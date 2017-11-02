@@ -6,7 +6,6 @@ Kristan, Kass, Jit
 '''
 
 """The object contain the various configurations for the simulation"""
-
 class Config():
     
     def __init__(self):

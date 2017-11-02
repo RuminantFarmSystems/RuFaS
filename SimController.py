@@ -6,6 +6,7 @@ Kristan, Kass, Jit
 '''
 
 '''Import all the required Data Structures'''
+from Config import Config
 from Crop import Crops
 from Herd import Herd
 from Manure import Manure
@@ -30,6 +31,7 @@ class SimController:
     
     'Constructor of a Simulation Controller Object'
     def __init__(self):
+        self.configurations = Crops()
         self.crop = Crops()
         self.herd = Herd()
         self.manure = Manure()

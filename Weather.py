@@ -11,7 +11,7 @@ represents the weather for a simulation."""
 class Weather:
 
     def __init__(self):
-        print("WEATHER REACHED")
+        pass
     
     def getTemperature(self):
         return self.temperature
