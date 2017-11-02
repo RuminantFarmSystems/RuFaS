@@ -9,7 +9,7 @@ Kristan, Kass, Jit
 runs a simulation. Functions in the class are divided based on time periods;
 year, month, day"""
 
-#from Weather import Weather
+from Weather import Weather
 
 class SimulationController:
 
@@ -82,10 +82,10 @@ class SimulationController:
 """Execution of the program begins here."""
 if __name__ == '__main__':
     
-#    SimWeather = Weather(20)
- #   print(SimWeather.getTemperature())
- #   SimWeather.setTemperature(50)
-  #  print(SimWeather.getTemperature())
+    SimWeather = Weather(20)
+    print(SimWeather.getTemperature())
+    SimWeather.setTemperature(50)
+    print(SimWeather.getTemperature())
 
 
     """
