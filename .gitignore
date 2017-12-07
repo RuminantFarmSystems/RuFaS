@@ -1,0 +1,12 @@
+# MASM .gitignore
+
+# ignore text files
+*.txt
+*.doc
+*.docx
+
+# ignore python compiled files
+*.pyc
+
+# ignore output folder
+Outputs

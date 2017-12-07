@@ -1,0 +1,31 @@
+#-------------------------------------------------------------------------------
+# Example MASM Input file
+# Sample.MASM
+# Kass Chupongstimun
+#-------------------------------------------------------------------------------
+
+@CONFIG
+#	Iterations	Years
+	2		3
+		
+     
+
+
+
+@OUTPUT
+#	OutputFilePath	OutputFileName
+	../Outputs/	Sample_1_out.txt
+
+@CROPS
+
+@FEED
+
+@FIELDOPS
+
+@HERD
+
+@HOUSING
+
+@MANURE
+
+@SOIL
