@@ -1,0 +1,30 @@
+#-------------------------------------------------------------------------------
+# Example MASM Input file
+# Sample.MASM
+# Kass Chupongstimun
+#-------------------------------------------------------------------------------
+
+@CONFIG
+#	Iterations	Years
+	1		xxx
+
+@OUTPUT
+#	Animal&Milk		C Loss			N Loss			P Loss
+# Active?
+	1			1			1			0
+# Output File Name
+	Custom_Animal_Milk.txt	0			Custom_Nitrogen.txt	0
+
+@CROPS
+
+@FEED
+
+@FIELDOPS
+
+@HERD
+
+@HOUSING
+
+@MANURE
+
+@SOIL
