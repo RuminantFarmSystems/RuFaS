@@ -8,13 +8,14 @@
 #          Jit Patil
 #
 ################################################################################
-
 import json
+import csv
 from pathlib import Path
 
-from MASM.output import OutputHandler
-from MASM.classes import State, Config, Weather
+from MASM.outputs import OutputHandler
 from MASM.errors import LengthMismatchError, JSONfileError, InvalidJSONfileError
+from MASM.classes import State, Config, Weather
+from pip._vendor.distlib.util import CSVReader
 
 #-------------------------------------------------------------------------------
 # Function: read_json_file
@@ -29,75 +30,141 @@ from MASM.errors import LengthMismatchError, JSONfileError, InvalidJSONfileError
 # Raises: InvalidJSONfileError - when there is a problem with the json file
 #-------------------------------------------------------------------------------
 def read_json_file(fPath:Path, s:State, c:Config, w:Weather, o:OutputHandler):
-
+    
     c.fName = fPath.name
-
+    
     with fPath.open('r') as f:
         data = json.load(f)
-
+        
         try:
             read_config(data['config'], c)
-            #read_weather(data['weather'], w, c)
-            #read_farm(data['farm'], s, c)
+            read_weather(data['weather'], w, c)
             read_output_options(data['output'], o, c)
-
+            read_farm(data['farm'], s, c, o)
+            
         except (JSONfileError, LengthMismatchError) as e:
             print(e.msg)
             raise InvalidJSONfileError(c.fName)
-
+        
         #except Exception:
-        #    print("Something wrong with {}".format(c.fName))
-        #    raise InvalidJSONfileError(c.fName)
-
+            #print("Something wrong with {}".format(c.fName))
+            #raise InvalidJSONfileError(c.fName)
+        
 #-------------------------------------------------------------------------------
 # Function: read_config
-#
+# 
 #-------------------------------------------------------------------------------
 def read_config(data, c:Config):
-
+    
     c.iterations = data['iterations']
     c.iterate = data['iterations'] > 1
     c.years = data['years']
 
 #-------------------------------------------------------------------------------
 # Function: read_output_options
-#
+# 
 #-------------------------------------------------------------------------------
 def read_output_options(data, o:OutputHandler, c:Config):
 
-    if len(data['reports']) != len(o.report_handlers):
+    if len(data) != len(o.report_handlers):
         raise LengthMismatchError(c.fName, "OUTPUT", len(o.report_handlers))
-
-    for name, report in data['reports'].items():
-        
-        if name not in o.report_handlers:
+    
+    for key, value in data.items():
+        if key not in o.report_handlers:
             raise JSONfileError(c.fName, "OUTPUT",
                                 "Output Report Handler name mismatch")
         else:
-            o.report_handlers[name].path = data['path']
-            o.report_handlers[name].active = report['active']
-            if report['file_name'] is not None:
-                o.report_handlers[name].fName = report['file_name']
-
-
+            o.report_handlers[key].active = value['active']
+            if data[key]['file_name'] is not None:
+                o.report_handlers[key].fName = value['file_name']
+            
+    
 #-------------------------------------------------------------------------------
 # Function: read_weather
-#
+# 1) Reads in rainfall data and stores date in w.rainfall
 #-------------------------------------------------------------------------------
-def read_weather(wPath:Path, w:Weather, c:Config):
+def read_weather(filePath:str, w:Weather, c:Config):    
+    
+    currentRow = 0
+    
+    w.rainfall = [[0 for i in range(365)]for j in range(c.years)]
+    w.tMax = [[0 for i in range(365)]for j in range(c.years)]
+    w.tMin = [[0 for i in range(365)]for j in range(c.years)]
+    w.tAvg = [[0 for i in range(365)]for j in range(c.years)]
+    w.biomass = [[0 for i in range(365)]for j in range(c.years)]
 
-    with wPath.open('r') as f:
-        pass
+    rainfallData = []
+    tMaxData = []
+    tMinData = []
+    tAvgData = []
+    bioMass = []
+    
+    with open(filePath, "r") as f:
+        readCSV = csv.reader(f, delimiter=',')
+        for row in readCSV:
+            if currentRow != 0:
+                # 1) Read rainfall data
+                rainfallData.append(row[1])
+                
+                # 2) Read max temperature data
+                tMaxData.append(row[2])
+                
+                # 3) Read min temperature data
+                tMinData.append(row[3])
+                
+                # 4) Read avg temperature data
+                tAvgData.append(row[4])
+                
+                # 5) Read biomass data
+                bioMass.append(row[5])
+            
+            currentRow += 1
+    
+    # 1) Update Rainfall in weather
+    for i in range(0, c.years):
+        for j in range(0, 365):
+            if (i*365+j) >= len(rainfallData):
+                break
+            else:
+                w.rainfall[i][j] = rainfallData[i*365 + j]
 
-        #
-        # Interpret weather file here
-        #
+    # 2) Update Max Temperature in weather
+    for i in range(0, c.years):
+        for j in range(0, 365):
+            if (i*365+j) >= len(tMaxData):
+                break
+            else:
+                w.tMax[i][j] = tMaxData[i*365 + j]
+                
+    # 3) Update Min Temperature in weather
+    for i in range(0, c.years):
+        for j in range(0, 365):
+            if (i*365+j) >= len(tMinData):
+                break
+            else:
+                w.tMin[i][j] = tMinData[i*365 + j]
 
-#-------------------------------------------------------------------------------
+    # 4) Update Avg Temperature in weather
+    for i in range(0, c.years):
+        for j in range(0, 365):
+            if (i*365+j) >= len(tAvgData):
+                break
+            else:
+                w.tAvg[i][j] = tAvgData[i*365 + j] 
+                
+    # 4) Update biomass in weather
+    for i in range(0, c.years):
+        for j in range(0, 365):
+            if (i*365+j) >= len(bioMass):
+                break
+            else:
+                w.biomass[i][j] = bioMass[i*365 + j]    #-------------------------------------------------------------------------------
 # Function: read_farm
-#
+# 
 #-------------------------------------------------------------------------------
-def read_farm(data, s:State, c:Config):
+def read_farm(data, s:State, c:Config, o:OutputHandler):
+    read_location(data['location'], s.location, c)
+    read_soil(data['soil'], s.soil, c, o)
 
     read_crops(data, s.crops, c)
     read_feed(data, s.feed, c)
@@ -105,53 +172,137 @@ def read_farm(data, s:State, c:Config):
     read_herd(data, s.herd, c)
     read_housing(data, s.housing, c)
     read_manure(data, s.manure, c)
-    read_soil(data, s.soil, c)
 
 #-------------------------------------------------------------------------------
+# Function: read_location
+# 
+#-------------------------------------------------------------------------------
+def read_location(f, loc, c:Config):
+    lat = 0.0
+    for key, value in f.items():
+        if(key == "Latitude"):
+            lat = value
+        else:
+            raise JSONfileError(c.fName, "Location", "Location Input Key Mismatch")
+    loc.latitude = lat
+#-------------------------------------------------------------------------------
 # Function: read_crops
-#
+# 
 #-------------------------------------------------------------------------------
 def read_crops(f, cp, c:Config):
     pass
 
 #-------------------------------------------------------------------------------
 # Function: read_feed
-#
+# 
 #-------------------------------------------------------------------------------
 def read_feed(f, fd, c:Config):
     pass
 
 #-------------------------------------------------------------------------------
 # Function: read_fieldOps
-#
+# 
 #-------------------------------------------------------------------------------
 def read_fieldOps(f, fo, c:Config):
     pass
 
 #-------------------------------------------------------------------------------
 # Function: read_herd
-#
+# 
 #-------------------------------------------------------------------------------
 def read_herd(f, hd, c:Config):
     pass
 
 #-------------------------------------------------------------------------------
 # Function: read_housing
-#
+# 
 #-------------------------------------------------------------------------------
 def read_housing(f, hs, c:Config):
     pass
 
 #-------------------------------------------------------------------------------
 # Function: read_manure
-#
+# 
 #-------------------------------------------------------------------------------
 def read_manure(f, mn, c:Config):
     pass
 
 #-------------------------------------------------------------------------------
 # Function: read_soil
-#
+# Reads the data-fields associated with the soil portion from the json file 
 #-------------------------------------------------------------------------------
-def read_soil(f, so, c:Config):
-    pass
+def read_soil(f, so, c:Config, o:OutputHandler):  
+    for key, value in f.items():
+        if(key == "ProfileDepth"):
+            so.profileDepth = value
+        elif(key == "CN2"):
+            so.CN2 = value
+        elif(key.startswith("Layer")):
+            read_soil_layer(key, f[key], so, c)
+        elif(key == "WiltingPoint"):
+            so.wiltingPoint = value
+        elif(key == "FieldCapacity"):
+            so.fieldCapacity = value        
+        elif(key == "Saturation"):
+            so.saturation = value 
+        elif(key == "FieldSlope"):
+            so.fieldSlope = value
+        elif(key == "SlopeLength"):
+            so.slopeLength = value
+        elif(key.startswith("Manning")):
+            so.manning = value
+        elif(key == "FieldSize"):
+            so.fieldSize = value
+        elif(key == "PracticeFactor"):
+            so.practiceFactor = value        
+        elif(key == "Orgc"):
+            so.orgc = value 
+        elif(key == "Sand"):
+            so.sand = value
+        elif(key == "Silt"):
+            so.silt = value
+        elif(key == "Clay"):
+            so.clay = value
+        else:
+            raise JSONfileError(c.fName, "Soil", "Soil Input Key Mismatch")
+   
+    # sort layers by bottomDepth 
+    so.listOfSoilLayers.sort(key=lambda x: x.bottomDepth) 
+    
+    # calculate initial depth of each soil layer
+    for x in range(0, len(so.listOfSoilLayers)):
+        if x == 0:
+            so.listOfSoilLayers[x].depth = so.listOfSoilLayers[x].bottomDepth
+        else:   
+            so.listOfSoilLayers[x].depth = (so.listOfSoilLayers[x].bottomDepth
+                - so.listOfSoilLayers[x-1].bottomDepth)
+    
+    so.convertCurrentSoilWaterToMM() # calculate initial soil water in layer
+    so.calculateWiltingWater() # calculate wilting water in layer
+    so.calculateFcWater() # calculate field capacity water in layer
+    
+    # initialize number of layer in soil summary report handler to get output
+    # data pertaining to each soil layer 
+    o.report_handlers.get("soil_Summary").setNumSoilLayers(
+        len(so.listOfSoilLayers))
+
+#-------------------------------------------------------------------------------
+# Function: read_soil_layer
+# Reads the data-fields associated with a layer of soil from the json file 
+#-------------------------------------------------------------------------------        
+def read_soil_layer(layerName, f, so, c:Config):
+    bottomDepth = 0.0
+    currentSoilWater = 0.0
+    kSat = 0.0
+    
+    for key, value in f.items():
+        if(key == "BottomDepth"):
+            bottomDepth = value   
+        elif(key == "StartingSoilWater"):
+            currentSoilWater = value
+        elif(key == "Ksat"):
+            kSat = value
+        else:
+            raise JSONfileError(c.fName, "SoilLayer", "Soil Layer Input Key Mismatch")
+        
+    so.addSoilLayer(layerName, bottomDepth, currentSoilWater, kSat)

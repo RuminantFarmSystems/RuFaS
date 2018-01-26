@@ -136,12 +136,25 @@ class Soil():
         self.saturation = 0.0        
         self.profileDepth = 0.0 
         self.CN2 = 0.0 # unitless, user-defined curve number (empirical)
+        self.dayInfiltraiton = 0.0 # daily infiltration
         
         # daily output values
         self.runoff = 0.0
         self.Etrans = 0.0
         self.E0 = 0.0
         self.Esoil = 0.0
+        
+        # soil erosion attributes
+        self.fieldSlope = 0.0
+        self.slopeLength = 0.0
+        self.manning = 0.0
+        self.fieldSize = 0.0
+        self.practiceFactor = 0.0
+        self.orgc = 0.0
+        self.sand = 0.0
+        self.silt = 0.0
+        self.clay = 0.0
+        self.sedimentYield = 0.0
 
     #---------------------------------------------------------------------------
     # Class: SoilLayer
@@ -150,7 +163,8 @@ class Soil():
     class SoilLayer():
         def __init__(self):
             self.name = None
-            self.bottomDepth = 0.0 # depth of soil layer
+            self.bottomDepth = 0.0 # bottom depth of soil layer
+            self.depth = 0.0 # depth of soil layer
             self.fcWater = 0.0 # constant
             self.wiltingWater = 0.0 # constant
             #self.currentSoilWater = 0.0
@@ -176,8 +190,9 @@ class Soil():
         soilLayer.name = name
         soilLayer.bottomDepth = bd
         #soilLayer.currentSoilWater = csw
-        soilLayer.ksat = ksat
+        soilLayer.ksat = ksat        
         self.listOfSoilLayers.append(soilLayer)
+        
              
     #---------------------------------------------------------------------------
     # Function: calculateFcWater
@@ -186,14 +201,9 @@ class Soil():
     #---------------------------------------------------------------------------
     def calculateFcWater(self):
         for x in range(0, len(self.listOfSoilLayers)):
-            if x == 0:
-                self.listOfSoilLayers[x].fcWater = (self.
-                    listOfSoilLayers[x].bottomDepth * self.fieldCapacity)
-            else:
-                self.listOfSoilLayers[x].fcWater = (self.
-                    listOfSoilLayers[x].bottomDepth- 
-                    self.listOfSoilLayers[x-1].bottomDepth) * self.fieldCapacity        
-
+            self.listOfSoilLayers[x].fcWater = (self.listOfSoilLayers[x].depth
+                    * self.fieldCapacity)
+            
     #---------------------------------------------------------------------------
     # Function: calculateWiltingWater
     # Calculates the amount of water in soil profile for a given layer at 
@@ -201,13 +211,8 @@ class Soil():
     #---------------------------------------------------------------------------          
     def calculateWiltingWater(self):
         for x in range(0, len(self.listOfSoilLayers)):
-            if x == 0:
-                self.listOfSoilLayers[x].wiltingWater = (self.
-                    listOfSoilLayers[x].bottomDepth * self.wiltingPoint)
-            else:
-                self.listOfSoilLayers[x].wiltingWater = (self.
-                    listOfSoilLayers[x].bottomDepth - 
-                    self.listOfSoilLayers[x-1].bottomDepth) * self.wiltingPoint 
+            self.listOfSoilLayers[x].wiltingWater = (self.listOfSoilLayers[x].
+                    depth * self.wiltingPoint)           
     
     #---------------------------------------------------------------------------
     # Function: convertCurrentSoilWaterToMM
@@ -216,13 +221,8 @@ class Soil():
     #---------------------------------------------------------------------------  
     def convertCurrentSoilWaterToMM(self):
         for x in range(0, len(self.listOfSoilLayers)):
-            if x == 0:
-                self.listOfSoilLayers[x].currentSoilWaterMM = (self.
-                    listOfSoilLayers[x].bottomDepth * self.fieldCapacity)
-            else:
-                self.listOfSoilLayers[x].currentSoilWaterMM = (self.
-                    listOfSoilLayers[x].bottomDepth- 
-                    self.listOfSoilLayers[x-1].bottomDepth) * self.fieldCapacity
+            self.listOfSoilLayers[x].currentSoilWaterMM = (
+                self.listOfSoilLayers[x].depth * self.fieldCapacity)        
     
     #---------------------------------------------------------------------------
     # Function: getSumSoilWater
@@ -294,7 +294,10 @@ class Soil():
             Q = ((float(dailyRainfall) - 0.2*s)**2) / (float(dailyRainfall) 
                                                        + 0.8*s) 
         
-        self.runoff = Q                  
+        self.runoff = Q 
+        
+        # daily infiltration (mm H20) 
+        self.dayInfiltraiton = float(dailyRainfall) - self.runoff              
 
     #---------------------------------------------------------------------------
     # Function: dailyEvapotranspiration
@@ -411,17 +414,10 @@ class Soil():
                           (self.listOfSoilLayers[x].fcWater))
             
             # travel time for percolation (h)
-            if x == 0:
-                self.listOfSoilLayers[x].TT = (((self.saturation*
-                    self.listOfSoilLayers[x].bottomDepth)-
+            self.listOfSoilLayers[x].TT = (((self.saturation*
+                    self.listOfSoilLayers[x].depth)-
                     self.listOfSoilLayers[x].fcWater)/ 
                                                self.listOfSoilLayers[x].ksat)
-            else:
-                self.listOfSoilLayers[x].TT = (((self.saturation*
-                    (self.listOfSoilLayers[x].bottomDepth-
-                     self.listOfSoilLayers[x-1].bottomDepth))-
-                    self.listOfSoilLayers[x].fcWater)/ 
-                                               self.listOfSoilLayers[x].ksat) 
             t = 24 # time step (hours)
             
             #amount of water that percolates
@@ -458,6 +454,77 @@ class Soil():
                         +self.listOfSoilLayers[x-1].perc))                    
 
     #---------------------------------------------------------------------------
+    # Function: dailySoilErosion
+    # Use MUSLE approach (equations taken from SWAT 2009 documentation) to 
+    # determine soil erosion
+    #--------------------------------------------------------------------------- 
+    def dailySoilErosion(self, rainfall, jday):
+        
+        # time of concentration (h)
+        Tconc = ((self.slopeLength**0.6) * (self.manning**0.6)) / (
+            18 * (self.fieldSlope**0.3))
+        
+        alphaMean = (0.02083 + (1 - math.exp(-125 / (float(rainfall) + 5))))/2
+        
+        # fraction of daily rain during time of concentration
+        alpha = 1 - math.exp(2 * Tconc * math.log(1 - alphaMean))
+
+        # rain amount during time of concentration (mm)
+        Rtc = alpha * float(rainfall)
+    
+        # rainfall intensity (mm/hr)
+        I = Rtc / Tconc
+        
+        # peak runoff rate (m**3/sec)
+        Qpeak = 0.0
+        if float(rainfall) != 0:
+            Qpeak = ((self.runoff/float(rainfall)) * I * 
+                     self.fieldSize) / 3.6
+        
+        # gives low factors for soils with high sand contents and high values 
+        # for soils with little sand
+        Fcsand = 0.2 + 0.3 * math.exp(-0.256 * self.sand * (1-
+                                                (self.silt/100)))
+        
+        # gives low factors for soils with high clay to silt ratios
+        Fclsi = (self.silt / (self.clay + self.silt))**0.3
+        
+        # reduces soil erodibility for soils with high organic carbon content 
+        Forgc = 1 - ((0.25 * self.orgc) / (self.orgc 
+                            + math.exp(3.72 - 2.95 * self.orgc)))
+        
+        # reduces soil erodibility for soils with high sand contents
+        Fsand = 1 - (0.7 * (1 - self.sand/100) / ((1 - self.sand/100) + 
+                        math.exp(-5.51 + 22.9 * (1 / (self.sand/100)))))
+        
+        # USLE soil erodibility factor (Mg MJ**-1 mm**-1)
+        K = Fcsand * Fclsi * Forgc * Fsand
+        
+        
+        # C is USLE cover and management factor
+        # 0.05 is the minimum value for C. This is an estimate.
+        # 250 (COVER) NEEDS TO BE CHANGED (BIOMASS)
+        C = math.exp((math.log(0.8) - math.log(0.05)) * 
+                     math.exp(-0.00115 * 250) + math.log(0.05))
+        
+        
+        # the exponential term m is calculated as...
+        m = 0.6 * (1 - math.exp(-35.835 * self.fieldSlope))
+        
+        # angle of the slope
+        alphahill = math.tan(self.fieldSlope)
+        
+        # USLE topographic factor
+        LS = ((self.slopeLength / 22.1)**m) * (65.41 * (math.sin(alphahill)**2)
+                    + 4.56 * math.sin(alphahill) + 0.065) 
+        
+        # sediment yield on a given day (metric tons)
+        # Qpeak is peak runoff rate (m3/sec)
+        sed = 11.8 * ((self.runoff * Qpeak)**0.56
+                      ) * K * C * self.practiceFactor * LS
+        self.sedimentYield = sed
+    
+    #---------------------------------------------------------------------------
     # Function: updateDailyOutput
     # Stores the daily values that need to be printed in the 'soil summary'
     # cvs file
@@ -478,6 +545,8 @@ class Soil():
                                     self.listOfSoilLayers[x].layerEsoil)
             SoilSumReportHandler.layersPerc[x].append(
                                     self.listOfSoilLayers[x].perc)
+            
+        SoilSumReportHandler.sedimentYield.append(self.sedimentYield)
 
     def annual_reset(self):
         pass

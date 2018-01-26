@@ -48,6 +48,7 @@ class SoilSummary(ReportHandler):
         self.potentialEvapotranspiration = []
         self.cropTranspiration = []
         self.sublimation = []
+        self.sedimentYield = []
         self.numSoilLayers = 0
     
     #---------------------------------------------------------------------------
@@ -90,6 +91,8 @@ class SoilSummary(ReportHandler):
             for x in range(0, self.numSoilLayers):
                 fieldnames.append("Perc/L" + str(x+1))
                 
+            fieldnames.append("Sediment Yield")
+            
             writer = csv.DictWriter(csvfile, fieldnames=fieldnames, 
                                     lineterminator = '\n')
             writer.writeheader()
@@ -99,7 +102,8 @@ class SoilSummary(ReportHandler):
                              'Rainfall': "mm", 'Runoff (Q)': "mm", 
                              'Potential Evapotranspiration (E0)': "mm d^-1",
                              'Crop Transpiration (Etrans)': "mm H2O",
-                             'Maximum Sublimation (Esoil)': "mm H2O"}
+                             'Maximum Sublimation (Esoil)': "mm H2O",
+                             'Sediment Yield': "metric tons"}
             for fieldname in fieldnames:
                 if fieldname.startswith("SoilWater"):
                     units[fieldname] = 'mm'
@@ -120,7 +124,8 @@ class SoilSummary(ReportHandler):
                     'Crop Transpiration (Etrans)': str(round
                                     (self.cropTranspiration[x],3)),
                     'Maximum Sublimation (Esoil)': str(round
-                                    (self.sublimation[x],3))}
+                                    (self.sublimation[x],3)),
+                    'Sediment Yield': str(round(self.sedimentYield[x],3))}
                 
                 for y in range(0, self.numSoilLayers):
                         dailySoilData["SoilWater/L" + str(y+1)] = str(

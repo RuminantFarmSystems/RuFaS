@@ -100,7 +100,10 @@ def daily_simulation():
             , weather.biomass[time.y-1][time.MMDD_to_JulianDay(time.m, time.d)-1]
             , state.location.latitude)
         
-        state.soil.dailyPercolation()   
+        state.soil.dailyPercolation()  
+        
+        state.soil.dailySoilErosion(weather.rainfall[time.y-1]
+                                  [time.MMDD_to_JulianDay(time.m, time.d)-1], time.MMDD_to_JulianDay(time.m, time.d)) 
         
         state.soil.updateDailyOutput(output_handler.report_handlers.get
                     ("soil_Summary"), weather.rainfall[time.y-1]
