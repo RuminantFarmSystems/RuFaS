@@ -12,7 +12,7 @@
 #!/usr/bin/env python3
 
 from MASM.simulation_engine import MASM_Simulate
-from MASM.inputs import MASM_prompt_input
+from MASM.input import MASM_prompt_input
 
 #-------------------------------------------------------------------------------
 # Function: main

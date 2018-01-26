@@ -13,8 +13,8 @@
 from pathlib import Path
 
 from MASM.classes import State, Config, Time, Weather
-from MASM.outputs import OutputHandler
-from MASM.inputs import read_json_file
+from MASM.output import OutputHandler
+from MASM.input import read_json_file
 from MASM.errors import InvalidJSONfileError
 
 # Import all 'main' simulation routines
