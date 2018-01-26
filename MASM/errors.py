@@ -28,17 +28,6 @@ class InvalidJSONfileError(Exception):
         self.msg = "Skipping simulation for {}\n".format(fName)
         
 #-------------------------------------------------------------------------------
-# Class: ParsingError
-#
-#-------------------------------------------------------------------------------     
-class ParsingError(Exception):
-    
-    def __init__(self, fName, section, line, kind):
-        self.msg = ("MASM FILE PARSING ERROR: " + fName + "\n\t"
-                    + section + " section at line " + str(line) + "\n\t"
-                    + "Data on this line must be parsable as " + kind)
-        
-#-------------------------------------------------------------------------------
 # Class: LengthMismatchError
 #
 #-------------------------------------------------------------------------------     

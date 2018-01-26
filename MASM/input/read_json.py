@@ -12,10 +12,9 @@ import json
 import csv
 from pathlib import Path
 
-from MASM.outputs import OutputHandler
+from MASM.output import OutputHandler
 from MASM.errors import LengthMismatchError, JSONfileError, InvalidJSONfileError
 from MASM.classes import State, Config, Weather
-from pip._vendor.distlib.util import CSVReader
 
 #-------------------------------------------------------------------------------
 # Function: read_json_file
@@ -87,11 +86,11 @@ def read_weather(filePath:str, w:Weather, c:Config):
     
     currentRow = 0
     
-    w.rainfall = [[0 for i in range(365)]for j in range(c.years)]
-    w.tMax = [[0 for i in range(365)]for j in range(c.years)]
-    w.tMin = [[0 for i in range(365)]for j in range(c.years)]
-    w.tAvg = [[0 for i in range(365)]for j in range(c.years)]
-    w.biomass = [[0 for i in range(365)]for j in range(c.years)]
+    w.rainfall = [[0 for _ in range(365)]for _ in range(c.years)]
+    w.tMax = [[0 for _ in range(365)]for _ in range(c.years)]
+    w.tMin = [[0 for _ in range(365)]for _ in range(c.years)]
+    w.tAvg = [[0 for _ in range(365)]for _ in range(c.years)]
+    w.biomass = [[0 for _ in range(365)]for _ in range(c.years)]
 
     rainfallData = []
     tMaxData = []
@@ -158,20 +157,23 @@ def read_weather(filePath:str, w:Weather, c:Config):
             if (i*365+j) >= len(bioMass):
                 break
             else:
-                w.biomass[i][j] = bioMass[i*365 + j]    #-------------------------------------------------------------------------------
+                w.biomass[i][j] = bioMass[i*365 + j]
+
+#-------------------------------------------------------------------------------
 # Function: read_farm
 # 
 #-------------------------------------------------------------------------------
 def read_farm(data, s:State, c:Config, o:OutputHandler):
+    
     read_location(data['location'], s.location, c)
     read_soil(data['soil'], s.soil, c, o)
 
-    read_crops(data, s.crops, c)
-    read_feed(data, s.feed, c)
-    read_fieldOps(data, s.fieldOps, c)
-    read_herd(data, s.herd, c)
-    read_housing(data, s.housing, c)
-    read_manure(data, s.manure, c)
+    #read_crops(data, s.crops, c)
+    #read_feed(data, s.feed, c)
+    #read_fieldOps(data, s.fieldOps, c)
+    #read_herd(data, s.herd, c)
+    #read_housing(data, s.housing, c)
+    #read_manure(data, s.manure, c)
 
 #-------------------------------------------------------------------------------
 # Function: read_location
@@ -185,47 +187,6 @@ def read_location(f, loc, c:Config):
         else:
             raise JSONfileError(c.fName, "Location", "Location Input Key Mismatch")
     loc.latitude = lat
-#-------------------------------------------------------------------------------
-# Function: read_crops
-# 
-#-------------------------------------------------------------------------------
-def read_crops(f, cp, c:Config):
-    pass
-
-#-------------------------------------------------------------------------------
-# Function: read_feed
-# 
-#-------------------------------------------------------------------------------
-def read_feed(f, fd, c:Config):
-    pass
-
-#-------------------------------------------------------------------------------
-# Function: read_fieldOps
-# 
-#-------------------------------------------------------------------------------
-def read_fieldOps(f, fo, c:Config):
-    pass
-
-#-------------------------------------------------------------------------------
-# Function: read_herd
-# 
-#-------------------------------------------------------------------------------
-def read_herd(f, hd, c:Config):
-    pass
-
-#-------------------------------------------------------------------------------
-# Function: read_housing
-# 
-#-------------------------------------------------------------------------------
-def read_housing(f, hs, c:Config):
-    pass
-
-#-------------------------------------------------------------------------------
-# Function: read_manure
-# 
-#-------------------------------------------------------------------------------
-def read_manure(f, mn, c:Config):
-    pass
 
 #-------------------------------------------------------------------------------
 # Function: read_soil
@@ -283,7 +244,7 @@ def read_soil(f, so, c:Config, o:OutputHandler):
     
     # initialize number of layer in soil summary report handler to get output
     # data pertaining to each soil layer 
-    o.report_handlers.get("soil_Summary").setNumSoilLayers(
+    o.report_handlers['soil_summary'].setNumSoilLayers(
         len(so.listOfSoilLayers))
 
 #-------------------------------------------------------------------------------
@@ -306,3 +267,47 @@ def read_soil_layer(layerName, f, so, c:Config):
             raise JSONfileError(c.fName, "SoilLayer", "Soil Layer Input Key Mismatch")
         
     so.addSoilLayer(layerName, bottomDepth, currentSoilWater, kSat)
+    
+"""
+#-------------------------------------------------------------------------------
+# Function: read_crops
+# 
+#-------------------------------------------------------------------------------
+def read_crops(f, cp, c:Config):
+    pass
+
+#-------------------------------------------------------------------------------
+# Function: read_feed
+# 
+#-------------------------------------------------------------------------------
+def read_feed(f, fd, c:Config):
+    pass
+
+#-------------------------------------------------------------------------------
+# Function: read_fieldOps
+# 
+#-------------------------------------------------------------------------------
+def read_fieldOps(f, fo, c:Config):
+    pass
+
+#-------------------------------------------------------------------------------
+# Function: read_herd
+# 
+#-------------------------------------------------------------------------------
+def read_herd(f, hd, c:Config):
+    pass
+
+#-------------------------------------------------------------------------------
+# Function: read_housing
+# 
+#-------------------------------------------------------------------------------
+def read_housing(f, hs, c:Config):
+    pass
+
+#-------------------------------------------------------------------------------
+# Function: read_manure
+# 
+#-------------------------------------------------------------------------------
+def read_manure(f, mn, c:Config):
+    pass
+"""

@@ -17,47 +17,19 @@
             "soil_Summary":
             {
                 "active": true,
-                "file_name": "soil_summary.txt"
-            },
-            "animal_milk":
-            {
-                "active": true,
-                "file_name": "Custom_Animal_Milk.txt"
-            },
-            "forage":
-            {
-                "active": false,
-                "file_name": null
-            },
-            "grain":
-            {
-                "active": false,
-                "file_name": null
-            },
-            "carbon_loss":
-            {
-                "active": true,
-                "file_name": null
-            },
-            "nitrogen_loss":
-            {
-                "active": true,
-                "file_name": "Custom_Nitrogen_Loss.txt"
-            },
-            "phosphorus_loss":
-            {
-                "active": false,
-                "file_name": null
+                "file_name": "soil_summary.csv"
             }
         }
     },
 
     "farm":
     {
+    
       "location":
       {
           "Latitude": 0.7309
       },
+      
       "soil":
       {
           "WiltingPoint": 0.1,
