@@ -1,2 +1,2 @@
 
-from MASM.outputs.output_handler import OutputHandler
+from MASM.output.output_handler import OutputHandler

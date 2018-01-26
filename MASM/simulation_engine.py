@@ -16,8 +16,7 @@ from MASM.classes import State, Config, Time, Weather
 from MASM.output import OutputHandler
 from MASM.input import read_json_file
 from MASM.errors import InvalidJSONfileError
-
-# Import all 'main' simulation routines
+import MASM.routines as routines
 
 #
 # Define Module Global Variables
@@ -29,7 +28,7 @@ weather = None
 output_handler = None
 
 #-------------------------------------------------------------------------------
-# Function: MASM_Simulate
+# Function: simulate
 #           Executes the simulation using the json file at the path specified
 #           Deals with simulation iterations as specified
 #           Skips over the simulation (immediately returns) when an error in
@@ -37,7 +36,7 @@ output_handler = None
 #
 # Parameters: input_fPath - path to the input json file
 #------------------------------------------------------------------------------- 
-def MASM_Simulate(input_fPath:Path):
+def simulate(input_fPath:Path):
     
     #
     # Instantiates global variables for this simulation
@@ -82,41 +81,12 @@ def daily_simulation():
     # Daily Routines
     # Pass only information needed
     #
+    routines.daily_soil_routine(state.soil, state.location, weather, time)
     
-    # This IF statement is in place because of the soil hydrology file Pete has
-    # provided. His values are calculated starting from day 274 of year 1. 
-    if time.MMDD_to_JulianDay(time.m, time.d) >= 274 or time.y > 1:
-                
-        # calculate daily runoff (soil)
-        state.soil.dailyInfiltration(weather.rainfall[time.y-1]
-                                  [time.MMDD_to_JulianDay(time.m, time.d)-1],
-                                  weather.cumulative)
-    
-        # calculate daily transpiration (soil)
-        state.soil.dailyEvapotranspiration(time.MMDD_to_JulianDay(time.m, time.d)
-            , weather.tMax[time.y-1][time.MMDD_to_JulianDay(time.m, time.d)-1]
-            , weather.tMin[time.y-1][time.MMDD_to_JulianDay(time.m, time.d)-1]
-            , weather.tAvg[time.y-1][time.MMDD_to_JulianDay(time.m, time.d)-1]
-            , weather.biomass[time.y-1][time.MMDD_to_JulianDay(time.m, time.d)-1]
-            , state.location.latitude)
-        
-        state.soil.dailyPercolation()  
-        
-        state.soil.dailySoilErosion(weather.rainfall[time.y-1]
-                                  [time.MMDD_to_JulianDay(time.m, time.d)-1], time.MMDD_to_JulianDay(time.m, time.d)) 
-        
-        state.soil.updateDailyOutput(output_handler.report_handlers.get
-                    ("soil_Summary"), weather.rainfall[time.y-1]
-                    [time.MMDD_to_JulianDay(time.m, time.d)-1], 
-                    time.MMDD_to_JulianDay(time.m, time.d), time.y)
-        
-        if float(weather.tAvg[time.y-1][time.MMDD_to_JulianDay(time.m, time.d)-1]) > 0:
-            weather.cumulative = max(-10, min(20, weather.cumulative + 1.0))
-        else:
-            weather.cumulative = max(-10, min(20, weather.cumulative - 1.0)) 
-            
-        state.soil.updateCurrentSoilWater(weather.rainfall[time.y-1]
-            [time.MMDD_to_JulianDay(time.m, time.d)-1])       
+    #
+    # Daily Output Updates
+    #
+    output_handler.report_handlers['soil_summary'].daily_update(state.soil, weather, time)
     
     time.advance()
 

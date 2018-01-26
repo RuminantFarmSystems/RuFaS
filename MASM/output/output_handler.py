@@ -10,6 +10,7 @@
 ################################################################################
 
 from pathlib import Path
+from abc import ABC, abstractmethod
 import os
 
 #-------------------------------------------------------------------------------
@@ -21,14 +22,10 @@ class OutputHandler():
 
     def __init__(self):
 
-        self.report_handlers = {'animal_milk': AnimalMilk(),
-                                'forage': Forage(),
-                                'grain': Grain(),
-                                'carbon_loss': CarbonLoss(),
-                                'nitrogen_loss': NitrogenLoss(),
-                                'phosphorus_loss': PhosphorusLoss(),
-                                'soil_Summary': SoilSummary()}
-
+        self.report_handlers = {
+                                'soil_summary': SoilSummary()
+                                }
+        
     #---------------------------------------------------------------------------
     # Function: write_annual_reports
     #
@@ -68,11 +65,11 @@ class OutputHandler():
                 handler.annual_flush()
 
 #-------------------------------------------------------------------------------
-# Class: ReportHandler
+# Abstract Class: ReportHandler
 #        Contains every all the information printed in a yearly report
 #        Information is flushed at the beginning of every year
 #-------------------------------------------------------------------------------
-class ReportHandler():
+class ReportHandler(ABC):
 
     def __init__(self, reportName, fName):
 
@@ -106,11 +103,16 @@ class ReportHandler():
         else:
             index = self.fName.rfind(str(i - 1))
             self.fname = self.fName[:index] + str(i) + self.fName [index + 1:]
+            
+    #---------------------------------------------------------------------------
+    # Abstract Methods
+    #---------------------------------------------------------------------------
+    @abstractmethod
+    def daily_update(self): pass
+    @abstractmethod
+    def compile_annual_report(self): pass
+    @abstractmethod
+    def annual_flush(self): pass
 
-from .animal_milk import AnimalMilk
-from .forage import Forage
-from .grain import Grain
-from .carbon_loss import CarbonLoss
-from .nitrogen_loss import NitrogenLoss
-from .phosphorus_loss import PhosphorusLoss
+
 from .soil_summary import SoilSummary

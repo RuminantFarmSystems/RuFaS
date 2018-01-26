@@ -17,6 +17,7 @@ import csv
 #        
 #-------------------------------------------------------------------------------
 class SoilSummary(ReportHandler):
+    
     layersSoilWater = []
     layersEsoil = []
     layersPerc = []
@@ -49,7 +50,7 @@ class SoilSummary(ReportHandler):
         self.cropTranspiration = []
         self.sublimation = []
         self.sedimentYield = []
-        self.numSoilLayers = 0
+        self.numSoilLayers = 0   
     
     #---------------------------------------------------------------------------
     # Function: setNumSoilLayers
@@ -58,7 +59,7 @@ class SoilSummary(ReportHandler):
     #--------------------------------------------------------------------------- 
     def setNumSoilLayers(self, numSoilLayers):
         self.numSoilLayers = numSoilLayers
-        for x in range (0, numSoilLayers):
+        for _ in range (0, numSoilLayers):
             soilLayerSoilWater = []
             self.layersSoilWater.append(soilLayerSoilWater)
             
@@ -67,7 +68,15 @@ class SoilSummary(ReportHandler):
             
             soilLayerPerc = []
             self.layersPerc.append(soilLayerPerc)
-        
+
+    #---------------------------------------------------------------------------
+    # Function: updateDailyOutput
+    # Stores the daily values that need to be printed in the 'soil summary'
+    # csv file
+    #--------------------------------------------------------------------------- 
+    def daily_update(self, soil, weather, time):
+        pass
+    
     #---------------------------------------------------------------------------
     # Function: compile_annual_report
     #           Appends the annual report to the output file
