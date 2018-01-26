@@ -8,6 +8,7 @@
 #          Jit Patil
 #
 ################################################################################
+
 import json
 import csv
 from pathlib import Path
@@ -55,9 +56,13 @@ def read_json_file(fPath:Path, s:State, c:Config, w:Weather, o:OutputHandler):
 #-------------------------------------------------------------------------------
 def read_config(data, c:Config):
     
-    c.iterations = data['iterations']
-    c.iterate = data['iterations'] > 1
-    c.years = data['years']
+    try:
+        c.iterations = data['iterations']
+        c.iterate = data['iterations'] > 1
+        c.years = data['years']
+        
+    except KeyError:
+        raise JSONfileError(c.fName, "CONFIG", "Config Input Key Mismatch")
 
 #-------------------------------------------------------------------------------
 # Function: read_output_options
@@ -179,20 +184,20 @@ def read_farm(data, s:State, c:Config, o:OutputHandler):
 # Function: read_location
 # 
 #-------------------------------------------------------------------------------
-def read_location(f, loc, c:Config):
-    lat = 0.0
-    for key, value in f.items():
-        if(key == "Latitude"):
-            lat = value
-        else:
-            raise JSONfileError(c.fName, "Location", "Location Input Key Mismatch")
-    loc.latitude = lat
+def read_location(data, location, c:Config):
+    
+    try:
+        location.latitude = data['latitude']
+        
+    except KeyError:
+        raise JSONfileError(c.fName, "Location", "Location Input Key Mismatch")
 
 #-------------------------------------------------------------------------------
 # Function: read_soil
 # Reads the data-fields associated with the soil portion from the json file 
 #-------------------------------------------------------------------------------
-def read_soil(f, so, c:Config, o:OutputHandler):  
+def read_soil(f, so, c:Config, o:OutputHandler):
+     
     for key, value in f.items():
         if(key == "ProfileDepth"):
             so.profileDepth = value

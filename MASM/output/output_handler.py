@@ -11,12 +11,11 @@
 
 from pathlib import Path
 from abc import ABC, abstractmethod
-import os
 
 #-------------------------------------------------------------------------------
 # Class: OutputHandler
-#        Contains every all the information printed in a yearly report
-#        Information is flushed at the beginning of every year
+#        Contains a dictionary of all the report handlers
+#        Handles output related interactions
 #-------------------------------------------------------------------------------
 class OutputHandler():
 
@@ -35,11 +34,11 @@ class OutputHandler():
 
         for _, handler in self.report_handlers.items():
             if handler.active:
-                mode = 'a+' if os.path.exists(handler.path) else 'w+'
+                mode = 'a+' if handler.get_fPath().exists() else 'w+'
                 if isinstance(handler, SoilSummary):
                     handler.compile_annual_report()
                 else:
-                    with open(handler.path, mode) as f:
+                    with handler.get_fPath().open(mode) as f:
                         f.write(handler.compile_annual_report(y))
 
     #---------------------------------------------------------------------------
@@ -76,7 +75,7 @@ class ReportHandler(ABC):
         self.active = True
         self.reportName = reportName
         self.fName = fName
-        self.path = Path("./Outputs/" + self.fName)
+        self.path = "./Outputs/"
 
     #---------------------------------------------------------------------------
     # Function: get_fPath
