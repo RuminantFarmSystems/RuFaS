@@ -131,6 +131,22 @@ class Time():
         julianDay += date
         return julianDay
     
+    #----------------------------------------------------------------------------
+    # Function: julian_day
+    # Returns: returns the julian day of the year given a particular month and 
+    # dat
+    #----------------------------------------------------------------------------    
+    def julian_day(self):
+        
+        day_in_months = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31]
+        
+        julian_day = 0
+        for i in range(0, self.m - 1):
+            julian_day += day_in_months[i]
+        julian_day += self.d
+        
+        return julian_day
+    
     #---------------------------------------------------------------------------
     # Function: advance_iteration
     #           Resets the time at the end of a simulation cycle
