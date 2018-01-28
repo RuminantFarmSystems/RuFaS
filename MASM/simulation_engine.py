@@ -25,7 +25,7 @@ state = None
 config = None
 time = None
 weather = None
-output_handler = None
+output = None
 
 #-------------------------------------------------------------------------------
 # Function: simulate
@@ -48,7 +48,7 @@ def simulate(input_fPath:Path):
     # Reads the json input file
     #
     try:
-        read_json_file(input_fPath, state, config, weather, output_handler)
+        read_json_file(input_fPath, state, config, weather, output)
     except InvalidJSONfileError as e:
         print(e.msg)
         return
@@ -61,7 +61,7 @@ def simulate(input_fPath:Path):
         print("Simulating: {} Iteration: {}".format(config.fName, time.i))
         
         if config.iterate:
-            output_handler.update_fNames(time.i)
+            output.update_fNames(time.i)
             #config.modify_parameters(time.i)
 
         while not end_simulation():
@@ -79,7 +79,8 @@ def daily_simulation():
     
     # This IF statement is in place because of the soil hydrology file Pete has
     # provided. His values are calculated starting from day 274 of year 1.
-    if time.MMDD_to_JulianDay(time.m, time.d) >= 274 or time.y > 1:
+    if time.julian_day() >= 274 or time.y > 1:
+        
         #
         # Daily Routines
         # Pass only information needed
@@ -89,8 +90,7 @@ def daily_simulation():
         #
         # Daily Output Updates
         #
-        output_handler.report_handlers['soil_summary'].daily_update(state.soil, 
-                                                                weather, time)
+        output.reports['soil_summary'].daily_update(state.soil, weather, time)
     
         #
         # Daily Attribute Updates
@@ -129,8 +129,8 @@ def annual_simulation():
     #
     # Annual Routines
     #
-    output_handler.write_annual_reports(time)
-    output_handler.annual_flush()
+    output.write_annual_reports(time)
+    output.annual_flush()
     state.annual_reset()
     time.advance()
     
@@ -157,10 +157,10 @@ def end_iterations():
 #------------------------------------------------------------------------------- 
 def initialize_globals():
     
-    global state, config, time, weather, output_handler
+    global state, config, time, weather, output
     state = State()
     config = Config()
     weather = Weather()
     time = Time()
-    output_handler = OutputHandler()
+    output = OutputHandler()
     
