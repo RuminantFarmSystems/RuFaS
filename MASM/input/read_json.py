@@ -256,8 +256,7 @@ def read_soil(f, so, c:Config, o:OutputHandler):
     
     # initialize number of layer in soil summary report handler to get output
     # data pertaining to each soil layer 
-    o.report_handlers['soil_summary'].setNumSoilLayers(
-        len(so.listOfSoilLayers))
+    o.reports['soil_summary'].setNumSoilLayers(len(so.listOfSoilLayers))
 
 #-------------------------------------------------------------------------------
 # Function: read_soil_layer
