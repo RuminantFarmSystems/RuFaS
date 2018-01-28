@@ -19,15 +19,15 @@ def daily_soil_routine(soil, location, weather, time):
                    
     # calculate daily runoff 
     soil.dailyInfiltration(weather.rainfall[time.y-1]
-                                  [time.MMDD_to_JulianDay(time.m, time.d)-1],
+                                  [time.julian_day()-1],
                                   weather.cumulative)
     
     # calculate daily transpiration 
-    soil.dailyEvapotranspiration(time.MMDD_to_JulianDay(time.m, time.d)
-        , weather.tMax[time.y-1][time.MMDD_to_JulianDay(time.m, time.d)-1]
-        , weather.tMin[time.y-1][time.MMDD_to_JulianDay(time.m, time.d)-1]
-        , weather.tAvg[time.y-1][time.MMDD_to_JulianDay(time.m, time.d)-1]
-        , weather.biomass[time.y-1][time.MMDD_to_JulianDay(time.m, time.d)-1]
+    soil.dailyEvapotranspiration(time.julian_day()
+        , weather.tMax[time.y-1][time.julian_day()-1]
+        , weather.tMin[time.y-1][time.julian_day()-1]
+        , weather.tAvg[time.y-1][time.julian_day()-1]
+        , weather.biomass[time.y-1][time.julian_day()-1]
         , location.latitude)
         
     # calculate daily percolation
@@ -35,8 +35,8 @@ def daily_soil_routine(soil, location, weather, time):
         
     # calculate daily soil erosion
     soil.dailySoilErosion(weather.rainfall[time.y-1]
-        [time.MMDD_to_JulianDay(time.m, time.d)-1], 
-        time.MMDD_to_JulianDay(time.m, time.d)) 
+        [time.julian_day()-1], 
+        time.julian_day()) 
                         
         
 #------------------------------------------------------------------------------
@@ -46,14 +46,14 @@ def daily_soil_routine(soil, location, weather, time):
 def daily_soil_update(soil, weather, time):
                 
     # update indicator (var cumulative) of whether soil is frozen
-    if float(weather.tAvg[time.y-1][time.MMDD_to_JulianDay(time.m, time.d)-1]) > 0:
+    if float(weather.tAvg[time.y-1][time.julian_day()-1]) > 0:
         weather.cumulative = max(-10, min(20, weather.cumulative + 1.0))
     else:
         weather.cumulative = max(-10, min(20, weather.cumulative - 1.0))
             
     # update current soil water    
     soil.updateCurrentSoilWater(weather.rainfall[time.y-1]
-        [time.MMDD_to_JulianDay(time.m, time.d)-1]) 
+        [time.julian_day()-1]) 
 
 #-------------------------------------------------------------------------------
 # Class: Soil

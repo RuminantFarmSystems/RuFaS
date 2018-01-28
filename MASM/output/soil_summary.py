@@ -24,7 +24,7 @@ class SoilSummary(ReportHandler):
     
     def __init__(self):
              
-        #super().__init__("Soil Summary", "Soil_Summary.csv")
+        super().__init__("Soil Summary", "Soil_Summary.csv")
                  
         #
         # Yearly Output
@@ -76,8 +76,8 @@ class SoilSummary(ReportHandler):
     #--------------------------------------------------------------------------- 
     def daily_update(self, soil, weather, time):
         self.updateDailySoilOutput(soil, weather.rainfall[time.y-1]
-                    [time.MMDD_to_JulianDay(time.m, time.d)-1], 
-                    time.MMDD_to_JulianDay(time.m, time.d), time.y) 
+                    [time.julian_day()-1], 
+                    time.julian_day(), time.y) 
     
     #---------------------------------------------------------------------------
     # Function: updateDailySoilOutput
@@ -109,7 +109,8 @@ class SoilSummary(ReportHandler):
     # Soil Summary is a cvsfile
     #---------------------------------------------------------------------------
     def compile_annual_report(self):
-        with open(self.path, 'w') as csvfile:
+        
+        with self.get_fPath().open('w') as csvfile:
             
             # 1) Initialize the header of the cvsfile
             fieldnames = ['Year', 'Julian Day', 'Rainfall', 'Runoff (Q)',
