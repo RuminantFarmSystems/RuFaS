@@ -69,29 +69,30 @@ def read_config(data, c:Config):
 # 
 #-------------------------------------------------------------------------------
 def read_output_options(data, o:OutputHandler, c:Config):
-    
-    directory = data['path']
-    reports = data['reports']
 
-    if len(reports) != len(o.report_handlers):
-        raise LengthMismatchError(c.fName, "OUTPUT", len(o.report_handlers))
+    if len(data) != len(o.reports):
+        raise LengthMismatchError(c.fName, "OUTPUT", len(o.reports))
     
-    for key, value in reports.items():
-        if key not in o.report_handlers:
+    
+    for key in data:
+        try:
+            o.reports[key].active = data[key]['active']
+            if data[key]['file_name'] is not None:
+                o.reports[key].fName = data[key]['file_name']
+            if data[key]['path'] is not None:
+                    o.reports[key].path = data[key]['path']
+        except KeyError:
             raise JSONfileError(c.fName, "OUTPUT",
-                                "Output Report Handler name mismatch")
-        else:
-            o.report_handlers[key].active = value['active']
-            if reports[key]['file_name'] is not None:
-                o.report_handlers[key].fName = value['file_name']
-                o.report_handlers[key].path = directory + o.report_handlers[key].fName
+                                "Output Report Handler name mismatch: " + key)
             
     
 #-------------------------------------------------------------------------------
 # Function: read_weather
 # 1) Reads in rainfall data and stores date in w.rainfall
 #-------------------------------------------------------------------------------
-def read_weather(filePath:str, w:Weather, c:Config):    
+def read_weather(weather_fPath_str, w:Weather, c:Config):    
+    
+    fPath = Path(weather_fPath_str)
     
     currentRow = 0
     
@@ -107,7 +108,7 @@ def read_weather(filePath:str, w:Weather, c:Config):
     tAvgData = []
     bioMass = []
     
-    with open(filePath, "r") as f:
+    with fPath.open('r') as f:
         readCSV = csv.reader(f, delimiter=',')
         for row in readCSV:
             if currentRow != 0:
