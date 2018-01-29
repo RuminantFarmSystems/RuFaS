@@ -45,18 +45,6 @@ class OutputHandler():
                 report.write_annual_report()
 
     #---------------------------------------------------------------------------
-    # Function: update_fNames
-    #           Adds a suffix of "_Iteration_i_" to the end of the output file
-    #           name where i is the iteration number
-    # Parameters: i - iteration number
-    #---------------------------------------------------------------------------
-    def update_fNames(self, i):
-
-        for _, report in self.reports.items():
-            if report.active:
-                report.update_fName(i)
-
-    #---------------------------------------------------------------------------
     # Function: annual_flush
     #           Sets all of the reports in the output object to the default report
     #---------------------------------------------------------------------------
@@ -87,24 +75,6 @@ class ReportHandler(ABC):
     #---------------------------------------------------------------------------        
     def get_fPath(self):
         return Path(self.path + self.fName)
-
-    #---------------------------------------------------------------------------
-    # Function: update_fName
-    #           Adds a suffix of "_Iteration_i_" to the end of the output file
-    #           name where i is the iteration number
-    # Parameters: i - iteration number
-    #---------------------------------------------------------------------------
-    def update_fName(self, i):
-
-        # For first iteration
-        if i == 1:
-            index = self.fName.index('.')
-            self.fname = self.fName[:index] + "_Iteration_1_" + self.fName[index:]
-
-        # For other iterations, replace only iteration number
-        else:
-            index = self.fName.rfind(str(i - 1))
-            self.fname = self.fName[:index] + str(i) + self.fName [index + 1:]
             
     #---------------------------------------------------------------------------
     # Abstract Methods

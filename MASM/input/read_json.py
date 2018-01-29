@@ -57,8 +57,6 @@ def read_json_file(fPath:Path, s:State, c:Config, w:Weather, o:OutputHandler):
 def read_config(data, c:Config):
     
     try:
-        c.iterations = data['iterations']
-        c.iterate = data['iterations'] > 1
         c.years = data['years']
         
     except KeyError:

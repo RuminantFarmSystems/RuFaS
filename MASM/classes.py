@@ -66,8 +66,6 @@ class Config():
 
         self.fName = "none"
         self.years = 1
-        self.iterations = 0
-        self.iterate = False
     
     #----------------------------------------------------------------------------
     # Function: modify_parameters

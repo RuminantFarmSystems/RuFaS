@@ -55,25 +55,17 @@ def simulate(input_fPath:Path):
     
     #
     # Initialize reports
-    # Transfer needed data from state to output handler
+    # Transfer needed data from state to report handlers
     #
     output.initialize_reports(state)
     
     #
     # MAIN Simulation Loop
     #
-    while not end_iterations():
-        
-        print("Simulating: {} Iteration: {}".format(config.fName, time.i))
-        
-        if config.iterate:
-            output.update_fNames(time.i)
-            #config.modify_parameters(time.i)
+    print("Simulating: {}".format(config.fName))
 
-        while not end_simulation():
-            annual_simulation()
-        
-        time.advance_iteration()
+    while not end_simulation():
+        annual_simulation()
         
     print("Simulation Successful: {}\n".format(config.fName))
 
@@ -147,14 +139,6 @@ def annual_simulation():
 #------------------------------------------------------------------------------- 
 def end_simulation():
     return time.y > config.years
-
-#------------------------------------------------------------------------------- 
-# Function: end_iterations
-# Returns: True if all specified iterations of the simulation is complete
-#          False otherwise
-#------------------------------------------------------------------------------- 
-def end_iterations():
-    return time.i > config.iterations
 
 #------------------------------------------------------------------------------- 
 # Function: initialize_globals
