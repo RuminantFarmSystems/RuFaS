@@ -24,7 +24,15 @@ class OutputHandler():
         self.reports = {
                         'soil_summary': SoilSummary()
                         }
+    
+    #---------------------------------------------------------------------------
+    # Function: initialize_reports
+    #
+    #---------------------------------------------------------------------------
+    def initialize_reports(self, state):
         
+        self.reports['soil_summary'].initialize(state.soil)
+    
     #---------------------------------------------------------------------------
     # Function: write_annual_reports
     #
@@ -34,12 +42,7 @@ class OutputHandler():
 
         for _, report in self.reports.items():
             if report.active:
-                mode = 'a+' if report.get_fPath().exists() else 'w+'
-                if isinstance(report, SoilSummary):
-                    report.compile_annual_report()
-                else:
-                    with report.get_fPath().open(mode) as f:
-                        f.write(report.compile_annual_report(y))
+                report.write_annual_report()
 
     #---------------------------------------------------------------------------
     # Function: update_fNames
@@ -107,9 +110,11 @@ class ReportHandler(ABC):
     # Abstract Methods
     #---------------------------------------------------------------------------
     @abstractmethod
+    def initialize(self): pass
+    @abstractmethod
     def daily_update(self): pass
     @abstractmethod  
-    def compile_annual_report(self): pass
+    def write_annual_report(self): pass
     @abstractmethod
     def annual_flush(self): pass
 

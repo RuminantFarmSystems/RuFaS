@@ -53,6 +53,13 @@ class SoilSummary(ReportHandler):
         self.numSoilLayers = 0   
     
     #---------------------------------------------------------------------------
+    # Function: initialize
+    #           Transfers the needed data from Soil object to the report handler
+    #---------------------------------------------------------------------------
+    def initialize(self, soil):
+        pass
+    
+    #---------------------------------------------------------------------------
     # Function: setNumSoilLayers
     # Initializes the output arrays for current soil water, Esoil, and 
     # percolation for each soil layer
@@ -104,13 +111,18 @@ class SoilSummary(ReportHandler):
         self.sedimentYield.append(soil.sedimentYield)  
     
     #---------------------------------------------------------------------------
-    # Function: compile_annual_report
+    # Function: write_annual_report
     #           Appends the annual report to the output file
     # Soil Summary is a cvsfile
     #---------------------------------------------------------------------------
-    def compile_annual_report(self):
+    def write_annual_report(self):
         
-        with self.get_fPath().open('w') as csvfile:
+        #
+        # TODO: Make sure a new file is used for a new simulation
+        #
+        mode = 'a+' if self.get_fPath().exists() else 'w+'
+        
+        with self.get_fPath().open(mode) as csvfile:
             
             # 1) Initialize the header of the cvsfile
             fieldnames = ['Year', 'Julian Day', 'Rainfall', 'Runoff (Q)',
