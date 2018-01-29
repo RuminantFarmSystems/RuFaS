@@ -54,6 +54,12 @@ def simulate(input_fPath:Path):
         return
     
     #
+    # Initialize reports
+    # Transfer needed data from state to output handler
+    #
+    output.initialize_reports(state)
+    
+    #
     # MAIN Simulation Loop
     #
     while not end_iterations():
