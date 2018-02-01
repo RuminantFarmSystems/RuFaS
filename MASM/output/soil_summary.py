@@ -9,8 +9,8 @@
 #
 ################################################################################
 
-from .output_handler import ReportHandler
 import csv
+from .output_handler import ReportHandler
 
 #-------------------------------------------------------------------------------
 # Class: SoilSummary
@@ -191,4 +191,4 @@ class SoilSummary(ReportHandler):
         #self.precip = []
         #self.runoff = []
         pass
-    
+        

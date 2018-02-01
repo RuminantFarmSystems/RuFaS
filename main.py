@@ -20,7 +20,7 @@ import MASM
 def main():
  
     print("MASM: Modular Agricultural Systems Modeling Environment")
-
+    
     #
     # Prompt user for an input
     # Input could either be a json file when doing only 1 simulation

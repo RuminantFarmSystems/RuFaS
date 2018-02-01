@@ -41,15 +41,15 @@ def read_json_file(fPath:Path, s:State, c:Config, w:Weather, o:OutputHandler):
             read_weather(data['weather'], w, c)
             read_farm(data['farm'], s, c, o)
             read_output_options(data['output'], o, c)
+        
+        except KeyError:
+            raise JSONfileError(c.fName, "TOP LEVEL",
+                                "json file section mismatch")
             
         except (JSONfileError, LengthMismatchError) as e:
             print(e.msg)
             raise InvalidJSONfileError(c.fName)
-        
-        #except Exception:
-            #print("Something wrong with {}".format(c.fName))
-            #raise InvalidJSONfileError(c.fName)
-        
+
 #-------------------------------------------------------------------------------
 # Function: read_config
 # 
@@ -80,7 +80,7 @@ def read_output_options(data, o:OutputHandler, c:Config):
                 o.reports[key].path = data[key]['path']
         except KeyError:
             raise JSONfileError(c.fName, "OUTPUT",
-                                "Output Report Handler name mismatch: " + key)
+                                "Report Handler name mismatch: " + key)
             
     
 #-------------------------------------------------------------------------------

@@ -58,6 +58,7 @@ def simulate(input_fPath:Path):
     # Transfer needed data from state to report handlers
     #
     output.initialize_reports(state)
+    output.handle_existing_files()
     
     #
     # MAIN Simulation Loop
@@ -75,8 +76,11 @@ def simulate(input_fPath:Path):
 #------------------------------------------------------------------------------- 
 def daily_simulation():
     
+    #
     # This IF statement is in place because of the soil hydrology file Pete has
     # provided. His values are calculated starting from day 274 of year 1.
+    # We should avoid doing this if possible
+    #
     if time.julian_day() >= 274 or time.y > 1:
         
         #

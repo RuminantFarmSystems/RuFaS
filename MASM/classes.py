@@ -64,7 +64,7 @@ class Config():
 
     def __init__(self):
 
-        self.fName = "none"
+        self.fName = None
         self.years = 1
     
     #----------------------------------------------------------------------------

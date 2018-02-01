@@ -24,7 +24,7 @@ class OutputHandler():
         self.reports = {
                         'soil_summary': SoilSummary()
                         }
-    
+        
     #---------------------------------------------------------------------------
     # Function: initialize_reports
     #
@@ -46,13 +46,23 @@ class OutputHandler():
 
     #---------------------------------------------------------------------------
     # Function: annual_flush
-    #           Sets all of the reports in the output object to the default report
+    #           Sets all of the reports in the output object to the default
     #---------------------------------------------------------------------------
     def annual_flush(self):
 
         for _, report in self.reports.items():
             if report.active:
                 report.annual_flush()
+                
+    #---------------------------------------------------------------------------
+    # Function: handle_existing_files
+    #           Sets all of the reports in the output object to the default
+    #---------------------------------------------------------------------------
+    def handle_existing_files(self):
+
+        for _, report in self.reports.items():
+            if report.active:
+                report.handle_existing_file()
 
 #-------------------------------------------------------------------------------
 # Abstract Class: ReportHandler
@@ -66,7 +76,7 @@ class ReportHandler(ABC):
         self.active = True
         self.reportName = reportName
         self.fName = fName
-        self.path = "../Outputs/"
+        self.path = "./Outputs/"
 
     #---------------------------------------------------------------------------
     # Function: get_fPath
@@ -75,6 +85,16 @@ class ReportHandler(ABC):
     #---------------------------------------------------------------------------        
     def get_fPath(self):
         return Path(self.path + self.fName)
+    
+    #---------------------------------------------------------------------------
+    # Function: handle_existing_file
+    #           deletes the existing output file of the same name if exists
+    #---------------------------------------------------------------------------
+    def handle_existing_file(self):
+        
+        if self.get_fPath().exists():
+            print("Existing {} file detected and deleted".format(self.fName))
+            self.get_fPath().unlink()
             
     #---------------------------------------------------------------------------
     # Abstract Methods

@@ -6,7 +6,7 @@
         "years": 2
     },
 
-    "weather": "../Inputs/Weather.csv",
+    "weather": "./Inputs/Weather.csv",
 
     "output":
     {
