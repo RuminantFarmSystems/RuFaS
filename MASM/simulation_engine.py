@@ -56,7 +56,9 @@ def simulate(input_fPath:Path):
     #
     # Initialize reports
     # Transfer needed data from state to report handlers
+    # Deletes existing output files of the same name from previous files
     #
+    output.initialize_output_dir(config)
     output.initialize_reports(state)
     output.handle_existing_files()
     

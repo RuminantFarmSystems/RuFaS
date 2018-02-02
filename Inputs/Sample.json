@@ -3,7 +3,8 @@
 
     "config":
     {
-        "years": 2
+        "years": 2,
+        "output_dir": "./Outputs/Sample_Farm_Outputs/"
     },
 
     "weather": "./Inputs/Weather.csv",
@@ -13,8 +14,7 @@
         "soil_summary":
         {
             "active": true,
-            "file_name": "soil_summary.csv",
-            "path": null
+            "file_name": "soil_summary.csv"
         }
     },
 

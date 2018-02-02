@@ -32,6 +32,18 @@ class OutputHandler():
     def initialize_reports(self, state):
         
         self.reports['soil_summary'].initialize(state.soil)
+        
+            
+    #---------------------------------------------------------------------------
+    # Function: make_output_dir
+    #           Creates the directory to store output files (if doesn't exist)
+    #           Sets output file path for all reports (through ReportHandler
+    #           class attribute)
+    #---------------------------------------------------------------------------
+    def initialize_output_dir(self, config):
+        
+        Path(config.output_dir).mkdir(exist_ok = True, parents = False)
+        ReportHandler.path = config.output_dir
     
     #---------------------------------------------------------------------------
     # Function: write_annual_reports
@@ -66,17 +78,18 @@ class OutputHandler():
 
 #-------------------------------------------------------------------------------
 # Abstract Class: ReportHandler
-#        Contains every all the information printed in a yearly report
-#        Information is flushed at the beginning of every year
+#                 Contains an interface for report handlers, each output report
+#                 file implements this abstract class
 #-------------------------------------------------------------------------------
 class ReportHandler(ABC):
+    
+    path = None
 
     def __init__(self, reportName, fName):
 
         self.active = True
         self.reportName = reportName
         self.fName = fName
-        self.path = "./Outputs/"
 
     #---------------------------------------------------------------------------
     # Function: get_fPath
@@ -93,7 +106,7 @@ class ReportHandler(ABC):
     def handle_existing_file(self):
         
         if self.get_fPath().exists():
-            print("Existing {} file detected and deleted".format(self.fName))
+            print("Existing {} file detected and deleted\n".format(self.fName))
             self.get_fPath().unlink()
             
     #---------------------------------------------------------------------------

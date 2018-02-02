@@ -58,6 +58,7 @@ def read_config(data, c:Config):
     
     try:
         c.years = data['years']
+        c.output_dir = data['output_dir']
         
     except KeyError:
         raise JSONfileError(c.fName, "CONFIG", "Config Input Key Mismatch")
@@ -68,16 +69,12 @@ def read_config(data, c:Config):
 #-------------------------------------------------------------------------------
 def read_output_options(data, o:OutputHandler, c:Config):
 
-    if len(data) != len(o.reports):
-        raise LengthMismatchError(c.fName, "OUTPUT", len(o.reports))
-    
     for key in data:
         try:
             o.reports[key].active = data[key]['active']
             if data[key]['file_name'] is not None:
                 o.reports[key].fName = data[key]['file_name']
-            if data[key]['path'] is not None:
-                o.reports[key].path = data[key]['path']
+
         except KeyError:
             raise JSONfileError(c.fName, "OUTPUT",
                                 "Report Handler name mismatch: " + key)

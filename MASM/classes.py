@@ -65,6 +65,7 @@ class Config():
     def __init__(self):
 
         self.fName = None
+        self.output_dir = None
         self.years = 1
     
     #----------------------------------------------------------------------------
