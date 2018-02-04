@@ -106,8 +106,8 @@ class ReportHandler(ABC):
     def handle_existing_file(self):
         
         if self.get_fPath().exists():
-            print("Existing {} file detected and deleted\n".format(self.fName))
             self.get_fPath().unlink()
+            print("Existing {} file detected and deleted\n".format(self.fName))
             
     #---------------------------------------------------------------------------
     # Abstract Methods
