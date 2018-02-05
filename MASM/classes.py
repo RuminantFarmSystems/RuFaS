@@ -22,7 +22,6 @@ class State():
 
     def __init__(self, data):
         
-        self.location = Location(data['location'])
         self.soil = Soil(data['soil'])
         
         #self.crops = Crops()
@@ -46,15 +45,6 @@ class State():
         #self.herd.annual_reset()
         #self.housing.annual_reset()
         #self.manure.annual_reset()
-
-#-------------------------------------------------------------------------------
-# Class: Location
-#        Contains the state of the farm's location 
-#-------------------------------------------------------------------------------  
-class Location():
-    
-    def __init__(self, data):
-        self.latitude = data['latitude']
     
 #-------------------------------------------------------------------------------
 # Class: Config
@@ -85,8 +75,6 @@ class Weather():
 
     def __init__(self, weather_path_str, duration):
 
-        self.cumulative = 1.0 
-        
         #
         # Weather Data in 2D lists -> [year][julianDay]
         #
@@ -102,6 +90,7 @@ class Weather():
         tMinData = []
         tAvgData = []
         bioMassData = []
+        radiationData = []
         
         with Path(weather_path_str).open('r') as f:
             readCSV = csv.reader(f, delimiter=',')
@@ -134,7 +123,10 @@ class Weather():
                     
                     # 5) Read biomass data
                     bioMassData.append(row[5])
-                
+                    
+                    # 6) Read radiation data
+                    radiationData.append(row[6])
+
                 currentRow += 1
             #
             # TODO: check for weather file length match with simulation duration
@@ -179,13 +171,21 @@ class Weather():
                 else:
                     self.tAvg[i][j] = tAvgData[i*365 + j] 
                     
-        # 4) Update biomass in weather
+        # 5) Update biomass in weather
         for i in range(0, duration):
             for j in range(0, 365):
                 if (i*365+j) >= len(bioMassData):
                     break
                 else:
                     self.biomass[i][j] = bioMassData[i*365 + j]
+                    
+        # 6) Update radiation in weather
+        for i in range(0, duration):
+            for j in range(0, 365):
+                if (i*365+j) >= len(radiationData):
+                    break
+                else:
+                    self.radiation[i][j] = radiationData[i*365 + j]
        
 #-------------------------------------------------------------------------------
 # Class: Time

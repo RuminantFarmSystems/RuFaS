@@ -15,15 +15,14 @@ import math
 # Function: daily_soil_routine
 # Executes all the daily soil routines
 #------------------------------------------------------------------------------
-def daily_soil_routine(soil, location, weather, time):
+def daily_soil_routine(soil, weather, time):
                    
     # calculate daily runoff 
-    soil.dailyInfiltration(weather.rainfall[time.y-1]
-                                  [time.julian_day()-1])
+    soil.dailyInfiltration(weather.rainfall[time.y-1][time.julian_day()-1])
     
     # calculate daily transpiration 
-    soil.dailyEvapotranspiration(time.julian_day()
-        , weather.tMax[time.y-1][time.julian_day()-1]
+    soil.dailyEvapotranspiration(
+        weather.tMax[time.y-1][time.julian_day()-1]
         , weather.tMin[time.y-1][time.julian_day()-1]
         , weather.tAvg[time.y-1][time.julian_day()-1]
         , weather.biomass[time.y-1][time.julian_day()-1]
@@ -33,17 +32,16 @@ def daily_soil_routine(soil, location, weather, time):
     soil.dailyPercolation()  
         
     # calculate daily soil erosion
-    soil.dailySoilErosion(weather.rainfall[time.y-1]
-        [time.MMDD_to_JulianDay(time.m, time.d)-1], 
-        weather.biomass[time.y-1][time.MMDD_to_JulianDay(time.m, time.d)-1]) 
+    soil.dailySoilErosion(weather.rainfall[time.y-1][time.julian_day()-1], 
+                          weather.biomass[time.y-1][time.julian_day()-1]) 
     
     # calculate and update the temperature of the soil layers
     soil.updateSoilTemperature(
-        weather.biomass[time.y-1][time.MMDD_to_JulianDay(time.m, time.d)-1],
-        weather.radiation[time.y-1][time.MMDD_to_JulianDay(time.m, time.d)-1], 
-        weather.tAvg[time.y-1][time.MMDD_to_JulianDay(time.m, time.d)-1],
+        weather.biomass[time.y-1][time.julian_day()-1],
+        weather.radiation[time.y-1][time.julian_day()-1], 
+        weather.tAvg[time.y-1][time.julian_day()-1],
         6.94,
-        time.MMDD_to_JulianDay(time.m, time.d))
+        time.julian_day())
                             
         
 #------------------------------------------------------------------------------
@@ -53,8 +51,7 @@ def daily_soil_routine(soil, location, weather, time):
 def daily_soil_update(soil, weather, time):
                             
     # update current soil water    
-    soil.updateCurrentSoilWater(weather.rainfall[time.y-1]
-        [time.MMDD_to_JulianDay(time.m, time.d)-1]) 
+    soil.updateCurrentSoilWater(weather.rainfall[time.y-1][time.julian_day()-1]) 
 
 #-------------------------------------------------------------------------------
 # Class: Soil
@@ -66,20 +63,25 @@ class Soil():
 
     def __init__(self, data):
         
-    # Values Initialized by Input  
-        self.profileDepth = 0.0 
-        self.CN2 = 0.0 # unitless, user-defined curve number (empirical)
+        # Values Initialized by Input  
+        self.profileDepth = data['ProfileDepth']
+        self.CN2 = data['CN2'] # unitless, user-defined curve number (empirical)
      
         # soil erosion attributes
-        self.fieldSlope = 0.0
-        self.slopeLength = 0.0
-        self.manning = 0.0
-        self.fieldSize = 0.0
-        self.practiceFactor = 0.0
-        self.orgc = 0.0
-        self.sand = 0.0
-        self.silt = 0.0
-        self.clay = 0.0
+        self.fieldSlope = data['FieldSlope']
+        self.slopeLength = data['SlopeLength']
+        self.manning = data['Manning']
+        self.fieldSize = data['FieldSize']
+        self.practiceFactor = data['PracticeFactor']
+        self.orgc = data['Orgc']
+        self.sand = data['Sand']
+        self.silt = data['Silt']
+        self.clay = data['Clay']
+
+        # soil temperature attributes
+        self.bulkDensity = data['BulkDensity']
+        self.soilAlbedo = data['SoilAlbedo']
+        self.Tsurf = data['SoilLayers']['Layer1']['InitialTemperature']
         
         # daily output values
         self.runoff = 0.0
@@ -90,12 +92,7 @@ class Soil():
         self.dayInfiltraiton = 0.0 # daily infiltration
         self.sedimentYield = 0.0
 
-        # soil temperature attributes
-        self.bulkDensity = 0.0
-        self.soilAlbedo = 0.0
-        self.Tsurf = 0.0
-
-        for layerName, layerData in data["SoilLayers"].items():
+        for layerName, layerData in data['SoilLayers'].items():
             self.listOfSoilLayers.append(self.SoilLayer(layerName, layerData))
             
         # sort layers by bottomDepth 
@@ -118,16 +115,20 @@ class Soil():
     # An instance of this class represents a layer in the soil
     #---------------------------------------------------------------------------      
     class SoilLayer():
-        def __init__(self):
-            self.name = None
-            self.bottomDepth = 0.0 # bottom depth of soil layer
+        
+        def __init__(self, layerName, layerData):
+            
+            self.name = layerName
+            
+            self.bottomDepth = layerData['BottomDepth']
+            self.wiltingPoint = layerData['WiltingPoint']
+            self.fieldCapacity = layerData['FieldCapacity']
+            self.saturation = layerData['Saturation']
+            #self.currentSoilWater = layerData['StartingSoilWater']
+            
             self.depth = 0.0 # depth of soil layer
             self.fcWater = 0.0 # constant
             self.wiltingWater = 0.0 # constant
-            self.wiltingPoint = 0.0
-            self.fieldCapacity = 0.0
-            self.saturation = 0.0
-            #self.currentSoilWater = 0.0
             
             self.currentSoilWaterMM = 0.0 # soil water in layer in mm
 
@@ -137,28 +138,12 @@ class Soil():
             self.layerEsoil = 0.0 # evaporation demand at layer
             
             # Variables used for soil temperature
-            self.temperature = 0.0
+            self.temperature = layerData['InitialTemperature']
             
             # Variables to calculate dailyPercolation
-            self.ksat = 0 # saturated hydraulic conductivity (mm/h)
+            self.ksat = layerData['Ksat'] # saturated hydraulic conductivity (mm/h)
             self.TT = 0.0  
             self.perc = 0.0 # amount of water that percolates to next layer
-    
-    #---------------------------------------------------------------------------
-    # Function: addSoilLayer
-    # Adds a soil layer to the list of soil layers
-    #---------------------------------------------------------------------------        
-    def addSoilLayer(self, name, bd, csw, ksat, wp, fc, sat, temp):
-        soilLayer = self.SoilLayer()
-        soilLayer.name = name
-        soilLayer.bottomDepth = bd
-        soilLayer.wiltingPoint = wp
-        soilLayer.fieldCapacity = fc
-        soilLayer.saturation = sat
-        soilLayer.temperature = temp
-        #soilLayer.currentSoilWater = csw
-        soilLayer.ksat = ksat        
-        self.listOfSoilLayers.append(soilLayer)
         
     #---------------------------------------------------------------------------
     # Function: calculateFcWater
