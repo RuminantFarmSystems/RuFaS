@@ -33,39 +33,39 @@ def input_prompt():
     while(True):
         
         try:
-            userInput = input("\nEnter MASM Input: ")
+            user_input = input("\nEnter MASM Input: ")
 
             #
             # Handle user exiting program
             #
-            if userInput.upper() == 'Q':
+            if user_input.upper() == 'Q':
                 print("Exiting MASM...")
                 sys.exit()
                 
-            inputPath = Path(userInput)
+            input_path = Path(user_input)
 
             #
             # Handle single json file input
             #
-            if inputPath.suffix == '.json':
-                if not inputPath.is_file():
+            if input_path.suffix == '.json':
+                if not input_path.is_file():
                     raise UserInputError("Specified file does not exist")
                 else:
                     print("json file Detected...\n")
-                    return [inputPath]
+                    return [input_path]
             
             #
             # Handle directory of json files input
             #
-            elif inputPath.is_dir():
+            elif input_path.is_dir():
                 # Grab all json files in dir
-                pathList = list(inputPath.glob('*.json'))
+                path_list = list(input_path.glob('*.json'))
                 # Handle no json files in dir
-                if len(pathList) < 1:
+                if len(path_list) < 1:
                     raise UserInputError("Directory contains no json files")
                 else:
-                    print(str(len(pathList)) + " json files detected...\n")
-                    return pathList
+                    print(str(len(path_list)) + " json files detected...\n")
+                    return path_list
 
             #
             # Handle bad inputs
