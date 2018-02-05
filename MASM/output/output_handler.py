@@ -39,17 +39,12 @@ class OutputHandler():
     #           Sets output file path for all reports (through ReportHandler
     #           class attribute)
     #---------------------------------------------------------------------------
-    def initialize_output_dir(self, config):
+    def initialize_output_dir(self, output_dir):
         
-        Path(config.output_dir).mkdir(exist_ok = True, parents = False)
-        ReportHandler.path = config.output_dir
+        Path(output_dir).mkdir(exist_ok = True, parents = False)
+        BaseReportHandler.path = output_dir
         
-    #---------------------------------------------------------------------------
-    # Function: handle_existing_files
-    #           Sets all of the reports in the output object to the default
-    #---------------------------------------------------------------------------
-    def handle_existing_files(self):
-
+        # Deletes existing output files of the same name
         for _, report in self.reports.items():
             if report.active:
                 report.handle_existing_file()
@@ -76,13 +71,14 @@ class OutputHandler():
                 report.annual_flush()
             
 #-------------------------------------------------------------------------------
-# Abstract Class: ReportHandler
+# Abstract Class: BaseReportHandler
 #                 Contains an interface for report handlers, each output report
 #                 file implements this abstract class
 #-------------------------------------------------------------------------------
-class ReportHandler(ABC):
+class BaseReportHandler(ABC):
     
-    path = "Default_Output_Dir"
+    # Default path for output report files
+    path = "./Outputs/Default_Output_Dir/"
 
     def set_properties(self, data):
 
@@ -112,13 +108,13 @@ class ReportHandler(ABC):
     # Abstract Methods
     #---------------------------------------------------------------------------
     @abstractmethod
-    def get_data(self): pass
+    def get_data(self): raise NotImplementedError()
     @abstractmethod
-    def daily_update(self): pass
+    def daily_update(self): raise NotImplementedError()
     @abstractmethod  
-    def write_annual_report(self): pass
+    def write_annual_report(self): raise NotImplementedError()
     @abstractmethod
-    def annual_flush(self): pass
+    def annual_flush(self): raise NotImplementedError()
 
 
 from .soil_summary import SoilSummary

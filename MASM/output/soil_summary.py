@@ -10,13 +10,13 @@
 ################################################################################
 
 import csv
-from .output_handler import ReportHandler
+from .output_handler import BaseReportHandler
 
 #-------------------------------------------------------------------------------
 # Class: SoilSummary
 # Creates and prints to the file soil_summary.csv
 #-------------------------------------------------------------------------------
-class SoilSummary(ReportHandler):
+class SoilSummary(BaseReportHandler):
     
     layersSoilWater = []
     layersEsoil = []
@@ -24,6 +24,9 @@ class SoilSummary(ReportHandler):
     
     def __init__(self, data):
              
+        #
+        # Sets active, report_name, f_name using data
+        #
         self.set_properties(data)
                  
         #
@@ -115,9 +118,6 @@ class SoilSummary(ReportHandler):
     #---------------------------------------------------------------------------
     def write_annual_report(self):
         
-        #
-        # TODO: Make sure a new file is used for a new simulation
-        #
         mode = 'a+' if self.get_fPath().exists() else 'w+'
         
         with self.get_fPath().open(mode) as csvfile:
