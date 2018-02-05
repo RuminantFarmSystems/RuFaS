@@ -22,30 +22,30 @@
     "farm":
     {
 
-      "location":
-      {
-          "latitude": 0.7309
-      },
+        "location":
+        {
+            "latitude": 0.7309
+        },
 
-      "soil":
-      {
-          "WiltingPoint": 0.1,
-          "FieldCapacity": 0.30,
-          "Saturation": 0.5,
-          "ProfileDepth": 2000,
-          "CN2": 80.00,
-          "FieldSlope": 0.02,
-          "SlopeLength": 100,
-          "Manning": 0.4,
-          "FieldSize": 1.6,
-          "PracticeFactor": 0.25,
-          "Orgc": 2,
-          "Sand": 15,
-          "Silt": 65,
-          "Clay": 20,
+        "soil":
+        {
+            "WiltingPoint": 0.1,
+            "FieldCapacity": 0.30,
+            "Saturation": 0.5,
+            "ProfileDepth": 2000,
+            "CN2": 80.00,
+            "FieldSlope": 0.02,
+            "SlopeLength": 100,
+            "Manning": 0.4,
+            "FieldSize": 1.6,
+            "PracticeFactor": 0.25,
+            "Orgc": 2,
+            "Sand": 15,
+            "Silt": 65,
+            "Clay": 20,
 
-          "SoilLayers":
-          {
+            "SoilLayers":
+            {
                 "Layer1":
                 {
                     "BottomDepth": 150,
