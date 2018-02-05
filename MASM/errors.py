@@ -31,21 +31,10 @@ class InvalidJSONfileError(Exception):
 # Class: LengthMismatchError
 #
 #-------------------------------------------------------------------------------     
-class LengthMismatchError(Exception):
+class JSONfileDataError(Exception):
     
-    def __init__(self, fName, section, count):
-        self.msg = ("JSON FILE LENGTH MISMATCH ERROR: " + fName + "\n\t"
-                    + section + " section must contain " + str(count) + " values")
-        
-#-------------------------------------------------------------------------------
-# Class: LengthMismatchError
-#
-#-------------------------------------------------------------------------------     
-class JSONfileError(Exception):
-    
-    def __init__(self, fName, section, msg):
-        self.msg = ("JSON FILE ERROR: " + fName + "\n\t"
-                    + section + " section\n\t"
-                    + msg + '\n')
+    def __init__(self, section, msg):
+        self.section = section
+        self.msg = msg
         
         

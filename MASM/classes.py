@@ -12,6 +12,7 @@
 import csv
 from pathlib import Path
 from MASM.routines import Soil
+from MASM.errors import JSONfileDataError
 
 #-------------------------------------------------------------------------------
 # Class: State
@@ -64,9 +65,10 @@ class Config():
     def __init__(self, data, fName):
         
         self.fName = fName
+
         self.duration = data['duration']
         self.output_dir = data['output_dir']
-    
+        
     #----------------------------------------------------------------------------
     # Function: modify_parameters
     #
@@ -103,6 +105,17 @@ class Weather():
         with Path(weather_path_str).open('r') as f:
             readCSV = csv.reader(f, delimiter=',')
             
+            """if sum(1 for row in f) != duration:
+                raise JSONfileDataError("WEATHER",
+                                        "\tNumber of years in weather file does "
+                                        + "not match simulation duration")
+            """
+            
+            #
+            # Read data from CSV file
+            # Data read is in the format data[day]
+            # 1D list of length total number of days in the whole weather file
+            #
             currentRow = 0
             for row in readCSV:
                 if currentRow != 0:
@@ -122,7 +135,17 @@ class Weather():
                     bioMassData.append(row[5])
                 
                 currentRow += 1
-        
+            #
+            # TODO: check for weather file length match with simulation duration
+            #
+            # Print out number of rows(days) read from CSV file
+            #print(str(currentRow - 1))
+           
+        #
+        # Put weather data into the format:
+        #    data[year][julian_day]
+        #
+         
         # 1) Update Rainfall in weather
         for i in range(0, duration):
             for j in range(0, 365):
@@ -184,20 +207,6 @@ class Time():
     #----------------------------------------------------------------------------
     def to_str(self):
         return "{}/{}/{} Iteration: {}".format(self.d, self.m, self.y, self.i)
-
-    #----------------------------------------------------------------------------
-    # Function: MMDD_to_JulianDay
-    # Returns: returns the julian day of the year given a particular month and 
-    # dat
-    #----------------------------------------------------------------------------    
-    def MMDD_to_JulianDay(self, month, date):
-        dayInMonths = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31]
-        
-        julianDay = 0
-        for i in range(0, month-1):
-            julianDay += dayInMonths[i]
-        julianDay += date
-        return julianDay
     
     #----------------------------------------------------------------------------
     # Function: julian_day
@@ -214,17 +223,6 @@ class Time():
         julian_day += self.d
         
         return julian_day
-    
-    #---------------------------------------------------------------------------
-    # Function: advance_iteration
-    #           Resets the time at the end of a simulation cycle
-    #           Sets day, month, and year to 1 and increments i
-    #---------------------------------------------------------------------------
-    def advance_iteration(self):
-        self.y = 1
-        self.m = 1
-        self.d = 1
-        self.i += 1
 
     #---------------------------------------------------------------------------
     # Function: advance
@@ -267,75 +265,3 @@ class Time():
             return True
         else:
             return False
-        
-# UNUSED CLASSES
-"""    
-#-------------------------------------------------------------------------------
-# Class: Crops
-#        Contains the state of the farm's crops 
-#-------------------------------------------------------------------------------  
-class Crops():
-    def __init__(self):
-        pass
-    
-    def annual_reset(self):
-        pass
-
-#-------------------------------------------------------------------------------
-# Class: Feed
-#        Contains the state of the farm's feed 
-#-------------------------------------------------------------------------------  
-class Feed():
-    def __init__(self):
-        pass
-    
-    def annual_reset(self):
-        pass
-        
-
-#-------------------------------------------------------------------------------
-# Class: FieldOps
-#        Contains the state of the farm's field operations 
-#-------------------------------------------------------------------------------  
-class FieldOps():
-    def __init__(self):
-        pass
-    
-    def annual_reset(self):
-        pass
-    
-#-------------------------------------------------------------------------------
-# Class: Herd
-#        Contains the state of the farm's herd 
-#-------------------------------------------------------------------------------  
-class Herd():
-    def __init__(self):
-        pass
-    
-    def annual_reset(self):
-        pass
-    
-
-#-------------------------------------------------------------------------------
-# Class: Housing
-#        Contains the state of the farm's housing 
-#-------------------------------------------------------------------------------  
-class Housing():
-    def __init__(self):
-        pass
-    
-    def annual_reset(self):
-        pass
-
-#-------------------------------------------------------------------------------
-# Class: Manure
-#        Contains the state of the farm's manure 
-#-------------------------------------------------------------------------------  
-class Manure():
-    def __init__(self):
-        pass
-    
-    def annual_reset(self):
-        pass
-        
-"""
