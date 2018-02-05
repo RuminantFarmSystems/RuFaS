@@ -49,6 +49,7 @@ def simulate(input_fPath:Path):
     #
     try:
         read_json_file(input_fPath, state, config, weather, output_handler)
+        output_handler.initialize_reports(state.soil)
     except InvalidJSONfileError as e:
         print(e.msg)
         return
@@ -84,7 +85,7 @@ def daily_simulation():
         # Daily Routines
         # Pass only information needed
         #
-        routines.daily_soil_routine(state.soil, state.location, weather, time)
+        routines.daily_soil_routine(state.soil, weather, time)
     
         #
         # Daily Output Updates
@@ -163,4 +164,3 @@ def initialize_globals():
     weather = Weather()
     time = Time()
     output_handler = OutputHandler()
-    

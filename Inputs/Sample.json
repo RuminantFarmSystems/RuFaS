@@ -25,16 +25,8 @@
     "farm":
     {
 
-      "location":
-      {
-          "latitude": 0.7309
-      },
-
       "soil":
       {
-          "WiltingPoint": 0.1,
-          "FieldCapacity": 0.30,
-          "Saturation": 0.5,
           "ProfileDepth": 2000,
           "CN2": 80.00,
           "FieldSlope": 0.02,
@@ -46,26 +38,40 @@
           "Sand": 15,
           "Silt": 65,
           "Clay": 20,
+          "BulkDensity": 1.2,
+          "SoilAlbedo": 0.16,
 
           "Layer2":
           {
+            "WiltingPoint": 0.1,
+            "FieldCapacity": 0.30,
+            "Saturation": 0.5,
             "BottomDepth": 1000,
             "StartingSoilWater": 0.3,
-            "Ksat": 4
+            "Ksat": 4,
+            "InitialTemperature": 10
           },
 
           "Layer1":
           {
+            "WiltingPoint": 0.1,
+            "FieldCapacity": 0.30,
+            "Saturation": 0.5,
             "BottomDepth": 150,
             "StartingSoilWater": 0.2,
-            "Ksat": 5
+            "Ksat": 5,
+            "InitialTemperature": 12
           },
 
           "Layer3":
           {
+            "WiltingPoint": 0.1,
+            "FieldCapacity": 0.30,
+            "Saturation": 0.5,
             "BottomDepth": 2000,
             "StartingSoilWater": 0.3,
-            "Ksat": 4
+            "Ksat": 4,
+            "InitialTemperature": 8
           }
       }
 

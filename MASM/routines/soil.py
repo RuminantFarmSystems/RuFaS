@@ -15,20 +15,19 @@ import math
 # Function: daily_soil_routine
 # Executes all the daily soil routines
 #------------------------------------------------------------------------------
-def daily_soil_routine(soil, location, weather, time):
+def daily_soil_routine(soil, weather, time):
                    
     # calculate daily runoff 
     soil.dailyInfiltration(weather.rainfall[time.y-1]
-                                  [time.MMDD_to_JulianDay(time.m, time.d)-1],
-                                  weather.cumulative)
+                                  [time.MMDD_to_JulianDay(time.m, time.d)-1])
     
     # calculate daily transpiration 
-    soil.dailyEvapotranspiration(time.MMDD_to_JulianDay(time.m, time.d)
-        , weather.tMax[time.y-1][time.MMDD_to_JulianDay(time.m, time.d)-1]
+    soil.dailyEvapotranspiration(
+        weather.tMax[time.y-1][time.MMDD_to_JulianDay(time.m, time.d)-1]
         , weather.tMin[time.y-1][time.MMDD_to_JulianDay(time.m, time.d)-1]
         , weather.tAvg[time.y-1][time.MMDD_to_JulianDay(time.m, time.d)-1]
         , weather.biomass[time.y-1][time.MMDD_to_JulianDay(time.m, time.d)-1]
-        , location.latitude)
+        , weather.radiation[time.y-1][time.MMDD_to_JulianDay(time.m, time.d)-1])
         
     # calculate daily percolation
     soil.dailyPercolation()  
@@ -36,21 +35,23 @@ def daily_soil_routine(soil, location, weather, time):
     # calculate daily soil erosion
     soil.dailySoilErosion(weather.rainfall[time.y-1]
         [time.MMDD_to_JulianDay(time.m, time.d)-1], 
-        time.MMDD_to_JulianDay(time.m, time.d)) 
-                        
+        weather.biomass[time.y-1][time.MMDD_to_JulianDay(time.m, time.d)-1]) 
+    
+    # calculate and update the temperature of the soil layers
+    soil.updateSoilTemperature(
+        weather.biomass[time.y-1][time.MMDD_to_JulianDay(time.m, time.d)-1],
+        weather.radiation[time.y-1][time.MMDD_to_JulianDay(time.m, time.d)-1], 
+        weather.tAvg[time.y-1][time.MMDD_to_JulianDay(time.m, time.d)-1],
+        6.94,
+        time.MMDD_to_JulianDay(time.m, time.d))
+                            
         
 #------------------------------------------------------------------------------
 # Function: daily_soil_update
 # Update attributes of soil in preparation of following day
 #------------------------------------------------------------------------------
 def daily_soil_update(soil, weather, time):
-                
-    # update indicator (var cumulative) of whether soil is frozen
-    if float(weather.tAvg[time.y-1][time.MMDD_to_JulianDay(time.m, time.d)-1]) > 0:
-        weather.cumulative = max(-10, min(20, weather.cumulative + 1.0))
-    else:
-        weather.cumulative = max(-10, min(20, weather.cumulative - 1.0))
-            
+                            
     # update current soil water    
     soil.updateCurrentSoilWater(weather.rainfall[time.y-1]
         [time.MMDD_to_JulianDay(time.m, time.d)-1]) 
@@ -65,10 +66,7 @@ class Soil():
 
     def __init__(self):
         
-    # Values Initialized by Input
-        self.wiltingPoint = 0.0
-        self.fieldCapacity = 0.0
-        self.saturation = 0.0        
+    # Values Initialized by Input  
         self.profileDepth = 0.0 
         self.CN2 = 0.0 # unitless, user-defined curve number (empirical)
      
@@ -91,6 +89,11 @@ class Soil():
         
         self.dayInfiltraiton = 0.0 # daily infiltration
         self.sedimentYield = 0.0
+        
+        # soil temperature attributes
+        self.bulkDensity = 0.0
+        self.soilAlbedo = 0.0
+        self.Tsurf = 0.0
 
     #---------------------------------------------------------------------------
     # Class: SoilLayer
@@ -103,6 +106,9 @@ class Soil():
             self.depth = 0.0 # depth of soil layer
             self.fcWater = 0.0 # constant
             self.wiltingWater = 0.0 # constant
+            self.wiltingPoint = 0.0
+            self.fieldCapacity = 0.0
+            self.saturation = 0.0
             #self.currentSoilWater = 0.0
             
             self.currentSoilWaterMM = 0.0 # soil water in layer in mm
@@ -111,6 +117,9 @@ class Soil():
             self.topEsoil = 0.0 # evaporation demand at top of layer
             self.bottomEsoil = 0.0 # evaporation demand at bottom of layer
             self.layerEsoil = 0.0 # evaporation demand at layer
+            
+            # Variables used for soil temperature
+            self.temperature = 0.0
             
             # Variables to calculate dailyPercolation
             self.ksat = 0 # saturated hydraulic conductivity (mm/h)
@@ -121,10 +130,14 @@ class Soil():
     # Function: addSoilLayer
     # Adds a soil layer to the list of soil layers
     #---------------------------------------------------------------------------        
-    def addSoilLayer(self, name, bd, csw, ksat):
+    def addSoilLayer(self, name, bd, csw, ksat, wp, fc, sat, temp):
         soilLayer = self.SoilLayer()
         soilLayer.name = name
         soilLayer.bottomDepth = bd
+        soilLayer.wiltingPoint = wp
+        soilLayer.fieldCapacity = fc
+        soilLayer.saturation = sat
+        soilLayer.temperature = temp
         #soilLayer.currentSoilWater = csw
         soilLayer.ksat = ksat        
         self.listOfSoilLayers.append(soilLayer)
@@ -137,7 +150,7 @@ class Soil():
     def calculateFcWater(self):
         for x in range(0, len(self.listOfSoilLayers)):
             self.listOfSoilLayers[x].fcWater = (self.listOfSoilLayers[x].depth
-                    * self.fieldCapacity)
+                    * self.listOfSoilLayers[x].fieldCapacity)
             
     #---------------------------------------------------------------------------
     # Function: calculateWiltingWater
@@ -147,7 +160,7 @@ class Soil():
     def calculateWiltingWater(self):
         for x in range(0, len(self.listOfSoilLayers)):
             self.listOfSoilLayers[x].wiltingWater = (self.listOfSoilLayers[x].
-                    depth * self.wiltingPoint)           
+                    depth * self.listOfSoilLayers[x].wiltingPoint)           
     
     #---------------------------------------------------------------------------
     # Function: convertCurrentSoilWaterToMM
@@ -157,7 +170,8 @@ class Soil():
     def convertCurrentSoilWaterToMM(self):
         for x in range(0, len(self.listOfSoilLayers)):
             self.listOfSoilLayers[x].currentSoilWaterMM = (
-                self.listOfSoilLayers[x].depth * self.fieldCapacity)        
+                self.listOfSoilLayers[x].depth * self.listOfSoilLayers[x]
+                .fieldCapacity)        
     
     #---------------------------------------------------------------------------
     # Function: getSumSoilWater
@@ -179,11 +193,12 @@ class Soil():
             totalWiltingWater += soilLayer.wiltingWater
         return totalWiltingWater
     
+
     #---------------------------------------------------------------------------
     # Function: dailyInfiltration
     # Uses curve number approach (equations taken from SWAT 2009 documentation)
     #---------------------------------------------------------------------------       
-    def dailyInfiltration(self, dailyRainfall, cumulative): 
+    def dailyInfiltration(self, dailyRainfall): 
           
         # curve number 1
         cn1 = self.CN2 - (20 * (100 - self.CN2)) / (100
@@ -198,10 +213,10 @@ class Soil():
         s3 = 25.4*((1000/cn3) - 10)
         
         # amount of water in soil profile at field capacity (mm H2O)
-        FC = self.profileDepth * self.fieldCapacity
+        FC = self.profileDepth * self.listOfSoilLayers[0].fieldCapacity
         
         # amount of water in soil profile at saturation (mm H2O)
-        SAT = self.profileDepth * self.saturation
+        SAT = self.profileDepth * self.listOfSoilLayers[0].saturation
 
         # soil water content of entire profile, excluding water held at wilting
         # point (mm H2O)
@@ -220,7 +235,7 @@ class Soil():
         s = sMax * (1 - (SW/(SW + math.exp(w1 - (w2)*(SW)))))
         
         # when the top soil is frozen, s is modified
-        if(cumulative <= 0):
+        if(self.listOfSoilLayers[0].temperature <= 2):
             s = sMax * (1-math.exp(-0.000862 * s))
         
         # daily runoff (mm H2O)
@@ -243,24 +258,11 @@ class Soil():
     # Step 3: Calculate Sublimation and Soil Evaporation
     # Step 4: Partition Esoil among different soil layers 
     #---------------------------------------------------------------------------       
-    def dailyEvapotranspiration(self, jday, tMax, tMin, tAvg, biomass, latitude):
+    def dailyEvapotranspiration(self, tMax, tMin, tAvg, biomass, radiation):
         
-    # Step 1: Calculate Potential Evapotranspiration
-        av = 0.2618 # angular velocity of earth's rotation (rad*h^-1)
-        
-        # eccentricity correction factor of earth's orbit
-        ECF = 1 + 0.033*math.cos((2*math.pi*(jday))/(365))
-        
-        # solar declination in radians
-        SD = math.asin(0.4*math.sin((2*math.pi/365)*(jday-82)))
-        
-        # hours of sunrise
-        TSR = math.acos(math.atan(SD)*math.tan(latitude))/av
-        
+    # Step 1: Calculate Potential Evapotranspiration       
         # extraterrestrial radiation (MJ*m^-2*d^-1) --> MAKE INPUT VARIABLE
-        H0 = (37.59)*(ECF)*((av)*(TSR)*(math.sin(SD))*(math.sin(latitude))+
-                            (math.cos(SD))*(math.cos(latitude))*
-                            math.sin(av*TSR))
+        H0 = float(radiation)
         
         # latent heat of vaporization (MJ*kg^-1)
         LHV = 2.501 - 2.361*(10**(-3))*float(tAvg)
@@ -349,8 +351,8 @@ class Soil():
                           (self.listOfSoilLayers[x].fcWater))
             
             # travel time for percolation (h)
-            self.listOfSoilLayers[x].TT = (((self.saturation*
-                    self.listOfSoilLayers[x].depth)-
+            self.listOfSoilLayers[x].TT = (((self.listOfSoilLayers[x].saturation
+                    * self.listOfSoilLayers[x].depth)-
                     self.listOfSoilLayers[x].fcWater)/ 
                                                self.listOfSoilLayers[x].ksat)
             t = 24 # time step (hours)
@@ -364,7 +366,7 @@ class Soil():
     # Use MUSLE approach (equations taken from SWAT 2009 documentation) to 
     # determine soil erosion
     #--------------------------------------------------------------------------- 
-    def dailySoilErosion(self, rainfall, jday):
+    def dailySoilErosion(self, rainfall, biomass):
         
         # time of concentration (h)
         Tconc = ((self.slopeLength**0.6) * (self.manning**0.6)) / (
@@ -411,7 +413,7 @@ class Soil():
         # 0.05 is the minimum value for C. This is an estimate.
         # 250 (COVER) NEEDS TO BE CHANGED (BIOMASS)
         C = math.exp((math.log(0.8) - math.log(0.05)) * 
-                     math.exp(-0.00115 * 250) + math.log(0.05))
+                     math.exp(-0.00115 * float(biomass)) + math.log(0.05))
         
         
         # the exponential term m is calculated as...
@@ -429,7 +431,88 @@ class Soil():
         sed = 11.8 * ((self.runoff * Qpeak)**0.56
                       ) * K * C * self.practiceFactor * LS
         self.sedimentYield = sed
+
+    #---------------------------------------------------------------------------
+    # Function: dailySoilTemperature
+    # Equations taken from SWAT 2009 documentation to determine temperature of 
+    # soil
+    #---------------------------------------------------------------------------       
+    def updateSoilTemperature(self, biomass, radiation, Tavg, TavgAnnual, day):
+                
+        albedoSoil = self.soilAlbedo # soil albedo constant
+        bd = self.bulkDensity # soil bulk density (g/cm^3)
+        CV = float(biomass) # above ground biomass and residue (kg/ha)
+        Hday = float(radiation) # daily solar radiation (user input, MJ/m2)
+        Tav = float(Tavg) # average daily temperature (oC)
+        SW = self.getSumSoilWater() # total soil water in the profile (mm)
+        ztot = self.profileDepth # total soil profile depth
+        Taair = TavgAnnual # Average annual air temperature (C)
         
+        # soil cover index
+        cover = math.exp(-0.00005 * float(CV))
+        
+        # daily albedo
+        albedo = 0.23 * (1 - cover) + albedoSoil * cover
+        
+        # radiation term
+        radiate = (Hday * (1 - albedo) - 14) / 20
+        
+        # Temperature of a bare soil surface (C)
+        Tbare = Tav + radiate * Tav
+        
+        # weight factor taking snow cover into account
+        coverFactor = (CV / (CV + math.exp(7.563-0.0001297 * (-CV))))
+        
+        # snow water content on the current day (mm)
+        SNOW = 0
+        if day > 300 or day < 95: 
+            SNOW = 0.8
+        snowFactor = (SNOW*10 / (SNOW*10 + math.exp(6.055-0.3002* SNOW*10)))
+        
+        # used cover factor
+        bcv = max(coverFactor, snowFactor)
+        
+        # Daily soil surface temperature (C)
+        self.Tsurf = (bcv * self.Tsurf) + ((1 - bcv) * Tbare)       
+        
+        # scaling factor for soil water
+        scale = SW / ((0.356-0.144*bd) * ztot)
+        
+        # maximum damping depth (mm)
+        ddmax = 1000 + (2500 * bd) / (bd + 686 * math.exp(-5.63 * bd))
+        
+        # damping depth (mm)
+        dd = ddmax * math.exp(math.log(500/ddmax) * ((1-scale)/(1+scale))**2)
+        
+        # lag coefficient
+        L = 0.8
+
+        # depth at the center of the soil layer
+        z = 0.0
+                  
+        # Calculate soil temperature for each soil layer
+        for x in range(0, len(self.listOfSoilLayers)):
+            
+            # calculate depth at the center of the soil layer
+            if x == 0:
+                z = self.listOfSoilLayers[x].bottomDepth/2
+            else:
+                z = (self.listOfSoilLayers[x].bottomDepth + 
+                     self.listOfSoilLayers[x-1].bottomDepth)/2
+            
+            # soil temperature (C) at depth z (mm) on previous day
+            TsoilPrev = self.listOfSoilLayers[x].temperature
+        
+            # ratio of depth at the center of soil layer to damping depth
+            zd = z / dd
+        
+            # depth factor
+            df = zd/ (zd + math.exp(-0.867 - 2.078 * zd))
+        
+            # soil temperature (C) at depth z (mm)
+            self.listOfSoilLayers[x].temperature = (
+                L * TsoilPrev) + (1-L) * (df * (Taair-self.Tsurf) + self.Tsurf)  
+
     #---------------------------------------------------------------------------
     # Function: updateCurrentSoilWater
     # Updates the soil water within each layer at the end of each day. The 
@@ -437,6 +520,7 @@ class Soil():
     # and 20% from layer 2.
     #---------------------------------------------------------------------------
     def updateCurrentSoilWater(self, rainfall):
+        
         for x in range(0, len(self.listOfSoilLayers)):
             if x == 0:
                 self.listOfSoilLayers[x].currentSoilWaterMM = (max

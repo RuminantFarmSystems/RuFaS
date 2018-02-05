@@ -62,6 +62,17 @@ class OutputHandler():
         for _, handler in self.report_handlers.items():
             if handler.active:
                 handler.annual_flush()
+                
+    #------------------------------------------------------------------------------- 
+    # Function: initialize_reports
+    #           Initializes attributes of output report files
+    #-------------------------------------------------------------------------------   
+    def initialize_reports(self, soil):
+        # initialize number of layer in soil summary report handler to get output
+        # data pertaining to each soil layer 
+        if self.report_handlers['soil_summary'].active == True:
+            self.report_handlers['soil_summary'].setNumSoilLayers(len
+                                                (soil.listOfSoilLayers))
 
 #-------------------------------------------------------------------------------
 # Abstract Class: ReportHandler
@@ -72,7 +83,7 @@ class ReportHandler(ABC):
 
     def __init__(self, reportName, fName):
 
-        self.active = True
+        self.active = False
         self.reportName = reportName
         self.fName = fName
         self.path = "./Outputs/"

@@ -100,12 +100,15 @@ def read_weather(filePath:str, w:Weather, c:Config):
     w.tMin = [[0 for _ in range(365)]for _ in range(c.years)]
     w.tAvg = [[0 for _ in range(365)]for _ in range(c.years)]
     w.biomass = [[0 for _ in range(365)]for _ in range(c.years)]
+    w.radiation = [[0 for _ in range(365)]for _ in range(c.years)]
+
 
     rainfallData = []
     tMaxData = []
     tMinData = []
     tAvgData = []
     bioMass = []
+    radiation = []
     
     with open(filePath, "r") as f:
         readCSV = csv.reader(f, delimiter=',')
@@ -125,6 +128,9 @@ def read_weather(filePath:str, w:Weather, c:Config):
                 
                 # 5) Read biomass data
                 bioMass.append(row[5])
+                
+                # 6) Read radiation data
+                radiation.append(row[6])
             
             currentRow += 1
     
@@ -167,15 +173,23 @@ def read_weather(filePath:str, w:Weather, c:Config):
                 break
             else:
                 w.biomass[i][j] = bioMass[i*365 + j]
-
+                
+    # 4) Update radiation in weather
+    for i in range(0, c.years):
+        for j in range(0, 365):
+            if (i*365+j) >= len(radiation):
+                break
+            else:
+                w.radiation[i][j] = radiation[i*365 + j]
+                
 #-------------------------------------------------------------------------------
 # Function: read_farm
 # 
 #-------------------------------------------------------------------------------
 def read_farm(data, s:State, c:Config, o:OutputHandler):
     
-    read_location(data['location'], s.location, c)
-    read_soil(data['soil'], s.soil, c, o)
+    #read_location(data['location'], s.location, c)
+    read_soil(data['soil'], s.soil, c)
 
     #read_crops(data, s.crops, c)
     #read_feed(data, s.feed, c)
@@ -200,7 +214,7 @@ def read_location(data, location, c:Config):
 # Function: read_soil
 # Reads the data-fields associated with the soil portion from the json file 
 #-------------------------------------------------------------------------------
-def read_soil(f, so, c:Config, o:OutputHandler):
+def read_soil(f, so, c:Config):
     
     # read in each soil attribute
     for key, value in f.items():
@@ -210,12 +224,6 @@ def read_soil(f, so, c:Config, o:OutputHandler):
             so.CN2 = value
         elif(key.startswith("Layer")):
             read_soil_layer(key, f[key], so, c)
-        elif(key == "WiltingPoint"):
-            so.wiltingPoint = value
-        elif(key == "FieldCapacity"):
-            so.fieldCapacity = value        
-        elif(key == "Saturation"):
-            so.saturation = value 
         elif(key == "FieldSlope"):
             so.fieldSlope = value
         elif(key == "SlopeLength"):
@@ -234,6 +242,10 @@ def read_soil(f, so, c:Config, o:OutputHandler):
             so.silt = value
         elif(key == "Clay"):
             so.clay = value
+        elif(key == "BulkDensity"):
+            so.bulkDensity = value
+        elif(key == "SoilAlbedo"):
+            so.soilAlbedo = value
         else:
             raise JSONfileError(c.fName, "Soil", "Soil Input Key Mismatch")
      
@@ -253,11 +265,6 @@ def read_soil(f, so, c:Config, o:OutputHandler):
     so.calculateWiltingWater() # calculate wilting water in layer
     so.calculateFcWater() # calculate field capacity water in layer
     
-    # initialize number of layer in soil summary report handler to get output
-    # data pertaining to each soil layer 
-    o.report_handlers['soil_summary'].setNumSoilLayers(
-        len(so.listOfSoilLayers))
-
 #-------------------------------------------------------------------------------
 # Function: read_soil_layer
 # Reads the data-fields associated with a layer of soil from the json file 
@@ -266,6 +273,10 @@ def read_soil_layer(layerName, f, so, c:Config):
     bottomDepth = 0.0
     currentSoilWater = 0.0
     kSat = 0.0
+    wiltingPoint = 0.0
+    fieldCapacity = 0.0
+    saturation = 0.0
+    temperature = 0.0
     
     for key, value in f.items():
         if(key == "BottomDepth"):
@@ -274,10 +285,21 @@ def read_soil_layer(layerName, f, so, c:Config):
             currentSoilWater = value
         elif(key == "Ksat"):
             kSat = value
+        elif(key == "WiltingPoint"):
+            wiltingPoint = value
+        elif(key == "FieldCapacity"):
+            fieldCapacity = value        
+        elif(key == "Saturation"):
+            saturation = value     
+        elif(key == "InitialTemperature"):
+            temperature = value
+            if layerName == "Layer1":
+                so.Tsurf = value   
         else:
             raise JSONfileError(c.fName, "SoilLayer", "Soil Layer Input Key Mismatch")
         
-    so.addSoilLayer(layerName, bottomDepth, currentSoilWater, kSat)
+    so.addSoilLayer(layerName, bottomDepth, currentSoilWater, kSat,
+                    wiltingPoint, fieldCapacity, saturation, temperature)
     
 """
 #-------------------------------------------------------------------------------

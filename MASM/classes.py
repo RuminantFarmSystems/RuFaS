@@ -93,9 +93,8 @@ class Weather():
         self.tMin = [[]]
         self.tAvg = [[]]
         self.biomass = [[]]
-        
-        self.cumulative = 1.0
-       
+        self.radiation = [[]]
+               
 #-------------------------------------------------------------------------------
 # Class: Time
 #        Contains information about the current time in the simulation

@@ -21,6 +21,7 @@ class SoilSummary(ReportHandler):
     layersSoilWater = []
     layersEsoil = []
     layersPerc = []
+    layersTemperature = []
     
     def __init__(self):
              
@@ -49,6 +50,7 @@ class SoilSummary(ReportHandler):
         self.potentialEvapotranspiration = []
         self.cropTranspiration = []
         self.sublimation = []
+        self.surfaceTemp = []
         self.sedimentYield = []
         self.numSoilLayers = 0   
     
@@ -68,6 +70,9 @@ class SoilSummary(ReportHandler):
             
             soilLayerPerc = []
             self.layersPerc.append(soilLayerPerc)
+            
+            soilLayerTemperature = []
+            self.layersTemperature.append(soilLayerTemperature)
 
     #---------------------------------------------------------------------------
     # Function: updateDailyOutput
@@ -96,11 +101,18 @@ class SoilSummary(ReportHandler):
         for x in range(0, len(soil.listOfSoilLayers)):
             self.layersSoilWater[x].append(
                 soil.listOfSoilLayers[x].currentSoilWaterMM)
+            
             self.layersEsoil[x].append(
                                     soil.listOfSoilLayers[x].layerEsoil)
+            
             self.layersPerc[x].append(
                                     soil.listOfSoilLayers[x].perc)
             
+            self.layersTemperature[x].append(
+                                    soil.listOfSoilLayers[x].temperature)
+            
+        
+        self.surfaceTemp.append(soil.Tsurf)  
         self.sedimentYield.append(soil.sedimentYield)  
     
     #---------------------------------------------------------------------------
@@ -126,6 +138,10 @@ class SoilSummary(ReportHandler):
             for x in range(0, self.numSoilLayers):
                 fieldnames.append("Perc/L" + str(x+1))
                 
+            for x in range(0, self.numSoilLayers):
+                fieldnames.append("Temp/L" + str(x+1))
+                      
+            fieldnames.append("Surface Temp")
             fieldnames.append("Sediment Yield")
             
             writer = csv.DictWriter(csvfile, fieldnames=fieldnames, 
@@ -138,6 +154,7 @@ class SoilSummary(ReportHandler):
                              'Potential Evapotranspiration (E0)': "mm d^-1",
                              'Crop Transpiration (Etrans)': "mm H2O",
                              'Maximum Sublimation (Esoil)': "mm H2O",
+                             'Surface Temp': "C",
                              'Sediment Yield': "metric tons"}
             for fieldname in fieldnames:
                 if fieldname.startswith("SoilWater"):
@@ -146,6 +163,9 @@ class SoilSummary(ReportHandler):
                     units[fieldname] = 'mm H2O'
                 elif fieldname.startswith("Perc"):
                     units[fieldname] = 'mm H2O'
+                elif fieldname.startswith("Temp"):
+                    units[fieldname] = 'C'
+                                        
             writer.writerow(units)
 
             # 3) Write data day by day
@@ -160,6 +180,7 @@ class SoilSummary(ReportHandler):
                                     (self.cropTranspiration[x],3)),
                     'Maximum Sublimation (Esoil)': str(round
                                     (self.sublimation[x],3)),
+                    'Surface Temp': str(round(self.surfaceTemp[x],3)),
                     'Sediment Yield': str(round(self.sedimentYield[x],3))}
                 
                 for y in range(0, self.numSoilLayers):
@@ -169,7 +190,9 @@ class SoilSummary(ReportHandler):
                             round(self.layersEsoil[y][x], 3))
                         dailySoilData["Perc/L" + str(y+1)] = str(
                             round(self.layersPerc[y][x], 3))
-
+                        dailySoilData["Temp/L" + str(y+1)] = str(
+                            round(self.layersTemperature[y][x], 3))
+                        
                 writer.writerow(dailySoilData)
                     
     #---------------------------------------------------------------------------
