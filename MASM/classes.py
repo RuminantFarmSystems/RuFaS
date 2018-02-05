@@ -9,6 +9,8 @@
 #
 ################################################################################
 
+import csv
+from pathlib import Path
 from MASM.routines import Soil
 
 #-------------------------------------------------------------------------------
@@ -17,10 +19,10 @@ from MASM.routines import Soil
 #-------------------------------------------------------------------------------
 class State():
 
-    def __init__(self):
+    def __init__(self, data):
         
-        self.location = Location()
-        self.soil = Soil()
+        self.location = Location(data['location'])
+        self.soil = Soil(data['soil'])
         
         #self.crops = Crops()
         #self.feed = Feed()
@@ -50,11 +52,8 @@ class State():
 #-------------------------------------------------------------------------------  
 class Location():
     
-    def __init__(self):
-        self.latitude = 0.0
-    
-    def annual_reset(self):
-        pass
+    def __init__(self, data):
+        self.latitude = data['latitude']
     
 #-------------------------------------------------------------------------------
 # Class: Config
@@ -62,11 +61,11 @@ class Location():
 #-------------------------------------------------------------------------------
 class Config():
 
-    def __init__(self):
-
-        self.fName = None
-        self.output_dir = None
-        self.years = 1
+    def __init__(self, data, fName):
+        
+        self.fName = fName
+        self.duration = data['duration']
+        self.output_dir = data['output_dir']
     
     #----------------------------------------------------------------------------
     # Function: modify_parameters
@@ -82,18 +81,87 @@ class Config():
 #-------------------------------------------------------------------------------
 class Weather():
 
-    def __init__(self):
+    def __init__(self, weather_path_str, duration):
 
+        self.cumulative = 1.0 
+        
         #
         # Weather Data in 2D lists -> [year][julianDay]
         #
-        self.rainfall = [[]]
-        self.tMax = [[]]
-        self.tMin = [[]]
-        self.tAvg = [[]]
-        self.biomass = [[]]
+        self.rainfall = [[0 for _ in range(365)]for _ in range(duration)]
+        self.tMax = [[0 for _ in range(365)]for _ in range(duration)]
+        self.tMin = [[0 for _ in range(365)]for _ in range(duration)]
+        self.tAvg = [[0 for _ in range(365)]for _ in range(duration)]
+        self.biomass = [[0 for _ in range(365)]for _ in range(duration)]
+    
+        rainfallData = []
+        tMaxData = []
+        tMinData = []
+        tAvgData = []
+        bioMassData = []
         
-        self.cumulative = 1.0
+        with Path(weather_path_str).open('r') as f:
+            readCSV = csv.reader(f, delimiter=',')
+            
+            currentRow = 0
+            for row in readCSV:
+                if currentRow != 0:
+                    # 1) Read rainfall data
+                    rainfallData.append(row[1])
+                    
+                    # 2) Read max temperature data
+                    tMaxData.append(row[2])
+                    
+                    # 3) Read min temperature data
+                    tMinData.append(row[3])
+                    
+                    # 4) Read avg temperature data
+                    tAvgData.append(row[4])
+                    
+                    # 5) Read biomass data
+                    bioMassData.append(row[5])
+                
+                currentRow += 1
+        
+        # 1) Update Rainfall in weather
+        for i in range(0, duration):
+            for j in range(0, 365):
+                if (i*365+j) >= len(rainfallData):
+                    break
+                else:
+                    self.rainfall[i][j] = rainfallData[i*365 + j]
+    
+        # 2) Update Max Temperature in weather
+        for i in range(0, duration):
+            for j in range(0, 365):
+                if (i*365+j) >= len(tMaxData):
+                    break
+                else:
+                    self.tMax[i][j] = tMaxData[i*365 + j]
+                    
+        # 3) Update Min Temperature in weather
+        for i in range(0, duration):
+            for j in range(0, 365):
+                if (i*365+j) >= len(tMinData):
+                    break
+                else:
+                    self.tMin[i][j] = tMinData[i*365 + j]
+    
+        # 4) Update Avg Temperature in weather
+        for i in range(0, duration):
+            for j in range(0, 365):
+                if (i*365+j) >= len(tAvgData):
+                    break
+                else:
+                    self.tAvg[i][j] = tAvgData[i*365 + j] 
+                    
+        # 4) Update biomass in weather
+        for i in range(0, duration):
+            for j in range(0, 365):
+                if (i*365+j) >= len(bioMassData):
+                    break
+                else:
+                    self.biomass[i][j] = bioMassData[i*365 + j]
        
 #-------------------------------------------------------------------------------
 # Class: Time
@@ -103,6 +171,7 @@ class Weather():
 class Time():
 
     def __init__(self):
+        
         self.d = 1  # Current Day
         self.m = 1  # Current Month
         self.y = 1  # Current Year

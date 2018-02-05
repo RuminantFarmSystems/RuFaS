@@ -22,9 +22,9 @@ class SoilSummary(ReportHandler):
     layersEsoil = []
     layersPerc = []
     
-    def __init__(self):
+    def __init__(self, data):
              
-        super().__init__("Soil Summary", "Soil_Summary.csv")
+        self.set_properties(data)
                  
         #
         # Yearly Output
@@ -53,10 +53,10 @@ class SoilSummary(ReportHandler):
         self.numSoilLayers = 0   
     
     #---------------------------------------------------------------------------
-    # Function: initialize
+    # Function: get_data
     #           Transfers the needed data from Soil object to the report handler
     #---------------------------------------------------------------------------
-    def initialize(self, soil):
+    def get_data(self, soil):
         
         # initialize number of layer in soil summary report handler to get output
         # data pertaining to each soil layer

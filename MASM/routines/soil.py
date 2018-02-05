@@ -56,6 +56,25 @@ def daily_soil_update(soil, weather, time):
         [time.julian_day()-1]) 
 
 #-------------------------------------------------------------------------------
+# Function: read_soil_layer
+# Reads the data-fields associated with a layer of soil from the json file 
+#-------------------------------------------------------------------------------        
+def read_soil_layer(layerName, f, so):
+    
+    bottomDepth = 0.0
+    currentSoilWater = 0.0
+    kSat = 0.0
+    
+    for key, value in f.items():
+        if(key == "BottomDepth"):
+            bottomDepth = value   
+        elif(key == "StartingSoilWater"):
+            currentSoilWater = value
+        elif(key == "Ksat"):
+            kSat = value
+        
+    so.addSoilLayer(layerName, bottomDepth, currentSoilWater, kSat)
+#-------------------------------------------------------------------------------
 # Class: Soil
 #        Contains the state of the farm's soil 
 #-------------------------------------------------------------------------------   
@@ -63,25 +82,25 @@ class Soil():
     
     listOfSoilLayers = [] 
 
-    def __init__(self):
+    def __init__(self, data):
         
     # Values Initialized by Input
-        self.wiltingPoint = 0.0
-        self.fieldCapacity = 0.0
-        self.saturation = 0.0        
-        self.profileDepth = 0.0 
-        self.CN2 = 0.0 # unitless, user-defined curve number (empirical)
+        self.wiltingPoint = data['WiltingPoint']
+        self.fieldCapacity = data['FieldCapacity']
+        self.saturation = data['Saturation']        
+        self.profileDepth = data['ProfileDepth']
+        self.CN2 = data['CN2'] # unitless, user-defined curve number (empirical)
      
         # soil erosion attributes
-        self.fieldSlope = 0.0
-        self.slopeLength = 0.0
-        self.manning = 0.0
-        self.fieldSize = 0.0
-        self.practiceFactor = 0.0
-        self.orgc = 0.0
-        self.sand = 0.0
-        self.silt = 0.0
-        self.clay = 0.0
+        self.fieldSlope = data['FieldSlope']
+        self.slopeLength = data['SlopeLength']
+        self.manning = data['Manning']
+        self.fieldSize = data['FieldSize']
+        self.practiceFactor = data['PracticeFactor']
+        self.orgc = data['Orgc']
+        self.sand = data['Sand']
+        self.silt = data['Silt']
+        self.clay = data['CN2']
         
         # daily output values
         self.runoff = 0.0
@@ -91,13 +110,33 @@ class Soil():
         
         self.dayInfiltraiton = 0.0 # daily infiltration
         self.sedimentYield = 0.0
+        
+        for layerName, layer in data["SoilLayers"].items():
+            self.addSoilLayer(layerName, layer['BottomDepth'], layer['Ksat'])
+            
+        # sort layers by bottomDepth 
+        self.listOfSoilLayers.sort(key=lambda x: x.bottomDepth) 
+        
+        # calculate initial depth of each soil layer
+        for x in range(0, len(self.listOfSoilLayers)):
+            if x == 0:
+                self.listOfSoilLayers[x].depth = self.listOfSoilLayers[x].bottomDepth
+            else:   
+                self.listOfSoilLayers[x].depth = (self.listOfSoilLayers[x].bottomDepth
+                    - self.listOfSoilLayers[x-1].bottomDepth)
+        
+        self.convertCurrentSoilWaterToMM() # calculate initial soil water in layer
+        self.calculateWiltingWater() # calculate wilting water in layer
+        self.calculateFcWater() # calculate field capacity water in layer
 
     #---------------------------------------------------------------------------
     # Class: SoilLayer
     # An instance of this class represents a layer in the soil
     #---------------------------------------------------------------------------      
     class SoilLayer():
+        
         def __init__(self):
+            
             self.name = None
             self.bottomDepth = 0.0 # bottom depth of soil layer
             self.depth = 0.0 # depth of soil layer
@@ -121,7 +160,7 @@ class Soil():
     # Function: addSoilLayer
     # Adds a soil layer to the list of soil layers
     #---------------------------------------------------------------------------        
-    def addSoilLayer(self, name, bd, csw, ksat):
+    def addSoilLayer(self, name, bd, ksat):
         soilLayer = self.SoilLayer()
         soilLayer.name = name
         soilLayer.bottomDepth = bd

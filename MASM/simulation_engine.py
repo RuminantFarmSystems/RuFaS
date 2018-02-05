@@ -12,20 +12,19 @@
 
 from pathlib import Path
 
-from MASM.classes import State, Config, Time, Weather
-from MASM.output import OutputHandler
 from MASM.input import read_json_file
+from MASM.classes import Time
 from MASM.errors import InvalidJSONfileError
 import MASM.routines as routines
 
 #
 # Define Module Global Variables
 #
-state = None
 config = None
-time = None
-weather = None
+state = None
 output = None
+weather = None
+time = None
 
 #-------------------------------------------------------------------------------
 # Function: simulate
@@ -37,21 +36,22 @@ output = None
 # Parameters: input_fPath - path to the input json file
 #------------------------------------------------------------------------------- 
 def simulate(input_fPath:Path):
-    
-    #
-    # Instantiates global variables for this simulation
-    # New instances are created for every new simulation
-    #
-    initialize_globals()
 
     #
-    # Reads the json input file
+    # Reads the json input file and uses the information to instantiate the
+    # simulation global variables returned as a dictionary
     #
     try:
-        read_json_file(input_fPath, state, config, weather, output)
+        json_contents = read_json_file(input_fPath)
     except InvalidJSONfileError as e:
         print(e.msg)
         return
+    
+    #
+    # Assigns the classes returned from reading the json file to the simulation
+    # global variables
+    #
+    initialize_globals(json_contents)
     
     #
     # Initialize reports
@@ -144,19 +144,19 @@ def annual_simulation():
 #          False otherwise
 #------------------------------------------------------------------------------- 
 def end_simulation():
-    return time.y > config.years
+    return time.y > config.duration
 
 #------------------------------------------------------------------------------- 
 # Function: initialize_globals
 #           Initializes all simulation global objects
 #           Creates a new instance for each object
 #------------------------------------------------------------------------------- 
-def initialize_globals():
+def initialize_globals(json_contents):
     
-    global state, config, time, weather, output
-    state = State()
-    config = Config()
-    weather = Weather()
+    global config, state, output, weather, time
+    config = json_contents['config']
+    state = json_contents['state']
+    output = json_contents['output']
+    weather = json_contents['weather']
     time = Time()
-    output = OutputHandler()
     

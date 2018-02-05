@@ -19,10 +19,10 @@ from abc import ABC, abstractmethod
 #-------------------------------------------------------------------------------
 class OutputHandler():
 
-    def __init__(self):
+    def __init__(self, data):
 
         self.reports = {
-                        'soil_summary': SoilSummary()
+                        'soil_summary': SoilSummary(data['soil_summary'])
                         }
         
     #---------------------------------------------------------------------------
@@ -31,9 +31,8 @@ class OutputHandler():
     #---------------------------------------------------------------------------
     def initialize_reports(self, state):
         
-        self.reports['soil_summary'].initialize(state.soil)
+        self.reports['soil_summary'].get_data(state.soil)
         
-            
     #---------------------------------------------------------------------------
     # Function: make_output_dir
     #           Creates the directory to store output files (if doesn't exist)
@@ -44,6 +43,16 @@ class OutputHandler():
         
         Path(config.output_dir).mkdir(exist_ok = True, parents = False)
         ReportHandler.path = config.output_dir
+        
+    #---------------------------------------------------------------------------
+    # Function: handle_existing_files
+    #           Sets all of the reports in the output object to the default
+    #---------------------------------------------------------------------------
+    def handle_existing_files(self):
+
+        for _, report in self.reports.items():
+            if report.active:
+                report.handle_existing_file()
     
     #---------------------------------------------------------------------------
     # Function: write_annual_reports
@@ -65,17 +74,7 @@ class OutputHandler():
         for _, report in self.reports.items():
             if report.active:
                 report.annual_flush()
-                
-    #---------------------------------------------------------------------------
-    # Function: handle_existing_files
-    #           Sets all of the reports in the output object to the default
-    #---------------------------------------------------------------------------
-    def handle_existing_files(self):
-
-        for _, report in self.reports.items():
-            if report.active:
-                report.handle_existing_file()
-
+            
 #-------------------------------------------------------------------------------
 # Abstract Class: ReportHandler
 #                 Contains an interface for report handlers, each output report
@@ -83,13 +82,13 @@ class OutputHandler():
 #-------------------------------------------------------------------------------
 class ReportHandler(ABC):
     
-    path = None
+    path = "Default_Output_Dir"
 
-    def __init__(self, reportName, fName):
+    def set_properties(self, data):
 
-        self.active = True
-        self.reportName = reportName
-        self.fName = fName
+        self.active = data['active']
+        self.report_name = data['report_name']
+        self.fName = data['file_name']
 
     #---------------------------------------------------------------------------
     # Function: get_fPath
@@ -113,7 +112,7 @@ class ReportHandler(ABC):
     # Abstract Methods
     #---------------------------------------------------------------------------
     @abstractmethod
-    def initialize(self): pass
+    def get_data(self): pass
     @abstractmethod
     def daily_update(self): pass
     @abstractmethod  
