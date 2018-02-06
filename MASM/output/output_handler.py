@@ -22,6 +22,7 @@ class OutputHandler():
     def __init__(self, data):
 
         self.reports = {
+                        'farm_summary': FarmSummary(data['farm_summary']),
                         'soil_summary': SoilSummary(data['soil_summary'])
                         }
         
@@ -101,7 +102,7 @@ class BaseReportHandler(ABC):
         
         if self.get_fPath().exists():
             self.get_fPath().unlink()
-            print("Existing {} file detected and deleted\n".format(self.fName))
+            print("Existing {} file detected and deleted".format(self.fName))
             
     #---------------------------------------------------------------------------
     # Abstract Methods
@@ -115,5 +116,5 @@ class BaseReportHandler(ABC):
     @abstractmethod
     def annual_flush(self): raise NotImplementedError()
 
-
+from .farm_summary import FarmSummary
 from .soil_summary import SoilSummary

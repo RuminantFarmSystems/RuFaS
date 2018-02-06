@@ -58,12 +58,12 @@ def simulate(input_fPath:Path):
     #
     # MAIN Simulation Loop
     #
-    print("Simulating: {}".format(config.fName))
+    print("\nSimulating: {}".format(input_fPath.name))
 
     while not end_simulation():
         annual_simulation()
         
-    print("Simulation Successful: {}\n".format(config.fName))
+    print("Simulation Successful: {}\n".format(input_fPath.name))
 
 #------------------------------------------------------------------------------- 
 # Function: daily_simulation
@@ -156,7 +156,7 @@ def read_json_file(fPath:Path):
         data = json.load(f)
             
         try:
-            config = Config(data['config'], fPath.name)
+            config = Config(data['config'])
             state = State(data['farm'])
             output = OutputHandler(data['output'])
             weather = Weather(data['weather'], config.duration)

@@ -52,10 +52,8 @@ class State():
 #-------------------------------------------------------------------------------
 class Config():
 
-    def __init__(self, data, fName):
+    def __init__(self, data):
         
-        self.fName = fName
-
         self.duration = data['duration']
         self.output_dir = data['output_dir']
         
