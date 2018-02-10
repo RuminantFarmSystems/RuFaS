@@ -8,4 +8,5 @@
 # ignore python compiled files
 *.pyc
 
-# ignore output folder
+# ignore build folder
+build

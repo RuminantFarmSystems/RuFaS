@@ -1,6 +1,6 @@
 ################################################################################
 #
-# MASM: Modular Agricultural Systems Modeling Environment
+# RUFAS: Ruminant Farm Systems Model
 #
 # main.py - Main program routine
 #
@@ -11,22 +11,22 @@
 
 #!/usr/bin/env python3
 
-import MASM
+import RUFAS
 
 #-------------------------------------------------------------------------------
 # Function: main
-#           Main function of MASM, the whole simulation is executed here
-#-------------------------------------------------------------------------------
+#           Main function of RUFAS, the whole simulation is executed here
+#-------------------------------------------------f------------------------------
 def main():
  
-    print("MASM: Modular Agricultural Systems Modeling Environment")
-    
+    print("RUFAS: Ruminant Farm Systems Model")
+
     #
     # Prompt user for an input
     # Input could either be a json file when doing only 1 simulation
     # or a directory containing json files when doing a batch simulation
     #
-    input_file_list = MASM.input_prompt()
+    input_file_list = RUFAS.input_prompt()
     
     #
     # Begin the simulation
@@ -34,7 +34,7 @@ def main():
     # Runs only 1 simulation in the case of a single input file
     #
     for input_file_path in input_file_list:
-        MASM.simulate(input_file_path)
+        RUFAS.simulate(input_file_path)
 
 #-------------------------------------------------------------------------------
 #

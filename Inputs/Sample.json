@@ -3,7 +3,7 @@
 
     "config":
     {
-        "duration": 2,
+        "duration": 24,
         "output_dir": "./Outputs/Sample_Farm_Outputs/"
     },
 
