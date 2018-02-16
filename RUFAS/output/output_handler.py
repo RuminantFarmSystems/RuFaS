@@ -24,7 +24,8 @@ class OutputHandler():
 
         self.reports = {
                         'farm_summary': FarmSummary(data['farm_summary']),
-                        'soil_summary': SoilSummary(data['soil_summary'])
+                        'soil_summary': SoilSummary(data['soil_summary']),
+                        'soil_nitrogen': SoilNitrogen(data['soil_nitrogen'])
                         }
         
     #---------------------------------------------------------------------------

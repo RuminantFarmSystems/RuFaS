@@ -111,6 +111,10 @@ class Soil():
         self.dayInfiltraiton = 0.0
         self.sedimentYield = 0.0
         
+        self.residue = data['Residue']
+        self.labileP = data['LabileP']
+        self.freshNMineralRate = data['FreshNMineralRate']
+        
     #---------------------------------------------------------------------------
     # Class: SoilLayer
     # An instance of this class represents a layer in the soil
@@ -145,6 +149,13 @@ class Soil():
             self.ksat = layerData['Ksat'] # saturated hydraulic conductivity (mm/h)
             self.TT = 0.0  
             self.perc = 0.0 # amount of water that percolates to next layer
+            
+            # Variable to simulate nitrogenCycling
+            self.orgC = layerData['OrgC']
+            self.activeMineralRate = layerData['ActiveMineralRate']
+            self.cationExclusionFraction = layerData['CationExclusionFraction']
+            self.denitrificationRate = layerData['DenitrificationRate']
+
         
     #---------------------------------------------------------------------------
     # Function: calculateFcWater

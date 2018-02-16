@@ -82,6 +82,7 @@ def daily_simulation():
         # Pass only information needed
         #
         routines.daily_soil_routine(state.soil, weather, time)
+        routines.daily_nitrogen_cycling_routine(state.soil)
     
         #
         # Daily Output Updates

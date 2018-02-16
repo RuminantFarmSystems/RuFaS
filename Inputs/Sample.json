@@ -43,6 +43,9 @@
             "Clay": 20,
             "BulkDensity": 1.2,
             "SoilAlbedo": 0.16,
+            "Residue": 250,
+            "LabileP": 15,
+            "FreshNMineralRate": 0.05,
 
             "SoilLayers":
             {
@@ -54,7 +57,11 @@
                     "BottomDepth": 150,
                     "StartingSoilWater": 0.2,
                     "Ksat": 5,
-                    "InitialTemperature": 12
+                    "InitialTemperature": 12,
+                    "OrgC": 2,
+                    "ActiveMineralRate": 0.0001,
+                    "CationExclusionFraction": 0.2,
+                    "DenitrificationRate": 0.001
                 },
                 "Layer2":
                 {
@@ -64,7 +71,11 @@
                     "BottomDepth": 1000,
                     "StartingSoilWater": 0.3,
                     "Ksat": 4,
-                    "InitialTemperature": 10
+                    "InitialTemperature": 10,
+                    "OrgC": 1,
+                    "ActiveMineralRate": 0.0001,
+                    "CationExclusionFraction": 0.2,
+                    "DenitrificationRate": 0.001
                 },
                 "Layer3":
                 {
@@ -74,7 +85,11 @@
                     "BottomDepth": 2000,
                     "StartingSoilWater": 0.3,
                     "Ksat": 4,
-                    "InitialTemperature": 8
+                    "InitialTemperature": 8,
+                    "OrgC": 0.5,
+                    "ActiveMineralRate": 0.0001,
+                    "CationExclusionFraction": 0.2,
+                    "DenitrificationRate": 0.001
                 }
             }
         }
