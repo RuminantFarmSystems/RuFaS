@@ -10,8 +10,8 @@
 ################################################################################
 
 #-------------------------------------------------------------------------------
-# Class: UserInput
-#
+# Error: UserInput
+#        Raised when the user enters an invalid input at the prompt
 #-------------------------------------------------------------------------------     
 class UserInput(Exception):
     
@@ -19,8 +19,8 @@ class UserInput(Exception):
         self.msg = "USER INPUT ERROR: " + msg
 
 #-------------------------------------------------------------------------------
-# Class: 
-#
+# Error: InvalidJSONfile
+#        Raised when the json file fed to the program has problems
 #-------------------------------------------------------------------------------     
 class InvalidJSONfile(Exception):
     
@@ -28,8 +28,8 @@ class InvalidJSONfile(Exception):
         self.msg = "Skipping simulation for {}\n".format(fName)
         
 #-------------------------------------------------------------------------------
-# Class: LengthMismatchError
-#
+# Error: JSONfileData
+#        Raised when speficif parts of the json file has problems
 #-------------------------------------------------------------------------------     
 class JSONfileData(Exception):
     

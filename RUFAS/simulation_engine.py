@@ -49,7 +49,7 @@ def simulate(input_fPath:Path):
     #
     # Creates a new directory for the output files (if doesn't already exist)
     # Deletes existing output files of the same name from previous simulation
-    # Transfer needed data from state to report handlers
+    # Transfer needed (initial) data from state to report handlers
     #
     output.initialize_output_dir(config.output_dir)
     output.initialize_reports(state)
@@ -113,7 +113,7 @@ def monthly_simulation():
 #------------------------------------------------------------------------------- 
 # Function: annual_simulation
 #           Executes the annual routines of the simulation
-#           Writes the annual report to the output text file
+#           Writes the annual report to the output files
 #           Flushes the data in the output object
 #           Resets the state for the following year
 #------------------------------------------------------------------------------- 
@@ -140,20 +140,22 @@ def end_simulation():
     
 #-------------------------------------------------------------------------------
 # Function: read_json_file
-#           Sets up the parameters of the simulation
 #           Reads and interprets the json file
+#           Sets up the parameters of the simulation
 #
 # Parameters: fPath - Path to the json input file for the simulation
 #
 # Raises: InvalidJSONfileError - when there is a problem with the json file
 #-------------------------------------------------------------------------------
 def read_json_file(fPath:Path):
-    
+
+    # Specify that we are using global variables
     global config, state, output, weather, time
     
     with fPath.open('r') as f:
         data = json.load(f)
-            
+        
+        # Instantiate objects using dictionary data from .json file
         try:
             config = Config(data['config'])
             state = State(data['farm'])

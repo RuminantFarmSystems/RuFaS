@@ -2,7 +2,7 @@
 #
 # RUFAS: Ruminant Farm Systems Model
 #
-# Output.py
+# soil_summary.py
 #
 # Authors: Kass Chupongstimun
 #          Jit Patil
@@ -14,7 +14,7 @@ from RUFAS.output.output_handler import BaseReportHandler
 
 #-------------------------------------------------------------------------------
 # Class: SoilSummary
-# Creates and prints to the file soil_summary.csv
+#        Creates and prints to the file soil_summary.csv
 #-------------------------------------------------------------------------------
 class SoilSummary(BaseReportHandler):
     

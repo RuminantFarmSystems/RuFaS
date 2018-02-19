@@ -2,7 +2,7 @@
 #
 # RUFAS: Ruminant Farm Systems Model
 #
-# classes.py - Contains various class definitions
+# classes.py - Contains class definitions
 #
 # Authors: Kass Chupongstimun
 #          Jit Patil
@@ -73,7 +73,7 @@ class Config():
 #-------------------------------------------------------------------------------
 # Class: Weather
 #        Contains daily weather information stored in 3D lists
-#        Data lists are in the format Data[year][month][day]
+#        Data lists are in the format Data[year][julian_day]
 #-------------------------------------------------------------------------------
 class Weather():
 
@@ -206,20 +206,18 @@ class Time():
         self.d = 1  # Current Day
         self.m = 1  # Current Month
         self.y = 1  # Current Year
-        self.i = 1  # Current Iteration number
 
     #----------------------------------------------------------------------------
     # Function: to_str
     # Returns: a String representation of the current time in the simulation in
-    #          the format "d/m/y Rep: r"
+    #          the format "d/m/y"
     #----------------------------------------------------------------------------
     def to_str(self):
-        return "{}/{}/{} Iteration: {}".format(self.d, self.m, self.y, self.i)
+        return "{}/{}/{}".format(self.d, self.m, self.y)
     
     #----------------------------------------------------------------------------
     # Function: julian_day
-    # Returns: returns the julian day of the year given a particular month and 
-    # dat
+    # Returns: the julian day of the year
     #----------------------------------------------------------------------------    
     def julian_day(self):
         

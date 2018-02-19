@@ -2,7 +2,7 @@
 #
 # RUFAS: Ruminant Farm Systems Model
 #
-# output_handler.py
+# output_handler.py - Contains the object than handles all outputs
 #
 # Authors: Kass Chupongstimun
 #          Jit Patil
@@ -29,7 +29,7 @@ class OutputHandler():
         
     #---------------------------------------------------------------------------
     # Function: initialize_reports
-    #
+    #           Transfer needed (initial) data from state to report handlers
     #---------------------------------------------------------------------------
     def initialize_reports(self, state):
         
