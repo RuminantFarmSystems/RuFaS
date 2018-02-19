@@ -56,6 +56,10 @@ class Config():
 
     def __init__(self, data):
         
+        if data['duration'] <= 0:
+            raise errors.JSONfileData("CONFIG",
+                                      "\tSimulation Duration must be at least 1 year")
+        
         self.duration = data['duration']
         self.output_dir = data['output_dir']
         
@@ -137,12 +141,6 @@ class Weather():
                                       str(weather_file_years) +
                                       "\n\tSimulation specifies " + str(duration) +
                                       " years")
-        #
-        # TODO: check for weather file length match with simulation duration
-        #
-        # Print out number of rows(days) read from CSV file
-        #print(str(currentRow - 1))
-       
         #
         # Put weather data into the format:
         #    data[year][julian_day]

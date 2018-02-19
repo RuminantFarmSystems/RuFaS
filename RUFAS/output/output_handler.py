@@ -37,13 +37,14 @@ class OutputHandler():
         self.reports['soil_summary'].get_data(state.soil)
         
     #---------------------------------------------------------------------------
-    # Function: make_output_dir
+    # Function: initialize_output_dir
     #           Creates the directory to store output files (if doesn't exist)
     #           Sets output file path for all reports (through ReportHandler
     #           class attribute)
     #---------------------------------------------------------------------------
     def initialize_output_dir(self, output_dir):
         
+        # Initialize path for reports
         output_full_path = util.get_base_dir() / output_dir
         output_full_path.mkdir(exist_ok = True, parents = False)
         BaseReportHandler.path = output_full_path
@@ -55,7 +56,7 @@ class OutputHandler():
     
     #---------------------------------------------------------------------------
     # Function: write_annual_reports
-    #
+    #           Prints the annual report to file for all reports
     #---------------------------------------------------------------------------
     def write_annual_reports(self):
 
@@ -91,7 +92,7 @@ class BaseReportHandler(ABC):
     #---------------------------------------------------------------------------
     # Function: get_fPath
     #           Gets the path to which the report handler will write the report
-    # Returns: A path object to which the report will be writtens
+    # Returns: A path object to which the report will be written
     #---------------------------------------------------------------------------        
     def get_fPath(self):
         return self.path / self.fName

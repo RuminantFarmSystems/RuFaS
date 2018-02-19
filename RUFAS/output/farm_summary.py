@@ -94,7 +94,7 @@ class FarmSummary(BaseReportHandler):
     # Function: updateDailyOutput
     # 
     #--------------------------------------------------------------------------- 
-    def daily_update(self, soil, weather, time):
+    def daily_update(self, state, weather, time):
         
         pass 
  
