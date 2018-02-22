@@ -14,7 +14,7 @@ import math
 
 from RUFAS import util
 from RUFAS import errors
-from RUFAS.routines import Soil
+from RUFAS.routines import Soil, Animal
 
 #-------------------------------------------------------------------------------
 # Class: State
@@ -25,6 +25,7 @@ class State():
     def __init__(self, data):
         
         self.soil = Soil(data['soil'])
+        self.animal = Animal(data['animal'])
         
         #self.crops = Crops()
         #self.feed = Feed()
@@ -40,6 +41,7 @@ class State():
     def annual_reset(self):
         
         self.soil.annual_reset() 
+        self.animal.annual_reset()
 
         #self.crops.annual_reset()
         #self.feed.annual_reset()

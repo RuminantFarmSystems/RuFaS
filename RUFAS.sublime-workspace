@@ -1,0 +1,366 @@
+{
+	"auto_complete":
+	{
+		"selected_items":
+		[
+		]
+	},
+	"buffers":
+	[
+		{
+			"file": "main.py",
+			"settings":
+			{
+				"buffer_size": 1380,
+				"encoding": "UTF-8",
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "RUFAS/routines/soil.py",
+			"settings":
+			{
+				"buffer_size": 25012,
+				"encoding": "UTF-8",
+				"line_ending": "Unix"
+			}
+		}
+	],
+	"build_system": "",
+	"build_system_choices":
+	[
+	],
+	"build_varint": "",
+	"command_palette":
+	{
+		"height": 167.0,
+		"last_filter": "resour",
+		"selected_items":
+		[
+			[
+				"resour",
+				"PackageResourceViewer: Open Resource"
+			],
+			[
+				"res",
+				"PackageResourceViewer: Open Resource"
+			],
+			[
+				"re",
+				"PackageResourceViewer: Extract Package"
+			],
+			[
+				"resource",
+				"PackageResourceViewer: Open Resource"
+			],
+			[
+				"package in",
+				"Package Control: Install Package"
+			],
+			[
+				"packageres",
+				"PackageResourceViewer: Open Resource"
+			],
+			[
+				"package control:",
+				"Package Control: Install Package"
+			],
+			[
+				"PackageRe",
+				"PackageResourceViewer: Open Resource"
+			],
+			[
+				"packageResource: ",
+				"PackageResourceViewer: Extract Package"
+			],
+			[
+				"Package Control: Install Package",
+				"Package Control: Install Package"
+			]
+		],
+		"width": 464.0
+	},
+	"console":
+	{
+		"height": 179.0,
+		"history":
+		[
+			"c",
+			"cl",
+			"clc",
+			"clear",
+			"PackageResourceViewer",
+			"PackageResourceViewer: Open Resource:",
+			"PackageResourceViewer:",
+			"PackageResourceViewer: Open Resource:",
+			"Package Control: Install Package",
+			"import urllib.request,os,hashlib; h = '6f4c264a24d933ce70df5dedcf1dcaee' + 'ebe013ee18cced0ef93d5f746d80ef60'; pf = 'Package Control.sublime-package'; ipp = sublime.installed_packages_path(); urllib.request.install_opener( urllib.request.build_opener( urllib.request.ProxyHandler()) ); by = urllib.request.urlopen( 'http://packagecontrol.io/' + pf.replace(' ', '%20')).read(); dh = hashlib.sha256(by).hexdigest(); print('Error validating download (got %s instead of %s), please try manual install' % (dh, h)) if dh != h else open(os.path.join( ipp, pf), 'wb' ).write(by)"
+		]
+	},
+	"distraction_free":
+	{
+		"menu_visible": true,
+		"show_minimap": false,
+		"show_open_files": false,
+		"show_tabs": false,
+		"side_bar_visible": false,
+		"status_bar_visible": false
+	},
+	"expanded_folders":
+	[
+		"/Users/Kass/Documents/LiClipse_Workspace/RUFAS",
+		"/Users/Kass/Documents/LiClipse_Workspace/RUFAS/RUFAS",
+		"/Users/Kass/Documents/LiClipse_Workspace/RUFAS/RUFAS/output",
+		"/Users/Kass/Documents/LiClipse_Workspace/RUFAS/RUFAS/routines"
+	],
+	"file_history":
+	[
+		"/Users/Kass/Library/Application Support/Sublime Text 3/Packages/Neon Color Scheme/Neon.tmTheme",
+		"/Users/Kass/Desktop/test_py.py",
+		"/Users/Kass/Documents/LiClipse_Workspace/RUFAS/RUFAS/simulation_engine.py",
+		"/Users/Kass/Documents/LiClipse_Workspace/RUFAS/RUFAS/output/output_handler.py",
+		"/Users/Kass/Documents/LiClipse_Workspace/RUFAS/RUFAS/classes.py",
+		"/Users/Kass/Library/Application Support/Sublime Text 3/Packages/Color Scheme - Default/Mariana.tmTheme",
+		"/Users/Kass/Library/Application Support/Sublime Text 3/Packages/Material Theme/schemes/Material-Theme-Darker.tmTheme",
+		"/Users/Kass/Documents/LiClipse_Workspace/RUFAS/RUFAS/user_prompt.py",
+		"/Users/Kass/Desktop/test_code.py",
+		"/Users/Kass/Documents/LiClipse_Workspace/RUFAS/main.py",
+		"/Users/Kass/Library/Application Support/Sublime Text 3/Packages/Material Theme/Material-Theme-Darker.sublime-theme",
+		"/Users/Kass/Desktop/Material-Theme-Darker-OG..no-sublime-package",
+		"/Users/Kass/Desktop/Material-Theme-Darker-OG.xml",
+		"/Users/Kass/Library/Application Support/Sublime Text 3/Packages/Material Theme/Material-Theme.skins"
+	],
+	"find":
+	{
+		"height": 30.0
+	},
+	"find_in_files":
+	{
+		"height": 158.0,
+		"where_history":
+		[
+		]
+	},
+	"find_state":
+	{
+		"case_sensitive": false,
+		"find_history":
+		[
+			"#92A998",
+			"809BB2",
+			"CC878C",
+			"support",
+			"92A998",
+			"annotation",
+			"punc",
+			"92A998",
+			"string",
+			"annotation",
+			"punctuation.definition.keyword",
+			"92A998",
+			"#BDBDB8",
+			"#A7ADBA",
+			"#5FB3B3",
+			"80CBC4",
+			"c594c5",
+			"#EC5F68",
+			"#EC5F61",
+			"#99C794",
+			"#5FB3AA",
+			"#92A998",
+			"#FFFFFF",
+			"#6699CC",
+			"#5FB3B3",
+			"#F9AE58",
+			"#C594C5",
+			"#FF1400",
+			"definition",
+			"#FFF577",
+			"CFFF00",
+			"FF0000",
+			"class",
+			"#FF4100",
+			"#F24100",
+			"#FF4100",
+			"class",
+			"FF4100",
+			"def",
+			"FF4100",
+			"0E93FF",
+			"80CBC4",
+			"F8E71C",
+			"python",
+			"argument",
+			"2CB71D",
+			"299A0E",
+			"80CBC4"
+		],
+		"highlight": true,
+		"in_selection": false,
+		"preserve_case": false,
+		"regex": false,
+		"replace_history":
+		[
+			"#7DB9B9",
+			"7DB9B9"
+		],
+		"reverse": false,
+		"show_context": true,
+		"use_buffer2": true,
+		"whole_word": false,
+		"wrap": true
+	},
+	"groups":
+	[
+		{
+			"selected": 1,
+			"sheets":
+			[
+				{
+					"buffer": 0,
+					"file": "main.py",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 1380,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								601,
+								601
+							]
+						],
+						"settings":
+						{
+							"git_gutter_is_enabled": true,
+							"syntax": "Packages/Python/Python.sublime-syntax",
+							"tab_size": 4,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 249.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 1,
+					"type": "text"
+				},
+				{
+					"buffer": 1,
+					"file": "RUFAS/routines/soil.py",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 25012,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								8693,
+								8693
+							]
+						],
+						"settings":
+						{
+							"git_gutter_is_enabled": true,
+							"syntax": "Packages/Python/Python.sublime-syntax",
+							"tab_size": 4,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 0,
+					"type": "text"
+				}
+			]
+		}
+	],
+	"incremental_find":
+	{
+		"height": 30.0
+	},
+	"input":
+	{
+		"height": 68.0
+	},
+	"layout":
+	{
+		"cells":
+		[
+			[
+				0,
+				0,
+				1,
+				1
+			]
+		],
+		"cols":
+		[
+			0.0,
+			1.0
+		],
+		"rows":
+		[
+			0.0,
+			1.0
+		]
+	},
+	"menu_visible": true,
+	"output.find_results":
+	{
+		"height": 0.0
+	},
+	"pinned_build_system": "",
+	"project": "RUFAS.sublime-project",
+	"replace":
+	{
+		"height": 56.0
+	},
+	"save_all_on_build": true,
+	"select_file":
+	{
+		"height": 0.0,
+		"last_filter": "",
+		"selected_items":
+		[
+		],
+		"width": 0.0
+	},
+	"select_project":
+	{
+		"height": 0.0,
+		"last_filter": "",
+		"selected_items":
+		[
+		],
+		"width": 0.0
+	},
+	"select_symbol":
+	{
+		"height": 0.0,
+		"last_filter": "",
+		"selected_items":
+		[
+		],
+		"width": 0.0
+	},
+	"selected_group": 0,
+	"settings":
+	{
+	},
+	"show_minimap": true,
+	"show_open_files": true,
+	"show_tabs": true,
+	"side_bar_visible": true,
+	"side_bar_width": 273.0,
+	"status_bar_visible": true,
+	"template_settings":
+	{
+	}
+}
