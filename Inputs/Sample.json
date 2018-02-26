@@ -77,6 +77,14 @@
                     "InitialTemperature": 8
                 }
             }
+        },
+
+        "animal":
+        {
+            "ration":
+            {
+                "dummy": null
+            }
         }
     }
 }
