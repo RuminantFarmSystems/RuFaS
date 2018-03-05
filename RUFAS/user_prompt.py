@@ -70,7 +70,7 @@ def input_prompt():
                 else:
                     print("json file Detected...\n")
                 return [input_path]
-            
+                
             #
             # Handle directory of json files input
             #

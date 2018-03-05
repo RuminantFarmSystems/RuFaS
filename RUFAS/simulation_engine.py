@@ -121,7 +121,7 @@ def annual_simulation():
    
     while not time.end_year():
         monthly_simulation()
-            
+
     #
     # Annual Routines
     #
