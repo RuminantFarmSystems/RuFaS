@@ -1,5 +1,5 @@
-from pulp import *
 import math
+from RUFAS import util
 
 def optimize_feed_ration(parity, WIM, AMF, BWR, base_MEID, housing):
 
@@ -18,10 +18,10 @@ def optimize_feed_ration(parity, WIM, AMF, BWR, base_MEID, housing):
 	# BaseMY is the milk base milk yield estimated from breed specific lactation curve
 	#
 	if parity > 1:
-		base_my = ( 33.95 * (WIM ** 0.2208) *
+		base_MY = ( 33.95 * (WIM ** 0.2208) *
 					math.exp(-0.03395 * WIM) )
 	else:
-		base_my = ( 24.12 * (WIM ** 0.1782) *
+		base_MY = ( 24.12 * (WIM ** 0.1782) *
 			 		math.exp(-0.02095 * WIM) )
 	#
 	# Estimate Base milk fat
@@ -40,7 +40,7 @@ def optimize_feed_ration(parity, WIM, AMF, BWR, base_MEID, housing):
 		BW = ( BWR * 690 * ((WIM + 1.57) ** -0.0803) *
 			   math.exp(0.00720 * (WIM + 1.57)))
 	else:
-  		BW = ( BWR * 567 * ((WIM + 1.71)** -0.0730) * \
+  		BW = ( BWR * 567 * ((WIM + 1.71)** -0.0730) *
   			   math.exp(0.00869 * (WIM + 1.71)))
 
 
@@ -208,20 +208,5 @@ def optimize_feed_ration(parity, WIM, AMF, BWR, base_MEID, housing):
 	# Objective Function
 	LP_ration += LpSum([ LP_vars[key] * feed[key]['price'] for key in feed_types ])
 
-	#
-	# Add Constraints, rows represent each nutrient
-	# [Sum over all feed types (feed_amount * nutrient_content)] <operator> nutrient_limit 
-	#
-	LP_ration += LpSum([ LP_vars[key] * LP_LHS[0][key] for key in feed_types ]) <= LP_RHS[0]
-	LP_ration += LpSum([ LP_vars[key] * LP_LHS[1][key] for key in feed_types ]) >  LP_RHS[1] 
-	LP_ration += LpSum([ LP_vars[key] * LP_LHS[2][key] for key in feed_types ]) >= LP_RHS[2] 
-	LP_ration += LpSum([ LP_vars[key] * LP_LHS[3][key] for key in feed_types ]) >= LP_RHS[3] 
-	LP_ration += LpSum([ LP_vars[key] * LP_LHS[4][key] for key in feed_types ]) >= LP_RHS[4]
-
-	LP_ration.solve()
-
-	results = {}
-	for v in LP_ration.variables():
-	    results[v.name] = v.varValue
-
-	return results
+	ration = util.LP_solve(LHS, RHS, objective, operators, feed_types, "minimize", 
+						   "LP_Ration", max_feed, None)

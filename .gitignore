@@ -10,3 +10,10 @@
 
 # ignore build folder
 build
+
+# ignore project files
+*.sublime-project
+*.sublime-workspace
+*.project
+*.pydevproject
+*.vscode
