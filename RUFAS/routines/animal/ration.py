@@ -1,35 +1,39 @@
-import math
+from math import exp, pow
 from RUFAS import util
 
-def optimize_feed_ration(parity, WIM, AMF, BWR, base_NED, housing, feed):
+def calculate_rqmts(parity, WIM, AMF, BWR, base_NED, housing,
+					nutrients_list, milk_production_multiplier):
 
 	#
 	# FIC: Fiber intake capacity
 	#
 	if parity > 1:
-		FIC = ( (0.564 * (WIM + 0.857)**(0.360)) *
-				math.exp(-0.0186 * (WIM + 0.857)) )
+		FIC = ( 0.564 * pow(WIM + 0.857, 0.360) *
+				exp(-0.0186 * (WIM + 0.857)) )
 	else:
-		FIC = ( (0.388 * (WIM + 3) ** (0.588)) *
-				math.exp(-0.0277 * (WIM + 3)) )
+		FIC = ( 0.388 * pow(WIM + 3, 0.588) *
+				exp(-0.0277 * (WIM + 3)) )
 
 	#
-	# Estimate Base milk production
+	# Estimate Base milk production (base milk yield)
 	# BaseMY is the milk base milk yield estimated from breed specific lactation curve
 	#
 	if parity > 1:
 		base_MY = ( 33.95 * (WIM ** 0.2208) *
-					math.exp(-0.03395 * WIM) )
+					exp(-0.03395 * WIM) )
 	else:
 		base_MY = ( 24.12 * (WIM ** 0.1782) *
-			 		math.exp(-0.02095 * WIM) )
+			 		exp(-0.02095 * WIM) )
+
+	base_MY *= milk_production_multiplier
+
 	#
 	# Estimate Base milk fat
 	# BaseMF is the base milk fat estimated from breed specific 
 	# average milk fat and compoMEInt lactation curve
 	#
 	base_MF = ( 1.4286 * AMF * (WIM ** -0.24) *
-				math.exp(0.016 * WIM) )
+				exp(0.016 * WIM) )
 	
 	#
 	# Estimate Body Weight
@@ -38,10 +42,10 @@ def optimize_feed_ration(parity, WIM, AMF, BWR, base_NED, housing, feed):
 	#
 	if parity > 1:
 		BW = ( BWR * 690 * ((WIM + 1.57) ** -0.0803) *
-			   math.exp(0.00720 * (WIM + 1.57)))
+			   exp(0.00720 * (WIM + 1.57)))
 	else:
   		BW = ( BWR * 567 * ((WIM + 1.71)** -0.0730) *
-  			   math.exp(0.00869 * (WIM + 1.71)))
+  			   exp(0.00869 * (WIM + 1.71)))
 
 
   	#
@@ -50,10 +54,10 @@ def optimize_feed_ration(parity, WIM, AMF, BWR, base_NED, housing, feed):
 	if WIM < 56:
 		if parity > 1:
 			DBW = ( BWR * 690 * ((WIM + 0.57)**(-0.0803)) *
-					math.exp(0.00720 * (WIM + 0.57)))
+					exp(0.00720 * (WIM + 0.57)))
 		else:
 			DBW = ( BWR * 567 * ((WIM + 0.71)**(-0.730)) *
-					math.exp(0.00869 * (WIM + 0.71)))	  
+					exp(0.00869 * (WIM + 0.71)))	  
 		
 		# change in body weight (kg/d)
 		CBW = (BW - DBW) / 7
@@ -120,7 +124,7 @@ def optimize_feed_ration(parity, WIM, AMF, BWR, base_NED, housing, feed):
 	MP_mlk = 10 * PROT_mlk*base_MY/0.65  # g metabolizable protein for milk
 
 	#
-	# Sum total requrements
+	# Sum total requisrements
 	# MEIeds: MEIM, MEIACT, ME_mlk, MECBW, MPM
 	#
 	ME_req = MEIM/0.667 + MEIACT/0.667 + ME_mlk + MECBW # total ME req (Mcal)
@@ -136,15 +140,10 @@ def optimize_feed_ration(parity, WIM, AMF, BWR, base_NED, housing, feed):
 	MCP = 0.13 * TDN * DMI_est # MCP is microbial crude protein
 
 
-	#-------------------------------------------------------------------------------
-	# LINEAR PROGRAM SECTION
-	#-------------------------------------------------------------------------------
 
-	#
 	# Set Constraints limits based on requirements and intake capacity
 	# (RHS of constraints matrix)
 	# MEIeds: BW, FIC, base_NED, DMI_est, MP_req, MCP
-	#
 
 	FI_max = 0.01025 * BW * FIC
 	RV_min = 0
@@ -152,18 +151,19 @@ def optimize_feed_ration(parity, WIM, AMF, BWR, base_NED, housing, feed):
 	RPD_min = MCP / 0.9
 	RUP_min = MP_req /1000 - 0.8 * 0.8 * MCP
 
-	"""FI_max = round(FI_max, 3)
-	RV_min = round(RV_min, 3)
-	NE_min = round(NE_min, 3)
-	RPD_min = round(RPD_min, 3)
-	RUP_min = round(RUP_min, 3)"""
+	nutrient_rqmts = [	
+						{'op': '<=', 'val': FI_max},
+						{'op': '>=', 'val': RV_min},
+						{'op': '>=', 'val': NE_min},
+						{'op': '>=', 'val': RPD_min},
+						{'op': '>=', 'val': RUP_min}
+					 ]
 
-	# LP_RHS [type_nutrient]
-	RHS = [FI_max, RV_min, NE_min, RPD_min, RUP_min]
-	
-	#
-	# (LHS of constraints matrix)
-	#
+	return dict(zip(nutrients_list, nutrient_rqmts))
+
+def calculate_constraints(feed, nutrients_list):
+
+	# LHS
 	FI = {}
 	RV = {}
 	NE = {}
@@ -176,65 +176,63 @@ def optimize_feed_ration(parity, WIM, AMF, BWR, base_NED, housing, feed):
 
 	# Loop over types of feed
 	# CHANGE i TO KEY
-	for key in feed.keys():
+	for feed_type in feed.keys():
 		#set FI, rumen volume, and MEIt eMEIrgy 
-		FI[key] = feed[key]['FI']
-		RV[key] = feed[key]['RV']
-		NE[key] = feed[key]['NE']
+		FI[feed_type] = feed[feed_type]['nutrition']['FI']
+		RV[feed_type] = feed[feed_type]['nutrition']['RV']
+		NE[feed_type] = feed[feed_type]['nutrition']['NE']
       
 		# Use rumen degradable, total, and indigestible CP to estimate degradable and undegradable CP
-		NH3[key] = feed[key]['CP'] * feed[key]['RDP']
+		NH3[feed_type] = feed[feed_type]['nutrition']['CP'] * feed[feed_type]['nutrition']['RDP']
       
-		if feed[key]['conc'] == "conc":
-			unavail_prot[key] = 0.4 * feed[key]['ICP']
-		else: # feed[key]['conc'] == "rough"
-			unavail_prot[key] = 0.7 * feed[key]['ICP']
+		if feed[feed_type]['nutrition']['conc'] == "conc":
+			unavail_prot[feed_type] = 0.4 * feed[feed_type]['nutrition']['ICP']
+		else: # feed[feed_type]['conc'] == "rough"
+			unavail_prot[feed_type] = 0.7 * feed[feed_type]['nutrition']['ICP']
       
-		RDP[key] = NH3[key] + 0.15 * feed[key]['CP']
-		RUP[key] = 0.87 * (feed[key]['CP'] - NH3[key] - unavail_prot[key] * feed[key]['CP'])
+		RDP[feed_type] = NH3[feed_type] + 0.15 * feed[feed_type]['nutrition']['CP']
+		RUP[feed_type] = 0.87 * (feed[feed_type]['nutrition']['CP'] - NH3[feed_type] - 
+								 (unavail_prot[feed_type] * feed[feed_type]['nutrition']['CP']))
 
+	constraint = [
+					[ FI[feed_type] for feed_type in feed.keys() ],
+					[ RV[feed_type] for feed_type in feed.keys() ],
+					[ NE[feed_type] for feed_type in feed.keys() ],
+					[ RDP[feed_type] for feed_type in feed.keys() ],
+					[ RUP[feed_type] for feed_type in feed.keys() ]
+				 ]
+
+	return dict(zip(nutrients_list, constraint))
+
+#-------------------------------------------------------------------------------
+# LINEAR PROGRAM SECTION
+#-------------------------------------------------------------------------------
+def optimize(constraints, rqmts, objective, limits, nutrients_list, feed_types):
+
+	# LP_RHS [type_nutrient]
+	RHS = [ rqmts[nutrient]['val'] for nutrient in nutrients_list ]
+	
 	# LHS [type_nutrient][type_feed]
-	LHS = [
-			[ FI[key] for key in feed.keys() ],
-			[ RV[key] for key in feed.keys() ],
-			[ NE[key] for key in feed.keys() ],
-			[ RDP[key] for key in feed.keys() ],
-			[ RUP[key] for key in feed.keys() ]
-		  ]
-	"""
-	LHS = [
-			[ round(FI[key], 3) for key in feed.keys() ],
-			[ round(RV[key], 3) for key in feed.keys() ],
-			[ round(NE[key], 3) for key in feed.keys() ],
-			[ round(RDP[key], 3) for key in feed.keys() ],
-			[ round(RUP[key], 3) for key in feed.keys() ]
-		  ]
-	"""
+	LHS = [ constraints[nutrient] for nutrient in nutrients_list ]
 
-	#
-	# Objective
-	#
-	objective = [ feed[key]['price'] for key in feed.keys() ]
+	# operators [type_nutrient]
+	operators = [ rqmts[nutrient]['op'] for nutrient in nutrients_list ]
+	
+	# Objective [type_feed]
+	objective = [ objective[feed_type] for feed_type in feed_types ]
 
-	#
 	# Variables
-	#
-	variables = list(feed.keys())
+	variables = list(feed_types)
 
-	#
-	# Operators
-	#
-	operators = [ '<=', '>=', '>=', '>=', '>=']
-
-	#
-	# min/max variable values
-	#
-	min_v = [0]*len(variables)
-	max_v = [ feed[key]['limit'] for key in feed.keys()]
+	# min/max variable values [type_feed]
+	min_v = [0]*len(feed_types)
+	max_v = [ limits[feed_type] for feed_type in feed_types ]
 
 	util.LP_print(LHS, RHS, objective, variables, operators,
 				  "minimize", "RATION", min_v, max_v)
-	ration = util.LP_solve(LHS, RHS, objective, variables, operators,
-						   "minimize", "RATION", min_v, max_v)
+	
+	return util.LP_solve(LHS, RHS, objective, variables, operators,
+						 "minimize", "RATION", min_v, max_v)
 
-	return ration
+
+

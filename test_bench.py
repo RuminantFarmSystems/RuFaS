@@ -11,19 +11,19 @@
 
 #!/usr/bin/env python3
 
-import tests
+from tests import *
 
 def test():
 
     #
     # TEST LP ROUTINE
     #
-    #tests.test_LP()
+    #test_LP()
 
     #
     # TEST RATION FORMULATION ROUTINE
     #
-	tests.test_ration()
+	test_ration()
 
 #-------------------------------------------------------------------------------
 #

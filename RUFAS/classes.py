@@ -64,13 +64,6 @@ class Config():
         
         self.duration = data['duration']
         self.output_dir = data['output_dir']
-        
-    #----------------------------------------------------------------------------
-    # Function: modify_parameters
-    #
-    #----------------------------------------------------------------------------
-    def modify_parameters(self, i):
-        pass
 
 #-------------------------------------------------------------------------------
 # Class: Weather

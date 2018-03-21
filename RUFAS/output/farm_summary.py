@@ -2,7 +2,7 @@
 #
 # RUFAS: Ruminant Farm Systems Model
 #
-# Output.py
+# farm_summary.py
 #
 # Authors: Kass Chupongstimun
 #          Jit Patil

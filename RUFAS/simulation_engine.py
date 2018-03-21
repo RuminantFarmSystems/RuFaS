@@ -2,7 +2,7 @@
 #
 # RUFAS: Ruminant Farm Systems Model
 #
-# SimulationEngine.py - Contains the functions that manage the control flow of 
+# simulation_engine .py - Contains the functions that manage the control flow of 
 #                       the simulation
 #
 # Authors: Kass Chupongstimun
@@ -94,6 +94,11 @@ def daily_simulation():
         #
         routines.daily_soil_update(state.soil, weather, time)
     
+    #
+    # Daily animal routine
+    #
+    #routines.daily_animal_routine(state.animal, state.feed, weather, time)
+
     time.advance()
 
 #------------------------------------------------------------------------------- 
