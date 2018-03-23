@@ -15,14 +15,16 @@ from pathlib import Path
 
 #-------------------------------------------------------------------------------
 # Function: get_base_dir
-#           Gets the base directory as reference for all relative paths
-#
-#           Unfrozen appliaction - gets the project directory
-#           Frozen application - gets the executable directory
-#
-# Returns: The reference directory for all paths in the program
 #-------------------------------------------------------------------------------
 def get_base_dir():
+    '''Gets the base directory as reference for all relative paths.
+
+    Unfrozen appliaction - gets the project directory
+    Frozen application - gets the executable directory
+
+    Returns:
+        Path: The reference directory for all paths in the program.
+    '''
     
     # Frozen
     if getattr(sys, 'frozen', False):
@@ -45,33 +47,44 @@ def get_base_dir():
 
 #-------------------------------------------------------------------------------
 # Function: LP_solve
-#
-# Parameters: LHS: float[[]] - Each sublist contains coefficients for each
-#                              constraint equation
-#             RHS: float[] - List of right hand side values of each constraint
-#             objective: float[] - List of coefficients in objective function
-#             variables: string[] - List of variable names 
-#             operators: string[] - List of operators for each constraint
-#             mode: string - direction of optimization for LP
-#                            could start with "min" or "max", case-insensitive
-#             name: string - name for the LP problem
-#             min_v: float[] - minimum bounds for each variable
-#                              defaults to no bounds if not specified
-#             max_v: float[] - maximum bounds for each variable
-#                              defaults to no bounds if not specified
-#             LHS, RHS, and operators will have length of #constraints
-#             variables, objective, min_v, max_v, and each sub-list in LHS
-#             must have length of #variables
-#
-# Returns: a dictionary with the names of variables as keys and the values of
-#          that variable at the optimal solution (if possible)
-#          the dictionary contains the key: "status" which would show whether
-#          the solution is "optimal" or "infeasible"
-#          the dictionay also contains the key: "objective" which has the
-#          value of the optimized objective equation
 #-------------------------------------------------------------------------------
 def LP_solve(LHS, RHS, objective, variables, operators,
              mode="min", name="LP", min_v=None, max_v=None):
+    '''Solves the linear program using the PULP package solver.
+    
+    Solves the Linear Program and returns the results of the optimization.
+    LHS, RHS, and operators will have length of #constraints in the LP.
+    variables, objective, min_v, max_v, and each sub-list in LHS must have
+    length of #variables in the LP.
+    
+    Args:
+        LHS (float[[]]): Coefficients of the LHS of the constraints of the LP.
+            Each sublist corresponds to a constraint equation.
+        RHS (float[]): RHS values of each constraints of the LP.
+        objective (float[]): Coefficients of the objective function.
+        variables (str[]): List of variable names.
+        operators (str[]): List of equation operator for each constraint.
+            Must contain only: '>', '<', or '='
+        mode (str, optional): Direction of the optimization og the LP.
+            Could start with "min" or "max", case-insensitive.
+            Defaults to "min" if not specified.
+        name (str, optional): Name of the LP problem.
+            Defaults to "LP" if not specified.
+        min_v (float[], optional): Lower bound for each of the variables.
+            Defaults to no bounds if not specified.
+        max_v (float[], optional): Upper bound for each of the variables.
+            Defaults to no bounds if not specified.
+
+    Returns:
+        dict: a dictionary with the names of variables as keys and the values of
+            that variable at the optimal solution (if possible).
+            {
+             'status': "Infeasible" or "Optimal"
+             'objective':  optimized value of the objective function
+             (for all variables):
+                'variable_name': variable value
+            }
+    '''
 
     if mode.lower().startswith("min"):
         LP = pulp.LpProblem(name, pulp.LpMinimize)
@@ -138,10 +151,10 @@ def LP_solve(LHS, RHS, objective, variables, operators,
 
 #-------------------------------------------------------------------------------
 # Function: LP_print
-# Returns: Text representation of the Linear Programming problem
 #-------------------------------------------------------------------------------
 def LP_print(LHS, RHS, objective, variables, operators,
              mode="min", name="LP", min_v=None, max_v=None):
+    '''Text representation of the Linear Programming problem.'''
 
     LHS = [ [round(x, 4) for x in row] for row in LHS]
     RHS = [ round(x, 4) for x in RHS]

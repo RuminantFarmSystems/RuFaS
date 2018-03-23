@@ -1,12 +1,10 @@
 ################################################################################
-#
-# RUFAS: Ruminant Farm Systems Model
-#
-# user_prompt.py - Contains user input prompt routine
-#
-# Authors: Kass Chupongstimun
-#          Jit Patil
-#
+'''
+RUFAS: Ruminant Farm Systems Model
+File name: user_prompt.py
+Description:
+Author(s): Kass Chupongstimun, kass_c@hotmail.com
+'''
 ################################################################################
 
 import sys
@@ -17,19 +15,26 @@ from RUFAS import errors
 
 #-------------------------------------------------------------------------------
 # Function: input_prompt
-#           Prompts the user for an input file name that could either be a json
-#           file for a single simulation mode or a directory containing json
-#           files for a batch simulation
-#           The user could also choose to see the current base directory
-#           and to quit the program
-#           Loops back to the prompt until the user inputs a valid file name or
-#           chooses to quit the program
-#
-# Returns: A list of Path objects containing the Paths to the json files from
-#          which the program will draw data for the simulation
-#          The list could contain only 1 or multiple paths
 #-------------------------------------------------------------------------------
 def input_prompt():
+    '''Prompts the user for an input to RUFAS.
+
+    Prompts the user for an input path that could either be a path to a json
+    file (for a single simulation mode) or a path to a directory containing one
+    or more json files (for a batch simulation).
+    Loops back to the prompt until the user either chooses to quit or enters a
+    valid input.
+    Valid inputs are:
+        Valid path to a json file: single simulation mode
+        Valid path to directory of json files: batch simulation mode
+        'Q' or 'q': quit the program
+        'dir': prints the program's current working directory
+
+    Returns:
+        list[Path]: A list of Path objects containing the Paths to the json
+            files from which the program will draw data for the simulation.
+            The list could contain only 1 or multiple paths.
+    '''
     
     print("\nSingle Simulation:\n\t" +
                 "Enter a json file name\n" +
@@ -89,6 +94,9 @@ def input_prompt():
             #
             else:
                 raise errors.UserInput("Invalid Input")
-                
+          
+        #
+        # Handles bad user inputs, prints out error messages
+        #      
         except errors.UserInput as e:
                 print(e.msg)

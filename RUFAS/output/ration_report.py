@@ -1,12 +1,10 @@
 ################################################################################
-#
-# RUFAS: Ruminant Farm Systems Model
-#
-# ration_report.py
-#
-# Authors: Kass Chupongstimun
-#          Jit Patil
-#
+'''
+RUFAS: Ruminant Farm Systems Model
+File name: ration_report.py
+Description:
+Author(s): Kass Chupongstimun, kass_c@hotmail.com
+'''
 ################################################################################
 
 from pathlib import path
@@ -14,12 +12,15 @@ from RUFAS.output.output_handler import BaseReportHandler
 
 #-------------------------------------------------------------------------------
 # Class: RationReport
-#        Creates and prints to the file ration_report.txt
 #-------------------------------------------------------------------------------
 class RationReport(BaseReportHandler):
+    '''Creates and prints to the file ration_report.txt'''
     
     def __init__(self, data):
-             
+    '''
+    TODO: Add DocString
+    '''
+
         #
         # Sets active, report_name, f_name using data
         #
@@ -41,10 +42,10 @@ class RationReport(BaseReportHandler):
         self.feed_info = {}
 
     #---------------------------------------------------------------------------
-    # Function: get_data
-    #           Transfers the needed data from Soil object to the report handler
+    # Method: get_data
     #---------------------------------------------------------------------------
     def get_data(self):
+        '''Transfers the needed data from Soil object to the report handler.'''
         
         # get static data like units associated with each feed type
         # store in Feed or Animal???????
@@ -52,20 +53,18 @@ class RationReport(BaseReportHandler):
         pass
 
     #---------------------------------------------------------------------------
-    # Function: updateDailyOutput
-    # Stores the daily values that need to be printed in the 'soil summary'
-    # csv file
+    # Method: daily_update
     #--------------------------------------------------------------------------- 
     def daily_update(self, animal, time):
+        '''Stores the daily values that need to be printed in the report.'''
         
         pass
  
     #---------------------------------------------------------------------------
-    # Function: write_annual_report
-    #           Appends the annual report to the output file
-    # Soil Summary is a cvsfile
+    # Method: write_annual_report
     #---------------------------------------------------------------------------
     def write_annual_report(self):
+        '''Appends the annual report to the output file.'''
         
         mode = 'a+' if self.get_fPath().exists() else 'w+'
 
@@ -85,10 +84,10 @@ class RationReport(BaseReportHandler):
                             )
             f.write('\n')                    
     #---------------------------------------------------------------------------
-    # Function: annual_flush
-    #           Sets all of the values in the output object to the default value
+    # Method: annual_flush
     #---------------------------------------------------------------------------
     def annual_flush(self):
+        '''Sets all of the values in the output object to the default value.'''
 
         self.achieved_price = [None]
         self.feed_amounts = [None]

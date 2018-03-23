@@ -1,12 +1,11 @@
 ################################################################################
-#
-# RUFAS: Ruminant Farm Systems Model
-#
-# classes.py - Contains class definitions
-#
-# Authors: Kass Chupongstimun
-#          Jit Patil
-#
+'''
+RUFAS: Ruminant Farm Systems Model
+File name: classes.py
+Description:
+Author(s): Kass Chupongstimun, kass_c@hotmail.com
+           Jit Patil, spatil5@wisc.edu
+'''
 ################################################################################
 
 import csv
@@ -18,11 +17,14 @@ from RUFAS.routines import Soil, Animal
 
 #-------------------------------------------------------------------------------
 # Class: State
-#        Contains information about the current state of the farm
 #-------------------------------------------------------------------------------
 class State():
+    '''Contains information about the current state of the farm'''
 
     def __init__(self, data):
+        '''
+        TODO: Add DocString
+        '''
         
         self.soil = Soil(data['soil'])
         self.animal = Animal(data['animal'])
@@ -34,11 +36,11 @@ class State():
         #self.housing = Housing()
         #self.manure = Manure()   
         
-    #----------------------------------------------------------------------------
-    # Function: annual_reset
-    #
-    #----------------------------------------------------------------------------
+    #---------------------------------------------------------------------------
+    # Method: annual_reset
+    #---------------------------------------------------------------------------
     def annual_reset(self):
+        '''Annual Reset'''
         
         self.soil.annual_reset() 
         self.animal.annual_reset()
@@ -52,27 +54,35 @@ class State():
     
 #-------------------------------------------------------------------------------
 # Class: Config
-#        Contains configuration information of the simulation
 #-------------------------------------------------------------------------------
 class Config():
+    '''Contains configuration information of the simulation'''
 
     def __init__(self, data):
-        
+    '''
+    TODO: Add DocString
+    '''
+
         if data['duration'] <= 0:
             raise errors.JSONfileData("CONFIG",
-                                      "\tSimulation Duration must be at least 1 year")
+                                "\tSimulation Duration must be at least 1 year")
         
         self.duration = data['duration']
         self.output_dir = data['output_dir']
 
 #-------------------------------------------------------------------------------
 # Class: Weather
-#        Contains daily weather information stored in 3D lists
-#        Data lists are in the format Data[year][julian_day]
 #-------------------------------------------------------------------------------
 class Weather():
+    '''Contains daily weather information stored in 3D lists
+    
+    Data lists are in the format Data[year][julian_day]
+    '''
 
     def __init__(self, weather_path_str, duration):
+    '''
+    TODO: Add DocString
+    '''
 
         #
         # Weather Data in 2D lists -> [year][julianDay]
@@ -191,10 +201,12 @@ class Weather():
        
 #-------------------------------------------------------------------------------
 # Class: Time
-#        Contains information about the current time in the simulation
-#        This object is responsible for tracking time in the simulation
 #-------------------------------------------------------------------------------
 class Time():
+    '''Contains information about the current time in the simulation
+
+    This object is responsible for tracking time in the simulation
+    '''
 
     def __init__(self):
         
@@ -203,18 +215,27 @@ class Time():
         self.y = 1  # Current Year
 
     #----------------------------------------------------------------------------
-    # Function: to_str
-    # Returns: a String representation of the current time in the simulation in
-    #          the format "d/m/y"
+    # Method: to_str
     #----------------------------------------------------------------------------
     def to_str(self):
+        '''Returns a string representation of the current time.
+
+        Returns:
+            str: a String representation of the current time in the simulation in
+                the format "d/m/y"
+        '''
+
         return "{}/{}/{}".format(self.d, self.m, self.y)
     
     #----------------------------------------------------------------------------
-    # Function: julian_day
-    # Returns: the julian day of the year
+    # Method: julian_day
     #----------------------------------------------------------------------------    
     def julian_day(self):
+        '''Returns the julian day of the year.
+
+        Returns:
+            int: The julian day of the year.
+        '''
         
         day_in_months = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31]
         
@@ -226,11 +247,14 @@ class Time():
         return julian_day
 
     #---------------------------------------------------------------------------
-    # Function: advance
-    #           Advances the time in the simulation by 1 day
-    #           Automatically detects end of months and years
+    # Method: advance
     #---------------------------------------------------------------------------
     def advance(self):
+        '''Advances the time in the simulation by 1 day
+        
+        Automatically detects end of months and years
+        '''
+
         if self.end_year():
             self.d = 1
             self.m = 1
@@ -242,19 +266,27 @@ class Time():
             self.d += 1
 
     #---------------------------------------------------------------------------
-    # Function: end_year
-    # Returns: True if it is the end of a year
-    #          False if it is not the end of a year
+    # Method: end_year
     #---------------------------------------------------------------------------
     def end_year(self):
+        '''Returns a bool signifying the end of a year.
+
+        Returns:
+            bool: True if it is the end of a year, False otherwise
+        '''
+
         return self.m > 12
 
     #---------------------------------------------------------------------------
-    # Function: end_month
-    # Returns: True if it is the end of a month
-    #          False if it is not the end of a month
+    # Method: end_month
     #---------------------------------------------------------------------------
     def end_month(self):
+        '''Returns a bool signifying the end of a month.
+
+        Returns:
+            bool: True if it is the end of a year, False otherwise
+        '''
+        
         if (self.d > 30) and (self.m == 4 or self.m == 6 or
                               self.m == 9 or self.m == 11):
             return True

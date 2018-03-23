@@ -1,23 +1,26 @@
 ################################################################################
-#
-# RUFAS: Ruminant Farm Systems Model
-#
-# farm_summary.py
-#
-# Authors: Kass Chupongstimun
-#          Jit Patil
-#
+'''
+RUFAS: Ruminant Farm Systems Model
+File name: farm_summary.py
+Description:
+Author(s): Kass Chupongstimun, kass_c@hotmail.com
+'''
 ################################################################################
 
 from RUFAS.output.output_handler import BaseReportHandler
 
 #-------------------------------------------------------------------------------
 # Class: FarmSummary
-# 
 #-------------------------------------------------------------------------------
 class FarmSummary(BaseReportHandler):
+    '''
+    TODO: Add DocString
+    '''
     
     def __init__(self, data):
+        '''
+        TODO: Add DocString
+        '''
              
         #
         # Sets active, report_name, f_name using data
@@ -83,26 +86,31 @@ class FarmSummary(BaseReportHandler):
                                        'GHG': 0.0 }
         
     #---------------------------------------------------------------------------
-    # Function: get_data
-    #           Transfers the needed data from Soil object to the report handler
+    # Method: get_data       
     #---------------------------------------------------------------------------
     def get_data(self):
+        '''Transfers the needed data from Soil object to the report handler.'''
+
         
         pass
     
     #---------------------------------------------------------------------------
-    # Function: updateDailyOutput
-    # 
+    # Method: updateDailyOutput
     #--------------------------------------------------------------------------- 
     def daily_update(self, state, weather, time):
-        
+        '''
+        TODO: Add DocString
+        '''
+
         pass 
  
     #---------------------------------------------------------------------------
-    # Function: write_annual_report
-    #           
+    # Method: write_annual_report 
     #---------------------------------------------------------------------------
     def write_annual_report(self):
+        '''
+        TODO: Add DocString
+        '''
         
         mode = 'a+' if self.get_fPath().exists() else 'w+'
         
@@ -111,10 +119,10 @@ class FarmSummary(BaseReportHandler):
             pass
                     
     #---------------------------------------------------------------------------
-    # Function: annual_flush
-    #           Sets all of the values in the output object to the default value
+    # Method: annual_flush
     #---------------------------------------------------------------------------
     def annual_flush(self):
+        ''' Sets all of the values in the output object to the default value.'''
         
         pass
         
