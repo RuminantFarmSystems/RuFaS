@@ -19,3 +19,4 @@ Outputs
 *.project
 *.pydevproject
 *.vscode
+*.settings

@@ -47,6 +47,8 @@ class OutputHandler():
         for _, report in self.reports.items():
             if report.active:
                 report.get_data(state)
+            if report.getfPath().suffix == '.csv':
+                report.write_header()
 
     #---------------------------------------------------------------------------
     # Method: initialize_output_dir
