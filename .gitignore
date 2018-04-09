@@ -11,12 +11,12 @@
 # folders
 build
 others
-Outputs
+Outputs/*
 
 # ignore project files
-*.sublime-project
-*.sublime-workspace
-*.project
-*.pydevproject
-*.vscode
-*.settings
+.sublime-project
+.sublime-workspace
+.project
+.pydevproject
+.vscode
+.settings
