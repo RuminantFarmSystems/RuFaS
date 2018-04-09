@@ -26,8 +26,7 @@ def daily_soil_routine(soil, weather, time):
         time.julian_day())
       
     # calculate daily runoff 
-    soil.dailyInfiltration(weather.rainfall[time.y-1][time.julian_day()-1],
-                           time.julian_day())
+    soil.dailyInfiltration(weather.rainfall[time.y-1][time.julian_day()-1])
     
     # calculate daily transpiration 
     soil.dailyEvapotranspiration(
@@ -38,7 +37,7 @@ def daily_soil_routine(soil, weather, time):
         , weather.radiation[time.y-1][time.julian_day()-1])
         
     # calculate daily percolation
-    soil.dailyPercolation(time.julian_day())  
+    soil.dailyPercolation()  
         
     # calculate daily soil erosion
     soil.dailySoilErosion(weather.rainfall[time.y-1][time.julian_day()-1], 
@@ -53,8 +52,7 @@ def daily_soil_routine(soil, weather, time):
 def daily_soil_update(soil, weather, time):
                             
     # update current soil water    
-    soil.updateCurrentSoilWater(weather.rainfall[time.y-1][time.julian_day()-1],
-                                time.julian_day()) 
+    soil.updateCurrentSoilWater(weather.rainfall[time.y-1][time.julian_day()-1]) 
 
 #-------------------------------------------------------------------------------
 # Class: Soil
@@ -320,10 +318,7 @@ class Soil():
     # Function: dailyInfiltration
     # Uses curve number approach (equations taken from SWAT 2009 documentation)
     #---------------------------------------------------------------------------       
-    def dailyInfiltration(self, dailyRainfall, jday): 
-          
-        if jday == 233:
-            print("TOP DI")
+    def dailyInfiltration(self, dailyRainfall): 
         
         # curve number 1
         cn1 = self.CN2 - (20 * (100 - self.CN2)) / (100
@@ -345,8 +340,6 @@ class Soil():
 
         # soil water content of entire profile, excluding water held at wilting
         # point (mm H2O)
-        SSW = self.getSumSoilWater()
-        SWW = self.getSumWiltingWater()
         SW = self.getSumSoilWater() - self.getSumWiltingWater()
         
         #shape coefficients
@@ -466,10 +459,8 @@ class Soil():
     # Function: dailyPercolation
     # (equations taken from SWAT 2009 documentation)
     #---------------------------------------------------------------------------      
-    def dailyPercolation(self, jday):   
+    def dailyPercolation(self):   
         
-        if jday == 122:
-            print("TOP DP")
         # Calculate value of water available for percolation FOR each layer            
         for x in range(0, len(self.listOfSoilLayers)):
             # Volume of water available for percolation (SWperc) in a soil layer
@@ -497,9 +488,6 @@ class Soil():
     # determine soil erosion
     #--------------------------------------------------------------------------- 
     def dailySoilErosion(self, rainfall, biomass, day):
-        
-        if day == 203:
-            print("TOP SE")
         
         # time of concentration (h)
         Tconc = ((self.slopeLength**0.6) * (self.manning**0.6)) / (
@@ -577,9 +565,6 @@ class Soil():
     # soil
     #---------------------------------------------------------------------------       
     def updateSoilTemperature(self, biomass, radiation, Tavg, TavgAnnual, day):
-        
-        if day == 206:
-            print("TOP ST")
         
         albedoSoil = self.soilAlbedo # soil albedo constant
         bd = self.listOfSoilLayers[0].bulkDensity # soil bulk density (g/cm^3)
@@ -661,10 +646,7 @@ class Soil():
     # model assumes 80% of plant transpiration comes out of the top soil layer 
     # and 20% from layer 2.
     #---------------------------------------------------------------------------
-    def updateCurrentSoilWater(self, rainfall, jday):
-        
-        if jday == 122:
-            print("TOP UCSW")
+    def updateCurrentSoilWater(self, rainfall):
             
         for x in range(0, len(self.listOfSoilLayers)):
             if x == 0:

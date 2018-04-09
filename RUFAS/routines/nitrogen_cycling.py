@@ -10,8 +10,6 @@
 ################################################################################
 
 import math
-from test.pickletester import AbstractUnpickleTests
-from tkinter.constants import ACTIVE
 
 
 #------------------------------------------------------------------------------
@@ -230,8 +228,6 @@ def daily_soil_nitrogen(soil, jday, year, rainfall):
                        
         
         # Mass (kg/ha) of NO3 loss in runoff (mm) from soil layer 1 only is:
-        if jday == 203:
-            print("HERE")
         NO3Runoff = 0.0
         if x == 0:    
             NO3Runoff = soil.runoffNO3Conc * runoff
@@ -239,8 +235,6 @@ def daily_soil_nitrogen(soil, jday, year, rainfall):
         
         # Mass (kg/ha) of NO3 loss in percolation water (mm) from all soil 
         # layers is:
-        if year == 2 and jday == 160 and x == 2:
-            print("Here")
         NO3Perc = NO3Conc * perc
         soil.listOfSoilLayers[x].NO3Perc = NO3Perc
                 
@@ -264,8 +258,6 @@ def daily_soil_nitrogen(soil, jday, year, rainfall):
             
         # For N loss in erosion, soil N concentrations (mg/kg) for each pool except
         # NO3 are calculated as:
-        if year == 2 and jday == 294:
-            print("heLLO")
         if x == 0:
             soil.freshNConc = (100 * soil.topLayerFreshN) / (BD / soil.listOfSoilLayers[x].bottomDepth)
             soil.stableNConc = (100 * stableN) / BD / soil.listOfSoilLayers[x].bottomDepth
@@ -293,9 +285,7 @@ def daily_soil_nitrogen(soil, jday, year, rainfall):
             ER = max(1, math.exp(1.21 - 0.16 * math.log(Sed * 1000)))
         soil.enrichmentRatio = ER
     
-        # N mass loss in erosion (kg/ha) is calculated as:
-        if year == 2 and jday == 297:
-            print("HERE")     
+        # N mass loss in erosion (kg/ha) is calculated as:     
         if x == 0:
             if Sed > 0:
                 soil.freshNLoss = 0.001 * soil.freshNConc * Sed * ER
@@ -309,13 +299,8 @@ def daily_soil_nitrogen(soil, jday, year, rainfall):
                 soil.NH4Loss = 0.0
         
         # Mineralization from Active N pool is:
-        if year == 2 and jday == 265 and x == 1:
-            print("HERE")
         Nminact = minRate * (tempFac * waterFac) ** 0.5 * activeN
         soil.listOfSoilLayers[x].nMinAct = Nminact  
-        
-        if jday == 189:
-            print("HERE")
         
         # Update Stable N
         stableN = max(0, stableN - soil.stableNLoss)
@@ -344,8 +329,6 @@ def daily_soil_nitrogen(soil, jday, year, rainfall):
             NH4Conc = (1 - math.exp(-SW / soil.listOfSoilLayers[x].satWater)) * NH4/SW
         soil.listOfSoilLayers[x].NH4Conc = NH4Conc
 
-        if year == 2 and jday == 357 and x == 1:
-            print("HERE")
         NH4Perc = NH4Conc * perc  
         soil.listOfSoilLayers[x].NH4Perc = NH4Perc           
 
@@ -357,10 +340,7 @@ def daily_soil_nitrogen(soil, jday, year, rainfall):
 def daily_soil_nitrogen_update(soil, jday, year, addedN):
             
     for x in range(0, len(soil.listOfSoilLayers)):
-        
-        if x == 0 and jday == 101 and year == 2:
-            print("TOP DSNU")
-        
+                
         # UPDATE NO3 POOL
         NO3 = soil.listOfSoilLayers[x].NO3
         NO3 -= soil.listOfSoilLayers[x].denitrification
@@ -376,9 +356,7 @@ def daily_soil_nitrogen_update(soil, jday, year, addedN):
                     
         NO3 += soil.listOfSoilLayers[x].nitrification
         soil.listOfSoilLayers[x].NO3 = NO3
-              
-        if jday == 266 and year == 2:
-            print("Here")      
+                   
         # UPDATE NH4 POOL
         NH4 = soil.listOfSoilLayers[x].NH4
         NH4 = max(0, NH4 - soil.listOfSoilLayers[x].totNitriVolatil)
@@ -405,8 +383,6 @@ def daily_soil_nitrogen_update(soil, jday, year, addedN):
         soil.listOfSoilLayers[x].NH4 = NH4
           
         # UPDATE ACTIVE N POOL
-        if jday == 189:
-            print("HERE")
         activeN = soil.listOfSoilLayers[x].activeN
         
         if x == 0:
@@ -429,8 +405,6 @@ def daily_soil_nitrogen_update(soil, jday, year, addedN):
         soil.listOfSoilLayers[x].activeN = activeN
         
         # UPDATE STABLE N POOL
-        if jday == 188:
-            print("HERE")
         stableN = soil.listOfSoilLayers[x].stableN
         if x == 0:
             stableN = max(0, stableN - soil.stableNLoss)
