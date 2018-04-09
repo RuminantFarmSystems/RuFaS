@@ -8,8 +8,10 @@
 # ignore python compiled files
 *.pyc
 
-# ignore build folder
+# folders
 build
+others
+Outputs
 
 # ignore project files
 *.sublime-project
