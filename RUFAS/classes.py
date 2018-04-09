@@ -79,125 +79,141 @@ class Weather():
 	Data lists are in the format Data[year][julian_day]
 	'''
 
-	def __init__(self, weather_path_str, duration):
-		'''
-		TODO: Add DocString
-		'''
+    def __init__(self, weather_path_str, duration):
 
-		#
-		# Weather Data in 2D lists -> [year][julianDay]
-		#
-		self.rainfall = [[0 for _ in range(365)]for _ in range(duration)]
-		self.tMax = [[0 for _ in range(365)]for _ in range(duration)]
-		self.tMin = [[0 for _ in range(365)]for _ in range(duration)]
-		self.tAvg = [[0 for _ in range(365)]for _ in range(duration)]
-		self.biomass = [[0 for _ in range(365)]for _ in range(duration)]
-		self.radiation = [[0 for _ in range(365)]for _ in range(duration)]
+        #
+        # Weather Data in 2D lists -> [year][julianDay]
+        #
+        self.rainfall = [[0 for _ in range(365)]for _ in range(duration)]
+        self.tMax = [[0 for _ in range(365)]for _ in range(duration)]
+        self.tMin = [[0 for _ in range(365)]for _ in range(duration)]
+        self.tAvg = [[0 for _ in range(365)]for _ in range(duration)]
+        self.biomass = [[0 for _ in range(365)]for _ in range(duration)]
+        self.radiation = [[0 for _ in range(365)]for _ in range(duration)]
+        self.addedN = [[0 for _ in range(365)]for _ in range(duration)]
 
-		rainfallData = []
-		tMaxData = []
-		tMinData = []
-		tAvgData = []
-		bioMassData = []
-		radiationData = []
+        rainfallData = []
+        tMaxData = []
+        tMinData = []
+        tAvgData = []
+        bioMassData = []
+        radiationData = []
+        addedNData = []
 
-		weather_full_path = util.get_base_dir() / weather_path_str
+        weather_full_path = util.get_base_dir() / weather_path_str
 
-		if not weather_full_path.is_file():
-			raise errors.JSONfileData("WEATHER",
-									  "\tWeather file specified does not exist")
+        if not weather_full_path.is_file():
+            raise errors.JSONfileData("WEATHER",
+                                      "\tWeather file specified does not exist")
 
-		#
-		# Read data from CSV file
-		# Data read is in the format data[day]
-		# 1D list of length total number of days in the whole weather file
-		#
-		with weather_full_path.open('r') as f:
-			readCSV = csv.reader(f, delimiter=',')
+        #
+        # Read data from CSV file
+        # Data read is in the format data[day]
+        # 1D list of length total number of days in the whole weather file
+        #
+        with weather_full_path.open('r') as f:
+            readCSV = csv.reader(f, delimiter=',')
 
-			currentRow = 0
-			for row in readCSV:
-				if currentRow != 0:
-					# 1) Read rainfall data
-					rainfallData.append(row[1])
+            currentRow = 0
+            for row in readCSV:
+                if currentRow != 0:
+                    # 1) Read rainfall data
+                    rainfallData.append(row[1])
 
-					# 2) Read max temperature data
-					tMaxData.append(row[2])
+                    # 2) Read max temperature data
+                    tMaxData.append(row[2])
 
-					# 3) Read min temperature data
-					tMinData.append(row[3])
+                    # 3) Read min temperature data
+                    tMinData.append(row[3])
 
-					# 4) Read avg temperature data
-					tAvgData.append(row[4])
+                    # 4) Read avg temperature data
+                    tAvgData.append(row[4])
 
-					# 5) Read biomass data
-					bioMassData.append(row[5])
+                    # 5) Read biomass data
+                    bioMassData.append(row[5])
 
-					# 6) Read radiation data
-					radiationData.append(row[6])
+                    # 6) Read radiation data
+                    radiationData.append(row[6])
 
-				currentRow += 1
+                    # 7) Added N Data
+                    addedNData.append(row[7])
 
-		# Make sure weather data length matchs simulation duaration
-		weather_file_years = math.floor(currentRow / 365)
-		if weather_file_years < duration:
-			raise errors.JSONfileData("WEATHER",
-									  "\tWeather file contains " +
-									  str(weather_file_years) +
-									  "\n\tSimulation specifies " + str(duration) +
-									  " years")
-		#
-		# Put weather data into the format:
-		#    data[year][julian_day]
-		#
+                currentRow += 1
 
-		# 1) Update Rainfall in weather
-		for i in range(0, duration):
-			for j in range(0, 365):
-				if (i*365+j) >= len(rainfallData):
-					break
-				else:
-					self.rainfall[i][j] = rainfallData[i*365 + j]
+        # Make sure weather data length matchs simulation duaration
+        weather_file_years = math.floor(currentRow / 365)
+        if weather_file_years != duration:
+            raise errors.JSONfileData("WEATHER",
+                                      "\tWeather file contains " +
+                                      str(weather_file_years) +
+                                      "\n\tSimulation specifies " + str(duration) +
+                                      " years")
+        #
+        # TODO: check for weather file length match with simulation duration
+        #
+        # Print out number of rows(days) read from CSV file
+        #print(str(currentRow - 1))
 
-		# 2) Update Max Temperature in weather
-		for i in range(0, duration):
-			for j in range(0, 365):
-				if (i*365+j) >= len(tMaxData):
-					break
-				else:
-					self.tMax[i][j] = tMaxData[i*365 + j]
+        #
+        # Put weather data into the format:
+        #    data[year][julian_day]
+        #
 
-		# 3) Update Min Temperature in weather
-		for i in range(0, duration):
-			for j in range(0, 365):
-				if (i*365+j) >= len(tMinData):
-					break
-				else:
-					self.tMin[i][j] = tMinData[i*365 + j]
+        # 1) Update Rainfall in weather
+        for i in range(0, duration):
+            for j in range(0, 365):
+                if (i*365+j) >= len(rainfallData):
+                    break
+                else:
+                    self.rainfall[i][j] = rainfallData[i*365 + j]
 
-		# 4) Update Avg Temperature in weather
-		for i in range(0, duration):
-			for j in range(0, 365):
-				if (i*365+j) >= len(tAvgData):
-					break
-				else:
-					self.tAvg[i][j] = tAvgData[i*365 + j]
+        # 2) Update Max Temperature in weather
+        for i in range(0, duration):
+            for j in range(0, 365):
+                if (i*365+j) >= len(tMaxData):
+                    break
+                else:
+                    self.tMax[i][j] = tMaxData[i*365 + j]
 
-		# 5) Update biomass in weather
-		for i in range(0, duration):
-			for j in range(0, 365):
-				if (i*365+j) >= len(bioMassData):
-					break
-				else:
-					self.biomass[i][j] = bioMassData[i*365 + j]
+        # 3) Update Min Temperature in weather
+        for i in range(0, duration):
+            for j in range(0, 365):
+                if (i*365+j) >= len(tMinData):
+                    break
+                else:
+                    self.tMin[i][j] = tMinData[i*365 + j]
 
-		# 6) Update radiation in weather
-		for i in range(0, duration):
-			for j in range(0, 365):
-				if (i*365+j) >= len(radiationData):
-					break
-				else:
-					self.radiation[i][j] = radiationData[i*365 + j]
+        # 4) Update Avg Temperature in weather
+        for i in range(0, duration):
+            for j in range(0, 365):
+                if (i*365+j) >= len(tAvgData):
+                    break
+                else:
+                    self.tAvg[i][j] = tAvgData[i*365 + j]
+
+        # 5) Update biomass in weather
+        for i in range(0, duration):
+            for j in range(0, 365):
+                if (i*365+j) >= len(bioMassData):
+                    break
+                else:
+                    self.biomass[i][j] = bioMassData[i*365 + j]
+
+        # 6) Update radiation in weather
+        for i in range(0, duration):
+            for j in range(0, 365):
+                if (i*365+j) >= len(radiationData):
+                    break
+                else:
+                    self.radiation[i][j] = radiationData[i*365 + j]
+
+        # 7) Update addedN in weather
+        for i in range(0, duration):
+            for j in range(0, 365):
+                if (i*365+j) >= len(addedNData):
+                    break
+                else:
+                    self.addedN[i][j] = addedNData[i*365 + j]
 
 #-------------------------------------------------------------------------------
 # Class: Time

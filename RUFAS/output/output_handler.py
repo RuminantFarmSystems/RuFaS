@@ -34,7 +34,8 @@ class OutputHandler():
                         'farm_summary': FarmSummary(data['farm_summary']),
                         'soil_summary': SoilSummary(data['soil_summary']),
                         'ration_report': RationReport(data['ration_report']),
-                        'crop_report': CropReport(data['crop_report'])
+                        'crop_report': CropReport(data['crop_report']),
+                        'soil_nitrogen': SoilNitrogen(data['soil_nitrogen'])
                         }
 
     #---------------------------------------------------------------------------
@@ -96,7 +97,7 @@ class OutputHandler():
 
     #---------------------------------------------------------------------------
     # Method: annual_flush
-    #---------------------------------------------------------------------------
+    #---------------------------------------------------------------------------s
     def annual_flush(self):
         '''Sets all of the reports in the output object to the default.'''
 
