@@ -24,6 +24,7 @@ class SoilSummary(BaseReportHandler):
         # Sets active, report_name, f_name using data
         #
         self.set_properties(data)
+        self.fieldNames = None
         
         #
         # Daily Outputs
@@ -49,7 +50,7 @@ class SoilSummary(BaseReportHandler):
     # Function: get_header
     #           Writes the header (title and units) in the csvfile
     #---------------------------------------------------------------------------
-    def write_header(self, soil):
+    def write_header(self):
         
         mode = 'a+' if self.get_fPath().exists() else 'w+'
             
@@ -76,6 +77,7 @@ class SoilSummary(BaseReportHandler):
             fieldnames.append("Surface Temp")
             fieldnames.append("Sediment Yield")
             
+            self.fieldNames = fieldnames
             writer = csv.DictWriter(csvfile, fieldnames=fieldnames, 
                                     lineterminator = '\n')
             writer.writeheader()
@@ -199,7 +201,7 @@ class SoilSummary(BaseReportHandler):
                     dailySoilData["Temp/L" + str(y+1)] = str(
                         round(self.layersTemperature[y][x], 3))
                     
-                writer = csv.DictWriter(csvfile, fieldnames=dailySoilData, 
+                writer = csv.DictWriter(csvfile, fieldnames=self.fieldNames, 
                                     lineterminator = '\n')                        
                 writer.writerow(dailySoilData)
                     

@@ -84,13 +84,15 @@ class Weather():
         self.tAvg = [[0 for _ in range(365)]for _ in range(duration)]
         self.biomass = [[0 for _ in range(365)]for _ in range(duration)]
         self.radiation = [[0 for _ in range(365)]for _ in range(duration)]
-    
+        self.addedN = [[0 for _ in range(365)]for _ in range(duration)]
+
         rainfallData = []
         tMaxData = []
         tMinData = []
         tAvgData = []
         bioMassData = []
         radiationData = []
+        addedNData = []
         
         weather_full_path = util.get_base_dir() / weather_path_str
         
@@ -126,6 +128,9 @@ class Weather():
                     
                     # 6) Read radiation data
                     radiationData.append(row[6])
+                    
+                    # 7) Added N Data
+                    addedNData.append(row[7])
     
                 currentRow += 1
         
@@ -195,6 +200,14 @@ class Weather():
                     break
                 else:
                     self.radiation[i][j] = radiationData[i*365 + j]
+                    
+        # 7) Update addedN in weather
+        for i in range(0, duration):
+            for j in range(0, 365):
+                if (i*365+j) >= len(addedNData):
+                    break
+                else:
+                    self.addedN[i][j] = addedNData[i*365 + j]
        
 #-------------------------------------------------------------------------------
 # Class: Time

@@ -36,7 +36,10 @@ class OutputHandler():
         
         #self.reports['farm_summary'].get_data(state)
         self.reports['soil_summary'].get_data(state.soil)
-        self.reports['soil_summary'].write_header(state.soil)
+        self.reports['soil_summary'].write_header()
+        
+        self.reports['soil_nitrogen'].get_data(state.soil)
+        self.reports['soil_nitrogen'].write_header()
 
         
     #---------------------------------------------------------------------------
@@ -126,4 +129,5 @@ class BaseReportHandler(ABC):
 # Imports are down here to prevent circular imports
 #
 from RUFAS.output.farm_summary import FarmSummary
+from RUFAS.output.soil_nitrogen import SoilNitrogen
 from RUFAS.output.soil_summary import SoilSummary

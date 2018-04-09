@@ -16,9 +16,18 @@ import math
 # Executes all the daily soil routines
 #------------------------------------------------------------------------------
 def daily_soil_routine(soil, weather, time):
-                   
+                 
+    # calculate and update the temperature of the soil layers
+    soil.updateSoilTemperature(
+        weather.biomass[time.y-1][time.julian_day()-1],
+        weather.radiation[time.y-1][time.julian_day()-1], 
+        weather.tAvg[time.y-1][time.julian_day()-1],
+        8.41,
+        time.julian_day())
+      
     # calculate daily runoff 
-    soil.dailyInfiltration(weather.rainfall[time.y-1][time.julian_day()-1])
+    soil.dailyInfiltration(weather.rainfall[time.y-1][time.julian_day()-1],
+                           time.julian_day())
     
     # calculate daily transpiration 
     soil.dailyEvapotranspiration(
@@ -29,19 +38,12 @@ def daily_soil_routine(soil, weather, time):
         , weather.radiation[time.y-1][time.julian_day()-1])
         
     # calculate daily percolation
-    soil.dailyPercolation()  
+    soil.dailyPercolation(time.julian_day())  
         
     # calculate daily soil erosion
     soil.dailySoilErosion(weather.rainfall[time.y-1][time.julian_day()-1], 
-                          weather.biomass[time.y-1][time.julian_day()-1]) 
-    
-    # calculate and update the temperature of the soil layers
-    soil.updateSoilTemperature(
-        weather.biomass[time.y-1][time.julian_day()-1],
-        weather.radiation[time.y-1][time.julian_day()-1], 
-        weather.tAvg[time.y-1][time.julian_day()-1],
-        6.94,
-        time.julian_day())
+                          weather.biomass[time.y-1][time.julian_day()-1],
+                          time.julian_day()) 
                             
         
 #------------------------------------------------------------------------------
@@ -51,7 +53,8 @@ def daily_soil_routine(soil, weather, time):
 def daily_soil_update(soil, weather, time):
                             
     # update current soil water    
-    soil.updateCurrentSoilWater(weather.rainfall[time.y-1][time.julian_day()-1]) 
+    soil.updateCurrentSoilWater(weather.rainfall[time.y-1][time.julian_day()-1],
+                                time.julian_day()) 
 
 #-------------------------------------------------------------------------------
 # Class: Soil
@@ -79,7 +82,6 @@ class Soil():
         self.clay = data['Clay']
 
         # soil temperature attributes
-        self.bulkDensity = data['BulkDensity']
         self.soilAlbedo = data['SoilAlbedo']
         self.Tsurf = data['SoilLayers']['Layer1']['InitialTemperature']
         
@@ -101,6 +103,7 @@ class Soil():
         self.convertCurrentSoilWaterToMM() # calculate initial soil water in layer
         self.calculateWiltingWater() # calculate wilting water in layer
         self.calculateFcWater() # calculate field capacity water in layer
+        self.calculateSatWater() # calculate saturation water in layer
 
         # daily output values
         self.runoff = 0.0
@@ -110,10 +113,71 @@ class Soil():
         
         self.dayInfiltraiton = 0.0
         self.sedimentYield = 0.0
+        self.snowCorrectedSed = 0.0
         
+        # daily soil nitrogen values
         self.residue = data['Residue']
         self.labileP = data['LabileP']
         self.freshNMineralRate = data['FreshNMineralRate']
+        self.CToN = 0.0
+        self.CToP = 0.0
+        self.decayRate = 0.0
+        self.freshMin = 0.0
+        self.freshDecomp = 0.0
+        
+        self.freshNConc = 0.0
+        self.activeNConc = 0.0
+        self.stableNConc = 0.0
+        self.NH4Conc = 0.0
+        self.enrichmentRatio = 0.0
+        self.freshNLoss = 0.0
+        self.activeNLoss = 0.0
+        self.stableNLoss = 0.0
+        self.NH4Loss = 0.0
+        self.runoffNO3Conc = 0.0
+        self.NO3Runoff = 0.0
+        self.runoffNH4Conc = 0.0
+        self.NH4Runoff = 0.0
+        
+    #------ INITIALIZE SOIL NITROGEN POOLS ------------------------------------
+        # Calculate initial amount of NO3 in each soil layer; 
+        # Initial NO3 levels (kg/ha) in the soil are varied by depth as: 
+        for x in range(0, len(self.listOfSoilLayers)):
+            # Initial NO3 levels (kg/ha) in the soil are varied by depth as: 
+            self.listOfSoilLayers[x].NO3 = ((7 * math.exp
+                                (-self.listOfSoilLayers[x].bottomDepth / 
+                                1000)) * self.listOfSoilLayers[x].bulkDensity
+                                 * self.listOfSoilLayers[x].depth) /100
+                                 
+            # Calculate initial amount of organic N in each soil layer; 
+            # Organic N (Active + Stable, mg/kg): is initialized as:
+            self.listOfSoilLayers[x].orgN = (10 ** 4) * (
+                self.listOfSoilLayers[x].orgC / 14)
+            
+            # Calculate initial amount (kg/ha) of active N in each soil layer; 
+            self.listOfSoilLayers[x].activeN = ((
+                self.listOfSoilLayers[x].fracActiveN * 
+                self.listOfSoilLayers[x].orgN)*
+                self.listOfSoilLayers[x].bulkDensity *
+                self.listOfSoilLayers[x].depth) /100
+                
+            # Calculate initial amount (kg/ha) of stable N in each soil layer; 
+            self.listOfSoilLayers[x].stableN = (((1 - 
+                self.listOfSoilLayers[x].fracActiveN) * 
+                self.listOfSoilLayers[x].orgN) * 
+                self.listOfSoilLayers[x].bulkDensity *
+                self.listOfSoilLayers[x].depth) /100
+
+            # Calculate initial amount (kg/ha) of NH4 in each soil layer; 
+            self.listOfSoilLayers[x].NH4 = (self.listOfSoilLayers[x].NH4 *
+                            self.listOfSoilLayers[x].bulkDensity *
+                            self.listOfSoilLayers[x].depth) /100
+        
+        # Fresh N Pool --- only in top soil layer
+        self.topLayerFreshN = ((0.0015*self.residue)*
+                            self.listOfSoilLayers[x].bulkDensity *
+                            self.listOfSoilLayers[x].depth) /100
+
         
     #---------------------------------------------------------------------------
     # Class: SoilLayer
@@ -133,9 +197,12 @@ class Soil():
             
             self.depth = 0.0 # depth of soil layer
             self.fcWater = 0.0 # constant
+            self.satWater = 0.0 # constant
             self.wiltingWater = 0.0 # constant
             
             self.currentSoilWaterMM = 0.0 # soil water in layer in mm
+            self.bulkDensity = layerData['BulkDensity']
+
 
             # Variables to calculate dailyEvapotranspiration
             self.topEsoil = 0.0 # evaporation demand at top of layer
@@ -151,10 +218,40 @@ class Soil():
             self.perc = 0.0 # amount of water that percolates to next layer
             
             # Variable to simulate nitrogenCycling
-            self.orgC = layerData['OrgC']
+            self.orgC = layerData['OrgC%']
             self.activeMineralRate = layerData['ActiveMineralRate']
             self.cationExclusionFraction = layerData['CationExclusionFraction']
             self.denitrificationRate = layerData['DenitrificationRate']
+            self.NH4 = layerData['NH4']
+            
+            # Initial NO3 levels (kg/ha) in the soil layer: 
+            self.NO3 = 0.0
+            
+            # Organic N (Active + Stable, mg/kg): 
+            self.orgN = 0.0
+
+            # Initial Active N in layer:
+            self.activeN = 0.0
+            
+            # Initial Stable N in layer:
+            self.stableN = 0.0
+            
+            
+            self.nMinAct = 0.0
+            self.nitrification = 0.0
+            self.volatilization = 0.0
+            self.denitrification = 0.0
+            self.NO3Conc = 0.0
+            self.NO3Perc = 0.0
+            self.NH4Conc = 0.0
+            self.NH4Perc = 0.0
+            self.activeNConc = 0.0
+            self.activeNPerc = 0.0
+            self.nTrans = 0.0
+            self.totNitriVolatil = 0.0
+            
+            self.fracActiveN = layerData['FracActiveN']
+            self.volatileExchangeFactor = layerData['VolatileExchangeFac']
 
         
     #---------------------------------------------------------------------------
@@ -166,6 +263,17 @@ class Soil():
         for x in range(0, len(self.listOfSoilLayers)):
             self.listOfSoilLayers[x].fcWater = (self.listOfSoilLayers[x].depth
                     * self.listOfSoilLayers[x].fieldCapacity)
+            
+
+    #---------------------------------------------------------------------------
+    # Function: calculateSatWater
+    # Calculates the amount of water in soil profile for a given layer at 
+    # saturation (mm H2O). Called when soil portion of input is read.
+    #---------------------------------------------------------------------------
+    def calculateSatWater(self):
+        for x in range(0, len(self.listOfSoilLayers)):
+            self.listOfSoilLayers[x].satWater = (self.listOfSoilLayers[x].depth
+                    * self.listOfSoilLayers[x].saturation)
             
     #---------------------------------------------------------------------------
     # Function: calculateWiltingWater
@@ -212,8 +320,11 @@ class Soil():
     # Function: dailyInfiltration
     # Uses curve number approach (equations taken from SWAT 2009 documentation)
     #---------------------------------------------------------------------------       
-    def dailyInfiltration(self, dailyRainfall): 
+    def dailyInfiltration(self, dailyRainfall, jday): 
           
+        if jday == 233:
+            print("TOP DI")
+        
         # curve number 1
         cn1 = self.CN2 - (20 * (100 - self.CN2)) / (100
                                                     - self.CN2 + math.exp(2.533 
@@ -234,6 +345,8 @@ class Soil():
 
         # soil water content of entire profile, excluding water held at wilting
         # point (mm H2O)
+        SSW = self.getSumSoilWater()
+        SWW = self.getSumWiltingWater()
         SW = self.getSumSoilWater() - self.getSumWiltingWater()
         
         #shape coefficients
@@ -353,7 +466,10 @@ class Soil():
     # Function: dailyPercolation
     # (equations taken from SWAT 2009 documentation)
     #---------------------------------------------------------------------------      
-    def dailyPercolation(self):   
+    def dailyPercolation(self, jday):   
+        
+        if jday == 122:
+            print("TOP DP")
         # Calculate value of water available for percolation FOR each layer            
         for x in range(0, len(self.listOfSoilLayers)):
             # Volume of water available for percolation (SWperc) in a soil layer
@@ -380,7 +496,10 @@ class Soil():
     # Use MUSLE approach (equations taken from SWAT 2009 documentation) to 
     # determine soil erosion
     #--------------------------------------------------------------------------- 
-    def dailySoilErosion(self, rainfall, biomass):
+    def dailySoilErosion(self, rainfall, biomass, day):
+        
+        if day == 203:
+            print("TOP SE")
         
         # time of concentration (h)
         Tconc = ((self.slopeLength**0.6) * (self.manning**0.6)) / (
@@ -445,6 +564,12 @@ class Soil():
         sed = 11.8 * ((self.runoff * Qpeak)**0.56
                       ) * K * C * self.practiceFactor * LS
         self.sedimentYield = sed
+        
+        snowCorrectedSed = sed
+        if day < 95 or day > 300:
+            snowCorrectedSed = sed/(math.exp(3*20/25.4))
+        self.snowCorrectedSed = snowCorrectedSed
+            
 
     #---------------------------------------------------------------------------
     # Function: dailySoilTemperature
@@ -452,9 +577,12 @@ class Soil():
     # soil
     #---------------------------------------------------------------------------       
     def updateSoilTemperature(self, biomass, radiation, Tavg, TavgAnnual, day):
-                
+        
+        if day == 206:
+            print("TOP ST")
+        
         albedoSoil = self.soilAlbedo # soil albedo constant
-        bd = self.bulkDensity # soil bulk density (g/cm^3)
+        bd = self.listOfSoilLayers[0].bulkDensity # soil bulk density (g/cm^3)
         CV = float(biomass) # above ground biomass and residue (kg/ha)
         Hday = float(radiation) # daily solar radiation (user input, MJ/m2)
         Tav = float(Tavg) # average daily temperature (oC)
@@ -525,30 +653,33 @@ class Soil():
         
             # soil temperature (C) at depth z (mm)
             self.listOfSoilLayers[x].temperature = (
-                L * TsoilPrev) + (1-L) * (df * (Taair-self.Tsurf) + self.Tsurf)  
-
+                L * TsoilPrev) + (1-L) * (df * (Taair-self.Tsurf) + self.Tsurf)
+                
     #---------------------------------------------------------------------------
     # Function: updateCurrentSoilWater
     # Updates the soil water within each layer at the end of each day. The 
     # model assumes 80% of plant transpiration comes out of the top soil layer 
     # and 20% from layer 2.
     #---------------------------------------------------------------------------
-    def updateCurrentSoilWater(self, rainfall):
+    def updateCurrentSoilWater(self, rainfall, jday):
         
+        if jday == 122:
+            print("TOP UCSW")
+            
         for x in range(0, len(self.listOfSoilLayers)):
             if x == 0:
                 self.listOfSoilLayers[x].currentSoilWaterMM = (max
                     (self.listOfSoilLayers[x].wiltingWater,
                     self.listOfSoilLayers[x].currentSoilWaterMM+float(rainfall)
                     -self.runoff-self.listOfSoilLayers[x].layerEsoil
-                    -self.listOfSoilLayers[x].perc-self.Etrans*0.8))
+                    -self.listOfSoilLayers[x].perc))#-self.Etrans*0.8))
             elif x== 1:
                     self.listOfSoilLayers[x].currentSoilWaterMM = (max
                         (self.listOfSoilLayers[x].wiltingWater, 
                          self.listOfSoilLayers[x].currentSoilWaterMM
                         -self.listOfSoilLayers[x].layerEsoil
                         -self.listOfSoilLayers[x].perc
-                        +self.listOfSoilLayers[x-1].perc-(self.Etrans*0.2)))
+                        +self.listOfSoilLayers[x-1].perc))#-(self.Etrans*0.2)))
             else:
                     self.listOfSoilLayers[x].currentSoilWaterMM = (max
                         (self.listOfSoilLayers[x].wiltingWater, 

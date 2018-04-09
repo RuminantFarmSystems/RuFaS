@@ -72,28 +72,31 @@ def daily_simulation():
     
     #
     # This IF statement is in place because of the soil hydrology file Pete has
-    # provided. His values are calculated starting from day 274 of year 1.
+    # provided. His values are calculated starting from day 188 of year 1.
     # We should avoid doing this if possible
     #
-    if time.julian_day() >= 274 or time.y > 1:
+    if time.julian_day() >= 188 or time.y > 1:
         
         #
         # Daily Routines
         # Pass only information needed
         #
         routines.daily_soil_routine(state.soil, weather, time)
-        routines.daily_nitrogen_cycling_routine(state.soil)
-    
+        routines.daily_nitrogen_cycling_routine(state.soil, time, weather)
+
         #
         # Daily Output Updates
         #
         output.reports['soil_summary'].daily_update(state.soil, weather, time)
-    
+        output.reports['soil_nitrogen'].daily_update(state.soil, time)
+
         #
         # Daily Attribute Updates
         # Update attributes in preparation of following day
         #
         routines.daily_soil_update(state.soil, weather, time)
+        routines.daily_nitrogen_update(state.soil, time, weather)
+
     
     time.advance()
 
