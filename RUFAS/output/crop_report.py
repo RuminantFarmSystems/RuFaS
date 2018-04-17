@@ -48,7 +48,7 @@ class CropReport(BaseReportHandler):
     def daily_update(self, state, weather, time):
         '''Stores the daily values that need to be printed in the report.'''
 
-        d = time.julian_day()
+        d = time.day
         crop = state.crop
 
         self.LAI[d] = crop.LAI

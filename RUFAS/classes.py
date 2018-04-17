@@ -238,25 +238,54 @@ class Time():
 
 	def __init__(self):
 
-		self.day_in_months = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31]
+		#self.day_in_months = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31]
 
-		self.d = 1  # Current Day
-		self.m = 1  # Current Month
-		self.y = 1  # Current Year
+		self.day = 1  # Current Julian Day
+		self.year = 1  # Current Year
 
-	#----------------------------------------------------------------------------
+	#---------------------------------------------------------------------------
 	# Method: to_str
-	#----------------------------------------------------------------------------
+	#---------------------------------------------------------------------------
 	def to_str(self):
 		'''Returns a string representation of the current time.
 
 		Returns:
-			str: a String representation of the current time in the simulation in
-				the format "d/m/y"
+			str: a String representation of the current time in the simulation
+				in the format "Year: <year> Day: <day>"
 		'''
 
-		return "{}/{}/{}".format(self.d, self.m, self.y)
+		return "Year: {} Day: {}".format(self.year, self.day)
 
+
+
+	#---------------------------------------------------------------------------
+	# Method: advance
+	#---------------------------------------------------------------------------
+	def advance(self):
+		'''Advances the time in the simulation by 1 day
+
+		Automatically detects end of months and years
+		'''
+
+		if self.end_year():
+			self.day = 1
+			self.year += 1
+		else:
+			self.day += 1
+
+	#---------------------------------------------------------------------------
+	# Method: end_year
+	#---------------------------------------------------------------------------
+	def end_year(self):
+		'''Returns a bool signifying the end of a year.
+
+		Returns:
+			bool: True if it is the end of a year, False otherwise
+		'''
+
+		return self.day > 365
+
+	"""
 	#----------------------------------------------------------------------------
 	# Method: julian_day
 	#----------------------------------------------------------------------------
@@ -273,37 +302,6 @@ class Time():
 		julian_day += self.d
 
 		return julian_day
-
-	#---------------------------------------------------------------------------
-	# Method: advance
-	#---------------------------------------------------------------------------
-	def advance(self):
-		'''Advances the time in the simulation by 1 day
-
-		Automatically detects end of months and years
-		'''
-
-		if self.end_year():
-			self.d = 1
-			self.m = 1
-			self.y += 1
-		elif self.end_month():
-			self.d = 1
-			self.m += 1
-		else:
-			self.d += 1
-
-	#---------------------------------------------------------------------------
-	# Method: end_year
-	#---------------------------------------------------------------------------
-	def end_year(self):
-		'''Returns a bool signifying the end of a year.
-
-		Returns:
-			bool: True if it is the end of a year, False otherwise
-		'''
-
-		return self.m > 12
 
 	#---------------------------------------------------------------------------
 	# Method: end_month
@@ -326,3 +324,4 @@ class Time():
 			return True
 		else:
 			return False
+	"""

@@ -180,8 +180,8 @@ class SoilNitrogen(BaseReportHandler):
 
         soil = state.soil
 
-        day = time.julian_day()
-        year = time.y
+        day = time.day
+        year = time.year
 
         self.year.append(year)
         self.julianDay.append(day)

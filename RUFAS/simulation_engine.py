@@ -85,7 +85,7 @@ def daily_simulation():
     # provided. His values are calculated starting from day 188 of year 1.
     # We should avoid doing this if possible
     #
-    if time.julian_day() >= 188 or time.y > 1:
+    if time.day >= 188 or time.year > 1:
 
         #
         # Daily Routines
@@ -111,21 +111,7 @@ def daily_simulation():
     # Daily Output Updates
     #
     output.daily_update(state, weather, time)
-
-    time.advance()
-
-#-------------------------------------------------------------------------------
-# Function: monthly_simulation
-#-------------------------------------------------------------------------------
-def monthly_simulation():
-    '''Executes the monthly simulation routines'''
-
-    while not time.end_month():
-        daily_simulation()
-
-    #
-    # Monthly Routines
-    #
+    print("simulating: " + time.to_str())
     time.advance()
 
 #-------------------------------------------------------------------------------
@@ -145,12 +131,12 @@ def annual_simulation():
     #routines.annual_crop_routine(state.crop, weather, time)
 
     while not time.end_year():
-        monthly_simulation()
+        daily_simulation()
 
     #
-    # Annual Routines
+    # Post-Annual Routines
     #
-    output.write_annual_reports(time.y)
+    output.write_annual_reports(time.year)
     output.annual_flush()
     #state.annual_reset()
     time.advance()
@@ -202,4 +188,4 @@ def end_simulation():
         bool: True if the simulation has ended, false otherwise
     '''
 
-    return time.y > config.duration
+    return time.year > config.duration

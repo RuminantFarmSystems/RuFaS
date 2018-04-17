@@ -55,7 +55,7 @@ class RationReport(BaseReportHandler):
     def daily_update(self, state, weather, time):
         '''Stores the daily values that need to be printed in the report.'''
 
-        d = time.julian_day()
+        d = time.day
         if (d % self.ration_interval) == 1:
             animal = state.animal
 

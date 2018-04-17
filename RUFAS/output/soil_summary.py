@@ -131,9 +131,9 @@ class SoilSummary(BaseReportHandler):
 
         soil = state.soil
 
-        rainfall = weather.rainfall[time.y-1][time.julian_day()-1]
-        day = time.julian_day()
-        year = time.y
+        rainfall = weather.rainfall[time.year-1][time.day-1]
+        day = time.day
+        year = time.year
 
         self.year.append(year)
         self.julianDay.append(day)

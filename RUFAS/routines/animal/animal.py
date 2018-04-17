@@ -13,13 +13,11 @@ from RUFAS.routines.animal import ration
 # Function: daily_animal_routine
 #-------------------------------------------------------------------------------
 def daily_animal_routine(animal, feed, weather, time):
-    '''
-    TODO: Add DocString
-    '''
+    '''Executes daily routines relating to Animals.'''
 
     # Formulate ration using LP
     if not animal.user_input_ration:
-        if animal.end_ration_interval(time.julian_day()):
+        if animal.end_ration_interval(time.day):
             animal.formulate_optimized_ration(feed.all_feed, feed.feed_nutrition)
 
 #-------------------------------------------------------------------------------
@@ -66,8 +64,16 @@ class Animal():
     # Method: formulate_optimized_ration
     #---------------------------------------------------------------------------
     def formulate_optimized_ration(self, feed, feed_nutrition):
-        '''
-        TODO: Add DocString
+        '''Formulates the least cost ration for the animals.
+
+        1) Extract feed nutrition from Feed object
+        2) Compile the information into the contraint and objective coefficients
+           for the linear program
+        3) Set up loop variables and enter formulation loop, for each loop,
+           calculate requirements and linear program to solve for optimal
+           solution. If the LP is not feasible, scale base milk production (in
+           requirements) down by 5% and try again. Repeat until a feasible
+           ration is found.
         '''
 
     #***************************************************************************
@@ -103,7 +109,6 @@ class Animal():
         while infeasible:
             milk_production_power += 1
             milk_production_multiplier = 0.95**milk_production_power
-            print("MP reduction: " + str(milk_production_multiplier))
 
             #
             # Constraints: minimum nutrition requirements for cows
