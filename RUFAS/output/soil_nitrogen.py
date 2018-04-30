@@ -140,10 +140,10 @@ class SoilNitrogen(BaseReportHandler):
             writer.writerow(units)
 
     #---------------------------------------------------------------------------
-    # Function: get_data
+    # Function: initialize
     #           Transfers the needed data from Soil object to the report handler
     #---------------------------------------------------------------------------
-    def get_data(self, state):
+    def initialize(self, state):
 
         soil = state.soil
 
@@ -170,6 +170,8 @@ class SoilNitrogen(BaseReportHandler):
             self.layersActiveNPerc.append([])
             self.layersTotNitriVolatil.append([])
             self.layersNtrans.append([])
+
+        self.write_header()
 
     #---------------------------------------------------------------------------
     # Function: updateDailyOutput
@@ -222,6 +224,14 @@ class SoilNitrogen(BaseReportHandler):
             self.layersActiveNPerc[x].append(soil.listOfSoilLayers[x].activeNPerc)
             self.layersTotNitriVolatil[x].append(soil.listOfSoilLayers[x].totNitriVolatil)
             self.layersNtrans[x].append(soil.listOfSoilLayers[x].nTrans)
+
+    #---------------------------------------------------------------------------
+    # Method: annual_update
+    #---------------------------------------------------------------------------
+    def annual_update(self, state, weather, time):
+        '''Stores the yearly values that need to be printed in the report.'''
+        pass
+
     #---------------------------------------------------------------------------
     # Function: write_annual_report
     #           Appends the annual report to the output file

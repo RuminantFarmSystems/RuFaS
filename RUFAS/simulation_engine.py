@@ -17,15 +17,6 @@ from RUFAS.classes import Config, State, Weather, Time
 from RUFAS.output import OutputHandler
 
 #-------------------------------------------------------------------------------
-# Define Module Global Variables
-#-------------------------------------------------------------------------------
-config = None
-state = None
-output = None
-weather = None
-time = None
-
-#-------------------------------------------------------------------------------
 # Function: simulate
 #-------------------------------------------------------------------------------
 def simulate(input_fPath:Path):
@@ -66,7 +57,7 @@ def simulate(input_fPath:Path):
     #
     # MAIN Simulation Loop
     #
-    while not end_simulation():
+    while not time.end_simulation():
         annual_simulation()
 
     t_end_sim = timer.time()
@@ -111,7 +102,8 @@ def daily_simulation():
     # Daily Output Updates
     #
     output.daily_update(state, weather, time)
-    print("simulating: " + time.to_str())
+
+    #print("simulating: " + time.to_str()) # Print out current day of simulation
     time.advance()
 
 #-------------------------------------------------------------------------------
@@ -136,6 +128,7 @@ def annual_simulation():
     #
     # Post-Annual Routines
     #
+    output.annual_update(state, weather, time)
     output.write_annual_reports(time.year)
     output.annual_flush()
     #state.annual_reset()
@@ -159,7 +152,9 @@ def read_json_file(fPath:Path):
             conform with the format required
     '''
 
-    # Specify that we are using global variables
+    #
+    # Designate as module-global variables
+    #
     global config, state, output, weather, time
 
     with fPath.open('r') as f:
@@ -171,21 +166,9 @@ def read_json_file(fPath:Path):
             state = State(data['farm'])
             output = OutputHandler(data['output'])
             weather = Weather(data['weather'], config.duration)
-            time = Time()
+            time = Time(config.duration)
 
         except errors.JSONfileData as e:
             print("JSON FILE ERROR: " +
                   "{} \n\t{} Section\n{}\n".format(fPath.name, e.section, e.msg))
             raise errors.InvalidJSONfile(fPath.name)
-
-#-------------------------------------------------------------------------------
-# Function: end_simulation
-#-------------------------------------------------------------------------------
-def end_simulation():
-    '''Checks whether the simulation has ended
-
-    Returns:
-        bool: True if the simulation has ended, false otherwise
-    '''
-
-    return time.year > config.duration

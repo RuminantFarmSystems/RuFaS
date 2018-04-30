@@ -236,10 +236,11 @@ class Time():
 	This object is responsible for tracking time in the simulation
 	'''
 
-	def __init__(self):
+	def __init__(self, duration):
 
 		#self.day_in_months = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31]
 
+		self.duration = duration # Simulation duration in years
 		self.day = 1  # Current Julian Day
 		self.year = 1  # Current Year
 
@@ -284,6 +285,18 @@ class Time():
 		'''
 
 		return self.day > 365
+
+	#-------------------------------------------------------------------------------
+	# Function: end_simulation
+	#-------------------------------------------------------------------------------
+	def end_simulation(self):
+	    '''Checks whether the simulation has ended
+
+	    Returns:
+	        bool: True if the simulation has ended, false otherwise
+	    '''
+
+	    return self.year > self.duration
 
 	"""
 	#----------------------------------------------------------------------------

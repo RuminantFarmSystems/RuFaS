@@ -11,12 +11,6 @@
 
     "output":
     {
-        "farm_summary":
-        {
-            "active": false,
-            "report_name": "Farm Summary",
-            "file_name": "farm_summary.txt"
-        },
         "soil_summary":
         {
             "active": false,
@@ -28,12 +22,6 @@
             "active": true,
             "report_name": "Ration Report",
             "file_name": "ration_report.txt"
-        },
-        "crop_report":
-        {
-            "active": false,
-            "report_name": "Crop Report",
-            "file_name": "crop_report.txt"
         },
         "soil_nitrogen":
         {

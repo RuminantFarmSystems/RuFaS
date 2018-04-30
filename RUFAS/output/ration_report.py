@@ -39,9 +39,9 @@ class RationReport(BaseReportHandler):
         self.feed_info = {}
 
     #---------------------------------------------------------------------------
-    # Method: get_data
+    # Method: initialize
     #---------------------------------------------------------------------------
-    def get_data(self, state):
+    def initialize(self, state):
         '''Transfers the needed data from Soil object to the report handler.'''
         feed = state.feed
         # get static data like units associated with each feed type
@@ -62,6 +62,13 @@ class RationReport(BaseReportHandler):
             self.achieved_price[d] = animal.ration['objective']
             self.feed_amounts[d] = {feed_type: animal.ration[feed_type] for feed_type in self.feed_info.keys()}
             self.milk_production_reduction[d] = animal.ration['MP_reduction']
+
+    #---------------------------------------------------------------------------
+    # Method: annual_update
+    #---------------------------------------------------------------------------
+    def annual_update(self, state, weather, time):
+        '''Stores the yearly values that need to be printed in the report.'''
+        pass
 
     #---------------------------------------------------------------------------
     # Method: write_annual_report

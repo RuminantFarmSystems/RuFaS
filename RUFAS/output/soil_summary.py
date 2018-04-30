@@ -103,10 +103,10 @@ class SoilSummary(BaseReportHandler):
             writer.writerow(units)
 
     #---------------------------------------------------------------------------
-    # Function: get_data
+    # Function: initialize
     #           Transfers the needed data from Soil object to the report handler
     #---------------------------------------------------------------------------
-    def get_data(self, state):
+    def initialize(self, state):
 
         soil = state.soil
 
@@ -121,6 +121,8 @@ class SoilSummary(BaseReportHandler):
             self.layersEsoil.append([])
             self.layersPerc.append([])
             self.layersTemperature.append([])
+
+        self.write_header()
 
     #---------------------------------------------------------------------------
     # Function: updateDailyOutput
@@ -160,6 +162,13 @@ class SoilSummary(BaseReportHandler):
 
         self.surfaceTemp.append(soil.Tsurf)
         self.sedimentYield.append(soil.sedimentYield)
+
+    #---------------------------------------------------------------------------
+    # Method: annual_update
+    #---------------------------------------------------------------------------
+    def annual_update(self, state, weather, time):
+        '''Stores the yearly values that need to be printed in the report.'''
+        pass
 
     #---------------------------------------------------------------------------
     # Function: write_annual_report

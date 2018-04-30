@@ -26,9 +26,19 @@ class BaseReportHandler(ABC):
 
     # Private Property
     # Default directory for output report files
+    # overwritten by the directory given in json file
     __output_dir = util.get_base_dir() / Path("Outputs/Default_Output_Dir")
 
+    #---------------------------------------------------------------------------
+    # Method: set_properties
+    #---------------------------------------------------------------------------
     def set_properties(self, data):
+        '''Sets the properties of each report handler initialized.
+
+        This is called in the report handler's __init__() method, and takes in
+        the data passed to it and assigns the properties below.
+        '''
+
         self.active = data['active']
         self.report_name = data['report_name']
         self.fName = data['file_name']
@@ -42,7 +52,7 @@ class BaseReportHandler(ABC):
         Returns:
             Path: path to which the report will be written.
         '''
-        return self.__output_dir / self.fName
+        return BaseReportHandler.__output_dir / self.fName
 
     #---------------------------------------------------------------------------
     # Class Method: set_dir
@@ -56,22 +66,12 @@ class BaseReportHandler(ABC):
     # Abstract Methods
     #---------------------------------------------------------------------------
     @abstractmethod
-    def get_data(self): raise NotImplementedError()
+    def initialize(self): raise NotImplementedError()
     @abstractmethod
     def daily_update(self): raise NotImplementedError()
+    @abstractmethod
+    def annual_update(self): raise NotImplementedError()
     @abstractmethod
     def write_annual_report(self): raise NotImplementedError()
     @abstractmethod
     def annual_flush(self): raise NotImplementedError()
-
-    """
-    #---------------------------------------------------------------------------
-    # Method: handle_existing_file
-    #---------------------------------------------------------------------------
-    def handle_existing_file(self):
-        '''Deletes the existing output file of the same name if exists.'''
-
-        if self.get_fPath().exists():
-            self.get_fPath().unlink()
-            print("Existing {} file detected and deleted".format(self.fName))
-    """

@@ -2,7 +2,7 @@
 '''
 RUFAS: Ruminant Farm Systems Model
 File name: output_handler.py
-Description:
+Description: Contains the definition of the OutputHandler object
 Author(s): Kass Chupongstimun, kass_c@hotmail.com
 '''
 ################################################################################
@@ -11,11 +11,13 @@ from pathlib import Path
 
 from RUFAS import util
 from RUFAS.output.report_handler import BaseReportHandler
-from RUFAS.output.farm_summary import FarmSummary
+
+#
+# Import report handlers here
+#
 from RUFAS.output.soil_summary import SoilSummary
 from RUFAS.output.soil_nitrogen import SoilNitrogen
 from RUFAS.output.ration_report import RationReport
-from RUFAS.output.crop_report import CropReport
 
 #-------------------------------------------------------------------------------
 # Class: OutputHandler
@@ -23,31 +25,36 @@ from RUFAS.output.crop_report import CropReport
 class OutputHandler():
     '''Handles all output related interactions.
 
-    Contains a dictionary of all the report handlers, which handles all output-
-    related functionalities. This object is the (only) bridge between the
-    simulation engine and the output routines.
+    Contains a list of all the report handlers, which handles all output-related
+    functionalities. This object is the (only) bridge between the simulation
+    engine and the output routines.
+
     Output values are updated at the end of each day, and the each report is
     printed at the end of each year, using the values (that are written daily)
-    for the year period. After each the report for the year is printed, every
-    single report handler object is flushed, leaving absolutely nothing. The
-    report handler begins accumulating information again for the next year.
-    There must absolutely be NO CALCULATIONS performed by ANY report handler.
-    Report handlers exist ONLY to store RAW OUTPUT DATA. All calculations should
-    be done within the routine, saved to the State object, then extracted from
-    the state object to the report handler at the end of the day.
+    for the year period and also any yearly output values. After each the report
+    for the year is printed, every single report handler object is flushed,
+    leaving absolutely nothing. The report handler begins accumulating
+    information again for the next year.
+
+    We do not recommend doing any calculations inside the report handler.
+    Report handlers should exist only to store RAW OUTPUT DATA. All calculations
+    should be done within the routine, saved to the State object, then extracted
+    from the state object to the report handler at the end of the day. However,
+    it is OK to perform some calculations (it won't cause any bugs). This makes
+    sense to do when you want some statistical values that aren't already
+    calculated in the routine, and you do not want to mess with the routine
+    directly.
     '''
 
     def __init__(self, data):
         '''Initializes the report handlers with the given data'''
 
         # Instantiate Report Handler Objects here
-        self.reports = {
-                        'farm_summary': FarmSummary(data['farm_summary']),
-                        'soil_summary': SoilSummary(data['soil_summary']),
-                        'soil_nitrogen': SoilNitrogen(data['soil_nitrogen']),
-                        'ration_report': RationReport(data['ration_report']),
-                        'crop_report': CropReport(data['crop_report'])
-                        }
+        self.reports = [
+                            SoilSummary(data['soil_summary']),
+                            SoilNitrogen(data['soil_nitrogen']),
+                            RationReport(data['ration_report'])
+                       ]
 
     #---------------------------------------------------------------------------
     # Method: initialize_output_dir
@@ -82,21 +89,29 @@ class OutputHandler():
     def initialize_reports(self, state):
         '''Transfer needed (initial) data from state to report handlers.'''
 
-        for _, report in self.reports.items():
+        for report in self.reports:
             if report.active:
-                report.get_data(state)
-                if report.get_fPath().suffix == '.csv':
-                    report.write_header()
+                report.initialize(state)
 
     #---------------------------------------------------------------------------
     # Method: daily_update
     #---------------------------------------------------------------------------
     def daily_update(self, state, weather, time):
-        '''Sets all of the reports in the output object to the default.'''
+        '''Updates the report handler with new daily values.'''
 
-        for _, report in self.reports.items():
+        for report in self.reports:
             if report.active:
                 report.daily_update(state, weather, time)
+
+    #---------------------------------------------------------------------------
+    # Method: annual_update
+    #---------------------------------------------------------------------------
+    def annual_update(self, state, weather, time):
+        '''Updates the report handler with anuual output values.'''
+
+        for report in self.reports:
+            if report.active:
+                report.annual_update(state, weather, time)
 
     #---------------------------------------------------------------------------
     # Method: write_annual_reports
@@ -104,7 +119,7 @@ class OutputHandler():
     def write_annual_reports(self, y):
         '''Prints the annual report to file for all reports.'''
 
-        for _, report in self.reports.items():
+        for report in self.reports:
             if report.active:
                 report.write_annual_report(y)
 
@@ -114,6 +129,6 @@ class OutputHandler():
     def annual_flush(self):
         '''Sets all of the reports in the output object to the default.'''
 
-        for _, report in self.reports.items():
+        for report in self.reports:
             if report.active:
                 report.annual_flush()

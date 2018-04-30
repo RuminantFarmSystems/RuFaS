@@ -29,7 +29,7 @@ class InvalidJSONfile(Exception):
 # Error: JSONfileData
 #-------------------------------------------------------------------------------
 class JSONfileData(Exception):
-	'''Raised when speficif parts of the json file has problems'''
+	'''Raised when specific parts of the json file has problems'''
 
 	def __init__(self, section, msg):
 		self.section = section

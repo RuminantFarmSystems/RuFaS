@@ -21,7 +21,7 @@ class Feed():
         '''
 
     #***************************************************************************
-    # WARNING: EXTREMELY STUPID INFORMATION ARRANGEMENT AND MESSY CODE BELOW
+    # WARNING: EXTREMELY MESSY CODE AND BAD INFORMATION ARRANGEMENT BELOW
     #   I'M SORRY IF YOU HAVE TO TRY TO READ THIS
     #   WILL REFACTOR WHEN I HAVE TIME
     #   - Kass C.

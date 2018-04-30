@@ -1,0 +1,386 @@
+
+{
+
+    "config":
+    {
+        "duration": 2,
+        "output_dir": "Outputs/Output_Ration_Scenario_3/"
+    },
+
+    "weather": "Inputs/Weather.csv",
+
+    "output":
+    {
+        "soil_summary":
+        {
+            "active": false,
+            "report_name": "Soil Summary",
+            "file_name": "soil_summary.csv"
+        },
+        "ration_report":
+        {
+            "active": true,
+            "report_name": "Ration Report",
+            "file_name": "ration_report.txt"
+        },
+        "soil_nitrogen":
+        {
+            "active": false,
+            "report_name": "Soil Nitrogen",
+            "file_name": "soil_nitrogen.csv"
+        }
+    },
+
+    "farm":
+    {
+        "animal":
+        {
+            "housing": "barn",
+            "ration":
+            {
+                "user_input": false,
+                "formulation_interval": 7
+            }
+        },
+        "crop":
+        {
+            "FRGE":
+            {
+                "crop_name": "Forage",
+                "crop_type": "annual",
+                "planting_date": 10,
+                "is_feed": true
+            },
+            "HMC":
+            {
+                "crop_name": "High Moisture Corn",
+                "crop_type": "annual",
+                "planting_date": 10,
+                "is_feed": true
+            }
+        },
+        "feed":
+        {
+            "nutrients_list": ["FI", "RV", "NE", "CP", "ICP", "RDP", "conc"],
+
+            "purchased_feed":
+            [
+                {
+                "Feed": "Alfalfa Silage",
+                "NDF": 0.457,
+                "LP": 0.6,
+                "SP": 0.4,
+                "FFL": 1.35,
+                "FFS": 0.4,
+                "RFL": 1,
+                "RFS": 0.6,
+                "NE": 1.2,
+                "CP": 0.2,
+                "IndigestibleCP": 0.016,
+                "Rumen Degradable Protein": 0.903,
+                "Concentrate or Roughage": "Rough",
+                "Price": 0,
+                "Limit": 0
+              },
+              {
+                "Feed": "Corn Silage",
+                "NDF": 0.45,
+                "LP": 0.408,
+                "SP": 0.592,
+                "FFL": 1.45,
+                "FFS": 0.4,
+                "RFL": 1,
+                "RFS": 0.7,
+                "NE": 1.45,
+                "CP": 0.088,
+                "IndigestibleCP": 0.013,
+                "Rumen Degradable Protein": 0.815,
+                "Concentrate or Roughage": "Rough",
+                "Price": 0,
+                "Limit": 0
+              },
+              {
+                "Feed": "Alfalfa Hay",
+                "NDF": 0.429,
+                "LP": 0.6,
+                "SP": 0.4,
+                "FFL": 1.35,
+                "FFS": 0.4,
+                "RFL": 1,
+                "RFS": 0.6,
+                "NE": 1.28,
+                "CP": 0.208,
+                "IndigestibleCP": 0.016,
+                "Rumen Degradable Protein": 0.912,
+                "Concentrate or Roughage": "Rough",
+                "Price": 0.05,
+                "Limit": 0
+              },
+              {
+                "Feed": "Grass Hay",
+                "NDF": 0.644,
+                "LP": 0.7,
+                "SP": 0.3,
+                "FFL": 1.5,
+                "FFS": 0.8,
+                "RFL": 1,
+                "RFS": 0.8,
+                "NE": 1.12,
+                "CP": 0.133,
+                "IndigestibleCP": 0.013,
+                "Rumen Degradable Protein": 0.884,
+                "Concentrate or Roughage": "Rough",
+                "Price": 0,
+                "Limit": 0
+              },
+              {
+                "Feed": "Grass Silage",
+                "NDF": 0.607,
+                "LP": 0.7,
+                "SP": 0.3,
+                "FFL": 1.5,
+                "FFS": 0.8,
+                "RFL": 1,
+                "RFS": 0.8,
+                "NE": 1.12,
+                "CP": 0.128,
+                "IndigestibleCP": 0.015,
+                "Rumen Degradable Protein": 0.893,
+                "Concentrate or Roughage": "Rough",
+                "Price": 0,
+                "Limit": 0
+              },
+              {
+                "Feed": "Wheat Silage",
+                "NDF": 0.597,
+                "LP": 0.4165,
+                "SP": 0.5835,
+                "FFL": 1.55,
+                "FFS": 0.6,
+                "RFL": 1,
+                "RFS": 0.8,
+                "NE": 1.18,
+                "CP": 0.138,
+                "IndigestibleCP": 0.01,
+                "Rumen Degradable Protein": 0.895,
+                "Concentrate or Roughage": "Rough",
+                "Price": 0,
+                "Limit": 0
+              },
+              {
+                "Feed": "HMC",
+                "NDF": 0.103,
+                "LP": 0,
+                "SP": 1,
+                "FFL": 0,
+                "FFS": 0.4,
+                "RFL": 0,
+                "RFS": 0.4,
+                "NE": 2.01,
+                "CP": 0.092,
+                "IndigestibleCP": 0.003,
+                "Rumen Degradable Protein": 0.993,
+                "Concentrate or Roughage": "Conc",
+                "Price": 0,
+                "Limit": 0
+              },
+              {
+                "Feed": "Corn Grain",
+                "NDF": 0.095,
+                "LP": 0,
+                "SP": 1,
+                "FFL": 0,
+                "FFS": 0.4,
+                "RFL": 0,
+                "RFS": 0.4,
+                "NE": 2.01,
+                "CP": 0.094,
+                "IndigestibleCP": 0.003,
+                "Rumen Degradable Protein": 0.964,
+                "Concentrate or Roughage": "Conc",
+                "Price": 0.132,
+                "Limit": 11
+              },
+              {
+                "Feed": "Urea",
+                "NDF": 0,
+                "LP": 0,
+                "SP": 1,
+                "FFL": 0,
+                "FFS": 0.4,
+                "RFL": 0,
+                "RFS": 0.4,
+                "NE": 0,
+                "CP": 1,
+                "IndigestibleCP": 1,
+                "Rumen Degradable Protein": 0,
+                "Concentrate or Roughage": "Conc",
+                "Price": 0.462,
+                "Limit": 2
+              },
+              {
+                "Feed": "DDG",
+                "NDF": 0.474,
+                "LP": 0,
+                "SP": 1,
+                "FFL": 0,
+                "FFS": 0.4,
+                "RFL": 0,
+                "RFS": 0.4,
+                "NE": 1.71,
+                "CP": 0.292,
+                "IndigestibleCP": 0.035,
+                "Rumen Degradable Protein": 0.829,
+                "Concentrate or Roughage": "Conc",
+                "Price": 0.76,
+                "Limit": 1
+              },
+              {
+                "Feed": "Soybean Meal",
+                "NDF": 0.149,
+                "LP": 0,
+                "SP": 1,
+                "FFL": 0,
+                "FFS": 0.4,
+                "RFL": 0,
+                "RFS": 0.4,
+                "NE": 2.13,
+                "CP": 0.499,
+                "IndigestibleCP": 0.004,
+                "Rumen Degradable Protein": 0.993,
+                "Concentrate or Roughage": "Conc",
+                "Price": 0.76,
+                "Limit": 1
+              },
+              {
+                "Feed": "Fat",
+                "NDF": 0,
+                "LP": 0,
+                "SP": 0,
+                "FFL": 0,
+                "FFS": 0,
+                "RFL": 0,
+                "RFS": 0,
+                "NE": 10.92,
+                "CP": 0,
+                "IndigestibleCP": 0,
+                "Rumen Degradable Protein": 0,
+                "Concentrate or Roughage": "Conc",
+                "Price": 1.06,
+                "Limit": 100
+              }
+            ],
+            "farm_feed":
+            {
+                "CG":
+                {
+                    "price": 0.0,
+                    "units": "x",
+                    "limit": 9999999,
+                    "nutrition":
+                    {
+                        "FI": 0.52,
+                        "RV": 0.254,
+                        "NE": 1.21,
+                        "CP": 0.164,
+                        "ICP": 0.036,
+                        "RDP": 0.121,
+                        "conc": "rough"
+                    }
+                },
+                "HMC":
+                {
+                    "price": 0.0,
+                    "units": "x",
+                    "limit": 0,
+                    "nutrition":
+                    {
+                        "FI": 0.04,
+                        "RV": -0.17,
+                        "NE": 2.25,
+                        "CP": 0.09,
+                        "ICP": 0.07,
+                        "RDP": 0.034,
+                        "conc": "conc"
+                    }
+                }
+            }
+        },
+        "soil":
+        {
+            "ProfileDepth": 450,
+            "CN2": 86.00,
+            "FieldSlope": 0.02,
+            "SlopeLength": 7,
+            "Manning": 0.4,
+            "FieldSize": 1.0,
+            "PracticeFactor": 0.25,
+            "Orgc": 1,
+            "Sand": 15,
+            "Silt": 65,
+            "Clay": 20,
+            "SoilAlbedo": 0.16,
+            "Residue": 0,
+            "LabileP": 15,
+            "FreshNMineralRate": 0.05,
+
+            "SoilLayers":
+            {
+                "Layer1":
+                {
+                    "BulkDensity": 1.8,
+                    "WiltingPoint": 0.1,
+                    "FieldCapacity": 0.30,
+                    "Saturation": 0.5,
+                    "BottomDepth": 150,
+                    "StartingSoilWater": 0.3,
+                    "Ksat": 20,
+                    "InitialTemperature": 12,
+                    "OrgC%": 1.2,
+                    "ActiveMineralRate": 0.00005,
+                    "CationExclusionFraction": 0.0,
+                    "DenitrificationRate": 0.005,
+                    "NH4": 1,
+                    "FracActiveN": 0.02,
+                    "VolatileExchangeFac": 0.1
+                },
+                "Layer2":
+                {
+                    "BulkDensity": 1.8,
+                    "WiltingPoint": 0.1,
+                    "FieldCapacity": 0.30,
+                    "Saturation": 0.5,
+                    "BottomDepth": 300,
+                    "StartingSoilWater": 0.3,
+                    "Ksat": 20,
+                    "InitialTemperature": 10,
+                    "OrgC%": 1.2,
+                    "ActiveMineralRate": 0.00005,
+                    "CationExclusionFraction": 0.0,
+                    "DenitrificationRate": 0.005,
+                    "NH4": 1,
+                    "FracActiveN": 0.02,
+                    "VolatileExchangeFac": 0.1
+                },
+                "Layer3":
+                {
+                    "BulkDensity": 1.8,
+                    "WiltingPoint": 0.1,
+                    "FieldCapacity": 0.30,
+                    "Saturation": 0.5,
+                    "BottomDepth": 450,
+                    "StartingSoilWater": 0.3,
+                    "Ksat": 20,
+                    "InitialTemperature": 8,
+                    "OrgC%": 1.2,
+                    "ActiveMineralRate": 0.00005,
+                    "CationExclusionFraction": 0.0,
+                    "DenitrificationRate": 0.005,
+                    "NH4": 1,
+                    "FracActiveN": 0.02,
+                    "VolatileExchangeFac": 0.1
+                }
+            }
+        }
+    }
+}
