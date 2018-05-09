@@ -161,6 +161,8 @@ class Soil():
         self.pUptake = [[0 for x in range(366)] for y in range(config.endYear+1)]
         self.lightFactor = []
         self.yieldFactor = []
+        self.summan = 0.0
+        self.summanP = 0.0
 
 
     #------ INITIALIZE SOIL NITROGEN POOLS ------------------------------------

@@ -2,7 +2,7 @@
 #
 # RUFAS: Ruminant Farm Systems Model
 #
-# Output.py
+# soil_nitrogen.py
 #
 # Authors: Kass Chupongstimun
 #          Jit Patil
@@ -13,8 +13,8 @@ import csv
 from RUFAS.output.report_handler import BaseReportHandler
 
 #-------------------------------------------------------------------------------
-# Class: SoilSummary
-# Creates and prints to the file soil_summary.csv
+# Class: SoilNitrogen
+# Creates and prints to the file soil_nitrogen.csv
 #-------------------------------------------------------------------------------
 class SoilNitrogen(BaseReportHandler):
 

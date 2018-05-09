@@ -26,6 +26,9 @@ def daily_phosphorus_cycling_routine(soil, time, weather, config):
     if time.year == 1 and time.day == 1:    
         initializePhosphorusInputs(soil, time, weather, config)    
         soilChem(soil)
+    
+    fertilizer(soil, time)
+    manure(soil, time)
 
 #------------------------------------------------------------------------------
 # Function: daily_phosphorus_update
@@ -34,6 +37,73 @@ def daily_phosphorus_cycling_routine(soil, time, weather, config):
 def daily_phosphorus_update(soil, time, weather):
     pass
 
+#------------------------------------------------------------------------------
+# Function: manure
+# This subroutine calculates # of plops added per day and amount of TP, WIP, 
+# and WOP added in manure. Adds P to surface manure pool, and updates
+# cumulative manure and TP added during model run.
+#
+# Calculates TP, WIP, and WOP added in the manure, adds P to surface manure 
+# pools. All units are KG or HA.
+#------------------------------------------------------------------------------
+def manure(soil, time):
+    for x in range(0, len(soil.manureApplications)):
+        if(time.day == soil.manureApplications[x].appDay and 
+                            time.year == soil.manureApplications[x].appYear):
+            COVSLP = 0.0154 * (soil.manureApplications[x].mass**-0.555)
+            
+            soil.manureApplications[x].percentCover = min(1.0,
+                    0.012*soil.manureApplications[x].mass**0.48)
+            MCOVAPP = soil.fieldSize * soil.manureApplications[x].percentCover
+            MANPAPP = (soil.manureApplications[x].mass *
+                       soil.manureApplications[x].totalP)
+            soil.summan += soil.manureApplications[x].mass
+            soil.summanP += MANPAPP
+    pass
+
+#------------------------------------------------------------------------------
+# Function: fertilizer
+# This subroutine calculates P added in fertilizer, adds fertilizer P to 
+# surface pool, and updates cumulative fertilizer P added during the model run
+#
+# Calculates TP, WIP, and WOP added in the manure,
+# adds P to surface manure pools. All units are KG or HA
+#------------------------------------------------------------------------------
+def fertilizer(soil, time):
+    for x in range(0, len(soil.fertilizerApplications)):
+        if(time.day == soil.fertilizerApplications[x].appDay and 
+           time.year == soil.fertilizerApplications[x].appYear):
+            sumFert = 0.0 #needed?
+            noRains = 0.0
+            fertCnt = 1.0
+            
+            if(soil.fertilizerApplications[x].depth == 0.0):
+                AvFrtP = 0.0
+                FrtPSt = 0.0 
+                RSFRTP = 0.0
+            else:
+                AvFrtP = 0.0
+                FrtPSt = 0.0 
+                RSFRTP = 0.0     
+                
+                for y in range(0, len(soil.listOfSoilLayers)):           
+                    if(soil.listOfSoilLayers[y].depth > 
+                                        soil.fertilizerApplications[x].depth):
+                        sumfac = 0.0
+                        soil.listOfSoilLayers[y].labileP *= soil.fieldSize
+                        for z in range (0, y):
+                            fact = (soil.listOfSoilLayers[z].depth /
+                                    soil.fertilizerApplications[x].depth)
+                            soil.listOfSoilLayers[z].labileP += (
+                                soil.fertilizerApplications[x].fertPMass *
+                                fact * (1.0 - 
+                                soil.fertilizerApplications[x].percentOnSurface))
+                        
+                        soil.listOfSoilLayers[x].labileP /= soil.fieldSize
+                        
+    #for x in range(0, len(soil.listOfSoilLayers)):
+    #    labileP = soil.listOfSoilLayers[x].labileP
+    #    print("HI")
 
 #------------------------------------------------------------------------------
 # Function: soilChem
@@ -200,12 +270,6 @@ def uptake(pUptake, soil, config):
             for j in range(0, 365):
                 pUptake[soil.cropPUptakes[i].uptakeYear][j] = (
                     soil.cropPUptakes[i].pUptake/365)
-
-def fertilizer():
-    pass
-
-def manure():
-    pass
 
 def plow():
     pass
