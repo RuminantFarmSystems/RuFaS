@@ -55,9 +55,9 @@
                 
                 "LAI_max": 3,
                 "radiation_use_efficiency": 39,
-                "light extinction coefficient": 1, # Could not find a value for this in parameters tab of spreadsheet -Andy
+                "light extinction coefficient": 1, 
                 
-                "z_root_max": 2000, # (millimeters)
+                "z_root_max": 2000, 
                 
                 
                 "fr,n1": 0.47,
@@ -68,13 +68,13 @@
         
                 "(fr,n~3 - fr,n3)": 0.00001,
                 "beta_w": 10,
-                "beta_n": 10'
+                "beta_n": 10,
                 "epco": 0.5,
                 "soil albedo": 0.16,
 
                 "max damping depth mm": 3462.7,
-                "n1" = 4.9907587471,
-                "n2" = 15.401033781,
+                "n1": 4.9907587471,
+                "n2": 15.401033781,
                 "N fert date": 114,
                 "fert amount": 120,
                 "%NO3": 0.5,
@@ -92,7 +92,7 @@
                 "HI,opt": 0.6, 
                 "HI,min": 0.3,
                 "harvest efficiency": 0.9,
-                "E_t": 1, # maximum plant transpiration on a given day. Could not find a value for this in parameters tab of spreadsheet -Andy
+                "E_t": 1
 
             }
         },
