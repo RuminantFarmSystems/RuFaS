@@ -8,7 +8,7 @@ Author(s): Kass Chupongstimun, kass_c@hotmail.com
 ################################################################################
 
 from math import exp, log, floor
-import heat_units, leaf_area_index, root_depth, biomass
+from . import heat_units, leaf_area_index, root_depth, biomass
 #-------------------------------------------------------------------------------
 # Function: daily_crop_routine
 #-------------------------------------------------------------------------------
@@ -16,16 +16,15 @@ def daily_crop_routine(crop, weather, time, soil):
     '''
     TODO: Add DocString
     '''
-    T_min = weather.tMin[time.year][time.day]
-    T_max = weather.tMax[time.year][time.day]
-
+    T_min = weather.tMin[time.year-1][time.day-1]
+    T_max = weather.tMax[time.year-1][time.day-1]
 
     for _,crop_type in crop.crops_list.items():
-        heat_units.calculate_frPHU(crop_type, T_min, T_max)
-        leaf_area_index.calculate_LAI_actual(crop_type)
-        root_depth.calculate_z_root(crop_type)
-        biomass.calculate_actual_Biomass(crop_type, time, weather)
-
+        heat_units.calculate_frPHU(crop_type, T_min, T_max, time)
+        biomass.calculate_gamma_reg(crop_type, time, weather)
+        # leaf_area_index.calculate_LAI_actual(crop_type)
+        # root_depth.calculate_z_root(crop_type)
+        # biomass.calculate_actual_Biomass(crop_type, time, weather)
        
         # Other daily calculations to be made
 
@@ -38,9 +37,7 @@ def annual_crop_routine(crop, weather, time):
     '''
 
     for _,crop_type in crop.crops.items():
-        crop_type.calculate_start_growth_day(
-            weather.T_min, weather.T_max, weather.T_avg
-        )
+        crop_type.calculate_start_growth_day(weather.T_avg[time.year])
 
 #-------------------------------------------------------------------------------
 # Class: Crop
@@ -55,7 +52,7 @@ class Crop():
         TODO: Add DocString
         '''
 
-        self.crops_list = {crop: self.CropType(data[crop]) for crop in data.keys()}
+        self.crops_list = {crop_type: self.CropType(data[crop_type]) for crop_type in data.keys()}
 
     #---------------------------------------------------------------------------
     # Class: CropType
@@ -66,6 +63,8 @@ class Crop():
             '''
             TODO: Add DocString
             '''
+
+            self.line = 16
 
             #
             # CONSTANTS
@@ -82,7 +81,7 @@ class Crop():
             self.T_base_min = data['min_temp_for_growth']
             self.T_base_max = data['max_temp_for_growth']
             self.PHU = data['HU_for_maturity']
-            
+
             # Internally calculated inputs
             self.accumulated_HU = 0.0
             self.prev_accumulated_HU = 0.0
@@ -125,7 +124,7 @@ class Crop():
             # Inputs
             self.kl = data['light extinction coefficient']
             self.RUE = data['radiation_use_efficiency']
-            self.T_opt = data['T_opt']
+            self.T_opt = data['opt_temp_for_growth']
 
             # Internally calculated inputs
             self.gamma_reg = 0
@@ -176,7 +175,7 @@ class Crop():
         #-----------------------------------------------------------------------
         # Method: calculate_start_growth_day
         #-----------------------------------------------------------------------
-        def calculate_start_growth_day(self, T_min, T_max, T_avg):
+        def calculate_start_growth_day(self, T_avg):
             '''
             TODO: Add DocString
             '''
@@ -184,7 +183,7 @@ class Crop():
             if self.crop_type == "annual":
                 self.start_day = self.planting_date
             else: # crop_type == "perennial"
-                for d in range(len(T_avg)): # ?? is T_avg a 2d list. Is this right. -Andy
+                for d in range(len(T_avg)):
                     if T_avg > self.T_base_min:
                         self.start_day = d
 
@@ -263,5 +262,11 @@ class Crop():
         '''
         TODO: Add DocString
         '''
-        pass
+        for _, crop_type in self.crops_list.items():
+            crop_type.accumulated_HU = 0.0
+            crop_type.prev_accumulated_HU = 0.0
+
+            crop_type.fr_PHU = 0
+            crop_type.prev_fr_PHU = 0
+
 

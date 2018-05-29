@@ -3,6 +3,8 @@ This module contains the necessary functions for calculating and updating the
 Leaf Area Index of the current day. The only function that is meant to be called 
 outside of this file is calculate_LAI_actual().
 
+The plant growth factor (aka crop.gamma_reg needs to be updated prior to this function being called.
+
 CropType values updated by calling calculate_LAI_actual():
     prev_fr_LAI_max
     fr_LAI_max
@@ -28,13 +30,15 @@ def calculate_LAI_actual(crop):
     else:
         crop.LAI_actual = crop.LAI_max * (1-crop.fr_PHU) / (1-crop.fr_PHU_sen)
     crop.prev_LAI_actual = temp_for_LAI
+
     
 
 def calculate_shape_coefficients(crop):
-    l2_part1_floor = floor((crop.fr_PHU_1 / crop.fr_LAI_1) - crop.fr_PHU_1)
-    l2_part2_floor = floor((crop.fr_PHU_2 / crop.fr_LAI_2) - crop.fr_PHU_2)
+    l2_part1 = (crop.fr_PHU_1 / crop.fr_LAI_1) - crop.fr_PHU_1
+    l2_part2 = (crop.fr_PHU_2 / crop.fr_LAI_2) - crop.fr_PHU_2
+
     
-    l2 = ( (log(l2_part1_floor) - log(l2_part2_floor)) 
+    l2 = ( (log(l2_part1) - log(l2_part2))
            / (crop.fr_PHU_2 - crop.fr_PHU_1) )
  
     

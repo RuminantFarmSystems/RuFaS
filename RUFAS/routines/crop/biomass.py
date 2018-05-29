@@ -18,7 +18,7 @@ def calculate_actual_Biomass(crop_type, time, weather):
     H_phosyn = calculate_intercepted_radiation(crop_type, time, weather)
     crop_type.dBiomass_max = crop_type.RUE * H_phosyn
     
-    crop_type.gamma_reg = calculate_gamma_reg(crop_type, time, weather)
+    # calculate_gamma_reg(crop_type, time, weather)
     crop_type.dBiomass_actual = crop_type.dBiomass_max * crop_type.gamma_reg
     crop_type.prev_biomass_actual = crop_type.biomass_actual
     crop_type.biomass_actual += crop_type.dBiomass_actual
@@ -27,6 +27,10 @@ def calculate_intercepted_radiation(crop_type, time, weather):
     H_day = weather.radiation[time.year][time.day]
     return 0.5 * H_day * (1 - exp(-1*crop_type.kl*crop_type.LAI_actual))
 
+
+#
+# gamma_reg represents "plant growth factor"
+#
 def calculate_gamma_reg(crop_type, time, weather):
     wstrs = calculate_wstrs(crop_type)
     tstrs = calculate_tstrs(crop_type, time, weather)
@@ -34,6 +38,9 @@ def calculate_gamma_reg(crop_type, time, weather):
     pstrs = calculate_pstrs(crop_type)
     
     crop_type.gamma_reg = 1- max(wstrs, tstrs, nstrs, pstrs)
+
+    print("%i)  %f || %f || %f || %f || %f" %(crop_type.line, wstrs, tstrs, nstrs, pstrs, crop_type.gamma_reg))
+    crop_type.line += 1
     
     
 '''
@@ -44,10 +51,13 @@ They do not modify the values of any State class.
 '''
 
 def calculate_wstrs(crop_type):
-    return 1 - (crop_type.water_actual_up / crop_type.Et)
+    if crop_type.Et == 0:
+        return 0
+    else:
+        return 1 - (crop_type.water_actual_up / crop_type.Et)
     
 def calculate_tstrs(crop_type, time, weather):
-    T_avg = weather.tAvg[time.year][time.day]
+    T_avg = weather.tAvg[time.year-1][time.day-1]
     T_opt = crop_type.T_opt
     T_base_min = crop_type.T_base_min
     
@@ -68,9 +78,13 @@ def calculate_tstrs(crop_type, time, weather):
         return 1
     
 def calculate_nstrs(crop_type):
+    if crop_type.prev_bio_N_opt == 0:
+        return 0
     phi_n = 200 * ((crop_type.prev_bio_N/crop_type.prev_bio_N_opt) - 0.5)
     return 1 - phi_n / (phi_n + exp(3.535 - 0.02597*phi_n))   
     
 def calculate_pstrs(crop_type):
+    if crop_type.prev_bio_P_opt == 0:
+        return 0
     phi_p = 200 * ((crop_type.prev_bio_P/crop_type.prev_bio_P_opt) - 0.5)
     return 1 - phi_p / (phi_p + exp(3.535 - 0.02597 * phi_p))

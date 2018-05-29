@@ -7,7 +7,7 @@
         "output_dir": "Outputs/Sample_Farm_Outputs/"
     },
 
-    "weather": "Inputs/Weather.csv",
+    "weather": "Inputs/crop_module_testWeather.csv",
 
     "output":
     {

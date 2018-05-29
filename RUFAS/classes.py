@@ -41,7 +41,7 @@ class State():
 		self.soil = Soil(data['soil'])
 		self.animal = Animal(data['animal'])
 		self.feed = Feed(data['feed'])
-		#self.crop = Crop(data['crop'])
+		self.crop = Crop(data['crop'])
 
 		#self.fieldOps = FieldOps()
 		#self.herd = Herd()
@@ -128,31 +128,31 @@ class Weather():
 
 			currentRow = 0
 			for row in readCSV:
-				if currentRow != 0:
+				if currentRow != 0: # Skip the first row because first row contains column headers
 					# 1) Read rainfall data
-					rainfallData.append(row[1])
+					rainfallData.append(float(row[1]))
 
 					# 2) Read max temperature data
-					tMaxData.append(row[2])
+					tMaxData.append(float(row[2]))
 
 					# 3) Read min temperature data
-					tMinData.append(row[3])
+					tMinData.append(float(row[3]))
 
 					# 4) Read avg temperature data
-					tAvgData.append(row[4])
+					tAvgData.append(float(row[4]))
 
 					# 5) Read biomass data
-					bioMassData.append(row[5])
+					bioMassData.append(float(row[5]))
 
 					# 6) Read radiation data
-					radiationData.append(row[6])
+					radiationData.append(float(row[6]))
 
 					# 7) Added N Data
-					addedNData.append(row[7])
+					addedNData.append(float(row[7]))
 
 				currentRow += 1
 
-		# Make sure weather data length matchs simulation duaration
+		# Make sure weather data length matchs simulation duration
 		weather_file_years = math.floor(currentRow / 365)
 		if weather_file_years < duration:
 			raise errors.JSONfileData("WEATHER",
@@ -226,6 +226,7 @@ class Weather():
 					break
 				else:
 					self.addedN[i][j] = addedNData[i*365 + j]
+
 
 #-------------------------------------------------------------------------------
 # Class: Time
