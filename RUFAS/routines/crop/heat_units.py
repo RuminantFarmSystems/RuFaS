@@ -19,19 +19,19 @@ Author(s): Andy Achenreiner, achenreiner@wisc.edu
 ################################################################################
 
 
-def calculate_frPHU(crop, tMin, tMax, time):
+def calculate_frPHU(crop, T_min, T_max, time):
     #
     # Part 1B of Crop Biomass pseudocode
     #
-    if tMin < crop.T_base_min:
+    if T_min < crop.T_base_min:
         T_HU_min = crop.T_base_min
     else:
-        T_HU_min = tMin
+        T_HU_min = T_min
 
-    if tMax > crop.T_base_max:
+    if T_max > crop.T_base_max:
         T_HU_max = crop.T_base_max
     else:
-        T_HU_max = tMax
+        T_HU_max = T_max
 
     T_HU = (T_HU_min + T_HU_max) / 2.0
 

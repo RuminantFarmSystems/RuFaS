@@ -97,9 +97,9 @@ class Weather():
 		# Weather Data in 2D lists -> [year][julianDay]
 		#
 		self.rainfall = [[0 for _ in range(365)]for _ in range(duration)]
-		self.tMax = [[0 for _ in range(365)]for _ in range(duration)]
-		self.tMin = [[0 for _ in range(365)]for _ in range(duration)]
-		self.tAvg = [[0 for _ in range(365)]for _ in range(duration)]
+		self.T_max = [[0 for _ in range(365)] for _ in range(duration)]
+		self.T_min = [[0 for _ in range(365)] for _ in range(duration)]
+		self.T_avg = [[0 for _ in range(365)] for _ in range(duration)]
 		self.biomass = [[0 for _ in range(365)]for _ in range(duration)]
 		self.radiation = [[0 for _ in range(365)]for _ in range(duration)]
 		self.addedN = [[0 for _ in range(365)]for _ in range(duration)]
@@ -185,7 +185,7 @@ class Weather():
 				if (i*365+j) >= len(tMaxData):
 					break
 				else:
-					self.tMax[i][j] = tMaxData[i*365 + j]
+					self.T_max[i][j] = tMaxData[i * 365 + j]
 
 		# 3) Update Min Temperature in weather
 		for i in range(0, duration):
@@ -193,7 +193,7 @@ class Weather():
 				if (i*365+j) >= len(tMinData):
 					break
 				else:
-					self.tMin[i][j] = tMinData[i*365 + j]
+					self.T_min[i][j] = tMinData[i * 365 + j]
 
 		# 4) Update Avg Temperature in weather
 		for i in range(0, duration):
@@ -201,7 +201,7 @@ class Weather():
 				if (i*365+j) >= len(tAvgData):
 					break
 				else:
-					self.tAvg[i][j] = tAvgData[i*365 + j]
+					self.T_avg[i][j] = tAvgData[i * 365 + j]
 
 		# 5) Update biomass in weather
 		for i in range(0, duration):

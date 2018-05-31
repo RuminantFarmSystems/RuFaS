@@ -21,7 +21,7 @@ def daily_soil_routine(soil, weather, time):
     soil.updateSoilTemperature(
         weather.biomass[time.year-1][time.day-1],
         weather.radiation[time.year-1][time.day-1],
-        weather.tAvg[time.year-1][time.day-1],
+        weather.T_avg[time.year-1][time.day-1],
         8.41,
         time.day)
 
@@ -30,9 +30,9 @@ def daily_soil_routine(soil, weather, time):
 
     # calculate daily transpiration
     soil.dailyEvapotranspiration(
-        weather.tMax[time.year-1][time.day-1]
-        , weather.tMin[time.year-1][time.day-1]
-        , weather.tAvg[time.year-1][time.day-1]
+        weather.T_max[time.year-1][time.day-1]
+        , weather.T_min[time.year-1][time.day-1]
+        , weather.T_avg[time.year-1][time.day-1]
         , weather.biomass[time.year-1][time.day-1]
         , weather.radiation[time.year-1][time.day-1])
 

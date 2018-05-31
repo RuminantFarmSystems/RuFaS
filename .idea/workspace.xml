@@ -2,19 +2,15 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="27e9656f-e2fe-44e1-b51b-f0d38480d9b9" name="Default" comment="">
-      <change beforePath="" afterPath="$PROJECT_DIR$/.idea/MASM.iml" />
-      <change beforePath="" afterPath="$PROJECT_DIR$/.idea/misc.xml" />
-      <change beforePath="" afterPath="$PROJECT_DIR$/.idea/modules.xml" />
-      <change beforePath="" afterPath="$PROJECT_DIR$/.idea/vcs.xml" />
-      <change beforePath="" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
-      <change beforePath="" afterPath="$PROJECT_DIR$/Inputs/crop_module_testWeather.csv" />
-      <change beforePath="" afterPath="$PROJECT_DIR$/createCropWeatherDoc.py" />
+      <change beforePath="" afterPath="$PROJECT_DIR$/actualGammaRegResults.csv" />
+      <change beforePath="" afterPath="$PROJECT_DIR$/correctGammaRegResults.csv" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
       <change beforePath="$PROJECT_DIR$/Inputs/Sample2.json" afterPath="$PROJECT_DIR$/Inputs/Sample2.json" />
       <change beforePath="$PROJECT_DIR$/RUFAS/classes.py" afterPath="$PROJECT_DIR$/RUFAS/classes.py" />
       <change beforePath="$PROJECT_DIR$/RUFAS/routines/crop/biomass.py" afterPath="$PROJECT_DIR$/RUFAS/routines/crop/biomass.py" />
       <change beforePath="$PROJECT_DIR$/RUFAS/routines/crop/crop.py" afterPath="$PROJECT_DIR$/RUFAS/routines/crop/crop.py" />
       <change beforePath="$PROJECT_DIR$/RUFAS/routines/crop/heat_units.py" afterPath="$PROJECT_DIR$/RUFAS/routines/crop/heat_units.py" />
-      <change beforePath="$PROJECT_DIR$/RUFAS/routines/crop/leaf_area_index.py" afterPath="$PROJECT_DIR$/RUFAS/routines/crop/leaf_area_index.py" />
+      <change beforePath="$PROJECT_DIR$/RUFAS/routines/soil/soil.py" afterPath="$PROJECT_DIR$/RUFAS/routines/soil/soil.py" />
       <change beforePath="$PROJECT_DIR$/RUFAS/simulation_engine.py" afterPath="$PROJECT_DIR$/RUFAS/simulation_engine.py" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
@@ -25,12 +21,12 @@
     <option name="LAST_RESOLUTION" value="IGNORE" />
   </component>
   <component name="FileEditorManager">
-    <leaf>
+    <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
       <file leaf-file-name="classes.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/RUFAS/classes.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="1584">
-              <caret line="93" column="15" lean-forward="false" selection-start-line="93" selection-start-column="13" selection-end-line="93" selection-end-column="15" />
+            <state relative-caret-position="216">
+              <caret line="101" column="13" lean-forward="false" selection-start-line="101" selection-start-column="13" selection-end-line="101" selection-end-column="18" />
               <folding />
             </state>
           </provider>
@@ -39,8 +35,8 @@
       <file leaf-file-name="simulation_engine.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/RUFAS/simulation_engine.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="1314">
-              <caret line="97" column="0" lean-forward="true" selection-start-line="97" selection-start-column="0" selection-end-line="97" selection-end-column="0" />
+            <state relative-caret-position="-594">
+              <caret line="99" column="0" lean-forward="true" selection-start-line="99" selection-start-column="0" selection-end-line="99" selection-end-column="0" />
               <folding>
                 <element signature="e#393#404#0" expanded="true" />
               </folding>
@@ -48,8 +44,20 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="__init__.py" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/RUFAS/output/__init__.py">
+      <file leaf-file-name="crop.py" pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/RUFAS/routines/crop/crop.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="500">
+              <caret line="49" column="70" lean-forward="false" selection-start-line="49" selection-start-column="70" selection-end-line="49" selection-end-column="70" />
+              <folding>
+                <element signature="e#288#320#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="createCropWeatherDoc.py" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/createCropWeatherDoc.py">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="0">
               <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
@@ -58,14 +66,12 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="crop.py" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/RUFAS/routines/crop/crop.py">
+      <file leaf-file-name="heat_units.py" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/RUFAS/routines/crop/heat_units.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="0">
-              <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="7" selection-end-column="80" />
-              <folding>
-                <element signature="e#288#320#0" expanded="true" />
-              </folding>
+            <state relative-caret-position="162">
+              <caret line="21" column="38" lean-forward="false" selection-start-line="21" selection-start-column="33" selection-end-line="21" selection-end-column="38" />
+              <folding />
             </state>
           </provider>
         </entry>
@@ -73,28 +79,38 @@
       <file leaf-file-name="biomass.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/RUFAS/routines/crop/biomass.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="428">
-              <caret line="41" column="90" lean-forward="false" selection-start-line="41" selection-start-column="90" selection-end-line="41" selection-end-column="90" />
+            <state relative-caret-position="342">
+              <caret line="67" column="4" lean-forward="true" selection-start-line="67" selection-start-column="4" selection-end-line="67" selection-end-column="4" />
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="heat_units.py" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/RUFAS/routines/crop/heat_units.py">
+      <file leaf-file-name="soil.py" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/RUFAS/routines/soil/soil.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="810">
-              <caret line="45" column="0" lean-forward="true" selection-start-line="45" selection-start-column="0" selection-end-line="45" selection-end-column="0" />
+            <state relative-caret-position="180">
+              <caret line="480" column="44" lean-forward="true" selection-start-line="480" selection-start-column="44" selection-end-line="480" selection-end-column="44" />
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="crop_module_testWeather.csv" pinned="false" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/Inputs/crop_module_testWeather.csv">
+      <file leaf-file-name="actualGammaRegResults.csv" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/actualGammaRegResults.csv">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="432">
+              <caret line="525" column="41" lean-forward="false" selection-start-line="525" selection-start-column="24" selection-end-line="525" selection-end-column="41" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="correctGammaRegResults.csv" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/correctGammaRegResults.csv">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="0">
-              <caret line="0" column="33" lean-forward="false" selection-start-line="0" selection-start-column="33" selection-end-line="0" selection-end-column="33" />
+              <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
               <folding />
             </state>
           </provider>
@@ -103,8 +119,8 @@
       <file leaf-file-name="Sample2.json" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/Inputs/Sample2.json">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="198">
-              <caret line="11" column="13" lean-forward="true" selection-start-line="11" selection-start-column="13" selection-end-line="11" selection-end-column="13" />
+            <state relative-caret-position="392">
+              <caret line="101" column="39262" lean-forward="false" selection-start-line="101" selection-start-column="39262" selection-end-line="101" selection-end-column="39262" />
               <folding />
             </state>
           </provider>
@@ -125,6 +141,9 @@
       <find>stat</find>
       <find>t_</find>
       <find>T_</find>
+      <find>time</find>
+      <find>tM</find>
+      <find>tA</find>
     </findStrings>
   </component>
   <component name="Git.Settings">
@@ -134,13 +153,14 @@
     <option name="CHANGED_PATHS">
       <list>
         <option value="$PROJECT_DIR$/Inputs/crop_module_testWeather.csv" />
-        <option value="$PROJECT_DIR$/Inputs/Sample2.json" />
-        <option value="$PROJECT_DIR$/RUFAS/classes.py" />
-        <option value="$PROJECT_DIR$/RUFAS/simulation_engine.py" />
         <option value="$PROJECT_DIR$/RUFAS/routines/crop/leaf_area_index.py" />
-        <option value="$PROJECT_DIR$/RUFAS/routines/crop/crop.py" />
-        <option value="$PROJECT_DIR$/RUFAS/routines/crop/biomass.py" />
+        <option value="$PROJECT_DIR$/Inputs/Sample2.json" />
+        <option value="$PROJECT_DIR$/RUFAS/simulation_engine.py" />
+        <option value="$PROJECT_DIR$/RUFAS/classes.py" />
         <option value="$PROJECT_DIR$/RUFAS/routines/crop/heat_units.py" />
+        <option value="$PROJECT_DIR$/RUFAS/routines/crop/biomass.py" />
+        <option value="$PROJECT_DIR$/RUFAS/routines/soil/soil.py" />
+        <option value="$PROJECT_DIR$/RUFAS/routines/crop/crop.py" />
       </list>
     </option>
   </component>
@@ -151,10 +171,10 @@
     <sorting>DEFINITION_ORDER</sorting>
   </component>
   <component name="ProjectFrameBounds" extendedState="6">
-    <option name="x" value="1491" />
+    <option name="x" value="1649" />
     <option name="y" value="24" />
-    <option name="width" value="1297" />
-    <option name="height" value="736" />
+    <option name="width" value="1295" />
+    <option name="height" value="700" />
   </component>
   <component name="ProjectView">
     <navigator currentView="ProjectPane" proportions="" version="1">
@@ -171,8 +191,6 @@
       <foldersAlwaysOnTop value="true" />
     </navigator>
     <panes>
-      <pane id="Scratches" />
-      <pane id="Scope" />
       <pane id="ProjectPane">
         <subPane>
           <expand>
@@ -185,10 +203,42 @@
               <item name="MASM" type="462c0819:PsiDirectoryNode" />
               <item name="Inputs" type="462c0819:PsiDirectoryNode" />
             </path>
+            <path>
+              <item name="MASM" type="b2602c69:ProjectViewProjectNode" />
+              <item name="MASM" type="462c0819:PsiDirectoryNode" />
+              <item name="others" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="MASM" type="b2602c69:ProjectViewProjectNode" />
+              <item name="MASM" type="462c0819:PsiDirectoryNode" />
+              <item name="RUFAS" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="MASM" type="b2602c69:ProjectViewProjectNode" />
+              <item name="MASM" type="462c0819:PsiDirectoryNode" />
+              <item name="RUFAS" type="462c0819:PsiDirectoryNode" />
+              <item name="routines" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="MASM" type="b2602c69:ProjectViewProjectNode" />
+              <item name="MASM" type="462c0819:PsiDirectoryNode" />
+              <item name="RUFAS" type="462c0819:PsiDirectoryNode" />
+              <item name="routines" type="462c0819:PsiDirectoryNode" />
+              <item name="crop" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="MASM" type="b2602c69:ProjectViewProjectNode" />
+              <item name="MASM" type="462c0819:PsiDirectoryNode" />
+              <item name="RUFAS" type="462c0819:PsiDirectoryNode" />
+              <item name="routines" type="462c0819:PsiDirectoryNode" />
+              <item name="soil" type="462c0819:PsiDirectoryNode" />
+            </path>
           </expand>
           <select />
         </subPane>
       </pane>
+      <pane id="Scratches" />
+      <pane id="Scope" />
     </panes>
   </component>
   <component name="PropertiesComponent">
@@ -230,7 +280,8 @@
     <servers />
   </component>
   <component name="ToolWindowManager">
-    <frame x="1491" y="24" width="1855" height="1092" extended-state="6" />
+    <frame x="1433" y="-4" width="1853" height="1084" extended-state="6" />
+    <editor active="true" />
     <layout>
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
       <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="true" content_ui="tabs" />
@@ -238,10 +289,10 @@
       <window_info id="Python Console" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
-      <window_info id="Project" active="true" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.24986508" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
+      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.24986508" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
       <window_info id="Docker" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="false" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Database" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
-      <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.32924336" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
+      <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.34560326" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="SciView" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="true" content_ui="tabs" />
@@ -265,7 +316,25 @@
     <watches-manager />
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/RUFAS/user_prompt.py">
+    <entry file="file://$PROJECT_DIR$/RUFAS/classes.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="1584">
+          <caret line="93" column="15" lean-forward="false" selection-start-line="93" selection-start-column="13" selection-end-line="93" selection-end-column="15" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/RUFAS/simulation_engine.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="1746">
+          <caret line="97" column="0" lean-forward="true" selection-start-line="97" selection-start-column="0" selection-end-line="97" selection-end-column="0" />
+          <folding>
+            <element signature="e#393#404#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/RUFAS/output/__init__.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="0">
           <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
@@ -273,34 +342,28 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/Inputs/Weather.csv">
+    <entry file="file://$PROJECT_DIR$/RUFAS/routines/crop/crop.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="0">
-          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="59" />
+          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="7" selection-end-column="80" />
+          <folding>
+            <element signature="e#288#320#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/RUFAS/routines/crop/biomass.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="738">
+          <caret line="41" column="90" lean-forward="false" selection-start-line="41" selection-start-column="90" selection-end-line="41" selection-end-column="90" />
           <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/RUFAS/output/report_template.py">
+    <entry file="file://$PROJECT_DIR$/RUFAS/routines/crop/heat_units.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="0">
-          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/Inputs/Sample.json">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-162">
-          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/RUFAS/output/report_handler.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="0">
-          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+        <state relative-caret-position="810">
+          <caret line="45" column="0" lean-forward="true" selection-start-line="45" selection-start-column="0" selection-end-line="45" selection-end-column="0" />
           <folding />
         </state>
       </provider>
@@ -313,11 +376,54 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/Inputs/crop_module_testWeather.csv">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="0">
+          <caret line="0" column="33" lean-forward="false" selection-start-line="0" selection-start-column="33" selection-end-line="0" selection-end-column="33" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/RUFAS/user_prompt.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="0">
+          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Inputs/Weather.csv">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="0">
+          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="59" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/RUFAS/output/report_template.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="0">
+          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Inputs/Sample.json">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-162">
+          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/RUFAS/output/report_handler.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="0">
+          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/RUFAS/output/soil_summary.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="446">
           <caret line="197" column="50" lean-forward="true" selection-start-line="197" selection-start-column="50" selection-end-line="197" selection-end-column="50" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -325,7 +431,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="216">
           <caret line="13" column="21" lean-forward="true" selection-start-line="13" selection-start-column="21" selection-end-line="13" selection-end-column="21" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -345,59 +450,23 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/RUFAS/simulation_engine.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1314">
-          <caret line="97" column="0" lean-forward="true" selection-start-line="97" selection-start-column="0" selection-end-line="97" selection-end-column="0" />
-          <folding>
-            <element signature="e#393#404#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/RUFAS/routines/crop/leaf_area_index.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="576">
           <caret line="32" column="0" lean-forward="true" selection-start-line="32" selection-start-column="0" selection-end-line="32" selection-end-column="0" />
-          <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/RUFAS/routines/crop/biomass.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="428">
-          <caret line="41" column="90" lean-forward="false" selection-start-line="41" selection-start-column="90" selection-end-line="41" selection-end-column="90" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/RUFAS/routines/crop/crop.py">
+    <entry file="file://$PROJECT_DIR$/crop_module_testWeather.csv" />
+    <entry file="file://$PROJECT_DIR$/Inputs/crop_module_testWeather.csv">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="0">
-          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="7" selection-end-column="80" />
-          <folding>
-            <element signature="e#288#320#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/RUFAS/classes.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1584">
-          <caret line="93" column="15" lean-forward="false" selection-start-line="93" selection-start-column="13" selection-end-line="93" selection-end-column="15" />
+          <caret line="0" column="33" lean-forward="false" selection-start-line="0" selection-start-column="33" selection-end-line="0" selection-end-column="33" />
           <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/RUFAS/routines/crop/heat_units.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="810">
-          <caret line="45" column="0" lean-forward="true" selection-start-line="45" selection-start-column="0" selection-end-line="45" selection-end-column="0" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/crop_module_testWeather.csv">
+    <entry file="file://$PROJECT_DIR$/python3">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="0">
           <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
@@ -405,11 +474,95 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/Inputs/crop_module_testWeather.csv">
+    <entry file="file://$PROJECT_DIR$/main.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="0">
-          <caret line="0" column="33" lean-forward="false" selection-start-line="0" selection-start-column="33" selection-end-line="0" selection-end-column="33" />
+          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
           <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Inputs/Sample2.json">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="392">
+          <caret line="101" column="39262" lean-forward="false" selection-start-line="101" selection-start-column="39262" selection-end-line="101" selection-end-column="39262" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/actualGammaRegResults.csv">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="432">
+          <caret line="525" column="41" lean-forward="false" selection-start-line="525" selection-start-column="24" selection-end-line="525" selection-end-column="41" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/createCropWeatherDoc.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="0">
+          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/correctGammaRegResults.csv">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="0">
+          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/RUFAS/simulation_engine.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-594">
+          <caret line="99" column="0" lean-forward="true" selection-start-line="99" selection-start-column="0" selection-end-line="99" selection-end-column="0" />
+          <folding>
+            <element signature="e#393#404#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/RUFAS/classes.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="216">
+          <caret line="101" column="13" lean-forward="false" selection-start-line="101" selection-start-column="13" selection-end-line="101" selection-end-column="18" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/RUFAS/routines/crop/heat_units.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="162">
+          <caret line="21" column="38" lean-forward="false" selection-start-line="21" selection-start-column="33" selection-end-line="21" selection-end-column="38" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/RUFAS/routines/crop/biomass.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="342">
+          <caret line="67" column="4" lean-forward="true" selection-start-line="67" selection-start-column="4" selection-end-line="67" selection-end-column="4" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/RUFAS/routines/soil/soil.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="180">
+          <caret line="480" column="44" lean-forward="true" selection-start-line="480" selection-start-column="44" selection-end-line="480" selection-end-column="44" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/RUFAS/routines/crop/crop.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="500">
+          <caret line="49" column="70" lean-forward="false" selection-start-line="49" selection-start-column="70" selection-end-line="49" selection-end-column="70" />
+          <folding>
+            <element signature="e#288#320#0" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>

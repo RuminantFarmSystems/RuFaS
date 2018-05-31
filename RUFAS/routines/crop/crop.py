@@ -16,10 +16,20 @@ def daily_crop_routine(crop, weather, time, soil):
     '''
     TODO: Add DocString
     '''
-    T_min = weather.tMin[time.year-1][time.day-1]
-    T_max = weather.tMax[time.year-1][time.day-1]
+
+    T_min = weather.T_min[time.year-1][time.day-1]
+    T_max = weather.T_max[time.year-1][time.day-1]
 
     for _,crop_type in crop.crops_list.items():
+        timeIndex = (time.year -1)*365 + time.day -1
+        crop_type.Et = crop_type.test_Et[timeIndex]
+        crop_type.water_actual_up = crop_type.test_water_actual_up[timeIndex]
+
+        crop_type.bio_N = crop_type.test_bio_N[timeIndex]
+        crop_type.bio_N_opt = crop_type.test_bio_N_opt[timeIndex]
+        crop_type.bio_P = crop_type.test_bio_P[timeIndex]
+        crop_type.bio_P_opt = crop_type.test_bio_P_opt[timeIndex]
+
         heat_units.calculate_frPHU(crop_type, T_min, T_max, time)
         biomass.calculate_gamma_reg(crop_type, time, weather)
         # leaf_area_index.calculate_LAI_actual(crop_type)
@@ -36,8 +46,8 @@ def annual_crop_routine(crop, weather, time):
     TODO: Add DocString
     '''
 
-    for _,crop_type in crop.crops.items():
-        crop_type.calculate_start_growth_day(weather.T_avg[time.year])
+    for _,crop_type in crop.crops_list.items():
+        crop_type.calculate_start_growth_day(weather.T_avg[time.year-1])
 
 #-------------------------------------------------------------------------------
 # Class: Crop
@@ -149,18 +159,12 @@ class Crop():
             ''' Nitrogen Uptake Data '''
             
             self.bio_N_opt = 0
-            self.prev_bio_N_opt = 0
-            
-            self.prev_bio_N = 0
             self.bio_N = 0
 
             #===================================================================
             ''' Phosphorus Uptake Data '''
             
             self.bio_P_opt = 0
-            self.prev_bio_P_opt = 0
-            
-            self.prev_bio_P = 0
             self.bio_P = 0
             
             #===================================================================
@@ -172,6 +176,14 @@ class Crop():
             ''' Yield Data '''
             
             #===================================================================
+            ''' Testing Data '''
+            self.test_water_actual_up = data["TESTING_water_up"]
+            self.test_Et = data["TESTING_Et"]
+
+            self.test_bio_P = data["TESTING_bioP"]
+            self.test_bio_P_opt = data["TESTING_bioP_opt"]
+            self.test_bio_N = data["TESTING_bioN"]
+            self.test_bio_N_opt = data["TESTING_bioN_opt"]
         #-----------------------------------------------------------------------
         # Method: calculate_start_growth_day
         #-----------------------------------------------------------------------
