@@ -8,7 +8,8 @@ Author(s): Kass Chupongstimun, kass_c@hotmail.com
 ################################################################################
 
 from math import exp, log, floor
-from . import heat_units, leaf_area_index, root_development, biomass
+from . import heat_units, leaf_area_index, root_development, biomass, yields, \
+    phosphorus_uptake, nitrogen_uptake
 
 #-------------------------------------------------------------------------------
 # Function: daily_crop_routine
@@ -36,17 +37,20 @@ def daily_crop_routine(crop, weather, time, soil):
         crop_type.bio_N_opt = crop_type.test_bio_N_opt[timeIndex]
         crop_type.bio_P = crop_type.test_bio_P[timeIndex]
         crop_type.bio_P_opt = crop_type.test_bio_P_opt[timeIndex]
-        # crop_type.LAI_actual = crop_type.test_LAI_actual[timeIndex]
+
+        crop_type.Ea_sum = crop_type.test_Ea_sum[time.year-1]
+        crop_type.Eo_sum = crop_type.test_Eo_sum[time.year-1]
 
         #
         # Run calculations
         #
         heat_units.update_all(crop_type, T_min, T_max, time)
-        biomass.calculate_gamma_reg(crop_type, time, weather)
-        biomass.calculate_actual_Biomass(crop_type, time, weather)
+        biomass.update_all(crop_type, time, weather)
         leaf_area_index.update_all(crop_type, time)
         root_development.update_all(crop_type, time)
-
+        phosphorus_uptake.update_all(crop_type, time)
+        nitrogen_uptake.update_all(crop_type, time)
+        yields.update_all(crop_type, time)
        
         # Other daily calculations to be made
 
@@ -180,22 +184,62 @@ class Crop():
             self.bio_N_opt = 0
             self.bio_N = 0
 
+            self.fr_n1 = data["fr_p1"]
+            self.fr_n2 = data["fr_p2"]
+            self.fr_n3 = data["fr_p3"]
+            self.fr_n3ish = data["fr_p3ish"]
+
+            self.fr_N = 0
+            self.fr_N_up = 0
             #===================================================================
             ''' Phosphorus Uptake Data '''
             
             self.bio_P_opt = 0
             self.bio_P = 0
-            
+
+            self.fr_PHU_50 = data["fr_PHU_50"]
+            self.fr_PHU_100 = data["fr_PHU_100"]
+            self.fr_p1 = data["fr_p1"]
+            self.fr_p2 = data["fr_p2"]
+            self.fr_p3 = data["fr_p3"]
+            self.fr_p3ish = data["fr_p3ish"]
+
+            self.fr_P = 0
+            self.P_up = 0
+
             #===================================================================
             ''' Hydrology Data '''
             
             self.water_actual_up = 0
             self.Et = 0
+
+            self.Ea = 0
+            self.Ea_sum = 0
+
+            self.Eo = 0
+            self.Eo_sum = 0
+
             #===================================================================
-            ''' Yield Data '''
-            
+            ''' Yields Data '''
+
+            self.HI_max = 0
+            self.HI_min = data["HI_min"]
+            self.HI_actual = 0
+            self.HI_opt = data["HI_opt"]
+
+            self.harvest_eff = data["harvest_eff"]
+
+            # Note that currently gamma wu is only accurate on harvest date because
+            # hard coded inputs for Ea_sum and Eo_sum are set for those days
+            self.gamma_wu = 0
+
+            self.bio_AG = 0
+            self.yield_max = 0
+            self.yield_actual = 0
+
             #===================================================================
             ''' Testing Data '''
+
             self.test_water_actual_up = data["TESTING_water_up"]
             self.test_Et = data["TESTING_Et"]
 
@@ -204,7 +248,10 @@ class Crop():
             self.test_bio_N = data["TESTING_bioN"]
             self.test_bio_N_opt = data["TESTING_bioN_opt"]
 
-            self.test_LAI_actual = data["TESTING_LAI_actual"]
+            self.test_Ea_sum = data["TESTING_Ea_sum"]
+            self.test_Eo_sum = data["TESTING_Eo_sum"]
+
+
         #-----------------------------------------------------------------------
         # Method: calculate_start_growth_day
         #-----------------------------------------------------------------------

@@ -1,7 +1,7 @@
 '''
 RUFAS: Ruminant Farm Systems Model
 
-File name: heat_units.py
+File name: root_development.py
 
 Author(s): Andy Achenreiner, achenreiner@wisc.edu
 
@@ -80,23 +80,33 @@ def calc_z_root(crop_type, time):
 
 #==============================================================================
 
-''' The follow can be used for testing purposes '''
+''' The following can be used for testing purposes '''
 
 #
 # The file that will record results of the root depth calculations.
 # This is for testing purposes.
 #
-root_depth_test_file = "root_depth_results.csv"
+root_depth_test_file = "tests/crop_test_files/root_depth_results.csv"
 
 #
 # The following will record the root depth calculations into the
 # test file.
 #
 def record_results(crop_type, time):
+    if time.day == 1 and time.year == 1:
+        reset_file((root_depth_test_file))
+
     with open(root_depth_test_file, "a") as resultFile:
         result = "%i,%f,%f,%f\n" % (
             time.day,
             crop_type.fr_PHU,
             crop_type.fr_root,
             crop_type.z_root)
+        if time.day == 1 and time.year == 1:
+            resultFile.write("day,fr_PHU,fr_root,z_root\n")
         resultFile.write(result)
+
+
+def reset_file(fileName):
+    with open(fileName, "w") as file:
+        pass

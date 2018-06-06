@@ -58,9 +58,9 @@ CropType values updated by calling calculate_frPHU():
 # This function calls the functions necessary to update the current heat unit
 # information.
 #
-def update_all(crop, T_min, T_max, time):
-    results = calculate_frPHU(crop, T_min, T_max, time)
-    record_results(crop, time, results)
+def update_all(crop_type, T_min, T_max, time):
+    results = calculate_frPHU(crop_type, T_min, T_max, time)
+    record_results(crop_type, time, results)
 
 
 #
@@ -68,73 +68,83 @@ def update_all(crop, T_min, T_max, time):
 # today. The equations used for this part can be found in
 # "Pseudo code_SC_maxdeltabio_1.0.docx" section 1.B and 1.C
 #
-def calculate_frPHU(crop, T_min, T_max, time):
+def calculate_frPHU(crop_type, T_min, T_max, time):
     #
     # Part 1B of Crop Biomass pseudocode
     #
-    T_HU_min = calc_T_HU_min(crop, T_min)
+    T_HU_min = calc_T_HU_min(crop_type, T_min)
 
-    T_HU_max = calc_T_HU_max(crop, T_max)
+    T_HU_max = calc_T_HU_max(crop_type, T_max)
 
-    HU = calc_HU(crop, T_HU_min, T_HU_max)
+    HU = calc_HU(crop_type, T_HU_min, T_HU_max)
 
 
-    crop.prev_accumulated_HU = crop.accumulated_HU
+    crop_type.prev_accumulated_HU = crop_type.accumulated_HU
 
-    if time.day >= crop.planting_date:
-        crop.accumulated_HU += HU
+    if time.day >= crop_type.planting_date:
+        crop_type.accumulated_HU += HU
 
     # Calculate accumulated fraction of potential Heat Units
 
-    crop.prev_fr_PHU = crop.fr_PHU
+    crop_type.prev_fr_PHU = crop_type.fr_PHU
 
-    crop.fr_PHU = crop.accumulated_HU / crop.PHU
+    crop_type.fr_PHU = crop_type.accumulated_HU / crop_type.PHU
 
     calc_info = (T_max, T_min, T_HU_min, T_HU_max, HU)
 
     return calc_info
 
 
-def calc_T_HU_min(crop, T_min):
-    if T_min < crop.T_base_min:
-        return crop.T_base_min
+def calc_T_HU_min(crop_type, T_min):
+    if T_min < crop_type.T_base_min:
+        return crop_type.T_base_min
     else:
         return T_min
 
 
-def calc_T_HU_max(crop, T_max):
-    if T_max > crop.T_base_max:
-        return crop.T_base_max
+def calc_T_HU_max(crop_type, T_max):
+    if T_max > crop_type.T_base_max:
+        return crop_type.T_base_max
     else:
         return T_max
 
 
-def calc_HU(crop, T_HU_min, T_HU_max):
+def calc_HU(crop_type, T_HU_min, T_HU_max):
     T_HU = (T_HU_min + T_HU_max) / 2
 
-    if T_HU < crop.T_base_min:
+    if T_HU < crop_type.T_base_min:
         return 0.0
     else:
-        return T_HU - crop.T_base_min
+        return T_HU - crop_type.T_base_min
 
 
 #==============================================================================
 
-''' The follow can be used for testing purposes '''
+''' The following can be used for testing purposes '''
 
 #
 # The file that will record results of the heat unit calculations.
 # This is for testing purposes.
 #
-heat_units_test_file = "heat_units_results.csv"
+heat_units_test_file = "tests/crop_test_files/heat_units_results.csv"
 
 #
 # The following will record the heat unit calculations into the
 # test file.
 #
-def record_results(crop, time, results):
+def record_results(crop_type, time, results):
+    if time.day == 1 and time.year == 1:
+        reset_file(heat_units_test_file)
+
     T_max, T_min, T_HU_min, T_HU_max, HU = results
     with open(heat_units_test_file, "a") as resultFile:
         info = "%i,%f,%f,%f,%f,%f,%f,%f\n"%\
-               (time.day,T_max,T_min,T_HU_max,T_HU_min,HU,crop.accumulated_HU,crop.fr_PHU)
+               (time.day, T_max, T_min, T_HU_max, T_HU_min, HU, crop_type.accumulated_HU, crop_type.fr_PHU)
+        if time.day == 1 and time.year ==1:
+            resultFile.write("day,T_max,T_min,T_HU_max,T_HU_min,HU,accumulated_HU,fr_PHU\n")
         resultFile.write(info)
+
+
+def reset_file(fileName):
+    with open(fileName, "w") as file:
+        pass
