@@ -5,7 +5,11 @@ File name: nitrogen_fixation.py
 
 Author(s): Andy Achenreiner, achenreiner@wisc.edu
 
-Description:
+Description: This module contains the necessary functions for calculating the
+             nitrogen fixation data of a crop_type. Currently the only
+             function meant to be used outside of this file is the calc_N_fixation()
+             function. The other functions are meant to serve as helper
+             functions within this file.
 
 Variable definitions:
 
@@ -16,20 +20,28 @@ CropType values updated by calling update_all():
 ###############################################################################
 
 #
-#
+# Calculates the amount of nitrogen added to the plant biomass by fixation.
+# "Pseudo code_SC_NitrogenUptake_1.0.docx" section 3.D.6
 #
 def calc_N_fixation(crop_type, soil):
-    accessible_layers = get_root_accessible_layers(crop_type, soil)
-    f_gr = calc_f_gr(crop_type)
-    f_NO3 = calc_f_NO3(accessible_layers)
-    f_sw = calc_f_sw(accessible_layers)
-    N_demand = calc_N_demand(crop_type, accessible_layers)
+    # Check if this crop can form symbiotic nitrogen fixation associations
+    if not crop_type.fix_nitrogen:
+        return 0
+    else:
+        accessible_layers = get_root_accessible_layers(crop_type, soil)
+        f_gr = calc_f_gr(crop_type)
+        f_NO3 = calc_f_NO3(accessible_layers)
+        f_sw = calc_f_sw(accessible_layers)
+        N_demand = calc_N_demand(crop_type, accessible_layers)
 
-    return N_demand * f_gr * min(f_sw, f_NO3, 1)
+        return N_demand * f_gr * min(f_sw, f_NO3, 1)
 
 
 #
-#
+# Determines the soil layer of lowest depth that is accessible to root
+# biomass. Returns a list containing all of the soil layers accessible
+# to root biomass.
+# "Pseudo code_SC_NitrogenUptake_1.0.docx" section 3.D.1
 #
 def get_root_accessible_layers(crop_type, soil):
     accessible_layers = []
@@ -46,7 +58,8 @@ def get_root_accessible_layers(crop_type, soil):
 
 
 #
-#
+# Calculates growth stage factor.
+# "Pseudo code_SC_NitrogenUptake_1.0.docx" section 3.D.2
 #
 def calc_f_gr(crop_type):
     fr_PHU = crop_type.fr_PHU
@@ -63,7 +76,8 @@ def calc_f_gr(crop_type):
 
 
 #
-#
+# Calculates soil nitrate factor.
+# "Pseudo code_SC_NitrogenUptake_1.0.docx" section 3.D.3
 #
 def calc_f_NO3(accessible_layers):
     NO3_root = sum([layer.NO3 for layer in accessible_layers])
@@ -76,7 +90,8 @@ def calc_f_NO3(accessible_layers):
 
 
 #
-#
+# Calculates soil water factor.
+# "Pseudo code_SC_NitrogenUptake_1.0.docx" section 3.D.4
 #
 def calc_f_sw(accessible_layers):
     SW_root = sum([layer.currentSoilWaterMM for layer in accessible_layers])
@@ -89,7 +104,8 @@ def calc_f_sw(accessible_layers):
 
 
 #
-#
+# Calculates N demand
+#"Pseudo code_SC_NitrogenUptake_1.0.docx" section 3.D.5
 #
 def calc_N_demand(crop_type, accessible_layers):
     NO3_root = sum([layer.NO3 for layer in accessible_layers])

@@ -35,8 +35,8 @@ def daily_crop_routine(crop, weather, time, soil):
 
         crop_type.bio_N = crop_type.test_bio_N[timeIndex]
         crop_type.bio_N_opt = crop_type.test_bio_N_opt[timeIndex]
-        crop_type.bio_P = crop_type.test_bio_P[timeIndex]
-        crop_type.bio_P_opt = crop_type.test_bio_P_opt[timeIndex]
+        #crop_type.bio_P = crop_type.test_bio_P[timeIndex]
+        #crop_type.bio_P_opt = crop_type.test_bio_P_opt[timeIndex]
 
         crop_type.Ea_sum = crop_type.test_Ea_sum[time.year-1]
         crop_type.Eo_sum = crop_type.test_Eo_sum[time.year-1]
@@ -184,9 +184,15 @@ class Crop():
             self.beta_w = data['beta_w']   # water-use distribution parameter
             self.epco = data['epco']
 
-            #===================================================================
-            ''' Nitrogen Fixation Data '''
-            
+            self.actual_E_t = 0
+            self.water_uptake_each_layer = []
+
+            self.Ea = 0
+            self.Ea_sum = 0
+
+            self.Eo = 0
+            self.Eo_sum = 0
+
             #===================================================================
             ''' Nitrogen Uptake Data '''
 
@@ -203,6 +209,9 @@ class Crop():
             self.fr_N = 0
             self.fr_N_up = 0
             self.N_up = 0
+            self.act_N_up_each_layer = []
+            self.N_actual_up = 0
+
             #===================================================================
             ''' Phosphorus Uptake Data '''
 
@@ -220,18 +229,8 @@ class Crop():
 
             self.fr_P = 0
             self.P_up = 0
-
-            #===================================================================
-            ''' Hydrology Data '''
-            
-            self.water_actual_up = 0
-            self.Et = 0
-
-            self.Ea = 0
-            self.Ea_sum = 0
-
-            self.Eo = 0
-            self.Eo_sum = 0
+            self.act_P_up_each_layer = []
+            self.P_act_up = 0
 
             #===================================================================
             ''' Yields Data '''
