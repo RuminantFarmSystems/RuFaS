@@ -67,8 +67,8 @@ This module needs the following inputs in order to operate correctly:
 
         And the following attributes of a soil layer:
             bottomDepth
-            Ea
-            Eo
+            Ea_sum
+            Eo_sum
             Et
             NO3
             labileP
@@ -101,7 +101,7 @@ def daily_crop_routine(crop, weather, time, soil):
         Load input values to represent input from other modules.
         This will need to be removed eventually because the crop module will
         get this information from the other modules instead of from an input file. 
-        This is just for testing the calculations of the crop module.
+        This is just for isolating and testing the calculations of the crop module.
         '''
         timeIndex = (time.year -1)*365 + time.day -1
         crop_type.Et = crop_type.test_Et[timeIndex]

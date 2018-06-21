@@ -71,27 +71,31 @@ from math import exp
 #
 def update_all(crop_type, time, weather):
     # update gamma_reg value and record growth constraints in results
-    results = calculate_gamma_reg(crop_type, time, weather)
+    results = calc_gamma_reg(crop_type, time, weather)
     record_gammareg_results(crop_type, time, results)
 
     # update biomass values
-    calculate_actual_Biomass(crop_type, time, weather)
-    H_phosyn_result = calculate_intercepted_radiation(crop_type, time, weather)
-    record_biomass_results(crop_type, time, weather, H_phosyn_result)
+    calc_actual_Biomass(crop_type, time, weather)
+    record_biomass_results(crop_type, time, weather)
 
 
 #
+# Calculate current actual biomass.
 #
-#
-def calculate_actual_Biomass(crop_type, time, weather):
-    H_phosyn = calculate_intercepted_radiation(crop_type, time, weather)
+def calc_actual_Biomass(crop_type, time, weather):
+    H_phosyn = calc_intercepted_radiation(crop_type, time, weather)
+
+    # "Pseudo code_SC_maxdeltabio_1.0.docx" section 1.E.2
     crop_type.dBiomass_max = crop_type.RUE * H_phosyn
 
+    # "Pseudo code_SC_actual growth and yield_1.0.docx" section 7.A.2
     crop_type.dBiomass_actual = crop_type.dBiomass_max * crop_type.gamma_reg
+
+    # Save value as previous day's value
     crop_type.prev_biomass_actual = crop_type.biomass_actual
 
     inGrowingPeriod = crop_type.planting_date <= time.day <= crop_type.harvest_date
-
+    # Update current actual biomass
     if inGrowingPeriod:
         crop_type.biomass_actual += crop_type.dBiomass_actual
     else:
@@ -99,21 +103,24 @@ def calculate_actual_Biomass(crop_type, time, weather):
 
 
 #
+# Calculates amount of intercepted photosynthetically active radiation
+# on a given day (MJ m^-2).
+# "Pseudo code_SC_maxdeltabio_1.0.docx" section 1.E.1
 #
-#
-def calculate_intercepted_radiation(crop_type, time, weather):
+def calc_intercepted_radiation(crop_type, time, weather):
     H_day = weather.radiation[time.year-1][time.day-1]
     return 0.5 * H_day * (1 - exp(-1*crop_type.kl*crop_type.LAI_actual))
 
 
 #
-# gamma_reg represents "plant growth factor"
+# Calculates plant growth factor (AKA gamma_reg).
+# "Pseudo code_SC_actual growth and yield_1.0.docx" section 7.A.1
 #
-def calculate_gamma_reg(crop_type, time, weather):
-    wstrs = calculate_wstrs(crop_type)
-    tstrs = calculate_tstrs(crop_type, time, weather)
-    nstrs = calculate_nstrs(crop_type)
-    pstrs = calculate_pstrs(crop_type)
+def calc_gamma_reg(crop_type, time, weather):
+    wstrs = calc_wstrs(crop_type)
+    tstrs = calc_tstrs(crop_type, time, weather)
+    nstrs = calc_nstrs(crop_type)
+    pstrs = calc_pstrs(crop_type)
     
     crop_type.gamma_reg = 1- max(wstrs, tstrs, nstrs, pstrs)
 
@@ -127,7 +134,11 @@ for a given day. These values are needed to calculate the gamma_reg value.
 They do not modify the values of any State class.
 '''
 
-def calculate_wstrs(crop_type):
+#
+# Calculates water stress for a given day
+# "Pseudo code_SC_growth constraints_1.0.docx" section 6.1
+#
+def calc_wstrs(crop_type):
     if crop_type.Et == 0:
         return 0
     result = 1.0 - (crop_type.water_actual_up / crop_type.Et)
@@ -137,7 +148,11 @@ def calculate_wstrs(crop_type):
         return min(0.99, result)
 
 
-def calculate_tstrs(crop_type, time, weather):
+#
+# Calculates temperature stress for a given day.
+# "Pseudo code_SC_growth constraints_1.0.docx" section 6.2
+#
+def calc_tstrs(crop_type, time, weather):
     T_avg = weather.T_avg[time.year-1][time.day-1]
     T_opt = crop_type.T_opt
     T_base_min = crop_type.T_base_min
@@ -156,24 +171,17 @@ def calculate_tstrs(crop_type, time, weather):
         bottom_half_eq = (2*T_opt - T_avg - T_base_min)**2
         result = 1 - exp(top_half_eq / bottom_half_eq)
     
-    elif T_avg > (2*T_opt - T_base_min):
+    else: # T_avg > (2*T_opt - T_base_min):
         result = MAX
-
-    else:
-        ''' 
-        Should have hit one of the preceding cases. Not sure if they cover
-        all possible cases though.
-        '''
-
-        print("Error: Did not hit one of the cases for calculate_tstrs.")
-        print("Check if T_opt and T_base_min input values are correct")
-        print("Exiting program")
-        exit()
 
     return min(result, MAX)
 
 
-def calculate_nstrs(crop_type):
+#
+# Calculates nitrogen stress for a given day.
+# "Pseudo code_SC_growth constraints_1.0.docx" section 6.3.2
+#
+def calc_nstrs(crop_type):
     if crop_type.bio_N_opt == 0:
         return 0
     phi_n = calc_phi_N(crop_type)
@@ -181,6 +189,10 @@ def calculate_nstrs(crop_type):
     return min(0.99, result)
 
 
+#
+# Calculates nitrogen stress scaling factor.
+# "Pseudo code_SC_growth constraints_1.0.docx" section 6.3.1
+#
 def calc_phi_N(crop_type):
     if crop_type.bio_N_opt == 0:
         return 300
@@ -189,7 +201,11 @@ def calc_phi_N(crop_type):
         return max(0, result)
 
 
-def calculate_pstrs(crop_type):
+#
+# Calculates phosphorus stress scaling factor.
+# "Pseudo code_SC_growth constraints_1.0.docx" section 6.4.2
+#
+def calc_pstrs(crop_type):
     if crop_type.bio_P_opt == 0:
         return 0
     phi_p = calc_phi_P(crop_type)
@@ -197,6 +213,10 @@ def calculate_pstrs(crop_type):
     return min(0.99, result)
 
 
+#
+# Calculates phosphorus stress scaling factor.
+# "Pseudo code_SC_growth constraints_1.0.docx" section 6.4.1
+#
 def calc_phi_P(crop_type):
     if crop_type.bio_P_opt == 0:
         return 300
@@ -215,10 +235,10 @@ biomass_test_file = "tests/crop_test_files/biomass_results.csv"
 #
 # The following will record the biomass calculations into the test file.
 #
-def record_biomass_results(crop_type, time, weather, H_phosyn):
+def record_biomass_results(crop_type, time, weather):
     if time.day == 1 and time.year == 1:
         reset_file(biomass_test_file)
-
+    H_phosyn = calc_intercepted_radiation(crop_type, time, weather)
     with open(biomass_test_file, "a") as testResults:
         results = "%i,%f,%f,%f,%f,%f,%f\n" % (
             time.day,

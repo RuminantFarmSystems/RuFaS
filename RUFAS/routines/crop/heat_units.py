@@ -95,6 +95,10 @@ def calculate_frPHU(crop_type, T_min, T_max, time):
     return calc_info
 
 
+#
+# Calculates minimum heat unit temperature on current day.
+# "Pseudo code_SC_maxdeltabio_1.0.docx" section 1.B.a
+#
 def calc_T_HU_min(crop_type, T_min):
     if T_min < crop_type.T_base_min:
         return crop_type.T_base_min
@@ -102,6 +106,10 @@ def calc_T_HU_min(crop_type, T_min):
         return T_min
 
 
+#
+# Calculates maximum heat unit temperature on current day.
+# "Pseudo code_SC_maxdeltabio_1.0.docx" section 1.B.b
+#
 def calc_T_HU_max(crop_type, T_max):
     if T_max > crop_type.T_base_max:
         return crop_type.T_base_max
@@ -109,9 +117,14 @@ def calc_T_HU_max(crop_type, T_max):
         return T_max
 
 
+#
+# Calculates available heat units on current day.
+#
 def calc_HU(crop_type, T_HU_min, T_HU_max):
+    # "Pseudo code_SC_maxdeltabio_1.0.docx" section 1.B.1
     T_HU = (T_HU_min + T_HU_max) / 2
 
+    # "Pseudo code_SC_maxdeltabio_1.0.docx" section 1.B.2
     if T_HU < crop_type.T_base_min:
         return 0.0
     else:

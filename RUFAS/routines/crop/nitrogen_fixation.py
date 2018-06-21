@@ -105,7 +105,7 @@ def calc_f_sw(accessible_layers):
 
 #
 # Calculates N demand
-#"Pseudo code_SC_NitrogenUptake_1.0.docx" section 3.D.5
+# "Pseudo code_SC_NitrogenUptake_1.0.docx" section 3.D.5
 #
 def calc_N_demand(crop_type, accessible_layers):
     NO3_root = sum([layer.NO3 for layer in accessible_layers])

@@ -87,7 +87,7 @@ def daily_simulation():
         #
         routines.daily_soil_routine(state.soil, weather, time)
         routines.daily_nitrogen_cycling_routine(state.soil, time, weather)
-	routines.daily_phosphorus_cycling_routine(state.soil, time, weather, config)
+	
 
         #
         # Daily Attribute Updates
@@ -95,18 +95,20 @@ def daily_simulation():
         #
         routines.daily_soil_update(state.soil, weather, time)
         routines.daily_nitrogen_update(state.soil, time, weather)
-	routines.daily_phosphorus_update(state.soil, time, weather)
 
     #
     # Daily routines
     #
-    routines.daily_animal_routine(state.animal, state.feed, weather, time)
-    #routines.daily_crop_routine(state.crop, weather, time)
+    routines.daily_phosphorus_cycling_routine(state.soil, time, weather, config)
+    #routines.daily_animal_routine(state.animal, state.feed, weather, time)
+    routines.daily_crop_routine(state.crop, weather, time, state.soil)
 
     #
     # Daily Output Updates
     #
     output.daily_update(state, weather, time)
+
+    routines.daily_phosphorus_update(state.soil, time, weather)
 
     #print("simulating: " + time.to_str()) # Print out current day of simulation
     time.advance()
