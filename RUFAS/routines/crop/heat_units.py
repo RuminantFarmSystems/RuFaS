@@ -13,7 +13,7 @@ Description: This module contains the necessary functions for calculating and
 
 Variable Definitions:
 
-    * Note that all temperatures listed below are in degrees Celcius
+    * Note that all temperatures listed below are in degrees Celsius
 
     T_min = Minimum temperature on current day
 
@@ -41,14 +41,11 @@ Variable Definitions:
 
     fr_PHU = Fraction of PHU accumulated including today
 
+
 CropType values updated by calling calculate_frPHU():
-
     prev_accumulated_HU
-
     accumulated_HU
-
     prev_fr_PHU
-
     fr_PHU
 
 '''
@@ -73,23 +70,21 @@ def calculate_frPHU(crop_type, T_min, T_max, time):
     # Part 1B of Crop Biomass pseudocode
     #
     T_HU_min = calc_T_HU_min(crop_type, T_min)
-
     T_HU_max = calc_T_HU_max(crop_type, T_max)
-
     HU = calc_HU(crop_type, T_HU_min, T_HU_max)
-
 
     crop_type.prev_accumulated_HU = crop_type.accumulated_HU
 
     if time.day >= crop_type.planting_date:
         crop_type.accumulated_HU += HU
 
-    # Calculate accumulated fraction of potential Heat Units
-
     crop_type.prev_fr_PHU = crop_type.fr_PHU
 
+    # Calculate accumulated fraction of potential Heat Units
     crop_type.fr_PHU = crop_type.accumulated_HU / crop_type.PHU
 
+    # This information is just returned so it can be recorded by the record
+    # function for testing purposes
     calc_info = (T_max, T_min, T_HU_min, T_HU_max, HU)
 
     return calc_info

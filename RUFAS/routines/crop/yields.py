@@ -53,8 +53,8 @@ from math import exp
 #
 # Runs all the yield calculations
 #
-def update_all(crop_type, time):
-    calc_gamma_wu(crop_type)
+def update_all(crop_type, time, soil):
+    calc_gamma_wu(crop_type, soil)
     calc_HI_max(crop_type)
     calc_bio_AG(crop_type)
     calc_HI_actual(crop_type, time)
@@ -68,8 +68,10 @@ def update_all(crop_type, time):
 # Calculates water deficiency factor (AKA gamma_wu).
 # "Pseudo code_SC_actual growth and yield_1.0.docx" section 7.B.1
 #
-def calc_gamma_wu(crop_type):
-    crop_type.gamma_wu = 100*(crop_type.Ea_sum/crop_type.Eo_sum)
+def calc_gamma_wu(crop_type, soil):
+    if soil.Eo_sum == 0:
+        return 0
+    crop_type.gamma_wu = 100*(soil.Ea_sum/soil.Eo_sum)
 
 
 #

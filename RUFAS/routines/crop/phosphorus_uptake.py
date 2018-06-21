@@ -6,10 +6,10 @@ File name: phosphorus_uptake.py
 Author(s): Andy Achenreiner, achenreiner@wisc.edu
 
 Description: This module contains the necessary functions for calculating and
-             updating the phosphorus uptake information of a crop_type. Currently the only
-             function meant to be used outside of this file is the update_all()
-             function. The other functions are meant to serve as helper
-             functions within this file.
+             updating the phosphorus uptake information of a crop_type.
+             Currently the only function meant to be used outside of this file
+             is the update_all() function. The other functions are meant to
+             serve as helper functions within this file.
 
 Variable definitions:
 

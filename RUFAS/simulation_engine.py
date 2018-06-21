@@ -87,7 +87,6 @@ def daily_simulation():
         #
         routines.daily_soil_routine(state.soil, weather, time)
         routines.daily_nitrogen_cycling_routine(state.soil, time, weather)
-	
 
         #
         # Daily Attribute Updates
@@ -100,7 +99,7 @@ def daily_simulation():
     # Daily routines
     #
     routines.daily_phosphorus_cycling_routine(state.soil, time, weather, config)
-    #routines.daily_animal_routine(state.animal, state.feed, weather, time)
+    # routines.daily_animal_routine(state.animal, state.feed, weather, time)
     routines.daily_crop_routine(state.crop, weather, time, state.soil)
 
     #

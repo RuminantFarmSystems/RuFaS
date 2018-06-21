@@ -26,7 +26,6 @@ Variable definitions:
 CropType values updated by calling update_all():
 
     fr_root
-
     z_root
 
 '''
@@ -43,9 +42,9 @@ def update_all(crop_type, time):
 
 
 #
-# This function calculates the fraction of total biomass partitioned to roots
-# on a given day in the growing season (AKA fr_root). The equations used can
-# be found in "Pseudo code_SC_Water Uptake_1.0.docx" section 2.A.1
+# Calculates the fraction of total biomass partitioned to roots
+# on a given day in the growing season (AKA fr_root).
+# "Pseudo code_SC_Water Uptake_1.0.docx" section 2.A.1
 #
 def calc_daily_root_biomass(crop_type, time):
     inGrowingPeriod = crop_type.planting_date <= time.day <= crop_type.harvest_date
@@ -57,16 +56,15 @@ def calc_daily_root_biomass(crop_type, time):
 
 
 #
-# This function calculates depth of root development in the soil on a given
-# day (AKA z_root). The equations used can be found in
+# Calculates depth of root development in the soil on a given
+# day (AKA z_root).
 # "Pseudo code_SC_Water Uptake_1.0.docx" section 2.A.2
 #
 def calc_z_root(crop_type, time):
-
-    afterHarvest = time.day > crop_type.harvest_date
-
     # Save the previous day's value
     crop_type.prev_z_root = crop_type.z_root
+
+    afterHarvest = time.day > crop_type.harvest_date
 
     if crop_type.crop_type == "perennial":
         crop_type.z_root = crop_type.z_root_max

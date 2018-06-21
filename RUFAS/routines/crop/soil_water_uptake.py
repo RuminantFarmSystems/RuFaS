@@ -13,7 +13,7 @@ Description: This module contains the necessary functions for calculating and
 
 Variable definitions:
 
-    Et = Maximum plant transpiration on a given day (mm H2O)
+    soil.Etrans = Maximum plant transpiration on a given day (mm H2O)
 
     beta_w = Water-use distribution parameter
 
@@ -24,6 +24,7 @@ Variable definitions:
     Et_actual = Actual amount of transpiration that occurs on a given day
 
     water_actual_up = Total plant water uptake on a given day
+
 
 CropType values updated by calling update_all():
 
@@ -65,7 +66,7 @@ def calc_max_water_uptake_each_layer(crop_type, soil):
     max_uptake_each_layer = []
 
     for layer in soil.listOfSoilLayers:
-        lower_boundary_uptake = calc_max_water_uptake_z(crop_type, layer.bottomDepth)
+        lower_boundary_uptake = calc_max_water_uptake_z(crop_type, soil, layer.bottomDepth)
         max_uptake_this_layer = lower_boundary_uptake - upper_boundary_uptake
         max_uptake_each_layer.append(max_uptake_this_layer)
 
@@ -80,11 +81,11 @@ def calc_max_water_uptake_each_layer(crop_type, soil):
 # z (mm H2O).
 # "Pseudo code_SC_Water Uptake_1.0.docx" section 2.B.1
 #
-def calc_max_water_uptake_z(crop_type, z):
+def calc_max_water_uptake_z(crop_type, soil, z):
     if crop_type.z_root == 0:
         return 0
     else:
-        term1 = crop_type.Et  / (1 - exp(-1*crop_type.beta_w))
+        term1 = soil.Etrans  / (1 - exp(-1*crop_type.beta_w))
         term2 = 1 - exp(-1*crop_type.beta_w * z / crop_type.z_root)
         return term1 * term2
 
@@ -193,7 +194,7 @@ def record_results(crop_type, soil, time, max_uptakes):
         result_f = "%i," + "%f,"*8 + "\n"
         result =  result_f % (
             time.day,
-            crop_type.Et,
+            soil.Etrans,
             soil.listOfSoilLayers[0].currentSoilWaterMM,
             soil.listOfSoilLayers[1].currentSoilWaterMM,
             soil.listOfSoilLayers[2].currentSoilWaterMM,

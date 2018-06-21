@@ -69,9 +69,9 @@ from math import exp
 #
 # This function updates all biomass information
 #
-def update_all(crop_type, time, weather):
+def update_all(crop_type, time, weather, soil):
     # update gamma_reg value and record growth constraints in results
-    results = calc_gamma_reg(crop_type, time, weather)
+    results = calc_gamma_reg(crop_type, time, weather, soil)
     record_gammareg_results(crop_type, time, results)
 
     # update biomass values
@@ -116,8 +116,8 @@ def calc_intercepted_radiation(crop_type, time, weather):
 # Calculates plant growth factor (AKA gamma_reg).
 # "Pseudo code_SC_actual growth and yield_1.0.docx" section 7.A.1
 #
-def calc_gamma_reg(crop_type, time, weather):
-    wstrs = calc_wstrs(crop_type)
+def calc_gamma_reg(crop_type, time, weather, soil):
+    wstrs = calc_wstrs(crop_type, soil)
     tstrs = calc_tstrs(crop_type, time, weather)
     nstrs = calc_nstrs(crop_type)
     pstrs = calc_pstrs(crop_type)
@@ -138,10 +138,10 @@ They do not modify the values of any State class.
 # Calculates water stress for a given day
 # "Pseudo code_SC_growth constraints_1.0.docx" section 6.1
 #
-def calc_wstrs(crop_type):
-    if crop_type.Et == 0:
+def calc_wstrs(crop_type, soil):
+    if soil.Etrans == 0:
         return 0
-    result = 1.0 - (crop_type.water_actual_up / crop_type.Et)
+    result = 1.0 - (crop_type.water_actual_up / soil.Etrans)
     if result < 0:
         return 0
     else:

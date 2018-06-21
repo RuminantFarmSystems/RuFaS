@@ -67,9 +67,9 @@ This module needs the following inputs in order to operate correctly:
 
         And the following attributes of a soil layer:
             bottomDepth
-            Ea_sum
-            Eo_sum
-            Et
+            Ea_sum = Sum of the Ea values leading up to today
+            Eo_sum = Sum of the Eo values leading up to today
+            Etrans
             NO3
             labileP
             currentSoilWaterMM
@@ -79,10 +79,10 @@ This module needs the following inputs in order to operate correctly:
 '''
 ################################################################################
 
-from math import exp, log, floor
 from . import heat_units, leaf_area_index, root_development, biomass, yields, \
     phosphorus_uptake, nitrogen_uptake, soil_water_uptake
 from RUFAS import util
+
 #-------------------------------------------------------------------------------
 # Function: daily_crop_routine
 #-------------------------------------------------------------------------------
@@ -104,10 +104,11 @@ def daily_crop_routine(crop, weather, time, soil):
         This is just for isolating and testing the calculations of the crop module.
         '''
         timeIndex = (time.year -1)*365 + time.day -1
-        crop_type.Et = crop_type.test_Et[timeIndex]
 
-        crop_type.Ea_sum = crop_type.test_Ea_sum[time.year-1]
-        crop_type.Eo_sum = crop_type.test_Eo_sum[time.year-1]
+        soil.Etrans = crop_type.test_Et[timeIndex]
+
+        soil.Ea_sum = crop_type.test_Ea_sum[time.year-1]
+        soil.Eo_sum = crop_type.test_Eo_sum[time.year-1]
 
         soil.listOfSoilLayers[0].NO3 = crop_type.test_NO3_l1[timeIndex]
         soil.listOfSoilLayers[1].NO3 = crop_type.test_NO3_l2[timeIndex]
@@ -121,12 +122,14 @@ def daily_crop_routine(crop, weather, time, soil):
 
         #
         # Run calculations
+        # The order in which these are called matters because some of the later
+        # update_all calls depend on values calculated earlier.
         #
         heat_units.update_all(crop_type, T_min, T_max, time)
 
         soil_water_uptake.update_all(crop_type, soil, time)
 
-        biomass.update_all(crop_type, time, weather)
+        biomass.update_all(crop_type, time, weather, soil)
 
         leaf_area_index.update_all(crop_type, time)
 
@@ -136,7 +139,7 @@ def daily_crop_routine(crop, weather, time, soil):
 
         root_development.update_all(crop_type, time)
 
-        yields.update_all(crop_type, time)
+        yields.update_all(crop_type, time, soil)
 
 
 #-------------------------------------------------------------------------------
@@ -175,16 +178,17 @@ class Crop():
             TODO: Add DocString
             '''
 
-            #
-            # CONSTANTS
-            #
+            '''GENERAL PLANT INFO'''
+
             self.crop_name = data['crop_name']
+
             self.crop_type = data['crop_type']
+            self.fix_nitrogen = data['fix_nitrogen']
+
             self.planting_date = data['planting_date']
             self.harvest_date = data['harvest_date']
-            self.fix_nitrogen = data['fix_nitrogen']
             self.start_day = 0
-            
+
             #===================================================================
             ''' HEAT UNIT DATA '''
            
@@ -260,12 +264,6 @@ class Crop():
             self.water_actual_up = 0
             self.water_uptake_each_layer = []
 
-            self.Ea = 0
-            self.Ea_sum = 0
-
-            self.Eo = 0
-            self.Eo_sum = 0
-
             #===================================================================
             ''' Nitrogen Uptake Data '''
 
@@ -315,8 +313,6 @@ class Crop():
 
             self.harvest_eff = data["harvest_eff"]
 
-            # Note that currently gamma wu is only accurate on harvest date because
-            # hard coded inputs for Ea_sum and Eo_sum are set for those days
             self.gamma_wu = 0
 
             self.bio_AG = 0
@@ -334,11 +330,9 @@ class Crop():
             self.test_water_actual_up = TEST_DATA[2][1:]
 
             self.test_bio_N_opt = TEST_DATA[3][1:]
-
             self.test_bio_N = TEST_DATA[4][1:]
 
             self.test_bio_P_opt = TEST_DATA[5][1:]
-
             self.test_bio_P = TEST_DATA[6][1:]
 
             self.test_NO3_l1 = TEST_DATA[7][1:]
@@ -369,7 +363,6 @@ class Crop():
                         self.start_day = d
 
 
-
     #---------------------------------------------------------------------------
     # Method: annual_reset
     #---------------------------------------------------------------------------
@@ -389,6 +382,4 @@ class Crop():
 
             crop_type.bio_P = 0
             crop_type.bio_N = 0
-
-
 

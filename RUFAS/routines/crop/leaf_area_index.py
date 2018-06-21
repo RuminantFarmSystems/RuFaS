@@ -58,9 +58,8 @@ def update_all(crop_type, time):
 
 
 #
-# Calculate shape coefficients for LAI accumulation. The equations for these
-# calculations can be found in "Pseudo code_SC_maxdeltabio_1.0.docx" in
-# section 1.D.1
+# Calculate shape coefficients for LAI accumulation.
+# "Pseudo code_SC_maxdeltabio_1.0.docx" section 1.D.1
 #
 def calculate_shape_coefficients(crop_type):
     l2_part1 = (crop_type.fr_PHU_1 / crop_type.fr_LAI_1) - crop_type.fr_PHU_1
@@ -78,8 +77,8 @@ def calculate_shape_coefficients(crop_type):
 
 #
 # This function calculates the accumulated fraction of LAI maximum accumulated
-# including today. This can be found in "Pseudo code_SC_maxdeltabio_1.0.docx"
-# in section 1.D.2
+# including today.
+# "Pseudo code_SC_maxdeltabio_1.0.docx" section 1.D.2
 #
 def calc_fr_LAI_max(crop_type, time, l1, l2):
     crop_type.prev_fr_LAI_max = crop_type.fr_LAI_max
@@ -122,7 +121,7 @@ def calculate_LAI_actual(crop_type, time):
         dLAI_actual = dLAI_max * sqrt(crop_type.gamma_reg)
 
     # Return these calculated values just so they can be used in testing/debugging
-    return (dLAI_max, dLAI_actual)
+    return dLAI_max, dLAI_actual
 
 # ==============================================================================
 
