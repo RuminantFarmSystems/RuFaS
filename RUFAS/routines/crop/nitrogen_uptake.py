@@ -11,7 +11,7 @@ Description: This module contains the necessary functions for calculating and
              function. The other functions are meant to serve as helper
              functions within this file.
 
-Variable definitions:
+CropType attribute definitions:
 
     fr_n1 = Normal fraction of nitrogen in the plant biomass at emergence
 
@@ -45,7 +45,6 @@ CropType values updated by calling update_all():
     actual_N_up_each_layer
     N_actual_up
     bio_N
-
 '''
 ###############################################################################
 
@@ -62,8 +61,6 @@ def update_all(crop_type, soil, time):
     calc_actual_N_up_each_layer(crop_type, soil)
     crop_type.N_actual_up = sum(crop_type.act_N_up_each_layer)
     calc_bio_N(crop_type, soil)
-
-    record_results(crop_type, time, soil)
 
 
 #
@@ -229,44 +226,3 @@ def calc_bio_N(crop_type, soil):
     N_fix = calc_N_fixation(crop_type, soil)
 
     crop_type.bio_N = crop_type.bio_N + crop_type.N_actual_up + N_fix
-
-#==============================================================================
-
-''' The following can be used for testing purposes '''
-
-#
-# The file that will record results of the root depth calculations.
-# This is for testing purposes.
-#
-test_file = "tests/crop_test_files/nitrogen_uptake_results.csv"
-
-
-#
-# The following will record the root depth calculations into the
-# test file.
-#
-def record_results(crop_type, time, soil):
-    if time.day == 1 and time.year == 1:
-        reset_file((test_file))
-
-
-    with open(test_file, "a") as resultFile:
-        result = "%i,%f,%f,%f,%f,%f,%f,%f,%f\n" % (
-            time.day,
-            crop_type.biomass_actual,
-            crop_type.fr_N,
-            crop_type.bio_N_opt,
-            crop_type.N_up,
-            crop_type.act_N_up_each_layer[0],
-            crop_type.act_N_up_each_layer[1],
-            crop_type.act_N_up_each_layer[2],
-            crop_type.bio_N
-        )
-        if time.day == 1 and time.year == 1:
-            resultFile.write("day,biomass_actual,fr_N,bio_N_opt,N_up\n")
-        resultFile.write(result)
-
-
-def reset_file(fileName):
-    with open(fileName, "w") as file:
-        pass

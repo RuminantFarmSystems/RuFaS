@@ -20,3 +20,4 @@ Outputs
 *.pydevproject
 *.vscode
 *.settings
+.idea/**

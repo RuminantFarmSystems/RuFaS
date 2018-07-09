@@ -1,7 +1,7 @@
 '''
 RUFAS: Ruminant Farm Systems Model
 
-File name: heat_units.py
+File name: leaf_area_index.py
 
 Author(s): Andy Achenreiner, achenreiner@wisc.edu
 
@@ -9,7 +9,7 @@ Description: This module contains the necessary functions for calculating and
              updating the Leaf Area Index of the current day. The only function
              that is meant to be called outside of this module is update_all()
 
-Variable definitions:
+CropType attribute definitions:
 
     fr_PHU_1 = crop-specific curve point
 
@@ -38,6 +38,7 @@ Variable definitions:
 
 
 CropType values updated by update_all():
+
     prev_fr_LAI_max
     fr_LAI_max
     LAI_actual
@@ -53,8 +54,7 @@ from math import exp, log, sqrt
 def update_all(crop_type, time):
     l1, l2 = calculate_shape_coefficients(crop_type)
     calc_fr_LAI_max(crop_type, time, l1, l2)
-    results = calculate_LAI_actual(crop_type, time)
-    record_results(crop_type, time, results)
+    calculate_LAI_actual(crop_type, time)
 
 
 #
@@ -122,45 +122,3 @@ def calculate_LAI_actual(crop_type, time):
 
     # Return these calculated values just so they can be used in testing/debugging
     return dLAI_max, dLAI_actual
-
-# ==============================================================================
-
-''' The following can be used for testing purposes '''
-
-#
-# The file that will record results of the leaf area index calculations.
-# This is for testing purposes.
-#
-lai_test_file = "tests/crop_test_files/LAI_results.csv"
-
-#
-# The following will record the leaf area index calculations into the test
-# file.
-#
-def record_results(crop_type, time, results):
-    if time.day == 1 and time.year == 1:
-        reset_file(lai_test_file)
-
-    with open(lai_test_file, "a") as resultFile:
-        dLAI_max = results[0]
-        dLAI_actual = results[1]
-
-        info = "%i,%f,%f,%f,%f,%f,%f\n" %(
-                  time.day,
-                  crop_type.fr_PHU,
-                  crop_type.fr_LAI_max,
-                  dLAI_max,
-                  crop_type.gamma_reg,
-                  dLAI_actual,
-                  crop_type.LAI_actual
-                  )
-
-        if time.day == 1 and time.year == 1:
-            resultFile.write("time.day,fr_PHU,fr_LAI_max,dLAI_max,gamma_reg,dLAI_actual,LAI_actual\n")
-
-        resultFile.write(info)
-
-
-def reset_file(fileName):
-    with open(fileName, "w") as file:
-        pass

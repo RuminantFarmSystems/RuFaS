@@ -107,7 +107,7 @@ def daily_simulation():
     #
     output.daily_update(state, weather, time)
 
-    routines.daily_phosphorus_update(state.soil, time, weather)
+    #routines.daily_phosphorus_update(state.soil, time, weather)
 
     #print("simulating: " + time.to_str()) # Print out current day of simulation
     time.advance()

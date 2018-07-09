@@ -11,7 +11,7 @@ Description: This module contains the necessary functions for calculating and
              is the update_all() function. The other functions are meant to
              serve as helper functions within this file.
 
-Variable definitions:
+CropType attribute definitions:
 
     fr_p1 = Normal fraction of phosphorus in the plant biomass at emergence
 
@@ -48,7 +48,6 @@ CropType values updated by calling update_all():
     act_P_up_each_layer
     P_act_up
     bio_P
-
 '''
 ###############################################################################
 from math import log, exp
@@ -64,8 +63,6 @@ def update_all(crop_type, soil, time):
     calc_actual_P_up_each_layer(crop_type, soil)
     crop_type.P_act_up = sum(crop_type.act_P_up_each_layer)
     calc_bio_P(crop_type)
-
-    record_results(crop_type, soil, time)
 
 
 #
@@ -228,45 +225,3 @@ def calc_bio_P(crop_type):
         crop_type.bio_P = 0
 
     crop_type.bio_P += crop_type.P_act_up
-
-#==============================================================================
-
-''' The following can be used for testing purposes '''
-
-#
-# The file that will record results of the root depth calculations.
-# This is for testing purposes.
-#
-test_file = "tests/crop_test_files/phosphorus_uptake_results.csv"
-
-#
-# The following will record the root depth calculations into the
-# test file.
-#
-def record_results(crop_type, soil, time):
-    if time.day == 1 and time.year == 1:
-        reset_file((test_file))
-
-    with open(test_file, "a") as resultFile:
-        result = "%i,%f,%f,%f,%f,%f,%f,%f,%f,%f\n" % (
-            time.day,
-            crop_type.biomass_actual,
-            crop_type.z_root,
-            crop_type.fr_P,
-            crop_type.bio_P_opt,
-            crop_type.P_up,
-            crop_type.act_P_up_each_layer[0],
-            crop_type.act_P_up_each_layer[1],
-            crop_type.act_P_up_each_layer[2],
-            crop_type.bio_P
-
-        )
-        if time.day == 1 and time.year == 1:
-            resultFile.write("day,biomass_actual,z_root,fr_P,bio_P_opt,P_up,"
-                             "actPup1,actPup2,actPup3,bio_P\n")
-        resultFile.write(result)
-
-
-def reset_file(fileName):
-    with open(fileName, "w") as file:
-        pass

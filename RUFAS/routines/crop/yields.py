@@ -11,7 +11,7 @@ Description: This module contains the necessary functions for calculating and
              function. The other functions are meant to serve as helper
              functions within this file.
 
-Variable definitions:
+CropType attribute definitions:
 
     HI_min = Harvest index for the plants in drought conditions
 
@@ -46,6 +46,7 @@ Variable definitions:
 
 
 CropType values updated by update_all():
+
     gamma_wu
     HI_max
     bio_AG
@@ -71,8 +72,6 @@ def update_all(crop_type, time, soil):
     calc_yield_actual(crop_type)
     calc_nutrient_removal(crop_type)
     calc_residue(crop_type)
-
-    record_results(crop_type, time)
 
 
 #
@@ -155,40 +154,3 @@ def calc_nutrient_removal(crop_type):
 def calc_residue(crop_type):
     dResidue = crop_type.biomass_actual - crop_type.yield_actual
     crop_type.residue += dResidue
-
-
-#==============================================================================
-
-''' The following is for testing purposes '''
-
-#
-# The file that will record results of the yield calculations.
-#
-yield_test_file = "tests/crop_test_files/yield_results.csv"
-
-#
-# The following will record the root depth calculations into the
-# test file.
-#
-def record_results(crop_type, time):
-    if time.day == 1 and time.year == 1:
-        reset_file(yield_test_file)
-    with open(yield_test_file, "a") as resultFile:
-        result = "%i,%f,%f,%f,%f,%f\n" % (
-            time.day,
-            crop_type.gamma_wu,
-            crop_type.bio_AG,
-            crop_type.HI_actual,
-            crop_type.yield_max,
-            crop_type.yield_actual
-        )
-        if time.day == 1 and time.year == 1:
-            resultFile.write("day,gamma wu,bioAG,HI_actual,yield_max,yield_actual\n")
-
-        if time.day == crop_type.harvest_date:
-            resultFile.write(result)
-
-
-def reset_file(fileName):
-    with open(fileName, "w") as file:
-        pass

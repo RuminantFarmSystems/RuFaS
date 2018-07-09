@@ -190,7 +190,7 @@ class Weather():
 					#
 					# # 8) Beef Calf Data
 					# beefCalfData.append(row[14])
-					
+
 				currentRow += 1
 
 		# Make sure weather data length matchs simulation duration
@@ -395,44 +395,3 @@ class Time():
 	    '''
 
 	    return self.year > self.duration
-
-	"""
-	#----------------------------------------------------------------------------
-	# Method: julian_day
-	#----------------------------------------------------------------------------
-	def julian_day(self):
-		'''Returns the julian day of the year.
-
-		Returns:
-			int: The julian day of the year.
-		'''
-
-		julian_day = 0
-		for i in range(0, self.m - 1):
-			julian_day += self.day_in_months[i]
-		julian_day += self.d
-
-		return julian_day
-
-	#---------------------------------------------------------------------------
-	# Method: end_month
-	#---------------------------------------------------------------------------
-	def end_month(self):
-		'''Returns a bool signifying the end of a month.
-
-		Returns:
-			bool: True if it is the end of a year, False otherwise
-		'''
-
-		if (self.d > 30) and (self.m == 4 or self.m == 6 or
-							  self.m == 9 or self.m == 11):
-			return True
-		elif (self.d > 31) and (self.m == 1 or self.m == 3 or self.m == 5 or
-								self.m == 7 or self.m == 8 or self.m == 10 or
-								self.m == 12):
-			return True
-		elif self.d > 28 and self.m == 2:
-			return True
-		else:
-			return False
-	"""

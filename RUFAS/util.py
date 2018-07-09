@@ -214,6 +214,9 @@ def LP_print(LHS, RHS, objective, variables, operators,
 # in the first column in the csv. If an entry in the csv can be turned into a
 # float, then it will be.
 #
+# This is useful for reading in time series data where each column corresponds
+# to data of a specific attribute such as temperature.
+#
 def get_csv_columns(fileName):
     filePath = get_base_dir() / fileName
     with filePath.open("r") as input:

@@ -11,7 +11,7 @@ Description: This module contains the necessary functions for calculating and
              function. The other functions are meant to serve as helper
              functions within this file.
 
-Variable definitions:
+CropType attribute definitions:
 
     H_day = incident total solar (MJ m^-2)
 
@@ -56,6 +56,7 @@ Variable definitions:
 
 
 CropType values updated by update_all():
+
     dBiomass_max
     gamma_reg
     dBiomass_actual
@@ -70,13 +71,11 @@ from math import exp
 # This function updates all biomass information
 #
 def update_all(crop_type, time, weather, soil):
-    # update gamma_reg value and record growth constraints in results
-    results = calc_gamma_reg(crop_type, time, weather, soil)
-    record_gammareg_results(crop_type, time, results)
+    # update gamma_reg value
+    calc_gamma_reg(crop_type, time, weather, soil)
 
     # update biomass values
     calc_actual_Biomass(crop_type, time, weather)
-    record_biomass_results(crop_type, time, weather)
 
 
 #
@@ -95,6 +94,7 @@ def calc_actual_Biomass(crop_type, time, weather):
     crop_type.prev_biomass_actual = crop_type.biomass_actual
 
     inGrowingPeriod = crop_type.planting_date <= time.day <= crop_type.harvest_date
+
     # Update current actual biomass
     if inGrowingPeriod:
         crop_type.biomass_actual += crop_type.dBiomass_actual
@@ -122,13 +122,11 @@ def calc_gamma_reg(crop_type, time, weather, soil):
     nstrs = calc_nstrs(crop_type)
     pstrs = calc_pstrs(crop_type)
     
-    crop_type.gamma_reg = 1- max(wstrs, tstrs, nstrs, pstrs)
-
-    return (wstrs, tstrs, nstrs, pstrs)
+    crop_type.gamma_reg = 1 - max(wstrs, tstrs, nstrs, pstrs)
 
 
 '''
-The following four functions comprise the "Growth Constraints".
+The following functions comprise the "Growth Constraints".
 This includes the water, temperature, nitrogen, and phosphorus stress
 for a given day. These values are needed to calculate the gamma_reg value.
 They do not modify the values of any State class.
@@ -222,63 +220,3 @@ def calc_phi_P(crop_type):
         return 300
     else:
         return 200 * ((crop_type.bio_P/crop_type.bio_P_opt) - 0.5)
-
-
-#==============================================================================
-
-''' The following can be used for testing purposes '''
-
-
-# The file that will record results of the biomass calculations.
-biomass_test_file = "tests/crop_test_files/biomass_results.csv"
-
-#
-# The following will record the biomass calculations into the test file.
-#
-def record_biomass_results(crop_type, time, weather):
-    if time.day == 1 and time.year == 1:
-        reset_file(biomass_test_file)
-    H_phosyn = calc_intercepted_radiation(crop_type, time, weather)
-    with open(biomass_test_file, "a") as testResults:
-        results = "%i,%f,%f,%f,%f,%f,%f\n" % (
-            time.day,
-            weather.radiation[time.year - 1][time.day - 1],
-            H_phosyn,
-            crop_type.dBiomass_max,
-            crop_type.gamma_reg,
-            crop_type.dBiomass_actual,
-            crop_type.biomass_actual
-        )
-
-        if time.day == 1 and time.year == 1:
-            testResults.write("Day,H_day,Hphosyn,dbiomax,gamma reg, dbioactual,bioactual\n")
-
-        testResults.write(results)
-
-
-
-# The file that will record results of the gamma reg calculations.
-gammareg_test_file = "tests/crop_test_files/gammareg_results.csv"
-
-#
-# The following will record the gammareg calculations into the test file.
-#
-def record_gammareg_results(crop_type, time, results):
-    wstrs, tstrs, nstrs, pstrs = results
-
-    if time.day == 1 and time.year == 1:
-        reset_file(gammareg_test_file)
-
-    with open(gammareg_test_file, "a") as testResults:
-        info = "%i,%f,%f,%f,%f,%f\n" % \
-               (time.day, wstrs, tstrs, nstrs, pstrs, crop_type.gamma_reg)
-
-        if time.day == 1 and time.year == 1:
-            testResults.write("day,wstrs,tstrs,nstrs,pstrs,gamma_reg\n")
-
-        testResults.write(info)
-
-
-def reset_file(fileName):
-    with open(fileName, "w") as file:
-        pass

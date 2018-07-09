@@ -11,7 +11,7 @@ Description: This module contains the necessary functions for calculating and
              function. The other functions are meant to serve as helper
              functions within this file.
 
-Variable definitions:
+CropType attribute definitions:
 
     soil.Etrans = Maximum plant transpiration on a given day (mm H2O)
 
@@ -31,7 +31,6 @@ CropType values updated by calling update_all():
     water_uptake_each_layer
     water_actual_up
     Et_actual
-
 '''
 ###############################################################################
 from math import exp
@@ -51,8 +50,6 @@ def update_all(crop_type, soil, time):
 
     # Calculate total actual water uptake
     calc_act_water_uptake(crop_type, soil, adj_uptakes_ly)
-
-    record_results(crop_type, soil, time, max_uptakes_ly)
 
 
 #
@@ -170,45 +167,3 @@ def calc_act_water_uptake(crop_type, soil, adj_uptakes):
 
     # Total plant water uptake is also the actual amount of transpiration (2.D.3)
     crop_type.Et_actual = crop_type.water_actual_up
-
-
-#==============================================================================
-
-''' The following can be used for testing purposes '''
-
-#
-# The file that will record results of the root depth calculations.
-# This is for testing purposes.
-#
-test_file = "tests/crop_test_files/water_uptake_results.csv"
-
-#
-# The following will record the root depth calculations into the
-# test file.
-#
-def record_results(crop_type, soil, time, max_uptakes):
-    if time.day == 1 and time.year == 1:
-        reset_file((test_file))
-
-    with open(test_file, "a") as resultFile:
-        result_f = "%i," + "%f,"*8 + "\n"
-        result =  result_f % (
-            time.day,
-            soil.Etrans,
-            soil.listOfSoilLayers[0].currentSoilWaterMM,
-            soil.listOfSoilLayers[1].currentSoilWaterMM,
-            soil.listOfSoilLayers[2].currentSoilWaterMM,
-            max_uptakes[0],
-            max_uptakes[1],
-            max_uptakes[2],
-            crop_type.water_actual_up
-        )
-
-        if time.day == 1 and time.year == 1:
-            resultFile.write("day,et actual\n")
-        resultFile.write(result)
-
-
-def reset_file(fileName):
-    with open(fileName, "w") as file:
-        pass

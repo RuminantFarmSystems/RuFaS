@@ -11,11 +11,16 @@ Description: This module contains the necessary functions for calculating the
              function. The other functions are meant to serve as helper
              functions within this file.
 
-Variable definitions:
+CropType attribute definitions:
 
+    fix_nitrogen = boolean indicating whether the crop can fix nitrogen
 
-CropType values updated by calling update_all():
+    z_root = Depth of root development in the soil on a given day
 
+    fr_PHU = Fraction of potential heat units accumulated for the plant on a
+             given day in the growing season.
+
+    act_N_up_each_layer = List of actual nitrogen uptakes from each soil layer.
 '''
 ###############################################################################
 
@@ -110,43 +115,7 @@ def calc_f_sw(accessible_layers):
 def calc_N_demand(crop_type, accessible_layers):
     NO3_root = sum([layer.NO3 for layer in accessible_layers])
 
-    count_accessible = len(accessible_layers)
-    act_N_up_root = sum(crop_type.act_N_up_each_layer[:count_accessible])
+    count_acc_layers = len(accessible_layers)
+    act_N_up_root = sum(crop_type.act_N_up_each_layer[:count_acc_layers])
 
     return act_N_up_root - NO3_root
-
-
-#==============================================================================
-
-''' The following can be used for testing purposes '''
-
-#
-# The file that will record results of the root depth calculations.
-# This is for testing purposes.
-#
-test_file = "tests/crop_test_files/nitrogen_uptake_results.csv"
-
-#
-# The following will record the root depth calculations into the
-# test file.
-#
-def record_results(crop_type, time):
-    if time.day == 1 and time.year == 1:
-        reset_file((test_file))
-
-    with open(test_file, "a") as resultFile:
-        result = "%i,%f,%f,%f,%f\n" % (
-            time.day,
-            crop_type.prev_biomass_actual,
-            crop_type.fr_N,
-            crop_type.bio_N_opt,
-            crop_type.N_up
-        )
-        if time.day == 1 and time.year == 1:
-            resultFile.write("day,prev_biomass_actual,fr_N,bio_N_opt,N_up\n")
-        resultFile.write(result)
-
-
-def reset_file(fileName):
-    with open(fileName, "w") as file:
-        pass

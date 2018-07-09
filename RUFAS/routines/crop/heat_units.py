@@ -11,7 +11,7 @@ Description: This module contains the necessary functions for calculating and
              calculated in other crop submodules, heat_units.update_all() should
              be the first function called in the daily_crop_routine.
 
-Variable Definitions:
+CropType attribute definitions:
 
     * Note that all temperatures listed below are in degrees Celsius
 
@@ -43,11 +43,11 @@ Variable Definitions:
 
 
 CropType values updated by calling calculate_frPHU():
+
     prev_accumulated_HU
     accumulated_HU
     prev_fr_PHU
     fr_PHU
-
 '''
 ################################################################################
 
@@ -56,8 +56,7 @@ CropType values updated by calling calculate_frPHU():
 # information.
 #
 def update_all(crop_type, T_min, T_max, time):
-    results = calculate_frPHU(crop_type, T_min, T_max, time)
-    record_results(crop_type, time, results)
+    calculate_frPHU(crop_type, T_min, T_max, time)
 
 
 #
@@ -82,12 +81,6 @@ def calculate_frPHU(crop_type, T_min, T_max, time):
 
     # Calculate accumulated fraction of potential Heat Units
     crop_type.fr_PHU = crop_type.accumulated_HU / crop_type.PHU
-
-    # This information is just returned so it can be recorded by the record
-    # function for testing purposes
-    calc_info = (T_max, T_min, T_HU_min, T_HU_max, HU)
-
-    return calc_info
 
 
 #
@@ -124,35 +117,3 @@ def calc_HU(crop_type, T_HU_min, T_HU_max):
         return 0.0
     else:
         return T_HU - crop_type.T_base_min
-
-
-#==============================================================================
-
-''' The following can be used for testing purposes '''
-
-#
-# The file that will record results of the heat unit calculations.
-# This is for testing purposes.
-#
-heat_units_test_file = "tests/crop_test_files/heat_units_results.csv"
-
-#
-# The following will record the heat unit calculations into the
-# test file.
-#
-def record_results(crop_type, time, results):
-    if time.day == 1 and time.year == 1:
-        reset_file(heat_units_test_file)
-
-    T_max, T_min, T_HU_min, T_HU_max, HU = results
-    with open(heat_units_test_file, "a") as resultFile:
-        info = "%i,%f,%f,%f,%f,%f,%f,%f\n"%\
-               (time.day, T_max, T_min, T_HU_max, T_HU_min, HU, crop_type.accumulated_HU, crop_type.fr_PHU)
-        if time.day == 1 and time.year ==1:
-            resultFile.write("day,T_max,T_min,T_HU_max,T_HU_min,HU,accumulated_HU,fr_PHU\n")
-        resultFile.write(info)
-
-
-def reset_file(fileName):
-    with open(fileName, "w") as file:
-        pass

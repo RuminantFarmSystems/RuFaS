@@ -76,7 +76,6 @@ This module needs the following inputs in order to operate correctly:
             currentSoilWaterMM
             fcWater
             wiltingWater
-
 '''
 ################################################################################
 

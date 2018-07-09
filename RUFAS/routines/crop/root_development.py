@@ -10,7 +10,7 @@ Description: This module contains the necessary functions for calculating and
              function is the only function intended to be used outside of this
              module.
 
-Variable definitions:
+CropType attribute definitions:
 
     fr_PHU = Fraction of potential heat units accumulated for the plant on a
              given day in the growing season.
@@ -27,7 +27,6 @@ CropType values updated by calling update_all():
 
     fr_root
     z_root
-
 '''
 ###############################################################################
 
@@ -38,7 +37,6 @@ CropType values updated by calling update_all():
 def update_all(crop_type, time):
     calc_daily_root_biomass(crop_type, time)
     calc_z_root(crop_type, time)
-    record_results(crop_type, time)
 
 
 #
@@ -77,37 +75,3 @@ def calc_z_root(crop_type, time):
 
     else: # crop_type == "annual" and self.fr_PHU <= 0.4
         crop_type.z_root = 2.5 * crop_type.fr_PHU * crop_type.z_root_max
-
-
-#==============================================================================
-
-''' The following can be used for testing purposes '''
-
-#
-# The file that will record results of the root depth calculations.
-# This is for testing purposes.
-#
-root_depth_test_file = "tests/crop_test_files/root_depth_results.csv"
-
-#
-# The following will record the root depth calculations into the
-# test file.
-#
-def record_results(crop_type, time):
-    if time.day == 1 and time.year == 1:
-        reset_file((root_depth_test_file))
-
-    with open(root_depth_test_file, "a") as resultFile:
-        result = "%i,%f,%f,%f\n" % (
-            time.day,
-            crop_type.fr_PHU,
-            crop_type.fr_root,
-            crop_type.z_root)
-        if time.day == 1 and time.year == 1:
-            resultFile.write("day,fr_PHU,fr_root,z_root\n")
-        resultFile.write(result)
-
-
-def reset_file(fileName):
-    with open(fileName, "w") as file:
-        pass
