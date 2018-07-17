@@ -2,8 +2,14 @@
 
 # ignore text files
 *.txt
+*.txt#
 *.doc
 *.docx
+
+# ignore log files
+*.log
+# ignore linear programming files
+*.lp
 
 # ignore python compiled files
 *.pyc

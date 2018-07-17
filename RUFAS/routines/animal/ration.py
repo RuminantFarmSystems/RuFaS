@@ -207,6 +207,7 @@ def calculate_rqmts(parity, WIM, AMF, BWR, base_NED, housing,
 						{'op': '>=', 'val': RUP_min}
 					 ]
 
+	print(dict(zip(nutrients_list, nutrient_rqmts)))
 	return dict(zip(nutrients_list, nutrient_rqmts))
 
 #-------------------------------------------------------------------------------

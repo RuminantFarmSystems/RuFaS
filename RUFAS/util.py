@@ -49,8 +49,8 @@ def get_base_dir():
 #-------------------------------------------------------------------------------
 # Function: LP_solve
 #-------------------------------------------------------------------------------
-def LP_solve(LHS, RHS, objective, variables, operators,
-             mode="min", name="LP", min_v=None, max_v=None):
+def LP_solve(LHS, RHS, objective, var_names, operators,
+             mode="min", name="LP", lower_var_bounds=None, upper_var_bounds=None):
     '''Solves the linear program using the PULP package solver.
 
     Solves the Linear Program and returns the results of the optimization.
@@ -63,7 +63,7 @@ def LP_solve(LHS, RHS, objective, variables, operators,
             Each sublist corresponds to a constraint equation.
         RHS (float[]): RHS values of each constraints of the LP.
         objective (float[]): Coefficients of the objective function.
-        variables (str[]): List of variable names.
+        var_names (str[]): List of variable names.
         operators (str[]): List of equation operator for each constraint.
             Must contain only: '>', '<', or '='
         mode (str, optional): Direction of the optimization og the LP.
@@ -71,86 +71,131 @@ def LP_solve(LHS, RHS, objective, variables, operators,
             Defaults to "min" if not specified.
         name (str, optional): Name of the LP problem.
             Defaults to "LP" if not specified.
-        min_v (float[], optional): Lower bound for each of the variables.
+        lower_var_bounds (float[], optional): Lower bound for each of the variables.
             Defaults to no bounds if not specified.
-        max_v (float[], optional): Upper bound for each of the variables.
+        upper_var_bounds (float[], optional): Upper bound for each of the variables.
             Defaults to no bounds if not specified.
 
     Returns:
         dict: a dictionary with the names of variables as keys and the values of
             that variable at the optimal solution (if possible).
             {
-             'status': "Infeasible" or "Optimal"
-             'objective':  optimized value of the objective function
-             (for all variables):
-                'variable_name': variable value
+             'status': "Infeasible" or "Optimal",
+             'objective':  optimized value of the objective function,
+            'variable1_name': variable value,
+            'variable2_name': variable value,
+            .
+            .
+            .
+            
+            'variableN_name': variable value
             }
     '''
+    for group in zip(*LHS):
+        print(sorted(list(group)))
+
+    print("-")
+    print(repr(RHS))
+    print("-")
+    for name, obj in zip(var_names, objective):
+        print(str(obj) + " " + name)
+    print("-")
+    print(repr(operators))
 
     start = timer.time()
 
+    num_variables = len(var_names)
+
+    # Ensure the LP is structured correctly
+    if is_correct_structure(LHS, RHS, objective, var_names):
+        LP = create_LP_problem(name, mode)
+    else:
+        print("Incorrect LP structure. Exiting ...")
+        exit()
+
+    # Create LP Variables
+    LP_vars = generate_LP_vars(var_names, lower_var_bounds, upper_var_bounds)
+
+    # Add objective function
+    LP += pulp.lpSum([ LP_vars[v] * objective[v] for v in range(num_variables) ])
+
+    # Add constraints
+    add_LP_constraints(LHS, RHS, LP_vars, operators, LP)
+
+    # Solve
+    #LP.solve(pulp.solvers.GLPK(msg=0)) # Switched to GUROBI because ~2-3x faster
+    LP.solve(pulp.solvers.GUROBI(msg=0))
+
+    # Get organized results
+    results = organize_results(LP)
+
+    end = timer.time()
+    LP.writeLP("FirstDay4.lp")
+    exit()
+
+    #print("LP elapsed time: " + str(end-start))
+    return results
+
+
+def create_LP_problem(name, mode):
     if mode.lower().startswith("min"):
         LP = pulp.LpProblem(name, pulp.LpMinimize)
     elif mode.lower().startswith("max"):
         LP = pulp.LpProblem(name, pulp.LpMaximize)
     else:
         print("ERROR")
+        exit()
+    return LP
 
-    #if len(LHS) != len(RHS) or len(variables) != len(objective):
-    #    print("ERROR")
-    #    return None
 
-    num_constraints = len(RHS)
-    num_variables = len(variables)
+def is_correct_structure(LHS, RHS, objective, var_names):
+    if len(LHS) != len(RHS) or len(objective) != len(var_names):
+        return False
+    for constraint_eq in LHS:
+        if len(constraint_eq) != len(var_names):
+            return False
+    return True
 
+
+def generate_LP_vars(var_names, lower_bounds, upper_bounds):
+    num_vars = len(var_names)
 
     # If max and min values for variables were not given
-    if min_v is None:
-        min_v = [None]*num_variables
-    if max_v is None:
-        max_v = [None]*num_variables
-
-    for constraint_eq in LHS:
-        if len(constraint_eq) != len(variables):
-            print("LP ERROR")
+    if lower_bounds is None:
+        lower_bounds = [None] * num_vars
+    if upper_bounds is None:
+        upper_bounds = [None] * num_vars
 
     #
     # LP Variables
     #
     LP_vars = []
-    for v in range(num_variables):
-        LP_vars.append( pulp.LpVariable(variables[v], min_v[v], max_v[v]) )
-        #print("Appending {}, min:{}, max:{} to LP_vars".format(variables[v], min_v[v], max_v[v]))
+    for var_info in zip(var_names, lower_bounds, upper_bounds):
+        new_variable = pulp.LpVariable(*var_info)
+        LP_vars.append(new_variable)
 
-    #
-    # Objective function
-    #
-    LP += pulp.lpSum([ LP_vars[v] * objective[v] for v in range(num_variables) ])
+    return LP_vars
 
-    #
-    # Constraints
-    #
-    for c in range(num_constraints):
-        if operators[c] == '<=':
-            LP += pulp.lpSum([ LHS[c][v] * LP_vars[v] for v in range(num_variables) ]) <= RHS[c]
-        elif operators[c] == '>=':
-            LP += pulp.lpSum([ LHS[c][v] * LP_vars[v] for v in range(num_variables) ]) >= RHS[c]
+
+def add_LP_constraints(LHS, RHS, LP_Vars, operators, LP):
+    num_vars = len(LP_Vars)
+    for constraint_eq, constraint_value, operator in zip(LHS, RHS, operators):
+        terms_in_equation = [constraint_eq[v] * LP_Vars[v] for v in range(num_vars)]
+        if operator == '<=':
+            LP += pulp.lpSum(terms_in_equation) <= constraint_value
+        elif operator == '>=':
+            LP += pulp.lpSum(terms_in_equation) >= constraint_value
         else:
-            LP += pulp.lpSum([ LHS[c][v] * LP_vars[v] for v in range(num_variables) ]) == RHS[c]
+            LP += pulp.lpSum(terms_in_equation) == constraint_value
 
-    #LP.solve(pulp.solvers.GLPK(msg=0)) # Switched to GUROBI because ~2-3x faster
-    LP.solve(pulp.solvers.GUROBI(msg=0))
 
-    results = { }
+def organize_results(LP):
+    results = {}
     for v in LP.variables():
         results[v.name] = v.varValue
 
     results['status'] = pulp.LpStatus[LP.status]
     results['objective'] = pulp.value(LP.objective)
-
-    end = timer.time()
-
-    #print("LP elapsed time: " + str(end-start))
     return results
 
 #-------------------------------------------------------------------------------

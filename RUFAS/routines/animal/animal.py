@@ -16,7 +16,7 @@ def daily_animal_routine(animal, feed, weather, time):
     '''Executes daily routines relating to Animals.'''
 
     # Formulate ration using LP
-    if not animal.user_input_ration:
+    if not animal.has_user_input_ration:
         if animal.end_ration_interval(time.day):
             animal.formulate_optimized_ration(feed.all_feed, feed.feed_nutrition)
 
@@ -43,7 +43,7 @@ class Animal():
         '''
 
         self.housing = data['housing']
-        self.user_input_ration = data['ration']['user_input']
+        self.has_user_input_ration = data['ration']['user_input']
 
         self.ration_formulation_interval = data['ration']['formulation_interval']
 
@@ -53,7 +53,7 @@ class Animal():
         #
         # HARD-CODED for now
         self.parity = 1.0
-        self.WIM = 20.0
+        self.WIM = 20.0 # Week in milk
         self.AMF = 3.5
         self.BWR = 1.0
         self.base_NED = 1.0
@@ -83,8 +83,8 @@ class Animal():
     #   - Kass C.
     #***************************************************************************
 
-        nutrients = feed_nutrition.keys()
-        feed_types = feed.keys()
+        nutrients = list(feed_nutrition.keys())
+        feed_types = list(feed.keys())
 
         # Constraints: minimum nutrition requirements for cows
         # values here are coefficients (on the LHS of the eq)
