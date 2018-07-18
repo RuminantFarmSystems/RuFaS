@@ -32,30 +32,40 @@ class Feed():
 
         # merge feed from farm and purchased
         self.all_feed = {**self.farm_feed, **self.purchased_feed}
+        self.feed_types = sorted(list(self.all_feed.keys()))
 
         self.feed_nutrition = { 'FI': {}, 'RV': {}, 'NE': {}, 'RDP': {}, 'RUP': {}}
+        self.nutrient_types = sorted(list(self.feed_nutrition.keys()))
+
+        # RDP -> Rumen degradable protein
+        # NE --> Net Energy
+        # CP --> Crude Protein
+        #
 
         NH3 = {}
         unavail_prot = {}
 
         # Loop over types of feed
-        for feed_type in self.all_feed.keys():
+        for feed_type in self.feed_types:
             #set FI, rumen volume, and MEIt eMEIrgy
             self.feed_nutrition['FI'][feed_type] = self.all_feed[feed_type]['nutrition']['FI']
             self.feed_nutrition['RV'][feed_type] = self.all_feed[feed_type]['nutrition']['RV']
             self.feed_nutrition['NE'][feed_type] = self.all_feed[feed_type]['nutrition']['NE']
 
+            CP = self.all_feed[feed_type]['nutrition']['CP']
+            ICP = self.all_feed[feed_type]['nutrition']['ICP']
+
             # Use rumen degradable, total, and indigestible CP to estimate degradable and undegradable CP
-            NH3[feed_type] = self.all_feed[feed_type]['nutrition']['CP'] * self.all_feed[feed_type]['nutrition']['RDP']
+            NH3[feed_type] = CP * self.all_feed[feed_type]['nutrition']['RDP']
 
             if self.all_feed[feed_type]['nutrition']['conc'] == "conc":
-                unavail_prot[feed_type] = 0.4 * self.all_feed[feed_type]['nutrition']['ICP']
+                unavail_prot[feed_type] = 0.4 * ICP
             else: # feed[feed_type]['conc'] == "rough"
-                unavail_prot[feed_type] = 0.7 * self.all_feed[feed_type]['nutrition']['ICP']
+                unavail_prot[feed_type] = 0.7 * ICP
 
-            self.feed_nutrition['RDP'][feed_type] = NH3[feed_type] + 0.15 * self.all_feed[feed_type]['nutrition']['CP']
-            self.feed_nutrition['RUP'][feed_type] = 0.87 * (self.all_feed[feed_type]['nutrition']['CP'] - NH3[feed_type] -
-                                     (unavail_prot[feed_type] * self.all_feed[feed_type]['nutrition']['CP']))
+            self.feed_nutrition['RDP'][feed_type] = NH3[feed_type] + 0.15 * CP
+            self.feed_nutrition['RUP'][feed_type] = 0.87 * (CP - NH3[feed_type] -
+                                     (unavail_prot[feed_type] * CP))
 
     #---------------------------------------------------------------------------
     # Method: annual_reset

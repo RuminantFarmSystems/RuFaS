@@ -92,7 +92,7 @@ class RationReport(BaseReportHandler):
                     f.write("\n\t\tMilk Production Reduction Factor: " +
                             str(self.milk_production_reduction[d]) + '\n')
 
-                    for feed_type in self.feed_info.keys():
+                    for feed_type in sorted(self.feed_info.keys()):
                         f.write("\t\t{}: {} {}".format(
                             feed_type,
                             self.feed_amounts[d][feed_type],

@@ -16,9 +16,9 @@ def daily_animal_routine(animal, feed, weather, time):
     '''Executes daily routines relating to Animals.'''
 
     # Formulate ration using LP
-    if not animal.user_input_ration:
+    if not animal.has_user_input_ration:
         if animal.end_ration_interval(time.day):
-            animal.formulate_optimized_ration(feed.all_feed, feed.feed_nutrition)
+            animal.formulate_optimized_ration(feed)
 
 #-------------------------------------------------------------------------------
 # Function: daily_animal_routine
@@ -43,7 +43,7 @@ class Animal():
         '''
 
         self.housing = data['housing']
-        self.user_input_ration = data['ration']['user_input']
+        self.has_user_input_ration = data['ration']['user_input']
 
         self.ration_formulation_interval = data['ration']['formulation_interval']
 
@@ -53,7 +53,7 @@ class Animal():
         #
         # HARD-CODED for now
         self.parity = 1.0
-        self.WIM = 20.0
+        self.WIM = 20.0 # Week in milk
         self.AMF = 3.5
         self.BWR = 1.0
         self.base_NED = 1.0
@@ -63,7 +63,7 @@ class Animal():
     #---------------------------------------------------------------------------
     # Method: formulate_optimized_ration
     #---------------------------------------------------------------------------
-    def formulate_optimized_ration(self, feed, feed_nutrition):
+    def formulate_optimized_ration(self, feed):
         '''Formulates the least cost ration for the animals.
 
         1) Extract feed nutrition from Feed object
@@ -75,27 +75,6 @@ class Animal():
            requirements) down by 5% and try again. Repeat until a feasible
            ration is found.
         '''
-
-    #***************************************************************************
-    # WARNING: EXTREMELY MESSY AND INTRACTABLE CODE BELOW
-    #   I'M SORRY IF YOU HAVE TO TRY TO READ THIS
-    #   WILL REFACTOR WHEN I HAVE TIME
-    #   - Kass C.
-    #***************************************************************************
-
-        nutrients = feed_nutrition.keys()
-        feed_types = feed.keys()
-
-        # Constraints: minimum nutrition requirements for cows
-        # values here are coefficients (on the LHS of the eq)
-        #constraints = ration.calculate_constraints(feed, nutrients)
-        constraints = {nutrient: [feed_nutrition[nutrient][feed_type] for feed_type in feed_types] for nutrient in nutrients}
-
-        # Objective: minimize total cost of all feeds
-        objective = {feed_type: feed[feed_type]['price'] for feed_type in feed_types}
-
-        # Maximum allowed use for each feed type
-        limits = {feed_type: feed[feed_type]['limit'] for feed_type in feed_types}
 
         # Loop variables
         infeasible = True
@@ -119,11 +98,9 @@ class Animal():
             #
             rqmts = ration.calculate_rqmts(
                 self.parity, self.WIM, self.AMF, self.BWR, self.base_NED,
-                self.housing, nutrients, milk_production_multiplier
+                self.housing, feed.nutrient_types, milk_production_multiplier
             )
-            formulated_ration = ration.optimize(
-                constraints, rqmts, objective, limits, nutrients, feed_types
-            )
+            formulated_ration = ration.optimize(feed, rqmts)
             #
             # Ideally, we will use status == 'Infeasible', but due to bugs in
             # the GLPK routine outputting an 'Undefined' in some infeasible
