@@ -112,9 +112,8 @@ def LP_solve(LHS, RHS, objective, var_names, operators,
     add_LP_constraints(LHS, RHS, LP_vars, operators, LP)
 
     # Solve
-    # Switched from GLPK to GUROBI because ~2-3x faster
-    #LP.solve(pulp.solvers.GLPK(msg=0))
-    LP.solve(pulp.solvers.GUROBI(msg=0))
+    # Uses the fastest solver available
+    solve_with_fastest_solver(LP)
 
     # Get organized results
     results = organize_results(LP)
@@ -182,6 +181,21 @@ def add_LP_constraints(LHS, RHS, LP_Vars, operators, LP):
             LP += pulp.lpSum(terms_in_equation) >= constraint_value
         else:
             LP += pulp.lpSum(terms_in_equation) == constraint_value
+
+
+# Finds the fastest solver available, and uses it to solve the LP.
+def solve_with_fastest_solver(LP):
+    if pulp.solvers.GUROBI.available:
+        LP.solve(pulp.solvers.GUROBI(msg=0))
+
+    elif pulp.solvers.GLPK.available:
+        LP.solve(pulp.solvers.GLPK(msg=0))
+
+    elif pulp.solvers.PULP_CBC_CMD.available:
+        LP.solve(pulp.solvers.PULP_CBC_CMD(msg=0))
+
+    elif pulp.solvers.COIN_CMD.available:
+        LP.solve(pulp.solvers.COIN_CMD(msg=0))
 
 
 # Organizes the results in a dictionary such that the names of variables
