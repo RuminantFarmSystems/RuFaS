@@ -185,17 +185,16 @@ def add_LP_constraints(LHS, RHS, LP_Vars, operators, LP):
 
 # Finds the fastest solver available, and uses it to solve the LP.
 def solve_with_fastest_solver(LP):
-    if pulp.solvers.GUROBI.available:
+    try:
         LP.solve(pulp.solvers.GUROBI(msg=0))
-
-    elif pulp.solvers.GLPK.available:
-        LP.solve(pulp.solvers.GLPK(msg=0))
-
-    elif pulp.solvers.PULP_CBC_CMD.available:
-        LP.solve(pulp.solvers.PULP_CBC_CMD(msg=0))
-
-    elif pulp.solvers.COIN_CMD.available:
-        LP.solve(pulp.solvers.COIN_CMD(msg=0))
+    except pulp.PulpSolverError:
+        try:
+            LP.solve(pulp.solvers.GLPK(msg=0))
+        except pulp.PulpSolverError:
+            try:
+                LP.solve(pulp.solvers.PULP_CBC_CMD(msg=0))
+            except pulp.PulpSolverError:
+                LP.solve(pulp.solvers.COIN_CMD(msg=0))
 
 
 # Organizes the results in a dictionary such that the names of variables
