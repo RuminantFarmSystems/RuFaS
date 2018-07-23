@@ -20,30 +20,34 @@ def optimize(feed, rqmts):
 	'''
     # LHS [type_nutrient][type_feed]
     LHS = []
-    for nutrient_type in feed.nutrient_types:
-        constraint = [feed.feed_nutrition[nutrient_type][feed_type] for feed_type in feed.feed_types]
+    for nutrient_type in feed.nutrients_in_LP:
+        constraint = [feed.available_feeds[feed_name][nutrient_type]
+                      for feed_name in feed.available_feed_names]
+
         LHS.append(constraint)
 
     # LP_RHS [type_nutrient]
-    RHS = [rqmts[nutrient]['val'] for nutrient in feed.nutrient_types]
+    RHS = [rqmts[nutrient]['val'] for nutrient in feed.nutrients_in_LP]
 
     # Objective [type_feed]
-    objective = [feed.all_feed[feed_type]['price'] for feed_type in feed.feed_types]
+    objective = [feed.available_feeds[feed_name]['Price']
+                 for feed_name in feed.available_feed_names]
 
     # Variables
-    variables = feed.feed_types
+    var_names = feed.available_feed_names
 
     # operators [type_nutrient]
-    operators = [rqmts[nutrient]['op'] for nutrient in feed.nutrient_types]
+    operators = [rqmts[nutrient]['op'] for nutrient in feed.nutrients_in_LP]
 
     # The lower and upper bounds for quantity of each feed type
-    lower_bounds = [0] * len(feed.feed_types)
-    upper_bounds = [feed.all_feed[feed_type]['limit'] for feed_type in feed.feed_types]
+    lower_bounds = [0] * len(feed.available_feed_names)
+    upper_bounds = [feed.available_feeds[feed_name]['Limit']
+                    for feed_name in feed.available_feed_names]
 
-    # util.LP_print(LHS, RHS, objective, variables, operators,
+    # util.LP_print(LHS, RHS, objective, var_names, operators,
     #			  "minimize", "RATION", lower_bounds, upper_bounds)
 
-    return util.LP_solve(LHS, RHS, objective, variables, operators,
+    return util.LP_solve(LHS, RHS, objective, var_names, operators,
                          "minimize", "RATION", lower_bounds, upper_bounds)
 
 

@@ -292,3 +292,51 @@ def try_to_float(input):
         return float(input)
     except:
         return input
+
+
+#
+# Serves as a generic library. Each thing in the library is represented as
+# a dictionary with the traits of the thing as keys, and the values of each
+# trait as the values in the dictionary.
+#
+# This library is populated by csv files in which the first row specifies the
+# traits of the type of thing in the library. Each row represents a specific
+# thing. The only requirements for traits are that each thing must have a
+# unique "ID" trait and a unique "Name" trait.
+#
+class Library():
+    def __init__(self, csvFile):
+        self.lib_by_id = {}
+        self.lib_by_name = {}
+        info = get_csv_columns(csvFile)
+
+        # The names of the traits are the first entry in each column
+        traits = [col[0] for col in info]
+        size = len(info[0])
+        for i in range(1,size):
+            thing = {}
+            values = [col[i] for col in info]
+
+            # Populate the things dictionary of traits
+            for trait, value in zip(traits, values):
+                thing[trait] = value
+
+            # Make the thing retrievable by both ID and Name
+            id = thing['ID']
+            name = thing['Name']
+            self.lib_by_id[id] = thing
+            self.lib_by_name[name] = thing
+
+    # Returns the dictionary of traits and corresponding values for the thing
+    # in the library with the given key
+    def checkout(self, key):
+        if key in self.lib_by_name:
+            return self.lib_by_name[key]
+        elif key in self.lib_by_id:
+            return self.lib_by_id[key]
+        else:
+            print("Unable to find " + str(key) + " in the library.")
+            print("Please check that this is the correct key, and that the "
+                  "correct library is specified in the input file.")
+            print("Exiting...")
+            exit()
