@@ -9,7 +9,24 @@ import matplotlib.pyplot as plt
 cow_num = 100
 days = 3000 
 
-	# initialize summary variables 
+# Method: start_simulation
+''' 
+	Description:
+		Initializes summary variables
+	Input: 
+		cow_num: number of cows at the beginning of the simulation
+		days: how long the simulation lasts
+	Output:
+		cull_num: numbers of cows culled in this simulation
+		new_born_num: numbers of cows born in this simulation
+		new_born_sold_num: numbers of newborns (male calves) sold in this simulation
+		total_milk_prod: total milk production in the simulation 
+		total_manure: total manure production in the simulation
+		total_feed: total feed used in the simulation
+		ai_num: times of services in this simulation 
+		preg_num: number of pregnancy in the whole simulation  
+		milk_num: number of lactation in the whole simulation 
+'''
 def start_simulation(cow_num, days):
 	cows = []
 	cull_lst = []				# num of cows culled per day
@@ -24,7 +41,7 @@ def start_simulation(cow_num, days):
 
 	# choose breed and repro method
 	for i in range(cow_num):
-		new_cow = Holstein('ed_tai', 0)
+		new_cow = Holstein('ed-tai', 0, 'pgf-gnrh', 'ovsynch56', 'pgf', '2pgf', '2pgf')
 		if new_cow.sex == 'F':
 			cows.append(new_cow)
 
@@ -57,7 +74,7 @@ def start_simulation(cow_num, days):
 					if (calving):
 						new_born_num = new_born_num + 1
 						if cows[j].type == 'H':
-							new_cow = Holstein('ed_tai', i)
+							new_cow = Holstein('ed-tai', i, 'pgf-gnrh', 'ovsynch56', 'pgf', '2pgf', '2pgf')
 						# else:
 							# new_cow = Jersey(sexed_semen)
 
@@ -92,8 +109,9 @@ def start_simulation(cow_num, days):
 		total_milk_lst.append(milk_num)
 
 	print("Cow count: " + str(len(cows)) + "\n")
-	cows[120].print_stat()
-	draw_stat(cull_lst, new_born_lst, new_born_sold_lst, total_milk_prod_lst, total_manure_lst, total_feed_lst, total_ai_lst, total_preg_lst, total_milk_lst)
+	print("Cow #50: ")
+	cows[50].print_stat()
+	# draw_stat(cull_lst, new_born_lst, new_born_sold_lst, total_milk_prod_lst, total_manure_lst, total_feed_lst, total_ai_lst, total_preg_lst, total_milk_lst)
 
 def draw_stat(cull_lst, new_born_lst, new_born_sold_lst, total_milk_prod_lst, total_manure_lst, total_feed_lst, total_ai_lst, total_preg_lst, total_milk_lst):
 	fig = plt.figure()
