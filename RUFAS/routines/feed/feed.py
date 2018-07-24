@@ -20,22 +20,28 @@ class Feed():
         '''
         TODO: Add DocString
         '''
-
+        # The feed library contains all the types of feed described in the input
+        # csv file specified for "feed_library" in the input json file.
         self.feed_library = util.Library(data["feed_library"])
 
+        # The available_feeds are the collection of feeds that are actually
+        # available and should be used in calculations.
         self.available_feeds = {}
+
+        # Populate available_feeds. The key to retrieve a feed type from
+        # available_feeds is the name of the feed as specified in the csv
+        # library. The feed_keys are specified in the input json file. They
+        # may be the Name or the ID of the feed type in the csv.
         for feed_key in data["available_feeds"]:
             feed_type = self.feed_library.checkout(feed_key)
             self.available_feeds[feed_type["Name"]] = feed_type
 
+        # Sorted so that they are in a consistent order.
         self.available_feed_names = sorted(list(self.available_feeds.keys()))
 
+        # Sorted so that is easier to ensure that the requirements calculated
+        # in ration.py are zipped with the correct nutrient.
         self.nutrients_in_LP = sorted(['FI', 'RV', 'NE', 'RDP', 'RUP'])
-
-        # RDP -> Rumen degradable protein
-        # NE --> Net Energy
-        # CP --> Crude Protein
-        #
 
         NH3 = {}
         unavail_prot = {}
