@@ -18,7 +18,15 @@ def optimize(feed, rqmts):
     '''
 	TODO: Add DocString
 	'''
-    # LHS [type_nutrient][type_feed]
+
+    # LHS is of the following form. LHS stands for Left Hand Side.
+    # [
+    #     [##,##, ..., ##],  // Each column has the coefficients for one specific feed type
+    #     [##,##, ..., ##],  // Each row has the coefficients for one specific nutrient type
+    #     [##,##, ..., ##],  // Each row represents the LHS of a constraint equation
+    #     [##,##, ..., ##],
+    #     [##,##, ..., ##]
+    # ]
     LHS = []
     for nutrient_type in feed.nutrients_in_LP:
         constraint = [feed.available_feeds[feed_name][nutrient_type]
@@ -26,21 +34,38 @@ def optimize(feed, rqmts):
 
         LHS.append(constraint)
 
-    # LP_RHS [type_nutrient]
+    # RHS is of the following form. Each value represents the required RHS value
+    # for the corresponding LHS constraint found in LHS.
+    # [
+    #     ##,
+    #     ##,
+    #     ##,
+    #     ##,
+    #     ##
+    # ]
     RHS = [rqmts[nutrient]['val'] for nutrient in feed.nutrients_in_LP]
 
-    # Objective [type_feed]
+    # objective is of the form [##,##, ..., ##] with the values being the price
+    # for each food type. This makes the objective function represent the total
+    # cost of a ration formulation.
     objective = [feed.available_feeds[feed_name]['Price']
                  for feed_name in feed.available_feed_names]
 
-    # Variables
+    # Each variable represents the quantity of a feed type. The variables are
+    # named after their corresponding food type.
     var_names = feed.available_feed_names
 
-    # operators [type_nutrient]
+    # operators is of the form [##, ##, ..., ##] with each value being one of
+    # '<=', '>=', or '=='. These are the operators between the corresponding
+    # LHS constraint and RHS required value.
     operators = [rqmts[nutrient]['op'] for nutrient in feed.nutrients_in_LP]
 
-    # The lower and upper bounds for quantity of each feed type
+    # The lower bounds for quantity of a food type are zero since a negative
+    # quantity of food in this context does not make sense.
     lower_bounds = [0] * len(feed.available_feed_names)
+
+    # The upper bounds are the 'Limit' specified in the csv library for each
+    # food type.
     upper_bounds = [feed.available_feeds[feed_name]['Limit']
                     for feed_name in feed.available_feed_names]
 
@@ -217,55 +242,3 @@ def calculate_rqmts(parity, WIM, AMF, BWR, base_NED, housing,
     ]
 
     return dict(zip(nutrients_list, nutrient_rqmts))
-
-
-# -------------------------------------------------------------------------------
-# Function: calculate_constraints
-# -------------------------------------------------------------------------------
-"""
-def calculate_constraints(feed, nutrients_list):
-	'''
-	TODO: Add DocString
-	'''
-
-	# LHS
-	FI = {}
-	RV = {}
-	NE = {}
-	RDP = {}
-	RUP = {}
-
-	# Intermediates
-	NH3 = {}
-	unavail_prot = {}
-
-	# Loop over types of feed
-	for feed_type in feed.keys():
-		#set FI, rumen volume, and MEIt eMEIrgy
-		FI[feed_type] = feed[feed_type]['nutrition']['FI']
-		RV[feed_type] = feed[feed_type]['nutrition']['RV']
-		NE[feed_type] = feed[feed_type]['nutrition']['NE']
-
-		# Use rumen degradable, total, and indigestible CP to estimate degradable and undegradable CP
-		NH3[feed_type] = feed[feed_type]['nutrition']['CP'] * feed[feed_type]['nutrition']['RDP']
-
-		if feed[feed_type]['nutrition']['conc'] == "conc":
-			unavail_prot[feed_type] = 0.4 * feed[feed_type]['nutrition']['ICP']
-		else: # feed[feed_type]['conc'] == "rough"
-			unavail_prot[feed_type] = 0.7 * feed[feed_type]['nutrition']['ICP']
-
-		RDP[feed_type] = NH3[feed_type] + 0.15 * feed[feed_type]['nutrition']['CP']
-		RUP[feed_type] = 0.87 * (feed[feed_type]['nutrition']['CP'] - NH3[feed_type] -
-								 (unavail_prot[feed_type] * feed[feed_type]['nutrition']['CP']))
-
-
-	constraint = [
-					[ FI[feed_type] for feed_type in feed.keys() ],
-					[ RV[feed_type] for feed_type in feed.keys() ],
-					[ NE[feed_type] for feed_type in feed.keys() ],
-					[ RDP[feed_type] for feed_type in feed.keys() ],
-					[ RUP[feed_type] for feed_type in feed.keys() ]
-				 ]
-
-	return dict(zip(nutrients_list, constraint))
-"""
