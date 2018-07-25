@@ -3,10 +3,11 @@
 RUFAS: Ruminant Farm Systems Model
 File name: feed.py
 Description:
-Author(s): Kass Chupongstimun, kass_c@hotmail.com
+Author(s): Kass Chupongstimun, kass_c@hotmail.com,
+           Andy Achenreiner, achenreiner@wisc.edu
 '''
 ################################################################################
-
+from RUFAS import util
 #-------------------------------------------------------------------------------
 # Class: Feed
 #-------------------------------------------------------------------------------
@@ -19,53 +20,51 @@ class Feed():
         '''
         TODO: Add DocString
         '''
+        # The feed library contains all the types of feed described in the input
+        # csv file specified for "feed_library" in the input json file.
+        self.feed_library = util.Library(data["feed_library"])
 
-    #***************************************************************************
-    # WARNING: EXTREMELY MESSY CODE AND BAD INFORMATION ARRANGEMENT BELOW
-    #   I'M SORRY IF YOU HAVE TO TRY TO READ THIS
-    #   WILL REFACTOR WHEN I HAVE TIME
-    #   - Kass C.
-    #***************************************************************************
+        # The available_feeds are the collection of feeds that are actually
+        # available and should be used in calculations.
+        self.available_feeds = {}
 
-        self.purchased_feed = data['purchased_feed']
-        self.farm_feed = data['farm_feed']
+        # Populate available_feeds. The key to retrieve a feed type from
+        # available_feeds is the name of the feed as specified in the csv
+        # library. The feed_keys are specified in the input json file. They
+        # may be the Name or the ID of the feed type in the csv.
+        for feed_key in data["available_feeds"]:
+            feed_type = self.feed_library.checkout(feed_key)
+            self.available_feeds[feed_type["Name"]] = feed_type
 
-        # merge feed from farm and purchased
-        self.all_feed = {**self.farm_feed, **self.purchased_feed}
-        self.feed_types = sorted(list(self.all_feed.keys()))
+        # Sorted so that they are in a consistent order.
+        self.available_feed_names = sorted(list(self.available_feeds.keys()))
 
-        self.feed_nutrition = { 'FI': {}, 'RV': {}, 'NE': {}, 'RDP': {}, 'RUP': {}}
-        self.nutrient_types = sorted(list(self.feed_nutrition.keys()))
-
-        # RDP -> Rumen degradable protein
-        # NE --> Net Energy
-        # CP --> Crude Protein
-        #
+        # Sorted so that is easier to ensure that the requirements calculated
+        # in ration.py are zipped with the correct nutrient.
+        self.nutrients_in_LP = sorted(['FI', 'RV', 'NE', 'RDP', 'RUP'])
 
         NH3 = {}
         unavail_prot = {}
 
         # Loop over types of feed
-        for feed_type in self.feed_types:
-            #set FI, rumen volume, and MEIt eMEIrgy
-            self.feed_nutrition['FI'][feed_type] = self.all_feed[feed_type]['nutrition']['FI']
-            self.feed_nutrition['RV'][feed_type] = self.all_feed[feed_type]['nutrition']['RV']
-            self.feed_nutrition['NE'][feed_type] = self.all_feed[feed_type]['nutrition']['NE']
+        for feed_name in self.available_feed_names:
 
-            CP = self.all_feed[feed_type]['nutrition']['CP']
-            ICP = self.all_feed[feed_type]['nutrition']['ICP']
+            CP = self.available_feeds[feed_name]['CP']
+            ICP = self.available_feeds[feed_name]['ICP']
 
             # Use rumen degradable, total, and indigestible CP to estimate degradable and undegradable CP
-            NH3[feed_type] = CP * self.all_feed[feed_type]['nutrition']['RDP']
+            NH3[feed_name] = CP * self.available_feeds[feed_name]['RDP']
 
-            if self.all_feed[feed_type]['nutrition']['conc'] == "conc":
-                unavail_prot[feed_type] = 0.4 * ICP
-            else: # feed[feed_type]['conc'] == "rough"
-                unavail_prot[feed_type] = 0.7 * ICP
+            if self.available_feeds[feed_name]['conc'] == "conc":
+                unavail_prot[feed_name] = 0.4 * ICP
+            else: # feed[feed_name]['conc'] == "rough"
+                unavail_prot[feed_name] = 0.7 * ICP
 
-            self.feed_nutrition['RDP'][feed_type] = NH3[feed_type] + 0.15 * CP
-            self.feed_nutrition['RUP'][feed_type] = 0.87 * (CP - NH3[feed_type] -
-                                     (unavail_prot[feed_type] * CP))
+            self.available_feeds[feed_name]['RDP'] = NH3[feed_name] + 0.15 * CP
+
+            self.available_feeds[feed_name]['RUP'] = 0.87 * (CP - NH3[feed_name] -
+                                     (unavail_prot[feed_name] * CP))
+
 
     #---------------------------------------------------------------------------
     # Method: annual_reset
