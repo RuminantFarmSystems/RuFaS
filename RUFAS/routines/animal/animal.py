@@ -98,7 +98,7 @@ class Animal():
             #
             rqmts = ration.calculate_rqmts(
                 self.parity, self.WIM, self.AMF, self.BWR, self.base_NED,
-                self.housing, feed.nutrient_types, milk_production_multiplier
+                self.housing, feed.nutrients_in_LP, milk_production_multiplier
             )
             formulated_ration = ration.optimize(feed, rqmts)
             #

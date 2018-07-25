@@ -46,7 +46,7 @@ class RationReport(BaseReportHandler):
         feed = state.feed
         # get static data like units associated with each feed type
         # store in Feed or Animal???????
-        self.feed_info = {**feed.purchased_feed, **feed.farm_feed}
+        self.feed_info = feed.available_feeds
         self.ration_interval = state.animal.ration_formulation_interval
 
     #---------------------------------------------------------------------------
@@ -96,7 +96,7 @@ class RationReport(BaseReportHandler):
                         f.write("\t\t{}: {} {}".format(
                             feed_type,
                             self.feed_amounts[d][feed_type],
-                            self.feed_info[feed_type]['units'])
+                            self.feed_info[feed_type]['Units'])
                         )
                     f.write('\n')
     #---------------------------------------------------------------------------
