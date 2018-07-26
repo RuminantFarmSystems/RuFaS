@@ -1,7 +1,5 @@
 from __future__ import print_function
-from cowa import Cow
-from Holstein import Holstein
-from Jersey import Jersey
+from RUFAS.routines.animal.Holstein import Holstein
 import matplotlib as mpl
 mpl.use('TkAgg')
 import matplotlib.pyplot as plt

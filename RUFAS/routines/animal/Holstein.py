@@ -1,12 +1,12 @@
 from __future__ import print_function
-from cowa import Cow
-from event import cowEvent
+from RUFAS.routines.animal.cowa import Cow
+from RUFAS.routines.animal.event import cowEvent
 import numpy as np
 import random
 import math
 import matplotlib as mpl
 mpl.use('TkAgg')
-import matplotlib.pyplot as plt
+
 
 # Class for Holstein
 class Holstein(Cow):

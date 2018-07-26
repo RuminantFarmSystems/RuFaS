@@ -1,4 +1,4 @@
-from event import cowEvent
+from RUFAS.routines.animal.event import cowEvent
 import random
 import numpy as np
 

@@ -7,7 +7,7 @@ Author(s): Kass Chupongstimun, kass_c@hotmail.com
 '''
 ################################################################################
 
-from RUFAS.routines.animal import ration
+from RUFAS.routines.animal import ration, Herd
 
 #-------------------------------------------------------------------------------
 # Function: daily_animal_routine
@@ -19,6 +19,7 @@ def daily_animal_routine(animal, feed, weather, time):
     if not animal.has_user_input_ration:
         if animal.end_ration_interval(time.day):
             animal.formulate_optimized_ration(feed)
+    animal.herd.daily_update(time)
 
 #-------------------------------------------------------------------------------
 # Function: daily_animal_routine
@@ -41,7 +42,7 @@ class Animal():
         '''
         TODO: Add DocString
         '''
-
+        self.herd = Herd.Herd(data["Herd"])
         self.housing = data['housing']
         self.has_user_input_ration = data['ration']['user_input']
 

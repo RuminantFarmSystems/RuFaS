@@ -1,4 +1,4 @@
-from cowa import Cow
+from RUFAS.routines.animal.cowa import Cow
 import numpy as np
 
 # Class for Jersey. Temporarily disabled

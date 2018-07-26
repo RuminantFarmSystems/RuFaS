@@ -257,6 +257,10 @@
 
         "animal":
         {
+            "Herd":
+            {
+                "cow_num": 100
+            },
             "housing": "barn",
             "ration":
             {
