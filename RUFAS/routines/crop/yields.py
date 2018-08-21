@@ -71,7 +71,7 @@ def update_all(crop_type, time, soil):
     calc_yield_max(crop_type, time)
     calc_yield_actual(crop_type)
     calc_nutrient_removal(crop_type)
-    calc_residue(crop_type)
+    calc_residue(crop_type, time)
 
 
 #
@@ -79,9 +79,9 @@ def update_all(crop_type, time, soil):
 # "Pseudo code_SC_actual growth and yield_1.0.docx" section 7.B.1
 #
 def calc_gamma_wu(crop_type, soil):
-    if soil.Eo_sum == 0:
+    if soil.E0_sum == 0:
         return 0
-    crop_type.gamma_wu = 100*(soil.Ea_sum/soil.Eo_sum)
+    crop_type.gamma_wu = 100*(crop_type.Ea_sum/soil.E0_sum)
 
 
 #
@@ -151,6 +151,7 @@ def calc_nutrient_removal(crop_type):
 # Updates the current residue.
 # "Pseudo code_SC_actual growth and yield_1.0.docx" section 7.B.4
 #
-def calc_residue(crop_type):
-    dResidue = crop_type.biomass_actual - crop_type.yield_actual
-    crop_type.residue += dResidue
+def calc_residue(crop_type, time):
+    if crop_type.harvest_date == time.day:
+        dResidue = crop_type.biomass_actual - crop_type.yield_actual
+        crop_type.residue += dResidue

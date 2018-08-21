@@ -100,6 +100,7 @@
         "soil":
         {
             "ProfileDepth": 450,
+            "ProfileBulkDensity": 1.16525,
             "CN2": 86.00,
             "FieldSlope": 0.02,
             "SlopeLength": 7,
@@ -110,7 +111,7 @@
             "Sand": 15,
             "Silt": 65,
             "SoilAlbedo": 0.16,
-            "Residue": 0,
+            "Residue": 8000,
             "FreshNMineralRate": 0.05,
             "SoilCoverType": "BARE",
 

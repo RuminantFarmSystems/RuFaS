@@ -103,20 +103,22 @@ def daily_crop_routine(crop, weather, time, soil):
         get this information from the other modules instead of from an input file. 
         This is just for isolating and testing the calculations of the crop module.
         '''
-        timeIndex = (time.year -1)*365 + time.day -1
+        # timeIndex = (time.year -1)*365 + time.day -1
 
-        soil.Etrans = crop_type.test_Et[timeIndex]
+        # soil.Etrans = crop_type.test_Et[timeIndex]
 
-        soil.Ea_sum = crop_type.test_Ea_sum[time.year-1]
-        soil.Eo_sum = crop_type.test_Eo_sum[time.year-1]
+        # soil.Ea_sum = crop_type.test_Ea_sum[time.year-1]
 
-        soil.listOfSoilLayers[0].NO3 = crop_type.test_NO3_l1[timeIndex]
-        soil.listOfSoilLayers[1].NO3 = crop_type.test_NO3_l2[timeIndex]
-        soil.listOfSoilLayers[2].NO3 = crop_type.test_NO3_l3[timeIndex]
+        # soil.E0_sum = crop_type.test_Eo_sum[time.year-1]
 
-        soil.listOfSoilLayers[0].currentSoilWaterMM = crop_type.test_soil_water1[timeIndex]
-        soil.listOfSoilLayers[1].currentSoilWaterMM = crop_type.test_soil_water2[timeIndex]
-        soil.listOfSoilLayers[2].currentSoilWaterMM = crop_type.test_soil_water3[timeIndex]
+        # soil.listOfSoilLayers[0].NO3 = crop_type.test_NO3_l1[timeIndex]
+        # soil.listOfSoilLayers[1].NO3 = crop_type.test_NO3_l2[timeIndex]
+        # soil.listOfSoilLayers[2].NO3 = crop_type.test_NO3_l3[timeIndex]
+
+        # soil.listOfSoilLayers[0].currentSoilWaterMM = crop_type.test_soil_water1[timeIndex]
+
+        # soil.listOfSoilLayers[1].currentSoilWaterMM = crop_type.test_soil_water2[timeIndex]
+        # soil.listOfSoilLayers[2].currentSoilWaterMM = crop_type.test_soil_water3[timeIndex]
 
 #------------------------------------------------------------------------------
 
@@ -261,6 +263,7 @@ class Crop():
             self.epco = data['epco']
 
             self.Et_actual = 0
+            self.Ea_sum = 0
             self.water_actual_up = 0
             self.water_uptake_each_layer = []
 
@@ -324,30 +327,30 @@ class Crop():
 
             #===================================================================
             ''' Testing Data '''
-
-            TEST_DATA = util.get_csv_columns(data["TEST_DATA"])
-
-
-            self.test_Et = TEST_DATA[1][1:]
-
-            self.test_water_actual_up = TEST_DATA[2][1:]
-
-            self.test_bio_N_opt = TEST_DATA[3][1:]
-            self.test_bio_N = TEST_DATA[4][1:]
-
-            self.test_bio_P_opt = TEST_DATA[5][1:]
-            self.test_bio_P = TEST_DATA[6][1:]
-
-            self.test_NO3_l1 = TEST_DATA[7][1:]
-            self.test_NO3_l2 = TEST_DATA[8][1:]
-            self.test_NO3_l3 = TEST_DATA[9][1:]
-
-            self.test_soil_water1 = TEST_DATA[10][1:]
-            self.test_soil_water2 = TEST_DATA[11][1:]
-            self.test_soil_water3 = TEST_DATA[12][1:]
-
-            self.test_Ea_sum = data["TESTING_Ea_sum"]
-            self.test_Eo_sum = data["TESTING_Eo_sum"]
+            #
+            # TEST_DATA = util.get_csv_columns(data["TEST_DATA"])
+            #
+            #
+            # self.test_Et = TEST_DATA[1][1:]
+            #
+            # self.test_water_actual_up = TEST_DATA[2][1:]
+            #
+            # self.test_bio_N_opt = TEST_DATA[3][1:]
+            # self.test_bio_N = TEST_DATA[4][1:]
+            #
+            # self.test_bio_P_opt = TEST_DATA[5][1:]
+            # self.test_bio_P = TEST_DATA[6][1:]
+            #
+            # self.test_NO3_l1 = TEST_DATA[7][1:]
+            # self.test_NO3_l2 = TEST_DATA[8][1:]
+            # self.test_NO3_l3 = TEST_DATA[9][1:]
+            #
+            # self.test_soil_water1 = TEST_DATA[10][1:]
+            # self.test_soil_water2 = TEST_DATA[11][1:]
+            # self.test_soil_water3 = TEST_DATA[12][1:]
+            #
+            # self.test_Ea_sum = data["TESTING_Ea_sum"]
+            # self.test_Eo_sum = data["TESTING_Eo_sum"]
 
 
         #-----------------------------------------------------------------------
@@ -386,3 +389,4 @@ class Crop():
             crop_type.bio_P = 0
             crop_type.bio_N = 0
 
+            crop_type.Ea_sum = 0

@@ -3,7 +3,7 @@ from RUFAS.routines.animal.Holstein import Holstein
 import matplotlib as mpl
 
 mpl.use('TkAgg')
-import matplotlib.pyplot as plt
+# import matplotlib.pyplot as plt
 
 # Method: start_simulation
 ''' 
@@ -127,45 +127,45 @@ class Herd():
     
     # draw_stat(cull_lst, new_born_lst, new_born_sold_lst, total_milk_prod_lst, total_manure_lst, total_feed_lst, total_ai_lst, total_preg_lst, total_milk_lst)
     
-    def draw_stat(self):
-        fig = plt.figure()
-    
-        ax1 = fig.add_subplot(521)
-        ax1.plot(self.cull_lst)
-        ax1.set_title("Total culls per day")
-    
-        ax2 = fig.add_subplot(522)
-        ax2.plot(self.new_born_lst)
-        ax2.set_title("Total new borns per day")
-    
-        ax3 = fig.add_subplot(523)
-        ax3.plot(self.new_born_sold_lst)
-        ax3.set_title("Total new borns sold per day")
-    
-        ax4 = fig.add_subplot(524)
-        ax4.plot(self.total_milk_prod_lst)
-        ax4.set_title("Total milk production per day")
-    
-        ax5 = fig.add_subplot(525)
-        ax5.plot(self.total_manure_lst)
-        ax5.set_title("Total manure production per day")
-    
-        ax6 = fig.add_subplot(526)
-        ax6.plot(self.total_feed_lst)
-        ax6.set_title("Total feed per day")
-    
-        ax7 = fig.add_subplot(527)
-        ax7.plot(self.total_ai_lst)
-        ax7.set_title("Total AI per day")
-    
-        ax8 = fig.add_subplot(528)
-        ax8.plot(self.total_preg_lst)
-        ax8.set_title("Total preg per day")
-    
-        ax9 = fig.add_subplot(529)
-        ax9.plot(self.total_milk_lst)
-        ax9.set_title("Total cows milking per day")
-    
-        plt.tight_layout(pad=0.4, w_pad=0.5, h_pad=0.5)
-        plt.show()
-    
+    # def draw_stat(self):
+    #     fig = plt.figure()
+    #
+    #     ax1 = fig.add_subplot(521)
+    #     ax1.plot(self.cull_lst)
+    #     ax1.set_title("Total culls per day")
+    #
+    #     ax2 = fig.add_subplot(522)
+    #     ax2.plot(self.new_born_lst)
+    #     ax2.set_title("Total new borns per day")
+    #
+    #     ax3 = fig.add_subplot(523)
+    #     ax3.plot(self.new_born_sold_lst)
+    #     ax3.set_title("Total new borns sold per day")
+    #
+    #     ax4 = fig.add_subplot(524)
+    #     ax4.plot(self.total_milk_prod_lst)
+    #     ax4.set_title("Total milk production per day")
+    #
+    #     ax5 = fig.add_subplot(525)
+    #     ax5.plot(self.total_manure_lst)
+    #     ax5.set_title("Total manure production per day")
+    #
+    #     ax6 = fig.add_subplot(526)
+    #     ax6.plot(self.total_feed_lst)
+    #     ax6.set_title("Total feed per day")
+    #
+    #     ax7 = fig.add_subplot(527)
+    #     ax7.plot(self.total_ai_lst)
+    #     ax7.set_title("Total AI per day")
+    #
+    #     ax8 = fig.add_subplot(528)
+    #     ax8.plot(self.total_preg_lst)
+    #     ax8.set_title("Total preg per day")
+    #
+    #     ax9 = fig.add_subplot(529)
+    #     ax9.plot(self.total_milk_lst)
+    #     ax9.set_title("Total cows milking per day")
+    #
+    #     plt.tight_layout(pad=0.4, w_pad=0.5, h_pad=0.5)
+    #     plt.show()
+    #

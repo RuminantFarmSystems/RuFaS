@@ -324,6 +324,10 @@ class Weather():
 				else:
 					self.beefCalf[i][j] = beefCalfData[i*365 + j]
 
+		self.T_avg_annual = []
+		for i in range(0, duration):
+			avg = sum(self.T_avg[i])/len(self.T_avg[i])
+			self.T_avg_annual.append(avg)
 
 #-------------------------------------------------------------------------------
 # Class: Time

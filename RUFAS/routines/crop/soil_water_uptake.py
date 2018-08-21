@@ -49,7 +49,7 @@ def update_all(crop_type, soil, time):
     adj_uptakes_ly = decrease_effic_of_uptake(soil, adj_uptakes_ly)
 
     # Calculate total actual water uptake
-    calc_act_water_uptake(crop_type, soil, adj_uptakes_ly)
+    calc_act_water_uptake(crop_type, soil, adj_uptakes_ly, time)
 
 
 #
@@ -152,7 +152,7 @@ def decrease_effic_of_uptake(soil, uptake_each_layer):
 # update Et_actual and water_actual_up.
 # "Pseudo code_SC_Water Uptake_1.0.docx" section 2.D
 #
-def calc_act_water_uptake(crop_type, soil, adj_uptakes):
+def calc_act_water_uptake(crop_type, soil, adj_uptakes, time):
     act_uptake_each_layer = []
 
     # Calculate actual uptake for each layer (2.D.1)
@@ -167,3 +167,6 @@ def calc_act_water_uptake(crop_type, soil, adj_uptakes):
 
     # Total plant water uptake is also the actual amount of transpiration (2.D.3)
     crop_type.Et_actual = crop_type.water_actual_up
+
+    if time.day >= crop_type.planting_date:
+        crop_type.Ea_sum += crop_type.Et_actual
