@@ -10,20 +10,21 @@
 ################################################################################
 
 import math
-
+from RUFAS.routines.soil.nitrogen_cycling import daily_nitrogen_cycling_routine, daily_nitrogen_update
 #------------------------------------------------------------------------------
 # Function: daily_soil_routine
 # Executes all the daily soil routines
 #------------------------------------------------------------------------------
-def daily_soil_routine(soil, weather, time):
+def daily_soil_routine(soil, crop, weather, time):
 
     # calculate and update the temperature of the soil layers
     soil.updateSoilTemperature(
-        weather.biomass[time.year-1][time.day-1],
-        weather.radiation[time.year-1][time.day-1],
-        weather.T_avg[time.year-1][time.day-1],
-        8.41,
-        time.day)
+                           crop.crops_list["corn"].bio_AG,
+                           weather.radiation[time.year-1][time.day-1],
+                           weather.T_avg[time.year-1][time.day-1],
+                           weather.T_avg_annual[time.year-1],
+                           time.day
+                           )
 
     # calculate daily runoff
     soil.dailyInfiltration(weather.rainfall[time.year-1][time.day-1])
@@ -33,26 +34,29 @@ def daily_soil_routine(soil, weather, time):
         weather.T_max[time.year-1][time.day-1]
         , weather.T_min[time.year-1][time.day-1]
         , weather.T_avg[time.year-1][time.day-1]
-        , weather.biomass[time.year-1][time.day-1]
-        , weather.radiation[time.year-1][time.day-1])
+        , crop.crops_list["corn"]
+        , weather.radiation[time.year-1][time.day-1]
+        , time)
 
     # calculate daily percolation
     soil.dailyPercolation()
 
     # calculate daily soil erosion
     soil.dailySoilErosion(weather.rainfall[time.year-1][time.day-1],
-                          weather.biomass[time.year-1][time.day-1],
+                          crop.crops_list["corn"].bio_AG,
                           time.day)
 
+    daily_nitrogen_cycling_routine(soil, time, weather)
 
 #------------------------------------------------------------------------------
 # Function: daily_soil_update
 # Update attributes of soil in preparation of following day
 #------------------------------------------------------------------------------
-def daily_soil_update(soil, weather, time):
-
+def daily_soil_update(soil, crop, weather, time):
     # update current soil water
     soil.updateCurrentSoilWater(weather.rainfall[time.year-1][time.day-1])
+    daily_nitrogen_update(soil, time, weather)
+    soil.updateResidue(crop.crops_list["corn"], time)
 
 #-------------------------------------------------------------------------------
 # Class: Soil
@@ -71,6 +75,7 @@ class Soil():
 
         # Values Initialized by Input
         self.profileDepth = data['ProfileDepth']
+        self.profileBulkDensity = data['ProfileBulkDensity']
         self.CN2 = data['CN2'] # unitless, user-defined curve number (empirical)
 
         # soil erosion attributes
@@ -127,6 +132,7 @@ class Soil():
         self.runoff = 0.0
         self.Etrans = 0.0
         self.E0 = 0.0
+        self.E0_sum = 0.0
         self.Esoil = 0.0
 
         self.dayInfiltraiton = 0.0
@@ -201,8 +207,8 @@ class Soil():
 
         # Fresh N Pool --- only in top soil layer
         self.topLayerFreshN = ((0.0015*self.residue)*
-                            self.listOfSoilLayers[x].bulkDensity *
-                            self.listOfSoilLayers[x].depth) /100      
+                            self.listOfSoilLayers[0].bulkDensity *
+                            self.listOfSoilLayers[0].depth) /100
 
 
     #---------------------------------------------------------------------------
@@ -425,7 +431,7 @@ class Soil():
     # Uses curve number approach (equations taken from SWAT 2009 documentation)
     #---------------------------------------------------------------------------
     def dailyInfiltration(self, dailyRainfall):
-
+        dailyRainfall = float(dailyRainfall)
         # curve number 1
         cn1 = self.CN2 - (20 * (100 - self.CN2)) / (100
                                                     - self.CN2 + math.exp(2.533
@@ -466,14 +472,13 @@ class Soil():
 
         # daily runoff (mm H2O)
         Q = 0.0
-        if float(dailyRainfall) > 0.2*s:
-            Q = ((float(dailyRainfall) - 0.2*s)**2) / (float(dailyRainfall)
-                                                       + 0.8*s)
+        if dailyRainfall > 0.2*s:
+            Q = ((dailyRainfall - 0.2*s)**2) / (dailyRainfall + 0.8*s)
 
         self.runoff = Q
 
         # daily infiltration (mm H20)
-        self.dayInfiltraiton = float(dailyRainfall) - self.runoff
+        self.dayInfiltraiton = dailyRainfall - self.runoff
 
     #---------------------------------------------------------------------------
     # Function: dailyEvapotranspiration
@@ -484,7 +489,7 @@ class Soil():
     # Step 3: Calculate Sublimation and Soil Evaporation
     # Step 4: Partition Esoil among different soil layers
     #---------------------------------------------------------------------------
-    def dailyEvapotranspiration(self, tMax, tMin, tAvg, biomass, radiation):
+    def dailyEvapotranspiration(self, tMax, tMin, tAvg, crop_type, radiation, time):
 
     # Step 1: Calculate Potential Evapotranspiration
         # extraterrestrial radiation (MJ*m^-2*d^-1) --> MAKE INPUT VARIABLE
@@ -496,10 +501,11 @@ class Soil():
         # potential evapotranspiration (mm*d^-1)
         self.E0 = max(0.001, 0.0023*H0*(float(tMax)-float(tMin))**0.5*
                       (float(tAvg) + 17.8)/LHV)
-
+        if time.day >= crop_type.planting_date:
+            self.E0_sum += self.E0
     # Step 2: Calculate Crop Transpiration
         # Leaf Area Index (calculated in Crop Growth Section)
-        LAI = float(biomass) / 1500
+        LAI = crop_type.LAI_actual
 
         # maximum transpiration on a given day (mm H2O)
         # The actual amount of transpiration may be less than this maximum
@@ -514,7 +520,7 @@ class Soil():
         # aboveground biomass and residue (kg*ha^-1)
 
         # soil cover index
-        soilCov = math.exp(-5.0 * ((10)**(-5)) * float(biomass))
+        soilCov = math.exp(-5.0 * 0.00001 * crop_type.bio_AG)
 
         # maximum soil evaporation/sublimation on a given day (mm H2O)
         Esoil = (round(self.E0,3) - self.Etrans) * (soilCov)
@@ -593,7 +599,7 @@ class Soil():
     # Use MUSLE approach (equations taken from SWAT 2009 documentation) to
     # determine soil erosion
     #---------------------------------------------------------------------------
-    def dailySoilErosion(self, rainfall, biomass, day):
+    def dailySoilErosion(self, rainfall, bio_AG, day):
 
         # time of concentration (h)
         Tconc = ((self.slopeLength**0.6) * (self.manning**0.6)) / (
@@ -640,7 +646,7 @@ class Soil():
         # 0.05 is the minimum value for C. This is an estimate.
         # 250 (COVER) NEEDS TO BE CHANGED (BIOMASS)
         C = math.exp((math.log(0.8) - math.log(0.05)) *
-                     math.exp(-0.00115 * float(biomass)) + math.log(0.05))
+                     math.exp(-0.00115 * bio_AG) + math.log(0.05))
 
 
         # the exponential term m is calculated as...
@@ -673,7 +679,7 @@ class Soil():
     def updateSoilTemperature(self, biomass, radiation, Tavg, TavgAnnual, day):
 
         albedoSoil = self.soilAlbedo # soil albedo constant
-        bd = self.listOfSoilLayers[0].bulkDensity # soil bulk density (g/cm^3)
+        bd = self.profileBulkDensity  # soil bulk density (g/cm^3)
         CV = float(biomass) # above ground biomass and residue (kg/ha)
         Hday = float(radiation) # daily solar radiation (user input, MJ/m2)
         Tav = float(Tavg) # average daily temperature (oC)
@@ -743,8 +749,8 @@ class Soil():
             df = zd/ (zd + math.exp(-0.867 - 2.078 * zd))
 
             # soil temperature (C) at depth z (mm)
-            self.listOfSoilLayers[x].temperature = (
-                L * TsoilPrev) + (1-L) * (df * (Taair-self.Tsurf) + self.Tsurf)
+            value = (L * TsoilPrev) + (1-L) * (df * (Taair-self.Tsurf) + self.Tsurf)
+            self.listOfSoilLayers[x].temperature = value
 
     #---------------------------------------------------------------------------
     # Function: updateCurrentSoilWater
@@ -776,5 +782,11 @@ class Soil():
                         -self.listOfSoilLayers[x].perc
                         +self.listOfSoilLayers[x-1].perc))
 
+    def updateResidue(self, crop_type, time):
+        self.residue *= (1-self.decayRate)
+        if crop_type.harvest_date == time.day:
+            dResidue = crop_type.biomass_actual - crop_type.yield_actual
+            self.residue += dResidue
+
     def annual_reset(self):
-        pass
+        self.E0_sum = 0.0

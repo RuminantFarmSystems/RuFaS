@@ -107,7 +107,11 @@ def daily_soil_nitrogen(soil, jday, year, rainfall):
             freshOrganicP = freshOrganicP * BD * soil.listOfSoilLayers[x].bottomDepth / 100  # kg
             labileP = soil.listOfSoilLayers[x].labileP  # input
 
-            carbonToNitrogen = (0.58 * soil.residue) / (soil.topLayerFreshN + NO3)  # C:N ratio
+            if (soil.topLayerFreshN + NO3) > 0:
+                carbonToNitrogen = (0.58 * soil.residue) / (soil.topLayerFreshN + NO3)  # C:N ratio
+            else:
+                carbonToNitrogen = 0
+
             soil.CToN = carbonToNitrogen
 
             carbonToPhosphorus = (0.58 * soil.residue) / (freshOrganicP + labileP)  # C:P ratio
@@ -115,9 +119,11 @@ def daily_soil_nitrogen(soil, jday, year, rainfall):
 
             # A decay rate constant (Decay) defines the fraction of residue that is
             # decomposed as:
+
             residueFactor = min(math.exp(-0.693 * (carbonToNitrogen - 25) / 25),
                        1)
             decay = residueFactor * resComp * ((tempFac * waterFac) ** 0.5)
+
             soil.decayRate = decay
 
             # Mineralization of Fresh N (kg/ha) is then calculated as:
@@ -354,7 +360,7 @@ def daily_soil_nitrogen_update(soil, jday, year, addedN):
             NO3 += soil.listOfSoilLayers[x - 1].NO3Perc
 
         NO3 += soil.listOfSoilLayers[x].nitrification
-        soil.listOfSoilLayers[x].NO3 = NO3
+        soil.listOfSoilLayers[x].NO3 = max(0, NO3)
 
         # UPDATE NH4 POOL
         NH4 = soil.listOfSoilLayers[x].NH4
@@ -416,5 +422,7 @@ def daily_soil_nitrogen_update(soil, jday, year, addedN):
         soil.listOfSoilLayers[x].stableN = stableN
 
         # UPDATE FRESH N POOL
-        soil.topLayerFreshN = max(0, soil.topLayerFreshN - soil.freshMin
+
+        if x==0:
+            soil.topLayerFreshN = max(0, soil.topLayerFreshN - soil.freshMin
                                   - soil.freshDecomp - soil.freshNLoss)
