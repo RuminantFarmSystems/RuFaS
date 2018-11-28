@@ -10,13 +10,19 @@ Author(s): Kass Chupongstimun, kass_c@hotmail.com
 from numpy import exp
 from RUFAS import util
 
-
 # -------------------------------------------------------------------------------
 # Function: optimize
 # -------------------------------------------------------------------------------
 def optimize(feed, rqmts):
     '''
-	TODO: Add DocString
+    Sets up the arguments for the linear programming optimization.
+
+	Args:
+        feed : instance of the Feed class
+        rqmts : dict which represents the dietary requirements of the cows
+
+    Returns:
+        dict: the dictionary that is returned by the call to util.LP_solve()
 	'''
 
     # LHS is of the following form. LHS stands for Left Hand Side.
@@ -83,7 +89,23 @@ def optimize(feed, rqmts):
 def calculate_rqmts(parity, WIM, AMF, BWR, base_NED, housing,
                     nutrients_list, milk_production_multiplier):
     '''
-	TODO: Add DocString
+    Calculate the dietary requirements of the cows. These values are used
+    on the RHS of the linear program.
+
+	Args:
+        parity : number
+        WIM : number of weeks since parturition
+        AMF : number for the average milk fat
+        BWR : number for the mature body weight of the animal in kg
+        base_NED : number for the baseline net energy content of the diet
+        housing : string which can be either "barn", "drylot", or "pasture"
+        nutrients_list : list that is the LHS of the returned dictionary
+        milk_production_multiplier : number
+
+    Returns:
+        dict : a dictionary that represents the dietary requirements of the cows,
+            where the left hand side is nutrients_list and the right hand side is
+            calculated in this method
 	'''
 
     #
