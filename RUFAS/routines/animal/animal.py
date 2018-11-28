@@ -13,7 +13,14 @@ from RUFAS.routines.animal import ration, Herd
 # Function: daily_animal_routine
 #-------------------------------------------------------------------------------
 def daily_animal_routine(animal, feed, weather, time):
-    '''Executes daily routines relating to Animals.'''
+    '''Executes daily routines relating to Animals.
+
+    Args:
+        animal : instance of the Animal class
+        feed : instance of the Feed class
+        weather : instance of the Weather class
+        time : instance of the Time class
+    '''
 
     # Formulate ration using LP
     if not animal.has_user_input_ration:
@@ -35,12 +42,15 @@ def daily_animal_update(animal, weather, time):
 #-------------------------------------------------------------------------------
 class Animal():
     '''
-    TODO: Add DocString
+    Currently represents a Cow.
     '''
 
     def __init__(self, data):
         '''
-        TODO: Add DocString
+        Constructs an instance of the Animal class
+
+        Args:
+            data : 2D dictionary which stores information about the cow
         '''
         self.herd = Herd.Herd(data["Herd"])
         self.housing = data['housing']
@@ -75,6 +85,9 @@ class Animal():
            solution. If the LP is not feasible, scale base milk production (in
            requirements) down by 5% and try again. Repeat until a feasible
            ration is found.
+
+        Args:
+            feed : instance of the Feed class
         '''
 
         # Loop variables
