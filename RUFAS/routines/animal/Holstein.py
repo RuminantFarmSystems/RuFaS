@@ -11,27 +11,27 @@ mpl.use('TkAgg')
 # Class for Holstein
 class Holstein(Cow):
 	# Method: ed_init
-	''' 
+	def ed_init(self):
+		'''
 		Description:
-			initialize parameters for ed method
-		Input: 
+			initialize parameters for ed (estrus detection) method
+		Args:
 			vwp: voluentary waiting period
 			conception_rate: conception rate
 			estrus cycle
-			servise rate
+			service rate
 		Output:
 			Reproduction events:
-
-	'''
-	def ed_init(self):
+		'''
 		self.vwp = 50
 		self.conception_rate = 0.339
 
 	# Method: tai_init
-	''' 
+	def tai_init(self, presynch_method, ovsynch_method, resynch_method, heifer_presynch_method, heifer_ovsynch_method):
+		'''
 		Description:
-			initialize parameters for tai method
-		Input: 
+			initialize parameters for tai (timed artificial insemination) method
+		Input:
 			presynch_method: 2PGF GnRH-PGF-GNRH PGF-GnRH
 			ovsynch_method: ovsynch56 ovsynch48 5dcosynch72 cosynch72
 			resynch_method: ovsynch-after-PD TAI-before-PD 1PGF/ovsynch GnRh/ovsynch
@@ -39,8 +39,7 @@ class Holstein(Cow):
 			heifer_ovsynch_method: 2PGF 1PGF
 			method specific conception_rate
 		Output:
-	'''
-	def tai_init(self, presynch_method, ovsynch_method, resynch_method, heifer_presynch_method, heifer_ovsynch_method):
+		'''
 		self.vwp = 72
 		self.presynch_method = presynch_method
 		self.ovsynch_method = ovsynch_method
@@ -72,16 +71,16 @@ class Holstein(Cow):
 		self.events.append(cowEvent(self.timed_ai_day, 'timed ai'))
 
 	# Method: tai_param_init
-	''' 
+	def tai_param_init(self):
+		'''
 		Description:
 			initialize parameters for tai method
-		Input: 
-			vwp: voluentary waiting period
-			conception_rate: conception rate
+		Input:
+			vwp: number for voluentary waiting period
+			conception_rate: number for conception rate
 		Output:
 			Reproduction events:
-	'''
-	def tai_param_init(self):
+		'''
 		self.vwp = 72
 		if (not self.presynch_method == None):
 			self.conception_rate = 0.376
@@ -89,18 +88,23 @@ class Holstein(Cow):
 			self.conception_rate = 0.29
 
 	# Method: __init__
-	''' 
-		Description:
-			initialize Holsein
-		Input: 
-			repro_method: ED TAI ED-TAI
-			date: date of each event
-		Output:
-			Reproduction events:
-	'''
 	def __init__(self, repro_method, date, presynch_method, ovsynch_method, resynch_method, heifer_presynch_method, heifer_ovsynch_method):
 		Cow.__init__(self, 40.8, 0.9, 'H', date)
-		
+		'''
+		Description:
+			initialize Holstein
+		Input:
+			repro_method: ED TAI ED-TAI
+			date: date of each event
+			presynch_method: 2PGF GnRH-PGF-GNRH PGF-GnRH
+			ovsynch_method: ovsynch56 ovsynch48 5dcosynch72 cosynch72
+			resynch_method: ovsynch-after-PD TAI-before-PD 1PGF/ovsynch GnRh/ovsynch
+			heifer_presynch_method: 2PGF CODR-PGF-1 CODR-PGF-2
+			heifer_ovsynch_method: 2PGF 1PGF
+		Output:
+			Reproduction events:
+		'''
+
 		# Reproduction method: ED or TAI or ED-TAI
 		self.repro_method = repro_method
 
@@ -114,10 +118,10 @@ class Holstein(Cow):
 		self.milk_produced_stat = []
 
 		# Lactating statistics for first and later lactations
-		self.milk_produced_total = [0, 0] 
-		self.milk_produced_days = [0, 0] 
+		self.milk_produced_total = [0, 0]
+		self.milk_produced_days = [0, 0]
 
-		# Culling 
+		# Culling
 		self.future_cull_date = -1
 		self.cull_reason = ""
 
@@ -152,16 +156,16 @@ class Holstein(Cow):
 			self.tai_init(presynch_method, ovsynch_method, resynch_method, heifer_presynch_method, heifer_ovsynch_method)
 
 	# Method: ed_heat_detection
-	''' 
+	def ed_heat_detection(self):
+		'''
 		Description:
-			detect heat for the cow
-		Input: 
+			Detects heat for the cow. If ed heat is detected, the cow is pregnant.
+		Input:
 			estrus cycle
 			service rate
 		Output:
 			reproduction events
-	'''
-	def ed_heat_detection(self):
+		'''
 		if ((self.days_born > 400 and self.num_birth == 0) or ((not self.num_birth == 0) and (not self.first_estrus))) and (self.next_estrus_date == -1):
 			self.next_estrus_date = np.trunc(np.random.normal(21, 2.5)) + self.days_born
 		elif (self.first_estrus) and (self.next_estrus_date == -1):
@@ -179,7 +183,7 @@ class Holstein(Cow):
 					# Detected
 					self.preg_days = -2
 					self.expected_due = np.trunc(np.random.normal(278,6))
-					self.events.append(cowEvent(self.days_born, 'ed heat detected, cow pregnant'))	
+					self.events.append(cowEvent(self.days_born, 'ed heat detected, cow pregnant'))
 				else:
 					self.next_estrus_date = -1
 					if (not self.num_birth == 0):
@@ -191,45 +195,45 @@ class Holstein(Cow):
 					self.first_estrus = False
 
 	# Method: tai_date_check
-	''' 
-		Description:
-			check if it is the date for tai
-		Input: 
-			protocol
-		Output: 
-			if it is the date for tai
-	'''
 	def tai_date_check(self):
+		'''
+		Description:
+			Check if it is the date for tai. If it is, the cow is pregnant.
+		Input:
+			protocol
+		Output:
+			if it is the date for tai
+		'''
 		if (self.days_born == self.timed_ai_day-1):
 			self.preg_days = -1
 			self.expected_due = np.trunc(np.random.normal(278,6))
 			self.events.append(cowEvent(self.days_born+1, 'cow pregnant'))
 
 	# Method: ed_no_preg
-	''' 
+	def ed_no_preg(self):
+		'''
 		Description:
 			deals with the situation when pregnancy did not happen for ed method
 			resetting parameters
-		Input: 
+		Input:
 			protocol
-		Output: 
-			not pregonant
-	'''
-	def ed_no_preg(self):
+		Output:
+			not pregnant
+		'''
 		self.next_estrus_date = -1
 		self.conception_rate = self.conception_rate - 0.026
 
 	# Method: tai_no_preg
-	''' 
+	def tai_no_preg(self):
+		'''
 		Description:
 			deals with the situation when pregnancy did not happen for tai method
 			resetting parameters
-		Input: 
+		Input:
 			protocol
-		Output: 
-			not pregonant
-	'''
-	def tai_no_preg(self):
+		Output:
+			not pregnant
+		'''
 		if (self.ovsynch_method == 'ovsynch56'):
 			self.timed_ai_day = self.days_born + 9
 		elif (self.ovsynch_method == 'ovsynch48'):
@@ -250,30 +254,30 @@ class Holstein(Cow):
 		self.events.append(cowEvent(self.timed_ai_day, 'timed ai'))
 
 	# Method: ed_abortion
-	''' 
+	def ed_abortion(self):
+		'''
 		Description:
 			deals with abortion for ed method
 			resetting parameters
-		Input: 
+		Input:
 			protocol
-		Output: 
+		Output:
 			abortion happens
-	'''
-	def ed_abortion(self):
+		'''
 		self.next_estrus_date = -1
 		self.conception_rate = self.conception_rate
 
 	# Method: tai_abortion
-	''' 
-		Description:
-			deals with abortion for ed method
-			resetting parameters
-		Input: 
-			protocol
-		Output: 
-			abortion happens
-	'''
 	def tai_abortion(self):
+		'''
+		Description:
+			deals with abortion for tai method
+			resetting parameters
+		Input:
+			protocol
+		Output:
+			abortion happens
+		'''
 		self.timed_ai_day = self.days_born + 72
 		if (self.ovsynch_method == 'ovsynch56'):
 			self.ovsynch_start = self.timed_ai_day - 9
@@ -300,30 +304,30 @@ class Holstein(Cow):
 		self.events.append(cowEvent(self.timed_ai_day, 'timed ai'))
 
 	# Method: ed_birth
-	''' 
+	def ed_birth(self):
+		'''
 		Description:
 			deals with birth ed method
 			resetting parameters
-		Input: 
+		Input:
 			protocol
-		Output: 
+		Output:
 			calving
-	'''
-	def ed_birth(self):
+		'''
 		self.next_estrus_date = -1
 		self.conception_rate = 0.339
 
 	# Method: tai_birth
-	''' 
+	def tai_birth(self):
+		'''
 		Description:
 			deals with birth for tai method
 			resetting parameters
-		Input: 
+		Input:
 			protocol
-		Output: 
+		Output:
 			calving
-	'''
-	def tai_birth(self):
+		'''
 		self.timed_ai_day = self.days_born + 72
 		if (self.ovsynch_method == 'ovsynch56'):
 			self.ovsynch_start = self.timed_ai_day - 9
@@ -350,10 +354,12 @@ class Holstein(Cow):
 		self.events.append(cowEvent(self.timed_ai_day, 'timed ai'))
 
 	# Method: update
-	''' 
+	def update(self, date):
+		'''
 		Description:
-			updates Holstein's information for each day. Simutes any events happened to the Holstein each day
-		Input: 
+			Updates Holstein's information for each day. Simulates any events happened to the Holstein each day,
+			namely culling, weight change, heat detection, and pregnancy.
+		Input:
 			date: the date counter for the entire simulation
 		Output:
 			cull: determine culled or not at this day
@@ -362,8 +368,7 @@ class Holstein(Cow):
 			ai_given: determine AI was given or not at this day
 			manure: manure production this day
 			feed: feed comsumption this day
-	'''
-	def update(self, date): 
+		'''
 		ai_given = False		# True if ai is given at this date
 		calving = False			# True if a newborn at this date
 		milk_produced = 0		# Milk production for current date
@@ -390,13 +395,13 @@ class Holstein(Cow):
 		if (self.days_in_milk > 299) and not (self.is_preg()):
 			self.culled = True
 			self.cull_reason = "Cow no preg when DIM reaches 300"
-			self.cull_stat.append(date)	
+			self.cull_stat.append(date)
 			cull = True
 			self.events.append(cowEvent(date-self.birthday, 'culled: ' + self.cull_reason))
 			return cull, calving, milk_produced, ai_given, 0, 0
 
 		# if (self.is_milk()):
-			# culling with regression 
+			# culling with regression
 			# dim = self.days_in_milk + 1
 			# inv_culled = -3.5 - 0.28 * dim + 0.075 * dim ** 2 - 0.004 * dim ** 3 + 0.00001 * dim ** 4 - 0.000001 * dim ** 5
 			# prob = math.exp(inv_culled) / (1 + math.exp(inv_culled))
@@ -420,7 +425,7 @@ class Holstein(Cow):
 			mean_weight_inc = 0.77
 
 		if self.days_born <= 70:
-			# New born calves average daily gain 
+			# New born calves average daily gain
 			weight_increase = np.random.normal(mean_weight_inc, 0.02)
 		elif self.weight < 680 :
 			# Mature cows stop steady daily growth
@@ -479,7 +484,7 @@ class Holstein(Cow):
 			if (self.preg_days == 0):
 				ai_given = True
 				self.service_stat.append(date)
-			
+
 			# On the 32nd day, preg diagnosis #1
 			if (self.preg_days == 32):
 				rand = random.random()
@@ -567,7 +572,7 @@ class Holstein(Cow):
 					self.events.append(cowEvent(date-self.birthday, 'heifei died from birth'))
 				else:
 					self.events.append(cowEvent(date-self.birthday, 'heifei born'))
-				
+
 				# Involutary culling reason and date
 				inv_cull_rate = 0
 				if self.num_birth > 4:
@@ -630,7 +635,12 @@ class Holstein(Cow):
 
 		return cull, calving, milk_produced, ai_given, manure, feed
 
+	#Method: print_stat
 	def print_stat(self):
+		'''
+		Description:
+			Prints the Holstein's events and the date of each event.
+		'''
 		print('Date born: ', end='')
 		print(self.birthday, end='')
 		print('\n')
@@ -678,14 +688,3 @@ class Holstein(Cow):
 		# plt.figure('Cow ' + str(self.id) + ' milk production')
 		# plt.plot(self.milk_produced_stat)
 		# plt.show()
-
-
-
-
-
-
-
-
-		
-
-
