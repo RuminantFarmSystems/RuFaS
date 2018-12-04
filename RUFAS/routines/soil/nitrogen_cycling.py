@@ -33,15 +33,22 @@ def daily_nitrogen_update(soil, time, weather):
 #------------------------------------------------------------------------------
 # Function: daily_soil_nitrogen
 # Equations taken from SWAT 2009 documentation
-# We will simulate 3 organic N pools (Fresh, Active, Stable) and 2 inorganic
-# pools (NO3 and NH4).
-#
-# 1) Get current soil N Pools
-# 2) Mineralization and Decomposition
-# 3) Nitrification and Volatilization
-# 4) N loss in Leaching, runoff, and erosion
 #------------------------------------------------------------------------------
 def daily_soil_nitrogen(soil, jday, year, rainfall):
+    '''
+    Description:
+        We will simulate 3 organic N pools (Fresh, Active, Stable) and 2 inorganic
+        pools (NO3 and NH4).
+        1) Get current soil N Pools
+        2) Mineralization and Decomposition
+        3) Nitrification and Volatilization
+        4) N loss in Leaching, runoff, and erosion
+    Args:
+        soil: instance of the Soil class
+        jday:
+        year: the year from the instance of the Time class
+        rainfall: the rainfall from the instance of the Weather class
+    '''
 
     # FOR each soil layer
     for x in range(0, len(soil.listOfSoilLayers)):
@@ -343,6 +350,14 @@ def daily_soil_nitrogen(soil, jday, year, rainfall):
 # Updates the nitrogen pools in the soil for each layer
 #---------------------------------------------------------------------------
 def daily_soil_nitrogen_update(soil, jday, year, addedN):
+    '''
+    Description:
+        Updates the nitrogen pools in the soil for each layer.
+    Args:
+        soil: instance of the Soil class
+        jday:
+        year: the year field from the instance of the Year class
+    '''
 
     for x in range(0, len(soil.listOfSoilLayers)):
 

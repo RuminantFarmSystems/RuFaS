@@ -17,15 +17,15 @@ class Cow(object):
 
 	# Method: __init__
 	def __init__(self, mean, stv, cow_type, date, days_born=0):
-	'''
-	Initializes common parameters for all cows
-	Args:
-		mean: mean of new birth weight
-		stv: standard diviation of birth weight
-		cow_type: breed of the cow
-		date: the date of the simulation when the calf was born
-		days_born: age of the animal
-	'''
+		'''
+		Initializes common parameters for all cows
+		Args:
+			mean: mean of new birth weight
+			stv: standard diviation of birth weight
+			cow_type: breed of the cow
+			date: the date of the simulation when the calf was born
+			days_born: age of the animal
+		'''
 		self.weight = np.random.normal(mean, stv)
 		self.days_born = days_born
 		self.type = cow_type
@@ -52,32 +52,32 @@ class Cow(object):
 
 	# Method: sold
 	def sold(self):
-	'''
-	Checks if the cow is sold (male calves will be sold)
+		'''
+		Checks if the cow is sold (male calves will be sold)
 
-	Returns
-		True/False value indicating if sold
-	'''
+		Returns
+			True/False value indicating if sold
+		'''
 		return self.sex == 'M'
 
 	# Method: is_culled
 	def is_culled(self):
-	'''
-	Check if the the cow is culled
+		'''
+		Check if the the cow is culled
 
-	Returns:
-		True/False value inidicating if culled
-	'''
+		Returns:
+			True/False value inidicating if culled
+		'''
 		return self.culled
 
 	# Method: is_preg
 	def is_preg(self):
-	'''
-	Checks if the the cow is pregnant
+		'''
+		Checks if the the cow is pregnant
 
-	Returns:
-		True/False value indicating pregnancy
-	'''
+		Returns:
+			True/False value indicating pregnancy
+		'''
 		if (self.preg_days == -12):
 			return False
 		else:
@@ -85,12 +85,12 @@ class Cow(object):
 
 	# Method: is_milk
 	def is_milk(self):
-	'''
-	Checks if the the cow is in milk
+		'''
+		Checks if the the cow is in milk
 
-	Returns:
-		True/False value indicating if milking
-	'''
+		Returns:
+			True/False value indicating if milking
+		'''
 		if (self.days_in_milk == -1):
 			return False
 		else:
@@ -98,16 +98,16 @@ class Cow(object):
 
 	# Method: update
 	def update(self, weight_increase):
-	'''
-	Updates common daily information for each cow
+		'''
+		Updates common daily information for each cow
 
-	Args:
-		weight_increase: number for average daily gain
+		Args:
+			weight_increase: number for average daily gain
 
-	Returns:
-		manure: number for the daily production of manure
-		feed: number for the daily consumption of feed
-	'''
+		Returns:
+			manure: number for the daily production of manure
+			feed: number for the daily consumption of feed
+		'''
 		feed = self.weight * 0.03
 		manure = 0.06 * self.weight
 

@@ -9,25 +9,25 @@ mpl.use('TkAgg')
 
 class Herd():
     def __init__(self, input_herd_data):
-    '''
-    Initializes summary variables:
-        cull_num: numbers of cows culled in this simulation
-        new_born_num: numbers of cows born in this simulation
-        new_born_sold_num: numbers of newborns (male calves) sold in this simulation
-        total_milk_prod: total milk production in the simulation
-        total_manure: total manure production in the simulation
-        total_feed: total feed used in the simulation
-        ai_num: times of services in this simulation
-        preg_num: number of pregnancy in the whole simulation
-        milk_num: number of lactation in the whole simulation
+        '''
+        Initializes summary variables:
+            cull_num: numbers of cows culled in this simulation
+            new_born_num: numbers of cows born in this simulation
+            new_born_sold_num: numbers of newborns (male calves) sold in this simulation
+            total_milk_prod: total milk production in the simulation
+            total_manure: total manure production in the simulation
+            total_feed: total feed used in the simulation
+            ai_num: times of services in this simulation
+            preg_num: number of pregnancy in the whole simulation
+            milk_num: number of lactation in the whole simulation
 
-        cow_num: number of cows at the beginning of the simulation
-        days: how long the simulation lasts
+            cow_num: number of cows at the beginning of the simulation
+            days: how long the simulation lasts
 
-    Args:
-        input_herd_data : dictionary which stores all of the necessary
-            information for a Herd object.
-    '''
+        Args:
+            input_herd_data : dictionary which stores all of the necessary
+                information for a Herd object.
+        '''
         self.cow_num = input_herd_data["cow_num"]
         self.cows = [] #list of the Cow objects
         self.cull_lst = []  # num of cows culled per day
