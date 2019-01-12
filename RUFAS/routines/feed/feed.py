@@ -14,11 +14,20 @@ from RUFAS import util
 class Feed():
     '''
     TODO: Add DocString
+    Description: Sorts all feeds by the contraints set in the Linear Program of rations.py
+
+    Args: No arguments
     '''
 
     def __init__(self, data):
         '''
         TODO: Add DocString
+        Description: This method takes the data specified in the feed Library
+        populates the array available_feeds and loops through the keys of the
+        array to sort them by the requirements set in the linear program.
+
+        Args: self: references current instance of class Feed and is the first
+        argument of every class method.
         '''
         # The feed library contains all the types of feed described in the input
         # csv file specified for "feed_library" in the input json file.
@@ -72,5 +81,10 @@ class Feed():
     def annual_reset(self):
         '''
         TODO: Add DocString
+        Description: This method resets the data in the available_feeds array
+        for another cycle.
+
+        Args: self: references current instance of class Feed and is the first
+        argument of every class method.
         '''
         pass
