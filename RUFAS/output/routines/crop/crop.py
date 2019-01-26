@@ -87,8 +87,15 @@ from RUFAS import util
 # Function: daily_crop_routine
 #-------------------------------------------------------------------------------
 def daily_crop_routine(crop, weather, time, soil):
-    '''
-    TODO: Add DocString
+    '''Creates local variables for the min and max weather
+    for the specified day given, updates field croplist in
+    object crop
+
+    Args:
+        crop: an object of class Crop (from class.py)
+        weather: an object of class Weather (from classes.py)
+        time: an object of class Time (from classes.py)
+        soil: an object of class Soil (from soil.py)
     '''
 
     T_min = weather.T_min[time.year-1][time.day-1]
@@ -100,7 +107,7 @@ def daily_crop_routine(crop, weather, time, soil):
         '''
         Load input values to represent input from other modules.
         This will need to be removed eventually because the crop module will
-        get this information from the other modules instead of from an input file. 
+        get this information from the other modules instead of from an input file.
         This is just for isolating and testing the calculations of the crop module.
         '''
         # timeIndex = (time.year -1)*365 + time.day -1
@@ -148,8 +155,12 @@ def daily_crop_routine(crop, weather, time, soil):
 # Function: annual_crop_routine
 #-------------------------------------------------------------------------------
 def annual_crop_routine(crop, weather, time):
-    '''
-    TODO: Add DocString
+    '''Updates the crops in crop_list by setting the start day of
+    the harvest to the planting date
+        Args:
+            crop: an object of class Crop (from crop.py)
+            weather: an object of class Weather (from classes.py)
+            time: an object of class Time (from classes.py)
     '''
 
     for _,crop_type in crop.crops_list.items():
@@ -160,12 +171,17 @@ def annual_crop_routine(crop, weather, time):
 #-------------------------------------------------------------------------------
 class Crop():
     '''
-    TODO: Add DocString
+    An object that contains information on the crop from the list
     '''
 
     def __init__(self, data):
         '''
-        TODO: Add DocString
+        Description:
+            Constructs an instance of the Crop class by populating an list
+            of values
+
+        Args:
+            data: the information from the json input file
         '''
 
         self.crops_list = {crop_type: self.CropType(data[crop_type]) for crop_type in data.keys()}
@@ -193,7 +209,7 @@ class Crop():
 
             #===================================================================
             ''' HEAT UNIT DATA '''
-           
+
             # Inputs
             self.T_base_min = data['min_temp_for_growth']
             self.T_base_max = data['max_temp_for_growth']
@@ -202,14 +218,14 @@ class Crop():
             # Internally calculated inputs
             self.accumulated_HU = 0.0
             self.prev_accumulated_HU = 0.0
-            
+
             # Outputs
             self.fr_PHU = 0.0
             self.prev_fr_PHU = 0.0
-            
+
             #===================================================================
             ''' LEAF AREA INDEX (LAI) DATA '''
-            
+
             # Inputs
             self.fr_PHU_1 = data['fr_PHU_1']
             self.fr_PHU_2 = data['fr_PHU_2']
@@ -217,31 +233,31 @@ class Crop():
             self.fr_LAI_2 = data['fr_LAI_2']
             self.fr_PHU_sen = data['fr_PHU_sen']
             self.LAI_max = data['LAI_max']
-            
+
             # Internally calculated inputs
             self.prev_fr_LAI_max = 0
             self.fr_LAI_max = 0
-            
+
             # Outputs
             self.prev_LAI_actual = 0
             self.LAI_actual = 0
-            
+
             #===================================================================
             ''' ROOT DEPTH DATA '''
-            
+
             # Inputs
             self.z_root_max = data['z_root_max'] # maximum depth of root development
 
             # Internally calculated inputs
             self.fr_root = 0
-            
+
             # Outputs
             self.z_root = 0
             self.prev_z_root = 0
-            
+
             #===================================================================
             ''' BIOMASS DATA '''
-            
+
             # Inputs
             self.kl = data['light extinction coefficient']
             self.RUE = data['radiation_use_efficiency']
@@ -251,11 +267,11 @@ class Crop():
             self.gamma_reg = 0
             self.dBiomass_max = 0
             self.dBiomass_actual = 0.0
-            
+
             # Outputs
             self.biomass_actual = 0
             self.prev_biomass_actual = 0
-            
+
             #===================================================================
             ''' Soil Water Uptake Data '''
 
