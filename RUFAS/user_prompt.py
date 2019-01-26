@@ -12,6 +12,7 @@ from pathlib import Path
 
 from RUFAS import util
 from RUFAS import errors
+import fileReader
 
 #-------------------------------------------------------------------------------
 # Function: input_prompt
@@ -35,7 +36,7 @@ def input_prompt():
             files from which the program will draw data for the simulation.
             The list could contain only 1 or multiple paths.
     '''
-    
+
     print("\nSingle Simulation:\n\t" +
                 "Enter a json file name\n" +
           "Batch Simulation:\n\t" +
@@ -46,7 +47,7 @@ def input_prompt():
                 "Enter \'Q\' or \'q\'")
 
     while(True):
-        
+
         try:
             user_input = input("\nEnter RUFAS Input: ")
 
@@ -56,16 +57,28 @@ def input_prompt():
             if user_input.upper() == 'Q':
                 print("Exiting RUFAS...")
                 sys.exit()
-            
+
             #
             # Handle print base directory
             #
             elif user_input.lower() == 'dir':
                 print(str(util.get_base_dir()))
                 continue
-            
+
             input_path = Path(user_input.strip())
-            
+
+            #
+            # Handle commented json text file input
+            #
+            if input_path.suffix == '.txt':
+                if not input_path.is_file():
+                    raise errors.UserInput("Specified file does not exist")
+                else:
+                    print("commented json file detected, stripping comments...\n")
+                json_filename = fileReader.convert_to_json(str(input_path))
+                json_path = Path(json_filename.strip())
+                return [json_path]
+
             #
             # Handle single json file input
             #
@@ -75,7 +88,7 @@ def input_prompt():
                 else:
                     print("json file Detected...\n")
                 return [input_path]
-                
+
             #
             # Handle directory of json files input
             #
@@ -88,15 +101,15 @@ def input_prompt():
                 else:
                     print(str(len(path_list)) + " json files detected...\n")
                     return path_list
-            
+
             #
             # Handle bad inputs
             #
             else:
                 raise errors.UserInput("Invalid Input")
-          
+
         #
         # Handles bad user inputs, prints out error messages
-        #      
+        #
         except errors.UserInput as e:
                 print(e.msg)
