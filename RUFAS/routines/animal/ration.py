@@ -82,6 +82,87 @@ def optimize(feed, rqmts):
                          "minimize", "RATION", lower_bounds, upper_bounds)
 
 
+def new_calculate_rqmts(BW, BCS, CBW, CI, CP_Milk, DOP, DHD, DPVD, DIM,
+                        Fat_Milk, Lactose_Milk, Milk, parity):
+    '''
+    Calculate the dietary requirements of the cows. These values are used
+    on the RHS of the linear program. Each calculation has a reference to the
+    respective calculation in the pseudocode.
+
+	Args:
+        BW: body weight, kg
+        BCS: body condition score, 1 to 5
+        CBW: calf birth weight, kg
+        CI: calving inerval, days
+        CP_Milk: milk crude protein content
+        DOP: days of pregnancy, days
+        DHD: daily horizontal distance, km
+        DPVD: daily positive vertical distance, km
+        DIM: days in milk, days
+        Fat_Milk: milk fat content
+        Lactose_Milk: milk lactose content
+        Milk: milk production, kg
+        parity: number of times birth was given
+
+    Returns:
+        # TODO
+    '''
+
+    #ENERGY REQUIREMENTS (divided into the following 5 components: maintenance,
+    #lactation, activity, pregnancy, and body weight change requirements):
+
+    #Maintenance requirements
+    #------------------------
+    #Ideal Body Weight, kg (A.ER.1.2)
+    IBW = BW / (0.65 + 0.1 * BCS)
+    #Net Energy maintenance, Mcal (A.ER.1.1)
+    NEm = 0.10 * IBW ** 0.75
+
+    #Lactation requirements
+    #----------------------
+    #Net Energy lactation, Mcal (A.ER.2.1)
+    NEl = 9.29 * Milk * Fat_Milk + 5.5 * Milk * CP_Milk + 3.95 * Milk * Lactose_Milk
+
+    #Activity requirements
+    #---------------------
+    #Net Energy activity, Mcal (A.ER.3.1)
+    Neact = (DOP * 0.35 * BW + DPVD * 5 * BW) / 1000
+
+    #Pregnancy energy requirements
+    #-----------------------------
+    #Net Energy pregnancy, Mcal (A.ER.4.1)
+    if DOP < 190:
+        NEpreg = 0
+    elif DOP >= 190 and DOP <= 279:
+        NEpreg = ((0.00318 * DOP - 0.0352) * (CBW / 45)) / 0.218
+    else:
+        NEpreg = ((0.00318 * 279 - 0.0352) * (CBW / 45)) / 0.218
+
+    #Body Weight change requirements
+    #-------------------------------
+    #Target Calving Weight, kg (A.ER.5.1)
+    if parity == 1:
+        TCW = 700 * 0.85
+    elif parity == 2:
+        TCW = 700 * 0.92
+    elif parity == 3:
+        TCW = 700 * 0.96
+    elif parity > 3:
+        TCW = 700 * 1
+    #Body weight change (delta body weight = DBW), kg (A.ER.5.4)
+    DBW = (TCW - 0.94 * BW) / (280 - CI + DOP)
+    #Net Energy body weight, Mcal (A.ER.5.5)
+    if DBW > 0:
+        NEbw = DBW * 6.7 * 0.88
+    else:
+        NEbw = DBW * 6.7 * 0.85
+
+    #Total energy requirements, mCal (A.ER.6.1)
+    TNEL = NEm + Nel + NEact + NEpreg + NEbw
+
+    #FEED INTAKE
+    #
+
 # -------------------------------------------------------------------------------
 # Function: Calculate the dietary requirements of the cows. These values are used
 #           on the RHS of the linear program.
