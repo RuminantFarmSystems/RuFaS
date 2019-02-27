@@ -161,7 +161,30 @@ def new_calculate_rqmts(BW, BCS, CBW, CI, CP_Milk, DOP, DHD, DPVD, DIM,
     TNEL = NEm + Nel + NEact + NEpreg + NEbw
 
     #FEED INTAKE
-    #
+    #Dry Matter Intake, kg (A.FI.1.1)
+    if DIM > 100:
+        DMI = 2.58 + 0.30 * NEl + 0.027 * BW + 0.05 * DBW - 1.15 * BCS
+    else:
+        DMI = (2.58 + 0.30 * NEl + 0.027 * BW) * (1 - exp(-0.192 * ((DIM + 3.5)/ 7 + 3.67)))
+
+    #Fiber Intake Capacity, Fiber Units/day (A.FI.2.2)
+    if parity == 1:
+        FIC = 0.338 * (WIM + 3) ** 0.588 * exp(-0.0277 * (WIM + 3))
+    else:
+        FIC = 0.564 * (WIM + 0.857) ** 0.36 * exp(-0.0186 * (WIM + 0.857))
+    #Maximum Fiber Intake (A.FI.2.3)
+    FIMax = 0.01025 * BW * FIC
+
+    RU_min = 0
+
+    nutrient_rqmts = [
+        {'op': '<=', 'val': FIMax},
+        {'op': '>=', 'val': RU_min},
+        {'op': '>=', 'val': TNEL}
+    ]
+
+    return dict(zip(nutrients_list, nutrient_rqmts))
+
 
 # -------------------------------------------------------------------------------
 # Function: Calculate the dietary requirements of the cows. These values are used
