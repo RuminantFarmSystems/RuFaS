@@ -82,8 +82,8 @@ def optimize(feed, rqmts):
                          "minimize", "RATION", lower_bounds, upper_bounds)
 
 
-def new_calculate_rqmts(BW, BCS, CBW, CI, CP_Milk, DOP, DHD, DPVD, DIM,
-                        Fat_Milk, Lactose_Milk, Milk, parity):
+def new_calculate_rqmts(BW, BCS, CBW, CI, concentrate, CP_Milk, DOP, DHD, DVD,
+                        DIM, fat_milk, lactose_milk, milk, parity, type):
     '''
     Calculate the dietary requirements of the cows. These values are used
     on the RHS of the linear program. Each calculation has a reference to the
@@ -94,15 +94,17 @@ def new_calculate_rqmts(BW, BCS, CBW, CI, CP_Milk, DOP, DHD, DPVD, DIM,
         BCS: body condition score, 1 to 5
         CBW: calf birth weight, kg
         CI: calving inerval, days
+        concentrate: concentrate supplementation when farming type is "Pasture", kg
         CP_Milk: milk crude protein content
         DOP: days of pregnancy, days
         DHD: daily horizontal distance, km
-        DPVD: daily positive vertical distance, km
+        DVD: daily vertical distance, km
         DIM: days in milk, days
-        Fat_Milk: milk fat content
-        Lactose_Milk: milk lactose content
-        Milk: milk production, kg
+        fat_milk: milk fat content
+        lactose_milk: milk lactose content
+        milk: milk production, kg
         parity: number of times birth was given
+        type: farming type, "Barn" or "Pasture"
 
     Returns:
         # TODO
@@ -121,12 +123,15 @@ def new_calculate_rqmts(BW, BCS, CBW, CI, CP_Milk, DOP, DHD, DPVD, DIM,
     #Lactation requirements
     #----------------------
     #Net Energy lactation, Mcal (A.ER.2.1)
-    NEl = 9.29 * Milk * Fat_Milk + 5.5 * Milk * CP_Milk + 3.95 * Milk * Lactose_Milk
+    NEl = 9.29 * milk * fat_milk + 5.5 * milk * CP_Milk + 3.95 * milk * lactose_milk
 
     #Activity requirements
     #---------------------
     #Net Energy activity, Mcal (A.ER.3.1)
-    Neact = (DOP * 0.35 * BW + DPVD * 5 * BW) / 1000
+    if type == "Barn":
+        Neact = (DHD * 0.35 * BW + DVD * 5 * BW) / 1000
+    elif type == "Pasture":
+        Neact = (DHD * 0.35 * BW + DVD * 5 * BW + 10 * BW ** 0.75 * ((600 - 12 * concentrate) / 600)) / 1000
 
     #Pregnancy energy requirements
     #-----------------------------
@@ -161,11 +166,11 @@ def new_calculate_rqmts(BW, BCS, CBW, CI, CP_Milk, DOP, DHD, DPVD, DIM,
     TNEL = NEm + Nel + NEact + NEpreg + NEbw
 
     #FEED INTAKE
-    #Dry Matter Intake, kg (A.FI.1.1)
+    #Dry Matter Intake estimation, kg (A.FI.1.1)
     if DIM > 100:
-        DMI = 2.58 + 0.30 * NEl + 0.027 * BW + 0.05 * DBW - 1.15 * BCS
+        DMIest = 2.58 + 0.30 * NEl + 0.027 * BW + 0.05 * DBW - 1.15 * BCS
     else:
-        DMI = (2.58 + 0.30 * NEl + 0.027 * BW) * (1 - exp(-0.192 * ((DIM + 3.5)/ 7 + 3.67)))
+        DMIest = (2.58 + 0.30 * NEl + 0.027 * BW) * (1 - exp(-0.192 * ((DIM + 3.5)/ 7 + 3.67)))
 
     #Fiber Intake Capacity, Fiber Units/day (A.FI.2.2)
     if parity == 1:
@@ -175,12 +180,26 @@ def new_calculate_rqmts(BW, BCS, CBW, CI, CP_Milk, DOP, DHD, DPVD, DIM,
     #Maximum Fiber Intake (A.FI.2.3)
     FIMax = 0.01025 * BW * FIC
 
+    #PROTEIN REQUIREMENTS - temporarily based on IFSM, will be replaced with NRC
+    #Metabolize protein required for maintenance per day, g (A.PR.1.1)
+    MPM = 3.8 * (0.96 * BW) ** 0.75
+    #Metabolize protein required for lactation per day, g (A.PR.2.1)
+    MPMLK = 10 * CP_Milk * milk / 0.65
+    #Microbial crude protein, kg (A.PR.3.1)
+    MCP = 0.13 * 0.51 * DMIest
+    #Rumen degradable (RDPreq, kg) and undegradable protein (RUPreq, kg) requirements
+    RDPreq = MCP / 0.9 #(A.PR.3.2)
+    MPreq = MPM + MPMLK #(A.PR.3.3)
+    RUPreq = MPreq / 1000 - 0.8 * 0.8 * MCP #(A.PR.3.4)
+
     RU_min = 0
 
     nutrient_rqmts = [
-        {'op': '<=', 'val': FIMax},
-        {'op': '>=', 'val': RU_min},
-        {'op': '>=', 'val': TNEL}
+        {'op': '<=', 'val': FIMax}, #(A.LP.2.1)
+        {'op': '>=', 'val': RU_min}, #(A.LP.2.2)
+        {'op': '>=', 'val': TNEL / 0.68}, #(A.LP.2.3)
+        {'op': '>=', 'val': RDPreq}, #(A.LP.2.4)
+        {'op': '>=', 'val': RUPreq} #(A.LP.2.5)
     ]
 
     return dict(zip(nutrients_list, nutrient_rqmts))
