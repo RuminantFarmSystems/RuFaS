@@ -82,6 +82,129 @@ def optimize(feed, rqmts):
                          "minimize", "RATION", lower_bounds, upper_bounds)
 
 
+def new_calculate_rqmts(BW, BCS, CBW, CI, concentrate, CP_Milk, DOP, DHD, DVD,
+                        DIM, fat_milk, lactose_milk, milk, parity, type):
+    '''
+    Calculate the dietary requirements of the cows. These values are used
+    on the RHS of the linear program. Each calculation has a reference to the
+    respective calculation in the pseudocode.
+
+	Args:
+        BW: body weight, kg
+        BCS: body condition score, 1 to 5
+        CBW: calf birth weight, kg
+        CI: calving inerval, days
+        concentrate: concentrate supplementation when farming type is "Pasture", kg
+        CP_Milk: milk crude protein content
+        DOP: days of pregnancy, days
+        DHD: daily horizontal distance, km
+        DVD: daily vertical distance, km
+        DIM: days in milk, days
+        fat_milk: milk fat content
+        lactose_milk: milk lactose content
+        milk: milk production, kg
+        parity: number of times birth was given
+        type: farming type, "Barn" or "Pasture"
+
+    Returns:
+        # TODO
+    '''
+
+    #ENERGY REQUIREMENTS (divided into the following 5 components: maintenance,
+    #lactation, activity, pregnancy, and body weight change requirements):
+
+    #Maintenance requirements
+    #------------------------
+    #Ideal Body Weight, kg (A.ER.1.2)
+    IBW = BW / (0.65 + 0.1 * BCS)
+    #Net Energy maintenance, Mcal (A.ER.1.1)
+    NEm = 0.10 * IBW ** 0.75
+
+    #Lactation requirements
+    #----------------------
+    #Net Energy lactation, Mcal (A.ER.2.1)
+    NEl = 9.29 * milk * fat_milk + 5.5 * milk * CP_Milk + 3.95 * milk * lactose_milk
+
+    #Activity requirements
+    #---------------------
+    #Net Energy activity, Mcal (A.ER.3.1)
+    if type == "Barn":
+        Neact = (DHD * 0.35 * BW + DVD * 5 * BW) / 1000
+    elif type == "Pasture":
+        Neact = (DHD * 0.35 * BW + DVD * 5 * BW + 10 * BW ** 0.75 * ((600 - 12 * concentrate) / 600)) / 1000
+
+    #Pregnancy energy requirements
+    #-----------------------------
+    #Net Energy pregnancy, Mcal (A.ER.4.1)
+    if DOP < 190:
+        NEpreg = 0
+    elif DOP >= 190 and DOP <= 279:
+        NEpreg = ((0.00318 * DOP - 0.0352) * (CBW / 45)) / 0.218
+    else:
+        NEpreg = ((0.00318 * 279 - 0.0352) * (CBW / 45)) / 0.218
+
+    #Body Weight change requirements
+    #-------------------------------
+    #Target Calving Weight, kg (A.ER.5.1)
+    if parity == 1:
+        TCW = 700 * 0.85
+    elif parity == 2:
+        TCW = 700 * 0.92
+    elif parity == 3:
+        TCW = 700 * 0.96
+    elif parity > 3:
+        TCW = 700 * 1
+    #Body weight change (delta body weight = DBW), kg (A.ER.5.4)
+    DBW = (TCW - 0.94 * BW) / (280 - CI + DOP)
+    #Net Energy body weight, Mcal (A.ER.5.5)
+    if DBW > 0:
+        NEbw = DBW * 6.7 * 0.88
+    else:
+        NEbw = DBW * 6.7 * 0.85
+
+    #Total energy requirements, mCal (A.ER.6.1)
+    TNEL = NEm + Nel + NEact + NEpreg + NEbw
+
+    #FEED INTAKE
+    #Dry Matter Intake estimation, kg (A.FI.1.1)
+    if DIM > 100:
+        DMIest = 2.58 + 0.30 * NEl + 0.027 * BW + 0.05 * DBW - 1.15 * BCS
+    else:
+        DMIest = (2.58 + 0.30 * NEl + 0.027 * BW) * (1 - exp(-0.192 * ((DIM + 3.5)/ 7 + 3.67)))
+
+    #Fiber Intake Capacity, Fiber Units/day (A.FI.2.2)
+    if parity == 1:
+        FIC = 0.338 * (WIM + 3) ** 0.588 * exp(-0.0277 * (WIM + 3))
+    else:
+        FIC = 0.564 * (WIM + 0.857) ** 0.36 * exp(-0.0186 * (WIM + 0.857))
+    #Maximum Fiber Intake (A.FI.2.3)
+    FIMax = 0.01025 * BW * FIC
+
+    #PROTEIN REQUIREMENTS - temporarily based on IFSM, will be replaced with NRC
+    #Metabolize protein required for maintenance per day, g (A.PR.1.1)
+    MPM = 3.8 * (0.96 * BW) ** 0.75
+    #Metabolize protein required for lactation per day, g (A.PR.2.1)
+    MPMLK = 10 * CP_Milk * milk / 0.65
+    #Microbial crude protein, kg (A.PR.3.1)
+    MCP = 0.13 * 0.51 * DMIest
+    #Rumen degradable (RDPreq, kg) and undegradable protein (RUPreq, kg) requirements
+    RDPreq = MCP / 0.9 #(A.PR.3.2)
+    MPreq = MPM + MPMLK #(A.PR.3.3)
+    RUPreq = MPreq / 1000 - 0.8 * 0.8 * MCP #(A.PR.3.4)
+
+    RU_min = 0
+
+    nutrient_rqmts = [
+        {'op': '<=', 'val': FIMax}, #(A.LP.2.1)
+        {'op': '>=', 'val': RU_min}, #(A.LP.2.2)
+        {'op': '>=', 'val': TNEL / 0.68}, #(A.LP.2.3)
+        {'op': '>=', 'val': RDPreq}, #(A.LP.2.4)
+        {'op': '>=', 'val': RUPreq} #(A.LP.2.5)
+    ]
+
+    return dict(zip(nutrients_list, nutrient_rqmts))
+
+
 # -------------------------------------------------------------------------------
 # Function: Calculate the dietary requirements of the cows. These values are used
 #           on the RHS of the linear program.
