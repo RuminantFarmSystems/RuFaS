@@ -87,11 +87,14 @@ from RUFAS import util
 # Function: daily_crop_routine
 #-------------------------------------------------------------------------------
 def daily_crop_routine(crop, weather, time, soil):
+    '''
+    TODO: Add DocString
+    '''
 
     T_min = weather.T_min[time.year-1][time.day-1]
     T_max = weather.T_max[time.year-1][time.day-1]
 
-    for _, crop_type in crop.crops_list.items():
+    for _,crop_type in crop.crops_list.items():
 
 #------------------------------------------------------------------------------
         '''
@@ -126,17 +129,17 @@ def daily_crop_routine(crop, weather, time, soil):
         #
         heat_units.update_all(crop_type, T_min, T_max, time)
 
-        leaf_area_index.update_all(crop_type, time)
-
-        root_development.update_all(crop_type, time)
-
         soil_water_uptake.update_all(crop_type, soil, time)
 
         biomass.update_all(crop_type, time, weather, soil)
 
+        leaf_area_index.update_all(crop_type, time)
+
         phosphorus_uptake.update_all(crop_type, soil, time)
 
         nitrogen_uptake.update_all(crop_type, soil, time)
+
+        root_development.update_all(crop_type, time)
 
         yields.update_all(crop_type, time, soil)
 
@@ -145,6 +148,9 @@ def daily_crop_routine(crop, weather, time, soil):
 # Function: annual_crop_routine
 #-------------------------------------------------------------------------------
 def annual_crop_routine(crop, weather, time):
+    '''
+    TODO: Add DocString
+    '''
 
     for _,crop_type in crop.crops_list.items():
         crop_type.calculate_start_growth_day(weather.T_avg[time.year-1])
@@ -153,8 +159,15 @@ def annual_crop_routine(crop, weather, time):
 # Class: Crop
 #-------------------------------------------------------------------------------
 class Crop():
+    '''
+    TODO: Add DocString
+    '''
 
     def __init__(self, data):
+        '''
+        TODO: Add DocString
+        '''
+
         self.crops_list = {crop_type: self.CropType(data[crop_type]) for crop_type in data.keys()}
 
     #---------------------------------------------------------------------------
@@ -163,6 +176,10 @@ class Crop():
     class CropType():
 
         def __init__(self, data):
+            '''
+            TODO: Add DocString
+            '''
+
             '''GENERAL PLANT INFO'''
 
             self.crop_name = data['crop_name']
@@ -213,7 +230,7 @@ class Crop():
             ''' ROOT DEPTH DATA '''
             
             # Inputs
-            self.z_root_max = data['z_root_max']  # maximum depth of root development
+            self.z_root_max = data['z_root_max'] # maximum depth of root development
 
             # Internally calculated inputs
             self.fr_root = 0
@@ -340,9 +357,13 @@ class Crop():
         # Method: calculate_start_growth_day
         #-----------------------------------------------------------------------
         def calculate_start_growth_day(self, T_avg):
+            '''
+            TODO: Add DocString
+            '''
+
             if self.crop_type == "annual":
                 self.start_day = self.planting_date
-            else:
+            else: # crop_type == "perennial"
                 for d in range(len(T_avg)):
                     if T_avg > self.T_base_min:
                         self.start_day = d
@@ -352,6 +373,9 @@ class Crop():
     # Method: annual_reset
     #---------------------------------------------------------------------------
     def annual_reset(self):
+        '''
+        TODO: Add DocString
+        '''
         for _, crop_type in self.crops_list.items():
             crop_type.accumulated_HU = 0
             crop_type.prev_accumulated_HU = 0

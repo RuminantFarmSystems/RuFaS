@@ -56,7 +56,7 @@ def update_all(crop_type, soil, time):
 # Calculates the maximum potential water uptake from each soil layer and
 # returns these values in a list ordered shallow to deep. The soil layers
 # in soil.listOfSoilLayers should already be in this order.
-# "pseudocode_SC_wateruptake.docx" section 2.B.2
+# "Pseudo code_SC_Water Uptake_1.0.docx" section 2.B.2
 #
 def calc_max_water_uptake_each_layer(crop_type, soil):
     upper_boundary_uptake = 0
@@ -76,13 +76,13 @@ def calc_max_water_uptake_each_layer(crop_type, soil):
 #
 # Calculates potential water uptake from the soil surface to a specified depth
 # z (mm H2O).
-# "pseudocode_SC_wateruptake.docx" section 2.B.1
+# "Pseudo code_SC_Water Uptake_1.0.docx" section 2.B.1
 #
 def calc_max_water_uptake_z(crop_type, soil, z):
     if crop_type.z_root == 0:
         return 0
     else:
-        term1 = soil.Etrans / (1 - exp(-1*crop_type.beta_w))
+        term1 = soil.Etrans  / (1 - exp(-1*crop_type.beta_w))
         term2 = 1 - exp(-1*crop_type.beta_w * z / crop_type.z_root)
         return term1 * term2
 
@@ -94,7 +94,7 @@ def calc_max_water_uptake_z(crop_type, soil, z):
 # allowed to compensate by increasing their potential uptake.
 # This function takes in the initially calculated potential uptakes, and returns
 # a list of adjusted potential uptakes that compensate for this situation.
-# "pseudocode_SC_wateruptake.docx" section 2.C.1
+# "Pseudo code_SC_Water Uptake_1.0.docx" section 2.C.1
 #
 def inc_lower_layer_uptake(crop_type, soil, uptake_each_layer):
     # Sum of potential uptake for layers above current layer
@@ -117,8 +117,7 @@ def inc_lower_layer_uptake(crop_type, soil, uptake_each_layer):
         water_uptake_above += adjusted_uptake
         water_avail_above += layer.currentSoilWaterMM
         water_demand = water_uptake_above - water_avail_above
-        if water_demand < 0:
-            water_demand = 0
+        if water_demand < 0 : water_demand = 0
 
     return adjusted_uptakes
 
@@ -128,7 +127,7 @@ def inc_lower_layer_uptake(crop_type, soil, uptake_each_layer):
 # resulting in a decrease in the efficiency of uptake. This function takes in
 # a list of potential uptakes, and returns a list of adjusted potential uptakes
 # that compensate for this situation.
-# "pseudocode_SC_wateruptake.docx" section 2.C.2
+# "Pseudo code_SC_Water Uptake_1.0.docx" section 2.C.2
 #
 def decrease_effic_of_uptake(soil, uptake_each_layer):
     adjusted_uptakes = []
@@ -136,12 +135,12 @@ def decrease_effic_of_uptake(soil, uptake_each_layer):
     for uptake, layer in zip(uptake_each_layer, soil.listOfSoilLayers):
         # Point at which plant available water in soil layer begins to limit
         # efficiency of plant uptake (mm H2O)
-        AWC_limit = 0.25 * (layer.fcWater - layer.wiltingWater) + layer.wiltingWater
+        AWC = 0.25 * (layer.fcWater - layer.wiltingWater) + layer.wiltingWater
 
-        if layer.currentSoilWaterMM > AWC_limit:
+        if layer.currentSoilWaterMM > AWC:
             adjusted_uptakes.append(uptake)
         else:
-            inside_exp = 5 * ((layer.currentSoilWaterMM / AWC_limit) - 1)
+            inside_exp = 5 * (layer.currentSoilWaterMM / AWC  -  1)
             adjusted_uptake = uptake * exp(inside_exp)
             adjusted_uptakes.append(adjusted_uptake)
 
@@ -151,7 +150,7 @@ def decrease_effic_of_uptake(soil, uptake_each_layer):
 #
 # Calculates the actual water uptake by the plant. It uses this value to
 # update Et_actual and water_actual_up.
-# "pseudocode_SC_wateruptake.docx" section 2.D
+# "Pseudo code_SC_Water Uptake_1.0.docx" section 2.D
 #
 def calc_act_water_uptake(crop_type, soil, adj_uptakes, time):
     act_uptake_each_layer = []
