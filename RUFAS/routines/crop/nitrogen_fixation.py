@@ -26,7 +26,7 @@ CropType attribute definitions:
 
 #
 # Calculates the amount of nitrogen added to the plant biomass by fixation.
-# "pseudocode_SC_nitrogenuptake.docx" section 3.D.6
+# "Pseudo code_SC_NitrogenUptake_1.0.docx" section 3.D.6
 #
 def calc_N_fixation(crop_type, soil):
     # Check if this crop can form symbiotic nitrogen fixation associations
@@ -46,7 +46,7 @@ def calc_N_fixation(crop_type, soil):
 # Determines the soil layer of lowest depth that is accessible to root
 # biomass. Returns a list containing all of the soil layers accessible
 # to root biomass.
-# "pseudocode_SC_nitrogenuptake.docx" section 3.D.1
+# "Pseudo code_SC_NitrogenUptake_1.0.docx" section 3.D.1
 #
 def get_root_accessible_layers(crop_type, soil):
     accessible_layers = []
@@ -64,7 +64,7 @@ def get_root_accessible_layers(crop_type, soil):
 
 #
 # Calculates growth stage factor.
-# "pseudocode_SC_nitrogenuptake.docx" section 3.D.2
+# "Pseudo code_SC_NitrogenUptake_1.0.docx" section 3.D.2
 #
 def calc_f_gr(crop_type):
     fr_PHU = crop_type.fr_PHU
@@ -82,7 +82,7 @@ def calc_f_gr(crop_type):
 
 #
 # Calculates soil nitrate factor.
-# "pseudocode_SC_nitrogenuptake.docx" section 3.D.3
+# "Pseudo code_SC_NitrogenUptake_1.0.docx" section 3.D.3
 #
 def calc_f_NO3(accessible_layers):
     NO3_root = sum([layer.NO3 for layer in accessible_layers])
@@ -96,7 +96,7 @@ def calc_f_NO3(accessible_layers):
 
 #
 # Calculates soil water factor.
-# "pseudocode_SC_nitrogenuptake.docx" section 3.D.4
+# "Pseudo code_SC_NitrogenUptake_1.0.docx" section 3.D.4
 #
 def calc_f_sw(accessible_layers):
     SW_root = sum([layer.currentSoilWaterMM for layer in accessible_layers])
@@ -110,11 +110,12 @@ def calc_f_sw(accessible_layers):
 
 #
 # Calculates N demand
-# "pseudocode_SC_nitrogenuptake.docx" section 3.D.5
+# "Pseudo code_SC_NitrogenUptake_1.0.docx" section 3.D.5
 #
 def calc_N_demand(crop_type, accessible_layers):
     NO3_root = sum([layer.NO3 for layer in accessible_layers])
 
-    act_N_up_root = sum(crop_type.act_N_up_each_layer[:len(accessible_layers)])
+    count_acc_layers = len(accessible_layers)
+    act_N_up_root = sum(crop_type.act_N_up_each_layer[:count_acc_layers])
 
     return act_N_up_root - NO3_root
