@@ -41,6 +41,7 @@ CropType attribute definitions:
 
     fr_PHU = Fraction of PHU accumulated including today
 
+
 CropType values updated by calling calculate_frPHU():
 
     prev_accumulated_HU
@@ -49,7 +50,6 @@ CropType values updated by calling calculate_frPHU():
     fr_PHU
 '''
 ################################################################################
-
 
 #
 # This function calls the functions necessary to update the current heat unit
@@ -62,11 +62,12 @@ def update_all(crop_type, T_min, T_max, time):
 #
 # This function calculates the fraction of PHU accumulated up to and including
 # today. The equations used for this part can be found in
-# "pseudocode_SC_cropbiomass.docx" section 1.B and 1.C
+# "Pseudo code_SC_maxdeltabio_1.0.docx" section 1.B and 1.C
 #
 def calculate_frPHU(crop_type, T_min, T_max, time):
-
-    #1.B
+    #
+    # Part 1B of Crop Biomass pseudocode
+    #
     T_HU_min = calc_T_HU_min(crop_type, T_min)
     T_HU_max = calc_T_HU_max(crop_type, T_max)
     HU = calc_HU(crop_type, T_HU_min, T_HU_max)
@@ -84,7 +85,7 @@ def calculate_frPHU(crop_type, T_min, T_max, time):
 
 #
 # Calculates minimum heat unit temperature on current day.
-# "pseudocode_SC_cropbiomass.docx" section 1.B.a
+# "Pseudo code_SC_maxdeltabio_1.0.docx" section 1.B.a
 #
 def calc_T_HU_min(crop_type, T_min):
     if T_min < crop_type.T_base_min:
@@ -95,7 +96,7 @@ def calc_T_HU_min(crop_type, T_min):
 
 #
 # Calculates maximum heat unit temperature on current day.
-# "pseudocode_SC_cropbiomass.docx" section 1.B.b
+# "Pseudo code_SC_maxdeltabio_1.0.docx" section 1.B.b
 #
 def calc_T_HU_max(crop_type, T_max):
     if T_max > crop_type.T_base_max:
@@ -108,10 +109,10 @@ def calc_T_HU_max(crop_type, T_max):
 # Calculates available heat units on current day.
 #
 def calc_HU(crop_type, T_HU_min, T_HU_max):
-    # "pseudocode_SC_cropbiomass.docx" section 1.B.1
+    # "Pseudo code_SC_maxdeltabio_1.0.docx" section 1.B.1
     T_HU = (T_HU_min + T_HU_max) / 2
 
-    # "pseudocode_SC_cropbiomass.docx" section 1.B.2
+    # "Pseudo code_SC_maxdeltabio_1.0.docx" section 1.B.2
     if T_HU < crop_type.T_base_min:
         return 0.0
     else:

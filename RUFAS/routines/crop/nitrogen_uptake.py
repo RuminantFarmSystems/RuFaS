@@ -65,7 +65,7 @@ def update_all(crop_type, soil, time):
 
 #
 # Calculates the fraction of nitrogen in the plant biomass on a given day.
-# "pseudocode_SC_nitrogenuptake.docx" section 3.B.1
+# "Pseudo code_SC_NitrogenUptake_1.0.docx" section 3.B.1
 #
 def calc_fr_N(crop_type):
     n2 = calc_n2(crop_type)
@@ -84,7 +84,7 @@ def calc_fr_N(crop_type):
 
 #
 # Calculates the second shape coefficient.
-# "pseudocode_SC_nitrogenuptake.docx" section 3.A.1
+# "Pseudo code_SC_NitrogenUptake_1.0.docx" section 3.A.1
 #
 def calc_n2(crop_type):
     term1 = calc_log_term_of_shape_coeff(
@@ -102,7 +102,7 @@ def calc_n2(crop_type):
 
 #
 # Calculates the first shape coefficient.
-# "pseudocode_SC_nitrogenuptake.docx" section 3.A.2
+# "Pseudo code_SC_NitrogenUptake_1.0.docx" section 3.A.2
 #
 def calc_n1(crop_type, n2):
     term1 = calc_log_term_of_shape_coeff(
@@ -124,7 +124,7 @@ def calc_log_term_of_shape_coeff(crop_type, fr_PHU_fract, fr_n_):
 
 #
 # Calculates the optimal mass of nitrogen stored in plant biomass.
-# "pseudocode_SC_nitrogenuptake.docx" section 3.B.2
+# "Pseudo code_SC_NitrogenUptake_1.0.docx" section 3.B.2
 #
 def calc_bio_N_opt(crop_type):
     crop_type.bio_N_opt = crop_type.fr_N * crop_type.prev_biomass_actual
@@ -132,7 +132,7 @@ def calc_bio_N_opt(crop_type):
 
 #
 # Calculates potential nitrogen uptake.
-# "pseudocode_SC_nitrogenuptake.docx" section 3.B.3
+# "Pseudo code_SC_NitrogenUptake_1.0.docx" section 3.B.3
 #
 def calc_N_up(crop_type):
     if crop_type.bio_N_opt - crop_type.bio_N < 0:
@@ -150,21 +150,21 @@ def calc_N_up(crop_type):
 # The order of the values in the list corresponds with the order of the layers
 # in soil.listOfSoilLayers. The soil layers in that list need to be in order
 # of shallowest to deepest for this to work correctly.
-# "pseudocode_SC_nitrogenuptake.docx" section 3.C.3
+# "Pseudo code_SC_NitrogenUptake_1.0.docx" section 3.C.3
 #
 def calc_actual_N_up_each_layer(crop_type, soil):
     N_up_each_layer = calc_N_up_each_layer(crop_type, soil)
     act_N_up_each_layer = []
 
     # Running total of potential nitrogen uptake in overlying layers
-    # Corresponds with "pseudocode_SC_nitrogenuptake.docx" 3.C.3.1
+    # Corresponds with "Pseudo code_SC_NitrogenUptake_1.0.docx" 3.C.3.1
     N_up_over = 0
 
     # Running total of nitrate in overlying soil layers
     NO3_over = 0
 
     # Nitrogen uptake demand not met in overlying soil layers
-    # Corresponds with "pseudocode_SC_nitrogenuptake.docx" 3.C.3.2
+    # Corresponds with "Pseudo code_SC_NitrogenUptake_1.0.docx" 3.C.3.2
     N_demand = 0
 
     for pot_N_up, soilLayer in zip(N_up_each_layer, soil.listOfSoilLayers):
@@ -186,7 +186,7 @@ def calc_actual_N_up_each_layer(crop_type, soil):
 # corresponds with the order of the layers in soil.listOfSoilLayers. The soil
 # layers in that list need to be in order of shallowest to deepest for this
 # to work correctly.
-# "pseudocode_SC_nitrogenuptake.docx" section 3.C.2
+# "Pseudo code_SC_NitrogenUptake_1.0.docx" section 3.C.2
 #
 def calc_N_up_each_layer(crop_type, soil):
     N_up_each_layer = []
@@ -208,7 +208,7 @@ def calc_N_up_each_layer(crop_type, soil):
 #
 # Calculates potential nitrogen uptake from soil solution at the surface to
 # depth z. This function is used in calc_N_up_each_layer.
-# "pseudocode_SC_nitrogenuptake.docx" section 3.C.1
+# "Pseudo code_SC_NitrogenUptake_1.0.docx" section 3.C.1
 #
 def calc_N_up_z(crop_type, z):
     if crop_type.z_root == 0:
@@ -220,7 +220,7 @@ def calc_N_up_z(crop_type, z):
 
 #
 # Calculates actual mass of nitrogen stored in plant material.
-# "pseudocode_SC_nitrogenuptake.docx" section 3.E.1
+# "Pseudo code_SC_NitrogenUptake_1.0.docx" section 3.E.1
 #
 def calc_bio_N(crop_type, soil):
     N_fix = calc_N_fixation(crop_type, soil)

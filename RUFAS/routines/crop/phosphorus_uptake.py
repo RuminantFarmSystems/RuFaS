@@ -67,7 +67,7 @@ def update_all(crop_type, soil, time):
 
 #
 # Calculates fraction of phosphorus in the plant biomass.
-# "pseudocode_SC_phosphorusuptake.docx" section 4.B.1
+# "Pseudo code_SC_PhosphorusUptake_1.0.docx" section 4.B.1
 #
 def calc_fr_P(crop_type):
     p2 = calc_p2(crop_type)
@@ -85,7 +85,7 @@ def calc_fr_P(crop_type):
 
 #
 # Calculates the second shape coefficent.
-# "pseudocode_SC_phosphorusuptake.docx" section 4.A.1
+# "Pseudo code_SC_PhosphorusUptake_1.0.docx" section 4.A.1
 #
 def calc_p2(crop_type):
     first_term = calc_log_term_of_shape_coeff(
@@ -103,7 +103,7 @@ def calc_p2(crop_type):
 
 #
 # Calculates the first shape coefficient
-# "pseudocode_SC_phosphorusuptake.docx" section 4.A.2
+# "Pseudo code_SC_PhosphorusUptake_1.0.docx" section 4.A.2
 #
 def calc_p1(crop_type, p2):
     first_term = calc_log_term_of_shape_coeff(
@@ -124,7 +124,7 @@ def calc_log_term_of_shape_coeff(crop_type, fr_PHU_fract, fr_p_):
 
 #
 # Calculates optimal mass of phosphorus stored in plant material.
-# "pseudocode_SC_phosphorusuptake.docx" section 4.B.2
+# "Pseudo code_SC_PhosphorusUptake_1.0.doc" section 4.B.2
 #
 def calc_bio_P_opt(crop_type):
     crop_type.bio_P_opt = crop_type.prev_biomass_actual * crop_type.fr_P
@@ -132,7 +132,7 @@ def calc_bio_P_opt(crop_type):
 
 #
 # Calculates potential phosphorus uptake.
-# "pseudocode_SC_phosphorusuptake.docx" section 4.B.3
+# "Pseudo code_SC_PhosphorusUptake_1.0.docx" section 4.B.3
 #
 def calc_P_up(crop_type):
     if crop_type.bio_P_opt - crop_type.bio_P < 0:
@@ -149,28 +149,30 @@ def calc_P_up(crop_type):
 # The order of the values in the list corresponds with the order of the layers
 # in soil.listOfSoilLayers. The soil layers in that list need to be in order
 # of shallowest to deepest for this to work correctly.
-# "pseudocode_SC_phosphorusuptake.docx" section 4.C.3
+# "Pseudo code_SC_PhosphorusUptake_1.0.docx" section 4.C.3
 #
 def calc_actual_P_up_each_layer(crop_type, soil):
     P_up_each_layer = calc_P_up_each_layer(crop_type, soil)
     act_P_up_each_layer = []
 
     # Running total of potential phosphorus uptake in overlying layers
-    # Corresponds with "pseudocode_SC_phosphorusuptake.docx" 4.C.3.1
+    # Corresponds with "Pseudo code_SC_PhosphorusUptake_1.0.docx" 4.C.3.1
     P_up_over = 0
 
     # Running total of phosphorus content of soil solution in overlying layers
     P_sol_over = 0
 
     # Phosphorus uptake demand not met in overlying soil layers
-    # Corresponds with "pseudocode_SC_phosphorusuptake.docx" 4.C.3.2
+    # Corresponds with "Pseudo code_SC_PhosphorusUptake_1.0.docx" 4.C.3.2
     P_demand = 0
 
     for pot_P_up, soilLayer in zip(P_up_each_layer, soil.listOfSoilLayers):
+        # Not sure what soilLayer phosphorus attribute represents "P_solution" in the pseudocode
+        # I used "labileP" for now, but this may need to be changed -Andy
         act_P_up = min((pot_P_up + P_demand), soilLayer.labileP)
         act_P_up_each_layer.append(act_P_up)
 
-        # Update values for next layer
+        # Update values so ready for the next layer
         P_up_over += pot_P_up
         P_sol_over += soilLayer.labileP
         P_demand = P_up_over - P_sol_over
@@ -185,7 +187,7 @@ def calc_actual_P_up_each_layer(crop_type, soil):
 # corresponds with the order of the layers in soil.listOfSoilLayers. The soil
 # layers in that list need to be in order of shallowest to deepest for this
 # to work correctly.
-# "pseudocode_SC_phosphorusuptake.docx" section 4.C.2
+# "Pseudo code_SC_PhosphorusUptake_1.0.docx" section 4.C.2
 #
 def calc_P_up_each_layer(crop_type, soil):
     P_up_each_layer = []
@@ -205,7 +207,7 @@ def calc_P_up_each_layer(crop_type, soil):
 #
 # Calculates potential phosphorus uptake from soil solution at the surface to
 # depth z. This function is used in calc_P_up_each_layer.
-# "pseudocode_SC_phosphorusuptake.docx" section 4.C.1
+# "Pseudo code_SC_PhosphorusUptake_1.0.docx" section 4.C.1
 #
 def calc_P_up_z(crop_type, z):
     if crop_type.z_root == 0:
