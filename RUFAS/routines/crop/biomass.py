@@ -71,12 +71,12 @@ from math import exp
 # This function updates all biomass information
 #
 def update_all(crop_type, time, weather, soil):
-    # update gamma_reg value
-    calc_gamma_reg(crop_type, time, weather, soil)
 
     # update biomass values
     calc_actual_Biomass(crop_type, time, weather)
 
+    # update gamma_reg value
+    calc_gamma_reg(crop_type, time, weather, soil)
 
 #
 # Calculate current actual biomass.
@@ -84,10 +84,10 @@ def update_all(crop_type, time, weather, soil):
 def calc_actual_Biomass(crop_type, time, weather):
     H_phosyn = calc_intercepted_radiation(crop_type, time, weather)
 
-    # "Pseudo code_SC_maxdeltabio_1.0.docx" section 1.E.2
+    # "pseudocode_SC_cropbiomass.docx" section 1.E.2
     crop_type.dBiomass_max = crop_type.RUE * H_phosyn
 
-    # "Pseudo code_SC_actual growth and yield_1.0.docx" section 7.A.2
+    # "pseudocode_SC_actualgrowth.docx" section 7.A.2
     crop_type.dBiomass_actual = crop_type.dBiomass_max * crop_type.gamma_reg
 
     # Save value as previous day's value
@@ -105,7 +105,7 @@ def calc_actual_Biomass(crop_type, time, weather):
 #
 # Calculates amount of intercepted photosynthetically active radiation
 # on a given day (MJ m^-2).
-# "Pseudo code_SC_maxdeltabio_1.0.docx" section 1.E.1
+# "pseudocode_SC_cropbiomass.docx" section 1.E.1
 #
 def calc_intercepted_radiation(crop_type, time, weather):
     H_day = weather.radiation[time.year-1][time.day-1]
@@ -114,14 +114,14 @@ def calc_intercepted_radiation(crop_type, time, weather):
 
 #
 # Calculates plant growth factor (AKA gamma_reg).
-# "Pseudo code_SC_actual growth and yield_1.0.docx" section 7.A.1
+# "pseudocode_SC_actualgrowth.docx" section 7.A.1
 #
 def calc_gamma_reg(crop_type, time, weather, soil):
     wstrs = calc_wstrs(crop_type, soil)
     tstrs = calc_tstrs(crop_type, time, weather)
     nstrs = calc_nstrs(crop_type)
     pstrs = calc_pstrs(crop_type)
-    
+
     crop_type.gamma_reg = 1 - max(wstrs, tstrs, nstrs, pstrs)
 
 
@@ -134,89 +134,91 @@ They do not modify the values of any State class.
 
 #
 # Calculates water stress for a given day
-# "Pseudo code_SC_growth constraints_1.0.docx" section 6.1
+# "pseudocode_SC_growthconstraints.docx" section 6.1
 #
 def calc_wstrs(crop_type, soil):
     if soil.Etrans == 0:
         return 0
-    result = 1.0 - (crop_type.water_actual_up / soil.Etrans)
-    if result < 0:
+    wstrs = 1.0 - (crop_type.water_actual_up / soil.Etrans)
+    if wstrs < 0:
         return 0
     else:
-        return min(0.99, result)
+        return min(0.99, wstrs)
 
 
 #
 # Calculates temperature stress for a given day.
-# "Pseudo code_SC_growth constraints_1.0.docx" section 6.2
+# "pseudocode_SC_growthconstraints.docx" section 6.2
 #
 def calc_tstrs(crop_type, time, weather):
     T_avg = weather.T_avg[time.year-1][time.day-1]
     T_opt = crop_type.T_opt
     T_base_min = crop_type.T_base_min
     MAX = 0.99
-    result = 0
+    tstrs = 0
     if T_avg <= T_base_min:
-        result = MAX
-    
+        tstrs = MAX
+
     elif T_base_min < T_avg  and T_avg <= T_opt:
         top_half_eq = -0.1054 * (T_opt - T_avg)**2
         bottom_half_eq = (T_avg - T_base_min)**2
-        result = 1 - exp(top_half_eq / bottom_half_eq)
-    
+        tstrs = 1 - exp(top_half_eq / bottom_half_eq)
+
     elif T_opt < T_avg and T_avg <= (2 * T_opt - T_base_min):
         top_half_eq = -0.1054 * (T_opt - T_avg)**2
         bottom_half_eq = (2*T_opt - T_avg - T_base_min)**2
-        result = 1 - exp(top_half_eq / bottom_half_eq)
-    
-    else: # T_avg > (2*T_opt - T_base_min):
-        result = MAX
+        tstrs = 1 - exp(top_half_eq / bottom_half_eq)
 
-    return min(result, MAX)
+    else: # T_avg > (2*T_opt - T_base_min):
+        tstrs = MAX
+
+    return min(tstrs, MAX)
 
 
 #
 # Calculates nitrogen stress for a given day.
-# "Pseudo code_SC_growth constraints_1.0.docx" section 6.3.2
+# "pseudocode_SC_growthconstraints.docx" section 6.3.2
 #
 def calc_nstrs(crop_type):
     if crop_type.bio_N_opt == 0:
         return 0
     phi_n = calc_phi_N(crop_type)
-    result = 1 - phi_n / (phi_n + exp(3.535 - 0.02597*phi_n))
-    return min(0.99, result)
+    nstrs = 1 - phi_n / (phi_n + exp(3.535 - 0.02597*phi_n))
+    return min(0.99, nstrs)
 
 
 #
 # Calculates nitrogen stress scaling factor.
-# "Pseudo code_SC_growth constraints_1.0.docx" section 6.3.1
+# "pseudocode_SC_growthconstraints.docx" section 6.3.1
 #
 def calc_phi_N(crop_type):
     if crop_type.bio_N_opt == 0:
         return 300
     else:
-        result = 200 * ((crop_type.bio_N/crop_type.bio_N_opt) - 0.5)
-        return max(0, result)
+        phi_n = 200 * ((crop_type.bio_N/crop_type.bio_N_opt) - 0.5)
+        return max(0, phi_n)
 
 
 #
 # Calculates phosphorus stress scaling factor.
-# "Pseudo code_SC_growth constraints_1.0.docx" section 6.4.2
+# "pseudocode_SC_growthconstraints.docx" section 6.4.2
 #
 def calc_pstrs(crop_type):
     if crop_type.bio_P_opt == 0:
         return 0
     phi_p = calc_phi_P(crop_type)
-    result = 1 - phi_p / (phi_p + exp(3.535 - 0.02597 * phi_p))
-    return min(0.99, result)
+    pstrs = 1 - phi_p / (phi_p + exp(3.535 - 0.02597 * phi_p))
+    return min(0.99, pstrs)
 
 
 #
 # Calculates phosphorus stress scaling factor.
-# "Pseudo code_SC_growth constraints_1.0.docx" section 6.4.1
+# "pseudocode_SC_growthconstraints.docx" section 6.4.1
 #
 def calc_phi_P(crop_type):
     if crop_type.bio_P_opt == 0:
         return 300
     else:
-        return 200 * ((crop_type.bio_P/crop_type.bio_P_opt) - 0.5)
+        phi_p = 200 * ((crop_type.bio_P/crop_type.bio_P_opt) - 0.5)
+        return max(0, phi_p)
+
