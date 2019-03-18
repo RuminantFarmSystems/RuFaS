@@ -13,6 +13,88 @@ from RUFAS import util
 # -------------------------------------------------------------------------------
 # Function: optimize
 # -------------------------------------------------------------------------------
+def new_optimize(feed, rqmts):
+    '''
+    Sets up the arguments for the linear programming optimization.
+
+	Args:
+        feed : instance of the Feed class
+        rqmts : dict which represents the dietary requirements of the cows
+
+    Returns:
+        dict: the dictionary that is returned by the call to util.LP_solve()
+	'''
+
+    # LHS is of the following form. LHS stands for Left Hand Side.
+    # [
+    #     [##,##, ..., ##],  // Each column has the coefficients for one specific feed type
+    #     [##,##, ..., ##],  // Each row has the coefficients for one specific nutrient type
+    #     [##,##, ..., ##],  // Each row represents the LHS of a constraint equation
+    #     [##,##, ..., ##],
+    #     [##,##, ..., ##]
+    # ]
+    LHS = []
+    constraint = [feed.available_feeds[feed_name]['FU']
+                  for feed_name in feed.available_feed_names]
+    LHS.append(constraint)
+
+    constraint = [(feed.available_feeds[feed_name]['RU'] - 0.21)
+                  for feed_name in feed.available_feed_names]
+    LHS.append(constraint)
+    #for now, set as dummy variables:
+    DMIest = 0
+    BW = 0
+    DBW = 0
+    ME_DM_arr, RDP_DM_arr, RUP_DM_arr = calculate_ME_RDP_RUP(feed, DMIest, BW, DBW)
+    LHS.append(ME_DM_arr)
+    LHS.append(RDP_DM_arr)
+    LHS.append(RUP_DM_arr)
+
+    # RHS is of the following form. Each value represents the required RHS value
+    # for the corresponding LHS constraint found in LHS.
+    # [
+    #     ##,
+    #     ##,
+    #     ##,
+    #     ##,
+    #     ##
+    # ]
+    RHS = [rqmts[nutrient]['val'] for nutrient in feed.nutrients_in_LP]
+
+    # objective is of the form [##,##, ..., ##] with the values being the price
+    # for each food type. This makes the objective function represent the total
+    # cost of a ration formulation.
+    objective = [feed.available_feeds[feed_name]['Price']
+                 for feed_name in feed.available_feed_names]
+
+    # Each variable represents the quantity of a feed type. The variables are
+    # named after their corresponding food type.
+    var_names = feed.available_feed_names
+
+    # operators is of the form [##, ##, ..., ##] with each value being one of
+    # '<=', '>=', or '=='. These are the operators between the corresponding
+    # LHS constraint and RHS required value.
+    operators = [rqmts[nutrient]['op'] for nutrient in feed.nutrients_in_LP]
+
+    # The lower bounds for quantity of a food type are zero since a negative
+    # quantity of food in this context does not make sense.
+    lower_bounds = [0] * len(feed.available_feed_names)
+
+    # The upper bounds are the 'Limit' specified in the csv library for each
+    # food type.
+    upper_bounds = [feed.available_feeds[feed_name]['Limit']
+                    for feed_name in feed.available_feed_names]
+
+    # util.LP_print(LHS, RHS, objective, var_names, operators,
+    #			  "minimize", "RATION", lower_bounds, upper_bounds)
+
+    return util.LP_solve(LHS, RHS, objective, var_names, operators,
+                         "minimize", "RATION", lower_bounds, upper_bounds)
+
+
+# -------------------------------------------------------------------------------
+# Function: optimize
+# -------------------------------------------------------------------------------
 def optimize(feed, rqmts):
     '''
     Sets up the arguments for the linear programming optimization.
@@ -39,7 +121,6 @@ def optimize(feed, rqmts):
                       for feed_name in feed.available_feed_names]
 
         LHS.append(constraint)
-
     # RHS is of the following form. Each value represents the required RHS value
     # for the corresponding LHS constraint found in LHS.
     # [
