@@ -10,6 +10,15 @@ Author(s): Kass Chupongstimun, kass_c@hotmail.com
 from numpy import exp
 from RUFAS import util
 
+#These values are needed and calculated in calculate_rqmts() but they are also
+#needed in optimize(), so when they are calculated in calculate_rqmts(),
+#these global variables keep track of their values in order to minize code
+#repitition. They are initialized to -1 for debugging purposes, as negative
+#values would not make sense for these variables.
+global_BW = -1
+global_DMIest = -1
+global_DBW = -1
+
 # -------------------------------------------------------------------------------
 # Function: optimize
 # -------------------------------------------------------------------------------
@@ -41,11 +50,8 @@ def new_optimize(feed, rqmts):
     constraint = [(feed.available_feeds[feed_name]['RU'] - 0.21)
                   for feed_name in feed.available_feed_names]
     LHS.append(constraint)
-    #for now, set as dummy variables:
-    DMIest = 0
-    BW = 0
-    DBW = 0
-    ME_DM_arr, RDP_DM_arr, RUP_DM_arr = calculate_ME_RDP_RUP(feed, DMIest, BW, DBW)
+
+    ME_DM_arr, RDP_DM_arr, RUP_DM_arr = calculate_ME_RDP_RUP(feed, global_DMIest, global_BW, global_DBW)
     LHS.append(ME_DM_arr)
     LHS.append(RDP_DM_arr)
     LHS.append(RUP_DM_arr)
@@ -191,7 +197,11 @@ def new_calculate_rqmts(BW, BCS, CBW, CI, concentrate, CP_Milk, DOP, DHD, DVD,
         dict : a dictionary that represents the dietary requirements of the cows,
             used as the RHS of the LP
     '''
-
+    #Sets these variables as global. See comment on line 13 for further details.
+    global global_BW
+    global global_DMIest
+    global global_DBW
+    global_BW = BW
     #ENERGY REQUIREMENTS (divided into the following 5 components: maintenance,
     #lactation, activity, pregnancy, and body weight change requirements):
 
@@ -238,6 +248,7 @@ def new_calculate_rqmts(BW, BCS, CBW, CI, concentrate, CP_Milk, DOP, DHD, DVD,
         TCW = 700 * 1
     #Body weight change (delta body weight = DBW), kg (A.ER.5.4)
     DBW = (TCW - 0.94 * BW) / (280 - CI + DOP)
+    global_DBW = DBW
     #Net Energy body weight, Mcal (A.ER.5.5)
     if DBW > 0:
         NEbw = DBW * 6.7 * 0.88
@@ -253,7 +264,7 @@ def new_calculate_rqmts(BW, BCS, CBW, CI, concentrate, CP_Milk, DOP, DHD, DVD,
         DMIest = 2.58 + 0.30 * NEl + 0.027 * BW + 0.05 * DBW - 1.15 * BCS
     else:
         DMIest = (2.58 + 0.30 * NEl + 0.027 * BW) * (1 - exp(-0.192 * ((DIM + 3.5)/ 7 + 3.67)))
-
+    global_DMIest = DMIest
     #Fiber Intake Capacity, Fiber Units/day (A.FI.2.2)
     if parity == 1:
         FIC = 0.338 * (WIM + 3) ** 0.588 * exp(-0.0277 * (WIM + 3))
