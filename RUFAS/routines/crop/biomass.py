@@ -72,11 +72,12 @@ from math import exp
 #
 def update_all(crop_type, time, weather, soil):
 
+    # update gamma_reg value
+    calc_gamma_reg(crop_type, time, weather, soil)
+
     # update biomass values
     calc_actual_Biomass(crop_type, time, weather)
 
-    # update gamma_reg value
-    calc_gamma_reg(crop_type, time, weather, soil)
 
 #
 # Calculate current actual biomass.
@@ -219,6 +220,5 @@ def calc_phi_P(crop_type):
     if crop_type.bio_P_opt == 0:
         return 300
     else:
-        phi_p = 200 * ((crop_type.bio_P/crop_type.bio_P_opt) - 0.5)
-        return max(0, phi_p)
+        return 200 * ((crop_type.bio_P/crop_type.bio_P_opt) - 0.5)
 
