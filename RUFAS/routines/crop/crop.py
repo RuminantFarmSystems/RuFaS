@@ -125,17 +125,17 @@ def daily_crop_routine(crop, weather, time, soil):
         #
         heat_units.update_all(crop_type, T_min, T_max, time)
 
-        leaf_area_index.update_all(crop_type, time)
-
-        root_development.update_all(crop_type, time)
-
         soil_water_uptake.update_all(crop_type, soil, time)
 
         biomass.update_all(crop_type, time, weather, soil)
 
+        leaf_area_index.update_all(crop_type, time)
+
         phosphorus_uptake.update_all(crop_type, soil, time)
 
         nitrogen_uptake.update_all(crop_type, soil, time)
+
+        root_development.update_all(crop_type, time)
 
         yields.update_all(crop_type, time, soil)
 
