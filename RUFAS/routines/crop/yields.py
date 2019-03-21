@@ -153,6 +153,6 @@ def calc_nutrient_removal(crop_type):
 #
 def calc_residue(crop_type, time):
     if crop_type.harvest_date == time.day:
-        # dResidue = yld * (1 - harv_eff) = yld - yld_actual = (bio_AF * HI) - yld_actual
-        dResidue = (crop_type.bio_AG * crop_type.HI_max) - crop_type.yield_actual
+        # matches spreadsheet model, but not pseudocode
+        dResidue = crop_type.biomass_actual - crop_type.yield_actual
         crop_type.residue += dResidue
