@@ -10,7 +10,7 @@
 ################################################################################
 
 import math
-from . import nitrogen_cycling, phosphorus_cycling
+from . import nitrogen_cycling, phosphorus_cycling, evapotranspiration
 #------------------------------------------------------------------------------
 # Function: daily_soil_routine
 # Executes all the daily soil routines
@@ -39,13 +39,7 @@ def daily_soil_routine(soil, crop, weather, time):
     soil.dailyInfiltration(weather.rainfall[time.year-1][time.day-1])
 
     # calculate daily transpiration
-    soil.dailyEvapotranspiration(
-        weather.T_max[time.year-1][time.day-1]
-        , weather.T_min[time.year-1][time.day-1]
-        , weather.T_avg[time.year-1][time.day-1]
-        , crop.crops_list["corn"]
-        , weather.radiation[time.year-1][time.day-1]
-        , time)
+    evapotranspiration.update_all(soil, crop, weather, time)
 
     # calculate daily percolation
     soil.dailyPercolation()
@@ -601,110 +595,6 @@ class Soil():
         # daily infiltration (mm H20)
         self.dayInfiltraiton = dailyRainfall - self.runoff
 
-    #---------------------------------------------------------------------------
-    # Function: dailyEvapotranspiration
-    # Uses Hargreaves method for simplicity (equations taken from SWAT 2009
-    # documentation)
-    # Step 1: Calculate Potential Evapotranspiration
-    # Step 2: Calculate Crop Transpiration
-    # Step 3: Calculate Sublimation and Soil Evaporation
-    # Step 4: Partition Esoil among different soil layers
-    #---------------------------------------------------------------------------
-    def dailyEvapotranspiration(self, tMax, tMin, tAvg, crop_type, radiation, time):
-        '''
-        Description:
-            Uses Hargreaves method to calculate the daily evapotranspiration of
-            this particular uptake;
-
-            Step 1: Calculate Potential Evapotranspiration
-            Step 2: Calculate Crop Transpiration
-            Step 3: Calculate Sublimation and Soil Evaporation
-            Step 4: Partition Esoil among different soil layers
-
-        Args:
-            tMax: a number which is the maximum temperature
-            tMin: a number which is the minimum temperature
-            tAvg: a number which is the average temperature
-            crop_type: an instance of the class Crop_Type
-            radiation: the radiation from the Weather instance
-            time: instance of the Time class
-        '''
-        # Step 1: Calculate Potential Evapotranspiration
-        # extraterrestrial radiation (MJ*m^-2*d^-1) --> MAKE INPUT VARIABLE
-        H0 = float(radiation)
-
-        # latent heat of vaporization (MJ*kg^-1)
-        LHV = 2.501 - 2.361*(10**(-3))*float(tAvg)
-
-        # potential evapotranspiration (mm*d^-1)
-        self.E0 = max(0.001, 0.0023*H0*(float(tMax)-float(tMin))**0.5*
-                      (float(tAvg) + 17.8)/LHV)
-        if time.day >= crop_type.planting_date:
-            self.E0_sum += self.E0
-
-        # Step 2: Calculate Crop Transpiration
-        # Leaf Area Index (calculated in Crop Growth Section)
-        LAI = crop_type.LAI_actual
-
-        # maximum transpiration on a given day (mm H2O)
-        # The actual amount of transpiration may be less than this maximum
-        # amount due to lack of available water in the rooting depth of the
-        # soil profile.
-        if LAI >= 0 and LAI <= 3.0:
-            self.Etrans = (self.E0 * round(LAI,3)) / 3.0
-        else:
-            self.Etrans = self.E0
-
-        # Step 3: Calculate Sublimation and soil evaporation
-        # aboveground biomass and residue (kg*ha^-1)
-
-        # soil cover index
-        soilCov = math.exp(-5.0 * 0.00001 * crop_type.bio_AG)
-
-        # maximum soil evaporation/sublimation on a given day (mm H2O)
-        Esoil = (round(self.E0,3) - self.Etrans) * (soilCov)
-        self.Esoil = min(Esoil, ((Esoil*self.E0)/(Esoil + self.Etrans)))
-
-        # If snow is present and snow water is greater than Esoil, there is no
-        # evaporation from soil. If snow water is less than Esoil, both soil
-        # and snow will contribute to Esoil.
-
-        # Step 4: Partition Esoil among different soil layers
-        # FOR each soil layer, calculate Esoil at top of layer, Esoil at bottom
-        # of layer and then Esoil of entire layer
-        for x in range(0, len(self.listOfSoilLayers)):
-            if x == 0:
-                self.listOfSoilLayers[x].topEsoil = 0
-                self.listOfSoilLayers[x].bottomEsoil = (Esoil *
-                    self.listOfSoilLayers[x].bottomDepth/
-                    (self.listOfSoilLayers[x].bottomDepth +  math.exp
-                    (2.374 - 0.00713*self.listOfSoilLayers[x].bottomDepth)))
-            else:
-                self.listOfSoilLayers[x].topEsoil = (self.listOfSoilLayers[x-1].
-                                                     bottomEsoil)
-                self.listOfSoilLayers[x].bottomEsoil = (Esoil *
-                    self.listOfSoilLayers[x].bottomDepth/
-                    (self.listOfSoilLayers[x].bottomDepth + math.exp
-                    (2.374 - 0.00713*self.listOfSoilLayers[x].bottomDepth)))
-
-            # The evaporation demand for a given soil layer is the difference
-            # between evaporation demands at the top and bottom of the layer.
-            # One soil layer cannot compensate for the inability of another layer
-            # to meet evaporation demand. Evaporation demand not met by a soil
-            # layer results in a reduction in actual ET.
-            if (self.listOfSoilLayers[x].currentSoilWaterMM >
-                                            self.listOfSoilLayers[x].fcWater):
-                self.listOfSoilLayers[x].layerEsoil= (self.listOfSoilLayers[x].
-                            bottomEsoil - self.listOfSoilLayers[x].topEsoil)
-            # ELSE, When soil water content is less than field capacity, Esoil
-            # for a given layer is reduced as:
-            else:
-                self.listOfSoilLayers[x].layerEsoil=((self.listOfSoilLayers[x].
-                            bottomEsoil - self.listOfSoilLayers[x].topEsoil)*
-                            math.exp(2.5*(self.listOfSoilLayers[x].
-                            currentSoilWaterMM-self.listOfSoilLayers[x].fcWater)
-                            /(self.listOfSoilLayers[x].fcWater-self.
-                            listOfSoilLayers[x].wiltingWater)))
 
     #---------------------------------------------------------------------------
     # Function: dailyPercolation
