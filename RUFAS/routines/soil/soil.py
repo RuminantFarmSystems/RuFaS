@@ -10,7 +10,7 @@
 ################################################################################
 
 import math
-from . import nitrogen_cycling, phosphorus_cycling, evapotranspiration
+from . import nitrogen_cycling, phosphorus_cycling, evapotranspiration, infiltration
 #------------------------------------------------------------------------------
 # Function: daily_soil_routine
 # Executes all the daily soil routines
@@ -36,7 +36,7 @@ def daily_soil_routine(soil, crop, weather, time):
                            )
 
     # calculate daily runoff
-    soil.dailyInfiltration(weather.rainfall[time.year-1][time.day-1])
+    infiltration.update_all(soil, weather, time)
 
     # calculate daily transpiration
     evapotranspiration.update_all(soil, crop, weather, time)
@@ -532,69 +532,6 @@ class Soil():
         for soilLayer in self.listOfSoilLayers:
             totalWiltingWater += soilLayer.wiltingWater
         return totalWiltingWater
-
-    #---------------------------------------------------------------------------
-    # Function: dailyInfiltration
-    # Uses curve number approach (equations taken from SWAT 2009 documentation)
-    #---------------------------------------------------------------------------
-    def dailyInfiltration(self, dailyRainfall):
-        '''
-        Description:
-            Uses the curve number approach to calculate the daily infiltration of this
-            particular uptake.
-
-        Args:
-            dailyRainfall: a number which represents the daily rainfall from the Weather class
-        '''
-        dailyRainfall = float(dailyRainfall)
-        # curve number 1
-        cn1 = self.CN2 - (20 * (100 - self.CN2)) / (100
-                                                    - self.CN2 + math.exp(2.533
-                                                    - 0.0636 * (100- self.CN2)))
-        # curve number 3
-        cn3 = self.CN2 * math.exp(0.00673 * (100 - self.CN2))
-
-        # maximum value of S on any given day (mm H2O)
-        sMax = 25.4 * ((1000 / cn1) - 10)
-
-        s3 = 25.4*((1000/cn3) - 10)
-
-        # amount of water in soil profile at field capacity (mm H2O)
-        FC = self.profileDepth * self.listOfSoilLayers[0].fieldCapacity
-
-        # amount of water in soil profile at saturation (mm H2O)
-        SAT = self.profileDepth * self.listOfSoilLayers[0].saturation
-
-        # soil water content of entire profile, excluding water held at wilting
-        # point (mm H2O)
-        SW = self.getSumSoilWater() - self.getSumWiltingWater()
-
-        #shape coefficients
-        w2 = (math.log(FC /
-                      (1 -s3 * (1/sMax)) - FC) -math.log(
-                          SAT/(1-2.54*(1/sMax))- SAT
-                          )) /(SAT - FC)
-        w1 = math.log((FC /
-                       (1 - (s3) * (1/sMax)))-
-                      FC)+ w2*FC
-
-        # retention paramenter (mm H2O)
-        s = sMax * (1 - (SW/(SW + math.exp(w1 - (w2)*(SW)))))
-
-        # when the top soil is frozen, s is modified
-        if(self.listOfSoilLayers[0].temperature <= 2):
-            s = sMax * (1-math.exp(-0.000862 * s))
-
-        # daily runoff (mm H2O)
-        Q = 0.0
-        if dailyRainfall > 0.2*s:
-            Q = ((dailyRainfall - 0.2*s)**2) / (dailyRainfall + 0.8*s)
-
-        self.runoff = Q
-
-        # daily infiltration (mm H20)
-        self.dayInfiltraiton = dailyRainfall - self.runoff
-
 
     #---------------------------------------------------------------------------
     # Function: dailyPercolation
