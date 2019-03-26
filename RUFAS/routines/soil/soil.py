@@ -10,7 +10,7 @@
 ################################################################################
 
 import math
-from RUFAS.routines.soil.nitrogen_cycling import daily_nitrogen_cycling_routine, daily_nitrogen_update
+from . import nitrogen_cycling, phosphorus_cycling
 #------------------------------------------------------------------------------
 # Function: daily_soil_routine
 # Executes all the daily soil routines
@@ -55,7 +55,7 @@ def daily_soil_routine(soil, crop, weather, time):
                           crop.crops_list["corn"].bio_AG,
                           time.day)
 
-    daily_nitrogen_cycling_routine(soil, time, weather)
+    nitrogen_cycling.daily_nitrogen_cycling_routine(soil, time, weather)
 
 #------------------------------------------------------------------------------
 # Function: daily_soil_update
@@ -74,7 +74,7 @@ def daily_soil_update(soil, crop, weather, time):
     '''
     # update current soil water
     soil.updateCurrentSoilWater(weather.rainfall[time.year-1][time.day-1])
-    daily_nitrogen_update(soil, time, weather)
+    nitrogen_cycling.daily_nitrogen_update(soil, time, weather)
     soil.updateResidue(crop.crops_list["corn"], time)
 
 #-------------------------------------------------------------------------------
