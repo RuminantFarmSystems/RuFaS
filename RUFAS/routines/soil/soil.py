@@ -10,7 +10,7 @@
 ################################################################################
 
 import math
-from . import nitrogen_cycling, phosphorus_cycling, evapotranspiration
+from . import nitrogen_cycling, phosphorus_cycling, evapotranspiration, soil_temp
 #------------------------------------------------------------------------------
 # Function: daily_soil_routine
 # Executes all the daily soil routines
@@ -27,13 +27,7 @@ def daily_soil_routine(soil, crop, weather, time):
         time: instance of the Time class
     '''
     # calculate and update the temperature of the soil layers
-    soil.updateSoilTemperature(
-                           crop.crops_list["corn"].bio_AG,
-                           weather.radiation[time.year-1][time.day-1],
-                           weather.T_avg[time.year-1][time.day-1],
-                           weather.T_avg_annual[time.year-1],
-                           time.day
-                           )
+    soil_temp.update_all(soil, crop, weather, time)
 
     # calculate daily runoff
     soil.dailyInfiltration(weather.rainfall[time.year-1][time.day-1])
@@ -710,98 +704,6 @@ class Soil():
         if day < 95 or day > 300:
             snowCorrectedSed = sed/(math.exp(3*20/25.4))
         self.snowCorrectedSed = snowCorrectedSed
-
-
-    #---------------------------------------------------------------------------
-    # Function: dailySoilTemperature
-    # Equations taken from SWAT 2009 documentation to determine temperature of
-    # soil
-    #---------------------------------------------------------------------------
-    def updateSoilTemperature(self, biomass, radiation, Tavg, TavgAnnual, day):
-        '''
-        Description:
-            Determines the temperature of the soil.
-
-        Args:
-            biomass: the biomass from the CropType instance
-            radiation: the radiation from the Weather class
-            Tavg: a number which is the average temperature
-            TavgAnnual: a number which is the average annual temperature
-            day: the day from the Time class
-        '''
-        albedoSoil = self.soilAlbedo # soil albedo constant
-        bd = self.profileBulkDensity  # soil bulk density (g/cm^3)
-        CV = float(biomass) # above ground biomass and residue (kg/ha)
-        Hday = float(radiation) # daily solar radiation (user input, MJ/m2)
-        Tav = float(Tavg) # average daily temperature (oC)
-        SW = self.getSumSoilWater() # total soil water in the profile (mm)
-        ztot = self.profileDepth # total soil profile depth
-        Taair = TavgAnnual # Average annual air temperature (C)
-
-        # soil cover index
-        cover = math.exp(-0.00005 * float(CV))
-
-        # daily albedo
-        albedo = 0.23 * (1 - cover) + albedoSoil * cover
-
-        # radiation term
-        radiate = (Hday * (1 - albedo) - 14) / 20
-
-        # Temperature of a bare soil surface (C)
-        Tbare = Tav + radiate * Tav
-
-        # weight factor taking snow cover into account
-        coverFactor = (CV / (CV + math.exp(7.563-0.0001297 * (-CV))))
-
-        # snow water content on the current day (mm)
-        SNOW = 0
-        if day > 300 or day < 95:
-            SNOW = 0.8
-        snowFactor = (SNOW*10 / (SNOW*10 + math.exp(6.055-0.3002* SNOW*10)))
-
-        # used cover factor
-        bcv = max(coverFactor, snowFactor)
-
-        # Daily soil surface temperature (C)
-        self.Tsurf = (bcv * self.Tsurf) + ((1 - bcv) * Tbare)
-
-        # scaling factor for soil water
-        scale = SW / ((0.356-0.144*bd) * ztot)
-
-        # maximum damping depth (mm)
-        ddmax = 1000 + (2500 * bd) / (bd + 686 * math.exp(-5.63 * bd))
-
-        # damping depth (mm)
-        dd = ddmax * math.exp(math.log(500/ddmax) * ((1-scale)/(1+scale))**2)
-
-        # lag coefficient
-        L = 0.8
-
-        # depth at the center of the soil layer
-        z = 0.0
-
-        # Calculate soil temperature for each soil layer
-        for x in range(0, len(self.listOfSoilLayers)):
-
-            # calculate depth at the center of the soil layer
-            if x == 0:
-                z = self.listOfSoilLayers[x].bottomDepth/2
-            else:
-                z = (self.listOfSoilLayers[x].bottomDepth +
-                     self.listOfSoilLayers[x-1].bottomDepth)/2
-
-            # soil temperature (C) at depth z (mm) on previous day
-            TsoilPrev = self.listOfSoilLayers[x].temperature
-
-            # ratio of depth at the center of soil layer to damping depth
-            zd = z / dd
-
-            # depth factor
-            df = zd/ (zd + math.exp(-0.867 - 2.078 * zd))
-
-            # soil temperature (C) at depth z (mm)
-            value = (L * TsoilPrev) + (1-L) * (df * (Taair-self.Tsurf) + self.Tsurf)
-            self.listOfSoilLayers[x].temperature = value
 
     #---------------------------------------------------------------------------
     # Function: updateCurrentSoilWater
