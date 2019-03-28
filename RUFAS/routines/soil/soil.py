@@ -11,7 +11,7 @@
 
 import math
 from . import nitrogen_cycling, phosphorus_cycling, evapotranspiration, soil_temp,\
-    infiltration
+    infiltration, percolation
 #------------------------------------------------------------------------------
 # Function: daily_soil_routine
 # Executes all the daily soil routines
@@ -37,7 +37,7 @@ def daily_soil_routine(soil, crop, weather, time):
     evapotranspiration.update_all(soil, crop, weather, time)
 
     # calculate daily percolation
-    soil.dailyPercolation()
+    percolation.update_all(soil)
 
     # calculate daily soil erosion
     soil.dailySoilErosion(weather.rainfall[time.year-1][time.day-1],
@@ -501,35 +501,6 @@ class Soil():
                 .fieldCapacity)
 
 
-    #---------------------------------------------------------------------------
-    # Function: dailyPercolation
-    # (equations taken from SWAT 2009 documentation)
-    #---------------------------------------------------------------------------
-    def dailyPercolation(self):
-        '''
-        Description:
-            Calculates the daily percolation for this particular uptake.
-        '''
-        # Calculate value of water available for percolation FOR each layer
-        for x in range(0, len(self.listOfSoilLayers)):
-            # Volume of water available for percolation (SWperc) in a soil layer
-            # is the difference between SW and WP.
-            SWperc = 0.0
-            if (self.listOfSoilLayers[x].currentSoilWaterMM >=
-                                            self.listOfSoilLayers[x].fcWater):
-                SWperc = (self.listOfSoilLayers[x].currentSoilWaterMM -
-                          (self.listOfSoilLayers[x].fcWater))
-
-            # travel time for percolation (h)
-            self.listOfSoilLayers[x].TT = (((self.listOfSoilLayers[x].saturation
-                    * self.listOfSoilLayers[x].depth)-
-                    self.listOfSoilLayers[x].fcWater)/
-                                               self.listOfSoilLayers[x].ksat)
-            t = 24 # time step (hours)
-
-            #amount of water that percolates
-            self.listOfSoilLayers[x].perc = (SWperc *
-                            (1 - math.exp(-t/self.listOfSoilLayers[x].TT)))
 
     #---------------------------------------------------------------------------
     # Function: dailySoilErosion
