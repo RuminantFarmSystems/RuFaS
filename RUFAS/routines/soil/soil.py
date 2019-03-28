@@ -10,8 +10,10 @@
 ################################################################################
 
 import math
-from . import nitrogen_cycling, phosphorus_cycling, evapotranspiration, soil_temp,\
-    infiltration, percolation
+from . import nitrogen_cycling, phosphorus_cycling, infiltration, \
+    evapotranspiration, percolation, soil_temp, soil_erosion
+
+
 #------------------------------------------------------------------------------
 # Function: daily_soil_routine
 # Executes all the daily soil routines
@@ -40,9 +42,7 @@ def daily_soil_routine(soil, crop, weather, time):
     percolation.update_all(soil)
 
     # calculate daily soil erosion
-    soil.dailySoilErosion(weather.rainfall[time.year-1][time.day-1],
-                          crop.crops_list["corn"].bio_AG,
-                          time.day)
+    soil_erosion.update_all(soil, crop, weather, time)
 
     nitrogen_cycling.daily_nitrogen_cycling_routine(soil, time, weather)
 
@@ -500,92 +500,6 @@ class Soil():
                 self.listOfSoilLayers[x].depth * self.listOfSoilLayers[x]
                 .fieldCapacity)
 
-
-
-    #---------------------------------------------------------------------------
-    # Function: dailySoilErosion
-    # Use MUSLE approach (equations taken from SWAT 2009 documentation) to
-    # determine soil erosion
-    #---------------------------------------------------------------------------
-    def dailySoilErosion(self, rainfall, bio_AG, day):
-        '''
-        Description:
-            Use MUSLE approach to determine soil erosion.
-
-        Args:
-            rainfall: a number which represents the rainfall from the Weather instance
-            bio_AG: the biomass from the CropType instance
-            day: the day from the Time class
-        '''
-
-        # time of concentration (h)
-        Tconc = ((self.slopeLength**0.6) * (self.manning**0.6)) / (
-            18 * (self.fieldSlope**0.3))
-
-        alphaMean = (0.02083 + (1 - math.exp(-125 / (float(rainfall) + 5))))/2
-
-        # fraction of daily rain during time of concentration
-        alpha = 1 - math.exp(2 * Tconc * math.log(1 - alphaMean))
-
-        # rain amount during time of concentration (mm)
-        Rtc = alpha * float(rainfall)
-
-        # rainfall intensity (mm/hr)
-        I = Rtc / Tconc
-
-        # peak runoff rate (m**3/sec)
-        Qpeak = 0.0
-        if float(rainfall) != 0:
-            Qpeak = ((self.runoff/float(rainfall)) * I *
-                     self.fieldSize) / 3.6
-
-        # gives low factors for soils with high sand contents and high values
-        # for soils with little sand
-        Fcsand = 0.2 + 0.3 * math.exp(-0.256 * self.sand * (1-
-                                                (self.silt/100)))
-
-        # gives low factors for soils with high clay to silt ratios
-        Fclsi = (self.silt / (self.listOfSoilLayers[0].clay + self.silt))**0.3
-
-        # reduces soil erodibility for soils with high organic carbon content
-        Forgc = 1 - ((0.25 * self.orgc) / (self.orgc
-                            + math.exp(3.72 - 2.95 * self.orgc)))
-
-        # reduces soil erodibility for soils with high sand contents
-        Fsand = 1 - (0.7 * (1 - self.sand/100) / ((1 - self.sand/100) +
-                        math.exp(-5.51 + 22.9 * (1 / (self.sand/100)))))
-
-        # USLE soil erodibility factor (Mg MJ**-1 mm**-1)
-        K = Fcsand * Fclsi * Forgc * Fsand
-
-
-        # C is USLE cover and management factor
-        # 0.05 is the minimum value for C. This is an estimate.
-        # 250 (COVER) NEEDS TO BE CHANGED (BIOMASS)
-        C = math.exp((math.log(0.8) - math.log(0.05)) *
-                     math.exp(-0.00115 * bio_AG) + math.log(0.05))
-
-
-        # the exponential term m is calculated as...
-        m = 0.6 * (1 - math.exp(-35.835 * self.fieldSlope))
-
-        # angle of the slope
-        alphahill = math.tan(self.fieldSlope)
-
-        # USLE topographic factor
-        LS = ((self.slopeLength / 22.1)**m) * (65.41 * (math.sin(alphahill)**2)
-                    + 4.56 * math.sin(alphahill) + 0.065)
-
-        # sediment yield on a given day (metric tons)
-        # Qpeak is peak runoff rate (m3/sec)
-        sed = 11.8 * ((self.runoff * Qpeak)**0.56
-                      ) * K * C * self.practiceFactor * LS
-        self.sedimentYield = sed
-
-        snowCorrectedSed = sed
-        if day < 95 or day > 300:
-            snowCorrectedSed = sed/(math.exp(3*20/25.4))
-        self.snowCorrectedSed = snowCorrectedSed
 
     #---------------------------------------------------------------------------
     # Function: updateCurrentSoilWater
