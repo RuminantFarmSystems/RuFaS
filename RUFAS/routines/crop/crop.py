@@ -83,20 +83,16 @@ from . import heat_units, leaf_area_index, root_development, biomass, yields, \
     phosphorus_uptake, nitrogen_uptake, soil_water_uptake
 from RUFAS import util
 
-#-------------------------------------------------------------------------------
+
+# -------------------------------------------------------------------------------
 # Function: daily_crop_routine
-#-------------------------------------------------------------------------------
+# -------------------------------------------------------------------------------
 def daily_crop_routine(crop, weather, time, soil):
-    '''
-    TODO: Add DocString
-    '''
+    T_min = weather.T_min[time.year - 1][time.day - 1]
+    T_max = weather.T_max[time.year - 1][time.day - 1]
 
-    T_min = weather.T_min[time.year-1][time.day-1]
-    T_max = weather.T_max[time.year-1][time.day-1]
-
-    for _,crop_type in crop.crops_list.items():
-
-#------------------------------------------------------------------------------
+    for _, crop_type in crop.crops_list.items():
+        # ------------------------------------------------------------------------------
         '''
         Load input values to represent input from other modules.
         This will need to be removed eventually because the crop module will
@@ -120,7 +116,7 @@ def daily_crop_routine(crop, weather, time, soil):
         # soil.listOfSoilLayers[1].currentSoilWaterMM = crop_type.test_soil_water2[timeIndex]
         # soil.listOfSoilLayers[2].currentSoilWaterMM = crop_type.test_soil_water3[timeIndex]
 
-#------------------------------------------------------------------------------
+        # ------------------------------------------------------------------------------
 
         #
         # Run calculations
@@ -144,42 +140,28 @@ def daily_crop_routine(crop, weather, time, soil):
         yields.update_all(crop_type, time, soil)
 
 
-#-------------------------------------------------------------------------------
+# -------------------------------------------------------------------------------
 # Function: annual_crop_routine
-#-------------------------------------------------------------------------------
+# -------------------------------------------------------------------------------
 def annual_crop_routine(crop, weather, time):
-    '''
-    TODO: Add DocString
-    '''
+    for _, crop_type in crop.crops_list.items():
+        crop_type.calculate_start_growth_day(weather.T_avg[time.year - 1])
 
-    for _,crop_type in crop.crops_list.items():
-        crop_type.calculate_start_growth_day(weather.T_avg[time.year-1])
 
-#-------------------------------------------------------------------------------
+# -------------------------------------------------------------------------------
 # Class: Crop
-#-------------------------------------------------------------------------------
+# -------------------------------------------------------------------------------
 class Crop():
-    '''
-    TODO: Add DocString
-    '''
 
     def __init__(self, data):
-        '''
-        TODO: Add DocString
-        '''
-
         self.crops_list = {crop_type: self.CropType(data[crop_type]) for crop_type in data.keys()}
 
-    #---------------------------------------------------------------------------
+    # ---------------------------------------------------------------------------
     # Class: CropType
-    #---------------------------------------------------------------------------
+    # ---------------------------------------------------------------------------
     class CropType():
 
         def __init__(self, data):
-            '''
-            TODO: Add DocString
-            '''
-
             '''GENERAL PLANT INFO'''
 
             self.crop_name = data['crop_name']
@@ -191,9 +173,9 @@ class Crop():
             self.harvest_date = data['harvest_date']
             self.start_day = 0
 
-            #===================================================================
+            # ===================================================================
             ''' HEAT UNIT DATA '''
-           
+
             # Inputs
             self.T_base_min = data['min_temp_for_growth']
             self.T_base_max = data['max_temp_for_growth']
@@ -202,14 +184,14 @@ class Crop():
             # Internally calculated inputs
             self.accumulated_HU = 0.0
             self.prev_accumulated_HU = 0.0
-            
+
             # Outputs
             self.fr_PHU = 0.0
             self.prev_fr_PHU = 0.0
-            
-            #===================================================================
+
+            # ===================================================================
             ''' LEAF AREA INDEX (LAI) DATA '''
-            
+
             # Inputs
             self.fr_PHU_1 = data['fr_PHU_1']
             self.fr_PHU_2 = data['fr_PHU_2']
@@ -217,31 +199,31 @@ class Crop():
             self.fr_LAI_2 = data['fr_LAI_2']
             self.fr_PHU_sen = data['fr_PHU_sen']
             self.LAI_max = data['LAI_max']
-            
+
             # Internally calculated inputs
             self.prev_fr_LAI_max = 0
             self.fr_LAI_max = 0
-            
+
             # Outputs
             self.prev_LAI_actual = 0
             self.LAI_actual = 0
-            
-            #===================================================================
+
+            # ===================================================================
             ''' ROOT DEPTH DATA '''
-            
+
             # Inputs
-            self.z_root_max = data['z_root_max'] # maximum depth of root development
+            self.z_root_max = data['z_root_max']  # maximum depth of root development
 
             # Internally calculated inputs
             self.fr_root = 0
-            
+
             # Outputs
             self.z_root = 0
             self.prev_z_root = 0
-            
-            #===================================================================
+
+            # ===================================================================
             ''' BIOMASS DATA '''
-            
+
             # Inputs
             self.kl = data['light extinction coefficient']
             self.RUE = data['radiation_use_efficiency']
@@ -251,15 +233,15 @@ class Crop():
             self.gamma_reg = 0
             self.dBiomass_max = 0
             self.dBiomass_actual = 0.0
-            
+
             # Outputs
             self.biomass_actual = 0
             self.prev_biomass_actual = 0
-            
-            #===================================================================
+
+            # ===================================================================
             ''' Soil Water Uptake Data '''
 
-            self.beta_w = data['beta_w']   # water-use distribution parameter
+            self.beta_w = data['beta_w']  # water-use distribution parameter
             self.epco = data['epco']
 
             self.Et_actual = 0
@@ -267,7 +249,7 @@ class Crop():
             self.water_actual_up = 0
             self.water_uptake_each_layer = []
 
-            #===================================================================
+            # ===================================================================
             ''' Nitrogen Uptake Data '''
 
             self.beta_n = data["beta_n"]
@@ -286,7 +268,7 @@ class Crop():
             self.act_N_up_each_layer = []
             self.N_actual_up = 0
 
-            #===================================================================
+            # ===================================================================
             ''' Phosphorus Uptake Data '''
 
             self.beta_p = data["beta_p"]
@@ -306,7 +288,7 @@ class Crop():
             self.act_P_up_each_layer = []
             self.P_act_up = 0
 
-            #===================================================================
+            # ===================================================================
             ''' Yields Data '''
 
             self.HI_max = 0
@@ -325,7 +307,7 @@ class Crop():
             self.yield_P = 0
             self.residue = data["init_residue"]
 
-            #===================================================================
+            # ===================================================================
             ''' Testing Data '''
             #
             # TEST_DATA = util.get_csv_columns(data["TEST_DATA"])
@@ -352,30 +334,21 @@ class Crop():
             # self.test_Ea_sum = data["TESTING_Ea_sum"]
             # self.test_Eo_sum = data["TESTING_Eo_sum"]
 
-
-        #-----------------------------------------------------------------------
+        # -----------------------------------------------------------------------
         # Method: calculate_start_growth_day
-        #-----------------------------------------------------------------------
+        # -----------------------------------------------------------------------
         def calculate_start_growth_day(self, T_avg):
-            '''
-            TODO: Add DocString
-            '''
-
             if self.crop_type == "annual":
                 self.start_day = self.planting_date
-            else: # crop_type == "perennial"
+            else:
                 for d in range(len(T_avg)):
                     if T_avg > self.T_base_min:
                         self.start_day = d
 
-
-    #---------------------------------------------------------------------------
+    # ---------------------------------------------------------------------------
     # Method: annual_reset
-    #---------------------------------------------------------------------------
+    # ---------------------------------------------------------------------------
     def annual_reset(self):
-        '''
-        TODO: Add DocString
-        '''
         for _, crop_type in self.crops_list.items():
             crop_type.accumulated_HU = 0
             crop_type.prev_accumulated_HU = 0
