@@ -47,7 +47,7 @@ class SoilSummary(BaseReportHandler):
         self.layersTemperature = []
 
     #---------------------------------------------------------------------------
-    # Function: get_header
+    # Function: write_header
     #           Writes the header (title and units) in the csvfile
     #---------------------------------------------------------------------------
     def write_header(self):
@@ -78,8 +78,8 @@ class SoilSummary(BaseReportHandler):
             fieldnames.append("Sediment Yield")
 
             self.fieldNames = fieldnames
-            writer = csv.DictWriter(csvfile, fieldnames=fieldnames,
-                                    lineterminator = '\n')
+            writer = csv.DictWriter(csvfile, fieldnames=self.fieldNames,
+                                    lineterminator='\n')
             writer.writeheader()
 
             # 2) Write Units in 2nd row of cvsfile
@@ -215,7 +215,7 @@ class SoilSummary(BaseReportHandler):
                         round(self.layersTemperature[y][x], 3))
 
                 writer = csv.DictWriter(csvfile, fieldnames=self.fieldNames,
-                                    lineterminator = '\n')
+                                        lineterminator='\n')
                 writer.writerow(dailySoilData)
 
     #---------------------------------------------------------------------------
