@@ -74,14 +74,14 @@ class Config():
 		'''
 		TODO: Add DocString
 		'''
-		
+
 		self.startYear = data['StartYear']
 		self.endYear = data['EndYear']
 		self.duration = self.endYear - self.startYear + 1
-		
+
 		if self.duration <= 0:
 			raise errors.JSONfileData("CONFIG",
-								"\tSimulation Duration must be at least 1 year")
+									  "\tSimulation Duration must be at least 1 year")
 
 		self.output_dir = data['output_dir']
 
@@ -106,7 +106,7 @@ class Weather():
 		self.biomass = [[0 for _ in range(365)]for _ in range(duration)]
 		self.radiation = [[0 for _ in range(365)]for _ in range(duration)]
 		self.addedN = [[0 for _ in range(365)]for _ in range(duration)]
-		
+
 		self.evaporation = [[0 for _ in range(365)]for _ in range(duration)]
 		self.lCows = [[0 for _ in range(365)]for _ in range(duration)]
 		self.dCows = [[0 for _ in range(365)]for _ in range(duration)]
@@ -122,7 +122,7 @@ class Weather():
 		bioMassData = []
 		radiationData = []
 		addedNData = []
-		
+
 		evaporationData = []
 		lCowsData = []
 		dCowsData = []
@@ -267,7 +267,7 @@ class Weather():
 					break
 				else:
 					self.addedN[i][j] = addedNData[i*365 + j]
-					
+
 		# 8) Update evaporation in weather
 		for i in range(0, duration):
 			for j in range(0, 365):
@@ -283,7 +283,7 @@ class Weather():
 					break
 				else:
 					self.lCows[i][j] = lCowsData[i*365 + j]
-					
+
 		# 10) Update dry cows in weather
 		for i in range(0, duration):
 			for j in range(0, 365):
@@ -291,7 +291,7 @@ class Weather():
 					break
 				else:
 					self.dCows[i][j] = dCowsData[i*365 + j]
-					
+
 		# 11) Update heifer in weather
 		for i in range(0, duration):
 			for j in range(0, 365):
@@ -299,7 +299,7 @@ class Weather():
 					break
 				else:
 					self.heifer[i][j] = heiferData[i*365 + j]
-					
+
 		# 12) Update calf in weather
 		for i in range(0, duration):
 			for j in range(0, 365):
@@ -307,7 +307,7 @@ class Weather():
 					break
 				else:
 					self.calf[i][j] = calfData[i*365 + j]
-					
+
 		# 13) Update beef in weather
 		for i in range(0, duration):
 			for j in range(0, 365):
@@ -315,7 +315,7 @@ class Weather():
 					break
 				else:
 					self.beef[i][j] = beefData[i*365 + j]
-					
+
 		# 14) Update beef calf in weather
 		for i in range(0, duration):
 			for j in range(0, 365):
@@ -392,10 +392,10 @@ class Time():
 	# Function: end_simulation
 	#-------------------------------------------------------------------------------
 	def end_simulation(self):
-	    '''Checks whether the simulation has ended
+		'''Checks whether the simulation has ended
 
-	    Returns:
-	        bool: True if the simulation has ended, false otherwise
-	    '''
+		Returns:
+	    	bool: True if the simulation has ended, false otherwise
+		'''
 
-	    return self.year > self.duration
+		return self.year > self.duration
