@@ -75,16 +75,9 @@ def daily_simulation():
     '''Executes the daily simulation routines.'''
 
     #
-    # This IF statement is in place because of the soil hydrology file Pete has
-    # provided. His values are calculated starting from day 188 of year 1.
-    # We should avoid doing this if possible
+    # Daily Routines
+    # Pass only information needed
     #
-    if time.day >= 188 or time.year > 1:
-        pass
-        #
-        # Daily Routines
-        # Pass only information needed
-        #
     routines.daily_soil_routine(state.soil, state.crop, weather, time)
 
         #
@@ -169,8 +162,8 @@ def read_json_file(fPath:Path):
             config = Config(data['config'])
             state = State(data['farm'], config)
             output = OutputHandler(data['output'])
-            weather = Weather(data['weather'], config.duration)
-            time = Time(config.duration)
+            weather = Weather(data['weather'], config.years)
+            time = Time(config.years)
 
         except errors.JSONfileData as e:
             print("JSON FILE ERROR: " +

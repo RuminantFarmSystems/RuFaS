@@ -1,3 +1,11 @@
+################################################################################
+'''
+RUFAS: Ruminant Farm Systems Model
+File name: crop_summary.py
+Description:
+Author(s): William Donovan, wmdonovan@wisc.edu
+'''
+#############################################
 import csv
 from RUFAS.output.report_handler import BaseReportHandler
 
