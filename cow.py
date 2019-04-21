@@ -25,7 +25,7 @@ class Cow(HeiferIII):
 		self._tai_program_start_day_c = 0
 		self._resynch_method = args['resynch_method']
 
-		# ecnomics counts
+		# economics counts
 		self._ED_days = 0
 		self._ED_econ_days = 0
 		self._GnRH_injections = 0
@@ -107,7 +107,7 @@ class Cow(HeiferIII):
 		else:
 			self._body_weight = self._mature_body_weight * (1-(1-(self._birth_weight/self._mature_body_weight)**(1/3)) * math.exp(-0.006 * self._days_born)) **3 - (40/75) * self._days_in_milk * math.exp(1-self._days_in_milk/75) + 0.0187**3 * (self._days_in_preg - 50) ** 3
 
-		#caculate dry matter intake from fat corrected milk production
+		#calculate dry matter intake from fat corrected milk production
 		if self._milking:
 			dry_matter_intake = 0.372 * daily_fat_correct_milk_production + 0.0968 * self._body_weight**0.75 * (1-math.exp(-0.192 * (self._days_in_milk/7 +3.67)))
 		else:
