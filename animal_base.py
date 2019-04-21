@@ -42,7 +42,7 @@ class AnimalBase(object):
 		Description:
 			Check if the the cow is culled
 		Input: 
-			From involuentury and voluentury culling section
+			From involuntary and voluntary culling section
 		Output:
 			True/False value inidicating if culled
 	'''
