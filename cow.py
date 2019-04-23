@@ -1,3 +1,20 @@
+'''
+RUFAS: Ruminant Farm Systems Model
+File name: cow.py
+Author(s): Manfei Li, mli497@wisc.edu
+Description: This file updates the cow form first calving to leaving the herd.
+			Temp: Body weight change uses equations for lactation cows (decrease for the first 50 days and increase later on)
+			Temp: Dry matter intake is caculated by body weight and FCM production.
+			TODO: Dry Matter Intake and Body Weight changed could be based on nutrition intake later fron Ration Formulation.
+			Reproduction program could be chosen from the ED, TAI, ED-TAI projects, reference:
+			http://www.dcrcouncil.org/wp-content/uploads/2019/04/Dairy-Cow-Protocol-Sheet-Updated-2018.pdf
+			Preg check follows AI for three times.
+			Daily milk production is based on breed and parity specific lactation curve model (wood's and Milkbot) parameters.
+			Culling inclouding 3 components: repro, production, and health,
+				health culling for 6 reasons: Lameness, Injury, Mastitis, Disease, Udder, and Unknown
+'''
+###############################################################################
+
 import math
 import numpy as np
 from heiferIII import HeiferIII
@@ -8,6 +25,17 @@ config = Config()
 
 
 class Cow(HeiferIII):
+	'''
+		Description:
+			initialize the cow from heifer
+		Input:
+			heiferIII: third stage of heifer, pass heifer information from heiferIII
+			args.repro_program: reproduction program used in cow, three of them: ED, TAI, and ED-TAI programs
+			args.presynch_method: presych protocols used for presynch programs, four of them: PreSynch, Double OvSynch, G6G, and user_defined
+			args.tai_method_c: timed-AI protocols used for reproduction programs, five of them: OvSynch 56, OvSynch 48, CoSynch 72, 5d CoSynch, and user-defined
+			args.resynch_method: resynch protocols used for resynch programs, three of them: TAIafterPD, TAIbeforePD, and PGFatPD
+		Output:
+	'''
 	def __init__(self, heiferIII, args):
 		super().init_from_heiferIII(heiferIII)
 		self._calves = 0
@@ -17,6 +45,7 @@ class Cow(HeiferIII):
 		self._future_cull_date = 0
 		self._cull_reason = None
 		self._repro_program = args['repro_program']
+		self._first_ai = False
 
 		# TAI params
 		self._presynch_method = args['presynch_method']
@@ -37,6 +66,13 @@ class Cow(HeiferIII):
 		self._fixed_cost = 0
 		self._milk_income = 0
 
+	'''
+		Description:
+            initialize the cow in this stage from the third stage of heifer and initialize the repro program parameters for coding purpose
+		Input:
+			heiferIII: another heifer out of the herd
+		Output:
+	'''
 	def init_from_cow(self, cow):
 		super().init_from_heiferIII(Cow)
 		self._calves = cow._calves
@@ -46,6 +82,7 @@ class Cow(HeiferIII):
 		self._future_cull_date = cow._future_cull_date
 		self._cull_reason = cow._cull_reason
 		self._repro_program = cow._repro_program
+		self._first_ai = cow._first_ai
 
 		# TAI params
 		self._presynch_method = cow._presynch_method
@@ -65,10 +102,30 @@ class Cow(HeiferIII):
 		self._fixed_cost = cow._fixed_cost
 		self._milk_income = cow._milk_income
 
+	'''
+		Description:
+			determine parameter value distribution for lactation curve model parameters
+		Input:
+			mean: mean of the parameter value for l, m, n in wood's model
+			std: standard divation of the parameter value for l, m, n in wood's model
+		Output:
+			np.random.normal(mean, std): a random value draw from distribution of parameters
+	'''
 	def _determine_param_value(self, mean, std):
 		return np.random.normal(mean, std)
 
-	# lactation curve
+	'''
+		Description:
+			update milking status for lactating cows
+			start at calving, daily milk production estimated by breed and parity specific lactation curves
+			TEMP: fat percent, FCM, body weight during lactation, and dry matter intake are coded here with equations with hard-coded parameters just for valid the simulation model indication of the place for future adjustment with ration formulation and ecnomics caculation
+		Input:
+		Output:
+			estimated_daily_milk_produced: estimated daily milk production from the lactation curve
+			fat_percent: caculated with days in milk, for temprary use
+			daily_fat_correct_milk_production: caculated form estimated milk production and fat percent, for temprary use
+			dry_matter_intake: caculated from FCM, days in milk, and body weight, for temprary use
+	'''
 	def _milking_update(self):
 		if self._days_in_preg == self._gestation_length - config.dry_period:
 			self._milking = False
@@ -88,18 +145,18 @@ class Cow(HeiferIII):
 			m = self._determine_param_value(config.m[breed_index][parity_index], config.m_std[breed_index][parity_index])
 			n = self._determine_param_value(config.n[breed_index][parity_index], config.n_std[breed_index][parity_index])
 
-			daily_milk_produced = l * \
+			estimated_daily_milk_produced = l * \
 				math.pow(self._days_in_milk, m) * \
 				math.exp((0 - n) * self._days_in_milk)
 		elif config.lactation_curve == 'milkbot':
-			daily_milk_produced = config.a * \
+			estimated_daily_milk_produced = config.a * \
 				(1 - math.exp((config.c-self._days_in_milk) / config.b) / 2) * \
 				math.exp((0 - config.d) * self._days_in_milk)
-		self._single_acc_milk_prod += daily_milk_produced
+		self._single_acc_milk_prod += estimated_daily_milk_produced
 
 		# calculate fat percent in milk and fat corrected milk production
 		fat_percent = 12.86 * self._days_in_milk ** (-1.081) * math.exp((0.0926) * (math.log(self._days_in_milk)) ** 2) * (math.log(self._days_in_milk) ** 1.107)
-		daily_fat_correct_milk_production = 0.4 * daily_milk_produced + 0.15 * fat_percent * daily_milk_produced
+		daily_fat_correct_milk_production = 0.4 * estimated_daily_milk_produced + 0.15 * fat_percent * estimated_daily_milk_produced
 
 		# calculate body weight when milking
 		if self._calves == 1:
@@ -107,20 +164,34 @@ class Cow(HeiferIII):
 		else:
 			self._body_weight = self._mature_body_weight * (1-(1-(self._birth_weight/self._mature_body_weight)**(1/3)) * math.exp(-0.006 * self._days_born)) **3 - (40/75) * self._days_in_milk * math.exp(1-self._days_in_milk/75) + 0.0187**3 * (self._days_in_preg - 50) ** 3
 
-		#calculate dry matter intake from fat corrected milk production
+		#caculate dry matter intake from fat corrected milk production
 		if self._milking:
 			dry_matter_intake = 0.372 * daily_fat_correct_milk_production + 0.0968 * self._body_weight**0.75 * (1-math.exp(-0.192 * (self._days_in_milk/7 +3.67)))
 		else:
 			dry_matter_intake = 12
 
-		return daily_milk_produced, fat_percent, daily_fat_correct_milk_production, dry_matter_intake
+		return estimated_daily_milk_produced, fat_percent, daily_fat_correct_milk_production, dry_matter_intake
 
-	# cow update
+
+	'''
+		Description:
+			update cow status from the moment of calving, parity+1, milking start, pregnancy stop, and estrus restart
+			TEMP: caculate cost and income related values for validating model
+		Input:
+			record_econ_stats: record cost and income in defferent fuctions for temprary use
+		Output:
+			estimated_daily_milk_produced: estimated daily milk production from the lactation curve
+			fat_percent: caculated with days in milk, for temprary use
+			daily_fat_correct_milk_production: caculated form estimated milk production and fat percent, for temprary use
+			dry_matter_intake: caculated from FCM, days in milk, and body weight, for temprary use
+			cull_stage: True if a cow is culled, false if it stays in the herd
+			new_born: True if a calf is born
+	'''
 	def update(self, record_econ_stats):
 		if self._culled:
 			return None
 
-		daily_milk_produced = 0
+		estimated_daily_milk_produced = 0
 		cull_stage = False
 		new_born = False
 		self._days_born += 1
@@ -133,19 +204,19 @@ class Cow(HeiferIII):
 			self._days_in_preg = 0
 			self._gestation_length = 0
 			self._events.add_event(self._days_born, 'New birth, start milking')
-			self._involuntary_cull_update()
+			self._health_cull_update()
 			new_born = True
 
 			# restarting estrus
 			if self._repro_program in ['ED', 'ED-TAI']:
 				self._restart_estrus()
 
-		daily_milk_produced = 0
+		estimated_daily_milk_produced = 0
 		fat_percent = 0
 		daily_fat_correct_milk_production = 0
 		dry_matter_intake = 0
 		if self._milking:
-			daily_milk_produced, fat_percent, daily_fat_correct_milk_production, dry_matter_intake = self._milking_update()
+			estimated_daily_milk_produced, fat_percent, daily_fat_correct_milk_production, dry_matter_intake = self._milking_update()
 			if self._repro_program == 'ED':
 					self._ed_update(record_econ_stats)
 			elif self._repro_program == 'ED-TAI':
@@ -155,34 +226,71 @@ class Cow(HeiferIII):
 					self._tai_update(record_econ_stats)
 
 		self._preg_update(record_econ_stats)
-		cull_stage = self._cull_update(daily_milk_produced)
+		cull_stage = self._cull_update(estimated_daily_milk_produced)
 
-		self._economy_update(cull_stage, daily_milk_produced, dry_matter_intake, record_econ_stats)
+		self._economy_update(cull_stage, estimated_daily_milk_produced, dry_matter_intake, record_econ_stats)
 
-		return daily_milk_produced, fat_percent, daily_fat_correct_milk_production, dry_matter_intake, cull_stage, new_born
+		return estimated_daily_milk_produced, fat_percent, daily_fat_correct_milk_production, dry_matter_intake, cull_stage, new_born
 
 	################ ED methods #################
-
+	'''
+		Description:
+			in estrus detection program, determine estrus day and estrus note
+		Input:
+			start_date: start day of a estrus cycle, 1st day when breeding start after calving or last estrus happend or return estrus from preg loss
+			estrus_note: note of this estrus
+			avg: average length for an estrus cycle
+			std: standard divation for an estrus cycle
+		Output:
+			estrus_day: the day when this estrus should occur
+	'''
 	def _determine_estrus_day(self, start_date, estrus_note, avg, std):
 		estrus_day = int(start_date + abs(np.random.normal(avg, std)))
 		self._events.add_event(estrus_day, estrus_note)
 		return estrus_day
 
+	'''
+		Description:
+			return estrus after calving
+	'''
 	def _restart_estrus(self):
 		self._estrus_day = self._determine_estrus_day(self._days_born, '1st estrus after calving', config.avg_estrus_cycle_r, config.std_estrus_cycle_r)
 
+	'''
+		Description:
+			return estrus after first estrus
+	'''
 	def _later_estrus(self):
 		self._estrus_day = self._determine_estrus_day(self._estrus_day, 'estrus occur before vwp', config.avg_estrus_cycle_c, config.std_estrus_cycle_c)
 
+	'''
+		Description:
+			return estrus after estrus not detected or not serveded
+	'''
 	def _return_estrus(self):
 		self._estrus_day = self._determine_estrus_day(self._estrus_day, 'Estrus', config.avg_estrus_cycle_c, config.std_estrus_cycle_c)
 
+	'''
+		Description:
+			return estrus after AI
+	'''
 	def _after_ai_estrus(self):
 		self._estrus_day = self._determine_estrus_day(self._estrus_day, 'Estrus after AI', config.avg_estrus_cycle_c, config.std_estrus_cycle_c)
 
+	'''
+		Description:
+			return estrus after abortion at preg check
+	'''
 	def _after_abortion_estrus(self):
 		self._estrus_day = self._determine_estrus_day(self._abortion_day, 'Estrus after abortion', config.avg_estrus_cycle_c, config.std_estrus_cycle_c)
 
+	'''
+		Description:
+			estrus occur at estrus day,
+			estrus detected with detection rate,
+			service proformed with service rate,
+			conception successed with conception rate
+	'''
 	def _ed_update(self, record_econ_stats):
 		# if on estrus day, start detecting estrus
 		if self._days_born == self._estrus_day:
@@ -213,9 +321,21 @@ class Cow(HeiferIII):
 
 	################ TAI methods #################
 
+	'''
+		Description:
+			determine the program start time when pass voluntary waiting period
+		Input:
+			date: the time tai program start
+		Output:
+			_tai_program_start_day_c = date: at this day, the tai program starts
+	'''
 	def _determine_tai_program_day(self, date):
 		self._tai_program_start_day_c = date
 
+	'''
+		Description:
+			resynch start after calving, resynch method assigned
+	'''
 	def _tai_program_day_after_preg_check(self, record_econ_stats):
 		if self._resynch_method == 'TAIafterPD':
 			self._tai_program_start_day_c = self._abortion_day + 1
@@ -232,6 +352,13 @@ class Cow(HeiferIII):
 			self._tai_program_start_day_c = self._abortion_day + 8
 			self._conception_rate -= config.conception_rate_decrease
 
+	'''
+		Description:
+			OvSynch56 protocol for tai method
+		Input:
+			record_econ_stats: record injection counts in this protocol, for temparary use
+		Output:
+	'''
 	def _OvSynch56_update(self, record_econ_stats):
 		if self._days_born == self._tai_program_start_day_c:
 			self._events.add_event(self._days_born, 'Inject GnRH')
@@ -246,6 +373,13 @@ class Cow(HeiferIII):
 			self._ai_day = self._days_born
 			self._conception_rate = config.ovsynch56_conception_rate
 
+	'''
+		Description:
+			OvSynch48 protocol for tai method
+		Input:
+			record_econ_stats: record injection counts in this protocol, for temparary use
+		Output:
+	'''
 	def _OvSynch48_update(self, record_econ_stats):
 		if self._days_born == self._tai_program_start_day_c:
 			self._events.add_event(self._days_born, 'Inject GnRH')
@@ -260,6 +394,13 @@ class Cow(HeiferIII):
 			self._ai_day = self._days_born
 			self._conception_rate = config.ovsynch48_conception_rate
 
+	'''
+		Description:
+			CoSynch72 protocol for tai method
+		Input:
+			record_econ_stats: record injection counts in this protocol, for temparary use
+		Output:
+	'''
 	def _CoSynch72_update(self, record_econ_stats):
 		if self._days_born == self._tai_program_start_day_c:
 			self._events.add_event(self._days_born, 'Inject GnRH')
@@ -273,6 +414,13 @@ class Cow(HeiferIII):
 			self._ai_day = self._days_born
 			self._conception_rate = config.cosynch72_conception_rate
 
+	'''
+		Description:
+			5dCoSynch protocol for tai method
+		Input:
+			record_econ_stats: record injection counts in this protocol, for temparary use
+		Output:
+	'''
 	def _5dCoSynch_update(self, record_econ_stats):
 		if self._days_born == self._tai_program_start_day_c:
 			self._events.add_event(self._days_born, 'Inject GnRH')
@@ -289,14 +437,33 @@ class Cow(HeiferIII):
 			self._ai_day = self._days_born
 			self._conception_rate = config._5dcosynch_conception_rate
 
+	'''
+		Description:
+			user_defined protocol for tai method
+	'''
 	def _user_defined_update(self):
 		if self._days_born == self._tai_program_start_day_c + config.tai_program_length:
 			self._ai_day = self._days_born
 			self._conception_rate = config.defined_conception_rate_c
 
+	'''
+		Description:
+			determine the presynch program start time when pass voluntary waiting period
+		Input:
+			date: the time presynch program start
+		Output:
+			_presynch_program_start_day = date: at this day, the presynch program starts
+	'''
 	def _determine_presynch_program_day(self, date):
 		self._presynch_program_start_day = date
 
+	'''
+		Description:
+			presynch protocol for presynch method
+		Input:
+			record_econ_stats: record injection counts in this protocol, for temparary use
+		Output:
+	'''
 	def _presynch_update(self, record_econ_stats):
 		if self._days_born == self._presynch_program_start_day:
 			self._events.add_event(self._days_born, 'Inject PGF')
@@ -308,6 +475,13 @@ class Cow(HeiferIII):
 			self._tai_program_start_day_c = self._days_born
 			self._events.add_event(self._days_born, 'PreSynch end')
 
+	'''
+		Description:
+			oubleovsynch protocol for presynch method
+		Input:
+			record_econ_stats: record injection counts in this protocol, for temparary use
+		Output:
+	'''
 	def _doubleovsynch_update(self, record_econ_stats):
 		if self._days_born == self._presynch_program_start_day:
 			self._events.add_event(self._days_born, 'Inject GnRH')
@@ -322,6 +496,13 @@ class Cow(HeiferIII):
 			self._tai_program_start_day_c = self._days_born
 			self._events.add_event(self._days_born, 'Double OvSynch end')
 
+	'''
+		Description:
+			g6g protocol for presynch method
+		Input:
+			record_econ_stats: record injection counts in this protocol, for temparary use
+		Output:
+	'''
 	def _g6g_update(self, record_econ_stats):
 		if self._days_born == self._presynch_program_start_day:
 			self._events.add_event(self._days_born, 'Inject PGF')
@@ -333,10 +514,21 @@ class Cow(HeiferIII):
 			self._tai_program_start_day_c = self._days_born
 			self._events.add_event(self._days_born, 'G6G end')
 
+	'''
+		Description:
+			user_defined_presynch protocol for presynch method
+	'''
 	def _user_defined_presynch_update(self):
 		if self._days_born == self._presynch_program_start_day:
 			self._tai_program_start_day_c = self._days_born + config.presynch_program_length
 
+	'''
+		Description:
+			assign tai and presynch method, update time AI method status, TAI can be performed with or without presynch
+		Input:
+			record_econ_stats: record injection counts in this protocol, for temparary use
+		Output:
+	'''
 	def _tai_update(self, record_econ_stats):
 		if self._days_in_milk == config.vwp:
 			if self._presynch_method:
@@ -366,6 +558,14 @@ class Cow(HeiferIII):
 			self._user_defined_update()
 
 	################ ED-TAI methods #################
+
+	'''
+		Description:
+			update ED-TAI method, perform estrus detection before the TAI program
+		Input:
+			record_econ_stats: record injection counts in this protocol, for temparary use
+		Output:
+	'''
 	def _ed_tai_update(self, record_econ_stats):
 		# if on estrus day, start detecting estrus
 		if self._days_born == self._estrus_day and self._days_in_milk < config.tai_program_start_day:
@@ -407,6 +607,13 @@ class Cow(HeiferIII):
 			elif self._tai_method_c == 'user_defined':
 				self._user_defined_update()
 
+	'''
+		Description:
+			using ED at the resynch period of ED-TAI
+		Input:
+			record_econ_stats: record injection counts in this protocol, for temparary use
+		Output:
+	'''
 	def _resynch_ed_tai(self, record_econ_stats):
 		if self._resynch_method == 'TAIafterPD':
 			self._tai_program_start_day_c = self._abortion_day + 1
@@ -426,6 +633,14 @@ class Cow(HeiferIII):
 
 	################ Preg methods #################
 
+	'''
+		Description:
+			assign breeding method for open cows after spot open at preg check
+			three methods can be assigned: ED, TAI, ED-TAI
+		Input:
+			record_econ_stats: record injection counts in this protocol, for temparary use
+		Output:
+	'''
 	def _open(self, record_econ_stats):
 		if self._repro_program == 'ED':
 			self._after_abortion_estrus()
@@ -434,6 +649,16 @@ class Cow(HeiferIII):
 		elif self._repro_program == 'ED-TAI':
 			self._resynch_ed_tai(record_econ_stats)
 
+	'''
+		Description:
+			update AI for cows reach ai day, inseminate the cow with specific semen type
+			by comparing with conception rate, if conception success, gestion length determined
+			for preg chek 1, confirm the conception
+			for preg chek 2 and 3, confirm pregnacy, there are chances of preg loss in each period of time between preg checks
+		Input:
+			record_econ_stats: record injection counts in this protocol, for temparary use
+		Output:
+	'''
 	def _preg_update(self, record_econ_stats):
 		if self._preg:
 			self._days_in_preg += 1
@@ -506,13 +731,19 @@ class Cow(HeiferIII):
 					self._days_born, 'Preg loss happened between 2nd and 3rd preg check')
 
 	################ Cull methods #################
+
+	'''
+		Description:
+		Input:
+		Output:
+	'''
 	def _cull_update(self, record_econ_stats):
 		if not self._preg and self._days_in_milk > config.repro_cull_time:
 			self._culled = True
 			self._events.add_event(self._days_born, 'Cull for repro problem')
 			self._cull_reason = "Reproduction failure"
 			return True
-		if self._days_in_milk > 80 and not self._preg and self._milk_income < self._feed_cost + self._fixed_cost: #daily_milk_produced < config.cull_milk_production:
+		if self._days_in_milk > 80 and not self._preg and self._milk_income < self._feed_cost + self._fixed_cost: #estimated_daily_milk_produced < config.cull_milk_production:
 			self._culled = True
 			self._events.add_event(self._days_born, 'Cull for low production')
 			self._cull_reason = "Low production"
@@ -523,7 +754,13 @@ class Cow(HeiferIII):
 			return True
 		return False
 
-	def _involuntary_cull_update(self):
+	'''
+		Description:
+			update cows culled for health problem, first cull or not in this parity will be determined with parity specific culling rate
+				then a cull reason will be determined by ramdom draw
+				then a cull day will be indentified by reverse a distribution for cases of this reason
+	'''
+	def _health_cull_update(self):
 		inv_cull_rate = 0
 		if self._calves >= 4:
 			inv_cull_rate = config.parity_cull_prob[3]
@@ -562,7 +799,14 @@ class Cow(HeiferIII):
 			ai = (x_upper-x_lower) / (c_upper-c_lower)
 			self._future_cull_date = round(x_lower + ai * (cull_reason_rand - c_lower) + self._days_born)
 
-	def _economy_update(self, cull_stage, daily_milk_produced, dry_matter_intake, record_econ_stats):
+	'''
+		Description:
+			TEMP: update cost and income caculation for feed cost, fixed cost and milking income
+		Input:
+			AnimalBasecull_stage, estimated_daily_milk_produced, dry_matter_intake, record_econ_stats from temp use
+		Output:
+	'''
+	def _economy_update(self, cull_stage, estimated_daily_milk_produced, dry_matter_intake, record_econ_stats):
 		# cow ecnomics
 		if record_econ_stats:
 			if self._milking:
@@ -573,8 +817,15 @@ class Cow(HeiferIII):
 			if cull_stage == False:
 				self._fixed_cost += 2.5
 
-			self._milk_income += daily_milk_produced * 0.40
+			self._milk_income += estimated_daily_milk_produced * 0.40
 
+	'''
+		Description:
+			TEMP: update breeding method cost and slaughter value of culled cows
+		Input:
+			_repro_cost, semen_cost, AI_cost, preg_check_cost, _feed_cost, _fixed_cost, _milk_income, slaughter_value for temp use
+		Output:
+	'''
 	def get_economy_stats(self):
 		if self._repro_program == 'ED':
 			self._repro_cost = self._ED_days * 0.15

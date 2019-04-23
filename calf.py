@@ -1,3 +1,16 @@
+'''
+RUFAS: Ruminant Farm Systems Model
+File name: calf.py
+Author(s): Manfei Li, mli497@wisc.edu
+Description: This file updates the calf form birth to wean.
+			Birth weight initialized with breed specific distributions,
+			Gender determined with the semen type used,
+			Sold or keep decision made by user input,
+			Body weight gain with user input calf average daily gain.
+			TODO: Body weight changed could be based on nutrition intake later fron Ration Formulation
+'''
+###############################################################################
+
 import numpy as np
 from random import random
 from animal_base import AnimalBase
@@ -5,16 +18,26 @@ from config import Config
 
 config = Config()
 
-# calf born, with stillbirth porbabality, semen type related gender ratio and birthweight
 class Calf(AnimalBase):
+	'''
+		Description:
+			initialize calf at the time it was born, determine stillbirth, gender, and birth weight
+		Input:
+			args.breed: breed of the cow
+			args.date: the date of the simulation when the calf was born
+			args.daysBorn: age of the animal
+		Output:
+	'''
 	def __init__(self, args):
 		super().__init__(args)
 		self._sold = False
+		# calf born, with stillbirth porbabality
 		if random() < config.still_birth_rate:
 			self._culled = True
 			self._events.add_event(0, 'Still birth')
 			return
 
+		# gender determined with gender ratio relates to semen type
 		if config.semen_type == 'conventional':
 			male_calf_rate = config.male_calf_rate_conventional_semen
 		else:
@@ -24,12 +47,14 @@ class Calf(AnimalBase):
 		else:
 			self._gender = 'female'
 
+		# sell the male calves and the unwanted female calves (if config.keep_female_calf_rate = 1, keep all the female calves in farm. if config.keep_female_calf_rate = 0, sell all female calves)
 		if self._gender == 'male' or random() > config.keep_female_calf_rate:
 			self._sold = True
 			return
 		else:
 			self._sold = False
 
+		# birthweight determined by breed specific distribution
 		if self._breed == 'HO':
 			self._birth_weight = np.random.normal(config.birth_weight_avg_ho, config.birth_weight_std_ho)
 		elif self._breed == 'JE':
@@ -37,6 +62,13 @@ class Calf(AnimalBase):
 		self._body_weight = self._birth_weight
 		self._wean_weight = 0
 
+	'''
+		Description:
+			initialize calf value from class calf, for coding purpose
+		Input:
+			calf: initialed values from the first day
+		Output:
+	'''
 	def init_from_calf(self, calf):
 		super().init_from_animal(calf)
 		self._culled = calf._culled
@@ -47,7 +79,15 @@ class Calf(AnimalBase):
 		self._body_weight = calf._body_weight
 		self._wean_weight = calf._wean_weight
 
-	# update controls calf's grow
+	'''
+		Description:
+			controls calf's grow with average daily gain based on user's input untill wean day
+			caculate the wean weight at wean day
+			here is the place to change growth rate with calf feeding methods later when we have calf nutrition from the ration furmulation module
+		Input:
+		Output:
+			wean_day: time when calf is weaned -- stop be fed with milk
+	'''
 	def update(self):
 		wean_day = False
 

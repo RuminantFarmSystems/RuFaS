@@ -1,3 +1,11 @@
+'''
+RUFAS: Ruminant Farm Systems Model
+File name: heiferI.py
+Author(s): Manfei Li, mli497@wisc.edu
+Description: read config.json file
+'''
+###############################################################################
+
 import json
 
 class Config():

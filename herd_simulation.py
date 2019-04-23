@@ -1,3 +1,12 @@
+'''
+RUFAS: Ruminant Farm Systems Model
+File name: herd_simulation.py
+Author(s): Manfei Li, mli497@wisc.edu
+Description: This file simulates the whole herd with herd size and simulation length
+
+'''
+
+from collections import Counter
 from animal_base import AnimalBase
 from calf import Calf
 from heiferI import HeiferI
@@ -7,9 +16,10 @@ from cow import Cow
 from config import Config
 
 config = Config()
+NUM_21_DAYS = 15
 
 
-def generate_replacement_herd(max_num):
+def generate_replacement_herd(max_num, sim_days=1500):
     calves = []
     heiferIs = []
     heiferIIs = []
@@ -25,7 +35,7 @@ def generate_replacement_herd(max_num):
         if not (new_calf._culled or new_calf._sold):
             calves.append(new_calf)
 
-    for date in range(1500):
+    for date in range(sim_days):
         for calf in calves:
             wean_day = calf.update()
             if wean_day:
@@ -118,6 +128,17 @@ def start_simulation(herd_num, sim_length, replacement_market):
     total_milk_income = 0
     cull_reason_stats = {}
     cull_reason_stats_range = {}
+    parity_culling_stats_range = {}
+
+    count_21_days = 0
+    num_ai_21_days = 0
+    num_cow_btw_vwp_preg_21_days = 0
+    service_rate_sum_21_days = 0
+    num_preg_21_days = 0
+    num_ai_21_days = 0
+    conception_rate_sum_21_days = 0
+
+
 
     for date in range(sim_length):
         record_econ_stats = False
@@ -185,10 +206,10 @@ def start_simulation(herd_num, sim_length, replacement_market):
 
         for cow in cows:
             _, _, _, _, culled, new_born = cow.update(record_econ_stats)
-            if date == 1500:
-                #print(len(calves))
-                print(cows[10])
-                return
+            # if date == 1500:
+            #     #print(len(calves))
+            #     print(cows[10])
+            #     return
             if culled:
                 repro_cost, semen_cost, AI_cost, preg_check_cost, feed_cost, fixed_cost, milk_income, slaughter_value = cow.get_economy_stats()
                 if record_econ_stats:
@@ -198,6 +219,11 @@ def start_simulation(herd_num, sim_length, replacement_market):
                         cull_reason_stats_range[cow._cull_reason] += 1
                     else:
                         cull_reason_stats_range[cow._cull_reason] = 1
+                    parity = cow._calves if cow._calves <= 3 else '4+'
+                    if cow._calves in parity_culling_stats_range:
+                        parity_culling_stats_range[parity] += 1
+                    else:
+                        parity_culling_stats_range[parity] = 1
 
                 if cow._cull_reason in cull_reason_stats:
                     cull_reason_stats[cow._cull_reason] += 1
@@ -217,6 +243,23 @@ def start_simulation(herd_num, sim_length, replacement_market):
                     total_new_born += 1
                 if new_calf._sold:
                     total_calf_value += config.calf_price
+            if date >= sim_length - 21 * NUM_21_DAYS:
+                if cow._ai_day == cow._days_born:
+                    num_ai_21_days += 1
+                if cow._days_in_milk > config.vwp and not cow._preg:
+                    num_cow_btw_vwp_preg_21_days += 1
+                if cow._days_in_preg == 1:
+                    num_preg_21_days += 1
+
+        if date >= sim_length - 21 * NUM_21_DAYS:
+            count_21_days += 1
+            if count_21_days % 21 == 0:
+                service_rate_sum_21_days += float(num_ai_21_days) / float(num_cow_btw_vwp_preg_21_days)
+                conception_rate_sum_21_days += float(num_preg_21_days) / float(num_ai_21_days)
+                num_ai_21_days = 0
+                num_cow_btw_vwp_preg_21_days = 0
+                num_preg_21_days = 0
+
 
     # count stats
     for heiferII in heiferIIs:
@@ -240,7 +283,11 @@ def start_simulation(herd_num, sim_length, replacement_market):
         total_fixed_cost += fixed_cost
         total_milk_income += milk_income
 
-
+    parity_lst = [cow._calves if cow._calves <= 3 else '4+' for cow in cows ]
+    parity_count_tuple = Counter(parity_lst)
+    avg_service_rate = service_rate_sum_21_days / float(NUM_21_DAYS) * 21.0
+    avg_conception_rate = conception_rate_sum_21_days / float(NUM_21_DAYS)
+    pregnancy_rate = avg_service_rate * avg_conception_rate
     print("Total calves:\t\t\t{}".format(len(calves)))
     print("Total heiferI:\t\t\t{}".format(len(heiferIs)))
     print("Total heiferII:\t\t\t{}".format(len(heiferIIs)))
@@ -269,8 +316,16 @@ def start_simulation(herd_num, sim_length, replacement_market):
     print("Total heifer sold income:\t{0:.2f}".format(total_heifer_value))
     print("Total milk income:\t\t{0:.2f}".format(total_milk_income))
     print("Total cows culled:\t\t{}".format(num_culled_range))
+    print("SR%: {}%".format(avg_service_rate * 100.0))
+    print("CR%: {}%".format(avg_conception_rate * 100.0))
+    print("PR%: {}%".format(pregnancy_rate * 100.0))
+    print("Culling rate: {}%".format(float(num_culled_range) / float(len(cows)) * 100))
     for cull_reason, count in cull_reason_stats_range.items():
         print("{} => {}".format(cull_reason, count))
+    for parity, count in parity_count_tuple.items():
+        print("Parity {}: {}".format(parity, count))
+    for parity, count in parity_culling_stats_range.items():
+        print("Parity {} total culls: {}".format(parity, count))
 
 if __name__ == "__main__":
     replacement_market = generate_replacement_herd(3000)

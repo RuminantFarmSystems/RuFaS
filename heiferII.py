@@ -1,3 +1,18 @@
+'''
+RUFAS: Ruminant Farm Systems Model
+File name: heiferII.py
+Author(s): Manfei Li, mli497@wisc.edu
+Description: This file updates the heifer form breeding to close to calving.
+			Body weight gain with user input average daily gain,
+			once mature body weight or grow end day reached, grow stop.
+			TODO: Body weight changed could be based on nutrition intake later fron Ration Formulation.
+			Reproduction program could be chosen from the ED, TAI, Synch-ED projects, reference:
+			http://www.dcrcouncil.org/wp-content/uploads/2018/12/Dairy-Heifer-Protocol-Sheet-Updated-2018.pdf
+			Preg check follows AI for three times.
+'''
+###############################################################################
+
+
 import numpy as np
 from heiferI import HeiferI
 from random import random
@@ -6,6 +21,16 @@ from config import Config
 config = Config()
 
 class HeiferII(HeiferI):
+	'''
+		Description:
+			initialize the heifer in this stage from the first stage and initialize the repro program parameters
+		Input:
+			heiferI: first stage of heifer, pass heifer information from heiferI
+			args.repro_program: reproduction program used in heifer, three of them: ED, TAI, and synch-ED programs
+			args.tai_method_h: timed-AI protocols used for reproduction programs, three of them: 5dCG2P, 5dCGP, and user-defined
+			args.synch_ed_method_h: synch ed protocols used for reproduction programs, two of them: 2P and CP
+		Output:
+	'''
 	def __init__(self, heiferI, args):
 		super().init_from_heiferI(heiferI)
 		self._repro_program = args['repro_program']
@@ -32,6 +57,13 @@ class HeiferII(HeiferI):
 		self._preg = False
 		self._gestation_length = 0
 
+	'''
+		Description:
+			initialize the heifer in this stage from the first stage and initialize the repro program parameters for coding purpose
+		Input:
+			heiferII: another heifer out of the herd
+		Output:
+	'''
 	def init_from_heiferII(self, heiferII):
 		super().init_from_heiferI(heiferII)
 		self._repro_program = heiferII._repro_program
@@ -58,6 +90,18 @@ class HeiferII(HeiferI):
 		self._preg = heiferII._preg
 		self._gestation_length = heiferII._gestation_length
 
+	'''
+		Description:
+			controls heifer's grow with average daily gain based on user's input untill breeding start day
+			here is the place to change growth rate with heifer feeding methods later when we have heifer nutrition from the ration furmulation module
+			breeding start with assigned reproduction program
+			time to move to the 3rd stage -- replacement stage determined based on gestion length and user input of replacement timw
+			culling for reproduction problem occur when heifer doesn't get pregnant for a long time
+		Input:
+		Output:
+			cull_stage: culling for reproduction failure
+			third_stage: move to next stage -- heiferIII stage when time comes
+	'''
 	def update(self):
 		cull_stage = False
 		third_stage = False
@@ -100,20 +144,48 @@ class HeiferII(HeiferI):
 
 	################ ED methods #################
 
+	'''
+		Description:
+			in estrus detection program, determine estrus day and estrus note
+		Input:
+			start_date: start day of a estrus cycle, 1st day when breeding start or last estrus happend or return estrus from preg loss
+			estrus_note: note of this estrus
+		Output:
+			estrus_day: the day when this estrus should occur
+	'''
 	def _determine_estrus_day(self, start_date, estrus_note):
 		estrus_day =  int(start_date + np.random.normal(config.avg_estrus_cycle_h, config.std_estrus_cycle_h))
 		self._events.add_event(estrus_day, estrus_note)
 		return estrus_day
 
+	'''
+		Description:
+			return estrus after estrus not detected or not serveded
+	'''
 	def _return_estrus(self):
 		self._estrus_day = self._determine_estrus_day(self._estrus_day, 'Estrus')
 
+	'''
+		Description:
+			return estrus after AI
+	'''
 	def _after_ai_estrus(self):
 		self._estrus_day = self._determine_estrus_day(self._estrus_day, 'Estrus after AI')
 
+	'''
+		Description:
+			return estrus after abortion at preg check
+	'''
 	def _after_abortion_estrus(self):
 		self._estrus_day = self._determine_estrus_day(self._abortion_day, 'Estrus after abortion')
 
+	'''
+		Description:
+			estrus occur at estrus day,
+			estrus detected with detection rate,
+			service proformed with service rate,
+			conception successed with conception rate
+	'''
 	def _ed_update(self):
 		if self._days_born == config.breeding_start_day_h:
 			self._estrus_day = self._determine_estrus_day(config.breeding_start_day_h, 'First estrus')
@@ -130,7 +202,7 @@ class HeiferII(HeiferI):
 				if ed_service_rand < config.estrus_service_rate:
 					# serviced
 					self._ai_day = self._estrus_day + 1
-					self._conception_rate = config.estrus_service_rate
+					self._conception_rate = config.estrus_conception_rate
 				else:
 					self._return_estrus()
 			else:
@@ -138,15 +210,27 @@ class HeiferII(HeiferI):
 
 	################ TAI methods #################
 
-	# Tai when reach breeding start time
+	'''
+		Description:
+			determine the program start time when reach breeding start time
+		Input:
+			date: the time breeding program start
+		Output:
+	'''
 	def _determine_tai_program_day(self, date):
 		self._tai_program_start_day_h = date
 
-	# Tai after preg checks
+	'''
+		Description:
+			determine the TAI restart date after abortion preg checks
+	'''
 	def _tai_program_day_after_abortion(self):
 		self._tai_program_start_day_h = self._abortion_day + 1
 
-	# Tai method 5dCG2P
+	'''
+		Description:
+			5dCG2P protocol for tai method
+	'''
 	def _5dCG2P_update(self):
 		if self._days_born == self._tai_program_start_day_h:
 			self._events.add_event(self._days_born, 'Inject GnRH')
@@ -159,7 +243,10 @@ class HeiferII(HeiferI):
 			self._conception_rate = config.m5dCG2P_conception_rate
 			self._events.add_event(self._days_born, 'Inject GnRH')
 
-	# Tai method 5dCGP
+	'''
+		Description:
+			5dCGP protocol for tai method
+	'''
 	def _5dCGP_update(self):
 		if self._days_born == self._tai_program_start_day_h:
 			self._events.add_event(self._days_born, 'Inject GnRH')
@@ -170,13 +257,19 @@ class HeiferII(HeiferI):
 			self._conception_rate = config.m5dCGP_conception_rate
 			self._events.add_event(self._days_born, 'Inject GnRH')
 
-	# Tai method user_define
+	'''
+		Description:
+			user defined protocol for tai method
+	'''
 	def _user_defined_update(self):
 		if self._days_born == self._tai_program_start_day_h + config.tai_program_length:
 			self._ai_day = self._days_born
 			self._conception_rate = config.defined_conception_rate
 
-	# Tai method assigned
+	'''
+		Description:
+			tai method update, assign tai method
+	'''
 	def _tai_update(self):
 		if self._days_born == config.breeding_start_day_h:
 			self._determine_tai_program_day(config.breeding_start_day_h)
@@ -190,19 +283,44 @@ class HeiferII(HeiferI):
 
 	################ synch-ED methods #################
 
-
+	'''
+		Description:
+			determine the program start time when reach breeding start time
+		Input:
+			date: the time breeding program start
+		Output:
+	'''
 	def _determine_synch_ed_program_day(self, date):
 		self._synch_ed_program_start_day_h = date
 
+	'''
+		Description:
+			determine synch ed leading estrus start day, with nornal distribution
+		Input:
+			date: start of the synch ed day
+			avg: average of estrus occur after synch ed
+			std: standard diviation of synch ed
+			max: max value can go for the normal distribution, avoiding negtive value
+		Output:
+	'''
 	def _determine_synch_ed_estrus_day(self, date, avg, std, max):
 		norm = abs(np.random.normal(avg, std))
 		if norm >= max:
 			norm = max - 1
 		self._synch_ed_estrus_day = int(date + norm)
 
+	'''
+		Description:
+			return to synch ed after abortion when spot at the preg check
+	'''
 	def _synch_ed_program_day_after_abortion(self):
 		self._synch_ed_program_start_day_h = self._abortion_day
 
+	'''
+		Description:
+			2P protocol for synch ed method
+			estrus detection happens when estrus occur
+	'''
 	def _2P_update(self):
 		if self._days_born == self._synch_ed_program_start_day_h:
 			self._events.add_event(self._days_born, 'Inject PGF')
@@ -230,6 +348,11 @@ class HeiferII(HeiferI):
 				self._stop_day = self._synch_ed_program_start_day_h + 21
 				self._determine_synch_ed_program_day(self._stop_day)
 
+	'''
+		Description:
+			CP protocol for synch ed method
+			estrus detection happens when estrus occur
+	'''
 	def _CP_update(self):
 		if (self._days_born == self._synch_ed_program_start_day_h):
 			self._events.add_event(self._days_born, 'Inject CIDR')
@@ -253,6 +376,10 @@ class HeiferII(HeiferI):
 				self._stop_day = self._synch_ed_program_start_day_h + 14
 				self._determine_synch_ed_program_day(self._stop_day)
 
+	'''
+		Description:
+			synch ed method update, assign with protocols: 2P or CP
+	'''
 	def _synch_ed_update(self):
 		if self._days_born == config.breeding_start_day_h:
 			self._determine_synch_ed_program_day(config.breeding_start_day_h)
@@ -265,6 +392,12 @@ class HeiferII(HeiferI):
 	################ Preg stage #################
 
 	# after preg loss between 1 and 3 preg checks, return to coresponding protocols
+	'''
+		Description:
+			assign breeding method for open heifers after spot open at preg check
+			three methods can be assigned: ED, TAI, synch-ED
+
+	'''
 	def _open(self):
 		if self._repro_program == 'ED':
 			self._after_abortion_estrus()
@@ -274,6 +407,13 @@ class HeiferII(HeiferI):
 			self._synch_ed_program_day_after_abortion()
 
 	# artificial inseminated and go through 3 preg checks
+	'''
+		Description:
+			update AI for heifers reach ai day, inseminate the heifer with specific semen type
+			by comparing with conception rate, if conception success, gestion length determined
+			for preg chek 1, confirm the conception
+			for preg chek 2 and 3, confirm pregnacy, there are chances of preg loss in each period of time between preg checks
+	'''
 	def _preg_update(self):
 		if self._preg:
 			self._days_in_preg += 1

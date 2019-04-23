@@ -1,3 +1,13 @@
+'''
+RUFAS: Ruminant Farm Systems Model
+File name: animal_base.py
+Author(s): Manfei Li, mli497@wisc.edu
+Description: This file initialize common parameters
+			include ID, breed, birth date, and age for all animals to be indentified in different
+'''
+###############################################################################
+
+
 from animal_events import AnimalEvents
 import random
 import numpy as np
@@ -14,11 +24,11 @@ class AnimalBase(object):
 	# Method: __init__
 	'''
 		Description:
-			initialize common parameters for all cows
+			initialize common parameters for all animals
 		Input:
-			breed: breed of the cow
-			date: the date of the simulation when the calf was born
-			daysBorn: age of the animal
+			args.breed: breed of the cow
+			args.date: the date of the simulation when the calf was born
+			args.daysBorn: age of the animal
 		Output:
 	'''
 	def __init__(self, args):
@@ -38,11 +48,11 @@ class AnimalBase(object):
 		self._events = animal._events
 
 	# Method: is_culled
-	''' 
+	'''
 		Description:
 			Check if the the cow is culled
-		Input: 
-			From involuntary and voluntary culling section
+		Input:
+			From repro, production, and health culling section
 		Output:
 			True/False value inidicating if culled
 	'''

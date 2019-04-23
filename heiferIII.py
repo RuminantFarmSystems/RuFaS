@@ -1,3 +1,16 @@
+'''
+RUFAS: Ruminant Farm Systems Model
+File name: heiferIII.py
+Author(s): Manfei Li, mli497@wisc.edu
+Description: This file updates the heifer form close to calving to calving,
+            replacement from other farms are enter the herd in this stage, and heifers can be sold in this stage.
+			Body weight gain with user input average daily gain,
+			once mature body weight or grow end day reached, grow stop.
+			TODO: Body weight changed could be based on nutrition intake later fron Ration Formulation.
+			TODO: Rank heifers to enter the herd or sold
+'''
+###############################################################################
+
 import numpy as np
 from heiferII import HeiferII
 from random import random
@@ -6,12 +19,35 @@ from config import Config
 config = Config()
 
 class HeiferIII(HeiferII):
+    '''
+		Description:
+			initialize the heifer in this stage from the second stage
+        Input:
+			heiferI: first stage of heifer, pass heifer information from heiferI
+        Output:
+	'''
     def __init__(self, heiferII):
         super().init_from_heiferII(heiferII)
 
+    '''
+		Description:
+            initialize the heifer in this stage from the second stage and initialize the repro program parameters for coding purpose
+		Input:
+			heiferII: another heifer out of the herd
+		Output:
+	'''
     def init_from_heiferIII(self, heiferIII):
         super().init_from_heiferII(heiferIII)
 
+    '''
+		Description:
+            controls heifer's grow with average daily gain based on user's input untill breeding start day
+			here is the place to change growth rate with heifer feeding methods later when we have heifer nutrition from the ration furmulation module
+            next to it could build the fuction of ranking heifers
+		Input:
+		Output:
+            cow_stage: heifer close to calving, move to cow stage
+	'''
     def update(self):
         cow_stage = False
         self._days_born += 1
