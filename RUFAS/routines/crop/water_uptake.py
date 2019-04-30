@@ -1,7 +1,7 @@
 '''
 RUFAS: Ruminant Farm Systems Model
 
-File name: soil_water_uptake.py
+File name: water_uptake.py
 
 Author(s): Andy Achenreiner, achenreiner@wisc.edu
 
