@@ -68,7 +68,7 @@ def optimize(feed, rqmts):
     #     ##,
     #     ##
     # ]
-    RHS = [rqmts[nutrient]['val'] for nutrient in feed.nutrients_in_LP]
+    RHS = [rqmts[nutrient]['val'] for nutrient in feed.nutrient_rqmts]
 
     # objective is of the form [##,##, ..., ##] with the values being the price
     # for each food type. This makes the objective function represent the total
@@ -83,7 +83,7 @@ def optimize(feed, rqmts):
     # operators is of the form [##, ##, ..., ##] with each value being one of
     # '<=', '>=', or '=='. These are the operators between the corresponding
     # LHS constraint and RHS required value.
-    operators = [rqmts[nutrient]['op'] for nutrient in feed.nutrients_in_LP]
+    operators = [rqmts[nutrient]['op'] for nutrient in feed.nutrient_rqmts]
 
     # The lower bounds for quantity of a food type are zero since a negative
     # quantity of food in this context does not make sense.

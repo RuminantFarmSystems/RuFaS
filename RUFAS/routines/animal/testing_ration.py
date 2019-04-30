@@ -17,10 +17,10 @@ def test_ration(feed):
     parity=2
     type="Barn"
 
-    rqmts = ration.new_calculate_rqmts(BW, BCS, CBW, CI, concentrate, CP_Milk, DOP,
-                                        DHD, DVD, DIM, fat_milk, lactose_milk, milk, parity, type, feed.nutrients_in_LP)
+    rqmts = ration.calculate_rqmts(BW, BCS, CBW, CI, concentrate, CP_Milk, DOP,
+                                        DHD, DVD, DIM, fat_milk, lactose_milk, milk, parity, type, feed.nutrient_rqmts)
     
-    formulated_ration = ration.new_optimize(feed, rqmts)
+    formulated_ration = ration.optimize(feed, rqmts)
 
     print('Solution is', formulated_ration['status'])
     print('Price is calculated to: \t', formulated_ration['objective'])
@@ -31,3 +31,5 @@ def test_ration(feed):
     print('Rye_hay is calculated to: \t', formulated_ration['Rye_hay'])
 
     print("\n done")
+    
+    return formulated_ration
