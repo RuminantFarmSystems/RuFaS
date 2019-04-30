@@ -121,7 +121,7 @@ class Animal():
             # cases, we have to just check for not optimal and re-iterate
             # accordingly
             #
-            testing_ration.test_ration(feed)
+            formulated_ration = testing_ration.test_ration(feed)
             infeasible = (formulated_ration['status'] != 'Optimal')
 
         self.ration = formulated_ration
