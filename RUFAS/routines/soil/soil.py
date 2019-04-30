@@ -11,7 +11,7 @@
 
 import math
 from . import nitrogen_cycling, phosphorus_cycling, infiltration, \
-    evapotranspiration, percolation, soil_temp, soil_erosion
+    evapotranspiration, percolation, soil_temp, soil_erosion, soil_water
 
 
 #------------------------------------------------------------------------------
@@ -46,6 +46,10 @@ def daily_soil_routine(soil, crop, weather, time):
 
     nitrogen_cycling.daily_nitrogen_cycling_routine(soil, time, weather)
 
+    # updates changes in soil water resulting from infiltration,
+    # evapotranspiration, and percolation
+    soil_water.update_all(soil, crop, weather, time)
+
 #------------------------------------------------------------------------------
 # Function: daily_soil_update
 # Update attributes of soil in preparation of following day
@@ -61,8 +65,6 @@ def daily_soil_update(soil, crop, weather, time):
         weather: instance of the Weather class
         time: instance of the Time class
     '''
-    # update current soil water
-    soil.updateCurrentSoilWater(weather.rainfall[time.year-1][time.day-1])
     nitrogen_cycling.daily_nitrogen_update(soil, time, weather)
     soil.updateResidue(crop.crops_list["corn"], time)
 
@@ -141,10 +143,10 @@ class Soil():
         for uptakePApp, uptakePData in data['CropPUptake'].items():
             self.cropPUptakes.append(self.CropPUptake(uptakePApp, uptakePData))
 
-        self.convertCurrentSoilWaterToMM() # calculate initial soil water in layer
-        self.calculateWiltingWater() # calculate wilting water in layer
-        self.calculateFcWater() # calculate field capacity water in layer
-        self.calculateSatWater() # calculate saturation water in layer
+        self.convertCurrentSoilWaterToMM()  # calculate initial soil water in layer
+        self.calculateWiltingWater()  # calculate wilting water in layer
+        self.calculateFcWater()  # calculate field capacity water in layer
+        self.calculateSatWater()  # calculate saturation water in layer
 
         # daily output values
         self.runoff = 0.0
@@ -254,12 +256,12 @@ class Soil():
             self.saturation = layerData['Saturation']
             #self.currentSoilWater = layerData['StartingSoilWater']
 
-            self.depth = 0.0 # depth of soil layer
-            self.fcWater = 0.0 # constant
-            self.satWater = 0.0 # constant
-            self.wiltingWater = 0.0 # constant
+            self.depth = 0.0  # depth of soil layer
+            self.fcWater = 0.0  # constant
+            self.satWater = 0.0  # constant
+            self.wiltingWater = 0.0  # constant
 
-            self.currentSoilWaterMM = 0.0 # soil water in layer in mm
+            self.currentSoilWaterMM = 0.0  # soil water in layer in mm
             self.bulkDensity = layerData['BulkDensity']
 
 
@@ -272,9 +274,9 @@ class Soil():
             self.temperature = layerData['InitialTemperature']
 
             # Variables to calculate dailyPercolation
-            self.ksat = layerData['Ksat'] # saturated hydraulic conductivity (mm/h)
+            self.ksat = layerData['Ksat']  # saturated hydraulic conductivity (mm/h)
             self.TT = 0.0
-            self.perc = 0.0 # amount of water that percolates to next layer
+            self.perc = 0.0  # amount of water that percolates to next layer
 
             self.labileP = layerData['LabileP'] # labile P in soil layer
             self.clay = layerData['Clay'] # soil clay % in soil layer
@@ -451,7 +453,7 @@ class Soil():
         '''
         for x in range(0, len(self.listOfSoilLayers)):
             self.listOfSoilLayers[x].fcWater = (self.listOfSoilLayers[x].depth
-                    * self.listOfSoilLayers[x].fieldCapacity)
+                                                * self.listOfSoilLayers[x].fieldCapacity)
 
 
     #---------------------------------------------------------------------------
@@ -467,7 +469,7 @@ class Soil():
         '''
         for x in range(0, len(self.listOfSoilLayers)):
             self.listOfSoilLayers[x].satWater = (self.listOfSoilLayers[x].depth
-                    * self.listOfSoilLayers[x].saturation)
+                                                 * self.listOfSoilLayers[x].saturation)
 
     #---------------------------------------------------------------------------
     # Function: calculateWiltingWater
@@ -482,7 +484,7 @@ class Soil():
         '''
         for x in range(0, len(self.listOfSoilLayers)):
             self.listOfSoilLayers[x].wiltingWater = (self.listOfSoilLayers[x].
-                    depth * self.listOfSoilLayers[x].wiltingPoint)
+                                                     depth * self.listOfSoilLayers[x].wiltingPoint)
 
     #---------------------------------------------------------------------------
     # Function: convertCurrentSoilWaterToMM
@@ -500,45 +502,6 @@ class Soil():
                 self.listOfSoilLayers[x].depth * self.listOfSoilLayers[x]
                 .fieldCapacity)
 
-
-    #---------------------------------------------------------------------------
-    # Function: updateCurrentSoilWater
-    # Updates the soil water within each layer at the end of each day. The
-    # model assumes 80% of plant transpiration comes out of the top soil layer
-    # and 20% from layer 2.
-    #---------------------------------------------------------------------------
-    def updateCurrentSoilWater(self, rainfall):
-        '''
-        Description:
-            Updates the soil water within each layer at the end of each day. The
-            model assumes 80% of plant transpiration comes out of the top soil layer
-            and 20% from layer 2.
-
-        Args:
-            rainfall: a number which represents the rainfall from the Weather instance
-        '''
-
-        for x in range(0, len(self.listOfSoilLayers)):
-            if x == 0:
-                self.listOfSoilLayers[x].currentSoilWaterMM = (max
-                    (self.listOfSoilLayers[x].wiltingWater,
-                    self.listOfSoilLayers[x].currentSoilWaterMM+float(rainfall)
-                    -self.runoff-self.listOfSoilLayers[x].layerEsoil
-                    -self.listOfSoilLayers[x].perc))#-self.Etrans*0.8))
-            elif x== 1:
-                    self.listOfSoilLayers[x].currentSoilWaterMM = (max
-                        (self.listOfSoilLayers[x].wiltingWater,
-                         self.listOfSoilLayers[x].currentSoilWaterMM
-                        -self.listOfSoilLayers[x].layerEsoil
-                        -self.listOfSoilLayers[x].perc
-                        +self.listOfSoilLayers[x-1].perc))#-(self.Etrans*0.2)))
-            else:
-                    self.listOfSoilLayers[x].currentSoilWaterMM = (max
-                        (self.listOfSoilLayers[x].wiltingWater,
-                         self.listOfSoilLayers[x].currentSoilWaterMM
-                        -self.listOfSoilLayers[x].layerEsoil
-                        -self.listOfSoilLayers[x].perc
-                        +self.listOfSoilLayers[x-1].perc))
 
     def updateResidue(self, crop_type, time):
         '''

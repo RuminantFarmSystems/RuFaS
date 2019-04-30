@@ -80,7 +80,7 @@ This module needs the following inputs in order to operate correctly:
 ################################################################################
 
 from . import heat_units, leaf_area_index, root_development, biomass, yields, \
-    phosphorus_uptake, nitrogen_uptake, soil_water_uptake
+    phosphorus_uptake, nitrogen_uptake, water_uptake
 from RUFAS import util
 
 
@@ -125,7 +125,7 @@ def daily_crop_routine(crop, weather, time, soil):
         #
         heat_units.update_all(crop_type, T_min, T_max, time)
 
-        soil_water_uptake.update_all(crop_type, soil, time)
+        water_uptake.update_all(crop_type, soil, time)
 
         biomass.update_all(crop_type, time, weather, soil)
 
