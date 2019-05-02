@@ -68,16 +68,13 @@ def update_SW(soil, crop, weather, time):
         # grown when we add soy/alfalfa and what not.
         Et_actual = crop.crops_list["corn"].water_uptake_each_layer[x]
 
-        # the reason for multiplying Et by 0.8 is unknown. in the spreadsheet
-        # model, layer 1 is calculated by taking 80% of Esoil, but this doesn't
-        # make sense to me, and it differs from how SW is calculated in l2/3
         if x == 0:
-            SW = max(WP, SW + R - Q - Esoil - Perc - Et_actual * 0.8)
+            SW = max(WP, SW + R - Q - Esoil - Perc - Et_actual)
 
         else:
             Perc_prev = soil.listOfSoilLayers[x-1].perc
 
-            SW = max(WP, SW + Perc_prev - Esoil - Perc - Et_actual * 0.8)
+            SW = max(WP, SW + Perc_prev - Esoil - Perc - Et_actual)
 
         layer.currentSoilWaterMM = SW
         soil.listOfSoilLayers[x] = layer
