@@ -28,6 +28,7 @@ Soil values updated by calling update_all():
 
 from math import exp
 
+
 #
 # This function calls all the necessary functions to update information related
 # to percolation
