@@ -181,7 +181,7 @@ def calc_Tsurf(soil, crop, weather, time):
     Tbare = calc_Tbare(soil, crop, weather, time)
     bcv = calc_bcv(crop, time)
 
-    soil.Tsurf = (bcv * soil.Tsurf) + ((1 - bcv) * Tbare)
+    soil.Tsurf = (bcv * soil.listOfSoilLayers[0].temperature) + ((1 - bcv) * Tbare)
 
 
 #

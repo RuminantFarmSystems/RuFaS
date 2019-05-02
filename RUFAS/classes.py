@@ -93,7 +93,7 @@ class Config():
                 else:
                     days += (_ for _ in range(self.startDay, 366))
             elif year == self.endYear:
-                days = [_ for _ in range(1, self.endDay + 1)]
+                days = [_ for _ in range(1, self.endDay)]
             else:
                 if year % 4 == 0:
                     days = [_ for _ in range(1, 367)]

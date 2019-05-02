@@ -1,12 +1,154 @@
 ################################################################################
-#
-# RUFAS: Ruminant Farm Systems Model
-#
-# soil.py -
-#
-# Authors: Kass Chupongstimun
-#          Jit Patil
-#
+'''
+RUFAS: Ruminant Farm Systems Model
+File name: soil.py
+Description:
+Author(s): Kass Chupongstimun, kass_c@hotmail.com
+           Jit Patil
+           William Donovan, wmdonovan@wisc.edu
+
+This module needs the following inputs in order to operate correctly:
+
+    These are attributes of a soil profile that need to be specified in the json input
+    file. The values on the right are just examples from a soil profile with 1 layer.
+
+        "ProfileDepth": 450,
+        "ProfileBulkDensity": 1.4,
+        "CN2": 85.00
+        "FieldSlope": 0.02,
+        "SlopeLength": 3,
+        "Manning": 0.4,
+        "FieldSize": 1.0,
+        "PracticeFactor": 0.08,
+        "Orgc": 1.2,
+        "Sand": 15,
+        "Silt": 65,
+        "SoilAlbedo": 0.16,
+        "Residue": 0,
+        "FreshNMineralRate": 0.05,
+        "SoilCoverType": "BARE",
+
+        These are attributes defined for each layer of the soil profile. Any
+        number of profiles may be specified, but they all require the following
+        information. The values on the right are examples.
+
+        "SoilLayers":
+
+            "Layer1":
+
+                "BottomDepth": 150,
+                "WiltingPoint": 0.1,
+                "FieldCapacity": 0.30,
+                "Saturation": 0.5,
+                "Ksat": 20,
+                "CationExclusionFraction": 0.0,
+                "Clay": 20,
+                "InitialTemperature": 15.77575,
+                "BulkDensity": 1.4,
+                "OrgC%": 1.2,
+                "NH4": 1,
+                "FracActiveN": 0.02,
+                "LabileP": 15,
+                "ActiveMineralRate": 0.0003,
+                "VolatileExchangeFac": 0.15,
+                "DenitrificationRate": 0.05,
+                "StartingSoilWater": 45,
+                "OM%": 1.9
+
+            "Layer2":
+                ...
+
+        Each layer needs to be specified in a similar manner
+
+        The following are attributes of a fertilizer application. No fertilizer
+        applications need be specified for the module to run, but for any that
+        are specified, the following attributes are needed. Again, the values
+        on the right are simply examples
+
+        "Fertilizers":
+
+            "Application1":
+
+                "Year": 2008
+                "JDay": 179,
+                "PMass": 25.0,
+                "Depth": 3.0,
+                "%onSurface": 0.25
+
+            "Application2":
+
+                ...
+
+        The following are attributes of a manure application. No manure
+        applications need be specified for the module to run, but for any that
+        are specified, the following attributes are needed. The values on the
+        right should serve as examples.
+
+        "ManureApplication":
+
+            "Application1":
+
+                "Type": "DAIRY",
+                "Year": 2009,
+                "Jday": 200
+                "Mass": 1000.0,
+                "TotalP": 0.025,
+                "WEIP": 0.50,
+                "WEOP": 0.05,
+                "DryMatter": 0.05,
+                "%Cover": 0.5,
+                "Depth": 0.0,
+                "%onSurface": 100.0
+
+            "Application2":
+
+                ...
+
+        The following are attributes of a tillage operation. No tillage
+        operation need be specified for the module to run, but for any operation
+        that is specified, the following attributes are needed. Values on the
+        right are examples.
+
+        "TillageOperations":
+
+            "Operation1":
+
+                "Year": 2008,
+                "Jday": 365,
+                "%Incorporate": 0.5,
+                "%Mixed": 0.30,
+                "Depth": 15.0,
+
+            "Operation2":
+
+                ...
+
+        CropPUptake TODO: Finish description. I am unclear as to what this is
+
+        "CropPUptake":
+
+            "Uptake1":
+
+                "Year": 2008,
+                "PUptake": 15.0
+
+            "Uptake2":
+
+                ...
+
+    From the weather class, the following will be needed:
+        T_min
+        T_max
+        radiation
+        rainfall
+        T_avg
+
+    From the crop class, the following will be needed:
+        crops_list
+
+        And the following attributes of a crop type:
+            bioAG (aboveground biomass)
+'''
 ################################################################################
 
 import math
@@ -230,7 +372,6 @@ class Soil():
                             self.listOfSoilLayers[0].bulkDensity *
                             self.listOfSoilLayers[0].depth) /100
 
-
     #---------------------------------------------------------------------------
     # Class: SoilLayer
     # An instance of this class represents a layer in the soil
@@ -265,10 +406,10 @@ class Soil():
             self.bulkDensity = layerData['BulkDensity']
 
 
-            # Variables to calculate dailyEvapotranspiration
-            self.topEsoil = 0.0 # evaporation demand at top of layer
-            self.bottomEsoil = 0.0 # evaporation demand at bottom of layer
-            self.layerEsoil = 0.0 # evaporation demand at layer
+            # Variables to calculate daily Evapotranspiration
+            self.topEsoil = 0.0  # evaporation demand at top of layer
+            self.bottomEsoil = 0.0  # evaporation demand at bottom of layer
+            self.layerEsoil = 0.0  # evaporation demand at layer
 
             # Variables used for soil temperature
             self.temperature = layerData['InitialTemperature']
@@ -278,11 +419,11 @@ class Soil():
             self.TT = 0.0
             self.perc = 0.0  # amount of water that percolates to next layer
 
-            self.labileP = layerData['LabileP'] # labile P in soil layer
+            self.labileP = layerData['LabileP']  # labile P in soil layer
             self.clay = layerData['Clay'] # soil clay % in soil layer
 
 
-            # Variable to simulate nitrogenCycling
+            # Variable to simulate nitrogen Cycling
             self.orgC = layerData['OrgC%']
             self.activeMineralRate = layerData['ActiveMineralRate']
             self.cationExclusionFraction = layerData['CationExclusionFraction']
@@ -299,9 +440,7 @@ class Soil():
             self.activeN = 0.0
 
             # Initial Stable N in layer:
-            self.stableN = 0.0
-
-
+            self.stableN = 0.
             self.nMinAct = 0.0
             self.nitrification = 0.0
             self.volatilization = 0.0
