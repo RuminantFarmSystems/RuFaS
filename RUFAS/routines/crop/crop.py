@@ -80,7 +80,7 @@ This module needs the following inputs in order to operate correctly:
 ################################################################################
 
 from . import heat_units, leaf_area_index, root_development, biomass, yields, \
-    phosphorus_uptake, nitrogen_uptake, soil_water_uptake
+    phosphorus_uptake, nitrogen_uptake, water_uptake
 from RUFAS import util
 
 
@@ -92,32 +92,6 @@ def daily_crop_routine(crop, weather, time, soil):
     T_max = weather.T_max[time.year - 1][time.day - 1]
 
     for _, crop_type in crop.crops_list.items():
-        # ------------------------------------------------------------------------------
-        '''
-        Load input values to represent input from other modules.
-        This will need to be removed eventually because the crop module will
-        get this information from the other modules instead of from an input file. 
-        This is just for isolating and testing the calculations of the crop module.
-        '''
-        # timeIndex = (time.year -1)*365 + time.day -1
-
-        # soil.Etrans = crop_type.test_Et[timeIndex]
-
-        # soil.Ea_sum = crop_type.test_Ea_sum[time.year-1]
-
-        # soil.E0_sum = crop_type.test_Eo_sum[time.year-1]
-
-        # soil.listOfSoilLayers[0].NO3 = crop_type.test_NO3_l1[timeIndex]
-        # soil.listOfSoilLayers[1].NO3 = crop_type.test_NO3_l2[timeIndex]
-        # soil.listOfSoilLayers[2].NO3 = crop_type.test_NO3_l3[timeIndex]
-
-        # soil.listOfSoilLayers[0].currentSoilWaterMM = crop_type.test_soil_water1[timeIndex]
-
-        # soil.listOfSoilLayers[1].currentSoilWaterMM = crop_type.test_soil_water2[timeIndex]
-        # soil.listOfSoilLayers[2].currentSoilWaterMM = crop_type.test_soil_water3[timeIndex]
-
-        # ------------------------------------------------------------------------------
-
         #
         # Run calculations
         # The order in which these are called matters because some of the later
@@ -125,7 +99,7 @@ def daily_crop_routine(crop, weather, time, soil):
         #
         heat_units.update_all(crop_type, T_min, T_max, time)
 
-        soil_water_uptake.update_all(crop_type, soil, time)
+        water_uptake.update_all(crop_type, soil, time)
 
         biomass.update_all(crop_type, time, weather, soil)
 
@@ -307,32 +281,6 @@ class Crop():
             self.yield_P = 0
             self.residue = data["init_residue"]
 
-            # ===================================================================
-            ''' Testing Data '''
-            #
-            # TEST_DATA = util.get_csv_columns(data["TEST_DATA"])
-            #
-            #
-            # self.test_Et = TEST_DATA[1][1:]
-            #
-            # self.test_water_actual_up = TEST_DATA[2][1:]
-            #
-            # self.test_bio_N_opt = TEST_DATA[3][1:]
-            # self.test_bio_N = TEST_DATA[4][1:]
-            #
-            # self.test_bio_P_opt = TEST_DATA[5][1:]
-            # self.test_bio_P = TEST_DATA[6][1:]
-            #
-            # self.test_NO3_l1 = TEST_DATA[7][1:]
-            # self.test_NO3_l2 = TEST_DATA[8][1:]
-            # self.test_NO3_l3 = TEST_DATA[9][1:]
-            #
-            # self.test_soil_water1 = TEST_DATA[10][1:]
-            # self.test_soil_water2 = TEST_DATA[11][1:]
-            # self.test_soil_water3 = TEST_DATA[12][1:]
-            #
-            # self.test_Ea_sum = data["TESTING_Ea_sum"]
-            # self.test_Eo_sum = data["TESTING_Eo_sum"]
 
         # -----------------------------------------------------------------------
         # Method: calculate_start_growth_day

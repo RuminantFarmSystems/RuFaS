@@ -86,6 +86,7 @@ def update_all(soil, crop, weather, time):
 #
 # Calculates sed, sediment yield on a given day (metric tons)
 # "pseudocode_SC_soilerosion.docx" 1.A.1
+# "pseudocode_SC_soilerosion.docx" 1.A.16
 #
 def calc_sed(soil, crop, weather, time):
     Qsurf = soil.runoff
@@ -97,17 +98,13 @@ def calc_sed(soil, crop, weather, time):
 
     sed = 11.8 * ((Qsurf * Qpeak) ** 0.56) * K * C * P * LS
 
-    soil.sedimentYield = sed
-
-    # Sediment yield is not adjusted for snow in the pseudocode, but is in both
-    # RUFAS and the spreadsheet model. RUFAS accounts for when day < 95 / > 300
-    # The spreadsheet model uses 60 and 350 respectively.
-    snow_corrected_sed = sed
+    # Sediment yield is adjusted for snow on the range day < 60 or day > 350
+    # "pseudocode_SC_soilerosion.docx" 1.A.16
     if time.day < 60 or time.day > 350:
         exp_part = exp(3 * 20 / 25.4)
-        snow_corrected_sed = sed / exp_part
+        sed = sed / exp_part
 
-    soil.snowCorrectedSed = snow_corrected_sed
+    soil.sedimentYield = sed
 
 
 #

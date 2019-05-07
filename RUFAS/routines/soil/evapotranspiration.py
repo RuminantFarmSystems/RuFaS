@@ -116,9 +116,7 @@ def calc_LHV(Tavg):
 def calc_crop_transpiration(soil, crop):
     LAI = crop.crops_list["corn"].LAI_actual
     if 0 <= LAI <= 3.0:
-        # unknown why LAI is rounded here. this was in the original code.
-        # offsets Etrans by a sum of 23.56
-        soil.Etrans = (soil.E0 * round(LAI, 3)) / 3.0
+        soil.Etrans = (soil.E0 * LAI) / 3.0
     else:
         soil.Etrans = soil.E0
 
@@ -176,8 +174,6 @@ def update_Esoil_z(soil):
             z = curr_layer.bottomDepth
             exp_part = exp(2.374 - 0.00713 * z)
 
-            #in current RUFAS, Esoil is never adjusted for Etrans.
-            #this could account for differences in model output
             curr_layer.bottomEsoil = soil.Esoil * (z / (z + exp_part))
 
 
@@ -187,12 +183,10 @@ def update_Esoil_z(soil):
         # Esoil for a given layer is calculated:
         # "pseudocode_SC_soilhydrology.docx" 1.B.8
         #
-        if curr_layer.currentSoilWaterMM > curr_layer.fcWater:
-            curr_layer.layerEsoil = curr_layer.bottomEsoil - \
-                                    curr_layer.topEsoil
+        if SW > FC:
+            curr_layer.layerEsoil = curr_layer.bottomEsoil - curr_layer.topEsoil
         else:
-            exp_part = exp(2.5 * (SW - FC) /
-                           (FC - WP))
+            exp_part = exp(2.5 * (SW - FC) / (FC - WP))
             curr_layer.layerEsoil = (curr_layer.bottomEsoil - curr_layer.topEsoil) * exp_part
 
         soil.listOfSoilLayers[x] = curr_layer
