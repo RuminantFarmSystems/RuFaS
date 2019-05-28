@@ -1,8 +1,8 @@
 {
     "config":
     {
-        "StartDate" : "2011:1",
-        "EndDate" : "2014:365",
+        "StartDate" : "2009:244",
+        "EndDate" : "2016:243",
         "output_dir": "Outputs/Sample_Farm_Outputs/"
     },
 

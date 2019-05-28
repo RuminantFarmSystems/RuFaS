@@ -80,6 +80,15 @@ class Config():
         self.endYear = int(self.endDate[0])
         self.startDay = int(self.startDate[1])
         self.endDay = int(self.endDate[1]) #TODO changed from startDate to endDate
+
+        if self.startYear == 2009 and self.startDay < 244:
+            print("Start date invalid. Starting simulation on 2009:244")
+            self.startDay = 244
+
+        if self.endYear == 2016 and self.endDay > 243:
+            print("End date invalid. Ending simulation on 2016:243")
+            self.endDay = 243
+
         #TODO
         print("Start: " + str(self.startDate[0]) + ":" + str(self.startDay)
                 + " | End: " + str(self.endDate[0]) + ":" + str(self.endDay))
@@ -110,9 +119,6 @@ class Config():
                     days += [_ for _ in range(1, 366)]
 
             self.years.append(days)
-
-        # for row in self.years:
-          # print("Row: " + str(row))
 
         if len(self.years) <= 0:
             raise errors.JSONfileData("CONFIG",
@@ -162,19 +168,19 @@ class Weather():
         if startYear == 2009:
             daysToStart = startDate - 244
         elif startYear == 2010:
-            daysToStart = 122 + startDate
+            daysToStart = 121 + startDate
         elif startYear == 2011:
-            daysToStart = 122 + 365 + startDate
+            daysToStart = 121 + 365 + startDate
         elif startYear == 2012:
-            daysToStart = 122 + 365*2 + startDate
+            daysToStart = 121 + 365*2 + startDate
         elif startYear == 2013:
-            daysToStart = 122 + 365*2 + 366 + startDate
+            daysToStart = 121 + 365*2 + 366 + startDate
         elif startYear == 2014:
-            daysToStart = 122 + 365*3 + 366 + startDate
+            daysToStart = 121 + 365*3 + 366 + startDate
         elif startYear == 2015:
-            daysToStart = 122 + 365*4 + 366 + startDate
+            daysToStart = 121 + 365*4 + 366 + startDate
         elif startYear == 2016:
-            daysToStart = 122 + 365*5 + 366 + startDate
+            daysToStart = 121 + 365*5 + 366 + startDate
         else:
             print("This should never happen.")
 
@@ -196,9 +202,6 @@ class Weather():
             self.beef.append([0 for _ in range(len(year) - 1)])
             self.beefCalf.append([0 for _ in range(len(year) - 1)])
 
-            # print("Size of each year: " + str(len(self.rainfall)))
-
-
         # read in the input csv file
         weather_full_path = util.get_base_dir() / weather_path_str
 
@@ -219,6 +222,7 @@ class Weather():
                 # limits weather data read in to the length of the simulation
                 if year > len(years) - 1:
                     break
+
                 if counter < daysToStart:
                     counter += 1
                     continue
@@ -234,7 +238,7 @@ class Weather():
 
                     # fill data at appropriate location
                     # TODO
-                    #print("Year/Day - 1: " + str(year) + " " + str(day))
+                    # print("Year/Day - 1: " + str(year) + " " + str(day))
 
                     self.rainfall[year][day - offset] = float(row[1])
                     self.T_max[year][day - offset] = float(row[2])
@@ -246,6 +250,8 @@ class Weather():
 
                     # iterate year counter
                     if day == 365 or day == 366:
+                        year += 1
+                    if year == len(years) - 1 and day == len(self.rainfall[year]):
                         year += 1
                 currentRow += 1
 
