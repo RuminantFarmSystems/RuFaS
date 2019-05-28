@@ -79,29 +79,40 @@ class Config():
         self.startYear = int(self.startDate[0])
         self.endYear = int(self.endDate[0])
         self.startDay = int(self.startDate[1])
-        self.endDay = int(self.startDate[1])
+        self.endDay = int(self.endDate[1]) #TODO changed from startDate to endDate
+        #TODO
+        print("Start: " + str(self.startDate[0]) + ":" + str(self.startDay)
+                + " | End: " + str(self.endDate[0]) + ":" + str(self.endDay))
 
         # constructs a calendar of julian days and years, accounting for leap
         # years and mid-year start/end dates
+
+        cols = 0
+        rows = 17
+        # self.years = [[0 for i in range(cols)] for j in range(rows)]
         self.years = []
 
         for year in range(self.startYear, self.endYear + 1):
+
+            days = [year]
             if year == self.startYear:
-                days = [None for _ in range(1, self.startDay)]
+                days += [None for _ in range(1, self.startDay)]
                 if year % 4 == 0:
                     days += (_ for _ in range(self.startDay, 367))
                 else:
                     days += (_ for _ in range(self.startDay, 366))
             elif year == self.endYear:
-                days = [_ for _ in range(1, self.endDay)]
+                days += [_ for _ in range(1, self.endDay + 1)]
             else:
                 if year % 4 == 0:
-                    days = [_ for _ in range(1, 367)]
+                    days += [_ for _ in range(1, 367)]
                 else:
-                    days = [_ for _ in range(1, 366)]
+                    days += [_ for _ in range(1, 366)]
 
             self.years.append(days)
 
+        # for row in self.years:
+          # print("Row: " + str(row))
 
         if len(self.years) <= 0:
             raise errors.JSONfileData("CONFIG",
@@ -140,22 +151,53 @@ class Weather():
         self.beef = []
         self.beefCalf = []
 
-        for year in years:
-            self.rainfall.append([0 for _ in range(len(year))])
-            self.T_max.append([0 for _ in range(len(year))])
-            self.T_min.append([0 for _ in range(len(year))])
-            self.T_avg.append([0 for _ in range(len(year))])
-            self.biomass.append([0 for _ in range(len(year))])
-            self.radiation.append([0 for _ in range(len(year))])
-            self.addedN.append([0 for _ in range(len(year))])
+        for i in years[0]:
+            if str(i).isdigit() and len(str(i)) < 4:
+                startDate = i
+                break
 
-            self.evaporation.append([0 for _ in range(len(year))])
-            self.lCows.append([0 for _ in range(len(year))])
-            self.dCows.append([0 for _ in range(len(year))])
-            self.heifer.append([0 for _ in range(len(year))])
-            self.calf.append([0 for _ in range(len(year))])
-            self.beef.append([0 for _ in range(len(year))])
-            self.beefCalf.append([0 for _ in range(len(year))])
+        startYear = years[0][0]
+        daysToStart = 0
+
+        if startYear == 2009:
+            daysToStart = startDate - 244
+        elif startYear == 2010:
+            daysToStart = 122 + startDate
+        elif startYear == 2011:
+            daysToStart = 122 + 365 + startDate
+        elif startYear == 2012:
+            daysToStart = 122 + 365*2 + startDate
+        elif startYear == 2013:
+            daysToStart = 122 + 365*2 + 366 + startDate
+        elif startYear == 2014:
+            daysToStart = 122 + 365*3 + 366 + startDate
+        elif startYear == 2015:
+            daysToStart = 122 + 365*4 + 366 + startDate
+        elif startYear == 2016:
+            daysToStart = 122 + 365*5 + 366 + startDate
+        else:
+            print("This should never happen.")
+
+        for year in years:
+
+            self.rainfall.append([0 for _ in range(len(year) - 1)])
+            self.T_max.append([0 for _ in range(len(year) - 1)])
+            self.T_min.append([0 for _ in range(len(year) - 1)])
+            self.T_avg.append([0 for _ in range(len(year) - 1)])
+            self.biomass.append([0 for _ in range(len(year) - 1)])
+            self.radiation.append([0 for _ in range(len(year) - 1)])
+            self.addedN.append([0 for _ in range(len(year) - 1)])
+
+            self.evaporation.append([0 for _ in range(len(year) - 1)])
+            self.lCows.append([0 for _ in range(len(year) - 1)])
+            self.dCows.append([0 for _ in range(len(year) - 1)])
+            self.heifer.append([0 for _ in range(len(year) - 1)])
+            self.calf.append([0 for _ in range(len(year) - 1)])
+            self.beef.append([0 for _ in range(len(year) - 1)])
+            self.beefCalf.append([0 for _ in range(len(year) - 1)])
+
+            # print("Size of each year: " + str(len(self.rainfall)))
+
 
         # read in the input csv file
         weather_full_path = util.get_base_dir() / weather_path_str
@@ -172,21 +214,28 @@ class Weather():
             # used by the module
             currentRow = 0
             year = 0
+            counter = 0
             for row in readCSV:
                 # limits weather data read in to the length of the simulation
                 if year > len(years) - 1:
                     break
+                if counter < daysToStart:
+                    counter += 1
+                    continue
+
                 # row 0 contains variable names
                 if currentRow!= 0:
-
                     day = int(row[0])
                     offset = 1
 
                     # adjust year iteration for leap years
-                    if day == 366:
+                    if day == 366:  # TODO Error is in leap years
                         year -= 1
 
                     # fill data at appropriate location
+                    # TODO
+                    #print("Year/Day - 1: " + str(year) + " " + str(day))
+
                     self.rainfall[year][day - offset] = float(row[1])
                     self.T_max[year][day - offset] = float(row[2])
                     self.T_min[year][day - offset] = float(row[3])
@@ -195,7 +244,7 @@ class Weather():
                     self.radiation[year][day - offset] = float(row[6])
                     self.addedN[year][day - offset] = float(row[7])
 
-                    # iterate year conter
+                    # iterate year counter
                     if day == 365 or day == 366:
                         year += 1
                 currentRow += 1
@@ -214,15 +263,16 @@ class Time():
     This object is responsible for tracking time in the simulation
     '''
 
-    def __init__(self, years):
+    def __init__(self, years, cal_year):
 
+        self.cal_year = cal_year
         self.years = years
         self.year = 1  # Current Year
 
         # finds the first non-null day of the first year
-        for i in range (len(years[0])):
+        for i in range(1, len(years[0])): #TODO changed to start at 1
             if years[0][i] == None:
-                pass
+                continue
             else:
                 self.day = years[0][i]
                 break
@@ -252,6 +302,7 @@ class Time():
         if self.end_year():
             self.day = 1
             self.year += 1
+            self.cal_year += 1
         else:
             self.day += 1
 
@@ -266,7 +317,7 @@ class Time():
         '''
 
         # if the day is > the length of the current year, then the year is over
-        return self.day > len(self.years[self.year - 1])
+        return self.day > (len(self.years[self.year - 1]) - 1) #TODO added - 1 at the end
 
     #-------------------------------------------------------------------------------
     # Function: end_simulation
