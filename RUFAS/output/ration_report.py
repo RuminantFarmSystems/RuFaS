@@ -82,7 +82,7 @@ class RationReport(BaseReportHandler):
         '''Stores the daily values that need to be printed in the report.'''
 
         d = time.day
-        if (d % self.ration_interval) == 1:
+        if (d % self.ration_interval) == 1 or self.ration_interval == 1:
             animal = state.animal
 
             self.achieved_price[d] = animal.ration['objective']
@@ -108,7 +108,7 @@ class RationReport(BaseReportHandler):
         with self.get_fPath().open(mode) as csvfile:
 
             for d in range(1, 366):
-                if (d % self.ration_interval) == 1:
+                if (d % self.ration_interval) == 1 or self.ration_interval == 1:
             
                     rationData = {
                             'Year':
