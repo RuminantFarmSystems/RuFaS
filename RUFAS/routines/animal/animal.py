@@ -136,7 +136,7 @@ class Animal():
             bool: True if today is the day a new ration has to be formulated,
                 false otherwise.
         '''
-        return (day % self.ration_formulation_interval) == 1
+        return (day % self.ration_formulation_interval) == 1 or self.ration_formulation_interval == 1
 
     #---------------------------------------------------------------------------
     # Method: annual_reset

@@ -266,7 +266,7 @@
             "ration":
             {
                 "user_input": false,
-                "formulation_interval": 7
+                "formulation_interval": 1
             }
         },
 
