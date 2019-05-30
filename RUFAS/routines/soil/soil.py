@@ -153,13 +153,14 @@ This module needs the following inputs in order to operate correctly:
 
 import math
 from . import nitrogen_cycling, phosphorus_cycling, infiltration, \
-    evapotranspiration, percolation, soil_temp, soil_erosion, soil_water
+    evapotranspiration, percolation, soil_temp, soil_erosion, soil_water,\
+    residue
 
 
-#------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # Function: daily_soil_routine
 # Executes all the daily soil routines
-#------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 def daily_soil_routine(soil, crop, weather, time):
     '''
     Description:
@@ -186,34 +187,21 @@ def daily_soil_routine(soil, crop, weather, time):
     # calculate daily soil erosion
     soil_erosion.update_all(soil, crop, weather, time)
 
-    nitrogen_cycling.daily_nitrogen_cycling_routine(soil, time, weather)
+    # calculate and update the contents of 3 organic and 2 inorganic nitrogen
+    # pools
+    nitrogen_cycling.update_all(soil)
 
     # updates changes in soil water resulting from infiltration,
     # evapotranspiration, and percolation
     soil_water.update_all(soil, crop, weather, time)
 
-#------------------------------------------------------------------------------
-# Function: daily_soil_update
-# Update attributes of soil in preparation of following day
-#------------------------------------------------------------------------------
-def daily_soil_update(soil, crop, weather, time):
-    '''
-    Description:
-        Update attributes of soil in preparation of the following day.
+    residue.update_all(soil, crop, time)
 
-    Args:
-        soil: instance of the Soil class
-        crop: instance of the Crop class
-        weather: instance of the Weather class
-        time: instance of the Time class
-    '''
-    nitrogen_cycling.daily_nitrogen_update(soil, time, weather)
-    soil.updateResidue(crop.crops_list["corn"], time)
 
-#-------------------------------------------------------------------------------
+# -------------------------------------------------------------------------------
 # Class: Soil
 #        Contains the state of the farm's soil
-#-------------------------------------------------------------------------------
+# -------------------------------------------------------------------------------
 class Soil():
     '''
     Contains the state of the farm's soil.
@@ -223,7 +211,6 @@ class Soil():
     manureApplications = []
     tillageOperations = []
     cropPUptakes = []
-
 
     def __init__(self, data, config):
         '''
@@ -238,7 +225,7 @@ class Soil():
         # Values Initialized by Input
         self.profileDepth = data['ProfileDepth']
         self.profileBulkDensity = data['ProfileBulkDensity']
-        self.CN2 = data['CN2'] # unitless, user-defined curve number (empirical)
+        self.CN2 = data['CN2']  # unitless, user-defined curve number (empirical)
 
         # soil erosion attributes
         self.fieldSlope = data['FieldSlope']
@@ -262,12 +249,10 @@ class Soil():
         self.listOfSoilLayers.sort(key=lambda x: x.bottomDepth)
 
         # calculate initial depth of each soil layer
-        for x in range(0, len(self.listOfSoilLayers)):
-            if x == 0:
-                self.listOfSoilLayers[x].depth = self.listOfSoilLayers[x].bottomDepth
-            else:
-                self.listOfSoilLayers[x].depth = (self.listOfSoilLayers[x].bottomDepth
-                    - self.listOfSoilLayers[x-1].bottomDepth)
+        curr_depth = 0
+        for layer in self.listOfSoilLayers:
+            layer.depth = layer.bottomDepth - curr_depth
+            curr_depth = layer.bottomDepth
 
         # get fertilizer application information
         for fertApp, fertData in data['Fertilizers'].items():
@@ -299,87 +284,71 @@ class Soil():
 
         self.dayInfiltraiton = 0.0
         self.sedimentYield = 0.0
-        self.snowCorrectedSed = 0.0
 
         # daily soil nitrogen values
         self.residue = data['Residue']
         self.freshNMineralRate = data['FreshNMineralRate']
-        self.CToN = 0.0
-        self.CToP = 0.0
         self.decayRate = 0.0
-        self.freshMin = 0.0
-        self.freshDecomp = 0.0
-
-        self.freshNConc = 0.0
-        self.activeNConc = 0.0
-        self.stableNConc = 0.0
-        self.NH4Conc = 0.0
-        self.enrichmentRatio = 0.0
-        self.freshNLoss = 0.0
-        self.activeNLoss = 0.0
-        self.stableNLoss = 0.0
-        self.NH4Loss = 0.0
-        self.runoffNO3Conc = 0.0
-        self.NO3Runoff = 0.0
-        self.runoffNH4Conc = 0.0
-        self.NH4Runoff = 0.0
+        self.topLayerFreshN = 0.0
 
         # soil phosphorus attributes
         self.soilCoverType = data['SoilCoverType']
-        self.pUptake = [[0 for x in range(366)] for y in range(config.endYear+1)]
+        self.pUptake = [[0 for x in range(366)] for y in range(config.endYear + 1)]
         self.lightFactor = []
         self.yieldFactor = []
         self.summan = 0.0
         self.summanP = 0.0
 
-
-    #------ INITIALIZE SOIL NITROGEN POOLS ------------------------------------
+        # ------ INITIALIZE SOIL NITROGEN POOLS ------------------------------------
         # Calculate initial amount of NO3 in each soil layer;
         # Initial NO3 levels (kg/ha) in the soil are varied by depth as:
-        for x in range(0, len(self.listOfSoilLayers)):
-            # Initial NO3 levels (kg/ha) in the soil are varied by depth as:
-            self.listOfSoilLayers[x].NO3 = ((7 * math.exp
-                                (-self.listOfSoilLayers[x].bottomDepth /
-                                1000)) * self.listOfSoilLayers[x].bulkDensity
-                                 * self.listOfSoilLayers[x].depth) /100
+        # "pseudocode_SC_soilnitrogen" 4.A
+        for layer in self.listOfSoilLayers:
+            z = layer.bottomDepth
 
-            # Calculate initial amount of organic N in each soil layer;
-            # Organic N (Active + Stable, mg/kg): is initialized as:
-            self.listOfSoilLayers[x].orgN = (10 ** 4) * (
-                self.listOfSoilLayers[x].orgC / 14)
+            # "pseudocode_SC_soilnitrogen" 1.A.1
+            exp_part = math.exp(-z / 1000)
+            NO3 = 7 * exp_part
 
-            # Calculate initial amount (kg/ha) of active N in each soil layer;
-            self.listOfSoilLayers[x].activeN = ((
-                self.listOfSoilLayers[x].fracActiveN *
-                self.listOfSoilLayers[x].orgN)*
-                self.listOfSoilLayers[x].bulkDensity *
-                self.listOfSoilLayers[x].depth) /100
+            # "pseudocode_SC_soilnitrogen" 1.A.2
+            OrgC = layer.orgC
+            OrgN = (10 ** 4) * (OrgC / 14)
 
-            # Calculate initial amount (kg/ha) of stable N in each soil layer;
-            self.listOfSoilLayers[x].stableN = (((1 -
-                self.listOfSoilLayers[x].fracActiveN) *
-                self.listOfSoilLayers[x].orgN) *
-                self.listOfSoilLayers[x].bulkDensity *
-                self.listOfSoilLayers[x].depth) /100
+            # "pseudocode_SC_soilnitrogen" 1.A.3
+            FracN = 0.02
+            activeN = FracN * OrgN
 
-            # Calculate initial amount (kg/ha) of NH4 in each soil layer;
-            self.listOfSoilLayers[x].NH4 = (self.listOfSoilLayers[x].NH4 *
-                            self.listOfSoilLayers[x].bulkDensity *
-                            self.listOfSoilLayers[x].depth) /100
+            # "pseudocode_SC_soilnitrogen" 1.A.4
+            stableN = (1 - FracN) * OrgN
 
-        # Fresh N Pool --- only in top soil layer
-        self.topLayerFreshN = ((0.0015*self.residue)*
-                            self.listOfSoilLayers[0].bulkDensity *
-                            self.listOfSoilLayers[0].depth) /100
+            # "pseudocode_SC_soilnitrogen" 1.A.5
+            res = self.residue
+            FreshN = 0.0015 * res
 
-    #---------------------------------------------------------------------------
+            # "pseudocode_SC_soilnitrogen" 1.A.6
+            NH4 = layer.NH4
+
+            # "pseudocode_SC_soilnitrogen" 1.A.7
+            BD = layer.bulkDensity
+            depth = layer.depth
+            unit_adjustment = (BD * depth) / 100
+
+            layer.NO3 = NO3 * unit_adjustment
+            layer.orgN = OrgN
+            layer.activeN = activeN * unit_adjustment
+            layer.stableN = stableN * unit_adjustment
+            layer.NH4 = NH4 * unit_adjustment
+            layer.topLayerFreshN = FreshN * unit_adjustment
+
+    # ---------------------------------------------------------------------------
     # Class: SoilLayer
     # An instance of this class represents a layer in the soil
-    #---------------------------------------------------------------------------
+    # ---------------------------------------------------------------------------
     class SoilLayer():
         '''
         An instance of this class represents a layer in the soil.
         '''
+
         def __init__(self, layerName, layerData):
             '''
             Description:
@@ -395,7 +364,7 @@ class Soil():
             self.wiltingPoint = layerData['WiltingPoint']
             self.fieldCapacity = layerData['FieldCapacity']
             self.saturation = layerData['Saturation']
-            #self.currentSoilWater = layerData['StartingSoilWater']
+            # self.currentSoilWater = layerData['StartingSoilWater']
 
             self.depth = 0.0  # depth of soil layer
             self.fcWater = 0.0  # constant
@@ -405,8 +374,7 @@ class Soil():
             self.currentSoilWaterMM = 0.0  # soil water in layer in mm
             self.bulkDensity = layerData['BulkDensity']
 
-
-            # Variables to calculate daily Evapotranspiration
+            # Variables to calculate daily evapotranspiration
             self.topEsoil = 0.0  # evaporation demand at top of layer
             self.bottomEsoil = 0.0  # evaporation demand at bottom of layer
             self.layerEsoil = 0.0  # evaporation demand at layer
@@ -420,8 +388,7 @@ class Soil():
             self.perc = 0.0  # amount of water that percolates to next layer
 
             self.labileP = layerData['LabileP']  # labile P in soil layer
-            self.clay = layerData['Clay'] # soil clay % in soil layer
-
+            self.clay = layerData['Clay']  # soil clay % in soil layer
 
             # Variable to simulate nitrogen Cycling
             self.orgC = layerData['OrgC%']
@@ -429,6 +396,9 @@ class Soil():
             self.cationExclusionFraction = layerData['CationExclusionFraction']
             self.denitrificationRate = layerData['DenitrificationRate']
             self.NH4 = layerData['NH4']
+
+            self.tempFac = 0.0
+            self.waterFac = 0.0
 
             # Initial NO3 levels (kg/ha) in the soil layer:
             self.NO3 = 0.0
@@ -441,16 +411,11 @@ class Soil():
 
             # Initial Stable N in layer:
             self.stableN = 0.
+
             self.nMinAct = 0.0
             self.nitrification = 0.0
             self.volatilization = 0.0
             self.denitrification = 0.0
-            self.NO3Conc = 0.0
-            self.NO3Perc = 0.0
-            self.NH4Conc = 0.0
-            self.NH4Perc = 0.0
-            self.activeNConc = 0.0
-            self.activeNPerc = 0.0
             self.nTrans = 0.0
             self.totNitriVolatil = 0.0
 
@@ -466,18 +431,18 @@ class Soil():
             self.stableP = 0.0
             self.orgP = 0.0
 
-
-    #---------------------------------------------------------------------------
+    # ---------------------------------------------------------------------------
     # Class: Fertilizer
     # An instance of this class represents a particular fertilizer and the date
     # of its application
-    #---------------------------------------------------------------------------
+    # ---------------------------------------------------------------------------
     class Fertilizer():
         '''
         Description:
             An instance of this class represents a particular fertilizer and the date
         of its application.
         '''
+
         def __init__(self, FertName, FertData):
             '''
             Constructs an instance of this class by setting the values of its necessary
@@ -495,16 +460,17 @@ class Soil():
             self.depth = FertData['Depth']
             self.percentOnSurface = FertData['%onSurface']
 
-    #---------------------------------------------------------------------------
+    # ---------------------------------------------------------------------------
     # Class: Manure
     # An instance of this class represents a particular manure and the date
     # of its application
-    #---------------------------------------------------------------------------
+    # ---------------------------------------------------------------------------
     class Manure():
         '''
         An instance of this class represents a particular manure and the date
         of its application
         '''
+
         def __init__(self, manureName, manureData):
             '''
             Description:
@@ -527,17 +493,17 @@ class Soil():
             self.depth = manureData['Depth']
             self.percentOnSurface = manureData['%onSurface']
 
-
-    #---------------------------------------------------------------------------
+    # ---------------------------------------------------------------------------
     # Class: Tillage
     # An instance of this class represents a particular tillage and the date
     # of its application
-    #---------------------------------------------------------------------------
+    # ---------------------------------------------------------------------------
     class Tillage():
         '''
         An instance of this class represents a particular tillage and the date
         of its application
         '''
+
         def __init__(self, tillageName, tillageData):
             '''
             Description:
@@ -554,16 +520,17 @@ class Soil():
             self.percentMixed = tillageData['%Mixed']
             self.depth = tillageData['Depth']
 
-    #---------------------------------------------------------------------------
+    # ---------------------------------------------------------------------------
     # Class: CropPUptake
     # An instance of this class represents a particular uptake and the date
     # of uptake
-    #---------------------------------------------------------------------------
+    # ---------------------------------------------------------------------------
     class CropPUptake():
         '''
         An instance of this class represents a particular uptake and the date
         of uptake
         '''
+
         def __init__(self, uptakeName, uptakeData):
             '''
             Description:
@@ -578,83 +545,61 @@ class Soil():
             self.uptakeYear = uptakeData['Year']
             self.pUptake = uptakeData['PUptake']
 
-
-    #---------------------------------------------------------------------------
+    # ---------------------------------------------------------------------------
     # Function: calculateFcWater
     # Calculates the amount of water in soil profile for a given layer at
     # field capacity (mm H2O). Called when soil portion of input is read.
-    #---------------------------------------------------------------------------
+    # ---------------------------------------------------------------------------
     def calculateFcWater(self):
         '''
         Description:
             Calculates the amount of water in soil profile for a given layer at
             field capacity (mm H2O). Called when soil portion of input is read.
         '''
-        for x in range(0, len(self.listOfSoilLayers)):
-            self.listOfSoilLayers[x].fcWater = (self.listOfSoilLayers[x].depth
-                                                * self.listOfSoilLayers[x].fieldCapacity)
+        for layer in self.listOfSoilLayers:
+            layer.fcWater = layer.depth * layer.fieldCapacity
 
-
-    #---------------------------------------------------------------------------
+    # ---------------------------------------------------------------------------
     # Function: calculateSatWater
     # Calculates the amount of water in soil profile for a given layer at
     # saturation (mm H2O). Called when soil portion of input is read.
-    #---------------------------------------------------------------------------
+    # ---------------------------------------------------------------------------
     def calculateSatWater(self):
         '''
         Description:
             Calculates the amount of water in soil profile for a given layer at
             saturation (mm H2O). Called when soil portion of input is read.
         '''
-        for x in range(0, len(self.listOfSoilLayers)):
-            self.listOfSoilLayers[x].satWater = (self.listOfSoilLayers[x].depth
-                                                 * self.listOfSoilLayers[x].saturation)
+        for layer in self.listOfSoilLayers:
+            layer.satWater = layer.depth * layer.saturation
 
-    #---------------------------------------------------------------------------
+    # ---------------------------------------------------------------------------
     # Function: calculateWiltingWater
     # Calculates the amount of water in soil profile for a given layer at
     # wilting point (mm H2O). Called when soil portion of input is read.
-    #---------------------------------------------------------------------------
+    # ---------------------------------------------------------------------------
     def calculateWiltingWater(self):
         '''
         Description:
             Calculates the amount of water in soil profile for a given layer at
             wilting point (mm H2O). Called when soil portion of input is read.
         '''
-        for x in range(0, len(self.listOfSoilLayers)):
-            self.listOfSoilLayers[x].wiltingWater = (self.listOfSoilLayers[x].
-                                                     depth * self.listOfSoilLayers[x].wiltingPoint)
+        for layer in self.listOfSoilLayers:
+            layer.wiltingWater = layer.depth * layer.wiltingPoint
 
-    #---------------------------------------------------------------------------
+    # ---------------------------------------------------------------------------
     # Function: convertCurrentSoilWaterToMM
     # Calculates the amount of soil water in a given layer in millimeters.
     # Called once when soil portion of input is read.
-    #---------------------------------------------------------------------------
+    # ---------------------------------------------------------------------------
     def convertCurrentSoilWaterToMM(self):
         '''
         Description:
             Calculates the amount of soil water in a given layer in millimeters.
             Called once when soil portion of input is read.
         '''
-        for x in range(0, len(self.listOfSoilLayers)):
-            self.listOfSoilLayers[x].currentSoilWaterMM = (
-                self.listOfSoilLayers[x].depth * self.listOfSoilLayers[x]
-                .fieldCapacity)
-
-
-    def updateResidue(self, crop_type, time):
-        '''
-        Description:
-            Updates the residue
-
-        Args:
-            crop_type: an instance of the CropType class
-            time: an instance of the Time class
-        '''
-        self.residue *= (1-self.decayRate)
-        if crop_type.harvest_date == time.day:
-            dResidue = crop_type.biomass_actual - crop_type.yield_actual
-            self.residue += dResidue
+        for layer in self.listOfSoilLayers:
+            layer.currentSoilWaterMM = layer.depth * layer.fieldCapacity
 
     def annual_reset(self):
         '''

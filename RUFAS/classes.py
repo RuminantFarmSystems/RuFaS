@@ -6,6 +6,7 @@ Description: Contains top level class definitions for RUFAS
 Author(s): Kass Chupongstimun, kass_c@hotmail.com
            Jit Patil, spatil5@wisc.edu
            William Donovan, wmdonovan@wisc.edu
+           Jacob Johnson, jacob8399@gmail.com
 '''
 ################################################################################
 
@@ -324,6 +325,7 @@ class Time():
     '''
 
     def __init__(self, years, cal_year):
+
 
         self.cal_year = cal_year
         self.years = years
