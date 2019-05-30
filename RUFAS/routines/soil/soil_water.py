@@ -50,23 +50,21 @@ def update_all(soil, crop, weather, time):
 
 #
 # Calculates soil water by layer
-# "pseudocode_SC_soilhydrology.docx" 1.D.1/2
+# "pseudocode_SC_soilhydrology.docx" 2.D.1/2
 #
 def update_SW(soil, crop, weather, time):
 
     R = weather.rainfall[time.year-1][time.day-1]
     Q = soil.runoff
-    for x in range(len(soil.listOfSoilLayers)):
+    for x in range(0, len(soil.listOfSoilLayers)):
         layer = soil.listOfSoilLayers[x]
         SW = layer.currentSoilWaterMM
         WP = layer.wiltingWater
         Perc = layer.perc
         Esoil = layer.layerEsoil
 
-        # this reference is confusing, and will have to be changed (possibly to
-        # a for loop representing the potential varieties of crop that could be
-        # grown when we add soy/alfalfa and what not.
-        Et_actual = crop.crops_list["corn"].water_uptake_each_layer[x]
+        # "pseudocode_SC_wateruptake.docx" 2.D.2
+        Et_actual = crop.crops_list["corn"].water_uptake_each_layer[x]  # TODO: Crop Flag
 
         if x == 0:
             SW = max(WP, SW + R - Q - Esoil - Perc - Et_actual)

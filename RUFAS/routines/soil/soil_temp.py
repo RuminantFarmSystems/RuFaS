@@ -118,25 +118,14 @@ def calc_Tsoil(soil, weather, time):
 # "pseudocode_SC_soiltemperature.docx" 1.A.4
 #
 def calc_dd(soil):
-    ddmax = calc_ddmax(soil)
     scale = calc_scale(soil)
+    ddmax = calc_ddmax(soil)
 
     part_1 = log(500 / ddmax)
     part_2 = ((1 - scale)/(1 + scale)) ** 2
     exp_part = exp(part_1 * part_2)
 
     return ddmax * exp_part
-
-
-#
-# Calculates the maximum damping depth (mm)
-# "pseudocode_SC_soiltemperature.docx" 1.A.6
-#
-def calc_ddmax(soil):
-    bd = soil.profileBulkDensity
-    exp_part = exp(-5.63 * bd)
-    return 1000 + (2500 * bd) / (bd + 686 * exp_part)
-
 
 #
 # Calculates the scaling factor for soil water in a given soil profile
@@ -211,7 +200,7 @@ def calc_radiate(soil, crop, weather, time):
 # cover. "pseudocode_SC_soiltemperature.docx" 1.A.9/10
 #
 def calc_albedo(soil, crop):
-    CV = crop.crops_list["corn"].bio_AG
+    CV = crop.crops_list["corn"].bio_AG  # TODO: Crop Flag
     albedoSoil = soil.soilAlbedo
 
     # "pseudocode_SC_soiltemperature.docx" 1.A.10
@@ -229,17 +218,14 @@ def calc_bcv(crop, time):
     CV = crop.crops_list["corn"].bio_AG
     exp_part = exp(7.563 - 0.0001297 * (-CV))
 
-    # "pseudocode_SC_soiltemperature.docx" 1.A.11
     bcv = CV / (CV + exp_part)
 
     SNOW = 0
-    # RUFAS has these values set to 300 and 95, but the spreadheet has them at
-    # 335 and 59
+    # TODO: these time ranges for snowfall are taken from the barnyard spreadsheet model and seem largely arbitrary
     if time.day > 335 or time.day < 59:
-        SNOW = 0.8
+        albedo_snow = 0.8
+        SNOW = albedo_snow * 10
 
-    # "pseudocode_SC_soiltemperature.docx" 1.A.12
-    # exp_part = exp(6.055 - 0.3002 * SNOW)
-    bcv_snow = (SNOW*10 / (SNOW*10 + exp(6.055 - 0.3002 * SNOW*10)))
+    bcv_snow = (SNOW / (SNOW + exp(6.055 - 0.3002 * SNOW)))
 
     return max(bcv, bcv_snow)

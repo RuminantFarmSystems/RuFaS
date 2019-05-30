@@ -195,7 +195,7 @@ class Weather():
                     self.radiation[year][day - offset] = float(row[6])
                     self.addedN[year][day - offset] = float(row[7])
 
-                    # iterate year conter
+                    # iterate year counter
                     if day == 365 or day == 366:
                         year += 1
                 currentRow += 1
@@ -215,6 +215,7 @@ class Time():
     '''
 
     def __init__(self, years):
+
 
         self.years = years
         self.year = 1  # Current Year
