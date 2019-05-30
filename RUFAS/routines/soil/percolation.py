@@ -41,36 +41,32 @@ def update_all(soil):
 #
 # Calculates daily percolation as a function of the water available for
 # percolation (SWperc) in a soil layer.
-# "pseudocode_SC_soilhydrology.docx" 1.C.1/2
+# "pseudocode_SC_soilhydrology.docx" 2.C.1/2
 #
 def calc_daily_percolation(soil):
-    for x in range(0, len(soil.listOfSoilLayers)):
-        curr_layer = soil.listOfSoilLayers[x]
 
-        SW = curr_layer.currentSoilWaterMM
-        FC = curr_layer.fcWater
+    for layer in soil.listOfSoilLayers:
+        SW = layer.currentSoilWaterMM
+        FC = layer.fcWater
+
 
         SWperc = 0.0
         if SW >= FC:
             SWperc = SW - FC
 
-        SAT = curr_layer.saturation
-        FC = curr_layer.fcWater
-        Ksat = curr_layer.ksat
+        SAT = layer.saturation
+        Ksat = layer.ksat
 
-        # Pseudocode uses SAT and SATwater interchangeably but both the
-        # spreadsheet model and RUFAS make it clear that this is not the case
-        depth = curr_layer.depth
+        depth = layer.depth
         SATwater = SAT * depth
 
         # Travel Time for each soil layer
-        # "pseudocode_SC_soilhydrology.docx" 1.C.2
+        # "pseudocode_SC_soilhydrology.docx" 2.C.2
         TT = (SATwater - FC) / Ksat
-        curr_layer.TT = TT
+        layer.TT = TT
 
         t = 24
 
-        exp_part = exp((-t) / curr_layer.TT)
-        curr_layer.perc = SWperc * (1 - exp_part)
+        exp_part = exp((-t) / layer.TT)
+        layer.perc = SWperc * (1 - exp_part)
 
-        soil.listOfSoilLayers[x] = curr_layer

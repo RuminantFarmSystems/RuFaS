@@ -97,6 +97,16 @@ def daily_crop_routine(crop, weather, time, soil):
         # The order in which these are called matters because some of the later
         # update_all calls depend on values calculated earlier.
         #
+
+        #
+        # nitrogen uptake is performed "first" because it occurs AFTER the soil
+        # module, but the crop module has to run before the soil module as of
+        # 05.14.2019. This may change eventually. For now, nitrogen uptake
+        # output values are behind one day. In actuality, this means nitrogen
+        # calculations are performed "last" as far as updating daily values
+        #
+        nitrogen_uptake.update_all(crop_type, soil, time)
+
         heat_units.update_all(crop_type, T_min, T_max, time)
 
         water_uptake.update_all(crop_type, soil, time)
@@ -106,8 +116,6 @@ def daily_crop_routine(crop, weather, time, soil):
         leaf_area_index.update_all(crop_type, time)
 
         phosphorus_uptake.update_all(crop_type, soil, time)
-
-        nitrogen_uptake.update_all(crop_type, soil, time)
 
         root_development.update_all(crop_type, time)
 
@@ -221,7 +229,7 @@ class Crop():
             self.Et_actual = 0
             self.Ea_sum = 0
             self.water_actual_up = 0
-            self.water_uptake_each_layer = []
+            self.water_uptake_each_layer = [0,0,0]
 
             # ===================================================================
             ''' Nitrogen Uptake Data '''
