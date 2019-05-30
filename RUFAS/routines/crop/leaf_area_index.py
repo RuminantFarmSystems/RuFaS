@@ -19,9 +19,9 @@ CropType attribute definitions:
 
     fr_LAI_2 = crop-specific curve point
 
-    l1 = shape coefficient
+    L1 = shape coefficient
 
-    l2 = shape coefficient
+    L2 = shape coefficient
 
     fr_PHU = Fraction of PHU accumulated by current day
 
@@ -53,8 +53,8 @@ from math import exp, log, sqrt
 # to the leaf area index.
 #
 def update_all(crop_type, time):
-    l1, l2 = calculate_shape_coefficients(crop_type)
-    calc_fr_LAI_max(crop_type, time, l1, l2)
+    L1, L2 = calculate_shape_coefficients(crop_type)
+    calc_fr_LAI_max(crop_type, time, L1, L2)
     calculate_LAI_actual(crop_type, time)
 
 
@@ -63,17 +63,17 @@ def update_all(crop_type, time):
 # "pseudocode_SC_cropbiomass.docx" section 1.D.1
 #
 def calculate_shape_coefficients(crop_type):
-    l2_part1 = (crop_type.fr_PHU_1 / crop_type.fr_LAI_1) - crop_type.fr_PHU_1
-    l2_part2 = (crop_type.fr_PHU_2 / crop_type.fr_LAI_2) - crop_type.fr_PHU_2
+    L2_part1 = (crop_type.fr_PHU_1 / crop_type.fr_LAI_1) - crop_type.fr_PHU_1
+    L2_part2 = (crop_type.fr_PHU_2 / crop_type.fr_LAI_2) - crop_type.fr_PHU_2
 
-    l2 = ((log(l2_part1) - log(l2_part2))
+    L2 = ((log(L2_part1) - log(L2_part2))
           / (crop_type.fr_PHU_2 - crop_type.fr_PHU_1))
 
-    l1_part1 = (crop_type.fr_PHU_1 / crop_type.fr_LAI_1) - crop_type.fr_PHU_1
+    L1_part1 = (crop_type.fr_PHU_1 / crop_type.fr_LAI_1) - crop_type.fr_PHU_1
 
-    l1 = log(l1_part1) + l2 * crop_type.fr_PHU_1
+    L1 = log(L1_part1) + L2 * crop_type.fr_PHU_1
 
-    return l1, l2
+    return L1, L2
 
 
 #
@@ -81,7 +81,7 @@ def calculate_shape_coefficients(crop_type):
 # including today.
 # "pseudocode_SC_cropbiomass.docx" section 1.D.2
 #
-def calc_fr_LAI_max(crop_type, time, l1, l2):
+def calc_fr_LAI_max(crop_type, time, L1, L2):
     crop_type.prev_fr_LAI_max = crop_type.fr_LAI_max
 
     inGrowingPeriod = crop_type.planting_date <= time.day <= crop_type.harvest_date
@@ -89,7 +89,7 @@ def calc_fr_LAI_max(crop_type, time, l1, l2):
     if not inGrowingPeriod:
         crop_type.fr_LAI_max = 0
     else:
-        exp_part = exp(l1 - l2 * crop_type.fr_PHU)
+        exp_part = exp(L1 - L2 * crop_type.fr_PHU)
         crop_type.fr_LAI_max = crop_type.fr_PHU / (crop_type.fr_PHU + exp_part)
 
 
@@ -117,7 +117,6 @@ def calculate_LAI_actual(crop_type, time):
         crop_type.LAI_actual = crop_type.prev_LAI_actual + dLAI_actual
 
     else:
-
         # 1.D.4.a.2
         LAI_actual = crop_type.LAI_max * (1 - crop_type.fr_PHU) / (1 - crop_type.fr_PHU_sen)
         crop_type.LAI_actual = max(LAI_actual, 0)
