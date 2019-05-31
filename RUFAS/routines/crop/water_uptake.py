@@ -159,6 +159,7 @@ def calc_act_water_uptake(crop_type, soil, adj_uptakes, time):
     # Calculate actual uptake for each layer (2.D.1)
     for uptake, layer in zip(adj_uptakes, soil.listOfSoilLayers):
         act_uptake = min(uptake, layer.currentSoilWaterMM - layer.wiltingWater)
+        layer.Et_actual = act_uptake
         act_uptake_each_layer.append(act_uptake)
 
     crop_type.water_uptake_each_layer = act_uptake_each_layer

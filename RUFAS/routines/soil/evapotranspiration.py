@@ -96,7 +96,7 @@ def calc_potential_evap(soil, crop, weather, time):
 
     soil.E0 = max(0.001, E0)
 
-    if crop.crops_list["corn"].planting_date <= time.day <= crop.crops_list["corn"].harvest_date:
+    if crop.crops_list["corn"].planting_date <= time.day <= crop.crops_list["corn"].harvest_date:  # TODO: Crop Flag
         soil.E0_sum += soil.E0
 
 

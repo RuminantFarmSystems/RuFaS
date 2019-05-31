@@ -193,7 +193,7 @@ def daily_soil_routine(soil, crop, weather, time):
 
     # updates changes in soil water resulting from infiltration,
     # evapotranspiration, and percolation
-    soil_water.update_all(soil, crop, weather, time)
+    soil_water.update_all(soil, weather, time)
 
     residue.update_all(soil, crop, time)
 
@@ -378,6 +378,7 @@ class Soil():
             self.topEsoil = 0.0  # evaporation demand at top of layer
             self.bottomEsoil = 0.0  # evaporation demand at bottom of layer
             self.layerEsoil = 0.0  # evaporation demand at layer
+            self.Et_actual = 0.0  # actual transpiration for the layer (updated in crop)
 
             # Variables used for soil temperature
             self.temperature = layerData['InitialTemperature']

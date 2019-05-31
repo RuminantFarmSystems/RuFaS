@@ -43,16 +43,15 @@ Soil values updated by calling update_all():
 # This function calls all the necessary functions to update the value of soil
 # water
 #
-def update_all(soil, crop, weather, time):
+def update_all(soil, weather, time):
 
-    update_SW(soil, crop, weather, time)
+    update_SW(soil, weather, time)
 
-i
 #
 # Calculates soil water by layer
 # "pseudocode_SC_soilhydrology.docx" 2.D.1/2
 #
-def update_SW(soil, crop, weather, time):
+def update_SW(soil, weather, time):
 
     R = weather.rainfall[time.year-1][time.day-1]
     Q = soil.runoff
@@ -63,8 +62,7 @@ def update_SW(soil, crop, weather, time):
         Perc = layer.perc
         Esoil = layer.layerEsoil
 
-        # "pseudocode_SC_wateruptake.docx" 2.D.2
-        Et_actual = crop.crops_list["corn"].water_uptake_each_layer[x]  # TODO: Crop Flag
+        Et_actual = layer.Et_actual
 
         if x == 0:
             SW = max(WP, SW + R - Q - Esoil - Perc - Et_actual)

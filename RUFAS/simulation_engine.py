@@ -59,7 +59,6 @@ def simulate(input_fPath:Path):
     # MAIN Simulation Loop
     #
 
-
     while not time.end_simulation():
         annual_simulation()
 
@@ -67,6 +66,7 @@ def simulate(input_fPath:Path):
 
     print("Simulation Successful: {}".format(input_fPath.name))
     print("Total Run Time: {} seconds\n".format(str(t_end_sim - t_start_sim)))
+
 
 #-------------------------------------------------------------------------------
 # Function: daily_simulation
@@ -88,6 +88,8 @@ def daily_simulation():
 
     #print("simulating: " + time.to_str()) # Print out current day of simulation
     time.advance()
+
+
 #-------------------------------------------------------------------------------
 # Function: annual_simulation
 #-------------------------------------------------------------------------------
