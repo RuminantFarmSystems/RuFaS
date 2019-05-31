@@ -4,6 +4,7 @@ RUFAS: Ruminant Farm Systems Model
 File name: ration.py
 Description:
 Author(s): Kass Chupongstimun, kass_c@hotmail.com
+           Militsa Sotirova, militsasotirova@gmail.com
 '''
 ################################################################################
 
