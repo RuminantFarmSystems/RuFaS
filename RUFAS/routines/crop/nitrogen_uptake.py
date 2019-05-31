@@ -127,7 +127,7 @@ def calc_log_term_of_shape_coeff(crop_type, fr_PHU_fract, fr_n_):
 # "pseudocode_SC_nitrogenuptake.docx" section 3.B.2
 #
 def calc_bio_N_opt(crop_type):
-    crop_type.bio_N_opt = crop_type.fr_N * crop_type.prev_biomass_actual
+    crop_type.bio_N_opt = crop_type.fr_N * crop_type.biomass_actual #TODO changed from prev
 
 
 #
@@ -138,7 +138,7 @@ def calc_N_up(crop_type):
     if crop_type.bio_N_opt - crop_type.bio_N < 0:
         crop_type.N_up = 0
     else:
-        option1 = crop_type.bio_N_opt - crop_type.bio_N
+        option1 = crop_type.bio_N_opt - crop_type.bio_N # TODO should be prev??
         option2 = 4 * crop_type.fr_n3 * crop_type.dBiomass_max
 
         crop_type.N_up = min(option1, option2)

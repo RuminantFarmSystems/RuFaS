@@ -115,7 +115,7 @@ def daily_crop_routine(crop, weather, time, soil):
 
         leaf_area_index.update_all(crop_type, time)
 
-        phosphorus_uptake.update_all(crop_type, soil, time)
+        phosphorus_uptake.update_all(crop_type, soil)
 
         root_development.update_all(crop_type, time)
 
@@ -127,7 +127,7 @@ def daily_crop_routine(crop, weather, time, soil):
 # -------------------------------------------------------------------------------
 def annual_crop_routine(crop, weather, time):
     for _, crop_type in crop.crops_list.items():
-        crop_type.calculate_start_growth_day(weather.T_avg[time.year - 1])
+        crop_type.calculate_start_growth_date(weather.T_avg[time.year - 1])
 
 
 # -------------------------------------------------------------------------------
@@ -153,7 +153,7 @@ class Crop():
 
             self.planting_date = data['planting_date']
             self.harvest_date = data['harvest_date']
-            self.start_day = 0
+            self.start_date = 0
 
             # ===================================================================
             ''' HEAT UNIT DATA '''
@@ -292,14 +292,16 @@ class Crop():
 
         # -----------------------------------------------------------------------
         # Method: calculate_start_growth_day
+        # "pseudocode_SC_cropbiomass.docx" section 1.A
         # -----------------------------------------------------------------------
-        def calculate_start_growth_day(self, T_avg):
+        def calculate_start_growth_date(self, yearly_T_avg):
             if self.crop_type == "annual":
-                self.start_day = self.planting_date
+                self.start_date = self.planting_date
             else:
-                for d in range(len(T_avg)):
-                    if T_avg > self.T_base_min:
-                        self.start_day = d
+                for d in range(len(yearly_T_avg)):
+                    if yearly_T_avg[d] > self.T_base_min:
+                        self.start_date = d
+                        break
 
     # ---------------------------------------------------------------------------
     # Method: annual_reset
