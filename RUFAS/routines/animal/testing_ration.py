@@ -22,6 +22,7 @@ def test_ration(feed):
     
     formulated_ration = ration.optimize(feed, rqmts)
 
+    '''
     print('Solution is', formulated_ration['status'])
     print('Price is calculated to: \t', formulated_ration['objective'])
     print('Corn_grain is calculated to: \t', formulated_ration['Corn_grain'])
@@ -31,5 +32,6 @@ def test_ration(feed):
     print('Rye_hay is calculated to: \t', formulated_ration['Rye_hay'])
 
     print("\n done")
+    '''
     
     return formulated_ration
