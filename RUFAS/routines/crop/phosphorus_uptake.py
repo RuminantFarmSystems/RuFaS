@@ -56,7 +56,7 @@ from math import log, exp
 #
 # This function updates all of a crop's phosphorus uptake information.
 #
-def update_all(crop_type, soil, time):
+def update_all(crop_type, soil):
     calc_fr_P(crop_type)
     calc_bio_P_opt(crop_type)
     calc_P_up(crop_type)

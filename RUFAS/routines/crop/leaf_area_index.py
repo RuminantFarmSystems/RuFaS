@@ -84,7 +84,7 @@ def calculate_shape_coefficients(crop_type):
 def calc_fr_LAI_max(crop_type, time, L1, L2):
     crop_type.prev_fr_LAI_max = crop_type.fr_LAI_max
 
-    inGrowingPeriod = crop_type.planting_date <= time.day <= crop_type.harvest_date
+    inGrowingPeriod = crop_type.start_date <= time.day <= crop_type.harvest_date
 
     if not inGrowingPeriod:
         crop_type.fr_LAI_max = 0
@@ -99,34 +99,26 @@ def calc_fr_LAI_max(crop_type, time, L1, L2):
 # section 1.D.3 and 1.D.4 respectively.
 #
 def calculate_LAI_actual(crop_type, time):
-    inGrowingPeriod = crop_type.planting_date <= time.day <= crop_type.harvest_date
-    crop_type.prev_LAI_actual = crop_type.LAI_actual
+    growing_period = crop_type.start_date <= time.day <= crop_type.harvest_date
+    prev_LAI_actual = crop_type.LAI_actual
 
-    if not inGrowingPeriod:
-        dLAI_max = 0
-        dLAI_actual = 0
+    if growing_period:
 
-    elif crop_type.fr_PHU < crop_type.fr_PHU_sen:
         # 1.D.3
-        exp_part = exp(5 * (crop_type.prev_LAI_actual - crop_type.LAI_max))
+        exp_part = exp(5 * (prev_LAI_actual - crop_type.LAI_max))
         d_fr_LAI_max = (crop_type.fr_LAI_max - crop_type.prev_fr_LAI_max)
         dLAI_max = d_fr_LAI_max * crop_type.LAI_max * (1 - exp_part)
         dLAI_actual = calculate_dLAI_actual(crop_type, dLAI_max)
 
-        # 1.D.4.a.1
-        crop_type.LAI_actual = crop_type.prev_LAI_actual + dLAI_actual
+        if crop_type.fr_PHU < crop_type.fr_PHU_sen:
+            # 1.D.4.a.1
+            crop_type.LAI_actual = prev_LAI_actual + dLAI_actual
 
-    else:
-        # 1.D.4.a.2
-        LAI_actual = crop_type.LAI_max * (1 - crop_type.fr_PHU) / (1 - crop_type.fr_PHU_sen)
-        crop_type.LAI_actual = max(LAI_actual, 0)
+        else:
+            # 1.D.4.a.2
+            LAI_actual = crop_type.LAI_max * (1 - crop_type.fr_PHU) / (1 - crop_type.fr_PHU_sen)
+            crop_type.LAI_actual = max(LAI_actual, 0)
 
-        # 1.D.4.a.1 (LAIi = LAIi-1 + dLAIi, dLAI = LAIi - LAIi-1)
-        dLAI_max = crop_type.LAI_actual - crop_type.prev_LAI_actual
-        dLAI_actual = calculate_dLAI_actual(crop_type, dLAI_max)
-
-    # Return these calculated values just so they can be used in testing/debugging
-    return dLAI_max, dLAI_actual
 
 
 #
@@ -134,5 +126,6 @@ def calculate_LAI_actual(crop_type, time):
 # on a given day. The equations for calculating dLAI_actual can be found in
 # "pseudocode_SC_actualgrowth.docx" in section 7.A.3
 #
-def calculate_dLAI_actual(crop_type, dLAI_max):
-    return dLAI_max * sqrt(crop_type.gamma_reg)
+def calculate_dLAI_actual(crop_type, dLAI):
+    return dLAI * sqrt(crop_type.gamma_reg)
+
