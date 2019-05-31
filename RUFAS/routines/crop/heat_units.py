@@ -66,7 +66,7 @@ def update_all(crop_type, T_min, T_max, time):
 #
 def calculate_frPHU(crop_type, T_min, T_max, time):
 
-    #1.B
+    # 1.B
     T_HU_min = calc_T_HU_min(crop_type, T_min)
     T_HU_max = calc_T_HU_max(crop_type, T_max)
     HU = calc_HU(crop_type, T_HU_min, T_HU_max)
@@ -84,7 +84,7 @@ def calculate_frPHU(crop_type, T_min, T_max, time):
 
 #
 # Calculates minimum heat unit temperature on current day.
-# "pseudocode_SC_cropbiomass.docx" section 1.B.a
+# "pseudocode_SC_cropbiomass.docx" section 1.B.3
 #
 def calc_T_HU_min(crop_type, T_min):
     if T_min < crop_type.T_base_min:
@@ -95,7 +95,7 @@ def calc_T_HU_min(crop_type, T_min):
 
 #
 # Calculates maximum heat unit temperature on current day.
-# "pseudocode_SC_cropbiomass.docx" section 1.B.b
+# "pseudocode_SC_cropbiomass.docx" section 1.B.4
 #
 def calc_T_HU_max(crop_type, T_max):
     if T_max > crop_type.T_base_max:
@@ -106,12 +106,13 @@ def calc_T_HU_max(crop_type, T_max):
 
 #
 # Calculates available heat units on current day.
+# # "pseudocode_SC_cropbiomass.docx" section 1.B.1/2
 #
 def calc_HU(crop_type, T_HU_min, T_HU_max):
-    # "pseudocode_SC_cropbiomass.docx" section 1.B.1
+    # "pseudocode_SC_cropbiomass.docx" section 1.B.2
     T_HU = (T_HU_min + T_HU_max) / 2
 
-    # "pseudocode_SC_cropbiomass.docx" section 1.B.2
+    # "pseudocode_SC_cropbiomass.docx" section 1.B.1
     if T_HU < crop_type.T_base_min:
         return 0.0
     else:

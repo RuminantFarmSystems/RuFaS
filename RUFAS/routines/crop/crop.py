@@ -229,7 +229,7 @@ class Crop():
             self.Et_actual = 0
             self.Ea_sum = 0
             self.water_actual_up = 0
-            self.water_uptake_each_layer = [0,0,0]
+            self.water_uptake_each_layer = []
 
             # ===================================================================
             ''' Nitrogen Uptake Data '''
