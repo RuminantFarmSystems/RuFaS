@@ -29,7 +29,7 @@ Soil attribute definitions
 
     Tavg = mean air temperature for a given day (ºC)
 
-    Etrans = maximum transpiration on a given day (mm H20)
+    Et_max = maximum transpiration on a given day (mm H20)
 
     LAI = Leaf Area Index (calculated in Crop Routine)
 
@@ -53,7 +53,7 @@ Soil attribute definitions
 Soil values updated by calling update_all():
     soil.E0
     soil.E0_sum
-    soil.Etrans
+    soil.Et_max
     soil.Esoil
     soil.listOfSoilLayers.topEsoil
     soil.listOfSoilLayers.bottomEsoil
@@ -118,9 +118,9 @@ def calc_LHV(Tavg):
 def calc_crop_transpiration(soil, crop):
     LAI = crop.crops_list["corn"].LAI_actual  # TODO: Crop Flag
     if 0 <= LAI <= 3.0:
-        soil.Etrans = (soil.E0 * LAI) / 3.0
+        soil.Et_max = (soil.E0 * LAI) / 3.0
     else:
-        soil.Etrans = soil.E0
+        soil.Et_max = soil.E0
 
 
 #
@@ -128,22 +128,22 @@ def calc_crop_transpiration(soil, crop):
 # "pseudocode_SC_soilhydrology.docx" 2.B.4/6
 #
 def calc_soil_evap(soil, crop):
-    SoilCov = calc_soil_cov(crop)
+    SoilCov = calc_soil_cov(soil, crop)
 
     # "pseudocode_SC_soilhydrology.docx" 2.B.4
     Esoil = soil.E0 * SoilCov
 
     # "pseudocode_SC_soilhydrology.docx" 2.B.6
-    soil.Esoil = min(Esoil, ((Esoil * soil.E0) / (Esoil + soil.Etrans)))
+    soil.Esoil = min(Esoil, ((Esoil * soil.E0) / (Esoil + soil.Et_max)))
 
 
 #
 # Calculates soil cover for use in calculating soil evaporation
 # "pseudocode_SC_soilhydrology.docx" 2.B.5
 #
-def calc_soil_cov(crop):
-    bio_AG = crop.crops_list["corn"].bio_AG  #TODO: Crop Flag
-    residue = crop.crops_list["corn"].residue
+def calc_soil_cov(soil, crop):
+    bio_AG = crop.crops_list["corn"].bio_AG  # TODO: Crop Flag
+    residue = soil.residue
     BioMass = bio_AG + residue
 
     return exp(-5.0 * (10 ** -5) * BioMass)
@@ -202,4 +202,5 @@ def update_Esoil_z(soil):
         #
         curr_layer.layerEsoil = min(layerEsoil, 0.8 * (SW - FC))
 
+        soil.Ea_sum += curr_layer.layerEsoil
         soil.listOfSoilLayers[x] = curr_layer

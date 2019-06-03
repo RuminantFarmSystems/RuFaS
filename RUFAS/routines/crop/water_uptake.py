@@ -13,7 +13,7 @@ Description: This module contains the necessary functions for calculating and
 
 CropType attribute definitions:
 
-    soil.Etrans = Maximum plant transpiration on a given day (mm H2O)
+    soil.Et_max = Maximum plant transpiration on a given day (mm H2O)
 
     beta_w = Water-use distribution parameter
 
@@ -82,7 +82,7 @@ def calc_max_water_uptake_z(crop_type, soil, z):
     if crop_type.z_root == 0:
         return 0
     else:
-        term1 = soil.Etrans / (1 - exp(-1*crop_type.beta_w))
+        term1 = soil.Et_max / (1 - exp(-1*crop_type.beta_w))
         term2 = 1 - exp(-1*crop_type.beta_w * z / crop_type.z_root)
         return term1 * term2
 
@@ -167,8 +167,5 @@ def calc_act_water_uptake(crop_type, soil, adj_uptakes, time):
     # Calculate total plant uptake of water from soil profile (2.D.2)
     crop_type.water_actual_up = sum(act_uptake_each_layer)
 
-    # Total plant water uptake is also the actual amount of transpiration (2.D.3)
-    crop_type.Et_actual = crop_type.water_actual_up
-
     if time.day >= crop_type.planting_date:
-        crop_type.Ea_sum += crop_type.Et_actual
+        soil.Ea_sum += crop_type.water_actual_up
