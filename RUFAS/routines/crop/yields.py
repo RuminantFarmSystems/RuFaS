@@ -76,7 +76,7 @@ def update_all(crop_type, time, soil):
 
 #
 # Calculates water deficiency factor (AKA gamma_wu).
-# "pseudocode_SC_actualgrowth.docx" section 7.B.1
+# "pseudocode_SC_actualgrowth.docx" section 7.A.4
 #
 def calc_gamma_wu(crop_type, soil):
     if soil.E0_sum == 0:
@@ -86,34 +86,34 @@ def calc_gamma_wu(crop_type, soil):
 
 #
 # Calculates max potential harvest index for a given day.
-# "pseudocode_SC_cropyield.docx" section 5.1
+# "pseudocode_SC_cropyield.docx" section 5.A
 #
 def calc_HI_max(crop_type):
     top = 100 * crop_type.fr_PHU
-    bottom = 100 * crop_type.fr_PHU + exp(11.1 - 10*crop_type.fr_PHU)
+    bottom = 100 * crop_type.fr_PHU + exp(11.1 - (10 * crop_type.fr_PHU))
     crop_type.HI_max = crop_type.HI_opt * top / bottom
 
 
 #
 # Calculates aboveground biomass.
-# "pseudocode_SC_cropyield.docx" section 5.2
+# "pseudocode_SC_cropyield.docx" section 5.B
 #
 def calc_bio_AG(crop_type):
-    crop_type.bio_AG = (1-crop_type.fr_root) * crop_type.biomass_actual
+    crop_type.bio_AG = (1 - crop_type.fr_root) * crop_type.biomass_actual
 
 
 #
 # Calculates the actual harvest index (AKA HI_actual).
-# "pseudocode_SC_actualgrowth.docx" section 7.B.2
+# "pseudocode_SC_actualgrowth.docx" section 7.A.5
 #
 def calc_HI_actual(crop_type, time):
-    inGrowingPeriod = crop_type.planting_date <= time.day <= crop_type.harvest_date
-    if not inGrowingPeriod:
+    growing_period = crop_type.start_date <= time.day <= crop_type.harvest_date
+    if not growing_period:
         crop_type.HI_actual = 0
     else:
         term1 = crop_type.HI_max - crop_type.HI_min
 
-        exp_part = exp(6.13 - 0.883*crop_type.gamma_wu)
+        exp_part = exp(6.13 - (0.883 * crop_type.gamma_wu))
         term2 = crop_type.gamma_wu / (crop_type.gamma_wu + exp_part)
 
         crop_type.HI_actual = term1 * term2 + crop_type.HI_min
@@ -121,7 +121,7 @@ def calc_HI_actual(crop_type, time):
 
 #
 # Calculates maximum crop yield at harvest.
-# "pseudocode_SC_cropyield.docx" section 5.3
+# "pseudocode_SC_cropyield.docx" section 5.C
 #
 def calc_yield_max(crop_type, time):
     if time.day == crop_type.harvest_date:
@@ -132,24 +132,24 @@ def calc_yield_max(crop_type, time):
 
 #
 # Calculates actual crop yield at harvest.
-# "pseudocode_SC_actualgrowth.docx" section 7.B.3
+# "pseudocode_SC_actualgrowth.docx" section 7.A.6
 #
 def calc_yield_actual(crop_type):
-    crop_type.yield_actual = crop_type.harvest_eff * crop_type.yield_max
+    crop_type.yield_actual = crop_type.yield_max * crop_type.harvest_eff
 
 
 #
 # Calculates the amount of nitrogen and phosphorus removed in the yield.
-# "pseudocode_SC_cropyield.docx" section 5.4
+# "pseudocode_SC_cropyield.docx" section 5.D.1/2
 #
 def calc_nutrient_removal(crop_type):
-    crop_type.yield_N = crop_type.fr_N * crop_type.yield_actual
+    crop_type.yield_N = crop_type.fr_N * crop_type.yield_actual  # TODO should be yield_max??
     crop_type.yield_P = crop_type.fr_P * crop_type.yield_actual
 
 
 #
 # Updates the current residue.
-# "pseudocode_SC_actualgrowth.docx" section 7.B.4
+# "pseudocode_SC_actualgrowth.docx" section 7.A.7
 #
 def calc_residue(crop_type, time):
     if crop_type.harvest_date == time.day:

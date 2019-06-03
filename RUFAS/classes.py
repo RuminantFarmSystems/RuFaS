@@ -326,14 +326,13 @@ class Time():
 
     def __init__(self, years, cal_year):
 
-
         self.cal_year = cal_year
         self.years = years
         self.year = 1  # Current Year
 
         # finds the first non-null day of the first year
-        for i in range(1, len(years[0])): #TODO changed to start at 1
-            if years[0][i] == None:
+        for i in range(1, len(years[0])):  # TODO changed to start at 1
+            if years[0][i] is None:
                 continue
             else:
                 self.day = years[0][i]

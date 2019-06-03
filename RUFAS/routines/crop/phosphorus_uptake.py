@@ -149,32 +149,35 @@ def calc_P_up(crop_type):
 # The order of the values in the list corresponds with the order of the layers
 # in soil.listOfSoilLayers. The soil layers in that list need to be in order
 # of shallowest to deepest for this to work correctly.
-# "pseudocode_SC_phosphorusuptake.docx" section 4.C.3
+# "pseudocode_SC_phosphorusuptake.docx" section 4.C
 #
 def calc_actual_P_up_each_layer(crop_type, soil):
     P_up_each_layer = calc_P_up_each_layer(crop_type, soil)
     act_P_up_each_layer = []
 
     # Running total of potential phosphorus uptake in overlying layers
-    # Corresponds with "pseudocode_SC_phosphorusuptake.docx" 4.C.3.1
     P_up_over = 0
 
     # Running total of phosphorus content of soil solution in overlying layers
     P_sol_over = 0
 
     # Phosphorus uptake demand not met in overlying soil layers
-    # Corresponds with "pseudocode_SC_phosphorusuptake.docx" 4.C.3.2
     P_demand = 0
 
+    # Corresponds with "pseudocode_SC_phosphorusuptake.docx" 4.C.4
     for pot_P_up, soilLayer in zip(P_up_each_layer, soil.listOfSoilLayers):
         act_P_up = min((pot_P_up + P_demand), soilLayer.labileP)
+        # Corresponds with "pseudocode_SC_phosphorusuptake.docx" 4.C.7
         act_P_up_each_layer.append(act_P_up)
 
+        # Corresponds with "pseudocode_SC_phosphorusuptake.docx" 4.C.6
         # Update values for next layer
         P_up_over += pot_P_up
         P_sol_over += soilLayer.labileP
+        # Corresponds with "pseudocode_SC_phosphorusuptake.docx" 4.C.5
         P_demand = P_up_over - P_sol_over
-        if P_demand < 0 : P_demand = 0
+        if P_demand < 0:
+            P_demand = 0
 
     crop_type.act_P_up_each_layer = act_P_up_each_layer
 
@@ -185,7 +188,7 @@ def calc_actual_P_up_each_layer(crop_type, soil):
 # corresponds with the order of the layers in soil.listOfSoilLayers. The soil
 # layers in that list need to be in order of shallowest to deepest for this
 # to work correctly.
-# "pseudocode_SC_phosphorusuptake.docx" section 4.C.2
+# "pseudocode_SC_phosphorusuptake.docx" section 4.C.3
 #
 def calc_P_up_each_layer(crop_type, soil):
     P_up_each_layer = []

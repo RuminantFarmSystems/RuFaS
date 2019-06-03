@@ -45,9 +45,9 @@ def update_all(crop_type, time):
 # "pseudocode_SC_wateruptake.docx" section 2.A.1
 #
 def calc_daily_root_biomass(crop_type, time):
-    inGrowingPeriod = crop_type.planting_date <= time.day <= crop_type.harvest_date
+    growing_period = crop_type.start_date <= time.day <= crop_type.harvest_date
 
-    if inGrowingPeriod:
+    if growing_period:
         crop_type.fr_root = 0.4 - 0.2 * crop_type.fr_PHU
     else:
         crop_type.fr_root = 0
@@ -56,20 +56,22 @@ def calc_daily_root_biomass(crop_type, time):
 #
 # Calculates depth of root development in the soil on a given
 # day (AKA z_root).
-# "pseudocode_SC_wateruptake.docx" section 2.A.2
+# "pseudocode_SC_wateruptake.docx" section 2.A.2/3
 #
 def calc_z_root(crop_type, time):
     # Save the previous day's value
     crop_type.prev_z_root = crop_type.z_root
 
-    afterHarvest = time.day > crop_type.harvest_date
+    after_harvest = time.day > crop_type.harvest_date
 
+    # "pseudocode_SC_wateruptake.docx" section 2.A.2
     if crop_type.crop_type == "perennial":
         crop_type.z_root = crop_type.z_root_max
 
-    elif afterHarvest:
+    elif after_harvest:
         crop_type.z_root = 0
 
+    # "pseudocode_SC_wateruptake.docx" section 2.A.3
     elif crop_type.crop_type == "annual" and crop_type.fr_PHU > 0.4:
         crop_type.z_root = crop_type.z_root_max
 

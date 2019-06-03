@@ -67,6 +67,7 @@ CropType values updated by update_all():
 
 from math import exp
 
+
 #
 # This function updates all biomass information
 #
@@ -94,10 +95,10 @@ def calc_actual_Biomass(crop_type, time, weather):
     # Save value as previous day's value
     crop_type.prev_biomass_actual = crop_type.biomass_actual
 
-    inGrowingPeriod = crop_type.start_date <= time.day <= crop_type.harvest_date
+    growing_period = crop_type.start_date <= time.day <= crop_type.harvest_date
 
     # Update current actual biomass
-    if inGrowingPeriod:
+    if growing_period:
         crop_type.biomass_actual += crop_type.dBiomass_actual
     else:
         crop_type.biomass_actual = 0
@@ -109,8 +110,8 @@ def calc_actual_Biomass(crop_type, time, weather):
 # "pseudocode_SC_cropbiomass.docx" section 1.E.1
 #
 def calc_intercepted_radiation(crop_type, time, weather):
-    H_day = weather.radiation[time.year-1][time.day-1]
-    return 0.5 * H_day * (1 - exp(-1*crop_type.kl*crop_type.LAI_actual))
+    H_day = weather.radiation[time.year - 1][time.day - 1]
+    return 0.5 * H_day * (1 - exp(-1 * crop_type.kl * crop_type.LAI_actual))
 
 
 #
@@ -135,7 +136,7 @@ They do not modify the values of any State class.
 
 #
 # Calculates water stress for a given day
-# "pseudocode_SC_growthconstraints.docx" section 6.1
+# "pseudocode_SC_growthconstraints.docx" section 6.A.1
 #
 def calc_wstrs(crop_type, soil):
     if soil.Etrans == 0:
@@ -149,27 +150,30 @@ def calc_wstrs(crop_type, soil):
 
 #
 # Calculates temperature stress for a given day.
-# "pseudocode_SC_growthconstraints.docx" section 6.2
+# "pseudocode_SC_growthconstraints.docx" section 6.B
 #
 def calc_tstrs(crop_type, time, weather):
-    T_avg = weather.T_avg[time.year-1][time.day-1]
+    # "pseudocode_SC_growthconstraints.docx" section 6.B.1
+    T_avg = weather.T_avg[time.year - 1][time.day - 1]
     T_opt = crop_type.T_opt
     T_base_min = crop_type.T_base_min
     MAX = 0.99
-    tstrs = 0
     if T_avg <= T_base_min:
         tstrs = MAX
 
+    # "pseudocode_SC_growthconstraints.docx" section 6.B.2
     elif T_base_min < T_avg  and T_avg <= T_opt:
         top_half_eq = -0.1054 * (T_opt - T_avg)**2
         bottom_half_eq = (T_avg - T_base_min)**2
         tstrs = 1 - exp(top_half_eq / bottom_half_eq)
 
+    # "pseudocode_SC_growthconstraints.docx" section 6.B.3
     elif T_opt < T_avg and T_avg <= (2 * T_opt - T_base_min):
         top_half_eq = -0.1054 * (T_opt - T_avg)**2
-        bottom_half_eq = (2*T_opt - T_avg - T_base_min)**2
+        bottom_half_eq = ((2 * T_opt - T_avg) - T_base_min)**2
         tstrs = 1 - exp(top_half_eq / bottom_half_eq)
 
+    # "pseudocode_SC_growthconstraints.docx" section 6.B.4
     else: # T_avg > (2*T_opt - T_base_min):
         tstrs = MAX
 
@@ -178,23 +182,23 @@ def calc_tstrs(crop_type, time, weather):
 
 #
 # Calculates nitrogen stress for a given day.
-# "pseudocode_SC_growthconstraints.docx" section 6.3.2
+# "pseudocode_SC_growthconstraints.docx" section 6.C.2
 #
 def calc_nstrs(crop_type):
     if crop_type.bio_N_opt == 0:
         return 0
     phi_n = calc_phi_N(crop_type)
-    nstrs = 1 - phi_n / (phi_n + exp(3.535 - 0.02597*phi_n))
+    nstrs = 1 - phi_n / (phi_n + exp(3.535 - 0.02597 * phi_n))
     return min(0.99, nstrs)
 
 
 #
 # Calculates nitrogen stress scaling factor.
-# "pseudocode_SC_growthconstraints.docx" section 6.3.1
+# "pseudocode_SC_growthconstraints.docx" section 6.C.1
 #
 def calc_phi_N(crop_type):
     if crop_type.bio_N_opt == 0:
-        return 300
+        return 300  # TODO not in pseudocode
     else:
         phi_n = 200 * ((crop_type.bio_N/crop_type.bio_N_opt) - 0.5)
         return max(0, phi_n)
@@ -202,7 +206,7 @@ def calc_phi_N(crop_type):
 
 #
 # Calculates phosphorus stress scaling factor.
-# "pseudocode_SC_growthconstraints.docx" section 6.4.2
+# "pseudocode_SC_growthconstraints.docx" section 6.D.2
 #
 def calc_pstrs(crop_type):
     if crop_type.bio_P_opt == 0:
@@ -214,7 +218,7 @@ def calc_pstrs(crop_type):
 
 #
 # Calculates phosphorus stress scaling factor.
-# "pseudocode_SC_growthconstraints.docx" section 6.4.1
+# "pseudocode_SC_growthconstraints.docx" section 6.D.1
 #
 def calc_phi_P(crop_type):
     if crop_type.bio_P_opt == 0:
