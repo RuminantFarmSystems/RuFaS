@@ -44,30 +44,36 @@ def update_all(soil):
 # "pseudocode_SC_soilhydrology.docx" 2.C.1/2
 #
 def calc_daily_percolation(soil):
+    #
+    # The soil water in each layer is dependent on the amount percolated from
+    # the layer above. Because there are no layers above the first, prev_perc
+    # is initialized at 0 and updated with each pass of the loop.
+    #
     prev_perc = 0
     for layer in soil.listOfSoilLayers:
-        SW = layer.currentSoilWaterMM + prev_perc
-        FC = layer.fcWater
+        WP = layer.wiltingWater
+        SAT = layer.satWater
 
+        layer.currentSoilWaterMM = min(SAT, layer.currentSoilWaterMM + prev_perc)
+        SW = layer.currentSoilWaterMM
+        FC = layer.fcWater
 
         SWperc = 0.0
         if SW >= FC:
             SWperc = SW - FC
 
-        SAT = layer.saturation
         Ksat = layer.ksat
 
-        depth = layer.depth
-        SATwater = SAT * depth
 
         # Travel Time for each soil layer
         # "pseudocode_SC_soilhydrology.docx" 2.C.2
-        TT = (SATwater - FC) / Ksat
+        TT = (SAT - FC) / Ksat
         layer.TT = TT
 
         t = 24
 
         exp_part = exp((-t) / layer.TT)
         layer.perc = SWperc * (1 - exp_part)
+        layer.currentSoilWaterMM = max(WP, SW - layer.perc)
         prev_perc = layer.perc
 

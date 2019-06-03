@@ -200,7 +200,8 @@ def update_Esoil_z(soil):
         # limited to 80% of plant available water (SW - WP)
         # "pseudocode_SC_soilhydrology.docx" 2.B.10
         #
-        curr_layer.layerEsoil = min(layerEsoil, 0.8 * (SW - FC))
+        curr_layer.layerEsoil = min(layerEsoil, 0.8 * (SW - WP))
+        curr_layer.currentSoilWaterMM = max(WP, SW - (curr_layer.layerEsoil + curr_layer.Et_actual))
 
         soil.Ea_sum += curr_layer.layerEsoil
         soil.listOfSoilLayers[x] = curr_layer

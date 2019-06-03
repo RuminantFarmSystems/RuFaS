@@ -47,6 +47,7 @@ def update_all(soil, weather, time):
 
     update_SW(soil, weather, time)
 
+
 #
 # Calculates soil water by layer
 # "pseudocode_SC_soilhydrology.docx" 2.D.1/2
