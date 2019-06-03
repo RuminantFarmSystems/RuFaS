@@ -15,12 +15,17 @@ def manure_calculations(ration_formulation, BW, DIM, mPrt):
     Equations referenced are from pseudocode.
     
     Args:
-        DMI: dry matter intake, kg (from feed formulation)
-        ADF: dietary ADF, % of DM (from feed formulation)
-        CP: dietary crude protein, % of DM (from feed formulation)
-        DM: dietary dry matter, % of diet (from feed formulation)
-        LIG: dietary lignin, % of DM (from feed formulation)
-        ash: dietary ash, % of DM (from feed formulation)
+        ration_formulation: dictionary which stores the calculated ration
+            For n available feeds, the output of the linear programming for the ration formulation 
+            is a dictionary that looks like:
+            {    
+                'feed1': amount,
+                'feed2': amount,
+                ...
+                'feedn': amount,
+                'status': 'Optimal'
+                'objective': price
+            }
         BW: body weight, kg (from animal input)
         DIM: days in milk, d (from animal input)
         mPrt: milk protein, % of milk (from animal input)
@@ -35,53 +40,50 @@ def manure_calculations(ration_formulation, BW, DIM, mPrt):
     '''
     
     '''
-    For n available feeds, the output of the linear programming for the ration formulation 
-    is a dictionary that looks something like:
-    {    
-        'feed1': amount,
-        'feed2': amount,
-        ...
-        'feedn': amount,
-        'status': 'Optimal'
-        'objective': price
-    }
-    Thus, to find the weighted sums of the nutrients in each ingredient, we have to check if the 
-    key is an available feed or not.
+    To find the weighted sums of the nutrients in each ingredient, we have to check if the 
+    key is an available feed or not, hence the if statement in the for loop.
+    
+    DMI: dry matter intake, kg (from feed formulation)
+    ADF: dietary ADF, % of DM (from feed formulation)
+    CP: dietary crude protein, % of DM (from feed formulation)
+    DM: dietary dry matter, % of diet (from feed formulation)
+    LIG: dietary lignin, % of DM (from feed formulation)
+    Ash: dietary Ash, % of DM (from feed formulation)
     '''
-    ADF_sum = 0
-    CP_sum = 0
-    DM_sum = 0
-    LIG_sum = 0
-    ash_sum = 0
+    DMI = 0
+    ADF = 0
+    CP = 0
+    LIG = 0
+    Ash = 0
+    NDF = 0
     for key in ration_formulation:
         if key in feed.available_feed_names:
             # to each sum, add the amount of the nutrient which is in the key
-            ADF_sum += feed.available_feeds[key]['ADF_DM']
-            CP_sum += feed.available_feeds[key]['CP_DM']
-            DM_sum += feed.available_feeds[key]['DM']
-            LIG_sum += feed.available_feeds[key]['LIG_DM']  # doesn't currently exist
-            ash_sum += feed.available_feeds[key]['Ash_DM']
-            
-    # TODO: what to do about NDF in 3.1 and 4.1?
-    
+            DMI += feed.available_feeds[key]['DM']
+            ADF += feed.available_feeds[key]['ADF_DM']
+            CP += feed.available_feeds[key]['CP_DM']
+            LIG += feed.available_feeds[key]['LIG_DM']  # doesn't currently exist in feed library
+            Ash += feed.available_feeds[key]['Ash_DM']
+            NDF += feed.available_feeds[key]['NDF_DM']
+                
     # Faecal water, kg (Eq 1.2)
-    F_water = 1.987 * DMI + 0.348 * ADF_sum - 0.412 * CP_sum - 0.074 * DM_sum - 0.0057 * DIM
+    F_water = 1.987 * DMI + 0.348 * ADF - 0.412 * CP - 0.074 * DM - 0.0057 * DIM
     # Faecal dry matter, kg (Eq 1.3)
-    F_DM = -0.576 + 0.370 * DMI - 0.075 * CP_sum + 0.059 * ADF_sum
+    F_DM = -0.576 + 0.370 * DMI - 0.075 * CP + 0.059 * ADF
     # Total urine, kg (Eq 1.4)
-    U_E = -7.742 + 0.388 * DMI + 0.726 * CP_sum + 2.066 * mPrt
+    U_E = -7.742 + 0.388 * DMI + 0.726 * CP + 2.066 * mPrt
     # Amount of manure, kg (Eq 1.1)
     Mkg = F_water + F_DM + U_E
     
     # Faecal nitrogen, g (Eq 2.2)
-    F_N = -0.0368 + 0.0096 * DMI + 0.0022 * CP_sum + 0.0034 * LIG_sum - 0.000043 * BW
+    F_N = -0.0368 + 0.0096 * DMI + 0.0022 * CP + 0.0034 * LIG - 0.000043 * BW
     # Urine nitrogen, g (Eq 2.3)
-    U_N = -0.2837 + 0.0068 * DMI + 0.0155 * CP_sum + 0.00013 * DIM + 0.000092 * BW
+    U_N = -0.2837 + 0.0068 * DMI + 0.0155 * CP + 0.00013 * DIM + 0.000092 * BW
     # Nitrogen in liquid and solid manure, g (Eq 2.1)
     MN = F_N + U_N
     
     # Organic matter intake, kg
-    OMI = DMI * (1 - ash_sum)
+    OMI = DMI * (1 - Ash)
     # Degradable volatile solids, g (Eq 3.1)
     VSd = -1.017 + 0.364 * OMI + 0.029 * NDF - 0.023 * CP
     
