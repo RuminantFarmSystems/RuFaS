@@ -21,7 +21,6 @@ This module needs the following inputs in order to operate correctly:
         "harvest_eff": 0.9,
         "HI_opt": 0.6,
         "HI_min": 0.3,
-        "init_residue": 8000,
 
         "min_temp_for_growth": 10,
         "max_temp_for_growth": 30,
@@ -68,9 +67,8 @@ This module needs the following inputs in order to operate correctly:
 
         And the following attributes of a soil layer:
             bottomDepth
-            Ea_sum = Sum of the Ea values leading up to today
             Eo_sum = Sum of the Eo values leading up to today
-            Etrans
+            Et_max
             NO3
             labileP
             currentSoilWaterMM
@@ -226,8 +224,6 @@ class Crop():
             self.beta_w = data['beta_w']  # water-use distribution parameter
             self.epco = data['epco']
 
-            self.Et_actual = 0
-            self.Ea_sum = 0
             self.water_actual_up = 0
             self.water_uptake_each_layer = []
 
@@ -287,7 +283,6 @@ class Crop():
             self.yield_actual = 0
             self.yield_N = 0
             self.yield_P = 0
-            self.residue = data["init_residue"]
 
 
         # -----------------------------------------------------------------------

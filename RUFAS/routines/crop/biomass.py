@@ -139,9 +139,9 @@ They do not modify the values of any State class.
 # "pseudocode_SC_growthconstraints.docx" section 6.A.1
 #
 def calc_wstrs(crop_type, soil):
-    if soil.Etrans == 0:
+    if soil.Et_max == 0:
         return 0
-    wstrs = 1.0 - (crop_type.water_actual_up / soil.Etrans)
+    wstrs = 1.0 - (crop_type.water_actual_up / soil.Et_max)
     if wstrs < 0:
         return 0
     else:
@@ -158,6 +158,7 @@ def calc_tstrs(crop_type, time, weather):
     T_opt = crop_type.T_opt
     T_base_min = crop_type.T_base_min
     MAX = 0.99
+
     if T_avg <= T_base_min:
         tstrs = MAX
 

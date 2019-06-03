@@ -91,7 +91,7 @@ def calc_sed(soil, crop, weather, time):
     Qsurf = soil.runoff
     Qpeak = calc_Qpeak(soil, weather, time)
     K = calc_K(soil)
-    C = calc_C(crop)
+    C = calc_C(soil, crop)
     P = soil.practiceFactor
     LS = calc_LS(soil)
 
@@ -259,10 +259,10 @@ def calc_Fsand(soil):
 # fallow. The minimum value for C is estimated at 0.05
 # "pseudocode_SC_soilerosion.docx" 3.A.14
 #
-def calc_C(crop):
+def calc_C(soil, crop):
     # TODO: Crop Flag
     bio_AG = crop.crops_list["corn"].bio_AG
-    residue = crop.crops_list["corn"].residue
+    residue = soil.residue
     Cover = bio_AG + residue
 
     l1 = log(0.8)

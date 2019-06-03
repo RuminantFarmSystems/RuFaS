@@ -454,6 +454,8 @@ def mineralization_decomp(soil):
             # "pseudocode_SC_soilnitrogen" 1.E.4
             Decay = minCoeff * resComp * ((tempFac * waterFac) ** 0.5)
 
+            soil.decayRate = Decay
+
             # "pseudocode_SC_soilnitrogen" 1.E.6
             FreshMin = Decay * FreshN
 
