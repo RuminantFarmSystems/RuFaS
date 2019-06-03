@@ -19,10 +19,10 @@ def manure_calculations(ration_formulation, BW, DIM, mPrt):
             For n available feeds, the output of the linear programming for the ration formulation 
             is a dictionary that looks like:
             {    
-                'feed1': amount,
-                'feed2': amount,
+                'feed1': amount of feed 1 in kg,
+                'feed2': amount of feed 2 in kg,
                 ...
-                'feedn': amount,
+                'feedn': amount of feed n in kg,
                 'status': 'Optimal'
                 'objective': price
             }
@@ -40,31 +40,71 @@ def manure_calculations(ration_formulation, BW, DIM, mPrt):
     '''
     
     '''
-    To find the weighted sums of the nutrients in each ingredient, we have to check if the 
-    key is an available feed or not, hence the if statement in the for loop.
+    Further calculations to account for entire diet:
+    DMI: dry matter intake, kg
+    DM: dietary dry matter, % of diet  
+    ADF: dietary ADF, % of DM 
+    CP: dietary crude protein, % of DM 
+    LIG: dietary lignin, % of DM 
+    Ash: dietary Ash, % of DM 
+    NDF: dietary NDF, % of DM
+    -----------------------------------------------------
+    Li's example to highlight difference between DM and DMI, as well as respective calculations:
+    Suppose we have a diet with only feeds A and B and the result from the linear programming is 
+    A = 10 kg
+    B = 15 kg
+    Then, since all the variables in the solution are in DM basis, the DMI = 10 + 15 = 25 kg.
+    Let the DM content of A be 80%, of B be 40%. 
+    Farmers need to feed 10 / 0.8 = 12.5 kg of A and 15 / 0.4 = 37.5 kg of B (as fed basis).
+    Then, the DM content of the diet is (10 + 15) / (12.5 + 37.5) = 50%.
     
-    DMI: dry matter intake, kg (from feed formulation)
-    ADF: dietary ADF, % of DM (from feed formulation)
-    CP: dietary crude protein, % of DM (from feed formulation)
-    DM: dietary dry matter, % of diet (from feed formulation)
-    LIG: dietary lignin, % of DM (from feed formulation)
-    Ash: dietary Ash, % of DM (from feed formulation)
+    For the nutrient compositions:
+    Let the CP content of A be 80%, of B be 40%.
+    Then the CP content of the diet is (10 * 0.8 + 15 * 0.4) / (10 + 15) = 56% in DM basis.
+    Similarly for ADF, LIG, Ash, and NDF.
     '''
     DMI = 0
-    ADF = 0
-    CP = 0
-    LIG = 0
-    Ash = 0
-    NDF = 0
+    total_diet = 0 # in kg
+    ADF_diet_content = 0 
+    CP_diet_content = 0
+    LIG_diet_content = 0
+    Ash_diet_content = 0
+    NDF_diet_content = 0
     for key in ration_formulation:
-        if key in feed.available_feed_names:
-            # to each sum, add the amount of the nutrient which is in the key
-            DMI += feed.available_feeds[key]['DM']
-            ADF += feed.available_feeds[key]['ADF_DM']
-            CP += feed.available_feeds[key]['CP_DM']
-            LIG += feed.available_feeds[key]['LIG_DM']  # doesn't currently exist in feed library
-            Ash += feed.available_feeds[key]['Ash_DM']
-            NDF += feed.available_feeds[key]['NDF_DM']
+        if key in feed.available_feed_names: # since not every key in the ration_formulation dictionary refers to a feed
+            # percentages of the DM of each nutrient
+            DM_feed_content = 0.01 * feed.available_feeds[key]['DM']
+            ADF_feed_content = 0.01 * feed.available_feeds[key]['ADF_DM']
+            CP_feed_content = 0.01 * feed.available_feeds[key]['CP_DM']
+            LIG_feed_content = 0.01 * feed.available_feeds[key]['LIG_DM']  
+            Ash_feed_content = 0.01 * feed.available_feeds[key]['Ash_DM']
+            NDF_feed_content = 0.01 * feed.available_feeds[key]['NDF_DM']
+            
+            # kg of each nutrient
+            DM_feed_amount = ration_formulation[key]
+            ADF_feed_amount = ADF_feed_content * DM_feed_amount
+            CP_feed_amount = CP_feed_content * DM_feed_amount
+            LIG_feed_amount = LIG_feed_content * DM_feed_amount
+            Ash_feed_amount = Ash_feed_content * DM_feed_amount
+            NDF_feed_amount = NDF_feed_content * DM_feed_amount
+            
+            # add to running sums
+            feed_amount = DM_feed_amount / DM_feed_content
+            total_diet += feed_amount
+            DMI += DM_feed_amount
+            ADF_diet_content += ADF_feed_amount
+            CP_diet_content += CP_feed_amount
+            LIG_diet_content += LIG_feed_amount
+            Ash_diet_content += Ash_feed_amount
+            NDF_diet_content += NDF_feed_amount
+            
+    # divide to find total percentages
+    DM = DMI / total_diet
+    ADF = ADF_diet_content / DMI
+    CP = CP_diet_content / DMI
+    LIG = LIG_diet_content / DMI
+    Ash = Ash_diet_content / DMI
+    NDF = NDF_diet_content / DMI
                 
     # Faecal water, kg (Eq 1.2)
     F_water = 1.987 * DMI + 0.348 * ADF - 0.412 * CP - 0.074 * DM - 0.0057 * DIM
@@ -97,4 +137,3 @@ def manure_calculations(ration_formulation, BW, DIM, mPrt):
     TAN_s = -5.8 * U + 3.4
     
     return U, TAN_s, MN, Mkg, VSd, VSnd
-
