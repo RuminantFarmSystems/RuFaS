@@ -24,7 +24,7 @@ This module needs the following inputs in order to operate correctly:
         "Sand": 15,
         "Silt": 65,
         "SoilAlbedo": 0.16,
-        "Residue": 0,
+        "residue": 0,
         "FreshNMineralRate": 0.05,
         "SoilCoverType": "BARE",
 
@@ -153,8 +153,7 @@ This module needs the following inputs in order to operate correctly:
 
 import math
 from . import nitrogen_cycling, phosphorus_cycling, infiltration, \
-    evapotranspiration, percolation, soil_temp, soil_erosion, soil_water,\
-    residue
+    evapotranspiration, percolation, soil_temp, soil_erosion, soil_water
 
 
 # ------------------------------------------------------------------------------
@@ -194,8 +193,6 @@ def daily_soil_routine(soil, crop, weather, time):
     # updates changes in soil water resulting from infiltration,
     # evapotranspiration, and percolation
     soil_water.update_all(soil, weather, time)
-
-    residue.update_all(soil, crop, time)
 
 
 # -------------------------------------------------------------------------------
@@ -277,16 +274,17 @@ class Soil():
 
         # daily output values
         self.runoff = 0.0
-        self.Etrans = 0.0
+        self.Et_max = 0.0
         self.E0 = 0.0
         self.E0_sum = 0.0
+        self.Ea_sum = 0.0
         self.Esoil = 0.0
 
         self.dayInfiltraiton = 0.0
         self.sedimentYield = 0.0
 
         # daily soil nitrogen values
-        self.residue = data['Residue']
+        self.residue = data['initial_residue']
         self.freshNMineralRate = data['FreshNMineralRate']
         self.decayRate = 0.0
         self.topLayerFreshN = 0.0

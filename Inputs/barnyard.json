@@ -1,8 +1,8 @@
 {
     "config":
     {
-        "StartDate" : "2010:1",
-        "EndDate" : "2012:365",
+        "StartDate" : "2009:244",
+        "EndDate" : "2016:243",
         "output_dir": "Outputs/Sample_Farm_Outputs/"
     },
 
@@ -53,7 +53,6 @@
                 "harvest_eff": 0.9,
                 "HI_opt": 0.6,
                 "HI_min": 0.3,
-                "init_residue": 0,
 
                 "min_temp_for_growth": 10,
                 "max_temp_for_growth": 30,
@@ -109,7 +108,7 @@
             "Sand": 15,
             "Silt": 65,
             "SoilAlbedo": 0.16,
-            "Residue": 0,
+            "initial_residue": 0,
             "FreshNMineralRate": 0.05,
             "SoilCoverType": "BARE",
 

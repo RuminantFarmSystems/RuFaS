@@ -32,7 +32,6 @@ class CropSummary(BaseReportHandler):
         self.daily_bio_N = []
         self.daily_bio_P = []
         self.daily_z_root = []
-        self.daily_Et_actual = []
         self.daily_yield_actual = []
 
         #
@@ -50,7 +49,6 @@ class CropSummary(BaseReportHandler):
                           'Biomass (biomass_actual)', 'LAI (LAI_actual)',
                           'BioN (bio_N)', 'BioP (bio_P)',
                           'Rooting Depth (z_root)',
-                          'Transpiration (Et_actual)',
                           'Yield (yield_actual)']
 
             self.fieldNames = fieldnames
@@ -60,11 +58,10 @@ class CropSummary(BaseReportHandler):
 
             units = {'Year': '', 'Julian Day': '', 'frPHU (fr_PHU)': '%',
                      'Biomass (biomass_actual)': 'kg ha^-1',
-                     'LAI (LAI_actual)' : 'm^2 / m^2',
+                     'LAI (LAI_actual)': 'm^2 / m^2',
                      'BioN (bio_N)': 'kg N ha^-1',
                      'BioP (bio_P)': 'kg P ha^-1',
                      'Rooting Depth (z_root)': 'mm',
-                     'Transpiration (Et_actual)': 'mm H20',
                      'Yield (yield_actual)': 'kg ha^-1'}
 
             writer.writerow(units)
@@ -84,7 +81,6 @@ class CropSummary(BaseReportHandler):
         # self.daily_bio_N[d] = cropType.bio_N
         # self.daily_bio_P[d] = cropType.bio_P
         # self.daily_z_root[d] = cropType.z_root
-        # self.daily_Et_actual[d] = cropType.Et_actual
         # self.daily_yield_actual[d] = cropType.yield_actual
 
         self.write_header()
@@ -106,7 +102,6 @@ class CropSummary(BaseReportHandler):
         self.daily_bio_N.append(cropType.bio_N)
         self.daily_bio_P.append(cropType.bio_P)
         self.daily_z_root.append(cropType.z_root)
-        self.daily_Et_actual.append(cropType.Et_actual)
         self.daily_yield_actual.append(cropType.yield_actual)
 
     # ---------------------------------------------------------------------------
@@ -144,8 +139,6 @@ class CropSummary(BaseReportHandler):
                         str(self.daily_bio_P[x]),
                     'Rooting Depth (z_root)':
                         str(self.daily_z_root[x]),
-                    'Transpiration (Et_actual)':
-                        str(self.daily_Et_actual[x]),
                     'Yield (yield_actual)':
                         str(self.daily_yield_actual[x])
                 }
@@ -169,5 +162,4 @@ class CropSummary(BaseReportHandler):
         self.daily_bio_N = []
         self.daily_bio_P = []
         self.daily_z_root = []
-        self.daily_Et_actual = []
         self.daily_yield_actual = []
