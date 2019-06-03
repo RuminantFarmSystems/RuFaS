@@ -82,7 +82,7 @@ def calc_max_water_uptake_z(crop_type, soil, z):
     if crop_type.z_root == 0:
         return 0
     else:
-        term1 = soil.Et_max / (1 - exp(-1*crop_type.beta_w))
+        term1 = soil.Et_max / (1 - exp(-1 * crop_type.beta_w))
         term2 = 1 - exp(-1*crop_type.beta_w * z / crop_type.z_root)
         return term1 * term2
 

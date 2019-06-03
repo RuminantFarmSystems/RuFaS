@@ -44,9 +44,9 @@ def update_all(soil):
 # "pseudocode_SC_soilhydrology.docx" 2.C.1/2
 #
 def calc_daily_percolation(soil):
-
+    prev_perc = 0
     for layer in soil.listOfSoilLayers:
-        SW = layer.currentSoilWaterMM
+        SW = layer.currentSoilWaterMM + prev_perc
         FC = layer.fcWater
 
 
@@ -69,4 +69,5 @@ def calc_daily_percolation(soil):
 
         exp_part = exp((-t) / layer.TT)
         layer.perc = SWperc * (1 - exp_part)
+        prev_perc = layer.perc
 

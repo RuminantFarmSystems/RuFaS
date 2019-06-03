@@ -78,7 +78,7 @@ This module needs the following inputs in order to operate correctly:
 ################################################################################
 
 from . import heat_units, leaf_area_index, root_development, biomass, yields, \
-    phosphorus_uptake, nitrogen_uptake, water_uptake
+    phosphorus_uptake, nitrogen_uptake, water_uptake, growth_constraints
 from RUFAS import util
 
 
@@ -103,19 +103,22 @@ def daily_crop_routine(crop, weather, time, soil):
         # output values are behind one day. In actuality, this means nitrogen
         # calculations are performed "last" as far as updating daily values
         #
-        nitrogen_uptake.update_all(crop_type, soil, time)
 
         heat_units.update_all(crop_type, T_min, T_max, time)
 
+        root_development.update_all(crop_type, time)
+
         water_uptake.update_all(crop_type, soil, time)
 
-        biomass.update_all(crop_type, time, weather, soil)
-
-        leaf_area_index.update_all(crop_type, time)
+        nitrogen_uptake.update_all(crop_type, soil, time)
 
         phosphorus_uptake.update_all(crop_type, soil)
 
-        root_development.update_all(crop_type, time)
+        growth_constraints.update_all(crop_type, time, weather, soil)
+
+        leaf_area_index.update_all(crop_type, time)
+
+        biomass.update_all(crop_type, time, weather)
 
         yields.update_all(crop_type, time, soil)
 

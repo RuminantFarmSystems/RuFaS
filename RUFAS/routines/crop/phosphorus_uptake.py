@@ -213,8 +213,8 @@ def calc_P_up_each_layer(crop_type, soil):
 def calc_P_up_z(crop_type, z):
     if crop_type.z_root == 0:
         return 0
-    term1 = crop_type.P_up / (1 - exp(-1*crop_type.beta_p))
-    term2 = 1 - exp(-1*crop_type.beta_p * z / crop_type.z_root)
+    term1 = crop_type.P_up / (1 - exp(-1 * crop_type.beta_p))
+    term2 = 1 - exp(-1 * crop_type.beta_p * z / crop_type.z_root)
     return term1 * term2
 
 
