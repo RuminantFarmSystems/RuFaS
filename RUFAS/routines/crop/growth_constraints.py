@@ -59,7 +59,7 @@ def update_all(crop_type, time, weather, soil):
 
 #
 # Calculates plant growth factor (AKA gamma_reg).
-# "pseudocode_SC_actualgrowth.docx" section 7.A.1
+# "pseudocode_crop" section 7
 #
 def calc_gamma_reg(crop_type, time, weather, soil):
     wstrs = calc_wstrs(crop_type, soil)
@@ -67,6 +67,7 @@ def calc_gamma_reg(crop_type, time, weather, soil):
     nstrs = calc_nstrs(crop_type)
     pstrs = calc_pstrs(crop_type)
 
+    # 7.E.1
     crop_type.gamma_reg = 1 - max(wstrs, tstrs, nstrs, pstrs)
 
 
@@ -77,9 +78,10 @@ for a given day. These values are needed to calculate the gamma_reg value.
 They do not modify the values of any State class.
 '''
 
+
 #
 # Calculates water stress for a given day
-# "pseudocode_SC_growthconstraints.docx" section 6.A.1
+# "pseudocode_crop" section 7.A.1
 #
 def calc_wstrs(crop_type, soil):
     if soil.Et_max == 0:
@@ -93,10 +95,10 @@ def calc_wstrs(crop_type, soil):
 
 #
 # Calculates temperature stress for a given day.
-# "pseudocode_SC_growthconstraints.docx" section 6.B
+# "pseudocode_crop" section 7.B.1/2/3/4
 #
 def calc_tstrs(crop_type, time, weather):
-    # "pseudocode_SC_growthconstraints.docx" section 6.B.1
+    # 7.B.1
     T_avg = weather.T_avg[time.year - 1][time.day - 1]
     T_opt = crop_type.T_opt
     T_base_min = crop_type.T_base_min
@@ -105,19 +107,19 @@ def calc_tstrs(crop_type, time, weather):
     if T_avg <= T_base_min:
         tstrs = MAX
 
-    # "pseudocode_SC_growthconstraints.docx" section 6.B.2
+    # 7.B.2
     elif T_base_min < T_avg and T_avg <= T_opt:
         top_half_eq = -0.1054 * (T_opt - T_avg) ** 2
         bottom_half_eq = (T_avg - T_base_min) ** 2
         tstrs = 1 - exp(top_half_eq / bottom_half_eq)
 
-    # "pseudocode_SC_growthconstraints.docx" section 6.B.3
+    # 7.B.3
     elif T_opt < T_avg and T_avg <= (2 * T_opt - T_base_min):
         top_half_eq = -0.1054 * (T_opt - T_avg) ** 2
         bottom_half_eq = ((2 * T_opt - T_avg) - T_base_min) ** 2
         tstrs = 1 - exp(top_half_eq / bottom_half_eq)
 
-    # "pseudocode_SC_growthconstraints.docx" section 6.B.4
+    # 7.B.4
     else:  # T_avg > (2*T_opt - T_base_min):
         tstrs = MAX
 
@@ -126,7 +128,7 @@ def calc_tstrs(crop_type, time, weather):
 
 #
 # Calculates nitrogen stress for a given day.
-# "pseudocode_SC_growthconstraints.docx" section 6.C.2
+# "pseudocode_crop" section 7.C.2
 #
 def calc_nstrs(crop_type):
     if crop_type.bio_N_opt == 0:
@@ -138,7 +140,7 @@ def calc_nstrs(crop_type):
 
 #
 # Calculates nitrogen stress scaling factor.
-# "pseudocode_SC_growthconstraints.docx" section 6.C.1
+# "pseudocode_crop" section 7.C.1
 #
 def calc_phi_N(crop_type):
     if crop_type.bio_N_opt == 0:
@@ -150,7 +152,7 @@ def calc_phi_N(crop_type):
 
 #
 # Calculates phosphorus stress scaling factor.
-# "pseudocode_SC_growthconstraints.docx" section 6.D.2
+# "pseudocode_crop" section 7.D.2
 #
 def calc_pstrs(crop_type):
     if crop_type.bio_P_opt == 0:
@@ -162,7 +164,7 @@ def calc_pstrs(crop_type):
 
 #
 # Calculates phosphorus stress scaling factor.
-# "pseudocode_SC_growthconstraints.docx" section 6.D.1
+# "pseudocode_crop" section 7.D.1
 #
 def calc_phi_P(crop_type):
     if crop_type.bio_P_opt == 0:

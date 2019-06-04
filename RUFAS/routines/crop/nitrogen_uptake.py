@@ -65,7 +65,7 @@ def update_all(crop_type, soil, time):
 
 #
 # Calculates the fraction of nitrogen in the plant biomass on a given day.
-# "pseudocode_SC_nitrogenuptake.docx" section 3.B.1
+# "pseudocode_crop" section 5.B.1
 #
 def calc_fr_N(crop_type):
     n2 = calc_n2(crop_type)
@@ -84,7 +84,7 @@ def calc_fr_N(crop_type):
 
 #
 # Calculates the second shape coefficient.
-# "pseudocode_SC_nitrogenuptake.docx" section 3.A.1
+# "pseudocode_crop" section 5.A.1
 #
 def calc_n2(crop_type):
     term1 = calc_log_term_of_shape_coeff(
@@ -102,7 +102,7 @@ def calc_n2(crop_type):
 
 #
 # Calculates the first shape coefficient.
-# "pseudocode_SC_nitrogenuptake.docx" section 3.A.2
+# "pseudocode_crop" section 5.A.2
 #
 def calc_n1(crop_type, n2):
     term1 = calc_log_term_of_shape_coeff(
@@ -124,7 +124,7 @@ def calc_log_term_of_shape_coeff(crop_type, fr_PHU_fract, fr_n_):
 
 #
 # Calculates the optimal mass of nitrogen stored in plant biomass.
-# "pseudocode_SC_nitrogenuptake.docx" section 3.B.2
+# "pseudocode_crop" section 5.B.2
 #
 def calc_bio_N_opt(crop_type):
     crop_type.bio_N_opt = crop_type.fr_N * crop_type.biomass_actual
@@ -132,7 +132,7 @@ def calc_bio_N_opt(crop_type):
 
 #
 # Calculates potential nitrogen uptake.
-# "pseudocode_SC_nitrogenuptake.docx" section 3.B.3
+# "pseudocode_crop" section 5.B.3
 #
 def calc_N_up(crop_type):
     if crop_type.bio_N_opt - crop_type.bio_N < 0:
@@ -150,30 +150,32 @@ def calc_N_up(crop_type):
 # The order of the values in the list corresponds with the order of the layers
 # in soil.listOfSoilLayers. The soil layers in that list need to be in order
 # of shallowest to deepest for this to work correctly.
-# "pseudocode_SC_nitrogenuptake.docx" section 3.C.3
+# "pseudocode_crop" section 5.C.4/5/6/7
 #
 def calc_actual_N_up_each_layer(crop_type, soil):
     N_up_each_layer = calc_N_up_each_layer(crop_type, soil)
     act_N_up_each_layer = []
 
     # Running total of potential nitrogen uptake in overlying layers
-    # Corresponds with "pseudocode_SC_nitrogenuptake.docx" 3.C.3.1
     N_up_over = 0
 
     # Running total of nitrate in overlying soil layers
     NO3_over = 0
 
     # Nitrogen uptake demand not met in overlying soil layers
-    # Corresponds with "pseudocode_SC_nitrogenuptake.docx" 3.C.3.2
     N_demand = 0
 
     for pot_N_up, soilLayer in zip(N_up_each_layer, soil.listOfSoilLayers):
+        # 5.C.4
         act_N_up = min((pot_N_up + N_demand), soilLayer.NO3)
+        # 5.C.7
         act_N_up_each_layer.append(act_N_up)
 
         # Update values so ready for the next layer
         N_up_over += pot_N_up
+        # 5.C.6
         NO3_over += soilLayer.NO3
+        # 5.C.5
         N_demand = N_up_over - NO3_over
         if N_demand < 0 : N_demand = 0
 
@@ -186,7 +188,7 @@ def calc_actual_N_up_each_layer(crop_type, soil):
 # corresponds with the order of the layers in soil.listOfSoilLayers. The soil
 # layers in that list need to be in order of shallowest to deepest for this
 # to work correctly.
-# "pseudocode_SC_nitrogenuptake.docx" section 3.C.2
+# "pseudocode_crop" section 5.C.2/3
 #
 def calc_N_up_each_layer(crop_type, soil):
     N_up_each_layer = []
@@ -195,6 +197,7 @@ def calc_N_up_each_layer(crop_type, soil):
     for layer in soil.listOfSoilLayers:
         N_up_for_bottom_of_layer = calc_N_up_z(crop_type, layer.bottomDepth)
 
+        # 5.C.3
         N_up_ly = N_up_for_bottom_of_layer - N_up_for_top_of_layer
 
         N_up_each_layer.append(N_up_ly)
@@ -208,7 +211,7 @@ def calc_N_up_each_layer(crop_type, soil):
 #
 # Calculates potential nitrogen uptake from soil solution at the surface to
 # depth z. This function is used in calc_N_up_each_layer.
-# "pseudocode_SC_nitrogenuptake.docx" section 3.C.1
+# "pseudocode_crop" section 5.C.1
 #
 def calc_N_up_z(crop_type, z):
     if crop_type.z_root == 0:
@@ -220,7 +223,7 @@ def calc_N_up_z(crop_type, z):
 
 #
 # Calculates actual mass of nitrogen stored in plant material.
-# "pseudocode_SC_nitrogenuptake.docx" section 3.E.1
+# "pseudocode_crop" section 5.E.1
 #
 def calc_bio_N(crop_type, soil):
     N_fix = calc_N_fixation(crop_type, soil)
