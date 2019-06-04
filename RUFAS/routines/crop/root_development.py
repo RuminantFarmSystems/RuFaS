@@ -75,5 +75,5 @@ def calc_z_root(crop_type, time):
     elif crop_type.crop_type == "annual" and crop_type.fr_PHU > 0.4:
         crop_type.z_root = crop_type.z_root_max
 
-    else: # crop_type == "annual" and self.fr_PHU <= 0.4
+    else:  # crop_type == "annual" and self.fr_PHU <= 0.4
         crop_type.z_root = 2.5 * crop_type.fr_PHU * crop_type.z_root_max
