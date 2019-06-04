@@ -245,7 +245,7 @@ def nitrification_volatilization(soil):
             layer.totNitriVolatil = TotNitriVolatil
 
             layer.NO3 += Nitrification
-            layer.NH4 -= max(0, layer.NH4 - TotNitriVolatil)
+            layer.NH4 = max(0, layer.NH4 - TotNitriVolatil)
 
 
 #
@@ -255,6 +255,7 @@ def nitrification_volatilization(soil):
 def leaching_runoff_erosion(soil):
     prev_NO3_perc = 0
     prev_NH4_perc = 0
+    prev_active_perc = 0
 
     for layer in soil.listOfSoilLayers:
 
@@ -266,6 +267,7 @@ def leaching_runoff_erosion(soil):
         #
         layer.NO3 += prev_NO3_perc
         layer.NH4 += prev_NH4_perc
+        layer.activeN += prev_active_perc
 
         SW = layer.currentSoilWaterMM
         FC = layer.fcWater
@@ -348,13 +350,16 @@ def leaching_runoff_erosion(soil):
         # "pseudocode_SC_soilnitrogen" 1.C.7
         NO3Perc = 0
         NH4Perc = 0
+        activePerc = 0
         if Perc > 0:
             # "pseudocode_SC_soilnitrogen" 1.C.6
             NO3Conc = layer.NO3 / (FC + Perc)
             NH4Conc = layer.NH4 / (FC + Perc)
+            activeConc = layer.activeN / (FC + Perc) / 50
 
-            NO3Perc = NO3Conc / (Cl * Perc)
-            NH4Perc = NH4Conc / (Cl * Perc)
+            NO3Perc = NO3Conc / Cl * Perc
+            NH4Perc = NH4Conc * Perc
+            activePerc = activeConc * Perc
 
 
         #
@@ -364,11 +369,18 @@ def leaching_runoff_erosion(soil):
         # loop. These values are set to 0 before the loop begins because there
         # is no N gained through leaching in the first layer)
         #
-        layer.NO3 = max(0, layer.NO3 - NO3Perc)
-        layer.NH4 = max(0, layer.NH4 - NH4Perc)
+
+        NO3Perc = min(layer.NO3, NO3Perc)
+        NH4Perc = min(layer.NH4, NH4Perc)
+        activePerc = min(layer.activeN, activePerc)
+
+        layer.NO3 -= NO3Perc
+        layer.NH4 -= NH4Perc
+        layer.activeN -= activePerc
 
         prev_NO3_perc = NO3Perc
         prev_NH4_perc = NH4Perc
+        prev_active_perc = activePerc
 
 
 #
@@ -408,9 +420,11 @@ def mineralization_decomp(soil):
         waterFac = layer.waterFac
 
         # "pseudocode_SC_soilnitrogen" 1.E.1
+
         nMinAct = minrate * ((tempFac * waterFac) ** 0.5) * activeN
 
-        layer.activeN = max(0, layer.activeN - nMinAct)
+        nMinAct = min(layer.activeN, nMinAct)
+        layer.activeN -= nMinAct
         layer.NH4 += nMinAct
 
         #
@@ -453,15 +467,16 @@ def mineralization_decomp(soil):
             # "pseudocode_SC_soilnitrogen" 1.E.4
             Decay = minCoeff * resComp * ((tempFac * waterFac) ** 0.5)
 
+            # decay rate used in calculating residue for crop
             soil.decayRate = Decay
 
             # "pseudocode_SC_soilnitrogen" 1.E.6
             FreshMin = Decay * FreshN
 
-            layer.topLayerFreshN = min(0, layer.topLayerFreshN - (0.2 * FreshMin))
-            layer.activeN += (0.2 * FreshMin)
+            FreshMin = min(layer.topLayerFreshN, FreshMin)
+            layer.topLayerFreshN -= FreshMin
 
-            layer.topLayerFreshN = min(0, layer.topLayerFreshN - (0.8 * FreshMin))
+            layer.activeN += (0.2 * FreshMin)
             layer.NH4 += (0.8 * FreshMin)
 
 
