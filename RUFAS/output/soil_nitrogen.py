@@ -125,11 +125,8 @@ class SoilNitrogen(BaseReportHandler):
 
         soil = state.soil
 
-        day = time.day
-        year = time.year
-
-        self.year.append(year)
-        self.julianDay.append(day)
+        self.year.append(time.cal_year)
+        self.julianDay.append(time.day)
         self.freshN.append(soil.topLayerFreshN)
 
         for x in range(0, len(soil.listOfSoilLayers)):

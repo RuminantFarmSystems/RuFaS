@@ -6,7 +6,7 @@
         "output_dir": "Outputs/Sample_Farm_Outputs/"
     },
 
-    "weather": "Inputs/barnyard_weather_N.csv",
+    "weather": "Inputs/barnyard_weather_N_years.csv",
 
     "output":
     {
@@ -20,7 +20,7 @@
         {
             "active": true,
             "report_name": "Ration Report",
-            "file_name": "ration_report.txt"
+            "file_name": "ration_report.csv"
         },
         "soil_nitrogen":
         {
