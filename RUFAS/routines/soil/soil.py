@@ -188,7 +188,7 @@ def daily_soil_routine(soil, crop, weather, time):
 
     # calculate and update the contents of 3 organic and 2 inorganic nitrogen
     # pools
-    nitrogen_cycling.update_all(soil)
+    nitrogen_cycling.update_all(soil, weather, time)
 
     # updates changes in soil water resulting from infiltration,
     # evapotranspiration, and percolation

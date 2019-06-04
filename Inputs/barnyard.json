@@ -1,12 +1,12 @@
 {
     "config":
     {
-        "StartDate" : "2009:1",
-        "EndDate" : "2016:365",
+        "StartDate" : "2009:244",
+        "EndDate" : "2016:243",
         "output_dir": "Outputs/Sample_Farm_Outputs/"
     },
 
-    "weather": "Inputs/barnyard_weather_leap_year.csv",
+    "weather": "Inputs/barnyard_weather_N.csv",
 
     "output":
     {

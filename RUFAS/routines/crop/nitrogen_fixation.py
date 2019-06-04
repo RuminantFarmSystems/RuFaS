@@ -90,7 +90,7 @@ def calc_f_gr(crop_type):
 # "pseudocode_crop" section 5.D.3/4
 #
 def calc_f_NO3(accessible_layers):
-    #5.D.3
+    # 5.D.3
     NO3_root = sum([layer.NO3 for layer in accessible_layers])
 
     #5.D.4
