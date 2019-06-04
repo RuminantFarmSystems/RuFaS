@@ -71,7 +71,7 @@ class State():
 class Config():
     '''Contains configuration information of the simulation'''
 
-    def __init__(self, data):
+    def __init__(self, data, weather_path_str):
 
         # gets a start date in the format YYYY;julian-day. That way the program
         # can start in the middle of the year
@@ -81,6 +81,29 @@ class Config():
         self.endYear = int(self.end_date[0])
         self.startDay = int(self.start_date[1])
         self.endDay = int(self.end_date[1])
+
+        # read in the input csv file
+        weather_full_path = util.get_base_dir() / weather_path_str
+
+        if not weather_full_path.is_file():
+            raise errors.JSONfileData("WEATHER",
+                                      "\tWeather file specified does not exist")
+
+        with weather_full_path.open('r') as f:
+            readCSV = csv.reader(f, delimiter=',')
+            row_count = sum(1 for row in readCSV)
+            print(str(row_count))
+
+            for row in range(1, row_count):
+                if row == 1:
+                    w_start_year = row[0]
+                    w_start_day = row[1]
+                elif row == row_count:
+                    w_end_year = row[0]
+                    w_end_day = row[1]
+
+        print("Start: " + str(w_start_year) + ":" + str(w_start_day)
+              + "End: " + str(w_end_year) + ":" + str(w_end_day))
 
         # These will depend on the weather CSV file, currently hardcoded***
         w_start_day = 244
@@ -214,7 +237,7 @@ class Weather():
         # get the start year
         start_year = years[0][0]
 
-        # these will depend on the weather CSV file, currently hardcoded***
+        # these will depend on the weather CSV file, currently hardcoded*** TODO
         w_start_day = 244
         w_start_year = 2009
 
@@ -267,7 +290,7 @@ class Weather():
         with weather_full_path.open('r') as f:
             readCSV = csv.reader(f, delimiter=',')
 
-            # this for loop takes the 1D array of weather data [day] and parses
+            # this for loop takes the 2D array of weather data [day] and parses
             # it into multiple 2D arrays [year][day] for different data points
             # used by the module
             current_row = 0
@@ -289,13 +312,13 @@ class Weather():
                     offset = 1
 
                     # fill data at appropriate location
-                    self.rainfall[year][day - offset] = float(row[1])
-                    self.T_max[year][day - offset] = float(row[2])
-                    self.T_min[year][day - offset] = float(row[3])
-                    self.T_avg[year][day - offset] = float(row[4])
-                    self.biomass[year][day - offset] = float(row[5])
-                    self.radiation[year][day - offset] = float(row[6])
-                    self.addedN[year][day - offset] = float(row[7])
+                    self.rainfall[year][day - offset] = float(row[2])
+                    self.T_max[year][day - offset] = float(row[3])
+                    self.T_min[year][day - offset] = float(row[4])
+                    self.T_avg[year][day - offset] = float(row[5])
+                    self.biomass[year][day - offset] = float(row[6])
+                    self.radiation[year][day - offset] = float(row[7])
+                    self.addedN[year][day - offset] = float(row[8])
 
                     # iterate year counter accounting for leap years
                     if year == len(years) - 1 and day == len(self.rainfall[year]):

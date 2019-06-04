@@ -146,7 +146,7 @@ def read_json_file(fPath:Path):
 
         # Instantiate objects using dictionary data from .json file
         try:
-            config = Config(data['config'])
+            config = Config(data['config'], data['weather'])
             state = State(data['farm'], config)
             output = OutputHandler(data['output'])
             weather = Weather(data['weather'], config.years)
