@@ -149,7 +149,7 @@ def read_json_file(fPath:Path):
             config = Config(data['config'], data['weather'])
             state = State(data['farm'], config)
             output = OutputHandler(data['output'])
-            weather = Weather(data['weather'], config.years)
+            weather = Weather(data['weather'], config.years, config.w_start_year, config.w_start_day)
             time = Time(config.years, config.startYear)
 
         except errors.JSONfileData as e:
