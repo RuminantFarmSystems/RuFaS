@@ -145,7 +145,7 @@ class Crop():
     class CropType():
 
         def __init__(self, data):
-            '''GENERAL PLANT INFO'''
+            """GENERAL PLANT INFO"""
 
             self.crop_name = data['crop_name']
 
