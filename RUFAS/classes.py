@@ -91,25 +91,21 @@ class Config():
 
         with weather_full_path.open('r') as f:
             readCSV = csv.reader(f, delimiter=',')
-            row_count = sum(1 for row in readCSV)
-            print(str(row_count))
 
-            for row in range(1, row_count):
-                if row == 1:
-                    w_start_year = row[0]
-                    w_start_day = row[1]
-                elif row == row_count:
-                    w_end_year = row[0]
-                    w_end_day = row[1]
+            counter = 1
+            for row in readCSV:
+                if counter == 2:
+                    w_start_year = int(row[0])
+                    w_start_day = int(row[1])
+                elif counter > 2:
+                    w_end_year = int(row[0])
+                    w_end_day = int(row[1])
+                counter += 1
 
-        print("Start: " + str(w_start_year) + ":" + str(w_start_day)
-              + "End: " + str(w_end_year) + ":" + str(w_end_day))
-
-        # These will depend on the weather CSV file, currently hardcoded***
-        w_start_day = 244
-        w_start_year = 2009
-        w_end_day = 243
-        w_end_year = 2016
+        self.w_start_year = w_start_year
+        self.w_start_day = w_start_day
+        self.w_end_year = w_end_year
+        self.w_end_day = w_end_day
 
         # error statements if the start date is not within the weather data
 
@@ -207,7 +203,7 @@ class Weather():
     Data lists are in the format Data[year][julian_day].
     '''
 
-    def __init__(self, weather_path_str, years):
+    def __init__(self, weather_path_str, years, w_start_year, w_start_day):
 
         # initialize data sets and fill them with 0s
 
@@ -236,10 +232,6 @@ class Weather():
 
         # get the start year
         start_year = years[0][0]
-
-        # these will depend on the weather CSV file, currently hardcoded*** TODO
-        w_start_day = 244
-        w_start_year = 2009
 
         # create the offset day for weather file that start mid year
         if w_start_year % 4 == 0:
@@ -308,7 +300,7 @@ class Weather():
 
                 # row 0 contains variable names
                 if current_row != 0:
-                    day = int(row[0])
+                    day = int(row[1])
                     offset = 1
 
                     # fill data at appropriate location
