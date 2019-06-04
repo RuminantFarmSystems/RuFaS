@@ -22,7 +22,7 @@
         {
             "active": true,
             "report_name": "Ration Report",
-            "file_name": "ration_report.txt"
+            "file_name": "ration_report.csv"
         },
         "soil_nitrogen":
         {

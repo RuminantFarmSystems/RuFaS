@@ -8,6 +8,7 @@ Author(s): Kass Chupongstimun, kass_c@hotmail.com
 ################################################################################
 
 from pathlib import Path
+import csv
 from RUFAS.output.report_handler import BaseReportHandler
 
 #-------------------------------------------------------------------------------
@@ -17,9 +18,6 @@ class RationReport(BaseReportHandler):
     '''Creates and prints to the file ration_report.txt'''
 
     def __init__(self, data):
-        '''
-        TODO: Add DocString
-        '''
 
         #
         # Sets active, report_name, f_name using data
@@ -39,6 +37,33 @@ class RationReport(BaseReportHandler):
         self.feed_info = {}
 
     #---------------------------------------------------------------------------
+    # Method: write_header
+    #         Writes the header (column titles and units) in the csvfile
+    #---------------------------------------------------------------------------
+    def write_header(self):
+
+        mode = 'a+' if self.get_fPath().exists() else 'w+'
+
+        with self.get_fPath().open(mode) as csvfile:
+
+            # 1) Initialize the header of the cvsfile
+            fieldnames = ['Year', 'Julian Day', 'Achieved Total Price', 'Milk Production Reduction Factor']
+            for key in self.feed_info.keys():
+                fieldnames.append(key)
+            self.fieldNames = fieldnames
+            writer = csv.DictWriter(csvfile, fieldnames=fieldnames,
+                                    lineterminator = '\n')
+            writer.writeheader()
+
+            # 2) Write Units in 2nd row of cvsfile
+            units = {'Year': '', 'Julian Day': '',
+                             'Achieved Total Price': "$", 'Milk Production Reduction Factor': ""}
+            for key in self.feed_info.keys():
+                units[key] = 'kg'            
+
+            writer.writerow(units)
+
+    #---------------------------------------------------------------------------
     # Method: initialize
     #---------------------------------------------------------------------------
     def initialize(self, state):
@@ -48,6 +73,7 @@ class RationReport(BaseReportHandler):
         # store in Feed or Animal???????
         self.feed_info = feed.available_feeds
         self.ration_interval = state.animal.ration_formulation_interval
+        self.write_header()
 
     #---------------------------------------------------------------------------
     # Method: daily_update
@@ -79,26 +105,27 @@ class RationReport(BaseReportHandler):
         print("printing ration report for year: " + str(y))
         mode = 'a+' if self.get_fPath().exists() else 'w+'
 
-        with self.get_fPath().open(mode) as f:
-            f.write("RUFAS: Ration Formulation Report\n")
-            f.write("Year {}:\n".format(y))
+        with self.get_fPath().open(mode) as csvfile:
 
             for d in range(1, 366):
                 if (d % self.ration_interval) == 1:
-                    f.write("\tDay:{} \n".format(str(d)))
-                    #f.write("\tRation Optimization Status: " + self.ration_LP_status[d])
-                    f.write("\t\tAchieved Total Price: " +
-                            str(self.achieved_price[d]))
-                    f.write("\n\t\tMilk Production Reduction Factor: " +
-                            str(self.milk_production_reduction[d]) + '\n')
-
+            
+                    rationData = {
+                            'Year':
+                                str(y),
+                            'Julian Day':
+                                str(d),
+                            'Achieved Total Price':
+                                str(self.achieved_price[d]),
+                            'Milk Production Reduction Factor':
+                                str(self.milk_production_reduction[d]) }
+        
                     for feed_type in sorted(self.feed_info.keys()):
-                        f.write("\t\t{}: {} {}".format(
-                            feed_type,
-                            self.feed_amounts[d][feed_type],
-                            self.feed_info[feed_type]['Units'])
-                        )
-                    f.write('\n')
+                        rationData[feed_type] = self.feed_amounts[d][feed_type]
+    
+                    writer = csv.DictWriter(csvfile, fieldnames=self.fieldNames,
+                                        lineterminator = '\n')
+                    writer.writerow(rationData)
     #---------------------------------------------------------------------------
     # Method: annual_flush
     #---------------------------------------------------------------------------
