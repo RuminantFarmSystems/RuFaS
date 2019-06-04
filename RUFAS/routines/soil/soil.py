@@ -192,7 +192,7 @@ def daily_soil_routine(soil, crop, weather, time):
 
     # updates changes in soil water resulting from infiltration,
     # evapotranspiration, and percolation
-    soil_water.update_all(soil, weather, time)
+    # soil_water.update_all(soil, weather, time)
 
 
 # -------------------------------------------------------------------------------
