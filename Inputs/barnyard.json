@@ -2,7 +2,7 @@
     "config":
     {
         "StartDate" : "2009:244",
-        "EndDate" : "2014:242",
+        "EndDate" : "2016:243",
         "output_dir": "Outputs/Sample_Farm_Outputs/"
     },
 
@@ -18,7 +18,7 @@
         },
         "ration_report":
         {
-            "active": false,
+            "active": true,
             "report_name": "Ration Report",
             "file_name": "ration_report.txt"
         },
