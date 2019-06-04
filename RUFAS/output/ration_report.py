@@ -28,9 +28,10 @@ class RationReport(BaseReportHandler):
         # Daily Outputs
         # 1D Lists [julianDay]
         #
-        self.achieved_price = [None]*366
-        self.feed_amounts = [None]*366
-        self.milk_production_reduction = [None]*366
+        self.achieved_price = []
+        self.feed_amounts = []
+        self.milk_production_reduction = []
+        self.julianDay = []
         #self.LP_text = ""
 
         # static
@@ -81,13 +82,15 @@ class RationReport(BaseReportHandler):
     def daily_update(self, state, weather, time):
         '''Stores the daily values that need to be printed in the report.'''
 
-        d = time.day
-        if (d % self.ration_interval) == 1:
+        day = time.day
+        self.julianDay.append(day)
+        # for each day that a ration is calculated, appends the necessary information to the lists
+        if (day % self.ration_interval) == 1 or self.ration_interval == 1:
             animal = state.animal
 
-            self.achieved_price[d] = animal.ration['objective']
-            self.feed_amounts[d] = {feed_type: animal.ration[feed_type] for feed_type in self.feed_info.keys()}
-            self.milk_production_reduction[d] = animal.ration['MP_reduction']
+            self.achieved_price.append(animal.ration['objective'])
+            self.feed_amounts.append({feed_type: animal.ration[feed_type] for feed_type in self.feed_info.keys()})
+            self.milk_production_reduction.append(animal.ration['MP_reduction'])
 
     #---------------------------------------------------------------------------
     # Method: annual_update
@@ -106,32 +109,35 @@ class RationReport(BaseReportHandler):
         mode = 'a+' if self.get_fPath().exists() else 'w+'
 
         with self.get_fPath().open(mode) as csvfile:
-
-            for d in range(1, 366):
-                if (d % self.ration_interval) == 1:
+            # data_index keeps track of which calculation is being recorded 
+            data_index = 0
+            for i in range(0, len(self.julianDay)):
+                if (self.julianDay[i] % self.ration_interval) == 1 or self.ration_interval == 1:
             
                     rationData = {
                             'Year':
                                 str(y),
                             'Julian Day':
-                                str(d),
+                                str(self.julianDay[i]),
                             'Achieved Total Price':
-                                str(self.achieved_price[d]),
+                                str(self.achieved_price[data_index]),
                             'Milk Production Reduction Factor':
-                                str(self.milk_production_reduction[d]) }
+                                str(self.milk_production_reduction[data_index]) }
         
                     for feed_type in sorted(self.feed_info.keys()):
-                        rationData[feed_type] = self.feed_amounts[d][feed_type]
+                        rationData[feed_type] = self.feed_amounts[data_index][feed_type]
     
                     writer = csv.DictWriter(csvfile, fieldnames=self.fieldNames,
                                         lineterminator = '\n')
                     writer.writerow(rationData)
+                    data_index += 1
     #---------------------------------------------------------------------------
     # Method: annual_flush
     #---------------------------------------------------------------------------
     def annual_flush(self):
         '''Sets all of the values in the output object to the default value.'''
 
-        self.achieved_price = [None]*366
-        self.feed_amounts = [None]*366
-        self.milk_production_reduction = [None]*366
+        self.achieved_price = []
+        self.feed_amounts = []
+        self.milk_production_reduction = [] 
+        self.julianDay = []
