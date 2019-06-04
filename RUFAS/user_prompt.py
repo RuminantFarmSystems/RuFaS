@@ -49,7 +49,8 @@ def input_prompt():
     while(True):
 
         try:
-            user_input = input("\nEnter RUFAS Input: ")
+            # user_input = input("\nEnter RUFAS Input: ")
+            user_input = "Inputs/barnyard.json"  # TODO: remove eventually
 
             #
             # Handle user exiting program

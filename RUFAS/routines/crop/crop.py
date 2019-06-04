@@ -128,7 +128,7 @@ def daily_crop_routine(crop, weather, time, soil):
 # -------------------------------------------------------------------------------
 def annual_crop_routine(crop, weather, time):
     for _, crop_type in crop.crops_list.items():
-        crop_type.calculate_start_growth_date(weather.T_avg[time.year - 1])
+        crop_type.calculate_start_growth_date(weather, time)
 
 
 # -------------------------------------------------------------------------------
@@ -287,19 +287,25 @@ class Crop():
             self.yield_N = 0
             self.yield_P = 0
 
-
         # -----------------------------------------------------------------------
         # Method: calculate_start_growth_day
         # "pseudocode_SC_cropbiomass.docx" section 1.A
         # -----------------------------------------------------------------------
-        def calculate_start_growth_date(self, yearly_T_avg):
-            if self.crop_type == "annual":
+        def calculate_start_growth_date(self, weather, time):
+            yearly_T_avg = weather.T_avg[time.year - 1]
+            if time.year == 1 and time.day > self.planting_date:
+                self.start_date = self.harvest_date
+
+            elif self.crop_type == "annual":
                 self.start_date = self.planting_date
+
             else:
                 for d in range(len(yearly_T_avg)):
                     if yearly_T_avg[d] > self.T_base_min:
                         self.start_date = d
                         break
+
+            print(str(time.year) + " " + str(self.start_date))
 
     # ---------------------------------------------------------------------------
     # Method: annual_reset

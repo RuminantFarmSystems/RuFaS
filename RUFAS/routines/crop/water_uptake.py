@@ -175,5 +175,5 @@ def calc_act_water_uptake(crop_type, soil, adj_uptakes, time):
     crop_type.water_actual_up = sum(act_uptake_each_layer)
 
     # 4.C.3
-    if time.day >= crop_type.planting_date:
+    if time.day >= crop_type.start_date:
         soil.Ea_sum += crop_type.water_actual_up
