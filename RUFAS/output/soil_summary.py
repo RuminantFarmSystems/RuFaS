@@ -144,14 +144,9 @@ class SoilSummary(BaseReportHandler):
 
         soil = state.soil
 
-        rainfall = weather.rainfall[time.year-1][time.day-1]
-        day = time.day
-        # year = time.year
-        cal_year = time.cal_year
-
-        self.year.append(cal_year)
-        self.julianDay.append(day)
-        self.precip.append(rainfall)
+        self.year.append(time.cal_year)
+        self.julianDay.append(time.day)
+        self.precip.append(weather.rainfall[time.year-1][time.day-1])
 
         self.runoff.append(soil.runoff)
         self.potentialEvapotranspiration.append(soil.E0)

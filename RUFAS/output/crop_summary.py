@@ -93,7 +93,7 @@ class CropSummary(BaseReportHandler):
 
         cropType = state.crop.crops_list["corn"]
         # Copy daily output values here
-        self.year.append(time.year)
+        self.year.append(time.cal_year)
         self.julianDay.append(time.day)
 
         self.daily_fr_PHU.append(cropType.fr_PHU)
