@@ -2,11 +2,11 @@
     "config":
     {
         "StartDate" : "2009:244",
-        "EndDate" : "2014:242",
+        "EndDate" : "2016:243",
         "output_dir": "Outputs/Sample_Farm_Outputs/"
     },
 
-    "weather": "Inputs/barnyard_weather_N.csv",
+    "weather": "Inputs/barnyard_weather_N_years.csv",
 
     "output":
     {
@@ -18,9 +18,9 @@
         },
         "ration_report":
         {
-            "active": false,
+            "active": true,
             "report_name": "Ration Report",
-            "file_name": "ration_report.txt"
+            "file_name": "ration_report.csv"
         },
         "soil_nitrogen":
         {
