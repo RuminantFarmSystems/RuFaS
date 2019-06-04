@@ -183,7 +183,6 @@ def calc_waterFactors(soil):
 
         if SW > FC:
             waterFac = (SAT - SW) / (SAT - FC)
-
         else:
             waterFac = (SW - WP) / (FC - WP)
 

@@ -56,14 +56,15 @@ def update_all(crop_type, time, weather):
 
 #
 # Calculate current actual biomass.
+# "pseudocode_crop" section 9.A.2/3
 #
 def calc_actual_Biomass(crop_type, time, weather):
     H_phosyn = calc_intercepted_radiation(crop_type, time, weather)
 
-    # "pseudocode_SC_cropbiomass.docx" section 1.E.2
+    # 9.A.2
     crop_type.dBiomass_max = crop_type.RUE * H_phosyn
 
-    # "pseudocode_SC_actualgrowth.docx" section 7.A.2
+    # 9.A.3
     crop_type.dBiomass_actual = crop_type.dBiomass_max * crop_type.gamma_reg
 
     # Save value as previous day's value
@@ -81,7 +82,7 @@ def calc_actual_Biomass(crop_type, time, weather):
 #
 # Calculates amount of intercepted photosynthetically active radiation
 # on a given day (MJ m^-2).
-# "pseudocode_SC_cropbiomass.docx" section 1.E.1
+# "pseudocode_crop" section 9.A.1
 #
 def calc_intercepted_radiation(crop_type, time, weather):
     H_day = weather.radiation[time.year - 1][time.day - 1]
