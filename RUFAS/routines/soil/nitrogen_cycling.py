@@ -136,7 +136,8 @@ from math import exp, log
 # to nitrogen cycling. The order in which each method is called is significant
 # and is still being worked out.
 #
-def update_all(soil):
+def update_all(soil, weather, time):
+
     calc_tempFactors(soil)
 
     calc_waterFactors(soil)
@@ -150,6 +151,8 @@ def update_all(soil):
     mineralization_decomp(soil)
 
     humus_mineralization(soil)
+
+    addedN(soil, weather, time)
 
 
 #
@@ -504,6 +507,14 @@ def humus_mineralization(soil):
         layer.nTrans = Ntrans
 
 
+def addedN(soil, weather, time):
+    totalN = weather.addedN[time.year - 1][time.day - 1]
+
+    activeN = totalN * 0.875
+    stableN = totalN * 0.875
+
+    soil.listOfSoilLayers[0].activeN += activeN
+    soil.listOfSoilLayers[0].stableN += stableN
 
 
 
