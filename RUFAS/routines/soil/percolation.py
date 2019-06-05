@@ -59,7 +59,7 @@ def calc_daily_percolation(soil):
         FC = layer.fcWater
 
         SWperc = 0.0
-        if SW >= FC:
+        if SW > FC:
             SWperc = SW - FC
 
         Ksat = layer.ksat
