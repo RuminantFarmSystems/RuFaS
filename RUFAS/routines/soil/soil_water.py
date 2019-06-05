@@ -62,7 +62,6 @@ def update_SW(soil, weather, time):
         WP = layer.wiltingWater
         Perc = layer.perc
         Esoil = layer.layerEsoil
-
         Et_actual = layer.Et_actual
 
         if x == 0:
@@ -73,5 +72,6 @@ def update_SW(soil, weather, time):
 
             SW = max(WP, SW + Perc_prev - Esoil - Perc - Et_actual)
 
+        soil.Ea_sum += Esoil + Et_actual
         layer.currentSoilWaterMM = SW
         soil.listOfSoilLayers[x] = layer

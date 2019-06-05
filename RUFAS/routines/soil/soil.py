@@ -190,10 +190,7 @@ def daily_soil_routine(soil, crop, weather, time):
     # pools
     nitrogen_cycling.update_all(soil, weather, time)
 
-    # updates changes in soil water resulting from infiltration,
-    # evapotranspiration, and percolation
-    # TODO: if we decide to update throughout, this will be removed
-    # soil_water.update_all(soil, weather, time)
+    soil_water.update_all(soil, weather, time)
 
 
 # -------------------------------------------------------------------------------
