@@ -93,6 +93,7 @@ class Config():
             readCSV = csv.reader(f, delimiter=',')
 
             counter = 1
+            # sets the starting and ending weather dates
             for row in readCSV:
                 if counter == 2:
                     w_start_year = int(row[0])
@@ -102,6 +103,24 @@ class Config():
                     w_end_day = int(row[1])
                 counter += 1
 
+            # size of the csv file to determine if the weather file has any gaps
+            size_CSV = 0
+            if w_start_year % 4 == 0:
+                size_CSV += 367 - w_start_day
+            else:
+                size_CSV += 366 - w_start_day
+            for x in range(w_start_year + 1, w_end_year):
+                if x % 4 == 0:
+                    size_CSV += 366
+                else:
+                    size_CSV += 365
+            size_CSV += w_end_day
+
+            if counter - 1 != size_CSV + 1:
+                msg = "Start and end dates of the Weather CSV file do not match the size.\n" \
+                      "\tSize: " + str(counter - 1) + "\n\tExpected size: " + str(size_CSV + 1)
+                raise errors.InvalidWeatherCSV(weather_full_path.name, msg)
+
         self.w_start_year = w_start_year
         self.w_start_day = w_start_day
         self.w_end_year = w_end_year
@@ -109,7 +128,7 @@ class Config():
 
         # error statements if the start date is not within the weather data
 
-        # special statements
+        # special error statements
         if self.startYear == w_start_year and self.startDay < w_start_day \
                 or self.startYear < w_start_year:
             print("Start date invalid. Starting simulation on "
