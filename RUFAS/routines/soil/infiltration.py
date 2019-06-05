@@ -205,8 +205,3 @@ def calc_daily_infiltration(soil, weather, time):
     R = weather.rainfall[time.year-1][time.day-1]
     Q = soil.runoff
     soil.dailyInfiltration = R - Q
-
-    SAT = soil.listOfSoilLayers[0].satWater
-    SW = soil.listOfSoilLayers[0].currentSoilWaterMM
-
-    soil.listOfSoilLayers[0].currentSoilWaterMM = min(SAT, soil.dailyInfiltration + SW)
