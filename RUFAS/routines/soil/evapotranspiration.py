@@ -81,14 +81,14 @@ def update_all(soil, crop, weather, time):
 
 #
 # Calculates potential evapotranspiration E0 using the Hargreaves method
-# "pseudocode_SC_soilhydrology.docx" 2.B.1
+# "pseudocode_soil" 2.B.1
 #
 def calc_potential_evap(soil, crop, weather, time):
-    H0 = weather.radiation[time.year-1][time.day-1]
+    H0 = weather.radiation[time.year - 1][time.day - 1]
 
-    Tmax = weather.T_max[time.year-1][time.day-1]
-    Tmin = weather.T_min[time.year-1][time.day-1]
-    Tavg = weather.T_avg[time.year-1][time.day-1]
+    Tmax = weather.T_max[time.year - 1][time.day - 1]
+    Tmin = weather.T_min[time.year - 1][time.day - 1]
+    Tavg = weather.T_avg[time.year - 1][time.day - 1]
 
     LHV = calc_LHV(Tavg)
 
@@ -103,7 +103,7 @@ def calc_potential_evap(soil, crop, weather, time):
 #
 # Calculates LHV (latent heat of vaporization (MJ kg^-1)) for use in
 # determining potential evapotranspiration
-# "pseudocode_SC_soilhydrology.docx" 2.B.2
+# "pseudocode_soil" 2.B.2
 #
 def calc_LHV(Tavg):
     return 2.501 - (2.361 * (10 ** (-3)) * Tavg)
@@ -113,7 +113,7 @@ def calc_LHV(Tavg):
 # Calculates crop transpiration as a function of maximum transpiration on a
 # given day and Leaf Area Index (calculated in the Crop Routine file
 # leaf_area_index.py)
-# "pseudocode_SC_soilhydrology.docx" 2.B.3
+# "pseudocode_soil" 2.B.3
 #
 def calc_crop_transpiration(soil, crop):
     LAI = crop.crops_list["corn"].LAI_actual  # TODO: Crop Flag
@@ -125,21 +125,21 @@ def calc_crop_transpiration(soil, crop):
 
 #
 # Calculates sublimation and soil evaporation
-# "pseudocode_SC_soilhydrology.docx" 2.B.4/6
+# "pseudocode_soil" 2.B.4/6
 #
 def calc_soil_evap(soil, crop):
     SoilCov = calc_soil_cov(soil, crop)
 
-    # "pseudocode_SC_soilhydrology.docx" 2.B.4
+    # "pseudocode_soil" 2.B.4
     Esoil = soil.E0 * SoilCov
 
-    # "pseudocode_SC_soilhydrology.docx" 2.B.6
+    # "pseudocode_soil" 2.B.6
     soil.Esoil = min(Esoil, ((Esoil * soil.E0) / (Esoil + soil.Et_max)))
 
 
 #
 # Calculates soil cover for use in calculating soil evaporation
-# "pseudocode_SC_soilhydrology.docx" 2.B.5
+# "pseudocode_soil" 2.B.5
 #
 def calc_soil_cov(soil, crop):
     bio_AG = crop.crops_list["corn"].bio_AG  # TODO: Crop Flag
@@ -152,7 +152,7 @@ def calc_soil_cov(soil, crop):
 #
 # Calculates the Esoil for each layer of soil in a given profile as a function
 # of the evaporation demand between the soil layers above and below.
-# "pseudocode_SC_soilhydrology.docx" 2.B.7-10
+# "pseudocode_soil" 2.B.7-10
 #
 def update_Esoil_z(soil):
     for x in range(0, len(soil.listOfSoilLayers)):
@@ -163,7 +163,7 @@ def update_Esoil_z(soil):
 
         #
         # Calculate Esoil at a given depth
-        # "pseudocode_SC_soilhydrology.docx" 2.B.7
+        # "pseudocode_soil" 2.B.7
         #
         if x == 0:
             curr_layer.topEsoil = 0
@@ -182,23 +182,23 @@ def update_Esoil_z(soil):
         #
         # Evaporation demand for a given soil layer is the difference between
         # evaporation demands at the top and bottom of the layer
-        # "pseudocode_SC_soilhydrology.docx" 2.B.8
+        # "pseudocode_soil" 2.B.8
         #
-        if SW > FC:
-            layerEsoil = curr_layer.bottomEsoil - curr_layer.topEsoil
+        layerEsoil = curr_layer.bottomEsoil - curr_layer.topEsoil
+
         #
         # When the water content of a soil layer is below field capacity, the
         # evaporative demand for the layer is reduced
-        # "pseudocode_SC_soilhydrology.docx" 2.B.9
+        # "pseudocode_soil" 2.B.9
         #
-        else:
+        if SW < FC:
             exp_part = exp(2.5 * (SW - FC) / (FC - WP))
-            layerEsoil = (curr_layer.bottomEsoil - curr_layer.topEsoil) * exp_part
+            layerEsoil = layerEsoil * exp_part
 
         #
         # In addition, the daily amount of water removed by evaporation is
         # limited to 80% of plant available water (SW - WP)
-        # "pseudocode_SC_soilhydrology.docx" 2.B.10
+        # "pseudocode_soil" 2.B.10
         #
         curr_layer.layerEsoil = min(layerEsoil, 0.8 * (SW - WP))
         curr_layer.currentSoilWaterMM = max(WP, SW - (curr_layer.layerEsoil + curr_layer.Et_actual))
