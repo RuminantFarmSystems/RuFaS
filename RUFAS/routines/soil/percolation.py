@@ -41,7 +41,7 @@ def update_all(soil):
 #
 # Calculates daily percolation as a function of the water available for
 # percolation (SWperc) in a soil layer.
-# "pseudocode_soil" 2.C.1/2
+# "pseudocode_soil" S.2.C.1/2
 #
 def calc_daily_percolation(soil):
     #
@@ -62,7 +62,7 @@ def calc_daily_percolation(soil):
         Ksat = layer.ksat
 
         # Travel Time for each soil layer
-        # "pseudocode_soil" 2.C.2
+        # "pseudocode_soil" S.2.C.2
         TT = (SAT - FC) / Ksat
         layer.TT = TT
 

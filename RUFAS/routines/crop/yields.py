@@ -76,7 +76,7 @@ def update_all(crop_type, time, soil):
 
 #
 # Calculates water deficiency factor (AKA gamma_wu).
-# "pseudocode_crop" section 10.A.1
+# "pseudocode_crop" C.10.A.1
 #
 def calc_gamma_wu(crop_type, soil):
     if soil.E0_sum == 0:
@@ -86,7 +86,7 @@ def calc_gamma_wu(crop_type, soil):
 
 #
 # Calculates max potential harvest index for a given day.
-# "pseudocode_crop" section 10.B.1
+# "pseudocode_crop" C.10.B.1
 #
 def calc_HI_max(crop_type):
     top = 100 * crop_type.fr_PHU
@@ -96,7 +96,7 @@ def calc_HI_max(crop_type):
 
 #
 # Calculates aboveground biomass.
-# "pseudocode_crop" section 10.C.1
+# "pseudocode_crop" C.10.C.1
 #
 def calc_bio_AG(crop_type):
     crop_type.bio_AG = (1 - crop_type.fr_root) * crop_type.biomass_actual
@@ -104,7 +104,7 @@ def calc_bio_AG(crop_type):
 
 #
 # Calculates the actual harvest index (AKA HI_actual).
-# "pseudocode_crop" section 10.D.1
+# "pseudocode_crop" C.10.D.1
 #
 def calc_HI_actual(crop_type, time):
     growing_period = crop_type.start_date <= time.day <= crop_type.harvest_date
@@ -121,7 +121,7 @@ def calc_HI_actual(crop_type, time):
 
 #
 # Calculates maximum crop yield at harvest.
-# "pseudocode_crop" section 10.E.1
+# "pseudocode_crop" C.10.E.1
 #
 def calc_yield_max(crop_type, time):
     if time.day == crop_type.harvest_date:
@@ -132,7 +132,7 @@ def calc_yield_max(crop_type, time):
 
 #
 # Calculates actual crop yield at harvest.
-# "pseudocode_crop" section 10.F.1
+# "pseudocode_crop" C.10.F.1
 #
 def calc_yield_actual(crop_type):
     crop_type.yield_actual = crop_type.yield_max * crop_type.harvest_eff
@@ -140,7 +140,7 @@ def calc_yield_actual(crop_type):
 
 #
 # Calculates the amount of nitrogen and phosphorus removed in the yield.
-# "pseudocode_crop" section 10.G.1/2
+# "pseudocode_crop" C.10.G.1/2
 #
 def calc_nutrient_removal(crop_type):
     crop_type.yield_N = crop_type.fr_N * crop_type.yield_actual  # TODO should be yield_max??
@@ -149,7 +149,7 @@ def calc_nutrient_removal(crop_type):
 
 #
 # Updates the current residue.
-# # "pseudocode_crop" section 10.H.1/2
+# # "pseudocode_crop" C.10.H.1/2
 #
 def calc_residue(crop_type, time, soil):
     if crop_type.harvest_date == time.day:

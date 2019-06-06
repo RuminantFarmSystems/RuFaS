@@ -50,7 +50,7 @@ def update_all(soil, weather, time):
 
 #
 # Calculates soil water by layer
-# "pseudocode_soil" 2.D.1/2
+# "pseudocode_soil" S.2.D.1/2
 #
 def update_SW(soil, weather, time):
 

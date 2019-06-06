@@ -42,7 +42,7 @@ def update_all(crop_type, time):
 #
 # Calculates the fraction of total biomass partitioned to roots
 # on a given day in the growing season (AKA fr_root).
-# "pseudocode_crop" section 3.A.1
+# "pseudocode_crop" C.3.A.1
 #
 def calc_daily_root_biomass(crop_type, time):
     growing_period = crop_type.start_date <= time.day <= crop_type.harvest_date
@@ -56,7 +56,7 @@ def calc_daily_root_biomass(crop_type, time):
 #
 # Calculates depth of root development in the soil on a given
 # day (AKA z_root).
-# "pseudocode_crop" section 3.A.2/3
+# "pseudocode_crop" C.3.A.2/3
 #
 def calc_z_root(crop_type, time):
     # Save the previous day's value
@@ -64,14 +64,14 @@ def calc_z_root(crop_type, time):
 
     after_harvest = time.day > crop_type.harvest_date
 
-    # 3.A.2
+    # C.3.A.2
     if crop_type.crop_type == "perennial":
         crop_type.z_root = crop_type.z_root_max
 
     elif after_harvest:
         crop_type.z_root = 0
 
-    # 3.A.3
+    # C.3.A.3
     elif crop_type.crop_type == "annual" and crop_type.fr_PHU > 0.4:
         crop_type.z_root = crop_type.z_root_max
 

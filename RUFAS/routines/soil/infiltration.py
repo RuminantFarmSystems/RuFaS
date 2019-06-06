@@ -66,14 +66,14 @@ def update_all(soil, weather, time):
 
 #
 # Calculates the daily runoff Q (mm H20)
-# "pseudocode_soil" 2.A.1
+# "pseudocode_soil" S.2.A.1
 #
 def calc_Q(soil, weather, time):
     R = weather.rainfall[time.year-1][time.day-1]
     S = calc_S(soil)
 
     # modifies S if the top layer of soil is frozen
-    # "pseudocode_soil" 2.A.9
+    # "pseudocode_soil" S.2.A.9
     if soil.listOfSoilLayers[0].temperature <= 2:
         Smax = calc_Smax(soil)
         exp_part = exp(-0.000862 * S)
@@ -89,7 +89,7 @@ def calc_Q(soil, weather, time):
 #
 # Calculates the retention parameter S (mm H20) for use in calculating daily
 # runoff (mm H20)
-# "pseudocode_soil" 2.A.4
+# "pseudocode_soil" S.2.A.4
 #
 def calc_S(soil):
 
@@ -108,7 +108,7 @@ def calc_S(soil):
 
 #
 # Calculates Curve Number 1 for use in calculating Smax
-# "pseudocode_soil" 2.A.2
+# "pseudocode_soil" S.2.A.2
 #
 def calc_CN1(soil):
     CN2 = soil.CN2
@@ -118,7 +118,7 @@ def calc_CN1(soil):
 
 #
 # Calculates Curve Number 3 for use in calculating S3
-# "pseudocode_soil" 2.A.3
+# "pseudocode_soil" S.2.A.3
 #
 def calc_CN3(soil):
     CN2 = soil.CN2
@@ -128,7 +128,7 @@ def calc_CN3(soil):
 
 #
 # Calculates Smax, the maximum value for S on any given day (mm H20)
-# "pseudocode_soil" 2.A.5
+# "pseudocode_soil" S.2.A.5
 #
 def calc_Smax(soil):
     CN1 = calc_CN1(soil)
@@ -137,7 +137,7 @@ def calc_Smax(soil):
 
 #
 # Calculates the shape coefficient w1
-# "pseudocode_soil" 2.A.6
+# "pseudocode_soil" S.2.A.6
 #
 def calc_w1(soil, Smax, CN3, w2):
     FC = soil.profileDepth * soil.listOfSoilLayers[0].fieldCapacity
@@ -151,7 +151,7 @@ def calc_w1(soil, Smax, CN3, w2):
 
 #
 # Calculates the shape coefficient w2
-# "pseudocode_soil" 2.A.7
+# "pseudocode_soil" S.2.A.7
 #
 def calc_w2(soil, Smax, CN3):
     FC = soil.profileDepth * soil.listOfSoilLayers[0].fieldCapacity
@@ -168,7 +168,7 @@ def calc_w2(soil, Smax, CN3):
 
 #
 # Calculates S3 for use in calculating shape coefficients w1/w2
-# "pseudocode_soil" 2.A.8
+# "pseudocode_soil" S. 2.A.8
 #
 def calc_S3(CN3):
     return 25.4 * ((1000 / CN3) - 10)
@@ -176,7 +176,7 @@ def calc_S3(CN3):
 
 #
 # Calculates soil water content of the entire profile for use in calculating S
-# "pseudocode_soil" 2.A.4
+# "pseudocode_soil" S.2.A.4
 #
 def sum_SW(soil):
     SW = 0.0
@@ -188,7 +188,7 @@ def sum_SW(soil):
 #
 # Calculates the quantity of water held at wilting point in the entire profile
 # for use in calculating S
-# "pseudocode_soil" 2.A.4
+# "pseudocode_soil" S.2.A.4
 #
 def sum_WW(soil):
     WW = 0.0
@@ -199,7 +199,7 @@ def sum_WW(soil):
 
 #
 # Calculates and updates daily infiltration as rainfall - runoff
-# "pseudocode_soil" 2.A.10
+# "pseudocode_soil" S.2.A.10
 #
 def calc_daily_infiltration(soil, weather, time):
     R = weather.rainfall[time.year-1][time.day-1]
