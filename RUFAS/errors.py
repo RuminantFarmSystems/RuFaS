@@ -37,24 +37,3 @@ class JSONfileData(Exception):
 	def __init__(self, section, msg):
 		self.section = section
 		self.msg = msg
-
-
-# -------------------------------------------------------------------------------
-# Error: InvalidWeatherCSV
-# -------------------------------------------------------------------------------
-class InvalidWeatherCSV(Exception):
-	'''Raised when the weather file fed to the program has problems'''
-
-	def __init__(self, weather_full_path, msg):
-		self.weather_full_path = weather_full_path
-		self.msg = msg
-
-
-# -------------------------------------------------------------------------------
-# Error: InvalidWeatherfile
-# -------------------------------------------------------------------------------
-class InvalidWeatherfile(Exception):
-	'''Raised when the weather file fed to the program has problems'''
-
-	def __init__(self, wName):
-		self.msg = "Skipping simulation for {}\n".format(wName)

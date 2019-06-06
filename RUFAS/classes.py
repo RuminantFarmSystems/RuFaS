@@ -37,7 +37,6 @@ class State():
     '''
 
     def __init__(self, data, config):
-
         self.soil = Soil(data['soil'], config)
         self.animal = Animal(data['animal'])
         self.feed = Feed(data['feed'])
@@ -73,7 +72,7 @@ class Config():
 
     def __init__(self, data, weather_path_str):
 
-        # gets a start date in the format YYYY;julian-day. That way the program
+        # gets a start/end date in the format YYYY;julian-day. That way the program
         # can start in the middle of the year
         self.start_date = data['StartDate'].split(':')
         self.end_date = data['EndDate'].split(':')
@@ -92,9 +91,12 @@ class Config():
         with weather_full_path.open('r') as f:
             readCSV = csv.reader(f, delimiter=',')
 
+            # keeps track of how many lines are in the weather file
             counter = 1
             # sets the starting and ending weather dates
             for row in readCSV:
+                if len(row) == 0:
+                    continue
                 if counter == 2:
                     w_start_year = int(row[0])
                     w_start_day = int(row[1])
@@ -103,23 +105,26 @@ class Config():
                     w_end_day = int(row[1])
                 counter += 1
 
-            # size of the csv file to determine if the weather file has any gaps
-            size_CSV = 0
+            # expected size of the csv file from start to end
+            # to determine if the weather file has any gaps
+            size_wCSV = 0
             if w_start_year % 4 == 0:
-                size_CSV += 367 - w_start_day
+                size_wCSV += 367 - w_start_day
             else:
-                size_CSV += 366 - w_start_day
+                size_wCSV += 366 - w_start_day
             for x in range(w_start_year + 1, w_end_year):
                 if x % 4 == 0:
-                    size_CSV += 366
+                    size_wCSV += 366
                 else:
-                    size_CSV += 365
-            size_CSV += w_end_day
+                    size_wCSV += 365
+            size_wCSV += w_end_day
 
-            if counter - 1 != size_CSV + 1:
+            # compares actual size of the file to expected size
+            if counter - 1 != size_wCSV + 1:
                 msg = "Start and end dates of the Weather CSV file do not match the size.\n" \
-                      "\tSize: " + str(counter - 1) + "\n\tExpected size: " + str(size_CSV + 1)
-                raise errors.InvalidWeatherCSV(weather_full_path.name, msg)
+                      "There may be missing or duplicate days in: " + weather_full_path.name \
+                      + "\n\tSize: " + str(counter - 1) + "\n\tExpected size: " + str(size_wCSV + 1)
+                print(msg + "\n")
 
         self.w_start_year = w_start_year
         self.w_start_day = w_start_day
@@ -127,8 +132,7 @@ class Config():
         self.w_end_day = w_end_day
 
         # error statements if the start date is not within the weather data
-
-        # special error statements
+        # special error statements for start and end years
         if self.startYear == w_start_year and self.startDay < w_start_day \
                 or self.startYear < w_start_year:
             print("Start date invalid. Starting simulation on "
@@ -184,6 +188,11 @@ class Config():
 
         # constructs a calendar of julian days and years, accounting for leap
         # years and mid-year start/end dates
+        # each year in years starts with the calendar date at index zero and then
+        # is filled with the days of the year that the program will run
+        # the start and end dates will be specified by the user
+        # years is used as a correctly size template for each of the weather arrays
+        # in Weather()
 
         self.years = []
 
@@ -243,16 +252,17 @@ class Weather():
         self.beef = []
         self.beefCalf = []
 
-        # get the start day
+        # get the start day of the simulation
         for i in years[0]:
             if str(i).isdigit() and len(str(i)) < 4:
                 start_day = i
                 break
 
-        # get the start year
+        # get the start year of the simulation
         start_year = years[0][0]
 
-        # create the offset day for weather file that start mid year
+        # create the offset day from the start of the weather file to
+        # the start of the next year
         if w_start_year % 4 == 0:
             w_day_offset = 366 - w_start_day
         else:
@@ -274,6 +284,7 @@ class Weather():
                     days_to_start += 365
                 temp_year += 1
 
+        # fill the weather arrays to an accurate size with zeros
         for year in years:
             self.rainfall.append([0 for _ in range(len(year) - 1)])
             self.T_max.append([0 for _ in range(len(year) - 1)])
@@ -301,35 +312,53 @@ class Weather():
         with weather_full_path.open('r') as f:
             readCSV = csv.reader(f, delimiter=',')
 
-            # this for loop takes the 2D array of weather data [day] and parses
+            # this for loop takes the weather data and parses
             # it into multiple 2D arrays [year][day] for different data points
             # used by the module
             current_row = 0
             year = 0
             counter = 0
+            day = start_day
+            skips = 0
             for row in readCSV:
                 # limits weather data read in to the length of the simulation
                 if year > len(years) - 1:
                     break
 
-                # sets a pointer to the start date in the weather file
+                # if a line is empty then skip it
+                if len(row) == 0:
+                    skips += 1
+                    continue
+
+                # sets a pointer to the start date of the simulation in the weather file
                 if counter < days_to_start:
                     counter += 1
                     continue
 
                 # row 0 contains variable names
                 if current_row != 0:
-                    day = int(row[1])
                     offset = 1
 
-                    # fill data at appropriate location
-                    self.rainfall[year][day - offset] = float(row[2])
-                    self.T_max[year][day - offset] = float(row[3])
-                    self.T_min[year][day - offset] = float(row[4])
-                    self.T_avg[year][day - offset] = float(row[5])
-                    self.biomass[year][day - offset] = float(row[6])
-                    self.radiation[year][day - offset] = float(row[7])
-                    self.addedN[year][day - offset] = float(row[8])
+                    # try/except statement to catch faulty weather data
+                    try:
+                        # fill data at appropriate location
+                        self.rainfall[year][day - offset] = float(row[2])
+                        self.T_max[year][day - offset] = float(row[3])
+                        self.T_min[year][day - offset] = float(row[4])
+                        self.T_avg[year][day - offset] = float(row[5])
+                        self.biomass[year][day - offset] = float(row[6])
+                        self.radiation[year][day - offset] = float(row[7])
+                        self.addedN[year][day - offset] = float(row[8])
+
+                    except (IndexError, ValueError) as e:
+                        # prints out each problematic row in the weather CSV file
+                        if skips == 0:
+                            print("Weather CSV file has invalid data in: " + weather_full_path.name)
+                            print("Invalid rows that are skipped:")
+
+                        skips += 1
+                        print("Row: " + str(current_row + skips + days_to_start) + "")
+                        continue
 
                     # iterate year counter accounting for leap years
                     if year == len(years) - 1 and day == len(self.rainfall[year]):
@@ -337,9 +366,12 @@ class Weather():
                     elif years[year][0] % 4 == 0:
                         if day == 366:
                             year += 1
+                            day = 0
                     else:
                         if day == 365:
                             year += 1
+                            day = 0
+                    day += 1
 
                 current_row += 1
 
@@ -347,7 +379,6 @@ class Weather():
             for i in range(len(years)):
                 avg = sum(self.T_avg[i]) / len(years[i])
                 self.T_avg_annual.append(avg)
-        test = "stop"
 
 
 # Class: Time
@@ -365,7 +396,7 @@ class Time():
         self.year = 1  # Current Year
 
         # finds the first non-null day of the first year
-        for i in range(1, len(years[0])):  # TODO changed to start at 1
+        for i in range(1, len(years[0])):
             if years[0][i] is None:
                 continue
             else:
@@ -412,7 +443,7 @@ class Time():
         '''
 
         # if the day is > the length of the current year, then the year is over
-        return self.day > (len(self.years[self.year - 1]) - 1) #TODO added - 1 at the end
+        return self.day > (len(self.years[self.year - 1]) - 1)
 
     # -------------------------------------------------------------------------------
     # Function: end_simulation

@@ -157,10 +157,5 @@ def read_json_file(fPath:Path):
                   "{} \n\t{} Section\n{}\n".format(fPath.name, e.section, e.msg))
             raise errors.InvalidJSONfile(fPath.name)
 
-        except errors.InvalidWeatherCSV as e:
-            print("WEATHER CSV ERROR: " +
-                  "{} \n\t{}\n".format(e.weather_full_path, e.msg))
-            wPath = e.weather_full_path
-            raise errors.InvalidJSONfile(wPath)
 
 #=======================================================================================
