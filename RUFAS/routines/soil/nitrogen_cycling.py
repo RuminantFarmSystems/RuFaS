@@ -287,8 +287,6 @@ def leaching_runoff_erosion(soil):
         FC = layer.fcWater
         SAT = layer.satWater
 
-        Perc = layer.perc
-
         BD = layer.bulkDensity
         depth = layer.depth
 
@@ -308,19 +306,19 @@ def leaching_runoff_erosion(soil):
             w = runoff + SW
 
             if w == 0:
-                NO3Conc1 = 0
-                NH4Conc1 = 0
+                NO3RunoffConc = 0
+                NH4RunoffConc = 0
 
             else:
                 exp_part = exp(-w / SAT)
-                NO3Conc1 = layer.NO3 * (1 - exp_part) / w
-                NH4Conc1 = layer.NH4 * (1 - exp_part) / w
+                NO3RunoffConc = layer.NO3 * (1 - exp_part) / w
+                NH4RunoffConc = layer.NH4 * (1 - exp_part) / w
 
             Cr = 0.1
 
             # "pseudocode_soil" 4.C.2
-            NO3Runoff = NO3Conc1 * Cr * runoff
-            NH4Runoff = NH4Conc1 * runoff
+            NO3Runoff = NO3RunoffConc * Cr * runoff
+            NH4Runoff = NH4RunoffConc * runoff
 
             # it is important for the order of operations that the pools are
             # updated after each process and that those updated values are used
@@ -331,13 +329,15 @@ def leaching_runoff_erosion(soil):
             layer.NH4 -= NH4Runoff
 
             # "pseudocode_soil" 4.C.3
-            activeNConc = (100 * layer.activeN) / (BD * depth)
-            stableNConc = (100 * layer.stableN) / (BD * depth)
-            freshNConc = (100 * layer.topLayerFreshN / (BD * depth))
+            activeNErosConc = (100 * layer.activeN) / (BD * depth)
+            stableNErosConc = (100 * layer.stableN) / (BD * depth)
+            freshNErosConc = (100 * layer.topLayerFreshN / (BD * depth))
+            NH4ErosConc = (100 * layer.NH4 / (BD * depth))
 
             Eros_activeN_loss = 0
             Eros_stableN_loss = 0
             Eros_freshN_loss = 0
+            Eros_NH4_loss = 0
 
             Sed = soil.sedimentYield
 
@@ -346,9 +346,10 @@ def leaching_runoff_erosion(soil):
                 ER = exp(1.21 - 0.16 * log(Sed * 1000))
 
                 # "pseudocode_soil" 4.C.4
-                Eros_activeN_loss = 0.001 * activeNConc * Sed * ER
-                Eros_stableN_loss = 0.001 * stableNConc * Sed * ER
-                Eros_freshN_loss = 0.001 * freshNConc * Sed * ER
+                Eros_activeN_loss = 0.001 * activeNErosConc * Sed * ER
+                Eros_stableN_loss = 0.001 * stableNErosConc * Sed * ER
+                Eros_freshN_loss = 0.001 * freshNErosConc * Sed * ER
+                Eros_NH4_loss = 0.001 * NH4ErosConc * Sed * ER
 
             Eros_activeN_loss = min(layer.activeN, Eros_activeN_loss)
             layer.activeN -= Eros_activeN_loss
@@ -359,6 +360,9 @@ def leaching_runoff_erosion(soil):
             Eros_freshN_loss = min(layer.topLayerFreshN, Eros_freshN_loss)
             layer.topLayerFreshN -= Eros_freshN_loss
 
+            Eros_NH4_loss = min(layer.NH4, Eros_NH4_loss)
+            layer.NH4 -= Eros_NH4_loss
+
             #
             # the coefficient of extraction for leaching is calibrated to 1.0
             # for layer 1
@@ -366,17 +370,22 @@ def leaching_runoff_erosion(soil):
             Cl = 1.0
 
         # "pseudocode_soil" 4.C.7
+        Perc = layer.perc
         NO3Perc = 0
         NH4Perc = 0
         activePerc = 0
+
         if Perc > 0:
             # "pseudocode_soil" 4.C.6
-            NO3Conc = layer.NO3 / (FC + Perc)
-            NH4Conc = layer.NH4 / (FC + Perc)
+            NO3PercConc = layer.NO3 / (FC + Perc)
+            NH4PercConc = layer.NH4 / (FC + Perc)
+
+            # "pseudocode_soil" 4.C.7
             activeConc = layer.activeN / (FC + Perc) / 50
 
-            NO3Perc = NO3Conc / Cl * Perc
-            NH4Perc = NH4Conc * Perc
+            # "pseudocode_soil" 4.C.8
+            NO3Perc = NO3PercConc * Perc / Cl
+            NH4Perc = NH4PercConc * Perc
             activePerc = activeConc * Perc
 
         #

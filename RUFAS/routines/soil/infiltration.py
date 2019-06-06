@@ -46,7 +46,7 @@ Soil attribute definitions
 
 Soil values updated by calling update_all():
     soil.runoff
-    soil.dayInfiltration
+    soil.dailyInfiltration
 '''
 ###############################################################################
 

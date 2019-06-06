@@ -186,11 +186,11 @@ def daily_soil_routine(soil, crop, weather, time):
     # calculate daily soil erosion
     soil_erosion.update_all(soil, crop, weather, time)
 
+    soil_water.update_all(soil, weather, time)
+
     # calculate and update the contents of 3 organic and 2 inorganic nitrogen
     # pools
     nitrogen_cycling.update_all(soil, weather, time)
-
-    soil_water.update_all(soil, weather, time)
 
 
 # -------------------------------------------------------------------------------
@@ -277,8 +277,8 @@ class Soil():
         self.E0_sum = 0.0
         self.Ea_sum = 0.0
         self.Esoil = 0.0
+        self.dailyInfiltration = 0.0
 
-        self.dayInfiltraiton = 0.0
         self.sedimentYield = 0.0
 
         # daily soil nitrogen values
