@@ -409,6 +409,9 @@ class Soil():
             # Initial Stable N in layer:
             self.stableN = 0.
 
+            self.NO3Perc = 0.0
+            self.NH4Perc = 0.0
+            self.activePerc = 0.0
             self.nMinAct = 0.0
             self.nitrification = 0.0
             self.volatilization = 0.0
