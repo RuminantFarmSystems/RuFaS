@@ -273,7 +273,9 @@ def leaching_runoff_erosion(soil):
         # N in leaching is added to the next deeper layer. These values are
         # calculated as the last step of each iteration through the loop. They
         # are initialized at 0 because there is no nitrogen gained through
-        # leaching for the first layer. Toggle these comments to change order
+        # leaching for the first layer.
+        #
+        # Toggle these comments to change order
         # of operations + updates.
         #
         # layer.NO3 += prev_NO3_perc
@@ -317,13 +319,15 @@ def leaching_runoff_erosion(soil):
 
             # "pseudocode_soil" 4.C.2
             NO3Runoff = NO3Conc1 * Cr * runoff
-            NH4Runoff = NH4Conc1 * Cr * runoff
+            NH4Runoff = NH4Conc1 * runoff
 
             # it is important for the order of operations that the pools are
             # updated after each process and that those updated values are used
             # thereafter
-            layer.NO3 = max(0, layer.NO3 - NO3Runoff)
-            layer.NH4 = max(0, layer.NH4 - NH4Runoff)
+            NO3Runoff = min(layer.NO3, NO3Runoff)
+            layer.NO3 -= NO3Runoff
+            NH4Runoff = min(layer.NH4, NH4Runoff)
+            layer.NH4 -= NH4Runoff
 
             # "pseudocode_soil" 4.C.3
             activeNConc = (100 * layer.activeN) / (BD * depth)
