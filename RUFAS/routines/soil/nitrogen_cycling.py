@@ -137,6 +137,7 @@ from math import exp, log
 # and is still being worked out.
 #
 def update_all(soil, weather, time):
+
     calc_tempFactors(soil)
 
     calc_waterFactors(soil)
@@ -527,12 +528,8 @@ def humus_mineralization(soil):
         # "pseudocode_soil" 4.F.1
         Ntrans = 0.00001 * (activeN * ((1 / FracN) - 1) - stableN)
 
-        if Ntrans > 0:
-            layer.activeN -= abs(Ntrans)
-            layer.stableN += abs(Ntrans)
-        else:
-            layer.stableN -= abs(Ntrans)
-            layer.activeN += abs(Ntrans)
+        layer.activeN -= Ntrans
+        layer.stableN += Ntrans
 
         layer.nTrans = Ntrans
 
@@ -541,7 +538,7 @@ def addedN(soil, weather, time):
     totalN = weather.addedN[time.year - 1][time.day - 1]
 
     activeN = totalN * 0.875
-    stableN = totalN * 0.875
+    stableN = totalN * 0.125
 
     soil.listOfSoilLayers[0].activeN += activeN
     soil.listOfSoilLayers[0].stableN += stableN
