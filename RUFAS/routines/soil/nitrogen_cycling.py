@@ -455,8 +455,9 @@ def mineralization_decomp(soil):
         waterFac = layer.waterFac
 
         # "pseudocode_soil" 4.E.1
-
-        nMinAct = minrate * ((tempFac * waterFac) ** 0.5) * activeN
+        nMinAct = 0
+        if layer.temperature > 0:
+            nMinAct = minrate * ((tempFac * waterFac) ** 0.5) * activeN
 
         nMinAct = min(layer.activeN, nMinAct)
         layer.activeN -= nMinAct
