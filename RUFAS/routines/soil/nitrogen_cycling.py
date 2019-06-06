@@ -128,7 +128,7 @@ Soil values updated by calling update_all():
 
 ###############################################################################
 
-from math import exp, log
+from math import exp, log, e
 
 
 #
@@ -200,7 +200,8 @@ def calc_waterFactors(soil):
 # "pseudocode_soil" 4.B
 #
 def nitrification_volatilization(soil):
-    for layer in soil.listOfSoilLayers:
+    for x in range(0, len(soil.listOfSoilLayers)):
+        layer = soil.listOfSoilLayers[x]
 
         tempFac = layer.tempFac
 
@@ -208,17 +209,13 @@ def nitrification_volatilization(soil):
 
         # DepthFac is confused by the variable z_mid which is insufficiently defined in the pseudocode
         # "pseudocode_soil" 4.B.3
-        if layer.name == "Layer1":
-            DepthFac = 0.95
-
-        elif layer.name == "Layer2":
-            DepthFac = 0.0005
-
+        if x == 0:
+            z_mid = 5
         else:
-            DepthFac = 0.0
+            z_mid = (layer.bottomDepth + soil.listOfSoilLayers[x - 1].bottomDepth) / 2
 
-        # exp_part = exp(4.706 - 0.0305 * z_mid)
-        # DepthFac = 1 - (z_mid / (z_mid + exp_part))
+        exp_part = exp(4.706 - 0.0305 * z_mid)
+        DepthFac = 1 - (z_mid / (z_mid + exp_part))
 
         # "pseudocode_soil" 4.B.5
         CECFac = 0.15
@@ -277,7 +274,9 @@ def leaching_runoff_erosion(soil):
         # N in leaching is added to the next deeper layer. These values are
         # calculated as the last step of each iteration through the loop. They
         # are initialized at 0 because there is no nitrogen gained through
-        # leaching for the first layer. Toggle these comments to change order
+        # leaching for the first layer.
+        #
+        # Toggle these comments to change order
         # of operations + updates.
         #
         # layer.NO3 += prev_NO3_perc
@@ -321,13 +320,15 @@ def leaching_runoff_erosion(soil):
 
             # "pseudocode_soil" 4.C.2
             NO3Runoff = NO3Conc1 * Cr * runoff
-            NH4Runoff = NH4Conc1 * Cr * runoff
+            NH4Runoff = NH4Conc1 * runoff
 
             # it is important for the order of operations that the pools are
             # updated after each process and that those updated values are used
             # thereafter
-            layer.NO3 = max(0, layer.NO3 - NO3Runoff)
-            layer.NH4 = max(0, layer.NH4 - NH4Runoff)
+            NO3Runoff = min(layer.NO3, NO3Runoff)
+            layer.NO3 -= NO3Runoff
+            NH4Runoff = min(layer.NH4, NH4Runoff)
+            layer.NH4 -= NH4Runoff
 
             # "pseudocode_soil" 4.C.3
             activeNConc = (100 * layer.activeN) / (BD * depth)
@@ -455,8 +456,9 @@ def mineralization_decomp(soil):
         waterFac = layer.waterFac
 
         # "pseudocode_soil" 4.E.1
-
-        nMinAct = minrate * ((tempFac * waterFac) ** 0.5) * activeN
+        nMinAct = 0
+        if layer.temperature > 0:
+            nMinAct = minrate * ((tempFac * waterFac) ** 0.5) * activeN
 
         nMinAct = min(layer.activeN, nMinAct)
         layer.activeN -= nMinAct
