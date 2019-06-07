@@ -289,7 +289,7 @@ class Crop():
 
         # -----------------------------------------------------------------------
         # Method: calculate_start_growth_day
-        # "pseudocode_crop" section 1.A
+        # "pseudocode_crop" section C.1.A
         # -----------------------------------------------------------------------
         def calculate_start_growth_date(self, weather, time):
             yearly_T_avg = weather.T_avg[time.year - 1]
