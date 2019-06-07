@@ -185,7 +185,8 @@ class SoilNitrogen(BaseReportHandler):
                         round(self.nitrification[y][x], 3))
 
                     dailySoilNitrogenData["Volati/L" + str(y + 1)] = str(
-                        round(self.volatilization[y][x], 3))
+                        self.volatilization[y][x])
+
 
                     dailySoilNitrogenData["Denitri/L" + str(y + 1)] = str(
                         round(self.denitrification[y][x], 3))
