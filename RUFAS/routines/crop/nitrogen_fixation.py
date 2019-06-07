@@ -26,7 +26,7 @@ CropType attribute definitions:
 
 #
 # Calculates the amount of nitrogen added to the plant biomass by fixation.
-# "pseudocode_crop" section 5.D.1
+# "pseudocode_crop" C.5.D.1
 #
 def calc_N_fixation(crop_type, soil):
     # Check if this crop can form symbiotic nitrogen fixation associations
@@ -46,7 +46,7 @@ def calc_N_fixation(crop_type, soil):
 # Determines the soil layer of lowest depth that is accessible to root
 # biomass. Returns a list containing all of the soil layers accessible
 # to root biomass.
-# "pseudocode_crop" section 5.D.8
+# "pseudocode_crop" C.5.D.8
 #
 def get_root_accessible_layers(crop_type, soil):
     accessible_layers = []
@@ -64,7 +64,7 @@ def get_root_accessible_layers(crop_type, soil):
 
 #
 # Calculates growth stage factor.
-# "pseudocode_crop" section 5.D.2
+# "pseudocode_crop" C.5.D.2
 #
 def calc_f_gr(crop_type):
     fr_PHU = crop_type.fr_PHU
@@ -87,13 +87,13 @@ def calc_f_gr(crop_type):
 
 #
 # Calculates soil nitrate factor.
-# "pseudocode_crop" section 5.D.3/4
+# "pseudocode_crop" C.5.D.3/4
 #
 def calc_f_NO3(accessible_layers):
-    # 5.D.3
+    # C.5.D.3
     NO3_root = sum([layer.NO3 for layer in accessible_layers])
 
-    #5.D.4
+    # C.5.D.4
     if NO3_root <= 100:
         return 1
 
@@ -106,7 +106,7 @@ def calc_f_NO3(accessible_layers):
 
 #
 # Calculates soil water factor.
-# "pseudocode_crop" section 5.D.5/6
+# "pseudocode_crop" C.5.D.5/6
 #
 def calc_f_sw(accessible_layers):
     SW_root = sum([layer.currentSoilWaterMM for layer in accessible_layers])
@@ -120,7 +120,7 @@ def calc_f_sw(accessible_layers):
 
 #
 # Calculates N demand
-# "pseudocode_crop" section 5.D.7
+# "pseudocode_crop" C.5.D.7
 #
 def calc_N_demand(crop_type, accessible_layers):
     NO3_root = sum([layer.NO3 for layer in accessible_layers])

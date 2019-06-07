@@ -186,14 +186,11 @@ def daily_soil_routine(soil, crop, weather, time):
     # calculate daily soil erosion
     soil_erosion.update_all(soil, crop, weather, time)
 
+    soil_water.update_all(soil, weather, time)
+
     # calculate and update the contents of 3 organic and 2 inorganic nitrogen
     # pools
     nitrogen_cycling.update_all(soil, weather, time)
-
-    # updates changes in soil water resulting from infiltration,
-    # evapotranspiration, and percolation
-    # TODO: if we decide to update throughout, this will be removed
-    # soil_water.update_all(soil, weather, time)
 
 
 # -------------------------------------------------------------------------------
@@ -280,8 +277,8 @@ class Soil():
         self.E0_sum = 0.0
         self.Ea_sum = 0.0
         self.Esoil = 0.0
+        self.dailyInfiltration = 0.0
 
-        self.dayInfiltraiton = 0.0
         self.sedimentYield = 0.0
 
         # daily soil nitrogen values
@@ -301,33 +298,33 @@ class Soil():
         # ------ INITIALIZE SOIL NITROGEN POOLS ------------------------------------
         # Calculate initial amount of NO3 in each soil layer;
         # Initial NO3 levels (kg/ha) in the soil are varied by depth as:
-        # "pseudocode_soil" 4.A
+        # "pseudocode_soil" S.4.A
         for layer in self.listOfSoilLayers:
             z = layer.bottomDepth
 
-            # "pseudocode_soil" 4.A.1
+            # "pseudocode_soil" S.4.A.1
             exp_part = math.exp(-z / 1000)
             NO3 = 7 * exp_part
 
-            # "pseudocode_soil" 4.A.2
+            # "pseudocode_soil" S.4.A.2
             OrgC = layer.orgC
             OrgN = (10 ** 4) * (OrgC / 14)
 
-            # "pseudocode_soil" 4.A.3
+            # "pseudocode_soil" S.4.A.3
             FracN = 0.02
             activeN = FracN * OrgN
 
-            # "pseudocode_soil" 4.A.4
+            # "pseudocode_soil" S.4.A.4
             stableN = (1 - FracN) * OrgN
 
-            # "pseudocode_soil" 4.A.5
+            # "pseudocode_soil" S.4.A.5
             res = self.residue
             FreshN = 0.0015 * res
 
-            # "pseudocode_soil" 4.A.6
+            # "pseudocode_soil" S.4.A.6
             NH4 = layer.NH4
 
-            # "pseudocode_soil" 4.A.7
+            # "pseudocode_soil" S.4.A.7
             BD = layer.bulkDensity
             depth = layer.depth
             unit_adjustment = (BD * depth) / 100
@@ -412,6 +409,9 @@ class Soil():
             # Initial Stable N in layer:
             self.stableN = 0.
 
+            self.NO3Perc = 0.0
+            self.NH4Perc = 0.0
+            self.activePerc = 0.0
             self.nMinAct = 0.0
             self.nitrification = 0.0
             self.volatilization = 0.0

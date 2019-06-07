@@ -41,7 +41,7 @@ def update_all(soil):
 #
 # Calculates daily percolation as a function of the water available for
 # percolation (SWperc) in a soil layer.
-# "pseudocode_soil" 2.C.1/2
+# "pseudocode_soil" S.2.C.1/2
 #
 def calc_daily_percolation(soil):
     #
@@ -49,12 +49,9 @@ def calc_daily_percolation(soil):
     # the layer above. Because there are no layers above the first, prev_perc
     # is initialized at 0 and updated with each pass of the loop.
     #
-    prev_perc = 0
     for layer in soil.listOfSoilLayers:
-        WP = layer.wiltingWater
         SAT = layer.satWater
 
-        layer.currentSoilWaterMM = min(SAT, layer.currentSoilWaterMM + prev_perc)
         SW = layer.currentSoilWaterMM
         FC = layer.fcWater
 
@@ -65,7 +62,7 @@ def calc_daily_percolation(soil):
         Ksat = layer.ksat
 
         # Travel Time for each soil layer
-        # "pseudocode_soil" 2.C.2
+        # "pseudocode_soil" S.2.C.2
         TT = (SAT - FC) / Ksat
         layer.TT = TT
 
@@ -73,6 +70,4 @@ def calc_daily_percolation(soil):
 
         exp_part = exp((-t) / layer.TT)
         layer.perc = SWperc * (1 - exp_part)
-        layer.currentSoilWaterMM = max(WP, SW - layer.perc)
-        prev_perc = layer.perc
 
