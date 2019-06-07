@@ -87,7 +87,8 @@ def update_all(soil, crop, weather, time):
 #
 def calc_Tsoil(soil, weather, time):
     L = 0.8
-    Taair = weather.T_avg_annual[time.year-1]
+    # Taair = weather.T_avg_annual[time.year-1]
+    Taair = 8.18  # TODO: spreadsheet model fix. Note in pseudocode
     dd = calc_dd(soil)
     for x in range(0, len(soil.listOfSoilLayers)):
 
@@ -126,6 +127,7 @@ def calc_dd(soil):
     exp_part = exp(part_1 * part_2)
 
     return ddmax * exp_part
+
 
 #
 # Calculates the scaling factor for soil water in a given soil profile
