@@ -50,7 +50,7 @@ def update_all(soil, weather, time):
 
 #
 # Calculates soil water by layer
-# "pseudocode_soil" 2.D.1/2
+# "pseudocode_soil" S.2.D.1/2
 #
 def update_SW(soil, weather, time):
 
@@ -60,18 +60,21 @@ def update_SW(soil, weather, time):
         layer = soil.listOfSoilLayers[x]
         SW = layer.currentSoilWaterMM
         WP = layer.wiltingWater
+        SAT = layer.satWater
         Perc = layer.perc
         Esoil = layer.layerEsoil
-
         Et_actual = layer.Et_actual
 
         if x == 0:
             SW = max(WP, SW + R - Q - Esoil - Perc - Et_actual)
+            SW = min(SAT, SW)
 
         else:
             Perc_prev = soil.listOfSoilLayers[x-1].perc
 
             SW = max(WP, SW + Perc_prev - Esoil - Perc - Et_actual)
+            SW = min(SAT, SW)
 
+        soil.Ea_sum += Esoil + Et_actual
         layer.currentSoilWaterMM = SW
         soil.listOfSoilLayers[x] = layer

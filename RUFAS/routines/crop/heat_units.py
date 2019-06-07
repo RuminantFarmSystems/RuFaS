@@ -62,7 +62,7 @@ def update_all(crop_type, T_min, T_max, time):
 #
 # This function calculates the fraction of PHU accumulated up to and including
 # today. The equations used for this part can be found in
-# "pseudocode_crop" section 2.B.1
+# "pseudocode_crop" C.2.B.1
 #
 def calculate_frPHU(crop_type, T_min, T_max, time):
 
@@ -84,7 +84,7 @@ def calculate_frPHU(crop_type, T_min, T_max, time):
 
 #
 # Calculates minimum heat unit temperature on current day.
-# "pseudocode_crop" section 2.A.3
+# "pseudocode_crop" C.2.A.3
 #
 def calc_T_HU_min(crop_type, T_min):
     if T_min < crop_type.T_base_min:
@@ -95,7 +95,7 @@ def calc_T_HU_min(crop_type, T_min):
 
 #
 # Calculates maximum heat unit temperature on current day.
-# "pseudocode_crop" section 2.A.4
+# "pseudocode_crop" C.2.A.4
 #
 def calc_T_HU_max(crop_type, T_max):
     if T_max > crop_type.T_base_max:
@@ -106,13 +106,13 @@ def calc_T_HU_max(crop_type, T_max):
 
 #
 # Calculates available heat units on current day.
-# # "pseudocode_crop" section 2.A.1/2
+# # "pseudocode_crop" C.2.A.1/2
 #
 def calc_HU(crop_type, T_HU_min, T_HU_max):
     # 2.A.2
     T_HU = (T_HU_min + T_HU_max) / 2
 
-    # "pseudocode_crop" section 2.A.1
+    # "pseudocode_crop" C.2.A.1
     if T_HU < crop_type.T_base_min:
         return 0.0
     else:
