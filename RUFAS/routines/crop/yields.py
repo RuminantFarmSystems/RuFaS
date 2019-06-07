@@ -143,7 +143,7 @@ def calc_yield_actual(crop_type):
 # "pseudocode_crop" section 10.G.1/2
 #
 def calc_nutrient_removal(crop_type):
-    crop_type.yield_N = crop_type.fr_N * crop_type.yield_actual  # TODO should be yield_max??
+    crop_type.yield_N = crop_type.fr_N * crop_type.yield_actual
     crop_type.yield_P = crop_type.fr_P * crop_type.yield_actual
 
 

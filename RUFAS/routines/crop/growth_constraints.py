@@ -144,7 +144,7 @@ def calc_nstrs(crop_type):
 #
 def calc_phi_N(crop_type):
     if crop_type.bio_N_opt == 0:
-        return 300  # TODO not in pseudocode
+        return 300
     else:
         phi_n = 200 * ((crop_type.bio_N / crop_type.bio_N_opt) - 0.5)
         return max(0, phi_n)
