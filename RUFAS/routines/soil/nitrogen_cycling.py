@@ -161,7 +161,7 @@ def update_all(soil, weather, time):
 # Helper method used to calculate the temperature factor used to
 # calculate nitrification, volatilization, denitrification, and mineralization
 # for each layer
-# "pseudocode_soil" 4.B.1
+# "pseudocode_soil" S.4.B.1
 #
 def calc_tempFactors(soil):
     for layer in soil.listOfSoilLayers:
@@ -177,7 +177,7 @@ def calc_tempFactors(soil):
 # Helper method used to calculate the water factor used to
 # calculate nitrification, volatilization, denitrification, and mineralization
 # for each layer
-# "pseudocode_soil" 4.B.2
+# "pseudocode_soil" S.4.B.2
 #
 def calc_waterFactors(soil):
     for layer in soil.listOfSoilLayers:
@@ -197,7 +197,7 @@ def calc_waterFactors(soil):
 #
 # Nitrification is the transfer of NH4 to NO3, this method determines when that
 # transfer occurs and calculates the magnitude of that transfer.
-# "pseudocode_soil" 4.B
+# "pseudocode_soil" S.4.B
 #
 def nitrification_volatilization(soil):
     for x in range(0, len(soil.listOfSoilLayers)):
@@ -208,7 +208,7 @@ def nitrification_volatilization(soil):
         waterFac = layer.waterFac
 
         # DepthFac is confused by the variable z_mid which is insufficiently defined in the pseudocode
-        # "pseudocode_soil" 4.B.3
+        # "pseudocode_soil" S.4.B.3
         if x == 0:
             z_mid = 5
         else:
@@ -217,7 +217,7 @@ def nitrification_volatilization(soil):
         exp_part = exp(4.706 - 0.0305 * z_mid)
         DepthFac = 1 - (z_mid / (z_mid + exp_part))
 
-        # "pseudocode_soil" 4.B.5
+        # "pseudocode_soil" S.4.B.5
         CECFac = 0.15
         VolatilReg = tempFac * DepthFac * CECFac
 
@@ -227,20 +227,23 @@ def nitrification_volatilization(soil):
         #
         NitrReg = 0
         if layer.temperature >= 5:
-            # "pseudocode_soil" 4.B.4
+            # "pseudocode_soil" S.4.B.4
             NitrReg = tempFac * waterFac
 
-        # "pseudocode_soil" 4.B.6
+        # "pseudocode_soil" S.4.B.6
         exp_part = exp(-NitrReg - VolatilReg)
         TotNitriVolatil = layer.NH4 * (1 - exp_part)
 
-        # "pseudocode_soil" 4.B.7
+        TotNitriVolatil = min(layer.NH4, TotNitriVolatil)
+        layer.NH4 -= TotNitriVolatil
+
+        # "pseudocode_soil" S.4.B.7
         FracNitr = 1 - exp(-NitrReg)
 
-        # "pseudocode_soil" 4.B.8
+        # "pseudocode_soil" S.4.B.8
         FracVolatil = 1 - exp(-VolatilReg)
 
-        # "pseudocode_soil" 4.B.9/10
+        # "pseudocode_soil" S.4.B.9/10
         if FracNitr + FracVolatil == 0:
             Nitrification = 0
             Volatilization = 0
@@ -256,12 +259,11 @@ def nitrification_volatilization(soil):
         layer.totNitriVolatil = TotNitriVolatil
 
         layer.NO3 += Nitrification
-        layer.NH4 = max(0, layer.NH4 - TotNitriVolatil)
 
 
 #
 # Calculates/updates N lost in leaching, runoff, and erosion
-# "pseudocode_soil" 1.C
+# "pseudocode_soil" S.4.C
 #
 def leaching_runoff_erosion(soil):
     # prev_NO3_perc = 0
@@ -287,8 +289,6 @@ def leaching_runoff_erosion(soil):
         FC = layer.fcWater
         SAT = layer.satWater
 
-        Perc = layer.perc
-
         BD = layer.bulkDensity
         depth = layer.depth
 
@@ -303,24 +303,24 @@ def leaching_runoff_erosion(soil):
         #
         if layer.name == "Layer1":
 
-            # "pseudocode_soil" 4.C.1
+            # "pseudocode_soil" S.4.C.1
             runoff = soil.runoff
             w = runoff + SW
 
             if w == 0:
-                NO3Conc1 = 0
-                NH4Conc1 = 0
+                NO3RunoffConc = 0
+                NH4RunoffConc = 0
 
             else:
                 exp_part = exp(-w / SAT)
-                NO3Conc1 = layer.NO3 * (1 - exp_part) / w
-                NH4Conc1 = layer.NH4 * (1 - exp_part) / w
+                NO3RunoffConc = layer.NO3 * (1 - exp_part) / w
+                NH4RunoffConc = layer.NH4 * (1 - exp_part) / w
 
             Cr = 0.1
 
-            # "pseudocode_soil" 4.C.2
-            NO3Runoff = NO3Conc1 * Cr * runoff
-            NH4Runoff = NH4Conc1 * runoff
+            # "pseudocode_soil" S.4.C.2
+            NO3Runoff = NO3RunoffConc * Cr * runoff
+            NH4Runoff = NH4RunoffConc * runoff
 
             # it is important for the order of operations that the pools are
             # updated after each process and that those updated values are used
@@ -330,25 +330,28 @@ def leaching_runoff_erosion(soil):
             NH4Runoff = min(layer.NH4, NH4Runoff)
             layer.NH4 -= NH4Runoff
 
-            # "pseudocode_soil" 4.C.3
-            activeNConc = (100 * layer.activeN) / (BD * depth)
-            stableNConc = (100 * layer.stableN) / (BD * depth)
-            freshNConc = (100 * layer.topLayerFreshN / (BD * depth))
+            # "pseudocode_soil" S.4.C.3
+            activeNErosConc = (100 * layer.activeN) / (BD * depth)
+            stableNErosConc = (100 * layer.stableN) / (BD * depth)
+            freshNErosConc = (100 * layer.topLayerFreshN / (BD * depth))
+            NH4ErosConc = (100 * layer.NH4 / (BD * depth))
 
             Eros_activeN_loss = 0
             Eros_stableN_loss = 0
             Eros_freshN_loss = 0
+            Eros_NH4_loss = 0
 
             Sed = soil.sedimentYield
 
             if Sed > 0:
-                # "pseudocode_soil" 4.C.5
+                # "pseudocode_soil" S.4.C.5
                 ER = exp(1.21 - 0.16 * log(Sed * 1000))
 
-                # "pseudocode_soil" 4.C.4
-                Eros_activeN_loss = 0.001 * activeNConc * Sed * ER
-                Eros_stableN_loss = 0.001 * stableNConc * Sed * ER
-                Eros_freshN_loss = 0.001 * freshNConc * Sed * ER
+                # "pseudocode_soil" S.4.C.4
+                Eros_activeN_loss = 0.001 * activeNErosConc * Sed * ER
+                Eros_stableN_loss = 0.001 * stableNErosConc * Sed * ER
+                Eros_freshN_loss = 0.001 * freshNErosConc * Sed * ER
+                Eros_NH4_loss = 0.001 * NH4ErosConc * Sed * ER
 
             Eros_activeN_loss = min(layer.activeN, Eros_activeN_loss)
             layer.activeN -= Eros_activeN_loss
@@ -359,24 +362,32 @@ def leaching_runoff_erosion(soil):
             Eros_freshN_loss = min(layer.topLayerFreshN, Eros_freshN_loss)
             layer.topLayerFreshN -= Eros_freshN_loss
 
+            Eros_NH4_loss = min(layer.NH4, Eros_NH4_loss)
+            layer.NH4 -= Eros_NH4_loss
+
             #
             # the coefficient of extraction for leaching is calibrated to 1.0
             # for layer 1
             #
             Cl = 1.0
 
-        # "pseudocode_soil" 4.C.7
+        # "pseudocode_soil" S.4.C.6-8
+        Perc = layer.perc
         NO3Perc = 0
         NH4Perc = 0
         activePerc = 0
+
         if Perc > 0:
-            # "pseudocode_soil" 4.C.6
-            NO3Conc = layer.NO3 / (FC + Perc)
-            NH4Conc = layer.NH4 / (FC + Perc)
+            # "pseudocode_soil" S.4.C.6
+            NO3PercConc = layer.NO3 / (FC + Perc)
+            NH4PercConc = layer.NH4 / (FC + Perc)
+
+            # "pseudocode_soil" S.4.C.7
             activeConc = layer.activeN / (FC + Perc) / 50
 
-            NO3Perc = NO3Conc / Cl * Perc
-            NH4Perc = NH4Conc * Perc
+            # "pseudocode_soil" S.4.C.8
+            NO3Perc = NO3PercConc * Perc / Cl
+            NH4Perc = NH4PercConc * Perc
             activePerc = activeConc * Perc
 
         #
@@ -421,7 +432,7 @@ def leaching_update(soil):
 #
 # Calculates denitrification (the bacterial conversion of NO3 to gas under
 # anaerobic conditions).
-# "pseudocode_soil" 4.D
+# "pseudocode_soil" S.4.D
 #
 def denitrification(soil):
     for layer in soil.listOfSoilLayers:
@@ -432,7 +443,7 @@ def denitrification(soil):
 
         tempFac = layer.tempFac
 
-        # "pseudocode_soil" 4.D.1
+        # "pseudocode_soil" S.4.D.1
         DenitrN = 0
         if SW > FC:
             exp_part = exp(-deNrate * tempFac * OrgC)
@@ -446,7 +457,7 @@ def denitrification(soil):
 
 #
 # Calculates mineralization and decomposition processes for the nitrogen cycle.
-# "pseudocode_soil" 4.E
+# "pseudocode_soil" S.4.E
 #
 def mineralization_decomp(soil):
     minrate = 0.0003
@@ -455,7 +466,7 @@ def mineralization_decomp(soil):
         tempFac = layer.tempFac
         waterFac = layer.waterFac
 
-        # "pseudocode_soil" 4.E.1
+        # "pseudocode_soil" S.4.E.1
         nMinAct = 0
         if layer.temperature > 0:
             nMinAct = minrate * ((tempFac * waterFac) ** 0.5) * activeN
@@ -475,7 +486,7 @@ def mineralization_decomp(soil):
             BD = layer.bulkDensity
             depth = layer.bottomDepth
 
-            # "pseudocode_soil" 4.E.2
+            # "pseudocode_soil" S.4.E.2
             CN = 0
             if FreshN + NO3 > 0:
                 CN = (0.58 * res) / (FreshN + NO3)
@@ -486,27 +497,27 @@ def mineralization_decomp(soil):
             freshOrgP = (res * 0.0003) * BD * depth / 100
             labileP = layer.labileP
 
-            # "pseudocode_soil" 4.E.3
+            # "pseudocode_soil" S.4.E.3
             CP = 0
             if freshOrgP + labileP > 0:
                 CP = (0.58 * res) / (freshOrgP + labileP)
 
             minCoeff = 0.05
 
-            # "pseudocode_soil" 4.E.5
+            # "pseudocode_soil" S.4.E.5
             term1 = exp(-0.693 * (CN - 25) / 25)
             term2 = exp(-0.693 * (CP - 200) / 200)
             term3 = 1.0
 
             resComp = min(term1, term2, term3)
 
-            # "pseudocode_soil" 4.E.4
+            # "pseudocode_soil" S.4.E.4
             Decay = minCoeff * resComp * ((tempFac * waterFac) ** 0.5)
 
             # decay rate used in calculating residue for crop
             soil.decayRate = Decay
 
-            # "pseudocode_soil" 4.E.6
+            # "pseudocode_soil" S.4.E.6
             FreshMin = Decay * FreshN
 
             FreshMin = min(layer.topLayerFreshN, FreshMin)
@@ -519,7 +530,7 @@ def mineralization_decomp(soil):
 #
 # Nitrogen is allowed to move between the Active and Stable organic pools,
 # representing humus mineralization. This method accounts for that process
-# "pseudocode_soil" 4.F
+# "pseudocode_soil" S.4.F
 #
 def humus_mineralization(soil):
     for layer in soil.listOfSoilLayers:
@@ -527,7 +538,7 @@ def humus_mineralization(soil):
         stableN = layer.stableN
         FracN = 0.02
 
-        # "pseudocode_soil" 4.F.1
+        # "pseudocode_soil" S.4.F.1
         Ntrans = 0.00001 * (activeN * ((1 / FracN) - 1) - stableN)
 
         layer.activeN -= Ntrans
