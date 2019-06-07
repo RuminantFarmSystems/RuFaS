@@ -76,9 +76,9 @@ from math import exp, log
 #
 def update_all(soil, crop, weather, time):
 
-    calc_Tsoil(soil, weather, time)
-
     calc_Tsurf(soil, crop, weather, time)
+
+    calc_Tsoil(soil, weather, time)
 
 
 #
