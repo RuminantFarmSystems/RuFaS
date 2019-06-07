@@ -123,7 +123,8 @@ This module needs the following inputs in order to operate correctly:
 
                 ...
 
-        CropPUptake TODO: Finish description. I am unclear as to what this is
+        The following are attributes of Phosphorus Uptake.
+        TODO: This will likely be removed after implementing P_Cycling
 
         "CropPUptake":
 
