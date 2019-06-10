@@ -9,7 +9,7 @@ Author(s): Militsa Sotirova, militsasotirova@gmail.com
 ################################################################################
 
 
-def manure_calculations(ration_formulation, BW, DIM, mPrt):
+def manure_calculations(ration_formulation, feed, BW, DIM, mPrt):
     '''
     Calculates inputs for manure module with information from the ration formulation. 
     Equations referenced are from pseudocode.
@@ -23,9 +23,10 @@ def manure_calculations(ration_formulation, BW, DIM, mPrt):
                 'feed2': amount of feed 2 in kg,
                 ...
                 'feedn': amount of feed n in kg,
-                'status': 'Optimal'
+                'status': 'Optimal',
                 'objective': price
             }
+        feed: instance of the Feed class
         BW: body weight, kg (from animal input)
         DIM: days in milk, d (from animal input)
         mPrt: milk protein, % of milk (from animal input)
@@ -61,17 +62,17 @@ def manure_calculations(ration_formulation, BW, DIM, mPrt):
     For the nutrient compositions:
     Let the CP content of A be 80%, of B be 40%.
     Then the CP content of the diet is (10 * 0.8 + 15 * 0.4) / (10 + 15) = 56% in DM basis.
-    Similarly for ADF, LIG, Ash, and NDF.
+    Similarly for ADF, LIG, Ash, and NDF.   
     '''
     DMI = 0
-    total_diet = 0 # in kg
+    total_diet = 0  # in kg
     ADF_diet_content = 0 
     CP_diet_content = 0
     LIG_diet_content = 0
     Ash_diet_content = 0
     NDF_diet_content = 0
     for key in ration_formulation:
-        if key in feed.available_feed_names: # since not every key in the ration_formulation dictionary refers to a feed
+        if key in feed.available_feed_names:  # since not every key in the ration_formulation dictionary refers to a feed
             # percentages of the DM of each nutrient
             DM_feed_content = 0.01 * feed.available_feeds[key]['DM']
             ADF_feed_content = 0.01 * feed.available_feeds[key]['ADF_DM']
@@ -97,14 +98,14 @@ def manure_calculations(ration_formulation, BW, DIM, mPrt):
             LIG_diet_content += LIG_feed_amount
             Ash_diet_content += Ash_feed_amount
             NDF_diet_content += NDF_feed_amount
-            
-    # divide to find total percentages
-    DM = DMI / total_diet
-    ADF = ADF_diet_content / DMI
-    CP = CP_diet_content / DMI
-    LIG = LIG_diet_content / DMI
-    Ash = Ash_diet_content / DMI
-    NDF = NDF_diet_content / DMI
+    
+    # to find total percentages
+    DM = DMI / total_diet * 100
+    ADF = ADF_diet_content / DMI * 100
+    CP = CP_diet_content / DMI * 100
+    LIG = LIG_diet_content / DMI * 100
+    Ash = Ash_diet_content / DMI * 100
+    NDF = NDF_diet_content / DMI * 100
                 
     # Faecal water, kg (Eq 1.2)
     F_water = 1.987 * DMI + 0.348 * ADF - 0.412 * CP - 0.074 * DM - 0.0057 * DIM
@@ -122,8 +123,8 @@ def manure_calculations(ration_formulation, BW, DIM, mPrt):
     # Nitrogen in liquid and solid manure, g (Eq 2.1)
     MN = F_N + U_N
     
-    # Organic matter intake, kg
-    OMI = DMI * (1 - Ash)
+    #Organic matter intake, kg
+    OMI = DMI - Ash_diet_content
     # Degradable volatile solids, g (Eq 3.1)
     VSd = (-1.017 + 0.364 * OMI + 0.029 * NDF - 0.023 * CP) * 1000
     
@@ -134,6 +135,29 @@ def manure_calculations(ration_formulation, BW, DIM, mPrt):
     U = (-1.16 + 0.86 * (U_N / U_E)) / 28
     
     # Total ammoniacal nitrogen concentration in the manure slurry, mol/L (Eq 6.1)
-    TAN_s = (-162.4 * (U ** 2) + 96.4 * U) / 100 
+    TAN_s = (-162.4 * U * U + 96.4 * U) / 100 
     
     return U, TAN_s, MN, Mkg, VSd, VSnd
+
+
+def test_manure(feed):
+    ration_formulation = {    
+                'Corn_grain': 0,
+                'Legume_hay': 13.5588,
+                'Cotton_seed': 6.3620,
+                'Roasted_soybean': 2.3964,
+                'Rye_hay': 0,
+                'status': 'Optimal',
+                'objective': 4.5756
+            }
+    BW = 650
+    DIM = 100
+    mPrt = 0.032
+    U, TAN_s, MN, Mkg, VSd, VSnd = manure_calculations(ration_formulation, feed, BW, DIM, mPrt)
+    print('U = ', U, '\t expected: ', 0.340)
+    print('TAN_s = ', TAN_s, '\t expected: ', 0.14)
+    print('MN = ', MN, '\t expected: ', 532.407)
+    print('Mkg = ', Mkg, '\t expected: ', 70.792)
+    print('VSd = ', VSd, '\t expected: ', 7087.413)
+    print('VSnd = ', VSnd, '\t expected: ', 859.390)
+    print()
