@@ -152,7 +152,7 @@ def test_manure(feed):
             }
     BW = 650
     DIM = 100
-    mPrt = 0.032
+    mPrt = 3.2
     U, TAN_s, MN, Mkg, VSd, VSnd = manure_calculations(ration_formulation, feed, BW, DIM, mPrt)
     print('U = ', U, '\t expected: ', 0.340)
     print('TAN_s = ', TAN_s, '\t expected: ', 0.14)
