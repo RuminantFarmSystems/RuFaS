@@ -116,24 +116,24 @@ def manure_calculations(ration_formulation, BW, DIM, mPrt):
     Mkg = F_water + F_DM + U_E
     
     # Faecal nitrogen, g (Eq 2.2)
-    F_N = -0.0368 + 0.0096 * DMI + 0.0022 * CP + 0.0034 * LIG - 0.000043 * BW
+    F_N = (-0.0368 + 0.0096 * DMI + 0.0022 * CP + 0.0034 * LIG - 0.000043 * BW) * 1000
     # Urine nitrogen, g (Eq 2.3)
-    U_N = -0.2837 + 0.0068 * DMI + 0.0155 * CP + 0.00013 * DIM + 0.000092 * BW
+    U_N = (-0.2837 + 0.0068 * DMI + 0.0155 * CP + 0.00013 * DIM + 0.000092 * BW) * 1000
     # Nitrogen in liquid and solid manure, g (Eq 2.1)
     MN = F_N + U_N
     
     # Organic matter intake, kg
     OMI = DMI * (1 - Ash)
     # Degradable volatile solids, g (Eq 3.1)
-    VSd = -1.017 + 0.364 * OMI + 0.029 * NDF - 0.023 * CP
+    VSd = (-1.017 + 0.364 * OMI + 0.029 * NDF - 0.023 * CP) * 1000
     
     # Nondegradable volatile solids, g (Eq 4.1)
-    VSnd = -0.184 + 0.038 * OMI + 0.007 * NDF - 0.001 * CP
+    VSnd = (-0.184 + 0.038 * OMI + 0.007 * NDF - 0.001 * CP) * 1000
     
     # Urea concentration, mol/L (Eq 5.1)
     U = (-1.16 + 0.86 * (U_N / U_E)) / 28
     
     # Total ammoniacal nitrogen concentration in the manure slurry, mol/L (Eq 6.1)
-    TAN_s = -5.8 * U + 3.4
+    TAN_s = (-162.4 * (U ** 2) + 96.4 * U) / 100 
     
     return U, TAN_s, MN, Mkg, VSd, VSnd
