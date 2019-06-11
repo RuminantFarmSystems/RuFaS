@@ -91,7 +91,7 @@ class CropSummary(BaseReportHandler):
     def daily_update(self, state, weather, time):
         '''Stores the daily values that need to be printed in the report.'''
 
-        cropType = state.crop.crops_list["corn"]
+        cropType = state.crop.current_crop
         # Copy daily output values here
         self.year.append(time.cal_year)
         self.julianDay.append(time.day)
