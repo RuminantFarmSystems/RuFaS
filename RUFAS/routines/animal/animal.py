@@ -115,7 +115,6 @@ class Animal():
                 self.housing, feed.nutrients_in_LP, milk_production_multiplier
             )
             formulated_ration = ration.optimize(feed, rqmts)
-            
             #
             # Ideally, we will use status == 'Infeasible', but due to bugs in
             # the GLPK routine outputting an 'Undefined' in some infeasible
@@ -123,7 +122,6 @@ class Animal():
             # accordingly
             #
             infeasible = (formulated_ration['status'] != 'Optimal')
-            
 
         self.ration = formulated_ration
         self.ration['MP_reduction'] = milk_production_multiplier
