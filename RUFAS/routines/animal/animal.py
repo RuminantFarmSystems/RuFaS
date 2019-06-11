@@ -7,7 +7,7 @@ Author(s): Kass Chupongstimun, kass_c@hotmail.com
 '''
 ################################################################################
 
-from RUFAS.routines.animal import ration, Herd, manure_excretion
+from RUFAS.routines.animal import ration, Herd
 
 #-------------------------------------------------------------------------------
 # Function: daily_animal_routine
@@ -110,7 +110,6 @@ class Animal():
             # values here are requirements (on the RHS of constraint eq)
             # milk_production_multiplier is passed as scaling factor
             #
-            '''
             rqmts = ration.calculate_rqmts(
                 self.parity, self.WIM, self.AMF, self.BWR, self.base_NED,
                 self.housing, feed.nutrients_in_LP, milk_production_multiplier
@@ -124,21 +123,10 @@ class Animal():
             # accordingly
             #
             infeasible = (formulated_ration['status'] != 'Optimal')
-            '''
-            formulated_ration = {    
-                'Corn_grain': 0,
-                'Legume_hay': 13.5588,
-                'Cotton_seed': 6.3620,
-                'Roasted_soybean': 2.3964,
-                'Rye_hay': 0,
-                'status': 'Optimal',
-                'objective': 4.5756
-            }
-            infeasible = False
+            
 
         self.ration = formulated_ration
         self.ration['MP_reduction'] = milk_production_multiplier
-        manure_excretion.test_manure(feed)
 
     #---------------------------------------------------------------------------
     # Method: end_ration_interval
