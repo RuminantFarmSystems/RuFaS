@@ -260,7 +260,7 @@ def calc_Fsand(soil):
 # "pseudocode_soil" S.3.A.14
 #
 def calc_C(soil, crop):
-    bio_AG = crop.crops_list["corn"].bio_AG  # TODO: Crop Flag
+    bio_AG = crop.current_crop.bio_AG
     residue = soil.residue
     Cover = bio_AG + residue
 
