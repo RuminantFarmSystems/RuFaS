@@ -170,5 +170,5 @@ def calc_phi_P(crop_type):
     if crop_type.bio_P_opt == 0:
         return 300
     else:
-        return 200 * ((crop_type.bio_P / crop_type.bio_P_opt) - 0.5)
-
+        phi_p = 200 * ((crop_type.bio_P / crop_type.bio_P_opt) - 0.5)
+        return max(0, phi_p)
