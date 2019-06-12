@@ -90,8 +90,8 @@ def manure_calculations(ration_formulation, feed, BW, DIM, mPrt):
             NDF_feed_amount = NDF_feed_content * DM_feed_amount
             
             # add to running sums
-            feed_amount = DM_feed_amount / DM_feed_content
-            total_diet += feed_amount
+            as_fed_feed_amount = DM_feed_amount / DM_feed_content
+            total_diet += as_fed_feed_amount
             DMI += DM_feed_amount
             ADF_diet_content += ADF_feed_amount
             CP_diet_content += CP_feed_amount
