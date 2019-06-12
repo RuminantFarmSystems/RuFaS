@@ -294,7 +294,7 @@ class Crop():
         def calculate_start_growth_date(self, weather, time):
             yearly_T_avg = weather.T_avg[time.year - 1]
             if time.year == 1 and time.day > self.planting_date:
-                self.start_date = self.harvest_date
+                self.start_date = self.harvest_date + 1
 
             elif self.crop_type == "annual":
                 self.start_date = self.planting_date
