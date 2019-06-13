@@ -1,401 +1,475 @@
 ################################################################################
-'''
+"""
 RUFAS: Ruminant Farm Systems Model
 File name: classes.py
 Description: Contains top level class definitions for RUFAS
 Author(s): Kass Chupongstimun, kass_c@hotmail.com
-		   Jit Patil, spatil5@wisc.edu
-'''
+           Jit Patil, spatil5@wisc.edu
+           William Donovan, wmdonovan@wisc.edu
+           Jacob Johnson, jacob8399@gmail.com
+"""
 ################################################################################
 
 import csv
-import math
 
 from RUFAS import util
 from RUFAS import errors
 from RUFAS.routines import Soil, Animal, Feed, Crop
 
-#-------------------------------------------------------------------------------
+
+# -------------------------------------------------------------------------------
 # Class: State
-#-------------------------------------------------------------------------------
-class State():
-	'''Contains information about the current state of the farm.
+# -------------------------------------------------------------------------------
+class State:
+    """Contains information about the current state of the farm.
 
-	The state object represents the state of the farm at a certain instant in
-	time. It contains information arranged in different objects by what routine
-	they (mostly) relate to. The state object (or some of its sub-objects) will
-	be passed to routines during the simulation, which may access the
-	information in the different sub-objects in the state to use in its
-	calculations.
-	The state object should ONLY store persistent data that WILL be used in
-	future calculations and/or reports.
-	DO NOT store immediate operands or values that do not NEED to be accessed in
-	the future or in an output report in the state object.
-	'''
+    The state object represents the state of the farm at a certain instant in
+    time. It contains information arranged in different objects by what routine
+    they (mostly) relate to. The state object (or some of its sub-objects) will
+    be passed to routines during the simulation, which may access the
+    information in the different sub-objects in the state to use in its
+    calculations.
+    The state object should ONLY store persistent data that WILL be used in
+    future calculations and/or reports.
+    DO NOT store immediate operands or values that do not NEED to be accessed in
+    the future or in an output report in the state object.
+    """
 
-	def __init__(self, data, config):
-		'''
-		TODO: Add DocString
-		'''
+    def __init__(self, data, config):
+        self.soil = Soil(data['soil'], config)
+        self.animal = Animal(data['animal'])
+        self.feed = Feed(data['feed'])
+        self.crop = Crop(data['crop'])
 
-		self.soil = Soil(data['soil'], config)
-		self.animal = Animal(data['animal'])
-		self.feed = Feed(data['feed'])
-		self.crop = Crop(data['crop'])
+    # self.fieldOps = FieldOps()
+    # self.herd = Herd()
+    # self.housing = Housing()
+    # self.manure = Manure()
 
-		#self.fieldOps = FieldOps()
-		#self.herd = Herd()
-		#self.housing = Housing()
-		#self.manure = Manure()
+    # ---------------------------------------------------------------------------
+    # Method: annual_reset
+    # ---------------------------------------------------------------------------
+    def annual_reset(self):
+        """Annual Reset"""
 
-	#---------------------------------------------------------------------------
-	# Method: annual_reset
-	#---------------------------------------------------------------------------
-	def annual_reset(self):
-		'''Annual Reset'''
+        self.soil.annual_reset()
+        self.animal.annual_reset()
+        self.feed.annual_reset()
+        self.crop.annual_reset()
 
-		self.soil.annual_reset()
-		self.animal.annual_reset()
-		self.crop.annual_reset()
-		self.feed.annual_reset()
+    # self.fieldOps.annual_reset()
+    # self.herd.annual_reset()
+    # self.housing.annual_reset()
+    # self.manure.annual_reset()
 
-		#self.fieldOps.annual_reset()
-		#self.herd.annual_reset()
-		#self.housing.annual_reset()
-		#self.manure.annual_reset()
 
-#-------------------------------------------------------------------------------
+# -------------------------------------------------------------------------------
 # Class: Config
-#-------------------------------------------------------------------------------
-class Config():
-	'''Contains configuration information of the simulation'''
+# -------------------------------------------------------------------------------
+class Config:
+    """Contains configuration information of the simulation"""
 
-	def __init__(self, data):
-		'''
-		TODO: Add DocString
-		'''
-		
-		self.startYear = data['StartYear']
-		self.endYear = data['EndYear']
-		self.duration = self.endYear - self.startYear + 1
-		
-		if self.duration <= 0:
-			raise errors.JSONfileData("CONFIG",
-								"\tSimulation Duration must be at least 1 year")
+    def __init__(self, data, weather_path_str):
 
-		self.output_dir = data['output_dir']
+        # gets a start/end date in the format year:julian-day. That way the program
+        # can start in the middle of the year
+        self.start_date = data['StartDate'].split(':')
+        self.end_date = data['EndDate'].split(':')
+        self.start_year = int(self.start_date[0])
+        self.end_year = int(self.end_date[0])
+        self.start_day = int(self.start_date[1])
+        self.end_day = int(self.end_date[1])
 
-#-------------------------------------------------------------------------------
+        year_length = 365
+        leap_year_length = 366
+
+        # read in the input csv file
+        weather_full_path = util.get_base_dir() / weather_path_str
+
+        if not weather_full_path.is_file():
+            raise errors.JSONfileData("WEATHER",
+                                      "\tWeather file specified does not exist")
+
+        with weather_full_path.open('r') as f:
+            readCSV = csv.reader(f, delimiter=',')
+
+            # keeps track of how many lines are in the weather file
+            line = 1
+            # sets the starting and ending weather dates
+            for row in readCSV:
+                if len(row) == 0:
+                    continue
+                if line == 2:
+                    w_start_year = int(row[0])
+                    w_start_day = int(row[1])
+                elif line > 2:
+                    w_end_year = int(row[0])
+                    w_end_day = int(row[1])
+                line += 1
+
+            # expected size of the csv file from start to end
+            # to determine if the weather file has any gaps
+            expected_weather_size = 0
+            if is_leap_year(w_start_year):
+                expected_weather_size += leap_year_length + 1 - w_start_day
+            else:
+                expected_weather_size += year_length + 1 - w_start_day
+
+            for x in range(w_start_year + 1, w_end_year):
+                if is_leap_year(x):
+                    expected_weather_size += leap_year_length
+                else:
+                    expected_weather_size += year_length
+
+            expected_weather_size += w_end_day
+
+            # compares actual size of the file to expected size
+            if line - 1 != expected_weather_size + 1:
+                print("Start and end dates of the Weather CSV file do not match the size.")
+                if line - 1 > expected_weather_size + 1:
+                    print("There may be duplicate days in: " + weather_full_path.name)
+                else:
+                    print("There may be missing days in: " + weather_full_path.name)
+                print("\tWeather File Size: " + str(line - 1)
+                      + "\n\tExpected size: " + str(expected_weather_size + 1) + "\n")
+
+        self.w_start_year = w_start_year
+        self.w_start_day = w_start_day
+        self.w_end_year = w_end_year
+        self.w_end_day = w_end_day
+
+        # error statements if the start date is not within the weather data
+        # special error statements for start and end years
+        if self.start_year == w_start_year and self.start_day < w_start_day \
+                or self.start_year < w_start_year:
+            print("Start date invalid. Starting simulation on "
+                  + str(w_start_year) + ":" + str(w_start_day))
+            self.start_day = w_start_day
+            self.start_year = w_start_year
+        if self.end_year == w_end_year and self.end_day > w_end_day \
+                or self.end_year > w_end_year:
+            print("End date invalid. Ending simulation on "
+                  + str(w_end_year) + ":" + str(w_end_day))
+            self.end_day = w_end_day
+            self.end_year = w_end_year
+
+        # start date errors if the simulation starts before day 1 or after
+        # the last possible day of the year
+        if self.start_day < 1:
+            print("Start date invalid. Starting simulation on "
+                  + str(self.start_year) + ":" + str(1))
+            self.start_day = 1
+        if not is_leap_year(self.start_year):
+            if self.start_day > year_length:
+                print("Start date invalid. Starting simulation on "
+                      + str(self.start_year) + ":" + str(year_length))
+                self.start_day = year_length
+        else:
+            if self.start_day > leap_year_length:
+                print("Start date invalid. Starting simulation on "
+                      + str(self.start_year) + ":" + str(leap_year_length))
+                self.start_day = leap_year_length
+
+        # end date errors if the simulation ends before day 1 or after
+        # the last possible day of the year
+        if self.end_day < 1:
+            print("End date invalid. Ending simulation on "
+                  + str(self.end_year) + ":" + str(1))
+            self.end_day = 1
+        if not is_leap_year(self.end_year):
+            if self.end_day > year_length:
+                print("End date invalid. Ending simulation on "
+                      + str(self.end_year) + ":" + str(year_length))
+                self.end_day = year_length
+        else:
+            if self.end_day > leap_year_length:
+                print("End date invalid. Ending simulation on "
+                      + str(self.end_year) + ":" + str(leap_year_length))
+                self.end_day = leap_year_length
+
+        # checks that start date is not after end date
+        if self.start_year > self.end_year \
+                or (self.start_year == self.end_year and self.start_day > self.end_day):
+            raise errors.JSONfileData("CONFIG", "\tThe start date must be before the end date")
+
+        # constructs a calendar (years[]) of julian days and years, accounting for leap
+        # years and mid-year start/end dates
+        # each year in years starts with the calendar date at index zero and then
+        # is filled with the days of the year that the program will run
+        # the start and end dates will be specified by the user
+        # years is used as a correctly size template for each of the weather arrays
+        # in Weather()
+
+        self.years = []
+
+        for year in range(self.start_year, self.end_year + 1):
+
+            if year == self.start_year == self.end_year:
+                days = [None for _ in range(1, self.start_day)]
+                days += [_ for _ in range(self.start_day, self.end_day + 1)]
+            elif year == self.start_year:
+                days = [None for _ in range(1, self.start_day)]
+                if is_leap_year(year):
+                    days += (_ for _ in range(self.start_day, leap_year_length + 1))
+                else:
+                    days += (_ for _ in range(self.start_day, year_length + 1))
+            elif year == self.end_year:
+                days = [_ for _ in range(1, self.end_day + 1)]
+            else:
+                if is_leap_year(year):
+                    days = [_ for _ in range(1, leap_year_length + 1)]
+                else:
+                    days = [_ for _ in range(1, year_length + 1)]
+
+            self.years.append(days)
+
+        self.output_dir = data['output_dir']
+
+
+# -------------------------------------------------------------------------------
 # Class: Weather
-#-------------------------------------------------------------------------------
-class Weather():
-	'''Contains daily weather information stored in 2D lists
+# -------------------------------------------------------------------------------
+class Weather:
+    """
+    Contains daily weather information stored in 2D lists
+    Data lists are in the format Data[year][julian_day].
+    """
 
-	Data lists are in the format Data[year][julian_day].
-	'''
+    def __init__(self, weather_path_str, years, w_start_year, w_start_day, start_year, start_day):
 
-	def __init__(self, weather_path_str, duration):
+        # initialize data sets
+        self.rainfall = []
+        self.T_max = []
+        self.T_min = []
+        self.T_avg = []
+        self.biomass = []
+        self.radiation = []
+        self.manureN = []
+        self.T_avg_annual = []
 
-		#
-		# Weather Data in 2D lists -> [year][julianDay]
-		#
-		self.rainfall = [[0 for _ in range(365)]for _ in range(duration)]
-		self.T_max = [[0 for _ in range(365)] for _ in range(duration)]
-		self.T_min = [[0 for _ in range(365)] for _ in range(duration)]
-		self.T_avg = [[0 for _ in range(365)] for _ in range(duration)]
-		self.biomass = [[0 for _ in range(365)]for _ in range(duration)]
-		self.radiation = [[0 for _ in range(365)]for _ in range(duration)]
-		self.addedN = [[0 for _ in range(365)]for _ in range(duration)]
-		
-		self.evaporation = [[0 for _ in range(365)]for _ in range(duration)]
-		self.lCows = [[0 for _ in range(365)]for _ in range(duration)]
-		self.dCows = [[0 for _ in range(365)]for _ in range(duration)]
-		self.heifer = [[0 for _ in range(365)]for _ in range(duration)]
-		self.calf = [[0 for _ in range(365)]for _ in range(duration)]
-		self.beef = [[0 for _ in range(365)]for _ in range(duration)]
-		self.beefCalf = [[0 for _ in range(365)]for _ in range(duration)]
+        self.evaporation = []
+        self.lCows = []
+        self.dCows = []
+        self.heifer = []
+        self.calf = []
+        self.beef = []
+        self.beefCalf = []
 
-		rainfallData = []
-		tMaxData = []
-		tMinData = []
-		tAvgData = []
-		bioMassData = []
-		radiationData = []
-		addedNData = []
-		
-		evaporationData = []
-		lCowsData = []
-		dCowsData = []
-		heiferData = []
-		calfData = []
-		beefData = []
-		beefCalfData = []
+        year_length = 365
+        leap_year_length = 366
 
-		weather_full_path = util.get_base_dir() / weather_path_str
+        # calculate the number of days between the beginning of
+        # the weather file and the next year
+        if is_leap_year(w_start_year):
+            w_day_offset = leap_year_length - w_start_day
+        else:
+            w_day_offset = year_length - w_start_day
 
-		if not weather_full_path.is_file():
-			raise errors.JSONfileData("WEATHER",
-									  "\tWeather file specified does not exist")
+        # calculates the amount of days between the start day of the weather
+        # file and the start day of the simulation
+        if start_year == w_start_year:
+            days_to_start = start_day - w_start_day
+        elif start_year == w_start_year + 1:
+            days_to_start = w_day_offset + start_day
+        else:
+            days_to_start = w_day_offset + start_day
+            temp_year = w_start_year + 1
+            while temp_year < start_year:
+                if is_leap_year(temp_year):
+                    days_to_start += leap_year_length
+                else:
+                    days_to_start += year_length
+                temp_year += 1
 
-		#
-		# Read data from CSV file
-		# Data read is in the format data[day]
-		# 1D list of length total number of days in the whole weather file
-		#
-		with weather_full_path.open('r') as f:
-			readCSV = csv.reader(f, delimiter=',')
+        # fill the weather arrays with zeros for the size of each year in years[]
+        for year in years:
+            self.rainfall.append([0 for _ in range(len(year))])
+            self.T_max.append([0 for _ in range(len(year))])
+            self.T_min.append([0 for _ in range(len(year))])
+            self.T_avg.append([0 for _ in range(len(year))])
+            self.biomass.append([0 for _ in range(len(year))])
+            self.radiation.append([0 for _ in range(len(year))])
+            self.manureN.append([0 for _ in range(len(year))])
 
-			currentRow = 0
-			for row in readCSV:
-				if currentRow != 0: # Skip the first row because first row contains column headers
-					# 1) Read rainfall data
+            # These are not currently inputs into the weather file. They may
+            # be/may have been at some point.
+            # self.evaporation.append([0 for _ in range(len(year))])
+            # self.lCows.append([0 for _ in range(len(year))])
+            # self.dCows.append([0 for _ in range(len(year))])
+            # self.heifer.append([0 for _ in range(len(year))])
+            # self.calf.append([0 for _ in range(len(year))])
+            # self.beef.append([0 for _ in range(len(year))])
+            # self.beefCalf.append([0 for _ in range(len(year))])
 
-					rainfallData.append(float(row[1]))
+        # read in the input csv file
+        weather_full_path = util.get_base_dir() / weather_path_str
 
-					# 2) Read max temperature data
-					tMaxData.append(float(row[2]))
+        if not weather_full_path.is_file():
+            raise errors.JSONfileData("WEATHER",
+                                      "\tWeather file specified does not exist")
 
-					# 3) Read min temperature data
-					tMinData.append(float(row[3]))
+        with weather_full_path.open('r') as f:
+            readCSV = csv.reader(f, delimiter=',')
 
-					# 4) Read avg temperature data
-					tAvgData.append(float(row[4]))
+            # this for loop takes the weather data and parses it into multiple
+            # 2D arrays [year][day] for different weather variables used by the
+            # module
+            current_row = 0
+            year = 0
+            counter = 0
+            day = start_day
+            skips = 0
+            offset = 1
+            for row in readCSV:
+                # limits weather data read in to the length of the simulation
+                if year > len(years) - 1:
+                    break
 
-					# 5) Read biomass data
-					bioMassData.append(float(row[5]))
+                # if a line is empty then skip it
+                if len(row) == 0:
+                    skips += 1
+                    continue
 
-					# 6) Read radiation data
-					radiationData.append(float(row[6]))
+                # sets a pointer to the start date of the simulation in the weather file
+                if counter < days_to_start:
+                    counter += 1
+                    continue
 
-					# 7) Added N Data
-					addedNData.append(float(row[7]))
+                # row 0 contains variable names
+                if current_row != 0:
+                    # try/except statement to catch faulty weather data
+                    try:
+                        # fill data at appropriate location
+                        self.rainfall[year][day - offset] = float(row[2])
+                        self.T_max[year][day - offset] = float(row[3])
+                        self.T_min[year][day - offset] = float(row[4])
+                        self.T_avg[year][day - offset] = float(row[5])
+                        self.biomass[year][day - offset] = float(row[6])
+                        self.radiation[year][day - offset] = float(row[7])
+                        self.manureN[year][day - offset] = float(row[8])
+                    except(IndexError, ValueError):
+                        # prints out each problematic row in the weather CSV file
+                        skips += 1
+                        if skips == 1:
+                            print("Weather CSV file has invalid data in: " + weather_full_path.name
+                                  + "\nInvalid rows that are skipped:")
+                        if skips <= 5:
+                            print("Row: " + str(current_row + skips + days_to_start) + "")
+                        continue
 
-					# # 8) Evaporation Data
-					# evaporationData.append(row[8])
-                    #
-					# # 9) Lactate Cows Data
-					# lCowsData.append(row[9])
-					#
-					# # 10) Dry Cows Data
-					# dCowsData.append(row[10])
-					#
-					# # 11) Heifer Data
-					# heiferData.append(row[11])
-					#
-					# # 12) Calf Data
-					# calfData.append(row[12])
-					#
-					# # 13) Beef Data
-					# beefData.append(row[13])
-					#
-					# # 8) Beef Calf Data
-					# beefCalfData.append(row[14])
+                    # iterate year counter accounting for leap years
+                    if day == len(years[year]):
+                        year += 1
+                        day = 0
 
-				currentRow += 1
+                    day += 1
 
-		# Make sure weather data length matchs simulation duration
-		weather_file_years = math.floor(currentRow / 365)
-		if weather_file_years < duration:
-			raise errors.JSONfileData("WEATHER",
-									  "\tWeather file contains " +
-									  str(weather_file_years) +
-									  "\n\tSimulation specifies " + str(duration) +
-									  " years")
-		#
-		# TODO: check for weather file length match with simulation duration
-		#
-		# Print out number of rows(days) read from CSV file
-		#print(str(currentRow - 1))
+                current_row += 1
 
-		#
-		# Put weather data into the format:
-		#    data[year][julian_day]
-		#
+            # prints if there are more than 5 skipped lines in order to
+            # prevent console clutter
+            if skips > 5:
+                print("Only printing first 5 invalid rows, there are " + str(skips)
+                      + " total invalid rows")
 
-		# 1) Update Rainfall in weather
-		for i in range(0, duration):
-			for j in range(0, 365):
-				if (i*365+j) >= len(rainfallData):
-					break
-				else:
-					self.rainfall[i][j] = rainfallData[i*365 + j]
+            # calculates T_avg_annual for each year
+            for i in range(len(years)):
+                avg = sum(self.T_avg[i]) / (len(years[i]))
+                self.T_avg_annual.append(avg)
 
-		# 2) Update Max Temperature in weather
-		for i in range(0, duration):
-			for j in range(0, 365):
-				if (i*365+j) >= len(tMaxData):
-					break
-				else:
-					self.T_max[i][j] = tMaxData[i * 365 + j]
 
-		# 3) Update Min Temperature in weather
-		for i in range(0, duration):
-			for j in range(0, 365):
-				if (i*365+j) >= len(tMinData):
-					break
-				else:
-					self.T_min[i][j] = tMinData[i * 365 + j]
-
-		# 4) Update Avg Temperature in weather
-		for i in range(0, duration):
-			for j in range(0, 365):
-				if (i*365+j) >= len(tAvgData):
-					break
-				else:
-					self.T_avg[i][j] = tAvgData[i * 365 + j]
-
-		# 5) Update biomass in weather
-		for i in range(0, duration):
-			for j in range(0, 365):
-				if (i*365+j) >= len(bioMassData):
-					break
-				else:
-					self.biomass[i][j] = bioMassData[i*365 + j]
-
-		# 6) Update radiation in weather
-		for i in range(0, duration):
-			for j in range(0, 365):
-				if (i*365+j) >= len(radiationData):
-					break
-				else:
-					self.radiation[i][j] = radiationData[i*365 + j]
-
-		# 7) Update addedN in weather
-		for i in range(0, duration):
-			for j in range(0, 365):
-				if (i*365+j) >= len(addedNData):
-					break
-				else:
-					self.addedN[i][j] = addedNData[i*365 + j]
-					
-		# 8) Update evaporation in weather
-		for i in range(0, duration):
-			for j in range(0, 365):
-				if (i*365+j) >= len(evaporationData):
-					break
-				else:
-					self.evaporation[i][j] = evaporationData[i*365 + j]
-
-		# 9) Update lactate cows in weather
-		for i in range(0, duration):
-			for j in range(0, 365):
-				if (i*365+j) >= len(lCowsData):
-					break
-				else:
-					self.lCows[i][j] = lCowsData[i*365 + j]
-					
-		# 10) Update dry cows in weather
-		for i in range(0, duration):
-			for j in range(0, 365):
-				if (i*365+j) >= len(dCowsData):
-					break
-				else:
-					self.dCows[i][j] = dCowsData[i*365 + j]
-					
-		# 11) Update heifer in weather
-		for i in range(0, duration):
-			for j in range(0, 365):
-				if (i*365+j) >= len(heiferData):
-					break
-				else:
-					self.heifer[i][j] = heiferData[i*365 + j]
-					
-		# 12) Update calf in weather
-		for i in range(0, duration):
-			for j in range(0, 365):
-				if (i*365+j) >= len(calfData):
-					break
-				else:
-					self.calf[i][j] = calfData[i*365 + j]
-					
-		# 13) Update beef in weather
-		for i in range(0, duration):
-			for j in range(0, 365):
-				if (i*365+j) >= len(beefData):
-					break
-				else:
-					self.beef[i][j] = beefData[i*365 + j]
-					
-		# 14) Update beef calf in weather
-		for i in range(0, duration):
-			for j in range(0, 365):
-				if (i*365+j) >= len(beefCalfData):
-					break
-				else:
-					self.beefCalf[i][j] = beefCalfData[i*365 + j]
-
-		self.T_avg_annual = []
-		for i in range(0, duration):
-			avg = sum(self.T_avg[i])/len(self.T_avg[i])
-			self.T_avg_annual.append(avg)
-
-#-------------------------------------------------------------------------------
 # Class: Time
-#-------------------------------------------------------------------------------
-class Time():
-	'''Contains information about the current time in the simulation
+# -------------------------------------------------------------------------------
+class Time:
+    """
+    This object is responsible for creating and tracking time in the simulation.
+    Time is currently represented as a year and day only.
+    """
 
-	This object is responsible for tracking time in the simulation
-	'''
+    def __init__(self, years, cal_year):
 
-	def __init__(self, duration):
+        self.cal_year = cal_year
+        self.years = years
+        self.year = 1  # Current Year
 
-		#self.day_in_months = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31]
+        # finds the first non-null day of the first year
+        for i in range(0, len(years[0])):
+            if years[0][i] is None:
+                continue
+            else:
+                self.day = years[0][i]
+                break
 
-		self.duration = duration # Simulation duration in years
-		self.day = 1  # Current Julian Day
-		self.year = 1  # Current Year
+    # ---------------------------------------------------------------------------
+    # Method: to_str
+    # ---------------------------------------------------------------------------
+    def to_str(self):
+        """Returns a string representation of the current time.
 
-	#---------------------------------------------------------------------------
-	# Method: to_str
-	#---------------------------------------------------------------------------
-	def to_str(self):
-		'''Returns a string representation of the current time.
+        Returns:
+            str: a String representation of the current time in the simulation
+                in the format "Year: <year> Day: <day>"
+        """
 
-		Returns:
-			str: a String representation of the current time in the simulation
-				in the format "Year: <year> Day: <day>"
-		'''
+        return "Year: {} Day: {}".format(self.year, self.day)
 
-		return "Year: {} Day: {}".format(self.year, self.day)
+    # ---------------------------------------------------------------------------
+    # Method: advance
+    # ---------------------------------------------------------------------------
+    def advance(self):
+        """Advances the time in the simulation by 1 day
+
+        Automatically detects end of months and years
+        """
+
+        if self.end_year():
+            self.day = 1
+            self.year += 1
+            self.cal_year += 1
+        else:
+            self.day += 1
+
+    # ---------------------------------------------------------------------------
+    # Method: end_year
+    # ---------------------------------------------------------------------------
+    def end_year(self):
+        """Returns a bool signifying the end of a year.
+
+        Returns:
+            bool: True if it is the end of a year, False otherwise
+        """
+
+        # if the day is > the length of the current year, then the year is over
+        return self.day > len(self.years[self.year - 1])
+
+    # -------------------------------------------------------------------------------
+    # Function: end_simulation
+    # -------------------------------------------------------------------------------
+    def end_simulation(self):
+        """Checks whether the simulation has ended
+
+        Returns:
+            bool: True if the simulation has ended, false otherwise
+        """
+
+        # midyear end date adjusted
+        if self.year > len(self.years):
+            return True
+        elif self.year == len(self.years):
+            return self.day > len(self.years[self.year - 1])
+
+        return False
 
 
-
-	#---------------------------------------------------------------------------
-	# Method: advance
-	#---------------------------------------------------------------------------
-	def advance(self):
-		'''Advances the time in the simulation by 1 day
-
-		Automatically detects end of months and years
-		'''
-
-		if self.end_year():
-			self.day = 1
-			self.year += 1
-		else:
-			self.day += 1
-
-	#---------------------------------------------------------------------------
-	# Method: end_year
-	#---------------------------------------------------------------------------
-	def end_year(self):
-		'''Returns a bool signifying the end of a year.
-
-		Returns:
-			bool: True if it is the end of a year, False otherwise
-		'''
-
-		return self.day > 365
-
-	#-------------------------------------------------------------------------------
-	# Function: end_simulation
-	#-------------------------------------------------------------------------------
-	def end_simulation(self):
-	    '''Checks whether the simulation has ended
-
-	    Returns:
-	        bool: True if the simulation has ended, false otherwise
-	    '''
-
-	    return self.year > self.duration
+#
+# Helper method determines if the given year is a leap year
+#
+def is_leap_year(year):
+    if year % 400 == 0:
+        return True
+    elif year % 100 == 0:
+        return False
+    elif year % 4 == 0:
+        return True
+    else:
+        return False
