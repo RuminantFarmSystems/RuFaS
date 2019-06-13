@@ -269,16 +269,15 @@
 
         "feed":
         {
-            "feed_library": "Inputs/first_feed_library.csv",
+            "feed_library": "Inputs/testing_ration_feedlib.csv",
 
             "available_feeds":
             [
-              "CG",
-              "PROT",
-              "UPROT",
-              "FAT",
-              5,
-              "HMC"
+              "Corn_grain",
+              "Legume_hay",
+              "Cotton_seed",
+              "Roasted_soybean",
+              "Rye_hay"
             ]
         }
     }
