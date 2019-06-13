@@ -1,4 +1,4 @@
-'''
+"""
 RUFAS: Ruminant Farm Systems Model
 
 File name: nitrogen_cycling.py
@@ -124,7 +124,7 @@ Soil values updated by calling update_all():
         stableN
 
 
-'''
+"""
 
 ###############################################################################
 

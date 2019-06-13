@@ -1,4 +1,4 @@
-'''
+"""
 RUFAS: Ruminant Farm Systems Model
 
 File name: soil_temp.py
@@ -64,7 +64,7 @@ Soil attribute definitions
 Soil values updated by calling update_all():
     Tsurf
     listOfSoilLayers.temperature
-'''
+"""
 ###############################################################################
 
 

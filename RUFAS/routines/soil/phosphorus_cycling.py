@@ -23,7 +23,7 @@ import math
 # Executes all the daily phosphorus cycling  routines
 #------------------------------------------------------------------------------
 def daily_phosphorus_cycling_routine(soil, time, weather, config):
-    '''
+    """
     Description:
         Executes all the daily phosphorus cycling routines.
 
@@ -32,7 +32,7 @@ def daily_phosphorus_cycling_routine(soil, time, weather, config):
         time: instance of the Time class
         weather: instance of the Weather class
         config: instance of the Config class
-    '''
+    """
     if time.year == 1 and time.day == 1:
         initializePhosphorusInputs(soil, time, weather, config)
         soilChem(soil)
@@ -45,7 +45,7 @@ def daily_phosphorus_cycling_routine(soil, time, weather, config):
 # Update attributes of soil phosphorus in preparation of following day
 #------------------------------------------------------------------------------
 def daily_phosphorus_update(soil, time, weather):
-    '''
+    """
     Description:
         Update attributes of soil phosphorus in preparation of the following day.
 
@@ -53,7 +53,7 @@ def daily_phosphorus_update(soil, time, weather):
         soil: instance of the Soil class
         time: instance of the Time class
         weather: instance of the Weather class
-    '''
+    """
     pass
 
 #------------------------------------------------------------------------------
@@ -66,7 +66,7 @@ def daily_phosphorus_update(soil, time, weather):
 # pools. All units are KG or HA.
 #------------------------------------------------------------------------------
 def manure(soil, time):
-    '''
+    """
     Description:
         This subroutine calculates the number of plops added per day and the amount of TP,
         WIP, and WOP added in manure. Adds P to surface manure pool, and updates cumulative
@@ -75,7 +75,7 @@ def manure(soil, time):
     Args:
         soil: instance of the Soil class
         time: instance of the Time class
-    '''
+    """
     for x in range(0, len(soil.manureApplications)):
         if(time.day == soil.manureApplications[x].appDay and
                             time.year == soil.manureApplications[x].appYear):
@@ -99,7 +99,7 @@ def manure(soil, time):
 # adds P to surface manure pools. All units are KG or HA
 #------------------------------------------------------------------------------
 def fertilizer(soil, time):
-    '''
+    """
     Description:
         This subroutine calculates P added in fertilizer, adds fertilizer P to the
         surface pool, and updates cumulative fertalizer P added during the model run
@@ -110,7 +110,7 @@ def fertilizer(soil, time):
     Args:
         soil: instance of the Soil class
         time: instance of the Time class
-    '''
+    """
     for x in range(0, len(soil.fertilizerApplications)):
         if(time.day == soil.fertilizerApplications[x].appDay and
            time.year == soil.fertilizerApplications[x].appYear):
@@ -151,13 +151,13 @@ def fertilizer(soil, time):
 # This subroutine initializes soil chemical properties
 #------------------------------------------------------------------------------
 def soilChem(soil):
-    '''
+    """
     Description:
         This subroutine initializes soil chemical properties.
 
     Args:
         soil: instance of the Soil class
-    '''
+    """
     for x in range(0, len(soil.listOfSoilLayers)):
         labileP = soil.listOfSoilLayers[x].labileP
         psp = soil.listOfSoilLayers[x].psp
@@ -180,7 +180,7 @@ def soilChem(soil):
 # Initialize phosphorus variable on at the beginning of the simulation
 #------------------------------------------------------------------------------
 def initializePhosphorusInputs(soil, time, weather, config):
-    '''
+    """
     Description:
         Initializes the phosphorus variable at the beginning of the simulation
 
@@ -189,7 +189,7 @@ def initializePhosphorusInputs(soil, time, weather, config):
         time: instance of the Time class
         weather: instance of the Weather class
         config: instance of the Config class
-    '''
+    """
     uptake(soil.pUptake, soil, config)
 
     for x in range(0, len(soil.listOfSoilLayers)):
@@ -312,7 +312,7 @@ def initializePhosphorusInputs(soil, time, weather, config):
 # Initilaize crop phosphorus uptake array
 #------------------------------------------------------------------------------
 def uptake(pUptake, soil, config):
-    '''
+    """
     Description:
         Initializes crop phosphorus uptake array.
 
@@ -320,7 +320,7 @@ def uptake(pUptake, soil, config):
         pUptake: the array which is being initialized
         soil: instnace of the Soil class
         config: instance of the Config class
-    '''
+    """
 
     for i in range(0, len(soil.cropPUptakes)):
         if(soil.cropPUptakes[i].uptakeYear == config.start_year):

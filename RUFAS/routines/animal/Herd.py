@@ -9,7 +9,7 @@ mpl.use('TkAgg')
 
 class Herd():
     def __init__(self, input_herd_data):
-        '''
+        """
         Initializes summary variables:
             cull_num: numbers of cows culled in this simulation
             new_born_num: numbers of cows born in this simulation
@@ -27,7 +27,7 @@ class Herd():
         Args:
             input_herd_data : dictionary which stores all of the necessary
                 information for a Herd object.
-        '''
+        """
         self.cow_num = input_herd_data["cow_num"]
         self.cows = [] #list of the Cow objects
         self.cull_lst = []  # num of cows culled per day
@@ -63,12 +63,12 @@ class Herd():
         self.milk_num = 0
 
     def daily_update(self, time):
-        '''
+        """
         Update the information for the Herd for one day.
 
         Args:
             time : instance of the class Time
-        '''
+        """
         self.cull_num = 0
         self.new_born_num = 0
         self.new_born_sold_num = 0

@@ -1,4 +1,4 @@
-'''
+"""
 RUFAS: Ruminant Farm Systems Model
 
 File name: phosphorus_uptake.py
@@ -48,7 +48,7 @@ CropType values updated by calling update_all():
     act_P_up_each_layer
     P_act_up
     bio_P
-'''
+"""
 ###############################################################################
 from math import log, exp
 

@@ -1,10 +1,10 @@
 ################################################################################
-'''
+"""
 RUFAS: Ruminant Farm Systems Model
 File name: output_handler.py
 Description: Contains the definition of the OutputHandler object
 Author(s): Kass Chupongstimun, kass_c@hotmail.com
-'''
+"""
 ################################################################################
 
 from pathlib import Path
@@ -26,7 +26,7 @@ from RUFAS.output.soil_phosphorus import SoilPhosphorus
 # Class: OutputHandler
 #-------------------------------------------------------------------------------
 class OutputHandler():
-    '''Handles all output related interactions.
+    """Handles all output related interactions.
 
     Contains a list of all the report handlers, which handles all output-related
     functionalities. This object is the (only) bridge between the simulation
@@ -47,10 +47,10 @@ class OutputHandler():
     sense to do when you want some statistical values that aren't already
     calculated in the routine, and you do not want to mess with the routine
     directly.
-    '''
+    """
 
     def __init__(self, data):
-        '''Initializes the report handlers with the given data'''
+        """Initializes the report handlers with the given data"""
 
         # Instantiate Report Handler Objects here
         self.reports = {
@@ -66,7 +66,7 @@ class OutputHandler():
     # Method: initialize_output_dir
     #---------------------------------------------------------------------------
     def initialize_output_dir(self, output_dir):
-        '''
+        """
         If a directory of the same name exists, it and its contents is deleted,
         then creates the directory for all output report files as specified.
         Sets output file path for all reports through the class attribute of the
@@ -75,7 +75,7 @@ class OutputHandler():
         Args:
             output_dir (Path): The path to the directory that will store all
                 output report files.
-        '''
+        """
 
         # Initialize path for reports
         output_dir = util.get_base_dir() / output_dir
@@ -86,14 +86,14 @@ class OutputHandler():
                 file.unlink()
             output_dir.rmdir()
 
-        output_dir.mkdir(exist_ok = True, parents = False)
+        output_dir.mkdir(exist_ok=True, parents=False)
         BaseReportHandler.set_dir(output_dir)
 
     #---------------------------------------------------------------------------
     # Method: initialize_reports
     #---------------------------------------------------------------------------
     def initialize_reports(self, state):
-        '''Transfer needed (initial) data from state to report handlers.'''
+        """Transfer needed (initial) data from state to report handlers."""
 
         for reportName in self.reports:
             report = self.reports[reportName]
@@ -104,7 +104,7 @@ class OutputHandler():
     # Method: daily_update
     #---------------------------------------------------------------------------
     def daily_update(self, state, weather, time):
-        '''Updates the report handler with new daily values.'''
+        """Updates the report handler with new daily values."""
 
         for reportName in self.reports:
             report = self.reports[reportName]
@@ -115,7 +115,7 @@ class OutputHandler():
     # Method: annual_update
     #---------------------------------------------------------------------------
     def annual_update(self, state, weather, time):
-        '''Updates the report handler with anuual output values.'''
+        """Updates the report handler with anuual output values."""
 
         for reportName in self.reports:
             report = self.reports[reportName]
@@ -126,7 +126,7 @@ class OutputHandler():
     # Method: write_annual_reports
     #---------------------------------------------------------------------------
     def write_annual_reports(self, y):
-        '''Prints the annual report to file for all reports.'''
+        """Prints the annual report to file for all reports."""
 
         for reportName in self.reports:
             report = self.reports[reportName]
@@ -137,7 +137,7 @@ class OutputHandler():
     # Method: annual_flush
     #---------------------------------------------------------------------------s
     def annual_flush(self):
-        '''Sets all of the reports in the output object to the default.'''
+        """Sets all of the reports in the output object to the default."""
 
         for reportName in self.reports:
             report = self.reports[reportName]
