@@ -50,13 +50,12 @@ class Feed():
 
         # Sorted so that is easier to ensure that the requirements calculated
         # in ration.py are zipped with the correct nutrient.
-        self.nutrient_rqmts = ['FU', 'RU', 'ME_DM', 'RDP_DM', 'RUP_DM']
+        self.nutrients_in_LP = sorted(['FI', 'RV', 'NE', 'RDP', 'RUP'])
 
         NH3 = {}
         unavail_prot = {}
 
         # Loop over types of feed
-        '''
         for feed_name in self.available_feed_names:
 
             CP = self.available_feeds[feed_name]['CP']
@@ -74,7 +73,7 @@ class Feed():
 
             self.available_feeds[feed_name]['RUP'] = 0.87 * (CP - NH3[feed_name] -
                                      (unavail_prot[feed_name] * CP))
-        '''
+
 
     #---------------------------------------------------------------------------
     # Method: annual_reset
