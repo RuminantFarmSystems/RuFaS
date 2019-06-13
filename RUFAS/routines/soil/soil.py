@@ -290,7 +290,7 @@ class Soil():
 
         # soil phosphorus attributes
         self.soilCoverType = data['SoilCoverType']
-        self.pUptake = [[0 for x in range(366)] for y in range(config.endYear + 1)]
+        self.pUptake = [[0 for x in range(366)] for y in range(config.end_year + 1)]
         self.lightFactor = []
         self.yieldFactor = []
         self.summan = 0.0

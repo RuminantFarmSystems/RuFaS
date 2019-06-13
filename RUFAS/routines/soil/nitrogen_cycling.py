@@ -154,7 +154,7 @@ def update_all(soil, weather, time):
 
     humus_mineralization(soil)
 
-    addedN(soil, weather, time)
+    added_manure_N(soil, weather, time)
 
 
 #
@@ -207,7 +207,6 @@ def nitrification_volatilization(soil):
 
         waterFac = layer.waterFac
 
-        # DepthFac is confused by the variable z_mid which is insufficiently defined in the pseudocode
         # "pseudocode_soil" S.4.B.3
         if x == 0:
             z_mid = 5
@@ -547,8 +546,8 @@ def humus_mineralization(soil):
         layer.nTrans = Ntrans
 
 
-def addedN(soil, weather, time):
-    totalN = weather.addedN[time.year - 1][time.day - 1]
+def added_manure_N(soil, weather, time):
+    totalN = weather.manureN[time.year - 1][time.day - 1]
 
     activeN = totalN * 0.875
     stableN = totalN * 0.125

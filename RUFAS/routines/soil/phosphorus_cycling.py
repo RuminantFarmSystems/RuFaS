@@ -323,13 +323,13 @@ def uptake(pUptake, soil, config):
     '''
 
     for i in range(0, len(soil.cropPUptakes)):
-        if(soil.cropPUptakes[i].uptakeYear == config.startYear):
+        if(soil.cropPUptakes[i].uptakeYear == config.start_year):
             for j in range(0, 365):
                 pUptake[soil.cropPUptakes[i].uptakeYear][j] = (
                     soil.cropPUptakes[i].pUptake/364)
                 # print(pUptake[soil.cropPUptakes[i].uptakeYear][j])
 
-        elif(soil.cropPUptakes[i].uptakeYear == config.endYear):
+        elif(soil.cropPUptakes[i].uptakeYear == config.end_year):
             for j in range(0, 365):
                 pUptake[soil.cropPUptakes[i].uptakeYear][j] = (
                     soil.cropPUptakes[i].pUptake/365)
