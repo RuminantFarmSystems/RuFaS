@@ -1,4 +1,4 @@
-'''
+"""
 RUFAS: Ruminant Farm Systems Model
 
 File name: percolation.py
@@ -23,7 +23,7 @@ Soil attribute definitions
 
 Soil values updated by calling update_all():
     soil.listOfSoilLayers.perc
-'''
+"""
 ###############################################################################
 
 from math import exp

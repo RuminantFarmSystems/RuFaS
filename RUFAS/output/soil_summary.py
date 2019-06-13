@@ -178,7 +178,7 @@ class SoilSummary(BaseReportHandler):
     # Method: annual_update
     #---------------------------------------------------------------------------
     def annual_update(self, state, weather, time):
-        '''Stores the yearly values that need to be printed in the report.'''
+        """Stores the yearly values that need to be printed in the report."""
         pass
 
     #---------------------------------------------------------------------------

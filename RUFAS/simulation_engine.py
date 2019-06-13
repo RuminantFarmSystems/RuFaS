@@ -1,11 +1,11 @@
 ################################################################################
-'''
+"""
 RUFAS: Ruminant Farm Systems Model
 File name: simulation_engine.py
 Description: Contains the main routines that drive the simulation
 Author(s): Kass Chupongstimun, kass_c@hotmail.com
            Jit Patil, spatil5@wisc.edu
-'''
+"""
 ################################################################################
 
 import json
@@ -21,7 +21,7 @@ from RUFAS.output import OutputHandler
 # Function: simulate
 #-------------------------------------------------------------------------------
 def simulate(input_fPath:Path):
-    '''Executes the simulation with the json file specified.
+    """Executes the simulation with the json file specified.
 
     Executes the similation with the json file at the path specified. Skips over
     the simulation (immediately returns) when an error is present in the json
@@ -31,7 +31,7 @@ def simulate(input_fPath:Path):
     Args:
         input_fPath (Path): Path to the json file that contains all the input
             parameters to the simulation. Passed to read_json_file().
-    '''
+    """
 
     #
     # Reads the json input file and uses the information to instantiate the
@@ -72,7 +72,7 @@ def simulate(input_fPath:Path):
 # Function: daily_simulation
 #-------------------------------------------------------------------------------
 def daily_simulation():
-    '''Executes the daily simulation routines.'''
+    """Executes the daily simulation routines."""
 
     #
     # Daily routines
@@ -94,12 +94,12 @@ def daily_simulation():
 # Function: annual_simulation
 #-------------------------------------------------------------------------------
 def annual_simulation():
-    '''Executes the annual simulation routines.
+    """Executes the annual simulation routines.
 
     Writes the annual report to the output files
     Flushes the data in the output object
     Resets the state for the following year
-    '''
+    """
 
     #
     # Pre-annual Routines
@@ -122,7 +122,7 @@ def annual_simulation():
 # Function: read_json_file
 #-------------------------------------------------------------------------------
 def read_json_file(fPath:Path):
-    '''Reads the json file, writes information to the simulation variables.
+    """Reads the json file, writes information to the simulation variables.
 
     Reads and inteprets the (json) file at the given path. Compiles the
     information into dictionaries and instantiates the simulation objects with
@@ -134,7 +134,7 @@ def read_json_file(fPath:Path):
     Raises:
         InvalidJSONfileError: If the json file at the given path does not
             conform with the format required
-    '''
+    """
 
     #
     # Designate as module-global variables
@@ -149,7 +149,8 @@ def read_json_file(fPath:Path):
             config = Config(data['config'], data['weather'])
             state = State(data['farm'], config)
             output = OutputHandler(data['output'])
-            weather = Weather(data['weather'], config.years, config.w_start_year, config.w_start_day)
+            weather = Weather(data['weather'], config.years, config.w_start_year,
+                              config.w_start_day, config.start_year, config.start_day)
             time = Time(config.years, config.start_year)
 
         except errors.JSONfileData as e:

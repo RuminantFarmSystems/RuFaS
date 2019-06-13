@@ -1,5 +1,5 @@
 ################################################################################
-'''
+"""
 RUFAS: Ruminant Farm Systems Model
 File name: crop.py
 Description:
@@ -74,7 +74,7 @@ This module needs the following inputs in order to operate correctly:
             currentSoilWaterMM
             fcWater
             wiltingWater
-'''
+"""
 ################################################################################
 
 from . import heat_units, leaf_area_index, root_development, biomass, yields, \
@@ -157,7 +157,7 @@ class Crop():
             self.start_date = 0
 
             # ===================================================================
-            ''' HEAT UNIT DATA '''
+            """ HEAT UNIT DATA """
 
             # Inputs
             self.T_base_min = data['min_temp_for_growth']
@@ -173,7 +173,7 @@ class Crop():
             self.prev_fr_PHU = 0.0
 
             # ===================================================================
-            ''' LEAF AREA INDEX (LAI) DATA '''
+            """ LEAF AREA INDEX (LAI) DATA """
 
             # Inputs
             self.fr_PHU_1 = data['fr_PHU_1']
@@ -192,7 +192,7 @@ class Crop():
             self.LAI_actual = 0
 
             # ===================================================================
-            ''' ROOT DEPTH DATA '''
+            """ ROOT DEPTH DATA """
 
             # Inputs
             self.z_root_max = data['z_root_max']  # maximum depth of root development
@@ -205,7 +205,7 @@ class Crop():
             self.prev_z_root = 0
 
             # ===================================================================
-            ''' BIOMASS DATA '''
+            """ BIOMASS DATA """
 
             # Inputs
             self.kl = data['light extinction coefficient']
@@ -222,7 +222,7 @@ class Crop():
             self.prev_biomass_actual = 0
 
             # ===================================================================
-            ''' Soil Water Uptake Data '''
+            """ Soil Water Uptake Data """
 
             self.beta_w = data['beta_w']  # water-use distribution parameter
             self.epco = data['epco']
@@ -231,7 +231,7 @@ class Crop():
             self.water_uptake_each_layer = []
 
             # ===================================================================
-            ''' Nitrogen Uptake Data '''
+            """ Nitrogen Uptake Data """
 
             self.beta_n = data["beta_n"]
 
@@ -250,7 +250,7 @@ class Crop():
             self.N_actual_up = 0
 
             # ===================================================================
-            ''' Phosphorus Uptake Data '''
+            """ Phosphorus Uptake Data """
 
             self.beta_p = data["beta_p"]
 
@@ -270,7 +270,7 @@ class Crop():
             self.P_act_up = 0
 
             # ===================================================================
-            ''' Yields Data '''
+            """ Yields Data """
 
             self.HI_max = 0
             self.HI_min = data["HI_min"]

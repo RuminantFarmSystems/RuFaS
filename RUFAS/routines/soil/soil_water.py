@@ -1,5 +1,5 @@
 ###############################################################################
-'''
+"""
 RUFAS: Ruminant Farm Systems Model
 
 File name: infiltration.py
@@ -35,7 +35,7 @@ Soil values updated by calling update_all():
 
     Soil Layer attributes updated:
         SW
-'''
+"""
 ###############################################################################
 
 

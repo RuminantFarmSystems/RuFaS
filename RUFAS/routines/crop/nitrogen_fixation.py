@@ -1,4 +1,4 @@
-'''
+"""
 RUFAS: Ruminant Farm Systems Model
 
 File name: nitrogen_fixation.py
@@ -21,7 +21,7 @@ CropType attribute definitions:
              given day in the growing season.
 
     act_N_up_each_layer = List of actual nitrogen uptakes from each soil layer.
-'''
+"""
 ###############################################################################
 
 #

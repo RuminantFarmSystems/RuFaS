@@ -1,4 +1,4 @@
-'''
+"""
 RUFAS: Ruminant Farm Systems Model
 
 File name: soil_erosion.py
@@ -69,7 +69,7 @@ Soil values updated by calling update_all():
     sedimentYield
 
 
-'''
+"""
 ###############################################################################
 
 from math import exp, log, atan, sin

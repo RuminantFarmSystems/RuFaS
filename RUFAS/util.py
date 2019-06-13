@@ -1,11 +1,11 @@
 ################################################################################
-'''
+"""
 RUFAS: Ruminant Farm Systems Model
 File name: util.py
 Description:
 Author(s): Kass Chupongstimun, kass_c@hotmail.com
            Jit Patil, spatil5@wisc.edu
-'''
+"""
 ################################################################################
 
 import sys
@@ -18,14 +18,14 @@ import csv
 # Function: get_base_dir
 #-------------------------------------------------------------------------------
 def get_base_dir():
-    '''Gets the base directory as reference for all relative paths.
+    """Gets the base directory as reference for all relative paths.
 
     Unfrozen appliaction - gets the project directory
     Frozen application - gets the executable directory
 
     Returns:
         Path: The reference directory for all paths in the program.
-    '''
+    """
 
     # Frozen
     if getattr(sys, 'frozen', False):
@@ -51,7 +51,7 @@ def get_base_dir():
 #-------------------------------------------------------------------------------
 def LP_solve(LHS, RHS, objective, var_names, operators,
              mode="min", name="LP", lower_var_bounds=None, upper_var_bounds=None):
-    '''Solves the linear program using the PULP package solver.
+    """Solves the linear program using the PULP package solver.
 
     Solves the Linear Program and returns the results of the optimization.
     LHS, RHS, and operators will have length of #constraints in the LP.
@@ -90,7 +90,7 @@ def LP_solve(LHS, RHS, objective, var_names, operators,
             
             'variableN_name': variable value
             }
-    '''
+    """
     start = timer.time()
 
     num_variables = len(var_names)
@@ -214,7 +214,7 @@ def organize_results(LP):
 #-------------------------------------------------------------------------------
 def LP_print(LHS, RHS, objective, variables, operators,
              mode="min", name="LP", min_v=None, max_v=None):
-    '''Text representation of the Linear Programming problem.'''
+    """Text representation of the Linear Programming problem."""
 
     LHS = [ [round(x, 4) for x in row] for row in LHS]
     RHS = [ round(x, 4) for x in RHS]

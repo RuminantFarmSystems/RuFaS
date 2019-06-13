@@ -1,4 +1,4 @@
-'''
+"""
 RUFAS: Ruminant Farm Systems Model
 
 File name: heat_units.py
@@ -47,7 +47,7 @@ CropType values updated by calling calculate_frPHU():
     accumulated_HU
     prev_fr_PHU
     fr_PHU
-'''
+"""
 ################################################################################
 
 

@@ -1,10 +1,10 @@
 ################################################################################
-'''
+"""
 RUFAS: Ruminant Farm Systems Model
 File name: ration.py
 Description:
 Author(s): Kass Chupongstimun, kass_c@hotmail.com
-'''
+"""
 ################################################################################
 
 from numpy import exp
@@ -14,7 +14,7 @@ from RUFAS import util
 # Function: optimize
 # -------------------------------------------------------------------------------
 def optimize(feed, rqmts):
-    '''
+    """
     Sets up the arguments for the linear programming optimization.
 
 	Args:
@@ -23,7 +23,7 @@ def optimize(feed, rqmts):
 
     Returns:
         dict: the dictionary that is returned by the call to util.LP_solve()
-	'''
+	"""
 
     # LHS is of the following form. LHS stands for Left Hand Side.
     # [
@@ -88,7 +88,7 @@ def optimize(feed, rqmts):
 # -------------------------------------------------------------------------------
 def calculate_rqmts(parity, WIM, AMF, BWR, base_NED, housing,
                     nutrients_list, milk_production_multiplier):
-    '''
+    """
     Calculate the dietary requirements of the cows. These values are used
     on the RHS of the linear program.
 
@@ -106,7 +106,7 @@ def calculate_rqmts(parity, WIM, AMF, BWR, base_NED, housing,
         dict : a dictionary that represents the dietary requirements of the cows,
             where the left hand side is nutrients_list and the right hand side is
             calculated in this method
-	'''
+	"""
 
     #
     # FIC: Fiber intake capacity

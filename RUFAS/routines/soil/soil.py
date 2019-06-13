@@ -1,5 +1,5 @@
 ################################################################################
-'''
+"""
 RUFAS: Ruminant Farm Systems Model
 File name: soil.py
 Description:
@@ -149,7 +149,7 @@ This module needs the following inputs in order to operate correctly:
 
         And the following attributes of a crop type:
             bioAG (aboveground biomass)
-'''
+"""
 ################################################################################
 
 import math
@@ -162,7 +162,7 @@ from . import nitrogen_cycling, phosphorus_cycling, infiltration, \
 # Executes all the daily soil routines
 # ------------------------------------------------------------------------------
 def daily_soil_routine(soil, crop, weather, time):
-    '''
+    """
     Description:
         Executes all the daily soil routines.
 
@@ -171,7 +171,7 @@ def daily_soil_routine(soil, crop, weather, time):
         crop: instance of the Crop class
         weather: instance of the Weather class
         time: instance of the Time class
-    '''
+    """
     # calculate and update the temperature of the soil layers
     soil_temp.update_all(soil, crop, weather, time)
 
@@ -199,9 +199,9 @@ def daily_soil_routine(soil, crop, weather, time):
 #        Contains the state of the farm's soil
 # -------------------------------------------------------------------------------
 class Soil():
-    '''
+    """
     Contains the state of the farm's soil.
-    '''
+    """
     listOfSoilLayers = []
     fertilizerApplications = []
     manureApplications = []
@@ -209,7 +209,7 @@ class Soil():
     cropPUptakes = []
 
     def __init__(self, data, config):
-        '''
+        """
         Description:
             Constructs an instance of the Soil class by populating its arrays
             and the necessary values.
@@ -217,7 +217,7 @@ class Soil():
         Args:
             data: the information from the json input file
             config: instance of the Config class
-        '''
+        """
         # Values Initialized by Input
         self.profileDepth = data['ProfileDepth']
         self.profileBulkDensity = data['ProfileBulkDensity']
@@ -342,19 +342,19 @@ class Soil():
     # An instance of this class represents a layer in the soil
     # ---------------------------------------------------------------------------
     class SoilLayer():
-        '''
+        """
         An instance of this class represents a layer in the soil.
-        '''
+        """
 
         def __init__(self, layerName, layerData):
-            '''
+            """
             Description:
                 Populates the characteristic values of a soil layer.
 
             Args:
                 layerName: a string which is the name of this layer
                 layerData: a dictionary which stores the information for this layer
-            '''
+            """
             self.name = layerName
 
             self.bottomDepth = layerData['BottomDepth']
@@ -438,14 +438,14 @@ class Soil():
     # of its application
     # ---------------------------------------------------------------------------
     class Fertilizer():
-        '''
+        """
         Description:
             An instance of this class represents a particular fertilizer and the date
         of its application.
-        '''
+        """
 
         def __init__(self, FertName, FertData):
-            '''
+            """
             Constructs an instance of this class by setting the values of its necessary
             fields.
 
@@ -453,7 +453,7 @@ class Soil():
                 FertName: a string which is the name of this fertilizer
                 FertData: a dictionary which holds the rest of the information about
                     this fertilizer
-            '''
+            """
             self.name = FertName
             self.appYear = FertData['Year']
             self.appDay = FertData['JDay']
@@ -467,20 +467,20 @@ class Soil():
     # of its application
     # ---------------------------------------------------------------------------
     class Manure():
-        '''
+        """
         An instance of this class represents a particular manure and the date
         of its application
-        '''
+        """
 
         def __init__(self, manureName, manureData):
-            '''
+            """
             Description:
                 Constructs an instance of this class
 
             Args:
                 manureName: a string which represents the name is this manure
                 manureData: a dictionary which stores the information for this manure
-            '''
+            """
             self.name = manureName
             self.type = manureData['Type']
             self.appYear = manureData['Year']
@@ -500,20 +500,20 @@ class Soil():
     # of its application
     # ---------------------------------------------------------------------------
     class Tillage():
-        '''
+        """
         An instance of this class represents a particular tillage and the date
         of its application
-        '''
+        """
 
         def __init__(self, tillageName, tillageData):
-            '''
+            """
             Description:
                 Constructs an instance of this class.
 
             Args:
                 tillageName: a string which is the name of this tillage
                 tillageData: a dictionary which stores the information for this tillage
-            '''
+            """
             self.name = tillageName
             self.appYear = tillageData['Year']
             self.appDay = tillageData['Jday']
@@ -527,13 +527,13 @@ class Soil():
     # of uptake
     # ---------------------------------------------------------------------------
     class CropPUptake():
-        '''
+        """
         An instance of this class represents a particular uptake and the date
         of uptake
-        '''
+        """
 
         def __init__(self, uptakeName, uptakeData):
-            '''
+            """
             Description:
                 Constructs an instance of this class.
 
@@ -541,7 +541,7 @@ class Soil():
                 uptakeName: a string which is the name of this particular uptake
                 uptakeData: a dictionary which stores the information for this particular
                     uptake
-            '''
+            """
             self.name = uptakeName
             self.uptakeYear = uptakeData['Year']
             self.pUptake = uptakeData['PUptake']
@@ -552,11 +552,11 @@ class Soil():
     # field capacity (mm H2O). Called when soil portion of input is read.
     # ---------------------------------------------------------------------------
     def calculateFcWater(self):
-        '''
+        """
         Description:
             Calculates the amount of water in soil profile for a given layer at
             field capacity (mm H2O). Called when soil portion of input is read.
-        '''
+        """
         for layer in self.listOfSoilLayers:
             layer.fcWater = layer.depth * layer.fieldCapacity
 
@@ -566,11 +566,11 @@ class Soil():
     # saturation (mm H2O). Called when soil portion of input is read.
     # ---------------------------------------------------------------------------
     def calculateSatWater(self):
-        '''
+        """
         Description:
             Calculates the amount of water in soil profile for a given layer at
             saturation (mm H2O). Called when soil portion of input is read.
-        '''
+        """
         for layer in self.listOfSoilLayers:
             layer.satWater = layer.depth * layer.saturation
 
@@ -580,11 +580,11 @@ class Soil():
     # wilting point (mm H2O). Called when soil portion of input is read.
     # ---------------------------------------------------------------------------
     def calculateWiltingWater(self):
-        '''
+        """
         Description:
             Calculates the amount of water in soil profile for a given layer at
             wilting point (mm H2O). Called when soil portion of input is read.
-        '''
+        """
         for layer in self.listOfSoilLayers:
             layer.wiltingWater = layer.depth * layer.wiltingPoint
 
@@ -594,17 +594,17 @@ class Soil():
     # Called once when soil portion of input is read.
     # ---------------------------------------------------------------------------
     def convertCurrentSoilWaterToMM(self):
-        '''
+        """
         Description:
             Calculates the amount of soil water in a given layer in millimeters.
             Called once when soil portion of input is read.
-        '''
+        """
         for layer in self.listOfSoilLayers:
             layer.currentSoilWaterMM = layer.depth * layer.fieldCapacity
 
     def annual_reset(self):
-        '''
+        """
         Description:
             Resets the E0 sum for the next year.
-        '''
+        """
         self.E0_sum = 0.0

@@ -1,4 +1,4 @@
-'''
+"""
 RUFAS: Ruminant Farm Systems Model
 
 File name: root_development.py
@@ -27,7 +27,7 @@ CropType values updated by calling update_all():
 
     fr_root
     z_root
-'''
+"""
 ###############################################################################
 
 #
@@ -45,9 +45,9 @@ def update_all(crop_type, time):
 # "pseudocode_crop" C.3.A.1
 #
 def calc_daily_root_biomass(crop_type, time):
-    growing_period = crop_type.start_date <= time.day <= crop_type.harvest_date
+    in_growing_period = crop_type.start_date <= time.day <= crop_type.harvest_date
 
-    if growing_period:
+    if in_growing_period:
         crop_type.fr_root = 0.4 - 0.2 * crop_type.fr_PHU
     else:
         crop_type.fr_root = 0

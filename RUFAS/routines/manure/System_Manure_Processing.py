@@ -1,13 +1,13 @@
-'''
+"""
 Created on Oct 2, 2018
 
 @author: ombenomr
-'''
-'''
+"""
+"""
 Created on Sep 4, 2018
 
 @author: ombenomr
-'''
+"""
 # This code is written by Osama Ben Omran
 # Date : 08/23/2018
 # Program Name: System_Manure_Processing.py

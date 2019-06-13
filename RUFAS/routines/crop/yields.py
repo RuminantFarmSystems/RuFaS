@@ -1,4 +1,4 @@
-'''
+"""
 RUFAS: Ruminant Farm Systems Model
 
 File name: yields.py
@@ -56,7 +56,7 @@ CropType values updated by update_all():
     yield_N
     yield_P
     residue
-'''
+"""
 ###############################################################################
 from math import exp
 
@@ -107,8 +107,8 @@ def calc_bio_AG(crop_type):
 # "pseudocode_crop" C.10.D.1
 #
 def calc_HI_actual(crop_type, time):
-    growing_period = crop_type.start_date <= time.day <= crop_type.harvest_date
-    if not growing_period:
+    in_growing_period = crop_type.start_date <= time.day <= crop_type.harvest_date
+    if not in_growing_period:
         crop_type.HI_actual = 0
     else:
         term1 = crop_type.HI_max - crop_type.HI_min
