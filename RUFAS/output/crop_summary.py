@@ -7,6 +7,8 @@ Author(s): William Donovan, wmdonovan@wisc.edu
 """
 #############################################
 import csv
+
+from RUFAS.output.data_analysis import data_analysis
 from RUFAS.output.report_handler import BaseReportHandler
 
 class CropSummary(BaseReportHandler):
@@ -14,7 +16,7 @@ class CropSummary(BaseReportHandler):
     def __init__(self, data):
 
         #
-        # Sets active, report_name, f_name using data
+        # Sets active, report_name, file_name using data
         #
         self.set_properties(data)
         self.fieldNames = None
@@ -24,6 +26,7 @@ class CropSummary(BaseReportHandler):
         # 1D Lists [julianDay]
         #
 
+        self.file_name = data['file_name']
         self.year = []
         self.julianDay = []
         self.daily_fr_PHU = []
@@ -163,3 +166,6 @@ class CropSummary(BaseReportHandler):
         self.daily_bio_P = []
         self.daily_z_root = []
         self.daily_yield_actual = []
+
+    def produce_data_analysis(self):
+        data_analysis(self.file_name)

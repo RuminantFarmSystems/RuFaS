@@ -11,6 +11,8 @@
 ################################################################################
 
 import csv
+
+from RUFAS.output.data_analysis import data_analysis
 from RUFAS.output.report_handler import BaseReportHandler
 
 
@@ -23,7 +25,7 @@ class SoilNitrogen(BaseReportHandler):
     def __init__(self, data):
 
         #
-        # Sets active, report_name, f_name using data
+        # Sets active, report_name, file_name using data
         #
         self.set_properties(data)
         self.fieldNames = None
@@ -222,3 +224,6 @@ class SoilNitrogen(BaseReportHandler):
             self.denitrification[x] = []
             self.layersTotNitriVolatil[x] = []
             self.layersNtrans[x] = []
+
+    def produce_data_analysis(self):
+        data_analysis(self.file_name)

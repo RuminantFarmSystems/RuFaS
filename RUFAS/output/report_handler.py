@@ -12,9 +12,10 @@ from abc import ABC, abstractmethod
 
 from RUFAS import util
 
-#-------------------------------------------------------------------------------
+
+# -------------------------------------------------------------------------------
 # Abstract Class: BaseReportHandler
-#-------------------------------------------------------------------------------
+# -------------------------------------------------------------------------------
 class BaseReportHandler(ABC):
     """
     Contains an interface for report handlers, each output report
@@ -29,9 +30,9 @@ class BaseReportHandler(ABC):
     # overwritten by the directory given in json file
     __output_dir = util.get_base_dir() / Path("Outputs/Default_Output_Dir")
 
-    #---------------------------------------------------------------------------
+    # ---------------------------------------------------------------------------
     # Method: set_properties
-    #---------------------------------------------------------------------------
+    # ---------------------------------------------------------------------------
     def set_properties(self, data):
         """Sets the properties of each report handler initialized.
 
@@ -43,9 +44,9 @@ class BaseReportHandler(ABC):
         self.report_name = data['report_name']
         self.fName = data['file_name']
 
-    #---------------------------------------------------------------------------
+    # ---------------------------------------------------------------------------
     # Method: get_fPath
-    #---------------------------------------------------------------------------
+    # ---------------------------------------------------------------------------
     def get_fPath(self):
         """Gets the path to which the report handler will write the report.
 
@@ -54,17 +55,17 @@ class BaseReportHandler(ABC):
         """
         return BaseReportHandler.__output_dir / self.fName
 
-    #---------------------------------------------------------------------------
+    # ---------------------------------------------------------------------------
     # Class Method: set_dir
-    #---------------------------------------------------------------------------
+    # ---------------------------------------------------------------------------
     @classmethod
     def set_dir(cls, new_dir):
         """Sets the base path to write the output report files to"""
         cls.__output_dir = new_dir
 
-    #---------------------------------------------------------------------------
+    # ---------------------------------------------------------------------------
     # Abstract Methods
-    #---------------------------------------------------------------------------
+    # ---------------------------------------------------------------------------
     @abstractmethod
     def initialize(self): raise NotImplementedError()
     @abstractmethod
@@ -75,3 +76,5 @@ class BaseReportHandler(ABC):
     def write_annual_report(self): raise NotImplementedError()
     @abstractmethod
     def annual_flush(self): raise NotImplementedError()
+    @abstractmethod
+    def produce_data_analysis(self): raise NotImplementedError()

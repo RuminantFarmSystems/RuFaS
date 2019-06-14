@@ -18,7 +18,7 @@
         },
         "ration_report":
         {
-            "active": true,
+            "active": false,
             "report_name": "Ration Report",
             "file_name": "ration_report.csv"
         },
@@ -28,7 +28,7 @@
             "report_name": "Soil Nitrogen",
             "file_name": "soil_nitrogen.csv"
         },
-        "crop_report":
+        "crop_summary":
         {
             "active": true,
             "report_name": "Crop Report",

@@ -10,18 +10,21 @@
 ################################################################################
 
 import csv
+
+from RUFAS.output.data_analysis import data_analysis
 from RUFAS.output.report_handler import BaseReportHandler
 
-#-------------------------------------------------------------------------------
+
+# -------------------------------------------------------------------------------
 # Class: SoilPhosphorus
 # Creates and prints to the file soil_nitrogen.csv
-#-------------------------------------------------------------------------------
+# -------------------------------------------------------------------------------
 class SoilPhosphorus(BaseReportHandler):
 
     def __init__(self, data):
 
         #
-        # Sets active, report_name, f_name using data
+        # Sets active, report_name, file_name using data
         #
         self.set_properties(data)
         self.fieldNames = None
@@ -37,10 +40,10 @@ class SoilPhosphorus(BaseReportHandler):
         self.layersStableP = []
 
 
-    #---------------------------------------------------------------------------
+    # ---------------------------------------------------------------------------
     # Function: get_header
     #           Writes the header (title and units) in the csvfile
-    #---------------------------------------------------------------------------
+    # ---------------------------------------------------------------------------
     def write_header(self):
 
         mode = 'a+' if self.get_fPath().exists() else 'w+'
@@ -65,10 +68,10 @@ class SoilPhosphorus(BaseReportHandler):
                     units[fieldname] = 'kg/ha'
             writer.writerow(units)
 
-    #---------------------------------------------------------------------------
+    # ---------------------------------------------------------------------------
     # Function: get_data
     #           Transfers the needed data from Soil object to the report handler
-    #---------------------------------------------------------------------------
+    # ---------------------------------------------------------------------------
     def get_data(self, state):
 
         soil = state.soil
@@ -84,11 +87,11 @@ class SoilPhosphorus(BaseReportHandler):
             self.layersStableP.append([])
 
 
-    #---------------------------------------------------------------------------
+    # ---------------------------------------------------------------------------
     # Function: updateDailyOutput
     # Stores the daily values that need to be printed in the 'soil summary'
     # csv file
-    #---------------------------------------------------------------------------
+    # ---------------------------------------------------------------------------
     def daily_update(self, state, weather, time):
 
         soil = state.soil
@@ -100,11 +103,11 @@ class SoilPhosphorus(BaseReportHandler):
             self.layersActiveP[x].append(soil.listOfSoilLayers[x].activeP)
             self.layersStableP[x].append(soil.listOfSoilLayers[x].stableP)
             
-    #---------------------------------------------------------------------------
+    # ---------------------------------------------------------------------------
     # Function: write_annual_report
     #           Appends the annual report to the output file
     # Soil Summary is a cvsfile
-    #---------------------------------------------------------------------------
+    # ---------------------------------------------------------------------------
     def write_annual_report(self, y):
 
         mode = 'a+' if self.get_fPath().exists() else 'w+'
@@ -128,10 +131,10 @@ class SoilPhosphorus(BaseReportHandler):
                                     lineterminator = '\n')
                 writer.writerow(dailySoilPhosphorusData)
 
-    #---------------------------------------------------------------------------
+    # ---------------------------------------------------------------------------
     # Function: annual_flush
     #           Sets all of the values in the output object to the default value
-    #---------------------------------------------------------------------------
+    # ---------------------------------------------------------------------------
     def annual_flush(self):
 
         self.year = []
@@ -140,3 +143,6 @@ class SoilPhosphorus(BaseReportHandler):
         for x in range(0, self.numSoilLayers):
             self.layersActiveP[x] = []
             self.layersStableP[x] = []
+
+    def produce_data_analysis(self):
+        data_analysis(self.file_name)

@@ -18,10 +18,10 @@
 
 import math
 
-#------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # Function: daily_phosphorus_cycling_routine
 # Executes all the daily phosphorus cycling  routines
-#------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 def daily_phosphorus_cycling_routine(soil, time, weather, config):
     """
     Description:
@@ -40,10 +40,10 @@ def daily_phosphorus_cycling_routine(soil, time, weather, config):
     fertilizer(soil, time)
     manure(soil, time)
 
-#------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # Function: daily_phosphorus_update
 # Update attributes of soil phosphorus in preparation of following day
-#------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 def daily_phosphorus_update(soil, time, weather):
     """
     Description:
@@ -56,7 +56,7 @@ def daily_phosphorus_update(soil, time, weather):
     """
     pass
 
-#------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # Function: manure
 # This subroutine calculates # of plops added per day and amount of TP, WIP,
 # and WOP added in manure. Adds P to surface manure pool, and updates
@@ -64,7 +64,7 @@ def daily_phosphorus_update(soil, time, weather):
 #
 # Calculates TP, WIP, and WOP added in the manure, adds P to surface manure
 # pools. All units are KG or HA.
-#------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 def manure(soil, time):
     """
     Description:
@@ -90,14 +90,14 @@ def manure(soil, time):
             soil.summanP += MANPAPP
     pass
 
-#------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # Function: fertilizer
 # This subroutine calculates P added in fertilizer, adds fertilizer P to
 # surface pool, and updates cumulative fertilizer P added during the model run
 #
 # Calculates TP, WIP, and WOP added in the manure,
 # adds P to surface manure pools. All units are KG or HA
-#------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 def fertilizer(soil, time):
     """
     Description:
@@ -146,10 +146,10 @@ def fertilizer(soil, time):
     #    labileP = soil.listOfSoilLayers[x].labileP
     #    print("HI")
 
-#------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # Function: soilChem
 # This subroutine initializes soil chemical properties
-#------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 def soilChem(soil):
     """
     Description:
@@ -175,10 +175,10 @@ def soilChem(soil):
 
         # print("HI")
 
-#------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # Function: initializePhosphorusInputs
 # Initialize phosphorus variable on at the beginning of the simulation
-#------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 def initializePhosphorusInputs(soil, time, weather, config):
     """
     Description:
@@ -307,10 +307,10 @@ def initializePhosphorusInputs(soil, time, weather, config):
 
     #print("HI")
 
-#------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # Function: uptake
 # Initilaize crop phosphorus uptake array
-#------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 def uptake(pUptake, soil, config):
     """
     Description:

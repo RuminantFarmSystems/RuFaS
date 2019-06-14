@@ -9,20 +9,25 @@ Author(s): Kass Chupongstimun, kass_c@hotmail.com
 
 from pathlib import Path
 import csv
+
+from RUFAS.output.data_analysis import data_analysis
 from RUFAS.output.report_handler import BaseReportHandler
 
-#-------------------------------------------------------------------------------
+
+# -------------------------------------------------------------------------------
 # Class: RationReport
-#-------------------------------------------------------------------------------
+# -------------------------------------------------------------------------------
 class RationReport(BaseReportHandler):
     """Creates and prints to the file ration_report.txt"""
 
     def __init__(self, data):
 
         #
-        # Sets active, report_name, f_name using data
+        # Sets active, report_name, file_name using data
         #
         self.set_properties(data)
+
+        self.file_name = data['file_name']
 
         #
         # Daily Outputs
@@ -32,15 +37,15 @@ class RationReport(BaseReportHandler):
         self.feed_amounts = []
         self.milk_production_reduction = []
         self.julianDay = []
-        #self.LP_text = ""
+        # self.LP_text = ""
 
         # static
         self.feed_info = {}
 
-    #---------------------------------------------------------------------------
+    # ---------------------------------------------------------------------------
     # Method: write_header
     #         Writes the header (column titles and units) in the csvfile
-    #---------------------------------------------------------------------------
+    # ---------------------------------------------------------------------------
     def write_header(self):
 
         mode = 'a+' if self.get_fPath().exists() else 'w+'
@@ -64,9 +69,9 @@ class RationReport(BaseReportHandler):
 
             writer.writerow(units)
 
-    #---------------------------------------------------------------------------
+    # ---------------------------------------------------------------------------
     # Method: initialize
-    #---------------------------------------------------------------------------
+    # ---------------------------------------------------------------------------
     def initialize(self, state):
         """Transfers the needed data from Soil object to the report handler."""
         feed = state.feed
@@ -76,9 +81,9 @@ class RationReport(BaseReportHandler):
         self.ration_interval = state.animal.ration_formulation_interval
         self.write_header()
 
-    #---------------------------------------------------------------------------
+    # ---------------------------------------------------------------------------
     # Method: daily_update
-    #---------------------------------------------------------------------------
+    # ---------------------------------------------------------------------------
     def daily_update(self, state, weather, time):
         """Stores the daily values that need to be printed in the report."""
 
@@ -92,16 +97,16 @@ class RationReport(BaseReportHandler):
             self.feed_amounts.append({feed_type: animal.ration[feed_type] for feed_type in self.feed_info.keys()})
             self.milk_production_reduction.append(animal.ration['MP_reduction'])
 
-    #---------------------------------------------------------------------------
+    # ---------------------------------------------------------------------------
     # Method: annual_update
-    #---------------------------------------------------------------------------
+    # ---------------------------------------------------------------------------
     def annual_update(self, state, weather, time):
         """Stores the yearly values that need to be printed in the report."""
         pass
 
-    #---------------------------------------------------------------------------
+    # ---------------------------------------------------------------------------
     # Method: write_annual_report
-    #---------------------------------------------------------------------------
+    # ---------------------------------------------------------------------------
     def write_annual_report(self, y):
         """Appends the annual report to the output file."""
 
@@ -131,9 +136,10 @@ class RationReport(BaseReportHandler):
                                         lineterminator = '\n')
                     writer.writerow(rationData)
                     data_index += 1
-    #---------------------------------------------------------------------------
+
+    # ---------------------------------------------------------------------------
     # Method: annual_flush
-    #---------------------------------------------------------------------------
+    # ---------------------------------------------------------------------------
     def annual_flush(self):
         """Sets all of the values in the output object to the default value."""
 
@@ -141,3 +147,6 @@ class RationReport(BaseReportHandler):
         self.feed_amounts = []
         self.milk_production_reduction = [] 
         self.julianDay = []
+
+    def produce_data_analysis(self):
+        data_analysis(self.file_name)

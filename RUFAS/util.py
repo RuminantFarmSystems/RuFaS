@@ -14,9 +14,9 @@ import time as timer
 from pathlib import Path
 import csv
 
-#-------------------------------------------------------------------------------
+# -------------------------------------------------------------------------------
 # Function: get_base_dir
-#-------------------------------------------------------------------------------
+# -------------------------------------------------------------------------------
 def get_base_dir():
     """Gets the base directory as reference for all relative paths.
 
@@ -46,9 +46,9 @@ def get_base_dir():
         #                     parent[1] = base_dir/
         return Path(__file__).resolve().parents[1]
 
-#-------------------------------------------------------------------------------
+# -------------------------------------------------------------------------------
 # Function: LP_solve
-#-------------------------------------------------------------------------------
+# -------------------------------------------------------------------------------
 def LP_solve(LHS, RHS, objective, var_names, operators,
              mode="min", name="LP", lower_var_bounds=None, upper_var_bounds=None):
     """Solves the linear program using the PULP package solver.
@@ -209,9 +209,9 @@ def organize_results(LP):
     results['objective'] = pulp.value(LP.objective)
     return results
 
-#-------------------------------------------------------------------------------
+# -------------------------------------------------------------------------------
 # Function: LP_print
-#-------------------------------------------------------------------------------
+# -------------------------------------------------------------------------------
 def LP_print(LHS, RHS, objective, variables, operators,
              mode="min", name="LP", min_v=None, max_v=None):
     """Text representation of the Linear Programming problem."""

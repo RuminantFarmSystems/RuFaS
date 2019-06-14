@@ -11,18 +11,20 @@
 ################################################################################
 
 import csv
+
+from RUFAS.output.data_analysis import data_analysis
 from RUFAS.output.report_handler import BaseReportHandler
 
-#-------------------------------------------------------------------------------
+# -------------------------------------------------------------------------------
 # Class: SoilSummary
 # Creates and prints to the file soil_summary.csv
-#-------------------------------------------------------------------------------
+# -------------------------------------------------------------------------------
 class SoilSummary(BaseReportHandler):
 
     def __init__(self, data):
 
         #
-        # Sets active, report_name, f_name using data
+        # Sets active, report_name, file_name using data
         #
         self.set_properties(data)
         self.fieldNames = None
@@ -49,10 +51,10 @@ class SoilSummary(BaseReportHandler):
         self.layersPerc = []
         self.layersTemperature = []
 
-    #---------------------------------------------------------------------------
+    # ---------------------------------------------------------------------------
     # Function: write_header
     #           Writes the header (title and units) in the csvfile
-    #---------------------------------------------------------------------------
+    # ---------------------------------------------------------------------------
     def write_header(self):
 
         mode = 'a+' if self.get_fPath().exists() else 'w+'
@@ -112,10 +114,10 @@ class SoilSummary(BaseReportHandler):
 
             writer.writerow(units)
 
-    #---------------------------------------------------------------------------
+    # ---------------------------------------------------------------------------
     # Function: initialize
     #           Transfers the needed data from Soil object to the report handler
-    #---------------------------------------------------------------------------
+    # ---------------------------------------------------------------------------
     def initialize(self, state):
 
         soil = state.soil
@@ -135,11 +137,11 @@ class SoilSummary(BaseReportHandler):
 
         self.write_header()
 
-    #---------------------------------------------------------------------------
+    # ---------------------------------------------------------------------------
     # Function: updateDailyOutput
     # Stores the daily values that need to be printed in the 'soil summary'
     # csv file
-    #---------------------------------------------------------------------------
+    # ---------------------------------------------------------------------------
     def daily_update(self, state, weather, time):
 
         soil = state.soil
@@ -174,18 +176,18 @@ class SoilSummary(BaseReportHandler):
         self.surfaceTemp.append(soil.Tsurf)
         self.sedimentYield.append(soil.sedimentYield)
 
-    #---------------------------------------------------------------------------
+    # ---------------------------------------------------------------------------
     # Method: annual_update
-    #---------------------------------------------------------------------------
+    # ---------------------------------------------------------------------------
     def annual_update(self, state, weather, time):
         """Stores the yearly values that need to be printed in the report."""
         pass
 
-    #---------------------------------------------------------------------------
+    # ---------------------------------------------------------------------------
     # Function: write_annual_report
     #           Appends the annual report to the output file
     # Soil Summary is a cvsfile
-    #---------------------------------------------------------------------------
+    # ---------------------------------------------------------------------------
     def write_annual_report(self, y):
 
         mode = 'a+' if self.get_fPath().exists() else 'w+'
@@ -232,10 +234,10 @@ class SoilSummary(BaseReportHandler):
                                         lineterminator='\n')
                 writer.writerow(dailySoilData)
 
-    #---------------------------------------------------------------------------
+    # ---------------------------------------------------------------------------
     # Function: annual_flush
     #           Sets all of the values in the output object to the default value
-    #---------------------------------------------------------------------------
+    # ---------------------------------------------------------------------------
     def annual_flush(self):
 
         self.year = []
@@ -257,3 +259,6 @@ class SoilSummary(BaseReportHandler):
 
         self.surfaceTemp = []
         self.sedimentYield = []
+
+    def produce_data_analysis(self):
+        data_analysis(self.file_name)
