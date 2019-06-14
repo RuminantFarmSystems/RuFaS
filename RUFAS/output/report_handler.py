@@ -41,8 +41,10 @@ class BaseReportHandler(ABC):
         """
 
         self.active = data['active']
+        self.produce_diagnostics = data['produce_diagnostics']
+        self.show_diagnostics = data['show_diagnostics']
         self.report_name = data['report_name']
-        self.fName = data['file_name']
+        self.file_name = data['file_name']
 
     # ---------------------------------------------------------------------------
     # Method: get_fPath
@@ -53,7 +55,7 @@ class BaseReportHandler(ABC):
         Returns:
             Path: path to which the report will be written.
         """
-        return BaseReportHandler.__output_dir / self.fName
+        return BaseReportHandler.__output_dir / self.file_name
 
     # ---------------------------------------------------------------------------
     # Class Method: set_dir

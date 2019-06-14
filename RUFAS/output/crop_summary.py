@@ -18,7 +18,6 @@ class CropSummary(BaseReportHandler):
         #
         # Sets active, report_name, file_name using data
         #
-        self.file_name = data['file_name']
         self.set_properties(data)
         self.fieldNames = None
 
@@ -26,8 +25,6 @@ class CropSummary(BaseReportHandler):
         # Daily Outputs
         # 1D Lists [julianDay]
         #
-
-        self.file_name = data['file_name']
         self.year = []
         self.julianDay = []
         self.daily_fr_PHU = []
@@ -169,4 +166,4 @@ class CropSummary(BaseReportHandler):
         self.daily_yield_actual = []
 
     def produce_data_analysis(self):
-        data_analysis(self.file_name)
+        data_analysis(self.file_name, self.show_diagnostics)

@@ -49,7 +49,7 @@ def simulate(input_fPath:Path):
     # Transfer needed (initial) data from state to report handlers
     #
     output.initialize_output_dir(config.output_dir)
-    output.initialize_output_dir(config.diagnostic_dir)
+    output.initialize_diagnostic_dir(config.diagnostic_dir)
     output.initialize_reports(state)
 
     print("\nSimulating: {}".format(input_fPath.name))
