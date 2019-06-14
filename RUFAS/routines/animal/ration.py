@@ -27,7 +27,7 @@ global_CP_Milk = -1
 # Function: optimize
 # -------------------------------------------------------------------------------
 def optimize(feed, rqmts):
-  """
+    """
     Sets up the arguments for the linear programming optimization.
 
 	Args:
@@ -36,7 +36,7 @@ def optimize(feed, rqmts):
 
     Returns:
         dict: the dictionary that is returned by the call to util.LP_solve()
-	"""
+    """
 
     # LHS is of the following form. LHS stands for Left Hand Side.
     # [
@@ -46,6 +46,7 @@ def optimize(feed, rqmts):
     #     [##,##, ..., ##],
     #     [##,##, ..., ##]
     # ]
+
     LHS = []
     constraint = [percentage(feed.available_feeds[feed_name]['FU'])
                   for feed_name in feed.available_feed_names]
