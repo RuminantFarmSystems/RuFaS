@@ -25,7 +25,6 @@ class RationReport(BaseReportHandler):
         #
         # Sets active, report_name, file_name using data
         #
-        self.file_name = data['file_name']
         self.set_properties(data)
 
         self.file_name = data['file_name']
@@ -150,4 +149,4 @@ class RationReport(BaseReportHandler):
         self.julianDay = []
 
     def produce_data_analysis(self):
-        data_analysis(self.file_name)
+        data_analysis(self.file_name, self.show_diagnostics)

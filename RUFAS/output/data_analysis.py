@@ -16,10 +16,9 @@ import matplotlib.pyplot as mp, datetime as dt, csv
 # Produces graphical representations of data passed in from a csv file.
 #
 from RUFAS import util
-from RUFAS.output import OutputHandler
 
 
-def data_analysis(output_csv):
+def data_analysis(output_csv, show_diagnostics):
 
     output_full_path = util.get_base_dir() / 'Outputs/Sample_Farm_Outputs' / output_csv
     save_dir = util.get_base_dir() / 'Outputs/diagnostics/' / output_csv.split('.')[0]
@@ -55,13 +54,13 @@ def data_analysis(output_csv):
         counter = 0
         for variable in variables:
             if counter > 1:
-                mp.figure()
+                fig = mp.figure()
                 mp.plot(dates, variables[variable])
                 mp.title(variable.split()[0].upper())
                 mp.xlabel('Dates')
                 mp.ylabel(variable + " " + units[counter])
                 path = str(save_dir / variable)
-                mp.savefig(path + '.png')
+                mp.savefig(path + '')
             counter += 1
 
-        # mp.show()
+        mp.show()

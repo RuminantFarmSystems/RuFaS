@@ -15,6 +15,7 @@ import csv
 from RUFAS.output.data_analysis import data_analysis
 from RUFAS.output.report_handler import BaseReportHandler
 
+
 # -------------------------------------------------------------------------------
 # Class: SoilSummary
 # Creates and prints to the file soil_summary.csv
@@ -27,7 +28,6 @@ class SoilSummary(BaseReportHandler):
         # Sets active, report_name, file_name using data
         #
 
-        self.file_name = data['file_name']
         self.set_properties(data)
         self.fieldNames = None
 
@@ -263,4 +263,4 @@ class SoilSummary(BaseReportHandler):
         self.sedimentYield = []
 
     def produce_data_analysis(self):
-        data_analysis(self.file_name)
+        data_analysis(self.file_name, self.show_diagnostics)

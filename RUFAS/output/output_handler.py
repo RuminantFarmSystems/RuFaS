@@ -6,7 +6,7 @@ Description: Contains the definition of the OutputHandler object
 Author(s): Kass Chupongstimun, kass_c@hotmail.com
 """
 ################################################################################
-
+import shutil
 from pathlib import Path
 
 from RUFAS import util
@@ -67,8 +67,8 @@ class OutputHandler():
     # ---------------------------------------------------------------------------
     def initialize_output_dir(self, output_dir):
         """
-        If a directory of the same name exists, it and its contents is deleted,
-        then creates the directory for all output report files as specified.
+        If a directory of the same name exists, it and its contents are deleted,
+        then a directory for each output report is created.
         Sets output file path for all reports through the class attribute of the
         BaseReportHandler class.
 
@@ -88,6 +88,22 @@ class OutputHandler():
 
         output_dir.mkdir(exist_ok=True, parents=False)
         BaseReportHandler.set_dir(output_dir)
+
+    def initialize_diagnostic_dir(self, diagnostic_dir):
+        diagnostic_dir = util.get_base_dir() / diagnostic_dir
+
+        if diagnostic_dir.exists():
+            for file in diagnostic_dir.iterdir():
+                shutil.rmtree(file)
+            diagnostic_dir.rmdir()
+
+        diagnostic_dir.mkdir(exist_ok=True, parents=False)
+
+        for reportName in self.reports:
+            report = self.reports[reportName]
+            if report.produce_diagnostics:
+                report_dir = util.get_base_dir() / diagnostic_dir / reportName
+                report_dir.mkdir(exist_ok=True, parents=False)
 
     # ---------------------------------------------------------------------------
     # Method: initialize_reports
@@ -147,5 +163,5 @@ class OutputHandler():
     def produce_data_analysis(self):
         for reportName in self.reports:
             report = self.reports[reportName]
-            if report.active:
+            if report.produce_diagnostics:
                 report.produce_data_analysis()

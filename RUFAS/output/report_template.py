@@ -80,7 +80,6 @@ class ReportTemplate(BaseReportHandler):
         #
         # Sets active, report_name, file_name using data
         #
-        self.file_name = data['file_name']
         self.set_properties(data)
         #
         # Daily Outputs
@@ -163,4 +162,4 @@ class ReportTemplate(BaseReportHandler):
         self.average_val = None
 
     def produce_data_analysis(self):
-        data_analysis(self.file_name)
+        data_analysis(self.file_name, self.show_diagnostics)

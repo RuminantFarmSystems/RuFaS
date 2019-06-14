@@ -33,7 +33,7 @@
         "crop_summary":
         {
             "active": true,
-            "report_name": "Crop Report",
+            "report_name": "Crop Summary",
             "file_name": "crop_summary.csv"
         }
     },
