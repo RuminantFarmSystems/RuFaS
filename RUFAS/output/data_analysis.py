@@ -54,7 +54,7 @@ def data_analysis(output_csv, show_diagnostics):
         counter = 0
         for variable in variables:
             if counter > 1:
-                fig = mp.figure()
+                mp.figure()
                 mp.plot(dates, variables[variable])
                 mp.title(variable.split()[0].upper())
                 mp.xlabel('Dates')
@@ -62,5 +62,3 @@ def data_analysis(output_csv, show_diagnostics):
                 path = str(save_dir / variable)
                 mp.savefig(path + '')
             counter += 1
-
-        mp.show()
