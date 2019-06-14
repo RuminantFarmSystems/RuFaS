@@ -61,6 +61,7 @@ class OutputHandler():
                         'ration_report': RationReport(data['ration_report']),
                         'crop_summary': CropSummary(data['crop_summary'])
                         }
+        self.final = False
 
     # ---------------------------------------------------------------------------
     # Method: initialize_output_dir
@@ -161,7 +162,12 @@ class OutputHandler():
                 report.annual_flush()
 
     def produce_data_analysis(self):
+        counter = 0
         for reportName in self.reports:
             report = self.reports[reportName]
+
             if report.produce_diagnostics:
-                report.produce_data_analysis()
+                if counter == len(self.reports) - 1:
+                    self.final = True
+                report.produce_data_analysis(self.final)
+            counter += 1

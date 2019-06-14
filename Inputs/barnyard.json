@@ -14,8 +14,8 @@
         "soil_summary":
         {
             "active": true,
-            "produce_diagnostics": false,
-            "show_diagnostics": false,
+            "produce_diagnostics": true,
+            "show_diagnostics": true,
             "report_name": "Soil Summary",
             "file_name": "soil_summary.csv"
         },
@@ -30,7 +30,7 @@
         "soil_nitrogen":
         {
             "active": true,
-            "produce_diagnostics": false,
+            "produce_diagnostics": true,
             "show_diagnostics": false,
             "report_name": "Soil Nitrogen",
             "file_name": "soil_nitrogen.csv"
@@ -39,7 +39,7 @@
         {
             "active": true,
             "produce_diagnostics": true,
-            "show_diagnostics": false,
+            "show_diagnostics": true,
             "report_name": "Crop Summary",
             "file_name": "crop_summary.csv"
         }

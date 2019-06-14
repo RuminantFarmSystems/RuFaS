@@ -18,7 +18,7 @@ import matplotlib.pyplot as mp, datetime as dt, csv
 from RUFAS import util
 
 
-def data_analysis(output_csv, show_diagnostics):
+def data_analysis(output_csv, show_diagnostics, is_final):
 
     output_full_path = util.get_base_dir() / 'Outputs/Sample_Farm_Outputs' / output_csv
     save_dir = util.get_base_dir() / 'Outputs/diagnostics/' / output_csv.split('.')[0]
@@ -54,13 +54,16 @@ def data_analysis(output_csv, show_diagnostics):
         counter = 0
         for variable in variables:
             if counter > 1:
-                fig = mp.figure()
+                mp.figure()
                 mp.plot(dates, variables[variable])
                 mp.title(variable.split()[0].upper())
                 mp.xlabel('Dates')
                 mp.ylabel(variable + " " + units[counter])
                 path = str(save_dir / variable)
                 mp.savefig(path + '')
+                if not show_diagnostics:
+                    mp.close()
             counter += 1
 
-        mp.show()
+        if is_final:
+            mp.show()
