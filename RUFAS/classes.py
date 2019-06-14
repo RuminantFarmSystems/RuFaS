@@ -224,6 +224,7 @@ class Config:
             self.years.append(days)
 
         self.output_dir = data['output_dir']
+        self.diagnostic_dir = data['diagnostic_dir']
 
 
 # -------------------------------------------------------------------------------
