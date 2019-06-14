@@ -5,7 +5,8 @@
     {
         "StartDate" : "2008:1",
         "EndDate" : "2009:365",
-        "output_dir": "Outputs/Sample_Farm_Outputs/"
+        "output_dir": "Outputs/Sample_Farm_Outputs/",
+        "diagnostic_dir": "Outputs/diagnostics/"
     },
 
     "weather": "Inputs/crop_module_testWeather_3.4.csv",
@@ -15,24 +16,32 @@
         "soil_summary":
         {
             "active": true,
+            "produce_diagnostics": true,
+            "show_diagnostics": false,
             "report_name": "Soil Summary",
             "file_name": "soil_summary.csv"
         },
         "ration_report":
         {
             "active": true,
+            "produce_diagnostics": false,
+            "show_diagnostics": false,
             "report_name": "Ration Report",
-            "file_name": "ration_report.txt"
+            "file_name": "ration_report.csv"
         },
         "soil_nitrogen":
         {
             "active": true,
+            "produce_diagnostics": false,
+            "show_diagnostics": false,
             "report_name": "Soil Nitrogen",
             "file_name": "soil_nitrogen.csv"
         },
         "crop_summary":
         {
             "active": true,
+            "produce_diagnostics": false,
+            "show_diagnostics": false,
             "report_name": "Crop Summary",
             "file_name": "crop_summary.csv"
         }
