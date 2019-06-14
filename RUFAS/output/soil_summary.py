@@ -26,6 +26,8 @@ class SoilSummary(BaseReportHandler):
         #
         # Sets active, report_name, file_name using data
         #
+
+        self.file_name = data['file_name']
         self.set_properties(data)
         self.fieldNames = None
 
@@ -69,19 +71,19 @@ class SoilSummary(BaseReportHandler):
                           'Maximum Sublimation (Esoil)']
 
             for x in range(0, self.numSoilLayers):
-                fieldnames.append("Et_actual/L" + str(x+1))
+                fieldnames.append("Et_actual_L" + str(x+1))
 
             for x in range(0, self.numSoilLayers):
-                fieldnames.append("SoilWater/L" + str(x+1))
+                fieldnames.append("SoilWater_L" + str(x+1))
 
             for x in range(0, self.numSoilLayers):
-                fieldnames.append("Esoil/L" + str(x+1))
+                fieldnames.append("Esoil_L" + str(x+1))
 
             for x in range(0, self.numSoilLayers):
-                fieldnames.append("Perc/L" + str(x+1))
+                fieldnames.append("Perc_L" + str(x+1))
 
             for x in range(0, self.numSoilLayers):
-                fieldnames.append("Temp/L" + str(x+1))
+                fieldnames.append("Temp_L" + str(x+1))
 
             fieldnames.append("Surface Temp")
             fieldnames.append("Sediment Yield")
@@ -219,15 +221,15 @@ class SoilSummary(BaseReportHandler):
                         str(round(self.sedimentYield[x], 3))}
 
                 for y in range(0, self.numSoilLayers):
-                    dailySoilData["Et_actual/L" + str(y+1)] = str(
+                    dailySoilData["Et_actual_L" + str(y+1)] = str(
                         round(self.layers_Et_actual[y][x], 3))
-                    dailySoilData["SoilWater/L" + str(y+1)] = str(
+                    dailySoilData["SoilWater_L" + str(y+1)] = str(
                         round(self.layersSoilWater[y][x], 3))
-                    dailySoilData["Esoil/L" + str(y+1)] = str(
+                    dailySoilData["Esoil_L" + str(y+1)] = str(
                         round(self.layersEsoil[y][x], 3))
-                    dailySoilData["Perc/L" + str(y+1)] = str(
+                    dailySoilData["Perc_L" + str(y+1)] = str(
                         round(self.layersPerc[y][x], 3))
-                    dailySoilData["Temp/L" + str(y+1)] = str(
+                    dailySoilData["Temp_L" + str(y+1)] = str(
                         round(self.layersTemperature[y][x], 3))
 
                 writer = csv.DictWriter(csvfile, fieldnames=self.fieldNames,
