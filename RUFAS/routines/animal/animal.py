@@ -7,7 +7,7 @@ Author(s): Kass Chupongstimun, kass_c@hotmail.com
 """
 ################################################################################
 
-from RUFAS.routines.animal import ration, Herd
+from RUFAS.routines.animal import ration, Herd, testing_ration
 
 #-------------------------------------------------------------------------------
 # Function: daily_animal_routine
@@ -110,17 +110,18 @@ class Animal():
             # values here are requirements (on the RHS of constraint eq)
             # milk_production_multiplier is passed as scaling factor
             #
-            rqmts = ration.calculate_rqmts(
+            '''rqmts = ration.calculate_rqmts(
                 self.parity, self.WIM, self.AMF, self.BWR, self.base_NED,
                 self.housing, feed.nutrients_in_LP, milk_production_multiplier
             )
-            formulated_ration = ration.optimize(feed, rqmts)
+            formulated_ration = ration.optimize(feed, rqmts)'''
             #
             # Ideally, we will use status == 'Infeasible', but due to bugs in
             # the GLPK routine outputting an 'Undefined' in some infeasible
             # cases, we have to just check for not optimal and re-iterate
             # accordingly
             #
+            formulated_ration = testing_ration.test_ration(feed)
             infeasible = (formulated_ration['status'] != 'Optimal')
 
         self.ration = formulated_ration
