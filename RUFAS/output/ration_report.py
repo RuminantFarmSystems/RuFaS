@@ -148,5 +148,5 @@ class RationReport(BaseReportHandler):
         self.milk_production_reduction = [] 
         self.julianDay = []
 
-    def produce_data_analysis(self):
-        data_analysis(self.file_name, self.show_diagnostics)
+    def produce_data_analysis(self, is_final):
+        data_analysis(self.file_name, self.show_diagnostics, is_final)

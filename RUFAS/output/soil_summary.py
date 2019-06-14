@@ -174,7 +174,6 @@ class SoilSummary(BaseReportHandler):
             self.layersTemperature[x].append(
                                     soil.listOfSoilLayers[x].temperature)
 
-
         self.surfaceTemp.append(soil.Tsurf)
         self.sedimentYield.append(soil.sedimentYield)
 
@@ -262,5 +261,5 @@ class SoilSummary(BaseReportHandler):
         self.surfaceTemp = []
         self.sedimentYield = []
 
-    def produce_data_analysis(self):
-        data_analysis(self.file_name, self.show_diagnostics)
+    def produce_data_analysis(self, is_final):
+        data_analysis(self.file_name, self.show_diagnostics, is_final)

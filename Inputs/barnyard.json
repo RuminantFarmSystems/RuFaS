@@ -15,7 +15,7 @@
         {
             "active": true,
             "produce_diagnostics": true,
-            "show_diagnostics": false,
+            "show_diagnostics": true,
             "report_name": "Soil Summary",
             "file_name": "soil_summary.csv"
         },
@@ -39,7 +39,7 @@
         {
             "active": true,
             "produce_diagnostics": true,
-            "show_diagnostics": false,
+            "show_diagnostics": true,
             "report_name": "Crop Summary",
             "file_name": "crop_summary.csv"
         }
