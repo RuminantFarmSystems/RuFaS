@@ -27,6 +27,7 @@ class SoilNitrogen(BaseReportHandler):
         #
         # Sets active, report_name, file_name using data
         #
+        self.file_name = data['file_name']
         self.set_properties(data)
         self.fieldNames = None
 
@@ -60,15 +61,15 @@ class SoilNitrogen(BaseReportHandler):
         with self.get_fPath().open(mode) as csvfile:
 
             # 1) Initialize the header of the cvsfile
-            fieldnames = ['Year', 'Julian Day', 'NO3/L1', 'NO3/L2', 'NO3/L3',
-                          'NH4/L1', 'NH4/L2', 'NH4/L3', 'ActiveN/L1',
-                          'ActiveN/L2', 'ActiveN/L3', 'StableN/L1',
-                          'StableN/L2', 'StableN/L3', 'FreshN', 'Nitri/L1',
-                          'Nitri/L2', 'Nitri/L3', 'Volati/L1', 'Volati/L2',
-                          'Volati/L3', 'Denitri/L1', 'Denitri/L2',
-                          'Denitri/L3', 'TotNitrVolatil/L1',
-                          'TotNitrVolatil/L2', 'TotNitrVolatil/L3',
-                          'Ntrans/L1', 'Ntrans/L2', 'Ntrans/L3']
+            fieldnames = ['Year', 'Julian Day', 'NO3_L1', 'NO3_L2', 'NO3_L3',
+                          'NH4_L1', 'NH4_L2', 'NH4_L3', 'ActiveN_L1',
+                          'ActiveN_L2', 'ActiveN_L3', 'StableN_L1',
+                          'StableN_L2', 'StableN_L3', 'FreshN', 'Nitri_L1',
+                          'Nitri_L2', 'Nitri_L3', 'Volati_L1', 'Volati_L2',
+                          'Volati_L3', 'Denitri_L1', 'Denitri_L2',
+                          'Denitri_L3', 'TotNitrVolatil_L1',
+                          'TotNitrVolatil_L2', 'TotNitrVolatil_L3',
+                          'Ntrans_L1', 'Ntrans_L2', 'Ntrans_L3']
 
             self.fieldNames = fieldnames
             writer = csv.DictWriter(csvfile, fieldnames=fieldnames,
@@ -78,7 +79,7 @@ class SoilNitrogen(BaseReportHandler):
             # 2) Write Units in 2nd row of cvsfile
             units = {'Year': '', 'Julian Day': '', }
             for fieldname in fieldnames:
-                if (fieldname.startswith("NO3/") or fieldname.startswith("NH4/")
+                if (fieldname.startswith("NO3_") or fieldname.startswith("NH4_")
                         or fieldname.startswith("ActiveN")
                         or fieldname.startswith("StableN")
                         or fieldname == "FreshN"
@@ -168,36 +169,36 @@ class SoilNitrogen(BaseReportHandler):
                 }
 
                 for y in range(0, self.numSoilLayers):
-                    dailySoilNitrogenData["NO3/L" + str(y + 1)] = str(
+                    dailySoilNitrogenData["NO3_L" + str(y + 1)] = str(
                         round(self.layersNO3[y][x], 3))
 
-                    dailySoilNitrogenData["NH4/L" + str(y + 1)] = str(
+                    dailySoilNitrogenData["NH4_L" + str(y + 1)] = str(
                         round(self.layersNH4[y][x], 3))
 
-                    dailySoilNitrogenData["ActiveN/L" + str(y + 1)] = str(
+                    dailySoilNitrogenData["ActiveN_L" + str(y + 1)] = str(
                         round(self.layersActiveN[y][x], 3))
 
-                    dailySoilNitrogenData["StableN/L" + str(y + 1)] = str(
+                    dailySoilNitrogenData["StableN_L" + str(y + 1)] = str(
                         round(self.layersStableN[y][x], 3))
 
                 dailySoilNitrogenData["FreshN"] = str(round(self.freshN[x], 3))
 
                 for y in range(0, self.numSoilLayers):
-                    dailySoilNitrogenData["Nitri/L" + str(y + 1)] = str(
+                    dailySoilNitrogenData["Nitri_L" + str(y + 1)] = str(
                         round(self.nitrification[y][x], 3))
 
-                    dailySoilNitrogenData["Volati/L" + str(y + 1)] = str(
+                    dailySoilNitrogenData["Volati_L" + str(y + 1)] = str(
                         self.volatilization[y][x])
 
 
-                    dailySoilNitrogenData["Denitri/L" + str(y + 1)] = str(
+                    dailySoilNitrogenData["Denitri_L" + str(y + 1)] = str(
                         round(self.denitrification[y][x], 3))
 
                 for y in range(0, self.numSoilLayers):
-                    dailySoilNitrogenData["TotNitrVolatil/L" + str(y + 1)] = str(
+                    dailySoilNitrogenData["TotNitrVolatil_L" + str(y + 1)] = str(
                         round(self.layersTotNitriVolatil[y][x], 3))
 
-                    dailySoilNitrogenData["Ntrans/L" + str(y + 1)] = str(
+                    dailySoilNitrogenData["Ntrans_L" + str(y + 1)] = str(
                         round(self.layersNtrans[y][x], 3))
 
                 writer = csv.DictWriter(csvfile, fieldnames=self.fieldNames,

@@ -80,6 +80,7 @@ class ReportTemplate(BaseReportHandler):
         #
         # Sets active, report_name, file_name using data
         #
+        self.file_name = data['file_name']
         self.set_properties(data)
         #
         # Daily Outputs

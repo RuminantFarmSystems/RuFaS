@@ -26,6 +26,7 @@ class SoilPhosphorus(BaseReportHandler):
         #
         # Sets active, report_name, file_name using data
         #
+        self.file_name = data['file_name']
         self.set_properties(data)
         self.fieldNames = None
 
@@ -51,9 +52,9 @@ class SoilPhosphorus(BaseReportHandler):
         with self.get_fPath().open(mode) as csvfile:
 
             # 1) Initialize the header of the cvsfile
-            fieldnames = ['Year', 'Julian Day', 'ActiveP/L1',
-                          'ActiveP/L2', 'ActiveP/L3', 'StableP/L1',
-                          'StableP/L2', 'StableP/L3']
+            fieldnames = ['Year', 'Julian Day', 'ActiveP_L1',
+                          'ActiveP_L2', 'ActiveP_L3', 'StableP_L1',
+                          'StableP_L2', 'StableP_L3']
 
             self.fieldNames = fieldnames
             writer = csv.DictWriter(csvfile, fieldnames=fieldnames,
@@ -63,8 +64,8 @@ class SoilPhosphorus(BaseReportHandler):
             # 2) Write Units in 2nd row of cvsfile
             units = {'Year': '', 'Julian Day': ''}
             for fieldname in fieldnames:
-                if (fieldname.startswith("ActiveP/") or 
-                    fieldname.startswith("StableP/")):
+                if (fieldname.startswith("ActiveP_") or
+                    fieldname.startswith("StableP_")):
                     units[fieldname] = 'kg/ha'
             writer.writerow(units)
 
@@ -121,10 +122,10 @@ class SoilPhosphorus(BaseReportHandler):
                     'Julian Day': self.julianDay[x]}
                 
                 for y in range(0, self.numSoilLayers):
-                    dailySoilPhosphorusData["ActiveP/L" + str(y+1)] = str(
+                    dailySoilPhosphorusData["ActiveP_L" + str(y+1)] = str(
                         round(self.layersActiveP[y][x], 3))
                     
-                    dailySoilPhosphorusData["StableP/L" + str(y+1)] = str(
+                    dailySoilPhosphorusData["StableP_L" + str(y+1)] = str(
                         round(self.layersStableP[y][x], 3))                
 
                 writer = csv.DictWriter(csvfile, fieldnames=self.fieldNames,

@@ -15,8 +15,14 @@ import matplotlib.pyplot as mp, datetime as dt, csv
 #
 # Produces graphical representations of data passed in from a csv file.
 #
-def data_analysis(input_csv):
-    with open('crop_summary.csv') as csvfile:
+from RUFAS import util
+
+
+def data_analysis(output_csv):
+
+    save_dir = util.get_base_dir() / 'Outputs/diagnostics/'
+    output_full_path = util.get_base_dir() / 'Outputs/Sample_Farm_Outputs' / output_csv
+    with open(output_full_path) as csvfile:
         read_CSV = csv.reader(csvfile, delimiter=',')
 
         variables = {}
@@ -53,5 +59,6 @@ def data_analysis(input_csv):
                 mp.xlabel('Dates')
                 mp.ylabel(variable + " " + units[counter])
             counter += 1
-            mp.savefig('save_dir')
-        mp.show()
+            path = str(save_dir / variable)
+            mp.savefig(path + '.png')
+        # mp.show()
