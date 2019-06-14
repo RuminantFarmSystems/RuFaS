@@ -11,6 +11,7 @@ import csv
 from RUFAS.output.data_analysis import data_analysis
 from RUFAS.output.report_handler import BaseReportHandler
 
+
 class CropSummary(BaseReportHandler):
 
     def __init__(self, data):
@@ -165,5 +166,5 @@ class CropSummary(BaseReportHandler):
         self.daily_z_root = []
         self.daily_yield_actual = []
 
-    def produce_data_analysis(self):
-        data_analysis(self.file_name, self.show_diagnostics)
+    def produce_data_analysis(self, is_final):
+        data_analysis(self.file_name, self.show_diagnostics, is_final)
