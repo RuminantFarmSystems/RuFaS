@@ -7,7 +7,7 @@
         "diagnostic_dir": "Outputs/diagnostics/"
     },
 
-    "weather": "Inputs/barnyard_weather_N_years.csv",
+    "weather": "Inputs/barnyard_weather.csv",
 
     "output":
     {
@@ -30,7 +30,7 @@
         "soil_nitrogen":
         {
             "active": true,
-            "produce_diagnostics": false,
+            "produce_diagnostics": true,
             "show_diagnostics": false,
             "report_name": "Soil Nitrogen",
             "file_name": "soil_nitrogen.csv"
@@ -39,7 +39,7 @@
         {
             "active": true,
             "produce_diagnostics": true,
-            "show_diagnostics": true,
+            "show_diagnostics": false,
             "report_name": "Crop Summary",
             "file_name": "crop_summary.csv"
         }
