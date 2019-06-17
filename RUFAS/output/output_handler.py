@@ -166,8 +166,8 @@ class OutputHandler():
         for reportName in self.reports:
             report = self.reports[reportName]
 
-            if report.produce_diagnostics:
-                if counter == len(self.reports) - 1:
-                    self.final = True
-                report.produce_data_analysis(self.final)
+            # if report.produce_diagnostics:
+            if counter == len(self.reports) - 1:
+                self.final = True
+            report.produce_data_analysis(self.final)
             counter += 1
