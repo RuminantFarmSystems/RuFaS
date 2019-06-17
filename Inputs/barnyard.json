@@ -42,6 +42,14 @@
             "show_diagnostics": false,
             "report_name": "Crop Summary",
             "file_name": "crop_summary.csv"
+        },
+        "water_balance":
+        {
+            "active": true,
+            "produce_diagnostics": false,
+            "show_diagnostics": false,
+            "report_name": "Water Balance",
+            "file_name": "water_balance.csv"
         }
     },
 
