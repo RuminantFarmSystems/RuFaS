@@ -226,4 +226,4 @@ class SoilNitrogen(BaseReportHandler):
             self.layersNtrans[x] = []
 
     def produce_data_analysis(self, is_final):
-        data_analysis(self.file_name, self.show_diagnostics, is_final)
+        data_analysis(self.file_name, self.show_diagnostics, self.produce_diagnostics, is_final)

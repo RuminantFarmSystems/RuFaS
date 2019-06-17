@@ -18,52 +18,54 @@ import matplotlib.pyplot as mp, datetime as dt, csv
 from RUFAS import util
 
 
-def data_analysis(output_csv, show_diagnostics, is_final):
+def data_analysis(output_csv, show_diagnostics, produce_diagnostics, is_final):
 
-    output_full_path = util.get_base_dir() / 'Outputs/Sample_Farm_Outputs' / output_csv
-    save_dir = util.get_base_dir() / 'Outputs/diagnostics/' / output_csv.split('.')[0]
+    if produce_diagnostics:
 
-    with open(output_full_path) as csvfile:
-        read_CSV = csv.reader(csvfile, delimiter=',')
+        output_full_path = util.get_base_dir() / 'Outputs/Sample_Farm_Outputs' / output_csv
+        save_dir = util.get_base_dir() / 'Outputs/diagnostics/' / output_csv.split('.')[0]
 
-        variables = {}
-        units = []
+        with open(output_full_path) as csvfile:
+            read_CSV = csv.reader(csvfile, delimiter=',')
 
-        r = 0
-        for row in read_CSV:
-            if r == 0:
-                for variable in row:
-                    variable_list = []
-                    variables[variable.lower()] = variable_list
-            elif r == 1:
-                for unit in row:
-                    units.append(unit)
-            else:
-                c = 0
-                for variable in variables:
-                    variables[variable].append(float(row[c]))
-                    c += 1
-            r += 1
+            variables = {}
+            units = []
 
-        start_year = int(variables['year'][0])
-        start_day = int(variables['julian day'][0])
-        start_date = dt.datetime(int(start_year), 1, 1) + dt.timedelta(start_day - 1)
+            r = 0
+            for row in read_CSV:
+                if r == 0:
+                    for variable in row:
+                        variable_list = []
+                        variables[variable.lower()] = variable_list
+                elif r == 1:
+                    for unit in row:
+                        units.append(unit)
+                else:
+                    c = 0
+                    for variable in variables:
+                        variables[variable].append(float(row[c]))
+                        c += 1
+                r += 1
 
-        dates = [start_date + dt.timedelta(days=i) for i in range(len(variables['julian day']))]
+            start_year = int(variables['year'][0])
+            start_day = int(variables['julian day'][0])
+            start_date = dt.datetime(int(start_year), 1, 1) + dt.timedelta(start_day - 1)
 
-        counter = 0
-        for variable in variables:
-            if counter > 1:
-                mp.figure()
-                mp.plot(dates, variables[variable])
-                mp.title(variable.split()[0].upper())
-                mp.xlabel('Dates')
-                mp.ylabel(variable + " " + units[counter])
-                path = str(save_dir / variable)
-                mp.savefig(path + '')
-                if not show_diagnostics:
-                    mp.close()
-            counter += 1
+            dates = [start_date + dt.timedelta(days=i) for i in range(len(variables['julian day']))]
 
-        if is_final:
-            mp.show()
+            counter = 0
+            for variable in variables:
+                if counter > 1:
+                    mp.figure()
+                    mp.plot(dates, variables[variable])
+                    mp.title(variable.split()[0].upper())
+                    mp.xlabel('Dates')
+                    mp.ylabel(variable + " " + units[counter])
+                    path = str(save_dir / variable)
+                    mp.savefig(path + '')
+                    if not show_diagnostics:
+                        mp.close()
+                counter += 1
+
+    if is_final:
+        mp.show()
