@@ -54,6 +54,9 @@ def update_all(soil, weather, time):
 #
 def update_SW(soil, weather, time):
 
+    profile_SW = 0
+    Ea = 0
+
     R = weather.rainfall[time.year-1][time.day-1]
     Q = soil.runoff
     for x in range(0, len(soil.listOfSoilLayers)):
@@ -75,6 +78,23 @@ def update_SW(soil, weather, time):
             SW = max(WP, SW + Perc_prev - Esoil - Perc - Et_actual)
             SW = min(SAT, SW)
 
-        soil.Ea_sum += Esoil + Et_actual
+        soil.delta_SW += (SW - layer.currentSoilWaterMM)
+
         layer.currentSoilWaterMM = SW
         soil.listOfSoilLayers[x] = layer
+
+        profile_SW += SW
+
+        Ea += (Esoil + Et_actual)
+
+    soil.Ea = Ea
+    soil.profile_SW = profile_SW
+    soil.drainage = soil.listOfSoilLayers[-1].perc
+
+    soil.p_act = R
+    soil.p_calc = soil.delta_SW + soil.Ea + Q + soil.drainage
+
+    soil.drainage_sum += soil.drainage
+    soil.runoff_sum += Q
+    soil.p_act_annual += R
+    soil.Ea_sum += soil.Ea

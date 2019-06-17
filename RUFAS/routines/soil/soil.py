@@ -198,7 +198,7 @@ def daily_soil_routine(soil, crop, weather, time):
 # Class: Soil
 #        Contains the state of the farm's soil
 # -------------------------------------------------------------------------------
-class Soil():
+class Soil:
     """
     Contains the state of the farm's soil.
     """
@@ -266,18 +266,41 @@ class Soil():
         for uptakePApp, uptakePData in data['CropPUptake'].items():
             self.cropPUptakes.append(self.CropPUptake(uptakePApp, uptakePData))
 
-        self.convertCurrentSoilWaterToMM()  # calculate initial soil water in layer
         self.calculateWiltingWater()  # calculate wilting water in layer
         self.calculateFcWater()  # calculate field capacity water in layer
         self.calculateSatWater()  # calculate saturation water in layer
 
         # daily output values
-        self.runoff = 0.0
         self.Et_max = 0.0
         self.E0 = 0.0
-        self.E0_sum = 0.0
-        self.Ea_sum = 0.0
+        self.profile_SW = 0.0
         self.Esoil = 0.0
+
+        # daily water balance
+        self.delta_SW = 0.0
+        self.runoff = 0.0
+        self.Ea = 0.0
+        self.drainage = 0.0
+
+        self.p_act = 0.0
+        self.p_calc = 0.0
+
+        self.water_balance = 0.0
+
+        # annual variables
+        self.E0_sum = 0.0
+
+        # annual water balance
+        self.annual_delta_SW = 0.0
+        self.runoff_sum = 0.0
+        self.Ea_sum = 0.0
+        self.drainage_sum = 0.0
+
+        self.p_act_annual = 0.0
+        self.p_calc_annual = 0.0
+
+        self.annual_water_balance = 0.0
+
         self.dailyInfiltration = 0.0
 
         self.sedimentYield = 0.0
@@ -337,11 +360,16 @@ class Soil():
             layer.NH4 = NH4 * unit_adjustment
             layer.topLayerFreshN = FreshN * unit_adjustment
 
+        for layer in self.listOfSoilLayers:
+            self.profile_SW += layer.currentSoilWaterMM
+
+        self.initial_annual_SW = self.profile_SW
+
     # ---------------------------------------------------------------------------
     # Class: SoilLayer
     # An instance of this class represents a layer in the soil
     # ---------------------------------------------------------------------------
-    class SoilLayer():
+    class SoilLayer:
         """
         An instance of this class represents a layer in the soil.
         """
@@ -361,14 +389,13 @@ class Soil():
             self.wiltingPoint = layerData['WiltingPoint']
             self.fieldCapacity = layerData['FieldCapacity']
             self.saturation = layerData['Saturation']
-            # self.currentSoilWater = layerData['StartingSoilWater']
+            self.currentSoilWaterMM = layerData['StartingSoilWater']
 
             self.depth = 0.0  # depth of soil layer
             self.fcWater = 0.0  # constant
             self.satWater = 0.0  # constant
             self.wiltingWater = 0.0  # constant
 
-            self.currentSoilWaterMM = 0.0  # soil water in layer in mm
             self.bulkDensity = layerData['BulkDensity']
 
             # Variables to calculate daily evapotranspiration
@@ -437,7 +464,7 @@ class Soil():
     # An instance of this class represents a particular fertilizer and the date
     # of its application
     # ---------------------------------------------------------------------------
-    class Fertilizer():
+    class Fertilizer:
         """
         Description:
             An instance of this class represents a particular fertilizer and the date
@@ -466,7 +493,7 @@ class Soil():
     # An instance of this class represents a particular manure and the date
     # of its application
     # ---------------------------------------------------------------------------
-    class Manure():
+    class Manure:
         """
         An instance of this class represents a particular manure and the date
         of its application
@@ -499,7 +526,7 @@ class Soil():
     # An instance of this class represents a particular tillage and the date
     # of its application
     # ---------------------------------------------------------------------------
-    class Tillage():
+    class Tillage:
         """
         An instance of this class represents a particular tillage and the date
         of its application
@@ -526,7 +553,7 @@ class Soil():
     # An instance of this class represents a particular uptake and the date
     # of uptake
     # ---------------------------------------------------------------------------
-    class CropPUptake():
+    class CropPUptake:
         """
         An instance of this class represents a particular uptake and the date
         of uptake
@@ -588,23 +615,28 @@ class Soil():
         for layer in self.listOfSoilLayers:
             layer.wiltingWater = layer.depth * layer.wiltingPoint
 
-    # ---------------------------------------------------------------------------
-    # Function: convertCurrentSoilWaterToMM
-    # Calculates the amount of soil water in a given layer in millimeters.
-    # Called once when soil portion of input is read.
-    # ---------------------------------------------------------------------------
-    def convertCurrentSoilWaterToMM(self):
+    def calculate_annual_water_balance(self):
         """
         Description:
-            Calculates the amount of soil water in a given layer in millimeters.
-            Called once when soil portion of input is read.
+            Calculates annual water balance
         """
-        for layer in self.listOfSoilLayers:
-            layer.currentSoilWaterMM = layer.depth * layer.fieldCapacity
+        self.p_calc_annual = (self.profile_SW - self.initial_annual_SW) \
+            + self.runoff_sum + self.Ea_sum + self.drainage_sum
 
     def annual_reset(self):
         """
         Description:
-            Resets the E0 sum for the next year.
+            Resets the annual values for the next year.
         """
+
         self.E0_sum = 0.0
+        self.Ea_sum = 0.0
+        self.drainage_sum = 0.0
+        self.runoff_sum = 0.0
+
+        self.p_act_annual = 0
+        self.p_calc_annual = 0
+
+        # initial annual soil water is set to soil water on the last day of the
+        # previous year
+        self.initial_annual_SW = self.profile_SW

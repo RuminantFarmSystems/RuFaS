@@ -201,7 +201,7 @@ class SoilSummary(BaseReportHandler):
                     'Year':
                         str(self.year[x]),
                     'Julian Day':
-                        self.julianDay[x],
+                        str(self.julianDay[x]),
                     'Rainfall':
                         str(round(float(self.precip[x]), 2)),
                     'Runoff (Q)':

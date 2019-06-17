@@ -19,12 +19,15 @@ from RUFAS.output.soil_summary import SoilSummary
 from RUFAS.output.soil_nitrogen import SoilNitrogen
 from RUFAS.output.ration_report import RationReport
 from RUFAS.output.crop_summary import CropSummary
+from RUFAS.output.water_balance import WaterBalance
 from RUFAS.output.soil_phosphorus import SoilPhosphorus
 
 
 # -------------------------------------------------------------------------------
 # Class: OutputHandler
 # -------------------------------------------------------------------------------
+
+
 class OutputHandler():
     """Handles all output related interactions.
 
@@ -59,7 +62,8 @@ class OutputHandler():
                         'soil_nitrogen': SoilNitrogen(data['soil_nitrogen']),
                         #'soil_phosphorus': SoilPhosphorus(data['soil_phosphorus']),
                         'ration_report': RationReport(data['ration_report']),
-                        'crop_summary': CropSummary(data['crop_summary'])
+                        'crop_summary': CropSummary(data['crop_summary']),
+                        'water_balance': WaterBalance(data['water_balance'])
                         }
         self.final = False
 
