@@ -47,6 +47,18 @@ def data_analysis(output_csv, show_diagnostics, produce_diagnostics, is_final):
                         c += 1
                 r += 1
 
+        if output_csv.endswith('_annual.csv'):
+            counter = 0
+            stacks = []
+
+            for variable in variables:
+                if 1 < counter < 6:
+                    stacks.append(variables[variable])
+                if counter == 6:
+                    precip = variables[variable]
+                counter += 1
+
+        else:
             start_year = int(variables['year'][0])
             start_day = int(variables['julian day'][0])
             start_date = dt.datetime(int(start_year), 1, 1) + dt.timedelta(start_day - 1)

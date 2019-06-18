@@ -622,6 +622,7 @@ class Soil:
         """
         self.p_calc_annual = (self.profile_SW - self.initial_annual_SW) \
             + self.runoff_sum + self.Ea_sum + self.drainage_sum
+        self.annual_water_balance = self.p_act_annual - self.p_calc_annual
 
     def annual_reset(self):
         """

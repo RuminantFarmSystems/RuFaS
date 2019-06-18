@@ -18,7 +18,7 @@ from RUFAS.output.report_handler import BaseReportHandler
 
 # -------------------------------------------------------------------------------
 # Class: SoilSummary
-# Creates and prints to the file soil_summary.csv
+# Creates and prints to the file water_balance.csv
 # -------------------------------------------------------------------------------
 class WaterBalance(BaseReportHandler):
 
@@ -84,9 +84,10 @@ class WaterBalance(BaseReportHandler):
 
             units = {}
             for fieldname in fieldnames:
-                if fieldname == 'Year' or 'Julian Day':
-                    continue
-                units[fieldname] = 'mm H2O'
+                if fieldname == 'Year' or fieldname == 'Julian Day':
+                    units[fieldname] = ''
+                else:
+                    units[fieldname] = 'mm H2O'
 
             writer.writerow(units)
 
@@ -96,12 +97,12 @@ class WaterBalance(BaseReportHandler):
     # ---------------------------------------------------------------------------
     def initialize(self, state):
         self.write_headers(self.get_fPath())
-        annual_path = str(self.get_fPath()) + "_annual"
-        self.write_headers(Path(annual_path))
+        annual_path = Path(str(self.get_fPath()).split('.')[0] + "_annual.csv")
+        self.write_headers(annual_path)
 
     # ---------------------------------------------------------------------------
     # Function: updateDailyOutput
-    # Stores the daily values that need to be printed in the 'soil summary'
+    # Stores the daily values that need to be printed in the 'water balance'
     # csv file
     # ---------------------------------------------------------------------------
     def daily_update(self, state, weather, time):
@@ -128,6 +129,8 @@ class WaterBalance(BaseReportHandler):
         """Stores the yearly values that need to be printed in the report."""
         soil = state.soil
 
+        soil.calculate_annual_water_balance()
+
         self.cal_year = time.year
 
         self.annual_delta_SW = soil.annual_delta_SW
@@ -153,7 +156,7 @@ class WaterBalance(BaseReportHandler):
 
             # Write data day by day
             for x in range(0, len(self.julianDay)):
-                daily_soil_data = {
+                daily_water_data = {
                     'Year':
                         str(self.year[x]),
                     'Julian Day':
@@ -176,14 +179,14 @@ class WaterBalance(BaseReportHandler):
 
                 writer = csv.DictWriter(csvfile, fieldnames=self.fieldNames,
                                         lineterminator='\n')
-                writer.writerow(daily_soil_data)
+                writer.writerow(daily_water_data)
 
-        annual_path = Path(str(self.get_fPath()) + "_annual")
+        annual_path = Path(str(self.get_fPath()).split('.')[0] + "_annual.csv")
 
         mode = 'a+' if annual_path.exists() else 'w+'
 
         with annual_path.open(mode) as csvfile:
-            annual_soil_data = {
+            annual_water_data = {
                 'Year':
                     str(self.cal_year),
                 'Julian Day':
@@ -207,7 +210,7 @@ class WaterBalance(BaseReportHandler):
 
             writer = csv.DictWriter(csvfile, fieldnames=self.fieldNames,
                                     lineterminator='\n')
-            writer.writerow(annual_soil_data)
+            writer.writerow(annual_water_data)
 
     # ---------------------------------------------------------------------------
     # Function: annual_flush
@@ -240,4 +243,6 @@ class WaterBalance(BaseReportHandler):
         self.annual_diff = 0.0
 
     def produce_data_analysis(self, is_final):
+        annual_file_name = str(self.file_name).split('.')[0] + "_annual.csv"
+        data_analysis(annual_file_name, self.show_diagnostics, self.produce_diagnostics, False)
         data_analysis(self.file_name, self.show_diagnostics, self.produce_diagnostics, is_final)

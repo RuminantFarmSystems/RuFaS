@@ -93,6 +93,7 @@ def update_SW(soil, weather, time):
 
     soil.p_act = R
     soil.p_calc = soil.delta_SW + soil.Ea + Q + soil.drainage
+    soil.water_balance = soil.p_act - soil.p_calc
 
     soil.drainage_sum += soil.drainage
     soil.runoff_sum += Q
