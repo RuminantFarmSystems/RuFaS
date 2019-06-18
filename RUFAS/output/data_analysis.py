@@ -73,11 +73,14 @@ def data_analysis(output_csv, show_diagnostics, produce_diagnostics, is_final):
                     row_labs.append(variable)
                 counter += 1
 
-            mp.table(cellText=table_vals,
+            table = mp.table(cellText=table_vals,
                      rowLabels=row_labs,
-                     colLabels=years)
-            mp.legend(legend, loc='best')  # , bbox_to_anchor=(1, 0.5))
-            mp.xlabel('Dates')
+                     bbox=[0, -.9, 1, .75])
+            table.auto_set_font_size()
+
+            mp.legend(legend, loc='best')
+            mp.subplots_adjust(left=0.25, bottom=0.5)
+            # mp.xlabel('Dates')
             mp.ylabel('mm H2O')
             mp.title('Annual Water Balance')
             path = str(save_dir / 'annual_water_balance')
