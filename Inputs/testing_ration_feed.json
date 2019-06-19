@@ -17,7 +17,7 @@
         {
             "active": true,
             "produce_diagnostics": false,
-            "show_diagnostics": false,
+            "show_daily": false,
             "report_name": "Soil Summary",
             "file_name": "soil_summary.csv"
         },
@@ -25,7 +25,7 @@
         {
             "active": true,
             "produce_diagnostics": false,
-            "show_diagnostics": false,
+            "show_daily": false,
             "report_name": "Ration Report",
             "file_name": "ration_report.csv"
         },
@@ -33,7 +33,7 @@
         {
             "active": true,
             "produce_diagnostics": false,
-            "show_diagnostics": false,
+            "show_daily": false,
             "report_name": "Soil Nitrogen",
             "file_name": "soil_nitrogen.csv"
         },
@@ -41,7 +41,7 @@
         {
             "active": true,
             "produce_diagnostics": false,
-            "show_diagnostics": false,
+            "show_daily": false,
             "report_name": "Crop Summary",
             "file_name": "crop_summary.csv"
         },
@@ -49,7 +49,8 @@
         {
             "active": true,
             "produce_diagnostics": true,
-            "show_diagnostics": true,
+            "show_daily": true,
+            "show_annual": false,
             "report_name": "Water Balance",
             "file_name": "water_balance.csv"
         }

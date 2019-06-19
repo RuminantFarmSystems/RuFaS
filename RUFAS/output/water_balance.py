@@ -30,6 +30,8 @@ class WaterBalance(BaseReportHandler):
 
         self.set_properties(data)
         self.fieldNames = None
+        self.show_annual = data['show_annual']
+        
 
         #
         # Daily Outputs
@@ -244,5 +246,5 @@ class WaterBalance(BaseReportHandler):
 
     def produce_data_analysis(self, is_final):
         annual_file_name = str(self.file_name).split('.')[0] + "_annual.csv"
-        annual_data_analysis(annual_file_name, self.show_diagnostics, self.produce_diagnostics)
-        data_analysis(self.file_name, self.show_diagnostics, self.produce_diagnostics, is_final)
+        annual_data_analysis(annual_file_name, self.show_annual, self.produce_diagnostics)
+        data_analysis(self.file_name, self.show_daily, self.produce_diagnostics, is_final)

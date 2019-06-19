@@ -149,4 +149,4 @@ class RationReport(BaseReportHandler):
         self.julianDay = []
 
     def produce_data_analysis(self, is_final):
-        ration_data_analysis(self.file_name, self.show_diagnostics, self.produce_diagnostics, is_final, self.ration_interval)
+        ration_data_analysis(self.file_name, self.show_daily, self.produce_diagnostics, is_final, self.ration_interval)

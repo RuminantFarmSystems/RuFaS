@@ -145,4 +145,4 @@ class SoilPhosphorus(BaseReportHandler):
             self.layersStableP[x] = []
 
     def produce_data_analysis(self):
-        data_analysis(self.file_name, self.show_diagnostics)
+        data_analysis(self.file_name, self.show_daily)

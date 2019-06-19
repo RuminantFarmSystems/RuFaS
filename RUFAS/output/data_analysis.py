@@ -45,7 +45,7 @@ def read_data(output_csv):
     return variables, units
 
 
-def ration_data_analysis(output_csv, show_diagnostics, produce_diagnostics, is_final, ration_interval):
+def ration_data_analysis(output_csv, show_daily, produce_diagnostics, is_final, ration_interval):
 
     if produce_diagnostics:
         variables, units = read_data(output_csv)
@@ -72,14 +72,14 @@ def ration_data_analysis(output_csv, show_diagnostics, produce_diagnostics, is_f
                 mp.ylabel(variable + ' ' + units[counter])
                 path = str(save_dir / variable)
                 mp.savefig(path + '')
-                if not show_diagnostics:
+                if not show_daily:
                     mp.close()
             counter += 1
 
     show_figures(is_final)
 
 
-def annual_data_analysis(output_csv, show_diagnostics, produce_diagnostics):
+def annual_data_analysis(output_csv, show_annual, produce_diagnostics):
     if produce_diagnostics:
         variables, units = read_data(output_csv)
 
@@ -118,11 +118,11 @@ def annual_data_analysis(output_csv, show_diagnostics, produce_diagnostics):
         mp.title('Annual Water Balance')
         path = str(save_dir / 'annual_water_balance')
         mp.savefig(path + '')
-        if not show_diagnostics:
+        if not show_annual:
             mp.close()
 
 
-def data_analysis(output_csv, show_diagnostics, produce_diagnostics, is_final):
+def data_analysis(output_csv, show_daily, produce_diagnostics, is_final):
 
     if produce_diagnostics:
         variables, units = read_data(output_csv)
@@ -145,7 +145,7 @@ def data_analysis(output_csv, show_diagnostics, produce_diagnostics, is_final):
                 mp.ylabel(variable + ' ' + units[counter])
                 path = str(save_dir / variable)
                 mp.savefig(path + '')
-                if not show_diagnostics:
+                if not show_daily:
                     mp.close()
             counter += 1
 
