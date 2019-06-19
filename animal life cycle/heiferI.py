@@ -62,7 +62,6 @@ class HeiferI(Calf):
 			Birth Weight: {}kg\n
 			Wean Weight: {}kg\n
 			Body Weight: {}kg\n
-			Wean Day: {}\n
 			Breeding Start Day: {}\n
 			Life Events: \n
 			{}
@@ -72,7 +71,6 @@ class HeiferI(Calf):
 				   self._birth_weight,
 				   self._wean_weight,
 				   self._body_weight,
-				   config.wean_day,
 				   config.breeding_start_day_h,
 				   str(self._events))
 

@@ -5,11 +5,12 @@ Author(s): Manfei Li, mli497@wisc.edu
 Description: This file updates the cow form first calving to leaving the herd.
 			Temp: Body weight change uses equations for lactation cows (decrease for the first 50 days and increase later on)
 			Temp: Dry matter intake is caculated by body weight and FCM production.
+			TODO: different body weight for different lactations and individual mature body weight.
 			TODO: Dry Matter Intake and Body Weight changed could be based on nutrition intake later fron Ration Formulation.
 			Reproduction program could be chosen from the ED, TAI, ED-TAI projects, reference:
 			http://www.dcrcouncil.org/wp-content/uploads/2019/04/Dairy-Cow-Protocol-Sheet-Updated-2018.pdf
 			Preg check follows AI for three times.
-			Daily milk production is based on breed and parity specific lactation curve model (wood's and Milkbot) parameters.
+			Daily milk production is based on breed and parity specific lactation curve model (Wood's and Milkbot) parameters.
 			Culling inclouding 3 components: repro, production, and health,
 				health culling for 6 reasons: Lameness, Injury, Mastitis, Disease, Udder, and Unknown
 '''
@@ -17,6 +18,7 @@ Description: This file updates the cow form first calving to leaving the herd.
 
 import math
 import numpy as np
+import matplotlib.pyplot as plt
 from heiferIII import HeiferIII
 from random import random
 from config import Config
@@ -41,6 +43,7 @@ class Cow(HeiferIII):
 		self._calves = 0
 		self._milking = False
 		self._days_in_milk = 0
+		self._estimated_daily_milk_produced = 0
 		self._single_acc_milk_prod = 0
 		self._future_cull_date = 0
 		self._cull_reason = None
@@ -66,6 +69,10 @@ class Cow(HeiferIII):
 		self._fixed_cost = 0
 		self._milk_income = 0
 
+		#figures
+		self._estimated_daily_milk_produced_lst = []
+		self._body_weight_lst = []
+
 	'''
 		Description:
             initialize the cow in this stage from the third stage of heifer and initialize the repro program parameters for coding purpose
@@ -78,6 +85,7 @@ class Cow(HeiferIII):
 		self._calves = cow._calves
 		self._milking = cow._milking
 		self._days_in_milk = cow._days_in_milk
+		self._estimated_daily_milk_produced = cow._estimated_daily_milk_produced
 		self._single_acc_milk_prod = cow._single_acc_milk_prod
 		self._future_cull_date = cow._future_cull_date
 		self._cull_reason = cow._cull_reason
@@ -101,6 +109,10 @@ class Cow(HeiferIII):
 		self._feed_cost = cow._feed_cost
 		self._fixed_cost = cow._fixed_cost
 		self._milk_income = cow._milk_income
+
+		#figures
+		self._estimated_daily_milk_produced_lst = cow._estimated_daily_milk_produced_lst
+		self._body_weight_lst = cow._body_weight_lst
 
 	'''
 		Description:
@@ -131,7 +143,11 @@ class Cow(HeiferIII):
 			self._milking = False
 			self._events.add_event(self._days_born, 'dry')
 			self._days_in_milk = 0
-			return 0, 0, 0, 0
+			self._estimated_daily_milk_produced = 0
+			self._estimated_daily_milk_produced_lst.append(self._estimated_daily_milk_produced)
+			self._body_weight_lst.append(self._body_weight)
+			dry_matter_intake = 12
+			return 0, 0, 0, dry_matter_intake
 
 		self._days_in_milk += 1
 		if self._breed == 'HO':
@@ -140,11 +156,12 @@ class Cow(HeiferIII):
 		elif self._breed == 'JE':
 			breed_index = 1
 			parity_index = 2 if self._calves - 1 > 2 else self._calves - 1
+
 		if config.lactation_curve == 'wood':
 			l = self._determine_param_value(config.l[breed_index][parity_index], config.l_std[breed_index][parity_index])
 			m = self._determine_param_value(config.m[breed_index][parity_index], config.m_std[breed_index][parity_index])
 			n = self._determine_param_value(config.n[breed_index][parity_index], config.n_std[breed_index][parity_index])
-
+			
 			estimated_daily_milk_produced = l * \
 				math.pow(self._days_in_milk, m) * \
 				math.exp((0 - n) * self._days_in_milk)
@@ -152,7 +169,12 @@ class Cow(HeiferIII):
 			estimated_daily_milk_produced = config.a * \
 				(1 - math.exp((config.c-self._days_in_milk) / config.b) / 2) * \
 				math.exp((0 - config.d) * self._days_in_milk)
+		if self._milking:
+			self._estimated_daily_milk_produced = estimated_daily_milk_produced
+		else:
+			self._estimated_daily_milk_produced = 0
 		self._single_acc_milk_prod += estimated_daily_milk_produced
+
 
 		# calculate fat percent in milk and fat corrected milk production
 		fat_percent = 12.86 * self._days_in_milk ** (-1.081) * math.exp((0.0926) * (math.log(self._days_in_milk)) ** 2) * (math.log(self._days_in_milk) ** 1.107)
@@ -165,10 +187,10 @@ class Cow(HeiferIII):
 			self._body_weight = self._mature_body_weight * (1-(1-(self._birth_weight/self._mature_body_weight)**(1/3)) * math.exp(-0.006 * self._days_born)) **3 - (40/75) * self._days_in_milk * math.exp(1-self._days_in_milk/75) + 0.0187**3 * (self._days_in_preg - 50) ** 3
 
 		#caculate dry matter intake from fat corrected milk production
-		if self._milking:
-			dry_matter_intake = 0.372 * daily_fat_correct_milk_production + 0.0968 * self._body_weight**0.75 * (1-math.exp(-0.192 * (self._days_in_milk/7 +3.67)))
-		else:
-			dry_matter_intake = 12
+		dry_matter_intake = 0.372 * daily_fat_correct_milk_production + 0.0968 * self._body_weight**0.75 * (1-math.exp(-0.192 * (self._days_in_milk/7 +3.67)))
+
+		self._estimated_daily_milk_produced_lst.append(self._estimated_daily_milk_produced)
+		self._body_weight_lst.append(self._body_weight)
 
 		return estimated_daily_milk_produced, fat_percent, daily_fat_correct_milk_production, dry_matter_intake
 
@@ -215,15 +237,15 @@ class Cow(HeiferIII):
 		fat_percent = 0
 		daily_fat_correct_milk_production = 0
 		dry_matter_intake = 0
-		if self._milking:
-			estimated_daily_milk_produced, fat_percent, daily_fat_correct_milk_production, dry_matter_intake = self._milking_update()
-			if self._repro_program == 'ED':
-					self._ed_update(record_econ_stats)
-			elif self._repro_program == 'ED-TAI':
-					self._ed_tai_update(record_econ_stats)
-			elif self._repro_program == 'TAI':
-				if self._days_in_milk >= config.vwp:
-					self._tai_update(record_econ_stats)
+		# if self._milking:
+		estimated_daily_milk_produced, fat_percent, daily_fat_correct_milk_production, dry_matter_intake = self._milking_update()
+		if self._repro_program == 'ED':
+				self._ed_update(record_econ_stats)
+		elif self._repro_program == 'ED-TAI':
+				self._ed_tai_update(record_econ_stats)
+		elif self._repro_program == 'TAI':
+			if self._days_in_milk >= config.vwp:
+				self._tai_update(record_econ_stats)
 
 		self._preg_update(record_econ_stats)
 		cull_stage = self._cull_update(estimated_daily_milk_produced)
@@ -729,21 +751,30 @@ class Cow(HeiferIII):
 				self._open(record_econ_stats)
 				self._events.add_event(
 					self._days_born, 'Preg loss happened between 2nd and 3rd preg check')
+		if not self._preg and self._days_in_milk > config.do_not_breed_time:
+			self._do_not_breed = True
+			self._events.add_event(self._days_born, 'Do not breed')
+			return True
+
 
 	################ Cull methods #################
 
 	'''
 		Description:
+			update culling time and cull reasons for cow to leave the herd
+			the reasons are reproduction failure, low production, and health issues
 		Input:
+			record_econ_stats: record income from beef for temprary use
 		Output:
+			not culled
 	'''
 	def _cull_update(self, record_econ_stats):
-		if not self._preg and self._days_in_milk > config.repro_cull_time:
-			self._culled = True
-			self._events.add_event(self._days_born, 'Cull for repro problem')
-			self._cull_reason = "Reproduction failure"
-			return True
-		if self._days_in_milk > 80 and not self._preg and self._milk_income < self._feed_cost + self._fixed_cost: #estimated_daily_milk_produced < config.cull_milk_production:
+		# if not self._preg and self._days_in_milk > config.repro_cull_time:
+		# 	self._culled = True
+		# 	self._events.add_event(self._days_born, 'Cull for repro problem')
+		# 	self._cull_reason = "Reproduction failure"
+		# 	return True
+		if self._do_not_breed and self._days_in_milk > 80 and self._estimated_daily_milk_produced < config.cull_milk_production: #estimated_daily_milk_produced < config.cull_milk_production:
 			self._culled = True
 			self._events.add_event(self._days_born, 'Cull for low production')
 			self._cull_reason = "Low production"
@@ -810,9 +841,9 @@ class Cow(HeiferIII):
 		# cow ecnomics
 		if record_econ_stats:
 			if self._milking:
-				self._feed_cost += dry_matter_intake * 0.25
+				self._feed_cost += dry_matter_intake * 0.22
 			else:
-				self._feed_cost += dry_matter_intake * 0.15
+				self._feed_cost += dry_matter_intake * 0.18
 
 			if cull_stage == False:
 				self._fixed_cost += 2.5
@@ -841,16 +872,35 @@ class Cow(HeiferIII):
 
 		return self._repro_cost, semen_cost, AI_cost, preg_check_cost, self._feed_cost, self._fixed_cost, self._milk_income, slaughter_value
 
+	def draw_curves(self):
+		fig = plt.figure()
+
+		ax1 = fig.add_subplot(121)
+		ax1.plot(self._estimated_daily_milk_produced_lst)
+		ax1.spines['right'].set_visible(False)
+		ax1.spines['top'].set_visible(False)
+		ax1.set_title("Milk")
+			
+		ax2 = fig.add_subplot(122)
+		ax2.plot(self._body_weight_lst)
+		ax2.spines['right'].set_visible(False)
+		ax2.spines['top'].set_visible(False)
+		ax2.set_title("Weight")
+
+		plt.plot()
+		plt.show()
+	
 	def __str__(self):
 		res_str = """
 			==> Cow: \n
 			ID: {} \n
-			Birth Date: {}\n
+			Enter herd date: {}\n
 			Days Born: {}\n
 			Body Weight: {}kg\n
 			Repro program: {}\n
 			Parity: {}\n
 			Days in milk: {}\n
+			Milk produced: {}kg\n
 			Days in preg: {}\n
 			Gestation Length: {}\n
 			Life Events: \n
@@ -862,6 +912,7 @@ class Cow(HeiferIII):
 				   self._repro_program,
 				   self._calves,
 				   self._days_in_milk,
+				   self._estimated_daily_milk_produced,
 				   self._days_in_preg,
 				   self._gestation_length,
 				   str(self._events))

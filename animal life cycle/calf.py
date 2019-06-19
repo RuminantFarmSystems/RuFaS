@@ -31,11 +31,6 @@ class Calf(AnimalBase):
 	def __init__(self, args):
 		super().__init__(args)
 		self._sold = False
-		# calf born, with stillbirth porbabality
-		if random() < config.still_birth_rate:
-			self._culled = True
-			self._events.add_event(0, 'Still birth')
-			return
 
 		# gender determined with gender ratio relates to semen type
 		if config.semen_type == 'conventional':
@@ -46,6 +41,12 @@ class Calf(AnimalBase):
 			self._gender = 'male'
 		else:
 			self._gender = 'female'
+
+		# calf born, with stillbirth porbabality
+		if random() < config.still_birth_rate:
+			self._culled = True
+			self._events.add_event(0, 'Still birth')
+			return
 
 		# sell the male calves and the unwanted female calves (if config.keep_female_calf_rate = 1, keep all the female calves in farm. if config.keep_female_calf_rate = 0, sell all female calves)
 		if self._gender == 'male' or random() > config.keep_female_calf_rate:

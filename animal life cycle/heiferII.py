@@ -160,7 +160,7 @@ class HeiferII(HeiferI):
 
 	'''
 		Description:
-			return estrus after estrus not detected or not serveded
+			return estrus after estrus not detected or not serviced
 	'''
 	def _return_estrus(self):
 		self._estrus_day = self._determine_estrus_day(self._estrus_day, 'Estrus')
