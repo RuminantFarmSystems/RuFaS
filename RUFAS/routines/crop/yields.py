@@ -112,7 +112,6 @@ def calc_HI_actual(crop_type, time):
         crop_type.HI_actual = 0
     else:
         term1 = crop_type.HI_max - crop_type.HI_min
-
         exp_part = exp(6.13 - (0.883 * crop_type.gamma_wu))
         term2 = crop_type.gamma_wu / (crop_type.gamma_wu + exp_part)
 
