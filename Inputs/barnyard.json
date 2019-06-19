@@ -22,10 +22,11 @@
         "ration_report":
         {
             "active": true,
-            "produce_diagnostics": false,
+            "produce_diagnostics": true,
             "show_diagnostics": false,
             "report_name": "Ration Report",
-            "file_name": "ration_report.csv"
+            "file_name": "ration_report.csv",
+            "ration_interval": 7
         },
         "soil_nitrogen":
         {
@@ -46,8 +47,8 @@
         "water_balance":
         {
             "active": true,
-            "produce_diagnostics": true,
-            "show_diagnostics": true,
+            "produce_diagnostics": false,
+            "show_diagnostics": false,
             "report_name": "Water Balance",
             "file_name": "water_balance.csv"
         }
