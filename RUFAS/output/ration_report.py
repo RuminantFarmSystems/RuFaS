@@ -10,7 +10,7 @@ Author(s): Kass Chupongstimun, kass_c@hotmail.com
 from pathlib import Path
 import csv
 
-from RUFAS.output.data_analysis import data_analysis
+from RUFAS.output.data_analysis import ration_data_analysis
 from RUFAS.output.report_handler import BaseReportHandler
 
 
@@ -149,4 +149,4 @@ class RationReport(BaseReportHandler):
         self.julianDay = []
 
     def produce_data_analysis(self, is_final):
-        data_analysis(self.file_name, self.show_diagnostics, self.produce_diagnostics, is_final) #, self.ration_interval)
+        ration_data_analysis(self.file_name, self.show_diagnostics, self.produce_diagnostics, is_final, self.ration_interval)
