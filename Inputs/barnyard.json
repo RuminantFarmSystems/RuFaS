@@ -14,8 +14,8 @@
         "soil_summary":
         {
             "active": true,
-            "produce_diagnostics": false,
-            "show_diagnostics": false,
+            "produce_diagnostics": true,
+            "show_diagnostics": true,
             "report_name": "Soil Summary",
             "file_name": "soil_summary.csv"
         },
@@ -63,7 +63,7 @@
                 "crop_type": "annual",
                 "fix_nitrogen": false,
 
-                "planting_date": 121,
+                "planting_date": 320,
                 "harvest_date": 319,
 
                 "harvest_index": 0.65,

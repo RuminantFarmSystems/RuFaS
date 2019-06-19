@@ -79,7 +79,7 @@ def data_analysis(output_csv, show_diagnostics, produce_diagnostics, is_final):
             table.auto_set_font_size()
 
             mp.legend(legend, loc='best')
-            mp.subplots_adjust(left=0.25, bottom=0.5)
+            mp.subplots_adjust(left=0.31, bottom=0.5)
             # mp.xlabel('Dates')
             mp.ylabel('mm H2O')
             mp.title('Annual Water Balance')
