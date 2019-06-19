@@ -135,7 +135,7 @@ def calc_dd(soil):
 #
 def calc_scale(soil):
     SW = sum_soil_water(soil)
-    Ztot = soil.profileDepth
+    Ztot = soil.profile_depth
     bd = soil.profileBulkDensity
 
     return SW / ((0.356 - 0.144 * bd) * Ztot)

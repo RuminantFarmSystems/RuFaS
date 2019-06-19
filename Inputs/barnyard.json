@@ -65,7 +65,7 @@
                 "crop_type": "annual",
                 "fix_nitrogen": false,
 
-                "planting_date": 320,
+                "planting_date": 121,
                 "harvest_date": 319,
 
                 "harvest_index": 0.65,
@@ -115,7 +115,6 @@
         },
         "soil":
         {
-            "ProfileDepth": 450,
             "ProfileBulkDensity": 1.4,
             "CN2": 85.00,
             "FieldSlope": 0.02,
@@ -151,7 +150,7 @@
                     "ActiveMineralRate": 0.0003,
                     "VolatileExchangeFac": 0.15,
                     "DenitrificationRate": 0.05,
-                    "StartingSoilWater": 45,
+                    "SoilWaterRatio": 0.3,
                     "OM%": 1.9
                 },
                 "Layer2":
@@ -172,7 +171,7 @@
                     "ActiveMineralRate": 0.0003,
                     "VolatileExchangeFac": 0.15,
                     "DenitrificationRate": 0.05,
-                    "StartingSoilWater": 45,
+                    "SoilWaterRatio": 0.3,
                     "OM%": 1.9
                 },
                 "Layer3":
@@ -193,7 +192,7 @@
                     "ActiveMineralRate": 0.0003,
                     "VolatileExchangeFac": 0.15,
                     "DenitrificationRate": 0.05,
-                    "StartingSoilWater": 45,
+                    "SoilWaterRatio": 0.3,
                     "OM%": 1.9
                 }
             },

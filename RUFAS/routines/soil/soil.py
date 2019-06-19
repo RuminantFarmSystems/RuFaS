@@ -52,7 +52,7 @@ This module needs the following inputs in order to operate correctly:
                 "ActiveMineralRate": 0.0003,
                 "VolatileExchangeFac": 0.15,
                 "DenitrificationRate": 0.05,
-                "StartingSoilWater": 45,
+                "SoilWaterRatio": 0.3,
                 "OM%": 1.9
 
             "Layer2":
@@ -219,7 +219,6 @@ class Soil:
             config: instance of the Config class
         """
         # Values Initialized by Input
-        self.profileDepth = data['ProfileDepth']
         self.profileBulkDensity = data['ProfileBulkDensity']
         self.CN2 = data['CN2']  # unitless, user-defined curve number (empirical)
 
@@ -243,7 +242,10 @@ class Soil:
 
         # sort layers by bottomDepth
         self.listOfSoilLayers.sort(key=lambda x: x.bottomDepth)
-
+        
+        # determine profile depth
+        self.profile_depth = self.listOfSoilLayers[-1].bottomDepth
+        
         # calculate initial depth of each soil layer
         curr_depth = 0
         for layer in self.listOfSoilLayers:
@@ -266,6 +268,7 @@ class Soil:
         for uptakePApp, uptakePData in data['CropPUptake'].items():
             self.cropPUptakes.append(self.CropPUptake(uptakePApp, uptakePData))
 
+        self.calculateSoilWater()
         self.calculateWiltingWater()  # calculate wilting water in layer
         self.calculateFcWater()  # calculate field capacity water in layer
         self.calculateSatWater()  # calculate saturation water in layer
@@ -386,15 +389,16 @@ class Soil:
             self.name = layerName
 
             self.bottomDepth = layerData['BottomDepth']
+            self.soilWaterRatio = layerData['SoilWaterRatio']
             self.wiltingPoint = layerData['WiltingPoint']
             self.fieldCapacity = layerData['FieldCapacity']
             self.saturation = layerData['Saturation']
-            self.currentSoilWaterMM = layerData['StartingSoilWater']
 
+            self.currentSoilWaterMM = 0.0  # mm water in the soil profile
             self.depth = 0.0  # depth of soil layer
-            self.fcWater = 0.0  # constant
-            self.satWater = 0.0  # constant
-            self.wiltingWater = 0.0  # constant
+            self.fcWater = 0.0  # calculated constant
+            self.satWater = 0.0  # calculated constant
+            self.wiltingWater = 0.0  # calculated constant
 
             self.bulkDensity = layerData['BulkDensity']
 
@@ -572,6 +576,15 @@ class Soil:
             self.name = uptakeName
             self.uptakeYear = uptakeData['Year']
             self.pUptake = uptakeData['PUptake']
+
+    # ---------------------------------------------------------------------------
+    # Function: calculateSoilWater
+    # Calculates the amount of water in soil profile for a given layer at.
+    # Called when soil portion of input is read.
+    # ---------------------------------------------------------------------------
+    def calculateSoilWater(self):
+        for layer in self.listOfSoilLayers:
+            layer.currentSoilWaterMM = layer.depth * layer.soilWaterRatio
 
     # ---------------------------------------------------------------------------
     # Function: calculateFcWater
