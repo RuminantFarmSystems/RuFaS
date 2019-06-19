@@ -1,4 +1,4 @@
-'''
+"""
 RUFAS: Ruminant Farm Systems Model
 
 File name: growth_constraints.py
@@ -42,7 +42,7 @@ CropType values updated by update_all():
 
     gamma_reg
 
-'''
+"""
 ###############################################################################
 
 from math import exp
@@ -71,12 +71,12 @@ def calc_gamma_reg(crop_type, time, weather, soil):
     crop_type.gamma_reg = 1 - max(wstrs, tstrs, nstrs, pstrs)
 
 
-'''
+"""
 The following functions comprise the "Growth Constraints".
 This includes the water, temperature, nitrogen, and phosphorus stress
 for a given day. These values are needed to calculate the gamma_reg value.
 They do not modify the values of any State class.
-'''
+"""
 
 
 #
@@ -170,5 +170,5 @@ def calc_phi_P(crop_type):
     if crop_type.bio_P_opt == 0:
         return 300
     else:
-        return 200 * ((crop_type.bio_P / crop_type.bio_P_opt) - 0.5)
-
+        phi_p = 200 * ((crop_type.bio_P / crop_type.bio_P_opt) - 0.5)
+        return max(0, phi_p)

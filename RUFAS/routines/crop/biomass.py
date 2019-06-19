@@ -1,4 +1,4 @@
-'''
+"""
 RUFAS: Ruminant Farm Systems Model
 
 File name: biomass.py
@@ -39,7 +39,7 @@ CropType values updated by update_all():
     dBiomass_actual
     prev_biomass_actual
     biomass_actual
-'''
+"""
 ###############################################################################
 
 from math import exp
@@ -70,10 +70,10 @@ def calc_actual_Biomass(crop_type, time, weather):
     # Save value as previous day's value
     crop_type.prev_biomass_actual = crop_type.biomass_actual
 
-    growing_period = crop_type.start_date <= time.day <= crop_type.harvest_date
+    in_growing_period = crop_type.start_date <= time.day <= crop_type.harvest_date
 
     # Update current actual biomass
-    if growing_period:
+    if in_growing_period:
         crop_type.biomass_actual += crop_type.dBiomass_actual
     else:
         crop_type.biomass_actual = 0

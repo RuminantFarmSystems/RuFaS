@@ -1,4 +1,4 @@
-'''
+"""
 RUFAS: Ruminant Farm Systems Model
 
 File name: infiltration.py
@@ -47,7 +47,7 @@ Soil attribute definitions
 Soil values updated by calling update_all():
     soil.runoff
     soil.dailyInfiltration
-'''
+"""
 ###############################################################################
 
 from math import exp, log

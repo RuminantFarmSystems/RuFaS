@@ -1,10 +1,10 @@
 ################################################################################
-'''
+"""
 RUFAS: Ruminant Farm Systems Model
 File name: base_report_handler.py
 Description:
 Author(s): Kass Chupongstimun, kass_c@hotmail.com
-'''
+"""
 ################################################################################
 
 from pathlib import Path
@@ -16,13 +16,13 @@ from RUFAS import util
 # Abstract Class: BaseReportHandler
 #-------------------------------------------------------------------------------
 class BaseReportHandler(ABC):
-    '''
+    """
     Contains an interface for report handlers, each output report
     file implements this abstract class.
     When a Report Handler object that implements this abstract class is
     instantiated, set_properties() is called to set the properties that all
     report handlers must contain.
-    '''
+    """
 
     # Private Property
     # Default directory for output report files
@@ -33,11 +33,11 @@ class BaseReportHandler(ABC):
     # Method: set_properties
     #---------------------------------------------------------------------------
     def set_properties(self, data):
-        '''Sets the properties of each report handler initialized.
+        """Sets the properties of each report handler initialized.
 
         This is called in the report handler's __init__() method, and takes in
         the data passed to it and assigns the properties below.
-        '''
+        """
 
         self.active = data['active']
         self.report_name = data['report_name']
@@ -47,11 +47,11 @@ class BaseReportHandler(ABC):
     # Method: get_fPath
     #---------------------------------------------------------------------------
     def get_fPath(self):
-        '''Gets the path to which the report handler will write the report.
+        """Gets the path to which the report handler will write the report.
 
         Returns:
             Path: path to which the report will be written.
-        '''
+        """
         return BaseReportHandler.__output_dir / self.fName
 
     #---------------------------------------------------------------------------
@@ -59,7 +59,7 @@ class BaseReportHandler(ABC):
     #---------------------------------------------------------------------------
     @classmethod
     def set_dir(cls, new_dir):
-        '''Sets the base path to write the output report files to'''
+        """Sets the base path to write the output report files to"""
         cls.__output_dir = new_dir
 
     #---------------------------------------------------------------------------

@@ -1,4 +1,4 @@
-'''
+"""
 RUFAS: Ruminant Farm Systems Model
 
 File name: evapotranspiration.py
@@ -59,7 +59,7 @@ Soil values updated by calling update_all():
     soil.listOfSoilLayers.bottomEsoil
     soil.listOfSoilLayers.layerEsoil
 
-'''
+"""
 ###############################################################################
 
 from math import exp

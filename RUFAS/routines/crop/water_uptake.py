@@ -1,4 +1,4 @@
-'''
+"""
 RUFAS: Ruminant Farm Systems Model
 
 File name: water_uptake.py
@@ -31,7 +31,7 @@ CropType values updated by calling update_all():
     water_uptake_each_layer
     water_actual_up
     Et_actual
-'''
+"""
 ###############################################################################
 from math import exp
 

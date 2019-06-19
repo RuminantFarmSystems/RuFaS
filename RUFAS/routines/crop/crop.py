@@ -1,5 +1,5 @@
 ################################################################################
-'''
+"""
 RUFAS: Ruminant Farm Systems Model
 File name: crop.py
 Description:
@@ -74,7 +74,7 @@ This module needs the following inputs in order to operate correctly:
             currentSoilWaterMM
             fcWater
             wiltingWater
-'''
+"""
 ################################################################################
 
 from . import heat_units, leaf_area_index, root_development, biomass, yields, \
@@ -196,7 +196,6 @@ class init_crop:
 
         # ===================================================================
         ''' LEAF AREA INDEX (LAI) DATA '''
-
         # Inputs
         self.fr_PHU_1 = 0
         self.fr_PHU_2 = 0

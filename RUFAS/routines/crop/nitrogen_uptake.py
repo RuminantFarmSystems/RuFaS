@@ -1,4 +1,4 @@
-'''
+"""
 RUFAS: Ruminant Farm Systems Model
 
 File name: nitrogen_uptake.py
@@ -45,7 +45,7 @@ CropType values updated by calling update_all():
     actual_N_up_each_layer
     N_actual_up
     bio_N
-'''
+"""
 ###############################################################################
 
 from math import log, exp

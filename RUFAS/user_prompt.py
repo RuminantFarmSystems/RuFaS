@@ -1,10 +1,10 @@
 ################################################################################
-'''
+"""
 RUFAS: Ruminant Farm Systems Model
 File name: user_prompt.py
 Description:
 Author(s): Kass Chupongstimun, kass_c@hotmail.com
-'''
+"""
 ################################################################################
 
 import sys
@@ -18,7 +18,7 @@ import fileReader
 # Function: input_prompt
 #-------------------------------------------------------------------------------
 def input_prompt():
-    '''Prompts the user for an input to RUFAS.
+    """Prompts the user for an input to RUFAS.
 
     Prompts the user for an input path that could either be a path to a json
     file (for a single simulation mode) or a path to a directory containing one
@@ -35,7 +35,7 @@ def input_prompt():
         list[Path]: A list of Path objects containing the Paths to the json
             files from which the program will draw data for the simulation.
             The list could contain only 1 or multiple paths.
-    '''
+    """
 
     print("\nSingle Simulation:\n\t" +
                 "Enter a json file name\n" +
