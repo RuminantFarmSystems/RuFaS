@@ -3,8 +3,8 @@
 
     "config":
     {
-        "StartDate" : "2008:1",
-        "EndDate" : "2011:366",
+        "StartYear" : 2008,
+        "EndYear" : 2009,
         "output_dir": "Outputs/Sample_Farm_Outputs/"
     },
 
@@ -22,7 +22,7 @@
         {
             "active": true,
             "report_name": "Ration Report",
-            "file_name": "ration_report.csv"
+            "file_name": "ration_report.txt"
         },
         "soil_nitrogen":
         {
@@ -55,6 +55,7 @@
                 "harvest_eff": 0.9,
                 "HI_opt": 0.6,
                 "HI_min": 0.3,
+                "init_residue": 8000,
 
                 "min_temp_for_growth": 10,
                 "max_temp_for_growth": 30,
@@ -110,7 +111,7 @@
             "Sand": 15,
             "Silt": 65,
             "SoilAlbedo": 0.16,
-            "initial_residue": 0,
+            "Residue": 8000,
             "FreshNMineralRate": 0.05,
             "SoilCoverType": "BARE",
 
