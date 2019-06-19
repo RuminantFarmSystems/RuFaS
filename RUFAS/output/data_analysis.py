@@ -46,7 +46,35 @@ def data_analysis(output_csv, show_diagnostics, produce_diagnostics, is_final):
                         c += 1
                 r += 1
 
-        if output_csv.endswith('_annual.csv'):
+        if output_csv.endswith('_report.csv'):
+
+            save_dir = util.get_base_dir() / 'Outputs/diagnostics/' / output_csv.split('.')[0]
+
+            start_year = int(variables['year'][0])
+            start_day = int(variables['julian day'][0])
+            # start date
+            date = dt.datetime(int(start_year), 1, 1) + dt.timedelta(start_day - 1)
+
+            dates = []
+            for i in range(len(variables['julian day'])):
+                dates.append(date)
+                date += dt.timedelta(days=7)
+
+            counter = 0
+            for variable in variables:
+                if counter > 1:
+                    mp.figure()
+                    mp.plot(dates, variables[variable])
+                    mp.title(variable.split()[0].upper())
+                    mp.xlabel('Dates')
+                    mp.ylabel(variable + ' ' + units[counter])
+                    path = str(save_dir / variable)
+                    mp.savefig(path + '')
+                    if not show_diagnostics:
+                        mp.close()
+                counter += 1
+
+        elif output_csv.endswith('_annual.csv'):
 
             save_dir = util.get_base_dir() / 'Outputs/diagnostics/' / output_csv.split('.')[0].strip('_annual')
 
@@ -76,7 +104,6 @@ def data_analysis(output_csv, show_diagnostics, produce_diagnostics, is_final):
             table = mp.table(cellText=table_vals,
                      rowLabels=row_labs,
                      bbox=[0, -.9, 1, .75])
-            table.auto_set_font_size()
 
             mp.legend(legend, loc='best')
             mp.subplots_adjust(left=0.31, bottom=0.5)

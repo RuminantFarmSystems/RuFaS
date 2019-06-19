@@ -27,12 +27,11 @@ class RationReport(BaseReportHandler):
         #
         self.set_properties(data)
 
-        self.file_name = data['file_name']
-
         #
         # Daily Outputs
         # 1D Lists [julianDay]
         #
+        self.cal_year = []
         self.achieved_price = []
         self.feed_amounts = []
         self.milk_production_reduction = []
@@ -88,6 +87,7 @@ class RationReport(BaseReportHandler):
         """Stores the daily values that need to be printed in the report."""
 
         day = time.day
+        self.cal_year.append(time.cal_year)
         self.julianDay.append(day)
         # for each day that a ration is calculated, appends the necessary information to the lists
         if (day % self.ration_interval) == 1 or self.ration_interval == 1:
@@ -121,7 +121,7 @@ class RationReport(BaseReportHandler):
             
                     rationData = {
                             'Year':
-                                str(y),
+                                str(self.cal_year[i]),
                             'Julian Day':
                                 str(self.julianDay[i]),
                             'Achieved Total Price':
@@ -149,4 +149,4 @@ class RationReport(BaseReportHandler):
         self.julianDay = []
 
     def produce_data_analysis(self, is_final):
-        data_analysis(self.file_name, self.show_diagnostics, self.produce_diagnostics, is_final)
+        data_analysis(self.file_name, self.show_diagnostics, self.produce_diagnostics, is_final) #, self.ration_interval)
