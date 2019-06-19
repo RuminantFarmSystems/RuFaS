@@ -245,4 +245,4 @@ class WaterBalance(BaseReportHandler):
     def produce_data_analysis(self, is_final):
         annual_file_name = str(self.file_name).split('.')[0] + "_annual.csv"
         data_analysis(annual_file_name, self.show_diagnostics, self.produce_diagnostics, False)
-        data_analysis(self.file_name, False, self.produce_diagnostics, is_final)
+        data_analysis(self.file_name, self.show_diagnostics, self.produce_diagnostics, is_final)
