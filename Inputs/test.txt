@@ -136,7 +136,7 @@
                     "ActiveMineralRate": 0.0001,
                     "VolatileExchangeFac": 0.15,
                     "DenitrificationRate": 0.01,
-                    "StartingSoilWater": 0.3,
+                    "SoilWaterRatio": 0.3,
                     "OM%": 1.9
                 },
                 "Layer2":
@@ -157,7 +157,7 @@
                     "ActiveMineralRate": 0.0001,
                     "VolatileExchangeFac": 0.15,
                     "DenitrificationRate": 0.01,
-                    "StartingSoilWater": 0.3,
+                    "SoilWaterRatio": 0.3,
                     "OM%": 1.9
                 },
                 "Layer3":
@@ -178,7 +178,7 @@
                     "ActiveMineralRate": 0.00005,
                     "VolatileExchangeFac": 0.15,
                     "DenitrificationRate": 0.01,
-                    "StartingSoilWater": 0.3,
+                    "SoilWaterRatio": 0.3,
                     "OM%": 1.9
                 }
             },

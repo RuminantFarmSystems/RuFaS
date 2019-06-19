@@ -321,5 +321,3 @@ class Crop():
 
             crop_type.bio_P = 0
             crop_type.bio_N = 0
-
-            crop_type.Ea_sum = 0

@@ -42,7 +42,7 @@ class BaseReportHandler(ABC):
 
         self.active = data['active']
         self.produce_diagnostics = data['produce_diagnostics']
-        self.show_diagnostics = data['show_diagnostics']
+        self.show_daily = data['show_daily']
         self.report_name = data['report_name']
         self.file_name = data['file_name']
 

@@ -157,6 +157,7 @@ def calc_soil_cov(soil, crop):
 def update_Esoil_z(soil):
     for x in range(0, len(soil.listOfSoilLayers)):
         curr_layer = soil.listOfSoilLayers[x]
+
         FC = curr_layer.fcWater
         SW = curr_layer.currentSoilWaterMM
         WP = curr_layer.wiltingWater
@@ -193,8 +194,7 @@ def update_Esoil_z(soil):
         #
         if SW < FC:
             exp_part = exp(2.5 * (SW - FC) / (FC - WP))
-            layerEsoil = layerEsoil * exp_part
-
+            layerEsoil *= exp_part
         #
         # In addition, the daily amount of water removed by evaporation is
         # limited to 80% of plant available water (SW - WP)

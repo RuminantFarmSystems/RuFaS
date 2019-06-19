@@ -140,7 +140,7 @@ def calc_Smax(soil):
 # "pseudocode_soil" S.2.A.6
 #
 def calc_w1(soil, Smax, CN3, w2):
-    FC = soil.profileDepth * soil.listOfSoilLayers[0].fieldCapacity
+    FC = soil.profile_depth * soil.listOfSoilLayers[0].fieldCapacity
 
     S3 = calc_S3(CN3)
 
@@ -154,9 +154,9 @@ def calc_w1(soil, Smax, CN3, w2):
 # "pseudocode_soil" S.2.A.7
 #
 def calc_w2(soil, Smax, CN3):
-    FC = soil.profileDepth * soil.listOfSoilLayers[0].fieldCapacity
+    FC = soil.profile_depth * soil.listOfSoilLayers[0].fieldCapacity
 
-    SAT = soil.profileDepth * soil.listOfSoilLayers[0].saturation
+    SAT = soil.profile_depth * soil.listOfSoilLayers[0].saturation
 
     S3 = calc_S3(CN3)
 

@@ -167,4 +167,4 @@ class CropSummary(BaseReportHandler):
         self.daily_yield_actual = []
 
     def produce_data_analysis(self, is_final):
-        data_analysis(self.file_name, self.show_diagnostics, self.produce_diagnostics, is_final)
+        data_analysis(self.file_name, self.show_daily, self.produce_diagnostics, is_final)
