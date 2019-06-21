@@ -273,6 +273,8 @@ class Soil:
         self.calculateFcWater()  # calculate field capacity water in layer
         self.calculateSatWater()  # calculate saturation water in layer
 
+        self.prev_SW = 0.0  # TODO: Necessary for water balance testing
+
         # daily output values
         self.Et_max = 0.0
         self.E0 = 0.0

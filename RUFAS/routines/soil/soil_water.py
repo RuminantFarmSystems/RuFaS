@@ -45,7 +45,9 @@ Soil values updated by calling update_all():
 #
 def update_all(soil, weather, time):
 
-    update_SW(soil, weather, time)
+    # update_SW(soil, weather, time)
+
+    daily_water_balance(soil, weather, time)
 
 
 #
@@ -99,3 +101,32 @@ def update_SW(soil, weather, time):
     soil.runoff_sum += Q
     soil.p_act_annual += R
     soil.Ea_sum += soil.Ea
+
+
+def daily_water_balance(soil, weather, time):
+    R = weather.rainfall[time.year - 1][time.day - 1]
+    D = soil.drainage
+    Q = soil.runoff
+    Ea = soil.Ea
+    SW = sum_SW(soil)
+    prev_SW = soil.prev_SW
+
+    d_SW = SW - prev_SW
+
+    soil.p_act = R
+    soil.p_calc = d_SW + Ea + Q + D
+    soil.water_balance = soil.p_act - soil.p_calc
+
+    soil.drainage_sum += soil.drainage
+    soil.runoff_sum += Q
+    soil.p_act_annual += R
+    soil.Ea_sum += soil.Ea
+
+    soil.prev_SW = SW
+
+
+def sum_SW(soil):
+    SW = 0.0
+    for layer in soil.listOfSoilLayers:
+        SW += layer.currentSoilWaterMM
+    return SW

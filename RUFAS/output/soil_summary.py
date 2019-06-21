@@ -154,7 +154,7 @@ class SoilSummary(BaseReportHandler):
 
         self.runoff.append(soil.runoff)
         self.potentialEvapotranspiration.append(soil.E0)
-        self.Ea_actual.append(soil.Ea_sum)
+        self.Ea_actual.append(soil.Ea)
         self.Et_max.append(soil.Et_max)
         self.sublimation.append(soil.Esoil)
 
