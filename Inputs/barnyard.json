@@ -6,7 +6,7 @@
         "output_dir": "Outputs/Sample_Farm_Outputs/"
     },
 
-    "weather": "Inputs/barnyard_weather_N_years.csv",
+    "weather": "Inputs/barnyard_weather.csv",
 
     "output":
     {
@@ -86,12 +86,7 @@
                 "fr,p2": 0.0018,
                 "fr,p3": 0.0014,
                 "fr,p~3": 0.00141,
-                "beta_p": 10,
-
-
-                "TESTING_Ea_sum" : [251.2544561385, 313.6495119524],
-                "TESTING_Eo_sum" : [329.6603213136, 372.2587849571],
-                "TEST_DATA" : "Inputs/TEST_INPUTS.csv"
+                "beta_p": 10
             }
         },
         "soil":
