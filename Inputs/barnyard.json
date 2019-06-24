@@ -6,7 +6,7 @@
         "output_dir": "Outputs/Sample_Farm_Outputs/"
     },
 
-    "weather": "Inputs/barnyard_weather_N_years.csv",
+    "weather": "Inputs/barnyard_weather.csv",
 
     "output":
     {
