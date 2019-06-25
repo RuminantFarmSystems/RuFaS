@@ -210,8 +210,6 @@ def update_Esoil_z(soil):
 def update_SW(soil):
     Ea = 0
     for layer in soil.listOfSoilLayers:
-        SAT = layer.satWater
-        WP = layer.wiltingWater
-        layer.currentSoilWaterMM = min(SAT, max(WP, layer.currentSoilWaterMM - (layer.layerEsoil + layer.Et_actual)))
+        layer.currentSoilWaterMM -= (layer.layerEsoil + layer.Et_actual)
         Ea += (layer.layerEsoil + layer.Et_actual)
     soil.Ea = Ea
