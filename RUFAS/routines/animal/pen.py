@@ -7,38 +7,53 @@ Author(s): Militsa Sotirova, militsasotirova@gmail.com
 '''
 ################################################################################
 from animal_object import AnimalObject
-#from RUFAS.routines.animal import ration
+# from RUFAS.routines.animal import ration
 
 class Pen:
-    #unique pen ID, from input file
+    # unique pen ID, from input file
     id = -1
-    #list of all animals in this pen, dete
+    
+    # list of all animals in this pen
     animals_in_pen = []
-    #list of all the classes to which the animals in the pen belong to
+    # TODO: maybe put checks to see if there are no animals in pen? (division by len(animals_in_pen))
+    
+    # list of all the classes to which the animals in the pen belong to
     classes_in_pen = []
-    #vertical distance to milking parlor, km, from input file
+    
+    # vertical distance to milking parlor, km, from input file
     vertical_dist_to_parlor = -1
-    #horizontal distance to milking parlor, km, from input file
+    
+    # horizontal distance to milking parlor, km, from input file
     horizontal_dist_to_parlor = -1
-    #number of stalls, from input file
+    
+    # number of stalls, from input file
     num_stalls = -1
-    #stocking density of pen, calculated when animals in pen are updated in update_animals()
+    
+    # stocking density of pen, calculated when animals in pen are updated in update_animals()
     stocking_density = -1
-    #housing type of the pen, from input file
+    
+    # housing type of the pen, from input file
     housing_type = ""
-    #bedding type of the pen, from input file
+    
+    # bedding type of the pen, from input file
     bedding_type = ""
-    #freestall or tiestall, from input file
+    
+    # freestall or tiestall, from input file
     pen_type = "" 
-    #average nutrient requirements of the animals in the pen
+    
+    # average nutrient requirements of the animals in the pen
     avg_nutrient_rqmts = {}
-    #ration for all the animals in the pen
+    
+    # ration for all the animals in the pen
     daily_ration = {}
-    #total manure excretion of the animals in the pen
+    
+    # total manure excretion of the animals in the pen
     manure = {}
-    #average milk production of the animals in the pen
+    
+    # average milk production of the animals in the pen
     avg_milk_production = -1
-    #average growth of the animals in the pen
+    
+    # average growth of the animals in the pen
     avg_growth = -1
     
     def __init__(self, id, vert_dist, horiz_dist, num_stalls, housing_type, bedding_type, pen_type):
@@ -67,26 +82,23 @@ class Pen:
         '''
         Finds the average nutrient requirements of the animals in the pen.
         '''
-        if (len(self.animals_in_pen) == 0):
-            print('There are no animals in the pen with ID', self.id, '- cannot calculate average nutrient requirements.')
-        
+        first_animal_rqmts = self.animals_in_pen[0].get_nutrient_rqmts()
         sum_dict = {}
-        for key in self.animals_in_pen[0].nutrient_rqmts.keys():
+        for key in first_animal_rqmts.keys():
             sum_dict[key] = 0
         
-        #find sums of nutrients for each animal in the pen
+        # find sums of nutrients for each animal in the pen
         for animal in self.animals_in_pen:
+            curr_rqmts = animal.get_nutrient_rqmts()
             for key in sum_dict.keys():
-                sum_dict[key] += animal.nutrient_rqmts[key]['val']
+                sum_dict[key] += curr_rqmts[key]['val']
                 
-        #divide by number of animals to find average
+        # divide by number of animals to find average
         num_animals = len(self.animals_in_pen)
         for key in sum_dict:
-            avg_value = sum_dict[key]/ num_animals
+            avg_value = sum_dict[key] / num_animals
             self.avg_nutrient_rqmts[key] = {'op': self.animals_in_pen[0].nutrient_rqmts[key]['op'], 'val': avg_value}
-            
-        print(self.avg_nutrient_rqmts)
-    
+                
     def calc_ration(self, feed):
         '''
         Calculates the ration for the pen using the average nutrient requirements.
@@ -94,31 +106,55 @@ class Pen:
             feed: instance of the Feed class, used to determine characteristics of available feeds
         '''
         ration_per_animal = ration.optimize(feed, self.avg_nutrient_rqmts)
+        while(ration_per_animal['status'] != 'Optimal'):
+            # TODO: recalculate with milk production reduced by 0.5 kg
+            pass
+        
+        for animal in self.animals_in_pen:
+            animal.set_ration(ration_per_animal)
+            
         num_animals = len(self.animals_in_pen)
         for key in ration_per_animal:
             if (key == 'status'):
                 self.daily_ration[key] = ration_per_animal[key]
                 
-            else: #feeds and price
+            else:  # feeds and price
                 self.daily_ration[key] = ration_per_animal[key] * num_animals
         
-    def calc_manure(self):
+    def calc_manure(self, feed):
         '''
         Calculates the total manure excretion of the animals in the pen.
         '''
-        pass
+        for animal in self.animals_in_pen:
+            animal.calc_manure_excretion(feed)
+        
+        first_animal_manure = self.animals_in_pen[0].get_manure_excretion()
+        for key in first_animal_manure.keys():
+            self.manure[key] = 0
+        
+        # find sums of nutrients for each animal in the pen
+        for animal in self.animals_in_pen:
+            curr_manure = animal.get_manure_excretion()
+            for key in manure.keys():
+                manure[key] += curr_manure[key]
     
     def calc_avg_milk(self):
         '''
         Calculates the average milk production of the animals in the pen.
         '''
-        pass
+        sum = 0
+        for animal in self.animals_in_pen:
+            sum += animal.get_milk_production()
+        self.avg_milk_production = sum / len(self.animals_in_pen)
     
     def calc_avg_growth(self):
         '''
         Calculates the average growth of the animals in the pen.
         '''
-        pass
+        sum = 0
+        for animal in self.animals_in_pen:
+            sum += animal.get_daily_growth()
+        self.avg_growth = sum / len(self.animals_in_pen)
         
     def calc_daily_walking_dist(self):
         '''
@@ -134,9 +170,7 @@ class Pen:
         self.animals_in_pen = []
 
 
-
-
-#Some test code 
+# Some test code 
 p = Pen(9, 6, 4, "housing_type", "bedding_type", "pen_type")
 animals = []
 for i in range(0, 100):
@@ -147,9 +181,5 @@ for i in range(0, 100):
 p.update_animals(animals)
 
 p.calc_avg_nutrient_rqmts()
-    
-
-    
-    
     
     
