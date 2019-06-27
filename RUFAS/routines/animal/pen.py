@@ -16,8 +16,10 @@ class Pen:
     animals_in_pen = []
     #list of all the classes to which the animals in the pen belong to
     classes_in_pen = []
-    #distance to milking parlor, km, from input file
-    dist_to_parlor = -1
+    #vertical distance to milking parlor, km, from input file
+    vertical_dist_to_parlor = -1
+    #horizontal distance to milking parlor, km, from input file
+    horizontal_dist_to_parlor = -1
     #number of stalls, from input file
     num_stalls = -1
     #stocking density of pen, calculated when animals in pen are updated in update_animals()
@@ -39,12 +41,13 @@ class Pen:
     #average growth of the animals in the pen
     avg_growth = -1
     
-    def __init__(self, id, dist_to_parlor, num_stalls, housing_type, bedding_type, pen_type):
+    def __init__(self, id, vert_dist, horiz_dist, num_stalls, housing_type, bedding_type, pen_type):
         '''
         Initializes a pen with the arguments. More information about each above.
         '''
         self.id = id
-        self.dist_to_parlor = dist_to_parlor
+        self.vertical_dist_to_parlor = vert_dist
+        serlf.horizontal_dist_to_parlor = horiz_dist
         self.num_stalls = num_stalls
         self.housing_type = housing_type
         self.bedding_type = bedding_type
@@ -52,12 +55,13 @@ class Pen:
     
     def update_animals(self, new_animals):
         '''
-        Sets the list of animals to @new_animals and calculates the stocking density.
+        Sets the list of animals to @new_animals and calculates the stocking density and each animal's walking distance.
         Args:
             new_animals: list of new animals in the pen
         '''
         self.animals_in_pen = new_animals
         self.stocking_density = len(self.animals_in_pen) / self.num_stalls * 100 
+        self.calc_daily_walking_dist()
         
     def calc_avg_nutrient_rqmts(self):
         '''
@@ -116,11 +120,18 @@ class Pen:
         '''
         pass
         
-
-
-
-
-
+    def calc_daily_walking_dist(self):
+        '''
+        Sets each animal's daily walking distance.
+        '''
+        for animal in self.animals_in_pen:
+            animal.calc_daily_walking_dist(self.vertical_dist_to_parlor, self.horizontal_dist_to_parlor)
+            
+    def clear(self):
+        '''
+        Clears the pen for re-allocation.
+        '''
+        self.animals_in_pen = []
 
 
 
