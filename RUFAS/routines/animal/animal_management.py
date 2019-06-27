@@ -60,6 +60,15 @@ class AnimalManagement:
         '''
         Allocates the animals in all_animals to pens in all_pens based on the animals' characteristics.
         '''
+
+        pass
+    
+    def clear_pens(self):
+        '''
+        Removes animals from pens for re-allocation.
+        '''
+        for pen in all_pens:
+            pen.clear()
         pass
       
     def calc_avg_nutrient_rqmts(self):

@@ -278,7 +278,8 @@
 	        	"pen0":
 	        	{
 	        		"id": 0,
-	        		"walking_dist_to_milking_parlor": 5,
+	        		"vertical_dist_to_milking_parlor": 5,
+	        		"horizontal_dist_to_milking_parlor": 5,
 	        		"number_of_stalls": 100,
 	        		"housing_type": "open air barn",
 	        		"bedding_type": "sand",
@@ -287,7 +288,8 @@
 	        	"pen1":
 	        	{
 	        		"id": 1,
-	        		"walking_dist_to_milking_parlor": 10,
+	        		"vertical_dist_to_milking_parlor": 10,
+	        		"horizontal_dist_to_milking_parlor": 10,
 	        		"number_of_stalls": 200,
 	        		"housing_type": "open air barn",
 	        		"bedding_type": "sawdust",
@@ -296,7 +298,8 @@
 	        	"pen2":
 	        	{
 	        		"id": 0,
-	        		"walking_dist_to_milking_parlor": 15,
+	        		"vertical_dist_to_milking_parlor": 15,
+	        		"horizontal_dist_to_milking_parlor": 15,
 	        		"number_of_stalls": 300,
 	        		"housing_type": "open air barn",
 	        		"bedding_type": "straw",
@@ -305,7 +308,8 @@
 	        	"pen3":
 	        	{
 	        		"id": 0,
-	        		"walking_dist_to_milking_parlor": 20,
+	        		"vertical_dist_to_milking_parlor": 20,
+	        		"horizontal_dist_to_milking_parlor": 20,
 	        		"number_of_stalls": 400,
 	        		"housing_type": "open air barn",
 	        		"bedding_type": "sand",
