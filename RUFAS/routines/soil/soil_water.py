@@ -67,9 +67,10 @@ def update_SW(soil, weather, time):
         Perc = layer.perc
         Esoil = layer.layerEsoil
         Et_actual = layer.Et_actual
+        I = soil.dailyInfiltration
 
         if x == 0:
-            SW = max(WP, SW + R - Q - Esoil - Perc - Et_actual)
+            SW = max(WP, SW + I - Esoil - Perc - Et_actual)
             SW = min(SAT, SW)
 
         else:
