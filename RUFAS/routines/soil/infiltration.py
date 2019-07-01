@@ -63,6 +63,8 @@ def update_all(soil, weather, time):
 
     calc_daily_infiltration(soil, weather, time)
 
+    update_SW(soil)
+
 
 #
 # Calculates the daily runoff Q (mm H20)
@@ -205,3 +207,10 @@ def calc_daily_infiltration(soil, weather, time):
     R = weather.rainfall[time.year-1][time.day-1]
     Q = soil.runoff
     soil.dailyInfiltration = R - Q
+
+
+def update_SW(soil):
+    top_layer = soil.listOfSoilLayers[0]
+    SW = top_layer.currentSoilWaterMM
+    SAT = top_layer.satWater
+    soil.listOfSoilLayers[0].currentSoilWaterMM = max(SAT, SW + soil.dailyInfiltration)

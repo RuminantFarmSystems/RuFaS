@@ -37,6 +37,8 @@ def update_all(soil):
 
     calc_daily_percolation(soil)
 
+    update_SW(soil)
+
 
 #
 # Calculates daily percolation as a function of the water available for
@@ -71,3 +73,14 @@ def calc_daily_percolation(soil):
         exp_part = exp((-t) / layer.TT)
         layer.perc = SWperc * (1 - exp_part)
 
+
+def update_SW(soil):
+    for x in range(len(soil.listOfSoilLayers)):
+        layer = soil.listOfSoilLayers[x]
+        SAT = layer.satWater
+        WP = layer.wiltingWater
+        layer.currentSoilWaterMM = max(WP, layer.currentSoilWaterMM - layer.perc)
+        if x > 0:
+            layer.currentSoilWaterMM = min(SAT, layer.currentSoilWaterMM + soil.listOfSoilLayers[x - 1].perc)
+
+    soil.drainage = soil.listOfSoilLayers[-1].perc
