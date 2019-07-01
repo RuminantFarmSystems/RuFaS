@@ -274,7 +274,7 @@ class Soil:
         self.calculateSatWater()  # calculate saturation water in layer
 
         self.prev_SW = 0.0  # TODO: Necessary for water balance testing
-        self.update_SW = True  # TODO: Temporary to turn the SW update on and off
+        self.update_SW = False  # TODO: Temporary to turn the SW update on and off
 
         # daily output values
         self.Et_max = 0.0
