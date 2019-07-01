@@ -78,6 +78,8 @@ def update_all(soil, crop, weather, time):
 
     update_Esoil_z(soil)
 
+    update_SW(soil)
+
 
 #
 # Calculates potential evapotranspiration E0 using the Hargreaves method
@@ -203,3 +205,13 @@ def update_Esoil_z(soil):
         curr_layer.layerEsoil = min(layerEsoil, 0.8 * (SW - WP))
 
         soil.listOfSoilLayers[x] = curr_layer
+
+
+def update_SW(soil):
+    Ea = 0
+    for layer in soil.listOfSoilLayers:
+        SAT = layer.satWater
+        WP = layer.wiltingWater
+        layer.currentSoilWaterMM = min(SAT, max(WP, layer.currentSoilWaterMM - (layer.layerEsoil + layer.Et_actual)))
+        Ea += (layer.layerEsoil + layer.Et_actual)
+    soil.Ea = Ea

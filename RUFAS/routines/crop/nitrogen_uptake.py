@@ -54,7 +54,7 @@ from .nitrogen_fixation import calc_N_fixation
 #
 # This function updates all of a crop's nitrogen uptake information.
 #
-def update_all(crop_type, soil, time):
+def update_all(crop_type, soil):
     calc_fr_N(crop_type)
     calc_bio_N_opt(crop_type)
     calc_N_up(crop_type)
@@ -76,7 +76,7 @@ def calc_fr_N(crop_type):
     else:
         term1 = crop_type.fr_n1 - crop_type.fr_n3
 
-        exp_part = exp(n1 - n2 * crop_type.prev_fr_PHU)
+        exp_part = exp(n1 + n2 * crop_type.prev_fr_PHU)
         term2 = 1 - crop_type.prev_fr_PHU / (crop_type.prev_fr_PHU + exp_part)
 
         crop_type.fr_N = term1 * term2 + crop_type.fr_n3
@@ -166,18 +166,24 @@ def calc_actual_N_up_each_layer(crop_type, soil):
     N_demand = 0
 
     for pot_N_up, soilLayer in zip(N_up_each_layer, soil.listOfSoilLayers):
-        # 5.C.4
+
+        # C.5.C.4
         act_N_up = min((pot_N_up + N_demand), soilLayer.NO3)
-        # 5.C.7
+
+        # C.5.C.7
         act_N_up_each_layer.append(act_N_up)
 
         # Update values so ready for the next layer
         N_up_over += pot_N_up
-        # 5.C.6
+
+        # C.5.C.6
         NO3_over += soilLayer.NO3
-        # 5.C.5
+
+        # C.5.C.5
         N_demand = N_up_over - NO3_over
-        if N_demand < 0 : N_demand = 0
+
+        if N_demand < 0:
+            N_demand = 0
 
     crop_type.act_N_up_each_layer = act_N_up_each_layer
 
@@ -197,7 +203,7 @@ def calc_N_up_each_layer(crop_type, soil):
     for layer in soil.listOfSoilLayers:
         N_up_for_bottom_of_layer = calc_N_up_z(crop_type, layer.bottomDepth)
 
-        # 5.C.3
+        # C.5.C.3
         N_up_ly = N_up_for_bottom_of_layer - N_up_for_top_of_layer
 
         N_up_each_layer.append(N_up_ly)
