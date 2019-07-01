@@ -119,6 +119,7 @@ def daily_water_balance(soil, weather, time):
     soil.p_calc = d_SW + Ea + Q + D
     soil.water_balance = soil.p_act - soil.p_calc
 
+    # annual values
     soil.drainage_sum += soil.drainage
     soil.runoff_sum += Q
     soil.p_act_annual += R
