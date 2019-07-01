@@ -152,5 +152,6 @@ def calc_nutrient_removal(crop_type):
 #
 def calc_residue(crop_type, time, soil):
     if crop_type.harvest_date == time.day:
-        dResidue = (crop_type.biomass_actual - crop_type.yield_actual)
+        dResidue = (crop_type.bio_AG - crop_type.yield_actual)
         soil.residue = (soil.residue + dResidue) * (1 - soil.decayRate)
+        soil.listOfSoilLayers[0].topLayerFreshN += 0.0015 * soil.residue

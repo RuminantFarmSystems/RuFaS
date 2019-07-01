@@ -214,4 +214,4 @@ def update_SW(soil):
     top_layer = soil.listOfSoilLayers[0]
     SW = top_layer.currentSoilWaterMM
     SAT = top_layer.satWater
-    soil.listOfSoilLayers[0].currentSoilWaterMM = max(SAT, SW + soil.dailyInfiltration)
+    soil.listOfSoilLayers[0].currentSoilWaterMM = min(SAT, SW + soil.dailyInfiltration)
