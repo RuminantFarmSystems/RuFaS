@@ -45,9 +45,10 @@ Soil values updated by calling update_all():
 #
 def update_all(soil, weather, time):
 
-    # update_SW(soil, weather, time)
-
-    daily_water_balance(soil, weather, time)
+    if soil.update_SW:
+        daily_water_balance(soil, weather, time)
+    else:
+        update_SW(soil, weather, time)
 
 
 #
