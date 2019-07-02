@@ -60,6 +60,7 @@ class AnimalManagement:
     def pen_allocation(self):
         '''
         Allocates the animals in all_animals to pens in all_pens based on the animals' characteristics.
+        TEMPORARY CODE JUST FOR TESTING PURPOSES.
         '''
         pass
     

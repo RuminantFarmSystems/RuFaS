@@ -258,22 +258,48 @@
 
         "animal":
         {
-            "Herd":
+            "herd_information":
             {
-            	"calf_num": 160, 
-            	"heiferI_num": 800, 
-            	"heiferII_num": 820, 
-            	"heiferIII_num": 50, 
-                "cow_num": 100
+            	"calf": 
+            	{
+            		"number": 160,
+            		"body_weight": 90
+            	}, 
+            	
+            	"heiferI": 
+				{
+					"number": 800,
+					"body_weight": 90
+				},
+				 
+            	"heiferII": 
+            	{
+            		"number": 820, 
+            		"body_weight": 90
+            	},
+            	
+            	"heiferIII": 
+            	{
+            		"number": 50,
+            		"body_weight": 90
+            	}, 
+            	
+                "cow": 
+                {
+                	"number": 100,
+                	"body_weight": 90
+                }
             },
+            
             "housing": "barn",
+            
             "ration":
             {
                 "user_input": false,
                 "formulation_interval": 7
             },
         
-	        "penInformation":
+	        "pen_information":
 	        {
 	        	"pen0":
 	        	{
@@ -285,6 +311,7 @@
 	        		"bedding_type": "sand",
 	        		"pen_type": "freestall"
 	        	},
+	        	
 	        	"pen1":
 	        	{
 	        		"id": 1,
@@ -295,6 +322,7 @@
 	        		"bedding_type": "sawdust",
 	        		"pen_type": "freestall"
 	        	},
+	        	
 	        	"pen2":
 	        	{
 	        		"id": 0,
@@ -305,7 +333,19 @@
 	        		"bedding_type": "straw",
 	        		"pen_type": "tiestall"
 	        	},
+	        	
 	        	"pen3":
+	        	{
+	        		"id": 0,
+	        		"vertical_dist_to_milking_parlor": 20,
+	        		"horizontal_dist_to_milking_parlor": 20,
+	        		"number_of_stalls": 400,
+	        		"housing_type": "open air barn",
+	        		"bedding_type": "sand",
+	        		"pen_type": "tiestall"
+	        	},
+	        	
+	        	"pen4":
 	        	{
 	        		"id": 0,
 	        		"vertical_dist_to_milking_parlor": 20,
