@@ -14,9 +14,9 @@ Description: This file updates the heifer form breeding to close to calving.
 
 
 import numpy as np
-from heiferI import HeiferI
+from animal_life_cycle.heiferI import HeiferI
 from random import random
-from config import Config
+from animal_life_cycle.config import Config
 
 config = Config()
 

@@ -10,13 +10,13 @@ import matplotlib as mpl
 mpl.use('TkAgg')
 import matplotlib.pyplot as plt
 from collections import Counter
-from animal_base import AnimalBase
-from calf import Calf
-from heiferI import HeiferI
-from heiferII import HeiferII
-from heiferIII import HeiferIII
-from cow import Cow
-from config import Config
+from animal_life_cycle.animal_base import AnimalBase
+from animal_life_cycle.calf import Calf
+from animal_life_cycle.heiferI import HeiferI
+from animal_life_cycle.heiferII import HeiferII
+from animal_life_cycle.heiferIII import HeiferIII
+from animal_life_cycle.cow import Cow
+from animal_life_cycle.config import Config
 
 config = Config()
 NUM_21_DAYS = 15
