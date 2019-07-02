@@ -8,9 +8,9 @@ Description: This file updates the heifer form wean to start breeding.
 '''
 ###############################################################################
 
-from calf import Calf
-from animal_base import AnimalBase
-from config import Config
+from animal_life_cycle.calf import Calf
+from animal_life_cycle.animal_base import AnimalBase
+from animal_life_cycle.config import Config
 import numpy as np
 
 config = Config()

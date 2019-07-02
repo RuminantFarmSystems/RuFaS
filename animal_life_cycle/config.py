@@ -10,7 +10,7 @@ import json
 
 class Config():
 	def __init__(self):
-		with open('config.json', 'r') as f:
+		with open('animal_life_cycle/config.json', 'r') as f:
 			self._config = json.load(f)
 
 	def __getitem__(self, key):

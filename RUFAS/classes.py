@@ -39,7 +39,7 @@ class State():
 		'''
 
 		self.soil = Soil(data['soil'], config)
-		self.animal = AnimalManagemnt(data['animal'])
+		self.animal = Animal(data['animal'])
 		self.feed = Feed(data['feed'])
 		self.crop = Crop(data['crop'])
 

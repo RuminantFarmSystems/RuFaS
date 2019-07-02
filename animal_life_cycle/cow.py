@@ -19,9 +19,9 @@ Description: This file updates the cow form first calving to leaving the herd.
 import math
 import numpy as np
 import matplotlib.pyplot as plt
-from heiferIII import HeiferIII
+from animal_life_cycle.heiferIII import HeiferIII
 from random import random
-from config import Config
+from animal_life_cycle.config import Config
 
 config = Config()
 

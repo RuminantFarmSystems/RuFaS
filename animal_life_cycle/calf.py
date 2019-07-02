@@ -13,8 +13,8 @@ Description: This file updates the calf form birth to wean.
 
 import numpy as np
 from random import random
-from animal_base import AnimalBase
-from config import Config
+from animal_life_cycle.animal_base import AnimalBase
+from animal_life_cycle.config import Config
 
 config = Config()
 

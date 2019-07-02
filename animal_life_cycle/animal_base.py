@@ -8,7 +8,7 @@ Description: This file initialize common parameters
 ###############################################################################
 
 
-from animal_events import AnimalEvents
+from animal_life_cycle.animal_events import AnimalEvents
 import random
 import numpy as np
 

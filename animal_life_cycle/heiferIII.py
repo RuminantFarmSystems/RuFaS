@@ -12,9 +12,9 @@ Description: This file updates the heifer form close to calving to calving,
 ###############################################################################
 
 import numpy as np
-from heiferII import HeiferII
+from animal_life_cycle.heiferII import HeiferII
 from random import random
-from config import Config
+from animal_life_cycle.config import Config
 
 config = Config()
 
