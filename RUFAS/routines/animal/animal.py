@@ -7,7 +7,7 @@ Author(s): Kass Chupongstimun, kass_c@hotmail.com
 '''
 ################################################################################
 
-from RUFAS.routines.animal import ration, Herd, testing_ration
+from RUFAS.routines.animal import ration, testing_ration
 from animal_life_cycle import herd_simulation
 
 #-------------------------------------------------------------------------------
@@ -27,8 +27,10 @@ def daily_animal_routine(animal, feed, weather, time):
     if not animal.has_user_input_ration:
         if animal.end_ration_interval(time.day):
             animal.formulate_optimized_ration(feed)
-    animal.herd.daily_update(time)
-
+    #animal.herd.daily_update(time)
+    calves, heiferIs, heiferIIs, heiferIIIs, cows, replacement_market = herd_simulation.initialize_herd(160, 800, 820, 50, 1000, 5000)
+    herd_simulation.start_simulation(1000, 3000, calves, heiferIs, heiferIIs, heiferIIIs, cows, replacement_market)
+    print('done')
 #-------------------------------------------------------------------------------
 # Function: daily_animal_routine
 #-------------------------------------------------------------------------------
@@ -56,7 +58,7 @@ class Animal():
             data : 2D dictionary which stores information about the cow
         '''
         
-        self.herd = Herd.Herd(data["Herd"])
+        #self.herd = Herd.Herd(data["Herd"])
         self.housing = data['housing']
         self.has_user_input_ration = data['ration']['user_input']
 

@@ -1,6 +1,5 @@
 # import ration
 
-
 class AnimalObject:
     # unique animal ID, from input file
     id = -1
