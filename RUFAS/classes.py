@@ -13,7 +13,8 @@ import math
 
 from RUFAS import util
 from RUFAS import errors
-from RUFAS.routines import Soil, Animal, Feed, Crop
+from RUFAS.routines import Soil, Feed, Crop
+from RUFAS.routines.animal.animal_management import AnimalManagement
 
 #-------------------------------------------------------------------------------
 # Class: State
@@ -39,7 +40,7 @@ class State():
 		'''
 
 		self.soil = Soil(data['soil'], config)
-		self.animal = Animal(data['animal'])
+		self.animal_management = AnimalManagement(data['animal'])
 		self.feed = Feed(data['feed'])
 		self.crop = Crop(data['crop'])
 
@@ -55,7 +56,7 @@ class State():
 		'''Annual Reset'''
 
 		self.soil.annual_reset()
-		self.animal.annual_reset()
+		self.animal_management.annual_reset()
 		self.crop.annual_reset()
 		self.feed.annual_reset()
 

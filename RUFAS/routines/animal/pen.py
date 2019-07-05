@@ -6,7 +6,7 @@ Description: The class which represents a pen on the farm.
 Author(s): Militsa Sotirova, militsasotirova@gmail.com
 '''
 ################################################################################
-from animal_object import AnimalObject
+from RUFAS.routines.animal.animal_object import AnimalObject
 # from RUFAS.routines.animal import ration
 
 class Pen:
@@ -62,7 +62,7 @@ class Pen:
         '''
         self.id = id
         self.vertical_dist_to_parlor = vert_dist
-        serlf.horizontal_dist_to_parlor = horiz_dist
+        self.horizontal_dist_to_parlor = horiz_dist
         self.num_stalls = num_stalls
         self.housing_type = housing_type
         self.bedding_type = bedding_type
@@ -170,6 +170,7 @@ class Pen:
         self.animals_in_pen = []
 
 
+'''
 # Some test code 
 p = Pen(9, 6, 4, "housing_type", "bedding_type", "pen_type")
 animals = []
@@ -181,5 +182,5 @@ for i in range(0, 100):
 p.update_animals(animals)
 
 p.calc_avg_nutrient_rqmts()
-    
+'''
     
