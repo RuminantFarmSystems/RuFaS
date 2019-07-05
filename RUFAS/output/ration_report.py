@@ -72,7 +72,7 @@ class RationReport(BaseReportHandler):
         # get static data like units associated with each feed type
         # store in Feed or Animal???????
         self.feed_info = feed.available_feeds
-        self.ration_interval = state.animal.ration_formulation_interval
+        self.ration_interval = state.animal_management.formulation_interval
         self.write_header()
 
     #---------------------------------------------------------------------------

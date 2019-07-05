@@ -7,8 +7,23 @@ Description: The class which manages all of the animal routines and keeps track 
 Author(s): Militsa Sotirova, militsasotirova@gmail.com
 '''
 ################################################################################
-import pen, animal_object
+from RUFAS.routines.animal.pen import Pen
+from RUFAS.routines.animal.animal_object import AnimalObject
+from RUFAS.routines.animal.life_cycle import LifeCycleManager
 
+def daily_animal_routine(animal_management, feed, weather, time):
+    '''Executes daily routines relating to Animals.
+
+    Args:
+        animal : instance of the Animal class
+        feed : instance of the Feed class
+        weather : instance of the Weather class
+        time : instance of the Time class
+    '''
+    animal_management.daily_updates(feed, time)
+
+def daily_animal_update(animal, weather, time):
+    pass
 
 class AnimalManagement:
     # list of all the animals in the simulations
@@ -16,6 +31,18 @@ class AnimalManagement:
     
     # list of all the pens on the farm
     all_pens = []
+        
+    sim_length = -1
+    
+    life_cycle_manager = None
+    
+    times_milked_per_day = 0
+    
+    housing = ""
+    
+    ration_user_input = False
+    
+    formulation_interval = 0
     
     def __init__(self, data):
         '''
@@ -23,8 +50,13 @@ class AnimalManagement:
         Args:
             data: dictionary with the animal information from the input json file
         '''
-        init_pens(data['penInformation'])
-        init_animals(data['Herd'])
+        self.life_cycle_manager = LifeCycleManager(data['animal_config'])
+        self.init_animals(data['herd_information'])
+        self.times_milked_per_day = data['times_milked_per_day']
+        self.housing = data['housing']
+        self.ration_user_input = data['ration']['user_input']
+        self.formulation_interval = data['ration']['formulation_interval']
+        self.init_pens(data['pen_information'])
         
     def init_pens(self, data):
         '''
@@ -32,15 +64,17 @@ class AnimalManagement:
         Args:
             data: dictionary with the pen information from the input json file
         '''
-        for penName in data:
-            id = penName["id"]
-            dist_to_parlor = penName["walking_dist_to_milking_parlor"]
-            num_stalls = penName["number_of_stalls"]
-            housing_type = penName["housing_type"]
-            bedding_type = penName["bedding_type"]
-            pen_type = penName["pen_type"]
-            pen = Pen(id, dist_to_parlor, num_stalls, housing_type, bedding_type, pen_type)
-            all_pens.append(pen) 
+        for pen_name in data:
+            pen_data = data[pen_name]
+            pen_id = pen_data['id']
+            vertical_dist_to_parlor = pen_data['vertical_dist_to_milking_parlor']
+            horizontal_dist_to_parlor = pen_data['horizontal_dist_to_milking_parlor']
+            num_stalls = pen_data['number_of_stalls']
+            housing_type = pen_data['housing_type']
+            bedding_type = pen_data['bedding_type']
+            pen_type = pen_data['pen_type']
+            pen = Pen(pen_id, vertical_dist_to_parlor, horizontal_dist_to_parlor, num_stalls, housing_type, bedding_type, pen_type)
+            self.all_pens.append(pen) 
     
     def init_animals(self, data):
         '''
@@ -48,8 +82,15 @@ class AnimalManagement:
         Args:
             data: dictionary with the herd information from the input json file
         '''
-        pass
-    
+        calf_num = data['calf_num']
+        heiferI_num = data['heiferI_num']
+        heiferII_num = data['heiferII_num']
+        heiferIII_num = data['heiferIII_num']
+        cow_num = data['cow_num']
+        replace_num = data['replace_num']
+        # TODO: get number of simulation days from initiation?
+        self.life_cycle_manager.initialize_herd(calf_num, heiferI_num, heiferII_num, heiferIII_num, cow_num, replace_num)
+        
     def calc_nutrient_rqmts(self):
         '''
         Calls each animal's method to calculate its nutrient requirements.
@@ -109,7 +150,7 @@ class AnimalManagement:
         for pen in self.all_pens:
             pen.calc_avg_growth()
     
-    def daily_animal_routine(feed, weather, time):
+    def daily_updates(self, feed, time):
         '''
         Executes daily routines relating to Animals.
         Args:
@@ -117,12 +158,30 @@ class AnimalManagement:
             weather : instance of the Weather class
             time : instance of the Time class
         '''
-        # placeholder for method call to life cycle update to update animal states
-        calc_nutrient_rqmts()  # per animal
-        pen_allocation()
-        calc_avg_nutrient_rqmts()  # per pen
-        calc_ration()  # per pen
-        calc_manure_excretion(feed)  # per pen
-        calc_avg_milk()  # per pen
-        calc_avg_growth()  # per pen
+        self.life_cycle_manager.daily_update(time.day, self.sim_length)
+        
+        if self.end_ration_interval(time.day):
+            calc_nutrient_rqmts()  # per animal
+            pen_allocation()
+            calc_avg_nutrient_rqmts()  # per pen
+            calc_ration()  # per pen
+            calc_manure_excretion(feed)  # per pen
+            calc_avg_milk()  # per pen
+            calc_avg_growth()  # per pen
+            
         # other daily actions
+        
+        
+    def end_ration_interval(self, day):
+        '''Checks whether it is the day to formulate a new ration.
+
+        Returns:
+            bool: True if today is the day a new ration has to be formulated,
+                false otherwise.
+        '''
+        return (day % self.ration_formulation_interval) == 1 or self.ration_formulation_interval == 1
+    
+    def annual_reset(self):
+        #TODO: Add DocString
+
+        pass

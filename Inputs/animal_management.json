@@ -261,14 +261,11 @@
             "herd_information":
             {
             	"calf_num": 160, 
-            
             	"heiferI_num": 800,
-			
             	"heiferII_num": 820,
-            	
             	"heiferIII_num": 50,
-            	
-                "cow_num": 100
+                "cow_num": 1000,
+                "replace_num": 5000
             },
             
             "animal_config":
@@ -349,7 +346,7 @@
 				"calf_price": 140	
             },
             
-            "time_milked_per_day": 1,
+            "times_milked_per_day": 1,
             
             "housing": "barn",
             
