@@ -64,7 +64,6 @@ Soil values updated by calling update_all():
 
 from math import exp
 
-
 #
 # This function calls all the necessary functions to update information related
 # to evapotranspiration
@@ -211,6 +210,10 @@ def update_Esoil_z(soil):
 def update_SW(soil):
     Ea = 0
     for layer in soil.listOfSoilLayers:
-        layer.currentSoilWaterMM -= (layer.layerEsoil + layer.Et_actual)
+        WP = layer.wiltingWater
+        layer.layerEsoil = min(layer.currentSoilWaterMM - WP, layer.layerEsoil)
+        layer.currentSoilWaterMM -= layer.layerEsoil
+        layer.Et_actual = min(layer.currentSoilWaterMM - WP, layer.Et_actual)
+        layer.currentSoilWaterMM -= layer.Et_actual
         Ea += (layer.layerEsoil + layer.Et_actual)
     soil.Ea = Ea
