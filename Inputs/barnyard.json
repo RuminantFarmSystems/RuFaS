@@ -49,7 +49,7 @@
             "active": true,
             "produce_diagnostics": true,
             "show_daily": false,
-            "show_annual": true,
+            "show_annual": false,
             "report_name": "Water Balance",
             "file_name": "water_balance.csv"
         }
