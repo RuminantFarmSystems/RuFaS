@@ -91,6 +91,34 @@ class HeiferII(HeiferI):
 		self._gestation_length = heiferII._gestation_length
 
 	'''
+       	Calculates this heiferII's nutrient requirements.
+    '''
+	def calc_nutrient_rqmts(self):
+		# self.nutrient_rqmts = ration.calculate_rqmts(BW, BCS, CBW, CI, concentrate, CP_Milk, DOP, DHD, DVD, DIM, fat_milk, lactose_milk, milk, parity, type, nutrients_list)
+		self._nutrient_rqmts = {'FU': {'op': '<=', 'val': 7.566673489860807}, 'RU': {'op': '>=', 'val': 0}, 'ME_DM': {'op': '>=', 'val': 57.238188330372566}, 'RDP_DM': {'op': '>=', 'val': 2.0347001114951313}, 'RUP_DM': {'op': '>=', 'val': 1.2716733909335047}}
+
+	'''
+		Calculates and sets the manure excretion components.
+	'''  
+	def calc_manure_excretion(self, feed):
+		
+		# self.manure_excretion = manure_excretion.manure_calculations(this.ration_formulation, feed, BW, DIM, mPrt)
+		self._manure_excretion = {"U": 0.340, 
+			"TAN_s": 0.14, 
+			"MN": 532.407, 
+			"Mkg": 70.792, 
+			"VSd": 7087.413, 
+			"VSnd": 859.390} 
+
+	'''
+		Sets this animal's ration formulation.
+		Args:
+			ration_formulation: dictionary representing the calculated ration
+	'''
+	def set_ration(self, ration_formulation):
+		self._ration_formulation = ration_formulation  
+		
+	'''
 		Description:
 			controls heifer's grow with average daily gain based on user's input untill breeding start day
 			here is the place to change growth rate with heifer feeding methods later when we have heifer nutrition from the ration furmulation module
@@ -105,6 +133,8 @@ class HeiferII(HeiferI):
 	def update(self):
 		cull_stage = False
 		third_stage = False
+		
+		prev_weight = self._body_weight
 		self._days_born += 1
 
 		if self._days_born < config.grow_end_day:
@@ -115,7 +145,9 @@ class HeiferII(HeiferI):
 				self._body_weight = config.mature_body_weight
 				self._mature_body_weight = self._body_weight
 				self._events.add_event(self._days_born, 'Mature body weight prior to grow end day')
-
+		
+		self._daily_growth = self._body_weight - prev_weight
+		
 		# Mature body weight
 		if self._days_born == config.grow_end_day:
 			self._mature_body_weight = self._body_weight

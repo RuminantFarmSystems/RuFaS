@@ -31,8 +31,8 @@ class LifeCycleManager():
     num_cow_preg = 0
     num_cow_milking = 0
     num_cow_in_vwp = 0
-    total_feed_cost = 0
-    total_fixed_cost = 0
+    total_feed_cost = 0 #not used?
+    total_fixed_cost = 0 #not used?
     total_breeding_cost = 0
     total_semen_cost = 0
     total_ai_cost = 0
@@ -45,7 +45,7 @@ class LifeCycleManager():
     total_calf_value = 0
     total_heifer_sold = 0
     total_heifer_value = 0
-    total_milk_income = 0
+    total_milk_income = 0 #not used?
     cull_reason_stats = {}
     cull_reason_stats_range = {}
     parity_culling_stats_range = {}
@@ -55,7 +55,6 @@ class LifeCycleManager():
     num_cow_btw_vwp_preg_21_days = 0
     service_rate_sum_21_days = 0
     num_preg_21_days = 0
-    num_ai_21_days = 0
     conception_rate_sum_21_days = 0
     
     config = None
@@ -67,10 +66,14 @@ class LifeCycleManager():
     cows = []
     replacement_market = []
     
+    herd_num = 0
+    
     def __init__(self, data):
         self.config = data        
     
-    def initialize_herd(self, calf_num, heiferI_num, heiferII_num, heiferIII_num, cow_num, replace_num, sim_days=1500):
+    def initialize_herd(self, herd_num, calf_num, heiferI_num, heiferII_num, heiferIII_num, cow_num, replace_num, sim_days=1500):
+        self.herd_num = herd_num
+        
         calves = []
         heiferIs = []
         heiferIIs = []
@@ -173,14 +176,14 @@ class LifeCycleManager():
         daily_heifer_sold = 0
         daily_bought_from_market = 0
         daily_cow_milking = 0
-        self.daily_calf_num.append(len(calves))
-        self.daily_heiferI_num.append(len(heiferIs))
-        self.daily_heiferII_num.append(len(heiferIIs))
-        self.daily_heiferIII_num.append(len(heiferIIIs))
-        self.daily_cow_num.append(len(cows))
+        self.daily_calf_num.append(len(self.calves))
+        self.daily_heiferI_num.append(len(self.heiferIs))
+        self.daily_heiferII_num.append(len(self.heiferIIs))
+        self.daily_heiferIII_num.append(len(self.heiferIIIs))
+        self.daily_cow_num.append(len(self.cows))
     
         record_econ_stats = False
-        if sim_length - date <= config.econ_indicator_range:
+        if sim_length - date <= self.config["econ_indicator_range"]:
             record_econ_stats = True
     
         # calf to heiferI
@@ -216,9 +219,9 @@ class LifeCycleManager():
         for heiferII in self.heiferIIs:
             cull_stage, third_stage = heiferII.update()
             if cull_stage:
-                total_culled += 1
-                culled_heifers.append(heiferII)
-                heiferIIs.remove(heiferII)
+                self.total_culled += 1
+                self.culled_heifers.append(heiferII)
+                self.heiferIIs.remove(heiferII)
             if third_stage:
                 new_heiferIII = HeiferIII(heiferII)
                 self.heiferIIIs.append(new_heiferIII)
@@ -247,24 +250,24 @@ class LifeCycleManager():
             #     return
     
         # if the number of heifers is more than needed for the herd, sell those as replacement
-        while len(self.heiferIIIs) + len(self.cows) > herd_num * 1.03:
+        while len(self.heiferIIIs) + len(self.cows) > self.herd_num * 1.03:
             self.heiferIIIs.pop()
-            sold_to_market += 1
+            self.sold_to_market += 1
             daily_heifer_sold += 1
             if record_econ_stats:
-                total_heifer_sold += 1
-                total_heifer_value += config.heifer_sell_price
+                self.total_heifer_sold += 1
+                self.total_heifer_value += self.config["heifer_sell_price"]
     
         # if the number of heifers is less than needed for the herd, buy replacement from the market
-        while len(self.cows) + len(self.heiferIIIs) < herd_num * 1.01 and date > 1:
+        while len(self.cows) + len(self.heiferIIIs) < self.herd_num * 1.01 and date > 1:
             replacement_market[0]._events.add_event(replacement_market[0]._days_born, 'Entered Herd')
             cows.append(replacement_market[0])
-            bought_from_market += 1
+            self.bought_from_market += 1
             daily_bought_from_market += 1
             del replacement_market[0]
             if record_econ_stats:
-                total_replacement_bought += 1
-                total_replacement_cost += config.heifer_buy_price
+                self.total_replacement_bought += 1
+                self.total_replacement_cost += self.config["heifer_buy_price"]
     
         # cow culling action and economic stats
         for cow in self.cows:
@@ -278,24 +281,24 @@ class LifeCycleManager():
             if culled:
                 repro_cost, semen_cost, AI_cost, preg_check_cost, feed_cost, fixed_cost, milk_income, slaughter_value = cow.get_economy_stats()
                 if record_econ_stats:
-                    total_slaughter_value += slaughter_value
-                    num_culled_range += 1
-                    avg_slaughter_value = total_slaughter_value / num_culled_range
-                    if cow._cull_reason in cull_reason_stats_range:
-                        cull_reason_stats_range[cow._cull_reason] += 1
+                    self.total_slaughter_value += slaughter_value
+                    self.num_culled_range += 1
+                    self.avg_slaughter_value = self.total_slaughter_value / self.num_culled_range
+                    if cow._cull_reason in self.cull_reason_stats_range:
+                        self.cull_reason_stats_range[cow._cull_reason] += 1
                     else:
-                        cull_reason_stats_range[cow._cull_reason] = 1
+                        self.cull_reason_stats_range[cow._cull_reason] = 1
                     parity = cow._calves if cow._calves <= 3 else '4+'
-                    if cow._calves in parity_culling_stats_range:
-                        parity_culling_stats_range[parity] += 1
+                    if cow._calves in self.parity_culling_stats_range:
+                        self.parity_culling_stats_range[parity] += 1
                     else:
-                        parity_culling_stats_range[parity] = 1
+                        self.parity_culling_stats_range[parity] = 1
     
-                if cow._cull_reason in cull_reason_stats:
-                    cull_reason_stats[cow._cull_reason] += 1
+                if cow._cull_reason in self.cull_reason_stats:
+                    self.cull_reason_stats[cow._cull_reason] += 1
                 else:
-                    cull_reason_stats[cow._cull_reason] = 1
-                total_culled += 1
+                    self.cull_reason_stats[cow._cull_reason] = 1
+                self.total_culled += 1
                 daily_cow_cull_num += 1
                 
                 self.culled_cows.append(cow)
@@ -312,93 +315,92 @@ class LifeCycleManager():
                 new_calf = Calf(args)
                 if not (new_calf._culled or new_calf._sold):
                     new_calf._events.add_event(new_calf._days_born, 'Entered Herd')
-                    calves.append(new_calf)
-                    total_new_born += 1
+                    self.calves.append(new_calf)
+                    self.total_new_born += 1
                 if new_calf._sold:
-                    total_calf_sold += 1
-                    total_calf_value += config.calf_price
+                    self.total_calf_sold += 1
+                    self.total_calf_value += self.config["calf_price"]
     
             # calculate reproduction indications
-            if date >= sim_length - 21 * NUM_21_DAYS:
+            if date >= sim_length - 21 * self.config["num_21_days"]:
                 if cow._ai_day == cow._days_born:
-                    num_ai_21_days += 1
-                if cow._days_in_milk > config.vwp and not cow._preg:
-                    num_cow_btw_vwp_preg_21_days += 1
+                    self.num_ai_21_days += 1
+                if cow._days_in_milk > self.config["vwp"] and not cow._preg:
+                    self.num_cow_btw_vwp_preg_21_days += 1
                 if cow._days_in_preg == 1:
-                    num_preg_21_days += 1
+                    self.num_preg_21_days += 1
             
             if cow._milking:
                 daily_cow_milking += 1
     
         # calculate service rate and conception rate
-        if date >= sim_length - 21 * NUM_21_DAYS:
-            count_21_days += 1
-            if count_21_days % 21 == 0:
-                service_rate_sum_21_days += float(num_ai_21_days) / float(num_cow_btw_vwp_preg_21_days)
-                conception_rate_sum_21_days += float(num_preg_21_days) / float(num_ai_21_days)
-                num_ai_21_days = 0
-                num_cow_btw_vwp_preg_21_days = 0
-                num_preg_21_days = 0
+        if date >= sim_length - 21 * self.config["num_21_days"]:
+            self.count_21_days += 1
+            if self.count_21_days % 21 == 0:
+                self.service_rate_sum_21_days += float(self.num_ai_21_days) / float(self.num_cow_btw_vwp_preg_21_days)
+                self.conception_rate_sum_21_days += float(self.num_preg_21_days) / float(self.num_ai_21_days)
+                self.num_ai_21_days = 0
+                self.num_cow_btw_vwp_preg_21_days = 0
+                self.num_preg_21_days = 0
     
         # for figures
-        culled_cows_lst.append(daily_cow_cull_num)
-        heifer_sold_lst.append(daily_heifer_sold)
-        replacement_bought_lst.append(daily_bought_from_market)
-        milking_cows_lst.append(daily_cow_milking)
+        self.culled_cows_lst.append(daily_cow_cull_num)
+        self.heifer_sold_lst.append(daily_heifer_sold)
+        self.replacement_bought_lst.append(daily_bought_from_market)
+        self.milking_cows_lst.append(daily_cow_milking)
     
         
     def output_end_stats(self):
         parity_lst = [cow._calves if cow._calves <= 2 else '3+' for cow in cows ]
         parity_count_tuple = Counter(parity_lst)
-        avg_service_rate = service_rate_sum_21_days / float(NUM_21_DAYS) * 21.0
-        avg_conception_rate = conception_rate_sum_21_days / float(NUM_21_DAYS)
+        avg_service_rate = self.service_rate_sum_21_days / float(self.config["num_21_days"]) * 21.0
+        avg_conception_rate = self.conception_rate_sum_21_days / float(self.config["num_21_days"])
         pregnancy_rate = avg_service_rate * avg_conception_rate
     
-        print("\n=================== Herd structure at the end of the simulation ===================\n".format(config.econ_indicator_range))
+        print("\n=================== Herd structure at the end of the simulation ===================\n".format(self.config["econ_indicator_range"]))
         print("Total calves:\t\t\t{}".format(len(calves)))
         print("Total heiferI:\t\t\t{}".format(len(heiferIs)))
         print("Total heiferII:\t\t\t{}".format(len(heiferIIs)))
         print("Total heiferIII:\t\t{}".format(len(heiferIIIs)))
         print("Total cows:\t\t\t{}".format(len(cows)))
-        print("Total heiferII pregnant:\t{}".format(num_heiferII_preg))
-        print("Total cows pregnant:\t\t{}".format(num_cow_preg))
-        print("Total cows milking:\t\t{}".format(num_cow_milking))
+        print("Total heiferII pregnant:\t{}".format(self.num_heiferII_preg))
+        print("Total cows pregnant:\t\t{}".format(self.num_cow_preg))
+        print("Total cows milking:\t\t{}".format(self.num_cow_milking))
         for parity, count in parity_count_tuple.items():
             print("Parity {}:\t\t\t {}".format(parity, count))
-        print("Total cows in vwp:\t\t{}".format(num_cow_in_vwp))
+        print("Total cows in vwp:\t\t{}".format(self.num_cow_in_vwp))
     
-        print("\n=================== Last {} days economy stats ===================\n".format(config.econ_indicator_range))
+        print("\n=================== Last {} days economy stats ===================\n".format(self.config["econ_indicator_range"]))
         print("Feed cost:\t\t\t{0:.2f} $/cow/day".format(avg_feed_cost))
         print("Fixed cost:\t\t\t{0:.2f} $/cow/day".format(avg_fixed_cost))
         print("Repro cost:\t\t\t{0:.2f} $/cow/day".format(avg_repro_cost))
-        # print("Total breeding cost:\t\t{0:.2f} $".format(total_breeding_cost))
-        # print("Total semen cost:\t\t{0:.2f} $".format(total_semen_cost))
-        # print("Total ai cost:\t\t\t{0:.2f} $".format(total_ai_cost))
-        # print("Total preg check cost:\t\t{0:.2f} $".format(total_preg_check_cost))
+        # print("Total breeding cost:\t\t{0:.2f} $".format(self.total_breeding_cost))
+        # print("Total semen cost:\t\t{0:.2f} $".format(self.total_semen_cost))
+        # print("Total ai cost:\t\t\t{0:.2f} $".format(self.total_ai_cost))
+        # print("Total preg check cost:\t\t{0:.2f} $".format(self.total_preg_check_cost))
         print("Milk income:\t\t\t{0:.2f} $/cow/day".format(avg_milk_income))
-        print("Total replacement bought:\t{0:.2f}".format(total_replacement_bought))
-        print("Total replacement cost:\t\t{0:.2f} $".format(total_replacement_cost))
-        print("Total replacement sold:\t\t{0:.2f}".format(total_heifer_sold))
-        print("Total heifer sold income:\t{0:.2f} $".format(total_heifer_value))
-        print("Total calf sold:\t\t{0:.2f}".format(total_calf_sold))
-        print("Total calf sold income:\t\t{0:.2f} $".format(total_calf_value))
-        print("Total slaughter income:\t\t{0:.2f} $".format(total_slaughter_value))
-        print("Average slaughter income:\t{0:.2f} $".format(avg_slaughter_value))
+        print("Total replacement bought:\t{0:.2f}".format(self.total_replacement_bought))
+        print("Total replacement cost:\t\t{0:.2f} $".format(self.total_replacement_cost))
+        print("Total replacement sold:\t\t{0:.2f}".format(self.total_heifer_sold))
+        print("Total heifer sold income:\t{0:.2f} $".format(self.total_heifer_value))
+        print("Total calf sold:\t\t{0:.2f}".format(self.total_calf_sold))
+        print("Total calf sold income:\t\t{0:.2f} $".format(self.total_calf_value))
+        print("Total slaughter income:\t\t{0:.2f} $".format(self.total_slaughter_value))
+        print("Average slaughter income:\t{0:.2f} $".format(self.avg_slaughter_value))
         print("IOFC: \t\t\t\t{0:.2f} $".format(income_over_feed_cost))
         print("Net return: \t\t\t{0:.2f} $".format(net_return))
     
         print("SR%: \t\t\t\t{0:.2f}%".format(avg_service_rate * 100.0))
         print("CR%: \t\t\t\t{0:.2f}%".format(avg_conception_rate * 100.0))
         print("PR%: \t\t\t\t{0:.2f}%".format(pregnancy_rate * 100.0))
-        print("Total cows culled:\t\t{}".format(num_culled_range))
-        print("Culling rate: \t\t\t{0:.2f}%".format(float(num_culled_range) / float(len(cows)) * 100))
-        for cull_reason, count in cull_reason_stats_range.items():
+        print("Total cows culled:\t\t{}".format(self.num_culled_range))
+        print("Culling rate: \t\t\t{0:.2f}%".format(float(self.num_culled_range) / float(len(cows)) * 100))
+        for cull_reason, count in self.cull_reason_stats_range.items():
             print("{} => {}".format(cull_reason, count))
-        # for parity, count in parity_culling_stats_range.items():
+        # for parity, count in self.parity_culling_stats_range.items():
         #     print("Parity {} total culls: {}".format(parity, count))
     
-        # @staticmethod
-        draw_stat(daily_calf_num, daily_heiferI_num, daily_heiferII_num, daily_heiferIII_num, daily_cow_num, culled_cows_lst, heifer_sold_lst, replacement_bought_lst, milking_cows_lst, sim_length) 
+        draw_stat(sim_length) 
         # draw curves for a cow
         print(cows[0])
         cows[0].draw_curves()
@@ -410,60 +412,60 @@ class LifeCycleManager():
         cows[150].draw_curves()
     
     
-    def draw_stat(self, daily_calf_num, daily_heiferI_num, daily_heiferII_num, daily_heiferIII_num, daily_cow_num, culled_cows_lst, heifer_sold_lst, replacement_bought_lst, milking_cows_lst, sim_length):    
+    def draw_stat(self, sim_length):    
         fig = plt.figure()
         x = [date for date in range(sim_length)]
     
         ax1 = fig.add_subplot(521)
-        ax1.scatter(x, daily_calf_num, s=1)
+        ax1.scatter(x, self.daily_calf_num, s=1)
         ax1.spines['right'].set_visible(False)
         ax1.spines['top'].set_visible(False)
         ax1.set_title("Number of calves each day")
             
         ax2 = fig.add_subplot(522)
-        ax2.scatter(x, daily_heiferI_num, s=1)
+        ax2.scatter(x, self.daily_heiferI_num, s=1)
         ax2.spines['right'].set_visible(False)
         ax2.spines['top'].set_visible(False)
         ax2.set_title("Number of heiferIs each day")
             
         ax3 = fig.add_subplot(523)
-        ax3.scatter(x, daily_heiferII_num, s=1)
+        ax3.scatter(x, self.daily_heiferII_num, s=1)
         ax3.spines['right'].set_visible(False)
         ax3.spines['top'].set_visible(False)
         ax3.set_title("Number of heiferIIs each day")
             
         ax4 = fig.add_subplot(524)
-        ax4.scatter(x, daily_heiferIII_num, s=1)
+        ax4.scatter(x, self.daily_heiferIII_num, s=1)
         ax4.spines['right'].set_visible(False)
         ax4.spines['top'].set_visible(False)
         ax4.set_title("Number of heiferIIIs each day")
         
         ax5 = fig.add_subplot(525)
-        ax5.scatter(x, daily_cow_num, s=1)
+        ax5.scatter(x, self.daily_cow_num, s=1)
         ax5.spines['right'].set_visible(False)
         ax5.spines['top'].set_visible(False)
         ax5.set_title("Number of cows each day")
             
         ax6 = fig.add_subplot(526)
-        ax6.scatter(x, culled_cows_lst, s=1)
+        ax6.scatter(x, self.culled_cows_lst, s=1)
         ax6.spines['right'].set_visible(False)
         ax6.spines['top'].set_visible(False)
         ax6.set_title("Number of culled cows each day")
             
         ax7 = fig.add_subplot(527)
-        ax7.scatter(x, heifer_sold_lst, s=1)
+        ax7.scatter(x, self.heifer_sold_lst, s=1)
         ax7.spines['right'].set_visible(False)
         ax7.spines['top'].set_visible(False)
         ax7.set_title("Number of sold heifers each day")
             
         ax8 = fig.add_subplot(528)
-        ax8.scatter(x, replacement_bought_lst, s=1)
+        ax8.scatter(x, self.replacement_bought_lst, s=1)
         ax8.spines['right'].set_visible(False)
         ax8.spines['top'].set_visible(False)
         ax8.set_title("Number of bought heifers each day")
         
         # ax9 = fig.add_subplot(529)
-        # ax9.scatter(x, milking_cows_lst, s=1)
+        # ax9.scatter(x, self.milking_cows_lst, s=1)
         # ax9.spines['right'].set_visible(False)
         # ax9.spines['top'].set_visible(False)
         # ax9.set_title("Number of milking cows each day")

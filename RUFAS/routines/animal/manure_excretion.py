@@ -137,7 +137,12 @@ def manure_calculations(ration_formulation, feed, BW, DIM, mPrt):
     # Total ammoniacal nitrogen concentration in the manure slurry, mol/L (Eq 6.1)
     TAN_s = (-162.4 * U * U + 96.4 * U) / 100 
     
-    return U, TAN_s, MN, Mkg, VSd, VSnd
+    return {"U": U, 
+            "TAN_s": TAN_s, 
+            "MN": MN, 
+            "Mkg": Mkg, 
+            "VSd": VSd, 
+            "VSnd": VSnd}
 
 
 def test_manure(feed):
@@ -153,11 +158,11 @@ def test_manure(feed):
     BW = 650
     DIM = 100
     mPrt = 3.2
-    U, TAN_s, MN, Mkg, VSd, VSnd = manure_calculations(ration_formulation, feed, BW, DIM, mPrt)
-    print('U = ', U, '\t expected: ', 0.340)
-    print('TAN_s = ', TAN_s, '\t expected: ', 0.14)
-    print('MN = ', MN, '\t expected: ', 532.407)
-    print('Mkg = ', Mkg, '\t expected: ', 70.792)
-    print('VSd = ', VSd, '\t expected: ', 7087.413)
-    print('VSnd = ', VSnd, '\t expected: ', 859.390)
+    manure_contents = manure_calculations(ration_formulation, feed, BW, DIM, mPrt)
+    print('U = ', manure_contents["U"], '\t expected: ', 0.340)
+    print('TAN_s = ', manure_contents["TAN_s"], '\t expected: ', 0.14)
+    print('MN = ', manure_contents["MN"], '\t expected: ', 532.407)
+    print('Mkg = ', manure_contents["Mkg"], '\t expected: ', 70.792)
+    print('VSd = ', manure_contents["VSd"], '\t expected: ', 7087.413)
+    print('VSnd = ', manure_contents["VSnd"], '\t expected: ', 859.390)
     print()

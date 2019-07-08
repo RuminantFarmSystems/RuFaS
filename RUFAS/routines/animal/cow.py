@@ -179,13 +179,17 @@ class Cow(HeiferIII):
 		# calculate fat percent in milk and fat corrected milk production
 		fat_percent = 12.86 * self._days_in_milk ** (-1.081) * math.exp((0.0926) * (math.log(self._days_in_milk)) ** 2) * (math.log(self._days_in_milk) ** 1.107)
 		daily_fat_correct_milk_production = 0.4 * estimated_daily_milk_produced + 0.15 * fat_percent * estimated_daily_milk_produced
-
+		
+		prev_weight = self._body_weight
+		
 		# calculate body weight when milking
 		if self._calves == 1:
 			self._body_weight = self._mature_body_weight * (1-(1-(self._birth_weight/self._mature_body_weight)**(1/3)) * math.exp(-0.0039 * self._days_born)) **3 - (20/65) * self._days_in_milk * math.exp(1-self._days_in_milk/65) + 0.0187**3 * (self._days_in_preg - 50) ** 3
 		else:
 			self._body_weight = self._mature_body_weight * (1-(1-(self._birth_weight/self._mature_body_weight)**(1/3)) * math.exp(-0.006 * self._days_born)) **3 - (40/75) * self._days_in_milk * math.exp(1-self._days_in_milk/75) + 0.0187**3 * (self._days_in_preg - 50) ** 3
-
+		
+		self._daily_growth = self._body_weight - prev_weight
+		
 		#caculate dry matter intake from fat corrected milk production
 		dry_matter_intake = 0.372 * daily_fat_correct_milk_production + 0.0968 * self._body_weight**0.75 * (1-math.exp(-0.192 * (self._days_in_milk/7 +3.67)))
 
@@ -193,8 +197,34 @@ class Cow(HeiferIII):
 		self._body_weight_lst.append(self._body_weight)
 
 		return estimated_daily_milk_produced, fat_percent, daily_fat_correct_milk_production, dry_matter_intake
+	
+	'''
+       	Calculates this cow's nutrient requirements.
+    '''
+	def calc_nutrient_rqmts(self):
+		# self.nutrient_rqmts = ration.calculate_rqmts(BW, BCS, CBW, CI, concentrate, CP_Milk, DOP, DHD, DVD, DIM, fat_milk, lactose_milk, milk, parity, type, nutrients_list)
+		self._nutrient_rqmts = {'FU': {'op': '<=', 'val': 7.566673489860807}, 'RU': {'op': '>=', 'val': 0}, 'ME_DM': {'op': '>=', 'val': 57.238188330372566}, 'RDP_DM': {'op': '>=', 'val': 2.0347001114951313}, 'RUP_DM': {'op': '>=', 'val': 1.2716733909335047}}
 
-
+	'''
+		Calculates and sets the manure excretion components.
+	'''  
+	def calc_manure_excretion(self, feed):
+		
+		# self.manure_excretion = manure_excretion.manure_calculations(this.ration_formulation, feed, BW, DIM, mPrt)
+		self._manure_excretion = {"U": 0.340, 
+			"TAN_s": 0.14, 
+			"MN": 532.407, 
+			"Mkg": 70.792, 
+			"VSd": 7087.413, 
+			"VSnd": 859.390} 
+	'''
+		Sets this animal's ration formulation.
+		Args:
+			ration_formulation: dictionary representing the calculated ration
+	'''
+	def set_ration(self, ration_formulation):
+		self._ration_formulation = ration_formulation  
+		
 	'''
 		Description:
 			update cow status from the moment of calving, parity+1, milking start, pregnancy stop, and estrus restart

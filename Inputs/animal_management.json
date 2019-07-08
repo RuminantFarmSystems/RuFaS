@@ -265,11 +265,13 @@
             	"heiferII_num": 820,
             	"heiferIII_num": 50,
                 "cow_num": 1000,
-                "replace_num": 5000
+                "replace_num": 5000,
+                "herd_num": 1000
             },
             
             "animal_config":
             {
+            	"num_21_days": 15,
             	"still_birth_rate": 0.065,
 				"male_calf_rate_sexed_semen": 0.1,
 				"male_calf_rate_conventional_semen": 0.53,

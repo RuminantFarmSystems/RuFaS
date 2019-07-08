@@ -8,7 +8,6 @@ Author(s): Militsa Sotirova, militsasotirova@gmail.com
 '''
 ################################################################################
 from RUFAS.routines.animal.pen import Pen
-from RUFAS.routines.animal.animal_object import AnimalObject
 from RUFAS.routines.animal.life_cycle import LifeCycleManager
 
 def daily_animal_routine(animal_management, feed, weather, time):
@@ -20,6 +19,7 @@ def daily_animal_routine(animal_management, feed, weather, time):
         weather : instance of the Weather class
         time : instance of the Time class
     '''
+    print('here')
     animal_management.daily_updates(feed, time)
 
 def daily_animal_update(animal, weather, time):
@@ -27,7 +27,11 @@ def daily_animal_update(animal, weather, time):
 
 class AnimalManagement:
     # list of all the animals in the simulations
-    all_animals = []
+    calves = []
+    heiferIs = []
+    heiferIIs = []
+    heiferIIIs = []
+    cows = []
     
     # list of all the pens on the farm
     all_pens = []
@@ -88,22 +92,45 @@ class AnimalManagement:
         heiferIII_num = data['heiferIII_num']
         cow_num = data['cow_num']
         replace_num = data['replace_num']
+        herd_num = data['herd_num']
         # TODO: get number of simulation days from initiation?
-        self.life_cycle_manager.initialize_herd(calf_num, heiferI_num, heiferII_num, heiferIII_num, cow_num, replace_num)
+        self.life_cycle_manager.initialize_herd(herd_num, calf_num, heiferI_num, heiferII_num, heiferIII_num, cow_num, replace_num)
+        self.calves = self.life_cycle_manager.calves
+        self.heiferIs = self.life_cycle_manager.heiferIs
+        self.heiferIIs = self.life_cycle_manager.heiferIIs
+        self.heiferIIIs = self.life_cycle_manager.heiferIIIs
+        self.cows = self.life_cycle_manager.cows
         
     def calc_nutrient_rqmts(self):
         '''
         Calls each animal's method to calculate its nutrient requirements.
         '''
-        for animal in self.all_animals:
-            animal.calc_nutrient_rqmts()
-    
+        for calf in self.calves:
+            calf.calc_nutrient_rqmts()
+            
+        for heiferI in self.heiferIs:
+            heiferI.calc_nutrient_rqmts()
+            
+        for heiferII in self.heiferIIs:
+            heiferII.calc_nutrient_rqmts()
+            
+        for heiferIII in self.heiferIIIs:
+            heiferIII.calc_nutrient_rqmts()
+            
+        for cow in self.cows:
+            cow.calc_nutrient_rqmts()
+            
+        
     def pen_allocation(self):
         '''
         Allocates the animals in all_animals to pens in all_pens based on the animals' characteristics.
-        TEMPORARY CODE JUST FOR TESTING PURPOSES.
+        TEMPORARY HARD-CODE FOR TESTING PURPOSES.
         '''
-        pass
+        self.all_pens[0].update_animals(self.calves)
+        self.all_pens[1].update_animals(self.heiferIs)
+        self.all_pens[2].update_animals(self.heiferIIs)
+        self.all_pens[3].update_animals(self.heiferIIIs)
+        self.all_pens[4].update_animals(self.cows)
     
     def clear_pens(self):
         '''
@@ -111,7 +138,6 @@ class AnimalManagement:
         '''
         for pen in all_pens:
             pen.clear()
-        pass
       
     def calc_avg_nutrient_rqmts(self):
         '''
@@ -161,13 +187,13 @@ class AnimalManagement:
         self.life_cycle_manager.daily_update(time.day, self.sim_length)
         
         if self.end_ration_interval(time.day):
-            calc_nutrient_rqmts()  # per animal
-            pen_allocation()
-            calc_avg_nutrient_rqmts()  # per pen
-            calc_ration()  # per pen
-            calc_manure_excretion(feed)  # per pen
-            calc_avg_milk()  # per pen
-            calc_avg_growth()  # per pen
+            self.calc_nutrient_rqmts()  # per animal
+            self.pen_allocation()
+            self.calc_avg_nutrient_rqmts()  # per pen
+            self.calc_ration()  # per pen
+            self.calc_manure_excretion(feed)  # per pen
+            self.calc_avg_milk()  # per pen
+            self.calc_avg_growth()  # per pen
             
         # other daily actions
         
@@ -179,7 +205,7 @@ class AnimalManagement:
             bool: True if today is the day a new ration has to be formulated,
                 false otherwise.
         '''
-        return (day % self.ration_formulation_interval) == 1 or self.ration_formulation_interval == 1
+        return (day % self.formulation_interval) == 1 or self.formulation_interval == 1
     
     def annual_reset(self):
         #TODO: Add DocString

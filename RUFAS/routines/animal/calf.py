@@ -31,7 +31,6 @@ class Calf(AnimalBase):
 	def __init__(self, args):
 		super().__init__(args)
 		self._sold = False
-
 		# gender determined with gender ratio relates to semen type
 		if config.semen_type == 'conventional':
 			male_calf_rate = config.male_calf_rate_conventional_semen
@@ -79,7 +78,36 @@ class Calf(AnimalBase):
 		self._birth_weight = calf._birth_weight
 		self._body_weight = calf._body_weight
 		self._wean_weight = calf._wean_weight
+	
+	'''
+       	Calculates this calf's nutrient requirements.
+    '''
+	def calc_nutrient_rqmts(self):
+		# self.nutrient_rqmts = ration.calculate_rqmts(BW, BCS, CBW, CI, concentrate, CP_Milk, DOP, DHD, DVD, DIM, fat_milk, lactose_milk, milk, parity, type, nutrients_list)
+		self._nutrient_rqmts = {'FU': {'op': '<=', 'val': 7.566673489860807}, 'RU': {'op': '>=', 'val': 0}, 'ME_DM': {'op': '>=', 'val': 57.238188330372566}, 'RDP_DM': {'op': '>=', 'val': 2.0347001114951313}, 'RUP_DM': {'op': '>=', 'val': 1.2716733909335047}}
 
+	'''
+		Calculates and sets the manure excretion components.
+	'''  
+	def calc_manure_excretion(self, feed):
+		
+		# self.manure_excretion = manure_excretion.manure_calculations(this.ration_formulation, feed, BW, DIM, mPrt)
+		self._manure_excretion = {"U": 0.340, 
+			"TAN_s": 0.14, 
+			"MN": 532.407, 
+			"Mkg": 70.792, 
+			"VSd": 7087.413, 
+			"VSnd": 859.390} 
+
+	'''
+		Sets this animal's ration formulation.
+		Args:
+			ration_formulation: dictionary representing the calculated ration
+	'''
+	def set_ration(self, ration_formulation):
+		self._ration_formulation = ration_formulation  
+		
+		
 	'''
 		Description:
 			controls calf's grow with average daily gain based on user's input untill wean day
@@ -91,7 +119,9 @@ class Calf(AnimalBase):
 	'''
 	def update(self):
 		wean_day = False
-
+		
+		prev_weight = self._body_weight
+		
 		self._days_born += 1
 		if self._days_born == config.wean_day:
 			wean_day = True
@@ -100,7 +130,9 @@ class Calf(AnimalBase):
 			self._days_born -= 1 # will increment by 1 again in heifer update
 		else:
 			self._body_weight += np.random.normal(config.avg_daily_gain_c, config.std_daily_gain_c)
-
+		
+		self._daily_growth = self._body_weight - prev_weight
+		
 		return wean_day
 
 	def __str__(self):
