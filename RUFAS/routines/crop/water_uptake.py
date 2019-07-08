@@ -160,6 +160,7 @@ def decrease_effic_of_uptake(soil, uptake_each_layer):
 #
 def calc_act_water_uptake(crop_type, soil, adj_uptakes, time):
     act_uptake_each_layer = []
+    transpiration = 0
 
     # Calculate actual uptake for each layer
     # C.4.C.1
@@ -167,9 +168,11 @@ def calc_act_water_uptake(crop_type, soil, adj_uptakes, time):
         act_uptake = min(uptake, layer.currentSoilWaterMM - layer.wiltingWater)
 
         layer.Et_actual = act_uptake
+        transpiration += layer.Et_actual
 
         act_uptake_each_layer.append(act_uptake)
 
+    soil.transpiration = transpiration
     crop_type.water_uptake_each_layer = act_uptake_each_layer
 
     # Calculate total plant uptake of water from soil profile

@@ -279,12 +279,12 @@ class Soil:
         self.Et_max = 0.0
         self.E0 = 0.0
         self.profile_SW = 0.0
-        self.Esoil = 0.0
 
         # daily water balance
         self.delta_SW = 0.0
         self.runoff = 0.0
-        self.Ea = 0.0
+        self.Esoil = 0.0
+        self.transpiration = 0.0
         self.drainage = 0.0
 
         self.p_act = 0.0
@@ -298,7 +298,8 @@ class Soil:
         # annual water balance
         self.annual_delta_SW = 0.0
         self.runoff_sum = 0.0
-        self.Ea_sum = 0.0
+        self.Esoil_sum = 0.0
+        self.transpiration_sum = 0.0
         self.drainage_sum = 0.0
 
         self.p_act_annual = 0.0
@@ -636,7 +637,9 @@ class Soil:
             Calculates annual water balance
         """
         self.p_calc_annual = (self.profile_SW - self.initial_annual_SW) \
-            + self.runoff_sum + self.Ea_sum + self.drainage_sum
+            + self.runoff_sum + self.Esoil_sum + self.transpiration_sum \
+            + self.drainage_sum
+
         self.annual_water_balance = self.p_act_annual - self.p_calc_annual
 
     def annual_reset(self):
@@ -646,7 +649,8 @@ class Soil:
         """
 
         self.E0_sum = 0.0
-        self.Ea_sum = 0.0
+        self.Esoil_sum = 0.0
+        self.transpiration_sum = 0.0
         self.drainage_sum = 0.0
         self.runoff_sum = 0.0
 

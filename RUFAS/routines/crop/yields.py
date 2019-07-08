@@ -81,7 +81,8 @@ def update_all(crop_type, time, soil):
 def calc_gamma_wu(crop_type, soil):
     if soil.E0_sum == 0:
         return 0
-    crop_type.gamma_wu = 100*(soil.Ea_sum/soil.E0_sum)
+    Ea_sum = soil.Esoil_sum + soil.transpiration_sum
+    crop_type.gamma_wu = 100 * (Ea_sum / soil.E0_sum)
 
 
 #
@@ -151,6 +152,8 @@ def calc_nutrient_removal(crop_type):
 # # "pseudocode_crop" C.10.H.1/2
 #
 def calc_residue(crop_type, time, soil):
+    dResidue = 0
     if crop_type.harvest_date == time.day:
-        dResidue = (crop_type.biomass_actual - crop_type.yield_actual)
-        soil.residue = (soil.residue + dResidue) * (1 - soil.decayRate)
+        dResidue = (crop_type.bio_AG - crop_type.yield_actual)
+    soil.listOfSoilLayers[0].topLayerFreshN += 0.0015 * soil.residue
+    soil.residue = soil.residue * (1 - soil.decayRate) + dResidue

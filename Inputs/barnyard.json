@@ -14,8 +14,8 @@
         "soil_summary":
         {
             "active": true,
-            "produce_diagnostics": false,
-            "show_daily": false,
+            "produce_diagnostics": true,
+            "show_daily": true,
             "report_name": "Soil Summary",
             "file_name": "soil_summary.csv"
         },
@@ -47,9 +47,9 @@
         "water_balance":
         {
             "active": true,
-            "produce_diagnostics": true,
+            "produce_diagnostics": false,
             "show_daily": false,
-            "show_annual": true,
+            "show_annual": false,
             "report_name": "Water Balance",
             "file_name": "water_balance.csv"
         }

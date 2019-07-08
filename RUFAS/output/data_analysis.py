@@ -93,13 +93,13 @@ def annual_data_analysis(output_csv, show_annual, produce_diagnostics):
         width = 0.35
         table_vals = []
         row_labs = []
-        colors = ['', '', '#1561ad', '#fbaf08', '#51d0de', '#431c5d']
+        colors = ['', '', '#1561ad', '#006400', '#fbaf08',  '#51d0de', '#431c5d']
         for variable in variables:
-            if 1 < counter < 6:
+            if 1 < counter < 7:
                 mp.bar(years, variables[variable], width, color=colors[counter], bottom=prev_vars)
                 legend.append(variable)
                 prev_vars = [sum(x) for x in zip(prev_vars, variables[variable])]
-            if counter == 6:
+            if counter == 7:
                 precip = variables[variable]
                 legend.insert(0, variable)
                 mp.scatter(years, precip, c='black', marker='x')

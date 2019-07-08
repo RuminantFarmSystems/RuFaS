@@ -100,27 +100,30 @@ def update_SW(soil, weather, time):
     soil.drainage_sum += soil.drainage
     soil.runoff_sum += Q
     soil.p_act_annual += R
-    soil.Ea_sum += soil.Ea
+    soil.Esoil_sum += soil.Esoil
+    soil.transpiration_sum += soil.transpiration
 
 
 def daily_water_balance(soil, weather, time):
     R = weather.rainfall[time.year - 1][time.day - 1]
     D = soil.drainage
     Q = soil.runoff
-    Ea = soil.Ea
+    Esoil = soil.Esoil
+    transpiration = soil.transpiration
     SW = sum_SW(soil)
     prev_SW = soil.prev_SW
 
     d_SW = SW - prev_SW
 
     soil.p_act = R
-    soil.p_calc = d_SW + Ea + Q + D
+    soil.p_calc = d_SW + Esoil + transpiration + Q + D
     soil.water_balance = soil.p_act - soil.p_calc
 
     soil.drainage_sum += soil.drainage
     soil.runoff_sum += Q
     soil.p_act_annual += R
-    soil.Ea_sum += soil.Ea
+    soil.Esoil_sum += Esoil
+    soil.transpiration_sum += transpiration
 
     soil.prev_SW = SW
 

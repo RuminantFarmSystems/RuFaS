@@ -45,6 +45,7 @@ class SoilSummary(BaseReportHandler):
         self.sublimation = []
         self.surfaceTemp = []
         self.sedimentYield = []
+        self.residue = []
         self.numSoilLayers = 0
 
         self.layers_Et_actual = []
@@ -87,6 +88,7 @@ class SoilSummary(BaseReportHandler):
 
             fieldnames.append("Surface Temp")
             fieldnames.append("Sediment Yield")
+            fieldnames.append("Residue")
 
             self.fieldNames = fieldnames
             writer = csv.DictWriter(csvfile, fieldnames=self.fieldNames,
@@ -101,7 +103,9 @@ class SoilSummary(BaseReportHandler):
                              'Crop Transpiration (Et_max)': "mm H2O",
                              'Maximum Sublimation (Esoil)': "mm H2O",
                              'Surface Temp': "C",
-                             'Sediment Yield': "metric tons"}
+                             'Sediment Yield': "metric tons",
+                             'Residue': "kg/ha"
+                     }
             for fieldname in fieldnames:
                 if fieldname.startswith("Et_actual"):
                     units[fieldname] = 'mm H2O'
@@ -176,6 +180,7 @@ class SoilSummary(BaseReportHandler):
 
         self.surfaceTemp.append(soil.Tsurf)
         self.sedimentYield.append(soil.sedimentYield)
+        self.residue.append(soil.residue)
 
     # ---------------------------------------------------------------------------
     # Method: annual_update
@@ -217,7 +222,10 @@ class SoilSummary(BaseReportHandler):
                     'Surface Temp':
                         str(round(self.surfaceTemp[x], 3)),
                     'Sediment Yield':
-                        str(round(self.sedimentYield[x], 3))}
+                        str(round(self.sedimentYield[x], 3)),
+                    'Residue':
+                        str(round(self.residue[x], 3))
+                }
 
                 for y in range(0, self.numSoilLayers):
                     dailySoilData["Et_actual_L" + str(y+1)] = str(
@@ -260,6 +268,7 @@ class SoilSummary(BaseReportHandler):
 
         self.surfaceTemp = []
         self.sedimentYield = []
+        self.residue = []
 
     def produce_data_analysis(self, is_final):
         data_analysis(self.file_name, self.show_daily, self.produce_diagnostics, is_final)
