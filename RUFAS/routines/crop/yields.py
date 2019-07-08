@@ -125,7 +125,7 @@ def calc_HI_actual(crop_type, time):
 #
 def calc_yield_max(crop_type, time):
     if time.day == crop_type.harvest_date:
-        crop_type.yield_max = crop_type.bio_AG * crop_type.HI_actual
+        crop_type.yield_max = crop_type.bio_AG * crop_type.HI_max
     else:
         crop_type.yield_max = 0
 
