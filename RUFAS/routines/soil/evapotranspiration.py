@@ -78,7 +78,8 @@ def update_all(soil, crop, weather, time):
 
     update_Esoil_z(soil)
 
-    update_SW(soil)
+    if soil.update_SW:
+        update_SW(soil)
 
 
 #

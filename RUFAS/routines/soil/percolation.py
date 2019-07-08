@@ -37,7 +37,8 @@ def update_all(soil):
 
     calc_daily_percolation(soil)
 
-    update_SW(soil)
+    if soil.update_SW:
+        update_SW(soil)
 
 
 #

@@ -45,9 +45,10 @@ Soil values updated by calling update_all():
 #
 def update_all(soil, weather, time):
 
-    # update_SW(soil, weather, time)
-
-    daily_water_balance(soil, weather, time)
+    if soil.update_SW:
+        daily_water_balance(soil, weather, time)
+    else:
+        update_SW(soil, weather, time)
 
 
 #
@@ -69,9 +70,10 @@ def update_SW(soil, weather, time):
         Perc = layer.perc
         Esoil = layer.layerEsoil
         Et_actual = layer.Et_actual
+        I = soil.dailyInfiltration
 
         if x == 0:
-            SW = max(WP, SW + R - Q - Esoil - Perc - Et_actual)
+            SW = max(WP, SW + I - Esoil - Perc - Et_actual)
             SW = min(SAT, SW)
 
         else:
@@ -119,6 +121,7 @@ def daily_water_balance(soil, weather, time):
     soil.p_calc = d_SW + Esoil + transpiration + Q + D
     soil.water_balance = soil.p_act - soil.p_calc
 
+    # annual values
     soil.drainage_sum += soil.drainage
     soil.runoff_sum += Q
     soil.p_act_annual += R

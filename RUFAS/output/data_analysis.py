@@ -9,8 +9,9 @@ Author(s): Jacob Johnson, jacob8399@gmail.com
 Description: Produces graphical representations of RuFaS output data.
 """
 
-import matplotlib.pyplot as mp, datetime as dt, csv
-
+import csv
+import datetime as dt
+import matplotlib.pyplot as mp
 
 #
 # Produces graphical representations of data passed in from a csv file.
@@ -22,13 +23,13 @@ def read_data(output_csv):
     output_full_path = util.get_base_dir() / 'Outputs/Sample_Farm_Outputs' / output_csv
 
     with open(output_full_path) as csvfile:
-        read_CSV = csv.reader(csvfile, delimiter=',')
+        read_csv = csv.reader(csvfile, delimiter=',')
 
         variables = {}
         units = []
 
         r = 0
-        for row in read_CSV:
+        for row in read_csv:
             if r == 0:
                 for variable in row:
                     variable_list = []
@@ -108,6 +109,7 @@ def annual_data_analysis(output_csv, show_annual, produce_diagnostics):
                 row_labs.append(variable)
             counter += 1
 
+        mp.axis('tight')
         mp.table(cellText=table_vals,
                  rowLabels=row_labs,
                  bbox=[0, -.9, 1, .75])
@@ -118,6 +120,7 @@ def annual_data_analysis(output_csv, show_annual, produce_diagnostics):
         mp.title('Annual Water Balance')
         path = str(save_dir / 'annual_water_balance')
         mp.savefig(path + '')
+
         if not show_annual:
             mp.close()
 

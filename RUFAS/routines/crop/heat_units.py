@@ -78,7 +78,7 @@ def calculate_frPHU(crop_type, T_min, T_max, time):
     crop_type.prev_fr_PHU = crop_type.fr_PHU
 
     # Calculate accumulated fraction of potential Heat Units
-    # 2.B.1
+    # C.2.B.1
     crop_type.fr_PHU = crop_type.accumulated_HU / crop_type.PHU
 
 
