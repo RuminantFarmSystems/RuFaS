@@ -103,7 +103,7 @@ def annual_data_analysis(output_csv, show_annual, produce_diagnostics):
             if counter == 7:
                 precip = variables[variable]
                 legend.insert(0, variable)
-                mp.scatter(years, precip, c='black', marker='x')
+                mp.scatter(years, precip, c='red', marker='x', zorder=2)
             if counter > 1:
                 table_vals.append(variables[variable])
                 row_labs.append(variable)

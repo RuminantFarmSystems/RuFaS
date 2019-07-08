@@ -110,7 +110,9 @@ def daily_water_balance(soil, weather, time):
     R = weather.rainfall[time.year - 1][time.day - 1]
     D = soil.drainage
     Q = soil.runoff
-    Esoil = soil.Esoil
+    Esoil = 0
+    for layer in soil.listOfSoilLayers:
+        Esoil += layer.layerEsoil
     transpiration = soil.transpiration
     SW = sum_SW(soil)
     prev_SW = soil.prev_SW
