@@ -101,7 +101,7 @@ class WaterBalance(BaseReportHandler):
     # ---------------------------------------------------------------------------
     def initialize(self, state):
         self.write_headers(self.get_fPath())
-        annual_path = Path(str(self.get_fPath()).split('.')[0] + "_annual.csv")
+        annual_path = Path(str(self.get_fPath()).split('.csv')[0] + "_annual.csv")
         self.write_headers(annual_path)
 
     # ---------------------------------------------------------------------------
@@ -189,7 +189,7 @@ class WaterBalance(BaseReportHandler):
                                         lineterminator='\n')
                 writer.writerow(daily_water_data)
 
-        annual_path = Path(str(self.get_fPath()).split('.')[0] + "_annual.csv")
+        annual_path = Path(str(self.get_fPath()).split('.csv')[0] + "_annual.csv")
 
         mode = 'a+' if annual_path.exists() else 'w+'
 
