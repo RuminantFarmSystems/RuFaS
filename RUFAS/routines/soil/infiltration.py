@@ -163,10 +163,10 @@ def calc_w2(soil, Smax, CN3):
 
     S3 = calc_S3(CN3)
 
-    l1 = log(FC / (1 - S3 * (1 / Smax)) - FC)
-    l2 = log(SAT / (1 - 2.54 * (1 / Smax)) - SAT)
+    L1 = log(FC / (1 - S3 * (1 / Smax)) - FC)
+    L2 = log(SAT / (1 - 2.54 * (1 / Smax)) - SAT)
 
-    return (l1 - l2) / (SAT - FC)
+    return (L1 - L2) / (SAT - FC)
 
 
 #
