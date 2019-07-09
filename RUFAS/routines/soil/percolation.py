@@ -37,8 +37,8 @@ def update_all(soil):
 
     calc_daily_percolation(soil)
 
-    # if soil.update_SW:
-    #     update_SW(soil)
+    if soil.update_SW:
+        update_SW(soil)
 
 
 #
@@ -78,24 +78,20 @@ def calc_daily_percolation(soil):
         perc = SWperc * (1 - exp_part)
         layer.perc = min(SW - WP, perc)
 
-        layer.currentSoilWaterMM -= layer.perc
-        perc_in = layer.perc
-    soil.drainage = perc_in
-
 
 def update_SW(soil):
     for x in range(len(soil.listOfSoilLayers)):
         layer = soil.listOfSoilLayers[x]
-        SW = layer.currentSoilWaterMM
         SAT = layer.satWater
-        layer.currentSoilWaterMM -= layer.perc
+        SW = layer.currentSoilWaterMM - layer.perc
+        if x == 0:
+            layer.currentSoilWaterMM += soil.dailyInfiltration
         if x > 0:
             prev_layer = soil.listOfSoilLayers[x - 1]
-            perc_in = soil.listOfSoilLayers[x - 1].perc
+            perc_in = prev_layer.perc
             if perc_in + SW > SAT:
-                perc_in = SAT - SW
-                soil.listOfSoilLayers[x - 1].currentSoilWaterMM += soil.listOfSoilLayers[x - 1].perc - perc_in
+                layer.perc += (SAT - SW)
             layer.currentSoilWaterMM += perc_in
-
+        layer.currentSoilWaterMM -= layer.perc
 
     soil.drainage = soil.listOfSoilLayers[-1].perc
