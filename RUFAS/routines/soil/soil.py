@@ -640,7 +640,9 @@ class Soil:
         Description:
             Calculates annual water balance
         """
-        self.p_calc_annual = (self.profile_SW - self.initial_annual_SW) \
+        self.annual_delta_SW = self.prev_SW - self.initial_annual_SW
+
+        self.p_calc_annual = self.annual_delta_SW \
             + self.runoff_sum + self.Esoil_sum + self.transpiration_sum \
             + self.drainage_sum
 
@@ -663,4 +665,4 @@ class Soil:
 
         # initial annual soil water is set to soil water on the last day of the
         # previous year
-        self.initial_annual_SW = self.profile_SW
+        self.initial_annual_SW = self.prev_SW
