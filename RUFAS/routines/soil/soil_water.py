@@ -90,6 +90,7 @@ def update_SW(soil, weather, time):
         profile_SW += SW
 
         Ea += (Esoil + Et_actual)
+        soil.Esoil_sum += Esoil
 
     soil.Ea = Ea
     soil.profile_SW = profile_SW
@@ -102,7 +103,7 @@ def update_SW(soil, weather, time):
     soil.drainage_sum += soil.drainage
     soil.runoff_sum += Q
     soil.p_act_annual += R
-    soil.Esoil_sum += soil.Esoil
+
     soil.transpiration_sum += soil.transpiration
 
 

@@ -155,6 +155,7 @@ This module needs the following inputs in order to operate correctly:
 import math
 from . import nitrogen_cycling, phosphorus_cycling, infiltration, \
     evapotranspiration, percolation, soil_temp, soil_erosion, soil_water
+from ..crop import water_uptake
 
 
 # ------------------------------------------------------------------------------
@@ -181,6 +182,8 @@ def daily_soil_routine(soil, crop, weather, time):
     # calculate daily transpiration
     evapotranspiration.update_all(soil, crop, weather, time)
 
+    water_uptake.update_all(crop.crops_list['corn'], soil, time)
+
     # calculate daily percolation
     percolation.update_all(soil)
 
@@ -206,7 +209,7 @@ class Soil:
     fertilizerApplications = []
     manureApplications = []
     tillageOperations = []
-    cropPUptakes = []
+    cropPUptakes = []  # TODO temporary?
 
     def __init__(self, data, config):
         """
@@ -320,7 +323,7 @@ class Soil:
 
         # soil phosphorus attributes
         self.soilCoverType = data['SoilCoverType']
-        self.pUptake = [[0 for x in range(366)] for y in range(config.end_year + 1)]
+        self.pUptake = [[0 for x in range(366)] for y in range(config.end_year + 1)]  # TODO pUptake flag
         self.lightFactor = []
         self.yieldFactor = []
         self.summan = 0.0
