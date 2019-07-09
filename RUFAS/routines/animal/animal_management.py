@@ -39,9 +39,7 @@ class AnimalManagement:
     sim_length = -1
     
     life_cycle_manager = None
-    
-    times_milked_per_day = 0
-    
+        
     housing = ""
     
     ration_user_input = False
@@ -55,12 +53,11 @@ class AnimalManagement:
             data: dictionary with the animal information from the input json file
         '''
         self.life_cycle_manager = LifeCycleManager(data['animal_config'])
+        self.init_pens(data['pen_information'])
         self.init_animals(data['herd_information'])
-        self.times_milked_per_day = data['times_milked_per_day']
         self.housing = data['housing']
         self.ration_user_input = data['ration']['user_input']
         self.formulation_interval = data['ration']['formulation_interval']
-        self.init_pens(data['pen_information'])
         
     def init_pens(self, data):
         '''
@@ -100,14 +97,16 @@ class AnimalManagement:
         self.heiferIIs = self.life_cycle_manager.heiferIIs
         self.heiferIIIs = self.life_cycle_manager.heiferIIIs
         self.cows = self.life_cycle_manager.cows
+        self.init_nutrient_rqmts()
         
-    def calc_nutrient_rqmts(self):
-        '''
-        Calls each animal's method to calculate its nutrient requirements.
-        '''
+        
+    def init_nutrient_rqmts(self):
+        #average vertical & horizontal distance (VD, HD) of pens to milking parlor
+        avg_VD_parlor, avg_HD_parlor = self.avg_pen_dist()
+        
         for calf in self.calves:
             calf.calc_nutrient_rqmts()
-            
+        
         for heiferI in self.heiferIs:
             heiferI.calc_nutrient_rqmts()
             
@@ -118,8 +117,26 @@ class AnimalManagement:
             heiferIII.calc_nutrient_rqmts()
             
         for cow in self.cows:
-            cow.calc_nutrient_rqmts()
-            
+            cow.calc_nutrient_rqmts(avg_VD_parlor, avg_HD_parlor)
+    
+    def avg_pen_dist(self):
+        #vertical distance
+        VD_sum = 0
+        
+        #horizontal distance
+        HD_sum = 0
+        for pen in self.all_pens:
+            VD_sum += pen.vertical_dist_to_parlor
+            HD_sum += pen.horizontal_dist_to_parlor
+        
+        return VD_sum / len(self.all_pens), HD_sum / len(self.all_pens)
+        
+    def calc_nutrient_rqmts(self):
+        '''
+        Calls each animal's method to calculate its nutrient requirements.
+        '''
+        for pen in self.all_pens:
+            pen.call_animal_nutrient_rqmts()
         
     def pen_allocation(self):
         '''

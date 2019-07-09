@@ -272,6 +272,7 @@
             "animal_config":
             {
             	"num_21_days": 15,
+            	"cow_times_milked_per_day": 1,
             	"still_birth_rate": 0.065,
 				"male_calf_rate_sexed_semen": 0.1,
 				"male_calf_rate_conventional_semen": 0.53,
@@ -347,8 +348,6 @@
 				"heifer_buy_price": 1600,
 				"calf_price": 140	
             },
-            
-            "times_milked_per_day": 1,
             
             "housing": "barn",
             

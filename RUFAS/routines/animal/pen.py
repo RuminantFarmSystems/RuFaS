@@ -6,7 +6,6 @@ Description: The class which represents a pen on the farm.
 Author(s): Militsa Sotirova, militsasotirova@gmail.com
 '''
 ################################################################################
-from RUFAS.routines.animal.animal_object import AnimalObject
 # from RUFAS.routines.animal import ration
 
 class Pen:
@@ -18,7 +17,7 @@ class Pen:
     # TODO: maybe put checks to see if there are no animals in pen? (division by len(animals_in_pen))
     
     # list of all the classes to which the animals in the pen belong to
-    classes_in_pen = []
+    classes_in_pen = set()
     
     # vertical distance to milking parlor, km, from input file
     vertical_dist_to_parlor = 0
@@ -77,6 +76,13 @@ class Pen:
         self.animals_in_pen = new_animals
         self.stocking_density = len(self.animals_in_pen) / self.num_stalls * 100 
         self.calc_daily_walking_dist()
+        for animal in self.animals_in_pen:
+            stage = type(animal).__name__
+            self.classes_in_pen.add(stage)
+            
+    def call_animal_nutrient_rqmts(self):
+        for animal in self.animals_in_pen:
+            animal.calc_nutrient_rqmts()
     
     def calc_avg_nutrient_rqmts(self):
         '''
@@ -160,8 +166,10 @@ class Pen:
         '''
         Sets each animal's daily walking distance.
         '''
-        for animal in self.animals_in_pen:
-            animal.calc_daily_walking_dist(self.vertical_dist_to_parlor, self.horizontal_dist_to_parlor)
+        if 'Cow' in self.classes_in_pen:
+            for animal in self.animals_in_pen:
+                if type(animal).__name__ == 'Cow':
+                    animal.calc_daily_walking_dist(self.vertical_dist_to_parlor, self.horizontal_dist_to_parlor)
             
     def clear(self):
         '''

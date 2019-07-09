@@ -40,6 +40,8 @@ class Cow(HeiferIII):
 	'''
 	def __init__(self, heiferIII, args):
 		super().init_from_heiferIII(heiferIII)
+		self._DVD = 0
+		self._DHD = 0
 		self._calves = 0
 		self._milking = False
 		self._days_in_milk = 0
@@ -206,6 +208,14 @@ class Cow(HeiferIII):
 		self._nutrient_rqmts = {'FU': {'op': '<=', 'val': 7.566673489860807}, 'RU': {'op': '>=', 'val': 0}, 'ME_DM': {'op': '>=', 'val': 57.238188330372566}, 'RDP_DM': {'op': '>=', 'val': 2.0347001114951313}, 'RUP_DM': {'op': '>=', 'val': 1.2716733909335047}}
 
 	'''
+       	Calculates this cow's nutrient requirements.
+    '''
+	def calc_nutrient_rqmts(self, vertical_distance, horizontal_distance):
+		self.calc_daily_walking_dist(vertical_distance, horizontal_distance)
+		# self.nutrient_rqmts = ration.calculate_rqmts(BW, BCS, CBW, CI, concentrate, CP_Milk, DOP, DHD, DVD, DIM, fat_milk, lactose_milk, milk, parity, type, nutrients_list)
+		self._nutrient_rqmts = {'FU': {'op': '<=', 'val': 7.566673489860807}, 'RU': {'op': '>=', 'val': 0}, 'ME_DM': {'op': '>=', 'val': 57.238188330372566}, 'RDP_DM': {'op': '>=', 'val': 2.0347001114951313}, 'RUP_DM': {'op': '>=', 'val': 1.2716733909335047}}
+
+	'''
 		Calculates and sets the manure excretion components.
 	'''  
 	def calc_manure_excretion(self, feed):
@@ -224,7 +234,19 @@ class Cow(HeiferIII):
 	'''
 	def set_ration(self, ration_formulation):
 		self._ration_formulation = ration_formulation  
-		
+	
+	'''
+		Calculates and sets the animal's daily vertical and horizontal walking distance (DVD and DHD).
+		Args:
+			vertical_dist_to_parlor: number, km
+			horizontal_dist_to_parlor: number, km
+	'''
+	def calc_daily_walking_dist(self, vertical_dist_to_parlor, horizontal_dist_to_parlor):
+		# multiplied by 2 for return trip
+		self._DVD = 2 * vertical_dist_to_parlor * config.cow_times_milked_per_day
+		self._DHD = 2 * horizontal_dist_to_parlor * config.cow_times_milked_per_day
+	
+	
 	'''
 		Description:
 			update cow status from the moment of calving, parity+1, milking start, pregnancy stop, and estrus restart
