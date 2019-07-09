@@ -13,10 +13,7 @@ Description: This file updates the calf form birth to wean.
 
 import numpy as np
 from random import random
-from animal_life_cycle.animal_base import AnimalBase
-from animal_life_cycle.config import Config
-
-config = Config()
+from RUFAS.routines.animal.animal_base import AnimalBase
 
 class Calf(AnimalBase):
 	'''
@@ -32,23 +29,23 @@ class Calf(AnimalBase):
 		super().__init__(args)
 		self._sold = False
 		# gender determined with gender ratio relates to semen type
-		if config.semen_type == 'conventional':
-			male_calf_rate = config.male_calf_rate_conventional_semen
+		if AnimalBase.config['semen_type'] == 'conventional':
+			male_calf_rate = AnimalBase.config['male_calf_rate_conventional_semen']
 		else:
-			male_calf_rate = config.male_calf_rate_sexed_semen
+			male_calf_rate = AnimalBase.config['male_calf_rate_sexed_semen']
 		if random() < male_calf_rate:
 			self._gender = 'male'
 		else:
 			self._gender = 'female'
 
 		# calf born, with stillbirth porbabality
-		if random() < config.still_birth_rate:
+		if random() < AnimalBase.config['still_birth_rate']:
 			self._culled = True
 			self._events.add_event(0, 'Still birth')
 			return
 
-		# sell the male calves and the unwanted female calves (if config.keep_female_calf_rate = 1, keep all the female calves in farm. if config.keep_female_calf_rate = 0, sell all female calves)
-		if self._gender == 'male' or random() > config.keep_female_calf_rate:
+		# sell the male calves and the unwanted female calves (if AnimalBase.config['keep_female_calf_rate'] = 1, keep all the female calves in farm. if AnimalBase.config['keep_female_calf_rate = 0, sell all female calves)
+		if self._gender == 'male' or random() > AnimalBase.config['keep_female_calf_rate']:
 			self._sold = True
 			return
 		else:
@@ -56,9 +53,9 @@ class Calf(AnimalBase):
 
 		# birthweight determined by breed specific distribution
 		if self._breed == 'HO':
-			self._birth_weight = np.random.normal(config.birth_weight_avg_ho, config.birth_weight_std_ho)
+			self._birth_weight = np.random.normal(AnimalBase.config['birth_weight_avg_ho'], AnimalBase.config['birth_weight_std_ho'])
 		elif self._breed == 'JE':
-			self._birth_weight = np.random.normal(config.birth_weight_avg_je, config.birth_weight_std_je)
+			self._birth_weight = np.random.normal(AnimalBase.config['birth_weight_avg_je'], AnimalBase.config['birth_weight_std_je'])
 		self._body_weight = self._birth_weight
 		self._wean_weight = 0
 
@@ -123,13 +120,13 @@ class Calf(AnimalBase):
 		prev_weight = self._body_weight
 		
 		self._days_born += 1
-		if self._days_born == config.wean_day:
+		if self._days_born == AnimalBase.config['wean_day']:
 			wean_day = True
 			self._wean_weight = self._body_weight
 			self._events.add_event(self._days_born, 'Wean Day')
 			self._days_born -= 1 # will increment by 1 again in heifer update
 		else:
-			self._body_weight += np.random.normal(config.avg_daily_gain_c, config.std_daily_gain_c)
+			self._body_weight += np.random.normal(AnimalBase.config['avg_daily_gain_c'], AnimalBase.config['std_daily_gain_c'])
 		
 		self._daily_growth = self._body_weight - prev_weight
 		
@@ -152,7 +149,7 @@ class Calf(AnimalBase):
 					self._days_born,
 					self._birth_weight,
 					self._body_weight,
-					config.wean_day,
+					AnimalBase.config['wean_day'],
 					str(self._events))
 		else:
 			res_str = """

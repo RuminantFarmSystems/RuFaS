@@ -12,11 +12,9 @@ Description: This file updates the heifer form close to calving to calving,
 ###############################################################################
 
 import numpy as np
-from animal_life_cycle.heiferII import HeiferII
+from RUFAS.routines.animal.heiferII import HeiferII
+from RUFAS.routines.animal.animal_base import AnimalBase
 from random import random
-from animal_life_cycle.config import Config
-
-config = Config()
 
 class HeiferIII(HeiferII):
     '''
@@ -85,18 +83,18 @@ class HeiferIII(HeiferII):
             
         prev_weight = self._body_weight
 
-        if self._days_born < config.grow_end_day:
+        if self._days_born < AnimalBase.config['grow_end_day']:
             # Heifer can only grow to a maximum weight of mature_body_weight
-            if self._body_weight < config.mature_body_weight:
-                self._body_weight += np.random.normal(config.avg_daily_gain_h, config.std_daily_gain_h)
-            if self._body_weight > config.mature_body_weight:
-                self._body_weight = config.mature_body_weight
+            if self._body_weight < AnimalBase.config['mature_body_weight']:
+                self._body_weight += np.random.normal(AnimalBase.config['avg_daily_gain_h'], AnimalBase.config['std_daily_gain_h'])
+            if self._body_weight > AnimalBase.config['mature_body_weight']:
+                self._body_weight = AnimalBase.config['mature_body_weight']
                 self._mature_body_weight = self._body_weight
                 self._events.add_event(self._days_born, 'Mature body weight prior to grow end day')
         
         self._daily_growth = self._body_weight - prev_weight
         
-        if self._days_born == config.grow_end_day:
+        if self._days_born == AnimalBase.config['grow_end_day']:
             self._mature_body_weight = self._body_weight
             self._events.add_event(self._days_born, 'Mature body weight')
 
@@ -123,7 +121,7 @@ class HeiferIII(HeiferII):
 				   self._birth_date,
 				   self._days_born,
 				   self._body_weight,
-				   config.breeding_start_day_h,
+				   AnimalBase.config['breeding_start_day_h'],
 				   self._repro_program,
 				   self._days_in_preg,
                    self._gestation_length,

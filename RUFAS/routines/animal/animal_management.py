@@ -9,6 +9,7 @@ Author(s): Militsa Sotirova, militsasotirova@gmail.com
 ################################################################################
 from RUFAS.routines.animal.pen import Pen
 from RUFAS.routines.animal.life_cycle import LifeCycleManager
+from RUFAS.routines.animal.animal_base import AnimalBase
 
 def daily_animal_routine(animal_management, feed, weather, time):
     '''Executes daily routines relating to Animals.
@@ -53,6 +54,7 @@ class AnimalManagement:
             data: dictionary with the animal information from the input json file
         '''
         self.life_cycle_manager = LifeCycleManager(data['animal_config'])
+        AnimalBase.set_config(data['animal_config'])
         self.init_pens(data['pen_information'])
         self.init_animals(data['herd_information'])
         self.housing = data['housing']

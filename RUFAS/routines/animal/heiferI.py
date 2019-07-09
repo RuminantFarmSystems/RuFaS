@@ -8,12 +8,9 @@ Description: This file updates the heifer form wean to start breeding.
 '''
 ###############################################################################
 
-from animal_life_cycle.calf import Calf
-from animal_life_cycle.animal_base import AnimalBase
-from animal_life_cycle.config import Config
+from RUFAS.routines.animal.calf import Calf
+from RUFAS.routines.animal.animal_base import AnimalBase
 import numpy as np
-
-config = Config()
 
 class HeiferI(Calf):
 	'''
@@ -75,12 +72,12 @@ class HeiferI(Calf):
 		
 		prev_weight = self._body_weight
 		
-		self._body_weight += np.random.normal(config.avg_daily_gain_h, config.std_daily_gain_h)
+		self._body_weight += np.random.normal(AnimalBase.config['avg_daily_gain_h'], AnimalBase.config['std_daily_gain_h'])
 		
 		self._daily_growth = self._body_weight - prev_weight
 		
 		self._days_born += 1
-		if self._days_born == config.breeding_start_day_h:
+		if self._days_born == AnimalBase.config['breeding_start_day_h']:
 			second_stage = True
 			self._events.add_event(self._days_born, 'Breeding start')
 			self._days_born -= 1 # will increment in next stage again
@@ -105,7 +102,7 @@ class HeiferI(Calf):
 				   self._birth_weight,
 				   self._wean_weight,
 				   self._body_weight,
-				   config.breeding_start_day_h,
+				   AnimalBase.config['breeding_start_day_h'],
 				   str(self._events))
 
 		return res_str

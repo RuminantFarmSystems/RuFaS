@@ -8,18 +8,23 @@ Description: This file initialize common parameters
 ###############################################################################
 
 
-from animal_life_cycle.animal_events import AnimalEvents
+from RUFAS.routines.animal.animal_events import AnimalEvents
 import random
 import numpy as np
 
 # initial a cow with ID
 class AnimalBase(object):
 	global_id = 0
+	config = []
 
 	@staticmethod
 	def next_id():
 		AnimalBase.global_id += 1
 		return AnimalBase.global_id
+	
+	@staticmethod
+	def set_config(config):
+		AnimalBase.config = config
 
 	# Method: __init__
 	'''
