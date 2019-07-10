@@ -111,7 +111,7 @@
         "soil":
         {
             "ProfileBulkDensity": 1.4,
-            "CN2": 85.00,
+            "CN2": 72.00,
             "FieldSlope": 0.02,
             "SlopeLength": 3,
             "Manning": 0.4,
