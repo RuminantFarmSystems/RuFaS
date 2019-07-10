@@ -84,9 +84,9 @@ They do not modify the values of any State class.
 # "pseudocode_crop" C.7.A.1
 #
 def calc_wstrs(crop_type, soil):
-    if soil.Et_max == 0:
+    if soil.trans_max == 0:
         return 0
-    wstrs = 1.0 - (crop_type.water_actual_up / soil.Et_max)
+    wstrs = 1.0 - (crop_type.water_act_up / soil.trans_max)
     if wstrs < 0:
         return 0
     else:

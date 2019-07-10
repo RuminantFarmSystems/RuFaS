@@ -118,7 +118,6 @@
             "Manning": 0.4,
             "FieldSize": 1.0,
             "PracticeFactor": 0.25,
-            "Orgc": 1,
             "Sand": 15,
             "Silt": 65,
             "SoilAlbedo": 0.16,
