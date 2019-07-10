@@ -85,13 +85,12 @@ def update_SW(soil):
         SAT = layer.satWater
         SW = layer.currentSoilWaterMM - layer.perc
         if x == 0:
-            layer.currentSoilWaterMM += soil.dailyInfiltration
-        if x > 0:
-            prev_layer = soil.listOfSoilLayers[x - 1]
-            perc_in = prev_layer.perc
-            if perc_in + SW > SAT:
-                layer.perc += (SAT - SW)
-            layer.currentSoilWaterMM += perc_in
+            perc_in = soil.dailyInfiltration
+        else:
+            perc_in = soil.listOfSoilLayers[x - 1].perc
+        if perc_in + SW > SAT:
+            layer.perc += (SAT - SW)
+        layer.currentSoilWaterMM += perc_in
         layer.currentSoilWaterMM -= layer.perc
 
     soil.drainage = soil.listOfSoilLayers[-1].perc
