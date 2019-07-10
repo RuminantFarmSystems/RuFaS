@@ -44,10 +44,13 @@ class AnimalBase(object):
 		self._culled = False
 		self._do_not_breed = False
 		self._events = AnimalEvents()
+		
 		self._daily_growth = 0
 		self._nutrient_rqmts = {}
 		self._manure_excretion = {}
 		self._ration_formulation = {}
+		self._DMIest = 0
+		self._DBW = 0
 
 	def init_from_animal(self, animal):
 		self._id = animal._id

@@ -83,11 +83,11 @@ class RationReport(BaseReportHandler):
 
         d = time.day
         if (d % self.ration_interval) == 1:
-            animal = state.animal
-
-            self.achieved_price[d] = animal.ration['objective']
-            self.feed_amounts[d] = {feed_type: animal.ration[feed_type] for feed_type in self.feed_info.keys()}
-            self.milk_production_reduction[d] = animal.ration['MP_reduction']
+            animal = state.animal_management
+            #TODO: info by pen
+            #self.achieved_price[d] = animal.ration['objective']
+            #self.feed_amounts[d] = {feed_type: animal.ration[feed_type] for feed_type in self.feed_info.keys()}
+            #self.milk_production_reduction[d] = animal.ration['MP_reduction']
 
     #---------------------------------------------------------------------------
     # Method: annual_update

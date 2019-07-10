@@ -82,7 +82,9 @@ class Calf(AnimalBase):
 	def calc_nutrient_rqmts(self):
 		# self.nutrient_rqmts = ration.calculate_rqmts(BW, BCS, CBW, CI, concentrate, CP_Milk, DOP, DHD, DVD, DIM, fat_milk, lactose_milk, milk, parity, type, nutrients_list)
 		self._nutrient_rqmts = {'FU': {'op': '<=', 'val': 7.566673489860807}, 'RU': {'op': '>=', 'val': 0}, 'ME_DM': {'op': '>=', 'val': 57.238188330372566}, 'RDP_DM': {'op': '>=', 'val': 2.0347001114951313}, 'RUP_DM': {'op': '>=', 'val': 1.2716733909335047}}
-
+		self._DMIest = 27.620363504458798 
+		self._DBW = -0.4125
+		
 	'''
 		Calculates and sets the manure excretion components.
 	'''  
@@ -133,6 +135,8 @@ class Calf(AnimalBase):
 		return wean_day
 
 	def __str__(self):
+		return 'calf'
+		'''
 		if not self._culled:
 			res_str = """
 				==> Calf: \n
@@ -165,3 +169,4 @@ class Calf(AnimalBase):
 					self._days_born,
 					str(self._events))
 		return res_str
+		'''
