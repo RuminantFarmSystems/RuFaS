@@ -172,6 +172,7 @@ class LifeCycleManager():
         self.replacement_market = cows
     
     def daily_update(self, date, sim_length):
+        # record the last days stats
         daily_cow_cull_num = 0
         daily_heifer_sold = 0
         daily_bought_from_market = 0
@@ -260,7 +261,7 @@ class LifeCycleManager():
     
         # if the number of heifers is less than needed for the herd, buy replacement from the market
         while len(self.cows) + len(self.heiferIIIs) < self.herd_num * 1.01 and date > 1:
-            replacement_market[0]._events.add_event(replacement_market[0]._days_born, 'Entered Herd')
+            self.replacement_market[0]._events.add_event(replacement_market[0]._days_born, 'Entered Herd')
             cows.append(replacement_market[0])
             self.bought_from_market += 1
             daily_bought_from_market += 1

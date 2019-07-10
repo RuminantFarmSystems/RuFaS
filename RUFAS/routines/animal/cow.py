@@ -39,6 +39,7 @@ class Cow(HeiferIII):
 		super().init_from_heiferIII(heiferIII)
 		self._DVD = 0
 		self._DHD = 0
+		self._daily_growth = 0
 		self._CP_milk = 0
 		self._calves = 0
 		self._milking = False
@@ -82,6 +83,7 @@ class Cow(HeiferIII):
 	'''
 	def init_from_cow(self, cow):
 		super().init_from_heiferIII(Cow)
+		self._daily_growth = 0
 		self._calves = cow._calves
 		self._milking = cow._milking
 		self._days_in_milk = cow._days_in_milk

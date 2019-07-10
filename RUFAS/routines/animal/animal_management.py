@@ -21,7 +21,6 @@ def daily_animal_routine(animal_management, feed, weather, time):
         time : instance of the Time class
     '''
     animal_management.daily_updates(feed, time)
-    print('day done')
 
 def daily_animal_update(animal, weather, time):
     pass
