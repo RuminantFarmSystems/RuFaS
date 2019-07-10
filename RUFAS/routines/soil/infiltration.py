@@ -63,8 +63,8 @@ def update_all(soil, weather, time):
 
     calc_daily_infiltration(soil, weather, time)
 
-    if soil.update_SW:
-        update_SW(soil)
+    # if soil.update_SW:
+    #     update_SW(soil)
 
 
 #
