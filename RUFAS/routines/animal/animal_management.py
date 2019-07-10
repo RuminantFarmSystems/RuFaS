@@ -20,8 +20,8 @@ def daily_animal_routine(animal_management, feed, weather, time):
         weather : instance of the Weather class
         time : instance of the Time class
     '''
-    print('here')
     animal_management.daily_updates(feed, time)
+    print('day done')
 
 def daily_animal_update(animal, weather, time):
     pass
@@ -100,7 +100,7 @@ class AnimalManagement:
         self.heiferIIIs = self.life_cycle_manager.heiferIIIs
         self.cows = self.life_cycle_manager.cows
         self.init_nutrient_rqmts()
-        
+        self.pen_allocation()
         
     def init_nutrient_rqmts(self):
         #average vertical & horizontal distance (VD, HD) of pens to milking parlor
@@ -119,7 +119,7 @@ class AnimalManagement:
             heiferIII.calc_nutrient_rqmts()
             
         for cow in self.cows:
-            cow.calc_nutrient_rqmts(avg_VD_parlor, avg_HD_parlor)
+            cow.calc_init_nutrient_rqmts(avg_VD_parlor, avg_HD_parlor)
     
     def avg_pen_dist(self):
         #vertical distance
@@ -209,7 +209,7 @@ class AnimalManagement:
             self.calc_nutrient_rqmts()  # per animal
             self.pen_allocation()
             self.calc_avg_nutrient_rqmts()  # per pen
-            self.calc_ration()  # per pen
+            self.calc_ration(feed)  # per pen
             self.calc_manure_excretion(feed)  # per pen
             self.calc_avg_milk()  # per pen
             self.calc_avg_growth()  # per pen

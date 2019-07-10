@@ -4,14 +4,14 @@ File name: cow.py
 Author(s): Manfei Li, mli497@wisc.edu
 Description: This file updates the cow form first calving to leaving the herd.
 			Temp: Body weight change uses equations for lactation cows (decrease for the first 50 days and increase later on)
-			Temp: Dry matter intake is caculated by body weight and FCM production.
+			Temp: Dry matter intake is calculated by body weight and FCM production.
 			TODO: different body weight for different lactations and individual mature body weight.
-			TODO: Dry Matter Intake and Body Weight changed could be based on nutrition intake later fron Ration Formulation.
+			TODO: Dry Matter Intake and Body Weight changed could be based on nutrition intake later from Ration Formulation.
 			Reproduction program could be chosen from the ED, TAI, ED-TAI projects, reference:
 			http://www.dcrcouncil.org/wp-content/uploads/2019/04/Dairy-Cow-Protocol-Sheet-Updated-2018.pdf
 			Preg check follows AI for three times.
 			Daily milk production is based on breed and parity specific lactation curve model (Wood's and Milkbot) parameters.
-			Culling inclouding 3 components: repro, production, and health,
+			Culling including 3 components: repro, production, and health,
 				health culling for 6 reasons: Lameness, Injury, Mastitis, Disease, Udder, and Unknown
 '''
 ###############################################################################
@@ -39,6 +39,7 @@ class Cow(HeiferIII):
 		super().init_from_heiferIII(heiferIII)
 		self._DVD = 0
 		self._DHD = 0
+		self._CP_milk = 0
 		self._calves = 0
 		self._milking = False
 		self._days_in_milk = 0
@@ -98,7 +99,7 @@ class Cow(HeiferIII):
 		self._tai_program_start_day_c = cow._tai_program_start_day_c
 		self._resynch_method = cow._resynch_method
 
-		# ecnomics counts
+		# economics counts
 		self._ED_days = cow._ED_days
 		self._GnRH_injections = cow._GnRH_injections
 		self._PGF_injections = cow._PGF_injections
@@ -118,7 +119,7 @@ class Cow(HeiferIII):
 			determine parameter value distribution for lactation curve model parameters
 		Input:
 			mean: mean of the parameter value for l, m, n in wood's model
-			std: standard divation of the parameter value for l, m, n in wood's model
+			std: standard deviation of the parameter value for l, m, n in wood's model
 		Output:
 			np.random.normal(mean, std): a random value draw from distribution of parameters
 	'''
@@ -133,9 +134,9 @@ class Cow(HeiferIII):
 		Input:
 		Output:
 			estimated_daily_milk_produced: estimated daily milk production from the lactation curve
-			fat_percent: caculated with days in milk, for temprary use
-			daily_fat_correct_milk_production: caculated form estimated milk production and fat percent, for temprary use
-			dry_matter_intake: caculated from FCM, days in milk, and body weight, for temprary use
+			fat_percent: calculated with days in milk, for temporary use
+			daily_fat_correct_milk_production: calculated form estimated milk production and fat percent, for temporary use
+			dry_matter_intake: calculated from FCM, days in milk, and body weight, for temporary use
 	'''
 	def _milking_update(self):
 		if self._days_in_preg == self._gestation_length - AnimalBase.config['dry_period']:
@@ -201,23 +202,27 @@ class Cow(HeiferIII):
        	Calculates this cow's nutrient requirements.
     '''
 	def calc_nutrient_rqmts(self):
-		# self.nutrient_rqmts = ration.calculate_rqmts(BW, BCS, CBW, CI, concentrate, CP_Milk, DOP, DHD, DVD, DIM, fat_milk, lactose_milk, milk, parity, type, nutrients_list)
+		# self.nutrient_rqmts, self._DMIest, self._DBW = ration.calculate_rqmts(BW, BCS, CBW, CI, concentrate, CP_Milk, DOP, DHD, DVD, DIM, fat_milk, lactose_milk, milk, parity, type, nutrients_list)
 		self._nutrient_rqmts = {'FU': {'op': '<=', 'val': 7.566673489860807}, 'RU': {'op': '>=', 'val': 0}, 'ME_DM': {'op': '>=', 'val': 57.238188330372566}, 'RDP_DM': {'op': '>=', 'val': 2.0347001114951313}, 'RUP_DM': {'op': '>=', 'val': 1.2716733909335047}}
-
+		self._DMIest = 27.620363504458798 
+		self._DBW = -0.4125
+		
 	'''
        	Calculates this cow's nutrient requirements.
     '''
-	def calc_nutrient_rqmts(self, vertical_distance, horizontal_distance):
+	def calc_init_nutrient_rqmts(self, vertical_distance, horizontal_distance):
 		self.calc_daily_walking_dist(vertical_distance, horizontal_distance)
-		# self.nutrient_rqmts = ration.calculate_rqmts(BW, BCS, CBW, CI, concentrate, CP_Milk, DOP, DHD, DVD, DIM, fat_milk, lactose_milk, milk, parity, type, nutrients_list)
+		# self._nutrient_rqmts, self._DMIest, self._DBW = ration.calculate_rqmts(BW, BCS, CBW, CI, concentrate, CP_Milk, DOP, DHD, DVD, DIM, fat_milk, lactose_milk, milk, parity, type, nutrients_list)
 		self._nutrient_rqmts = {'FU': {'op': '<=', 'val': 7.566673489860807}, 'RU': {'op': '>=', 'val': 0}, 'ME_DM': {'op': '>=', 'val': 57.238188330372566}, 'RDP_DM': {'op': '>=', 'val': 2.0347001114951313}, 'RUP_DM': {'op': '>=', 'val': 1.2716733909335047}}
-
+		self._DMIest = 27.620363504458798 
+		self._DBW = -0.4125
+		
 	'''
 		Calculates and sets the manure excretion components.
 	'''  
 	def calc_manure_excretion(self, feed):
 		
-		# self.manure_excretion = manure_excretion.manure_calculations(this.ration_formulation, feed, BW, DIM, mPrt)
+		# self.manure_excretion = manure_excretion.manure_calculations(self._ration_formulation, feed, BW, DIM, mPrt)
 		self._manure_excretion = {"U": 0.340, 
 			"TAN_s": 0.14, 
 			"MN": 532.407, 
@@ -247,14 +252,14 @@ class Cow(HeiferIII):
 	'''
 		Description:
 			update cow status from the moment of calving, parity+1, milking start, pregnancy stop, and estrus restart
-			TEMP: caculate cost and income related values for validating model
+			TEMP: calculate cost and income related values for validating model
 		Input:
-			record_econ_stats: record cost and income in defferent fuctions for temprary use
+			record_econ_stats: record cost and income in different functions for temporary use
 		Output:
 			estimated_daily_milk_produced: estimated daily milk production from the lactation curve
-			fat_percent: caculated with days in milk, for temprary use
-			daily_fat_correct_milk_production: caculated form estimated milk production and fat percent, for temprary use
-			dry_matter_intake: caculated from FCM, days in milk, and body weight, for temprary use
+			fat_percent: calculated with days in milk, for temporary use
+			daily_fat_correct_milk_production: calculated form estimated milk production and fat percent, for temporary use
+			dry_matter_intake: calculated from FCM, days in milk, and body weight, for temporary use
 			cull_stage: True if a cow is culled, false if it stays in the herd
 			new_born: True if a calf is born
 	'''
@@ -813,7 +818,7 @@ class Cow(HeiferIII):
 			update culling time and cull reasons for cow to leave the herd
 			the reasons are reproduction failure, low production, and health issues
 		Input:
-			record_econ_stats: record income from beef for temprary use
+			record_econ_stats: record income from beef for temporary use
 		Output:
 			not culled
 	'''
@@ -837,8 +842,8 @@ class Cow(HeiferIII):
 	'''
 		Description:
 			update cows culled for health problem, first cull or not in this parity will be determined with parity specific culling rate
-				then a cull reason will be determined by ramdom draw
-				then a cull day will be indentified by reverse a distribution for cases of this reason
+				then a cull reason will be determined by random draw
+				then a cull day will be identified by reverse a distribution for cases of this reason
 	'''
 	def _health_cull_update(self):
 		inv_cull_rate = 0
@@ -881,7 +886,7 @@ class Cow(HeiferIII):
 
 	'''
 		Description:
-			TEMP: update cost and income caculation for feed cost, fixed cost and milking income
+			TEMP: update cost and income calculation for feed cost, fixed cost and milking income
 		Input:
 			AnimalBasecull_stage, estimated_daily_milk_produced, dry_matter_intake, record_econ_stats from temp use
 		Output:
@@ -940,6 +945,8 @@ class Cow(HeiferIII):
 		plt.show()
 	
 	def __str__(self):
+		return 'cow'
+		'''
 		res_str = """
 			==> Cow: \n
 			ID: {} \n
@@ -967,3 +974,4 @@ class Cow(HeiferIII):
 				   str(self._events))
 
 		return res_str
+		'''

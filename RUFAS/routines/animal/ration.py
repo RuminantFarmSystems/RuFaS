@@ -22,10 +22,19 @@ global_DBW = -1
 global_milk = -1
 global_CP_Milk = -1
 
+def set_globals(DMIest, BW, DBW, milk, CP_milk):
+    global global_BW
+    global global_DMIest
+    global global_DBW
+    global global_milk
+    global global_CP_Milk
+    
+    global_DMIest = DMIest
+    global_BW = BW
+    global_DBW = DBW
+    global_milk = milk
+    global_CP_Milk = CP_milk
 
-# -------------------------------------------------------------------------------
-# Function: optimize
-# -------------------------------------------------------------------------------
 def optimize(feed, rqmts):
     '''
     Sets up the arguments for the linear programming optimization.
@@ -94,12 +103,10 @@ def optimize(feed, rqmts):
     # food type.
     upper_bounds = [feed.available_feeds[feed_name]['Limit']
                     for feed_name in feed.available_feed_names]
+    
+    #util.LP_print(LHS, RHS, objective, var_names, operators, "minimize", "RATION", lower_bounds, upper_bounds)
 
-    # util.LP_print(LHS, RHS, objective, var_names, operators,
-    #   		  "minimize", "RATION", lower_bounds, upper_bounds)
-
-    return util.LP_solve(LHS, RHS, objective, var_names, operators,
-                         "minimize", "RATION", lower_bounds, upper_bounds)
+    return util.LP_solve(LHS, RHS, objective, var_names, operators, "minimize", "RATION", lower_bounds, upper_bounds)
 
 
 def calculate_rqmts(BW, BCS, CBW, CI, concentrate, CP_Milk, DOP, DHD, DVD,
@@ -113,7 +120,7 @@ def calculate_rqmts(BW, BCS, CBW, CI, concentrate, CP_Milk, DOP, DHD, DVD,
         BW: body weight, kg
         BCS: body condition score, 1 to 5
         CBW: calf birth weight, kg
-        CI: calving inerval, days
+        CI: calving interval, days
         concentrate: concentrate supplementation when farming type is "Pasture", kg
         CP_Milk: milk crude protein content
         DOP: days of pregnancy, days
@@ -240,7 +247,7 @@ def calculate_rqmts(BW, BCS, CBW, CI, concentrate, CP_Milk, DOP, DHD, DVD,
         {'op': '>=', 'val': RUPreq}  # (A.LP.2.5)
     ]
 
-    return dict(zip(nutrients_list, nutrient_rqmts))
+    return dict(zip(nutrients_list, nutrient_rqmts)), DMIest, DBW
 
 
 def calculate_ME_RDP_RUP(feed, DMIest, BW, DBW, milk, CP_Milk):
@@ -332,7 +339,7 @@ def calculate_ME_RDP_RUP(feed, DMIest, BW, DBW, milk, CP_Milk):
         ME_DM_arr.append(ME_DM)
         RDP_DM_arr.append(percentage(RDP_DM))
         RUP_DM_arr.append(percentage(RUP_CP) * percentage(CP_DM))
-
+    
     return ME_DM_arr, RDP_DM_arr, RUP_DM_arr
 
 
