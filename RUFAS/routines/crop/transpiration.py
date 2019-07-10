@@ -143,7 +143,7 @@ def decrease_effic_of_uptake(soil, uptake_each_layer):
         # Point at which plant available water in soil layer begins to limit
         # efficiency of plant uptake (mm H2O)
         # C.4.B.5
-        AWC_limit = 0.25 * (layer.fcWater - layer.wiltingWater) + layer.wiltingWater
+        AWC_limit = 0.25 * (layer.fcWater - layer.wiltingWater)  # + layer.wiltingWater TODO: Not in SWAT
 
         # C.4.B.4
         if layer.currentSoilWaterMM > AWC_limit:

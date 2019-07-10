@@ -86,7 +86,7 @@
                 "fr_LAI_1": 0.05,
                 "fr_LAI_2": 0.95,
 
-                "LAI_max": 3,
+                "LAI_max": 5,
                 "radiation_use_efficiency": 39,
                 "light extinction coefficient": 0.65,
 
