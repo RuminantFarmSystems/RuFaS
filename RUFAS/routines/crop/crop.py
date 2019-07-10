@@ -96,19 +96,11 @@ def daily_crop_routine(crop, weather, time, soil):
         # update_all calls depend on values calculated earlier.
         #
 
-        #
-        # nitrogen uptake is performed "first" because it occurs AFTER the soil
-        # module, but the crop module has to run before the soil module as of
-        # 05.14.2019. This may change eventually. For now, nitrogen uptake
-        # output values are behind one day. In actuality, this means nitrogen
-        # calculations are performed "last" as far as updating daily values
-        #
-
         heat_units.update_all(crop_type, T_min, T_max, time)
 
         root_development.update_all(crop_type, time)
 
-        # water_uptake.update_all(crop_type, soil, time)
+        # transpiration.update_all(crop_type, soil, time)
 
         nitrogen_uptake.update_all(crop_type, soil)
 

@@ -57,8 +57,10 @@ def update_all(soil, weather, time):
 #
 def update_SW(soil, weather, time):
 
-    profile_SW = 0
-    ET = 0
+    prev_SW = 0
+    ET_act = 0
+    soil.evap_sum = 0
+    soil.trans_sum = 0
 
     R = weather.rainfall[time.year-1][time.day-1]
     runoff = soil.runoff
@@ -69,17 +71,26 @@ def update_SW(soil, weather, time):
         SAT = layer.satWater
         perc = layer.perc
         evap = layer.layer_evap
-        trans_act = layer.trans_act
+        trans = layer.trans_act
         I = soil.dailyInfiltration
 
         if x == 0:
-            SW = max(WP, SW + I - evap - perc - trans_act)
+            SW = SW + I - evap - perc - trans
+            if SW < WP:
+                layer.perc -= WP - SW
+            SW = max(WP, SW)
+            if SW > SAT:
+                layer.perc += SW - SAT
             SW = min(SAT, SW)
 
         else:
             perc_prev = soil.listOfSoilLayers[x-1].perc
-
-            SW = max(WP, SW + perc_prev - evap - perc - trans_act)
+            SW = SW + perc_prev - evap - perc - trans
+            if SW < WP:
+                layer.perc -= WP - SW
+            SW = max(WP, SW)
+            if SW > SAT:
+                layer.perc += SW - SAT
             SW = min(SAT, SW)
 
         soil.delta_SW += (SW - layer.currentSoilWaterMM)
@@ -87,17 +98,18 @@ def update_SW(soil, weather, time):
         layer.currentSoilWaterMM = SW
         soil.listOfSoilLayers[x] = layer
 
-        profile_SW += SW
+        prev_SW += SW
 
-        ET += (evap + trans_act)
-        soil.evap_annual += evap
+        ET_act += (evap + trans)
+        soil.evap_sum += evap
+        soil.trans_sum += trans
 
-    soil.ET = ET
-    soil.profile_SW = profile_SW
+    soil.ET_act = ET_act
+    soil.prev_SW = prev_SW
     soil.drainage = soil.listOfSoilLayers[-1].perc
 
     soil.p_act = R
-    soil.p_calc = soil.delta_SW + soil.ET + runoff + soil.drainage
+    soil.p_calc = soil.delta_SW + soil.ET_act + runoff + soil.drainage
     soil.water_balance = soil.p_act - soil.p_calc
 
     soil.drainage_annual += soil.drainage
@@ -105,6 +117,7 @@ def update_SW(soil, weather, time):
     soil.p_act_annual += R
 
     soil.trans_annual += soil.trans_sum
+    soil.evap_annual += soil.evap_sum
 
 
 def daily_water_balance(soil, weather, time):
