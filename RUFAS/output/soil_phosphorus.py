@@ -78,7 +78,7 @@ class SoilPhosphorus(BaseReportHandler):
 
         # initialize number of layer in soil summary report handler to get output
         # data pertaining to each soil layer
-        # Initializes the output arrays for current soil water, Esoil, and
+        # Initializes the output arrays for current soil water, evap, and
         # percolation for each soil layer
         self.numSoilLayers = len(soil.listOfSoilLayers)
         

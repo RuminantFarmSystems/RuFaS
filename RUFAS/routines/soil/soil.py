@@ -20,7 +20,6 @@ This module needs the following inputs in order to operate correctly:
         "Manning": 0.4,
         "FieldSize": 1.0,
         "PracticeFactor": 0.08,
-        "Orgc": 1.2,
         "Sand": 15,
         "Silt": 65,
         "SoilAlbedo": 0.16,
@@ -155,7 +154,7 @@ This module needs the following inputs in order to operate correctly:
 import math
 from . import nitrogen_cycling, phosphorus_cycling, infiltration, \
     evapotranspiration, percolation, soil_temp, soil_erosion, soil_water
-from ..crop import water_uptake
+from ..crop import transpiration
 
 
 # ------------------------------------------------------------------------------
@@ -182,7 +181,7 @@ def daily_soil_routine(soil, crop, weather, time):
     # calculate daily transpiration
     evapotranspiration.update_all(soil, crop, weather, time)
 
-    water_uptake.update_all(crop.crops_list['corn'], soil, time)
+    transpiration.update_all(crop.crops_list['corn'], soil, time)
 
     # calculate daily percolation
     percolation.update_all(soil)
@@ -231,7 +230,6 @@ class Soil:
         self.manning = data['Manning']
         self.fieldSize = data['FieldSize']
         self.practiceFactor = data['PracticeFactor']
-        self.orgc = data['Orgc']
         self.sand = data['Sand']
         self.silt = data['Silt']
 
@@ -280,15 +278,16 @@ class Soil:
         self.update_SW = True  # TODO: Temporary to turn the SW update on and off
 
         # daily output values
-        self.Et_max = 0.0
-        self.E0 = 0.0
+        self.evap_max = 0.0
+        self.trans_max = 0.0
+        self.ET_max = 0.0
         self.profile_SW = 0.0
 
         # daily water balance
         self.delta_SW = 0.0
         self.runoff = 0.0
-        self.Esoil = 0.0
-        self.transpiration = 0.0
+        self.evap_sum = 0.0
+        self.trans = 0.0
         self.drainage = 0.0
 
         self.p_act = 0.0
@@ -297,14 +296,14 @@ class Soil:
         self.water_balance = 0.0
 
         # annual variables
-        self.E0_sum = 0.0
+        self.ET_max_annual = 0.0
 
         # annual water balance
         self.annual_delta_SW = 0.0
-        self.runoff_sum = 0.0
-        self.Esoil_sum = 0.0
-        self.transpiration_sum = 0.0
-        self.drainage_sum = 0.0
+        self.runoff_annual = 0.0
+        self.evap_annual = 0.0
+        self.trans_annual = 0.0
+        self.drainage_annual = 0.0
 
         self.p_act_annual = 0.0
         self.p_calc_annual = 0.0
@@ -410,10 +409,10 @@ class Soil:
             self.bulkDensity = layerData['BulkDensity']
 
             # Variables to calculate daily evapotranspiration
-            self.topEsoil = 0.0  # evaporation demand at top of layer
-            self.bottomEsoil = 0.0  # evaporation demand at bottom of layer
-            self.layerEsoil = 0.0  # evaporation demand at layer
-            self.Et_actual = 0.0  # actual transpiration for the layer (updated in crop)
+            self.top_evap = 0.0  # evaporation demand at top of layer
+            self.bottom_evap = 0.0  # evaporation demand at bottom of layer
+            self.layer_evap = 0.0  # evaporation demand at layer
+            self.trans_act = 0.0  # actual transpiration for the layer (updated in crop)
 
             # Variables used for soil temperature
             self.temperature = layerData['InitialTemperature']
@@ -448,9 +447,9 @@ class Soil:
             # Initial Stable N in layer:
             self.stableN = 0.
 
-            self.NO3Perc = 0.0
-            self.NH4Perc = 0.0
-            self.activePerc = 0.0
+            self.NO3_perc = 0.0
+            self.NH4_perc = 0.0
+            self.active_perc = 0.0
             self.nMinAct = 0.0
             self.nitrification = 0.0
             self.volatilization = 0.0
@@ -643,8 +642,8 @@ class Soil:
         self.annual_delta_SW = self.prev_SW - self.initial_annual_SW
 
         self.p_calc_annual = self.annual_delta_SW \
-            + self.runoff_sum + self.Esoil_sum + self.transpiration_sum \
-            + self.drainage_sum
+            + self.runoff_annual + self.evap_annual + self.trans_annual \
+            + self.drainage_annual
 
         self.annual_water_balance = self.p_act_annual - self.p_calc_annual
 
@@ -654,11 +653,11 @@ class Soil:
             Resets the annual values for the next year.
         """
 
-        self.E0_sum = 0.0
-        self.Esoil_sum = 0.0
-        self.transpiration_sum = 0.0
-        self.drainage_sum = 0.0
-        self.runoff_sum = 0.0
+        self.ET_max_annual = 0.0
+        self.evap_annual = 0.0
+        self.trans_annual = 0.0
+        self.drainage_annual = 0.0
+        self.runoff_annual = 0.0
 
         self.p_act_annual = 0
         self.p_calc_annual = 0

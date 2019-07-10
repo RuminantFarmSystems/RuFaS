@@ -60,7 +60,7 @@ def update_all(crop_type, soil):
     calc_fr_P(crop_type)
     calc_bio_P_opt(crop_type)
     calc_P_up(crop_type)
-    calc_actual_P_up_each_layer(crop_type, soil)
+    calc_act_P_up_each_layer(crop_type, soil)
     crop_type.P_act_up = sum(crop_type.act_P_up_each_layer)
     calc_bio_P(crop_type)
 
@@ -72,7 +72,7 @@ def update_all(crop_type, soil):
 def calc_fr_P(crop_type):
     p2 = calc_p2(crop_type)
     p1 = calc_p1(crop_type, p2)
-    if crop_type.prev_biomass_actual == 0:
+    if crop_type.prev_biomass_act == 0:
         crop_type.fr_P = 0
     else:
         first_term = crop_type.fr_p1 - crop_type.fr_p3
@@ -127,7 +127,7 @@ def calc_log_term_of_shape_coeff(crop_type, fr_PHU_fract, fr_p_):
 # "pseudocode_crop" C.6.B.2
 #
 def calc_bio_P_opt(crop_type):
-    crop_type.bio_P_opt = crop_type.prev_biomass_actual * crop_type.fr_P
+    crop_type.bio_P_opt = crop_type.prev_biomass_act * crop_type.fr_P
 
 
 #
@@ -151,7 +151,7 @@ def calc_P_up(crop_type):
 # of shallowest to deepest for this to work correctly.
 # "pseudocode_crop" C.6.C.4-7
 #
-def calc_actual_P_up_each_layer(crop_type, soil):
+def calc_act_P_up_each_layer(crop_type, soil):
     P_up_each_layer = calc_P_up_each_layer(crop_type, soil)
     act_P_up_each_layer = []
 

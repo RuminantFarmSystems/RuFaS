@@ -40,18 +40,18 @@ class SoilSummary(BaseReportHandler):
         self.precip = []
         self.runoff = []
         self.potentialEvapotranspiration = []
-        self.Ea_actual = []
-        self.Et_max = []
+        self.ET_act = []
+        self.trans_max = []
         self.sublimation = []
         self.surfaceTemp = []
         self.sedimentYield = []
         self.residue = []
         self.numSoilLayers = 0
 
-        self.layers_Et_actual = []
+        self.layers_trans_act = []
         self.layersSoilWater = []
-        self.layersEsoil = []
-        self.layersPerc = []
+        self.layers_evap = []
+        self.layers_perc = []
         self.layersTemperature = []
 
     # ---------------------------------------------------------------------------
@@ -65,23 +65,23 @@ class SoilSummary(BaseReportHandler):
         with self.get_fPath().open(mode) as csvfile:
 
             # 1) Initialize the header of the cvsfile
-            fieldnames = ['Year', 'Julian Day', 'Rainfall', 'Runoff (Q)',
-                          'Potential Evapotranspiration (E0)',
-                          'Actual Evapotranspiration (Ea)',
-                          'Crop Transpiration (Et_max)',
-                          'Maximum Sublimation (Esoil)']
+            fieldnames = ['Year', 'Julian Day', 'Rainfall', 'Runoff',
+                          'Potential Evapotranspiration (ET_max)',
+                          'Actual Evapotranspiration (ET)',
+                          'Crop Transpiration (trans_max)',
+                          'Maximum Sublimation (evap_max)']
 
             for x in range(0, self.numSoilLayers):
-                fieldnames.append("Et_actual_L" + str(x+1))
+                fieldnames.append("trans_act_L" + str(x+1))
 
             for x in range(0, self.numSoilLayers):
                 fieldnames.append("SoilWater_L" + str(x+1))
 
             for x in range(0, self.numSoilLayers):
-                fieldnames.append("Esoil_L" + str(x+1))
+                fieldnames.append("evap_L" + str(x+1))
 
             for x in range(0, self.numSoilLayers):
-                fieldnames.append("Perc_L" + str(x+1))
+                fieldnames.append("perc_L" + str(x+1))
 
             for x in range(0, self.numSoilLayers):
                 fieldnames.append("Temp_L" + str(x+1))
@@ -97,23 +97,23 @@ class SoilSummary(BaseReportHandler):
 
             # 2) Write Units in 2nd row of cvsfile
             units = {'Year': '', 'Julian Day': '',
-                             'Rainfall': "mm", 'Runoff (Q)': "mm",
-                             'Potential Evapotranspiration (E0)': "mm d^-1",
-                             'Actual Evapotranspiration (Ea)': "mm H2O",
-                             'Crop Transpiration (Et_max)': "mm H2O",
-                             'Maximum Sublimation (Esoil)': "mm H2O",
+                             'Rainfall': "mm", 'Runoff': "mm",
+                             'Potential Evapotranspiration (ET_max)': "mm d^-1",
+                             'Actual Evapotranspiration (ET)': "mm H2O",
+                             'Crop Transpiration (trans_max)': "mm H2O",
+                             'Maximum Sublimation (evap_max)': "mm H2O",
                              'Surface Temp': "C",
                              'Sediment Yield': "metric tons",
                              'Residue': "kg/ha"
                      }
             for fieldname in fieldnames:
-                if fieldname.startswith("Et_actual"):
+                if fieldname.startswith("trans_act"):
                     units[fieldname] = 'mm H2O'
                 elif fieldname.startswith("SoilWater"):
                     units[fieldname] = 'mm'
-                elif fieldname.startswith("Esoil"):
+                elif fieldname.startswith("evap"):
                     units[fieldname] = 'mm H2O'
-                elif fieldname.startswith("Perc"):
+                elif fieldname.startswith("perc"):
                     units[fieldname] = 'mm H2O'
                 elif fieldname.startswith("Temp"):
                     units[fieldname] = 'C'
@@ -130,15 +130,15 @@ class SoilSummary(BaseReportHandler):
 
         # initialize number of layer in soil summary report handler to get output
         # data pertaining to each soil layer
-        # Initializes the output arrays for current soil water, Esoil, and
+        # Initializes the output arrays for current soil water, evap, and
         # percolation for each soil layer
         self.numSoilLayers = len(soil.listOfSoilLayers)
 
         for _ in range (0, self.numSoilLayers):
-            self.layers_Et_actual.append([])
+            self.layers_trans_act.append([])
             self.layersSoilWater.append([])
-            self.layersEsoil.append([])
-            self.layersPerc.append([])
+            self.layers_evap.append([])
+            self.layers_perc.append([])
             self.layersTemperature.append([])
 
         self.write_header()
@@ -157,22 +157,22 @@ class SoilSummary(BaseReportHandler):
         self.precip.append(weather.rainfall[time.year-1][time.day-1])
 
         self.runoff.append(soil.runoff)
-        self.potentialEvapotranspiration.append(soil.E0)
-        self.Ea_actual.append(soil.Ea)
-        self.Et_max.append(soil.Et_max)
-        self.sublimation.append(soil.Esoil)
+        self.potentialEvapotranspiration.append(soil.ET_max)
+        self.ET_act.append(soil.ET)
+        self.trans_max.append(soil.trans_max)
+        self.sublimation.append(soil.evap_max)
 
         for x in range(0, len(soil.listOfSoilLayers)):
-            self.layers_Et_actual[x].append(
-                                    soil.listOfSoilLayers[x].Et_actual)
+            self.layers_trans_act[x].append(
+                                    soil.listOfSoilLayers[x].trans_act)
 
             self.layersSoilWater[x].append(
                                     soil.listOfSoilLayers[x].currentSoilWaterMM)
 
-            self.layersEsoil[x].append(
-                                    soil.listOfSoilLayers[x].layerEsoil)
+            self.layers_evap[x].append(
+                                    soil.listOfSoilLayers[x].layer_evap)
 
-            self.layersPerc[x].append(
+            self.layers_perc[x].append(
                                     soil.listOfSoilLayers[x].perc)
 
             self.layersTemperature[x].append(
@@ -209,15 +209,15 @@ class SoilSummary(BaseReportHandler):
                         str(self.julianDay[x]),
                     'Rainfall':
                         str(round(float(self.precip[x]), 2)),
-                    'Runoff (Q)':
+                    'Runoff':
                         str(round(self.runoff[x], 2)),
-                    'Potential Evapotranspiration (E0)':
+                    'Potential Evapotranspiration (ET_max)':
                         str(round(self.potentialEvapotranspiration[x], 3)),
-                    'Actual Evapotranspiration (Ea)':
-                        str(round(self.Ea_actual[x], 3)),
-                    'Crop Transpiration (Et_max)':
-                        str(round(self.Et_max[x], 3)),
-                    'Maximum Sublimation (Esoil)':
+                    'Actual Evapotranspiration (ET)':
+                        str(round(self.ET_act[x], 3)),
+                    'Crop Transpiration (trans_max)':
+                        str(round(self.trans_max[x], 3)),
+                    'Maximum Sublimation (evap_max)':
                         str(round(self.sublimation[x], 3)),
                     'Surface Temp':
                         str(round(self.surfaceTemp[x], 3)),
@@ -228,14 +228,14 @@ class SoilSummary(BaseReportHandler):
                 }
 
                 for y in range(0, self.numSoilLayers):
-                    dailySoilData["Et_actual_L" + str(y+1)] = str(
-                        round(self.layers_Et_actual[y][x], 3))
+                    dailySoilData["trans_act_L" + str(y+1)] = str(
+                        round(self.layers_trans_act[y][x], 3))
                     dailySoilData["SoilWater_L" + str(y+1)] = str(
                         round(self.layersSoilWater[y][x], 3))
-                    dailySoilData["Esoil_L" + str(y+1)] = str(
-                        round(self.layersEsoil[y][x], 3))
-                    dailySoilData["Perc_L" + str(y+1)] = str(
-                        round(self.layersPerc[y][x], 3))
+                    dailySoilData["evap_L" + str(y+1)] = str(
+                        round(self.layers_evap[y][x], 3))
+                    dailySoilData["perc_L" + str(y+1)] = str(
+                        round(self.layers_perc[y][x], 3))
                     dailySoilData["Temp_L" + str(y+1)] = str(
                         round(self.layersTemperature[y][x], 3))
 
@@ -255,15 +255,15 @@ class SoilSummary(BaseReportHandler):
 
         self.runoff = []
         self.potentialEvapotranspiration = []
-        self.Ea_actual = []
-        self.Et_max = []
+        self.ET_act = []
+        self.trans_max = []
         self.sublimation = []
 
         for x in range(0, self.numSoilLayers):
-            self.layers_Et_actual[x] = []
+            self.layers_trans_act[x] = []
             self.layersSoilWater[x] = []
-            self.layersEsoil[x] = []
-            self.layersPerc[x] = []
+            self.layers_evap[x] = []
+            self.layers_perc[x] = []
             self.layersTemperature[x] = []
 
         self.surfaceTemp = []

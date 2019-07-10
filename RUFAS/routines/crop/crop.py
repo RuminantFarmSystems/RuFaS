@@ -68,7 +68,7 @@ This module needs the following inputs in order to operate correctly:
         And the following attributes of a soil layer:
             bottomDepth
             Eo_sum = Sum of the Eo values leading up to today
-            Et_max
+            trans_max
             NO3
             labileP
             currentSoilWaterMM
@@ -78,7 +78,7 @@ This module needs the following inputs in order to operate correctly:
 ################################################################################
 
 from . import heat_units, leaf_area_index, root_development, biomass, yields, \
-    phosphorus_uptake, nitrogen_uptake, water_uptake, growth_constraints
+    phosphorus_uptake, nitrogen_uptake, transpiration, growth_constraints
 from RUFAS import util
 
 
@@ -188,8 +188,8 @@ class Crop():
             self.fr_LAI_max = 0
 
             # Outputs
-            self.prev_LAI_actual = 0
-            self.LAI_actual = 0
+            self.prev_LAI_act = 0
+            self.LAI_act = 0
 
             # ===================================================================
             """ ROOT DEPTH DATA """
@@ -215,11 +215,11 @@ class Crop():
             # Internally calculated inputs
             self.gamma_reg = 0
             self.dBiomass_max = 0
-            self.dBiomass_actual = 0.0
+            self.dBiomass_act = 0.0
 
             # Outputs
-            self.biomass_actual = 0
-            self.prev_biomass_actual = 0
+            self.biomass_act = 0
+            self.prev_biomass_act = 0
 
             # ===================================================================
             """ Soil Water Uptake Data """
@@ -227,7 +227,7 @@ class Crop():
             self.beta_w = data['beta_w']  # water-use distribution parameter
             self.epco = data['epco']
 
-            self.water_actual_up = 0
+            self.water_act_up = 0
             self.water_uptake_each_layer = []
 
             # ===================================================================
@@ -247,7 +247,7 @@ class Crop():
             self.fr_N_up = 0
             self.N_up = 0
             self.act_N_up_each_layer = []
-            self.N_actual_up = 0
+            self.N_act_up = 0
 
             # ===================================================================
             """ Phosphorus Uptake Data """
@@ -274,7 +274,7 @@ class Crop():
 
             self.HI_max = 0
             self.HI_min = data["HI_min"]
-            self.HI_actual = 0
+            self.HI_act = 0
             self.HI_opt = data["HI_opt"]
 
             self.harvest_eff = data["harvest_eff"]
@@ -283,7 +283,7 @@ class Crop():
 
             self.bio_AG = 0
             self.yield_max = 0
-            self.yield_actual = 0
+            self.yield_act = 0
             self.yield_N = 0
             self.yield_P = 0
 
@@ -316,8 +316,8 @@ class Crop():
             crop_type.fr_PHU = 0
             crop_type.prev_fr_PHU = 0
 
-            crop_type.biomass_actual = 0
-            crop_type.prev_biomass_actual = 0
+            crop_type.biomass_act = 0
+            crop_type.prev_biomass_act = 0
 
             crop_type.bio_P = 0
             crop_type.bio_N = 0

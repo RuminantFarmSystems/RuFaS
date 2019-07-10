@@ -13,7 +13,7 @@ Description: This module contains the necessary functions for calculating and
 
 Soil attribute definitions
 
-    Perc = amount of water that percolates to the underlying soil layer (mm H20)
+    perc = amount of water that percolates to the underlying soil layer (mm H20)
 
     t = time step (24h)
 

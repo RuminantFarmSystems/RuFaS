@@ -1,7 +1,7 @@
 """
 RUFAS: Ruminant Farm Systems Model
 
-File name: water_uptake.py
+File name: transpiration.py
 
 Author(s): Andy Achenreiner, achenreiner@wisc.edu
 
@@ -13,7 +13,7 @@ Description: This module contains the necessary functions for calculating and
 
 CropType attribute definitions:
 
-    soil.Et_max = Maximum plant transpiration on a given day (mm H2O)
+    soil.trans_max = Maximum plant transpiration on a given day (mm H2O)
 
     beta_w = Water-use distribution parameter
 
@@ -21,16 +21,16 @@ CropType attribute definitions:
 
     water_uptake_each_layer = Actual plant water uptake for each soil layer
 
-    Et_actual = Actual amount of transpiration that occurs on a given day
+    trans_act = Actual amount of transpiration that occurs on a given day
 
-    water_actual_up = Total plant water uptake on a given day
+    water_act_up = Total plant water uptake on a given day
 
 
 CropType values updated by calling update_all():
 
     water_uptake_each_layer
-    water_actual_up
-    Et_actual
+    water_act_up
+    trans_act
 """
 ###############################################################################
 from math import exp
@@ -86,7 +86,7 @@ def calc_max_water_uptake_z(crop_type, soil, z):
     if crop_type.z_root == 0:
         return 0
     else:
-        term1 = soil.Et_max / (1 - exp(-1 * crop_type.beta_w))
+        term1 = soil.trans_max / (1 - exp(-1 * crop_type.beta_w))
         term2 = 1 - exp(-1*crop_type.beta_w * z / crop_type.z_root)
         return term1 * term2
 
@@ -143,7 +143,7 @@ def decrease_effic_of_uptake(soil, uptake_each_layer):
         # Point at which plant available water in soil layer begins to limit
         # efficiency of plant uptake (mm H2O)
         # C.4.B.5
-        AWC_limit = 0.25 * (layer.fcWater - layer.wiltingWater) + layer.wiltingWater
+        AWC_limit = 0.25 * (layer.fcWater - layer.wiltingWater)  # + layer.wiltingWater TODO: Not in SWAT
 
         # C.4.B.4
         if layer.currentSoilWaterMM > AWC_limit:
@@ -158,36 +158,34 @@ def decrease_effic_of_uptake(soil, uptake_each_layer):
 
 #
 # Calculates the actual water uptake by the plant. It uses this value to
-# update Et_actual and water_actual_up.
+# update trans_act and water_act_up.
 # "pseudocode_crop" C.4.C.2/3
 #
 def calc_act_water_uptake(crop_type, soil, adj_uptakes):
     act_uptake_each_layer = []
-    transpiration = 0
+    trans = 0
 
     # Calculate actual uptake for each layer
     # C.4.C.1
     for uptake, layer in zip(adj_uptakes, soil.listOfSoilLayers):
         act_uptake = min(uptake, layer.currentSoilWaterMM - layer.wiltingWater)
 
-        layer.Et_actual = act_uptake
-        transpiration += layer.Et_actual
+        layer.trans_act = act_uptake
 
         act_uptake_each_layer.append(act_uptake)
 
-    soil.transpiration = transpiration
     crop_type.water_uptake_each_layer = act_uptake_each_layer
 
     # Calculate total plant uptake of water from soil profile
     # C.4.C.2
-    crop_type.water_actual_up = sum(act_uptake_each_layer)
+    crop_type.water_act_up = sum(act_uptake_each_layer)
 
 
 def update_SW(soil):
-    soil.Ea = 0
+    soil.ET = 0
     for layer in soil.listOfSoilLayers:
         WP = layer.wiltingWater
-        layer.Et_actual = min(layer.currentSoilWaterMM - WP, layer.Et_actual)
-        layer.currentSoilWaterMM -= layer.Et_actual
-        soil.Ea += (layer.layerEsoil + layer.Et_actual)
+        layer.trans_act = min(layer.currentSoilWaterMM - WP, layer.trans_act)
+        layer.currentSoilWaterMM -= layer.trans_act
+        soil.ET += (layer.layer_evap + layer.trans_act)
 

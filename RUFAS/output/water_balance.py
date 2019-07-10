@@ -42,8 +42,8 @@ class WaterBalance(BaseReportHandler):
 
         self.delta_SW = []
         self.runoff = []
-        self.Esoil = []
-        self.transpiration = []
+        self.evap = []
+        self.trans = []
         self.drainage = []
 
         self.p_act = []
@@ -54,10 +54,10 @@ class WaterBalance(BaseReportHandler):
         self.cal_year = []
 
         self.annual_delta_SW = 0.0
-        self.runoff_sum = 0.0
-        self.Esoil_sum = 0.0
-        self.transpiration_sum = 0.0
-        self.drainage_sum = 0.0
+        self.runoff_annual = 0.0
+        self.evap_annual = 0.0
+        self.trans_annual = 0.0
+        self.drainage_annual = 0.0
 
         self.annual_p_act = 0.0
         self.annual_p_calc = 0.0
@@ -118,8 +118,8 @@ class WaterBalance(BaseReportHandler):
 
         self.delta_SW.append(soil.delta_SW)
         self.runoff.append(soil.runoff)
-        self.Esoil.append(soil.Esoil)
-        self.transpiration.append(soil.transpiration)
+        self.evap.append(soil.evap_sum)
+        self.trans.append(soil.trans_sum)
         self.drainage.append(soil.drainage)
 
         self.p_act.append(soil.p_act)
@@ -139,10 +139,10 @@ class WaterBalance(BaseReportHandler):
         self.cal_year = time.cal_year
 
         self.annual_delta_SW = soil.annual_delta_SW
-        self.runoff_sum = soil.runoff_sum
-        self.Esoil_sum = soil.Esoil_sum
-        self.transpiration_sum = soil.transpiration_sum
-        self.drainage_sum = soil.drainage_sum
+        self.runoff_annual = soil.runoff_annual
+        self.evap_annual = soil.evap_annual
+        self.trans_annual = soil.trans_annual
+        self.drainage_annual = soil.drainage_annual
 
         self.annual_p_act = soil.p_act_annual
         self.annual_p_calc = soil.p_calc_annual
@@ -172,9 +172,9 @@ class WaterBalance(BaseReportHandler):
                     'Runoff':
                         str(round(float(self.runoff[x]), 3)),
                     'Evaporation':
-                        str(round(float(self.Esoil[x]), 3)),
+                        str(round(float(self.evap[x]), 3)),
                     'Transpiration':
-                        str(round(float(self.transpiration[x]), 3)),
+                        str(round(float(self.trans[x]), 3)),
                     'Drainage':
                         str(round(float(self.drainage[x]), 3)),
                     'Actual Precipitation':
@@ -202,13 +202,13 @@ class WaterBalance(BaseReportHandler):
                 'Change in SW':
                     str(round(float(self.annual_delta_SW), 3)),
                 'Runoff':
-                    str(round(float(self.runoff_sum), 3)),
+                    str(round(float(self.runoff_annual), 3)),
                 'Evaporation':
-                    str(round(float(self.Esoil_sum), 3)),
+                    str(round(float(self.evap_annual), 3)),
                 'Transpiration':
-                    str(round(float(self.transpiration_sum), 3)),
+                    str(round(float(self.trans_annual), 3)),
                 'Drainage':
-                    str(round(float(self.drainage_sum), 3)),
+                    str(round(float(self.drainage_annual), 3)),
                 'Actual Precipitation':
                     str(round(float(self.annual_p_act), 3)),
                 'Calculated Water':
@@ -233,8 +233,8 @@ class WaterBalance(BaseReportHandler):
 
         self.delta_SW = []
         self.runoff = []
-        self.Esoil = []
-        self.transpiration = []
+        self.evap = []
+        self.trans = []
         self.drainage = []
 
         self.p_act = []
@@ -245,10 +245,10 @@ class WaterBalance(BaseReportHandler):
         self.cal_year = []
 
         self.annual_delta_SW = 0.0
-        self.runoff_sum = 0.0
-        self.Esoil_sum = 0.0
-        self.transpiration_sum = 0.0
-        self.drainage_sum = 0.0
+        self.runoff_annual = 0.0
+        self.evap_annual = 0.0
+        self.trans_annual = 0.0
+        self.drainage_annual = 0.0
 
         self.annual_p_act = 0.0
         self.annual_p_calc = 0.0

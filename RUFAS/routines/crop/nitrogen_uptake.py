@@ -31,7 +31,7 @@ CropType attribute definitions:
 
     act_N_up_each_layer = List of actual nitrogen uptakes from each soil layer.
 
-    N_actual_up = Actual amount of nitrogen removed from the soil solution
+    N_act_up = Actual amount of nitrogen removed from the soil solution
                   on a given day (kg N ha^-1)
 
     bio_N = Actual mass of nitrogen stored in plant material (kg N ha^-1)
@@ -42,8 +42,8 @@ CropType values updated by calling update_all():
     fr_N
     bio_N_opt
     N_up
-    actual_N_up_each_layer
-    N_actual_up
+    act_N_up_each_layer
+    N_act_up
     bio_N
 """
 ###############################################################################
@@ -58,8 +58,8 @@ def update_all(crop_type, soil):
     calc_fr_N(crop_type)
     calc_bio_N_opt(crop_type)
     calc_N_up(crop_type)
-    calc_actual_N_up_each_layer(crop_type, soil)
-    crop_type.N_actual_up = sum(crop_type.act_N_up_each_layer)
+    calc_act_N_up_each_layer(crop_type, soil)
+    crop_type.N_act_up = sum(crop_type.act_N_up_each_layer)
     calc_bio_N(crop_type, soil)
 
 
@@ -71,7 +71,7 @@ def calc_fr_N(crop_type):
     n2 = calc_n2(crop_type)
     n1 = calc_n1(crop_type, n2)
 
-    if crop_type.prev_biomass_actual == 0:
+    if crop_type.prev_biomass_act == 0:
         crop_type.fr_N = 0
     else:
         term1 = crop_type.fr_n1 - crop_type.fr_n3
@@ -127,7 +127,7 @@ def calc_log_term_of_shape_coeff(crop_type, fr_PHU_fract, fr_n_):
 # "pseudocode_crop" C.5.B.2
 #
 def calc_bio_N_opt(crop_type):
-    crop_type.bio_N_opt = crop_type.fr_N * crop_type.biomass_actual
+    crop_type.bio_N_opt = crop_type.fr_N * crop_type.biomass_act
 
 
 #
@@ -152,7 +152,7 @@ def calc_N_up(crop_type):
 # of shallowest to deepest for this to work correctly.
 # "pseudocode_crop" C.5.C.4/5/6/7
 #
-def calc_actual_N_up_each_layer(crop_type, soil):
+def calc_act_N_up_each_layer(crop_type, soil):
     N_up_each_layer = calc_N_up_each_layer(crop_type, soil)
     act_N_up_each_layer = []
 
@@ -234,4 +234,4 @@ def calc_N_up_z(crop_type, z):
 def calc_bio_N(crop_type, soil):
     N_fix = calc_N_fixation(crop_type, soil)
 
-    crop_type.bio_N = crop_type.bio_N + crop_type.N_actual_up + N_fix
+    crop_type.bio_N = crop_type.bio_N + crop_type.N_act_up + N_fix

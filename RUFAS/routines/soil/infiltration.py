@@ -13,7 +13,7 @@ Description: This module contains the necessary functions for calculating and
 
 Soil attribute definitions
 
-    Q = daily runoff (mm H20)
+    runoff = daily runoff (mm H20)
 
     R = daily rainfall depth (mm H20)
 
@@ -59,7 +59,7 @@ from math import exp, log
 #
 def update_all(soil, weather, time):
 
-    calc_Q(soil, weather, time)
+    calc_runoff(soil, weather, time)
 
     calc_daily_infiltration(soil, weather, time)
 
@@ -68,10 +68,10 @@ def update_all(soil, weather, time):
 
 
 #
-# Calculates the daily runoff Q (mm H20)
+# Calculates the daily runoff (mm H20)
 # "pseudocode_soil" S.2.A.1
 #
-def calc_Q(soil, weather, time):
+def calc_runoff(soil, weather, time):
     R = weather.rainfall[time.year-1][time.day-1]
     S = calc_S(soil)
 
@@ -82,11 +82,11 @@ def calc_Q(soil, weather, time):
         exp_part = exp(-0.000862 * S)
         S = Smax * (1 - exp_part)
 
-    Q = 0.0
+    runoff = 0.0
     if R > 0.2 * S:
-        Q = ((R - 0.2 * S) ** 2) / (R + 0.8 * S)
+        runoff = ((R - 0.2 * S) ** 2) / (R + 0.8 * S)
 
-    soil.runoff = Q
+    soil.runoff = runoff
 
 
 #
@@ -206,8 +206,8 @@ def sum_WW(soil):
 #
 def calc_daily_infiltration(soil, weather, time):
     R = weather.rainfall[time.year-1][time.day-1]
-    Q = soil.runoff
-    soil.dailyInfiltration = R - Q
+    runoff = soil.runoff
+    soil.dailyInfiltration = R - runoff
 
 
 def update_SW(soil):
