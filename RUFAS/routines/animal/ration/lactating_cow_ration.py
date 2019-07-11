@@ -1,11 +1,11 @@
 ################################################################################
-'''
+"""
 RUFAS: Ruminant Farm Systems Model
 File name: ration.py
 Description:
 Author(s): Kass Chupongstimun, kass_c@hotmail.com
            Militsa Sotirova, militsasotirova@gmail.com
-'''
+"""
 ################################################################################
 
 from numpy import exp
@@ -36,7 +36,7 @@ def set_globals(DMIest, BW, DBW, milk, CP_milk):
     global_CP_Milk = CP_milk
 
 def optimize(feed, rqmts):
-    '''
+    """
     Sets up the arguments for the linear programming optimization.
 
 	Args:
@@ -45,7 +45,7 @@ def optimize(feed, rqmts):
 
     Returns:
         dict: the dictionary that is returned by the call to util.LP_solve()
-	'''
+    """
 
     # LHS is of the following form. LHS stands for Left Hand Side.
     # [
@@ -55,6 +55,7 @@ def optimize(feed, rqmts):
     #     [##,##, ..., ##],
     #     [##,##, ..., ##]
     # ]
+
     LHS = []
     constraint = [percentage(feed.available_feeds[feed_name]['FU'])
                   for feed_name in feed.available_feed_names]
@@ -109,9 +110,10 @@ def optimize(feed, rqmts):
     return util.LP_solve(LHS, RHS, objective, var_names, operators, "minimize", "RATION", lower_bounds, upper_bounds)
 
 
+
 def calculate_rqmts(BW, BCS, CBW, CI, concentrate, CP_Milk, DOP, DHD, DVD,
                         DIM, fat_milk, lactose_milk, milk, parity, type, nutrients_list):
-    '''
+    """
     Calculate the dietary requirements of the cows. These values are used
     on the RHS of the linear program. Each calculation has a reference to the
     respective calculation in the pseudocode.
@@ -135,8 +137,11 @@ def calculate_rqmts(BW, BCS, CBW, CI, concentrate, CP_Milk, DOP, DHD, DVD,
 
     Returns:
         dict : a dictionary that represents the dietary requirements of the cows,
-            used as the RHS of the LP
-    '''
+
+            where the left hand side is nutrients_list and the right hand side is
+            calculated in this method
+	"""
+
     # Since the following variables represent percentages, they are multiplied by 0.01
     # CP_Milk = percentage(CP_Milk)
     # fat_milk = percentage(fat_milk)
