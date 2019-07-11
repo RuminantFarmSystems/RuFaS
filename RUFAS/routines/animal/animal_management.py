@@ -8,8 +8,10 @@ Author(s): Militsa Sotirova, militsasotirova@gmail.com
 '''
 ################################################################################
 from RUFAS.routines.animal.pen import Pen
-from RUFAS.routines.animal.life_cycle import LifeCycleManager
-from RUFAS.routines.animal.animal_base import AnimalBase
+from RUFAS.routines.animal.life_cycle.life_cycle import LifeCycleManager
+from RUFAS.routines.animal.life_cycle.animal_base import AnimalBase
+
+count = 0
 
 def daily_animal_routine(animal_management, feed, weather, time):
     '''Executes daily routines relating to Animals.
@@ -21,6 +23,9 @@ def daily_animal_routine(animal_management, feed, weather, time):
         time : instance of the Time class
     '''
     animal_management.daily_updates(feed, time)
+    global count
+    print('day', count)
+    count += 1
 
 def daily_animal_update(animal, weather, time):
     pass
@@ -202,6 +207,7 @@ class AnimalManagement:
             weather : instance of the Weather class
             time : instance of the Time class
         '''
+        print('sim length', self.sim_length)
         self.life_cycle_manager.daily_update(time.day, self.sim_length)
         
         if self.end_ration_interval(time.day):

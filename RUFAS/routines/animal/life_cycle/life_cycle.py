@@ -1,8 +1,8 @@
-from RUFAS.routines.animal.calf import Calf
-from RUFAS.routines.animal.heiferI import HeiferI
-from RUFAS.routines.animal.heiferII import HeiferII
-from RUFAS.routines.animal.heiferIII import HeiferIII
-from RUFAS.routines.animal.cow import Cow
+from RUFAS.routines.animal.life_cycle.calf import Calf
+from RUFAS.routines.animal.life_cycle.heiferI import HeiferI
+from RUFAS.routines.animal.life_cycle.heiferII import HeiferII
+from RUFAS.routines.animal.life_cycle.heiferIII import HeiferIII
+from RUFAS.routines.animal.life_cycle.cow import Cow
 
 class LifeCycleManager():
     # statistics
@@ -261,11 +261,11 @@ class LifeCycleManager():
     
         # if the number of heifers is less than needed for the herd, buy replacement from the market
         while len(self.cows) + len(self.heiferIIIs) < self.herd_num * 1.01 and date > 1:
-            self.replacement_market[0]._events.add_event(replacement_market[0]._days_born, 'Entered Herd')
-            cows.append(replacement_market[0])
+            self.replacement_market[0]._events.add_event(self.replacement_market[0]._days_born, 'Entered Herd')
+            self.cows.append(self.replacement_market[0])
             self.bought_from_market += 1
             daily_bought_from_market += 1
-            del replacement_market[0]
+            del self.replacement_market[0]
             if record_econ_stats:
                 self.total_replacement_bought += 1
                 self.total_replacement_cost += self.config["heifer_buy_price"]
@@ -323,9 +323,15 @@ class LifeCycleManager():
                     self.total_calf_value += self.config["calf_price"]
     
             # calculate reproduction indications
+            print()
+            print(date)
+            print(sim_length - 21 * self.config["num_21_days"])
             if date >= sim_length - 21 * self.config["num_21_days"]:
                 if cow._ai_day == cow._days_born:
                     self.num_ai_21_days += 1
+                print(cow._days_in_milk)
+                print(self.config["vwp"])
+                print(not cow._preg)
                 if cow._days_in_milk > self.config["vwp"] and not cow._preg:
                     self.num_cow_btw_vwp_preg_21_days += 1
                 if cow._days_in_preg == 1:

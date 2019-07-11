@@ -19,8 +19,12 @@ Description: This file updates the cow form first calving to leaving the herd.
 import math
 import numpy as np
 import matplotlib.pyplot as plt
-from RUFAS.routines.animal.heiferIII import HeiferIII
-from RUFAS.routines.animal.animal_base import AnimalBase
+from RUFAS.routines.animal.life_cycle.heiferIII import HeiferIII
+from RUFAS.routines.animal.life_cycle.animal_base import AnimalBase
+from RUFAS.routines.animal.ration.lactating_cow_ration import calculate_rqmts as lactating_calculate_rqmts
+from RUFAS.routines.animal.ration.dry_cow_ration import calculate_rqmts as dry_calculate_rqmts
+from RUFAS.routines.animal.manure.lactating_cow_manure_excretion import manure_calculations as lactating_manure_calculations
+from RUFAS.routines.animal.manure.dry_cow_manure_excretion import manure_calculations as dry_manure_calculations
 from random import random
 
 class Cow(HeiferIII):
@@ -204,7 +208,11 @@ class Cow(HeiferIII):
        	Calculates this cow's nutrient requirements.
     '''
 	def calc_nutrient_rqmts(self):
-		# self.nutrient_rqmts, self._DMIest, self._DBW = ration.calculate_rqmts(BW, BCS, CBW, CI, concentrate, CP_Milk, DOP, DHD, DVD, DIM, fat_milk, lactose_milk, milk, parity, type, nutrients_list)
+		if self._milking:
+			#self._nutrient_rqmts,self._DMIest, self._DBW = lactating_calculate_rqmts(BW, BCS, CBW, CI, concentrate, CP_Milk, DOP, DHD, DVD, DIM, fat_milk, lactose_milk, milk, parity, type, nutrients_list)
+			pass
+		else:
+			self._nutrient_rqmts = dry_calculate_rqmts()
 		self._nutrient_rqmts = {'FU': {'op': '<=', 'val': 7.566673489860807}, 'RU': {'op': '>=', 'val': 0}, 'ME_DM': {'op': '>=', 'val': 57.238188330372566}, 'RDP_DM': {'op': '>=', 'val': 2.0347001114951313}, 'RUP_DM': {'op': '>=', 'val': 1.2716733909335047}}
 		self._DMIest = 27.620363504458798 
 		self._DBW = -0.4125
@@ -214,17 +222,17 @@ class Cow(HeiferIII):
     '''
 	def calc_init_nutrient_rqmts(self, vertical_distance, horizontal_distance):
 		self.calc_daily_walking_dist(vertical_distance, horizontal_distance)
-		# self._nutrient_rqmts, self._DMIest, self._DBW = ration.calculate_rqmts(BW, BCS, CBW, CI, concentrate, CP_Milk, DOP, DHD, DVD, DIM, fat_milk, lactose_milk, milk, parity, type, nutrients_list)
-		self._nutrient_rqmts = {'FU': {'op': '<=', 'val': 7.566673489860807}, 'RU': {'op': '>=', 'val': 0}, 'ME_DM': {'op': '>=', 'val': 57.238188330372566}, 'RDP_DM': {'op': '>=', 'val': 2.0347001114951313}, 'RUP_DM': {'op': '>=', 'val': 1.2716733909335047}}
-		self._DMIest = 27.620363504458798 
-		self._DBW = -0.4125
+		self.calc_nutrient_rqmts()
 		
 	'''
 		Calculates and sets the manure excretion components.
 	'''  
 	def calc_manure_excretion(self, feed):
-		
-		# self.manure_excretion = manure_excretion.manure_calculations(self._ration_formulation, feed, BW, DIM, mPrt)
+		if self._milking:
+			#self._manure_excretion = lactating_manure_calculations(self._ration_formulation, feed, BW, DIM, mPrt)
+			pass
+		else:
+			self._manure_excretion = dry_manure_calculations()
 		self._manure_excretion = {"U": 0.340, 
 			"TAN_s": 0.14, 
 			"MN": 532.407, 

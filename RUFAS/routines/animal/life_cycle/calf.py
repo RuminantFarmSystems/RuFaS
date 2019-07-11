@@ -7,13 +7,15 @@ Description: This file updates the calf form birth to wean.
 			Gender determined with the semen type used,
 			Sold or keep decision made by user input,
 			Body weight gain with user input calf average daily gain.
-			TODO: Body weight changed could be based on nutrition intake later fron Ration Formulation
+			TODO: Body weight changed could be based on nutrition intake later from Ration Formulation
 '''
 ###############################################################################
 
 import numpy as np
 from random import random
-from RUFAS.routines.animal.animal_base import AnimalBase
+from RUFAS.routines.animal.life_cycle.animal_base import AnimalBase
+from RUFAS.routines.animal.ration.calf_ration import calculate_rqmts
+from RUFAS.routines.animal.manure.calf_manure_excretion import manure_calculations
 
 class Calf(AnimalBase):
 	'''
@@ -80,24 +82,14 @@ class Calf(AnimalBase):
        	Calculates this calf's nutrient requirements.
     '''
 	def calc_nutrient_rqmts(self):
-		# self.nutrient_rqmts = ration.calculate_rqmts(BW, BCS, CBW, CI, concentrate, CP_Milk, DOP, DHD, DVD, DIM, fat_milk, lactose_milk, milk, parity, type, nutrients_list)
-		self._nutrient_rqmts = {'FU': {'op': '<=', 'val': 7.566673489860807}, 'RU': {'op': '>=', 'val': 0}, 'ME_DM': {'op': '>=', 'val': 57.238188330372566}, 'RDP_DM': {'op': '>=', 'val': 2.0347001114951313}, 'RUP_DM': {'op': '>=', 'val': 1.2716733909335047}}
-		self._DMIest = 27.620363504458798 
-		self._DBW = -0.4125
+		self._nutrient_rqmts, self._DMIest, self._DBW = calculate_rqmts()
 		
 	'''
 		Calculates and sets the manure excretion components.
 	'''  
 	def calc_manure_excretion(self, feed):
+		self._manure_excretion = manure_calculations()
 		
-		# self.manure_excretion = manure_excretion.manure_calculations(this.ration_formulation, feed, BW, DIM, mPrt)
-		self._manure_excretion = {"U": 0.340, 
-			"TAN_s": 0.14, 
-			"MN": 532.407, 
-			"Mkg": 70.792, 
-			"VSd": 7087.413, 
-			"VSnd": 859.390} 
-
 	'''
 		Sets this animal's ration formulation.
 		Args:

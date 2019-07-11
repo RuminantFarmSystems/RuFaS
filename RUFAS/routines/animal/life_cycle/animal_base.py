@@ -8,7 +8,7 @@ Description: This file initialize common parameters
 ###############################################################################
 
 
-from RUFAS.routines.animal.animal_events import AnimalEvents
+from RUFAS.routines.animal.life_cycle.animal_events import AnimalEvents
 import random
 import numpy as np
 
