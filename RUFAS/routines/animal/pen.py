@@ -6,7 +6,7 @@ Description: The class which represents a pen on the farm.
 Author(s): Militsa Sotirova, militsasotirova@gmail.com
 '''
 ################################################################################
-from RUFAS.routines.animal.ration import optimize, set_globals
+from RUFAS.routines.animal.ration.lactating_cow_ration import optimize, set_globals
 
 class Pen:
     # unique pen ID, from input file
