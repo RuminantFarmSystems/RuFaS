@@ -1,4 +1,4 @@
-'''
+"""
 RUFAS: Ruminant Farm Systems Model
 
 File name: root_development.py
@@ -27,7 +27,7 @@ CropType values updated by calling update_all():
 
     fr_root
     z_root
-'''
+"""
 ###############################################################################
 
 #
@@ -42,12 +42,12 @@ def update_all(crop_type, time):
 #
 # Calculates the fraction of total biomass partitioned to roots
 # on a given day in the growing season (AKA fr_root).
-# "Pseudo code_SC_Water Uptake_1.0.docx" section 2.A.1
+# "pseudocode_crop" C.3.A.1
 #
 def calc_daily_root_biomass(crop_type, time):
-    inGrowingPeriod = crop_type.planting_date <= time.day <= crop_type.harvest_date
+    in_growing_period = crop_type.start_date <= time.day <= crop_type.harvest_date
 
-    if inGrowingPeriod:
+    if in_growing_period:
         crop_type.fr_root = 0.4 - 0.2 * crop_type.fr_PHU
     else:
         crop_type.fr_root = 0
@@ -56,22 +56,24 @@ def calc_daily_root_biomass(crop_type, time):
 #
 # Calculates depth of root development in the soil on a given
 # day (AKA z_root).
-# "Pseudo code_SC_Water Uptake_1.0.docx" section 2.A.2
+# "pseudocode_crop" C.3.A.2/3
 #
 def calc_z_root(crop_type, time):
     # Save the previous day's value
     crop_type.prev_z_root = crop_type.z_root
 
-    afterHarvest = time.day > crop_type.harvest_date
+    after_harvest = time.day > crop_type.harvest_date
 
+    # C.3.A.2
     if crop_type.crop_type == "perennial":
         crop_type.z_root = crop_type.z_root_max
 
-    elif afterHarvest:
+    elif after_harvest:
         crop_type.z_root = 0
 
+    # C.3.A.3
     elif crop_type.crop_type == "annual" and crop_type.fr_PHU > 0.4:
         crop_type.z_root = crop_type.z_root_max
 
-    else: # crop_type == "annual" and self.fr_PHU <= 0.4
+    else:  # crop_type == "annual" and self.fr_PHU <= 0.4
         crop_type.z_root = 2.5 * crop_type.fr_PHU * crop_type.z_root_max

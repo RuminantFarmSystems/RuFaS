@@ -4,7 +4,7 @@
     "config":
     {
         "StartDate" : "2008:1",
-        "EndDate" : "2011:366",
+        "EndDate" : "2009:365",
         "output_dir": "Outputs/Sample_Farm_Outputs/"
     },
 
@@ -22,7 +22,7 @@
         {
             "active": true,
             "report_name": "Ration Report",
-            "file_name": "ration_report.csv"
+            "file_name": "ration_report.txt"
         },
         "soil_nitrogen":
         {
@@ -105,7 +105,7 @@
             "Sand": 15,
             "Silt": 65,
             "SoilAlbedo": 0.16,
-            "initial_residue": 0,
+            "initial_residue": 8000,
             "FreshNMineralRate": 0.05,
             "SoilCoverType": "BARE",
 

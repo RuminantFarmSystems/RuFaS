@@ -1,26 +1,26 @@
 ################################################################################
-'''
+"""
 RUFAS: Ruminant Farm Systems Model
 File name: animal.py
 Description:
 Author(s): Kass Chupongstimun, kass_c@hotmail.com
-'''
+"""
 ################################################################################
 
-from RUFAS.routines.animal import ration, Herd
+from RUFAS.routines.animal import ration, Herd, testing_ration
 
 #-------------------------------------------------------------------------------
 # Function: daily_animal_routine
 #-------------------------------------------------------------------------------
 def daily_animal_routine(animal, feed, weather, time):
-    '''Executes daily routines relating to Animals.
+    """Executes daily routines relating to Animals.
 
     Args:
         animal : instance of the Animal class
         feed : instance of the Feed class
         weather : instance of the Weather class
         time : instance of the Time class
-    '''
+    """
 
     # Formulate ration using LP
     if not animal.has_user_input_ration:
@@ -32,26 +32,26 @@ def daily_animal_routine(animal, feed, weather, time):
 # Function: daily_animal_routine
 #-------------------------------------------------------------------------------
 def daily_animal_update(animal, weather, time):
-    '''
+    """
     TODO: Add DocString
-    '''
+    """
     pass
 
 #-------------------------------------------------------------------------------
 # Class: animal
 #-------------------------------------------------------------------------------
 class Animal():
-    '''
+    """
     Currently represents a Cow.
-    '''
+    """
 
     def __init__(self, data):
-        '''
+        """
         Constructs an instance of the Animal class
 
         Args:
             data : 2D dictionary which stores information about the cow
-        '''
+        """
         self.herd = Herd.Herd(data["Herd"])
         self.housing = data['housing']
         self.has_user_input_ration = data['ration']['user_input']
@@ -75,7 +75,7 @@ class Animal():
     # Method: formulate_optimized_ration
     #---------------------------------------------------------------------------
     def formulate_optimized_ration(self, feed):
-        '''Formulates the least cost ration for the animals.
+        """Formulates the least cost ration for the animals.
 
         1) Extract feed nutrition from Feed object
         2) Compile the information into the constraint and objective coefficients
@@ -88,7 +88,7 @@ class Animal():
 
         Args:
             feed : instance of the Feed class
-        '''
+        """
 
         # Loop variables
         infeasible = True
@@ -110,17 +110,18 @@ class Animal():
             # values here are requirements (on the RHS of constraint eq)
             # milk_production_multiplier is passed as scaling factor
             #
-            rqmts = ration.calculate_rqmts(
+            '''rqmts = ration.calculate_rqmts(
                 self.parity, self.WIM, self.AMF, self.BWR, self.base_NED,
                 self.housing, feed.nutrients_in_LP, milk_production_multiplier
             )
-            formulated_ration = ration.optimize(feed, rqmts)
+            formulated_ration = ration.optimize(feed, rqmts)'''
             #
             # Ideally, we will use status == 'Infeasible', but due to bugs in
             # the GLPK routine outputting an 'Undefined' in some infeasible
             # cases, we have to just check for not optimal and re-iterate
             # accordingly
             #
+            formulated_ration = testing_ration.test_ration(feed)
             infeasible = (formulated_ration['status'] != 'Optimal')
 
         self.ration = formulated_ration
@@ -130,19 +131,19 @@ class Animal():
     # Method: end_ration_interval
     #---------------------------------------------------------------------------
     def end_ration_interval(self, day):
-        '''Checks whether it is the day to formulate a new ration.
+        """Checks whether it is the day to formulate a new ration.
 
         Returns:
             bool: True if today is the day a new ration has to be formulated,
                 false otherwise.
-        '''
+        """
         return (day % self.ration_formulation_interval) == 1 or self.ration_formulation_interval == 1
 
     #---------------------------------------------------------------------------
     # Method: annual_reset
     #---------------------------------------------------------------------------
     def annual_reset(self):
-        '''
+        """
         TODO: Add DocString
-        '''
+        """
         pass

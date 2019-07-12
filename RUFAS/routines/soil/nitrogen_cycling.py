@@ -1,443 +1,556 @@
-################################################################################
+"""
+RUFAS: Ruminant Farm Systems Model
+
+File name: nitrogen_cycling.py
+
+Author(s): William Donovan, wmdonovan@wisc.edu
+
+Description: This module contains the necessary functions for calculating and
+             updating the content of three organic N pools (Fresh, Active, and
+             Stable) and two inorganic pools (NO3 and NH4) associated with a
+             soil profile on a given day 
+
+Soil attribute definitions
+
+    NO3 = initial NO3 levels (mg/kg)
+
+    z = depth of the soil layer's lower boundary
+
+    OrgN = initial Organic N (Active + Stable) (mg/kg)
+
+    OrgC = Organic carbon in a soil layer (%, user input)
+
+    NH4 = initial NO4 levels (0 mg/kg)
+    
+    tempfac = temperature factor
+    
+    waterfac = water factor
+    
+    soilTemp = temperature of the soil layer (ºC)
+    
+    SW = soil water content of entire profile, excluding water held at wilting
+            point (mm H2O)
+
+    WP = soil water content held at wilting point (mm H2O)
+
+    FC = field capacity (mm H2O)
+    
+    SAT = saturated water content of the soil layer (mm H2O)
+
+    DepthFac = volatilization depth factor
+
+    z_mid = 5mm (assuming a 10mm top layer)
+
+    NitrReg = nitrification regulator
+
+    VolatilReg = volatilization regulator
+
+    CECFac = volatilization cation exchange factor (0.15)
+
+    TotNitriVolatil = total combined nitrification and volatilization (kg/ha)
+
+    FracNitr = fraction of total that is nitrification
+
+    FracVolatil = fraction of total that is volatilization
+
+    Nitrification = mass of nitrification (kg/ha)
+
+    Volatilization = mass of Volatilization
+
+    NO3/NH4Conc1 = concentration of NO3 or NH4 in the top soil layer (kg N/mm H2O)
+
+    w = sum of runoff and soil water for the layer
+
+    NO3/NH4Runoff = mass of NO3 or NH4 loss in runoff from soil layer 1 (kg/ha)
+
+    Cr = coefficient of extraction for runoff (0.1)
+
+    NConc = concentration of nitrogen loss in erosion for each pool except
+                    NO3 (mg/kg)
+
+    BD = soil layer bulk density (g/cm^3)
+
+    depth = soil layer thickness (mm)
+
+    Eros_N_Loss = N mass loss in erosion for each pool(kg/ha)
+
+    Sed = daily soil loss (Metric Tons/ha)
+
+    ER = enrichment ratio
+
+    NO3/NH4Conc = concentration of NO3 or NH4 for leaching (kg N / mm H2O)
+
+    NO3/NH4Perc = mass of NO3 or NH4 loss in percolation water from all soil layers
+                (kg/ha)
+
+    DenitrN = denitrification (kg/ha)
+
+    deNrate = user defined denitrification rate coefficient (0.1)
+
+    OrgC = soil organic matter content (%)
+
+    Nminact = mineralization from active N pool (kg/ha)
+
+    CN = daily rate constant, ratio of Carbon to Nitrogen
+
+    CP = ratio of the residue
+
+    Decay = decay rate constant defining the fraction of residue decomposed
+
+    minCoeff = fresh residue mineralization coefficient (0.05)
+
+    resComp = nutrient cycling residue decomposition factor
+
+    FreshMin = mineralization of Fresh N (kg/ha)
+
+    Ntrans = nitrogen transferred between the active and stable pools
+
+    FracN = fraction of humic nitrogen in the active pool (0.02)
+
+
+Soil values updated by calling update_all():
+
+    listOfSoilLayers
+
+    values updated in each soil layer:
+
+        NO3
+        NH4
+        tempFac
+        waterFac
+        volatilization
+        activeN
+        orgN
+        stableN
+
+
+"""
+
+###############################################################################
+
+from math import exp, log, e
+
+
 #
-# RUFAS: Ruminant Farm Systems Model
+# This function calls all the necessary functions to update information related
+# to nitrogen cycling. The order in which each method is called is significant
+# and is still being worked out.
 #
-# nitrogen_cycling.py -
+def update_all(soil, weather, time):
+
+    calc_tempFactors(soil)
+
+    calc_waterFactors(soil)
+
+    nitrification_volatilization(soil)
+
+    leaching_runoff_erosion(soil)
+
+    leaching_update(soil)
+
+    denitrification(soil)
+
+    mineralization_decomp(soil)
+
+    humus_mineralization(soil)
+
+    added_manure_N(soil, weather, time)
+
+
 #
-# Authors: Kass Chupongstimun
-#          Jit Patil
+# Helper method used to calculate the temperature factor used to
+# calculate nitrification, volatilization, denitrification, and mineralization
+# for each layer
+# "pseudocode_soil" S.4.B.1
 #
-################################################################################
+def calc_tempFactors(soil):
+    for layer in soil.listOfSoilLayers:
+        soilTemp = layer.temperature
 
-import math
+        exp_part = exp(9.93 - 0.312 * soilTemp)
+        tempFac = max(0, soilTemp / (soilTemp + exp_part))
 
-
-#------------------------------------------------------------------------------
-# Function: daily_nitrogen_cycling_routine
-# Executes all the daily nitrogen cycling  routines
-#------------------------------------------------------------------------------
-def daily_nitrogen_cycling_routine(soil, time, weather):
-    daily_soil_nitrogen(soil, time.day, time.year,
-                        float(weather.rainfall[time.year-1][time.day-1]))
+        layer.tempFac = tempFac
 
 
-#------------------------------------------------------------------------------
-# Function: daily_nitrogen_update
-# Update attributes of soil nitrogen in preparation of following day
-#------------------------------------------------------------------------------
-def daily_nitrogen_update(soil, time, weather):
-    daily_soil_nitrogen_update(soil, time.day, time.year,
-                    float(weather.addedN[time.year-1][time.day-1]))
+#
+# Helper method used to calculate the water factor used to
+# calculate nitrification, volatilization, denitrification, and mineralization
+# for each layer
+# "pseudocode_soil" S.4.B.2
+#
+def calc_waterFactors(soil):
+    for layer in soil.listOfSoilLayers:
+        SW = layer.currentSoilWaterMM
+        FC = layer.fcWater
+        WP = layer.wiltingWater
+        SAT = layer.satWater
+
+        if SW > FC:
+            waterFac = (SAT - SW) / (SAT - FC)
+        else:
+            waterFac = (SW - WP) / (FC - WP)
+
+        layer.waterFac = waterFac
 
 
-#------------------------------------------------------------------------------
-# Function: daily_soil_nitrogen
-# Equations taken from SWAT 2009 documentation
-#------------------------------------------------------------------------------
-def daily_soil_nitrogen(soil, jday, year, rainfall):
-    '''
-    Description:
-        We will simulate 3 organic N pools (Fresh, Active, Stable) and 2 inorganic
-        pools (NO3 and NH4).
-        1) Get current soil N Pools
-        2) Mineralization and Decomposition
-        3) Nitrification and Volatilization
-        4) N loss in Leaching, runoff, and erosion
-    Args:
-        soil: instance of the Soil class
-        jday:
-        year: the year from the instance of the Time class
-        rainfall: the rainfall from the instance of the Weather class
-    '''
-
-    # FOR each soil layer
+#
+# Nitrification is the transfer of NH4 to NO3, this method determines when that
+# transfer occurs and calculates the magnitude of that transfer.
+# "pseudocode_soil" S.4.B
+#
+def nitrification_volatilization(soil):
     for x in range(0, len(soil.listOfSoilLayers)):
+        layer = soil.listOfSoilLayers[x]
 
-    # 1) ----------------Current soil N Pools-----------------------------------
+        tempFac = layer.tempFac
 
-        # soil layer bulk density (g/cm3)
-        BD = soil.listOfSoilLayers[x].bulkDensity
+        waterFac = layer.waterFac
 
-        # Organic carbon in a soil layer (%, user input)
-        OrgC = soil.listOfSoilLayers[x].orgC
-
-        # NO3 level (kg/ha) in the soil layer
-        NO3 = soil.listOfSoilLayers[x].NO3
-
-        # Organic N (Active + Stable, mg/kg) is:
-        OrgN = soil.listOfSoilLayers[x].orgN
-
-        # Variable to partition OrgN into pools
-        FracN = soil.listOfSoilLayers[x].fracActiveN
-
-        # Active N Pool
-        activeN = soil.listOfSoilLayers[x].activeN
-
-        # Stable N Pool
-        stableN = soil.listOfSoilLayers[x].stableN
-
-        # NH4 Pool
-        NH4 = soil.listOfSoilLayers[x].NH4
-
-    # 2) ----------------Mineralization and Decomposition-----------------------
-        # Mineralization equations represent net mineralization. Both Fresh and
-        # Active N are subject to mineralization. Mineralization uses soil
-        # temperature and soil water factors in calculations.
-
-        # temperature of soil layer
-        soilTemp = soil.listOfSoilLayers[x].temperature
-
-        # water content of the soil layer (mm)
-        SW = soil.listOfSoilLayers[x].currentSoilWaterMM
-
-        # field capacity water content of the soil layer (mm)
-        FC = soil.listOfSoilLayers[x].fcWater
-
-        # Active N mineralization rate (kg/ha; user defined)
-        minRate = soil.listOfSoilLayers[x].activeMineralRate
-
-        # the soil temperature factor; has to be >= 0.1
-        tempFac = max(0.1, 0.1 + 0.9 * soilTemp / (soilTemp + math.exp(9.93 -
-                                                    0.312 * soilTemp)))
-
-        # the soil water factor
-        waterFac = min(1, max(0.05, SW / FC))
-
-        resComp = soil.freshNMineralRate  # fresh N mineral rate
-
-        # Decomposition and mineralization of Fresh N is only in the first soil
-        # layer. Decomposition and mineralization are a function of a daily rate
-        # constant that is calculated with the C:N ratio and C:P ratio of the
-        # residue, and temperature and soil water factors.
+        # "pseudocode_soil" S.4.B.3
         if x == 0:
-            freshOrganicP = soil.residue * 0.0003
-            freshOrganicP = freshOrganicP * BD * soil.listOfSoilLayers[x].bottomDepth / 100  # kg
-            labileP = soil.listOfSoilLayers[x].labileP  # input
+            z_mid = 5
+        else:
+            z_mid = (layer.bottomDepth + soil.listOfSoilLayers[x - 1].bottomDepth) / 2
 
-            if (soil.topLayerFreshN + NO3) > 0:
-                carbonToNitrogen = (0.58 * soil.residue) / (soil.topLayerFreshN + NO3)  # C:N ratio
+        exp_part = exp(4.706 - 0.0305 * z_mid)
+        DepthFac = 1 - (z_mid / (z_mid + exp_part))
+
+        # "pseudocode_soil" S.4.B.5
+        CECFac = 0.15
+        VolatilReg = tempFac * DepthFac * CECFac
+
+        #
+        # Nitrification only occurs when the soil temperature of a given layer
+        # exceeds 5ºC
+        #
+        NitrReg = 0
+        if layer.temperature >= 5:
+            # "pseudocode_soil" S.4.B.4
+            NitrReg = tempFac * waterFac
+
+        # "pseudocode_soil" S.4.B.6
+        exp_part = exp(-NitrReg - VolatilReg)
+        TotNitriVolatil = layer.NH4 * (1 - exp_part)
+
+        TotNitriVolatil = min(layer.NH4, TotNitriVolatil)
+        layer.NH4 -= TotNitriVolatil
+
+        # "pseudocode_soil" S.4.B.7
+        FracNitr = 1 - exp(-NitrReg)
+
+        # "pseudocode_soil" S.4.B.8
+        FracVolatil = 1 - exp(-VolatilReg)
+
+        # "pseudocode_soil" S.4.B.9/10
+        if FracNitr + FracVolatil == 0:
+            Nitrification = 0
+            Volatilization = 0
+
+        else:
+            Nitrification = (FracNitr / (FracNitr + FracVolatil)) * \
+                            TotNitriVolatil
+            Volatilization = (FracVolatil / (FracNitr + FracVolatil)) * \
+                             TotNitriVolatil
+
+        layer.nitrification = Nitrification
+        layer.volatilization = Volatilization
+        layer.totNitriVolatil = TotNitriVolatil
+
+        layer.NO3 += Nitrification
+
+
+#
+# Calculates/updates N lost in leaching, runoff, and erosion
+# "pseudocode_soil" S.4.C
+#
+def leaching_runoff_erosion(soil):
+    # prev_NO3_perc = 0
+    # prev_NH4_perc = 0
+    # prev_active_perc = 0
+
+    for layer in soil.listOfSoilLayers:
+
+        #
+        # N in leaching is added to the next deeper layer. These values are
+        # calculated as the last step of each iteration through the loop. They
+        # are initialized at 0 because there is no nitrogen gained through
+        # leaching for the first layer.
+        #
+        # Toggle these comments to change order
+        # of operations + updates.
+        #
+        # layer.NO3 += prev_NO3_perc
+        # layer.NH4 += prev_NH4_perc
+        # layer.activeN += prev_active_perc
+
+        SW = layer.currentSoilWaterMM
+        FC = layer.fcWater
+        SAT = layer.satWater
+
+        BD = layer.bulkDensity
+        depth = layer.depth
+
+        #
+        # the coefficient of extraction for leaching is calibrated to 2.5
+        # for layers 2 and 3
+        #
+        Cl = 2.5
+
+        #
+        # All N lost in runoff and erosion is removed from layer 1
+        #
+        if layer.name == "Layer1":
+
+            # "pseudocode_soil" S.4.C.1
+            runoff = soil.runoff
+            w = runoff + SW
+
+            if w == 0:
+                NO3RunoffConc = 0
+                NH4RunoffConc = 0
+
             else:
-                carbonToNitrogen = 0
+                exp_part = exp(-w / SAT)
+                NO3RunoffConc = layer.NO3 * (1 - exp_part) / w
+                NH4RunoffConc = layer.NH4 * (1 - exp_part) / w
 
-            soil.CToN = carbonToNitrogen
+            Cr = 0.1
 
-            carbonToPhosphorus = (0.58 * soil.residue) / (freshOrganicP + labileP)  # C:P ratio
-            soil.CToP = carbonToPhosphorus
+            # "pseudocode_soil" S.4.C.2
+            NO3Runoff = NO3RunoffConc * Cr * runoff
+            NH4Runoff = NH4RunoffConc * runoff
 
-            # A decay rate constant (Decay) defines the fraction of residue that is
-            # decomposed as:
+            # it is important for the order of operations that the pools are
+            # updated after each process and that those updated values are used
+            # thereafter
+            NO3Runoff = min(layer.NO3, NO3Runoff)
+            layer.NO3 -= NO3Runoff
+            NH4Runoff = min(layer.NH4, NH4Runoff)
+            layer.NH4 -= NH4Runoff
 
-            residueFactor = min(math.exp(-0.693 * (carbonToNitrogen - 25) / 25),
-                       1)
-            decay = residueFactor * resComp * ((tempFac * waterFac) ** 0.5)
+            # "pseudocode_soil" S.4.C.3
+            activeNErosConc = (100 * layer.activeN) / (BD * depth)
+            stableNErosConc = (100 * layer.stableN) / (BD * depth)
+            freshNErosConc = (100 * layer.topLayerFreshN / (BD * depth))
+            NH4ErosConc = (100 * layer.NH4 / (BD * depth))
 
-            soil.decayRate = decay
+            Eros_activeN_loss = 0
+            Eros_stableN_loss = 0
+            Eros_freshN_loss = 0
+            Eros_NH4_loss = 0
 
-            # Mineralization of Fresh N (kg/ha) is then calculated as:
-            # freshMin = residueFactor * freshN
-            freshMin = 0.8 * decay * soil.topLayerFreshN
-            soil.freshMin = freshMin
+            Sed = soil.sedimentYield
 
-            freshDecomp = 0.2 * decay * soil.topLayerFreshN
-            soil.freshDecomp = freshDecomp
-
-    # 3) ----------------Nitrification and Volatilization-----------------------
-        # Nitrification is the transfer of NH4 to NO3. Nitrification occurs only
-        # when the soil temperature exceeds 5oC. It is a function of soil
-        # temperature and water factors.
-        WP = soil.listOfSoilLayers[x].wiltingWater
-
-        # calculate temperature factor
-        nitrTFac = 0.0
-        if soil.listOfSoilLayers[x].temperature > 5.0:
-            nitrTFac = 0.41 * (soilTemp - 5) / 10
-        nitrTFac = min(1.0, nitrTFac)
-
-        # volatilization depth factor is calculated as:
-        depthFac = 0.9500
-        if x != 0:
-            # depth to the midpoint of the soil layer (mm)
-            midpointDepth = (soil.listOfSoilLayers[x-1].bottomDepth
-                             + soil.listOfSoilLayers[x].bottomDepth) / 2
-            depthFac = 1 - (midpointDepth / (midpointDepth + math.exp(4.706 - 0.0305
-                                                             * midpointDepth)))
-
-        # volatilization cation exchange factor
-        CECFac = soil.listOfSoilLayers[x].volatileExchangeFactor
-
-        nitrReg = tempFac * waterFac * 0.1 # nitrification regulator
-
-        volatilReg = nitrTFac * depthFac * CECFac  # volatilization regulator
-
-        # Total combined nitrification and volatilization (kg/ha) is:
-        totNitriVolatil = NH4 * (1 - math.exp(-nitrReg - volatilReg))
-        soil.listOfSoilLayers[x].totNitriVolatil = totNitriVolatil
-
-        # Fraction of the total that is nitrification is:
-        # fracNitri = 1 - math.exp(nitrFac)
-        fracNitri = 1 - math.exp(-nitrReg)
-
-        # Fraction of the total that is volatilization is:
-        fracVolatili = 1 - math.exp(-volatilReg)
-
-        # Mass of volatilization (kg/ha) is:
-        volatilization = (soil.listOfSoilLayers[x].NH4 *
-                          volatilReg)
-        soil.listOfSoilLayers[x].volatilization = volatilization
-
-        # Mass of nitrification (kg/ha) is:
-        nitrification = (soil.listOfSoilLayers[x].NH4 - volatilization
-                         ) * nitrReg
-        soil.listOfSoilLayers[x].nitrification = nitrification
-
-    # 4) ----------------N loss in leaching, runoff, and erosion----------------
-        # All N lost in runoff and erosion is removed from soil layer 1. N in
-        # leaching is removed from a given soil layer and added to the next deeper
-        # layer.
-
-        # Fraction of soil porosity where anions are excluded (user defined)
-        anionEx = soil.listOfSoilLayers[x].cationExclusionFraction
-
-        runoff = soil.runoff  # runoff on a particular given day
-
-        # percolation on a particular given day
-        perc = soil.listOfSoilLayers[x].perc
-
-        # water content at soil saturation for layer
-        SAT = soil.listOfSoilLayers[x].saturation
-
-        Sed = soil.snowCorrectedSed  # daily soil loss (Metric Tons)
-
-        # calculate Denitrification in soil layer
-        denitrificationRate = soil.listOfSoilLayers[x].denitrificationRate
-        denitrification = 0.0
-        if (soil.listOfSoilLayers[x].currentSoilWaterMM >
-                                    soil.listOfSoilLayers[x].satWater * 0.6):
-            denitrification = NO3 * (1 - math.exp(-denitrificationRate *
-                                                  tempFac * OrgC))
-
-        soil.listOfSoilLayers[x].denitrification = denitrification
-
-        # Update NO3
-        NO3 = max(0, NO3 - soil.listOfSoilLayers[x].denitrification)
-
-        if x == 0 and SW != 0:
-            soil.runoffNO3Conc = (1 - math.exp((-SW-rainfall)/
-                        (soil.listOfSoilLayers[x].satWater + rainfall))
-                       ) * NO3 / (SW+rainfall)/25
-
-        # Update NO3
-        if x == 0:
-            NO3 = max(0, NO3 - soil.NO3Runoff)
-
-        # Concentration (kg N/mm H20) of NO3 in a soil layer is:
-        NO3Conc = 0.0
-        if SW != 0:
-            NO3Conc = (1 - math.exp(-SW/soil.listOfSoilLayers[x].satWater)
-                       )/SW*NO3/5
-
-        soil.listOfSoilLayers[x].NO3Conc = NO3Conc
-
-
-        # Mass (kg/ha) of NO3 loss in runoff (mm) from soil layer 1 only is:
-        NO3Runoff = 0.0
-        if x == 0:
-            NO3Runoff = soil.runoffNO3Conc * runoff
-            soil.NO3Runoff = NO3Runoff
-
-        # Mass (kg/ha) of NO3 loss in percolation water (mm) from all soil
-        # layers is:
-        NO3Perc = NO3Conc * perc
-        soil.listOfSoilLayers[x].NO3Perc = NO3Perc
-
-        # NH4 UPDATE
-        NH4 = max(0, NH4 - totNitriVolatil)
-
-        if x == 0 and SW != 0:
-            soil.runoffNH4Conc = (1 - math.exp((-SW-rainfall) /
-                        (soil.listOfSoilLayers[x].satWater+rainfall))
-                        ) * NH4/(SW+rainfall)/5
-
-        # Mass (kg/ha) of NH4 loss in runoff (mm) from soil layer 1 only is:
-        NH4Runoff = 0.0
-        if x == 0:
-            NH4Runoff = soil.runoffNH4Conc * runoff
-            soil.NH4Runoff = NH4Runoff
-
-        # NH4 Update
-        if x == 0:
-            NH4 = max(0, NH4 - soil.NH4Runoff)
-
-        # For N loss in erosion, soil N concentrations (mg/kg) for each pool except
-        # NO3 are calculated as:
-        if x == 0:
-            soil.freshNConc = (100 * soil.topLayerFreshN) / (BD / soil.listOfSoilLayers[x].bottomDepth)
-            soil.stableNConc = (100 * stableN) / BD / soil.listOfSoilLayers[x].bottomDepth
-            soil.NH4Conc = (100 * NH4) / BD / soil.listOfSoilLayers[x].bottomDepth
-            soil.activeNConc = (100 * activeN) / BD / soil.listOfSoilLayers[x].bottomDepth
-
-        # Update Active N
-        if x == 0:
-            activeN = max(0, activeN - soil.activeNLoss)
-
-        # Concentration (kg N/mm H20) of active N in a soil layer is:
-        activeNConc = 0.0
-        if SW != 0:
-            activeNConc = (1 - math.exp(-SW / soil.listOfSoilLayers[x].satWater)) * activeN/SW/15
-        soil.listOfSoilLayers[x].activeNConc = activeNConc
-
-        # Mass (kg/ha) of active N loss in percolation water (mm) from all soil
-        # layers is:
-        activeNPerc = activeNConc * perc
-        soil.listOfSoilLayers[x].activeNPerc = activeNPerc
-
-        # Enrichment ratio
-        ER = 0.0
-        if Sed != 0.0:
-            ER = max(1, math.exp(1.21 - 0.16 * math.log(Sed * 1000)))
-        soil.enrichmentRatio = ER
-
-        # N mass loss in erosion (kg/ha) is calculated as:
-        if x == 0:
             if Sed > 0:
-                soil.freshNLoss = 0.001 * soil.freshNConc * Sed * ER
-                soil.activeNLoss = 0.001 * soil.activeNConc * Sed * ER
-                soil.stableNLoss = 0.001 * soil.stableNConc * Sed * ER
-                soil.NH4Loss = 0.001 * soil.NH4Conc * Sed * ER
-            else:
-                soil.freshNLoss = 0.0
-                soil.activeNLoss = 0.0
-                soil.stableNLoss = 0.0
-                soil.NH4Loss = 0.0
+                # "pseudocode_soil" S.4.C.5
+                ER = exp(1.21 - 0.16 * log(Sed * 1000))
 
-        # Mineralization from Active N pool is:
-        Nminact = minRate * (tempFac * waterFac) ** 0.5 * activeN
-        soil.listOfSoilLayers[x].nMinAct = Nminact
+                # "pseudocode_soil" S.4.C.4
+                Eros_activeN_loss = 0.001 * activeNErosConc * Sed * ER
+                Eros_stableN_loss = 0.001 * stableNErosConc * Sed * ER
+                Eros_freshN_loss = 0.001 * freshNErosConc * Sed * ER
+                Eros_NH4_loss = 0.001 * NH4ErosConc * Sed * ER
 
-        # Update Stable N
-        stableN = max(0, stableN - soil.stableNLoss)
+            Eros_activeN_loss = min(layer.activeN, Eros_activeN_loss)
+            layer.activeN -= Eros_activeN_loss
 
-        # Update Active N
-        if x == 0:
-            activeN -= soil.listOfSoilLayers[x].activeNPerc
-        else:
-            activeN -= soil.listOfSoilLayers[x].activeNPerc
-            activeN += soil.listOfSoilLayers[x-1].activeNPerc
+            Eros_stableN_loss = min(layer.stableN, Eros_stableN_loss)
+            layer.stableN -= Eros_stableN_loss
 
-        activeN = max(0, activeN
-                      - soil.listOfSoilLayers[x].nMinAct)
+            Eros_freshN_loss = min(layer.topLayerFreshN, Eros_freshN_loss)
+            layer.topLayerFreshN -= Eros_freshN_loss
 
-        # N moves between the Active and Stable pools to maintain an equilibrium as:
-        Ntrans = 0.00001 * (activeN * (1 / FracN - 1) - stableN)
-        soil.listOfSoilLayers[x].nTrans = Ntrans
+            Eros_NH4_loss = min(layer.NH4, Eros_NH4_loss)
+            layer.NH4 -= Eros_NH4_loss
 
-        # Update NH4
-        if x == 0:
-            NH4 = max(0, NH4-soil.NH4Loss)
+            #
+            # the coefficient of extraction for leaching is calibrated to 1.0
+            # for layer 1
+            #
+            Cl = 1.0
 
-        # Concentration (kg N/mm H20) of NH4 in a soil layer is:
-        NH4Conc = 0.0
-        if SW != 0:
-            NH4Conc = (1 - math.exp(-SW / soil.listOfSoilLayers[x].satWater)) * NH4/SW
-        soil.listOfSoilLayers[x].NH4Conc = NH4Conc
+        # "pseudocode_soil" S.4.C.6-8
+        Perc = layer.perc
+        NO3Perc = 0
+        NH4Perc = 0
+        activePerc = 0
 
-        NH4Perc = NH4Conc * perc
-        soil.listOfSoilLayers[x].NH4Perc = NH4Perc
+        if Perc > 0:
+            # "pseudocode_soil" S.4.C.6
+            NO3PercConc = layer.NO3 / (FC + Perc)
+            NH4PercConc = layer.NH4 / (FC + Perc)
+
+            # "pseudocode_soil" S.4.C.7
+            activeConc = layer.activeN / (FC + Perc) / 50
+
+            # "pseudocode_soil" S.4.C.8
+            NO3Perc = NO3PercConc * Perc / Cl
+            NH4Perc = NH4PercConc * Perc
+            activePerc = activeConc * Perc
+
+        #
+        # N in leaching is removed from a given soil layer and added to the
+        # next deeper layer (note that prev_NO3/NH4/active_perc are added to the
+        # current pools as the first step of the next iteration through the
+        # loop. These values are set to 0 before the loop begins because there
+        # is no N gained through leaching in the first layer)
+        #
+
+        layer.NO3Perc = min(layer.NO3, NO3Perc)
+        layer.NH4Perc = min(layer.NH4, NH4Perc)
+        layer.activePerc = min(layer.activeN, activePerc)
+
+        # layer.NO3 -= NO3Perc
+        # layer.NH4 -= NH4Perc
+        # layer.activeN -= activePerc
+        #
+        # prev_NO3_perc = NO3Perc
+        # prev_NH4_perc = NH4Perc
+        # prev_active_perc = activePerc
 
 
-#---------------------------------------------------------------------------
-# Function: daily_soil_nitrogen_update
-# Updates the nitrogen pools in the soil for each layer
-#---------------------------------------------------------------------------
-def daily_soil_nitrogen_update(soil, jday, year, addedN):
-    '''
-    Description:
-        Updates the nitrogen pools in the soil for each layer.
-    Args:
-        soil: instance of the Soil class
-        jday:
-        year: the year field from the instance of the Year class
-    '''
-
+#
+# If leaching occurs separately for each layer, this helper method updates each
+# pool after the fact
+#
+def leaching_update(soil):
     for x in range(0, len(soil.listOfSoilLayers)):
+        layer = soil.listOfSoilLayers[x]
+        layer.NO3 -= layer.NO3Perc
+        layer.NH4 -= layer.NH4Perc
+        layer.activeN -= layer.activePerc
 
-        # UPDATE NO3 POOL
-        NO3 = soil.listOfSoilLayers[x].NO3
-        NO3 -= soil.listOfSoilLayers[x].denitrification
+        if x != 0:
+            prev_layer = soil.listOfSoilLayers[x - 1]
+            layer.NO3 += prev_layer.NO3Perc
+            layer.NH4 += prev_layer.NH4Perc
+            layer.activeN += prev_layer.activePerc
 
-        if x == 0:
-            NO3 -= soil.NO3Runoff
 
-        if x == 0:
-            NO3 -= soil.listOfSoilLayers[x].NO3Perc
-        else:
-            NO3 -= soil.listOfSoilLayers[x].NO3Perc
-            NO3 += soil.listOfSoilLayers[x - 1].NO3Perc
+#
+# Calculates denitrification (the bacterial conversion of NO3 to gas under
+# anaerobic conditions).
+# "pseudocode_soil" S.4.D
+#
+def denitrification(soil):
+    for layer in soil.listOfSoilLayers:
+        OrgC = layer.orgC
+        deNrate = 0.1
+        SW = layer.currentSoilWaterMM
+        FC = layer.fcWater
 
-        NO3 += soil.listOfSoilLayers[x].nitrification
-        soil.listOfSoilLayers[x].NO3 = max(0, NO3)
+        tempFac = layer.tempFac
 
-        # UPDATE NH4 POOL
-        NH4 = soil.listOfSoilLayers[x].NH4
-        NH4 = max(0, NH4 - soil.listOfSoilLayers[x].totNitriVolatil)
+        # "pseudocode_soil" S.4.D.1
+        DenitrN = 0
+        if SW > FC:
+            exp_part = exp(-deNrate * tempFac * OrgC)
+            DenitrN = layer.NO3 * (1 - exp_part)
 
-        if x == 0:
-            NH4 -= soil.NH4Runoff
+        DenitrN = min(layer.NO3, DenitrN)
+        layer.NO3 -= DenitrN
 
-        if x == 0:
-            NH4 -= soil.NH4Loss
+        layer.denitrification = DenitrN
 
-        if x == 0:
-            NH4 -= soil.listOfSoilLayers[x].NH4Perc
-        else:
-            NH4 -= soil.listOfSoilLayers[x].NH4Perc
-            NH4 += soil.listOfSoilLayers[x-1].NH4Perc
 
-        if x == 0:
-            NH4 = max(0, NH4
-                    + soil.listOfSoilLayers[x].nMinAct + soil.freshMin
-                    * 0.8 + (addedN*0.1))
-        else:
-            NH4 = max(0, NH4 + soil.listOfSoilLayers[x].nMinAct)
+#
+# Calculates mineralization and decomposition processes for the nitrogen cycle.
+# "pseudocode_soil" S.4.E
+#
+def mineralization_decomp(soil):
+    minrate = 0.0003
+    for layer in soil.listOfSoilLayers:
+        activeN = layer.activeN
+        tempFac = layer.tempFac
+        waterFac = layer.waterFac
 
-        soil.listOfSoilLayers[x].NH4 = NH4
+        # "pseudocode_soil" S.4.E.1
+        nMinAct = 0
+        if layer.temperature > 0:
+            nMinAct = minrate * ((tempFac * waterFac) ** 0.5) * activeN
 
-        # UPDATE ACTIVE N POOL
-        activeN = soil.listOfSoilLayers[x].activeN
+        nMinAct = min(layer.activeN, nMinAct)
+        layer.activeN -= nMinAct
+        layer.NH4 += nMinAct
 
-        if x == 0:
-            activeN = max(0, activeN - soil.activeNLoss)
+        #
+        # Decomposition and mineralization of Fresh N only occur in the first
+        # soil layer.
+        #
+        if layer.name == "Layer1":
+            FreshN = layer.topLayerFreshN
+            NO3 = layer.NO3
+            res = soil.residue
+            BD = layer.bulkDensity
+            depth = layer.bottomDepth
 
-        if x == 0:
-            activeN -= soil.listOfSoilLayers[x].activeNPerc
-        else:
-            activeN -= soil.listOfSoilLayers[x].activeNPerc
-            activeN += soil.listOfSoilLayers[x-1].activeNPerc
+            # "pseudocode_soil" S.4.E.2
+            CN = 0
+            if FreshN + NO3 > 0:
+                CN = (0.58 * res) / (FreshN + NO3)
 
-        activeN = max(0, activeN
-                      - soil.listOfSoilLayers[x].nMinAct)
+            #
+            # TODO: these values are taken from phosphorus_cycling.py which is incomplete
+            #
+            freshOrgP = (res * 0.0003) * BD * depth / 100
+            labileP = layer.labileP
 
-        activeN -= soil.listOfSoilLayers[x].nTrans
+            # "pseudocode_soil" S.4.E.3
+            CP = 0
+            if freshOrgP + labileP > 0:
+                CP = (0.58 * res) / (freshOrgP + labileP)
 
-        if x == 0:
-            activeN = (activeN + soil.freshMin*0.2 + addedN*0.9)
+            minCoeff = 0.05
 
-        soil.listOfSoilLayers[x].activeN = activeN
+            # "pseudocode_soil" S.4.E.5
+            term1 = exp(-0.693 * (CN - 25) / 25)
+            term2 = exp(-0.693 * (CP - 200) / 200)
+            term3 = 1.0
 
-        # UPDATE STABLE N POOL
-        stableN = soil.listOfSoilLayers[x].stableN
-        if x == 0:
-            stableN = max(0, stableN - soil.stableNLoss)
+            resComp = min(term1, term2, term3)
 
-        stableN = max(0, stableN + soil.listOfSoilLayers[x].nTrans)
+            # "pseudocode_soil" S.4.E.4
+            Decay = minCoeff * resComp * ((tempFac * waterFac) ** 0.5)
 
-        if x == 0:
-            stableN = max(0, stableN + 0)
+            # decay rate used in calculating residue for crop
+            soil.decayRate = Decay
 
-        soil.listOfSoilLayers[x].stableN = stableN
+            # "pseudocode_soil" S.4.E.6
+            FreshMin = Decay * FreshN
 
-        # UPDATE FRESH N POOL
+            FreshMin = min(layer.topLayerFreshN, FreshMin)
+            layer.topLayerFreshN -= FreshMin
 
-        if x==0:
-            soil.topLayerFreshN = max(0, soil.topLayerFreshN - soil.freshMin
-                                  - soil.freshDecomp - soil.freshNLoss)
+            layer.activeN += (0.2 * FreshMin)
+            layer.NH4 += (0.8 * FreshMin)
+
+
+#
+# Nitrogen is allowed to move between the Active and Stable organic pools,
+# representing humus mineralization. This method accounts for that process
+# "pseudocode_soil" S.4.F
+#
+def humus_mineralization(soil):
+    for layer in soil.listOfSoilLayers:
+        activeN = layer.activeN
+        stableN = layer.stableN
+        FracN = 0.02
+
+        # "pseudocode_soil" S.4.F.1
+        Ntrans = 0.00001 * (activeN * ((1 / FracN) - 1) - stableN)
+
+        layer.activeN -= Ntrans
+        layer.stableN += Ntrans
+
+        layer.nTrans = Ntrans
+
+
+def added_manure_N(soil, weather, time):
+    totalN = weather.manureN[time.year - 1][time.day - 1]
+
+    activeN = totalN * 0.875
+    stableN = totalN * 0.125
+
+    soil.listOfSoilLayers[0].activeN += activeN
+    soil.listOfSoilLayers[0].stableN += stableN

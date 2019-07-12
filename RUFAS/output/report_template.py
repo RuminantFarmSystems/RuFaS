@@ -1,10 +1,10 @@
 ################################################################################
-'''
+"""
 RUFAS: Ruminant Farm Systems Model
 File name: report_template.py
 Description: Gives users an idea of how to create a report in RUFAS
 Author(s): Kass Chupongstimun, kass_c@hotmail.com
-'''
+"""
 ################################################################################
 
 from pathlib import Path
@@ -14,7 +14,7 @@ from RUFAS.output.report_handler import BaseReportHandler
 # Class: Report Template
 #-------------------------------------------------------------------------------
 class ReportTemplate(BaseReportHandler):
-    '''This serves as an example of how to print out a report in RUFAS.
+    """This serves as an example of how to print out a report in RUFAS.
 
     * All code here is only for mocking, adding this report to the output
       handler will cause runtime errors
@@ -62,10 +62,10 @@ class ReportTemplate(BaseReportHandler):
     8) Add an instance of this report handler to the "reports" dictionary in
        the output handler object. Don't forget to also give the input json
        file the data for this report in the outputs section.
-    '''
+    """
 
     def __init__(self, data):
-        ''' Initializes an instace of the report handler.
+        """ Initializes an instace of the report handler.
 
         data contains:
             {
@@ -73,7 +73,7 @@ class ReportTemplate(BaseReportHandler):
                 "report_name": name of the report,
                 "file_name": file name of the report
             }
-        '''
+        """
 
         #
         # Sets active, report_name, f_name using data
@@ -102,7 +102,7 @@ class ReportTemplate(BaseReportHandler):
     # Method: initialize
     #---------------------------------------------------------------------------
     def initialize(self, state):
-        '''Transfers the needed data from state object to the report handler.'''
+        """Transfers the needed data from state object to the report handler."""
 
         self.units = [state.dummy_object.units]
         self.num_values = [state.dummy_object.some_list.length]
@@ -111,7 +111,7 @@ class ReportTemplate(BaseReportHandler):
     # Method: daily_update
     #---------------------------------------------------------------------------
     def daily_update(self, state, weather, time):
-        '''Stores the daily values that need to be printed in the report.'''
+        """Stores the daily values that need to be printed in the report."""
 
         d = time.day
         dummy_object = state.dummy_object
@@ -124,7 +124,7 @@ class ReportTemplate(BaseReportHandler):
     # Method: annual_update
     #---------------------------------------------------------------------------
     def annual_update(self, state, weather, time):
-        '''Stores the yearly values that need to be printed in the report.'''
+        """Stores the yearly values that need to be printed in the report."""
 
         dummy_object = state.dummy_object
 
@@ -138,7 +138,7 @@ class ReportTemplate(BaseReportHandler):
     # Method: write_annual_report
     #---------------------------------------------------------------------------
     def write_annual_report(self, y):
-        '''Appends the annual report to the output file.'''
+        """Appends the annual report to the output file."""
 
         mode = 'a+' if self.get_fPath().exists() else 'w+'
 
@@ -153,7 +153,7 @@ class ReportTemplate(BaseReportHandler):
     # Method: annual_flush
     #---------------------------------------------------------------------------
     def annual_flush(self):
-        '''Sets all of the values in the output object to the default value.'''
+        """Sets all of the values in the output object to the default value."""
 
         self.sample_daily_output_1 = [None]*366
         self.sample_daily_output_2 = [None]*366
