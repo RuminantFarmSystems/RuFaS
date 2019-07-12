@@ -60,6 +60,7 @@ CropType values updated by update_all():
 ###############################################################################
 from math import exp
 
+
 #
 # Runs all the yield calculations
 #
