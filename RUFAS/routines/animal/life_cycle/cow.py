@@ -2,6 +2,7 @@
 RUFAS: Ruminant Farm Systems Model
 File name: cow.py
 Author(s): Manfei Li, mli497@wisc.edu
+		   Militsa Sotirova, militsasotirova@gmail.com
 Description: This file updates the cow form first calving to leaving the herd.
 			Temp: Body weight change uses equations for lactation cows (decrease for the first 50 days and increase later on)
 			Temp: Dry matter intake is calculated by body weight and FCM production.

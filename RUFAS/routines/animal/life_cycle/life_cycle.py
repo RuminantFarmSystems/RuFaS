@@ -1,3 +1,11 @@
+################################################################################
+'''
+RUFAS: Ruminant Farm Systems Model
+File name: life_cycle.py
+Description: The class which manages the life cycle of the animals.
+Author(s): Militsa Sotirova, militsasotirova@gmail.com
+'''
+################################################################################
 from RUFAS.routines.animal.life_cycle.calf import Calf
 from RUFAS.routines.animal.life_cycle.heiferI import HeiferI
 from RUFAS.routines.animal.life_cycle.heiferII import HeiferII
@@ -69,9 +77,24 @@ class LifeCycleManager():
     herd_num = 0
     
     def __init__(self, data):
+        '''
+        Initializes the necessary configuration data.
+        '''
         self.config = data        
     
     def initialize_herd(self, herd_num, calf_num, heiferI_num, heiferII_num, heiferIII_num, cow_num, replace_num, sim_days=1500):
+        '''
+        Generates a replacement herd to simulate the market, for the herd to get replacements. Initializes the herd.
+        Args:
+            herd_num: what the number of cows should be maintained at
+            calf_num: the number of calves to start the simulation with
+            heiferI_num: the number of heiferIs to start the simulation with
+            heiferII_num: the number of heiferIIs to start the simulation with
+            heiferIII_num: the number of heiferIIIs to start the simulation with
+            cow_num: the number of cows to start the simulation with
+            replace_num: replacements in the market
+            sim_days: simulation length of this herd, to make sure they reach to the heiferIII stage
+        '''
         self.herd_num = herd_num
         
         calves = []
@@ -172,6 +195,12 @@ class LifeCycleManager():
         self.replacement_market = cows
     
     def daily_update(self, date, sim_length):
+        '''
+        Updates the status of the animals.
+        Args:
+            date: day number
+            sim_length: length of the simulation, days
+        '''
         # record the last days stats
         daily_cow_cull_num = 0
         daily_heifer_sold = 0
@@ -352,6 +381,9 @@ class LifeCycleManager():
     
         
     def output_end_stats(self):
+        '''
+        End of simulation statistics.
+        '''
         parity_lst = [cow._calves if cow._calves <= 2 else '3+' for cow in cows ]
         parity_count_tuple = Counter(parity_lst)
         avg_service_rate = self.service_rate_sum_21_days / float(self.config["num_21_days"]) * 21.0
@@ -413,7 +445,10 @@ class LifeCycleManager():
         cows[150].draw_curves()
     
     
-    def draw_stat(self, sim_length):    
+    def draw_stat(self, sim_length): 
+        '''
+        Plots the ending statistics of the simulation.
+        '''   
         fig = plt.figure()
         x = [date for date in range(sim_length)]
     

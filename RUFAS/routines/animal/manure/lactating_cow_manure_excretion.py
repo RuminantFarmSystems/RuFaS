@@ -1,13 +1,12 @@
 ################################################################################
 '''
 RUFAS: Ruminant Farm Systems Model
-File name: manure_excretion.py
+File name: lactating_cow_manure_excretion.py
 Description: Determines manure excretion with information from the ration formulation, 
                 outputs used by the manure module.
 Author(s): Militsa Sotirova, militsasotirova@gmail.com
 '''
 ################################################################################
-
 
 def manure_calculations(ration_formulation, feed, BW, DIM, mPrt):
     '''
@@ -143,26 +142,3 @@ def manure_calculations(ration_formulation, feed, BW, DIM, mPrt):
             "Mkg": Mkg, 
             "VSd": VSd, 
             "VSnd": VSnd}
-
-
-def test_manure(feed):
-    ration_formulation = {    
-                'Corn_grain': 0,
-                'Legume_hay': 13.5588,
-                'Cotton_seed': 6.3620,
-                'Roasted_soybean': 2.3964,
-                'Rye_hay': 0,
-                'status': 'Optimal',
-                'objective': 4.5756
-            }
-    BW = 650
-    DIM = 100
-    mPrt = 3.2
-    manure_contents = manure_calculations(ration_formulation, feed, BW, DIM, mPrt)
-    print('U = ', manure_contents["U"], '\t expected: ', 0.340)
-    print('TAN_s = ', manure_contents["TAN_s"], '\t expected: ', 0.14)
-    print('MN = ', manure_contents["MN"], '\t expected: ', 532.407)
-    print('Mkg = ', manure_contents["Mkg"], '\t expected: ', 70.792)
-    print('VSd = ', manure_contents["VSd"], '\t expected: ', 7087.413)
-    print('VSnd = ', manure_contents["VSnd"], '\t expected: ', 859.390)
-    print()

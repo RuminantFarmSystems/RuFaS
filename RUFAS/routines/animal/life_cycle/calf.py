@@ -2,6 +2,7 @@
 RUFAS: Ruminant Farm Systems Model
 File name: calf.py
 Author(s): Manfei Li, mli497@wisc.edu
+		   Militsa Sotirova, militsasotirova@gmail.com
 Description: This file updates the calf form birth to wean.
 			Birth weight initialized with breed specific distributions,
 			Gender determined with the semen type used,

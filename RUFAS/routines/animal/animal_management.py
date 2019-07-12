@@ -13,6 +13,7 @@ from RUFAS.routines.animal.life_cycle.animal_base import AnimalBase
 
 count = 0
 
+
 def daily_animal_routine(animal_management, feed, weather, time):
     '''Executes daily routines relating to Animals.
 
@@ -27,8 +28,10 @@ def daily_animal_routine(animal_management, feed, weather, time):
     print('day', count)
     count += 1
 
+
 def daily_animal_update(animal, weather, time):
     pass
+
 
 class AnimalManagement:
     # list of all the animals in the simulations
@@ -41,14 +44,18 @@ class AnimalManagement:
     # list of all the pens on the farm
     all_pens = []
         
+    # simulation length, days
     sim_length = -1
     
+    # instance of LifeCycleManager class
     life_cycle_manager = None
         
+    # housing type: barn or pasture
     housing = ""
     
     ration_user_input = False
     
+    # how often a ration is calculated, days
     formulation_interval = 0
     
     def __init__(self, data, config):
@@ -97,7 +104,6 @@ class AnimalManagement:
         cow_num = data['cow_num']
         replace_num = data['replace_num']
         herd_num = data['herd_num']
-        # TODO: get number of simulation days from initiation?
         self.life_cycle_manager.initialize_herd(herd_num, calf_num, heiferI_num, heiferII_num, heiferIII_num, cow_num, replace_num)
         self.calves = self.life_cycle_manager.calves
         self.heiferIs = self.life_cycle_manager.heiferIs
@@ -108,8 +114,12 @@ class AnimalManagement:
         self.pen_allocation()
         
     def init_nutrient_rqmts(self):
-        #average vertical & horizontal distance (VD, HD) of pens to milking parlor
+        '''
+        Calculates initial nutrient requirements at the beginning of the simulation for initial pen allocation.
+        '''
+        # average vertical & horizontal distance (VD, HD) of pens to milking parlor
         avg_VD_parlor, avg_HD_parlor = self.avg_pen_dist()
+        print(avg_VD_parlor, avg_HD_parlor)
         
         for calf in self.calves:
             calf.calc_nutrient_rqmts()
@@ -124,13 +134,20 @@ class AnimalManagement:
             heiferIII.calc_nutrient_rqmts()
             
         for cow in self.cows:
+            #uses average distances from pens to milking parlor
             cow.calc_init_nutrient_rqmts(avg_VD_parlor, avg_HD_parlor)
     
     def avg_pen_dist(self):
-        #vertical distance
+        '''
+        Calculates the average distance from a pen to the milking parlor.
+        Returns:
+            average vertical distance from milking parlor
+            average horizontal distance from milking parlor
+        '''
+        # vertical distance
         VD_sum = 0
         
-        #horizontal distance
+        # horizontal distance
         HD_sum = 0
         for pen in self.all_pens:
             VD_sum += pen.vertical_dist_to_parlor
@@ -161,7 +178,7 @@ class AnimalManagement:
         '''
         Removes animals from pens for re-allocation.
         '''
-        for pen in all_pens:
+        for pen in self.all_pens:
             pen.clear()
       
     def calc_avg_nutrient_rqmts(self):
@@ -187,13 +204,6 @@ class AnimalManagement:
         for pen in self.all_pens:
             pen.calc_manure(feed)
     
-    def calc_avg_milk(self):
-        '''
-        Calls each pen's method to calculate the average milk production of animals in the pen. 
-        '''
-        for pen in self.all_pens:
-            pen.calc_avg_milk()
-    
     def calc_avg_growth(self):
         '''
         Calls each pen's method to calculate the average growth of animals in the pen. 
@@ -206,22 +216,20 @@ class AnimalManagement:
         Executes daily routines relating to Animals.
         Args:
             feed : instance of the Feed class
-            weather : instance of the Weather class
             time : instance of the Time class
         '''
         self.life_cycle_manager.daily_update(time.day, self.sim_length)
         
         if self.end_ration_interval(time.day):
+            self.clear_pens()
             self.calc_nutrient_rqmts()  # per animal
             self.pen_allocation()
             self.calc_avg_nutrient_rqmts()  # per pen
             self.calc_ration(feed)  # per pen
             self.calc_manure_excretion(feed)  # per pen
-            self.calc_avg_milk()  # per pen
             self.calc_avg_growth()  # per pen
             
         # other daily actions
-        
         
     def end_ration_interval(self, day):
         '''Checks whether it is the day to formulate a new ration.

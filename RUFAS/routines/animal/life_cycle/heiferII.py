@@ -2,6 +2,7 @@
 RUFAS: Ruminant Farm Systems Model
 File name: heiferII.py
 Author(s): Manfei Li, mli497@wisc.edu
+	       Militsa Sotirova, militsasotirova@gmail.com
 Description: This file updates the heifer form breeding to close to calving.
 			Body weight gain with user input average daily gain,
 			once mature body weight or grow end day reached, grow stop.

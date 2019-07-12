@@ -2,6 +2,7 @@
 RUFAS: Ruminant Farm Systems Model
 File name: heiferI.py
 Author(s): Manfei Li, mli497@wisc.edu
+	       Militsa Sotirova, militsasotirova@gmail.com
 Description: This file updates the heifer form wean to start breeding.
 			Body weight gain with user input heifer average daily gain.
 			TODO: Body weight changed could be based on nutrition intake later fron Ration Formulation

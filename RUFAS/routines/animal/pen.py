@@ -8,15 +8,16 @@ Author(s): Militsa Sotirova, militsasotirova@gmail.com
 ################################################################################
 from RUFAS.routines.animal.ration.lactating_cow_ration import optimize, set_globals
 
+
 class Pen:
     # unique pen ID, from input file
     id = -1
     
     # list of all animals in this pen
     animals_in_pen = []
-    # TODO: maybe put checks to see if there are no animals in pen? (division by len(animals_in_pen))
+    # TODO: put checks to see if there are no animals in pen? (division by len(animals_in_pen))
     
-    # list of all the classes to which the animals in the pen belong to
+    # set (no repeats) of all the classes to which the animals in the pen belong to
     classes_in_pen = set()
     
     # vertical distance to milking parlor, km, from input file
@@ -40,13 +41,22 @@ class Pen:
     # freestall or tiestall, from input file
     pen_type = "" 
     
-    # average nutrient requirements of the animals in the pen
+    # average nutrient requirements of the animals in the pen, used for ration formulation
     avg_nutrient_rqmts = {}
     
+    # average body weight of the animals in the pen, used for ration formulation
     avg_BW = 0
+    
+    # average dry matter intake estimation of the animals in the pen, used for ration formulation
     avg_DMIest = 0
+    
+    # average change in (delta) body weight of the animals in the pen, used for ration formulation
     avg_DBW = 0
+    
+    # average milk production of the animals in the pen, used for (lactating cow) ration formulation
     avg_milk = 0
+    
+    # average milk crude protein content of the animals in the pen, used for (lactating cow) ration formulation
     avg_CP_milk = 0
     
     # ration for all the animals in the pen
@@ -54,9 +64,6 @@ class Pen:
     
     # total manure excretion of the animals in the pen
     manure = {}
-    
-    # average milk production of the animals in the pen
-    avg_milk_production = 0
     
     # average growth of the animals in the pen
     avg_growth = 0
@@ -75,26 +82,31 @@ class Pen:
     
     def update_animals(self, new_animals):
         '''
-        Sets the list of animals to @new_animals and calculates the stocking density and each animal's walking distance.
+        Sets the list of animals to new_animals and calculates the stocking density and each animal's walking distance.
         Args:
             new_animals: list of new animals in the pen
         '''
         self.animals_in_pen = new_animals
         self.stocking_density = len(self.animals_in_pen) / self.num_stalls * 100 
         self.calc_daily_walking_dist()
+        
+        # sets the current animal classes in the pen
         for animal in self.animals_in_pen:
             stage = type(animal).__name__
             self.classes_in_pen.add(stage)
+        print(self.classes_in_pen)
             
     def call_animal_nutrient_rqmts(self):
+        '''
+        Calls each animal's nutrient requirement calculation methods.
+        '''
         for animal in self.animals_in_pen:
             animal.calc_nutrient_rqmts()
     
     def calc_avg_nutrient_rqmts(self):
         '''
-        Finds the average nutrient requirements of the animals in the pen.
+        Finds the average nutrient requirements and necessary ration stats of the animals in the pen.
         '''
-        print('should be calves:', len(self.animals_in_pen))
         first_animal_rqmts = self.animals_in_pen[0]._nutrient_rqmts
         sum_dict = {}
         for key in first_animal_rqmts.keys():
@@ -106,9 +118,10 @@ class Pen:
         sum_milk = 0
         sum_CP_milk = 0
         
-        # find sums of nutrients for each animal in the pen
+        # find sums of nutrients and necessary ration stats for each animal in the pen
         for animal in self.animals_in_pen:
             curr_rqmts = animal._nutrient_rqmts
+            print(curr_rqmts)
             for key in sum_dict.keys():
                 sum_dict[key] += curr_rqmts[key]['val']
             
@@ -119,7 +132,7 @@ class Pen:
                 sum_milk += animal._estimated_daily_milk_produced
                 sum_CP_milk += animal._CP_milk
                 
-        # divide by number of animals to find average
+        # divide by number of animals to find averages
         num_animals = len(self.animals_in_pen)
         for key in sum_dict:
             avg_value = sum_dict[key] / num_animals
@@ -137,14 +150,15 @@ class Pen:
         Args:
             feed: instance of the Feed class, used to determine characteristics of available feeds
         '''
+        # sets ration's necessary fields for ration formulation calculation
         set_globals(self.avg_DMIest, self.avg_BW, self.avg_DBW, self.avg_milk, self.avg_CP_milk)
         ration_per_animal = optimize(feed, self.avg_nutrient_rqmts)
-        #while(ration_per_animal['status'] != 'Optimal'):
-            # TODO: recalculate with milk production reduced by 0.5 kg
+        # TODO: if infeasible, recalculate with milk production reduced by 0.5 kg
         
         for animal in self.animals_in_pen:
             animal.set_ration(ration_per_animal)
             
+        # set ration for whole pen by multiplying calculated ration by number of animals in the pen
         num_animals = len(self.animals_in_pen)
         for key in ration_per_animal:
             if (key == 'status'):
@@ -160,25 +174,16 @@ class Pen:
         for animal in self.animals_in_pen:
             animal.calc_manure_excretion(feed)
         
+        #obtain keys of manure composition calculations
         first_animal_manure = self.animals_in_pen[0]._manure_excretion
         for key in first_animal_manure.keys():
             self.manure[key] = 0
         
-        # find sums of nutrients for each animal in the pen
+        # find sums of manure components for each animal in the pen for total manure in pen
         for animal in self.animals_in_pen:
             curr_manure = animal._manure_excretion
             for key in self.manure.keys():
                 self.manure[key] += curr_manure[key]
-    
-    def calc_avg_milk(self):
-        '''
-        Calculates the average milk production of the animals in the pen.
-        '''
-        sum = 0
-        for animal in self.animals_in_pen:
-            if type(animal).__name__ == 'Cow':
-                sum += animal._estimated_daily_milk_produced
-        self.avg_milk_production = sum / len(self.animals_in_pen)
     
     def calc_avg_growth(self):
         '''
@@ -191,7 +196,7 @@ class Pen:
         
     def calc_daily_walking_dist(self):
         '''
-        Sets each animal's daily walking distance.
+        Sets the daily walking distance for cows.
         '''
         if 'Cow' in self.classes_in_pen:
             for animal in self.animals_in_pen:
@@ -203,3 +208,14 @@ class Pen:
         Clears the pen for re-allocation.
         '''
         self.animals_in_pen = []
+        self.classes_in_pen = set()
+        self.stocking_density = 0
+        self.avg_nutrient_rqmts = {}
+        self.avg_BW = 0
+        self.avg_DMIest = 0
+        self.avg_DBW = 0
+        self.avg_milk = 0
+        self.avg_CP_milk = 0
+        self.daily_ration = {}
+        self.manure = {}
+        self.avg_growth = 0

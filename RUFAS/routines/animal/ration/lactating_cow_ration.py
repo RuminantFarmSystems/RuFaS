@@ -1,8 +1,8 @@
 ################################################################################
 """
 RUFAS: Ruminant Farm Systems Model
-File name: ration.py
-Description:
+File name: lactating_cow_ration.py
+Description: Calculates the ration for lactating cows.
 Author(s): Kass Chupongstimun, kass_c@hotmail.com
            Militsa Sotirova, militsasotirova@gmail.com
 """
@@ -23,6 +23,15 @@ global_milk = -1
 global_CP_Milk = -1
 
 def set_globals(DMIest, BW, DBW, milk, CP_milk):
+    """
+    Sets the global variables with averages from pen.
+    Args:
+        DMIest: dry matter intake estimation, kg
+        BW: body weight, kg
+        DBW: Body weight change (delta body weight = DBW), kg
+        milk: milk production, kg
+        CP_Milk: milk crude protein content
+    """
     global global_BW
     global global_DMIest
     global global_DBW
@@ -110,7 +119,6 @@ def optimize(feed, rqmts):
     return util.LP_solve(LHS, RHS, objective, var_names, operators, "minimize", "RATION", lower_bounds, upper_bounds)
 
 
-
 def calculate_rqmts(BW, BCS, CBW, CI, concentrate, CP_Milk, DOP, DHD, DVD,
                         DIM, fat_milk, lactose_milk, milk, parity, type, nutrients_list):
     """
@@ -137,16 +145,11 @@ def calculate_rqmts(BW, BCS, CBW, CI, concentrate, CP_Milk, DOP, DHD, DVD,
 
     Returns:
         dict : a dictionary that represents the dietary requirements of the cows,
-
             where the left hand side is nutrients_list and the right hand side is
             calculated in this method
+        DMIest: dry matter intake estimation, kg
+        DBW: Body weight change (delta body weight = DBW), kg
 	"""
-
-    # Since the following variables represent percentages, they are multiplied by 0.01
-    # CP_Milk = percentage(CP_Milk)
-    # fat_milk = percentage(fat_milk)
-    # lactose_milk = percentage(lactose_milk)
-    
     # Sets these variables as global. See comment at the beginning of this file for further details.
     global global_BW
     global global_DMIest

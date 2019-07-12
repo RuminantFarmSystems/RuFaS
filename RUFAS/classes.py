@@ -228,6 +228,9 @@ class Config:
         self.output_dir = data['output_dir']
 
     def calc_sim_length(self, leap_year_length, year_length):
+        '''
+        Calculates and returns the length of the simulation in days.
+        '''
         sim_length = 0
         for i in range(len(self.years)):
             if i == 0:
