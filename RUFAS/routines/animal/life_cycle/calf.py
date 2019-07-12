@@ -102,8 +102,8 @@ class Calf(AnimalBase):
 		
 	'''
 		Description:
-			controls calf's grow with average daily gain based on user's input untill wean day
-			caculate the wean weight at wean day
+			controls calf's grow with average daily gain based on user's input until wean day
+			calculate the wean weight at wean day
 			here is the place to change growth rate with calf feeding methods later when we have calf nutrition from the ration furmulation module
 		Input:
 		Output:
