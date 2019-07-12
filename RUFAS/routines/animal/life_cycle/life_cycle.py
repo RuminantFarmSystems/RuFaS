@@ -3,7 +3,8 @@
 RUFAS: Ruminant Farm Systems Model
 File name: life_cycle.py
 Description: The class which manages the life cycle of the animals.
-Author(s): Militsa Sotirova, militsasotirova@gmail.com
+Author(s): Manfei Li, mli497@wisc.edu
+           Militsa Sotirova, militsasotirova@gmail.com
 '''
 ################################################################################
 from RUFAS.routines.animal.life_cycle.calf import Calf

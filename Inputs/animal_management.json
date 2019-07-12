@@ -377,7 +377,7 @@
 	        	
 	        	"pen2":
 	        	{
-	        		"id": 0,
+	        		"id": 2,
 	        		"vertical_dist_to_milking_parlor": 15,
 	        		"horizontal_dist_to_milking_parlor": 15,
 	        		"number_of_stalls": 300,
@@ -388,7 +388,7 @@
 	        	
 	        	"pen3":
 	        	{
-	        		"id": 0,
+	        		"id": 3,
 	        		"vertical_dist_to_milking_parlor": 20,
 	        		"horizontal_dist_to_milking_parlor": 20,
 	        		"number_of_stalls": 400,
@@ -399,7 +399,7 @@
 	        	
 	        	"pen4":
 	        	{
-	        		"id": 0,
+	        		"id": 4,
 	        		"vertical_dist_to_milking_parlor": 20,
 	        		"horizontal_dist_to_milking_parlor": 20,
 	        		"number_of_stalls": 400,
