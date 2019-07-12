@@ -38,7 +38,7 @@ class State:
 
     def __init__(self, data, config):
         self.soil = Soil(data['soil'], config)
-        self.animal_management = AnimalManagement(data['animal'])
+        self.animal_management = AnimalManagement(data['animal'], config)
         self.feed = Feed(data['feed'])
         self.crop = Crop(data['crop'])
 
@@ -223,10 +223,24 @@ class Config:
                     days = [_ for _ in range(1, year_length + 1)]
 
             self.years.append(days)
-
+        
+        self.sim_length = self.calc_sim_length(leap_year_length, year_length)
         self.output_dir = data['output_dir']
 
-
+    def calc_sim_length(self, leap_year_length, year_length):
+        sim_length = 0
+        for i in range(len(self.years)):
+            if i == 0:
+                #check for +-1
+                if is_leap_year(self.start_year):
+                    sim_length += leap_year_length - self.day
+                else:
+                    sim_length += year_length - self.start_day
+            else:
+                sim_length += len(self.years[i])
+                
+        return sim_length + 1
+    
 # -------------------------------------------------------------------------------
 # Class: Weather
 # -------------------------------------------------------------------------------

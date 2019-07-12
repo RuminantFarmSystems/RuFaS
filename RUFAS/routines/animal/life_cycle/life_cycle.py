@@ -323,15 +323,9 @@ class LifeCycleManager():
                     self.total_calf_value += self.config["calf_price"]
     
             # calculate reproduction indications
-            print()
-            print(date)
-            print(sim_length - 21 * self.config["num_21_days"])
             if date >= sim_length - 21 * self.config["num_21_days"]:
                 if cow._ai_day == cow._days_born:
                     self.num_ai_21_days += 1
-                print(cow._days_in_milk)
-                print(self.config["vwp"])
-                print(not cow._preg)
                 if cow._days_in_milk > self.config["vwp"] and not cow._preg:
                     self.num_cow_btw_vwp_preg_21_days += 1
                 if cow._days_in_preg == 1:

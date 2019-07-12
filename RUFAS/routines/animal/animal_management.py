@@ -51,12 +51,13 @@ class AnimalManagement:
     
     formulation_interval = 0
     
-    def __init__(self, data):
+    def __init__(self, data, config):
         '''
         Initializes the pens and animals in the simulation with data from the json file.
         Args:
             data: dictionary with the animal information from the input json file
         '''
+        self.sim_length = config.sim_length
         self.life_cycle_manager = LifeCycleManager(data['animal_config'])
         AnimalBase.set_config(data['animal_config'])
         self.init_pens(data['pen_information'])
@@ -149,6 +150,7 @@ class AnimalManagement:
         Allocates the animals in all_animals to pens in all_pens based on the animals' characteristics.
         TEMPORARY HARD-CODE FOR TESTING PURPOSES.
         '''
+        print('calves:', len(self.calves))
         self.all_pens[0].update_animals(self.calves)
         self.all_pens[1].update_animals(self.heiferIs)
         self.all_pens[2].update_animals(self.heiferIIs)
@@ -207,7 +209,6 @@ class AnimalManagement:
             weather : instance of the Weather class
             time : instance of the Time class
         '''
-        print('sim length', self.sim_length)
         self.life_cycle_manager.daily_update(time.day, self.sim_length)
         
         if self.end_ration_interval(time.day):
@@ -232,6 +233,4 @@ class AnimalManagement:
         return (day % self.formulation_interval) == 1 or self.formulation_interval == 1
     
     def annual_reset(self):
-        #TODO: Add DocString
-
         pass

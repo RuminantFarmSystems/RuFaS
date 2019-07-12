@@ -94,6 +94,7 @@ class Pen:
         '''
         Finds the average nutrient requirements of the animals in the pen.
         '''
+        print('should be calves:', len(self.animals_in_pen))
         first_animal_rqmts = self.animals_in_pen[0]._nutrient_rqmts
         sum_dict = {}
         for key in first_animal_rqmts.keys():

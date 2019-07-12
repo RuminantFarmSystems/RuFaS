@@ -3,12 +3,12 @@
 
     "config":
     {
-        "StartYear" : 2008,
-        "EndYear" : 2009,
+         "StartDate" : "2009:244",
+        "EndDate" : "2016:243",
         "output_dir": "Outputs/Sample_Farm_Outputs/"
     },
 
-    "weather": "Inputs/crop_module_testWeather_3.4.csv",
+    "weather": "Inputs/barnyard_weather.csv",
 
     "output":
     {
@@ -55,7 +55,6 @@
                 "harvest_eff": 0.9,
                 "HI_opt": 0.6,
                 "HI_min": 0.3,
-                "init_residue": 8000,
 
                 "min_temp_for_growth": 10,
                 "max_temp_for_growth": 30,
@@ -89,29 +88,24 @@
                 "fr,p2": 0.0018,
                 "fr,p3": 0.0014,
                 "fr,p~3": 0.00141,
-                "beta_p": 10,
-
-
-                "TESTING_Ea_sum" : [251.2544561385, 313.6495119524],
-                "TESTING_Eo_sum" : [329.6603213136, 372.2587849571],
-                "TEST_DATA" : "Inputs/TEST_INPUTS.csv"
+                "beta_p": 10
             }
         },
         "soil":
         {
             "ProfileDepth": 450,
-            "ProfileBulkDensity": 1.16525,
-            "CN2": 86.00,
+            "ProfileBulkDensity": 1.4,
+            "CN2": 85.00,
             "FieldSlope": 0.02,
-            "SlopeLength": 7,
+            "SlopeLength": 3,
             "Manning": 0.4,
             "FieldSize": 1.0,
-            "PracticeFactor": 0.25,
-            "Orgc": 1,
+            "PracticeFactor": 0.08,
+            "Orgc": 1.2,
             "Sand": 15,
             "Silt": 65,
             "SoilAlbedo": 0.16,
-            "Residue": 8000,
+            "initial_residue": 0,
             "FreshNMineralRate": 0.05,
             "SoilCoverType": "BARE",
 
@@ -121,63 +115,63 @@
                 {
                     "BottomDepth": 150,
                     "WiltingPoint": 0.1,
-                    "FieldCapacity": 0.33,
+                    "FieldCapacity": 0.30,
                     "Saturation": 0.5,
-                    "Ksat": 29.2,
+                    "Ksat": 20,
                     "CationExclusionFraction": 0.0,
-                    "Clay": 21,
-                    "InitialTemperature": -4.098,
-                    "BulkDensity": 1.23,
-                    "OrgC%": 2.0,
+                    "Clay": 20,
+                    "InitialTemperature": 15.77575,
+                    "BulkDensity": 1.4,
+                    "OrgC%": 1.2,
                     "NH4": 1,
                     "FracActiveN": 0.02,
                     "LabileP": 15,
-                    "ActiveMineralRate": 0.0001,
+                    "ActiveMineralRate": 0.0003,
                     "VolatileExchangeFac": 0.15,
-                    "DenitrificationRate": 0.01,
-                    "StartingSoilWater": 0.3,
+                    "DenitrificationRate": 0.05,
+                    "StartingSoilWater": 45,
                     "OM%": 1.9
                 },
                 "Layer2":
                 {
-                    "BottomDepth": 1000,
+                    "BottomDepth": 300,
                     "WiltingPoint": 0.1,
                     "FieldCapacity": 0.3,
                     "Saturation": 0.5,
-                    "Ksat": 13.2,
+                    "Ksat": 20,
                     "CationExclusionFraction": 0.0,
-                    "Clay": 33,
-                    "InitialTemperature": -1.978,
-                    "BulkDensity": 1.16,
-                    "OrgC%": 1,
+                    "Clay": 20,
+                    "InitialTemperature": 14.50797297,
+                    "BulkDensity": 1.4,
+                    "OrgC%": 1.2,
                     "NH4": 1,
                     "FracActiveN": 0.02,
                     "LabileP": 15,
-                    "ActiveMineralRate": 0.0001,
+                    "ActiveMineralRate": 0.0003,
                     "VolatileExchangeFac": 0.15,
-                    "DenitrificationRate": 0.01,
-                    "StartingSoilWater": 0.3,
+                    "DenitrificationRate": 0.05,
+                    "StartingSoilWater": 45,
                     "OM%": 1.9
                 },
                 "Layer3":
                 {
-                    "BottomDepth": 2000,
+                    "BottomDepth": 450,
                     "WiltingPoint": 0.1,
                     "FieldCapacity": 0.30,
                     "Saturation": 0.5,
                     "Ksat": 20,
                     "CationExclusionFraction": 0.0,
                     "Clay": 20,
-                    "InitialTemperature": 8,
-                    "BulkDensity": 1.8,
+                    "InitialTemperature": 13.38623,
+                    "BulkDensity": 1.4,
                     "OrgC%": 1.2,
                     "NH4": 1,
                     "FracActiveN": 0.02,
-                    "LabileP": 174,
-                    "ActiveMineralRate": 0.00005,
+                    "LabileP": 15,
+                    "ActiveMineralRate": 0.0003,
                     "VolatileExchangeFac": 0.15,
-                    "DenitrificationRate": 0.01,
-                    "StartingSoilWater": 0.3,
+                    "DenitrificationRate": 0.05,
+                    "StartingSoilWater": 45,
                     "OM%": 1.9
                 }
             },
@@ -255,7 +249,7 @@
 
             }
         },
-
+        
         "animal":
         {
             "herd_information":
