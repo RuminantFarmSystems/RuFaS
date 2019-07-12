@@ -182,10 +182,10 @@ def calc_act_water_uptake(crop_type, soil, adj_uptakes):
 
 
 def update_SW(soil):
-    soil.ET = 0
+    soil.ET_act = 0
     for layer in soil.listOfSoilLayers:
         WP = layer.wiltingWater
         layer.trans_act = min(layer.currentSoilWaterMM - WP, layer.trans_act)
         layer.currentSoilWaterMM -= layer.trans_act
-        soil.ET += (layer.layer_evap + layer.trans_act)
+        soil.ET_act += (layer.layer_evap + layer.trans_act)
 

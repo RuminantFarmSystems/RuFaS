@@ -67,7 +67,7 @@ class SoilSummary(BaseReportHandler):
             # 1) Initialize the header of the cvsfile
             fieldnames = ['Year', 'Julian Day', 'Rainfall', 'Runoff',
                           'Potential Evapotranspiration (ET_max)',
-                          'Actual Evapotranspiration (ET)',
+                          'Actual Evapotranspiration (ET_act)',
                           'Crop Transpiration (trans_max)',
                           'Maximum Sublimation (evap_max)']
 
@@ -99,7 +99,7 @@ class SoilSummary(BaseReportHandler):
             units = {'Year': '', 'Julian Day': '',
                              'Rainfall': "mm", 'Runoff': "mm",
                              'Potential Evapotranspiration (ET_max)': "mm d^-1",
-                             'Actual Evapotranspiration (ET)': "mm H2O",
+                             'Actual Evapotranspiration (ET_act)': "mm H2O",
                              'Crop Transpiration (trans_max)': "mm H2O",
                              'Maximum Sublimation (evap_max)': "mm H2O",
                              'Surface Temp': "C",
@@ -158,7 +158,7 @@ class SoilSummary(BaseReportHandler):
 
         self.runoff.append(soil.runoff)
         self.potentialEvapotranspiration.append(soil.ET_max)
-        self.ET_act.append(soil.ET)
+        self.ET_act.append(soil.ET_act)
         self.trans_max.append(soil.trans_max)
         self.sublimation.append(soil.evap_max)
 
@@ -213,7 +213,7 @@ class SoilSummary(BaseReportHandler):
                         str(round(self.runoff[x], 2)),
                     'Potential Evapotranspiration (ET_max)':
                         str(round(self.potentialEvapotranspiration[x], 3)),
-                    'Actual Evapotranspiration (ET)':
+                    'Actual Evapotranspiration (ET_act)':
                         str(round(self.ET_act[x], 3)),
                     'Crop Transpiration (trans_max)':
                         str(round(self.trans_max[x], 3)),

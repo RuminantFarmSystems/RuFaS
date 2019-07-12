@@ -287,7 +287,7 @@ class Soil:
         self.delta_SW = 0.0
         self.runoff = 0.0
         self.evap_sum = 0.0
-        self.trans = 0.0
+        self.trans_sum = 0.0
         self.drainage = 0.0
 
         self.p_act = 0.0
