@@ -31,6 +31,7 @@ class RationReport(BaseReportHandler):
         self.achieved_price = []
         self.feed_amounts = []
         self.milk_production_reduction = []
+        self.year = []
         self.julianDay = []
         #self.LP_text = ""
 
@@ -84,6 +85,7 @@ class RationReport(BaseReportHandler):
 
         day = time.day
         self.julianDay.append(day)
+        self.year.append(time.cal_year)
         # for each day that a ration is calculated, appends the necessary information to the lists
         if (day % self.ration_interval) == 1 or self.ration_interval == 1:
             animal = state.animal
@@ -116,7 +118,7 @@ class RationReport(BaseReportHandler):
             
                     rationData = {
                             'Year':
-                                str(y),
+                                str(self.year[i]),
                             'Julian Day':
                                 str(self.julianDay[i]),
                             'Achieved Total Price':
