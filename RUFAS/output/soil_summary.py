@@ -6,6 +6,7 @@
 #
 # Authors: Kass Chupongstimun
 #          Jit Patil
+#          William Donovan
 #
 ################################################################################
 
@@ -35,19 +36,21 @@ class SoilSummary(BaseReportHandler):
         self.precip = []
         self.runoff = []
         self.potentialEvapotranspiration = []
-        self.cropTranspiration = []
+        self.Ea_actual = []
+        self.Et_max = []
         self.sublimation = []
         self.surfaceTemp = []
         self.sedimentYield = []
         self.numSoilLayers = 0
 
+        self.layers_Et_actual = []
         self.layersSoilWater = []
         self.layersEsoil = []
         self.layersPerc = []
         self.layersTemperature = []
 
     #---------------------------------------------------------------------------
-    # Function: get_header
+    # Function: write_header
     #           Writes the header (title and units) in the csvfile
     #---------------------------------------------------------------------------
     def write_header(self):
@@ -59,8 +62,12 @@ class SoilSummary(BaseReportHandler):
             # 1) Initialize the header of the cvsfile
             fieldnames = ['Year', 'Julian Day', 'Rainfall', 'Runoff (Q)',
                           'Potential Evapotranspiration (E0)',
-                          'Crop Transpiration (Etrans)',
+                          'Actual Evapotranspiration (Ea)',
+                          'Crop Transpiration (Et_max)',
                           'Maximum Sublimation (Esoil)']
+
+            for x in range(0, self.numSoilLayers):
+                fieldnames.append("Et_actual/L" + str(x+1))
 
             for x in range(0, self.numSoilLayers):
                 fieldnames.append("SoilWater/L" + str(x+1))
@@ -78,20 +85,23 @@ class SoilSummary(BaseReportHandler):
             fieldnames.append("Sediment Yield")
 
             self.fieldNames = fieldnames
-            writer = csv.DictWriter(csvfile, fieldnames=fieldnames,
-                                    lineterminator = '\n')
+            writer = csv.DictWriter(csvfile, fieldnames=self.fieldNames,
+                                    lineterminator='\n')
             writer.writeheader()
 
             # 2) Write Units in 2nd row of cvsfile
             units = {'Year': '', 'Julian Day': '',
                              'Rainfall': "mm", 'Runoff (Q)': "mm",
                              'Potential Evapotranspiration (E0)': "mm d^-1",
-                             'Crop Transpiration (Etrans)': "mm H2O",
+                             'Actual Evapotranspiration (Ea)': "mm H2O",
+                             'Crop Transpiration (Et_max)': "mm H2O",
                              'Maximum Sublimation (Esoil)': "mm H2O",
                              'Surface Temp': "C",
                              'Sediment Yield': "metric tons"}
             for fieldname in fieldnames:
-                if fieldname.startswith("SoilWater"):
+                if fieldname.startswith("Et_actual"):
+                    units[fieldname] = 'mm H2O'
+                elif fieldname.startswith("SoilWater"):
                     units[fieldname] = 'mm'
                 elif fieldname.startswith("Esoil"):
                     units[fieldname] = 'mm H2O'
@@ -117,6 +127,7 @@ class SoilSummary(BaseReportHandler):
         self.numSoilLayers = len(soil.listOfSoilLayers)
 
         for _ in range (0, self.numSoilLayers):
+            self.layers_Et_actual.append([])
             self.layersSoilWater.append([])
             self.layersEsoil.append([])
             self.layersPerc.append([])
@@ -133,22 +144,22 @@ class SoilSummary(BaseReportHandler):
 
         soil = state.soil
 
-        rainfall = weather.rainfall[time.year-1][time.day-1]
-        day = time.day
-        year = time.year
-
-        self.year.append(year)
-        self.julianDay.append(day)
-        self.precip.append(rainfall)
+        self.year.append(time.cal_year)
+        self.julianDay.append(time.day)
+        self.precip.append(weather.rainfall[time.year-1][time.day-1])
 
         self.runoff.append(soil.runoff)
         self.potentialEvapotranspiration.append(soil.E0)
-        self.cropTranspiration.append(soil.Etrans)
+        self.Ea_actual.append(soil.Ea_sum)
+        self.Et_max.append(soil.Et_max)
         self.sublimation.append(soil.Esoil)
 
         for x in range(0, len(soil.listOfSoilLayers)):
+            self.layers_Et_actual[x].append(
+                                    soil.listOfSoilLayers[x].Et_actual)
+
             self.layersSoilWater[x].append(
-                soil.listOfSoilLayers[x].currentSoilWaterMM)
+                                    soil.listOfSoilLayers[x].currentSoilWaterMM)
 
             self.layersEsoil[x].append(
                                     soil.listOfSoilLayers[x].layerEsoil)
@@ -167,7 +178,7 @@ class SoilSummary(BaseReportHandler):
     # Method: annual_update
     #---------------------------------------------------------------------------
     def annual_update(self, state, weather, time):
-        '''Stores the yearly values that need to be printed in the report.'''
+        """Stores the yearly values that need to be printed in the report."""
         pass
 
     #---------------------------------------------------------------------------
@@ -179,10 +190,9 @@ class SoilSummary(BaseReportHandler):
 
         mode = 'a+' if self.get_fPath().exists() else 'w+'
 
-
         with self.get_fPath().open(mode) as csvfile:
 
-        # Write data day by day
+            # Write data day by day
             for x in range(0, len(self.julianDay)):
                 dailySoilData = {
                     'Year':
@@ -194,17 +204,21 @@ class SoilSummary(BaseReportHandler):
                     'Runoff (Q)':
                         str(round(self.runoff[x], 2)),
                     'Potential Evapotranspiration (E0)':
-                        str(round(self.potentialEvapotranspiration[x],3)),
-                    'Crop Transpiration (Etrans)':
-                        str(round(self.cropTranspiration[x],3)),
+                        str(round(self.potentialEvapotranspiration[x], 3)),
+                    'Actual Evapotranspiration (Ea)':
+                        str(round(self.Ea_actual[x], 3)),
+                    'Crop Transpiration (Et_max)':
+                        str(round(self.Et_max[x], 3)),
                     'Maximum Sublimation (Esoil)':
-                        str(round(self.sublimation[x],3)),
+                        str(round(self.sublimation[x], 3)),
                     'Surface Temp':
-                        str(round(self.surfaceTemp[x],3)),
+                        str(round(self.surfaceTemp[x], 3)),
                     'Sediment Yield':
-                        str(round(self.sedimentYield[x],3))}
+                        str(round(self.sedimentYield[x], 3))}
 
                 for y in range(0, self.numSoilLayers):
+                    dailySoilData["Et_actual/L" + str(y+1)] = str(
+                        round(self.layers_Et_actual[y][x], 3))
                     dailySoilData["SoilWater/L" + str(y+1)] = str(
                         round(self.layersSoilWater[y][x], 3))
                     dailySoilData["Esoil/L" + str(y+1)] = str(
@@ -215,7 +229,7 @@ class SoilSummary(BaseReportHandler):
                         round(self.layersTemperature[y][x], 3))
 
                 writer = csv.DictWriter(csvfile, fieldnames=self.fieldNames,
-                                    lineterminator = '\n')
+                                        lineterminator='\n')
                 writer.writerow(dailySoilData)
 
     #---------------------------------------------------------------------------
@@ -230,10 +244,12 @@ class SoilSummary(BaseReportHandler):
 
         self.runoff = []
         self.potentialEvapotranspiration = []
-        self.cropTranspiration = []
+        self.Ea_actual = []
+        self.Et_max = []
         self.sublimation = []
 
         for x in range(0, self.numSoilLayers):
+            self.layers_Et_actual[x] = []
             self.layersSoilWater[x] = []
             self.layersEsoil[x] = []
             self.layersPerc[x] = []
