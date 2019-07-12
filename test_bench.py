@@ -1,11 +1,11 @@
 ################################################################################
-'''
+"""
 RUFAS: Ruminant Farm Systems Model
 File name: test_bench.py
 Description:
 Author(s): Kass Chupongstimun, kass_c@hotmail.com
            Jit Patil, spatil5@wisc.edu
-'''
+"""
 ################################################################################
 
 #!/usr/bin/env python3

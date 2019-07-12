@@ -1,4 +1,4 @@
-'''
+"""
 RUFAS: Ruminant Farm Systems Model
 
 File name: heat_units.py
@@ -41,15 +41,15 @@ CropType attribute definitions:
 
     fr_PHU = Fraction of PHU accumulated including today
 
-
 CropType values updated by calling calculate_frPHU():
 
     prev_accumulated_HU
     accumulated_HU
     prev_fr_PHU
     fr_PHU
-'''
+"""
 ################################################################################
+
 
 #
 # This function calls the functions necessary to update the current heat unit
@@ -62,30 +62,29 @@ def update_all(crop_type, T_min, T_max, time):
 #
 # This function calculates the fraction of PHU accumulated up to and including
 # today. The equations used for this part can be found in
-# "Pseudo code_SC_maxdeltabio_1.0.docx" section 1.B and 1.C
+# "pseudocode_crop" C.2.B.1
 #
 def calculate_frPHU(crop_type, T_min, T_max, time):
-    #
-    # Part 1B of Crop Biomass pseudocode
-    #
+
     T_HU_min = calc_T_HU_min(crop_type, T_min)
     T_HU_max = calc_T_HU_max(crop_type, T_max)
     HU = calc_HU(crop_type, T_HU_min, T_HU_max)
 
     crop_type.prev_accumulated_HU = crop_type.accumulated_HU
 
-    if time.day >= crop_type.planting_date:
+    if time.day >= crop_type.start_date:
         crop_type.accumulated_HU += HU
 
     crop_type.prev_fr_PHU = crop_type.fr_PHU
 
     # Calculate accumulated fraction of potential Heat Units
+    # 2.B.1
     crop_type.fr_PHU = crop_type.accumulated_HU / crop_type.PHU
 
 
 #
 # Calculates minimum heat unit temperature on current day.
-# "Pseudo code_SC_maxdeltabio_1.0.docx" section 1.B.a
+# "pseudocode_crop" C.2.A.3
 #
 def calc_T_HU_min(crop_type, T_min):
     if T_min < crop_type.T_base_min:
@@ -96,7 +95,7 @@ def calc_T_HU_min(crop_type, T_min):
 
 #
 # Calculates maximum heat unit temperature on current day.
-# "Pseudo code_SC_maxdeltabio_1.0.docx" section 1.B.b
+# "pseudocode_crop" C.2.A.4
 #
 def calc_T_HU_max(crop_type, T_max):
     if T_max > crop_type.T_base_max:
@@ -107,12 +106,13 @@ def calc_T_HU_max(crop_type, T_max):
 
 #
 # Calculates available heat units on current day.
+# # "pseudocode_crop" C.2.A.1/2
 #
 def calc_HU(crop_type, T_HU_min, T_HU_max):
-    # "Pseudo code_SC_maxdeltabio_1.0.docx" section 1.B.1
+    # 2.A.2
     T_HU = (T_HU_min + T_HU_max) / 2
 
-    # "Pseudo code_SC_maxdeltabio_1.0.docx" section 1.B.2
+    # "pseudocode_crop" C.2.A.1
     if T_HU < crop_type.T_base_min:
         return 0.0
     else:

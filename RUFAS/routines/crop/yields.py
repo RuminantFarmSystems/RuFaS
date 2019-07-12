@@ -1,4 +1,4 @@
-'''
+"""
 RUFAS: Ruminant Farm Systems Model
 
 File name: yields.py
@@ -56,9 +56,10 @@ CropType values updated by update_all():
     yield_N
     yield_P
     residue
-'''
+"""
 ###############################################################################
 from math import exp
+
 
 #
 # Runs all the yield calculations
@@ -71,49 +72,48 @@ def update_all(crop_type, time, soil):
     calc_yield_max(crop_type, time)
     calc_yield_actual(crop_type)
     calc_nutrient_removal(crop_type)
-    calc_residue(crop_type, time)
+    calc_residue(crop_type, time, soil)
 
 
 #
 # Calculates water deficiency factor (AKA gamma_wu).
-# "Pseudo code_SC_actual growth and yield_1.0.docx" section 7.B.1
+# "pseudocode_crop" C.10.A.1
 #
 def calc_gamma_wu(crop_type, soil):
     if soil.E0_sum == 0:
         return 0
-    crop_type.gamma_wu = 100*(crop_type.Ea_sum/soil.E0_sum)
+    crop_type.gamma_wu = 100*(soil.Ea_sum/soil.E0_sum)
 
 
 #
 # Calculates max potential harvest index for a given day.
-# "Pseudo code_SC_crop yield_1.1.docx" section 5.1
+# "pseudocode_crop" C.10.B.1
 #
 def calc_HI_max(crop_type):
     top = 100 * crop_type.fr_PHU
-    bottom = 100 * crop_type.fr_PHU + exp(11.1 - 10*crop_type.fr_PHU)
+    bottom = 100 * crop_type.fr_PHU + exp(11.1 - (10 * crop_type.fr_PHU))
     crop_type.HI_max = crop_type.HI_opt * top / bottom
 
 
 #
 # Calculates aboveground biomass.
-# "Pseudo code_SC_crop yield_1.1.docx" section 5.2
+# "pseudocode_crop" C.10.C.1
 #
 def calc_bio_AG(crop_type):
-    crop_type.bio_AG = (1-crop_type.fr_root) * crop_type.biomass_actual
+    crop_type.bio_AG = (1 - crop_type.fr_root) * crop_type.biomass_actual
 
 
 #
 # Calculates the actual harvest index (AKA HI_actual).
-# "Pseudo code_SC_actual growth and yield_1.0.docx" section 7.B.2
+# "pseudocode_crop" C.10.D.1
 #
 def calc_HI_actual(crop_type, time):
-    inGrowingPeriod = crop_type.planting_date <= time.day <= crop_type.harvest_date
-    if not inGrowingPeriod:
+    in_growing_period = crop_type.start_date <= time.day <= crop_type.harvest_date
+    if not in_growing_period:
         crop_type.HI_actual = 0
     else:
         term1 = crop_type.HI_max - crop_type.HI_min
-
-        exp_part = exp(6.13 - 0.883*crop_type.gamma_wu)
+        exp_part = exp(6.13 - (0.883 * crop_type.gamma_wu))
         term2 = crop_type.gamma_wu / (crop_type.gamma_wu + exp_part)
 
         crop_type.HI_actual = term1 * term2 + crop_type.HI_min
@@ -121,26 +121,26 @@ def calc_HI_actual(crop_type, time):
 
 #
 # Calculates maximum crop yield at harvest.
-# "Pseudo code_SC_crop yield_1.1.docx" section 5.3
+# "pseudocode_crop" C.10.E.1
 #
 def calc_yield_max(crop_type, time):
     if time.day == crop_type.harvest_date:
-        crop_type.yield_max =  crop_type.bio_AG * crop_type.HI_actual
+        crop_type.yield_max = crop_type.bio_AG * crop_type.HI_max
     else:
         crop_type.yield_max = 0
 
 
 #
 # Calculates actual crop yield at harvest.
-# "Pseudo code_SC_actual growth and yield_1.0.docx" section 7.B.3
+# "pseudocode_crop" C.10.F.1
 #
 def calc_yield_actual(crop_type):
-    crop_type.yield_actual = crop_type.harvest_eff * crop_type.yield_max
+    crop_type.yield_actual = crop_type.yield_max * crop_type.harvest_eff
 
 
 #
 # Calculates the amount of nitrogen and phosphorus removed in the yield.
-# "Pseudo code_SC_crop yield_1.1.docx" section 5.4
+# "pseudocode_crop" C.10.G.1/2
 #
 def calc_nutrient_removal(crop_type):
     crop_type.yield_N = crop_type.fr_N * crop_type.yield_actual
@@ -149,9 +149,11 @@ def calc_nutrient_removal(crop_type):
 
 #
 # Updates the current residue.
-# "Pseudo code_SC_actual growth and yield_1.0.docx" section 7.B.4
+# # "pseudocode_crop" C.10.H.1/2
 #
-def calc_residue(crop_type, time):
+def calc_residue(crop_type, time, soil):
+    dResidue = 0
     if crop_type.harvest_date == time.day:
-        dResidue = crop_type.biomass_actual - crop_type.yield_actual
-        crop_type.residue += dResidue
+        dResidue = (crop_type.bio_AG - crop_type.yield_actual)
+    soil.listOfSoilLayers[0].topLayerFreshN += 0.0015 * soil.residue
+    soil.residue = soil.residue * (1 - soil.decayRate) + dResidue
