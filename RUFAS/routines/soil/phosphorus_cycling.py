@@ -305,7 +305,6 @@ def initializePhosphorusInputs(soil, time, weather, config):
             soil.yieldFactor.append((7500.0-9000.0)/31.0+soil.yieldFactor
                                     [len(soil.yieldFactor)-1])
 
-    #print("HI")
 
 #------------------------------------------------------------------------------
 # Function: uptake

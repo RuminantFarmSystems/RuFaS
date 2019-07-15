@@ -4,8 +4,8 @@ from math import log
 from . import fert_leach, fertilizer, manure, manure_leach, p_mineralization, plow, sol_P
 
 
-def daily_P_routine():
-    fertilizer()
+def daily_P_routine(surphos):
+    fertilizer.update_all(surphos)
     manure()
     plow()
     sol_P()
@@ -19,7 +19,7 @@ class SurPhos():
         self.time = Time()
         self.weather = Weather(self.time)
         self.manure = Manure()
-        self.fertilizer = Fertilizer()
+        self.fertilizer_app = Fertilizer()
         self.tillage = Tillage()
         self.crop_P_uptake = CropPUptake()
 
@@ -64,20 +64,29 @@ class SurPhos():
 
             self.CNT_day_layer.append(0.0)
 
+        # default values
         self.moisture = 0.5
         self.CNT = 1
         self.manure_cov = 0.0
         self.manure_mass = 0.0
         self.cover_SLP = 0.000025
 
+        # fertilizer
+        self.fert_sum = 0
+        self.no_rains = 0
+        self.fert_CNT = 0
+        self.fert_p_avg = 0  # avfrtp
+        self.rs_fert_p = 0  # rsfrtp
+        self.fact = 0
+
 
 class Fertilizer:
     def __init__(self):
-        self.year = 0
-        self.day = 0
-        self.mass = 0.0
-        self.depth = 0.0
-        self.surface_percent = 0.0
+        self.year = [0]
+        self.day = [0]
+        self.mass = [0.0]
+        self.depth = [0.0]
+        self.surface_percent = [0.0]
 
 
 class Manure:
