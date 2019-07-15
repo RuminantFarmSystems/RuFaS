@@ -3,11 +3,19 @@ from math import log
 from pathlib import Path
 
 
+def daily_P_routine():
+    manure()
+    plow()
+    solP()
+    fert_leach()
+    man_leach()
+    P_mineralization()
+    write_day()
 
 class SurPhos():
     def __init__(self):
         print('here')
-        self.time = Time
+        self.time = Time()
         self.weather = Weather(self.time)
 
         self.cover = 3
@@ -39,7 +47,7 @@ class SurPhos():
             self.PSP_layer.append(-0.045 * log(self.clay_layer[x]) + 0.001 *
                                   self.labile_P_layer[x] - 0.035 * self.OC_layer[x]
                                   + 0.43)
-            self.labile_P_layer[x] = self.labile_P_layer * self.bulk_density_layer[x] * self.thick_layer[x] * 0.1
+            self.labile_P_layer[x] = self.labile_P_layer[x] * self.bulk_density_layer[x] * self.thick_layer[x] * 0.1
 
             self.active_P_layer.append(self.labile_P_layer[x] * (1.0 - self.PSP_layer[x])
                                        / self.PSP_layer[x])
@@ -71,52 +79,48 @@ class Time:
 
 class Weather:
     def __init__(self, time):
-        self.rainfall = [2]
-        self.runoff = [2]
-        self.temp = [2]
+        self.rainfall = []
+        self.runoff = []
+        self.temp = []
+
+        self.years = 2
+
+        for i in range(self.years):
+            self.rainfall.append([])
+            self.runoff.append([])
+            self.temp.append([])
+
+        day = 0
+        while day < time.start_day - 1:
+            self.rainfall[0].append(0)
+            self.runoff[0].append(0)
+            self.temp[0].append(0)
+            day += 1
 
         self.weather_csv = 'SurPhos_weather.csv'
-        full_path = Path('C:/MASM/RUFAS/routines/SurPhos/', self.weather_csv)
 
-        with full_path.open('r') as f:
+        with open(self.weather_csv, 'r') as f:
             readCSV = csv.reader(f, delimiter=',')
 
-        curr_row = 0
-        day = 0
-        year = 0
-        for row in readCSV:
-            if curr_row == 0:
-                curr_row += 1
-            else:
+            curr_row = 0
+            year = 0
 
-                if day < time.start_day:
-                    self.rainfall[0].append(0)
-                    self.runoff[0].append(0)
-                    self.temp[0].append(0)
+            for row in readCSV:
+                if curr_row == 0:
+                    curr_row += 1
                 else:
-                    self.rainfall[year][day].append(float(row[2]))
-                    self.runoff[year][day].append(float(row[3]))
-                    self.temp[year][day].append(float(row[4]))
-                if day == 366:
-                    year += 1
-                    day = -1
-                day += 1
-        f.close()
+                    self.rainfall[year].append(float(row[2]))
+                    self.runoff[year].append(float(row[3]))
+                    self.temp[year].append(float(row[4]))
+                    if day == 364:
+                        year += 1
+                        day = -1
+                    day += 1
 
-
-# def daily_P_update():
-#     manure()
-#     plow()
-#     solP()
-#     fert_leach()
-#     man_leach()
-#     P_mineralization()
-#     write_day()
 
 def main():
-    print('sifris')
     surphos = SurPhos()
-    i = 2
+    daily_P_routine(surphos)
 
 
 if __name__ == '__main__':
