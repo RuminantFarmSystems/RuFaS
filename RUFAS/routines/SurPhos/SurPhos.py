@@ -1,22 +1,27 @@
 import csv
 from math import log
-from pathlib import Path
+
+from . import fert_leach, fertilizer, manure, manure_leach, p_mineralization, plow, sol_P
 
 
 def daily_P_routine():
+    fertilizer()
     manure()
     plow()
-    solP()
+    sol_P()
     fert_leach()
-    man_leach()
-    P_mineralization()
-    write_day()
+    manure_leach()
+    p_mineralization()
+
 
 class SurPhos():
     def __init__(self):
-        print('here')
         self.time = Time()
         self.weather = Weather(self.time)
+        self.manure = Manure()
+        self.fertilizer = Fertilizer()
+        self.tillage = Tillage()
+        self.crop_P_uptake = CropPUptake()
 
         self.cover = 3
         self.leach = 0.0
@@ -64,6 +69,45 @@ class SurPhos():
         self.manure_cov = 0.0
         self.manure_mass = 0.0
         self.cover_SLP = 0.000025
+
+
+class Fertilizer:
+    def __init__(self):
+        self.year = 0
+        self.day = 0
+        self.mass = 0.0
+        self.depth = 0.0
+        self.surface_percent = 0.0
+
+
+class Manure:
+    def __init__(self):
+        self.type = 1
+        self.year = [2012, 2012, 2012, 2012, 2013, 2013, 2013, 2013]
+        self.day = [103, 176, 226, 283, 46, 155, 241, 273]
+        self.mass = [1320.0, 2120.0, 1329.0, 2228.0, 1250.0, 1587.0, 1750.0, 1555.0]
+        self.total_P = [0.00820, 0.00866, 0.00941, 0.00656, 0.00748, 0.00698, 0.00721, 0.00646]
+        self.weip = 0.6
+        self.weop = 0.05
+        self.dry_matter = [0.04, 0.07, 0.04, 0.04, 0.05, 0.05, 0.07, 0.06]
+        self.percent_cover = 0.95
+        self.depth = 0.0
+        self.surface_percent = 1.0
+
+
+class Tillage:
+    def __init__(self):
+        self.year = 0
+        self.day = 0
+        self.percent_incorporated = 0.0
+        self.percent_mixed = 0.0
+        self.depth = 0.0
+
+
+class CropPUptake:
+    def __init__(self):
+        self.year = [2012, 2013]
+        self.P_uptake = 25.0
 
 
 class Time:
@@ -120,7 +164,13 @@ class Weather:
 
 def main():
     surphos = SurPhos()
-    daily_P_routine(surphos)
+    while surphos.time.year != surphos.time.end_year and surphos.time.day != surphos.time.end_day:
+        daily_P_routine(surphos)
+
+        if surphos.time.day == 364:
+            surphos.time.year += 1
+            surphos.time.day = -1
+        surphos.time.day += 1
 
 
 if __name__ == '__main__':
