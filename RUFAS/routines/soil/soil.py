@@ -198,7 +198,7 @@ def daily_soil_routine(soil, crop, weather, time):
 # Class: Soil
 #        Contains the state of the farm's soil
 # -------------------------------------------------------------------------------
-class Soil():
+class Soil:
     """
     Contains the state of the farm's soil.
     """
