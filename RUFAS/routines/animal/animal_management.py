@@ -11,7 +11,7 @@ from RUFAS.routines.animal.pen import Pen
 from RUFAS.routines.animal.life_cycle.life_cycle import LifeCycleManager
 from RUFAS.routines.animal.life_cycle.animal_base import AnimalBase
 
-count = 0
+simulation_day = 0
 
 
 def daily_animal_routine(animal_management, feed, weather, time):
@@ -24,9 +24,9 @@ def daily_animal_routine(animal_management, feed, weather, time):
         time : instance of the Time class
     '''
     animal_management.daily_updates(feed, time)
-    global count
-    print('day', count)
-    count += 1
+    global simulation_day
+    print('day', simulation_day)
+    simulation_day += 1
 
 
 def daily_animal_update(animal, weather, time):
@@ -221,9 +221,11 @@ class AnimalManagement:
             feed : instance of the Feed class
             time : instance of the Time class
         '''
-        self.life_cycle_manager.daily_update(time.day, self.sim_length)
+        global simulation_day
         
-        if self.end_ration_interval(time.day):
+        self.life_cycle_manager.daily_update(simulation_day, self.sim_length)
+        
+        if self.end_ration_interval(simulation_day):
             print('end of ration interval')
             self.calc_nutrient_rqmts()  # per animal, new requirements calculated based on previous ration interval's housing
             self.clear_pens()
