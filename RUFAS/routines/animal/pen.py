@@ -15,7 +15,9 @@ class Pen:
     
     # list of all animals in this pen
     animals_in_pen = []
-    # TODO: put checks to see if there are no animals in pen? (division by len(animals_in_pen))
+    
+    # boolean: False if len(self.animals_in_pen) == 0 (i.e. there are no animals in the pen)
+    pen_populated = False
     
     # set (no repeats) of all the classes to which the animals in the pen belong to
     classes_in_pen = set()
@@ -86,6 +88,7 @@ class Pen:
         Args:
             new_animals: list of new animals in the pen
         '''
+        self.pen_populated = not (len(self.animals_in_pen) == 0)
         self.animals_in_pen = new_animals
         self.stocking_density = len(self.animals_in_pen) / self.num_stalls * 100 
         self.calc_daily_walking_dist()
@@ -94,7 +97,6 @@ class Pen:
         for animal in self.animals_in_pen:
             stage = type(animal).__name__
             self.classes_in_pen.add(stage)
-        print(self.classes_in_pen)
             
     def call_animal_nutrient_rqmts(self):
         '''
@@ -121,7 +123,6 @@ class Pen:
         # find sums of nutrients and necessary ration stats for each animal in the pen
         for animal in self.animals_in_pen:
             curr_rqmts = animal._nutrient_rqmts
-            print(curr_rqmts)
             for key in sum_dict.keys():
                 sum_dict[key] += curr_rqmts[key]['val']
             

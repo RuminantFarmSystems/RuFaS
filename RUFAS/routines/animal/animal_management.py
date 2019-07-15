@@ -119,7 +119,6 @@ class AnimalManagement:
         '''
         # average vertical & horizontal distance (VD, HD) of pens to milking parlor
         avg_VD_parlor, avg_HD_parlor = self.avg_pen_dist()
-        print(avg_VD_parlor, avg_HD_parlor)
         
         for calf in self.calves:
             calf.calc_nutrient_rqmts()
@@ -160,14 +159,14 @@ class AnimalManagement:
         Calls each animal's method to calculate its nutrient requirements.
         '''
         for pen in self.all_pens:
-            pen.call_animal_nutrient_rqmts()
+            if pen.pen_populated:
+                pen.call_animal_nutrient_rqmts()
         
     def pen_allocation(self):
         '''
         Allocates the animals in all_animals to pens in all_pens based on the animals' characteristics.
         TEMPORARY HARD-CODE FOR TESTING PURPOSES.
         '''
-        print('calves:', len(self.calves))
         self.all_pens[0].update_animals(self.calves)
         self.all_pens[1].update_animals(self.heiferIs)
         self.all_pens[2].update_animals(self.heiferIIs)
@@ -186,7 +185,8 @@ class AnimalManagement:
         Calls each pens's method to calculate the average nutrient requirements of the animals inside.
         '''
         for pen in self.all_pens:
-            pen.calc_avg_nutrient_rqmts()
+            if pen.pen_populated:
+                pen.calc_avg_nutrient_rqmts()
     
     def calc_ration(self, feed):
         '''
@@ -195,21 +195,24 @@ class AnimalManagement:
             feed: instance of the Feed class, used to determine characteristics of available feeds
         '''
         for pen in self.all_pens:
-            pen.calc_ration(feed)
+            if pen.pen_populated:
+                pen.calc_ration(feed)
     
     def calc_manure_excretion(self, feed):
         '''
         Calls each animal's method to calculate manure excretion to find the total for each pen.
         '''
         for pen in self.all_pens:
-            pen.calc_manure(feed)
+            if pen.pen_populated:
+                pen.calc_manure(feed)
     
     def calc_avg_growth(self):
         '''
         Calls each pen's method to calculate the average growth of animals in the pen. 
         '''
         for pen in self.all_pens:
-            pen.calc_avg_growth()
+            if pen.pen_populated:
+                pen.calc_avg_growth()
     
     def daily_updates(self, feed, time):
         '''
@@ -221,8 +224,9 @@ class AnimalManagement:
         self.life_cycle_manager.daily_update(time.day, self.sim_length)
         
         if self.end_ration_interval(time.day):
+            print('end of ration interval')
+            self.calc_nutrient_rqmts()  # per animal, new requirements calculated based on previous ration interval's housing
             self.clear_pens()
-            self.calc_nutrient_rqmts()  # per animal
             self.pen_allocation()
             self.calc_avg_nutrient_rqmts()  # per pen
             self.calc_ration(feed)  # per pen
