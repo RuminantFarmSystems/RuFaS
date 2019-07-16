@@ -28,6 +28,7 @@ class GrowthReport(BaseReportHandler):
         self.pen_ids = []
         self.num_animals_in_pen = {}
         self.avg_growth = {}
+        self.avg_milk = {}
 
         self.feed_info = {}
 
@@ -42,7 +43,7 @@ class GrowthReport(BaseReportHandler):
         with self.get_fPath().open(mode) as csvfile:
 
             # 1) Initialize the header of the cvsfile
-            fieldnames = ['Year', 'Julian Day', 'Pen ID', 'Number of Animals in Pen', 'Average Growth']
+            fieldnames = ['Year', 'Julian Day', 'Pen ID', 'Number of Animals in Pen', 'Average Growth', 'Average Milk']
             self.fieldNames = fieldnames
             writer = csv.DictWriter(csvfile, fieldnames=fieldnames,
                                     lineterminator = '\n')
@@ -50,7 +51,7 @@ class GrowthReport(BaseReportHandler):
 
             # 2) Write Units in 2nd row of cvsfile
             units = {'Year': '', 'Julian Day': '', 'Pen ID': '', 'Number of Animals in Pen': '',
-                             'Average Growth': 'kg'}
+                             'Average Growth': 'kg', 'Average Milk': 'kg'}
             writer.writerow(units)
 
     #---------------------------------------------------------------------------
@@ -62,6 +63,7 @@ class GrowthReport(BaseReportHandler):
             self.pen_ids.append(pen.id)
             self.num_animals_in_pen[pen.id] = []
             self.avg_growth[pen.id] = []
+            self.avg_milk[pen.id] = []
                 
         self.write_header()
 
@@ -83,8 +85,10 @@ class GrowthReport(BaseReportHandler):
                 
                 if pen.pen_populated:
                     self.avg_growth[pen.id].append(pen.avg_growth)
+                    self.avg_milk[pen.id].append(pen.avg_milk)
                 else:
-                    self.avg_growth[pen.id].append(pen.avg_growth)
+                    self.avg_growth[pen.id].append(0)
+                    self.avg_milk[pen.id].append(0)
     
     #---------------------------------------------------------------------------
     # Method: annual_update
@@ -114,7 +118,9 @@ class GrowthReport(BaseReportHandler):
                         'Number of Animals in Pen':
                             str(self.num_animals_in_pen[pen_id][i]),
                         'Average Growth':
-                            str(self.avg_growth[pen_id][i])
+                            str(self.avg_growth[pen_id][i]),
+                        'Average Milk':
+                            str(self.avg_milk[pen_id][i])
                     }
 
                     writer = csv.DictWriter(csvfile, fieldnames=self.fieldNames,
@@ -131,4 +137,4 @@ class GrowthReport(BaseReportHandler):
         for pen_id in self.pen_ids:
             self.num_animals_in_pen[pen_id] = []
             self.avg_growth[pen_id] = []
-   
+            self.avg_milk[pen_id] = []
