@@ -1,7 +1,18 @@
 import csv
 from math import log
 
-from . import fert_leach, fertilizer, manure, manure_leach, p_mineralization, plow, sol_P
+from SurPhos import util
+from SurPhos.routines import p_mineralization, manure, plow, fertilizer, manure_leach, sol_P, fert_leach
+
+
+def simulate():
+    surphos = SurPhos()
+    while surphos.time.year != surphos.time.end_year and surphos.time.day != surphos.time.end_day:
+        daily_P_routine(surphos, surphos.weather, surphos.time)
+        if surphos.time.day == 364:
+            surphos.time.year += 1
+            surphos.time.day = -1
+        surphos.time.day += 1
 
 
 def daily_P_routine(surphos, weather, time):
@@ -75,7 +86,7 @@ class SurPhos:
         self.fert_applied_sum = 0.0
         self.no_rains = 0.0
         self.fert_CNT = 0.0
-        self.fert_p_available = 0.0 # avfrtp
+        self.fert_p_available = 0.0  # avfrtp
         self.fert_p_released = 0.0  # rsfrtp
         self.fact = 0.0
 
@@ -171,13 +182,14 @@ class Weather:
 
         self.weather_csv = 'SurPhos_weather.csv'
 
-        with open(self.weather_csv, 'r') as f:
-            readCSV = csv.reader(f, delimiter=',')
+        weather_path = util.get_base_dir() / 'SurPhos' / self.weather_csv
+        with weather_path.open('r') as f:
+            read_csv = csv.reader(f, delimiter=',')
 
             curr_row = 0
             year = 0
 
-            for row in readCSV:
+            for row in read_csv:
                 if curr_row == 0:
                     curr_row += 1
                 else:
@@ -188,18 +200,3 @@ class Weather:
                         year += 1
                         day = -1
                     day += 1
-
-
-def main():
-    surphos = SurPhos()
-    while surphos.time.year != surphos.time.end_year and surphos.time.day != surphos.time.end_day:
-        daily_P_routine(surphos, surphos.weather, surphos.time)
-
-        if surphos.time.day == 364:
-            surphos.time.year += 1
-            surphos.time.day = -1
-        surphos.time.day += 1
-
-
-if __name__ == '__main__':
-    main()
