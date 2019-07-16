@@ -4,23 +4,23 @@ from math import log
 from . import fert_leach, fertilizer, manure, manure_leach, p_mineralization, plow, sol_P
 
 
-def daily_P_routine(surphos):
-    fertilizer.update_all(surphos)
-    manure()
-    plow()
-    sol_P()
-    fert_leach()
-    manure_leach()
-    p_mineralization()
+def daily_P_routine(surphos, weather, time):
+    fertilizer.update_all(surphos, time)  # done
+    manure.update_all(surphos)
+    plow.update_all(surphos, time)  # done
+    sol_P.update_all(surphos, weather, time)  # done
+    fert_leach.update_all(surphos, weather, time)
+    manure_leach.update_all(surphos)
+    p_mineralization.update_all(surphos)
 
 
-class SurPhos():
+class SurPhos:
     def __init__(self):
         self.time = Time()
         self.weather = Weather(self.time)
-        self.manure = Manure()
+        self.manure_app = Manure()
         self.fertilizer_app = Fertilizer()
-        self.tillage = Tillage()
+        self.tillage_app = Tillage()
         self.crop_P_uptake = CropPUptake()
 
         self.cover = 3
@@ -72,12 +72,31 @@ class SurPhos():
         self.cover_SLP = 0.000025
 
         # fertilizer
-        self.fert_sum = 0
-        self.no_rains = 0
-        self.fert_CNT = 0
-        self.fert_p_avg = 0  # avfrtp
-        self.rs_fert_p = 0  # rsfrtp
-        self.fact = 0
+        self.fert_applied_sum = 0.0
+        self.no_rains = 0.0
+        self.fert_CNT = 0.0
+        self.fert_p_available = 0.0 # avfrtp
+        self.fert_p_released = 0.0  # rsfrtp
+        self.fact = 0.0
+
+        # manure
+        self.WIP = 0.0
+        self.WOP = 0.0
+        self.SIP = 0.0
+        self.SOP = 0.0
+
+        # plow
+
+        # solp
+        self.soil_P = [0, 0, 0]
+        self.SRP_sum = 0.0
+
+        # fert_leach
+        self.fert_sorp = 0.0
+        self.fert_absorbed_sum = 0.0
+        self.fert_leach = 0.0
+        self.PD_factor = 0.0
+        self.fert_runoff_P = 0.0
 
 
 class Fertilizer:
@@ -96,8 +115,8 @@ class Manure:
         self.day = [103, 176, 226, 283, 46, 155, 241, 273]
         self.mass = [1320.0, 2120.0, 1329.0, 2228.0, 1250.0, 1587.0, 1750.0, 1555.0]
         self.total_P = [0.00820, 0.00866, 0.00941, 0.00656, 0.00748, 0.00698, 0.00721, 0.00646]
-        self.weip = 0.6
-        self.weop = 0.05
+        self.WIP_rate = 0.6
+        self.WOP_rate = 0.05
         self.dry_matter = [0.04, 0.07, 0.04, 0.04, 0.05, 0.05, 0.07, 0.06]
         self.percent_cover = 0.95
         self.depth = 0.0
@@ -106,11 +125,11 @@ class Manure:
 
 class Tillage:
     def __init__(self):
-        self.year = 0
-        self.day = 0
-        self.percent_incorporated = 0.0
-        self.percent_mixed = 0.0
-        self.depth = 0.0
+        self.year = [0]
+        self.day = [0]
+        self.percent_incorporated = [0.0]
+        self.percent_mixed = [0.0]
+        self.depth = [0.0]
 
 
 class CropPUptake:
@@ -174,7 +193,7 @@ class Weather:
 def main():
     surphos = SurPhos()
     while surphos.time.year != surphos.time.end_year and surphos.time.day != surphos.time.end_day:
-        daily_P_routine(surphos)
+        daily_P_routine(surphos, surphos.weather, surphos.time)
 
         if surphos.time.day == 364:
             surphos.time.year += 1
