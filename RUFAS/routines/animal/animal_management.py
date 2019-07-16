@@ -11,9 +11,6 @@ from RUFAS.routines.animal.pen import Pen
 from RUFAS.routines.animal.life_cycle.life_cycle import LifeCycleManager
 from RUFAS.routines.animal.life_cycle.animal_base import AnimalBase
 
-simulation_day = 0
-
-
 def daily_animal_routine(animal_management, feed, weather, time):
     '''Executes daily routines relating to Animals.
 
@@ -24,9 +21,6 @@ def daily_animal_routine(animal_management, feed, weather, time):
         time : instance of the Time class
     '''
     animal_management.daily_updates(feed, time)
-    global simulation_day
-    print('day', simulation_day)
-    simulation_day += 1
 
 
 def daily_animal_update(animal, weather, time):
@@ -57,6 +51,9 @@ class AnimalManagement:
     
     # how often a ration is calculated, days
     formulation_interval = 0
+    
+    # day in the simulation
+    simulation_day = 0
     
     def __init__(self, data, config):
         '''
@@ -159,8 +156,7 @@ class AnimalManagement:
         Calls each animal's method to calculate its nutrient requirements.
         '''
         for pen in self.all_pens:
-            if pen.pen_populated:
-                pen.call_animal_nutrient_rqmts()
+            pen.call_animal_nutrient_rqmts()
         
     def pen_allocation(self):
         '''
@@ -221,12 +217,9 @@ class AnimalManagement:
             feed : instance of the Feed class
             time : instance of the Time class
         '''
-        global simulation_day
+        self.life_cycle_manager.daily_update(self.simulation_day, self.sim_length)
         
-        self.life_cycle_manager.daily_update(simulation_day, self.sim_length)
-        
-        if self.end_ration_interval(simulation_day):
-            print('end of ration interval')
+        if self.end_ration_interval():
             self.calc_nutrient_rqmts()  # per animal, new requirements calculated based on previous ration interval's housing
             self.clear_pens()
             self.pen_allocation()
@@ -236,15 +229,15 @@ class AnimalManagement:
             self.calc_avg_growth()  # per pen
             
         # other daily actions
-        
-    def end_ration_interval(self, day):
+                
+    def end_ration_interval(self):
         '''Checks whether it is the day to formulate a new ration.
 
         Returns:
             bool: True if today is the day a new ration has to be formulated,
                 false otherwise.
         '''
-        return (day % self.formulation_interval) == 1 or self.formulation_interval == 1
+        return (self.simulation_day % self.formulation_interval) == 1 or self.formulation_interval == 1
     
     def annual_reset(self):
         pass

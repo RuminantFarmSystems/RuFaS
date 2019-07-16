@@ -88,8 +88,8 @@ class Pen:
         Args:
             new_animals: list of new animals in the pen
         '''
-        self.pen_populated = not (len(self.animals_in_pen) == 0)
         self.animals_in_pen = new_animals
+        self.pen_populated = not (len(self.animals_in_pen) == 0)
         self.stocking_density = len(self.animals_in_pen) / self.num_stalls * 100 
         self.calc_daily_walking_dist()
         
@@ -154,7 +154,6 @@ class Pen:
         # sets ration's necessary fields for ration formulation calculation
         set_globals(self.avg_DMIest, self.avg_BW, self.avg_DBW, self.avg_milk, self.avg_CP_milk)
         ration_per_animal = optimize(feed, self.avg_nutrient_rqmts)
-        # TODO: if infeasible, recalculate with milk production reduced by 0.5 kg
         
         for animal in self.animals_in_pen:
             animal.set_ration(ration_per_animal)

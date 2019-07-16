@@ -85,9 +85,11 @@ def daily_simulation():
     # Daily Output Updates
     #
     output.daily_update(state, weather, time)
-
+    
     #print("simulating: " + time.to_str()) # Print out current day of simulation
     time.advance()
+    #have to increment simulation_day here so that the daily output has the correct simulation day
+    state.animal_management.simulation_day += 1 
 
 
 #-------------------------------------------------------------------------------
