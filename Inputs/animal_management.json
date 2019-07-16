@@ -35,6 +35,18 @@
             "active": true,
             "report_name": "Crop Report",
             "file_name": "crop_summary.csv"
+        },
+        "manure_report":
+        {
+        	"active": true,
+        	"report_name": "Manure Report",
+        	"file_name": "manure_report.csv"
+        },
+        "growth_report":
+        {
+        	"active": true,
+        	"report_name": "Growth Report",
+        	"file_name": "growth_report.csv"
         }
     },
 

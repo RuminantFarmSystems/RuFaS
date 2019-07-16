@@ -1,10 +1,9 @@
 ################################################################################
 """
 RUFAS: Ruminant Farm Systems Model
-File name: ration_report.py
+File name: manure_report.py
 Description:
-Author(s): Kass Chupongstimun, kass_c@hotmail.com
-           Militsa Sotirova, militsasotirova@gmail.com
+Author(s): Militsa Sotirova, militsasotirova@gmail.com
 """
 ################################################################################
 
@@ -13,10 +12,10 @@ import csv
 from RUFAS.output.report_handler import BaseReportHandler
 
 #-------------------------------------------------------------------------------
-# Class: RationReport
+# Class: ManureReport
 #-------------------------------------------------------------------------------
-class RationReport(BaseReportHandler):
-    """Creates and prints to the file ration_report.csv"""
+class ManureReport(BaseReportHandler):
+    """Creates and prints to the file manure_report.csv"""
 
     def __init__(self, data):
 
@@ -28,8 +27,12 @@ class RationReport(BaseReportHandler):
         self.julian_day = []
         self.pen_ids = []
         self.num_animals_in_pen = {}
-        self.achieved_price = {}
-        self.feed_amounts = {}
+        self.U = {}
+        self.TAN_s = {}
+        self.MN = {}
+        self.Mkg = {}
+        self.VSd = {}
+        self.VSnd = {}
 
         self.feed_info = {}
 
@@ -44,19 +47,15 @@ class RationReport(BaseReportHandler):
         with self.get_fPath().open(mode) as csvfile:
 
             # 1) Initialize the header of the cvsfile
-            fieldnames = ['Year', 'Julian Day', 'Pen ID', 'Number of Animals in Pen', 'Achieved Total Price']
-            for key in self.feed_info.keys():
-                fieldnames.append(key)
+            fieldnames = ['Year', 'Julian Day', 'Pen ID', 'Number of Animals in Pen', 'U', 'TAN_s', 'MN', 'Mkg', 'VSd', 'VSnd']
             self.fieldNames = fieldnames
             writer = csv.DictWriter(csvfile, fieldnames=fieldnames,
                                     lineterminator = '\n')
             writer.writeheader()
-
+            
             # 2) Write Units in 2nd row of cvsfile
             units = {'Year': '', 'Julian Day': '', 'Pen ID': '', 'Number of Animals in Pen': '',
-                             'Achieved Total Price': "$"}
-            for key in self.feed_info.keys():
-                units[key] = self.feed_info[key]['Units']
+                             'U': 'mol/L', 'TAN_s': 'mol/L', 'MN': 'g', 'Mkg': 'g', 'VSd': 'g', 'VSnd': 'g'}
 
             writer.writerow(units)
 
@@ -64,17 +63,16 @@ class RationReport(BaseReportHandler):
     # Method: initialize
     #---------------------------------------------------------------------------
     def initialize(self, state):
-        """Transfers the needed data from State object to the report handler."""
-        feed = state.feed
-        # get static data like units associated with each feed type
-        # store in Feed or Animal???????
-        self.feed_info = feed.available_feeds
-        
+        """Transfers the needed data from State object to the report handler."""        
         for pen in state.animal_management.all_pens:
             self.pen_ids.append(pen.id)
             self.num_animals_in_pen[pen.id] = []
-            self.achieved_price[pen.id] = []
-            self.feed_amounts[pen.id] = []
+            self.U[pen.id] = []
+            self.TAN_s[pen.id] = []
+            self.MN[pen.id] = []
+            self.Mkg[pen.id] = []
+            self.VSd[pen.id] = []
+            self.VSnd[pen.id] = []
                 
         self.write_header()
 
@@ -90,17 +88,25 @@ class RationReport(BaseReportHandler):
         # for each day that a ration is calculated, appends the necessary information to the lists
         if animal_management.end_ration_interval():
             self.julian_day.append(time.day) 
-
+            
             for pen in animal_management.all_pens:
                 self.num_animals_in_pen[pen.id].append(len(pen.animals_in_pen))
                 
                 if pen.pen_populated:
-                    self.achieved_price[pen.id].append(pen.daily_ration['objective'])
-                    self.feed_amounts[pen.id].append({feed_type: pen.daily_ration[feed_type] for feed_type in self.feed_info.keys()})
+                    self.U[pen.id].append(pen.manure['U'])
+                    self.TAN_s[pen.id].append(pen.manure['TAN_s'])
+                    self.MN[pen.id].append(pen.manure['MN'])
+                    self.Mkg[pen.id].append(pen.manure['Mkg'])
+                    self.VSd[pen.id].append(pen.manure['VSd'])
+                    self.VSnd[pen.id].append(pen.manure['VSnd'])
                 else:
-                    self.achieved_price[pen.id].append(0)
-                    self.feed_amounts[pen.id].append({feed_type: 0 for feed_type in self.feed_info.keys()})
-    
+                    self.U[pen.id].append(0)
+                    self.TAN_s[pen.id].append(0)
+                    self.MN[pen.id].append(0)
+                    self.Mkg[pen.id].append(0)
+                    self.VSd[pen.id].append(0)
+                    self.VSnd[pen.id].append(0)
+                    
     #---------------------------------------------------------------------------
     # Method: annual_update
     #---------------------------------------------------------------------------
@@ -114,13 +120,12 @@ class RationReport(BaseReportHandler):
     def write_annual_report(self, y):
         """Appends the annual report to the output file."""
 
-        print("printing ration report for year: " + str(y))
         mode = 'a+' if self.get_fPath().exists() else 'w+'
 
         with self.get_fPath().open(mode) as csvfile:
             for i in range(0, len(self.julian_day)):
                 for pen_id in self.pen_ids:
-                    ration_data = {
+                    manure_data = {
                         'Year':
                             str(self.year[i]),
                         'Julian Day':
@@ -129,15 +134,23 @@ class RationReport(BaseReportHandler):
                             str(pen_id),
                         'Number of Animals in Pen':
                             str(self.num_animals_in_pen[pen_id][i]),
-                        'Achieved Total Price':
-                            str(self.achieved_price[pen_id][i])
+                        'U':
+                            str(self.U[pen_id][i]),
+                        'TAN_s':
+                            str(self.TAN_s[pen_id][i]),
+                        'MN':
+                            str(self.MN[pen_id][i]),
+                        'Mkg':
+                            str(self.Mkg[pen_id][i]),
+                        'VSd':
+                            str(self.VSd[pen_id][i]),
+                        'VSnd':
+                            str(self.VSnd[pen_id][i]),
                     }
-                    for feed_type in sorted(self.feed_info.keys()):
-                        ration_data[feed_type] = self.feed_amounts[pen_id][i][feed_type]
 
                     writer = csv.DictWriter(csvfile, fieldnames=self.fieldNames,
                                     lineterminator = '\n')
-                    writer.writerow(ration_data)
+                    writer.writerow(manure_data)
                     
     #---------------------------------------------------------------------------
     # Method: annual_flush
@@ -148,7 +161,11 @@ class RationReport(BaseReportHandler):
         
         for pen_id in self.pen_ids:
             self.num_animals_in_pen[pen_id] = []
-            self.achieved_price[pen_id] = []
-            self.feed_amounts[pen_id] = []
+            self.U[pen_id] = []
+            self.TAN_s[pen_id] = []
+            self.MN[pen_id] = []
+            self.Mkg[pen_id] = []
+            self.VSd[pen_id] = []
+            self.VSnd[pen_id] = []
 
         
