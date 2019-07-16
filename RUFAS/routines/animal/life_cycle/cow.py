@@ -195,7 +195,8 @@ class Cow(HeiferIII):
 		else:
 			self._body_weight = self._mature_body_weight * (1-(1-(self._birth_weight/self._mature_body_weight)**(1/3)) * math.exp(-0.006 * self._days_born)) **3 - (40/75) * self._days_in_milk * math.exp(1-self._days_in_milk/75) + 0.0187**3 * (self._days_in_preg - 50) ** 3
 		
-		self._daily_growth = self._body_weight - prev_weight
+		if not self._milking:
+			self._daily_growth = self._body_weight - prev_weight
 		
 		#caculate dry matter intake from fat corrected milk production
 		dry_matter_intake = 0.372 * daily_fat_correct_milk_production + 0.0968 * self._body_weight**0.75 * (1-math.exp(-0.192 * (self._days_in_milk/7 +3.67)))
@@ -211,12 +212,14 @@ class Cow(HeiferIII):
 	def calc_nutrient_rqmts(self):
 		if self._milking:
 			#self._nutrient_rqmts,self._DMIest, self._DBW = lactating_calculate_rqmts(BW, BCS, CBW, CI, concentrate, CP_Milk, DOP, DHD, DVD, DIM, fat_milk, lactose_milk, milk, parity, type, nutrients_list)
+			#self._daily_growth = self._DBW
 			pass
 		else:
 			self._nutrient_rqmts = dry_calculate_rqmts()
 		self._nutrient_rqmts = {'FU': {'op': '<=', 'val': 7.566673489860807}, 'RU': {'op': '>=', 'val': 0}, 'ME_DM': {'op': '>=', 'val': 57.238188330372566}, 'RDP_DM': {'op': '>=', 'val': 2.0347001114951313}, 'RUP_DM': {'op': '>=', 'val': 1.2716733909335047}}
 		self._DMIest = 27.620363504458798 
 		self._DBW = -0.4125
+		self._daily_growth = self._DBW
 		
 	'''
        	Calculates this cow's nutrient requirements.
