@@ -47,6 +47,9 @@ class AnimalManagement:
     # housing type: barn or pasture
     housing = ""
     
+    # concentrate supplementation when farming type is "pasture", kg
+    pasture_concentrate = -1
+    
     ration_user_input = False
     
     # how often a ration is calculated, days
@@ -55,7 +58,7 @@ class AnimalManagement:
     # day in the simulation
     simulation_day = 0
     
-    def __init__(self, data, config):
+    def __init__(self, data, config, feed):
         '''
         Initializes the pens and animals in the simulation with data from the json file.
         Args:
@@ -65,8 +68,9 @@ class AnimalManagement:
         self.life_cycle_manager = LifeCycleManager(data['animal_config'])
         AnimalBase.set_config(data['animal_config'])
         self.init_pens(data['pen_information'])
-        self.init_animals(data['herd_information'])
+        self.init_animals(data['herd_information'], feed)
         self.housing = data['housing']
+        self.pasture_concentrate = data['pasture_concentrate']
         self.ration_user_input = data['ration']['user_input']
         self.formulation_interval = data['ration']['formulation_interval']
         
@@ -88,7 +92,7 @@ class AnimalManagement:
             pen = Pen(pen_id, vertical_dist_to_parlor, horizontal_dist_to_parlor, num_stalls, housing_type, bedding_type, pen_type)
             self.all_pens.append(pen) 
     
-    def init_animals(self, data):
+    def init_animals(self, data, feed):
         '''
         Populates the list of animals with the information from the input json file.
         Args:
@@ -107,10 +111,10 @@ class AnimalManagement:
         self.heiferIIs = self.life_cycle_manager.heiferIIs
         self.heiferIIIs = self.life_cycle_manager.heiferIIIs
         self.cows = self.life_cycle_manager.cows
-        self.init_nutrient_rqmts()
+        self.init_nutrient_rqmts(feed)
         self.pen_allocation()
         
-    def init_nutrient_rqmts(self):
+    def init_nutrient_rqmts(self, feed):
         '''
         Calculates initial nutrient requirements at the beginning of the simulation for initial pen allocation.
         '''
@@ -131,7 +135,7 @@ class AnimalManagement:
             
         for cow in self.cows:
             #uses average distances from pens to milking parlor
-            cow.calc_init_nutrient_rqmts(avg_VD_parlor, avg_HD_parlor)
+            cow.calc_init_nutrient_rqmts(avg_VD_parlor, avg_HD_parlor, self.housing, self.pasture_concentrate, feed)
     
     def avg_pen_dist(self):
         '''
@@ -151,12 +155,12 @@ class AnimalManagement:
         
         return VD_sum / len(self.all_pens), HD_sum / len(self.all_pens)
         
-    def calc_nutrient_rqmts(self):
+    def calc_nutrient_rqmts(self, feed):
         '''
         Calls each animal's method to calculate its nutrient requirements.
         '''
         for pen in self.all_pens:
-            pen.call_animal_nutrient_rqmts()
+            pen.call_animal_nutrient_rqmts(self.housing, self.pasture_concentrate, feed)
         
     def pen_allocation(self):
         '''
@@ -220,7 +224,7 @@ class AnimalManagement:
         self.life_cycle_manager.daily_update(self.simulation_day, self.sim_length)
         
         if self.end_ration_interval():
-            self.calc_nutrient_rqmts()  # per animal, new requirements calculated based on previous ration interval's housing
+            self.calc_nutrient_rqmts(feed)  # per animal, new requirements calculated based on previous ration interval's housing
             self.clear_pens()
             self.pen_allocation()
             self.calc_avg_nutrient_rqmts()  # per pen

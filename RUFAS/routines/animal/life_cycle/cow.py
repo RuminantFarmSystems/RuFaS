@@ -42,10 +42,18 @@ class Cow(HeiferIII):
 	'''
 	def __init__(self, heiferIII, args):
 		super().init_from_heiferIII(heiferIII)
-		self._DVD = 0
-		self._DHD = 0
-		self._daily_growth = 0
-		self._CP_milk = 0
+		
+		#current hard-coded values necessary for nutrient requirement calculations
+		self._BCS = 3.5 #body condition score
+		self._CP_milk = 3.2
+		self._lactose_milk = 4.85
+		self._mPrt = 3.5 #milk protein
+		
+		self._DVD = 0 #daily vertical distance, km
+		self._DHD = 0 #daily horizontal distance, km
+		self._CI = 0 #calving interval, days
+		self._CBW = 0 #weight of cow when she gives birth
+		self._daily_growth = 0 #change in body weight, kg
 		self._calves = 0
 		self._milking = False
 		self._days_in_milk = 0
@@ -88,6 +96,12 @@ class Cow(HeiferIII):
 	'''
 	def init_from_cow(self, cow):
 		super().init_from_heiferIII(Cow)
+		
+		#current hard-coded values necessary for nutrient requirement calculations
+		self._BCS = 3.5 #body condition score
+		self._CP_milk = 3.2
+		self._lactose_milk = 4.85
+		
 		self._daily_growth = 0
 		self._calves = cow._calves
 		self._milking = cow._milking
@@ -209,40 +223,45 @@ class Cow(HeiferIII):
 	'''
        	Calculates this cow's nutrient requirements.
     '''
-	def calc_nutrient_rqmts(self):
+	def calc_nutrient_rqmts(self, housing, pasture_concentrate, nutrient_rqmts):
 		if self._milking:
-			#self._nutrient_rqmts,self._DMIest, self._DBW = lactating_calculate_rqmts(BW, BCS, CBW, CI, concentrate, CP_Milk, DOP, DHD, DVD, DIM, fat_milk, lactose_milk, milk, parity, type, nutrients_list)
-			#self._daily_growth = self._DBW
-			pass
+			result = lactating_calculate_rqmts(self._body_weight, self._BCS, self._CBW, self._CI, pasture_concentrate, self._CP_milk, self._days_in_preg, self._DHD, self._DVD, self._days_in_milk, self._fat_percent, self._lactose_milk, self._estimated_daily_milk_produced, self._calves, housing, nutrient_rqmts)
+			self._nutrient_rqmts = result[0]
+			self._DMIest = result[1]
+			self._DBW = result[2]
+			self._daily_growth = self._DBW
 		else:
-			self._nutrient_rqmts = dry_calculate_rqmts()
+			result = dry_calculate_rqmts()
+		'''
 		self._nutrient_rqmts = {'FU': {'op': '<=', 'val': 7.566673489860807}, 'RU': {'op': '>=', 'val': 0}, 'ME_DM': {'op': '>=', 'val': 57.238188330372566}, 'RDP_DM': {'op': '>=', 'val': 2.0347001114951313}, 'RUP_DM': {'op': '>=', 'val': 1.2716733909335047}}
 		self._DMIest = 27.620363504458798 
 		self._DBW = -0.4125
 		self._daily_growth = self._DBW
+		'''
 		
 	'''
        	Calculates this cow's nutrient requirements.
     '''
-	def calc_init_nutrient_rqmts(self, vertical_distance, horizontal_distance):
+	def calc_init_nutrient_rqmts(self, vertical_distance, horizontal_distance, housing, pasture_concentrate, nutrient_rqmts):
 		self.calc_daily_walking_dist(vertical_distance, horizontal_distance)
-		self.calc_nutrient_rqmts()
+		self.calc_nutrient_rqmts(housing, pasture_concentrate, nutrient_rqmts)
 		
 	'''
 		Calculates and sets the manure excretion components.
 	'''  
 	def calc_manure_excretion(self, feed):
 		if self._milking:
-			#self._manure_excretion = lactating_manure_calculations(self._ration_formulation, feed, BW, DIM, mPrt)
-			pass
+			self._manure_excretion = lactating_manure_calculations(self._ration_formulation, feed, self._body_weight, self._days_in_milk, self._mPrt)
 		else:
 			self._manure_excretion = dry_manure_calculations()
+		'''
 		self._manure_excretion = {"U": 0.340, 
 			"TAN_s": 0.14, 
 			"MN": 532.407, 
 			"Mkg": 70.792, 
 			"VSd": 7087.413, 
 			"VSnd": 859.390} 
+		'''
 	'''
 		Sets this animal's ration formulation.
 		Args:
@@ -293,7 +312,12 @@ class Cow(HeiferIII):
 			self._preg = False
 			self._days_in_preg = 0
 			self._gestation_length = 0
-			self._events.add_event(self._days_born, 'New birth, start milking')
+			birth_description = 'New birth, start milking'
+			if self._calves >= 2:
+				last_time_given_birth = self._events.get_most_recent_date(birth_description)
+				self._CI = self._days_born - last_time_given_birth
+			self._CBW = self._body_weight
+			self._events.add_event(self._days_born, birth_description)
 			self._health_cull_update()
 			new_born = True
 
@@ -314,7 +338,8 @@ class Cow(HeiferIII):
 		elif self._repro_program == 'TAI':
 			if self._days_in_milk >= AnimalBase.config['vwp']:
 				self._tai_update(record_econ_stats)
-
+		
+		self._fat_percent = fat_percent
 		self._preg_update(record_econ_stats)
 		cull_stage = self._cull_update(estimated_daily_milk_produced)
 

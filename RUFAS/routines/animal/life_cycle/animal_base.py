@@ -60,6 +60,13 @@ class AnimalBase(object):
 		self._culled = animal._culled
 		self._do_not_breed = animal._do_not_breed
 		self._events = animal._events
+		
+		self._daily_growth = 0
+		self._nutrient_rqmts = {}
+		self._manure_excretion = {}
+		self._ration_formulation = {}
+		self._DMIest = 0
+		self._DBW = 0
 
 	# Method: is_culled
 	'''

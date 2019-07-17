@@ -356,6 +356,7 @@
             },
             
             "housing": "barn",
+            "pasture_concentrate": -1,
             
             "ration":
             {
@@ -424,7 +425,7 @@
 
         "feed":
         {
-            "feed_library": "Inputs/testing_ration_feedlib.csv",
+            "feed_library": "Inputs/manure_feed_test.csv",
 
             "available_feeds":
             [
