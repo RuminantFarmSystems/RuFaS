@@ -6,8 +6,11 @@ Description: The class which represents a pen on the farm.
 Author(s): Militsa Sotirova, militsasotirova@gmail.com
 '''
 ################################################################################
-from RUFAS.routines.animal.ration.lactating_cow_ration import optimize, set_globals
-
+from RUFAS.routines.animal.ration.lactating_cow_ration import set_globals
+from RUFAS.routines.animal.ration.lactating_cow_ration import optimize as lactating_cow_optimize 
+from RUFAS.routines.animal.ration.calf_ration import optimize as calf_optimize
+from RUFAS.routines.animal.ration.dry_cow_ration import optimize as dry_cow_optimize
+from RUFAS.routines.animal.ration.growing_heifer_ration import optimize as growing_heifer_optimize
 
 class Pen:
     # unique pen ID, from input file
@@ -155,9 +158,18 @@ class Pen:
             feed: instance of the Feed class, used to determine characteristics of available feeds
         '''
         # sets ration's necessary fields for ration formulation calculation
-        set_globals(self.avg_DMIest, self.avg_BW, self.avg_DBW, self.avg_milk, self.avg_CP_milk)
-        ration_per_animal = optimize(feed, self.avg_nutrient_rqmts)
-        
+        # there should only be one group of animals in a pen
+        if 'Calf' in self.classes_in_pen:
+            ration_per_animal = calf_optimize(feed, self.avg_nutrient_rqmts)
+        elif 'HeiferI' in self.classes_in_pen or 'HeiferII' in self.classes_in_pen or 'HeiferIII' in self.classes_in_pen:
+            ration_per_animal = growing_heifer_optimize(feed, self.avg_nutrient_rqmts)
+        elif 'Cow' in self.classes_in_pen and self.animals_in_pen[0]._milking: # lactating cow
+            ration_per_animal = lactating_cow_optimize(feed, self.avg_nutrient_rqmts)
+        elif 'Cow' in self.classes_in_pen and not self.animals_in_pen[0]._milking:# dry cow
+            ration_per_animal = dry_cow_optimize(feed, self.avg_nutrient_rqmts)
+        else:
+            ration_per_animal = {}
+
         for animal in self.animals_in_pen:
             animal.set_ration(ration_per_animal)
             
