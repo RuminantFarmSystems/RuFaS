@@ -94,7 +94,8 @@ def annual_data_analysis(output_csv, show_annual, produce_diagnostics):
         width = 0.35
         table_vals = []
         row_labs = []
-        colors = ['', '', '#1561ad', '#006400', '#fbaf08',  '#51d0de', '#431c5d']
+
+        colors = ['#ffffff', '#ffffff', '#ff00ff', '#006400', '#fbaf08',  '#51d0de', '#431c5d', 'red']
         for variable in variables:
             if 1 < counter < 7:
                 mp.bar(years, variables[variable], width, color=colors[counter], bottom=prev_vars)
@@ -105,16 +106,26 @@ def annual_data_analysis(output_csv, show_annual, produce_diagnostics):
                 legend.insert(0, variable)
                 mp.scatter(years, precip, c='red', marker='x', zorder=2)
             if counter > 1:
+                variables[variable].insert(0, "")
                 table_vals.append(variables[variable])
                 row_labs.append(variable)
             counter += 1
 
-        mp.axis('tight')
-        mp.table(cellText=table_vals,
-                 rowLabels=row_labs,
-                 bbox=[0, -.9, 1, .75])
+        cell_colors = [['#ffffff' for i in range(len(years) + 1)] for j in range(len(variables) - 2)]
+        for x in range(len(colors)):
+            cell_colors[x - 2][0] = colors[x]
 
-        mp.legend(legend, loc='best')
+        mp.axis('tight')
+        table = mp.table(cellText=table_vals,
+                         rowLabels=row_labs,
+                         cellColours=cell_colors,
+                         bbox=[0, -.95, 1, .75])
+
+        cellDict = table.get_celld()
+        for x in range(len(colors)):
+            cellDict[(x, 0)].set_width(0.02)
+
+        # mp.legend(legend, loc='upper left')  # TODO legend toggle
         mp.subplots_adjust(left=0.31, bottom=0.5)
         mp.ylabel('mm H2O')
         mp.title('Annual Water Balance')
