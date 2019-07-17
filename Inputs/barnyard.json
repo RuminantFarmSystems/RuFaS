@@ -22,7 +22,7 @@
         "ration_report":
         {
             "active": true,
-            "produce_diagnostics": true,
+            "produce_diagnostics": false,
             "show_daily": false,
             "report_name": "Ration Report",
             "file_name": "ration_report.csv",
@@ -31,7 +31,7 @@
         "soil_nitrogen":
         {
             "active": true,
-            "produce_diagnostics": true,
+            "produce_diagnostics": false,
             "show_daily": false,
             "report_name": "Soil Nitrogen",
             "file_name": "soil_nitrogen.csv"

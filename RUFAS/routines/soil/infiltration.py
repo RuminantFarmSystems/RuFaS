@@ -63,8 +63,8 @@ def update_all(soil, weather, time):
 
     calc_daily_infiltration(soil, weather, time)
 
-    # if soil.update_SW:
-    #     update_SW(soil)
+    if soil.update_SW:
+        update_SW(soil)
 
 
 #
@@ -211,10 +211,11 @@ def calc_daily_infiltration(soil, weather, time):
 
 
 def update_SW(soil):
-    SAT = soil.listOfSoilLayers[0].satWater
-    SW = soil.listOfSoilLayers[0].currentSoilWaterMM
-    I = soil.dailyInfiltration
-    if SW + I > SAT:
-        I = SAT - SW
-        soil.runoff += soil.dailyInfiltration - I
-    soil.dailyInfiltration = I
+    # SAT = soil.listOfSoilLayers[0].satWater
+    # SW = soil.listOfSoilLayers[0].currentSoilWaterMM
+    # I = soil.dailyInfiltration
+    # if SW + I > SAT:
+    #     I = SAT - SW
+    #     soil.runoff += soil.dailyInfiltration - I
+    # soil.dailyInfiltration = I
+    soil.listOfSoilLayers[0].currentSoilWaterMM += soil.dailyInfiltration

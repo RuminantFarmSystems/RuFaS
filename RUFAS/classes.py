@@ -343,7 +343,7 @@ class Weather:
                     # try/except statement to catch faulty weather data
                     try:
                         # fill data at appropriate location
-                        self.rainfall[year][day - offset] = float(row[2])
+                        self.rainfall[year][day - offset] = float(row[2]) / 2
                         self.T_max[year][day - offset] = float(row[3])
                         self.T_min[year][day - offset] = float(row[4])
                         self.T_avg[year][day - offset] = float(row[5])

@@ -85,7 +85,7 @@ def update_SW(soil):
         SAT = layer.satWater
         SW = layer.currentSoilWaterMM - layer.perc
         if x == 0:
-            perc_in = soil.dailyInfiltration
+            perc_in = 0
         else:
             perc_in = soil.listOfSoilLayers[x - 1].perc
         if perc_in + SW > SAT:
