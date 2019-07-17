@@ -50,7 +50,8 @@ def calc_daily_percolation(soil):
     #
     # The soil water in each layer is dependent on the amount percolated from
     # the layer above. Because there are no layers above the first, prev_perc
-    # is initialized at 0 and updated with each pass of the loop.
+    # is initialized at 0 and updated with each pass of the loop. Not currently
+    # implemented.
     #
     perc_in = 0
     for layer in soil.listOfSoilLayers:
@@ -85,7 +86,7 @@ def update_SW(soil):
         SAT = layer.satWater
         SW = layer.currentSoilWaterMM - layer.perc
         if x == 0:
-            perc_in = 0
+            perc_in = soil.dailyInfiltration
         else:
             perc_in = soil.listOfSoilLayers[x - 1].perc
         if perc_in + SW > SAT:

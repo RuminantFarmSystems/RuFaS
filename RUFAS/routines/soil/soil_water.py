@@ -81,6 +81,7 @@ def update_SW(soil, weather, time):
                 layer.perc -= WP - SW
             SW = max(WP, SW)
             if SW > SAT:
+                print(SW - SAT)
                 layer.perc += SW - SAT
             SW = min(SAT, SW)
 
@@ -88,9 +89,11 @@ def update_SW(soil, weather, time):
             perc_prev = soil.listOfSoilLayers[x-1].perc
             SW = SW + perc_prev - evap - perc - trans
             if SW < WP:
+                print(WP - SW)
                 layer.perc -= WP - SW
             SW = max(WP, SW)
             if SW > SAT:
+                print(SW - SAT)
                 layer.perc += SW - SAT
             SW = min(SAT, SW)
 
