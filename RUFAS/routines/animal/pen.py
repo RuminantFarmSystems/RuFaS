@@ -98,13 +98,16 @@ class Pen:
             stage = type(animal).__name__
             self.classes_in_pen.add(stage)
             
-    def call_animal_nutrient_rqmts(self):
+    def call_animal_nutrient_rqmts(self, housing, pasture_concentrate, feed):
         '''
         Calls each animal's nutrient requirement calculation methods.
         '''
         for animal in self.animals_in_pen:
-            animal.calc_nutrient_rqmts()
-    
+            if type(animal).__name__ == 'Cow':
+                animal.calc_nutrient_rqmts(housing, pasture_concentrate, feed.nutrient_rqmts)
+            else:
+                animal.calc_nutrient_rqmts()
+                
     def calc_avg_nutrient_rqmts(self):
         '''
         Finds the average nutrient requirements and necessary ration stats of the animals in the pen.

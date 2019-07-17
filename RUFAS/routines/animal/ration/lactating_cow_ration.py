@@ -119,7 +119,7 @@ def optimize(feed, rqmts):
     return util.LP_solve(LHS, RHS, objective, var_names, operators, "minimize", "RATION", lower_bounds, upper_bounds)
 
 
-def calculate_rqmts(BW, BCS, CBW, CI, concentrate, CP_Milk, DOP, DHD, DVD,
+def calculate_rqmts(BW, BCS, CBW, CI, pasture_concentrate, CP_Milk, DOP, DHD, DVD,
                         DIM, fat_milk, lactose_milk, milk, parity, type, nutrients_list):
     """
     Calculate the dietary requirements of the cows. These values are used
@@ -131,7 +131,7 @@ def calculate_rqmts(BW, BCS, CBW, CI, concentrate, CP_Milk, DOP, DHD, DVD,
         BCS: body condition score, 1 to 5
         CBW: calf birth weight, kg
         CI: calving interval, days
-        concentrate: concentrate supplementation when farming type is "Pasture", kg
+        pasture_concentrate: concentrate supplementation when farming type is "pasture", kg
         CP_Milk: milk crude protein content
         DOP: days of pregnancy, days
         DHD: daily horizontal distance, km
@@ -141,7 +141,7 @@ def calculate_rqmts(BW, BCS, CBW, CI, concentrate, CP_Milk, DOP, DHD, DVD,
         lactose_milk: milk lactose content
         milk: milk production, kg
         parity: number of times birth was given
-        type: farming type, "Barn" or "Pasture"
+        type: farming type, "barn" or "pasture"
 
     Returns:
         dict : a dictionary that represents the dietary requirements of the cows,
@@ -178,10 +178,10 @@ def calculate_rqmts(BW, BCS, CBW, CI, concentrate, CP_Milk, DOP, DHD, DVD,
     # Activity requirements
     #---------------------
     # Net Energy activity, Mcal (A.ER.3.1)
-    if type == "Barn":
+    if type == "barn":
         NEact = (DHD * 0.35 * BW + DVD * 5 * BW) / 1000
-    elif type == "Pasture":
-        NEact = (DHD * 0.35 * BW + DVD * 5 * BW + 10 * (BW ** 0.75) * ((600 - 12 * concentrate) / 600)) / 1000
+    elif type == "pasture":
+        NEact = (DHD * 0.35 * BW + DVD * 5 * BW + 10 * (BW ** 0.75) * ((600 - 12 * pasture_concentrate) / 600)) / 1000
 
     # Pregnancy energy requirements
     #-----------------------------

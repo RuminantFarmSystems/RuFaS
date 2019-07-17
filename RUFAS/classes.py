@@ -38,8 +38,8 @@ class State:
 
     def __init__(self, data, config):
         self.soil = Soil(data['soil'], config)
-        self.animal_management = AnimalManagement(data['animal'], config)
         self.feed = Feed(data['feed'])
+        self.animal_management = AnimalManagement(data['animal'], config, self.feed)
         self.crop = Crop(data['crop'])
 
     # self.fieldOps = FieldOps()
