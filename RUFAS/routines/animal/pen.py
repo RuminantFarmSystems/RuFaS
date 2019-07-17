@@ -151,7 +151,7 @@ class Pen:
         self.avg_milk = sum_milk / num_animals
         self.avg_CP_milk = sum_CP_milk / num_animals   
              
-    def calc_ration(self, feed):
+    def calc_ration(self, housing, pasture_concentrate, feed):
         '''
         Calculates the ration for the pen using the average nutrient requirements.
         Args:
@@ -159,17 +159,43 @@ class Pen:
         '''
         # sets ration's necessary fields for ration formulation calculation
         # there should only be one group of animals in a pen
+        #    while True:
         if 'Calf' in self.classes_in_pen:
             ration_per_animal = calf_optimize(feed, self.avg_nutrient_rqmts)
+            
         elif 'HeiferI' in self.classes_in_pen or 'HeiferII' in self.classes_in_pen or 'HeiferIII' in self.classes_in_pen:
             ration_per_animal = growing_heifer_optimize(feed, self.avg_nutrient_rqmts)
+        
         elif 'Cow' in self.classes_in_pen and self.animals_in_pen[0]._milking: # lactating cow
             ration_per_animal = lactating_cow_optimize(feed, self.avg_nutrient_rqmts)
+        
         elif 'Cow' in self.classes_in_pen and not self.animals_in_pen[0]._milking:# dry cow
             ration_per_animal = dry_cow_optimize(feed, self.avg_nutrient_rqmts)
+        
         else:
-            ration_per_animal = {}
-
+            ration_per_animal = {'status': 'Infeasible'}
+        
+            """
+            if ration_per_animal['status'] == 'Optimal':
+                break
+            
+            # According to lactating cow ration formulation psuedocode, if a ration isn't 
+            # feasible, milk production is reduced by 0.5 kg and the formulation is re-run 
+            # until a feasible ration is obtained.
+            
+            # Reduce estimated milk production by 0.5 kg
+            if self.animals_in_pen[0]._estimated_daily_milk_produced < 0:
+                print('negative esitmated milk production')
+                print(ration_per_animal)
+            for animal in self.animals_in_pen:
+                animal._estimated_daily_milk_produced -= 0.5
+                
+            # Recalculate animal requirements
+            self.call_animal_nutrient_rqmts(housing, pasture_concentrate, feed)
+            
+            # Recalculate average requirements
+            self.calc_avg_nutrient_rqmts()
+            """
         for animal in self.animals_in_pen:
             animal.set_ration(ration_per_animal)
             

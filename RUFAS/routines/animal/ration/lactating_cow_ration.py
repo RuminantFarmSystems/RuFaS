@@ -205,7 +205,7 @@ def calculate_rqmts(BW, BCS, CBW, CI, pasture_concentrate, CP_Milk, DOP, DHD, DV
     elif parity > 3:
         TCW = 700 * 1
     # Body weight change (delta body weight = DBW), kg (A.ER.5.4)
-    DBW = (TCW - 0.94 * BW) / (280 - CI + DOP)
+    DBW = 0 #(TCW - 0.94 * BW) / (280 - CI + DOP)
     global_DBW = DBW
     # Net Energy body weight, Mcal (A.ER.5.5)
     if DBW > 0:

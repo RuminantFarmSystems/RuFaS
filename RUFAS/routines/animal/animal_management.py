@@ -196,7 +196,7 @@ class AnimalManagement:
         '''
         for pen in self.all_pens:
             if pen.pen_populated:
-                pen.calc_ration(feed)
+                pen.calc_ration(self.housing, self.pasture_concentrate, feed)
     
     def calc_manure_excretion(self, feed):
         '''
