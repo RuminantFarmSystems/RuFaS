@@ -77,6 +77,7 @@ def update_SW(soil, weather, time):
         if x == 0:
             SW = SW + I - evap - perc - trans
             if SW < WP:
+                print(WP - SW)
                 layer.perc -= WP - SW
             SW = max(WP, SW)
             if SW > SAT:

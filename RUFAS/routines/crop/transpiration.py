@@ -163,7 +163,6 @@ def decrease_effic_of_uptake(soil, uptake_each_layer):
 #
 def calc_act_water_uptake(crop_type, soil, adj_uptakes):
     act_uptake_each_layer = []
-    trans = 0
 
     # Calculate actual uptake for each layer
     # C.4.C.1
