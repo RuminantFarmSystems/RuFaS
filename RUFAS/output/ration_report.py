@@ -95,8 +95,8 @@ class RationReport(BaseReportHandler):
                 self.num_animals_in_pen[pen.id].append(len(pen.animals_in_pen))
                 
                 if pen.pen_populated:
-                    self.achieved_price[pen.id].append(pen.daily_ration['objective'])
-                    self.feed_amounts[pen.id].append({feed_type: pen.daily_ration[feed_type] for feed_type in self.feed_info.keys()})
+                    self.achieved_price[pen.id].append(pen.ration['objective'])
+                    self.feed_amounts[pen.id].append({feed_type: pen.ration[feed_type] for feed_type in self.feed_info.keys()})
                 else:
                     self.achieved_price[pen.id].append(0)
                     self.feed_amounts[pen.id].append({feed_type: 0 for feed_type in self.feed_info.keys()})

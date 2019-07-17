@@ -65,7 +65,7 @@ class Pen:
     avg_CP_milk = 0
     
     # ration for all the animals in the pen
-    daily_ration = {}
+    ration = {}
     
     # total manure excretion of the animals in the pen
     manure = {}
@@ -177,10 +177,10 @@ class Pen:
         num_animals = len(self.animals_in_pen)
         for key in ration_per_animal:
             if (key == 'status'):
-                self.daily_ration[key] = ration_per_animal[key]
+                self.ration[key] = ration_per_animal[key]
                 
             else:  # feeds and price
-                self.daily_ration[key] = ration_per_animal[key] * num_animals
+                self.ration[key] = ration_per_animal[key] * num_animals
         
     def calc_manure(self, feed):
         '''
@@ -231,6 +231,6 @@ class Pen:
         self.avg_DBW = 0
         self.avg_milk = 0
         self.avg_CP_milk = 0
-        self.daily_ration = {}
+        self.ration = {}
         self.manure = {}
         self.avg_growth = 0
