@@ -7,22 +7,23 @@ from SurPhos.routines import p_mineralization, manure, plow, fertilizer, manure_
 
 def simulate():
     surphos = SurPhos()
-    while surphos.time.year != surphos.time.end_year and surphos.time.day != surphos.time.end_day:
+    while not (surphos.time.year == surphos.time.end_year - surphos.time.start_year
+               and surphos.time.day == surphos.time.end_day):
         daily_P_routine(surphos, surphos.weather, surphos.time)
-        if surphos.time.day == 364:
+        if surphos.time.day == 365:
             surphos.time.year += 1
-            surphos.time.day = -1
+            surphos.time.day = 0
         surphos.time.day += 1
 
 
 def daily_P_routine(surphos, weather, time):
     fertilizer.update_all(surphos, time)  # done
-    manure.update_all(surphos)
+    manure.update_all(surphos, time)
     plow.update_all(surphos, time)  # done
     sol_P.update_all(surphos, weather, time)  # done
-    fert_leach.update_all(surphos, weather, time)
+    fert_leach.update_all(surphos, weather, time)  # done
     manure_leach.update_all(surphos)
-    p_mineralization.update_all(surphos)
+    p_mineralization.update_all(surphos, time)  # done
 
 
 class SurPhos:
@@ -33,6 +34,25 @@ class SurPhos:
         self.fertilizer_app = Fertilizer()
         self.tillage_app = Tillage()
         self.crop_P_uptake = CropPUptake()
+
+        for i in range(0, len(self.weather.rainfall)):
+            self.crop_P_uptake.P_uptake_daily.append([0 for _ in range(0, len(self.weather.rainfall[i]))])
+
+        for i in range(0, len(self.weather.rainfall)):
+
+            if i == 0:
+                days = len(self.weather.rainfall[i]) - self.time.start_day
+                for j in range(self.time.start_day - 1, len(self.weather.rainfall[i])):
+                    self.crop_P_uptake.P_uptake_daily[i][j] = self.crop_P_uptake.P_uptake_annual[i] / days
+
+            elif i == len(self.weather.rainfall) - 1:
+                days = self.time.end_day
+                for j in range(0, self.time.end_day):
+                    self.crop_P_uptake.P_uptake_daily[i][j] = self.crop_P_uptake.P_uptake_annual[i] / days
+            else:
+                days = len(self.weather.rainfall[i])
+                for j in range(0, len(self.weather.rainfall[i])):
+                    self.crop_P_uptake.P_uptake_daily[i][j] = self.crop_P_uptake.P_uptake_annual[i] / days
 
         self.cover = 3
         self.leach = 0.0
@@ -91,10 +111,31 @@ class SurPhos:
         self.fact = 0.0
 
         # manure
+        self.manure_sum = 0
+        self.manure_P_sum = 0
+        self.manure_N_sum = 0
         self.WIP = 0.0
         self.WOP = 0.0
         self.SIP = 0.0
         self.SOP = 0.0
+        self.manure_NH4 = 0.0
+        self.manure_SON = 0.0
+        self.manure_mass_app = 0.0
+
+        self.cows = []
+        self.heifer = []
+        self.dry_cow = []
+        self.d_calf = []
+        self.beef_cow = []
+        self.b_calf = []
+
+        for x in range(0, len(self.weather.rainfall)):
+            self.cows.append([0 for _ in range(0, 366)])
+            self.heifer.append([0 for _ in range(0, 366)])
+            self.dry_cow.append([0 for _ in range(0, 366)])
+            self.d_calf.append([0 for _ in range(0, 366)])
+            self.beef_cow.append([0 for _ in range(0, 366)])
+            self.b_calf.append([0 for _ in range(0, 366)])
 
         # plow
 
@@ -108,6 +149,16 @@ class SurPhos:
         self.fert_leach = 0.0
         self.PD_factor = 0.0
         self.fert_runoff_P = 0.0
+        self.fert_R_sum = 0.0
+        self.fert_L_sum = 0.0
+
+        # p_mineralization
+        self.count_it = [0, 0, 0]
+        self.counts = [0, 0, 0]
+        self.soil_yp = []  # soilyp
+        for x in range(0, 3):
+            self.soil_yp.append([0 for _ in range(0, 366)])
+        self.PSP_avg = self.PSP_layer
 
 
 class Fertilizer:
@@ -125,13 +176,15 @@ class Manure:
         self.year = [2012, 2012, 2012, 2012, 2013, 2013, 2013, 2013]
         self.day = [103, 176, 226, 283, 46, 155, 241, 273]
         self.mass = [1320.0, 2120.0, 1329.0, 2228.0, 1250.0, 1587.0, 1750.0, 1555.0]
-        self.total_P = [0.00820, 0.00866, 0.00941, 0.00656, 0.00748, 0.00698, 0.00721, 0.00646]
-        self.WIP_rate = 0.6
-        self.WOP_rate = 0.05
+        self.total_P_frac = [0.00820, 0.00866, 0.00941, 0.00656, 0.00748, 0.00698, 0.00721, 0.00646]
+        self.WIP_frac = 0.6
+        self.WOP_frac = 0.05
+        self.total_N_frac = [0, 0, 0, 0, 0, 0, 0, 0]
+        self.total_NH4_frac = [0, 0, 0, 0, 0, 0, 0, 0]
         self.dry_matter = [0.04, 0.07, 0.04, 0.04, 0.05, 0.05, 0.07, 0.06]
-        self.percent_cover = 0.95
+        self.percent_cover = [0.95, 0.95, 0.95, 0.95, 0.95, 0.95, 0.95, 1.0]
         self.depth = 0.0
-        self.surface_percent = 1.0
+        self.surface_percent = [1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0]
 
 
 class Tillage:
@@ -146,7 +199,8 @@ class Tillage:
 class CropPUptake:
     def __init__(self):
         self.year = [2012, 2013]
-        self.P_uptake = 25.0
+        self.P_uptake_annual = [25.0, 25.0]
+        self.P_uptake_daily = []
 
 
 class Time:
@@ -157,7 +211,7 @@ class Time:
         self.end_day = 335
 
         self.day = self.start_day
-        self.year = self.start_year
+        self.year = 0
 
 
 class Weather:
