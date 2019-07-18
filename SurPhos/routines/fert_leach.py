@@ -4,7 +4,7 @@
 
 # fertilizer P adsorption by soil in KG
 
-from math import log
+from math import log, exp
 
 
 def update_all(surphos, weather, time):
@@ -38,15 +38,15 @@ def update_all(surphos, weather, time):
 
     # convert soil P from KG/HA to KG and add fertilizer p adsorbed
 
-    surphos.labile_P_layer[1] *= surphos.area
-    surphos.labile_P_layer[1] += surphos.fert_sorp
-    surphos.labile_P_layer[1] /= surphos.area
+    surphos.labile_P_layer[0] *= surphos.area
+    surphos.labile_P_layer[0] += surphos.fert_sorp
+    surphos.labile_P_layer[0] /= surphos.area
 
     surphos.fert_CNT += 1.0
 
     # P leached from fertilizer on surface to rain and runoff water in KG
 
-    if rainfall[year][day] > 0.0:
+    if rainfall[year][day - 1] > 0.0:
         surphos.no_rains += 1
 
         if surphos.no_rains == 1:
@@ -64,5 +64,43 @@ def update_all(surphos, weather, time):
 
     # calculate the concentration of fertilizer dissolved P in runoff in MG/L
 
-    # if runoff[year][day] > 0.0:
-    #     surphos.PD_factor =
+    if runoff[year][day - 1] > 0.0:
+        surphos.PD_factor = 0.034 * exp((runoff[year][day - 1] / rainfall[year][day - 1]) * 3.4)
+        surphos.fert_runoff_P = surphos.fert_leach / (rainfall[year][day - 1] / 10.0) \
+                                / surphos.area * 10.0 * surphos.PD_factor
+
+    # calculate fertilizer runoff P in KG
+
+        fert_run = surphos.fert_runoff_P * runoff[year][day - 1] * 0.01 * surphos.area
+        if fert_run < 0.0:
+            fert_run = 0.0
+        if fert_run > surphos.fert_leach:
+            fert_run = surphos.fert_leach
+
+    else:
+        surphos.fert_runoff_P = 0.0
+        fert_run = 0.0
+
+    # convert soil P from KG/HA to KG and add fertilizer P leached
+
+    surphos.labile_P_layer[0] *= surphos.area
+    surphos.labile_P_layer[1] *= surphos.area
+    surphos.labile_P_layer[2] *= surphos.area
+
+    surphos.labile_P_layer[0] += (surphos.fert_leach - fert_run) * 0.6
+
+    if surphos.depths_layer[1] <= 15.0:
+        surphos.labile_P_layer[1] += (surphos.fert_leach - fert_run) * 0.3
+        surphos.labile_P_layer[2] += (surphos.fert_leach - fert_run) * 0.1
+    else:
+        surphos.labile_P_layer[1] += (surphos.fert_leach - fert_run) * 0.4
+
+    surphos.labile_P_layer[0] /= surphos.area
+    surphos.labile_P_layer[1] /= surphos.area
+    surphos.labile_P_layer[2] /= surphos.area
+
+    # add fertilizer P leached and in runoff to running total
+
+    surphos.fert_R_sum += fert_run
+    surphos.fert_L_sum += (surphos.fert_leach - fert_run)
+

@@ -1,10 +1,189 @@
-def update_all(surphos):
-    pass
-    # for app in
-    #     if app.year == surphos.time.year
-    # manure_day = False
-    # if manure_day:
-    #     surphos.cover_SLP = 0.0154 * surphos.manure_mass ** -0.55
-    #     percent_cover = min(1.0, 0.012 * surphos.manure_mass ** 0.48)
-    #     manure_cover_application = surphos.area * percent_cover
-    #     manure_P_application = surphos.manure_mass * P_frac
+
+# calculates # of plops added per day and amount of TP, WIP, and WOP added
+# in manure, adds P to surface manure pools, and updates cumulative manure
+# and TP added during model run
+
+# calculates TP, WIP, and WOP added in the manure, adds P to surface manure
+# pools. All units are KG or HA
+
+
+def update_all(S, time):
+
+    day = time.day
+    year = time.year
+    m_app = S.manure_app
+    mass = m_app.mass
+
+    for i in range(0, len(m_app.day)):
+        if day == m_app.day[i] and year == m_app.year[i] - time.start_year:
+
+            S.cover_SLP = 0.0154 * mass ** -0.555
+
+            m_app.percent_cover[i] = min( 1.0, 0.012 * mass[i] ** 0.48)
+            cover_app = S.area * m_app.percent_cover[i]
+            P_app = mass[i] * m_app.total_P_frac[i]
+            N_app = mass[i] * m_app.total_N_frac[i]
+            S.manure_sum += mass[i]
+            S.manure_P_sum += P_app
+            S.manure_N_sum += N_app
+
+            S.moisture = (S.moisture * S.manure_mass + (1.0 - m_app.dry_matter[i]) * mass[i]) \
+                         / (S.manure_mass + mass[i])
+            wet_rate = mass[i] / m_app.dry_matter[i] / cover_app
+            infiltration = min(0.9, 0.000002 * wet_rate + 0.267)
+
+            for w in range(0, 3):
+                S.active_P_layer[w] *= S.area
+                S.labile_P_layer[w] *= S.area
+
+            # surface application
+
+            if m_app.depth == 0.0:
+
+                # infiltrate manure P if less than 15% solids
+
+                if m_app.dry_matter[i] <= 0.15:
+
+                    S.manure_cov = min(S.area, S.manure_cov + cover_app * 0.5)
+                    S.manure_mass += mass[i] * 0.8
+                    S.WIP += P_app * m_app.WIP_frac * infiltration
+                    S.WOP += P_app * m_app.WOP_frac * infiltration
+                    S.SOP += P_app * (1.0 - (m_app.WIP_frac + m_app.WOP_frac)) * 0.25 * infiltration
+                    S.SIP += P_app * (1.0 - (m_app.WIP_frac + m_app.WOP_frac)) * 0.75 * infiltration
+                    S.manure_NH4 += N_app * m_app.total_N_frac * 0.65 * infiltration
+                    S.manure_SON += N_app * (1.0 - m_app.total_N_frac) * infiltration
+
+                    # add manure P infiltrated into soil
+
+                    # TODO these two lines are not included in the else below but in the next
+                    # TOD if/else statement it is
+                    S.active_P_layer[0] += P_app * (1.0 - (m_app.WIP_frac + m_app.WOP_frac)) \
+                                           * 0.25 * (1.0 - infiltration)
+                    S.labile_P_layer[0] += P_app * m_app.WIP_frac * (1.0 - infiltration) + P_app \
+                                           * (1.0 - (m_app.WIP_frac + m_app.WOP_frac)) \
+                                           * 0.75 * 0.95 * (1.0 - infiltration)
+
+                else:
+                    S.manure_cov = min(S.area, S.manure_cov + cover_app)
+                    S.manure_mass += mass[i]
+                    S.WIP += P_app * m_app.WIP_frac
+                    S.WOP += P_app * m_app.WOP_frac
+                    S.SOP += P_app * (1.0 - (m_app.WIP_frac + m_app.WOP_frac)) * 0.75
+                    S.SIP += P_app * (1.0 - (m_app.WIP_frac + m_app.WOP_frac)) * 0.25
+                    S.manure_NH4 += N_app * m_app.total_N_frac * 0.65
+                    S.manure_SON += N_app * (1.0 - m_app.total_N_frac)
+
+            else:
+
+                # subsurface application
+                # infiltrate manure P if less than 15% solids
+
+                if m_app.dry_matter[i] <= 0.15:
+
+                    S.manure_cov = min(S.area, S.manure_cov + cover_app
+                                       * m_app.surface_percent[i] * 0.5)
+                    S.manure_mass += mass[i] * m_app.surface_percent[i] * 0.8
+                    S.WIP += P_app * m_app.WIP_frac * infiltration * m_app.surface_percent[i]
+                    S.WOP += P_app * m_app.WOP_frac * infiltration * m_app.surface_percent[i]
+                    S.SOP += P_app * (1.0 - (m_app.WIP_frac + m_app.WOP_frac)) \
+                             * 0.25 * infiltration * m_app.surface_percent[i]
+                    S.SIP += P_app * (1.0 - (m_app.WIP_frac + m_app.WOP_frac)) \
+                             * 0.75 * infiltration * m_app.surface_percent[i]
+                    S.manure_NH4 += N_app * m_app.total_N_frac * 0.65 * infiltration \
+                                    * m_app.surface_percent[i]
+                    S.manure_SON += N_app * (1.0 - m_app.total_N_frac) * infiltration \
+                                    * m_app.surface_percent[i]
+
+                    # add manure P infiltrated into soil
+
+                    S.active_P_layer[0] += P_app * (1.0 - (m_app.WIP_frac + m_app.WOP_frac)) \
+                                           * 0.25 * (1.0 - infiltration) \
+                                           * (1.0 - m_app.surface_percent[i])
+                    S.labile_P_layer[0] += P_app * m_app.WIP_frac * (1.0 - infiltration) + P_app \
+                                           * (1.0 - (m_app.WIP_frac + m_app.WOP_frac)) \
+                                           * 0.75 * 0.95 * (1.0 - infiltration) \
+                                           * (1.0 - m_app.surface_percent[i])
+
+                else:
+                    S.manure_cov = min(S.area, S.manure_cov + cover_app
+                                       * m_app.surface_percent[i])
+                    S.manure_mass += mass[i] * m_app.surface_percent[i]
+                    S.WIP += P_app * m_app.WIP_frac * m_app.surface_percent[i]
+                    S.WOP += P_app * m_app.WOP_frac * m_app.surface_percent[i]
+                    S.SOP += P_app * (1.0 - (m_app.WIP_frac + m_app.WOP_frac)) * 0.75 \
+                             * m_app.surface_percent[i]
+                    S.SIP += P_app * (1.0 - (m_app.WIP_frac + m_app.WOP_frac)) * 0.25 \
+                             * m_app.surface_percent[i]
+                    S.manure_NH4 += N_app * m_app.total_N_frac * 0.65 * m_app.surface_percent[i]
+                    S.manure_SON += N_app * (1.0 - m_app.total_N_frac) * m_app.surface_percent[i]
+
+                    S.active_P_layer[0] += P_app * (1.0 - (m_app.WIP_frac + m_app.WOP_frac)) \
+                                           * 0.25 * (1.0 - m_app.surface_percent[i])
+                    S.labile_P_layer[0] += P_app * m_app.WIP_frac * (1.0 - m_app.surface_percent[i]) \
+                                           + P_app * (1.0 - (m_app.WIP_frac + m_app.WOP_frac)) \
+                                           * 0.75 * 0.95 * (1.0 - m_app.surface_percent[i]) + P_app \
+                                           * m_app.WOP_frac * (1.0 - m_app.surface_percent[i])
+
+                n = 0  # TODO might cause error
+                for n in range(0, 3):
+                    if S.depths_layer[n] >= m_app.depth[i]:
+                        break
+
+                sum_fact = 0.0
+
+                for k in range(0, n - 1):
+                    fact = S.depths_layer[k] / m_app.depth[i]
+
+                    S.labile_P_layer[k] += P_app * m_app.WIP_frac * (1.0 - m_app.surface_percent[1]) \
+                                           * fact + P_app * (1.0 - m_app.WIP_frac + m_app.WOP_frac) * 0.75 \
+                                           * 0.95 * (1.0 - infiltration) * (1.0 - m_app.surface_percent[i]) \
+                                           * fact + P_app * m_app.WOP_frac * 0.95 * (1.0 - infiltration) \
+                                           * (1.0 - m_app.surface_percent[i]) * fact
+                    S.active_P_layer[k] += P_app * fact * (1.0 - (m_app.WIP_frac + m_app.WOP_frac)) * 0.25 \
+                                           * (1.0 - m_app.surface_percent[i])
+
+                    sum_fact += fact
+                fact = 1.0 - sum_fact
+
+                S.labile_P_layer[n] += P_app * m_app.WIP_frac * (1.0 - m_app.surface_percent[1]) \
+                                       * fact + P_app * (1.0 - m_app.WIP_frac + m_app.WOP_frac) * 0.75 \
+                                       * 0.95 * (1.0 - infiltration) * (1.0 - m_app.surface_percent[i]) \
+                                       * fact + P_app * m_app.WOP_frac * 0.95 * (1.0 - infiltration) \
+                                       * (1.0 - m_app.surface_percent[i]) * fact
+                S.active_P_layer[n] += P_app * fact * (1.0 - (m_app.WIP_frac + m_app.WOP_frac)) * 0.25 \
+                                       * (1.0 - m_app.surface_percent[i])
+
+            for w in range(0, 3):
+                S.active_P_layer[w] /= S.area
+                S.labile_P_layer[w] /= S.area
+
+            S.manure_mass_app = S.manure_mass
+
+            cow_mass_app = S.cows[year][day - 1] * 8.9 + S.heifer[year][day - 1] * 3.7 \
+                           + S.dry_cow[year][day - 1] * 4.9 + S.d_calf[year][day - 1] * 1.4 \
+                           + S.beef_cow[year][day - 1] * 6.6 + S.b_calf[year][day - 1] * 2.7
+
+            if cow_mass_app > 0.0:
+
+                S.moisture = (S.moisture * S.maure_mass + 0.9 * cow_mass_app) \
+                             / (S.manure_mass + cow_mass_app)
+
+                S.manure_mass += cow_mass_app
+                S.manure_cov += cow_mass_app / 0.25 * 659.0 / 100 ** 4
+
+                cow_P_app = S.cows[year][day - 1] * 8.9 * 0.0088 + S.heifer[year][day - 1] * 3.7 \
+                            * 0.0054 + S.dry_cow[year][day - 1] * 4.9 * 0.0061 \
+                            + S.d_calf[year][day - 1] * 1.4 * 0.0054 + S.beef_cow[year][day - 1] \
+                            * 6.6 * 0.0067 + S.b_calf[year][day - 1] * 2.7 * 0.0092
+
+                S.WIP += cow_P_app * 0.50
+                S.WOP += cow_P_app * 0.05
+                S.SOP += cow_P_app * 0.45 * 0.75
+                S.SIP += cow_P_app * 0.45 * 0.25
+
+                # update cumulative manure and TP added during model run
+
+                S.manure_sum += cow_mass_app
+                S.manure_P_sum += cow_P_app
+
+                S.manure_mass_app = S.manure_mass
