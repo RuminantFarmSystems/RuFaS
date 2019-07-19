@@ -149,7 +149,7 @@ class Pen:
         self.avg_DMIest = sum_DMIest / num_animals
         self.avg_DBW = sum_DBW / num_animals
         self.avg_milk = sum_milk / num_animals
-        self.avg_CP_milk = sum_CP_milk / num_animals   
+        self.avg_CP_milk = sum_CP_milk / num_animals  
              
     def calc_ration(self, housing, pasture_concentrate, feed):
         '''
@@ -159,24 +159,39 @@ class Pen:
         '''
         # sets ration's necessary fields for ration formulation calculation
         # there should only be one group of animals in a pen
-        #    while True:
-        if 'Calf' in self.classes_in_pen:
-            ration_per_animal = calf_optimize(feed, self.avg_nutrient_rqmts)
+        count = 0
+        while True:
+        
+            if 'Calf' in self.classes_in_pen:
+                ration_per_animal = calf_optimize(feed, self.avg_nutrient_rqmts)
+                
+            elif 'HeiferI' in self.classes_in_pen or 'HeiferII' in self.classes_in_pen or 'HeiferIII' in self.classes_in_pen:
+                ration_per_animal = growing_heifer_optimize(feed, self.avg_nutrient_rqmts)
             
-        elif 'HeiferI' in self.classes_in_pen or 'HeiferII' in self.classes_in_pen or 'HeiferIII' in self.classes_in_pen:
-            ration_per_animal = growing_heifer_optimize(feed, self.avg_nutrient_rqmts)
-        
-        elif 'Cow' in self.classes_in_pen and self.animals_in_pen[0]._milking: # lactating cow
-            ration_per_animal = lactating_cow_optimize(feed, self.avg_nutrient_rqmts)
-        
-        elif 'Cow' in self.classes_in_pen and not self.animals_in_pen[0]._milking:# dry cow
-            ration_per_animal = dry_cow_optimize(feed, self.avg_nutrient_rqmts)
-        
-        else:
-            print('infeasible')
-            ration_per_animal = {'status': 'Infeasible'}
-        
-            """
+            elif 'Cow' in self.classes_in_pen and self.animals_in_pen[0]._milking: # lactating cow
+                set_globals(self.avg_DMIest, self.avg_BW, self.avg_DBW, self.avg_milk, self.avg_CP_milk)
+                ration_per_animal = lactating_cow_optimize(feed, self.avg_nutrient_rqmts)
+                #if ration_per_animal['status'] == 'Infeasible':
+                #print(count)
+                """print(ration_per_animal['status'])
+                print('avg DMIest:\t', self.avg_DMIest)
+                print('avg BW:\t\t', self.avg_BW)
+                print('avg DBW:\t', self.avg_DBW)
+                print('avg milk:\t', self.avg_milk)
+                print('avg cp milk:\t', self.avg_CP_milk)
+                print('nutrient rqmts:\t', self.avg_nutrient_rqmts)
+                print('ration:\t\t', ration_per_animal)
+                print()"""
+                    
+                    
+            elif 'Cow' in self.classes_in_pen and not self.animals_in_pen[0]._milking:# dry cow
+                ration_per_animal = dry_cow_optimize(feed, self.avg_nutrient_rqmts)
+            
+            else: #this shouldn't occur
+                print('error in pen ration calculation')
+                ration_per_animal = {'status': 'Infeasible'}
+            
+            
             if ration_per_animal['status'] == 'Optimal':
                 break
             
@@ -187,7 +202,7 @@ class Pen:
             # Reduce estimated milk production by 0.5 kg
             if self.animals_in_pen[0]._estimated_daily_milk_produced < 0:
                 print('negative esitmated milk production')
-                print(ration_per_animal)
+            
             for animal in self.animals_in_pen:
                 animal._estimated_daily_milk_produced -= 0.5
                 
@@ -196,9 +211,9 @@ class Pen:
             
             # Recalculate average requirements
             self.calc_avg_nutrient_rqmts()
-            """
-        if ration_per_animal == {}:
-           print('ration is blank')
+            
+            count+= 1
+            
         for animal in self.animals_in_pen:
             animal.set_ration(ration_per_animal, feed)
             
