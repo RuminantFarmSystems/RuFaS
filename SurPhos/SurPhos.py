@@ -8,8 +8,9 @@ from SurPhos.routines import p_mineralization, manure, plow, fertilizer, manure_
 def simulate():
     surphos = SurPhos()
     while not (surphos.time.year == surphos.time.end_year - surphos.time.start_year
-               and surphos.time.day == surphos.time.end_day):
+               and surphos.time.day == surphos.time.end_day + 1):
         daily_P_routine(surphos, surphos.weather, surphos.time)
+        print(surphos.time.day, surphos.manure_cov)
         if surphos.time.day == 365:
             surphos.time.year += 1
             surphos.time.day = 0
@@ -18,11 +19,11 @@ def simulate():
 
 def daily_P_routine(surphos, weather, time):
     fertilizer.update_all(surphos, time)  # done
-    manure.update_all(surphos, time)
+    manure.update_all(surphos, time)  # done
     plow.update_all(surphos, time)  # done
     sol_P.update_all(surphos, weather, time)  # done
     fert_leach.update_all(surphos, weather, time)  # done
-    manure_leach.update_all(surphos)
+    manure_leach.update_all(surphos, weather, time)
     p_mineralization.update_all(surphos, time)  # done
 
 
@@ -159,6 +160,22 @@ class SurPhos:
         for x in range(0, 3):
             self.soil_yp.append([0 for _ in range(0, 366)])
         self.PSP_avg = self.PSP_layer
+
+        # manure_leach
+        self.TIP_leach = 0.0
+        self.TOP_leach = 0.0
+        self.TN_leach = 0.0
+        self.ND_factor = 0.0
+        self.WIP_R_sum = 0.0
+        self.WOP_R_sum = 0.0
+        self.NH_R_sum = 0.0
+        self.WIP_L_sum = 0.0
+        self.WOP_L_sum = 0.0
+        self.NH_L_sum = 0.0
+        self.DP_sum = 0.0
+        self.N_sum = 0.0
+        self.SRP_MGL = 0.0
+        self.T_runoff_IP = 0.0
 
 
 class Fertilizer:

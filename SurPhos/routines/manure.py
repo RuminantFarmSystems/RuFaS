@@ -17,7 +17,7 @@ def update_all(S, time):
     for i in range(0, len(m_app.day)):
         if day == m_app.day[i] and year == m_app.year[i] - time.start_year:
 
-            S.cover_SLP = 0.0154 * mass ** -0.555
+            S.cover_SLP = 0.0154 * mass[i] ** -0.555
 
             m_app.percent_cover[i] = min( 1.0, 0.012 * mass[i] ** 0.48)
             cover_app = S.area * m_app.percent_cover[i]
@@ -50,8 +50,8 @@ def update_all(S, time):
                     S.WOP += P_app * m_app.WOP_frac * infiltration
                     S.SOP += P_app * (1.0 - (m_app.WIP_frac + m_app.WOP_frac)) * 0.25 * infiltration
                     S.SIP += P_app * (1.0 - (m_app.WIP_frac + m_app.WOP_frac)) * 0.75 * infiltration
-                    S.manure_NH4 += N_app * m_app.total_N_frac * 0.65 * infiltration
-                    S.manure_SON += N_app * (1.0 - m_app.total_N_frac) * infiltration
+                    S.manure_NH4 += N_app * m_app.total_N_frac[i] * 0.65 * infiltration
+                    S.manure_SON += N_app * (1.0 - m_app.total_N_frac[i]) * infiltration
 
                     # add manure P infiltrated into soil
 
