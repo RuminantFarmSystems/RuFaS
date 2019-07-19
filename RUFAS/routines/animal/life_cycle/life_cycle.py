@@ -302,7 +302,7 @@ class LifeCycleManager():
     
         # cow culling action and economic stats
         for cow in self.cows:
-            _, _, _, _, culled, new_born = cow.update(record_econ_stats)
+            _, _, _, culled, new_born = cow.update(record_econ_stats)
             # if date == 2000:
             #     print(len(cows))
             #     print(cows[20])

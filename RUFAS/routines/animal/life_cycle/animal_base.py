@@ -48,7 +48,7 @@ class AnimalBase(object):
 		self._daily_growth = 0
 		self._nutrient_rqmts = {}
 		self._manure_excretion = {}
-		self._ration_formulation = {}
+		self._ration_formulation = {'objective': 0.00}
 		self._DMIest = 0
 		self._DBW = 0
 
@@ -64,7 +64,7 @@ class AnimalBase(object):
 		self._daily_growth = 0
 		self._nutrient_rqmts = {}
 		self._manure_excretion = {}
-		self._ration_formulation = {}
+		self._ration_formulation = {'objective': 0.00}
 		self._DMIest = 0
 		self._DBW = 0
 

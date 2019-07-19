@@ -10,6 +10,8 @@ Author(s): Kass Chupongstimun, kass_c@hotmail.com
 #!/usr/bin/env python3
 
 import RUFAS
+import random
+import numpy
 
 def main():
     """
@@ -28,7 +30,10 @@ def main():
     # or a directory containing json files when doing a batch simulation
     #
     input_file_list = RUFAS.input_prompt()
-
+    
+    random.seed(18)
+    numpy.random.seed(9)
+    
     #
     # Begin the simulation
     # Runs the simulation for each input file in input_file_path

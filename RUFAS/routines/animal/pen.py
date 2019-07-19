@@ -173,6 +173,7 @@ class Pen:
             ration_per_animal = dry_cow_optimize(feed, self.avg_nutrient_rqmts)
         
         else:
+            print('infeasible')
             ration_per_animal = {'status': 'Infeasible'}
         
             """
@@ -196,8 +197,10 @@ class Pen:
             # Recalculate average requirements
             self.calc_avg_nutrient_rqmts()
             """
+        if ration_per_animal == {}:
+           print('ration is blank')
         for animal in self.animals_in_pen:
-            animal.set_ration(ration_per_animal)
+            animal.set_ration(ration_per_animal, feed)
             
         # set ration for whole pen by multiplying calculated ration by number of animals in the pen
         num_animals = len(self.animals_in_pen)

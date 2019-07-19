@@ -157,7 +157,6 @@ class Cow(HeiferIII):
 			estimated_daily_milk_produced: estimated daily milk production from the lactation curve
 			fat_percent: calculated with days in milk, for temporary use
 			daily_fat_correct_milk_production: calculated form estimated milk production and fat percent, for temporary use
-			dry_matter_intake: calculated from FCM, days in milk, and body weight, for temporary use
 	'''
 	def _milking_update(self):
 		if self._days_in_preg == self._gestation_length - AnimalBase.config['dry_period']:
@@ -167,8 +166,7 @@ class Cow(HeiferIII):
 			self._estimated_daily_milk_produced = 0
 			self._estimated_daily_milk_produced_lst.append(self._estimated_daily_milk_produced)
 			self._body_weight_lst.append(self._body_weight)
-			dry_matter_intake = 12
-			return 0, 0, 0, dry_matter_intake
+			return 0, 0, 0
 
 		self._days_in_milk += 1
 		if self._breed == 'HO':
@@ -212,13 +210,10 @@ class Cow(HeiferIII):
 		if not self._milking:
 			self._daily_growth = self._body_weight - prev_weight
 		
-		#caculate dry matter intake from fat corrected milk production
-		dry_matter_intake = 0.372 * daily_fat_correct_milk_production + 0.0968 * self._body_weight**0.75 * (1-math.exp(-0.192 * (self._days_in_milk/7 +3.67)))
-
 		self._estimated_daily_milk_produced_lst.append(self._estimated_daily_milk_produced)
 		self._body_weight_lst.append(self._body_weight)
 
-		return estimated_daily_milk_produced, fat_percent, daily_fat_correct_milk_production, dry_matter_intake
+		return estimated_daily_milk_produced, fat_percent, daily_fat_correct_milk_production
 	
 	'''
        	Calculates this cow's nutrient requirements.
@@ -231,7 +226,7 @@ class Cow(HeiferIII):
 			self._DBW = result[2]
 			self._daily_growth = self._DBW
 		else:
-			result = dry_calculate_rqmts()
+			self._nutrient_rqmts = dry_calculate_rqmts()
 		'''
 		self._nutrient_rqmts = {'FU': {'op': '<=', 'val': 7.566673489860807}, 'RU': {'op': '>=', 'val': 0}, 'ME_DM': {'op': '>=', 'val': 57.238188330372566}, 'RDP_DM': {'op': '>=', 'val': 2.0347001114951313}, 'RUP_DM': {'op': '>=', 'val': 1.2716733909335047}}
 		self._DMIest = 27.620363504458798 
@@ -267,9 +262,13 @@ class Cow(HeiferIII):
 		Args:
 			ration_formulation: dictionary representing the calculated ration
 	'''
-	def set_ration(self, ration_formulation):
+	def set_ration(self, ration_formulation, feed):
 		self._ration_formulation = ration_formulation  
-	
+		self._dry_matter_intake = 0
+		for key in ration_formulation:
+			if key in feed.available_feed_names: 
+				DM_feed_amount = ration_formulation[key]
+				self._dry_matter_intake += DM_feed_amount
 	'''
 		Calculates and sets the animal's daily vertical and horizontal walking distance (DVD and DHD).
 		Args:
@@ -292,7 +291,6 @@ class Cow(HeiferIII):
 			estimated_daily_milk_produced: estimated daily milk production from the lactation curve
 			fat_percent: calculated with days in milk, for temporary use
 			daily_fat_correct_milk_production: calculated form estimated milk production and fat percent, for temporary use
-			dry_matter_intake: calculated from FCM, days in milk, and body weight, for temporary use
 			cull_stage: True if a cow is culled, false if it stays in the herd
 			new_born: True if a calf is born
 	'''
@@ -328,9 +326,8 @@ class Cow(HeiferIII):
 		estimated_daily_milk_produced = 0
 		fat_percent = 0
 		daily_fat_correct_milk_production = 0
-		dry_matter_intake = 0
 		# if self._milking:
-		estimated_daily_milk_produced, fat_percent, daily_fat_correct_milk_production, dry_matter_intake = self._milking_update()
+		estimated_daily_milk_produced, fat_percent, daily_fat_correct_milk_production = self._milking_update()
 		if self._repro_program == 'ED':
 				self._ed_update(record_econ_stats)
 		elif self._repro_program == 'ED-TAI':
@@ -343,9 +340,9 @@ class Cow(HeiferIII):
 		self._preg_update(record_econ_stats)
 		cull_stage = self._cull_update(estimated_daily_milk_produced)
 
-		self._economy_update(cull_stage, estimated_daily_milk_produced, dry_matter_intake, record_econ_stats)
+		self._economy_update(cull_stage, estimated_daily_milk_produced, record_econ_stats)
 
-		return estimated_daily_milk_produced, fat_percent, daily_fat_correct_milk_production, dry_matter_intake, cull_stage, new_born
+		return estimated_daily_milk_produced, fat_percent, daily_fat_correct_milk_production, cull_stage, new_born
 
 	################ ED methods #################
 	'''
@@ -927,16 +924,13 @@ class Cow(HeiferIII):
 		Description:
 			TEMP: update cost and income calculation for feed cost, fixed cost and milking income
 		Input:
-			AnimalBasecull_stage, estimated_daily_milk_produced, dry_matter_intake, record_econ_stats from temp use
+			AnimalBasecull_stage, estimated_daily_milk_produced, record_econ_stats from temp use
 		Output:
 	'''
-	def _economy_update(self, cull_stage, estimated_daily_milk_produced, dry_matter_intake, record_econ_stats):
-		# cow ecnomics
+	def _economy_update(self, cull_stage, estimated_daily_milk_produced, record_econ_stats):
+		# cow economics
 		if record_econ_stats:
-			if self._milking:
-				self._feed_cost += dry_matter_intake * 0.22
-			else:
-				self._feed_cost += dry_matter_intake * 0.18
+			self._feed_cost += self._ration_formulation['objective']
 
 			if cull_stage == False:
 				self._fixed_cost += 2.5

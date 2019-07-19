@@ -57,8 +57,13 @@ class HeiferIII(HeiferII):
         Args:
             ration_formulation: dictionary representing the calculated ration
     '''
-    def set_ration(self, ration_formulation):
-        self._ration_formulation = ration_formulation  
+    def set_ration(self, ration_formulation, feed):
+        self._ration_formulation = ration_formulation
+        self._dry_matter_intake = 0
+        for key in ration_formulation:
+            if key in feed.available_feed_names:
+                DM_feed_amount = ration_formulation[key]
+                self._dry_matter_intake += DM_feed_amount
 
     '''
 		Description:
