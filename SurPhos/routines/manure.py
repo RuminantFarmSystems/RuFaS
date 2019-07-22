@@ -17,9 +17,9 @@ def update_all(S, time):
     for i in range(0, len(m_app.day)):
         if day == m_app.day[i] and year == m_app.year[i] - time.start_year:
 
-            S.cover_SLP = 0.0154 * mass[i] ** -0.555
+            # S.cover_SLP = 0.0154 * mass[i] ** -0.555
 
-            m_app.percent_cover[i] = min( 1.0, 0.012 * mass[i] ** 0.48)
+            # m_app.percent_cover[i] = min(1.0, 0.012 * mass[i] ** 0.48)
             cover_app = S.area * m_app.percent_cover[i]
             P_app = mass[i] * m_app.total_P_frac[i]
             N_app = mass[i] * m_app.total_N_frac[i]
@@ -43,7 +43,6 @@ def update_all(S, time):
                 # infiltrate manure P if less than 15% solids
 
                 if m_app.dry_matter[i] <= 0.15:
-
                     S.manure_cov = min(S.area, S.manure_cov + cover_app * 0.5)
                     S.manure_mass += mass[i] * 0.8
                     S.WIP += P_app * m_app.WIP_frac * infiltration
@@ -56,7 +55,6 @@ def update_all(S, time):
                     # add manure P infiltrated into soil
 
                     # TODO these two lines are not included in the else below but in the next
-                    # TOD if/else statement it is
                     S.active_P_layer[0] += P_app * (1.0 - (m_app.WIP_frac + m_app.WOP_frac)) \
                                            * 0.25 * (1.0 - infiltration)
                     S.labile_P_layer[0] += P_app * m_app.WIP_frac * (1.0 - infiltration) + P_app \

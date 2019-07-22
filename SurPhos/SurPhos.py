@@ -10,7 +10,6 @@ def simulate():
     while not (surphos.time.year == surphos.time.end_year - surphos.time.start_year
                and surphos.time.day == surphos.time.end_day + 1):
         daily_P_routine(surphos, surphos.weather, surphos.time)
-        print(surphos.time.day, surphos.manure_cov)
         if surphos.time.day == 365:
             surphos.time.year += 1
             surphos.time.day = 0

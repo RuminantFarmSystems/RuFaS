@@ -29,15 +29,15 @@ def update_all(S, time):
 
     for i in range(0, 3):
         if i == 0:
-            S.labile_P_layer[i] -= crop_P_up.P_uptake_daily[year][day - 1] \
+            S.labile_P_layer[i] = S.labile_P_layer[i] - crop_P_up.P_uptake_daily[year][day - 1] \
                                    * S.labile_P_layer[0] / (S.labile_P_layer[0]
                                                             + S.labile_P_layer[1] * 0.9)
         elif i == 1:
-            S.labile_P_layer[1] -= crop_P_up.P_uptake_daily[year][day - 1] \
+            S.labile_P_layer[i] = S.labile_P_layer[i] - crop_P_up.P_uptake_daily[year][day - 1] \
                                    * S.labile_P_layer[1] / (S.labile_P_layer[0]
                                                             + S.labile_P_layer[1] * 0.9)
-        elif i == 3:
-            S.labile_P_layer[i] -= crop_P_up.P_uptake_daily[year][day - 1] * 0.10
+        elif i == 2:
+            S.labile_P_layer[i] = S.labile_P_layer[i] - crop_P_up.P_uptake_daily[year][day - 1] * 0.10
 
         S.labile_P_layer[i] = max(0.0, S.labile_P_layer[i])
 
@@ -72,7 +72,7 @@ def update_all(S, time):
         elif S.PSP_layer[i] > 0.7:
             S.PSP_layer[i] = 0.7
 
-        S.PSP_layer[i] = (S.PSP_avg[i] * 29.0 + S.PSP_layer[i]) / 30
+        S.PSP_layer[i] = (S.PSP_avg[i] * 29.0 + S.PSP_layer[i]) / 30.0
         S.PSP_avg[i] = S.PSP_layer[i]
 
         pbal[i] = S.labile_P_layer[i] - S.active_P_layer[i] \
