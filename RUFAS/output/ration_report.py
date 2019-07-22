@@ -144,6 +144,7 @@ class RationReport(BaseReportHandler):
     #---------------------------------------------------------------------------
     def annual_flush(self):
         """Sets all of the values in the output object to the default value."""
+        self.year = []
         self.julian_day = []
         
         for pen_id in self.pen_ids:

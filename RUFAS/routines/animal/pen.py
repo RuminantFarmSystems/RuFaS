@@ -170,27 +170,14 @@ class Pen:
             
             elif 'Cow' in self.classes_in_pen and self.animals_in_pen[0]._milking: # lactating cow
                 set_globals(self.avg_DMIest, self.avg_BW, self.avg_DBW, self.avg_milk, self.avg_CP_milk)
-                ration_per_animal = lactating_cow_optimize(feed, self.avg_nutrient_rqmts)
-                #if ration_per_animal['status'] == 'Infeasible':
-                #print(count)
-                """print(ration_per_animal['status'])
-                print('avg DMIest:\t', self.avg_DMIest)
-                print('avg BW:\t\t', self.avg_BW)
-                print('avg DBW:\t', self.avg_DBW)
-                print('avg milk:\t', self.avg_milk)
-                print('avg cp milk:\t', self.avg_CP_milk)
-                print('nutrient rqmts:\t', self.avg_nutrient_rqmts)
-                print('ration:\t\t', ration_per_animal)
-                print()"""
-                    
+                ration_per_animal = lactating_cow_optimize(feed, self.avg_nutrient_rqmts)                    
                     
             elif 'Cow' in self.classes_in_pen and not self.animals_in_pen[0]._milking:# dry cow
                 ration_per_animal = dry_cow_optimize(feed, self.avg_nutrient_rqmts)
             
-            else: #this shouldn't occur
+            else: #this shouldn never occur
                 print('error in pen ration calculation')
                 ration_per_animal = {'status': 'Infeasible'}
-            
             
             if ration_per_animal['status'] == 'Optimal':
                 break
@@ -199,21 +186,18 @@ class Pen:
             # feasible, milk production is reduced by 0.5 kg and the formulation is re-run 
             # until a feasible ration is obtained.
             
-            # Reduce estimated milk production by 0.5 kg
-            if self.animals_in_pen[0]._estimated_daily_milk_produced < 0:
-                print('negative esitmated milk production')
+            # Reduce estimated milk production by 0.5 kg                
             
             for animal in self.animals_in_pen:
-                animal._estimated_daily_milk_produced -= 0.5
-                
+                if type(animal).__name__ == 'Cow' and animal._milking:
+                    animal._estimated_daily_milk_produced -= 0.5
+               
             # Recalculate animal requirements
             self.call_animal_nutrient_rqmts(housing, pasture_concentrate, feed)
             
             # Recalculate average requirements
             self.calc_avg_nutrient_rqmts()
-            
-            count+= 1
-            
+                        
         for animal in self.animals_in_pen:
             animal.set_ration(ration_per_animal, feed)
             
