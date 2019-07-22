@@ -15,9 +15,9 @@ def update_all(surphos, weather, time):
     temp = weather.temp
     m_app = surphos.manure_app
 
-    runoff_IP = 0.0
-    runoff_OP = 0.0
-    runoff_NH = 0.0
+    surphos.runoff_IP = 0.0
+    surphos.runoff_OP = 0.0
+    surphos.runoff_NH = 0.0
 
     TFA = max(0.0, (2.0 * 32.0 ** 2 * temp[year][day - 1] ** 2
                     - temp[year][day - 1] ** 4) / 32.0 ** 4)
@@ -73,15 +73,15 @@ def update_all(surphos, weather, time):
             surphos.ND_factor = runoff[year][day - 1] / rainfall[year][day - 1]
             surphos.ND_factor = 0.034 * exp((runoff[year][day - 1] / rainfall[year][day - 1]) * 3.4)
 
-            runoff_IP = MIP_leach / (rainfall[year][day - 1] / 10.0) / surphos.area * 10.0 * surphos.PD_factor
-            runoff_OP = MOP_leach / (rainfall[year][day - 1] / 10.0) / surphos.area * 10.0 * surphos.PD_factor
-            runoff_NH = MNH_leach / (rainfall[year][day - 1] / 10.0) / surphos.area * 10.0 * surphos.PD_factor
+            surphos.runoff_IP = MIP_leach / (rainfall[year][day - 1] / 10.0) / surphos.area * 10.0 * surphos.PD_factor
+            surphos.runoff_OP = MOP_leach / (rainfall[year][day - 1] / 10.0) / surphos.area * 10.0 * surphos.PD_factor
+            surphos.runoff_NH = MNH_leach / (rainfall[year][day - 1] / 10.0) / surphos.area * 10.0 * surphos.PD_factor
 
             # calculate manure runoff P in KG
 
-            runoff_MIP = runoff_IP * runoff[year][day - 1] * 0.01 * surphos.area
-            runoff_MOP = runoff_OP * runoff[year][day - 1] * 0.01 * surphos.area
-            runoff_MNH = runoff_NH * runoff[year][day - 1] * 0.01 * surphos.area
+            runoff_MIP = surphos.runoff_IP * runoff[year][day - 1] * 0.01 * surphos.area
+            runoff_MOP = surphos.runoff_OP * runoff[year][day - 1] * 0.01 * surphos.area
+            runoff_MNH = surphos.runoff_NH * runoff[year][day - 1] * 0.01 * surphos.area
 
             if runoff_MIP < 0.0:
                 runoff_MIP = 0.0
@@ -101,9 +101,9 @@ def update_all(surphos, weather, time):
             runoff_MIP = 0.0
             runoff_MOP = 0.0
             runoff_MNH = 0.0
-            runoff_IP = 0.0
-            runoff_OP = 0.0
-            runoff_NH = 0.0
+            surphos.runoff_IP = 0.0
+            surphos.runoff_OP = 0.0
+            surphos.runoff_NH = 0.0
 
         # convert soil P from KG/HA to KG and add manure P leached
 
@@ -123,7 +123,7 @@ def update_all(surphos, weather, time):
 
         surphos.WIP_R_sum += runoff_MIP
         surphos.WOP_R_sum += runoff_MOP
-        surphos.NH_R_sum += runoff_NH
+        surphos.NH_R_sum += surphos.runoff_NH
         surphos.WIP_L_sum += MIP_leach - runoff_MIP
         surphos.WOP_L_sum += MOP_leach - runoff_MOP
         surphos.NH_L_sum += MNH_leach - runoff_MNH
@@ -263,11 +263,13 @@ def update_all(surphos, weather, time):
         # calculate runoff P in MG/L from both soil and manure
         # and manure P in runoff from spreading and grazing
 
+        surphos.runoff_OP = surphos.runoff_OP
+
         if runoff[year][day - 1] > 0.0:
             surphos.soil_P[0] = surphos.labile_P_layer[0] / surphos.bulk_density_layer[0] / surphos.thick_layer[0] / 0.1
             surphos.SRP_MGL = surphos.soil_P[0] * 0.005
 
-            surphos.T_runoff_IP = runoff_IP + surphos.SRP_MGL + surphos.fert_runoff_P
+            surphos.T_runoff_IP = surphos.runoff_IP + surphos.SRP_MGL + surphos.fert_runoff_P
 
         else:
             surphos.SRP_MGL = 0.0
