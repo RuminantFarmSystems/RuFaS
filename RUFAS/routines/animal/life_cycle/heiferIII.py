@@ -105,8 +105,6 @@ class HeiferIII(HeiferII):
         return cow_stage
 
     def __str__(self):
-        return 'heiferIII'
-        '''
         res_str = """
 			==> Heifer III: \n
 			ID: {} \n
@@ -130,4 +128,3 @@ class HeiferIII(HeiferII):
 				   str(self._events))
 
         return res_str
-        '''

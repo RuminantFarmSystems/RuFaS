@@ -978,8 +978,6 @@ class Cow(HeiferIII):
 		plt.show()
 	
 	def __str__(self):
-		return 'cow'
-		'''
 		res_str = """
 			==> Cow: \n
 			ID: {} \n
@@ -1007,4 +1005,3 @@ class Cow(HeiferIII):
 				   str(self._events))
 
 		return res_str
-		'''

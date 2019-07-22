@@ -175,7 +175,7 @@ class Pen:
             elif 'Cow' in self.classes_in_pen and not self.animals_in_pen[0]._milking:# dry cow
                 ration_per_animal = dry_cow_optimize(feed, self.avg_nutrient_rqmts)
             
-            else: #this shouldn never occur
+            else: #this should never occur
                 print('error in pen ration calculation')
                 ration_per_animal = {'status': 'Infeasible'}
             
