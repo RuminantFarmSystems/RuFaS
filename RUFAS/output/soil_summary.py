@@ -174,6 +174,7 @@ class SoilSummary(BaseReportHandler):
         self.surfaceTemp.append(soil.Tsurf)
         self.sedimentYield.append(soil.sedimentYield)
 
+
     #---------------------------------------------------------------------------
     # Method: annual_update
     #---------------------------------------------------------------------------

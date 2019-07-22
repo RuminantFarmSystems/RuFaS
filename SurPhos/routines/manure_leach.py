@@ -15,9 +15,9 @@ def update_all(S, weather, time):
     temp = weather.temp
     m_app = S.manure_app
 
-    runoff_IP = 0.0
-    runoff_OP = 0.0
-    runoff_NH = 0.0
+    S.runoff_IP = 0.0
+    S.runoff_OP = 0.0
+    S.runoff_NH = 0.0
 
     TFA = max(0.0, (2.0 * 32.0 ** 2 * temp[year][day - 1] ** 2
                     - temp[year][day - 1] ** 4) / 32.0 ** 4)
@@ -73,15 +73,15 @@ def update_all(S, weather, time):
             S.ND_factor = runoff[year][day - 1] / rainfall[year][day - 1]
             # S.ND_factor = 0.034 * exp((runoff[year][day - 1] / rainfall[year][day - 1]) * 3.4)
 
-            runoff_IP = MIP_leach / (rainfall[year][day - 1] / 10.0) / S.area * 10.0 * S.PD_factor
-            runoff_OP = MOP_leach / (rainfall[year][day - 1] / 10.0) / S.area * 10.0 * S.PD_factor
-            runoff_NH = MNH_leach / (rainfall[year][day - 1] / 10.0) / S.area * 10.0 * S.PD_factor
+            S.runoff_IP = MIP_leach / (rainfall[year][day - 1] / 10.0) / S.area * 10.0 * S.PD_factor
+            S.runoff_OP = MOP_leach / (rainfall[year][day - 1] / 10.0) / S.area * 10.0 * S.PD_factor
+            S.runoff_NH = MNH_leach / (rainfall[year][day - 1] / 10.0) / S.area * 10.0 * S.PD_factor
 
             # calculate manure runoff P in KG
 
-            runoff_MIP = runoff_IP * runoff[year][day - 1] * 0.01 * S.area
-            runoff_MOP = runoff_OP * runoff[year][day - 1] * 0.01 * S.area
-            runoff_MNH = runoff_NH * runoff[year][day - 1] * 0.01 * S.area
+            runoff_MIP = S.runoff_IP * runoff[year][day - 1] * 0.01 * S.area
+            runoff_MOP = S.runoff_OP * runoff[year][day - 1] * 0.01 * S.area
+            runoff_MNH = S.runoff_NH * runoff[year][day - 1] * 0.01 * S.area
 
             if runoff_MIP < 0.0:
                 runoff_MIP = 0.0
@@ -101,9 +101,9 @@ def update_all(S, weather, time):
             runoff_MIP = 0.0
             runoff_MOP = 0.0
             runoff_MNH = 0.0
-            runoff_IP = 0.0
-            runoff_OP = 0.0
-            runoff_NH = 0.0
+            S.runoff_IP = 0.0
+            S.runoff_OP = 0.0
+            S.runoff_NH = 0.0
 
         # convert soil P from KG/HA to KG and add manure P leached
 
@@ -123,7 +123,7 @@ def update_all(S, weather, time):
 
         S.WIP_R_sum += runoff_MIP
         S.WOP_R_sum += runoff_MOP
-        S.NH_R_sum += runoff_NH
+        S.NH_R_sum += S.runoff_NH
         S.WIP_L_sum += MIP_leach - runoff_MIP
         S.WOP_L_sum += MOP_leach - runoff_MOP
         S.NH_L_sum += MNH_leach - runoff_MNH
@@ -156,15 +156,15 @@ def update_all(S, weather, time):
             cov_d_com = S.manure_cov
 
         # TODO should be commented out
-        # SIP_d_com = max(0.0, surphos.SIP * 0.0025 * TFA * surphos.moisture)
-        # if SIP_d_com > surphos.SIP:
-        #     SIP_d_com = surphos.SIP
-        # SOP_d_com = max(0.0, surphos.SOP * 0.01 * TFA * surphos.moisture)
-        # if SOP_d_com > surphos.SOP:
-        #     SOP_d_com = surphos.SOP
-        # man_ASIM = max(0.0, surphos.manure_mass * 0.025 * TFA * surphos.moisture)
-        # if man_ASIM > surphos.manure_mass:
-        #     man_ASIM = surphos.manure_mass
+        # SIP_d_com = max(0.0, S.SIP * 0.0025 * TFA * S.moisture)
+        # if SIP_d_com > S.SIP:
+        #     SIP_d_com = S.SIP
+        # SOP_d_com = max(0.0, S.SOP * 0.01 * TFA * S.moisture)
+        # if SOP_d_com > S.SOP:
+        #     SOP_d_com = S.SOP
+        # man_ASIM = max(0.0, S.manure_mass * 0.025 * TFA * S.moisture)
+        # if man_ASIM > S.manure_mass:
+        #     man_ASIM = S.manure_mass
 
         SIP_d_com = max(0.0, S.SIP * 0.0025 * min(TFA, S.moisture))
         if SIP_d_com > S.SIP:
@@ -266,11 +266,13 @@ def update_all(S, weather, time):
         # calculate runoff P in MG/L from both soil and manure
         # and manure P in runoff from spreading and grazing
 
+        S.runoff_OP = S.runoff_OP
+
         if runoff[year][day - 1] > 0.0:
             S.soil_P[0] = S.labile_P_layer[0] / S.bulk_density_layer[0] / S.thick_layer[0] / 0.1
             S.SRP_MGL = S.soil_P[0] * 0.005
 
-            S.T_runoff_IP = runoff_IP + S.SRP_MGL + S.fert_runoff_P
+            S.T_runoff_IP = S.runoff_IP + S.SRP_MGL + S.fert_runoff_P
 
         else:
             S.SRP_MGL = 0.0
