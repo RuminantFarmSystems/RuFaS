@@ -52,7 +52,7 @@ def update_all(S, weather, time):
     if leach_P < 0.0:
         leach_P = 0.0
 
-    S.labile_P_layer[0] -= soil_runoff_P - leach_P
+    S.labile_P_layer[0] = S.labile_P_layer[0] - soil_runoff_P - leach_P
     S.labile_P_layer[1] += leach_P - seep_P
     S.labile_P_layer[2] += seep_P
 
