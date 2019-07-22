@@ -133,8 +133,6 @@ class Calf(AnimalBase):
 		return wean_day
 
 	def __str__(self):
-		return 'calf'
-		'''
 		if not self._culled:
 			res_str = """
 				==> Calf: \n
@@ -167,4 +165,3 @@ class Calf(AnimalBase):
 					self._days_born,
 					str(self._events))
 		return res_str
-		'''

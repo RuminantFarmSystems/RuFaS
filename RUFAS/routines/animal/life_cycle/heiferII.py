@@ -500,8 +500,6 @@ class HeiferII(HeiferI):
 				self._events.add_event(self._days_born, 'Preg loss happened between 2nd and 3rd preg check')
 
 	def __str__(self):
-		return 'heiferII'
-		'''
 		res_str = """
 			==> Heifer II: \n
 			ID: {} \n
@@ -525,4 +523,3 @@ class HeiferII(HeiferI):
 				   str(self._events))
 
 		return res_str
-		'''
