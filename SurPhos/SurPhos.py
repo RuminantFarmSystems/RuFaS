@@ -1,21 +1,34 @@
 import csv
 from math import log
 
-from SurPhos import util
+from SurPhos import util, surphos_summary
 from SurPhos.routines import p_mineralization, manure, plow, fertilizer, manure_leach, sol_P, fert_leach
 
 
 def simulate():
+
+    clear_output_dir()
     surphos = SurPhos()
+    report = surphos_summary.SurPhosSummary()
+    report.initialize()
     while not (surphos.time.year == surphos.time.end_year - surphos.time.start_year
                and surphos.time.day == surphos.time.end_day + 1):
         daily_P_routine(surphos, surphos.weather, surphos.time)
-        print(surphos.time.day, surphos.manure_cov)
+        report.daily_update(surphos)
         if surphos.time.day == 365:
             surphos.time.year += 1
             surphos.time.day = 0
+            report.write_annual_report()
+            report.annual_flush()
         surphos.time.day += 1
+    report.write_annual_report()
+    report.annual_flush()
 
+
+def clear_output_dir():
+    path = util.get_base_dir()/'SurPhos/output'
+    for file in path.iterdir():
+        file.unlink()
 
 def daily_P_routine(surphos, weather, time):
     fertilizer.update_all(surphos, time)  # done
@@ -175,6 +188,8 @@ class SurPhos:
         self.DP_sum = 0.0
         self.N_sum = 0.0
         self.SRP_MGL = 0.0
+        self.runoff_IP = 0.0
+        self.runoff_OP = 0.0
         self.T_runoff_IP = 0.0
 
 
