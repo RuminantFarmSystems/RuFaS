@@ -1,7 +1,7 @@
 import csv
 from math import log
 
-from SurPhos import util, surphos_summary
+from SurPhos import util, surphos_summary, data_analysis
 from SurPhos.routines import p_mineralization, manure, plow, fertilizer, manure_leach, sol_P, fert_leach
 
 
@@ -23,6 +23,7 @@ def simulate():
         surphos.time.day += 1
     report.write_annual_report()
     report.annual_flush()
+    data_analysis.produce_graphics()
 
 
 def clear_output_dir():
