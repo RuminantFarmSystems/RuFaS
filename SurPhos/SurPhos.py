@@ -38,7 +38,7 @@ def daily_P_routine(surphos, weather, time):
     plow.update_all(surphos, time)  # done
     sol_P.update_all(surphos, weather, time)  # done
     fert_leach.update_all(surphos, weather, time)  # done
-    manure_leach.update_all(surphos, weather, time)
+    manure_leach.update_all(surphos, weather, time)  # done
     p_mineralization.update_all(surphos, time)  # done
 
 
@@ -176,7 +176,22 @@ class SurPhos:
         self.soil_yp = []  # soilyp
         for x in range(0, 3):
             self.soil_yp.append([0 for _ in range(0, 366)])
-        self.PSP_avg = self.PSP_layer
+        self.PSP_avg = []
+        for x in range(len(self.PSP_layer)):
+            self.PSP_avg.append(self.PSP_layer[x])
+        self.pbal = [0, 0, 0]
+        self.old_pbal = [0, 0, 0]
+        self.lab_P_sum = [0, 0, 0]
+        self.lab_P_avg = [0, 0, 0]
+        self.varA = [0, 0, 0]
+        self.varB = [0, 0, 0]
+        self.base = [0, 0, 0]
+        self.pflow = [0, 0, 0]
+        self.pd_srb_fac = [0, 0, 0]
+        self.pflow_r = [0, 0, 0]
+        self.PSP_fac = [0, 0, 0]
+        self.pflow2 = [0, 0, 0]
+        self.temp_lab = [0, 0, 0]
 
         # manure_leach
         self.TIP_leach = 0.0
