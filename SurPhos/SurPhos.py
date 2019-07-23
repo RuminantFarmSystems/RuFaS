@@ -31,6 +31,7 @@ def clear_output_dir():
     for file in path.iterdir():
         file.unlink()
 
+
 def daily_P_routine(surphos, weather, time):
     fertilizer.update_all(surphos, time)  # done
     manure.update_all(surphos, time)  # done
@@ -205,6 +206,7 @@ class Fertilizer:
 
 class Manure:
     def __init__(self):
+        # TODO doody3.gen
         self.type = 1
         self.year = [2012, 2012, 2012, 2012, 2013, 2013, 2013, 2013]
         self.day = [103, 176, 226, 283, 46, 155, 241, 273]
@@ -219,6 +221,20 @@ class Manure:
         self.depth = 0.0
         self.surface_percent = [1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0]
 
+        # TODO doody5.gen
+        # self.type = 1
+        # self.year = [2012, 2012, 2012, 2012, 2013, 2013, 2013]
+        # self.day = [137, 191, 226, 283, 161, 204, 277]
+        # self.mass = [1869.0, 2009.0, 1329.0, 2228.0, 1197.0, 1370.0, 1623.0]
+        # self.total_P_frac = [0.00714, 0.00725, 0.00941, 0.00656, 0.00869, 0.00657, 0.00784]
+        # self.WIP_frac = 0.6
+        # self.WOP_frac = 0.05
+        # self.total_N_frac = [0, 0, 0, 0, 0, 0, 0]
+        # self.total_NH4_frac = [0, 0, 0, 0, 0, 0, 0]
+        # self.dry_matter = [0.06, 0.06, 0.04, 0.04, 0.04, 0.05, 0.06]
+        # self.percent_cover = [0.95, 0.95, 0.95, 0.95, 0.95, 0.95, 0.95, 0.95]
+        # self.depth = 0.0
+        # self.surface_percent = [1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0]
 
 class Tillage:
     def __init__(self):

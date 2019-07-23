@@ -19,8 +19,8 @@ def update_all(S, weather, time):
     S.runoff_OP = 0.0
     S.runoff_NH = 0.0
 
-    TFA = max(0.0, (2.0 * 32.0 ** 2 * temp[year][day - 1] ** 2
-                    - temp[year][day - 1] ** 4) / 32.0 ** 4)
+    TFA = max(0.0, ((2.0 * 32.0 ** 2 * temp[year][day - 1] ** 2
+                    - temp[year][day - 1] ** 4)) / 32.0 ** 4)
 
     for w in range(0, 3):
         S.active_P_layer[w] *= S.area
@@ -75,7 +75,7 @@ def update_all(S, weather, time):
 
             S.runoff_IP = MIP_leach / (rainfall[year][day - 1] / 10.0) / S.area * 10.0 * S.PD_factor
             S.runoff_OP = MOP_leach / (rainfall[year][day - 1] / 10.0) / S.area * 10.0 * S.PD_factor
-            S.runoff_NH = MNH_leach / (rainfall[year][day - 1] / 10.0) / S.area * 10.0 * S.PD_factor
+            S.runoff_NH = MNH_leach / (rainfall[year][day - 1] / 10.0) / S.area * 10.0 * S.ND_factor
 
             # calculate manure runoff P in KG
 
@@ -93,7 +93,7 @@ def update_all(S, weather, time):
             if runoff_MIP > MIP_leach:
                 runoff_MIP = MIP_leach
             if runoff_MOP > MOP_leach:
-                runoff_MOP = MIP_leach
+                runoff_MOP = MOP_leach
             if runoff_MNH > MNH_leach:
                 runoff_MNH = MNH_leach
 
@@ -111,27 +111,27 @@ def update_all(S, weather, time):
         S.labile_P_layer[0] += (MOP_leach - runoff_MOP) * 0.6
 
         if S.depths_layer[1] <= 15.0:
-            S.labile_P_layer[1] += MIP_leach - runoff_MIP * 0.3
-            S.labile_P_layer[1] += MOP_leach - runoff_MOP * 0.3
-            S.labile_P_layer[2] += MIP_leach - runoff_MIP * 0.1
-            S.labile_P_layer[2] += MOP_leach - runoff_MOP * 0.1
+            S.labile_P_layer[1] += (MIP_leach - runoff_MIP) * 0.3
+            S.labile_P_layer[1] += (MOP_leach - runoff_MOP) * 0.3
+            S.labile_P_layer[2] += (MIP_leach - runoff_MIP) * 0.1
+            S.labile_P_layer[2] += (MOP_leach - runoff_MOP) * 0.1
         else:
-            S.labile_P_layer[1] += MIP_leach - runoff_MIP * 0.4
-            S.labile_P_layer[1] += MOP_leach - runoff_MOP * 0.4
+            S.labile_P_layer[1] += (MIP_leach - runoff_MIP) * 0.4
+            S.labile_P_layer[1] += (MOP_leach - runoff_MOP) * 0.4
 
         # add manure P leached and in runoff to running total
 
         S.WIP_R_sum += runoff_MIP
         S.WOP_R_sum += runoff_MOP
         S.NH_R_sum += S.runoff_NH
-        S.WIP_L_sum += MIP_leach - runoff_MIP
-        S.WOP_L_sum += MOP_leach - runoff_MOP
-        S.NH_L_sum += MNH_leach - runoff_MNH
+        S.WIP_L_sum += (MIP_leach - runoff_MIP)
+        S.WOP_L_sum += (MOP_leach - runoff_MOP)
+        S.NH_L_sum += (MNH_leach - runoff_MNH)
 
         # decompose manure and manure P in KG
 
         wet = -0.3 * S.moisture + 0.27
-        dry = (-0.05 * S.manure_mass / S.manure_mass_app + 0.075) * TFA
+        dry = (-0.05 * (S.manure_mass / S.manure_mass_app) + 0.075) * TFA
 
         if rainfall[year][day - 1] > 4.0:
             S.moisture += wet
@@ -184,7 +184,7 @@ def update_all(S, weather, time):
         cov_ASIM = max(0.0, man_ASIM / S.manure_mass * S.manure_cov)
         # if cov_d_com > S.manure_cov:  # TODO seems like an error, why is it cov_d_com
         #     cov_ASIM = S.manure_cov
-        if cov_ASIM > S.manure_cov:  # TODO fixed version above
+        if cov_ASIM > S.manure_cov:  # TODO fixed version of above
             cov_ASIM = S.manure_cov
         WIP_ASIM = max(0.0, man_ASIM / S.manure_mass * S.WIP)
         if WIP_ASIM > S.WIP:
@@ -209,7 +209,7 @@ def update_all(S, weather, time):
         S.SON = max(0.0, S.manure_SON - SON_ASIM - SON_d_com)
         S.WOP = max(0.0, S.WOP - WOP_ASIM - WOP_d_com)
         S.SIP = max(0.0, S.SIP - SIP_ASIM - SIP_d_com)
-        S.WIP - max(0.0, S.WIP - WIP_ASIM)
+        S.WIP = max(0.0, S.WIP - WIP_ASIM)
         S.manure_NH4 = max(0.0, S.manure_NH4 - NH_ASIM)
 
         S.WIP += WOP_d_com + SOP_d_com * 0.75 + SIP_d_com
@@ -257,24 +257,22 @@ def update_all(S, weather, time):
     else:
         water_manure = 0.0
 
-        # convert soil P from KG/HA to KG and add manure P decomposed
+    # convert soil P from KG/HA to KG and add manure P decomposed
 
-        for w in range(0, 3):
-            S.active_P_layer[w] /= S.area
-            S.labile_P_layer[w] /= S.area
+    for w in range(0, 3):
+        S.active_P_layer[w] /= S.area
+        S.labile_P_layer[w] /= S.area
 
-        # calculate runoff P in MG/L from both soil and manure
-        # and manure P in runoff from spreading and grazing
+    # calculate runoff P in MG/L from both soil and manure
+    # and manure P in runoff from spreading and grazing
 
-        S.runoff_OP = S.runoff_OP
+    if runoff[year][day - 1] > 0.0:
+        S.soil_P[0] = S.labile_P_layer[0] / S.bulk_density_layer[0] / S.thick_layer[0] / 0.1
+        S.SRP_MGL = S.soil_P[0] * 0.005
 
-        if runoff[year][day - 1] > 0.0:
-            S.soil_P[0] = S.labile_P_layer[0] / S.bulk_density_layer[0] / S.thick_layer[0] / 0.1
-            S.SRP_MGL = S.soil_P[0] * 0.005
+        S.T_runoff_IP = S.runoff_IP + S.SRP_MGL + S.fert_runoff_P
 
-            S.T_runoff_IP = S.runoff_IP + S.SRP_MGL + S.fert_runoff_P
-
-        else:
-            S.SRP_MGL = 0.0
-            S.T_runoff_IP = 0.0
+    else:
+        S.SRP_MGL = 0.0
+        S.T_runoff_IP = 0.0
 
