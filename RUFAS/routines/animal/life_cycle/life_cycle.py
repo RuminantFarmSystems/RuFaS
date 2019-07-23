@@ -210,7 +210,7 @@ class LifeCycleManager():
         daily_cow_cull_num = 0
         daily_heifer_sold = 0
         daily_bought_from_market = 0
-        self.daily_cow_milking = 0
+        daily_cow_milking = 0
         self.daily_calf_num.append(len(self.calves))
         self.daily_heiferI_num.append(len(self.heiferIs))
         self.daily_heiferII_num.append(len(self.heiferIIs))
@@ -366,7 +366,7 @@ class LifeCycleManager():
                     self.num_preg_21_days += 1
             
             if cow._milking:
-                self.daily_cow_milking += 1
+                daily_cow_milking += 1
     
         # calculate service rate and conception rate
         if date >= sim_length - 21 * self.config["num_21_days"]:
@@ -382,13 +382,19 @@ class LifeCycleManager():
         self.culled_cows_lst.append(daily_cow_cull_num)
         self.heifer_sold_lst.append(daily_heifer_sold)
         self.replacement_bought_lst.append(daily_bought_from_market)
-        self.milking_cows_lst.append(self.daily_cow_milking)
+        self.milking_cows_lst.append(daily_cow_milking)
     
         
     def output_end_stats(self, sim_length):
         '''
         End of simulation statistics.
         '''
+        #find avg of self.milking_cows_lst
+        self.avg_daily_cow_milking = 0
+        for daily_val in self.milking_cows_lst:
+            self.avg_daily_cow_milking += daily_val
+        self.avg_daily_cow_milking /= len(self.milking_cows_lst)
+        
         # count stats
         for heiferII in self.heiferIIs:
             if heiferII._preg:
@@ -410,11 +416,11 @@ class LifeCycleManager():
             total_repro_cost = self.total_breeding_cost + self.total_semen_cost + self.total_ai_cost + self.total_preg_check_cost
             avg_repro_cost = total_repro_cost/365/1000
             self.total_feed_cost += feed_cost
-            avg_feed_cost = self.total_feed_cost/365/self.daily_cow_milking
+            avg_feed_cost = self.total_feed_cost/365/self.avg_daily_cow_milking
             self.total_fixed_cost += fixed_cost
             avg_fixed_cost = self.total_fixed_cost/365/1000
             self.total_milk_income += milk_income
-            avg_milk_income = self.total_milk_income/365/self.daily_cow_milking
+            avg_milk_income = self.total_milk_income/365/self.avg_daily_cow_milking
             income_over_feed_cost = self.total_milk_income + self.total_slaughter_value + self.total_heifer_value + self.total_calf_value - self.total_feed_cost
             net_return = income_over_feed_cost - self.total_replacement_cost - self.total_fixed_cost
             
