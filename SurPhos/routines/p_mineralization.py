@@ -64,19 +64,22 @@ def update_all(S, time):
 
         S.soil_P[i] = S.labile_P_layer[i] / S.bulk_density_layer[i] \
                       / S.thick_layer[i] / 0.1
+
         S.PSP_layer[i] = -0.045 * log(S.clay_layer[i]) \
                          + 0.001 * S.labile_P_layer[i] \
                          - 0.035 * S.OC_layer[i] + 0.43
+
         if S.PSP_layer[i] < 0.05:
             S.PSP_layer[i] = 0.05
         elif S.PSP_layer[i] > 0.7:
             S.PSP_layer[i] = 0.7
 
         S.PSP_layer[i] = (S.PSP_avg[i] * 29.0 + S.PSP_layer[i]) / 30.0
-        S.PSP_avg[i] = S.PSP_layer[i]
+        S.PSP_avg[i] = S.PSP_layer[i]  # TODO psp_avg is unnecessary
 
         pbal[i] = S.labile_P_layer[i] - S.active_P_layer[i] \
                   * (S.PSP_layer[i] / (1.0 - S.PSP_layer[i]))
+
         varA[i] = 0.918 * (exp(-4.603 * S.PSP_layer[i]))
         varB[i] = -0.238 * log(varA[i]) - 1.126
 
@@ -105,7 +108,7 @@ def update_all(S, time):
             if S.labile_P_layer[i] <= 0.0:
                 S.labile_P_layer[i] = 0.0
 
-        if pbal[i] >= 0.0:
+        elif pbal[i] >= 0.0:
             pflow_r[i] = 0.0
             cnt_day[i] = 0.0
 
@@ -119,6 +122,7 @@ def update_all(S, time):
             PSP_fac[i] = varA[i] * (days[i] ** varB[i])
             pflow[i] = PSP_fac[i] * pbal[i]
 
+            # TODO next two if statements are redundant
             if pflow[i] > S.labile_P_layer[i]:
                 pflow[i] = S.labile_P_layer[i]
 
@@ -130,9 +134,9 @@ def update_all(S, time):
             if S.active_P_layer[i] <= 0:
                 S.active_P_layer[i] = 0.0
 
-            old_pbal[i] = pbal[i]
+            old_pbal[i] = pbal[i]  # TODO why is this not done in both?
 
-        pflow2[i] = 0.0006 * (S.stable_P_layer[i] - 4.0 * S.active_P_layer[i])
+        pflow2[i] = 0.0006 * (S.stable_P_layer[i] - (4.0 * S.active_P_layer[i]))
         S.stable_P_layer[i] -= pflow2[i]
         S.active_P_layer[i] += pflow2[i]
 
@@ -140,6 +144,6 @@ def update_all(S, time):
                       / S.thick_layer[i] / 0.1
         if temp_lab[i] < 5.0:
             min_P = min(((5.0 * S.bulk_density_layer[i] * S.thick_layer[i] * 0.1)
-                         - S.labile_P_layer[i])), S.org_P_layer[i]
+                         - S.labile_P_layer[i]), S.org_P_layer[i])
             S.labile_P_layer[i] += min_P
             S.org_P_layer[i] -= min_P

@@ -32,9 +32,9 @@ def update_all(S, weather, time):
     DRP[0] = min(40.0, exp((S.soil_P[0] * 1.5 - inter[0] / slope[0])))
     DRP[1] = min(40.0, exp((S.soil_P[1] * 1.5 - inter[1] / slope[1])))
 
-    water[0] = max(0.0, (-0.07 * log(S.depths_layer[0] / 2.54 + 0.6))
+    water[0] = max(0.0, (-0.07 * log((S.depths_layer[0] / 2.54) + 0.6))
                    * rainfall[year][day - 1])
-    water[1] = max(0.0, (-0.07 * log(S.depths_layer[1] / 2.54 + 0.6))
+    water[1] = max(0.0, (-0.07 * log((S.depths_layer[1] / 2.54) + 0.6))
                    * rainfall[year][day - 1])
 
     # compute soluble P lost in surface runoff in KG/HA
