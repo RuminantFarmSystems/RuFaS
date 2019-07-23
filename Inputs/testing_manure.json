@@ -1,10 +1,8 @@
-
 {
-
     "config":
     {
-        "StartYear" : 2008,
-        "EndYear" : 2009,
+        "StartDate" : "2008:1",
+        "EndDate" : "2009:365",
         "output_dir": "Outputs/Sample_Farm_Outputs/"
     },
 
@@ -55,7 +53,6 @@
                 "harvest_eff": 0.9,
                 "HI_opt": 0.6,
                 "HI_min": 0.3,
-                "init_residue": 8000,
 
                 "min_temp_for_growth": 10,
                 "max_temp_for_growth": 30,
@@ -89,12 +86,7 @@
                 "fr,p2": 0.0018,
                 "fr,p3": 0.0014,
                 "fr,p~3": 0.00141,
-                "beta_p": 10,
-
-
-                "TESTING_Ea_sum" : [251.2544561385, 313.6495119524],
-                "TESTING_Eo_sum" : [329.6603213136, 372.2587849571],
-                "TEST_DATA" : "Inputs/TEST_INPUTS.csv"
+                "beta_p": 10
             }
         },
         "soil":
@@ -111,7 +103,7 @@
             "Sand": 15,
             "Silt": 65,
             "SoilAlbedo": 0.16,
-            "Residue": 8000,
+            "initial_residue": 8000,
             "FreshNMineralRate": 0.05,
             "SoilCoverType": "BARE",
 
