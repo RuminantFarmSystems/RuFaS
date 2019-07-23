@@ -62,7 +62,7 @@ def simulate(input_fPath:Path):
     while not time.end_simulation():
         annual_simulation()
 
-    state.animal_management.life_cycle_manager.output_end_stats(config.sim_length)
+    #state.animal_management.life_cycle_manager.output_end_stats(config.sim_length)
     t_end_sim = timer.time()
 
     print("Simulation Successful: {}".format(input_fPath.name))
