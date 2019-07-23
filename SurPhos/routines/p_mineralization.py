@@ -18,15 +18,16 @@ def update_all(S, time):
     varB = [0, 0, 0]
     base = [0, 0, 0]
     pflow = [0, 0, 0]
-    days = [0, 0, 0]
-    cnt_day = [0, 0, 0]
-    pd_srd_fac = [0, 0, 0]
+    S.count_day = [0, 0, 0]
+    pd_srb_fac = [0, 0, 0]
     pflow_r = [0, 0, 0]
     old_pbal = [0, 0, 0]
     PSP_fac = [0, 0, 0]
     pflow2 = [0, 0, 0]
     temp_lab = [0, 0, 0]
 
+    if day == 102:
+        print(S.labile_P_layer)
     for i in range(0, 3):
         if i == 0:
             S.labile_P_layer[i] = S.labile_P_layer[i] - crop_P_up.P_uptake_daily[year][day - 1] \
@@ -64,7 +65,8 @@ def update_all(S, time):
 
         S.soil_P[i] = S.labile_P_layer[i] / S.bulk_density_layer[i] \
                       / S.thick_layer[i] / 0.1
-
+        if day == 102:
+            print("\t", i, S.labile_P_layer)
         S.PSP_layer[i] = -0.045 * log(S.clay_layer[i]) \
                          + 0.001 * S.labile_P_layer[i] \
                          - 0.035 * S.OC_layer[i] + 0.43
@@ -87,15 +89,15 @@ def update_all(S, time):
 
         if pbal[i] < 0.0:
             pflow[i] = 0.0
-            days[i] = 0.0
+            S.days[i] = 0.0
 
-            if cnt_day[i] > 0.0:
-                cnt_day[i] += 1.0
-            if cnt_day[i] == 0.0:
-                cnt_day[i] = 1.0
+            if S.count_day[i] > 0.0:
+                S.count_day[i] += 1.0
+            if S.count_day[i] == 0.0:
+                S.count_day[i] = 1.0
 
-            pd_srd_fac[i] = base[i] * (cnt_day[i] ** -0.32)
-            pflow_r[i] = pd_srd_fac[i] * pbal[i] * -1.0
+            pd_srb_fac[i] = base[i] * (S.count_day[i] ** -0.32)
+            pflow_r[i] = pd_srb_fac[i] * pbal[i] * -1.0
 
             if pflow_r[i] > S.active_P_layer[i]:
                 pflow_r = S.active_P_layer[i]
@@ -110,16 +112,16 @@ def update_all(S, time):
 
         elif pbal[i] >= 0.0:
             pflow_r[i] = 0.0
-            cnt_day[i] = 0.0
+            S.count_day[i] = 0.0
 
             if pbal[i] > old_pbal[i]:
-                days[i] = 0.0
-            if days[i] >= 1.0:
-                days[i] += 1.0
-            if days[i] == 0.0:
-                days[i] = 1.0
+                S.days[i] = 0.0
+            if S.days[i] >= 1.0:
+                S.days[i] += 1.0
+            if S.days[i] == 0.0:
+                S.days[i] = 1.0
 
-            PSP_fac[i] = varA[i] * (days[i] ** varB[i])
+            PSP_fac[i] = varA[i] * (S.days[i] ** varB[i])
             pflow[i] = PSP_fac[i] * pbal[i]
 
             # TODO next two if statements are redundant
@@ -147,3 +149,5 @@ def update_all(S, time):
                          - S.labile_P_layer[i]), S.org_P_layer[i])
             S.labile_P_layer[i] += min_P
             S.org_P_layer[i] -= min_P
+    if day == 102:
+        print(S.labile_P_layer, "\n")

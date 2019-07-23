@@ -112,11 +112,13 @@ class SurPhos:
             self.CNT_day_layer.append(0.0)
 
         # default values
+        self.days = [0, 0, 0]
         self.moisture = 0.5
         self.CNT = 1
         self.manure_cov = 0.0
         self.manure_mass = 0.0
         self.cover_SLP = 0.000025
+        self.count_day = [0, 0, 0]
 
         # fertilizer
         self.fert_applied_sum = 0.0
