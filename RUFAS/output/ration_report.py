@@ -69,13 +69,13 @@ class RationReport(BaseReportHandler):
         # get static data like units associated with each feed type
         # store in Feed or Animal???????
         self.feed_info = feed.available_feeds
-        
+
         for pen in state.animal_management.all_pens:
             self.pen_ids.append(pen.id)
             self.num_animals_in_pen[pen.id] = []
             self.achieved_price[pen.id] = []
             self.feed_amounts[pen.id] = []
-                
+
         self.write_header()
 
     #---------------------------------------------------------------------------
@@ -84,23 +84,23 @@ class RationReport(BaseReportHandler):
     def daily_update(self, state, weather, time):
         """Stores the daily values that need to be printed in the report."""
         self.year.append(time.cal_year)
-        
+
         animal_management = state.animal_management
-            
+
         # for each day that a ration is calculated, appends the necessary information to the lists
         if animal_management.end_ration_interval():
-            self.julian_day.append(time.day) 
+            self.julian_day.append(time.day)
 
             for pen in animal_management.all_pens:
                 self.num_animals_in_pen[pen.id].append(len(pen.animals_in_pen))
-                
+
                 if pen.pen_populated:
                     self.achieved_price[pen.id].append(pen.ration['objective'])
                     self.feed_amounts[pen.id].append({feed_type: pen.ration[feed_type] for feed_type in self.feed_info.keys()})
                 else:
                     self.achieved_price[pen.id].append(0)
                     self.feed_amounts[pen.id].append({feed_type: 0 for feed_type in self.feed_info.keys()})
-    
+
     #---------------------------------------------------------------------------
     # Method: annual_update
     #---------------------------------------------------------------------------
@@ -138,7 +138,7 @@ class RationReport(BaseReportHandler):
                     writer = csv.DictWriter(csvfile, fieldnames=self.fieldNames,
                                     lineterminator = '\n')
                     writer.writerow(ration_data)
-                    
+
     #---------------------------------------------------------------------------
     # Method: annual_flush
     #---------------------------------------------------------------------------
@@ -146,10 +146,8 @@ class RationReport(BaseReportHandler):
         """Sets all of the values in the output object to the default value."""
         self.year = []
         self.julian_day = []
-        
+
         for pen_id in self.pen_ids:
             self.num_animals_in_pen[pen_id] = []
             self.achieved_price[pen_id] = []
             self.feed_amounts[pen_id] = []
-
-        
