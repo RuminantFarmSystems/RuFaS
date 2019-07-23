@@ -15,10 +15,6 @@ def update_all(S, weather, time):
     temp = weather.temp
     m_app = S.manure_app
 
-    S.runoff_IP = 0.0
-    S.runoff_OP = 0.0
-    S.runoff_NH = 0.0
-
     TFA = max(0.0, ((2.0 * 32.0 ** 2 * temp[year][day - 1] ** 2
                     - temp[year][day - 1] ** 4)) / 32.0 ** 4)
 

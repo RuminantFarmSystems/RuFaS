@@ -160,6 +160,10 @@ class SurPhos:
         # solp
         self.soil_P = [0, 0, 0]
         self.SRP_sum = 0.0
+        self.slope = [0, 0, 0]
+        self.inter = [0, 0, 0]
+        self.DRP = [0, 0, 0]
+        self.water = [0, 0, 0]
 
         # fert_leach
         self.fert_sorp = 0.0
@@ -209,6 +213,7 @@ class SurPhos:
         self.SRP_MGL = 0.0
         self.runoff_IP = 0.0
         self.runoff_OP = 0.0
+        self.runoff_NH = 0.0
         self.T_runoff_IP = 0.0
 
 
