@@ -236,7 +236,7 @@ class Config:
             if i == 0:
                 #check for +-1
                 if is_leap_year(self.start_year):
-                    sim_length += leap_year_length - self.day
+                    sim_length += leap_year_length - self.start_day
                 else:
                     sim_length += year_length - self.start_day
             else:
