@@ -3,6 +3,7 @@ import datetime as dt
 import matplotlib.pyplot as mp
 from SurPhos import util
 
+
 def read_data(output_csv):
     output_full_path = util.get_base_dir()/'SurPhos'/output_csv
     with output_full_path.open('r') as csv_file:
@@ -33,6 +34,11 @@ def produce_graphics():
     fortran, units = read_data('surphos_output.csv')
     python, units = read_data('output/surphos_report.csv')
 
+    if len(python['j_day']) != len(fortran['j_day']):
+        fortran, units = read_data('output/surphos_report.csv')
+        print("Could not compare Fortran and Python because of different simulation lengths.",
+              "\n\t*Showing Python*")
+
     save_dir = util.get_base_dir()/'SurPhos/output'
 
     start_year = int(fortran['year'][0])
@@ -48,6 +54,7 @@ def produce_graphics():
     counter = 0
     for variable in zip(python, fortran):
         if counter > 1:
+            # print(variable, sum(fortran[variable[1]]) - sum(python[variable[0]]))
             mp.figure()
             mp.plot(dates, fortran[variable[1]])
             mp.plot(dates, python[variable[0]])

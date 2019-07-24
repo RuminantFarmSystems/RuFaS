@@ -291,7 +291,7 @@ class Weather:
         self.runoff = []
         self.temp = []
 
-        self.years = 2
+        self.years = time.end_year - time.start_year + 1
 
         for i in range(self.years):
             self.rainfall.append([])
