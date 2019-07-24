@@ -139,6 +139,7 @@ class SurPhos:
         self.fact = 0.0
 
         # manure
+        self.manure_type = 0
         self.manure_sum = 0
         self.manure_P_sum = 0
         self.manure_N_sum = 0
