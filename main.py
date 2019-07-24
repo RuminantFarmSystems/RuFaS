@@ -10,11 +10,15 @@ Author(s): Kass Chupongstimun, kass_c@hotmail.com
 # !/usr/bin/env python3
 
 import RUFAS, SurPhos
+from pathlib import Path
 
 
 def main():
 
-    SurPhos.simulate()
+    print('Welcome to SurPhos:')
+    json_file = Path(input('Enter SurPhos Input: '))
+    print(json_file)
+    SurPhos.simulate(json_file)
 
     # """
     # Main function of RUFAS, executes simulations for all files specified.

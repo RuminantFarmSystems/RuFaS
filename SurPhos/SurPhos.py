@@ -1,14 +1,21 @@
 import csv
+import json
+
 from math import log
 
 from SurPhos import util, surphos_summary, data_analysis
 from SurPhos.routines import p_mineralization, manure, plow, fertilizer, manure_leach, sol_P, fert_leach
 
 
-def simulate():
+def simulate(json_file):
 
     clear_output_dir()
-    surphos = SurPhos()
+
+    with json_file.open('r') as f:
+        data = json.load(f)
+
+        surphos = SurPhos(data)
+
     report = surphos_summary.SurPhosSummary()
     report.initialize()
     while not (surphos.time.year == surphos.time.end_year - surphos.time.start_year
@@ -44,13 +51,13 @@ def daily_P_routine(surphos, weather, time):
 
 
 class SurPhos:
-    def __init__(self):
-        self.time = Time()
-        self.weather = Weather(self.time)
-        self.manure_app = Manure()
-        self.fertilizer_app = Fertilizer()
-        self.tillage_app = Tillage()
-        self.crop_P_uptake = CropPUptake()
+    def __init__(self, data):
+        self.time = Time(data['time'])
+        self.weather = Weather(self.time, data['weather'])
+        self.manure_app = Manure(data['manure'])
+        self.fertilizer_app = Fertilizer(data['fertilizer'])
+        self.tillage_app = Tillage(data['tillage'])
+        self.crop_P_uptake = CropPUptake(data['p_uptake'])
 
         for i in range(0, len(self.weather.rainfall)):
             self.crop_P_uptake.P_uptake_daily.append([0 for _ in range(0, len(self.weather.rainfall[i]))])
@@ -219,76 +226,62 @@ class SurPhos:
 
 
 class Fertilizer:
-    def __init__(self):
-        self.year = [0]
-        self.day = [0]
-        self.mass = [0.0]
-        self.depth = [0.0]
-        self.surface_percent = [0.0]
+    def __init__(self, data):
+        self.year = data['year']
+        self.day = data['day']
+        self.mass = data['mass']
+        self.depth = data['depth']
+        self.surface_percent = data['surf_perc']
 
 
 class Manure:
-    def __init__(self):
+    def __init__(self, data):
         # TODO doody3.gen
-        self.type = 1
-        self.year = [2012, 2012, 2012, 2012, 2013, 2013, 2013, 2013]
-        self.day = [103, 176, 226, 283, 46, 155, 241, 273]
-        self.mass = [1320.0, 2120.0, 1329.0, 2228.0, 1250.0, 1587.0, 1750.0, 1555.0]
-        self.total_P_frac = [0.00820, 0.00866, 0.00941, 0.00656, 0.00748, 0.00698, 0.00721, 0.00646]
-        self.WIP_frac = 0.6
-        self.WOP_frac = 0.05
-        self.total_N_frac = [0, 0, 0, 0, 0, 0, 0, 0]
-        self.total_NH4_frac = [0, 0, 0, 0, 0, 0, 0, 0]
-        self.dry_matter = [0.04, 0.07, 0.04, 0.04, 0.05, 0.05, 0.07, 0.06]
-        self.percent_cover = [0.95, 0.95, 0.95, 0.95, 0.95, 0.95, 0.95, 1.0]
-        self.depth = 0.0
-        self.surface_percent = [1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0]
+        self.type = data['type']
+        self.year = data['year']
+        self.day = data['day']
+        self.mass = data['mass']
+        self.total_P_frac = data['P_frac']
+        self.WIP_frac = data['WIP_frac']
+        self.WOP_frac = data['WOP_frac']
+        self.total_N_frac = data['N_frac']
+        self.total_NH4_frac = data['NH4_frac']
+        self.dry_matter = data['dry_matter']
+        self.percent_cover = data['percent_cover']
+        self.depth = data['depth']
+        self.surface_percent = data['surf_perc']
 
-        # TODO doody5.gen
-        # self.type = 1
-        # self.year = [2012, 2012, 2012, 2012, 2013, 2013, 2013]
-        # self.day = [137, 191, 226, 283, 161, 204, 277]
-        # self.mass = [1869.0, 2009.0, 1329.0, 2228.0, 1197.0, 1370.0, 1623.0]
-        # self.total_P_frac = [0.00714, 0.00725, 0.00941, 0.00656, 0.00869, 0.00657, 0.00784]
-        # self.WIP_frac = 0.6
-        # self.WOP_frac = 0.05
-        # self.total_N_frac = [0, 0, 0, 0, 0, 0, 0]
-        # self.total_NH4_frac = [0, 0, 0, 0, 0, 0, 0]
-        # self.dry_matter = [0.06, 0.06, 0.04, 0.04, 0.04, 0.05, 0.06]
-        # self.percent_cover = [0.95, 0.95, 0.95, 0.95, 0.95, 0.95, 0.95, 0.95]
-        # self.depth = 0.0
-        # self.surface_percent = [1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0]
 
 
 class Tillage:
-    def __init__(self):
-        self.year = [0]
-        self.day = [0]
-        self.percent_incorporated = [0.0]
-        self.percent_mixed = [0.0]
-        self.depth = [0.0]
+    def __init__(self, data):
+        self.year = data['year']
+        self.day = data['day']
+        self.percent_incorporated = data['perc_incorporated']
+        self.percent_mixed = data['perc_mixed']
+        self.depth = data['depth']
 
 
 class CropPUptake:
-    def __init__(self):
-        self.year = [2012, 2013]
-        self.P_uptake_annual = [25.0, 25.0]
+    def __init__(self, data):
+        self.year = data['year']
+        self.P_uptake_annual = data['annual_uptake']
         self.P_uptake_daily = []
 
 
 class Time:
-    def __init__(self):
-        self.start_year = 2012
-        self.start_day = 102
-        self.end_year = 2013
-        self.end_day = 335
+    def __init__(self, data):
+        self.start_year = int(data['StartDate'].split(':')[0])
+        self.start_day = int(data['StartDate'].split(':')[1])
+        self.end_year = int(data['EndDate'].split(':')[0])
+        self.end_day = int(data['EndDate'].split(':')[1])
 
         self.day = self.start_day
         self.year = 0
 
 
 class Weather:
-    def __init__(self, time):
+    def __init__(self, time, data):
         self.rainfall = []
         self.runoff = []
         self.temp = []
@@ -307,7 +300,7 @@ class Weather:
             self.temp[0].append(0)
             day += 1
 
-        self.weather_csv = 'SurPhos_weather.csv'
+        self.weather_csv = data
 
         weather_path = util.get_base_dir() / 'SurPhos' / self.weather_csv
         with weather_path.open('r') as f:
