@@ -31,7 +31,7 @@ def read_data(output_csv):
 
 
 def produce_graphics():
-    fortran, units = read_data('surphos_output.csv')
+    fortran, units = read_data('surphos_doody5.csv')
     python, units = read_data('output/surphos_report.csv')
 
     if len(python['j_day']) != len(fortran['j_day']):

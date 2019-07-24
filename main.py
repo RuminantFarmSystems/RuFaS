@@ -16,7 +16,7 @@ from pathlib import Path
 def main():
 
     print('Welcome to SurPhos:')
-    json_file = Path(input('Enter SurPhos Input: '))
+    json_file = Path('SurPhos/' + input('Enter SurPhos Input: '))
     print(json_file)
     SurPhos.simulate(json_file)
 
