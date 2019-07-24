@@ -6,7 +6,7 @@ import csv
 class SurPhosSummary:
     def __init__(self):
         self.f_path = util.get_base_dir() / 'SurPhos/output/surphos_report.csv'
-        self.variables = {'year': ['time.year', '', []],
+        self.variables = {'year': ['time.start_year + time.year', '', []],
                           'j_day': ['time.day', '', []],
                           'precip': ['weather.rainfall[time.year][time.day - 1]', 'mmH2O', []],
                           'runoff': ['weather.runoff[time.year][time.day - 1]', 'mmH2O', []],
