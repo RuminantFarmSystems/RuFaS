@@ -78,16 +78,18 @@ class SurPhos:
                 for j in range(0, len(self.weather.rainfall[i])):
                     self.crop_P_uptake.P_uptake_daily[i][j] = self.crop_P_uptake.P_uptake_annual[i] / days
 
-        self.cover = 3
+        soil_data = data['soil']
+
+        self.cover = soil_data['CoverType']
         self.leach = 0.0
-        self.area = 1.0
+        self.area = soil_data['FieldArea']
 
         self.soil_layers = 3
-        self.depths_layer = [2.5, 15.0, 75.0]
-        self.labile_P_layer = [23.7, 10.0, 10.0]
-        self.clay_layer = [20.0, 20.0, 20.0]
-        self.OM_layer = [4.8, 3.4, 2.0]
-        self.bulk_density_layer = [1.3, 1.3, 1.3]
+        self.depths_layer = soil_data['Depth']
+        self.labile_P_layer = soil_data['LabileP']
+        self.clay_layer = soil_data['Clay']
+        self.OM_layer = soil_data['SoilOM']
+        self.bulk_density_layer = soil_data['BulkDensity']
         self.OC_layer = []
         self.PSP_layer = []
         self.thick_layer = []
@@ -236,7 +238,6 @@ class Fertilizer:
 
 class Manure:
     def __init__(self, data):
-        # TODO doody3.gen
         self.type = data['type']
         self.year = data['year']
         self.day = data['day']
@@ -250,7 +251,6 @@ class Manure:
         self.percent_cover = data['percent_cover']
         self.depth = data['depth']
         self.surface_percent = data['surf_perc']
-
 
 
 class Tillage:
