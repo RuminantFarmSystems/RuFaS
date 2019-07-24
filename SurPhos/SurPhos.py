@@ -15,7 +15,8 @@ def simulate():
                and surphos.time.day == surphos.time.end_day + 1):
         daily_P_routine(surphos, surphos.weather, surphos.time)
         report.daily_update(surphos)
-        if surphos.time.day == 365:
+        if surphos.time.day == len(surphos.weather.rainfall[surphos.time.year])\
+                and surphos.time.year != surphos.time.end_year - surphos.time.start_year:
             surphos.time.year += 1
             surphos.time.day = 0
             report.write_annual_report()
@@ -124,8 +125,8 @@ class SurPhos:
         self.fert_applied_sum = 0.0
         self.no_rains = 0.0
         self.fert_CNT = 0.0
-        self.fert_p_available = 0.0  # avfrtp
-        self.fert_p_released = 0.0  # rsfrtp
+        self.fert_P_available = 0.0  # avfrtp
+        self.fert_P_released = 0.0  # rsfrtp
         self.fact = 0.0
 
         # manure
@@ -148,12 +149,12 @@ class SurPhos:
         self.b_calf = []
 
         for x in range(0, len(self.weather.rainfall)):
-            self.cows.append([0 for _ in range(0, 366)])
-            self.heifer.append([0 for _ in range(0, 366)])
-            self.dry_cow.append([0 for _ in range(0, 366)])
-            self.d_calf.append([0 for _ in range(0, 366)])
-            self.beef_cow.append([0 for _ in range(0, 366)])
-            self.b_calf.append([0 for _ in range(0, 366)])
+            self.cows.append([0 for _ in range(0, len(self.weather.rainfall[x]))])
+            self.heifer.append([0 for _ in range(0, len(self.weather.rainfall[x]))])
+            self.dry_cow.append([0 for _ in range(0, len(self.weather.rainfall[x]))])
+            self.d_calf.append([0 for _ in range(0, len(self.weather.rainfall[x]))])
+            self.beef_cow.append([0 for _ in range(0, len(self.weather.rainfall[x]))])
+            self.b_calf.append([0 for _ in range(0, len(self.weather.rainfall[x]))])
 
         # plow
 
@@ -257,6 +258,7 @@ class Manure:
         # self.percent_cover = [0.95, 0.95, 0.95, 0.95, 0.95, 0.95, 0.95, 0.95]
         # self.depth = 0.0
         # self.surface_percent = [1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0]
+
 
 class Tillage:
     def __init__(self):

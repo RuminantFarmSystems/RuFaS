@@ -26,13 +26,13 @@ def update_all(S, weather, time):
 
     if S.fert_sorp < 0.0:
         S.fert_sorp = 0.0
-    if S.fert_sorp > S.fert_p_available:
-        S.fert_sorp = S.fert_p_available
+    if S.fert_sorp > S.fert_P_available:
+        S.fert_sorp = S.fert_P_available
 
-    S.fert_p_available -= S.fert_sorp
+    S.fert_P_available -= S.fert_sorp
 
-    if S.fert_p_available < 0.0:
-        S.fert_p_available = 0.0
+    if S.fert_P_available < 0.0:
+        S.fert_P_available = 0.0
 
     S.fert_absorbed_sum += S.fert_sorp
 
@@ -50,14 +50,14 @@ def update_all(S, weather, time):
         S.no_rains += 1
 
         if S.no_rains == 1:
-            S.fert_leach = S.fert_p_available
-            S.fert_p_available = 0.0
+            S.fert_leach = S.fert_P_available
+            S.fert_P_available = 0.0
         else:
             if S.no_rains == 2:
-                S.fert_leach = S.fert_p_released * 0.40
+                S.fert_leach = S.fert_P_released * 0.40
             if S.no_rains > 2:
-                S.fert_leach = S.fert_p_released * 0.075
-            S.fert_p_released -= S.fert_leach
+                S.fert_leach = S.fert_P_released * 0.075
+            S.fert_P_released -= S.fert_leach
 
     else:
         S.fert_leach = 0.0

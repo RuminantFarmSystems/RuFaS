@@ -17,10 +17,10 @@ def update_all(S, time):
 
             # incorporate surface manure and fertilizer
 
-            S.labile_P_layer[0] += S.fert_p_available * till_app.percent_incorporated[x]
-            S.labile_P_layer[0] += S.fert_p_released * till_app.percent_incorporated[x]
-            S.fert_p_available = S.fert_p_available - (S.fert_p_available * till_app.percent_incorporated[x])
-            S.fert_p_released = S.fert_p_released - (S.fert_p_released * till_app.percent_incorporated[x])
+            S.labile_P_layer[0] += S.fert_P_available * till_app.percent_incorporated[x]
+            S.labile_P_layer[0] += S.fert_P_released * till_app.percent_incorporated[x]
+            S.fert_P_available = S.fert_P_available - (S.fert_P_available * till_app.percent_incorporated[x])
+            S.fert_P_released = S.fert_P_released - (S.fert_P_released * till_app.percent_incorporated[x])
 
             S.labile_P_layer[0] += S.WIP * till_app.percent_incorporated[x]
             S.active_P_layer[0] += S.SIP * till_app.percent_incorporated[x]

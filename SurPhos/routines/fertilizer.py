@@ -19,13 +19,13 @@ def update_all(S, time):
             S.fert_CNT = 1.0
 
             if fert_app.depth[x] == 0.0:
-                S.fert_p_available += fert_app.mass[x] * 0.75
-                fert_PST = S.fert_p_available  # TODO fert_PST is frtpst and unused
-                S.fert_p_released += fert_app.mass[x] * 0.25
+                S.fert_P_available += fert_app.mass[x] * 0.75
+                fert_PST = S.fert_P_available  # TODO fert_PST is frtpst and unused
+                S.fert_P_released += fert_app.mass[x] * 0.25
 
             else:
-                S.fert_p_available += fert_app.mass[x] * 0.75 * fert_app.surface_percent[x]
-                fert_PST = S.fert_p_available  # above
+                S.fert_P_available += fert_app.mass[x] * 0.75 * fert_app.surface_percent[x]
+                fert_PST = S.fert_P_available  # above
                 S.rs_frt_p += fert_app.mass[x] * 0.25 * fert_app.surface_percent[x]
 
                 no = 0
