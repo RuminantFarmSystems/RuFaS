@@ -17,6 +17,8 @@ def update_all(S, time):
     for i in range(0, len(m_app.day)):
         if day == m_app.day[i] and year == m_app.year[i] - time.start_year:
 
+            S.manure_type = m_app.type[i]
+
             # S.cover_SLP = 0.0154 * mass[i] ** -0.555
 
             # m_app.percent_cover[i] = min(1.0, 0.012 * mass[i] ** 0.48)

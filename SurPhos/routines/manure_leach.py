@@ -30,7 +30,7 @@ def update_all(S, weather, time):
 
         if rainfall[year][day - 1] > 0.0:
 
-            if m_app.type == 1:
+            if S.manure_type == 1:
                 manure_extr = min(1.0, 1.2 * water_manure / (water_manure + 73.1))
                 # manure_extr = min(1.0, 0.0000144 * water_manure ** 2.0285)
                 NH_extr = min(1.0, 0.9 * water_manure / (water_manure + 7.1))
