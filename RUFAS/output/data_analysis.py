@@ -54,12 +54,12 @@ def ration_data_analysis(output_csv, show_daily, produce_diagnostics, is_final, 
         save_dir = util.get_base_dir() / 'Outputs/diagnostics/' / output_csv.split('.')[0]
 
         start_year = int(variables['year'][0])
-        start_day = int(variables['julian day'][0])
+        start_day = int(variables['j_day'][0])
         # start date
         date = dt.datetime(int(start_year), 1, 1) + dt.timedelta(start_day - 1)
 
         dates = []
-        for i in range(len(variables['julian day'])):
+        for i in range(len(variables['j_day'])):
             dates.append(date)
             date += dt.timedelta(days=ration_interval)
 
@@ -144,10 +144,10 @@ def data_analysis(output_csv, show_daily, produce_diagnostics, is_final):
         save_dir = util.get_base_dir() / 'Outputs/diagnostics/' / output_csv.split('.')[0]
 
         start_year = int(variables['year'][0])
-        start_day = int(variables['julian day'][0])
+        start_day = int(variables['j_day'][0])
         start_date = dt.datetime(start_year, 1, 1) + dt.timedelta(start_day - 1)
 
-        dates = [start_date + dt.timedelta(days=i) for i in range(len(variables['julian day']))]
+        dates = [start_date + dt.timedelta(days=i) for i in range(len(variables['j_day']))]
 
         counter = 0
         for variable in variables:

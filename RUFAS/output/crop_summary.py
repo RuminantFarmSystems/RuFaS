@@ -26,15 +26,16 @@ class CropSummary(BaseReportHandler):
         # Daily Outputs
         # 1D Lists [julianDay]
         #
-        self.year = []
-        self.julianDay = []
-        self.daily_fr_PHU = []
-        self.daily_biomass_act = []
-        self.daily_LAI_act = []
-        self.daily_bio_N = []
-        self.daily_bio_P = []
-        self.daily_z_root = []
-        self.daily_yield_act = []
+        self.variables = {'year': ['time.cal_year', '', []],
+                          'j_day': ['time.day', '', []],
+                          'fr_PHU': ['cropType.fr_PHU', '%', []],
+                          'biomass': ['cropType.biomass_act', 'kg ha^-1', []],
+                          'LAI_act': ['cropType.LAI_act', 'm^2/m^2', []],
+                          'Bio_N': ['cropType.bio_N', 'kg N ha^-1', []],
+                          'Bio_P': ['cropType.bio_P', 'kg P ha^-1', []],
+                          'z_root': ['cropType.z_root', 'mm', []],
+                          'yield_act': ['cropType.yield_act', 'kg ha^-1', []]
+                          }
 
         #
         # Yearly Outputs **NOT YET IMPLEMENTED**
@@ -47,43 +48,21 @@ class CropSummary(BaseReportHandler):
 
         with self.get_fPath().open(mode) as csvfile:
 
-            fieldnames = ['Year', 'Julian Day', 'frPHU (fr_PHU)',
-                          'Biomass (biomass_act)', 'LAI (LAI_act)',
-                          'BioN (bio_N)', 'BioP (bio_P)',
-                          'Rooting Depth (z_root)',
-                          'Yield (yield_act)']
-
-            self.fieldNames = fieldnames
-            writer = csv.DictWriter(csvfile, fieldnames=self.fieldNames,
+            writer = csv.DictWriter(csvfile, fieldnames=self.variables.keys(),
                                     lineterminator='\n')
+
             writer.writeheader()
 
-            units = {'Year': '', 'Julian Day': '', 'frPHU (fr_PHU)': '%',
-                     'Biomass (biomass_act)': 'kg ha^-1',
-                     'LAI (LAI_act)': 'm^2 / m^2',
-                     'BioN (bio_N)': 'kg N ha^-1',
-                     'BioP (bio_P)': 'kg P ha^-1',
-                     'Rooting Depth (z_root)': 'mm',
-                     'Yield (yield_act)': 'kg ha^-1'}
+            units = {}
+            for variable in self.variables:
+                units[variable] = self.variables[variable][1]
 
             writer.writerow(units)
-
 
     # ---------------------------------------------------------------------------
     # Method: initialize
     # ---------------------------------------------------------------------------
     def initialize(self, state):
-        """Transfers the needed data from state object to the report handler."""
-        # d = 1
-
-        # Copy daily output values here
-        # self.daily_fr_PHU[d] = cropType.fr_PHU
-        # self.daily_biomass_act[d] = cropType.biomass_act
-        # self.daily_LAI_act[d] = cropType.LAI_act
-        # self.daily_bio_N[d] = cropType.bio_N
-        # self.daily_bio_P[d] = cropType.bio_P
-        # self.daily_z_root[d] = cropType.z_root
-        # self.daily_yield_act[d] = cropType.yield_act
 
         self.write_header()
 
@@ -95,16 +74,20 @@ class CropSummary(BaseReportHandler):
 
         cropType = state.crop.crops_list["corn"]
         # Copy daily output values here
-        self.year.append(time.cal_year)
-        self.julianDay.append(time.day)
 
-        self.daily_fr_PHU.append(cropType.fr_PHU)
-        self.daily_biomass_act.append(cropType.biomass_act)
-        self.daily_LAI_act.append(cropType.LAI_act)
-        self.daily_bio_N.append(cropType.bio_N)
-        self.daily_bio_P.append(cropType.bio_P)
-        self.daily_z_root.append(cropType.z_root)
-        self.daily_yield_act.append(cropType.yield_act)
+        for variable in self.variables:
+            self.variables[variable][2].append(eval(self.variables[variable][0], globals(), locals()))
+
+        # self.year.append(time.cal_year)
+        # self.julianDay.append(time.day)
+        #
+        # self.daily_fr_PHU.append(cropType.fr_PHU)
+        # self.daily_biomass_act.append(cropType.biomass_act)
+        # self.daily_LAI_act.append(cropType.LAI_act)
+        # self.daily_bio_N.append(cropType.bio_N)
+        # self.daily_bio_P.append(cropType.bio_P)
+        # self.daily_z_root.append(cropType.z_root)
+        # self.daily_yield_act.append(cropType.yield_act)
 
     # ---------------------------------------------------------------------------
     # Method: annual_update
@@ -122,32 +105,13 @@ class CropSummary(BaseReportHandler):
         mode = 'a+' if self.get_fPath().exists() else 'w+'
 
         with self.get_fPath().open(mode) as csvfile:
-
-            for x in range(0, len(self.julianDay)):
-                dailyCropData = {
-                    'Year':
-                        str(self.year[x]),
-                    'Julian Day':
-                        str(self.julianDay[x]),
-                    'frPHU (fr_PHU)':
-                        str(self.daily_fr_PHU[x]),
-                    'Biomass (biomass_act)':
-                        str(self.daily_biomass_act[x]),
-                    'LAI (LAI_act)':
-                        str(self.daily_LAI_act[x]),
-                    'BioN (bio_N)':
-                        str(self.daily_bio_N[x]),
-                    'BioP (bio_P)':
-                        str(self.daily_bio_P[x]),
-                    'Rooting Depth (z_root)':
-                        str(self.daily_z_root[x]),
-                    'Yield (yield_act)':
-                        str(self.daily_yield_act[x])
-                }
-
-                writer = csv.DictWriter(csvfile, fieldnames=self.fieldNames,
-                                        lineterminator='\n')
-                writer.writerow(dailyCropData)
+            writer = csv.DictWriter(csvfile, fieldnames=self.variables,
+                                    lineterminator='\n')
+            for day in range(len(self.variables['j_day'])):
+                row = {}
+                for variable in self.variables:
+                    row[variable] = self.variables[variable][2][day]
+                writer.writerow(row)
 
     # ---------------------------------------------------------------------------
     # Method: annual_flush
@@ -155,16 +119,8 @@ class CropSummary(BaseReportHandler):
     def annual_flush(self):
         """Sets all of the values in the output object to the default value."""
 
-        self.year = []
-        self.julianDay = []
-
-        self.daily_fr_PHU = []
-        self.daily_biomass_act = []
-        self.daily_LAI_act = []
-        self.daily_bio_N = []
-        self.daily_bio_P = []
-        self.daily_z_root = []
-        self.daily_yield_act = []
+        for variable in self.variables:
+            self.variables[variable][2] = []
 
     def produce_data_analysis(self, is_final):
         data_analysis(self.file_name, self.show_daily, self.produce_diagnostics, is_final)
