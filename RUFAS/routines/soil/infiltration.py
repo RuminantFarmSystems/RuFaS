@@ -214,8 +214,6 @@ def update_SW(soil):
     SAT = soil.listOfSoilLayers[0].satWater
     SW = soil.listOfSoilLayers[0].currentSoilWaterMM
     I = soil.dailyInfiltration
-    if SW + I > SAT:
-        print((SW + I) - SAT)
     #     soil.runoff += soil.dailyInfiltration - I
     # soil.dailyInfiltration = I
 

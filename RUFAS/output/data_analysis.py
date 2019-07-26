@@ -145,7 +145,7 @@ def data_analysis(output_csv, show_daily, produce_diagnostics, is_final):
 
         start_year = int(variables['year'][0])
         start_day = int(variables['julian day'][0])
-        start_date = dt.datetime(int(start_year), 1, 1) + dt.timedelta(start_day - 1)
+        start_date = dt.datetime(start_year, 1, 1) + dt.timedelta(start_day - 1)
 
         dates = [start_date + dt.timedelta(days=i) for i in range(len(variables['julian day']))]
 
@@ -154,9 +154,11 @@ def data_analysis(output_csv, show_daily, produce_diagnostics, is_final):
             if counter > 1:
                 mp.figure()
                 mp.plot(dates, variables[variable])
+                mp.xticks(rotation=45)
                 mp.title(variable.split()[0].upper())
                 mp.xlabel('Dates')
                 mp.ylabel(variable + ' ' + units[counter])
+                mp.tight_layout()
                 path = str(save_dir / variable)
                 mp.savefig(path + '')
                 if not show_daily:
