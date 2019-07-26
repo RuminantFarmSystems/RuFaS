@@ -79,4 +79,4 @@ class BaseReportHandler(ABC):
     @abstractmethod
     def annual_flush(self): raise NotImplementedError()
     @abstractmethod
-    def produce_data_analysis(self): raise NotImplementedError()
+    def produce_data_analysis(self, is_final): raise NotImplementedError()
