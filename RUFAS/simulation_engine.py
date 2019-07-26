@@ -115,7 +115,7 @@ def annual_simulation():
     # Post-Annual Routines
     #
     output.annual_updates(state, weather, time)
-    output.write_annual_reports(time.year)
+    output.write_annual_reports()
     output.annual_flushes()
     state.annual_reset()
     time.advance()

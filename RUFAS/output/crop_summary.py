@@ -99,7 +99,7 @@ class CropSummary(BaseReportHandler):
     # ---------------------------------------------------------------------------
     # Method: write_annual_report
     # ---------------------------------------------------------------------------
-    def write_annual_report(self, y):
+    def write_annual_report(self):
         """Appends the annual report to the output file."""
 
         mode = 'a+' if self.get_fPath().exists() else 'w+'

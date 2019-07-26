@@ -107,10 +107,9 @@ class RationReport(BaseReportHandler):
     # ---------------------------------------------------------------------------
     # Method: write_annual_report
     # ---------------------------------------------------------------------------
-    def write_annual_report(self, y):
+    def write_annual_report(self):
         """Appends the annual report to the output file."""
 
-        print("printing ration report for year: " + str(y))
         mode = 'a+' if self.get_fPath().exists() else 'w+'
 
         with self.get_fPath().open(mode) as csvfile:

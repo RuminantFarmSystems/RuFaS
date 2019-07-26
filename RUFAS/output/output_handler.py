@@ -146,13 +146,13 @@ class OutputHandler():
     # ---------------------------------------------------------------------------
     # Method: write_annual_reports
     # ---------------------------------------------------------------------------
-    def write_annual_reports(self, y):
+    def write_annual_reports(self):
         """Prints the annual report to file for all reports."""
 
         for reportName in self.reports:
             report = self.reports[reportName]
             if report.active:
-                report.write_annual_report(y)
+                report.write_annual_report()
 
     # ---------------------------------------------------------------------------
     # Method: annual_flush
