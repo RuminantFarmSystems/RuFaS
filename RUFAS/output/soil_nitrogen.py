@@ -113,7 +113,7 @@ class SoilNitrogen(BaseReportHandler):
     #           Appends the annual report to the output file
     # Soil Summary is a cvsfile
     # ---------------------------------------------------------------------------
-    def write_annual_report(self, y):
+    def write_annual_report(self):
 
         mode = 'a+' if self.get_fPath().exists() else 'w+'
 
