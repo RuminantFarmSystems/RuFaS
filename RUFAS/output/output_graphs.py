@@ -13,11 +13,11 @@ def graph_milk_production(day):
             row = plots[i]
             pen_avg_milk_prod.append(float(row[5]))
 
+    f1 = plt.figure(1)
     plt.plot(day, pen_avg_milk_prod)
     plt.xlabel('Day in Simulation (day)')
     plt.ylabel('Average Milk Production (kg)')
-    plt.title('Average Milk Production per Animal for Milk-Producing Pens')
-    plt.show()
+    plt.title('Average Milk Production per Animal for Milk-Producing Pen')
 
 def graph_manure_excretion(day):
     manure = {}
@@ -27,6 +27,13 @@ def graph_manure_excretion(day):
     manure[3] = []
     manure[4] = []
     
+    num_animals = {}
+    num_animals[0] = []
+    num_animals[1] = []
+    num_animals[2] = []
+    num_animals[3] = []
+    num_animals[4] = []
+    
     manure_production_output_path = util.get_base_dir() / 'Outputs/Sample_Farm_Outputs/manure_report.csv'
     with open(manure_production_output_path,'r') as csvfile:
         plots = list(csv.reader(csvfile, delimiter=','))
@@ -35,7 +42,10 @@ def graph_manure_excretion(day):
             row = plots[i]
             pen = int(row[2])
             manure[pen].append(float(row[7]))
+            num_animals[pen].append(int(row[3]))
     
+    f2 = plt.figure(2)
+    plt.subplot(2, 1, 1)
     plt.plot(day, manure[0], label='Pen 0 - Calf')
     #plt.plot(day, manure[1], label='Pen 1 - HeiferI')
     plt.plot(day, manure[2], label='Pen 2 - HeiferII')
@@ -45,10 +55,22 @@ def graph_manure_excretion(day):
     plt.ylabel('Total Manure Excretion (kg)')
     plt.title('Total Manure Excretion per Pen')
     plt.legend()
-    plt.show()
-
+    
+    plt.subplot(2, 1, 2)
+    plt.plot(day, num_animals[0], label='Pen 0 - Calf')
+    #plt.plot(day, num_animals[1], label='Pen 1 - HeiferI')
+    plt.plot(day, num_animals[2], label='Pen 2 - HeiferII')
+    #plt.plot(day, num_animals[3], label='Pen 3 - HeiferIII')
+    plt.plot(day, num_animals[4], label='Pen 4 - Cow')
+    plt.xlabel('Day in Simulation (day)')
+    plt.ylabel('Number of Animals in Pen')
+    plt.title('Number of Animals in Each Pen')
+    plt.legend()
+    
 
 def display_graphs(formulation_interval, sim_length):
     day = [i for i in range(1, sim_length, formulation_interval)]
     graph_milk_production(day)
     graph_manure_excretion(day)
+    plt.tight_layout()
+    plt.show()
