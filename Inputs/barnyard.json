@@ -28,6 +28,12 @@
             "report_name": "Soil Nitrogen",
             "file_name": "soil_nitrogen.csv"
         },
+        "soil_phosphorus":
+        {
+            "active": false,
+            "report_name": "Soil Phosphorus",
+            "file_name": "soil_phosphorus.csv"
+        },
         "crop_report":
         {
             "active": true,
@@ -91,7 +97,7 @@
         },
         "soil":
         {
-            "ProfileDepth": 450,
+            "ProfileDepth": 750,
             "ProfileBulkDensity": 1.4,
             "CN2": 85.00,
             "FieldSlope": 0.02,
@@ -111,7 +117,7 @@
             {
                 "Layer1":
                 {
-                    "BottomDepth": 150,
+                    "BottomDepth": 25,
                     "WiltingPoint": 0.1,
                     "FieldCapacity": 0.30,
                     "Saturation": 0.5,
@@ -119,20 +125,20 @@
                     "CationExclusionFraction": 0.0,
                     "Clay": 20,
                     "InitialTemperature": 15.77575,
-                    "BulkDensity": 1.4,
+                    "BulkDensity": 1.3,
                     "OrgC%": 1.2,
                     "NH4": 1,
                     "FracActiveN": 0.02,
-                    "LabileP": 15,
+                    "LabileP": 23.7,
                     "ActiveMineralRate": 0.0003,
                     "VolatileExchangeFac": 0.15,
                     "DenitrificationRate": 0.05,
                     "StartingSoilWater": 45,
-                    "OM%": 1.9
+                    "OM%": 4.8
                 },
                 "Layer2":
                 {
-                    "BottomDepth": 300,
+                    "BottomDepth": 150,
                     "WiltingPoint": 0.1,
                     "FieldCapacity": 0.3,
                     "Saturation": 0.5,
@@ -140,20 +146,20 @@
                     "CationExclusionFraction": 0.0,
                     "Clay": 20,
                     "InitialTemperature": 14.50797297,
-                    "BulkDensity": 1.4,
+                    "BulkDensity": 1.3,
                     "OrgC%": 1.2,
                     "NH4": 1,
                     "FracActiveN": 0.02,
-                    "LabileP": 15,
+                    "LabileP": 10,
                     "ActiveMineralRate": 0.0003,
                     "VolatileExchangeFac": 0.15,
                     "DenitrificationRate": 0.05,
                     "StartingSoilWater": 45,
-                    "OM%": 1.9
+                    "OM%": 3.4
                 },
                 "Layer3":
                 {
-                    "BottomDepth": 450,
+                    "BottomDepth": 750,
                     "WiltingPoint": 0.1,
                     "FieldCapacity": 0.30,
                     "Saturation": 0.5,
@@ -161,16 +167,16 @@
                     "CationExclusionFraction": 0.0,
                     "Clay": 20,
                     "InitialTemperature": 13.38623,
-                    "BulkDensity": 1.4,
+                    "BulkDensity": 1.3,
                     "OrgC%": 1.2,
                     "NH4": 1,
                     "FracActiveN": 0.02,
-                    "LabileP": 15,
+                    "LabileP": 10,
                     "ActiveMineralRate": 0.0003,
                     "VolatileExchangeFac": 0.15,
                     "DenitrificationRate": 0.05,
                     "StartingSoilWater": 45,
-                    "OM%": 1.9
+                    "OM%": 2.0
                 }
             },
 
@@ -180,30 +186,27 @@
                 {
                     "Year": 2008,
                     "JDay": 179,
-                    "PMass": 25.0,
+                    "PMass": 25,
                     "Depth": 3.0,
                     "%onSurface": 0.25
                 }
             },
-
             "ManureApplication":
             {
-                "Application1":
-                {
-                    "Type": "DAIRY",
-                    "Year": 2009,
-                    "Jday": 200,
-                    "Mass": 1000.0,
-                    "TotalP": 0.025,
-                    "WEIP": 0.50,
-                    "WEOP": 0.05,
-                    "DryMatter": 0.05,
-                    "%Cover": 0.5,
-                    "Depth": 0.0,
-                    "%onSurface": 100.0
-                }
+                "type": ["DAIRY", "DAIRY", "DAIRY", "DAIRY", "DAIRY", "DAIRY", "DAIRY", "DAIRY"],
+                "year": [2012, 2012, 2012, 2012, 2013, 2013, 2013, 2013],
+                "day": [103 ,176, 226, 283, 46, 155, 241, 273],
+                "mass": [1320.0, 2120.0, 1329.0, 2228.0, 1250.0, 1587.0, 1750.0, 1555.0],
+                "P_frac": [0.00820, 0.00866, 0.00941, 0.00656, 0.00748, 0.00698, 0.00721, 0.00646],
+                "WIP_frac": [0.6, 0.6, 0.6, 0.6, 0.6, 0.6, 0.6, 0.6],
+                "WOP_frac": [0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05],
+                "N_frac": [0, 0, 0, 0, 0, 0, 0, 0],
+                "NH4_frac": [0, 0, 0, 0, 0, 0, 0, 0],
+                "dry_matter": [0.04, 0.07, 0.04, 0.04, 0.05, 0.05, 0.07, 0.06],
+                "percent_cover": [0.95, 0.95, 0.95, 0.95, 0.95, 0.95, 0.95, 1.0],
+                "depth": [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0],
+                "surf_perc": [1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0]
             },
-
             "TillageOperations":
             {
                 "Operation1":
