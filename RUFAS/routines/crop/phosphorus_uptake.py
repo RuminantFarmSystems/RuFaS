@@ -168,7 +168,7 @@ def calc_actual_P_up_each_layer(crop_type, soil):
         # C.6.C.4
         act_P_up = min((pot_P_up + P_demand), soilLayer.labileP)
         # C.6.C.7
-        act_P_up_each_layer.append(act_P_up)
+        soilLayer.p_uptake = act_P_up
 
         # C.6.C.6
         # Update values for next layer

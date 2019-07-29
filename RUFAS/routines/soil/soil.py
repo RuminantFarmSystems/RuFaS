@@ -204,7 +204,6 @@ class Soil:
     """
     listOfSoilLayers = []
     fertilizerApplications = []
-    manureApplications = []
     tillageOperations = []
     cropPUptakes = []
 
@@ -219,6 +218,8 @@ class Soil:
             config: instance of the Config class
         """
         # Values Initialized by Input
+        self.manure = Soil.Manure(data["ManureApplication"])
+
         self.profileDepth = data['ProfileDepth']
         self.profileBulkDensity = data['ProfileBulkDensity']
         self.CN2 = data['CN2']  # unitless, user-defined curve number (empirical)
@@ -253,10 +254,6 @@ class Soil:
         # get fertilizer application information
         for fertApp, fertData in data['Fertilizers'].items():
             self.fertilizerApplications.append(self.Fertilizer(fertApp, fertData))
-
-        # get manure application information
-        for manureApp, manureData in data['ManureApplication'].items():
-            self.manureApplications.append(self.Manure(manureApp, manureData))
 
         # get tillage application information
         for tillageApp, tillageData in data['TillageOperations'].items():
@@ -341,7 +338,7 @@ class Soil:
     # Class: SoilLayer
     # An instance of this class represents a layer in the soil
     # ---------------------------------------------------------------------------
-    class SoilLayer():
+    class SoilLayer:
         """
         An instance of this class represents a layer in the soil.
         """
@@ -431,6 +428,7 @@ class Soil:
             self.activeP = 0.0
             self.stableP = 0.0
             self.orgP = 0.0
+            self.p_uptake = 0.0
 
     # ---------------------------------------------------------------------------
     # Class: Fertilizer
@@ -472,27 +470,29 @@ class Soil:
         of its application
         """
 
-        def __init__(self, manureName, manureData):
+        def __init__(self, manureData):
             """
             Description:
                 Constructs an instance of this class
 
             Args:
-                manureName: a string which represents the name is this manure
                 manureData: a dictionary which stores the information for this manure
             """
-            self.name = manureName
-            self.type = manureData['Type']
-            self.appYear = manureData['Year']
-            self.appDay = manureData['Jday']
-            self.mass = manureData['Mass']
-            self.totalP = manureData['TotalP']
-            self.weip = manureData['WEIP']
-            self.weop = manureData['WEOP']
-            self.dryMatter = manureData['DryMatter']
-            self.percentCover = manureData['%Cover']
-            self.depth = manureData['Depth']
-            self.percentOnSurface = manureData['%onSurface']
+            self.type = manureData['type']
+            self.year = manureData['year']
+            self.day = manureData['day']
+            self.mass = manureData['mass']
+            self.total_P_frac = manureData['P_frac']
+            self.WIP_frac = manureData['WIP_frac']
+            self.WOP_frac = manureData['WOP_frac']
+
+            # TODO: total_N_frac and total_NH4_frac only exist in some SurPhos
+            # TODO: data sets and are set to 0.
+
+            self.dry_matter = manureData['dry_matter']
+            self.percent_cover = manureData['percent_cover']
+            self.depth = manureData['depth']
+            self.surface_percent = manureData['surf_perc']
 
     # ---------------------------------------------------------------------------
     # Class: Tillage
