@@ -55,7 +55,7 @@ class ManureReport(BaseReportHandler):
             
             # 2) Write Units in 2nd row of cvsfile
             units = {'Year': '', 'Julian Day': '', 'Pen ID': '', 'Number of Animals in Pen': '',
-                             'U': 'mol/L', 'TAN_s': 'mol/L', 'MN': 'g', 'Mkg': 'g', 'VSd': 'g', 'VSnd': 'g'}
+                             'U': 'mol/L', 'TAN_s': 'mol/L', 'MN': 'g', 'Mkg': 'kg', 'VSd': 'g', 'VSnd': 'g'}
 
             writer.writerow(units)
 
