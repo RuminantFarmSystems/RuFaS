@@ -153,8 +153,10 @@ This module needs the following inputs in order to operate correctly:
 ################################################################################
 
 import math
-from . import nitrogen_cycling, phosphorus_cycling, infiltration, \
+from . import infiltration, \
     evapotranspiration, percolation, soil_temp, soil_erosion, soil_water
+from .nitrogen_cycling import nitrogen_cycling
+from .phosphorus_cycling import phosphorus_cycling
 
 
 # ------------------------------------------------------------------------------
@@ -192,6 +194,8 @@ def daily_soil_routine(soil, crop, weather, time):
     # calculate and update the contents of 3 organic and 2 inorganic nitrogen
     # pools
     nitrogen_cycling.update_all(soil, weather, time)
+
+    phosphorus_cycling.update_all(soil, weather, time)
 
 
 # -------------------------------------------------------------------------------
