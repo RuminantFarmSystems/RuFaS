@@ -84,8 +84,8 @@ class GrowthReport(BaseReportHandler):
                 self.num_animals_in_pen[pen.id].append(len(pen.animals_in_pen))
                 
                 if pen.pen_populated:
-                    self.avg_growth[pen.id].append(pen.avg_growth)
-                    self.avg_milk[pen.id].append(pen.avg_milk)
+                    self.avg_growth[pen.id].append(round(pen.avg_growth, 3))
+                    self.avg_milk[pen.id].append(round(pen.avg_milk, 3))
                 else:
                     self.avg_growth[pen.id].append(0)
                     self.avg_milk[pen.id].append(0)
