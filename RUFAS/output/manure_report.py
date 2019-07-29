@@ -55,7 +55,7 @@ class ManureReport(BaseReportHandler):
             
             # 2) Write Units in 2nd row of cvsfile
             units = {'Year': '', 'Julian Day': '', 'Pen ID': '', 'Number of Animals in Pen': '',
-                             'U': 'mol/L', 'TAN_s': 'mol/L', 'MN': 'g', 'Mkg': 'g', 'VSd': 'g', 'VSnd': 'g'}
+                             'U': 'mol/L', 'TAN_s': 'mol/L', 'MN': 'g', 'Mkg': 'kg', 'VSd': 'g', 'VSnd': 'g'}
 
             writer.writerow(units)
 
@@ -93,12 +93,12 @@ class ManureReport(BaseReportHandler):
                 self.num_animals_in_pen[pen.id].append(len(pen.animals_in_pen))
                 
                 if pen.pen_populated:
-                    self.U[pen.id].append(pen.manure['U'])
-                    self.TAN_s[pen.id].append(pen.manure['TAN_s'])
-                    self.MN[pen.id].append(pen.manure['MN'])
-                    self.Mkg[pen.id].append(pen.manure['Mkg'])
-                    self.VSd[pen.id].append(pen.manure['VSd'])
-                    self.VSnd[pen.id].append(pen.manure['VSnd'])
+                    self.U[pen.id].append(round(pen.manure['U'], 3))
+                    self.TAN_s[pen.id].append(round(pen.manure['TAN_s'], 3))
+                    self.MN[pen.id].append(round(pen.manure['MN'], 3))
+                    self.Mkg[pen.id].append(round(pen.manure['Mkg'], 3))
+                    self.VSd[pen.id].append(round(pen.manure['VSd'], 3))
+                    self.VSnd[pen.id].append(round(pen.manure['VSnd'], 3))
                 else:
                     self.U[pen.id].append(0)
                     self.TAN_s[pen.id].append(0)

@@ -3,7 +3,12 @@
 RUFAS: Ruminant Farm Systems Model
 File name: animal_management.py
 Description: The class which manages all of the animal routines and keeps track of 
-    all animals and pens.
+    all animals and pens. All operations are as described in the Animal Module 
+    Information Flow document on Basecamp (such as daily animal updates and 
+    pen allocation). Method calls cascade through from the animal management 
+    class to pen to each individual animal in that pen. The life cycle of each animal
+    is controlled by an instance of the LifeCycleManager class, and this instance
+    updates the animals daily.
 Author(s): Militsa Sotirova, militsasotirova@gmail.com
 '''
 ################################################################################

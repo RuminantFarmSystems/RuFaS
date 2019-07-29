@@ -14,7 +14,7 @@ from pathlib import Path
 
 from RUFAS import routines, errors
 from RUFAS.classes import Config, State, Weather, Time
-from RUFAS.output import OutputHandler
+from RUFAS.output import OutputHandler, output_graphs
 
 
 #-------------------------------------------------------------------------------
@@ -62,9 +62,10 @@ def simulate(input_fPath:Path):
     while not time.end_simulation():
         annual_simulation()
 
-    #state.animal_management.life_cycle_manager.output_end_stats(config.sim_length)
     t_end_sim = timer.time()
-
+    #state.animal_management.life_cycle_manager.output_end_stats(config.sim_length)
+    #output_graphs.display_graphs(state.animal_management.formulation_interval, state.animal_management.sim_length)
+    
     print("Simulation Successful: {}".format(input_fPath.name))
     print("Total Run Time: {} seconds\n".format(str(t_end_sim - t_start_sim)))
 
