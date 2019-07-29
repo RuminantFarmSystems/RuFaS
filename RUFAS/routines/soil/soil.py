@@ -195,7 +195,7 @@ def daily_soil_routine(soil, crop, weather, time):
     # pools
     nitrogen_cycling.update_all(soil, weather, time)
 
-    phosphorus_cycling.update_all(soil, weather, time)
+    # phosphorus_cycling.update_all(soil, weather, time)
 
 
 # -------------------------------------------------------------------------------
