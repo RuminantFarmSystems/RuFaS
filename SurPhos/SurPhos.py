@@ -62,21 +62,26 @@ class SurPhos:
         for i in range(0, len(self.weather.rainfall)):
             self.crop_P_uptake.P_uptake_daily.append([0 for _ in range(0, len(self.weather.rainfall[i]))])
 
-        for i in range(0, len(self.weather.rainfall)):
+        for i in range(0, len(self.crop_P_uptake.P_uptake_annual)):
 
-            if i == 0:
-                days = len(self.weather.rainfall[i]) - self.time.start_day
-                for j in range(self.time.start_day - 1, len(self.weather.rainfall[i])):
-                    self.crop_P_uptake.P_uptake_daily[i][j] = self.crop_P_uptake.P_uptake_annual[i] / days
+            uptake_year = self.crop_P_uptake.year[i] - self.time.start_year
 
-            elif i == len(self.weather.rainfall) - 1:
+            if uptake_year == 0:
+                days = len(self.weather.rainfall[uptake_year]) - self.time.start_day
+                for j in range(self.time.start_day - 1, len(self.weather.rainfall[uptake_year])):
+                    self.crop_P_uptake.P_uptake_daily[uptake_year][j] \
+                        = self.crop_P_uptake.P_uptake_annual[i] / days
+
+            elif uptake_year == len(self.weather.rainfall) - 1:
                 days = self.time.end_day
                 for j in range(0, self.time.end_day):
-                    self.crop_P_uptake.P_uptake_daily[i][j] = self.crop_P_uptake.P_uptake_annual[i] / days
+                    self.crop_P_uptake.P_uptake_daily[uptake_year][j] \
+                        = self.crop_P_uptake.P_uptake_annual[i] / days
             else:
-                days = len(self.weather.rainfall[i])
-                for j in range(0, len(self.weather.rainfall[i])):
-                    self.crop_P_uptake.P_uptake_daily[i][j] = self.crop_P_uptake.P_uptake_annual[i] / days
+                days = len(self.weather.rainfall[uptake_year])
+                for j in range(0, len(self.weather.rainfall[uptake_year])):
+                    self.crop_P_uptake.P_uptake_daily[uptake_year][j] \
+                        = self.crop_P_uptake.P_uptake_annual[i] / days
 
         soil_data = data['soil']
 
