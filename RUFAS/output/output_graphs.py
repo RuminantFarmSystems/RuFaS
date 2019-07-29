@@ -1,9 +1,9 @@
 import matplotlib.pyplot as plt
 import csv
 from RUFAS import util
+from tkinter.tix import Form
 
-def graph_milk_production():
-    day = []
+def graph_milk_production(day):
     pen_avg_milk_prod = []
     milk_production_output_path = util.get_base_dir() / 'Outputs/Sample_Farm_Outputs/growth_report.csv'
     with open(milk_production_output_path,'r') as csvfile:
@@ -11,17 +11,15 @@ def graph_milk_production():
         
         for i in range(6, len(plots), 5):
             row = plots[i]
-            day.append(i)
             pen_avg_milk_prod.append(float(row[5]))
-    
+
     plt.plot(day, pen_avg_milk_prod)
-    plt.xlabel('Day in Simulation When Ration is Calculated (day)')
+    plt.xlabel('Day in Simulation (day)')
     plt.ylabel('Average Milk Production (kg)')
     plt.title('Average Milk Production per Animal for Milk-Producing Pens')
     plt.show()
 
-def graph_manure_excretion():
-    day = []
+def graph_manure_excretion(day):
     manure = {}
     manure[0] = []
     manure[1] = []
@@ -33,8 +31,6 @@ def graph_manure_excretion():
     with open(manure_production_output_path,'r') as csvfile:
         plots = list(csv.reader(csvfile, delimiter=','))
         
-        day = [i for i in range(2, len(plots), 5)]
-        
         for i in range(2, len(plots)):
             row = plots[i]
             pen = int(row[2])
@@ -45,13 +41,14 @@ def graph_manure_excretion():
     plt.plot(day, manure[2], label='Pen 2 - HeiferII')
     #plt.plot(day, manure[3], label='Pen 3 - HeiferIII')
     plt.plot(day, manure[4], label='Pen 4 - Cow')
-    plt.xlabel('Day in Simulation When Ration is Calculated (day)')
+    plt.xlabel('Day in Simulation (day)')
     plt.ylabel('Total Manure Excretion (kg)')
     plt.title('Total Manure Excretion per Pen')
     plt.legend()
     plt.show()
 
 
-def display_graphs():
-    graph_milk_production()
-    graph_manure_excretion()
+def display_graphs(formulation_interval, sim_length):
+    day = [i for i in range(1, sim_length, formulation_interval)]
+    graph_milk_production(day)
+    graph_manure_excretion(day)
