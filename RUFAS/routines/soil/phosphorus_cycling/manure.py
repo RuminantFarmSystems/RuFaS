@@ -1,3 +1,11 @@
+################################################################################
+"""
+SurPhos
+File name: manure.py
+Author(s): Jacob Johnson, jacob8399@gmail.com,
+           WIlliam Donovan, wmdonovan@wisc.edu
+"""
+################################################################################
 
 # calculates # of plops added per day and amount of TP, WIP, and WOP added
 # in manure, adds P to surface manure pools, and updates cumulative manure
@@ -11,18 +19,19 @@ def update_all(S, time):
 
     day = time.day
     year = time.year
-    m_app = S.manure_app
+    m_app = S.manure
     mass = m_app.mass
 
     for i in range(0, len(m_app.day)):
-        if day == m_app.day[i] and year == m_app.year[i] - time.start_year:
+        if m_app.day[i] == day and m_app.year[i] - time.start_year == year:
 
             S.manure_type = m_app.type[i]
 
             # S.cover_SLP = 0.0154 * mass[i] ** -0.555
 
             # m_app.percent_cover[i] = min(1.0, 0.012 * mass[i] ** 0.48)
-            cover_app = S.area * m_app.percent_cover[i]
+
+            cover_app = m_app.percent_cover[i] * S.area
             P_app = mass[i] * m_app.total_P_frac[i]
             N_app = mass[i] * m_app.total_N_frac[i]
             S.manure_sum += mass[i]
@@ -35,8 +44,8 @@ def update_all(S, time):
             infiltration = min(0.9, 0.000002 * wet_rate + 0.267)
 
             for w in range(0, 3):
-                S.active_P_layer[w] *= S.area
-                S.labile_P_layer[w] *= S.area
+                S.listOfSoilLayers[w].active_P *= S.area
+                S.listOfSoilLayers[w].labile_P *= S.area
 
             # surface application
 
@@ -56,10 +65,10 @@ def update_all(S, time):
 
                     # add manure P infiltrated into soil
 
-                    # TODO these two lines are not included in the else below but in the next
-                    S.active_P_layer[0] += P_app * (1.0 - (m_app.WIP_frac[i] + m_app.WOP_frac[i])) \
+                    # TODO these two lines are not included in the else below (111) but in the next (68)
+                    S.listOfSoilLayers[0].active_P += P_app * (1.0 - (m_app.WIP_frac[i] + m_app.WOP_frac[i])) \
                                            * 0.25 * (1.0 - infiltration)
-                    S.labile_P_layer[0] += P_app * m_app.WIP_frac[i] * (1.0 - infiltration) + P_app \
+                    S.listOfSoilLayers[0].labile_P += P_app * m_app.WIP_frac[i] * (1.0 - infiltration) + P_app \
                                            * (1.0 - (m_app.WIP_frac[i] + m_app.WOP_frac[i])) \
                                            * 0.75 * 0.95 * (1.0 - infiltration) + P_app * m_app.WOP_frac[i] \
                                            * 0.95 * (1.0 - infiltration)
@@ -97,10 +106,10 @@ def update_all(S, time):
 
                     # add manure P infiltrated into soil
 
-                    S.active_P_layer[0] += P_app * (1.0 - (m_app.WIP_frac[i] + m_app.WOP_frac[i])) \
+                    S.listOfSoilLayers[0].active_P += P_app * (1.0 - (m_app.WIP_frac[i] + m_app.WOP_frac[i])) \
                                            * 0.25 * (1.0 - infiltration) \
                                            * (1.0 - m_app.surface_percent[i])
-                    S.labile_P_layer[0] += P_app * m_app.WIP_frac[i] * (1.0 - infiltration) \
+                    S.listOfSoilLayers[0].labile_P += P_app * m_app.WIP_frac[i] * (1.0 - infiltration) \
                                            * (1.0 - m_app.surface_percent[i]) + P_app \
                                            * (1.0 - (m_app.WIP_frac[i] + m_app.WOP_frac[i])) \
                                            * 0.75 * 0.95 * (1.0 - infiltration) \
@@ -120,45 +129,45 @@ def update_all(S, time):
                     S.manure_NH4 += N_app * m_app.total_N_frac * 0.65 * m_app.surface_percent[i]
                     S.manure_SON += N_app * (1.0 - m_app.total_N_frac) * m_app.surface_percent[i]
 
-                    S.active_P_layer[0] += P_app * (1.0 - (m_app.WIP_frac[i] + m_app.WOP_frac[i])) \
+                    S.listOfSoilLayers[0].active_P += P_app * (1.0 - (m_app.WIP_frac[i] + m_app.WOP_frac[i])) \
                                            * 0.25 * (1.0 - m_app.surface_percent[i])
-                    S.labile_P_layer[0] += P_app * m_app.WIP_frac[i] * (1.0 - m_app.surface_percent[i]) \
+                    S.listOfSoilLayers[0].labile_P += P_app * m_app.WIP_frac[i] * (1.0 - m_app.surface_percent[i]) \
                                            + P_app * (1.0 - (m_app.WIP_frac[i] + m_app.WOP_frac[i])) \
                                            * 0.75 * 0.95 * (1.0 - m_app.surface_percent[i]) + P_app \
                                            * m_app.WOP_frac[i] * 0.95 * (1.0 - m_app.surface_percent[i])
 
-                n = 0  # TODO might cause error
+                n = 0
                 for n in range(0, 3):
-                    if S.depths_layer[n] >= m_app.depth[i]:
+                    if S.listOfSoilLayers[n].bottomDepth >= m_app.depth[i]:
                         break
 
                 sum_fact = 0.0
 
                 for k in range(0, n - 1):
-                    fact = S.depths_layer[k] / m_app.depth[i]
+                    fact = S.listOfSoilLayers[k].bottomDepth / m_app.depth[i]
 
-                    S.labile_P_layer[k] += P_app * m_app.WIP_frac[i] * (1.0 - m_app.surface_percent[1]) \
+                    S.listOfSoilLayers[k].labile_P += P_app * m_app.WIP_frac[i] * (1.0 - m_app.surface_percent[1]) \
                                            * fact + P_app * (1.0 - (m_app.WIP_frac[i] + m_app.WOP_frac[i])) * 0.75 \
                                            * 0.95 * (1.0 - infiltration) * (1.0 - m_app.surface_percent[i]) \
                                            * fact + P_app * m_app.WOP_frac[i] * 0.95 * (1.0 - infiltration) \
                                            * (1.0 - m_app.surface_percent[i]) * fact
-                    S.active_P_layer[k] += P_app * fact * (1.0 - (m_app.WIP_frac[i] + m_app.WOP_frac[i])) * 0.25 \
+                    S.listOfSoilLayers[k].active_P += P_app * fact * (1.0 - (m_app.WIP_frac[i] + m_app.WOP_frac[i])) * 0.25 \
                                            * (1.0 - m_app.surface_percent[i])
 
                     sum_fact += fact
                 fact = 1.0 - sum_fact
 
-                S.labile_P_layer[n] += P_app * m_app.WIP_frac[i] * (1.0 - m_app.surface_percent[1]) \
+                S.listOfSoilLayers[n].labile_P += P_app * m_app.WIP_frac[i] * (1.0 - m_app.surface_percent[1]) \
                                        * fact + P_app * (1.0 - (m_app.WIP_frac[i] + m_app.WOP_frac[i])) * 0.75 \
                                        * 0.95 * (1.0 - infiltration) * (1.0 - m_app.surface_percent[i]) \
                                        * fact + P_app * m_app.WOP_frac[i] * 0.95 * (1.0 - infiltration) \
                                        * (1.0 - m_app.surface_percent[i]) * fact
-                S.active_P_layer[n] += P_app * fact * (1.0 - (m_app.WIP_frac[i] + m_app.WOP_frac[i])) * 0.25 \
+                S.listOfSoilLayers[n].active_P += P_app * fact * (1.0 - (m_app.WIP_frac[i] + m_app.WOP_frac[i])) * 0.25 \
                                        * (1.0 - m_app.surface_percent[i])
 
             for w in range(0, 3):
-                S.active_P_layer[w] /= S.area
-                S.labile_P_layer[w] /= S.area
+                S.listOfSoilLayers[w].active_P /= S.area
+                S.listOfSoilLayers[w].labile_P /= S.area
 
             S.manure_mass_app = S.manure_mass
 

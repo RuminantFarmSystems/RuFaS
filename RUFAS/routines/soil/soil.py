@@ -152,7 +152,7 @@ This module needs the following inputs in order to operate correctly:
 """
 ################################################################################
 
-import math
+from math import exp, log
 from . import infiltration, \
     evapotranspiration, percolation, soil_temp, soil_erosion, soil_water
 from .nitrogen_cycling import nitrogen_cycling
@@ -267,6 +267,153 @@ class Soil:
         for uptakePApp, uptakePData in data['CropPUptake'].items():
             self.cropPUptakes.append(self.CropPUptake(uptakePApp, uptakePData))
 
+        # TODO SurPhos
+        # soil_data = data['soil']
+
+        self.cover = data['SoilCoverType']
+        self.leach = 0.0
+        self.area = data['FieldSize']
+
+        self.soil_layers = 3
+        self.thick_layer = []  # TODO I think this is already created as depth something
+        self.CNT_day_layer = []
+
+        x = 0
+        for layer in self.listOfSoilLayers:
+
+            # TODO careful of cm to mm, I had to add the / 10
+            if x == 0:
+                self.thick_layer.append(layer.depth / 10)
+            else:
+                self.thick_layer.append(layer.depth / 10)
+
+            # TODO orgC is an input
+            # self.OC_layer.append(layer.OM_percent * 0.58)
+
+            layer.PSP = -0.045 * log(layer.clay) + 0.001 * \
+                        layer.labile_P - 0.035 * layer.orgC + 0.43
+            layer.labile_P = layer.labile_P * layer.bulkDensity \
+                             * self.thick_layer[x] * 0.1
+
+            layer.active_P = layer.labile_P * (1.0 - layer.PSP) / layer.PSP
+
+            layer.stable_P = layer.active_P * 4.0
+
+            layer.org_P = layer.orgC / 8.0 / 14.0 * 10000 * layer.bulkDensity \
+                          * self.thick_layer[x] * 0.1
+
+            self.CNT_day_layer.append(0.0)
+
+            x += 1
+
+        # default values
+        self.days = [0, 0, 0]
+        self.moisture = 0.5
+        self.CNT = 1
+        self.manure_cov = 0.0
+        self.manure_mass = 0.0
+        self.cover_SLP = 0.000025
+        self.count_day = [0, 0, 0]
+
+        # fertilizer
+        self.fert_applied_sum = 0.0
+        self.no_rains = 0.0
+        self.fert_CNT = 0.0
+        self.fert_P_available = 0.0  # avfrtp
+        self.fert_P_released = 0.0  # rsfrtp
+        self.fact = 0.0
+
+        # manure
+        self.manure_type = 0
+        self.manure_sum = 0
+        self.manure_P_sum = 0
+        self.manure_N_sum = 0
+        self.WIP = 0.0
+        self.WOP = 0.0
+        self.SIP = 0.0
+        self.SOP = 0.0
+        self.manure_NH4 = 0.0
+        self.manure_SON = 0.0
+        self.manure_mass_app = 0.0
+
+        self.cows = []
+        self.heifer = []
+        self.dry_cow = []
+        self.d_calf = []
+        self.beef_cow = []
+        self.b_calf = []
+
+        # TODO temp
+        for x in range(0, 50):
+            self.cows.append([0 for _ in range(0, 366)])
+            self.heifer.append([0 for _ in range(0, 366)])
+            self.dry_cow.append([0 for _ in range(0, 366)])
+            self.d_calf.append([0 for _ in range(0, 366)])
+            self.beef_cow.append([0 for _ in range(0, 366)])
+            self.b_calf.append([0 for _ in range(0, 366)])
+
+        # plow
+
+        # solp
+        self.soil_P = [0, 0, 0]
+        self.SRP_sum = 0.0
+        self.slope = [0, 0, 0]
+        self.inter = [0, 0, 0]
+        self.DRP = [0, 0, 0]
+        self.water = [0, 0, 0]
+
+        # fert_leach
+        self.fert_sorp = 0.0
+        self.fert_absorbed_sum = 0.0
+        self.fert_leach = 0.0
+        self.PD_factor = 0.0
+        self.fert_runoff_P = 0.0
+        self.fert_R_sum = 0.0
+        self.fert_L_sum = 0.0
+
+        # p_mineralization
+        self.count_it = [0, 0, 0]
+        self.counts = [0, 0, 0]
+        self.soil_yp = []  # soilyp
+        for x in range(0, 3):
+            self.soil_yp.append([0 for _ in range(0, 366)])
+        self.PSP_avg = []
+        for layer in self.listOfSoilLayers:
+            self.PSP_avg.append(layer.PSP)
+        self.pbal = [0, 0, 0]
+        self.old_pbal = [0, 0, 0]
+        self.lab_P_sum = [0, 0, 0]
+        self.lab_P_avg = [0, 0, 0]
+        self.varA = [0, 0, 0]
+        self.varB = [0, 0, 0]
+        self.base = [0, 0, 0]
+        self.pflow = [0, 0, 0]
+        self.pd_srb_fac = [0, 0, 0]
+        self.pflow_r = [0, 0, 0]
+        self.PSP_fac = [0, 0, 0]
+        self.pflow2 = [0, 0, 0]
+        self.temp_lab = [0, 0, 0]
+
+        # manure_leach
+        self.TIP_leach = 0.0
+        self.TOP_leach = 0.0
+        self.TN_leach = 0.0
+        self.ND_factor = 0.0
+        self.WIP_R_sum = 0.0
+        self.WOP_R_sum = 0.0
+        self.NH_R_sum = 0.0
+        self.WIP_L_sum = 0.0
+        self.WOP_L_sum = 0.0
+        self.NH_L_sum = 0.0
+        self.DP_sum = 0.0
+        self.N_sum = 0.0
+        self.SRP_MGL = 0.0
+        self.runoff_IP = 0.0
+        self.runoff_OP = 0.0
+        self.runoff_NH = 0.0
+        self.T_runoff_IP = 0.0
+        # TODO
+
         self.convertCurrentSoilWaterToMM()  # calculate initial soil water in layer
         self.calculateWiltingWater()  # calculate wilting water in layer
         self.calculateFcWater()  # calculate field capacity water in layer
@@ -305,7 +452,7 @@ class Soil:
             z = layer.bottomDepth
 
             # "pseudocode_soil" S.4.A.1
-            exp_part = math.exp(-z / 1000)
+            exp_part = exp(-z / 1000)
             NO3 = 7 * exp_part
 
             # "pseudocode_soil" S.4.A.2
@@ -386,7 +533,7 @@ class Soil:
             self.TT = 0.0
             self.perc = 0.0  # amount of water that percolates to next layer
 
-            self.labileP = layerData['LabileP']  # labile P in soil layer
+            self.labile_P = layerData['LabileP']  # labile P in soil layer
             self.clay = layerData['Clay']  # soil clay % in soil layer
 
             # Variable to simulate nitrogen Cycling
@@ -425,13 +572,13 @@ class Soil:
             self.volatileExchangeFactor = layerData['VolatileExchangeFac']
 
             # Variables to simulate phosphorus cycling
-            self.OMpercent = layerData['OM%']
+            self.OM_percent = layerData['OM%']
             self.soilOC = 0.0
-            self.psp = 0.0
+            self.PSP = 0.0
 
-            self.activeP = 0.0
-            self.stableP = 0.0
-            self.orgP = 0.0
+            self.active_P = 0.0
+            self.stable_P = 0.0
+            self.org_P = 0.0
             self.p_uptake = 0.0
 
     # ---------------------------------------------------------------------------
@@ -439,7 +586,7 @@ class Soil:
     # An instance of this class represents a particular fertilizer and the date
     # of its application
     # ---------------------------------------------------------------------------
-    class Fertilizer():
+    class Fertilizer:
         """
         Description:
             An instance of this class represents a particular fertilizer and the date
@@ -468,7 +615,7 @@ class Soil:
     # An instance of this class represents a particular manure and the date
     # of its application
     # ---------------------------------------------------------------------------
-    class Manure():
+    class Manure:
         """
         An instance of this class represents a particular manure and the date
         of its application
@@ -503,7 +650,7 @@ class Soil:
     # An instance of this class represents a particular tillage and the date
     # of its application
     # ---------------------------------------------------------------------------
-    class Tillage():
+    class Tillage:
         """
         An instance of this class represents a particular tillage and the date
         of its application

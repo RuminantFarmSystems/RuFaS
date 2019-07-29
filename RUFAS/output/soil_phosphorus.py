@@ -97,8 +97,8 @@ class SoilPhosphorus(BaseReportHandler):
         self.julianDay.append(time.day)
         
         for x in range(0, len(soil.listOfSoilLayers)):
-            self.layersActiveP[x].append(soil.listOfSoilLayers[x].activeP)
-            self.layersStableP[x].append(soil.listOfSoilLayers[x].stableP)
+            self.layersActiveP[x].append(soil.listOfSoilLayers[x].active_P)
+            self.layersStableP[x].append(soil.listOfSoilLayers[x].stable_P)
             
     #---------------------------------------------------------------------------
     # Function: write_annual_report

@@ -2,7 +2,7 @@
 #
 # RUFAS: Ruminant Farm Systems Model
 #
-# phosphorus_cycling.py -
+# phosphorus_cycling.py
 #
 # Authors: DR. Peter A. Vadas
 #          USDA-ARS Dairy Forage Research Center
@@ -11,8 +11,8 @@
 #          PHONE NO. (608) 890-0069
 #          E-mail: peter.vadas@ars.usda.gov
 #
-# Coders:  Kass Chupongstimun
-#          Jit Patil
+# Coders:  Jacob Johnson
+#          William Donovan
 #
 ################################################################################
 
@@ -22,11 +22,12 @@ import math
 
 
 def update_all(soil, weather, time):
-    fertilizer.update_all(soil, time)
+
+    # fertilizer.update_all(soil, time)
 
     manure.update_all(soil, time)
 
-    plow.update_all(soil, time)
+    # plow.update_all(soil, time)
 
     sol_P.update_all(soil, weather, time)
 

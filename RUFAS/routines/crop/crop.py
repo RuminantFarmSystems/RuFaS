@@ -70,7 +70,7 @@ This module needs the following inputs in order to operate correctly:
             Eo_sum = Sum of the Eo values leading up to today
             Et_max
             NO3
-            labileP
+            labile_P
             currentSoilWaterMM
             fcWater
             wiltingWater
