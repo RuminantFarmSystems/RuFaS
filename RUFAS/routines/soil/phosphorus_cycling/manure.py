@@ -136,14 +136,15 @@ def update_all(S, time):
                                            * 0.75 * 0.95 * (1.0 - m_app.surface_percent[i]) + P_app \
                                            * m_app.WOP_frac[i] * 0.95 * (1.0 - m_app.surface_percent[i])
 
-                n = 0
+                no = 0
                 for n in range(0, 3):
                     if S.listOfSoilLayers[n].bottomDepth >= m_app.depth[i]:
                         break
+                    no += 1
 
                 sum_fact = 0.0
 
-                for k in range(0, n - 1):
+                for k in range(0, no):
                     fact = S.listOfSoilLayers[k].bottomDepth / m_app.depth[i]
 
                     S.listOfSoilLayers[k].labile_P += P_app * m_app.WIP_frac[i] * (1.0 - m_app.surface_percent[i]) \
@@ -156,14 +157,15 @@ def update_all(S, time):
                                                       * (1.0 - m_app.surface_percent[i])
 
                     sum_fact += fact
+
                 fact = 1.0 - sum_fact
 
-                S.listOfSoilLayers[n].labile_P += P_app * m_app.WIP_frac[i] * (1.0 - m_app.surface_percent[1]) \
+                S.listOfSoilLayers[no].labile_P += P_app * m_app.WIP_frac[i] * (1.0 - m_app.surface_percent[1]) \
                                        * fact + P_app * (1.0 - (m_app.WIP_frac[i] + m_app.WOP_frac[i])) * 0.75 \
                                        * 0.95 * (1.0 - infiltration) * (1.0 - m_app.surface_percent[i]) \
                                        * fact + P_app * m_app.WOP_frac[i] * 0.95 * (1.0 - infiltration) \
                                        * (1.0 - m_app.surface_percent[i]) * fact
-                S.listOfSoilLayers[n].active_P += P_app * fact * (1.0 - (m_app.WIP_frac[i]
+                S.listOfSoilLayers[no].active_P += P_app * fact * (1.0 - (m_app.WIP_frac[i]
                                                                          + m_app.WOP_frac[i])) * 0.25 \
                                                   * (1.0 - m_app.surface_percent[i])
 

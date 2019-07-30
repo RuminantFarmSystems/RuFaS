@@ -374,6 +374,7 @@ class Soil:
         self.fert_runoff_P = 0.0
         self.fert_R_sum = 0.0
         self.fert_L_sum = 0.0
+        self.fert_run = 0.0
 
         # p_mineralization
         self.count_it = [0, 0, 0]
@@ -611,7 +612,7 @@ class Soil:
             self.year = FertData['year']
             self.day = FertData['day']
             self.mass = FertData['mass']
-            self.depth = FertData['depth']
+            self.depth = FertData['depth'] / 10
             self.surface_percent = FertData['surf_perc']
 
     # ---------------------------------------------------------------------------
@@ -648,7 +649,7 @@ class Soil:
 
             self.dry_matter = manureData['dry_matter']
             self.percent_cover = manureData['percent_cover']
-            self.depth = manureData['depth']
+            self.depth = manureData['depth'] / 10
             self.surface_percent = manureData['surf_perc']
 
     # ---------------------------------------------------------------------------
@@ -675,7 +676,7 @@ class Soil:
             self.day = tillageData['day']
             self.percent_incorporated = tillageData['perc_incorporated']
             self.percent_mixed = tillageData['perc_mixed']
-            self.depth = tillageData['depth']
+            self.depth = tillageData['depth'] / 10
 
     # ---------------------------------------------------------------------------
     # Class: CropPUptake
