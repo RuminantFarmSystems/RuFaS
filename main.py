@@ -9,16 +9,10 @@ Author(s): Kass Chupongstimun, kass_c@hotmail.com
 
 # !/usr/bin/env python3
 
-import RUFAS, SurPhos
-from pathlib import Path
+import RUFAS
 
 
 def main():
-
-    print('Welcome to SurPhos:')
-    json_file = Path('SurPhos/' + input('Enter SurPhos Input: '))
-    print(json_file)
-    SurPhos.simulate(json_file)
 
     """
     Main function of RUFAS, executes simulations for all files specified.
@@ -28,22 +22,22 @@ def main():
     through and executes the simulation for each of the files in the list.
     """
 
-    # print("\nRUFAS: Ruminant Farm Systems Model 2018")
+    print("\nRUFAS: Ruminant Farm Systems Model 2018")
+
     #
-    # #
-    # # Prompt user for an input
-    # # Input could either be a json file when doing only 1 simulation
-    # # or a directory containing json files when doing a batch simulation
-    # #
-    # input_file_list = RUFAS.input_prompt()
+    # Prompt user for an input
+    # Input could either be a json file when doing only 1 simulation
+    # or a directory containing json files when doing a batch simulation
     #
-    # #
-    # # Begin the simulation
-    # # Runs the simulation for each input file in input_file_path
-    # # Runs only 1 simulation in the case of a single input file
-    # #
-    # for input_file_path in input_file_list:
-    #     RUFAS.simulate(input_file_path)
+    input_file_list = RUFAS.input_prompt()
+
+    #
+    # Begin the simulation
+    # Runs the simulation for each input file in input_file_path
+    # Runs only 1 simulation in the case of a single input file
+    #
+    for input_file_path in input_file_list:
+        RUFAS.simulate(input_file_path)
 
 
 # -------------------------------------------------------------------------------
