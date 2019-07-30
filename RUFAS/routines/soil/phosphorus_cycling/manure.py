@@ -146,13 +146,14 @@ def update_all(S, time):
                 for k in range(0, n - 1):
                     fact = S.listOfSoilLayers[k].bottomDepth / m_app.depth[i]
 
-                    S.listOfSoilLayers[k].labile_P += P_app * m_app.WIP_frac[i] * (1.0 - m_app.surface_percent[1]) \
+                    S.listOfSoilLayers[k].labile_P += P_app * m_app.WIP_frac[i] * (1.0 - m_app.surface_percent[i]) \
                                            * fact + P_app * (1.0 - (m_app.WIP_frac[i] + m_app.WOP_frac[i])) * 0.75 \
                                            * 0.95 * (1.0 - infiltration) * (1.0 - m_app.surface_percent[i]) \
                                            * fact + P_app * m_app.WOP_frac[i] * 0.95 * (1.0 - infiltration) \
                                            * (1.0 - m_app.surface_percent[i]) * fact
-                    S.listOfSoilLayers[k].active_P += P_app * fact * (1.0 - (m_app.WIP_frac[i] + m_app.WOP_frac[i])) * 0.25 \
-                                           * (1.0 - m_app.surface_percent[i])
+                    S.listOfSoilLayers[k].active_P += P_app * fact * (1.0 - (m_app.WIP_frac[i]
+                                                                             + m_app.WOP_frac[i])) * 0.25 \
+                                                      * (1.0 - m_app.surface_percent[i])
 
                     sum_fact += fact
                 fact = 1.0 - sum_fact
@@ -162,8 +163,9 @@ def update_all(S, time):
                                        * 0.95 * (1.0 - infiltration) * (1.0 - m_app.surface_percent[i]) \
                                        * fact + P_app * m_app.WOP_frac[i] * 0.95 * (1.0 - infiltration) \
                                        * (1.0 - m_app.surface_percent[i]) * fact
-                S.listOfSoilLayers[n].active_P += P_app * fact * (1.0 - (m_app.WIP_frac[i] + m_app.WOP_frac[i])) * 0.25 \
-                                       * (1.0 - m_app.surface_percent[i])
+                S.listOfSoilLayers[n].active_P += P_app * fact * (1.0 - (m_app.WIP_frac[i]
+                                                                         + m_app.WOP_frac[i])) * 0.25 \
+                                                  * (1.0 - m_app.surface_percent[i])
 
             for w in range(0, 3):
                 S.listOfSoilLayers[w].active_P /= S.area
