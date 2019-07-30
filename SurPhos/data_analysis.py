@@ -5,7 +5,7 @@ from SurPhos import util
 
 
 def read_data(output_csv):
-    output_full_path = util.get_base_dir()/'SurPhos'/output_csv
+    output_full_path = util.get_base_dir()/output_csv
     with output_full_path.open('r') as csv_file:
         read_csv = csv.reader(csv_file, delimiter=',')
 
@@ -31,10 +31,10 @@ def read_data(output_csv):
 
 
 def produce_graphics():
-    fortran, units = read_data('surphos_doody5.csv')
-    python, units = read_data('output/surphos_report.csv')
+    fortran, units = read_data('SurPhos/surphos_doody3.csv')
+    python, units = read_data('SurPhos/output/surphos_report.csv')
 
-    if len(python['j_day']) != len(fortran['j_day']):
+    if len(python['year']) != len(fortran['year']):
         fortran, units = read_data('output/surphos_report.csv')
         print("Could not compare Fortran and Python because of different simulation lengths.",
               "\n\t*Showing Python*")
@@ -58,10 +58,12 @@ def produce_graphics():
             mp.figure()
             mp.plot(dates, fortran[variable[1]])
             mp.plot(dates, python[variable[0]])
+            mp.xticks(rotation=45)
             mp.legend(['fortran', 'python'])
             mp.xlabel('Dates')
             mp.ylabel(variable[0] + ' ' + units[counter])
             mp.title(variable[0])
+            mp.tight_layout()
             mp.savefig(save_dir / variable[0])
             mp.close()
         counter += 1

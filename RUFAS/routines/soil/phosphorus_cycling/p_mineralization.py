@@ -90,10 +90,10 @@ def update_all(S, time):
                 S.pflow_r = S.listOfSoilLayers[i].active_P
 
             S.listOfSoilLayers[i].active_P -= S.pflow_r[i]
-            S.listOfSoilLayers[i].active_P = min(0.0, S.listOfSoilLayers[i].active_P)
+            S.listOfSoilLayers[i].active_P = max(0.0, S.listOfSoilLayers[i].active_P)
 
             S.listOfSoilLayers[i].labile_P += S.pflow_r[i]
-            S.listOfSoilLayers[i].labile_P = min(0.0, S.listOfSoilLayers[i].labile_P)
+            S.listOfSoilLayers[i].labile_P = max(0.0, S.listOfSoilLayers[i].labile_P)
 
         elif S.pbal[i] >= 0.0:
             S.pflow_r[i] = 0.0
@@ -113,10 +113,10 @@ def update_all(S, time):
             S.pflow[i] = min(S.pflow[i], S.listOfSoilLayers[i].labile_P)
 
             S.listOfSoilLayers[i].labile_P -= S.pflow[i]
-            S.listOfSoilLayers[i].labile_P = min(0.0, S.listOfSoilLayers[i].labile_P)
+            S.listOfSoilLayers[i].labile_P = max(0.0, S.listOfSoilLayers[i].labile_P)
 
             S.listOfSoilLayers[i].active_P += S.pflow[i]
-            S.listOfSoilLayers[i].active_P = min(0.0, S.listOfSoilLayers[i].active_P)
+            S.listOfSoilLayers[i].active_P = max(0.0, S.listOfSoilLayers[i].active_P)
 
             S.old_pbal[i] = S.pbal[i]
 

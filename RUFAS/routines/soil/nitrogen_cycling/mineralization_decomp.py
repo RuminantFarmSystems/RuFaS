@@ -51,7 +51,7 @@ def mineralization_decomp(soil):
             # TODO: these values are taken from phosphorus_cycling.py which is incomplete
             #
             freshOrgP = (res * 0.0003) * BD * depth / 100
-            labileP = layer.labileP
+            labileP = layer.labile_P
 
             # "pseudocode_soil" S.4.E.3
             CP = 0

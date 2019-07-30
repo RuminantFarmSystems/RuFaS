@@ -30,7 +30,7 @@
         },
         "soil_phosphorus":
         {
-            "active": false,
+            "active": true,
             "report_name": "Soil Phosphorus",
             "file_name": "soil_phosphorus.csv"
         },
@@ -180,16 +180,13 @@
                 }
             },
 
-            "Fertilizers":
+            "FertilizerApplication":
             {
-                "Application1":
-                {
-                    "Year": 2008,
-                    "JDay": 179,
-                    "PMass": 25,
-                    "Depth": 3.0,
-                    "%onSurface": 0.25
-                }
+                "year": [0],
+                "day": [0],
+                "mass": [0.0],
+                "depth": [0.0],
+                "surf_perc": [0.0]
             },
             "ManureApplication":
             {
@@ -207,32 +204,13 @@
                 "depth": [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0],
                 "surf_perc": [1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0]
             },
-            "TillageOperations":
+            "TillageApplication":
             {
-                "Operation1":
-                {
-                    "Year": 2008,
-                    "Jday": 365,
-                    "%Incorporate": 0.5,
-                    "%Mixed": 0.30,
-                    "Depth": 15.0
-                },
-                "Operation2":
-                {
-                    "Year": 2009,
-                    "Jday": 365,
-                    "%Incorporate": 0.5,
-                    "%Mixed": 0.30,
-                    "Depth": 15.0
-                },
-                "Operation3":
-                {
-                    "Year": 2010,
-                    "Jday": 365,
-                    "%Incorporate": 0.5,
-                    "%Mixed": 0.30,
-                    "Depth": 15.0
-                }
+                "year": [0],
+                "day": [0],
+                "perc_incorporated": [0.0],
+                "perc_mixed": [0.0],
+                "depth": [0.0]
             },
 
             "CropPUptake":

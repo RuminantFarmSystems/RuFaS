@@ -23,7 +23,7 @@ def update_all(S, time):
     mass = m_app.mass
 
     for i in range(0, len(m_app.day)):
-        if m_app.day[i] == day and m_app.year[i] - time.start_year == year:
+        if m_app.day[i] == day and m_app.year[i] - S.start_year + 1 == year:
 
             S.manure_type = m_app.type[i]
 
@@ -32,8 +32,8 @@ def update_all(S, time):
             # m_app.percent_cover[i] = min(1.0, 0.012 * mass[i] ** 0.48)
 
             cover_app = m_app.percent_cover[i] * S.area
-            P_app = mass[i] * m_app.total_P_frac[i]
-            N_app = mass[i] * m_app.total_N_frac[i]
+            P_app = mass[i] * m_app.P_frac[i]
+            N_app = mass[i] * m_app.N_frac[i]
             S.manure_sum += mass[i]
             S.manure_P_sum += P_app
             S.manure_N_sum += N_app
@@ -60,8 +60,8 @@ def update_all(S, time):
                     S.WOP += P_app * m_app.WOP_frac[i] * infiltration
                     S.SOP += P_app * (1.0 - (m_app.WIP_frac[i] + m_app.WOP_frac[i])) * 0.75 * infiltration
                     S.SIP += P_app * (1.0 - (m_app.WIP_frac[i] + m_app.WOP_frac[i])) * 0.25 * infiltration
-                    S.manure_NH4 += N_app * m_app.total_N_frac[i] * infiltration * 0.65
-                    S.manure_SON += N_app * (1.0 - m_app.total_N_frac[i]) * infiltration
+                    S.manure_NH4 += N_app * m_app.N_frac[i] * infiltration * 0.65
+                    S.manure_SON += N_app * (1.0 - m_app.N_frac[i]) * infiltration
 
                     # add manure P infiltrated into soil
 
@@ -80,8 +80,8 @@ def update_all(S, time):
                     S.WOP += P_app * m_app.WOP_frac[i]
                     S.SOP += P_app * (1.0 - (m_app.WIP_frac[i] + m_app.WOP_frac[i])) * 0.75
                     S.SIP += P_app * (1.0 - (m_app.WIP_frac[i] + m_app.WOP_frac[i])) * 0.25
-                    S.manure_NH4 += N_app * m_app.total_N_frac * 0.65
-                    S.manure_SON += N_app * (1.0 - m_app.total_N_frac)
+                    S.manure_NH4 += N_app * m_app.N_frac * 0.65
+                    S.manure_SON += N_app * (1.0 - m_app.N_frac)
 
             else:  # TODO did not double check because it never happens
 
@@ -99,9 +99,9 @@ def update_all(S, time):
                              * 0.25 * infiltration * m_app.surface_percent[i]
                     S.SIP += P_app * (1.0 - (m_app.WIP_frac[i] + m_app.WOP_frac[i])) \
                              * 0.75 * infiltration * m_app.surface_percent[i]
-                    S.manure_NH4 += N_app * m_app.total_N_frac * 0.65 * infiltration \
+                    S.manure_NH4 += N_app * m_app.N_frac * 0.65 * infiltration \
                                     * m_app.surface_percent[i]
-                    S.manure_SON += N_app * (1.0 - m_app.total_N_frac) * infiltration \
+                    S.manure_SON += N_app * (1.0 - m_app.N_frac) * infiltration \
                                     * m_app.surface_percent[i]
 
                     # add manure P infiltrated into soil
@@ -126,8 +126,8 @@ def update_all(S, time):
                              * m_app.surface_percent[i]
                     S.SIP += P_app * (1.0 - (m_app.WIP_frac[i] + m_app.WOP_frac[i])) * 0.25 \
                              * m_app.surface_percent[i]
-                    S.manure_NH4 += N_app * m_app.total_N_frac * 0.65 * m_app.surface_percent[i]
-                    S.manure_SON += N_app * (1.0 - m_app.total_N_frac) * m_app.surface_percent[i]
+                    S.manure_NH4 += N_app * m_app.N_frac * 0.65 * m_app.surface_percent[i]
+                    S.manure_SON += N_app * (1.0 - m_app.N_frac) * m_app.surface_percent[i]
 
                     S.listOfSoilLayers[0].active_P += P_app * (1.0 - (m_app.WIP_frac[i] + m_app.WOP_frac[i])) \
                                            * 0.25 * (1.0 - m_app.surface_percent[i])

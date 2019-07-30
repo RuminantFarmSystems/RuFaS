@@ -15,10 +15,10 @@ def update_all(S, time):
 
     day = time.day
     year = time.year
-    till_app = S.tillage_app
+    till_app = S.tillage
 
     for x in range(len(till_app.day)):
-        if till_app.day[x] == day and till_app.year[x] - time.start_year == year:
+        if till_app.day[x] == day and till_app.year[x] - S.start_year + 1 == year:
             for w in range(0, 3):
                 S.listOfSoilLayers[w].active_P *= S.area
                 S.listOfSoilLayers[w].labile_P *= S.area

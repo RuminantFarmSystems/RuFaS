@@ -23,11 +23,11 @@ import math
 
 def update_all(soil, weather, time):
 
-    # fertilizer.update_all(soil, time)
+    fertilizer.update_all(soil, time)
 
     manure.update_all(soil, time)
 
-    # plow.update_all(soil, time)
+    plow.update_all(soil, time)
 
     sol_P.update_all(soil, weather, time)
 
@@ -36,4 +36,5 @@ def update_all(soil, weather, time):
     manure_leach.update_all(soil, weather, time)
 
     p_mineralization.update_all(soil, time)
+
 

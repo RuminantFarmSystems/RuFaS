@@ -195,7 +195,7 @@ def daily_soil_routine(soil, crop, weather, time):
     # pools
     nitrogen_cycling.update_all(soil, weather, time)
 
-    # phosphorus_cycling.update_all(soil, weather, time)
+    phosphorus_cycling.update_all(soil, weather, time)
 
 
 # -------------------------------------------------------------------------------
@@ -222,7 +222,9 @@ class Soil:
             config: instance of the Config class
         """
         # Values Initialized by Input
-        self.manure = Soil.Manure(data["ManureApplication"])
+        self.manure = Soil.Manure(data['ManureApplication'])
+        self.fertilizer = Soil.Fertilizer(data['FertilizerApplication'])
+        self.tillage = Soil.Tillage(data['TillageApplication'])
 
         self.profileDepth = data['ProfileDepth']
         self.profileBulkDensity = data['ProfileBulkDensity']
@@ -255,20 +257,22 @@ class Soil:
             layer.depth = layer.bottomDepth - curr_depth
             curr_depth = layer.bottomDepth
 
-        # get fertilizer application information
-        for fertApp, fertData in data['Fertilizers'].items():
-            self.fertilizerApplications.append(self.Fertilizer(fertApp, fertData))
+        # # get fertilizer application information
+        # for fertApp, fertData in data['Fertilizers'].items():
+        #     self.fertilizerApplications.append(self.Fertilizer(fertApp, fertData))
+        #
+        # # get tillage application information
+        # for tillageApp, tillageData in data['TillageOperations'].items():
+        #     self.tillageOperations.append(self.Tillage(tillageApp, tillageData))
 
-        # get tillage application information
-        for tillageApp, tillageData in data['TillageOperations'].items():
-            self.tillageOperations.append(self.Tillage(tillageApp, tillageData))
-
-        # get crop phosphorus uptake  information
-        for uptakePApp, uptakePData in data['CropPUptake'].items():
-            self.cropPUptakes.append(self.CropPUptake(uptakePApp, uptakePData))
+        # # get crop phosphorus uptake  information
+        # for uptakePApp, uptakePData in data['CropPUptake'].items():
+        #     self.cropPUptakes.append(self.CropPUptake(uptakePApp, uptakePData))
 
         # TODO SurPhos
         # soil_data = data['soil']
+
+        self.start_year = config.start_year
 
         self.cover = data['SoilCoverType']
         self.leach = 0.0
@@ -288,7 +292,7 @@ class Soil:
                 self.thick_layer.append(layer.depth / 10)
 
             # TODO orgC is an input
-            # self.OC_layer.append(layer.OM_percent * 0.58)
+            # layer.orgC = layer.OM_percent * 0.58
 
             layer.PSP = -0.045 * log(layer.clay) + 0.001 * \
                         layer.labile_P - 0.035 * layer.orgC + 0.43
@@ -436,9 +440,10 @@ class Soil:
         self.decayRate = 0.0
         self.topLayerFreshN = 0.0
 
+        # TODO
         # soil phosphorus attributes
-        self.soilCoverType = data['SoilCoverType']
-        self.pUptake = [[0 for x in range(366)] for y in range(config.end_year + 1)]
+        # self.soilCoverType = data['SoilCoverType']
+        # self.pUptake = [[0 for x in range(366)] for y in range(config.end_year + 1)]
         self.lightFactor = []
         self.yieldFactor = []
         self.summan = 0.0
@@ -579,7 +584,7 @@ class Soil:
             self.active_P = 0.0
             self.stable_P = 0.0
             self.org_P = 0.0
-            self.p_uptake = 0.0
+            self.p_uptake = 0.00
 
     # ---------------------------------------------------------------------------
     # Class: Fertilizer
@@ -593,7 +598,7 @@ class Soil:
         of its application.
         """
 
-        def __init__(self, FertName, FertData):
+        def __init__(self, FertData):
             """
             Constructs an instance of this class by setting the values of its necessary
             fields.
@@ -603,12 +608,11 @@ class Soil:
                 FertData: a dictionary which holds the rest of the information about
                     this fertilizer
             """
-            self.name = FertName
-            self.appYear = FertData['Year']
-            self.appDay = FertData['JDay']
-            self.fertPMass = FertData['PMass']
-            self.depth = FertData['Depth']
-            self.percentOnSurface = FertData['%onSurface']
+            self.year = FertData['year']
+            self.day = FertData['day']
+            self.mass = FertData['mass']
+            self.depth = FertData['depth']
+            self.surface_percent = FertData['surf_perc']
 
     # ---------------------------------------------------------------------------
     # Class: Manure
@@ -633,11 +637,13 @@ class Soil:
             self.year = manureData['year']
             self.day = manureData['day']
             self.mass = manureData['mass']
-            self.total_P_frac = manureData['P_frac']
+            self.P_frac = manureData['P_frac']
+            self.N_frac = manureData['N_frac']
+            self.NH4_frac = manureData['NH4_frac']
             self.WIP_frac = manureData['WIP_frac']
             self.WOP_frac = manureData['WOP_frac']
 
-            # TODO: total_N_frac and total_NH4_frac only exist in some SurPhos
+            # TODO: N_frac and total_NH4_frac only exist in some SurPhos
             # TODO: data sets and are set to 0.
 
             self.dry_matter = manureData['dry_matter']
@@ -656,7 +662,7 @@ class Soil:
         of its application
         """
 
-        def __init__(self, tillageName, tillageData):
+        def __init__(self, tillageData):
             """
             Description:
                 Constructs an instance of this class.
@@ -665,19 +671,18 @@ class Soil:
                 tillageName: a string which is the name of this tillage
                 tillageData: a dictionary which stores the information for this tillage
             """
-            self.name = tillageName
-            self.appYear = tillageData['Year']
-            self.appDay = tillageData['Jday']
-            self.percentIncorporate = tillageData['%Incorporate']
-            self.percentMixed = tillageData['%Mixed']
-            self.depth = tillageData['Depth']
+            self.year = tillageData['year']
+            self.day = tillageData['day']
+            self.percent_incorporated = tillageData['perc_incorporated']
+            self.percent_mixed = tillageData['perc_mixed']
+            self.depth = tillageData['depth']
 
     # ---------------------------------------------------------------------------
     # Class: CropPUptake
     # An instance of this class represents a particular uptake and the date
     # of uptake
     # ---------------------------------------------------------------------------
-    class CropPUptake():
+    class CropPUptake:
         """
         An instance of this class represents a particular uptake and the date
         of uptake

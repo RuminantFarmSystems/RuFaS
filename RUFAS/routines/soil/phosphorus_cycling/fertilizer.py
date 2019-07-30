@@ -18,10 +18,10 @@ def update_all(S, time):
 
     day = time.day
     year = time.year
-    fert_app = S.fertilizer_app
+    fert_app = S.fertilizer
 
     for x in range(len(fert_app.day)):
-        if fert_app.day[x] == day and fert_app.year[x] - time.start_year == year:
+        if fert_app.day[x] == day and fert_app.year[x] - S.start_year + 1 == year:
             S.fert_applied_sum += fert_app.mass[x]  # fertpkg
             S.no_rains = 0
             S.fert_CNT = 1.0

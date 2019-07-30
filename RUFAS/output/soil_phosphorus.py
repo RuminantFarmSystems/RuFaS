@@ -12,10 +12,11 @@
 import csv
 from RUFAS.output.report_handler import BaseReportHandler
 
-#-------------------------------------------------------------------------------
+
+# -------------------------------------------------------------------------------
 # Class: SoilPhosphorus
 # Creates and prints to the file soil_nitrogen.csv
-#-------------------------------------------------------------------------------
+# -------------------------------------------------------------------------------
 class SoilPhosphorus(BaseReportHandler):
 
     def __init__(self, data):
@@ -54,10 +55,10 @@ class SoilPhosphorus(BaseReportHandler):
         self.manure_mass = []
         self.manure_cover = []
 
-    #---------------------------------------------------------------------------
+    # ---------------------------------------------------------------------------
     # Function: get_header
     #           Writes the header (title and units) in the csvfile
-    #---------------------------------------------------------------------------
+    # ---------------------------------------------------------------------------
     def write_header(self):
 
         mode = 'a+' if self.get_fPath().exists() else 'w+'
@@ -89,30 +90,19 @@ class SoilPhosphorus(BaseReportHandler):
                      'manure_SON': 'kg', 'manure_mass': 'kg', 'manure_cover': 'HA'}
             writer.writerow(units)
 
-    #---------------------------------------------------------------------------
-    # Function: get_data
+    # ---------------------------------------------------------------------------
+    # Function: initialize
     #           Transfers the needed data from Soil object to the report handler
-    #---------------------------------------------------------------------------
-    def get_data(self, state):
+    # ---------------------------------------------------------------------------
+    def initialize(self, state):
 
-        soil = state.soil
+        self.write_header()
 
-        # initialize number of layer in soil summary report handler to get output
-        # data pertaining to each soil layer
-        # Initializes the output arrays for current soil water, Esoil, and
-        # percolation for each soil layer
-        self.numSoilLayers = len(soil.listOfSoilLayers)
-        
-        for _ in range (0, self.numSoilLayers):
-            self.layersActiveP.append([])
-            self.layersStableP.append([])
-
-
-    #---------------------------------------------------------------------------
+    # ---------------------------------------------------------------------------
     # Function: updateDailyOutput
     # Stores the daily values that need to be printed in the 'soil summary'
     # csv file
-    #---------------------------------------------------------------------------
+    # ---------------------------------------------------------------------------
     def daily_update(self, state, weather, time):
 
         soil = state.soil
@@ -122,39 +112,46 @@ class SoilPhosphorus(BaseReportHandler):
 
         # TODO: still needs to be implemented
 
-        self.soil_runoff_DRP.append()
-        self.manure_runoff_DRP.append()
-        self.fert_runoff_DRP.append()
-        self.runoff_DIP.append()
-        self.manure_runoff_DOP.append()
-        self.manure_runoff_NH4.append()
-        self.PSP.append()
-        self.labile_p1.append()
-        self.labile_p2.append()
-        self.labile_p3.append()
-        self.available_fert_P.append()
-        self.released_fert_P.append()
-        self.manure_WIP.append()
-        self.manure_WOP.append()
-        self.manure_SIP.append()
-        self.manure_SOP.append()
-        self.manure_NH4.append()
-        self.manure_SON.append()
-        self.manure_mass.append()
-        self.manure_cover.append()
+        self.soil_runoff_DRP.append(soil.SRP_MGL)
+        self.manure_runoff_DRP.append(soil.runoff_IP)
+        self.fert_runoff_DRP.append(soil.fert_runoff_P)
+        self.runoff_DIP.append(soil.T_runoff_IP)
+        self.manure_runoff_DOP.append(soil.runoff_OP)
+        self.manure_runoff_NH4.append(soil.runoff_NH)
+        self.PSP.append(soil.listOfSoilLayers[0].PSP)
+        self.labile_p1.append(soil.listOfSoilLayers[0].labile_P)
+        self.labile_p2.append(soil.listOfSoilLayers[1].labile_P)
+        self.labile_p3.append(soil.listOfSoilLayers[2].labile_P)
+        self.available_fert_P.append(soil.fert_P_available)
+        self.released_fert_P.append(soil.fert_P_released)
+        self.manure_WIP.append(soil.WIP)
+        self.manure_WOP.append(soil.WOP)
+        self.manure_SIP.append(soil.SIP)
+        self.manure_SOP.append(soil.SOP)
+        self.manure_NH4.append(soil.manure_NH4)
+        self.manure_SON.append(soil.manure_SON)
+        self.manure_mass.append(soil.manure_mass)
+        self.manure_cover.append(soil.manure_cov)
 
-    #---------------------------------------------------------------------------
+    # ---------------------------------------------------------------------------
+    # Method: annual_update
+    # ---------------------------------------------------------------------------
+    def annual_update(self, state, weather, time):
+        """Stores the yearly values that need to be printed in the report."""
+        pass
+
+    # ---------------------------------------------------------------------------
     # Function: write_annual_report
     #           Appends the annual report to the output file
     # Soil Summary is a cvsfile
-    #---------------------------------------------------------------------------
+    # ---------------------------------------------------------------------------
     def write_annual_report(self, y):
 
         mode = 'a+' if self.get_fPath().exists() else 'w+'
 
         with self.get_fPath().open(mode) as csvfile:
 
-        # Write data day by day
+            # Write data day by day
             for x in range(0, len(self.julianDay)):
                 dailySoilPhosphorusData = {
                     'Year': str(self.year[x]),
