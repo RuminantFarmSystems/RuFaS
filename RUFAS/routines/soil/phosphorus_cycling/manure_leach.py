@@ -22,8 +22,8 @@ def update_all(S, weather, time):
     runoff = S.runoff
     temp = weather.T_avg
 
-    TFA = max(0.0, ((2.0 * 32.0 ** 2 * temp[year - 1][day - 1] ** 2
-                    - temp[year - 1][day - 1] ** 4)) / 32.0 ** 4)
+    TFA = max(0.0, (2.0 * 32.0 ** 2 * temp[year - 1][day - 1] ** 2
+                    - temp[year - 1][day - 1] ** 4) / 32.0 ** 4)
 
     for w in range(0, 3):
         S.listOfSoilLayers[w].active_P *= S.area
@@ -57,7 +57,7 @@ def update_all(S, weather, time):
 
         S.WIP = max(0.0, S.WIP - MIP_leach)
         S.WOP = max(0.0, S.WOP - MOP_leach)
-        S.manure_NH4 = max(0.0, S.manure_NH4 - MNH_leach)
+        S.manure_NH4 = max(0.0, S.manure_NH4 - MNH_leach)  # TODO: this is redundant
 
         S.TIP_leach += MIP_leach
         S.TOP_leach += MOP_leach
