@@ -20,41 +20,42 @@ def update_all(S, time):
     year = time.year
     fert_app = S.fertilizer
 
-    for x in range(len(fert_app.day)):
-        if fert_app.day[x] == day and fert_app.year[x] - S.start_year + 1 == year:
-            S.fert_applied_sum += fert_app.mass[x]  # fertpkg
+    for i in range(len(fert_app.day)):
+        if fert_app.day[i] == day and fert_app.year[i] - S.start_year + 1 == year:
+            S.fert_applied_sum += fert_app.mass[i]  # fertpkg
             S.no_rains = 0
             S.fert_CNT = 1.0
 
-            if fert_app.depth[x] == 0.0:
-                S.fert_P_available += fert_app.mass[x] * 0.75
+            if fert_app.depth[i] == 0.0:
+                S.fert_P_available += fert_app.mass[i] * 0.75
                 fert_PST = S.fert_P_available  # TODO fert_PST is frtpst and unused
-                S.fert_P_released += fert_app.mass[x] * 0.25
+                S.fert_P_released += fert_app.mass[i] * 0.25
 
             else:
-                S.fert_P_available += fert_app.mass[x] * 0.75 * fert_app.surface_percent[x]
+                S.fert_P_available += fert_app.mass[i] * 0.75 * fert_app.surface_percent[i]
                 fert_PST = S.fert_P_available  # TODO above
-                S.rs_frt_p += fert_app.mass[x] * 0.25 * fert_app.surface_percent[x]
+                S.fert_P_released += fert_app.mass[i] * 0.25 * fert_app.surface_percent[i]
 
-                n = 0
+                no = 0
                 for n in range(0, 3):
-                    if S.listOfSoilLayers[n].bottomDepth >= fert_app.depth[x]:
+                    if S.listOfSoilLayers[n].bottomDepth >= fert_app.depth[i]:
                         break
+                    no += 1
 
                 sum_fac = 0.0
 
                 for w in range(0, 3):
                     S.listOfSoilLayers[w].labile_P *= S.area
 
-                for k in range(0, n - 1):  # TODO weird, can be -1 but that might be intentional
-                    S.fact = S.listOfSoilLayers[k].bottomDepth / fert_app.depth[x]
-                    S.listOfSoilLayers[k].labile_P += (fert_app.mass[x] * S.fact
-                                            * (1.0 - fert_app.surface_percent[x]))
-                    sum_fac = sum_fac + S.fact
+                for k in range(0, no):  # TODO weird, can be -1 but that might be intentional
+                    S.fact = S.listOfSoilLayers[k].bottomDepth / fert_app.depth[i]
+                    S.listOfSoilLayers[k].labile_P += (fert_app.mass[i] * S.fact
+                                            * (1.0 - fert_app.surface_percent[i]))
+                    sum_fac += S.fact
 
                 S.fact = 1.0 - sum_fac
-                S.listOfSoilLayers[n].labile_P += (fert_app.mass[x] * S.fact
-                                         * (1.0 - fert_app.surface_percent[x]))
+                S.listOfSoilLayers[no].labile_P += (fert_app.mass[i] * S.fact
+                                         * (1.0 - fert_app.surface_percent[i]))
 
                 for w in range(0, 3):
                     S.listOfSoilLayers[w].labile_P /= S.area
