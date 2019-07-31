@@ -80,7 +80,7 @@ def update_all(S, time):
 
         S.base[i] = -1.0 * S.listOfSoilLayers[i].PSP + 0.8
 
-        if S.pbal[i] < 0.0:
+        if S.pbal[i] < 0.0:  # TODO: This whole section could be simplified
             S.pflow[i] = 0.0
             S.days[i] = 0.0
 
@@ -115,7 +115,6 @@ def update_all(S, time):
             S.PSP_fac[i] = S.varA[i] * (S.days[i] ** S.varB[i])
             S.pflow[i] = S.PSP_fac[i] * S.pbal[i]
 
-            # TODO next two if statements are redundant
             S.pflow[i] = min(S.pflow[i], S.listOfSoilLayers[i].labile_P)
 
             S.listOfSoilLayers[i].labile_P -= S.pflow[i]
