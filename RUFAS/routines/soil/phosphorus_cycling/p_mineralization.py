@@ -35,6 +35,12 @@ def update_all(S, time):
 
         S.listOfSoilLayers[i].labile_P = max(0.0, S.listOfSoilLayers[i].labile_P)
 
+        # This code only executes once at the beginning of each year of the simulation
+        # count_it and counts are one dimensional arrays of size 3 (standard for
+        # representation of soil layers which goes along with the i indexing)
+        # each then represents a year counter, count_it beginning at 0 and
+        # counts beginning at 1. Both being limited to a 10 year maximum. Counts
+        # resets upon reaching that maximum, count_it does not.
         if day == 1:
             if S.count_it[i] < 10:
                 S.count_it[i] += 1

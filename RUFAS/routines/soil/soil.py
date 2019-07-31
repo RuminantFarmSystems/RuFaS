@@ -599,21 +599,21 @@ class Soil:
         of its application.
         """
 
-        def __init__(self, FertData):
+        def __init__(self, fert_data):
             """
             Constructs an instance of this class by setting the values of its necessary
             fields.
 
             Args:
                 FertName: a string which is the name of this fertilizer
-                FertData: a dictionary which holds the rest of the information about
+                fert_data: a dictionary which holds the rest of the information about
                     this fertilizer
             """
-            self.year = FertData['year']
-            self.day = FertData['day']
-            self.mass = FertData['mass']
-            self.depth = FertData['depth'] / 10
-            self.surface_percent = FertData['surf_perc']
+            self.year = fert_data['year']
+            self.day = fert_data['day']
+            self.mass = fert_data['mass']
+            self.depth = [x / 10 for x in fert_data['depth']]
+            self.surface_percent = fert_data['surf_perc']
 
     # ---------------------------------------------------------------------------
     # Class: Manure
@@ -626,31 +626,31 @@ class Soil:
         of its application
         """
 
-        def __init__(self, manureData):
+        def __init__(self, manure_data):
             """
             Description:
                 Constructs an instance of this class
 
             Args:
-                manureData: a dictionary which stores the information for this manure
+                manure_data: a dictionary which stores the information for this manure
             """
-            self.type = manureData['type']
-            self.year = manureData['year']
-            self.day = manureData['day']
-            self.mass = manureData['mass']
-            self.P_frac = manureData['P_frac']
-            self.N_frac = manureData['N_frac']
-            self.NH4_frac = manureData['NH4_frac']
-            self.WIP_frac = manureData['WIP_frac']
-            self.WOP_frac = manureData['WOP_frac']
+            self.type = manure_data['type']
+            self.year = manure_data['year']
+            self.day = manure_data['day']
+            self.mass = manure_data['mass']
+            self.P_frac = manure_data['P_frac']
+            self.N_frac = manure_data['N_frac']
+            self.NH4_frac = manure_data['NH4_frac']
+            self.WIP_frac = manure_data['WIP_frac']
+            self.WOP_frac = manure_data['WOP_frac']
 
             # TODO: N_frac and total_NH4_frac only exist in some SurPhos
             # TODO: data sets and are set to 0.
 
-            self.dry_matter = manureData['dry_matter']
-            self.percent_cover = manureData['percent_cover']
-            self.depth = manureData['depth'] / 10
-            self.surface_percent = manureData['surf_perc']
+            self.dry_matter = manure_data['dry_matter']
+            self.percent_cover = manure_data['percent_cover']
+            self.depth = [x / 10 for x in manure_data['depth']]
+            self.surface_percent = manure_data['surf_perc']
 
     # ---------------------------------------------------------------------------
     # Class: Tillage
@@ -663,20 +663,20 @@ class Soil:
         of its application
         """
 
-        def __init__(self, tillageData):
+        def __init__(self, tillage_data):
             """
             Description:
                 Constructs an instance of this class.
 
             Args:
                 tillageName: a string which is the name of this tillage
-                tillageData: a dictionary which stores the information for this tillage
+                tillage_data: a dictionary which stores the information for this tillage
             """
-            self.year = tillageData['year']
-            self.day = tillageData['day']
-            self.percent_incorporated = tillageData['perc_incorporated']
-            self.percent_mixed = tillageData['perc_mixed']
-            self.depth = tillageData['depth'] / 10
+            self.year = tillage_data['year']
+            self.day = tillage_data['day']
+            self.percent_incorporated = tillage_data['perc_incorporated']
+            self.percent_mixed = tillage_data['perc_mixed']
+            self.depth = [x / 10 for x in tillage_data['depth']]
 
     # ---------------------------------------------------------------------------
     # Class: CropPUptake
@@ -689,19 +689,19 @@ class Soil:
         of uptake
         """
 
-        def __init__(self, uptakeName, uptakeData):
+        def __init__(self, uptake_name, uptake_data):
             """
             Description:
                 Constructs an instance of this class.
 
             Args:
-                uptakeName: a string which is the name of this particular uptake
-                uptakeData: a dictionary which stores the information for this particular
+                uptake_name: a string which is the name of this particular uptake
+                uptake_data: a dictionary which stores the information for this particular
                     uptake
             """
-            self.name = uptakeName
-            self.uptakeYear = uptakeData['Year']
-            self.pUptake = uptakeData['PUptake']
+            self.name = uptake_name
+            self.uptakeYear = uptake_data['Year']
+            self.pUptake = uptake_data['PUptake']
 
     # ---------------------------------------------------------------------------
     # Function: calculateFcWater
