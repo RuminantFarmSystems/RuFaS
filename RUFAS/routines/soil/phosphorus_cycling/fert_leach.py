@@ -89,7 +89,7 @@ def update_all(S, weather, time):
 
     S.listOfSoilLayers[0].labile_P += (S.fert_leach - S.fert_run) * 0.6
 
-    if S.listOfSoilLayers[1].bottomDepth <= 15.0:
+    if S.listOfSoilLayers[1].bottom_depth_cm <= 15.0:
         S.listOfSoilLayers[1].labile_P += (S.fert_leach - S.fert_run) * 0.3
         S.listOfSoilLayers[2].labile_P += (S.fert_leach - S.fert_run) * 0.1
     else:

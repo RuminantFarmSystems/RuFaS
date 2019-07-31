@@ -96,7 +96,7 @@ def update_all(S, weather, time):
         # TODO math
         S.listOfSoilLayers[0].labile_P += 0.6 * (MIP_leach - runoff_MIP + MOP_leach - runoff_MOP)
 
-        if S.listOfSoilLayers[1].bottomDepth <= 15.0:
+        if S.listOfSoilLayers[1].bottom_depth_cm <= 15.0:
 
             # TODO math
             S.listOfSoilLayers[1].labile_P += 0.3 * (MIP_leach - runoff_MIP + MOP_leach - runoff_MOP)
@@ -212,7 +212,7 @@ def update_all(S, weather, time):
         # TODO math
         S.listOfSoilLayers[0].labile_P += 0.6 * (WIP_ASIM + WOP_ASIM + SOP_ASIM)
 
-        if S.listOfSoilLayers[1].bottomDepth <= 15.0:
+        if S.listOfSoilLayers[1].bottom_depth_cm <= 15.0:
 
             S.listOfSoilLayers[1].active_P += SIP_ASIM * 0.3
             S.listOfSoilLayers[2].active_P += SIP_ASIM * 0.1

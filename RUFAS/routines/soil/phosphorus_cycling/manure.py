@@ -138,14 +138,14 @@ def update_all(S, time):
 
                 no = 0
                 for n in range(0, 3):
-                    if S.listOfSoilLayers[n].bottomDepth >= m_app.depth[i]:
+                    if S.listOfSoilLayers[n].bottom_depth_cm >= m_app.depth[i]:
                         break
                     no += 1
 
                 sum_fact = 0.0
 
                 for k in range(0, no):
-                    fact = S.listOfSoilLayers[k].bottomDepth / m_app.depth[i]
+                    fact = S.listOfSoilLayers[k].bottom_depth_cm / m_app.depth[i]
 
                     S.listOfSoilLayers[k].labile_P += P_app * m_app.WIP_frac[i] * (1.0 - m_app.surface_percent[i]) \
                                            * fact + P_app * (1.0 - (m_app.WIP_frac[i] + m_app.WOP_frac[i])) * 0.75 \
