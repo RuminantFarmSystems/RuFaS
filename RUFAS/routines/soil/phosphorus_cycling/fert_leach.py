@@ -68,8 +68,6 @@ def update_all(S, weather, time):
 
     # calculate the concentration of fertilizer dissolved P in runoff in MG/L
 
-    S.fert_runoff_P = 0.0
-    fert_run = 0.0
     if runoff > 0.0:
         S.PD_factor = 0.034 * exp((runoff / rainfall[year - 1][day - 1]) * 3.4)
         S.fert_runoff_P = S.fert_leach / (rainfall[year - 1][day - 1] / 10.0) \
@@ -77,29 +75,32 @@ def update_all(S, weather, time):
 
         # calculate fertilizer runoff P in KG
 
-        fert_run = S.fert_runoff_P * runoff * 0.01 * S.area
-        fert_run = max(0.0, fert_run)
-        fert_run = min(fert_run, S.fert_leach)
+        S.fert_run = S.fert_runoff_P * runoff * 0.01 * S.area
+        S.fert_run = max(0.0, S.fert_run)
+        S.fert_run = min(S.fert_run, S.fert_leach)
+    else:
+        S.fert_runoff_P = 0.0
+        S.fert_run = 0.0
 
     # convert soil P from KG/HA to KG and add fertilizer P leached
 
     for w in range(0, 3):
         S.listOfSoilLayers[w].labile_P *= S.area
 
-    S.listOfSoilLayers[0].labile_P += (S.fert_leach - fert_run) * 0.6
+    S.listOfSoilLayers[0].labile_P += (S.fert_leach - S.fert_run) * 0.6
 
     if S.listOfSoilLayers[1].bottomDepth <= 15.0:
-        S.listOfSoilLayers[1].labile_P += (S.fert_leach - fert_run) * 0.3
-        S.listOfSoilLayers[2].labile_P += (S.fert_leach - fert_run) * 0.1
+        S.listOfSoilLayers[1].labile_P += (S.fert_leach - S.fert_run) * 0.3
+        S.listOfSoilLayers[2].labile_P += (S.fert_leach - S.fert_run) * 0.1
     else:
-        S.listOfSoilLayers[1].labile_P += (S.fert_leach - fert_run) * 0.4
+        S.listOfSoilLayers[1].labile_P += (S.fert_leach - S.fert_run) * 0.4
 
     for w in range(0, 3):
         S.listOfSoilLayers[w].labile_P /= S.area
 
     # add fertilizer P leached and in runoff to running total
 
-    S.fert_R_sum += fert_run
-    S.fert_L_sum += (S.fert_leach - fert_run)
+    S.fert_R_sum += S.fert_run
+    S.fert_L_sum += (S.fert_leach - S.fert_run)
 
 
