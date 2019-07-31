@@ -281,13 +281,11 @@ class Soil:
         self.soil_layers = 3
         self.thick_layer = []  # TODO I think this is already created as depth something
         self.CNT_day_layer = []
-        self.bottom_depth_cm = []
 
         x = 0
         for layer in self.listOfSoilLayers:
 
             # TODO careful of cm to mm, I had to add the / 10
-            self.bottom_depth_cm.append(layer.bottomDepth / 10)
 
             self.thick_layer.append(layer.depth / 10)
 
@@ -512,6 +510,7 @@ class Soil:
             self.name = layerName
 
             self.bottomDepth = layerData['BottomDepth']
+            self.bottom_depth_cm = layerData['BottomDepth'] / 10
             self.wiltingPoint = layerData['WiltingPoint']
             self.fieldCapacity = layerData['FieldCapacity']
             self.saturation = layerData['Saturation']
