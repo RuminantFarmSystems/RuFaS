@@ -26,13 +26,14 @@ def update_all(S, time):
             # incorporate surface manure and fertilizer
 
             # TODO math
-            S.listOfSoilLayers[0].labile_P += till_app.percent_incorporated[x] * (S.fert_P_available + S.fert_P_released)
+            S.listOfSoilLayers[0].labile_P += till_app.percent_incorporated[x] * (S.fert_P_available
+                                                                                  + S.fert_P_released)
 
             S.fert_P_available = S.fert_P_available - (S.fert_P_available * till_app.percent_incorporated[x])
             S.fert_P_released = S.fert_P_released - (S.fert_P_released * till_app.percent_incorporated[x])
 
-            # TODO math
-            S.listOfSoilLayers[0].labile_P += till_app.percent_incorporated[x] * (S.SIP + S.WIP)
+            S.listOfSoilLayers[0].labile_P += till_app.percent_incorporated[x] * S.WIP
+            S.listOfSoilLayers[0].active_P += till_app.percent_incorporated[x] * S.SIP
 
             S.WIP -= S.WIP * till_app.percent_incorporated[x]
             S.WOP -= S.WOP * till_app.percent_incorporated[x]
