@@ -49,7 +49,7 @@ def update_all(S, time):
 
             NLS = 0
             for k in range(0, 3):
-                if not till_app.depth[x] > S.depths_layer[k]:
+                if not till_app.depth[x] > S.listOfSoilLayers[k].bottom_depth_cm:
                     NLS = k
                     break
 

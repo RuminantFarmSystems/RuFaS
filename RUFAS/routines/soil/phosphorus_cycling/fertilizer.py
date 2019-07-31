@@ -38,7 +38,7 @@ def update_all(S, time):
 
                 no = 0
                 for n in range(0, 3):
-                    if S.listOfSoilLayers[n].bottomDepth >= fert_app.depth[i]:
+                    if S.listOfSoilLayers[n].bottom_depth_cm >= fert_app.depth[i]:
                         break
                     no += 1
 
@@ -48,7 +48,7 @@ def update_all(S, time):
                     S.listOfSoilLayers[w].labile_P *= S.area
 
                 for k in range(0, no):  # TODO weird, can be -1 but that might be intentional
-                    S.fact = S.listOfSoilLayers[k].bottomDepth / fert_app.depth[i]
+                    S.fact = S.listOfSoilLayers[k].bottom_depth_cm / fert_app.depth[i]
                     S.listOfSoilLayers[k].labile_P += (fert_app.mass[i] * S.fact
                                             * (1.0 - fert_app.surface_percent[i]))
                     sum_fac += S.fact
