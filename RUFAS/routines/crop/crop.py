@@ -138,7 +138,7 @@ def annual_crop_routine(crop, weather, time):
 # -------------------------------------------------------------------------------
 class Crop:
     def __init__(self, data):
-        self.init_crop = init_crop(data)
+        self.init_crop = InitCrop(data)
         self.alfalfa = Alfalfa(data)
         self.corn = Corn(data)
         self.soy = Soybean(data)
@@ -166,7 +166,7 @@ class Crop:
             crop_type.Ea_sum = 0
 
 
-class init_crop:
+class InitCrop:
     def __init__(self, data):
 
         self.data = data
@@ -299,7 +299,7 @@ class init_crop:
         self.HI_actual = 0
         self.HI_opt = 0
 
-        self.harvest_eff = 0 # TODO: possibly a non-crop specific user input
+        self.harvest_eff = 0  # TODO: possibly a non-crop specific user input
 
         self.gamma_wu = 0
 
@@ -469,7 +469,7 @@ class Soybean:
         self.harvest_date = soy_data['harvest_date']
         """GENERAL PLANT INFO"""
         self.crop_name = 'soybean'
-        self.crop_type = 'perennial'
+        self.crop_type = 'annual'
         self.start_date = 0
 
         self.fix_nitrogen = True
@@ -493,11 +493,11 @@ class Soybean:
         ''' LEAF AREA INDEX (LAI) DATA '''
 
         # Inputs
-        self.fr_PHU_1 = 0.05
-        self.fr_PHU_2 = 0.10
-        self.fr_LAI_1 = 0.25
-        self.fr_LAI_2 = 0.70
-        self.fr_PHU_sen = 0.8
+        self.fr_PHU_1 = 0.15
+        self.fr_PHU_2 = 0.05
+        self.fr_LAI_1 = 0.50
+        self.fr_LAI_2 = 0.95
+        self.fr_PHU_sen = 0.9
         self.LAI_max = 3
 
         # Internally calculated inputs
@@ -614,7 +614,7 @@ class Alfalfa:
         self.harvest_date = alfalfa_data['harvest_date']
         """GENERAL PLANT INFO"""
         self.crop_name = 'alfalfa'
-        self.crop_type = 'annual'
+        self.crop_type = 'perennial'
         self.start_date = 0
 
         self.fix_nitrogen = False
@@ -622,9 +622,9 @@ class Alfalfa:
         ''' HEAT UNIT DATA '''
 
         # Inputs
-        self.T_base_min = 10
-        self.T_base_max = 30
-        self.PHU = 1200
+        self.T_base_min = 4
+        self.T_base_max = 30  # corn
+        self.PHU = 1200  # corn
 
         # Internally calculated inputs
         self.accumulated_HU = 0.0
@@ -639,11 +639,11 @@ class Alfalfa:
 
         # Inputs
         self.fr_PHU_1 = 0.15
-        self.fr_PHU_2 = 0.50
-        self.fr_LAI_1 = 0.05
+        self.fr_PHU_2 = 0.01
+        self.fr_LAI_1 = 0.50
         self.fr_LAI_2 = 0.95
         self.fr_PHU_sen = 0.90
-        self.LAI_max = 3
+        self.LAI_max = 4
 
         # Internally calculated inputs
         self.prev_fr_LAI_max = 0
@@ -657,7 +657,7 @@ class Alfalfa:
         ''' ROOT DEPTH DATA '''
 
         # Inputs
-        self.z_root_max = 2000  # maximum depth of root development
+        self.z_root_max = 3000  # maximum depth of root development
 
         # Internally calculated inputs
         self.fr_root = 0
@@ -670,8 +670,8 @@ class Alfalfa:
         ''' BIOMASS DATA '''
 
         # Inputs
-        self.kl = 0.65
-        self.RUE = 39
+        self.kl = 0.65  # corn
+        self.RUE = 20
         self.T_opt = 25
 
         # Internally calculated inputs
@@ -686,8 +686,8 @@ class Alfalfa:
         # ===================================================================
         ''' Soil Water Uptake Data '''
 
-        self.beta_w = 10  # water-use distribution parameter
-        self.epco = 0.5
+        self.beta_w = 10  # water-use distribution parameter  # corn
+        self.epco = 0.5  # corn
 
         self.water_actual_up = 0
         self.water_uptake_each_layer = []
@@ -695,15 +695,15 @@ class Alfalfa:
         # ===================================================================
         ''' Nitrogen Uptake Data '''
 
-        self.beta_n = 10
+        self.beta_n = 10  # corn
 
         self.bio_N_opt = 0
         self.bio_N = 0
 
-        self.fr_n1 = 0.047
-        self.fr_n2 = 0.0177
-        self.fr_n3 = 0.0138
-        self.fr_n3ish = 0.01381
+        self.fr_n1 = 0.0417
+        self.fr_n2 = 0.0290
+        self.fr_n3 = 0.0200
+        self.fr_n3ish = 0.02001
 
         self.fr_N = 0
         self.fr_N_up = 0
@@ -714,17 +714,17 @@ class Alfalfa:
         # ===================================================================
         ''' Phosphorus Uptake Data '''
 
-        self.beta_p = 10
+        self.beta_p = 10  # corn
 
         self.bio_P_opt = 0
         self.bio_P = 0
 
-        self.fr_PHU_50 = 0.5
-        self.fr_PHU_100 = 1.0
-        self.fr_p1 = 0.0048
-        self.fr_p2 = 0.0018
-        self.fr_p3 = 0.0014
-        self.fr_p3ish = 0.00141
+        self.fr_PHU_50 = 0.5  # corn
+        self.fr_PHU_100 = 1.0  # corn
+        self.fr_p1 = 0.0035
+        self.fr_p2 = 0.0028
+        self.fr_p3 = 0.0020
+        self.fr_p3ish = 0.00201
 
         self.fr_P = 0
         self.P_up = 0
@@ -735,11 +735,11 @@ class Alfalfa:
         ''' Yields Data '''
 
         self.HI_max = 0
-        self.HI_min = 0.3
+        self.HI_min = 0.9
         self.HI_actual = 0
-        self.HI_opt = 0.6
+        self.HI_opt = 0.9
 
-        self.harvest_eff = 0.9
+        self.harvest_eff = 0.9  # corn
 
         self.gamma_wu = 0
 
@@ -748,6 +748,7 @@ class Alfalfa:
         self.yield_actual = 0
         self.yield_N = 0
         self.yield_P = 0
+
 
 # -----------------------------------------------------------------------
 # Method: calculate_start_growth_day
