@@ -252,10 +252,10 @@ class Soil:
         self.listOfSoilLayers.sort(key=lambda x: x.bottomDepth)
 
         # calculate initial depth of each soil layer
-        curr_depth = 0
+        curr_thickness = 0
         for layer in self.listOfSoilLayers:
-            layer.depth = layer.bottomDepth - curr_depth
-            curr_depth = layer.bottomDepth
+            layer.thickness = layer.bottomDepth - curr_thickness
+            curr_thickness = layer.bottomDepth
 
         # # get fertilizer application information
         # for fertApp, fertData in data['Fertilizers'].items():
@@ -279,7 +279,7 @@ class Soil:
         self.area = data['FieldSize']
 
         self.soil_layers = 3
-        self.thick_layer = []  # TODO I think this is already created as depth something
+        self.thickness_cm = []  # TODO I think this is already created as depth something
         self.CNT_day_layer = []
 
         x = 0
@@ -287,7 +287,7 @@ class Soil:
 
             # TODO careful of cm to mm, I had to add the / 10
 
-            self.thick_layer.append(layer.depth / 10)
+            self.thickness_cm.append(layer.thickness / 10)
 
             # TODO orgC is an input
             # layer.orgC = layer.OM_percent * 0.58
@@ -295,14 +295,14 @@ class Soil:
             layer.PSP = -0.045 * log(layer.clay) + 0.001 * \
                         layer.labile_P - 0.035 * layer.orgC + 0.43
             layer.labile_P = layer.labile_P * layer.bulkDensity \
-                             * self.thick_layer[x] * 0.1
+                             * self.thickness_cm[x] * 0.1
 
             layer.active_P = layer.labile_P * (1.0 - layer.PSP) / layer.PSP
 
             layer.stable_P = layer.active_P * 4.0
 
             layer.org_P = layer.orgC / 8.0 / 14.0 * 10000 * layer.bulkDensity \
-                          * self.thick_layer[x] * 0.1
+                          * self.thickness_cm[x] * 0.1
 
             self.CNT_day_layer.append(0.0)
 
@@ -479,8 +479,8 @@ class Soil:
 
             # "pseudocode_soil" S.4.A.7
             BD = layer.bulkDensity
-            depth = layer.depth
-            unit_adjustment = (BD * depth) / 100
+            thickness = layer.thickness
+            unit_adjustment = (BD * thickness) / 100
 
             layer.NO3 = NO3 * unit_adjustment
             layer.orgN = OrgN
@@ -516,7 +516,7 @@ class Soil:
             self.saturation = layerData['Saturation']
             # self.currentSoilWater = layerData['StartingSoilWater']
 
-            self.depth = 0.0  # depth of soil layer
+            self.thickness = 0.0  # thickness of soil layer
             self.fcWater = 0.0  # constant
             self.satWater = 0.0  # constant
             self.wiltingWater = 0.0  # constant
@@ -714,7 +714,7 @@ class Soil:
             field capacity (mm H2O). Called when soil portion of input is read.
         """
         for layer in self.listOfSoilLayers:
-            layer.fcWater = layer.depth * layer.fieldCapacity
+            layer.fcWater = layer.thickness * layer.fieldCapacity
 
     # ---------------------------------------------------------------------------
     # Function: calculateSatWater
@@ -728,7 +728,7 @@ class Soil:
             saturation (mm H2O). Called when soil portion of input is read.
         """
         for layer in self.listOfSoilLayers:
-            layer.satWater = layer.depth * layer.saturation
+            layer.satWater = layer.thickness * layer.saturation
 
     # ---------------------------------------------------------------------------
     # Function: calculateWiltingWater
@@ -742,7 +742,7 @@ class Soil:
             wilting point (mm H2O). Called when soil portion of input is read.
         """
         for layer in self.listOfSoilLayers:
-            layer.wiltingWater = layer.depth * layer.wiltingPoint
+            layer.wiltingWater = layer.thickness * layer.wiltingPoint
 
     # ---------------------------------------------------------------------------
     # Function: convertCurrentSoilWaterToMM
@@ -756,7 +756,7 @@ class Soil:
             Called once when soil portion of input is read.
         """
         for layer in self.listOfSoilLayers:
-            layer.currentSoilWaterMM = layer.depth * layer.fieldCapacity
+            layer.currentSoilWaterMM = layer.thickness * layer.fieldCapacity
 
     def annual_reset(self):
         """

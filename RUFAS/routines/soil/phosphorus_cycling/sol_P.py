@@ -15,9 +15,9 @@ def update_all(S, weather, time):
     runoff = S.runoff
 
     S.soil_P[0] = S.listOfSoilLayers[0].labile_P / S.listOfSoilLayers[0].bulkDensity \
-                  / S.thick_layer[0] / 0.1
+                  / S.thickness_cm[0] / 0.1
     S.soil_P[1] = S.listOfSoilLayers[1].labile_P / S.listOfSoilLayers[1].bulkDensity \
-                  / S.thick_layer[1] / 0.1
+                  / S.thickness_cm[1] / 0.1
 
     S.slope[0] = 173.51 * (S.listOfSoilLayers[0].clay / 100.0) + 8.48
     S.slope[1] = 173.51 * (S.listOfSoilLayers[1].clay / 100.0) + 8.48

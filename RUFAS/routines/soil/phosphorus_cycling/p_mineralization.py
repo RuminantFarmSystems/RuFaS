@@ -52,7 +52,7 @@ def update_all(S, time):
 
             S.soil_yp[i][S.counts[i]] = S.listOfSoilLayers[i].labile_P \
                                         / S.listOfSoilLayers[i].bulkDensity \
-                                        / S.thick_layer[i] / 0.1
+                                        / S.thickness_cm[i] / 0.1
             S.lab_P_sum[i] = 0
 
             for j in range(0, S.count_it[i]):
@@ -61,7 +61,7 @@ def update_all(S, time):
             S.lab_P_avg[i] = max(0.01, S.lab_P_sum[i] / S.count_it[i])
 
         S.soil_P[i] = S.listOfSoilLayers[i].labile_P / S.listOfSoilLayers[i].bulkDensity \
-                      / S.thick_layer[i] / 0.1
+                      / S.thickness_cm[i] / 0.1
         S.listOfSoilLayers[i].PSP = -0.045 * log(S.listOfSoilLayers[i].clay) \
                          + 0.001 * S.listOfSoilLayers[i].labile_P \
                          - 0.035 * S.listOfSoilLayers[i].orgC + 0.43
@@ -130,9 +130,9 @@ def update_all(S, time):
         S.listOfSoilLayers[i].active_P += S.pflow2[i]
 
         S.temp_lab[i] = S.listOfSoilLayers[i].labile_P / S.listOfSoilLayers[i].bulkDensity \
-                      / S.thick_layer[i] / 0.1
+                      / S.thickness_cm[i] / 0.1
         if S.temp_lab[i] < 5.0:
-            min_P = min(((5.0 * S.listOfSoilLayers[i].bulkDensity * S.thick_layer[i] * 0.1)
+            min_P = min(((5.0 * S.listOfSoilLayers[i].bulkDensity * S.thickness_cm[i] * 0.1)
                          - S.listOfSoilLayers[i].labile_P), S.listOfSoilLayers[i].org_P)
             S.listOfSoilLayers[i].labile_P += min_P
             S.listOfSoilLayers[i].org_P -= min_P
