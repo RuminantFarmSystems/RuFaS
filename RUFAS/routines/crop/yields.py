@@ -60,6 +60,7 @@ CropType values updated by update_all():
 ###############################################################################
 from math import exp
 
+
 #
 # Runs all the yield calculations
 #
@@ -112,7 +113,6 @@ def calc_HI_actual(crop_type, time):
         crop_type.HI_actual = 0
     else:
         term1 = crop_type.HI_max - crop_type.HI_min
-
         exp_part = exp(6.13 - (0.883 * crop_type.gamma_wu))
         term2 = crop_type.gamma_wu / (crop_type.gamma_wu + exp_part)
 
@@ -125,7 +125,7 @@ def calc_HI_actual(crop_type, time):
 #
 def calc_yield_max(crop_type, time):
     if time.day == crop_type.harvest_date:
-        crop_type.yield_max = crop_type.bio_AG * crop_type.HI_actual
+        crop_type.yield_max = crop_type.bio_AG * crop_type.HI_max
     else:
         crop_type.yield_max = 0
 
@@ -152,6 +152,8 @@ def calc_nutrient_removal(crop_type):
 # # "pseudocode_crop" C.10.H.1/2
 #
 def calc_residue(crop_type, time, soil):
+    dResidue = 0
     if crop_type.harvest_date == time.day:
-        dResidue = (crop_type.biomass_actual - crop_type.yield_actual)
-        soil.residue = (soil.residue + dResidue) * (1 - soil.decayRate)
+        dResidue = (crop_type.bio_AG - crop_type.yield_actual)
+    soil.listOfSoilLayers[0].topLayerFreshN += 0.0015 * soil.residue
+    soil.residue = soil.residue * (1 - soil.decayRate) + dResidue
