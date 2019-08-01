@@ -58,7 +58,7 @@ def update_all(S, time):
             till_lab_P = 0.0
 
             for j in range(0, NLS + 1):
-                S.soil_ms[j] = S.listOfSoilLayers[j].bulkDensity * S.thick_layer[j] * 100000.0
+                S.soil_ms[j] = S.listOfSoilLayers[j].bulkDensity * S.thickness_cm[j] * 100000.0
                 till_soil += S.soil_ms[j]
                 till_lab_P += S.listOfSoilLayers[j].labile_P
                 till_act_P += S.listOfSoilLayers[j].active_P

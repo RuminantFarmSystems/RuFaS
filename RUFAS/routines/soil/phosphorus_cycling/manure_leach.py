@@ -238,7 +238,7 @@ def update_all(S, weather, time):
     # and manure P in runoff from spreading and grazing
 
     if runoff > 0.0:
-        S.soil_P[0] = S.listOfSoilLayers[0].labile_P / S.listOfSoilLayers[0].bulkDensity / S.thick_layer[0] / 0.1
+        S.soil_P[0] = S.listOfSoilLayers[0].labile_P / S.listOfSoilLayers[0].bulkDensity / S.thickness_cm[0] / 0.1
         S.SRP_MGL = S.soil_P[0] * 0.005
 
         S.T_runoff_IP = S.runoff_IP + S.SRP_MGL + S.fert_runoff_P

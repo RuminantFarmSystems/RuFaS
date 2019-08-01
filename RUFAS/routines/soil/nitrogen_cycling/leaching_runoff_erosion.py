@@ -41,7 +41,7 @@ def leaching_runoff_erosion(soil):
         SAT = layer.satWater
 
         BD = layer.bulkDensity
-        depth = layer.depth
+        thickness = layer.thickness
 
         #
         # the coefficient of extraction for leaching is calibrated to 2.5
@@ -82,10 +82,10 @@ def leaching_runoff_erosion(soil):
             layer.NH4 -= NH4Runoff
 
             # "pseudocode_soil" S.4.C.3
-            activeNErosConc = (100 * layer.activeN) / (BD * depth)
-            stableNErosConc = (100 * layer.stableN) / (BD * depth)
-            freshNErosConc = (100 * layer.topLayerFreshN / (BD * depth))
-            NH4ErosConc = (100 * layer.NH4 / (BD * depth))
+            activeNErosConc = (100 * layer.activeN) / (BD * thickness)
+            stableNErosConc = (100 * layer.stableN) / (BD * thickness)
+            freshNErosConc = (100 * layer.topLayerFreshN / (BD * thickness))
+            NH4ErosConc = (100 * layer.NH4 / (BD * thickness))
 
             Eros_activeN_loss = 0
             Eros_stableN_loss = 0
