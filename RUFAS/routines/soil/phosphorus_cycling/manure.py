@@ -181,7 +181,7 @@ def update_all(S, time):
 
     if cow_mass_app > 0.0:
 
-        S.moisture = (S.moisture * S.maure_mass + 0.9 * cow_mass_app) \
+        S.moisture = (S.moisture * S.manure_mass + 0.9 * cow_mass_app) \
                      / (S.manure_mass + cow_mass_app)
 
         S.manure_mass += cow_mass_app

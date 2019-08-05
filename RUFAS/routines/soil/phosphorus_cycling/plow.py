@@ -58,13 +58,13 @@ def update_all(S, time):
             till_lab_P = 0.0
 
             for j in range(0, NLS + 1):
-                S.soil_ms[j] = S.listOfSoilLayers[j].bulkDensity * S.thickness_cm[j] * 100000.0
-                till_soil += S.soil_ms[j]
+                S.soil_mass[j] = S.listOfSoilLayers[j].bulkDensity * S.thickness_cm[j] * 100000.0
+                till_soil += S.soil_mass[j]
                 till_lab_P += S.listOfSoilLayers[j].labile_P
                 till_act_P += S.listOfSoilLayers[j].active_P
 
             for j in range(0, NLS + 1):
-                ratio = S.soil_ms[j] / till_soil
+                ratio = S.soil_mass[j] / till_soil
                 S.listOfSoilLayers[j].labile_P = (1.0 - till_app.percent_mixed[x]) \
                                       * S.listOfSoilLayers[j].labile_P + till_lab_P \
                                       * ratio * till_app.percent_mixed[x]
