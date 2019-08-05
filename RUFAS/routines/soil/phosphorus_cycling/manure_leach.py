@@ -36,32 +36,32 @@ def update_all(S, weather, time):
                        * S.manure_cov * 10000.0
 
         manure_extr = 0.0
-        NH_extr = 0.0
+        NH4_extr = 0.0
         if rainfall[year - 1][day - 1] > 0.0:
 
             if S.manure_type == "DAIRY":
                 manure_extr = min(1.0, 1.2 * water_manure / (water_manure + 73.1))
                 # manure_extr = min(1.0, 0.0000144 * water_manure ** 2.0285)
-                NH_extr = min(1.0, 0.9 * water_manure / (water_manure + 7.1))
+                NH4_extr = min(1.0, 0.9 * water_manure / (water_manure + 7.1))
             else:
                 manure_extr = min(1.0, 2.2 * water_manure / (water_manure + 300.1))
-                NH_extr = 0.0  # TODO I added this
+                NH4_extr = 0.0  # TODO I added this
 
         MIP_leach = max(0.0, manure_extr * S.WIP)
         MOP_leach = max(0.0, manure_extr * S.WOP / 0.6)
-        MNH_leach = max(0.0, NH_extr * S.manure_NH4)
+        NH4_leach = max(0.0, NH4_extr * S.NH4)
 
         MIP_leach = min(MIP_leach, S.WIP)
         MOP_leach = min(MOP_leach, S.WOP)
-        MNH_leach = min(MNH_leach, S.manure_NH4)  # TODO changed from MOP_leach to MNH_leach
+        NH4_leach = min(NH4_leach, S.NH4)  # TODO changed from MOP_leach to NH4_leach
 
         S.WIP = max(0.0, S.WIP - MIP_leach)
         S.WOP = max(0.0, S.WOP - MOP_leach)
-        S.manure_NH4 = max(0.0, S.manure_NH4 - MNH_leach)  # TODO: this is redundant
+        S.NH4 = max(0.0, S.NH4 - NH4_leach)  # TODO: this is redundant
 
         S.TIP_leach += MIP_leach
         S.TOP_leach += MOP_leach
-        S.TN_leach += MNH_leach
+        S.TN_leach += NH4_leach
 
         # calculates the concentration of all dissolved P in runoff in MG/L
 
@@ -79,7 +79,7 @@ def update_all(S, weather, time):
 
             S.runoff_IP = MIP_leach / (rainfall[year - 1][day - 1] / 10.0) / S.area * 10.0 * S.PD_factor
             S.runoff_OP = MOP_leach / (rainfall[year - 1][day - 1] / 10.0) / S.area * 10.0 * S.PD_factor
-            S.runoff_NH = MNH_leach / (rainfall[year - 1][day - 1] / 10.0) / S.area * 10.0 * S.ND_factor
+            S.runoff_NH = NH4_leach / (rainfall[year - 1][day - 1] / 10.0) / S.area * 10.0 * S.ND_factor
 
             # calculate manure runoff P in KG
 
@@ -89,7 +89,7 @@ def update_all(S, weather, time):
 
             runoff_MIP = min(runoff_MIP, MIP_leach)
             runoff_MOP = min(runoff_MOP, MOP_leach)
-            runoff_MNH = min(runoff_MNH, MNH_leach)
+            runoff_MNH = min(runoff_MNH, NH4_leach)
 
         # convert soil P from KG/HA to KG and add manure P leached
 
@@ -111,10 +111,10 @@ def update_all(S, weather, time):
 
         S.WIP_R_sum += runoff_MIP
         S.WOP_R_sum += runoff_MOP
-        S.NH_R_sum += S.runoff_NH
+        S.NH4_R_sum += S.runoff_NH
         S.WIP_L_sum += (MIP_leach - runoff_MIP)
         S.WOP_L_sum += (MOP_leach - runoff_MOP)
-        S.NH_L_sum += (MNH_leach - runoff_MNH)
+        S.NH4_L_sum += (NH4_leach - runoff_MNH)
 
         # decompose manure and manure P in KG
 
@@ -154,8 +154,8 @@ def update_all(S, weather, time):
         SOP_d_com = max(0.0, S.SOP * 0.01 * min(TFA, S.moisture))
         SOP_d_com = min(SOP_d_com, S.SOP)
 
-        SON_d_com = max(0.0, S.manure_SON * 0.01 * min(TFA, S.moisture))
-        SON_d_com = min(SON_d_com, S.manure_SON)
+        SON_d_com = max(0.0, S.SON * 0.01 * min(TFA, S.moisture))
+        SON_d_com = min(SON_d_com, S.SON)
 
         WOP_d_com = max(0.0, S.WOP * 0.1 * min(TFA, S.moisture))
         WOP_d_com = min(WOP_d_com, S.WOP)
@@ -169,8 +169,8 @@ def update_all(S, weather, time):
         WIP_ASIM = max(0.0, man_ASIM / S.manure_mass * S.WIP)
         WIP_ASIM = min(WIP_ASIM, S.WIP)
 
-        NH_ASIM = max(0.0, man_ASIM / S.manure_mass * S.manure_NH4)
-        NH_ASIM = min(NH_ASIM, S.manure_NH4)
+        NH4_ASIM = max(0.0, man_ASIM / S.manure_mass * S.NH4)
+        NH4_ASIM = min(NH4_ASIM, S.NH4)
 
         SIP_ASIM = max(0.0, man_ASIM / S.manure_mass * S.SIP)
         SIP_ASIM = min(SIP_ASIM, S.SIP)
@@ -181,22 +181,22 @@ def update_all(S, weather, time):
         SOP_ASIM = max(0.0, man_ASIM / S.manure_mass * S.SOP)
         SOP_ASIM = min(SOP_ASIM, S.SOP)
 
-        SON_ASIM = max(0.0, man_ASIM / S.manure_mass * S.manure_SON)
-        SON_ASIM = min(SON_ASIM, S.manure_SON)
+        SON_ASIM = max(0.0, man_ASIM / S.manure_mass * S.SON)
+        SON_ASIM = min(SON_ASIM, S.SON)
 
         S.SOP = max(0.0, S.SOP - SOP_ASIM - SOP_d_com)
-        S.SON = max(0.0, S.manure_SON - SON_ASIM - SON_d_com)
+        S.SON = max(0.0, S.SON - SON_ASIM - SON_d_com)
         S.WOP = max(0.0, S.WOP - WOP_ASIM - WOP_d_com)
         S.SIP = max(0.0, S.SIP - SIP_ASIM - SIP_d_com)
         S.WIP = max(0.0, S.WIP - WIP_ASIM)
-        S.manure_NH4 = max(0.0, S.manure_NH4 - NH_ASIM)
+        S.NH4 = max(0.0, S.NH4 - NH4_ASIM)
 
         S.WIP += WOP_d_com + SOP_d_com * 0.75 + SIP_d_com
         S.WOP += SOP_d_com * 0.25
-        S.manure_NH4 += SON_d_com
+        S.NH4 += SON_d_com
 
         S.DP_sum += SIP_ASIM + WOP_ASIM + SOP_ASIM + WIP_ASIM
-        S.N_sum += SON_ASIM + NH_ASIM
+        S.N_sum += SON_ASIM + NH4_ASIM
 
         S.manure_mass = max(0.0, S.manure_mass - d_com - man_ASIM)
 

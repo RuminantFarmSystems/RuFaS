@@ -128,8 +128,8 @@ class SoilPhosphorus(BaseReportHandler):
         self.manure_WOP.append(soil.WOP)
         self.manure_SIP.append(soil.SIP)
         self.manure_SOP.append(soil.SOP)
-        self.manure_NH4.append(soil.manure_NH4)
-        self.manure_SON.append(soil.manure_SON)
+        self.manure_NH4.append(soil.NH4)
+        self.manure_SON.append(soil.SON)
         self.manure_mass.append(soil.manure_mass)
         self.manure_cover.append(soil.manure_cov)
 
