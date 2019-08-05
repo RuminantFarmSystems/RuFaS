@@ -479,7 +479,7 @@ class Soybean:
         # Inputs
         self.T_base_min = 10
         self.T_base_max = 30  # corn
-        self.PHU = 1200  # corn
+        self.PHU = 1150
 
         # Internally calculated inputs
         self.accumulated_HU = 0.0
@@ -525,7 +525,7 @@ class Soybean:
         ''' BIOMASS DATA '''
 
         # Inputs
-        self.kl = 0.65  # corn
+        self.kl = 0.45
         self.RUE = 25
         self.T_opt = 25
 
@@ -541,7 +541,7 @@ class Soybean:
         # ===================================================================
         ''' Soil Water Uptake Data '''
 
-        self.beta_w = 10 # water-use distribution parameter  # corn
+        self.beta_w = 10  # water-use distribution parameter  # corn
         self.epco = 0.5  # corn
 
         self.water_actual_up = 0
@@ -574,8 +574,8 @@ class Soybean:
         self.bio_P_opt = 0
         self.bio_P = 0
 
-        self.fr_PHU_50 = 0.5  # corn
-        self.fr_PHU_100 = 1.0  # corn
+        self.fr_PHU_50 = 0.5
+        self.fr_PHU_100 = 1.0
         self.fr_p1 = 0.0074
         self.fr_p2 = 0.0037
         self.fr_p3 = 0.0035
@@ -594,7 +594,7 @@ class Soybean:
         self.HI_actual = 0
         self.HI_opt = 0.31
 
-        self.harvest_eff = 0.9  # corn
+        self.harvest_eff = 0.9
 
         self.gamma_wu = 0
 
@@ -623,8 +623,8 @@ class Alfalfa:
 
         # Inputs
         self.T_base_min = 4
-        self.T_base_max = 30  # corn
-        self.PHU = 1200  # corn
+        self.T_base_max = 32  # until dormancy
+        self.PHU = 1200  # corn, swat says 0
 
         # Internally calculated inputs
         self.accumulated_HU = 0.0
@@ -670,7 +670,7 @@ class Alfalfa:
         ''' BIOMASS DATA '''
 
         # Inputs
-        self.kl = 0.65  # corn
+        self.kl = 0.65
         self.RUE = 20
         self.T_opt = 25
 
@@ -719,8 +719,8 @@ class Alfalfa:
         self.bio_P_opt = 0
         self.bio_P = 0
 
-        self.fr_PHU_50 = 0.5  # corn
-        self.fr_PHU_100 = 1.0  # corn
+        self.fr_PHU_50 = 0.5
+        self.fr_PHU_100 = 1.0
         self.fr_p1 = 0.0035
         self.fr_p2 = 0.0028
         self.fr_p3 = 0.0020
@@ -739,7 +739,7 @@ class Alfalfa:
         self.HI_actual = 0
         self.HI_opt = 0.9
 
-        self.harvest_eff = 0.9  # corn
+        self.harvest_eff = 0.9
 
         self.gamma_wu = 0
 
