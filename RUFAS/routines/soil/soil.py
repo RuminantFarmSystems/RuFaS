@@ -334,8 +334,8 @@ class Soil:
         self.WOP = 0.0
         self.SIP = 0.0
         self.SOP = 0.0
-        self.manure_NH4 = 0.0
-        self.manure_SON = 0.0
+        self.NH4 = 0.0
+        self.SON = 0.0
         self.manure_mass_app = 0.0
 
         self.cows = []
@@ -404,10 +404,10 @@ class Soil:
         self.ND_factor = 0.0
         self.WIP_R_sum = 0.0
         self.WOP_R_sum = 0.0
-        self.NH_R_sum = 0.0
+        self.NH4_R_sum = 0.0
         self.WIP_L_sum = 0.0
         self.WOP_L_sum = 0.0
-        self.NH_L_sum = 0.0
+        self.NH4_L_sum = 0.0
         self.DP_sum = 0.0
         self.N_sum = 0.0
         self.SRP_MGL = 0.0
