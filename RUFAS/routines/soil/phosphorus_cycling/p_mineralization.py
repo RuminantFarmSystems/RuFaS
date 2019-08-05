@@ -53,7 +53,7 @@ def update_all(S, time):
             S.soil_yp[i][S.counts[i]] = S.listOfSoilLayers[i].labile_P \
                                         / S.listOfSoilLayers[i].bulkDensity \
                                         / S.thickness_cm[i] / 0.1
-            S.lab_P_sum[i] = 0
+            S.lab_P_sum[i] = 0.0
 
             for j in range(0, S.count_it[i]):
                 S.lab_P_sum[i] += S.soil_yp[i][j]
