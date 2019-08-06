@@ -1,8 +1,8 @@
 {
     "config":
     {
-        "StartDate" : "2009:244",
-        "EndDate" : "2016:243",
+        "StartDate" : "2009:1",
+        "EndDate" : "2015:365",
         "output_dir": "Outputs/Sample_Farm_Outputs/"
     },
 
@@ -40,23 +40,24 @@
     {
         "crop":
         {
+            "latitude": 43.332708,
             "corn":
             {
-                "grow_years": [2010],
+                "grow_years": [],
                 "planting_date": 121,
                 "harvest_date": 319
             },
             "soybean":
             {
-                "grow_years": [2011, 2012, 2013],
+                "grow_years": [],
                 "planting_date": 121,
                 "harvest_date": 319
             },
             "alfalfa":
             {
-                "grow_years": [],
+                "grow_years": [2009, 2010, 2011, 2012, 2013, 2014, 2015],
                 "planting_date": 121,
-                "harvest_date": 319
+                "harvest_date": 365
             }
         },
         "soil":

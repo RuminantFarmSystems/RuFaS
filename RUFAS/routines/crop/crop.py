@@ -77,6 +77,7 @@ This module needs the following inputs in order to operate correctly:
 """
 ################################################################################
 
+from math import acos, asin, sin, tan, pi
 from . import heat_units, leaf_area_index, root_development, biomass, yields, \
     phosphorus_uptake, nitrogen_uptake, water_uptake, growth_constraints
 from RUFAS import util
@@ -99,23 +100,34 @@ def daily_crop_routine(crop, weather, time, soil):
 
     if crop.current_crop.crop_name != 'null':
 
-        heat_units.update_all(crop_type, T_min, T_max, time)
+        if not crop_is_dormant(crop, time):
 
-        root_development.update_all(crop_type, time)
+            crop.dormancy = False
 
-        water_uptake.update_all(crop_type, soil, time)
+            # crop work
+            if time.day >= crop.current_crop.start_date:
+                crop.planted = True
 
-        nitrogen_uptake.update_all(crop_type, soil)
+            heat_units.update_all(crop_type, T_min, T_max, time)
 
-        phosphorus_uptake.update_all(crop_type, soil)
+            root_development.update_all(crop_type, time)
 
-        growth_constraints.update_all(crop_type, time, weather, soil)
+            water_uptake.update_all(crop_type, soil, time)
 
-        leaf_area_index.update_all(crop_type, time)
+            nitrogen_uptake.update_all(crop_type, soil)
 
-        biomass.update_all(crop_type, time, weather)
+            phosphorus_uptake.update_all(crop_type, soil)
 
-        yields.update_all(crop_type, time, soil)
+            growth_constraints.update_all(crop_type, time, weather, soil)
+
+            leaf_area_index.update_all(crop_type, time)
+
+            biomass.update_all(crop_type, time, weather)
+
+            yields.update_all(crop_type, time, soil)
+
+        elif not crop.dormancy:
+            dormancy_routine(crop, soil)
 
 
 # -------------------------------------------------------------------------------
@@ -127,6 +139,13 @@ def annual_crop_routine(crop, weather, time):
     calculate_start_growth_date(crop.current_crop, weather, time)
 
 
+def dormancy_routine(crop, soil):
+    crop.current_crop.LAI_actual = crop.current_crop.LAI_min
+    crop.current_crop.biomass_actual -= crop.current_crop.biomass_actual * 0.1
+    soil.residue += crop.current_crop.biomass_actual * 0.1
+    crop.dormancy = True
+
+
 # -------------------------------------------------------------------------------
 # Class: Crop
 # -------------------------------------------------------------------------------
@@ -136,6 +155,14 @@ class Crop:
         self.alfalfa = Alfalfa(data)
         self.corn = Corn(data)
         self.soy = Soybean(data)
+
+        # Dormancy for perennial crops
+        self.latitude = data['latitude']
+        self.T_dl_min = calculate_minimum_day_length(self.latitude)
+        self.t_dorm = calculate_t_dorm(self.latitude)
+        self.solar_declination = 0.0
+        self.dormancy = False
+        self.planted = False
 
         self.crops_list = [self.alfalfa, self.corn, self.soy]
         self.current_crop = self.init_crop
@@ -644,6 +671,7 @@ class Alfalfa:
         self.fr_LAI_2 = 0.95
         self.fr_PHU_sen = 0.90
         self.LAI_max = 4
+        self.LAI_min = 0.75
 
         # Internally calculated inputs
         self.prev_fr_LAI_max = 0
@@ -767,3 +795,58 @@ def calculate_start_growth_date(crop_type, weather, time):
             if yearly_T_avg[d] > crop_type.T_base_min:
                 crop_type.start_date = d
                 break
+
+
+def calculate_minimum_day_length(latitude):
+    angular_velocity = 0.2618
+    solar_declination = -0.4102
+    latitude_radians = latitude * pi / 180
+
+    T_dl_min = 2 * acos(-tan(solar_declination) * tan(latitude_radians)) / angular_velocity
+
+    return T_dl_min
+
+
+def calculate_t_dorm(latitude):
+    if latitude > 40:
+        return 1.0
+    elif 20 <= latitude <= 40:
+        return (latitude - 20) / 20
+    else:
+        return 0.0
+
+
+def crop_is_dormant(crop, time):
+
+    if crop.current_crop.crop_type == 'annual':
+        return False
+
+    if not crop.planted:
+        return False
+
+    # if time.day < crop.current_crop.start_date and not crop.planted:
+    #     return False
+
+    year_length = get_year_length(time.cal_year)
+    solar_declination = asin(0.4 * sin(2 * pi / year_length * (time.day - 82)))
+    angular_velocity = 0.2618
+    latitude_radians = crop.latitude * pi / 180
+
+    T_dl = 2 * acos(-tan(solar_declination) * tan(latitude_radians)) / angular_velocity
+
+    T_dl_thr = crop.T_dl_min + crop.t_dorm
+
+    if T_dl < T_dl_thr:
+        return True
+    return False
+
+
+def get_year_length(year):
+    if year % 400 == 0:
+        return 366
+    elif year % 100 == 0:
+        return 365
+    elif year % 4 == 0:
+        return 366
+    else:
+        return 365
