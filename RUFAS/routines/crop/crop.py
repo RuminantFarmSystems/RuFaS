@@ -123,21 +123,15 @@ def daily_crop_routine(crop, weather, time, soil):
 # -------------------------------------------------------------------------------
 def annual_crop_routine(crop, weather, time):
 
-    crop.current_crop = crop.init_crop
-
-    for crop_type in crop.crops_list:
-        for year in crop_type.grow_years:
-            if year == time.cal_year:
-                calculate_start_growth_date(crop_type, weather, time)
-                crop.current_crop = crop_type
-                break
+    crop.current_crop = crop.grow_regimen[time.year - 1]
+    calculate_start_growth_date(crop.current_crop, weather, time)
 
 
 # -------------------------------------------------------------------------------
 # Class: Crop
 # -------------------------------------------------------------------------------
 class Crop:
-    def __init__(self, data):
+    def __init__(self, data, time):
         self.init_crop = InitCrop(data)
         self.alfalfa = Alfalfa(data)
         self.corn = Corn(data)
@@ -145,6 +139,12 @@ class Crop:
 
         self.crops_list = [self.alfalfa, self.corn, self.soy]
         self.current_crop = self.init_crop
+
+        self.grow_regimen = [self.init_crop for x in range(0, len(time.years))]
+
+        for crop_type in self.crops_list:
+            for year in crop_type.grow_years:
+                self.grow_regimen[year - time.start_year] = crop_type
 
     # ---------------------------------------------------------------------------
     # Method: annual_reset

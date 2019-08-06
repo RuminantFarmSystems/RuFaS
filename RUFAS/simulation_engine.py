@@ -118,9 +118,10 @@ def annual_simulation():
     state.annual_reset()
     time.advance()
 
-#-------------------------------------------------------------------------------
+
+# -------------------------------------------------------------------------------
 # Function: read_json_file
-#-------------------------------------------------------------------------------
+# -------------------------------------------------------------------------------
 def read_json_file(fPath:Path):
     """Reads the json file, writes information to the simulation variables.
 
@@ -147,11 +148,11 @@ def read_json_file(fPath:Path):
         # Instantiate objects using dictionary data from .json file
         try:
             config = Config(data['config'], data['weather'])
-            state = State(data['farm'], config)
             output = OutputHandler(data['output'])
             weather = Weather(data['weather'], config.years, config.w_start_year,
                               config.w_start_day, config.start_year, config.start_day)
             time = Time(config.years, config.start_year)
+            state = State(data['farm'], config, time)
 
         except errors.JSONfileData as e:
             print("JSON FILE ERROR: " +
@@ -159,4 +160,4 @@ def read_json_file(fPath:Path):
             raise errors.InvalidJSONfile(fPath.name)
 
 
-#=======================================================================================
+# =======================================================================================
