@@ -87,7 +87,7 @@ def calculate_shape_coefficients(crop_type):
 def calc_fr_LAI_max(crop_type, time, L1, L2):
     crop_type.prev_fr_LAI_max = crop_type.fr_LAI_max
 
-    in_growing_period = crop_type.start_date <= time.day <= crop_type.harvest_date
+    in_growing_period = crop_type.start_date <= time.day <= crop_type.harvest_date and not crop_type.dormancy
 
     if not in_growing_period:
         crop_type.fr_LAI_max = 0
@@ -101,7 +101,7 @@ def calc_fr_LAI_max(crop_type, time, L1, L2):
 # "pseudocode_crop" section C.8.A.4/6
 #
 def calculate_LAI_actual(crop_type, time):
-    in_growing_period = crop_type.start_date <= time.day <= crop_type.harvest_date
+    in_growing_period = crop_type.start_date <= time.day <= crop_type.harvest_date and not crop_type.dormancy
     prev_LAI_actual = crop_type.LAI_actual
 
     if in_growing_period:

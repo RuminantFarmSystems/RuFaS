@@ -45,7 +45,7 @@ def update_all(crop_type, time):
 # "pseudocode_crop" C.3.A.1
 #
 def calc_daily_root_biomass(crop_type, time):
-    in_growing_period = crop_type.start_date <= time.day <= crop_type.harvest_date
+    in_growing_period = crop_type.start_date <= time.day <= crop_type.harvest_date and not crop_type.dormancy
 
     if in_growing_period:
         crop_type.fr_root = 0.4 - 0.2 * crop_type.fr_PHU
@@ -65,7 +65,7 @@ def calc_z_root(crop_type, time):
     after_harvest = time.day > crop_type.harvest_date
 
     # C.3.A.2
-    if crop_type.crop_type == "perennial":
+    if crop_type.crop_type == "perennial" and crop_type.planted:
         crop_type.z_root = crop_type.z_root_max
 
     elif after_harvest:

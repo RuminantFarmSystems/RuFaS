@@ -98,15 +98,17 @@ def daily_crop_routine(crop, weather, time, soil):
     # update_all calls depend on values calculated earlier.
     #
 
-    if crop.current_crop.crop_name != 'null':
+    if crop_type.crop_name != 'null':
 
         if not crop_is_dormant(crop, time):
 
-            crop.dormancy = False
+            if crop_type.dormancy:
+                calculate_start_growth_date(crop_type, weather, time)
 
-            # crop work
-            if time.day >= crop.current_crop.start_date:
-                crop.planted = True
+            crop_type.dormancy = False
+
+            if crop_type.start_date <= time.day <= crop_type.harvest_date:
+                crop_type.planted = True
 
             heat_units.update_all(crop_type, T_min, T_max, time)
 
@@ -126,8 +128,8 @@ def daily_crop_routine(crop, weather, time, soil):
 
             yields.update_all(crop_type, time, soil)
 
-        elif not crop.dormancy:
-            dormancy_routine(crop, soil)
+        elif not crop_type.dormancy and crop_type.planted:
+            dormancy_routine(crop_type, soil)
 
 
 # -------------------------------------------------------------------------------
@@ -135,15 +137,28 @@ def daily_crop_routine(crop, weather, time, soil):
 # -------------------------------------------------------------------------------
 def annual_crop_routine(crop, weather, time):
 
-    crop.current_crop = crop.grow_regimen[time.year - 1]
+    if crop.current_crop.crop_name != crop.grow_regimen[time.year - 1].crop_name:
+        crop.current_crop = crop.grow_regimen[time.year - 1]
+
     calculate_start_growth_date(crop.current_crop, weather, time)
+    crop.current_crop.kill_year = is_kill_year(crop, time)
+    if not crop.current_crop.planted:
+        crop.current_crop.dormancy = True
 
 
-def dormancy_routine(crop, soil):
-    crop.current_crop.LAI_actual = crop.current_crop.LAI_min
-    crop.current_crop.biomass_actual -= crop.current_crop.biomass_actual * 0.1
-    soil.residue += crop.current_crop.biomass_actual * 0.1
-    crop.dormancy = True
+def dormancy_routine(crop_type, soil):
+    crop_type.LAI_actual = crop_type.LAI_min
+    crop_type.biomass_actual -= crop_type.biomass_actual * 0.1
+    soil.residue += crop_type.biomass_actual * 0.1
+    crop_type.dormancy = True
+
+
+def is_kill_year(crop, time):
+    if len(crop.grow_regimen) == time.year or \
+            crop.current_crop.crop_name != crop.grow_regimen[time.year].crop_name or \
+            crop.current_crop.crop_type == 'annual':
+        return True
+    return False
 
 
 # -------------------------------------------------------------------------------
@@ -161,8 +176,6 @@ class Crop:
         self.T_dl_min = calculate_minimum_day_length(self.latitude)
         self.t_dorm = calculate_t_dorm(self.latitude)
         self.solar_declination = 0.0
-        self.dormancy = False
-        self.planted = False
 
         self.crops_list = [self.alfalfa, self.corn, self.soy]
         self.current_crop = self.init_crop
@@ -171,26 +184,11 @@ class Crop:
 
         for crop_type in self.crops_list:
             for year in crop_type.grow_years:
-                self.grow_regimen[year - time.start_year] = crop_type
-
-    # ---------------------------------------------------------------------------
-    # Method: annual_reset
-    # ---------------------------------------------------------------------------
-    def annual_reset(self):
-        for crop_type in self.crops_list:
-            crop_type.accumulated_HU = 0
-            crop_type.prev_accumulated_HU = 0
-
-            crop_type.fr_PHU = 0
-            crop_type.prev_fr_PHU = 0
-
-            crop_type.biomass_actual = 0
-            crop_type.prev_biomass_actual = 0
-
-            crop_type.bio_P = 0
-            crop_type.bio_N = 0
-
-            crop_type.Ea_sum = 0
+                if year - time.start_year >= len(self.grow_regimen) or year - time.start_year < 0:
+                    print('\nCannot grow ', crop_type.crop_name, ' in year ', year,
+                          ' because ', year, '\nis outside of the scope of the simulation.')
+                else:
+                    self.grow_regimen[year - time.start_year] = crop_type
 
 
 class InitCrop:
@@ -205,6 +203,9 @@ class InitCrop:
         self.planting_date = 0
         self.harvest_date = 0
         self.start_date = 0
+        self.kill_year = False
+        self.planted = False
+        self.dormancy = True
 
         # ===================================================================
         ''' HEAT UNIT DATA '''
@@ -351,6 +352,9 @@ class Corn:
         self.crop_name = 'corn'
         self.crop_type = 'annual'
         self.start_date = 0
+        self.kill_year = False
+        self.planted = False
+        self.dormancy = True
 
         self.fix_nitrogen = False
 
@@ -380,6 +384,7 @@ class Corn:
         self.fr_LAI_2 = 0.95
         self.fr_PHU_sen = 0.90
         self.LAI_max = 3
+        self.LAI_min = 0.75
 
         # Internally calculated inputs
         self.prev_fr_LAI_max = 0
@@ -498,6 +503,9 @@ class Soybean:
         self.crop_name = 'soybean'
         self.crop_type = 'annual'
         self.start_date = 0
+        self.kill_year = False
+        self.planted = False
+        self.dormancy = True
 
         self.fix_nitrogen = True
         # ===================================================================
@@ -521,8 +529,8 @@ class Soybean:
 
         # Inputs
         self.fr_PHU_1 = 0.15
-        self.fr_PHU_2 = 0.05
-        self.fr_LAI_1 = 0.50
+        self.fr_PHU_2 = 0.50
+        self.fr_LAI_1 = 0.05
         self.fr_LAI_2 = 0.95
         self.fr_PHU_sen = 0.9
         self.LAI_max = 3
@@ -643,6 +651,9 @@ class Alfalfa:
         self.crop_name = 'alfalfa'
         self.crop_type = 'perennial'
         self.start_date = 0
+        self.kill_year = False
+        self.planted = False
+        self.dormancy = True
 
         self.fix_nitrogen = False
         # ===================================================================
@@ -666,8 +677,8 @@ class Alfalfa:
 
         # Inputs
         self.fr_PHU_1 = 0.15
-        self.fr_PHU_2 = 0.01
-        self.fr_LAI_1 = 0.50
+        self.fr_PHU_2 = 0.50
+        self.fr_LAI_1 = 0.01
         self.fr_LAI_2 = 0.95
         self.fr_PHU_sen = 0.90
         self.LAI_max = 4
@@ -791,7 +802,7 @@ def calculate_start_growth_date(crop_type, weather, time):
         crop_type.start_date = crop_type.planting_date
 
     else:
-        for d in range(len(yearly_T_avg)):
+        for d in range(time.day - 1, len(yearly_T_avg)):
             if yearly_T_avg[d] > crop_type.T_base_min:
                 crop_type.start_date = d
                 break
@@ -821,9 +832,6 @@ def crop_is_dormant(crop, time):
     if crop.current_crop.crop_type == 'annual':
         return False
 
-    if not crop.planted:
-        return False
-
     # if time.day < crop.current_crop.start_date and not crop.planted:
     #     return False
 
@@ -836,8 +844,12 @@ def crop_is_dormant(crop, time):
 
     T_dl_thr = crop.T_dl_min + crop.t_dorm
 
+    if not crop.current_crop.planted and not T_dl < T_dl_thr:
+        return False
+
     if T_dl < T_dl_thr:
         return True
+
     return False
 
 

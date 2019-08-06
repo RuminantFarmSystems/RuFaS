@@ -108,7 +108,7 @@ def calc_bio_AG(crop_type):
 # "pseudocode_crop" C.10.D.1
 #
 def calc_HI_actual(crop_type, time):
-    in_growing_period = crop_type.start_date <= time.day <= crop_type.harvest_date
+    in_growing_period = crop_type.start_date <= time.day <= crop_type.harvest_date and not crop_type.dormancy
     if not in_growing_period:
         crop_type.HI_actual = 0
     else:
@@ -154,6 +154,48 @@ def calc_nutrient_removal(crop_type):
 def calc_residue(crop_type, time, soil):
     dResidue = 0
     if crop_type.harvest_date == time.day:
-        dResidue = (crop_type.bio_AG - crop_type.yield_actual)
+        # This is where we differentiate between a kill and a harvest.
+        # The primary difference being that root biomass is added to residue.
+        # This also replaces the annual update, adjusting biomass @ harvest
+        if crop_type.kill_year:
+            dResidue = crop_type.biomass_actual - crop_type.yield_actual
+            kill(crop_type)
+        else:
+            dResidue = (crop_type.bio_AG - crop_type.yield_actual)
+            harvest(crop_type)
     soil.listOfSoilLayers[0].topLayerFreshN += 0.0015 * soil.residue
     soil.residue = soil.residue * (1 - soil.decayRate) + dResidue
+
+
+def kill(crop_type):
+
+    crop_type.accumulated_HU = 0
+    crop_type.prev_accumulated_HU = 0
+
+    crop_type.fr_PHU = 0
+    crop_type.prev_fr_PHU = 0
+
+    crop_type.biomass_actual = 0
+    crop_type.prev_biomass_actual = 0
+
+    crop_type.z_root = 0
+
+    crop_type.bio_P = 0
+    crop_type.bio_N = 0
+
+    crop_type.Ea_sum = 0
+
+    crop_type.planted = False
+
+
+def harvest(crop_type):
+    crop_type.accumulated_HU = 0
+    crop_type.prev_accumulated_HU = 0
+
+    crop_type.bio_AG = 0
+
+    crop_type.bio_P = 0
+    crop_type.bio_N = 0
+
+    crop_type.Ea_sum = 0
+
