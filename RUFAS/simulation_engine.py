@@ -104,7 +104,7 @@ def annual_simulation():
     #
     # Pre-annual Routines
     #
-    routines.annual_crop_routine(state.crop, weather, time)
+    routines.annual_crop_routine(state.crop, time)
 
     while not time.end_year():
         daily_simulation()
