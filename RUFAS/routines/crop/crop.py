@@ -159,8 +159,6 @@ def annual_crop_routine(crop, time):
 
     crop.current_crop.kill_year = is_kill_year(crop, time)
 
-    print(time.year, crop.current_crop.crop_name, crop.current_crop.kill_year)
-
     # If no crop is currently growing, is_dormant is set to true so that
     # calculate_start_date is called the first day out of dormancy L 111
     if not crop.current_crop.planted:
@@ -220,7 +218,17 @@ class Crop:
                     print('\nCannot grow ', crop_type.crop_name, ' in year ', year,
                           ' because ', year, '\nis outside of the scope of the simulation.')
                 else:
-                    self.grow_regimen[year - time.start_year] = crop_type
+                    # has priority for populating grow regimen over crop cycles
+                    if crop_type.repeat == 0:
+                        self.grow_regimen[year - time.start_year] = crop_type
+                    # populates grow regimen based off of crop cycles if
+                    # another crop is not set for those years
+                    else:
+                        x = year - time.start_year
+                        while x < len(self.grow_regimen):
+                            if self.grow_regimen[x].crop_name == 'null':
+                                self.grow_regimen[x] = crop_type
+                            x += crop_type.repeat
 
 
 #
@@ -235,6 +243,7 @@ class InitCrop:
         self.fix_nitrogen = False
 
         self.grow_years = []
+        self.repeat = 0
         self.planting_date = 0
         self.harvest_date = 0
         self.start_date = 0
@@ -384,6 +393,7 @@ class Corn:
 
         corn_data = data['corn']
         self.grow_years = corn_data['grow_years']
+        self.repeat = corn_data['repeat']
         self.planting_date = corn_data['planting_date']
         self.harvest_date = corn_data['harvest_date']
 
@@ -538,6 +548,7 @@ class Soybean:
 
         soy_data = data['soybean']
         self.grow_years = soy_data['grow_years']
+        self.repeat = soy_data['repeat']
         self.planting_date = soy_data['planting_date']
         self.harvest_date = soy_data['harvest_date']
         """GENERAL PLANT INFO"""
@@ -689,6 +700,7 @@ class Alfalfa:
     def __init__(self, data):
         alfalfa_data = data['alfalfa']
         self.grow_years = alfalfa_data['grow_years']
+        self.repeat = alfalfa_data['repeat']
         self.planting_date = alfalfa_data['planting_date']
         self.harvest_date = alfalfa_data['harvest_date']
         """GENERAL PLANT INFO"""
