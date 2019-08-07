@@ -33,13 +33,22 @@
 
     "farm":
     {
-        "crop":
-        {
-            "crop_x":
-            {
-                "crop_name": "crop x",
-                "crop_type": "annual",
-                "planting_date": 10
+        "crop": {
+            "latitude": 43.332708,
+            "corn": {
+                "grow_years": [],
+                "planting_date": 121,
+                "harvest_date": 319
+            },
+            "soybean": {
+                "grow_years": [],
+                "planting_date": 121,
+                "harvest_date": 319
+            },
+            "alfalfa": {
+                "grow_years": [],
+                "planting_date": 121,
+                "harvest_date": 300
             }
         },
         "soil":

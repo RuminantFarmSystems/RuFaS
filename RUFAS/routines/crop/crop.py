@@ -154,13 +154,12 @@ def daily_crop_routine(crop, weather, time, soil):
 # -------------------------------------------------------------------------------
 def annual_crop_routine(crop, time):
 
-    # If the same crop is growing next year, we keep the same object to allow
-    # for perennial crops. If not, current_crop is updated to the next object
-    # in the list.
-    if crop.current_crop.crop_name != crop.grow_regimen[time.year - 1].crop_name:
-        crop.current_crop = crop.grow_regimen[time.year - 1]
+    # current crop is set to the next crop in the regimen
+    crop.current_crop = crop.grow_regimen[time.year - 1]
 
     crop.current_crop.kill_year = is_kill_year(crop, time)
+
+    print(time.year, crop.current_crop.crop_name, crop.current_crop.kill_year)
 
     # If no crop is currently growing, is_dormant is set to true so that
     # calculate_start_date is called the first day out of dormancy L 111
@@ -239,7 +238,7 @@ class InitCrop:
         self.planting_date = 0
         self.harvest_date = 0
         self.start_date = 0
-        self.kill_year = False
+        self.kill_year = True
         self.planted = False
         self.is_dormant = True
 
@@ -423,7 +422,7 @@ class Corn:
         self.fr_LAI_2 = 0.95
         self.fr_PHU_sen = 0.90
         self.LAI_max = 3
-        self.LAI_min = 0.75
+        self.LAI_min = 0
 
         # Internally calculated inputs
         self.prev_fr_LAI_max = 0

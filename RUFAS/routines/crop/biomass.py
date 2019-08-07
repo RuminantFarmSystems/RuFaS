@@ -70,7 +70,7 @@ def calc_actual_Biomass(crop_type, time, weather):
     # Save value as previous day's value
     crop_type.prev_biomass_actual = crop_type.biomass_actual
 
-    in_growing_period = crop_type.start_date <= time.day <= crop_type.harvest_date and not crop_type.dormancy
+    in_growing_period = crop_type.start_date <= time.day <= crop_type.harvest_date and not crop_type.is_dormant
 
     # Update current actual biomass
     if in_growing_period:
