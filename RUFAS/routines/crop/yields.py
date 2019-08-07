@@ -82,7 +82,7 @@ def update_all(crop_type, time, soil):
 def calc_gamma_wu(crop_type, soil):
     if soil.E0_sum == 0:
         return 0
-    crop_type.gamma_wu = 100*(soil.Ea_sum/soil.E0_sum)
+    crop_type.gamma_wu = 100 * (soil.Ea_sum/soil.E0_sum)
 
 
 #
@@ -108,7 +108,7 @@ def calc_bio_AG(crop_type):
 # "pseudocode_crop" C.10.D.1
 #
 def calc_HI_actual(crop_type, time):
-    in_growing_period = crop_type.start_date <= time.day <= crop_type.harvest_date and not crop_type.dormancy
+    in_growing_period = crop_type.start_date <= time.day <= crop_type.harvest_date and not crop_type.is_dormant
     if not in_growing_period:
         crop_type.HI_actual = 0
     else:
@@ -161,10 +161,9 @@ def calc_residue(crop_type, time, soil):
             dResidue = crop_type.biomass_actual - crop_type.yield_actual
             kill(crop_type)
         else:
-            dResidue = (crop_type.bio_AG - crop_type.yield_actual)
-            harvest(crop_type)
-    soil.listOfSoilLayers[0].topLayerFreshN += 0.0015 * soil.residue
-    soil.residue = soil.residue * (1 - soil.decayRate) + dResidue
+            bio_frac = crop_type.yield_actual / crop_type.bio_AG
+            harvest(crop_type, bio_frac)
+    soil.residue += dResidue
 
 
 def kill(crop_type):
@@ -177,6 +176,7 @@ def kill(crop_type):
 
     crop_type.biomass_actual = 0
     crop_type.prev_biomass_actual = 0
+    crop_type.bio_AG = 0
 
     crop_type.z_root = 0
 
@@ -188,11 +188,13 @@ def kill(crop_type):
     crop_type.planted = False
 
 
-def harvest(crop_type):
-    crop_type.accumulated_HU = 0
-    crop_type.prev_accumulated_HU = 0
+def harvest(crop_type, bio_frac):
+    crop_type.accumulated_HU = crop_type.accumulated_HU * (1 - bio_frac)
 
-    crop_type.bio_AG = 0
+    crop_type.LAI_actual = crop_type.LAI_actual * (1 - bio_frac)
+
+    crop_type.biomass_actual -= crop_type.yield_actual
+    crop_type.bio_AG -= crop_type.yield_actual
 
     crop_type.bio_P = 0
     crop_type.bio_N = 0

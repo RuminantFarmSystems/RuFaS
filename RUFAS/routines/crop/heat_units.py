@@ -56,7 +56,7 @@ CropType values updated by calling calculate_frPHU():
 # information.
 #
 def update_all(crop_type, T_min, T_max, time):
-    calculate_frPHU(crop_type, T_min, T_max, time)
+    calculate_fr_PHU(crop_type, T_min, T_max, time)
 
 
 #
@@ -64,7 +64,7 @@ def update_all(crop_type, T_min, T_max, time):
 # today. The equations used for this part can be found in
 # "pseudocode_crop" C.2.B.1
 #
-def calculate_frPHU(crop_type, T_min, T_max, time):
+def calculate_fr_PHU(crop_type, T_min, T_max, time):
 
     T_HU_min = calc_T_HU_min(crop_type, T_min)
     T_HU_max = calc_T_HU_max(crop_type, T_max)
@@ -72,7 +72,7 @@ def calculate_frPHU(crop_type, T_min, T_max, time):
 
     crop_type.prev_accumulated_HU = crop_type.accumulated_HU
 
-    if crop_type.start_date <= time.day <= crop_type.harvest_date and not crop_type.dormancy:
+    if crop_type.start_date <= time.day <= crop_type.harvest_date and not crop_type.is_dormant:
         crop_type.accumulated_HU += HU
 
     crop_type.prev_fr_PHU = crop_type.fr_PHU
