@@ -95,25 +95,25 @@ def annual_data_analysis(output_csv, show_annual, produce_diagnostics):
         table_vals = []
         row_labs = []
 
-        colors = ['#ffffff', '#ffffff', '#ff00ff', '#006400', '#fbaf08',  '#51d0de', '#431c5d', 'red']
+        colors = ['#ffffff', '#ff00ff', '#006400', '#fbaf08',  '#51d0de', '#431c5d', 'red']
         for variable in variables:
-            if 1 < counter < 7:
+            if 0 < counter < 6:
                 mp.bar(years, variables[variable], width, color=colors[counter], bottom=prev_vars)
                 legend.append(variable)
                 prev_vars = [sum(x) for x in zip(prev_vars, variables[variable])]
-            if counter == 7:
+            if counter == 6:
                 precip = variables[variable]
                 legend.insert(0, variable)
                 mp.scatter(years, precip, c='red', marker='x', zorder=2)
-            if counter > 1:
+            if counter > 0:
                 variables[variable].insert(0, "")
                 table_vals.append(variables[variable])
                 row_labs.append(variable)
             counter += 1
 
-        cell_colors = [['#ffffff' for i in range(len(years) + 1)] for j in range(len(variables) - 2)]
+        cell_colors = [['#ffffff' for i in range(len(years) + 1)] for j in range(len(variables) - 1)]
         for x in range(len(colors)):
-            cell_colors[x - 2][0] = colors[x]
+            cell_colors[x - 1][0] = colors[x]
 
         mp.axis('tight')
         table = mp.table(cellText=table_vals,
