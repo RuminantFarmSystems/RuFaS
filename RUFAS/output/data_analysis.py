@@ -121,9 +121,9 @@ def annual_data_analysis(output_csv, show_annual, produce_diagnostics):
                          cellColours=cell_colors,
                          bbox=[0, -.95, 1, .75])
 
-        cellDict = table.get_celld()
-        for x in range(len(colors)):
-            cellDict[(x, 0)].set_width(0.02)
+        # cellDict = table.get_celld()
+        # for x in range(len(colors)):
+        #     cellDict[(x, 0)].set_width(0.02)
 
         # mp.legend(legend, loc='upper left')  # TODO legend toggle
         mp.subplots_adjust(left=0.31, bottom=0.5)

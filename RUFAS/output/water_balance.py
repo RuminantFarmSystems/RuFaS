@@ -31,67 +31,52 @@ class WaterBalance(BaseReportHandler):
         self.set_properties(data)
         self.fieldNames = None
         self.show_annual = data['show_annual']
-        
 
         #
         # Daily Outputs
-        # 1D Lists [julianDay]
         #
-        self.year = []
-        self.julianDay = []
+        self.daily_variables = {'year': ['time.cal_year', '', []],
+                                'j_day': ['time.day', '', []],
+                                'delta_SW': ['soil.delta_SW', 'mmH2O', []],
+                                'runoff': ['soil.runoff', 'mmH2O', []],
+                                'evaporation': ['soil.evap_sum', 'mmH2O', []],
+                                'transpiration': ['soil.trans_sum', 'mmH2O', []],
+                                'drainage': ['soil.drainage', 'mmH2O', []],
+                                'actual precipitation': ['soil.p_act', 'mmH2O', []],
+                                'calculated water': ['soil.p_calc', 'mmH2O', []],
+                                'difference': ['soil.water_balance', 'mmH2O', []]}
 
-        self.delta_SW = []
-        self.runoff = []
-        self.evap = []
-        self.trans = []
-        self.drainage = []
-
-        self.p_act = []
-        self.p_calc = []
-
-        self.diff = []
-
-        self.cal_year = []
-
-        self.annual_delta_SW = 0.0
-        self.runoff_annual = 0.0
-        self.evap_annual = 0.0
-        self.trans_annual = 0.0
-        self.drainage_annual = 0.0
-
-        self.annual_p_act = 0.0
-        self.annual_p_calc = 0.0
-        self.annual_diff = 0.0
+        #
+        # Annual outputs
+        #
+        self.annual_variables = {'year': ['time.cal_year', '', 0],
+                                 'delta_SW': ['soil.annual_delta_SW', 'mmH2O', 0],
+                                 'runoff': ['soil.runoff_annual', 'mmH2O', 0],
+                                 'evaporation': ['soil.evap_annual', 'mmH2O', 0],
+                                 'transpiration': ['soil.trans_annual', 'mmH2O', 0],
+                                 'drainage': ['soil.drainage_annual', 'mmH2O', 0],
+                                 'actual precipitation': ['soil.p_act_annual', 'mmH2O', 0],
+                                 'calculated water': ['soil.p_calc_annual', 'mmH2O', 0],
+                                 'difference': ['soil.annual_water_balance', 'mmH2O', 0]}
 
     # ---------------------------------------------------------------------------
     # Function: write_header
     #           Writes the header (title and units) in the csvfile
     # ---------------------------------------------------------------------------
-    def write_headers(self, output_csv):
+    def write_headers(self, output_csv, variables):
 
         mode = 'a+' if output_csv.exists() else 'w+'
 
         with output_csv.open(mode) as csvfile:
 
-            # 1) Initialize the header of the cvsfile
-            fieldnames = ['Year', 'Julian Day', 'Change in SW', 'Runoff',
-                          'Evaporation', 'Transpiration', 'Drainage',
-                          'Actual Precipitation', 'Calculated Water',
-                          'Difference']
-
-            self.fieldNames = fieldnames
-            writer = csv.DictWriter(csvfile, fieldnames=self.fieldNames,
+            writer = csv.DictWriter(csvfile, fieldnames=variables.keys(),
                                     lineterminator='\n')
+
             writer.writeheader()
 
-            # 2) Write Units in 2nd row of cvsfile
-
             units = {}
-            for fieldname in fieldnames:
-                if fieldname == 'Year' or fieldname == 'Julian Day':
-                    units[fieldname] = ''
-                else:
-                    units[fieldname] = 'mm H2O'
+            for variable in variables:
+                units[variable] = variables[variable][1]
 
             writer.writerow(units)
 
@@ -100,9 +85,9 @@ class WaterBalance(BaseReportHandler):
     #           Transfers the needed data from Soil object to the report handler
     # ---------------------------------------------------------------------------
     def initialize(self, state):
-        self.write_headers(self.get_fPath())
+        self.write_headers(self.get_fPath(), self.daily_variables)
         annual_path = Path(str(self.get_fPath()).split('.csv')[0] + "_annual.csv")
-        self.write_headers(annual_path)
+        self.write_headers(annual_path, self.annual_variables)
 
     # ---------------------------------------------------------------------------
     # Function: updateDailyOutput
@@ -112,20 +97,9 @@ class WaterBalance(BaseReportHandler):
     def daily_update(self, state, weather, time):
 
         soil = state.soil
-
-        self.year.append(time.cal_year)
-        self.julianDay.append(time.day)
-
-        self.delta_SW.append(soil.delta_SW)
-        self.runoff.append(soil.runoff)
-        self.evap.append(soil.evap_sum)
-        self.trans.append(soil.trans_sum)
-        self.drainage.append(soil.drainage)
-
-        self.p_act.append(soil.p_act)
-        self.p_calc.append(soil.p_calc)
-
-        self.diff.append(soil.water_balance)
+        for variable in self.daily_variables:
+            self.daily_variables[variable][2].append(
+                eval(self.daily_variables[variable][0], globals(), locals()))
 
     # ---------------------------------------------------------------------------
     # Method: annual_update
@@ -134,20 +108,9 @@ class WaterBalance(BaseReportHandler):
         """Stores the yearly values that need to be printed in the report."""
         soil = state.soil
 
-        soil.calculate_annual_water_balance()
-
-        self.cal_year = time.cal_year
-
-        self.annual_delta_SW = soil.annual_delta_SW
-        self.runoff_annual = soil.runoff_annual
-        self.evap_annual = soil.evap_annual
-        self.trans_annual = soil.trans_annual
-        self.drainage_annual = soil.drainage_annual
-
-        self.annual_p_act = soil.p_act_annual
-        self.annual_p_calc = soil.p_calc_annual
-
-        self.annual_diff = soil.annual_water_balance
+        for variable in self.annual_variables:
+            self.annual_variables[variable][2] = \
+                eval(self.annual_variables[variable][0], globals(), locals())
 
     # ---------------------------------------------------------------------------
     # Function: write_annual_report
@@ -159,68 +122,27 @@ class WaterBalance(BaseReportHandler):
         mode = 'a+' if self.get_fPath().exists() else 'w+'
 
         with self.get_fPath().open(mode) as csvfile:
-
             # Write data day by day
-            for x in range(0, len(self.julianDay)):
-                daily_water_data = {
-                    'Year':
-                        str(self.year[x]),
-                    'Julian Day':
-                        str(self.julianDay[x]),
-                    'Change in SW':
-                        str(round(float(self.delta_SW[x]), 3)),
-                    'Runoff':
-                        str(round(float(self.runoff[x]), 3)),
-                    'Evaporation':
-                        str(round(float(self.evap[x]), 3)),
-                    'Transpiration':
-                        str(round(float(self.trans[x]), 3)),
-                    'Drainage':
-                        str(round(float(self.drainage[x]), 3)),
-                    'Actual Precipitation':
-                        str(round(float(self.p_act[x]), 3)),
-                    'Calculated Water':
-                        str(round(float(self.p_calc[x]), 3)),
-                    'Difference':
-                        str(round(float(self.diff[x]), 3))
-                }
+            writer = csv.DictWriter(csvfile, fieldnames=self.daily_variables.keys(),
+                                    lineterminator='\n')
 
-                writer = csv.DictWriter(csvfile, fieldnames=self.fieldNames,
-                                        lineterminator='\n')
-                writer.writerow(daily_water_data)
+            for day in range(len(self.daily_variables['j_day'][2])):
+                row = {}
+                for variable in self.daily_variables:
+                    row[variable] = self.daily_variables[variable][2][day]
+                writer.writerow(row)
 
         annual_path = Path(str(self.get_fPath()).split('.csv')[0] + "_annual.csv")
 
         mode = 'a+' if annual_path.exists() else 'w+'
 
         with annual_path.open(mode) as csvfile:
-            annual_water_data = {
-                'Year':
-                    str(self.cal_year),
-                'Julian Day':
-                    str(self.julianDay[-1]),
-                'Change in SW':
-                    str(round(float(self.annual_delta_SW), 3)),
-                'Runoff':
-                    str(round(float(self.runoff_annual), 3)),
-                'Evaporation':
-                    str(round(float(self.evap_annual), 3)),
-                'Transpiration':
-                    str(round(float(self.trans_annual), 3)),
-                'Drainage':
-                    str(round(float(self.drainage_annual), 3)),
-                'Actual Precipitation':
-                    str(round(float(self.annual_p_act), 3)),
-                'Calculated Water':
-                    str(round(float(self.annual_p_calc), 3)),
-                'Difference':
-                    str(round(float(self.annual_diff), 3))
-
-            }
-
-            writer = csv.DictWriter(csvfile, fieldnames=self.fieldNames,
+            writer = csv.DictWriter(csvfile, fieldnames=self.annual_variables.keys(),
                                     lineterminator='\n')
-            writer.writerow(annual_water_data)
+            row = {}
+            for variable in self.annual_variables:
+                row[variable] = self.annual_variables[variable][2]
+            writer.writerow(row)
 
     # ---------------------------------------------------------------------------
     # Function: annual_flush
@@ -228,31 +150,11 @@ class WaterBalance(BaseReportHandler):
     # ---------------------------------------------------------------------------
     def annual_flush(self):
 
-        self.year = []
-        self.julianDay = []
+        for variable in self.daily_variables:
+            self.daily_variables[variable][2] = []
 
-        self.delta_SW = []
-        self.runoff = []
-        self.evap = []
-        self.trans = []
-        self.drainage = []
-
-        self.p_act = []
-        self.p_calc = []
-
-        self.diff = []
-
-        self.cal_year = []
-
-        self.annual_delta_SW = 0.0
-        self.runoff_annual = 0.0
-        self.evap_annual = 0.0
-        self.trans_annual = 0.0
-        self.drainage_annual = 0.0
-
-        self.annual_p_act = 0.0
-        self.annual_p_calc = 0.0
-        self.annual_diff = 0.0
+        for variable in self.annual_variables:
+            self.annual_variables[variable][2] = 0
 
     def produce_data_analysis(self, is_final):
         annual_file_name = str(self.file_name).split('.')[0] + "_annual.csv"

@@ -107,7 +107,7 @@ class CropSummary(BaseReportHandler):
         with self.get_fPath().open(mode) as csvfile:
             writer = csv.DictWriter(csvfile, fieldnames=self.variables,
                                     lineterminator='\n')
-            for day in range(len(self.variables['j_day'])):
+            for day in range(len(self.variables['j_day'][2])):
                 row = {}
                 for variable in self.variables:
                     row[variable] = self.variables[variable][2][day]
