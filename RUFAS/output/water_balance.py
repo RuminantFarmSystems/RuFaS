@@ -50,14 +50,15 @@ class WaterBalance(BaseReportHandler):
         # Annual outputs
         #
         self.annual_variables = {'year': ['time.cal_year', '', 0],
-                                 'delta_SW': ['soil.annual_delta_SW', 'mmH2O', 0],
-                                 'runoff': ['soil.runoff_annual', 'mmH2O', 0],
-                                 'evaporation': ['soil.evap_annual', 'mmH2O', 0],
-                                 'transpiration': ['soil.trans_annual', 'mmH2O', 0],
-                                 'drainage': ['soil.drainage_annual', 'mmH2O', 0],
-                                 'actual precipitation': ['soil.p_act_annual', 'mmH2O', 0],
-                                 'calculated water': ['soil.p_calc_annual', 'mmH2O', 0],
-                                 'difference': ['soil.annual_water_balance', 'mmH2O', 0]}
+                                 'j_day': ['time.day', '', 0],
+                                 'delta_SW': ['round(soil.annual_delta_SW, 3)', 'mmH2O', 0],
+                                 'runoff': ['round(soil.runoff_annual, 3)', 'mmH2O', 0],
+                                 'evaporation': ['round(soil.evap_annual, 3)', 'mmH2O', 0],
+                                 'transpiration': ['round(soil.trans_annual, 3)', 'mmH2O', 0],
+                                 'drainage': ['round(soil.drainage_annual, 3)', 'mmH2O', 0],
+                                 'actual precipitation': ['round(soil.p_act_annual, 3)', 'mmH2O', 0],
+                                 'calculated water': ['round(soil.p_calc_annual, 3)', 'mmH2O', 0],
+                                 'difference': ['round(soil.annual_water_balance, 3)', 'mmH2O', 0]}
 
     # ---------------------------------------------------------------------------
     # Function: write_header
@@ -107,6 +108,8 @@ class WaterBalance(BaseReportHandler):
     def annual_update(self, state, weather, time):
         """Stores the yearly values that need to be printed in the report."""
         soil = state.soil
+
+        soil.calculate_annual_water_balance()
 
         for variable in self.annual_variables:
             self.annual_variables[variable][2] = \

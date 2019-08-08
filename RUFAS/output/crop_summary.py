@@ -78,17 +78,6 @@ class CropSummary(BaseReportHandler):
         for variable in self.variables:
             self.variables[variable][2].append(eval(self.variables[variable][0], globals(), locals()))
 
-        # self.year.append(time.cal_year)
-        # self.julianDay.append(time.day)
-        #
-        # self.daily_fr_PHU.append(cropType.fr_PHU)
-        # self.daily_biomass_act.append(cropType.biomass_act)
-        # self.daily_LAI_act.append(cropType.LAI_act)
-        # self.daily_bio_N.append(cropType.bio_N)
-        # self.daily_bio_P.append(cropType.bio_P)
-        # self.daily_z_root.append(cropType.z_root)
-        # self.daily_yield_act.append(cropType.yield_act)
-
     # ---------------------------------------------------------------------------
     # Method: annual_update
     # ---------------------------------------------------------------------------

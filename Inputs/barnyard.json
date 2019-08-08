@@ -47,7 +47,7 @@
         "water_balance":
         {
             "active": true,
-            "produce_diagnostics": true,
+            "produce_diagnostics": false,
             "show_daily": false,
             "show_annual": false,
             "report_name": "Water Balance",
