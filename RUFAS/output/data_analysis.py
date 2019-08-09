@@ -12,6 +12,7 @@ Description: Produces graphical representations of RuFaS output data.
 import csv
 import datetime as dt
 import matplotlib.pyplot as mp
+import random
 
 #
 # Produces graphical representations of data passed in from a csv file.
@@ -95,31 +96,54 @@ def annual_data_analysis(output_csv, show_annual, produce_diagnostics):
         table_vals = []
         row_labs = []
 
-        colors = ['#ffffff', '#ffffff', '#ff00ff', '#006400', '#fbaf08',  '#51d0de', '#431c5d', 'red']
+        added_variables = len(variables) - 9
+
+        colors = ['#ffffff', '#ff00ff', '#006400', '#fbaf08',  '#51d0de', '#431c5d', 'red']
         for variable in variables:
-            if 1 < counter < 7:
+            # assigns a random color to variables not originally included
+            if len(colors) - 2 < counter < len(variables) - 3:
+                for x in range(0, len(years)):
+                    # TODO sloppy code, needs to be done before csv is created but I am unsure how
+                    # TODO @calculate_annual_water_balance
+                    variables['calculated water'][x] = round(variables['calculated water'][x]
+                                                             + variables[variable][x], 3)
+                    variables['difference'][x] = round(variables['actual precipitation'][x]
+                                                       - variables['calculated water'][x], 3)
+                colors.insert(counter, "#"+''.join([random.choice('1236789ABCDE') for j in range(6)]))
+
+            # 0 through 6 are outputs we would not change
+            # 6 is precip which we do not want as a bar in the graph
+            if 0 < counter < len(variables) - 3:
                 mp.bar(years, variables[variable], width, color=colors[counter], bottom=prev_vars)
                 legend.append(variable)
                 prev_vars = [sum(x) for x in zip(prev_vars, variables[variable])]
-            if counter == 7:
+            elif counter == len(variables) - 3:
                 precip = variables[variable]
                 legend.insert(0, variable)
                 mp.scatter(years, precip, c='red', marker='x', zorder=2)
-            if counter > 1:
+            if counter > 0:
                 variables[variable].insert(0, "")
                 table_vals.append(variables[variable])
                 row_labs.append(variable)
             counter += 1
 
-        cell_colors = [['#ffffff' for i in range(len(years) + 1)] for j in range(len(variables) - 2)]
+        cell_colors = [['#ffffff' for i in range(len(years) + 1)] for j in range(len(variables) - 1)]
         for x in range(len(colors)):
-            cell_colors[x - 2][0] = colors[x]
+            cell_colors[x - 1][0] = colors[x]
+
+        # original bbox values with 9 variables ( len(variables) )
+        table_bot = -0.95
+        table_height = 0.75
+
+        # added bbox adjustments when there are more variables
+        table_bot -= 0.08 * added_variables
+        table_height += 0.08 * added_variables
 
         mp.axis('tight')
         table = mp.table(cellText=table_vals,
                          rowLabels=row_labs,
                          cellColours=cell_colors,
-                         bbox=[0, -.95, 1, .75])
+                         bbox=[0, table_bot, 1, table_height])
 
         cellDict = table.get_celld()
         for x in range(len(cell_colors)):
