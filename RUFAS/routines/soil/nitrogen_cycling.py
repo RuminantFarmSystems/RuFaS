@@ -324,10 +324,10 @@ def leaching_runoff_erosion(soil):
             # it is important for the order of operations that the pools are
             # updated after each process and that those updated values are used
             # thereafter
-            NO3Runoff = min(layer.NO3, NO3Runoff)
-            layer.NO3 -= NO3Runoff
-            NH4Runoff = min(layer.NH4, NH4Runoff)
-            layer.NH4 -= NH4Runoff
+            soil.NO3_runoff = min(layer.NO3, NO3Runoff)
+            layer.NO3 -= soil.NO3_runoff
+            soil.NH4_runoff = min(layer.NH4, NH4Runoff)
+            layer.NH4 -= soil.NH4_runoff
 
             # "pseudocode_soil" S.4.C.3
             activeNErosConc = (100 * layer.activeN) / (BD * depth)

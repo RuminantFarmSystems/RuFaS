@@ -328,6 +328,9 @@ class Soil:
         self.summan = 0.0
         self.summanP = 0.0
 
+        self.NO3_runoff = 0.0
+        self.NH4_runoff = 0.0
+
         # ------ INITIALIZE SOIL NITROGEN POOLS ------------------------------------
         # Calculate initial amount of NO3 in each soil layer;
         # Initial NO3 levels (kg/ha) in the soil are varied by depth as:

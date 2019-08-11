@@ -59,8 +59,19 @@ class SoilNitrogen(BaseReportHandler):
                           'Tot_Nitri_Vol_L3': ['soil.listOfSoilLayers[2].totNitriVolatil', 'kg/ha', []],
                           'N_trans_L1': ['soil.listOfSoilLayers[0].nTrans', 'kg', []],
                           'N_trans_L2': ['soil.listOfSoilLayers[1].nTrans', 'kg', []],
-                          'N_trans_L3': ['soil.listOfSoilLayers[2].nTrans', 'kg', []]}
-
+                          'N_trans_L3': ['soil.listOfSoilLayers[2].nTrans', 'kg', []],
+                          'NO3_runoff': ['soil.NO3_runoff', 'kg', []],
+                          'NH4_runoff': ['soil.NH4_runoff', 'kg', []],
+                          'NO3_perc_L1': ['soil.listOfSoilLayers[0].NO3_perc', 'kg', []],
+                          'NO3_perc_L2': ['soil.listOfSoilLayers[1].NO3_perc', 'kg', []],
+                          'NO3_perc_L3': ['soil.listOfSoilLayers[2].NO3_perc', 'kg', []],
+                          'NH4_perc_L1': ['soil.listOfSoilLayers[0].NH4_perc', 'kg', []],
+                          'NH4_perc_L2': ['soil.listOfSoilLayers[1].NH4_perc', 'kg', []],
+                          'NH4_perc_L3': ['soil.listOfSoilLayers[2].NH4_perc', 'kg', []],
+                          'active_perc_L1': ['soil.listOfSoilLayers[0].active_perc', 'kg', []],
+                          'active_perc_L2': ['soil.listOfSoilLayers[1].active_perc', 'kg', []],
+                          'active_perc_L3': ['soil.listOfSoilLayers[2].active_perc', 'kg', []]
+                          }
 
     # ---------------------------------------------------------------------------
     # Function: get_header
