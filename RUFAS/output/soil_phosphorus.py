@@ -26,6 +26,19 @@ class SoilPhosphorus(BaseReportHandler):
     def __init__(self, data):
 
         #
+        # Outputs can be added in this single place in the following format:
+        # 'output_name': ['variable_name', 'unit', []],
+        # 'output_name' is a user defined key that will show up in outputs/graphs.
+        # avoid spaces.
+        # 'variable_name' is very important. This has to be a variable defined
+        # and initialized in the object. If you are interested in tracking
+        # a variable not defined in the class, you need to create it there
+        # first. The output handler will not work if the variable is incorrect.
+        # 'unit' is user defined but will, again, show up in outputs/graphs.
+        # [] is an empty list
+        #
+
+        #
         # Sets active, report_name, f_name using data
         #
         self.set_properties(data)
@@ -54,10 +67,9 @@ class SoilPhosphorus(BaseReportHandler):
                           'manure_cover': ['soil.manure_cov', 'HA', []],
                           }
 
-    # ---------------------------------------------------------------------------
-    # Function: get_header
-    #           Writes the header (title and units) in the csvfile
-    # ---------------------------------------------------------------------------
+    #
+    # writes header names and units to the csv
+    #
     def write_header(self):
 
         mode = 'a+' if self.get_fPath().exists() else 'w+'
@@ -73,36 +85,27 @@ class SoilPhosphorus(BaseReportHandler):
 
             writer.writerow(units)
 
-    # ---------------------------------------------------------------------------
-    # Function: initialize
-    #           Transfers the needed data from Soil object to the report handler
-    # ---------------------------------------------------------------------------
     def initialize(self, state):
         self.write_header()
 
-    # ---------------------------------------------------------------------------
-    # Function: updateDailyOutput
-    # Stores the daily values that need to be printed in the 'soil_phosphorus'
-    # csv file
-    # ---------------------------------------------------------------------------
+    #
+    # stores specified daily values. NOTE: the eval() method is limited
+    # to the scope of soil variables. If a specified output is not a soil
+    # variable, this will throw an error. See comment at the top of the file.
+    #
     def daily_update(self, state, weather, time):
         soil = state.soil
 
         for variable in self.variables:
             self.variables[variable][2].append(eval(self.variables[variable][0], globals(), locals()))
 
-    # ---------------------------------------------------------------------------
-    # Method: annual_update
-    # ---------------------------------------------------------------------------
     def annual_update(self, state, weather, time):
         """Stores the yearly values that need to be printed in the report."""
         pass
 
-    # ---------------------------------------------------------------------------
-    # Function: write_annual_report
-    #           Appends the annual report to the output file
-    # Soil Phosphorus is a cvsfile
-    # ---------------------------------------------------------------------------
+    #
+    # writes stored values to the csv at the end of the year
+    #
     def write_annual_report(self):
 
         mode = 'a+' if self.get_fPath().exists() else 'w+'
@@ -116,10 +119,9 @@ class SoilPhosphorus(BaseReportHandler):
                     row[variable] = self.variables[variable][2][day]
                 writer.writerow(row)
 
-    # ---------------------------------------------------------------------------
-    # Function: annual_flush
-    #           Sets all of the values in the output object to the default value
-    # ---------------------------------------------------------------------------
+    #
+    # clears stored values at the end of the year
+    #
     def annual_flush(self):
         for variable in self.variables:
             self.variables[variable][2] = []
