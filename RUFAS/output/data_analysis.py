@@ -20,6 +20,7 @@ import random
 from RUFAS import util
 
 
+# reads all the data from a csv and puts it in a dictionary with each variable
 def read_data(output_csv):
     output_full_path = util.get_base_dir() / 'Outputs/Sample_Farm_Outputs' / output_csv
 
@@ -47,6 +48,7 @@ def read_data(output_csv):
     return variables, units
 
 
+# data analytics for ration
 def ration_data_analysis(output_csv, show_daily, produce_diagnostics, is_final, ration_interval):
 
     if produce_diagnostics:
@@ -81,6 +83,7 @@ def ration_data_analysis(output_csv, show_daily, produce_diagnostics, is_final, 
     show_figures(is_final)
 
 
+# produces the annual data analytics
 def annual_data_analysis(output_csv, show_annual, produce_diagnostics):
     if produce_diagnostics:
         variables, units = read_data(output_csv)
@@ -102,13 +105,6 @@ def annual_data_analysis(output_csv, show_annual, produce_diagnostics):
         for variable in variables:
             # assigns a random color to variables not originally included
             if len(colors) - 2 < counter < len(variables) - 3:
-                for x in range(0, len(years)):
-                    # TODO sloppy code, needs to be done before csv is created but I am unsure how
-                    # TODO @calculate_annual_water_balance
-                    variables['calculated water'][x] = round(variables['calculated water'][x]
-                                                             + variables[variable][x], 3)
-                    variables['difference'][x] = round(variables['actual precipitation'][x]
-                                                       - variables['calculated water'][x], 3)
                 colors.insert(counter, "#"+''.join([random.choice('1236789ABCDE') for j in range(6)]))
 
             # 0 through 6 are outputs we would not change
@@ -145,6 +141,7 @@ def annual_data_analysis(output_csv, show_annual, produce_diagnostics):
                          cellColours=cell_colors,
                          bbox=[0, table_bot, 1, table_height])
 
+        # creates the color indicator in the table
         cellDict = table.get_celld()
         for x in range(len(cell_colors)):
             cellDict[(x, 0)].set_width(0.02)
@@ -160,6 +157,7 @@ def annual_data_analysis(output_csv, show_annual, produce_diagnostics):
             mp.close()
 
 
+# produces the daily data analysis
 def data_analysis(output_csv, show_daily, produce_diagnostics, is_final):
 
     if produce_diagnostics:
@@ -169,11 +167,13 @@ def data_analysis(output_csv, show_daily, produce_diagnostics, is_final):
 
         start_year = int(variables['year'][0])
         start_day = int(variables['j_day'][0])
+        # creates the date ticks for the graphs
         start_date = dt.datetime(start_year, 1, 1) + dt.timedelta(start_day - 1)
 
         dates = [start_date + dt.timedelta(days=i) for i in range(len(variables['j_day']))]
 
         counter = 0
+        # for each variable, create the figure and save it
         for variable in variables:
             if counter > 1:
                 mp.figure()
@@ -192,6 +192,7 @@ def data_analysis(output_csv, show_daily, produce_diagnostics, is_final):
     show_figures(is_final)
 
 
+# shows figures on screen for manipulation
 def show_figures(is_final):
     if is_final:
         mp.show()

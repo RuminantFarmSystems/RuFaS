@@ -4,8 +4,8 @@
 #
 # water_balance.py
 #
-# Authors: Jacob Johnson
-#          William Donovan
+# Authors: Jacob Johnson, jacob8399@gmail.com
+#          William Donovan, wmdonovan@wisc.edu
 #
 ################################################################################
 
@@ -160,6 +160,11 @@ class WaterBalance(BaseReportHandler):
 
         for variable in self.annual_variables:
             self.annual_variables[variable][2] = 0
+
+    # ---------------------------------------------------------------------------
+    # Function: produce_data_analysis
+    #           Produces the data analytics
+    # ---------------------------------------------------------------------------
 
     def produce_data_analysis(self, is_final):
         annual_file_name = str(self.file_name).split('.')[0] + "_annual.csv"

@@ -4,6 +4,7 @@ RUFAS: Ruminant Farm Systems Model
 File name: crop_summary.py
 Description:
 Author(s): William Donovan, wmdonovan@wisc.edu
+           Jacob Johnson, jacob8399@gmail.com
 """
 #############################################
 import csv
@@ -111,5 +112,9 @@ class CropSummary(BaseReportHandler):
         for variable in self.variables:
             self.variables[variable][2] = []
 
+    # ---------------------------------------------------------------------------
+    # Function: produce_data_analysis
+    #           Produces the data analytics
+    # ---------------------------------------------------------------------------
     def produce_data_analysis(self, is_final):
         data_analysis(self.file_name, self.show_daily, self.produce_diagnostics, is_final)
