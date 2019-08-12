@@ -3,7 +3,7 @@
 SurPhos
 File name: p_mineralization.py
 Author(s): Jacob Johnson, jacob8399@gmail.com,
-           WIlliam Donovan, wmdonovan@wisc.edu
+           William Donovan, wmdonovan@wisc.edu
 """
 ################################################################################
 
