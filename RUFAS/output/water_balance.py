@@ -25,6 +25,19 @@ class WaterBalance(BaseReportHandler):
     def __init__(self, data):
 
         #
+        # Outputs can be added in this single place in the following format:
+        # 'output_name': ['variable_name', 'unit', []],
+        # 'output_name' is a user defined key that will show up in outputs/graphs.
+        # avoid spaces.
+        # 'variable_name' is very important. This has to be a variable defined
+        # and initialized in the object. If you are interested in tracking
+        # a variable not defined in the class, you need to create it there
+        # first. The output handler will not work if the variable is incorrect.
+        # 'unit' is user defined but will, again, show up in outputs/graphs.
+        # [] is an empty list
+        #
+
+        #
         # Sets active, report_name, file_name using data
         #
 
@@ -62,10 +75,9 @@ class WaterBalance(BaseReportHandler):
                                  'calculated water': ['round(soil.p_calc_annual, 3)', 'mmH2O', 0],
                                  'difference': ['round(soil.annual_water_balance, 3)', 'mmH2O', 0]}
 
-    # ---------------------------------------------------------------------------
-    # Function: write_header
-    #           Writes the header (title and units) in the csvfile
-    # ---------------------------------------------------------------------------
+    #
+    # writes header names and units to the csv
+    #
     def write_headers(self, output_csv, variables):
 
         mode = 'a+' if output_csv.exists() else 'w+'
@@ -83,20 +95,16 @@ class WaterBalance(BaseReportHandler):
 
             writer.writerow(units)
 
-    # ---------------------------------------------------------------------------
-    # Function: initialize
-    #           Transfers the needed data from Soil object to the report handler
-    # ---------------------------------------------------------------------------
     def initialize(self, state):
         self.write_headers(self.get_fPath(), self.daily_variables)
         annual_path = Path(str(self.get_fPath()).split('.csv')[0] + "_annual.csv")
         self.write_headers(annual_path, self.annual_variables)
 
-    # ---------------------------------------------------------------------------
-    # Function: updateDailyOutput
-    # Stores the daily values that need to be printed in the 'water balance'
-    # csv file
-    # ---------------------------------------------------------------------------
+    #
+    # stores specified daily values. NOTE: the eval() method is limited
+    # to the scope of variables. If a specified output is not a soil
+    # variable, this will throw an error. See comment at the top of the file.
+    #
     def daily_update(self, state, weather, time):
 
         soil = state.soil
@@ -104,9 +112,6 @@ class WaterBalance(BaseReportHandler):
             self.daily_variables[variable][2].append(
                 eval(self.daily_variables[variable][0], globals(), locals()))
 
-    # ---------------------------------------------------------------------------
-    # Method: annual_update
-    # ---------------------------------------------------------------------------
     def annual_update(self, state, weather, time):
         """Stores the yearly values that need to be printed in the report."""
         soil = state.soil
@@ -117,11 +122,9 @@ class WaterBalance(BaseReportHandler):
             self.annual_variables[variable][2] = \
                 eval(self.annual_variables[variable][0], globals(), locals())
 
-    # ---------------------------------------------------------------------------
-    # Function: write_annual_report
-    #           Appends the annual report to the output file
-    # Water Balance is a cvsfile
-    # ---------------------------------------------------------------------------
+    #
+    # writes stored values to the csv at the end of the year
+    #
     def write_annual_report(self):
 
         mode = 'a+' if self.get_fPath().exists() else 'w+'
@@ -149,10 +152,9 @@ class WaterBalance(BaseReportHandler):
                 row[variable] = self.annual_variables[variable][2]
             writer.writerow(row)
 
-    # ---------------------------------------------------------------------------
-    # Function: annual_flush
-    #           Sets all of the values in the output object to the default value
-    # ---------------------------------------------------------------------------
+    #
+    # clears stored values at the end of the year
+    #
     def annual_flush(self):
 
         for variable in self.daily_variables:
@@ -160,11 +162,6 @@ class WaterBalance(BaseReportHandler):
 
         for variable in self.annual_variables:
             self.annual_variables[variable][2] = 0
-
-    # ---------------------------------------------------------------------------
-    # Function: produce_data_analysis
-    #           Produces the data analytics
-    # ---------------------------------------------------------------------------
 
     def produce_data_analysis(self, is_final):
         annual_file_name = str(self.file_name).split('.')[0] + "_annual.csv"
