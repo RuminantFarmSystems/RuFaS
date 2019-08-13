@@ -9,18 +9,21 @@ Author(s): Kass Chupongstimun, kass_c@hotmail.com
 
 from pathlib import Path
 import csv
+
+from RUFAS.output.data_analysis import ration_data_analysis
 from RUFAS.output.report_handler import BaseReportHandler
 
-#-------------------------------------------------------------------------------
+
+# -------------------------------------------------------------------------------
 # Class: RationReport
-#-------------------------------------------------------------------------------
+# -------------------------------------------------------------------------------
 class RationReport(BaseReportHandler):
     """Creates and prints to the file ration_report.txt"""
 
     def __init__(self, data):
 
         #
-        # Sets active, report_name, f_name using data
+        # Sets active, report_name, file_name using data
         #
         self.set_properties(data)
 
@@ -28,19 +31,20 @@ class RationReport(BaseReportHandler):
         # Daily Outputs
         # 1D Lists [julianDay]
         #
+        self.cal_year = []
         self.achieved_price = []
         self.feed_amounts = []
         self.milk_production_reduction = []
         self.julianDay = []
-        #self.LP_text = ""
+        # self.LP_text = ""
 
         # static
         self.feed_info = {}
 
-    #---------------------------------------------------------------------------
+    # ---------------------------------------------------------------------------
     # Method: write_header
     #         Writes the header (column titles and units) in the csvfile
-    #---------------------------------------------------------------------------
+    # ---------------------------------------------------------------------------
     def write_header(self):
 
         mode = 'a+' if self.get_fPath().exists() else 'w+'
@@ -48,7 +52,7 @@ class RationReport(BaseReportHandler):
         with self.get_fPath().open(mode) as csvfile:
 
             # 1) Initialize the header of the cvsfile
-            fieldnames = ['Year', 'Julian Day', 'Achieved Total Price', 'Milk Production Reduction Factor']
+            fieldnames = ['year', 'j_day', 'Achieved Total Price', 'Milk Production Reduction Factor']
             for key in self.feed_info.keys():
                 fieldnames.append(key)
             self.fieldNames = fieldnames
@@ -57,16 +61,16 @@ class RationReport(BaseReportHandler):
             writer.writeheader()
 
             # 2) Write Units in 2nd row of cvsfile
-            units = {'Year': '', 'Julian Day': '',
+            units = {'year': '', 'j_day': '',
                              'Achieved Total Price': "$", 'Milk Production Reduction Factor': ""}
             for key in self.feed_info.keys():
                 units[key] = 'kg'            
 
             writer.writerow(units)
 
-    #---------------------------------------------------------------------------
+    # ---------------------------------------------------------------------------
     # Method: initialize
-    #---------------------------------------------------------------------------
+    # ---------------------------------------------------------------------------
     def initialize(self, state):
         """Transfers the needed data from Soil object to the report handler."""
         feed = state.feed
@@ -76,13 +80,14 @@ class RationReport(BaseReportHandler):
         self.ration_interval = state.animal.ration_formulation_interval
         self.write_header()
 
-    #---------------------------------------------------------------------------
+    # ---------------------------------------------------------------------------
     # Method: daily_update
-    #---------------------------------------------------------------------------
+    # ---------------------------------------------------------------------------
     def daily_update(self, state, weather, time):
         """Stores the daily values that need to be printed in the report."""
 
         day = time.day
+        self.cal_year.append(time.cal_year)
         self.julianDay.append(day)
         # for each day that a ration is calculated, appends the necessary information to the lists
         if (day % self.ration_interval) == 1 or self.ration_interval == 1:
@@ -92,20 +97,19 @@ class RationReport(BaseReportHandler):
             self.feed_amounts.append({feed_type: animal.ration[feed_type] for feed_type in self.feed_info.keys()})
             self.milk_production_reduction.append(animal.ration['MP_reduction'])
 
-    #---------------------------------------------------------------------------
+    # ---------------------------------------------------------------------------
     # Method: annual_update
-    #---------------------------------------------------------------------------
+    # ---------------------------------------------------------------------------
     def annual_update(self, state, weather, time):
         """Stores the yearly values that need to be printed in the report."""
         pass
 
-    #---------------------------------------------------------------------------
+    # ---------------------------------------------------------------------------
     # Method: write_annual_report
-    #---------------------------------------------------------------------------
-    def write_annual_report(self, y):
+    # ---------------------------------------------------------------------------
+    def write_annual_report(self):
         """Appends the annual report to the output file."""
 
-        print("printing ration report for year: " + str(y))
         mode = 'a+' if self.get_fPath().exists() else 'w+'
 
         with self.get_fPath().open(mode) as csvfile:
@@ -115,9 +119,9 @@ class RationReport(BaseReportHandler):
                 if (self.julianDay[i] % self.ration_interval) == 1 or self.ration_interval == 1:
             
                     rationData = {
-                            'Year':
-                                str(y),
-                            'Julian Day':
+                            'year':
+                                str(self.cal_year[i]),
+                            'j_day':
                                 str(self.julianDay[i]),
                             'Achieved Total Price':
                                 str(self.achieved_price[data_index]),
@@ -131,9 +135,10 @@ class RationReport(BaseReportHandler):
                                         lineterminator = '\n')
                     writer.writerow(rationData)
                     data_index += 1
-    #---------------------------------------------------------------------------
+
+    # ---------------------------------------------------------------------------
     # Method: annual_flush
-    #---------------------------------------------------------------------------
+    # ---------------------------------------------------------------------------
     def annual_flush(self):
         """Sets all of the values in the output object to the default value."""
 
@@ -141,3 +146,6 @@ class RationReport(BaseReportHandler):
         self.feed_amounts = []
         self.milk_production_reduction = [] 
         self.julianDay = []
+
+    def produce_data_analysis(self, is_final):
+        ration_data_analysis(self.file_name, self.show_daily, self.produce_diagnostics, is_final, self.ration_interval)

@@ -25,15 +25,15 @@ This module needs the following inputs in order to operate correctly:
         T_avg
 
     From the soil class, the following will be needed:
-        listOfSoilLayers
+        soil_layers
 
         And the following attributes of a soil layer:
             bottomDepth
             Eo_sum = Sum of the Eo values leading up to today
-            Et_max
+            trans_max
             NO3
             labileP
-            currentSoilWaterMM
+            soil_water
             fcWater
             wiltingWater
 """
@@ -41,7 +41,7 @@ This module needs the following inputs in order to operate correctly:
 
 from math import acos, asin, sin, tan, pi
 from . import heat_units, leaf_area_index, root_development, biomass, yields, \
-    phosphorus_uptake, nitrogen_uptake, water_uptake, growth_constraints
+    phosphorus_uptake, nitrogen_uptake, transpiration, growth_constraints
 from RUFAS import util
 
 
@@ -89,7 +89,7 @@ def daily_crop_routine(crop, weather, time, soil):
 
             root_development.update_all(crop_type, time)
 
-            water_uptake.update_all(crop_type, soil, time)
+            # transpiration.update_all(crop_type, soil, time)
 
             nitrogen_uptake.update_all(crop_type, soil)
 
@@ -597,8 +597,9 @@ class Soybean:
         self.beta_w = 10  # water-use distribution parameter  # corn
         self.epco = 0.5  # corn
 
-        self.water_actual_up = 0
-        self.water_uptake_each_layer = []
+        # Outputs
+        self.prev_LAI_act = 0
+        self.LAI_act = 0
 
         # ===================================================================
         ''' Nitrogen Uptake Data '''
@@ -627,6 +628,15 @@ class Soybean:
         self.bio_P_opt = 0
         self.bio_P = 0
 
+        # Internally calculated inputs
+        self.gamma_reg = 0
+        self.dBiomass_max = 0
+        self.dBiomass_act = 0.0
+
+        # Outputs
+        self.biomass_act = 0
+        self.prev_biomass_act = 0
+
         self.fr_PHU_50 = 0.5
         self.fr_PHU_100 = 1.0
         self.fr_p1 = 0.0074
@@ -638,9 +648,6 @@ class Soybean:
         self.P_up = 0
         self.act_P_up_each_layer = []
         self.P_act_up = 0
-
-        # ===================================================================
-        ''' Yields Data '''
 
         self.HI_max = 0
         self.HI_min = 0.01
@@ -787,6 +794,13 @@ class Alfalfa:
         self.fr_p3 = 0.0020
         self.fr_p3ish = 0.00201
 
+
+        self.fr_N = 0
+        self.fr_N_up = 0
+        self.N_up = 0
+        self.act_N_up_each_layer = []
+        self.N_act_up = 0
+
         self.fr_P = 0
         self.P_up = 0
         self.act_P_up_each_layer = []
@@ -810,6 +824,10 @@ class Alfalfa:
         self.yield_N = 0
         self.yield_P = 0
 
+        self.HI_max = 0
+        self.HI_min = data["HI_min"]
+        self.HI_act = 0
+        self.HI_opt = data["HI_opt"]
 
 # -----------------------------------------------------------------------
 # Method: calculate_start_growth_day
@@ -828,6 +846,7 @@ def calculate_start_growth_date(crop_type, weather, time):
             if yearly_T_avg[d] > crop_type.T_base_min:
                 crop_type.start_date = d
                 break
+
 
 
 #

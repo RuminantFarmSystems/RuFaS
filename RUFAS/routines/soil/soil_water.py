@@ -14,7 +14,7 @@ Description: This module contains the necessary functions for calculating and
 
 Soil attribute definitions
 
-    Q = daily runoff (mm H20)
+    runoff = daily runoff (mm H20)
 
     R = daily rainfall depth (mm H20)
 
@@ -24,14 +24,14 @@ Soil attribute definitions
 
     WP = amount of water in the soil profile held at wilting point (mm H20)
 
-    Perc = the amount of water percolated to the next layer (mm H20)
+    perc = the amount of water percolated to the next layer (mm H20)
 
-    Et_actual = the amount of water lost to transpiration on a give day (mm H20)
+    trans_act = the amount of water lost to transpiration on a give day (mm H20)
                 (this value is taken from the crop module)
 
 Soil values updated by calling update_all():
     soil.SW
-    soil.listOfSoilLayers
+    soil.soil_layers
 
     Soil Layer attributes updated:
         SW
@@ -48,33 +48,62 @@ def update_all(soil, weather, time):
     update_SW(soil, weather, time)
 
 
-#
-# Calculates soil water by layer
-# "pseudocode_soil" S.2.D.1/2
-#
 def update_SW(soil, weather, time):
 
-    R = weather.rainfall[time.year-1][time.day-1]
-    Q = soil.runoff
-    for x in range(0, len(soil.listOfSoilLayers)):
-        layer = soil.listOfSoilLayers[x]
-        SW = layer.currentSoilWaterMM
+    soil.trans_sum = 0.0
+    soil.evap_sum = 0.0
+    soil.ET_act = 0.0
+
+    profile_SW = 0
+    for x in range(len(soil.soil_layers)):
+        layer = soil.soil_layers[x]
+
+        SW = layer.soil_water
         WP = layer.wiltingWater
         SAT = layer.satWater
-        Perc = layer.perc
-        Esoil = layer.layerEsoil
-        Et_actual = layer.Et_actual
+
+        perc = layer.perc
+        evap = layer.evap
+        trans = layer.trans_act
+        I = soil.infiltration
 
         if x == 0:
-            SW = max(WP, SW + R - Q - Esoil - Perc - Et_actual)
-            SW = min(SAT, SW)
-
+            perc_in = I
         else:
-            Perc_prev = soil.listOfSoilLayers[x-1].perc
+            perc_in = soil.soil_layers[x - 1].perc
 
-            SW = max(WP, SW + Perc_prev - Esoil - Perc - Et_actual)
-            SW = min(SAT, SW)
+        SW = SW + perc_in - evap - perc - trans
 
-        soil.Ea_sum += Esoil + Et_actual
-        layer.currentSoilWaterMM = SW
-        soil.listOfSoilLayers[x] = layer
+        if SW < WP:
+            layer.perc -= WP - SW
+        SW = max(WP, SW)
+        if SW > SAT:
+            layer.perc += SW - SAT
+        SW = min(SAT, SW)
+
+        profile_SW += SW
+        soil.trans_sum += trans
+        soil.evap_sum += evap
+        soil.ET_act += (evap + trans)
+
+        layer.soil_water = SW
+        soil.soil_layers[x] = layer
+
+    soil.drainage = perc
+    soil.delta_SW = profile_SW - soil.profile_SW
+    soil.profile_SW = profile_SW
+
+    R = weather.rainfall[time.year - 1][time.day - 1]
+
+    soil.p_act = R
+    soil.p_calc = soil.delta_SW + soil.ET_act + soil.drainage + soil.runoff
+
+    soil.water_balance = soil.p_act - soil.p_calc
+
+    # annual variables
+    soil.drainage_annual += soil.drainage
+    soil.runoff_annual += soil.runoff
+    soil.trans_annual += soil.trans_sum
+    soil.evap_annual += soil.evap_sum
+
+    soil.p_act_annual += R

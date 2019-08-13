@@ -80,7 +80,7 @@ Soil attribute definitions
 
     NO3/NH4Conc = concentration of NO3 or NH4 for leaching (kg N / mm H2O)
 
-    NO3/NH4Perc = mass of NO3 or NH4 loss in percolation water from all soil layers
+    NO3/NH4_perc = mass of NO3 or NH4 loss in percolation water from all soil layers
                 (kg/ha)
 
     DenitrN = denitrification (kg/ha)
@@ -110,7 +110,7 @@ Soil attribute definitions
 
 Soil values updated by calling update_all():
 
-    listOfSoilLayers
+    soil_layers
 
     values updated in each soil layer:
 
@@ -164,7 +164,7 @@ def update_all(soil, weather, time):
 # "pseudocode_soil" S.4.B.1
 #
 def calc_tempFactors(soil):
-    for layer in soil.listOfSoilLayers:
+    for layer in soil.soil_layers:
         soilTemp = layer.temperature
 
         exp_part = exp(9.93 - 0.312 * soilTemp)
@@ -180,8 +180,8 @@ def calc_tempFactors(soil):
 # "pseudocode_soil" S.4.B.2
 #
 def calc_waterFactors(soil):
-    for layer in soil.listOfSoilLayers:
-        SW = layer.currentSoilWaterMM
+    for layer in soil.soil_layers:
+        SW = layer.soil_water
         FC = layer.fcWater
         WP = layer.wiltingWater
         SAT = layer.satWater
@@ -200,8 +200,8 @@ def calc_waterFactors(soil):
 # "pseudocode_soil" S.4.B
 #
 def nitrification_volatilization(soil):
-    for x in range(0, len(soil.listOfSoilLayers)):
-        layer = soil.listOfSoilLayers[x]
+    for x in range(len(soil.soil_layers)):
+        layer = soil.soil_layers[x]
 
         tempFac = layer.tempFac
 
@@ -211,7 +211,7 @@ def nitrification_volatilization(soil):
         if x == 0:
             z_mid = 5
         else:
-            z_mid = (layer.bottomDepth + soil.listOfSoilLayers[x - 1].bottomDepth) / 2
+            z_mid = (layer.bottomDepth + soil.soil_layers[x - 1].bottomDepth) / 2
 
         exp_part = exp(4.706 - 0.0305 * z_mid)
         DepthFac = 1 - (z_mid / (z_mid + exp_part))
@@ -269,7 +269,7 @@ def leaching_runoff_erosion(soil):
     # prev_NH4_perc = 0
     # prev_active_perc = 0
 
-    for layer in soil.listOfSoilLayers:
+    for layer in soil.soil_layers:
 
         #
         # N in leaching is added to the next deeper layer. These values are
@@ -284,7 +284,7 @@ def leaching_runoff_erosion(soil):
         # layer.NH4 += prev_NH4_perc
         # layer.activeN += prev_active_perc
 
-        SW = layer.currentSoilWaterMM
+        SW = layer.soil_water
         FC = layer.fcWater
         SAT = layer.satWater
 
@@ -324,10 +324,10 @@ def leaching_runoff_erosion(soil):
             # it is important for the order of operations that the pools are
             # updated after each process and that those updated values are used
             # thereafter
-            NO3Runoff = min(layer.NO3, NO3Runoff)
-            layer.NO3 -= NO3Runoff
-            NH4Runoff = min(layer.NH4, NH4Runoff)
-            layer.NH4 -= NH4Runoff
+            soil.NO3_runoff = min(layer.NO3, NO3Runoff)
+            layer.NO3 -= soil.NO3_runoff
+            soil.NH4_runoff = min(layer.NH4, NH4Runoff)
+            layer.NH4 -= soil.NH4_runoff
 
             # "pseudocode_soil" S.4.C.3
             activeNErosConc = (100 * layer.activeN) / (BD * depth)
@@ -371,23 +371,23 @@ def leaching_runoff_erosion(soil):
             Cl = 1.0
 
         # "pseudocode_soil" S.4.C.6-8
-        Perc = layer.perc
-        NO3Perc = 0
-        NH4Perc = 0
-        activePerc = 0
+        perc = layer.perc
+        NO3_perc = 0
+        NH4_perc = 0
+        active_perc = 0
 
-        if Perc > 0:
+        if perc > 0:
             # "pseudocode_soil" S.4.C.6
-            NO3PercConc = layer.NO3 / (FC + Perc)
-            NH4PercConc = layer.NH4 / (FC + Perc)
+            NO3_perc_conc = layer.NO3 / (FC + perc)
+            NH4_perc_conc = layer.NH4 / (FC + perc)
 
             # "pseudocode_soil" S.4.C.7
-            activeConc = layer.activeN / (FC + Perc) / 50
+            active_conc = layer.activeN / (FC + perc) / 50
 
             # "pseudocode_soil" S.4.C.8
-            NO3Perc = NO3PercConc * Perc / Cl
-            NH4Perc = NH4PercConc * Perc
-            activePerc = activeConc * Perc
+            NO3_perc = NO3_perc_conc * perc / Cl
+            NH4_perc = NH4_perc_conc * perc
+            active_perc = active_conc * perc
 
         #
         # N in leaching is removed from a given soil layer and added to the
@@ -397,17 +397,17 @@ def leaching_runoff_erosion(soil):
         # is no N gained through leaching in the first layer)
         #
 
-        layer.NO3Perc = min(layer.NO3, NO3Perc)
-        layer.NH4Perc = min(layer.NH4, NH4Perc)
-        layer.activePerc = min(layer.activeN, activePerc)
+        layer.NO3_perc = min(layer.NO3, NO3_perc)
+        layer.NH4_perc = min(layer.NH4, NH4_perc)
+        layer.active_perc = min(layer.activeN, active_perc)
 
-        # layer.NO3 -= NO3Perc
-        # layer.NH4 -= NH4Perc
-        # layer.activeN -= activePerc
+        # layer.NO3 -= NO3_perc
+        # layer.NH4 -= NH4_perc
+        # layer.activeN -= active_perc
         #
-        # prev_NO3_perc = NO3Perc
-        # prev_NH4_perc = NH4Perc
-        # prev_active_perc = activePerc
+        # prev_NO3_perc = NO3_perc
+        # prev_NH4_perc = NH4_perc
+        # prev_active_perc = active_perc
 
 
 #
@@ -415,17 +415,17 @@ def leaching_runoff_erosion(soil):
 # pool after the fact
 #
 def leaching_update(soil):
-    for x in range(0, len(soil.listOfSoilLayers)):
-        layer = soil.listOfSoilLayers[x]
-        layer.NO3 -= layer.NO3Perc
-        layer.NH4 -= layer.NH4Perc
-        layer.activeN -= layer.activePerc
+    for x in range(len(soil.soil_layers)):
+        layer = soil.soil_layers[x]
+        layer.NO3 -= layer.NO3_perc
+        layer.NH4 -= layer.NH4_perc
+        layer.activeN -= layer.active_perc
 
         if x != 0:
-            prev_layer = soil.listOfSoilLayers[x - 1]
-            layer.NO3 += prev_layer.NO3Perc
-            layer.NH4 += prev_layer.NH4Perc
-            layer.activeN += prev_layer.activePerc
+            prev_layer = soil.soil_layers[x - 1]
+            layer.NO3 += prev_layer.NO3_perc
+            layer.NH4 += prev_layer.NH4_perc
+            layer.activeN += prev_layer.active_perc
 
 
 #
@@ -434,10 +434,10 @@ def leaching_update(soil):
 # "pseudocode_soil" S.4.D
 #
 def denitrification(soil):
-    for layer in soil.listOfSoilLayers:
+    for layer in soil.soil_layers:
         OrgC = layer.orgC
         deNrate = 0.1
-        SW = layer.currentSoilWaterMM
+        SW = layer.soil_water
         FC = layer.fcWater
 
         tempFac = layer.tempFac
@@ -461,7 +461,7 @@ def denitrification(soil):
 def mineralization_decomp(soil):
 
     minrate = 0.0003
-    for layer in soil.listOfSoilLayers:
+    for layer in soil.soil_layers:
         activeN = layer.activeN
         tempFac = layer.tempFac
         waterFac = layer.waterFac
@@ -538,7 +538,7 @@ def mineralization_decomp(soil):
 # "pseudocode_soil" S.4.F
 #
 def humus_mineralization(soil):
-    for layer in soil.listOfSoilLayers:
+    for layer in soil.soil_layers:
         activeN = layer.activeN
         stableN = layer.stableN
         FracN = 0.02
@@ -558,5 +558,5 @@ def added_manure_N(soil, weather, time):
     activeN = totalN * 0.875
     stableN = totalN * 0.125
 
-    soil.listOfSoilLayers[0].activeN += activeN
-    soil.listOfSoilLayers[0].stableN += stableN
+    soil.soil_layers[0].activeN += activeN
+    soil.soil_layers[0].stableN += stableN
