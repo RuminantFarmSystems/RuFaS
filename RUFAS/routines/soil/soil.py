@@ -23,7 +23,7 @@ This module needs the following inputs in order to operate correctly:
         "Sand": 15,
         "Silt": 65,
         "SoilAlbedo": 0.16,
-        "residue": 0,
+        "initial_residue": 0,
         "FreshNMineralRate": 0.05,
         "SoilCoverType": "BARE",
 
@@ -147,7 +147,7 @@ This module needs the following inputs in order to operate correctly:
         crops_list
 
         And the following attributes of a crop type:
-            bioAG (aboveground biomass)
+            bio_AG (aboveground biomass)
 """
 ################################################################################
 
@@ -181,15 +181,18 @@ def daily_soil_routine(soil, crop, weather, time):
     # calculate daily transpiration
     evapotranspiration.update_all(soil, crop, weather, time)
 
+    # transpiration is defined in the crop module, but called here as a
+    # component of water balance
     transpiration.update_all(crop.crops_list['corn'], soil, time)
 
     # calculate daily percolation
     percolation.update_all(soil)
 
+    # updates daily soil water fluxes
+    soil_water.update_all(soil, weather, time)
+
     # calculate daily soil erosion
     soil_erosion.update_all(soil, crop, weather, time)
-
-    soil_water.update_all(soil, weather, time)
 
     # calculate and update the contents of 3 organic and 2 inorganic nitrogen
     # pools
@@ -204,7 +207,7 @@ class Soil:
     """
     Contains the state of the farm's soil.
     """
-    listOfSoilLayers = []
+    soil_layers = []
     fertilizerApplications = []
     manureApplications = []
     tillageOperations = []
@@ -239,17 +242,17 @@ class Soil:
 
         # create soil layers
         for layerName, layerData in data['SoilLayers'].items():
-            self.listOfSoilLayers.append(self.SoilLayer(layerName, layerData))
+            self.soil_layers.append(self.SoilLayer(layerName, layerData))
 
         # sort layers by bottomDepth
-        self.listOfSoilLayers.sort(key=lambda x: x.bottomDepth)
+        self.soil_layers.sort(key=lambda x: x.bottomDepth)
         
         # determine profile depth
-        self.profile_depth = self.listOfSoilLayers[-1].bottomDepth
+        self.profile_depth = self.soil_layers[-1].bottomDepth
         
         # calculate initial depth of each soil layer
         curr_depth = 0
-        for layer in self.listOfSoilLayers:
+        for layer in self.soil_layers:
             layer.depth = layer.bottomDepth - curr_depth
             curr_depth = layer.bottomDepth
 
@@ -269,21 +272,23 @@ class Soil:
         for uptakePApp, uptakePData in data['CropPUptake'].items():
             self.cropPUptakes.append(self.CropPUptake(uptakePApp, uptakePData))
 
-        self.calculateSoilWater()
+        self.calculateSoilWater()  # calculate soil water in layer
         self.calculateWiltingWater()  # calculate wilting water in layer
         self.calculateFcWater()  # calculate field capacity water in layer
         self.calculateSatWater()  # calculate saturation water in layer
 
-        self.prev_SW = 0.0  # TODO: Necessary for water balance testing
-        self.update_SW = False  # TODO: Temporary to turn the SW update on and off
+        self.profile_SW = 0.0
+
+        for layer in self.soil_layers:
+            self.profile_SW += layer.soil_water
 
         # daily output values
         self.evap_max = 0.0
         self.trans_max = 0.0
         self.ET_max = 0.0
-        self.profile_SW = 0.0
 
         # daily water balance
+        self.profile_SW = 0.0
         self.delta_SW = 0.0
         self.runoff = 0.0
         self.evap_sum = 0.0
@@ -310,7 +315,7 @@ class Soil:
 
         self.annual_water_balance = 0.0
 
-        self.dailyInfiltration = 0.0
+        self.infiltration = 0.0
 
         self.sedimentYield = 0.0
 
@@ -335,7 +340,7 @@ class Soil:
         # Calculate initial amount of NO3 in each soil layer;
         # Initial NO3 levels (kg/ha) in the soil are varied by depth as:
         # "pseudocode_soil" S.4.A
-        for layer in self.listOfSoilLayers:
+        for layer in self.soil_layers:
             z = layer.bottomDepth
 
             # "pseudocode_soil" S.4.A.1
@@ -372,8 +377,8 @@ class Soil:
             layer.NH4 = NH4 * unit_adjustment
             layer.topLayerFreshN = FreshN * unit_adjustment
 
-        for layer in self.listOfSoilLayers:
-            self.profile_SW += layer.currentSoilWaterMM
+        for layer in self.soil_layers:
+            self.profile_SW += layer.soil_water
 
         self.initial_annual_SW = self.profile_SW
 
@@ -403,7 +408,7 @@ class Soil:
             self.fieldCapacity = layerData['FieldCapacity']
             self.saturation = layerData['Saturation']
 
-            self.currentSoilWaterMM = 0.0  # mm water in the soil profile
+            self.soil_water = 0.0  # mm water in the soil profile
             self.depth = 0.0  # depth of soil layer
             self.fcWater = 0.0  # calculated constant
             self.satWater = 0.0  # calculated constant
@@ -414,7 +419,7 @@ class Soil:
             # Variables to calculate daily evapotranspiration
             self.top_evap = 0.0  # evaporation demand at top of layer
             self.bottom_evap = 0.0  # evaporation demand at bottom of layer
-            self.layer_evap = 0.0  # evaporation demand at layer
+            self.evap = 0.0  # evaporation demand at layer
             self.trans_act = 0.0  # actual transpiration for the layer (updated in crop)
 
             # Variables used for soil temperature
@@ -592,8 +597,8 @@ class Soil:
     # Called when soil portion of input is read.
     # ---------------------------------------------------------------------------
     def calculateSoilWater(self):
-        for layer in self.listOfSoilLayers:
-            layer.currentSoilWaterMM = layer.depth * layer.soilWaterRatio
+        for layer in self.soil_layers:
+            layer.soil_water = layer.depth * layer.soilWaterRatio
 
     # ---------------------------------------------------------------------------
     # Function: calculateFcWater
@@ -606,7 +611,7 @@ class Soil:
             Calculates the amount of water in soil profile for a given layer at
             field capacity (mm H2O). Called when soil portion of input is read.
         """
-        for layer in self.listOfSoilLayers:
+        for layer in self.soil_layers:
             layer.fcWater = layer.depth * layer.fieldCapacity
 
     # ---------------------------------------------------------------------------
@@ -620,7 +625,7 @@ class Soil:
             Calculates the amount of water in soil profile for a given layer at
             saturation (mm H2O). Called when soil portion of input is read.
         """
-        for layer in self.listOfSoilLayers:
+        for layer in self.soil_layers:
             layer.satWater = layer.depth * layer.saturation
 
     # ---------------------------------------------------------------------------
@@ -634,7 +639,7 @@ class Soil:
             Calculates the amount of water in soil profile for a given layer at
             wilting point (mm H2O). Called when soil portion of input is read.
         """
-        for layer in self.listOfSoilLayers:
+        for layer in self.soil_layers:
             layer.wiltingWater = layer.depth * layer.wiltingPoint
 
     def calculate_annual_water_balance(self):
@@ -642,7 +647,7 @@ class Soil:
         Description:
             Calculates annual water balance
         """
-        self.annual_delta_SW = self.prev_SW - self.initial_annual_SW
+        self.annual_delta_SW = self.profile_SW - self.initial_annual_SW
 
         self.p_calc_annual = self.annual_delta_SW \
             + self.runoff_annual + self.evap_annual + self.trans_annual \
@@ -667,4 +672,4 @@ class Soil:
 
         # initial annual soil water is set to soil water on the last day of the
         # previous year
-        self.initial_annual_SW = self.prev_SW
+        self.initial_annual_SW = self.profile_SW

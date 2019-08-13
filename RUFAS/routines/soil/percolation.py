@@ -8,8 +8,8 @@ Author(s): William Donovan, wmdonovan@wisc.edu
 Description: This module contains the necessary functions for calculating and
              updating water percolation on a given day. Currently the only
              function meant to be used outside of this file is the update_all()
-              function. The other functions are meant to serve as helper
-              functions within this file.
+             function. The other functions are meant to serve as helper
+             methods within this file.
 
 Soil attribute definitions
 
@@ -22,7 +22,7 @@ Soil attribute definitions
     Ksat = saturated hydraulic conductivity (mm/h)
 
 Soil values updated by calling update_all():
-    soil.listOfSoilLayers.perc
+    soil.soil_layers.perc
 """
 ###############################################################################
 
@@ -37,9 +37,6 @@ def update_all(soil):
 
     calc_daily_percolation(soil)
 
-    if soil.update_SW:
-        update_SW(soil)
-
 
 #
 # Calculates daily percolation as a function of the water available for
@@ -47,18 +44,10 @@ def update_all(soil):
 # "pseudocode_soil" S.2.C.1/2
 #
 def calc_daily_percolation(soil):
-    #
-    # The soil water in each layer is dependent on the amount percolated from
-    # the layer above. Because there are no layers above the first, prev_perc
-    # is initialized at 0 and updated with each pass of the loop. Not currently
-    # implemented.
-    #
-    perc_in = 0
-    for layer in soil.listOfSoilLayers:
-        layer.currentSoilWaterMM += perc_in
+    for layer in soil.soil_layers:
         SAT = layer.satWater
 
-        SW = layer.currentSoilWaterMM
+        SW = layer.soil_water
         FC = layer.fcWater
         WP = layer.wiltingWater
 
@@ -78,20 +67,3 @@ def calc_daily_percolation(soil):
         exp_part = exp((-t) / layer.TT)
         perc = SWperc * (1 - exp_part)
         layer.perc = min(SW - WP, perc)
-
-
-def update_SW(soil):
-    for x in range(len(soil.listOfSoilLayers)):
-        layer = soil.listOfSoilLayers[x]
-        SAT = layer.satWater
-        SW = layer.currentSoilWaterMM - layer.perc
-        if x == 0:
-            perc_in = soil.dailyInfiltration
-        else:
-            perc_in = soil.listOfSoilLayers[x - 1].perc
-        if perc_in + SW > SAT:
-            layer.perc += (SAT - SW)
-        layer.currentSoilWaterMM += perc_in
-        layer.currentSoilWaterMM -= layer.perc
-
-    soil.drainage = soil.listOfSoilLayers[-1].perc

@@ -46,7 +46,7 @@ Soil attribute definitions
 
 Soil values updated by calling update_all():
     soil.runoff
-    soil.dailyInfiltration
+    soil.infiltration
 """
 ###############################################################################
 
@@ -63,9 +63,6 @@ def update_all(soil, weather, time):
 
     calc_daily_infiltration(soil, weather, time)
 
-    if soil.update_SW:
-        update_SW(soil)
-
 
 #
 # Calculates the daily runoff (mm H20)
@@ -77,7 +74,7 @@ def calc_runoff(soil, weather, time):
 
     # modifies S if the top layer of soil is frozen
     # "pseudocode_soil" S.2.A.9
-    if soil.listOfSoilLayers[0].temperature <= 2:
+    if soil.soil_layers[0].temperature <= 2:
         Smax = calc_Smax(soil)
         exp_part = exp(-0.000862 * S)
         S = Smax * (1 - exp_part)
@@ -143,7 +140,7 @@ def calc_Smax(soil):
 # "pseudocode_soil" S.2.A.6
 #
 def calc_w1(soil, Smax, CN3, w2):
-    FC = soil.profile_depth * soil.listOfSoilLayers[0].fieldCapacity
+    FC = soil.profile_depth * soil.soil_layers[0].fieldCapacity
 
     S3 = calc_S3(CN3)
 
@@ -157,9 +154,9 @@ def calc_w1(soil, Smax, CN3, w2):
 # "pseudocode_soil" S.2.A.7
 #
 def calc_w2(soil, Smax, CN3):
-    FC = soil.profile_depth * soil.listOfSoilLayers[0].fieldCapacity
+    FC = soil.profile_depth * soil.soil_layers[0].fieldCapacity
 
-    SAT = soil.profile_depth * soil.listOfSoilLayers[0].saturation
+    SAT = soil.profile_depth * soil.soil_layers[0].saturation
 
     S3 = calc_S3(CN3)
 
@@ -183,8 +180,8 @@ def calc_S3(CN3):
 #
 def sum_SW(soil):
     SW = 0.0
-    for layer in soil.listOfSoilLayers:
-        SW += layer.currentSoilWaterMM
+    for layer in soil.soil_layers:
+        SW += layer.soil_water
     return SW
 
 
@@ -195,7 +192,7 @@ def sum_SW(soil):
 #
 def sum_WW(soil):
     WW = 0.0
-    for layer in soil.listOfSoilLayers:
+    for layer in soil.soil_layers:
         WW += layer.wiltingWater
     return WW
 
@@ -207,14 +204,4 @@ def sum_WW(soil):
 def calc_daily_infiltration(soil, weather, time):
     R = weather.rainfall[time.year-1][time.day-1]
     runoff = soil.runoff
-    soil.dailyInfiltration = R - runoff
-
-
-def update_SW(soil):
-    SAT = soil.listOfSoilLayers[0].satWater
-    SW = soil.listOfSoilLayers[0].currentSoilWaterMM
-    I = soil.dailyInfiltration
-    #     soil.runoff += soil.dailyInfiltration - I
-    # soil.dailyInfiltration = I
-
-    # soil.listOfSoilLayers[0].currentSoilWaterMM += soil.dailyInfiltration
+    soil.infiltration = R - runoff

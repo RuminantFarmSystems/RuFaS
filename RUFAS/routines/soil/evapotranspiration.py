@@ -7,7 +7,7 @@ Author(s): William Donovan, wmdonovan@wisc.edu
 
 Description: This module contains the necessary functions for calculating and
              updating water evapotranspiration on a given day by calculating:
-                1. Potential Evapotranspiration
+                1. Potential evapotranspiration
                 2. Crop transpiration
                 3. Sublimation and Soil Evaporation.
                 4. Soil Evaporation by soil layer
@@ -55,9 +55,9 @@ Soil values updated by calling update_all():
     soil.ET_max_annual
     soil.trans_max
     soil.evap_max
-    soil.listOfSoilLayers.top_evap
-    soil.listOfSoilLayers.bottom_evap
-    soil.listOfSoilLayers.layer_evap
+    soil.soil_layers.top_evap
+    soil.soil_layers.bottom_evap
+    soil.soil_layers.evap
 
 """
 ###############################################################################
@@ -76,9 +76,6 @@ def update_all(soil, crop, weather, time):
     calc_soil_evap(soil, crop)
 
     update_evap_z(soil)
-
-    if soil.update_SW:
-        update_SW(soil)
 
 
 #
@@ -157,11 +154,11 @@ def calc_soil_cov(soil, crop):
 # "pseudocode_soil" S.2.B.7-10
 #
 def update_evap_z(soil):
-    for x in range(0, len(soil.listOfSoilLayers)):
-        curr_layer = soil.listOfSoilLayers[x]
+    for x in range(len(soil.soil_layers)):
+        curr_layer = soil.soil_layers[x]
 
         FC = curr_layer.fcWater
-        SW = curr_layer.currentSoilWaterMM
+        SW = curr_layer.soil_water
         WP = curr_layer.wiltingWater
 
         #
@@ -176,7 +173,7 @@ def update_evap_z(soil):
             curr_layer.bottom_evap = soil.evap_max * (z / (z + exp_part))
 
         else:
-            curr_layer.top_evap = soil.listOfSoilLayers[x-1].bottom_evap
+            curr_layer.top_evap = soil.soil_layers[x - 1].bottom_evap
             z = curr_layer.bottomDepth
             exp_part = exp(2.374 - 0.00713 * z)
 
@@ -202,13 +199,6 @@ def update_evap_z(soil):
         # limited to 80% of plant available water (SW - WP)
         # "pseudocode_soil" S.2.B.10
         #
-        curr_layer.layer_evap = min(layer_evap, 0.8 * (SW - WP))
+        curr_layer.evap = min(layer_evap, 0.8 * (SW - WP))
 
-        soil.listOfSoilLayers[x] = curr_layer
-
-
-def update_SW(soil):
-    for layer in soil.listOfSoilLayers:
-        WP = layer.wiltingWater
-        layer.layer_evap = min(layer.currentSoilWaterMM - WP, layer.layer_evap)
-        layer.currentSoilWaterMM -= layer.layer_evap
+        soil.soil_layers[x] = curr_layer

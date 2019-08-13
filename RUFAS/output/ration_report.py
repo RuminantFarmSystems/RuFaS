@@ -52,7 +52,7 @@ class RationReport(BaseReportHandler):
         with self.get_fPath().open(mode) as csvfile:
 
             # 1) Initialize the header of the cvsfile
-            fieldnames = ['Year', 'Julian Day', 'Achieved Total Price', 'Milk Production Reduction Factor']
+            fieldnames = ['year', 'j_day', 'Achieved Total Price', 'Milk Production Reduction Factor']
             for key in self.feed_info.keys():
                 fieldnames.append(key)
             self.fieldNames = fieldnames
@@ -61,7 +61,7 @@ class RationReport(BaseReportHandler):
             writer.writeheader()
 
             # 2) Write Units in 2nd row of cvsfile
-            units = {'Year': '', 'Julian Day': '',
+            units = {'year': '', 'j_day': '',
                              'Achieved Total Price': "$", 'Milk Production Reduction Factor': ""}
             for key in self.feed_info.keys():
                 units[key] = 'kg'            
@@ -119,9 +119,9 @@ class RationReport(BaseReportHandler):
                 if (self.julianDay[i] % self.ration_interval) == 1 or self.ration_interval == 1:
             
                     rationData = {
-                            'Year':
+                            'year':
                                 str(self.cal_year[i]),
-                            'Julian Day':
+                            'j_day':
                                 str(self.julianDay[i]),
                             'Achieved Total Price':
                                 str(self.achieved_price[data_index]),

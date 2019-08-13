@@ -156,5 +156,5 @@ def calc_residue(crop_type, time, soil):
     dResidue = 0
     if crop_type.harvest_date == time.day:
         dResidue = (crop_type.bio_AG - crop_type.yield_act)
-    soil.listOfSoilLayers[0].topLayerFreshN += 0.0015 * soil.residue
+    soil.soil_layers[0].topLayerFreshN += 0.0015 * soil.residue
     soil.residue = soil.residue * (1 - soil.decayRate) + dResidue

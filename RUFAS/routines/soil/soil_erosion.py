@@ -222,7 +222,7 @@ def calc_Fcsand(soil):
 #
 def calc_Fcl_si(soil):
     silt = soil.silt
-    clay = soil.listOfSoilLayers[0].clay
+    clay = soil.soil_layers[0].clay
 
     return (silt / (clay + silt)) ** 0.3
 
@@ -233,7 +233,7 @@ def calc_Fcl_si(soil):
 # "pseudocode_soil" S.3.A.12
 #
 def calc_Forgc(soil):
-    orgC = soil.listOfSoilLayers[0].orgC
+    orgC = soil.soil_layers[0].orgC
 
     exp_part = exp(3.72 - 2.95 * orgC)
 

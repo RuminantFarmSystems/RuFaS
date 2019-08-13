@@ -148,7 +148,7 @@ def calc_N_up(crop_type):
 # Calculates the actual nitrogen uptake from soil solution in each layer.
 # Saves the list containing these values to act_N_up_each_layer attribute.
 # The order of the values in the list corresponds with the order of the layers
-# in soil.listOfSoilLayers. The soil layers in that list need to be in order
+# in soil.soil_layers. The soil layers in that list need to be in order
 # of shallowest to deepest for this to work correctly.
 # "pseudocode_crop" C.5.C.4/5/6/7
 #
@@ -165,7 +165,7 @@ def calc_act_N_up_each_layer(crop_type, soil):
     # Nitrogen uptake demand not met in overlying soil layers
     N_demand = 0
 
-    for pot_N_up, soilLayer in zip(N_up_each_layer, soil.listOfSoilLayers):
+    for pot_N_up, soilLayer in zip(N_up_each_layer, soil.soil_layers):
 
         # C.5.C.4
         act_N_up = min((pot_N_up + N_demand), soilLayer.NO3)
@@ -191,7 +191,7 @@ def calc_act_N_up_each_layer(crop_type, soil):
 #
 # Calculates the potential nitrogen uptake from soil solution in each layer.
 # Returns a list containing these values. The order of the values in the list
-# corresponds with the order of the layers in soil.listOfSoilLayers. The soil
+# corresponds with the order of the layers in soil.soil_layers. The soil
 # layers in that list need to be in order of shallowest to deepest for this
 # to work correctly.
 # "pseudocode_crop" C.5.C.2/3
@@ -200,7 +200,7 @@ def calc_N_up_each_layer(crop_type, soil):
     N_up_each_layer = []
 
     N_up_for_top_of_layer = 0
-    for layer in soil.listOfSoilLayers:
+    for layer in soil.soil_layers:
         N_up_for_bottom_of_layer = calc_N_up_z(crop_type, layer.bottomDepth)
 
         # C.5.C.3

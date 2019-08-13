@@ -110,7 +110,7 @@ Soil attribute definitions
 
 Soil values updated by calling update_all():
 
-    listOfSoilLayers
+    soil_layers
 
     values updated in each soil layer:
 
@@ -164,7 +164,7 @@ def update_all(soil, weather, time):
 # "pseudocode_soil" S.4.B.1
 #
 def calc_tempFactors(soil):
-    for layer in soil.listOfSoilLayers:
+    for layer in soil.soil_layers:
         soilTemp = layer.temperature
 
         exp_part = exp(9.93 - 0.312 * soilTemp)
@@ -180,8 +180,8 @@ def calc_tempFactors(soil):
 # "pseudocode_soil" S.4.B.2
 #
 def calc_waterFactors(soil):
-    for layer in soil.listOfSoilLayers:
-        SW = layer.currentSoilWaterMM
+    for layer in soil.soil_layers:
+        SW = layer.soil_water
         FC = layer.fcWater
         WP = layer.wiltingWater
         SAT = layer.satWater
@@ -200,8 +200,8 @@ def calc_waterFactors(soil):
 # "pseudocode_soil" S.4.B
 #
 def nitrification_volatilization(soil):
-    for x in range(0, len(soil.listOfSoilLayers)):
-        layer = soil.listOfSoilLayers[x]
+    for x in range(len(soil.soil_layers)):
+        layer = soil.soil_layers[x]
 
         tempFac = layer.tempFac
 
@@ -211,7 +211,7 @@ def nitrification_volatilization(soil):
         if x == 0:
             z_mid = 5
         else:
-            z_mid = (layer.bottomDepth + soil.listOfSoilLayers[x - 1].bottomDepth) / 2
+            z_mid = (layer.bottomDepth + soil.soil_layers[x - 1].bottomDepth) / 2
 
         exp_part = exp(4.706 - 0.0305 * z_mid)
         DepthFac = 1 - (z_mid / (z_mid + exp_part))
@@ -269,7 +269,7 @@ def leaching_runoff_erosion(soil):
     # prev_NH4_perc = 0
     # prev_active_perc = 0
 
-    for layer in soil.listOfSoilLayers:
+    for layer in soil.soil_layers:
 
         #
         # N in leaching is added to the next deeper layer. These values are
@@ -284,7 +284,7 @@ def leaching_runoff_erosion(soil):
         # layer.NH4 += prev_NH4_perc
         # layer.activeN += prev_active_perc
 
-        SW = layer.currentSoilWaterMM
+        SW = layer.soil_water
         FC = layer.fcWater
         SAT = layer.satWater
 
@@ -415,14 +415,14 @@ def leaching_runoff_erosion(soil):
 # pool after the fact
 #
 def leaching_update(soil):
-    for x in range(0, len(soil.listOfSoilLayers)):
-        layer = soil.listOfSoilLayers[x]
+    for x in range(len(soil.soil_layers)):
+        layer = soil.soil_layers[x]
         layer.NO3 -= layer.NO3_perc
         layer.NH4 -= layer.NH4_perc
         layer.activeN -= layer.active_perc
 
         if x != 0:
-            prev_layer = soil.listOfSoilLayers[x - 1]
+            prev_layer = soil.soil_layers[x - 1]
             layer.NO3 += prev_layer.NO3_perc
             layer.NH4 += prev_layer.NH4_perc
             layer.activeN += prev_layer.active_perc
@@ -434,10 +434,10 @@ def leaching_update(soil):
 # "pseudocode_soil" S.4.D
 #
 def denitrification(soil):
-    for layer in soil.listOfSoilLayers:
+    for layer in soil.soil_layers:
         OrgC = layer.orgC
         deNrate = 0.1
-        SW = layer.currentSoilWaterMM
+        SW = layer.soil_water
         FC = layer.fcWater
 
         tempFac = layer.tempFac
@@ -460,7 +460,7 @@ def denitrification(soil):
 #
 def mineralization_decomp(soil):
     minrate = 0.0003
-    for layer in soil.listOfSoilLayers:
+    for layer in soil.soil_layers:
         activeN = layer.activeN
         tempFac = layer.tempFac
         waterFac = layer.waterFac
@@ -532,7 +532,7 @@ def mineralization_decomp(soil):
 # "pseudocode_soil" S.4.F
 #
 def humus_mineralization(soil):
-    for layer in soil.listOfSoilLayers:
+    for layer in soil.soil_layers:
         activeN = layer.activeN
         stableN = layer.stableN
         FracN = 0.02
@@ -552,5 +552,5 @@ def added_manure_N(soil, weather, time):
     activeN = totalN * 0.875
     stableN = totalN * 0.125
 
-    soil.listOfSoilLayers[0].activeN += activeN
-    soil.listOfSoilLayers[0].stableN += stableN
+    soil.soil_layers[0].activeN += activeN
+    soil.soil_layers[0].stableN += stableN

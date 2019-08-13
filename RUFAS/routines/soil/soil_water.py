@@ -31,7 +31,7 @@ Soil attribute definitions
 
 Soil values updated by calling update_all():
     soil.SW
-    soil.listOfSoilLayers
+    soil.soil_layers
 
     Soil Layer attributes updated:
         SW
@@ -45,113 +45,65 @@ Soil values updated by calling update_all():
 #
 def update_all(soil, weather, time):
 
-    if soil.update_SW:
-        daily_water_balance(soil, weather, time)
-    else:
-        update_SW(soil, weather, time)
+    update_SW(soil, weather, time)
 
 
-#
-# Calculates soil water by layer
-# "pseudocode_soil" S.2.D.1/2
-#
 def update_SW(soil, weather, time):
 
-    prev_SW = 0
-    ET_act = 0
-    soil.evap_sum = 0
-    soil.trans_sum = 0
+    soil.trans_sum = 0.0
+    soil.evap_sum = 0.0
+    soil.ET_act = 0.0
 
-    R = weather.rainfall[time.year-1][time.day-1]
-    runoff = soil.runoff
-    for x in range(0, len(soil.listOfSoilLayers)):
-        layer = soil.listOfSoilLayers[x]
-        SW = layer.currentSoilWaterMM
+    profile_SW = 0
+    for x in range(len(soil.soil_layers)):
+        layer = soil.soil_layers[x]
+
+        SW = layer.soil_water
         WP = layer.wiltingWater
         SAT = layer.satWater
+
         perc = layer.perc
-        evap = layer.layer_evap
+        evap = layer.evap
         trans = layer.trans_act
-        I = soil.dailyInfiltration
+        I = soil.infiltration
 
         if x == 0:
-            SW = SW + I - evap - perc - trans
-            if SW < WP:
-                layer.perc -= WP - SW
-            SW = max(WP, SW)
-            if SW > SAT:
-                layer.perc += SW - SAT
-            SW = min(SAT, SW)
-
+            perc_in = I
         else:
-            perc_prev = soil.listOfSoilLayers[x-1].perc
-            SW = SW + perc_prev - evap - perc - trans
-            if SW < WP:
-                layer.perc -= WP - SW
-            SW = max(WP, SW)
-            if SW > SAT:
-                layer.perc += SW - SAT
-            SW = min(SAT, SW)
+            perc_in = soil.soil_layers[x - 1].perc
 
-        soil.delta_SW += (SW - layer.currentSoilWaterMM)
+        SW = SW + perc_in - evap - perc - trans
 
-        layer.currentSoilWaterMM = SW
-        soil.listOfSoilLayers[x] = layer
+        if SW < WP:
+            layer.perc -= WP - SW
+        SW = max(WP, SW)
+        if SW > SAT:
+            layer.perc += SW - SAT
+        SW = min(SAT, SW)
 
-        prev_SW += SW
-
-        ET_act += (evap + trans)
-        soil.evap_sum += evap
+        profile_SW += SW
         soil.trans_sum += trans
+        soil.evap_sum += evap
+        soil.ET_act += (evap + trans)
 
-    soil.ET_act = ET_act
-    soil.prev_SW = prev_SW
-    soil.drainage = soil.listOfSoilLayers[-1].perc
+        layer.soil_water = SW
+        soil.soil_layers[x] = layer
+
+    soil.drainage = perc
+    soil.delta_SW = profile_SW - soil.profile_SW
+    soil.profile_SW = profile_SW
+
+    R = weather.rainfall[time.year - 1][time.day - 1]
 
     soil.p_act = R
-    soil.p_calc = soil.delta_SW + soil.ET_act + runoff + soil.drainage
+    soil.p_calc = soil.delta_SW + soil.ET_act + soil.drainage + soil.runoff
+
     soil.water_balance = soil.p_act - soil.p_calc
 
+    # annual variables
     soil.drainage_annual += soil.drainage
-    soil.runoff_annual += runoff
-    soil.p_act_annual += R
-
+    soil.runoff_annual += soil.runoff
     soil.trans_annual += soil.trans_sum
     soil.evap_annual += soil.evap_sum
 
-
-def daily_water_balance(soil, weather, time):
-    R = weather.rainfall[time.year - 1][time.day - 1]
-    D = soil.drainage
-    runoff = soil.runoff
-    soil.evap_sum = 0
-    soil.trans_sum = 0
-    for layer in soil.listOfSoilLayers:
-        soil.evap_sum += layer.layer_evap
-        soil.trans_sum += layer.trans_act
-    evap = soil.evap_sum
-    trans = soil.trans_sum
-    SW = sum_SW(soil)
-    prev_SW = soil.prev_SW
-
-    d_SW = SW - prev_SW
-
-    soil.p_act = R
-    soil.p_calc = d_SW + evap + trans + runoff + D
-    soil.water_balance = soil.p_act - soil.p_calc
-
-    # annual values
-    soil.drainage_annual += soil.drainage
-    soil.runoff_annual += runoff
     soil.p_act_annual += R
-    soil.evap_annual += evap
-    soil.trans_annual += trans
-
-    soil.prev_SW = SW
-
-
-def sum_SW(soil):
-    SW = 0.0
-    for layer in soil.listOfSoilLayers:
-        SW += layer.currentSoilWaterMM
-    return SW

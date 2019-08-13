@@ -63,7 +63,7 @@ This module needs the following inputs in order to operate correctly:
         T_avg
 
     From the soil class, the following will be needed:
-        listOfSoilLayers
+        soil_layers
 
         And the following attributes of a soil layer:
             bottomDepth
@@ -71,7 +71,7 @@ This module needs the following inputs in order to operate correctly:
             trans_max
             NO3
             labileP
-            currentSoilWaterMM
+            soil_water
             fcWater
             wiltingWater
 """

@@ -147,7 +147,7 @@ def calc_P_up(crop_type):
 # Calculates the actual phosphorus uptake from soil solution in each layer.
 # Saves the list containing these values to act_P_up_each_layer attribute.
 # The order of the values in the list corresponds with the order of the layers
-# in soil.listOfSoilLayers. The soil layers in that list need to be in order
+# in soil.soil_layers. The soil layers in that list need to be in order
 # of shallowest to deepest for this to work correctly.
 # "pseudocode_crop" C.6.C.4-7
 #
@@ -164,7 +164,7 @@ def calc_act_P_up_each_layer(crop_type, soil):
     # Phosphorus uptake demand not met in overlying soil layers
     P_demand = 0
 
-    for pot_P_up, soilLayer in zip(P_up_each_layer, soil.listOfSoilLayers):
+    for pot_P_up, soilLayer in zip(P_up_each_layer, soil.soil_layers):
         # C.6.C.4
         act_P_up = min((pot_P_up + P_demand), soilLayer.labileP)
         # C.6.C.7
@@ -185,7 +185,7 @@ def calc_act_P_up_each_layer(crop_type, soil):
 #
 # Calculates the potential phosphorus uptake from soil solution in each layer.
 # Returns a list containing these values. The order of the values in the list
-# corresponds with the order of the layers in soil.listOfSoilLayers. The soil
+# corresponds with the order of the layers in soil.soil_layers. The soil
 # layers in that list need to be in order of shallowest to deepest for this
 # to work correctly.
 # "pseudocode_crop" C.6.C.3
@@ -193,7 +193,7 @@ def calc_act_P_up_each_layer(crop_type, soil):
 def calc_P_up_each_layer(crop_type, soil):
     P_up_each_layer = []
     P_up_for_top_of_layer = 0
-    for layer in soil.listOfSoilLayers:
+    for layer in soil.soil_layers:
         P_up_for_bottom_of_layer = calc_P_up_z(crop_type, layer.bottomDepth)
         P_up_ly = P_up_for_bottom_of_layer - P_up_for_top_of_layer
 
