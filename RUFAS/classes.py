@@ -52,7 +52,9 @@ class State:
     def annual_reset(self):
         """Annual Reset"""
 
+        # calculates water balance for the year before resetting necessary vals
         self.soil.annual_reset()
+
         self.animal.annual_reset()
         self.feed.annual_reset()
 
@@ -223,6 +225,7 @@ class Config:
             self.years.append(days)
 
         self.output_dir = data['output_dir']
+        self.diagnostic_dir = data['diagnostic_dir']
 
 
 # -------------------------------------------------------------------------------

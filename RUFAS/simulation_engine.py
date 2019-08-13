@@ -17,9 +17,9 @@ from RUFAS.classes import Config, State, Weather, Time
 from RUFAS.output import OutputHandler
 
 
-#-------------------------------------------------------------------------------
+# -------------------------------------------------------------------------------
 # Function: simulate
-#-------------------------------------------------------------------------------
+# -------------------------------------------------------------------------------
 def simulate(input_fPath:Path):
     """Executes the simulation with the json file specified.
 
@@ -49,6 +49,7 @@ def simulate(input_fPath:Path):
     # Transfer needed (initial) data from state to report handlers
     #
     output.initialize_output_dir(config.output_dir)
+    output.initialize_diagnostic_dir(config.diagnostic_dir)
     output.initialize_reports(state)
 
     print("\nSimulating: {}".format(input_fPath.name))
@@ -62,15 +63,16 @@ def simulate(input_fPath:Path):
     while not time.end_simulation():
         annual_simulation()
 
+    output.produce_data_analysis()
     t_end_sim = timer.time()
 
     print("Simulation Successful: {}".format(input_fPath.name))
     print("Total Run Time: {} seconds\n".format(str(t_end_sim - t_start_sim)))
 
 
-#-------------------------------------------------------------------------------
+# -------------------------------------------------------------------------------
 # Function: daily_simulation
-#-------------------------------------------------------------------------------
+# -------------------------------------------------------------------------------
 def daily_simulation():
     """Executes the daily simulation routines."""
 
@@ -90,9 +92,9 @@ def daily_simulation():
     time.advance()
 
 
-#-------------------------------------------------------------------------------
+# -------------------------------------------------------------------------------
 # Function: annual_simulation
-#-------------------------------------------------------------------------------
+# -------------------------------------------------------------------------------
 def annual_simulation():
     """Executes the annual simulation routines.
 
@@ -112,9 +114,9 @@ def annual_simulation():
     #
     # Post-Annual Routines
     #
-    output.annual_update(state, weather, time)
-    output.write_annual_reports(time.year)
-    output.annual_flush()
+    output.annual_updates(state, weather, time)
+    output.write_annual_reports()
+    output.annual_flushes()
     state.annual_reset()
     time.advance()
 

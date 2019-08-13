@@ -3,7 +3,8 @@
     {
         "StartDate" : "2009:244",
         "EndDate" : "2016:243",
-        "output_dir": "Outputs/Sample_Farm_Outputs/"
+        "output_dir": "Outputs/Sample_Farm_Outputs/",
+        "diagnostic_dir": "Outputs/diagnostics/"
     },
 
     "weather": "Inputs/barnyard_weather.csv",
@@ -13,26 +14,52 @@
         "soil_summary":
         {
             "active": true,
+            "produce_diagnostics": true,
+            "show_daily": false,
             "report_name": "Soil Summary",
             "file_name": "soil_summary.csv"
         },
         "ration_report":
         {
             "active": true,
+            "produce_diagnostics": true,
+            "show_daily": false,
             "report_name": "Ration Report",
-            "file_name": "ration_report.csv"
+            "file_name": "ration_report.csv",
+            "ration_interval": 7
         },
         "soil_nitrogen":
         {
             "active": true,
+            "produce_diagnostics": true,
+            "show_daily": false,
             "report_name": "Soil Nitrogen",
             "file_name": "soil_nitrogen.csv"
         },
-        "crop_report":
+        "soil_phosphorus":
         {
             "active": true,
-            "report_name": "Crop Report",
+            "produce_diagnostics": false,
+            "show_daily": false,
+            "report_name": "Soil Phosphorus",
+            "file_name": "soil_phosphorus.csv"
+        },
+        "crop_summary":
+        {
+            "active": true,
+            "produce_diagnostics": true,
+            "show_daily": false,
+            "report_name": "Crop Summary",
             "file_name": "crop_summary.csv"
+        },
+        "water_balance":
+        {
+            "active": true,
+            "produce_diagnostics": true,
+            "show_daily": false,
+            "show_annual": false,
+            "report_name": "Water Balance",
+            "file_name": "water_balance.csv"
         }
     },
 
@@ -65,15 +92,13 @@
         },
         "soil":
         {
-            "ProfileDepth": 450,
             "ProfileBulkDensity": 1.4,
-            "CN2": 85.00,
+            "CN2": 73.00,
             "FieldSlope": 0.02,
             "SlopeLength": 3,
             "Manning": 0.4,
             "FieldSize": 1.0,
             "PracticeFactor": 0.08,
-            "Orgc": 1.2,
             "Sand": 15,
             "Silt": 65,
             "SoilAlbedo": 0.16,
@@ -101,7 +126,7 @@
                     "ActiveMineralRate": 0.0003,
                     "VolatileExchangeFac": 0.15,
                     "DenitrificationRate": 0.05,
-                    "StartingSoilWater": 45,
+                    "SoilWaterRatio": 0.3,
                     "OM%": 1.9
                 },
                 "Layer2":
@@ -122,7 +147,7 @@
                     "ActiveMineralRate": 0.0003,
                     "VolatileExchangeFac": 0.15,
                     "DenitrificationRate": 0.05,
-                    "StartingSoilWater": 45,
+                    "SoilWaterRatio": 0.3,
                     "OM%": 1.9
                 },
                 "Layer3":
@@ -143,7 +168,7 @@
                     "ActiveMineralRate": 0.0003,
                     "VolatileExchangeFac": 0.15,
                     "DenitrificationRate": 0.05,
-                    "StartingSoilWater": 45,
+                    "SoilWaterRatio": 0.3,
                     "OM%": 1.9
                 }
             },

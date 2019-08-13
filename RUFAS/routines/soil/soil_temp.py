@@ -63,7 +63,7 @@ Soil attribute definitions
 
 Soil values updated by calling update_all():
     Tsurf
-    listOfSoilLayers.temperature
+    soil_layers.temperature
 """
 ###############################################################################
 
@@ -90,16 +90,16 @@ def calc_Tsoil(soil, weather, time):
     # Taair = weather.T_avg_annual[time.year-1]
     Taair = 8.18  # TODO: spreadsheet model fix. Note in pseudocode
     dd = calc_dd(soil)
-    for x in range(0, len(soil.listOfSoilLayers)):
+    for x in range(len(soil.soil_layers)):
 
         if x == 0:
-            z = soil.listOfSoilLayers[x].bottomDepth / 2
+            z = soil.soil_layers[x].bottomDepth / 2
         else:
-            z = (soil.listOfSoilLayers[x].bottomDepth +
-                 soil.listOfSoilLayers[x - 1].bottomDepth) / 2
+            z = (soil.soil_layers[x].bottomDepth +
+                 soil.soil_layers[x - 1].bottomDepth) / 2
 
         # soil temperature (C) at depth z (mm) on previous day
-        Tsoil_prev_day = soil.listOfSoilLayers[x].temperature
+        Tsoil_prev_day = soil.soil_layers[x].temperature
 
         # "pseudocode_soil" S.1.A.3
         zd = z / dd
@@ -111,7 +111,7 @@ def calc_Tsoil(soil, weather, time):
         # "pseudocode_soil" S.1.A.1
         Tsoil = (L * Tsoil_prev_day) + (1 - L) * \
                 (df * (Taair - soil.Tsurf) + soil.Tsurf)
-        soil.listOfSoilLayers[x].temperature = Tsoil
+        soil.soil_layers[x].temperature = Tsoil
 
 
 #
@@ -135,7 +135,7 @@ def calc_dd(soil):
 #
 def calc_scale(soil):
     SW = sum_soil_water(soil)
-    Ztot = soil.profileDepth
+    Ztot = soil.profile_depth
     bd = soil.profileBulkDensity
 
     return SW / ((0.356 - 0.144 * bd) * Ztot)
@@ -157,8 +157,8 @@ def calc_ddmax(soil):
 def sum_soil_water(soil):
     total_soil_water = 0.0
 
-    for soilLayer in soil.listOfSoilLayers:
-        total_soil_water += soilLayer.currentSoilWaterMM
+    for layer in soil.soil_layers:
+        total_soil_water += layer.soil_water
 
     return total_soil_water
 
@@ -172,7 +172,7 @@ def calc_Tsurf(soil, crop, weather, time):
     Tbare = calc_Tbare(soil, crop, weather, time)
     bcv = calc_bcv(crop, time)
 
-    soil.Tsurf = (bcv * soil.listOfSoilLayers[0].temperature) + ((1 - bcv) * Tbare)
+    soil.Tsurf = (bcv * soil.soil_layers[0].temperature) + ((1 - bcv) * Tbare)
 
 
 #

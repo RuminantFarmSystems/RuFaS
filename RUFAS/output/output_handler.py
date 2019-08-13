@@ -6,7 +6,7 @@ Description: Contains the definition of the OutputHandler object
 Author(s): Kass Chupongstimun, kass_c@hotmail.com
 """
 ################################################################################
-
+import shutil
 from pathlib import Path
 
 from RUFAS import util
@@ -19,12 +19,15 @@ from RUFAS.output.soil_summary import SoilSummary
 from RUFAS.output.soil_nitrogen import SoilNitrogen
 from RUFAS.output.ration_report import RationReport
 from RUFAS.output.crop_summary import CropSummary
+from RUFAS.output.water_balance import WaterBalance
 from RUFAS.output.soil_phosphorus import SoilPhosphorus
 
 
-#-------------------------------------------------------------------------------
+# -------------------------------------------------------------------------------
 # Class: OutputHandler
-#-------------------------------------------------------------------------------
+# -------------------------------------------------------------------------------
+
+
 class OutputHandler():
     """Handles all output related interactions.
 
@@ -59,16 +62,18 @@ class OutputHandler():
                         'soil_nitrogen': SoilNitrogen(data['soil_nitrogen']),
                         #'soil_phosphorus': SoilPhosphorus(data['soil_phosphorus']),
                         'ration_report': RationReport(data['ration_report']),
-                        'crop_report': CropSummary(data['crop_report'])
+                        'crop_summary': CropSummary(data['crop_summary']),
+                        'water_balance': WaterBalance(data['water_balance'])
                         }
+        self.final = False
 
-    #---------------------------------------------------------------------------
+    # ---------------------------------------------------------------------------
     # Method: initialize_output_dir
-    #---------------------------------------------------------------------------
+    # ---------------------------------------------------------------------------
     def initialize_output_dir(self, output_dir):
         """
-        If a directory of the same name exists, it and its contents is deleted,
-        then creates the directory for all output report files as specified.
+        If a directory of the same name exists, it and its contents are deleted,
+        then a directory for each output report is created.
         Sets output file path for all reports through the class attribute of the
         BaseReportHandler class.
 
@@ -89,9 +94,25 @@ class OutputHandler():
         output_dir.mkdir(exist_ok=True, parents=False)
         BaseReportHandler.set_dir(output_dir)
 
-    #---------------------------------------------------------------------------
+    def initialize_diagnostic_dir(self, diagnostic_dir):
+        diagnostic_dir = util.get_base_dir() / diagnostic_dir
+
+        if diagnostic_dir.exists():
+            for file in diagnostic_dir.iterdir():
+                shutil.rmtree(file)
+            diagnostic_dir.rmdir()
+
+        diagnostic_dir.mkdir(exist_ok=True, parents=False)
+
+        for reportName in self.reports:
+            report = self.reports[reportName]
+            if report.produce_diagnostics:
+                report_dir = util.get_base_dir() / diagnostic_dir / reportName
+                report_dir.mkdir(exist_ok=True, parents=False)
+
+    # ---------------------------------------------------------------------------
     # Method: initialize_reports
-    #---------------------------------------------------------------------------
+    # ---------------------------------------------------------------------------
     def initialize_reports(self, state):
         """Transfer needed (initial) data from state to report handlers."""
 
@@ -100,9 +121,9 @@ class OutputHandler():
             if report.active:
                 report.initialize(state)
 
-    #---------------------------------------------------------------------------
+    # ---------------------------------------------------------------------------
     # Method: daily_update
-    #---------------------------------------------------------------------------
+    # ---------------------------------------------------------------------------
     def daily_update(self, state, weather, time):
         """Updates the report handler with new daily values."""
 
@@ -111,10 +132,10 @@ class OutputHandler():
             if report.active:
                 report.daily_update(state, weather, time)
 
-    #---------------------------------------------------------------------------
+    # ---------------------------------------------------------------------------
     # Method: annual_update
-    #---------------------------------------------------------------------------
-    def annual_update(self, state, weather, time):
+    # ---------------------------------------------------------------------------
+    def annual_updates(self, state, weather, time):
         """Updates the report handler with anuual output values."""
 
         for reportName in self.reports:
@@ -122,24 +143,35 @@ class OutputHandler():
             if report.active:
                 report.annual_update(state, weather, time)
 
-    #---------------------------------------------------------------------------
+    # ---------------------------------------------------------------------------
     # Method: write_annual_reports
-    #---------------------------------------------------------------------------
-    def write_annual_reports(self, y):
+    # ---------------------------------------------------------------------------
+    def write_annual_reports(self):
         """Prints the annual report to file for all reports."""
 
         for reportName in self.reports:
             report = self.reports[reportName]
             if report.active:
-                report.write_annual_report(y)
+                report.write_annual_report()
 
-    #---------------------------------------------------------------------------
+    # ---------------------------------------------------------------------------
     # Method: annual_flush
-    #---------------------------------------------------------------------------s
-    def annual_flush(self):
+    # ---------------------------------------------------------------------------s
+    def annual_flushes(self):
         """Sets all of the reports in the output object to the default."""
 
         for reportName in self.reports:
             report = self.reports[reportName]
             if report.active:
                 report.annual_flush()
+
+    def produce_data_analysis(self):
+        counter = 0
+        for reportName in self.reports:
+            report = self.reports[reportName]
+
+            # if report.produce_diagnostics:
+            if counter == len(self.reports) - 1:
+                self.final = True
+            report.produce_data_analysis(self.final)
+            counter += 1

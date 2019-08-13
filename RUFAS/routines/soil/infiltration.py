@@ -13,7 +13,7 @@ Description: This module contains the necessary functions for calculating and
 
 Soil attribute definitions
 
-    Q = daily runoff (mm H20)
+    runoff = daily runoff (mm H20)
 
     R = daily rainfall depth (mm H20)
 
@@ -46,7 +46,7 @@ Soil attribute definitions
 
 Soil values updated by calling update_all():
     soil.runoff
-    soil.dailyInfiltration
+    soil.infiltration
 """
 ###############################################################################
 
@@ -59,31 +59,31 @@ from math import exp, log
 #
 def update_all(soil, weather, time):
 
-    calc_Q(soil, weather, time)
+    calc_runoff(soil, weather, time)
 
     calc_daily_infiltration(soil, weather, time)
 
 
 #
-# Calculates the daily runoff Q (mm H20)
+# Calculates the daily runoff (mm H20)
 # "pseudocode_soil" S.2.A.1
 #
-def calc_Q(soil, weather, time):
+def calc_runoff(soil, weather, time):
     R = weather.rainfall[time.year-1][time.day-1]
     S = calc_S(soil)
 
     # modifies S if the top layer of soil is frozen
     # "pseudocode_soil" S.2.A.9
-    if soil.listOfSoilLayers[0].temperature <= 2:
+    if soil.soil_layers[0].temperature <= 2:
         Smax = calc_Smax(soil)
         exp_part = exp(-0.000862 * S)
         S = Smax * (1 - exp_part)
 
-    Q = 0.0
+    runoff = 0.0
     if R > 0.2 * S:
-        Q = ((R - 0.2 * S) ** 2) / (R + 0.8 * S)
+        runoff = ((R - 0.2 * S) ** 2) / (R + 0.8 * S)
 
-    soil.runoff = Q
+    soil.runoff = runoff
 
 
 #
@@ -140,7 +140,7 @@ def calc_Smax(soil):
 # "pseudocode_soil" S.2.A.6
 #
 def calc_w1(soil, Smax, CN3, w2):
-    FC = soil.profileDepth * soil.listOfSoilLayers[0].fieldCapacity
+    FC = soil.profile_depth * soil.soil_layers[0].fieldCapacity
 
     S3 = calc_S3(CN3)
 
@@ -154,16 +154,16 @@ def calc_w1(soil, Smax, CN3, w2):
 # "pseudocode_soil" S.2.A.7
 #
 def calc_w2(soil, Smax, CN3):
-    FC = soil.profileDepth * soil.listOfSoilLayers[0].fieldCapacity
+    FC = soil.profile_depth * soil.soil_layers[0].fieldCapacity
 
-    SAT = soil.profileDepth * soil.listOfSoilLayers[0].saturation
+    SAT = soil.profile_depth * soil.soil_layers[0].saturation
 
     S3 = calc_S3(CN3)
 
-    l1 = log(FC / (1 - S3 * (1 / Smax)) - FC)
-    l2 = log(SAT / (1 - 2.54 * (1 / Smax)) - SAT)
+    L1 = log(FC / (1 - S3 * (1 / Smax)) - FC)
+    L2 = log(SAT / (1 - 2.54 * (1 / Smax)) - SAT)
 
-    return (l1 - l2) / (SAT - FC)
+    return (L1 - L2) / (SAT - FC)
 
 
 #
@@ -180,8 +180,8 @@ def calc_S3(CN3):
 #
 def sum_SW(soil):
     SW = 0.0
-    for layer in soil.listOfSoilLayers:
-        SW += layer.currentSoilWaterMM
+    for layer in soil.soil_layers:
+        SW += layer.soil_water
     return SW
 
 
@@ -192,7 +192,7 @@ def sum_SW(soil):
 #
 def sum_WW(soil):
     WW = 0.0
-    for layer in soil.listOfSoilLayers:
+    for layer in soil.soil_layers:
         WW += layer.wiltingWater
     return WW
 
@@ -203,5 +203,5 @@ def sum_WW(soil):
 #
 def calc_daily_infiltration(soil, weather, time):
     R = weather.rainfall[time.year-1][time.day-1]
-    Q = soil.runoff
-    soil.dailyInfiltration = R - Q
+    runoff = soil.runoff
+    soil.infiltration = R - runoff
