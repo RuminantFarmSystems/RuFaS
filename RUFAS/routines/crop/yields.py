@@ -100,7 +100,7 @@ def calc_HI_max(crop_type):
 # "pseudocode_crop" C.10.C.1
 #
 def calc_bio_AG(crop_type):
-    crop_type.bio_AG = (1 - crop_type.fr_root) * crop_type.biomass_act
+    crop_type.bio_AG = (1 - crop_type.fr_root) * crop_type.biomass_actual
 
 
 #

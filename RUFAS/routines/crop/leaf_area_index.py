@@ -41,7 +41,7 @@ CropType values updated by update_all():
 
     prev_fr_LAI_max
     fr_LAI_max
-    LAI_act
+    LAI_actual
     prev_LAI_act
 """
 ###############################################################################
@@ -97,7 +97,7 @@ def calc_fr_LAI_max(crop_type, time, L1, L2):
 
 
 #
-# This function calculates LAI_act.
+# This function calculates LAI_actual.
 # "pseudocode_crop" section C.8.A.4/6
 #
 def calculate_LAI_actual(crop_type, time):
@@ -114,16 +114,16 @@ def calculate_LAI_actual(crop_type, time):
 
         if crop_type.fr_PHU < crop_type.fr_PHU_sen:
             # C.8.A.6
-            crop_type.LAI_act = prev_LAI_actual + dLAI_act
+            crop_type.LAI_actual = prev_LAI_actual + dLAI_act
 
         else:
             # C.8.A.6
-            LAI_act = crop_type.LAI_max * (1 - crop_type.fr_PHU) / (1 - crop_type.fr_PHU_sen)
-            crop_type.LAI_act = max(LAI_act, 0)
+            LAI_actual = crop_type.LAI_max * (1 - crop_type.fr_PHU) / (1 - crop_type.fr_PHU_sen)
+            crop_type.LAI_actual = max(LAI_actual, 0)
 
 
 #
-# This function calculates dLAI_act for use in calculating dLAI_max and LAI_act
+# This function calculates dLAI_act for use in calculating dLAI_max and LAI_actual
 # on a given day. The equations for calculating dLAI_act can be found in
 # "pseudocode_crop" C.8.A.5
 #

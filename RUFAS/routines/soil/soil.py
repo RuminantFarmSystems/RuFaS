@@ -183,7 +183,7 @@ def daily_soil_routine(soil, crop, weather, time):
 
     # transpiration is defined in the crop module, but called here as a
     # component of water balance
-    transpiration.update_all(crop.crops_list['corn'], soil, time)
+    transpiration.update_all(crop.current_crop, soil, time)
 
     # calculate daily percolation
     percolation.update_all(soil)
@@ -241,8 +241,8 @@ class Soil:
         self.Tsurf = data['SoilLayers']['Layer1']['InitialTemperature']
 
         # create soil layers
-        for layerName, layerData in data['SoilLayers'].items():
-            self.soil_layers.append(self.SoilLayer(layerName, layerData))
+        for layer_name, layer_data in data['SoilLayers'].items():
+            self.soil_layers.append(self.SoilLayer(layer_name, layer_data))
 
         # sort layers by bottomDepth
         self.soil_layers.sort(key=lambda x: x.bottomDepth)
@@ -391,22 +391,22 @@ class Soil:
         An instance of this class represents a layer in the soil.
         """
 
-        def __init__(self, layerName, layerData):
+        def __init__(self, layer_name, layer_data):
             """
             Description:
                 Populates the characteristic values of a soil layer.
 
             Args:
-                layerName: a string which is the name of this layer
-                layerData: a dictionary which stores the information for this layer
+                layer_name: a string which is the name of this layer
+                layer_data: a dictionary which stores the information for this layer
             """
-            self.name = layerName
+            self.name = layer_name
 
-            self.bottomDepth = layerData['BottomDepth']
-            self.soilWaterRatio = layerData['SoilWaterRatio']
-            self.wiltingPoint = layerData['WiltingPoint']
-            self.fieldCapacity = layerData['FieldCapacity']
-            self.saturation = layerData['Saturation']
+            self.bottomDepth = layer_data['BottomDepth']
+            self.soilWaterRatio = layer_data['SoilWaterRatio']
+            self.wiltingPoint = layer_data['WiltingPoint']
+            self.fieldCapacity = layer_data['FieldCapacity']
+            self.saturation = layer_data['Saturation']
 
             self.soil_water = 0.0  # mm water in the soil profile
             self.depth = 0.0  # depth of soil layer
@@ -414,7 +414,7 @@ class Soil:
             self.satWater = 0.0  # calculated constant
             self.wiltingWater = 0.0  # calculated constant
 
-            self.bulkDensity = layerData['BulkDensity']
+            self.bulkDensity = layer_data['BulkDensity']
 
             # Variables to calculate daily evapotranspiration
             self.top_evap = 0.0  # evaporation demand at top of layer
@@ -423,22 +423,22 @@ class Soil:
             self.trans_act = 0.0  # actual transpiration for the layer (updated in crop)
 
             # Variables used for soil temperature
-            self.temperature = layerData['InitialTemperature']
+            self.temperature = layer_data['InitialTemperature']
 
             # Variables to calculate dailyPercolation
-            self.ksat = layerData['Ksat']  # saturated hydraulic conductivity (mm/h)
+            self.ksat = layer_data['Ksat']  # saturated hydraulic conductivity (mm/h)
             self.TT = 0.0
             self.perc = 0.0  # amount of water that percolates to next layer
 
-            self.labileP = layerData['LabileP']  # labile P in soil layer
-            self.clay = layerData['Clay']  # soil clay % in soil layer
+            self.labileP = layer_data['LabileP']  # labile P in soil layer
+            self.clay = layer_data['Clay']  # soil clay % in soil layer
 
             # Variable to simulate nitrogen Cycling
-            self.orgC = layerData['OrgC%']
-            self.activeMineralRate = layerData['ActiveMineralRate']
-            self.cationExclusionFraction = layerData['CationExclusionFraction']
-            self.denitrificationRate = layerData['DenitrificationRate']
-            self.NH4 = layerData['NH4']
+            self.orgC = layer_data['OrgC%']
+            self.activeMineralRate = layer_data['ActiveMineralRate']
+            self.cationExclusionFraction = layer_data['CationExclusionFraction']
+            self.denitrificationRate = layer_data['DenitrificationRate']
+            self.NH4 = layer_data['NH4']
 
             self.tempFac = 0.0
             self.waterFac = 0.0
@@ -465,11 +465,11 @@ class Soil:
             self.nTrans = 0.0
             self.totNitriVolatil = 0.0
 
-            self.fracActiveN = layerData['FracActiveN']
-            self.volatileExchangeFactor = layerData['VolatileExchangeFac']
+            self.fracActiveN = layer_data['FracActiveN']
+            self.volatileExchangeFactor = layer_data['VolatileExchangeFac']
 
             # Variables to simulate phosphorus cycling
-            self.OMpercent = layerData['OM%']
+            self.OMpercent = layer_data['OM%']
             self.soilOC = 0.0
             self.psp = 0.0
 

@@ -64,6 +64,7 @@ Soil values updated by calling update_all():
 
 from math import exp
 
+
 #
 # This function calls all the necessary functions to update information related
 # to evapotranspiration
@@ -96,7 +97,8 @@ def calc_potential_evap(soil, crop, weather, time):
     soil.ET_max = max(0.001, ET_max)
 
     if crop.current_crop.start_date <= time.day <= crop.current_crop.harvest_date:
-        soil.E0_sum += soil.E0
+        soil.ET_max_annual += soil.ET_max
+
 
 #
 # Calculates LHV (latent heat of vaporization (MJ kg^-1)) for use in

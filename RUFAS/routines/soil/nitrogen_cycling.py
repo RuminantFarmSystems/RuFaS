@@ -528,7 +528,7 @@ def mineralization_decomp(soil):
             layer.NH4 += (0.8 * FreshMin)
 
     # "pseudocode_soil" S.4.E.7/8
-    soil.listOfSoilLayers[0].topLayerFreshN += 0.0015 * soil.residue
+    soil.soil_layers[0].topLayerFreshN += 0.0015 * soil.residue
     soil.residue = soil.residue * (1 - soil.decayRate)
 
 

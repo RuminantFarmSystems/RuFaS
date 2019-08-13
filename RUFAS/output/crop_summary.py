@@ -42,13 +42,13 @@ class CropSummary(BaseReportHandler):
         #
         self.variables = {'year': ['time.cal_year', '', []],
                           'j_day': ['time.day', '', []],
-                          'fr_PHU': ['cropType.fr_PHU', '%', []],
-                          'biomass': ['cropType.biomass_act', 'kg ha^-1', []],
-                          'LAI_act': ['cropType.LAI_act', 'm^2/m^2', []],
-                          'Bio_N': ['cropType.bio_N', 'kg N ha^-1', []],
-                          'Bio_P': ['cropType.bio_P', 'kg P ha^-1', []],
-                          'z_root': ['cropType.z_root', 'mm', []],
-                          'yield_act': ['cropType.yield_act', 'kg ha^-1', []]
+                          'fr_PHU': ['crop_type.fr_PHU', '%', []],
+                          'biomass': ['crop_type.biomass_actual', 'kg ha^-1', []],
+                          'LAI_act': ['crop_type.LAI_actual', 'm^2/m^2', []],
+                          'Bio_N': ['crop_type.bio_N', 'kg N ha^-1', []],
+                          'Bio_P': ['crop_type.bio_P', 'kg P ha^-1', []],
+                          'rooting_depth': ['crop_type.z_root', 'mm', []],
+                          'yield_act': ['crop_type.yield_act', 'kg ha^-1', []]
                           }
 
     #
@@ -83,7 +83,7 @@ class CropSummary(BaseReportHandler):
     def daily_update(self, state, weather, time):
         """Stores the daily values that need to be printed in the report."""
 
-        cropType = state.crop.current_crop
+        crop_type = state.crop.current_crop
         # Copy daily output values here
 
         for variable in self.variables:

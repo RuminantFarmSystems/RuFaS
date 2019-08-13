@@ -28,7 +28,7 @@ CropType attribute definitions:
 
     dBiomass_act = Actual increase in total plant biomass on a given day (kg ha^-1)
 
-    biomass_act = Total plant biomass on a given day
+    biomass_actual = Total plant biomass on a given day
 
     gamma_reg = Plant growth factor
 
@@ -37,8 +37,8 @@ CropType values updated by update_all():
 
     dBiomass_max
     dBiomass_act
-    prev_biomass_act
-    biomass_act
+    prev_biomass_actual
+    biomass_actual
 """
 ###############################################################################
 
@@ -68,15 +68,15 @@ def calc_act_Biomass(crop_type, time, weather):
     crop_type.dBiomass_act = crop_type.dBiomass_max * crop_type.gamma_reg
 
     # Save value as previous day's value
-    crop_type.prev_biomass_act = crop_type.biomass_act
+    crop_type.prev_biomass_actual = crop_type.biomass_actual
 
     in_growing_period = crop_type.start_date <= time.day <= crop_type.harvest_date and not crop_type.is_dormant
 
     # Update current actual biomass
     if in_growing_period:
-        crop_type.biomass_act += crop_type.dBiomass_act
+        crop_type.biomass_actual += crop_type.dBiomass_act
     else:
-        crop_type.biomass_act = 0
+        crop_type.biomass_actual = 0
 
 
 #
@@ -86,4 +86,4 @@ def calc_act_Biomass(crop_type, time, weather):
 #
 def calc_intercepted_radiation(crop_type, time, weather):
     H_day = weather.radiation[time.year - 1][time.day - 1]
-    return 0.5 * H_day * (1 - exp(-1 * crop_type.kl * crop_type.LAI_act))
+    return 0.5 * H_day * (1 - exp(-1 * crop_type.kl * crop_type.LAI_actual))

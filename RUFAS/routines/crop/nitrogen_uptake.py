@@ -51,6 +51,7 @@ CropType values updated by calling update_all():
 from math import log, exp
 from .nitrogen_fixation import calc_N_fixation
 
+
 #
 # This function updates all of a crop's nitrogen uptake information.
 #
@@ -71,7 +72,7 @@ def calc_fr_N(crop_type):
     n2 = calc_n2(crop_type)
     n1 = calc_n1(crop_type, n2)
 
-    if crop_type.prev_biomass_act == 0:
+    if crop_type.prev_biomass_actual == 0:
         crop_type.fr_N = 0
     else:
         term1 = crop_type.fr_n1 - crop_type.fr_n3
@@ -127,7 +128,7 @@ def calc_log_term_of_shape_coeff(crop_type, fr_PHU_fract, fr_n_):
 # "pseudocode_crop" C.5.B.2
 #
 def calc_bio_N_opt(crop_type):
-    crop_type.bio_N_opt = crop_type.fr_N * crop_type.biomass_act
+    crop_type.bio_N_opt = crop_type.fr_N * crop_type.biomass_actual
 
 
 #

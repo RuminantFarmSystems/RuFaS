@@ -202,20 +202,22 @@ class Crop:
 #
 class InitCrop:
     def __init__(self, data):
+        """GENERAL PLANT INFO"""
 
         self.data = data
-        self.crop_name = 'null'
-        self.crop_type = ''
-        self.fix_nitrogen = False
-
         self.grow_years = []
         self.repeat = 0
         self.planting_date = 0
         self.harvest_date = 0
+
+        self.crop_name = 'null'
+        self.crop_type = ''
         self.start_date = 0
         self.kill_year = True
         self.planted = False
         self.is_dormant = True
+
+        self.fix_nitrogen = False
 
         # ===================================================================
         ''' HEAT UNIT DATA '''
@@ -235,6 +237,7 @@ class InitCrop:
 
         # ===================================================================
         ''' LEAF AREA INDEX (LAI) DATA '''
+
         # Inputs
         self.fr_PHU_1 = 0
         self.fr_PHU_2 = 0
@@ -242,6 +245,7 @@ class InitCrop:
         self.fr_LAI_2 = 0
         self.fr_PHU_sen = 0
         self.LAI_max = 0
+        self.LAI_min = 0
 
         # Internally calculated inputs
         self.prev_fr_LAI_max = 0
@@ -354,7 +358,6 @@ class InitCrop:
 class Corn:
 
     def __init__(self, data):
-
         """GENERAL PLANT INFO"""
 
         corn_data = data['corn']
@@ -511,13 +514,14 @@ class Corn:
 class Soybean:
 
     def __init__(self, data):
+        """GENERAL PLANT INFO"""
 
         soy_data = data['soybean']
         self.grow_years = soy_data['grow_years']
         self.repeat = soy_data['repeat']
         self.planting_date = soy_data['planting_date']
         self.harvest_date = soy_data['harvest_date']
-        """GENERAL PLANT INFO"""
+
         self.crop_name = 'soybean'
         self.crop_type = 'annual'
         self.start_date = 0
@@ -552,6 +556,7 @@ class Soybean:
         self.fr_LAI_2 = 0.95
         self.fr_PHU_sen = 0.9
         self.LAI_max = 3
+        self.LAI_min = 0
 
         # Internally calculated inputs
         self.prev_fr_LAI_max = 0
@@ -599,7 +604,7 @@ class Soybean:
 
         # Outputs
         self.prev_LAI_act = 0
-        self.LAI_act = 0
+        self.LAI_actual = 0
 
         # ===================================================================
         ''' Nitrogen Uptake Data '''
@@ -628,15 +633,6 @@ class Soybean:
         self.bio_P_opt = 0
         self.bio_P = 0
 
-        # Internally calculated inputs
-        self.gamma_reg = 0
-        self.dBiomass_max = 0
-        self.dBiomass_act = 0.0
-
-        # Outputs
-        self.biomass_act = 0
-        self.prev_biomass_act = 0
-
         self.fr_PHU_50 = 0.5
         self.fr_PHU_100 = 1.0
         self.fr_p1 = 0.0074
@@ -648,6 +644,9 @@ class Soybean:
         self.P_up = 0
         self.act_P_up_each_layer = []
         self.P_act_up = 0
+
+        # ===================================================================
+        ''' Yields Data '''
 
         self.HI_max = 0
         self.HI_min = 0.01
@@ -671,12 +670,14 @@ class Soybean:
 class Alfalfa:
 
     def __init__(self, data):
+        """GENERAL PLANT INFO"""
+
         alfalfa_data = data['alfalfa']
         self.grow_years = alfalfa_data['grow_years']
         self.repeat = alfalfa_data['repeat']
         self.planting_date = alfalfa_data['planting_date']
         self.harvest_date = alfalfa_data['harvest_date']
-        """GENERAL PLANT INFO"""
+
         self.crop_name = 'alfalfa'
         self.crop_type = 'perennial'
         self.start_date = 0
@@ -794,13 +795,6 @@ class Alfalfa:
         self.fr_p3 = 0.0020
         self.fr_p3ish = 0.00201
 
-
-        self.fr_N = 0
-        self.fr_N_up = 0
-        self.N_up = 0
-        self.act_N_up_each_layer = []
-        self.N_act_up = 0
-
         self.fr_P = 0
         self.P_up = 0
         self.act_P_up_each_layer = []
@@ -824,10 +818,6 @@ class Alfalfa:
         self.yield_N = 0
         self.yield_P = 0
 
-        self.HI_max = 0
-        self.HI_min = data["HI_min"]
-        self.HI_act = 0
-        self.HI_opt = data["HI_opt"]
 
 # -----------------------------------------------------------------------
 # Method: calculate_start_growth_day
@@ -846,7 +836,6 @@ def calculate_start_growth_date(crop_type, weather, time):
             if yearly_T_avg[d] > crop_type.T_base_min:
                 crop_type.start_date = d
                 break
-
 
 
 #
