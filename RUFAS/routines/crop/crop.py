@@ -8,53 +8,15 @@ Author(s): Kass Chupongstimun, kass_c@hotmail.com
 
 This module needs the following inputs in order to operate correctly:
 
+    "latitude": 43.332708
+
     These are attributes of a crop type that need to be specified in the json input
     file. The values on the right are just examples from a corn crop type.
-        "crop_name": "corn",
-        "crop_type": "annual",
-        "fix_nitrogen": false,
 
+        "grow_years": [2009],
+        "repeat": 1,
         "planting_date": 121,
-        "harvest_date": 319,
-
-        "harvest_index": 0.65,
-        "harvest_eff": 0.9,
-        "HI_opt": 0.6,
-        "HI_min": 0.3,
-
-        "min_temp_for_growth": 10,
-        "max_temp_for_growth": 30,
-        "opt_temp_for_growth": 25,
-        "HU_for_maturity": 1200,
-
-        "fr_PHU_50" : 0.5,
-        "fr_PHU_100" : 1.0,
-        "fr_PHU_sen": 0.90,
-        "fr_PHU_1": 0.15,
-        "fr_PHU_2": 0.50,
-        "fr_LAI_1": 0.05,
-        "fr_LAI_2": 0.95,
-
-        "LAI_max": 3,
-        "radiation_use_efficiency": 39,
-        "light extinction coefficient": 0.65,
-
-        "z_root_max": 2000,
-
-        "fr,n1": 0.047,
-        "fr,n2": 0.0177,
-        "fr,n3": 0.0138,
-        "fr,n~3": 0.01381,
-        "beta_n": 10,
-
-        "beta_w": 10,
-        "epco": 0.5,
-
-        "fr,p1": 0.0048,
-        "fr,p2": 0.0018,
-        "fr,p3": 0.0014,
-        "fr,p~3": 0.00141,
-        "beta_p": 10
+        "harvest_date": 319
 
     From the weather class, the following will be needed:
         T_min
@@ -220,7 +182,8 @@ class Crop:
                 else:
                     # has priority for populating grow regimen over crop cycles
                     if crop_type.repeat == 0:
-                        self.grow_regimen[year - time.start_year] = crop_type
+                        x = year - time.start_year
+                        self.grow_regimen[x] = crop_type
                     # populates grow regimen based off of crop cycles if
                     # another crop is not set for those years
                     else:
@@ -228,6 +191,9 @@ class Crop:
                         while x < len(self.grow_regimen):
                             if self.grow_regimen[x].crop_name == 'null':
                                 self.grow_regimen[x] = crop_type
+                            else:
+                                print("Cannot grow", crop_type.crop_name, "in", str(year + x) + ",",
+                                      self.grow_regimen[x].crop_name, "is already growing.")
                             x += crop_type.repeat
 
 
