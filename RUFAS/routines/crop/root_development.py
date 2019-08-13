@@ -49,8 +49,6 @@ def calc_daily_root_biomass(crop_type, time):
 
     if in_growing_period:
         crop_type.fr_root = 0.4 - 0.2 * crop_type.fr_PHU
-    else:
-        crop_type.fr_root = 0
 
 
 #

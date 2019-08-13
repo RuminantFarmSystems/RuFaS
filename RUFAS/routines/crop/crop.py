@@ -85,23 +85,24 @@ def daily_crop_routine(crop, weather, time, soil):
             # The order in which these are called matters because some of the later
             # update_all calls depend on values calculated earlier.
 
-            heat_units.update_all(crop_type, T_min, T_max, time)
+            if crop_type.planted:
+                heat_units.update_all(crop_type, T_min, T_max, time)
 
-            root_development.update_all(crop_type, time)
+                root_development.update_all(crop_type, time)
 
-            # transpiration.update_all(crop_type, soil, time)
+                # transpiration.update_all(crop_type, soil, time)
 
-            nitrogen_uptake.update_all(crop_type, soil)
+                nitrogen_uptake.update_all(crop_type, soil)
 
-            phosphorus_uptake.update_all(crop_type, soil)
+                phosphorus_uptake.update_all(crop_type, soil)
 
-            growth_constraints.update_all(crop_type, time, weather, soil)
+                growth_constraints.update_all(crop_type, time, weather, soil)
 
-            leaf_area_index.update_all(crop_type, time)
+                leaf_area_index.update_all(crop_type, time)
 
-            biomass.update_all(crop_type, time, weather)
+                biomass.update_all(crop_type, time, weather)
 
-            yields.update_all(crop_type, time, soil)
+                yields.update_all(crop_type, time, soil)
 
         # The dormancy_routine only occurs on the first day of dormancy if there
         # is a crop present. This is indicated by the first time in_dormancy is true
@@ -827,6 +828,7 @@ def calculate_start_growth_date(crop_type, weather, time):
     yearly_T_avg = weather.T_avg[time.year - 1]
     if time.year == 1 and time.day > crop_type.planting_date:
         crop_type.start_date = crop_type.harvest_date + 1
+        crop_type.planted = False
 
     elif crop_type.crop_type == "annual":
         crop_type.start_date = crop_type.planting_date

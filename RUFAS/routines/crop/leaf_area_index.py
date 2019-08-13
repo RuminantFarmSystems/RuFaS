@@ -76,6 +76,8 @@ def calculate_shape_coefficients(crop_type):
 
     L1 = log(L1_part1) + (L2 * crop_type.fr_PHU_1)
 
+    # print("L", L1, L2)
+
     return L1, L2
 
 

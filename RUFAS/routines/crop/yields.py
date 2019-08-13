@@ -35,7 +35,7 @@ CropType attribute definitions:
 
     yield_max = maximum crop yield at harvest (kg ha^-1)
 
-    yield_act = Actual crop yield at harvest (kg ha^-1)
+    yield_actual = Actual crop yield at harvest (kg ha^-1)
 
     yield_N = Amount of nitrogen removed in the yield
 
@@ -52,7 +52,7 @@ CropType values updated by update_all():
     bio_AG
     HI_act
     yield_max
-    yield_act
+    yield_actual
     yield_N
     yield_P
     residue
@@ -83,7 +83,8 @@ def calc_gamma_wu(crop_type, soil):
     if soil.ET_max_annual == 0:
         return 0
     ET_sum = soil.evap_annual + soil.trans_annual
-    crop_type.gamma_wu = 100 * (ET_sum / soil.ET_max_annual)\
+    crop_type.gamma_wu = 100 * (ET_sum / soil.ET_max_annual) \
+
 
 #
 # Calculates max potential harvest index for a given day.
@@ -135,7 +136,7 @@ def calc_yield_max(crop_type, time):
 # "pseudocode_crop" C.10.F.1
 #
 def calc_yield_act(crop_type):
-    crop_type.yield_act = crop_type.yield_max * crop_type.harvest_eff
+    crop_type.yield_actual = crop_type.yield_max * crop_type.harvest_eff
 
 
 #
@@ -143,8 +144,8 @@ def calc_yield_act(crop_type):
 # "pseudocode_crop" C.10.G.1/2
 #
 def calc_nutrient_removal(crop_type):
-    crop_type.yield_N = crop_type.fr_N * crop_type.yield_act
-    crop_type.yield_P = crop_type.fr_P * crop_type.yield_act
+    crop_type.yield_N = crop_type.fr_N * crop_type.yield_actual
+    crop_type.yield_P = crop_type.fr_P * crop_type.yield_actual
 
 
 #
@@ -167,7 +168,6 @@ def calc_residue(crop_type, time, soil):
 
 
 def kill(crop_type):
-
     crop_type.accumulated_HU = 0
     crop_type.prev_accumulated_HU = 0
 
@@ -179,6 +179,7 @@ def kill(crop_type):
     crop_type.bio_AG = 0
 
     crop_type.z_root = 0
+    crop_type.fr_root = 0
 
     crop_type.bio_P = 0
     crop_type.bio_N = 0

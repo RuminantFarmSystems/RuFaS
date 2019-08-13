@@ -75,8 +75,6 @@ def calc_act_Biomass(crop_type, time, weather):
     # Update current actual biomass
     if in_growing_period:
         crop_type.biomass_actual += crop_type.dBiomass_act
-    else:
-        crop_type.biomass_actual = 0
 
 
 #
