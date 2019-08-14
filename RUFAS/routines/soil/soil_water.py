@@ -105,5 +105,6 @@ def update_SW(soil, weather, time):
     soil.runoff_annual += soil.runoff
     soil.trans_annual += soil.trans_sum
     soil.evap_annual += soil.evap_sum
+    soil.ET_annual += soil.ET_act
 
     soil.p_act_annual += R

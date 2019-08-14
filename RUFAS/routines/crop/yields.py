@@ -23,7 +23,7 @@ CropType attribute definitions:
 
     Eo_sum = Sum of potential evapotranspiration from day 1 up to today (mm H20)
 
-    HI_act = Actual harvest index
+    HI_actual = Actual harvest index
 
     HI_opt = Potential harvest for the plant at maturity given ideal growing
              conditions
@@ -50,7 +50,7 @@ CropType values updated by update_all():
     gamma_wu
     HI_max
     bio_AG
-    HI_act
+    HI_actual
     yield_max
     yield_actual
     yield_N
@@ -82,8 +82,8 @@ def update_all(crop_type, time, soil):
 def calc_gamma_wu(crop_type, soil):
     if soil.ET_max_annual == 0:
         return 0
-    ET_sum = soil.evap_annual + soil.trans_annual
-    crop_type.gamma_wu = 100 * (ET_sum / soil.ET_max_annual) \
+    crop_type.ET_annual = soil.evap_annual + soil.trans_annual
+    crop_type.gamma_wu = 100 * (crop_type.ET_annual / soil.ET_max_annual)
 
 
 #
@@ -105,19 +105,17 @@ def calc_bio_AG(crop_type):
 
 
 #
-# Calculates the actual harvest index (AKA HI_act).
+# Calculates the actual harvest index (AKA HI_actual).
 # "pseudocode_crop" C.10.D.1
 #
 def calc_HI_actual(crop_type, time):
-    in_growing_period = crop_type.start_date <= time.day <= crop_type.harvest_date and not crop_type.is_dormant
-    if not in_growing_period:
-        crop_type.HI_act = 0
-    else:
-        term1 = crop_type.HI_max - crop_type.HI_min
-        exp_part = exp(6.13 - (0.883 * crop_type.gamma_wu))
-        term2 = crop_type.gamma_wu / (crop_type.gamma_wu + exp_part)
+    in_growing_period = crop_type.start_date <= time.day <= crop_type.harvest_date
+    # if time.day >= crop_type.start_date:
+    term1 = crop_type.HI_max - crop_type.HI_min
+    exp_part = exp(6.13 - (0.883 * crop_type.gamma_wu))
+    term2 = crop_type.gamma_wu / (crop_type.gamma_wu + exp_part)
 
-        crop_type.HI_act = term1 * term2 + crop_type.HI_min
+    crop_type.HI_actual = term1 * term2 + crop_type.HI_min
 
 
 #
@@ -174,6 +172,8 @@ def kill(crop_type):
     crop_type.fr_PHU = 0
     crop_type.prev_fr_PHU = 0
 
+    crop_type.fr_LAI_max = 0
+
     crop_type.biomass_actual = 0
     crop_type.prev_biomass_actual = 0
     crop_type.bio_AG = 0
@@ -184,7 +184,9 @@ def kill(crop_type):
     crop_type.bio_P = 0
     crop_type.bio_N = 0
 
-    crop_type.Ea_sum = 0
+    crop_type.HI_actual = 0
+
+    crop_type.ET_annual = 0
 
     crop_type.planted = False
 
@@ -200,4 +202,4 @@ def harvest(crop_type, bio_frac):
     crop_type.bio_P = 0
     crop_type.bio_N = 0
 
-    crop_type.Ea_sum = 0
+    crop_type.ET_annual = 0

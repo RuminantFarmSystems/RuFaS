@@ -44,7 +44,7 @@ class CropSummary(BaseReportHandler):
                           'j_day': ['time.day', '', []],
                           'fr_PHU': ['crop_type.fr_PHU', '%', []],
                           'biomass': ['crop_type.biomass_actual', 'kg ha^-1', []],
-                          'LAI_act': ['crop_type.LAI_actual', 'm^2/m^2', []],
+                          'LAI_actual': ['crop_type.LAI_actual', 'm^2/m^2', []],
                           'Bio_N': ['crop_type.bio_N', 'kg N ha^-1', []],
                           'Bio_P': ['crop_type.bio_P', 'kg P ha^-1', []],
                           'rooting_depth': ['crop_type.z_root', 'mm', []],

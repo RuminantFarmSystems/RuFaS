@@ -45,10 +45,10 @@ def update_all(crop_type, time):
 # "pseudocode_crop" C.3.A.1
 #
 def calc_daily_root_biomass(crop_type, time):
-    in_growing_period = crop_type.start_date <= time.day <= crop_type.harvest_date and not crop_type.is_dormant
+    in_growing_period = crop_type.start_date <= time.day <= crop_type.harvest_date
 
-    if in_growing_period:
-        crop_type.fr_root = 0.4 - 0.2 * crop_type.fr_PHU
+    # if time.day >= crop_type.start_date:
+    crop_type.fr_root = 0.4 - 0.2 * crop_type.fr_PHU
 
 
 #

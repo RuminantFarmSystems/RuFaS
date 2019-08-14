@@ -302,6 +302,7 @@ class Soil:
 
         # annual variables
         self.ET_max_annual = 0.0
+        self.ET_annual = 0.0
 
         # annual water balance
         self.annual_delta_SW = 0.0
@@ -666,6 +667,7 @@ class Soil:
         self.trans_annual = 0.0
         self.drainage_annual = 0.0
         self.runoff_annual = 0.0
+        self.ET_annual = 0.0
 
         self.p_act_annual = 0
         self.p_calc_annual = 0

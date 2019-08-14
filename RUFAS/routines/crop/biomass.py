@@ -26,7 +26,7 @@ CropType attribute definitions:
 
     dBiomass_max = Maximum potential biomass increase on current day
 
-    dBiomass_act = Actual increase in total plant biomass on a given day (kg ha^-1)
+    d_biomass_actual = Actual increase in total plant biomass on a given day (kg ha^-1)
 
     biomass_actual = Total plant biomass on a given day
 
@@ -36,7 +36,7 @@ CropType attribute definitions:
 CropType values updated by update_all():
 
     dBiomass_max
-    dBiomass_act
+    d_biomass_actual
     prev_biomass_actual
     biomass_actual
 """
@@ -65,16 +65,16 @@ def calc_act_Biomass(crop_type, time, weather):
     crop_type.dBiomass_max = crop_type.RUE * H_phosyn
 
     # C.9.A.3
-    crop_type.dBiomass_act = crop_type.dBiomass_max * crop_type.gamma_reg
+    crop_type.d_biomass_actual = crop_type.dBiomass_max * crop_type.gamma_reg
 
     # Save value as previous day's value
     crop_type.prev_biomass_actual = crop_type.biomass_actual
 
-    in_growing_period = crop_type.start_date <= time.day <= crop_type.harvest_date and not crop_type.is_dormant
+    in_growing_period = crop_type.start_date <= time.day <= crop_type.harvest_date
 
     # Update current actual biomass
-    if in_growing_period:
-        crop_type.biomass_actual += crop_type.dBiomass_act
+    #if time.day >= crop_type.start_date:
+    crop_type.biomass_actual += crop_type.d_biomass_actual
 
 
 #

@@ -80,12 +80,18 @@ def daily_crop_routine(crop, weather, time, soil):
             # dormancy is entered
             if crop_type.start_date <= time.day <= crop_type.harvest_date:
                 crop_type.planted = True
+                # TODO better location
+            elif time.day == crop_type.harvest_date + 1:
+                crop_type.yield_actual = 0
 
             # Runs the crop growth routines
             # The order in which these are called matters because some of the later
             # update_all calls depend on values calculated earlier.
 
             if crop_type.planted:
+
+                # print(time.year, time.day)
+
                 heat_units.update_all(crop_type, T_min, T_max, time)
 
                 root_development.update_all(crop_type, time)
@@ -134,9 +140,13 @@ def annual_crop_routine(crop, time):
 # is signalled to be dormant
 #
 def dormancy_routine(crop_type, soil):
-    crop_type.LAI_actual = crop_type.LAI_min
+    crop_type.LAI_actual = max(0, min(crop_type.LAI_min, crop_type.LAI_actual))
+    crop_type.fr_LAI_max = crop_type.LAI_actual / crop_type.LAI_max
     crop_type.biomass_actual -= crop_type.biomass_actual * 0.1
+    crop_type.accumulated_HU -= crop_type.accumulated_HU * 0.1
+
     soil.residue += crop_type.biomass_actual * 0.1
+
     crop_type.is_dormant = True
 
 
@@ -280,7 +290,7 @@ class InitCrop:
         # Internally calculated inputs
         self.gamma_reg = 0
         self.dBiomass_max = 0
-        self.dBiomass_actual = 0
+        self.d_biomass_actual = 0
 
         # Outputs
         self.biomass_actual = 0
@@ -436,7 +446,7 @@ class Corn:
         # Internally calculated inputs
         self.gamma_reg = 0
         self.dBiomass_max = 0
-        self.dBiomass_actual = 0.0
+        self.d_biomass_actual = 0.0
 
         # Outputs
         self.biomass_actual = 0
@@ -591,7 +601,7 @@ class Soybean:
         # Internally calculated inputs
         self.gamma_reg = 0
         self.dBiomass_max = 0
-        self.dBiomass_actual = 0.0
+        self.d_biomass_actual = 0.0
 
         # Outputs
         self.biomass_actual = 0
@@ -604,7 +614,7 @@ class Soybean:
         self.epco = 0.5  # corn
 
         # Outputs
-        self.prev_LAI_act = 0
+        self.prev_LAI_actual = 0
         self.LAI_actual = 0
 
         # ===================================================================
@@ -693,7 +703,7 @@ class Alfalfa:
         # Inputs
         self.T_base_min = 4
         self.T_base_max = 32  # until dormancy
-        self.PHU = 1200  # corn, swat says 0
+        self.PHU = 2500  # corn, swat says 0
 
         # Internally calculated inputs
         self.accumulated_HU = 0.0
@@ -747,7 +757,7 @@ class Alfalfa:
         # Internally calculated inputs
         self.gamma_reg = 0
         self.dBiomass_max = 0
-        self.dBiomass_actual = 0.0
+        self.d_biomass_actual = 0.0
 
         # Outputs
         self.biomass_actual = 0
