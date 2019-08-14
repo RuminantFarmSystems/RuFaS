@@ -308,6 +308,7 @@ class Soil:
         self.runoff_annual = 0.0
         self.evap_annual = 0.0
         self.trans_annual = 0.0
+        self.ET_annual = 0.0
         self.drainage_annual = 0.0
 
         self.p_act_annual = 0.0
@@ -664,6 +665,7 @@ class Soil:
         self.ET_max_annual = 0.0
         self.evap_annual = 0.0
         self.trans_annual = 0.0
+        self.ET_annual = 0.0
         self.drainage_annual = 0.0
         self.runoff_annual = 0.0
 

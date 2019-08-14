@@ -19,7 +19,7 @@ CropType attribute definitions:
 
     gamma_wu = Water deficiency factor
 
-    ET_sum = Sum of actual evapotranspiration from day 1 up to today (mm H20)
+    ET_annual = Sum of actual evapotranspiration from day 1 up to today (mm H20)
 
     Eo_sum = Sum of potential evapotranspiration from day 1 up to today (mm H20)
 
@@ -82,8 +82,8 @@ def update_all(crop_type, time, soil):
 def calc_gamma_wu(crop_type, soil):
     if soil.ET_max_annual == 0:
         return 0
-    ET_sum = soil.evap_annual + soil.trans_annual
-    crop_type.gamma_wu = 100 * (ET_sum / soil.ET_max_annual)
+    soil.ET_annual = soil.evap_annual + soil.trans_annual
+    crop_type.gamma_wu = 100 * (soil.ET_annual / soil.ET_max_annual)
 
 
 #
