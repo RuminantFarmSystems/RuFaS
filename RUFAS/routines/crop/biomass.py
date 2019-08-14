@@ -74,6 +74,7 @@ def calc_act_Biomass(crop_type, time, weather):
 
     # Update current actual biomass
     #if time.day >= crop_type.start_date:
+
     crop_type.biomass_actual += crop_type.d_biomass_actual
 
 

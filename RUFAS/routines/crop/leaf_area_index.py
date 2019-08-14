@@ -112,13 +112,16 @@ def calculate_LAI_actual(crop_type, time):
 
     if crop_type.fr_PHU < crop_type.fr_PHU_sen:
         # C.8.A.6
+        print(time.day, crop_type.LAI_actual)
         crop_type.LAI_actual = prev_LAI_actual + d_LAI_actual
         crop_type.LAI_actual = max(crop_type.LAI_actual, 0)
-
     else:
         # C.8.A.6
+        print('*', time.day, crop_type.LAI_actual)
         LAI_actual = crop_type.LAI_max * (1 - crop_type.fr_PHU) / (1 - crop_type.fr_PHU_sen)
         crop_type.LAI_actual = max(LAI_actual, 0)
+
+
 
 
 #

@@ -88,7 +88,7 @@ def daily_crop_routine(crop, weather, time, soil):
             # The order in which these are called matters because some of the later
             # update_all calls depend on values calculated earlier.
 
-            if crop_type.planted:
+            if crop_type.planted and crop_type.start_date <= time.day:
 
                 # print(time.year, time.day)
 
@@ -108,14 +108,14 @@ def daily_crop_routine(crop, weather, time, soil):
 
                 biomass.update_all(crop_type, time, weather)
 
-                yields.update_all(crop_type, time, soil)
-
         # The dormancy_routine only occurs on the first day of dormancy if there
         # is a crop present. This is indicated by the first time in_dormancy is true
         # but is_dormant is false and there is a crop planted
         elif not crop_type.is_dormant and crop_type.planted:
             dormancy_routine(crop_type, soil)
 
+        if crop_type.planted:
+            yields.update_all(crop_type, time, soil)
 
 # -------------------------------------------------------------------------------
 # Function: annual_crop_routine determines the current crop and whether it is
