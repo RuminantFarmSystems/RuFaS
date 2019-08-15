@@ -61,8 +61,7 @@ def update_all(crop_type, soil):
     calc_bio_P_opt(crop_type)
     calc_P_up(crop_type)
     calc_act_P_up_each_layer(crop_type, soil)
-    crop_type.P_act_up = sum(crop_type.act_P_up_each_layer)
-    calc_bio_P(crop_type)
+    calc_bio_P(crop_type, soil)
 
 
 #
@@ -153,7 +152,6 @@ def calc_P_up(crop_type):
 #
 def calc_act_P_up_each_layer(crop_type, soil):
     P_up_each_layer = calc_P_up_each_layer(crop_type, soil)
-    act_P_up_each_layer = []
 
     # Running total of potential phosphorus uptake in overlying layers
     P_up_over = 0
@@ -166,20 +164,18 @@ def calc_act_P_up_each_layer(crop_type, soil):
 
     for pot_P_up, soilLayer in zip(P_up_each_layer, soil.soil_layers):
         # C.6.C.4
-        act_P_up = min((pot_P_up + P_demand), soilLayer.labileP)
+        act_P_up = min((pot_P_up + P_demand), soilLayer.labile_P)
         # C.6.C.7
-        act_P_up_each_layer.append(act_P_up)
+        soilLayer.P_uptake = act_P_up
 
         # C.6.C.6
         # Update values for next layer
         P_up_over += pot_P_up
-        P_sol_over += soilLayer.labileP
+        P_sol_over += soilLayer.labile_P
         # C.6.C.5
         P_demand = P_up_over - P_sol_over
         if P_demand < 0:
             P_demand = 0
-
-    crop_type.act_P_up_each_layer = act_P_up_each_layer
 
 
 #
@@ -194,7 +190,7 @@ def calc_P_up_each_layer(crop_type, soil):
     P_up_each_layer = []
     P_up_for_top_of_layer = 0
     for layer in soil.soil_layers:
-        P_up_for_bottom_of_layer = calc_P_up_z(crop_type, layer.bottomDepth)
+        P_up_for_bottom_of_layer = calc_P_up_z(crop_type, layer.bottom_depth)
         P_up_ly = P_up_for_bottom_of_layer - P_up_for_top_of_layer
 
         P_up_each_layer.append(P_up_ly)
@@ -221,8 +217,9 @@ def calc_P_up_z(crop_type, z):
 #
 # Calculates actual mass of phosphorus stored in plant material.
 #
-def calc_bio_P(crop_type):
+def calc_bio_P(crop_type, soil):
     if crop_type.prev_fr_PHU == 0:
         crop_type.bio_P = 0
 
-    crop_type.bio_P += crop_type.P_act_up
+    for layer in soil.soil_layers:
+        crop_type.bio_P += layer.P_uptake

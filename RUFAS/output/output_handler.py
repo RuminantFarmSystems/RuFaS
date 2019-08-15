@@ -60,7 +60,7 @@ class OutputHandler():
                         #'farm_summary': FarmSummary(data['farm_summary']),
                         'soil_summary': SoilSummary(data['soil_summary']),
                         'soil_nitrogen': SoilNitrogen(data['soil_nitrogen']),
-                        #'soil_phosphorus': SoilPhosphorus(data['soil_phosphorus']),
+                        'soil_phosphorus': SoilPhosphorus(data['soil_phosphorus']),
                         'ration_report': RationReport(data['ration_report']),
                         'crop_summary': CropSummary(data['crop_summary']),
                         'water_balance': WaterBalance(data['water_balance'])

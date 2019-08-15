@@ -13,6 +13,7 @@ import RUFAS
 
 
 def main():
+
     """
     Main function of RUFAS, executes simulations for all files specified.
 
@@ -42,4 +43,5 @@ def main():
 # -------------------------------------------------------------------------------
 # PROGRAM ENTRY POINT
 # -------------------------------------------------------------------------------
-if __name__ == '__main__': main()
+if __name__ == '__main__':
+    main()

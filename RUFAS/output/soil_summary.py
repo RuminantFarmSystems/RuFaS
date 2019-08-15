@@ -101,6 +101,9 @@ class SoilSummary(BaseReportHandler):
         for variable in self.variables:
             self.variables[variable][2].append(eval(self.variables[variable][0], globals(), locals()))
 
+    # ---------------------------------------------------------------------------
+    # Method: annual_update
+    # ---------------------------------------------------------------------------
     def annual_update(self, state, weather, time):
         """Stores the yearly values that need to be printed in the report."""
         pass

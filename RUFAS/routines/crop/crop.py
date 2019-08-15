@@ -28,21 +28,20 @@ This module needs the following inputs in order to operate correctly:
         soil_layers
 
         And the following attributes of a soil layer:
-            bottomDepth
+            bottom_depth
             Eo_sum = Sum of the Eo values leading up to today
             trans_max
             NO3
-            labileP
+            labile_P
             soil_water
-            fcWater
-            wiltingWater
+            fc_water
+            wilting_water
 """
 ################################################################################
 
 from math import acos, asin, sin, tan, pi
 from . import heat_units, leaf_area_index, root_development, biomass, yields, \
     phosphorus_uptake, nitrogen_uptake, transpiration, growth_constraints
-from RUFAS import util
 
 
 # -------------------------------------------------------------------------------
@@ -86,8 +85,6 @@ def daily_crop_routine(crop, weather, time, soil):
             # update_all calls depend on values calculated earlier.
 
             if crop_type.planted and time.day >= crop_type.start_date:
-
-                # print(time.year, time.day)
 
                 heat_units.update_all(crop_type, T_min, T_max)
 

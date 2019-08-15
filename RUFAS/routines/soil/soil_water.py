@@ -59,8 +59,8 @@ def update_SW(soil, weather, time):
         layer = soil.soil_layers[x]
 
         SW = layer.soil_water
-        WP = layer.wiltingWater
-        SAT = layer.satWater
+        WP = layer.wilting_water
+        SAT = layer.sat_water
 
         perc = layer.perc
         evap = layer.evap

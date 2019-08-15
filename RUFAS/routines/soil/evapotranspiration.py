@@ -158,9 +158,9 @@ def update_evap_z(soil):
     for x in range(len(soil.soil_layers)):
         curr_layer = soil.soil_layers[x]
 
-        FC = curr_layer.fcWater
+        FC = curr_layer.fc_water
         SW = curr_layer.soil_water
-        WP = curr_layer.wiltingWater
+        WP = curr_layer.wilting_water
 
         #
         # Calculate evap at a given depth
@@ -168,14 +168,14 @@ def update_evap_z(soil):
         #
         if x == 0:
             curr_layer.top_evap = 0
-            z = curr_layer.bottomDepth
+            z = curr_layer.bottom_depth
             exp_part = exp(2.374 - 0.00713 * z)
 
             curr_layer.bottom_evap = soil.evap_max * (z / (z + exp_part))
 
         else:
             curr_layer.top_evap = soil.soil_layers[x - 1].bottom_evap
-            z = curr_layer.bottomDepth
+            z = curr_layer.bottom_depth
             exp_part = exp(2.374 - 0.00713 * z)
 
             curr_layer.bottom_evap = soil.evap_max * (z / (z + exp_part))
