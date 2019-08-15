@@ -25,7 +25,6 @@ def update_all(S, time):
 
             # incorporate surface manure and fertilizer
 
-            # TODO math
             S.soil_layers[0].labile_P += till_app.percent_incorporated[x] * (S.fert_P_available
                                                                                   + S.fert_P_released)
 

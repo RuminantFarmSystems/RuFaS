@@ -83,7 +83,7 @@ def update_all(S, time):
                     S.NH4 += N_app * m_app.N_frac * 0.65
                     S.SON += N_app * (1.0 - m_app.N_frac)
 
-            else:  # TODO did not double check because it never happens
+            else:
 
                 # subsurface application
                 # infiltrate manure P if less than 15% solids

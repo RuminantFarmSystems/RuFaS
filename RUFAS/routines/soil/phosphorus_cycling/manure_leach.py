@@ -45,7 +45,7 @@ def update_all(S, weather, time):
                 NH4_extr = min(1.0, 0.9 * water_manure / (water_manure + 7.1))
             else:
                 manure_extr = min(1.0, 2.2 * water_manure / (water_manure + 300.1))
-                NH4_extr = 0.0  # TODO I added this
+                NH4_extr = 0.0
 
         MIP_leach = max(0.0, manure_extr * S.WIP)
         MOP_leach = max(0.0, manure_extr * S.WOP / 0.6)
@@ -57,7 +57,7 @@ def update_all(S, weather, time):
 
         S.WIP = max(0.0, S.WIP - MIP_leach)
         S.WOP = max(0.0, S.WOP - MOP_leach)
-        S.NH4 = max(0.0, S.NH4 - NH4_leach)  # TODO: this is redundant
+        S.NH4 = max(0.0, S.NH4 - NH4_leach)
 
         S.TIP_leach += MIP_leach
         S.TOP_leach += MOP_leach
@@ -137,7 +137,8 @@ def update_all(S, weather, time):
         cov_d_com = max(0.0, d_com / S.manure_mass * S.manure_cov)
         cov_d_com = min(cov_d_com, S.manure_cov)
 
-        # TODO should be commented out
+        # This should be commented out
+
         # SIP_d_com = max(0.0, S.SIP * 0.0025 * TFA * S.moisture)
         # if SIP_d_com > S.SIP:
         #     SIP_d_com = S.SIP
@@ -202,7 +203,8 @@ def update_all(S, weather, time):
 
         S.manure_cov = S.manure_cov - cov_d_com - cov_ASIM
 
-        # TODO should be commented out
+        # This should be commented out
+
         # S.manure_cov = S.cover_SLP * S.manure_mass * S.area
 
         # convert soil P form KG/HA to KG and add manure P decomposed

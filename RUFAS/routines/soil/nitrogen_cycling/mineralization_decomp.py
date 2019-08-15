@@ -49,9 +49,6 @@ def mineralization_decomp(soil):
             if FreshN + NO3 > 0:
                 CN = (0.58 * res) / (FreshN + NO3)
 
-            #
-            # TODO: these values are taken from phosphorus_cycling.py which is incomplete
-            #
             freshOrgP = (res * 0.0003) * BD * depth / 100
             labileP = layer.labile_P
 

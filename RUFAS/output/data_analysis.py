@@ -146,7 +146,8 @@ def annual_data_analysis(output_csv, show_annual, produce_diagnostics):
         for x in range(len(cell_colors)):
             cellDict[(x, 0)].set_width(0.02)
 
-        # mp.legend(legend, loc='upper left')  # TODO legend toggle
+        # legend toggle
+        # mp.legend(legend, loc='upper left')
         mp.subplots_adjust(left=0.31, bottom=0.5)
         mp.ylabel('mm H2O')
         mp.title('Annual Water Balance')
