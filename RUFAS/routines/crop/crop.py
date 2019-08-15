@@ -850,6 +850,7 @@ def calculate_start_growth_date(crop_type, weather, time):
 #
 # Calculates minimum day length for the given watershed based on latitude and
 # solar declination during the winter solstice
+# "pseudocode_crop" C.11.B.1
 #
 def calculate_minimum_day_length(latitude):
     angular_velocity = 0.2618
@@ -863,6 +864,7 @@ def calculate_minimum_day_length(latitude):
 
 #
 # Calculates the dormancy threshold given the latitude of the given watershed
+# "pseudocode_crop" C.11.A.2
 #
 def calculate_t_dorm(latitude):
     if latitude > 40:
@@ -876,6 +878,7 @@ def calculate_t_dorm(latitude):
 #
 # Returns a boolean indicating whether the given day is within the dormant
 # period for the watershed.
+# "pseudocode_crop" C.11.A.1/C.11.B.2
 #
 def in_dormancy(crop, time):
 
@@ -887,7 +890,10 @@ def in_dormancy(crop, time):
     #     return False
 
     year_length = get_year_length(time.cal_year)
+
+    # C.11.B.2
     solar_declination = asin(0.4 * sin(2 * pi / year_length * (time.day - 82)))
+
     angular_velocity = 0.2618
     latitude_radians = crop.latitude * pi / 180
 
