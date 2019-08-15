@@ -55,8 +55,8 @@ from math import exp, log, sqrt
 #
 def update_all(crop_type, time):
     L1, L2 = calculate_shape_coefficients(crop_type)
-    calc_fr_LAI_max(crop_type, time, L1, L2)
-    calculate_LAI_actual(crop_type, time)
+    calc_fr_LAI_max(crop_type, L1, L2)
+    calculate_LAI_actual(crop_type)
 
 
 #
@@ -84,12 +84,9 @@ def calculate_shape_coefficients(crop_type):
 # including today.
 # "pseudocode_crop" section C.8.A.3
 #
-def calc_fr_LAI_max(crop_type, time, L1, L2):
+def calc_fr_LAI_max(crop_type, L1, L2):
     crop_type.prev_fr_LAI_max = crop_type.fr_LAI_max
 
-    in_growing_period = crop_type.start_date <= time.day <= crop_type.harvest_date
-
-    #if time.day >= crop_type.start_date:
     exp_part = exp(L1 - (L2 * crop_type.fr_PHU))
     crop_type.fr_LAI_max = crop_type.fr_PHU / (crop_type.fr_PHU + exp_part)
 
@@ -98,11 +95,9 @@ def calc_fr_LAI_max(crop_type, time, L1, L2):
 # This function calculates LAI_actual.
 # "pseudocode_crop" section C.8.A.4/6
 #
-def calculate_LAI_actual(crop_type, time):
-    in_growing_period = crop_type.start_date <= time.day <= crop_type.harvest_date
-    prev_LAI_actual = crop_type.LAI_actual
+def calculate_LAI_actual(crop_type):
 
-    #if time.day >= crop_type.start_date:
+    prev_LAI_actual = crop_type.LAI_actual
 
     # C.8.A.4
     exp_part = exp(5 * (prev_LAI_actual - crop_type.LAI_max))
@@ -112,16 +107,12 @@ def calculate_LAI_actual(crop_type, time):
 
     if crop_type.fr_PHU < crop_type.fr_PHU_sen:
         # C.8.A.6
-        print(time.day, crop_type.LAI_actual)
         crop_type.LAI_actual = prev_LAI_actual + d_LAI_actual
         crop_type.LAI_actual = max(crop_type.LAI_actual, 0)
     else:
         # C.8.A.6
-        print('*', time.day, crop_type.LAI_actual)
         LAI_actual = crop_type.LAI_max * (1 - crop_type.fr_PHU) / (1 - crop_type.fr_PHU_sen)
         crop_type.LAI_actual = max(LAI_actual, 0)
-
-
 
 
 #

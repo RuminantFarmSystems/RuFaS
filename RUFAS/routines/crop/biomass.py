@@ -51,14 +51,14 @@ from math import exp
 def update_all(crop_type, time, weather):
 
     # update biomass values
-    calc_act_Biomass(crop_type, time, weather)
+    calc_act_biomass(crop_type, time, weather)
 
 
 #
 # Calculate current actual biomass.
 # "pseudocode_crop" C.9.A.2/3
 #
-def calc_act_Biomass(crop_type, time, weather):
+def calc_act_biomass(crop_type, time, weather):
     H_phosyn = calc_intercepted_radiation(crop_type, time, weather)
 
     # C.9.A.2
@@ -70,11 +70,7 @@ def calc_act_Biomass(crop_type, time, weather):
     # Save value as previous day's value
     crop_type.prev_biomass_actual = crop_type.biomass_actual
 
-    in_growing_period = crop_type.start_date <= time.day <= crop_type.harvest_date
-
     # Update current actual biomass
-    #if time.day >= crop_type.start_date:
-
     crop_type.biomass_actual += crop_type.d_biomass_actual
 
 

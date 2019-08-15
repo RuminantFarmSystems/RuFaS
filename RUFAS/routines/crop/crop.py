@@ -80,21 +80,18 @@ def daily_crop_routine(crop, weather, time, soil):
             # dormancy is entered
             if crop_type.start_date <= time.day <= crop_type.harvest_date:
                 crop_type.planted = True
-                # TODO better location
-            elif time.day == crop_type.harvest_date + 1:
-                crop_type.yield_actual = 0
 
             # Runs the crop growth routines
             # The order in which these are called matters because some of the later
             # update_all calls depend on values calculated earlier.
 
-            if crop_type.planted and crop_type.start_date <= time.day:
+            if crop_type.planted and time.day >= crop_type.start_date:
 
                 # print(time.year, time.day)
 
-                heat_units.update_all(crop_type, T_min, T_max, time)
+                heat_units.update_all(crop_type, T_min, T_max)
 
-                root_development.update_all(crop_type, time)
+                root_development.update_all(crop_type)
 
                 # transpiration.update_all(crop_type, soil, time)
 
@@ -116,6 +113,10 @@ def daily_crop_routine(crop, weather, time, soil):
 
         if crop_type.planted:
             yields.update_all(crop_type, time, soil)
+
+        if time.day == crop_type.harvest_date + 1:
+            crop_type.yield_actual = 0
+
 
 # -------------------------------------------------------------------------------
 # Function: annual_crop_routine determines the current crop and whether it is
@@ -277,7 +278,6 @@ class InitCrop:
 
         # Outputs
         self.z_root = 0
-        self.prev_z_root = 0
 
         # ===================================================================
         ''' BIOMASS DATA '''
@@ -433,7 +433,6 @@ class Corn:
 
         # Outputs
         self.z_root = 0
-        self.prev_z_root = 0
 
         # ===================================================================
         ''' BIOMASS DATA '''
@@ -588,7 +587,6 @@ class Soybean:
 
         # Outputs
         self.z_root = 0
-        self.prev_z_root = 0
 
         # ===================================================================
         ''' BIOMASS DATA '''
@@ -744,7 +742,6 @@ class Alfalfa:
 
         # Outputs
         self.z_root = 0
-        self.prev_z_root = 0
 
         # ===================================================================
         ''' BIOMASS DATA '''
