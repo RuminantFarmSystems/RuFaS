@@ -11,12 +11,15 @@ from RUFAS.output.report_handler import BaseReportHandler
 
 class CropSummary(BaseReportHandler):
 
-    def __init__(self, data):
+    def __init__(self, data, toggle):
 
         #
         # Sets active, report_name, f_name using data
         #
         self.set_properties(data)
+        if not toggle.crop and self.active:
+            print('Crop Module set as not simulated in json file and crop_summary report is still active, setting crop_summary to not active.')
+            self.active = False
         self.fieldNames = None
 
         #

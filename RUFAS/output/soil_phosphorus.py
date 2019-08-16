@@ -24,6 +24,9 @@ class SoilPhosphorus(BaseReportHandler):
         # Sets active, report_name, f_name using data
         #
         self.set_properties(data)
+        if not toggle.soil and self.active:
+            print('Soil Module set as not simulated in json file and soil_phosphorus report is still active, setting soil_phosphorus report to not active.')
+            self.active = False
         self.fieldNames = None
 
         #
