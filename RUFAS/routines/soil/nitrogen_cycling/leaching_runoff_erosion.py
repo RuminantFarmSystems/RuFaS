@@ -76,10 +76,10 @@ def leaching_runoff_erosion(soil):
             # it is important for the order of operations that the pools are
             # updated after each process and that those updated values are used
             # thereafter
-            NO3Runoff = min(layer.NO3, NO3Runoff)
-            layer.NO3 -= NO3Runoff
-            NH4Runoff = min(layer.NH4, NH4Runoff)
-            layer.NH4 -= NH4Runoff
+            soil.NO3_runoff = min(layer.NO3, NO3Runoff)
+            layer.NO3 -= soil.NO3_runoff
+            soil.NH4_runoff = min(layer.NH4, NH4Runoff)
+            layer.NH4 -= soil.NH4_runoff
 
             # "pseudocode_soil" S.4.C.3
             activeNErosConc = (100 * layer.activeN) / (BD * thickness)
@@ -104,17 +104,17 @@ def leaching_runoff_erosion(soil):
                 Eros_freshN_loss = 0.001 * freshNErosConc * Sed * ER
                 Eros_NH4_loss = 0.001 * NH4ErosConc * Sed * ER
 
-            Eros_activeN_loss = min(layer.activeN, Eros_activeN_loss)
-            layer.activeN -= Eros_activeN_loss
+            soil.activeN_erosion = min(layer.activeN, Eros_activeN_loss)
+            layer.activeN -= soil.activeN_erosion
 
-            Eros_stableN_loss = min(layer.stableN, Eros_stableN_loss)
-            layer.stableN -= Eros_stableN_loss
+            soil.stableN_erosion = min(layer.stableN, Eros_stableN_loss)
+            layer.stableN -= soil.stableN_erosion
 
-            Eros_freshN_loss = min(layer.topLayerFreshN, Eros_freshN_loss)
-            layer.topLayerFreshN -= Eros_freshN_loss
+            soil.freshN_erosion = min(layer.topLayerFreshN, Eros_freshN_loss)
+            layer.topLayerFreshN -= soil.freshN_erosion
 
-            Eros_NH4_loss = min(layer.NH4, Eros_NH4_loss)
-            layer.NH4 -= Eros_NH4_loss
+            soil.NH4_erosion = min(layer.NH4, Eros_NH4_loss)
+            layer.NH4 -= soil.NH4_erosion
 
             #
             # the coefficient of extraction for leaching is calibrated to 1.0
@@ -149,9 +149,9 @@ def leaching_runoff_erosion(soil):
         # is no N gained through leaching in the first layer)
         #
 
-        layer.NO3Perc = min(layer.NO3, NO3Perc)
-        layer.NH4Perc = min(layer.NH4, NH4Perc)
-        layer.activePerc = min(layer.activeN, activePerc)
+        layer.NO3_perc = min(layer.NO3, NO3Perc)
+        layer.NH4_perc = min(layer.NH4, NH4Perc)
+        layer.active_perc = min(layer.activeN, activePerc)
 
         # layer.NO3 -= NO3Perc
         # layer.NH4 -= NH4Perc
@@ -164,14 +164,14 @@ def leaching_runoff_erosion(soil):
     # Updates each pool with calculated leaching information
     for x in range(0, len(soil.soil_layers)):
         layer = soil.soil_layers[x]
-        layer.NO3 -= layer.NO3Perc
-        layer.NH4 -= layer.NH4Perc
-        layer.activeN -= layer.activePerc
+        layer.NO3 -= layer.NO3_perc
+        layer.NH4 -= layer.NH4_perc
+        layer.activeN -= layer.active_perc
 
         if x != 0:
             prev_layer = soil.soil_layers[x - 1]
-            layer.NO3 += prev_layer.NO3Perc
-            layer.NH4 += prev_layer.NH4Perc
-            layer.activeN += prev_layer.activePerc
+            layer.NO3 += prev_layer.NO3_perc
+            layer.NH4 += prev_layer.NH4_perc
+            layer.activeN += prev_layer.active_perc
 
 

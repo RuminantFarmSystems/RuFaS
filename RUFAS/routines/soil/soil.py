@@ -122,20 +122,6 @@ This module needs the following inputs in order to operate correctly:
 
                 ...
 
-        The following are attributes of Phosphorus Uptake.
-        TODO: This will likely be removed after implementing P_Cycling
-
-        "CropPUptake":
-
-            "Uptake1":
-
-                "Year": 2008,
-                "PUptake": 15.0
-
-            "Uptake2":
-
-                ...
-
     From the weather class, the following will be needed:
         T_min
         T_max
@@ -442,6 +428,7 @@ class Soil:
         self.runoff_annual = 0.0
         self.evap_annual = 0.0
         self.trans_annual = 0.0
+        self.ET_annual = 0.0
         self.drainage_annual = 0.0
 
         self.p_act_annual = 0.0
@@ -467,6 +454,11 @@ class Soil:
 
         self.NO3_runoff = 0.0
         self.NH4_runoff = 0.0
+
+        self.NH4_erosion = 0.0
+        self.activeN_erosion = 0.0
+        self.stableN_erosion = 0.0
+        self.freshN_erosion = 0.0
 
         # ------ INITIALIZE SOIL NITROGEN POOLS ------------------------------------
         # Calculate initial amount of NO3 in each soil layer;
@@ -598,6 +590,7 @@ class Soil:
             self.nTrans = 0.0
             self.totNitriVolatil = 0.0
 
+            self.deNrate = layer_data['DenitrificationRate']
             self.fracActiveN = layer_data['FracActiveN']
             self.volatileExchangeFactor = layer_data['VolatileExchangeFac']
 
@@ -780,6 +773,7 @@ class Soil:
         self.ET_max_annual = 0.0
         self.evap_annual = 0.0
         self.trans_annual = 0.0
+        self.ET_annual = 0.0
         self.drainage_annual = 0.0
         self.runoff_annual = 0.0
         self.ET_annual = 0.0
