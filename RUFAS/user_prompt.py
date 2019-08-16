@@ -46,11 +46,12 @@ def input_prompt():
           "Exit RUFAS:\n\t" +
                 "Enter \'Q\' or \'q\'")
 
-    while(True):
+    while True:
 
         try:
             # user_input = input("\nEnter RUFAS Input: ")
             user_input = "Inputs/barnyard.json"  # TODO: Delete
+
 
             #
             # Handle user exiting program

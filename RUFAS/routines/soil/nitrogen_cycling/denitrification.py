@@ -19,7 +19,7 @@ from math import exp
 def denitrification(soil):
     for layer in soil.soil_layers:
         OrgC = layer.org_C
-        deNrate = 0.1
+        deNrate = layer.deNrate
         SW = layer.soil_water
         FC = layer.fc_water
 
