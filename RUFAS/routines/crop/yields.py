@@ -199,6 +199,7 @@ def cut(crop_type, bio_frac):
     crop_type.accumulated_HU = crop_type.accumulated_HU * (1 - bio_frac)
 
     crop_type.LAI_actual = crop_type.LAI_actual * (1 - bio_frac)
+    crop_type.fr_LAI_max = 0
 
     crop_type.biomass_actual -= crop_type.yield_actual
 

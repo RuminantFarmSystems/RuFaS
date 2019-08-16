@@ -141,7 +141,7 @@ def annual_crop_routine(crop, time):
 #
 def dormancy_routine(crop_type, soil):
     crop_type.LAI_actual = max(0, min(crop_type.LAI_min, crop_type.LAI_actual))
-    crop_type.fr_LAI_max = crop_type.LAI_actual / crop_type.LAI_max
+    crop_type.fr_LAI_max = 0
 
     soil.residue += crop_type.biomass_actual * 0.1
     crop_type.biomass_actual -= crop_type.biomass_actual * 0.1
