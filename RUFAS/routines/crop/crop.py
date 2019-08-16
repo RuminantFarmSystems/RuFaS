@@ -5,6 +5,8 @@ File name: crop.py
 Description:
 Author(s): Kass Chupongstimun, kass_c@hotmail.com
            Andy Achenreiner, achenreiner@wisc.edu
+           William Donovan, wmdonovan@wisc.edu
+           Jacob Johnson, jacob8399@gmail.com
 
 This module needs the following inputs in order to operate correctly:
 
@@ -111,7 +113,7 @@ def daily_crop_routine(crop, weather, time, soil):
         if crop_type.planted:
             yields.update_all(crop_type, time, soil)
 
-        if time.day == crop_type.harvest_date + 1:
+        if crop_type.crop_type == 'annual' and time.day == crop_type.harvest_date + 1:
             crop_type.yield_actual = 0
 
 
@@ -139,11 +141,15 @@ def annual_crop_routine(crop, time):
 #
 def dormancy_routine(crop_type, soil):
     crop_type.LAI_actual = max(0, min(crop_type.LAI_min, crop_type.LAI_actual))
-    crop_type.fr_LAI_max = crop_type.LAI_actual / crop_type.LAI_max
-    crop_type.biomass_actual -= crop_type.biomass_actual * 0.1
-    crop_type.accumulated_HU -= crop_type.accumulated_HU * 0.1
+    crop_type.fr_LAI_max = 0
 
     soil.residue += crop_type.biomass_actual * 0.1
+    crop_type.biomass_actual -= crop_type.biomass_actual * 0.1
+    crop_type.bio_N -= crop_type.bio_N * 0.1
+    crop_type.bio_P -= crop_type.bio_P * 0.1
+
+    crop_type.accumulated_HU = 0
+    crop_type.fr_PHU = 0
 
     crop_type.is_dormant = True
 
@@ -698,7 +704,7 @@ class Alfalfa:
         # Inputs
         self.T_base_min = 4
         self.T_base_max = 32  # until dormancy
-        self.PHU = 2500  # corn, swat says 0
+        self.PHU = 800  # still unknown
 
         # Internally calculated inputs
         self.accumulated_HU = 0.0
@@ -847,6 +853,7 @@ def calculate_start_growth_date(crop_type, weather, time):
 #
 # Calculates minimum day length for the given watershed based on latitude and
 # solar declination during the winter solstice
+# "pseudocode_crop" C.11.B.1
 #
 def calculate_minimum_day_length(latitude):
     angular_velocity = 0.2618
@@ -860,6 +867,7 @@ def calculate_minimum_day_length(latitude):
 
 #
 # Calculates the dormancy threshold given the latitude of the given watershed
+# "pseudocode_crop" C.11.A.2
 #
 def calculate_t_dorm(latitude):
     if latitude > 40:
@@ -873,6 +881,7 @@ def calculate_t_dorm(latitude):
 #
 # Returns a boolean indicating whether the given day is within the dormant
 # period for the watershed.
+# "pseudocode_crop" C.11.A.1/C.11.B.2
 #
 def in_dormancy(crop, time):
 
@@ -884,7 +893,10 @@ def in_dormancy(crop, time):
     #     return False
 
     year_length = get_year_length(time.cal_year)
+
+    # C.11.B.2
     solar_declination = asin(0.4 * sin(2 * pi / year_length * (time.day - 82)))
+
     angular_velocity = 0.2618
     latitude_radians = crop.latitude * pi / 180
 

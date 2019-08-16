@@ -122,7 +122,12 @@ def calc_HI_actual(crop_type):
 # "pseudocode_crop" C.10.E.1
 #
 def calc_yield_max(crop_type, time):
-    if time.day == crop_type.harvest_date:
+    if crop_type.crop_type == 'perennial':
+        if crop_type.accumulated_HU >= crop_type.PHU:
+            crop_type.yield_max = crop_type.bio_AG * crop_type.HI_max
+        else:
+            crop_type.yield_max = 0
+    elif time.day == crop_type.harvest_date:
         crop_type.yield_max = crop_type.bio_AG * crop_type.HI_max
     else:
         crop_type.yield_max = 0
@@ -158,9 +163,9 @@ def calc_residue(crop_type, time, soil):
         if crop_type.kill_year:
             d_residue = crop_type.biomass_actual - crop_type.yield_actual
             kill(crop_type)
-        else:
-            bio_frac = crop_type.yield_actual / crop_type.bio_AG
-            harvest(crop_type, bio_frac)
+    if crop_type.crop_type == 'perennial' and crop_type.accumulated_HU >= crop_type.PHU:
+        bio_frac = crop_type.yield_actual / crop_type.biomass_actual
+        cut(crop_type, bio_frac)
     soil.residue += d_residue
 
 
@@ -190,15 +195,15 @@ def kill(crop_type):
     crop_type.planted = False
 
 
-def harvest(crop_type, bio_frac):
+def cut(crop_type, bio_frac):
     crop_type.accumulated_HU = crop_type.accumulated_HU * (1 - bio_frac)
 
     crop_type.LAI_actual = crop_type.LAI_actual * (1 - bio_frac)
+    crop_type.fr_LAI_max = 0
 
     crop_type.biomass_actual -= crop_type.yield_actual
-    crop_type.bio_AG -= crop_type.yield_actual
 
-    crop_type.bio_P = 0
-    crop_type.bio_N = 0
+    crop_type.bio_P = crop_type.bio_P * (1 - bio_frac)
+    crop_type.bio_N = crop_type.bio_N * (1 - bio_frac)
 
     crop_type.ET_annual = 0
