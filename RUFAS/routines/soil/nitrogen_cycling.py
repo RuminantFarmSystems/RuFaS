@@ -352,17 +352,17 @@ def leaching_runoff_erosion(soil):
                 Eros_freshN_loss = 0.001 * freshNErosConc * Sed * ER
                 Eros_NH4_loss = 0.001 * NH4ErosConc * Sed * ER
 
-            Eros_activeN_loss = min(layer.activeN, Eros_activeN_loss)
-            layer.activeN -= Eros_activeN_loss
+            soil.activeN_erosion = min(layer.activeN, Eros_activeN_loss)
+            layer.activeN -= soil.activeN_erosion
 
-            Eros_stableN_loss = min(layer.stableN, Eros_stableN_loss)
-            layer.stableN -= Eros_stableN_loss
+            soil.stableN_erosion = min(layer.stableN, Eros_stableN_loss)
+            layer.stableN -= soil.stableN_erosion
 
-            Eros_freshN_loss = min(layer.topLayerFreshN, Eros_freshN_loss)
-            layer.topLayerFreshN -= Eros_freshN_loss
+            soil.freshN_erosion = min(layer.topLayerFreshN, Eros_freshN_loss)
+            layer.topLayerFreshN -= soil.freshN_erosion
 
-            Eros_NH4_loss = min(layer.NH4, Eros_NH4_loss)
-            layer.NH4 -= Eros_NH4_loss
+            soil.NH4_erosion = min(layer.NH4, Eros_NH4_loss)
+            layer.NH4 -= soil.NH4_erosion
 
             #
             # the coefficient of extraction for leaching is calibrated to 1.0
@@ -436,7 +436,7 @@ def leaching_update(soil):
 def denitrification(soil):
     for layer in soil.soil_layers:
         OrgC = layer.orgC
-        deNrate = 0.1
+        deNrate = layer.deNrate
         SW = layer.soil_water
         FC = layer.fcWater
 

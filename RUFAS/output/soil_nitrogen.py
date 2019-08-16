@@ -73,17 +73,21 @@ class SoilNitrogen(BaseReportHandler):
                           'N_trans_L1': ['soil.soil_layers[0].nTrans', 'kg', []],
                           'N_trans_L2': ['soil.soil_layers[1].nTrans', 'kg', []],
                           'N_trans_L3': ['soil.soil_layers[2].nTrans', 'kg', []],
-                          'NO3_runoff': ['soil.NO3_runoff', 'kg', []],
-                          'NH4_runoff': ['soil.NH4_runoff', 'kg', []],
-                          'NO3_perc_L1': ['soil.soil_layers[0].NO3_perc', 'kg', []],
-                          'NO3_perc_L2': ['soil.soil_layers[1].NO3_perc', 'kg', []],
-                          'NO3_perc_L3': ['soil.soil_layers[2].NO3_perc', 'kg', []],
-                          'NH4_perc_L1': ['soil.soil_layers[0].NH4_perc', 'kg', []],
-                          'NH4_perc_L2': ['soil.soil_layers[1].NH4_perc', 'kg', []],
-                          'NH4_perc_L3': ['soil.soil_layers[2].NH4_perc', 'kg', []],
-                          'active_perc_L1': ['soil.soil_layers[0].active_perc', 'kg', []],
-                          'active_perc_L2': ['soil.soil_layers[1].active_perc', 'kg', []],
-                          'active_perc_L3': ['soil.soil_layers[2].active_perc', 'kg', []]
+                          'NO3_runoff': ['soil.NO3_runoff', 'kg/ha', []],
+                          'NH4_runoff': ['soil.NH4_runoff', 'kg/ha', []],
+                          'NO3_perc_L1': ['soil.soil_layers[0].NO3_perc', 'kg/ha', []],
+                          'NO3_perc_L2': ['soil.soil_layers[1].NO3_perc', 'kg/ha', []],
+                          'NO3_perc_L3': ['soil.soil_layers[2].NO3_perc', 'kg/ha', []],
+                          'NH4_perc_L1': ['soil.soil_layers[0].NH4_perc', 'kg/ha', []],
+                          'NH4_perc_L2': ['soil.soil_layers[1].NH4_perc', 'kg/ha', []],
+                          'NH4_perc_L3': ['soil.soil_layers[2].NH4_perc', 'kg/ha', []],
+                          'active_perc_L1': ['soil.soil_layers[0].active_perc', 'kg/ha', []],
+                          'active_perc_L2': ['soil.soil_layers[1].active_perc', 'kg/ha', []],
+                          'active_perc_L3': ['soil.soil_layers[2].active_perc', 'kg/ha', []],
+                          'NH4_erosion': ['soil.NH4_erosion', 'kg/ha', []],
+                          'activeN_erosion': ['soil.activeN_erosion', 'kg/ha', []],
+                          'stableN_erosion': ['soil.stableN_erosion', 'kg/ha', []],
+                          'freshN_erosion': ['soil.freshN_erosion', 'kg/ha', []]
                           }
 
     #
