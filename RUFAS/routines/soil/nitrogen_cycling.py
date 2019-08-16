@@ -436,7 +436,7 @@ def leaching_update(soil):
 def denitrification(soil):
     for layer in soil.soil_layers:
         OrgC = layer.orgC
-        deNrate = 0.1
+        deNrate = layer.deNrate
         SW = layer.soil_water
         FC = layer.fcWater
 

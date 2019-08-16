@@ -151,7 +151,7 @@
                     "LabileP": 15,
                     "ActiveMineralRate": 0.0003,
                     "VolatileExchangeFac": 0.15,
-                    "DenitrificationRate": 0.05,
+                    "DenitrificationRate": 0.1,
                     "SoilWaterRatio": 0.3,
                     "OM%": 1.9
                 },
@@ -172,7 +172,7 @@
                     "LabileP": 15,
                     "ActiveMineralRate": 0.0003,
                     "VolatileExchangeFac": 0.15,
-                    "DenitrificationRate": 0.05,
+                    "DenitrificationRate": 0.1,
                     "SoilWaterRatio": 0.3,
                     "OM%": 1.9
                 },
@@ -193,7 +193,7 @@
                     "LabileP": 15,
                     "ActiveMineralRate": 0.0003,
                     "VolatileExchangeFac": 0.15,
-                    "DenitrificationRate": 0.05,
+                    "DenitrificationRate": 0.1,
                     "SoilWaterRatio": 0.3,
                     "OM%": 1.9
                 }

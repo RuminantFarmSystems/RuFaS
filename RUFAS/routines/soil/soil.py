@@ -471,6 +471,7 @@ class Soil:
             self.nTrans = 0.0
             self.totNitriVolatil = 0.0
 
+            self.deNrate = layerData['DenitrificationRate']
             self.fracActiveN = layerData['FracActiveN']
             self.volatileExchangeFactor = layerData['VolatileExchangeFac']
 
