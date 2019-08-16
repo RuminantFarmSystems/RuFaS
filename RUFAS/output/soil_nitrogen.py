@@ -47,6 +47,18 @@ class SoilNitrogen(BaseReportHandler):
         self.layersTotNitriVolatil = []
         self.layersNtrans = []
 
+        self.NH4_runoff = []
+        self.NO3_runoff = []
+
+        self.NH4_drainage = []
+        self.NO3_drainage = []
+        self.active_drainage = []
+
+        self.NH4_erosion = []
+        self.activeN_erosion = []
+        self.stableN_erosion = []
+        self.freshN_erosion = []
+
     # ---------------------------------------------------------------------------
     # Function: get_header
     #           Writes the header (title and units) in the csvfile
@@ -66,7 +78,9 @@ class SoilNitrogen(BaseReportHandler):
                           'Volati/L3', 'Denitri/L1', 'Denitri/L2',
                           'Denitri/L3', 'TotNitrVolatil/L1',
                           'TotNitrVolatil/L2', 'TotNitrVolatil/L3',
-                          'Ntrans/L1', 'Ntrans/L2', 'Ntrans/L3']
+                          'Ntrans/L1', 'Ntrans/L2', 'Ntrans/L3', 'NH4_runoff',
+                          'NO3_runoff', 'NH4_drainage', 'NO3_drainage', 'active_drainage',
+                          'NH4_erosion', 'activeN_erosion', 'stableN_erosion', 'freshN_erosion']
 
             self.fieldNames = fieldnames
             writer = csv.DictWriter(csvfile, fieldnames=fieldnames,
@@ -74,18 +88,18 @@ class SoilNitrogen(BaseReportHandler):
             writer.writeheader()
 
             # 2) Write Units in 2nd row of cvsfile
-            units = {'Year': '', 'Julian Day': '', }
+            units = {}
             for fieldname in fieldnames:
-                if (fieldname.startswith("NO3/") or fieldname.startswith("NH4/")
+                if fieldname.startswith('Year') \
+                        or fieldname.startswith('Julian Day'):
+                    units[fieldname] = ''
+                elif (fieldname.startswith("NO3/") or fieldname.startswith("NH4/")
                         or fieldname.startswith("ActiveN")
                         or fieldname.startswith("StableN")
                         or fieldname == "FreshN"
                         or fieldname.startswith("Ntrans")):
                     units[fieldname] = 'kg'
-                elif (fieldname.startswith("Nitri")
-                      or fieldname.startswith("Volati")
-                      or fieldname.startswith("Denitri")
-                      or fieldname.startswith("TotNitrVolatil")):
+                else:
                     units[fieldname] = 'kg/ha'
             writer.writerow(units)
 
@@ -128,6 +142,18 @@ class SoilNitrogen(BaseReportHandler):
         self.year.append(time.cal_year)
         self.julianDay.append(time.day)
         self.freshN.append(soil.topLayerFreshN)
+
+        self.NH4_runoff.append(soil.NH4_runoff)
+        self.NO3_runoff.append(soil.NO3_runoff)
+
+        self.NH4_drainage.append(soil.listOfSoilLayers[-1].NH4Perc)
+        self.NO3_drainage.append(soil.listOfSoilLayers[-1].NO3Perc)
+        self.active_drainage.append(soil.listOfSoilLayers[-1].activePerc)
+
+        self.NH4_erosion.append(soil.NH4_erosion)
+        self.activeN_erosion.append(soil.activeN_erosion)
+        self.stableN_erosion.append(soil.stableN_erosion)
+        self.freshN_erosion.append(soil.freshN_erosion)
 
         for x in range(0, len(soil.listOfSoilLayers)):
             self.layersNO3[x].append(soil.listOfSoilLayers[x].NO3)
@@ -198,6 +224,24 @@ class SoilNitrogen(BaseReportHandler):
                     dailySoilNitrogenData["Ntrans/L" + str(y + 1)] = str(
                         round(self.layersNtrans[y][x], 3))
 
+                dailySoilNitrogenData["NH4_runoff"] = str(round(self.NH4_runoff[x], 3))
+
+                dailySoilNitrogenData["NO3_runoff"] = str(round(self.NO3_runoff[x], 3))
+
+                dailySoilNitrogenData["NH4_drainage"] = str(round(self.NH4_drainage[x], 3))
+
+                dailySoilNitrogenData["NO3_drainage"] = str(round(self.NO3_drainage[x], 3))
+
+                dailySoilNitrogenData["active_drainage"] = str(round(self.active_drainage[x], 3))
+
+                dailySoilNitrogenData["NH4_erosion"] = str(round(self.NH4_erosion[x], 3))
+
+                dailySoilNitrogenData["activeN_erosion"] = str(round(self.activeN_erosion[x], 3))
+
+                dailySoilNitrogenData["stableN_erosion"] = str(round(self.stableN_erosion[x], 3))
+
+                dailySoilNitrogenData["freshN_erosion"] = str(round(self.freshN_erosion[x], 3))
+
                 writer = csv.DictWriter(csvfile, fieldnames=self.fieldNames,
                                         lineterminator='\n')
                 writer.writerow(dailySoilNitrogenData)
@@ -222,3 +266,9 @@ class SoilNitrogen(BaseReportHandler):
             self.denitrification[x] = []
             self.layersTotNitriVolatil[x] = []
             self.layersNtrans[x] = []
+
+        self.NH4_runoff = []
+        self.NO3_runoff = []
+        self.NH4_drainage = []
+        self.NO3_drainage = []
+        self.active_drainage = []

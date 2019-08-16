@@ -324,10 +324,10 @@ def leaching_runoff_erosion(soil):
             # it is important for the order of operations that the pools are
             # updated after each process and that those updated values are used
             # thereafter
-            NO3Runoff = min(layer.NO3, NO3Runoff)
-            layer.NO3 -= NO3Runoff
-            NH4Runoff = min(layer.NH4, NH4Runoff)
-            layer.NH4 -= NH4Runoff
+            soil.NO3_runoff = min(layer.NO3, NO3Runoff)
+            layer.NO3 -= soil.NO3_runoff
+            soil.NH4_runoff = min(layer.NH4, NH4Runoff)
+            layer.NH4 -= soil.NH4_runoff
 
             # "pseudocode_soil" S.4.C.3
             activeNErosConc = (100 * layer.activeN) / (BD * depth)
@@ -352,17 +352,17 @@ def leaching_runoff_erosion(soil):
                 Eros_freshN_loss = 0.001 * freshNErosConc * Sed * ER
                 Eros_NH4_loss = 0.001 * NH4ErosConc * Sed * ER
 
-            Eros_activeN_loss = min(layer.activeN, Eros_activeN_loss)
-            layer.activeN -= Eros_activeN_loss
+            soil.activeN_erosion = min(layer.activeN, Eros_activeN_loss)
+            layer.activeN -= soil.activeN_erosion
 
-            Eros_stableN_loss = min(layer.stableN, Eros_stableN_loss)
-            layer.stableN -= Eros_stableN_loss
+            soil.stableN_erosion = min(layer.stableN, Eros_stableN_loss)
+            layer.stableN -= soil.stableN_erosion
 
-            Eros_freshN_loss = min(layer.topLayerFreshN, Eros_freshN_loss)
-            layer.topLayerFreshN -= Eros_freshN_loss
+            soil.freshN_erosion = min(layer.topLayerFreshN, Eros_freshN_loss)
+            layer.topLayerFreshN -= soil.freshN_erosion
 
-            Eros_NH4_loss = min(layer.NH4, Eros_NH4_loss)
-            layer.NH4 -= Eros_NH4_loss
+            soil.NH4_erosion = min(layer.NH4, Eros_NH4_loss)
+            layer.NH4 -= soil.NH4_erosion
 
             #
             # the coefficient of extraction for leaching is calibrated to 1.0
@@ -549,8 +549,10 @@ def humus_mineralization(soil):
 def added_manure_N(soil, weather, time):
     totalN = weather.manureN[time.year - 1][time.day - 1]
 
-    activeN = totalN * 0.875
-    stableN = totalN * 0.125
+    activeN = totalN * 0.65
+    stableN = totalN * 0.15
+    NH4 = totalN * 0.20
 
     soil.listOfSoilLayers[0].activeN += activeN
     soil.listOfSoilLayers[0].stableN += stableN
+    soil.listOfSoilLayers[0].NH4 += NH4
