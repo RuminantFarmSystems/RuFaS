@@ -13,7 +13,7 @@ import time as timer
 from pathlib import Path
 
 from RUFAS import routines, errors
-from RUFAS.classes import Config, State, Weather, Time
+from RUFAS.classes import Config, Toggle, State, Weather, Time
 from RUFAS.output import OutputHandler, output_graphs
 
 
@@ -79,9 +79,12 @@ def daily_simulation():
     #
     # Daily routines
     #
-    routines.daily_animal_routine(state.animal_management, state.feed, weather, time)
-    routines.daily_soil_routine(state.soil, state.crop, weather, time)
-    routines.daily_crop_routine(state.crop, weather, time, state.soil)
+    if toggle.animal:
+        routines.daily_animal_routine(state.animal_management, state.feed, weather, time)
+    if toggle.soil:
+        routines.daily_soil_routine(state.soil, state.crop, weather, time)
+    if toggle.crop:
+        routines.daily_crop_routine(state.crop, weather, time, state.soil)
 
     #
     # Daily Output Updates
@@ -90,8 +93,9 @@ def daily_simulation():
     
     #print("simulating: " + time.to_str()) # Print out current day of simulation
     time.advance()
-    #have to increment simulation_day here so that the daily output has the correct simulation day
-    state.animal_management.simulation_day += 1 
+    if toggle.animal:
+        #have to increment simulation_day here so that the daily output has the correct simulation day
+        state.animal_management.simulation_day += 1 
 
 
 #-------------------------------------------------------------------------------
@@ -108,7 +112,8 @@ def annual_simulation():
     #
     # Pre-annual Routines
     #
-    routines.annual_crop_routine(state.crop, weather, time)
+    if toggle.crop:
+        routines.annual_crop_routine(state.crop, weather, time)
 
     while not time.end_year():
         daily_simulation()
@@ -143,7 +148,7 @@ def read_json_file(fPath:Path):
     #
     # Designate as module-global variables
     #
-    global config, state, output, weather, time
+    global config, toggle, state, output, weather, time
 
     with fPath.open('r') as f:
         data = json.load(f)
@@ -151,8 +156,9 @@ def read_json_file(fPath:Path):
         # Instantiate objects using dictionary data from .json file
         try:
             config = Config(data['config'], data['weather'])
-            state = State(data['farm'], config)
-            output = OutputHandler(data['output'])
+            toggle = Toggle(data['simulate_module'])
+            state = State(data['farm'], config, toggle)
+            output = OutputHandler(data['output'], toggle)
             weather = Weather(data['weather'], config.years, config.w_start_year,
                               config.w_start_day, config.start_year, config.start_day)
             time = Time(config.years, config.start_year)
