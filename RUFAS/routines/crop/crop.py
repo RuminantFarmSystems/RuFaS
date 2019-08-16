@@ -113,7 +113,7 @@ def daily_crop_routine(crop, weather, time, soil):
         if crop_type.planted:
             yields.update_all(crop_type, time, soil)
 
-        if time.day == crop_type.harvest_date + 1:
+        if crop_type.crop_type == 'annual' and time.day == crop_type.harvest_date + 1:
             crop_type.yield_actual = 0
 
 
@@ -142,10 +142,14 @@ def annual_crop_routine(crop, time):
 def dormancy_routine(crop_type, soil):
     crop_type.LAI_actual = max(0, min(crop_type.LAI_min, crop_type.LAI_actual))
     crop_type.fr_LAI_max = crop_type.LAI_actual / crop_type.LAI_max
-    crop_type.biomass_actual -= crop_type.biomass_actual * 0.1
-    crop_type.accumulated_HU -= crop_type.accumulated_HU * 0.1
 
     soil.residue += crop_type.biomass_actual * 0.1
+    crop_type.biomass_actual -= crop_type.biomass_actual * 0.1
+    crop_type.bio_N -= crop_type.bio_N * 0.1
+    crop_type.bio_P -= crop_type.bio_P * 0.1
+
+    crop_type.accumulated_HU = 0
+    crop_type.fr_PHU = 0
 
     crop_type.is_dormant = True
 
@@ -700,7 +704,7 @@ class Alfalfa:
         # Inputs
         self.T_base_min = 4
         self.T_base_max = 32  # until dormancy
-        self.PHU = 2500  # corn, swat says 0
+        self.PHU = 800  # still unknown
 
         # Internally calculated inputs
         self.accumulated_HU = 0.0

@@ -73,7 +73,7 @@ def calculate_fr_PHU(crop_type, T_min, T_max):
     crop_type.prev_accumulated_HU = crop_type.accumulated_HU
 
     # if crop_type.start_date <= time.day <= crop_type.harvest_date:
-    crop_type.accumulated_HU = min(crop_type.PHU, crop_type.accumulated_HU + HU)
+    crop_type.accumulated_HU = crop_type.accumulated_HU + HU
 
     crop_type.prev_fr_PHU = crop_type.fr_PHU
 

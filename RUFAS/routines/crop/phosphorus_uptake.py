@@ -222,7 +222,5 @@ def calc_P_up_z(crop_type, z):
 # Calculates actual mass of phosphorus stored in plant material.
 #
 def calc_bio_P(crop_type):
-    if crop_type.prev_fr_PHU == 0:
-        crop_type.bio_P = 0
 
     crop_type.bio_P += crop_type.P_act_up

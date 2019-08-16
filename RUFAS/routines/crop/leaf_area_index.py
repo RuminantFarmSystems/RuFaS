@@ -111,8 +111,9 @@ def calculate_LAI_actual(crop_type):
         crop_type.LAI_actual = max(crop_type.LAI_actual, 0)
     else:
         # C.8.A.6
-        LAI_actual = crop_type.LAI_max * (1 - crop_type.fr_PHU) / (1 - crop_type.fr_PHU_sen)
-        crop_type.LAI_actual = max(LAI_actual, 0)
+        # TODO equation (and SWAT) previously used LAI_max but it would cause massive spikes
+        crop_type.LAI_actual = crop_type.LAI_actual * (1 - crop_type.fr_PHU) / (1 - crop_type.fr_PHU_sen)
+        crop_type.LAI_actual = max(crop_type.LAI_actual, 0)
 
 
 #
