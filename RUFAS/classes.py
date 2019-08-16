@@ -36,11 +36,15 @@ class State:
     the future or in an output report in the state object.
     """
 
-    def __init__(self, data, config):
-        self.soil = Soil(data['soil'], config)
-        self.feed = Feed(data['feed'])
-        self.animal_management = AnimalManagement(data['animal'], config, self.feed)
-        self.crop = Crop(data['crop'])
+    def __init__(self, data, config, toggle):
+        self.toggle = toggle
+        if self.toggle.soil:
+            self.soil = Soil(data['soil'], config)
+        if self.toggle.animal:
+            self.feed = Feed(data['feed'])
+            self.animal_management = AnimalManagement(data['animal'], config, self.feed)
+        if self.toggle.crop:
+            self.crop = Crop(data['crop'])
 
     # self.fieldOps = FieldOps()
     # self.herd = Herd()
@@ -52,11 +56,13 @@ class State:
     # ---------------------------------------------------------------------------
     def annual_reset(self):
         """Annual Reset"""
-
-        self.soil.annual_reset()
-        self.animal_management.annual_reset()
-        self.feed.annual_reset()
-        self.crop.annual_reset()
+        if self.toggle.soil:
+            self.soil.annual_reset()
+        if self.toggle.animal:
+            self.animal_management.annual_reset()
+            self.feed.annual_reset()
+        if self.toggle.crop:
+            self.crop.annual_reset()
 
     # self.fieldOps.annual_reset()
     # self.herd.annual_reset()
@@ -491,3 +497,10 @@ def is_leap_year(year):
         return True
     else:
         return False
+    
+    
+class Toggle:
+    def __init__(self, data):
+        self.animal = data['animal']
+        self.soil = data['soil']
+        self.crop = data['crop']

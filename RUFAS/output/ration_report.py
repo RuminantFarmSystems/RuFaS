@@ -18,10 +18,13 @@ from RUFAS.output.report_handler import BaseReportHandler
 class RationReport(BaseReportHandler):
     """Creates and prints to the file ration_report.csv"""
 
-    def __init__(self, data):
+    def __init__(self, data, toggle):
 
         # Sets active, report_name, f_name using data
         self.set_properties(data)
+        if not toggle.animal and self.active:
+            print('Animal Module set as not simulated in json file and ration_report is still active, setting ration_report to not active.')
+            self.active = False
 
         # Daily Outputs
         self.year = []

@@ -19,12 +19,15 @@ from RUFAS.output.report_handler import BaseReportHandler
 #-------------------------------------------------------------------------------
 class SoilSummary(BaseReportHandler):
 
-    def __init__(self, data):
+    def __init__(self, data, toggle):
 
         #
         # Sets active, report_name, f_name using data
         #
         self.set_properties(data)
+        if not toggle.soil and self.active:
+            print('Soil Module set as not simulated in json file and soil_summary report is still active, setting soil_summary report to not active.')
+            self.active = False
         self.fieldNames = None
 
         #
