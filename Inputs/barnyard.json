@@ -55,7 +55,7 @@
         "water_balance":
         {
             "active": true,
-            "produce_diagnostics": true,
+            "produce_diagnostics": false,
             "show_daily": false,
             "show_annual": false,
             "report_name": "Water Balance",
@@ -84,8 +84,8 @@
             },
             "alfalfa":
             {
-                "grow_years": [2009],
-                "repeat": 1,
+                "grow_years": [],
+                "repeat": 0,
                 "planting_date": 121,
                 "harvest_date": 319
             }
