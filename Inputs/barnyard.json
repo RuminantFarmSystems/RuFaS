@@ -31,7 +31,7 @@
         "soil_nitrogen":
         {
             "active": true,
-            "produce_diagnostics": false,
+            "produce_diagnostics": true,
             "show_daily": false,
             "report_name": "Soil Nitrogen",
             "file_name": "soil_nitrogen.csv"
@@ -73,7 +73,7 @@
                 "crop_type": "annual",
                 "fix_nitrogen": false,
 
-                "planting_date": 121,
+                "planting_date": 320,
                 "harvest_date": 319,
 
                 "harvest_index": 0.65,
@@ -119,7 +119,7 @@
         "soil":
         {
             "ProfileBulkDensity": 1.4,
-            "CN2": 73.00,
+            "CN2": 85.00,
             "FieldSlope": 0.02,
             "SlopeLength": 3,
             "Manning": 0.4,

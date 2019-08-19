@@ -334,6 +334,7 @@ class Soil:
         self.summan = 0.0
         self.summanP = 0.0
 
+
         self.NO3_runoff = 0.0
         self.NH4_runoff = 0.0
 
