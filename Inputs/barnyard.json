@@ -92,7 +92,6 @@
         },
         "soil":
         {
-            "ProfileDepth": 750,
             "ProfileBulkDensity": 1.4,
             "CN2": 73.00,
             "FieldSlope": 0.02,

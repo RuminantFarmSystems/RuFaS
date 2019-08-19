@@ -214,7 +214,6 @@ class Soil:
         self.fertilizer = Soil.Fertilizer(data['FertilizerApplication'])
         self.tillage = Soil.Tillage(data['TillageApplication'])
 
-        self.profileDepth = data['ProfileDepth']
         self.profileBulkDensity = data['ProfileBulkDensity']
         self.CN2 = data['CN2']  # unitless, user-defined curve number (empirical)
 
@@ -401,13 +400,14 @@ class Soil:
         for layer in self.soil_layers:
             self.profile_SW += layer.soil_water
 
+        self.initial_annual_SW = self.profile_SW
+
         # daily output values
         self.evap_max = 0.0
         self.trans_max = 0.0
         self.ET_max = 0.0
 
         # daily water balance
-        self.profile_SW = 0.0
         self.delta_SW = 0.0
         self.runoff = 0.0
         self.evap_sum = 0.0
@@ -500,11 +500,6 @@ class Soil:
             layer.stableN = stableN * unit_adjustment
             layer.NH4 = NH4 * unit_adjustment
             layer.topLayerFreshN = FreshN * unit_adjustment
-
-        for layer in self.soil_layers:
-            self.profile_SW += layer.soil_water
-
-        self.initial_annual_SW = self.profile_SW
 
     # ---------------------------------------------------------------------------
     # Class: SoilLayer
