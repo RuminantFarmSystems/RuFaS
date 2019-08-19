@@ -701,7 +701,7 @@ class Soil:
     # ---------------------------------------------------------------------------
     def calculate_soil_water(self):
         for layer in self.soil_layers:
-            layer.soil_water = layer.bottom_depth * layer.soil_water_ratio
+            layer.soil_water = layer.thickness * layer.soil_water_ratio
 
     # ---------------------------------------------------------------------------
     # Function: calculateFcWater
