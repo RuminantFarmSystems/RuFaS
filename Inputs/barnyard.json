@@ -47,7 +47,7 @@
         "crop_summary":
         {
             "active": true,
-            "produce_diagnostics": true,
+            "produce_diagnostics": false,
             "show_daily": false,
             "report_name": "Crop Summary",
             "file_name": "crop_summary.csv"
@@ -84,8 +84,8 @@
             },
             "alfalfa":
             {
-                "grow_years": [2009],
-                "repeat": 1,
+                "grow_years": [0],
+                "repeat": 0,
                 "planting_date": 121,
                 "harvest_date": 319
             }
@@ -93,7 +93,7 @@
         "soil":
         {
             "ProfileBulkDensity": 1.4,
-            "CN2": 73.00,
+            "CN2": 85.00,
             "FieldSlope": 0.02,
             "SlopeLength": 3,
             "Manning": 0.4,
