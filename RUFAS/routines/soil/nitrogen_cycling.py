@@ -555,8 +555,11 @@ def humus_mineralization(soil):
 def added_manure_N(soil, weather, time):
     totalN = weather.manureN[time.year - 1][time.day - 1]
 
-    activeN = totalN * 0.875
-    stableN = totalN * 0.125
+    activeN = totalN * 0.65
+    stableN = totalN * 0.15
+    NH4 = totalN * 0.20
 
     soil.soil_layers[0].activeN += activeN
     soil.soil_layers[0].stableN += stableN
+    soil.soil_layers[0].NH4 += NH4
+
