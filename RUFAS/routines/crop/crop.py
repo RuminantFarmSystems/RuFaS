@@ -60,61 +60,43 @@ def daily_crop_routine(crop, weather, time, soil):
     # is skipped in this case
     if crop_type.crop_name != 'null':
 
-        # in_dormancy is a method that determines whether the current date is
-        # in the dormant period
-        if not in_dormancy(crop, time):
+        crop_type.yield_actual = 0
 
-            # This is different than the crop-specific is_dormant flag that
-            # indicates whether the current crop is dormant. The only time
-            # when this flag would be true when we are not in dormancy (the
-            # previous check) is the first day outside of the dormant period.
-            # In this case, we calculate when it will be warm enough for the
-            # perennial to start growing
-            if crop_type.is_dormant:
-                calculate_start_growth_date(crop_type, weather, time)
+        if not crop_type.planted:
+            calculate_start(crop, weather, time)
 
-            crop_type.is_dormant = False
+        if crop_type.planted and crop_type.growing:
+            heat_units.update_all(crop_type, T_min, T_max)
 
-            # Planted is a boolean that indicates the status of a present plant,
-            # outside of the dormant period when it is warm enough to grow. It
-            # helps us to determine whether there is a plant present when
-            # dormancy is entered
-            if crop_type.start_date <= time.day <= crop_type.harvest_date:
-                crop_type.planted = True
+            root_development.update_all(crop_type)
 
-            # Runs the crop growth routines
-            # The order in which these are called matters because some of the later
-            # update_all calls depend on values calculated earlier.
+            # transpiration.update_all(crop_type, soil, time)
 
-            if crop_type.planted and time.day >= crop_type.start_date:
+            nitrogen_uptake.update_all(crop_type, soil)
 
-                heat_units.update_all(crop_type, T_min, T_max)
+            phosphorus_uptake.update_all(crop_type, soil)
 
-                root_development.update_all(crop_type)
+            growth_constraints.update_all(crop_type, time, weather, soil)
 
-                # transpiration.update_all(crop_type, soil, time)
+            leaf_area_index.update_all(crop_type, time)
 
-                nitrogen_uptake.update_all(crop_type, soil)
+            biomass.update_all(crop_type, time, weather)
 
-                phosphorus_uptake.update_all(crop_type, soil)
+            if crop_type.harvest_type == 'scheduled':
+                if time.day == crop_type.harvest_date:
+                    yields.update_all(crop_type, time, soil)
+            else:
+                if crop_type.fr_PHU >= crop_type.fr_PHU_harvest:
+                    yields.update_all(crop_type, time, soil)
 
-                growth_constraints.update_all(crop_type, time, weather, soil)
+        if crop_type.crop_type == "perennial":
+            if crop_type.planted and in_dormancy(crop, time):
+                if crop_type.growing:
+                    dormancy_routine(crop_type, soil)
+                    crop_type.growing = False
 
-                leaf_area_index.update_all(crop_type, time)
-
-                biomass.update_all(crop_type, time, weather)
-
-        # The dormancy_routine only occurs on the first day of dormancy if there
-        # is a crop present. This is indicated by the first time in_dormancy is true
-        # but is_dormant is false and there is a crop planted
-        elif not crop_type.is_dormant and crop_type.planted:
-            dormancy_routine(crop_type, soil)
-
-        if crop_type.planted:
-            yields.update_all(crop_type, time, soil)
-
-        if crop_type.crop_type == 'annual' and time.day == crop_type.harvest_date + 1:
-            crop_type.yield_actual = 0
+            elif crop_type.planted:
+                crop_type.growing = True
 
 
 # -------------------------------------------------------------------------------
@@ -127,11 +109,6 @@ def annual_crop_routine(crop, time):
     crop.current_crop = crop.grow_regimen[time.year - 1]
 
     crop.current_crop.kill_year = is_kill_year(crop, time)
-
-    # If no crop is currently growing, is_dormant is set to true so that
-    # calculate_start_date is called the first day out of dormancy L 111
-    if not crop.current_crop.planted:
-        crop.current_crop.is_dormant = True
 
 
 #
@@ -150,8 +127,6 @@ def dormancy_routine(crop_type, soil):
 
     crop_type.accumulated_HU = 0
     crop_type.fr_PHU = 0
-
-    crop_type.is_dormant = True
 
 
 #
@@ -192,14 +167,14 @@ class Crop:
         for crop_type in self.crops_list:
             for year in crop_type.grow_years:
                 if year - time.start_year >= len(self.grow_regimen) or year - time.start_year < 0:
-                    print('\nCannot grow ', crop_type.crop_name, ' in year ', year,
-                          ' because ', year, '\nis outside of the scope of the simulation.')
+                    print('\nCannot grow', crop_type.crop_name, 'in year', year,
+                          'because', year, '\nis outside of the scope of the simulation.')
                 else:
                     # has priority for populating grow regimen over crop cycles
                     if crop_type.repeat == 0:
                         x = year - time.start_year
                         self.grow_regimen[x] = crop_type
-                    # populates grow regimen based off of crop cycles if
+                    # populates grow regimen based on crop cycles if
                     # another crop is not set for those years
                     else:
                         x = year - time.start_year
@@ -207,8 +182,8 @@ class Crop:
                             if self.grow_regimen[x].crop_name == 'null':
                                 self.grow_regimen[x] = crop_type
                             else:
-                                print("Cannot grow", crop_type.crop_name, "in", str(year + x) + ",",
-                                      self.grow_regimen[x].crop_name, "is already growing.")
+                                print('Cannot grow', crop_type.crop_name, 'in', str(year + x) + ',',
+                                      self.grow_regimen[x].crop_name, 'is already growing.')
                             x += crop_type.repeat
 
 
@@ -224,13 +199,14 @@ class InitCrop:
         self.repeat = 0
         self.planting_date = 0
         self.harvest_date = 0
+        self.harvest_type = ''
 
         self.crop_name = 'null'
         self.crop_type = ''
-        self.start_date = 0
+
         self.kill_year = True
         self.planted = False
-        self.is_dormant = True
+        self.growing = False
 
         self.fix_nitrogen = False
 
@@ -259,6 +235,7 @@ class InitCrop:
         self.fr_LAI_1 = 0
         self.fr_LAI_2 = 0
         self.fr_PHU_sen = 0
+        self.fr_PHU_harvest = 0
         self.LAI_max = 0
         self.LAI_min = 0
 
@@ -379,13 +356,14 @@ class Corn:
         self.repeat = corn_data['repeat']
         self.planting_date = corn_data['planting_date']
         self.harvest_date = corn_data['harvest_date']
+        self.harvest_type = corn_data['harvest_type']
 
         self.crop_name = 'corn'
         self.crop_type = 'annual'
-        self.start_date = 0
-        self.kill_year = False
+
+        self.kill_year = True
         self.planted = False
-        self.is_dormant = True
+        self.growing = False
 
         self.fix_nitrogen = False
 
@@ -414,6 +392,7 @@ class Corn:
         self.fr_LAI_1 = 0.05
         self.fr_LAI_2 = 0.95
         self.fr_PHU_sen = 0.90
+        self.fr_PHU_harvest = 1.2
         self.LAI_max = 3
         self.LAI_min = 0
 
@@ -534,13 +513,14 @@ class Soybean:
         self.repeat = soy_data['repeat']
         self.planting_date = soy_data['planting_date']
         self.harvest_date = soy_data['harvest_date']
+        self.harvest_type = soy_data['harvest_type']
 
         self.crop_name = 'soybean'
         self.crop_type = 'annual'
-        self.start_date = 0
-        self.kill_year = False
+
+        self.kill_year = True
         self.planted = False
-        self.is_dormant = True
+        self.growing = False
 
         self.fix_nitrogen = True
         # ===================================================================
@@ -568,6 +548,7 @@ class Soybean:
         self.fr_LAI_1 = 0.05
         self.fr_LAI_2 = 0.95
         self.fr_PHU_sen = 0.9
+        self.fr_PHU_harvest = 1.0  # TODO: If soybean has drydown, this is 1.2
         self.LAI_max = 3
         self.LAI_min = 0
 
@@ -689,13 +670,14 @@ class Alfalfa:
         self.repeat = alfalfa_data['repeat']
         self.planting_date = alfalfa_data['planting_date']
         self.harvest_date = alfalfa_data['harvest_date']
+        self.harvest_type = alfalfa_data['harvest_type']
 
         self.crop_name = 'alfalfa'
         self.crop_type = 'perennial'
-        self.start_date = 0
+
         self.kill_year = False
         self.planted = False
-        self.is_dormant = True
+        self.growing = False
 
         self.fix_nitrogen = False
         # ===================================================================
@@ -723,6 +705,7 @@ class Alfalfa:
         self.fr_LAI_1 = 0.01
         self.fr_LAI_2 = 0.95
         self.fr_PHU_sen = 0.90
+        self.fr_PHU_harvest = 1.0  # TODO: If alfalfa is a hay, PHU to cut is 0.6
         self.LAI_max = 4
         self.LAI_min = 0.75
 
@@ -834,21 +817,21 @@ class Alfalfa:
 # Method: calculate_start_growth_day
 # "pseudocode_crop" section C.1.A
 # -----------------------------------------------------------------------
-def calculate_start_growth_date(crop_type, weather, time):
+def calculate_start(crop, weather, time):
+    crop_type = crop.current_crop
     yearly_T_avg = weather.T_avg[time.year - 1]
-    if time.year == 1 and time.day > crop_type.planting_date:
-        crop_type.start_date = crop_type.harvest_date + 1
-        crop_type.planted = False
-
-    elif crop_type.crop_type == "annual":
-        crop_type.start_date = crop_type.planting_date
-
+    if crop_type.crop_type == 'annual':
+        if time.day == crop_type.planting_date:
+            crop_type.planted = True
+            crop_type.growing = True
     else:
-        for d in range(time.day - 1, len(yearly_T_avg)):
-            if yearly_T_avg[d] > crop_type.T_base_min:
-                crop_type.start_date = d
-                break
+        if time.year == 1 and time.day > crop_type.planting_date:
+            pass
+        elif not in_dormancy(crop, time) and yearly_T_avg[time.day - 1] > crop_type.T_base_min:
+            crop_type.planted = True
+            crop_type.growing = True
 
+    crop.current_crop = crop_type
 
 #
 # Calculates minimum day length for the given watershed based on latitude and
@@ -885,13 +868,6 @@ def calculate_t_dorm(latitude):
 #
 def in_dormancy(crop, time):
 
-    # Annual crops will never be dormant
-    if crop.current_crop.crop_type == 'annual':
-        return False
-
-    # if time.day < crop.current_crop.start_date and not crop.planted:
-    #     return False
-
     year_length = get_year_length(time.cal_year)
 
     # C.11.B.2
@@ -903,10 +879,6 @@ def in_dormancy(crop, time):
     T_dl = 2 * acos(-tan(solar_declination) * tan(latitude_radians)) / angular_velocity
 
     T_dl_thr = crop.T_dl_min + crop.t_dorm
-
-    # A crop that is not planted cannot be dormant
-    if not crop.current_crop.planted and not T_dl < T_dl_thr:
-        return False
 
     # The current day length is less than the day length threshold for dormancy
     if T_dl < T_dl_thr:
