@@ -8,6 +8,7 @@ Author(s): William Donovan, wmdonovan@wisc.edu
 """
 #############################################
 import csv
+from pathlib import Path
 
 from RUFAS.output.data_analysis import data_analysis
 from RUFAS.output.report_handler import BaseReportHandler
@@ -40,7 +41,7 @@ class CropSummary(BaseReportHandler):
         # Daily Outputs
         # 1D Lists [julianDay]
         #
-        self.variables = {'year': ['time.cal_year', '', []],
+        self.daily_variables = {'year': ['time.cal_year', '', []],
                           'j_day': ['time.day', '', []],
                           'fr_PHU': ['crop_type.fr_PHU', '%', []],
                           'biomass': ['crop_type.biomass_actual', 'kg ha^-1', []],
@@ -51,29 +52,35 @@ class CropSummary(BaseReportHandler):
                           'yield_actual': ['crop_type.yield_actual', 'kg ha^-1', []]
                           }
 
+        self.annual_variables = {'year': ['time.cal_year', '', 0],
+                                 'yield_annual': ['crop_type.yield_annual', 'kg ha^-1', 0]
+                                 }
+
     #
     # writes header names and units to the csv
     #
-    def write_header(self):
+    def write_headers(self, output_csv, variables):
 
-        mode = 'a+' if self.get_fPath().exists() else 'w+'
+        mode = 'a+' if output_csv.exists() else 'w+'
 
-        with self.get_fPath().open(mode) as csvfile:
+        with output_csv.open(mode) as csvfile:
 
-            writer = csv.DictWriter(csvfile, fieldnames=self.variables.keys(),
+            writer = csv.DictWriter(csvfile, fieldnames=variables.keys(),
                                     lineterminator='\n')
 
             writer.writeheader()
 
             units = {}
-            for variable in self.variables:
-                units[variable] = self.variables[variable][1]
+            for variable in variables:
+                units[variable] = variables[variable][1]
 
             writer.writerow(units)
 
     def initialize(self, state):
 
-        self.write_header()
+        self.write_headers(self.get_fPath(), self.daily_variables)
+        annual_path = Path(str(self.get_fPath()).split('.csv')[0] + '_annual.csv')
+        self.write_headers(annual_path, self.annual_variables)
 
     #
     # stores specified daily values. NOTE: the eval() method is limited
@@ -86,11 +93,17 @@ class CropSummary(BaseReportHandler):
         crop_type = state.crop.current_crop
         # Copy daily output values here
 
-        for variable in self.variables:
-            self.variables[variable][2].append(eval(self.variables[variable][0], globals(), locals()))
+        for variable in self.daily_variables:
+            self.daily_variables[variable][2].append(
+                eval(self.daily_variables[variable][0], globals(), locals()))
 
     def annual_update(self, state, weather, time):
         """Stores the yearly values that need to be printed in the report."""
+        crop_type = state.crop.current_crop
+
+        for variable in self.annual_variables:
+            self.annual_variables[variable][2] = \
+                eval(self.annual_variables[variable][0], globals(), locals())
         pass
 
     #
@@ -102,13 +115,26 @@ class CropSummary(BaseReportHandler):
         mode = 'a+' if self.get_fPath().exists() else 'w+'
 
         with self.get_fPath().open(mode) as csvfile:
-            writer = csv.DictWriter(csvfile, fieldnames=self.variables,
+            writer = csv.DictWriter(csvfile, fieldnames=self.daily_variables,
                                     lineterminator='\n')
-            for day in range(len(self.variables['j_day'][2])):
+            for day in range(len(self.daily_variables['j_day'][2])):
                 row = {}
-                for variable in self.variables:
-                    row[variable] = self.variables[variable][2][day]
+                for variable in self.daily_variables:
+                    row[variable] = self.daily_variables[variable][2][day]
                 writer.writerow(row)
+
+        annual_path = Path(str(self.get_fPath()).split('.csv')[0] + '_annual.csv')
+
+        mode = 'a+' if annual_path.exists() else 'w+'
+
+        with annual_path.open(mode) as csvfile:
+            writer = csv.DictWriter(csvfile, fieldnames=self.annual_variables.keys(),
+                                    lineterminator='\n')
+
+            row = {}
+            for variable in self.annual_variables:
+                row[variable] = self.annual_variables[variable][2]
+            writer.writerow(row)
 
     #
     # clears stored values at the end of the year
@@ -116,8 +142,11 @@ class CropSummary(BaseReportHandler):
     def annual_flush(self):
         """Sets all of the values in the output object to the default value."""
 
-        for variable in self.variables:
-            self.variables[variable][2] = []
+        for variable in self.daily_variables:
+            self.daily_variables[variable][2] = []
+
+        for variable in self.annual_variables:
+            self.annual_variables[variable][2] = 0
 
     def produce_data_analysis(self, is_final):
         data_analysis(self.file_name, self.show_daily, self.produce_diagnostics, is_final)
