@@ -123,15 +123,7 @@ def calc_HI_actual(crop_type):
 # "pseudocode_crop" C.10.E.1
 #
 def calc_yield_max(crop_type, time):
-    if crop_type.crop_type == 'perennial':
-        if crop_type.accumulated_HU >= crop_type.PHU:
-            crop_type.yield_max = crop_type.bio_AG * crop_type.HI_max
-        else:
-            crop_type.yield_max = 0
-    elif time.day == crop_type.harvest_date:
-        crop_type.yield_max = crop_type.bio_AG * crop_type.HI_max
-    else:
-        crop_type.yield_max = 0
+    crop_type.yield_max = crop_type.bio_AG * crop_type.HI_max
 
 
 #
@@ -153,18 +145,14 @@ def calc_nutrient_removal(crop_type):
 
 #
 # Updates the current residue.
-# # "pseudocode_crop" C.10.H.1/2
+# "pseudocode_crop" C.10.H.1/2
 #
 def calc_residue(crop_type, time, soil):
     d_residue = 0
-    if crop_type.harvest_date == time.day:
-        # This is where we differentiate between a kill and a harvest.
-        # The primary difference being that root biomass is added to residue.
-        # This also replaces the annual update, adjusting biomass @ harvest
-        if crop_type.kill_year:
-            d_residue = crop_type.biomass_actual - crop_type.yield_actual
-            kill(crop_type)
-    if crop_type.crop_type == 'perennial' and crop_type.accumulated_HU >= crop_type.PHU:
+    if time.day == crop_type.kill_day or crop_type.crop_type == 'annual':
+        d_residue = crop_type.biomass_actual - crop_type.yield_actual
+        kill(crop_type)
+    else:
         bio_frac = crop_type.yield_actual / crop_type.biomass_actual
         cut(crop_type, bio_frac)
     soil.residue += d_residue
@@ -177,6 +165,7 @@ def kill(crop_type):
     crop_type.fr_PHU = 0
     crop_type.prev_fr_PHU = 0
 
+    crop_type.LAI_actual = 0
     crop_type.fr_LAI_max = 0
 
     crop_type.biomass_actual = 0
@@ -194,6 +183,7 @@ def kill(crop_type):
     crop_type.ET_annual = 0
 
     crop_type.planted = False
+    crop_type.growing = False
 
 
 def cut(crop_type, bio_frac):
