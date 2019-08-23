@@ -56,47 +56,58 @@ def daily_crop_routine(crop, weather, time, soil):
     # Current crop is set at the beginning of the year in annual_crop_routine
     crop_type = crop.current_crop
 
-    # If no crop is being grown, current crop will be named 'null'. The routine
-    # is skipped in this case
+    # If there is no crop in rotation this year, current crop will be named
+    # 'null'. The routine is skipped in this case
     if crop_type.crop_name != 'null':
 
+        # yield is reset to 0 at the beginning of the next day so it can be
+        # accessed by the output handler.
         crop_type.yield_actual = 0
 
+        # If the crop is not planted yet, determine whether it is planted today
         if not crop_type.planted:
             calculate_start(crop, weather, time)
 
-        if crop_type.planted and crop_type.growing:
-            heat_units.update_all(crop_type, T_min, T_max)
+        # Once the crop is planted:
+        else:
+            # If the crop is growing, run the routines
+            if crop_type.growing:
+                heat_units.update_all(crop_type, T_min, T_max)
 
-            root_development.update_all(crop_type)
+                root_development.update_all(crop_type)
 
-            # transpiration.update_all(crop_type, soil, time)
+                # transpiration.update_all(crop_type, soil, time)
 
-            nitrogen_uptake.update_all(crop_type, soil)
+                nitrogen_uptake.update_all(crop_type, soil)
 
-            phosphorus_uptake.update_all(crop_type, soil)
+                phosphorus_uptake.update_all(crop_type, soil)
 
-            growth_constraints.update_all(crop_type, time, weather, soil)
+                growth_constraints.update_all(crop_type, time, weather, soil)
 
-            leaf_area_index.update_all(crop_type, time)
+                leaf_area_index.update_all(crop_type, time)
 
-            biomass.update_all(crop_type, time, weather)
+                biomass.update_all(crop_type, time, weather)
 
-            if crop_type.harvest_type == 'scheduled':
-                if time.day == crop_type.harvest_date:
+                # TODO: This is where we toggle scheduled vs optimal harvests
+                if crop_type.harvest_type == 'scheduled' and time.day == crop_type.kill_day:
                     yields.update_all(crop_type, time, soil)
-            else:
-                if crop_type.fr_PHU >= crop_type.fr_PHU_harvest:
+                elif crop_type.harvest_type == 'optimal' and crop_type.fr_PHU >= crop_type.fr_PHU_harvest:
                     yields.update_all(crop_type, time, soil)
+                else:
+                    print('"' + crop_type.harvest_type + '"', 'is not a recognized harvest type.'
+                                                              ' Harvesting on optimal date.')
+                    crop_type.harvest_type = 'optimal'
 
-        if crop_type.crop_type == "perennial":
-            if crop_type.planted and in_dormancy(crop, time):
-                if crop_type.growing:
-                    dormancy_routine(crop_type, soil)
+            # If the crop is perennial, determine whether it is dormant
+            if crop_type.crop_type == 'perennial':
+                # If it is, run the dormancy routine and set growing to false
+                # (This method is only called once on the first day when crop
+                # enters dormancy)
+                if in_dormancy(crop, time) and crop_type.growing:
+                    dormancy_routine(crop_type, time, soil)
                     crop_type.growing = False
-
-            elif crop_type.planted:
-                crop_type.growing = True
+                elif not in_dormancy(crop, time):
+                    crop_type.growing = True
 
 
 # -------------------------------------------------------------------------------
@@ -104,7 +115,6 @@ def daily_crop_routine(crop, weather, time, soil):
 # a kill year for that crop
 # -------------------------------------------------------------------------------
 def annual_crop_routine(crop, time):
-
     # current crop is set to the next crop in the regimen
     crop.current_crop = crop.grow_regimen[time.year - 1]
 
@@ -116,17 +126,25 @@ def annual_crop_routine(crop, time):
 # LAI is set to minimum LAI, 10% of biomass is added to residue, and the crop
 # is signalled to be dormant
 #
-def dormancy_routine(crop_type, soil):
-    crop_type.LAI_actual = max(0, min(crop_type.LAI_min, crop_type.LAI_actual))
-    crop_type.fr_LAI_max = 0
+def dormancy_routine(crop_type, time, soil):
+    if crop_type.kill_year:
+        crop_type.kill_day = time.day
+        yields.update_all(crop_type, time, soil)
+    else:
+        # TODO: This is just our guess. Variable exclusive to perennials. Possibly a component of management
+        fr_PHU_harvest_min = 0.7
+        if crop_type.fr_PHU > fr_PHU_harvest_min:
+            yields.update_all(crop_type, time, soil)
+        crop_type.LAI_actual = max(0, min(crop_type.LAI_min, crop_type.LAI_actual))
+        crop_type.fr_LAI_max = 0
 
-    soil.residue += crop_type.biomass_actual * 0.1
-    crop_type.biomass_actual -= crop_type.biomass_actual * 0.1
-    crop_type.bio_N -= crop_type.bio_N * 0.1
-    crop_type.bio_P -= crop_type.bio_P * 0.1
+        soil.residue += crop_type.biomass_actual * 0.1
+        crop_type.biomass_actual -= crop_type.biomass_actual * 0.1
+        crop_type.bio_N -= crop_type.bio_N * 0.1
+        crop_type.bio_P -= crop_type.bio_P * 0.1
 
-    crop_type.accumulated_HU = 0
-    crop_type.fr_PHU = 0
+        crop_type.accumulated_HU = 0
+        crop_type.fr_PHU = 0
 
 
 #
@@ -136,6 +154,7 @@ def is_kill_year(crop, time):
     if len(crop.grow_regimen) == time.year or \
             crop.current_crop.crop_name != crop.grow_regimen[time.year].crop_name or \
             crop.current_crop.crop_type == 'annual':
+        crop.current_crop.kill_day = crop.current_crop.harvest_date
         return True
     return False
 
@@ -204,6 +223,7 @@ class InitCrop:
         self.crop_name = 'null'
         self.crop_type = ''
 
+        self.kill_day = -1
         self.kill_year = True
         self.planted = False
         self.growing = False
@@ -293,10 +313,10 @@ class InitCrop:
         self.bio_N_opt = 0
         self.bio_N = 0
 
-        self.fr_n1 = 0  
-        self.fr_n2 = 0  
-        self.fr_n3 = 0  
-        self.fr_n3ish = 0  
+        self.fr_n1 = 0
+        self.fr_n2 = 0
+        self.fr_n3 = 0
+        self.fr_n3ish = 0
 
         self.fr_N = 0
         self.fr_N_up = 0
@@ -361,6 +381,7 @@ class Corn:
         self.crop_name = 'corn'
         self.crop_type = 'annual'
 
+        self.kill_day = -1
         self.kill_year = True
         self.planted = False
         self.growing = False
@@ -518,6 +539,7 @@ class Soybean:
         self.crop_name = 'soybean'
         self.crop_type = 'annual'
 
+        self.kill_day = -1
         self.kill_year = True
         self.planted = False
         self.growing = False
@@ -670,11 +692,16 @@ class Alfalfa:
         self.repeat = alfalfa_data['repeat']
         self.planting_date = alfalfa_data['planting_date']
         self.harvest_date = alfalfa_data['harvest_date']
-        self.harvest_type = alfalfa_data['harvest_type']
+
+        if alfalfa_data['harvest_type'] != 'optimal':
+            print('Perennial crops are always optimally harvested')
+
+        self.harvest_type = 'optimal'
 
         self.crop_name = 'alfalfa'
         self.crop_type = 'perennial'
 
+        self.kill_day = -1
         self.kill_year = False
         self.planted = False
         self.growing = False
@@ -833,6 +860,7 @@ def calculate_start(crop, weather, time):
 
     crop.current_crop = crop_type
 
+
 #
 # Calculates minimum day length for the given watershed based on latitude and
 # solar declination during the winter solstice
@@ -867,7 +895,6 @@ def calculate_t_dorm(latitude):
 # "pseudocode_crop" C.11.A.1/C.11.B.2
 #
 def in_dormancy(crop, time):
-
     year_length = get_year_length(time.cal_year)
 
     # C.11.B.2

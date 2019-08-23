@@ -145,11 +145,11 @@ def calc_nutrient_removal(crop_type):
 
 #
 # Updates the current residue.
-# # "pseudocode_crop" C.10.H.1/2
+# "pseudocode_crop" C.10.H.1/2
 #
 def calc_residue(crop_type, time, soil):
     d_residue = 0
-    if crop_type.kill_year:
+    if time.day == crop_type.kill_day or crop_type.crop_type == 'annual':
         d_residue = crop_type.biomass_actual - crop_type.yield_actual
         kill(crop_type)
     else:
@@ -165,6 +165,7 @@ def kill(crop_type):
     crop_type.fr_PHU = 0
     crop_type.prev_fr_PHU = 0
 
+    crop_type.LAI_actual = 0
     crop_type.fr_LAI_max = 0
 
     crop_type.biomass_actual = 0
