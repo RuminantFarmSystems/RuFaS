@@ -89,10 +89,12 @@ def daily_crop_routine(crop, weather, time, soil):
                 biomass.update_all(crop_type, time, weather)
 
                 # TODO: This is where we toggle scheduled vs optimal harvests
-                if crop_type.harvest_type == 'scheduled' and time.day == crop_type.kill_day:
-                    yields.update_all(crop_type, time, soil)
-                elif crop_type.harvest_type == 'optimal' and crop_type.fr_PHU >= crop_type.fr_PHU_harvest:
-                    yields.update_all(crop_type, time, soil)
+                if crop_type.harvest_type == 'scheduled':
+                    if time.day == crop_type.kill_day:
+                        yields.update_all(crop_type, time, soil)
+                elif crop_type.harvest_type == 'optimal':
+                    if crop_type.fr_PHU >= crop_type.fr_PHU_harvest:
+                        yields.update_all(crop_type, time, soil)
                 else:
                     print('"' + crop_type.harvest_type + '"', 'is not a recognized harvest type.'
                                                               ' Harvesting on optimal date.')
