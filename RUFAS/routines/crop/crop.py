@@ -88,7 +88,7 @@ def daily_crop_routine(crop, weather, time, soil):
 
                 biomass.update_all(crop_type, time, weather)
 
-                # TODO: This is where we toggle scheduled vs optimal harvests
+                # "pseudocode_crop" C.10.A.1/2
                 if crop_type.harvest_type == 'scheduled':
                     if time.day == crop_type.kill_day:
                         yields.update_all(crop_type, time, soil)
@@ -206,6 +206,9 @@ class Crop:
                                 print('Cannot grow', crop_type.crop_name, 'in', str(year + x) + ',',
                                       self.grow_regimen[x].crop_name, 'is already growing.')
                             x += crop_type.repeat
+
+    def annual_reset(self):
+        self.current_crop.yield_annual = 0
 
 
 #
@@ -363,6 +366,8 @@ class InitCrop:
         self.yield_actual = 0
         self.yield_N = 0
         self.yield_P = 0
+
+        self.yield_annual = 0
 
 
 #
@@ -522,6 +527,8 @@ class Corn:
         self.yield_N = 0
         self.yield_P = 0
 
+        self.yield_annual = 0
+
 
 #
 # Crop object populated with Soybean data
@@ -679,6 +686,8 @@ class Soybean:
         self.yield_actual = 0
         self.yield_N = 0
         self.yield_P = 0
+
+        self.yield_annual = 0
 
 
 #
@@ -841,6 +850,8 @@ class Alfalfa:
         self.yield_N = 0
         self.yield_P = 0
 
+        self.yield_annual = 0
+
 
 # -----------------------------------------------------------------------
 # Method: calculate_start_growth_day
@@ -928,3 +939,5 @@ def get_year_length(year):
         return 366
     else:
         return 365
+
+
