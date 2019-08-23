@@ -73,21 +73,24 @@
                 "grow_years": [],
                 "repeat": 0,
                 "planting_date": 121,
-                "harvest_date": 319
+                "harvest_date": 319,
+                "harvest_type": "optimal"
             },
             "soybean":
             {
                 "grow_years": [],
                 "repeat": 0,
                 "planting_date": 121,
-                "harvest_date": 319
+                "harvest_date": 319,
+                "harvest_type": "scheduled"
             },
             "alfalfa":
             {
                 "grow_years": [],
                 "repeat": 0,
                 "planting_date": 121,
-                "harvest_date": 319
+                "harvest_date": 319,
+                "harvest_type": "optimal"
             }
         },
         "soil":

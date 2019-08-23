@@ -96,8 +96,7 @@ def calc_potential_evap(soil, crop, weather, time):
 
     soil.ET_max = max(0.001, ET_max)
 
-    if crop.current_crop.start_date <= time.day <= crop.current_crop.harvest_date:
-        soil.ET_max_annual += soil.ET_max
+    soil.ET_max_annual += soil.ET_max
 
 
 #
