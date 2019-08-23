@@ -128,12 +128,14 @@ def annual_data_analysis(output_csv, show_annual, produce_diagnostics):
             cell_colors[x - 1][0] = colors[x]
 
         # original bbox values with 9 variables ( len(variables) )
-        table_bot = -0.95
+        table_bot = -1.08
         table_height = 0.75
 
         # added bbox adjustments when there are more variables
         table_bot -= 0.08 * added_variables
         table_height += 0.08 * added_variables
+
+        mp.xticks(rotation=45)
 
         mp.axis('tight')
         table = mp.table(cellText=table_vals,
