@@ -39,7 +39,7 @@
         "soil_phosphorus":
         {
             "active": true,
-            "produce_diagnostics": true,
+            "produce_diagnostics": false,
             "show_daily": false,
             "report_name": "Soil Phosphorus",
             "file_name": "soil_phosphorus.csv"
@@ -47,7 +47,7 @@
         "crop_summary":
         {
             "active": true,
-            "produce_diagnostics": false,
+            "produce_diagnostics": true,
             "show_daily": false,
             "report_name": "Crop Summary",
             "file_name": "crop_summary.csv"
@@ -55,7 +55,7 @@
         "water_balance":
         {
             "active": true,
-            "produce_diagnostics": true,
+            "produce_diagnostics": false,
             "show_daily": false,
             "show_annual": false,
             "report_name": "Water Balance",
@@ -86,8 +86,8 @@
             },
             "alfalfa":
             {
-                "grow_years": [],
-                "repeat": 0,
+                "grow_years": [2009],
+                "repeat": 1,
                 "planting_date": 121,
                 "harvest_date": 319,
                 "harvest_type": "optimal"
@@ -243,6 +243,17 @@
 
         "feed":
         {
+            "storage_type": "bag",
+            "moisture%": "direct_cut",
+            "additive": "preservative",
+            "packing_density": 14,
+            "inoculation": "heterofermentative",
+            "bunk_type": "open_floor",
+            "ventilation": true,
+            "removal_rate": 6,
+
+            "initial_dry_matter": 0
+
             "feed_library": "Inputs/testing_ration_feedlib.csv",
 
             "available_feeds":

@@ -8,10 +8,25 @@ Author(s): Kass Chupongstimun, kass_c@hotmail.com,
 """
 ################################################################################
 from RUFAS import util
+from . import nitrogen_loss, carbon_loss, protein_degradation
+
+def daily_feed_routine(feed, crop):
+    feed.dry_matter += crop.current_crop.yield_actual
+
+    nitrogen_loss.update_all()
+
+    carbon_loss.update_all()
+
+    protein_degradation.update_all()
+
+def annual_feed_routine(feed, crop):
+    feed.crop_type = crop.current_crop.crop_name
+
+
 # -------------------------------------------------------------------------------
 # Class: Feed
 # -------------------------------------------------------------------------------
-class Feed():
+class Feed:
     """
     TODO: Add DocString
     Description: Sorts all feeds by the contraints set in the Linear Program of rations.py
@@ -20,6 +35,21 @@ class Feed():
     """
 
     def __init__(self, data):
+
+        self.storage_type = data['storage_type']
+        self.moisture_percent = data['moisture%']
+        self.additive = data['additive']
+        self.packing_density = data['packing_density']
+
+        self.inoculation = data['inoculation']
+        self.bunk_type = data['bunk_type']
+        self.ventilation = data['ventilation']
+        self.removal_rate = data['removal_rate']
+
+        self.crop_type = ''
+
+        self.dry_matter = data['initial_dry_matter']
+
         """
         TODO: Add DocString
         Description: This method takes the data specified in the feed Library
