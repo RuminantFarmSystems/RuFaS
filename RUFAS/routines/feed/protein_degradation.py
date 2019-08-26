@@ -19,9 +19,10 @@ Feed values updated by update_all():
 """
 ###############################################################################
 
-def update_all():
-    degrade_protein()
+
+def update_all(feed):
+    degrade_protein(feed)
 
 
-def degrade_protein():
+def degrade_protein(feed):
     pass

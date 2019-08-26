@@ -20,15 +20,34 @@ Feed values updated by update_all():
 ###############################################################################
 
 
-def update_all():
-    storage_loss()
+def update_all(feed):
+    harvest_loss(feed)
 
-    feedout_loss()
+    storage_loss(feed)
+
+    feedout_loss(feed)
+
+    update_carbon(feed)
 
 
-def storage_loss():
-    pass
+def harvest_loss(feed):
+    feed.C_harvest_gas = feed.carbon * feed.C_harvest_gas_percent
+
+    feed.C_harvest_particle = feed.carbon * feed.C_harvest_particle_percent
 
 
-def feedout_loss():
-    pass
+def storage_loss(feed):
+    feed.C_storage_gas = feed.carbon * feed.C_storage_gas_percent
+
+    feed.C_storage_leachate = feed.carbon * feed.C_storage_leachate_percent
+
+
+def feedout_loss(feed):
+    feed.C_feedout_gas = feed.carbon * feed.C_feedout_gas_percent
+
+    feed.C_feedout_particle = feed.carbon * feed.C_feedout_particle_percent
+
+def update_carbon(feed):
+    feed.carbon -= (feed.C_harvest_gas + feed.C_harvest_particle +
+                    feed.C_storage_gas + feed.C_storage_leachate +
+                    feed.C_feedout_gas + feed.C_feedout_particle)

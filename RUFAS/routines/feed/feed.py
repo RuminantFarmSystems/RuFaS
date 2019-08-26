@@ -10,17 +10,119 @@ Author(s): Kass Chupongstimun, kass_c@hotmail.com,
 from RUFAS import util
 from . import nitrogen_loss, carbon_loss, protein_degradation
 
+
 def daily_feed_routine(feed, crop):
     feed.dry_matter += crop.current_crop.yield_actual
 
-    nitrogen_loss.update_all()
+    if crop.current_crop.yield_actual != 0:
+        feed.nitrogen += crop.current_crop.bio_N
+        feed.phosphorus += crop.current_crop.bio_P
+        # feed.carbon += crop.current_crop.org_C  TODO: no Carbon Cycle currently implemented
 
-    carbon_loss.update_all()
+        nitrogen_loss.update_all(feed)
 
-    protein_degradation.update_all()
+        carbon_loss.update_all(feed)
+
+        protein_degradation.update_all(feed)
+
 
 def annual_feed_routine(feed, crop):
     feed.crop_type = crop.current_crop.crop_name
+    
+    if feed.crop_type != 'null':
+        calibrate_feed(feed)
+
+
+def calibrate_feed(feed):
+    if feed.crop_type == 'corn':
+        if feed.moisture == 'direct_cut':
+            feed.CP_gas_percent = 0
+            feed.CP_leachate_percent = 0.02
+            feed.NPN_min_percent = 0.50
+            feed.C_harvest_gas_percent = 0.01
+            feed.C_harvest_particle_percent = 0.005
+            feed.C_storage_gas_percent = 0.08
+            feed.C_storage_leachate_percent = 0.02
+            feed.C_feedout_gas_percent = 0.02
+            feed.C_feedout_particle_percent = 0
+        elif feed.moisture == 'wilted':
+            feed.CP_gas_percent = 0
+            feed.CP_leachate_percent = 0
+            feed.NPN_min_percent = 0.45
+            feed.C_harvest_gas_percent = 0.015
+            feed.C_harvest_particle_percent = 0.005
+            feed.C_storage_gas_percent = 0.07
+            feed.C_storage_leachate_percent = 0
+            feed.C_feedout_gas_percent = 0.02
+            feed.C_feedout_particle_percent = 0
+        elif feed.moisture == 'baleage':
+            feed.CP_gas_percent = 0
+            feed.CP_leachate_percent = 0
+            feed.NPN_min_percent = 0.40
+            feed.C_harvest_gas_percent = 0.015
+            feed.C_harvest_particle_percent = 0.005
+            feed.C_storage_gas_percent = 0.12
+            feed.C_storage_leachate_percent = 0
+            feed.C_feedout_gas_percent = 0.02
+            feed.C_feedout_particle_percent = 0
+        else:
+            print(feed.moisture, 'is not a recognized moisture category for', feed.crop_type)
+    elif feed.crop_type == 'alfalfa':
+        if feed.moisture == 'direct_cut':
+            feed.CP_gas_percent = 0
+            feed.CP_leachate_percent = 0.025
+            feed.NPN_min_percent = 0.40
+            feed.C_harvest_gas_percent = 0.03
+            feed.C_harvest_particle_percent = 0
+            feed.C_storage_gas_percent = 0.095
+            feed.C_storage_leachate_percent = 0.025
+            feed.C_feedout_gas_percent = 0.02
+            feed.C_feedout_particle_percent = 0
+        elif feed.moisture == 'wilted':
+            feed.CP_gas_percent = 0
+            feed.CP_leachate_percent = 0
+            feed.NPN_min_percent = 0.40
+            feed.C_harvest_gas_percent = 0.035
+            feed.C_harvest_particle_percent = 0.015
+            feed.C_storage_gas_percent = 0.09
+            feed.C_storage_leachate_percent = 0
+            feed.C_feedout_gas_percent = 0.02
+            feed.C_feedout_particle_percent = 0
+        elif feed.moisture == 'haylage':
+            feed.CP_gas_percent = 0
+            feed.CP_leachate_percent = 0
+            feed.NPN_min_percent = 0.35
+            feed.C_harvest_gas_percent = 0.045
+            feed.C_harvest_particle_percent = 0.025
+            feed.C_storage_gas_percent = 0.07
+            feed.C_storage_leachate_percent = 0
+            feed.C_feedout_gas_percent = 0.02
+            feed.C_feedout_particle_percent = 0
+        elif feed.moisture == 'moist_hay':
+            feed.CP_gas_percent = 0
+            feed.CP_leachate_percent = 0
+            feed.NPN_min_percent = 0.30
+            feed.C_harvest_gas_percent = 0.07
+            feed.C_harvest_particle_percent = 0.10
+            feed.C_storage_gas_percent = 0.03
+            feed.C_storage_leachate_percent = 0
+            feed.C_feedout_gas_percent = 0
+            feed.C_feedout_particle_percent = 0.01
+        elif feed.moisture == 'dry_hay':
+            feed.CP_gas_percent = 0
+            feed.CP_leachate_percent = 0
+            feed.NPN_min_percent = 0.20
+            feed.C_harvest_gas_percent = 0.07
+            feed.C_harvest_particle_percent = 0.16
+            feed.C_storage_gas_percent = 0.02
+            feed.C_storage_leachate_percent = 0
+            feed.C_feedout_gas_percent = 0
+            feed.C_feedout_particle_percent = 0.01
+        else:
+            print('"' + feed.moisture + '"', 'is not a recognized moisture category for', feed.crop_type)
+    else:
+        print(feed.crop_type, 'storage is not currently implemented')
+
 
 
 # -------------------------------------------------------------------------------
@@ -37,7 +139,7 @@ class Feed:
     def __init__(self, data):
 
         self.storage_type = data['storage_type']
-        self.moisture_percent = data['moisture%']
+        self.moisture = data['moisture']
         self.additive = data['additive']
         self.packing_density = data['packing_density']
 
@@ -46,10 +148,41 @@ class Feed:
         self.ventilation = data['ventilation']
         self.removal_rate = data['removal_rate']
 
-        self.crop_type = ''
+        self.crop_type = 'null'
 
         self.dry_matter = data['initial_dry_matter']
 
+        self.carbon = 0.0
+        self.nitrogen = 0.0
+        self.phosphorus = 0.0
+
+        self.C_harvest_gas = 0.0
+        self.C_harvest_particle = 0.0
+
+        self.C_storage_gas = 0.0
+        self.C_storage_leachate = 0.0
+
+        self.C_feedout_gas = 0.0
+        self.C_feedout_particle = 0.0
+
+        self.crude_protein = 0.0
+
+        self.CP_gas = 0.0
+        self.CP_leachate = 0.0
+        self.NPN = 0.0
+
+        self.C_harvest_gas_percent = 0.0
+        self.C_harvest_particle_percent = 0.0
+
+        self.C_storage_gas_percent = 0.0
+        self.C_storage_leachate_percent = 0.0
+
+        self.C_feedout_gas_percent = 0.0
+        self.C_feedout_particle_percent = 0.0
+
+        self.CP_gas_percent = 0.0
+        self.CP_leachate_percent = 0.0
+        self.NPN_min_percent = 0.0
         """
         TODO: Add DocString
         Description: This method takes the data specified in the feed Library
@@ -105,6 +238,8 @@ class Feed:
             self.available_feeds[feed_name]['RUP'] = 0.87 * (CP - NH3[feed_name] -
                                      (unavail_prot[feed_name] * CP))
         '''
+
+
 
     # ---------------------------------------------------------------------------
     # Method: annual_reset

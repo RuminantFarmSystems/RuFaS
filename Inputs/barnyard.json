@@ -14,7 +14,7 @@
         "soil_summary":
         {
             "active": true,
-            "produce_diagnostics": true,
+            "produce_diagnostics": false,
             "show_daily": false,
             "report_name": "Soil Summary",
             "file_name": "soil_summary.csv"
@@ -47,7 +47,7 @@
         "crop_summary":
         {
             "active": true,
-            "produce_diagnostics": true,
+            "produce_diagnostics": false,
             "show_daily": false,
             "report_name": "Crop Summary",
             "file_name": "crop_summary.csv"
@@ -86,8 +86,8 @@
             },
             "alfalfa":
             {
-                "grow_years": [2009],
-                "repeat": 1,
+                "grow_years": [],
+                "repeat": 0,
                 "planting_date": 121,
                 "harvest_date": 319,
                 "harvest_type": "optimal"
@@ -244,7 +244,7 @@
         "feed":
         {
             "storage_type": "bag",
-            "moisture%": "direct_cut",
+            "moisture": "direct_cut",
             "additive": "preservative",
             "packing_density": 14,
             "inoculation": "heterofermentative",
@@ -252,7 +252,7 @@
             "ventilation": true,
             "removal_rate": 6,
 
-            "initial_dry_matter": 0
+            "initial_dry_matter": 0,
 
             "feed_library": "Inputs/testing_ration_feedlib.csv",
 

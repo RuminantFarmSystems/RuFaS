@@ -19,13 +19,23 @@ Feed values updated by update_all():
 """
 ###############################################################################
 
-def update_all():
-    CP_loss()
 
-    NPN_loss()
+def update_all(feed):
+    CP_loss(feed)
 
-def CP_loss():
-    pass
+    NPN_loss(feed)
 
-def NPN_loss():
-    pass
+    update_CP(feed)
+
+
+def CP_loss(feed):
+    feed.CP_gas = feed.crude_protein * feed.CP_gas_percent
+
+    feed.CP_leachate = feed.crude_protein * feed.CP_leachate_percent
+
+
+def NPN_loss(feed):
+    feed.NPN += feed.crude_protein * feed.NPN_min_percent
+
+def update_CP(feed):
+    feed.crude_protein -= (feed.CP_gas + feed.CP_leachate)

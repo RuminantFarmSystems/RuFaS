@@ -82,6 +82,7 @@ def daily_simulation():
     routines.daily_animal_routine(state.animal, state.feed, weather, time)
     routines.daily_soil_routine(state.soil, state.crop, weather, time)
     routines.daily_crop_routine(state.crop, weather, time, state.soil)
+    routines.daily_feed_routine(state.feed, state.crop)
 
     #
     # Daily Output Updates
@@ -107,6 +108,7 @@ def annual_simulation():
     # Pre-annual Routines
     #
     routines.annual_crop_routine(state.crop, time)
+    routines.annual_feed_routine(state.feed, state.crop)
 
     while not time.end_year():
         daily_simulation()
