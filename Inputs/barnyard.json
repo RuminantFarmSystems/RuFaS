@@ -47,10 +47,18 @@
         "crop_summary":
         {
             "active": true,
-            "produce_diagnostics": false,
+            "produce_diagnostics": true,
             "show_daily": false,
             "report_name": "Crop Summary",
             "file_name": "crop_summary.csv"
+        },
+        "feed_storage":
+        {
+            "active": true,
+            "produce_diagnostics": true,
+            "show_daily": false,
+            "report_name": "Feed Storage",
+            "file_name": "feed_storage.csv"
         },
         "water_balance":
         {

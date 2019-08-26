@@ -13,6 +13,8 @@ from . import nitrogen_loss, carbon_loss, protein_degradation
 
 def daily_feed_routine(feed, crop):
     feed.dry_matter += crop.current_crop.yield_actual * feed.dry_matter_percent
+    feed.crude_protein += crop.current_crop.yield_actual * \
+                          feed.dry_matter_percent * feed.crude_protein_percent
 
     if crop.current_crop.yield_actual != 0:
         feed.nitrogen += crop.current_crop.bio_N
@@ -29,13 +31,14 @@ def daily_feed_routine(feed, crop):
 def annual_feed_routine(feed, crop):
     feed.prev_crop_type = feed.crop_type
     feed.crop_type = crop.current_crop.crop_name
-    
+
     if feed.crop_type != 'null':
         calibrate_feed(feed)
 
 
 def calibrate_feed(feed):
     if feed.crop_type == 'corn':
+        feed.crude_protein_percent = 0.08
         if feed.moisture == 'direct_cut':
             feed.dry_matter_percent = 0.25
             feed.CP_gas_percent = 0
@@ -73,6 +76,7 @@ def calibrate_feed(feed):
             if feed.prev_crop_type != feed.crop_type:
                 print('"' + feed.moisture + '"', 'is not a recognized moisture category for', feed.crop_type)
     elif feed.crop_type == 'alfalfa':
+        feed.crude_protein_percent = 0.22
         if feed.moisture == 'direct_cut':
             feed.dry_matter_percent = 0.25
             feed.CP_gas_percent = 0
@@ -148,7 +152,6 @@ class Feed:
     """
 
     def __init__(self, data):
-
         self.storage_type = data['storage_type']
         self.moisture = data['moisture']
         self.additive = data['additive']
@@ -165,6 +168,8 @@ class Feed:
         self.dry_matter = data['initial_dry_matter']
 
         self.dry_matter_percent = 0.0
+
+        self.crude_protein_percent = 0.0
 
         self.carbon = 0.0
         self.nitrogen = 0.0

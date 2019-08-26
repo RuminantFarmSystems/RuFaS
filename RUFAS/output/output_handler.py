@@ -17,10 +17,11 @@ from RUFAS.output.report_handler import BaseReportHandler
 #
 from RUFAS.output.soil_summary import SoilSummary
 from RUFAS.output.soil_nitrogen import SoilNitrogen
+from RUFAS.output.soil_phosphorus import SoilPhosphorus
 from RUFAS.output.ration_report import RationReport
 from RUFAS.output.crop_summary import CropSummary
+from RUFAS.output.feed_storage import FeedStorage
 from RUFAS.output.water_balance import WaterBalance
-from RUFAS.output.soil_phosphorus import SoilPhosphorus
 
 
 # -------------------------------------------------------------------------------
@@ -63,6 +64,7 @@ class OutputHandler():
                         'soil_phosphorus': SoilPhosphorus(data['soil_phosphorus']),
                         'ration_report': RationReport(data['ration_report']),
                         'crop_summary': CropSummary(data['crop_summary']),
+                        'feed_storage': FeedStorage(data['feed_storage']),
                         'water_balance': WaterBalance(data['water_balance'])
                         }
         self.final = False
