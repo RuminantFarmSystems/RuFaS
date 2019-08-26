@@ -17,6 +17,8 @@ Feed attribute definitions:
 Feed values updated by update_all():
 
 """
+
+
 ###############################################################################
 
 
@@ -47,7 +49,12 @@ def feedout_loss(feed):
 
     feed.C_feedout_particle = feed.carbon * feed.C_feedout_particle_percent
 
+
 def update_carbon(feed):
-    feed.carbon -= (feed.C_harvest_gas + feed.C_harvest_particle +
-                    feed.C_storage_gas + feed.C_storage_leachate +
-                    feed.C_feedout_gas + feed.C_feedout_particle)
+    carbon_loss = (feed.C_harvest_gas + feed.C_harvest_particle +
+                   feed.C_storage_gas + feed.C_storage_leachate +
+                   feed.C_feedout_gas + feed.C_feedout_particle)
+
+    feed.carbon -= carbon_loss
+
+    feed.dry_matter -= carbon_loss
