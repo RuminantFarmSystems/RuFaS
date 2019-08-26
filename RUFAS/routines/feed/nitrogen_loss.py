@@ -37,5 +37,6 @@ def CP_loss(feed):
 def NPN_loss(feed):
     feed.NPN += feed.crude_protein * feed.NPN_min_percent
 
+
 def update_CP(feed):
     feed.crude_protein -= (feed.CP_gas + feed.CP_leachate)
