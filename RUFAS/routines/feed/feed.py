@@ -27,6 +27,7 @@ def daily_feed_routine(feed, crop):
 
 
 def annual_feed_routine(feed, crop):
+    feed.prev_crop_type = feed.crop_type
     feed.crop_type = crop.current_crop.crop_name
     
     if feed.crop_type != 'null':
@@ -66,7 +67,8 @@ def calibrate_feed(feed):
             feed.C_feedout_gas_percent = 0.02
             feed.C_feedout_particle_percent = 0
         else:
-            print(feed.moisture, 'is not a recognized moisture category for', feed.crop_type)
+            if feed.prev_crop_type != feed.crop_type:
+                print('"' + feed.moisture + '"', 'is not a recognized moisture category for', feed.crop_type)
     elif feed.crop_type == 'alfalfa':
         if feed.moisture == 'direct_cut':
             feed.CP_gas_percent = 0
@@ -119,10 +121,11 @@ def calibrate_feed(feed):
             feed.C_feedout_gas_percent = 0
             feed.C_feedout_particle_percent = 0.01
         else:
-            print('"' + feed.moisture + '"', 'is not a recognized moisture category for', feed.crop_type)
+            if feed.prev_crop_type != feed.crop_type:
+                print('"' + feed.moisture + '"', 'is not a recognized moisture category for', feed.crop_type)
     else:
-        print(feed.crop_type, 'storage is not currently implemented')
-
+        if feed.prev_crop_type != feed.crop_type:
+            print('"' + feed.crop_type + '"', 'storage is not currently implemented')
 
 
 # -------------------------------------------------------------------------------
@@ -149,6 +152,7 @@ class Feed:
         self.removal_rate = data['removal_rate']
 
         self.crop_type = 'null'
+        self.prev_crop_type = 'null'
 
         self.dry_matter = data['initial_dry_matter']
 
@@ -238,8 +242,6 @@ class Feed:
             self.available_feeds[feed_name]['RUP'] = 0.87 * (CP - NH3[feed_name] -
                                      (unavail_prot[feed_name] * CP))
         '''
-
-
 
     # ---------------------------------------------------------------------------
     # Method: annual_reset
