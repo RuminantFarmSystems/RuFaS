@@ -63,6 +63,8 @@ def daily_crop_routine(crop, weather, time, soil):
         # yield is reset to 0 at the beginning of the next day so it can be
         # accessed by the output handler.
         crop_type.yield_actual = 0
+        crop_type.yield_N = 0
+        crop_type.yield_P = 0
 
         # If the crop is not planted yet, determine whether it is planted today
         if not crop_type.planted:
@@ -86,15 +88,17 @@ def daily_crop_routine(crop, weather, time, soil):
 
                 leaf_area_index.update_all(crop_type, time)
 
-                biomass.update_all(crop_type, time, weather)
+                biomass.update_all(crop_type, soil, time, weather)
 
                 # TODO: This is where we toggle scheduled vs optimal harvests
                 if crop_type.harvest_type == 'scheduled':
                     if time.day == crop_type.kill_day:
                         yields.update_all(crop_type, time, soil)
+
                 elif crop_type.harvest_type == 'optimal':
                     if crop_type.fr_PHU >= crop_type.fr_PHU_harvest:
                         yields.update_all(crop_type, time, soil)
+
                 else:
                     print('"' + crop_type.harvest_type + '"', 'is not a recognized harvest type.'
                                                               ' Harvesting on optimal date.')

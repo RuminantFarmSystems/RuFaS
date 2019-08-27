@@ -48,7 +48,9 @@ class CropSummary(BaseReportHandler):
                           'Bio_N': ['crop_type.bio_N', 'kg N ha^-1', []],
                           'Bio_P': ['crop_type.bio_P', 'kg P ha^-1', []],
                           'rooting_depth': ['crop_type.z_root', 'mm', []],
-                          'yield_actual': ['crop_type.yield_actual', 'kg ha^-1', []]
+                          'yield_actual': ['crop_type.yield_actual', 'kg ha^-1', []],
+                          'yield_N': ['crop_type.yield_N', 'kg N ha^-1', []],
+                          'yield_P': ['crop_type.yield_P', 'kg P ha^-1', []]
                           }
 
     #
