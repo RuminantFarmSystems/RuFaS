@@ -9,7 +9,6 @@ Author(s): Kass Chupongstimun, kass_c@hotmail.com
 
 from pathlib import Path
 import csv
-
 from RUFAS.output.data_analysis import ration_data_analysis
 from RUFAS.output.report_handler import BaseReportHandler
 

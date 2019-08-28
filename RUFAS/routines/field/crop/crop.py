@@ -43,7 +43,7 @@ This module needs the following inputs in order to operate correctly:
 
 from math import acos, asin, sin, tan, pi
 from . import heat_units, leaf_area_index, root_development, biomass, yields, \
-    phosphorus_uptake, nitrogen_uptake, transpiration, growth_constraints
+    phosphorus_uptake, nitrogen_uptake, growth_constraints
 
 
 # -------------------------------------------------------------------------------

@@ -12,32 +12,26 @@ from . import nitrogen_loss, carbon_loss, protein_degradation
 
 
 def daily_feed_routine(feed, crop):
-    feed.dry_matter += crop.current_crop.yield_actual * feed.dry_matter_percent
-    feed.crude_protein += crop.current_crop.yield_actual * \
-                          feed.dry_matter_percent * feed.crude_protein_percent
+    if crop.current_crop.crop_type != 'null':
+        calibrate_feed(feed, crop)
+        feed.dry_matter += crop.current_crop.yield_actual * feed.dry_matter_percent
+        feed.crude_protein += crop.current_crop.yield_actual * \
+                              feed.dry_matter_percent * feed.crude_protein_percent
 
-    if crop.current_crop.yield_actual != 0:
-        feed.nitrogen += crop.current_crop.bio_N
-        feed.phosphorus += crop.current_crop.bio_P
-        # feed.carbon += crop.current_crop.org_C  TODO: no Carbon Cycle currently implemented
+        if crop.current_crop.yield_actual != 0:
+            feed.nitrogen += crop.current_crop.yield_N
+            feed.phosphorus += crop.current_crop.yield_P
+            # feed.carbon += crop.current_crop.yield_C  TODO: no Carbon Cycle currently implemented
 
-        nitrogen_loss.update_all(feed)
+            nitrogen_loss.update_all(feed)
 
-        carbon_loss.update_all(feed)
+            carbon_loss.update_all(feed)
 
-        protein_degradation.update_all(feed)
-
-
-def annual_feed_routine(feed, crop):
-    feed.prev_crop_type = feed.crop_type
-    feed.crop_type = crop.current_crop.crop_name
-
-    if feed.crop_type != 'null':
-        calibrate_feed(feed)
+            protein_degradation.update_all(feed)
 
 
-def calibrate_feed(feed):
-    if feed.crop_type == 'corn':
+def calibrate_feed(feed, crop):
+    if crop.current_crop.crop_type == 'corn':
         feed.crude_protein_percent = 0.08
         if feed.moisture == 'direct_cut':
             feed.dry_matter_percent = 0.25
@@ -73,9 +67,8 @@ def calibrate_feed(feed):
             feed.C_feedout_gas_percent = 0.02
             feed.C_feedout_particle_percent = 0
         else:
-            if feed.prev_crop_type != feed.crop_type:
-                print('"' + feed.moisture + '"', 'is not a recognized moisture category for', feed.crop_type)
-    elif feed.crop_type == 'alfalfa':
+            print('"' + feed.moisture + '"', 'is not a recognized moisture category for', crop.current_crop.crop_name)
+    elif crop.current_crop.crop_type == 'alfalfa':
         feed.crude_protein_percent = 0.22
         if feed.moisture == 'direct_cut':
             feed.dry_matter_percent = 0.25
@@ -133,11 +126,9 @@ def calibrate_feed(feed):
             feed.C_feedout_gas_percent = 0
             feed.C_feedout_particle_percent = 0.01
         else:
-            if feed.prev_crop_type != feed.crop_type:
-                print('"' + feed.moisture + '"', 'is not a recognized moisture category for', feed.crop_type)
+            print('"' + feed.moisture + '"', 'is not a recognized moisture category for', crop.current_crop.crop_name)
     else:
-        if feed.prev_crop_type != feed.crop_type:
-            print('"' + feed.crop_type + '"', 'storage is not currently implemented')
+        print('"' + crop.current_crop.crop_name + '"', 'storage is not currently implemented')
 
 
 # -------------------------------------------------------------------------------
@@ -161,9 +152,6 @@ class Feed:
         self.bunk_type = data['bunk_type']
         self.ventilation = data['ventilation']
         self.removal_rate = data['removal_rate']
-
-        self.crop_type = 'null'
-        self.prev_crop_type = 'null'
 
         self.dry_matter = data['initial_dry_matter']
 
@@ -213,7 +201,7 @@ class Feed:
         """
         # The feed library contains all the types of feed described in the input
         # csv file specified for "feed_library" in the input json file.
-        self.feed_library = util.Library(data["feed_library"])
+        self.feed_library = util.Library('Inputs/feed_storage/' + data["feed_library"])
 
         # The available_feeds are the collection of feeds that are actually
         # available and should be used in calculations.

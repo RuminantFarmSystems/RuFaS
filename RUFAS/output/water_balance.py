@@ -105,16 +105,16 @@ class WaterBalance(BaseReportHandler):
     # to the scope of variables. If a specified output is not a soil
     # variable, this will throw an error. See comment at the top of the file.
     #
-    def daily_update(self, state, weather, time):
+    def daily_update(self, field, weather, time):
 
-        soil = state.soil
+        soil = field.soil
         for variable in self.daily_variables:
             self.daily_variables[variable][2].append(
                 eval(self.daily_variables[variable][0], globals(), locals()))
 
-    def annual_update(self, state, weather, time):
+    def annual_update(self, field, weather, time):
         """Stores the yearly values that need to be printed in the report."""
-        soil = state.soil
+        soil = field.soil
 
         soil.calculate_annual_water_balance()
 

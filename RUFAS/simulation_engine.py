@@ -80,9 +80,10 @@ def daily_simulation():
     # Daily routines
     #
     routines.daily_animal_routine(state.animal, state.feed, weather, time)
-    routines.daily_soil_routine(state.soil, state.crop, weather, time)
-    routines.daily_crop_routine(state.crop, weather, time, state.soil)
-    routines.daily_feed_routine(state.feed, state.crop)
+    for field in state.fields:
+        routines.daily_soil_routine(field.soil, field.crop, weather, time)
+        routines.daily_crop_routine(field.crop, weather, time, field.soil)
+        routines.daily_feed_routine(state.feed, field.crop)
 
     #
     # Daily Output Updates
@@ -107,8 +108,8 @@ def annual_simulation():
     #
     # Pre-annual Routines
     #
-    routines.annual_crop_routine(state.crop, time)
-    routines.annual_feed_routine(state.feed, state.crop)
+    for field in state.fields:
+        routines.annual_crop_routine(field.crop, time)
 
     while not time.end_year():
         daily_simulation()
@@ -152,11 +153,11 @@ def read_json_file(fPath:Path):
         # Instantiate objects using dictionary data from .json file
         try:
             config = Config(data['config'], data['weather'])
-            output = OutputHandler(data['output'])
             weather = Weather(data['weather'], config.years, config.w_start_year,
                               config.w_start_day, config.start_year, config.start_day)
             time = Time(config.years, config.start_year)
-            state = State(data['farm'], config, time)
+            state = State(data['farm'], time)
+            output = OutputHandler(data['output'], state)
 
         except errors.JSONfileData as e:
             print("JSON FILE ERROR: " +

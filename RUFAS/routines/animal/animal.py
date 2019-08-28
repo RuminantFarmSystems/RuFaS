@@ -39,10 +39,11 @@ def daily_animal_update(animal, weather, time):
     """
     pass
 
+
 # -------------------------------------------------------------------------------
 # Class: animal
 # -------------------------------------------------------------------------------
-class Animal():
+class Animal:
     """
     Currently represents a Cow.
     """
@@ -54,7 +55,7 @@ class Animal():
         Args:
             data : 2D dictionary which stores information about the cow
         """
-        self.herd = Herd.Herd(data["Herd"])
+        self.herd = Herd.Herd(data['Herd'])
         self.housing = data['housing']
         self.has_user_input_ration = data['ration']['user_input']
 

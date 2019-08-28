@@ -308,10 +308,10 @@ def try_to_float(input):
 # (defined in the csv) must have a unique "ID" trait and a unique "Name" trait.
 #
 class Library():
-    def __init__(self, csvFile):
+    def __init__(self, csv_file):
         self.lib_by_id = {}
         self.lib_by_name = {}
-        info = get_csv_columns(csvFile)
+        info = get_csv_columns(csv_file)
 
         # The names of the traits are the first entry in each column
         traits = [col[0] for col in info]

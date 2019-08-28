@@ -140,7 +140,7 @@ This module needs the following inputs in order to operate correctly:
 from math import exp, log
 from . import infiltration, \
     evapotranspiration, percolation, soil_temp, soil_erosion, soil_water
-from ..crop import transpiration
+from RUFAS.routines.field.crop import transpiration
 from .nitrogen_cycling import nitrogen_cycling
 from .phosphorus_cycling import phosphorus_cycling
 
@@ -197,9 +197,8 @@ class Soil:
     """
     Contains the state of the farm's soil.
     """
-    soil_layers = []
 
-    def __init__(self, data, config):
+    def __init__(self, data, application_data, time):
         """
         Description:
             Constructs an instance of the Soil class by populating its arrays
@@ -210,9 +209,13 @@ class Soil:
             config: instance of the Config class
         """
         # Values Initialized by Input
-        self.manure = Soil.Manure(data['ManureApplication'])
-        self.fertilizer = Soil.Fertilizer(data['FertilizerApplication'])
-        self.tillage = Soil.Tillage(data['TillageApplication'])
+        self.soil_layers = []
+
+        self.start_year = time.start_year
+
+        self.manure = Soil.Manure(application_data['ManureApplication'])
+        self.fertilizer = Soil.Fertilizer(application_data['FertilizerApplication'])
+        self.tillage = Soil.Tillage(application_data['TillageApplication'])
 
         self.profileBulkDensity = data['ProfileBulkDensity']
         self.CN2 = data['CN2']  # unitless, user-defined curve number (empirical)
@@ -246,8 +249,6 @@ class Soil:
         for layer in self.soil_layers:
             layer.thickness = layer.bottom_depth - curr_thickness
             curr_thickness = layer.bottom_depth
-
-        self.start_year = config.start_year
 
         self.cover = data['SoilCoverType']
         self.leach = 0.0

@@ -11,15 +11,19 @@ Author(s): Kass Chupongstimun, kass_c@hotmail.com
 ################################################################################
 
 import csv
+import json
+from pathlib import Path
 
 from RUFAS import util
 from RUFAS import errors
-from RUFAS.routines import Soil, Animal, Feed, Crop
+from RUFAS.routines import Field, Animal, Feed
 
 
 # -------------------------------------------------------------------------------
 # Class: State
 # -------------------------------------------------------------------------------
+
+
 class State:
     """Contains information about the current state of the farm.
 
@@ -35,16 +39,15 @@ class State:
     the future or in an output report in the state object.
     """
 
-    def __init__(self, data, config, time):
-        self.soil = Soil(data['soil'], config)
-        self.animal = Animal(data['animal'])
-        self.feed = Feed(data['feed'])
-        self.crop = Crop(data['crop'], time)
+    def __init__(self, data, time):
+        self.fields = []
+        self.fields_data = data['fields']
+        for field_name, field_data in self.fields_data.items():
+            self.fields.append(Field(field_name, field_data, time))
+        input_dir = util.get_base_dir() / 'Inputs'
+        self.animal = Animal(read_json_file(input_dir / 'animals' / data['animal']))
+        self.feed = Feed(read_json_file(input_dir / 'feed_storage' / data['feed']))
 
-    # self.fieldOps = FieldOps()
-    # self.herd = Herd()
-    # self.housing = Housing()
-    # self.manure = Manure()
 
     # ---------------------------------------------------------------------------
     # Method: annual_reset
@@ -53,16 +56,28 @@ class State:
         """Annual Reset"""
 
         # calculates water balance for the year before resetting necessary vals
-        self.soil.annual_reset()
-        self.crop.annual_reset()
+        for field in self.fields:
+            field.crop.annual_reset()
+            field.soil.annual_reset()
         self.animal.annual_reset()
         self.feed.annual_reset()
 
-    # self.fieldOps.annual_reset()
-    # self.herd.annual_reset()
-    # self.housing.annual_reset()
-    # self.manure.annual_reset()
 
+def read_json_file(file_path: Path):
+    try:
+        if file_path.suffix == '.json':
+            if not file_path.is_file():
+                raise errors.UserInput(str(file_path) + ' does not exist')
+        else:
+            raise errors.UserInput(str(file_path) + ' is not a JSON file')
+
+        with file_path.open('r') as f:
+            data = json.load(f)
+
+        return data
+
+    except errors.UserInput as e:
+        print(e.msg)
 
 # -------------------------------------------------------------------------------
 # Class: Config
@@ -85,7 +100,7 @@ class Config:
         leap_year_length = 366
 
         # read in the input csv file
-        weather_full_path = util.get_base_dir() / weather_path_str
+        weather_full_path = util.get_base_dir() / 'Inputs/weather' / weather_path_str
 
         if not weather_full_path.is_file():
             raise errors.JSONfileData("WEATHER",
@@ -304,7 +319,7 @@ class Weather:
             # self.beefCalf.append([0 for _ in range(len(year))])
 
         # read in the input csv file
-        weather_full_path = util.get_base_dir() / weather_path_str
+        weather_full_path = util.get_base_dir() / 'Inputs/weather' / weather_path_str
 
         if not weather_full_path.is_file():
             raise errors.JSONfileData("WEATHER",

@@ -18,7 +18,6 @@
 
 from . import fert_leach, fertilizer, manure, manure_leach, p_mineralization,\
     plow, sol_P
-import math
 
 
 def update_all(soil, weather, time):
