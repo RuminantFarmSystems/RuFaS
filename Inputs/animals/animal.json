@@ -1,0 +1,13 @@
+{
+    "Herd":
+    {
+        "cow_num": 100
+    },
+    "housing": "barn",
+    "ration":
+    {
+        "user_input": false,
+        "formulation_interval": 7
+    }
+}
+

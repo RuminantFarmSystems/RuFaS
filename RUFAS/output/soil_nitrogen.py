@@ -117,14 +117,14 @@ class SoilNitrogen(BaseReportHandler):
     # to the scope of soil variables. If a specified output is not a soil
     # variable, this will throw an error. See comment at the top of the file.
     #
-    def daily_update(self, state, weather, time):
+    def daily_update(self, field, weather, time):
 
-        soil = state.soil
+        soil = field.soil
 
         for variable in self.variables:
             self.variables[variable][2].append(eval(self.variables[variable][0], globals(), locals()))
 
-    def annual_update(self, state, weather, time):
+    def annual_update(self, field, weather, time):
         """Stores the yearly values that need to be printed in the report."""
         pass
 
