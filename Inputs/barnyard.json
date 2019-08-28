@@ -47,7 +47,7 @@
         "crop_summary":
         {
             "active": true,
-            "produce_diagnostics": false,
+            "produce_diagnostics": true,
             "show_daily": false,
             "report_name": "Crop Summary",
             "file_name": "crop_summary.csv"
@@ -70,8 +70,8 @@
             "latitude": 43.332708,
             "corn":
             {
-                "grow_years": [2009],
-                "repeat": 1,
+                "grow_years": [],
+                "repeat": 0,
                 "planting_date": 121,
                 "harvest_date": 319,
                 "harvest_type": "optimal"
@@ -86,8 +86,8 @@
             },
             "alfalfa":
             {
-                "grow_years": [],
-                "repeat": 0,
+                "grow_years": [2009],
+                "repeat": 1,
                 "planting_date": 121,
                 "harvest_date": 319,
                 "harvest_type": "optimal"
