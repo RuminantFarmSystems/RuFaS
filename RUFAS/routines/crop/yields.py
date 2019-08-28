@@ -76,7 +76,7 @@ def update_all(crop_type, time, soil):
 
 #
 # Calculates max potential harvest index for a given day.
-# "pseudocode_crop" C.10.B.1
+# "pseudocode_crop" C.10.C.1
 #
 def calc_HI_max(crop_type):
     top = 100 * crop_type.fr_PHU
@@ -112,6 +112,8 @@ def calc_yield_max(crop_type):
 def calc_yield_act(crop_type):
     crop_type.yield_actual = crop_type.yield_max * crop_type.harvest_eff
 
+    crop_type.yield_annual += crop_type.yield_actual
+
 
 #
 # Calculates the amount of nitrogen and phosphorus removed in the yield.
@@ -124,7 +126,7 @@ def calc_nutrient_removal(crop_type):
 
 #
 # Updates the current residue.
-# "pseudocode_crop" C.10.G.1/2/3/4/5
+# "pseudocode_crop" C.10.G.1/4/5
 #
 def calc_residue(crop_type, time, soil):
     d_residue = 0
@@ -136,7 +138,10 @@ def calc_residue(crop_type, time, soil):
         cut(crop_type, bio_frac)
     soil.residue += d_residue
 
-
+#
+# Kills the crop
+# "pseudocode_crop" C.10.G.4
+#
 def kill(crop_type):
     crop_type.accumulated_HU = 0
     crop_type.prev_accumulated_HU = 0
@@ -165,6 +170,10 @@ def kill(crop_type):
     crop_type.growing = False
 
 
+#
+# Cuts the crop without killing it
+# "pseudocode_crop" C.10.G.2/3
+#
 def cut(crop_type, bio_frac):
     crop_type.accumulated_HU = crop_type.accumulated_HU * (1 - bio_frac)
 
