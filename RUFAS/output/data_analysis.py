@@ -101,7 +101,7 @@ def annual_data_analysis(output_csv, show_annual, produce_diagnostics):
 
         added_variables = len(variables) - 9
 
-        colors = ['#ffffff', '#ff00ff', '#006400', '#fbaf08',  '#51d0de', '#431c5d', 'red']
+        colors = ['#ffffff', '#DC267F', '#648FFF', '#FFB000',  '#FE6100', '#785EF0', '#8B0000']
         for variable in variables:
             # assigns a random color to variables not originally included
             if len(colors) - 2 < counter < len(variables) - 3:
@@ -116,7 +116,7 @@ def annual_data_analysis(output_csv, show_annual, produce_diagnostics):
             elif counter == len(variables) - 3:
                 precip = variables[variable]
                 legend.insert(0, variable)
-                mp.scatter(years, precip, c='red', marker='x', zorder=2)
+                mp.scatter(years, precip, c='#8B0000', marker='x', zorder=2)
             if counter > 0:
                 variables[variable].insert(0, "")
                 table_vals.append(variables[variable])
@@ -149,7 +149,7 @@ def annual_data_analysis(output_csv, show_annual, produce_diagnostics):
             cellDict[(x, 0)].set_width(0.02)
 
         # legend toggle
-        # mp.legend(legend, loc='upper left')
+        # mp.legend(legend, loc='upper center', bbox_to_anchor=(-0.35, 1.3), ncol=1, prop={'size': 9})
         mp.subplots_adjust(left=0.31, bottom=0.5)
         mp.ylabel('mm H2O')
         mp.title('Annual Water Balance')

@@ -50,12 +50,12 @@ class WaterBalance(BaseReportHandler):
         #
         self.daily_variables = {'year': ['time.cal_year', '', []],
                                 'j_day': ['time.day', '', []],
-                                'delta_SW': ['soil.delta_SW', 'mmH2O', []],
+                                'change in sw': ['soil.delta_SW', 'mmH2O', []],
                                 'runoff': ['soil.runoff', 'mmH2O', []],
                                 'evaporation': ['soil.evap_sum', 'mmH2O', []],
                                 'transpiration': ['soil.trans_sum', 'mmH2O', []],
                                 'drainage': ['soil.drainage', 'mmH2O', []],
-                                'actual precipitation': ['soil.p_act', 'mmH2O', []],
+                                'precipitation': ['soil.p_act', 'mmH2O', []],
                                 'calculated water': ['soil.p_calc', 'mmH2O', []],
                                 'difference': ['soil.water_balance', 'mmH2O', []]}
 
@@ -63,7 +63,7 @@ class WaterBalance(BaseReportHandler):
         # Annual outputs
         #
         self.annual_variables = {'year': ['time.cal_year', '', 0],
-                                 'delta_SW': ['round(soil.annual_delta_SW, 3)', 'mmH2O', 0],
+                                 'change in sw': ['round(soil.annual_delta_SW, 3)', 'mmH2O', 0],
                                  'runoff': ['round(soil.runoff_annual, 3)', 'mmH2O', 0],
                                  'evaporation': ['round(soil.evap_annual, 3)', 'mmH2O', 0],
                                  'transpiration': ['round(soil.trans_annual, 3)', 'mmH2O', 0],
@@ -71,7 +71,7 @@ class WaterBalance(BaseReportHandler):
                                  # new variables need to be added below here in the gap
 
                                  # new variables need to be added above here
-                                 'actual precipitation': ['round(soil.p_act_annual, 3)', 'mmH2O', 0],
+                                 'precipitation': ['round(soil.p_act_annual, 3)', 'mmH2O', 0],
                                  'calculated water': ['round(soil.p_calc_annual, 3)', 'mmH2O', 0],
                                  'difference': ['round(soil.annual_water_balance, 3)', 'mmH2O', 0]}
 
