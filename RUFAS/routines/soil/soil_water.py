@@ -26,7 +26,7 @@ Soil attribute definitions
 
     perc = the amount of water percolated to the next layer (mm H20)
 
-    trans_act = the amount of water lost to transpiration on a give day (mm H20)
+    trans_act = the amount of water lost to transpiration on a given day (mm H20)
                 (this value is taken from the crop module)
 
 Soil values updated by calling update_all():
@@ -98,7 +98,7 @@ def update_SW(soil, weather, time):
     soil.p_act = R
     soil.p_calc = soil.delta_SW + soil.ET_act + soil.drainage + soil.runoff
 
-    soil.water_balance = soil.p_act - soil.p_calc
+    soil.water_balance_difference = soil.p_act - soil.p_calc
 
     # annual variables
     soil.drainage_annual += soil.drainage

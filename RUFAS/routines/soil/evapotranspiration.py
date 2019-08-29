@@ -19,7 +19,7 @@ Soil attribute definitions
 
     LHV = latent heat of vaporization (MJ kg^-1)
 
-    ET_max = potential evotranspiration (mm d^-1)
+    ET_max = potential evotranspiration a.k.a PET (mm d^-1)
 
     H0 = extraterrestrial radiation (mm m^-2d^-1)
 

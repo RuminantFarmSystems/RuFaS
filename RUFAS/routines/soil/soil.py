@@ -298,7 +298,7 @@ class Soil:
         self.p_act = 0.0
         self.p_calc = 0.0
 
-        self.water_balance = 0.0
+        self.water_balance_difference = 0.0
 
         # annual variables
         self.ET_max_annual = 0.0
@@ -314,7 +314,7 @@ class Soil:
         self.p_act_annual = 0.0
         self.p_calc_annual = 0.0
 
-        self.annual_water_balance = 0.0
+        self.annual_water_balance_difference = 0.0
 
         self.infiltration = 0.0
 
@@ -601,7 +601,7 @@ class Soil:
 
     # ---------------------------------------------------------------------------
     # Function: calculateSoilWater
-    # Calculates the amount of water in soil profile for a given layer at.
+    # Calculates the initial amount of water in soil profile for a given layer.
     # Called when soil portion of input is read.
     # ---------------------------------------------------------------------------
     def calculateSoilWater(self):
@@ -661,7 +661,7 @@ class Soil:
             + self.runoff_annual + self.evap_annual + self.trans_annual \
             + self.drainage_annual
 
-        self.annual_water_balance = self.p_act_annual - self.p_calc_annual
+        self.annual_water_balance_difference = self.p_act_annual - self.p_calc_annual
 
     def annual_reset(self):
         """
