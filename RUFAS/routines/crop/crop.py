@@ -30,8 +30,13 @@ This module needs the following inputs in order to operate correctly:
         soil_layers
 
         And the following attributes of a soil layer:
+<<<<<<< HEAD
             bottom_depth
             Eo_sum = Sum of the Eo values leading up to today
+=======
+            bottomDepth
+            ET_annual = Sum of the ET_act values leading up to today
+>>>>>>> 6fcf95fbfeb3b863d6d835b33b197566dbbbdea8
             trans_max
             NO3
             labile_P
@@ -114,6 +119,13 @@ def daily_crop_routine(crop, weather, time, soil):
                     crop_type.growing = False
                 elif not in_dormancy(crop, time):
                     crop_type.growing = True
+
+        annual_variable_update(crop_type)
+
+
+def annual_variable_update(crop_type):
+
+    crop_type.yield_annual += crop_type.yield_actual
 
 
 # -------------------------------------------------------------------------------
@@ -298,7 +310,7 @@ class InitCrop:
 
         # Internally calculated inputs
         self.gamma_reg = 0
-        self.dBiomass_max = 0
+        self.d_biomass_max = 0
         self.d_biomass_actual = 0
 
         # Outputs
@@ -458,7 +470,7 @@ class Corn:
 
         # Internally calculated inputs
         self.gamma_reg = 0
-        self.dBiomass_max = 0
+        self.d_biomass_max = 0
         self.d_biomass_actual = 0.0
 
         # Outputs
@@ -617,7 +629,7 @@ class Soybean:
 
         # Internally calculated inputs
         self.gamma_reg = 0
-        self.dBiomass_max = 0
+        self.d_biomass_max = 0
         self.d_biomass_actual = 0.0
 
         # Outputs
@@ -781,7 +793,7 @@ class Alfalfa:
 
         # Internally calculated inputs
         self.gamma_reg = 0
-        self.dBiomass_max = 0
+        self.d_biomass_max = 0
         self.d_biomass_actual = 0.0
 
         # Outputs
@@ -943,5 +955,3 @@ def get_year_length(year):
         return 366
     else:
         return 365
-
-

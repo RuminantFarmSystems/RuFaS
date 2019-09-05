@@ -13,17 +13,17 @@ Description: This module contains the necessary functions for calculating and
 
 CropType attribute definitions:
 
-    bio_N = Actual mass of nitrogen stored in plant material (kg N ha^-1)
+    bio_N = Actual mass of nitrogen stored in plant material (kg N/ha)
 
     bio_N_opt = Optimal mass of nitrogen stored in plant material for current
-                growth stage (kg N ha^-1)
+                growth stage (kg N/ha)
 
     phi_N = Scaling factor for nitrogen stress
 
-    bio_P = Actual mass of phosphorus stored in plant material (kg P ha^-1)
+    bio_P = Actual mass of phosphorus stored in plant material (kg P/ha)
 
     bio_P_opt = Optimal mass of phosphorus stored in plant material for current
-                growth stage (kg P ha^-1)
+                growth stage (kg P/ha)
 
     phi_P = scaling factor for phosphorus stress
 

@@ -21,28 +21,28 @@ CropType attribute definitions:
 
     ET_annual = Sum of actual evapotranspiration from day 1 up to today (mm H20)
 
-    Eo_sum = Sum of potential evapotranspiration from day 1 up to today (mm H20)
+    ET_max_annual = Sum of potential evapotranspiration from day 1 up to today (mm H20)
 
     HI_actual = Actual harvest index
 
     HI_opt = Potential harvest for the plant at maturity given ideal growing
              conditions
 
-    bio_AG = Aboveground biomass (kg ha^-1)
+    bio_AG = Aboveground biomass (kg/ha)
 
     harvest_eff = Efficiency of the harvest operation, i.e. fraction of yield
                   biomass removed by the harvesting equipment.
 
-    yield_max = maximum crop yield at harvest (kg ha^-1)
+    yield_max = maximum crop yield at harvest (kg/ha)
 
-    yield_actual = Actual crop yield at harvest (kg ha^-1)
+    yield_actual = Actual crop yield at harvest (kg/ha)
 
     yield_N = Amount of nitrogen removed in the yield
 
     yield_P = Amount of phosphorus removed in the yield
 
     residue = Material in the residue pool for the top 10mm of soil on current
-              day (kg ha^-1)
+              day (kg/ha)
 
 
 CropType values updated by update_all():
@@ -137,6 +137,7 @@ def calc_residue(crop_type, time, soil):
         bio_frac = crop_type.yield_actual / crop_type.biomass_actual
         cut(crop_type, bio_frac)
     soil.residue += d_residue
+
 
 #
 # Kills the crop
