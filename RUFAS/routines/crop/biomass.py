@@ -48,10 +48,14 @@ from math import exp
 #
 # This function updates all biomass information
 #
-def update_all(crop_type, time, weather):
+def update_all(crop_type, soil, time, weather):
 
     # update biomass values
     calc_act_biomass(crop_type, time, weather)
+
+    calc_bio_AG(crop_type)
+
+    calc_gamma_wu(crop_type, soil)
 
 
 #
@@ -82,3 +86,24 @@ def calc_act_biomass(crop_type, time, weather):
 def calc_intercepted_radiation(crop_type, time, weather):
     H_day = weather.radiation[time.year - 1][time.day - 1]
     return 0.5 * H_day * (1 - exp(-1 * crop_type.kl * crop_type.LAI_actual))
+
+
+#
+# Calculates aboveground biomass.
+# "pseudocode_crop" C.9.B.1
+#
+def calc_bio_AG(crop_type):
+    crop_type.bio_AG = (1 - crop_type.fr_root) * crop_type.biomass_actual
+
+
+#
+# Calculates water deficiency factor (AKA gamma_wu).
+# "pseudocode_crop" C.9.C.1
+#
+def calc_gamma_wu(crop_type, soil):
+    if soil.ET_max_annual == 0:
+        return 0
+
+    soil.ET_annual = soil.evap_annual + soil.trans_annual
+    crop_type.gamma_wu = 100 * (soil.ET_annual / soil.ET_max_annual)
+
