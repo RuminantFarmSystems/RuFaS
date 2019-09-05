@@ -236,10 +236,10 @@ class Soil:
 
         # sort layers by bottom_depth
         self.soil_layers.sort(key=lambda x: x.bottom_depth)
-        
+
         # determine profile depth
         self.profile_depth = self.soil_layers[-1].bottom_depth
-        
+
         # calculate initial depth of each soil layer
 
         curr_thickness = 0
@@ -259,7 +259,6 @@ class Soil:
 
         x = 0
         for layer in self.soil_layers:
-
             # TODO careful of cm to mm, I had to add the / 10
             self.thickness_cm.append(layer.thickness / 10)
 
@@ -683,6 +682,7 @@ class Soil:
         An instance of this class represents a particular uptake and the date
         of uptake
         """
+
         def __init__(self, uptake_name, uptake_data):
             """
             Args:
@@ -754,8 +754,8 @@ class Soil:
         self.annual_delta_SW = self.profile_SW - self.initial_annual_SW
 
         self.p_calc_annual = self.annual_delta_SW \
-            + self.runoff_annual + self.evap_annual + self.trans_annual \
-            + self.drainage_annual
+                             + self.runoff_annual + self.evap_annual + self.trans_annual \
+                             + self.drainage_annual
 
         self.annual_water_balance = self.p_act_annual - self.p_calc_annual
 
