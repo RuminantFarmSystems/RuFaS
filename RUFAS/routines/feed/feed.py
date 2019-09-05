@@ -12,13 +12,12 @@ from . import nitrogen_loss, carbon_loss, protein_degradation
 
 
 def daily_feed_routine(feed, crop):
-    feed.dry_matter += crop.current_crop.yield_actual * feed.dry_matter_percent
-    feed.crude_protein += crop.current_crop.yield_actual * \
-                          feed.dry_matter_percent * feed.crude_protein_percent
+    feed.dry_matter += crop.current_crop.yield_actual
+    feed.crude_protein += crop.current_crop.yield_actual * feed.crude_protein_percent
 
     if crop.current_crop.yield_actual != 0:
-        feed.nitrogen += crop.current_crop.bio_N
-        feed.phosphorus += crop.current_crop.bio_P
+        feed.nitrogen += crop.current_crop.yield_N
+        feed.phosphorus += crop.current_crop.yield_P
         # feed.carbon += crop.current_crop.org_C  TODO: no Carbon Cycle currently implemented
 
         nitrogen_loss.update_all(feed)
@@ -29,18 +28,17 @@ def daily_feed_routine(feed, crop):
 
 
 def annual_feed_routine(feed, crop):
-    feed.prev_crop_type = feed.crop_type
-    feed.crop_type = crop.current_crop.crop_name
+    feed.prev_crop_name = feed.crop_name
+    feed.crop_name = crop.current_crop.crop_name
 
-    if feed.crop_type != 'null':
+    if feed.crop_name != 'null':
         calibrate_feed(feed)
 
 
 def calibrate_feed(feed):
-    if feed.crop_type == 'corn':
+    if feed.crop_name == 'corn':
         feed.crude_protein_percent = 0.08
         if feed.moisture == 'direct_cut':
-            feed.dry_matter_percent = 0.25
             feed.CP_gas_percent = 0
             feed.CP_leachate_percent = 0.02
             feed.NPN_min_percent = 0.50
@@ -51,7 +49,6 @@ def calibrate_feed(feed):
             feed.C_feedout_gas_percent = 0.02
             feed.C_feedout_particle_percent = 0
         elif feed.moisture == 'wilted':
-            feed.dry_matter_percent = 0.25
             feed.CP_gas_percent = 0
             feed.CP_leachate_percent = 0
             feed.NPN_min_percent = 0.45
@@ -62,7 +59,6 @@ def calibrate_feed(feed):
             feed.C_feedout_gas_percent = 0.02
             feed.C_feedout_particle_percent = 0
         elif feed.moisture == 'baleage':
-            feed.dry_matter_percent = 0.25
             feed.CP_gas_percent = 0
             feed.CP_leachate_percent = 0
             feed.NPN_min_percent = 0.40
@@ -73,12 +69,11 @@ def calibrate_feed(feed):
             feed.C_feedout_gas_percent = 0.02
             feed.C_feedout_particle_percent = 0
         else:
-            if feed.prev_crop_type != feed.crop_type:
-                print('"' + feed.moisture + '"', 'is not a recognized moisture category for', feed.crop_type)
-    elif feed.crop_type == 'alfalfa':
+            if feed.prev_crop_name != feed.crop_name:
+                print('"' + feed.moisture + '"', 'is not a recognized moisture category for', feed.crop_name)
+    elif feed.crop_name == 'alfalfa':
         feed.crude_protein_percent = 0.22
         if feed.moisture == 'direct_cut':
-            feed.dry_matter_percent = 0.25
             feed.CP_gas_percent = 0
             feed.CP_leachate_percent = 0.025
             feed.NPN_min_percent = 0.40
@@ -89,7 +84,6 @@ def calibrate_feed(feed):
             feed.C_feedout_gas_percent = 0.02
             feed.C_feedout_particle_percent = 0
         elif feed.moisture == 'wilted':
-            feed.dry_matter_percent = 0.25
             feed.CP_gas_percent = 0
             feed.CP_leachate_percent = 0
             feed.NPN_min_percent = 0.40
@@ -100,7 +94,6 @@ def calibrate_feed(feed):
             feed.C_feedout_gas_percent = 0.02
             feed.C_feedout_particle_percent = 0
         elif feed.moisture == 'haylage':
-            feed.dry_matter_percent = 0.25
             feed.CP_gas_percent = 0
             feed.CP_leachate_percent = 0
             feed.NPN_min_percent = 0.35
@@ -111,7 +104,6 @@ def calibrate_feed(feed):
             feed.C_feedout_gas_percent = 0.02
             feed.C_feedout_particle_percent = 0
         elif feed.moisture == 'moist_hay':
-            feed.dry_matter_percent = 0.25
             feed.CP_gas_percent = 0
             feed.CP_leachate_percent = 0
             feed.NPN_min_percent = 0.30
@@ -122,7 +114,6 @@ def calibrate_feed(feed):
             feed.C_feedout_gas_percent = 0
             feed.C_feedout_particle_percent = 0.01
         elif feed.moisture == 'dry_hay':
-            feed.dry_matter_percent = 0.25
             feed.CP_gas_percent = 0
             feed.CP_leachate_percent = 0
             feed.NPN_min_percent = 0.20
@@ -133,11 +124,11 @@ def calibrate_feed(feed):
             feed.C_feedout_gas_percent = 0
             feed.C_feedout_particle_percent = 0.01
         else:
-            if feed.prev_crop_type != feed.crop_type:
-                print('"' + feed.moisture + '"', 'is not a recognized moisture category for', feed.crop_type)
+            if feed.prev_crop_name != feed.crop_name:
+                print('"' + feed.moisture + '"', 'is not a recognized moisture category for', feed.crop_name)
     else:
-        if feed.prev_crop_type != feed.crop_type:
-            print('"' + feed.crop_type + '"', 'storage is not currently implemented')
+        if feed.prev_crop_name != feed.crop_name:
+            print('"' + feed.crop_name + '"', 'storage is not currently implemented')
 
 
 # -------------------------------------------------------------------------------
@@ -162,12 +153,10 @@ class Feed:
         self.ventilation = data['ventilation']
         self.removal_rate = data['removal_rate']
 
-        self.crop_type = 'null'
-        self.prev_crop_type = 'null'
+        self.crop_name = 'null'
+        self.prev_crop_name = 'null'
 
         self.dry_matter = data['initial_dry_matter']
-
-        self.dry_matter_percent = 0.0
 
         self.crude_protein_percent = 0.0
 
