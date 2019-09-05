@@ -63,7 +63,7 @@ def simulate(input_fPath:Path):
     while not time.end_simulation():
         annual_simulation()
 
-    output.produce_data_analysis()
+    output.produce_graphics()
     t_end_sim = timer.time()
 
     print("Simulation Successful: {}".format(input_fPath.name))

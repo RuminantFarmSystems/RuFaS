@@ -9,8 +9,7 @@ Author(s): William Donovan, wmdonovan@wisc.edu
 #############################################
 import csv
 from pathlib import Path
-
-from RUFAS.output.data_analysis import data_analysis
+from RUFAS.output.graphics import daily_graphics, annual_graphics
 from RUFAS.output.report_handler import BaseReportHandler
 
 
@@ -42,18 +41,18 @@ class CropSummary(BaseReportHandler):
         # 1D Lists [julianDay]
         #
         self.daily_variables = {'year': ['time.cal_year', '', []],
-                          'j_day': ['time.day', '', []],
-                          'fr_PHU': ['crop_type.fr_PHU', '%', []],
-                          'biomass': ['crop_type.biomass_actual', 'kg ha^-1', []],
-                          'LAI_actual': ['crop_type.LAI_actual', 'm^2/m^2', []],
-                          'Bio_N': ['crop_type.bio_N', 'kg N ha^-1', []],
-                          'Bio_P': ['crop_type.bio_P', 'kg P ha^-1', []],
-                          'rooting_depth': ['crop_type.z_root', 'mm', []],
-                          'yield_actual': ['crop_type.yield_actual', 'kg ha^-1', []]
-                          }
+                                'j_day': ['time.day', '', []],
+                                'fr_PHU': ['crop_type.fr_PHU', '%', []],
+                                'biomass': ['crop_type.biomass_actual', 'kg/ha', []],
+                                'LAI_act': ['crop_type.LAI_actual', 'm^2/m^2', []],
+                                'Bio_N': ['crop_type.bio_N', 'kg N/ha', []],
+                                'Bio_P': ['crop_type.bio_P', 'kg P/ha', []],
+                                'z_root': ['crop_type.z_root', 'mm', []],
+                                'yield_act': ['crop_type.yield_actual', 'kg/ha', []]
+                                }
 
         self.annual_variables = {'year': ['time.cal_year', '', 0],
-                                 'yield_annual': ['crop_type.yield_annual', 'kg ha^-1', 0]
+                                 'yield': ['crop_type.yield_annual', 'kg/ha', 0]
                                  }
 
     #
@@ -64,7 +63,6 @@ class CropSummary(BaseReportHandler):
         mode = 'a+' if output_csv.exists() else 'w+'
 
         with output_csv.open(mode) as csvfile:
-
             writer = csv.DictWriter(csvfile, fieldnames=variables.keys(),
                                     lineterminator='\n')
 
@@ -77,9 +75,8 @@ class CropSummary(BaseReportHandler):
             writer.writerow(units)
 
     def initialize(self, state):
-
         self.write_headers(self.get_fPath(), self.daily_variables)
-        annual_path = Path(str(self.get_fPath()).split('.csv')[0] + '_annual.csv')
+        annual_path = Path(str(self.get_fPath()).split('.csv')[0] + "_annual.csv")
         self.write_headers(annual_path, self.annual_variables)
 
     #
@@ -104,18 +101,16 @@ class CropSummary(BaseReportHandler):
         for variable in self.annual_variables:
             self.annual_variables[variable][2] = \
                 eval(self.annual_variables[variable][0], globals(), locals())
-        pass
 
     #
     # writes stored values to the csv at the end of the year
     #
     def write_annual_report(self):
-        """Appends the annual report to the output file."""
 
         mode = 'a+' if self.get_fPath().exists() else 'w+'
 
         with self.get_fPath().open(mode) as csvfile:
-            writer = csv.DictWriter(csvfile, fieldnames=self.daily_variables,
+            writer = csv.DictWriter(csvfile, fieldnames=self.daily_variables.keys(),
                                     lineterminator='\n')
             for day in range(len(self.daily_variables['j_day'][2])):
                 row = {}
@@ -130,7 +125,6 @@ class CropSummary(BaseReportHandler):
         with annual_path.open(mode) as csvfile:
             writer = csv.DictWriter(csvfile, fieldnames=self.annual_variables.keys(),
                                     lineterminator='\n')
-
             row = {}
             for variable in self.annual_variables:
                 row[variable] = self.annual_variables[variable][2]
@@ -140,7 +134,6 @@ class CropSummary(BaseReportHandler):
     # clears stored values at the end of the year
     #
     def annual_flush(self):
-        """Sets all of the values in the output object to the default value."""
 
         for variable in self.daily_variables:
             self.daily_variables[variable][2] = []
@@ -148,5 +141,7 @@ class CropSummary(BaseReportHandler):
         for variable in self.annual_variables:
             self.annual_variables[variable][2] = 0
 
-    def produce_data_analysis(self, is_final):
-        data_analysis(self.file_name, self.show_daily, self.produce_diagnostics, is_final)
+    def produce_report_graphics(self, is_final):
+        annual_file_name = str(self.file_name).split('.')[0] + "_annual.csv"
+        annual_graphics(annual_file_name, self.display_graphics, self.produce_graphics, is_final)
+        daily_graphics(self.file_name, self.display_graphics, self.produce_graphics, is_final)

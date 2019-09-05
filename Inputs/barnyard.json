@@ -14,16 +14,16 @@
         "soil_summary":
         {
             "active": true,
-            "produce_diagnostics": false,
-            "show_daily": false,
+            "produce_graphics": false,
+            "display_graphics": false,
             "report_name": "Soil Summary",
             "file_name": "soil_summary.csv"
         },
         "ration_report":
         {
             "active": true,
-            "produce_diagnostics": false,
-            "show_daily": false,
+            "produce_graphics": false,
+            "display_graphics": false,
             "report_name": "Ration Report",
             "file_name": "ration_report.csv",
             "ration_interval": 7
@@ -31,35 +31,42 @@
         "soil_nitrogen":
         {
             "active": true,
-            "produce_diagnostics": false,
-            "show_daily": false,
+            "produce_graphics": false,
+            "display_graphics": false,
             "report_name": "Soil Nitrogen",
             "file_name": "soil_nitrogen.csv"
         },
         "soil_phosphorus":
         {
             "active": true,
-            "produce_diagnostics": false,
-            "show_daily": false,
+            "produce_graphics": false,
+            "display_graphics": false,
             "report_name": "Soil Phosphorus",
             "file_name": "soil_phosphorus.csv"
         },
         "crop_summary":
         {
             "active": true,
-            "produce_diagnostics": false,
-            "show_daily": false,
+            "produce_graphics": false,
+            "display_graphics": false,
             "report_name": "Crop Summary",
             "file_name": "crop_summary.csv"
         },
         "water_balance":
         {
             "active": true,
-            "produce_diagnostics": false,
-            "show_daily": false,
-            "show_annual": false,
+            "produce_graphics": false,
+            "display_graphics": false,
             "report_name": "Water Balance",
             "file_name": "water_balance.csv"
+        },
+        "custom_report":
+        {
+            "active": true,
+            "produce_graphics": true,
+            "display_graphics": false,
+            "report_name": "Custom Report",
+            "file_name": "custom_report.csv"
         }
     },
 
@@ -70,8 +77,8 @@
             "latitude": 43.332708,
             "corn":
             {
-                "grow_years": [],
-                "repeat": 0,
+                "grow_years": [2011],
+                "repeat": 3,
                 "planting_date": 121,
                 "harvest_date": 319,
                 "harvest_type": "optimal"
@@ -86,8 +93,8 @@
             },
             "alfalfa":
             {
-                "grow_years": [],
-                "repeat": 0,
+                "grow_years": [2009,2010],
+                "repeat": 3,
                 "planting_date": 121,
                 "harvest_date": 319,
                 "harvest_type": "optimal"

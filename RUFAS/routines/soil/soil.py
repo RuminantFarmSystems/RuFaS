@@ -198,6 +198,21 @@ def daily_soil_routine(soil, crop, weather, time):
     # pools
     nitrogen_cycling.update_all(soil, weather, time)
 
+    annual_variable_update(soil)
+
+
+def annual_variable_update(soil):
+
+    soil.ET_max_annual += soil.ET_max
+
+    soil.drainage_annual += soil.drainage
+    soil.runoff_annual += soil.runoff
+    soil.trans_annual += soil.trans_sum
+    soil.evap_annual += soil.evap_sum
+    soil.ET_annual += soil.ET_act
+
+    soil.p_act_annual += soil.p_act
+
 
 # -------------------------------------------------------------------------------
 # Class: Soil
@@ -298,7 +313,7 @@ class Soil:
         self.p_act = 0.0
         self.p_calc = 0.0
 
-        self.water_balance = 0.0
+        self.water_balance_difference = 0.0
 
         # annual variables
         self.ET_max_annual = 0.0
@@ -315,7 +330,7 @@ class Soil:
         self.p_act_annual = 0.0
         self.p_calc_annual = 0.0
 
-        self.annual_water_balance = 0.0
+        self.annual_water_balance_difference = 0.0
 
         self.infiltration = 0.0
 
@@ -601,7 +616,7 @@ class Soil:
 
     # ---------------------------------------------------------------------------
     # Function: calculateSoilWater
-    # Calculates the amount of water in soil profile for a given layer at.
+    # Calculates the initial amount of water in soil profile for a given layer.
     # Called when soil portion of input is read.
     # ---------------------------------------------------------------------------
     def calculateSoilWater(self):
@@ -661,7 +676,7 @@ class Soil:
             + self.runoff_annual + self.evap_annual + self.trans_annual \
             + self.drainage_annual
 
-        self.annual_water_balance = self.p_act_annual - self.p_calc_annual
+        self.annual_water_balance_difference = self.p_act_annual - self.p_calc_annual
 
     def annual_reset(self):
         """

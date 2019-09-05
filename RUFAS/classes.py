@@ -52,7 +52,6 @@ class State:
     def annual_reset(self):
         """Annual Reset"""
 
-        # calculates water balance for the year before resetting necessary vals
         self.soil.annual_reset()
         self.crop.annual_reset()
         self.animal.annual_reset()
