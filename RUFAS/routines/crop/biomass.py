@@ -26,7 +26,7 @@ CropType attribute definitions:
 
     dBiomass_max = Maximum potential biomass increase on current day
 
-    dBiomass_act = Actual increase in total plant biomass on a given day (kg ha^-1)
+    dBiomass_act = Actual increase in total plant biomass on a given day (kg/ha)
 
     biomass_act = Total plant biomass on a given day
 

@@ -198,6 +198,21 @@ def daily_soil_routine(soil, crop, weather, time):
     # pools
     nitrogen_cycling.update_all(soil, weather, time)
 
+    annual_variable_update(soil)
+
+
+def annual_variable_update(soil):
+
+    soil.ET_max_annual += soil.ET_max
+
+    soil.drainage_annual += soil.drainage
+    soil.runoff_annual += soil.runoff
+    soil.trans_annual += soil.trans_sum
+    soil.evap_annual += soil.evap_sum
+    soil.ET_annual += soil.ET_act
+
+    soil.p_act_annual += soil.p_act
+
 
 # -------------------------------------------------------------------------------
 # Class: Soil
@@ -333,7 +348,6 @@ class Soil:
         self.yieldFactor = []
         self.summan = 0.0
         self.summanP = 0.0
-
 
         self.NO3_runoff = 0.0
         self.NH4_runoff = 0.0

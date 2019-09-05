@@ -37,7 +37,7 @@ Soil attribute definitions
 
     SoilCov = soil cover index
 
-    BioMass = aboveground biomass and residue (kg ha^-1)
+    BioMass = aboveground biomass and residue (kg/ha)
 
     evap_z = evaporation demand at depth z (mm H20)
 
@@ -63,6 +63,7 @@ Soil values updated by calling update_all():
 ###############################################################################
 
 from math import exp
+
 
 #
 # This function calls all the necessary functions to update information related
@@ -94,9 +95,6 @@ def calc_potential_evap(soil, crop, weather, time):
     ET_max = (0.0023 * H0 * ((Tmax - Tmin) ** 0.5) * (Tavg + 17.8)) / LHV
 
     soil.ET_max = max(0.001, ET_max)
-
-    if crop.crops_list["corn"].start_date <= time.day <= crop.crops_list["corn"].harvest_date:  # TODO: Crop Flag
-        soil.ET_max_annual += soil.ET_max
 
 
 #

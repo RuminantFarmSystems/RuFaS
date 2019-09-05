@@ -41,17 +41,18 @@ class CropSummary(BaseReportHandler):
         # 1D Lists [julianDay]
         #
         self.daily_variables = {'year': ['time.cal_year', '', []],
-                          'j_day': ['time.day', '', []],
-                          'fr_PHU': ['crop_type.fr_PHU', '%', []],
-                          'biomass': ['crop_type.biomass_act', 'kg ha^-1', []],
-                          'LAI_act': ['crop_type.LAI_act', 'm^2/m^2', []],
-                          'Bio_N': ['crop_type.bio_N', 'kg N ha^-1', []],
-                          'Bio_P': ['crop_type.bio_P', 'kg P ha^-1', []],
-                          'z_root': ['crop_type.z_root', 'mm', []],
-                          'yield_act': ['crop_type.yield_act', 'kg ha^-1', []]
-                          }
+                                'j_day': ['time.day', '', []],
+                                'fr_PHU': ['crop_type.fr_PHU', '%', []],
+                                'biomass': ['crop_type.biomass_act', 'kg/ha', []],
+                                'LAI_act': ['crop_type.LAI_act', 'm^2/m^2', []],
+                                'Bio_N': ['crop_type.bio_N', 'kg N/ha', []],
+                                'Bio_P': ['crop_type.bio_P', 'kg P/ha', []],
+                                'z_root': ['crop_type.z_root', 'mm', []],
+                                'yield_act': ['crop_type.yield_act', 'kg/ha', []]
+                                }
 
-        self.annual_variables = {'year': ['time.cal_year', '', []]
+        self.annual_variables = {'year': ['time.cal_year', '', 0],
+                                 'yield': ['crop_type.yield_annual', 'kg/ha', 0]
                                  }
 
     #

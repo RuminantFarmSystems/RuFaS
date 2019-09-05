@@ -67,7 +67,7 @@ class SoilPhosphorus(BaseReportHandler):
                                 'manure_cover': ['soil.manure_cov', 'HA', []],
                                 }
 
-        self.annual_variables = {'year': ['time.cal_year', '', []]
+        self.annual_variables = {'year': ['time.cal_year', '', 0]
                                  }
 
     #

@@ -67,7 +67,7 @@ This module needs the following inputs in order to operate correctly:
 
         And the following attributes of a soil layer:
             bottomDepth
-            Eo_sum = Sum of the Eo values leading up to today
+            ET_annual = Sum of the ET_act values leading up to today
             trans_max
             NO3
             labileP
@@ -113,6 +113,13 @@ def daily_crop_routine(crop, weather, time, soil):
         biomass.update_all(crop_type, time, weather)
 
         yields.update_all(crop_type, time, soil)
+
+        annual_variable_update(crop_type)
+
+
+def annual_variable_update(crop_type):
+
+    crop_type.yield_annual += crop_type.yield_act
 
 
 # -------------------------------------------------------------------------------
@@ -279,6 +286,8 @@ class Crop():
             self.yield_N = 0
             self.yield_P = 0
 
+            self.yield_annual = 0
+
         # -----------------------------------------------------------------------
         # Method: calculate_start_growth_day
         # "pseudocode_crop" section C.1.A
@@ -313,3 +322,5 @@ class Crop():
 
             crop_type.bio_P = 0
             crop_type.bio_N = 0
+
+            crop_type.yield_annual = 0

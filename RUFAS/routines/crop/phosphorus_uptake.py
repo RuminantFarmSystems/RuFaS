@@ -23,9 +23,9 @@ CropType attribute definitions:
 
     fr_P =  Fraction of phosphorus in the plant biomass on a given day
 
-    bio_P_opt = Optimal mass of phosphorus stored in plant material (kg P ha^-1)
+    bio_P_opt = Optimal mass of phosphorus stored in plant material (kg P/ha)
 
-    P_up = Potential phosphorus uptake (kg P ha^-1)
+    P_up = Potential phosphorus uptake (kg P/ha)
 
     beta_p = Phosphorus uptake distribution parameter
 
@@ -35,9 +35,9 @@ CropType attribute definitions:
                           in each soil layer.
 
     P_act_up = Actual amount of phosphorus removed from the soil solution
-               on a given day (kg P ha^-1)
+               on a given day (kg P/ha)
 
-    bio_P = Actual mass of phosphorus stored in plant material (kg P ha^-1)
+    bio_P = Actual mass of phosphorus stored in plant material (kg P/ha)
 
 
 CropType values updated by calling update_all():

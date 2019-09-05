@@ -23,18 +23,18 @@ CropType attribute definitions:
 
     fr_N = Fraction of nitrogen in the plant biomass on a given day
 
-    bio_N_opt = Optimal mass of nitrogen stored in plant biomass (kg N ha^-1)
+    bio_N_opt = Optimal mass of nitrogen stored in plant biomass (kg N/ha)
 
-    N_up = Potential nitrogen uptake (kg N ha^-1)
+    N_up = Potential nitrogen uptake (kg N/ha)
 
     beta_n = Nitrogen uptake distribution parameter
 
     act_N_up_each_layer = List of actual nitrogen uptakes from each soil layer.
 
     N_act_up = Actual amount of nitrogen removed from the soil solution
-                  on a given day (kg N ha^-1)
+                  on a given day (kg N/ha)
 
-    bio_N = Actual mass of nitrogen stored in plant material (kg N ha^-1)
+    bio_N = Actual mass of nitrogen stored in plant material (kg N/ha)
 
 
 CropType values updated by calling update_all():

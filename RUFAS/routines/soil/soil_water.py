@@ -55,6 +55,7 @@ def update_SW(soil, weather, time):
     soil.ET_act = 0.0
 
     profile_SW = 0
+    perc = 0
     for x in range(len(soil.soil_layers)):
         layer = soil.soil_layers[x]
 
@@ -100,11 +101,3 @@ def update_SW(soil, weather, time):
 
     soil.water_balance_difference = soil.p_act - soil.p_calc
 
-    # annual variables
-    soil.drainage_annual += soil.drainage
-    soil.runoff_annual += soil.runoff
-    soil.trans_annual += soil.trans_sum
-    soil.evap_annual += soil.evap_sum
-    soil.ET_annual += soil.ET_act
-
-    soil.p_act_annual += R

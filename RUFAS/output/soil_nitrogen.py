@@ -91,7 +91,7 @@ class SoilNitrogen(BaseReportHandler):
                                 'freshN_erosion': ['soil.freshN_erosion', 'kg/ha', []]
                                 }
 
-        self.annual_variables = {'year': ['time.cal_year', '', []]
+        self.annual_variables = {'year': ['time.cal_year', '', 0]
                                  }
 
     #

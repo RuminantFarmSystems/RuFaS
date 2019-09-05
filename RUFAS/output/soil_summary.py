@@ -70,7 +70,9 @@ class SoilSummary(BaseReportHandler):
                                 'temperature_L3': ['soil.soil_layers[2].temperature', 'C', []],
                                 }
 
-        self.annual_variables = {'year': ['time.cal_year', '', []]
+        self.annual_variables = {'year': ['time.cal_year', '', 0],
+                                 'ET_max': ['soil.ET_max_annual', 'mm H20', 0],
+                                 'ET': ['soil.ET_annual', 'mm H20', 0]
                                  }
 
     #
