@@ -159,6 +159,7 @@ def calc_residue(crop_type, time, soil):
         cut(crop_type, bio_frac)
     soil.residue += d_residue
 
+
 #
 # Kills the crop
 # "pseudocode_crop" C.10.I.4
@@ -189,6 +190,7 @@ def kill(crop_type):
 
     crop_type.planted = False
     crop_type.growing = False
+
 
 #
 # Cuts the crop without killing it
