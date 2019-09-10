@@ -21,28 +21,28 @@ CropType attribute definitions:
 
     ET_annual = Sum of actual evapotranspiration from day 1 up to today (mm H20)
 
-    Eo_sum = Sum of potential evapotranspiration from day 1 up to today (mm H20)
+    ET_max_annual = Sum of potential evapotranspiration from day 1 up to today (mm H20)
 
     HI_actual = Actual harvest index
 
     HI_opt = Potential harvest for the plant at maturity given ideal growing
              conditions
 
-    bio_AG = Aboveground biomass (kg ha^-1)
+    bio_AG = Aboveground biomass (kg/ha)
 
     harvest_eff = Efficiency of the harvest operation, i.e. fraction of yield
                   biomass removed by the harvesting equipment.
 
-    yield_max = maximum crop yield at harvest (kg ha^-1)
+    yield_max = maximum crop yield at harvest (kg/ha)
 
-    yield_actual = Actual crop yield at harvest (kg ha^-1)
+    yield_actual = Actual crop yield at harvest (kg/ha)
 
     yield_N = Amount of nitrogen removed in the yield
 
     yield_P = Amount of phosphorus removed in the yield
 
     residue = Material in the residue pool for the top 10mm of soil on current
-              day (kg ha^-1)
+              day (kg/ha)
 
 
 CropType values updated by update_all():
@@ -65,26 +65,13 @@ from math import exp
 # Runs all the yield calculations
 #
 def update_all(crop_type, time, soil):
-    calc_gamma_wu(crop_type, soil)
+
     calc_HI_max(crop_type)
-    calc_bio_AG(crop_type)
-    calc_HI_actual(crop_type)
-    calc_yield_max(crop_type, time)
+    calc_HI_act(crop_type)
+    calc_yield_max(crop_type)
     calc_yield_act(crop_type)
     calc_nutrient_removal(crop_type)
     calc_residue(crop_type, time, soil)
-
-
-#
-# Calculates water deficiency factor (AKA gamma_wu).
-# "pseudocode_crop" C.10.B.1
-#
-def calc_gamma_wu(crop_type, soil):
-    if soil.ET_max_annual == 0:
-        return 0
-
-    soil.ET_annual = soil.evap_annual + soil.trans_annual
-    crop_type.gamma_wu = 100 * (soil.ET_annual / soil.ET_max_annual)
 
 
 #
@@ -98,18 +85,10 @@ def calc_HI_max(crop_type):
 
 
 #
-# Calculates aboveground biomass.
-# "pseudocode_crop" C.10.D.1
+# Calculates the actual harvest index (HI_actual).
+# "pseudocode_crop" C.10.C.1
 #
-def calc_bio_AG(crop_type):
-    crop_type.bio_AG = (1 - crop_type.fr_root) * crop_type.biomass_actual
-
-
-#
-# Calculates the actual harvest index (AKA HI_actual).
-# "pseudocode_crop" C.10.E.1
-#
-def calc_HI_actual(crop_type):
+def calc_HI_act(crop_type):
 
     term1 = crop_type.HI_max - crop_type.HI_min
     exp_part = exp(6.13 - (0.883 * crop_type.gamma_wu))
@@ -120,15 +99,15 @@ def calc_HI_actual(crop_type):
 
 #
 # Calculates maximum crop yield at harvest.
-# "pseudocode_crop" C.10.F.1
+# "pseudocode_crop" C.10.D.1
 #
-def calc_yield_max(crop_type, time):
-    crop_type.yield_max = crop_type.bio_AG * crop_type.HI_max
+def calc_yield_max(crop_type):
+    crop_type.yield_max = crop_type.bio_AG * crop_type.HI_actual
 
 
 #
 # Calculates actual crop yield at harvest.
-# "pseudocode_crop" C.10.G.1
+# "pseudocode_crop" C.10.E.1
 #
 def calc_yield_act(crop_type):
     crop_type.yield_actual = crop_type.yield_max * crop_type.harvest_eff
@@ -138,7 +117,7 @@ def calc_yield_act(crop_type):
 
 #
 # Calculates the amount of nitrogen and phosphorus removed in the yield.
-# "pseudocode_crop" C.10.H.1/2
+# "pseudocode_crop" C.10.F.1/2
 #
 def calc_nutrient_removal(crop_type):
     crop_type.yield_N = crop_type.fr_N * crop_type.yield_actual
@@ -147,7 +126,7 @@ def calc_nutrient_removal(crop_type):
 
 #
 # Updates the current residue.
-# "pseudocode_crop" C.10.I.1, 4, 5
+# "pseudocode_crop" C.10.G.1/4/5
 #
 def calc_residue(crop_type, time, soil):
     d_residue = 0
@@ -159,9 +138,10 @@ def calc_residue(crop_type, time, soil):
         cut(crop_type, bio_frac)
     soil.residue += d_residue
 
+
 #
 # Kills the crop
-# "pseudocode_crop" C.10.I.4
+# "pseudocode_crop" C.10.G.4
 #
 def kill(crop_type):
     crop_type.accumulated_HU = 0
@@ -190,9 +170,10 @@ def kill(crop_type):
     crop_type.planted = False
     crop_type.growing = False
 
+
 #
 # Cuts the crop without killing it
-# "pseudocode_crop" C.10.H.2/3
+# "pseudocode_crop" C.10.G.2/3
 #
 def cut(crop_type, bio_frac):
     crop_type.accumulated_HU = crop_type.accumulated_HU * (1 - bio_frac)

@@ -41,8 +41,8 @@ class BaseReportHandler(ABC):
         """
 
         self.active = data['active']
-        self.produce_diagnostics = data['produce_diagnostics']
-        self.show_daily = data['show_daily']
+        self.produce_graphics = data['produce_graphics']
+        self.display_graphics = data['display_graphics']
         self.report_name = data['report_name']
         self.file_name = data['file_name']
         if field_name != 'null':
@@ -81,4 +81,4 @@ class BaseReportHandler(ABC):
     @abstractmethod
     def annual_flush(self): raise NotImplementedError()
     @abstractmethod
-    def produce_data_analysis(self, is_final): raise NotImplementedError()
+    def produce_report_graphics(self, is_final): raise NotImplementedError()

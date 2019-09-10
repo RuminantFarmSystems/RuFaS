@@ -7,9 +7,9 @@ Author(s): Kass Chupongstimun, kass_c@hotmail.com
 """
 ################################################################################
 
-from pathlib import Path
 import csv
-from RUFAS.output.data_analysis import ration_data_analysis
+
+from RUFAS.output.graphics import ration_graphics
 from RUFAS.output.report_handler import BaseReportHandler
 
 
@@ -147,5 +147,5 @@ class RationReport(BaseReportHandler):
         self.milk_production_reduction = [] 
         self.julianDay = []
 
-    def produce_data_analysis(self, is_final):
-        ration_data_analysis(self.file_name, self.show_daily, self.produce_diagnostics, is_final, self.ration_interval)
+    def produce_report_graphics(self, is_final):
+        ration_graphics(self.file_name, self.display_graphics, self.produce_graphics, is_final, self.ration_interval)

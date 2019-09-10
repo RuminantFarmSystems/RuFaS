@@ -1,8 +1,10 @@
+
 from .soil_summary import SoilSummary
 from .crop_summary import CropSummary
 from .soil_nitrogen import SoilNitrogen
 from .soil_phosphorus import SoilPhosphorus
 from .water_balance import WaterBalance
+from .custom_report import CustomReport
 
 
 class FieldSummary:
@@ -10,13 +12,14 @@ class FieldSummary:
 
         self.report_name = field_name
         self.active = data['active']
-        self.produce_diagnostics = data['produce_diagnostics']
+        self.produce_graphics = data['produce_graphics']
 
         self.field_reports = {'crop_summary': CropSummary(data['crop_summary'], field_name),
                               'soil_summary': SoilSummary(data['soil_summary'], field_name),
                               'soil_nitrogen': SoilNitrogen(data['soil_nitrogen'], field_name),
                               'soil_phosphorus': SoilPhosphorus(data['soil_phosphorus'], field_name),
-                              'water_balance': WaterBalance(data['water_balance'], field_name)
+                              'water_balance': WaterBalance(data['water_balance'], field_name),
+                              'custom_report': CustomReport(data['custom_report'], field_name)
                               }
 
     def initialize(self, state):
@@ -48,6 +51,6 @@ class FieldSummary:
         for report in self.field_reports.values():
             report.annual_flush()
 
-    def produce_data_analysis(self, is_final):
+    def produce_report_graphics(self, is_final):
         for report in self.field_reports.values():
-            report.produce_data_analysis(is_final)
+            report.produce_report_graphics(is_final)

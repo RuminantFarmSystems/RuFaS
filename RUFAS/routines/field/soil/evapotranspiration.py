@@ -19,7 +19,7 @@ Soil attribute definitions
 
     LHV = latent heat of vaporization (MJ kg^-1)
 
-    ET_max = potential evotranspiration (mm d^-1)
+    ET_max = potential evotranspiration a.k.a PET (mm d^-1)
 
     H0 = extraterrestrial radiation (mm m^-2d^-1)
 
@@ -37,7 +37,7 @@ Soil attribute definitions
 
     SoilCov = soil cover index
 
-    BioMass = aboveground biomass and residue (kg ha^-1)
+    BioMass = aboveground biomass and residue (kg/ha)
 
     evap_z = evaporation demand at depth z (mm H20)
 
@@ -95,9 +95,6 @@ def calc_potential_evap(soil, crop, weather, time):
     ET_max = (0.0023 * H0 * ((Tmax - Tmin) ** 0.5) * (Tavg + 17.8)) / LHV
 
     soil.ET_max = max(0.001, ET_max)
-
-    soil.ET_max_annual += soil.ET_max
-
 
 #
 # Calculates LHV (latent heat of vaporization (MJ kg^-1)) for use in
