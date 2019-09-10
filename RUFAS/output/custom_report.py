@@ -1,18 +1,16 @@
 ################################################################################
-#
-# RUFAS: Ruminant Farm Systems Model
-#
-# water_balance.py
-#
-# Authors: Jacob Johnson, jacob8399@gmail.com
-#          William Donovan, wmdonovan@wisc.edu
-#
-################################################################################
-
+"""
+RUFAS: Ruminant Farm Systems Model
+File name: custom_report.py
+Description:
+Author(s): William Donovan, wmdonovan@wisc.edu
+           Jacob Johnson, jacob8399@gmail.com
+"""
+#############################################
 import csv
 from pathlib import Path
 
-from RUFAS.output.graphics import daily_graphics, annual_water_balance_graphic, annual_graphics
+from RUFAS.output.graphics import daily_graphics, annual_graphics
 from RUFAS.output.report_handler import BaseReportHandler
 
 
@@ -20,7 +18,7 @@ from RUFAS.output.report_handler import BaseReportHandler
 # Class: SoilSummary
 # Creates and prints to the file water_balance.csv
 # -------------------------------------------------------------------------------
-class WaterBalance(BaseReportHandler):
+class CustomReport(BaseReportHandler):
 
     def __init__(self, data):
 
@@ -48,31 +46,15 @@ class WaterBalance(BaseReportHandler):
         # Daily Outputs
         #
         self.daily_variables = {'year': ['time.cal_year', '', []],
-                                'j_day': ['time.day', '', []],
-                                'change in sw': ['soil.delta_SW', 'mmH2O', []],
-                                'runoff': ['soil.runoff', 'mmH2O', []],
-                                'evaporation': ['soil.evap_sum', 'mmH2O', []],
-                                'transpiration': ['soil.trans_sum', 'mmH2O', []],
-                                'drainage': ['soil.drainage', 'mmH2O', []],
-                                'precipitation': ['soil.p_act', 'mmH2O', []],
-                                'calculated water': ['soil.p_calc', 'mmH2O', []],
-                                'difference': ['soil.water_balance_difference', 'mmH2O', []]}
+                                'j_day': ['time.day', '', []]
+                                }
 
         #
         # Annual outputs
         #
-        self.annual_variables = {'year': ['time.cal_year', '', 0],
-                                 'change in sw': ['round(soil.annual_delta_SW, 3)', 'mmH2O', 0],
-                                 'runoff': ['round(soil.runoff_annual, 3)', 'mmH2O', 0],
-                                 'evaporation': ['round(soil.evap_annual, 3)', 'mmH2O', 0],
-                                 'transpiration': ['round(soil.trans_annual, 3)', 'mmH2O', 0],
-                                 'drainage': ['round(soil.drainage_annual, 3)', 'mmH2O', 0],
-                                 # new variables need to be added below here in the gap
+        self.annual_variables = {'year': ['time.cal_year', '', 0]
+                                 }
 
-                                 # new variables need to be added above here
-                                 'precipitation': ['round(soil.p_act_annual, 3)', 'mmH2O', 0],
-                                 'calculated water': ['round(soil.p_calc_annual, 3)', 'mmH2O', 0],
-                                 'difference': ['round(soil.annual_water_balance_difference, 3)', 'mmH2O', 0]}
 
     #
     # writes header names and units to the csv
@@ -105,8 +87,9 @@ class WaterBalance(BaseReportHandler):
     # variable, this will throw an error. See comment at the top of the file.
     #
     def daily_update(self, state, weather, time):
-
         soil = state.soil
+        crop_type = state.crop.current_crop
+
         for variable in self.daily_variables:
             self.daily_variables[variable][2].append(
                 eval(self.daily_variables[variable][0], globals(), locals()))
@@ -114,8 +97,7 @@ class WaterBalance(BaseReportHandler):
     def annual_update(self, state, weather, time):
         """Stores the yearly values that need to be printed in the report."""
         soil = state.soil
-
-        soil.calculate_annual_water_balance()
+        crop_type = state.crop.current_crop
 
         for variable in self.annual_variables:
             self.annual_variables[variable][2] = \
@@ -164,6 +146,5 @@ class WaterBalance(BaseReportHandler):
 
     def produce_report_graphics(self, is_final):
         annual_file_name = str(self.file_name).split('.')[0] + "_annual.csv"
-        annual_water_balance_graphic(annual_file_name, self.display_graphics, self.produce_graphics)
         annual_graphics(annual_file_name, self.display_graphics, self.produce_graphics, is_final)
         daily_graphics(self.file_name, self.display_graphics, self.produce_graphics, is_final)

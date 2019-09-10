@@ -30,8 +30,13 @@ This module needs the following inputs in order to operate correctly:
         soil_layers
 
         And the following attributes of a soil layer:
+<<<<<<< HEAD
             bottom_depth
             Eo_sum = Sum of the Eo values leading up to today
+=======
+            bottomDepth
+            ET_annual = Sum of the ET_act values leading up to today
+>>>>>>> 6fcf95fbfeb3b863d6d835b33b197566dbbbdea8
             trans_max
             NO3
             labile_P
@@ -63,6 +68,8 @@ def daily_crop_routine(crop, weather, time, soil):
         # yield is reset to 0 at the beginning of the next day so it can be
         # accessed by the output handler.
         crop_type.yield_actual = 0
+        crop_type.yield_N = 0
+        crop_type.yield_P = 0
 
         # If the crop is not planted yet, determine whether it is planted today
         if not crop_type.planted:
@@ -86,15 +93,17 @@ def daily_crop_routine(crop, weather, time, soil):
 
                 leaf_area_index.update_all(crop_type, time)
 
-                biomass.update_all(crop_type, time, weather)
+                biomass.update_all(crop_type, soil, time, weather)
 
                 # "pseudocode_crop" C.10.A.1/2
                 if crop_type.harvest_type == 'scheduled':
                     if time.day == crop_type.kill_day:
                         yields.update_all(crop_type, time, soil)
+
                 elif crop_type.harvest_type == 'optimal':
                     if crop_type.fr_PHU >= crop_type.fr_PHU_harvest:
                         yields.update_all(crop_type, time, soil)
+
                 else:
                     print('"' + crop_type.harvest_type + '"', 'is not a recognized harvest type.'
                                                               ' Harvesting on optimal date.')
@@ -110,6 +119,13 @@ def daily_crop_routine(crop, weather, time, soil):
                     crop_type.growing = False
                 elif not in_dormancy(crop, time):
                     crop_type.growing = True
+
+        annual_variable_update(crop_type)
+
+
+def annual_variable_update(crop_type):
+
+    crop_type.yield_annual += crop_type.yield_actual
 
 
 # -------------------------------------------------------------------------------
@@ -294,7 +310,7 @@ class InitCrop:
 
         # Internally calculated inputs
         self.gamma_reg = 0
-        self.dBiomass_max = 0
+        self.d_biomass_max = 0
         self.d_biomass_actual = 0
 
         # Outputs
@@ -454,7 +470,7 @@ class Corn:
 
         # Internally calculated inputs
         self.gamma_reg = 0
-        self.dBiomass_max = 0
+        self.d_biomass_max = 0
         self.d_biomass_actual = 0.0
 
         # Outputs
@@ -613,7 +629,7 @@ class Soybean:
 
         # Internally calculated inputs
         self.gamma_reg = 0
-        self.dBiomass_max = 0
+        self.d_biomass_max = 0
         self.d_biomass_actual = 0.0
 
         # Outputs
@@ -777,7 +793,7 @@ class Alfalfa:
 
         # Internally calculated inputs
         self.gamma_reg = 0
-        self.dBiomass_max = 0
+        self.d_biomass_max = 0
         self.d_biomass_actual = 0.0
 
         # Outputs
@@ -939,5 +955,3 @@ def get_year_length(year):
         return 366
     else:
         return 365
-
-

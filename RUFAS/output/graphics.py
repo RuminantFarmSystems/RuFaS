@@ -1,7 +1,7 @@
 """
 RUFAS: Ruminant Farm Systems Model
 
-File name: data_analysis.py
+File name: graphics.py
 
 Author(s): Jacob Johnson, jacob8399@gmail.com
            William Donovan, wmdonovan@wisc.edu
@@ -49,9 +49,9 @@ def read_data(output_csv):
 
 
 # data analytics for ration
-def ration_data_analysis(output_csv, show_daily, produce_diagnostics, is_final, ration_interval):
+def ration_graphics(output_csv, display_graphics, produce_graphics, is_final, ration_interval):
 
-    if produce_diagnostics:
+    if produce_graphics:
         variables, units = read_data(output_csv)
 
         save_dir = util.get_base_dir() / 'Outputs/diagnostics/' / output_csv.split('.')[0]
@@ -76,7 +76,7 @@ def ration_data_analysis(output_csv, show_daily, produce_diagnostics, is_final, 
                 mp.ylabel(variable + ' ' + units[counter])
                 path = str(save_dir / variable)
                 mp.savefig(path + '')
-                if not show_daily:
+                if not display_graphics:
                     mp.close()
             counter += 1
 
@@ -84,8 +84,8 @@ def ration_data_analysis(output_csv, show_daily, produce_diagnostics, is_final, 
 
 
 # produces the annual data analytics
-def annual_data_analysis(output_csv, show_annual, produce_diagnostics):
-    if produce_diagnostics:
+def annual_water_balance_graphic(output_csv, show_annual, produce_graphics):
+    if produce_graphics:
         variables, units = read_data(output_csv)
 
         save_dir = util.get_base_dir() / 'Outputs/diagnostics/' / output_csv.split('.')[0].strip('_annual')
@@ -101,7 +101,7 @@ def annual_data_analysis(output_csv, show_annual, produce_diagnostics):
 
         added_variables = len(variables) - 9
 
-        colors = ['#ffffff', '#ff00ff', '#006400', '#fbaf08',  '#51d0de', '#431c5d', 'red']
+        colors = ['#ffffff', '#DC267F', '#648FFF', '#FFB000',  '#FE6100', '#785EF0', '#8B0000']
         for variable in variables:
             # assigns a random color to variables not originally included
             if len(colors) - 2 < counter < len(variables) - 3:
@@ -116,7 +116,7 @@ def annual_data_analysis(output_csv, show_annual, produce_diagnostics):
             elif counter == len(variables) - 3:
                 precip = variables[variable]
                 legend.insert(0, variable)
-                mp.scatter(years, precip, c='red', marker='x', zorder=2)
+                mp.scatter(years, precip, c='#8B0000', marker='x', zorder=2)
             if counter > 0:
                 variables[variable].insert(0, "")
                 table_vals.append(variables[variable])
@@ -149,7 +149,7 @@ def annual_data_analysis(output_csv, show_annual, produce_diagnostics):
             cellDict[(x, 0)].set_width(0.02)
 
         # legend toggle
-        # mp.legend(legend, loc='upper left')
+        # mp.legend(legend, loc='upper center', bbox_to_anchor=(-0.35, 1.3), ncol=1, prop={'size': 9})
         mp.subplots_adjust(left=0.31, bottom=0.5)
         mp.ylabel('mm H2O')
         mp.title('Annual Water Balance')
@@ -161,9 +161,9 @@ def annual_data_analysis(output_csv, show_annual, produce_diagnostics):
 
 
 # produces the daily data analysis
-def data_analysis(output_csv, show_daily, produce_diagnostics, is_final):
+def daily_graphics(output_csv, display_graphics, produce_graphics, is_final):
 
-    if produce_diagnostics:
+    if produce_graphics:
         variables, units = read_data(output_csv)
 
         save_dir = util.get_base_dir() / 'Outputs/diagnostics/' / output_csv.split('.')[0]
@@ -188,14 +188,43 @@ def data_analysis(output_csv, show_daily, produce_diagnostics, is_final):
                 mp.tight_layout()
                 path = str(save_dir / variable)
                 mp.savefig(path + '')
-                if not show_daily:
+                if not display_graphics:
                     mp.close()
             counter += 1
 
     show_figures(is_final)
 
 
-# shows figures on screen for manipulation
+def annual_graphics(output_csv, show_annual, produce_graphics, is_final):
+    if produce_graphics:
+        variables, units = read_data(output_csv)
+        save_dir = util.get_base_dir() / 'Outputs/diagnostics/' / output_csv.split('.')[0].strip('_annual')
+
+        start_year = int(variables['year'][0])
+        end_year = int(variables['year'][-1])
+
+        dates = [x for x in range(start_year, end_year + 1)]
+
+        counter = 0
+        for variable in variables:
+            if counter > 0:
+                mp.figure()
+                mp.plot(dates, variables[variable])
+                mp.xticks(rotation=45)
+                mp.title(variable.split()[0].upper())
+                mp.xlabel('Dates')
+                mp.ylabel(variable + ' ' + units[counter])
+                mp.tight_layout()
+                path = str(save_dir / variable) + '_annual'
+                mp.savefig(path + '')
+                if not show_annual:
+                    mp.close()
+            counter += 1
+
+    show_figures(is_final)
+
+
+# shows figures on screen
 def show_figures(is_final):
     if is_final:
         mp.show()

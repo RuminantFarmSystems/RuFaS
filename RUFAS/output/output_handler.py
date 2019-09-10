@@ -22,6 +22,7 @@ from RUFAS.output.ration_report import RationReport
 from RUFAS.output.crop_summary import CropSummary
 from RUFAS.output.feed_storage import FeedStorage
 from RUFAS.output.water_balance import WaterBalance
+from RUFAS.output.custom_report import CustomReport
 
 
 # -------------------------------------------------------------------------------
@@ -29,7 +30,7 @@ from RUFAS.output.water_balance import WaterBalance
 # -------------------------------------------------------------------------------
 
 
-class OutputHandler():
+class OutputHandler:
     """Handles all output related interactions.
 
     Contains a list of all the report handlers, which handles all output-related
@@ -65,7 +66,8 @@ class OutputHandler():
                         'ration_report': RationReport(data['ration_report']),
                         'crop_summary': CropSummary(data['crop_summary']),
                         'feed_storage': FeedStorage(data['feed_storage']),
-                        'water_balance': WaterBalance(data['water_balance'])
+                        'water_balance': WaterBalance(data['water_balance']),
+                        'custom_report': CustomReport(data['custom_report'])
                         }
         self.final = False
 
@@ -108,7 +110,7 @@ class OutputHandler():
 
         for reportName in self.reports:
             report = self.reports[reportName]
-            if report.produce_diagnostics:
+            if report.produce_graphics:
                 report_dir = util.get_base_dir() / diagnostic_dir / reportName
                 report_dir.mkdir(exist_ok=True, parents=False)
 
@@ -167,13 +169,13 @@ class OutputHandler():
             if report.active:
                 report.annual_flush()
 
-    def produce_data_analysis(self):
+    def produce_graphics(self):
         counter = 0
         for reportName in self.reports:
             report = self.reports[reportName]
 
-            # if report.produce_diagnostics:
+            # if report.produce_graphics:
             if counter == len(self.reports) - 1:
                 self.final = True
-            report.produce_data_analysis(self.final)
+            report.produce_report_graphics(self.final)
             counter += 1

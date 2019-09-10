@@ -9,7 +9,7 @@ Author(s): William Donovan, wmdonovan@wisc.edu
 #############################################
 import csv
 
-from RUFAS.output.data_analysis import data_analysis
+from RUFAS.output.graphics import daily_graphics
 from RUFAS.output.report_handler import BaseReportHandler
 
 
@@ -126,5 +126,5 @@ class FeedStorage(BaseReportHandler):
         for variable in self.daily_variables:
             self.daily_variables[variable][2] = []
 
-    def produce_data_analysis(self, is_final):
-        data_analysis(self.file_name, self.show_daily, self.produce_diagnostics, is_final)
+    def produce_report_graphics(self, is_final):
+        daily_graphics(self.file_name, self.display_graphics, self.produce_graphics, is_final)
