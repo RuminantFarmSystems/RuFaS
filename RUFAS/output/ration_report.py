@@ -24,7 +24,8 @@ class RationReport(BaseReportHandler):
         #
         # Sets active, report_name, file_name using data
         #
-        self.set_properties(data)
+        self.field_name = 'null'
+        self.set_properties(data, self.field_name)
 
         #
         # Daily Outputs

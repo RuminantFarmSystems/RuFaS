@@ -33,7 +33,7 @@ class BaseReportHandler(ABC):
     # ---------------------------------------------------------------------------
     # Method: set_properties
     # ---------------------------------------------------------------------------
-    def set_properties(self, data):
+    def set_properties(self, data, field_name):
         """Sets the properties of each report handler initialized.
 
         This is called in the report handler's __init__() method, and takes in
@@ -45,6 +45,8 @@ class BaseReportHandler(ABC):
         self.show_daily = data['show_daily']
         self.report_name = data['report_name']
         self.file_name = data['file_name']
+        if field_name != 'null':
+            self.file_name = field_name + '/' + self.file_name
 
     # ---------------------------------------------------------------------------
     # Method: get_fPath
