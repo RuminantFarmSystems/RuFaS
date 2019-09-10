@@ -39,7 +39,7 @@ def annual_feed_routine(feed, crop):
 def calibrate_feed(feed):
     if feed.crop_name == 'corn':
         feed.crude_protein_percent = 0.08
-        feed.carbon_percent = 0.5
+        feed.carbon_percent = 0.58
         if feed.moisture == 'direct_cut':
             feed.CP_gas_percent = 0
             feed.CP_leachate_percent = 0.02
