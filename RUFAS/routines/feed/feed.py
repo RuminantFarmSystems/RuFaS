@@ -12,21 +12,21 @@ from . import nitrogen_loss, carbon_loss, protein_degradation
 
 
 def daily_feed_routine(feed, crop):
+    if feed.storage:
+        feed.dry_matter += crop.current_crop.yield_actual
+        feed.crude_protein += crop.current_crop.yield_actual * feed.crude_protein_percent
 
-    feed.dry_matter += crop.current_crop.yield_actual
-    feed.crude_protein += crop.current_crop.yield_actual * feed.crude_protein_percent
+        if crop.current_crop.yield_actual != 0:
+            feed.nitrogen += crop.current_crop.yield_N
+            feed.phosphorus += crop.current_crop.yield_P
+            # TODO: no Carbon Cycle currently implemented
+            feed.carbon += crop.current_crop.yield_actual * feed.carbon_percent
 
-    if crop.current_crop.yield_actual != 0:
-        feed.nitrogen += crop.current_crop.yield_N
-        feed.phosphorus += crop.current_crop.yield_P
-        # TODO: no Carbon Cycle currently implemented
-        feed.carbon += crop.current_crop.yield_actual * feed.carbon_percent
+            carbon_loss.update_all(feed)
 
-        carbon_loss.update_all(feed)
+            nitrogen_loss.update_all(feed)
 
-        nitrogen_loss.update_all(feed)
-
-        protein_degradation.update_all(feed)
+            protein_degradation.update_all(feed)
 
 
 def annual_feed_routine(feed, crop):
@@ -39,6 +39,7 @@ def annual_feed_routine(feed, crop):
 
 def calibrate_feed(feed):
     if feed.crop_name == 'corn':
+        feed.storage = True
         feed.crude_protein_percent = 0.08
         feed.carbon_percent = 0.58
         if feed.moisture == 'direct_cut':
@@ -75,6 +76,7 @@ def calibrate_feed(feed):
             if feed.prev_crop_name != feed.crop_name:
                 print('"' + feed.moisture + '"', 'is not a recognized moisture category for', feed.crop_name)
     elif feed.crop_name == 'alfalfa':
+        feed.storage = True
         feed.crude_protein_percent = 0.22
         feed.carbon_percent = 0.58
         if feed.moisture == 'direct_cut':
@@ -133,6 +135,7 @@ def calibrate_feed(feed):
     else:
         if feed.prev_crop_name != feed.crop_name:
             print('"' + feed.crop_name + '"', 'storage is not currently implemented')
+            feed.storage = False
 
 
 # -------------------------------------------------------------------------------
@@ -159,6 +162,8 @@ class Feed:
 
         self.crop_name = 'null'
         self.prev_crop_name = 'null'
+
+        self.storage = True
 
         self.dry_matter = data['initial_dry_matter']
 
