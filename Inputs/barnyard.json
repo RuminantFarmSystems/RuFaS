@@ -2,7 +2,7 @@
     "config":
     {
         "StartDate" : "2009:244",
-        "EndDate" : "2016:243",
+        "EndDate" : "2012:243",
         "output_dir": "Outputs/Sample_Farm_Outputs/",
         "diagnostic_dir": "Outputs/diagnostics/"
     },
@@ -17,7 +17,7 @@
             "crop_summary":
             {
                 "active": true,
-                "produce_diagnostics": true,
+                "produce_diagnostics": false,
                 "show_daily": false,
                 "report_name": "Crop Summary",
                 "file_name": "crop_summary.csv"
@@ -25,7 +25,7 @@
             "soil_summary":
             {
                 "active": true,
-                "produce_diagnostics": true,
+                "produce_diagnostics": false,
                 "show_daily": false,
                 "report_name": "Soil Summary",
                 "file_name": "soil_summary.csv"
@@ -79,34 +79,16 @@
     {
         "fields":
         {
-            "field1":
+            "field_1":
             {
                 "soil": "barnyard_soil.json",
                 "crop": "alfalfa_rotation.json",
                 "applications": "barnyard_applications.json"
             },
-            "field2":
+            "field_2":
             {
                 "soil": "barnyard_soil.json",
-                "crop": "alfalfa_rotation.json",
-                "applications": "barnyard_applications.json"
-            },
-            "field3":
-            {
-                "soil": "barnyard_soil.json",
-                "crop": "soybean_rotation.json",
-                "applications": "barnyard_applications.json"
-            },
-            "field4":
-            {
-                "soil": "barnyard_soil.json",
-                "crop": "soybean_rotation.json",
-                "applications": "barnyard_applications.json"
-            },
-            "field5":
-            {
-                "soil": "barnyard_soil.json",
-                "crop": "custom_rotation.json",
+                "crop": "no_crop.json",
                 "applications": "barnyard_applications.json"
             }
         },

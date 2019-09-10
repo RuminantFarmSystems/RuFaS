@@ -12,7 +12,7 @@ from . import nitrogen_loss, carbon_loss, protein_degradation
 
 
 def daily_feed_routine(feed, crop):
-    if crop.current_crop.crop_type != 'null':
+    if crop.current_crop.crop_name != 'null':
         calibrate_feed(feed, crop)
         feed.dry_matter += crop.current_crop.yield_actual * feed.dry_matter_percent
         feed.crude_protein += crop.current_crop.yield_actual * \
@@ -31,7 +31,7 @@ def daily_feed_routine(feed, crop):
 
 
 def calibrate_feed(feed, crop):
-    if crop.current_crop.crop_type == 'corn':
+    if crop.current_crop.crop_name == 'corn':
         feed.crude_protein_percent = 0.08
         if feed.moisture == 'direct_cut':
             feed.dry_matter_percent = 0.25
@@ -68,7 +68,7 @@ def calibrate_feed(feed, crop):
             feed.C_feedout_particle_percent = 0
         else:
             print('"' + feed.moisture + '"', 'is not a recognized moisture category for', crop.current_crop.crop_name)
-    elif crop.current_crop.crop_type == 'alfalfa':
+    elif crop.current_crop.crop_name == 'alfalfa':
         feed.crude_protein_percent = 0.22
         if feed.moisture == 'direct_cut':
             feed.dry_matter_percent = 0.25

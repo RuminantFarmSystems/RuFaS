@@ -22,7 +22,7 @@ from RUFAS.output.report_handler import BaseReportHandler
 # -------------------------------------------------------------------------------
 class WaterBalance(BaseReportHandler):
 
-    def __init__(self, data):
+    def __init__(self, data, field_name):
 
         #
         # Outputs can be added in this single place in the following format:
@@ -41,7 +41,8 @@ class WaterBalance(BaseReportHandler):
         # Sets active, report_name, file_name using data
         #
 
-        self.set_properties(data)
+        self.field_name = field_name
+        self.set_properties(data, self.field_name)
         self.fieldNames = None
         self.show_annual = data['show_annual']
 

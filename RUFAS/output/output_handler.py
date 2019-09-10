@@ -86,13 +86,27 @@ class OutputHandler:
 
         # Delete directory if previously exists
         if output_dir.exists():
-            for file in output_dir.iterdir():
-                file.unlink()
+            for output in output_dir.iterdir():
+                if output.is_file():
+                    output.unlink()
+                else:
+                    for file in output.iterdir():
+                        file.unlink()
+                    output.rmdir()
             output_dir.rmdir()
 
         output_dir.mkdir(exist_ok=True, parents=False)
         BaseReportHandler.set_dir(output_dir)
 
+        for reportName in self.reports:
+            report = self.reports[reportName]
+            if report.report_name.split('_')[0] == 'field':
+                report_dir = util.get_base_dir() / output_dir / reportName
+                report_dir.mkdir(exist_ok=True, parents=False)
+
+    # ---------------------------------------------------------------------------
+    # Method: initialize_diagnostic_dir
+    # ---------------------------------------------------------------------------
     def initialize_diagnostic_dir(self, diagnostic_dir):
         diagnostic_dir = util.get_base_dir() / diagnostic_dir
 
@@ -108,6 +122,8 @@ class OutputHandler:
             if report.produce_diagnostics:
                 report_dir = util.get_base_dir() / diagnostic_dir / reportName
                 report_dir.mkdir(exist_ok=True, parents=False)
+                if report.report_name.split('_')[0] == 'field':
+                    report.initialize_field_dir(report_dir)
 
     # ---------------------------------------------------------------------------
     # Method: initialize_reports
@@ -164,6 +180,9 @@ class OutputHandler:
             if report.active:
                 report.annual_flush()
 
+    # ---------------------------------------------------------------------------
+    # Method: produce_data_analysis
+    # ---------------------------------------------------------------------------
     def produce_data_analysis(self):
         counter = 0
         for reportName in self.reports:

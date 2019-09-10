@@ -12,68 +12,42 @@ class FieldSummary:
         self.active = data['active']
         self.produce_diagnostics = data['produce_diagnostics']
 
-        self.crop_report = CropSummary(data['crop_summary'])
-        self.soil_report = SoilSummary(data['soil_summary'])
-
-        self.soil_nitrogen = SoilNitrogen(data['soil_nitrogen'])
-        self.soil_phosphorus = SoilPhosphorus(data['soil_phosphorus'])
-
-        self.water_balance = WaterBalance(data['water_balance'])
+        self.field_reports = {'crop_summary': CropSummary(data['crop_summary'], field_name),
+                              'soil_summary': SoilSummary(data['soil_summary'], field_name),
+                              'soil_nitrogen': SoilNitrogen(data['soil_nitrogen'], field_name),
+                              'soil_phosphorus': SoilPhosphorus(data['soil_phosphorus'], field_name),
+                              'water_balance': WaterBalance(data['water_balance'], field_name)
+                              }
 
     def initialize(self, state):
-        self.crop_report.initialize(state)
-        self.soil_report.initialize(state)
+        for report in self.field_reports.values():
+            report.initialize(state)
 
-        self.soil_nitrogen.initialize(state)
-        self.soil_phosphorus.initialize(state)
-
-        self.water_balance.initialize(state)
+    def initialize_field_dir(self, field_dir):
+        for report in self.field_reports:
+            report_dir = field_dir / report
+            report_dir.mkdir(exist_ok=True, parents=False)
 
     def daily_update(self, state, weather, time):
         for field in state.fields:
             if self.report_name == field.field_name:
-                self.crop_report.daily_update(field, weather, time)
-                self.soil_report.daily_update(field, weather, time)
-
-                self.soil_nitrogen.daily_update(field, weather, time)
-                self.soil_phosphorus.daily_update(field, weather, time)
-
-                self.water_balance.daily_update(field, weather, time)
+                for report in self.field_reports.values():
+                    report.daily_update(field, weather, time)
 
     def annual_update(self, state, weather, time):
         for field in state.fields:
             if self.report_name == field.field_name:
-                self.crop_report.annual_update(field, weather, time)
-                self.soil_report.annual_update(field, weather, time)
-
-                self.soil_nitrogen.annual_update(field, weather, time)
-                self.soil_phosphorus.annual_update(field, weather, time)
-
-                self.water_balance.annual_update(field, weather, time)
+                for report in self.field_reports.values():
+                    report.annual_update(field, weather, time)
 
     def write_annual_report(self):
-        self.crop_report.write_annual_report()
-        self.soil_report.write_annual_report()
-
-        self.soil_nitrogen.write_annual_report()
-        self.soil_phosphorus.write_annual_report()
-
-        self.water_balance.write_annual_report()
+        for report in self.field_reports.values():
+            report.write_annual_report()
 
     def annual_flush(self):
-        self.crop_report.annual_flush()
-        self.soil_report.annual_flush()
-
-        self.soil_nitrogen.annual_flush()
-        self.soil_phosphorus.annual_flush()
-
-        self.water_balance.annual_flush()
+        for report in self.field_reports.values():
+            report.annual_flush()
 
     def produce_data_analysis(self, is_final):
-        self.crop_report.produce_data_analysis(is_final)
-        self.soil_report.produce_data_analysis(is_final)
-
-        self.soil_nitrogen.produce_data_analysis(is_final)
-        self.soil_phosphorus.produce_data_analysis(is_final)
-
-        self.water_balance.annual_flush()
+        for report in self.field_reports.values():
+            report.produce_data_analysis(is_final)
