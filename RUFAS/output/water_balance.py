@@ -12,7 +12,7 @@
 import csv
 from pathlib import Path
 
-from RUFAS.output.data_analysis import data_analysis, annual_data_analysis
+from RUFAS.output.graphics import daily_graphics, annual_water_balance_graphic, annual_graphics
 from RUFAS.output.report_handler import BaseReportHandler
 
 
@@ -44,27 +44,26 @@ class WaterBalance(BaseReportHandler):
         self.field_name = field_name
         self.set_properties(data, self.field_name)
         self.fieldNames = None
-        self.show_annual = data['show_annual']
 
         #
         # Daily Outputs
         #
         self.daily_variables = {'year': ['time.cal_year', '', []],
                                 'j_day': ['time.day', '', []],
-                                'delta_SW': ['soil.delta_SW', 'mmH2O', []],
+                                'change in sw': ['soil.delta_SW', 'mmH2O', []],
                                 'runoff': ['soil.runoff', 'mmH2O', []],
                                 'evaporation': ['soil.evap_sum', 'mmH2O', []],
                                 'transpiration': ['soil.trans_sum', 'mmH2O', []],
                                 'drainage': ['soil.drainage', 'mmH2O', []],
-                                'actual precipitation': ['soil.p_act', 'mmH2O', []],
+                                'precipitation': ['soil.p_act', 'mmH2O', []],
                                 'calculated water': ['soil.p_calc', 'mmH2O', []],
-                                'difference': ['soil.water_balance', 'mmH2O', []]}
+                                'difference': ['soil.water_balance_difference', 'mmH2O', []]}
 
         #
         # Annual outputs
         #
         self.annual_variables = {'year': ['time.cal_year', '', 0],
-                                 'delta_SW': ['round(soil.annual_delta_SW, 3)', 'mmH2O', 0],
+                                 'change in sw': ['round(soil.annual_delta_SW, 3)', 'mmH2O', 0],
                                  'runoff': ['round(soil.runoff_annual, 3)', 'mmH2O', 0],
                                  'evaporation': ['round(soil.evap_annual, 3)', 'mmH2O', 0],
                                  'transpiration': ['round(soil.trans_annual, 3)', 'mmH2O', 0],
@@ -72,9 +71,9 @@ class WaterBalance(BaseReportHandler):
                                  # new variables need to be added below here in the gap
 
                                  # new variables need to be added above here
-                                 'actual precipitation': ['round(soil.p_act_annual, 3)', 'mmH2O', 0],
+                                 'precipitation': ['round(soil.p_act_annual, 3)', 'mmH2O', 0],
                                  'calculated water': ['round(soil.p_calc_annual, 3)', 'mmH2O', 0],
-                                 'difference': ['round(soil.annual_water_balance, 3)', 'mmH2O', 0]}
+                                 'difference': ['round(soil.annual_water_balance_difference, 3)', 'mmH2O', 0]}
 
     #
     # writes header names and units to the csv
@@ -164,7 +163,8 @@ class WaterBalance(BaseReportHandler):
         for variable in self.annual_variables:
             self.annual_variables[variable][2] = 0
 
-    def produce_data_analysis(self, is_final):
+    def produce_report_graphics(self, is_final):
         annual_file_name = str(self.file_name).split('.')[0] + "_annual.csv"
-        annual_data_analysis(annual_file_name, self.show_annual, self.produce_diagnostics)
-        data_analysis(self.file_name, self.show_daily, self.produce_diagnostics, is_final)
+        annual_water_balance_graphic(annual_file_name, self.display_graphics, self.produce_graphics)
+        annual_graphics(annual_file_name, self.display_graphics, self.produce_graphics, is_final)
+        daily_graphics(self.file_name, self.display_graphics, self.produce_graphics, is_final)

@@ -1,5 +1,4 @@
 {
-
     "config":
     {
         "StartDate" : "2008:1",
@@ -26,7 +25,8 @@
             "produce_graphics": false,
             "display_graphics": false,
             "report_name": "Ration Report",
-            "file_name": "ration_report.csv"
+            "file_name": "ration_report.csv",
+            "ration_interval": 7
         },
         "soil_nitrogen":
         {
@@ -141,7 +141,7 @@
                 },
                 "Layer2":
                 {
-                    "BottomDepth": 1000,
+                    "BottomDepth": 300,
                     "WiltingPoint": 0.1,
                     "FieldCapacity": 0.3,
                     "Saturation": 0.5,
@@ -162,7 +162,7 @@
                 },
                 "Layer3":
                 {
-                    "BottomDepth": 2000,
+                    "BottomDepth": 450,
                     "WiltingPoint": 0.1,
                     "FieldCapacity": 0.30,
                     "Saturation": 0.5,

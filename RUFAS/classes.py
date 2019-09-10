@@ -48,7 +48,6 @@ class State:
         self.animal = Animal(read_json_file(input_dir / 'animals' / data['animal']))
         self.feed = Feed(read_json_file(input_dir / 'feed_storage' / data['feed']))
 
-
     # ---------------------------------------------------------------------------
     # Method: annual_reset
     # ---------------------------------------------------------------------------
@@ -78,6 +77,7 @@ def read_json_file(file_path: Path):
 
     except errors.UserInput as e:
         print(e.msg)
+
 
 # -------------------------------------------------------------------------------
 # Class: Config
@@ -261,7 +261,8 @@ class Weather:
         self.T_avg = []
         self.biomass = []
         self.radiation = []
-        self.manureN = []  # TODO: manureN is a temporary weather file input until the manure module is linked with the rest of the program
+        self.manureN = []
+        # TODO: manureN is a temporary weather file input until the manure module is linked with the rest of the program
         self.T_avg_annual = []
 
         self.evaporation = []
@@ -306,7 +307,9 @@ class Weather:
             self.T_avg.append([0 for _ in range(len(year))])
             self.biomass.append([0 for _ in range(len(year))])
             self.radiation.append([0 for _ in range(len(year))])
-            self.manureN.append([0 for _ in range(len(year))])  # TODO: manureN is a temporary weather file input until the manure module is linked with the rest of the program
+            self.manureN.append([0 for _ in range(len(year))])
+            # TODO: manureN is a temporary weather file input until the manure
+            # TODO: module is linked with the rest of the program
 
             # These are not currently inputs into the weather file. They may
             # be/may have been at some point.

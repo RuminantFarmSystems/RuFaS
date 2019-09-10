@@ -2,7 +2,7 @@
     "config":
     {
         "StartDate" : "2009:244",
-        "EndDate" : "2012:243",
+        "EndDate" : "2016:243",
         "output_dir": "Outputs/Sample_Farm_Outputs/",
         "diagnostic_dir": "Outputs/diagnostics/"
     },
@@ -13,54 +13,61 @@
     {
         "field_summary": {
             "active": true,
-            "produce_diagnostics": true,
+            "produce_graphics": true,
             "crop_summary":
             {
                 "active": true,
-                "produce_diagnostics": false,
-                "show_daily": false,
+                "produce_graphics": false,
+                "display_graphics": false,
                 "report_name": "Crop Summary",
                 "file_name": "crop_summary.csv"
             },
             "soil_summary":
             {
                 "active": true,
-                "produce_diagnostics": false,
-                "show_daily": false,
+                "produce_graphics": false,
+                "display_graphics": false,
                 "report_name": "Soil Summary",
                 "file_name": "soil_summary.csv"
             },
             "water_balance":
             {
                 "active": true,
-                "produce_diagnostics": false,
-                "show_daily": false,
-                "show_annual": false,
+                "produce_graphics": false,
+                "display_graphics": false,
                 "report_name": "Water Balance",
                 "file_name": "water_balance.csv"
             },
             "soil_nitrogen":
             {
                 "active": true,
-                "produce_diagnostics": false,
-                "show_daily": false,
+                "produce_graphics": false,
+                "display_graphics": false,
                 "report_name": "Soil Nitrogen",
                 "file_name": "soil_nitrogen.csv"
             },
             "soil_phosphorus":
             {
                 "active": true,
-                "produce_diagnostics": false,
-                "show_daily": false,
+                "produce_graphics": false,
+                "display_graphics": false,
                 "report_name": "Soil Phosphorus",
                 "file_name": "soil_phosphorus.csv"
+            },
+            "custom_report":
+            {
+                "active": true,
+                "produce_graphics": false,
+                "display_graphics": false,
+                "report_name": "Custom Report",
+                "file_name": "custom_report.csv"
             }
-        },
+    },
         "ration_report":
         {
             "active": true,
-            "produce_diagnostics": false,
-            "show_daily": false,
+            "produce_graphics": false,
+            "display_graphics": false,
             "report_name": "Ration Report",
             "file_name": "ration_report.csv",
             "ration_interval": 7
@@ -68,8 +75,8 @@
         "feed_storage":
         {
             "active": true,
-            "produce_diagnostics": false,
-            "show_daily": false,
+            "produce_graphics": false,
+            "display_graphics": false,
             "report_name": "Feed Storage",
             "file_name": "feed_storage.csv"
         }

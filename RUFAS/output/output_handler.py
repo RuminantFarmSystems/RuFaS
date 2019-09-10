@@ -15,11 +15,8 @@ from RUFAS.output.report_handler import BaseReportHandler
 #
 # Import report handlers here
 #
-from RUFAS.output.soil_nitrogen import SoilNitrogen
-from RUFAS.output.soil_phosphorus import SoilPhosphorus
 from RUFAS.output.ration_report import RationReport
 from RUFAS.output.feed_storage import FeedStorage
-from RUFAS.output.water_balance import WaterBalance
 from RUFAS.output.field_summary import FieldSummary
 
 
@@ -119,7 +116,7 @@ class OutputHandler:
 
         for reportName in self.reports:
             report = self.reports[reportName]
-            if report.produce_diagnostics:
+            if report.produce_graphics:
                 report_dir = util.get_base_dir() / diagnostic_dir / reportName
                 report_dir.mkdir(exist_ok=True, parents=False)
                 if report.report_name.split('_')[0] == 'field':
@@ -183,13 +180,13 @@ class OutputHandler:
     # ---------------------------------------------------------------------------
     # Method: produce_data_analysis
     # ---------------------------------------------------------------------------
-    def produce_data_analysis(self):
+    def produce_graphics(self):
         counter = 0
         for reportName in self.reports:
             report = self.reports[reportName]
 
-            # if report.produce_diagnostics:
+            # if report.produce_graphics:
             if counter == len(self.reports) - 1:
                 self.final = True
-            report.produce_data_analysis(self.final)
+            report.produce_report_graphics(self.final)
             counter += 1
