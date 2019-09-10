@@ -18,11 +18,12 @@ def daily_feed_routine(feed, crop):
     if crop.current_crop.yield_actual != 0:
         feed.nitrogen += crop.current_crop.yield_N
         feed.phosphorus += crop.current_crop.yield_P
-        # feed.carbon += crop.current_crop.org_C  TODO: no Carbon Cycle currently implemented
-
-        nitrogen_loss.update_all(feed)
+        # TODO: no Carbon Cycle currently implemented
+        feed.carbon += crop.current_crop.yield_actual * feed.carbon_percent
 
         carbon_loss.update_all(feed)
+
+        nitrogen_loss.update_all(feed)
 
         protein_degradation.update_all(feed)
 
@@ -38,6 +39,7 @@ def annual_feed_routine(feed, crop):
 def calibrate_feed(feed):
     if feed.crop_name == 'corn':
         feed.crude_protein_percent = 0.08
+        feed.carbon_percent = 0.5
         if feed.moisture == 'direct_cut':
             feed.CP_gas_percent = 0
             feed.CP_leachate_percent = 0.02
@@ -73,6 +75,7 @@ def calibrate_feed(feed):
                 print('"' + feed.moisture + '"', 'is not a recognized moisture category for', feed.crop_name)
     elif feed.crop_name == 'alfalfa':
         feed.crude_protein_percent = 0.22
+        feed.carbon_percent = 0.58
         if feed.moisture == 'direct_cut':
             feed.CP_gas_percent = 0
             feed.CP_leachate_percent = 0.025
