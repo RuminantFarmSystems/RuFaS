@@ -12,29 +12,36 @@ from . import nitrogen_loss, carbon_loss, protein_degradation
 
 
 def daily_feed_routine(feed, crop):
-    if crop.current_crop.crop_name != 'null':
-        calibrate_feed(feed, crop)
-        feed.dry_matter += crop.current_crop.yield_actual * feed.dry_matter_percent
-        feed.crude_protein += crop.current_crop.yield_actual * \
-                              feed.dry_matter_percent * feed.crude_protein_percent
 
-        if crop.current_crop.yield_actual != 0:
-            feed.nitrogen += crop.current_crop.yield_N
-            feed.phosphorus += crop.current_crop.yield_P
-            # feed.carbon += crop.current_crop.yield_C  TODO: no Carbon Cycle currently implemented
+    feed.dry_matter += crop.current_crop.yield_actual
+    feed.crude_protein += crop.current_crop.yield_actual * feed.crude_protein_percent
 
-            nitrogen_loss.update_all(feed)
+    if crop.current_crop.yield_actual != 0:
+        feed.nitrogen += crop.current_crop.yield_N
+        feed.phosphorus += crop.current_crop.yield_P
+        # TODO: no Carbon Cycle currently implemented
+        feed.carbon += crop.current_crop.yield_actual * feed.carbon_percent
 
-            carbon_loss.update_all(feed)
+        carbon_loss.update_all(feed)
 
-            protein_degradation.update_all(feed)
+        nitrogen_loss.update_all(feed)
+
+        protein_degradation.update_all(feed)
 
 
-def calibrate_feed(feed, crop):
-    if crop.current_crop.crop_name == 'corn':
+def annual_feed_routine(feed, crop):
+    feed.prev_crop_name = feed.crop_name
+    feed.crop_name = crop.current_crop.crop_name
+
+    if feed.crop_name != 'null':
+        calibrate_feed(feed)
+
+
+def calibrate_feed(feed):
+    if feed.crop_name == 'corn':
         feed.crude_protein_percent = 0.08
+        feed.carbon_percent = 0.58
         if feed.moisture == 'direct_cut':
-            feed.dry_matter_percent = 0.25
             feed.CP_gas_percent = 0
             feed.CP_leachate_percent = 0.02
             feed.NPN_min_percent = 0.50
@@ -45,7 +52,6 @@ def calibrate_feed(feed, crop):
             feed.C_feedout_gas_percent = 0.02
             feed.C_feedout_particle_percent = 0
         elif feed.moisture == 'wilted':
-            feed.dry_matter_percent = 0.25
             feed.CP_gas_percent = 0
             feed.CP_leachate_percent = 0
             feed.NPN_min_percent = 0.45
@@ -56,7 +62,6 @@ def calibrate_feed(feed, crop):
             feed.C_feedout_gas_percent = 0.02
             feed.C_feedout_particle_percent = 0
         elif feed.moisture == 'baleage':
-            feed.dry_matter_percent = 0.25
             feed.CP_gas_percent = 0
             feed.CP_leachate_percent = 0
             feed.NPN_min_percent = 0.40
@@ -67,11 +72,12 @@ def calibrate_feed(feed, crop):
             feed.C_feedout_gas_percent = 0.02
             feed.C_feedout_particle_percent = 0
         else:
-            print('"' + feed.moisture + '"', 'is not a recognized moisture category for', crop.current_crop.crop_name)
-    elif crop.current_crop.crop_name == 'alfalfa':
+            if feed.prev_crop_name != feed.crop_name:
+                print('"' + feed.moisture + '"', 'is not a recognized moisture category for', feed.crop_name)
+    elif feed.crop_name == 'alfalfa':
         feed.crude_protein_percent = 0.22
+        feed.carbon_percent = 0.58
         if feed.moisture == 'direct_cut':
-            feed.dry_matter_percent = 0.25
             feed.CP_gas_percent = 0
             feed.CP_leachate_percent = 0.025
             feed.NPN_min_percent = 0.40
@@ -82,7 +88,6 @@ def calibrate_feed(feed, crop):
             feed.C_feedout_gas_percent = 0.02
             feed.C_feedout_particle_percent = 0
         elif feed.moisture == 'wilted':
-            feed.dry_matter_percent = 0.25
             feed.CP_gas_percent = 0
             feed.CP_leachate_percent = 0
             feed.NPN_min_percent = 0.40
@@ -93,7 +98,6 @@ def calibrate_feed(feed, crop):
             feed.C_feedout_gas_percent = 0.02
             feed.C_feedout_particle_percent = 0
         elif feed.moisture == 'haylage':
-            feed.dry_matter_percent = 0.25
             feed.CP_gas_percent = 0
             feed.CP_leachate_percent = 0
             feed.NPN_min_percent = 0.35
@@ -104,7 +108,6 @@ def calibrate_feed(feed, crop):
             feed.C_feedout_gas_percent = 0.02
             feed.C_feedout_particle_percent = 0
         elif feed.moisture == 'moist_hay':
-            feed.dry_matter_percent = 0.25
             feed.CP_gas_percent = 0
             feed.CP_leachate_percent = 0
             feed.NPN_min_percent = 0.30
@@ -115,7 +118,6 @@ def calibrate_feed(feed, crop):
             feed.C_feedout_gas_percent = 0
             feed.C_feedout_particle_percent = 0.01
         elif feed.moisture == 'dry_hay':
-            feed.dry_matter_percent = 0.25
             feed.CP_gas_percent = 0
             feed.CP_leachate_percent = 0
             feed.NPN_min_percent = 0.20
@@ -126,9 +128,11 @@ def calibrate_feed(feed, crop):
             feed.C_feedout_gas_percent = 0
             feed.C_feedout_particle_percent = 0.01
         else:
-            print('"' + feed.moisture + '"', 'is not a recognized moisture category for', crop.current_crop.crop_name)
+            if feed.prev_crop_name != feed.crop_name:
+                print('"' + feed.moisture + '"', 'is not a recognized moisture category for', feed.crop_name)
     else:
-        print('"' + crop.current_crop.crop_name + '"', 'storage is not currently implemented')
+        if feed.prev_crop_name != feed.crop_name:
+            print('"' + feed.crop_name + '"', 'storage is not currently implemented')
 
 
 # -------------------------------------------------------------------------------
@@ -153,11 +157,13 @@ class Feed:
         self.ventilation = data['ventilation']
         self.removal_rate = data['removal_rate']
 
+        self.crop_name = 'null'
+        self.prev_crop_name = 'null'
+
         self.dry_matter = data['initial_dry_matter']
 
-        self.dry_matter_percent = 0.0
-
         self.crude_protein_percent = 0.0
+        self.carbon_percent = 0
 
         self.carbon = 0.0
         self.nitrogen = 0.0
