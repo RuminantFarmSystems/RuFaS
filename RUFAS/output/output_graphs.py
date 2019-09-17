@@ -18,6 +18,10 @@ def graph_milk_production(day):
     plt.xlabel('Day in Simulation (day)')
     plt.ylabel('Average Milk Production (kg)')
     plt.title('Average Milk Production per Animal for Milk-Producing Pen')
+    
+    save_dir = util.get_base_dir() / 'Outputs/diagnostics/animal'
+    path = str(save_dir / 'milk_production')
+    f1.savefig(path + '')
 
 def graph_manure_excretion(day):
     manure = {}
@@ -45,7 +49,6 @@ def graph_manure_excretion(day):
             num_animals[pen].append(int(row[3]))
     
     f2 = plt.figure(2)
-    plt.subplot(2, 1, 1)
     plt.plot(day, manure[0], label='Pen 0 - Calf')
     #plt.plot(day, manure[1], label='Pen 1 - HeiferI')
     plt.plot(day, manure[2], label='Pen 2 - HeiferII')
@@ -56,7 +59,11 @@ def graph_manure_excretion(day):
     plt.title('Total Manure Excretion per Pen')
     plt.legend()
     
-    plt.subplot(2, 1, 2)
+    save_dir = util.get_base_dir() / 'Outputs/diagnostics/animal'
+    path = str(save_dir / 'manure_excretion')
+    f2.savefig(path + '') 
+    
+    f3 = plt.figure(3)
     plt.plot(day, num_animals[0], label='Pen 0 - Calf')
     #plt.plot(day, num_animals[1], label='Pen 1 - HeiferI')
     plt.plot(day, num_animals[2], label='Pen 2 - HeiferII')
@@ -67,10 +74,13 @@ def graph_manure_excretion(day):
     plt.title('Number of Animals in Each Pen')
     plt.legend()
     
-
+    save_dir = util.get_base_dir() / 'Outputs/diagnostics/animal'
+    path = str(save_dir / 'num_animals_per_pen')
+    f3.savefig(path + '') 
+  
 def display_graphs(formulation_interval, sim_length):
     day = [i for i in range(1, sim_length, formulation_interval)]
     graph_milk_production(day)
     graph_manure_excretion(day)
-    plt.tight_layout()
-    plt.show()
+    #plt.tight_layout()
+    #plt.show()
