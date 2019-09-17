@@ -16,6 +16,11 @@ import numpy as np
 class AnimalBase(object):
 	global_id = 0
 	config = []
+	nutrients = None
+	
+	@staticmethod
+	def set_nutrient_list(nutrients):
+		AnimalBase.nutrients = nutrients
 
 	@staticmethod
 	def next_id():
@@ -46,7 +51,7 @@ class AnimalBase(object):
 		self._events = AnimalEvents()
 		
 		self._daily_growth = 0
-		self._nutrient_rqmts = {}
+		self.set_default_nutrient_rqmts()
 		self._manure_excretion = {}
 		self._ration_formulation = {'objective': 0.00}
 		self._DMIest = 0
@@ -62,11 +67,16 @@ class AnimalBase(object):
 		self._events = animal._events
 		
 		self._daily_growth = 0
-		self._nutrient_rqmts = {}
+		self.set_default_nutrient_rqmts()
 		self._manure_excretion = {}
 		self._ration_formulation = {'objective': 0.00}
 		self._DMIest = 0
 		self._DBW = 0
+		
+	def set_default_nutrient_rqmts(self):
+		self._nutrient_rqmts = {}
+		for key in self.nutrients:
+			self._nutrient_rqmts[key] = {'op': '', 'val': 0}
 
 	# Method: is_culled
 	'''

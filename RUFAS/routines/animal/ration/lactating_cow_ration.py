@@ -142,6 +142,7 @@ def calculate_rqmts(BW, BCS, CBW, CI, pasture_concentrate, CP_Milk, DOP, DHD, DV
         milk: milk production, kg
         parity: number of times birth was given
         type: farming type, "barn" or "pasture"
+        nutrients_list: a list of the nutrients for which requirements are calculated
 
     Returns:
         dict : a dictionary that represents the dietary requirements of the cows,

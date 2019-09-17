@@ -72,6 +72,7 @@ class AnimalManagement:
         self.sim_length = config.sim_length
         self.life_cycle_manager = LifeCycleManager(data['animal_config'])
         AnimalBase.set_config(data['animal_config'])
+        AnimalBase.set_nutrient_list(feed.nutrient_rqmts)
         self.init_pens(data['pen_information'])
         self.init_animals(data['herd_information'], feed)
         self.housing = data['housing']
@@ -176,7 +177,18 @@ class AnimalManagement:
         self.all_pens[1].update_animals(self.heiferIs)
         self.all_pens[2].update_animals(self.heiferIIs)
         self.all_pens[3].update_animals(self.heiferIIIs)
-        self.all_pens[4].update_animals(self.cows)
+        
+        #separate into lactating and dry cow pens
+        lactating_cows = []
+        dry_cows = []
+        for cow in self.cows:
+            if cow._milking:
+                lactating_cows.append(cow)
+            else:
+                dry_cows.append(cow)
+                
+        self.all_pens[4].update_animals(dry_cows)
+        self.all_pens[5].update_animals(lactating_cows)
     
     def clear_pens(self):
         '''

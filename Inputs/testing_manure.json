@@ -417,6 +417,17 @@
 	        		"housing_type": "open air barn",
 	        		"bedding_type": "sand",
 	        		"pen_type": "tiestall"
+	        	},
+	        	
+	        	"pen5":
+	        	{
+	        		"id": 5,
+	        		"vertical_dist_to_milking_parlor": 0.1,
+	        		"horizontal_dist_to_milking_parlor": 1.6,
+	        		"number_of_stalls": 400,
+	        		"housing_type": "open air barn",
+	        		"bedding_type": "sand",
+	        		"pen_type": "tiestall"
 	        	}
 	        }            
         },
