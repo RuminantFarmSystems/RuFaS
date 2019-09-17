@@ -51,19 +51,19 @@ class OutputHandler():
     directly.
     """
 
-    def __init__(self, data, toggle):
+    def __init__(self, data):
         """Initializes the report handlers with the given data"""
 
         # Instantiate Report Handler Objects here
         self.reports = {
-                        #'farm_summary': FarmSummary(data['farm_summary'], toggle),
-                        'soil_summary': SoilSummary(data['soil_summary'], toggle),
-                        'soil_nitrogen': SoilNitrogen(data['soil_nitrogen'], toggle),
-                        #'soil_phosphorus': SoilPhosphorus(data['soil_phosphorus'], toggle),
-                        'ration_report': RationReport(data['ration_report'], toggle),
-                        'crop_report': CropSummary(data['crop_report'], toggle),
-                        'manure_report': ManureReport(data['manure_report'], toggle),
-                        'growth_report': GrowthReport(data['growth_report'], toggle)
+                        #'farm_summary': FarmSummary(data['farm_summary']),
+                        'soil_summary': SoilSummary(data['soil_summary']),
+                        'soil_nitrogen': SoilNitrogen(data['soil_nitrogen']),
+                        #'soil_phosphorus': SoilPhosphorus(data['soil_phosphorus']),
+                        'ration_report': RationReport(data['ration_report']),
+                        'crop_report': CropSummary(data['crop_report']),
+                        'manure_report': ManureReport(data['manure_report']),
+                        'growth_report': GrowthReport(data['growth_report'])
                         }
 
     #---------------------------------------------------------------------------

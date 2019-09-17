@@ -17,13 +17,10 @@ from RUFAS.output.report_handler import BaseReportHandler
 class ManureReport(BaseReportHandler):
     """Creates and prints to the file manure_report.csv"""
 
-    def __init__(self, data, toggle):
+    def __init__(self, data):
 
         # Sets active, report_name, f_name using data
         self.set_properties(data)
-        if not toggle.animal and self.active:
-            print('Animal Module set as not simulated in json file and manure_report is still active, setting manure_report to not active.')
-            self.active = False
 
         # Daily Outputs
         self.year = []
