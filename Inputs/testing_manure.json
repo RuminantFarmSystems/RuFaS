@@ -5,13 +5,6 @@
         "EndDate" : "2009:365",
         "output_dir": "Outputs/Sample_Farm_Outputs/"
     },
-    
-    "simulate_module":
-    {
-    	"animal": true,
-    	"soil": true,
-    	"crop": true
-    },
 
     "weather": "Inputs/crop_module_testWeather_3.4.csv",
 
