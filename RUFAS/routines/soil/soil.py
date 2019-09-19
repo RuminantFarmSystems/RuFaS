@@ -452,7 +452,11 @@ class Soil:
 
         self.infiltration = 0.0
 
-        self.sedimentYield = 0.0
+        self.sed = 0.0
+        self.sed_P = 0.0
+        self.sed_P_conc = 0.0
+        self.enrichment_P = 0.0
+        self.runoff_conc = 0.0
 
         # daily soil nitrogen values
         self.residue = data['initial_residue']

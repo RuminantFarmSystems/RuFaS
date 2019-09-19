@@ -65,6 +65,7 @@ class SoilPhosphorus(BaseReportHandler):
                                 'manure_SON': ['soil.SON', 'kg', []],
                                 'manure_mass': ['soil.manure_mass', 'kg', []],
                                 'manure_cover': ['soil.manure_cov', 'HA', []],
+                                'sediment_P': ['soil.sed_P', 'kg/ha', []],
                                 }
 
         self.annual_variables = {'year': ['time.cal_year', '', 0]
