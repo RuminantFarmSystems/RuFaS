@@ -66,7 +66,7 @@ Soil attribute definitions
 
 
 Soil values updated by calling update_all():
-    sedimentYield
+    sed
 
 
 """
@@ -103,7 +103,7 @@ def calc_sed(soil, crop, weather, time):
         exp_part = exp(3 * 20 / 25.4)
         sed = sed / exp_part
 
-    soil.sedimentYield = sed
+    soil.sed = sed
 
 
 #

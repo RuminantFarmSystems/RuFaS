@@ -92,7 +92,7 @@ def leaching_runoff_erosion(soil):
             Eros_freshN_loss = 0
             Eros_NH4_loss = 0
 
-            Sed = soil.sedimentYield
+            Sed = soil.sed
 
             if Sed > 0:
                 # "pseudocode_soil" S.4.C.5
