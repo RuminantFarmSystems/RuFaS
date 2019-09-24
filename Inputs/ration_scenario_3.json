@@ -1,6 +1,5 @@
 
 {
-
     "config":
     {
         "duration": 2,
@@ -69,7 +68,7 @@
                     "FieldCapacity": 0.30,
                     "Saturation": 0.5,
                     "BottomDepth": 150,
-                    "StartingSoilWater": 0.3,
+                    "SoilWaterRatio": 0.3,
                     "Ksat": 20,
                     "InitialTemperature": 12,
                     "OrgC%": 1.2,
@@ -87,7 +86,7 @@
                     "FieldCapacity": 0.30,
                     "Saturation": 0.5,
                     "BottomDepth": 300,
-                    "StartingSoilWater": 0.3,
+                    "SoilWaterRatio": 0.3,
                     "Ksat": 20,
                     "InitialTemperature": 10,
                     "OrgC%": 1.2,
@@ -105,7 +104,7 @@
                     "FieldCapacity": 0.30,
                     "Saturation": 0.5,
                     "BottomDepth": 450,
-                    "StartingSoilWater": 0.3,
+                    "SoilWaterRatio": 0.3,
                     "Ksat": 20,
                     "InitialTemperature": 8,
                     "OrgC%": 1.2,

@@ -2,25 +2,25 @@
 #
 # RUFAS: Ruminant Farm Systems Model
 #
-# Output.py
+# water_balance.py
 #
-# Authors: Kass Chupongstimun
-#          Jit Patil
-#          William Donovan
+# Authors: Jacob Johnson, jacob8399@gmail.com
+#          William Donovan, wmdonovan@wisc.edu
 #
 ################################################################################
 
 import csv
 from pathlib import Path
+
+from RUFAS.output.graphics import daily_graphics, annual_water_balance_graphic, annual_graphics
 from RUFAS.output.report_handler import BaseReportHandler
-from RUFAS.output.graphics import daily_graphics, annual_graphics
 
 
 # -------------------------------------------------------------------------------
 # Class: SoilSummary
-# Creates and prints to the file soil_summary.csv
+# Creates and prints to the file water_balance.csv
 # -------------------------------------------------------------------------------
-class SoilSummary(BaseReportHandler):
+class WaterBalance(BaseReportHandler):
 
     def __init__(self, data):
 
@@ -38,42 +38,41 @@ class SoilSummary(BaseReportHandler):
         #
 
         #
-        # Sets active, report_name, f_name using data
+        # Sets active, report_name, file_name using data
         #
-        self.set_properties(data)
 
+        self.set_properties(data)
+        self.fieldNames = None
+
+        #
+        # Daily Outputs
+        #
         self.daily_variables = {'year': ['time.cal_year', '', []],
                                 'j_day': ['time.day', '', []],
-                                'precip': ['weather.rainfall[time.year - 1][time.day - 1]', 'mm', []],
-                                'runoff': ['soil.runoff', 'mm', []],
-                                'ET_max': ['soil.ET_max', 'mm d^-1', []],
-                                'ET_act': ['soil.ET_act', 'mm H20', []],
-                                'trans_max': ['soil.trans_max', 'mm H20', []],
-                                'evap_max': ['soil.evap_max', 'mm H20', []],
-                                'surface_temp': ['soil.Tsurf', 'C', []],
-                                'sediment_yield': ['soil.sedimentYield', 'metric tons', []],
-                                'residue': ['soil.residue', 'kg/ha', []],
-                                'trans_act_L1': ['soil.soil_layers[0].trans_act', 'mm H20', []],
-                                'trans_act_L2': ['soil.soil_layers[1].trans_act', 'mm H20', []],
-                                'trans_act_L3': ['soil.soil_layers[2].trans_act', 'mm H20', []],
-                                'soil_water_L1': ['soil.soil_layers[0].soil_water', 'mm', []],
-                                'soil_water_L2': ['soil.soil_layers[1].soil_water', 'mm', []],
-                                'soil_water_L3': ['soil.soil_layers[2].soil_water', 'mm', []],
-                                'evap_L1': ['soil.soil_layers[0].evap', 'mm H20', []],
-                                'evap_L2': ['soil.soil_layers[1].evap', 'mm H20', []],
-                                'evap_L3': ['soil.soil_layers[2].evap', 'mm H20', []],
-                                'perc_L1': ['soil.soil_layers[0].perc', 'mm H20', []],
-                                'perc_L2': ['soil.soil_layers[1].perc', 'mm H20', []],
-                                'perc_L3': ['soil.soil_layers[2].perc', 'mm H20', []],
-                                'temperature_L1': ['soil.soil_layers[0].temperature', 'C', []],
-                                'temperature_L2': ['soil.soil_layers[1].temperature', 'C', []],
-                                'temperature_L3': ['soil.soil_layers[2].temperature', 'C', []],
-                                }
+                                'delta_SW': ['soil.delta_SW', 'mmH2O', []],
+                                'runoff': ['soil.runoff', 'mmH2O', []],
+                                'evaporation': ['soil.evap_sum', 'mmH2O', []],
+                                'transpiration': ['soil.trans_sum', 'mmH2O', []],
+                                'drainage': ['soil.drainage', 'mmH2O', []],
+                                'actual precipitation': ['soil.p_act', 'mmH2O', []],
+                                'calculated water': ['soil.p_calc', 'mmH2O', []],
+                                'difference': ['soil.water_balance_difference', 'mmH2O', []]}
 
+        #
+        # Annual outputs
+        #
         self.annual_variables = {'year': ['time.cal_year', '', 0],
-                                 'ET_max': ['soil.ET_max_annual', 'mm H20', 0],
-                                 'ET': ['soil.ET_annual', 'mm H20', 0]
-                                 }
+                                 'delta_SW': ['round(soil.delta_SW_annual, 3)', 'mmH2O', 0],
+                                 'runoff': ['round(soil.runoff_annual, 3)', 'mmH2O', 0],
+                                 'evaporation': ['round(soil.evap_annual, 3)', 'mmH2O', 0],
+                                 'transpiration': ['round(soil.trans_annual, 3)', 'mmH2O', 0],
+                                 'drainage': ['round(soil.drainage_annual, 3)', 'mmH2O', 0],
+                                 # new variables need to be added below here in the gap
+
+                                 # new variables need to be added above here
+                                 'actual precipitation': ['round(soil.p_act_annual, 3)', 'mmH2O', 0],
+                                 'calculated water': ['round(soil.p_calc_annual, 3)', 'mmH2O', 0],
+                                 'difference': ['round(soil.annual_water_balance_difference, 3)', 'mmH2O', 0]}
 
     #
     # writes header names and units to the csv
@@ -83,6 +82,7 @@ class SoilSummary(BaseReportHandler):
         mode = 'a+' if output_csv.exists() else 'w+'
 
         with output_csv.open(mode) as csvfile:
+
             writer = csv.DictWriter(csvfile, fieldnames=variables.keys(),
                                     lineterminator='\n')
 
@@ -105,8 +105,8 @@ class SoilSummary(BaseReportHandler):
     # variable, this will throw an error. See comment at the top of the file.
     #
     def daily_update(self, state, weather, time):
-        soil = state.soil
 
+        soil = state.soil
         for variable in self.daily_variables:
             self.daily_variables[variable][2].append(
                 eval(self.daily_variables[variable][0], globals(), locals()))
@@ -114,6 +114,8 @@ class SoilSummary(BaseReportHandler):
     def annual_update(self, state, weather, time):
         """Stores the yearly values that need to be printed in the report."""
         soil = state.soil
+
+        soil.calculate_annual_water_balance()
 
         for variable in self.annual_variables:
             self.annual_variables[variable][2] = \
@@ -162,5 +164,6 @@ class SoilSummary(BaseReportHandler):
 
     def produce_report_graphics(self, is_final):
         annual_file_name = str(self.file_name).split('.')[0] + "_annual.csv"
+        annual_water_balance_graphic(annual_file_name, self.display_graphics, self.produce_graphics)
         annual_graphics(annual_file_name, self.display_graphics, self.produce_graphics, is_final)
         daily_graphics(self.file_name, self.display_graphics, self.produce_graphics, is_final)

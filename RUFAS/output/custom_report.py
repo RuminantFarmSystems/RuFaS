@@ -1,26 +1,24 @@
 ################################################################################
-#
-# RUFAS: Ruminant Farm Systems Model
-#
-# Output.py
-#
-# Authors: Kass Chupongstimun
-#          Jit Patil
-#          William Donovan
-#
-################################################################################
-
+"""
+RUFAS: Ruminant Farm Systems Model
+File name: custom_report.py
+Description:
+Author(s): William Donovan, wmdonovan@wisc.edu
+           Jacob Johnson, jacob8399@gmail.com
+"""
+#############################################
 import csv
 from pathlib import Path
-from RUFAS.output.report_handler import BaseReportHandler
+
 from RUFAS.output.graphics import daily_graphics, annual_graphics
+from RUFAS.output.report_handler import BaseReportHandler
 
 
 # -------------------------------------------------------------------------------
 # Class: SoilSummary
-# Creates and prints to the file soil_summary.csv
+# Creates and prints to the file water_balance.csv
 # -------------------------------------------------------------------------------
-class SoilSummary(BaseReportHandler):
+class CustomReport(BaseReportHandler):
 
     def __init__(self, data):
 
@@ -38,42 +36,25 @@ class SoilSummary(BaseReportHandler):
         #
 
         #
-        # Sets active, report_name, f_name using data
+        # Sets active, report_name, file_name using data
         #
-        self.set_properties(data)
 
+        self.set_properties(data)
+        self.fieldNames = None
+
+        #
+        # Daily Outputs
+        #
         self.daily_variables = {'year': ['time.cal_year', '', []],
-                                'j_day': ['time.day', '', []],
-                                'precip': ['weather.rainfall[time.year - 1][time.day - 1]', 'mm', []],
-                                'runoff': ['soil.runoff', 'mm', []],
-                                'ET_max': ['soil.ET_max', 'mm d^-1', []],
-                                'ET_act': ['soil.ET_act', 'mm H20', []],
-                                'trans_max': ['soil.trans_max', 'mm H20', []],
-                                'evap_max': ['soil.evap_max', 'mm H20', []],
-                                'surface_temp': ['soil.Tsurf', 'C', []],
-                                'sediment_yield': ['soil.sedimentYield', 'metric tons', []],
-                                'residue': ['soil.residue', 'kg/ha', []],
-                                'trans_act_L1': ['soil.soil_layers[0].trans_act', 'mm H20', []],
-                                'trans_act_L2': ['soil.soil_layers[1].trans_act', 'mm H20', []],
-                                'trans_act_L3': ['soil.soil_layers[2].trans_act', 'mm H20', []],
-                                'soil_water_L1': ['soil.soil_layers[0].soil_water', 'mm', []],
-                                'soil_water_L2': ['soil.soil_layers[1].soil_water', 'mm', []],
-                                'soil_water_L3': ['soil.soil_layers[2].soil_water', 'mm', []],
-                                'evap_L1': ['soil.soil_layers[0].evap', 'mm H20', []],
-                                'evap_L2': ['soil.soil_layers[1].evap', 'mm H20', []],
-                                'evap_L3': ['soil.soil_layers[2].evap', 'mm H20', []],
-                                'perc_L1': ['soil.soil_layers[0].perc', 'mm H20', []],
-                                'perc_L2': ['soil.soil_layers[1].perc', 'mm H20', []],
-                                'perc_L3': ['soil.soil_layers[2].perc', 'mm H20', []],
-                                'temperature_L1': ['soil.soil_layers[0].temperature', 'C', []],
-                                'temperature_L2': ['soil.soil_layers[1].temperature', 'C', []],
-                                'temperature_L3': ['soil.soil_layers[2].temperature', 'C', []],
+                                'j_day': ['time.day', '', []]
                                 }
 
-        self.annual_variables = {'year': ['time.cal_year', '', 0],
-                                 'ET_max': ['soil.ET_max_annual', 'mm H20', 0],
-                                 'ET': ['soil.ET_annual', 'mm H20', 0]
+        #
+        # Annual outputs
+        #
+        self.annual_variables = {'year': ['time.cal_year', '', 0]
                                  }
+
 
     #
     # writes header names and units to the csv
@@ -83,6 +64,7 @@ class SoilSummary(BaseReportHandler):
         mode = 'a+' if output_csv.exists() else 'w+'
 
         with output_csv.open(mode) as csvfile:
+
             writer = csv.DictWriter(csvfile, fieldnames=variables.keys(),
                                     lineterminator='\n')
 
@@ -106,6 +88,7 @@ class SoilSummary(BaseReportHandler):
     #
     def daily_update(self, state, weather, time):
         soil = state.soil
+        crop_type = state.crop.crops_list["corn"]
 
         for variable in self.daily_variables:
             self.daily_variables[variable][2].append(
@@ -114,6 +97,7 @@ class SoilSummary(BaseReportHandler):
     def annual_update(self, state, weather, time):
         """Stores the yearly values that need to be printed in the report."""
         soil = state.soil
+        crop_type = state.crop.crops_list["corn"]
 
         for variable in self.annual_variables:
             self.annual_variables[variable][2] = \

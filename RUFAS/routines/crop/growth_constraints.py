@@ -13,17 +13,17 @@ Description: This module contains the necessary functions for calculating and
 
 CropType attribute definitions:
 
-    bio_N = Actual mass of nitrogen stored in plant material (kg N ha^-1)
+    bio_N = Actual mass of nitrogen stored in plant material (kg N/ha)
 
     bio_N_opt = Optimal mass of nitrogen stored in plant material for current
-                growth stage (kg N ha^-1)
+                growth stage (kg N/ha)
 
     phi_N = Scaling factor for nitrogen stress
 
-    bio_P = Actual mass of phosphorus stored in plant material (kg P ha^-1)
+    bio_P = Actual mass of phosphorus stored in plant material (kg P/ha)
 
     bio_P_opt = Optimal mass of phosphorus stored in plant material for current
-                growth stage (kg P ha^-1)
+                growth stage (kg P/ha)
 
     phi_P = scaling factor for phosphorus stress
 
@@ -84,9 +84,9 @@ They do not modify the values of any State class.
 # "pseudocode_crop" C.7.A.1
 #
 def calc_wstrs(crop_type, soil):
-    if soil.Et_max == 0:
+    if soil.trans_max == 0:
         return 0
-    wstrs = 1.0 - (crop_type.water_actual_up / soil.Et_max)
+    wstrs = 1.0 - (crop_type.water_act_up / soil.trans_max)
     if wstrs < 0:
         return 0
     else:

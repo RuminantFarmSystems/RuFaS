@@ -3,9 +3,10 @@
 
     "config":
     {
-        "StartYear" : 2008,
-        "EndYear" : 2009,
-        "output_dir": "Outputs/Sample_Farm_Outputs/"
+        "StartDate" : "2008:1",
+        "EndDate" : "2009:365",
+        "output_dir": "Outputs/Sample_Farm_Outputs/",
+        "diagnostic_dir": "Outputs/diagnostics/"
     },
 
     "weather": "Inputs/crop_module_testWeather_3.4.csv",
@@ -15,26 +16,50 @@
         "soil_summary":
         {
             "active": true,
+            "produce_graphics": false,
+            "display_graphics": false,
             "report_name": "Soil Summary",
             "file_name": "soil_summary.csv"
         },
         "ration_report":
         {
             "active": true,
+            "produce_graphics": false,
+            "display_graphics": false,
             "report_name": "Ration Report",
             "file_name": "ration_report.csv"
         },
         "soil_nitrogen":
         {
             "active": true,
+            "produce_graphics": false,
+            "display_graphics": false,
             "report_name": "Soil Nitrogen",
             "file_name": "soil_nitrogen.csv"
         },
-        "crop_report":
+        "crop_summary":
         {
             "active": true,
-            "report_name": "Crop Report",
+            "produce_graphics": false,
+            "display_graphics": false,
+            "report_name": "Crop Summary",
             "file_name": "crop_summary.csv"
+        },
+        "water_balance":
+        {
+            "active": true,
+            "produce_graphics": false,
+            "display_graphics": false,
+            "report_name": "Water Balance",
+            "file_name": "water_balance.csv"
+        },
+        "custom_report":
+        {
+            "active": true,
+            "produce_graphics": false,
+            "display_graphics": false,
+            "report_name": "Custom Report",
+            "file_name": "custom_report.csv"
         }
     },
 
@@ -111,7 +136,7 @@
             "Sand": 15,
             "Silt": 65,
             "SoilAlbedo": 0.16,
-            "Residue": 8000,
+            "initial_residue": 8000,
             "FreshNMineralRate": 0.05,
             "SoilCoverType": "BARE",
 
@@ -135,7 +160,7 @@
                     "ActiveMineralRate": 0.0001,
                     "VolatileExchangeFac": 0.15,
                     "DenitrificationRate": 0.01,
-                    "StartingSoilWater": 0.3,
+                    "SoilWaterRatio": 0.3,
                     "OM%": 1.9
                 },
                 "Layer2":
@@ -156,7 +181,7 @@
                     "ActiveMineralRate": 0.0001,
                     "VolatileExchangeFac": 0.15,
                     "DenitrificationRate": 0.01,
-                    "StartingSoilWater": 0.3,
+                    "SoilWaterRatio": 0.3,
                     "OM%": 1.9
                 },
                 "Layer3":
@@ -177,7 +202,7 @@
                     "ActiveMineralRate": 0.00005,
                     "VolatileExchangeFac": 0.15,
                     "DenitrificationRate": 0.01,
-                    "StartingSoilWater": 0.3,
+                    "SoilWaterRatio": 0.3,
                     "OM%": 1.9
                 }
             },
