@@ -1,34 +1,63 @@
-
 {
-
     "config":
     {
-        "StartYear": 2008,
-        "EndYear": 2009,
-        "output_dir": "Outputs/Sample_Farm_Outputs/"
+        "StartDate" : "2008:1",
+        "EndDate" : "2011:366",
+        "output_dir": "Outputs/Sample_Farm_Outputs/",
+        "diagnostic_dir": "Outputs/diagnostics/"
     },
 
-    "weather": "Inputs/Weather.csv",
+    "weather": "Inputs/crop_module_testWeather_3.4.csv",
 
     "output":
     {
         "soil_summary":
         {
             "active": true,
+            "produce_graphics": false,
+            "display_graphics": false,
             "report_name": "Soil Summary",
             "file_name": "soil_summary.csv"
         },
         "ration_report":
         {
-            "active": false,
+            "active": true,
+            "produce_graphics": false,
+            "display_graphics": false,
             "report_name": "Ration Report",
-            "file_name": "ration_report.txt"
+            "file_name": "ration_report.csv"
         },
         "soil_nitrogen":
         {
             "active": true,
+            "produce_graphics": false,
+            "display_graphics": false,
             "report_name": "Soil Nitrogen",
             "file_name": "soil_nitrogen.csv"
+        },
+        "crop_summary":
+        {
+            "active": true,
+            "produce_graphics": false,
+            "display_graphics": false,
+            "report_name": "Crop Summary",
+            "file_name": "crop_summary.csv"
+        },
+        "water_balance":
+        {
+            "active": true,
+            "produce_graphics": false,
+            "display_graphics": false,
+            "report_name": "Water Balance",
+            "file_name": "water_balance.csv"
+        },
+        "custom_report":
+        {
+            "active": true,
+            "produce_graphics": false,
+            "display_graphics": false,
+            "report_name": "Custom Report",
+            "file_name": "custom_report.csv"
         }
     },
 
@@ -36,27 +65,68 @@
     {
         "crop":
         {
-            "crop_x":
+            "corn":
             {
-                "crop_name": "crop x",
+                "crop_name": "corn",
                 "crop_type": "annual",
-                "planting_date": 10
+                "fix_nitrogen": false,
+
+                "planting_date": 121,
+                "harvest_date": 319,
+
+                "harvest_index": 0.65,
+                "harvest_eff": 0.9,
+                "HI_opt": 0.6,
+                "HI_min": 0.3,
+
+                "min_temp_for_growth": 10,
+                "max_temp_for_growth": 30,
+                "opt_temp_for_growth": 25,
+                "HU_for_maturity": 1200,
+
+                "fr_PHU_50" : 0.5,
+                "fr_PHU_100" : 1.0,
+                "fr_PHU_sen": 0.90,
+                "fr_PHU_1": 0.15,
+                "fr_PHU_2": 0.50,
+                "fr_LAI_1": 0.05,
+                "fr_LAI_2": 0.95,
+
+                "LAI_max": 3,
+                "radiation_use_efficiency": 39,
+                "light extinction coefficient": 0.65,
+
+                "z_root_max": 2000,
+
+                "fr,n1": 0.047,
+                "fr,n2": 0.0177,
+                "fr,n3": 0.0138,
+                "fr,n~3": 0.01381,
+                "beta_n": 10,
+
+                "beta_w": 10,
+                "epco": 0.5,
+
+                "fr,p1": 0.0048,
+                "fr,p2": 0.0018,
+                "fr,p3": 0.0014,
+                "fr,p~3": 0.00141,
+                "beta_p": 10
             }
         },
         "soil":
         {
-            "ProfileDepth": 450,
+            "ProfileBulkDensity": 1.16525,
             "CN2": 86.00,
             "FieldSlope": 0.02,
             "SlopeLength": 7,
             "Manning": 0.4,
             "FieldSize": 1.0,
             "PracticeFactor": 0.25,
-            "Orgc": 1,
             "Sand": 15,
             "Silt": 65,
             "SoilAlbedo": 0.16,
-            "Residue": 0,
+            "initial_residue": 0,
             "FreshNMineralRate": 0.05,
             "SoilCoverType": "BARE",
 
@@ -64,65 +134,65 @@
             {
                 "Layer1":
                 {
-                    "BulkDensity": 1.8,
-                    "WiltingPoint": 0.1,
-                    "FieldCapacity": 0.30,
-                    "Saturation": 0.5,
                     "BottomDepth": 150,
-                    "StartingSoilWater": 0.3,
-                    "Ksat": 20,
-                    "InitialTemperature": 12,
-                    "OrgC%": 1.2,
-                    "ActiveMineralRate": 0.00005,
+                    "WiltingPoint": 0.1,
+                    "FieldCapacity": 0.33,
+                    "Saturation": 0.5,
+                    "Ksat": 29.2,
                     "CationExclusionFraction": 0.0,
-                    "DenitrificationRate": 0.005,
+                    "Clay": 21,
+                    "InitialTemperature": -4.098,
+                    "BulkDensity": 1.23,
+                    "OrgC%": 2.0,
                     "NH4": 1,
                     "FracActiveN": 0.02,
-                    "VolatileExchangeFac": 0.1,
                     "LabileP": 15,
-                    "Clay": 20,
+                    "ActiveMineralRate": 0.0001,
+                    "VolatileExchangeFac": 0.15,
+                    "DenitrificationRate": 0.01,
+                    "SoilWaterRatio": 0.3,
                     "OM%": 1.9
                 },
                 "Layer2":
                 {
-                    "BulkDensity": 1.8,
-                    "WiltingPoint": 0.1,
-                    "FieldCapacity": 0.30,
-                    "Saturation": 0.5,
                     "BottomDepth": 300,
-                    "StartingSoilWater": 0.3,
-                    "Ksat": 20,
-                    "InitialTemperature": 10,
-                    "OrgC%": 1.2,
-                    "ActiveMineralRate": 0.00005,
+                    "WiltingPoint": 0.1,
+                    "FieldCapacity": 0.3,
+                    "Saturation": 0.5,
+                    "Ksat": 13.2,
                     "CationExclusionFraction": 0.0,
-                    "DenitrificationRate": 0.005,
+                    "Clay": 33,
+                    "InitialTemperature": -1.978,
+                    "BulkDensity": 1.16,
+                    "OrgC%": 1,
                     "NH4": 1,
                     "FracActiveN": 0.02,
-                    "VolatileExchangeFac": 0.1,
                     "LabileP": 15,
-                    "Clay": 20,
+                    "ActiveMineralRate": 0.0001,
+                    "VolatileExchangeFac": 0.15,
+                    "DenitrificationRate": 0.01,
+                    "SoilWaterRatio": 0.3,
                     "OM%": 1.9
                 },
                 "Layer3":
                 {
-                    "BulkDensity": 1.8,
+                    "BottomDepth": 450,
                     "WiltingPoint": 0.1,
                     "FieldCapacity": 0.30,
                     "Saturation": 0.5,
-                    "BottomDepth": 450,
-                    "StartingSoilWater": 0.3,
                     "Ksat": 20,
-                    "InitialTemperature": 8,
-                    "OrgC%": 1.2,
-                    "ActiveMineralRate": 0.00005,
                     "CationExclusionFraction": 0.0,
-                    "DenitrificationRate": 0.005,
+                    "Clay": 20,
+                    "InitialTemperature": 8,
+                    "BulkDensity": 1.8,
+                    "OrgC%": 1.2,
                     "NH4": 1,
                     "FracActiveN": 0.02,
-                    "VolatileExchangeFac": 0.1,
-                    "LabileP": 15,
-                    "Clay": 20,
+                    "LabileP": 174,
+                    "ActiveMineralRate": 0.00005,
+                    "VolatileExchangeFac": 0.15,
+                    "DenitrificationRate": 0.01,
+                    "SoilWaterRatio": 0.3,
                     "OM%": 1.9
                 }
             },
@@ -196,17 +266,17 @@
                 {
                     "Year": 2009,
                     "PUptake": 15.0
-                },
-                "Uptake3":
-                {
-                    "Year": 2010,
-                    "PUptake": 15.0
                 }
+
             }
         },
 
         "animal":
         {
+            "Herd":
+            {
+                "cow_num": 100
+            },
             "housing": "barn",
             "ration":
             {
@@ -217,111 +287,17 @@
 
         "feed":
         {
-            "nutrients_list": ["FI", "RV", "NE", "CP", "ICP", "RDP", "conc"],
+            "feed_library": "Inputs/testing_ration_feedlib.csv",
 
-            "purchased_feed":
-            {
-                "CG":
-                {
-                "price": 0.132,
-                "units": "w",
-                "limit": 20,
-                "nutrition":
-                {
-                    "FI": 0.056,
-                    "RV": -0.154,
-                    "NE": 1.97,
-                    "CP": 0.1,
-                    "ICP": 0.41,
-                    "RDP": 0.12,
-                    "conc": "conc"
-                }
-                },
-                "PROT":
-                {
-                    "price": 0.462,
-                    "units": "x",
-                    "limit": 10,
-                    "nutrition":
-                    {
-                        "FI": 0.048,
-                        "RV": -0.162,
-                        "NE": 1.85,
-                        "CP": 0.49,
-                        "ICP": 0.33,
-                        "RDP": 0.32,
-                        "conc": "conc"
-                    }
-                },
-                "UPROT":
-                {
-                    "price": 0.46,
-                    "units": "y",
-                    "limit": 2,
-                    "nutrition":
-                    {
-                        "FI": 0.048,
-                        "RV": -0.162,
-                        "NE": 5.67,
-                        "CP": 0.62,
-                        "ICP": 0.2,
-                        "RDP": 0.4,
-                        "conc": "conc"
-                    }
-                },
-                "FAT":
-                {
-                    "price": 1.06,
-                    "units": "z",
-                    "limit": 100,
-                    "nutrition":
-                    {
-                        "FI": 0.0,
-                        "RV": 0.0,
-                        "NE": 10.92,
-                        "CP": 0.0,
-                        "ICP": 0.0,
-                        "RDP": 0.0,
-                        "conc": "conc"
-                    }
-                }
-            },
-
-            "farm_feed":
-            {
-                "FRGE":
-                {
-                    "price": 0.0,
-                    "units": "x",
-                    "limit": 9999999,
-                    "nutrition":
-                    {
-                        "FI": 0.52,
-                        "RV": 0.204,
-                        "NE": 1.41,
-                        "CP": 0.164,
-                        "ICP": 0.036,
-                        "RDP": 0.121,
-                        "conc": "rough"
-                    }
-                },
-                "HMC":
-                {
-                    "price": 0.0,
-                    "units": "x",
-                    "limit": 9999999,
-                    "nutrition":
-                    {
-                        "FI": 0.04,
-                        "RV": -0.17,
-                        "NE": 2.25,
-                        "CP": 0.09,
-                        "ICP": 0.07,
-                        "RDP": 0.034,
-                        "conc": "conc"
-                    }
-                }
-            }
+            "available_feeds":
+            [
+              "Corn_grain",
+              "Legume_hay",
+              "Cotton_seed",
+              "Roasted_soybean",
+              "Rye_hay"
+            ]
         }
     }
 }
+

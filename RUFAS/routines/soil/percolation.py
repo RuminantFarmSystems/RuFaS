@@ -8,12 +8,12 @@ Author(s): William Donovan, wmdonovan@wisc.edu
 Description: This module contains the necessary functions for calculating and
              updating water percolation on a given day. Currently the only
              function meant to be used outside of this file is the update_all()
-              function. The other functions are meant to serve as helper
-              functions within this file.
+             function. The other functions are meant to serve as helper
+             methods within this file.
 
 Soil attribute definitions
 
-    Perc = amount of water that percolates to the underlying soil layer (mm H20)
+    perc = amount of water that percolates to the underlying soil layer (mm H20)
 
     t = time step (24h)
 
@@ -22,7 +22,7 @@ Soil attribute definitions
     Ksat = saturated hydraulic conductivity (mm/h)
 
 Soil values updated by calling update_all():
-    soil.listOfSoilLayers.perc
+    soil.soil_layers.perc
 """
 ###############################################################################
 
@@ -44,16 +44,12 @@ def update_all(soil):
 # "pseudocode_soil" S.2.C.1/2
 #
 def calc_daily_percolation(soil):
-    #
-    # The soil water in each layer is dependent on the amount percolated from
-    # the layer above. Because there are no layers above the first, prev_perc
-    # is initialized at 0 and updated with each pass of the loop.
-    #
-    for layer in soil.listOfSoilLayers:
+    for layer in soil.soil_layers:
         SAT = layer.satWater
 
-        SW = layer.currentSoilWaterMM
+        SW = layer.soil_water
         FC = layer.fcWater
+        WP = layer.wiltingWater
 
         SWperc = 0.0
         if SW > FC:
@@ -69,5 +65,5 @@ def calc_daily_percolation(soil):
         t = 24
 
         exp_part = exp((-t) / layer.TT)
-        layer.perc = SWperc * (1 - exp_part)
-
+        perc = SWperc * (1 - exp_part)
+        layer.perc = min(SW - WP, perc)

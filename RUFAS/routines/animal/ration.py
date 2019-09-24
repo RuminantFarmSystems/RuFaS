@@ -30,9 +30,9 @@ def optimize(feed, rqmts):
     """
     Sets up the arguments for the linear programming optimization.
 
-	Args:
-        feed : instance of the Feed class
-        rqmts : dict which represents the dietary requirements of the cows
+    Args:
+	    feed : instance of the Feed class
+	    rqmts : dict which represents the dietary requirements of the cows
 
     Returns:
         dict: the dictionary that is returned by the call to util.LP_solve()
@@ -56,7 +56,8 @@ def optimize(feed, rqmts):
                   for feed_name in feed.available_feed_names]
     LHS.append(constraint)
 
-    ME_DM_arr, RDP_DM_arr, RUP_DM_arr = calculate_ME_RDP_RUP(feed, global_DMIest, global_BW, global_DBW, global_milk, global_CP_Milk)
+    ME_DM_arr, RDP_DM_arr, RUP_DM_arr = calculate_ME_RDP_RUP(feed, global_DMIest, global_BW, global_DBW, global_milk,
+                                                             global_CP_Milk)
     LHS.append(ME_DM_arr)
     LHS.append(RDP_DM_arr)
     LHS.append(RUP_DM_arr)
@@ -103,9 +104,8 @@ def optimize(feed, rqmts):
                          "minimize", "RATION", lower_bounds, upper_bounds)
 
 
-
 def calculate_rqmts(BW, BCS, CBW, CI, concentrate, CP_Milk, DOP, DHD, DVD,
-                        DIM, fat_milk, lactose_milk, milk, parity, type, nutrients_list):
+                    DIM, fat_milk, lactose_milk, milk, parity, type, nutrients_list):
     """
     Calculate the dietary requirements of the cows. These values are used
     on the RHS of the linear program. Each calculation has a reference to the
@@ -139,7 +139,7 @@ def calculate_rqmts(BW, BCS, CBW, CI, concentrate, CP_Milk, DOP, DHD, DVD,
     # CP_Milk = percentage(CP_Milk)
     # fat_milk = percentage(fat_milk)
     # lactose_milk = percentage(lactose_milk)
-    
+
     # Sets these variables as global. See comment at the beginning of this file for further details.
     global global_BW
     global global_DMIest
@@ -154,19 +154,19 @@ def calculate_rqmts(BW, BCS, CBW, CI, concentrate, CP_Milk, DOP, DHD, DVD,
     # lactation, activity, pregnancy, and body weight change requirements):
 
     # Maintenance requirements
-    #------------------------
+    # ------------------------
     # Ideal Body Weight, kg (A.ER.1.2)
     IBW = BW / (0.65 + 0.1 * BCS)
     # Net Energy maintenance, Mcal (A.ER.1.1)
     NEm = 0.10 * (IBW ** 0.75)
 
     # Lactation requirements
-    #----------------------
+    # ----------------------
     # Net Energy lactation, Mcal (A.ER.2.1)
     NEl = (9.29 * milk * fat_milk + 5.5 * milk * CP_Milk + 3.95 * milk * lactose_milk) / 100
 
     # Activity requirements
-    #---------------------
+    # ---------------------
     # Net Energy activity, Mcal (A.ER.3.1)
     if type == "Barn":
         NEact = (DHD * 0.35 * BW + DVD * 5 * BW) / 1000
@@ -174,7 +174,7 @@ def calculate_rqmts(BW, BCS, CBW, CI, concentrate, CP_Milk, DOP, DHD, DVD,
         NEact = (DHD * 0.35 * BW + DVD * 5 * BW + 10 * (BW ** 0.75) * ((600 - 12 * concentrate) / 600)) / 1000
 
     # Pregnancy energy requirements
-    #-----------------------------
+    # -----------------------------
     # Net Energy pregnancy, Mcal (A.ER.4.1)
     if DOP < 190:
         NEpreg = 0
@@ -184,7 +184,7 @@ def calculate_rqmts(BW, BCS, CBW, CI, concentrate, CP_Milk, DOP, DHD, DVD,
         NEpreg = ((0.00318 * 279 - 0.0352) * (CBW / 45)) / 0.218
 
     # Body Weight change requirements
-    #-------------------------------
+    # -------------------------------
     # Target Calving Weight, kg (A.ER.5.1)
     if parity == 1:
         TCW = 700 * 0.85
@@ -317,7 +317,9 @@ def calculate_ME_RDP_RUP(feed, DMIest, BW, DBW, milk, CP_Milk):
         efROM_DM = 0.0343
 
         # Digested energy per unit DM (A.FE.7.1)
-        DE_DM = 4.2 * NDF_DM * percentage(dNDF_NDF) + 4.23 * Starch_DM * percentage(dStarch_Starch) + 9.40 * FA_DM * percentage(dFA_FA) + 5.65 * CP_DM * percentage(dCP_CP) + 0.89 * percentage(sNPNCPE_DM) + 4.00 * ROM_DM * percentage(dROM_ROM) - 5.65 * efCP_DM - 4.00 * efROM_DM
+        DE_DM = 4.2 * NDF_DM * percentage(dNDF_NDF) + 4.23 * Starch_DM * percentage(
+            dStarch_Starch) + 9.40 * FA_DM * percentage(dFA_FA) + 5.65 * CP_DM * percentage(dCP_CP) + 0.89 * percentage(
+            sNPNCPE_DM) + 4.00 * ROM_DM * percentage(dROM_ROM) - 5.65 * efCP_DM - 4.00 * efROM_DM
 
         # Gas energy loss, mCal/kg of DM (A.FE.8.2)
         GasE_DM = (0.294 * DMIest - 0.35 * FA_DM + 0.041 * NDF_DM * dNDF_NDF) / DMIest
@@ -325,7 +327,9 @@ def calculate_ME_RDP_RUP(feed, DMIest, BW, DBW, milk, CP_Milk):
         adCP_CP = dCP_CP - (efCP_DM * 100 / CP_DM)
         Body_gain_CP = DBW * 0.072
         # (A.FE.8.6)
-        UE_DM = 0.00275 * (BW ** 0.75) / DMIest + 0.0177 * DE_DM + 0.00813 * percentage(CP_DM) * adCP_CP * 1000 / 6.25 - (0.00813 * (milk * percentage(CP_Milk) + Body_gain_CP) * 1000 / 6.25) / DMIest
+        UE_DM = 0.00275 * (BW ** 0.75) / DMIest + 0.0177 * DE_DM + 0.00813 * percentage(
+            CP_DM) * adCP_CP * 1000 / 6.25 - (
+                        0.00813 * (milk * percentage(CP_Milk) + Body_gain_CP) * 1000 / 6.25) / DMIest
         # Apparently digested CP (A.FE.8.4)
         adCP_CP = dCP_CP - (efCP_DM / CP_DM)
         # Metabolized energy per unit DM (A.FE.8.1)
