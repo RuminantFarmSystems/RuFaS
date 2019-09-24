@@ -88,7 +88,7 @@ def annual_water_balance_graphic(output_csv, show_annual, produce_graphics):
     if produce_graphics:
         variables, units = read_data(output_csv)
 
-        save_dir = util.get_base_dir() / 'Outputs/diagnostics/' / output_csv.split('.')[0].strip('_annual')
+        save_dir = util.get_base_dir() / 'Outputs/diagnostics/' / output_csv.split('.')[0].replace('_annual', '')
 
         mp.figure()
         counter = 0
@@ -195,7 +195,7 @@ def daily_graphics(output_csv, display_graphics, produce_graphics, is_final):
 def annual_graphics(output_csv, show_annual, produce_graphics, is_final):
     if produce_graphics:
         variables, units = read_data(output_csv)
-        save_dir = util.get_base_dir() / 'Outputs/diagnostics/' / output_csv.split('.')[0].strip('_annual')
+        save_dir = util.get_base_dir() / 'Outputs/diagnostics/' / output_csv.split('.')[0].replace('_annual', '')
 
         start_year = int(variables['year'][0])
         end_year = int(variables['year'][-1])

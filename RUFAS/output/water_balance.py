@@ -62,7 +62,7 @@ class WaterBalance(BaseReportHandler):
         # Annual outputs
         #
         self.annual_variables = {'year': ['time.cal_year', '', 0],
-                                 'delta_SW': ['round(soil.annual_delta_SW, 3)', 'mmH2O', 0],
+                                 'delta_SW': ['round(soil.delta_SW_annual, 3)', 'mmH2O', 0],
                                  'runoff': ['round(soil.runoff_annual, 3)', 'mmH2O', 0],
                                  'evaporation': ['round(soil.evap_annual, 3)', 'mmH2O', 0],
                                  'transpiration': ['round(soil.trans_annual, 3)', 'mmH2O', 0],
