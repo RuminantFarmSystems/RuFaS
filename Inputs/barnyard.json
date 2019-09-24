@@ -63,7 +63,7 @@
         "custom_report":
         {
             "active": true,
-            "produce_graphics": true,
+            "produce_graphics": false,
             "display_graphics": false,
             "report_name": "Custom Report",
             "file_name": "custom_report.csv"
@@ -77,8 +77,8 @@
             "latitude": 43.332708,
             "corn":
             {
-                "grow_years": [2011],
-                "repeat": 3,
+                "grow_years": [],
+                "repeat": 0,
                 "planting_date": 121,
                 "harvest_date": 319,
                 "harvest_type": "optimal"
@@ -93,8 +93,8 @@
             },
             "alfalfa":
             {
-                "grow_years": [2009,2010],
-                "repeat": 3,
+                "grow_years": [],
+                "repeat": 0,
                 "planting_date": 121,
                 "harvest_date": 319,
                 "harvest_type": "optimal"
