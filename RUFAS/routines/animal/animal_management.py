@@ -63,6 +63,9 @@ class AnimalManagement:
     # day in the simulation
     simulation_day = 0
     
+    # if False, there are no animals being simulated on the farm
+    simulate_animals = False
+    
     def __init__(self, data, config, feed):
         '''
         Initializes the pens and animals in the simulation with data from the json file.
@@ -111,6 +114,28 @@ class AnimalManagement:
         cow_num = data['cow_num']
         replace_num = data['replace_num']
         herd_num = data['herd_num']
+        
+        if herd_num == 0:
+            self.simulate_animals = False
+            print("herd_num is 0 -> no animals will be simulated")
+            if not calf_num == 0:
+                print("Warning: herd_num is 0, but calf_num is not. Setting calf_num = 0.")
+                calf_num = 0
+            if not heiferI_num == 0:
+                print("Warning: herd_num is 0, but heiferI_num is not. Setting calf_num = 0.")
+                heiferI_num = 0
+            if not heiferII_num == 0:
+                print("Warning: herd_num is 0, but heiferII_num is not. Setting calf_num = 0.")        
+                heiferII_num = 0
+            if not heiferIII_num == 0:
+                print("Warning: herd_num is 0, but heiferIII_num is not. Setting calf_num = 0.")
+                heiferIII_num = 0
+            if not cow_num == 0:
+                print("Warning: herd_num is 0, but cow_num is not. Setting calf_num = 0.")
+                cow_num = 0
+        else:
+            self.simulate_animals = True
+        
         self.life_cycle_manager.initialize_herd(herd_num, calf_num, heiferI_num, heiferII_num, heiferIII_num, cow_num, replace_num)
         self.calves = self.life_cycle_manager.calves
         self.heiferIs = self.life_cycle_manager.heiferIs
@@ -238,16 +263,17 @@ class AnimalManagement:
             feed : instance of the Feed class
             time : instance of the Time class
         '''
-        self.life_cycle_manager.daily_update(self.simulation_day, self.sim_length)
+        if self.simulate_animals:
+            self.life_cycle_manager.daily_update(self.simulation_day, self.sim_length)
         
-        if self.end_ration_interval():
-            self.calc_nutrient_rqmts(feed)  # per animal, new requirements calculated based on previous ration interval's housing
-            self.clear_pens()
-            self.pen_allocation()
-            self.calc_avg_nutrient_rqmts()  # per pen
-            self.calc_ration(feed)  # per pen
-            self.calc_manure_excretion(feed)  # per pen
-            self.calc_avg_growth()  # per pen
+            if self.end_ration_interval():
+                self.calc_nutrient_rqmts(feed)  # per animal, new requirements calculated based on previous ration interval's housing
+                self.clear_pens()
+                self.pen_allocation()
+                self.calc_avg_nutrient_rqmts()  # per pen
+                self.calc_ration(feed)  # per pen
+                self.calc_manure_excretion(feed)  # per pen
+                self.calc_avg_growth()  # per pen
             
         # other daily actions
                 
