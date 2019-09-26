@@ -22,8 +22,8 @@ def update_all(S):
 
     S.sed_P = 0.001 * S.sed_P_conc * (S.sed / S.area) * S.enrichment_P
 
-    S.soil_layers[0].active_P -= S.soil_layers[0].active_P[0] * \
+    S.soil_layers[0].active_P -= S.soil_layers[0].active_P * \
                                  (S.sed_P / S.soil_layers[0].active_P + S.soil_layers[0].stable_P)
 
-    S.soil_layers[0].stable_P -= S.soil_layers[0].stable_P[0] * \
+    S.soil_layers[0].stable_P -= S.soil_layers[0].stable_P * \
                                  (S.sed_P / S.soil_layers[0].active_P + S.soil_layers[0].stable_P)
