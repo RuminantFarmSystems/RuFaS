@@ -81,6 +81,9 @@ def leaching_runoff_erosion(soil):
             soil.NH4_runoff = min(layer.NH4, NH4Runoff)
             layer.NH4 -= soil.NH4_runoff
 
+            soil.NO3_runoff_annual += soil.NO3_runoff
+            soil.NH4_runoff_annual += soil.NH4_runoff
+
             # "pseudocode_soil" S.4.C.3
             activeNErosConc = (100 * layer.activeN) / (BD * thickness)
             stableNErosConc = (100 * layer.stableN) / (BD * thickness)
@@ -92,7 +95,7 @@ def leaching_runoff_erosion(soil):
             Eros_freshN_loss = 0
             Eros_NH4_loss = 0
 
-            Sed = soil.sedimentYield
+            Sed = soil.sed
 
             if Sed > 0:
                 # "pseudocode_soil" S.4.C.5
@@ -115,6 +118,11 @@ def leaching_runoff_erosion(soil):
 
             soil.NH4_erosion = min(layer.NH4, Eros_NH4_loss)
             layer.NH4 -= soil.NH4_erosion
+
+            soil.activeN_erosion_annual += soil.activeN_erosion
+            soil.stableN_erosion_annual += soil.stableN_erosion
+            soil.freshN_erosion_annual += soil.freshN_erosion
+            soil.NH4_erosion_annual += soil.NH4_erosion
 
             #
             # the coefficient of extraction for leaching is calibrated to 1.0
@@ -173,5 +181,9 @@ def leaching_runoff_erosion(soil):
             layer.NO3 += prev_layer.NO3_perc
             layer.NH4 += prev_layer.NH4_perc
             layer.activeN += prev_layer.active_perc
+
+    soil.NO3_drainage_annual += soil.soil_layers[-1].NO3_perc
+    soil.NH4_drainage_annual += soil.soil_layers[-1].NH4_perc
+    soil.activeN_drainage_annual += soil.soil_layers[-1].active_perc
 
 
