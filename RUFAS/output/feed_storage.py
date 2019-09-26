@@ -8,8 +8,9 @@ Author(s): William Donovan, wmdonovan@wisc.edu
 """
 #############################################
 import csv
+from pathlib import Path
 
-from RUFAS.output.graphics import daily_graphics
+from RUFAS.output.graphics import daily_graphics, annual_graphics
 from RUFAS.output.report_handler import BaseReportHandler
 
 
@@ -56,13 +57,17 @@ class FeedStorage(BaseReportHandler):
                                 'C_feedout_particle': ['feed.C_feedout_particle', 'kg', []],
                                 'CP_gas': ['feed.CP_gas', 'kg', []],
                                 'CP_leachate': ['feed.CP_leachate', 'kg', []],
-                                'NPN': ['feed.NPN', 'idk lol', []]
+                                'NPN': ['feed.NPN', '', []]
                                 }
+
+        self.annual_variables = {'year': ['time.cal_year', '', 0],
+                                 'dry_matter': ['feed.dry_matter', 'kg', 0]
+                                 }
 
     #
     # writes header names and units to the csv
     #
-    def write_header(self, output_csv, variables):
+    def write_headers(self, output_csv, variables):
 
         mode = 'a+' if output_csv.exists() else 'w+'
 
@@ -79,8 +84,9 @@ class FeedStorage(BaseReportHandler):
             writer.writerow(units)
 
     def initialize(self, state):
-
-        self.write_header(self.get_fPath(), self.daily_variables)
+        self.write_headers(self.get_fPath(), self.daily_variables)
+        annual_path = Path(str(self.get_fPath()).split('.csv')[0] + "_annual.csv")
+        self.write_headers(annual_path, self.annual_variables)
 
     #
     # stores specified daily values. NOTE: the eval() method is limited
@@ -99,6 +105,13 @@ class FeedStorage(BaseReportHandler):
 
     def annual_update(self, state, weather, time):
         """Stores the yearly values that need to be printed in the report."""
+
+        feed = state.feed
+
+        for variable in self.annual_variables:
+            self.annual_variables[variable][2] = \
+                eval(self.annual_variables[variable][0], globals(), locals())
+
         pass
 
     #
@@ -118,6 +131,18 @@ class FeedStorage(BaseReportHandler):
                     row[variable] = self.daily_variables[variable][2][day]
                 writer.writerow(row)
 
+        annual_path = Path(str(self.get_fPath()).split('.csv')[0] + '_annual.csv')
+
+        mode = 'a+' if annual_path.exists() else 'w+'
+
+        with annual_path.open(mode) as csvfile:
+            writer = csv.DictWriter(csvfile, fieldnames=self.annual_variables.keys(),
+                                    lineterminator='\n')
+            row = {}
+            for variable in self.annual_variables:
+                row[variable] = self.annual_variables[variable][2]
+            writer.writerow(row)
+
     #
     # clears stored values at the end of the year
     #
@@ -127,5 +152,10 @@ class FeedStorage(BaseReportHandler):
         for variable in self.daily_variables:
             self.daily_variables[variable][2] = []
 
+        for variable in self.annual_variables:
+            self.annual_variables[variable][2] = 0
+
     def produce_report_graphics(self, is_final):
         daily_graphics(self.file_name, self.display_graphics, self.produce_graphics, is_final)
+        annual_file_name = str(self.file_name).split('.')[0] + "_annual.csv"
+        annual_graphics(annual_file_name, self.display_graphics, self.produce_graphics, is_final)

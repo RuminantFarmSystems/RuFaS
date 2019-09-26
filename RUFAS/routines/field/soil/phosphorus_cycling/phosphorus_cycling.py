@@ -17,7 +17,7 @@
 ################################################################################
 
 from . import fert_leach, fertilizer, manure, manure_leach, p_mineralization,\
-    plow, sol_P
+    plow, sol_P, erosion
 
 
 def update_all(soil, weather, time):
@@ -35,5 +35,7 @@ def update_all(soil, weather, time):
     manure_leach.update_all(soil, weather, time)
 
     p_mineralization.update_all(soil, time)
+
+    erosion.update_all(soil)
 
 
