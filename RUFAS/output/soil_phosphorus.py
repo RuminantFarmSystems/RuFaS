@@ -2,7 +2,7 @@
 #
 # RUFAS: Ruminant Farm Systems Model
 #
-# soil_phosphorusn.py
+# soil_phosphorus.py
 #
 # Authors: Kass Chupongstimun
 #          Jit Patil

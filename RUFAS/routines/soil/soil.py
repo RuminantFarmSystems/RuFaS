@@ -274,7 +274,6 @@ class Soil:
 
         x = 0
         for layer in self.soil_layers:
-            # TODO careful of cm to mm, I had to add the / 10
             self.thickness_cm.append(layer.thickness / 10)
 
             # TODO org_C is an input
@@ -438,7 +437,7 @@ class Soil:
         self.ET_annual = 0.0
 
         # annual water balance
-        self.annual_delta_SW = 0.0
+        self.delta_SW_annual = 0.0
         self.runoff_annual = 0.0
         self.evap_annual = 0.0
         self.trans_annual = 0.0
@@ -477,6 +476,18 @@ class Soil:
         self.activeN_erosion = 0.0
         self.stableN_erosion = 0.0
         self.freshN_erosion = 0.0
+
+        self.NO3_runoff_annual = 0.0
+        self.NH4_runoff_annual = 0.0
+
+        self.NH4_erosion_annual = 0.0
+        self.activeN_erosion_annual = 0.0
+        self.stableN_erosion_annual = 0.0
+        self.freshN_erosion_annual = 0.0
+
+        self.NO3_drainage_annual = 0.0
+        self.NH4_drainage_annual = 0.0
+        self.activeN_drainage_annual = 0.0
 
         # ------ INITIALIZE SOIL NITROGEN POOLS ------------------------------------
         # Calculate initial amount of NO3 in each soil layer;
@@ -769,12 +780,11 @@ class Soil:
         Description:
             Calculates annual water balance
         """
+        self.delta_SW_annual = self.profile_SW - self.initial_annual_SW
 
-        self.annual_delta_SW = self.profile_SW - self.initial_annual_SW
-
-        self.p_calc_annual = self.annual_delta_SW \
-                             + self.runoff_annual + self.evap_annual + self.trans_annual \
-                             + self.drainage_annual
+        self.p_calc_annual = self.delta_SW_annual \
+            + self.runoff_annual + self.evap_annual + self.trans_annual \
+            + self.drainage_annual
 
         self.annual_water_balance_difference = self.p_act_annual - self.p_calc_annual
 
@@ -798,3 +808,15 @@ class Soil:
         # initial annual soil water is set to soil water on the last day of the
         # previous year
         self.initial_annual_SW = self.profile_SW
+
+        self.NO3_runoff_annual = 0.0
+        self.NH4_runoff_annual = 0.0
+
+        self.NH4_erosion_annual = 0.0
+        self.activeN_erosion_annual = 0.0
+        self.stableN_erosion_annual = 0.0
+        self.freshN_erosion_annual = 0.0
+
+        self.NO3_drainage_annual = 0.0
+        self.NH4_drainage_annual = 0.0
+        self.activeN_drainage_annual = 0.0

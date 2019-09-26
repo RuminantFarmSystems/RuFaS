@@ -63,7 +63,7 @@
         "custom_report":
         {
             "active": true,
-            "produce_graphics": true,
+            "produce_graphics": false,
             "display_graphics": false,
             "report_name": "Custom Report",
             "file_name": "custom_report.csv"
