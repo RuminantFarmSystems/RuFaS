@@ -165,7 +165,7 @@ class AnimalManagement:
             heiferIII.calc_nutrient_rqmts()
             
         for cow in self.cows:
-            #uses average distances from pens to milking parlor
+            # uses average distances from pens to milking parlor
             cow.calc_init_nutrient_rqmts(avg_VD_parlor, avg_HD_parlor, self.housing, self.pasture_concentrate, feed)
     
     def avg_pen_dist(self):
