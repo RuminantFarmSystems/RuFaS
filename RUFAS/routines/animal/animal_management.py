@@ -122,16 +122,16 @@ class AnimalManagement:
                 print("Warning: herd_num is 0, but calf_num is not. Setting calf_num = 0.")
                 calf_num = 0
             if not heiferI_num == 0:
-                print("Warning: herd_num is 0, but heiferI_num is not. Setting calf_num = 0.")
+                print("Warning: herd_num is 0, but heiferI_num is not. Setting heiferI_num = 0.")
                 heiferI_num = 0
             if not heiferII_num == 0:
-                print("Warning: herd_num is 0, but heiferII_num is not. Setting calf_num = 0.")        
+                print("Warning: herd_num is 0, but heiferII_num is not. Setting heiferII_num = 0.")        
                 heiferII_num = 0
             if not heiferIII_num == 0:
-                print("Warning: herd_num is 0, but heiferIII_num is not. Setting calf_num = 0.")
+                print("Warning: herd_num is 0, but heiferIII_num is not. Setting heiferIII_num = 0.")
                 heiferIII_num = 0
             if not cow_num == 0:
-                print("Warning: herd_num is 0, but cow_num is not. Setting calf_num = 0.")
+                print("Warning: herd_num is 0, but cow_num is not. Setting cow_num = 0.")
                 cow_num = 0
         else:
             self.simulate_animals = True
