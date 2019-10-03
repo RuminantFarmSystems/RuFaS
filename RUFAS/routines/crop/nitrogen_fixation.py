@@ -54,10 +54,10 @@ def get_root_accessible_layers(crop_type, soil):
     if crop_type.z_root == 0:
         return accessible_layers
 
-    for soilLayer in soil.listOfSoilLayers:
-        accessible_layers.append(soilLayer)
+    for layer in soil.soil_layers:
+        accessible_layers.append(layer)
 
-        if crop_type.z_root <= soilLayer.bottomDepth:
+        if crop_type.z_root <= layer.bottomDepth:
             break
     return accessible_layers
 
@@ -109,7 +109,7 @@ def calc_f_NO3(accessible_layers):
 # "pseudocode_crop" C.5.D.5/6
 #
 def calc_f_sw(accessible_layers):
-    SW_root = sum([layer.currentSoilWaterMM for layer in accessible_layers])
+    SW_root = sum([layer.soil_water for layer in accessible_layers])
     FC_root = sum([layer.fcWater for layer in accessible_layers])
 
     if FC_root == 0:

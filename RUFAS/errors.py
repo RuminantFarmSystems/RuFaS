@@ -24,8 +24,8 @@ class UserInput(Exception):
 class InvalidJSONfile(Exception):
 	"""Raised when the json file fed to the program has problems"""
 
-	def __init__(self, fName):
-		self.msg = "Skipping simulation for {}\n".format(fName)
+	def __init__(self, file_name):
+		self.msg = "Skipping simulation for {}\n".format(file_name)
 
 
 # -------------------------------------------------------------------------------

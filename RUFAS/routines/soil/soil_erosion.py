@@ -15,9 +15,9 @@ Soil attribute definitions
 
     sed = sediment yield on a given day (metric tons)
 
-    Qsurf = surface runoff volume (m^3)
+    runoff = surface runoff volume (m^3)
 
-    Qpeak = peak runoff rate (m^3/sec)
+    peak_runoff = peak runoff rate (m^3/sec)
 
     K = USLE soil erodibility factor (Mg MJ^-1mm^-1)
 
@@ -88,14 +88,14 @@ def update_all(soil, crop, weather, time):
 # "pseudocode_soil" S.3.A.1/17
 #
 def calc_sed(soil, crop, weather, time):
-    Qsurf = soil.runoff
-    Qpeak = calc_Qpeak(soil, weather, time)
+    runoff = soil.runoff
+    peak_runoff = calc_peak_runoff(soil, weather, time)
     K = calc_K(soil)
     C = calc_C(soil, crop)
     P = soil.practiceFactor
     LS = calc_LS(soil)
 
-    sed = 11.8 * ((Qsurf * Qpeak) ** 0.56) * K * C * P * LS
+    sed = 11.8 * ((runoff * peak_runoff) ** 0.56) * K * C * P * LS
 
     # Sediment yield is adjusted for snow on the range day < 60 or day > 350
     # "pseudocode_soil" S.3.A.17
@@ -107,24 +107,24 @@ def calc_sed(soil, crop, weather, time):
 
 
 #
-# Calculates Qpeak, the peak runoff rate (m^3/sec)
+# Calculates the peak runoff rate (m^3/sec)
 # "pseudocode_soil" S.3.A.2/3
 #
-def calc_Qpeak(soil, weather, time):
-    Qpeak = 0.0
+def calc_peak_runoff(soil, weather, time):
+    peak_runoff = 0.0
     R = weather.rainfall[time.year-1][time.day-1]
     if R != 0:
 
         # "pseudocode_soil" S.3.A.3
-        Q = soil.runoff
-        RC = Q / R
+        runoff = soil.runoff
+        RC = runoff / R
 
         I = calc_I(soil, weather, time)
         Area = soil.fieldSize
 
-        Qpeak = (RC * I * Area) / 3.6
+        peak_runoff = (RC * I * Area) / 3.6
 
-    return Qpeak
+    return peak_runoff
 
 
 #
@@ -222,7 +222,7 @@ def calc_Fcsand(soil):
 #
 def calc_Fcl_si(soil):
     silt = soil.silt
-    clay = soil.listOfSoilLayers[0].clay
+    clay = soil.soil_layers[0].clay
 
     return (silt / (clay + silt)) ** 0.3
 
@@ -233,7 +233,7 @@ def calc_Fcl_si(soil):
 # "pseudocode_soil" S.3.A.12
 #
 def calc_Forgc(soil):
-    orgC = soil.orgc
+    orgC = soil.soil_layers[0].orgC
 
     exp_part = exp(3.72 - 2.95 * orgC)
 
