@@ -1,19 +1,24 @@
 ################################################################################
 """
 RUFAS: Ruminant Farm Systems Model
-File name: crop_summary.py
+File name: custom_report.py
 Description:
 Author(s): William Donovan, wmdonovan@wisc.edu
            Jacob Johnson, jacob8399@gmail.com
 """
-###############################################################################
+#############################################
 import csv
 from pathlib import Path
+
 from RUFAS.output.graphics import daily_graphics, annual_graphics
 from RUFAS.output.report_handler import BaseReportHandler
 
 
-class CropSummary(BaseReportHandler):
+# -------------------------------------------------------------------------------
+# Class: SoilSummary
+# Creates and prints to the file water_balance.csv
+# -------------------------------------------------------------------------------
+class CustomReport(BaseReportHandler):
 
     def __init__(self, data):
 
@@ -33,27 +38,23 @@ class CropSummary(BaseReportHandler):
         #
         # Sets active, report_name, file_name using data
         #
+
         self.set_properties(data)
         self.fieldNames = None
 
         #
         # Daily Outputs
-        # 1D Lists [julianDay]
         #
         self.daily_variables = {'year': ['time.cal_year', '', []],
-                                'j_day': ['time.day', '', []],
-                                'fr_PHU': ['crop_type.fr_PHU', '%', []],
-                                'biomass': ['crop_type.biomass_act', 'kg/ha', []],
-                                'LAI_act': ['crop_type.LAI_act', 'm^2/m^2', []],
-                                'Bio_N': ['crop_type.bio_N', 'kg N/ha', []],
-                                'Bio_P': ['crop_type.bio_P', 'kg P/ha', []],
-                                'z_root': ['crop_type.z_root', 'mm', []],
-                                'yield_act': ['crop_type.yield_act', 'kg/ha', []]
+                                'j_day': ['time.day', '', []]
                                 }
 
-        self.annual_variables = {'year': ['time.cal_year', '', 0],
-                                 'yield': ['crop_type.yield_annual', 'kg/ha', 0]
+        #
+        # Annual outputs
+        #
+        self.annual_variables = {'year': ['time.cal_year', '', 0]
                                  }
+
 
     #
     # writes header names and units to the csv
@@ -63,6 +64,7 @@ class CropSummary(BaseReportHandler):
         mode = 'a+' if output_csv.exists() else 'w+'
 
         with output_csv.open(mode) as csvfile:
+
             writer = csv.DictWriter(csvfile, fieldnames=variables.keys(),
                                     lineterminator='\n')
 
@@ -85,7 +87,8 @@ class CropSummary(BaseReportHandler):
     # variable, this will throw an error. See comment at the top of the file.
     #
     def daily_update(self, state, weather, time):
-        crop_type = state.crop.crops_list['corn']
+        soil = state.soil
+        crop_type = state.crop.crops_list["corn"]
 
         for variable in self.daily_variables:
             self.daily_variables[variable][2].append(
@@ -93,7 +96,8 @@ class CropSummary(BaseReportHandler):
 
     def annual_update(self, state, weather, time):
         """Stores the yearly values that need to be printed in the report."""
-        crop_type = state.crop.crops_list['corn']
+        soil = state.soil
+        crop_type = state.crop.crops_list["corn"]
 
         for variable in self.annual_variables:
             self.annual_variables[variable][2] = \

@@ -1,19 +1,26 @@
 ################################################################################
-"""
-RUFAS: Ruminant Farm Systems Model
-File name: crop_summary.py
-Description:
-Author(s): William Donovan, wmdonovan@wisc.edu
-           Jacob Johnson, jacob8399@gmail.com
-"""
-###############################################################################
+#
+# RUFAS: Ruminant Farm Systems Model
+#
+# water_balance.py
+#
+# Authors: Jacob Johnson, jacob8399@gmail.com
+#          William Donovan, wmdonovan@wisc.edu
+#
+################################################################################
+
 import csv
 from pathlib import Path
-from RUFAS.output.graphics import daily_graphics, annual_graphics
+
+from RUFAS.output.graphics import daily_graphics, annual_water_balance_graphic, annual_graphics
 from RUFAS.output.report_handler import BaseReportHandler
 
 
-class CropSummary(BaseReportHandler):
+# -------------------------------------------------------------------------------
+# Class: SoilSummary
+# Creates and prints to the file water_balance.csv
+# -------------------------------------------------------------------------------
+class WaterBalance(BaseReportHandler):
 
     def __init__(self, data):
 
@@ -33,27 +40,39 @@ class CropSummary(BaseReportHandler):
         #
         # Sets active, report_name, file_name using data
         #
+
         self.set_properties(data)
         self.fieldNames = None
 
         #
         # Daily Outputs
-        # 1D Lists [julianDay]
         #
         self.daily_variables = {'year': ['time.cal_year', '', []],
                                 'j_day': ['time.day', '', []],
-                                'fr_PHU': ['crop_type.fr_PHU', '%', []],
-                                'biomass': ['crop_type.biomass_act', 'kg/ha', []],
-                                'LAI_act': ['crop_type.LAI_act', 'm^2/m^2', []],
-                                'Bio_N': ['crop_type.bio_N', 'kg N/ha', []],
-                                'Bio_P': ['crop_type.bio_P', 'kg P/ha', []],
-                                'z_root': ['crop_type.z_root', 'mm', []],
-                                'yield_act': ['crop_type.yield_act', 'kg/ha', []]
-                                }
+                                'delta_SW': ['soil.delta_SW', 'mmH2O', []],
+                                'runoff': ['soil.runoff', 'mmH2O', []],
+                                'evaporation': ['soil.evap_sum', 'mmH2O', []],
+                                'transpiration': ['soil.trans_sum', 'mmH2O', []],
+                                'drainage': ['soil.drainage', 'mmH2O', []],
+                                'actual precipitation': ['soil.p_act', 'mmH2O', []],
+                                'calculated water': ['soil.p_calc', 'mmH2O', []],
+                                'difference': ['soil.water_balance_difference', 'mmH2O', []]}
 
+        #
+        # Annual outputs
+        #
         self.annual_variables = {'year': ['time.cal_year', '', 0],
-                                 'yield': ['crop_type.yield_annual', 'kg/ha', 0]
-                                 }
+                                 'delta_SW': ['round(soil.delta_SW_annual, 3)', 'mmH2O', 0],
+                                 'runoff': ['round(soil.runoff_annual, 3)', 'mmH2O', 0],
+                                 'evaporation': ['round(soil.evap_annual, 3)', 'mmH2O', 0],
+                                 'transpiration': ['round(soil.trans_annual, 3)', 'mmH2O', 0],
+                                 'drainage': ['round(soil.drainage_annual, 3)', 'mmH2O', 0],
+                                 # new variables need to be added below here in the gap
+
+                                 # new variables need to be added above here
+                                 'actual precipitation': ['round(soil.p_act_annual, 3)', 'mmH2O', 0],
+                                 'calculated water': ['round(soil.p_calc_annual, 3)', 'mmH2O', 0],
+                                 'difference': ['round(soil.annual_water_balance_difference, 3)', 'mmH2O', 0]}
 
     #
     # writes header names and units to the csv
@@ -63,6 +82,7 @@ class CropSummary(BaseReportHandler):
         mode = 'a+' if output_csv.exists() else 'w+'
 
         with output_csv.open(mode) as csvfile:
+
             writer = csv.DictWriter(csvfile, fieldnames=variables.keys(),
                                     lineterminator='\n')
 
@@ -85,15 +105,17 @@ class CropSummary(BaseReportHandler):
     # variable, this will throw an error. See comment at the top of the file.
     #
     def daily_update(self, state, weather, time):
-        crop_type = state.crop.crops_list['corn']
 
+        soil = state.soil
         for variable in self.daily_variables:
             self.daily_variables[variable][2].append(
                 eval(self.daily_variables[variable][0], globals(), locals()))
 
     def annual_update(self, state, weather, time):
         """Stores the yearly values that need to be printed in the report."""
-        crop_type = state.crop.crops_list['corn']
+        soil = state.soil
+
+        soil.calculate_annual_water_balance()
 
         for variable in self.annual_variables:
             self.annual_variables[variable][2] = \
@@ -142,5 +164,6 @@ class CropSummary(BaseReportHandler):
 
     def produce_report_graphics(self, is_final):
         annual_file_name = str(self.file_name).split('.')[0] + "_annual.csv"
+        annual_water_balance_graphic(annual_file_name, self.display_graphics, self.produce_graphics)
         annual_graphics(annual_file_name, self.display_graphics, self.produce_graphics, is_final)
         daily_graphics(self.file_name, self.display_graphics, self.produce_graphics, is_final)

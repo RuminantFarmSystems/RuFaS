@@ -18,10 +18,10 @@
 
 import math
 
-#------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # Function: daily_phosphorus_cycling_routine
 # Executes all the daily phosphorus cycling  routines
-#------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 def daily_phosphorus_cycling_routine(soil, time, weather, config):
     """
     Description:
@@ -40,10 +40,10 @@ def daily_phosphorus_cycling_routine(soil, time, weather, config):
     fertilizer(soil, time)
     manure(soil, time)
 
-#------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # Function: daily_phosphorus_update
 # Update attributes of soil phosphorus in preparation of following day
-#------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 def daily_phosphorus_update(soil, time, weather):
     """
     Description:
@@ -56,7 +56,7 @@ def daily_phosphorus_update(soil, time, weather):
     """
     pass
 
-#------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # Function: manure
 # This subroutine calculates # of plops added per day and amount of TP, WIP,
 # and WOP added in manure. Adds P to surface manure pool, and updates
@@ -64,7 +64,7 @@ def daily_phosphorus_update(soil, time, weather):
 #
 # Calculates TP, WIP, and WOP added in the manure, adds P to surface manure
 # pools. All units are KG or HA.
-#------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 def manure(soil, time):
     """
     Description:
@@ -90,14 +90,14 @@ def manure(soil, time):
             soil.summanP += MANPAPP
     pass
 
-#------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # Function: fertilizer
 # This subroutine calculates P added in fertilizer, adds fertilizer P to
 # surface pool, and updates cumulative fertilizer P added during the model run
 #
 # Calculates TP, WIP, and WOP added in the manure,
 # adds P to surface manure pools. All units are KG or HA
-#------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 def fertilizer(soil, time):
     """
     Description:
@@ -127,29 +127,29 @@ def fertilizer(soil, time):
                 FrtPSt = 0.0
                 RSFRTP = 0.0
 
-                for y in range(0, len(soil.listOfSoilLayers)):
-                    if(soil.listOfSoilLayers[y].depth >
+                for y in range(len(soil.soil_layers)):
+                    if(soil.soil_layers[y].depth >
                                         soil.fertilizerApplications[x].depth):
                         sumfac = 0.0
-                        soil.listOfSoilLayers[y].labileP *= soil.fieldSize
+                        soil.soil_layers[y].labileP *= soil.fieldSize
                         for z in range (0, y):
-                            fact = (soil.listOfSoilLayers[z].depth /
+                            fact = (soil.soil_layers[z].depth /
                                     soil.fertilizerApplications[x].depth)
-                            soil.listOfSoilLayers[z].labileP += (
+                            soil.soil_layers[z].labileP += (
                                 soil.fertilizerApplications[x].fertPMass *
                                 fact * (1.0 -
                                 soil.fertilizerApplications[x].percentOnSurface))
 
-                        soil.listOfSoilLayers[x].labileP /= soil.fieldSize
+                        soil.soil_layers[x].labileP /= soil.fieldSize
 
-    #for x in range(0, len(soil.listOfSoilLayers)):
-    #    labileP = soil.listOfSoilLayers[x].labileP
+    #for x in range(0, len(soil.soil_layers)):
+    #    labileP = soil.soil_layers[x].labileP
     #    print("HI")
 
-#------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # Function: soilChem
 # This subroutine initializes soil chemical properties
-#------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 def soilChem(soil):
     """
     Description:
@@ -158,27 +158,27 @@ def soilChem(soil):
     Args:
         soil: instance of the Soil class
     """
-    for x in range(0, len(soil.listOfSoilLayers)):
-        labileP = soil.listOfSoilLayers[x].labileP
-        psp = soil.listOfSoilLayers[x].psp
-        soilOC = soil.listOfSoilLayers[x].soilOC
+    for x in range(0, len(soil.soil_layers)):
+        labileP = soil.soil_layers[x].labileP
+        psp = soil.soil_layers[x].psp
+        soilOC = soil.soil_layers[x].soilOC
 
-        soil.listOfSoilLayers[x].activeP = (labileP *
+        soil.soil_layers[x].activeP = (labileP *
                 (1.0 - psp)/
                 psp)
 
-        soil.listOfSoilLayers[x].stableP = (soil.listOfSoilLayers[x].activeP *4.0)
+        soil.soil_layers[x].stableP = (soil.soil_layers[x].activeP *4.0)
 
-        soil.listOfSoilLayers[x].orgP = (soilOC / 8.0/
-                    14.0*10000.0*soil.listOfSoilLayers[x].bulkDensity*
-                    soil.listOfSoilLayers[x].depth*0.1)
+        soil.soil_layers[x].orgP = (soilOC / 8.0/
+                    14.0*10000.0*soil.soil_layers[x].bulkDensity*
+                    soil.soil_layers[x].depth*0.1)
 
         # print("HI")
 
-#------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # Function: initializePhosphorusInputs
 # Initialize phosphorus variable on at the beginning of the simulation
-#------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 def initializePhosphorusInputs(soil, time, weather, config):
     """
     Description:
@@ -192,17 +192,17 @@ def initializePhosphorusInputs(soil, time, weather, config):
     """
     uptake(soil.pUptake, soil, config)
 
-    for x in range(0, len(soil.listOfSoilLayers)):
-        soil.listOfSoilLayers[x].soilOC = soil.listOfSoilLayers[x].OMpercent * 0.58
+    for x in range(len(soil.soil_layers)):
+        soil.soil_layers[x].soilOC = soil.soil_layers[x].OMpercent * 0.58
 
 
-        soil.listOfSoilLayers[x].psp = (-0.045 * math.log(
-            soil.listOfSoilLayers[x].clay) + 0.001*soil.listOfSoilLayers[x].labileP -
-            0.035 * soil.listOfSoilLayers[x].soilOC + 0.43)
+        soil.soil_layers[x].psp = (-0.045 * math.log(
+            soil.soil_layers[x].clay) + 0.001*soil.soil_layers[x].labileP -
+            0.035 * soil.soil_layers[x].soilOC + 0.43)
 
-        soil.listOfSoilLayers[x].labileP = (soil.listOfSoilLayers[x].labileP
-                * soil.listOfSoilLayers[x].bulkDensity  *
-                soil.listOfSoilLayers[x].depth / 10)
+        soil.soil_layers[x].labileP = (soil.soil_layers[x].labileP
+                * soil.soil_layers[x].bulkDensity  *
+                soil.soil_layers[x].depth / 10)
 
     7500, 3000, 2500, 2300, 2100, 1900, 1700, 1500, 1700, 2500, 6000, 9000
     soil.lightFactor.append(0.0)
@@ -307,10 +307,10 @@ def initializePhosphorusInputs(soil, time, weather, config):
 
     #print("HI")
 
-#------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # Function: uptake
 # Initilaize crop phosphorus uptake array
-#------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 def uptake(pUptake, soil, config):
     """
     Description:

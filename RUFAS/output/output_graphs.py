@@ -3,6 +3,7 @@ import csv
 from RUFAS import util
 from tkinter.tix import Form
 
+
 def graph_milk_production(day):
     pen_avg_milk_prod = []
     milk_production_output_path = util.get_base_dir() / 'Outputs/Sample_Farm_Outputs/growth_report.csv'
@@ -22,6 +23,7 @@ def graph_milk_production(day):
     save_dir = util.get_base_dir() / 'Outputs/diagnostics/animal'
     path = str(save_dir / 'milk_production')
     f1.savefig(path + '')
+
 
 def graph_manure_excretion(day):
     manure = {}
@@ -77,7 +79,8 @@ def graph_manure_excretion(day):
     save_dir = util.get_base_dir() / 'Outputs/diagnostics/animal'
     path = str(save_dir / 'num_animals_per_pen')
     f3.savefig(path + '') 
-  
+
+
 def display_graphs(formulation_interval, sim_length):
     day = [i for i in range(1, sim_length, formulation_interval)]
     graph_milk_production(day)
