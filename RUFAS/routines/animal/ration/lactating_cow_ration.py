@@ -51,8 +51,13 @@ def optimize(feed, rqmts):
     Sets up the arguments for the linear programming optimization.
 
     Args:
+<<<<<<< HEAD:RUFAS/routines/animal/ration/lactating_cow_ration.py
         feed : instance of the Feed class
         rqmts : dict which represents the dietary requirements of the cows
+=======
+	    feed : instance of the Feed class
+	    rqmts : dict which represents the dietary requirements of the cows
+>>>>>>> 9eaa8c2b3a37d66bc578382a7a7abfe0994a8877:RUFAS/routines/animal/ration.py
 
     Returns:
         dict: the dictionary that is returned by the call to util.LP_solve()
@@ -120,7 +125,6 @@ def optimize(feed, rqmts):
     # util.LP_print(LHS, RHS, objective, var_names, operators, "minimize", "RATION", lower_bounds, upper_bounds)
 
     return util.LP_solve(LHS, RHS, objective, var_names, operators, "minimize", "RATION", lower_bounds, upper_bounds)
-
 
 def calculate_rqmts(BW, BCS, CBW, CI, pasture_concentrate, CP_Milk, DOP, DHD, DVD,
                     DIM, fat_milk, lactose_milk, milk, parity, type, nutrients_list):

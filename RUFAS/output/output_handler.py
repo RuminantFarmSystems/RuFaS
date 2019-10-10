@@ -68,8 +68,10 @@ class OutputHandler:
                         'water_balance': WaterBalance(data['water_balance']),
                         'custom_report': CustomReport(data['custom_report'])
                         }
+
         for pen in state.animal_management.all_pens:
             self.reports['pen_' + str(pen.id)] = PenReport(pen.id, data['pen_report'])
+
         self.final = False
 
     # ---------------------------------------------------------------------------
@@ -188,6 +190,7 @@ class OutputHandler:
         for reportName in self.reports:
             report = self.reports[reportName]
 
+            # if report.produce_graphics:
             if counter == len(self.reports) - 1:
                 self.final = True
             report.produce_report_graphics(self.final)

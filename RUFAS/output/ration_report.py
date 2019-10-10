@@ -39,6 +39,10 @@ class RationReport(BaseReportHandler):
 
         self.annual_variables = {'year': ['time.cal_year', '', 0]}
 
+    # ---------------------------------------------------------------------------
+    # Method: write_headers
+    #         Writes the header (column titles and units) for the given csvfile
+    # ---------------------------------------------------------------------------
     def write_headers(self, output_csv, variables):
         mode = 'a+' if output_csv.exists() else 'w+'
 
@@ -60,10 +64,6 @@ class RationReport(BaseReportHandler):
         for feed_type in self.feed_info.keys():
             self.daily_variables[feed_type] = ['pen.ration[\'%s\'] if pen.pen_populated else 0' % feed_type,
                                                self.feed_info[feed_type]['Units'], []]
-
-        self.write_headers(self.get_fPath(), self.daily_variables)
-        annual_path = Path(str(self.get_fPath()).split('.csv')[0] + "_annual.csv")
-        self.write_headers(annual_path, self.annual_variables)
 
     # ---------------------------------------------------------------------------
     # Method: daily_update
@@ -92,7 +92,6 @@ class RationReport(BaseReportHandler):
         mode = 'a+' if self.get_fPath().exists() else 'w+'
 
         with self.get_fPath().open(mode) as csvfile:
-
             writer = csv.DictWriter(csvfile, fieldnames=self.daily_variables.keys(),
                                     lineterminator='\n')
 
@@ -102,17 +101,17 @@ class RationReport(BaseReportHandler):
                     row[variable] = self.daily_variables[variable][2][day]
                 writer.writerow(row)
 
-            annual_path = Path(str(self.get_fPath()).split('.csv')[0] + "_annual.csv")
+        annual_path = Path(str(self.get_fPath()).split('.csv')[0] + "_annual.csv")
 
-            mode = 'a+' if annual_path.exists() else 'w+'
+        mode = 'a+' if annual_path.exists() else 'w+'
 
-            with annual_path.open(mode) as csvfile:
-                writer = csv.DictWriter(csvfile, fieldnames=self.annual_variables.keys(),
-                                        lineterminator='\n')
-                row = {}
-                for variable in self.annual_variables:
-                    row[variable] = self.annual_variables[variable][2]
-                writer.writerow(row)
+        with annual_path.open(mode) as csvfile:
+            writer = csv.DictWriter(csvfile, fieldnames=self.annual_variables.keys(),
+                                    lineterminator='\n')
+            row = {}
+            for variable in self.annual_variables:
+                row[variable] = self.annual_variables[variable][2]
+            writer.writerow(row)
 
     # ---------------------------------------------------------------------------
     # Method: annual_flush

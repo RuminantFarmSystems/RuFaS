@@ -46,7 +46,6 @@ class BaseReportHandler(ABC):
         self.report_name = data['report_name']
         self.file_name = data['file_name']
 
-
     # ---------------------------------------------------------------------------
     # Method: get_fPath
     # ---------------------------------------------------------------------------
