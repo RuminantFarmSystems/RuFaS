@@ -40,7 +40,7 @@ class PenReport:
             for pen in state.animal_management.all_pens:
                 if self.pen_id == pen.id:
                     for report in self.pen_reports.values():
-                        report.annual_update(pen, weather, time)
+                        report.daily_update(pen, weather, time)
 
     def annual_update(self, state, weather, time):
         for pen in state.animal_management.all_pens:

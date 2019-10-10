@@ -28,15 +28,11 @@ class ManureReport(BaseReportHandler):
 
         self.daily_variables = {'year': ['time.cal_year', '', []],
                                 'j_day': ['time.day', '', []],
-                                'num_animals': ['pen.animals_in_pen', '', []],
-                                'U': ['pen.manure[\'U\']', 'mol/L', []],
-                                'TAN_s': ['pen.manure[\'TAN_s\']', 'mol/L', []],
-                                'MN': ['pen.manure[\'MN\']', 'g', []],
-                                'Mkg': ['pen.manure[\'Mkg\']', 'kg', []],
-                                'VSd': ['pen.manure[\'VSd\']', 'g', []],
-                                'VSnd': ['pen.manure[\'VSnd\']', 'g', []]
+                                'num_animals': ['len(pen.animals_in_pen)', '', []]
                                 }
         self.annual_variables = {'year': ['time.cal_year', '', 0]}
+
+        self.manure_info = {}
 
     def write_headers(self, output_csv, variables):
 
@@ -55,6 +51,12 @@ class ManureReport(BaseReportHandler):
             writer.writerow(units)
 
     def initialize(self, state):
+        self.manure_info = state.animal_management.all_pens[0].manure
+
+        for manure_type in self.manure_info.keys():
+            self.daily_variables[manure_type] = ['pen.manure[\'%s\'] if pen.pen_populated else 0' % manure_type,
+                                                 self.manure_info[manure_type]['Units'], []]
+
         self.write_headers(self.get_fPath(), self.daily_variables)
         annual_path = Path(str(self.get_fPath()).split('.csv')[0] + "_annual.csv")
         self.write_headers(annual_path, self.annual_variables)
@@ -67,7 +69,7 @@ class ManureReport(BaseReportHandler):
         for variable in self.daily_variables:
             self.daily_variables[variable][2].append(
                 eval(self.daily_variables[variable][0], globals(), locals()))
-                    
+
     # ---------------------------------------------------------------------------
     # Method: annual_update
     # ---------------------------------------------------------------------------

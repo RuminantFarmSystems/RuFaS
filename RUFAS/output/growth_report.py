@@ -27,10 +27,9 @@ class GrowthReport(BaseReportHandler):
         self.file_name = 'pen_' + str(pen_id) + '/' + self.file_name
         self.pen_id = pen_id
 
-
         self.daily_variables = {'year': ['time.cal_year', '', []],
-                                'j_day': ['time.j_day', '', []],
-                                'num_animals_in_pen': ['pen.animals_in_pen', '', []],
+                                'j_day': ['time.day', '', []],
+                                'num_animals_in_pen': ['len(pen.animals_in_pen)', '', []],
                                 'average_growth': ['pen.avg_growth', 'kg', []],
                                 'average_milk': ['pen.avg_milk', 'kg', []]
                                 }
