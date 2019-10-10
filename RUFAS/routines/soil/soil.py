@@ -325,7 +325,7 @@ class Soil:
         self.SON = 0.0
         self.manure_mass_app = 0.0
 
-        self.cows = []
+        self.lactating_cows = []
         self.heifer = []
         self.dry_cow = []
         self.d_calf = []
@@ -334,7 +334,7 @@ class Soil:
 
         # TODO temporary
         for x in range(0, 50):
-            self.cows.append([0 for _ in range(0, 366)])
+            self.lactating_cows.append([0 for _ in range(0, 366)])
             self.heifer.append([0 for _ in range(0, 366)])
             self.dry_cow.append([0 for _ in range(0, 366)])
             self.d_calf.append([0 for _ in range(0, 366)])
