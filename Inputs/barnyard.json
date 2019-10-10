@@ -305,13 +305,13 @@
         {
             "herd_information":
             {
-            	"calf_num": 160,
-            	"heiferI_num": 800,
-            	"heiferII_num": 820,
-            	"heiferIII_num": 50,
-                "cow_num": 1000,
-                "replace_num": 5000,
-                "herd_num": 1000
+            	"calf_num": 0,
+            	"heiferI_num": 0,
+            	"heiferII_num": 0,
+            	"heiferIII_num": 0,
+                "cow_num": 0,
+                "replace_num": 0,
+                "herd_num": 0
             },
             
             "animal_config":
@@ -415,7 +415,7 @@
 	        		"bedding_type": "sand",
 	        		"pen_type": "freestall"
 	        	},
-	        	
+
 	        	"pen1":
 	        	{
 	        		"id": 1,
@@ -426,7 +426,7 @@
 	        		"bedding_type": "sawdust",
 	        		"pen_type": "freestall"
 	        	},
-	        	
+
 	        	"pen2":
 	        	{
 	        		"id": 2,
@@ -437,7 +437,7 @@
 	        		"bedding_type": "straw",
 	        		"pen_type": "tiestall"
 	        	},
-	        	
+
 	        	"pen3":
 	        	{
 	        		"id": 3,
@@ -448,7 +448,7 @@
 	        		"bedding_type": "sand",
 	        		"pen_type": "tiestall"
 	        	},
-	        	
+
 	        	"pen4":
 	        	{
 	        		"id": 4,
@@ -459,7 +459,7 @@
 	        		"bedding_type": "sand",
 	        		"pen_type": "tiestall"
 	        	},
-	        	
+
 	        	"pen5":
 	        	{
 	        		"id": 5,
