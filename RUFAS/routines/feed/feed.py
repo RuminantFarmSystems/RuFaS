@@ -14,7 +14,6 @@ from . import nitrogen_loss, carbon_loss, protein_degradation
 def daily_feed_routine(feed, crop):
     if feed.storage:
         feed.dry_matter += crop.current_crop.yield_actual
-        print(feed.crude_protein_percent)
         feed.crude_protein += crop.current_crop.yield_actual * feed.crude_protein_percent
 
         if crop.current_crop.yield_actual != 0:
