@@ -138,6 +138,10 @@ class OutputHandler:
 
         for reportName in self.reports:
             report = self.reports[reportName]
+            if not report.active and report.produce_graphics:
+                print("Warning: Cannot produce graphics for inactive report:", report.report_name,
+                      ". Setting produce_graphics to False")
+                report.produce_graphics = False
             if report.active:
                 report.initialize(state)
 
@@ -190,7 +194,6 @@ class OutputHandler:
         for reportName in self.reports:
             report = self.reports[reportName]
 
-            # if report.produce_graphics:
             if counter == len(self.reports) - 1:
                 self.final = True
             report.produce_report_graphics(self.final)

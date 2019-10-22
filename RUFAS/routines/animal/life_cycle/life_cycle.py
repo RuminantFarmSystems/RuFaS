@@ -17,10 +17,11 @@ from RUFAS.routines.animal.life_cycle.heiferIII import HeiferIII
 from RUFAS.routines.animal.life_cycle.cow import Cow
 from collections import Counter
 import matplotlib as mpl
-mpl.use('TkAgg')
 import matplotlib.pyplot as plt
+mpl.use('TkAgg')
 
-class LifeCycleManager():
+
+class LifeCycleManager:
     # statistics
     sold_calves = []
     sold_heifers = []
@@ -111,7 +112,7 @@ class LifeCycleManager():
         heiferIIIs = []
         cows = []
     
-        #reserve: gathers simulated animals for the initial stage
+        # reserve: gathers simulated animals for the initial stage
         res_calves = []
         res_heiferIs = []
         res_heiferIIs = []
