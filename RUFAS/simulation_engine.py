@@ -52,9 +52,6 @@ def simulate(input_fPath:Path):
     output.initialize_output_dir(config.output_dir)
     output.initialize_diagnostic_dir(config.diagnostic_dir)
     output.initialize_reports(state)
-    
-    if config.run_tests:
-        test_handler.run_tests()
 
     print("\nSimulating: {}".format(input_fPath.name))
 
@@ -156,6 +153,10 @@ def read_json_file(fPath:Path):
         # Instantiate objects using dictionary data from .json file
         try:
             config = Config(data['config'], data['weather'])
+            
+            if config.run_tests:
+                test_handler.run_tests()
+                
             state = State(data['farm'], config)
             output = OutputHandler(data['output'], state)
             weather = Weather(data['weather'], config.years, config.w_start_year,
