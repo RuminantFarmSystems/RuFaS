@@ -4,169 +4,124 @@ RUFAS: Ruminant Farm Systems Model
 File name: manure_report.py
 Description:
 Author(s): Militsa Sotirova, militsasotirova@gmail.com
+           William Donovan, wmdonovan@wisc.edu
 """
 ################################################################################
 
 from pathlib import Path
 import csv
 from RUFAS.output.report_handler import BaseReportHandler
+from RUFAS.output.graphics import daily_graphics, annual_graphics
 
-#-------------------------------------------------------------------------------
+
+# -------------------------------------------------------------------------------
 # Class: ManureReport
-#-------------------------------------------------------------------------------
+# -------------------------------------------------------------------------------
 class ManureReport(BaseReportHandler):
     """Creates and prints to the file manure_report.csv"""
 
-    def __init__(self, data):
+    def __init__(self, data, pen_id):
 
         # Sets active, report_name, f_name using data
         self.set_properties(data)
+        self.file_name = 'pen_' + str(pen_id) + '/' + self.file_name
 
-        # Daily Outputs
-        self.year = []
-        self.julian_day = []
-        self.pen_ids = []
-        self.num_animals_in_pen = {}
-        self.U = {}
-        self.TAN_s = {}
-        self.MN = {}
-        self.Mkg = {}
-        self.VSd = {}
-        self.VSnd = {}
+        self.daily_variables = {'year': ['time.cal_year', '', []],
+                                'j_day': ['time.day', '', []],
+                                'num_animals': ['len(pen.animals_in_pen)', '', []]
+                                }
+        self.annual_variables = {'year': ['time.cal_year', '', 0]}
 
-        self.feed_info = {}
+        self.manure_info = {}
 
-    #---------------------------------------------------------------------------
-    # Method: write_header
-    #         Writes the header (column titles and units) in the csvfile
-    #---------------------------------------------------------------------------
-    def write_header(self):
+    def write_headers(self, output_csv, variables):
 
-        mode = 'a+' if self.get_fPath().exists() else 'w+'
+        mode = 'a+' if output_csv.exists() else 'w+'
 
-        with self.get_fPath().open(mode) as csvfile:
+        with output_csv.open(mode) as csvfile:
+            writer = csv.DictWriter(csvfile, fieldnames=variables.keys(),
+                                    lineterminator='\n')
 
-            # 1) Initialize the header of the cvsfile
-            fieldnames = ['Year', 'Julian Day', 'Pen ID', 'Number of Animals in Pen', 'U', 'TAN_s', 'MN', 'Mkg', 'VSd', 'VSnd']
-            self.fieldNames = fieldnames
-            writer = csv.DictWriter(csvfile, fieldnames=fieldnames,
-                                    lineterminator = '\n')
             writer.writeheader()
-            
-            # 2) Write Units in 2nd row of cvsfile
-            units = {'Year': '', 'Julian Day': '', 'Pen ID': '', 'Number of Animals in Pen': '',
-                             'U': 'mol/L', 'TAN_s': 'mol/L', 'MN': 'g', 'Mkg': 'kg', 'VSd': 'g', 'VSnd': 'g'}
+
+            units = {}
+            for variable in variables:
+                units[variable] = variables[variable][1]
 
             writer.writerow(units)
 
-    #---------------------------------------------------------------------------
-    # Method: initialize
-    #---------------------------------------------------------------------------
     def initialize(self, state):
-        """Transfers the needed data from State object to the report handler."""        
-        for pen in state.animal_management.all_pens:
-            self.pen_ids.append(pen.id)
-            self.num_animals_in_pen[pen.id] = []
-            self.U[pen.id] = []
-            self.TAN_s[pen.id] = []
-            self.MN[pen.id] = []
-            self.Mkg[pen.id] = []
-            self.VSd[pen.id] = []
-            self.VSnd[pen.id] = []
-                
-        self.write_header()
+        self.manure_info = state.animal_management.all_pens[0].manure
 
-    #---------------------------------------------------------------------------
+        for manure_type in self.manure_info.keys():
+            self.daily_variables[manure_type] = ['pen.manure[\'%s\'] if pen.pen_populated else 0' % manure_type,
+                                                 self.manure_info[manure_type]['Units'], []]
+
+        self.write_headers(self.get_fPath(), self.daily_variables)
+        annual_path = Path(str(self.get_fPath()).split('.csv')[0] + "_annual.csv")
+        self.write_headers(annual_path, self.annual_variables)
+
+    # ---------------------------------------------------------------------------
     # Method: daily_update
-    #---------------------------------------------------------------------------
-    def daily_update(self, state, weather, time):
+    # ---------------------------------------------------------------------------
+    def daily_update(self, pen, weather, time):
         """Stores the daily values that need to be printed in the report."""
-        self.year.append(time.cal_year)
-        
-        animal_management = state.animal_management
-            
-        # for each day that a ration is calculated, appends the necessary information to the lists
-        if animal_management.end_ration_interval():
-            self.julian_day.append(time.day) 
-            
-            for pen in animal_management.all_pens:
-                self.num_animals_in_pen[pen.id].append(len(pen.animals_in_pen))
-                
-                if pen.pen_populated:
-                    self.U[pen.id].append(round(pen.manure['U'], 3))
-                    self.TAN_s[pen.id].append(round(pen.manure['TAN_s'], 3))
-                    self.MN[pen.id].append(round(pen.manure['MN'], 3))
-                    self.Mkg[pen.id].append(round(pen.manure['Mkg'], 3))
-                    self.VSd[pen.id].append(round(pen.manure['VSd'], 3))
-                    self.VSnd[pen.id].append(round(pen.manure['VSnd'], 3))
-                else:
-                    self.U[pen.id].append(0)
-                    self.TAN_s[pen.id].append(0)
-                    self.MN[pen.id].append(0)
-                    self.Mkg[pen.id].append(0)
-                    self.VSd[pen.id].append(0)
-                    self.VSnd[pen.id].append(0)
-                    
-    #---------------------------------------------------------------------------
+        for variable in self.daily_variables:
+            self.daily_variables[variable][2].append(
+                eval(self.daily_variables[variable][0], globals(), locals()))
+
+    # ---------------------------------------------------------------------------
     # Method: annual_update
-    #---------------------------------------------------------------------------
+    # ---------------------------------------------------------------------------
     def annual_update(self, state, weather, time):
         """Stores the yearly values that need to be printed in the report."""
-        pass
+        for variable in self.annual_variables:
+            self.annual_variables[variable][2] = \
+                eval(self.daily_variables[variable][0], globals(), locals())
 
-    #---------------------------------------------------------------------------
+    # ---------------------------------------------------------------------------
     # Method: write_annual_report
-    #---------------------------------------------------------------------------
-    def write_annual_report(self, y):
+    # ---------------------------------------------------------------------------
+    def write_annual_report(self):
         """Appends the annual report to the output file."""
 
         mode = 'a+' if self.get_fPath().exists() else 'w+'
 
         with self.get_fPath().open(mode) as csvfile:
-            for i in range(0, len(self.julian_day)):
-                for pen_id in self.pen_ids:
-                    manure_data = {
-                        'Year':
-                            str(self.year[i]),
-                        'Julian Day':
-                            str(self.julian_day[i]),
-                        'Pen ID':
-                            str(pen_id),
-                        'Number of Animals in Pen':
-                            str(self.num_animals_in_pen[pen_id][i]),
-                        'U':
-                            str(self.U[pen_id][i]),
-                        'TAN_s':
-                            str(self.TAN_s[pen_id][i]),
-                        'MN':
-                            str(self.MN[pen_id][i]),
-                        'Mkg':
-                            str(self.Mkg[pen_id][i]),
-                        'VSd':
-                            str(self.VSd[pen_id][i]),
-                        'VSnd':
-                            str(self.VSnd[pen_id][i]),
-                    }
 
-                    writer = csv.DictWriter(csvfile, fieldnames=self.fieldNames,
-                                    lineterminator = '\n')
-                    writer.writerow(manure_data)
-                    
-    #---------------------------------------------------------------------------
+            writer = csv.DictWriter(csvfile, fieldnames=self.daily_variables.keys(),
+                                    lineterminator='\n')
+
+            for day in range(len(self.daily_variables['j_day'][2])):
+                row = {}
+                for variable in self.daily_variables:
+                    row[variable] = self.daily_variables[variable][2][day]
+                writer.writerow(row)
+
+            annual_path = Path(str(self.get_fPath()).split('.csv')[0] + "_annual.csv")
+
+            mode = 'a+' if annual_path.exists() else 'w+'
+
+            with annual_path.open(mode) as csvfile:
+                writer = csv.DictWriter(csvfile, fieldnames=self.annual_variables.keys(),
+                                        lineterminator='\n')
+                row = {}
+                for variable in self.annual_variables:
+                    row[variable] = self.annual_variables[variable][2]
+                writer.writerow(row)
+
+    # ---------------------------------------------------------------------------
     # Method: annual_flush
-    #---------------------------------------------------------------------------
+    # ---------------------------------------------------------------------------
     def annual_flush(self):
         """Sets all of the values in the output object to the default value."""
-        self.year = []
-        self.julian_day = []
-        
-        for pen_id in self.pen_ids:
-            self.num_animals_in_pen[pen_id] = []
-            self.U[pen_id] = []
-            self.TAN_s[pen_id] = []
-            self.MN[pen_id] = []
-            self.Mkg[pen_id] = []
-            self.VSd[pen_id] = []
-            self.VSnd[pen_id] = []
+        for variable in self.daily_variables:
+            self.daily_variables[variable][2] = []
 
-        
+        for variable in self.annual_variables:
+            self.annual_variables[variable][2] = 0
+
+    def produce_report_graphics(self, is_final):
+        annual_file_name = str(self.file_name).split('.')[0] + "_annual.csv"
+        annual_graphics(annual_file_name, self.display_graphics, self.produce_graphics, is_final)
+        daily_graphics(self.file_name, self.display_graphics, self.produce_graphics, is_final)

@@ -5,149 +5,126 @@ File name: ration_report.py
 Description:
 Author(s): Kass Chupongstimun, kass_c@hotmail.com
            Militsa Sotirova, militsasotirova@gmail.com
+           William Donovan, wmdonovan@wisc.edu
 """
 ################################################################################
 
 from pathlib import Path
 import csv
-from RUFAS.output.report_handler import BaseReportHandler
 
-#-------------------------------------------------------------------------------
+from RUFAS.output.graphics import ration_graphics
+from RUFAS.output.report_handler import BaseReportHandler
+from RUFAS.output.graphics import daily_graphics, annual_graphics
+
+
+# -------------------------------------------------------------------------------
 # Class: RationReport
-#-------------------------------------------------------------------------------
+# -------------------------------------------------------------------------------
 class RationReport(BaseReportHandler):
     """Creates and prints to the file ration_report.csv"""
 
-    def __init__(self, data):
+    def __init__(self, data, pen_id):
 
         # Sets active, report_name, f_name using data
         self.set_properties(data)
-
-        # Daily Outputs
-        self.year = []
-        self.julian_day = []
-        self.pen_ids = []
-        self.num_animals_in_pen = {}
-        self.achieved_price = {}
-        self.feed_amounts = {}
+        self.pen_id = pen_id
+        self.file_name = 'pen_' + str(pen_id) + '/' + self.file_name
 
         self.feed_info = {}
+        self.daily_variables = {'year': ['time.cal_year', '', []],
+                                'j_day': ['time.day', '', []],
+                                'num_animals': ['len(pen.animals_in_pen)', '', []],
+                                'achieved_price': ['pen.ration[\'objective\'] if pen.pen_populated else 0', '', []]
+                                }
 
-    #---------------------------------------------------------------------------
-    # Method: write_header
-    #         Writes the header (column titles and units) in the csvfile
-    #---------------------------------------------------------------------------
-    def write_header(self):
+        self.annual_variables = {'year': ['time.cal_year', '', 0]}
 
-        mode = 'a+' if self.get_fPath().exists() else 'w+'
+    # ---------------------------------------------------------------------------
+    # Method: write_headers
+    #         Writes the header (column titles and units) for the given csvfile
+    # ---------------------------------------------------------------------------
+    def write_headers(self, output_csv, variables):
+        mode = 'a+' if output_csv.exists() else 'w+'
 
-        with self.get_fPath().open(mode) as csvfile:
+        with output_csv.open(mode) as csvfile:
+            writer = csv.DictWriter(csvfile, fieldnames=variables.keys(),
+                                    lineterminator='\n')
 
-            # 1) Initialize the header of the cvsfile
-            fieldnames = ['Year', 'Julian Day', 'Pen ID', 'Number of Animals in Pen', 'Achieved Total Price']
-            for key in self.feed_info.keys():
-                fieldnames.append(key)
-            self.fieldNames = fieldnames
-            writer = csv.DictWriter(csvfile, fieldnames=fieldnames,
-                                    lineterminator = '\n')
             writer.writeheader()
 
-            # 2) Write Units in 2nd row of cvsfile
-            units = {'Year': '', 'Julian Day': '', 'Pen ID': '', 'Number of Animals in Pen': '',
-                             'Achieved Total Price': "$"}
-            for key in self.feed_info.keys():
-                units[key] = self.feed_info[key]['Units']
+            units = {}
+            for variable in variables:
+                units[variable] = variables[variable][1]
 
             writer.writerow(units)
 
-    #---------------------------------------------------------------------------
-    # Method: initialize
-    #---------------------------------------------------------------------------
     def initialize(self, state):
-        """Transfers the needed data from State object to the report handler."""
-        feed = state.feed
-        # get static data like units associated with each feed type
-        # store in Feed or Animal???????
-        self.feed_info = feed.available_feeds
+        self.feed_info = state.feed.available_feeds
 
-        for pen in state.animal_management.all_pens:
-            self.pen_ids.append(pen.id)
-            self.num_animals_in_pen[pen.id] = []
-            self.achieved_price[pen.id] = []
-            self.feed_amounts[pen.id] = []
+        for feed_type in self.feed_info.keys():
+            self.daily_variables[feed_type] = ['pen.ration[\'%s\'] if pen.pen_populated else 0' % feed_type,
+                                               self.feed_info[feed_type]['Units'], []]
 
-        self.write_header()
-
-    #---------------------------------------------------------------------------
+    # ---------------------------------------------------------------------------
     # Method: daily_update
-    #---------------------------------------------------------------------------
-    def daily_update(self, state, weather, time):
+    # ---------------------------------------------------------------------------
+    def daily_update(self, pen, weather, time):
         """Stores the daily values that need to be printed in the report."""
-        self.year.append(time.cal_year)
+        for variable in self.daily_variables:
+            self.daily_variables[variable][2].append(
+                eval(self.daily_variables[variable][0], globals(), locals()))
 
-        animal_management = state.animal_management
-
-        # for each day that a ration is calculated, appends the necessary information to the lists
-        if animal_management.end_ration_interval():
-            self.julian_day.append(time.day)
-
-            for pen in animal_management.all_pens:
-                self.num_animals_in_pen[pen.id].append(len(pen.animals_in_pen))
-
-                if pen.pen_populated:
-                    self.achieved_price[pen.id].append(round(pen.ration['objective'], 2))
-                    self.feed_amounts[pen.id].append({feed_type: round(pen.ration[feed_type], 3) for feed_type in self.feed_info.keys()})
-                else:
-                    self.achieved_price[pen.id].append(0)
-                    self.feed_amounts[pen.id].append({feed_type: 0 for feed_type in self.feed_info.keys()})
-
-    #---------------------------------------------------------------------------
+    # ---------------------------------------------------------------------------
     # Method: annual_update
-    #---------------------------------------------------------------------------
+    # ---------------------------------------------------------------------------
     def annual_update(self, state, weather, time):
         """Stores the yearly values that need to be printed in the report."""
-        pass
+        for variable in self.annual_variables:
+            self.annual_variables[variable][2] = \
+                eval(self.daily_variables[variable][0], globals(), locals())
 
-    #---------------------------------------------------------------------------
+    # ---------------------------------------------------------------------------
     # Method: write_annual_report
-    #---------------------------------------------------------------------------
-    def write_annual_report(self, y):
+    # ---------------------------------------------------------------------------
+    def write_annual_report(self):
         """Appends the annual report to the output file."""
 
-        print("printing ration report for year: " + str(y))
         mode = 'a+' if self.get_fPath().exists() else 'w+'
 
         with self.get_fPath().open(mode) as csvfile:
-            for i in range(0, len(self.julian_day)):
-                for pen_id in self.pen_ids:
-                    ration_data = {
-                        'Year':
-                            str(self.year[i]),
-                        'Julian Day':
-                            str(self.julian_day[i]),
-                        'Pen ID':
-                            str(pen_id),
-                        'Number of Animals in Pen':
-                            str(self.num_animals_in_pen[pen_id][i]),
-                        'Achieved Total Price':
-                            str(self.achieved_price[pen_id][i])
-                    }
-                    for feed_type in sorted(self.feed_info.keys()):
-                        ration_data[feed_type] = self.feed_amounts[pen_id][i][feed_type]
+            writer = csv.DictWriter(csvfile, fieldnames=self.daily_variables.keys(),
+                                    lineterminator='\n')
 
-                    writer = csv.DictWriter(csvfile, fieldnames=self.fieldNames,
-                                    lineterminator = '\n')
-                    writer.writerow(ration_data)
+            for day in range(len(self.daily_variables['j_day'][2])):
+                row = {}
+                for variable in self.daily_variables:
+                    row[variable] = self.daily_variables[variable][2][day]
+                writer.writerow(row)
 
-    #---------------------------------------------------------------------------
+        annual_path = Path(str(self.get_fPath()).split('.csv')[0] + "_annual.csv")
+
+        mode = 'a+' if annual_path.exists() else 'w+'
+
+        with annual_path.open(mode) as csvfile:
+            writer = csv.DictWriter(csvfile, fieldnames=self.annual_variables.keys(),
+                                    lineterminator='\n')
+            row = {}
+            for variable in self.annual_variables:
+                row[variable] = self.annual_variables[variable][2]
+            writer.writerow(row)
+
+    # ---------------------------------------------------------------------------
     # Method: annual_flush
-    #---------------------------------------------------------------------------
+    # ---------------------------------------------------------------------------
     def annual_flush(self):
         """Sets all of the values in the output object to the default value."""
-        self.year = []
-        self.julian_day = []
+        for variable in self.daily_variables:
+            self.daily_variables[variable][2] = []
 
-        for pen_id in self.pen_ids:
-            self.num_animals_in_pen[pen_id] = []
-            self.achieved_price[pen_id] = []
-            self.feed_amounts[pen_id] = []
+        for variable in self.annual_variables:
+            self.annual_variables[variable][2] = 0
+
+    def produce_report_graphics(self, is_final):
+        annual_file_name = str(self.file_name).split('.')[0] + "_annual.csv"
+        annual_graphics(annual_file_name, self.display_graphics, self.produce_graphics, is_final)
+        daily_graphics(self.file_name, self.display_graphics, self.produce_graphics, is_final)

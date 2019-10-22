@@ -226,6 +226,7 @@ class Config:
         
         self.sim_length = self.calc_sim_length(leap_year_length, year_length)
         self.output_dir = data['output_dir']
+        self.diagnostic_dir = data['diagnostic_dir']
 
     def calc_sim_length(self, leap_year_length, year_length):
         '''
@@ -243,7 +244,6 @@ class Config:
                 sim_length += len(self.years[i])
                 
         return sim_length + 1
-    
 # -------------------------------------------------------------------------------
 # Class: Weather
 # -------------------------------------------------------------------------------
