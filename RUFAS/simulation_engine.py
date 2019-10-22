@@ -15,6 +15,7 @@ from pathlib import Path
 from RUFAS import routines, errors
 from RUFAS.classes import Config, State, Weather, Time
 from RUFAS.output import OutputHandler
+from RUFAS.test import test_handler
 
 
 # -------------------------------------------------------------------------------
@@ -51,6 +52,9 @@ def simulate(input_fPath:Path):
     output.initialize_output_dir(config.output_dir)
     output.initialize_diagnostic_dir(config.diagnostic_dir)
     output.initialize_reports(state)
+    
+    if config.run_tests:
+        test_handler.run_tests()
 
     print("\nSimulating: {}".format(input_fPath.name))
 

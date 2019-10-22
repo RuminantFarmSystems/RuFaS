@@ -79,6 +79,8 @@ class Config:
         self.end_year = int(self.end_date[0])
         self.start_day = int(self.start_date[1])
         self.end_day = int(self.end_date[1])
+        
+        self.run_tests = data['run_tests']
 
         year_length = 365
         leap_year_length = 366
