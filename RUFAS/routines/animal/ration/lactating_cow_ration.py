@@ -22,6 +22,7 @@ global_DBW = -1
 global_milk = -1
 global_CP_Milk = -1
 
+
 def set_globals(DMIest, BW, DBW, milk, CP_milk):
     """
     Sets the global variables with averages from pen.
@@ -37,20 +38,26 @@ def set_globals(DMIest, BW, DBW, milk, CP_milk):
     global global_DBW
     global global_milk
     global global_CP_Milk
-    
+
     global_DMIest = DMIest
     global_BW = BW
     global_DBW = DBW
     global_milk = milk
     global_CP_Milk = CP_milk
 
+
 def optimize(feed, rqmts):
     """
     Sets up the arguments for the linear programming optimization.
 
-	Args:
+    Args:
+<<<<<<< HEAD:RUFAS/routines/animal/ration/lactating_cow_ration.py
         feed : instance of the Feed class
         rqmts : dict which represents the dietary requirements of the cows
+=======
+	    feed : instance of the Feed class
+	    rqmts : dict which represents the dietary requirements of the cows
+>>>>>>> 9eaa8c2b3a37d66bc578382a7a7abfe0994a8877:RUFAS/routines/animal/ration.py
 
     Returns:
         dict: the dictionary that is returned by the call to util.LP_solve()
@@ -74,7 +81,8 @@ def optimize(feed, rqmts):
                   for feed_name in feed.available_feed_names]
     LHS.append(constraint)
 
-    ME_DM_arr, RDP_DM_arr, RUP_DM_arr = calculate_ME_RDP_RUP(feed, global_DMIest, global_BW, global_DBW, global_milk, global_CP_Milk)
+    ME_DM_arr, RDP_DM_arr, RUP_DM_arr = calculate_ME_RDP_RUP(feed, global_DMIest, global_BW, global_DBW, global_milk,
+                                                             global_CP_Milk)
     LHS.append(ME_DM_arr)
     LHS.append(RDP_DM_arr)
     LHS.append(RUP_DM_arr)
@@ -113,20 +121,19 @@ def optimize(feed, rqmts):
     # food type.
     upper_bounds = [feed.available_feeds[feed_name]['Limit']
                     for feed_name in feed.available_feed_names]
-    
-    #util.LP_print(LHS, RHS, objective, var_names, operators, "minimize", "RATION", lower_bounds, upper_bounds)
+
+    # util.LP_print(LHS, RHS, objective, var_names, operators, "minimize", "RATION", lower_bounds, upper_bounds)
 
     return util.LP_solve(LHS, RHS, objective, var_names, operators, "minimize", "RATION", lower_bounds, upper_bounds)
 
-
 def calculate_rqmts(BW, BCS, CBW, CI, pasture_concentrate, CP_Milk, DOP, DHD, DVD,
-                        DIM, fat_milk, lactose_milk, milk, parity, type, nutrients_list):
+                    DIM, fat_milk, lactose_milk, milk, parity, type, nutrients_list):
     """
     Calculate the dietary requirements of the cows. These values are used
     on the RHS of the linear program. Each calculation has a reference to the
     respective calculation in the pseudocode.
 
-	Args:
+    Args:
         BW: body weight, kg
         BCS: body condition score, 1 to 5
         CBW: calf birth weight, kg
@@ -150,7 +157,8 @@ def calculate_rqmts(BW, BCS, CBW, CI, pasture_concentrate, CP_Milk, DOP, DHD, DV
             calculated in this method
         DMIest: dry matter intake estimation, kg
         DBW: Body weight change (delta body weight = DBW), kg
-	"""
+    """
+
     # Sets these variables as global. See comment at the beginning of this file for further details.
     global global_BW
     global global_DMIest
@@ -165,19 +173,19 @@ def calculate_rqmts(BW, BCS, CBW, CI, pasture_concentrate, CP_Milk, DOP, DHD, DV
     # lactation, activity, pregnancy, and body weight change requirements):
 
     # Maintenance requirements
-    #------------------------
+    # ------------------------
     # Ideal Body Weight, kg (A.ER.1.2)
     IBW = BW / (0.65 + 0.1 * BCS)
     # Net Energy maintenance, Mcal (A.ER.1.1)
     NEm = 0.10 * (IBW ** 0.75)
 
     # Lactation requirements
-    #----------------------
+    # ----------------------
     # Net Energy lactation, Mcal (A.ER.2.1)
     NEl = (9.29 * milk * fat_milk + 5.5 * milk * CP_Milk + 3.95 * milk * lactose_milk) / 100
 
     # Activity requirements
-    #---------------------
+    # ---------------------
     # Net Energy activity, Mcal (A.ER.3.1)
     if type == "barn":
         NEact = (DHD * 0.35 * BW + DVD * 5 * BW) / 1000
@@ -185,7 +193,7 @@ def calculate_rqmts(BW, BCS, CBW, CI, pasture_concentrate, CP_Milk, DOP, DHD, DV
         NEact = (DHD * 0.35 * BW + DVD * 5 * BW + 10 * (BW ** 0.75) * ((600 - 12 * pasture_concentrate) / 600)) / 1000
 
     # Pregnancy energy requirements
-    #-----------------------------
+    # -----------------------------
     # Net Energy pregnancy, Mcal (A.ER.4.1)
     if DOP < 190:
         NEpreg = 0
@@ -195,7 +203,7 @@ def calculate_rqmts(BW, BCS, CBW, CI, pasture_concentrate, CP_Milk, DOP, DHD, DV
         NEpreg = ((0.00318 * 279 - 0.0352) * (CBW / 45)) / 0.218
 
     # Body Weight change requirements
-    #-------------------------------
+    # -------------------------------
     # Target Calving Weight, kg (A.ER.5.1)
     if parity == 1:
         TCW = 700 * 0.85
@@ -206,7 +214,7 @@ def calculate_rqmts(BW, BCS, CBW, CI, pasture_concentrate, CP_Milk, DOP, DHD, DV
     elif parity > 3:
         TCW = 700 * 1
     # Body weight change (delta body weight = DBW), kg (A.ER.5.4)
-    DBW = 0 #(TCW - 0.94 * BW) / (280 - CI + DOP)
+    DBW = 0  # (TCW - 0.94 * BW) / (280 - CI + DOP)
     global_DBW = DBW
     # Net Energy body weight, Mcal (A.ER.5.5)
     if DBW > 0:
@@ -260,11 +268,11 @@ def calculate_rqmts(BW, BCS, CBW, CI, pasture_concentrate, CP_Milk, DOP, DHD, DV
 
 
 def calculate_ME_RDP_RUP(feed, DMIest, BW, DBW, milk, CP_Milk):
-    '''
+    """
     Calculates some of the Feed Composition values, which are the LHS multipliers
     in the LP
 
-	Args:
+    Args:
         feed: an instance of the feed class
         DMIest: dry matter intake estimation
         BW: body Weight
@@ -273,7 +281,8 @@ def calculate_ME_RDP_RUP(feed, DMIest, BW, DBW, milk, CP_Milk):
     Returns:
         three lists, where each element in each list is the respective value for
             ME_DM, RDP_DM, and RUP_DM for each feed
-    '''
+    """
+
     ME_DM_arr = []
     RDP_DM_arr = []
     RUP_DM_arr = []
@@ -328,7 +337,9 @@ def calculate_ME_RDP_RUP(feed, DMIest, BW, DBW, milk, CP_Milk):
         efROM_DM = 0.0343
 
         # Digested energy per unit DM (A.FE.7.1)
-        DE_DM = 4.2 * NDF_DM * percentage(dNDF_NDF) + 4.23 * Starch_DM * percentage(dStarch_Starch) + 9.40 * FA_DM * percentage(dFA_FA) + 5.65 * CP_DM * percentage(dCP_CP) + 0.89 * percentage(sNPNCPE_DM) + 4.00 * ROM_DM * percentage(dROM_ROM) - 5.65 * efCP_DM - 4.00 * efROM_DM
+        DE_DM = 4.2 * NDF_DM * percentage(dNDF_NDF) + 4.23 * Starch_DM * percentage(
+            dStarch_Starch) + 9.40 * FA_DM * percentage(dFA_FA) + 5.65 * CP_DM * percentage(dCP_CP) + 0.89 * percentage(
+            sNPNCPE_DM) + 4.00 * ROM_DM * percentage(dROM_ROM) - 5.65 * efCP_DM - 4.00 * efROM_DM
 
         # Gas energy loss, mCal/kg of DM (A.FE.8.2)
         GasE_DM = (0.294 * DMIest - 0.35 * FA_DM + 0.041 * NDF_DM * dNDF_NDF) / DMIest
@@ -336,7 +347,9 @@ def calculate_ME_RDP_RUP(feed, DMIest, BW, DBW, milk, CP_Milk):
         adCP_CP = dCP_CP - (efCP_DM * 100 / CP_DM)
         Body_gain_CP = DBW * 0.072
         # (A.FE.8.6)
-        UE_DM = 0.00275 * (BW ** 0.75) / DMIest + 0.0177 * DE_DM + 0.00813 * percentage(CP_DM) * adCP_CP * 1000 / 6.25 - (0.00813 * (milk * percentage(CP_Milk) + Body_gain_CP) * 1000 / 6.25) / DMIest
+        UE_DM = 0.00275 * (BW ** 0.75) / DMIest + 0.0177 * DE_DM + 0.00813 * percentage(
+            CP_DM) * adCP_CP * 1000 / 6.25 - (
+                        0.00813 * (milk * percentage(CP_Milk) + Body_gain_CP) * 1000 / 6.25) / DMIest
         # Apparently digested CP (A.FE.8.4)
         adCP_CP = dCP_CP - (efCP_DM / CP_DM)
         # Metabolized energy per unit DM (A.FE.8.1)
@@ -348,18 +361,18 @@ def calculate_ME_RDP_RUP(feed, DMIest, BW, DBW, milk, CP_Milk):
         ME_DM_arr.append(ME_DM)
         RDP_DM_arr.append(percentage(RDP_DM))
         RUP_DM_arr.append(percentage(RUP_CP) * percentage(CP_DM))
-    
+
     return ME_DM_arr, RDP_DM_arr, RUP_DM_arr
 
 
 def percentage(val):
-    '''
+    """
     Calculates the true value of a percentage.
-    
+
     Args:
         val: a number
-    
+
     Returns:
         0.01 multiplied by val
-    '''
+    """
     return 0.01 * val

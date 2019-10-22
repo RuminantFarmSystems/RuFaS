@@ -14,12 +14,12 @@ from pathlib import Path
 
 from RUFAS import routines, errors
 from RUFAS.classes import Config, State, Weather, Time
-from RUFAS.output import OutputHandler, output_graphs
+from RUFAS.output import OutputHandler
 
 
-#-------------------------------------------------------------------------------
+# -------------------------------------------------------------------------------
 # Function: simulate
-#-------------------------------------------------------------------------------
+# -------------------------------------------------------------------------------
 def simulate(input_fPath:Path):
     """Executes the simulation with the json file specified.
 
@@ -49,6 +49,7 @@ def simulate(input_fPath:Path):
     # Transfer needed (initial) data from state to report handlers
     #
     output.initialize_output_dir(config.output_dir)
+    output.initialize_diagnostic_dir(config.diagnostic_dir)
     output.initialize_reports(state)
 
     print("\nSimulating: {}".format(input_fPath.name))
@@ -62,17 +63,16 @@ def simulate(input_fPath:Path):
     while not time.end_simulation():
         annual_simulation()
 
+    output.produce_graphics()
     t_end_sim = timer.time()
-    #state.animal_management.life_cycle_manager.output_end_stats(config.sim_length)
-    #output_graphs.display_graphs(state.animal_management.formulation_interval, state.animal_management.sim_length)
-    
+
     print("Simulation Successful: {}".format(input_fPath.name))
     print("Total Run Time: {} seconds\n".format(str(t_end_sim - t_start_sim)))
 
 
-#-------------------------------------------------------------------------------
+# -------------------------------------------------------------------------------
 # Function: daily_simulation
-#-------------------------------------------------------------------------------
+# -------------------------------------------------------------------------------
 def daily_simulation():
     """Executes the daily simulation routines."""
 
@@ -94,9 +94,9 @@ def daily_simulation():
     state.animal_management.simulation_day += 1 
 
 
-#-------------------------------------------------------------------------------
+# -------------------------------------------------------------------------------
 # Function: annual_simulation
-#-------------------------------------------------------------------------------
+# -------------------------------------------------------------------------------
 def annual_simulation():
     """Executes the annual simulation routines.
 
@@ -116,15 +116,16 @@ def annual_simulation():
     #
     # Post-Annual Routines
     #
-    output.annual_update(state, weather, time)
-    output.write_annual_reports(time.year)
-    output.annual_flush()
+    output.annual_updates(state, weather, time)
+    output.write_annual_reports()
+    output.annual_flushes()
     state.annual_reset()
     time.advance()
 
-#-------------------------------------------------------------------------------
+
+# -------------------------------------------------------------------------------
 # Function: read_json_file
-#-------------------------------------------------------------------------------
+# -------------------------------------------------------------------------------
 def read_json_file(fPath:Path):
     """Reads the json file, writes information to the simulation variables.
 
@@ -152,7 +153,7 @@ def read_json_file(fPath:Path):
         try:
             config = Config(data['config'], data['weather'])
             state = State(data['farm'], config)
-            output = OutputHandler(data['output'])
+            output = OutputHandler(data['output'], state)
             weather = Weather(data['weather'], config.years, config.w_start_year,
                               config.w_start_day, config.start_year, config.start_day)
             time = Time(config.years, config.start_year)

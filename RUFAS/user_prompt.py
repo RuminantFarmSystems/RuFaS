@@ -14,9 +14,9 @@ from RUFAS import util
 from RUFAS import errors
 import fileReader
 
-#-------------------------------------------------------------------------------
+# -------------------------------------------------------------------------------
 # Function: input_prompt
-#-------------------------------------------------------------------------------
+# -------------------------------------------------------------------------------
 def input_prompt():
     """Prompts the user for an input to RUFAS.
 
@@ -50,6 +50,7 @@ def input_prompt():
 
         try:
             user_input = input("\nEnter RUFAS Input: ")
+
             #
             # Handle user exiting program
             #
