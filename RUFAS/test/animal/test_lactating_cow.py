@@ -1,8 +1,9 @@
 ################################################################################
 """
 RUFAS: Ruminant Farm Systems Model
-File name: t_ration.py
-Description:
+File name: test_lactating_cow.py
+Description: This file contains the test class for lactating cows, and its main
+    function runs the tests.
 Author(s): Militsa Sotirova
 """
 ################################################################################
@@ -16,6 +17,9 @@ from RUFAS.test.animal import animal_inputs_outputs
 class LactatingCowTest(unittest.TestCase):
     
     def set_up_feeds(self):
+        '''
+        Sets up the list of various feeds that will be used for the unit tests.
+        '''
         feed_info_0 = {
         "feed_library": "Inputs/manure_feed_test.csv",
         
@@ -31,6 +35,9 @@ class LactatingCowTest(unittest.TestCase):
         self.feeds = [Feed(feed_info_0)]
    
     def setUp(self):
+        '''
+        Sets up the inputs and expected outputs for the unit tests.
+        '''
         self.inputs_ouputs = animal_inputs_outputs.AnimalInputsOutputs()
         self.set_up_feeds()
 
