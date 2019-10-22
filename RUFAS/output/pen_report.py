@@ -7,7 +7,7 @@ Author(s): William Donovan, wmdonovan@wisc.edu
            Jacob Johnson, jacob8399@gmail.com
 """
 ###############################################################################
-
+from RUFAS.output.graphics import show_figures
 from .ration_report import RationReport
 from .growth_report import GrowthReport
 from .manure_report import ManureReport
@@ -27,8 +27,14 @@ class PenReport:
                             }
 
     def initialize(self, state):
-        for report in self.pen_reports.values():
-            report.initialize(state)
+        if self.active:
+            for report in self.pen_reports.values():
+                if not report.active and report.produce_graphics:
+                    print("Warning: Cannot produce graphics for inactive report:", report.report_name,
+                          ". Setting produce_graphics to False")
+                    report.produce_graphics = False
+                if report.active:
+                    report.initialize(state)
 
     def initialize_pen_dir(self, pen_dir):
         for report in self.pen_reports:
@@ -36,26 +42,37 @@ class PenReport:
             report_dir.mkdir(exist_ok=True, parents=False)
 
     def daily_update(self, state, weather, time):
-        if state.animal_management.end_ration_interval():
+        if self.active:
+            if state.animal_management.end_ration_interval():
+                for pen in state.animal_management.all_pens:
+                    if self.pen_id == pen.id:
+                        for report in self.pen_reports.values():
+                            if report.active:
+                                report.daily_update(pen, weather, time)
+
+    def annual_update(self, state, weather, time):
+        if self.active:
             for pen in state.animal_management.all_pens:
                 if self.pen_id == pen.id:
                     for report in self.pen_reports.values():
-                        report.daily_update(pen, weather, time)
-
-    def annual_update(self, state, weather, time):
-        for pen in state.animal_management.all_pens:
-            if self.pen_id == pen.id:
-                for report in self.pen_reports.values():
-                    report.annual_update(pen, weather, time)
+                        if report.active:
+                            report.annual_update(pen, weather, time)
 
     def write_annual_report(self):
-        for report in self.pen_reports.values():
-            report.write_annual_report()
+        if self.active:
+            for report in self.pen_reports.values():
+                if report.active:
+                    report.write_annual_report()
 
     def annual_flush(self):
-        for report in self.pen_reports.values():
-            report.annual_flush()
+        if self.active:
+            for report in self.pen_reports.values():
+                if report.active:
+                    report.annual_flush()
 
     def produce_report_graphics(self, is_final):
-        for report in self.pen_reports.values():
-            report.produce_report_graphics(is_final)
+        if self.produce_graphics:
+            for report in self.pen_reports.values():
+                report.produce_report_graphics(is_final)
+        else:
+            show_figures(is_final)
