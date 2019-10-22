@@ -65,6 +65,10 @@ class RationReport(BaseReportHandler):
             self.daily_variables[feed_type] = ['pen.ration[\'%s\'] if pen.pen_populated else 0' % feed_type,
                                                self.feed_info[feed_type]['Units'], []]
 
+        self.write_headers(self.get_fPath(), self.daily_variables)
+        annual_path = Path(str(self.get_fPath()).split('.csv')[0] + "_annual.csv")
+        self.write_headers(annual_path, self.annual_variables)
+
     # ---------------------------------------------------------------------------
     # Method: daily_update
     # ---------------------------------------------------------------------------
