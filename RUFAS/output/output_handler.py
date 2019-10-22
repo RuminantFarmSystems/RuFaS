@@ -4,6 +4,8 @@ RUFAS: Ruminant Farm Systems Model
 File name: output_handler.py
 Description: Contains the definition of the OutputHandler object
 Author(s): Kass Chupongstimun, kass_c@hotmail.com
+           William Donovan, wmdonovan@wisc.edu
+           Jacob Johnson, jacob8399@gmail.com
 """
 ################################################################################
 import shutil
@@ -17,10 +19,10 @@ from RUFAS.output.report_handler import BaseReportHandler
 #
 from RUFAS.output.soil_summary import SoilSummary
 from RUFAS.output.soil_nitrogen import SoilNitrogen
-from RUFAS.output.ration_report import RationReport
 from RUFAS.output.crop_summary import CropSummary
 from RUFAS.output.water_balance import WaterBalance
 from RUFAS.output.custom_report import CustomReport
+from RUFAS.output.pen_report import PenReport
 from RUFAS.output.soil_phosphorus import SoilPhosphorus
 
 
@@ -53,20 +55,23 @@ class OutputHandler:
     directly.
     """
 
-    def __init__(self, data):
+    def __init__(self, data, state):
         """Initializes the report handlers with the given data"""
 
         # Instantiate Report Handler Objects here
         self.reports = {
-                        #'farm_summary': FarmSummary(data['farm_summary']),
+                        # 'farm_summary': FarmSummary(data['farm_summary']),
                         'soil_summary': SoilSummary(data['soil_summary']),
                         'soil_nitrogen': SoilNitrogen(data['soil_nitrogen']),
-                        #'soil_phosphorus': SoilPhosphorus(data['soil_phosphorus']),
-                        'ration_report': RationReport(data['ration_report']),
+                        # 'soil_phosphorus': SoilPhosphorus(data['soil_phosphorus']),
                         'crop_summary': CropSummary(data['crop_summary']),
                         'water_balance': WaterBalance(data['water_balance']),
                         'custom_report': CustomReport(data['custom_report'])
                         }
+
+        for pen in state.animal_management.all_pens:
+            self.reports['pen_' + str(pen.id)] = PenReport(pen.id, data['pen_report'])
+
         self.final = False
 
     # ---------------------------------------------------------------------------
@@ -89,12 +94,23 @@ class OutputHandler:
 
         # Delete directory if previously exists
         if output_dir.exists():
-            for file in output_dir.iterdir():
-                file.unlink()
+            for output in output_dir.iterdir():
+                if output.is_file():
+                    output.unlink()
+                else:
+                    for file in output.iterdir():
+                        file.unlink()
+                    output.rmdir()
             output_dir.rmdir()
 
         output_dir.mkdir(exist_ok=True, parents=False)
         BaseReportHandler.set_dir(output_dir)
+
+        for report_name in self.reports:
+            report = self.reports[report_name]
+            if report.report_name.startswith('pen'):
+                report_dir = util.get_base_dir() / output_dir / report_name
+                report_dir.mkdir(exist_ok=True, parents=False)
 
     def initialize_diagnostic_dir(self, diagnostic_dir):
         diagnostic_dir = util.get_base_dir() / diagnostic_dir
@@ -111,6 +127,8 @@ class OutputHandler:
             if report.produce_graphics:
                 report_dir = util.get_base_dir() / diagnostic_dir / reportName
                 report_dir.mkdir(exist_ok=True, parents=False)
+                if report.report_name.startswith('pen'):
+                    report.initialize_pen_dir(report_dir)
 
     # ---------------------------------------------------------------------------
     # Method: initialize_reports
