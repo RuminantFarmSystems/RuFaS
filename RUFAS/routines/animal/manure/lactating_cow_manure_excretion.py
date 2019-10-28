@@ -1,13 +1,12 @@
 ################################################################################
 '''
 RUFAS: Ruminant Farm Systems Model
-File name: manure_excretion.py
+File name: lactating_cow_manure_excretion.py
 Description: Determines manure excretion with information from the ration formulation, 
                 outputs used by the manure module.
 Author(s): Militsa Sotirova, militsasotirova@gmail.com
 '''
 ################################################################################
-
 
 def manure_calculations(ration_formulation, feed, BW, DIM, mPrt):
     '''
@@ -137,27 +136,9 @@ def manure_calculations(ration_formulation, feed, BW, DIM, mPrt):
     # Total ammoniacal nitrogen concentration in the manure slurry, mol/L (Eq 6.1)
     TAN_s = (-162.4 * U * U + 96.4 * U) / 100 
     
-    return U, TAN_s, MN, Mkg, VSd, VSnd
-
-
-def test_manure(feed):
-    ration_formulation = {    
-                'Corn_grain': 0,
-                'Legume_hay': 13.5588,
-                'Cotton_seed': 6.3620,
-                'Roasted_soybean': 2.3964,
-                'Rye_hay': 0,
-                'status': 'Optimal',
-                'objective': 4.5756
-            }
-    BW = 650
-    DIM = 100
-    mPrt = 3.2
-    U, TAN_s, MN, Mkg, VSd, VSnd = manure_calculations(ration_formulation, feed, BW, DIM, mPrt)
-    print('U = ', U, '\t expected: ', 0.340)
-    print('TAN_s = ', TAN_s, '\t expected: ', 0.14)
-    print('MN = ', MN, '\t expected: ', 532.407)
-    print('Mkg = ', Mkg, '\t expected: ', 70.792)
-    print('VSd = ', VSd, '\t expected: ', 7087.413)
-    print('VSnd = ', VSnd, '\t expected: ', 859.390)
-    print()
+    return {"U": U, 
+            "TAN_s": TAN_s, 
+            "MN": MN, 
+            "Mkg": Mkg, 
+            "VSd": VSd, 
+            "VSnd": VSnd}
