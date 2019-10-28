@@ -29,7 +29,7 @@ def main():
     # or a directory containing json files when doing a batch simulation
     #
     input_file_list = RUFAS.input_prompt()
-
+    
     #
     # Begin the simulation
     # Runs the simulation for each input file in input_file_path
