@@ -6,7 +6,7 @@ Description:
 Author(s): William Donovan, wmdonovan@wisc.edu
            Jacob Johnson, jacob8399@gmail.com
 """
-#############################################
+###############################################################################
 import csv
 from pathlib import Path
 from RUFAS.output.graphics import daily_graphics, annual_graphics
