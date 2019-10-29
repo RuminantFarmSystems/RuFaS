@@ -27,10 +27,6 @@ def update_all(S, time):
 
             S.manure_type = m_app.type[i]
 
-            # S.cover_SLP = 0.0154 * mass[i] ** -0.555
-
-            # m_app.percent_cover[i] = min(1.0, 0.012 * mass[i] ** 0.48)
-
             cover_app = m_app.percent_cover[i] * S.area
             P_app = mass[i] * m_app.P_frac[i]
             N_app = mass[i] * m_app.N_frac[i]
@@ -175,7 +171,7 @@ def update_all(S, time):
 
             S.manure_mass_app = S.manure_mass
 
-    cow_mass_app = S.cows[year][day - 1] * 8.9 + S.heifer[year][day - 1] * 3.7 \
+    cow_mass_app = S.lactating_cows[year][day - 1] * 8.9 + S.heifer[year][day - 1] * 3.7 \
                    + S.dry_cow[year][day - 1] * 4.9 + S.d_calf[year][day - 1] * 1.4 \
                    + S.beef_cow[year][day - 1] * 6.6 + S.b_calf[year][day - 1] * 2.7
 
@@ -187,7 +183,7 @@ def update_all(S, time):
         S.manure_mass += cow_mass_app
         S.manure_cov += cow_mass_app / 0.25 * 659.0 / 100 ** 4
 
-        cow_P_app = S.cows[year][day - 1] * 8.9 * 0.0088 + S.heifer[year][day - 1] * 3.7 \
+        cow_P_app = S.lactating_cows[year][day - 1] * 8.9 * 0.0088 + S.heifer[year][day - 1] * 3.7 \
                     * 0.0054 + S.dry_cow[year][day - 1] * 4.9 * 0.0061 \
                     + S.d_calf[year][day - 1] * 1.4 * 0.0054 + S.beef_cow[year][day - 1] \
                     * 6.6 * 0.0067 + S.b_calf[year][day - 1] * 2.7 * 0.0092

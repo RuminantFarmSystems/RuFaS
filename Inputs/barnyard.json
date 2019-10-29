@@ -62,15 +62,36 @@
                 "report_name": "Custom Report",
                 "file_name": "custom_report.csv"
             }
-    },
-        "ration_report":
+        },
+        "pen_report":
         {
             "active": true,
-            "produce_graphics": false,
-            "display_graphics": false,
-            "report_name": "Ration Report",
-            "file_name": "ration_report.csv",
-            "ration_interval": 7
+            "produce_graphics": true,
+
+            "ration_report":
+            {
+                "active": true,
+                "produce_graphics": false,
+                "display_graphics": false,
+                "report_name": "Ration Report",
+                "file_name": "ration_report.csv",
+                "ration_interval": 7
+            },
+            "manure_report":
+            {
+        	    "active": true,
+                "produce_graphics": false,
+                "display_graphics": false,
+        	    "report_name": "Manure Report",
+        	    "file_name": "manure_report.csv"
+            },
+            "growth_report": {
+                "active": true,
+                "produce_graphics": false,
+                "display_graphics": false,
+                "report_name": "Growth Report",
+                "file_name": "growth_report.csv"
+            }
         },
         "feed_storage":
         {
@@ -100,7 +121,6 @@
             }
         },
         "animal": "animal.json",
-
         "feed": "buisse_storage.json"
     }
 }

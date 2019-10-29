@@ -16,7 +16,9 @@ from pathlib import Path
 
 from RUFAS import util
 from RUFAS import errors
-from RUFAS.routines import Field, Animal, Feed
+
+from RUFAS.routines import Field, Feed
+from RUFAS.routines.animal.animal_management import AnimalManagement
 
 
 # -------------------------------------------------------------------------------
@@ -39,14 +41,15 @@ class State:
     the future or in an output report in the state object.
     """
 
-    def __init__(self, data, time):
+    def __init__(self, data, config, time):
         self.fields = []
         self.fields_data = data['fields']
         for field_name, field_data in self.fields_data.items():
             self.fields.append(Field(field_name, field_data, time))
         input_dir = util.get_base_dir() / 'Inputs'
-        self.animal = Animal(read_json_file(input_dir / 'animals' / data['animal']))
         self.feed = Feed(read_json_file(input_dir / 'feed_storage' / data['feed']))
+        self.animal_management = AnimalManagement(
+            read_json_file(input_dir / 'animals' / data['animal']), config, self.feed)
 
     # ---------------------------------------------------------------------------
     # Method: annual_reset
@@ -58,7 +61,7 @@ class State:
         for field in self.fields:
             field.crop.annual_reset()
             field.soil.annual_reset()
-        self.animal.annual_reset()
+        self.animal_management.annual_reset()
         self.feed.annual_reset()
 
 
@@ -238,11 +241,27 @@ class Config:
                     days = [_ for _ in range(1, year_length + 1)]
 
             self.years.append(days)
-
+        
+        self.sim_length = self.calc_sim_length(leap_year_length, year_length)
         self.output_dir = data['output_dir']
         self.diagnostic_dir = data['diagnostic_dir']
 
-
+    def calc_sim_length(self, leap_year_length, year_length):
+        '''
+        Calculates and returns the length of the simulation in days.
+        '''
+        sim_length = 0
+        for i in range(len(self.years)):
+            if i == 0:
+                #check for +-1
+                if is_leap_year(self.start_year):
+                    sim_length += leap_year_length - self.start_day
+                else:
+                    sim_length += year_length - self.start_day
+            else:
+                sim_length += len(self.years[i])
+                
+        return sim_length + 1
 # -------------------------------------------------------------------------------
 # Class: Weather
 # -------------------------------------------------------------------------------
