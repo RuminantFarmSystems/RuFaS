@@ -1,1 +1,1 @@
-from .animal import Animal, daily_animal_routine, daily_animal_update
+from .animal_management import AnimalManagement, daily_animal_routine, daily_animal_update

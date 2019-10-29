@@ -4,7 +4,7 @@ RUFAS: Ruminant Farm Systems Model
 File name: soil.py
 Description:
 Author(s): Kass Chupongstimun, kass_c@hotmail.com
-           Jit Patil
+           Jit Patil, spatil5@wisc.edu
            William Donovan, wmdonovan@wisc.edu
 
 This module needs the following inputs in order to operate correctly:

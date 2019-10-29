@@ -1,13 +1,12 @@
 ################################################################################
-#
-# RUFAS: Ruminant Farm Systems Model
-#
-# water_balance.py
-#
-# Authors: Jacob Johnson, jacob8399@gmail.com
-#          William Donovan, wmdonovan@wisc.edu
-#
-################################################################################
+"""
+RUFAS: Ruminant Farm Systems Model
+File name: water_balance.py
+Description:
+Author(s): William Donovan, wmdonovan@wisc.edu
+           Jacob Johnson, jacob8399@gmail.com
+"""
+###############################################################################
 
 import csv
 from pathlib import Path

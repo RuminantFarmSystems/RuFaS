@@ -1,93 +1,52 @@
+
 {
+
     "config":
     {
-        "StartDate" : "2009:244",
-        "EndDate" : "2016:243",
-        "output_dir": "Outputs/Sample_Farm_Outputs/",
-        "diagnostic_dir": "Outputs/diagnostics/"
+         "StartDate" : "2009:244",
+        "EndDate" : "2011:243",
+        "output_dir": "Outputs/Sample_Farm_Outputs/"
     },
 
     "weather": "Inputs/barnyard_weather.csv",
 
     "output":
     {
-        "pen_report":
-        {
-            "active": true,
-            "produce_graphics": true,
-
-            "ration_report":
-            {
-                "active": true,
-                "produce_graphics": false,
-                "display_graphics": false,
-                "report_name": "Ration Report",
-                "file_name": "ration_report.csv",
-                "ration_interval": 7
-            },
-            "manure_report":
-            {
-        	    "active": true,
-                "produce_graphics": false,
-                "display_graphics": false,
-        	    "report_name": "Manure Report",
-        	    "file_name": "manure_report.csv"
-            },
-            "growth_report": {
-                "active": true,
-                "produce_graphics": false,
-                "display_graphics": false,
-                "report_name": "Growth Report",
-                "file_name": "growth_report.csv"
-            }
-        },
         "soil_summary":
         {
             "active": true,
-            "produce_graphics": false,
-            "display_graphics": false,
             "report_name": "Soil Summary",
             "file_name": "soil_summary.csv"
+        },
+        "ration_report":
+        {
+            "active": true,
+            "report_name": "Ration Report",
+            "file_name": "ration_report.csv"
         },
         "soil_nitrogen":
         {
             "active": true,
-            "produce_graphics": false,
-            "display_graphics": false,
             "report_name": "Soil Nitrogen",
             "file_name": "soil_nitrogen.csv"
         },
-        "soil_phosphorus":
+        "crop_report":
         {
             "active": true,
-            "produce_graphics": false,
-            "display_graphics": false,
-            "report_name": "Soil Phosphorus",
-            "file_name": "soil_phosphorus.csv"
-        },
-        "crop_summary":
-        {
-            "active": true,
-            "produce_graphics": false,
-            "display_graphics": false,
-            "report_name": "Crop Summary",
+            "report_name": "Crop Report",
             "file_name": "crop_summary.csv"
         },
-        "water_balance":
+        "manure_report":
         {
-            "active": true,
-            "produce_graphics": false,
-            "display_graphics": false,
-            "report_name": "Water Balance",
-            "file_name": "water_balance.csv"
+        	"active": true,
+        	"report_name": "Manure Report",
+        	"file_name": "manure_report.csv"
         },
-        "custom_report":
+        "growth_report":
         {
-            "active": true,
-            "produce_graphics": false,
-            "display_graphics": false,
-            "report_name": "Custom Report",
-            "file_name": "custom_report.csv"
+        	"active": true,
+        	"report_name": "Growth Report",
+        	"file_name": "growth_report.csv"
         }
     },
 
@@ -95,34 +54,58 @@
     {
         "crop":
         {
-            "latitude": 43.332708,
             "corn":
             {
-                "grow_years": [],
-                "repeat": 0,
+                "crop_name": "corn",
+                "crop_type": "annual",
+                "fix_nitrogen": false,
+
                 "planting_date": 121,
                 "harvest_date": 319,
-                "harvest_type": "optimal"
-            },
-            "soybean":
-            {
-                "grow_years": [],
-                "repeat": 0,
-                "planting_date": 121,
-                "harvest_date": 319,
-                "harvest_type": "scheduled"
-            },
-            "alfalfa":
-            {
-                "grow_years": [],
-                "repeat": 0,
-                "planting_date": 121,
-                "harvest_date": 319,
-                "harvest_type": "optimal"
+
+                "harvest_index": 0.65,
+                "harvest_eff": 0.9,
+                "HI_opt": 0.6,
+                "HI_min": 0.3,
+
+                "min_temp_for_growth": 10,
+                "max_temp_for_growth": 30,
+                "opt_temp_for_growth": 25,
+                "HU_for_maturity": 1200,
+
+                "fr_PHU_50" : 0.5,
+                "fr_PHU_100" : 1.0,
+                "fr_PHU_sen": 0.90,
+                "fr_PHU_1": 0.15,
+                "fr_PHU_2": 0.50,
+                "fr_LAI_1": 0.05,
+                "fr_LAI_2": 0.95,
+
+                "LAI_max": 3,
+                "radiation_use_efficiency": 39,
+                "light extinction coefficient": 0.65,
+
+                "z_root_max": 2000,
+
+                "fr,n1": 0.047,
+                "fr,n2": 0.0177,
+                "fr,n3": 0.0138,
+                "fr,n~3": 0.01381,
+                "beta_n": 10,
+
+                "beta_w": 10,
+                "epco": 0.5,
+
+                "fr,p1": 0.0048,
+                "fr,p2": 0.0018,
+                "fr,p3": 0.0014,
+                "fr,p~3": 0.00141,
+                "beta_p": 10
             }
         },
         "soil":
         {
+            "ProfileDepth": 450,
             "ProfileBulkDensity": 1.4,
             "CN2": 85.00,
             "FieldSlope": 0.02,
@@ -130,6 +113,7 @@
             "Manning": 0.4,
             "FieldSize": 1.0,
             "PracticeFactor": 0.08,
+            "Orgc": 1.2,
             "Sand": 15,
             "Silt": 65,
             "SoilAlbedo": 0.16,
@@ -156,8 +140,8 @@
                     "LabileP": 15,
                     "ActiveMineralRate": 0.0003,
                     "VolatileExchangeFac": 0.15,
-                    "DenitrificationRate": 0.1,
-                    "SoilWaterRatio": 0.3,
+                    "DenitrificationRate": 0.05,
+                    "StartingSoilWater": 45,
                     "OM%": 1.9
                 },
                 "Layer2":
@@ -177,8 +161,8 @@
                     "LabileP": 15,
                     "ActiveMineralRate": 0.0003,
                     "VolatileExchangeFac": 0.15,
-                    "DenitrificationRate": 0.1,
-                    "SoilWaterRatio": 0.3,
+                    "DenitrificationRate": 0.05,
+                    "StartingSoilWater": 45,
                     "OM%": 1.9
                 },
                 "Layer3":
@@ -198,8 +182,8 @@
                     "LabileP": 15,
                     "ActiveMineralRate": 0.0003,
                     "VolatileExchangeFac": 0.15,
-                    "DenitrificationRate": 0.1,
-                    "SoilWaterRatio": 0.3,
+                    "DenitrificationRate": 0.05,
+                    "StartingSoilWater": 45,
                     "OM%": 1.9
                 }
             },
@@ -277,18 +261,18 @@
 
             }
         },
-
+        
         "animal":
         {
             "herd_information":
             {
-            	"calf_num": 0,
-            	"heiferI_num": 0,
-            	"heiferII_num": 0,
-            	"heiferIII_num": 0,
-                "cow_num": 0,
-                "replace_num": 0,
-                "herd_num": 0
+            	"calf_num": 160, 
+            	"heiferI_num": 800,
+            	"heiferII_num": 820,
+            	"heiferIII_num": 50,
+                "cow_num": 1000,
+                "replace_num": 5000,
+                "herd_num": 1000
             },
             
             "animal_config":
@@ -392,7 +376,7 @@
 	        		"bedding_type": "sand",
 	        		"pen_type": "freestall"
 	        	},
-
+	        	
 	        	"pen1":
 	        	{
 	        		"id": 1,
@@ -403,7 +387,7 @@
 	        		"bedding_type": "sawdust",
 	        		"pen_type": "freestall"
 	        	},
-
+	        	
 	        	"pen2":
 	        	{
 	        		"id": 2,
@@ -414,7 +398,7 @@
 	        		"bedding_type": "straw",
 	        		"pen_type": "tiestall"
 	        	},
-
+	        	
 	        	"pen3":
 	        	{
 	        		"id": 3,
@@ -425,7 +409,7 @@
 	        		"bedding_type": "sand",
 	        		"pen_type": "tiestall"
 	        	},
-
+	        	
 	        	"pen4":
 	        	{
 	        		"id": 4,
@@ -436,7 +420,7 @@
 	        		"bedding_type": "sand",
 	        		"pen_type": "tiestall"
 	        	},
-
+	        	
 	        	"pen5":
 	        	{
 	        		"id": 5,
@@ -447,7 +431,7 @@
 	        		"bedding_type": "sand",
 	        		"pen_type": "tiestall"
 	        	}
-	        }
+	        }            
         },
 
         "feed":
