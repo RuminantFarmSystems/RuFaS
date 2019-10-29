@@ -1,13 +1,12 @@
 ################################################################################
-#
-# RUFAS: Ruminant Farm Systems Model
-#
-# soil_nitrogen.py
-#
-# Authors: Kass Chupongstimun
-#          Jit Patil
-#          William Donovan
-#
+"""
+RUFAS: Ruminant Farm Systems Model
+File name: soil_nitrogen.py
+Description:
+Author(s): Kass Chupongstimun, kass_c@hotmail.com
+           Jit Patil, spatil5@wisc.edu
+           William Donovan, wmdonovan@wisc.edu
+"""
 ################################################################################
 
 import csv

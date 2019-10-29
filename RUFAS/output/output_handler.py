@@ -4,6 +4,8 @@ RUFAS: Ruminant Farm Systems Model
 File name: output_handler.py
 Description: Contains the definition of the OutputHandler object
 Author(s): Kass Chupongstimun, kass_c@hotmail.com
+           William Donovan, wmdonovan@wisc.edu
+           Jacob Johnson, jacob8399@gmail.com
 """
 ################################################################################
 import shutil
@@ -15,9 +17,9 @@ from RUFAS.output.report_handler import BaseReportHandler
 #
 # Import report handlers here
 #
-from RUFAS.output.ration_report import RationReport
 from RUFAS.output.feed_storage import FeedStorage
 from RUFAS.output.field_summary import FieldSummary
+from RUFAS.output.pen_report import PenReport
 
 
 # -------------------------------------------------------------------------------
@@ -54,12 +56,14 @@ class OutputHandler:
 
         # Instantiate Report Handler Objects here
         self.reports = {
-                        #'farm_summary': FarmSummary(data['farm_summary']),
-                        'ration_report': RationReport(data['ration_report']),
+                        # 'farm_summary': FarmSummary(data['farm_summary']),
                         'feed_storage': FeedStorage(data['feed_storage']),
                         }
         for field in state.fields:
             self.reports[field.field_name] = FieldSummary(field.field_name, data['field_summary'])
+
+        for pen in state.animal_management.all_pens:
+            self.reports['pen_' + str(pen.id)] = PenReport(pen.id, data['pen_report'])
 
         self.final = False
 
@@ -101,9 +105,12 @@ class OutputHandler:
                 report_dir = util.get_base_dir() / output_dir / reportName
                 report_dir.mkdir(exist_ok=True, parents=False)
 
-    # ---------------------------------------------------------------------------
-    # Method: initialize_diagnostic_dir
-    # ---------------------------------------------------------------------------
+        for report_name in self.reports:
+            report = self.reports[report_name]
+            if report.report_name.startswith('pen'):
+                report_dir = util.get_base_dir() / output_dir / report_name
+                report_dir.mkdir(exist_ok=True, parents=False)
+
     def initialize_diagnostic_dir(self, diagnostic_dir):
         diagnostic_dir = util.get_base_dir() / diagnostic_dir
 
@@ -121,6 +128,8 @@ class OutputHandler:
                 report_dir.mkdir(exist_ok=True, parents=False)
                 if report.report_name.split('_')[0] == 'field':
                     report.initialize_field_dir(report_dir)
+                if report.report_name.startswith('pen'):
+                    report.initialize_pen_dir(report_dir)
 
     # ---------------------------------------------------------------------------
     # Method: initialize_reports
@@ -130,6 +139,10 @@ class OutputHandler:
 
         for reportName in self.reports:
             report = self.reports[reportName]
+            if not report.active and report.produce_graphics:
+                print("Warning: Cannot produce graphics for inactive report:", report.report_name,
+                      ". Setting produce_graphics to False")
+                report.produce_graphics = False
             if report.active:
                 report.initialize(state)
 
@@ -185,7 +198,6 @@ class OutputHandler:
         for reportName in self.reports:
             report = self.reports[reportName]
 
-            # if report.produce_graphics:
             if counter == len(self.reports) - 1:
                 self.final = True
             report.produce_report_graphics(self.final)

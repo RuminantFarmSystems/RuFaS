@@ -1,14 +1,13 @@
 ################################################################################
-#
-# RUFAS: Ruminant Farm Systems Model
-#
-# soil_phosphorus.py
-#
-# Authors: Kass Chupongstimun
-#          Jit Patil
-#          Jacob Johnson
-#          William Donovan
-#
+"""
+RUFAS: Ruminant Farm Systems Model
+File name: soil_phosphorus.py
+Description:
+Author(s): Kass Chupongstimun, kass_c@hotmail.com
+           Jit Patil, spatil5@wisc.edu
+           Jacob Johnson, jacob8399@gmail.com
+           William Donovan, wmdonovan@wisc.edu
+"""
 ################################################################################
 
 import csv

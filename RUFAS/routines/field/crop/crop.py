@@ -188,7 +188,7 @@ class Crop:
         self.soy = Soybean(data)
 
         # Dormancy for perennial crops
-        self.latitude = data['latitude']
+        self.latitude = abs(data['latitude'])
         self.T_dl_min = calculate_minimum_day_length(self.latitude)
         self.t_dorm = calculate_t_dorm(self.latitude)
         self.solar_declination = 0.0

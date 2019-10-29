@@ -79,7 +79,7 @@ def daily_simulation():
     #
     # Daily routines
     #
-    routines.daily_animal_routine(state.animal, state.feed, weather, time)
+    routines.daily_animal_routine(state.animal_management, state.feed, weather, time)
     for field in state.fields:
         routines.daily_soil_routine(field.soil, field.crop, weather, time)
         routines.daily_crop_routine(field.crop, weather, time, field.soil)
@@ -89,9 +89,11 @@ def daily_simulation():
     # Daily Output Updates
     #
     output.daily_update(state, weather, time)
-
-    #print("simulating: " + time.to_str()) # Print out current day of simulation
+    
+    # print("simulating: " + time.to_str()) # Print out current day of simulation
     time.advance()
+    # have to increment simulation_day here so that the daily output has the correct simulation day
+    state.animal_management.simulation_day += 1 
 
 
 # -------------------------------------------------------------------------------
@@ -156,7 +158,7 @@ def read_json_file(fPath:Path):
             weather = Weather(data['weather'], config.years, config.w_start_year,
                               config.w_start_day, config.start_year, config.start_day)
             time = Time(config.years, config.start_year)
-            state = State(data['farm'], time)
+            state = State(data['farm'], config, time)
             output = OutputHandler(data['output'], state)
 
         except errors.JSONfileData as e:
