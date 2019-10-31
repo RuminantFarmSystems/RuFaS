@@ -120,7 +120,7 @@
                 "applications": "barnyard_applications.json"
             }
         },
-        "animal": "animal.json",
+        "animal": "barnyard_animal.json",
         "feed": "buisse_storage.json"
     }
 }

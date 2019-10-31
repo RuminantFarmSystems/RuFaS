@@ -10,7 +10,7 @@
 
     "initial_dry_matter": 0,
 
-    "feed_library": "testing_ration_feedlib.csv",
+    "feed_library": "manure_feed_test.csv",
 
     "available_feeds":
     [

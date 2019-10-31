@@ -1,0 +1,82 @@
+{
+    "ProfileBulkDensity": 1.16525,
+    "CN2": 86.00,
+    "FieldSlope": 0.02,
+    "SlopeLength": 7,
+    "Manning": 0.4,
+    "FieldSize": 1.0,
+    "PracticeFactor": 0.25,
+    "Sand": 15,
+    "Silt": 65,
+    "SoilAlbedo": 0.16,
+    "initial_residue": 8000,
+    "FreshNMineralRate": 0.05,
+    "SoilCoverType": "BARE",
+
+    "SoilLayers":
+    {
+        "Layer1":
+        {
+            "BottomDepth": 150,
+            "WiltingPoint": 0.1,
+            "FieldCapacity": 0.33,
+            "Saturation": 0.5,
+            "Ksat": 29.2,
+            "CationExclusionFraction": 0.0,
+            "Clay": 21,
+            "InitialTemperature": -4.098,
+            "BulkDensity": 1.23,
+            "OrgC%": 2.0,
+            "NH4": 1,
+            "FracActiveN": 0.02,
+            "LabileP": 15,
+            "ActiveMineralRate": 0.0001,
+            "VolatileExchangeFac": 0.15,
+            "DenitrificationRate": 0.01,
+            "SoilWaterRatio": 0.3,
+            "OM%": 1.9
+        },
+        "Layer2":
+        {
+            "BottomDepth": 1000,
+            "WiltingPoint": 0.1,
+            "FieldCapacity": 0.3,
+            "Saturation": 0.5,
+            "Ksat": 13.2,
+            "CationExclusionFraction": 0.0,
+            "Clay": 33,
+            "InitialTemperature": -1.978,
+            "BulkDensity": 1.16,
+            "OrgC%": 1,
+            "NH4": 1,
+            "FracActiveN": 0.02,
+            "LabileP": 15,
+            "ActiveMineralRate": 0.0001,
+            "VolatileExchangeFac": 0.15,
+            "DenitrificationRate": 0.01,
+            "SoilWaterRatio": 0.3,
+            "OM%": 1.9
+        },
+        "Layer3":
+        {
+            "BottomDepth": 2000,
+            "WiltingPoint": 0.1,
+            "FieldCapacity": 0.30,
+            "Saturation": 0.5,
+            "Ksat": 20,
+            "CationExclusionFraction": 0.0,
+            "Clay": 20,
+            "InitialTemperature": 8,
+            "BulkDensity": 1.8,
+            "OrgC%": 1.2,
+            "NH4": 1,
+            "FracActiveN": 0.02,
+            "LabileP": 174,
+            "ActiveMineralRate": 0.00005,
+            "VolatileExchangeFac": 0.15,
+            "DenitrificationRate": 0.01,
+            "SoilWaterRatio": 0.3,
+            "OM%": 1.9
+        }
+    }
+}
