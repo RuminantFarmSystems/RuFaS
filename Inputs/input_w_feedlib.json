@@ -66,14 +66,6 @@
             "report_name": "Soil Phosphorus",
             "file_name": "soil_phosphorus.csv"
         },
-        "soil_phosphorus":
-        {
-            "active": true,
-            "produce_diagnostics": false,
-            "show_daily": false,
-            "report_name": "Soil Phosphorus",
-            "file_name": "soil_phosphorus.csv"
-        },
         "crop_summary":
         {
             "active": true,
@@ -89,6 +81,14 @@
             "display_graphics": false,
             "report_name": "Water Balance",
             "file_name": "water_balance.csv"
+        },
+        "feed_storage":
+        {
+            "active": true,
+            "produce_graphics": false,
+            "display_graphics": false,
+            "report_name": "Feed Storage",
+            "file_name": "feed_storage.csv"
         },
         "custom_report":
         {
@@ -439,6 +439,16 @@
 
         "feed":
         {
+            "storage_type": "bag",
+            "moisture": "direct_cut",
+            "additive": "preservative",
+            "packing_density": 14,
+            "inoculation": "heterofermentative",
+            "bunk_type": "open_floor",
+            "ventilation": true,
+            "removal_rate": 6,
+
+            "initial_dry_matter": 0,
             "feed_library": "Inputs/manure_feed_test.csv",
 
             "available_feeds":
