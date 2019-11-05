@@ -68,7 +68,7 @@
         "crop_summary":
         {
             "active": true,
-            "produce_graphics": false,
+            "produce_graphics": true,
             "display_graphics": false,
             "report_name": "Crop Summary",
             "file_name": "crop_summary.csv"

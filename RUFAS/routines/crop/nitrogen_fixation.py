@@ -24,6 +24,7 @@ CropType attribute definitions:
 """
 ###############################################################################
 
+
 #
 # Calculates the amount of nitrogen added to the plant biomass by fixation.
 # "pseudocode_crop" C.5.D.1
@@ -39,7 +40,12 @@ def calc_N_fixation(crop_type, soil):
         f_sw = calc_f_sw(accessible_layers)
         N_demand = calc_N_demand(crop_type, accessible_layers)
 
-        return N_demand * f_gr * min(f_sw, f_NO3, 1)
+        N_fix = N_demand * f_gr * min(f_sw, f_NO3, 1)
+
+        if N_fix > N_demand:
+            N_fix = N_demand
+
+        return N_fix
 
 
 #
@@ -127,4 +133,6 @@ def calc_N_demand(crop_type, accessible_layers):
 
     act_N_up_root = sum(crop_type.act_N_up_each_layer[:len(accessible_layers)])
 
-    return act_N_up_root - NO3_root
+    N_demand = max(act_N_up_root - NO3_root, 0)
+
+    return N_demand
