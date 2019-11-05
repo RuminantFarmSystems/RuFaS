@@ -108,7 +108,7 @@ def annual_simulation():
     #
     # Pre-annual Routines
     #
-    routines.annual_crop_routine(state.crop, weather, time)
+    routines.annual_crop_routine(state.crop, time)
 
     while not time.end_year():
         daily_simulation()
@@ -152,11 +152,11 @@ def read_json_file(fPath:Path):
         # Instantiate objects using dictionary data from .json file
         try:
             config = Config(data['config'], data['weather'])
-            state = State(data['farm'], config)
-            output = OutputHandler(data['output'], state)
             weather = Weather(data['weather'], config.years, config.w_start_year,
                               config.w_start_day, config.start_year, config.start_day)
             time = Time(config.years, config.start_year)
+            state = State(data['farm'], config, time)
+            output = OutputHandler(data['output'], state)
 
         except errors.JSONfileData as e:
             print("JSON FILE ERROR: " +
@@ -164,4 +164,4 @@ def read_json_file(fPath:Path):
             raise errors.InvalidJSONfile(fPath.name)
 
 
-#=======================================================================================
+# =======================================================================================

@@ -202,7 +202,7 @@ def calc_radiate(soil, crop, weather, time):
 # cover. "pseudocode_soil" S.1.A.9/10
 #
 def calc_albedo(soil, crop):
-    CV = crop.crops_list["corn"].bio_AG  # TODO: Crop Flag
+    CV = crop.current_crop.bio_AG
     albedoSoil = soil.soilAlbedo
 
     # "pseudocode_soil" S.1.A.10
@@ -217,7 +217,7 @@ def calc_albedo(soil, crop):
 # "pseudocode_soil" S.1.A.11/12
 #
 def calc_bcv(crop, time):
-    CV = crop.crops_list["corn"].bio_AG
+    CV = crop.current_crop.bio_AG
     exp_part = exp(7.563 - 0.0001297 * (-CV))
 
     bcv = CV / (CV + exp_part)

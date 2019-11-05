@@ -88,7 +88,7 @@ class CustomReport(BaseReportHandler):
     #
     def daily_update(self, state, weather, time):
         soil = state.soil
-        crop_type = state.crop.crops_list["corn"]
+        crop_type = state.crop.current_crop
 
         for variable in self.daily_variables:
             self.daily_variables[variable][2].append(
@@ -97,7 +97,7 @@ class CustomReport(BaseReportHandler):
     def annual_update(self, state, weather, time):
         """Stores the yearly values that need to be printed in the report."""
         soil = state.soil
-        crop_type = state.crop.crops_list["corn"]
+        crop_type = state.crop.current_crop
 
         for variable in self.annual_variables:
             self.annual_variables[variable][2] = \

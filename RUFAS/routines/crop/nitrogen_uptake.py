@@ -51,6 +51,7 @@ CropType values updated by calling update_all():
 from math import log, exp
 from .nitrogen_fixation import calc_N_fixation
 
+
 #
 # This function updates all of a crop's nitrogen uptake information.
 #
@@ -71,7 +72,7 @@ def calc_fr_N(crop_type):
     n2 = calc_n2(crop_type)
     n1 = calc_n1(crop_type, n2)
 
-    if crop_type.prev_biomass_act == 0:
+    if crop_type.prev_biomass_actual == 0:
         crop_type.fr_N = 0
     else:
         term1 = crop_type.fr_n1 - crop_type.fr_n3
@@ -127,7 +128,7 @@ def calc_log_term_of_shape_coeff(crop_type, fr_PHU_fract, fr_n_):
 # "pseudocode_crop" C.5.B.2
 #
 def calc_bio_N_opt(crop_type):
-    crop_type.bio_N_opt = crop_type.fr_N * crop_type.biomass_act
+    crop_type.bio_N_opt = crop_type.fr_N * crop_type.biomass_actual
 
 
 #
@@ -139,7 +140,7 @@ def calc_N_up(crop_type):
         crop_type.N_up = 0
     else:
         option1 = crop_type.bio_N_opt - crop_type.bio_N
-        option2 = 4 * crop_type.fr_n3 * crop_type.dBiomass_max
+        option2 = 4 * crop_type.fr_n3 * crop_type.d_biomass_max
 
         crop_type.N_up = min(option1, option2)
 
@@ -180,7 +181,7 @@ def calc_act_N_up_each_layer(crop_type, soil):
         NO3_over += soilLayer.NO3
 
         # C.5.C.5
-        N_demand = N_up_over - NO3_over
+        N_demand = max(N_up_over - NO3_over, 0)
 
         if N_demand < 0:
             N_demand = 0
@@ -232,6 +233,7 @@ def calc_N_up_z(crop_type, z):
 # "pseudocode_crop" C.5.E.1
 #
 def calc_bio_N(crop_type, soil):
+    # TODO: Nitrogen Fixation currently returns large negative numbers 11/05/19. This is not biologically feasible.
     N_fix = calc_N_fixation(crop_type, soil)
 
     crop_type.bio_N = crop_type.bio_N + crop_type.N_act_up + N_fix

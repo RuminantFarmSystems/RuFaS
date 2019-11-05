@@ -36,11 +36,11 @@ class State:
     the future or in an output report in the state object.
     """
 
-    def __init__(self, data, config):
+    def __init__(self, data, config, time):
         self.soil = Soil(data['soil'], config)
         self.feed = Feed(data['feed'])
         self.animal_management = AnimalManagement(data['animal'], config, self.feed)
-        self.crop = Crop(data['crop'])
+        self.crop = Crop(data['crop'], time)
 
     # self.fieldOps = FieldOps()
     # self.herd = Herd()
@@ -54,9 +54,9 @@ class State:
         """Annual Reset"""
 
         self.soil.annual_reset()
+        self.crop.annual_reset()
         self.animal_management.annual_reset()
         self.feed.annual_reset()
-        self.crop.annual_reset()
 
     # self.fieldOps.annual_reset()
     # self.herd.annual_reset()
@@ -406,6 +406,7 @@ class Time:
 
     def __init__(self, years, cal_year):
 
+        self.start_year = cal_year
         self.cal_year = cal_year
         self.years = years
         self.year = 1  # Current Year
