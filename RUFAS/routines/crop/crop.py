@@ -724,7 +724,7 @@ class Alfalfa:
         self.planted = False
         self.growing = False
 
-        self.fix_nitrogen = False
+        self.fix_nitrogen = True
         # ===================================================================
         ''' HEAT UNIT DATA '''
 

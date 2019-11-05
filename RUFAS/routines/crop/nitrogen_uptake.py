@@ -181,7 +181,7 @@ def calc_act_N_up_each_layer(crop_type, soil):
         NO3_over += soilLayer.NO3
 
         # C.5.C.5
-        N_demand = N_up_over - NO3_over
+        N_demand = max(N_up_over - NO3_over, 0)
 
         if N_demand < 0:
             N_demand = 0
