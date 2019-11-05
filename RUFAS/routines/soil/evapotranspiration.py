@@ -96,7 +96,6 @@ def calc_potential_evap(soil, crop, weather, time):
 
     soil.ET_max = max(0.001, ET_max)
 
-
 #
 # Calculates LHV (latent heat of vaporization (MJ kg^-1)) for use in
 # determining potential evapotranspiration
@@ -113,7 +112,7 @@ def calc_LHV(Tavg):
 # "pseudocode_soil" S.2.B.3
 #
 def calc_crop_transpiration(soil, crop):
-    LAI = crop.crops_list["corn"].LAI_act  # TODO: Crop Flag
+    LAI = crop.current_crop.LAI_actual
     if 0 <= LAI <= 3.0:
         soil.trans_max = (soil.ET_max * LAI) / 3.0
     else:
@@ -139,7 +138,7 @@ def calc_soil_evap(soil, crop):
 # "pseudocode_soil" S.2.B.5
 #
 def calc_soil_cov(soil, crop):
-    bio_AG = crop.crops_list["corn"].bio_AG  # TODO: Crop Flag
+    bio_AG = crop.current_crop.bio_AG
     residue = soil.residue
     BioMass = bio_AG + residue
 

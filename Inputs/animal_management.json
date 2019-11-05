@@ -5,102 +5,123 @@
     {
          "StartDate" : "2009:244",
         "EndDate" : "2011:243",
-        "output_dir": "Outputs/Sample_Farm_Outputs/"
+        "output_dir": "Outputs/Sample_Farm_Outputs/",
+        "diagnostic_dir": "Outputs/diagnostics/"
     },
 
     "weather": "Inputs/barnyard_weather.csv",
 
     "output":
     {
+        "pen_report":
+        {
+            "active": true,
+            "produce_graphics": true,
+
+            "ration_report":
+            {
+                "active": true,
+                "produce_graphics": false,
+                "display_graphics": false,
+                "report_name": "Ration Report",
+                "file_name": "ration_report.csv",
+                "ration_interval": 7
+            },
+            "manure_report":
+            {
+        	    "active": true,
+                "produce_graphics": false,
+                "display_graphics": false,
+        	    "report_name": "Manure Report",
+        	    "file_name": "manure_report.csv"
+            },
+            "growth_report": {
+                "active": true,
+                "produce_graphics": false,
+                "display_graphics": false,
+                "report_name": "Growth Report",
+                "file_name": "growth_report.csv"
+            }
+        },
         "soil_summary":
         {
             "active": true,
+            "produce_graphics": false,
+            "display_graphics": false,
             "report_name": "Soil Summary",
             "file_name": "soil_summary.csv"
-        },
-        "ration_report":
-        {
-            "active": true,
-            "report_name": "Ration Report",
-            "file_name": "ration_report.csv"
         },
         "soil_nitrogen":
         {
             "active": true,
+            "produce_graphics": false,
+            "display_graphics": false,
             "report_name": "Soil Nitrogen",
             "file_name": "soil_nitrogen.csv"
         },
-        "crop_report":
+        "soil_phosphorus":
         {
             "active": true,
-            "report_name": "Crop Report",
+            "produce_graphics": false,
+            "display_graphics": false,
+            "report_name": "Soil Phosphorus",
+            "file_name": "soil_phosphorus.csv"
+        },
+        "crop_summary":
+        {
+            "active": true,
+            "produce_graphics": false,
+            "display_graphics": false,
+            "report_name": "Crop Summary",
             "file_name": "crop_summary.csv"
         },
-        "manure_report":
+        "water_balance":
         {
-        	"active": true,
-        	"report_name": "Manure Report",
-        	"file_name": "manure_report.csv"
+            "active": true,
+            "produce_graphics": false,
+            "display_graphics": false,
+            "report_name": "Water Balance",
+            "file_name": "water_balance.csv"
         },
-        "growth_report":
+        "custom_report":
         {
-        	"active": true,
-        	"report_name": "Growth Report",
-        	"file_name": "growth_report.csv"
+            "active": true,
+            "produce_graphics": false,
+            "display_graphics": false,
+            "report_name": "Custom Report",
+            "file_name": "custom_report.csv"
         }
     },
+
 
     "farm":
     {
         "crop":
         {
+            "latitude": 43.332708,
             "corn":
             {
-                "crop_name": "corn",
-                "crop_type": "annual",
-                "fix_nitrogen": false,
-
+                "grow_years": [],
+                "repeat": 0,
                 "planting_date": 121,
                 "harvest_date": 319,
-
-                "harvest_index": 0.65,
-                "harvest_eff": 0.9,
-                "HI_opt": 0.6,
-                "HI_min": 0.3,
-
-                "min_temp_for_growth": 10,
-                "max_temp_for_growth": 30,
-                "opt_temp_for_growth": 25,
-                "HU_for_maturity": 1200,
-
-                "fr_PHU_50" : 0.5,
-                "fr_PHU_100" : 1.0,
-                "fr_PHU_sen": 0.90,
-                "fr_PHU_1": 0.15,
-                "fr_PHU_2": 0.50,
-                "fr_LAI_1": 0.05,
-                "fr_LAI_2": 0.95,
-
-                "LAI_max": 3,
-                "radiation_use_efficiency": 39,
-                "light extinction coefficient": 0.65,
-
-                "z_root_max": 2000,
-
-                "fr,n1": 0.047,
-                "fr,n2": 0.0177,
-                "fr,n3": 0.0138,
-                "fr,n~3": 0.01381,
-                "beta_n": 10,
-
-                "beta_w": 10,
-                "epco": 0.5,
-
-                "fr,p1": 0.0048,
-                "fr,p2": 0.0018,
-                "fr,p3": 0.0014,
-                "fr,p~3": 0.00141,
-                "beta_p": 10
+                "harvest_type": "optimal"
+            },
+            "soybean":
+            {
+                "grow_years": [],
+                "repeat": 0,
+                "planting_date": 121,
+                "harvest_date": 319,
+                "harvest_type": "scheduled"
+            },
+            "alfalfa":
+            {
+                "grow_years": [],
+                "repeat": 0,
+                "planting_date": 121,
+                "harvest_date": 319,
+                "harvest_type": "optimal"
             }
         },
         "soil":
@@ -141,7 +162,7 @@
                     "ActiveMineralRate": 0.0003,
                     "VolatileExchangeFac": 0.15,
                     "DenitrificationRate": 0.05,
-                    "StartingSoilWater": 45,
+                    "SoilWaterRatio": 0.3,
                     "OM%": 1.9
                 },
                 "Layer2":
@@ -162,7 +183,7 @@
                     "ActiveMineralRate": 0.0003,
                     "VolatileExchangeFac": 0.15,
                     "DenitrificationRate": 0.05,
-                    "StartingSoilWater": 45,
+                    "SoilWaterRatio": 0.3,
                     "OM%": 1.9
                 },
                 "Layer3":
@@ -183,7 +204,7 @@
                     "ActiveMineralRate": 0.0003,
                     "VolatileExchangeFac": 0.15,
                     "DenitrificationRate": 0.05,
-                    "StartingSoilWater": 45,
+                    "SoilWaterRatio": 0.3,
                     "OM%": 1.9
                 }
             },

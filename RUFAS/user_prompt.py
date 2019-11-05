@@ -46,10 +46,11 @@ def input_prompt():
           "Exit RUFAS:\n\t" +
                 "Enter \'Q\' or \'q\'")
 
-    while(True):
+    while True:
 
         try:
             user_input = input("\nEnter RUFAS Input: ")
+
 
             #
             # Handle user exiting program

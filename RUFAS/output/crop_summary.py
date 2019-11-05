@@ -43,12 +43,12 @@ class CropSummary(BaseReportHandler):
         self.daily_variables = {'year': ['time.cal_year', '', []],
                                 'j_day': ['time.day', '', []],
                                 'fr_PHU': ['crop_type.fr_PHU', '%', []],
-                                'biomass': ['crop_type.biomass_act', 'kg/ha', []],
-                                'LAI_act': ['crop_type.LAI_act', 'm^2/m^2', []],
+                                'biomass': ['crop_type.biomass_actual', 'kg/ha', []],
+                                'LAI_act': ['crop_type.LAI_actual', 'm^2/m^2', []],
                                 'Bio_N': ['crop_type.bio_N', 'kg N/ha', []],
                                 'Bio_P': ['crop_type.bio_P', 'kg P/ha', []],
                                 'z_root': ['crop_type.z_root', 'mm', []],
-                                'yield_act': ['crop_type.yield_act', 'kg/ha', []]
+                                'yield_act': ['crop_type.yield_actual', 'kg/ha', []]
                                 }
 
         self.annual_variables = {'year': ['time.cal_year', '', 0],
@@ -85,7 +85,10 @@ class CropSummary(BaseReportHandler):
     # variable, this will throw an error. See comment at the top of the file.
     #
     def daily_update(self, state, weather, time):
-        crop_type = state.crop.crops_list['corn']
+        """Stores the daily values that need to be printed in the report."""
+
+        crop_type = state.crop.current_crop
+        # Copy daily output values here
 
         for variable in self.daily_variables:
             self.daily_variables[variable][2].append(
@@ -93,7 +96,7 @@ class CropSummary(BaseReportHandler):
 
     def annual_update(self, state, weather, time):
         """Stores the yearly values that need to be printed in the report."""
-        crop_type = state.crop.crops_list['corn']
+        crop_type = state.crop.current_crop
 
         for variable in self.annual_variables:
             self.annual_variables[variable][2] = \
@@ -107,17 +110,15 @@ class CropSummary(BaseReportHandler):
         mode = 'a+' if self.get_fPath().exists() else 'w+'
 
         with self.get_fPath().open(mode) as csvfile:
-            # Write data day by day
             writer = csv.DictWriter(csvfile, fieldnames=self.daily_variables.keys(),
                                     lineterminator='\n')
-
             for day in range(len(self.daily_variables['j_day'][2])):
                 row = {}
                 for variable in self.daily_variables:
                     row[variable] = self.daily_variables[variable][2][day]
                 writer.writerow(row)
 
-        annual_path = Path(str(self.get_fPath()).split('.csv')[0] + "_annual.csv")
+        annual_path = Path(str(self.get_fPath()).split('.csv')[0] + '_annual.csv')
 
         mode = 'a+' if annual_path.exists() else 'w+'
 

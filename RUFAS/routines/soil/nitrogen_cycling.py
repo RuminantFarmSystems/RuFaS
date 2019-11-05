@@ -471,6 +471,7 @@ def denitrification(soil):
 # "pseudocode_soil" S.4.E
 #
 def mineralization_decomp(soil):
+
     minrate = 0.0003
     for layer in soil.soil_layers:
         activeN = layer.activeN
@@ -491,6 +492,7 @@ def mineralization_decomp(soil):
         # soil layer.
         #
         if layer.name == "Layer1":
+
             FreshN = layer.topLayerFreshN
             NO3 = layer.NO3
             res = soil.residue
@@ -536,6 +538,10 @@ def mineralization_decomp(soil):
 
             layer.activeN += (0.2 * FreshMin)
             layer.NH4 += (0.8 * FreshMin)
+
+    # "pseudocode_soil" S.4.E.7/8
+    soil.soil_layers[0].topLayerFreshN += 0.0015 * soil.residue
+    soil.residue = soil.residue * (1 - soil.decayRate)
 
 
 #
