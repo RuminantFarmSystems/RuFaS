@@ -8,7 +8,6 @@
     },
 
     "weather": "Inputs/crop_module_testWeather_3.4.csv",
-
     "output":
     {
         "pen_report":
@@ -62,14 +61,6 @@
             "active": true,
             "produce_graphics": false,
             "display_graphics": false,
-            "report_name": "Soil Phosphorus",
-            "file_name": "soil_phosphorus.csv"
-        },
-        "soil_phosphorus":
-        {
-            "active": true,
-            "produce_diagnostics": false,
-            "show_daily": false,
             "report_name": "Soil Phosphorus",
             "file_name": "soil_phosphorus.csv"
         },

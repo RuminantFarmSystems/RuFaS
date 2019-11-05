@@ -66,14 +66,6 @@
             "report_name": "Soil Phosphorus",
             "file_name": "soil_phosphorus.csv"
         },
-        "soil_phosphorus":
-        {
-            "active": true,
-            "produce_diagnostics": false,
-            "show_daily": false,
-            "report_name": "Soil Phosphorus",
-            "file_name": "soil_phosphorus.csv"
-        },
         "crop_summary":
         {
             "active": true,
@@ -99,6 +91,7 @@
             "file_name": "custom_report.csv"
         }
     },
+
 
 
     "farm":

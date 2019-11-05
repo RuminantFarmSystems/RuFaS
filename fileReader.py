@@ -24,5 +24,3 @@ def convert_to_json(filename):
     commented_file_reader.close()
     json_file_writer.close()
     return json_filename
-
-convert_to_json('Inputs/test.txt')
