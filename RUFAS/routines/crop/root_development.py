@@ -30,13 +30,14 @@ CropType values updated by calling update_all():
 """
 ###############################################################################
 
+
 #
 # This function calls the functions in this module necessary to update the
 # root development of the given crop.
 #
-def update_all(crop_type, time):
-    calc_daily_root_biomass(crop_type, time)
-    calc_z_root(crop_type, time)
+def update_all(crop_type):
+    calc_daily_root_biomass(crop_type)
+    calc_z_root(crop_type)
 
 
 #
@@ -44,13 +45,9 @@ def update_all(crop_type, time):
 # on a given day in the growing season (AKA fr_root).
 # "pseudocode_crop" C.3.A.1
 #
-def calc_daily_root_biomass(crop_type, time):
-    in_growing_period = crop_type.start_date <= time.day <= crop_type.harvest_date
+def calc_daily_root_biomass(crop_type):
 
-    if in_growing_period:
-        crop_type.fr_root = 0.4 - 0.2 * crop_type.fr_PHU
-    else:
-        crop_type.fr_root = 0
+    crop_type.fr_root = 0.4 - 0.2 * crop_type.fr_PHU
 
 
 #
@@ -58,22 +55,26 @@ def calc_daily_root_biomass(crop_type, time):
 # day (AKA z_root).
 # "pseudocode_crop" C.3.A.2/3
 #
-def calc_z_root(crop_type, time):
-    # Save the previous day's value
-    crop_type.prev_z_root = crop_type.z_root
+def calc_z_root(crop_type):
 
-    after_harvest = time.day > crop_type.harvest_date
+    if not crop_type.z_root == crop_type.z_root_max:
 
-    # C.3.A.2
-    if crop_type.crop_type == "perennial":
-        crop_type.z_root = crop_type.z_root_max
+        # C.3.A.3
+        if crop_type.fr_PHU > 0.4:
+            crop_type.z_root = crop_type.z_root_max
 
-    elif after_harvest:
-        crop_type.z_root = 0
+        else:  # self.fr_PHU <= 0.4
+            crop_type.z_root = 2.5 * crop_type.fr_PHU * crop_type.z_root_max
 
-    # C.3.A.3
-    elif crop_type.crop_type == "annual" and crop_type.fr_PHU > 0.4:
-        crop_type.z_root = crop_type.z_root_max
-
-    else:  # crop_type == "annual" and self.fr_PHU <= 0.4
-        crop_type.z_root = 2.5 * crop_type.fr_PHU * crop_type.z_root_max
+    # if crop_type.crop_type == "perennial" and crop_type.planted:
+    #     crop_type.z_root = crop_type.z_root_max
+    #
+    # elif after_harvest:
+    #     crop_type.z_root = 0
+    #
+    # # C.3.A.3
+    # elif crop_type.crop_type == "annual" and crop_type.fr_PHU > 0.4:
+    #     crop_type.z_root = crop_type.z_root_max
+    #
+    # else:  # crop_type == "annual" and self.fr_PHU <= 0.4
+    #     crop_type.z_root = 2.5 * crop_type.fr_PHU * crop_type.z_root_max
