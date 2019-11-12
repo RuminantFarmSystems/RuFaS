@@ -156,9 +156,7 @@ def read_json_file(fPath:Path):
 
             if config.run_tests:
                 test_handler.run_tests()
-
-            state = State(data['farm'], config)
-            output = OutputHandler(data['output'], state)
+        
             weather = Weather(data['weather'], config.years, config.w_start_year,
                               config.w_start_day, config.start_year, config.start_day)
             time = Time(config.years, config.start_year)
