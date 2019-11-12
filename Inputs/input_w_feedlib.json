@@ -5,7 +5,8 @@
         "StartDate" : "2008:1",
         "EndDate" : "2011:366",
         "output_dir": "Outputs/Sample_Farm_Outputs/",
-        "diagnostic_dir": "Outputs/diagnostics/"
+        "diagnostic_dir": "Outputs/diagnostics/",
+        "run_tests": true
     },
 
     "weather": "Inputs/crop_module_testWeather_3.4.csv",
