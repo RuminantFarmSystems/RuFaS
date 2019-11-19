@@ -83,7 +83,7 @@
         },
         "feed_storage":
         {
-            "active": true,
+            "produce_csv": true,
             "produce_graphics": false,
             "display_graphics": false,
             "report_name": "Feed Storage",
