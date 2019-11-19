@@ -5,7 +5,7 @@
         "end_date" : "2016:243",
         "output_dir": "Outputs/Sample_Farm_Outputs/",
         "diagnostic_dir": "Outputs/diagnostics/",
-        "run_tests": true
+        "run_tests": false
     },
 
     "weather": "Inputs/barnyard_weather.csv",
