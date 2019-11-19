@@ -6,7 +6,7 @@
          "StartDate" : "2009:244",
         "EndDate" : "2011:243",
         "output_dir": "Outputs/Sample_Farm_Outputs/",
-        "diagnostic_dir": "Outputs/diagnostics"
+        "diagnostic_dir": "Outputs/diagnostics/"
     },
 
     "weather": "Inputs/barnyard_weather.csv",
@@ -92,6 +92,7 @@
             "file_name": "custom_report.csv"
         }
     },
+
 
     "farm":
     {
