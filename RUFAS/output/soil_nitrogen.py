@@ -38,7 +38,7 @@ class SoilNitrogen(BaseReportHandler):
         #
 
         #
-        # Sets active, report_name, file_name using data
+        # Sets produce_csv, report_name, file_name using data
         #
         self.set_properties(data)
         self.fieldNames = None

@@ -9,9 +9,10 @@ Author(s): Militsa Sotirova, militsasotirova@gmail.com
 ################################################################################
 from RUFAS.test.animal import animal_test_handler as animal 
 
+
 def run_tests():
-    '''
+    """
     Calls the unit test functions for each routine that has them.
-    '''
+    """
     animal.run_tests()
     print('Tests completed.\n')
