@@ -40,7 +40,7 @@ class BaseReportHandler(ABC):
         the data passed to it and assigns the properties below.
         """
 
-        self.active = data['active']
+        self.produce_csv = data['produce_csv']
         self.produce_graphics = data['produce_graphics']
         self.display_graphics = data['display_graphics']
         self.report_name = data['report_name']

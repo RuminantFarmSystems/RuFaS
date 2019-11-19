@@ -139,11 +139,11 @@ class OutputHandler:
 
         for reportName in self.reports:
             report = self.reports[reportName]
-            if not report.active and report.produce_graphics:
+            if not report.produce_csv and report.produce_graphics:
                 print("Warning: Cannot produce graphics for inactive report:", report.report_name,
                       ". Setting produce_graphics to False")
                 report.produce_graphics = False
-            if report.active:
+            if report.produce_csv:
                 report.initialize(state)
 
     # ---------------------------------------------------------------------------
@@ -154,7 +154,7 @@ class OutputHandler:
 
         for reportName in self.reports:
             report = self.reports[reportName]
-            if report.active:
+            if report.produce_csv:
                 report.daily_update(state, weather, time)
 
     # ---------------------------------------------------------------------------
@@ -165,7 +165,7 @@ class OutputHandler:
 
         for reportName in self.reports:
             report = self.reports[reportName]
-            if report.active:
+            if report.produce_csv:
                 report.annual_update(state, weather, time)
 
     # ---------------------------------------------------------------------------
@@ -176,7 +176,7 @@ class OutputHandler:
 
         for reportName in self.reports:
             report = self.reports[reportName]
-            if report.active:
+            if report.produce_csv:
                 report.write_annual_report()
 
     # ---------------------------------------------------------------------------
@@ -187,7 +187,7 @@ class OutputHandler:
 
         for reportName in self.reports:
             report = self.reports[reportName]
-            if report.active:
+            if report.produce_csv:
                 report.annual_flush()
 
     # ---------------------------------------------------------------------------
