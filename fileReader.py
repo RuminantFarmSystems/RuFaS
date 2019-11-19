@@ -11,7 +11,7 @@ def convert_to_json(filename):
     Stripping inline comments is not supported, i.e. the comment must be contained within
     one line. See Inputs/test.txt for an example.
     """
-    file_base = filename.replace('.txt','')
+    file_base = filename.replace('.txt', '')
     json_filename = file_base + '.json'
     commented_file_reader = open(filename, 'r')
     json_file_writer = open(json_filename, 'w+')
@@ -24,5 +24,3 @@ def convert_to_json(filename):
     commented_file_reader.close()
     json_file_writer.close()
     return json_filename
-
-# convert_to_json('Inputs/test.txt')

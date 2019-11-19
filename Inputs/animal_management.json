@@ -37,6 +37,7 @@
                 "display_graphics": false,
                 "report_name": "Soil Nitrogen",
                 "file_name": "soil_nitrogen.csv"
+
             },
             "soil_phosphorus": {
                 "active": true,
