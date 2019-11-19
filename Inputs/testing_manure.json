@@ -8,7 +8,6 @@
     },
 
     "weather": "Inputs/crop_module_testWeather_3.4.csv",
-
     "output":
     {
         "pen_report":
