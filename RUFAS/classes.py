@@ -92,12 +92,14 @@ class Config:
 
         # gets a start/end date in the format year:julian-day. That way the program
         # can start in the middle of the year
-        self.start_date = data['StartDate'].split(':')
-        self.end_date = data['EndDate'].split(':')
+        self.start_date = data['start_date'].split(':')
+        self.end_date = data['end_date'].split(':')
         self.start_year = int(self.start_date[0])
         self.end_year = int(self.end_date[0])
         self.start_day = int(self.start_date[1])
         self.end_day = int(self.end_date[1])
+        
+        self.run_tests = data['run_tests']
 
         year_length = 365
         leap_year_length = 366

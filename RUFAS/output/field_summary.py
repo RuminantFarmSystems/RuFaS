@@ -11,7 +11,7 @@ class FieldSummary:
     def __init__(self, field_name, data):
 
         self.report_name = field_name
-        self.active = data['active']
+        self.produce_csv = data['produce_csv']
         self.produce_graphics = data['produce_graphics']
 
         self.field_reports = {'crop_summary': CropSummary(data['crop_summary'], field_name),
