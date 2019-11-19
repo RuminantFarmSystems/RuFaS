@@ -1,8 +1,8 @@
 {
     "config":
     {
-        "StartDate" : "2009:244",
-        "EndDate" : "2016:243",
+        "start_date" : "2009:244",
+        "end_date" : "2016:243",
         "output_dir": "Outputs/Sample_Farm_Outputs/",
         "diagnostic_dir": "Outputs/diagnostics/",
         "run_tests": true
@@ -14,12 +14,12 @@
     {
         "pen_report":
         {
-            "active": true,
+            "produce_csv": true,
             "produce_graphics": true,
 
             "ration_report":
             {
-                "active": true,
+                "produce_csv": true,
                 "produce_graphics": false,
                 "display_graphics": false,
                 "report_name": "Ration Report",
@@ -28,14 +28,14 @@
             },
             "manure_report":
             {
-        	    "active": true,
+        	    "produce_csv": true,
                 "produce_graphics": false,
                 "display_graphics": false,
         	    "report_name": "Manure Report",
         	    "file_name": "manure_report.csv"
             },
             "growth_report": {
-                "active": true,
+                "produce_csv": true,
                 "produce_graphics": false,
                 "display_graphics": false,
                 "report_name": "Growth Report",
@@ -44,7 +44,7 @@
         },
         "soil_summary":
         {
-            "active": true,
+            "produce_csv": true,
             "produce_graphics": false,
             "display_graphics": false,
             "report_name": "Soil Summary",
@@ -52,7 +52,7 @@
         },
         "soil_nitrogen":
         {
-            "active": true,
+            "produce_csv": true,
             "produce_graphics": false,
             "display_graphics": false,
             "report_name": "Soil Nitrogen",
@@ -60,7 +60,7 @@
         },
         "soil_phosphorus":
         {
-            "active": true,
+            "produce_csv": true,
             "produce_graphics": false,
             "display_graphics": false,
             "report_name": "Soil Phosphorus",
@@ -68,7 +68,7 @@
         },
         "crop_summary":
         {
-            "active": true,
+            "produce_csv": true,
             "produce_graphics": false,
             "display_graphics": false,
             "report_name": "Crop Summary",
@@ -76,7 +76,7 @@
         },
         "water_balance":
         {
-            "active": true,
+            "produce_csv": true,
             "produce_graphics": false,
             "display_graphics": false,
             "report_name": "Water Balance",
@@ -84,7 +84,7 @@
         },
         "custom_report":
         {
-            "active": true,
+            "produce_csv": true,
             "produce_graphics": false,
             "display_graphics": false,
             "report_name": "Custom Report",

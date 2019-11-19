@@ -10,10 +10,11 @@ Author(s): Militsa Sotirova
 from unittest import main
 from RUFAS.test.animal import test_lactating_cow
 
+
 def run_tests():
-    '''
+    """
     Calls the unit test functions for the animal routine.
-    '''
+    """
     print('Running animal tests...')
     main(module=test_lactating_cow, exit=False)
     print()
