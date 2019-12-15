@@ -282,12 +282,12 @@
 
             }
         },
-        
+
         "animal":
         {
             "herd_information":
             {
-            	"calf_num": 160, 
+            	"calf_num": 160,
             	"heiferI_num": 800,
             	"heiferII_num": 820,
             	"heiferIII_num": 50,
@@ -295,7 +295,7 @@
                 "replace_num": 5000,
                 "herd_num": 1000
             },
-            
+
             "animal_config":
             {
             	"num_21_days": 15,
@@ -373,21 +373,21 @@
 				"econ_indicator_range": 365,
 				"heifer_sell_price": 1400,
 				"heifer_buy_price": 1600,
-				"calf_price": 140	
+				"calf_price": 140
             },
-            
+
             "housing": "barn",
             "pasture_concentrate": -1,
-            
+
             "ration":
             {
                 "user_input": false,
                 "formulation_interval": 7
             },
-        
+
 	        "pen_information":
 	        {
-	        	"pen0":
+	        	"pen_calves":
 	        	{
 	        		"id": 0,
 	        		"vertical_dist_to_milking_parlor": 0.1,
@@ -397,8 +397,8 @@
 	        		"bedding_type": "sand",
 	        		"pen_type": "freestall"
 	        	},
-	        	
-	        	"pen1":
+
+	        	"pen_heiferI":
 	        	{
 	        		"id": 1,
 	        		"vertical_dist_to_milking_parlor": 0.1,
@@ -408,10 +408,43 @@
 	        		"bedding_type": "sawdust",
 	        		"pen_type": "freestall"
 	        	},
-	        	
-	        	"pen2":
+
+            "pen_heiferII":
 	        	{
 	        		"id": 2,
+	        		"vertical_dist_to_milking_parlor": 0.1,
+	        		"horizontal_dist_to_milking_parlor": 1.6,
+	        		"number_of_stalls": 100,
+	        		"housing_type": "open air barn",
+	        		"bedding_type": "sand",
+	        		"pen_type": "freestall"
+	        	},
+
+            "pen_heiferIII":
+	        	{
+	        		"id": 3,
+	        		"vertical_dist_to_milking_parlor": 0.1,
+	        		"horizontal_dist_to_milking_parlor": 1.6,
+	        		"number_of_stalls": 100,
+	        		"housing_type": "open air barn",
+	        		"bedding_type": "sand",
+	        		"pen_type": "freestall"
+	        	},
+
+            "pen_drycows":
+	        	{
+	        		"id": 4,
+	        		"vertical_dist_to_milking_parlor": 0.1,
+	        		"horizontal_dist_to_milking_parlor": 1.6,
+	        		"number_of_stalls": 100,
+	        		"housing_type": "open air barn",
+	        		"bedding_type": "sand",
+	        		"pen_type": "freestall"
+	        	},
+
+	        	"pen2":
+	        	{
+	        		"id": 5,
 	        		"vertical_dist_to_milking_parlor": 0.1,
 	        		"horizontal_dist_to_milking_parlor": 1.6,
 	        		"number_of_stalls": 300,
@@ -419,10 +452,10 @@
 	        		"bedding_type": "straw",
 	        		"pen_type": "tiestall"
 	        	},
-	        	
+
 	        	"pen3":
 	        	{
-	        		"id": 3,
+	        		"id": 6,
 	        		"vertical_dist_to_milking_parlor": 0.1,
 	        		"horizontal_dist_to_milking_parlor": 1.6,
 	        		"number_of_stalls": 400,
@@ -430,10 +463,10 @@
 	        		"bedding_type": "sand",
 	        		"pen_type": "tiestall"
 	        	},
-	        	
+
 	        	"pen4":
 	        	{
-	        		"id": 4,
+	        		"id": 7,
 	        		"vertical_dist_to_milking_parlor": 0.1,
 	        		"horizontal_dist_to_milking_parlor": 1.6,
 	        		"number_of_stalls": 400,
@@ -441,18 +474,128 @@
 	        		"bedding_type": "sand",
 	        		"pen_type": "tiestall"
 	        	},
-	        	
-	        	"pen5":
+
+	        	"pen6":
 	        	{
-	        		"id": 5,
-	        		"vertical_dist_to_milking_parlor": 0.1,
-	        		"horizontal_dist_to_milking_parlor": 1.6,
+	        		"id": 8,
+	        		"vertical_dist_to_milking_parlor": 0.2,
+	        		"horizontal_dist_to_milking_parlor": 1.0,
 	        		"number_of_stalls": 400,
 	        		"housing_type": "open air barn",
 	        		"bedding_type": "sand",
 	        		"pen_type": "tiestall"
-	        	}
-	        }            
+	        	},
+
+            "pen7":
+	        	{
+	        		"id": 9,
+	        		"vertical_dist_to_milking_parlor": 0.1,
+	        		"horizontal_dist_to_milking_parlor": 2.0,
+	        		"number_of_stalls": 100,
+	        		"housing_type": "open air barn",
+	        		"bedding_type": "straw",
+	        		"pen_type": "tiestall"
+	        	},
+
+            "pen8":
+	        	{
+	        		"id": 10,
+	        		"vertical_dist_to_milking_parlor": 0.1,
+	        		"horizontal_dist_to_milking_parlor": 1.6,
+	        		"number_of_stalls": 100,
+	        		"housing_type": "open air barn",
+	        		"bedding_type": "sand",
+	        		"pen_type": "freestall"
+	        	},
+
+            "pen9":
+	        	{
+	        		"id": 11,
+	        		"vertical_dist_to_milking_parlor": 0.1,
+	        		"horizontal_dist_to_milking_parlor": 1.6,
+	        		"number_of_stalls": 100,
+	        		"housing_type": "open air barn",
+	        		"bedding_type": "straw",
+	        		"pen_type": "freestall"
+	        	},
+
+            "pen22":
+           {
+             "id": 12,
+             "vertical_dist_to_milking_parlor": 0.1,
+             "horizontal_dist_to_milking_parlor": 1.6,
+             "number_of_stalls": 100,
+             "housing_type": "open air barn",
+             "bedding_type": "sand",
+             "pen_type": "tiestall"
+           },
+
+           "pen23":
+           {
+             "id": 13,
+             "vertical_dist_to_milking_parlor": 0.1,
+             "horizontal_dist_to_milking_parlor": 1.6,
+             "number_of_stalls": 100,
+             "housing_type": "open air barn",
+             "bedding_type": "sand",
+             "pen_type": "freestall"
+           },
+
+           "pen24":
+           {
+             "id": 14,
+             "vertical_dist_to_milking_parlor": 0.6,
+             "horizontal_dist_to_milking_parlor": 1.8,
+             "number_of_stalls": 100,
+             "housing_type": "open air barn",
+             "bedding_type": "straw",
+             "pen_type": "tiestall"
+           },
+
+           "pen25":
+           {
+             "id": 15,
+             "vertical_dist_to_milking_parlor": 0.5,
+             "horizontal_dist_to_milking_parlor": 1.6,
+             "number_of_stalls": 100,
+             "housing_type": "open air barn",
+             "bedding_type": "sand",
+             "pen_type": "freestall"
+           },
+
+           "pen26":
+           {
+             "id": 16,
+             "vertical_dist_to_milking_parlor": 0.5,
+             "horizontal_dist_to_milking_parlor": 1.6,
+             "number_of_stalls": 100,
+             "housing_type": "open air barn",
+             "bedding_type": "sand",
+             "pen_type": "freestall"
+           },
+
+           "pen27":
+           {
+             "id": 17,
+             "vertical_dist_to_milking_parlor": 0.3,
+             "horizontal_dist_to_milking_parlor": 1.4,
+             "number_of_stalls": 100,
+             "housing_type": "open air barn",
+             "bedding_type": "sand",
+             "pen_type": "freestall"
+           },
+
+           "pen28":
+           {
+             "id": 18,
+             "vertical_dist_to_milking_parlor": 0.1,
+             "horizontal_dist_to_milking_parlor": 1.2,
+             "number_of_stalls": 100,
+             "housing_type": "open air barn",
+             "bedding_type": "sand",
+             "pen_type": "freestall"
+           }
+	        }
         },
 
         "feed":
