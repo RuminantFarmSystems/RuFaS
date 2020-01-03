@@ -22,7 +22,7 @@ class ManureReport(BaseReportHandler):
 
     def __init__(self, data, pen_id):
 
-        # Sets active, report_name, f_name using data
+        # Sets produce_csv, report_name, f_name using data
         self.set_properties(data)
         self.file_name = 'pen_' + str(pen_id) + '/' + self.file_name
 
