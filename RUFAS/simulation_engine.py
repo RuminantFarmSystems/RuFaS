@@ -15,6 +15,7 @@ from pathlib import Path
 from RUFAS import routines, errors
 from RUFAS.classes import Config, State, Weather, Time
 from RUFAS.output import OutputHandler
+from RUFAS.test import test_handler
 
 
 # -------------------------------------------------------------------------------
@@ -87,11 +88,11 @@ def daily_simulation():
     # Daily Output Updates
     #
     output.daily_update(state, weather, time)
-    
+
     #print("simulating: " + time.to_str()) # Print out current day of simulation
     time.advance()
     #have to increment simulation_day here so that the daily output has the correct simulation day
-    state.animal_management.simulation_day += 1 
+    state.animal_management.simulation_day += 1
 
 
 # -------------------------------------------------------------------------------
@@ -152,6 +153,10 @@ def read_json_file(fPath:Path):
         # Instantiate objects using dictionary data from .json file
         try:
             config = Config(data['config'], data['weather'])
+
+            if config.run_tests:
+                test_handler.run_tests()
+        
             weather = Weather(data['weather'], config.years, config.w_start_year,
                               config.w_start_day, config.start_year, config.start_day)
             time = Time(config.years, config.start_year)
