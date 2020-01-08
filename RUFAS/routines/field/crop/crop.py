@@ -30,10 +30,6 @@ This module needs the following inputs in order to operate correctly:
         soil_layers
 
         And the following attributes of a soil layer:
-<<<<<<< HEAD
-            bottom_depth
-            Eo_sum = Sum of the Eo values leading up to today
-=======
             bottomDepth
             ET_annual = Sum of the ET_act values leading up to today
             trans_max
