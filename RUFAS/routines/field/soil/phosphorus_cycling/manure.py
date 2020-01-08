@@ -23,7 +23,9 @@ def update_all(S, time):
     mass = m_app.mass
 
     for i in range(0, len(m_app.day)):
-        if m_app.day[i] == day and m_app.year[i] - S.start_year + 1 == year:
+        if (m_app.day[i] == day and m_app.year[i] - S.start_year + 1 == year) \
+                or (m_app.year[i] - S.start_year + 1 == year and m_app.day[i] == -1
+                    and S.manure_day is True):
 
             S.manure_type = m_app.type[i]
 

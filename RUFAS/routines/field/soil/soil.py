@@ -193,6 +193,10 @@ def daily_soil_routine(soil, crop, weather, time):
 
 def annual_variable_update(soil):
 
+    soil.manure_day = False
+    soil.fertilizer_day = False
+    soil.tillage_day = False
+
     soil.ET_max_annual += soil.ET_max
 
     soil.drainage_annual += soil.drainage
@@ -233,6 +237,7 @@ def application_years(app_data, time, application):
 
     app_years.sort()
     return app_years
+
 
 # -------------------------------------------------------------------------------
 # Class: Soil
@@ -303,11 +308,11 @@ class Soil:
         self.thickness_cm = []
         self.CNT_day_layer = []
         self.soil_mass = []
-        self.soil_mass.append([0 for _ in range(0, self.num_soil_layers + 1)])
 
         x = 0
         for layer in self.soil_layers:
             self.thickness_cm.append(layer.thickness / 10)
+            self.soil_mass.append(0)
 
             # TODO org_C is an input
             # layer.org_C = layer.OM_percent * 0.58
@@ -329,6 +334,9 @@ class Soil:
             x += 1
 
         # default values
+        self.manure_day = False
+        self.fertilizer_day = False
+        self.tillage_day = False
         self.days = [0, 0, 0]
         self.moisture = 0.5
         self.CNT = 1
@@ -688,8 +696,8 @@ class Soil:
             for app_year in default_years:
                 # TODO: need default values
                 self.year.append(app_year)
-                self.day.append(50)
-                self.mass.append(5)
+                self.day.append(-1)
+                self.mass.append(100)
                 self.depth.append(0)
                 self.surface_percent.append(1)
 
@@ -729,7 +737,7 @@ class Soil:
                 # TODO: need default values
                 self.type.append("DAIRY")
                 self.year.append(app_year)
-                self.day.append(50)
+                self.day.append(-1)
                 self.mass.append(1500)
                 self.P_frac.append(0.007)
                 self.N_frac.append(0)
@@ -768,10 +776,11 @@ class Soil:
             for app_year in default_years:
                 # TODO: need default values
                 self.year.append(app_year)
-                self.day.append(50)
+                self.day.append(-1)
                 self.percent_incorporated.append(0)
                 self.percent_mixed.append(0)
-                self.depth.append(0)
+                # in cm
+                self.depth.append(25)
 
     # ---------------------------------------------------------------------------
     # Class: CropPUptake
@@ -854,8 +863,8 @@ class Soil:
         self.delta_SW_annual = self.profile_SW - self.initial_annual_SW
 
         self.p_calc_annual = self.delta_SW_annual \
-            + self.runoff_annual + self.evap_annual + self.trans_annual \
-            + self.drainage_annual
+                             + self.runoff_annual + self.evap_annual + self.trans_annual \
+                             + self.drainage_annual
 
         self.annual_water_balance_difference = self.p_act_annual - self.p_calc_annual
 

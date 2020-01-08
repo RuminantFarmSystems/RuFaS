@@ -5,6 +5,8 @@ File name: fertilizer.py
 Author(s): Jacob Johnson, jacob8399@gmail.com,
            William Donovan, wmdonovan@wisc.edu
 """
+
+
 ################################################################################
 
 # calculates P added in fertilizer, adds fertilizer P to surface pool,
@@ -15,13 +17,14 @@ Author(s): Jacob Johnson, jacob8399@gmail.com,
 
 
 def update_all(S, time):
-
     day = time.day
     year = time.year
     fert_app = S.fertilizer
 
     for i in range(len(fert_app.day)):
-        if fert_app.day[i] == day and fert_app.year[i] - S.start_year + 1 == year:
+        if (fert_app.day[i] == day and fert_app.year[i] - S.start_year + 1 == year) \
+                or (fert_app.year[i] - S.start_year + 1 == year and fert_app.day[i] == -1
+                    and S.fertilizer_day is True):
             S.fert_applied_sum += fert_app.mass[i]  # fertpkg
             S.no_rains = 0
             S.fert_CNT = 1.0
@@ -50,12 +53,12 @@ def update_all(S, time):
                 for k in range(0, no):
                     S.fact = S.soil_layers[k].bottom_depth_cm / fert_app.depth[i]
                     S.soil_layers[k].labile_P += (fert_app.mass[i] * S.fact
-                                            * (1.0 - fert_app.surface_percent[i]))
+                                                  * (1.0 - fert_app.surface_percent[i]))
                     sum_fac += S.fact
 
                 S.fact = 1.0 - sum_fac
                 S.soil_layers[no].labile_P += (fert_app.mass[i] * S.fact
-                                         * (1.0 - fert_app.surface_percent[i]))
+                                               * (1.0 - fert_app.surface_percent[i]))
 
                 for w in range(0, 3):
                     S.soil_layers[w].labile_P /= S.area

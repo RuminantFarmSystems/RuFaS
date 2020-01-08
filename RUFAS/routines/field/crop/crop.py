@@ -69,10 +69,9 @@ def daily_crop_routine(crop, weather, time, soil):
         crop_type.yield_actual = 0
         crop_type.yield_N = 0
         crop_type.yield_P = 0
-
         # If the crop is not planted yet, determine whether it is planted today
         if not crop_type.planted:
-            calculate_start(crop, weather, time)
+            calculate_start(crop, soil, weather, time)
 
         # Once the crop is planted:
         else:
@@ -117,6 +116,10 @@ def daily_crop_routine(crop, weather, time, soil):
                     dormancy_routine(crop_type, time, soil)
                     crop_type.growing = False
                 elif not in_dormancy(crop, time):
+                    if crop_type.growing is False:
+                        soil.manure_day = True
+                        soil.fertilizer_day = True
+
                     crop_type.growing = True
 
         annual_variable_update(crop_type)
@@ -872,19 +875,23 @@ class Alfalfa:
 # Method: calculate_start_growth_day
 # "pseudocode_crop" section C.1.A
 # -----------------------------------------------------------------------
-def calculate_start(crop, weather, time):
+def calculate_start(crop, soil, weather, time):
     crop_type = crop.current_crop
     yearly_T_avg = weather.T_avg[time.year - 1]
     if crop_type.crop_type == 'annual':
         if time.day == crop_type.planting_date:
             crop_type.planted = True
             crop_type.growing = True
+            soil.manure_day = True
+            soil.fertilizer_day = True
     else:
         if time.year == 1 and time.day > crop_type.planting_date:
             pass
         elif not in_dormancy(crop, time) and yearly_T_avg[time.day - 1] > crop_type.T_base_min:
             crop_type.planted = True
             crop_type.growing = True
+            soil.manure_day = True
+            soil.fertilizer_day = True
 
     crop.current_crop = crop_type
 

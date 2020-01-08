@@ -132,7 +132,7 @@ def calc_residue(crop_type, time, soil):
     d_residue = 0
     if time.day == crop_type.kill_day or crop_type.crop_type == 'annual':
         d_residue = crop_type.biomass_actual - crop_type.yield_actual
-        kill(crop_type)
+        kill(crop_type, soil)
     else:
         bio_frac = crop_type.yield_actual / crop_type.biomass_actual
         cut(crop_type, bio_frac)
@@ -143,7 +143,10 @@ def calc_residue(crop_type, time, soil):
 # Kills the crop
 # "pseudocode_crop" C.10.G.4
 #
-def kill(crop_type):
+def kill(crop_type, soil):
+
+    soil.tillage_day = True
+
     crop_type.accumulated_HU = 0
     crop_type.prev_accumulated_HU = 0
 
