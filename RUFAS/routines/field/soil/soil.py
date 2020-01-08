@@ -777,8 +777,8 @@ class Soil:
                 # TODO: need default values
                 self.year.append(app_year)
                 self.day.append(-1)
-                self.percent_incorporated.append(0)
-                self.percent_mixed.append(0)
+                self.percent_incorporated.append(.5)
+                self.percent_mixed.append(.5)
                 # in cm
                 self.depth.append(25)
 

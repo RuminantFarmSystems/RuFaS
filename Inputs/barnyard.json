@@ -111,7 +111,7 @@
             "field_1":
             {
                 "soil": "barnyard_soil.json",
-                "crop": "alfalfa_rotation.json",
+                "crop": "corn_rotation.json",
                 "applications": "barnyard_applications.json"
             }
         },
