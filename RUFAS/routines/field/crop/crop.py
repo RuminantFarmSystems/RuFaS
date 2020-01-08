@@ -36,7 +36,6 @@ This module needs the following inputs in order to operate correctly:
 =======
             bottomDepth
             ET_annual = Sum of the ET_act values leading up to today
->>>>>>> 6fcf95fbfeb3b863d6d835b33b197566dbbbdea8
             trans_max
             NO3
             labile_P

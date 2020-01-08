@@ -113,12 +113,6 @@
                 "soil": "barnyard_soil.json",
                 "crop": "alfalfa_rotation.json",
                 "applications": "barnyard_applications.json"
-            },
-            "field_2":
-            {
-                "soil": "barnyard_soil.json",
-                "crop": "no_crop.json",
-                "applications": "barnyard_applications.json"
             }
         },
         "animal": "barnyard_animal.json",

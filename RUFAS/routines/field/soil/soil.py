@@ -204,6 +204,36 @@ def annual_variable_update(soil):
     soil.p_act_annual += soil.p_act
 
 
+# ---------------------------------------------------------------------------
+# Function: app_years
+# Determines for what years each application is being applied
+# ---------------------------------------------------------------------------
+def application_years(app_data, time, application):
+    years = app_data['app_years']
+    repeat = app_data['repeat']
+    app_years = []
+
+    # if years is not empty
+    if len(years) != 0:
+        for year in years:
+            if year - time.start_year >= len(time.years) or year - time.start_year < 0:
+                print('\nCannot apply', application, 'in year', year,
+                      'because', year, '\nis outside of the scope of the simulation.')
+            else:
+                if year not in app_years:
+                    app_years.append(year)
+                    if repeat != 0:
+                        temp_year = year + repeat
+                        while temp_year - time.start_year < len(time.years):
+                            if temp_year not in app_years:
+                                app_years.append(temp_year)
+                            else:
+                                print("works")
+                            temp_year += repeat
+
+    app_years.sort()
+    return app_years
+
 # -------------------------------------------------------------------------------
 # Class: Soil
 #        Contains the state of the farm's soil
@@ -228,9 +258,9 @@ class Soil:
 
         self.start_year = time.start_year
 
-        self.manure = Soil.Manure(application_data['ManureApplication'])
-        self.fertilizer = Soil.Fertilizer(application_data['FertilizerApplication'])
-        self.tillage = Soil.Tillage(application_data['TillageApplication'])
+        self.manure = Soil.Manure(application_data['manure_application'], time)
+        self.fertilizer = Soil.Fertilizer(application_data['fertilizer_application'], time)
+        self.tillage = Soil.Tillage(application_data['tillage_application'], time)
 
         self.profileBulkDensity = data['ProfileBulkDensity']
         self.CN2 = data['CN2']  # unitless, user-defined curve number (empirical)
@@ -272,6 +302,8 @@ class Soil:
         self.num_soil_layers = 3
         self.thickness_cm = []
         self.CNT_day_layer = []
+        self.soil_mass = []
+        self.soil_mass.append([0 for _ in range(0, self.num_soil_layers + 1)])
 
         x = 0
         for layer in self.soil_layers:
@@ -639,17 +671,27 @@ class Soil:
         of its application
         """
 
-        def __init__(self, fert_data):
+        def __init__(self, fert_data, time):
             """
             Args:
                 fert_data: a dictionary which holds the rest of the information about
                     this fertilizer
             """
+            default_years = application_years(fert_data, time, "fertilizer")
+
             self.year = fert_data['year']
             self.day = fert_data['day']
             self.mass = fert_data['mass']
             self.depth = [x / 10 for x in fert_data['depth']]
             self.surface_percent = fert_data['surf_perc']
+
+            for app_year in default_years:
+                # TODO: need default values
+                self.year.append(app_year)
+                self.day.append(50)
+                self.mass.append(5)
+                self.depth.append(0)
+                self.surface_percent.append(1)
 
     # ---------------------------------------------------------------------------
     # Class: Manure
@@ -662,11 +704,13 @@ class Soil:
         of its application
         """
 
-        def __init__(self, manure_data):
+        def __init__(self, manure_data, time):
             """
             Args:
                 manure_data: a dictionary which stores the information for this manure
             """
+            default_years = application_years(manure_data, time, "manure")
+
             self.type = manure_data['type']
             self.year = manure_data['year']
             self.day = manure_data['day']
@@ -681,6 +725,22 @@ class Soil:
             self.depth = [x / 10 for x in manure_data['depth']]
             self.surface_percent = manure_data['surf_perc']
 
+            for app_year in default_years:
+                # TODO: need default values
+                self.type.append("DAIRY")
+                self.year.append(app_year)
+                self.day.append(50)
+                self.mass.append(1500)
+                self.P_frac.append(0.007)
+                self.N_frac.append(0)
+                self.NH4_frac.append(0)
+                self.WIP_frac.append(0.6)
+                self.WOP_frac.append(0.05)
+                self.dry_matter.append(0.05)
+                self.percent_cover.append(0.95)
+                self.depth.append(0)
+                self.surface_percent.append(1)
+
     # ---------------------------------------------------------------------------
     # Class: Tillage
     # An instance of this class represents a particular tillage and the date
@@ -692,16 +752,26 @@ class Soil:
         of its application
         """
 
-        def __init__(self, tillage_data):
+        def __init__(self, tillage_data, time):
             """
             Args:
                 tillage_data: a dictionary which stores the information for this tillage
             """
+            default_years = application_years(tillage_data, time, "tillage")
+
             self.year = tillage_data['year']
             self.day = tillage_data['day']
             self.percent_incorporated = tillage_data['perc_incorporated']
             self.percent_mixed = tillage_data['perc_mixed']
             self.depth = [x / 10 for x in tillage_data['depth']]
+
+            for app_year in default_years:
+                # TODO: need default values
+                self.year.append(app_year)
+                self.day.append(50)
+                self.percent_incorporated.append(0)
+                self.percent_mixed.append(0)
+                self.depth.append(0)
 
     # ---------------------------------------------------------------------------
     # Class: CropPUptake

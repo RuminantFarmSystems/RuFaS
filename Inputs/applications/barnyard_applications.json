@@ -1,14 +1,20 @@
 {
-    "FertilizerApplication":
+    "fertilizer_application":
     {
-        "year": [0],
-        "day": [0],
-        "mass": [0.0],
-        "depth": [0.0],
-        "surf_perc": [0.0]
+        "app_years": [2009],
+        "repeat": 1,
+
+        "year": [],
+        "day": [],
+        "mass": [],
+        "depth": [],
+        "surf_perc": []
     },
-    "ManureApplication":
+    "manure_application":
     {
+        "app_years": [2009],
+        "repeat": 1,
+
         "type": ["DAIRY", "DAIRY", "DAIRY", "DAIRY", "DAIRY", "DAIRY", "DAIRY", "DAIRY"],
         "year": [2012, 2012, 2012, 2012, 2013, 2013, 2013, 2013],
         "day": [103 ,176, 226, 283, 46, 155, 241, 273],
@@ -24,16 +30,19 @@
         "surf_perc": [1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0]
     },
 
-    "TillageApplication":
+    "tillage_application":
     {
-        "year": [0],
-        "day": [0],
-        "perc_incorporated": [0.0],
-        "perc_mixed": [0.0],
-        "depth": [0.0]
+        "app_years": [2009],
+        "repeat": 1,
+
+        "year": [],
+        "day": [],
+        "perc_incorporated": [],
+        "perc_mixed": [],
+        "depth": []
     },
 
-    "CropPUptake":
+    "crop_P_uptake":
     {
         "Uptake1":
         {
