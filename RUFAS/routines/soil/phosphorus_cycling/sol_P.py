@@ -1,3 +1,11 @@
+################################################################################
+"""
+SurPhos
+File name: sol_P.py
+Author(s): Jacob Johnson, jacob8399@gmail.com,
+           William Donovan, wmdonovan@wisc.edu
+"""
+################################################################################
 
 # calculates the amount of phosphorus lost from the soil
 # profile in runoff
