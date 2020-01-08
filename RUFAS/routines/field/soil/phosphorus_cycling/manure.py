@@ -183,7 +183,7 @@ def update_all(S, time):
                      / (S.manure_mass + cow_mass_app)
 
         S.manure_mass += cow_mass_app
-        S.manure_cov += cow_mass_app / 0.25 * 659.0 / 100 ** 4
+        S.manure_cov += cow_mass_app / (0.25 * 659.0) / 100 ** 4
 
         cow_P_app = S.lactating_cows[year][day - 1] * 8.9 * 0.0088 + S.heifer[year][day - 1] * 3.7 \
                     * 0.0054 + S.dry_cow[year][day - 1] * 4.9 * 0.0061 \

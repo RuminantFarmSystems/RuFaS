@@ -5,8 +5,6 @@ File name: erosion.py
 Author(s): Jacob Johnson, jacob8399@gmail.com,
            William Donovan, wmdonovan@wisc.edu
 """
-
-
 ################################################################################
 
 
