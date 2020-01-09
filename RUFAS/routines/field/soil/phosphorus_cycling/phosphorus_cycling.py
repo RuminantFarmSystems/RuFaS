@@ -22,11 +22,11 @@ from . import fert_leach, fertilizer, manure, manure_leach, p_mineralization,\
 
 def update_all(soil, weather, time):
 
-    fertilizer.update_all(soil, time)
+    fertilizer.update_all(soil, weather, time)
 
-    manure.update_all(soil, time)
+    manure.update_all(soil, weather, time)
 
-    plow.update_all(soil, time)
+    plow.update_all(soil, weather, time)
 
     sol_P.update_all(soil, weather, time)
 

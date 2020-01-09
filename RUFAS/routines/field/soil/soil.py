@@ -191,6 +191,10 @@ def daily_soil_routine(soil, crop, weather, time):
     annual_variable_update(soil)
 
 
+# ---------------------------------------------------------------------------
+# Function: annual_variable_update
+# Updates the annual variables every day
+# ---------------------------------------------------------------------------
 def annual_variable_update(soil):
 
     soil.manure_day = False
@@ -209,7 +213,7 @@ def annual_variable_update(soil):
 
 
 # ---------------------------------------------------------------------------
-# Function: app_years
+# Function: application_years
 # Determines for what years each application is being applied
 # ---------------------------------------------------------------------------
 def application_years(app_data, time, application):
@@ -231,8 +235,6 @@ def application_years(app_data, time, application):
                         while temp_year - time.start_year < len(time.years):
                             if temp_year not in app_years:
                                 app_years.append(temp_year)
-                            else:
-                                print("works")
                             temp_year += repeat
 
     app_years.sort()
@@ -266,6 +268,7 @@ class Soil:
         self.manure = Soil.Manure(application_data['manure_application'], time)
         self.fertilizer = Soil.Fertilizer(application_data['fertilizer_application'], time)
         self.tillage = Soil.Tillage(application_data['tillage_application'], time)
+        self.application_type = str(application_data['application_type']).lower()
 
         self.profileBulkDensity = data['ProfileBulkDensity']
         self.CN2 = data['CN2']  # unitless, user-defined curve number (empirical)

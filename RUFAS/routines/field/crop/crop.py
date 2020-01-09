@@ -44,6 +44,7 @@ This module needs the following inputs in order to operate correctly:
 from math import acos, asin, sin, tan, pi
 from . import heat_units, leaf_area_index, root_development, biomass, yields, \
     phosphorus_uptake, nitrogen_uptake, growth_constraints
+from ..soil.phosphorus_cycling import application_management
 
 
 # -------------------------------------------------------------------------------
@@ -95,9 +96,9 @@ def daily_crop_routine(crop, weather, time, soil):
                         yields.update_all(crop_type, time, soil)
 
                 elif crop_type.harvest_type == 'optimal':
-                    if crop_type.fr_PHU >= crop_type.fr_PHU_harvest:
+                    if crop_type.fr_PHU >= crop_type.fr_PHU_harvest \
+                            or (crop_type.fr_PHU <= crop_type.prev_fr_PHU and time.day > crop_type.harvest_date):
                         yields.update_all(crop_type, time, soil)
-
                 else:
                     print('"' + crop_type.harvest_type + '"', 'is not a recognized harvest type.'
                                                               ' Harvesting on optimal date.')
@@ -872,22 +873,47 @@ class Alfalfa:
 # "pseudocode_crop" section C.1.A
 # -----------------------------------------------------------------------
 def calculate_start(crop, soil, weather, time):
+
     crop_type = crop.current_crop
     yearly_T_avg = weather.T_avg[time.year - 1]
-    if crop_type.crop_type == 'annual':
-        if time.day == crop_type.planting_date:
-            crop_type.planted = True
-            crop_type.growing = True
-            soil.manure_day = True
-            soil.fertilizer_day = True
+    # if application type is optimal
+    if soil.application_type == 'optimal':
+        if crop_type.crop_type == 'annual':
+            if time.day == crop_type.planting_date:
+                if not application_management.check_conditions(time, weather, soil, 0, -1):
+                    crop_type.planted = True
+                    crop_type.growing = True
+                    soil.manure_day = True
+                    soil.fertilizer_day = True
+                else:
+                    crop_type.planting_date = time.day + 1
+        else:
+            if time.year == 1 and time.day > crop_type.planting_date:
+                pass
+            elif not in_dormancy(crop, time) and yearly_T_avg[time.day - 1] > crop_type.T_base_min:
+                if not application_management.check_conditions(time, weather, soil, 0, -1):
+                    crop_type.planted = True
+                    crop_type.growing = True
+                    soil.manure_day = True
+                    soil.fertilizer_day = True
+                else:
+                    crop_type.planting_date = time.day + 1
+
+    # if application type is scheduled
+    elif soil.application_type == 'scheduled':
+        if crop_type.crop_type == 'annual':
+            if time.day == crop_type.planting_date:
+                crop_type.planted = True
+                crop_type.growing = True
+        else:
+            if time.year == 1 and time.day > crop_type.planting_date:
+                pass
+            elif not in_dormancy(crop, time) and yearly_T_avg[time.day - 1] > crop_type.T_base_min:
+                crop_type.planted = True
+                crop_type.growing = True
     else:
-        if time.year == 1 and time.day > crop_type.planting_date:
-            pass
-        elif not in_dormancy(crop, time) and yearly_T_avg[time.day - 1] > crop_type.T_base_min:
-            crop_type.planted = True
-            crop_type.growing = True
-            soil.manure_day = True
-            soil.fertilizer_day = True
+        print(soil.application_type, "is not a valid application type, setting type to optimal.")
+        soil.application_type = 'optimal'
 
     crop.current_crop = crop_type
 

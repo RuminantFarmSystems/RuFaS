@@ -1,4 +1,6 @@
 {
+    "application_type": "optimal",
+
     "fertilizer_application":
     {
         "app_years": [2009],
@@ -10,6 +12,7 @@
         "depth": [],
         "surf_perc": []
     },
+
     "manure_application":
     {
         "app_years": [2009],

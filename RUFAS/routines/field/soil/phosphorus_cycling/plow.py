@@ -10,8 +10,10 @@ Author(s): Jacob Johnson, jacob8399@gmail.com,
 # conducts tillage operations and mixes any manure or fertilizer on
 # the surface into the soil and mixes the soil itself
 
+from. import application_management
 
-def update_all(S, time):
+
+def update_all(S, weather, time):
 
     day = time.day
     year = time.year
@@ -25,50 +27,54 @@ def update_all(S, time):
                 S.soil_layers[w].active_P *= S.area
                 S.soil_layers[w].labile_P *= S.area
 
-            # incorporate surface manure and fertilizer
+            till_app.day[i] = time.day
 
-            S.soil_layers[0].labile_P += till_app.percent_incorporated[i] * (S.fert_P_available
-                                                                                  + S.fert_P_released)
+            if not application_management.check_conditions(time, weather, S, i, 't'):
 
-            S.fert_P_available = S.fert_P_available - (S.fert_P_available * till_app.percent_incorporated[i])
-            S.fert_P_released = S.fert_P_released - (S.fert_P_released * till_app.percent_incorporated[i])
+                # incorporate surface manure and fertilizer
 
-            S.soil_layers[0].labile_P += till_app.percent_incorporated[i] * S.WIP
-            S.soil_layers[0].active_P += till_app.percent_incorporated[i] * S.SIP
+                S.soil_layers[0].labile_P += till_app.percent_incorporated[i] * (S.fert_P_available
+                                                                                      + S.fert_P_released)
 
-            S.WIP -= S.WIP * till_app.percent_incorporated[i]
-            S.WOP -= S.WOP * till_app.percent_incorporated[i]
-            S.SIP -= S.SIP * till_app.percent_incorporated[i]
-            S.SOP -= S.SOP * till_app.percent_incorporated[i]
-            S.manure_mass -= S.manure_mass * till_app.percent_incorporated[i]
+                S.fert_P_available = S.fert_P_available - (S.fert_P_available * till_app.percent_incorporated[i])
+                S.fert_P_released = S.fert_P_released - (S.fert_P_released * till_app.percent_incorporated[i])
 
-            for w in range(0, 3):
-                S.soil_layers[w].active_P /= S.area
-                S.soil_layers[w].labile_P /= S.area
+                S.soil_layers[0].labile_P += till_app.percent_incorporated[i] * S.WIP
+                S.soil_layers[0].active_P += till_app.percent_incorporated[i] * S.SIP
 
-            # mix soil
+                S.WIP -= S.WIP * till_app.percent_incorporated[i]
+                S.WOP -= S.WOP * till_app.percent_incorporated[i]
+                S.SIP -= S.SIP * till_app.percent_incorporated[i]
+                S.SOP -= S.SOP * till_app.percent_incorporated[i]
+                S.manure_mass -= S.manure_mass * till_app.percent_incorporated[i]
 
-            NLS = 0
-            for k in range(0, 3):
-                if not till_app.depth[i] > S.soil_layers[k].bottom_depth_cm:
-                    NLS = k
-                    break
+                for w in range(0, 3):
+                    S.soil_layers[w].active_P /= S.area
+                    S.soil_layers[w].labile_P /= S.area
 
-            till_soil = 0.0
-            till_act_P = 0.0
-            till_lab_P = 0.0
+                # mix soil
 
-            for j in range(0, NLS + 1):
-                S.soil_mass[j] = S.soil_layers[j].bulk_density * S.thickness_cm[j] * 100000.0
-                till_soil += S.soil_mass[j]
-                till_lab_P += S.soil_layers[j].labile_P
-                till_act_P += S.soil_layers[j].active_P
+                NLS = 0
+                for k in range(0, 3):
+                    if not till_app.depth[i] > S.soil_layers[k].bottom_depth_cm:
+                        NLS = k
+                        break
 
-            for j in range(0, NLS + 1):
-                ratio = S.soil_mass[j] / till_soil
-                S.soil_layers[j].labile_P = (1.0 - till_app.percent_mixed[i]) \
-                                      * S.soil_layers[j].labile_P + till_lab_P \
-                                      * ratio * till_app.percent_mixed[i]
-                S.soil_layers[j].active_P = (1.0 - till_app.percent_mixed[i]) \
-                                      * S.soil_layers[j].active_P + till_act_P \
-                                      * ratio * till_app.percent_mixed[i]
+                till_soil = 0.0
+                till_act_P = 0.0
+                till_lab_P = 0.0
+
+                for j in range(0, NLS + 1):
+                    S.soil_mass[j] = S.soil_layers[j].bulk_density * S.thickness_cm[j] * 100000.0
+                    till_soil += S.soil_mass[j]
+                    till_lab_P += S.soil_layers[j].labile_P
+                    till_act_P += S.soil_layers[j].active_P
+
+                for j in range(0, NLS + 1):
+                    ratio = S.soil_mass[j] / till_soil
+                    S.soil_layers[j].labile_P = (1.0 - till_app.percent_mixed[i]) \
+                                          * S.soil_layers[j].labile_P + till_lab_P \
+                                          * ratio * till_app.percent_mixed[i]
+                    S.soil_layers[j].active_P = (1.0 - till_app.percent_mixed[i]) \
+                                          * S.soil_layers[j].active_P + till_act_P \
+                                          * ratio * till_app.percent_mixed[i]
