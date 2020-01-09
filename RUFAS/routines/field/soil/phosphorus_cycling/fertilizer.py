@@ -5,8 +5,6 @@ File name: fertilizer.py
 Author(s): Jacob Johnson, jacob8399@gmail.com,
            William Donovan, wmdonovan@wisc.edu
 """
-
-
 ################################################################################
 
 # calculates P added in fertilizer, adds fertilizer P to surface pool,
@@ -15,8 +13,10 @@ Author(s): Jacob Johnson, jacob8399@gmail.com,
 # calculates TP, WIP, and WOP added in manure, adds to surface manure
 # pools. All units are KG or HA
 
+from . import application_management
 
-def update_all(S, time):
+
+def update_all(S, weather, time):
     day = time.day
     year = time.year
     fert_app = S.fertilizer
@@ -25,41 +25,46 @@ def update_all(S, time):
         if (fert_app.day[i] == day and fert_app.year[i] - S.start_year + 1 == year) \
                 or (fert_app.year[i] - S.start_year + 1 == year and fert_app.day[i] == -1
                     and S.fertilizer_day is True):
-            S.fert_applied_sum += fert_app.mass[i]  # fertpkg
-            S.no_rains = 0
-            S.fert_CNT = 1.0
 
-            if fert_app.depth[i] == 0.0:
-                S.fert_P_available += fert_app.mass[i] * 0.75
-                fert_PST = S.fert_P_available  # TODO fert_PST is frtpst and unused
-                S.fert_P_released += fert_app.mass[i] * 0.25
+            fert_app.day[i] = time.day
 
-            else:
-                S.fert_P_available += fert_app.mass[i] * 0.75 * fert_app.surface_percent[i]
-                fert_PST = S.fert_P_available
-                S.fert_P_released += fert_app.mass[i] * 0.25 * fert_app.surface_percent[i]
+            if not application_management.check_conditions(time, weather, S, i, 'f'):
 
-                no = 0
-                for n in range(0, 3):
-                    if S.soil_layers[n].bottom_depth_cm >= fert_app.depth[i]:
-                        break
-                    no += 1
+                S.fert_applied_sum += fert_app.mass[i]  # fertpkg
+                S.no_rains = 0
+                S.fert_CNT = 1.0
 
-                sum_fac = 0.0
+                if fert_app.depth[i] == 0.0:
+                    S.fert_P_available += fert_app.mass[i] * 0.75
+                    fert_PST = S.fert_P_available  # TODO fert_PST is frtpst and unused
+                    S.fert_P_released += fert_app.mass[i] * 0.25
 
-                for w in range(0, 3):
-                    S.soil_layers[w].labile_P *= S.area
+                else:
+                    S.fert_P_available += fert_app.mass[i] * 0.75 * fert_app.surface_percent[i]
+                    fert_PST = S.fert_P_available
+                    S.fert_P_released += fert_app.mass[i] * 0.25 * fert_app.surface_percent[i]
 
-                for k in range(0, no):
-                    S.fact = S.soil_layers[k].bottom_depth_cm / fert_app.depth[i]
-                    S.soil_layers[k].labile_P += (fert_app.mass[i] * S.fact
-                                                  * (1.0 - fert_app.surface_percent[i]))
-                    sum_fac += S.fact
+                    no = 0
+                    for n in range(0, 3):
+                        if S.soil_layers[n].bottom_depth_cm >= fert_app.depth[i]:
+                            break
+                        no += 1
 
-                S.fact = 1.0 - sum_fac
-                S.soil_layers[no].labile_P += (fert_app.mass[i] * S.fact
-                                               * (1.0 - fert_app.surface_percent[i]))
+                    sum_fac = 0.0
 
-                for w in range(0, 3):
-                    S.soil_layers[w].labile_P /= S.area
+                    for w in range(0, 3):
+                        S.soil_layers[w].labile_P *= S.area
+
+                    for k in range(0, no):
+                        S.fact = S.soil_layers[k].bottom_depth_cm / fert_app.depth[i]
+                        S.soil_layers[k].labile_P += (fert_app.mass[i] * S.fact
+                                                      * (1.0 - fert_app.surface_percent[i]))
+                        sum_fac += S.fact
+
+                    S.fact = 1.0 - sum_fac
+                    S.soil_layers[no].labile_P += (fert_app.mass[i] * S.fact
+                                                   * (1.0 - fert_app.surface_percent[i]))
+
+                    for w in range(0, 3):
+                        S.soil_layers[w].labile_P /= S.area
 

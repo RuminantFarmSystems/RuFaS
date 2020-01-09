@@ -14,8 +14,10 @@ Author(s): Jacob Johnson, jacob8399@gmail.com,
 # calculates TP, WIP, and WOP added in the manure, adds P to surface manure
 # pools. All units are KG or HA
 
+from . import application_management
 
-def update_all(S, time):
+
+def update_all(S, weather, time):
 
     day = time.day
     year = time.year
@@ -27,151 +29,156 @@ def update_all(S, time):
                 or (m_app.year[i] - S.start_year + 1 == year and m_app.day[i] == -1
                     and S.manure_day is True):
 
-            S.manure_type = m_app.type[i]
+            m_app.day[i] = time.day
 
-            cover_app = m_app.percent_cover[i] * S.area
-            P_app = mass[i] * m_app.P_frac[i]
-            N_app = mass[i] * m_app.N_frac[i]
-            S.manure_sum += mass[i]
-            S.manure_P_sum += P_app
-            S.manure_N_sum += N_app
+            # if the conditions are good enough to apply manure
+            if not application_management.check_conditions(time, weather, S, i, 'm'):
 
-            S.moisture = (S.moisture * S.manure_mass + (1.0 - m_app.dry_matter[i]) * mass[i]) \
-                         / (S.manure_mass + mass[i])
-            wet_rate = mass[i] / m_app.dry_matter[i] / cover_app
-            infiltration = min(0.9, 0.000002 * wet_rate + 0.267)
+                S.manure_type = m_app.type[i]
 
-            for w in range(0, 3):
-                S.soil_layers[w].active_P *= S.area
-                S.soil_layers[w].labile_P *= S.area
+                cover_app = m_app.percent_cover[i] * S.area
+                P_app = mass[i] * m_app.P_frac[i]
+                N_app = mass[i] * m_app.N_frac[i]
+                S.manure_sum += mass[i]
+                S.manure_P_sum += P_app
+                S.manure_N_sum += N_app
 
-            # surface application
+                S.moisture = (S.moisture * S.manure_mass + (1.0 - m_app.dry_matter[i]) * mass[i]) \
+                             / (S.manure_mass + mass[i])
+                wet_rate = mass[i] / m_app.dry_matter[i] / cover_app
+                infiltration = min(0.9, 0.000002 * wet_rate + 0.267)
 
-            if m_app.depth[i] == 0.0:
+                for w in range(0, 3):
+                    S.soil_layers[w].active_P *= S.area
+                    S.soil_layers[w].labile_P *= S.area
 
-                # infiltrate manure P if less than 15% solids
+                # surface application
 
-                if m_app.dry_matter[i] <= 0.15:
-                    S.manure_cov = min(S.area, S.manure_cov + cover_app * 0.5)
-                    S.manure_mass += mass[i] * 0.8
-                    S.WIP += P_app * m_app.WIP_frac[i] * infiltration
-                    S.WOP += P_app * m_app.WOP_frac[i] * infiltration
-                    S.SOP += P_app * (1.0 - (m_app.WIP_frac[i] + m_app.WOP_frac[i])) * 0.75 * infiltration
-                    S.SIP += P_app * (1.0 - (m_app.WIP_frac[i] + m_app.WOP_frac[i])) * 0.25 * infiltration
-                    S.NH4 += N_app * m_app.N_frac[i] * infiltration * 0.65
-                    S.SON += N_app * (1.0 - m_app.N_frac[i]) * infiltration
+                if m_app.depth[i] == 0.0:
 
-                    # add manure P infiltrated into soil
+                    # infiltrate manure P if less than 15% solids
 
-                    # TODO these two lines are not included in the else below (111) but in the next (68)
-                    S.soil_layers[0].active_P += P_app * (1.0 - (m_app.WIP_frac[i] + m_app.WOP_frac[i])) \
-                                           * 0.25 * (1.0 - infiltration)
-                    S.soil_layers[0].labile_P += P_app * m_app.WIP_frac[i] * (1.0 - infiltration) + P_app \
-                                           * (1.0 - (m_app.WIP_frac[i] + m_app.WOP_frac[i])) \
-                                           * 0.75 * 0.95 * (1.0 - infiltration) + P_app * m_app.WOP_frac[i] \
-                                           * 0.95 * (1.0 - infiltration)
+                    if m_app.dry_matter[i] <= 0.15:
+                        S.manure_cov = min(S.area, S.manure_cov + cover_app * 0.5)
+                        S.manure_mass += mass[i] * 0.8
+                        S.WIP += P_app * m_app.WIP_frac[i] * infiltration
+                        S.WOP += P_app * m_app.WOP_frac[i] * infiltration
+                        S.SOP += P_app * (1.0 - (m_app.WIP_frac[i] + m_app.WOP_frac[i])) * 0.75 * infiltration
+                        S.SIP += P_app * (1.0 - (m_app.WIP_frac[i] + m_app.WOP_frac[i])) * 0.25 * infiltration
+                        S.NH4 += N_app * m_app.N_frac[i] * infiltration * 0.65
+                        S.SON += N_app * (1.0 - m_app.N_frac[i]) * infiltration
 
-                else:
-                    S.manure_cov = min(S.area, S.manure_cov + cover_app)
-                    S.manure_mass += mass[i]
-                    S.WIP += P_app * m_app.WIP_frac[i]
-                    S.WOP += P_app * m_app.WOP_frac[i]
-                    S.SOP += P_app * (1.0 - (m_app.WIP_frac[i] + m_app.WOP_frac[i])) * 0.75
-                    S.SIP += P_app * (1.0 - (m_app.WIP_frac[i] + m_app.WOP_frac[i])) * 0.25
-                    S.NH4 += N_app * m_app.N_frac * 0.65
-                    S.SON += N_app * (1.0 - m_app.N_frac)
+                        # add manure P infiltrated into soil
 
-            else:
+                        # TODO these two lines are not included in the else below (111) but in the next (68)
+                        S.soil_layers[0].active_P += P_app * (1.0 - (m_app.WIP_frac[i] + m_app.WOP_frac[i])) \
+                                               * 0.25 * (1.0 - infiltration)
+                        S.soil_layers[0].labile_P += P_app * m_app.WIP_frac[i] * (1.0 - infiltration) + P_app \
+                                               * (1.0 - (m_app.WIP_frac[i] + m_app.WOP_frac[i])) \
+                                               * 0.75 * 0.95 * (1.0 - infiltration) + P_app * m_app.WOP_frac[i] \
+                                               * 0.95 * (1.0 - infiltration)
 
-                # subsurface application
-                # infiltrate manure P if less than 15% solids
-
-                if m_app.dry_matter[i] <= 0.15:
-
-                    S.manure_cov = min(S.area, S.manure_cov + cover_app
-                                       * m_app.surface_percent[i] * 0.5)
-                    S.manure_mass += mass[i] * m_app.surface_percent[i] * 0.8
-                    S.WIP += P_app * m_app.WIP_frac[i] * infiltration * m_app.surface_percent[i]
-                    S.WOP += P_app * m_app.WOP_frac[i] * infiltration * m_app.surface_percent[i]
-                    S.SOP += P_app * (1.0 - (m_app.WIP_frac[i] + m_app.WOP_frac[i])) \
-                             * 0.25 * infiltration * m_app.surface_percent[i]
-                    S.SIP += P_app * (1.0 - (m_app.WIP_frac[i] + m_app.WOP_frac[i])) \
-                             * 0.75 * infiltration * m_app.surface_percent[i]
-                    S.NH4 += N_app * m_app.N_frac * 0.65 * infiltration \
-                                    * m_app.surface_percent[i]
-                    S.SON += N_app * (1.0 - m_app.N_frac) * infiltration \
-                                    * m_app.surface_percent[i]
-
-                    # add manure P infiltrated into soil
-
-                    S.soil_layers[0].active_P += P_app * (1.0 - (m_app.WIP_frac[i] + m_app.WOP_frac[i])) \
-                                           * 0.25 * (1.0 - infiltration) \
-                                           * (1.0 - m_app.surface_percent[i])
-                    S.soil_layers[0].labile_P += P_app * m_app.WIP_frac[i] * (1.0 - infiltration) \
-                                           * (1.0 - m_app.surface_percent[i]) + P_app \
-                                           * (1.0 - (m_app.WIP_frac[i] + m_app.WOP_frac[i])) \
-                                           * 0.75 * 0.95 * (1.0 - infiltration) \
-                                           * (1.0 - m_app.surface_percent[i]) + P_app * m_app.WOP_frac[i] \
-                                           * 0.95 * (1.0 - infiltration) * (1.0 - m_app.surface_percent[i])
+                    else:
+                        S.manure_cov = min(S.area, S.manure_cov + cover_app)
+                        S.manure_mass += mass[i]
+                        S.WIP += P_app * m_app.WIP_frac[i]
+                        S.WOP += P_app * m_app.WOP_frac[i]
+                        S.SOP += P_app * (1.0 - (m_app.WIP_frac[i] + m_app.WOP_frac[i])) * 0.75
+                        S.SIP += P_app * (1.0 - (m_app.WIP_frac[i] + m_app.WOP_frac[i])) * 0.25
+                        S.NH4 += N_app * m_app.N_frac * 0.65
+                        S.SON += N_app * (1.0 - m_app.N_frac)
 
                 else:
-                    S.manure_cov = min(S.area, S.manure_cov + cover_app
-                                       * m_app.surface_percent[i])
-                    S.manure_mass += mass[i] * m_app.surface_percent[i]
-                    S.WIP += P_app * m_app.WIP_frac[i] * m_app.surface_percent[i]
-                    S.WOP += P_app * m_app.WOP_frac[i] * m_app.surface_percent[i]
-                    S.SOP += P_app * (1.0 - (m_app.WIP_frac[i] + m_app.WOP_frac[i])) * 0.75 \
-                             * m_app.surface_percent[i]
-                    S.SIP += P_app * (1.0 - (m_app.WIP_frac[i] + m_app.WOP_frac[i])) * 0.25 \
-                             * m_app.surface_percent[i]
-                    S.NH4 += N_app * m_app.N_frac * 0.65 * m_app.surface_percent[i]
-                    S.SON += N_app * (1.0 - m_app.N_frac) * m_app.surface_percent[i]
 
-                    S.soil_layers[0].active_P += P_app * (1.0 - (m_app.WIP_frac[i] + m_app.WOP_frac[i])) \
-                                           * 0.25 * (1.0 - m_app.surface_percent[i])
-                    S.soil_layers[0].labile_P += P_app * m_app.WIP_frac[i] * (1.0 - m_app.surface_percent[i]) \
-                                           + P_app * (1.0 - (m_app.WIP_frac[i] + m_app.WOP_frac[i])) \
-                                           * 0.75 * 0.95 * (1.0 - m_app.surface_percent[i]) + P_app \
-                                           * m_app.WOP_frac[i] * 0.95 * (1.0 - m_app.surface_percent[i])
+                    # subsurface application
+                    # infiltrate manure P if less than 15% solids
 
-                no = 0
-                for n in range(0, 3):
-                    if S.soil_layers[n].bottom_depth_cm >= m_app.depth[i]:
-                        break
-                    no += 1
+                    if m_app.dry_matter[i] <= 0.15:
 
-                sum_fact = 0.0
+                        S.manure_cov = min(S.area, S.manure_cov + cover_app
+                                           * m_app.surface_percent[i] * 0.5)
+                        S.manure_mass += mass[i] * m_app.surface_percent[i] * 0.8
+                        S.WIP += P_app * m_app.WIP_frac[i] * infiltration * m_app.surface_percent[i]
+                        S.WOP += P_app * m_app.WOP_frac[i] * infiltration * m_app.surface_percent[i]
+                        S.SOP += P_app * (1.0 - (m_app.WIP_frac[i] + m_app.WOP_frac[i])) \
+                                 * 0.25 * infiltration * m_app.surface_percent[i]
+                        S.SIP += P_app * (1.0 - (m_app.WIP_frac[i] + m_app.WOP_frac[i])) \
+                                 * 0.75 * infiltration * m_app.surface_percent[i]
+                        S.NH4 += N_app * m_app.N_frac * 0.65 * infiltration \
+                                        * m_app.surface_percent[i]
+                        S.SON += N_app * (1.0 - m_app.N_frac) * infiltration \
+                                        * m_app.surface_percent[i]
 
-                for k in range(0, no):
-                    fact = S.soil_layers[k].bottom_depth_cm / m_app.depth[i]
+                        # add manure P infiltrated into soil
 
-                    S.soil_layers[k].labile_P += P_app * m_app.WIP_frac[i] * (1.0 - m_app.surface_percent[i]) \
+                        S.soil_layers[0].active_P += P_app * (1.0 - (m_app.WIP_frac[i] + m_app.WOP_frac[i])) \
+                                               * 0.25 * (1.0 - infiltration) \
+                                               * (1.0 - m_app.surface_percent[i])
+                        S.soil_layers[0].labile_P += P_app * m_app.WIP_frac[i] * (1.0 - infiltration) \
+                                               * (1.0 - m_app.surface_percent[i]) + P_app \
+                                               * (1.0 - (m_app.WIP_frac[i] + m_app.WOP_frac[i])) \
+                                               * 0.75 * 0.95 * (1.0 - infiltration) \
+                                               * (1.0 - m_app.surface_percent[i]) + P_app * m_app.WOP_frac[i] \
+                                               * 0.95 * (1.0 - infiltration) * (1.0 - m_app.surface_percent[i])
+
+                    else:
+                        S.manure_cov = min(S.area, S.manure_cov + cover_app
+                                           * m_app.surface_percent[i])
+                        S.manure_mass += mass[i] * m_app.surface_percent[i]
+                        S.WIP += P_app * m_app.WIP_frac[i] * m_app.surface_percent[i]
+                        S.WOP += P_app * m_app.WOP_frac[i] * m_app.surface_percent[i]
+                        S.SOP += P_app * (1.0 - (m_app.WIP_frac[i] + m_app.WOP_frac[i])) * 0.75 \
+                                 * m_app.surface_percent[i]
+                        S.SIP += P_app * (1.0 - (m_app.WIP_frac[i] + m_app.WOP_frac[i])) * 0.25 \
+                                 * m_app.surface_percent[i]
+                        S.NH4 += N_app * m_app.N_frac * 0.65 * m_app.surface_percent[i]
+                        S.SON += N_app * (1.0 - m_app.N_frac) * m_app.surface_percent[i]
+
+                        S.soil_layers[0].active_P += P_app * (1.0 - (m_app.WIP_frac[i] + m_app.WOP_frac[i])) \
+                                               * 0.25 * (1.0 - m_app.surface_percent[i])
+                        S.soil_layers[0].labile_P += P_app * m_app.WIP_frac[i] * (1.0 - m_app.surface_percent[i]) \
+                                               + P_app * (1.0 - (m_app.WIP_frac[i] + m_app.WOP_frac[i])) \
+                                               * 0.75 * 0.95 * (1.0 - m_app.surface_percent[i]) + P_app \
+                                               * m_app.WOP_frac[i] * 0.95 * (1.0 - m_app.surface_percent[i])
+
+                    no = 0
+                    for n in range(0, 3):
+                        if S.soil_layers[n].bottom_depth_cm >= m_app.depth[i]:
+                            break
+                        no += 1
+
+                    sum_fact = 0.0
+
+                    for k in range(0, no):
+                        fact = S.soil_layers[k].bottom_depth_cm / m_app.depth[i]
+
+                        S.soil_layers[k].labile_P += P_app * m_app.WIP_frac[i] * (1.0 - m_app.surface_percent[i]) \
+                                               * fact + P_app * (1.0 - (m_app.WIP_frac[i] + m_app.WOP_frac[i])) * 0.75 \
+                                               * 0.95 * (1.0 - infiltration) * (1.0 - m_app.surface_percent[i]) \
+                                               * fact + P_app * m_app.WOP_frac[i] * 0.95 * (1.0 - infiltration) \
+                                               * (1.0 - m_app.surface_percent[i]) * fact
+                        S.soil_layers[k].active_P += P_app * fact * (1.0 - (m_app.WIP_frac[i]
+                                                                                 + m_app.WOP_frac[i])) * 0.25 \
+                                                          * (1.0 - m_app.surface_percent[i])
+
+                        sum_fact += fact
+
+                    fact = 1.0 - sum_fact
+
+                    S.soil_layers[no].labile_P += P_app * m_app.WIP_frac[i] * (1.0 - m_app.surface_percent[1]) \
                                            * fact + P_app * (1.0 - (m_app.WIP_frac[i] + m_app.WOP_frac[i])) * 0.75 \
                                            * 0.95 * (1.0 - infiltration) * (1.0 - m_app.surface_percent[i]) \
                                            * fact + P_app * m_app.WOP_frac[i] * 0.95 * (1.0 - infiltration) \
                                            * (1.0 - m_app.surface_percent[i]) * fact
-                    S.soil_layers[k].active_P += P_app * fact * (1.0 - (m_app.WIP_frac[i]
+                    S.soil_layers[no].active_P += P_app * fact * (1.0 - (m_app.WIP_frac[i]
                                                                              + m_app.WOP_frac[i])) * 0.25 \
                                                       * (1.0 - m_app.surface_percent[i])
 
-                    sum_fact += fact
+                for w in range(0, 3):
+                    S.soil_layers[w].active_P /= S.area
+                    S.soil_layers[w].labile_P /= S.area
 
-                fact = 1.0 - sum_fact
-
-                S.soil_layers[no].labile_P += P_app * m_app.WIP_frac[i] * (1.0 - m_app.surface_percent[1]) \
-                                       * fact + P_app * (1.0 - (m_app.WIP_frac[i] + m_app.WOP_frac[i])) * 0.75 \
-                                       * 0.95 * (1.0 - infiltration) * (1.0 - m_app.surface_percent[i]) \
-                                       * fact + P_app * m_app.WOP_frac[i] * 0.95 * (1.0 - infiltration) \
-                                       * (1.0 - m_app.surface_percent[i]) * fact
-                S.soil_layers[no].active_P += P_app * fact * (1.0 - (m_app.WIP_frac[i]
-                                                                         + m_app.WOP_frac[i])) * 0.25 \
-                                                  * (1.0 - m_app.surface_percent[i])
-
-            for w in range(0, 3):
-                S.soil_layers[w].active_P /= S.area
-                S.soil_layers[w].labile_P /= S.area
-
-            S.manure_mass_app = S.manure_mass
+                S.manure_mass_app = S.manure_mass
 
     cow_mass_app = S.lactating_cows[year][day - 1] * 8.9 + S.heifer[year][day - 1] * 3.7 \
                    + S.dry_cow[year][day - 1] * 4.9 + S.d_calf[year][day - 1] * 1.4 \
