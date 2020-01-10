@@ -44,15 +44,13 @@ This module needs the following inputs in order to operate correctly:
 from math import acos, asin, sin, tan, pi
 from . import heat_units, leaf_area_index, root_development, biomass, yields, \
     phosphorus_uptake, nitrogen_uptake, growth_constraints
-from ..soil.phosphorus_cycling import application_management
+from .. soil.phosphorus_cycling import application_management
 
 
 # -------------------------------------------------------------------------------
 # Function: daily_crop_routine
 # -------------------------------------------------------------------------------
 def daily_crop_routine(crop, weather, time, soil):
-    T_min = weather.T_min[time.year - 1][time.day - 1]
-    T_max = weather.T_max[time.year - 1][time.day - 1]
 
     # Current crop is set at the beginning of the year in annual_crop_routine
     crop_type = crop.current_crop
@@ -74,11 +72,9 @@ def daily_crop_routine(crop, weather, time, soil):
         else:
             # If the crop is growing, run the routines
             if crop_type.growing:
-                heat_units.update_all(crop_type, T_min, T_max)
+                heat_units.update_all(crop_type, weather, time)
 
                 root_development.update_all(crop_type)
-
-                # transpiration.update_all(crop_type, soil, time)
 
                 nitrogen_uptake.update_all(crop_type, soil)
 
@@ -122,8 +118,10 @@ def daily_crop_routine(crop, weather, time, soil):
         annual_variable_update(crop_type)
 
 
+# -------------------------------------------------------------------------------
+# Function: annual_variable_update
+# -------------------------------------------------------------------------------
 def annual_variable_update(crop_type):
-
     crop_type.yield_annual += crop_type.yield_actual
 
 
@@ -134,7 +132,6 @@ def annual_variable_update(crop_type):
 def annual_crop_routine(crop, time):
     # current crop is set to the next crop in the regimen
     crop.current_crop = crop.grow_regimen[time.year - 1]
-
     crop.current_crop.kill_year = is_kill_year(crop, time)
 
 
@@ -144,6 +141,8 @@ def annual_crop_routine(crop, time):
 # is signalled to be dormant
 #
 def dormancy_routine(crop_type, time, soil):
+    # if crop is perennial and in it's final year, then call yields
+    # to kill it
     if crop_type.kill_year:
         crop_type.kill_day = time.day
         yields.update_all(crop_type, time, soil)
@@ -168,9 +167,9 @@ def dormancy_routine(crop_type, time, soil):
 # Determines whether the crop is killed at harvest
 #
 def is_kill_year(crop, time):
-    if len(crop.grow_regimen) == time.year or \
-            crop.current_crop.crop_name != crop.grow_regimen[time.year].crop_name or \
-            crop.current_crop.crop_type == 'annual':
+
+    if crop.current_crop.crop_type == 'annual' or len(crop.grow_regimen) == time.year or \
+            crop.current_crop.crop_name != crop.grow_regimen[time.year].crop_name:
         crop.current_crop.kill_day = crop.current_crop.harvest_date
         return True
     return False
@@ -912,7 +911,7 @@ def calculate_start(crop, soil, weather, time):
                 crop_type.planted = True
                 crop_type.growing = True
     else:
-        print(soil.application_type, "is not a valid application type, setting type to optimal.")
+        print('"' + soil.application_type + '"', "is not a valid application type, setting type to optimal.")
         soil.application_type = 'optimal'
 
     crop.current_crop = crop_type

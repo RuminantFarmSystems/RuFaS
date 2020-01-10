@@ -98,7 +98,7 @@ class Config:
         self.end_year = int(self.end_date[0])
         self.start_day = int(self.start_date[1])
         self.end_day = int(self.end_date[1])
-        
+
         self.run_tests = data['run_tests']
 
         year_length = 365
@@ -243,27 +243,28 @@ class Config:
                     days = [_ for _ in range(1, year_length + 1)]
 
             self.years.append(days)
-        
+
         self.sim_length = self.calc_sim_length(leap_year_length, year_length)
         self.output_dir = data['output_dir']
         self.diagnostic_dir = data['diagnostic_dir']
 
     def calc_sim_length(self, leap_year_length, year_length):
-        '''
+        """
         Calculates and returns the length of the simulation in days.
-        '''
+        """
         sim_length = 0
         for i in range(len(self.years)):
             if i == 0:
-                #check for +-1
                 if is_leap_year(self.start_year):
                     sim_length += leap_year_length - self.start_day
                 else:
                     sim_length += year_length - self.start_day
             else:
                 sim_length += len(self.years[i])
-                
+
         return sim_length + 1
+
+
 # -------------------------------------------------------------------------------
 # Class: Weather
 # -------------------------------------------------------------------------------
@@ -330,7 +331,7 @@ class Weather:
             self.radiation.append([0 for _ in range(len(year))])
             self.manureN.append([0 for _ in range(len(year))])
             # TODO: manureN is a temporary weather file input until the manure
-            # TODO: module is linked with the rest of the program
+            #  module is linked with the rest of the program
 
             # These are not currently inputs into the weather file. They may
             # be/may have been at some point.
@@ -387,7 +388,9 @@ class Weather:
                         self.T_avg[year][day - offset] = float(row[5])
                         self.biomass[year][day - offset] = float(row[6])
                         self.radiation[year][day - offset] = float(row[7])
-                        self.manureN[year][day - offset] = float(row[8])  # TODO: manureN is a temporary weather file input until the manure module is linked with the rest of the program
+                        # TODO: manureN is a temporary weather file input until the manure
+                        #  module is linked with the rest of the program
+                        self.manureN[year][day - offset] = float(row[8])
                     except(IndexError, ValueError):
                         # prints out each problematic row in the weather CSV file
                         skips += 1

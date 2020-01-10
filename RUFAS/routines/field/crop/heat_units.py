@@ -55,8 +55,8 @@ CropType values updated by calling calculate_frPHU():
 # This function calls the functions necessary to update the current heat unit
 # information.
 #
-def update_all(crop_type, T_min, T_max):
-    calculate_fr_PHU(crop_type, T_min, T_max)
+def update_all(crop_type, weather, time):
+    calculate_fr_PHU(crop_type, weather, time)
 
 
 #
@@ -64,7 +64,10 @@ def update_all(crop_type, T_min, T_max):
 # today. The equations used for this part can be found in
 # "pseudocode_crop" C.2.B.1
 #
-def calculate_fr_PHU(crop_type, T_min, T_max):
+def calculate_fr_PHU(crop_type, weather, time):
+
+    T_min = weather.T_min[time.year - 1][time.day - 1]
+    T_max = weather.T_max[time.year - 1][time.day - 1]
 
     T_HU_min = calc_T_HU_min(crop_type, T_min)
     T_HU_max = calc_T_HU_max(crop_type, T_max)

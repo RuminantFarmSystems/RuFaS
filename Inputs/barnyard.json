@@ -31,14 +31,6 @@
                 "report_name": "Soil Summary",
                 "file_name": "soil_summary.csv"
             },
-            "water_balance":
-            {
-                "produce_csv": true,
-                "produce_graphics": false,
-                "display_graphics": false,
-                "report_name": "Water Balance",
-                "file_name": "water_balance.csv"
-            },
             "soil_nitrogen":
             {
                 "produce_csv": true,
@@ -54,6 +46,14 @@
                 "display_graphics": false,
                 "report_name": "Soil Phosphorus",
                 "file_name": "soil_phosphorus.csv"
+            },
+            "water_balance":
+            {
+                "produce_csv": true,
+                "produce_graphics": false,
+                "display_graphics": false,
+                "report_name": "Water Balance",
+                "file_name": "water_balance.csv"
             },
             "custom_report":
             {
@@ -111,7 +111,7 @@
             "field_1":
             {
                 "soil": "barnyard_soil.json",
-                "crop": "corn_rotation.json",
+                "crop": "alfalfa_rotation.json",
                 "applications": "barnyard_applications.json"
             }
         },
