@@ -23,6 +23,7 @@ def update_all(S, weather, time):
         if (till_app.day[i] == day and till_app.year[i] - S.start_year + 1 == year) \
                 or (till_app.year[i] - S.start_year + 1 == year and till_app.day[i] == -1
                     and S.tillage_day is True):
+
             for w in range(0, 3):
                 S.soil_layers[w].active_P *= S.area
                 S.soil_layers[w].labile_P *= S.area
