@@ -40,7 +40,7 @@ class FeedStorage(BaseReportHandler):
         #
 
         # daily outputs
-        self.daily_variables = {'year': ['time.cal_year', '', []],
+        self.daily_variables = {'year': ['time.calendar_year', '', []],
                                 'j_day': ['time.day', '', []],
                                 'dry_matter': ['feed.dry_matter', 'kg', []],
                                 'carbon': ['feed.carbon', 'kg', []],
@@ -59,7 +59,7 @@ class FeedStorage(BaseReportHandler):
                                 }
 
         # annual outputs
-        self.annual_variables = {'year': ['time.cal_year', '', 0],
+        self.annual_variables = {'year': ['time.calendar_year', '', 0],
                                  'dry_matter': ['feed.dry_matter', 'kg', 0]
                                  }
 

@@ -40,12 +40,12 @@ class CustomReport(BaseReportHandler):
         #
 
         # daily outputs
-        self.daily_variables = {'year': ['time.cal_year', '', []],
+        self.daily_variables = {'year': ['time.calendar_year', '', []],
                                 'j_day': ['time.day', '', []]
                                 }
 
-        # Annual outputs
-        self.annual_variables = {'year': ['time.cal_year', '', 0]
+        # annual outputs
+        self.annual_variables = {'year': ['time.calendar_year', '', 0]
                                  }
 
     def write_headers(self, output_csv, variables):

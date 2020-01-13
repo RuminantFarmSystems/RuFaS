@@ -951,7 +951,7 @@ def calculate_t_dorm(latitude):
 # "pseudocode_crop" C.11.A.1/C.11.B.2
 #
 def in_dormancy(crop, time):
-    year_length = get_year_length(time.cal_year)
+    year_length = get_year_length(time.calendar_year)
 
     # C.11.B.2
     solar_declination = asin(0.4 * sin(2 * pi / year_length * (time.day - 82)))

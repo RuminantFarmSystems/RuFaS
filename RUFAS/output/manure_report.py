@@ -38,13 +38,13 @@ class ManureReport(BaseReportHandler):
         #
 
         # daily output
-        self.daily_variables = {'year': ['time.cal_year', '', []],
+        self.daily_variables = {'year': ['time.calendar_year', '', []],
                                 'j_day': ['time.day', '', []],
                                 'num_animals': ['len(pen.animals_in_pen)', '', []]
                                 }
 
         # annual output
-        self.annual_variables = {'year': ['time.cal_year', '', 0]}
+        self.annual_variables = {'year': ['time.calendar_year', '', 0]}
 
     def write_headers(self, output_csv, variables):
 

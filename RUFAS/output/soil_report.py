@@ -40,7 +40,7 @@ class SoilSummary(BaseReportHandler):
         #
 
         # daily outputs
-        self.daily_variables = {'year': ['time.cal_year', '', []],
+        self.daily_variables = {'year': ['time.calendar_year', '', []],
                                 'j_day': ['time.day', '', []],
                                 'precip': ['weather.rainfall[time.year - 1][time.day - 1]', 'mm', []],
                                 'runoff': ['soil.runoff', 'mm', []],
@@ -69,7 +69,7 @@ class SoilSummary(BaseReportHandler):
                                 }
 
         # annual outputs
-        self.annual_variables = {'year': ['time.cal_year', '', 0],
+        self.annual_variables = {'year': ['time.calendar_year', '', 0],
                                  'ET_max': ['soil.ET_max_annual', 'mm H20', 0],
                                  'ET': ['soil.ET_annual', 'mm H20', 0]
                                  }
