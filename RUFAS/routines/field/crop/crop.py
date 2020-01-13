@@ -30,7 +30,7 @@ This module needs the following inputs in order to operate correctly:
         soil_layers
 
         And the following attributes of a soil layer:
-            bottomDepth
+            bottom_depth
             ET_annual = Sum of the ET_act values leading up to today
             trans_max
             NO3

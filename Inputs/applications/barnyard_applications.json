@@ -43,19 +43,5 @@
         "perc_incorporated": [],
         "perc_mixed": [],
         "depth": []
-    },
-
-    "crop_P_uptake":
-    {
-        "Uptake1":
-        {
-            "Year": 2008,
-            "PUptake": 15.0
-        },
-        "Uptake2":
-        {
-            "Year": 2009,
-            "PUptake": 15.0
-        }
     }
 }

@@ -1,12 +1,11 @@
-################################################################################
 """
 RUFAS: Ruminant Farm Systems Model
-File name: crop_summary.py
+File name: crop_report.py
 Description:
 Author(s): William Donovan, wmdonovan@wisc.edu
            Jacob Johnson, jacob8399@gmail.com
 """
-###############################################################################
+
 from RUFAS.output.graphics import show_figures
 from .ration_report import RationReport
 from .growth_report import GrowthReport

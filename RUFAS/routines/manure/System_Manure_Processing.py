@@ -127,11 +127,11 @@ def System_Manure_Processing(x_days):
     # Repeat Loop
     for i in Temp:
         for TR in i:
-            #Saturation pressure of water
+            # Saturation pressure of water
             Psat = math.exp(77.345 + 0.0057 * TR - 7235 / TR) / TR ** (8.2)
-            #Density of vapor of the puddle
+            # Density of vapor of the puddle
             Pv=Psat*18/(100000*TR*0.08315)
-            #Convective mass transfer coefficient for water
+            # Convective mass transfer coefficient for water
             KH20=0.0821*TR**(0.7)*VR**(0.5)*Dp**(-0.5)*DH20**(0.666)
             #change in the volume of the puddle
             dVp=KH20*Ap/Pp*1000*(Pv*(RH/100-1))

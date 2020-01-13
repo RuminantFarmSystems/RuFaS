@@ -1,8 +1,9 @@
-################################################################################
 """
 RUFAS: Ruminant Farm Systems Model
 File name: soil.py
+
 Description:
+
 Author(s): Kass Chupongstimun, kass_c@hotmail.com
            Jit Patil, spatil5@wisc.edu
            William Donovan, wmdonovan@wisc.edu
@@ -12,49 +13,49 @@ This module needs the following inputs in order to operate correctly:
     These are attributes of a soil profile that need to be specified in the json input
     file. The values on the right are just examples from a soil profile with 1 layer.
 
-        "ProfileDepth": 450,
-        "ProfileBulkDensity": 1.4,
+        "profile_depth": 450,
+        "profile_bulk_density": 1.4,
         "CN2": 85.00
-        "FieldSlope": 0.02,
-        "SlopeLength": 3,
-        "Manning": 0.4,
-        "FieldSize": 1.0,
-        "PracticeFactor": 0.08,
-        "Sand": 15,
-        "Silt": 65,
-        "SoilAlbedo": 0.16,
+        "field_slope": 0.02,
+        "slope_length": 3,
+        "manning": 0.4,
+        "field_size": 1.0,
+        "practice_factor": 0.08,
+        "sand": 15,
+        "silt": 65,
+        "soil_albedo": 0.16,
         "initial_residue": 0,
-        "FreshNMineralRate": 0.05,
-        "SoilCoverType": "BARE",
+        "fresh_N_mineral_rate": 0.05,
+        "soil_cover_type": "BARE",
 
         These are attributes defined for each layer of the soil profile. Any
         number of profiles may be specified, but they all require the following
         information. The values on the right are examples.
 
-        "SoilLayers":
+        "soil_layers":
 
-            "Layer1":
+            "layer_1":
 
-                "BottomDepth": 150,
-                "WiltingPoint": 0.1,
-                "FieldCapacity": 0.30,
-                "Saturation": 0.5,
-                "Ksat": 20,
-                "CationExclusionFraction": 0.0,
-                "Clay": 20,
-                "InitialTemperature": 15.77575,
-                "BulkDensity": 1.4,
-                "OrgC%": 1.2,
+                "bottom_depth": 150,
+                "wilting_point": 0.1,
+                "field_capacity": 0.30,
+                "saturation": 0.5,
+                "K_sat": 20,
+                "cation_exclusion_fraction": 0.0,
+                "clay": 20,
+                "initial_temperature": 15.77575,
+                "bulk_density": 1.4,
+                "org_C_percent": 1.2,
                 "NH4": 1,
-                "FracActiveN": 0.02,
-                "LabileP": 15,
-                "ActiveMineralRate": 0.0003,
-                "VolatileExchangeFac": 0.15,
-                "DenitrificationRate": 0.05,
-                "SoilWaterRatio": 0.3,
-                "OM%": 1.9
+                "active_N_percent": 0.02,
+                "labile_P": 15,
+                "active_mineral_rate": 0.0003,
+                "volatile_exchange_factor": 0.15,
+                "denitrification_rate": 0.05,
+                "soil_water_percent": 0.3,
+                "OM_percent": 1.9
 
-            "Layer2":
+            "layer_2":
                 ...
 
         Each layer needs to be specified in a similar manner
@@ -64,17 +65,17 @@ This module needs the following inputs in order to operate correctly:
         are specified, the following attributes are needed. Again, the values
         on the right are simply examples
 
-        "Fertilizers":
+        "fertilizers":
 
-            "Application1":
+            "application_1":
 
-                "Year": 2008
-                "JDay": 179,
-                "PMass": 25.0,
-                "Depth": 3.0,
-                "%onSurface": 0.25
+                "year": 2008
+                "j_day": 179,
+                "P_mass": 25.0,
+                "depth": 3.0,
+                "surface_percent": 0.25
 
-            "Application2":
+            "application_2":
 
                 ...
 
@@ -83,23 +84,23 @@ This module needs the following inputs in order to operate correctly:
         are specified, the following attributes are needed. The values on the
         right should serve as examples.
 
-        "ManureApplication":
+        "manure_application":
 
-            "Application1":
+            "application_1":
 
-                "Type": "DAIRY",
-                "Year": 2009,
-                "Jday": 200
-                "Mass": 1000.0,
-                "TotalP": 0.025,
-                "WEIP": 0.50,
-                "WEOP": 0.05,
-                "DryMatter": 0.05,
-                "%Cover": 0.5,
-                "Depth": 0.0,
-                "%onSurface": 100.0
+                "type": "DAIRY",
+                "year": 2009,
+                "j_day": 200
+                "mass": 1000.0,
+                "P_frac": 0.025,
+                "WIP_frac": 0.50,
+                "WOP_frac": 0.05,
+                "dry_matter": 0.05,
+                "cover_percent": 0.5,
+                "depth": 0.0,
+                "surface_percent": 100.0
 
-            "Application2":
+            "application_2":
 
                 ...
 
@@ -108,17 +109,17 @@ This module needs the following inputs in order to operate correctly:
         that is specified, the following attributes are needed. Values on the
         right are examples.
 
-        "TillageOperations":
+        "tillage":
 
-            "Operation1":
+            "operation_1":
 
-                "Year": 2008,
-                "Jday": 365,
-                "%Incorporate": 0.5,
-                "%Mixed": 0.30,
-                "Depth": 15.0,
+                "year": 2008,
+                "j_day": 365,
+                "percent_incorporated": 0.5,
+                "percent_mixed": 0.30,
+                "depth": 15.0,
 
-            "Operation2":
+            "operation_2":
 
                 ...
 
@@ -135,7 +136,6 @@ This module needs the following inputs in order to operate correctly:
         And the following attributes of a crop type:
             bio_AG (aboveground biomass)
 """
-################################################################################
 
 from math import exp, log
 from . import infiltration, \
@@ -258,8 +258,8 @@ class Soil:
 
         Args:
             data: the information from the json input file
-            config: instance of the Config class
         """
+
         # Values Initialized by Input
         self.soil_layers = []
 
@@ -270,24 +270,24 @@ class Soil:
         self.tillage = Soil.Tillage(application_data['tillage_application'], time)
         self.application_type = str(application_data['application_type']).lower()
 
-        self.profileBulkDensity = data['ProfileBulkDensity']
+        self.profile_bulk_density = data['profile_bulk_density']
         self.CN2 = data['CN2']  # unitless, user-defined curve number (empirical)
 
         # soil erosion attributes
-        self.fieldSlope = data['FieldSlope']
-        self.slopeLength = data['SlopeLength']
-        self.manning = data['Manning']
-        self.fieldSize = data['FieldSize']
-        self.practiceFactor = data['PracticeFactor']
-        self.sand = data['Sand']
-        self.silt = data['Silt']
+        self.fieldSlope = data['field_slope']
+        self.slopeLength = data['slope_length']
+        self.manning = data['manning']
+        self.fieldSize = data['field_size']
+        self.practiceFactor = data['practice_factor']
+        self.sand = data['sand']
+        self.silt = data['silt']
 
         # soil temperature attributes
-        self.soilAlbedo = data['SoilAlbedo']
-        self.Tsurf = data['SoilLayers']['Layer1']['InitialTemperature']
+        self.soilAlbedo = data['soil_albedo']
+        self.T_surf = data['soil_layers']['layer_1']['initial_temperature']
 
         # create soil layers
-        for layer_name, layer_data in data['SoilLayers'].items():
+        for layer_name, layer_data in data['soil_layers'].items():
             self.soil_layers.append(self.SoilLayer(layer_name, layer_data))
 
         # sort layers by bottom_depth
@@ -297,15 +297,14 @@ class Soil:
         self.profile_depth = self.soil_layers[-1].bottom_depth
 
         # calculate initial depth of each soil layer
-
         curr_thickness = 0
         for layer in self.soil_layers:
             layer.thickness = layer.bottom_depth - curr_thickness
             curr_thickness = layer.bottom_depth
 
-        self.cover = data['SoilCoverType']
+        self.cover = data['soil_cover_type']
         self.leach = 0.0
-        self.area = data['FieldSize']
+        self.area = data['field_size']
 
         self.num_soil_layers = 3
         self.thickness_cm = []
@@ -503,7 +502,7 @@ class Soil:
 
         # daily soil nitrogen values
         self.residue = data['initial_residue']
-        self.freshNMineralRate = data['FreshNMineralRate']
+        self.freshNMineralRate = data['fresh_N_mineral_rate']
         self.decayRate = 0.0
         self.topLayerFreshN = 0.0
 
@@ -594,12 +593,12 @@ class Soil:
             """
             self.name = layer_name
 
-            self.bottom_depth = layer_data['BottomDepth']
-            self.bottom_depth_cm = layer_data['BottomDepth'] / 10
-            self.wilting_point = layer_data['WiltingPoint']
-            self.field_capacity = layer_data['FieldCapacity']
-            self.saturation = layer_data['Saturation']
-            self.soil_water_ratio = layer_data['SoilWaterRatio']
+            self.bottom_depth = layer_data['bottom_depth']
+            self.bottom_depth_cm = layer_data['bottom_depth'] / 10
+            self.wilting_point = layer_data['wilting_point']
+            self.field_capacity = layer_data['field_capacity']
+            self.saturation = layer_data['saturation']
+            self.soil_water_ratio = layer_data['soil_water_percent']
 
             self.thickness = 0.0  # thickness of soil layer
             self.fc_water = 0.0  # constant
@@ -607,7 +606,7 @@ class Soil:
             self.wilting_water = 0.0  # constant
             self.soil_water = 0.0  # mm water in the soil profile
 
-            self.bulk_density = layer_data['BulkDensity']
+            self.bulk_density = layer_data['bulk_density']
 
             # Variables to calculate daily evapotranspiration
             self.top_evap = 0.0  # evaporation demand at top of layer
@@ -616,21 +615,21 @@ class Soil:
             self.trans_act = 0.0  # actual transpiration for the layer (updated in crop)
 
             # Variables used for soil temperature
-            self.temperature = layer_data['InitialTemperature']
+            self.temperature = layer_data['initial_temperature']
 
             # Variables to calculate dailyPercolation
-            self.ksat = layer_data['Ksat']  # saturated hydraulic conductivity (mm/h)
+            self.ksat = layer_data['K_sat']  # saturated hydraulic conductivity (mm/h)
             self.TT = 0.0
             self.perc = 0.0  # amount of water that percolates to next layer
 
-            self.labile_P = layer_data['LabileP']  # labile P in soil layer
-            self.clay = layer_data['Clay']  # soil clay % in soil layer
+            self.labile_P = layer_data['labile_P']  # labile P in soil layer
+            self.clay = layer_data['clay']  # soil clay % in soil layer
 
             # Variable to simulate nitrogen Cycling
-            self.org_C = layer_data['OrgC%']
-            self.activeMineralRate = layer_data['ActiveMineralRate']
-            self.cationExclusionFraction = layer_data['CationExclusionFraction']
-            self.denitrificationRate = layer_data['DenitrificationRate']
+            self.org_C = layer_data['org_C_percent']
+            self.activeMineralRate = layer_data['active_mineral_rate']
+            self.cationExclusionFraction = layer_data['cation_exclusion_fraction']
+            self.denitrificationRate = layer_data['denitrification_rate']
             self.NH4 = layer_data['NH4']
 
             self.temp_fac = 0.0
@@ -658,12 +657,12 @@ class Soil:
             self.nTrans = 0.0
             self.totNitriVolatil = 0.0
 
-            self.deNrate = layer_data['DenitrificationRate']
-            self.fracActiveN = layer_data['FracActiveN']
-            self.volatileExchangeFactor = layer_data['VolatileExchangeFac']
+            self.deNrate = layer_data['denitrification_rate']
+            self.fracActiveN = layer_data['active_N_percent']
+            self.volatileExchangeFactor = layer_data['volatile_exchange_factor']
 
             # Variables to simulate phosphorus cycling
-            self.OM_percent = layer_data['OM%']
+            self.OM_percent = layer_data['OM_percent']
             self.PSP = 0.0
 
             self.active_P = 0.0
@@ -784,28 +783,6 @@ class Soil:
                 self.percent_mixed.append(.5)
                 # in cm
                 self.depth.append(25)
-
-    # ---------------------------------------------------------------------------
-    # Class: CropPUptake
-    # An instance of this class represents a particular uptake and the date
-    # of uptake
-    # ---------------------------------------------------------------------------
-    class CropPUptake:
-        """
-        An instance of this class represents a particular uptake and the date
-        of uptake
-        """
-
-        def __init__(self, uptake_name, uptake_data):
-            """
-            Args:
-                uptake_name: a string which is the name of this particular uptake
-                uptake_data: a dictionary which stores the information for this particular
-                    uptake
-            """
-            self.name = uptake_name
-            self.uptake_year = uptake_data['Year']
-            self.P_uptake = uptake_data['PUptake']
 
     # ---------------------------------------------------------------------------
     # Function: calculate_soil_water

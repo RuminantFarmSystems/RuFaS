@@ -1,4 +1,3 @@
-################################################################################
 """
 RUFAS: Ruminant Farm Systems Model
 File name: manure_report.py
@@ -6,40 +5,53 @@ Description:
 Author(s): Militsa Sotirova, militsasotirova@gmail.com
            William Donovan, wmdonovan@wisc.edu
 """
-################################################################################
 
-from pathlib import Path
 import csv
+from pathlib import Path
+
 from RUFAS.output.report_handler import BaseReportHandler
 from RUFAS.output.graphics import daily_graphics, annual_graphics
 
 
-# -------------------------------------------------------------------------------
-# Class: ManureReport
-# -------------------------------------------------------------------------------
 class ManureReport(BaseReportHandler):
     """Creates and prints to the file manure_report.csv"""
 
     def __init__(self, data, pen_id):
 
-        # Sets active, report_name, f_name using data
+        # sets active, report_name, f_name using data
         self.set_properties(data, 'null')
         self.file_name = 'pen_' + str(pen_id) + '/' + self.file_name
 
+        self.manure_info = {}
+
+        #
+        # Outputs can be added in this single place in the following format:
+        # 'output_name': ['variable_name', 'unit', []],
+        # 'output_name' is a user defined key that will show up in outputs/graphs.
+        # avoid spaces.
+        # 'variable_name' is very important. This has to be a variable defined
+        # and initialized in the object. If you are interested in tracking
+        # a variable not defined in the class, you need to create it there
+        # first. The output handler will not work if the variable is incorrect.
+        # 'unit' is user defined but will, again, show up in outputs/graphs.
+        # [] is an empty list
+        #
+
+        # daily output
         self.daily_variables = {'year': ['time.cal_year', '', []],
                                 'j_day': ['time.day', '', []],
                                 'num_animals': ['len(pen.animals_in_pen)', '', []]
                                 }
-        self.annual_variables = {'year': ['time.cal_year', '', 0]}
 
-        self.manure_info = {}
+        # annual output
+        self.annual_variables = {'year': ['time.cal_year', '', 0]}
 
     def write_headers(self, output_csv, variables):
 
         mode = 'a+' if output_csv.exists() else 'w+'
 
-        with output_csv.open(mode) as csvfile:
-            writer = csv.DictWriter(csvfile, fieldnames=variables.keys(),
+        with output_csv.open(mode) as csv_file:
+            writer = csv.DictWriter(csv_file, fieldnames=variables.keys(),
                                     lineterminator='\n')
 
             writer.writeheader()
@@ -87,9 +99,9 @@ class ManureReport(BaseReportHandler):
 
         mode = 'a+' if self.get_fPath().exists() else 'w+'
 
-        with self.get_fPath().open(mode) as csvfile:
+        with self.get_fPath().open(mode) as csv_file:
 
-            writer = csv.DictWriter(csvfile, fieldnames=self.daily_variables.keys(),
+            writer = csv.DictWriter(csv_file, fieldnames=self.daily_variables.keys(),
                                     lineterminator='\n')
 
             for day in range(len(self.daily_variables['j_day'][2])):
@@ -102,8 +114,8 @@ class ManureReport(BaseReportHandler):
 
             mode = 'a+' if annual_path.exists() else 'w+'
 
-            with annual_path.open(mode) as csvfile:
-                writer = csv.DictWriter(csvfile, fieldnames=self.annual_variables.keys(),
+            with annual_path.open(mode) as csv_file:
+                writer = csv.DictWriter(csv_file, fieldnames=self.annual_variables.keys(),
                                         lineterminator='\n')
                 row = {}
                 for variable in self.annual_variables:

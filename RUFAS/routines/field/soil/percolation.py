@@ -19,7 +19,7 @@ Soil attribute definitions
 
     TT = travel time for percolation (h)
 
-    Ksat = saturated hydraulic conductivity (mm/h)
+    K_sat = saturated hydraulic conductivity (mm/h)
 
 Soil values updated by calling update_all():
     soil.soil_layers.perc
@@ -55,11 +55,11 @@ def calc_daily_percolation(soil):
         if SW > FC:
             SWperc = SW - FC
 
-        Ksat = layer.ksat
+        K_sat = layer.ksat
 
         # Travel Time for each soil layer
         # "pseudocode_soil" S.2.C.2
-        TT = (SAT - FC) / Ksat
+        TT = (SAT - FC) / K_sat
         layer.TT = TT
 
         t = 24

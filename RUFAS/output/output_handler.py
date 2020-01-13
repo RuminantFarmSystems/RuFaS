@@ -18,7 +18,7 @@ from RUFAS.output.report_handler import BaseReportHandler
 # Import report handlers here
 #
 from RUFAS.output.feed_storage import FeedStorage
-from RUFAS.output.field_summary import FieldSummary
+from RUFAS.output.field_report import FieldSummary
 from RUFAS.output.pen_report import PenReport
 
 

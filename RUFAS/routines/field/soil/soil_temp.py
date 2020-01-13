@@ -23,7 +23,7 @@ Soil attribute definitions
 
     Taair = average annual air temperature (ºC)
 
-    Tsurf = Daily soil surface temperature (ºC)
+    T_surf = Daily soil surface temperature (ºC)
 
     zd = ratio of depth at the center of soil layer to damping depth
 
@@ -62,7 +62,7 @@ Soil attribute definitions
     SNOW = snow water content on the current day (mm)
 
 Soil values updated by calling update_all():
-    Tsurf
+    T_surf
     soil_layers.temperature
 """
 ###############################################################################
@@ -110,7 +110,7 @@ def calc_Tsoil(soil, weather, time):
 
         # "pseudocode_soil" S.1.A.1
         Tsoil = (L * Tsoil_prev_day) + (1 - L) * \
-                (df * (Taair - soil.Tsurf) + soil.Tsurf)
+                (df * (Taair - soil.T_surf) + soil.T_surf)
         soil.soil_layers[x].temperature = Tsoil
 
 
@@ -136,7 +136,7 @@ def calc_dd(soil):
 def calc_scale(soil):
     SW = sum_soil_water(soil)
     Ztot = soil.profile_depth
-    bd = soil.profileBulkDensity
+    bd = soil.profile_bulk_density
 
     return SW / ((0.356 - 0.144 * bd) * Ztot)
 
@@ -146,7 +146,7 @@ def calc_scale(soil):
 # "pseudocode_soil" S.1.A.6
 #
 def calc_ddmax(soil):
-    bd = soil.profileBulkDensity
+    bd = soil.profile_bulk_density
     exp_part = exp(-5.63 * bd)
     return 1000 + (2500 * bd) / (bd + 686 * exp_part)
 
@@ -172,7 +172,7 @@ def calc_Tsurf(soil, crop, weather, time):
     Tbare = calc_Tbare(soil, crop, weather, time)
     bcv = calc_bcv(crop, time)
 
-    soil.Tsurf = (bcv * soil.soil_layers[0].temperature) + ((1 - bcv) * Tbare)
+    soil.T_surf = (bcv * soil.soil_layers[0].temperature) + ((1 - bcv) * Tbare)
 
 
 #

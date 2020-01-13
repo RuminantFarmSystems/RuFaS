@@ -136,15 +136,16 @@ class AnimalManagement:
                 cow_num = 0
         else:
             self.simulate_animals = True
-        
-        self.life_cycle_manager.initialize_herd(herd_num, calf_num, heiferI_num, heiferII_num, heiferIII_num, cow_num, replace_num)
-        self.calves = self.life_cycle_manager.calves
-        self.heiferIs = self.life_cycle_manager.heiferIs
-        self.heiferIIs = self.life_cycle_manager.heiferIIs
-        self.heiferIIIs = self.life_cycle_manager.heiferIIIs
-        self.cows = self.life_cycle_manager.cows
-        self.init_nutrient_rqmts(feed)
-        self.pen_allocation()
+
+        if self.simulate_animals:
+            self.life_cycle_manager.initialize_herd(herd_num, calf_num, heiferI_num, heiferII_num, heiferIII_num, cow_num, replace_num)
+            self.calves = self.life_cycle_manager.calves
+            self.heiferIs = self.life_cycle_manager.heiferIs
+            self.heiferIIs = self.life_cycle_manager.heiferIIs
+            self.heiferIIIs = self.life_cycle_manager.heiferIIIs
+            self.cows = self.life_cycle_manager.cows
+            self.init_nutrient_rqmts(feed)
+            self.pen_allocation()
         
     def init_nutrient_rqmts(self, feed):
         """
