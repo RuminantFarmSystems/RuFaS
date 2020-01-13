@@ -31,13 +31,13 @@ class RationReport(BaseReportHandler):
         self.file_name = 'pen_' + str(pen_id) + '/' + self.file_name
 
         self.feed_info = {}
-        self.daily_variables = {'year': ['time.cal_year', '', []],
+        self.daily_variables = {'year': ['time.calendar_year', '', []],
                                 'j_day': ['time.day', '', []],
                                 'num_animals': ['len(pen.animals_in_pen)', '', []],
                                 'achieved_price': ['pen.ration[\'objective\'] if pen.pen_populated else 0', '', []]
                                 }
 
-        self.annual_variables = {'year': ['time.cal_year', '', 0]}
+        self.annual_variables = {'year': ['time.calendar_year', '', 0]}
 
     # ---------------------------------------------------------------------------
     # Method: write_headers

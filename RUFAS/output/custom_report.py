@@ -45,14 +45,14 @@ class CustomReport(BaseReportHandler):
         #
         # Daily Outputs
         #
-        self.daily_variables = {'year': ['time.cal_year', '', []],
+        self.daily_variables = {'year': ['time.calendar_year', '', []],
                                 'j_day': ['time.day', '', []]
                                 }
 
         #
         # Annual outputs
         #
-        self.annual_variables = {'year': ['time.cal_year', '', 0]
+        self.annual_variables = {'year': ['time.calendar_year', '', 0]
                                  }
 
 

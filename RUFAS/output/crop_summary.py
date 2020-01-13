@@ -41,7 +41,7 @@ class CropSummary(BaseReportHandler):
         # Daily Outputs
         # 1D Lists [julianDay]
         #
-        self.daily_variables = {'year': ['time.cal_year', '', []],
+        self.daily_variables = {'year': ['time.calendar_year', '', []],
                                 'j_day': ['time.day', '', []],
                                 'fr_PHU': ['crop_type.fr_PHU', '%', []],
                                 'biomass': ['crop_type.biomass_actual', 'kg/ha', []],
@@ -52,7 +52,7 @@ class CropSummary(BaseReportHandler):
                                 'yield_act': ['crop_type.yield_actual', 'kg/ha', []]
                                 }
 
-        self.annual_variables = {'year': ['time.cal_year', '', 0],
+        self.annual_variables = {'year': ['time.calendar_year', '', 0],
                                  'yield': ['crop_type.yield_annual', 'kg/ha', 0]
                                  }
 

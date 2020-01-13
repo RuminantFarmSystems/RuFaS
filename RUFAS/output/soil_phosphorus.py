@@ -43,7 +43,7 @@ class SoilPhosphorus(BaseReportHandler):
         self.field_name = field_name
         self.set_properties(data, self.field_name)
 
-        self.daily_variables = {'year': ['time.cal_year', '', []],
+        self.daily_variables = {'year': ['time.calendar_year', '', []],
                                 'j_day': ['time.day', '', []],
                                 'soil_runoff_DRP': ['soil.SRP_MGL', 'mgL', []],
                                 'manure_runoff_DRP': ['soil.runoff_IP', 'mgL', []],
@@ -68,7 +68,7 @@ class SoilPhosphorus(BaseReportHandler):
                                 'sediment_P': ['soil.sed_P', 'kg/ha', []],
                                 }
 
-        self.annual_variables = {'year': ['time.cal_year', '', 0]
+        self.annual_variables = {'year': ['time.calendar_year', '', 0]
                                  }
 
     #

@@ -47,7 +47,7 @@ class WaterBalance(BaseReportHandler):
         #
         # Daily Outputs
         #
-        self.daily_variables = {'year': ['time.cal_year', '', []],
+        self.daily_variables = {'year': ['time.calendar_year', '', []],
                                 'j_day': ['time.day', '', []],
                                 'change in sw': ['soil.delta_SW', 'mmH2O', []],
                                 'runoff': ['soil.runoff', 'mmH2O', []],
@@ -61,7 +61,7 @@ class WaterBalance(BaseReportHandler):
         #
         # Annual outputs
         #
-        self.annual_variables = {'year': ['time.cal_year', '', 0],
+        self.annual_variables = {'year': ['time.calendar_year', '', 0],
                                  'delta_SW': ['round(soil.delta_SW_annual, 3)', 'mmH2O', 0],
                                  'runoff': ['round(soil.runoff_annual, 3)', 'mmH2O', 0],
                                  'evaporation': ['round(soil.evap_annual, 3)', 'mmH2O', 0],

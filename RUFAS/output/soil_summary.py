@@ -42,7 +42,7 @@ class SoilSummary(BaseReportHandler):
         self.field_name = field_name
         self.set_properties(data, self.field_name)
 
-        self.daily_variables = {'year': ['time.cal_year', '', []],
+        self.daily_variables = {'year': ['time.calendar_year', '', []],
                                 'j_day': ['time.day', '', []],
                                 'precip': ['weather.rainfall[time.year - 1][time.day - 1]', 'mm', []],
                                 'runoff': ['soil.runoff', 'mm', []],
@@ -70,7 +70,7 @@ class SoilSummary(BaseReportHandler):
                                 'temperature_L3': ['soil.soil_layers[2].temperature', 'C', []],
                                 }
 
-        self.annual_variables = {'year': ['time.cal_year', '', 0],
+        self.annual_variables = {'year': ['time.calendar_year', '', 0],
                                  'ET_max': ['soil.ET_max_annual', 'mm H20', 0],
                                  'ET': ['soil.ET_annual', 'mm H20', 0]
                                  }
