@@ -1,11 +1,9 @@
-################################################################################
 """
 SurPhos
 File name: plow.py
 Author(s): Jacob Johnson, jacob8399@gmail.com,
            William Donovan, wmdonovan@wisc.edu
 """
-################################################################################
 
 # conducts tillage operations and mixes any manure or fertilizer on
 # the surface into the soil and mixes the soil itself

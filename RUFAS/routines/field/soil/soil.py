@@ -780,10 +780,10 @@ class Soil:
                 # TODO: need default values
                 self.year.append(app_year)
                 self.day.append(-1)
-                self.percent_incorporated.append(.5)
-                self.percent_mixed.append(.5)
+                self.percent_incorporated.append(.8)
+                self.percent_mixed.append(.6)
                 # in cm
-                self.depth.append(25)
+                self.depth.append(15)
 
     # ---------------------------------------------------------------------------
     # Class: CropPUptake

@@ -145,8 +145,6 @@ def calc_residue(crop_type, time, soil):
 #
 def kill(crop_type, soil):
 
-    soil.tillage_day = True
-
     crop_type.accumulated_HU = 0
     crop_type.prev_accumulated_HU = 0
 

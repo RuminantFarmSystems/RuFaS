@@ -884,6 +884,7 @@ def calculate_start(crop, soil, weather, time):
                     crop_type.growing = True
                     soil.manure_day = True
                     soil.fertilizer_day = True
+                    soil.tillage_day = True
                 else:
                     crop_type.planting_date = time.day + 1
         else:
@@ -895,6 +896,7 @@ def calculate_start(crop, soil, weather, time):
                     crop_type.growing = True
                     soil.manure_day = True
                     soil.fertilizer_day = True
+                    soil.tillage_day = True
                 else:
                     crop_type.planting_date = time.day + 1
 
