@@ -3,7 +3,7 @@
 """
 RUFAS: Ruminant Farm Systems Model
 File name: main.py
-Description: Main entry point of RuFaS
+Description: Main entry point of RUFAS
 Author(s): Kass Chupongstimun, kass_c@hotmail.com
 """
 
