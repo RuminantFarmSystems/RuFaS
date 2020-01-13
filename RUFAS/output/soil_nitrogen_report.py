@@ -41,7 +41,7 @@ class SoilNitrogen(BaseReportHandler):
         #
 
         # daily outputs
-        self.daily_variables = {'year': ['time.cal_year', '', []],
+        self.daily_variables = {'year': ['time.calendar_year', '', []],
                                 'j_day': ['time.day', '', []],
                                 'NO3_L1': ['soil.soil_layers[0].NO3', 'kg', []],
                                 'NO3_L2': ['soil.soil_layers[1].NO3', 'kg', []],
@@ -89,7 +89,7 @@ class SoilNitrogen(BaseReportHandler):
                                 }
 
         # annual outputs
-        self.annual_variables = {'year': ['time.cal_year', '', 0],
+        self.annual_variables = {'year': ['time.calendar_year', '', 0],
                                  'NO3_runoff': ['soil.NO3_runoff_annual', 'kg/ha', 0],
                                  'NH4_runoff': ['soil.NH4_runoff_annual', 'kg/ha', 0],
                                  'NH4_erosion': ['soil.NH4_erosion_annual', 'kg/ha', 0],

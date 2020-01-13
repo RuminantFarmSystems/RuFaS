@@ -40,7 +40,7 @@ class SoilPhosphorus(BaseReportHandler):
         # [] is an empty list
         #
 
-        self.daily_variables = {'year': ['time.cal_year', '', []],
+        self.daily_variables = {'year': ['time.calendar_year', '', []],
                                 'j_day': ['time.day', '', []],
                                 'soil_runoff_DRP': ['soil.SRP_MGL', 'mgL', []],
                                 'manure_runoff_DRP': ['soil.runoff_IP', 'mgL', []],
@@ -65,7 +65,7 @@ class SoilPhosphorus(BaseReportHandler):
                                 'sediment_P': ['soil.sed_P', 'kg/ha', []],
                                 }
 
-        self.annual_variables = {'year': ['time.cal_year', '', 0]
+        self.annual_variables = {'year': ['time.calendar_year', '', 0]
                                  }
 
     def write_headers(self, output_csv, variables):

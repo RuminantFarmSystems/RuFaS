@@ -41,15 +41,15 @@ class GrowthReport(BaseReportHandler):
         #
 
         # daily outputs
-        self.daily_variables = {'year': ['time.cal_year', '', []],
+        self.daily_variables = {'year': ['time.calendar_year', '', []],
                                 'j_day': ['time.day', '', []],
                                 'num_animals_in_pen': ['len(pen.animals_in_pen)', '', []],
                                 'average_growth': ['pen.avg_growth', 'kg', []],
                                 'average_milk': ['pen.avg_milk', 'kg', []]
                                 }
 
-        # annual outpus
-        self.annual_variables = {'year': ['time.cal_year', '', 0]
+        # annual outputs
+        self.annual_variables = {'year': ['time.calendar_year', '', 0]
                                  }
 
     def write_headers(self, output_csv, variables):

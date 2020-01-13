@@ -1,4 +1,3 @@
-################################################################################
 """
 RUFAS: Ruminant Farm Systems Model
 File name: util.py
@@ -6,21 +5,17 @@ Description:
 Author(s): Kass Chupongstimun, kass_c@hotmail.com
            Jit Patil, spatil5@wisc.edu
 """
-################################################################################
 
-import sys
-import pulp
-import time as timer
-from pathlib import Path
 import csv
+import pulp
+import sys
+from pathlib import Path
 
-# -------------------------------------------------------------------------------
-# Function: get_base_dir
-# -------------------------------------------------------------------------------
+
 def get_base_dir():
     """Gets the base directory as reference for all relative paths.
 
-    Unfrozen appliaction - gets the project directory
+    Unfrozen application - gets the project directory
     Frozen application - gets the executable directory
 
     Returns:
@@ -46,9 +41,7 @@ def get_base_dir():
         #                     parent[1] = base_dir/
         return Path(__file__).resolve().parents[1]
 
-# -------------------------------------------------------------------------------
-# Function: LP_solve
-# -------------------------------------------------------------------------------
+
 def LP_solve(LHS, RHS, objective, var_names, operators,
              mode="min", name="LP", lower_var_bounds=None, upper_var_bounds=None):
     """Solves the linear program using the PULP package solver.
@@ -91,8 +84,8 @@ def LP_solve(LHS, RHS, objective, var_names, operators,
             'variableN_name': variable value
             }
     """
-    start = timer.time()
 
+    LP = None
     num_variables = len(var_names)
 
     # Ensure the LP is structured correctly
@@ -106,7 +99,7 @@ def LP_solve(LHS, RHS, objective, var_names, operators,
     LP_vars = generate_LP_vars(var_names, lower_var_bounds, upper_var_bounds)
 
     # Add objective function
-    LP += pulp.lpSum([ LP_vars[v] * objective[v] for v in range(num_variables) ])
+    LP += pulp.lpSum([LP_vars[v] * objective[v] for v in range(num_variables)])
 
     # Add constraints
     add_LP_constraints(LHS, RHS, LP_vars, operators, LP)
@@ -117,9 +110,6 @@ def LP_solve(LHS, RHS, objective, var_names, operators,
 
     # Get organized results
     results = organize_results(LP)
-
-    end = timer.time()
-    # print("LP elapsed time: " + str(end-start))
 
     return results
 
@@ -209,21 +199,19 @@ def organize_results(LP):
     results['objective'] = pulp.value(LP.objective)
     return results
 
-# -------------------------------------------------------------------------------
-# Function: LP_print
-# -------------------------------------------------------------------------------
+
 def LP_print(LHS, RHS, objective, variables, operators,
              mode="min", name="LP", min_v=None, max_v=None):
     """Text representation of the Linear Programming problem."""
 
-    LHS = [ [round(x, 4) for x in row] for row in LHS]
-    RHS = [ round(x, 4) for x in RHS]
-    objective = [ round(x, 4) for x in objective]
+    LHS = [[round(x, 4) for x in row] for row in LHS]
+    RHS = [round(x, 4) for x in RHS]
+    objective = [round(x, 4) for x in objective]
 
     # Problem name
     LP_text = "\nLP Problem: {}\n".format(name)
-    #LP_text += str(len(variables)) + " variables\n"
-    #LP_text += str(len(LHS)) + " constraints\n"
+    # LP_text += str(len(variables)) + " variables\n"
+    # LP_text += str(len(LHS)) + " constraints\n"
 
     # Direction of Optimization
     if mode.lower().startswith("min"):
@@ -239,7 +227,7 @@ def LP_print(LHS, RHS, objective, variables, operators,
     for v in range(len(variables)):
         objective_text += "{}*{} ".format(objective[v], variables[v])
         if not v == len(variables) - 1:
-                objective_text += "+ "
+            objective_text += "+ "
     LP_text += objective_text + '\n'
 
     # Contraint Equations
@@ -318,7 +306,7 @@ class Library():
         size = len(info[0])
 
         # Create and add each item to the library
-        for i in range(1,size):
+        for i in range(1, size):
             item = {}
             values = [col[i] for col in info]
 
@@ -364,8 +352,8 @@ class Library():
             duplicate = "Name of '%s'" % name
 
         if duplicate != "":
-            print("The "+duplicate+" corresponds with multiple items in the specified csv.\n"
-                  "Please modify the csv so that the "+duplicate+" is unique to one item.")
+            print("The " + duplicate + " corresponds with multiple items in the specified csv.\n"
+                                       "Please modify the csv so that the " + duplicate + " is unique to one item.")
             print("Exiting ...")
             exit()
 
