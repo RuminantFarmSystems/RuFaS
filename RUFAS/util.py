@@ -1,4 +1,3 @@
-################################################################################
 """
 RUFAS: Ruminant Farm Systems Model
 File name: util.py
@@ -6,17 +5,14 @@ Description:
 Author(s): Kass Chupongstimun, kass_c@hotmail.com
            Jit Patil, spatil5@wisc.edu
 """
-################################################################################
 
-import sys
+import csv
 import pulp
+import sys
 import time as timer
 from pathlib import Path
-import csv
 
-# -------------------------------------------------------------------------------
-# Function: get_base_dir
-# -------------------------------------------------------------------------------
+
 def get_base_dir():
     """Gets the base directory as reference for all relative paths.
 
@@ -46,9 +42,7 @@ def get_base_dir():
         #                     parent[1] = base_dir/
         return Path(__file__).resolve().parents[1]
 
-# -------------------------------------------------------------------------------
-# Function: LP_solve
-# -------------------------------------------------------------------------------
+
 def LP_solve(LHS, RHS, objective, var_names, operators,
              mode="min", name="LP", lower_var_bounds=None, upper_var_bounds=None):
     """Solves the linear program using the PULP package solver.
@@ -91,8 +85,8 @@ def LP_solve(LHS, RHS, objective, var_names, operators,
             'variableN_name': variable value
             }
     """
-    start = timer.time()
 
+    LP = None
     num_variables = len(var_names)
 
     # Ensure the LP is structured correctly
@@ -106,7 +100,7 @@ def LP_solve(LHS, RHS, objective, var_names, operators,
     LP_vars = generate_LP_vars(var_names, lower_var_bounds, upper_var_bounds)
 
     # Add objective function
-    LP += pulp.lpSum([ LP_vars[v] * objective[v] for v in range(num_variables) ])
+    LP += pulp.lpSum([LP_vars[v] * objective[v] for v in range(num_variables)])
 
     # Add constraints
     add_LP_constraints(LHS, RHS, LP_vars, operators, LP)
@@ -117,9 +111,6 @@ def LP_solve(LHS, RHS, objective, var_names, operators,
 
     # Get organized results
     results = organize_results(LP)
-
-    end = timer.time()
-    # print("LP elapsed time: " + str(end-start))
 
     return results
 
@@ -209,9 +200,7 @@ def organize_results(LP):
     results['objective'] = pulp.value(LP.objective)
     return results
 
-# -------------------------------------------------------------------------------
-# Function: LP_print
-# -------------------------------------------------------------------------------
+
 def LP_print(LHS, RHS, objective, variables, operators,
              mode="min", name="LP", min_v=None, max_v=None):
     """Text representation of the Linear Programming problem."""
