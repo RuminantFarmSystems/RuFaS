@@ -1,13 +1,11 @@
-################################################################################
+# !/usr/bin/env python3
+
 """
 RUFAS: Ruminant Farm Systems Model
 File name: main.py
-Description: Main entry point of RUFAS
+Description: Main entry point of RuFaS
 Author(s): Kass Chupongstimun, kass_c@hotmail.com
 """
-################################################################################
-
-# !/usr/bin/env python3
 
 import RUFAS
 
@@ -40,8 +38,8 @@ def main():
         RUFAS.simulate(input_file_path)
 
 
-# -------------------------------------------------------------------------------
+#
 # PROGRAM ENTRY POINT
-# -------------------------------------------------------------------------------
+#
 if __name__ == '__main__':
     main()
