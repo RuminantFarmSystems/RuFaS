@@ -4,6 +4,8 @@ RUFAS: Ruminant Farm Systems Model
 File name: yields.py
 
 Author(s): Andy Achenreiner, achenreiner@wisc.edu
+           William Donovan, wmdonovan@wisc.edu
+           Jacob Johnson, jacob8399@gmail.com
 
 Description: This module contains the necessary functions for calculating and
              updating the yield values of a crop_type. Currently the only

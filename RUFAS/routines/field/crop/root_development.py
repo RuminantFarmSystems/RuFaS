@@ -28,7 +28,6 @@ CropType values updated by calling update_all():
     fr_root
     z_root
 """
-###############################################################################
 
 
 #
@@ -65,16 +64,3 @@ def calc_z_root(crop_type):
 
         else:  # self.fr_PHU <= 0.4
             crop_type.z_root = 2.5 * crop_type.fr_PHU * crop_type.z_root_max
-
-    # if crop_type.crop_type == "perennial" and crop_type.planted:
-    #     crop_type.z_root = crop_type.z_root_max
-    #
-    # elif after_harvest:
-    #     crop_type.z_root = 0
-    #
-    # # C.3.A.3
-    # elif crop_type.crop_type == "annual" and crop_type.fr_PHU > 0.4:
-    #     crop_type.z_root = crop_type.z_root_max
-    #
-    # else:  # crop_type == "annual" and self.fr_PHU <= 0.4
-    #     crop_type.z_root = 2.5 * crop_type.fr_PHU * crop_type.z_root_max

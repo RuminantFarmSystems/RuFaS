@@ -1,4 +1,3 @@
-################################################################################
 """
 RUFAS: Ruminant Farm Systems Model
 File name: field.py
@@ -37,7 +36,7 @@ This module needs the following inputs in order to operate correctly:
             fc_water
             wilting_water
 """
-################################################################################
+
 import json
 from RUFAS import util, errors
 from pathlib import Path
@@ -60,7 +59,21 @@ class Field:
         self.crop = Crop(self.crop_data, time)
 
 
-def read_json_file(file_path:Path):
+def read_json_file(file_path: Path):
+    """Reads the json file, writes information to the simulation variables.
+
+    Reads and interprets the (json) file at the given path. Compiles the
+    information into dictionaries and instantiates the simulation objects with
+    them. Assigns the objects to the global simulation variables.
+
+    Inputs:
+        file_path (Path): Path to the input json file
+    Raises:
+        InvalidJSONFileError: If the json file at the given path does not
+            conform with the format required
+    Returns:
+        data: the data read from the json file
+    """
     try:
         if file_path.suffix == '.json':
             if not file_path.is_file():
@@ -73,6 +86,5 @@ def read_json_file(file_path:Path):
 
         return data
 
-    except errors.UserInput as e:\
+    except errors.UserInput as e:
         print(e.msg)
-

@@ -82,7 +82,7 @@ def daily_crop_routine(crop, weather, time, soil):
 
                 growth_constraints.update_all(crop_type, time, weather, soil)
 
-                leaf_area_index.update_all(crop_type, time)
+                leaf_area_index.update_all(crop_type)
 
                 biomass.update_all(crop_type, soil, time, weather)
 
@@ -343,6 +343,8 @@ class InitCrop:
         self.act_N_up_each_layer = []
         self.N_actual_up = 0
 
+        self.N_fix = 0
+
         # ===================================================================
         ''' Phosphorus Uptake Data '''
 
@@ -361,6 +363,7 @@ class InitCrop:
         self.fr_P = 0
         self.P_up = 0
         self.act_P_up_each_layer = []
+        self.pot_N_up_each_layer = []
         self.P_act_up = 0
 
         # ===================================================================
@@ -503,6 +506,8 @@ class Corn:
         self.act_N_up_each_layer = []
         self.N_actual_up = 0
 
+        self.N_fix = 0
+
         # ===================================================================
         ''' Phosphorus Uptake Data '''
 
@@ -521,6 +526,7 @@ class Corn:
         self.fr_P = 0
         self.P_up = 0
         self.act_P_up_each_layer = []
+        self.pot_N_up_each_layer = []
         self.P_act_up = 0
 
         # ===================================================================
@@ -661,7 +667,10 @@ class Soybean:
         self.fr_N_up = 0
         self.N_up = 0
         self.act_N_up_each_layer = []
+        self.pot_N_up_each_layer = []
         self.N_actual_up = 0
+
+        self.N_fix = 0
 
         # ===================================================================
         ''' Phosphorus Uptake Data '''
@@ -824,7 +833,10 @@ class Alfalfa:
         self.fr_N_up = 0
         self.N_up = 0
         self.act_N_up_each_layer = []
+        self.pot_N_up_each_layer = []
         self.N_actual_up = 0
+
+        self.N_fix = 0
 
         # ===================================================================
         ''' Phosphorus Uptake Data '''

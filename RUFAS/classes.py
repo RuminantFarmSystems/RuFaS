@@ -275,14 +275,6 @@ class Weather:
         # TODO: manureN is a temporary weather file input until the manure module is linked with the rest of the program
         self.T_avg_annual = []
 
-        self.evaporation = []
-        self.lCows = []
-        self.dCows = []
-        self.heifer = []
-        self.calf = []
-        self.beef = []
-        self.beefCalf = []
-
         year_length = 365
         leap_year_length = 366
 
@@ -320,16 +312,6 @@ class Weather:
             # TODO: manureN is a temporary weather file input until the manure
             #  module is linked with the rest of the program
             self.manureN.append([0.0 for _ in range(len(year))])
-
-            # These are not currently inputs into the weather file. They may
-            # be/may have been at some point.
-            # self.evaporation.append([0 for _ in range(len(year))])
-            # self.lCows.append([0 for _ in range(len(year))])
-            # self.dCows.append([0 for _ in range(len(year))])
-            # self.heifer.append([0 for _ in range(len(year))])
-            # self.calf.append([0 for _ in range(len(year))])
-            # self.beef.append([0 for _ in range(len(year))])
-            # self.beefCalf.append([0 for _ in range(len(year))])
 
         # read in the input csv file
         weather_full_path = util.get_base_dir() / 'Inputs/weather' / weather_file

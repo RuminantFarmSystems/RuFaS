@@ -1,4 +1,3 @@
-# TODO: Nitrogen Fixation currently returns large negative numbers 11/05/19. This is not biologically feasible
 """
 RUFAS: Ruminant Farm Systems Model
 
@@ -23,7 +22,6 @@ CropType attribute definitions:
 
     act_N_up_each_layer = List of actual nitrogen uptakes from each soil layer.
 """
-###############################################################################
 
 
 #
@@ -132,8 +130,8 @@ def calc_f_sw(accessible_layers):
 def calc_N_demand(crop_type, accessible_layers):
     NO3_root = sum([layer.NO3 for layer in accessible_layers])
 
-    act_N_up_root = sum(crop_type.act_N_up_each_layer[:len(accessible_layers)])
+    pot_N_up_root = sum(crop_type.pot_N_up_each_layer[:len(accessible_layers)])
 
-    N_demand = max(act_N_up_root - NO3_root, 0)
+    N_demand = max(pot_N_up_root - NO3_root, 0)
 
     return N_demand
