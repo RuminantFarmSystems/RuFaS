@@ -19,10 +19,12 @@ Feed values updated by update_all():
 """
 
 
-###############################################################################
-
-
 def update_all(feed):
+    """
+    Description:
+        The only external function call. Runs the carbon loss sub-module
+    """
+
     harvest_loss(feed)
 
     storage_loss(feed)
@@ -33,24 +35,44 @@ def update_all(feed):
 
 
 def harvest_loss(feed):
+    """
+    Description:
+        Carbon loss during harvest
+    """
+
     feed.C_harvest_gas = feed.carbon * feed.C_harvest_gas_percent
 
     feed.C_harvest_particle = feed.carbon * feed.C_harvest_particle_percent
 
 
 def storage_loss(feed):
+    """
+    Description:
+        Carbon loss during feed storage
+    """
+
     feed.C_storage_gas = feed.carbon * feed.C_storage_gas_percent
 
     feed.C_storage_leachate = feed.carbon * feed.C_storage_leachate_percent
 
 
 def feedout_loss(feed):
+    """
+    Description:
+        Carbon loss during feedout
+    """
+
     feed.C_feedout_gas = feed.carbon * feed.C_feedout_gas_percent
 
     feed.C_feedout_particle = feed.carbon * feed.C_feedout_particle_percent
 
 
 def update_carbon(feed):
+    """
+    Description:
+        Update feed carbon based on calculated losses
+    """
+
     carbon_loss = (feed.C_harvest_gas + feed.C_harvest_particle +
                    feed.C_storage_gas + feed.C_storage_leachate +
                    feed.C_feedout_gas + feed.C_feedout_particle)

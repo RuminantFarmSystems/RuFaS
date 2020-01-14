@@ -17,17 +17,17 @@ Soil attribute definitions
 
     z = depth of the soil layer's lower boundary
 
-    OrgN = initial Organic N (Active + Stable) (mg/kg)
+    org_N = initial Organic N (Active + Stable) (mg/kg)
 
-    OrgC = Organic carbon in a soil layer (%, user input)
+    org_C = Organic carbon in a soil layer (%, user input)
 
     NH4 = initial NO4 levels (0 mg/kg)
     
-    tempfac = temperature factor
+    temp_fac = temperature factor
     
-    waterfac = water factor
+    water_fac = water factor
     
-    soilTemp = temperature of the soil layer (ºC)
+    soil_temp = temperature of the soil layer (ºC)
     
     SW = soil water content of entire profile, excluding water held at wilting
             point (mm H2O)
@@ -38,75 +38,75 @@ Soil attribute definitions
     
     SAT = saturated water content of the soil layer (mm H2O)
 
-    DepthFac = volatilization depth factor
+    depth_fac = volatilization depth factor
 
     z_mid = 5mm (assuming a 10mm top layer)
 
-    NitrReg = nitrification regulator
+    nitr_reg = nitrification regulator
 
-    VolatilReg = volatilization regulator
+    volatil_reg = volatilization regulator
 
-    CECFac = volatilization cation exchange factor (0.15)
+    CEC_fac = volatilization cation exchange factor (0.15)
 
-    TotNitriVolatil = total combined nitrification and volatilization (kg/ha)
+    tot_nitri_volatil = total combined nitrification and volatilization (kg/ha)
 
-    FracNitr = fraction of total that is nitrification
+    frac_nitr = fraction of total that is nitrification
 
-    FracVolatil = fraction of total that is volatilization
+    frac_volatil = fraction of total that is volatilization
 
-    Nitrification = mass of nitrification (kg/ha)
+    nitrification = mass of nitrification (kg/ha)
 
-    Volatilization = mass of Volatilization
+    volatilization = mass of volatilization
 
-    NO3/NH4Conc1 = concentration of NO3 or NH4 in the top soil layer (kg N/mm H2O)
+    NO3/NH4_conc1 = concentration of NO3 or NH4 in the top soil layer (kg N/mm H2O)
 
     w = sum of runoff and soil water for the layer
 
-    NO3/NH4Runoff = mass of NO3 or NH4 loss in runoff from soil layer 1 (kg/ha)
+    NO3/NH4_runoff = mass of NO3 or NH4 loss in runoff from soil layer 1 (kg/ha)
 
     Cr = coefficient of extraction for runoff (0.1)
 
-    NConc = concentration of nitrogen loss in erosion for each pool except
+    N_conc = concentration of nitrogen loss in erosion for each pool except
                     NO3 (mg/kg)
 
     BD = soil layer bulk density (g/cm^3)
 
     depth = soil layer thickness (mm)
 
-    Eros_N_Loss = N mass loss in erosion for each pool(kg/ha)
+    eros_N_loss = N mass loss in erosion for each pool(kg/ha)
 
-    Sed = daily soil loss (Metric Tons/ha)
+    sed = daily soil loss (Metric Tons/ha)
 
     ER = enrichment ratio
 
-    NO3/NH4Conc = concentration of NO3 or NH4 for leaching (kg N / mm H2O)
+    NO3/NH4_conc = concentration of NO3 or NH4 for leaching (kg N / mm H2O)
 
-    NO3/NH4Perc = mass of NO3 or NH4 loss in percolation water from all soil layers
+    NO3/NH4_perc = mass of NO3 or NH4 loss in percolation water from all soil layers
                 (kg/ha)
 
-    DenitrN = denitrification (kg/ha)
+    denitr_N = denitrification (kg/ha)
 
-    deNrate = user defined denitrification rate coefficient (0.1)
+    de_N_rate = user defined denitrification rate coefficient (0.1)
 
-    OrgC = soil organic matter content (%)
+    org_C = soil organic matter content (%)
 
-    Nminact = mineralization from active N pool (kg/ha)
+    N_min_act = mineralization from active N pool (kg/ha)
 
     CN = daily rate constant, ratio of Carbon to Nitrogen
 
     CP = ratio of the residue
 
-    Decay = decay rate constant defining the fraction of residue decomposed
+    decay = decay rate constant defining the fraction of residue decomposed
 
-    minCoeff = fresh residue mineralization coefficient (0.05)
+    min_coeff = fresh residue mineralization coefficient (0.05)
 
-    resComp = nutrient cycling residue decomposition factor
+    res_comp = nutrient cycling residue decomposition factor
 
-    FreshMin = mineralization of Fresh N (kg/ha)
+    fresh_min = mineralization of Fresh N (kg/ha)
 
-    Ntrans = nitrogen transferred between the active and stable pools
+    N_trans = nitrogen transferred between the active and stable pools
 
-    FracN = fraction of humic nitrogen in the active pool (0.02)
+    frac_N = fraction of humic nitrogen in the active pool (0.02)
 
 
 Soil values updated by calling update_all():
@@ -120,26 +120,23 @@ Soil values updated by calling update_all():
         temp_fac
         water_fac
         volatilization
-        activeN
-        orgN
-        stableN
-
-
+        active_N
+        org_N
+        stable_N
 """
-
-###############################################################################
 
 from math import exp
 from . import denitrification, humus_mineralization, mineralization_decomp, \
     leaching_runoff_erosion, nitrification_volatilization
 
 
-#
-# This function calls all the necessary functions to update information related
-# to nitrogen cycling. The order in which each method is called is significant
-# and is still being worked out.
-#
 def update_all(soil, weather, time):
+    """
+    Description:
+        This function calls all the necessary functions to update information related
+        to nitrogen cycling. The order in which each method is called is significant
+        and is a matter of active development.
+    """
 
     calc_temp_factors(soil)
 
@@ -158,29 +155,33 @@ def update_all(soil, weather, time):
     added_manure_N(soil, weather, time)
 
 
-#
-# Helper method used to calculate the temperature factor used to
-# calculate nitrification, volatilization, denitrification, and mineralization
-# for each layer
-# "pseudocode_soil" S.4.B.1
-#
 def calc_temp_factors(soil):
-    for layer in soil.soil_layers:
-        soilTemp = layer.temperature
+    """
+    Description:
+        Helper method used to calculate the temperature factor used in the
+        calculations for nitrification, volatilization, denitrification, and
+        mineralization
+        "pseudocode_soil" S.4.B.1
+    """
 
-        exp_part = exp(9.93 - 0.312 * soilTemp)
-        temp_fac = max(0, soilTemp / (soilTemp + exp_part))
+    for layer in soil.soil_layers:
+        soil_temp = layer.temperature
+
+        exp_part = exp(9.93 - 0.312 * soil_temp)
+        temp_fac = max(0, soil_temp / (soil_temp + exp_part))
 
         layer.temp_fac = temp_fac
 
 
-#
-# Helper method used to calculate the water factor used to
-# calculate nitrification, volatilization, denitrification, and mineralization
-# for each layer
-# "pseudocode_soil" S.4.B.2
-#
 def calc_water_factors(soil):
+    """
+    Description:
+        Helper method used to calculate the water factor used in the
+        calculations for nitrification, volatilization, denitrification, and
+        mineralization
+        "pseudocode_soil" S.4.B.2
+    """
+
     for layer in soil.soil_layers:
         SW = layer.soil_water
         FC = layer.fc_water
@@ -194,11 +195,17 @@ def calc_water_factors(soil):
 
         layer.water_fac = water_fac
 
+
 def added_manure_N(soil, weather, time):
-    totalN = weather.manureN[time.year - 1][time.day - 1]
+    """
+    Description:
+        TODO: Temporary method to add manure from weather file
+    """
 
-    activeN = totalN * 0.875
-    stableN = totalN * 0.125
+    total_N = weather.manure_N[time.year - 1][time.day - 1]
 
-    soil.soil_layers[0].activeN += activeN
-    soil.soil_layers[0].stableN += stableN
+    active_N = total_N * 0.875
+    stable_N = total_N * 0.125
+
+    soil.soil_layers[0].active_N += active_N
+    soil.soil_layers[0].stable_N += stable_N

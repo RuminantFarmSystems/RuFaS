@@ -1,9 +1,11 @@
 """
 RUFAS: Ruminant Farm Systems Model
 File name: manure_report.py
-Description:
+
 Author(s): Militsa Sotirova, militsasotirova@gmail.com
            William Donovan, wmdonovan@wisc.edu
+
+Description: Output handler for animal manure report.
 """
 
 import csv

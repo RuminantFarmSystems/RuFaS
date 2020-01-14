@@ -2,10 +2,10 @@
 RUFAS: Ruminant Farm Systems Model
 File name: growth_report.py
 
-Description: Output handler for animal growth reports.
-
 Author(s): Militsa Sotirova, militsasotirova@gmail.com
            William Donovan, wmdonovan@wisc.edu
+
+Description: Output handler for animal growth report.
 """
 
 import csv

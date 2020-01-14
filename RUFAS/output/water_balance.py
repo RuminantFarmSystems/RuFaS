@@ -2,10 +2,10 @@
 RUFAS: Ruminant Farm Systems Model
 File name: water_balance.py
 
-Description: Output handler for the water balance report.
-
 Author(s): William Donovan, wmdonovan@wisc.edu
            Jacob Johnson, jacob8399@gmail.com
+
+Description: Output handler for the water balance report.
 """
 
 import csv

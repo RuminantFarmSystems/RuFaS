@@ -1,4 +1,4 @@
-Julian Day,Rainfall,Tmax,Tmin,Tavg,Biomass,Radiation,ManureN
+Julian Day,Rainfall,T_max,T_min,T_avg,Biomass,Radiation,ManureN
 1,0,0,0,0,0,0,0
 2,0,0,0,0,0,0,0
 3,0,0,0,0,0,0,0
