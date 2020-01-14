@@ -2,9 +2,9 @@
 RUFAS: Ruminant Farm Systems Model
 File name: base_report_handler.py
 
-Description: Abstract class defining a basic report.
-
 Author(s): Kass Chupongstimun, kass_c@hotmail.com
+
+Description: Abstract class defining a basic report.
 """
 
 from pathlib import Path

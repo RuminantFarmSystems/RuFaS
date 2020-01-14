@@ -1,9 +1,11 @@
 """
 RUFAS: Ruminant Farm Systems Model
 File name: crop_report.py
-Description:
+
 Author(s): William Donovan, wmdonovan@wisc.edu
            Jacob Johnson, jacob8399@gmail.com
+
+Description: Output handler for animal growth reports.
 """
 
 from RUFAS.output.graphics import show_figures

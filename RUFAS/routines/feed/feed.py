@@ -2,14 +2,14 @@
 RUFAS: Ruminant Farm Systems Model
 File name: feed.py
 
-Description: Main driver for the feed storage module. Calibrates storage and models
-                protein degradation as well as reductions in Carbon, Nitrogen, and
-                Phosphorus content during harvest, storage, and feedout.
-
 Author(s): Kass Chupongstimun, kass_c@hotmail.com,
            Andy Achenreiner, achenreiner@wisc.edu
            William Donovan, wmdonovan@wisc.edu
            Jacob Johnson, jacob8399@gmail.com
+
+Description: Main driver for the feed storage module. Calibrates storage and models
+                protein degradation as well as reductions in Carbon, Nitrogen, and
+                Phosphorus content during harvest, storage, and feedout.
 """
 
 from RUFAS import util

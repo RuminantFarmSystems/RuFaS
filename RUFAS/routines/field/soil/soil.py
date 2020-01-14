@@ -503,8 +503,8 @@ class Soil:
         # daily soil nitrogen values
         self.residue = data['initial_residue']
         self.freshNMineralRate = data['fresh_N_mineral_rate']
-        self.decayRate = 0.0
-        self.topLayerFreshN = 0.0
+        self.decay_rate = 0.0
+        self.top_layer_fresh_N = 0.0
 
         # soil phosphorus attributes
         self.lightFactor = []
@@ -516,21 +516,21 @@ class Soil:
         self.NH4_runoff = 0.0
 
         self.NH4_erosion = 0.0
-        self.activeN_erosion = 0.0
-        self.stableN_erosion = 0.0
-        self.freshN_erosion = 0.0
+        self.active_N_erosion = 0.0
+        self.stable_N_erosion = 0.0
+        self.fresh_N_erosion = 0.0
 
         self.NO3_runoff_annual = 0.0
         self.NH4_runoff_annual = 0.0
 
         self.NH4_erosion_annual = 0.0
-        self.activeN_erosion_annual = 0.0
-        self.stableN_erosion_annual = 0.0
-        self.freshN_erosion_annual = 0.0
+        self.active_N_erosion_annual = 0.0
+        self.stable_N_erosion_annual = 0.0
+        self.fresh_N_erosion_annual = 0.0
 
         self.NO3_drainage_annual = 0.0
         self.NH4_drainage_annual = 0.0
-        self.activeN_drainage_annual = 0.0
+        self.active_N_drainage_annual = 0.0
 
         # ------ INITIALIZE SOIL NITROGEN POOLS ------------------------------------
         # Calculate initial amount of NO3 in each soil layer;
@@ -544,19 +544,19 @@ class Soil:
             NO3 = 7 * exp_part
 
             # "pseudocode_soil" S.4.A.2
-            OrgC = layer.org_C
-            OrgN = (10 ** 4) * (OrgC / 14)
+            org_C = layer.org_C
+            org_N = (10 ** 4) * (org_C / 14)
 
             # "pseudocode_soil" S.4.A.3
-            FracN = 0.02
-            activeN = FracN * OrgN
+            frac_N = 0.02
+            active_N = frac_N * org_N
 
             # "pseudocode_soil" S.4.A.4
-            stableN = (1 - FracN) * OrgN
+            stable_N = (1 - frac_N) * org_N
 
             # "pseudocode_soil" S.4.A.5
             res = self.residue
-            FreshN = 0.0015 * res
+            fresh_N = 0.0015 * res
 
             # "pseudocode_soil" S.4.A.6
             NH4 = layer.NH4
@@ -567,11 +567,11 @@ class Soil:
             unit_adjustment = (BD * thickness) / 100
 
             layer.NO3 = NO3 * unit_adjustment
-            layer.orgN = OrgN
-            layer.activeN = activeN * unit_adjustment
-            layer.stableN = stableN * unit_adjustment
+            layer.orgN = org_N
+            layer.active_N = active_N * unit_adjustment
+            layer.stable_N = stable_N * unit_adjustment
             layer.NH4 = NH4 * unit_adjustment
-            layer.topLayerFreshN = FreshN * unit_adjustment
+            layer.top_layer_fresh_N = fresh_N * unit_adjustment
 
     # ---------------------------------------------------------------------------
     # Class: SoilLayer
@@ -642,22 +642,22 @@ class Soil:
             self.orgN = 0.0
 
             # Initial Active N in layer:
-            self.activeN = 0.0
+            self.active_N = 0.0
 
             # Initial Stable N in layer:
-            self.stableN = 0.
+            self.stable_N = 0.
 
             self.NO3_perc = 0.0
             self.NH4_perc = 0.0
             self.active_perc = 0.0
-            self.nMinAct = 0.0
+            self.N_min_act = 0.0
             self.nitrification = 0.0
             self.volatilization = 0.0
             self.denitrification = 0.0
-            self.nTrans = 0.0
+            self.N_trans = 0.0
             self.totNitriVolatil = 0.0
 
-            self.deNrate = layer_data['denitrification_rate']
+            self.de_N_rate = layer_data['denitrification_rate']
             self.fracActiveN = layer_data['active_N_percent']
             self.volatileExchangeFactor = layer_data['volatile_exchange_factor']
 
@@ -873,10 +873,10 @@ class Soil:
         self.NH4_runoff_annual = 0.0
 
         self.NH4_erosion_annual = 0.0
-        self.activeN_erosion_annual = 0.0
-        self.stableN_erosion_annual = 0.0
-        self.freshN_erosion_annual = 0.0
+        self.active_N_erosion_annual = 0.0
+        self.stable_N_erosion_annual = 0.0
+        self.fresh_N_erosion_annual = 0.0
 
         self.NO3_drainage_annual = 0.0
         self.NH4_drainage_annual = 0.0
-        self.activeN_drainage_annual = 0.0
+        self.active_N_drainage_annual = 0.0

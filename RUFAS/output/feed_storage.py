@@ -2,10 +2,10 @@
 RUFAS: Ruminant Farm Systems Model
 File name: feed_storage.py
 
-Description: Output handler for the feed storage module.
-
 Author(s): William Donovan, wmdonovan@wisc.edu
            Jacob Johnson, jacob8399@gmail.com
+
+Description: Output handler for the feed storage module.
 """
 
 import csv
