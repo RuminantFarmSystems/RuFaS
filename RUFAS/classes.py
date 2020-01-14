@@ -1,4 +1,3 @@
-################################################################################
 """
 RUFAS: Ruminant Farm Systems Model
 File name: classes.py
@@ -8,7 +7,6 @@ Author(s): Kass Chupongstimun, kass_c@hotmail.com
            William Donovan, wmdonovan@wisc.edu
            Jacob Johnson, jacob8399@gmail.com
 """
-################################################################################
 
 import csv
 import json
