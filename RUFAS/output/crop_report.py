@@ -3,11 +3,11 @@
 RUFAS: Ruminant Farm Systems Model
 File name: crop_report.py
 
-Description: Output handler for the crop module. Operates on daily and annual
-                simulation scale.
-
 Author(s): William Donovan, wmdonovan@wisc.edu
            Jacob Johnson, jacob8399@gmail.com
+
+Description: Output handler for the crop module. Operates on daily and annual
+                simulation scale.
 """
 
 import csv

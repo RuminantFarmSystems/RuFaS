@@ -1,7 +1,9 @@
 """
 RUFAS: Ruminant Farm Systems Model
 File name: crop.py
+
 Description:
+
 Author(s): Kass Chupongstimun, kass_c@hotmail.com
            Andy Achenreiner, achenreiner@wisc.edu
            William Donovan, wmdonovan@wisc.edu

@@ -92,7 +92,7 @@ def calc_sed(soil, crop, weather, time):
     peak_runoff = calc_peak_runoff(soil, weather, time)
     K = calc_K(soil)
     C = calc_C(soil, crop)
-    P = soil.practiceFactor
+    P = soil.practice_factor
     LS = calc_LS(soil)
 
     sed = 11.8 * ((runoff * peak_runoff) ** 0.56) * K * C * P * LS
@@ -120,7 +120,7 @@ def calc_peak_runoff(soil, weather, time):
         RC = runoff / R
 
         I = calc_I(soil, weather, time)
-        Area = soil.fieldSize
+        Area = soil.field_size
 
         peak_runoff = (RC * I * Area) / 3.6
 
@@ -143,9 +143,9 @@ def calc_I(soil, weather, time):
 # "pseudocode_soil" S.3.A.5
 #
 def calc_Tconc(soil):
-    Length = soil.slopeLength ** 0.6
+    Length = soil.slope_length ** 0.6
     n = soil.manning ** 0.6
-    slope = soil.fieldSlope ** 0.3
+    slope = soil.field_slope ** 0.3
 
     return (Length * n) / (18 * slope)
 
@@ -278,8 +278,8 @@ def calc_C(soil, crop):
 # "pseudocode_soil" S.3.A.15
 #
 def calc_LS(soil):
-    Lhill = soil.slopeLength
-    Alphahill = atan(soil.fieldSlope)
+    Lhill = soil.slope_length
+    Alphahill = atan(soil.field_slope)
     m = calc_m(soil)
 
     sin2_Alphahill = sin(Alphahill) ** 2
@@ -294,7 +294,7 @@ def calc_LS(soil):
 # "pseudocode_soil" S.3.A.16
 #
 def calc_m(soil):
-    slope = soil.fieldSlope
+    slope = soil.field_slope
 
     exp_part = exp(-35.835 * slope)
 

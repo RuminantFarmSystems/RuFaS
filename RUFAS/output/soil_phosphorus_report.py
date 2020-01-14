@@ -2,12 +2,12 @@
 RUFAS: Ruminant Farm Systems Model
 File name: soil_phosphorus_report.py
 
-Description: Output handler for Phosphorus cycling within the soil module
-
 Author(s): Kass Chupongstimun, kass_c@hotmail.com
            Jit Patil, spatil5@wisc.edu
            Jacob Johnson, jacob8399@gmail.com
            William Donovan, wmdonovan@wisc.edu
+
+Description: Output handler for Phosphorus cycling within the soil module
 """
 
 import csv

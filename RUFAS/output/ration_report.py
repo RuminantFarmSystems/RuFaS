@@ -1,10 +1,12 @@
 """
 RUFAS: Ruminant Farm Systems Model
 File name: ration_report.py
-Description:
+
 Author(s): Kass Chupongstimun, kass_c@hotmail.com
            Militsa Sotirova, militsasotirova@gmail.com
            William Donovan, wmdonovan@wisc.edu
+
+Description: Output handler for ration report.
 """
 
 import csv

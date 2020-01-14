@@ -72,7 +72,7 @@ def update_all(S, time):
 
         S.PSP_avg[i] = S.soil_layers[i].PSP
 
-        S.pbal[i] = S.soil_layers[i].labile_P - S.soil_layers[i].active_P \
+        S.P_bal[i] = S.soil_layers[i].labile_P - S.soil_layers[i].active_P \
                   * (S.soil_layers[i].PSP / (1.0 - S.soil_layers[i].PSP))
 
         S.varA[i] = 0.918 * (exp(-4.603 * S.soil_layers[i].PSP))
@@ -80,8 +80,8 @@ def update_all(S, time):
 
         S.base[i] = -1.0 * S.soil_layers[i].PSP + 0.8
 
-        if S.pbal[i] < 0.0:  # TODO: This whole section could be simplified
-            S.pflow[i] = 0.0
+        if S.P_bal[i] < 0.0:  # TODO: This whole section could be simplified
+            S.P_flow[i] = 0.0
             S.days[i] = 0.0
 
             if S.count_day[i] > 0.0:
@@ -90,22 +90,22 @@ def update_all(S, time):
                 S.count_day[i] = 1.0
 
             S.pd_srb_fac[i] = S.base[i] * (S.count_day[i] ** -0.32)
-            S.pflow_r[i] = S.pd_srb_fac[i] * S.pbal[i] * -1.0
+            S.P_flow_r[i] = S.pd_srb_fac[i] * S.P_bal[i] * -1.0
 
-            if S.pflow_r[i] > S.soil_layers[i].active_P:
-                S.pflow_r = S.soil_layers[i].active_P
+            if S.P_flow_r[i] > S.soil_layers[i].active_P:
+                S.P_flow_r = S.soil_layers[i].active_P
 
-            S.soil_layers[i].active_P -= S.pflow_r[i]
+            S.soil_layers[i].active_P -= S.P_flow_r[i]
             S.soil_layers[i].active_P = max(0.0, S.soil_layers[i].active_P)
 
-            S.soil_layers[i].labile_P += S.pflow_r[i]
+            S.soil_layers[i].labile_P += S.P_flow_r[i]
             S.soil_layers[i].labile_P = max(0.0, S.soil_layers[i].labile_P)
 
-        elif S.pbal[i] >= 0.0:
-            S.pflow_r[i] = 0.0
+        elif S.P_bal[i] >= 0.0:
+            S.P_flow_r[i] = 0.0
             S.count_day[i] = 0.0
 
-            if S.pbal[i] > S.old_pbal[i]:
+            if S.P_bal[i] > S.old_P_bal[i]:
                 S.days[i] = 0.0
             if S.days[i] >= 1.0:
                 S.days[i] += 1.0
@@ -113,21 +113,21 @@ def update_all(S, time):
                 S.days[i] = 1.0
 
             S.PSP_fac[i] = S.varA[i] * (S.days[i] ** S.varB[i])
-            S.pflow[i] = S.PSP_fac[i] * S.pbal[i]
+            S.P_flow[i] = S.PSP_fac[i] * S.P_bal[i]
 
-            S.pflow[i] = min(S.pflow[i], S.soil_layers[i].labile_P)
+            S.P_flow[i] = min(S.P_flow[i], S.soil_layers[i].labile_P)
 
-            S.soil_layers[i].labile_P -= S.pflow[i]
+            S.soil_layers[i].labile_P -= S.P_flow[i]
             S.soil_layers[i].labile_P = max(0.0, S.soil_layers[i].labile_P)
 
-            S.soil_layers[i].active_P += S.pflow[i]
+            S.soil_layers[i].active_P += S.P_flow[i]
             S.soil_layers[i].active_P = max(0.0, S.soil_layers[i].active_P)
 
-            S.old_pbal[i] = S.pbal[i]
+            S.old_P_bal[i] = S.P_bal[i]
 
-        S.pflow2[i] = 0.0006 * (S.soil_layers[i].stable_P - (4.0 * S.soil_layers[i].active_P))
-        S.soil_layers[i].stable_P -= S.pflow2[i]
-        S.soil_layers[i].active_P += S.pflow2[i]
+        S.P_flow2[i] = 0.0006 * (S.soil_layers[i].stable_P - (4.0 * S.soil_layers[i].active_P))
+        S.soil_layers[i].stable_P -= S.P_flow2[i]
+        S.soil_layers[i].active_P += S.P_flow2[i]
 
         S.temp_lab[i] = S.soil_layers[i].labile_P / S.soil_layers[i].bulk_density \
                       / S.thickness_cm[i] / 0.1

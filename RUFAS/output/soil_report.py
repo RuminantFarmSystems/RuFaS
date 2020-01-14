@@ -2,11 +2,11 @@
 RUFAS: Ruminant Farm Systems Model
 File name: soil_report.py
 
-Description: Output handler
-
 Author(s): Kass Chupongstimun, kass_c@hotmail.com
            Jit Patil, spatil5@wisc.edu
            William Donovan, wmdonovan@wisc.edu
+
+Description: Output handler for the soil report
 """
 
 import csv

@@ -2,11 +2,11 @@
 RUFAS: Ruminant Farm Systems Model
 File name: field_report.py
 
-Description: Each field is comprised of multiple reports, handled within this
-                shell.
-
 Author(s): William Donovan, wmdonovan@wisc.edu
            Jacob Johnson, jacob8399@gmail.com
+
+Description: Each field is comprised of multiple reports, handled within this
+                shell.
 """
 
 from .soil_report import SoilSummary

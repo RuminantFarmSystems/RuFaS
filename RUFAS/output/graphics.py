@@ -2,11 +2,11 @@
 RUFAS: Ruminant Farm Systems Model
 File name: graphics.py
 
-Description: Produces graphical representations of RuFaS output data
-                using matplotlib.
-
 Author(s): Jacob Johnson, jacob8399@gmail.com
            William Donovan, wmdonovan@wisc.edu
+
+Description: Produces graphical representations of RuFaS output data
+                using matplotlib.
 """
 
 from RUFAS import util
@@ -77,6 +77,7 @@ def ration_graphics(output_csv, produce_graphics, display_graphics, is_final, ra
 
         start_year = int(variables['year'][0])
         start_day = int(variables['j_day'][0])
+
         # start date
         date = dt.datetime(int(start_year), 1, 1) + dt.timedelta(start_day - 1)
 
@@ -121,7 +122,7 @@ def annual_water_balance_graphic(output_csv, produce_graphics, display_graphics,
         counter = 0
         years = variables['year']
         legend = []
-        prev_vars = [0 for x in range(len(years))]
+        prev_vars = [0 for _ in range(len(years))]
         width = 0.35
         table_vals = []
         row_labs = []
@@ -136,7 +137,7 @@ def annual_water_balance_graphic(output_csv, produce_graphics, display_graphics,
             # assigns a random color to variables not originally included
             # not currently implemented for colorblindness
             if len(colors) - 2 < counter < len(variables) - 3:
-                colors.insert(counter, "#"+''.join([random.choice('1236789ABCDE') for j in range(6)]))
+                colors.insert(counter, "#"+''.join([random.choice('1236789ABCDE') for _ in range(6)]))
 
             # 0 through 6 are outputs we would not change
             # 6 is total actual precipitation, represented as an x on the graph
@@ -162,7 +163,7 @@ def annual_water_balance_graphic(output_csv, produce_graphics, display_graphics,
             counter += 1
 
         # create the table. colorblind friendly
-        cell_colors = [['#ffffff' for i in range(len(years) + 1)] for j in range(len(variables) - 1)]
+        cell_colors = [['#ffffff' for _ in range(len(years) + 1)] for _ in range(len(variables) - 1)]
         for x in range(len(colors)):
             cell_colors[x - 1][0] = colors[x]
 
