@@ -24,26 +24,27 @@ Soil attribute definitions
 Soil values updated by calling update_all():
     soil.soil_layers.perc
 """
-###############################################################################
 
 from math import exp
 
 
-#
-# This function calls all the necessary functions to update information related
-# to percolation
-#
 def update_all(soil):
+    """
+    Definition:
+        This function calls all the necessary functions to update information related
+        to percolation
+    """
 
     calc_daily_percolation(soil)
 
 
-#
-# Calculates daily percolation as a function of the water available for
-# percolation (SWperc) in a soil layer.
-# "pseudocode_soil" S.2.C.1/2
-#
 def calc_daily_percolation(soil):
+    """
+    Definition:
+        Calculates daily percolation as a function of the water available for
+        percolation (SW_perc) in a soil layer.
+        "pseudocode_soil" S.2.C.1/2
+    """
     for layer in soil.soil_layers:
         SAT = layer.sat_water
 
@@ -51,9 +52,9 @@ def calc_daily_percolation(soil):
         FC = layer.fc_water
         WP = layer.wilting_water
 
-        SWperc = 0.0
+        SW_perc = 0.0
         if SW > FC:
-            SWperc = SW - FC
+            SW_perc = SW - FC
 
         K_sat = layer.ksat
 
@@ -65,5 +66,5 @@ def calc_daily_percolation(soil):
         t = 24
 
         exp_part = exp((-t) / layer.TT)
-        perc = SWperc * (1 - exp_part)
+        perc = SW_perc * (1 - exp_part)
         layer.perc = min(SW - WP, perc)

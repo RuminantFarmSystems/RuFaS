@@ -271,8 +271,8 @@ class Weather:
         self.T_avg = []
         self.biomass = []
         self.radiation = []
-        self.manureN = []
-        # TODO: manureN is a temporary weather file input until the manure module is linked with the rest of the program
+        self.manure_N = []
+        # TODO: manure_N is a temporary weather file input until the manure module is linked with the rest of the program
         self.T_avg_annual = []
 
         year_length = 365
@@ -309,9 +309,9 @@ class Weather:
             self.T_avg.append([0.0 for _ in range(len(year))])
             self.biomass.append([0.0 for _ in range(len(year))])
             self.radiation.append([0.0 for _ in range(len(year))])
-            # TODO: manureN is a temporary weather file input until the manure
+            # TODO: manure_N is a temporary weather file input until the manure
             #  module is linked with the rest of the program
-            self.manureN.append([0.0 for _ in range(len(year))])
+            self.manure_N.append([0.0 for _ in range(len(year))])
 
         # read in the input csv file
         weather_full_path = util.get_base_dir() / 'Inputs/weather' / weather_file
@@ -360,9 +360,9 @@ class Weather:
                         self.T_avg[year][day - offset] = float(row[5])
                         self.biomass[year][day - offset] = float(row[6])
                         self.radiation[year][day - offset] = float(row[7])
-                        # TODO: manureN is a temporary weather file input until the manure
+                        # TODO: manure_N is a temporary weather file input until the manure
                         #  module is linked with the rest of the program
-                        self.manureN[year][day - offset] = float(row[8])
+                        self.manure_N[year][day - offset] = float(row[8])
                     except(IndexError, ValueError):
                         # prints out each problematic row in the weather CSV file
                         skips += 1

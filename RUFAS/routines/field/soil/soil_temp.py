@@ -203,7 +203,7 @@ def calc_radiate(soil, crop, weather, time):
 #
 def calc_albedo(soil, crop):
     CV = crop.current_crop.bio_AG
-    albedoSoil = soil.soilAlbedo
+    albedoSoil = soil.soil_albedo
 
     # "pseudocode_soil" S.1.A.10
     cover = exp(-0.00005 * CV)

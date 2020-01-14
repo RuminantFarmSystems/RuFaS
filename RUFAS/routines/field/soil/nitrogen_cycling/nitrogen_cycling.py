@@ -121,10 +121,8 @@ Soil values updated by calling update_all():
         water_fac
         volatilization
         active_N
-        orgN
+        org_N
         stable_N
-
-
 """
 
 from math import exp
@@ -204,10 +202,10 @@ def added_manure_N(soil, weather, time):
         TODO: Temporary method to add manure from weather file
     """
 
-    totalN = weather.manureN[time.year - 1][time.day - 1]
+    total_N = weather.manure_N[time.year - 1][time.day - 1]
 
-    active_N = totalN * 0.875
-    stable_N = totalN * 0.125
+    active_N = total_N * 0.875
+    stable_N = total_N * 0.125
 
     soil.soil_layers[0].active_N += active_N
     soil.soil_layers[0].stable_N += stable_N

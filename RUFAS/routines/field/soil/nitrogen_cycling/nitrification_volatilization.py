@@ -75,7 +75,7 @@ def nitrification_volatilization(soil):
 
         layer.nitrification = nitrification
         layer.volatilization = volatilization
-        layer.totNitriVolatil = tot_nitri_volatil
+        layer.tot_nitri_volatil = tot_nitri_volatil
 
         layer.NO3 += nitrification
 
