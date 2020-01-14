@@ -1,11 +1,9 @@
-################################################################################
 """
 RUFAS: Ruminant Farm Systems Model
 File name: user_prompt.py
 Description:
 Author(s): Kass Chupongstimun, kass_c@hotmail.com
 """
-################################################################################
 
 import sys
 from pathlib import Path
