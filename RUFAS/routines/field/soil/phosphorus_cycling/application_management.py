@@ -33,7 +33,7 @@ def check_conditions(time, weather, S, i, application):
         return iterate_application(time, weather, S, i, application)
 
     # if it rains on the current day
-    if weather.rainfall[year - 1][day - 1] >= 10.0:
+    if weather.rainfall[year - 1][day - 1] >= 20.0:
         return iterate_application(time, weather, S, i, application)
 
     # if it rains on the following day
@@ -43,7 +43,7 @@ def check_conditions(time, weather, S, i, application):
             day = 0
         else:
             return False
-    if weather.rainfall[year - 1][day] >= 10.0:
+    if weather.rainfall[year - 1][day] >= 20.0:
         return iterate_application(time, weather, S, i, application)
 
     # if it rains on the 2nd day
@@ -53,7 +53,7 @@ def check_conditions(time, weather, S, i, application):
             day = -1
         else:
             return False
-    if weather.rainfall[year - 1][day + 1] >= 10.0:
+    if weather.rainfall[year - 1][day + 1] >= 20.0:
         return iterate_application(time, weather, S, i, application)
 
     return False
