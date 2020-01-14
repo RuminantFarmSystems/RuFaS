@@ -171,7 +171,7 @@ def daily_soil_routine(soil, crop, weather, time):
 
     # transpiration is defined in the crop module, but called here as a
     # component of water balance
-    transpiration.update_all(crop.current_crop, soil, time)
+    transpiration.update_all(crop.current_crop, soil)
 
     # calculate daily percolation
     percolation.update_all(soil)
