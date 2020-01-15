@@ -36,7 +36,7 @@ def update_all(S, application, weather, time):
 
                 if fert_app.depth[i] == 0.0:
                     S.fert_P_available += fert_app.mass[i] * 0.75
-                    fert_PST = S.fert_P_available  # TODO fert_PST is frtpst and unused
+                    fert_PST = S.fert_P_available
                     S.fert_P_released += fert_app.mass[i] * 0.25
 
                 else:
