@@ -531,9 +531,7 @@ class Soil:
         self.NH4_drainage_annual = 0.0
         self.active_N_drainage_annual = 0.0
 
-        # ------ INITIALIZE SOIL NITROGEN POOLS ------------------------------------
-        # Calculate initial amount of NO3 in each soil layer;
-        # Initial NO3 levels (kg/ha) in the soil are varied by depth as:
+        # Initialize Soil Nitrogen
         # "pseudocode_soil" S.4.A
         for layer in self.soil_layers:
             z = layer.bottom_depth
@@ -582,7 +580,7 @@ class Soil:
             Description:
                 Populates the characteristic values of a soil layer.
 
-            Args:
+            Input:
                 layer_name: a string which is the name of this layer
                 layer_data: a dictionary which stores the information for this layer
             """
@@ -673,7 +671,7 @@ class Soil:
 
         def __init__(self, fert_data, time):
             """
-            Args:
+            Input:
                 fert_data: a dictionary which holds the rest of the information about
                     this fertilizer
             """
@@ -702,7 +700,7 @@ class Soil:
 
         def __init__(self, manure_data, time):
             """
-            Args:
+            Input:
                 manure_data: a dictionary which stores the information for this manure
             """
 
@@ -746,7 +744,7 @@ class Soil:
 
         def __init__(self, tillage_data, time):
             """
-            Args:
+            Input:
                 tillage_data: a dictionary which stores the information for this tillage
             """
             default_years = application_years(tillage_data, time, "tillage")
