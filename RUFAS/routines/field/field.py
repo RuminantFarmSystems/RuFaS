@@ -42,6 +42,7 @@ from RUFAS import util, errors
 from pathlib import Path
 from .crop.crop import Crop
 from .soil.soil import Soil
+from .application_management.application_management import Application
 
 
 class Field:
@@ -54,8 +55,8 @@ class Field:
         self.crop_data = read_json_file(input_dir / 'crop_rotations' / field_data['crop'])
         self.application_data = read_json_file(input_dir / 'applications' / field_data['applications'])
 
-        self.soil = Soil(self.soil_data, self.application_data, time)
-
+        self.soil = Soil(self.soil_data, time)
+        self.application = Application(self.application_data, time)
         self.crop = Crop(self.crop_data, time)
 
 
@@ -74,6 +75,7 @@ def read_json_file(file_path: Path):
     Returns:
         data: the data read from the json file
     """
+
     try:
         if file_path.suffix == '.json':
             if not file_path.is_file():

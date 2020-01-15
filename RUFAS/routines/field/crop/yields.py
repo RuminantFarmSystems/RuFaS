@@ -63,7 +63,7 @@ CropType values updated by update_all():
 from math import exp
 
 
-def update_all(crop_type, time, soil):
+def update_all(soil, crop_type, application, time):
     """Runs all the yield calculations
 
     Inputs:
@@ -77,7 +77,7 @@ def update_all(crop_type, time, soil):
     calc_yield_max(crop_type)
     calc_yield_act(crop_type)
     calc_nutrient_removal(crop_type)
-    calc_residue(crop_type, time, soil)
+    calc_residue(soil, crop_type, application, time)
 
 
 def calc_HI_max(crop_type):
@@ -144,7 +144,7 @@ def calc_nutrient_removal(crop_type):
     crop_type.yield_P = crop_type.fr_P * crop_type.yield_actual
 
 
-def calc_residue(crop_type, time, soil):
+def calc_residue(soil, crop_type, application, time):
     """Updates the current residue.
        "pseudocode_crop" C.10.G.1/4/5
 
@@ -157,14 +157,14 @@ def calc_residue(crop_type, time, soil):
     d_residue = 0
     if time.day == crop_type.kill_day or crop_type.crop_type == 'annual':
         d_residue = crop_type.biomass_actual - crop_type.yield_actual
-        kill(crop_type, soil)
+        kill(crop_type, application)
     else:
         bio_frac = crop_type.yield_actual / crop_type.biomass_actual
         cut(crop_type, bio_frac)
     soil.residue += d_residue
 
 
-def kill(crop_type, soil):
+def kill(crop_type, application):
     """Kills the crop
        "pseudocode_crop" C.10.G.4
 
@@ -173,7 +173,7 @@ def kill(crop_type, soil):
         soil
     """
 
-    soil.tillage_day = True
+    application.tillage_day = True
 
     crop_type.accumulated_HU = 0
     crop_type.prev_accumulated_HU = 0

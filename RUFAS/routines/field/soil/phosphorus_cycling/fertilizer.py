@@ -13,22 +13,22 @@ Author(s): Jacob Johnson, jacob8399@gmail.com,
 # calculates TP, WIP, and WOP added in manure, adds to surface manure
 # pools. All units are KG or HA
 
-from . import application_management
+from RUFAS.routines.field.application_management import application_management
 
 
-def update_all(S, weather, time):
+def update_all(S, application, weather, time):
     day = time.day
     year = time.year
-    fert_app = S.fertilizer
+    fert_app = application.fertilizer
 
     for i in range(len(fert_app.day)):
         if (fert_app.day[i] == day and fert_app.year[i] - S.start_year + 1 == year) \
                 or (fert_app.year[i] - S.start_year + 1 == year and fert_app.day[i] == -1
-                    and S.fertilizer_day is True):
+                    and application.fertilizer_day is True):
 
             fert_app.day[i] = time.day
 
-            if not application_management.check_conditions(time, weather, S, i, 'f'):
+            if not application_management.check_conditions(S, application, weather, time, i, 'f'):
 
                 S.fert_applied_sum += fert_app.mass[i]  # fertpkg
                 S.no_rains = 0

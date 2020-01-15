@@ -1,6 +1,6 @@
 """
 RUFAS: Ruminant Farm Systems Model
-File name: soil.py
+File name: manure.py
 
 Description:
 

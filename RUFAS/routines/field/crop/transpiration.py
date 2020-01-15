@@ -38,7 +38,7 @@ CropType values updated by calling update_all():
 from math import exp
 
 
-def update_all(crop_type, soil):
+def update_all(soil, crop_type):
     """This function updates all of a crop's soil water uptake information.
 
     Inputs:
@@ -46,19 +46,19 @@ def update_all(crop_type, soil):
         soil
     """
 
-    max_uptakes_ly = calc_max_water_uptake_each_layer(crop_type, soil)
+    max_uptakes_ly = calc_max_water_uptake_each_layer(soil, crop_type)
 
     # First adjustment of water uptakes
-    adj_uptakes_ly = inc_lower_layer_uptake(crop_type, soil, max_uptakes_ly)
+    adj_uptakes_ly = inc_lower_layer_uptake(soil, crop_type, max_uptakes_ly)
 
     # Second adjustment of water uptakes
     adj_uptakes_ly = decrease_effic_of_uptake(soil, adj_uptakes_ly)
 
     # Calculate total actual water uptake
-    calc_act_water_uptake(crop_type, soil, adj_uptakes_ly)
+    calc_act_water_uptake(soil, crop_type, adj_uptakes_ly)
 
 
-def calc_max_water_uptake_each_layer(crop_type, soil):
+def calc_max_water_uptake_each_layer(soil, crop_type):
     """Calculates the maximum potential water uptake from each soil layer and
        returns these values in a list ordered shallow to deep. The soil layers
        in soil.soil_layers should already be in this order.
@@ -76,7 +76,7 @@ def calc_max_water_uptake_each_layer(crop_type, soil):
 
     # 4.A.2
     for layer in soil.soil_layers:
-        lower_boundary_uptake = calc_max_water_uptake_z(crop_type, soil, layer.bottom_depth)
+        lower_boundary_uptake = calc_max_water_uptake_z(soil, crop_type, layer.bottom_depth)
         max_uptake_this_layer = lower_boundary_uptake - upper_boundary_uptake
         max_uptake_each_layer.append(max_uptake_this_layer)
 
@@ -86,7 +86,7 @@ def calc_max_water_uptake_each_layer(crop_type, soil):
     return max_uptake_each_layer
 
 
-def calc_max_water_uptake_z(crop_type, soil, z):
+def calc_max_water_uptake_z(soil, crop_type, z):
     """Calculates potential water uptake from the soil surface to a specified depth
        z (mm H2O).
        "pseudocode_crop" C.4.A.1
@@ -107,7 +107,7 @@ def calc_max_water_uptake_z(crop_type, soil, z):
         return term1 * term2
 
 
-def inc_lower_layer_uptake(crop_type, soil, uptake_each_layer):
+def inc_lower_layer_uptake(soil, crop_type, uptake_each_layer):
     """In some cases, actual soil water content in layers overlying a layer may not
        be sufficient to meet the potential uptake of those layers as calculated by
        calc_max_water_uptake_each_layer(). In these cases, lower soil layers may be
@@ -185,7 +185,7 @@ def decrease_effic_of_uptake(soil, uptake_each_layer):
     return adjusted_uptakes
 
 
-def calc_act_water_uptake(crop_type, soil, adjusted_uptakes):
+def calc_act_water_uptake(soil, crop_type, adjusted_uptakes):
     """Calculates the actual water uptake by the plant. It uses this value to
        update trans_act and water_act_up.
        "pseudocode_crop" C.4.C.2/3

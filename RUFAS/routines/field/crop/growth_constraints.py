@@ -48,7 +48,7 @@ CropType values updated by update_all():
 from math import exp
 
 
-def update_all(crop_type, time, weather, soil):
+def update_all(soil, crop_type, weather, time):
     """This function updates all information for growth constraints
 
     Inputs:
@@ -59,10 +59,10 @@ def update_all(crop_type, time, weather, soil):
     """
 
     # update gamma_reg value
-    calc_gamma_reg(crop_type, time, weather, soil)
+    calc_gamma_reg(soil, crop_type, weather, time)
 
 
-def calc_gamma_reg(crop_type, time, weather, soil):
+def calc_gamma_reg(soil, crop_type, weather, time):
     """Calculates plant growth factor (AKA gamma_reg).
        "pseudocode_crop" C.7
 
@@ -73,8 +73,8 @@ def calc_gamma_reg(crop_type, time, weather, soil):
         soil
     """
 
-    wstrs = calc_wstrs(crop_type, soil)
-    tstrs = calc_tstrs(crop_type, time, weather)
+    wstrs = calc_wstrs(soil, crop_type)
+    tstrs = calc_tstrs(crop_type, weather, time)
     nstrs = calc_nstrs(crop_type)
     pstrs = calc_pstrs(crop_type)
 
@@ -90,7 +90,7 @@ They do not modify the values of any State class.
 """
 
 
-def calc_wstrs(crop_type, soil):
+def calc_wstrs(soil, crop_type):
     """Calculates water stress for a given day.
        "pseudocode_crop" C.7.A.1
 
@@ -110,7 +110,7 @@ def calc_wstrs(crop_type, soil):
         return min(0.99, wstrs)
 
 
-def calc_tstrs(crop_type, time, weather):
+def calc_tstrs(crop_type, weather, time):
     """Calculates temperature stress for a given day.
        "pseudocode_crop" C.7.B.1-4
 

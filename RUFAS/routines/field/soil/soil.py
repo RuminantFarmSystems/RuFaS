@@ -147,7 +147,7 @@ from .nitrogen_cycling import nitrogen_cycling
 from .phosphorus_cycling import phosphorus_cycling
 
 
-def daily_soil_routine(soil, crop, weather, time):
+def daily_soil_routine(soil, crop, application, weather, time):
     """
     Description:
         Executes all the daily soil routines.
@@ -155,6 +155,7 @@ def daily_soil_routine(soil, crop, weather, time):
     Args:
         soil: instance of the Soil class
         crop: instance of the Crop class
+        application: instance of the Application class
         weather: instance of the Weather class
         time: instance of the Time class
     """
@@ -170,7 +171,7 @@ def daily_soil_routine(soil, crop, weather, time):
 
     # transpiration is defined in the crop module, but called here as a
     # component of water balance
-    transpiration.update_all(crop.current_crop, soil)
+    transpiration.update_all(soil, crop.current_crop)
 
     # calculate daily percolation
     percolation.update_all(soil)
@@ -186,22 +187,22 @@ def daily_soil_routine(soil, crop, weather, time):
     nitrogen_cycling.update_all(soil, weather, time)
 
     # implementation of Peter Vadas' SurPhos (Surface Phosphorus Runoff) model
-    phosphorus_cycling.update_all(soil, weather, time)
+    phosphorus_cycling.update_all(soil, application, weather, time)
 
     # update annual sums at the end of each day
-    annual_variable_update(soil)
+    annual_variable_update(soil, application)
 
 
-def annual_variable_update(soil):
+def annual_variable_update(soil, application):
     """
     Definition:
         Update variables tracked on an annual scale and reset condition
         variables
     """
 
-    soil.manure_day = False
-    soil.fertilizer_day = False
-    soil.tillage_day = False
+    application.manure_day = False
+    application.fertilizer_day = False
+    application.tillage_day = False
 
     soil.ET_max_annual += soil.ET_max
 
@@ -254,7 +255,7 @@ class Soil:
     Contains the state of the farm's soil.
     """
 
-    def __init__(self, data, application_data, time):
+    def __init__(self, data, time):
         """
         Description:
             Constructs an instance of the Soil class by populating its arrays
@@ -266,13 +267,7 @@ class Soil:
 
         # Values Initialized by Input
         self.soil_layers = []
-
         self.start_year = time.start_year
-
-        self.manure = Soil.Manure(application_data['manure_application'], time)
-        self.fertilizer = Soil.Fertilizer(application_data['fertilizer_application'], time)
-        self.tillage = Soil.Tillage(application_data['tillage_application'], time)
-        self.application_type = str(application_data['application_type']).lower()
 
         self.profile_bulk_density = data['profile_bulk_density']
         self.CN2 = data['CN2']  # unitless, user-defined curve number (empirical)
@@ -340,9 +335,6 @@ class Soil:
             x += 1
 
         # default values
-        self.manure_day = False
-        self.fertilizer_day = False
-        self.tillage_day = False
         self.days = [0, 0, 0]
         self.moisture = 0.5
         self.CNT = 1
@@ -662,106 +654,6 @@ class Soil:
             self.stable_P = 0.0
             self.org_P = 0.0
             self.P_uptake = 0.00
-
-    class Fertilizer:
-        """
-        An instance of this class represents a particular fertilizer and the date
-        of its application
-        """
-
-        def __init__(self, fert_data, time):
-            """
-            Input:
-                fert_data: a dictionary which holds the rest of the information about
-                    this fertilizer
-            """
-
-            default_years = application_years(fert_data, time, "fertilizer")
-
-            self.year = fert_data['year']
-            self.day = fert_data['day']
-            self.mass = fert_data['mass']
-            self.depth = [x / 10 for x in fert_data['depth']]
-            self.surface_percent = fert_data['surf_perc']
-
-            for app_year in default_years:
-                # TODO: need default values
-                self.year.append(app_year)
-                self.day.append(-1)
-                self.mass.append(100)
-                self.depth.append(0)
-                self.surface_percent.append(1)
-
-    class Manure:
-        """
-        An instance of this class represents a particular manure and the date
-        of its application
-        """
-
-        def __init__(self, manure_data, time):
-            """
-            Input:
-                manure_data: a dictionary which stores the information for this manure
-            """
-
-            default_years = application_years(manure_data, time, "manure")
-
-            self.type = manure_data['type']
-            self.year = manure_data['year']
-            self.day = manure_data['day']
-            self.mass = manure_data['mass']
-            self.P_frac = manure_data['P_frac']
-            self.N_frac = manure_data['N_frac']
-            self.NH4_frac = manure_data['NH4_frac']
-            self.WIP_frac = manure_data['WIP_frac']
-            self.WOP_frac = manure_data['WOP_frac']
-            self.dry_matter = manure_data['dry_matter']
-            self.percent_cover = manure_data['percent_cover']
-            self.depth = [x / 10 for x in manure_data['depth']]
-            self.surface_percent = manure_data['surf_perc']
-
-            for app_year in default_years:
-                # TODO: need default values
-                self.type.append("DAIRY")
-                self.year.append(app_year)
-                self.day.append(-1)
-                self.mass.append(1500)
-                self.P_frac.append(0.007)
-                self.N_frac.append(0)
-                self.NH4_frac.append(0)
-                self.WIP_frac.append(0.6)
-                self.WOP_frac.append(0.05)
-                self.dry_matter.append(0.05)
-                self.percent_cover.append(0.95)
-                self.depth.append(0)
-                self.surface_percent.append(1)
-
-    class Tillage:
-        """
-        An instance of this class represents a particular tillage and the date
-        of its application
-        """
-
-        def __init__(self, tillage_data, time):
-            """
-            Input:
-                tillage_data: a dictionary which stores the information for this tillage
-            """
-            default_years = application_years(tillage_data, time, "tillage")
-
-            self.year = tillage_data['year']
-            self.day = tillage_data['day']
-            self.percent_incorporated = tillage_data['perc_incorporated']
-            self.percent_mixed = tillage_data['perc_mixed']
-            self.depth = [x / 10 for x in tillage_data['depth']]
-
-            for app_year in default_years:
-                self.year.append(app_year)
-                self.day.append(-1)
-                self.percent_incorporated.append(.8)
-                self.percent_mixed.append(.6)
-                # in cm
-                self.depth.append(25)
 
     def calculate_soil_water(self):
         """

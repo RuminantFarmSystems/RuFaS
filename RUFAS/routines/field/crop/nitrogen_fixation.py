@@ -24,7 +24,7 @@ CropType attribute definitions:
 """
 
 
-def calc_N_fixation(crop_type, soil):
+def calc_N_fixation(soil, crop_type):
     """Calculates the amount of nitrogen added to the plant biomass by fixation.
        "pseudocode_crop" C.5.D.1
 
