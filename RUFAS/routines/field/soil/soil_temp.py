@@ -13,15 +13,15 @@ Description: This module contains the necessary functions for calculating and
 
 Soil attribute definitions
 
-    Tsoil = soil temperature (ºC) at depth z (mm)
+    T_soil = soil temperature (ºC) at depth z (mm)
 
     L = lag coefficient, set to 0.8
 
-    Tsoil_prev_day = soil temperature (ºC) at depth z (mm) on the previous day
+    T_soil_prev_day = soil temperature (ºC) at depth z (mm) on the previous day
 
     df = depth factor
 
-    Taair = average annual air temperature (ºC)
+    T_a_air = average annual air temperature (ºC)
 
     T_surf = Daily soil surface temperature (ºC)
 
@@ -31,7 +31,7 @@ Soil attribute definitions
 
     z = depth at the center of the soil layer
 
-    ddmax = maximum damping depth (mm)
+    dd_max = maximum damping depth (mm)
 
     scale = scaling factor for soil water
 
@@ -39,15 +39,15 @@ Soil attribute definitions
 
     SW = total soil water in the profile (mm)
 
-    Ztot = total soil profile depth
+    Z_tot = total soil profile depth
 
-    Tbare = Temperature of bare soil surface (ºC)
+    T_bare = Temperature of bare soil surface (ºC)
 
-    Tav = Average daily temperature (ºC)
+    T_av = Average daily temperature (ºC)
 
     radiate = radiation term
 
-    Hday = daily solar radiation (MJ/m^2)
+    H_day = daily solar radiation (MJ/m^2)
 
     albedo = daily albedo
 
@@ -65,31 +65,33 @@ Soil values updated by calling update_all():
     T_surf
     soil_layers.temperature
 """
-###############################################################################
 
 
 from math import exp, log
 
 
-#
-# This function updates all soil temperature information
-#
 def update_all(soil, crop, weather, time):
+    """
+    Description:
+        This function updates all soil temperature information.
+    """
 
-    calc_Tsurf(soil, crop, weather, time)
+    calc_T_surf(soil, crop, weather, time)
 
-    calc_Tsoil(soil, weather, time)
+    calc_T_soil(soil, weather, time)
 
 
-#
-# Calculates the soil temperature for each layer given average annual air
-# temperature. "pseudocode_soil" S.1.A.1
-#
-def calc_Tsoil(soil, weather, time):
+def calc_T_soil(soil, weather, time):
+    """
+    Description:
+        Calculates the soil temperature for each layer given average annual air
+        temperature. "pseudocode_soil" S.1.A.1
+    """
+
     L = 0.8
-    # Taair = weather.T_avg_annual[time.year-1]
-    Taair = 8.18  # TODO: spreadsheet model fix. Note in pseudocode
+    T_a_air = weather.T_avg_annual[time.year - 1]
     dd = calc_dd(soil)
+
     for x in range(len(soil.soil_layers)):
 
         if x == 0:
@@ -99,7 +101,7 @@ def calc_Tsoil(soil, weather, time):
                  soil.soil_layers[x - 1].bottom_depth) / 2
 
         # soil temperature (C) at depth z (mm) on previous day
-        Tsoil_prev_day = soil.soil_layers[x].temperature
+        T_soil_prev_day = soil.soil_layers[x].temperature
 
         # "pseudocode_soil" S.1.A.3
         zd = z / dd
@@ -109,52 +111,61 @@ def calc_Tsoil(soil, weather, time):
         df = zd / (zd + df_exp)
 
         # "pseudocode_soil" S.1.A.1
-        Tsoil = (L * Tsoil_prev_day) + (1 - L) * \
-                (df * (Taair - soil.T_surf) + soil.T_surf)
-        soil.soil_layers[x].temperature = Tsoil
+        T_soil = (L * T_soil_prev_day) + (1 - L) * \
+                (df * (T_a_air - soil.T_surf) + soil.T_surf)
+        soil.soil_layers[x].temperature = T_soil
 
 
-#
-# Calculates damping depth of a given soil profile as a function of soil water and ddmax
-# "pseudocode_soil" S.1.A.4
-#
 def calc_dd(soil):
-    scale = calc_scale(soil)
-    ddmax = calc_ddmax(soil)
+    """
+    Description:
+        Calculates damping depth of a given soil profile as a function of soil
+        water and dd_max.
+        "pseudocode_soil" S.1.A.4
+    """
 
-    part_1 = log(500 / ddmax)
+    scale = calc_scale(soil)
+    dd_max = calc_dd_max(soil)
+
+    part_1 = log(500 / dd_max)
     part_2 = ((1 - scale)/(1 + scale)) ** 2
     exp_part = exp(part_1 * part_2)
 
-    return ddmax * exp_part
+    return dd_max * exp_part
 
 
-#
-# Calculates the scaling factor for soil water in a given soil profile
-# "pseudocode_soil" S.1.A.5
-#
 def calc_scale(soil):
+    """
+    Description:
+         Calculates the scaling factor for soil water in a given soil profile.
+        "pseudocode_soil" S.1.A.5
+    """
+
     SW = sum_soil_water(soil)
-    Ztot = soil.profile_depth
+    Z_tot = soil.profile_depth
     bd = soil.profile_bulk_density
 
-    return SW / ((0.356 - 0.144 * bd) * Ztot)
+    return SW / ((0.356 - 0.144 * bd) * Z_tot)
 
 
-#
-# Calculates maximum damping depth for a given soil profile.
-# "pseudocode_soil" S.1.A.6
-#
-def calc_ddmax(soil):
+def calc_dd_max(soil):
+    """
+    Description:
+        Calculates maximum damping depth for a given soil profile.
+        "pseudocode_soil" S.1.A.6
+    """
+
     bd = soil.profile_bulk_density
     exp_part = exp(-5.63 * bd)
     return 1000 + (2500 * bd) / (bd + 686 * exp_part)
 
 
-#
-# Calculates the sum of soil water in the profile
-#
 def sum_soil_water(soil):
+    """
+    Description:
+       Calculates the sum of soil water in the profile.
+    """
+
     total_soil_water = 0.0
 
     for layer in soil.soil_layers:
@@ -163,45 +174,54 @@ def sum_soil_water(soil):
     return total_soil_water
 
 
-#
-# Calculates the surface temperature as a function of the previous day's
-# temperature, the amount of ground cover, and the temperature of a bare soil
-# surface. "pseudocode_soil" S.1.A.13
-#
-def calc_Tsurf(soil, crop, weather, time):
-    Tbare = calc_Tbare(soil, crop, weather, time)
+def calc_T_surf(soil, crop, weather, time):
+    """
+    Description:
+        Calculates the surface temperature as a function of the previous day's
+        temperature, the amount of ground cover, and the temperature of a bare
+        soil surface.
+        "pseudocode_soil" S.1.A.13
+    """
+
+    T_bare = calc_T_bare(soil, crop, weather, time)
     bcv = calc_bcv(crop, time)
 
-    soil.T_surf = (bcv * soil.soil_layers[0].temperature) + ((1 - bcv) * Tbare)
+    soil.T_surf = (bcv * soil.soil_layers[0].temperature) + ((1 - bcv) * T_bare)
 
 
-#
-# Calculates the temperature of a bare soil
-# "pseudocode_soil" S.1.A.7
-#
-def calc_Tbare(soil, crop, weather, time):
-    Tav = weather.T_avg[time.year-1][time.day-1]
+def calc_T_bare(soil, crop, weather, time):
+    """
+    Description:
+        Calculates the temperature of a bare soil.
+        "pseudocode_soil" S.1.A.7
+    """
+    T_av = weather.T_avg[time.year-1][time.day-1]
     radiate = calc_radiate(soil, crop, weather, time)
 
-    return Tav + radiate * Tav
+    return T_av + radiate * T_av
 
 
-#
-# Calculates the radiation term for the temperature of bare soil
-# "pseudocode_soil" S.1.A.8
-#
 def calc_radiate(soil, crop, weather, time):
-    Hday = weather.radiation[time.year-1][time.day-1]
+    """
+    Description:
+        Calculates the radiation term for the temperature of bare soil.
+        "pseudocode_soil" S.1.A.8
+    """
+
+    H_day = weather.radiation[time.year-1][time.day-1]
     albedo = calc_albedo(soil, crop)
 
-    return (Hday * (1 - albedo) - 14) / 20
+    return (H_day * (1 - albedo) - 14) / 20
 
 
-#
-# Calculates the daily albedo as a function of soil type, plant cover, and snow
-# cover. "pseudocode_soil" S.1.A.9/10
-#
 def calc_albedo(soil, crop):
+    """
+    Description:
+        Calculates the daily albedo as a function of soil type, plant cover,
+        and snow cover.
+        "pseudocode_soil" S.1.A.9/10
+    """
+
     CV = crop.current_crop.bio_AG
     albedoSoil = soil.soil_albedo
 
@@ -212,11 +232,13 @@ def calc_albedo(soil, crop):
     return 0.23 * (1 - cover) + albedoSoil * cover
 
 
-#
-# Calculates the weighting factor for ground cover
-# "pseudocode_soil" S.1.A.11/12
-#
 def calc_bcv(crop, time):
+    """
+    Description:
+        Calculates the weighting factor for ground cover
+        "pseudocode_soil" S.1.A.11/12
+    """
+
     CV = crop.current_crop.bio_AG
     exp_part = exp(7.563 - 0.0001297 * (-CV))
 

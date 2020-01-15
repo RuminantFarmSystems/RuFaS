@@ -393,6 +393,16 @@ class Weather:
                 avg = sum(self.T_avg[i]) / (len(years[i]))
                 self.T_avg_annual.append(avg)
 
+            if len(years) > 2:
+                T_avg = sum([self.T_avg_annual[j] for j in range(1, len(self.T_avg_annual) - 1)]) \
+                        / (len(self.T_avg_annual) - 2)
+            else:
+                T_avg = sum([self.T_avg_annual[j] for j in range(len(self.T_avg_annual))]) \
+                        / len(self.T_avg_annual)
+
+            self.T_avg_annual[0] = T_avg
+            self.T_avg_annual[len(self.T_avg_annual) - 1] = T_avg
+
 
 class Time:
     """
