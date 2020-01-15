@@ -59,13 +59,12 @@ Soil attribute definitions
 
     bcv = weighting factor of ground cover
 
-    SNOW = snow water content on the current day (mm)
+    snow = snow water content on the current day (mm)
 
 Soil values updated by calling update_all():
     T_surf
     soil_layers.temperature
 """
-###############################################################################
 
 
 from math import exp, log
@@ -222,12 +221,12 @@ def calc_bcv(crop, time):
 
     bcv = CV / (CV + exp_part)
 
-    SNOW = 0
+    snow = 0
     # TODO: these time ranges for snowfall are taken from the barnyard spreadsheet model and seem largely arbitrary
     if time.day > 335 or time.day < 59:
         albedo_snow = 0.8
-        SNOW = 10 * albedo_snow
+        snow = 10 * albedo_snow
 
-    bcv_snow = (SNOW / (SNOW + exp(6.055 - 0.3002 * SNOW)))
+    bcv_snow = (snow / (snow + exp(6.055 - 0.3002 * snow)))
 
     return max(bcv, bcv_snow)

@@ -109,22 +109,18 @@ def calculate_LAI_actual(crop_type):
         crop_type
     """
 
-    prev_LAI_actual = crop_type.LAI_actual
-
     # C.8.A.4
-    exp_part = exp(5 * (prev_LAI_actual - crop_type.LAI_max))
+    exp_part = exp(5 * (crop_type.LAI_actual - crop_type.LAI_max))
     d_fr_LAI_max = (crop_type.fr_LAI_max - crop_type.prev_fr_LAI_max)
     d_LAI_max = d_fr_LAI_max * crop_type.LAI_max * (1 - exp_part)
     d_LAI_actual = calculate_d_LAI_actual(crop_type, d_LAI_max)
 
     if crop_type.fr_PHU < crop_type.fr_PHU_sen:
         # C.8.A.6
-        crop_type.LAI_actual = prev_LAI_actual + d_LAI_actual
+        crop_type.LAI_actual = crop_type.LAI_actual + d_LAI_actual
         crop_type.LAI_actual = max(crop_type.LAI_actual, 0)
     else:
         # C.8.A.6
-        # TODO: previous equation (and SWAT) use LAI_max as the multiplier
-        #  instead of LAI_actual but it caused massive spikes near senescence
         crop_type.LAI_actual = crop_type.LAI_actual * (1 - crop_type.fr_PHU) / (1 - crop_type.fr_PHU_sen)
         crop_type.LAI_actual = max(crop_type.LAI_actual, 0)
 

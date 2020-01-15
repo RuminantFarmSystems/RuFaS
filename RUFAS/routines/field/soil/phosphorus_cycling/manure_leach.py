@@ -93,18 +93,15 @@ def update_all(S, weather, time):
 
         # convert soil P from KG/HA to KG and add manure P leached
 
-        # TODO math
         S.soil_layers[0].labile_P += 0.6 * (MIP_leach - runoff_MIP + MOP_leach - runoff_MOP)
 
         if S.soil_layers[1].bottom_depth_cm <= 15.0:
 
-            # TODO math
             S.soil_layers[1].labile_P += 0.3 * (MIP_leach - runoff_MIP + MOP_leach - runoff_MOP)
             S.soil_layers[2].labile_P += 0.1 * (MIP_leach - runoff_MIP + MOP_leach - runoff_MOP)
 
         else:
 
-            # TODO math
             S.soil_layers[1].labile_P += 0.4 * (MIP_leach - runoff_MIP + MOP_leach - runoff_MOP)
 
         # add manure P leached and in runoff to running total
@@ -211,7 +208,6 @@ def update_all(S, weather, time):
 
         S.soil_layers[0].active_P += SIP_ASIM * 0.6
 
-        # TODO math
         S.soil_layers[0].labile_P += 0.6 * (WIP_ASIM + WOP_ASIM + SOP_ASIM)
 
         if S.soil_layers[1].bottom_depth_cm <= 15.0:
@@ -219,7 +215,6 @@ def update_all(S, weather, time):
             S.soil_layers[1].active_P += SIP_ASIM * 0.3
             S.soil_layers[2].active_P += SIP_ASIM * 0.1
 
-            # TODO math
             S.soil_layers[1].labile_P += 0.3 * (WIP_ASIM + WOP_ASIM + SOP_ASIM)
             S.soil_layers[2].labile_P += 0.1 * (WIP_ASIM + WOP_ASIM + SOP_ASIM)
 
@@ -227,7 +222,6 @@ def update_all(S, weather, time):
 
             S.soil_layers[1].active_P += SIP_ASIM * 0.4
 
-            # TODO math
             S.soil_layers[1].labile_P += 0.4 * (WIP_ASIM + WOP_ASIM + SOP_ASIM)
 
     # convert soil P from KG/HA to KG and add manure P decomposed

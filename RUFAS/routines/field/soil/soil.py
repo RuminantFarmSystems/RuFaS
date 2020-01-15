@@ -410,7 +410,7 @@ class Soil:
         self.count_it = [0, 0, 0]
         self.counts = [0, 0, 0]
 
-        self.soil_yp = []  # TODO: soilyp
+        self.soil_yp = []
         for _ in self.soil_layers:
             self.soil_yp.append([0 for _ in range(0, time.leap_year_length)])
 
