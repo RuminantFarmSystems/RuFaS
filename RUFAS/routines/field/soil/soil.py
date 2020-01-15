@@ -381,12 +381,12 @@ class Soil:
 
         # TODO temporary
         for x in range(0, 50):
-            self.lactating_cows.append([0 for _ in range(0, 366)])
-            self.heifer.append([0 for _ in range(0, 366)])
-            self.dry_cow.append([0 for _ in range(0, 366)])
-            self.d_calf.append([0 for _ in range(0, 366)])
-            self.beef_cow.append([0 for _ in range(0, 366)])
-            self.b_calf.append([0 for _ in range(0, 366)])
+            self.lactating_cows.append([0 for _ in range(0, time.leap_year_length)])
+            self.heifer.append([0 for _ in range(0, time.leap_year_length)])
+            self.dry_cow.append([0 for _ in range(0, time.leap_year_length)])
+            self.d_calf.append([0 for _ in range(0, time.leap_year_length)])
+            self.beef_cow.append([0 for _ in range(0, time.leap_year_length)])
+            self.b_calf.append([0 for _ in range(0, time.leap_year_length)])
 
         # solp
         self.soil_P = [0, 0, 0]
@@ -412,7 +412,7 @@ class Soil:
 
         self.soil_yp = []  # TODO: soilyp
         for _ in self.soil_layers:
-            self.soil_yp.append([0 for _ in range(0, 366)])
+            self.soil_yp.append([0 for _ in range(0, time.leap_year_length)])
 
         self.PSP_avg = []
         for layer in self.soil_layers:

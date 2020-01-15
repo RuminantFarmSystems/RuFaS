@@ -17,6 +17,8 @@ from RUFAS.classes import Config, State, Weather, Time
 from RUFAS.output import OutputHandler
 from RUFAS.test import test_handler
 
+config, state, output, weather, time = None, None, None, None, None
+
 
 def simulate(input_fPath: Path):
     """Executes the simulation with the json file specified.
@@ -133,9 +135,6 @@ def read_json_file(fPath: Path):
             conform with the format required
     """
 
-    #
-    # Designate as module-global variables
-    #
     global config, state, output, weather, time
 
     with fPath.open('r') as f:

@@ -249,6 +249,9 @@ class Config:
         self.output_dir = data['output_dir']
         self.diagnostic_dir = data['diagnostic_dir']
 
+        self.leap_year_length = leap_year_length
+        self.year_length = year_length
+
 
 class Weather:
     """
@@ -272,11 +275,12 @@ class Weather:
         self.biomass = []
         self.radiation = []
         self.manure_N = []
-        # TODO: manure_N is a temporary weather file input until the manure module is linked with the rest of the program
+        # TODO: manure_N is a temporary weather file input until
+        #  the manure module is linked with the rest of the program
         self.T_avg_annual = []
 
-        year_length = 365
-        leap_year_length = 366
+        year_length = config.year_length
+        leap_year_length = config.leap_year_length
 
         # calculate the number of days between the beginning of
         # the weather file and the next year
@@ -410,6 +414,8 @@ class Time:
         self.calendar_year = calendar_year
         self.years = years
         self.year = 1  # Current Year
+        self.leap_year_length = config.leap_year_length
+        self.year_length = config.year_length
 
         # finds the first non-null day of the first year
         for i in range(0, len(self.years[0])):
