@@ -53,7 +53,7 @@ CropType values updated by calling update_all():
 from math import log, exp
 
 
-def update_all(crop_type, soil):
+def update_all(soil, crop_type):
     """This function updates all of a crop's phosphorus uptake information.
 
     Inputs:

@@ -5,7 +5,9 @@ File name: manure.py
 Author(s): Jacob Johnson, jacob8399@gmail.com,
            William Donovan, wmdonovan@wisc.edu
 """
-################################################################################
+
+from RUFAS.routines.field.application_management import application_management
+
 
 # calculates # of plops added per day and amount of TP, WIP, and WOP added
 # in manure, adds P to surface manure pools, and updates cumulative manure
@@ -13,26 +15,22 @@ Author(s): Jacob Johnson, jacob8399@gmail.com,
 
 # calculates TP, WIP, and WOP added in the manure, adds P to surface manure
 # pools. All units are KG or HA
-
-from . import application_management
-
-
-def update_all(S, weather, time):
+def update_all(S, application, weather, time):
 
     day = time.day
     year = time.year
-    m_app = S.manure
+    m_app = application.manure
     mass = m_app.mass
 
     for i in range(0, len(m_app.day)):
         if (m_app.day[i] == day and m_app.year[i] - S.start_year + 1 == year) \
                 or (m_app.year[i] - S.start_year + 1 == year and m_app.day[i] == -1
-                    and S.manure_day is True):
+                    and application.manure_day is True):
 
             m_app.day[i] = time.day
 
             # if the conditions are good enough to apply manure
-            if not application_management.check_conditions(time, weather, S, i, 'm'):
+            if not application_management.check_conditions(S, application, weather, time, i, 'm',):
 
                 S.manure_type = m_app.type[i]
 

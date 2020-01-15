@@ -51,7 +51,7 @@ from math import log, exp
 from .nitrogen_fixation import calc_N_fixation
 
 
-def update_all(crop_type, soil):
+def update_all(soil, crop_type):
     """This function updates all of a crop's nitrogen uptake information.
 
     Inputs:
@@ -62,9 +62,9 @@ def update_all(crop_type, soil):
     calc_fr_N(crop_type)
     calc_bio_N_opt(crop_type)
     calc_N_up(crop_type)
-    calc_act_N_up_each_layer(crop_type, soil)
+    calc_act_N_up_each_layer(soil, crop_type)
     crop_type.N_act_up = sum(crop_type.act_N_up_each_layer)
-    calc_bio_N(crop_type, soil)
+    calc_bio_N(soil, crop_type)
 
 
 def calc_fr_N(crop_type):
@@ -175,7 +175,7 @@ def calc_N_up(crop_type):
         crop_type.N_up = min(option1, option2)
 
 
-def calc_act_N_up_each_layer(crop_type, soil):
+def calc_act_N_up_each_layer(soil, crop_type):
     """Calculates the actual nitrogen uptake from soil solution in each layer.
        Saves the list containing these values to act_N_up_each_layer attribute.
        The order of the values in the list corresponds with the order of the layers
@@ -188,7 +188,7 @@ def calc_act_N_up_each_layer(crop_type, soil):
         soil
     """
 
-    crop_type.pot_N_up_each_layer = calc_N_up_each_layer(crop_type, soil)
+    crop_type.pot_N_up_each_layer = calc_N_up_each_layer(soil, crop_type)
     act_N_up_each_layer = []
 
     # Running total of potential nitrogen uptake in overlying layers
@@ -223,7 +223,7 @@ def calc_act_N_up_each_layer(crop_type, soil):
     crop_type.act_N_up_each_layer = act_N_up_each_layer
 
 
-def calc_N_up_each_layer(crop_type, soil):
+def calc_N_up_each_layer(soil, crop_type):
     """Calculates the potential nitrogen uptake from soil solution in each layer.
        Returns a list containing these values. The order of the values in the list
        corresponds with the order of the layers in soil.soil_layers. The soil
@@ -274,7 +274,7 @@ def calc_N_up_z(crop_type, z):
     return term1 * term2
 
 
-def calc_bio_N(crop_type, soil):
+def calc_bio_N(soil, crop_type):
     """Calculates actual mass of nitrogen stored in plant material.
        "pseudocode_crop" C.5.E.1
 
@@ -283,6 +283,6 @@ def calc_bio_N(crop_type, soil):
         soil
     """
 
-    crop_type.N_fix = calc_N_fixation(crop_type, soil)
+    crop_type.N_fix = calc_N_fixation(soil, crop_type)
 
     crop_type.bio_N = crop_type.bio_N + crop_type.N_act_up + crop_type.N_fix
