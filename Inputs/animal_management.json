@@ -457,7 +457,7 @@
 
         "feed":
         {
-            "feed_library": "Inputs/manure_feed_test.csv",
+            "feed_library": "Inputs/feeds.sqlite",
 
             "available_feeds":
             [
