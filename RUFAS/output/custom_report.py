@@ -1,12 +1,13 @@
-################################################################################
 """
 RUFAS: Ruminant Farm Systems Model
 File name: custom_report.py
-Description:
+
 Author(s): William Donovan, wmdonovan@wisc.edu
            Jacob Johnson, jacob8399@gmail.com
+
+Description: Output handler for a custom report.
 """
-#############################################
+
 import csv
 from pathlib import Path
 
@@ -14,13 +15,16 @@ from RUFAS.output.graphics import daily_graphics, annual_graphics
 from RUFAS.output.report_handler import BaseReportHandler
 
 
-# -------------------------------------------------------------------------------
-# Class: SoilSummary
-# Creates and prints to the file water_balance.csv
-# -------------------------------------------------------------------------------
 class CustomReport(BaseReportHandler):
 
     def __init__(self, data, field_name):
+
+        # identifies report with a field
+        self.field_name = field_name
+
+        # sets produce_csv, report_name, file_name using report data
+        self.set_properties(data, self.field_name)
+        self.field_names = None
 
         #
         # Outputs can be added in this single place in the following format:
@@ -35,37 +39,30 @@ class CustomReport(BaseReportHandler):
         # [] is an empty list
         #
 
-        #
-        # Sets produce_csv, report_name, file_name using data
-        #
-        self.field_name = field_name
-        self.set_properties(data, self.field_name)
-        self.fieldNames = None
-
-        #
-        # Daily Outputs
-        #
-        self.daily_variables = {'year': ['time.cal_year', '', []],
+        # daily outputs
+        self.daily_variables = {'year': ['time.calendar_year', '', []],
                                 'j_day': ['time.day', '', []]
                                 }
 
-        #
-        # Annual outputs
-        #
-        self.annual_variables = {'year': ['time.cal_year', '', 0]
+        # annual outputs
+        self.annual_variables = {'year': ['time.calendar_year', '', 0]
                                  }
 
-
-    #
-    # writes header names and units to the csv
-    #
     def write_headers(self, output_csv, variables):
+        """
+        Description:
+            Writes variable names and units to the header of the csv
+
+        Inputs:
+            output_csv: csv to be written to
+            variables: list of variables being reported
+        """
 
         mode = 'a+' if output_csv.exists() else 'w+'
 
-        with output_csv.open(mode) as csvfile:
+        with output_csv.open(mode) as csv_file:
 
-            writer = csv.DictWriter(csvfile, fieldnames=variables.keys(),
+            writer = csv.DictWriter(csv_file, fieldnames=variables.keys(),
                                     lineterminator='\n')
 
             writer.writeheader()
@@ -77,16 +74,24 @@ class CustomReport(BaseReportHandler):
             writer.writerow(units)
 
     def initialize(self, field):
+        """
+        Description:
+            Initialize report
+        """
+
         self.write_headers(self.get_fPath(), self.daily_variables)
         annual_path = Path(str(self.get_fPath()).split('.csv')[0] + "_annual.csv")
         self.write_headers(annual_path, self.annual_variables)
 
-    #
-    # stores specified daily values. NOTE: the eval() method is limited
-    # to the scope of variables. If a specified output is not a soil
-    # variable, this will throw an error. See comment at the top of the file.
-    #
     def daily_update(self, field, weather, time):
+        """
+        Description:
+            Called daily from the output handler to store simulation values for
+             reporting at the end of the year
+        Inputs:
+            field: custom reports operate at the field level for the simulation
+        """
+
         soil = field.soil
         crop_type = field.crop.current_crop
 
@@ -95,7 +100,13 @@ class CustomReport(BaseReportHandler):
                 eval(self.daily_variables[variable][0], globals(), locals()))
 
     def annual_update(self, field, weather, time):
-        """Stores the yearly values that need to be printed in the report."""
+        """
+        Description:
+            Called at the end of each simulation year to store annual values
+        Inputs:
+            field: custom reports operate at the field level for the simulation
+        """
+
         soil = field.soil
         crop_type = field.crop.current_crop
 
@@ -103,16 +114,18 @@ class CustomReport(BaseReportHandler):
             self.annual_variables[variable][2] = \
                 eval(self.annual_variables[variable][0], globals(), locals())
 
-    #
-    # writes stored values to the csv at the end of the year
-    #
     def write_annual_report(self):
+        """
+        Description:
+            Called at the end of each simulation year to write stored values to
+            the csv
+        """
 
         mode = 'a+' if self.get_fPath().exists() else 'w+'
 
-        with self.get_fPath().open(mode) as csvfile:
+        with self.get_fPath().open(mode) as csv_file:
             # Write data day by day
-            writer = csv.DictWriter(csvfile, fieldnames=self.daily_variables.keys(),
+            writer = csv.DictWriter(csv_file, fieldnames=self.daily_variables.keys(),
                                     lineterminator='\n')
 
             for day in range(len(self.daily_variables['j_day'][2])):
@@ -125,18 +138,19 @@ class CustomReport(BaseReportHandler):
 
         mode = 'a+' if annual_path.exists() else 'w+'
 
-        with annual_path.open(mode) as csvfile:
-            writer = csv.DictWriter(csvfile, fieldnames=self.annual_variables.keys(),
+        with annual_path.open(mode) as csv_file:
+            writer = csv.DictWriter(csv_file, fieldnames=self.annual_variables.keys(),
                                     lineterminator='\n')
             row = {}
             for variable in self.annual_variables:
                 row[variable] = self.annual_variables[variable][2]
             writer.writerow(row)
 
-    #
-    # clears stored values at the end of the year
-    #
     def annual_flush(self):
+        """
+        Description:
+            Clears stored values after reporting
+        """
 
         for variable in self.daily_variables:
             self.daily_variables[variable][2] = []
@@ -145,6 +159,14 @@ class CustomReport(BaseReportHandler):
             self.annual_variables[variable][2] = 0
 
     def produce_report_graphics(self, is_final):
+        """
+        Description:
+            Calls functions in graphics.py
+        Inputs:
+            is_final: flag indicating that this is the last report being
+                        produced
+        """
+
         annual_file_name = str(self.file_name).split('.')[0] + "_annual.csv"
-        annual_graphics(annual_file_name, self.display_graphics, self.produce_graphics, is_final)
-        daily_graphics(self.file_name, self.display_graphics, self.produce_graphics, is_final)
+        annual_graphics(annual_file_name, self.produce_graphics, self.display_graphics, is_final)
+        daily_graphics(self.file_name, self.produce_graphics, self.display_graphics, is_final)

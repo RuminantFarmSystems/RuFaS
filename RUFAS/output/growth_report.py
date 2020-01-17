@@ -1,48 +1,71 @@
-################################################################################
 """
 RUFAS: Ruminant Farm Systems Model
 File name: growth_report.py
-Description:
+
 Author(s): Militsa Sotirova, militsasotirova@gmail.com
            William Donovan, wmdonovan@wisc.edu
-"""
-################################################################################
 
-from pathlib import Path
+Description: Output handler for animal growth report.
+"""
+
 import csv
+from pathlib import Path
+
 from RUFAS.output.report_handler import BaseReportHandler
 from RUFAS.output.graphics import daily_graphics, annual_graphics
 
 
-# -------------------------------------------------------------------------------
-# Class: GrowthReport
-# -------------------------------------------------------------------------------
 class GrowthReport(BaseReportHandler):
     """Creates and prints to the file growth_report.csv"""
 
     def __init__(self, data, pen_id):
 
-        # Sets active, report_name, f_name using data
+        # sets active, report_name, f_name using data
         self.set_properties(data, 'null')
         self.file_name = 'pen_' + str(pen_id) + '/' + self.file_name
+
+        # identifies report with a pen
         self.pen_id = pen_id
 
-        self.daily_variables = {'year': ['time.cal_year', '', []],
+        #
+        # Outputs can be added in this single place in the following format:
+        # 'output_name': ['variable_name', 'unit', []],
+        # 'output_name' is a user defined key that will show up in outputs/graphs.
+        # avoid spaces.
+        # 'variable_name' is very important. This has to be a variable defined
+        # and initialized in the object. If you are interested in tracking
+        # a variable not defined in the class, you need to create it there
+        # first. The output handler will not work if the variable is incorrect.
+        # 'unit' is user defined but will, again, show up in outputs/graphs.
+        # [] is an empty list
+        #
+
+        # daily outputs
+        self.daily_variables = {'year': ['time.calendar_year', '', []],
                                 'j_day': ['time.day', '', []],
                                 'num_animals_in_pen': ['len(pen.animals_in_pen)', '', []],
                                 'average_growth': ['pen.avg_growth', 'kg', []],
                                 'average_milk': ['pen.avg_milk', 'kg', []]
                                 }
 
-        self.annual_variables = {'year': ['time.cal_year', '', 0]
+        # annual outputs
+        self.annual_variables = {'year': ['time.calendar_year', '', 0]
                                  }
 
     def write_headers(self, output_csv, variables):
+        """
+        Description:
+            Writes variable names and units to the header of the csv
+
+        Inputs:
+            output_csv: csv to be written to
+            variables: list of variables being reported
+        """
 
         mode = 'a+' if output_csv.exists() else 'w+'
 
-        with output_csv.open(mode) as csvfile:
-            writer = csv.DictWriter(csvfile, fieldnames=variables.keys(),
+        with output_csv.open(mode) as csv_file:
+            writer = csv.DictWriter(csv_file, fieldnames=variables.keys(),
                                     lineterminator='\n')
 
             writer.writeheader()
@@ -54,39 +77,52 @@ class GrowthReport(BaseReportHandler):
             writer.writerow(units)
 
     def initialize(self, state):
+        """
+        Description:
+            Initialize report
+        """
+
         self.write_headers(self.get_fPath(), self.daily_variables)
         annual_path = Path(str(self.get_fPath()).split('.csv')[0] + "_annual.csv")
         self.write_headers(annual_path, self.annual_variables)
 
-    # ---------------------------------------------------------------------------
-    # Method: daily_update
-    # ---------------------------------------------------------------------------
     def daily_update(self, pen, weather, time):
-        """Stores the daily values that need to be printed in the report."""
+        """
+        Description:
+            Called daily from the output handler to store simulation values for
+             reporting at the end of the year
+        Inputs:
+            pen: a growth report is produced for each pen simulated
+        """
+
         for variable in self.daily_variables:
             self.daily_variables[variable][2].append(
                 eval(self.daily_variables[variable][0], globals(), locals()))
 
-    #---------------------------------------------------------------------------
-    # Method: annual_update
-    #---------------------------------------------------------------------------
-    def annual_update(self, state, weather, time):
-        """Stores the yearly values that need to be printed in the report."""
+    def annual_update(self, pen, weather, time):
+        """
+        Description:
+            Called at the end of each simulation year to store annual values
+        Inputs:
+            pen: a growth report is produced for each pen simulated
+        """
+
         for variable in self.annual_variables:
             self.annual_variables[variable][2] = \
                 eval(self.daily_variables[variable][0], globals(), locals())
 
-    #---------------------------------------------------------------------------
-    # Method: write_annual_report
-    #---------------------------------------------------------------------------
     def write_annual_report(self):
-        """Appends the annual report to the output file."""
+        """
+        Description:
+            Called at the end of each simulation year to write stored values to
+            the csv
+        """
 
         mode = 'a+' if self.get_fPath().exists() else 'w+'
 
-        with self.get_fPath().open(mode) as csvfile:
+        with self.get_fPath().open(mode) as csv_file:
 
-            writer = csv.DictWriter(csvfile, fieldnames=self.daily_variables.keys(),
+            writer = csv.DictWriter(csv_file, fieldnames=self.daily_variables.keys(),
                                     lineterminator='\n')
 
             for day in range(len(self.daily_variables['j_day'][2])):
@@ -97,21 +133,22 @@ class GrowthReport(BaseReportHandler):
 
             annual_path = Path(str(self.get_fPath()).split('.csv')[0] + "_annual.csv")
 
-            mode = 'a+' if annual_path.exists() else 'w+'
+        mode = 'a+' if annual_path.exists() else 'w+'
 
-            with annual_path.open(mode) as csvfile:
-                writer = csv.DictWriter(csvfile, fieldnames=self.annual_variables.keys(),
-                                        lineterminator='\n')
-                row = {}
-                for variable in self.annual_variables:
-                    row[variable] = self.annual_variables[variable][2]
-                writer.writerow(row)
-                    
-    #---------------------------------------------------------------------------
-    # Method: annual_flush
-    #---------------------------------------------------------------------------
+        with annual_path.open(mode) as csv_file:
+            writer = csv.DictWriter(csv_file, fieldnames=self.annual_variables.keys(),
+                                    lineterminator='\n')
+            row = {}
+            for variable in self.annual_variables:
+                row[variable] = self.annual_variables[variable][2]
+            writer.writerow(row)
+
     def annual_flush(self):
-        """Sets all of the values in the output object to the default value."""
+        """
+        Description:
+            Clears stored values after reporting
+        """
+
         for variable in self.daily_variables:
             self.daily_variables[variable][2] = []
 
@@ -119,6 +156,14 @@ class GrowthReport(BaseReportHandler):
             self.annual_variables[variable][2] = 0
 
     def produce_report_graphics(self, is_final):
+        """
+        Description:
+            Calls functions in graphics.py
+        Inputs:
+            is_final: flag indicating that this is the last report being
+                        produced
+        """
+
         annual_file_name = str(self.file_name).split('.')[0] + "_annual.csv"
-        annual_graphics(annual_file_name, self.display_graphics, self.produce_graphics, is_final)
-        daily_graphics(self.file_name, self.display_graphics, self.produce_graphics, is_final)
+        annual_graphics(annual_file_name, self.produce_graphics, self.display_graphics, is_final)
+        daily_graphics(self.file_name, self.produce_graphics, self.display_graphics, is_final)

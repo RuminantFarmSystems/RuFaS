@@ -1,55 +1,74 @@
 """
 RUFAS: Ruminant Farm Systems Model
-
 File name: graphics.py
 
 Author(s): Jacob Johnson, jacob8399@gmail.com
            William Donovan, wmdonovan@wisc.edu
 
-Description: Produces graphical representations of RuFaS output data.
+Description: Produces graphical representations of RuFaS output data
+                using matplotlib.
 """
 
+from RUFAS import util
 import csv
 import datetime as dt
 import matplotlib.pyplot as mp
 import random
 
-#
-# Produces graphical representations of data passed in from a csv file.
-#
-from RUFAS import util
 
-
-# reads all the data from a csv and puts it in a dictionary with each variable
 def read_data(output_csv):
+    """
+    Description:
+        Reads all the data from a csv into a dictionary representing the
+        reported variables
+    Inputs:
+        output_csv: file path to the csv containing the data to be read
+    """
+
     output_full_path = util.get_base_dir() / 'Outputs/Sample_Farm_Outputs' / output_csv
 
-    with open(output_full_path) as csvfile:
-        read_csv = csv.reader(csvfile, delimiter=',')
+    with open(output_full_path) as csv_file:
+        read_csv = csv.reader(csv_file, delimiter=',')
 
+        # dictionary representing the read data in the format {variable: values}
         variables = {}
         units = []
 
         r = 0
         for row in read_csv:
+
+            # the first row in the csv file contains the variable names
             if r == 0:
                 for variable in row:
                     variable_list = []
                     variables[variable.lower()] = variable_list
+
+            # the second row represents the units
             elif r == 1:
                 for unit in row:
                     units.append(unit)
+
             else:
                 c = 0
                 for variable in variables:
                     variables[variable].append(float(row[c]))
                     c += 1
             r += 1
+
     return variables, units
 
 
-# data analytics for ration
-def ration_graphics(output_csv, display_graphics, produce_graphics, is_final, ration_interval):
+def ration_graphics(output_csv, produce_graphics, display_graphics, is_final, ration_interval):
+    """
+    Description:
+        Graphics handler for the ration report.
+    Inputs:
+        output_csv: the report for which graphics are being produced
+        display_graphics: indicates whether graphics should be displayed
+        produce_graphics: indicates whether graphics should be produced for this report
+        is_final: indicates whether show_figures should be called
+        ration_interval: determines scale of the x_axis
+    """
 
     if produce_graphics:
         variables, units = read_data(output_csv)
@@ -58,6 +77,7 @@ def ration_graphics(output_csv, display_graphics, produce_graphics, is_final, ra
 
         start_year = int(variables['year'][0])
         start_day = int(variables['j_day'][0])
+
         # start date
         date = dt.datetime(int(start_year), 1, 1) + dt.timedelta(start_day - 1)
 
@@ -83,8 +103,16 @@ def ration_graphics(output_csv, display_graphics, produce_graphics, is_final, ra
     show_figures(is_final)
 
 
-# produces the annual data analytics
-def annual_water_balance_graphic(output_csv, show_annual, produce_graphics):
+def annual_water_balance_graphic(output_csv, produce_graphics, display_graphics,):
+    """
+    Description:
+        Graphic handler for the specific annual water balance bar graph report.
+    Inputs:
+        output_csv: the report for which the graphic is being produced
+        display_graphics: indicates whether graphics should be displayed
+        produce_graphics: indicates whether graphics should be produced
+    """
+
     if produce_graphics:
         variables, units = read_data(output_csv)
 
@@ -94,36 +122,48 @@ def annual_water_balance_graphic(output_csv, show_annual, produce_graphics):
         counter = 0
         years = variables['year']
         legend = []
-        prev_vars = [0 for x in range(len(years))]
+        prev_vars = [0 for _ in range(len(years))]
         width = 0.35
         table_vals = []
         row_labs = []
 
         added_variables = len(variables) - 9
 
+        # bar graph colors– currently implemented for colorblindness
         colors = ['#ffffff', '#DC267F', '#648FFF', '#FFB000',  '#FE6100', '#785EF0', '#8B0000']
+
         for variable in variables:
+
             # assigns a random color to variables not originally included
+            # not currently implemented for colorblindness
             if len(colors) - 2 < counter < len(variables) - 3:
-                colors.insert(counter, "#"+''.join([random.choice('1236789ABCDE') for j in range(6)]))
+                colors.insert(counter, "#"+''.join([random.choice('1236789ABCDE') for _ in range(6)]))
 
             # 0 through 6 are outputs we would not change
-            # 6 is precip which we do not want as a bar in the graph
+            # 6 is total actual precipitation, represented as an x on the graph
             if 0 < counter < len(variables) - 3:
+
                 mp.bar(years, variables[variable], width, color=colors[counter], bottom=prev_vars)
                 legend.append(variable)
+
+                # add each bar to the previous one in order to create
+                # illusion of stacking
                 prev_vars = [sum(x) for x in zip(prev_vars, variables[variable])]
+
             elif counter == len(variables) - 3:
+
                 precip = variables[variable]
                 legend.insert(0, variable)
                 mp.scatter(years, precip, c='#8B0000', marker='x', zorder=2)
+
             if counter > 0:
                 variables[variable].insert(0, "")
                 table_vals.append(variables[variable])
                 row_labs.append(variable)
             counter += 1
 
-        cell_colors = [['#ffffff' for i in range(len(years) + 1)] for j in range(len(variables) - 1)]
+        # create the table. colorblind friendly
+        cell_colors = [['#ffffff' for _ in range(len(years) + 1)] for _ in range(len(variables) - 1)]
         for x in range(len(colors)):
             cell_colors[x - 1][0] = colors[x]
 
@@ -131,7 +171,7 @@ def annual_water_balance_graphic(output_csv, show_annual, produce_graphics):
         table_bot = -1.08
         table_height = 0.75
 
-        # added bbox adjustments when there are more variables
+        # bbox adjustments when there are more variables
         table_bot -= 0.08 * added_variables
         table_height += 0.08 * added_variables
 
@@ -144,24 +184,33 @@ def annual_water_balance_graphic(output_csv, show_annual, produce_graphics):
                          bbox=[0, table_bot, 1, table_height])
 
         # creates the color indicator in the table
-        cellDict = table.get_celld()
+        cell_dict = table.get_celld()
         for x in range(len(cell_colors)):
-            cellDict[(x, 0)].set_width(0.02)
+            cell_dict[(x, 0)].set_width(0.02)
 
         # legend toggle
         # mp.legend(legend, loc='upper center', bbox_to_anchor=(-0.35, 1.3), ncol=1, prop={'size': 9})
+
         mp.subplots_adjust(left=0.31, bottom=0.5)
         mp.ylabel('mm H2O')
         mp.title('Annual Water Balance')
         path = str(save_dir / 'annual_water_balance')
         mp.savefig(path + '')
 
-        if not show_annual:
+        if not display_graphics:
             mp.close()
 
 
-# produces the daily data analysis
-def daily_graphics(output_csv, display_graphics, produce_graphics, is_final):
+def daily_graphics(output_csv, produce_graphics, display_graphics, is_final):
+    """
+    Description:
+        Graphics handler for standard daily output.
+    Inputs:
+        output_csv: the report for which graphics are being produced
+        display_graphics: indicates whether the graphics are to be displayed
+        produce_graphics: indicates whether the graphics are to be produced
+        is_final: indicates whether this is the final report (triggers show_figures)
+    """
 
     if produce_graphics:
         variables, units = read_data(output_csv)
@@ -195,7 +244,17 @@ def daily_graphics(output_csv, display_graphics, produce_graphics, is_final):
     show_figures(is_final)
 
 
-def annual_graphics(output_csv, show_annual, produce_graphics, is_final):
+def annual_graphics(output_csv, display_graphics, produce_graphics, is_final):
+    """
+    Description:
+        Graphics handler for standard annual output.
+    Inputs:
+        output_csv: the report for which graphics are being produced
+        display_graphics: indicates whether the graphics are to be displayed
+        produce_graphics: indicates whether the graphics are to be produced
+        is_final: indicates whether this is the final report (triggers show_figures)
+    """
+
     if produce_graphics:
         variables, units = read_data(output_csv)
         save_dir = util.get_base_dir() / 'Outputs/diagnostics/' / output_csv.split('.')[0].replace('_annual', '')
@@ -217,7 +276,7 @@ def annual_graphics(output_csv, show_annual, produce_graphics, is_final):
                 mp.tight_layout()
                 path = str(save_dir / variable) + '_annual'
                 mp.savefig(path + '')
-                if not show_annual:
+                if not display_graphics:
                     mp.close()
             counter += 1
 

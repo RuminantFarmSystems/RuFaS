@@ -12,12 +12,14 @@ Description: Implements the nitrogen cycling processes of nitrification and
 from math import exp
 
 
-#
-# Nitrification is the transfer of NH4 to NO3, this method determines when that
-# transfer occurs and calculates the magnitude of that transfer.
-# "pseudocode_soil" S.4.B
-#
 def nitrification_volatilization(soil):
+    """
+    Description:
+       nitrification is the transfer of NH4 to NO3, this method determines when that
+       transfer occurs and calculates the magnitude of that transfer.
+       "pseudocode_soil" S.4.B
+    """
+
     for x in range(0, len(soil.soil_layers)):
         layer = soil.soil_layers[x]
 
@@ -32,48 +34,47 @@ def nitrification_volatilization(soil):
             z_mid = (layer.bottom_depth + soil.soil_layers[x - 1].bottom_depth) / 2
 
         exp_part = exp(4.706 - 0.0305 * z_mid)
-        DepthFac = 1 - (z_mid / (z_mid + exp_part))
+        depth_fac = 1 - (z_mid / (z_mid + exp_part))
 
         # "pseudocode_soil" S.4.B.5
-        CECFac = 0.15
-        VolatilReg = temp_fac * DepthFac * CECFac
+        CEC_fac = 0.15
+        volatil_reg = temp_fac * depth_fac * CEC_fac
 
         #
-        # Nitrification only occurs when the soil temperature of a given layer
+        # nitrification only occurs when the soil temperature of a given layer
         # exceeds 5ºC
         #
-        NitrReg = 0
+        nitr_reg = 0
         if layer.temperature >= 5:
             # "pseudocode_soil" S.4.B.4
-            NitrReg = temp_fac * water_fac
+            nitr_reg = temp_fac * water_fac
 
         # "pseudocode_soil" S.4.B.6
-        exp_part = exp(-NitrReg - VolatilReg)
-        TotNitriVolatil = layer.NH4 * (1 - exp_part)
+        exp_part = exp(-nitr_reg - volatil_reg)
+        tot_nitri_volatil = layer.NH4 * (1 - exp_part)
 
-        TotNitriVolatil = min(layer.NH4, TotNitriVolatil)
-        layer.NH4 -= TotNitriVolatil
+        tot_nitri_volatil = min(layer.NH4, tot_nitri_volatil)
+        layer.NH4 -= tot_nitri_volatil
 
         # "pseudocode_soil" S.4.B.7
-        FracNitr = 1 - exp(-NitrReg)
+        frac_nitr = 1 - exp(-nitr_reg)
 
         # "pseudocode_soil" S.4.B.8
-        FracVolatil = 1 - exp(-VolatilReg)
+        frac_volatil = 1 - exp(-volatil_reg)
 
         # "pseudocode_soil" S.4.B.9/10
-        if FracNitr + FracVolatil == 0:
-            Nitrification = 0
-            Volatilization = 0
+        if frac_nitr + frac_volatil == 0:
+            nitrification = 0
+            volatilization = 0
 
         else:
-            Nitrification = (FracNitr / (FracNitr + FracVolatil)) * \
-                            TotNitriVolatil
-            Volatilization = (FracVolatil / (FracNitr + FracVolatil)) * \
-                             TotNitriVolatil
+            nitrification = (frac_nitr / (frac_nitr + frac_volatil)) * \
+                            tot_nitri_volatil
+            volatilization = (frac_volatil / (frac_nitr + frac_volatil)) * \
+                             tot_nitri_volatil
 
-        layer.nitrification = Nitrification
-        layer.volatilization = Volatilization
-        layer.totNitriVolatil = TotNitriVolatil
+        layer.nitrification = nitrification
+        layer.volatilization = volatilization
+        layer.tot_nitri_volatil = tot_nitri_volatil
 
-        layer.NO3 += Nitrification
-
+        layer.NO3 += nitrification

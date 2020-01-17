@@ -1,4 +1,3 @@
-################################################################################
 """
 RUFAS: Ruminant Farm Systems Model
 File name: util.py
@@ -6,21 +5,17 @@ Description:
 Author(s): Kass Chupongstimun, kass_c@hotmail.com
            Jit Patil, spatil5@wisc.edu
 """
-################################################################################
 
-import sys
-import pulp
-import time as timer
-from pathlib import Path
 import csv
+import pulp.solvers
+import sys
+from pathlib import Path
 
-# -------------------------------------------------------------------------------
-# Function: get_base_dir
-# -------------------------------------------------------------------------------
+
 def get_base_dir():
     """Gets the base directory as reference for all relative paths.
 
-    Unfrozen appliaction - gets the project directory
+    Unfrozen application - gets the project directory
     Frozen application - gets the executable directory
 
     Returns:
@@ -34,6 +29,7 @@ def get_base_dir():
         # Resolve to absolute path
         # Take the parent base_dir/RUFAS_exe
         #                 parent = base_dir/
+
         return Path(sys.executable).resolve().parent
 
     # Unfrozen
@@ -46,9 +42,7 @@ def get_base_dir():
         #                     parent[1] = base_dir/
         return Path(__file__).resolve().parents[1]
 
-# -------------------------------------------------------------------------------
-# Function: LP_solve
-# -------------------------------------------------------------------------------
+
 def LP_solve(LHS, RHS, objective, var_names, operators,
              mode="min", name="LP", lower_var_bounds=None, upper_var_bounds=None):
     """Solves the linear program using the PULP package solver.
@@ -80,8 +74,8 @@ def LP_solve(LHS, RHS, objective, var_names, operators,
         dict: a dictionary with the names of variables as keys and the values of
             that variable at the optimal solution (if possible).
             {
-             'status': "Infeasible" or "Optimal",
-             'objective':  optimized value of the objective function,
+            'status': "Infeasible" or "Optimal",
+            'objective':  optimized value of the objective function,
             'variable1_name': variable value,
             'variable2_name': variable value,
             .
@@ -91,8 +85,8 @@ def LP_solve(LHS, RHS, objective, var_names, operators,
             'variableN_name': variable value
             }
     """
-    start = timer.time()
 
+    LP = None
     num_variables = len(var_names)
 
     # Ensure the LP is structured correctly
@@ -106,7 +100,7 @@ def LP_solve(LHS, RHS, objective, var_names, operators,
     LP_vars = generate_LP_vars(var_names, lower_var_bounds, upper_var_bounds)
 
     # Add objective function
-    LP += pulp.lpSum([ LP_vars[v] * objective[v] for v in range(num_variables) ])
+    LP += pulp.lpSum([LP_vars[v] * objective[v] for v in range(num_variables)])
 
     # Add constraints
     add_LP_constraints(LHS, RHS, LP_vars, operators, LP)
@@ -118,14 +112,13 @@ def LP_solve(LHS, RHS, objective, var_names, operators,
     # Get organized results
     results = organize_results(LP)
 
-    end = timer.time()
-    # print("LP elapsed time: " + str(end-start))
-
     return results
 
 
-# Initializes the LP problem
 def create_LP_problem(name, mode):
+    """Initializes the LP problem"""
+
+    LP = None
     if mode.lower().startswith("min"):
         LP = pulp.LpProblem(name, pulp.LpMinimize)
     elif mode.lower().startswith("max"):
@@ -136,9 +129,13 @@ def create_LP_problem(name, mode):
     return LP
 
 
-# Checks if there are equal number of constraints and RHS values
-# Checks that objective and each constraint have all variables
 def is_correct_structure(LHS, RHS, objective, var_names):
+    """
+    Description:
+        Checks if there are equal number of constraints and RHS values
+        Checks that objective and each constraint have all variables
+    """
+
     if len(LHS) != len(RHS) or len(objective) != len(var_names):
         return False
     for constraint_eq in LHS:
@@ -147,10 +144,14 @@ def is_correct_structure(LHS, RHS, objective, var_names):
     return True
 
 
-# Initializes the LP variables, and returns a list containing them.
-# Each variable represents the quantity of a feed type. The variables
-# are organized in order of the feed types alphabetically.
 def generate_LP_vars(var_names, lower_bounds, upper_bounds):
+    """
+    Description:
+        Initializes the LP variables, and returns a list containing them.
+        Each variable represents the quantity of a feed type. The variables
+        are organized in order of the feed types alphabetically.
+    """
+
     num_vars = len(var_names)
 
     # If max and min values for variables were not given
@@ -169,9 +170,13 @@ def generate_LP_vars(var_names, lower_bounds, upper_bounds):
     return LP_vars
 
 
-# Adds the constraints to the LP problem. Each constraint represents the needed
-# amount of a certain nutrient in the ration for the cow.
 def add_LP_constraints(LHS, RHS, LP_Vars, operators, LP):
+    """
+    Description:
+        Adds the constraints to the LP problem. Each constraint represents the needed
+        amount of a certain nutrient in the ration for the cow.
+    """
+
     num_vars = len(LP_Vars)
     for constraint_eq, constraint_value, operator in zip(LHS, RHS, operators):
         terms_in_equation = [constraint_eq[v] * LP_Vars[v] for v in range(num_vars)]
@@ -183,8 +188,9 @@ def add_LP_constraints(LHS, RHS, LP_Vars, operators, LP):
             LP += pulp.lpSum(terms_in_equation) == constraint_value
 
 
-# Finds the fastest solver available, and uses it to solve the LP.
 def solve_with_fastest_solver(LP):
+    """Finds the fastest solver available, and uses it to solve the LP."""
+
     try:
         LP.solve(pulp.solvers.GUROBI(msg=0))
     except pulp.PulpSolverError:
@@ -197,10 +203,14 @@ def solve_with_fastest_solver(LP):
                 LP.solve(pulp.solvers.COIN_CMD(msg=0))
 
 
-# Organizes the results in a dictionary such that the names of variables
-# pair up with their optimal value (if possible), 'objective' with the optimal
-# value of the objective, and the LP status with 'status'.
 def organize_results(LP):
+    """
+    Description:
+        Organizes the results in a dictionary such that the names of variables
+        pair up with their optimal value (if possible), 'objective' with the optimal
+        value of the objective, and the LP status with 'status'.
+    """
+
     results = {}
     for v in LP.variables():
         results[v.name] = v.varValue
@@ -209,21 +219,19 @@ def organize_results(LP):
     results['objective'] = pulp.value(LP.objective)
     return results
 
-# -------------------------------------------------------------------------------
-# Function: LP_print
-# -------------------------------------------------------------------------------
+
 def LP_print(LHS, RHS, objective, variables, operators,
              mode="min", name="LP", min_v=None, max_v=None):
     """Text representation of the Linear Programming problem."""
 
-    LHS = [ [round(x, 4) for x in row] for row in LHS]
-    RHS = [ round(x, 4) for x in RHS]
-    objective = [ round(x, 4) for x in objective]
+    LHS = [[round(x, 4) for x in row] for row in LHS]
+    RHS = [round(x, 4) for x in RHS]
+    objective = [round(x, 4) for x in objective]
 
     # Problem name
     LP_text = "\nLP Problem: {}\n".format(name)
-    #LP_text += str(len(variables)) + " variables\n"
-    #LP_text += str(len(LHS)) + " constraints\n"
+    # LP_text += str(len(variables)) + " variables\n"
+    # LP_text += str(len(LHS)) + " constraints\n"
 
     # Direction of Optimization
     if mode.lower().startswith("min"):
@@ -239,10 +247,10 @@ def LP_print(LHS, RHS, objective, variables, operators,
     for v in range(len(variables)):
         objective_text += "{}*{} ".format(objective[v], variables[v])
         if not v == len(variables) - 1:
-                objective_text += "+ "
+            objective_text += "+ "
     LP_text += objective_text + '\n'
 
-    # Contraint Equations
+    # Constraint Equations
     constraint_text = "Subject to:\n"
     for c in range(len(LHS)):
         constraint_text += '\t'
@@ -264,20 +272,22 @@ def LP_print(LHS, RHS, objective, variables, operators,
     return LP_text
 
 
-#
-# Takes in the path to a csv file with the path starting after MASM/
-# This function returns a list of tuples. Each tuple is the contents of
-# a column in the csv. Thus, returnedList[0] would be the tuple of the contents
-# in the first column in the csv. If an entry in the csv can be turned into a
-# float, then it will be.
-#
-# This is useful for reading in time series data where each column corresponds
-# to data of a specific attribute such as temperature.
-#
 def get_csv_columns(fileName):
+    """
+    Description:
+        Takes in the path to a csv file with the path starting after MASM/
+        This function returns a list of tuples. Each tuple is the contents of
+        a column in the csv. Thus, returnedList[0] would be the tuple of the contents
+        in the first column in the csv. If an entry in the csv can be turned into a
+        float, then it will be.
+
+        This is useful for reading in time series data where each column corresponds
+        to data of a specific attribute such as temperature.
+    """
+
     filePath = get_base_dir() / fileName
-    with filePath.open("r") as input:
-        readCSV = csv.reader(input, delimiter=',')
+    with filePath.open("r") as file_input:
+        readCSV = csv.reader(file_input, delimiter=',')
         allRows = list(readCSV)
 
         # Convert all numerical data to floats if possible
@@ -287,27 +297,29 @@ def get_csv_columns(fileName):
         return list(allColumns)
 
 
-def try_to_float(input):
+def try_to_float(file_input):
     try:
-        return float(input)
-    except:
-        return input
+        return float(file_input)
+    except ValueError:
+        return file_input
 
 
-#
-# Serves as a generic library. Each item in the library is represented as
-# a dictionary with the traits of the item as keys, and the values of each
-# trait as the values in the dictionary.
-#
-# This library is populated by csv files in which the first row specifies the
-# traits of the type of item in the library. For example, a library of foods
-# could have the traits of calories, grams fat, and grams protein. Each row
-# corresponds to a specific item. Keeping with the food library example, each
-# row would specify the specifics for a different food like hamburger, pizza,
-# and apple. The only requirements are that each item in the library
-# (defined in the csv) must have a unique "ID" trait and a unique "Name" trait.
-#
-class Library():
+class Library:
+    """
+    Description:
+        Serves as a generic library. Each item in the library is represented as
+        a dictionary with the traits of the item as keys, and the values of each
+        trait as the values in the dictionary.
+
+        This library is populated by csv files in which the first row specifies the
+        traits of the type of item in the library. For example, a library of foods
+        could have the traits of calories, grams fat, and grams protein. Each row
+        corresponds to a specific item. Keeping with the food library example, each
+        row would specify the specifics for a different food like hamburger, pizza,
+        and apple. The only requirements are that each item in the library
+        (defined in the csv) must have a unique "ID" trait and a unique "Name" trait.
+    """
+
     def __init__(self, csv_file):
         self.lib_by_id = {}
         self.lib_by_name = {}
@@ -318,7 +330,7 @@ class Library():
         size = len(info[0])
 
         # Create and add each item to the library
-        for i in range(1,size):
+        for i in range(1, size):
             item = {}
             values = [col[i] for col in info]
 
@@ -328,10 +340,14 @@ class Library():
 
             self.add_to_library(item)
 
-    # Returns the dictionary of traits and corresponding values for the item
-    # in the library with the given key. Items in the library can be retrieved
-    # by either their Name or their ID.
     def checkout(self, key):
+        """
+        Description:
+            Returns the dictionary of traits and corresponding values for the item
+            in the library with the given key. Items in the library can be retrieved
+            by either their Name or their ID.
+        """
+
         if key in self.lib_by_name:
             return self.lib_by_name[key]
         elif key in self.lib_by_id:
@@ -343,32 +359,36 @@ class Library():
             print("Exiting...")
             exit()
 
-    # In order for an item to be added to the library, the item must be a
-    # dictionary containing an 'ID' and a 'Name' which can be used to uniquely
-    # identify the item in the library.
     def add_to_library(self, item):
+        """
+        Description:
+            In order for an item to be added to the library, the item must be a
+            dictionary containing an 'ID' and a 'Name' which can be used to uniquely
+            identify the item in the library.
+        """
+
         if (type(item) is not dict) or ('ID' not in item) or ("Name" not in item):
             print("In order to add an item to the library, it must be a "
                   "dictionary containing an 'ID' and a 'Name'.")
             print("Exiting ...")
             exit()
 
-        id = item['ID']
+        item_id = item['ID']
         name = item['Name']
 
         # Check for duplicate Names or IDs
         duplicate = ""
-        if id in self.lib_by_id:
-            duplicate = "ID of '%s'" % str(id)
+        if item_id in self.lib_by_id:
+            duplicate = "ID of '%s'" % str(item_id)
         elif name in self.lib_by_name:
             duplicate = "Name of '%s'" % name
 
         if duplicate != "":
-            print("The "+duplicate+" corresponds with multiple items in the specified csv.\n"
-                  "Please modify the csv so that the "+duplicate+" is unique to one item.")
+            print("The " + duplicate + " corresponds with multiple items in the specified csv.\n"
+                                       "Please modify the csv so that the " + duplicate + " is unique to one item.")
             print("Exiting ...")
             exit()
 
         # Add the item to the library
-        self.lib_by_id[id] = item
+        self.lib_by_id[item_id] = item
         self.lib_by_name[name] = item

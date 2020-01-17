@@ -1,12 +1,13 @@
-################################################################################
 """
 RUFAS: Ruminant Farm Systems Model
-File name: crop_summary.py
-Description:
+File name: crop_report.py
+
 Author(s): William Donovan, wmdonovan@wisc.edu
            Jacob Johnson, jacob8399@gmail.com
+
+Description: Output handler for animal growth reports.
 """
-###############################################################################
+
 from RUFAS.output.graphics import show_figures
 from .ration_report import RationReport
 from .growth_report import GrowthReport
@@ -14,6 +15,7 @@ from .manure_report import ManureReport
 
 
 class PenReport:
+
     def __init__(self, pen_id, data):
 
         self.report_name = 'pen_' + str(pen_id)
@@ -27,6 +29,11 @@ class PenReport:
                             }
 
     def initialize(self, state):
+        """
+        Description:
+            Call initialize for each of the pen's active reports.
+        """
+
         if self.produce_csv:
             for report in self.pen_reports.values():
                 if not report.produce_csv and report.produce_graphics:
@@ -37,11 +44,22 @@ class PenReport:
                     report.initialize(state)
 
     def initialize_pen_dir(self, pen_dir):
+        """
+        Description:
+            Creates a directory in the outputs folder for the pen
+        """
+
         for report in self.pen_reports:
             report_dir = pen_dir / report
             report_dir.mkdir(exist_ok=True, parents=False)
 
     def daily_update(self, state, weather, time):
+        """
+        Description:
+            Called from output_handler for each day in the simulation.
+            Calls daily_update for each of the pen's active reports.
+        """
+
         if self.produce_csv:
             if state.animal_management.end_ration_interval():
                 for pen in state.animal_management.all_pens:
@@ -51,6 +69,12 @@ class PenReport:
                                 report.daily_update(pen, weather, time)
 
     def annual_update(self, state, weather, time):
+        """
+        Description:
+            Called from output_handler at the end of each simulation year.
+            Calls annual_update for each of the pen's active reports.
+        """
+
         if self.produce_csv:
             for pen in state.animal_management.all_pens:
                 if self.pen_id == pen.id:
@@ -59,18 +83,38 @@ class PenReport:
                             report.annual_update(pen, weather, time)
 
     def write_annual_report(self):
+        """
+        Description:
+            Called from output_handler at the end of each simulation year.
+            Calls write_annual_report for each of the pen's active reports.
+        """
+
         if self.produce_csv:
             for report in self.pen_reports.values():
                 if report.produce_csv:
                     report.write_annual_report()
 
     def annual_flush(self):
+        """
+        Description:
+            Called from output_handler at the end of each simulation year.
+            Calls annual_flush for each of the pen's active reports.
+        """
+
         if self.produce_csv:
             for report in self.pen_reports.values():
                 if report.produce_csv:
                     report.annual_flush()
 
     def produce_report_graphics(self, is_final):
+        """
+        Description:
+            Called from output_handler at the end of the simulation.
+            Calls produce_report_graphics for each of the pen's active reports.
+        Inputs:
+            is_final: boolean value indicating whether this is the final report
+        """
+
         if self.produce_graphics:
             for report in self.pen_reports.values():
                 report.produce_report_graphics(is_final)

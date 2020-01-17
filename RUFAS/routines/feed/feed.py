@@ -1,17 +1,34 @@
-################################################################################
 """
 RUFAS: Ruminant Farm Systems Model
 File name: feed.py
-Description:
+
 Author(s): Kass Chupongstimun, kass_c@hotmail.com,
            Andy Achenreiner, achenreiner@wisc.edu
+           William Donovan, wmdonovan@wisc.edu
+           Jacob Johnson, jacob8399@gmail.com
+
+Description: Main driver for the feed storage module. Calibrates storage and models
+                protein degradation as well as reductions in Carbon, Nitrogen, and
+                Phosphorus content during harvest, storage, and feedout.
 """
-################################################################################
+
 from RUFAS import util
 from . import nitrogen_loss, carbon_loss, protein_degradation
 
 
 def daily_feed_routine(feed, crop):
+    """
+    Description:
+        The daily feed routine involves updating stored feed and nutrient
+        content information.
+    Inputs:
+        crop: when multiple fields are growing crops but only one storage
+                mechanism is specified, all feed goes to the same location.
+                Degradations vary by crop type so this portion of the module
+                is called once for each field with crop as the differentiating
+                parameter.
+    """
+
     if feed.storage:
         feed.dry_matter += crop.current_crop.yield_actual
         feed.crude_protein += crop.current_crop.yield_actual * feed.crude_protein_percent
@@ -19,7 +36,8 @@ def daily_feed_routine(feed, crop):
         if crop.current_crop.yield_actual != 0:
             feed.nitrogen += crop.current_crop.yield_N
             feed.phosphorus += crop.current_crop.yield_P
-            # TODO: no Carbon Cycle currently implemented
+
+            # TODO: Carbon Cycle implementation
             feed.carbon += crop.current_crop.yield_actual * feed.carbon_percent
 
             carbon_loss.update_all(feed)
@@ -30,6 +48,11 @@ def daily_feed_routine(feed, crop):
 
 
 def annual_feed_routine(feed, crop):
+    """
+    Description:
+        Feed is calibrated every time there is a crop to be stored (i.e. crop != null)
+    """
+
     feed.prev_crop_name = feed.crop_name
     feed.crop_name = crop.current_crop.crop_name
 
@@ -38,6 +61,14 @@ def annual_feed_routine(feed, crop):
 
 
 def calibrate_feed(feed):
+    """
+    Description:
+        calibrate_feed is the implementation of KPB's feed reduction table.
+        Based on the feed and storage types, reduction percentages are set for
+        use in the rest of the module. If the specified feed or storage type
+        are not currently implemented, an error message is printed.
+    """
+
     if feed.crop_name == 'corn':
         feed.storage = True
         feed.crude_protein_percent = 0.08
@@ -138,15 +169,14 @@ def calibrate_feed(feed):
             feed.storage = False
 
 
-# -------------------------------------------------------------------------------
-# Class: Feed
-# -------------------------------------------------------------------------------
 class Feed:
     """
-    TODO: Add DocString
-    Description: Sorts all feeds by the contraints set in the Linear Program of rations.py
+    Description:
+        Sorts all feeds by the constraints set in the Linear Program of rations.py
 
-    Args: No arguments
+        Object storing information about the feed storage method
+
+        TODO: Phase out feed library
     """
 
     def __init__(self, data):
@@ -201,15 +231,8 @@ class Feed:
         self.CP_gas_percent = 0.0
         self.CP_leachate_percent = 0.0
         self.NPN_min_percent = 0.0
-        """
-        TODO: Add DocString
-        Description: This method takes the data specified in the feed Library
-        populates the array available_feeds and loops through the keys of the
-        array to sort them by the requirements set in the linear program.
 
-        Args: self: references current instance of class Feed and is the first
-        argument of every class method.
-        """
+        # TODO: Feed library code starts here
         # The feed library contains all the types of feed described in the input
         # csv file specified for "feed_library" in the input json file.
         self.feed_library = util.Library('Inputs/feed_storage/' + data["feed_library"])
@@ -233,40 +256,10 @@ class Feed:
         # in ration.py are zipped with the correct nutrient.
         self.nutrient_rqmts = ['FU', 'RU', 'ME_DM', 'RDP_DM', 'RUP_DM']
 
-        NH3 = {}
-        unavail_prot = {}
-
-        # Loop over types of feed
-        '''
-        for feed_name in self.available_feed_names:
-
-            CP = self.available_feeds[feed_name]['CP']
-            ICP = self.available_feeds[feed_name]['ICP']
-
-            # Use rumen degradable, total, and indigestible CP to estimate degradable and undegradable CP
-            NH3[feed_name] = CP * self.available_feeds[feed_name]['RDP']
-
-            if self.available_feeds[feed_name]['conc'] == "conc":
-                unavail_prot[feed_name] = 0.4 * ICP
-            else: # feed[feed_name]['conc'] == "rough"
-                unavail_prot[feed_name] = 0.7 * ICP
-
-            self.available_feeds[feed_name]['RDP'] = NH3[feed_name] + 0.15 * CP
-
-            self.available_feeds[feed_name]['RUP'] = 0.87 * (CP - NH3[feed_name] -
-                                     (unavail_prot[feed_name] * CP))
-        '''
-
-    # ---------------------------------------------------------------------------
-    # Method: annual_reset
-    # ---------------------------------------------------------------------------
     def annual_reset(self):
         """
-        TODO: Add DocString
-        Description: This method resets the data in the available_feeds array
-        for another cycle.
-
-        Args: self: references current instance of class Feed and is the first
-        argument of every class method.
+        Description:
+            TODO: No annual reset currently implemented
         """
+
         pass
