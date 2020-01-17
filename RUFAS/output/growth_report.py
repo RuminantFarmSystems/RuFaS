@@ -133,15 +133,15 @@ class GrowthReport(BaseReportHandler):
 
             annual_path = Path(str(self.get_fPath()).split('.csv')[0] + "_annual.csv")
 
-            mode = 'a+' if annual_path.exists() else 'w+'
+        mode = 'a+' if annual_path.exists() else 'w+'
 
-            with annual_path.open(mode) as csv_file:
-                writer = csv.DictWriter(csv_file, fieldnames=self.annual_variables.keys(),
-                                        lineterminator='\n')
-                row = {}
-                for variable in self.annual_variables:
-                    row[variable] = self.annual_variables[variable][2]
-                writer.writerow(row)
+        with annual_path.open(mode) as csv_file:
+            writer = csv.DictWriter(csv_file, fieldnames=self.annual_variables.keys(),
+                                    lineterminator='\n')
+            row = {}
+            for variable in self.annual_variables:
+                row[variable] = self.annual_variables[variable][2]
+            writer.writerow(row)
 
     def annual_flush(self):
         """

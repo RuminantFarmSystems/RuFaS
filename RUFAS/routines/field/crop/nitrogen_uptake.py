@@ -52,8 +52,9 @@ from .nitrogen_fixation import calc_N_fixation
 
 
 def update_all(soil, crop_type):
-    """This function updates all of a crop's nitrogen uptake information.
-
+    """
+    Description:
+        This function updates all of a crop's nitrogen uptake information.
     Inputs:
         crop_type
         soil
@@ -68,7 +69,9 @@ def update_all(soil, crop_type):
 
 
 def calc_fr_N(crop_type):
-    """Calculates the fraction of nitrogen in the plant biomass on a given day.
+    """
+    Description:
+        Calculates the fraction of nitrogen in the plant biomass on a given day.
        "pseudocode_crop" C.5.B.1
 
     Inputs:
@@ -90,9 +93,10 @@ def calc_fr_N(crop_type):
 
 
 def calc_n2(crop_type):
-    """Calculates the second shape coefficient.
+    """
+    Description:
+        Calculates the second shape coefficient.
        "pseudocode_crop" C.5.A.1
-
     Inputs:
         crop_type
     Returns:
@@ -113,7 +117,9 @@ def calc_n2(crop_type):
 
 
 def calc_n1(crop_type, n2):
-    """Calculates the first shape coefficient.
+    """
+    Description:
+        Calculates the first shape coefficient.
        "pseudocode_crop" C.5.A.2
 
     Inputs:
@@ -130,7 +136,9 @@ def calc_n1(crop_type, n2):
 
 
 def calc_log_term_of_shape_coeff(crop_type, fr_PHU_frac, fr_n):
-    """Helper function. Calculates the log term in the shape coefficient calculations
+    """
+    Description:
+        Helper function. Calculates the log term in the shape coefficient calculations
        "pseudocode_crop" C.5.A.2
 
     Inputs:
@@ -148,7 +156,9 @@ def calc_log_term_of_shape_coeff(crop_type, fr_PHU_frac, fr_n):
 
 
 def calc_bio_N_opt(crop_type):
-    """Calculates the optimal mass of nitrogen stored in plant biomass.
+    """
+    Description:
+        Calculates the optimal mass of nitrogen stored in plant biomass.
        "pseudocode_crop" C.5.B.2
 
     Inputs:
@@ -159,7 +169,9 @@ def calc_bio_N_opt(crop_type):
 
 
 def calc_N_up(crop_type):
-    """Calculates potential nitrogen uptake.
+    """
+    Description:
+        Calculates potential nitrogen uptake.
        "pseudocode_crop" C.5.B.3
 
     Inputs:
@@ -176,12 +188,14 @@ def calc_N_up(crop_type):
 
 
 def calc_act_N_up_each_layer(soil, crop_type):
-    """Calculates the actual nitrogen uptake from soil solution in each layer.
-       Saves the list containing these values to act_N_up_each_layer attribute.
-       The order of the values in the list corresponds with the order of the layers
-       in soil.soil_layers. The soil layers in that list need to be in order
-       of shallowest to deepest for this to work correctly.
-       "pseudocode_crop" C.5.C.4/5/6/7
+    """
+    Description:
+        Calculates the actual nitrogen uptake from soil solution in each layer.
+        Saves the list containing these values to act_N_up_each_layer attribute.
+        The order of the values in the list corresponds with the order of the
+        layers in soil.soil_layers. The soil layers in that list need to be in
+        order of shallowest to deepest for this to work correctly.
+        "pseudocode_crop" C.5.C.4/5/6/7
 
     Inputs:
         crop_type
@@ -224,11 +238,13 @@ def calc_act_N_up_each_layer(soil, crop_type):
 
 
 def calc_N_up_each_layer(soil, crop_type):
-    """Calculates the potential nitrogen uptake from soil solution in each layer.
-       Returns a list containing these values. The order of the values in the list
-       corresponds with the order of the layers in soil.soil_layers. The soil
-       layers in that list need to be in order of shallowest to deepest for this
-       to work correctly.
+    """
+    Description:
+        Calculates the potential nitrogen uptake from soil solution in each
+        layer. Returns a list containing these values. The order of the values
+        in the list corresponds with the order of the layers in
+        soil.soil_layers. The soil layers in that list need to be in order of
+        shallowest to deepest for this to work correctly.
        "pseudocode_crop" C.5.C.2/3
 
     Inputs:
@@ -256,10 +272,11 @@ def calc_N_up_each_layer(soil, crop_type):
 
 
 def calc_N_up_z(crop_type, z):
-    """Calculates potential nitrogen uptake from soil solution at the surface
-       to depth z. This function is used in calc_N_up_each_layer.
-       "pseudocode_crop" C.5.C.1
-
+    """
+    Description:
+        Calculates potential nitrogen uptake from soil solution at the surface
+        to depth z. This function is used in calc_N_up_each_layer.
+        "pseudocode_crop" C.5.C.1
     Inputs:
         crop_type
         z: a depth
@@ -275,9 +292,10 @@ def calc_N_up_z(crop_type, z):
 
 
 def calc_bio_N(soil, crop_type):
-    """Calculates actual mass of nitrogen stored in plant material.
-       "pseudocode_crop" C.5.E.1
-
+    """
+    Description:
+        Calculates actual mass of nitrogen stored in plant material.
+        "pseudocode_crop" C.5.E.1
     Inputs:
         crop_type
         soil

@@ -30,7 +30,7 @@ CropType attribute definitions:
     HI_opt = Potential harvest for the plant at maturity given ideal growing
              conditions
 
-    bio_AG = Aboveground biomass (kg/ha)
+    bio_AG = Above ground biomass (kg/ha)
 
     harvest_eff = Efficiency of the harvest operation, i.e. fraction of yield
                   biomass removed by the harvesting equipment.

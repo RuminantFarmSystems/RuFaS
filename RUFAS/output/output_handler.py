@@ -18,7 +18,7 @@ from RUFAS.output.report_handler import BaseReportHandler
 #
 # Import report handlers here
 #
-from RUFAS.output.feed_storage import FeedStorage
+from RUFAS.output.feed_storage_report import FeedStorage
 from RUFAS.output.field_report import FieldSummary
 from RUFAS.output.pen_report import PenReport
 
@@ -27,7 +27,7 @@ class OutputHandler:
     """Handles all output related interactions.
 
     Contains a list of all the report handlers, which handles all output-related
-    functionalities. This object is the (only) bridge between the simulation
+    functionality. This object should be the (only) bridge between the simulation
     engine and the output routines.
 
     Output values are updated at the end of each day, and the each report is
@@ -55,6 +55,7 @@ class OutputHandler:
                         # 'farm_summary': FarmSummary(data['farm_summary']),
                         'feed_storage': FeedStorage(data['feed_storage']),
                         }
+
         for field in state.fields:
             self.reports[field.field_name] = FieldSummary(field.field_name, data['field_summary'])
 
@@ -165,7 +166,7 @@ class OutputHandler:
     def annual_updates(self, state, weather, time):
         """
         Description:
-            Updates the report handler with anuual output values.
+            Updates the report handler with annual output values.
         """
 
         for reportName in self.reports:
@@ -200,6 +201,7 @@ class OutputHandler:
         Description:
             Calls produce graphics for all of the reports.
         """
+
         counter = 0
         for reportName in self.reports:
             report = self.reports[reportName]

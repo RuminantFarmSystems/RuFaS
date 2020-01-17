@@ -28,4 +28,3 @@ def humus_mineralization(soil):
         layer.stable_N += N_trans
 
         layer.N_trans = N_trans
-

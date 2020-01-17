@@ -105,7 +105,7 @@ def calc_intercepted_radiation(crop_type, weather, time):
 
 
 def calc_bio_AG(crop_type):
-    """Calculates aboveground biomass.
+    """Calculates above ground biomass.
        "pseudocode_crop" C.9.B.1
 
     Inputs:
@@ -129,4 +129,3 @@ def calc_gamma_wu(soil, crop_type):
 
     soil.ET_annual = soil.evap_annual + soil.trans_annual
     crop_type.gamma_wu = 100 * (soil.ET_annual / soil.ET_max_annual)
-

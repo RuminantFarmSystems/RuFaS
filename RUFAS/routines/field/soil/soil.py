@@ -135,7 +135,7 @@ This module needs the following inputs in order to operate correctly:
         crops_list
 
         And the following attributes of a crop type:
-            bio_AG (aboveground biomass)
+            bio_AG (above ground biomass)
 """
 
 from math import exp, log

@@ -84,7 +84,7 @@ Soil attribute definitions
     NO3/NH4_perc = mass of NO3 or NH4 loss in percolation water from all soil layers
                 (kg/ha)
 
-    denitr_N = denitrification (kg/ha)
+    denitr_N = denitrified Nitrogen(kg/ha)
 
     de_N_rate = user defined denitrification rate coefficient (0.1)
 
@@ -106,7 +106,7 @@ Soil attribute definitions
 
     N_trans = nitrogen transferred between the active and stable pools
 
-    frac_N = fraction of humic nitrogen in the active pool (0.02)
+    frac_N = fraction of Humic nitrogen in the active pool (0.02)
 
 
 Soil values updated by calling update_all():

@@ -60,16 +60,16 @@ class BaseReportHandler(ABC):
 
     # abstract methods defined in each report
     @abstractmethod
-    def write_headers(self): raise NotImplementedError()
+    def write_headers(self, output_csv, variables): raise NotImplementedError()
 
     @abstractmethod
-    def initialize(self): raise NotImplementedError()
+    def initialize(self, state_info): raise NotImplementedError()
 
     @abstractmethod
-    def daily_update(self): raise NotImplementedError()
+    def daily_update(self, state_info, weather, time): raise NotImplementedError()
 
     @abstractmethod
-    def annual_update(self): raise NotImplementedError()
+    def annual_update(self, state_info, weather, time): raise NotImplementedError()
 
     @abstractmethod
     def write_annual_report(self): raise NotImplementedError()

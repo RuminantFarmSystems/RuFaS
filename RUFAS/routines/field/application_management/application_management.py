@@ -158,12 +158,24 @@ def application_years(app_data, time, application):
     return app_years
 
 
-# ---------------------------------------------------------------------------
-# Function: check_conditions
-# Calculates if there will be rain within two days from a certain day
-# or if the soil profile is too wet to have applications
-# ---------------------------------------------------------------------------
 def check_conditions(S, application, weather, time, i, application_type):
+    """
+    Description:
+        Function: check_conditions
+        Calculates if there will be rain within two days from a certain day
+        or if the soil profile is too wet to have applications
+    Input:
+        S: the soil profile– abbreviated here from soil to reduce line length
+        application: an instance of the application object
+        weather:
+        time:
+        i: the number of the application for which conditions are being checked
+        application_type: the type of application for which conditions are
+                            being checked
+    :return: recursively iterate application (move forward one or two days)
+                until conditions are correct.
+
+    """
     day = time.day
     year = time.year
 
@@ -198,11 +210,17 @@ def check_conditions(S, application, weather, time, i, application_type):
     return False
 
 
-# ---------------------------------------------------------------------------
-# Function: iterate_application
-# Moves applications to the next day
-# ---------------------------------------------------------------------------
 def iterate_application(application, weather, time, i, application_type):
+    """
+    Description:
+        Moves applications to the next day– called from check_conditions.
+    Input:
+        application: an instance of the application object
+        weather:
+        time:
+        i: the number of the application in the list being iterated
+        application_type: the type of application being iterated
+    """
 
     if application_type != -1:
 

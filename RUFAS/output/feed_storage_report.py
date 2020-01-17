@@ -1,6 +1,6 @@
 """
 RUFAS: Ruminant Farm Systems Model
-File name: feed_storage.py
+File name: feed_storage_report.py
 
 Author(s): William Donovan, wmdonovan@wisc.edu
            Jacob Johnson, jacob8399@gmail.com

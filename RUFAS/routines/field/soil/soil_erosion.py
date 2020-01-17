@@ -60,9 +60,9 @@ Soil attribute definitions
 
     Cover = amount of residue and growing biomass covering the soil surface (kg/ha)
 
-    Lhill = hillslope length (m)
+    L_hill = hill slope length (m)
 
-    Alphahill = angle of the hillslope defined arctan(slope) (m/m)
+    alpha_hill = angle of the hill slope defined arctan(slope) (m/m)
 
 
 Soil values updated by calling update_all():
@@ -310,15 +310,15 @@ def calc_LS(soil):
         "pseudocode_soil" S.3.A.15
     """
 
-    Lhill = soil.slope_length
-    Alphahill = atan(soil.field_slope)
+    L_hill = soil.slope_length
+    alpha_hill = atan(soil.field_slope)
     m = calc_m(soil)
 
-    sin2_Alphahill = sin(Alphahill) ** 2
-    sin_Alphahill = sin(Alphahill)
+    sin2_alpha_hill = sin(alpha_hill) ** 2
+    sin_alpha_hill = sin(alpha_hill)
 
-    return ((Lhill / 22.1) ** m) * \
-           (65.41 * sin2_Alphahill + 4.56 * sin_Alphahill + 0.065)
+    return ((L_hill / 22.1) ** m) * \
+           (65.41 * sin2_alpha_hill + 4.56 * sin_alpha_hill + 0.065)
 
 
 def calc_m(soil):

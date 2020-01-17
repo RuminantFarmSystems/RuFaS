@@ -172,7 +172,7 @@ def calibrate_feed(feed):
 class Feed:
     """
     Description:
-        Sorts all feeds by the contraints set in the Linear Program of rations.py
+        Sorts all feeds by the constraints set in the Linear Program of rations.py
 
         Object storing information about the feed storage method
 
