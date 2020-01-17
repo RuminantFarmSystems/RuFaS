@@ -1,6 +1,5 @@
 """
 RUFAS: Ruminant Farm Systems Model
-
 File name: nitrogen_loss.py
 
 Author(s): William Donovan, wmdonovan@wisc.edu
@@ -17,10 +16,14 @@ Feed attribute definitions:
 Feed values updated by update_all():
 
 """
-###############################################################################
 
 
 def update_all(feed):
+    """
+    Description:
+        The only external function call. Runs the nitrogen loss sub-module
+    """
+
     CP_loss(feed)
 
     NPN_loss(feed)
@@ -29,19 +32,32 @@ def update_all(feed):
 
 
 def CP_loss(feed):
+    """
+    Description:
+        Crude protein loss to gas and leaching
+    """
+
     feed.CP_gas = feed.crude_protein * feed.CP_gas_percent
 
     feed.CP_leachate = feed.crude_protein * feed.CP_leachate_percent
 
 
 def NPN_loss(feed):
+    """
+    Description:
+        Non-Protein-Nitrogen loss
+        TODO: Value never used
+    """
+
     feed.NPN += feed.crude_protein * feed.NPN_min_percent
 
 
 def update_CP(feed):
+    """
+    Description:
+        Account for crude protein loss in relevant pools
+    """
+
     feed.crude_protein -= (feed.CP_gas + feed.CP_leachate)
 
     feed.dry_matter -= (feed.CP_gas + feed.CP_leachate)
-
-
-

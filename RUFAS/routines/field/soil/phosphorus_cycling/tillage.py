@@ -1,6 +1,6 @@
 """
 SurPhos
-File name: plow.py
+File name: tillage.py
 Author(s): Jacob Johnson, jacob8399@gmail.com,
            William Donovan, wmdonovan@wisc.edu
 """
@@ -8,19 +8,19 @@ Author(s): Jacob Johnson, jacob8399@gmail.com,
 # conducts tillage operations and mixes any manure or fertilizer on
 # the surface into the soil and mixes the soil itself
 
-from. import application_management
+from RUFAS.routines.field.application_management import application_management
 
 
-def update_all(S, weather, time):
+def update_all(S, application, weather, time):
 
     day = time.day
     year = time.year
-    till_app = S.tillage
+    till_app = application.tillage
 
     for i in range(len(till_app.day)):
         if (till_app.day[i] == day and till_app.year[i] - S.start_year + 1 == year) \
                 or (till_app.year[i] - S.start_year + 1 == year and till_app.day[i] == -1
-                    and S.tillage_day is True):
+                    and application.tillage_day is True):
 
             for w in range(0, 3):
                 S.soil_layers[w].active_P *= S.area
@@ -28,7 +28,7 @@ def update_all(S, weather, time):
 
             till_app.day[i] = time.day
 
-            if not application_management.check_conditions(time, weather, S, i, 't'):
+            if not application_management.check_conditions(S, application, weather, time, i, 't'):
 
                 # incorporate surface manure and fertilizer
 

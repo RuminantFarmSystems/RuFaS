@@ -1,6 +1,7 @@
+# TODO: No protein degradation currently implemented
+
 """
 RUFAS: Ruminant Farm Systems Model
-
 File name: protein_degradation.py
 
 Author(s): William Donovan, wmdonovan@wisc.edu
@@ -17,12 +18,20 @@ Feed attribute definitions:
 Feed values updated by update_all():
 
 """
-###############################################################################
 
 
 def update_all(feed):
+    """
+    Description:
+
+    """
     degrade_protein(feed)
 
 
 def degrade_protein(feed):
+    """
+    Description:
+
+    """
+
     pass

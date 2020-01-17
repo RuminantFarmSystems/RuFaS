@@ -1,23 +1,17 @@
-################################################################################
 """
 RUFAS: Ruminant Farm Systems Model
 File name: user_prompt.py
 Description:
 Author(s): Kass Chupongstimun, kass_c@hotmail.com
 """
-################################################################################
 
 import sys
 from pathlib import Path
 
-from RUFAS import util
-from RUFAS import errors
+from RUFAS import util, errors
 import fileReader
 
 
-# -------------------------------------------------------------------------------
-# Function: input_prompt
-# -------------------------------------------------------------------------------
 def input_prompt():
     """Prompts the user for an input to RUFAS.
 

@@ -1,29 +1,30 @@
 """
 RUFAS: Ruminant Farm Systems Model
-
 File name: nitrogen_cycling.py
 
-Author(s): William Donovan, wmdonovan@wisc.edu
-
 Description: Implements the nitrogen cycling process of humus mineralization
+
+Author(s): William Donovan, wmdonovan@wisc.edu
 """
 
-#
-# Nitrogen is allowed to move between the Active and Stable organic pools,
-# representing humus mineralization. This method accounts for that process
-# "pseudocode_soil" S.4.F
-#
+
 def humus_mineralization(soil):
+    """
+    Definition:
+        Humus mineralization is the movement of Nitrogen between the Active and
+        Stable organic pools
+        "pseudocode_soil" S.4.F
+    """
+
     for layer in soil.soil_layers:
-        activeN = layer.activeN
-        stableN = layer.stableN
-        FracN = 0.02
+        active_N = layer.active_N
+        stable_N = layer.stable_N
+        frac_N = 0.02
 
         # "pseudocode_soil" S.4.F.1
-        Ntrans = 0.00001 * (activeN * ((1 / FracN) - 1) - stableN)
+        N_trans = 0.00001 * (active_N * ((1 / frac_N) - 1) - stable_N)
 
-        layer.activeN -= Ntrans
-        layer.stableN += Ntrans
+        layer.active_N -= N_trans
+        layer.stable_N += N_trans
 
-        layer.nTrans = Ntrans
-
+        layer.N_trans = N_trans

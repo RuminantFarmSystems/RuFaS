@@ -46,29 +46,38 @@ CropType values updated by calling update_all():
     N_act_up
     bio_N
 """
-###############################################################################
 
 from math import log, exp
 from .nitrogen_fixation import calc_N_fixation
 
 
-#
-# This function updates all of a crop's nitrogen uptake information.
-#
-def update_all(crop_type, soil):
+def update_all(soil, crop_type):
+    """
+    Description:
+        This function updates all of a crop's nitrogen uptake information.
+    Inputs:
+        crop_type
+        soil
+    """
+
     calc_fr_N(crop_type)
     calc_bio_N_opt(crop_type)
     calc_N_up(crop_type)
-    calc_act_N_up_each_layer(crop_type, soil)
+    calc_act_N_up_each_layer(soil, crop_type)
     crop_type.N_act_up = sum(crop_type.act_N_up_each_layer)
-    calc_bio_N(crop_type, soil)
+    calc_bio_N(soil, crop_type)
 
 
-#
-# Calculates the fraction of nitrogen in the plant biomass on a given day.
-# "pseudocode_crop" C.5.B.1
-#
 def calc_fr_N(crop_type):
+    """
+    Description:
+        Calculates the fraction of nitrogen in the plant biomass on a given day.
+       "pseudocode_crop" C.5.B.1
+
+    Inputs:
+        crop_type
+    """
+
     n2 = calc_n2(crop_type)
     n1 = calc_n1(crop_type, n2)
 
@@ -83,11 +92,17 @@ def calc_fr_N(crop_type):
         crop_type.fr_N = term1 * term2 + crop_type.fr_n3
 
 
-#
-# Calculates the second shape coefficient.
-# "pseudocode_crop" C.5.A.1
-#
 def calc_n2(crop_type):
+    """
+    Description:
+        Calculates the second shape coefficient.
+       "pseudocode_crop" C.5.A.1
+    Inputs:
+        crop_type
+    Returns:
+        float: second shape coefficient
+    """
+
     term1 = calc_log_term_of_shape_coeff(
         crop_type, crop_type.fr_PHU_50, crop_type.fr_n2
     )
@@ -101,11 +116,18 @@ def calc_n2(crop_type):
     return (term1 - term2) / term3
 
 
-#
-# Calculates the first shape coefficient.
-# "pseudocode_crop" C.5.A.2
-#
 def calc_n1(crop_type, n2):
+    """
+    Description:
+        Calculates the first shape coefficient.
+       "pseudocode_crop" C.5.A.2
+
+    Inputs:
+        crop_type
+    Returns:
+        float: first shape coefficient
+    """
+
     term1 = calc_log_term_of_shape_coeff(
         crop_type, crop_type.fr_PHU_50, crop_type.fr_n2
     )
@@ -113,29 +135,49 @@ def calc_n1(crop_type, n2):
     return term1 + n2 * crop_type.fr_PHU_50
 
 
-#
-# Helper function. Calculates the log term in the shape coefficient calculations
-#
-def calc_log_term_of_shape_coeff(crop_type, fr_PHU_fract, fr_n_):
-    bottom = 1 - (fr_n_ - crop_type.fr_n3) / (crop_type.fr_n1 - crop_type.fr_n3)
-    inside = (fr_PHU_fract / bottom) - fr_PHU_fract
+def calc_log_term_of_shape_coeff(crop_type, fr_PHU_frac, fr_n):
+    """
+    Description:
+        Helper function. Calculates the log term in the shape coefficient calculations
+       "pseudocode_crop" C.5.A.2
+
+    Inputs:
+        crop_type
+        fr_PHU_frac: fr_PHU type that is sent in
+        fr_n: fr_PHU_n type
+    Returns:
+        float: log term in the calculations
+    """
+
+    bottom = 1 - (fr_n - crop_type.fr_n3) / (crop_type.fr_n1 - crop_type.fr_n3)
+    inside = (fr_PHU_frac / bottom) - fr_PHU_frac
 
     return log(inside)
 
 
-#
-# Calculates the optimal mass of nitrogen stored in plant biomass.
-# "pseudocode_crop" C.5.B.2
-#
 def calc_bio_N_opt(crop_type):
+    """
+    Description:
+        Calculates the optimal mass of nitrogen stored in plant biomass.
+       "pseudocode_crop" C.5.B.2
+
+    Inputs:
+        crop_type
+    """
+
     crop_type.bio_N_opt = crop_type.fr_N * crop_type.biomass_actual
 
 
-#
-# Calculates potential nitrogen uptake.
-# "pseudocode_crop" C.5.B.3
-#
 def calc_N_up(crop_type):
+    """
+    Description:
+        Calculates potential nitrogen uptake.
+       "pseudocode_crop" C.5.B.3
+
+    Inputs:
+        crop_type
+    """
+
     if crop_type.bio_N_opt - crop_type.bio_N < 0:
         crop_type.N_up = 0
     else:
@@ -145,16 +187,22 @@ def calc_N_up(crop_type):
         crop_type.N_up = min(option1, option2)
 
 
-#
-# Calculates the actual nitrogen uptake from soil solution in each layer.
-# Saves the list containing these values to act_N_up_each_layer attribute.
-# The order of the values in the list corresponds with the order of the layers
-# in soil.soil_layers. The soil layers in that list need to be in order
-# of shallowest to deepest for this to work correctly.
-# "pseudocode_crop" C.5.C.4/5/6/7
-#
-def calc_act_N_up_each_layer(crop_type, soil):
-    N_up_each_layer = calc_N_up_each_layer(crop_type, soil)
+def calc_act_N_up_each_layer(soil, crop_type):
+    """
+    Description:
+        Calculates the actual nitrogen uptake from soil solution in each layer.
+        Saves the list containing these values to act_N_up_each_layer attribute.
+        The order of the values in the list corresponds with the order of the
+        layers in soil.soil_layers. The soil layers in that list need to be in
+        order of shallowest to deepest for this to work correctly.
+        "pseudocode_crop" C.5.C.4/5/6/7
+
+    Inputs:
+        crop_type
+        soil
+    """
+
+    crop_type.pot_N_up_each_layer = calc_N_up_each_layer(soil, crop_type)
     act_N_up_each_layer = []
 
     # Running total of potential nitrogen uptake in overlying layers
@@ -166,7 +214,7 @@ def calc_act_N_up_each_layer(crop_type, soil):
     # Nitrogen uptake demand not met in overlying soil layers
     N_demand = 0
 
-    for pot_N_up, soilLayer in zip(N_up_each_layer, soil.soil_layers):
+    for pot_N_up, soilLayer in zip(crop_type.pot_N_up_each_layer, soil.soil_layers):
 
         # C.5.C.4
         act_N_up = min((pot_N_up + N_demand), soilLayer.NO3)
@@ -189,15 +237,23 @@ def calc_act_N_up_each_layer(crop_type, soil):
     crop_type.act_N_up_each_layer = act_N_up_each_layer
 
 
-#
-# Calculates the potential nitrogen uptake from soil solution in each layer.
-# Returns a list containing these values. The order of the values in the list
-# corresponds with the order of the layers in soil.soil_layers. The soil
-# layers in that list need to be in order of shallowest to deepest for this
-# to work correctly.
-# "pseudocode_crop" C.5.C.2/3
-#
-def calc_N_up_each_layer(crop_type, soil):
+def calc_N_up_each_layer(soil, crop_type):
+    """
+    Description:
+        Calculates the potential nitrogen uptake from soil solution in each
+        layer. Returns a list containing these values. The order of the values
+        in the list corresponds with the order of the layers in
+        soil.soil_layers. The soil layers in that list need to be in order of
+        shallowest to deepest for this to work correctly.
+       "pseudocode_crop" C.5.C.2/3
+
+    Inputs:
+        crop_type
+        soil
+    Returns:
+        list: nitrogen uptake per layer
+    """
+
     N_up_each_layer = []
 
     N_up_for_top_of_layer = 0
@@ -215,12 +271,19 @@ def calc_N_up_each_layer(crop_type, soil):
     return N_up_each_layer
 
 
-#
-# Calculates potential nitrogen uptake from soil solution at the surface to
-# depth z. This function is used in calc_N_up_each_layer.
-# "pseudocode_crop" C.5.C.1
-#
 def calc_N_up_z(crop_type, z):
+    """
+    Description:
+        Calculates potential nitrogen uptake from soil solution at the surface
+        to depth z. This function is used in calc_N_up_each_layer.
+        "pseudocode_crop" C.5.C.1
+    Inputs:
+        crop_type
+        z: a depth
+    Returns:
+        float: nitrogen uptake from the surface to a depth
+    """
+
     if crop_type.z_root == 0:
         return 0
     term1 = crop_type.N_up / (1 - exp(-1 * crop_type.beta_n))
@@ -228,12 +291,16 @@ def calc_N_up_z(crop_type, z):
     return term1 * term2
 
 
-#
-# Calculates actual mass of nitrogen stored in plant material.
-# "pseudocode_crop" C.5.E.1
-#
-def calc_bio_N(crop_type, soil):
-    # TODO: Nitrogen Fixation currently returns large negative numbers 11/05/19. This is not biologically feasible.
-    N_fix = calc_N_fixation(crop_type, soil)
+def calc_bio_N(soil, crop_type):
+    """
+    Description:
+        Calculates actual mass of nitrogen stored in plant material.
+        "pseudocode_crop" C.5.E.1
+    Inputs:
+        crop_type
+        soil
+    """
 
-    crop_type.bio_N = crop_type.bio_N + crop_type.N_act_up + N_fix
+    crop_type.N_fix = calc_N_fixation(soil, crop_type)
+
+    crop_type.bio_N = crop_type.bio_N + crop_type.N_act_up + crop_type.N_fix

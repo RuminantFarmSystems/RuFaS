@@ -1,4 +1,3 @@
-###############################################################################
 """
 RUFAS: Ruminant Farm Systems Model
 
@@ -36,19 +35,26 @@ Soil values updated by calling update_all():
     Soil Layer attributes updated:
         SW
 """
-###############################################################################
 
 
-#
-# This function calls all the necessary functions to update the value of soil
-# water
-#
 def update_all(soil, weather, time):
+    """
+    Description:
+        This function calls all the necessary functions to update and track
+        soil water pools
+    """
 
     update_SW(soil, weather, time)
 
 
 def update_SW(soil, weather, time):
+    """
+    Description:
+        Tracks and updates soil water pools based on calculated fluxes.
+        Currently, all soil water transformations occur at the end of the day
+        and are limited at saturation and wilting point. Percolation accounts
+        for any excess flux.
+    """
 
     soil.trans_sum = 0.0
     soil.evap_sum = 0.0
@@ -100,4 +106,3 @@ def update_SW(soil, weather, time):
     soil.p_calc = soil.delta_SW + soil.ET_act + soil.drainage + soil.runoff
 
     soil.water_balance_difference = soil.p_act - soil.p_calc
-

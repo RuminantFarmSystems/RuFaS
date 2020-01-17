@@ -118,33 +118,33 @@ class AnimalManagement:
         
         if herd_num == 0:
             self.simulate_animals = False
-            print("herd_num is 0 -> no animals will be simulated")
             if not calf_num == 0:
-                print("Warning: herd_num is 0, but calf_num is not. Setting calf_num = 0.")
+                print("Warning: herd_num is 0, but calf_num is not. Setting calf_num to 0.")
                 calf_num = 0
             if not heiferI_num == 0:
-                print("Warning: herd_num is 0, but heiferI_num is not. Setting heiferI_num = 0.")
+                print("Warning: herd_num is 0, but heiferI_num is not. Setting heiferI_num to 0.")
                 heiferI_num = 0
             if not heiferII_num == 0:
-                print("Warning: herd_num is 0, but heiferII_num is not. Setting heiferII_num = 0.")        
+                print("Warning: herd_num is 0, but heiferII_num is not. Setting heiferII_num to 0.")
                 heiferII_num = 0
             if not heiferIII_num == 0:
-                print("Warning: herd_num is 0, but heiferIII_num is not. Setting heiferIII_num = 0.")
+                print("Warning: herd_num is 0, but heiferIII_num is not. Setting heiferIII_num to 0.")
                 heiferIII_num = 0
             if not cow_num == 0:
-                print("Warning: herd_num is 0, but cow_num is not. Setting cow_num = 0.")
+                print("Warning: herd_num is 0, but cow_num is not. Setting cow_num to 0.")
                 cow_num = 0
         else:
             self.simulate_animals = True
-        
-        self.life_cycle_manager.initialize_herd(herd_num, calf_num, heiferI_num, heiferII_num, heiferIII_num, cow_num, replace_num)
-        self.calves = self.life_cycle_manager.calves
-        self.heiferIs = self.life_cycle_manager.heiferIs
-        self.heiferIIs = self.life_cycle_manager.heiferIIs
-        self.heiferIIIs = self.life_cycle_manager.heiferIIIs
-        self.cows = self.life_cycle_manager.cows
-        self.init_nutrient_rqmts(feed)
-        self.pen_allocation()
+
+        if self.simulate_animals:
+            self.life_cycle_manager.initialize_herd(herd_num, calf_num, heiferI_num, heiferII_num, heiferIII_num, cow_num, replace_num)
+            self.calves = self.life_cycle_manager.calves
+            self.heiferIs = self.life_cycle_manager.heiferIs
+            self.heiferIIs = self.life_cycle_manager.heiferIIs
+            self.heiferIIIs = self.life_cycle_manager.heiferIIIs
+            self.cows = self.life_cycle_manager.cows
+            self.init_nutrient_rqmts(feed)
+            self.pen_allocation()
         
     def init_nutrient_rqmts(self, feed):
         """
