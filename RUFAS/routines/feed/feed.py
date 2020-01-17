@@ -31,7 +31,7 @@ class Feed():
         """
         # The feed library contains all the types of feed described in the input
         # csv file specified for "feed_library" in the input json file.
-        self.feed_library = util.Library(data["feed_library"])
+        self.feed_library = util.LibraryDatabase(data["feed_library"])
 
         # The available_feeds are the collection of feeds that are actually
         # available and should be used in calculations.

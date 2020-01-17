@@ -119,7 +119,7 @@ def optimize(feed, rqmts):
 
     # The upper bounds are the 'Limit' specified in the csv library for each
     # food type.
-    upper_bounds = [feed.available_feeds[feed_name]['Limit']
+    upper_bounds = [feed.available_feeds[feed_name]['Limits']
                     for feed_name in feed.available_feed_names]
 
     # util.LP_print(LHS, RHS, objective, var_names, operators, "minimize", "RATION", lower_bounds, upper_bounds)

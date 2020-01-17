@@ -12,7 +12,8 @@ import sys
 import pulp
 import time as timer
 from pathlib import Path
-import csv
+import sqlite3
+#import csv
 
 # -------------------------------------------------------------------------------
 # Function: get_base_dir
@@ -274,17 +275,17 @@ def LP_print(LHS, RHS, objective, variables, operators,
 # This is useful for reading in time series data where each column corresponds
 # to data of a specific attribute such as temperature.
 #
-def get_csv_columns(fileName):
-    filePath = get_base_dir() / fileName
-    with filePath.open("r") as input:
-        readCSV = csv.reader(input, delimiter=',')
-        allRows = list(readCSV)
-
-        # Convert all numerical data to floats if possible
-        allRows = [[try_to_float(value) for value in row] for row in allRows]
-
-        allColumns = zip(*allRows)
-        return list(allColumns)
+# def get_csv_columns(fileName):
+#     filePath = get_base_dir() / fileName
+#     with filePath.open("r") as input:
+#         readCSV = csv.reader(input, delimiter=',')
+#         allRows = list(readCSV)
+#
+#         # Convert all numerical data to floats if possible
+#         allRows = [[try_to_float(value) for value in row] for row in allRows]
+#
+#         allColumns = zip(*allRows)
+#         return list(allColumns)
 
 
 def try_to_float(input):
@@ -307,6 +308,7 @@ def try_to_float(input):
 # and apple. The only requirements are that each item in the library
 # (defined in the csv) must have a unique "ID" trait and a unique "Name" trait.
 #
+'''
 class Library():
     def __init__(self, csvFile):
         self.lib_by_id = {}
@@ -372,3 +374,76 @@ class Library():
         # Add the item to the library
         self.lib_by_id[id] = item
         self.lib_by_name[name] = item
+'''
+
+
+class LibraryDatabase():
+    def __init__(self, database_file):
+        conn = sqlite3.connect(database_file)
+        conn.row_factory = sqlite3.Row
+
+        c = conn.cursor()
+        c.execute("SELECT * FROM feed_library")
+
+        self.lib_by_id = {}
+        self.lib_by_name = {}
+        info = c.fetchall()
+        conn.close()
+
+        # The names of the traits are the first entry in each column
+        traits = info[0].keys()
+        size = len(info)
+
+        # Create and add each item to the library
+        for item in info:
+            self.add_to_library(dict(item))
+
+    def parse_table(self, table_rows):
+        pass
+
+    # Returns the dictionary of traits and corresponding values for the item
+    # in the library with the given key. Items in the library can be retrieved
+    # by either their Name or their ID.
+    def checkout(self, key):
+        if key in self.lib_by_name:
+            return self.lib_by_name[key]
+        elif key in self.lib_by_id:
+            return self.lib_by_id[key]
+        else:
+            print("Unable to find '" + str(key) + "' in the library.")
+            print("Please check that this is the correct Name or ID for the item, and that the "
+                  "csv containing this item is the one specified in the input file.")
+            print("Exiting...")
+            exit()
+
+    # In order for an item to be added to the library, the item must be a
+    # dictionary containing an 'ID' and a 'Name' which can be used to uniquely
+    # identify the item in the library.
+    def add_to_library(self, item):
+
+        if (type(item) is not dict) or ('ID' not in item) or ("Name" not in item):
+            print("In order to add an item to the library, it must be a "
+                  "dictionary containing an 'ID' and a 'Name'.")
+            print("Exiting ...")
+            exit()
+
+        id = item['ID']
+        name = item['Name']
+
+        # Check for duplicate Names or IDs
+        duplicate = ""
+        if id in self.lib_by_id:
+            duplicate = "ID of '%s'" % str(id)
+        elif name in self.lib_by_name:
+            duplicate = "Name of '%s'" % name
+
+        if duplicate != "":
+            print("The "+duplicate+" corresponds with multiple items in the specified csv.\n"
+                  "Please modify the csv so that the "+duplicate+" is unique to one item.")
+            print("Exiting ...")
+            exit()
+
+        # Add the item to the library
+        self.lib_by_id[id] = item
+        self.lib_by_name[name] = item
+
