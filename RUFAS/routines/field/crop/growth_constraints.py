@@ -32,7 +32,7 @@ CropType attribute definitions:
 
     tstrs = Temperature stress for a given day
 
-    nstrs = Nitrogen strss for a given day
+    nstrs = Nitrogen stress for a given day
 
     pstrs = Phosphorus stress for a given day
 

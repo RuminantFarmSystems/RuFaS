@@ -106,4 +106,3 @@ def update_SW(soil, weather, time):
     soil.p_calc = soil.delta_SW + soil.ET_act + soil.drainage + soil.runoff
 
     soil.water_balance_difference = soil.p_act - soil.p_calc
-

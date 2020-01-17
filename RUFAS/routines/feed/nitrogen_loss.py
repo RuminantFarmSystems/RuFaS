@@ -61,6 +61,3 @@ def update_CP(feed):
     feed.crude_protein -= (feed.CP_gas + feed.CP_leachate)
 
     feed.dry_matter -= (feed.CP_gas + feed.CP_leachate)
-
-
-
