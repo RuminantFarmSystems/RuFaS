@@ -28,12 +28,12 @@
             "bulk_density": 1.23,
             "org_C_percent": 0.02,
             "NH4": 1,
-            "active_N_fraction": 0.02,
+            "active_N_percent": 0.02,
             "labile_P": 15,
             "active_mineral_rate": 0.0001,
             "volatile_exchange_factor": 0.15,
             "denitrification_rate": 0.01,
-            "soil_water_ratio": 0.3,
+            "soil_water_percent": 0.3,
             "OM_percent": 1.9
         },
         "layer_2":
@@ -66,7 +66,7 @@
             "K_sat": 20,
             "cation_exclusion_fraction": 0.0,
             "clay": 20,
-            "InitialTemperature": 8,
+            "initial_temperature": 8,
             "bulk_density": 1.8,
             "org_C_percent": 0.012,
             "NH4": 1,

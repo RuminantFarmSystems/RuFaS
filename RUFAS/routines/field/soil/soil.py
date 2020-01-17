@@ -583,7 +583,7 @@ class Soil:
             self.wilting_point = layer_data['wilting_point']
             self.field_capacity = layer_data['field_capacity']
             self.saturation = layer_data['saturation']
-            self.soil_water_ratio = layer_data['soil_water_percent']
+            self.soil_water_percent = layer_data['soil_water_percent']
 
             self.thickness = 0.0  # thickness of soil layer
             self.fc_water = 0.0  # constant
@@ -643,7 +643,7 @@ class Soil:
             self.tot_nitri_volatil = 0.0
 
             self.de_N_rate = layer_data['denitrification_rate']
-            self.frac_active_N = layer_data['active_N_percent']
+            self.active_N_percent = layer_data['active_N_percent']
             self.volatile_exchange_factor = layer_data['volatile_exchange_factor']
 
             # Variables to simulate phosphorus cycling
@@ -663,7 +663,7 @@ class Soil:
         """
 
         for layer in self.soil_layers:
-            layer.soil_water = layer.thickness * layer.soil_water_ratio
+            layer.soil_water = layer.thickness * layer.soil_water_percent
 
     def calculate_FC_water(self):
         """
