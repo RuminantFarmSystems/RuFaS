@@ -11,11 +11,14 @@ Author(s): Kass Chupongstimun, kass_c@hotmail.com
 from numpy import exp
 from RUFAS import util
 import math
+from RUFAS.routines.feed.feed import NutrientValues, Nutrients, Feeds
+from typing import List, Dict
 
 # These values are needed and calculated in calculate_rqmts() but they are also
 # needed in optimize(), so when they are calculated in calculate_rqmts(),
 # these global variables keep track of their values in order to minimize code
 # repetition. They are initialized to -1 for debugging purposes.
+
 global_BW = -1
 global_DMIest = -1
 global_DBW = -1
@@ -282,11 +285,18 @@ def calculate_ME_RDP_RUP(feed, DMIest, BW, DBW, milk, CP_Milk):
         three lists, where each element in each list is the respective value for
             ME_DM, RDP_DM, and RUP_DM for each feed
     """
-
     ME_DM_arr = []
     RDP_DM_arr = []
     RUP_DM_arr = []
     DMI_BW = DMIest / BW
+    #
+    for managed_feed in feed.managed_feeds:
+        nutrients: Dict[str, float] = feed.values(managed_feed, False)
+        Ash_DM = nutrients[Nutrients.Ash_DM.name]
+        print('ash: ', Ash_DM)
+        CP_DM = nutrients[Nutrients.CP_DM.name]
+        print('cp: ', CP_DM)
+    #
     for feed_name in feed.available_feed_names:
         # Obtains the necessary values from the particular feed for the calculations
         Ash_DM = feed.available_feeds[feed_name]['Ash_DM']
