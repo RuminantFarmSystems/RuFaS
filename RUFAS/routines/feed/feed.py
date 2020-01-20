@@ -5,16 +5,21 @@ File name: feed.py
 Description:
 Author(s): Kass Chupongstimun, kass_c@hotmail.com,
            Andy Achenreiner, achenreiner@wisc.edu
+           Militsa Sotirova, militsasotirova@gmail.com
 """
 ################################################################################
-from enum import Enum, IntEnum
+from enum import IntEnum
 import sqlite3
-from typing import List
-
-from RUFAS import util
 
 
 class Feeds(IntEnum):
+    """
+    Each enum member is the name of a feed in the feed information database. The
+    values correspond to the ID column in the database table.
+
+    Note: if a feed is added to the database source of feed information, the
+    name of the feed along with its ID must be added here.
+    """
     Corn_grain = 1
     Legume_hay = 2
     Cotton_seed = 3
@@ -29,6 +34,15 @@ class Feeds(IntEnum):
 
 
 class Nutrients(IntEnum):
+    """
+    Each enum member is the name of either a nutrient or characteristic of a
+    feed in the database source of feed information.
+
+    Note: if a nutrient or characteristic column is added to the database
+    source of feed information, the nutrient or characteristic must be added
+    here.
+    """
+    # TODO change names in the enum
     DM = 0
     Ash_DM = 1
     CP_DM = 2
@@ -52,126 +66,123 @@ class Nutrients(IntEnum):
 
 
 class NutrientValues:
-    def __init__(self, database_file, table_name, configured_feeds):
-        # TODO error handling
-        # TODO filter by list of available feeds
-        conn = sqlite3.connect(database_file)
-        conn.row_factory = sqlite3.Row
+    """
+    Description: Stores the information from the database source of feed
+    information for the feeds listed as managed in the input JSON file.
+    """
+    def __init__(self, database_file: str, table_name, configured_feeds):
+        """
+        Connects to the @database_file and queries from the @table_name for the
+        nutrient and characteristic information of the list of
+        @configured_feeds. If an exception is raised, the method prints a
+        message and the program exits.
 
-        c = conn.cursor()
-        query = "SELECT * FROM " + \
-                table_name + \
-                " WHERE name IN " + \
-                "({})".format(','.join(['?'] * len(configured_feeds)))
-        c.execute(query, configured_feeds)
+        Args:
+            database_file: the name of the database file
+            table_name: the name of the table in the database which is queried
+            configured_feeds: a list of the feeds provided by the input JSON
+                file as feeds managed by the farm, and therefore the feeds
+                for which information will be stored
+        """
+        try:
+            conn = sqlite3.connect(database_file)
+            conn.row_factory = sqlite3.Row
 
-        self.values = []
-        row = c.fetchone()
-        while row is not None:
-            self.values.append(dict(row))
+            c = conn.cursor()
+            query = "SELECT * FROM " + \
+                    table_name + \
+                    " WHERE name IN " + \
+                    "({})".format(','.join(['?'] * len(configured_feeds)))
+            c.execute(query, configured_feeds)
+
+            # self.values is a list of dictionaries, where each dictionary in
+            # the list corresponds to a row in the database table with all of
+            # the information for the feed
+            self.values = []
             row = c.fetchone()
+            while row is not None:
+                self.values.append(dict(row))
+                row = c.fetchone()
 
-        conn.close()
+            conn.close()
 
-    '''
-        self.index = 0
+        except Exception as e:
+            print("The program has encountered the following exception while"
+                  "connecting to and querying the database: ", e,
+                  "\nExiting.")
+            exit(1)
 
-    def get(self, nutrient: Nutrients):
-        return self.values[self.index - 1][nutrient.name]
 
-    def next(self) -> bool:
-        if self.index < len(self.values):
-            self.index += 1
-            return True
-        return False
-
-    def reset(self):
-        self.index = 0
-        return self
-    '''
-
-# -------------------------------------------------------------------------------
-# Class: Feed
-# -------------------------------------------------------------------------------
 class Feed:
     """
-    TODO: Add DocString
-    Description: Sorts all feeds by the contraints set in the Linear Program of rations.py
-
-    Args: No arguments
+    Description: Stores the information for the feeds managed by the farm.
     """
 
     def __init__(self, data):
         """
-        TODO: Add DocString
-        Description: This method takes the data specified in the feed Library
-        populates the array available_feeds and loops through the keys of the
-        array to sort them by the requirements set in the linear program.
+        Sets up the data for the feeds managed by the farm.
 
-        Args: self: references current instance of class Feed and is the first
-        argument of every class method.
+        Args:
+            data: the feed information from the input JSON file
         """
-        # The feed library contains all the types of feed described in the input
-        # csv file specified for "feed_library" in the input json file.
         self.__feed_database = data["feed_database"]
         self.__table_name = data["table_name"]
-        self.available_feed_names = data["managed_feeds"]
-        self.feed_library = util.LibraryDatabase(self.__feed_database,
-                                                 self.__table_name)
+        self.managed_feed_names = data["managed_feeds"]
 
-        # The available_feeds are the collection of feeds that are actually
-        # available and should be used in calculations.
-        #TODO erase available_feeds
-        self.available_feeds = {}
+        # The managed_feeds are the collection of feeds should be used
+        # in calculations.
         self.managed_feeds = []
 
-        # Populate available_feeds. The key to retrieve a feed type from
-        # available_feeds is the name of the feed as specified in the csv
-        # library. The feed_keys are specified in the input json file. They
-        # may be the Name or the ID of the feed type in the csv.
-        for feed_key in self.available_feed_names:
+        # Populate managed_feeds. The key to retrieve a feed type from
+        # available_feeds is the name of the feed as specified in the database
+        # table. The feed_keys are specified in the input json file.
+        for feed_key in self.managed_feed_names:
             self.managed_feeds.append(Feeds[feed_key])
 
-
-            feed_type = self.feed_library.checkout(feed_key)
-            self.available_feeds[feed_type["Name"]] = feed_type
-
-        # Sorted so that they are in a consistent order.
-        #self.available_feed_names = sorted(list(self.available_feeds.keys()))
-        #self.available_feed_names = self.__available_feed_data
-
-        # Sorted so that is easier to ensure that the requirements calculated
-        # in ration.py are zipped with the correct nutrient.
+        # The nutrient requirements used in the ration calculations.
         self.nutrient_rqmts = ['FU', 'RU', 'ME_DM', 'RDP_DM', 'RUP_DM']
 
+        # The values in the database at the time of this object's
+        # initialization.
         self.__cached_values = NutrientValues(self.__feed_database,
                                               self.__table_name,
-                                              self.available_feed_names)
+                                              self.managed_feed_names)
 
-    # doesn't support multithreading
     def initial_values(self) -> NutrientValues:
-        return self.__cached_values#.reset()
+        """
+        Returns: a NutrientValues object which holds the values in the database
+        table at the time of program initialization.
+        """
+        return self.__cached_values
 
     def current_values(self) -> NutrientValues:
+        """
+        Returns: a new NutrientValues object which holds the values in the
+        database table at the time of the method call.
+        """
         return NutrientValues(self.__feed_database,
                               self.__table_name,
-                              self.available_feed_names)
+                              self.managed_feed_names)
 
-    def values(self, feed: Feeds, current: bool):
+    def values(self, desired_feed: Feeds, current: bool = False):
+        """
+        Args:
+            desired_feed: a member of the Feeds enum
+            current: if the values should be taken from the database at the time
+                of the method call, this value is true. The default value is
+                False, which means the cached values will be returned (stored at
+                the time of program initialization)
+                
+        Returns: the dictionary which represents the characteristics and
+        nutrients of the @desired_feed
+        """
         feeds = self.current_values() if current else self.initial_values()
-        index = self.managed_feeds.index(feed)
+        index = self.managed_feeds.index(desired_feed)
         return feeds.values[index]
 
-        # ---------------------------------------------------------------------------
-    # Method: annual_reset
-    # ---------------------------------------------------------------------------
     def annual_reset(self):
         """
-        TODO: Add DocString
-        Description: This method resets the data in the available_feeds array
+        This method resets the data in the available_feeds array
         for another cycle.
-
-        Args: self: references current instance of class Feed and is the first
-        argument of every class method.
         """
         pass

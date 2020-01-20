@@ -11,8 +11,7 @@ Author(s): Kass Chupongstimun, kass_c@hotmail.com
 from numpy import exp
 from RUFAS import util
 import math
-from RUFAS.routines.feed.feed import NutrientValues, Nutrients, Feeds
-from typing import List, Dict
+from RUFAS.routines.feed.feed import Nutrients
 
 # These values are needed and calculated in calculate_rqmts() but they are also
 # needed in optimize(), so when they are calculated in calculate_rqmts(),
@@ -25,7 +24,6 @@ global_DBW = -1
 global_milk = -1
 global_CP_Milk = -1
 
-
 def set_globals(DMIest, BW, DBW, milk, CP_milk):
     """
     Sets the global variables with averages from pen.
@@ -34,7 +32,7 @@ def set_globals(DMIest, BW, DBW, milk, CP_milk):
         BW: body weight, kg
         DBW: Body weight change (delta body weight = DBW), kg
         milk: milk production, kg
-        CP_Milk: milk crude protein content
+        CP_milk: milk crude protein content
     """
     global global_BW
     global global_DMIest
@@ -48,19 +46,13 @@ def set_globals(DMIest, BW, DBW, milk, CP_milk):
     global_milk = milk
     global_CP_Milk = CP_milk
 
-
 def optimize(feed, rqmts):
     """
     Sets up the arguments for the linear programming optimization.
 
     Args:
-<<<<<<< HEAD:RUFAS/routines/animal/ration/lactating_cow_ration.py
-        feed : instance of the Feed class
-        rqmts : dict which represents the dietary requirements of the cows
-=======
-	    feed : instance of the Feed class
-	    rqmts : dict which represents the dietary requirements of the cows
->>>>>>> 9eaa8c2b3a37d66bc578382a7a7abfe0994a8877:RUFAS/routines/animal/ration.py
+	    feed: instance of the Feed class
+	    rqmts: dict which represents the dietary requirements of the cows
 
     Returns:
         dict: the dictionary that is returned by the call to util.LP_solve()
@@ -76,15 +68,19 @@ def optimize(feed, rqmts):
     # ]
 
     LHS = []
-    constraint = [percentage(feed.available_feeds[feed_name]['FU'])
-                  for feed_name in feed.available_feed_names]
+    constraint = [percentage(feed.values(feed_name)['FU'])
+                  for feed_name in feed.managed_feeds]
     LHS.append(constraint)
 
-    constraint = [(percentage(feed.available_feeds[feed_name]['RU']) - 0.21)
-                  for feed_name in feed.available_feed_names]
+    constraint = [(percentage(feed.values(feed_name)['RU']) - 0.21)
+                  for feed_name in feed.managed_feeds]
     LHS.append(constraint)
 
-    ME_DM_arr, RDP_DM_arr, RUP_DM_arr = calculate_ME_RDP_RUP(feed, global_DMIest, global_BW, global_DBW, global_milk,
+    ME_DM_arr, RDP_DM_arr, RUP_DM_arr = calculate_ME_RDP_RUP(feed,
+                                                             global_DMIest,
+                                                             global_BW,
+                                                             global_DBW,
+                                                             global_milk,
                                                              global_CP_Milk)
     LHS.append(ME_DM_arr)
     LHS.append(RDP_DM_arr)
@@ -104,12 +100,12 @@ def optimize(feed, rqmts):
     # objective is of the form [##,##, ..., ##] with the values being the price
     # for each food type. This makes the objective function represent the total
     # cost of a ration formulation.
-    objective = [feed.available_feeds[feed_name]['Price']
-                 for feed_name in feed.available_feed_names]
+    objective = [feed.values(feed_name)['Price']
+                 for feed_name in feed.managed_feeds]
 
     # Each variable represents the quantity of a feed type. The variables are
     # named after their corresponding food type.
-    var_names = feed.available_feed_names
+    var_names = feed.managed_feed_names
 
     # operators is of the form [##, ##, ..., ##] with each value being one of
     # '<=', '>=', or '=='. These are the operators between the corresponding
@@ -118,19 +114,22 @@ def optimize(feed, rqmts):
 
     # The lower bounds for quantity of a food type are zero since a negative
     # quantity of food in this context does not make sense.
-    lower_bounds = [0] * len(feed.available_feed_names)
+    lower_bounds = [0] * len(var_names)
 
     # The upper bounds are the 'Limit' specified in the csv library for each
     # food type.
-    upper_bounds = [feed.available_feeds[feed_name]['Limits']
-                    for feed_name in feed.available_feed_names]
+    upper_bounds = [feed.values(feed_name)['Limits']
+                    for feed_name in feed.managed_feeds]
 
-    # util.LP_print(LHS, RHS, objective, var_names, operators, "minimize", "RATION", lower_bounds, upper_bounds)
+    # util.LP_print(LHS, RHS, objective, var_names, operators, "minimize",
+    # "RATION", lower_bounds, upper_bounds)
 
-    return util.LP_solve(LHS, RHS, objective, var_names, operators, "minimize", "RATION", lower_bounds, upper_bounds)
+    return util.LP_solve(LHS, RHS, objective, var_names, operators, "minimize",
+                         "RATION", lower_bounds, upper_bounds)
 
-def calculate_rqmts(BW, BCS, CBW, CI, pasture_concentrate, CP_Milk, DOP, DHD, DVD,
-                    DIM, fat_milk, lactose_milk, milk, parity, type, nutrients_list):
+def calculate_rqmts(BW, BCS, CBW, CI, pasture_concentrate, CP_Milk, DOP, DHD,
+                    DVD, DIM, fat_milk, lactose_milk, milk, parity, type,
+                    nutrients_list):
     """
     Calculate the dietary requirements of the cows. These values are used
     on the RHS of the linear program. Each calculation has a reference to the
@@ -162,7 +161,8 @@ def calculate_rqmts(BW, BCS, CBW, CI, pasture_concentrate, CP_Milk, DOP, DHD, DV
         DBW: Body weight change (delta body weight = DBW), kg
     """
 
-    # Sets these variables as global. See comment at the beginning of this file for further details.
+    # Sets these variables as global. See comment at the beginning of this
+    # file for further details.
     global global_BW
     global global_DMIest
     global global_DBW
@@ -193,14 +193,15 @@ def calculate_rqmts(BW, BCS, CBW, CI, pasture_concentrate, CP_Milk, DOP, DHD, DV
     if type == "barn":
         NEact = (DHD * 0.35 * BW + DVD * 5 * BW) / 1000
     elif type == "pasture":
-        NEact = (DHD * 0.35 * BW + DVD * 5 * BW + 10 * (BW ** 0.75) * ((600 - 12 * pasture_concentrate) / 600)) / 1000
+        NEact = (DHD * 0.35 * BW + DVD * 5 * BW + 10 * (BW ** 0.75) * (
+                (600 - 12 * pasture_concentrate) / 600)) / 1000
 
     # Pregnancy energy requirements
     # -----------------------------
     # Net Energy pregnancy, Mcal (A.ER.4.1)
     if DOP < 190:
         NEpreg = 0
-    elif DOP >= 190 and DOP <= 279:
+    elif 190 <= DOP <= 279:
         NEpreg = ((0.00318 * DOP - 0.0352) * (CBW / 45)) / 0.218
     else:
         NEpreg = ((0.00318 * 279 - 0.0352) * (CBW / 45)) / 0.218
@@ -233,7 +234,8 @@ def calculate_rqmts(BW, BCS, CBW, CI, pasture_concentrate, CP_Milk, DOP, DHD, DV
     if DIM > 100:
         DMIest = 2.58 + 0.30 * NEl + 0.027 * BW + 0.05 * DBW - 1.15 * BCS
     else:
-        DMIest = (2.58 + 0.30 * NEl + 0.027 * BW) * (1 - exp(-0.192 * ((DIM + 3.5) / 7 + 3.67)))
+        DMIest = (2.58 + 0.30 * NEl + 0.027 * BW) * (
+                1 - exp(-0.192 * ((DIM + 3.5) / 7 + 3.67)))
     global_DMIest = DMIest
     # Fiber Intake Capacity, Fiber Units/day (A.FI.2.2)
     # Weeks in milk
@@ -245,14 +247,15 @@ def calculate_rqmts(BW, BCS, CBW, CI, pasture_concentrate, CP_Milk, DOP, DHD, DV
     # Maximum Fiber Intake (A.FI.2.3)
     FIMax = 0.01025 * BW * FIC
 
-    # PROTEIN REQUIREMENTS - temporarily based on IFSM, will be replaced with NRC
-    # Metabolize protein required for maintenance per day, g (A.PR.1.1)
+    # PROTEIN REQUIREMENTS - temporarily based on IFSM, will be replaced with
+    # NRC Metabolize protein required for maintenance per day, g (A.PR.1.1)
     MPM = 3.8 * ((0.96 * BW) ** 0.75)
     # Metabolize protein required for lactation per day, g (A.PR.2.1)
     MPMLK = 10 * CP_Milk * milk / 0.65
     # Microbial crude protein, kg (A.PR.3.1)
     MCP = 0.13 * 0.51 * DMIest
-    # Rumen degradable (RDPreq, kg) and undegradable protein (RUPreq, kg) requirements
+    # Rumen degradable (RDPreq, kg) and undegradable protein (RUPreq, kg)
+    # requirements
     RDPreq = MCP / 0.9  # (A.PR.3.2)
     MPreq = MPM + MPMLK  # (A.PR.3.3)
     RUPreq = MPreq / 1000 - 0.8 * 0.8 * MCP  # (A.PR.3.4)
@@ -269,11 +272,10 @@ def calculate_rqmts(BW, BCS, CBW, CI, pasture_concentrate, CP_Milk, DOP, DHD, DV
 
     return dict(zip(nutrients_list, nutrient_rqmts)), DMIest, DBW
 
-
 def calculate_ME_RDP_RUP(feed, DMIest, BW, DBW, milk, CP_Milk):
     """
-    Calculates some of the Feed Composition values, which are the LHS multipliers
-    in the LP
+    Calculates some of the Feed Composition values, which are the LHS
+    multipliers in the LP
 
     Args:
         feed: an instance of the feed class
@@ -289,35 +291,27 @@ def calculate_ME_RDP_RUP(feed, DMIest, BW, DBW, milk, CP_Milk):
     RDP_DM_arr = []
     RUP_DM_arr = []
     DMI_BW = DMIest / BW
-    #
+
     for managed_feed in feed.managed_feeds:
-        nutrients: Dict[str, float] = feed.values(managed_feed, False)
+        # Obtains the necessary nutrient values for the particular feed
+        nutrients: dict[str, float] = feed.values(managed_feed)
         Ash_DM = nutrients[Nutrients.Ash_DM.name]
-        print('ash: ', Ash_DM)
         CP_DM = nutrients[Nutrients.CP_DM.name]
-        print('cp: ', CP_DM)
-    #
-    for feed_name in feed.available_feed_names:
-        # Obtains the necessary values from the particular feed for the calculations
-        Ash_DM = feed.available_feeds[feed_name]['Ash_DM']
-        CP_DM = feed.available_feeds[feed_name]['CP_DM']
-        dFA_FA_base = feed.available_feeds[feed_name]['dFA_FA_base']
-        dRUP_RUP = feed.available_feeds[feed_name]['dRUP_RUP']
-        dStarch_Starch_base = feed.available_feeds[feed_name]['dStarch_Starch_base']  # basic starch digestibility
-        FA_DM = feed.available_feeds[feed_name]['FA_DM']
-        FU = feed.available_feeds[feed_name]['FU']
-        IVNDFD_NDF = feed.available_feeds[feed_name]['IVNDFD_NDF']
-        NDF_DM = feed.available_feeds[feed_name]['NDF_DM']
-        NDIP_DM = feed.available_feeds[feed_name]['NDIP_DM']
-        RU = feed.available_feeds[feed_name]['RU']
-        RUP_CP = feed.available_feeds[feed_name]['RUP_CP']
-        Starch_DM = feed.available_feeds[feed_name]['Starch_DM']
-        sNPNCPE_DM = feed.available_feeds[feed_name]['sNPNCPE_DM']
+        dFA_FA_base = nutrients[Nutrients.dFA_FA_base.name]
+        dRUP_RUP = nutrients[Nutrients.dRUP_RUP.name]
+        dStarch_Starch_base = nutrients[Nutrients.dStarch_Starch_base.name]
+        FA_DM = nutrients[Nutrients.FA_DM.name]
+        IVNDFD_NDF = nutrients[Nutrients.IVNDFD_NDF.name]
+        NDF_DM = nutrients[Nutrients.NDF_DM.name]
+        RUP_CP = nutrients[Nutrients.RUP_CP.name]
+        Starch_DM = nutrients[Nutrients.Starch_DM.name]
+        sNPNCPE_DM = nutrients[Nutrients.sNPNCPE_DM.name]
 
         # Neutral detergent fiber (NDF) (A.FE.1.1)
         dNDF_NDF_base = 0.12 + 0.61 * percentage(IVNDFD_NDF)
         # Digested NDF, proportion of NDF (A.FE.1.2)
-        dNDF_NDF = dNDF_NDF_base - 0.43 * (percentage(Starch_DM) - 0.26) - 3.0 * (DMI_BW - 0.035)
+        dNDF_NDF = dNDF_NDF_base - 0.43 * (
+                percentage(Starch_DM) - 0.26) - 3.0 * (DMI_BW - 0.035)
 
         # Digested Starch (A.FE.2.1)
         dStarch_Starch = dStarch_Starch_base - 1.0 * (DMI_BW - 0.035)
@@ -329,11 +323,12 @@ def calculate_ME_RDP_RUP(feed, DMIest, BW, DBW, milk, CP_Milk):
         dCP_CP = (RDP_DM + dRUP_DM) / CP_DM
 
         # Residual Organic Matter (ROM) (A.FE.4.1)
-        if feed_name == 'Fatty acid' or feed_name == 'FA Soap':
+        if managed_feed == 'Fatty acid' or managed_feed == 'FA Soap':
             FatFactor = 1
         else:
             FatFactor = 1.06
-        ROM_DM = 100 - Ash_DM - NDF_DM - Starch_DM - FA_DM / FatFactor - (CP_DM - 0.64 * sNPNCPE_DM)
+        ROM_DM = 100 - Ash_DM - NDF_DM - Starch_DM - FA_DM / FatFactor - (
+                CP_DM - 0.64 * sNPNCPE_DM)
         # Digested ROM (A.FE.4.2)
         dROM_ROM = 0.96
 
@@ -347,19 +342,25 @@ def calculate_ME_RDP_RUP(feed, DMIest, BW, DBW, milk, CP_Milk):
         efROM_DM = 0.0343
 
         # Digested energy per unit DM (A.FE.7.1)
-        DE_DM = 4.2 * NDF_DM * percentage(dNDF_NDF) + 4.23 * Starch_DM * percentage(
-            dStarch_Starch) + 9.40 * FA_DM * percentage(dFA_FA) + 5.65 * CP_DM * percentage(dCP_CP) + 0.89 * percentage(
-            sNPNCPE_DM) + 4.00 * ROM_DM * percentage(dROM_ROM) - 5.65 * efCP_DM - 4.00 * efROM_DM
+        DE_DM = 4.2 * NDF_DM * percentage(
+            dNDF_NDF) + 4.23 * Starch_DM * percentage(
+            dStarch_Starch) + 9.40 * FA_DM * percentage(
+            dFA_FA) + 5.65 * CP_DM * percentage(dCP_CP) + 0.89 * percentage(
+            sNPNCPE_DM) + 4.00 * ROM_DM * percentage(
+            dROM_ROM) - 5.65 * efCP_DM - 4.00 * efROM_DM
 
         # Gas energy loss, mCal/kg of DM (A.FE.8.2)
-        GasE_DM = (0.294 * DMIest - 0.35 * FA_DM + 0.041 * NDF_DM * dNDF_NDF) / DMIest
+        GasE_DM = (0.294 * DMIest - 0.35 * FA_DM + 0.041 * NDF_DM * dNDF_NDF) \
+                  / DMIest
         # Apparently digested CP (A.FE.8.4)
         adCP_CP = dCP_CP - (efCP_DM * 100 / CP_DM)
         Body_gain_CP = DBW * 0.072
         # (A.FE.8.6)
-        UE_DM = 0.00275 * (BW ** 0.75) / DMIest + 0.0177 * DE_DM + 0.00813 * percentage(
+        UE_DM = 0.00275 * (
+                BW ** 0.75) / DMIest + 0.0177 * DE_DM + 0.00813 * percentage(
             CP_DM) * adCP_CP * 1000 / 6.25 - (
-                        0.00813 * (milk * percentage(CP_Milk) + Body_gain_CP) * 1000 / 6.25) / DMIest
+                        0.00813 * (milk * percentage(
+                    CP_Milk) + Body_gain_CP) * 1000 / 6.25) / DMIest
         # Apparently digested CP (A.FE.8.4)
         adCP_CP = dCP_CP - (efCP_DM / CP_DM)
         # Metabolized energy per unit DM (A.FE.8.1)
@@ -373,7 +374,6 @@ def calculate_ME_RDP_RUP(feed, DMIest, BW, DBW, milk, CP_Milk):
         RUP_DM_arr.append(percentage(RUP_CP) * percentage(CP_DM))
 
     return ME_DM_arr, RDP_DM_arr, RUP_DM_arr
-
 
 def percentage(val):
     """
