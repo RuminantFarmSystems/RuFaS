@@ -89,6 +89,12 @@ class NutrientValues:
             conn.row_factory = sqlite3.Row
 
             c = conn.cursor()
+
+            # The query selects all of the columns from the database (denoted by
+            # the *) with the additional specification that we only obtain
+            # information from the rows that correspond to the feeds listed in
+            # the input JSON file as managed by the farm (specified by the
+            # argument configured_feeds).
             query = "SELECT * FROM " + \
                     table_name + \
                     " WHERE name IN " + \
