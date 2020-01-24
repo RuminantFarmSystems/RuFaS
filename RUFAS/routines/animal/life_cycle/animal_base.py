@@ -56,6 +56,7 @@ class AnimalBase(object):
 		self._ration_formulation = {'objective': 0.00}
 		self._DMIest = 0
 		self._DBW = 0
+		self._p_animal = 0
 
 	def init_from_animal(self, animal):
 		self._id = animal._id

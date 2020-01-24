@@ -15,6 +15,7 @@ from RUFAS.routines.animal.ration.lactating_cow_ration import optimize as lactat
 from RUFAS.routines.animal.ration.calf_ration import optimize as calf_optimize
 from RUFAS.routines.animal.ration.dry_cow_ration import optimize as dry_cow_optimize
 from RUFAS.routines.animal.ration.growing_heifer_ration import optimize as growing_heifer_optimize
+from RUFAS.routines.feed.feed import Feeds, Nutrients
 
 class Pen:
     # unique pen ID, from input file
@@ -208,7 +209,7 @@ class Pen:
         # set ration for whole pen by multiplying calculated ration by number of animals in the pen
         num_animals = len(self.animals_in_pen)
         for key in ration_per_animal:
-            if (key == 'status'):
+            if key == 'status':
                 self.ration[key] = ration_per_animal[key]
                 
             else:  # feeds and price
@@ -249,7 +250,43 @@ class Pen:
             for animal in self.animals_in_pen:
                 if type(animal).__name__ == 'Cow':
                     animal.calc_daily_walking_dist(self.vertical_dist_to_parlor, self.horizontal_dist_to_parlor)
-            
+
+    def phosphorus_in_ration(self, ration, feed):
+        """
+        Args:
+            feed: instance of the Feed class, used to determine characteristics
+                of available feeds
+            ration: the dictionary representing the ration formulation
+
+        Returns: the amount of phosphorus (g) provided by the feed in @ration.
+        """
+        # amount of P in the formulated ration (g)
+        p_intake = 0
+
+        for key in ration:
+            # not every key in the ration dictionary refers to a feed
+            if key in feed.managed_feed_names:
+                managed_feed = Feeds[key]
+                nutrients: dict[str, float] = feed.values(managed_feed)
+                p_feed_conc = nutrients[Nutrients.PHOSPHORUS.name]
+                dmi_feed = ration[key]
+
+                # amount of P from feed (A.#.A.1)
+                p_feed_intake = p_feed_conc / 100 * dmi_feed * 1000
+
+                # (A.#.A.2)
+                p_intake += p_feed_intake
+
+        return p_intake
+
+    def calc_dmi(self, ration, feed):
+        dmi = 0
+        for key in ration:
+            if key in feed.managed_feed_names:
+                DM_feed_amount = ration[key]
+                dmi += DM_feed_amount
+        return dmi
+
     def clear(self):
         '''
         Clears the pen for re-allocation.
