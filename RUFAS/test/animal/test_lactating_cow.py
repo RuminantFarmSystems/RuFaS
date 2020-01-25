@@ -50,7 +50,7 @@ class LactatingCowTest(unittest.TestCase):
         feed = self.feeds[0]
 
         rqmts, _, _ = ration.calculate_rqmts(inputs['BW'], inputs['BCS'],
-                                             inputs['CBW'], inputs['CI'],
+                                             inputs['CBW'],
                                              inputs['concentrate'],
                                              inputs['CP_Milk'],
                                              inputs['DOP'], inputs['DHD'],

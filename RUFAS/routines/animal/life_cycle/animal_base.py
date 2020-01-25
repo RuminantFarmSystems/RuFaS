@@ -1,18 +1,15 @@
-'''
+"""
 RUFAS: Ruminant Farm Systems Model
 File name: animal_base.py
 Author(s): Manfei Li, mli497@wisc.edu
-Description: This file initialize common parameters
-			include ID, breed, birth date, and age for all animals to be indentified
-'''
+Description: This file initialize common parameters including ID, breed,
+			birth date, and age for all animals to be identified.
+"""
 ###############################################################################
 
-
 from RUFAS.routines.animal.life_cycle.animal_events import AnimalEvents
-import random
-import numpy as np
 
-# initial a cow with ID
+
 class AnimalBase(object):
 	global_id = 0
 	config = []
@@ -31,17 +28,15 @@ class AnimalBase(object):
 	def set_config(config):
 		AnimalBase.config = config
 
-	# Method: __init__
-	'''
-		Description:
-			initialize common parameters for all animals
-		Input:
-			args.breed: breed of the cow
-			args.date: the date of the simulation when the calf was born
-			args.daysBorn: age of the animal
-		Output:
-	'''
 	def __init__(self, args):
+		"""
+		Initializes common parameters for all animals
+		Args:
+			args:
+				args.breed: breed of the cow
+				args.date: the date of the simulation when the calf was born
+				args.daysBorn: age of the animal
+		"""
 		self._id = AnimalBase.next_id()
 		self._breed = args['breed']
 		self._birth_date = args['date']
@@ -51,6 +46,7 @@ class AnimalBase(object):
 		self._events = AnimalEvents()
 		
 		self._daily_growth = 0
+		self._nutrient_rqmts = {}
 		self.set_default_nutrient_rqmts()
 		self._manure_excretion = {}
 		self._ration_formulation = {'objective': 0.00}
@@ -68,6 +64,7 @@ class AnimalBase(object):
 		self._events = animal._events
 		
 		self._daily_growth = 0
+		self._nutrient_rqmts = {}
 		self.set_default_nutrient_rqmts()
 		self._manure_excretion = {}
 		self._ration_formulation = {'objective': 0.00}
@@ -75,18 +72,14 @@ class AnimalBase(object):
 		self._DBW = 0
 		
 	def set_default_nutrient_rqmts(self):
-		self._nutrient_rqmts = {}
+		"""
+		Sets the default nutrient requirement values to be 0.
+		"""
 		for key in self.nutrients:
 			self._nutrient_rqmts[key] = {'op': '', 'val': 0}
 
-	# Method: is_culled
-	'''
-		Description:
-			Check if the the cow is culled
-		Input:
-			From repro, production, and health culling section
-		Output:
-			True/False value inidicating if culled
-	'''
 	def culled(self):
+		"""
+		Returns: True/False value indicating if culled
+		"""
 		return self._culled
