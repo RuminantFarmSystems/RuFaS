@@ -24,9 +24,11 @@ global_DBW = -1
 global_milk = -1
 global_CP_Milk = -1
 
+
 def set_globals(DMIest, BW, DBW, milk, CP_milk):
     """
     Sets the global variables with averages from pen.
+
     Args:
         DMIest: dry matter intake estimation, kg
         BW: body weight, kg
@@ -46,25 +48,37 @@ def set_globals(DMIest, BW, DBW, milk, CP_milk):
     global_milk = milk
     global_CP_Milk = CP_milk
 
+
 def optimize(feed, rqmts):
     """
     Sets up the arguments for the linear programming optimization.
 
     Args:
-	    feed: instance of the Feed class
-	    rqmts: dict which represents the dietary requirements of the cows
+        feed: instance of the Feed class
+        rqmts: dictionary which represents the dietary requirements of the cows
 
-    Returns:
-        dict: the dictionary that is returned by the call to util.LP_solve()
+    Returns: a dictionary that represents the optimized ration formulation
+            For n available feeds, the output of the linear programming for the
+            ration formulation is a dictionary that looks like:
+            {
+                'feed1': amount of feed 1 in kg,
+                'feed2': amount of feed 2 in kg,
+                ...
+                'feedn': amount of feed n in kg,
+                'status': 'Optimal',
+                'objective': price
+            }
     """
-
     # LHS is of the following form. LHS stands for Left Hand Side.
+    # Each column has the coefficients for one specific feed type
+    # Each row has the coefficients for one specific nutrient type
+    # Each row represents the LHS of a constraint equation
     # [
-    #     [##,##, ..., ##],  // Each column has the coefficients for one specific feed type
-    #     [##,##, ..., ##],  // Each row has the coefficients for one specific nutrient type
-    #     [##,##, ..., ##],  // Each row represents the LHS of a constraint equation
-    #     [##,##, ..., ##],
-    #     [##,##, ..., ##]
+    #     [##, ##, ..., ##],
+    #     [##, ##, ..., ##],
+    #     [##, ##, ..., ##],
+    #     [##, ##, ..., ##],
+    #     [##, ##, ..., ##]
     # ]
 
     LHS = []
@@ -127,9 +141,10 @@ def optimize(feed, rqmts):
     return util.LP_solve(LHS, RHS, objective, var_names, operators, "minimize",
                          "RATION", lower_bounds, upper_bounds)
 
-def calculate_rqmts(BW, BCS, CBW, CI, pasture_concentrate, CP_Milk, DOP, DHD,
-                    DVD, DIM, fat_milk, lactose_milk, milk, parity, type,
-                    nutrients_list):
+
+def calculate_rqmts(BW, BCS, CBW, pasture_concentrate, CP_Milk, DOP, DHD,
+                    DVD, DIM, fat_milk, lactose_milk, milk, parity,
+                    farming_type, nutrients_list):
     """
     Calculate the dietary requirements of the cows. These values are used
     on the RHS of the linear program. Each calculation has a reference to the
@@ -139,8 +154,8 @@ def calculate_rqmts(BW, BCS, CBW, CI, pasture_concentrate, CP_Milk, DOP, DHD,
         BW: body weight, kg
         BCS: body condition score, 1 to 5
         CBW: calf birth weight, kg
-        CI: calving interval, days
-        pasture_concentrate: concentrate supplementation when farming type is "pasture", kg
+        pasture_concentrate: concentrate supplementation when farming type is
+            "pasture", kg
         CP_Milk: milk crude protein content
         DOP: days of pregnancy, days
         DHD: daily horizontal distance, km
@@ -150,13 +165,14 @@ def calculate_rqmts(BW, BCS, CBW, CI, pasture_concentrate, CP_Milk, DOP, DHD,
         lactose_milk: milk lactose content
         milk: milk production, kg
         parity: number of times birth was given
-        type: farming type, "barn" or "pasture"
-        nutrients_list: a list of the nutrients for which requirements are calculated
+        farming_type: farming type, "barn" or "pasture"
+        nutrients_list: the list of the nutrients for which requirements are
+            calculated
 
     Returns:
-        dict : a dictionary that represents the dietary requirements of the cows,
-            where the left hand side is nutrients_list and the right hand side is
-            calculated in this method
+        dict : a dictionary that represents the dietary requirements of the
+            cows, where the left hand side is nutrients_list and the right hand
+            side is calculated in this method
         DMIest: dry matter intake estimation, kg
         DBW: Body weight change (delta body weight = DBW), kg
     """
@@ -185,14 +201,17 @@ def calculate_rqmts(BW, BCS, CBW, CI, pasture_concentrate, CP_Milk, DOP, DHD,
     # Lactation requirements
     # ----------------------
     # Net Energy lactation, Mcal (A.ER.2.1)
-    NEl = (9.29 * milk * fat_milk + 5.5 * milk * CP_Milk + 3.95 * milk * lactose_milk) / 100
+    NEl = (9.29 * milk * fat_milk +
+           5.5 * milk * CP_Milk +
+           3.95 * milk * lactose_milk) / 100
 
     # Activity requirements
     # ---------------------
     # Net Energy activity, Mcal (A.ER.3.1)
-    if type == "barn":
+    NEact = 0
+    if farming_type == "barn":
         NEact = (DHD * 0.35 * BW + DVD * 5 * BW) / 1000
-    elif type == "pasture":
+    elif farming_type == "pasture":
         NEact = (DHD * 0.35 * BW + DVD * 5 * BW + 10 * (BW ** 0.75) * (
                 (600 - 12 * pasture_concentrate) / 600)) / 1000
 
@@ -218,6 +237,7 @@ def calculate_rqmts(BW, BCS, CBW, CI, pasture_concentrate, CP_Milk, DOP, DHD,
     elif parity > 3:
         TCW = 700 * 1
     # Body weight change (delta body weight = DBW), kg (A.ER.5.4)
+    # TODO formula for DBW that is not in danger of a division by 0 error
     DBW = 0  # (TCW - 0.94 * BW) / (280 - CI + DOP)
     global_DBW = DBW
     # Net Energy body weight, Mcal (A.ER.5.5)
@@ -240,6 +260,7 @@ def calculate_rqmts(BW, BCS, CBW, CI, pasture_concentrate, CP_Milk, DOP, DHD,
     # Fiber Intake Capacity, Fiber Units/day (A.FI.2.2)
     # Weeks in milk
     WIM = math.ceil(DIM / 7)
+    FIC = 0
     if parity == 1:
         FIC = 0.338 * ((WIM + 3) ** 0.588) * exp(-0.0277 * (WIM + 3))
     elif parity > 1:
@@ -272,20 +293,22 @@ def calculate_rqmts(BW, BCS, CBW, CI, pasture_concentrate, CP_Milk, DOP, DHD,
 
     return dict(zip(nutrients_list, nutrient_rqmts)), DMIest, DBW
 
+
 def calculate_ME_RDP_RUP(feed, DMIest, BW, DBW, milk, CP_Milk):
     """
     Calculates some of the Feed Composition values, which are the LHS
     multipliers in the LP
 
     Args:
-        feed: an instance of the feed class
+        feed: instance of the Feed class
         DMIest: dry matter intake estimation
-        BW: body Weight
+        BW: body weight
         DBW: change in body weight
+        milk: milk production, kg
+        CP_Milk: milk crude protein content, % of Milk
 
-    Returns:
-        three lists, where each element in each list is the respective value for
-            ME_DM, RDP_DM, and RUP_DM for each feed
+    Returns: three lists as a tuple, where each element in each list is the
+        respective value for ME_DM, RDP_DM, and RUP_DM for each feed
     """
     ME_DM_arr = []
     RDP_DM_arr = []
@@ -294,7 +317,7 @@ def calculate_ME_RDP_RUP(feed, DMIest, BW, DBW, milk, CP_Milk):
 
     for managed_feed in feed.managed_feeds:
         # Obtains the necessary nutrient values for the particular feed
-        nutrients: dict[str, float] = feed.values(managed_feed)
+        nutrients = feed.values(managed_feed)
         Ash_DM = nutrients[Nutrients.Ash_DM.name]
         CP_DM = nutrients[Nutrients.CP_DM.name]
         dFA_FA_base = nutrients[Nutrients.dFA_FA_base.name]
@@ -360,7 +383,7 @@ def calculate_ME_RDP_RUP(feed, DMIest, BW, DBW, milk, CP_Milk):
                 BW ** 0.75) / DMIest + 0.0177 * DE_DM + 0.00813 * percentage(
             CP_DM) * adCP_CP * 1000 / 6.25 - (
                         0.00813 * (milk * percentage(
-                    CP_Milk) + Body_gain_CP) * 1000 / 6.25) / DMIest
+                            CP_Milk) + Body_gain_CP) * 1000 / 6.25) / DMIest
         # Apparently digested CP (A.FE.8.4)
         adCP_CP = dCP_CP - (efCP_DM / CP_DM)
         # Metabolized energy per unit DM (A.FE.8.1)
@@ -375,6 +398,7 @@ def calculate_ME_RDP_RUP(feed, DMIest, BW, DBW, milk, CP_Milk):
 
     return ME_DM_arr, RDP_DM_arr, RUP_DM_arr
 
+
 def percentage(val):
     """
     Calculates the true value of a percentage.
@@ -382,7 +406,6 @@ def percentage(val):
     Args:
         val: a number
 
-    Returns:
-        0.01 multiplied by val
+    Returns: 0.01 multiplied by val
     """
     return 0.01 * val

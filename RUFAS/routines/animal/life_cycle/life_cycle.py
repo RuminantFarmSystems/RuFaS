@@ -1,14 +1,14 @@
 ################################################################################
-'''
+"""
 RUFAS: Ruminant Farm Systems Model
 File name: life_cycle.py
-Description: The class which manages the life cycle of the animals. This includes
-    storing all information necessary for the simulation, initializing the herd to 
-    start the simulation at a steady state, updating the animals for each day, and
-    providing end-of-simulation statistics and graphs.
+Description: The class which manages the life cycle of the animals. This
+    includes storing all information necessary for the simulation, initializing
+    the herd to start the simulation at a steady state, updating the animals
+    for each day, and providing end-of-simulation statistics and graphs.
 Author(s): Manfei Li, mli497@wisc.edu
            Militsa Sotirova, militsasotirova@gmail.com
-'''
+"""
 ################################################################################
 from RUFAS.routines.animal.life_cycle.calf import Calf
 from RUFAS.routines.animal.life_cycle.heiferI import HeiferI
@@ -22,6 +22,9 @@ mpl.use('TkAgg')
 
 
 class LifeCycleManager:
+    """
+    Manages the life cycles of the animals.
+    """
     # statistics
     sold_calves = []
     sold_heifers = []
@@ -86,14 +89,21 @@ class LifeCycleManager:
     herd_num = 0
     
     def __init__(self, data):
-        '''
+        """
         Initializes the necessary configuration data.
-        '''
-        self.config = data        
+
+        Args:
+            data: life cycle data from the input JSON file
+        """
+        self.config = data
+        self.avg_daily_cow_milking = 0
     
-    def initialize_herd(self, herd_num, calf_num, heiferI_num, heiferII_num, heiferIII_num, cow_num, replace_num, sim_days=1500):
-        '''
-        Generates a replacement herd to simulate the market, for the herd to get replacements. Initializes the herd.
+    def initialize_herd(self, herd_num, calf_num, heiferI_num, heiferII_num,
+                        heiferIII_num, cow_num, replace_num, sim_days=1500):
+        """
+        Generates a replacement herd to simulate the market, for the herd to get
+         replacements. Initializes the herd.
+
         Args:
             herd_num: what the number of cows should be maintained at
             calf_num: the number of calves to start the simulation with
@@ -102,8 +112,9 @@ class LifeCycleManager:
             heiferIII_num: the number of heiferIIIs to start the simulation with
             cow_num: the number of cows to start the simulation with
             replace_num: replacements in the market
-            sim_days: simulation length of this herd, to make sure they reach to the heiferIII stage
-        '''
+            sim_days: simulation length of this herd, to make sure they reach to
+                the heiferIII stage
+        """
         self.herd_num = herd_num
         
         calves = []
@@ -119,7 +130,8 @@ class LifeCycleManager:
         res_heiferIIIs = []
         res_cows = []
     
-        for _ in range(calf_num + heiferI_num + heiferII_num + heiferIII_num + cow_num + replace_num):
+        for _ in range(calf_num + heiferI_num + heiferII_num + heiferIII_num +
+                       cow_num + replace_num):
             args = {
                 'breed': 'HO',
                 'date': 0,
@@ -141,7 +153,8 @@ class LifeCycleManager:
                     new_heiferI = HeiferI(calf)
                     if len(res_heiferIs) < heiferI_num:
                         res_heiferIs.append(new_heiferI)
-                        new_heiferI._events.add_event(new_heiferI._days_born, 'Entered Herd')
+                        new_heiferI._events.add_event(new_heiferI._days_born,
+                                                      'Entered Herd')
                     else:
                         heiferIs.append(new_heiferI)
                     calves.remove(calf)
@@ -157,7 +170,8 @@ class LifeCycleManager:
                     new_heiferII = HeiferII(heiferI, args)
                     if len(res_heiferIIs) < heiferII_num:
                         res_heiferIIs.append(new_heiferII)
-                        new_heiferII._events.add_event(new_heiferII._days_born, 'Entered Herd')
+                        new_heiferII._events.add_event(new_heiferII._days_born,
+                                                       'Entered Herd')
                     else:
                         heiferIIs.append(new_heiferII)
                     heiferIs.remove(heiferI)
@@ -174,7 +188,8 @@ class LifeCycleManager:
                     new_heiferIII = HeiferIII(heiferII)
                     if len(res_heiferIIIs) < heiferIII_num:
                         res_heiferIIIs.append(new_heiferIII)
-                        new_heiferIII._events.add_event(new_heiferIII._days_born, 'Entered Herd')
+                        new_heiferIII._events.add_event(
+                            new_heiferIII._days_born, 'Entered Herd')
                     else:
                         heiferIIIs.append(new_heiferIII)
                     heiferIIs.remove(heiferII)
@@ -191,7 +206,8 @@ class LifeCycleManager:
                     new_cow = Cow(heiferIII, args)
                     if len(res_cows) < cow_num:
                         res_cows.append(new_cow)
-                        new_cow._events.add_event(new_cow._days_born, 'Entered Herd')
+                        new_cow._events.add_event(new_cow._days_born,
+                                                  'Entered Herd')
                     else:
                         cows.append(new_cow)
                     heiferIIIs.remove(heiferIII)
@@ -204,12 +220,13 @@ class LifeCycleManager:
         self.replacement_market = cows
     
     def daily_update(self, date, sim_length):
-        '''
+        """
         Updates the status of the animals.
+
         Args:
             date: day number
             sim_length: length of the simulation, days
-        '''
+        """
         # record the last days stats
         daily_cow_cull_num = 0
         daily_heifer_sold = 0
@@ -288,7 +305,8 @@ class LifeCycleManager:
             #     print(heiferIIIs[2])
             #     return
     
-        # if the number of heifers is more than needed for the herd, sell those as replacement
+        # if the number of heifers is more than needed for the herd, sell
+        # those as replacement
         while len(self.heiferIIIs) + len(self.cows) > self.herd_num * 1.03:
             self.heiferIIIs.pop()
             self.sold_to_market += 1
@@ -297,9 +315,12 @@ class LifeCycleManager:
                 self.total_heifer_sold += 1
                 self.total_heifer_value += self.config["heifer_sell_price"]
     
-        # if the number of heifers is less than needed for the herd, buy replacement from the market
-        while len(self.cows) + len(self.heiferIIIs) < self.herd_num * 1.01 and date > 1:
-            self.replacement_market[0]._events.add_event(self.replacement_market[0]._days_born, 'Entered Herd')
+        # if the number of heifers is less than needed for the herd,
+        # buy replacement from the market
+        while len(self.cows) + len(self.heiferIIIs) < self.herd_num * 1.01 and \
+                date > 1:
+            self.replacement_market[0]._events.add_event(
+                self.replacement_market[0]._days_born, 'Entered Herd')
             self.cows.append(self.replacement_market[0])
             self.bought_from_market += 1
             daily_bought_from_market += 1
@@ -318,11 +339,14 @@ class LifeCycleManager:
     
             # culled cows, calculate slaughter value and record culling reasons
             if culled:
-                repro_cost, semen_cost, AI_cost, preg_check_cost, feed_cost, fixed_cost, milk_income, slaughter_value = cow.get_economy_stats()
+                repro_cost, semen_cost, AI_cost, preg_check_cost, feed_cost, \
+                fixed_cost, milk_income, slaughter_value = \
+                    cow.get_economy_stats()
                 if record_econ_stats:
                     self.total_slaughter_value += slaughter_value
                     self.num_culled_range += 1
-                    self.avg_slaughter_value = self.total_slaughter_value / self.num_culled_range
+                    self.avg_slaughter_value = \
+                        self.total_slaughter_value / self.num_culled_range
                     if cow._cull_reason in self.cull_reason_stats_range:
                         self.cull_reason_stats_range[cow._cull_reason] += 1
                     else:
@@ -353,7 +377,8 @@ class LifeCycleManager:
                 }
                 new_calf = Calf(args)
                 if not (new_calf._culled or new_calf._sold):
-                    new_calf._events.add_event(new_calf._days_born, 'Entered Herd')
+                    new_calf._events.add_event(new_calf._days_born,
+                                               'Entered Herd')
                     self.calves.append(new_calf)
                     self.total_new_born += 1
                 if new_calf._sold:
@@ -376,8 +401,12 @@ class LifeCycleManager:
         if date >= sim_length - 21 * self.config["num_21_days"]:
             self.count_21_days += 1
             if self.count_21_days % 21 == 0:
-                self.service_rate_sum_21_days += float(self.num_ai_21_days) / float(self.num_cow_btw_vwp_preg_21_days)
-                self.conception_rate_sum_21_days += float(self.num_preg_21_days) / float(self.num_ai_21_days)
+                self.service_rate_sum_21_days += \
+                    float(self.num_ai_21_days) / \
+                    float(self.num_cow_btw_vwp_preg_21_days)
+                self.conception_rate_sum_21_days += \
+                    float(self.num_preg_21_days) / \
+                    float(self.num_ai_21_days)
                 self.num_ai_21_days = 0
                 self.num_cow_btw_vwp_preg_21_days = 0
                 self.num_preg_21_days = 0
@@ -387,14 +416,22 @@ class LifeCycleManager:
         self.heifer_sold_lst.append(daily_heifer_sold)
         self.replacement_bought_lst.append(daily_bought_from_market)
         self.milking_cows_lst.append(daily_cow_milking)
-    
-        
+
     def output_end_stats(self, sim_length):
-        '''
+        """
         End of simulation statistics.
-        '''
-        #find avg of self.milking_cows_lst
-        self.avg_daily_cow_milking = 0
+
+        Args:
+            sim_length: simulation length, d
+        """
+        income_over_feed_cost = 0
+        net_return = 0
+        avg_milk_income = 0
+        avg_feed_cost = 0
+        avg_fixed_cost = 0
+        avg_repro_cost = 0
+
+        # find avg of self.milking_cows_lst
         for daily_val in self.milking_cows_lst:
             self.avg_daily_cow_milking += daily_val
         self.avg_daily_cow_milking /= len(self.milking_cows_lst)
@@ -412,29 +449,46 @@ class LifeCycleManager:
                 self.num_cow_in_vwp += 1
     
             # calculate economy date
-            repro_cost, semen_cost, AI_cost, preg_check_cost, feed_cost, fixed_cost, milk_income, slaughter_value = cow.get_economy_stats()
+            repro_cost, semen_cost, AI_cost, preg_check_cost, feed_cost, \
+            fixed_cost, milk_income, slaughter_value = cow.get_economy_stats()
             self.total_breeding_cost += repro_cost
             self.total_semen_cost += semen_cost
             self.total_ai_cost += AI_cost
             self.total_preg_check_cost += preg_check_cost
-            total_repro_cost = self.total_breeding_cost + self.total_semen_cost + self.total_ai_cost + self.total_preg_check_cost
+            total_repro_cost = self.total_breeding_cost + \
+                               self.total_semen_cost + \
+                               self.total_ai_cost + \
+                               self.total_preg_check_cost
             avg_repro_cost = total_repro_cost/365/1000
             self.total_feed_cost += feed_cost
             avg_feed_cost = self.total_feed_cost/365/self.avg_daily_cow_milking
             self.total_fixed_cost += fixed_cost
             avg_fixed_cost = self.total_fixed_cost/365/1000
             self.total_milk_income += milk_income
-            avg_milk_income = self.total_milk_income/365/self.avg_daily_cow_milking
-            income_over_feed_cost = self.total_milk_income + self.total_slaughter_value + self.total_heifer_value + self.total_calf_value - self.total_feed_cost
-            net_return = income_over_feed_cost - self.total_replacement_cost - self.total_fixed_cost
+            avg_milk_income = \
+                self.total_milk_income/365/self.avg_daily_cow_milking
+            income_over_feed_cost = self.total_milk_income + \
+                                    self.total_slaughter_value + \
+                                    self.total_heifer_value + \
+                                    self.total_calf_value - \
+                                    self.total_feed_cost
+            net_return = income_over_feed_cost - \
+                         self.total_replacement_cost - \
+                         self.total_fixed_cost
             
-        parity_lst = [cow._calves if cow._calves <= 2 else '3+' for cow in self.cows ]
+        parity_lst = [cow._calves
+                      if cow._calves <= 2 else '3+'
+                      for cow in self.cows]
         parity_count_tuple = Counter(parity_lst)
-        avg_service_rate = self.service_rate_sum_21_days / float(self.config["num_21_days"]) * 21.0
-        avg_conception_rate = self.conception_rate_sum_21_days / float(self.config["num_21_days"])
+        avg_service_rate = self.service_rate_sum_21_days / \
+                           float(self.config["num_21_days"]) * 21.0
+        avg_conception_rate = self.conception_rate_sum_21_days / \
+                              float(self.config["num_21_days"])
         pregnancy_rate = avg_service_rate * avg_conception_rate
     
-        print("\n=================== Herd structure at the end of the simulation ===================\n".format(self.config["econ_indicator_range"]))
+        print("\n=================== Herd structure at the end of the "
+              "simulation ===================\n".format(
+                self.config["econ_indicator_range"]))
         print("Total calves:\t\t\t{}".format(len(self.calves)))
         print("Total heiferI:\t\t\t{}".format(len(self.heiferIs)))
         print("Total heiferII:\t\t\t{}".format(len(self.heiferIIs)))
@@ -447,23 +501,34 @@ class LifeCycleManager:
             print("Parity {}:\t\t\t {}".format(parity, count))
         print("Total cows in vwp:\t\t{}".format(self.num_cow_in_vwp))
     
-        print("\n=================== Last {} days economy stats ===================\n".format(self.config["econ_indicator_range"]))
+        print("\n=================== Last {} days economy stats "
+              "===================\n".format(
+                self.config["econ_indicator_range"]))
         print("Feed cost:\t\t\t{0:.2f} $/cow/day".format(avg_feed_cost))
         print("Fixed cost:\t\t\t{0:.2f} $/cow/day".format(avg_fixed_cost))
         print("Repro cost:\t\t\t{0:.2f} $/cow/day".format(avg_repro_cost))
-        # print("Total breeding cost:\t\t{0:.2f} $".format(self.total_breeding_cost))
+        # print("Total breeding cost:\t\t{0:.2f}
+        # $".format(self.total_breeding_cost))
         # print("Total semen cost:\t\t{0:.2f} $".format(self.total_semen_cost))
         # print("Total ai cost:\t\t\t{0:.2f} $".format(self.total_ai_cost))
-        # print("Total preg check cost:\t\t{0:.2f} $".format(self.total_preg_check_cost))
+        # print("Total preg check cost:\t\t{0:.2f}
+        # $".format(self.total_preg_check_cost))
         print("Milk income:\t\t\t{0:.2f} $/cow/day".format(avg_milk_income))
-        print("Total replacement bought:\t{0:.2f}".format(self.total_replacement_bought))
-        print("Total replacement cost:\t\t{0:.2f} $".format(self.total_replacement_cost))
-        print("Total replacement sold:\t\t{0:.2f}".format(self.total_heifer_sold))
-        print("Total heifer sold income:\t{0:.2f} $".format(self.total_heifer_value))
+        print("Total replacement bought:"
+              "\t{0:.2f}".format(self.total_replacement_bought))
+        print("Total replacement cost:\t\t{0:.2f} "
+              "$".format(self.total_replacement_cost))
+        print("Total replacement sold:"
+              "\t\t{0:.2f}".format(self.total_heifer_sold))
+        print("Total heifer sold income:\t{0:.2f} "
+              "$".format(self.total_heifer_value))
         print("Total calf sold:\t\t{0:.2f}".format(self.total_calf_sold))
-        print("Total calf sold income:\t\t{0:.2f} $".format(self.total_calf_value))
-        print("Total slaughter income:\t\t{0:.2f} $".format(self.total_slaughter_value))
-        print("Average slaughter income:\t{0:.2f} $".format(self.avg_slaughter_value))
+        print("Total calf sold income:\t\t{0:.2f} "
+              "$".format(self.total_calf_value))
+        print("Total slaughter income:\t\t{0:.2f} "
+              "$".format(self.total_slaughter_value))
+        print("Average slaughter income:\t{0:.2f} "
+              "$".format(self.avg_slaughter_value))
         print("IOFC: \t\t\t\t{0:.2f} $".format(income_over_feed_cost))
         print("Net return: \t\t\t{0:.2f} $".format(net_return))
     
@@ -471,7 +536,9 @@ class LifeCycleManager:
         print("CR%: \t\t\t\t{0:.2f}%".format(avg_conception_rate * 100.0))
         print("PR%: \t\t\t\t{0:.2f}%".format(pregnancy_rate * 100.0))
         print("Total cows culled:\t\t{}".format(self.num_culled_range))
-        print("Culling rate: \t\t\t{0:.2f}%".format(float(self.num_culled_range) / float(len(self.cows)) * 100))
+        print("Culling rate: \t\t\t{0:.2f}%".format(float(self.num_culled_range)
+                                                    / float(len(self.cows))
+                                                    * 100))
         for cull_reason, count in self.cull_reason_stats_range.items():
             print("{} => {}".format(cull_reason, count))
         # for parity, count in self.parity_culling_stats_range.items():
@@ -487,12 +554,14 @@ class LifeCycleManager:
     
         print(self.cows[150])
         self.cows[150].draw_curves()
-    
-    
+
     def draw_stat(self, sim_length): 
-        '''
+        """
         Plots the ending statistics of the simulation.
-        '''   
+
+        Args:
+            sim_length: simulation length
+        """
         fig = plt.figure()
         x = [date for date in range(sim_length)]
     
@@ -551,5 +620,4 @@ class LifeCycleManager:
         # ax9.set_title("Number of milking cows each day")
         
         plt.tight_layout(pad=0.4, w_pad=0.5, h_pad=0.4)
-        plt.show()  
-    
+        plt.show()
