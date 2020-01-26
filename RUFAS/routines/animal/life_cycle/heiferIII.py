@@ -30,7 +30,6 @@ class HeiferIII(HeiferII):
             heiferII: the heifer from the second stage that has grown into a
             heifer of the third stage
         """
-        self._dry_matter_intake = 0
         super().init_from_heiferII(heiferII)
 
     def init_from_heiferIII(self, heiferIII):
@@ -47,7 +46,7 @@ class HeiferIII(HeiferII):
         """
         Calculates this heiferIII's nutrient requirements.
         """
-        self._nutrient_rqmts, self._DMIest, self._DBW = calculate_rqmts()
+        self.nutrient_rqmts, self.DMIest, self.DBW = calculate_rqmts()
 
     def calc_manure_excretion(self, feed):
         """
@@ -56,7 +55,7 @@ class HeiferIII(HeiferII):
         Args:
             feed: instance of the Feed class
         """
-        self._manure_excretion = manure_calculations()
+        self.manure_excretion = manure_calculations()
 
     def update(self):
         """
@@ -69,34 +68,34 @@ class HeiferIII(HeiferII):
         Returns: cow_stage - heifer close to calving, move to cow stage
         """
         cow_stage = False
-        self._days_born += 1
+        self.days_born += 1
 
-        if self._preg:
-            self._days_in_preg += 1
+        if self.preg:
+            self.days_in_preg += 1
 
-        prev_weight = self._body_weight
+        prev_weight = self.body_weight
 
-        if self._days_born < AnimalBase.config['grow_end_day']:
+        if self.days_born < AnimalBase.config['grow_end_day']:
             # Heifer can only grow to a maximum weight of mature_body_weight
-            if self._body_weight < AnimalBase.config['mature_body_weight']:
-                self._body_weight += np.random.normal(
+            if self.body_weight < AnimalBase.config['mature_body_weight']:
+                self.body_weight += np.random.normal(
                     AnimalBase.config['avg_daily_gain_h'],
                     AnimalBase.config['std_daily_gain_h'])
-            if self._body_weight > AnimalBase.config['mature_body_weight']:
-                self._body_weight = AnimalBase.config['mature_body_weight']
-                self._mature_body_weight = self._body_weight
-                self._events.add_event(
-                    self._days_born,
+            if self.body_weight > AnimalBase.config['mature_body_weight']:
+                self.body_weight = AnimalBase.config['mature_body_weight']
+                self.mature_body_weight = self.body_weight
+                self.events.add_event(
+                    self.days_born,
                     'Mature body weight prior to grow end day')
 
-        self._daily_growth = self._body_weight - prev_weight
+        self.daily_growth = self.body_weight - prev_weight
 
-        if self._days_born == AnimalBase.config['grow_end_day']:
-            self._mature_body_weight = self._body_weight
-            self._events.add_event(self._days_born, 'Mature body weight')
+        if self.days_born == AnimalBase.config['grow_end_day']:
+            self.mature_body_weight = self.body_weight
+            self.events.add_event(self.days_born, 'Mature body weight')
 
-        if self._days_in_preg == self._gestation_length:
-            self._days_born -= 1  # will be incremented again in next stage
+        if self.days_in_preg == self.gestation_length:
+            self.days_born -= 1  # will be incremented again in next stage
             cow_stage = True
         return cow_stage
 
@@ -114,14 +113,14 @@ class HeiferIII(HeiferII):
         Life Events: \n
         {}
         """.\
-            format(self._id,
-                   self._birth_date,
-                   self._days_born,
-                   self._body_weight,
+            format(self.id,
+                   self.birth_date,
+                   self.days_born,
+                   self.body_weight,
                    AnimalBase.config['breeding_start_day_h'],
-                   self._repro_program,
-                   self._days_in_preg,
-                   self._gestation_length,
-                   str(self._events))
+                   self.repro_program,
+                   self.days_in_preg,
+                   self.gestation_length,
+                   str(self.events))
 
         return res_str

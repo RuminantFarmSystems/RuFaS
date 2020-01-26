@@ -37,48 +37,48 @@ class AnimalBase(object):
 				args.date: the date of the simulation when the calf was born
 				args.daysBorn: age of the animal
 		"""
-		self._id = AnimalBase.next_id()
-		self._breed = args['breed']
-		self._birth_date = args['date']
-		self._days_born = args['days_born']
-		self._culled = False
-		self._do_not_breed = False
-		self._events = AnimalEvents()
+		self.id = AnimalBase.next_id()
+		self.breed = args['breed']
+		self.birth_date = args['date']
+		self.days_born = args['days_born']
+		self.culled = False
+		self.do_not_breed = False
+		self.events = AnimalEvents()
 		
-		self._daily_growth = 0
-		self._nutrient_rqmts = {}
+		self.daily_growth = 0
+		self.nutrient_rqmts = {}
 		self.set_default_nutrient_rqmts()
-		self._dry_matter_intake = 0
-		self._manure_excretion = {}
-		self._ration_formulation = {'objective': 0.00}
-		self._DMIest = 0
-		self._DBW = 0
-		self._p_animal = 0
+		self.dry_matter_intake = 0
+		self.manure_excretion = {}
+		self.ration_formulation = {'objective': 0.00}
+		self.DMIest = 0
+		self.DBW = 0
+		self.p_animal = 0
 
 	def init_from_animal(self, animal):
-		self._id = animal._id
-		self._breed = animal._breed
-		self._birth_date = animal._birth_date
-		self._days_born = animal._days_born
-		self._culled = animal._culled
-		self._do_not_breed = animal._do_not_breed
-		self._events = animal._events
+		self.id = animal.id
+		self.breed = animal.breed
+		self.birth_date = animal.birth_date
+		self.days_born = animal.days_born
+		self.culled = animal.culled
+		self.do_not_breed = animal.do_not_breed
+		self.events = animal.events
 		
-		self._daily_growth = 0
-		self._nutrient_rqmts = {}
+		self.daily_growth = 0
+		self.nutrient_rqmts = {}
 		self.set_default_nutrient_rqmts()
-		self._dry_matter_intake = 0
-		self._manure_excretion = {}
-		self._ration_formulation = {'objective': 0.00}
-		self._DMIest = 0
-		self._DBW = 0
+		self.dry_matter_intake = 0
+		self.manure_excretion = {}
+		self.ration_formulation = {'objective': 0.00}
+		self.DMIest = 0
+		self.DBW = 0
 		
 	def set_default_nutrient_rqmts(self):
 		"""
 		Sets the default nutrient requirement values to be 0.
 		"""
 		for key in self.nutrients:
-			self._nutrient_rqmts[key] = {'op': '', 'val': 0}
+			self.nutrient_rqmts[key] = {'op': '', 'val': 0}
 
 	def set_ration(self, ration, DMI):
 		"""
@@ -88,11 +88,11 @@ class AnimalBase(object):
 			ration: dictionary representing the calculated ration
 			DMI: the dry matter intake from @ration
 		"""
-		self._ration_formulation = ration
-		self._dry_matter_intake = DMI
+		self.ration_formulation = ration
+		self.dry_matter_intake = DMI
 
 	def culled(self):
 		"""
 		Returns: True/False value indicating if culled
 		"""
-		return self._culled
+		return self.culled

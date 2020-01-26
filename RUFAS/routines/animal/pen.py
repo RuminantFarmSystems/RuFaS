@@ -151,7 +151,7 @@ class Pen:
         Calculates and sets the average nutrient requirements and necessary
         ration statistics of the animals in the pen.
         """
-        first_animal_rqmts = self.animals_in_pen[0]._nutrient_rqmts
+        first_animal_rqmts = self.animals_in_pen[0].nutrient_rqmts
         sum_dict = {}
         for key in first_animal_rqmts.keys():
             sum_dict[key] = 0
@@ -165,23 +165,23 @@ class Pen:
         # find sums of nutrients and necessary ration statistics for each
         # animal in the pen
         for animal in self.animals_in_pen:
-            curr_rqmts = animal._nutrient_rqmts
+            curr_rqmts = animal.nutrient_rqmts
             for key in sum_dict.keys():
                 sum_dict[key] += curr_rqmts[key]['val']
 
-            sum_BW += animal._body_weight
-            sum_DMIest += animal._DMIest
-            sum_DBW += animal._DBW
+            sum_BW += animal.body_weight
+            sum_DMIest += animal.DMIest
+            sum_DBW += animal.DBW
             if type(animal).__name__ == 'Cow':
-                sum_milk += animal._estimated_daily_milk_produced
-                sum_CP_milk += animal._CP_milk
+                sum_milk += animal.estimated_daily_milk_produced
+                sum_CP_milk += animal.CP_milk
 
         # divide by number of animals to find averages
         num_animals = len(self.animals_in_pen)
         for key in sum_dict:
             avg_value = sum_dict[key] / num_animals
             self.avg_nutrient_rqmts[key] = {
-                'op': self.animals_in_pen[0]._nutrient_rqmts[key]['op'],
+                'op': self.animals_in_pen[0].nutrient_rqmts[key]['op'],
                 'val': avg_value}
 
         self.avg_BW = sum_BW / num_animals
@@ -218,14 +218,14 @@ class Pen:
                     growing_heifer_optimize()
 
             elif 'Cow' in self.classes_in_pen and \
-                    self.animals_in_pen[0]._milking:  # lactating cow
+                    self.animals_in_pen[0].milking:  # lactating cow
                 set_globals(self.avg_DMIest, self.avg_BW, self.avg_DBW,
                             self.avg_milk, self.avg_CP_milk)
                 ration_per_animal = \
                     lactating_cow_optimize(feed, self.avg_nutrient_rqmts)
 
             elif 'Cow' in self.classes_in_pen and \
-                    not self.animals_in_pen[0]._milking:  # dry cow
+                    not self.animals_in_pen[0].milking:  # dry cow
                 ration_per_animal = dry_cow_optimize()
 
             else:  # this should never occur
@@ -241,8 +241,8 @@ class Pen:
 
             # Reduce estimated milk production by 0.5 kg
             for animal in self.animals_in_pen:
-                if type(animal).__name__ == 'Cow' and animal._milking:
-                    animal._estimated_daily_milk_produced -= 0.5
+                if type(animal).__name__ == 'Cow' and animal.milking:
+                    animal.estimated_daily_milk_produced -= 0.5
 
             # Recalculate animal requirements
             self.call_animal_nutrient_rqmts(housing, pasture_concentrate, feed)
@@ -250,7 +250,7 @@ class Pen:
             # Recalculate average requirements
             self.calc_avg_nutrient_rqmts()
 
-        DMI = self.calc_DMI(ration_per_animal, feed)
+        DMI = calc_DMI(ration_per_animal, feed)
 
         for animal in self.animals_in_pen:
             animal.set_ration(ration_per_animal, DMI)
@@ -278,14 +278,14 @@ class Pen:
             animal.calc_manure_excretion(feed)
 
         # obtain keys of manure composition calculations
-        first_animal_manure = self.animals_in_pen[0]._manure_excretion
+        first_animal_manure = self.animals_in_pen[0].manure_excretion
         for key in first_animal_manure.keys():
             self.manure[key] = 0
 
         # find sums of manure components for each animal in the pen for
         # total manure in pen
         for animal in self.animals_in_pen:
-            curr_manure = animal._manure_excretion
+            curr_manure = animal.manure_excretion
             for key in self.manure.keys():
                 self.manure[key] += curr_manure[key]
 
@@ -295,7 +295,7 @@ class Pen:
         """
         total_growth = 0
         for animal in self.animals_in_pen:
-            total_growth += animal._daily_growth
+            total_growth += animal.daily_growth
         self.avg_growth = total_growth / len(self.animals_in_pen)
 
     def calc_daily_walking_dist(self):
@@ -307,49 +307,6 @@ class Pen:
                 if type(animal).__name__ == 'Cow':
                     animal.calc_daily_walking_dist(self.vertical_parlor_dist,
                                                    self.horizontal_parlor_dist)
-
-    def phosphorus_in_ration(self, ration, feed):
-        """
-        Args:
-            feed: instance of the Feed class, used to determine characteristics
-                of available feeds
-            ration: the dictionary representing the ration formulation
-
-        Returns: the amount of phosphorus (g) provided by the feed in @ration.
-        """
-        # amount of P in the formulated ration (g)
-        p_intake = 0
-
-        for key in ration:
-            # not every key in the ration dictionary refers to a feed
-            if key in feed.managed_feed_names:
-                managed_feed = Feeds[key]
-                nutrients: dict[str, float] = feed.values(managed_feed)
-                p_feed_conc = nutrients[Nutrients.PHOSPHORUS.name]
-                dmi_feed = ration[key]
-
-                # amount of P from feed (A.#.A.1)
-                p_feed_intake = p_feed_conc / 100 * dmi_feed * 1000
-
-                # (A.#.A.2)
-                p_intake += p_feed_intake
-
-        return p_intake
-
-    def calc_DMI(self, ration, feed):
-        """
-        Args:
-            ration: the ration formulation for which the DMI is calculated
-            feed: an instance of the Feed class
-
-        Returns: the total Dry Matter Intake from @ration.
-        """
-        DMI = 0
-        for key in ration:
-            if key in feed.managed_feed_names:
-                DM_feed_amount = ration[key]
-                DMI += DM_feed_amount
-        return DMI
 
     def clear(self):
         """
@@ -367,3 +324,49 @@ class Pen:
         self.ration = {}
         self.manure = {}
         self.avg_growth = 0
+
+
+# methods used for additional ration calculations
+def phosphorus_in_ration(ration, feed):
+    """
+    Args:
+        feed: instance of the Feed class, used to determine characteristics
+            of available feeds
+        ration: the dictionary representing the ration formulation
+
+    Returns: the amount of phosphorus (g) provided by the feed in @ration.
+    """
+    # amount of P in the formulated ration (g)
+    p_intake = 0
+
+    for key in ration:
+        # not every key in the ration dictionary refers to a feed
+        if key in feed.managed_feed_names:
+            managed_feed = Feeds[key]
+            nutrients = feed.values(managed_feed)
+            p_feed_conc = nutrients[Nutrients.PHOSPHORUS.name]
+            dmi_feed = ration[key]
+
+            # amount of P from feed (A.#.A.1)
+            p_feed_intake = p_feed_conc / 100 * dmi_feed * 1000
+
+            # (A.#.A.2)
+            p_intake += p_feed_intake
+
+    return p_intake
+
+
+def calc_DMI(ration, feed):
+    """
+    Args:
+        ration: the ration formulation for which the DMI is calculated
+        feed: an instance of the Feed class
+
+    Returns: the total Dry Matter Intake from @ration.
+    """
+    DMI = 0
+    for key in ration:
+        if key in feed.managed_feed_names:
+            DM_feed_amount = ration[key]
+            DMI += DM_feed_amount
+    return DMI
