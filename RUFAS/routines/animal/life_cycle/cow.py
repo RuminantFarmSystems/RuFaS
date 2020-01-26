@@ -334,21 +334,6 @@ class Cow(HeiferIII):
 		else:
 			self._manure_excretion = dry_manure_calculations()
 
-	def set_ration(self, ration_formulation, feed):
-		"""
-		Sets this animal's ration formulation.
-
-		Args:
-			ration_formulation: dictionary representing the calculated ration
-			feed: instance of the Feed class
-		"""
-		self._ration_formulation = ration_formulation  
-		self._dry_matter_intake = 0
-		for key in ration_formulation:
-			if key in feed.managed_feed_names:
-				DM_feed_amount = ration_formulation[key]
-				self._dry_matter_intake += DM_feed_amount
-
 	def calc_daily_walking_dist(
 			self, vertical_dist_to_parlor, horizontal_dist_to_parlor):
 		"""

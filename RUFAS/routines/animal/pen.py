@@ -250,8 +250,10 @@ class Pen:
             # Recalculate average requirements
             self.calc_avg_nutrient_rqmts()
 
+        DMI = self.calc_DMI(ration_per_animal, feed)
+
         for animal in self.animals_in_pen:
-            animal.set_ration(ration_per_animal, feed)
+            animal.set_ration(ration_per_animal, DMI)
 
         # set ration for whole pen by multiplying calculated ration by number
         # of animals in the pen
@@ -334,7 +336,7 @@ class Pen:
 
         return p_intake
 
-    def calc_dmi(self, ration, feed):
+    def calc_DMI(self, ration, feed):
         """
         Args:
             ration: the ration formulation for which the DMI is calculated
@@ -342,12 +344,12 @@ class Pen:
 
         Returns: the total Dry Matter Intake from @ration.
         """
-        dmi = 0
+        DMI = 0
         for key in ration:
             if key in feed.managed_feed_names:
                 DM_feed_amount = ration[key]
-                dmi += DM_feed_amount
-        return dmi
+                DMI += DM_feed_amount
+        return DMI
 
     def clear(self):
         """

@@ -58,20 +58,6 @@ class HeiferIII(HeiferII):
         """
         self._manure_excretion = manure_calculations()
 
-    def set_ration(self, ration_formulation, feed):
-        """
-        Sets this animal's ration formulation
-
-        Args:
-            ration_formulation: dictionary representing the calculated ration
-            feed: instance of the Feed class
-        """
-        self._ration_formulation = ration_formulation
-        for key in ration_formulation:
-            if key in feed.managed_feed_names:
-                DM_feed_amount = ration_formulation[key]
-                self._dry_matter_intake += DM_feed_amount
-
     def update(self):
         """
         Controls heifer's grow with average daily gain based on user's input

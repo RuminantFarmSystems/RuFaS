@@ -48,6 +48,7 @@ class AnimalBase(object):
 		self._daily_growth = 0
 		self._nutrient_rqmts = {}
 		self.set_default_nutrient_rqmts()
+		self._dry_matter_intake = 0
 		self._manure_excretion = {}
 		self._ration_formulation = {'objective': 0.00}
 		self._DMIest = 0
@@ -66,6 +67,7 @@ class AnimalBase(object):
 		self._daily_growth = 0
 		self._nutrient_rqmts = {}
 		self.set_default_nutrient_rqmts()
+		self._dry_matter_intake = 0
 		self._manure_excretion = {}
 		self._ration_formulation = {'objective': 0.00}
 		self._DMIest = 0
@@ -77,6 +79,17 @@ class AnimalBase(object):
 		"""
 		for key in self.nutrients:
 			self._nutrient_rqmts[key] = {'op': '', 'val': 0}
+
+	def set_ration(self, ration, DMI):
+		"""
+		Sets this animal's ration formulation.
+
+		Args:
+			ration: dictionary representing the calculated ration
+			DMI: the dry matter intake from @ration
+		"""
+		self._ration_formulation = ration
+		self._dry_matter_intake = DMI
 
 	def culled(self):
 		"""
