@@ -108,6 +108,37 @@ class Calf(AnimalBase):
 		"""
 		self.manure_excretion = manure_calculations()
 
+	def phosphorus_retained(self, DMI):
+		"""
+		Calculates the phosphorus retained by the animal. Note that equation
+		(A.#.B.2) (which deals with the P retained for fetal growth)
+		is omitted because that is a calculation for HeiferII, HeiferIII, and
+		Cows.
+
+		Args:
+			DMI: the Dry Matter Intake (kg)
+
+		Returns: the amount of phosphorus retained by the animal
+			in grams per day
+		"""
+		# amount of P required for maintenance (g/d) (A.#.B.1)
+		p_maint = 0.0008 * DMI + 0.000002 * self.body_weight * 1000
+
+		# OMITTED: calculation for p_gest (A.#.B.2)
+
+		# TODO remove mature_body_weight and replace with better substitute
+		mature_body_weight = 0
+
+		# amount of P required for growth (g/d) (A.#.B.3)
+		p_growth = (0.0012 + 0.004635 * (mature_body_weight ** 0.22) * (
+					self.body_weight ** (-0.22))) * \
+			self.daily_growth / 0.96 * 1000
+
+		# amount of P retained (g/d) (A.#.B.4)
+		p_retained = p_maint + p_growth
+
+		return p_retained
+
 	def update(self):
 		"""
 		Controls calf's grow with average daily gain based on user's input until

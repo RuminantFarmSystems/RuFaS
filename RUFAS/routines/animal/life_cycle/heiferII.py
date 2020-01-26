@@ -12,7 +12,6 @@ Description: This file updates the heifer form breeding to close to calving.
 			Preg check follows AI for three times.
 """
 ###############################################################################
-
 import numpy as np
 from RUFAS.routines.animal.life_cycle.heiferI import HeiferI
 from RUFAS.routines.animal.life_cycle.animal_base import AnimalBase
@@ -20,6 +19,7 @@ from RUFAS.routines.animal.ration.growing_heifer_ration import calculate_rqmts
 from RUFAS.routines.animal.manure.growing_heifer_manure_excretion import \
 	manure_calculations
 from random import random
+import math
 
 
 class HeiferII(HeiferI):
@@ -114,6 +114,40 @@ class HeiferII(HeiferI):
 			feed: instance of the Feed class
 		"""
 		self.manure_excretion = manure_calculations()
+
+	def phosphorus_retained(self, DMI):
+		"""
+		Calculates the phosphorus retained by the animal.
+
+		Args:
+			DMI: the Dry Matter Intake (kg)
+
+		Returns: the amount of phosphorus retained by the animal
+			in grams per day
+		"""
+		# amount of P required for maintenance (g/d) (A.#.B.1)
+		p_maint = 0.0008 * DMI + 0.000002 * self.body_weight * 1000
+
+		# amount of P required for growth of a fetus (A.#.B.2)
+		if self.days_in_preg >= 190 :
+			exp_1 = (0.05527 - 0.000075 * self.days_in_preg) * self.days_in_preg
+			exp_2 = (0.05527 - 0.000075 * (self.days_in_preg - 1)) * \
+				(self.days_in_preg - 1)
+			p_gest = (
+					0.00002743 * math.exp(exp_1) -
+					0.00002743 * math.exp(exp_2)) * 1000
+		else:
+			p_gest = 0
+
+		# amount of P required for growth (g/d) (A.#.B.3)
+		p_growth = (0.0012 + 0.004635 * (self.mature_body_weight ** 0.22) * (
+				self.body_weight ** (-0.22))) * \
+			self.daily_growth / 0.96 * 1000
+
+		# amount of P retained (g/d) (A.#.B.4)
+		p_retained = p_maint + p_gest + p_growth
+
+		return p_retained
 
 	def update(self):
 		"""
