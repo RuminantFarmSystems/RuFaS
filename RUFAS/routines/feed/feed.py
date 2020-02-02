@@ -63,6 +63,9 @@ class Nutrients(IntEnum):
     Price = 17
     Limits = 18
     Units = 19
+    P_DM = 20
+    CA_DM = 21
+    K_DM = 22
 
 
 class NutrientValues:

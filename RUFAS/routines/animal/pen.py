@@ -344,7 +344,7 @@ def phosphorus_in_ration(ration, feed):
         if key in feed.managed_feed_names:
             managed_feed = Feeds[key]
             nutrients = feed.values(managed_feed)
-            p_feed_conc = nutrients[Nutrients.PHOSPHORUS.name]
+            p_feed_conc = nutrients[Nutrients.P_DM.name]
             dmi_feed = ration[key]
 
             # amount of P from feed (A.#.A.1)
