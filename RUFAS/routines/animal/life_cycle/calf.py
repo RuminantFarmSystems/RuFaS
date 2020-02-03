@@ -76,6 +76,7 @@ class Calf(AnimalBase):
 				AnimalBase.config['birth_weight_std_je'])
 		self.body_weight = self.birth_weight
 		self.wean_weight = 0
+		self.mature_body_weight = np.random.triangular(550, 700, 1000)
 
 	def init_from_calf(self, calf):
 		"""
@@ -92,6 +93,7 @@ class Calf(AnimalBase):
 		self.birth_weight = calf.birth_weight
 		self.body_weight = calf.body_weight
 		self.wean_weight = calf.wean_weight
+		self.mature_body_weight = calf.mature_body_weight
 
 	def calc_nutrient_rqmts(self):
 		"""
@@ -126,11 +128,8 @@ class Calf(AnimalBase):
 
 		# OMITTED: calculation for p_gest (A.#.B.2)
 
-		# TODO remove mature_body_weight and replace with better substitute
-		mature_body_weight = 0
-
 		# amount of P required for growth (g/d) (A.#.B.3)
-		p_growth = (0.0012 + 0.004635 * (mature_body_weight ** 0.22) * (
+		p_growth = (0.0012 + 0.004635 * (self.mature_body_weight ** 0.22) * (
 					self.body_weight ** (-0.22))) * \
 			self.daily_growth / 0.96 * 1000
 

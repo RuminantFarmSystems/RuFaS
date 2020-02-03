@@ -54,6 +54,7 @@ class AnimalBase(object):
 		self.DMIest = 0
 		self.DBW = 0
 		self.p_animal = 0
+		self.p_intake = 0
 
 	def init_from_animal(self, animal):
 		self.id = animal.id
@@ -72,6 +73,7 @@ class AnimalBase(object):
 		self.ration_formulation = {'objective': 0.00}
 		self.DMIest = 0
 		self.DBW = 0
+		self.p_intake = 0
 		
 	def set_default_nutrient_rqmts(self):
 		"""
@@ -90,6 +92,15 @@ class AnimalBase(object):
 		"""
 		self.ration_formulation = ration
 		self.dry_matter_intake = DMI
+
+	def set_p_intake(self, p_intake):
+		"""
+		Sets this animal's phosphorus intake.
+
+		Args:
+			p_intake: the phosphorus intake
+		"""
+		self.p_intake = p_intake
 
 	def culled(self):
 		"""

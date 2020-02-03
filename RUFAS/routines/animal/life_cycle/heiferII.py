@@ -65,6 +65,7 @@ class HeiferII(HeiferI):
 		self.days_in_preg = 0
 		self.preg = False
 		self.gestation_length = 0
+		self.p_gest_for_calf = 0
 
 	def init_from_heiferII(self, heiferII):
 		"""
@@ -99,6 +100,7 @@ class HeiferII(HeiferI):
 		self.days_in_preg = heiferII.days_in_preg
 		self.preg = heiferII.preg
 		self.gestation_length = heiferII.gestation_length
+		self.p_gest_for_calf = heiferII.p_gest_for_calf
 
 	def calc_nutrient_rqmts(self):
 		"""
@@ -129,13 +131,14 @@ class HeiferII(HeiferI):
 		p_maint = 0.0008 * DMI + 0.000002 * self.body_weight * 1000
 
 		# amount of P required for growth of a fetus (A.#.B.2)
-		if self.days_in_preg >= 190 :
+		if self.days_in_preg >= 190:
 			exp_1 = (0.05527 - 0.000075 * self.days_in_preg) * self.days_in_preg
 			exp_2 = (0.05527 - 0.000075 * (self.days_in_preg - 1)) * \
 				(self.days_in_preg - 1)
 			p_gest = (
 					0.00002743 * math.exp(exp_1) -
 					0.00002743 * math.exp(exp_2)) * 1000
+			self.p_gest_for_calf += p_gest
 		else:
 			p_gest = 0
 
@@ -199,7 +202,7 @@ class HeiferII(HeiferI):
 			elif self.repro_program == 'synch-ED':
 				self._synch_ed_update()
 			self._preg_update()
-			# piror to calving, heifer move to replacement group
+			# prior to calving, heifer move to replacement group
 			if self.days_in_preg == self.gestation_length - \
 				AnimalBase.config['replacement_day']:
 				self.days_born -= 1  # will be increment again in next stage

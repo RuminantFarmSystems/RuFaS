@@ -251,9 +251,11 @@ class Pen:
             self.calc_avg_nutrient_rqmts()
 
         DMI = calc_DMI(ration_per_animal, feed)
+        p_intake = phosphorus_in_ration(ration_per_animal, feed)
 
         for animal in self.animals_in_pen:
             animal.set_ration(ration_per_animal, DMI)
+            animal.set_p_intake(p_intake)
 
         # set ration for whole pen by multiplying calculated ration by number
         # of animals in the pen

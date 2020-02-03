@@ -373,8 +373,11 @@ class LifeCycleManager:
                 args = {
                     'breed': 'HO',
                     'date': 0,
-                    'days_born': 0
+                    'days_born': 0,
+                    'p_init': cow.p_gest_for_calf
                 }
+                cow.p_animal -= cow.p_gest_for_calf
+                cow.p_gest_for_calf = 0
                 new_calf = Calf(args)
                 if not (new_calf.culled or new_calf.sold):
                     new_calf.events.add_event(
