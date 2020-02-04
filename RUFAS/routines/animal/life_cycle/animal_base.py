@@ -55,6 +55,7 @@ class AnimalBase(object):
 		self.DBW = 0
 		self.p_animal = 0
 		self.p_intake = 0
+		self.p_excrt = 0
 
 	def init_from_animal(self, animal):
 		self.id = animal.id
@@ -73,7 +74,9 @@ class AnimalBase(object):
 		self.ration_formulation = {'objective': 0.00}
 		self.DMIest = 0
 		self.DBW = 0
+		self.p_animal = 0
 		self.p_intake = 0
+		self.p_excrt = 0
 		
 	def set_default_nutrient_rqmts(self):
 		"""
@@ -101,6 +104,14 @@ class AnimalBase(object):
 			p_intake: the phosphorus intake
 		"""
 		self.p_intake = p_intake
+
+	def daily_p_update(self):
+		"""
+		Calculates this animal's daily phosphorus update.
+		"""
+		# (A.#.D.2) from P tracking
+		self.p_animal = self.p_animal + self.p_intake - \
+			self.manure_excretion["p_excrt"]
 
 	def culled(self):
 		"""

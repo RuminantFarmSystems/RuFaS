@@ -353,6 +353,9 @@ class Cow(HeiferIII):
 			p_gest = (
 							0.00002743 * math.exp(exp_1) -
 							0.00002743 * math.exp(exp_2)) * 1000
+
+			# when the calf is born, this sum will be subtracted from the cow
+			# and will be the initial P value for the calf (A.#.D.1)
 			self.p_gest_for_calf += p_gest
 		else:
 			p_gest = 0

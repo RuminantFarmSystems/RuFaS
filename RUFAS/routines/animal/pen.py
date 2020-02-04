@@ -326,6 +326,13 @@ class Pen:
             #  p_growth are calculated but not used.
             animal.phosphorus_retained(DMI)
 
+    def daily_p_update(self):
+        """
+        Calls each animal's method to calculate daily phosphorus update.
+        """
+        for animal in self.animals_in_pen:
+            animal.daily_p_update()
+
     def clear(self):
         """
         Clears the pen attributes for re-allocation.

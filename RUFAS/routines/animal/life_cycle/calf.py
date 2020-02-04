@@ -78,6 +78,8 @@ class Calf(AnimalBase):
 		self.wean_weight = 0
 		self.mature_body_weight = np.random.triangular(550, 700, 1000)
 
+		self.p_animal = args['p_init']
+
 	def init_from_calf(self, calf):
 		"""
 		Initialize calf value from class calf, for coding purposes
