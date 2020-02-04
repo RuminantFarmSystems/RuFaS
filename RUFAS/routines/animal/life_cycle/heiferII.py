@@ -115,7 +115,8 @@ class HeiferII(HeiferI):
 		Args:
 			feed: instance of the Feed class
 		"""
-		self.manure_excretion = manure_calculations()
+		self.manure_excretion = \
+			manure_calculations(self.body_weight, self.p_intake)
 
 	def phosphorus_retained(self, DMI):
 		"""
