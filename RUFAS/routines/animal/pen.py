@@ -310,6 +310,22 @@ class Pen:
                     animal.calc_daily_walking_dist(self.vertical_parlor_dist,
                                                    self.horizontal_parlor_dist)
 
+    def call_p_retained(self, feed):
+        """
+        Calls each animal's method to calculate retained phosphorus.
+
+        Args:
+            feed: instance of the Feed class
+        """
+        # since each animal in the pen receives the same ration
+        if len(self.animals_in_pen) > 0:
+            DMI = calc_DMI(self.animals_in_pen[0].ration, feed)
+        for animal in self.animals_in_pen:
+            # TODO phosphorus_retained() returns p_retained, a value
+            #  currently not used by pen routines. Similarly, p_maint and
+            #  p_growth are calculated but not used.
+            animal.phosphorus_retained(DMI)
+
     def clear(self):
         """
         Clears the pen attributes for re-allocation.
