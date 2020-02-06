@@ -56,6 +56,7 @@ class AnimalBase(object):
 		self.p_animal = 0
 		self.p_intake = 0
 		self.p_excrt = 0
+		self.body_weight = 0
 
 	def init_from_animal(self, animal):
 		self.id = animal.id
@@ -65,6 +66,7 @@ class AnimalBase(object):
 		self.culled = animal.culled
 		self.do_not_breed = animal.do_not_breed
 		self.events = animal.events
+		self.body_weight = animal.body_weight
 		
 		self.daily_growth = 0
 		self.nutrient_rqmts = {}
@@ -77,7 +79,7 @@ class AnimalBase(object):
 		self.p_animal = 0
 		self.p_intake = 0
 		self.p_excrt = 0
-		
+
 	def set_default_nutrient_rqmts(self):
 		"""
 		Sets the default nutrient requirement values to be 0.
@@ -112,6 +114,13 @@ class AnimalBase(object):
 		# (A.#.D.2) from P tracking
 		self.p_animal = self.p_animal + self.p_intake - \
 			self.manure_excretion["p_excrt"]
+
+	def set_p_purchased(self):
+		"""
+		Sets this animal's phosphorus value as a purchased animal.
+		"""
+		# (A.#.D.1) from P tracking
+		self.p_animal = 0.0072 * self.body_weight * 1000
 
 	def culled(self):
 		"""

@@ -319,7 +319,7 @@ class Pen:
         """
         # since each animal in the pen receives the same ration
         if len(self.animals_in_pen) > 0:
-            DMI = calc_DMI(self.animals_in_pen[0].ration, feed)
+            DMI = calc_DMI(self.animals_in_pen[0].ration_formulation, feed)
         for animal in self.animals_in_pen:
             # TODO phosphorus_retained() returns p_retained, a value
             #  currently not used by pen routines. Similarly, p_maint and

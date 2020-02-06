@@ -62,7 +62,7 @@ class AnimalManagement:
     formulation_interval = 0
 
     # day in the simulation
-    simulation_day = 0
+    simulation_day = 1
 
     # if False, there are no animals being simulated on the farm
     simulate_animals = False
@@ -339,6 +339,7 @@ class AnimalManagement:
                 self.calc_manure_excretion(feed)  # per pen
                 self.calc_avg_growth()  # per pen
 
+            print(self.simulation_day)
             self.calc_p_retained(feed)  # per animal
             self.daily_p_update()  # per animal
 

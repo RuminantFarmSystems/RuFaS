@@ -12,6 +12,7 @@ import unittest
 from RUFAS.routines import Feed
 from RUFAS.routines.animal.ration import lactating_cow_ration as ration
 from RUFAS.routines.animal.manure import lactating_cow_manure_excretion as manure_excretion
+from RUFAS.routines.animal.pen import phosphorus_in_ration
 from RUFAS.test.animal import animal_inputs_outputs
 
 
@@ -72,10 +73,12 @@ class LactatingCowTest(unittest.TestCase):
         input_ration = self.inputs_outputs.lactating_cow_input_ration_1
         expected_manure = self.inputs_outputs.lactating_cow_expected_manure_1
         feed = self.feeds[0]
+        p_intake = phosphorus_in_ration(input_ration, feed)
 
         manure = manure_excretion.manure_calculations(input_ration, feed,
                                                       inputs['BW'], inputs['DIM'],
-                                                      inputs['mPrt'])
+                                                      inputs['mPrt'],
+                                                      p_intake)
 
         self.assertEqual(manure, expected_manure)
 
