@@ -117,6 +117,7 @@ class HeiferII(HeiferI):
 		"""
 		self.manure_excretion = \
 			manure_calculations(self.body_weight, self.p_intake)
+		self.p_excrt = self.manure_excretion['p_excrt']
 
 	def phosphorus_retained(self, DMI):
 		"""

@@ -57,6 +57,7 @@ class AnimalBase(object):
 		self.p_intake = 0
 		self.p_excrt = 0
 		self.body_weight = 0
+		self.mature_body_weight = 0
 
 	def init_from_animal(self, animal):
 		self.id = animal.id
@@ -67,6 +68,7 @@ class AnimalBase(object):
 		self.do_not_breed = animal.do_not_breed
 		self.events = animal.events
 		self.body_weight = animal.body_weight
+		self.mature_body_weight = animal.mature_body_weight
 		
 		self.daily_growth = 0
 		self.nutrient_rqmts = {}
@@ -113,7 +115,7 @@ class AnimalBase(object):
 		"""
 		# (A.#.D.2) from P tracking
 		self.p_animal = self.p_animal + self.p_intake - \
-			self.manure_excretion["p_excrt"]
+			self.p_excrt
 
 	def set_p_purchased(self):
 		"""

@@ -331,6 +331,7 @@ class Cow(HeiferIII):
 		else:
 			self.manure_excretion = \
 				dry_manure_calculations(self.body_weight, self.p_intake)
+		self.p_excrt = self.manure_excretion['p_excrt']
 
 	def phosphorus_retained(self, DMI):
 		"""

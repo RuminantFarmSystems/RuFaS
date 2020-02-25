@@ -78,12 +78,7 @@ class LifeCycleManager:
     conception_rate_sum_21_days = 0
     
     config = None
-    
-    calves = []
-    heiferIs = []
-    heiferIIs = []
-    heiferIIIs = []
-    cows = []
+
     replacement_market = []
     
     herd_num = 0
@@ -212,51 +207,57 @@ class LifeCycleManager:
                     else:
                         cows.append(new_cow)
                     heiferIIIs.remove(heiferIII)
-        
-        self.calves = res_calves
-        self.heiferIs = res_heiferIs
-        self.heiferIIs = res_heiferIIs
-        self.heiferIIIs = res_heiferIIIs
-        self.cows = res_cows
+
         self.replacement_market = cows
+        return res_calves, res_heiferIs, res_heiferIIs, res_heiferIIIs, res_cows
     
-    def daily_update(self, date, sim_length):
+    def daily_update(self, date, sim_length, calves, heiferIs, heiferIIs,
+                     heiferIIIs, cows):
         """
         Updates the status of the animals.
 
         Args:
+            cows: list of Cow objects to be updated
+            heiferIIIs: list of HeiferIII objects to be updated
+            heiferIIs: list of HeiferII objects to be updated
+            heiferIs: list of HeiferI objects to be updated
+            calves: list of Calf objects to be updated
             date: day number
             sim_length: length of the simulation, days
         """
+        ids_removed = []
+        animals_added = []
+        calves_born = []
+
         # record the last days stats
         daily_cow_cull_num = 0
         daily_heifer_sold = 0
         daily_bought_from_market = 0
         daily_cow_milking = 0
-        self.daily_calf_num.append(len(self.calves))
-        self.daily_heiferI_num.append(len(self.heiferIs))
-        self.daily_heiferII_num.append(len(self.heiferIIs))
-        self.daily_heiferIII_num.append(len(self.heiferIIIs))
-        self.daily_cow_num.append(len(self.cows))
+        self.daily_calf_num.append(len(calves))
+        self.daily_heiferI_num.append(len(heiferIs))
+        self.daily_heiferII_num.append(len(heiferIIs))
+        self.daily_heiferIII_num.append(len(heiferIIIs))
+        self.daily_cow_num.append(len(cows))
     
         record_econ_stats = False
         if sim_length - date <= self.config["econ_indicator_range"]:
             record_econ_stats = True
     
         # calf to heiferI
-        for calf in self.calves:
+        for calf in calves:
             wean_day = calf.update()
             if wean_day:
                 new_heiferI = HeiferI(calf)
-                self.heiferIs.append(new_heiferI)
-                self.calves.remove(calf)
+                heiferIs.append(new_heiferI)
+                calves.remove(calf)
             # if date == 50:
             #     print(len(calves))
             #     print(calves[0])
             #     return
     
         # heiferI to heiferII, assign repro programs
-        for heiferI in self.heiferIs:
+        for heiferI in heiferIs:
             second_stage = heiferI.update()
             if second_stage:
                 args = {
@@ -265,32 +266,39 @@ class LifeCycleManager:
                     'synch_ed_method_h': '2P'
                 }
                 new_heiferII = HeiferII(heiferI, args)
-                self.heiferIIs.append(new_heiferII)
-                self.heiferIs.remove(heiferI)
+                heiferIIs.append(new_heiferII)
+                heiferIs.remove(heiferI)
             # if date == 350:
             #     print(len(heiferIs))
             #     print(heiferIs[20])
             #     return
     
         # heiferII to heiferIII
-        for heiferII in self.heiferIIs:
+        for heiferII in heiferIIs:
             cull_stage, third_stage = heiferII.update()
             if cull_stage:
                 self.total_culled += 1
                 self.culled_heifers.append(heiferII)
-                self.heiferIIs.remove(heiferII)
+                heiferIIs.remove(heiferII)
             if third_stage:
                 new_heiferIII = HeiferIII(heiferII)
-                self.heiferIIIs.append(new_heiferIII)
-                self.heiferIIs.remove(heiferII)
+                heiferIIIs.append(new_heiferIII)
+                heiferIIs.remove(heiferII)
             # if date == 650:
             #     print(len(heiferIIs))
             #     print(heiferIIs[20])
             #     return
     
         # heiferIII to cow, assign repro programs
-        for heiferIII in self.heiferIIIs:
-            cow_stage = heiferIII.update()
+        for heiferIII in heiferIIIs:
+
+            # TODO why can cows be added to the list of HeiferIII's so that the
+            #  following if statement is necessary?
+            if type(heiferIII).__name__ == 'HeiferIII':
+                cow_stage = heiferIII.update()
+            else:
+                cow_stage = heiferIII.update(record_econ_stats)
+
             if cow_stage:
                 args = {
                     'repro_program': 'TAI',
@@ -299,8 +307,8 @@ class LifeCycleManager:
                     'resynch_method': 'TAIafterPD'
                 }
                 new_cow = Cow(heiferIII, args)
-                self.cows.append(new_cow)
-                self.heiferIIIs.remove(heiferIII)
+                cows.append(new_cow)
+                heiferIIIs.remove(heiferIII)
             # if date == 850:
             #     print(len(heiferIIIs))
             #     print(heiferIIIs[2])
@@ -308,8 +316,9 @@ class LifeCycleManager:
     
         # if the number of heifers is more than needed for the herd, sell
         # those as replacement
-        while len(self.heiferIIIs) + len(self.cows) > self.herd_num * 1.03:
-            self.heiferIIIs.pop()
+        while len(heiferIIIs) + len(cows) > self.herd_num * 1.03:
+            removed = heiferIIIs.pop()
+            ids_removed.append(removed.id)
             self.sold_to_market += 1
             daily_heifer_sold += 1
             if record_econ_stats:
@@ -318,22 +327,22 @@ class LifeCycleManager:
     
         # if the number of heifers is less than needed for the herd,
         # buy replacement from the market
-        while len(self.cows) + len(self.heiferIIIs) < self.herd_num * 1.01 and \
+        while len(cows) + len(heiferIIIs) < self.herd_num * 1.01 and \
                 date > 1:
             self.replacement_market[0].events.add_event(
                 self.replacement_market[0].days_born, 'Entered Herd')
             self.replacement_market[0].set_p_purchased()
-            self.cows.append(self.replacement_market[0])
+            animals_added.append(self.replacement_market[0])
+            cows.append(self.replacement_market[0])
             self.bought_from_market += 1
             daily_bought_from_market += 1
-            print(self.replacement_market[0].p_animal)
             del self.replacement_market[0]
             if record_econ_stats:
                 self.total_replacement_bought += 1
                 self.total_replacement_cost += self.config["heifer_buy_price"]
     
         # cow culling action and economic stats
-        for cow in self.cows:
+        for cow in cows:
             _, _, _, culled, new_born = cow.update(record_econ_stats)
             # if date == 2000:
             #     print(len(cows))
@@ -369,7 +378,8 @@ class LifeCycleManager:
                 
                 self.culled_cows.append(cow)
                 # print(len(culled_cows))
-                self.cows.remove(cow)
+                ids_removed.append(cow.id)
+                cows.remove(cow)
     
             # calculate income from sold calves
             if new_born:
@@ -382,11 +392,13 @@ class LifeCycleManager:
                 cow.p_animal -= cow.p_gest_for_calf
                 cow.p_gest_for_calf = 0
                 new_calf = Calf(args)
+
                 if not (new_calf.culled or new_calf.sold):
                     new_calf.events.add_event(
                         new_calf.days_born, 'Entered Herd')
-                    self.calves.append(new_calf)
+                    calves.append(new_calf)
                     self.total_new_born += 1
+                    calves_born.append(new_calf)
                 if new_calf.sold:
                     self.total_calf_sold += 1
                     self.total_calf_value += self.config["calf_price"]
@@ -423,11 +435,20 @@ class LifeCycleManager:
         self.replacement_bought_lst.append(daily_bought_from_market)
         self.milking_cows_lst.append(daily_cow_milking)
 
-    def output_end_stats(self, sim_length):
+        return animals_added, ids_removed, calves_born, calves, heiferIs, \
+            heiferIIs, heiferIIIs, cows
+
+    def output_end_stats(self, sim_length, calves, heiferIs, heiferIIs,
+                         heiferIIIs, cows):
         """
         End of simulation statistics.
 
         Args:
+            cows: list of Cow objects to be updated
+            heiferIIIs: list of HeiferIII objects to be updated
+            heiferIIs: list of HeiferII objects to be updated
+            heiferIs: list of HeiferI objects to be updated
+            calves: list of Calf objects to be updated
             sim_length: simulation length, d
         """
         income_over_feed_cost = 0
@@ -443,10 +464,10 @@ class LifeCycleManager:
         self.avg_daily_cow_milking /= len(self.milking_cows_lst)
         
         # count stats
-        for heiferII in self.heiferIIs:
+        for heiferII in heiferIIs:
             if heiferII.preg:
                 self.num_heiferII_preg += 1
-        for cow in self.cows:
+        for cow in cows:
             if cow.preg:
                 self.num_cow_preg += 1
             if cow.milking:
@@ -485,7 +506,7 @@ class LifeCycleManager:
             
         parity_lst = [cow.calves
                       if cow.calves <= 2 else '3+'
-                      for cow in self.cows]
+                      for cow in cows]
         parity_count_tuple = Counter(parity_lst)
         avg_service_rate = self.service_rate_sum_21_days / \
             float(self.config["num_21_days"]) * 21.0
@@ -496,11 +517,11 @@ class LifeCycleManager:
         print("\n=================== Herd structure at the end of the "
               "simulation ===================\n".format(
                 self.config["econ_indicator_range"]))
-        print("Total calves:\t\t\t{}".format(len(self.calves)))
-        print("Total heiferI:\t\t\t{}".format(len(self.heiferIs)))
-        print("Total heiferII:\t\t\t{}".format(len(self.heiferIIs)))
-        print("Total heiferIII:\t\t{}".format(len(self.heiferIIIs)))
-        print("Total cows:\t\t\t{}".format(len(self.cows)))
+        print("Total calves:\t\t\t{}".format(len(calves)))
+        print("Total heiferI:\t\t\t{}".format(len(heiferIs)))
+        print("Total heiferII:\t\t\t{}".format(len(heiferIIs)))
+        print("Total heiferIII:\t\t{}".format(len(heiferIIIs)))
+        print("Total cows:\t\t\t{}".format(len(cows)))
         print("Total heiferII pregnant:\t{}".format(self.num_heiferII_preg))
         print("Total cows pregnant:\t\t{}".format(self.num_cow_preg))
         print("Total cows milking:\t\t{}".format(self.num_cow_milking))
@@ -544,7 +565,7 @@ class LifeCycleManager:
         print("PR%: \t\t\t\t{0:.2f}%".format(pregnancy_rate * 100.0))
         print("Total cows culled:\t\t{}".format(self.num_culled_range))
         print("Culling rate: \t\t\t{0:.2f}%".format(float(self.num_culled_range)
-                                                    / float(len(self.cows))
+                                                    / float(len(cows))
                                                     * 100))
         for cull_reason, count in self.cull_reason_stats_range.items():
             print("{} => {}".format(cull_reason, count))
@@ -553,14 +574,14 @@ class LifeCycleManager:
     
         self.draw_stat(sim_length) 
         # draw curves for a cow
-        print(self.cows[0])
-        self.cows[0].draw_curves()
+        print(cows[0])
+        cows[0].draw_curves()
     
-        print(self.cows[20])
-        self.cows[20].draw_curves()
+        print(cows[20])
+        cows[20].draw_curves()
     
-        print(self.cows[150])
-        self.cows[150].draw_curves()
+        print(cows[150])
+        cows[150].draw_curves()
 
     def draw_stat(self, sim_length): 
         """

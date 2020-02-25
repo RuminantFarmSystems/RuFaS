@@ -15,6 +15,7 @@ Author(s): Militsa Sotirova, militsasotirova@gmail.com
 from RUFAS.routines.animal.pen import Pen
 from RUFAS.routines.animal.life_cycle.life_cycle import LifeCycleManager
 from RUFAS.routines.animal.life_cycle.animal_base import AnimalBase
+from collections import deque
 
 
 def daily_animal_routine(animal_management, feed, weather, time):
@@ -66,6 +67,14 @@ class AnimalManagement:
 
     # if False, there are no animals being simulated on the farm
     simulate_animals = False
+
+    # dictionary: key is animal ID, value is the pen ID that animal is in
+    id_pen = {}
+
+    # queue: pens from which animals have been removed in the order in which
+    # they have had animals removed. Elements will be added to the right of the
+    # queue and popped off the left
+    pens_needing_animals = deque([])
 
     def __init__(self, data, config, feed):
         """
@@ -155,15 +164,12 @@ class AnimalManagement:
         else:
             self.simulate_animals = True
 
-        self.life_cycle_manager.initialize_herd(herd_num, calf_num,
-                                                heiferI_num, heiferII_num,
-                                                heiferIII_num, cow_num,
-                                                replace_num)
-        self.calves = self.life_cycle_manager.calves
-        self.heiferIs = self.life_cycle_manager.heiferIs
-        self.heiferIIs = self.life_cycle_manager.heiferIIs
-        self.heiferIIIs = self.life_cycle_manager.heiferIIIs
-        self.cows = self.life_cycle_manager.cows
+        self.calves, self.heiferIs, self.heiferIIs, self.heiferIIIs, self.cows \
+            = self.life_cycle_manager.initialize_herd(herd_num, calf_num,
+                                                      heiferI_num, heiferII_num,
+                                                      heiferIII_num, cow_num,
+                                                      replace_num)
+
         self.init_nutrient_rqmts(feed)
         self.pen_allocation()
 
@@ -202,7 +208,6 @@ class AnimalManagement:
         Calculates the average distance from a  pen to the milking parlor.
         Returns: a tuple of (average vertical distance from milking parlor,
             average horizontal distance from milking parlor)
-
         """
         # vertical distance
         VD_sum = 0
@@ -226,6 +231,39 @@ class AnimalManagement:
             pen.call_animal_nutrient_rqmts(self.housing,
                                            self.pasture_concentrate, feed)
 
+    def fully_update_id_pen(self):
+        """
+        Updates the entire id_pen dictionary so that each animal's ID is
+        associated with the pen that animal is in.
+        """
+        for pen in self.all_pens:
+            animals_in_pen = pen.animals_in_pen
+            for animal in animals_in_pen:
+                self.id_pen[animal.id] = pen.id
+
+    def daily_update_id_pen(self, animals_added, ids_removed, calves_born):
+        """
+
+        Args:
+            animals_added: list of animal IDs that have been added to the herd
+            ids_removed: list of animal IDs that have been removed from the herd
+        """
+        for i in ids_removed:
+            if i in self.id_pen:
+                pen = self.id_pen[i]
+                self.pens_needing_animals.append(pen)
+                del self.id_pen[i]
+
+        for animal in animals_added:
+            pen = self.pens_needing_animals.popleft()
+            self.id_pen[animal.id] = pen
+            self.all_pens[pen].set_up_new_animal(animal)
+
+        for calf in calves_born:
+            # TODO: this is the hard coded calf pen value
+            pen = 0
+            self.all_pens[pen].set_up_new_animal(calf)
+
     def pen_allocation(self):
         """
         Allocates the animals in all_animals to pens in all_pens based on the
@@ -248,6 +286,8 @@ class AnimalManagement:
 
         self.all_pens[4].update_animals(dry_cows)
         self.all_pens[5].update_animals(lactating_cows)
+
+        self.fully_update_id_pen()
 
     def clear_pens(self):
         """
@@ -327,8 +367,16 @@ class AnimalManagement:
             time: instance of the Time class
         """
         if self.simulate_animals:
-            self.life_cycle_manager.daily_update(self.simulation_day,
-                                                 self.sim_length)
+            ids_added, ids_removed, calves_born, self.calves, self.heiferIs, \
+                self.heiferIIs, self.heiferIIIs, self.cows = \
+                self.life_cycle_manager.daily_update(self.simulation_day,
+                                                     self.sim_length,
+                                                     self.calves,
+                                                     self.heiferIs,
+                                                     self.heiferIIs,
+                                                     self.heiferIIIs, self.cows)
+
+            self.daily_update_id_pen(ids_added, ids_removed, calves_born)
 
             if self.end_ration_interval():
                 self.calc_nutrient_rqmts(feed)  # per animal
@@ -339,7 +387,6 @@ class AnimalManagement:
                 self.calc_manure_excretion(feed)  # per pen
                 self.calc_avg_growth()  # per pen
 
-            print(self.simulation_day)
             self.calc_p_retained(feed)  # per animal
             self.daily_p_update()  # per animal
 

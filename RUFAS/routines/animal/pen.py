@@ -333,12 +333,53 @@ class Pen:
         for animal in self.animals_in_pen:
             animal.daily_p_update()
 
+    def set_up_new_animal(self, animal):
+        """
+        Sets the necessary attributes for @animal to be a replacement in this
+        pen.
+
+        Args:
+            animal: the replacement animal which needs to have necessary values
+                for later computations
+        """
+        num_animals = len(self.animals_in_pen)
+        if num_animals == 0:
+            # for the case that there are no animals in this pen. Avoids a
+            # division by 0 error in below calculations
+            # TODO is there a better way?
+            num_animals = 1
+
+        # set animal's ration to be the intake of all other animals in pen
+        for key in self.ration:
+            if key == 'status':
+                animal.ration_formulation[key] = self.ration[key]
+
+            else:  # feeds and price
+                animal.ration_formulation[key] = self.ration[key] / num_animals
+
+        # set animal's manure to be the average manure of all other
+        # animals in pen
+        for key in self.manure.keys():
+            animal.manure_excretion[key] = self.manure[key] / num_animals
+
+        # set animal's nutrient requirements to be the average requirements of
+        # all other animals in pen
+        animal.nutrient_rqmts = self.avg_nutrient_rqmts
+
+        # set animal's DVD and DHD if it is a cow
+        if type(animal).__name__ == 'Cow':
+            animal.calc_daily_walking_dist(
+                self.vertical_parlor_dist, self.horizontal_parlor_dist)
+
+        self.animals_in_pen.append(animal)
+
     def clear(self):
         """
         Clears the pen attributes for re-allocation.
         """
         self.animals_in_pen = []
         self.classes_in_pen = set()
+        '''
         self.stocking_density = 0
         self.avg_nutrient_rqmts = {}
         self.avg_BW = 0
@@ -349,7 +390,7 @@ class Pen:
         self.ration = {}
         self.manure = {}
         self.avg_growth = 0
-
+        '''
 
 # methods used for additional ration calculations
 def phosphorus_in_ration(ration, feed):

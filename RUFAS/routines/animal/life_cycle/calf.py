@@ -64,7 +64,6 @@ class Calf(AnimalBase):
 			return
 		else:
 			self.sold = False
-
 		# birth weight determined by breed specific distribution
 		if self.breed == 'HO':
 			self.birth_weight = np.random.normal(
@@ -111,6 +110,7 @@ class Calf(AnimalBase):
 			feed: instance of the Feed class
 		"""
 		self.manure_excretion = manure_calculations(self.body_weight, self.p_intake)
+		self.p_excrt = self.manure_excretion['p_excrt']
 
 	def phosphorus_retained(self, DMI):
 		"""
