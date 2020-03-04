@@ -11,8 +11,11 @@ import time as timer
 def norm(x):
     '''Normalizes a list of values'''
     x = np.array(x)
-    normalized = (x - min(x)) / (max(x) - min(x))
-    return normalized
+    if max(x) != min(x):
+        normalized = (x - min(x)) / (max(x) - min(x))
+        return normalized
+    else:
+        return x
 #Function that inputs a list of values and returns the
 #percentiles for each value in that list
 def percentile_list(l):

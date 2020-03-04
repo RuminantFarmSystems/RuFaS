@@ -436,7 +436,7 @@
 	        		"id": 4,
 	        		"vertical_dist_to_milking_parlor": 0.1,
 	        		"horizontal_dist_to_milking_parlor": 1.6,
-	        		"number_of_stalls": 100,
+	        		"number_of_stalls": 200,
 	        		"housing_type": "open air barn",
 	        		"bedding_type": "sand",
 	        		"pen_type": "freestall"
@@ -473,128 +473,8 @@
 	        		"housing_type": "open air barn",
 	        		"bedding_type": "sand",
 	        		"pen_type": "tiestall"
-	        	},
+            }
 
-	        	"pen6":
-	        	{
-	        		"id": 8,
-	        		"vertical_dist_to_milking_parlor": 0.2,
-	        		"horizontal_dist_to_milking_parlor": 1.0,
-	        		"number_of_stalls": 400,
-	        		"housing_type": "open air barn",
-	        		"bedding_type": "sand",
-	        		"pen_type": "tiestall"
-	        	},
-
-            "pen7":
-	        	{
-	        		"id": 9,
-	        		"vertical_dist_to_milking_parlor": 0.1,
-	        		"horizontal_dist_to_milking_parlor": 2.0,
-	        		"number_of_stalls": 100,
-	        		"housing_type": "open air barn",
-	        		"bedding_type": "straw",
-	        		"pen_type": "tiestall"
-	        	},
-
-            "pen8":
-	        	{
-	        		"id": 10,
-	        		"vertical_dist_to_milking_parlor": 0.1,
-	        		"horizontal_dist_to_milking_parlor": 1.6,
-	        		"number_of_stalls": 100,
-	        		"housing_type": "open air barn",
-	        		"bedding_type": "sand",
-	        		"pen_type": "freestall"
-	        	},
-
-            "pen9":
-	        	{
-	        		"id": 11,
-	        		"vertical_dist_to_milking_parlor": 0.1,
-	        		"horizontal_dist_to_milking_parlor": 1.6,
-	        		"number_of_stalls": 100,
-	        		"housing_type": "open air barn",
-	        		"bedding_type": "straw",
-	        		"pen_type": "freestall"
-	        	},
-
-            "pen22":
-           {
-             "id": 12,
-             "vertical_dist_to_milking_parlor": 0.1,
-             "horizontal_dist_to_milking_parlor": 1.6,
-             "number_of_stalls": 100,
-             "housing_type": "open air barn",
-             "bedding_type": "sand",
-             "pen_type": "tiestall"
-           },
-
-           "pen23":
-           {
-             "id": 13,
-             "vertical_dist_to_milking_parlor": 0.1,
-             "horizontal_dist_to_milking_parlor": 1.6,
-             "number_of_stalls": 100,
-             "housing_type": "open air barn",
-             "bedding_type": "sand",
-             "pen_type": "freestall"
-           },
-
-           "pen24":
-           {
-             "id": 14,
-             "vertical_dist_to_milking_parlor": 0.6,
-             "horizontal_dist_to_milking_parlor": 1.8,
-             "number_of_stalls": 100,
-             "housing_type": "open air barn",
-             "bedding_type": "straw",
-             "pen_type": "tiestall"
-           },
-
-           "pen25":
-           {
-             "id": 15,
-             "vertical_dist_to_milking_parlor": 0.5,
-             "horizontal_dist_to_milking_parlor": 1.6,
-             "number_of_stalls": 100,
-             "housing_type": "open air barn",
-             "bedding_type": "sand",
-             "pen_type": "freestall"
-           },
-
-           "pen26":
-           {
-             "id": 16,
-             "vertical_dist_to_milking_parlor": 0.5,
-             "horizontal_dist_to_milking_parlor": 1.6,
-             "number_of_stalls": 100,
-             "housing_type": "open air barn",
-             "bedding_type": "sand",
-             "pen_type": "freestall"
-           },
-
-           "pen27":
-           {
-             "id": 17,
-             "vertical_dist_to_milking_parlor": 0.3,
-             "horizontal_dist_to_milking_parlor": 1.4,
-             "number_of_stalls": 100,
-             "housing_type": "open air barn",
-             "bedding_type": "sand",
-             "pen_type": "freestall"
-           },
-
-           "pen28":
-           {
-             "id": 18,
-             "vertical_dist_to_milking_parlor": 0.1,
-             "horizontal_dist_to_milking_parlor": 1.2,
-             "number_of_stalls": 100,
-             "housing_type": "open air barn",
-             "bedding_type": "sand",
-             "pen_type": "freestall"
-           }
 	        }
         },
 
