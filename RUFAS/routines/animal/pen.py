@@ -89,6 +89,12 @@ class Pen:
     # average growth of the animals in the pen
     avg_growth = 0
 
+    # average phosphorus of the animals in the pen
+    avg_p_animal = 0
+
+    # average phosphorus retained of the animals in the pen
+    avg_p_retained = 0
+
     def __init__(self, id_number, vert_dist, horiz_dist, num_stalls,
                  housing_type, bedding_type, pen_type):
         """
@@ -320,18 +326,25 @@ class Pen:
         # since each animal in the pen receives the same ration
         if len(self.animals_in_pen) > 0:
             DMI = calc_DMI(self.animals_in_pen[0].ration_formulation, feed)
-        for animal in self.animals_in_pen:
-            # TODO phosphorus_retained() returns p_retained, a value
-            #  currently not used by pen routines. Similarly, p_maint and
-            #  p_growth are calculated but not used.
-            animal.phosphorus_retained(DMI)
+        if len(self.animals_in_pen) > 0:
+            total_p_retained = 0
+            for animal in self.animals_in_pen:
+                # TODO phosphorus_retained() returns p_retained, a value
+                #  currently not used by pen routines. Similarly, p_maint and
+                #  p_growth are calculated but not used.
+                total_p_retained += animal.phosphorus_retained(DMI)
+            self.avg_p_retained = total_p_retained / len(self.animals_in_pen)
 
     def daily_p_update(self):
         """
         Calls each animal's method to calculate daily phosphorus update.
         """
-        for animal in self.animals_in_pen:
-            animal.daily_p_update()
+        if not len(self.animals_in_pen) == 0:
+            total_p_animal = 0
+            for animal in self.animals_in_pen:
+                animal.daily_p_update()
+                total_p_animal += animal.p_animal
+            self.avg_p_animal = total_p_animal / len(self.animals_in_pen)
 
     def set_up_new_animal(self, animal):
         """
