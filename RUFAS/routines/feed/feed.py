@@ -10,6 +10,7 @@ Author(s): Kass Chupongstimun, kass_c@hotmail.com,
 ################################################################################
 from enum import IntEnum
 import sqlite3
+from RUFAS.util import DatabaseReader
 
 
 class Feeds(IntEnum):
@@ -84,67 +85,38 @@ class NutrientValues:
                 file as feeds managed by the farm, and therefore the feeds
                 for which information will be stored
         """
-        try:
-            # Forms a connection to the database
-            conn = sqlite3.connect(database_file)
-            conn.row_factory = sqlite3.Row
-            c = conn.cursor()
-
-            # To obtain data from a database table, we form and execute a query.
-            # The table we are querying from with the following code looks like:
-            # ID    Name    Nutrient1   Nutrient2   ...
-            # 0     Feed1   value       value       ...
-            # 1     Feed2   value       value       ...
-            # ...
-            #
-            # The query below is in the following format:
-            # SELECT * FROM table_name WHERE name IN [list_of_feed_names]
-            #
-            # SELECT * FROM table_name:
-            #       The * indicates that information from all of the columns in
-            #       "table_name" are desired (otherwise, the names of specific
-            #       columns would be provided).
-            #
-            # WHERE name IN [list_of_feed_names]:
-            #       If we do not specify which rows we want information from, we
-            #       will get information from every row. We specify which feeds
-            #       (rows) we want information from by filtering. We specify
-            #       that we want each in the result to have a "name" that is in
-            #       list_of_feed_names. (Note that the column in the table is
-            #       "Name" - this is case insensitive.)
-            #
-            # Thus, the query selects all of the columns from the database with
-            # the additional specification that we only obtain information from
-            # the rows that correspond to the feeds listed in the input JSON
-            # file as managed by the farm (specified by the argument
-            # configured_feeds).
-            query = "SELECT * FROM " + \
-                    table_name + \
-                    " WHERE name IN " + \
-                    "({})".format(','.join(['?'] * len(configured_feeds)))
-
-            # Here, configured_feeds is a parameter to the query as the list of
-            # feed names for which information is desired. This list will be
-            # formatted as specified in the query above (i.e. all elements are
-            # separated by a comma and the list is surrounded by parentheses.
-            c.execute(query, configured_feeds)
-
-            # self.values is a list of dictionaries, where each dictionary in
-            # the list corresponds to a row in the database table with all of
-            # the information for the feed
-            self.values = []
-            row = c.fetchone()
-            while row is not None:
-                self.values.append(dict(row))
-                row = c.fetchone()
-
-            conn.close()
-
-        except Exception as e:
-            print("The program has encountered the following exception while"
-                  "connecting to and querying the database: ", e,
-                  "\nExiting.")
-            exit(1)
+        # To obtain data from a database table, we form and execute a query
+        # through the DatabaseReader class.
+        # The table we are querying from with the following code looks like:
+        # ID    Name    Nutrient1   Nutrient2   ...
+        # 0     Feed1   value       value       ...
+        # 1     Feed2   value       value       ...
+        # ...
+        #
+        # The query will be in the following format:
+        # SELECT * FROM table_name WHERE name IN [list_of_feed_names]
+        #
+        # SELECT * FROM table_name:
+        #       The * indicates that information from all of the columns in
+        #       "table_name" are desired (otherwise, the names of specific
+        #       columns would be provided).
+        #
+        # WHERE name IN [list_of_feed_names]:
+        #       If we do not specify which rows we want information from, we
+        #       will get information from every row. We specify which feeds
+        #       (rows) we want information from by filtering. We specify
+        #       that we want each in the result to have a "name" that is in
+        #       list_of_feed_names. (Note that the column in the table is
+        #       "Name" - this is case insensitive.)
+        #
+        # Thus, the query selects all of the columns from the database with
+        # the additional specification that we only obtain information from
+        # the rows that correspond to the feeds listed in the input JSON
+        # file as managed by the farm (specified by the argument
+        # configured_feeds).
+        reader = DatabaseReader(database_file, table_name, identifier="name",
+                                desired_rows=configured_feeds)
+        self.values = reader.values
 
 
 class Feed:

@@ -13,7 +13,74 @@ import pulp
 import time as timer
 from pathlib import Path
 import sqlite3
-#import csv
+
+
+class DatabaseReader:
+    """
+    Description: Stores the information from the database source specified.
+    """
+    def __init__(self, database_file: str, table_name, identifier=None,
+                 desired_rows=None):
+        """
+        Connects to the @database_file and queries from the @table_name.
+        If an exception is raised, the method prints a message and the program
+        exits.
+
+        Args:
+            database_file: the name of the database file
+            table_name: the name of the table in the database which is queried
+            identifier (optional): string that is the name of the column from
+                which values are used to populate @desired_rows
+                (case insenstive)
+            desired_rows (optional): a list of the values in the @identifier
+                column in the table which are in the rows that are desired
+
+            Note - if either @desired_rows or @row_identifier is None, all rows
+            of the table will be queried. If they are not None, only those rows
+            will be queried.
+        """
+        try:
+            # Forms a connection to the database
+            conn = sqlite3.connect(database_file)
+            conn.row_factory = sqlite3.Row
+            c = conn.cursor()
+
+            # To obtain data from a database table, we form and execute a query.
+            if desired_rows is None or identifier is None:
+                query = "SELECT * FROM " + table_name
+
+            else:
+                # SELECT * FROM table_name WHERE identifier IN [desired_rows]
+                query = "SELECT * FROM " + \
+                        table_name + \
+                        " WHERE " + \
+                        identifier + \
+                        " IN " + \
+                        "({})".format(','.join(['?'] * len(desired_rows)))
+
+            # Here, desired_rows is a parameter to the query as the list of
+            # rows for which information is wanted. This list will be
+            # formatted as specified in the query above (i.e. all elements are
+            # separated by a comma and the list is surrounded by parentheses.
+            c.execute(query, desired_rows)
+
+            # self.values is a list of dictionaries, where each dictionary in
+            # the list corresponds to a row in the database table storing
+            # the information for the row
+            self.values = []
+            row = c.fetchone()
+            while row is not None:
+                self.values.append(dict(row))
+                row = c.fetchone()
+
+            conn.close()
+
+        except Exception as e:
+            print("The program has encountered the following exception while"
+                  "connecting to and querying the database table ", table_name,
+                  ": ", e, "\nExiting.")
+            exit(1)
+
 
 # -------------------------------------------------------------------------------
 # Function: get_base_dir
