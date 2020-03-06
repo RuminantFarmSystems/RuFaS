@@ -51,6 +51,8 @@ class DatabaseReader:
 
             else:
                 # SELECT * FROM table_name WHERE identifier IN [desired_rows]
+                # For an example about how this specific query works, see the
+                # documentation of NutrientValues class in feed.py
                 query = "SELECT * FROM " + \
                         table_name + \
                         " WHERE " + \
