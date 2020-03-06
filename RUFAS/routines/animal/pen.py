@@ -426,10 +426,10 @@ def phosphorus_in_ration(ration, feed):
             p_feed_conc = nutrients[Nutrients.P_DM.name]
             dmi_feed = ration[key]
 
-            # amount of P from feed (A.#.A.1)
+            # amount of P from feed (A.4.A.1)
             p_feed_intake = p_feed_conc / 100 * dmi_feed * 1000
 
-            # (A.#.A.2)
+            # (A.4.A.2)
             p_intake += p_feed_intake
 
     return p_intake
