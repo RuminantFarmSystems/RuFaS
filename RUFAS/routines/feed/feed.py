@@ -13,7 +13,7 @@ import sqlite3
 from RUFAS.util import DatabaseReader
 
 
-class Feeds(IntEnum):
+class FeedNames(IntEnum):
     """
     Each enum member is the name of a feed in the feed information database. The
     values correspond to the ID column in the database table.
@@ -143,7 +143,7 @@ class Feed:
         # available_feeds is the name of the feed as specified in the database
         # table. The feed_keys are specified in the input json file.
         for feed_key in self.managed_feed_names:
-            self.managed_feeds.append(Feeds[feed_key])
+            self.managed_feeds.append(FeedNames[feed_key])
 
         # The nutrient requirements used in the ration calculations.
         self.nutrient_rqmts = ['FU', 'RU', 'ME_DM', 'RDP_DM', 'RUP_DM']
@@ -170,10 +170,10 @@ class Feed:
                               self.__table_name,
                               self.managed_feed_names)
 
-    def values(self, desired_feed: Feeds, current: bool = False):
+    def values(self, desired_feed: FeedNames, current: bool = False):
         """
         Args:
-            desired_feed: a member of the Feeds enum
+            desired_feed: a member of the FeedNames enum
             current: if the values should be taken from the database at the time
                 of the method call, this value is true. The default value is
                 False, which means the cached values will be returned (stored at
