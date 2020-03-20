@@ -260,6 +260,7 @@ class Soil:
         curr_thickness = 0
         for layer in self.soil_layers:
             layer.thickness = layer.bottom_depth - curr_thickness
+            layer.thickness_cm = layer.thickness / 10
             curr_thickness = layer.bottom_depth
 
         self.start_year = config.start_year
@@ -268,41 +269,36 @@ class Soil:
         self.leach = 0.0
         self.area = data['FieldSize']
 
-        self.num_soil_layers = 3
-        self.thickness_cm = []
-        self.CNT_day_layer = []
-
-        x = 0
+        # Initialize phosphorus variables
+        # "pseudocode_soil" S.6.A
         for layer in self.soil_layers:
-            self.thickness_cm.append(layer.thickness / 10)
 
-            # TODO org_C is an input
-            # layer.org_C = layer.OM_percent * 0.58
-
+            # S.6.A.1
             layer.PSP = -0.045 * log(layer.clay) + 0.001 * \
                         layer.labile_P - 0.035 * layer.org_C + 0.43
-            layer.labile_P = layer.labile_P * layer.bulk_density \
-                             * self.thickness_cm[x] * 0.1
 
+            # S.6.A.2
+            layer.labile_P = layer.labile_P * layer.bulk_density \
+                             * layer.thickness_cm * 0.1
+
+            # S.6.A.3
             layer.active_P = layer.labile_P * (1.0 - layer.PSP) / layer.PSP
 
+            # S.6.A.4
             layer.stable_P = layer.active_P * 4.0
 
+            # S.6.A.5 TODO organic soil pools (labile_O, and active_O) are not being tracked
             layer.org_P = layer.org_C / 8.0 / 14.0 * 10000 * layer.bulk_density \
-                          * self.thickness_cm[x] * 0.1
+                          * layer.thickness_cm * 0.1
 
-            self.CNT_day_layer.append(0.0)
+            # S.6.A.6
+            layer.mass = layer.bulk_density * layer.thickness_cm * 10000
 
-            x += 1
-
-        # default values
-        self.days = [0, 0, 0]
-        self.moisture = 0.5
+        self.manure_moisture = 0.5
         self.CNT = 1
         self.manure_cov = 0.0
         self.manure_mass = 0.0
         self.cover_SLP = 0.000025
-        self.count_day = [0, 0, 0]
 
         # fertilizer
         self.fert_applied_sum = 0.0
@@ -310,46 +306,26 @@ class Soil:
         self.fert_CNT = 0.0
         self.fert_P_available = 0.0  # avfrtp
         self.fert_P_released = 0.0  # rsfrtp
-        self.fact = 0.0
+        self.depth_fact = 0.0
 
         # manure
         self.manure_type = 0
-        self.manure_sum = 0
-        self.manure_P_sum = 0
-        self.manure_N_sum = 0
+        self.manure_annual = 0
+        self.manure_P_annual = 0
+        self.manure_N_annual = 0
+
         self.WIP = 0.0
         self.WOP = 0.0
         self.SIP = 0.0
         self.SOP = 0.0
         self.NH4 = 0.0
         self.SON = 0.0
+
         self.manure_mass_app = 0.0
 
-        self.lactating_cows = []
-        self.heifer = []
-        self.dry_cow = []
-        self.d_calf = []
-        self.beef_cow = []
-        self.b_calf = []
-
-        # TODO temporary
-        for x in range(0, 50):
-            self.lactating_cows.append([0 for _ in range(0, 366)])
-            self.heifer.append([0 for _ in range(0, 366)])
-            self.dry_cow.append([0 for _ in range(0, 366)])
-            self.d_calf.append([0 for _ in range(0, 366)])
-            self.beef_cow.append([0 for _ in range(0, 366)])
-            self.b_calf.append([0 for _ in range(0, 366)])
-
-        # plow
-
-        # solp
-        self.soil_P = [0, 0, 0]
-        self.SRP_sum = 0.0
-        self.slope = [0, 0, 0]
-        self.inter = [0, 0, 0]
-        self.DRP = [0, 0, 0]
-        self.water = [0, 0, 0]
+        # soluble_p
+        self.DRP_runoff_annual = 0.0
+        self.DRP_leachate_annual = 0.0
 
         # fert_leach
         self.fert_sorp = 0.0
@@ -357,8 +333,8 @@ class Soil:
         self.fert_leach = 0.0
         self.PD_factor = 0.0
         self.fert_runoff_P = 0.0
-        self.fert_R_sum = 0.0
-        self.fert_L_sum = 0.0
+        self.fert_runoff_annual = 0.0
+        self.fert_leachate_annual = 0.0
         self.fert_run = 0.0
 
         # p_mineralization
@@ -385,19 +361,19 @@ class Soil:
         self.temp_lab = [0, 0, 0]
 
         # manure_leach
-        self.TIP_leach = 0.0
-        self.TOP_leach = 0.0
-        self.TN_leach = 0.0
+        self.MIP_leach_annual = 0.0
+        self.TOP_leach_annual = 0.0
         self.ND_factor = 0.0
-        self.WIP_R_sum = 0.0
-        self.WOP_R_sum = 0.0
-        self.NH4_R_sum = 0.0
-        self.WIP_L_sum = 0.0
-        self.WOP_L_sum = 0.0
-        self.NH4_L_sum = 0.0
+
+        self.WIP_runoff_annual = 0.0
+        self.WOP_runoff_annual = 0.0
+
+        self.WIP_leachate_annual = 0.0
+        self.WOP_leachate_annual = 0.0
+
         self.DP_sum = 0.0
         self.N_sum = 0.0
-        self.SRP_MGL = 0.0
+        self.DRP_runoff_MGL = 0.0
         self.runoff_IP = 0.0
         self.runoff_OP = 0.0
         self.runoff_NH4 = 0.0
@@ -558,12 +534,15 @@ class Soil:
             self.soil_water_ratio = layer_data['SoilWaterRatio']
 
             self.thickness = 0.0  # thickness of soil layer
+            self.thickness_cm = 0.0
+
             self.fc_water = 0.0  # constant
             self.sat_water = 0.0  # constant
             self.wilting_water = 0.0  # constant
             self.soil_water = 0.0  # mm water in the soil profile
 
             self.bulk_density = layer_data['BulkDensity']
+            self.mass = 0
 
             # Variables to calculate daily evapotranspiration
             self.top_evap = 0.0  # evaporation demand at top of layer
@@ -602,7 +581,7 @@ class Soil:
             self.activeN = 0.0
 
             # Initial Stable N in layer:
-            self.stableN = 0.
+            self.stableN = 0.0
 
             self.NO3_perc = 0.0
             self.NH4_perc = 0.0
@@ -621,6 +600,16 @@ class Soil:
             # Variables to simulate phosphorus cycling
             self.OM_percent = layer_data['OM%']
             self.PSP = 0.0
+
+            # soluble P
+            self.soil_P = 0.0
+
+            self.iso_slope = 0.0  # the slope of the isotherm curve
+            self.iso_inter = 0.0  # the intercept of the isotherm curve
+
+            self.DRP_leachate = 0.0
+            self.DRP_leachate_act = 0.0
+            self.DRP_runoff = 0.0
 
             self.active_P = 0.0
             self.stable_P = 0.0
@@ -820,3 +809,16 @@ class Soil:
         self.NO3_drainage_annual = 0.0
         self.NH4_drainage_annual = 0.0
         self.activeN_drainage_annual = 0.0
+
+        self.manure_annual = 0.0
+        self.manure_P_annual = 0
+        self.manure_N_annual = 0
+
+        self.DRP_runoff_annual = 0.0
+        self.DRP_leachate_annual = 0.0
+
+        self.WIP_runoff_annual = 0.0
+        self.WOP_runoff_annual = 0.0
+
+        self.WIP_leachate_annual = 0.0
+        self.WOP_leachate_annual = 0.0

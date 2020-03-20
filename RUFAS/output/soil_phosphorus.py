@@ -44,9 +44,9 @@ class SoilPhosphorus(BaseReportHandler):
 
         self.daily_variables = {'year': ['time.cal_year', '', []],
                                 'j_day': ['time.day', '', []],
-                                'soil_runoff_DRP': ['soil.SRP_MGL', 'mgL', []],
-                                'manure_runoff_DRP': ['soil.runoff_IP', 'mgL', []],
-                                'fert_runoff_DRP': ['soil.runoff_IP', 'mgL', []],
+                                'soil_runoff_DRP_leachate': ['soil.DRP_runoff_MGL', 'mgL', []],
+                                'manure_runoff_DRP_leachate': ['soil.runoff_IP', 'mgL', []],
+                                'fert_runoff_DRP_leachate': ['soil.runoff_IP', 'mgL', []],
                                 'runoff_DIP': ['soil.T_runoff_IP', 'mgL', []],
                                 'manure_runoff_DOP': ['soil.runoff_OP', 'mgL', []],
                                 'manure_runoff_NH4': ['soil.runoff_NH4', 'mgL', []],
