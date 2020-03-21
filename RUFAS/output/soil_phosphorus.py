@@ -47,7 +47,7 @@ class SoilPhosphorus(BaseReportHandler):
                                 'soil_runoff_DRP_leachate': ['soil.DRP_runoff_MGL', 'mgL', []],
                                 'manure_runoff_DRP_leachate': ['soil.runoff_IP', 'mgL', []],
                                 'fert_runoff_DRP_leachate': ['soil.runoff_IP', 'mgL', []],
-                                'runoff_DIP': ['soil.T_runoff_IP', 'mgL', []],
+                                'runoff_DIP': ['soil.TIP_runoff', 'mgL', []],
                                 'manure_runoff_DOP': ['soil.runoff_OP', 'mgL', []],
                                 'manure_runoff_NH4': ['soil.runoff_NH4', 'mgL', []],
                                 'PSP': ['soil.soil_layers[0].PSP', '', []],

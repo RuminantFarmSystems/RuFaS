@@ -150,57 +150,44 @@ def update_all(S, weather, time):
         S.WIP = max(0.0, S.WIP - WIP_ASIM)
 
         # Decomposition and assimilation transfer between pools in some cases
+        # S.6.G.II.11
         S.WIP += WOP_d_com + SOP_d_com * 0.75 + SIP_d_com
         S.WOP += SOP_d_com * 0.25
 
-        S.DP_sum += SIP_ASIM + WOP_ASIM + SOP_ASIM + WIP_ASIM
+        # Total decomposed P
+        # S.6.G.III.12
+        S.DP = SIP_ASIM + WOP_ASIM + SOP_ASIM + WIP_ASIM
 
+        # Update manure mass and cover to reflect decomposition
+        # S.6.G.III.13
         S.manure_mass = max(0.0, S.manure_mass - d_com - man_ASIM)
-
         S.manure_cov = S.manure_cov - cov_d_com - cov_ASIM
 
-        # This should be commented out
+        DF = 0.6
+        DP_not_decomposed = S.DP
+        for layer in S.soil_layers:
+            layer.labile_P *= S.area
 
-        # S.manure_cov = S.cover_SLP * S.manure_mass * S.area
+            layer.labile_P += DF * S.DP
+            DP_not_decomposed -= DF * S.DP
 
-        # convert soil P form KG/HA to KG and add manure P decomposed
+            layer.labile_P /= S.area
 
-        S.soil_layers[0].active_P += SIP_ASIM * 0.6
+            DF = max(0.0, (DF / 2) - 0.02)
 
-        # TODO math
-        S.soil_layers[0].labile_P += 0.6 * (WIP_ASIM + WOP_ASIM + SOP_ASIM)
+        S.DRP_leach_annual += DP_not_decomposed
 
-        if S.soil_layers[1].bottom_depth_cm <= 15.0:
-
-            S.soil_layers[1].active_P += SIP_ASIM * 0.3
-            S.soil_layers[2].active_P += SIP_ASIM * 0.1
-
-            # TODO math
-            S.soil_layers[1].labile_P += 0.3 * (WIP_ASIM + WOP_ASIM + SOP_ASIM)
-            S.soil_layers[2].labile_P += 0.1 * (WIP_ASIM + WOP_ASIM + SOP_ASIM)
-
-        else:
-
-            S.soil_layers[1].active_P += SIP_ASIM * 0.4
-
-            # TODO math
-            S.soil_layers[1].labile_P += 0.4 * (WIP_ASIM + WOP_ASIM + SOP_ASIM)
-
-    # convert soil P from KG/HA to KG and add manure P decomposed
-
-    for w in range(0, 3):
-        S.soil_layers[w].active_P /= S.area
-        S.soil_layers[w].labile_P /= S.area
-
-    # calculate runoff P in MG/L from both soil and manure
-    # and manure P in runoff from spreading and grazing
-
+    # calculate manure runoff P in MG/L
+    # S.6.G.IV
+    S.M_DRP_runoff = 0.0
+    S.TIP_runoff = 0.0
     if runoff > 0.0:
-        S.soil_P[0] = S.soil_layers[0].labile_P / S.soil_layers[0].bulk_density / S.thickness_cm[0] / 0.1
-        S.DRP_runoff_MGL = S.soil_P[0] * 0.005
+        layer = S.soil_layer[0]
+        layer.soil_P = layer.labile_P / layer.bulk_density / layer.thickness_cm
 
-        S.T_runoff_IP = S.MIP_runoff + S.DRP_runoff_MGL + S.fert_runoff_P
+        S.M_DRP_runoff = layer.soil_P * 0.005
+        S.TIP_runoff = S.MIP_runoff + S.DRP_runoff_MGL + S.fert_runoff_P
 
-    else:
-        S.DRP_runoff_MGL = 0.0
-        S.T_runoff_IP = 0.0
+        S.M_DRP_runoff_annual += S.M_DRP_runoff
+        S.TIP_runoff_annual += S.TIP_runoff
+
