@@ -371,13 +371,13 @@ class Soil:
         self.WIP_leachate_annual = 0.0
         self.WOP_leachate_annual = 0.0
 
-        self.DP_sum = 0.0
+        self.DP = 0.0
         self.N_sum = 0.0
         self.DRP_runoff_MGL = 0.0
         self.runoff_IP = 0.0
         self.runoff_OP = 0.0
         self.runoff_NH4 = 0.0
-        self.T_runoff_IP = 0.0
+        self.TIP_runoff = 0.0
 
         self.calculate_soil_water()  # calculate soil water in layer
         self.calculateWiltingWater()  # calculate wilting water in layer
