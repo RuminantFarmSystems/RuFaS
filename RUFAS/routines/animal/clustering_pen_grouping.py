@@ -1,3 +1,15 @@
+################################################################################
+'''
+RUFAS: Ruminant Farm Systems Model
+File name: clustering_pen_grouping.py
+Description: This file's main function is grouping(list) (line 54) which returns
+    a 2D matrix (or list of lists) with each list in the matrix being a pen
+    grouping of cows based on nutritional requirments. This function is called in
+    animal_management.py for each ration cycle if there are more than 7 pens in
+    the input.
+Author(s): Chris VanKerkhove, cjv47@cornell.edu
+'''
+################################################################################
 import pandas as pd
 import numpy as np
 from scipy.stats import percentileofscore
@@ -7,20 +19,21 @@ import xlsxwriter
 import time as timer
 
 
-#Function that normalizes a list of values
 def norm(x):
-    '''Normalizes a list of values'''
+    '''Helper function that
+       normalizes a list of values and returns that normalized list
+    '''
     x = np.array(x)
     if max(x) != min(x):
         normalized = (x - min(x)) / (max(x) - min(x))
         return normalized
     else:
         return x
-#Function that inputs a list of values and returns the
-#percentiles for each value in that list
+
 def percentile_list(l):
-    '''Returns a list of percentiles corresponding
-    to the value in the original list'''
+    '''Helper function that returns a list of percentiles corresponding
+    to its matching value in the original list
+    '''
     percentile_list = []
     for e in l:
         x = percentileofscore(l, e)
@@ -28,18 +41,28 @@ def percentile_list(l):
     return(percentile_list)
 
 
+def grouping(list):
+    '''Grouping algorithim that utilizes k-means clustering and takes an input
+       that is a list of objects of class Cow (see cow.py) and groups them into
+       exactly 1 of 14 different pens. This function returns a list of 14 lists
+       of cow groupings (lists of objects of class Cow)
+    '''
+
+
 #############################################
 #Initial Data Manipulation
 #############################################
-
-def grouping(list):
-
+    #Cow ID number
     ID = []
+    #
     weekn = []
+    #Days In Milk
     DIM = []
+    #Lactation Number
     LACT = []
     RecDNED = []
     RecDMPD = []
+    #Avergae Milk Production
     AVGMILK_kg = []
 
     for cow in list:
@@ -87,7 +110,7 @@ def grouping(list):
     n = len(NGdata.columns)
     NGdata.insert(n, 'LACTcat', LACTcat)
     ##############################################
-    #Setting the number of nutritional groups and number of gcows per group
+    #Setting the number of nutritional groups and number of cows per group
     ##############################################
     #Ordering by weekn, LACTcat, and DIM
     NGdata = NGdata.sort_values(by = ['weekn', 'LACTcat','DIM'], ascending = [True, True, True])
@@ -124,7 +147,7 @@ def grouping(list):
     SPPenM=444 #Size Peak Pens Multiparous
 
     #Adding column DIMcat (Days in Milk Categorization)
-    ## 1=Fresh, 2=Early, 3=Pick, 4=Late##
+    ## 1=Fresh, 2=Early, 3=Peak, 4=Late##
     LACTcat = NGdata['LACTcat'].tolist()
     DIMcat = []
 
