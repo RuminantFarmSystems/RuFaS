@@ -11,7 +11,7 @@ Author(s): Jacob Johnson, jacob8399@gmail.com,
 # calculates # of plops added per day and amount of TP, WIP, and WOP added
 # in manure, adds P to surface manure pools, and updates cumulative manure
 # and TP added during model run
-# "pseudo_code_soil" S.6.C
+# "pseudocode_soil" S.6.C
 def update_all(S, time):
 
     day = time.day

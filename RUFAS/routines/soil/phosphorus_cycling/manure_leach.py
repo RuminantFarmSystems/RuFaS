@@ -34,6 +34,8 @@ def update_all(S, weather, time):
     S.MOP_leach = 0.0
     S.MIP_runoff = 0.0
     S.MOP_runoff = 0.0
+    MTF_1 = 1.2
+    MTF_2 = 73.1  # TODO: These are the values for a dairy application. Temporarily hard coded.
     if S.manure_mass > 0.0 and S.manure_cov > 0.0:
         water_manure = rainfall / S.manure_mass \
                        * S.manure_cov * 10000.0
@@ -166,11 +168,14 @@ def update_all(S, weather, time):
         DF = 0.6
         DP_not_decomposed = S.DP
         for layer in S.soil_layers:
+            # S.6.B.3
             layer.labile_P *= S.area
 
+            # S.6.G.IV.14
             layer.labile_P += DF * S.DP
             DP_not_decomposed -= DF * S.DP
 
+            # S.6.B.4
             layer.labile_P /= S.area
 
             DF = max(0.0, (DF / 2) - 0.02)
@@ -182,12 +187,13 @@ def update_all(S, weather, time):
     S.M_DRP_runoff = 0.0
     S.TIP_runoff = 0.0
     if runoff > 0.0:
+        # S.6.G.IV.1
         layer = S.soil_layer[0]
         layer.soil_P = layer.labile_P / layer.bulk_density / layer.thickness_cm
 
+        # S.6.G.IV.2/3
         S.M_DRP_runoff = layer.soil_P * 0.005
         S.TIP_runoff = S.MIP_runoff + S.DRP_runoff_MGL + S.fert_runoff_P
 
         S.M_DRP_runoff_annual += S.M_DRP_runoff
         S.TIP_runoff_annual += S.TIP_runoff
-
