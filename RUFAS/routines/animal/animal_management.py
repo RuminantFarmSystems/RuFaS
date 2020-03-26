@@ -530,14 +530,6 @@ class AnimalManagement:
                     self.all_pens[18].update_animals(cows_28)
 
 
-        #if len(lactating_cows) > 10:
-        #    print(len(lactating_cows))
-        #    lactating_cows[117789]
-    #def pen_grouping(self):
-    #    cows = self.all_pens[5]
-    #    for i in range(len(cows)):
-    #        cows[i].ID = i + 1
-
 
     def clear_pens(self):
         '''
