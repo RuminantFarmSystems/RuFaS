@@ -45,11 +45,11 @@ def update_all(soil):
 #
 def calc_daily_percolation(soil):
     for layer in soil.soil_layers:
-        SAT = layer.satWater
+        SAT = layer.sat_water
 
         SW = layer.soil_water
-        FC = layer.fcWater
-        WP = layer.wiltingWater
+        FC = layer.fc_water
+        WP = layer.wilting_water
 
         SWperc = 0.0
         if SW > FC:

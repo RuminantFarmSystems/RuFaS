@@ -202,7 +202,7 @@ def calc_N_up_each_layer(crop_type, soil):
 
     N_up_for_top_of_layer = 0
     for layer in soil.soil_layers:
-        N_up_for_bottom_of_layer = calc_N_up_z(crop_type, layer.bottomDepth)
+        N_up_for_bottom_of_layer = calc_N_up_z(crop_type, layer.bottom_depth)
 
         # C.5.C.3
         N_up_ly = N_up_for_bottom_of_layer - N_up_for_top_of_layer
