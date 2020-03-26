@@ -95,7 +95,7 @@ def update_all(S, weather, time):
 
             DF = max(0.0, (DF / 2) - 0.02)
 
-        S.DRP_leach_annual += M_not_leached
+        S.DRP_leachate_annual += M_not_leached
 
         S.WIP_runoff_annual += S.MIP_runoff
         S.WOP_runoff_annual += S.MOP_runoff
@@ -180,7 +180,7 @@ def update_all(S, weather, time):
 
             DF = max(0.0, (DF / 2) - 0.02)
 
-        S.DRP_leach_annual += DP_not_decomposed
+        S.DRP_leachate_annual += DP_not_decomposed
 
     # calculate manure runoff P in MG/L
     # S.6.G.IV
@@ -188,7 +188,7 @@ def update_all(S, weather, time):
     S.TIP_runoff = 0.0
     if runoff > 0.0:
         # S.6.G.IV.1
-        layer = S.soil_layer[0]
+        layer = S.soil_layers[0]
         layer.soil_P = layer.labile_P / layer.bulk_density / layer.thickness_cm
 
         # S.6.G.IV.2/3
