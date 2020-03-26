@@ -274,8 +274,10 @@ class Soil:
         for layer in self.soil_layers:
 
             # S.6.A.1
-            layer.PSP = -0.045 * log(layer.clay) + 0.001 * \
-                        layer.labile_P - 0.035 * layer.org_C + 0.43
+            layer.PSP_max = -0.045 * log(layer.clay) + 0.001 * \
+                            layer.labile_P - 0.035 * layer.org_C + 0.43
+            layer.PSP_act = max(0.05, min(0.7, layer.PSP_max))
+            layer.PSP_avg = layer.PSP_act
 
             # S.6.A.2
             layer.labile_P = layer.labile_P * layer.bulk_density \
@@ -312,14 +314,11 @@ class Soil:
         self.manure_type = 0
         self.manure_annual = 0
         self.manure_P_annual = 0
-        self.manure_N_annual = 0
 
         self.WIP = 0.0
         self.WOP = 0.0
         self.SIP = 0.0
         self.SOP = 0.0
-        self.NH4 = 0.0
-        self.SON = 0.0
 
         self.manure_mass_app = 0.0
 
@@ -337,47 +336,27 @@ class Soil:
         self.fert_leachate_annual = 0.0
         self.fert_run = 0.0
 
-        # p_mineralization
-        self.count_it = [0, 0, 0]
-        self.counts = [0, 0, 0]
-        self.soil_yp = []  # soilyp
-        for x in range(0, 3):
-            self.soil_yp.append([0 for _ in range(0, 366)])
-        self.PSP_avg = []
-        for layer in self.soil_layers:
-            self.PSP_avg.append(layer.PSP)
-        self.pbal = [0, 0, 0]
-        self.old_pbal = [0, 0, 0]
-        self.lab_P_sum = [0, 0, 0]
-        self.lab_P_avg = [0, 0, 0]
-        self.varA = [0, 0, 0]
-        self.varB = [0, 0, 0]
-        self.base = [0, 0, 0]
-        self.pflow = [0, 0, 0]
-        self.pd_srb_fac = [0, 0, 0]
-        self.pflow_r = [0, 0, 0]
-        self.PSP_fac = [0, 0, 0]
-        self.pflow2 = [0, 0, 0]
-        self.temp_lab = [0, 0, 0]
-
         # manure_leach
+        self.MIP_leach = 0.0
+        self.MOP_leach = 0.0
+        self.MIP_runoff = 0.0
+        self.MOP_runoff = 0.0
         self.MIP_leach_annual = 0.0
-        self.TOP_leach_annual = 0.0
-        self.ND_factor = 0.0
+        self.MOP_leach_annual = 0.0
+        self.M_leach = 0.0
+        self.DP = 0.0
+        self.N_sum = 0.0
+        self.M_DRP_runoff = 0.0
+        self.TIP_runoff = 0.0
+
+        self.TIP_runoff_annual = 0.0
+        self.M_DRP_runoff_annual = 0.0
 
         self.WIP_runoff_annual = 0.0
         self.WOP_runoff_annual = 0.0
 
         self.WIP_leachate_annual = 0.0
         self.WOP_leachate_annual = 0.0
-
-        self.DP = 0.0
-        self.N_sum = 0.0
-        self.DRP_runoff_MGL = 0.0
-        self.runoff_IP = 0.0
-        self.runoff_OP = 0.0
-        self.runoff_NH4 = 0.0
-        self.TIP_runoff = 0.0
 
         self.calculate_soil_water()  # calculate soil water in layer
         self.calculateWiltingWater()  # calculate wilting water in layer
@@ -527,7 +506,7 @@ class Soil:
             self.name = layer_name
 
             self.bottom_depth = layer_data['BottomDepth']
-            self.bottom_depth_cm = layer_data['BottomDepth'] / 10
+            self.bottom_depth_cm = self.bottom_depth / 10
             self.wilting_point = layer_data['WiltingPoint']
             self.field_capacity = layer_data['FieldCapacity']
             self.saturation = layer_data['Saturation']
@@ -558,7 +537,6 @@ class Soil:
             self.TT = 0.0
             self.perc = 0.0  # amount of water that percolates to next layer
 
-            self.labile_P = layer_data['LabileP']  # labile P in soil layer
             self.clay = layer_data['Clay']  # soil clay % in soil layer
 
             # Variable to simulate nitrogen Cycling
@@ -599,9 +577,8 @@ class Soil:
 
             # Variables to simulate phosphorus cycling
             self.OM_percent = layer_data['OM%']
-            self.PSP = 0.0
 
-            # soluble P
+            # P in the soil layer
             self.soil_P = 0.0
 
             self.iso_slope = 0.0  # the slope of the isotherm curve
@@ -611,10 +588,21 @@ class Soil:
             self.DRP_leachate_act = 0.0
             self.DRP_runoff = 0.0
 
+            self.labile_P = layer_data['LabileP']  # labile P in soil layer
             self.active_P = 0.0
             self.stable_P = 0.0
             self.org_P = 0.0
             self.P_uptake = 0.00
+
+            self.labile_P_uptake = 0.0
+            self.PSP_max = 0.0
+            self.PSP_act = 0.0
+            self.PSP_avg = 0.0
+
+            self.pbal = 0.0
+            self.days_unbalanced_labile = 0.0
+            self.days_unbalanced_active = 0.0
+
 
     # ---------------------------------------------------------------------------
     # Class: Fertilizer
@@ -812,7 +800,6 @@ class Soil:
 
         self.manure_annual = 0.0
         self.manure_P_annual = 0
-        self.manure_N_annual = 0
 
         self.DRP_runoff_annual = 0.0
         self.DRP_leachate_annual = 0.0
@@ -822,3 +809,10 @@ class Soil:
 
         self.WIP_leachate_annual = 0.0
         self.WOP_leachate_annual = 0.0
+
+        self.MIP_leach_annual = 0.0
+        self.MOP_leach_annual = 0.0
+
+        self.TIP_runoff_annual = 0.0
+        self.M_DRP_runoff_annual = 0.0
+

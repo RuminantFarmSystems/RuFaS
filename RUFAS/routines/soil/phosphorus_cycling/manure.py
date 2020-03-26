@@ -28,10 +28,8 @@ def update_all(S, time):
             # S.6.C.I.1-6
             cover_app = m_app.percent_cover[i] * S.area
             P_app = mass[i] * m_app.P_frac[i]
-            N_app = mass[i] * m_app.N_frac[i]
             S.manure_annual += mass[i]
             S.manure_P_annual += P_app
-            S.manure_N_annual += N_app
 
             S.manure_moisture = (S.manure_moisture * S.manure_mass + (1.0 - m_app.dry_matter[i]) * mass[i]) \
                          / (S.manure_mass + mass[i])
@@ -95,7 +93,8 @@ def update_all(S, time):
 
             D_fac = 1 - D_fac_sum
             S.soil_layers[last_layer].active_P += P_app * W_fac * 0.25 * I_fac * D_fac_1 * D_fac
-            S.soil_layers[last_layer].labile_P += C_WIP + C_WOP + (P_app * W_fac * 0.75 * 0.95 * I_fac * D_fac_2) * D_fac
+            S.soil_layers[last_layer].labile_P += C_WIP + C_WOP + \
+                                                  (P_app * W_fac * 0.75 * 0.95 * I_fac * D_fac_2) * D_fac
 
             # S.6.B.4
             for layer in S.soil_layers:

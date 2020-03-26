@@ -17,7 +17,7 @@ def update_all(S, weather, time):
 
     day = time.day
     year = time.year
-    rainfall = weather.rainfall
+    rainfall = weather.rainfall[year - 1][day - 1]
     runoff = S.runoff
 
     # Sorption
@@ -40,7 +40,7 @@ def update_all(S, weather, time):
     # S.6.F.II
 
     # S.6.F.II.1
-    if rainfall[year - 1][day - 1] > 0.0:
+    if rainfall > 0.0:
         S.no_rains += 1
 
         release_factor = 0
@@ -60,10 +60,10 @@ def update_all(S, weather, time):
     S.fert_run = 0.0
     if runoff > 0.0:
         # S.6.F.II.2
-        S.PD_factor = 0.034 * exp((runoff / rainfall[year - 1][day - 1]) * 3.4)
+        S.PD_factor = 0.034 * exp((runoff / rainfall) * 3.4)
 
         # S.6.F.II.3
-        S.fert_runoff_P = S.fert_leach / (rainfall[year - 1][day - 1] / 10.0) \
+        S.fert_runoff_P = S.fert_leach / (rainfall / 10.0) \
                           / S.area * 10.0 * S.PD_factor
 
         # calculate fertilizer runoff P in KG

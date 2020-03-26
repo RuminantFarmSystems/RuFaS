@@ -28,7 +28,7 @@ def update_all(soil, weather, time):
 
     tillage.update_all(soil, time)
 
-    soluble_P.update_all(soil, weather, time)
+    soluble_P.update_all(soil)
 
     fert_leach.update_all(soil, weather, time)
 
