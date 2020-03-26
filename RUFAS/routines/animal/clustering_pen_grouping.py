@@ -3,10 +3,9 @@
 RUFAS: Ruminant Farm Systems Model
 File name: clustering_pen_grouping.py
 Description: This file's main function is grouping(list) (line 54) which returns
-    a 2D matrix (or list of lists) with each list in the matrix being a pen
-    grouping of cows based on nutritional requirments. This function is called in
-    animal_management.py for each ration cycle if there are more than 7 pens in
-    the input.
+    a 2D list with each list in the matrix being a pen grouping of cows based on
+    nutritional requirments. This function is called in animal_management.py for
+    each ration cycle if there are more than 7 pens in the input.
 Author(s): Chris VanKerkhove, cjv47@cornell.edu
 '''
 ################################################################################
@@ -52,18 +51,15 @@ def grouping(list):
 #############################################
 #Initial Data Manipulation
 #############################################
-    #Cow ID number
-    ID = []
-    #
-    weekn = []
-    #Days In Milk
-    DIM = []
-    #Lactation Number
-    LACT = []
-    RecDNED = []
-    RecDMPD = []
-    #Avergae Milk Production
-    AVGMILK_kg = []
+    #Each of the Following lists contain the following attributes corresponding
+    #to the list of cows input in the grouping function
+    ID = []  #Cow ID number
+    weekn = []  #week number of the cow
+    DIM = []  #Days In Milk
+    LACT = [] #Lactation Number
+    RecDNED = []  #Required net energy density (Units= Mcal per kg of dry matter (DM) (Mcal/kg of DM))
+    RecDMPD = []  #Required Metabolizing Protein Density (Units= g of crude protein per kg of DM (g/kg of DM))
+    AVGMILK_kg = [] #Daily Milk Produced in kg
 
     for cow in list:
         ID.append(cow.ID)
@@ -84,6 +80,7 @@ def grouping(list):
     Cowrd['RecDMPD'] = RecDMPD
     Cowrd['AVGMILK_kg'] = AVGMILK_kg
 
+    #list of pen groups by ration requirments
     mygroups = [2, 3, 4, 6, 7, 8, 9, 22, 23, 24, 25, 26, 27, 28]
 
     #Aggregate the data for nutritional requirements per cow per week (using mean metric)
@@ -115,7 +112,7 @@ def grouping(list):
     #Ordering by weekn, LACTcat, and DIM
     NGdata = NGdata.sort_values(by = ['weekn', 'LACTcat','DIM'], ascending = [True, True, True])
 
-    ###Creating Rank Array###
+    ###Creating Rank Array (ranking of cows by Days in Milk)###
     LACTcat = NGdata['LACTcat'].tolist()
     NGdata_1 = NGdata.reset_index()
     weeknlist = NGdata_1['weekn'].tolist()
@@ -146,7 +143,7 @@ def grouping(list):
     SPPenP=444 #Size Peak Pens Pimiparous
     SPPenM=444 #Size Peak Pens Multiparous
 
-    #Adding column DIMcat (Days in Milk Categorization)
+    #Adding column DIMcat (Days in Milk Categorization number)
     ## 1=Fresh, 2=Early, 3=Peak, 4=Late##
     LACTcat = NGdata['LACTcat'].tolist()
     DIMcat = []
@@ -180,9 +177,9 @@ def grouping(list):
             index.append(i + 1)
     index.append(len(DIMcat))
 
-    ScDNED = []
-    ScDMPD = []
-    ScMilk = []
+    ScDNED = [] #normalized list of the RecDNED list
+    ScDMPD = [] #normalized list of the RecDNED list
+    ScMilk = [] #normalized list of the AVGMILK_kg
     RecDNED = RNKdat['RecDNED'].to_list()
     RecDMPD = RNKdat['RecDMPD'].to_list()
     AVGMILK_kg = RNKdat['AVGMILK_kg'].to_list()
@@ -213,7 +210,7 @@ def grouping(list):
 
         #Grouping By percentile
         ## 1=Firstlact, 2=Mature##
-        ## 1=TransitionFresh, 2=Fresh, 3=Picklact, 4=Late lactation##
+        ## 1=TransitionFresh, 2=Fresh, 3=Peack lact, 4=Late lactation##
         index2 = [0]
         for i in range(len(weeknlist) -1):
             if weeknlist[i] != weeknlist[i+1]:
@@ -265,14 +262,14 @@ def grouping(list):
 
         ######Pen Summary#######
         PenDat = NGdata[['DIMcat', 'LACTcat', 'NGgroup']]
-        LACTcategory = []
+        LACTcategory = []  #Lactiation categorization by english description
         LACTcat = PenDat['LACTcat'].to_list()
         for x in LACTcat:
             if (x == 1):
                 LACTcategory.append('Primiparous')
             else:
                 LACTcategory.append('Multiparous')
-        DIMcategory = []
+        DIMcategory = []  #Days in Milk categorization by english description
         DIMcat = PenDat['DIMcat'].to_list()
         for x in DIMcat:
             if (x == 1):
@@ -302,6 +299,6 @@ def grouping(list):
         ID = Grouping_Data['ID'].to_list()
         NGgroup = Grouping_Data['NGgroup'].to_list()
         Grouping_Data = [ID, NGgroup]
-        return(Grouping_Data)
+        return(Grouping_Data) #returning a 2D list with Cow ID and Pen Group
 
 ################################################################################
