@@ -7,132 +7,86 @@ Author(s): Jacob Johnson, jacob8399@gmail.com,
 """
 ################################################################################
 
-# computes P flux between labile and active pools
-
 from math import log, exp
 
 
+# computes P flux between labile and active pools
+# "pseudocode_soil" S.6.H
 def update_all(S, time):
 
-    day = time.day
+    # S.6.H.1
+    uptake_fact = 0.1
+    S.soil_layers[-1].labile_P_uptake = min(S.soil_layers[-1].labile_P, S.soil_layers[-1].P_uptake * uptake_fact)
+    S.soil_layers[-1].labile_P -= S.soil_layers[-1].labile_P_uptake
+    for x in range(len(S.soil_layers) - 2, 0, -1):
+        layer = S.soil_layers[x]
+        prev_layer = S.soil_layers[x + 1]
 
-    for i in range(0, 3):
-        if i == 0:
-            S.soil_layers[i].labile_P = S.soil_layers[i].labile_P \
-                                                   - S.soil_layers[i].P_uptake \
-                                                   * S.soil_layers[0].labile_P \
-                                                   / (S.soil_layers[0].labile_P
-                                                      + S.soil_layers[1].labile_P * 0.9)
-        elif i == 1:
-            S.soil_layers[i].labile_P = S.soil_layers[i].labile_P \
-                                                   - S.soil_layers[i].P_uptake \
-                                                   * S.soil_layers[1].labile_P \
-                                                   / (S.soil_layers[0].labile_P
-                                                      + S.soil_layers[1].labile_P * 0.9)
-        elif i == 2:
-            S.soil_layers[i].labile_P = S.soil_layers[i].labile_P \
-                                                   - S.soil_layers[i].P_uptake * 0.10
+        uptake_fact = layer.labile_P / layer.labile_P + prev_layer.labile_P * 0.9
 
-        S.soil_layers[i].labile_P = max(0.0, S.soil_layers[i].labile_P)
+        layer.labile_P_uptake = min(layer.labile_P, layer.P_uptake * uptake_fact)
+        layer.labile_P -= layer.labile_P_uptake
 
-        # This code only executes once at the beginning of each year of the simulation
-        # count_it and counts are one dimensional arrays of size 3 (standard for
-        # representation of soil layers which goes along with the i indexing)
-        # each then represents a year counter, count_it beginning at 0 and
-        # counts beginning at 1. Both being limited to a 10 year maximum. Counts
-        # resets upon reaching that maximum, count_it does not.
-        if day == 1:
-            if S.count_it[i] < 10:
-                S.count_it[i] += 1
-            S.counts[i] += 1
-            if S.counts[i] == 11:
-                S.counts[i] = 1
+        # S.6.H.3
+        layer.labile_P_sum += layer.labile_P
+        layer.labile_P_avg = layer.labile_P_sum / (time.year * time.day)
 
-            # convert soil P from KG/HA to MG/KG
+        # S.6.H.4
+        layer.soil_P = layer.labile_P / layer.bulk_density / layer.thickness_cm / 0.1
 
-            S.soil_yp[i][S.counts[i]] = S.soil_layers[i].labile_P \
-                                        / S.soil_layers[i].bulk_density \
-                                        / S.thickness_cm[i] / 0.1
-            S.lab_P_sum[i] = 0.0
+        # S.6.H.2
+        layer.PSP_max = -0.045 * log(layer.clay) + 0.001 * layer.labile_P_avg - 0.035 * layer.org_C + 0.43
 
-            for j in range(0, S.count_it[i]):
-                S.lab_P_sum[i] += S.soil_yp[i][j]
+        # S.6.H.5
+        layer.PSP_act = max(0.05, min(0.7, layer.PSP_max))
+        layer.PSP_act = ((layer.PSP_avg * 29.0) + layer.PSP_act) / 30.0
+        layer.PSP_avg = layer.PSP_act
 
-            S.lab_P_avg[i] = max(0.01, S.lab_P_sum[i] / S.count_it[i])
+        # S.6.H.6
+        layer.pbal = layer.labile_P - layer.active_P * (layer.PSP_act / (1.0 - layer.PSP_act))
 
-        S.soil_P[i] = S.soil_layers[i].labile_P / S.soil_layers[i].bulk_density \
-                      / S.thickness_cm[i] / 0.1
-        S.soil_layers[i].PSP = -0.045 * log(S.soil_layers[i].clay) \
-                         + 0.001 * S.soil_layers[i].labile_P \
-                         - 0.035 * S.soil_layers[i].org_C + 0.43
+        # S.6.H.7
+        varA = 0.918 * exp(-4.603 * layer.PSP_act)
+        varB = -0.238 * log(varA) - 1.126
+        base = -layer.PSP_act + 0.8
 
-        S.soil_layers[i].PSP = max(0.05, min(0.7, S.soil_layers[i].PSP))
+        # S.6.H.8
+        if layer.pbal < 0.0:
+            layer.days_unbalanced_labile += 1.0
+            PD_fac = base * (layer.days_unbalanced_labile ** -0.32)
 
-        S.soil_layers[i].PSP = (S.PSP_avg[i] * 29.0 + S.soil_layers[i].PSP) / 30.0
+            # S.6.H.9
+            labile_pflow = min(layer.active_P, (-1) * PD_fac * layer.pbal)
 
-        S.PSP_avg[i] = S.soil_layers[i].PSP
+            layer.active_P -= labile_pflow
+            layer.labile_P += labile_pflow
 
-        S.pbal[i] = S.soil_layers[i].labile_P - S.soil_layers[i].active_P \
-                  * (S.soil_layers[i].PSP / (1.0 - S.soil_layers[i].PSP))
+        # S.6.H.10
+        elif layer.pbal >= 0.0:
+            layer.days_unbalanced_active += 1.0
+            PS_fac = varA * (layer.days_unbalanced_active ** varB)
 
-        S.varA[i] = 0.918 * (exp(-4.603 * S.soil_layers[i].PSP))
-        S.varB[i] = -0.238 * log(S.varA[i]) - 1.126
+            # S.6.H.11
+            active_pflow = min(layer.labile_P, PS_fac * layer.pbal)
 
-        S.base[i] = -1.0 * S.soil_layers[i].PSP + 0.8
+            layer.labile_P -= active_pflow
+            layer.active_P += active_pflow
 
-        if S.pbal[i] < 0.0:  # TODO: This whole section could be simplified
-            S.pflow[i] = 0.0
-            S.days[i] = 0.0
+        else:
+            layer.days_unbalanced_labile = 0.0
+            layer.days_unbalanced_active = 0.0
 
-            if S.count_day[i] > 0.0:
-                S.count_day[i] += 1.0
-            if S.count_day[i] == 0.0:
-                S.count_day[i] = 1.0
+        # S.6.H.12
+        stable_pflow = min(layer.stable_P, 0.0006 * (layer.stable_P - (4.0 * layer.active_P)))
 
-            S.pd_srb_fac[i] = S.base[i] * (S.count_day[i] ** -0.32)
-            S.pflow_r[i] = S.pd_srb_fac[i] * S.pbal[i] * -1.0
+        layer.stable_P -= stable_pflow
+        layer.active_P += stable_pflow
 
-            if S.pflow_r[i] > S.soil_layers[i].active_P:
-                S.pflow_r = S.soil_layers[i].active_P
+        # S.6.H.13
+        if (layer.labile_P / layer.bulk_density / layer.thickness_cm / 0.1) < 5.0:
+            min_P = min(layer.org_P, (5.0 * layer.bulk_density * layer.thickness_cm * 0.1) - layer.labile_P)
 
-            S.soil_layers[i].active_P -= S.pflow_r[i]
-            S.soil_layers[i].active_P = max(0.0, S.soil_layers[i].active_P)
+            layer.org_P -= min_P
+            layer.labile_P += min_P
 
-            S.soil_layers[i].labile_P += S.pflow_r[i]
-            S.soil_layers[i].labile_P = max(0.0, S.soil_layers[i].labile_P)
-
-        elif S.pbal[i] >= 0.0:
-            S.pflow_r[i] = 0.0
-            S.count_day[i] = 0.0
-
-            if S.pbal[i] > S.old_pbal[i]:
-                S.days[i] = 0.0
-            if S.days[i] >= 1.0:
-                S.days[i] += 1.0
-            if S.days[i] == 0.0:
-                S.days[i] = 1.0
-
-            S.PSP_fac[i] = S.varA[i] * (S.days[i] ** S.varB[i])
-            S.pflow[i] = S.PSP_fac[i] * S.pbal[i]
-
-            S.pflow[i] = min(S.pflow[i], S.soil_layers[i].labile_P)
-
-            S.soil_layers[i].labile_P -= S.pflow[i]
-            S.soil_layers[i].labile_P = max(0.0, S.soil_layers[i].labile_P)
-
-            S.soil_layers[i].active_P += S.pflow[i]
-            S.soil_layers[i].active_P = max(0.0, S.soil_layers[i].active_P)
-
-            S.old_pbal[i] = S.pbal[i]
-
-        S.pflow2[i] = 0.0006 * (S.soil_layers[i].stable_P - (4.0 * S.soil_layers[i].active_P))
-        S.soil_layers[i].stable_P -= S.pflow2[i]
-        S.soil_layers[i].active_P += S.pflow2[i]
-
-        S.temp_lab[i] = S.soil_layers[i].labile_P / S.soil_layers[i].bulk_density \
-                      / S.thickness_cm[i] / 0.1
-        if S.temp_lab[i] < 5.0:
-            min_P = min(((5.0 * S.soil_layers[i].bulk_density * S.thickness_cm[i] * 0.1)
-                         - S.soil_layers[i].labile_P), S.soil_layers[i].org_P)
-            S.soil_layers[i].labile_P += min_P
-            S.soil_layers[i].org_P -= min_P
+        S.soil_layers[x] = layer
