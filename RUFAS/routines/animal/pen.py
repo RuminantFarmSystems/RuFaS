@@ -22,6 +22,11 @@ from RUFAS.routines.feed.feed import Feeds, Nutrients
 
 
 class Pen:
+    """
+    Manages a pen's operation. Stores the characteristics of the pen and the
+    animals that are housed in it any point in the simulation. This class also
+    keeps track of some key characteristics of the average animal in the pen.
+    """
     # unique pen ID, from input file
     id = -1
 
@@ -146,6 +151,8 @@ class Pen:
             feed: an instance of the Feed class
         """
         for animal in self.animals_in_pen:
+            # currently, only lactating cows have ration calculations, so there
+            # are different arguments
             if type(animal).__name__ == 'Cow':
                 animal.calc_nutrient_rqmts(housing, pasture_concentrate,
                                            feed.nutrient_rqmts)
@@ -276,11 +283,9 @@ class Pen:
     def calc_manure(self, feed):
         """
         Calculates the total manure excretion of the animals in the pen.
+
         Args:
             feed: instance of the Feed class
-
-        Returns:
-
         """
         for animal in self.animals_in_pen:
             animal.calc_manure_excretion(feed)
@@ -308,7 +313,7 @@ class Pen:
 
     def calc_daily_walking_dist(self):
         """
-        Sets the daily walking distance for the cows in the pen
+        Sets the daily walking distance for the cows in the pen (if any).
         """
         if 'Cow' in self.classes_in_pen:
             for animal in self.animals_in_pen:
@@ -326,7 +331,7 @@ class Pen:
         # since each animal in the pen receives the same ration
         if len(self.animals_in_pen) > 0:
             DMI = calc_DMI(self.animals_in_pen[0].ration_formulation, feed)
-        if len(self.animals_in_pen) > 0:
+
             total_p_retained = 0
             for animal in self.animals_in_pen:
                 # TODO phosphorus_retained() returns p_retained, a value
@@ -357,8 +362,8 @@ class Pen:
         """
         num_animals = len(self.animals_in_pen)
         if num_animals == 0:
-            # for the case that there are no animals in this pen. Avoids a
-            # division by 0 error in below calculations
+            # for the case that there are no animals currently in this pen.
+            # Avoids a division by 0 error in below calculations
             # TODO is there a better way?
             num_animals = 1
 
@@ -390,20 +395,12 @@ class Pen:
         """
         Clears the pen attributes for re-allocation.
         """
+        # All other attributes are kept the same so that if a pen becomes empty
+        # and animals are to be added to it, there are previous initial values
+        # that are non-zero.
         self.animals_in_pen = []
         self.classes_in_pen = set()
-        '''
-        self.stocking_density = 0
-        self.avg_nutrient_rqmts = {}
-        self.avg_BW = 0
-        self.avg_DMIest = 0
-        self.avg_DBW = 0
-        self.avg_milk = 0
-        self.avg_CP_milk = 0
-        self.ration = {}
-        self.manure = {}
-        self.avg_growth = 0
-        '''
+
 
 # methods used for additional ration calculations
 def phosphorus_in_ration(ration, feed):

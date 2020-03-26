@@ -109,6 +109,13 @@ class LifeCycleManager:
             replace_num: replacements in the market
             sim_days: simulation length of this herd, to make sure they reach to
                 the heiferIII stage
+
+        Returns:
+            res_calves: list of calves for the simulation
+            res_heiferIs: list of heiferIs for the simulation
+            res_heiferIIs: list of heiferIIs for the simulation
+            res_heiferIIIs: list of heiferIIIs for the simulation
+            res_cows: list of cows for the simulation
         """
         self.herd_num = herd_num
         
@@ -224,6 +231,17 @@ class LifeCycleManager:
             calves: list of Calf objects to be updated
             date: day number
             sim_length: length of the simulation, days
+
+        Returns:
+            animals_added: list of animals added from replacement herd
+            ids_removed: list of animal ids that were removed during this day
+            calves_born: list of calves that were born during this day
+            calves: updated list of calves
+            heiferIs: updated list of heiferIs
+            heiferIIs: updated list of heiferIIs
+            heiferIIIs: updated list of heiferIIIs
+            cows: updated list of cows
+
         """
         ids_removed = []
         animals_added = []
