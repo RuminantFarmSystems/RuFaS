@@ -18,24 +18,29 @@ from RUFAS.routines.animal.life_cycle.animal_base import AnimalBase
 from collections import deque
 
 
-def daily_animal_routine(animal_management, feed, weather, time):
+def daily_animal_routine(animal_management, feed, weather):
     """
-    Executes daily routines relating to Animals.
+    Executes daily routines relating to Animals. This method is called every day
+    in the simulation and calls @animal_management's daily_updates() method
+    with @feed and @time as arguments. [Note that currently, @weather is not
+    used in animal updates.]
 
     Args:
         animal_management: instance of the AnimalManagement class
         feed: instance of the Feed class
         weather: instance of the Weather class
-        time: instance of the Time class
     """
-    animal_management.daily_updates(feed, weather, time)
+    animal_management.daily_updates(feed, weather)
 
 
 class AnimalManagement:
     """
-    Manages all animal routines.
+    Manages all animal routines (i.e. calling daily updates, allocating animals
+    to pens, etc). Stores a list of all animals and pens in the simulation as
+    well as an instance of the LifeCycleManager class in order to update the
+    animals' life cycles.
     """
-    # list of all the animals in the simulations
+    # list of all the animals in the simulation
     calves = []
     heiferIs = []
     heiferIIs = []
@@ -79,7 +84,8 @@ class AnimalManagement:
     def __init__(self, data, config, feed):
         """
         Initializes the pens and animals in the simulation with data from the
-        JSON file.
+        JSON file by calling init_pens() and init_animals(). Creates instance
+        of LifeCycleManager class and sets up the animal environment.
 
         Args:
             data: dictionary with animal information from the input JSON file
@@ -100,7 +106,7 @@ class AnimalManagement:
     def init_pens(self, data):
         """
         Populates the list of pens with the information from the input
-        JSON file.
+        JSON file, @data.
 
         Args:
             data: dictionary with pen information from the input JSON file
@@ -124,7 +130,11 @@ class AnimalManagement:
     def init_animals(self, data, feed):
         """
         Populates the list of animals with the information from the
-        input JSON file.
+        input JSON file: constructs the calves, heiferI’s, heiferII’s,
+        heiferIII’s, and cows (the desired amounts of each is specified by
+        @data), then calls life_cycle_manager's initialize_herd() with those
+        numbers to create instances of the animals. The nutrient requirements
+        are calculated and the animals are allocated to pens.
 
         Args:
             data: dictionary with the herd information from the input json file
@@ -176,7 +186,9 @@ class AnimalManagement:
     def init_nutrient_rqmts(self, feed):
         """
         Calculates initial nutrient requirements at the beginning of the
-        simulation for initial pen allocation.
+        simulation for initial pen allocation. For the nutrient requirements
+        of cows, the average walking distance of all the pens initialized
+        is used.
 
         Args:
             feed: instance of the Feed class
@@ -205,7 +217,8 @@ class AnimalManagement:
 
     def avg_pen_dist(self):
         """
-        Calculates the average distance from a  pen to the milking parlor.
+        Calculates the average distance from a pen to the milking parlor.
+
         Returns: a tuple of (average vertical distance from milking parlor,
             average horizontal distance from milking parlor)
         """
@@ -243,8 +256,18 @@ class AnimalManagement:
 
     def daily_update_id_pen(self, animals_added, ids_removed, calves_born):
         """
+        For animals removed from the herd in daily animal updates, the ids of
+        the pens from which they were removed are stored in the
+        pens_needing_animals queue.
+        Animals added to the herd from the replacement herd are temporarily
+        assigned to a pen that had animals removed from it.
+        Calves that were born are assigned (currently) to the hard coded pen
+        for calves.
+        All new animals are set up with the characteristics of the pen to which
+        they were assigned.
 
         Args:
+            calves_born: list of Calf objects that have been added to the herd
             animals_added: list of animal IDs that have been added to the herd
             ids_removed: list of animal IDs that have been removed from the herd
         """
@@ -291,7 +314,8 @@ class AnimalManagement:
 
     def clear_pens(self):
         """
-        Removes animals from pens for re-allocation.
+        Removes animals from pens for re-allocation. This is part of the
+        routines that happen every ration interval.
         """
         for pen in self.all_pens:
             pen.clear()
@@ -299,7 +323,8 @@ class AnimalManagement:
     def calc_avg_nutrient_rqmts(self):
         """
         Calls each pens's method to calculate the average nutrient requirements
-        of the animals inside it.
+        of the animals inside it. This is part of the routines that happen every
+        ration interval.
         """
         for pen in self.all_pens:
             if pen.pen_populated:
@@ -307,7 +332,8 @@ class AnimalManagement:
 
     def calc_ration(self, feed):
         """
-        Calls each pens's method to calculate the ration for that pen.
+        Calls each pens's method to calculate the ration for that pen. This is
+        part of the routines that happen every ration interval.
 
         Args:
             feed: instance of the Feed class
@@ -319,7 +345,8 @@ class AnimalManagement:
     def calc_manure_excretion(self, feed):
         """
         Calls each animal's method to calculate manure excretion to find the
-        total for each pen.
+        total for each pen. This is part of the routines that happen every
+        ration interval.
 
         Args:
             feed: instance of the feed class
@@ -331,7 +358,8 @@ class AnimalManagement:
     def calc_avg_growth(self):
         """
         Calls each pen's method to calculate the average growth of animals in
-        the pen.
+        the pen. This is part of the routines that happen every
+        ration interval.
         """
         for pen in self.all_pens:
             if pen.pen_populated:
@@ -340,6 +368,7 @@ class AnimalManagement:
     def calc_p_retained(self, feed):
         """
         Calls each pen's method to calculate each animal's retained phosphorus.
+        This method is called daily.
 
         Args:
             feed: instance of the Feed class
@@ -351,20 +380,24 @@ class AnimalManagement:
     def daily_p_update(self):
         """
         Calls each pen's method to calculate each animal's daily phosphorus
-        update.
+        update. This method is called daily.
         """
         for pen in self.all_pens:
             if pen.pen_populated:
                 pen.daily_p_update()
 
-    def daily_updates(self, feed, weather, time):
+    def daily_updates(self, feed, weather):
         """
-        Executes the daily routines relating to Animals.
+        Executes the daily routines relating to Animals. All animals are
+        updated through the life_cycle_manager's daily_update() method. The
+        daily phosphorus calculations are also done. If it is the end of the
+        ration interval, the animals are allocated to new pens and the ration &
+        manure calculations are done.
+        [Note that currently, @weather is not used in animal updates.]
 
         Args:
             feed: instance of the Feed class
             weather: instance of the Weather class
-            time: instance of the Time class
         """
         if self.simulate_animals:
             ids_added, ids_removed, calves_born, self.calves, self.heiferIs, \
