@@ -266,6 +266,13 @@ class Soil:
         self.start_year = config.start_year
 
         self.cover = data['SoilCoverType']
+        if self.cover == "GRASSED":
+            self.cover_factor = 0.8
+        elif self.cover == "RESIDUE COVER":
+            self.cover_factor = 0.667
+        else:
+            self.cover_factor = 0.5333
+
         self.leach = 0.0
         self.area = data['FieldSize']
 
@@ -284,7 +291,7 @@ class Soil:
                              * layer.thickness_cm * 0.1
 
             # S.6.A.3
-            layer.active_P = layer.labile_P * (1.0 - layer.PSP) / layer.PSP
+            layer.active_P = layer.labile_P * (1.0 - layer.PSP_act) / layer.PSP_act
 
             # S.6.A.4
             layer.stable_P = layer.active_P * 4.0
@@ -595,6 +602,7 @@ class Soil:
             self.P_uptake = 0.00
 
             self.labile_P_uptake = 0.0
+            self.labile_P_sum = 0.0
             self.PSP_max = 0.0
             self.PSP_act = 0.0
             self.PSP_avg = 0.0
