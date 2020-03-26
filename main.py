@@ -13,6 +13,7 @@ import RUFAS
 
 
 def main():
+
     """
     Main function of RUFAS, executes simulations for all files specified.
 
