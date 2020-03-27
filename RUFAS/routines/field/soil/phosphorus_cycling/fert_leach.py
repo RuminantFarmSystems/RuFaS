@@ -7,100 +7,92 @@ Author(s): Jacob Johnson, jacob8399@gmail.com,
 """
 ################################################################################
 
-# estimates P leaching from surface fertilizer with rainfall and
-# P infiltration into soil and loss in runoff
-
-# fertilizer P adsorption by soil in KG
-
 from math import log, exp
 
 
+# estimates P leaching from surface fertilizer with rainfall and
+# P infiltration into soil and loss in runoff
+# "pseudocode_soil" S.6.F
 def update_all(S, weather, time):
 
     day = time.day
     year = time.year
-    rainfall = weather.rainfall
+    rainfall = weather.rainfall[year - 1][day - 1]
     runoff = S.runoff
 
+    # Sorption
+    # S.6.F.I
+
+    # S.6.F.I.1
     sorp_percent = 0.0
     if S.fert_CNT > 0.0:
-        if S.cover == "BARE":
-            sorp_percent = -0.16 * log(S.fert_CNT) + 0.5333
-        elif S.cover == "RESIDUE COVER":
-            sorp_percent = -0.16 * log(S.fert_CNT) + 0.6667
-        elif S.cover == "GRASSED":
-            sorp_percent = -0.16 * log(S.fert_CNT) + 0.8
+        sorp_percent = -0.16 * log(S.fert_CNT) + S.cover_factor
 
-    S.fert_sorp = max(0.0, S.fert_sorp)
-    S.fert_sorp = min(S.fert_sorp, S.fert_P_available)
+    # S.6.F.I.2
+    S.fert_sorp = min(max(0.0, S.fert_sorp), S.fert_P_available)
 
     S.fert_P_available -= S.fert_sorp
-
-    S.fert_P_available = max(0.0, S.fert_P_available)
-
     S.fert_absorbed_sum += S.fert_sorp
-
-    # convert soil P from KG/HA to KG and add fertilizer p adsorbed
-
-    S.soil_layers[0].labile_P *= S.area
-    S.soil_layers[0].labile_P += S.fert_sorp
-    S.soil_layers[0].labile_P /= S.area
 
     S.fert_CNT += 1.0
 
-    # P leached from fertilizer on surface to rain and runoff water in KG
+    # Runoff and Leaching
+    # S.6.F.II
 
-    if rainfall[year - 1][day - 1] > 0.0:
+    # S.6.F.II.1
+    if rainfall > 0.0:
         S.no_rains += 1
 
+        release_factor = 0
         if S.no_rains == 1:
-            S.fert_leach = S.fert_P_available
-            S.fert_P_available = 0.0
+            release_factor = 1
         else:
             if S.no_rains == 2:
-                S.fert_leach = S.fert_P_released * 0.40
+                release_factor = 0.4
             if S.no_rains > 2:
-                S.fert_leach = S.fert_P_released * 0.075
-            S.fert_P_released -= S.fert_leach
+                release_factor = 0.075
 
-    else:
-        S.fert_leach = 0.0
+        S.fert_leach = S.fert_P_available * release_factor
+        S.fert_P_released -= S.fert_leach
 
     # calculate the concentration of fertilizer dissolved P in runoff in MG/L
-
+    S.fert_runoff_P = 0.0
+    S.fert_run = 0.0
     if runoff > 0.0:
-        S.PD_factor = 0.034 * exp((runoff / rainfall[year - 1][day - 1]) * 3.4)
-        S.fert_runoff_P = S.fert_leach / (rainfall[year - 1][day - 1] / 10.0) \
+        # S.6.F.II.2
+        S.PD_factor = 0.034 * exp((runoff / rainfall) * 3.4)
+
+        # S.6.F.II.3
+        S.fert_runoff_P = S.fert_leach / (rainfall / 10.0) \
                           / S.area * 10.0 * S.PD_factor
 
         # calculate fertilizer runoff P in KG
+        # S.6.F.II.4
+        S.fert_run = min(max(0.0, S.fert_runoff_P * runoff * 0.01 * S.area), S.fert_leach)
 
-        S.fert_run = S.fert_runoff_P * runoff * 0.01 * S.area
-        S.fert_run = max(0.0, S.fert_run)
-        S.fert_run = min(S.fert_run, S.fert_leach)
-    else:
-        S.fert_runoff_P = 0.0
-        S.fert_run = 0.0
+    # convert soil P from KG/HA to KG and add fertilizer P leached to each layer
+    # S.6.F.II.5
+    DF = 0.6
+    S.fert_leach -= S.fert_run
+    fert_not_leached = S.fert_leach
+    for layer in S.soil_layers:
 
-    # convert soil P from KG/HA to KG and add fertilizer P leached
+        # S.6.B.3
+        layer.labile_P *= S.area
 
-    for w in range(0, 3):
-        S.soil_layers[w].labile_P *= S.area
+        if S.soil_layers.index(layer) == 0:
+            layer.labile_P += S.fert_sorp
 
-    S.soil_layers[0].labile_P += (S.fert_leach - S.fert_run) * 0.6
+        # S.6.F.II.5
+        layer.labile_P += S.fert_leach * DF
+        fert_not_leached -= S.fert_leach * DF
+        DF = max(0.0, (DF / 2) - 0.02)
 
-    if S.soil_layers[1].bottom_depth_cm <= 15.0:
-        S.soil_layers[1].labile_P += (S.fert_leach - S.fert_run) * 0.3
-        S.soil_layers[2].labile_P += (S.fert_leach - S.fert_run) * 0.1
-    else:
-        S.soil_layers[1].labile_P += (S.fert_leach - S.fert_run) * 0.4
+        # S.6.B.4
+        layer.labile_P /= S.area
 
-    for w in range(0, 3):
-        S.soil_layers[w].labile_P /= S.area
+    S.DRP_leachate_annual += fert_not_leached
 
     # add fertilizer P leached and in runoff to running total
-
-    S.fert_R_sum += S.fert_run
-    S.fert_L_sum += (S.fert_leach - S.fert_run)
-
-
+    S.fert_runoff_annual += S.fert_run
+    S.fert_leachate_annual += S.fert_leach

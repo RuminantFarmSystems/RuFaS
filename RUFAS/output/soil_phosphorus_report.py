@@ -40,29 +40,12 @@ class SoilPhosphorus(BaseReportHandler):
         # [] is an empty list
         #
 
+        # Sets produce_csv, report_name, f_name using data
+        #
+        self.set_properties(data, field_name)
+
         self.daily_variables = {'year': ['time.calendar_year', '', []],
-                                'j_day': ['time.day', '', []],
-                                'soil_runoff_DRP': ['soil.SRP_MGL', 'mgL', []],
-                                'manure_runoff_DRP': ['soil.runoff_IP', 'mgL', []],
-                                'fert_runoff_DRP': ['soil.runoff_IP', 'mgL', []],
-                                'runoff_DIP': ['soil.T_runoff_IP', 'mgL', []],
-                                'manure_runoff_DOP': ['soil.runoff_OP', 'mgL', []],
-                                'manure_runoff_NH4': ['soil.runoff_NH4', 'mgL', []],
-                                'PSP': ['soil.soil_layers[0].PSP', '', []],
-                                'labile_p1': ['soil.soil_layers[0].labile_P', 'kg/ha', []],
-                                'labile_p2': ['soil.soil_layers[1].labile_P', 'kg/ha', []],
-                                'labile_p3': ['soil.soil_layers[2].labile_P', 'kg/ha', []],
-                                'available_fert_P': ['soil.fert_P_available', 'kg', []],
-                                'released_fert_P': ['soil.fert_P_released', 'kg', []],
-                                'manure_WIP': ['soil.WIP', 'kg', []],
-                                'manure_WOP': ['soil.WOP', 'kg', []],
-                                'manure_SIP': ['soil.SIP', 'kg', []],
-                                'manure_SOP': ['soil.SOP', 'kg', []],
-                                'manure_NH4': ['soil.NH4', 'kg', []],
-                                'manure_SON': ['soil.SON', 'kg', []],
-                                'manure_mass': ['soil.manure_mass', 'kg', []],
-                                'manure_cover': ['soil.manure_cov', 'HA', []],
-                                'sediment_P': ['soil.sed_P', 'kg/ha', []],
+                                'j_day': ['time.day', '', []]
                                 }
 
         self.annual_variables = {'year': ['time.calendar_year', '', 0]

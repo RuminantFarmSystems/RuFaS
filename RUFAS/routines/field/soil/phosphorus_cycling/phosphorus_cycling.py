@@ -17,7 +17,7 @@
 ################################################################################
 
 from . import fert_leach, fertilizer, manure, manure_leach, p_mineralization,\
-    tillage, sol_P, erosion
+    tillage, soluble_P, erosion
 
 
 def update_all(soil, application, weather, time):
@@ -28,7 +28,7 @@ def update_all(soil, application, weather, time):
 
     tillage.update_all(soil, application, weather, time)
 
-    sol_P.update_all(soil, weather, time)
+    soluble_P.update_all(soil)
 
     fert_leach.update_all(soil, weather, time)
 
