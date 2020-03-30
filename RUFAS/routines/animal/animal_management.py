@@ -399,6 +399,9 @@ class AnimalManagement:
             feed: instance of the Feed class
         """
         if self.simulate_animals:
+            for pen in self.all_pens:
+                pen.pen_populated = len(pen.animals_in_pen) > 0
+
             ids_added, ids_removed, calves_born, self.calves, self.heiferIs, \
                 self.heiferIIs, self.heiferIIIs, self.cows = \
                 self.life_cycle_manager.daily_update(self.simulation_day,
