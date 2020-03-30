@@ -51,7 +51,6 @@ def input_prompt():
         try:
             user_input = input("\nEnter RUFAS Input: ")
 
-
             #
             # Handle user exiting program
             #
