@@ -73,7 +73,7 @@ class Pen:
     # used for ration formulation
     avg_DMIest = 0
 
-    # average change in (delta) body weight of the animals in the pen,
+    # average daily change in (delta) body weight of the animals in the pen,
     # used for ration formulation
     avg_DBW = 0
 

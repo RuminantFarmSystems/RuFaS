@@ -78,8 +78,11 @@ class AnimalManagement:
     id_pen = {}
 
     # queue: pens from which animals have been removed in the order in which
-    # they have had animals removed. Elements will be added to the right of the
-    # queue and popped off the left
+    # they have had animals removed. Elements (pen ids) will be added to the
+    # right of the queue and popped off the left. Pen ids are popped off the
+    # queue when animals are added (i.e. calves are born or animals are
+    # purchased from the replacement herd), and those new animals are placed in
+    # the popped pen.
     pens_needing_animals = deque([])
 
     def __init__(self, data, config, feed):
