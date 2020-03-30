@@ -180,7 +180,6 @@ class SoilNitrogen(BaseReportHandler):
     # clears stored values at the end of the year
     #
     def annual_flush(self):
-
         for variable in self.daily_variables:
             self.daily_variables[variable][2] = []
 
