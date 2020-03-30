@@ -93,10 +93,10 @@ def calc_Tsoil(soil, weather, time):
     for x in range(len(soil.soil_layers)):
 
         if x == 0:
-            z = soil.soil_layers[x].bottomDepth / 2
+            z = soil.soil_layers[x].bottom_depth / 2
         else:
-            z = (soil.soil_layers[x].bottomDepth +
-                 soil.soil_layers[x - 1].bottomDepth) / 2
+            z = (soil.soil_layers[x].bottom_depth +
+                 soil.soil_layers[x - 1].bottom_depth) / 2
 
         # soil temperature (C) at depth z (mm) on previous day
         Tsoil_prev_day = soil.soil_layers[x].temperature

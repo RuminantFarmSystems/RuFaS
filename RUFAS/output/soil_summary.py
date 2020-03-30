@@ -50,7 +50,7 @@ class SoilSummary(BaseReportHandler):
                                 'trans_max': ['soil.trans_max', 'mm H20', []],
                                 'evap_max': ['soil.evap_max', 'mm H20', []],
                                 'surface_temp': ['soil.Tsurf', 'C', []],
-                                'sediment_yield': ['soil.sedimentYield', 'metric tons', []],
+                                'sediment_yield': ['soil.sed', 'metric tons', []],
                                 'residue': ['soil.residue', 'kg/ha', []],
                                 'trans_act_L1': ['soil.soil_layers[0].trans_act', 'mm H20', []],
                                 'trans_act_L2': ['soil.soil_layers[1].trans_act', 'mm H20', []],
@@ -110,6 +110,9 @@ class SoilSummary(BaseReportHandler):
             self.daily_variables[variable][2].append(
                 eval(self.daily_variables[variable][0], globals(), locals()))
 
+    # ---------------------------------------------------------------------------
+    # Method: annual_update
+    # ---------------------------------------------------------------------------
     def annual_update(self, state, weather, time):
         """Stores the yearly values that need to be printed in the report."""
         soil = state.soil

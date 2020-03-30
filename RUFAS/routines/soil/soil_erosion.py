@@ -66,7 +66,7 @@ Soil attribute definitions
 
 
 Soil values updated by calling update_all():
-    sedimentYield
+    sed
 
 
 """
@@ -103,7 +103,7 @@ def calc_sed(soil, crop, weather, time):
         exp_part = exp(3 * 20 / 25.4)
         sed = sed / exp_part
 
-    soil.sedimentYield = sed
+    soil.sed = sed
 
 
 #
@@ -233,11 +233,11 @@ def calc_Fcl_si(soil):
 # "pseudocode_soil" S.3.A.12
 #
 def calc_Forgc(soil):
-    orgC = soil.soil_layers[0].orgC
+    org_C = soil.soil_layers[0].org_C
 
-    exp_part = exp(3.72 - 2.95 * orgC)
+    exp_part = exp(3.72 - 2.95 * org_C)
 
-    return 1 - ((0.25 * orgC) / (orgC + exp_part))
+    return 1 - ((0.25 * org_C) / (org_C + exp_part))
 
 
 #

@@ -101,7 +101,7 @@ def annual_water_balance_graphic(output_csv, show_annual, produce_graphics):
 
         added_variables = len(variables) - 9
 
-        colors = ['#ffffff', '#ff00ff', '#006400', '#fbaf08',  '#51d0de', '#431c5d', 'red']
+        colors = ['#ffffff', '#DC267F', '#648FFF', '#FFB000',  '#FE6100', '#785EF0', '#8B0000']
         for variable in variables:
             # assigns a random color to variables not originally included
             if len(colors) - 2 < counter < len(variables) - 3:
@@ -116,7 +116,7 @@ def annual_water_balance_graphic(output_csv, show_annual, produce_graphics):
             elif counter == len(variables) - 3:
                 precip = variables[variable]
                 legend.insert(0, variable)
-                mp.scatter(years, precip, c='red', marker='x', zorder=2)
+                mp.scatter(years, precip, c='#8B0000', marker='x', zorder=2)
             if counter > 0:
                 variables[variable].insert(0, "")
                 table_vals.append(variables[variable])
@@ -128,12 +128,14 @@ def annual_water_balance_graphic(output_csv, show_annual, produce_graphics):
             cell_colors[x - 1][0] = colors[x]
 
         # original bbox values with 9 variables ( len(variables) )
-        table_bot = -0.95
+        table_bot = -1.08
         table_height = 0.75
 
         # added bbox adjustments when there are more variables
         table_bot -= 0.08 * added_variables
         table_height += 0.08 * added_variables
+
+        mp.xticks(rotation=45)
 
         mp.axis('tight')
         table = mp.table(cellText=table_vals,
@@ -146,7 +148,8 @@ def annual_water_balance_graphic(output_csv, show_annual, produce_graphics):
         for x in range(len(cell_colors)):
             cellDict[(x, 0)].set_width(0.02)
 
-        # mp.legend(legend, loc='upper left')  # TODO legend toggle
+        # legend toggle
+        # mp.legend(legend, loc='upper center', bbox_to_anchor=(-0.35, 1.3), ncol=1, prop={'size': 9})
         mp.subplots_adjust(left=0.31, bottom=0.5)
         mp.ylabel('mm H2O')
         mp.title('Annual Water Balance')

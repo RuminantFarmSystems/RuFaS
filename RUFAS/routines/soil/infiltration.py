@@ -140,7 +140,7 @@ def calc_Smax(soil):
 # "pseudocode_soil" S.2.A.6
 #
 def calc_w1(soil, Smax, CN3, w2):
-    FC = soil.profile_depth * soil.soil_layers[0].fieldCapacity
+    FC = soil.profile_depth * soil.soil_layers[0].field_capacity
 
     S3 = calc_S3(CN3)
 
@@ -154,7 +154,7 @@ def calc_w1(soil, Smax, CN3, w2):
 # "pseudocode_soil" S.2.A.7
 #
 def calc_w2(soil, Smax, CN3):
-    FC = soil.profile_depth * soil.soil_layers[0].fieldCapacity
+    FC = soil.profile_depth * soil.soil_layers[0].field_capacity
 
     SAT = soil.profile_depth * soil.soil_layers[0].saturation
 
@@ -193,7 +193,7 @@ def sum_SW(soil):
 def sum_WW(soil):
     WW = 0.0
     for layer in soil.soil_layers:
-        WW += layer.wiltingWater
+        WW += layer.wilting_water
     return WW
 
 
