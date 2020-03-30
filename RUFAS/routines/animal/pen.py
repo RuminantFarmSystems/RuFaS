@@ -89,7 +89,15 @@ class Pen:
     ration = {}
 
     # total manure excretion of the animals in the pen
-    manure = {}
+    manure = {"U": 0,
+              "TAN_s": 0,
+              "MN": 0,
+              "Mkg": 0,
+              "VSd": 0,
+              "VSnd": 0,
+              "p_excrt": 0,
+              "WIP_frac": 0,
+              "WOP_frac": 0}
 
     # average growth of the animals in the pen
     avg_growth = 0
