@@ -66,7 +66,7 @@ def calc_max_water_uptake_each_layer(crop_type, soil):
 
     # 4.A.2
     for layer in soil.soil_layers:
-        lower_boundary_uptake = calc_max_water_uptake_z(crop_type, soil, layer.bottomDepth)
+        lower_boundary_uptake = calc_max_water_uptake_z(crop_type, soil, layer.bottom_depth)
         max_uptake_this_layer = lower_boundary_uptake - upper_boundary_uptake
         max_uptake_each_layer.append(max_uptake_this_layer)
 
@@ -142,7 +142,7 @@ def decrease_effic_of_uptake(soil, uptake_each_layer):
         # Point at which plant available water in soil layer begins to limit
         # efficiency of plant uptake (mm H2O)
         # C.4.B.5
-        AWC_limit = 0.25 * (layer.fcWater - layer.wiltingWater)  # + layer.wiltingWater TODO: Not in SWAT
+        AWC_limit = 0.25 * (layer.fc_water - layer.wilting_water)
 
         # C.4.B.4
         if layer.soil_water > AWC_limit:
@@ -166,7 +166,7 @@ def calc_act_water_uptake(crop_type, soil, adj_uptakes):
     # Calculate actual uptake for each layer
     # C.4.C.1
     for uptake, layer in zip(adj_uptakes, soil.soil_layers):
-        act_uptake = min(uptake, layer.soil_water - layer.wiltingWater)
+        act_uptake = min(uptake, layer.soil_water - layer.wilting_water)
 
         layer.trans_act = act_uptake
 
