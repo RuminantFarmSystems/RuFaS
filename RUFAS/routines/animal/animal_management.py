@@ -18,19 +18,20 @@ from RUFAS.routines.animal.life_cycle.animal_base import AnimalBase
 from collections import deque
 
 
-def daily_animal_routine(animal_management, feed, weather):
+def daily_animal_routine(animal_management, feed, weather, time):
     """
     Executes daily routines relating to Animals. This method is called every day
     in the simulation and calls @animal_management's daily_updates() method
-    with @feed and @time as arguments. [Note that currently, @weather is not
-    used in animal updates.]
+    with @feed and @time as arguments. [Note that currently, @weather and
+    @ time are not used in animal updates.]
 
     Args:
         animal_management: instance of the AnimalManagement class
         feed: instance of the Feed class
         weather: instance of the Weather class
+        time: instance of the Time class
     """
-    animal_management.daily_updates(feed, weather)
+    animal_management.daily_updates(feed)
 
 
 class AnimalManagement:
@@ -386,18 +387,16 @@ class AnimalManagement:
             if pen.pen_populated:
                 pen.daily_p_update()
 
-    def daily_updates(self, feed, weather):
+    def daily_updates(self, feed):
         """
         Executes the daily routines relating to Animals. All animals are
         updated through the life_cycle_manager's daily_update() method. The
         daily phosphorus calculations are also done. If it is the end of the
         ration interval, the animals are allocated to new pens and the ration &
         manure calculations are done.
-        [Note that currently, @weather is not used in animal updates.]
 
         Args:
             feed: instance of the Feed class
-            weather: instance of the Weather class
         """
         if self.simulate_animals:
             ids_added, ids_removed, calves_born, self.calves, self.heiferIs, \
