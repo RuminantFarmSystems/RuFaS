@@ -61,7 +61,7 @@ class HeiferIII(HeiferII):
         self._ration_formulation = ration_formulation
         self._dry_matter_intake = 0
         for key in ration_formulation:
-            if key in feed.available_feed_names:
+            if key in feed.managed_feed_names:
                 DM_feed_amount = ration_formulation[key]
                 self._dry_matter_intake += DM_feed_amount
 

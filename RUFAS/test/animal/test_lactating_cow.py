@@ -22,16 +22,17 @@ class LactatingCowTest(unittest.TestCase):
         Sets up the list of various feeds that will be used for the unit tests.
         """
         feed_info_0 = {
-            "feed_library": "Inputs/manure_feed_test.csv",
+            "feed_database": "Inputs/feeds.sqlite",
+            "table_name": "feed_library",
 
-            "available_feeds":
-                [
-                    "Corn_grain",
-                    "Legume_hay",
-                    "Cotton_seed",
-                    "Roasted_soybean",
-                    "Rye_hay"
-                ]
+            "managed_feeds":
+            [
+              "Corn_grain",
+              "Legume_hay",
+              "Cotton_seed",
+              "Roasted_soybean",
+              "Rye_hay"
+            ]
         }
         self.feeds = [Feed(feed_info_0)]
 
@@ -50,13 +51,15 @@ class LactatingCowTest(unittest.TestCase):
 
         rqmts, _, _ = ration.calculate_rqmts(inputs['BW'], inputs['BCS'],
                                              inputs['CBW'], inputs['CI'],
-                                             inputs['concentrate'], inputs['CP_Milk'],
+                                             inputs['concentrate'],
+                                             inputs['CP_Milk'],
                                              inputs['DOP'], inputs['DHD'],
                                              inputs['DVD'], inputs['DIM'],
                                              inputs['fat_milk'],
                                              inputs['lactose_milk'],
                                              inputs['milk'], inputs['parity'],
-                                             inputs['type'], feed.nutrient_rqmts)
+                                             inputs['type'],
+                                             feed.nutrient_rqmts)
 
         self.assertEqual(rqmts, expected_rqmts)
 
