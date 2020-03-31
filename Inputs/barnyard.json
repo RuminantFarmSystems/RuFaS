@@ -276,7 +276,7 @@
                 "replace_num": 0,
                 "herd_num": 0
             },
-            
+
             "animal_config":
             {
             	"num_21_days": 15,
@@ -354,18 +354,18 @@
 				"econ_indicator_range": 365,
 				"heifer_sell_price": 1400,
 				"heifer_buy_price": 1600,
-				"calf_price": 140	
+				"calf_price": 140
             },
-            
+
             "housing": "barn",
             "pasture_concentrate": -1,
-            
+
             "ration":
             {
                 "user_input": false,
                 "formulation_interval": 7
             },
-        
+
 	        "pen_information":
 	        {
 	        	"pen0":
@@ -449,9 +449,10 @@
 
             "initial_dry_matter": 0,
 
-            "feed_library": "Inputs/manure_feed_test.csv",
+            "feed_database": "Inputs/feeds.sqlite",
+            "table_name": "feed_library",
 
-            "available_feeds":
+            "managed_feeds":
             [
               "Corn_grain",
               "Legume_hay",
