@@ -30,7 +30,6 @@ class RationReport(BaseReportHandler):
         self.pen_id = pen_id
         self.file_name = 'pen_' + str(pen_id) + '/' + self.file_name
 
-        self.feed_info = {}
         self.daily_variables = {'year': ['time.cal_year', '', []],
                                 'j_day': ['time.day', '', []],
                                 'num_animals': ['len(pen.animals_in_pen)', '', []],
@@ -59,11 +58,12 @@ class RationReport(BaseReportHandler):
             writer.writerow(units)
 
     def initialize(self, state):
-        self.feed_info = state.feed.available_feeds
+        feed_names = state.feed.managed_feeds
 
-        for feed_type in self.feed_info.keys():
-            self.daily_variables[feed_type] = ['pen.ration[\'%s\'] if pen.pen_populated else 0' % feed_type,
-                                               self.feed_info[feed_type]['Units'], []]
+        for feed_name in feed_names:
+            feed_info = state.feed.values(feed_name)
+            self.daily_variables[feed_name.name] = ['pen.ration[\'%s\'] if pen.pen_populated else 0' % feed_name.name,
+                                               feed_info['Units'], []]
 
         self.write_headers(self.get_fPath(), self.daily_variables)
         annual_path = Path(str(self.get_fPath()).split('.csv')[0] + "_annual.csv")

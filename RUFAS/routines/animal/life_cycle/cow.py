@@ -42,13 +42,20 @@ class Cow(HeiferIII):
 	'''
 	def __init__(self, heiferIII, args):
 		super().init_from_heiferIII(heiferIII)
-		
+
 		#current hard-coded values necessary for nutrient requirement calculations
+		self.ID = 0     #hard-coded inital value for Identification
+		self.weekn = 1
+		self.LACT = 1   #Lactation number of the cow
+		self.RecDNED = 1
+		self.RecDMPD = 100
+		self.AVGMILK_kg = 50
 		self._BCS = 3.5 #body condition score
 		self._CP_milk = 3.2
 		self._lactose_milk = 4.85
 		self._mPrt = 3.5 #milk protein
-		
+
+
 		self._DVD = 0 #daily vertical distance, km
 		self._DHD = 0 #daily horizontal distance, km
 		self._CI = 0 #calving interval, days
@@ -96,12 +103,13 @@ class Cow(HeiferIII):
 	'''
 	def init_from_cow(self, cow):
 		super().init_from_heiferIII(Cow)
-		
+
 		#current hard-coded values necessary for nutrient requirement calculations
+		self.ID = 0		#hard-coded inital value for Identification
 		self._BCS = 3.5 #body condition score
 		self._CP_milk = 3.2
 		self._lactose_milk = 4.85
-		
+
 		self._daily_growth = 0
 		self._calves = cow._calves
 		self._milking = cow._milking
@@ -180,7 +188,7 @@ class Cow(HeiferIII):
 			l = self._determine_param_value(AnimalBase.config['l'][breed_index][parity_index], AnimalBase.config['l_std'][breed_index][parity_index])
 			m = self._determine_param_value(AnimalBase.config['m'][breed_index][parity_index], AnimalBase.config['m_std'][breed_index][parity_index])
 			n = self._determine_param_value(AnimalBase.config['n'][breed_index][parity_index], AnimalBase.config['n_std'][breed_index][parity_index])
-			
+
 			estimated_daily_milk_produced = l * \
 				math.pow(self._days_in_milk, m) * \
 				math.exp((0 - n) * self._days_in_milk)
@@ -198,23 +206,23 @@ class Cow(HeiferIII):
 		# calculate fat percent in milk and fat corrected milk production
 		fat_percent = 12.86 * self._days_in_milk ** (-1.081) * math.exp((0.0926) * (math.log(self._days_in_milk)) ** 2) * (math.log(self._days_in_milk) ** 1.107)
 		daily_fat_correct_milk_production = 0.4 * estimated_daily_milk_produced + 0.15 * fat_percent * estimated_daily_milk_produced
-		
+
 		prev_weight = self._body_weight
-		
+
 		# calculate body weight when milking
 		if self._calves == 1:
 			self._body_weight = self._mature_body_weight * (1-(1-(self._birth_weight/self._mature_body_weight)**(1/3)) * math.exp(-0.0039 * self._days_born)) **3 - (20/65) * self._days_in_milk * math.exp(1-self._days_in_milk/65) + 0.0187**3 * (self._days_in_preg - 50) ** 3
 		else:
 			self._body_weight = self._mature_body_weight * (1-(1-(self._birth_weight/self._mature_body_weight)**(1/3)) * math.exp(-0.006 * self._days_born)) **3 - (40/75) * self._days_in_milk * math.exp(1-self._days_in_milk/75) + 0.0187**3 * (self._days_in_preg - 50) ** 3
-		
+
 		if not self._milking:
 			self._daily_growth = self._body_weight - prev_weight
-		
+
 		self._estimated_daily_milk_produced_lst.append(self._estimated_daily_milk_produced)
 		self._body_weight_lst.append(self._body_weight)
 
 		return estimated_daily_milk_produced, fat_percent, daily_fat_correct_milk_production
-	
+
 	'''
        	Calculates this cow's nutrient requirements.
     '''
@@ -229,33 +237,33 @@ class Cow(HeiferIII):
 			self._nutrient_rqmts = dry_calculate_rqmts()
 		'''
 		self._nutrient_rqmts = {'FU': {'op': '<=', 'val': 7.566673489860807}, 'RU': {'op': '>=', 'val': 0}, 'ME_DM': {'op': '>=', 'val': 57.238188330372566}, 'RDP_DM': {'op': '>=', 'val': 2.0347001114951313}, 'RUP_DM': {'op': '>=', 'val': 1.2716733909335047}}
-		self._DMIest = 27.620363504458798 
+		self._DMIest = 27.620363504458798
 		self._DBW = -0.4125
 		self._daily_growth = self._DBW
 		'''
-		
+
 	'''
        	Calculates this cow's nutrient requirements.
     '''
 	def calc_init_nutrient_rqmts(self, vertical_distance, horizontal_distance, housing, pasture_concentrate, nutrient_rqmts):
 		self.calc_daily_walking_dist(vertical_distance, horizontal_distance)
 		self.calc_nutrient_rqmts(housing, pasture_concentrate, nutrient_rqmts)
-		
+
 	'''
 		Calculates and sets the manure excretion components.
-	'''  
+	'''
 	def calc_manure_excretion(self, feed):
 		if self._milking:
 			self._manure_excretion = lactating_manure_calculations(self._ration_formulation, feed, self._body_weight, self._days_in_milk, self._mPrt)
 		else:
 			self._manure_excretion = dry_manure_calculations()
 		'''
-		self._manure_excretion = {"U": 0.340, 
-			"TAN_s": 0.14, 
-			"MN": 532.407, 
-			"Mkg": 70.792, 
-			"VSd": 7087.413, 
-			"VSnd": 859.390} 
+		self._manure_excretion = {"U": 0.340,
+			"TAN_s": 0.14,
+			"MN": 532.407,
+			"Mkg": 70.792,
+			"VSd": 7087.413,
+			"VSnd": 859.390}
 		'''
 	'''
 		Sets this animal's ration formulation.
@@ -263,10 +271,10 @@ class Cow(HeiferIII):
 			ration_formulation: dictionary representing the calculated ration
 	'''
 	def set_ration(self, ration_formulation, feed):
-		self._ration_formulation = ration_formulation  
+		self._ration_formulation = ration_formulation
 		self._dry_matter_intake = 0
 		for key in ration_formulation:
-			if key in feed.available_feed_names: 
+			if key in feed.managed_feed_names:
 				DM_feed_amount = ration_formulation[key]
 				self._dry_matter_intake += DM_feed_amount
 	'''
@@ -279,8 +287,8 @@ class Cow(HeiferIII):
 		# multiplied by 2 for return trip
 		self._DVD = 2 * vertical_dist_to_parlor * AnimalBase.config['cow_times_milked_per_day']
 		self._DHD = 2 * horizontal_dist_to_parlor * AnimalBase.config['cow_times_milked_per_day']
-	
-	
+
+
 	'''
 		Description:
 			update cow status from the moment of calving, parity+1, milking start, pregnancy stop, and estrus restart
@@ -335,7 +343,7 @@ class Cow(HeiferIII):
 		elif self._repro_program == 'TAI':
 			if self._days_in_milk >= AnimalBase.config['vwp']:
 				self._tai_update(record_econ_stats)
-		
+
 		self._fat_percent = fat_percent
 		self._preg_update(record_econ_stats)
 		cull_stage = self._cull_update(estimated_daily_milk_produced)
@@ -967,7 +975,7 @@ class Cow(HeiferIII):
 		ax1.spines['right'].set_visible(False)
 		ax1.spines['top'].set_visible(False)
 		ax1.set_title("Milk")
-			
+
 		ax2 = fig.add_subplot(122)
 		ax2.plot(self._body_weight_lst)
 		ax2.spines['right'].set_visible(False)
@@ -976,7 +984,7 @@ class Cow(HeiferIII):
 
 		plt.plot()
 		plt.show()
-	
+
 	def __str__(self):
 		res_str = """
 			==> Cow: \n
