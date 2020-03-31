@@ -76,7 +76,7 @@ def daily_simulation():
     #
     # Daily routines
     #
-    routines.daily_animal_routine(state.animal_management, state.feed, weather, time)
+    routines.daily_animal_routine(state.animal_management, state.feed)
     for field in state.fields:
         routines.daily_soil_routine(field.soil, field.crop, field.application, weather, time)
         routines.daily_crop_routine(field.soil, field.crop, field.application, weather, time)

@@ -10,9 +10,10 @@
 
     "initial_dry_matter": 0,
 
-    "feed_library": "manure_feed_test.csv",
+    "feed_database": "Inputs/feeds.sqlite",
+    "table_name": "feed_library",
 
-    "available_feeds":
+    "managed_feeds":
     [
       "Corn_grain",
       "Legume_hay",

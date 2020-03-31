@@ -28,8 +28,6 @@ class RationReport(BaseReportHandler):
         self.pen_id = pen_id
         self.file_name = 'pen_' + str(pen_id) + '/' + self.file_name
 
-        self.feed_info = {}
-
         #
         # Outputs can be added in this single place in the following format:
         # 'output_name': ['variable_name', 'unit', []],
@@ -80,12 +78,12 @@ class RationReport(BaseReportHandler):
         Description:
             Initialize report
         """
+        feed_names = state.feed.managed_feeds
 
-        self.feed_info = state.feed.available_feeds
-
-        for feed_type in self.feed_info.keys():
-            self.daily_variables[feed_type] = ['pen.ration[\'%s\'] if pen.pen_populated else 0' % feed_type,
-                                               self.feed_info[feed_type]['Units'], []]
+        for feed_name in feed_names:
+            feed_info = state.feed.values(feed_name)
+            self.daily_variables[feed_name.name] = ['pen.ration[\'%s\'] if pen.pen_populated else 0' % feed_name.name,
+                                                    feed_info['Units'], []]
 
         self.write_headers(self.get_fPath(), self.daily_variables)
         annual_path = Path(str(self.get_fPath()).split('.csv')[0] + "_annual.csv")

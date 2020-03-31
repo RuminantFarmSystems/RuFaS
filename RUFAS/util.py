@@ -6,10 +6,80 @@ Author(s): Kass Chupongstimun, kass_c@hotmail.com
            Jit Patil, spatil5@wisc.edu
 """
 
-import csv
 import pulp.solvers
 import sys
 from pathlib import Path
+
+import sqlite3
+
+
+class DatabaseReader:
+    """
+    Description: Stores the information from the database source specified.
+    """
+    def __init__(self, database_file: str, table_name, identifier=None,
+                 desired_rows=None):
+        """
+        Connects to the @database_file and queries from the @table_name.
+        If an exception is raised, the method prints a message and the program
+        exits.
+
+        Args:
+            database_file: the name of the database file
+            table_name: the name of the table in the database which is queried
+            identifier (optional): string that is the name of the column from
+                which values are used to populate @desired_rows
+                (case insensitive)
+            desired_rows (optional): a list of the values in the @identifier
+                column in the table which are in the rows that are desired
+
+            Note - if either @desired_rows or @row_identifier is None, all rows
+            of the table will be queried. If they are not None, only those rows
+            will be queried.
+        """
+        try:
+            # Forms a connection to the database
+            conn = sqlite3.connect(database_file)
+            conn.row_factory = sqlite3.Row
+            c = conn.cursor()
+
+            # To obtain data from a database table, we form and execute a query.
+            if desired_rows is None or identifier is None:
+                query = "SELECT * FROM " + table_name
+
+            else:
+                # SELECT * FROM table_name WHERE identifier IN [desired_rows]
+                # For an example about how this specific query works, see the
+                # documentation of NutrientValues class in feed.py
+                query = "SELECT * FROM " + \
+                        table_name + \
+                        " WHERE " + \
+                        identifier + \
+                        " IN " + \
+                        "({})".format(','.join(['?'] * len(desired_rows)))
+
+            # Here, desired_rows is a parameter to the query as the list of
+            # rows for which information is wanted. This list will be
+            # formatted as specified in the query above (i.e. all elements are
+            # separated by a comma and the list is surrounded by parentheses.
+            c.execute(query, desired_rows)
+
+            # self.values is a list of dictionaries, where each dictionary in
+            # the list corresponds to a row in the database table storing
+            # the information for the row
+            self.values = []
+            row = c.fetchone()
+            while row is not None:
+                self.values.append(dict(row))
+                row = c.fetchone()
+
+            conn.close()
+
+        except Exception as e:
+            print("The program has encountered the following exception while"
+                  "connecting to and querying the database table ", table_name,
+                  ": ", e, "\nExiting.")
+            exit(1)
 
 
 def get_base_dir():
@@ -271,124 +341,31 @@ def LP_print(LHS, RHS, objective, variables, operators,
     print("* All floats rounded to 4 decimal places")
     return LP_text
 
-
-def get_csv_columns(fileName):
-    """
-    Description:
-        Takes in the path to a csv file with the path starting after MASM/
-        This function returns a list of tuples. Each tuple is the contents of
-        a column in the csv. Thus, returnedList[0] would be the tuple of the contents
-        in the first column in the csv. If an entry in the csv can be turned into a
-        float, then it will be.
-
-        This is useful for reading in time series data where each column corresponds
-        to data of a specific attribute such as temperature.
-    """
-
-    filePath = get_base_dir() / fileName
-    with filePath.open("r") as file_input:
-        readCSV = csv.reader(file_input, delimiter=',')
-        allRows = list(readCSV)
-
-        # Convert all numerical data to floats if possible
-        allRows = [[try_to_float(value) for value in row] for row in allRows]
-
-        allColumns = zip(*allRows)
-        return list(allColumns)
+#
+# Takes in the path to a csv file with the path starting after MASM/
+# This function returns a list of tuples. Each tuple is the contents of
+# a column in the csv. Thus, returnedList[0] would be the tuple of the contents
+# in the first column in the csv. If an entry in the csv can be turned into a
+# float, then it will be.
+#
+# This is useful for reading in time series data where each column corresponds
+# to data of a specific attribute such as temperature.
+#
+# def get_csv_columns(fileName):
+#     filePath = get_base_dir() / fileName
+#     with filePath.open("r") as input:
+#         readCSV = csv.reader(input, delimiter=',')
+#         allRows = list(readCSV)
+#
+#         # Convert all numerical data to floats if possible
+#         allRows = [[try_to_float(value) for value in row] for row in allRows]
+#
+#         allColumns = zip(*allRows)
+#         return list(allColumns)
 
 
 def try_to_float(file_input):
     try:
         return float(file_input)
-    except ValueError:
+    except:
         return file_input
-
-
-class Library:
-    """
-    Description:
-        Serves as a generic library. Each item in the library is represented as
-        a dictionary with the traits of the item as keys, and the values of each
-        trait as the values in the dictionary.
-
-        This library is populated by csv files in which the first row specifies the
-        traits of the type of item in the library. For example, a library of foods
-        could have the traits of calories, grams fat, and grams protein. Each row
-        corresponds to a specific item. Keeping with the food library example, each
-        row would specify the specifics for a different food like hamburger, pizza,
-        and apple. The only requirements are that each item in the library
-        (defined in the csv) must have a unique "ID" trait and a unique "Name" trait.
-    """
-
-    def __init__(self, csv_file):
-        self.lib_by_id = {}
-        self.lib_by_name = {}
-        info = get_csv_columns(csv_file)
-
-        # The names of the traits are the first entry in each column
-        traits = [col[0] for col in info]
-        size = len(info[0])
-
-        # Create and add each item to the library
-        for i in range(1, size):
-            item = {}
-            values = [col[i] for col in info]
-
-            # Populate the item's dictionary of traits
-            for trait, value in zip(traits, values):
-                item[trait] = value
-
-            self.add_to_library(item)
-
-    def checkout(self, key):
-        """
-        Description:
-            Returns the dictionary of traits and corresponding values for the item
-            in the library with the given key. Items in the library can be retrieved
-            by either their Name or their ID.
-        """
-
-        if key in self.lib_by_name:
-            return self.lib_by_name[key]
-        elif key in self.lib_by_id:
-            return self.lib_by_id[key]
-        else:
-            print("Unable to find '" + str(key) + "' in the library.")
-            print("Please check that this is the correct Name or ID for the item, and that the "
-                  "csv containing this item is the one specified in the input file.")
-            print("Exiting...")
-            exit()
-
-    def add_to_library(self, item):
-        """
-        Description:
-            In order for an item to be added to the library, the item must be a
-            dictionary containing an 'ID' and a 'Name' which can be used to uniquely
-            identify the item in the library.
-        """
-
-        if (type(item) is not dict) or ('ID' not in item) or ("Name" not in item):
-            print("In order to add an item to the library, it must be a "
-                  "dictionary containing an 'ID' and a 'Name'.")
-            print("Exiting ...")
-            exit()
-
-        item_id = item['ID']
-        name = item['Name']
-
-        # Check for duplicate Names or IDs
-        duplicate = ""
-        if item_id in self.lib_by_id:
-            duplicate = "ID of '%s'" % str(item_id)
-        elif name in self.lib_by_name:
-            duplicate = "Name of '%s'" % name
-
-        if duplicate != "":
-            print("The " + duplicate + " corresponds with multiple items in the specified csv.\n"
-                                       "Please modify the csv so that the " + duplicate + " is unique to one item.")
-            print("Exiting ...")
-            exit()
-
-        # Add the item to the library
-        self.lib_by_id[item_id] = item
-        self.lib_by_name[name] = item
