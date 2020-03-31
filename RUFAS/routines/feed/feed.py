@@ -6,6 +6,8 @@ Description:
 Author(s): Kass Chupongstimun, kass_c@hotmail.com,
            Andy Achenreiner, achenreiner@wisc.edu
            Militsa Sotirova, militsasotirova@gmail.com
+           William Donovan, william.m.donovan@gmail.com
+           Jacob Johnson, jacob8339@gmail.com
 """
 ################################################################################
 
@@ -15,6 +17,7 @@ from RUFAS.util import DatabaseReader
 from . import nitrogen_loss, carbon_loss, protein_degradation
 
 
+# runs the feed routine. Daily is a misnomer here– this is called once per harvest.
 def daily_feed_routine(feed, crop):
     if feed.storage:
         feed.dry_matter += crop.current_crop.yield_actual
@@ -33,6 +36,7 @@ def daily_feed_routine(feed, crop):
             protein_degradation.update_all(feed)
 
 
+# Determine the current crop
 def annual_feed_routine(feed, crop):
     feed.prev_crop_name = feed.crop_name
     feed.crop_name = crop.current_crop.crop_name
@@ -41,6 +45,7 @@ def annual_feed_routine(feed, crop):
         calibrate_feed(feed)
 
 
+# Parameterize the optimal empirical model based on crop and storage types generated in input
 def calibrate_feed(feed):
     if feed.crop_name == 'corn':
         feed.storage = True
