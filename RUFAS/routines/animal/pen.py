@@ -272,11 +272,11 @@ class Pen:
             self.calc_avg_nutrient_rqmts()
 
         DMI = calc_DMI(ration_per_animal, feed)
-        p_intake = phosphorus_in_ration(ration_per_animal, feed)
+        p_intake, p_conc = phosphorus_in_ration(DMI, ration_per_animal, feed)
 
         for animal in self.animals_in_pen:
             animal.set_ration(ration_per_animal, DMI)
-            animal.set_p_intake(p_intake)
+            animal.set_p_intake(p_intake, p_conc)
 
         # set ration for whole pen by multiplying calculated ration by number
         # of animals in the pen
@@ -411,14 +411,16 @@ class Pen:
 
 
 # methods used for additional ration calculations
-def phosphorus_in_ration(ration, feed):
+def phosphorus_in_ration(DMI, ration, feed):
     """
     Args:
+        DMI: the total dry matter intake of the ration
         feed: instance of the Feed class, used to determine characteristics
             of available feeds
         ration: the dictionary representing the ration formulation
 
-    Returns: the amount of phosphorus (g) provided by the feed in @ration.
+    Returns: the amount of phosphorus (g) provided by the feed in @ration and
+            the concentration of P in @ration (%)
     """
     # amount of P in the formulated ration (g)
     p_intake = 0
@@ -431,13 +433,16 @@ def phosphorus_in_ration(ration, feed):
             p_feed_conc = nutrients[Nutrients.P_DM.name]
             dmi_feed = ration[key]
 
-            # amount of P from feed (A.4.A.1)
+            # amount of P from feed (g) (A.4.A.1)
             p_feed_intake = p_feed_conc / 100 * dmi_feed * 1000
 
-            # (A.4.A.2)
+            # P intake from ration (g) (A.4.A.2)
             p_intake += p_feed_intake
 
-    return p_intake
+    # P concentration in ration (%) (A.4.A.3)
+    p_conc = p_intake / DMI * (1 / 1000) * 100
+
+    return p_intake, p_conc
 
 
 def calc_DMI(ration, feed):

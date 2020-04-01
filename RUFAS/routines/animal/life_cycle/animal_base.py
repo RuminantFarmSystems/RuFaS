@@ -55,6 +55,7 @@ class AnimalBase(object):
 		self.DBW = 0
 		self.p_animal = 0
 		self.p_intake = 0
+		self.p_conc = 0
 		self.p_excrt = 0
 		self.body_weight = 0
 		self.mature_body_weight = 0
@@ -80,6 +81,7 @@ class AnimalBase(object):
 		self.DBW = 0
 		self.p_animal = 0
 		self.p_intake = 0
+		self.p_conc = 0
 		self.p_excrt = 0
 
 	def set_default_nutrient_rqmts(self):
@@ -100,14 +102,16 @@ class AnimalBase(object):
 		self.ration_formulation = ration
 		self.dry_matter_intake = DMI
 
-	def set_p_intake(self, p_intake):
+	def set_p_intake(self, p_intake, p_conc):
 		"""
 		Sets this animal's phosphorus intake.
 
 		Args:
 			p_intake: the phosphorus intake
+			p_conc: the concentration of P in the ration
 		"""
 		self.p_intake = p_intake
+		self.p_conc = p_conc
 
 	def daily_p_update(self):
 		"""
