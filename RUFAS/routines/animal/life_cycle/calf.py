@@ -112,33 +112,29 @@ class Calf(AnimalBase):
 		self.manure_excretion = manure_calculations(self.body_weight, self.p_intake)
 		self.p_excrt = self.manure_excretion['p_excrt']
 
-	def phosphorus_retained(self, DMI):
+	def phosphorus_rqmts(self, DMI):
 		"""
-		Calculates the phosphorus retained by the animal. Note that equation
-		(A.#.B.2) (which deals with the P retained for fetal growth)
-		is omitted because that is a calculation for HeiferII, HeiferIII, and
-		Cows.
+		Calculates and sets the animal's phosphorus requirement.
 
 		Args:
 			DMI: the Dry Matter Intake (kg)
-
-		Returns: the amount of phosphorus retained by the animal
-			in grams per day
 		"""
-		# amount of P required for maintenance (g/d) (A.#.B.1)
-		p_maint = 0.0008 * DMI + 0.000002 * self.body_weight * 1000
+		# amount of P required for endogenous losses (g) (A.1A-D.C.1)
+		p_endo_feces = 0.0008 * DMI * 1000
 
-		# OMITTED: calculation for p_gest (A.#.B.2)
+		# amount pf P required for urine production (g) (A.1A-F.C.2)
+		p_urine = 0.000002 * self.body_weight * 1000
 
-		# amount of P required for growth (g/d) (A.#.B.3)
+		# absorbed P retained for growth (g) (A.1A-F.C.3)
 		p_growth = (0.0012 + 0.004635 * (self.mature_body_weight ** 0.22) * (
-					self.body_weight ** (-0.22))) * \
+				self.body_weight ** (-0.22))) * \
 			self.daily_growth / 0.96 * 1000
 
-		# amount of P retained (g/d) (A.#.B.4)
-		p_retained = p_maint + p_growth
+		# absorbed P required by the animal (g) (A.1A-F.C.6)
+		p_absorb = p_urine + p_endo_feces + p_growth
 
-		return p_retained
+		# requirement of P from the ration (g) (A.1A.C.7)
+		self.p_req = p_absorb / 0.90
 
 	def update(self):
 		"""
