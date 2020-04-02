@@ -327,49 +327,54 @@ class Cow(HeiferIII):
 		if self.milking:
 			self.manure_excretion = lactating_manure_calculations(
 				self.ration_formulation, feed, self.body_weight,
-				self.days_in_milk, self.mPrt, self.p_intake)
+				self.days_in_milk, self.mPrt, self.p_intake,
+				self.estimated_daily_milk_produced)
 		else:
 			self.manure_excretion = \
 				dry_manure_calculations(self.body_weight, self.p_intake)
 		self.p_excrt = self.manure_excretion['p_excrt']
 
-	def phosphorus_retained(self, DMI):
+	def phosphorus_rqmts(self, DMI):
 		"""
-		Calculates the phosphorus retained by the animal.
+		Calculates and sets the animal's phosphorus requirement.
 
 		Args:
 			DMI: the Dry Matter Intake (kg)
-
-		Returns: the amount of phosphorus retained by the animal
-			in grams per day
 		"""
-		# amount of P required for maintenance (g/d) (A.#.B.1)
-		p_maint = 0.001 * DMI + 0.000002 * self.body_weight * 1000
+		# amount of P required for endogenous losses (g) (A.1A-D.C.1)
+		p_endo_feces = 0.0008 * DMI * 1000
 
-		# amount of P required for growth of a fetus (A.#.B.2)
+		# amount pf P required for urine production (g) (A.1A-F.C.2)
+		p_urine = 0.000002 * self.body_weight * 1000
+
+		# absorbed P retained for fetal growth (g) (A.1C-F.C.4)
 		if self.days_in_preg >= 190:
 			exp_1 = (0.05527 - 0.000075 * self.days_in_preg) * self.days_in_preg
 			exp_2 = (0.05527 - 0.000075 * (self.days_in_preg - 1)) * \
-					(self.days_in_preg - 1)
+				(self.days_in_preg - 1)
 			p_gest = (
-							0.00002743 * math.exp(exp_1) -
-							0.00002743 * math.exp(exp_2)) * 1000
-
-			# when the calf is born, this sum will be subtracted from the cow
-			# and will be the initial P value for the calf (A.#.D.1)
+					0.00002743 * math.exp(exp_1) -
+					0.00002743 * math.exp(exp_2)) * 1000
 			self.p_gest_for_calf += p_gest
 		else:
 			p_gest = 0
 
-		# amount of P required for growth (g/d) (A.#.B.3)
-		p_growth = (0.0012 + 0.004635 * (self.mature_body_weight ** 0.22) * (
-				self.body_weight ** (-0.22))) * \
-			self.daily_growth / 0.96 * 1000
+		# amount of P in milk per animal (g) (A.1E.C.5)
+		if self.milking:
+			p_milk = 0.0009 * self.estimated_daily_milk_produced * 1000
+		else:
+			p_milk = 0
 
-		# amount of P retained (g/d) (A.#.B.4)
-		p_retained = p_maint + p_gest + p_growth
+		# absorbed P required by the animal (g) (A.1A-F.C.6)
+		p_absorb = p_urine + p_endo_feces + p_gest + p_milk
 
-		return p_retained
+		# requirement of P from the ration (g) (A.1E-F.C.7)
+		if self.milking:
+			self.p_req = p_absorb / \
+						(1.86696 - 5.01238 * self.p_conc / 100 + 5.12286 +
+							(self.p_conc / 100) ** 2)
+		else:
+			self.p_req = p_absorb / 0.664
 
 	def calc_daily_walking_dist(
 			self, vertical_dist_to_parlor, horizontal_dist_to_parlor):

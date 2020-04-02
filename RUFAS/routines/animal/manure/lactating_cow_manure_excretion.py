@@ -11,12 +11,14 @@ from RUFAS.routines.feed.feed import Feeds, Nutrients
 from .general_manure import phosphorus_excreted
 
 
-def manure_calculations(ration_formulation, feed, BW, DIM, mPrt, p_intake):
+def manure_calculations(ration_formulation, feed, BW, DIM, mPrt, p_intake,
+                        milk_prod):
     """
     Calculates inputs for manure module with information from the
     ration formulation.
 
     Args:
+        milk_prod: milk production, kg
         ration_formulation: dictionary which stores the calculated ration
         feed: instance of the Feed class
         BW: body weight, kg
@@ -149,7 +151,7 @@ def manure_calculations(ration_formulation, feed, BW, DIM, mPrt, p_intake):
     TAN_s = (-162.4 * U * U + 96.4 * U) / 100
 
     p_excrt, WIP_frac, WOP_frac = \
-        phosphorus_excreted(BW, 0, p_intake, Mkg)
+        phosphorus_excreted(BW, milk_prod, p_intake, Mkg)
     
     return {"U": U, 
             "TAN_s": TAN_s, 

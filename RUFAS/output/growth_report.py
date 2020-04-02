@@ -33,7 +33,7 @@ class GrowthReport(BaseReportHandler):
                                 'average_growth': ['pen.avg_growth', 'kg', []],
                                 'average_milk': ['pen.avg_milk', 'kg', []],
                                 'average_p_animal': ['pen.avg_p_animal', 'g', []],
-                                'average_p_retained': ['pen.avg_p_retained', 'g', []]
+                                'average_p_req': ['pen.avg_p_req', 'g', []]
                                 }
 
         self.annual_variables = {'year': ['time.cal_year', '', 0]

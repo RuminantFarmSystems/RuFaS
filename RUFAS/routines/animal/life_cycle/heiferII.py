@@ -119,20 +119,25 @@ class HeiferII(HeiferI):
 			manure_calculations(self.body_weight, self.p_intake)
 		self.p_excrt = self.manure_excretion['p_excrt']
 
-	def phosphorus_retained(self, DMI):
+	def phosphorus_rqmts(self, DMI):
 		"""
-		Calculates the phosphorus retained by the animal.
+		Calculates and sets the animal's phosphorus requirement.
 
 		Args:
 			DMI: the Dry Matter Intake (kg)
-
-		Returns: the amount of phosphorus retained by the animal
-			in grams per day
 		"""
-		# amount of P required for maintenance (g/d) (A.#.B.1)
-		p_maint = 0.0008 * DMI + 0.000002 * self.body_weight * 1000
+		# amount of P required for endogenous losses (g) (A.1A-D.C.1)
+		p_endo_feces = 0.0008 * DMI * 1000
 
-		# amount of P required for growth of a fetus (A.#.B.2)
+		# amount pf P required for urine production (g) (A.1A-F.C.2)
+		p_urine = 0.000002 * self.body_weight * 1000
+
+		# absorbed P retained for growth (g) (A.1A-F.C.3)
+		p_growth = (0.0012 + 0.004635 * (self.mature_body_weight ** 0.22) * (
+				self.body_weight ** (-0.22))) * \
+			self.daily_growth / 0.96 * 1000
+
+		# absorbed P retained for fetal growth (g) (A.1C-F.C.4)
 		if self.days_in_preg >= 190:
 			exp_1 = (0.05527 - 0.000075 * self.days_in_preg) * self.days_in_preg
 			exp_2 = (0.05527 - 0.000075 * (self.days_in_preg - 1)) * \
@@ -144,15 +149,11 @@ class HeiferII(HeiferI):
 		else:
 			p_gest = 0
 
-		# amount of P required for growth (g/d) (A.#.B.3)
-		p_growth = (0.0012 + 0.004635 * (self.mature_body_weight ** 0.22) * (
-				self.body_weight ** (-0.22))) * \
-			self.daily_growth / 0.96 * 1000
+		# absorbed P required by the animal (g) (A.1A-F.C.6)
+		p_absorb = p_urine + p_endo_feces + p_growth + p_gest
 
-		# amount of P retained (g/d) (A.#.B.4)
-		p_retained = p_maint + p_gest + p_growth
-
-		return p_retained
+		# requirement of P from the ration (g) (A.1B-D.C.7)
+		self.p_req = p_absorb / 0.664
 
 	def update(self):
 		"""

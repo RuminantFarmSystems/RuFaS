@@ -59,6 +59,7 @@ class AnimalBase(object):
 		self.p_excrt = 0
 		self.body_weight = 0
 		self.mature_body_weight = 0
+		self.p_req = 0
 
 	def init_from_animal(self, animal):
 		self.id = animal.id
@@ -83,6 +84,7 @@ class AnimalBase(object):
 		self.p_intake = 0
 		self.p_conc = 0
 		self.p_excrt = 0
+		self.p_req = 0
 
 	def set_default_nutrient_rqmts(self):
 		"""
