@@ -60,6 +60,10 @@ class AnimalBase(object):
 		self.body_weight = 0
 		self.mature_body_weight = 0
 		self.p_req = 0
+		self.dP_reserves = 0
+		self.p_excess = 0
+		self.p_gest = 0
+		self.p_growth = 0
 
 	def init_from_animal(self, animal):
 		self.id = animal.id
@@ -85,6 +89,10 @@ class AnimalBase(object):
 		self.p_conc = 0
 		self.p_excrt = 0
 		self.p_req = 0
+		self.dP_reserves = 0
+		self.p_excess = 0
+		self.p_gest = 0
+		self.p_growth = 0
 
 	def set_default_nutrient_rqmts(self):
 		"""
@@ -119,15 +127,22 @@ class AnimalBase(object):
 		"""
 		Calculates this animal's daily phosphorus update.
 		"""
-		# (A.#.D.2) from P tracking
-		self.p_animal = self.p_animal + self.p_intake - \
-			self.p_excrt
+		# change in body P reserves (g), must be <= 0 (A.1G.A.2)
+		if self.p_intake < self.p_req:
+			self.dP_reserves = self.p_intake - self.p_req + self.dP_reserves
+		elif self.p_intake >= self.p_req and self.dP_reserves < 0:
+			self.dP_reserves = 0.7 * self.p_excess + self.dP_reserves
+		else:
+			self.dP_reserves = 0
+
+		# amount of P in the animal
+		self.p_animal = self.p_animal + self.p_gest + self.p_growth + self.dP_reserves
 
 	def set_p_purchased(self):
 		"""
 		Sets this animal's phosphorus value as a purchased animal.
 		"""
-		# (A.#.D.1) from P tracking
+		# (A.1G.A.1) from P tracking
 		self.p_animal = 0.0072 * self.body_weight * 1000
 
 	def culled(self):

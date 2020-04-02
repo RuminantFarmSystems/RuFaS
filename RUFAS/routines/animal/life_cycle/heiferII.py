@@ -133,8 +133,9 @@ class HeiferII(HeiferI):
 		p_urine = 0.000002 * self.body_weight * 1000
 
 		# absorbed P retained for growth (g) (A.1A-F.C.3)
-		p_growth = (0.0012 + 0.004635 * (self.mature_body_weight ** 0.22) * (
-				self.body_weight ** (-0.22))) * \
+		self.p_growth = \
+			(0.0012 + 0.004635 * (self.mature_body_weight ** 0.22) *
+				(self.body_weight ** (-0.22))) * \
 			self.daily_growth / 0.96 * 1000
 
 		# absorbed P retained for fetal growth (g) (A.1C-F.C.4)
@@ -142,15 +143,15 @@ class HeiferII(HeiferI):
 			exp_1 = (0.05527 - 0.000075 * self.days_in_preg) * self.days_in_preg
 			exp_2 = (0.05527 - 0.000075 * (self.days_in_preg - 1)) * \
 				(self.days_in_preg - 1)
-			p_gest = (
+			self.p_gest = (
 					0.00002743 * math.exp(exp_1) -
 					0.00002743 * math.exp(exp_2)) * 1000
-			self.p_gest_for_calf += p_gest
+			self.p_gest_for_calf += self.p_gest
 		else:
-			p_gest = 0
+			self.p_gest = 0
 
 		# absorbed P required by the animal (g) (A.1A-F.C.6)
-		p_absorb = p_urine + p_endo_feces + p_growth + p_gest
+		p_absorb = p_urine + p_endo_feces + self.p_growth + self.p_gest
 
 		# requirement of P from the ration (g) (A.1B-D.C.7)
 		self.p_req = p_absorb / 0.664
