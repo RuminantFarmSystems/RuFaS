@@ -407,7 +407,13 @@ class LifeCycleManager:
                     'days_born': 0,
                     'p_init': cow.p_gest_for_calf
                 }
-                cow.p_animal -= cow.p_gest_for_calf
+                # at parturition, the sum of P absorbed for gestation rqmts is
+                # subtracted from the animal value. the sum of P absorbed for
+                # gestation is quatl to the inital animal P value for the calf
+                # (A.1G.A.4)
+                cow.p_animal = cow.p_animal - cow.p_gest_for_calf + \
+                    cow.p_growth + cow.dP_reserves
+
                 cow.p_gest_for_calf = 0
                 new_calf = Calf(args)
 

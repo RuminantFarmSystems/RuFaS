@@ -352,12 +352,12 @@ class Cow(HeiferIII):
 			exp_1 = (0.05527 - 0.000075 * self.days_in_preg) * self.days_in_preg
 			exp_2 = (0.05527 - 0.000075 * (self.days_in_preg - 1)) * \
 				(self.days_in_preg - 1)
-			p_gest = (
+			self.p_gest = (
 					0.00002743 * math.exp(exp_1) -
 					0.00002743 * math.exp(exp_2)) * 1000
-			self.p_gest_for_calf += p_gest
+			self.p_gest_for_calf += self.p_gest
 		else:
-			p_gest = 0
+			self.p_gest = 0
 
 		# amount of P in milk per animal (g) (A.1E.C.5)
 		if self.milking:
@@ -366,7 +366,7 @@ class Cow(HeiferIII):
 			p_milk = 0
 
 		# absorbed P required by the animal (g) (A.1A-F.C.6)
-		p_absorb = p_urine + p_endo_feces + p_gest + p_milk
+		p_absorb = p_urine + p_endo_feces + self.p_gest + p_milk
 
 		# requirement of P from the ration (g) (A.1E-F.C.7)
 		if self.milking:

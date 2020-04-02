@@ -75,12 +75,13 @@ class HeiferI(Calf):
 		p_urine = 0.000002 * self.body_weight * 1000
 
 		# absorbed P retained for growth (g) (A.1A-F.C.3)
-		p_growth = (0.0012 + 0.004635 * (self.mature_body_weight ** 0.22) * (
-				self.body_weight ** (-0.22))) * \
+		self.p_growth = \
+			(0.0012 + 0.004635 * (self.mature_body_weight ** 0.22) *
+				(self.body_weight ** (-0.22))) * \
 			self.daily_growth / 0.96 * 1000
 
 		# absorbed P required by the animal (g) (A.1A-F.C.6)
-		p_absorb = p_urine + p_endo_feces + p_growth
+		p_absorb = p_urine + p_endo_feces + self.p_growth
 
 		# requirement of P from the ration (g) (A.1B-D.C.7)
 		self.p_req = p_absorb / 0.664
