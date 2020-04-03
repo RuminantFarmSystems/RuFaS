@@ -369,17 +369,17 @@ class AnimalManagement:
             if pen.pen_populated:
                 pen.calc_avg_growth()
 
-    def calc_p_retained(self, feed):
+    def calc_p_rqmts(self, feed):
         """
-        Calls each pen's method to calculate each animal's retained phosphorus.
-        This method is called daily.
+        Calls each pen's method to calculate each animal's phosphorus
+        requirements. This method is called daily.
 
         Args:
             feed: instance of the Feed class
         """
         for pen in self.all_pens:
             if pen.pen_populated:
-                pen.call_p_retained(feed)
+                pen.call_p_rqmts(feed)
 
     def daily_p_update(self):
         """
@@ -425,7 +425,7 @@ class AnimalManagement:
                 self.calc_manure_excretion(feed)  # per pen
                 self.calc_avg_growth()  # per pen
 
-            self.calc_p_retained(feed)  # per animal
+            self.calc_p_rqmts(feed)  # per animal
             self.daily_p_update()  # per animal
 
     def end_ration_interval(self):
