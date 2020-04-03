@@ -105,7 +105,7 @@ class Pen:
     # average phosphorus of the animals in the pen
     avg_p_animal = 0
 
-    # average phosphorus retained of the animals in the pen
+    # average phosphorus requirement of the animals in the pen
     avg_p_req = 0
 
     def __init__(self, id_number, vert_dist, horiz_dist, num_stalls,
@@ -329,9 +329,9 @@ class Pen:
                     animal.calc_daily_walking_dist(self.vertical_parlor_dist,
                                                    self.horizontal_parlor_dist)
 
-    def call_p_retained(self, feed):
+    def call_p_rqmts(self, feed):
         """
-        Calls each animal's method to calculate retained phosphorus.
+        Calls each animal's method to calculate phosphorus requirements.
 
         Args:
             feed: instance of the Feed class

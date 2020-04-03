@@ -110,13 +110,13 @@ class Calf(AnimalBase):
 			p_urine: amount of P required for urine production (g)
 			p_feces_excrt: amount of P excreted by an animal (g)
 		"""
-		# amount of P required for urine production (g) (A.3.A.2)
+		# amount of P required for urine production (g) (A.3.A.1)
 		p_urine = 0.000002 * self.body_weight * 1000
 
-		# excess P in the diet (g) (A.3.A.3)
+		# excess P in the diet (g) (A.3.A.2)
 		self.p_excess = self.p_intake - self.p_req
 
-		# amount of P excreted by an animal (g) (A.3.A.4)
+		# amount of P excreted by an animal (g) (A.3.A.3)
 		if self.dP_reserves == 0 and self.p_intake >= self.p_req:
 			p_feces_excrt = self.p_intake - self.p_req + self.p_maint_feces
 		elif self.dP_reserves < 0 and self.p_intake >= self.p_req and \
