@@ -102,6 +102,25 @@ class Calf(AnimalBase):
 		"""
 		self.nutrient_rqmts, self.DMIest, self.DBW = calculate_rqmts()
 
+	def calc_base_manure(self):
+		# amount of P required for urine production (g) (A.3.A.2)
+		p_urine = 0.000002 * self.body_weight * 1000
+
+		# excess P in the diet (g) (A.3.A.3)
+		self.p_excess = self.p_intake - self.p_req
+
+		# amount of P excreted by an animal (g) (A.3.A.4)
+		if self.dP_reserves == 0 and self.p_intake >= self.p_req:
+			p_feces_excrt = self.p_intake - self.p_req + self.p_maint_feces
+		elif self.dP_reserves < 0 and self.p_intake >= self.p_req and \
+				self.p_excess >= self.dP_reserves / 0.7:
+			p_feces_excrt = self.p_intake - self.p_req + self.p_maint_feces - \
+							self.dP_reserves
+		else:
+			p_feces_excrt = self.p_maint_feces
+
+		return p_urine, p_feces_excrt
+
 	def calc_manure_excretion(self, feed):
 		"""
 		Calculates and sets the manure excretion components.
@@ -109,7 +128,9 @@ class Calf(AnimalBase):
 		Args:
 			feed: instance of the Feed class
 		"""
-		self.manure_excretion = manure_calculations(self.body_weight, self.p_intake)
+		p_urine, p_feces_excrt = self.calc_base_manure()
+
+		self.manure_excretion = manure_calculations(p_feces_excrt, p_urine)
 		self.p_excrt = self.manure_excretion['p_excrt']
 
 	def phosphorus_rqmts(self, DMI):
@@ -120,7 +141,7 @@ class Calf(AnimalBase):
 			DMI: the Dry Matter Intake (kg)
 		"""
 		# amount of P required for endogenous losses (g) (A.1A-D.C.1)
-		p_endo_feces = 0.0008 * DMI * 1000
+		self.p_maint_feces = 0.0008 * DMI * 1000
 
 		# amount pf P required for urine production (g) (A.1A-F.C.2)
 		p_urine = 0.000002 * self.body_weight * 1000
@@ -132,7 +153,7 @@ class Calf(AnimalBase):
 			self.daily_growth / 0.96 * 1000
 
 		# absorbed P required by the animal (g) (A.1A-F.C.6)
-		p_absorb = p_urine + p_endo_feces + self.p_growth
+		p_absorb = p_urine + self.p_maint_feces + self.p_growth
 
 		# requirement of P from the ration (g) (A.1A.C.7)
 		self.p_req = p_absorb / 0.90

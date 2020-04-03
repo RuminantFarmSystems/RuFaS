@@ -12,7 +12,7 @@ from .general_manure import phosphorus_excreted
 
 
 def manure_calculations(ration_formulation, feed, BW, DIM, mPrt, p_intake,
-                        milk_prod):
+                        milk_prod, p_feces_excrt, p_urine):
     """
     Calculates inputs for manure module with information from the
     ration formulation.
@@ -151,7 +151,7 @@ def manure_calculations(ration_formulation, feed, BW, DIM, mPrt, p_intake,
     TAN_s = (-162.4 * U * U + 96.4 * U) / 100
 
     p_excrt, WIP_frac, WOP_frac = \
-        phosphorus_excreted(BW, milk_prod, p_intake, Mkg)
+        phosphorus_excreted(milk_prod, Mkg, p_feces_excrt, p_urine)
     
     return {"U": U, 
             "TAN_s": TAN_s, 
