@@ -10,15 +10,15 @@ Author(s): Militsa Sotirova, militsasotirova@gmail.com
 from .general_manure import phosphorus_excreted
 
 
-def manure_calculations(BW, p_intake):
+def manure_calculations(p_feces_excrt, p_urine):
     """
     TEMPORARY PLACEHOLDER
     Calculates inputs for manure module with information from the
     ration formulation.
 
     Args:
-        BW: body weight of animal, kg
-        p_intake: amount of P in the formulated ration, g
+        p_feces_excrt: amount of P excreted by an animal (g)
+        p_urine: amount of P required for urine production (g)
 
     Returns: dictionary containing the following values
         U: urea concentration, mol/L
@@ -34,7 +34,7 @@ def manure_calculations(BW, p_intake):
     """
     total_manure = 70.792
     p_excrt, WIP_frac, WOP_frac = \
-        phosphorus_excreted(BW, 0, p_intake, total_manure)
+        phosphorus_excreted(0, total_manure, p_feces_excrt, p_urine)
     return {"U": 0.340,
             "TAN_s": 0.14,
             "MN": 532.407,

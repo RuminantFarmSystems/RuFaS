@@ -115,8 +115,9 @@ class HeiferII(HeiferI):
 		Args:
 			feed: instance of the Feed class
 		"""
-		self.manure_excretion = \
-			manure_calculations(self.body_weight, self.p_intake)
+		p_urine, p_feces_excrt = self.calc_base_manure()
+
+		self.manure_excretion = manure_calculations(p_feces_excrt, p_urine)
 		self.p_excrt = self.manure_excretion['p_excrt']
 
 	def phosphorus_rqmts(self, DMI):
@@ -127,7 +128,7 @@ class HeiferII(HeiferI):
 			DMI: the Dry Matter Intake (kg)
 		"""
 		# amount of P required for endogenous losses (g) (A.1A-D.C.1)
-		p_endo_feces = 0.0008 * DMI * 1000
+		self.p_maint_feces = 0.0008 * DMI * 1000
 
 		# amount pf P required for urine production (g) (A.1A-F.C.2)
 		p_urine = 0.000002 * self.body_weight * 1000
@@ -151,7 +152,7 @@ class HeiferII(HeiferI):
 			self.p_gest = 0
 
 		# absorbed P required by the animal (g) (A.1A-F.C.6)
-		p_absorb = p_urine + p_endo_feces + self.p_growth + self.p_gest
+		p_absorb = p_urine + self.p_maint_feces + self.p_growth + self.p_gest
 
 		# requirement of P from the ration (g) (A.1B-D.C.7)
 		self.p_req = p_absorb / 0.664

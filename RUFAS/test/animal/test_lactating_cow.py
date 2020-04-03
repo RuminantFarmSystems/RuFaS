@@ -76,10 +76,16 @@ class LactatingCowTest(unittest.TestCase):
         DMI = calc_DMI(input_ration, feed)
         p_intake, p_conc = phosphorus_in_ration(DMI, input_ration, feed)
 
+        # hard coded value because actual calculations require other variables
+        # that aren't able to be inputs (e.g. dP_reserves)
+        p_urine = 1
+        p_feces_excrt = 1
+
         manure = manure_excretion.manure_calculations(input_ration, feed,
                                                       inputs['BW'], inputs['DIM'],
                                                       inputs['mPrt'],
-                                                      p_intake, inputs['milk'])
+                                                      p_intake, inputs['milk'],
+                                                      p_feces_excrt, p_urine)
 
         self.assertEqual(manure, expected_manure)
 

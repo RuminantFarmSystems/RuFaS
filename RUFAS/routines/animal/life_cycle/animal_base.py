@@ -64,6 +64,7 @@ class AnimalBase(object):
 		self.p_excess = 0
 		self.p_gest = 0
 		self.p_growth = 0
+		self.p_maint_feces = 0
 
 	def init_from_animal(self, animal):
 		self.id = animal.id
@@ -93,6 +94,7 @@ class AnimalBase(object):
 		self.p_excess = 0
 		self.p_gest = 0
 		self.p_growth = 0
+		self.p_maint_feces = 0
 
 	def set_default_nutrient_rqmts(self):
 		"""

@@ -324,14 +324,15 @@ class Cow(HeiferIII):
 		Args:
 			feed: instance of the Feed class
 		"""
+		p_urine, p_feces_excrt = self.calc_base_manure()
+
 		if self.milking:
 			self.manure_excretion = lactating_manure_calculations(
 				self.ration_formulation, feed, self.body_weight,
 				self.days_in_milk, self.mPrt, self.p_intake,
-				self.estimated_daily_milk_produced)
+				self.estimated_daily_milk_produced, p_feces_excrt, p_urine)
 		else:
-			self.manure_excretion = \
-				dry_manure_calculations(self.body_weight, self.p_intake)
+			self.manure_excretion = dry_manure_calculations(p_feces_excrt, p_urine)
 		self.p_excrt = self.manure_excretion['p_excrt']
 
 	def phosphorus_rqmts(self, DMI):
@@ -342,7 +343,16 @@ class Cow(HeiferIII):
 			DMI: the Dry Matter Intake (kg)
 		"""
 		# amount of P required for endogenous losses (g) (A.1A-D.C.1)
-		p_endo_feces = 0.0008 * DMI * 1000
+		self.p_maint_feces = 0.001 * DMI * 1000
+
+		# absorbed P retained for growth (g) (A.1A-F.C.3)
+		if self.body_weight < self.mature_body_weight:
+			self.p_growth = \
+				(0.0012 + 0.004635 * (self.mature_body_weight ** 0.22) *
+					(self.body_weight ** (-0.22))) * \
+				self.daily_growth / 0.96 * 1000
+		else:
+			self.p_growth = 0
 
 		# amount pf P required for urine production (g) (A.1A-F.C.2)
 		p_urine = 0.000002 * self.body_weight * 1000
@@ -366,7 +376,8 @@ class Cow(HeiferIII):
 			p_milk = 0
 
 		# absorbed P required by the animal (g) (A.1A-F.C.6)
-		p_absorb = p_urine + p_endo_feces + self.p_gest + p_milk
+		p_absorb = p_urine + self.p_maint_feces + self.p_growth + \
+			self.p_gest + p_milk
 
 		# requirement of P from the ration (g) (A.1E-F.C.7)
 		if self.milking:
