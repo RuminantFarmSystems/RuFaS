@@ -103,6 +103,13 @@ class Calf(AnimalBase):
 		self.nutrient_rqmts, self.DMIest, self.DBW = calculate_rqmts()
 
 	def calc_base_manure(self):
+		"""
+		Calculates the values needed for animal class manure calculations.
+
+		Returns:
+			p_urine: amount of P required for urine production (g)
+			p_feces_excrt: amount of P excreted by an animal (g)
+		"""
 		# amount of P required for urine production (g) (A.3.A.2)
 		p_urine = 0.000002 * self.body_weight * 1000
 
