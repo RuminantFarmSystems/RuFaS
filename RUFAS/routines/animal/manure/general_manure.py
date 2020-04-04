@@ -31,7 +31,7 @@ def phosphorus_excreted(milk_prod, total_manure, p_feces_excrt, p_urine):
     # amount of P excreted by an animal (g) (A.3.A.7)
     p_excrt = p_milk + p_feces_excrt + p_urine
     
-    # TODO Add manure P excretion for manure module input (g) (A.3.A.8)
-    # p_excrt_manure = p_feces_excrt + p_urine
+    # manure P excretion for manure module input (g) (A.3.A.8)
+    p_excrt_manure = p_feces_excrt + p_urine
 
-    return p_excrt, WIP_frac, WOP_frac
+    return p_excrt, WIP_frac, WOP_frac, p_excrt_manure, p_frac

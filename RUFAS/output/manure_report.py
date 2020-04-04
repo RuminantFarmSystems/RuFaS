@@ -29,7 +29,7 @@ class ManureReport(BaseReportHandler):
         self.daily_variables = {'year': ['time.cal_year', '', []],
                                 'j_day': ['time.day', '', []],
                                 'num_animals': ['len(pen.animals_in_pen)', '', []],
-                                'manure': ['pen.manure[\'p_excrt\']', 'g', []]
+                                'manure': ['pen.manure[\'p_excrt_manure\']', 'g', []]
                                 }
         self.annual_variables = {'year': ['time.cal_year', '', 0]}
 

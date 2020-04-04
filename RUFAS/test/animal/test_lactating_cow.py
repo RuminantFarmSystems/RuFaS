@@ -81,11 +81,11 @@ class LactatingCowTest(unittest.TestCase):
         p_urine = 1
         p_feces_excrt = 1
 
-        manure = manure_excretion.manure_calculations(input_ration, feed,
-                                                      inputs['BW'], inputs['DIM'],
-                                                      inputs['mPrt'],
-                                                      p_intake, inputs['milk'],
-                                                      p_feces_excrt, p_urine)
+        excrt, manure = \
+            manure_excretion.manure_calculations(input_ration, feed,
+                                                 inputs['BW'], inputs['DIM'],
+                                                 inputs['mPrt'], inputs['milk'],
+                                                 p_feces_excrt, p_urine)
 
         self.assertEqual(manure, expected_manure)
 

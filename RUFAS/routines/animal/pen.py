@@ -95,9 +95,10 @@ class Pen:
               "Mkg": 0,
               "VSd": 0,
               "VSnd": 0,
-              "p_excrt": 0,
               "WIP_frac": 0,
-              "WOP_frac": 0}
+              "WOP_frac": 0,
+              "p_excrt_manure": 0,
+              "p_frac": 0}
 
     # average growth of the animals in the pen
     avg_growth = 0

@@ -137,8 +137,8 @@ class Calf(AnimalBase):
 		"""
 		p_urine, p_feces_excrt = self.calc_base_manure()
 
-		self.manure_excretion = manure_calculations(p_feces_excrt, p_urine)
-		self.p_excrt = self.manure_excretion['p_excrt']
+		self.p_excrt, self.manure_excretion = \
+			manure_calculations(p_feces_excrt, p_urine)
 
 	def phosphorus_rqmts(self, DMI):
 		"""

@@ -66,5 +66,6 @@ class AnimalInputsOutputs:
         'VSnd':  859.3916402321569,
         'WIP_frac': 1.4119588737072899e-05,
         'WOP_frac': 1.4119588737072899e-06,
-        'p_excrt': 38.0
+        'p_excrt_manure': 2,
+        "p_frac": 2.8239177474145797e-05
     }

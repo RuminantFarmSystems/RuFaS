@@ -11,7 +11,7 @@ from RUFAS.routines.feed.feed import Feeds, Nutrients
 from .general_manure import phosphorus_excreted
 
 
-def manure_calculations(ration_formulation, feed, BW, DIM, mPrt, p_intake,
+def manure_calculations(ration_formulation, feed, BW, DIM, mPrt,
                         milk_prod, p_feces_excrt, p_urine):
     """
     Calculates inputs for manure module with information from the
@@ -24,19 +24,23 @@ def manure_calculations(ration_formulation, feed, BW, DIM, mPrt, p_intake,
         BW: body weight, kg
         DIM: days in milk, d
         mPrt: milk protein, % of milk (from animal input)
-        p_intake: amount of P in the formulated ration, g
+        p_feces_excrt: amount of P excreted by an animal (g)
+        p_urine: amount of P required for urine production (g)
 
-    Returns: dictionary containing the following values
-        U: urea concentration, mol/L
-        TAN_s: total ammoniacal nitrogen concentration in the manure slurry,
-            mol/L
-        MN: nitrogen in liquid and solid manure, g
-        Mkg: amount of manure, kg
-        VSd: degradable volatile solids, g
-        VSnd: non-degradable volatile solids, g
+    Returns:
         p_excrt: amount of P excreted by animal, g
-        WIP_frac: water extractable inorganic P fraction
-        WOP_frac: water extractable organic P fraction
+        and a dictionary containing the following values
+            U: urea concentration, mol/L
+            TAN_s: total ammoniacal nitrogen concentration in the manure slurry,
+                mol/L
+            MN: nitrogen in liquid and solid manure, g
+            Mkg: amount of manure, kg
+            VSd: degradable volatile solids, g
+            VSnd: non-degradable volatile solids, g
+            WIP_frac: water extractable inorganic P fraction
+            WOP_frac: water extractable organic P fraction
+            p_excrt_manure: manure P excretion for manure module input (g)
+            p_frac: P fraction of manure
     """
 
     '''
@@ -150,16 +154,18 @@ def manure_calculations(ration_formulation, feed, BW, DIM, mPrt, p_intake,
     # mol/L (Eq 6.1)
     TAN_s = (-162.4 * U * U + 96.4 * U) / 100
 
-    p_excrt, WIP_frac, WOP_frac = \
+    p_excrt, WIP_frac, WOP_frac, p_excrt_manure, p_frac = \
         phosphorus_excreted(milk_prod, Mkg, p_feces_excrt, p_urine)
-    
-    return {"U": U, 
+
+    return p_excrt, \
+           {"U": U,
             "TAN_s": TAN_s, 
             "MN": MN, 
             "Mkg": Mkg, 
             "VSd": VSd, 
             "VSnd": VSnd,
-            "p_excrt": p_excrt,
             "WIP_frac": WIP_frac,
-            "WOP_frac": WOP_frac
+            "WOP_frac": WOP_frac,
+            "p_excrt_manure": p_excrt_manure,
+            "p_frac": p_frac
             }
