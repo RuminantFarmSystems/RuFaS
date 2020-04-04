@@ -11,8 +11,6 @@ Author(s): Kass Chupongstimun, kass_c@hotmail.com
 
 This module needs the following inputs in order to operate correctly:
 
-    "latitude": 43.332708
-
     These are attributes of a crop type that need to be specified in the json input
     file. The values on the right are just examples from a corn crop type.
 
@@ -47,7 +45,7 @@ from . import heat_units, leaf_area_index, root_development, biomass, yields, \
 from ..application_management import application_management
 
 
-def daily_crop_routine(soil, crop, application, weather, time):
+def daily_crop_routine(soil, crop, application, weather, space, time):
     """Executes all the daily crop routines.
 
     Inputs:
@@ -71,7 +69,7 @@ def daily_crop_routine(soil, crop, application, weather, time):
         crop_type.yield_P = 0
         # If the crop is not planted yet, determine whether it is planted today
         if not crop_type.planted:
-            calculate_start(soil, crop, application, weather, time)
+            calculate_start(soil, crop, application, weather, space, time)
 
         # Once the crop is planted:
         else:
@@ -110,10 +108,10 @@ def daily_crop_routine(soil, crop, application, weather, time):
                 # If it is, run the dormancy routine and set growing to false
                 # (This method is only called once on the first day when crop
                 # enters dormancy)
-                if in_dormancy(crop, time) and crop_type.growing:
+                if in_dormancy(crop, space, time) and crop_type.growing:
                     dormancy_routine(soil, crop_type, application, time)
                     crop_type.growing = False
-                elif not in_dormancy(crop, time):
+                elif not in_dormancy(crop, space, time):
                     if crop_type.growing is False:
                         application.manure_day = True
                         application.fertilizer_day = True
@@ -199,7 +197,7 @@ class Crop:
     Contains the state of the farm's crop.
     """
     
-    def __init__(self, data, time):
+    def __init__(self, data, space, time):
         """Constructs an instance of the Crop class by populating its arrays
             and the necessary values.
 
@@ -214,9 +212,8 @@ class Crop:
         self.soy = Soybean(data)
 
         # Dormancy for perennial crops
-        self.latitude = abs(data['latitude'])
-        self.T_dl_min = calculate_minimum_day_length(self.latitude)
-        self.t_dorm = calculate_t_dorm(self.latitude)
+        self.T_dl_min = calculate_minimum_day_length(space.latitude)
+        self.t_dorm = calculate_t_dorm(space.latitude)
         self.solar_declination = 0.0
 
         self.crops_list = [self.alfalfa, self.corn, self.soy]
@@ -873,7 +870,7 @@ class Alfalfa:
         self.yield_annual = 0
 
 
-def calculate_start(soil, crop, application, weather, time):
+def calculate_start(soil, crop, application, weather, space, time):
     """Calculates the start day for the crop
        "pseudocode_crop" section C.1.A
 
@@ -900,7 +897,7 @@ def calculate_start(soil, crop, application, weather, time):
         else:
             if time.year == 1 and time.day > crop_type.planting_date:
                 pass
-            elif not in_dormancy(crop, time) and yearly_T_avg[time.day - 1] > crop_type.T_base_min:
+            elif not in_dormancy(crop, space, time) and yearly_T_avg[time.day - 1] > crop_type.T_base_min:
                 if not application_management.check_conditions(soil, application, weather, time, 0, -1):
                     crop_type.planted = True
                     crop_type.growing = True
@@ -918,7 +915,7 @@ def calculate_start(soil, crop, application, weather, time):
         else:
             if time.year == 1 and time.day > crop_type.planting_date:
                 pass
-            elif not in_dormancy(crop, time) and yearly_T_avg[time.day - 1] > crop_type.T_base_min:
+            elif not in_dormancy(crop, space, time) and yearly_T_avg[time.day - 1] > crop_type.T_base_min:
                 crop_type.planted = True
                 crop_type.growing = True
     else:
@@ -966,7 +963,7 @@ def calculate_t_dorm(latitude):
         return 0.0
 
 
-def in_dormancy(crop, time):
+def in_dormancy(crop, space, time):
     """Returns a boolean indicating whether the given day is within the dormant
        period for the watershed.
        "pseudocode_crop" C.11.A.1/C.11.B.2
@@ -984,7 +981,7 @@ def in_dormancy(crop, time):
     solar_declination = asin(0.4 * sin(2 * pi / year_length * (time.day - 82)))
 
     angular_velocity = 0.2618
-    latitude_radians = crop.latitude * pi / 180
+    latitude_radians = space.latitude * pi / 180
 
     T_dl = 2 * acos(-tan(solar_declination) * tan(latitude_radians)) / angular_velocity
 

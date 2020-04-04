@@ -1,7 +1,7 @@
 {
     "corn":
     {
-        "grow_years": [],
+        "grow_years": [2010, 2011, 2012, 2013, 2014, 2015, 2019],
         "repeat": 0,
         "planting_date": 121,
         "harvest_date": 319,
@@ -9,15 +9,15 @@
     },
     "soybean":
     {
-        "grow_years": [2009],
-        "repeat": 1,
+        "grow_years": [],
+        "repeat": 0,
         "planting_date": 121,
         "harvest_date": 319,
         "harvest_type": "scheduled"
     },
     "alfalfa":
     {
-        "grow_years": [],
+        "grow_years": [2016, 2017, 2018],
         "repeat": 0,
         "planting_date": 121,
         "harvest_date": 319,

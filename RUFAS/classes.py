@@ -34,11 +34,11 @@ class State:
     the future or in an output report in the state object.
     """
 
-    def __init__(self, data, config, time):
+    def __init__(self, data, config, space, time):
         self.fields = []
         self.fields_data = data['fields']
         for field_name, field_data in self.fields_data.items():
-            self.fields.append(Field(field_name, field_data, time))
+            self.fields.append(Field(field_name, field_data, space, time))
         input_dir = util.get_base_dir() / 'Inputs'
         self.feed = Feed(read_json_file(input_dir / 'feed_storage' / data['feed']))
         self.animal_management = AnimalManagement(
@@ -92,6 +92,8 @@ class Config:
         self.end_year = int(self.end_full_date[0])
         self.start_day = int(self.start_full_date[1])
         self.end_day = int(self.end_full_date[1])
+
+        self.latitude = data['latitude']
 
         # boolean to determine if the tests should be run
         self.run_tests = data['run_tests']
@@ -406,6 +408,16 @@ class Weather:
 
             self.T_avg_annual[0] = T_avg
             self.T_avg_annual[len(self.T_avg_annual) - 1] = T_avg
+
+
+class Space:
+    """
+    This object is responsible for creating and tracking the farm's relevant spatial information.
+    Right now it currently represents a latitude only.
+    """
+
+    def __init__(self, config):
+        self.latitude = abs(config.latitude)
 
 
 class Time:
