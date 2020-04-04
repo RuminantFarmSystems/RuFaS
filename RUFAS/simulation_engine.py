@@ -13,11 +13,11 @@ import time as timer
 from pathlib import Path
 
 from RUFAS import routines, errors
-from RUFAS.classes import Config, State, Weather, Time
+from RUFAS.classes import Config, State, Weather, Space, Time
 from RUFAS.output import OutputHandler
 from RUFAS.test import test_handler
 
-config, state, output, weather, time = None, None, None, None, None
+config, state, output, weather, space, time = None, None, None, None, None, None
 
 
 def simulate(input_fPath: Path):
@@ -79,7 +79,7 @@ def daily_simulation():
     routines.daily_animal_routine(state.animal_management, state.feed)
     for field in state.fields:
         routines.daily_soil_routine(field.soil, field.crop, field.application, weather, time)
-        routines.daily_crop_routine(field.soil, field.crop, field.application, weather, time)
+        routines.daily_crop_routine(field.soil, field.crop, field.application, weather, space, time)
         routines.daily_feed_routine(state.feed, field.crop)
 
     #
@@ -135,7 +135,7 @@ def read_json_file(fPath: Path):
             conform with the format required
     """
 
-    global config, state, output, weather, time
+    global config, state, output, weather, space, time
 
     with fPath.open('r') as f:
         data = json.load(f)
@@ -148,8 +148,9 @@ def read_json_file(fPath: Path):
                 test_handler.run_tests()
 
             weather = Weather(data['weather'], config)
+            space = Space(config)
             time = Time(config)
-            state = State(data['farm'], config, time)
+            state = State(data['farm'], config, space, time)
             output = OutputHandler(data['output'], state)
 
         except errors.JSONfileData as e:

@@ -46,7 +46,7 @@ from .application_management.application_management import Application
 
 
 class Field:
-    def __init__(self, field_name, field_data, time):
+    def __init__(self, field_name, field_data, space, time):
         self.field_name = field_name
 
         input_dir = util.get_base_dir() / 'Inputs'
@@ -57,7 +57,7 @@ class Field:
 
         self.soil = Soil(self.soil_data, time)
         self.application = Application(self.application_data, time)
-        self.crop = Crop(self.crop_data, time)
+        self.crop = Crop(self.crop_data, space, time)
 
 
 def read_json_file(file_path: Path):
