@@ -108,6 +108,8 @@ def grouping(list, pens):
     n = len(RNKdat.columns)
     RNKdat.insert(n, 'Percentile', Percentile)
     Cow_nutr_df['Percentile'] = Percentile
+    Cow_nutr_df['Percentile'] = 1 - Cow_nutr_df['Percentile']
+
 
     #############################################
     ###Grouping###
