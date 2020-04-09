@@ -17,7 +17,7 @@ from RUFAS.classes import Config, State, Weather, Space, Time
 from RUFAS.output import OutputHandler
 from RUFAS.test import test_handler
 
-config, state, output, weather, space, time = None, None, None, None, None, None
+global config, state, output, weather, space, time
 
 
 def simulate(input_fPath: Path):

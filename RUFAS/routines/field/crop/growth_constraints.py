@@ -19,7 +19,7 @@ CropType attribute definitions:
     bio_N_opt = Optimal mass of nitrogen stored in plant material for current
                 growth stage (kg N/ha)
 
-    phi_N = Scaling factor for nitrogen stress
+    phi_N = sc_aling factor for nitrogen stress
 
     bio_P = Actual mass of phosphorus stored in plant material (kg P/ha)
 
