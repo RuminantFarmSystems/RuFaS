@@ -17,6 +17,7 @@ from RUFAS.routines.animal.pen import Pen
 from RUFAS.routines.animal.clustering_pen_grouping import grouping
 from RUFAS.routines.animal.life_cycle.life_cycle import LifeCycleManager
 from RUFAS.routines.animal.life_cycle.animal_base import AnimalBase
+import random
 
 def daily_animal_routine(animal_management, feed, weather, time):
     '''Executes daily routines relating to Animals.
@@ -224,7 +225,7 @@ class AnimalManagement:
         '''
         Allocates the animals in all_animals to pens in all_pens based on the animals' characteristics.
         '''
-
+        #Assiging non-cows to pens
         if len(self.all_pens) == 3:
             self.all_pens[0].update_animals(self.calves)
         elif len(self.all_pens) == 4:
@@ -232,10 +233,10 @@ class AnimalManagement:
             self.all_pens[0].update_animals(self.calves)
             self.all_pens[1].update_animals(heifers)
         elif len(self.all_pens) == 5:
-            heifers = self.heiferIs + self.heiferIIs
+            heifers = self.heiferIIs + self.heiferIIIs
             self.all_pens[0].update_animals(self.calves)
-            self.all_pens[1].update_animals(heifers)
-            self.all_pens[2].update_animals(self.heiferIIIs)
+            self.all_pens[1].update_animals(self.heiferIIs)
+            self.all_pens[2].update_animals(heifers)
         else:
             self.all_pens[0].update_animals(self.calves)
             self.all_pens[1].update_animals(self.heiferIs)
@@ -251,285 +252,26 @@ class AnimalManagement:
                 lactating_cows.append(cow)
             else:
                 dry_cows.append(cow)
+        #Asigning Dry Cows to Pens
         if len(self.all_pens) == 3:
             dry_and_heifers = self.heiferIs + self.heiferIIs + self.heiferIIIs + dry_cows
             self.all_pens[1].update_animals(dry_and_heifers)
             self.all_pens[2].update_animals(lactating_cows)
-        elif len(self.all_pens) == 4:
+        elif (4 <= len(self.all_pens) <= 6):
             self.all_pens[2].update_animals(dry_cows)
             self.all_pens[3].update_animals(lactating_cows)
-        elif len(self.all_pens) == 5:
-            self.all_pens[3].update_animals(dry_cows)
-            self.all_pens[4].update_animals(lactating_cows)
-        elif len(self.all_pens) == 6:
-            self.all_pens[4].update_animals(dry_cows)
-            self.all_pens[5].update_animals(lactating_cows)
         else:
             self.all_pens[4].update_animals(dry_cows)
-            for i in range(len(lactating_cows)):
-                lactating_cows[i].ID = i + 1
-
-            df = grouping(lactating_cows)
-            if isinstance(df, list):
-                cows_2 = []
-                cows_3 = []
-                cows_4 = []
-                cows_6 = []
-                cows_7 = []
-                cows_8 = []
-                cows_9 = []
-                cows_22 = []
-                cows_23 = []
-                cows_24 = []
-                cows_25 = []
-                cows_26 = []
-                cows_27 = []
-                cows_28 = []
-
-                for i in range(len(df[0]) - 1):
-                    ID = df[0][i]
-                    if df[1][i] == 2:
-                        cows_2.append(lactating_cows[df[0][i] - 1])
-                    elif df[1][i] == 3:
-                        cows_3.append(lactating_cows[df[0][i] - 1])
-                    elif df[1][i] == 4:
-                        cows_4.append(lactating_cows[df[0][i] - 1])
-                    elif df[1][i] == 6:
-                        cows_6.append(lactating_cows[df[0][i] - 1])
-                    elif df[1][i] == 7:
-                        cows_7.append(lactating_cows[df[0][i] - 1])
-                    elif df[1][i] == 8:
-                        cows_8.append(lactating_cows[df[0][i] - 1])
-                    elif df[1][i] == 9:
-                        cows_9.append(lactating_cows[df[0][i] - 1])
-                    elif df[1][i] == 22:
-                        cows_22.append(lactating_cows[df[0][i] - 1])
-                    elif df[1][i] == 23:
-                        cows_23.append(lactating_cows[df[0][i] - 1])
-                    elif df[1][i] == 24:
-                        cows_24.append(lactating_cows[df[0][i] - 1])
-                    elif df[1][i] == 25:
-                        cows_25.append(lactating_cows[df[0][i] - 1])
-                    elif df[1][i] == 26:
-                        cows_26.append(lactating_cows[df[0][i] - 1])
-                    elif df[1][i] == 27:
-                        cows_27.append(lactating_cows[df[0][i] - 1])
-                    else:
-                        cows_28.append(lactating_cows[df[0][i] - 1])
-
-
-                #allocation of lactating cows into pens (based on number of pens available)
-
-                n = len(self.all_pens)
-
-                if n == 7:
-                    #combining groupings of cows with similar ration requirments
-                    #due to sparsity of pens
-                    lactating_group_1 = cows_2 + cows_3 + cows_4 + cows_6 + cows_7 + cows_8 + cows_9
-                    lactating_group_2 = cows_22 + cows_23 + cows_24 + cows_25 + cows_26 + cows_27 + cows_28
-                    self.all_pens[5].update_animals(lactating_group_1)
-                    self.all_pens[6].update_animals(lactating_group_2)
-                elif n == 8:
-                    #combining groupings of cows with similar ration requirments
-                    #due to sparsity of pens
-                    lactating_group_1 = cows_2 + cows_3 + cows_4 + cows_6 + cows_7 + cows_8 + cows_9
-                    lactating_group_2 = cows_22 + cows_23 + cows_24 + cows_25
-                    lactating_group_3 = cows_26 + cows_27 + cows_28
-                    self.all_pens[5].update_animals(lactating_group_1)
-                    self.all_pens[6].update_animals(lactating_group_2)
-                    self.all_pens[7].update_animals(lactating_group_3)
-
-                elif n == 9:
-                    #combining groupings of cows with similar ration requirments
-                    #due to sparsity of pens
-                    lactating_group_1 = cows_2 + cows_3 + cows_4 + cows_6
-                    lactating_group_2 = cows_7 + cows_8 + cows_9
-                    lactating_group_3 = cows_22 + cows_23 + cows_24
-                    lactating_group_4 = cows_25 + cows_26 + cows_27 + cows_28
-                    self.all_pens[5].update_animals(lactating_group_1)
-                    self.all_pens[6].update_animals(lactating_group_2)
-                    self.all_pens[7].update_animals(lactating_group_3)
-                    self.all_pens[8].update_animals(lactating_group_4)
-
-                elif n == 10:
-                    #combining groupings of cows with similar ration requirments
-                    #due to sparsity of pens
-                    lactating_group_1 = cows_2 + cows_3 + cows_4 + cows_6
-                    lactating_group_2 = cows_7 + cows_8 + cows_9
-                    lactating_group_3 = cows_22 + cows_23 + cows_24
-                    lactating_group_4 = cows_25 + cows_26
-                    lactating_group_5 = cows_27 + cows_28
-                    self.all_pens[5].update_animals(lactating_group_1)
-                    self.all_pens[6].update_animals(lactating_group_2)
-                    self.all_pens[7].update_animals(lactating_group_3)
-                    self.all_pens[8].update_animals(lactating_group_4)
-                    self.all_pens[9].update_animals(lactating_group_5)
-
-                elif n == 11:
-                    #combining groupings of cows with similar ration requirments
-                    #due to sparsity of pens
-                    lactating_group_1 = cows_2 + cows_3 + cows_4 + cows_6
-                    lactating_group_2 = cows_7 + cows_8
-                    lactating_group_3 = cows_9
-                    lactating_group_4 = cows_22 + cows_23 + cows_24
-                    lactating_group_5 = cows_25 + cows_26
-                    lactating_group_6 = cows_27 + cows_28
-                    self.all_pens[5].update_animals(lactating_group_1)
-                    self.all_pens[6].update_animals(lactating_group_2)
-                    self.all_pens[7].update_animals(lactating_group_3)
-                    self.all_pens[8].update_animals(lactating_group_4)
-                    self.all_pens[9].update_animals(lactating_group_5)
-                    self.all_pens[10].update_animals(lactating_group_6)
-
-                elif n == 12:
-                    #combining groupings of cows with similar ration requirments
-                    #due to sparsity of pens
-                    lactating_group_1 = cows_2 + cows_3 + cows_4
-                    lactating_group_2 = cows_7 + cows_6
-                    lactating_group_3 = cows_8
-                    lactating_group_4 = cows_9
-                    lactating_group_5 = cows_22 + cows_23 + cows_24
-                    lactating_group_6 = cows_25 + cows_26
-                    lactating_group_7 = cows_27 + cows_28
-                    self.all_pens[5].update_animals(lactating_group_1)
-                    self.all_pens[6].update_animals(lactating_group_2)
-                    self.all_pens[7].update_animals(lactating_group_3)
-                    self.all_pens[8].update_animals(lactating_group_4)
-                    self.all_pens[9].update_animals(lactating_group_5)
-                    self.all_pens[10].update_animals(lactating_group_6)
-                    self.all_pens[11].update_animals(lactating_group_7)
-
-                elif n == 13:
-                    #combining groupings of cows with similar ration requirments
-                    #due to sparsity of pens
-                    lactating_group_1 = cows_2 + cows_3 + cows_4
-                    lactating_group_2 = cows_7 + cows_6
-                    lactating_group_3 = cows_8
-                    lactating_group_4 = cows_9
-                    lactating_group_5 = cows_22 + cows_23
-                    lactating_group_6 = cows_24
-                    lactating_group_7 = cows_25 + cows_26
-                    lactating_group_8 = cows_27 + cows_28
-                    self.all_pens[5].update_animals(lactating_group_1)
-                    self.all_pens[6].update_animals(lactating_group_2)
-                    self.all_pens[7].update_animals(lactating_group_3)
-                    self.all_pens[8].update_animals(lactating_group_4)
-                    self.all_pens[9].update_animals(lactating_group_5)
-                    self.all_pens[10].update_animals(lactating_group_6)
-                    self.all_pens[11].update_animals(lactating_group_7)
-                    self.all_pens[12].update_animals(lactating_group_8)
-
-                elif n == 14:
-                    #combining groupings of cows with similar ration requirments
-                    #due to sparsity of pens
-                    lactating_group_1 = cows_2 + cows_3 + cows_4
-                    lactating_group_2 = cows_7 + cows_6
-                    lactating_group_3 = cows_8
-                    lactating_group_4 = cows_9
-                    lactating_group_5 = cows_22 + cows_23
-                    lactating_group_6 = cows_24
-                    lactating_group_7 = cows_25
-                    lactating_group_8 = cows_26
-                    lactating_group_9 = cows_27 + cows_28
-                    self.all_pens[5].update_animals(lactating_group_1)
-                    self.all_pens[6].update_animals(lactating_group_2)
-                    self.all_pens[7].update_animals(lactating_group_3)
-                    self.all_pens[8].update_animals(lactating_group_4)
-                    self.all_pens[9].update_animals(lactating_group_5)
-                    self.all_pens[10].update_animals(lactating_group_6)
-                    self.all_pens[11].update_animals(lactating_group_7)
-                    self.all_pens[12].update_animals(lactating_group_8)
-                    self.all_pens[13].update_animals(lactating_group_9)
-
-                elif n == 15:
-                    #combining groupings of cows with similar ration requirments
-                    #due to sparsity of pens
-                    lactating_group_1 = cows_2 + cows_3 + cows_4
-                    lactating_group_2 = cows_7 + cows_6
-                    lactating_group_3 = cows_22 + cows_23
-
-
-                    self.all_pens[5].update_animals(lactating_group_1)
-                    self.all_pens[6].update_animals(lactating_group_2)
-                    self.all_pens[7].update_animals(cows_8)
-                    self.all_pens[8].update_animals(cows_9)
-                    self.all_pens[9].update_animals(lactating_group_3)
-                    self.all_pens[10].update_animals(cows_24)
-                    self.all_pens[11].update_animals(cows_25)
-                    self.all_pens[12].update_animals(cows_26)
-                    self.all_pens[13].update_animals(cows_27)
-                    self.all_pens[14].update_animals(cows_28)
-
-                elif n == 16:
-                    #combining groupings of cows with similar ration requirments
-                    #due to sparsity of pens
-                    lactating_group_1 = cows_2 + cows_3 + cows_4
-                    lactating_group_2 = cows_7 + cows_6
-
-                    self.all_pens[5].update_animals(lactating_group_1)
-                    self.all_pens[6].update_animals(lactating_group_2)
-                    self.all_pens[7].update_animals(cows_8)
-                    self.all_pens[8].update_animals(cows_9)
-                    self.all_pens[9].update_animals(cows_22)
-                    self.all_pens[10].update_animals(cows_23)
-                    self.all_pens[11].update_animals(cows_24)
-                    self.all_pens[12].update_animals(cows_25)
-                    self.all_pens[13].update_animals(cows_26)
-                    self.all_pens[14].update_animals(cows_27)
-                    self.all_pens[15].update_animals(cows_28)
-
-                elif n == 17:
-                    #combining groupings of cows with similar ration requirments
-                    #due to sparsity of pens
-                    lactating_group_1 = cows_2 + cows_3 + cows_4
-
-                    self.all_pens[5].update_animals(lactating_group_1)
-                    self.all_pens[6].update_animals(cows_6)
-                    self.all_pens[7].update_animals(cows_7)
-                    self.all_pens[8].update_animals(cows_8)
-                    self.all_pens[9].update_animals(cows_9)
-                    self.all_pens[10].update_animals(cows_22)
-                    self.all_pens[11].update_animals(cows_23)
-                    self.all_pens[12].update_animals(cows_24)
-                    self.all_pens[13].update_animals(cows_25)
-                    self.all_pens[14].update_animals(cows_26)
-                    self.all_pens[15].update_animals(cows_27)
-                    self.all_pens[16].update_animals(cows_28)
-
-                elif n == 18:
-                    lactating_group_1 = cows_2 + cows_2
-                    self.all_pens[5].update_animals(lactating_group_1)
-                    self.all_pens[6].update_animals(cows_4)
-                    self.all_pens[7].update_animals(cows_6)
-                    self.all_pens[8].update_animals(cows_7)
-                    self.all_pens[9].update_animals(cows_8)
-                    self.all_pens[10].update_animals(cows_9)
-                    self.all_pens[11].update_animals(cows_22)
-                    self.all_pens[12].update_animals(cows_23)
-                    self.all_pens[13].update_animals(cows_24)
-                    self.all_pens[14].update_animals(cows_25)
-                    self.all_pens[15].update_animals(cows_26)
-                    self.all_pens[16].update_animals(cows_27)
-                    self.all_pens[17].update_animals(cows_28)
-
-
-                else:
-                    self.all_pens[5].update_animals(cows_2)
-                    self.all_pens[6].update_animals(cows_3)
-                    self.all_pens[7].update_animals(cows_4)
-                    self.all_pens[8].update_animals(cows_6)
-                    self.all_pens[9].update_animals(cows_7)
-                    self.all_pens[10].update_animals(cows_8)
-                    self.all_pens[11].update_animals(cows_9)
-                    self.all_pens[12].update_animals(cows_22)
-                    self.all_pens[13].update_animals(cows_23)
-                    self.all_pens[14].update_animals(cows_24)
-                    self.all_pens[15].update_animals(cows_25)
-                    self.all_pens[16].update_animals(cows_26)
-                    self.all_pens[17].update_animals(cows_27)
-                    self.all_pens[18].update_animals(cows_28)
-
-
+        ###Temporary process below to randomly assign nutrition requirments###
+            if len(lactating_cows) > 0:
+                for i in range(len(lactating_cows)):
+                    lactating_cows[i].ID = i + 1
+                    lactating_cows[i].DMPD_req = 90 + random.random() * 34
+                    lactating_cows[i].DNED_req = 1.4 + random.random() * 0.3
+                pen_grouping = grouping(lactating_cows, self.all_pens[5:])
+            #Assigning Lactating Cows to Pens based on the grouping output
+                for key in pen_grouping:
+                    self.all_pens[key].update_animals(pen_grouping[key])
 
     def clear_pens(self):
         '''
