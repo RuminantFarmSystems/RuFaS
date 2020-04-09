@@ -266,8 +266,8 @@ class AnimalManagement:
             if len(lactating_cows) > 0:
                 for i in range(len(lactating_cows)):
                     lactating_cows[i].ID = i + 1
-                    lactating_cows[i].RecDMPD = 90 + random.random() * 34
-                    lactating_cows[i].RecDNED = 1.4 + random.random() * 0.3
+                    lactating_cows[i].DMPD_req = 90 + random.random() * 34
+                    lactating_cows[i].DNED_req = 1.4 + random.random() * 0.3
                 pen_grouping = grouping(lactating_cows, self.all_pens[5:])
             #Assigning Lactating Cows to Pens based on the grouping output
                 for key in pen_grouping:

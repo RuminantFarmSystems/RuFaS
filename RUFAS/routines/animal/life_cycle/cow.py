@@ -45,8 +45,8 @@ class Cow(HeiferIII):
 
 		#current hard-coded values necessary for nutrient requirement calculations
 		self.ID = 0     #hard-coded inital value for Identification
-		self.RecDNED = 1
-		self.RecDMPD = 100
+		self.DNED_req = 1
+		self.DMPD_req = 100
 		self._BCS = 3.5 #body condition score
 		self._CP_milk = 3.2
 		self._lactose_milk = 4.85
