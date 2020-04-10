@@ -121,8 +121,8 @@ class Calf(AnimalBase):
 			p_feces_excrt = self.p_intake - self.p_req + self.p_maint_feces
 		elif self.dP_reserves < 0 and self.p_intake >= self.p_req and \
 				self.p_excess >= self.dP_reserves / 0.7:
-			p_feces_excrt = self.p_intake - self.p_req + self.p_maint_feces - \
-							self.dP_reserves
+			p_feces_excrt = self.p_intake - self.p_req + self.p_maint_feces + \
+							self.dP_reserves / 0.7
 		else:
 			p_feces_excrt = self.p_maint_feces
 
