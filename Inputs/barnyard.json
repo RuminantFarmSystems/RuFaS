@@ -8,7 +8,7 @@
         "run_tests": false
     },
 
-    "weather": "Inputs/barnyard_weather.csv",
+    "weather": "Inputs/barnyard_weather.db",
 
     "output":
     {
