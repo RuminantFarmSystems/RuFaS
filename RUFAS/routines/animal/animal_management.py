@@ -235,7 +235,7 @@ class AnimalManagement:
         elif len(self.all_pens) == 5:
             heifers = self.heiferIIs + self.heiferIIIs
             self.all_pens[0].update_animals(self.calves)
-            self.all_pens[1].update_animals(self.heiferIIs)
+            self.all_pens[1].update_animals(self.heiferIs)
             self.all_pens[2].update_animals(heifers)
         else:
             self.all_pens[0].update_animals(self.calves)
@@ -258,8 +258,8 @@ class AnimalManagement:
             self.all_pens[1].update_animals(dry_and_heifers)
             self.all_pens[2].update_animals(lactating_cows)
         elif (4 <= len(self.all_pens) <= 6):
-            self.all_pens[2].update_animals(dry_cows)
-            self.all_pens[3].update_animals(lactating_cows)
+            self.all_pens[len(self.all_pens)-2].update_animals(dry_cows)
+            self.all_pens[len(self.all_pens) -1].update_animals(lactating_cows)
         else:
             self.all_pens[4].update_animals(dry_cows)
         ###Temporary process below to randomly assign nutrition requirments###

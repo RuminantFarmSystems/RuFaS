@@ -43,9 +43,10 @@ def grouping(cow_list, pens):
     """
         Description:
             Grouping algorithm that utilizes k-means clustering and takes an input
-            that is a list of objects of class cow (see cow.py) and groups them into
-            exactly 1 of 14 different pens. This function returns a list of 14 lists
-            of cow groupings (lists of objects of class cow)
+            that is a list of objects of class cow (see cow.py) and a list of
+            pen objetcs (from pen.py), and then groups the lactating cows into the
+            available pens based on their nutrional requirments relative to the
+            rest of the cows.
 
         Input:
             cow_list: a list of lactating cows
@@ -121,9 +122,7 @@ def grouping(cow_list, pens):
         key = 5
         group = 0
         while percentile[i] <= index[key-1] or percentile[i] > index[key]:
-            group = key
             key += 1
-        # TODO: was this meant to be .append(group) otherwise, what is the point of the group variable?
         pen_assignment.append(key)
 
     # Adding the pen_assignment assignment vector to the DataFrame
