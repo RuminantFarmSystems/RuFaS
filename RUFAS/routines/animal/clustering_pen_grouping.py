@@ -44,8 +44,8 @@ def grouping(cow_list, pens):
         Description:
             Grouping algorithm that utilizes k-means clustering and takes an input
             that is a list of objects of class cow (see cow.py) and a list of
-            pen objetcs (from pen.py), and then groups the lactating cows into the
-            available pens based on their nutrional requirments relative to the
+            pen objects (from pen.py), and then groups the lactating cows into the
+            available pens based on their nutritional requirements relative to the
             rest of the cows.
 
         Input:
@@ -74,7 +74,7 @@ def grouping(cow_list, pens):
 
     # Use the various nutrition requirement variables to create and assign a
     # percentile value to each cow
-    # Grouping By Ranking Methology
+    # Grouping By Ranking Methodology
     rank_data = cow_nutr_df[["DNED_req", "DMPD_req", "milk_avg"]]  # Rank data frame to create percentile vector
     rank_data = rank_data.dropna()
 
@@ -120,7 +120,6 @@ def grouping(cow_list, pens):
     # Adding pen_assignment number to list based on percentile
     for i in range(len(percentile)):
         key = 5
-        group = 0
         while percentile[i] <= index[key-1] or percentile[i] > index[key]:
             key += 1
         pen_assignment.append(key)
@@ -134,7 +133,7 @@ def grouping(cow_list, pens):
     # Sort the data frame by pen assignment
     # Return a dictionary of lists of cow objects, with keys corresponding to pen IDs
 
-    pen_data = cow_nutr_df.sort_values(by = 'pen_assignment', ascending=True)
+    pen_data = cow_nutr_df.sort_values(by='pen_assignment', ascending=True)
     # creating a list of values that keep track of the index for the start of each pen in the ID list
     separating_index = [0]
     pen_assignment = pen_data['pen_assignment'].to_list()
