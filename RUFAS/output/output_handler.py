@@ -13,7 +13,6 @@ import shutil
 from pathlib import Path
 
 from RUFAS import util
-from RUFAS.output.report_handler import BaseReportHandler
 
 #
 # Import report handlers here
@@ -62,8 +61,6 @@ class OutputHandler:
         for pen in state.animal_management.all_pens:
             self.reports['pen_' + str(pen.id)] = PenReport(pen.id, data['pen_report'])
 
-        self.final = False
-
     def initialize_output_dir(self, output_dir):
         """
         If a directory of the same name exists, it and its contents are deleted,
@@ -81,29 +78,17 @@ class OutputHandler:
 
         # Delete directory if previously exists
         if output_dir.exists():
-            for output in output_dir.iterdir():
-                if output.is_file():
-                    output.unlink()
-                else:
-                    for file in output.iterdir():
-                        file.unlink()
-                    output.rmdir()
-            output_dir.rmdir()
+            shutil.rmtree(output_dir)
 
         output_dir.mkdir(exist_ok=True, parents=False)
-        BaseReportHandler.set_dir(output_dir)
-
-        for reportName in self.reports:
-            report = self.reports[reportName]
-            if report.report_name.split('_')[0] == 'field':
-                report_dir = util.get_base_dir() / output_dir / reportName
-                report_dir.mkdir(exist_ok=True, parents=False)
 
         for report_name in self.reports:
             report = self.reports[report_name]
+            report.output_dir = output_dir
+            if report.report_name.startswith('field'):
+                report.initialize_field_output_dir(output_dir)
             if report.report_name.startswith('pen'):
-                report_dir = util.get_base_dir() / output_dir / report_name
-                report_dir.mkdir(exist_ok=True, parents=False)
+                report.initialize_pen_output_dir(output_dir)
 
     def initialize_diagnostic_dir(self, diagnostic_dir):
         """
@@ -121,21 +106,20 @@ class OutputHandler:
         diagnostic_dir = util.get_base_dir() / diagnostic_dir
 
         if diagnostic_dir.exists():
-            for file in diagnostic_dir.iterdir():
-                shutil.rmtree(file)
-            diagnostic_dir.rmdir()
+            shutil.rmtree(diagnostic_dir)
 
         diagnostic_dir.mkdir(exist_ok=True, parents=False)
 
         for reportName in self.reports:
             report = self.reports[reportName]
             if report.produce_graphics:
-                report_dir = util.get_base_dir() / diagnostic_dir / reportName
+                report_dir = diagnostic_dir / reportName
                 report_dir.mkdir(exist_ok=True, parents=False)
+                report.diagnostic_dir = report_dir
                 if report.report_name.split('_')[0] == 'field':
-                    report.initialize_field_dir(report_dir)
+                    report.initialize_field_diagnostic_dir(report_dir)
                 if report.report_name.startswith('pen'):
-                    report.initialize_pen_dir(report_dir)
+                    report.initialize_pen_diagnostic_dir(report_dir)
 
     def initialize_reports(self, state):
         """
@@ -201,12 +185,6 @@ class OutputHandler:
         Description:
             Calls produce graphics for all of the reports.
         """
-
-        counter = 0
         for reportName in self.reports:
             report = self.reports[reportName]
-
-            if counter == len(self.reports) - 1:
-                self.final = True
-            report.produce_report_graphics(self.final)
-            counter += 1
+            report.produce_report_graphics()

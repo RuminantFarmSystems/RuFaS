@@ -23,6 +23,8 @@ class FieldSummary:
         self.report_name = field_name
         self.produce_csv = data['produce_csv']
         self.produce_graphics = data['produce_graphics']
+        self.output_dir = ''
+        self.diagnostic_dir = ''
 
         self.field_reports = {'crop_summary': CropSummary(data['crop_summary'], field_name),
                               'soil_summary': SoilSummary(data['soil_summary'], field_name),
@@ -41,15 +43,31 @@ class FieldSummary:
         for report in self.field_reports.values():
             report.initialize(state)
 
-    def initialize_field_dir(self, field_dir):
+    def initialize_field_output_dir(self, field_dir):
         """
         Description:
-            Creates a directory in the outputs folder for the field
+            Creates an output directory in the outputs folder for the field
+        """
+        field_dir = field_dir / self.report_name
+        field_dir.mkdir(exist_ok=True, parents=False)
+
+        for report_name in self.field_reports:
+            report = self.field_reports[report_name]
+            report_dir = field_dir / report_name
+            report_dir.mkdir(exist_ok=True, parents=False)
+            report.output_dir = report_dir
+
+    def initialize_field_diagnostic_dir(self, field_dir):
+        """
+        Description:
+            Creates a diagnostic directory in the outputs folder for the field
         """
 
-        for report in self.field_reports:
-            report_dir = field_dir / report
+        for report_name in self.field_reports:
+            report = self.field_reports[report_name]
+            report_dir = field_dir / report_name
             report_dir.mkdir(exist_ok=True, parents=False)
+            report.diagnostic_dir = report_dir
 
     def daily_update(self, state, weather, time):
         """
@@ -95,14 +113,12 @@ class FieldSummary:
         for report in self.field_reports.values():
             report.annual_flush()
 
-    def produce_report_graphics(self, is_final):
+    def produce_report_graphics(self):
         """
         Description:
             Called from output_handler at the end of the simulation.
-            Calls produce_report_graphics for each active report in the field.
-        Inputs:
-            is_final: boolean value indicating whether this is the final report
+            Calls produce_report_graphics for each active report
         """
 
         for report in self.field_reports.values():
-            report.produce_report_graphics(is_final)
+            report.produce_report_graphics()

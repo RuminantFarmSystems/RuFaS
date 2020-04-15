@@ -24,7 +24,7 @@ class SoilSummary(BaseReportHandler):
         self.field_name = field_name
 
         # sets produce_csv, report_name, f_name using data
-        self.set_properties(data, self.field_name)
+        BaseReportHandler.__init__(self, data)
 
         #
         # Outputs can be added in this single place in the following format:
@@ -182,15 +182,11 @@ class SoilSummary(BaseReportHandler):
         for variable in self.annual_variables:
             self.annual_variables[variable][2] = 0
 
-    def produce_report_graphics(self, is_final):
+    def produce_report_graphics(self):
         """
         Description:
             Calls functions in graphics.py
-        Inputs:
-            is_final: flag indicating that this is the last report being
-                        produced
         """
 
-        annual_file_name = str(self.file_name).split('.')[0] + "_annual.csv"
-        annual_graphics(annual_file_name, self.produce_graphics, self.display_graphics, is_final)
-        daily_graphics(self.file_name, self.produce_graphics, self.display_graphics, is_final)
+        annual_graphics(self)
+        daily_graphics(self)

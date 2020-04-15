@@ -10,8 +10,6 @@ Description: Abstract class defining a basic report.
 from pathlib import Path
 from abc import ABC, abstractmethod
 
-from RUFAS import util
-
 
 class BaseReportHandler(ABC):
     """
@@ -21,27 +19,14 @@ class BaseReportHandler(ABC):
     instantiated, set_properties() is called to set the properties that all
     report handlers must contain.
     """
-
-    # Private Property
-    # Default directory for output report files
-    # overwritten by the directory given in json file
-    __output_dir = util.get_base_dir() / Path("Outputs/Default_Output_Dir")
-
-    def set_properties(self, data, field_name):
-        """
-        Sets the properties of each report handler initialized.
-
-        This is called in the report handler's __init__() method, and takes in
-        the data passed to it and assigns the properties below.
-        """
-
+    def __init__(self, data):
         self.produce_csv = data['produce_csv']
         self.produce_graphics = data['produce_graphics']
-        self.display_graphics = data['display_graphics']
         self.report_name = data['report_name']
         self.file_name = data['file_name']
-        if field_name != 'null':
-            self.file_name = field_name + '/' + self.file_name
+        self.annual_file_name = self.file_name.split('.csv')[0] + '_annual.csv'
+        self.output_dir = Path('')
+        self.diagnostic_dir = Path('')
 
     def get_fPath(self):
         """
@@ -51,12 +36,7 @@ class BaseReportHandler(ABC):
         Returns:
             Path: path to which the report will be written.
         """
-        return BaseReportHandler.__output_dir / self.file_name
-
-    @classmethod
-    def set_dir(cls, new_dir):
-        """Sets the base path to write the output report files to"""
-        cls.__output_dir = new_dir
+        return Path(self.output_dir) / Path(self.file_name)
 
     # abstract methods defined in each report
     @abstractmethod
@@ -78,4 +58,4 @@ class BaseReportHandler(ABC):
     def annual_flush(self): raise NotImplementedError()
 
     @abstractmethod
-    def produce_report_graphics(self, is_final): raise NotImplementedError()
+    def produce_report_graphics(self): raise NotImplementedError()

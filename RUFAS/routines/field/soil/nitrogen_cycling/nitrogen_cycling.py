@@ -128,9 +128,10 @@ Soil values updated by calling update_all():
 from math import exp
 from . import denitrification, humus_mineralization, mineralization_decomp, \
     leaching_runoff_erosion, nitrification_volatilization
+from ...application_management import application_management
 
 
-def update_all(soil, weather, time):
+def update_all(soil, application, weather, time):
     """
     Description:
         This function calls all the necessary functions to update information related
@@ -152,7 +153,7 @@ def update_all(soil, weather, time):
 
     humus_mineralization.humus_mineralization(soil)
 
-    added_manure_N(soil, weather, time)
+    added_manure_N(soil, application, weather, time)
 
 
 def calc_temp_factors(soil):
@@ -196,16 +197,28 @@ def calc_water_factors(soil):
         layer.water_fac = water_fac
 
 
-def added_manure_N(soil, weather, time):
+def added_manure_N(soil, application, weather, time):
     """
     Description:
         TODO: Temporary method to add manure from weather file
     """
+    day = time.day
+    year = time.year
+    m_app = application.manure
+    mass = m_app.mass
 
-    total_N = weather.manure_N[time.year - 1][time.day - 1]
+    for i in range(0, len(m_app.day)):
+        if (m_app.day[i] == day and m_app.year[i] - soil.start_year + 1 == year) \
+                or (m_app.year[i] - soil.start_year + 1 == year and m_app.day[i] == -1
+                    and application.manure_day is True):
 
-    active_N = total_N * 0.875
-    stable_N = total_N * 0.125
+            m_app.day[i] = time.day
 
-    soil.soil_layers[0].active_N += active_N
-    soil.soil_layers[0].stable_N += stable_N
+            # if the conditions are good enough to apply manure
+            if not application_management.check_conditions(soil, application, weather, time, i, 'm',):
+                total_N = mass[i] * m_app.N_frac[i]
+                active_N = total_N * 0.875
+                stable_N = total_N * 0.125
+
+                soil.soil_layers[0].active_N += active_N
+                soil.soil_layers[0].stable_N += stable_N

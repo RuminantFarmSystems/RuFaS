@@ -23,9 +23,9 @@ class CropSummary(BaseReportHandler):
         self.field_name = field_name
 
         # sets produce_csv, report_name, file_name using report data
-        self.set_properties(data, self.field_name)
         self.field_names = None
 
+        BaseReportHandler.__init__(self, data)
         #
         # Outputs can be added in this single place in the following format:
         # 'output_name': ['variable_name', 'unit', []],
@@ -139,7 +139,6 @@ class CropSummary(BaseReportHandler):
                 writer.writerow(row)
 
         annual_path = Path(str(self.get_fPath()).split('.csv')[0] + '_annual.csv')
-
         mode = 'a+' if annual_path.exists() else 'w+'
 
         with annual_path.open(mode) as csv_file:
@@ -162,15 +161,11 @@ class CropSummary(BaseReportHandler):
         for variable in self.annual_variables:
             self.annual_variables[variable][2] = 0
 
-    def produce_report_graphics(self, is_final):
+    def produce_report_graphics(self):
         """
         Description:
             Calls functions in graphics.py
-        Inputs:
-            is_final: flag indicating that this is the last report being
-                        produced
         """
 
-        annual_file_name = str(self.file_name).split('.')[0] + "_annual.csv"
-        annual_graphics(annual_file_name, self.display_graphics, self.produce_graphics, is_final)
-        daily_graphics(self.file_name, self.produce_graphics, self.display_graphics, is_final)
+        annual_graphics(self)
+        daily_graphics(self)
