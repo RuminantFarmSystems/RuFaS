@@ -21,11 +21,10 @@ class ManureReport(BaseReportHandler):
     def __init__(self, data, pen_id):
 
         # sets active, report_name, f_name using data
-        self.set_properties(data, 'null')
-        self.file_name = 'pen_' + str(pen_id) + '/' + self.file_name
+        BaseReportHandler.__init__(self, data)
 
         self.manure_info = {}
-
+        self.pen_id = pen_id
         #
         # Outputs can be added in this single place in the following format:
         # 'output_name': ['variable_name', 'unit', []],
@@ -135,7 +134,6 @@ class ManureReport(BaseReportHandler):
         for variable in self.annual_variables:
             self.annual_variables[variable][2] = 0
 
-    def produce_report_graphics(self, is_final):
-        annual_file_name = str(self.file_name).split('.')[0] + "_annual.csv"
-        annual_graphics(annual_file_name, self.display_graphics, self.produce_graphics, is_final)
-        daily_graphics(self.file_name, self.display_graphics, self.produce_graphics, is_final)
+    def produce_report_graphics(self):
+        annual_graphics(self)
+        daily_graphics(self)

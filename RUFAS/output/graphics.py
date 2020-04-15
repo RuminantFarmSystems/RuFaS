@@ -9,14 +9,13 @@ Description: Produces graphical representations of RuFaS output data
                 using matplotlib.
 """
 
-from RUFAS import util
 import csv
 import datetime as dt
 import matplotlib.pyplot as mp
 import random
 
 
-def read_data(output_csv):
+def read_data(report, file_name):
     """
     Description:
         Reads all the data from a csv into a dictionary representing the
@@ -25,7 +24,7 @@ def read_data(output_csv):
         output_csv: file path to the csv containing the data to be read
     """
 
-    output_full_path = util.get_base_dir() / 'Outputs/Sample_Farm_Outputs' / output_csv
+    output_full_path = report.output_dir / file_name
 
     with open(output_full_path) as csv_file:
         read_csv = csv.reader(csv_file, delimiter=',')
@@ -58,22 +57,19 @@ def read_data(output_csv):
     return variables, units
 
 
-def ration_graphics(output_csv, produce_graphics, display_graphics, is_final, ration_interval):
+def ration_graphics(report, ration_interval):
     """
     Description:
         Graphics handler for the ration report.
     Inputs:
         output_csv: the report for which graphics are being produced
-        display_graphics: indicates whether graphics should be displayed
         produce_graphics: indicates whether graphics should be produced for this report
-        is_final: indicates whether show_figures should be called
-        ration_interval: determines scale of the x_axis
     """
 
-    if produce_graphics:
-        variables, units = read_data(output_csv)
+    if report.produce_graphics:
+        variables, units = read_data(report, report.file_name)
 
-        save_dir = util.get_base_dir() / 'Outputs/diagnostics/' / output_csv.split('.')[0]
+        save_dir = report.diagnostic_dir
 
         start_year = int(variables['year'][0])
         start_day = int(variables['j_day'][0])
@@ -96,27 +92,22 @@ def ration_graphics(output_csv, produce_graphics, display_graphics, is_final, ra
                 mp.ylabel(variable + ' ' + units[counter])
                 path = str(save_dir / variable)
                 mp.savefig(path + '')
-                if not display_graphics:
-                    mp.close()
+                mp.close()
             counter += 1
 
-    show_figures(is_final)
 
-
-def annual_water_balance_graphic(output_csv, produce_graphics, display_graphics,):
+def annual_water_balance_graphic(report):
     """
     Description:
         Graphic handler for the specific annual water balance bar graph report.
     Inputs:
-        output_csv: the report for which the graphic is being produced
-        display_graphics: indicates whether graphics should be displayed
-        produce_graphics: indicates whether graphics should be produced
+        report: the report for which graphics are being produced
     """
 
-    if produce_graphics:
-        variables, units = read_data(output_csv)
+    if report.produce_graphics:
+        variables, units = read_data(report, report.annual_file_name)
 
-        save_dir = util.get_base_dir() / 'Outputs/diagnostics/' / output_csv.split('.')[0].replace('_annual', '')
+        save_dir = report.diagnostic_dir
 
         mp.figure()
         counter = 0
@@ -197,25 +188,21 @@ def annual_water_balance_graphic(output_csv, produce_graphics, display_graphics,
         path = str(save_dir / 'annual_water_balance')
         mp.savefig(path + '')
 
-        if not display_graphics:
-            mp.close()
+        mp.close()
 
 
-def daily_graphics(output_csv, produce_graphics, display_graphics, is_final):
+def daily_graphics(report):
     """
     Description:
         Graphics handler for standard daily output.
     Inputs:
-        output_csv: the report for which graphics are being produced
-        display_graphics: indicates whether the graphics are to be displayed
-        produce_graphics: indicates whether the graphics are to be produced
-        is_final: indicates whether this is the final report (triggers show_figures)
+        report: the report for which graphics are being produced
     """
 
-    if produce_graphics:
-        variables, units = read_data(output_csv)
+    if report.produce_graphics:
+        variables, units = read_data(report, report.file_name)
 
-        save_dir = util.get_base_dir() / 'Outputs/diagnostics/' / output_csv.split('.')[0]
+        save_dir = report.diagnostic_dir
 
         start_year = int(variables['year'][0])
         start_day = int(variables['j_day'][0])
@@ -237,27 +224,21 @@ def daily_graphics(output_csv, produce_graphics, display_graphics, is_final):
                 mp.tight_layout()
                 path = str(save_dir / variable)
                 mp.savefig(path + '')
-                if not display_graphics:
-                    mp.close()
+                mp.close()
             counter += 1
 
-    show_figures(is_final)
 
-
-def annual_graphics(output_csv, display_graphics, produce_graphics, is_final):
+def annual_graphics(report):
     """
     Description:
         Graphics handler for standard annual output.
     Inputs:
-        output_csv: the report for which graphics are being produced
-        display_graphics: indicates whether the graphics are to be displayed
-        produce_graphics: indicates whether the graphics are to be produced
-        is_final: indicates whether this is the final report (triggers show_figures)
+        report: the report for which graphics are being produced
     """
 
-    if produce_graphics:
-        variables, units = read_data(output_csv)
-        save_dir = util.get_base_dir() / 'Outputs/diagnostics/' / output_csv.split('.')[0].replace('_annual', '')
+    if report.produce_graphics:
+        variables, units = read_data(report, report.annual_file_name)
+        save_dir = report.diagnostic_dir
 
         start_year = int(variables['year'][0])
         end_year = int(variables['year'][-1])
@@ -276,14 +257,5 @@ def annual_graphics(output_csv, display_graphics, produce_graphics, is_final):
                 mp.tight_layout()
                 path = str(save_dir / variable) + '_annual'
                 mp.savefig(path + '')
-                if not display_graphics:
-                    mp.close()
+                mp.close()
             counter += 1
-
-    show_figures(is_final)
-
-
-# shows figures on screen
-def show_figures(is_final):
-    if is_final:
-        mp.show()

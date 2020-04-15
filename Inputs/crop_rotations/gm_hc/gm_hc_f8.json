@@ -1,8 +1,8 @@
 {
     "corn":
     {
-        "grow_years": [2003, 2004, 2005, 2006, 2007, 2008, 2009],
-        "repeat": 10,
+        "grow_years": [2013, 2014, 2015, 2016, 2017, 2018, 2019],
+        "repeat": 0,
         "planting_date": 121,
         "harvest_date": 319,
         "harvest_type": "optimal"
@@ -18,7 +18,7 @@
     "alfalfa":
     {
         "grow_years": [2010, 2011, 2012],
-        "repeat": 10,
+        "repeat": 0,
         "planting_date": 121,
         "harvest_date": 319,
         "harvest_type": "optimal"

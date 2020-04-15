@@ -21,8 +21,7 @@ class GrowthReport(BaseReportHandler):
     def __init__(self, data, pen_id):
 
         # sets active, report_name, f_name using data
-        self.set_properties(data, 'null')
-        self.file_name = 'pen_' + str(pen_id) + '/' + self.file_name
+        BaseReportHandler.__init__(self, data)
 
         # identifies report with a pen
         self.pen_id = pen_id
@@ -155,15 +154,10 @@ class GrowthReport(BaseReportHandler):
         for variable in self.annual_variables:
             self.annual_variables[variable][2] = 0
 
-    def produce_report_graphics(self, is_final):
+    def produce_report_graphics(self):
         """
         Description:
             Calls functions in graphics.py
-        Inputs:
-            is_final: flag indicating that this is the last report being
-                        produced
         """
-
-        annual_file_name = str(self.file_name).split('.')[0] + "_annual.csv"
-        annual_graphics(annual_file_name, self.produce_graphics, self.display_graphics, is_final)
-        daily_graphics(self.file_name, self.produce_graphics, self.display_graphics, is_final)
+        annual_graphics(self)
+        daily_graphics(self)

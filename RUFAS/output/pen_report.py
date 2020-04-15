@@ -8,7 +8,6 @@ Author(s): William Donovan, wmdonovan@wisc.edu
 Description: Output handler for animal growth reports.
 """
 
-from RUFAS.output.graphics import show_figures
 from .ration_report import RationReport
 from .growth_report import GrowthReport
 from .manure_report import ManureReport
@@ -22,6 +21,8 @@ class PenReport:
         self.pen_id = pen_id
         self.produce_csv = data['produce_csv']
         self.produce_graphics = data['produce_graphics']
+        self.output_dir = ''
+        self.report_dir = ''
 
         self.pen_reports = {'ration_report': RationReport(data['ration_report'], pen_id),
                             'growth_report': GrowthReport(data['growth_report'], pen_id),
@@ -43,15 +44,32 @@ class PenReport:
                 if report.produce_csv:
                     report.initialize(state)
 
-    def initialize_pen_dir(self, pen_dir):
+    def initialize_pen_output_dir(self, pen_dir):
         """
         Description:
-            Creates a directory in the outputs folder for the pen
+            Creates an output directory in the outputs folder for the pen
         """
 
-        for report in self.pen_reports:
-            report_dir = pen_dir / report
+        pen_dir = pen_dir / self.report_name
+        pen_dir.mkdir(exist_ok=True, parents=False)
+        
+        for report_name in self.pen_reports:
+            report = self.pen_reports[report_name]
+            report_dir = pen_dir / report_name
             report_dir.mkdir(exist_ok=True, parents=False)
+            report.output_dir = report_dir
+
+    def initialize_pen_diagnostic_dir(self, pen_dir):
+        """
+        Description:
+            Creates a diagnostic directory in the outputs folder for the pen
+        """
+
+        for report_name in self.pen_reports:
+            report = self.pen_reports[report_name]
+            report_dir = pen_dir / report_name
+            report_dir.mkdir(exist_ok=True, parents=False)
+            report.diagnostic_dir = report_dir
 
     def daily_update(self, state, weather, time):
         """
@@ -106,17 +124,13 @@ class PenReport:
                 if report.produce_csv:
                     report.annual_flush()
 
-    def produce_report_graphics(self, is_final):
+    def produce_report_graphics(self):
         """
         Description:
             Called from output_handler at the end of the simulation.
             Calls produce_report_graphics for each of the pen's active reports.
-        Inputs:
-            is_final: boolean value indicating whether this is the final report
         """
 
         if self.produce_graphics:
             for report in self.pen_reports.values():
-                report.produce_report_graphics(is_final)
-        else:
-            show_figures(is_final)
+                report.produce_report_graphics()

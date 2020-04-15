@@ -4,8 +4,8 @@
         "start_date" : "2010:1",
         "end_date" : "2019:365",
         "latitude": 43.582,
-        "output_dir": "Outputs/Sample_Farm_Outputs/",
-        "diagnostic_dir": "Outputs/diagnostics/",
+        "output_dir": "Outputs/gm_hc_mid/",
+        "diagnostic_dir": "Outputs/gm_hc_mid_diagnostics/",
         "run_tests": false
     },
 
@@ -20,39 +20,39 @@
             {
                 "produce_csv": true,
                 "produce_graphics": true,
-                "display_graphics": false,
+
                 "report_name": "Crop Summary",
                 "file_name": "crop_summary.csv"
             },
             "soil_summary":
             {
                 "produce_csv": true,
-                "produce_graphics": false,
-                "display_graphics": false,
+                "produce_graphics": true,
+
                 "report_name": "Soil Summary",
                 "file_name": "soil_summary.csv"
             },
             "soil_nitrogen":
             {
                 "produce_csv": true,
-                "produce_graphics": false,
-                "display_graphics": false,
+                "produce_graphics": true,
+
                 "report_name": "Soil Nitrogen",
                 "file_name": "soil_nitrogen.csv"
             },
             "soil_phosphorus":
             {
                 "produce_csv": true,
-                "produce_graphics": false,
-                "display_graphics": false,
+                "produce_graphics": true,
+
                 "report_name": "Soil Phosphorus",
                 "file_name": "soil_phosphorus.csv"
             },
             "water_balance":
             {
                 "produce_csv": true,
-                "produce_graphics": false,
-                "display_graphics": false,
+                "produce_graphics": true,
+
                 "report_name": "Water Balance",
                 "file_name": "water_balance.csv"
             },
@@ -60,7 +60,7 @@
             {
                 "produce_csv": true,
                 "produce_graphics": false,
-                "display_graphics": false,
+
                 "report_name": "Custom Report",
                 "file_name": "custom_report.csv"
             }
@@ -74,7 +74,7 @@
             {
                 "produce_csv": true,
                 "produce_graphics": false,
-                "display_graphics": false,
+
                 "report_name": "Ration Report",
                 "file_name": "ration_report.csv",
                 "ration_interval": 7
@@ -83,14 +83,14 @@
             {
         	    "produce_csv": true,
                 "produce_graphics": false,
-                "display_graphics": false,
+
         	    "report_name": "Manure Report",
         	    "file_name": "manure_report.csv"
             },
             "growth_report": {
                 "produce_csv": true,
                 "produce_graphics": false,
-                "display_graphics": false,
+
                 "report_name": "Growth Report",
                 "file_name": "growth_report.csv"
             }
@@ -99,7 +99,7 @@
         {
             "produce_csv": true,
             "produce_graphics": false,
-            "display_graphics": false,
+
             "report_name": "Feed Storage",
             "file_name": "feed_storage.csv"
         }
@@ -111,63 +111,63 @@
         {
             "field_1":
             {
-                "soil": "barnyard_soil.json",
+                "soil": "gm_soil.json",
                 "crop": "gm_hc/gm_hc_f1.json",
-                "applications": "gm_applications.json"
+                "applications": "gm_applications_mid.json"
             },
             "field_2":
             {
-                "soil": "barnyard_soil.json",
+                "soil": "gm_soil.json",
                 "crop": "gm_hc/gm_hc_f2.json",
-                "applications": "gm_applications.json"
+                "applications": "gm_applications_mid.json"
             },
             "field_3":
             {
-                "soil": "barnyard_soil.json",
+                "soil": "gm_soil.json",
                 "crop": "gm_hc/gm_hc_f3.json",
-                "applications": "gm_applications.json"
+                "applications": "gm_applications_mid.json"
             },
             "field_4":
             {
-                "soil": "barnyard_soil.json",
+                "soil": "gm_soil.json",
                 "crop": "gm_hc/gm_hc_f4.json",
-                "applications": "gm_applications.json"
+                "applications": "gm_applications_mid.json"
             },
             "field_5":
             {
-                "soil": "barnyard_soil.json",
+                "soil": "gm_soil.json",
                 "crop": "gm_hc/gm_hc_f5.json",
-                "applications": "gm_applications.json"
+                "applications": "gm_applications_mid.json"
             },
             "field_6":
             {
-                "soil": "barnyard_soil.json",
+                "soil": "gm_soil.json",
                 "crop": "gm_hc/gm_hc_f6.json",
-                "applications": "gm_applications.json"
+                "applications": "gm_applications_mid.json"
             },
             "field_7":
             {
-                "soil": "barnyard_soil.json",
+                "soil": "gm_soil.json",
                 "crop": "gm_hc/gm_hc_f7.json",
-                "applications": "gm_applications.json"
+                "applications": "gm_applications_mid.json"
             },
             "field_8":
             {
-                "soil": "barnyard_soil.json",
+                "soil": "gm_soil.json",
                 "crop": "gm_hc/gm_hc_f8.json",
-                "applications": "gm_applications.json"
+                "applications": "gm_applications_mid.json"
             },
             "field_9":
             {
-                "soil": "barnyard_soil.json",
+                "soil": "gm_soil.json",
                 "crop": "gm_hc/gm_hc_f9.json",
-                "applications": "gm_applications.json"
+                "applications": "gm_applications_mid.json"
             },
             "field_10":
             {
-                "soil": "barnyard_soil.json",
+                "soil": "gm_soil.json",
                 "crop": "gm_hc/gm_hc_f10.json",
-                "applications": "gm_applications.json"
+                "applications": "gm_applications_mid.json"
             }
         },
         "animal": "barnyard_animal.json",
