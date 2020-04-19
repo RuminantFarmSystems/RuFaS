@@ -488,7 +488,7 @@ class Feed:
                 of the method call, this value is true. The default value is
                 False, which means the cached values will be returned (stored at
                 the time of program initialization)
-                
+
         Returns: the dictionary which represents the characteristics and
         nutrients of the @desired_feed
         """
