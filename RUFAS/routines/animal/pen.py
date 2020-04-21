@@ -358,12 +358,14 @@ class Pen:
                 total_p_animal += animal.p_animal
             self.avg_p_animal = total_p_animal / len(self.animals_in_pen)
 
-    def set_up_new_animal(self, animal):
+    def set_up_new_animal(self, animal, p_conc):
         """
         Sets the necessary attributes for @animal to be a replacement in this
         pen.
 
         Args:
+            p_conc: P concentration of @animal's class, used to calculate the
+                P in @animal
             animal: the replacement animal which needs to have necessary values
                 for later computations
         """
@@ -395,6 +397,10 @@ class Pen:
         if type(animal).__name__ == 'Cow':
             animal.calc_daily_walking_dist(
                 self.vertical_parlor_dist, self.horizontal_parlor_dist)
+
+        # set this animal's p_animal to be the average P concentration of other
+        # animals in its class times its body weight
+        animal.p_animal = animal.body_weight * p_conc
 
         self.animals_in_pen.append(animal)
 

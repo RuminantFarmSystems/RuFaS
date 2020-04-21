@@ -85,6 +85,17 @@ class AnimalManagement:
     # the popped pen.
     pens_needing_animals = deque([])
 
+    # these variables are the P concentrations of each class of animal. They
+    # are calculated daily and are used when an animal is added to the
+    # herd, whether by birth or replacement herd purchase. They are calculated
+    # in calc_all_p_conc() and are the total body weight of the animals in the
+    # respective class divided by the total P in the animals of the class
+    calf_p_conc = 0
+    heiferI_p_conc = 0
+    heiferII_p_conc = 0
+    heiferIII_p_conc = 0
+    cow_p_conc = 0
+
     def __init__(self, data, config, feed):
         """
         Initializes the pens and animals in the simulation with data from the
@@ -284,12 +295,24 @@ class AnimalManagement:
         for animal in animals_added:
             pen = self.pens_needing_animals.popleft()
             self.id_pen[animal.id] = pen
-            self.all_pens[pen].set_up_new_animal(animal)
+
+            if type(animal).__name__ == 'Calf':
+                animal_p_conc = self.calf_p_conc
+            elif type(animal).__name__ == 'HeiferI':
+                animal_p_conc = self.heiferI_p_conc
+            elif type(animal).__name__ == 'HeiferII':
+                animal_p_conc = self.heiferII_p_conc
+            elif type(animal).__name__ == 'HeiferIII':
+                animal_p_conc = self.heiferIII_p_conc
+            else:  # animal is of class Cow
+                animal_p_conc = self.cow_p_conc
+
+            self.all_pens[pen].set_up_new_animal(animal, animal_p_conc)
 
         for calf in calves_born:
             # TODO: this is the hard coded calf pen value
             pen = 0
-            self.all_pens[pen].set_up_new_animal(calf)
+            self.all_pens[pen].set_up_new_animal(calf, self.calf_p_conc)
 
     def pen_allocation(self):
         """
@@ -369,6 +392,37 @@ class AnimalManagement:
             if pen.pen_populated:
                 pen.calc_avg_growth()
 
+    @staticmethod
+    def p_conc(animals):
+        """
+        Args:
+            animals: the list of animals for which the P concentration should be
+                calculated
+
+        Returns:
+            p_conc: the P concentration of @animals
+
+        """
+        if len(animals) == 0:
+            return 0
+        else:
+            total_bw = 0
+            total_p_animal = 0
+            for animal in animals:
+                total_bw += animal.body_weight
+                total_p_animal += animal.p_animal
+            return total_p_animal / total_bw
+
+    def calc_all_p_conc(self):
+        """
+        Calculates each animal class's P concentration.
+        """
+        self.calf_p_conc = self.p_conc(self.calves)
+        self.heiferI_p_conc = self.p_conc(self.heiferIs)
+        self.heiferII_p_conc = self.p_conc(self.heiferIIs)
+        self.heiferIII_p_conc = self.p_conc(self.heiferIIIs)
+        self.cow_p_conc = self.p_conc(self.cows)
+
     def calc_p_rqmts(self, feed):
         """
         Calls each pen's method to calculate each animal's phosphorus
@@ -419,6 +473,7 @@ class AnimalManagement:
             # phosphorus calculations
             self.calc_p_rqmts(feed)  # per animal
             self.daily_p_update()  # per animal
+            self.calc_all_p_conc()  # per animal
 
             if self.end_ration_interval():
                 self.calc_nutrient_rqmts(feed)  # per animal
@@ -426,7 +481,7 @@ class AnimalManagement:
                 self.pen_allocation()
                 self.calc_avg_nutrient_rqmts()  # per pen
                 self.calc_ration(feed)  # per pen
-                self.calc_manure_excretion(feed)  # per pen
+                self.calc_manure_excretion(feed)  # per animal
                 self.calc_avg_growth()  # per pen
 
     def end_ration_interval(self):
