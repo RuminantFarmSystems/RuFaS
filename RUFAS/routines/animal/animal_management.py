@@ -85,16 +85,16 @@ class AnimalManagement:
     # the popped pen.
     pens_needing_animals = deque([])
 
-    # these variables are the P concentrations of each class of animal. They
+    # these variables are the P compositions of each class of animal. They
     # are calculated daily and are used when an animal is added to the
     # herd, whether by birth or replacement herd purchase. They are calculated
-    # in calc_all_p_conc() and are the total body weight of the animals in the
+    # in calc_all_p_comp() and are the total body weight of the animals in the
     # respective class divided by the total P in the animals of the class
-    calf_p_conc = 0
-    heiferI_p_conc = 0
-    heiferII_p_conc = 0
-    heiferIII_p_conc = 0
-    cow_p_conc = 0
+    calf_p_comp = 0
+    heiferI_p_comp = 0
+    heiferII_p_comp = 0
+    heiferIII_p_comp = 0
+    cow_p_comp = 0
 
     def __init__(self, data, config, feed):
         """
@@ -297,15 +297,15 @@ class AnimalManagement:
             self.id_pen[animal.id] = pen
 
             if type(animal).__name__ == 'Calf':
-                animal_p_conc = self.calf_p_conc
+                animal_p_conc = self.calf_p_comp
             elif type(animal).__name__ == 'HeiferI':
-                animal_p_conc = self.heiferI_p_conc
+                animal_p_conc = self.heiferI_p_comp
             elif type(animal).__name__ == 'HeiferII':
-                animal_p_conc = self.heiferII_p_conc
+                animal_p_conc = self.heiferII_p_comp
             elif type(animal).__name__ == 'HeiferIII':
-                animal_p_conc = self.heiferIII_p_conc
+                animal_p_conc = self.heiferIII_p_comp
             else:  # animal is of class Cow
-                animal_p_conc = self.cow_p_conc
+                animal_p_conc = self.cow_p_comp
 
             self.all_pens[pen].set_up_new_animal(animal, animal_p_conc)
 
@@ -393,14 +393,14 @@ class AnimalManagement:
                 pen.calc_avg_growth()
 
     @staticmethod
-    def p_conc(animals):
+    def p_comp(animals):
         """
         Args:
-            animals: the list of animals for which the P concentration should be
+            animals: the list of animals for which the P composition should be
                 calculated
 
         Returns:
-            p_conc: the P concentration of @animals
+            p_comp: the P composition of @animals
 
         """
         if len(animals) == 0:
@@ -413,15 +413,15 @@ class AnimalManagement:
                 total_p_animal += animal.p_animal
             return total_p_animal / total_bw
 
-    def calc_all_p_conc(self):
+    def calc_all_p_comp(self):
         """
         Calculates each animal class's P concentration.
         """
-        self.calf_p_conc = self.p_conc(self.calves)
-        self.heiferI_p_conc = self.p_conc(self.heiferIs)
-        self.heiferII_p_conc = self.p_conc(self.heiferIIs)
-        self.heiferIII_p_conc = self.p_conc(self.heiferIIIs)
-        self.cow_p_conc = self.p_conc(self.cows)
+        self.calf_p_comp = self.p_comp(self.calves)
+        self.heiferI_p_comp = self.p_comp(self.heiferIs)
+        self.heiferII_p_comp = self.p_comp(self.heiferIIs)
+        self.heiferIII_p_comp = self.p_comp(self.heiferIIIs)
+        self.cow_p_comp = self.p_comp(self.cows)
 
     def calc_p_rqmts(self, feed):
         """
@@ -484,7 +484,7 @@ class AnimalManagement:
                 
             # phosphorus updates
             self.daily_p_update()  # per animal
-            self.calc_all_p_conc()  # per animal
+            self.calc_all_p_comp()  # per animal
 
     def end_ration_interval(self):
         """

@@ -358,13 +358,13 @@ class Pen:
                 total_p_animal += animal.p_animal
             self.avg_p_animal = total_p_animal / len(self.animals_in_pen)
 
-    def set_up_new_animal(self, animal, p_conc):
+    def set_up_new_animal(self, animal, p_comp):
         """
         Sets the necessary attributes for @animal to be a replacement in this
         pen.
 
         Args:
-            p_conc: P concentration of @animal's class, used to calculate the
+            p_comp: P composition of @animal's class, used to calculate the
                 P in @animal. -1 for this value indicates that @animal is a
                 calf and that its p_animal attribute has already been calculated
             animal: the replacement animal which needs to have necessary values
@@ -401,8 +401,8 @@ class Pen:
 
         # set this animal's p_animal to be the average P concentration of other
         # animals in its class times its body weight
-        if not p_conc == -1:
-            animal.p_animal = animal.body_weight * p_conc
+        if not p_comp == -1:
+            animal.p_animal = animal.body_weight * p_comp
 
         self.animals_in_pen.append(animal)
 
