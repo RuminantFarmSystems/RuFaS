@@ -470,10 +470,8 @@ class AnimalManagement:
 
             self.daily_update_id_pen(ids_added, ids_removed, calves_born)
 
-            # phosphorus calculations
+            # phosphorus requirements for daily updates
             self.calc_p_rqmts(feed)  # per animal
-            self.daily_p_update()  # per animal
-            self.calc_all_p_conc()  # per animal
 
             if self.end_ration_interval():
                 self.calc_nutrient_rqmts(feed)  # per animal
@@ -483,6 +481,10 @@ class AnimalManagement:
                 self.calc_ration(feed)  # per pen
                 self.calc_manure_excretion(feed)  # per animal
                 self.calc_avg_growth()  # per pen
+                
+            # phosphorus updates
+            self.daily_p_update()  # per animal
+            self.calc_all_p_conc()  # per animal
 
     def end_ration_interval(self):
         """
