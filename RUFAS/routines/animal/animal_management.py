@@ -312,7 +312,7 @@ class AnimalManagement:
         for calf in calves_born:
             # TODO: this is the hard coded calf pen value
             pen = 0
-            self.all_pens[pen].set_up_new_animal(calf, self.calf_p_conc)
+            self.all_pens[pen].set_up_new_animal(calf, -1)
 
     def pen_allocation(self):
         """

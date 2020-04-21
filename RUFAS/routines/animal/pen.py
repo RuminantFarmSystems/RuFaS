@@ -365,7 +365,8 @@ class Pen:
 
         Args:
             p_conc: P concentration of @animal's class, used to calculate the
-                P in @animal
+                P in @animal. -1 for this value indicates that @animal is a
+                calf and that its p_animal attribute has already been calculated
             animal: the replacement animal which needs to have necessary values
                 for later computations
         """
@@ -400,7 +401,8 @@ class Pen:
 
         # set this animal's p_animal to be the average P concentration of other
         # animals in its class times its body weight
-        animal.p_animal = animal.body_weight * p_conc
+        if not p_conc == -1:
+            animal.p_animal = animal.body_weight * p_conc
 
         self.animals_in_pen.append(animal)
 
