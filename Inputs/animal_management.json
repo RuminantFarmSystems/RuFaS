@@ -425,6 +425,36 @@
 	        		"id": 5,
 	        		"vertical_dist_to_milking_parlor": 0.1,
 	        		"horizontal_dist_to_milking_parlor": 1.6,
+	        		"number_of_stalls": 200,
+	        		"housing_type": "open air barn",
+	        		"bedding_type": "sand",
+	        		"pen_type": "tiestall"
+	        	},
+            "pen6":
+	        	{
+	        		"id": 6,
+	        		"vertical_dist_to_milking_parlor": 0.1,
+	        		"horizontal_dist_to_milking_parlor": 1.6,
+	        		"number_of_stalls": 300,
+	        		"housing_type": "open air barn",
+	        		"bedding_type": "sand",
+	        		"pen_type": "tiestall"
+	        	},
+            "pen7":
+	        	{
+	        		"id": 7,
+	        		"vertical_dist_to_milking_parlor": 0.2,
+	        		"horizontal_dist_to_milking_parlor": 1.6,
+	        		"number_of_stalls": 250,
+	        		"housing_type": "open air barn",
+	        		"bedding_type": "sand",
+	        		"pen_type": "tiestall"
+	        	},
+            "pen8":
+	        	{
+	        		"id": 8,
+	        		"vertical_dist_to_milking_parlor": 0.2,
+	        		"horizontal_dist_to_milking_parlor": 1.6,
 	        		"number_of_stalls": 400,
 	        		"housing_type": "open air barn",
 	        		"bedding_type": "sand",
