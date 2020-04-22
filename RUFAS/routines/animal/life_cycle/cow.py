@@ -45,11 +45,8 @@ class Cow(HeiferIII):
 
 		#current hard-coded values necessary for nutrient requirement calculations
 		self.ID = 0     #hard-coded inital value for Identification
-		self.weekn = 1
-		self.LACT = 1   #Lactation number of the cow
-		self.RecDNED = 1
-		self.RecDMPD = 100
-		self.AVGMILK_kg = 50
+		self.DNED_req = 1
+		self.DMPD_req = 100
 		self._BCS = 3.5 #body condition score
 		self._CP_milk = 3.2
 		self._lactose_milk = 4.85
@@ -226,6 +223,7 @@ class Cow(HeiferIII):
 	'''
        	Calculates this cow's nutrient requirements.
     '''
+
 	def calc_nutrient_rqmts(self, housing, pasture_concentrate, nutrient_rqmts):
 		if self._milking:
 			result = lactating_calculate_rqmts(self._body_weight, self._BCS, self._CBW, self._CI, pasture_concentrate, self._CP_milk, self._days_in_preg, self._DHD, self._DVD, self._days_in_milk, self._fat_percent, self._lactose_milk, self._estimated_daily_milk_produced, self._calves, housing, nutrient_rqmts)
