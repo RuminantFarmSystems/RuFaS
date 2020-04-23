@@ -24,6 +24,7 @@ global_DBW = -1
 global_milk = -1
 global_CP_Milk = -1
 
+
 def set_globals(DMIest, BW, DBW, milk, CP_milk):
     """
     Sets the global variables with averages from pen.
@@ -126,6 +127,7 @@ def optimize(feed, rqmts):
 
     return util.LP_solve(LHS, RHS, objective, var_names, operators, "minimize",
                          "RATION", lower_bounds, upper_bounds)
+
 
 def calculate_rqmts(BW, BCS, CBW, CI, pasture_concentrate, CP_Milk, DOP, DHD,
                     DVD, DIM, fat_milk, lactose_milk, milk, parity, type,
@@ -271,6 +273,7 @@ def calculate_rqmts(BW, BCS, CBW, CI, pasture_concentrate, CP_Milk, DOP, DHD,
     ]
 
     return dict(zip(nutrients_list, nutrient_rqmts)), DMIest, DBW
+
 
 def calculate_ME_RDP_RUP(feed, DMIest, BW, DBW, milk, CP_Milk):
     """

@@ -223,6 +223,7 @@ class Cow(HeiferIII):
 	'''
        	Calculates this cow's nutrient requirements.
     '''
+
 	def calc_nutrient_rqmts(self, housing, pasture_concentrate, nutrient_rqmts):
 		if self._milking:
 			result = lactating_calculate_rqmts(self._body_weight, self._BCS, self._CBW, self._CI, pasture_concentrate, self._CP_milk, self._days_in_preg, self._DHD, self._DVD, self._days_in_milk, self._fat_percent, self._lactose_milk, self._estimated_daily_milk_produced, self._calves, housing, nutrient_rqmts)
