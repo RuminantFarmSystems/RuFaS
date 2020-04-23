@@ -1,4 +1,3 @@
-################################################################################
 """
 RUFAS: Ruminant Farm Systems Model
 File name: lactating_cow_ration.py
@@ -6,7 +5,6 @@ Description: Calculates the ration for lactating cows.
 Author(s): Kass Chupongstimun, kass_c@hotmail.com
            Militsa Sotirova, militsasotirova@gmail.com
 """
-################################################################################
 
 from numpy import exp
 from RUFAS import util
@@ -19,40 +17,42 @@ from RUFAS.routines.feed.feed import Nutrients
 # repetition. They are initialized to -1 for debugging purposes.
 
 global_BW = -1
-global_DMIest = -1
+global_DMI_est = -1
 global_DBW = -1
 global_milk = -1
 global_CP_Milk = -1
 
-def set_globals(DMIest, BW, DBW, milk, CP_milk):
+
+def set_globals(DMI_est, BW, DBW, milk, CP_milk):
     """
     Sets the global variables with averages from pen.
     Args:
-        DMIest: dry matter intake estimation, kg
+        DMI_est: dry matter intake estimation, kg
         BW: body weight, kg
         DBW: Body weight change (delta body weight = DBW), kg
         milk: milk production, kg
         CP_milk: milk crude protein content
     """
     global global_BW
-    global global_DMIest
+    global global_DMI_est
     global global_DBW
     global global_milk
     global global_CP_Milk
 
-    global_DMIest = DMIest
+    global_DMI_est = DMI_est
     global_BW = BW
     global_DBW = DBW
     global_milk = milk
     global_CP_Milk = CP_milk
+
 
 def optimize(feed, rqmts):
     """
     Sets up the arguments for the linear programming optimization.
 
     Args:
-	    feed: instance of the Feed class
-	    rqmts: dict which represents the dietary requirements of the cows
+        feed: instance of the Feed class
+        rqmts: dict which represents the dietary requirements of the cows
 
     Returns:
         dict: the dictionary that is returned by the call to util.LP_solve()
@@ -77,7 +77,7 @@ def optimize(feed, rqmts):
     LHS.append(constraint)
 
     ME_DM_arr, RDP_DM_arr, RUP_DM_arr = calculate_ME_RDP_RUP(feed,
-                                                             global_DMIest,
+                                                             global_DMI_est,
                                                              global_BW,
                                                              global_DBW,
                                                              global_milk,
@@ -127,6 +127,7 @@ def optimize(feed, rqmts):
     return util.LP_solve(LHS, RHS, objective, var_names, operators, "minimize",
                          "RATION", lower_bounds, upper_bounds)
 
+
 def calculate_rqmts(BW, BCS, CBW, CI, pasture_concentrate, CP_Milk, DOP, DHD,
                     DVD, DIM, fat_milk, lactose_milk, milk, parity, type,
                     nutrients_list):
@@ -164,7 +165,7 @@ def calculate_rqmts(BW, BCS, CBW, CI, pasture_concentrate, CP_Milk, DOP, DHD,
     # Sets these variables as global. See comment at the beginning of this
     # file for further details.
     global global_BW
-    global global_DMIest
+    global global_DMI_est
     global global_DBW
     global global_milk
     global global_CP_Milk
@@ -236,7 +237,7 @@ def calculate_rqmts(BW, BCS, CBW, CI, pasture_concentrate, CP_Milk, DOP, DHD,
     else:
         DMIest = (2.58 + 0.30 * NEl + 0.027 * BW) * (
                 1 - exp(-0.192 * ((DIM + 3.5) / 7 + 3.67)))
-    global_DMIest = DMIest
+    global_DMI_est = DMIest
     # Fiber Intake Capacity, Fiber Units/day (A.FI.2.2)
     # Weeks in milk
     WIM = math.ceil(DIM / 7)
@@ -272,16 +273,19 @@ def calculate_rqmts(BW, BCS, CBW, CI, pasture_concentrate, CP_Milk, DOP, DHD,
 
     return dict(zip(nutrients_list, nutrient_rqmts)), DMIest, DBW
 
-def calculate_ME_RDP_RUP(feed, DMIest, BW, DBW, milk, CP_Milk):
+
+def calculate_ME_RDP_RUP(feed, DMI_est, BW, DBW, milk, CP_milk):
     """
     Calculates some of the Feed Composition values, which are the LHS
     multipliers in the LP
 
     Args:
         feed: an instance of the feed class
-        DMIest: dry matter intake estimation
+        DMI_est: dry matter intake estimation
         BW: body Weight
         DBW: change in body weight
+        milk:
+        CP_milk:
 
     Returns:
         three lists, where each element in each list is the respective value for
@@ -290,7 +294,7 @@ def calculate_ME_RDP_RUP(feed, DMIest, BW, DBW, milk, CP_Milk):
     ME_DM_arr = []
     RDP_DM_arr = []
     RUP_DM_arr = []
-    DMI_BW = DMIest / BW
+    DMI_BW = DMI_est / BW
 
     for managed_feed in feed.managed_feeds:
         # Obtains the necessary nutrient values for the particular feed
@@ -336,7 +340,7 @@ def calculate_ME_RDP_RUP(feed, DMIest, BW, DBW, milk, CP_Milk):
         dFA_FA = dFA_FA_base - 0.8 * (DMI_BW - 0.035)
 
         # Endogenous fecal materials (A.FE.6.1)
-        NDF_DMI = NDF_DM / DMIest
+        NDF_DMI = NDF_DM / DMI_est
         efCP_DM = 0.0116 + 0.0134 * percentage(NDF_DMI)
         # Endogenous fecal ROM (A.FE.6.2)
         efROM_DM = 0.0343
@@ -350,17 +354,17 @@ def calculate_ME_RDP_RUP(feed, DMIest, BW, DBW, milk, CP_Milk):
             dROM_ROM) - 5.65 * efCP_DM - 4.00 * efROM_DM
 
         # Gas energy loss, mCal/kg of DM (A.FE.8.2)
-        GasE_DM = (0.294 * DMIest - 0.35 * FA_DM + 0.041 * NDF_DM * dNDF_NDF) \
-                  / DMIest
+        GasE_DM = (0.294 * DMI_est - 0.35 * FA_DM + 0.041 * NDF_DM * dNDF_NDF) \
+                  / DMI_est
         # Apparently digested CP (A.FE.8.4)
         adCP_CP = dCP_CP - (efCP_DM * 100 / CP_DM)
         Body_gain_CP = DBW * 0.072
         # (A.FE.8.6)
         UE_DM = 0.00275 * (
-                BW ** 0.75) / DMIest + 0.0177 * DE_DM + 0.00813 * percentage(
+                BW ** 0.75) / DMI_est + 0.0177 * DE_DM + 0.00813 * percentage(
             CP_DM) * adCP_CP * 1000 / 6.25 - (
-                        0.00813 * (milk * percentage(
-                    CP_Milk) + Body_gain_CP) * 1000 / 6.25) / DMIest
+                0.00813 * (milk * percentage(
+                    CP_milk) + Body_gain_CP) * 1000 / 6.25) / DMI_est
         # Apparently digested CP (A.FE.8.4)
         adCP_CP = dCP_CP - (efCP_DM / CP_DM)
         # Metabolized energy per unit DM (A.FE.8.1)
@@ -374,6 +378,7 @@ def calculate_ME_RDP_RUP(feed, DMIest, BW, DBW, milk, CP_Milk):
         RUP_DM_arr.append(percentage(RUP_CP) * percentage(CP_DM))
 
     return ME_DM_arr, RDP_DM_arr, RUP_DM_arr
+
 
 def percentage(val):
     """

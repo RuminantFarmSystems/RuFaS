@@ -76,23 +76,22 @@ class AnimalManagement:
         AnimalBase.set_config(data['animal_config'])
         AnimalBase.set_nutrient_list(feed.nutrient_rqmts)
         self.init_pens(data['pen_information'], data['herd_information'])
-        self.init_animals(data['herd_information'], data['pen_information'], feed)
+        self.init_animals(data['herd_information'], self.all_pens, feed)
         self.housing = data['housing']
         self.pasture_concentrate = data['pasture_concentrate']
         self.ration_user_input = data['ration']['user_input']
         self.formulation_interval = data['ration']['formulation_interval']
 
-    def init_pens(self, Pen_data, Herd_data):
+    def init_pens(self, pen_data, herd_data):
         """
         Populates the list of pens with the information from the input json file.
         Args:
-            Pen_data: dictionary with the pen information from the input json file
-            Herd_data: dictionary with the herd information from the input
+            pen_data: dictionary with the pen information from the input json file
+            herd_data: dictionary with the herd information from the input
         """
 
-        for pen_name in Pen_data:
-            pen_data = Pen_data[pen_name]
-
+        for pen_name in pen_data:
+            pen_data = pen_data[pen_name]
             pen_id = pen_data['id']
             vertical_dist_to_parlor = pen_data['vertical_dist_to_milking_parlor']
             horizontal_dist_to_parlor = pen_data['horizontal_dist_to_milking_parlor']
@@ -105,7 +104,7 @@ class AnimalManagement:
 
             self.all_pens.append(pen)
 
-        herd_num = Herd_data['herd_num']
+        herd_num = herd_data['herd_num']
 
         if (len(self.all_pens) == 0) and (herd_num > 0):
             print('Warning: herd_num > 0, but pen_num = 0. Initilizing 3 default pens.')
@@ -126,21 +125,22 @@ class AnimalManagement:
             pen_3 = Pen(2, 0.1, 1.6, 300, 'open air barn', 'straw', 'tiestall')
             self.all_pens.append(pen_3)
 
-    def init_animals(self, Herd_data, Pen_data, feed):
+    def init_animals(self, herd_data, pen_data, feed):
         """
         Populates the list of animals with the information from the input json file.
         Args:
-            Pen_data: dictionary with the pen information from the input json file
-            Herd_data: dictionary with the herd information from the input json file
+            herd_data: dictionary with the herd information from the input json file
+            pen_data: dictionary with the pen information from the input json file
             feed: instance of the feed class
         """
-        calf_num = Herd_data['calf_num']
-        heiferI_num = Herd_data['heiferI_num']
-        heiferII_num = Herd_data['heiferII_num']
-        heiferIII_num = Herd_data['heiferIII_num']
-        cow_num = Herd_data['cow_num']
-        replace_num = Herd_data['replace_num']
-        herd_num = Herd_data['herd_num']
+
+        calf_num = herd_data['calf_num']
+        heiferI_num = herd_data['heiferI_num']
+        heiferII_num = herd_data['heiferII_num']
+        heiferIII_num = herd_data['heiferIII_num']
+        cow_num = herd_data['cow_num']
+        replace_num = herd_data['replace_num']
+        herd_num = herd_data['herd_num']
 
         if herd_num == 0:
             self.simulate_animals = False
@@ -174,10 +174,7 @@ class AnimalManagement:
             self.init_nutrient_rqmts(feed)
             self.pen_allocation()
 
-        pen_count = 0
-        for _ in Pen_data:
-            pen_count += 1
-        if pen_count > 0:
+        if len(pen_data) > 0:
             self.init_nutrient_rqmts(feed)
             self.pen_allocation()
 
@@ -243,7 +240,7 @@ class AnimalManagement:
         elif len(self.all_pens) == 5:
             heifers = self.heiferIIs + self.heiferIIIs
             self.all_pens[0].update_animals(self.calves)
-            self.all_pens[1].update_animals(self.heiferIIs)
+            self.all_pens[1].update_animals(self.heiferIs)
             self.all_pens[2].update_animals(heifers)
         else:
             self.all_pens[0].update_animals(self.calves)
@@ -267,8 +264,8 @@ class AnimalManagement:
             self.all_pens[1].update_animals(dry_and_heifers)
             self.all_pens[2].update_animals(lactating_cows)
         elif 4 <= len(self.all_pens) <= 6:
-            self.all_pens[2].update_animals(dry_cows)
-            self.all_pens[3].update_animals(lactating_cows)
+            self.all_pens[len(self.all_pens) - 2].update_animals(dry_cows)
+            self.all_pens[len(self.all_pens) - 1].update_animals(lactating_cows)
         else:
             self.all_pens[4].update_animals(dry_cows)
 
