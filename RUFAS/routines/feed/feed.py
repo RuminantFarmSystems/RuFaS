@@ -68,6 +68,9 @@ class Feed:
     def __init__(self, data):
         """
         Sets up the data for the feeds managed by the farm.
+        Currently stores and updates the Feed Inventory Information
+        TODO: Oncce there is a function to modify data in the database we will
+        use that to store inventory information, but for now we will store in the object
 
         Args:
             data: the feed information from the input JSON file
@@ -355,6 +358,134 @@ class Feed:
 
         self.C_loss += storage.C_loss
         self.CP_loss += storage.CP_loss
+
+    def initial_values(self) -> NutrientValues:
+        """
+        Returns: a NutrientValues object which holds the values in the database
+        table at the time of program initialization.
+        """
+        return self.__cached_values
+
+    def current_values(self) -> NutrientValues:
+        """
+        Returns: a new NutrientValues object which holds the values in the
+        database table at the time of the method call.
+        """
+        return NutrientValues(self.__feed_database,
+                              self.__table_name,
+                              self.managed_feed_names)
+
+    def values(self, desired_feed: FeedNames, current: bool = False):
+        """
+        Args:
+            desired_feed: a member of the FeedNames enum
+            current: if the values should be taken from the database at the time
+                of the method call, this value is true. The default value is
+                False, which means the cached values will be returned (stored at
+                the time of program initialization)
+
+        Returns: the dictionary which represents the characteristics and
+        nutrients of the @desired_feed
+        """
+        feeds = self.current_values() if current else self.initial_values()
+        index = self.managed_feeds.index(desired_feed)
+        return feeds.values[index]
+    #The Following Functions are used for Updating Feed Inventory and Feed allocation
+    def feed_allocation(self):
+        '''
+        Allocates farm grown feeds to be used for single or multiple animal classes. Priority is to
+        reserve high-quality forage for lactating cows.
+        '''
+        forage_quality_assesment()
+        pass
+
+    def forage_quality_assesment(self):
+        '''
+        Asseses quality of forage and populates lists of self.high_quality_forage
+        and self.low_quality_forage
+        '''
+        pass
+
+    def days_since_feedout(self):
+        '''
+        populations the days_since_feedout variable in Feed class
+        '''
+        pass
+
+    def forage_inv_plan(self, animal_management):
+
+        '''
+        Assess farm grown forage stocks and plans maximum intake of each forage to ensure there is enough forage to last a FULL YEAR.
+        Forage inventory is conducted at least 1x/year after harvest and then at a user specified number of times.
+        Note that the inventory should be executed at the end of the ‘simulation day’, preferably on the last day of a ration formulation interval
+        '''
+
+        #Begingin by creating a dictionary of all the current animals and animal information
+        animals = {'calves': animal_management.calves, 'heiferIs': animal_management.heiferIs, 'heiferIIs': animal_management.heiferIIs,
+        'heiferIIIs' : animal_management.heiferIIIs}
+        lactating_cows = []
+        dry_cows = []
+        for cow in animal_management.cows:
+            if cow._milking:
+                lactating_cows.append(cow)
+            else:
+                dry_cows.append(cow)
+
+        animals['dry_cows'] = dry_cows
+        animals['lactating_cows'] = lactating_cows
+        '''
+        #Computing Important values necessary for feed calculations for all cows
+        avg_BW = {} #average bodyweight for each animal type
+        animal_class_size_avg = {} #total number of this type of animal
+        for key in animals:
+            BW = 0
+            for animal in animals[key]:
+                BW += animal._body_weight
+            animal_class_size_avg[key] = len(animals)
+            avg_BW[key] = BW / len(animals)
+
+        #This dictionary contains dictionaries of information for each forage; specifically the required
+        #inventory for the corresponding animal class (in kg of DM)
+        Req_Inv = {}
+        #the hard-coded input of recomended inclusion rate of Forage as a percent of bodyweight per animal
+        #for now, base on the pseudo code these values are not unique to diff feeds
+        Inclusion_pct = {'calves': 2.0, 'heiferIs': 2.0, 'heiferIIs': 2.0, 'heiferIIIs': 2.0, 'dry_cows': 1.7, 'lactating_cows': 2.0}
+        #Estimated Inclusion rate to meet this type of animals requirments
+        Inclusion_rate_est = {}
+        for key in Inclusion_pct:
+            Inclusion_rate_est[key] = (Inclusion_pct[key]/100) * avg_BW[key]
+
+        #the number of days until the expected start date for feedout  of each forage from next harvest
+        Days_remaining = {}
+        for key in self.days_since_feedout:
+        Days_remaining[key] = 365 - self.days_since_feedout[key]
+        #total number of feeding days until next year's Forage begins to be fed out
+        Cow_days = {'calves': {}, 'heiferIs': {}, 'heiferIIs': {}, 'heiferIIIs': {}, 'dry_cows': {}, 'lactating_cows': {}}
+        for key in Days_remaining:
+        Cow_days[key] = Animal_Class_Size_Avg * Days_remaining[key]
+        #populating Req_Inv dictionary (key represents the type of feed)
+        for key in Cow_days:
+        Req_Inv[key] = Inclusion_rate_est * Cow_days[key]
+        ##Next, setting the max feed intake for each forage so it will be available all year
+        DMI_Forage_max = {}
+        for feed in self.available_feed_names:
+        #checking if feed will be allocated to just lactating cows or all cows
+        if (animal_type == 'lactating_cow' and feed in self.high_quality_forage):
+        if Req_Inv[feed] >= self.available_feeds[feed]['DM']:
+            DMI_Forage_max[feed] = self.available_feeds[feed]['DM'] / Cow_days[feed]
+        else:
+            DMI_Forage_max[feed] = 1.1 * Inclusion_rate_est
+        '''
+
+    def daily_updates(self, animal_management, time):
+
+        if ('Time for Forage Plan'):
+            self.forage_inv_plan(animal_management)
+
+
+        if animal_management.end_ration_interval():
+            pass
+
 
     def annual_reset(self):
         """
