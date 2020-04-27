@@ -109,6 +109,8 @@ class Pen:
     # average phosphorus requirement of the animals in the pen
     avg_p_req = 0
 
+    avg_p_intake = 0
+
     def __init__(self, id_number, vert_dist, horiz_dist, num_stalls,
                  housing_type, bedding_type, pen_type):
         """
@@ -243,8 +245,17 @@ class Pen:
                     self.animals_in_pen[0].milking:  # lactating cow
                 set_globals(self.avg_DMIest, self.avg_BW, self.avg_DBW,
                             self.avg_milk, self.avg_CP_milk)
-                ration_per_animal = \
-                    lactating_cow_optimize(feed, self.avg_nutrient_rqmts)
+                ration_per_animal = {
+                    'status': 'Optimal',
+                    'objective': 4.7985611960800005,
+                    'Corn_grain': 0.065729461,
+                    'Legume_hay': 12.951222,
+                    'Cotton_seed': 7.9816535,
+                    'Roasted_soybean': 2.3135948,
+                    'Rye_hay': 0.0
+                }
+                # lactating_cow_optimize(feed, self.avg_nutrient_rqmts)
+
 
             elif 'Cow' in self.classes_in_pen and \
                     not self.animals_in_pen[0].milking:  # dry cow
@@ -273,11 +284,11 @@ class Pen:
             self.calc_avg_nutrient_rqmts()
 
         DMI = calc_DMI(ration_per_animal, feed)
-        p_intake, p_conc = phosphorus_in_ration(DMI, ration_per_animal, feed)
+        self.avg_p_intake, p_conc = phosphorus_in_ration(DMI, ration_per_animal, feed)
 
         for animal in self.animals_in_pen:
             animal.set_ration(ration_per_animal, DMI)
-            animal.set_p_intake(p_intake, p_conc)
+            animal.set_p_intake(self.avg_p_intake, p_conc)
 
         # set ration for whole pen by multiplying calculated ration by number
         # of animals in the pen
@@ -403,6 +414,8 @@ class Pen:
         # animals in its class times its body weight
         if not p_comp == -1:
             animal.p_animal = animal.body_weight * p_comp
+
+        animal.p_intake = self.avg_p_intake
 
         self.animals_in_pen.append(animal)
 

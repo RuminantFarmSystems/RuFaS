@@ -420,7 +420,7 @@ class LifeCycleManager:
                 if not (new_calf.culled or new_calf.sold):
                     new_calf.events.add_event(
                         new_calf.days_born, 'Entered Herd')
-                    calves.append(new_calf)
+                    # calves.append(new_calf)
                     self.total_new_born += 1
                     calves_born.append(new_calf)
                 if new_calf.sold:

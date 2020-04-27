@@ -455,6 +455,7 @@ class AnimalManagement:
         Args:
             feed: instance of the Feed class
         """
+        print("day: ", self.simulation_day)
         if self.simulate_animals:
             for pen in self.all_pens:
                 pen.pen_populated = len(pen.animals_in_pen) > 0
@@ -481,9 +482,10 @@ class AnimalManagement:
                 self.calc_ration(feed)  # per pen
                 self.calc_manure_excretion(feed)  # per animal
                 self.calc_avg_growth()  # per pen
-                
+
             # phosphorus updates
             self.daily_p_update()  # per animal
+
             self.calc_all_p_comp()  # per animal
 
     def end_ration_interval(self):

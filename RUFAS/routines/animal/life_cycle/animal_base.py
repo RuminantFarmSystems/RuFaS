@@ -129,6 +129,8 @@ class AnimalBase(object):
 		"""
 		Calculates this animal's daily phosphorus update.
 		"""
+		if self.id == 8832:
+			print("P of 8832: ", self.p_animal)
 		# change in body P reserves (g), must be <= 0 (A.1G.A.2)
 		if self.p_intake < self.p_req:
 			self.dP_reserves = self.p_intake - self.p_req + self.dP_reserves
@@ -139,6 +141,9 @@ class AnimalBase(object):
 
 		# amount of P in the animal
 		self.p_animal = self.p_animal + self.p_gest + self.p_growth + self.dP_reserves
+
+		# if self.p_animal < 0:
+			# print(self.id)
 
 	def set_p_purchased(self):
 		"""
