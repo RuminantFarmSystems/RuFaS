@@ -205,6 +205,10 @@ class Feed:
         self.__cached_values = NutrientValues(self.__feed_database,
                                               self.__table_name,
                                               self.managed_feed_names)
+        #Initilizing a Dictionary that keeps track of the current Feed inventory in kg
+        #currently hard coded values. TODO Link with crop module
+        self.feed_inv = {'Corn_grain': 10000, 'Legume_hay': 3000000, 'Cotton_seed': 1200000, 'Roasted_soybean': 130000, 'Rye_hay': 1300000}
+
 
         self.storage_options = {}
 
@@ -541,7 +545,7 @@ class Feed:
 
         animals['dry_cows'] = dry_cows
         animals['lactating_cows'] = lactating_cows
-        '''
+
         #Computing Important values necessary for feed calculations for all cows
         avg_BW = {} #average bodyweight for each animal type
         animal_class_size_avg = {} #total number of this type of animal
@@ -549,41 +553,74 @@ class Feed:
             BW = 0
             for animal in animals[key]:
                 BW += animal._body_weight
-            animal_class_size_avg[key] = len(animals)
-            avg_BW[key] = BW / len(animals)
+            animal_class_size_avg[key] = len(animals[key])
+            if len(animals[key]) > 0:
+                avg_BW[key] = BW / len(animals[key])
+            else:
+                avg_BW[key] = 0
 
         #This dictionary contains dictionaries of information for each forage; specifically the required
         #inventory for the corresponding animal class (in kg of DM)
-        Req_Inv = {}
+        Req_Inv = {'calves': {}, 'heiferIs': {}, 'heiferIIs': {}, 'heiferIIIs': {}, 'dry_cows': {}, 'lactating_cows': {}}
         #the hard-coded input of recomended inclusion rate of Forage as a percent of bodyweight per animal
         #for now, base on the pseudo code these values are not unique to diff feeds
         Inclusion_pct = {'calves': 2.0, 'heiferIs': 2.0, 'heiferIIs': 2.0, 'heiferIIIs': 2.0, 'dry_cows': 1.7, 'lactating_cows': 2.0}
         #Estimated Inclusion rate to meet this type of animals requirments
         Inclusion_rate_est = {}
-        for key in Inclusion_pct:
-            Inclusion_rate_est[key] = (Inclusion_pct[key]/100) * avg_BW[key]
+        for animal in Inclusion_pct:
+            Inclusion_rate_est[animal] = {}
+            for feed in self.new_forages:
+                Inclusion_rate_est[animal][feed] = (Inclusion_pct[animal]/100) * avg_BW[animal]
 
-        #the number of days until the expected start date for feedout  of each forage from next harvest
+        #the number of days until the expected start date for feedout of each forage from next harvest
         Days_remaining = {}
-        for key in self.days_since_feedout:
-        Days_remaining[key] = 365 - self.days_since_feedout[key]
+        for feed_key in self.new_forages:
+            Days_remaining[feed_key] = 365 - self.days_since_feedout[feed_key]
         #total number of feeding days until next year's Forage begins to be fed out
         Cow_days = {'calves': {}, 'heiferIs': {}, 'heiferIIs': {}, 'heiferIIIs': {}, 'dry_cows': {}, 'lactating_cows': {}}
-        for key in Days_remaining:
-        Cow_days[key] = Animal_Class_Size_Avg * Days_remaining[key]
+        for animal in Cow_days:
+            for feed_key in self.new_forages:
+                Cow_days[animal][feed_key] = animal_class_size_avg[animal] * Days_remaining[feed_key]
         #populating Req_Inv dictionary (key represents the type of feed)
-        for key in Cow_days:
-        Req_Inv[key] = Inclusion_rate_est * Cow_days[key]
-        ##Next, setting the max feed intake for each forage so it will be available all year
-        DMI_Forage_max = {}
-        for feed in self.available_feed_names:
-        #checking if feed will be allocated to just lactating cows or all cows
-        if (animal_type == 'lactating_cow' and feed in self.high_quality_forage):
-        if Req_Inv[feed] >= self.available_feeds[feed]['DM']:
-            DMI_Forage_max[feed] = self.available_feeds[feed]['DM'] / Cow_days[feed]
-        else:
-            DMI_Forage_max[feed] = 1.1 * Inclusion_rate_est
-        '''
+        for animal in Cow_days:
+            for feed_key in self.new_forages:
+                Req_Inv[animal][feed_key] = Inclusion_rate_est[animal][feed_key] * Cow_days[animal][feed_key]
+        ##Next, setting the max feed intake for each forage so it will be available all year##
+        DMI_Forage_max = {'calves': {}, 'heiferIs': {}, 'heiferIIs': {}, 'heiferIIIs': {}, 'dry_cows': {}, 'lactating_cows': {}}     #for each type of feed
+        for feed in self.new_forages:                   #for each type of animal
+            if (feed in self.high_quality_forage):
+                if 1.1*Req_Inv[feed] >= self.feed_inv[feed]:
+                    DMI_Forage_max['lactating_cows'][feed] = self.feed_inv[feed] / Cow_days['lactating_cows'][feed]
+                else:
+                    DMI_Forage_max[animal][feed] = 1.1 * Inclusion_rate_est['lactating_cows'][feed]
+            elif (feed not in self.high_quality_forage):
+                Tot_Req_Inv = 0
+                for animal in animals:                      #For-loop used to calculate sum of Required Inventory of this feed
+                    Tot_Req_Inv += Req_Inv[animal][feed]    #Total Required inventory for this feed
+                Tot_Req_Inv_nlcow = Tot_Req_Inv - Req_Inv['lactating_cows'][feed]  #All animals except lactating cows for this feed
+                if Tot_Req_Inv <= self.feed_inv[feed]:
+                    for animal in animals:
+                        DMI_Forage_max[animal][feed] = Inclusion_rate_est[animal][feed]
+                    Available_Forage = self.feed_inv[feed] - Tot_Req_Inv_nlcow
+                    DMI_Forage_max['lactating_cows'][feed] = Available_Forage / Cow_days['lactating_cows'][feed]
+                else:
+                    Inv_delta = Tot_Req_Inv - self.feed_inv[feed]
+                    denom = 0
+                    for animal_key in animals:              #For-loop used to calculate sum of Reqired Inventory minus lac. Cows
+                        if animal_key != 'lactating_cows':
+                            denom += (avg_BW[animal_key] * Cow_days[animal_key][feed])
+                    Inclusion_pct_delta = Inv_delta / denom
+                    Available_Forage = self.feed_inv[feed]
+                    for animal in animals:
+                        if animal != 'lactating_cows':
+                            Inclusion_rate_est[animal][feed] = Inclusion_pct[animal] - Inclusion_pct_delta
+                            DMI_Forage_max[animal][feed] = Inclusion_rate_est[animal][feed]
+                            Available_Forage -= Inclusion_rate_est[animal][feed]*Cow_days[animal][feed]
+                    if Available_Forage > 0:
+                        DMI_Forage_max['lactating_cows'][feed] = Available_Forage / Cow_days['lactating_cows'][feed]
+                    else:
+                        DMI_Forage_max['lactating_cows'][feed] = 0
+        self.DMI_Forage_max = DMI_Forage_max
 
     def daily_updates(self, animal_management, time):
 
