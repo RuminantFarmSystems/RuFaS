@@ -77,24 +77,24 @@ class AnimalBase(object):
 		self.body_weight = animal.body_weight
 		self.mature_body_weight = animal.mature_body_weight
 		
-		self.daily_growth = 0
-		self.nutrient_rqmts = {}
+		self.daily_growth = animal.daily_growth
+		self.nutrient_rqmts = animal.nutrient_rqmts
 		self.set_default_nutrient_rqmts()
-		self.dry_matter_intake = 0
-		self.manure_excretion = {}
-		self.ration_formulation = {'objective': 0.00}
-		self.DMIest = 0
-		self.DBW = 0
-		self.p_animal = 0
-		self.p_intake = 0
-		self.p_conc = 0
-		self.p_excrt = 0
-		self.p_req = 0
-		self.dP_reserves = 0
-		self.p_excess = 0
-		self.p_gest = 0
-		self.p_growth = 0
-		self.p_maint_feces = 0
+		self.dry_matter_intake = animal.dry_matter_intake
+		self.manure_excretion = animal.manure_excretion
+		self.ration_formulation = animal.ration_formulation
+		self.DMIest = animal.DMIest
+		self.DBW = animal.DBW
+		self.p_animal = animal.p_animal
+		self.p_intake = animal.p_intake
+		self.p_conc = animal.p_conc
+		self.p_excrt = animal.p_excrt
+		self.p_req = animal.p_req
+		self.dP_reserves = animal.dP_reserves
+		self.p_excess = animal.p_excess
+		self.p_gest = animal.p_gest
+		self.p_growth = animal.p_growth
+		self.p_maint_feces = animal.p_maint_feces
 
 	def set_default_nutrient_rqmts(self):
 		"""
@@ -129,8 +129,6 @@ class AnimalBase(object):
 		"""
 		Calculates this animal's daily phosphorus update.
 		"""
-		if self.id == 8832:
-			print("P of 8832: ", self.p_animal)
 		# change in body P reserves (g), must be <= 0 (A.1G.A.2)
 		if self.p_intake < self.p_req:
 			self.dP_reserves = self.p_intake - self.p_req + self.dP_reserves
@@ -141,9 +139,6 @@ class AnimalBase(object):
 
 		# amount of P in the animal
 		self.p_animal = self.p_animal + self.p_gest + self.p_growth + self.dP_reserves
-
-		# if self.p_animal < 0:
-			# print(self.id)
 
 	def set_p_purchased(self):
 		"""

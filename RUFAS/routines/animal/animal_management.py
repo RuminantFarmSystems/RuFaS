@@ -31,6 +31,8 @@ def daily_animal_routine(animal_management, feed, weather, time):
         weather: instance of the Weather class
         time: instance of the Time class
     """
+    print()
+    print("year: ", time.year, " j_day: ", time.day)
     animal_management.daily_updates(feed)
 
 
@@ -298,20 +300,26 @@ class AnimalManagement:
 
             if type(animal).__name__ == 'Calf':
                 animal_p_conc = self.calf_p_comp
+                self.calves.append(animal)
             elif type(animal).__name__ == 'HeiferI':
                 animal_p_conc = self.heiferI_p_comp
+                self.heiferIs.append(animal)
             elif type(animal).__name__ == 'HeiferII':
                 animal_p_conc = self.heiferII_p_comp
+                self.heiferIIs.append(animal)
             elif type(animal).__name__ == 'HeiferIII':
                 animal_p_conc = self.heiferIII_p_comp
+                self.heiferIIIs.append(animal)
             else:  # animal is of class Cow
                 animal_p_conc = self.cow_p_comp
+                self.cows.append(animal)
 
             self.all_pens[pen].set_up_new_animal(animal, animal_p_conc)
 
         for calf in calves_born:
             # TODO: this is the hard coded calf pen value
             pen = 0
+            self.calves.append(calf)
             self.all_pens[pen].set_up_new_animal(calf, -1)
 
     def pen_allocation(self):

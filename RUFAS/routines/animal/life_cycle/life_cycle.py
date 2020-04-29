@@ -150,7 +150,7 @@ class LifeCycleManager:
             res_calves.append(calf)
     
         for date in range(sim_days):
-            for calf in calves:
+            for index, calf in enumerate(calves):
                 wean_day = calf.update()
                 if wean_day:
                     new_heiferI = HeiferI(calf)
@@ -160,9 +160,9 @@ class LifeCycleManager:
                             new_heiferI.days_born, 'Entered Herd')
                     else:
                         heiferIs.append(new_heiferI)
-                    calves.remove(calf)
+                    del calves[index]
     
-            for heiferI in heiferIs:
+            for index, heiferI in enumerate(heiferIs):
                 second_stage = heiferI.update()
                 if second_stage:
                     args = {
@@ -177,16 +177,16 @@ class LifeCycleManager:
                             new_heiferII.days_born, 'Entered Herd')
                     else:
                         heiferIIs.append(new_heiferII)
-                    heiferIs.remove(heiferI)
+                    del heiferIs[index]
     
-            for heiferII in heiferIIs:
+            for index, heiferII in enumerate(heiferIIs):
                 cull_stage, third_stage = heiferII.update()
                 # if date == 900:
                 #     print(len(calves))
                 #     print(heiferIIs[0])
                 #     return
                 if cull_stage:
-                    heiferIIs.remove(heiferII)
+                    del heiferIIs[index]
                 if third_stage:
                     new_heiferIII = HeiferIII(heiferII)
                     if len(res_heiferIIIs) < heiferIII_num:
@@ -195,9 +195,9 @@ class LifeCycleManager:
                             new_heiferIII.days_born, 'Entered Herd')
                     else:
                         heiferIIIs.append(new_heiferIII)
-                    heiferIIs.remove(heiferII)
+                    del heiferIIs[index]
     
-            for heiferIII in heiferIIIs:
+            for index, heiferIII in enumerate(heiferIIIs):
                 cow_stage = heiferIII.update()
                 if cow_stage:
                     args = {
@@ -213,9 +213,10 @@ class LifeCycleManager:
                             new_cow.days_born, 'Entered Herd')
                     else:
                         cows.append(new_cow)
-                    heiferIIIs.remove(heiferIII)
+                    del heiferIIIs[index]
 
         self.replacement_market = cows
+        print("init:", len(self.replacement_market))
         return res_calves, res_heiferIs, res_heiferIIs, res_heiferIIIs, res_cows
     
     def daily_update(self, date, sim_length, calves, heiferIs, heiferIIs,
@@ -263,19 +264,19 @@ class LifeCycleManager:
             record_econ_stats = True
     
         # calf to heiferI
-        for calf in calves:
+        for index, calf in enumerate(calves):
             wean_day = calf.update()
             if wean_day:
                 new_heiferI = HeiferI(calf)
                 heiferIs.append(new_heiferI)
-                calves.remove(calf)
+                del calves[index]
             # if date == 50:
             #     print(len(calves))
             #     print(calves[0])
             #     return
     
         # heiferI to heiferII, assign repro programs
-        for heiferI in heiferIs:
+        for index, heiferI in enumerate(heiferIs):
             second_stage = heiferI.update()
             if second_stage:
                 args = {
@@ -285,30 +286,30 @@ class LifeCycleManager:
                 }
                 new_heiferII = HeiferII(heiferI, args)
                 heiferIIs.append(new_heiferII)
-                heiferIs.remove(heiferI)
+                del heiferIs[index]
             # if date == 350:
             #     print(len(heiferIs))
             #     print(heiferIs[20])
             #     return
     
         # heiferII to heiferIII
-        for heiferII in heiferIIs:
+        for index, heiferII in enumerate(heiferIIs):
             cull_stage, third_stage = heiferII.update()
             if cull_stage:
                 self.total_culled += 1
                 self.culled_heifers.append(heiferII)
-                heiferIIs.remove(heiferII)
+                del heiferIIs[index]
             if third_stage:
                 new_heiferIII = HeiferIII(heiferII)
                 heiferIIIs.append(new_heiferIII)
-                heiferIIs.remove(heiferII)
+                del heiferIIs[index]
             # if date == 650:
             #     print(len(heiferIIs))
             #     print(heiferIIs[20])
             #     return
     
         # heiferIII to cow, assign repro programs
-        for heiferIII in heiferIIIs:
+        for index, heiferIII in enumerate(heiferIIIs):
 
             # TODO why can cows be added to the list of HeiferIII's so that the
             #  following if statement is necessary?
@@ -326,7 +327,7 @@ class LifeCycleManager:
                 }
                 new_cow = Cow(heiferIII, args)
                 cows.append(new_cow)
-                heiferIIIs.remove(heiferIII)
+                del heiferIIIs[index]
             # if date == 850:
             #     print(len(heiferIIIs))
             #     print(heiferIIIs[2])
@@ -345,13 +346,16 @@ class LifeCycleManager:
     
         # if the number of heifers is less than needed for the herd,
         # buy replacement from the market
-        while len(cows) + len(heiferIIIs) < self.herd_num * 1.01 and \
+        while len(cows) + len(heiferIIIs) + daily_bought_from_market < self.herd_num * 1.01 and \
                 date > 1:
+            print("repl. market len: ", len(self.replacement_market))
             self.replacement_market[0].events.add_event(
                 self.replacement_market[0].days_born, 'Entered Herd')
             self.replacement_market[0].set_p_purchased()
+            if self.replacement_market[0].id == 7263:
+                print('adding 7263')
             animals_added.append(self.replacement_market[0])
-            cows.append(self.replacement_market[0])
+            # cows.append(self.replacement_market[0])
             self.bought_from_market += 1
             daily_bought_from_market += 1
             del self.replacement_market[0]
@@ -360,7 +364,7 @@ class LifeCycleManager:
                 self.total_replacement_cost += self.config["heifer_buy_price"]
     
         # cow culling action and economic stats
-        for cow in cows:
+        for index, cow in enumerate(cows):
             _, _, _, culled, new_born = cow.update(record_econ_stats)
             # if date == 2000:
             #     print(len(cows))
@@ -397,7 +401,7 @@ class LifeCycleManager:
                 self.culled_cows.append(cow)
                 # print(len(culled_cows))
                 ids_removed.append(cow.id)
-                cows.remove(cow)
+                del cows[index]
     
             # calculate income from sold calves
             if new_born:
@@ -409,13 +413,16 @@ class LifeCycleManager:
                 }
                 # at parturition, the sum of P absorbed for gestation rqmts is
                 # subtracted from the animal value. the sum of P absorbed for
-                # gestation is quatl to the inital animal P value for the calf
+                # gestation is equal to the initial animal P value for the calf
                 # (A.1G.A.4)
                 cow.p_animal = cow.p_animal - cow.p_gest_for_calf + \
                     cow.p_growth + cow.dP_reserves
 
-                cow.p_gest_for_calf = 0
                 new_calf = Calf(args)
+                if new_calf.id == 8832:
+                    print('came from cow ', cow.id)
+                    print('with P of ', cow.p_gest_for_calf)
+                cow.p_gest_for_calf = 0
 
                 if not (new_calf.culled or new_calf.sold):
                     new_calf.events.add_event(
