@@ -464,6 +464,8 @@ class AnimalManagement:
             feed: instance of the Feed class
         """
         print("day: ", self.simulation_day)
+        if self.simulation_day == 2:
+            print('2')
         if self.simulate_animals:
             for pen in self.all_pens:
                 pen.pen_populated = len(pen.animals_in_pen) > 0

@@ -245,17 +245,16 @@ class Pen:
                     self.animals_in_pen[0].milking:  # lactating cow
                 set_globals(self.avg_DMIest, self.avg_BW, self.avg_DBW,
                             self.avg_milk, self.avg_CP_milk)
-                ration_per_animal = {
-                    'status': 'Optimal',
-                    'objective': 4.7985611960800005,
-                    'Corn_grain': 0.065729461,
-                    'Legume_hay': 12.951222,
-                    'Cotton_seed': 7.9816535,
-                    'Roasted_soybean': 2.3135948,
-                    'Rye_hay': 0.0
-                }
-                # lactating_cow_optimize(feed, self.avg_nutrient_rqmts)
-
+                # ration_per_animal = {
+                #     'status': 'Optimal',
+                #     'objective': 4.7985611960800005,
+                #     'Corn_grain': 0.065729461,
+                #     'Legume_hay': 12.951222,
+                #     'Cotton_seed': 7.9816535,
+                #     'Roasted_soybean': 2.3135948,
+                #     'Rye_hay': 0.0
+                # }
+                ration_per_animal = lactating_cow_optimize(feed, self.avg_nutrient_rqmts)
 
             elif 'Cow' in self.classes_in_pen and \
                     not self.animals_in_pen[0].milking:  # dry cow

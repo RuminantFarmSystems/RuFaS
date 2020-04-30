@@ -216,7 +216,6 @@ class LifeCycleManager:
                     del heiferIIIs[index]
 
         self.replacement_market = cows
-        print("init:", len(self.replacement_market))
         return res_calves, res_heiferIs, res_heiferIIs, res_heiferIIIs, res_cows
     
     def daily_update(self, date, sim_length, calves, heiferIs, heiferIIs,
@@ -348,12 +347,9 @@ class LifeCycleManager:
         # buy replacement from the market
         while len(cows) + len(heiferIIIs) + daily_bought_from_market < self.herd_num * 1.01 and \
                 date > 1:
-            print("repl. market len: ", len(self.replacement_market))
             self.replacement_market[0].events.add_event(
                 self.replacement_market[0].days_born, 'Entered Herd')
             self.replacement_market[0].set_p_purchased()
-            if self.replacement_market[0].id == 7263:
-                print('adding 7263')
             animals_added.append(self.replacement_market[0])
             # cows.append(self.replacement_market[0])
             self.bought_from_market += 1
@@ -419,9 +415,6 @@ class LifeCycleManager:
                     cow.p_growth + cow.dP_reserves
 
                 new_calf = Calf(args)
-                if new_calf.id == 8832:
-                    print('came from cow ', cow.id)
-                    print('with P of ', cow.p_gest_for_calf)
                 cow.p_gest_for_calf = 0
 
                 if not (new_calf.culled or new_calf.sold):

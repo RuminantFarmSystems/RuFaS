@@ -124,7 +124,7 @@ class Cow(HeiferIII):
 		self.CP_milk = 3.2
 		self.lactose_milk = 4.85
 		
-		self.daily_growth = 0
+		self.daily_growth = cow.daily_growth
 		self.calves = cow.calves
 		self.milking = cow.milking
 		self.days_in_milk = cow.days_in_milk
