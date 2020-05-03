@@ -24,21 +24,11 @@ class HeiferIII(HeiferII):
 		Description:
 			initialize the heifer in this stage from the second stage
         Input:
-			heiferI: first stage of heifer, pass heifer information from heiferI
+			args: same as heiferII
         Output:
 	'''
-    def __init__(self, heiferII):
-        super().init_from_heiferII(heiferII)
-
-    '''
-		Description:
-            initialize the heifer in this stage from the second stage and initialize the repro program parameters for coding purpose
-		Input:
-			heiferII: another heifer out of the herd
-		Output:
-	'''
-    def init_from_heiferIII(self, heiferIII):
-        super().init_from_heiferII(heiferIII)
+    def __init__(self, args):
+        super().__init__(args)
 
     '''
            Calculates this heiferIII's nutrient requirements.

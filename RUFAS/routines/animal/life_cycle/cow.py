@@ -33,15 +33,15 @@ class Cow(HeiferIII):
 		Description:
 			initialize the cow from heifer
 		Input:
-			heiferIII: third stage of heifer, pass heifer information from heiferIII
+			(In addition to heiferIII information)
 			args.repro_program: reproduction program used in cow, three of them: ED, TAI, and ED-TAI programs
 			args.presynch_method: presych protocols used for presynch programs, four of them: PreSynch, Double OvSynch, G6G, and user_defined
 			args.tai_method_c: timed-AI protocols used for reproduction programs, five of them: OvSynch 56, OvSynch 48, CoSynch 72, 5d CoSynch, and user-defined
 			args.resynch_method: resynch protocols used for resynch programs, three of them: TAIafterPD, TAIbeforePD, and PGFatPD
 		Output:
 	'''
-	def __init__(self, heiferIII, args):
-		super().init_from_heiferIII(heiferIII)
+	def __init__(self, args):
+		super().__init__(args)
 
 		#current hard-coded values necessary for nutrient requirement calculations
 		self.ID = 0     #hard-coded inital value for Identification
@@ -90,55 +90,6 @@ class Cow(HeiferIII):
 		#figures
 		self._estimated_daily_milk_produced_lst = []
 		self._body_weight_lst = []
-
-	'''
-		Description:
-            initialize the cow in this stage from the third stage of heifer and initialize the repro program parameters for coding purpose
-		Input:
-			heiferIII: another heifer out of the herd
-		Output:
-	'''
-	def init_from_cow(self, cow):
-		super().init_from_heiferIII(Cow)
-
-		#current hard-coded values necessary for nutrient requirement calculations
-		self.ID = 0		#hard-coded inital value for Identification
-		self._BCS = 3.5 #body condition score
-		self._CP_milk = 3.2
-		self._lactose_milk = 4.85
-
-		self._daily_growth = 0
-		self._calves = cow._calves
-		self._milking = cow._milking
-		self._days_in_milk = cow._days_in_milk
-		self._estimated_daily_milk_produced = cow._estimated_daily_milk_produced
-		self._single_acc_milk_prod = cow._single_acc_milk_prod
-		self._future_cull_date = cow._future_cull_date
-		self._cull_reason = cow._cull_reason
-		self._repro_program = cow._repro_program
-		self._first_ai = cow._first_ai
-
-		# TAI params
-		self._presynch_method = cow._presynch_method
-		self._tai_method_c = cow._tai_method_c
-		self._presynch_program_start_day = cow._presynch_program_start_day
-		self._tai_program_start_day_c = cow._tai_program_start_day_c
-		self._resynch_method = cow._resynch_method
-
-		# economics counts
-		self._ED_days = cow._ED_days
-		self._GnRH_injections = cow._GnRH_injections
-		self._PGF_injections = cow._PGF_injections
-		self._semen_used = cow._semen_used
-		self._AI_times = cow._AI_times
-		self._preg_diagnoses = cow._preg_diagnoses
-		self._feed_cost = cow._feed_cost
-		self._fixed_cost = cow._fixed_cost
-		self._milk_income = cow._milk_income
-
-		#figures
-		self._estimated_daily_milk_produced_lst = cow._estimated_daily_milk_produced_lst
-		self._body_weight_lst = cow._body_weight_lst
 
 	'''
 		Description:

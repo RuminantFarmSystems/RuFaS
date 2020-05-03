@@ -15,6 +15,7 @@ from RUFAS.routines.animal.life_cycle.heiferI import HeiferI
 from RUFAS.routines.animal.life_cycle.heiferII import HeiferII
 from RUFAS.routines.animal.life_cycle.heiferIII import HeiferIII
 from RUFAS.routines.animal.life_cycle.cow import Cow
+from RUFAS.routines.animal.life_cycle.animal_initialization import AnimalInitalization
 from collections import Counter
 import matplotlib as mpl
 import matplotlib.pyplot as plt
@@ -85,11 +86,14 @@ class LifeCycleManager:
 
     herd_num = 0
 
+    animal_initializer = None
+
     def __init__(self, data):
         '''
         Initializes the necessary configuration data.
         '''
         self.config = data
+        self.animal_initializer = AnimalInitalization()
 
     def initialize_herd(self, herd_num, calf_num, heiferI_num, heiferII_num, heiferIII_num, cow_num, replace_num, sim_days=1500):
         '''
@@ -104,104 +108,14 @@ class LifeCycleManager:
             replace_num: replacements in the market
             sim_days: simulation length of this herd, to make sure they reach to the heiferIII stage
         '''
+        self.animal_initializer.init_animals()
         self.herd_num = herd_num
-
-        calves = []
-        heiferIs = []
-        heiferIIs = []
-        heiferIIIs = []
-        cows = []
-
-        # reserve: gathers simulated animals for the initial stage
-        res_calves = []
-        res_heiferIs = []
-        res_heiferIIs = []
-        res_heiferIIIs = []
-        res_cows = []
-
-        for _ in range(calf_num + heiferI_num + heiferII_num + heiferIII_num + cow_num + replace_num):
-            args = {
-                'breed': 'HO',
-                'date': 0,
-                'days_born': 0
-            }
-            new_calf = Calf(args)
-            if not (new_calf._culled or new_calf._sold):
-                calves.append(new_calf)
-
-        while len(res_calves) < calf_num:
-            calf = calves.pop()
-            calf._events.add_event(calf._days_born, 'Entered Herd')
-            res_calves.append(calf)
-
-        for date in range(sim_days):
-            for calf in calves:
-                wean_day = calf.update()
-                if wean_day:
-                    new_heiferI = HeiferI(calf)
-                    if len(res_heiferIs) < heiferI_num:
-                        res_heiferIs.append(new_heiferI)
-                        new_heiferI._events.add_event(new_heiferI._days_born, 'Entered Herd')
-                    else:
-                        heiferIs.append(new_heiferI)
-                    calves.remove(calf)
-
-            for heiferI in heiferIs:
-                second_stage = heiferI.update()
-                if second_stage:
-                    args = {
-                        'repro_program': 'TAI',
-                        'tai_method_h': '5dCG2P',
-                        'synch_ed_method_h': '2P'
-                    }
-                    new_heiferII = HeiferII(heiferI, args)
-                    if len(res_heiferIIs) < heiferII_num:
-                        res_heiferIIs.append(new_heiferII)
-                        new_heiferII._events.add_event(new_heiferII._days_born, 'Entered Herd')
-                    else:
-                        heiferIIs.append(new_heiferII)
-                    heiferIs.remove(heiferI)
-
-            for heiferII in heiferIIs:
-                cull_stage, third_stage = heiferII.update()
-                # if date == 900:
-                #     print(len(calves))
-                #     print(heiferIIs[0])
-                #     return
-                if cull_stage:
-                    heiferIIs.remove(heiferII)
-                if third_stage:
-                    new_heiferIII = HeiferIII(heiferII)
-                    if len(res_heiferIIIs) < heiferIII_num:
-                        res_heiferIIIs.append(new_heiferIII)
-                        new_heiferIII._events.add_event(new_heiferIII._days_born, 'Entered Herd')
-                    else:
-                        heiferIIIs.append(new_heiferIII)
-                    heiferIIs.remove(heiferII)
-
-            for heiferIII in heiferIIIs:
-                cow_stage = heiferIII.update()
-                if cow_stage:
-                    args = {
-                        'repro_program': 'TAI',
-                        'presynch_method': 'PreSynch',
-                        'tai_method_c': 'OvSynch 56',
-                        'resynch_method': 'TAIafterPD'
-                    }
-                    new_cow = Cow(heiferIII, args)
-                    if len(res_cows) < cow_num:
-                        res_cows.append(new_cow)
-                        new_cow._events.add_event(new_cow._days_born, 'Entered Herd')
-                    else:
-                        cows.append(new_cow)
-                    heiferIIIs.remove(heiferIII)
-
-        self.calves = res_calves
-        self.heiferIs = res_heiferIs
-        self.heiferIIs = res_heiferIIs
-        self.heiferIIIs = res_heiferIIIs
-        self.cows = res_cows
-        self.replacement_market = cows
+        self.calves = self.animal_initializer.get_calves(calf_num)
+        self.heiferIs = self.animal_initializer.get_heiferIs(heiferI_num)
+        self.heiferIIs = self.animal_initializer.get_heiferIIs(heiferII_num)
+        self.heiferIIIs = self.animal_initializer.get_heiferIIIs(heiferIII_num)
+        self.cows = self.animal_initializer.get_cows(cow_num)
+        self.replacement_market = self.animal_initializer.get_heiferIIIs(replace_num)
 
     def daily_update(self, date, sim_length):
         '''
@@ -229,7 +143,17 @@ class LifeCycleManager:
         for calf in self.calves:
             wean_day = calf.update()
             if wean_day:
-                new_heiferI = HeiferI(calf)
+                args = {
+                        'id' : calf._id,
+                        'breed' : calf._breed,
+                        'birth_date' : calf._birth_date,
+                        'days_born' : calf._days_born,
+                        'birth_weight' : calf._birth_weight,
+                        'body_weight' : calf._body_weight,
+                        'wean_weight' : calf._wean_weight,
+                        'events' : str(calf._events)
+                    }
+                new_heiferI = HeiferI(args)
                 self.heiferIs.append(new_heiferI)
                 self.calves.remove(calf)
             # if date == 50:
@@ -242,11 +166,19 @@ class LifeCycleManager:
             second_stage = heiferI.update()
             if second_stage:
                 args = {
-                    'repro_program': 'TAI',
-                    'tai_method_h': '5dCG2P',
-                    'synch_ed_method_h': '2P'
-                }
-                new_heiferII = HeiferII(heiferI, args)
+                        'id' : heiferI._id,
+                        'breed' : heiferI._breed,
+                        'birth_date' : heiferI._birth_date,
+                        'days_born' : heiferI._days_born,
+                        'birth_weight' : heiferI._birth_weight,
+                        'body_weight' : heiferI._body_weight,
+                        'wean_weight' : heiferI._wean_weight,
+                        'events' : str(heiferI._events),
+                        'repro_program': 'TAI',
+                        'tai_method_h': '5dCG2P',
+                        'synch_ed_method_h': '2P'
+                    }
+                new_heiferII = HeiferII(args)
                 self.heiferIIs.append(new_heiferII)
                 self.heiferIs.remove(heiferI)
             # if date == 350:
@@ -262,7 +194,32 @@ class LifeCycleManager:
                 self.culled_heifers.append(heiferII)
                 self.heiferIIs.remove(heiferII)
             if third_stage:
-                new_heiferIII = HeiferIII(heiferII)
+                args = {
+                        'id' : heiferII._id,
+                        'breed' : heiferII._breed,
+                        'birth_date' : heiferII._birth_date,
+                        'days_born' : heiferII._days_born,
+                        'birth_weight' : heiferII._birth_weight,
+                        'body_weight' : heiferII._body_weight,
+                        'wean_weight' : heiferII._wean_weight,
+                        'events' : str(heiferII._events),
+                        'repro_program': heiferII._repro_program,
+                        'tai_method_h': heiferII._tai_method_h,
+                        'synch_ed_method_h': heiferII._synch_ed_method_h,
+                        'mature_body_weight': heiferII._mature_body_weight,
+                        'estrus_count': heiferII._estrus_count,
+                        'estrus_day': heiferII._estrus_day,
+                        'tai_program_start_day_h': heiferII._tai_program_start_day_h,
+                        'synch_ed_program_start_day_h': heiferII._synch_ed_program_start_day_h,
+                        'synch_ed_estrus_day': heiferII._synch_ed_estrus_day,
+                        'stop_day': heiferII._stop_day,
+                        'conception_rate': heiferII._conception_rate,
+                        'ai_day': heiferII._ai_day,
+                        'abortion_day': heiferII._abortion_day,
+                        'days_in_preg': heiferII._days_in_preg,
+                        'gestation_length': heiferII._gestation_length
+                    }
+                new_heiferIII = HeiferIII(args)
                 self.heiferIIIs.append(new_heiferIII)
                 self.heiferIIs.remove(heiferII)
             # if date == 650:
@@ -275,12 +232,34 @@ class LifeCycleManager:
             cow_stage = heiferIII.update()
             if cow_stage:
                 args = {
-                    'repro_program': 'TAI',
-                    'presynch_method': 'PreSynch',
-                    'tai_method_c': 'OvSynch 56',
-                    'resynch_method': 'TAIafterPD'
-                }
-                new_cow = Cow(heiferIII, args)
+                        'id' : heiferIII._id,
+                        'breed' : heiferIII._breed,
+                        'birth_date' : heiferIII._birth_date,
+                        'days_born' : heiferIII._days_born,
+                        'birth_weight' : heiferIII._birth_weight,
+                        'body_weight' : heiferIII._body_weight,
+                        'wean_weight' : heiferIII._wean_weight,
+                        'events' : str(heiferIII._events),
+                        'repro_program': 'TAI',
+                        'tai_method_h': heiferIII._tai_method_h,
+                        'synch_ed_method_h': heiferIII._synch_ed_method_h,
+                        'mature_body_weight': heiferIII._mature_body_weight,
+                        'estrus_count': heiferIII._estrus_count,
+                        'estrus_day': heiferIII._estrus_day,
+                        'tai_program_start_day_h': heiferIII._tai_program_start_day_h,
+                        'synch_ed_program_start_day_h': heiferIII._synch_ed_program_start_day_h,
+                        'synch_ed_estrus_day': heiferIII._synch_ed_estrus_day,
+                        'stop_day': heiferIII._stop_day,
+                        'conception_rate': heiferIII._conception_rate,
+                        'ai_day': heiferIII._ai_day,
+                        'abortion_day': heiferIII._abortion_day,
+                        'days_in_preg': heiferIII._days_in_preg,
+                        'gestation_length': heiferIII._gestation_length,
+                        'presynch_method': 'PreSynch',
+                        'tai_method_c': 'OvSynch 56',
+                        'resynch_method': 'TAIafterPD'
+                    }
+                new_cow = Cow(args)
                 self.cows.append(new_cow)
                 self.heiferIIIs.remove(heiferIII)
             # if date == 850:
@@ -347,8 +326,9 @@ class LifeCycleManager:
             # calculate income from sold calves
             if new_born:
                 args = {
+                    'id': self.animal_initializer.next_id(),
                     'breed': 'HO',
-                    'date': 0,
+                    'birth_date': 0,
                     'days_born': 0
                 }
                 new_calf = Calf(args)

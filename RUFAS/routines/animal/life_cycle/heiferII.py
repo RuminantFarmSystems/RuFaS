@@ -24,16 +24,36 @@ from random import random
 class HeiferII(HeiferI):
 	'''
 		Description:
-			initialize the heifer in this stage from the first stage and initialize the repro program parameters
+			initialize the heifer in this stage from the first stage and initialize or assigns the repro program parameters
 		Input:
-			heiferI: first stage of heifer, pass heifer information from heiferI
+			(In addition to heiferI information)
 			args.repro_program: reproduction program used in heifer, three of them: ED, TAI, and synch-ED programs
 			args.tai_method_h: timed-AI protocols used for reproduction programs, three of them: 5dCG2P, 5dCGP, and user-defined
 			args.synch_ed_method_h: synch ed protocols used for reproduction programs, two of them: 2P and CP
+			(optional: include the following to assign repro program parameters)
+			args.mature_body_weight
+			args.estrus_count
+			args.estrus_day
+			args.tai_program_start_day_h
+			args.synch_ed_program_start_day_h
+			args.synch_ed_estrus_day
+			args.stop_day
+			args.conception_rate
+			args.ai_day
+			args.abortion_day
+			args.days_in_preg
+			args.gestation_length
 		Output:
 	'''
-	def __init__(self, heiferI, args):
-		super().init_from_heiferI(heiferI)
+	def __init__(self, args):
+		super().__init__(args)
+
+		if 'mature_body_weight' in args:
+			self.assign_heiferII_values(args)
+		else:
+			self.init_values(args)
+		
+	def init_values(self, args):
 		self._repro_program = args['repro_program']
 		self._mature_body_weight = 0
 
@@ -58,38 +78,30 @@ class HeiferII(HeiferI):
 		self._preg = False
 		self._gestation_length = 0
 
-	'''
-		Description:
-			initialize the heifer in this stage from the first stage and initialize the repro program parameters for coding purpose
-		Input:
-			heiferII: another heifer out of the herd
-		Output:
-	'''
-	def init_from_heiferII(self, heiferII):
-		super().init_from_heiferI(heiferII)
-		self._repro_program = heiferII._repro_program
-		self._mature_body_weight = heiferII._mature_body_weight
+	def assign_heiferII_values(self, args):
+		self._repro_program = args['repro_program']
+		self._mature_body_weight = args['mature_body_weight']
 
-		# ED variables
-		self._estrus_count = heiferII._estrus_count
-		self._estrus_day = heiferII._estrus_day
+		# Estrus variables
+		self._estrus_count = args['estrus_count']
+		self._estrus_day = args['estrus_day']
 
 		# TAI variables
-		self._tai_method_h = heiferII._tai_method_h
-		self._tai_program_start_day_h = heiferII._tai_program_start_day_h
+		self._tai_method_h = args['tai_method_h']
+		self._tai_program_start_day_h = args['tai_program_start_day_h']
 
 		# synch_ED variables
-		self._synch_ed_method_h = heiferII._synch_ed_method_h
-		self._synch_ed_program_start_day_h = heiferII._synch_ed_program_start_day_h
-		self._synch_ed_estrus_day = heiferII._synch_ed_estrus_day
-		self._stop_day = heiferII._stop_day
+		self._synch_ed_method_h = args['synch_ed_method_h']
+		self._synch_ed_program_start_day_h = args['synch_ed_program_start_day_h']
+		self._synch_ed_estrus_day = args['synch_ed_estrus_day']
+		self._stop_day = args['stop_day']
 
-		self._conception_rate = heiferII._conception_rate
-		self._ai_day = heiferII._ai_day
-		self._abortion_day = heiferII._abortion_day
-		self._days_in_preg = heiferII._days_in_preg
-		self._preg = heiferII._preg
-		self._gestation_length = heiferII._gestation_length
+		self._conception_rate = args['conception_rate']
+		self._ai_day = args['ai_day']
+		self._abortion_day = args['abortion_day']
+		self._days_in_preg = args['days_in_preg']
+		self._preg = self._days_in_preg != 0
+		self._gestation_length = args['gestation_length']
 
 	'''
        	Calculates this heiferII's nutrient requirements.

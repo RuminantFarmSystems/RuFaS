@@ -18,20 +18,13 @@ import numpy as np
 class HeiferI(Calf):
 	'''
 		Description:
-			initialize the 1st heifer group from calf, pass calf information to heiferI
+			initialize the 1st heifer group from calf information
 		Input:
-			calf: class calf with calf parameters
+			args: same as calf
 		Output:
 	'''
-	def __init__(self, calf):
-		super().init_from_calf(calf)
-
-	'''
-		Description:
-			initialize the 1st heifer group from animal base, pass animal information to heiferI
-	'''
-	def init_from_heiferI(self, heiferI):
-		super().init_from_calf(heiferI)
+	def __init__(self, args):
+		super().__init__(args)
 		
 	'''
        	Calculates this heiferI's nutrient requirements.

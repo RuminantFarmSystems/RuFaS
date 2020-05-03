@@ -21,16 +21,31 @@ from RUFAS.routines.animal.manure.calf_manure_excretion import manure_calculatio
 class Calf(AnimalBase):
 	'''
 		Description:
-			initialize calf at the time it was born, determine stillbirth, gender, and birth weight
+			initialize calf at the time it was born
 		Input:
+			args.id: id of the cow
 			args.breed: breed of the cow
-			args.date: the date of the simulation when the calf was born
+			args.birth_date: the date of the simulation when the calf was born
 			args.daysBorn: age of the animal
+			(optional: include the following to assign cow information) 
+			args.birth_weight: the birth weight of the cow
+			args.body_weight: current body weight of the cow
+			args.wean_weight: the wean weight of the cow
+			args.events: events of the cow
 		Output:
 	'''
 	def __init__(self, args):
 		super().__init__(args)
-		self._sold = False
+		
+		if 'birth_weight' in args:
+			self.assign_calf_values(args)
+		else:
+			self.init_values()
+
+	'''
+		determine stillbirth, gender, and birth weight
+	'''
+	def init_values(self):
 		# gender determined with gender ratio relates to semen type
 		if AnimalBase.config['semen_type'] == 'conventional':
 			male_calf_rate = AnimalBase.config['male_calf_rate_conventional_semen']
@@ -45,12 +60,10 @@ class Calf(AnimalBase):
 		if random() < AnimalBase.config['still_birth_rate']:
 			self._culled = True
 			self._events.add_event(0, 'Still birth')
-			return
 
 		# sell the male calves and the unwanted female calves (if AnimalBase.config['keep_female_calf_rate'] = 1, keep all the female calves in farm. if AnimalBase.config['keep_female_calf_rate = 0, sell all female calves)
 		if self._gender == 'male' or random() > AnimalBase.config['keep_female_calf_rate']:
 			self._sold = True
-			return
 		else:
 			self._sold = False
 
@@ -61,23 +74,18 @@ class Calf(AnimalBase):
 			self._birth_weight = np.random.normal(AnimalBase.config['birth_weight_avg_je'], AnimalBase.config['birth_weight_std_je'])
 		self._body_weight = self._birth_weight
 		self._wean_weight = 0
-
+	
 	'''
-		Description:
-			initialize calf value from class calf, for coding purpose
-		Input:
-			calf: initialed values from the first day
-		Output:
+		assign calf with given values
 	'''
-	def init_from_calf(self, calf):
-		super().init_from_animal(calf)
-		self._culled = calf._culled
-		self._sold = calf._sold
-		self._gender = calf._gender
-		self._sold = calf._sold
-		self._birth_weight = calf._birth_weight
-		self._body_weight = calf._body_weight
-		self._wean_weight = calf._wean_weight
+	def assign_calf_values(self, args):
+		self._culled = False
+		self._sold = False
+		self._gender = 'female'
+		self._birth_weight = args['birth_weight']
+		self._body_weight = args['body_weight']
+		self._wean_weight = args['wean_weight']
+		self._events.init_from_string(args['events'])
 	
 	'''
        	Calculates this calf's nutrient requirements.
