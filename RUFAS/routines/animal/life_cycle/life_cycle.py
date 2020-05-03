@@ -279,7 +279,7 @@ class LifeCycleManager:
         # if the number of heifers is less than needed for the herd, buy replacement from the market
         while len(self.cows) + len(self.heiferIIIs) < self.herd_num * 1.01 and date > 1:
             self.replacement_market[0]._events.add_event(self.replacement_market[0]._days_born, 'Entered Herd')
-            self.cows.append(self.replacement_market[0])
+            self.heiferIIIs.append(self.replacement_market[0])
             self.bought_from_market += 1
             daily_bought_from_market += 1
             del self.replacement_market[0]
