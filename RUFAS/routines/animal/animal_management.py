@@ -31,8 +31,6 @@ def daily_animal_routine(animal_management, feed, weather, time):
         weather: instance of the Weather class
         time: instance of the Time class
     """
-    print()
-    print("year: ", time.year, " j_day: ", time.day)
     animal_management.daily_updates(feed)
 
 
@@ -463,9 +461,6 @@ class AnimalManagement:
         Args:
             feed: instance of the Feed class
         """
-        print("day: ", self.simulation_day)
-        if self.simulation_day == 2:
-            print('2')
         if self.simulate_animals:
             for pen in self.all_pens:
                 pen.pen_populated = len(pen.animals_in_pen) > 0

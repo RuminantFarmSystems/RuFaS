@@ -114,7 +114,7 @@ class Calf(AnimalBase):
 		p_urine = 0.000002 * self.body_weight * 1000
 
 		# excess P in the diet (g) (A.3.A.2)
-		self.p_excess = self.p_intake - self.p_req
+		self.p_excess = max(self.p_intake - self.p_req, 0)
 
 		# amount of P excreted by an animal (g) (A.3.A.3)
 		if self.dP_reserves == 0 and self.p_intake >= self.p_req:
