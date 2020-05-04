@@ -508,15 +508,34 @@ class Feed:
         Allocates farm grown feeds to be used for single or multiple animal classes. Priority is to
         reserve high-quality forage for lactating cows.
         '''
-        forage_quality_assesment()
-        pass
+        allocation = {'calves': {}, 'heiferIs': {}, 'heiferIIs': {}, 'heiferIIIs': {}, 'dry_cows': {}, 'lactating_cows': {}}
+        animals = ['calves', 'heiferIs', 'heiferIIs', 'heiferIIIs', 'dry_cows']
 
-    def forage_quality_assesment(self):
+        for feed in self.new_forages:
+            if feed in self.high_quality_forage:
+                if self.feed_inv[feed] > self.DMI_Forage_max['lactating_cows']:
+                    allocation['lactating_cows'][feed] = self.DMI_Forage_max['lactating_cows']
+                    for animal in animals:
+                        allocation[animal][feed] = (self.feed_inv[feed] - self.DMI_Forage_max['lactating_cows']) / 5
+                else:
+                    allocation['lactating_cows'][feed] = self.feed_inv[feed]
+                    for animal in animals:
+                        allocation[animal][feed] = 0
+            else:
+                allocation['lactating_cows'][feed] = self.feed_inv[feed] / 6
+                for animal in animals:
+                    allocation[animal][feed] = self.feed_inv[feed] / 6
+        self.allocation = allocation
+
+    def forage_quality_assesment(self, feed):
         '''
-        Asseses quality of forage and populates lists of self.high_quality_forage
-        and self.low_quality_forage
+        Asseses quality of forage and populates self.high_quality_forage
         '''
-        pass
+        nutrients = self.values(feed)
+        DM = nutrients[Nutrients.DM.name]
+        NDF_DM = nutrients[Nutrients.NDF_DM.name]
+        if NDF_DM <= DM * 0.5:
+            self.high_quality_forage.append(feed)
 
     def days_since_feedout(self):
         '''
