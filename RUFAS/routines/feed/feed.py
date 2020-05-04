@@ -20,9 +20,10 @@ from . import nitrogen_loss, carbon_loss, protein_degradation
 # runs the feed routine. Daily is a misnomer here– this is called once per harvest.
 def daily_feed_routine(feed, crop):
     if feed.storage:
-        feed.dry_matter += crop.current_crop.yield_actual
-
         if crop.current_crop.yield_actual != 0:
+            feed.dry_matter += crop.current_crop.yield_actual
+            feed.crude_protein += 6.25 * feed.nitrogen / feed.dry_matter
+
             feed.nitrogen += crop.current_crop.yield_N
             feed.phosphorus += crop.current_crop.yield_P
             # TODO: no Carbon Cycle currently implemented
@@ -33,9 +34,6 @@ def daily_feed_routine(feed, crop):
             nitrogen_loss.update_all(feed)
 
             protein_degradation.update_all(feed)
-
-        if feed.dry_matter != 0:
-            feed.crude_protein += 6.25 * feed.nitrogen / feed.dry_matter
 
 
 # Determine the current crop
