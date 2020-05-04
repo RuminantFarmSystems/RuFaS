@@ -10,8 +10,6 @@ Author(s): Kass Chupongstimun, kass_c@hotmail.com
 # !/usr/bin/env python3
 
 import RUFAS
-import numpy
-import random
 
 def main():
 
@@ -45,6 +43,4 @@ def main():
 # PROGRAM ENTRY POINT
 # -------------------------------------------------------------------------------
 if __name__ == '__main__':
-    numpy.random.seed(19)
-    random.seed(19)
     main()

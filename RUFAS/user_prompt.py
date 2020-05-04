@@ -49,7 +49,7 @@ def input_prompt():
     while True:
 
         try:
-            user_input = "Inputs/animal_management.json"  # input("\nEnter RUFAS Input: ")
+            user_input = input("\nEnter RUFAS Input: ")
 
             #
             # Handle user exiting program
