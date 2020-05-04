@@ -427,6 +427,7 @@ class Pen:
         # that are non-zero.
         self.animals_in_pen = []
         self.classes_in_pen = set()
+        self.avg_p_animal = 0
 
 
 # methods used for additional ration calculations

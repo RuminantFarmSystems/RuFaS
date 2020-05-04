@@ -266,7 +266,7 @@ class Cow(HeiferIII):
 		
 		if not self.milking:
 			self.daily_growth = self.body_weight - prev_weight
-		
+
 		self.estimated_daily_milk_produced_lst.append(
 			self.estimated_daily_milk_produced)
 		self.body_weight_lst.append(self.body_weight)
