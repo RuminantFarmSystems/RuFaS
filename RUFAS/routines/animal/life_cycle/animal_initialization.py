@@ -45,9 +45,12 @@ class AnimalInitalization:
         return self.animal_id
 
     '''
-        Initialize the database to store animal values
+        Description:
+            Initialize the database to store animal values. Simulate animals to store in database in init is True. 
+        Input:
+            init: whether or not update the database with new animals
     '''
-    def __init__(self):
+    def __init__(self, init = True):
         conn = sqlite3.connect('Inputs/animals.sqlite')
         cur = conn.cursor()
         cur.execute('CREATE TABLE IF NOT EXISTS calves (id VARCHAR, breed VARCHAR, birth_date VARCHAR, days_born VARCHAR, birth_weight VARCHAR, body_weight VARCHAR, wean_weight VARCHAR, events VARCHAR)')
@@ -57,6 +60,9 @@ class AnimalInitalization:
         cur.execute('CREATE TABLE IF NOT EXISTS cows (id VARCHAR, breed VARCHAR, birth_date VARCHAR, days_born VARCHAR, birth_weight VARCHAR, body_weight VARCHAR, wean_weight VARCHAR, events VARCHAR, repro_program VARCHAR, tai_method_h VARCHAR, synch_ed_method_h VARCHAR, mature_body_weight VARCHAR, estrus_count VARCHAR, estrus_day VARCHAR, tai_program_start_day_h VARCHAR, synch_ed_program_start_day_h VARCHAR, synch_ed_estrus_day VARCHAR, stop_day VARCHAR, conception_rate VARCHAR, ai_day VARCHAR, abortion_day VARCHAR, days_in_preg VARCHAR, gestation_length VARCHAR, presynch_method VARCHAR, tai_method_c VARCHAR, resynch_method VARCHAR)')
         conn.commit()
         conn.close()
+        if init:
+            self.init_animals()
+        
         
 
     '''
@@ -90,16 +96,8 @@ class AnimalInitalization:
             for calf in calves:
                 wean_day = calf.update()
                 if wean_day:
-                    args = {
-                        'id' : self.next_id(),
-                        'breed' : calf._breed,
-                        'birth_date' : calf._birth_date,
-                        'days_born' : calf._days_born,
-                        'birth_weight' : calf._birth_weight,
-                        'body_weight' : calf._body_weight,
-                        'wean_weight' : calf._wean_weight,
-                        'events' : str(calf._events)
-                    }
+                    args = calf.get_calf_values()
+                    args.update(id = self.next_id())
 
                     heiferI = HeiferI(args)
                     heiferIs.append(heiferI)
@@ -111,19 +109,11 @@ class AnimalInitalization:
             for heiferI in heiferIs:
                 second_stage = heiferI.update()
                 if second_stage:
-                    args = {
-                        'id' : self.next_id(),
-                        'breed' : heiferI._breed,
-                        'birth_date' : heiferI._birth_date,
-                        'days_born' : heiferI._days_born,
-                        'birth_weight' : heiferI._birth_weight,
-                        'body_weight' : heiferI._body_weight,
-                        'wean_weight' : heiferI._wean_weight,
-                        'events' : str(heiferI._events),
-                        'repro_program': 'TAI',
-                        'tai_method_h': '5dCG2P',
-                        'synch_ed_method_h': '2P'
-                    }
+                    args = heiferI.get_heiferI_values()
+                    args.update(id = self.next_id())
+                    args.update(repro_program = 'TAI')
+                    args.update(tai_method_h = '5dCG2P')
+                    args.update(synch_ed_method_h = '2P')
 
                     heiferII = HeiferII(args)
                     heiferIIs.append(heiferII)
@@ -137,31 +127,8 @@ class AnimalInitalization:
                 if cull_stage:
                     heiferIIs.remove(heiferII)
                 if third_stage:
-                    args = {
-                        'id' : self.next_id(),
-                        'breed' : heiferII._breed,
-                        'birth_date' : heiferII._birth_date,
-                        'days_born' : heiferII._days_born,
-                        'birth_weight' : heiferII._birth_weight,
-                        'body_weight' : heiferII._body_weight,
-                        'wean_weight' : heiferII._wean_weight,
-                        'events' : str(heiferII._events),
-                        'repro_program': 'TAI',
-                        'tai_method_h': heiferII._tai_method_h,
-                        'synch_ed_method_h': heiferII._synch_ed_method_h,
-                        'mature_body_weight': heiferII._mature_body_weight,
-                        'estrus_count': heiferII._estrus_count,
-                        'estrus_day': heiferII._estrus_day,
-                        'tai_program_start_day_h': heiferII._tai_program_start_day_h,
-                        'synch_ed_program_start_day_h': heiferII._synch_ed_program_start_day_h,
-                        'synch_ed_estrus_day': heiferII._synch_ed_estrus_day,
-                        'stop_day': heiferII._stop_day,
-                        'conception_rate': heiferII._conception_rate,
-                        'ai_day': heiferII._ai_day,
-                        'abortion_day': heiferII._abortion_day,
-                        'days_in_preg': heiferII._days_in_preg,
-                        'gestation_length': heiferII._gestation_length
-                    }
+                    args = heiferII.get_heiferII_values()
+                    args.update(id = self.next_id())
 
                     heiferIII = HeiferIII(args)
                     heiferIIIs.append(heiferIII)
@@ -173,41 +140,19 @@ class AnimalInitalization:
             for heiferIII in heiferIIIs:
                 cow_stage = heiferIII.update()
                 if cow_stage:
-                    args = {
-                        'id' : self.next_id(),
-                        'breed' : heiferIII._breed,
-                        'birth_date' : heiferIII._birth_date,
-                        'days_born' : heiferIII._days_born,
-                        'birth_weight' : heiferIII._birth_weight,
-                        'body_weight' : heiferIII._body_weight,
-                        'wean_weight' : heiferIII._wean_weight,
-                        'events' : str(heiferIII._events),
-                        'repro_program': heiferIII._repro_program,
-                        'tai_method_h': heiferIII._tai_method_h,
-                        'synch_ed_method_h': heiferIII._synch_ed_method_h,
-                        'mature_body_weight': heiferIII._mature_body_weight,
-                        'estrus_count': heiferIII._estrus_count,
-                        'estrus_day': heiferIII._estrus_day,
-                        'tai_program_start_day_h': heiferIII._tai_program_start_day_h,
-                        'synch_ed_program_start_day_h': heiferIII._synch_ed_program_start_day_h,
-                        'synch_ed_estrus_day': heiferIII._synch_ed_estrus_day,
-                        'stop_day': heiferIII._stop_day,
-                        'conception_rate': heiferIII._conception_rate,
-                        'ai_day': heiferIII._ai_day,
-                        'abortion_day': heiferIII._abortion_day,
-                        'days_in_preg': heiferIII._days_in_preg,
-                        'gestation_length': heiferIII._gestation_length,
-                        'presynch_method': 'PreSynch',
-                        'tai_method_c': 'OvSynch 56',
-                        'resynch_method': 'TAIafterPD',
-                    }
+                    args = heiferIII.get_heiferIII_values()
+                    args.update(id = self.next_id())
+                    args.update(repro_program = 'TAI')
+                    args.update(presynch_method = 'PreSynch')
+                    args.update(tai_method_c = 'OvSynch 56')
+                    args.update(resynch_method = 'TAIafterPD')
+                    
                     cow = Cow(args)
                     cows.append(cow)
                     heiferIIIs.remove(heiferIII)
                     
                     cur.execute('INSERT INTO cows (id, breed, birth_date, days_born, birth_weight, body_weight, wean_weight, events, repro_program, tai_method_h, synch_ed_method_h, mature_body_weight, estrus_count, estrus_day, tai_program_start_day_h, synch_ed_program_start_day_h, synch_ed_estrus_day, stop_day, conception_rate, ai_day, abortion_day, days_in_preg, gestation_length, presynch_method, tai_method_c, resynch_method) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)', (cow._id, cow._breed, cow._birth_date, cow._days_born, cow._birth_weight, cow._body_weight, cow._wean_weight, str(cow._events), cow._repro_program, cow._tai_method_h, cow._synch_ed_method_h, cow._mature_body_weight, cow._estrus_count, cow._estrus_day, cow._tai_program_start_day_h, cow._synch_ed_program_start_day_h, cow._synch_ed_estrus_day, cow._stop_day, cow._conception_rate, cow._ai_day, cow._abortion_day, cow._days_in_preg, cow._gestation_length, cow._presynch_method, cow._tai_method_c, cow._resynch_method))
                     conn.commit()
-
         conn.close()
 
 
@@ -236,6 +181,7 @@ class AnimalInitalization:
             }
             calf = Calf(args)
             calves.append(calf)
+        conn.close()
         return calves
 
     def get_heiferIs(self, num):
@@ -257,6 +203,7 @@ class AnimalInitalization:
             }
             heiferI = HeiferI(args)
             heiferIs.append(heiferI)
+        conn.close()
         return heiferIs
 
     def get_heiferIIs(self, num):
@@ -281,6 +228,7 @@ class AnimalInitalization:
             }
             heiferII = HeiferII(args)
             heiferIIs.append(heiferII)
+        conn.close()
         return heiferIIs
 
     def get_heiferIIIs(self, num):
@@ -317,6 +265,7 @@ class AnimalInitalization:
             }
             heiferIII = HeiferIII(args)
             heiferIIIs.append(heiferIII)
+        conn.close()
         return heiferIIIs
 
     def get_cows(self, num):
@@ -356,5 +305,6 @@ class AnimalInitalization:
             }
             cow = Cow(args)
             cows.append(cow)
+        conn.close()
         return cows
 

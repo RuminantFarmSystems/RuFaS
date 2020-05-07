@@ -31,6 +31,12 @@ class HeiferIII(HeiferII):
         super().__init__(args)
 
     '''
+		get current information from the heiferIII
+	'''
+    def get_heiferIII_values(self):
+        return self.get_heiferII_values()
+
+    '''
            Calculates this heiferIII's nutrient requirements.
     '''
     def calc_nutrient_rqmts(self):

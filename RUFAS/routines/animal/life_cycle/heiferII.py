@@ -104,6 +104,37 @@ class HeiferII(HeiferI):
 		self._gestation_length = args['gestation_length']
 
 	'''
+		get current information from the heiferII
+	'''
+	def get_heiferII_values(self):
+		values = {
+            'id' : self._id,
+            'breed' : self._breed,
+            'birth_date' : self._birth_date,
+            'days_born' : self._days_born,
+            'birth_weight' : self._birth_weight,
+            'body_weight' : self._body_weight,
+            'wean_weight' : self._wean_weight,
+            'events' : str(self._events),
+            'repro_program': self._repro_program,
+            'tai_method_h': self._tai_method_h,
+            'synch_ed_method_h': self._synch_ed_method_h,
+            'mature_body_weight': self._mature_body_weight,
+            'estrus_count': self._estrus_count,
+            'estrus_day': self._estrus_day,
+            'tai_program_start_day_h': self._tai_program_start_day_h,
+            'synch_ed_program_start_day_h': self._synch_ed_program_start_day_h,
+            'synch_ed_estrus_day': self._synch_ed_estrus_day,
+            'stop_day': self._stop_day,
+            'conception_rate': self._conception_rate,
+            'ai_day': self._ai_day,
+            'abortion_day': self._abortion_day,
+            'days_in_preg': self._days_in_preg,
+            'gestation_length': self._gestation_length
+        }
+		return values
+
+	'''
        	Calculates this heiferII's nutrient requirements.
     '''
 	def calc_nutrient_rqmts(self):

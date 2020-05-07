@@ -86,6 +86,22 @@ class Calf(AnimalBase):
 		self._body_weight = args['body_weight']
 		self._wean_weight = args['wean_weight']
 		self._events.init_from_string(args['events'])
+
+	'''
+		get current information from the calf
+	'''
+	def get_calf_values(self):
+		values = {
+            'id' : self._id,
+            'breed' : self._breed,
+            'birth_date' : self._birth_date,
+            'days_born' : self._days_born,
+            'birth_weight' : self._birth_weight,
+            'body_weight' : self._body_weight,
+            'wean_weight' : self._wean_weight,
+            'events' : str(self._events)
+		}
+		return values
 	
 	'''
        	Calculates this calf's nutrient requirements.

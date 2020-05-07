@@ -25,6 +25,12 @@ class HeiferI(Calf):
 	'''
 	def __init__(self, args):
 		super().__init__(args)
+
+	'''
+		get current information from the heiferI
+	'''
+	def get_heiferI_values(self):
+		return self.get_calf_values()
 		
 	'''
        	Calculates this heiferI's nutrient requirements.
