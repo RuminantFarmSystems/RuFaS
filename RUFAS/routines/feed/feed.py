@@ -391,7 +391,7 @@ class Feed:
         index = self.managed_feeds.index(desired_feed)
         return feeds.values[index]
     #The Following Functions are used for Updating Feed Inventory and Feed allocation
-    def feed_allocation(self):
+    def feed_allocation(self, feed):
         '''
         Allocates farm grown feeds to be used for single or multiple animal classes. Priority is to
         reserve high-quality forage for lactating cows.
@@ -424,6 +424,9 @@ class Feed:
         NDF_DM = nutrients[Nutrients.NDF_DM.name]
         if NDF_DM <= DM * 0.5:
             self.high_quality_forage.append(feed)
+            return "high"
+        else:
+            return "low"
 
     def days_since_feedout(self):
         '''
