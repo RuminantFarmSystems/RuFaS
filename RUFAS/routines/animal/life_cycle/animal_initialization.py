@@ -51,16 +51,21 @@ class AnimalInitalization:
             init: whether or not update the database with new animals
     '''
     def __init__(self, init = True):
-        conn = sqlite3.connect('Inputs/animals.sqlite')
-        cur = conn.cursor()
-        cur.execute('CREATE TABLE IF NOT EXISTS calves (id VARCHAR, breed VARCHAR, birth_date VARCHAR, days_born VARCHAR, birth_weight VARCHAR, body_weight VARCHAR, wean_weight VARCHAR, events VARCHAR)')
-        cur.execute('CREATE TABLE IF NOT EXISTS heiferIs (id VARCHAR, breed VARCHAR, birth_date VARCHAR, days_born VARCHAR, birth_weight VARCHAR, body_weight VARCHAR, wean_weight VARCHAR, events VARCHAR)')
-        cur.execute('CREATE TABLE IF NOT EXISTS heiferIIs (id VARCHAR, breed VARCHAR, birth_date VARCHAR, days_born VARCHAR, birth_weight VARCHAR, body_weight VARCHAR, wean_weight VARCHAR, events VARCHAR, repro_program VARCHAR, tai_method_h VARCHAR, synch_ed_method_h VARCHAR)')
-        cur.execute('CREATE TABLE IF NOT EXISTS heiferIIIs (id VARCHAR, breed VARCHAR, birth_date VARCHAR, days_born VARCHAR, birth_weight VARCHAR, body_weight VARCHAR, wean_weight VARCHAR, events VARCHAR, repro_program VARCHAR, tai_method_h VARCHAR, synch_ed_method_h VARCHAR, mature_body_weight VARCHAR, estrus_count VARCHAR, estrus_day VARCHAR, tai_program_start_day_h VARCHAR, synch_ed_program_start_day_h VARCHAR, synch_ed_estrus_day VARCHAR, stop_day VARCHAR, conception_rate VARCHAR, ai_day VARCHAR, abortion_day VARCHAR, days_in_preg VARCHAR, gestation_length VARCHAR)')
-        cur.execute('CREATE TABLE IF NOT EXISTS cows (id VARCHAR, breed VARCHAR, birth_date VARCHAR, days_born VARCHAR, birth_weight VARCHAR, body_weight VARCHAR, wean_weight VARCHAR, events VARCHAR, repro_program VARCHAR, tai_method_h VARCHAR, synch_ed_method_h VARCHAR, mature_body_weight VARCHAR, estrus_count VARCHAR, estrus_day VARCHAR, tai_program_start_day_h VARCHAR, synch_ed_program_start_day_h VARCHAR, synch_ed_estrus_day VARCHAR, stop_day VARCHAR, conception_rate VARCHAR, ai_day VARCHAR, abortion_day VARCHAR, days_in_preg VARCHAR, gestation_length VARCHAR, presynch_method VARCHAR, tai_method_c VARCHAR, resynch_method VARCHAR)')
-        conn.commit()
-        conn.close()
         if init:
+            conn = sqlite3.connect('Inputs/animals.sqlite')
+            cur = conn.cursor()
+            cur.execute('DROP TABLE IF EXISTS calves')
+            cur.execute('DROP TABLE IF EXISTS heiferIs')
+            cur.execute('DROP TABLE IF EXISTS heiferIIs')
+            cur.execute('DROP TABLE IF EXISTS heiferIIIs')
+            cur.execute('DROP TABLE IF EXISTS cows')
+            cur.execute('CREATE TABLE IF NOT EXISTS calves (id VARCHAR, breed VARCHAR, birth_date VARCHAR, days_born VARCHAR, birth_weight VARCHAR, body_weight VARCHAR, wean_weight VARCHAR, events VARCHAR)')
+            cur.execute('CREATE TABLE IF NOT EXISTS heiferIs (id VARCHAR, breed VARCHAR, birth_date VARCHAR, days_born VARCHAR, birth_weight VARCHAR, body_weight VARCHAR, wean_weight VARCHAR, events VARCHAR)')
+            cur.execute('CREATE TABLE IF NOT EXISTS heiferIIs (id VARCHAR, breed VARCHAR, birth_date VARCHAR, days_born VARCHAR, birth_weight VARCHAR, body_weight VARCHAR, wean_weight VARCHAR, events VARCHAR, repro_program VARCHAR, tai_method_h VARCHAR, synch_ed_method_h VARCHAR)')
+            cur.execute('CREATE TABLE IF NOT EXISTS heiferIIIs (id VARCHAR, breed VARCHAR, birth_date VARCHAR, days_born VARCHAR, birth_weight VARCHAR, body_weight VARCHAR, wean_weight VARCHAR, events VARCHAR, repro_program VARCHAR, tai_method_h VARCHAR, synch_ed_method_h VARCHAR, mature_body_weight VARCHAR, estrus_count VARCHAR, estrus_day VARCHAR, tai_program_start_day_h VARCHAR, synch_ed_program_start_day_h VARCHAR, synch_ed_estrus_day VARCHAR, stop_day VARCHAR, conception_rate VARCHAR, ai_day VARCHAR, abortion_day VARCHAR, days_in_preg VARCHAR, gestation_length VARCHAR)')
+            cur.execute('CREATE TABLE IF NOT EXISTS cows (id VARCHAR, breed VARCHAR, birth_date VARCHAR, days_born VARCHAR, birth_weight VARCHAR, body_weight VARCHAR, wean_weight VARCHAR, events VARCHAR, repro_program VARCHAR, tai_method_h VARCHAR, synch_ed_method_h VARCHAR, mature_body_weight VARCHAR, estrus_count VARCHAR, estrus_day VARCHAR, tai_program_start_day_h VARCHAR, synch_ed_program_start_day_h VARCHAR, synch_ed_estrus_day VARCHAR, stop_day VARCHAR, conception_rate VARCHAR, ai_day VARCHAR, abortion_day VARCHAR, days_in_preg VARCHAR, gestation_length VARCHAR, presynch_method VARCHAR, tai_method_c VARCHAR, resynch_method VARCHAR)')
+            conn.commit()
+            conn.close()
             self.init_animals()
         
         
