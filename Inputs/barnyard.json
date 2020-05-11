@@ -19,7 +19,7 @@
             "crop_summary":
             {
                 "produce_csv": true,
-                "produce_graphics": false,
+                "produce_graphics": true,
 
                 "report_name": "Crop Summary",
                 "file_name": "crop_summary.csv"
@@ -98,7 +98,7 @@
         "feed_storage":
         {
             "produce_csv": true,
-            "produce_graphics": false,
+            "produce_graphics": true,
 
             "report_name": "Feed Storage",
             "file_name": "feed_storage.csv"

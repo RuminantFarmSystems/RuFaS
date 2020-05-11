@@ -6,7 +6,7 @@ Author(s): William Donovan, wmdonovan@wisc.edu
            Jacob Johnson, jacob8399@gmail.com
 
 Description: This module contains the necessary functions for calculating and
-             updating the nitrogen loss during harvest, storage, and feedout.
+             updating the nitrogen loss during harvest, storage, and feed out.
              The only function meant to be used outside of this file is the
              update_all() function. The other functions are meant to serve as
              helper functions within this file.
@@ -18,46 +18,47 @@ Feed values updated by update_all():
 """
 
 
-def update_all(feed):
+def update_all(storage):
     """
     Description:
         The only external function call. Runs the nitrogen loss sub-module
     """
 
-    CP_loss(feed)
+    CP_loss(storage)
 
-    NPN_loss(feed)
+    NPN_loss(storage)
 
-    update_CP(feed)
+    update_CP(storage)
 
 
-def CP_loss(feed):
+def CP_loss(storage):
     """
     Description:
         Crude protein loss to gas and leaching
     """
 
-    feed.CP_gas = feed.crude_protein * feed.CP_gas_percent
+    storage.CP_gas = storage.CP * storage.CP_gas_percent
 
-    feed.CP_leachate = feed.crude_protein * feed.CP_leachate_percent
+    storage.CP_leachate = storage.CP * storage.CP_leachate_percent
 
 
-def NPN_loss(feed):
+def NPN_loss(storage):
     """
     Description:
         Non-Protein-Nitrogen loss
         TODO: Value never used
     """
 
-    feed.NPN += feed.crude_protein * feed.NPN_min_percent
+    storage.NPN += storage.CP * storage.NPN_min_percent
 
 
-def update_CP(feed):
+def update_CP(storage):
     """
     Description:
         Account for crude protein loss in relevant pools
     """
 
-    feed.crude_protein -= (feed.CP_gas + feed.CP_leachate)
+    storage.CP_loss += storage.CP_gas + storage.CP_leachate
+    storage.CP -= (storage.CP_gas + storage.CP_leachate)
 
-    feed.dry_matter -= (feed.CP_gas + feed.CP_leachate)
+    storage.DM -= (storage.CP_gas + storage.CP_leachate)

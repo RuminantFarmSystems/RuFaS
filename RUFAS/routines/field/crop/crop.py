@@ -266,6 +266,7 @@ class InitCrop:
 
         self.crop_name = 'null'
         self.crop_type = ''
+        self.harvest_quality = ''
 
         self.kill_day = -1
         self.kill_year = True
@@ -419,6 +420,7 @@ class Corn:
 
         self.crop_name = 'corn'
         self.crop_type = 'annual'
+        self.harvest_quality = ''
 
         self.kill_day = -1
         self.kill_year = True
@@ -572,6 +574,7 @@ class Soybean:
 
         self.crop_name = 'soybean'
         self.crop_type = 'annual'
+        self.harvest_quality = ''
 
         self.kill_day = -1
         self.kill_year = True
@@ -732,6 +735,7 @@ class Alfalfa:
 
         self.crop_name = 'alfalfa'
         self.crop_type = 'perennial'
+        self.harvest_quality = ''
 
         self.kill_day = -1
         self.kill_year = False

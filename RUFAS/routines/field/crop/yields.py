@@ -76,6 +76,7 @@ def update_all(soil, crop_type, application, time):
     calc_HI_act(crop_type)
     calc_yield_max(crop_type)
     calc_yield_act(crop_type)
+    calc_harvest_quality(crop_type)
     calc_nutrient_removal(crop_type)
     calc_residue(soil, crop_type, application, time)
 
@@ -162,6 +163,11 @@ def calc_residue(soil, crop_type, application, time):
         bio_frac = crop_type.yield_actual / crop_type.biomass_actual
         cut(crop_type, bio_frac)
     soil.residue += d_residue
+
+
+# TODO: Stand in for more sophisticated method
+def calc_harvest_quality(crop_type):
+    crop_type.harvest_quality = "good"
 
 
 def kill(crop_type, application):

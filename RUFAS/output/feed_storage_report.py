@@ -44,25 +44,14 @@ class FeedStorage(BaseReportHandler):
         # daily outputs
         self.daily_variables = {'year': ['time.calendar_year', '', []],
                                 'j_day': ['time.day', '', []],
-                                'dry_matter': ['feed.dry_matter', 'kg', []],
-                                'carbon': ['feed.carbon', 'kg', []],
-                                'nitrogen': ['feed.nitrogen', 'kg', []],
-                                'phosphorus': ['feed.phosphorus', 'kg', []],
-                                'crude_protein': ['feed.crude_protein', 'kg', []],
-                                'C_harvest_gas': ['feed.C_harvest_gas', 'kg', []],
-                                'C_harvest_particle': ['feed.C_harvest_particle', 'kg', []],
-                                'C_storage_gas': ['feed.C_storage_gas', 'kg', []],
-                                'C_storage_leachate': ['feed.C_storage_leachate', 'kg', []],
-                                'C_feedout_gas': ['feed.C_feedout_gas', 'kg', []],
-                                'C_feedout_particle': ['feed.C_feedout_particle', 'kg', []],
-                                'CP_gas': ['feed.CP_gas', 'kg', []],
-                                'CP_leachate': ['feed.CP_leachate', 'kg', []],
-                                'NPN': ['feed.NPN', '', []]
                                 }
 
         # annual outputs
         self.annual_variables = {'year': ['time.calendar_year', '', 0],
-                                 'dry_matter': ['feed.dry_matter', 'kg', 0]
+                                 'dry_matter': ['feed.DM', 'kg', 0],
+                                 'crude_protein': ['feed.CP', 'kg', 0],
+                                 'C_loss': ['feed.C_loss', 'kg', 0],
+                                 'CP_loss': ['feed.CP_loss', 'kg', 0]
                                  }
 
     def write_headers(self, output_csv, variables):

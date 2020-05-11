@@ -80,7 +80,8 @@ def daily_simulation():
     for field in state.fields:
         routines.daily_soil_routine(field.soil, field.crop, field.application, weather, time)
         routines.daily_crop_routine(field.soil, field.crop, field.application, weather, space, time)
-        routines.daily_feed_routine(state.feed, field.crop)
+
+    routines.daily_feed_routine(state.feed, state.fields)
 
     #
     # Daily Output Updates

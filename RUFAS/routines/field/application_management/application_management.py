@@ -44,7 +44,7 @@ class Application:
             self.NH4_frac = manure_data['NH4_frac']
             self.WIP_frac = manure_data['WIP_frac']
             self.WOP_frac = manure_data['WOP_frac']
-            self.dry_matter = manure_data['dry_matter']
+            self.DM = manure_data['dry_matter']
             self.percent_cover = manure_data['percent_cover']
             self.depth = [x / 10 for x in manure_data['depth']]
             self.surface_percent = manure_data['surf_perc']
@@ -60,7 +60,7 @@ class Application:
                 self.NH4_frac.append(0)
                 self.WIP_frac.append(0.6)
                 self.WOP_frac.append(0.05)
-                self.dry_matter.append(0.05)
+                self.DM.append(0.05)
                 self.percent_cover.append(0.95)
                 self.depth.append(0)
                 self.surface_percent.append(1)

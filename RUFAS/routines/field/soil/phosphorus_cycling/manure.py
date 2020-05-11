@@ -41,9 +41,9 @@ def update_all(S, application, weather, time):
                 S.manure_annual += mass[i]
                 S.manure_P_annual += P_app
 
-                S.manure_moisture = (S.manure_moisture * S.manure_mass + (1.0 - m_app.dry_matter[i]) * mass[i]) \
+                S.manure_moisture = (S.manure_moisture * S.manure_mass + (1.0 - m_app.DM[i]) * mass[i]) \
                                     / (S.manure_mass + mass[i])
-                wet_rate = mass[i] / m_app.dry_matter[i] / cover_app
+                wet_rate = mass[i] / m_app.DM[i] / cover_app
                 infiltration = min(0.9, 0.000002 * wet_rate + 0.267)
 
                 # S.6.B.3
@@ -66,7 +66,7 @@ def update_all(S, application, weather, time):
                 # S.6.C.II.3
                 S_fac_cover = 1.0
                 S_fac_mass = 1.0
-                if m_app.dry_matter[i] <= 0.15:
+                if m_app.DM[i] <= 0.15:
                     S_fac_cover = 0.5
                     S_fac_mass = 0.8
                     S_fac = infiltration
