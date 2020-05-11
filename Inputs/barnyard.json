@@ -19,7 +19,7 @@
             "crop_summary":
             {
                 "produce_csv": true,
-                "produce_graphics": true,
+                "produce_graphics": false,
 
                 "report_name": "Crop Summary",
                 "file_name": "crop_summary.csv"
@@ -98,7 +98,7 @@
         "feed_storage":
         {
             "produce_csv": true,
-            "produce_graphics": true,
+            "produce_graphics": false,
 
             "report_name": "Feed Storage",
             "file_name": "feed_storage.csv"
@@ -112,7 +112,7 @@
             "field_1":
             {
                 "soil": "barnyard_soil.json",
-                "crop": "alfalfa_rotation.json",
+                "crop": "corn_rotation.json",
                 "applications": "barnyard_applications.json"
             }
         },
