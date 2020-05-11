@@ -19,6 +19,7 @@ class AnimalEvents(object):
 		self.events = {}
 
 	def init_from_string(self, events_str):
+		self.events = {}
 		split_by_date = list(filter(lambda x : x != '', list(map(lambda x: x.strip(), events_str.split('Days born ')))))
 
 		for day in split_by_date:
