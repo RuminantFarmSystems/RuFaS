@@ -72,6 +72,7 @@ def daily_feed_routine(feed, fields):
 
         for storage_name, storage in feed.storage_options.items():
             if storage_name in feed.available_storage and storage.DM != 0:
+                storage.calculate_losses()
                 feed.available_storage.pop(storage_name)
 
     feed.summarize_feed_storage()
@@ -324,13 +325,14 @@ class Feed:
                 # TODO: C_percent is a temp work around. Update to yield_C when carbon model is implemented.
                 self.C += crop.yield_actual * self.C_percent
 
-                carbon_loss.update_all(self)
-                nitrogen_loss.update_all(self)
-
-                # TODO: no protein degradation is currently being simulated
-                protein_degradation.update_all()
-
                 crop.harvest_quality = ''
+
+        def calculate_losses(self):
+            carbon_loss.update_all(self)
+            nitrogen_loss.update_all(self)
+
+            # TODO: no protein degradation is currently being simulated
+            protein_degradation.update_all()
 
         # Parameterize the optimal empirical model based on crop and storage type
         def calibrate_storage(self, crop):
