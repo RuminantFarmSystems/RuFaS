@@ -1,6 +1,5 @@
- {
-	"herd_information":
-	{
+{
+	"herd_information": {
 		"calf_num": 160,
 		"heiferI_num": 800,
 		"heiferII_num": 820,
@@ -9,9 +8,7 @@
 		"replace_num": 5000,
 		"herd_num": 1000
 	},
-
-	"animal_config":
-	{
+	"animal_config": {
 		"num_21_days": 15,
 		"cow_times_milked_per_day": 1,
 		"still_birth_rate": 0.065,
@@ -52,12 +49,78 @@
 		"replacement_day": 30,
 		"dry_period": 60,
 		"lactation_curve": "wood",
-		"l": [[16.13, 23.61, 23.81], [14.07, 19.26, 19.21]],
-		"m": [[0.235, 0.227, 0.244], [0.186, 0.173, 0.190]],
-		"n": [[0.0019, 0.0032, 0.0036], [0.0021, 0.0028, 0.0032]],
-		"l_std": [[0.28, 0.54, 0.51], [0.39, 0.49, 0.47]],
-		"m_std": [[0.0046, 0.0064, 0.0060], [0.0076, 0.0071, 0.0069]],
-		"n_std": [[3.77e-5, 5.82e-5, 5.54e-5], [6.60e-5, 6.69e-5, 6.53e-5]],
+		"l": [
+			[
+				16.13,
+				23.61,
+				23.81
+			],
+			[
+				14.07,
+				19.26,
+				19.21
+			]
+		],
+		"m": [
+			[
+				0.235,
+				0.227,
+				0.244
+			],
+			[
+				0.186,
+				0.173,
+				0.190
+			]
+		],
+		"n": [
+			[
+				0.0019,
+				0.0032,
+				0.0036
+			],
+			[
+				0.0021,
+				0.0028,
+				0.0032
+			]
+		],
+		"l_std": [
+			[
+				0.28,
+				0.54,
+				0.51
+			],
+			[
+				0.39,
+				0.49,
+				0.47
+			]
+		],
+		"m_std": [
+			[
+				0.0046,
+				0.0064,
+				0.0060
+			],
+			[
+				0.0076,
+				0.0071,
+				0.0069
+			]
+		],
+		"n_std": [
+			[
+				3.77e-5,
+				5.82e-5,
+				5.54e-5
+			],
+			[
+				6.60e-5,
+				6.69e-5,
+				6.53e-5
+			]
+		],
 		"vwp": 60,
 		"avg_estrus_cycle_r": 19,
 		"std_estrus_cycle_r": 11,
@@ -74,35 +137,139 @@
 		"conception_rate_decrease": 0.026,
 		"tai_program_start_day": 72,
 		"repro_cull_time": 300,
-		"do_not_breed_time" : 300,
+		"do_not_breed_time": 300,
 		"cull_milk_production": 22,
-		"parity_cull_prob": [0.169, 0.233, 0.301, 0.408],
-		"mastitis_cp": [0, 0.06, 0.12, 0.19, 0.30, 0.43, 0.56, 0.68, 0.78, 0.85, 0.90, 0.94, 0.97, 1],
-		"feet_leg_cp": [0, 0.03, 0.08, 0.16, 0.25, 0.36, 0.48, 0.59, 0.69, 0.78, 0.85, 0.90, 0.95, 1],
-		"injury_cp": [0, 0.08, 0.18, 0.28, 0.38, 0.47, 0.56, 0.64, 0.71, 0.78, 0.85, 0.90, 0.95, 1],
-		"disease_cp": [0, 0.04, 0.12, 0.24, 0.34, 0.42, 0.50, 0.57, 0.64, 0.72, 0.81, 0.89, 0.95, 1],
-		"udder_cp": [0, 0.12, 0.24, 0.33, 0.41, 0.48, 0.55, 0.62, 0.68, 0.76, 0.82, 0.89, 0.95, 1],
-		"unkown_cp": [0, 0.05, 0.11, 0.18, 0.27, 0.37, 0.45, 0.54, 0.62, 0.70, 0.77, 0.84, 0.92, 1],
-		"cull_day_count": [0, 5, 15, 45, 90, 135, 180, 225, 270, 330, 380, 430, 280, 530],
+		"parity_cull_prob": [
+			0.169,
+			0.233,
+			0.301,
+			0.408
+		],
+		"mastitis_cp": [
+			0,
+			0.06,
+			0.12,
+			0.19,
+			0.30,
+			0.43,
+			0.56,
+			0.68,
+			0.78,
+			0.85,
+			0.90,
+			0.94,
+			0.97,
+			1
+		],
+		"feet_leg_cp": [
+			0,
+			0.03,
+			0.08,
+			0.16,
+			0.25,
+			0.36,
+			0.48,
+			0.59,
+			0.69,
+			0.78,
+			0.85,
+			0.90,
+			0.95,
+			1
+		],
+		"injury_cp": [
+			0,
+			0.08,
+			0.18,
+			0.28,
+			0.38,
+			0.47,
+			0.56,
+			0.64,
+			0.71,
+			0.78,
+			0.85,
+			0.90,
+			0.95,
+			1
+		],
+		"disease_cp": [
+			0,
+			0.04,
+			0.12,
+			0.24,
+			0.34,
+			0.42,
+			0.50,
+			0.57,
+			0.64,
+			0.72,
+			0.81,
+			0.89,
+			0.95,
+			1
+		],
+		"udder_cp": [
+			0,
+			0.12,
+			0.24,
+			0.33,
+			0.41,
+			0.48,
+			0.55,
+			0.62,
+			0.68,
+			0.76,
+			0.82,
+			0.89,
+			0.95,
+			1
+		],
+		"unknown_cp": [
+			0,
+			0.05,
+			0.11,
+			0.18,
+			0.27,
+			0.37,
+			0.45,
+			0.54,
+			0.62,
+			0.70,
+			0.77,
+			0.84,
+			0.92,
+			1
+		],
+		"cull_day_count": [
+			0,
+			5,
+			15,
+			45,
+			90,
+			135,
+			180,
+			225,
+			270,
+			330,
+			380,
+			430,
+			280,
+			530
+		],
 		"econ_indicator_range": 365,
 		"heifer_sell_price": 1400,
 		"heifer_buy_price": 1600,
 		"calf_price": 140
 	},
-
 	"housing": "barn",
 	"pasture_concentrate": -1,
-
-	"ration":
-	{
+	"ration": {
 		"user_input": false,
 		"formulation_interval": 7
 	},
-
-	"pen_information":
-	{
-		"pen0":
-		{
+	"pen_information": {
+		"pen0": {
 			"id": 0,
 			"vertical_dist_to_milking_parlor": 0.1,
 			"horizontal_dist_to_milking_parlor": 1.6,
@@ -111,9 +278,7 @@
 			"bedding_type": "sand",
 			"pen_type": "freestall"
 		},
-
-		"pen1":
-		{
+		"pen1": {
 			"id": 1,
 			"vertical_dist_to_milking_parlor": 0.1,
 			"horizontal_dist_to_milking_parlor": 1.6,
@@ -122,9 +287,7 @@
 			"bedding_type": "sawdust",
 			"pen_type": "freestall"
 		},
-
-		"pen2":
-		{
+		"pen2": {
 			"id": 2,
 			"vertical_dist_to_milking_parlor": 0.1,
 			"horizontal_dist_to_milking_parlor": 1.6,
@@ -133,9 +296,7 @@
 			"bedding_type": "straw",
 			"pen_type": "tiestall"
 		},
-
-		"pen3":
-		{
+		"pen3": {
 			"id": 3,
 			"vertical_dist_to_milking_parlor": 0.1,
 			"horizontal_dist_to_milking_parlor": 1.6,
@@ -144,9 +305,7 @@
 			"bedding_type": "sand",
 			"pen_type": "tiestall"
 		},
-
-		"pen4":
-		{
+		"pen4": {
 			"id": 4,
 			"vertical_dist_to_milking_parlor": 0.1,
 			"horizontal_dist_to_milking_parlor": 1.6,
@@ -155,11 +314,36 @@
 			"bedding_type": "sand",
 			"pen_type": "tiestall"
 		},
-
-		"pen5":
-		{
+		"pen5": {
 			"id": 5,
 			"vertical_dist_to_milking_parlor": 0.1,
+			"horizontal_dist_to_milking_parlor": 1.6,
+			"number_of_stalls": 200,
+			"housing_type": "open air barn",
+			"bedding_type": "sand",
+			"pen_type": "tiestall"
+		},
+		"pen6": {
+			"id": 6,
+			"vertical_dist_to_milking_parlor": 0.1,
+			"horizontal_dist_to_milking_parlor": 1.6,
+			"number_of_stalls": 300,
+			"housing_type": "open air barn",
+			"bedding_type": "sand",
+			"pen_type": "tiestall"
+		},
+		"pen7": {
+			"id": 7,
+			"vertical_dist_to_milking_parlor": 0.2,
+			"horizontal_dist_to_milking_parlor": 1.6,
+			"number_of_stalls": 250,
+			"housing_type": "open air barn",
+			"bedding_type": "sand",
+			"pen_type": "tiestall"
+		},
+		"pen8": {
+			"id": 8,
+			"vertical_dist_to_milking_parlor": 0.2,
 			"horizontal_dist_to_milking_parlor": 1.6,
 			"number_of_stalls": 400,
 			"housing_type": "open air barn",
@@ -167,4 +351,4 @@
 			"pen_type": "tiestall"
 		}
 	}
- }
+}

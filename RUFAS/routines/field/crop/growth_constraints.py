@@ -3,7 +3,8 @@ RUFAS: Ruminant Farm Systems Model
 
 File name: growth_constraints.py
 
-Author(s): Jacob Johnson, jacob8399@gmail.com
+Author(s): Andy Achenreiner, achenreiner@wisc.edu
+           Jacob Johnson, jacob8399@gmail.com
 
 Description: This module contains the necessary functions for calculating and
              updating the growth constraints of a crop_type. Currently the only
@@ -18,7 +19,7 @@ CropType attribute definitions:
     bio_N_opt = Optimal mass of nitrogen stored in plant material for current
                 growth stage (kg N/ha)
 
-    phi_N = Scaling factor for nitrogen stress
+    phi_N = sc_aling factor for nitrogen stress
 
     bio_P = Actual mass of phosphorus stored in plant material (kg P/ha)
 
@@ -31,7 +32,7 @@ CropType attribute definitions:
 
     tstrs = Temperature stress for a given day
 
-    nstrs = Nitrogen strss for a given day
+    nstrs = Nitrogen stress for a given day
 
     pstrs = Phosphorus stress for a given day
 
@@ -43,32 +44,42 @@ CropType values updated by update_all():
     gamma_reg
 
 """
-###############################################################################
 
 from math import exp
 
 
-#
-# This function updates all information for growth constraints
-#
-def update_all(crop_type, time, weather, soil):
+def update_all(soil, crop_type, weather, time):
+    """This function updates all information for growth constraints
+
+    Inputs:
+        crop_type
+        time
+        weather
+        soil
+    """
 
     # update gamma_reg value
-    calc_gamma_reg(crop_type, time, weather, soil)
+    calc_gamma_reg(soil, crop_type, weather, time)
 
 
-#
-# Calculates plant growth factor (AKA gamma_reg).
-# "pseudocode_crop" C.7
-#
-def calc_gamma_reg(crop_type, time, weather, soil):
-    wstrs = calc_wstrs(crop_type, soil)
-    tstrs = calc_tstrs(crop_type, time, weather)
+def calc_gamma_reg(soil, crop_type, weather, time):
+    """Calculates plant growth factor (AKA gamma_reg).
+       "pseudocode_crop" C.7
+
+    Inputs:
+        crop_type
+        time
+        weather
+        soil
+    """
+
+    wstrs = calc_wstrs(soil, crop_type)
+    tstrs = calc_tstrs(crop_type, weather, time)
     nstrs = calc_nstrs(crop_type)
     pstrs = calc_pstrs(crop_type)
 
     # C.7.E.1
-    crop_type.gamma_reg = 1 - max(wstrs, tstrs, nstrs, pstrs)
+    crop_type.gamma_reg = 1.0 - max(wstrs, tstrs, nstrs, pstrs)
 
 
 """
@@ -79,11 +90,17 @@ They do not modify the values of any State class.
 """
 
 
-#
-# Calculates water stress for a given day
-# "pseudocode_crop" C.7.A.1
-#
-def calc_wstrs(crop_type, soil):
+def calc_wstrs(soil, crop_type):
+    """Calculates water stress for a given day.
+       "pseudocode_crop" C.7.A.1
+
+    Inputs:
+        crop_type
+        soil
+    Returns:
+        float: water stress
+    """
+
     if soil.trans_max == 0:
         return 0
     wstrs = 1.0 - (crop_type.water_act_up / soil.trans_max)
@@ -93,11 +110,18 @@ def calc_wstrs(crop_type, soil):
         return min(0.99, wstrs)
 
 
-#
-# Calculates temperature stress for a given day.
-# "pseudocode_crop" C.7.B.1-4
-#
-def calc_tstrs(crop_type, time, weather):
+def calc_tstrs(crop_type, weather, time):
+    """Calculates temperature stress for a given day.
+       "pseudocode_crop" C.7.B.1-4
+
+    Inputs:
+        crop_type
+        time
+        weather
+    Returns;
+        float: temperature stress
+    """
+
     # C.7.B.1
     T_avg = weather.T_avg[time.year - 1][time.day - 1]
     T_opt = crop_type.T_opt
@@ -108,13 +132,13 @@ def calc_tstrs(crop_type, time, weather):
         tstrs = MAX
 
     # C.7.B.2
-    elif T_base_min < T_avg and T_avg <= T_opt:
+    elif T_base_min < T_avg <= T_opt:
         top_half_eq = -0.1054 * (T_opt - T_avg) ** 2
         bottom_half_eq = (T_avg - T_base_min) ** 2
         tstrs = 1 - exp(top_half_eq / bottom_half_eq)
 
     # C.7.B.3
-    elif T_opt < T_avg and T_avg <= (2 * T_opt - T_base_min):
+    elif T_opt < T_avg <= (2 * T_opt - T_base_min):
         top_half_eq = -0.1054 * (T_opt - T_avg) ** 2
         bottom_half_eq = ((2 * T_opt - T_avg) - T_base_min) ** 2
         tstrs = 1 - exp(top_half_eq / bottom_half_eq)
@@ -126,11 +150,16 @@ def calc_tstrs(crop_type, time, weather):
     return min(tstrs, MAX)
 
 
-#
-# Calculates nitrogen stress for a given day.
-# "pseudocode_crop" C.7.C.2
-#
 def calc_nstrs(crop_type):
+    """Calculates nitrogen stress for a given day.
+       "pseudocode_crop" C.7.C.2
+
+    Inputs:
+        crop_type
+    Returns:
+        float: nitrogen stress
+    """
+
     if crop_type.bio_N_opt == 0:
         return 0
     phi_n = calc_phi_N(crop_type)
@@ -138,11 +167,16 @@ def calc_nstrs(crop_type):
     return min(0.99, nstrs)
 
 
-#
-# Calculates nitrogen stress scaling factor.
-# "pseudocode_crop" C.7.C.1
-#
 def calc_phi_N(crop_type):
+    """Calculates nitrogen stress scaling factor.
+       "pseudocode_crop" C.7.C.1
+
+    Inputs:
+        crop_type
+    Returns:
+        float: scaling factor
+    """
+
     if crop_type.bio_N_opt == 0:
         return 300
     else:
@@ -150,11 +184,16 @@ def calc_phi_N(crop_type):
         return max(0, phi_n)
 
 
-#
-# Calculates phosphorus stress scaling factor.
-# "pseudocode_crop" C.7.D.2
-#
 def calc_pstrs(crop_type):
+    """Calculates phosphorus stress for a given day.
+       "pseudocode_crop" C.7.D.2
+
+    Inputs:
+        crop_type
+    Returns:
+        float: phosphorus stress
+    """
+
     if crop_type.bio_P_opt == 0:
         return 0
     phi_p = calc_phi_P(crop_type)
@@ -162,11 +201,16 @@ def calc_pstrs(crop_type):
     return min(0.99, pstrs)
 
 
-#
-# Calculates phosphorus stress scaling factor.
-# "pseudocode_crop" C.7.D.1
-#
 def calc_phi_P(crop_type):
+    """Calculates phosphorus stress scaling factor.
+       "pseudocode_crop" C.7.D.1
+
+    Inputs:
+        crop_type
+    Returns:
+        float: scaling factor
+    """
+
     if crop_type.bio_P_opt == 0:
         return 300
     else:

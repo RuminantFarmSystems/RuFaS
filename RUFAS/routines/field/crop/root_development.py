@@ -28,34 +28,40 @@ CropType values updated by calling update_all():
     fr_root
     z_root
 """
-###############################################################################
 
 
-#
-# This function calls the functions in this module necessary to update the
-# root development of the given crop.
-#
 def update_all(crop_type):
+    """This function calls the functions in this module necessary to update the
+       root development of the given crop.
+
+    Inputs:
+        crop_type
+    """
+
     calc_daily_root_biomass(crop_type)
     calc_z_root(crop_type)
 
 
-#
-# Calculates the fraction of total biomass partitioned to roots
-# on a given day in the growing season (AKA fr_root).
-# "pseudocode_crop" C.3.A.1
-#
 def calc_daily_root_biomass(crop_type):
+    """Calculates the fraction of total biomass partitioned to roots
+       on a given day in the growing season (AKA fr_root).
+       "pseudocode_crop" C.3.A.1
+
+    Inputs:
+        crop_type
+    """
 
     crop_type.fr_root = 0.4 - 0.2 * crop_type.fr_PHU
 
 
-#
-# Calculates depth of root development in the soil on a given
-# day (AKA z_root).
-# "pseudocode_crop" C.3.A.2/3
-#
 def calc_z_root(crop_type):
+    """Calculates depth of root development in the soil on a given
+       day (AKA z_root).
+       "pseudocode_crop" C.3.A.2/3
+
+    Inputs:
+        crop_type
+    """
 
     if not crop_type.z_root == crop_type.z_root_max:
 
@@ -65,16 +71,3 @@ def calc_z_root(crop_type):
 
         else:  # self.fr_PHU <= 0.4
             crop_type.z_root = 2.5 * crop_type.fr_PHU * crop_type.z_root_max
-
-    # if crop_type.crop_type == "perennial" and crop_type.planted:
-    #     crop_type.z_root = crop_type.z_root_max
-    #
-    # elif after_harvest:
-    #     crop_type.z_root = 0
-    #
-    # # C.3.A.3
-    # elif crop_type.crop_type == "annual" and crop_type.fr_PHU > 0.4:
-    #     crop_type.z_root = crop_type.z_root_max
-    #
-    # else:  # crop_type == "annual" and self.fr_PHU <= 0.4
-    #     crop_type.z_root = 2.5 * crop_type.fr_PHU * crop_type.z_root_max

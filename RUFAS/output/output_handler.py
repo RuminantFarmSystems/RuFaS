@@ -1,37 +1,32 @@
-################################################################################
 """
 RUFAS: Ruminant Farm Systems Model
 File name: output_handler.py
-Description: Contains the definition of the OutputHandler object
+
 Author(s): Kass Chupongstimun, kass_c@hotmail.com
            William Donovan, wmdonovan@wisc.edu
            Jacob Johnson, jacob8399@gmail.com
+
+Description: Contains the definition of the OutputHandler object
 """
-################################################################################
+
 import shutil
 from pathlib import Path
 
 from RUFAS import util
-from RUFAS.output.report_handler import BaseReportHandler
 
 #
 # Import report handlers here
 #
-from RUFAS.output.feed_storage import FeedStorage
-from RUFAS.output.field_summary import FieldSummary
+from RUFAS.output.feed_storage_report import FeedStorage
+from RUFAS.output.field_report import FieldSummary
 from RUFAS.output.pen_report import PenReport
-
-
-# -------------------------------------------------------------------------------
-# Class: OutputHandler
-# -------------------------------------------------------------------------------
 
 
 class OutputHandler:
     """Handles all output related interactions.
 
     Contains a list of all the report handlers, which handles all output-related
-    functionalities. This object is the (only) bridge between the simulation
+    functionality. This object should be the (only) bridge between the simulation
     engine and the output routines.
 
     Output values are updated at the end of each day, and the each report is
@@ -59,17 +54,13 @@ class OutputHandler:
                         # 'farm_summary': FarmSummary(data['farm_summary']),
                         'feed_storage': FeedStorage(data['feed_storage']),
                         }
+
         for field in state.fields:
             self.reports[field.field_name] = FieldSummary(field.field_name, data['field_summary'])
 
         for pen in state.animal_management.all_pens:
             self.reports['pen_' + str(pen.id)] = PenReport(pen.id, data['pen_report'])
 
-        self.final = False
-
-    # ---------------------------------------------------------------------------
-    # Method: initialize_output_dir
-    # ---------------------------------------------------------------------------
     def initialize_output_dir(self, output_dir):
         """
         If a directory of the same name exists, it and its contents are deleted,
@@ -87,55 +78,54 @@ class OutputHandler:
 
         # Delete directory if previously exists
         if output_dir.exists():
-            for output in output_dir.iterdir():
-                if output.is_file():
-                    output.unlink()
-                else:
-                    for file in output.iterdir():
-                        file.unlink()
-                    output.rmdir()
-            output_dir.rmdir()
+            shutil.rmtree(output_dir)
 
         output_dir.mkdir(exist_ok=True, parents=False)
-        BaseReportHandler.set_dir(output_dir)
-
-        for reportName in self.reports:
-            report = self.reports[reportName]
-            if report.report_name.split('_')[0] == 'field':
-                report_dir = util.get_base_dir() / output_dir / reportName
-                report_dir.mkdir(exist_ok=True, parents=False)
 
         for report_name in self.reports:
             report = self.reports[report_name]
+            report.output_dir = output_dir
+            if report.report_name.startswith('field'):
+                report.initialize_field_output_dir(output_dir)
             if report.report_name.startswith('pen'):
-                report_dir = util.get_base_dir() / output_dir / report_name
-                report_dir.mkdir(exist_ok=True, parents=False)
+                report.initialize_pen_output_dir(output_dir)
 
     def initialize_diagnostic_dir(self, diagnostic_dir):
+        """
+        Description:
+            If a directory of the same name exists, it and its contents are deleted,
+            then a directory for each output report is created.
+            Sets output file path for all diagnostics through the class attribute of the
+            BaseReportHandler class.
+
+        Args:
+            diagnostic_dir (Path): The path to the directory that will store all
+                output report files.
+        """
+
         diagnostic_dir = util.get_base_dir() / diagnostic_dir
 
         if diagnostic_dir.exists():
-            for file in diagnostic_dir.iterdir():
-                shutil.rmtree(file)
-            diagnostic_dir.rmdir()
+            shutil.rmtree(diagnostic_dir)
 
         diagnostic_dir.mkdir(exist_ok=True, parents=False)
 
         for reportName in self.reports:
             report = self.reports[reportName]
             if report.produce_graphics:
-                report_dir = util.get_base_dir() / diagnostic_dir / reportName
+                report_dir = diagnostic_dir / reportName
                 report_dir.mkdir(exist_ok=True, parents=False)
+                report.diagnostic_dir = report_dir
                 if report.report_name.split('_')[0] == 'field':
-                    report.initialize_field_dir(report_dir)
+                    report.initialize_field_diagnostic_dir(report_dir)
                 if report.report_name.startswith('pen'):
-                    report.initialize_pen_dir(report_dir)
+                    report.initialize_pen_diagnostic_dir(report_dir)
 
-    # ---------------------------------------------------------------------------
-    # Method: initialize_reports
-    # ---------------------------------------------------------------------------
     def initialize_reports(self, state):
-        """Transfer needed (initial) data from state to report handlers."""
+        """
+        Description:
+            Transfer needed (initial) data from state to report handlers.
+        """
 
         for reportName in self.reports:
             report = self.reports[reportName]
@@ -146,59 +136,55 @@ class OutputHandler:
             if report.produce_csv:
                 report.initialize(state)
 
-    # ---------------------------------------------------------------------------
-    # Method: daily_update
-    # ---------------------------------------------------------------------------
     def daily_update(self, state, weather, time):
-        """Updates the report handler with new daily values."""
+        """
+        Description:
+            Updates the report handler with new daily values.
+        """
 
         for reportName in self.reports:
             report = self.reports[reportName]
             if report.produce_csv:
                 report.daily_update(state, weather, time)
 
-    # ---------------------------------------------------------------------------
-    # Method: annual_update
-    # ---------------------------------------------------------------------------
     def annual_updates(self, state, weather, time):
-        """Updates the report handler with anuual output values."""
+        """
+        Description:
+            Updates the report handler with annual output values.
+        """
 
         for reportName in self.reports:
             report = self.reports[reportName]
             if report.produce_csv:
                 report.annual_update(state, weather, time)
 
-    # ---------------------------------------------------------------------------
-    # Method: write_annual_reports
-    # ---------------------------------------------------------------------------
     def write_annual_reports(self):
-        """Prints the annual report to file for all reports."""
+        """
+        Description:
+            Prints the annual report to file for all reports.
+        """
 
         for reportName in self.reports:
             report = self.reports[reportName]
             if report.produce_csv:
                 report.write_annual_report()
 
-    # ---------------------------------------------------------------------------
-    # Method: annual_flush
-    # ---------------------------------------------------------------------------s
     def annual_flushes(self):
-        """Sets all of the reports in the output object to the default."""
+        """
+        Description:
+            Sets all of the reports in the output object to the default.
+        """
 
         for reportName in self.reports:
             report = self.reports[reportName]
             if report.produce_csv:
                 report.annual_flush()
 
-    # ---------------------------------------------------------------------------
-    # Method: produce_data_analysis
-    # ---------------------------------------------------------------------------
     def produce_graphics(self):
-        counter = 0
+        """
+        Description:
+            Calls produce graphics for all of the reports.
+        """
         for reportName in self.reports:
             report = self.reports[reportName]
-
-            if counter == len(self.reports) - 1:
-                self.final = True
-            report.produce_report_graphics(self.final)
-            counter += 1
+            report.produce_report_graphics()

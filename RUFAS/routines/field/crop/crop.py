@@ -1,16 +1,15 @@
-################################################################################
 """
 RUFAS: Ruminant Farm Systems Model
 File name: crop.py
+
 Description:
+
 Author(s): Kass Chupongstimun, kass_c@hotmail.com
            Andy Achenreiner, achenreiner@wisc.edu
            William Donovan, wmdonovan@wisc.edu
            Jacob Johnson, jacob8399@gmail.com
 
 This module needs the following inputs in order to operate correctly:
-
-    "latitude": 43.332708
 
     These are attributes of a crop type that need to be specified in the json input
     file. The values on the right are just examples from a corn crop type.
@@ -30,7 +29,7 @@ This module needs the following inputs in order to operate correctly:
         soil_layers
 
         And the following attributes of a soil layer:
-            bottomDepth
+            bottom_depth
             ET_annual = Sum of the ET_act values leading up to today
             trans_max
             NO3
@@ -39,18 +38,22 @@ This module needs the following inputs in order to operate correctly:
             fc_water
             wilting_water
 """
-################################################################################
 
 from math import acos, asin, sin, tan, pi
 from . import heat_units, leaf_area_index, root_development, biomass, yields, \
     phosphorus_uptake, nitrogen_uptake, growth_constraints
-from .. soil.phosphorus_cycling import application_management
+from ..application_management import application_management
 
 
-# -------------------------------------------------------------------------------
-# Function: daily_crop_routine
-# -------------------------------------------------------------------------------
-def daily_crop_routine(crop, weather, time, soil):
+def daily_crop_routine(soil, crop, application, weather, space, time):
+    """Executes all the daily crop routines.
+
+    Inputs:
+        crop
+        weather
+        time
+        soil
+    """
 
     # Current crop is set at the beginning of the year in annual_crop_routine
     crop_type = crop.current_crop
@@ -66,7 +69,7 @@ def daily_crop_routine(crop, weather, time, soil):
         crop_type.yield_P = 0
         # If the crop is not planted yet, determine whether it is planted today
         if not crop_type.planted:
-            calculate_start(crop, soil, weather, time)
+            calculate_start(soil, crop, application, weather, space, time)
 
         # Once the crop is planted:
         else:
@@ -76,25 +79,25 @@ def daily_crop_routine(crop, weather, time, soil):
 
                 root_development.update_all(crop_type)
 
-                nitrogen_uptake.update_all(crop_type, soil)
+                nitrogen_uptake.update_all(soil, crop_type)
 
-                phosphorus_uptake.update_all(crop_type, soil)
+                phosphorus_uptake.update_all(soil, crop_type)
 
-                growth_constraints.update_all(crop_type, time, weather, soil)
+                growth_constraints.update_all(soil, crop_type, weather, time)
 
-                leaf_area_index.update_all(crop_type, time)
+                leaf_area_index.update_all(crop_type)
 
-                biomass.update_all(crop_type, soil, time, weather)
+                biomass.update_all(soil, crop_type, weather, time)
 
                 # "pseudocode_crop" C.10.A.1/2
                 if crop_type.harvest_type == 'scheduled':
                     if time.day == crop_type.kill_day:
-                        yields.update_all(crop_type, time, soil)
+                        yields.update_all(soil, crop_type, application, time)
 
                 elif crop_type.harvest_type == 'optimal':
                     if crop_type.fr_PHU >= crop_type.fr_PHU_harvest \
                             or (crop_type.fr_PHU <= crop_type.prev_fr_PHU and time.day > crop_type.harvest_date):
-                        yields.update_all(crop_type, time, soil)
+                        yields.update_all(soil, crop_type, application, time)
                 else:
                     print('"' + crop_type.harvest_type + '"', 'is not a recognized harvest type.'
                                                               ' Harvesting on optimal date.')
@@ -105,52 +108,63 @@ def daily_crop_routine(crop, weather, time, soil):
                 # If it is, run the dormancy routine and set growing to false
                 # (This method is only called once on the first day when crop
                 # enters dormancy)
-                if in_dormancy(crop, time) and crop_type.growing:
-                    dormancy_routine(crop_type, time, soil)
+                if in_dormancy(crop, space, time) and crop_type.growing:
+                    dormancy_routine(soil, crop_type, application, time)
                     crop_type.growing = False
-                elif not in_dormancy(crop, time):
+                elif not in_dormancy(crop, space, time):
                     if crop_type.growing is False:
-                        soil.manure_day = True
-                        soil.fertilizer_day = True
+                        application.manure_day = True
+                        application.fertilizer_day = True
 
                     crop_type.growing = True
 
         annual_variable_update(crop_type)
 
 
-# -------------------------------------------------------------------------------
-# Function: annual_variable_update
-# -------------------------------------------------------------------------------
 def annual_variable_update(crop_type):
+    """Update variables tracked on an annual scale and reset condition
+        variables
+    Inputs:
+        crop_type
+    """
+    
     crop_type.yield_annual += crop_type.yield_actual
 
 
-# -------------------------------------------------------------------------------
-# Function: annual_crop_routine determines the current crop and whether it is
-# a kill year for that crop
-# -------------------------------------------------------------------------------
 def annual_crop_routine(crop, time):
+    """Determines the current crop and whether it is a kill year for that crop
+    
+    Inputs:
+        crop
+        time
+    """
+    
     # current crop is set to the next crop in the regimen
     crop.current_crop = crop.grow_regimen[time.year - 1]
     crop.current_crop.kill_year = is_kill_year(crop, time)
 
 
-#
-# dormancy_routine runs on the first day of dormancy if there is a crop growing.
-# LAI is set to minimum LAI, 10% of biomass is added to residue, and the crop
-# is signalled to be dormant
-#
-def dormancy_routine(crop_type, time, soil):
+def dormancy_routine(soil, crop_type, application, time):
+    """dormancy_routine runs on the first day of dormancy if there is a crop growing.
+       LAI is set to minimum LAI, 10% of biomass is added to residue, and the crop
+       is signalled to be dormant
+
+    Inputs:
+        crop_type
+        time
+        soil
+    """
+
     # if crop is perennial and in it's final year, then call yields
     # to kill it
     if crop_type.kill_year:
         crop_type.kill_day = time.day
-        yields.update_all(crop_type, time, soil)
+        yields.update_all(soil, crop_type, application, time)
     else:
         # TODO: This is just our guess. Variable exclusive to perennials. Possibly a component of management
         fr_PHU_harvest_min = 0.7
         if crop_type.fr_PHU > fr_PHU_harvest_min:
-            yields.update_all(crop_type, time, soil)
+            yields.update_all(soil, crop_type, application, time)
         crop_type.LAI_actual = max(0, min(crop_type.LAI_min, crop_type.LAI_actual))
         crop_type.fr_LAI_max = 0
 
@@ -163,10 +177,13 @@ def dormancy_routine(crop_type, time, soil):
         crop_type.fr_PHU = 0
 
 
-#
-# Determines whether the crop is killed at harvest
-#
 def is_kill_year(crop, time):
+    """Determines whether the crop is killed at harvest
+    
+    Inputs:
+        crop
+        time
+    """
 
     if crop.current_crop.crop_type == 'annual' or len(crop.grow_regimen) == time.year or \
             crop.current_crop.crop_name != crop.grow_regimen[time.year].crop_name:
@@ -175,26 +192,34 @@ def is_kill_year(crop, time):
     return False
 
 
-# -------------------------------------------------------------------------------
-# Class: Crop
-# -------------------------------------------------------------------------------
 class Crop:
-    def __init__(self, data, time):
+    """
+    Contains the state of the farm's crop.
+    """
+    
+    def __init__(self, data, space, time):
+        """Constructs an instance of the Crop class by populating its arrays
+            and the necessary values.
+
+        Args:
+            data: the information from the json input file
+            time
+        """
+        
         self.init_crop = InitCrop(data)
         self.alfalfa = Alfalfa(data)
         self.corn = Corn(data)
         self.soy = Soybean(data)
 
         # Dormancy for perennial crops
-        self.latitude = abs(data['latitude'])
-        self.T_dl_min = calculate_minimum_day_length(self.latitude)
-        self.t_dorm = calculate_t_dorm(self.latitude)
+        self.T_dl_min = calculate_minimum_day_length(space.latitude)
+        self.t_dorm = calculate_t_dorm(space.latitude)
         self.solar_declination = 0.0
 
         self.crops_list = [self.alfalfa, self.corn, self.soy]
         self.current_crop = self.init_crop
 
-        self.grow_regimen = [self.init_crop for x in range(0, len(time.years))]
+        self.grow_regimen = [self.init_crop for _ in range(0, len(time.years))]
 
         # Each crop in crops_list has a list of grow years. This loop iterates
         # through those lists and populates a grow regimen with the crop grown
@@ -222,14 +247,14 @@ class Crop:
                             x += crop_type.repeat
 
     def annual_reset(self):
+        """Resets the annual values for the next year."""
+        
         self.current_crop.yield_annual = 0
 
 
-#
-# A base crop class used when no crop is grown
-#
 class InitCrop:
     def __init__(self, data):
+        """A base crop class used when no crop is grown"""
         """GENERAL PLANT INFO"""
 
         self.data = data
@@ -241,6 +266,7 @@ class InitCrop:
 
         self.crop_name = 'null'
         self.crop_type = ''
+        self.harvest_quality = ''
 
         self.kill_day = -1
         self.kill_year = True
@@ -249,8 +275,7 @@ class InitCrop:
 
         self.fix_nitrogen = False
 
-        # ===================================================================
-        ''' HEAT UNIT DATA '''
+        """ HEAT UNIT DATA """
 
         # Inputs
         self.T_base_min = 0
@@ -264,9 +289,8 @@ class InitCrop:
         # Outputs
         self.fr_PHU = 0
         self.prev_fr_PHU = 0
-
-        # ===================================================================
-        ''' LEAF AREA INDEX (LAI) DATA '''
+        
+        """ LEAF AREA INDEX (LAI) DATA """
 
         # Inputs
         self.fr_PHU_1 = 0
@@ -285,9 +309,8 @@ class InitCrop:
         # Outputs
         self.prev_LAI_actual = 0
         self.LAI_actual = 0
-
-        # ===================================================================
-        ''' ROOT DEPTH DATA '''
+     
+        """ ROOT DEPTH DATA """
 
         # Inputs
         self.z_root_max = 0  # maximum depth of root development
@@ -297,9 +320,8 @@ class InitCrop:
 
         # Outputs
         self.z_root = 0
-
-        # ===================================================================
-        ''' BIOMASS DATA '''
+     
+        """ BIOMASS DATA """
 
         # Inputs
         self.kl = 0
@@ -314,18 +336,16 @@ class InitCrop:
         # Outputs
         self.biomass_actual = 0
         self.prev_biomass_actual = 0
-
-        # ===================================================================
-        ''' Soil Water Uptake Data '''
+       
+        """ Soil Water Uptake Data """
 
         self.beta_w = 0
         self.epco = 0
 
         self.water_actual_up = 0
         self.water_uptake_each_layer = []
-
-        # ===================================================================
-        ''' Nitrogen Uptake Data '''
+       
+        """ Nitrogen Uptake Data """
 
         self.beta_n = 0
 
@@ -343,8 +363,9 @@ class InitCrop:
         self.act_N_up_each_layer = []
         self.N_actual_up = 0
 
-        # ===================================================================
-        ''' Phosphorus Uptake Data '''
+        self.N_fix = 0
+   
+        """ Phosphorus Uptake Data """
 
         self.beta_p = 0
 
@@ -361,10 +382,10 @@ class InitCrop:
         self.fr_P = 0
         self.P_up = 0
         self.act_P_up_each_layer = []
+        self.pot_N_up_each_layer = []
         self.P_act_up = 0
-
-        # ===================================================================
-        ''' Yields Data '''
+     
+        """ Yields Data """
 
         self.HI_max = 0
         self.HI_min = 0
@@ -384,12 +405,10 @@ class InitCrop:
         self.yield_annual = 0
 
 
-#
-# Crop object populated with Corn data
-#
 class Corn:
 
     def __init__(self, data):
+        """A base crop class used when corn is grown"""
         """GENERAL PLANT INFO"""
 
         corn_data = data['corn']
@@ -401,6 +420,7 @@ class Corn:
 
         self.crop_name = 'corn'
         self.crop_type = 'annual'
+        self.harvest_quality = ''
 
         self.kill_day = -1
         self.kill_year = True
@@ -408,9 +428,8 @@ class Corn:
         self.growing = False
 
         self.fix_nitrogen = False
-
-        # ===================================================================
-        ''' HEAT UNIT DATA '''
+      
+        """ HEAT UNIT DATA """
 
         # Inputs
         self.T_base_min = 10
@@ -424,9 +443,8 @@ class Corn:
         # Outputs
         self.fr_PHU = 0.0
         self.prev_fr_PHU = 0.0
-
-        # ===================================================================
-        ''' LEAF AREA INDEX (LAI) DATA '''
+     
+        """ LEAF AREA INDEX (LAI) DATA """
 
         # Inputs
         self.fr_PHU_1 = 0.15
@@ -445,9 +463,8 @@ class Corn:
         # Outputs
         self.prev_LAI_actual = 0
         self.LAI_actual = 0
-
-        # ===================================================================
-        ''' ROOT DEPTH DATA '''
+     
+        """ ROOT DEPTH DATA """
 
         # Inputs
         self.z_root_max = 2000  # maximum depth of root development
@@ -457,9 +474,8 @@ class Corn:
 
         # Outputs
         self.z_root = 0
-
-        # ===================================================================
-        ''' BIOMASS DATA '''
+     
+        """ BIOMASS DATA """
 
         # Inputs
         self.kl = 0.65
@@ -474,18 +490,16 @@ class Corn:
         # Outputs
         self.biomass_actual = 0
         self.prev_biomass_actual = 0
-
-        # ===================================================================
-        ''' Soil Water Uptake Data '''
+     
+        """ Soil Water Uptake Data """
 
         self.beta_w = 10  # water-use distribution parameter
         self.epco = 0.5
 
         self.water_actual_up = 0
         self.water_uptake_each_layer = []
-
-        # ===================================================================
-        ''' Nitrogen Uptake Data '''
+     
+        """ Nitrogen Uptake Data """
 
         self.beta_n = 10
 
@@ -503,8 +517,9 @@ class Corn:
         self.act_N_up_each_layer = []
         self.N_actual_up = 0
 
-        # ===================================================================
-        ''' Phosphorus Uptake Data '''
+        self.N_fix = 0
+    
+        """ Phosphorus Uptake Data """
 
         self.beta_p = 10
 
@@ -521,10 +536,10 @@ class Corn:
         self.fr_P = 0
         self.P_up = 0
         self.act_P_up_each_layer = []
+        self.pot_N_up_each_layer = []
         self.P_act_up = 0
-
-        # ===================================================================
-        ''' Yields Data '''
+     
+        """ Yields Data """
 
         self.HI_max = 0
         self.HI_min = 0.3
@@ -544,12 +559,10 @@ class Corn:
         self.yield_annual = 0
 
 
-#
-# Crop object populated with Soybean data
-#
 class Soybean:
 
     def __init__(self, data):
+        """A base crop class used when soybean is grown"""
         """GENERAL PLANT INFO"""
 
         soy_data = data['soybean']
@@ -561,15 +574,15 @@ class Soybean:
 
         self.crop_name = 'soybean'
         self.crop_type = 'annual'
+        self.harvest_quality = ''
 
         self.kill_day = -1
         self.kill_year = True
         self.planted = False
         self.growing = False
 
-        self.fix_nitrogen = True
-        # ===================================================================
-        ''' HEAT UNIT DATA '''
+        self.fix_nitrogen = True    
+        """ HEAT UNIT DATA """
 
         # Inputs
         self.T_base_min = 10
@@ -583,9 +596,8 @@ class Soybean:
         # Outputs
         self.fr_PHU = 0.0
         self.prev_fr_PHU = 0.0
-
-        # ===================================================================
-        ''' LEAF AREA INDEX (LAI) DATA '''
+    
+        """ LEAF AREA INDEX (LAI) DATA """
 
         # Inputs
         self.fr_PHU_1 = 0.15
@@ -593,7 +605,7 @@ class Soybean:
         self.fr_LAI_1 = 0.05
         self.fr_LAI_2 = 0.95
         self.fr_PHU_sen = 0.9
-        self.fr_PHU_harvest = 1.0  # TODO: If soybean has drydown, this is 1.2
+        self.fr_PHU_harvest = 1.0  # If soybean has drydown, this is 1.2
         self.LAI_max = 3
         self.LAI_min = 0
 
@@ -604,9 +616,8 @@ class Soybean:
         # Outputs
         self.prev_LAI_actual = 0
         self.LAI_actual = 0
-
-        # ===================================================================
-        ''' ROOT DEPTH DATA '''
+    
+        """ ROOT DEPTH DATA """
 
         # Inputs
         self.z_root_max = 1700  # maximum depth of root development
@@ -616,9 +627,8 @@ class Soybean:
 
         # Outputs
         self.z_root = 0
-
-        # ===================================================================
-        ''' BIOMASS DATA '''
+     
+        """ BIOMASS DATA """
 
         # Inputs
         self.kl = 0.45
@@ -633,9 +643,8 @@ class Soybean:
         # Outputs
         self.biomass_actual = 0
         self.prev_biomass_actual = 0
-
-        # ===================================================================
-        ''' Soil Water Uptake Data '''
+     
+        """ Soil Water Uptake Data """
 
         self.beta_w = 10  # water-use distribution parameter  # corn
         self.epco = 0.5  # corn
@@ -643,9 +652,8 @@ class Soybean:
         # Outputs
         self.prev_LAI_actual = 0
         self.LAI_actual = 0
-
-        # ===================================================================
-        ''' Nitrogen Uptake Data '''
+     
+        """ Nitrogen Uptake Data """
 
         self.beta_n = 10  # corn
 
@@ -661,10 +669,12 @@ class Soybean:
         self.fr_N_up = 0
         self.N_up = 0
         self.act_N_up_each_layer = []
+        self.pot_N_up_each_layer = []
         self.N_actual_up = 0
 
-        # ===================================================================
-        ''' Phosphorus Uptake Data '''
+        self.N_fix = 0
+     
+        """ Phosphorus Uptake Data """
 
         self.beta_p = 10  # corn
 
@@ -682,9 +692,8 @@ class Soybean:
         self.P_up = 0
         self.act_P_up_each_layer = []
         self.P_act_up = 0
-
-        # ===================================================================
-        ''' Yields Data '''
+     
+        """ Yields Data """
 
         self.HI_max = 0
         self.HI_min = 0.01
@@ -710,6 +719,7 @@ class Soybean:
 class Alfalfa:
 
     def __init__(self, data):
+        """A base crop class used when alfalfa is grown"""
         """GENERAL PLANT INFO"""
 
         alfalfa_data = data['alfalfa']
@@ -725,6 +735,7 @@ class Alfalfa:
 
         self.crop_name = 'alfalfa'
         self.crop_type = 'perennial'
+        self.harvest_quality = ''
 
         self.kill_day = -1
         self.kill_year = False
@@ -732,8 +743,8 @@ class Alfalfa:
         self.growing = False
 
         self.fix_nitrogen = True
-        # ===================================================================
-        ''' HEAT UNIT DATA '''
+        
+        """ HEAT UNIT DATA """
 
         # Inputs
         self.T_base_min = 4
@@ -747,9 +758,8 @@ class Alfalfa:
         # Outputs
         self.fr_PHU = 0.0
         self.prev_fr_PHU = 0.0
-
-        # ===================================================================
-        ''' LEAF AREA INDEX (LAI) DATA '''
+       
+        """ LEAF AREA INDEX (LAI) DATA """
 
         # Inputs
         self.fr_PHU_1 = 0.15
@@ -757,7 +767,7 @@ class Alfalfa:
         self.fr_LAI_1 = 0.01
         self.fr_LAI_2 = 0.95
         self.fr_PHU_sen = 0.90
-        self.fr_PHU_harvest = 1.0  # TODO: If alfalfa is a hay, PHU to cut is 0.6
+        self.fr_PHU_harvest = 1.0  # If alfalfa is a hay, PHU to cut is 0.6
         self.LAI_max = 4
         self.LAI_min = 0.75
 
@@ -768,9 +778,8 @@ class Alfalfa:
         # Outputs
         self.prev_LAI_actual = 0
         self.LAI_actual = 0
-
-        # ===================================================================
-        ''' ROOT DEPTH DATA '''
+      
+        """ ROOT DEPTH DATA """
 
         # Inputs
         self.z_root_max = 3000  # maximum depth of root development
@@ -780,9 +789,8 @@ class Alfalfa:
 
         # Outputs
         self.z_root = 0
-
-        # ===================================================================
-        ''' BIOMASS DATA '''
+      
+        """ BIOMASS DATA """
 
         # Inputs
         self.kl = 0.65
@@ -797,18 +805,16 @@ class Alfalfa:
         # Outputs
         self.biomass_actual = 0
         self.prev_biomass_actual = 0
-
-        # ===================================================================
-        ''' Soil Water Uptake Data '''
+      
+        """ Soil Water Uptake Data """
 
         self.beta_w = 10  # water-use distribution parameter  # corn
         self.epco = 0.5  # corn
 
         self.water_actual_up = 0
         self.water_uptake_each_layer = []
-
-        # ===================================================================
-        ''' Nitrogen Uptake Data '''
+    
+        """ Nitrogen Uptake Data """
 
         self.beta_n = 10  # corn
 
@@ -824,10 +830,12 @@ class Alfalfa:
         self.fr_N_up = 0
         self.N_up = 0
         self.act_N_up_each_layer = []
+        self.pot_N_up_each_layer = []
         self.N_actual_up = 0
 
-        # ===================================================================
-        ''' Phosphorus Uptake Data '''
+        self.N_fix = 0
+     
+        """ Phosphorus Uptake Data """
 
         self.beta_p = 10  # corn
 
@@ -846,8 +854,7 @@ class Alfalfa:
         self.act_P_up_each_layer = []
         self.P_act_up = 0
 
-        # ===================================================================
-        ''' Yields Data '''
+        """ Yields Data """
 
         self.HI_max = 0
         self.HI_min = 0.9
@@ -867,41 +874,44 @@ class Alfalfa:
         self.yield_annual = 0
 
 
-# -----------------------------------------------------------------------
-# Method: calculate_start_growth_day
-# "pseudocode_crop" section C.1.A
-# -----------------------------------------------------------------------
-def calculate_start(crop, soil, weather, time):
+def calculate_start(soil, crop, application, weather, space, time):
+    """Calculates the start day for the crop
+       "pseudocode_crop" section C.1.A
+
+    Inputs:
+        crop
+        soil
+        weather
+        time
+    """
 
     crop_type = crop.current_crop
     yearly_T_avg = weather.T_avg[time.year - 1]
     # if application type is optimal
-    if soil.application_type == 'optimal':
+    if application.application_type == 'optimal':
         if crop_type.crop_type == 'annual':
             if time.day == crop_type.planting_date:
-                if not application_management.check_conditions(time, weather, soil, 0, -1):
+                if not application_management.check_conditions(soil, application, weather, time, 0, -1):
                     crop_type.planted = True
                     crop_type.growing = True
-                    soil.manure_day = True
-                    soil.fertilizer_day = True
-                    soil.tillage_day = True
+                    application.manure_day = True
+                    application.fertilizer_day = True
                 else:
                     crop_type.planting_date = time.day + 1
         else:
             if time.year == 1 and time.day > crop_type.planting_date:
                 pass
-            elif not in_dormancy(crop, time) and yearly_T_avg[time.day - 1] > crop_type.T_base_min:
-                if not application_management.check_conditions(time, weather, soil, 0, -1):
+            elif not in_dormancy(crop, space, time) and yearly_T_avg[time.day - 1] > crop_type.T_base_min:
+                if not application_management.check_conditions(soil, application, weather, time, 0, -1):
                     crop_type.planted = True
                     crop_type.growing = True
-                    soil.manure_day = True
-                    soil.fertilizer_day = True
-                    soil.tillage_day = True
+                    application.manure_day = True
+                    application.fertilizer_day = True
                 else:
                     crop_type.planting_date = time.day + 1
 
     # if application type is scheduled
-    elif soil.application_type == 'scheduled':
+    elif application.application_type == 'scheduled':
         if crop_type.crop_type == 'annual':
             if time.day == crop_type.planting_date:
                 crop_type.planted = True
@@ -909,22 +919,27 @@ def calculate_start(crop, soil, weather, time):
         else:
             if time.year == 1 and time.day > crop_type.planting_date:
                 pass
-            elif not in_dormancy(crop, time) and yearly_T_avg[time.day - 1] > crop_type.T_base_min:
+            elif not in_dormancy(crop, space, time) and yearly_T_avg[time.day - 1] > crop_type.T_base_min:
                 crop_type.planted = True
                 crop_type.growing = True
     else:
-        print('"' + soil.application_type + '"', "is not a valid application type, setting type to optimal.")
-        soil.application_type = 'optimal'
+        print('"' + application.application_type + '"', "is not a valid application type, setting type to optimal.")
+        application.application_type = 'optimal'
 
     crop.current_crop = crop_type
 
 
-#
-# Calculates minimum day length for the given watershed based on latitude and
-# solar declination during the winter solstice
-# "pseudocode_crop" C.11.B.1
-#
 def calculate_minimum_day_length(latitude):
+    """Calculates minimum day length for the given watershed based on latitude and
+       solar declination during the winter solstice
+       "pseudocode_crop" C.11.B.1
+
+    Inputs:
+        latitude
+    Returns:
+        float: minimum day length
+    """
+
     angular_velocity = 0.2618
     solar_declination = -0.4102
     latitude_radians = latitude * pi / 180
@@ -934,11 +949,16 @@ def calculate_minimum_day_length(latitude):
     return T_dl_min
 
 
-#
-# Calculates the dormancy threshold given the latitude of the given watershed
-# "pseudocode_crop" C.11.A.2
-#
 def calculate_t_dorm(latitude):
+    """Calculates the dormancy threshold given the latitude of the given watershed
+       "pseudocode_crop" C.11.A.2
+
+    Inputs:
+        latitude
+    Returns:
+        float: a dormancy threshold
+    """
+
     if latitude > 40:
         return 1.0
     elif 20 <= latitude <= 40:
@@ -947,19 +967,25 @@ def calculate_t_dorm(latitude):
         return 0.0
 
 
-#
-# Returns a boolean indicating whether the given day is within the dormant
-# period for the watershed.
-# "pseudocode_crop" C.11.A.1/C.11.B.2
-#
-def in_dormancy(crop, time):
-    year_length = get_year_length(time.cal_year)
+def in_dormancy(crop, space, time):
+    """Returns a boolean indicating whether the given day is within the dormant
+       period for the watershed.
+       "pseudocode_crop" C.11.A.1/C.11.B.2
+
+    Inputs:
+        crop
+        time
+    Returns:
+        bool: if a day in within the crop's dormant period
+    """
+
+    year_length = get_year_length(time)
 
     # C.11.B.2
     solar_declination = asin(0.4 * sin(2 * pi / year_length * (time.day - 82)))
 
     angular_velocity = 0.2618
-    latitude_radians = crop.latitude * pi / 180
+    latitude_radians = space.latitude * pi / 180
 
     T_dl = 2 * acos(-tan(solar_declination) * tan(latitude_radians)) / angular_velocity
 
@@ -972,15 +998,22 @@ def in_dormancy(crop, time):
     return False
 
 
-#
-# Helper method to determine year lengths accounting for leap years
-#
-def get_year_length(year):
-    if year % 400 == 0:
-        return 366
-    elif year % 100 == 0:
-        return 365
-    elif year % 4 == 0:
-        return 366
+def get_year_length(time):
+    """Helper method to determine year lengths accounting for leap years
+
+    Inputs:
+        time
+    Returns:
+        int: amount of days in that year
+    """
+
+    calendar_year = time.calendar_year
+
+    if calendar_year % 400 == 0:
+        return time.leap_year_length
+    elif calendar_year % 100 == 0:
+        return time.year_length
+    elif calendar_year % 4 == 0:
+        return time.leap_year_length
     else:
-        return 365
+        return time.year_length

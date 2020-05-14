@@ -6,245 +6,194 @@ Author(s): Jacob Johnson, jacob8399@gmail.com,
            William Donovan, wmdonovan@wisc.edu
 """
 ################################################################################
-
-# this subroutine estimates P leaching from surface manure with rainfall
-# and P infiltration into soil and loss in runoff
-
 from math import exp
 
 
+# this subroutine estimates P leaching from surface manure with rainfall
+# and P infiltration into soil and loss in runoff
+# "pseudocode_soil" S.5.G
 def update_all(S, weather, time):
 
     day = time.day
     year = time.year
-
-    rainfall = weather.rainfall
+    rainfall = weather.rainfall[year - 1][day - 1]
     runoff = S.runoff
-    temp = weather.T_avg
+    temp = weather.T_avg[year - 1][day - 1]
 
-    TFA = max(0.0, (2.0 * 32.0 ** 2 * temp[year - 1][day - 1] ** 2
-                    - temp[year - 1][day - 1] ** 4) / 32.0 ** 4)
+    # Calculate manure factors
+    # S.5.G.I
 
-    for w in range(0, 3):
-        S.soil_layers[w].active_P *= S.area
-        S.soil_layers[w].labile_P *= S.area
+    # S.5.G.I.1
+    TFA = max(0.0, (2.0 * 32.0 ** 2 * temp ** 2
+                    - temp ** 4) / 32.0 ** 4)
 
     # P leached from manure on surface to rain and runoff water in KG
 
+    # S.5.G.I.2
+    S.MIP_leach = 0.0
+    S.MOP_leach = 0.0
+    S.MIP_runoff = 0.0
+    S.MOP_runoff = 0.0
+    MTF_1 = 1.2
+    MTF_2 = 73.1  # TODO: These are the values for a dairy application. Temporarily hard coded.
     if S.manure_mass > 0.0 and S.manure_cov > 0.0:
-        water_manure = rainfall[year - 1][day - 1] / S.manure_mass \
+        water_manure = rainfall / S.manure_mass \
                        * S.manure_cov * 10000.0
 
+        # S.5.G.I.3
         manure_extr = 0.0
-        NH4_extr = 0.0
-        if rainfall[year - 1][day - 1] > 0.0:
+        if rainfall > 0.0:
+            manure_extr = min(1.0, (MTF_1 * water_manure) / (water_manure + MTF_2))
 
-            if S.manure_type == "DAIRY":
-                manure_extr = min(1.0, 1.2 * water_manure / (water_manure + 73.1))
-                # manure_extr = min(1.0, 0.0000144 * water_manure ** 2.0285)
-                NH4_extr = min(1.0, 0.9 * water_manure / (water_manure + 7.1))
-            else:
-                manure_extr = min(1.0, 2.2 * water_manure / (water_manure + 300.1))
-                NH4_extr = 0.0
+        # Manure Phosphorus Leaching
+        # S.5.G.II
 
-        MIP_leach = max(0.0, manure_extr * S.WIP)
-        MOP_leach = max(0.0, manure_extr * S.WOP / 0.6)
-        NH4_leach = max(0.0, NH4_extr * S.NH4)
-
-        MIP_leach = min(MIP_leach, S.WIP)
-        MOP_leach = min(MOP_leach, S.WOP)
-        NH4_leach = min(NH4_leach, S.NH4)  # TODO changed from MOP_leach to NH4_leach
-
-        S.WIP = max(0.0, S.WIP - MIP_leach)
-        S.WOP = max(0.0, S.WOP - MOP_leach)
-        S.NH4 = max(0.0, S.NH4 - NH4_leach)
-
-        S.TIP_leach += MIP_leach
-        S.TOP_leach += MOP_leach
-        S.TN_leach += NH4_leach
+        # S.5.G.II.1
+        S.MIP_leach = min(max(0.0, manure_extr * S.WIP), S.WIP)
+        S.MOP_leach = min(max(0.0, manure_extr * S.WOP / 0.6), S.WOP)
 
         # calculates the concentration of all dissolved P in runoff in MG/L
-
-        runoff_MIP = 0.0
-        runoff_MOP = 0.0
-        runoff_MNH = 0.0
-        S.runoff_IP = 0.0
-        S.runoff_OP = 0.0
-        S.runoff_NH4 = 0.0
         if runoff > 0.0:
 
-            S.PD_factor = (runoff / rainfall[year - 1][day - 1]) ** 0.225
-            S.ND_factor = runoff / rainfall[year - 1][day - 1]
-            # S.ND_factor = 0.034 * exp((runoff / rainfall[year - 1][day - 1]) * 3.4)
+            # S.5.G.II.2
+            S.PD_factor = (runoff / rainfall) ** 0.225
 
-            S.runoff_IP = MIP_leach / (rainfall[year - 1][day - 1] / 10.0) / S.area * 10.0 * S.PD_factor
-            S.runoff_OP = MOP_leach / (rainfall[year - 1][day - 1] / 10.0) / S.area * 10.0 * S.PD_factor
-            S.runoff_NH4 = NH4_leach / (rainfall[year - 1][day - 1] / 10.0) / S.area * 10.0 * S.ND_factor
+            # S.5.G.II.3
+            S.MIP_runoff = min(
+                    max(
+                        0.0,
+                        (S.MIP_leach / (rainfall / 10.0) / S.area * 10.0 * S.PD_factor) * 0.01 * S.area),
+                    S.MIP_leach)
 
-            # calculate manure runoff P in KG
+            S.MOP_runoff = min(
+                    max(
+                        0.0,
+                        (S.MOP_leach / (rainfall / 10.0) / S.area * 10.0 * S.PD_factor) * runoff * 0.01 * S.area),
+                    S.MOP_leach)
 
-            runoff_MIP = max(0.0, S.runoff_IP * runoff * 0.01 * S.area)
-            runoff_MOP = max(0.0, S.runoff_OP * runoff * 0.01 * S.area)
-            runoff_MNH = max(0.0, S.runoff_NH4 * runoff * 0.01 * S.area)
+        # S.5.G.II.4
+        S.MIP_leach -= S.MIP_runoff
+        S.MOP_leach -= S.MOP_runoff
 
-            runoff_MIP = min(runoff_MIP, MIP_leach)
-            runoff_MOP = min(runoff_MOP, MOP_leach)
-            runoff_MNH = min(runoff_MNH, NH4_leach)
+        S.WIP -= (S.MIP_leach + S.MIP_runoff)
+        S.WOP -= (S.MIP_leach + S.MOP_runoff)
 
+        S.MIP_leach_annual += S.MIP_leach
+        S.MOP_leach_annual += S.MOP_leach
+        S.M_leach = S.MIP_leach - S.MIP_runoff + S.MOP_leach - S.MOP_runoff
         # convert soil P from KG/HA to KG and add manure P leached
 
-        # TODO math
-        S.soil_layers[0].labile_P += 0.6 * (MIP_leach - runoff_MIP + MOP_leach - runoff_MOP)
+        DF = 0.6
+        M_not_leached = S.M_leach
+        for layer in S.soil_layers:
+            layer.labile_P *= S.area
 
-        if S.soil_layers[1].bottom_depth_cm <= 15.0:
+            layer.labile_P += DF * S.M_leach
+            M_not_leached -= DF * S.M_leach
 
-            # TODO math
-            S.soil_layers[1].labile_P += 0.3 * (MIP_leach - runoff_MIP + MOP_leach - runoff_MOP)
-            S.soil_layers[2].labile_P += 0.1 * (MIP_leach - runoff_MIP + MOP_leach - runoff_MOP)
+            layer.labile_P /= S.area
 
-        else:
+            DF = max(0.0, (DF / 2) - 0.02)
 
-            # TODO math
-            S.soil_layers[1].labile_P += 0.4 * (MIP_leach - runoff_MIP + MOP_leach - runoff_MOP)
+        S.DRP_leachate_annual += M_not_leached
 
-        # add manure P leached and in runoff to running total
+        S.WIP_runoff_annual += S.MIP_runoff
+        S.WOP_runoff_annual += S.MOP_runoff
 
-        S.WIP_R_sum += runoff_MIP
-        S.WOP_R_sum += runoff_MOP
-        S.NH4_R_sum += S.runoff_NH4
-        S.WIP_L_sum += (MIP_leach - runoff_MIP)
-        S.WOP_L_sum += (MOP_leach - runoff_MOP)
-        S.NH4_L_sum += (NH4_leach - runoff_MNH)
+        S.WIP_leachate_annual += S.MIP_leach
+        S.WOP_leachate_annual += S.MOP_leach
 
-        # decompose manure and manure P in KG
+        # Manure Decomposition
+        # S.5.G.III
 
-        wet = -0.3 * S.moisture + 0.27
-        dry = (-0.05 * (S.manure_mass / S.manure_mass_app) + 0.075) * TFA
+        # S.5.G.III.1
+        wet_rate = -0.3 * S.manure_moisture + 0.27
+        dry_rate = (-0.05 * (S.manure_mass / S.manure_mass_app) + 0.075) * TFA
 
-        if rainfall[year - 1][day - 1] > 4.0:
-            S.moisture += wet
-        elif rainfall[year - 1][day - 1] <= 1.0:
-            S.moisture -= dry
+        # S.5.G.III.2
+        if rainfall > 4.0:
+            S.manure_moisture += wet_rate
+        elif rainfall <= 1.0:
+            S.manure_moisture -= dry_rate
 
-        S.moisture = min(0.9, max(0.0, S.moisture))
+        # S.5.G.III.3
+        S.manure_moisture = min(0.9, max(0.0, S.manure_moisture))
 
+        # S.5.G.III.4
         AWDCR = 0.003 * TFA ** 0.5
-        ASIM = 30.0 * exp(2.5 * S.moisture)
+        ASIM = 30.0 * exp(2.5 * S.manure_moisture)
 
-        d_com = max(0.0, S.manure_mass * AWDCR)
-        d_com = min(d_com, S.manure_mass)
+        # S.5.G.III.5
+        d_com = min(max(0.0, S.manure_mass * AWDCR), S.manure_mass)
 
-        cov_d_com = max(0.0, d_com / S.manure_mass * S.manure_cov)
-        cov_d_com = min(cov_d_com, S.manure_cov)
+        # S.5.G.III.6
+        cov_d_com = min(max(0.0, d_com / S.manure_mass * S.manure_cov), S.manure_cov)
 
-        # This should be commented out
+        # S.5.G.III.7
+        SIP_d_com = min(S.SIP, max(0.0, S.SIP * 0.0025 * min(TFA, S.manure_moisture)))
+        SOP_d_com = min(S.SOP, max(0.0, S.SOP * 0.01 * min(TFA, S.manure_moisture)))
+        WOP_d_com = min(S.WOP, max(0.0, S.WOP * 0.1 * min(TFA, S.manure_moisture)))
 
-        # SIP_d_com = max(0.0, S.SIP * 0.0025 * TFA * S.moisture)
-        # if SIP_d_com > S.SIP:
-        #     SIP_d_com = S.SIP
-        # SOP_d_com = max(0.0, S.SOP * 0.01 * TFA * S.moisture)
-        # if SOP_d_com > S.SOP:
-        #     SOP_d_com = S.SOP
-        # man_ASIM = max(0.0, S.manure_mass * 0.025 * TFA * S.moisture)
-        # if man_ASIM > S.manure_mass:
-        #     man_ASIM = S.manure_mass
+        # S.5.G.III.8
+        man_ASIM = min(S.manure_mass, max(0.0, ASIM * TFA * S.manure_cov))
 
-        SIP_d_com = max(0.0, S.SIP * 0.0025 * min(TFA, S.moisture))
-        SIP_d_com = min(SIP_d_com, S.SIP)
+        # S.5.G.III.9
+        cov_ASIM = min(S.manure_cov, max(0.0, man_ASIM / S.manure_mass * S.manure_cov))
 
-        SOP_d_com = max(0.0, S.SOP * 0.01 * min(TFA, S.moisture))
-        SOP_d_com = min(SOP_d_com, S.SOP)
-
-        SON_d_com = max(0.0, S.SON * 0.01 * min(TFA, S.moisture))
-        SON_d_com = min(SON_d_com, S.SON)
-
-        WOP_d_com = max(0.0, S.WOP * 0.1 * min(TFA, S.moisture))
-        WOP_d_com = min(WOP_d_com, S.WOP)
-
-        man_ASIM = max(0.0, ASIM * TFA * S.manure_cov)
-        man_ASIM = min(man_ASIM, S.manure_mass)
-
-        cov_ASIM = max(0.0, man_ASIM / S.manure_mass * S.manure_cov)
-        cov_ASIM = min(cov_ASIM, S.manure_cov)  # TODO cov_ASIM was cov_d_com in min()
-
-        WIP_ASIM = max(0.0, man_ASIM / S.manure_mass * S.WIP)
-        WIP_ASIM = min(WIP_ASIM, S.WIP)
-
-        NH4_ASIM = max(0.0, man_ASIM / S.manure_mass * S.NH4)
-        NH4_ASIM = min(NH4_ASIM, S.NH4)
-
-        SIP_ASIM = max(0.0, man_ASIM / S.manure_mass * S.SIP)
-        SIP_ASIM = min(SIP_ASIM, S.SIP)
-
-        WOP_ASIM = max(0.0, man_ASIM / S.manure_mass * S.WOP)
-        WOP_ASIM = min(WOP_ASIM, S.WOP)
-
-        SOP_ASIM = max(0.0, man_ASIM / S.manure_mass * S.SOP)
-        SOP_ASIM = min(SOP_ASIM, S.SOP)
-
-        SON_ASIM = max(0.0, man_ASIM / S.manure_mass * S.SON)
-        SON_ASIM = min(SON_ASIM, S.SON)
+        # S.5.G.III.10
+        WIP_ASIM = min(S.WIP, max(0.0, man_ASIM / S.manure_mass * S.WIP))
+        WOP_ASIM = min(S.WOP, max(0.0, man_ASIM / S.manure_mass * S.WOP))
+        SIP_ASIM = min(S.WIP, max(0.0, man_ASIM / S.manure_mass * S.SIP))
+        SOP_ASIM = min(S.SOP, max(0.0, man_ASIM / S.manure_mass * S.SOP))
 
         S.SOP = max(0.0, S.SOP - SOP_ASIM - SOP_d_com)
-        S.SON = max(0.0, S.SON - SON_ASIM - SON_d_com)
         S.WOP = max(0.0, S.WOP - WOP_ASIM - WOP_d_com)
         S.SIP = max(0.0, S.SIP - SIP_ASIM - SIP_d_com)
         S.WIP = max(0.0, S.WIP - WIP_ASIM)
-        S.NH4 = max(0.0, S.NH4 - NH4_ASIM)
 
+        # Decomposition and assimilation transfer between pools in some cases
+        # S.5.G.II.11
         S.WIP += WOP_d_com + SOP_d_com * 0.75 + SIP_d_com
         S.WOP += SOP_d_com * 0.25
-        S.NH4 += SON_d_com
 
-        S.DP_sum += SIP_ASIM + WOP_ASIM + SOP_ASIM + WIP_ASIM
-        S.N_sum += SON_ASIM + NH4_ASIM
+        # Total decomposed P
+        # S.5.G.III.12
+        S.DP = SIP_ASIM + WOP_ASIM + SOP_ASIM + WIP_ASIM
 
+        # Update manure mass and cover to reflect decomposition
+        # S.5.G.III.13
         S.manure_mass = max(0.0, S.manure_mass - d_com - man_ASIM)
-
         S.manure_cov = S.manure_cov - cov_d_com - cov_ASIM
 
-        # This should be commented out
+        DF = 0.6
+        DP_not_decomposed = S.DP
+        for layer in S.soil_layers:
+            # S.5.B.3
+            layer.labile_P *= S.area
 
-        # S.manure_cov = S.cover_SLP * S.manure_mass * S.area
+            # S.5.G.IV.14
+            layer.labile_P += DF * S.DP
+            DP_not_decomposed -= DF * S.DP
 
-        # convert soil P form KG/HA to KG and add manure P decomposed
+            # S.5.B.4
+            layer.labile_P /= S.area
 
-        S.soil_layers[0].active_P += SIP_ASIM * 0.6
+            DF = max(0.0, (DF / 2) - 0.02)
 
-        # TODO math
-        S.soil_layers[0].labile_P += 0.6 * (WIP_ASIM + WOP_ASIM + SOP_ASIM)
+        S.DRP_leachate_annual += DP_not_decomposed
 
-        if S.soil_layers[1].bottom_depth_cm <= 15.0:
-
-            S.soil_layers[1].active_P += SIP_ASIM * 0.3
-            S.soil_layers[2].active_P += SIP_ASIM * 0.1
-
-            # TODO math
-            S.soil_layers[1].labile_P += 0.3 * (WIP_ASIM + WOP_ASIM + SOP_ASIM)
-            S.soil_layers[2].labile_P += 0.1 * (WIP_ASIM + WOP_ASIM + SOP_ASIM)
-
-        else:
-
-            S.soil_layers[1].active_P += SIP_ASIM * 0.4
-
-            # TODO math
-            S.soil_layers[1].labile_P += 0.4 * (WIP_ASIM + WOP_ASIM + SOP_ASIM)
-
-    # convert soil P from KG/HA to KG and add manure P decomposed
-
-    for w in range(0, 3):
-        S.soil_layers[w].active_P /= S.area
-        S.soil_layers[w].labile_P /= S.area
-
-    # calculate runoff P in MG/L from both soil and manure
-    # and manure P in runoff from spreading and grazing
-
+    # calculate manure runoff P in MG/L
+    # S.5.G.IV
+    S.M_DRP_runoff = 0.0
+    S.TIP_runoff = 0.0
     if runoff > 0.0:
-        S.soil_P[0] = S.soil_layers[0].labile_P / S.soil_layers[0].bulk_density / S.thickness_cm[0] / 0.1
-        S.SRP_MGL = S.soil_P[0] * 0.005
+        # S.5.G.IV.1
+        layer = S.soil_layers[0]
+        layer.soil_P = layer.labile_P / layer.bulk_density / layer.thickness_cm
 
-        S.T_runoff_IP = S.runoff_IP + S.SRP_MGL + S.fert_runoff_P
+        # S.5.G.IV.2/3
+        S.M_DRP_runoff = layer.soil_P * 0.005
+        S.TIP_runoff = S.MIP_runoff + S.M_DRP_runoff + S.fert_runoff_P
 
-    else:
-        S.SRP_MGL = 0.0
-        S.T_runoff_IP = 0.0
+        S.M_DRP_runoff_annual += S.M_DRP_runoff
+        S.TIP_runoff_annual += S.TIP_runoff

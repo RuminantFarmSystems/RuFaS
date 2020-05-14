@@ -1,23 +1,47 @@
 {
-    "storage_type": "bag",
-    "moisture": "direct_cut",
-    "additive": "preservative",
-    "packing_density": 14,
-    "inoculation": "heterofermentative",
-    "bunk_type": "open_floor",
-    "ventilation": true,
-    "removal_rate": 6,
-
-    "initial_dry_matter": 0,
-
-    "feed_library": "manure_feed_test.csv",
-
-    "available_feeds":
-    [
-      "Corn_grain",
-      "Legume_hay",
-      "Cotton_seed",
-      "Roasted_soybean",
-      "Rye_hay"
-    ]
+    "feed_database": "Inputs/feeds.sqlite",
+    "table_name": "feed_library",
+    "managed_feeds": [
+            "Corn_grain",
+            "Legume_hay",
+            "Cotton_seed",
+            "Roasted_soybean",
+            "Rye_hay"
+        ],
+    "storage_options": {
+        "storage_1": {
+            "storage_type": "bag",
+            "moisture": "direct_cut",
+            "additive": "preservative",
+            "packing_density": 14,
+            "inoculation": "heterofermentative",
+            "bunk_type": "open_floor",
+            "ventilation": true,
+            "removal_rate": 6,
+            "initial_dry_matter": 0
+        },
+        "storage_2": {
+            "storage_type": "bag",
+            "moisture": "direct_cut",
+            "additive": "preservative",
+            "packing_density": 14,
+            "inoculation": "heterofermentative",
+            "bunk_type": "open_floor",
+            "ventilation": true,
+            "removal_rate": 6,
+            "initial_dry_matter": 0
+        },
+        "storage_3": {
+            "storage_type": "bag",
+            "moisture": "direct_cut",
+            "additive": "preservative",
+            "packing_density": 14,
+            "inoculation": "heterofermentative",
+            "bunk_type": "open_floor",
+            "ventilation": true,
+            "removal_rate": 6,
+            "initial_dry_matter": 0
+        }
+    }
 }
+

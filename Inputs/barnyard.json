@@ -3,6 +3,7 @@
     {
         "start_date" : "2009:244",
         "end_date" : "2016:243",
+        "latitude": 43.332708,
         "output_dir": "Outputs/Sample_Farm_Outputs/",
         "diagnostic_dir": "Outputs/diagnostics/",
         "run_tests": false
@@ -19,7 +20,7 @@
             {
                 "produce_csv": true,
                 "produce_graphics": false,
-                "display_graphics": false,
+
                 "report_name": "Crop Summary",
                 "file_name": "crop_summary.csv"
             },
@@ -27,7 +28,7 @@
             {
                 "produce_csv": true,
                 "produce_graphics": false,
-                "display_graphics": false,
+
                 "report_name": "Soil Summary",
                 "file_name": "soil_summary.csv"
             },
@@ -35,7 +36,7 @@
             {
                 "produce_csv": true,
                 "produce_graphics": false,
-                "display_graphics": false,
+
                 "report_name": "Soil Nitrogen",
                 "file_name": "soil_nitrogen.csv"
             },
@@ -43,7 +44,7 @@
             {
                 "produce_csv": true,
                 "produce_graphics": false,
-                "display_graphics": false,
+
                 "report_name": "Soil Phosphorus",
                 "file_name": "soil_phosphorus.csv"
             },
@@ -51,7 +52,7 @@
             {
                 "produce_csv": true,
                 "produce_graphics": false,
-                "display_graphics": false,
+
                 "report_name": "Water Balance",
                 "file_name": "water_balance.csv"
             },
@@ -59,7 +60,7 @@
             {
                 "produce_csv": true,
                 "produce_graphics": false,
-                "display_graphics": false,
+
                 "report_name": "Custom Report",
                 "file_name": "custom_report.csv"
             }
@@ -73,7 +74,7 @@
             {
                 "produce_csv": true,
                 "produce_graphics": false,
-                "display_graphics": false,
+
                 "report_name": "Ration Report",
                 "file_name": "ration_report.csv",
                 "ration_interval": 7
@@ -82,14 +83,14 @@
             {
         	    "produce_csv": true,
                 "produce_graphics": false,
-                "display_graphics": false,
+
         	    "report_name": "Manure Report",
         	    "file_name": "manure_report.csv"
             },
             "growth_report": {
                 "produce_csv": true,
                 "produce_graphics": false,
-                "display_graphics": false,
+
                 "report_name": "Growth Report",
                 "file_name": "growth_report.csv"
             }
@@ -98,7 +99,7 @@
         {
             "produce_csv": true,
             "produce_graphics": false,
-            "display_graphics": false,
+
             "report_name": "Feed Storage",
             "file_name": "feed_storage.csv"
         }
@@ -111,7 +112,7 @@
             "field_1":
             {
                 "soil": "barnyard_soil.json",
-                "crop": "alfalfa_rotation.json",
+                "crop": "corn_rotation.json",
                 "applications": "barnyard_applications.json"
             }
         },

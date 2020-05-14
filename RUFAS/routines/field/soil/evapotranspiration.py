@@ -23,11 +23,11 @@ Soil attribute definitions
 
     H0 = extraterrestrial radiation (mm m^-2d^-1)
 
-    Tmax = maximum air temperature for a given day (ºC)
+    T_max = maximum air temperature for a given day (ºC)
 
-    Tmin = minimum air temperature for a given day (ºC)
+    T_min = minimum air temperature for a given day (ºC)
 
-    Tavg = mean air temperature for a given day (ºC)
+    T_avg = mean air temperature for a given day (ºC)
 
     trans_max = maximum transpiration on a given day (mm H20)
 
@@ -35,9 +35,9 @@ Soil attribute definitions
 
     evap = maximum soil evaporation/sublimation on a given day (mm H20)
 
-    SoilCov = soil cover index
+    soil_cov = soil cover index
 
-    BioMass = aboveground biomass and residue (kg/ha)
+    bio_mass = above ground biomass and residue (kg/ha)
 
     evap_z = evaporation demand at depth z (mm H20)
 
@@ -60,17 +60,18 @@ Soil values updated by calling update_all():
     soil.soil_layers.evap
 
 """
-###############################################################################
 
 from math import exp
 
 
-#
-# This function calls all the necessary functions to update information related
-# to evapotranspiration
-#
 def update_all(soil, crop, weather, time):
-    calc_potential_evap(soil, crop, weather, time)
+    """
+    Description:
+        This function calls all the necessary functions to update information related
+        to evapotranspiration
+    """
+
+    calc_potential_evap(soil, weather, time)
 
     calc_crop_transpiration(soil, crop)
 
@@ -79,39 +80,46 @@ def update_all(soil, crop, weather, time):
     update_evap_z(soil)
 
 
-#
-# Calculates potential evapotranspiration ET_max using the Hargreaves method
-# "pseudocode_soil" S.2.B.1
-#
-def calc_potential_evap(soil, crop, weather, time):
+def calc_potential_evap(soil, weather, time):
+    """
+    Description:
+        Calculates potential evapotranspiration ET_max using the Hargreaves method
+        "pseudocode_soil" S.2.B.1
+    """
+
     H0 = weather.radiation[time.year - 1][time.day - 1]
 
-    Tmax = weather.T_max[time.year - 1][time.day - 1]
-    Tmin = weather.T_min[time.year - 1][time.day - 1]
-    Tavg = weather.T_avg[time.year - 1][time.day - 1]
+    T_max = weather.T_max[time.year - 1][time.day - 1]
+    T_min = weather.T_min[time.year - 1][time.day - 1]
+    T_avg = weather.T_avg[time.year - 1][time.day - 1]
 
-    LHV = calc_LHV(Tavg)
+    LHV = calc_LHV(T_avg)
 
-    ET_max = (0.0023 * H0 * ((Tmax - Tmin) ** 0.5) * (Tavg + 17.8)) / LHV
+    ET_max = (0.0023 * H0 * ((T_max - T_min) ** 0.5) * (T_avg + 17.8)) / LHV
 
     soil.ET_max = max(0.001, ET_max)
 
-#
-# Calculates LHV (latent heat of vaporization (MJ kg^-1)) for use in
-# determining potential evapotranspiration
-# "pseudocode_soil" S.2.B.2
-#
-def calc_LHV(Tavg):
-    return 2.501 - (2.361 * (10 ** (-3)) * Tavg)
+
+def calc_LHV(T_avg):
+    """
+    Description:
+        Calculates LHV (latent heat of vaporization (MJ kg^-1)) for use in
+        determining potential evapotranspiration
+        "pseudocode_soil" S.2.B.2
+    """
+
+    return 2.501 - (2.361 * (10 ** (-3)) * T_avg)
 
 
-#
-# Calculates crop transpiration as a function of maximum transpiration on a
-# given day and Leaf Area Index (calculated in the Crop Routine file
-# leaf_area_index.py)
-# "pseudocode_soil" S.2.B.3
-#
 def calc_crop_transpiration(soil, crop):
+    """
+    Description:
+        Calculates crop transpiration as a function of maximum transpiration on a
+        given day and Leaf Area Index (calculated in the Crop Routine file
+        leaf_area_index.py)
+        "pseudocode_soil" S.2.B.3
+    """
+
     LAI = crop.current_crop.LAI_actual
     if 0 <= LAI <= 3.0:
         soil.trans_max = (soil.ET_max * LAI) / 3.0
@@ -119,38 +127,44 @@ def calc_crop_transpiration(soil, crop):
         soil.trans_max = soil.ET_max
 
 
-#
-# Calculates sublimation and soil evaporation
-# "pseudocode_soil" S.2.B.4/6
-#
 def calc_soil_evap(soil, crop):
-    SoilCov = calc_soil_cov(soil, crop)
+    """
+    Description:
+        Calculates sublimation and soil evaporation
+        "pseudocode_soil" S.2.B.4/6
+    """
+
+    soil_cov = calc_soil_cov(soil, crop)
 
     # "pseudocode_soil" S.2.B.4
-    evap_max = soil.ET_max * SoilCov
+    evap_max = soil.ET_max * soil_cov
 
     # "pseudocode_soil" S.2.B.6
     soil.evap_max = min(evap_max, ((evap_max * soil.ET_max) / (evap_max + soil.trans_max)))
 
 
-#
-# Calculates soil cover for use in calculating soil evaporation
-# "pseudocode_soil" S.2.B.5
-#
 def calc_soil_cov(soil, crop):
+    """
+    Description:
+        Calculates soil cover for use in calculating soil evaporation
+        "pseudocode_soil" S.2.B.5
+    """
+
     bio_AG = crop.current_crop.bio_AG
     residue = soil.residue
-    BioMass = bio_AG + residue
+    bio_mass = bio_AG + residue
 
-    return exp(-5.0 * (10 ** -5) * BioMass)
+    return exp(-5.0 * (10 ** -5) * bio_mass)
 
 
-#
-# Calculates the evap for each layer of soil in a given profile as a function
-# of the evaporation demand between the soil layers above and below.
-# "pseudocode_soil" S.2.B.7-10
-#
 def update_evap_z(soil):
+    """
+    Description:
+        Calculates the evap for each layer of soil in a given profile as a function
+        of the evaporation demand between the soil layers above and below.
+        "pseudocode_soil" S.2.B.7-10
+    """
+
     for x in range(len(soil.soil_layers)):
         curr_layer = soil.soil_layers[x]
 
