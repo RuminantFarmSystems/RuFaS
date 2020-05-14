@@ -38,22 +38,22 @@ def update_all(S, application, weather, time):
                 for layer in S.soil_layers:
 
                     # incorporate surface manure and fertilizer into the first layer
-                    # S.6.D.1
+                    # S.5.D.1
                     if S.soil_layers.index(layer) == 0:
-                        # S.6.B.3
+                        # S.5.B.3
                         layer.active_P *= S.area
                         layer.labile_P *= S.area
 
                         layer.labile_P += till_app.percent_incorporated[i] * \
                                           (S.fert_P_available + S.fert_P_released)
 
-                        # S.6.D.2
+                        # S.5.D.2
                         S.fert_P_available = S.fert_P_available - \
                                              (S.fert_P_available * till_app.percent_incorporated[i])
                         S.fert_P_released = S.fert_P_released - \
                                             (S.fert_P_released * till_app.percent_incorporated[i])
 
-                        # S.6.D.3 TODO: RuFaS does not track org P (03.19.20).
+                        # S.5.D.3 TODO: RuFaS does not track org P (03.19.20).
                         layer.labile_P += till_app.percent_incorporated[i] * S.WIP
                         layer.active_P += till_app.percent_incorporated[i] * S.SIP
 
@@ -63,12 +63,12 @@ def update_all(S, application, weather, time):
                         S.SOP -= S.SOP * till_app.percent_incorporated[i]
                         S.manure_mass -= S.manure_mass * till_app.percent_incorporated[i]
 
-                        # S.6.B.4
+                        # S.5.B.4
                         layer.active_P /= S.area
                         layer.labile_P /= S.area
 
                     # Mix soil in accordance with the tillage operation
-                    # S.6.D.4
+                    # S.5.D.4
                     if layer.bottom_depth_cm <= till_app.depth[i]:
                         ratio = layer.mass / till_soil_mass
                         layer.labile_P = (1.0 - till_app.percent_mixed[i]) * layer.labile_P \
