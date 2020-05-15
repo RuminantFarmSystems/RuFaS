@@ -31,7 +31,6 @@ def daily_feed_routine(feed, crop):
 
     if current_crop.yield_actual != 0:
         if len(feed.available_storage) == 0:
-            print("Insufficient storage specified for " + current_crop.crop_name + ". Generating standard storage.")
             standard_data = {
                 "storage_type": "bag",
                 "moisture": "direct_cut",
