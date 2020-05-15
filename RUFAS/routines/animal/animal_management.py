@@ -82,16 +82,16 @@ class AnimalManagement:
         self.ration_user_input = data['ration']['user_input']
         self.formulation_interval = data['ration']['formulation_interval']
 
-    def init_pens(self, pen_data, herd_data):
+    def init_pens(self, all_pens_data, herd_data):
         """
         Populates the list of pens with the information from the input json file.
         Args:
-            pen_data: dictionary with the pen information from the input json file
+            all_pens_data: dictionary with the pen information from the input json file
             herd_data: dictionary with the herd information from the input
         """
 
-        for pen_name in pen_data:
-            pen_data = pen_data[pen_name]
+        for pen_name in all_pens_data:
+            pen_data = all_pens_data[pen_name]
             pen_id = pen_data['id']
             vertical_dist_to_parlor = pen_data['vertical_dist_to_milking_parlor']
             horizontal_dist_to_parlor = pen_data['horizontal_dist_to_milking_parlor']

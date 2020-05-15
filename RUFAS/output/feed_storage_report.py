@@ -46,10 +46,14 @@ class FeedStorage(BaseReportHandler):
                                 'j_day': ['time.day', '', []],
                                 }
 
-        # annual outputs
+        # annual variables
         self.annual_variables = {'year': ['time.calendar_year', '', 0],
-                                 'dry_matter': ['feed.DM', 'kg', 0],
-                                 'crude_protein': ['feed.CP', 'kg', 0],
+                                 'DM': ['feed.DM', 'kg', 0],
+                                 'C': ['feed.C', 'kg', 0],
+                                 'N': ['feed.N', 'kg', 0],
+                                 'P': ['feed.P', 'kg', 0],
+                                 'CP': ['feed.CP', 'kg', 0],
+                                 'NPN': ['feed.NPN', 'kg', 0],
                                  'C_loss': ['feed.C_loss', 'kg', 0],
                                  'CP_loss': ['feed.CP_loss', 'kg', 0]
                                  }

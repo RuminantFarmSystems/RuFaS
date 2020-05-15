@@ -31,7 +31,7 @@ def update_all(storage):
 
     feed_out_loss(storage)
 
-    update_C(storage)
+    update_carbon(storage)
 
 
 def harvest_loss(storage):
@@ -67,7 +67,7 @@ def feed_out_loss(storage):
     storage.C_feed_out_particle = storage.C * storage.C_feed_out_particle_percent
 
 
-def update_C(storage):
+def update_carbon(storage):
     """
     Description:
         Update stored carbon based on calculated losses

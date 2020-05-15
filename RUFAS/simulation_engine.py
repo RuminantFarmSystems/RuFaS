@@ -128,7 +128,7 @@ def read_json_file(fPath: Path):
     information into dictionaries and instantiates the simulation objects with
     them. Assigns the objects to the global simulation variables.
 
-    Inputs:
+    Args:
         fPath (Path): Path to the input json file
 
     Raises:
