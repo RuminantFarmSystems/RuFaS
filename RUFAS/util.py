@@ -6,7 +6,7 @@ Author(s): Kass Chupongstimun, kass_c@hotmail.com
            Jit Patil, spatil5@wisc.edu
 """
 
-import pulp.solvers
+import pulp
 import sys
 from pathlib import Path
 
@@ -17,6 +17,7 @@ class DatabaseReader:
     """
     Description: Stores the information from the database source specified.
     """
+
     def __init__(self, database_file: str, table_name, identifier=None,
                  desired_rows=None):
         """
@@ -155,14 +156,13 @@ def LP_solve(LHS, RHS, objective, var_names, operators,
             'variableN_name': variable value
             }
     """
-
-    LP = None
     num_variables = len(var_names)
 
     # Ensure the LP is structured correctly
     if is_correct_structure(LHS, RHS, objective, var_names):
         LP = create_LP_problem(name, mode)
     else:
+        LP = None
         print("Incorrect LP structure. Exiting ...")
         exit()
 
@@ -186,7 +186,10 @@ def LP_solve(LHS, RHS, objective, var_names, operators,
 
 
 def create_LP_problem(name, mode):
-    """Initializes the LP problem"""
+    """
+    Description:
+        Initializes the LP problem
+    """
 
     LP = None
     if mode.lower().startswith("min"):
@@ -262,15 +265,15 @@ def solve_with_fastest_solver(LP):
     """Finds the fastest solver available, and uses it to solve the LP."""
 
     try:
-        LP.solve(pulp.solvers.GUROBI(msg=0))
+        LP.solve(pulp.GUROBI_CMD(msg=0))
     except pulp.PulpSolverError:
         try:
-            LP.solve(pulp.solvers.GLPK(msg=0))
+            LP.solve(pulp.GLPK(msg=0))
         except pulp.PulpSolverError:
             try:
-                LP.solve(pulp.solvers.PULP_CBC_CMD(msg=0))
+                LP.solve(pulp.PULP_CBC_CMD(msg=0))
             except pulp.PulpSolverError:
-                LP.solve(pulp.solvers.COIN_CMD(msg=0))
+                LP.solve(pulp.COIN_CMD(msg=0))
 
 
 def organize_results(LP):
@@ -292,7 +295,10 @@ def organize_results(LP):
 
 def LP_print(LHS, RHS, objective, variables, operators,
              mode="min", name="LP", min_v=None, max_v=None):
-    """Text representation of the Linear Programming problem."""
+    """
+    Description:
+        Text representation of the Linear Programming problem.
+    """
 
     LHS = [[round(x, 4) for x in row] for row in LHS]
     RHS = [round(x, 4) for x in RHS]
@@ -340,32 +346,3 @@ def LP_print(LHS, RHS, objective, variables, operators,
     print(LP_text)
     print("* All floats rounded to 4 decimal places")
     return LP_text
-
-#
-# Takes in the path to a csv file with the path starting after MASM/
-# This function returns a list of tuples. Each tuple is the contents of
-# a column in the csv. Thus, returnedList[0] would be the tuple of the contents
-# in the first column in the csv. If an entry in the csv can be turned into a
-# float, then it will be.
-#
-# This is useful for reading in time series data where each column corresponds
-# to data of a specific attribute such as temperature.
-#
-# def get_csv_columns(fileName):
-#     filePath = get_base_dir() / fileName
-#     with filePath.open("r") as input:
-#         readCSV = csv.reader(input, delimiter=',')
-#         allRows = list(readCSV)
-#
-#         # Convert all numerical data to floats if possible
-#         allRows = [[try_to_float(value) for value in row] for row in allRows]
-#
-#         allColumns = zip(*allRows)
-#         return list(allColumns)
-
-
-def try_to_float(file_input):
-    try:
-        return float(file_input)
-    except:
-        return file_input

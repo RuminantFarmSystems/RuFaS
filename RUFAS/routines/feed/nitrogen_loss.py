@@ -23,7 +23,6 @@ def update_all(storage):
     Description:
         The only external function call. Runs the nitrogen loss sub-module
     """
-
     CP_loss(storage)
 
     NPN_loss(storage)
@@ -40,7 +39,6 @@ def CP_loss(storage):
     storage.CP_gas = storage.CP * storage.CP_gas_percent
 
     storage.CP_leachate = storage.CP * storage.CP_leachate_percent
-
 
 def NPN_loss(storage):
     """
