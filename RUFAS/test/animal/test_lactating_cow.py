@@ -22,28 +22,34 @@ class LactatingCowTest(unittest.TestCase):
         Sets up the list of various feeds that will be used for the unit tests.
         """
         feed_info_0 = {
-            "storage_type": "bag",
-            "moisture": "direct_cut",
-            "additive": "preservative",
-            "packing_density": 14,
-            "inoculation": "heterofermentative",
-            "bunk_type": "open_floor",
-            "ventilation": True,
-            "removal_rate": 6,
-
-            "initial_dry_matter": 0,
-
             "feed_database": "Inputs/feeds.sqlite",
             "table_name": "feed_library",
 
             "managed_feeds":
-            [
-              "Corn_grain",
-              "Legume_hay",
-              "Cotton_seed",
-              "Roasted_soybean",
-              "Rye_hay"
-            ]
+                [
+                    "Corn_grain",
+                    "Legume_hay",
+                    "Cotton_seed",
+                    "Roasted_soybean",
+                    "Rye_hay"
+                ],
+
+            "storage_options":
+                {
+                    "storage_1":
+                        {
+                            "storage_type": "bag",
+                            "moisture": "direct_cut",
+                            "additive": "preservative",
+                            "packing_density": 14,
+                            "inoculation": "heterofermentative",
+                            "bunk_type": "open_floor",
+                            "ventilation": True,
+                            "removal_rate": 6,
+
+                            "initial_dry_matter": 0
+                        }
+                }
         }
         self.feeds = [Feed(feed_info_0)]
 

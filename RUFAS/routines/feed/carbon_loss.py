@@ -7,7 +7,7 @@ Author(s): William Donovan, wmdonovan@wisc.edu
            Jacob Johnson, jacob8399@gmail.com
 
 Description: This module contains the necessary functions for calculating and
-             updating the carbon loss during harvest, storage, and feedout.
+             updating the carbon loss during harvest, storage, and feed out.
              The only function meant to be used outside of this file is the
              update_all() function. The other functions are meant to serve as
              helper functions within this file.
@@ -22,39 +22,39 @@ Feed values updated by update_all():
 ###############################################################################
 
 
-def update_all(feed):
-    harvest_loss(feed)
+def update_all(storage):
+    harvest_loss(storage)
 
-    storage_loss(feed)
+    storage_loss(storage)
 
-    feedout_loss(feed)
+    feed_out_loss(storage)
 
-    update_carbon(feed)
-
-
-def harvest_loss(feed):
-    feed.C_harvest_gas = feed.carbon * feed.C_harvest_gas_percent
-
-    feed.C_harvest_particle = feed.carbon * feed.C_harvest_particle_percent
+    update_carbon(storage)
 
 
-def storage_loss(feed):
-    feed.C_storage_gas = feed.carbon * feed.C_storage_gas_percent
+def harvest_loss(storage):
+    storage.C_harvest_gas = storage.C * storage.C_harvest_gas_percent
 
-    feed.C_storage_leachate = feed.carbon * feed.C_storage_leachate_percent
-
-
-def feedout_loss(feed):
-    feed.C_feedout_gas = feed.carbon * feed.C_feedout_gas_percent
-
-    feed.C_feedout_particle = feed.carbon * feed.C_feedout_particle_percent
+    storage.C_harvest_particle = storage.C * storage.C_harvest_particle_percent
 
 
-def update_carbon(feed):
-    carbon_loss = (feed.C_harvest_gas + feed.C_harvest_particle +
-                   feed.C_storage_gas + feed.C_storage_leachate +
-                   feed.C_feedout_gas + feed.C_feedout_particle)
+def storage_loss(storage):
+    storage.C_storage_gas = storage.C * storage.C_storage_gas_percent
 
-    feed.carbon -= carbon_loss
+    storage.C_storage_leachate = storage.C * storage.C_storage_leachate_percent
 
-    feed.dry_matter -= carbon_loss
+
+def feed_out_loss(storage):
+    storage.C_feed_out_gas = storage.C * storage.C_feed_out_gas_percent
+
+    storage.C_feed_out_particle = storage.C * storage.C_feed_out_particle_percent
+
+
+def update_carbon(storage):
+    storage.C_loss = (storage.C_harvest_gas + storage.C_harvest_particle +
+                           storage.C_storage_gas + storage.C_storage_leachate +
+                           storage.C_feed_out_gas + storage.C_feed_out_particle)
+
+    storage.C -= storage.C_loss
+
+    storage.DM -= storage.C_loss
