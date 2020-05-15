@@ -55,7 +55,6 @@ def daily_feed_routine(feed, fields):
                         stored = True
 
             if not stored:
-                print("Insufficient storage specified for " + crop_name + ". Simulating standard storage.")
                 standard_data = {
                                     "storage_type": "bag",
                                     "moisture": "direct_cut",
@@ -84,6 +83,7 @@ def daily_feed_routine(feed, fields):
                 feed.available_storage.pop(storage_name)
 
     feed.summarize_feed_storage()
+
 
 def annual_feed_routine():
     pass
