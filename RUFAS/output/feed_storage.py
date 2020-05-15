@@ -42,25 +42,18 @@ class FeedStorage(BaseReportHandler):
         # 1D Lists [julianDay]
         #
         self.daily_variables = {'year': ['time.cal_year', '', []],
-                                'j_day': ['time.day', '', []],
-                                'dry_matter': ['feed.dry_matter', 'kg', []],
-                                'carbon': ['feed.carbon', 'kg', []],
-                                'nitrogen': ['feed.nitrogen', 'kg', []],
-                                'phosphorus': ['feed.phosphorus', 'kg', []],
-                                'crude_protein': ['feed.crude_protein', 'kg', []],
-                                'C_harvest_gas': ['feed.C_harvest_gas', 'kg', []],
-                                'C_harvest_particle': ['feed.C_harvest_particle', 'kg', []],
-                                'C_storage_gas': ['feed.C_storage_gas', 'kg', []],
-                                'C_storage_leachate': ['feed.C_storage_leachate', 'kg', []],
-                                'C_feedout_gas': ['feed.C_feedout_gas', 'kg', []],
-                                'C_feedout_particle': ['feed.C_feedout_particle', 'kg', []],
-                                'CP_gas': ['feed.CP_gas', 'kg', []],
-                                'CP_leachate': ['feed.CP_leachate', 'kg', []],
-                                'NPN': ['feed.NPN', 'idk lol', []]
+                                'j_day': ['time.day', '', []]
                                 }
 
         self.annual_variables = {'year': ['time.cal_year', '', 0],
-                                 'dry_matter': ['feed.dry_matter', 'kg', 0]
+                                 'DM': ['feed.DM', 'kg', 0],
+                                 'C': ['feed.C', 'kg', 0],
+                                 'N': ['feed.N', 'kg', 0],
+                                 'P': ['feed.P', 'kg', 0],
+                                 'CP': ['feed.CP', 'kg', 0],
+                                 'NPN': ['feed.NPN', 'kg', 0],
+                                 'C_loss': ['feed.C_loss', 'kg', 0],
+                                 'CP_loss': ['feed.CP_loss', 'kg', 0]
                                  }
 
     #
