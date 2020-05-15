@@ -40,6 +40,7 @@ def NPN_loss(storage):
 
 def update_CP(storage):
     storage.CP_loss = storage.CP_gas + storage.CP_leachate
+
     storage.CP -= storage.CP_loss
 
     storage.DM -= storage.CP_loss
