@@ -52,8 +52,8 @@ def feed_out_loss(storage):
 
 def update_carbon(storage):
     storage.C_loss = (storage.C_harvest_gas + storage.C_harvest_particle +
-                           storage.C_storage_gas + storage.C_storage_leachate +
-                           storage.C_feed_out_gas + storage.C_feed_out_particle)
+                      storage.C_storage_gas + storage.C_storage_leachate +
+                      storage.C_feed_out_gas + storage.C_feed_out_particle)
 
     storage.C -= storage.C_loss
 
