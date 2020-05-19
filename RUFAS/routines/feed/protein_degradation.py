@@ -1,5 +1,3 @@
-# TODO: No protein degradation currently implemented
-
 """
 RUFAS: Ruminant Farm Systems Model
 File name: protein_degradation.py
@@ -23,7 +21,7 @@ Feed values updated by update_all():
 def update_all():
     """
     Description:
-        TODO: Not currently implemented
+        TODO: No protein_degradation currently implemented
     """
     degrade_protein()
 

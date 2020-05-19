@@ -14,6 +14,9 @@ def humus_mineralization(soil):
         Humus mineralization is the movement of Nitrogen between the Active and
         Stable organic pools
         "pseudocode_soil" S.4.F
+
+    Args:
+        soil:
     """
 
     for layer in soil.soil_layers:

@@ -54,25 +54,31 @@ from math import log, exp
 
 
 def update_all(soil, crop_type):
-    """This function updates all of a crop's phosphorus uptake information.
+    """
+    Description:
+        Invokes the functions necessary to update phosphorus uptake information
+        for the given crop.
 
-    Inputs:
-        crop_type
-        soil
+    Args:
+        soil: an instance of the Soil class specified in soil.py representing
+            the current state of the soil profile
+        crop_type: an instance of a crop class
     """
 
     calc_fr_P(crop_type)
     calc_bio_P_opt(crop_type)
     calc_P_up(crop_type)
-    calc_act_P_up_each_layer(crop_type, soil)
-    calc_bio_P(crop_type, soil)
+    calc_act_P_up_each_layer(soil, crop_type)
+    calc_bio_P(soil, crop_type)
 
 
 def calc_fr_P(crop_type):
-    """Calculates fraction of phosphorus in the plant biomass.
-       "pseudocode_crop" C.6.B.1
+    """
+    Description:
+        Calculates fraction of phosphorus in the plant biomass.
+        "pseudocode_crop" C.6.B.1
 
-    Inputs:
+    Args:
         crop_type
     """
 
@@ -90,20 +96,23 @@ def calc_fr_P(crop_type):
 
 
 def calc_p2(crop_type):
-    """Calculates the second shape coefficient.
-       "pseudocode_crop" C.6.A.1
+    """
+    Description:
+        Calculates the second shape coefficient.
+        "pseudocode_crop" C.6.A.1
 
-    Inputs:
+    Args:
         crop_type
+
     Returns:
         float: second shape coefficient
     """
 
-    first_term = calc_log_term_of_shape_coeff(
+    first_term = calc_log_term_of_shape_coefficient(
         crop_type, crop_type.fr_PHU_50, crop_type.fr_p2
     )
 
-    second_term = calc_log_term_of_shape_coeff(
+    second_term = calc_log_term_of_shape_coefficient(
         crop_type, crop_type.fr_PHU_100, crop_type.fr_p3ish
     )
 
@@ -113,45 +122,54 @@ def calc_p2(crop_type):
 
 
 def calc_p1(crop_type, p2):
-    """Calculates the first shape coefficient.
-       "pseudocode_crop" C.6.A.2
+    """
+    Description:
+        Calculates the first shape coefficient.
+        "pseudocode_crop" C.6.A.2
 
-    Inputs:
+    Args:
         crop_type
         p2: second shape coefficient
+
     Returns:
         float: first shape coefficient
     """
 
-    first_term = calc_log_term_of_shape_coeff(
+    first_term = calc_log_term_of_shape_coefficient(
         crop_type, crop_type.fr_PHU_50, crop_type.fr_p2
     )
 
     return first_term + p2 * crop_type.fr_PHU_50
 
 
-def calc_log_term_of_shape_coeff(crop_type, fr_PHU_frac, fr_p):
-    """Helper function. Calculates the log term in the shape coefficient calculations
-       "pseudocode_crop" C.6.A.2
+def calc_log_term_of_shape_coefficient(crop_type, fr_PHU_frac, fr_px):
+    """
+    Description:
+        Helper function. Calculates the log term in the shape coefficient calculations
+        "pseudocode_crop" C.6.A.2
 
-    Inputs:
+    Args:
         crop_type
-        fr_PHU_frac: fr_PHU type that is sent in
-        fr_p: fr_PHU_p type
+        fr_PHU_frac: the fraction of the fraction of potential heat units
+        fr_px: this function is used to calculate the log term in the calculations
+            of multiple shape coefficients. The fraction of p shape coefficient x
+
     Returns:
         float: log term in the calculations
     """
 
-    bottom = 1 - (fr_p - crop_type.fr_p3) / (crop_type.fr_p1 - crop_type.fr_p3)
+    bottom = 1 - (fr_px - crop_type.fr_p3) / (crop_type.fr_p1 - crop_type.fr_p3)
     inside = (fr_PHU_frac / bottom) - fr_PHU_frac
     return log(inside)
 
 
 def calc_bio_P_opt(crop_type):
-    """Calculates optimal mass of phosphorus stored in plant material.
-       "pseudocode_crop" C.6.B.2
+    """
+    Description:
+        Calculates optimal mass of phosphorus stored in plant material.
+        "pseudocode_crop" C.6.B.2
 
-    Inputs:
+    Args:
         crop_type
     """
 
@@ -159,10 +177,12 @@ def calc_bio_P_opt(crop_type):
 
 
 def calc_P_up(crop_type):
-    """Calculates potential phosphorus uptake.
-       "pseudocode_crop" C.6.B.3
+    """
+    Description:
+        Calculates potential phosphorus uptake.
+        "pseudocode_crop" C.6.B.3
 
-    Inputs:
+    Args:
         crop_type
     """
 
@@ -174,20 +194,22 @@ def calc_P_up(crop_type):
         crop_type.P_up = 1.5 * min(option1, option2)
 
 
-def calc_act_P_up_each_layer(crop_type, soil):
-    """Calculates the actual phosphorus uptake from soil solution in each layer.
-       Saves the list containing these values to act_P_up_each_layer attribute.
-       The order of the values in the list corresponds with the order of the layers
-       in soil.soil_layers. The soil layers in that list need to be in order
-       of shallowest to deepest for this to work correctly.
-       "pseudocode_crop" C.6.C.4-7
+def calc_act_P_up_each_layer(soil, crop_type):
+    """
+    Description:
+        Calculates the actual phosphorus uptake from soil solution in each layer.
+        Saves the list containing these values to act_P_up_each_layer attribute.
+        The order of the values in the list corresponds with the order of the layers
+        in soil.soil_layers. The soil layers in that list need to be in order
+        of shallowest to deepest for this to work correctly.
+        "pseudocode_crop" C.6.C.4-7
 
-    Inputs:
-        crop_type
+    Args:
         soil
+        crop_type
     """
 
-    P_up_each_layer = calc_P_up_each_layer(crop_type, soil)
+    P_up_each_layer = calc_P_up_each_layer(soil, crop_type)
 
     # Running total of potential phosphorus uptake in overlying layers
     P_up_over = 0
@@ -198,33 +220,35 @@ def calc_act_P_up_each_layer(crop_type, soil):
     # Phosphorus uptake demand not met in overlying soil layers
     P_demand = 0
 
-    for pot_P_up, soilLayer in zip(P_up_each_layer, soil.soil_layers):
+    for pot_P_up, layer in zip(P_up_each_layer, soil.soil_layers):
         # C.6.C.4
-        act_P_up = min((pot_P_up + P_demand), soilLayer.labile_P)
+        act_P_up = min((pot_P_up + P_demand), layer.labile_P)
         # C.6.C.7
-        soilLayer.P_uptake = act_P_up
+        layer.P_uptake = act_P_up
 
         # C.6.C.6
         # Update values for next layer
         P_up_over += pot_P_up
-        P_sol_over += soilLayer.labile_P
+        P_sol_over += layer.labile_P
         # C.6.C.5
         P_demand = P_up_over - P_sol_over
         if P_demand < 0:
             P_demand = 0
 
 
-def calc_P_up_each_layer(crop_type, soil):
-    """Calculates the potential phosphorus uptake from soil solution in each layer.
-       Returns a list containing these values. The order of the values in the list
-       corresponds with the order of the layers in soil.soil_layers. The soil
-       layers in that list need to be in order of shallowest to deepest for this
-       to work correctly.
-       "pseudocode_crop" C.6.C.3
+def calc_P_up_each_layer(soil, crop_type):
+    """
+    Description:
+        Calculates the potential phosphorus uptake from soil solution in each layer.
+        Returns a list containing these values. The order of the values in the list
+        corresponds with the order of the layers in soil.soil_layers. The soil
+        layers in that list need to be in order of shallowest to deepest for this
+        to work correctly.
+        "pseudocode_crop" C.6.C.3
 
-    Inputs:
-        crop_type
+    Args:
         soil
+        crop_type
     """
 
     P_up_each_layer = []
@@ -242,13 +266,16 @@ def calc_P_up_each_layer(crop_type, soil):
 
 
 def calc_P_up_z(crop_type, z):
-    """Calculates potential phosphorus uptake from soil solution at the surface to
-       depth z. This function is used in calc_P_up_each_layer.
-       "pseudocode_crop" C.6.C.1
+    """
+    Description:
+        Calculates potential phosphorus uptake from soil solution at the surface to
+        depth z. This function is used in calc_P_up_each_layer.
+        "pseudocode_crop" C.6.C.1
 
-    Inputs:
+    Args:
         crop_type
-        z: a depth
+        z: the given depth
+
     Returns:
         float: nitrogen uptake from the surface to a depth
     """
@@ -260,10 +287,12 @@ def calc_P_up_z(crop_type, z):
     return term1 * term2
 
 
-def calc_bio_P(crop_type, soil):
-    """Calculates actual mass of phosphorus stored in plant material.
+def calc_bio_P(soil, crop_type):
+    """
+    Description:
+        Calculates actual mass of phosphorus stored in plant material.
 
-    Inputs:
+    Args:
         crop_type
         soil
     """

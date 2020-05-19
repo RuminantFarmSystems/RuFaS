@@ -48,7 +48,7 @@ def grouping(cow_list, pens):
             available pens based on their nutritional requirements relative to the
             rest of the cows.
 
-        Input:
+        Args:
             cow_list: a list of lactating cows
             pens: the number of pens allocated for lactating cows
     """

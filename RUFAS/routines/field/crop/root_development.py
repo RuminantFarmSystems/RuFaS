@@ -31,11 +31,13 @@ CropType values updated by calling update_all():
 
 
 def update_all(crop_type):
-    """This function calls the functions in this module necessary to update the
-       root development of the given crop.
+    """
+    Description:
+        This function calls the functions in this module necessary to update the
+        root development of the given crop.
 
-    Inputs:
-        crop_type
+    Args:
+        crop_type: an instance of a crop
     """
 
     calc_daily_root_biomass(crop_type)
@@ -43,11 +45,13 @@ def update_all(crop_type):
 
 
 def calc_daily_root_biomass(crop_type):
-    """Calculates the fraction of total biomass partitioned to roots
-       on a given day in the growing season (AKA fr_root).
-       "pseudocode_crop" C.3.A.1
+    """
+    Description:
+        Calculates the fraction of total biomass partitioned to roots
+        on a given day in the growing season (AKA fr_root).
+        "pseudocode_crop" C.3.A.1
 
-    Inputs:
+    Args:
         crop_type
     """
 
@@ -55,11 +59,13 @@ def calc_daily_root_biomass(crop_type):
 
 
 def calc_z_root(crop_type):
-    """Calculates depth of root development in the soil on a given
-       day (AKA z_root).
-       "pseudocode_crop" C.3.A.2/3
+    """
+    Description:
+        Calculates depth of root development in the soil on a given
+        day (AKA z_root).
+        "pseudocode_crop" C.3.A.2/3
 
-    Inputs:
+    Args:
         crop_type
     """
 

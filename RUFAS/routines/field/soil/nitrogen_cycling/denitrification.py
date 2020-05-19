@@ -5,7 +5,6 @@ File name: nitrogen_cycling.py
 Description: Implements the nitrogen cycling process of denitrification.
 
 Author(s): William Donovan, wmdonovan@wisc.edu
-
 """
 
 from math import exp

@@ -1,26 +1,38 @@
-################################################################################
 """
+RUFAS
 SurPhos
+
 File name: p_mineralization.py
-Author(s): Jacob Johnson, jacob8399@gmail.com,
-           William Donovan, wmdonovan@wisc.edu
+
+Author(s):  DR. Peter A. Vadas
+            USDA-ARS Dairy Forage Research Center
+            E-mail: peter.vadas@ars.usda.gov
+
+Coder(s):   Jacob Johnson jacob8399@gmail.com
+            William Donovan wmdonovan@wisc.edu
 """
-################################################################################
 
 from math import log, exp
 
 
-# computes P flux between labile and active pools
-# "pseudocode_soil" S.5.H
-def update_all(S, time):
+def update_all(soil, time):
+    """
+    Description:
+        computes P flux between labile and active P pools
+        "pseudocode_soil" S.5.H
+    Args:
+        soil: instance of the Soil class specified in soil.py
+        time: instance of the Time class specified in classes.py
+    """
 
     # S.5.H.1
     uptake_fact = 0.1
-    S.soil_layers[-1].labile_P_uptake = min(S.soil_layers[-1].labile_P, S.soil_layers[-1].P_uptake * uptake_fact)
-    S.soil_layers[-1].labile_P -= S.soil_layers[-1].labile_P_uptake
-    for x in range(len(S.soil_layers) - 2, 0, -1):
-        layer = S.soil_layers[x]
-        prev_layer = S.soil_layers[x + 1]
+    soil.soil_layers[-1].labile_P_uptake = min(soil.soil_layers[-1].labile_P,
+                                               soil.soil_layers[-1].P_uptake * uptake_fact)
+    soil.soil_layers[-1].labile_P -= soil.soil_layers[-1].labile_P_uptake
+    for x in range(len(soil.soil_layers) - 2, 0, -1):
+        layer = soil.soil_layers[x]
+        prev_layer = soil.soil_layers[x + 1]
 
         uptake_fact = layer.labile_P / layer.labile_P + prev_layer.labile_P * 0.9
 
@@ -89,4 +101,4 @@ def update_all(S, time):
             layer.org_P -= min_P
             layer.labile_P += min_P
 
-        S.soil_layers[x] = layer
+        soil.soil_layers[x] = layer

@@ -13,27 +13,20 @@ Description: This module contains the necessary functions for calculating and
 
 Soil attribute definitions
 
-    runoff = daily runoff (mm H20)
+    runoff = daily runoff (mm H2O)
 
-    R = daily rainfall depth (mm H20)
+    R = daily rainfall depth (mm H2O)
 
-    SW = soil water content of entire profile (mm H20)
+    SW = soil water content of entire profile (mm H2O)
 
-    FC = amount of water in soil profile at field capacity (mm H20)
+    FC = amount of water in soil profile at field capacity (mm H2O)
 
-    WP = amount of water in the soil profile held at wilting point (mm H20)
+    WP = amount of water in the soil profile held at wilting point (mm H2O)
 
-    perc = the amount of water percolated to the next layer (mm H20)
+    perc = the amount of water percolated to the next layer (mm H2O)
 
-    trans_act = the amount of water lost to transpiration on a given day (mm H20)
+    trans_act = the amount of water lost to transpiration on a given day (mm H2O)
                 (this value is taken from the crop module)
-
-Soil values updated by calling update_all():
-    soil.SW
-    soil.soil_layers
-
-    Soil Layer attributes updated:
-        SW
 """
 
 
@@ -42,6 +35,11 @@ def update_all(soil, weather, time):
     Description:
         This function calls all the necessary functions to update and track
         soil water pools
+
+    Args:
+        soil: instance of the Soil class specified in soil.py
+        weather: instance of the Weather class specified in classes.py
+        time: instance of the Time class specified in classes.py
     """
 
     update_SW(soil, weather, time)
@@ -54,6 +52,11 @@ def update_SW(soil, weather, time):
         Currently, all soil water transformations occur at the end of the day
         and are limited at saturation and wilting point. Percolation accounts
         for any excess flux.
+
+    Args:
+        soil
+        weather
+        time
     """
 
     soil.trans_sum = 0.0

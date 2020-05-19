@@ -23,7 +23,7 @@ class HeiferIII(HeiferII):
     '''
 		Description:
 			initialize the heifer in this stage from the second stage
-        Input:
+        Args:
 			heiferI: first stage of heifer, pass heifer information from heiferI
         Output:
 	'''
@@ -33,7 +33,7 @@ class HeiferIII(HeiferII):
     '''
 		Description:
             initialize the heifer in this stage from the second stage and initialize the repro program parameters for coding purpose
-		Input:
+		Args:
 			heiferII: another heifer out of the herd
 		Output:
 	'''
@@ -70,7 +70,7 @@ class HeiferIII(HeiferII):
             controls heifer's grow with average daily gain based on user's input untill breeding start day
 			here is the place to change growth rate with heifer feeding methods later when we have heifer nutrition from the ration furmulation module
             next to it could build the fuction of ranking heifers
-		Input:
+		Args:
 		Output:
             cow_stage: heifer close to calving, move to cow stage
 	'''
