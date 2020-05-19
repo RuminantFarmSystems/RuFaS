@@ -20,7 +20,7 @@ def read_data(report, file_name):
     Description:
         Reads all the data from a csv into a dictionary representing the
         reported variables
-    Inputs:
+    Args:
         output_csv: file path to the csv containing the data to be read
     """
 
@@ -61,7 +61,7 @@ def ration_graphics(report, ration_interval):
     """
     Description:
         Graphics handler for the ration report.
-    Inputs:
+    Args:
         output_csv: the report for which graphics are being produced
         produce_graphics: indicates whether graphics should be produced for this report
     """
@@ -100,7 +100,7 @@ def annual_water_balance_graphic(report):
     """
     Description:
         Graphic handler for the specific annual water balance bar graph report.
-    Inputs:
+    Args:
         report: the report for which graphics are being produced
     """
 
@@ -195,7 +195,7 @@ def daily_graphics(report):
     """
     Description:
         Graphics handler for standard daily output.
-    Inputs:
+    Args:
         report: the report for which graphics are being produced
     """
 
@@ -232,7 +232,7 @@ def annual_graphics(report):
     """
     Description:
         Graphics handler for standard annual output.
-    Inputs:
+    Args:
         report: the report for which graphics are being produced
     """
 

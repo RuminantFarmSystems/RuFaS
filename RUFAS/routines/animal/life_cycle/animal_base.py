@@ -35,7 +35,7 @@ class AnimalBase(object):
 	'''
 		Description:
 			initialize common parameters for all animals
-		Input:
+		Args:
 			args.breed: breed of the cow
 			args.date: the date of the simulation when the calf was born
 			args.daysBorn: age of the animal
@@ -82,7 +82,7 @@ class AnimalBase(object):
 	'''
 		Description:
 			Check if the the cow is culled
-		Input:
+		Args:
 			From repro, production, and health culling section
 		Output:
 			True/False value inidicating if culled

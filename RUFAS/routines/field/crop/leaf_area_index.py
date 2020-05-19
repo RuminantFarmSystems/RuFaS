@@ -49,11 +49,13 @@ from math import exp, log, sqrt
 
 
 def update_all(crop_type):
-    """This function calls all the necessary functions to update information
-        related to the leaf area index.
+    """
+    Description:
+        Calls all the necessary functions to update information
+        related to the leaf area index for the given crop_type.
 
-    Inputs:
-        crop_type
+    Args:
+        crop_type: an instance of a crop
     """
     L1, L2 = calculate_shape_coefficients(crop_type)
     calc_fr_LAI_max(crop_type, L1, L2)
@@ -61,10 +63,12 @@ def update_all(crop_type):
 
 
 def calculate_shape_coefficients(crop_type):
-    """Calculate shape coefficients for LAI accumulation.
-       "pseudocode_crop" section C.8.A.1/2
+    """
+    Description:
+        Calculate shape coefficients for LAI accumulation.
+        "pseudocode_crop" section C.8.A.1/2
 
-    Inputs:
+    Args:
         crop_type
     Returns:
         int: shape coefficients
@@ -85,14 +89,16 @@ def calculate_shape_coefficients(crop_type):
 
 
 def calc_fr_LAI_max(crop_type, L1, L2):
-    """This function calculates the accumulated fraction of LAI maximum
-       accumulated including today.
-       "pseudocode_crop" section C.8.A.3
+    """
+    Description:
+        Calculates the accumulated fraction of LAI maximum
+        accumulated including today for the given crop type.
+        "pseudocode_crop" section C.8.A.3
 
-    Inputs:
+    Args:
         crop_type
-        L1
-        L2
+        L1: first shape coefficient
+        L2: second shape coefficient
     """
 
     crop_type.prev_fr_LAI_max = crop_type.fr_LAI_max
@@ -102,10 +108,12 @@ def calc_fr_LAI_max(crop_type, L1, L2):
 
 
 def calculate_LAI_actual(crop_type):
-    """This function calculates LAI_actual.
-       "pseudocode_crop" section C.8.A.4/6
+    """
+    Description:
+        This calculates LAI_actual for the given crop_type.
+        "pseudocode_crop" section C.8.A.4/6
 
-    Inputs:
+    Args:
         crop_type
     """
 
@@ -126,14 +134,17 @@ def calculate_LAI_actual(crop_type):
 
 
 def calculate_d_LAI_actual(crop_type, d_LAI_max):
-    """This function calculates d_LAI_actual for use in calculating d_LAI_max and
-       LAI_actual on a given day.
-       "pseudocode_crop" C.8.A.5
+    """
+    Description:
+        Calculates d_LAI_actual for use in calculating d_LAI_max and
+        LAI_actual on a given day for the given crop.
+        "pseudocode_crop" C.8.A.5
 
-    Inputs:
+    Args:
         crop_type
         d_LAI_max: change in LAI maximum
     Returns:
         float: change in LAI actual
     """
+
     return d_LAI_max * sqrt(crop_type.gamma_reg)

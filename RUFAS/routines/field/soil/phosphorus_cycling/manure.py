@@ -1,114 +1,107 @@
-################################################################################
 """
+RUFAS
 SurPhos
+
 File name: manure.py
-Author(s): Jacob Johnson, jacob8399@gmail.com,
-           William Donovan, wmdonovan@wisc.edu
+
+Author(s):  DR. Peter A. Vadas
+            USDA-ARS Dairy Forage Research Center
+            E-mail: peter.vadas@ars.usda.gov
+
+Coder(s):   Jacob Johnson jacob8399@gmail.com
+            William Donovan wmdonovan@wisc.edu
 """
 
-from RUFAS.routines.field.application_management import application_management
 
+def update_all(soil, m_app):
+    """
+    Description:
+        calculates TP, WIP, and WOP added in the manure, adds P to surface
+        manure pools. All units are KG or HA
 
-# calculates # of plops added per day and amount of TP, WIP, and WOP added
-# in manure, adds P to surface manure pools, and updates cumulative manure
-# and TP added during model run
+    Args:
+        soil: an instance of the Soil class specified in soil.py
+        m_app: an instance of the Manure class specified in
+            application_management.py
+    """
 
-# calculates TP, WIP, and WOP added in the manure, adds P to surface manure
-# pools. All units are KG or HA
-def update_all(S, application, weather, time):
+    soil.manure_type = m_app.type
 
-    day = time.day
-    year = time.year
-    m_app = application.manure
-    mass = m_app.mass
+    # Update manure characteristics
+    # S.5.C.I.1-6
+    cover_app = m_app.percent_cover * soil.area
+    P_app = m_app.mass * m_app.P_frac
+    soil.manure_annual += m_app.mass
+    soil.manure_P_annual += P_app
 
-    for i in range(0, len(m_app.day)):
-        if (m_app.day[i] == day and m_app.year[i] - S.start_year + 1 == year) \
-                or (m_app.year[i] - S.start_year + 1 == year and m_app.day[i] == -1
-                    and application.manure_day is True):
+    soil.manure_moisture = (soil.manure_moisture * soil.manure_mass + (1.0 - m_app.DM) * m_app.mass) \
+                           / (soil.manure_mass + m_app.mass)
+    wet_rate = m_app.mass / m_app.DM / cover_app
+    infiltration = min(0.9, 0.000002 * wet_rate + 0.267)
 
-            m_app.day[i] = time.day
+    # S.5.B.3
+    for layer in soil.soil_layers:
+        layer.active_P *= soil.area
+        layer.labile_P *= soil.area
 
-            # if the conditions are good enough to apply manure
-            if not application_management.check_conditions(S, application, weather, time, i, 'm',):
+    # application factors
+    # S.5.C.II.1
+    I_fac = 1.0 - infiltration
+    S_fac = 1.0 - m_app.surface_percent
+    W_fac = 1.0 - (m_app.WIP_frac + m_app.WOP_frac)
 
-                S.manure_type = m_app.type[i]
+    # concentration factors
+    # S.5.C.II.2
+    C_WIP = P_app * m_app.WIP_frac * I_fac
+    C_WOP = P_app * m_app.WOP_frac * 0.95 * I_fac
 
-                # Update manure characteristics
-                # S.5.C.I.1-6
-                cover_app = m_app.percent_cover[i] * S.area
-                P_app = mass[i] * m_app.P_frac[i]
-                S.manure_annual += mass[i]
-                S.manure_P_annual += P_app
+    # slurry factors
+    # S.5.C.II.3
+    S_fac_cover = 1.0
+    S_fac_mass = 1.0
+    if m_app.DM <= 0.15:
+        S_fac_cover = 0.5
+        S_fac_mass = 0.8
+        S_fac = infiltration
 
-                S.manure_moisture = (S.manure_moisture * S.manure_mass + (1.0 - m_app.DM[i]) * mass[i]) \
-                                    / (S.manure_mass + mass[i])
-                wet_rate = mass[i] / m_app.DM[i] / cover_app
-                infiltration = min(0.9, 0.000002 * wet_rate + 0.267)
+    # depth factors
+    # S.5.C.II.4
+    D_fac_1 = 1.0
+    D_fac_2 = 1.0
+    if m_app.depth > 0.0:
+        D_fac_1 = S_fac * C_WIP * C_WOP
+        D_fac_2 = S_fac
 
-                # S.5.B.3
-                for layer in S.soil_layers:
-                    layer.active_P *= S.area
-                    layer.labile_P *= S.area
+    # update manure features and composition
+    # S.5.C.II.5
+    soil.manure_cov = min(soil.area, soil.manure_cov + cover_app * S_fac_cover)
+    soil.manure_mass += m_app.mass * S_fac_mass
+    soil.WIP += P_app * m_app.WIP_frac * S_fac
+    soil.WOP += P_app * m_app.WOP_frac * S_fac
+    soil.SOP += P_app * W_fac * 0.75 * m_app.surface_percent * S_fac
+    soil.SIP += P_app * W_fac * 0.25 * m_app.surface_percent * S_fac
 
-                # application factors
-                # S.5.C.II.1
-                I_fac = 1.0 - infiltration
-                S_fac = 1.0 - m_app.surface_percent[i]
-                W_fac = 1.0 - (m_app.WIP_frac[i] + m_app.WOP_frac[i])
+    # update active and labile soil pools for each layer affected by the application
+    # S.5.C.II.6
+    last_layer = 0
+    D_fac_sum = 0
+    for layer in soil.soil_layers:
+        if layer.bottom_depth_cm < m_app.depth:
+            D_fac = layer.bottom_depth_cm / m_app.depth
+            layer.active_P += P_app * W_fac * 0.25 * I_fac * D_fac_1 * D_fac
+            layer.labile_P += C_WIP + C_WOP + (P_app * W_fac * 0.75 * 0.95 * I_fac * D_fac_2) * D_fac
 
-                # concentration factors
-                # S.5.C.II.2
-                C_WIP = P_app * m_app.WIP_frac[i] * I_fac
-                C_WOP = P_app * m_app.WOP_frac[i] * 0.95 * I_fac
+            D_fac_sum += D_fac
+            last_layer += 1
 
-                # slurry factors
-                # S.5.C.II.3
-                S_fac_cover = 1.0
-                S_fac_mass = 1.0
-                if m_app.DM[i] <= 0.15:
-                    S_fac_cover = 0.5
-                    S_fac_mass = 0.8
-                    S_fac = infiltration
+    D_fac = 1 - D_fac_sum
+    soil.soil_layers[last_layer].active_P += P_app * W_fac * 0.25 * I_fac * D_fac_1 * D_fac
+    soil.soil_layers[last_layer].labile_P += C_WIP + C_WOP + \
+                                             (P_app * W_fac * 0.75 * 0.95 * I_fac * D_fac_2) * D_fac
 
-                # depth factors
-                # S.5.C.II.4
-                D_fac_1 = 1.0
-                D_fac_2 = 1.0
-                if m_app.depth[i] > 0.0:
-                    D_fac_1 = S_fac * C_WIP * C_WOP
-                    D_fac_2 = S_fac
+    # S.5.B.4
+    for layer in soil.soil_layers:
+        layer.active_P /= soil.area
+        layer.labile_P /= soil.area
 
-                # update manure features and composition
-                # S.5.C.II.5
-                S.manure_cov = min(S.area, S.manure_cov + cover_app * S_fac_cover)
-                S.manure_mass += mass[i] * S_fac_mass
-                S.WIP += P_app * m_app.WIP_frac[i] * S_fac
-                S.WOP += P_app * m_app.WOP_frac[i] * S_fac
-                S.SOP += P_app * W_fac * 0.75 * m_app.surface_percent[i] * S_fac
-                S.SIP += P_app * W_fac * 0.25 * m_app.surface_percent[i] * S_fac
-
-                # update active and labile soil pools for each layer affected by the application
-                # S.5.C.II.6
-                last_layer = 0
-                D_fac_sum = 0
-                for layer in S.soil_layers:
-                    if layer.bottom_depth_cm < m_app.depth[i]:
-                        D_fac = layer.bottom_depth_cm / m_app.depth[i]
-                        layer.active_P += P_app * W_fac * 0.25 * I_fac * D_fac_1 * D_fac
-                        layer.labile_P += C_WIP + C_WOP + (P_app * W_fac * 0.75 * 0.95 * I_fac * D_fac_2) * D_fac
-
-                        D_fac_sum += D_fac
-                        last_layer += 1
-
-                D_fac = 1 - D_fac_sum
-                S.soil_layers[last_layer].active_P += P_app * W_fac * 0.25 * I_fac * D_fac_1 * D_fac
-                S.soil_layers[last_layer].labile_P += C_WIP + C_WOP + \
-                                                      (P_app * W_fac * 0.75 * 0.95 * I_fac * D_fac_2) * D_fac
-
-                # S.5.B.4
-                for layer in S.soil_layers:
-                    layer.active_P /= S.area
-                    layer.labile_P /= S.area
-
-                S.manure_mass_app = S.manure_mass
+    soil.manure_mass_app = soil.manure_mass

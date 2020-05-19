@@ -1,21 +1,33 @@
-################################################################################
 """
+RUFAS
 SurPhos
+
 File name: soluble_P.py
-Author(s): Jacob Johnson, jacob8399@gmail.com,
-           William Donovan, wmdonovan@wisc.edu
+
+Author(s):  DR. Peter A. Vadas
+            USDA-ARS Dairy Forage Research Center
+            E-mail: peter.vadas@ars.usda.gov
+
+Coder(s):   Jacob Johnson jacob8399@gmail.com
+            William Donovan wmdonovan@wisc.edu
 """
-################################################################################
+
 from math import exp
 
 
-# calculates the transfer of phosphorus through hydrological processes
-# "pseudocode_soil" S.5.E
-def update_all(S):
-    runoff = S.runoff
+def update_all(soil):
+    """
+    Description:
+        calculates the transfer of phosphorus through hydrological processes
+        "pseudocode_soil" S.5.E
+    Args:
+        soil: an instance of the Soil class specified in soil.py
+    """
+
+    runoff = soil.runoff
 
     DRP_leachate_prev_layer = 0.0
-    for layer in S.soil_layers:
+    for layer in soil.soil_layers:
         # convert soil P from KG/HA to MG/KG
         # S.5.E.1
         layer.soil_P = layer.labile_P / layer.bulk_density / layer.thickness_cm / 0.1
@@ -29,7 +41,7 @@ def update_all(S):
         layer.DRP_leachate = min(40.0, exp(min(709.78, (layer.soil_P * 1.5 - layer.iso_inter / layer.iso_slope))))
 
         # S.5.E.4
-        if S.soil_layers.index(layer) == 0:
+        if soil.soil_layers.index(layer) == 0:
             layer.DRP_runoff = min(layer.labile_P, layer.soil_P * 0.005 * runoff * 0.01)
             layer.labile_P -= layer.DRP_runoff
 
@@ -42,6 +54,6 @@ def update_all(S):
         DRP_leachate_prev_layer = layer.DRP_leachate_act
 
         # S.5.E.6
-        S.DRP_runoff_annual += layer.DRP_runoff * S.area
+        soil.DRP_runoff_annual += layer.DRP_runoff * soil.area
 
-    S.DRP_leachate_annual += DRP_leachate_prev_layer
+    soil.DRP_leachate_annual += DRP_leachate_prev_layer

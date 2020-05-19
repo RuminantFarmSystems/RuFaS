@@ -62,7 +62,7 @@ class CropSummary(BaseReportHandler):
         Description:
             Writes variable names and units to the header of the csv
 
-        Inputs:
+        Args:
             output_csv: csv to be written to
             variables: list of variables being reported
         """
@@ -96,7 +96,7 @@ class CropSummary(BaseReportHandler):
         Description:
             Called daily from the output handler to store simulation values for
              reporting at the end of the year
-        Inputs:
+        Args:
             field: each field in the simulation has a separate crop report
         """
 
@@ -110,8 +110,10 @@ class CropSummary(BaseReportHandler):
         """
         Description:
             Called at the end of each simulation year to store annual values
-        Inputs:
+        Args:
             field: each field in the simulation has a separate crop report
+            weather:
+            time:
         """
 
         crop_type = field.crop.current_crop

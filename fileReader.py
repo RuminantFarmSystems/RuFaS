@@ -1,7 +1,7 @@
 
 def convert_to_json(filename):
     """
-    Input:
+    Args:
         filename: a string which is the commented text file to be turned into a json file
     Returns:
         a json file

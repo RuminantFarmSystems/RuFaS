@@ -51,24 +51,29 @@ CropType values updated by calling calculate_frPHU():
 
 
 def update_all(crop_type, weather, time):
-    """This function calls the functions necessary to update the current heat
-       unit information.
+    """
+    Description:
+        Calls the functions necessary to update the current heat
+        unit information for the given crop_type.
 
-    Inputs:
-        crop_type
-        weather
-        time
+    Args:
+        crop_type: an instance of a crop class
+        weather: an instance of the Weather class specified in classes.py
+            containing environmental information
+        time: an instance of the Time class specified in classes.py
     """
 
     calculate_fr_PHU(crop_type, weather, time)
 
 
 def calculate_fr_PHU(crop_type, weather, time):
-    """This function calculates the fraction of PHU accumulated up to and
-       including today.
-       "pseudocode_crop" C.2.B.1
+    """
+    Description:
+        Calculates the fraction of PHU accumulated up to and
+        including the given day for the given crop type.
+        "pseudocode_crop" C.2.B.1
 
-    Inputs:
+    Args:
         crop_type
         weather
         time
@@ -93,12 +98,14 @@ def calculate_fr_PHU(crop_type, weather, time):
 
 
 def calc_T_HU_min(crop_type, T_min):
-    """Calculates minimum heat unit temperature on current day.
-       "pseudocode_crop" C.2.A.3
+    """
+    Description:
+        Calculates minimum heat unit temperature on current day.
+        "pseudocode_crop" C.2.A.3
 
-    Inputs:
+    Args:
         crop_type
-        T_min: temperature minimum
+        T_min: minimum temperature on the current day
     Returns:
         float: minimum heat unit temperature
     """
@@ -110,12 +117,14 @@ def calc_T_HU_min(crop_type, T_min):
 
 
 def calc_T_HU_max(crop_type, T_max):
-    """Calculates maximum heat unit temperature on current day.
-       "pseudocode_crop" C.2.A.4
+    """
+    Description:
+        Calculates maximum heat unit temperature on current day.
+        "pseudocode_crop" C.2.A.4
 
-    Inputs:
+    Args:
         crop_type
-        T_max: temperature maximum
+        T_max: maximum temperature on the current day
     Returns:
         float: maximum heat unit temperature
     """
@@ -127,10 +136,12 @@ def calc_T_HU_max(crop_type, T_max):
 
 
 def calc_HU(crop_type, T_HU_min, T_HU_max):
-    """Calculates available heat units on current day.
-       "pseudocode_crop" C.2.A.1/2
+    """
+    Description:
+        Calculates available heat units on current day.
+        "pseudocode_crop" C.2.A.1/2
 
-    Inputs:
+    Args:
         crop_type
         T_HU_min: minimum heat unit temperature
         T_HU_max: maximum heat unit temperature

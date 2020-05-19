@@ -55,7 +55,6 @@ def daily_feed_routine(feed, fields):
                         stored = True
 
             if not stored:
-                print("Insufficient storage specified for " + crop_name + ". Simulating standard storage.")
                 standard_data = {
                                     "storage_type": "bag",
                                     "moisture": "direct_cut",
@@ -67,12 +66,10 @@ def daily_feed_routine(feed, fields):
                                     "removal_rate": 6,
                                     "initial_dry_matter": 0
                 }
-
-                standard_storage = feed.Storage(standard_data)
                 standard_storage_name = str('standard_storage_' + str(feed.standard_storage_count))
 
-                feed.storage_options[standard_storage_name] = standard_storage
-                feed.available_storage[standard_storage_name] = standard_storage
+                feed.storage_options[standard_storage_name] = feed.Storage(standard_data)
+                feed.available_storage[standard_storage_name] = feed.storage_options[standard_storage_name]
 
                 feed.standard_storage_count += 1
 
@@ -84,6 +81,7 @@ def daily_feed_routine(feed, fields):
                 feed.available_storage.pop(storage_name)
 
     feed.summarize_feed_storage()
+
 
 def annual_feed_routine():
     pass
@@ -200,12 +198,12 @@ class Feed:
     Description:
         Stores the information for the feeds managed by the farm, and the methods
         for storage.
-
     """
 
     def __init__(self, data):
         """
-        Sets up the data for the feeds managed by the farm.
+        Description:
+            Sets up the data for the feeds managed by the farm.
 
         Args:
             data: the feed information from the input JSON file
@@ -233,6 +231,7 @@ class Feed:
                                               self.__table_name,
                                               self.managed_feed_names)
 
+        # Storage receptacles managed by the feed module
         self.storage_options = {}
 
         for storage_name, storage_data in data['storage_options'].items():
@@ -241,6 +240,7 @@ class Feed:
         self.available_storage = dict(self.storage_options)
         self.standard_storage_count = 0
 
+        # Summary variables tracked for output
         self.C = 0.0
         self.N = 0.0
         self.P = 0.0
@@ -252,6 +252,10 @@ class Feed:
         self.CP_loss = 0.0
 
     def summarize_feed_storage(self):
+        """
+        Description:
+            Summarize nutrients and losses over the managed storage receptacles
+        """
         for storage in self.storage_options.values():
             self.C += storage.C
             self.N += storage.C
@@ -474,7 +478,6 @@ class Feed:
 
             # TODO: no protein degradation is currently being simulated
             protein_degradation.update_all()
-
 
         def reset_storage(self):
             """

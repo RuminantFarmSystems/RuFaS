@@ -60,10 +60,6 @@ Soil attribute definitions
     bcv = weighting factor of ground cover
 
     snow = snow water content on the current day (mm)
-
-Soil values updated by calling update_all():
-    T_surf
-    soil_layers.temperature
 """
 
 
@@ -74,6 +70,12 @@ def update_all(soil, crop, weather, time):
     """
     Description:
         This function updates all soil temperature information.
+
+    Args:
+        soil: instance of the Soil class specified in soil.py
+        crop: instance of the Crop class specified in crop.py
+        weather: instance of the Weather class specified in classes.py
+        time: instance of the Time class specified in classes.py
     """
 
     calc_T_surf(soil, crop, weather, time)
@@ -86,6 +88,11 @@ def calc_T_soil(soil, weather, time):
     Description:
         Calculates the soil temperature for each layer given average annual air
         temperature. "pseudocode_soil" S.1.A.1
+
+    Args:
+        soil
+        weather
+        time
     """
 
     L = 0.8
@@ -122,6 +129,12 @@ def calc_dd(soil):
         Calculates damping depth of a given soil profile as a function of soil
         water and dd_max.
         "pseudocode_soil" S.1.A.4
+
+    Args:
+        soil
+
+    Returns:
+        int: dd, damping depth of the profile (mm)
     """
 
     scale = calc_scale(soil)
@@ -139,6 +152,12 @@ def calc_scale(soil):
     Description:
          Calculates the scaling factor for soil water in a given soil profile.
         "pseudocode_soil" S.1.A.5
+
+    Args:
+        soil
+
+    Returns:
+        int: soil water scaling factor for the profile
     """
 
     SW = sum_soil_water(soil)
@@ -153,6 +172,12 @@ def calc_dd_max(soil):
     Description:
         Calculates maximum damping depth for a given soil profile.
         "pseudocode_soil" S.1.A.6
+
+    Args:
+        soil
+
+    Returns:
+        int: dd_max, the maximum damping depth fro the profile (mm)
     """
 
     bd = soil.profile_bulk_density
@@ -163,7 +188,13 @@ def calc_dd_max(soil):
 def sum_soil_water(soil):
     """
     Description:
-       Calculates the sum of soil water in the profile.
+       Helper method to calculates the sum of soil water in the profile.
+
+    Args:
+        soil
+
+    Returns:
+        int: total_soil_water (mm)
     """
 
     total_soil_water = 0.0
@@ -181,6 +212,12 @@ def calc_T_surf(soil, crop, weather, time):
         temperature, the amount of ground cover, and the temperature of a bare
         soil surface.
         "pseudocode_soil" S.1.A.13
+
+    Args:
+        soil
+        crop
+        weather
+        time
     """
 
     T_bare = calc_T_bare(soil, crop, weather, time)
@@ -194,6 +231,15 @@ def calc_T_bare(soil, crop, weather, time):
     Description:
         Calculates the temperature of a bare soil.
         "pseudocode_soil" S.1.A.7
+
+    Args:
+        soil
+        crop
+        weather
+        time
+
+    Returns:
+        int: T_bare, the theoretical temperature of the bare soil (ºC)
     """
     T_av = weather.T_avg[time.year-1][time.day-1]
     radiate = calc_radiate(soil, crop, weather, time)
@@ -206,6 +252,15 @@ def calc_radiate(soil, crop, weather, time):
     Description:
         Calculates the radiation term for the temperature of bare soil.
         "pseudocode_soil" S.1.A.8
+
+    Args:
+        soil
+        crop
+        weather
+        time
+
+    Returns:
+        int: radiate, the radiation term for the temperature of bare soil
     """
 
     H_day = weather.radiation[time.year-1][time.day-1]
@@ -220,16 +275,22 @@ def calc_albedo(soil, crop):
         Calculates the daily albedo as a function of soil type, plant cover,
         and snow cover.
         "pseudocode_soil" S.1.A.9/10
+
+    Args:
+        soil
+        crop
+
+    Returns:
+        int: soil albedo
     """
 
     CV = crop.current_crop.bio_AG
-    albedoSoil = soil.soil_albedo
 
     # "pseudocode_soil" S.1.A.10
     cover = exp(-0.00005 * CV)
 
     # "pseudocode_soil" S.1.A.9
-    return 0.23 * (1 - cover) + albedoSoil * cover
+    return 0.23 * (1 - cover) + soil.soil_albedo * cover
 
 
 def calc_bcv(crop, time):
@@ -237,6 +298,13 @@ def calc_bcv(crop, time):
     Description:
         Calculates the weighting factor for ground cover
         "pseudocode_soil" S.1.A.11/12
+
+    Args:
+        crop
+        time
+
+    Returns:
+        int: bcv, the bio-cover weighting factor for ground cover
     """
 
     CV = crop.current_crop.bio_AG
@@ -245,7 +313,7 @@ def calc_bcv(crop, time):
     bcv = CV / (CV + exp_part)
 
     snow = 0
-    # TODO: these time ranges for snowfall are taken from the barnyard spreadsheet model and seem largely arbitrary
+    # TODO: arbitrary snow flag
     if time.day > 335 or time.day < 59:
         albedo_snow = 0.8
         snow = 10 * albedo_snow

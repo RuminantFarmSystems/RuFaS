@@ -21,9 +21,9 @@ CropType attribute definitions:
 
     gamma_wu = Water deficiency factor
 
-    ET_annual = Sum of actual evapotranspiration from day 1 up to today (mm H20)
+    ET_annual = Sum of actual evapotranspiration from day 1 up to today (mm H2O)
 
-    ET_max_annual = Sum of potential evapotranspiration from day 1 up to today (mm H20)
+    ET_max_annual = Sum of potential evapotranspiration from day 1 up to today (mm H2O)
 
     HI_actual = Actual harvest index
 
@@ -63,13 +63,16 @@ CropType values updated by update_all():
 from math import exp
 
 
-def update_all(soil, crop_type, application, time):
+def update_all(soil, crop_type, application_management, time):
     """Runs all the yield calculations
 
-    Inputs:
-        crop_type
-        time
-        soil
+    Args:
+        soil: an instance of the Soil class specified in soil.py representing
+            the current state of the soil profile
+        crop_type: an instance of a crop class
+        application_management: an instance of the ApplicationManagement class
+            specified in application_management.py
+        time: an instance of the Time class specified in classes.py
     """
 
     calc_HI_max(crop_type)
@@ -78,14 +81,16 @@ def update_all(soil, crop_type, application, time):
     calc_yield_act(crop_type)
     calc_harvest_quality(crop_type)
     calc_nutrient_removal(crop_type)
-    calc_residue(soil, crop_type, application, time)
+    calc_residue(soil, crop_type, application_management, time)
 
 
 def calc_HI_max(crop_type):
-    """Calculates max potential harvest index for a given day.
-       "pseudocode_crop" C.10.C.1
+    """
+    Description:
+        Calculates max potential harvest index for a given day.
+        "pseudocode_crop" C.10.C.1
 
-    Inputs:
+    Args:
         crop_type
     """
 
@@ -95,10 +100,12 @@ def calc_HI_max(crop_type):
 
 
 def calc_HI_act(crop_type):
-    """Calculates the actual harvest index (HI_actual).
-       "pseudocode_crop" C.10.C.1
+    """
+    Description:
+        Calculates the actual harvest index (HI_actual).
+        "pseudocode_crop" C.10.C.1
 
-    Inputs:
+    Args:
         crop_type
     """
 
@@ -110,10 +117,12 @@ def calc_HI_act(crop_type):
 
 
 def calc_yield_max(crop_type):
-    """Calculates maximum crop yield at harvest.
-       "pseudocode_crop" C.10.D.1
+    """
+    Description:
+        Calculates maximum crop yield at harvest.
+        "pseudocode_crop" C.10.D.1
 
-    Inputs:
+    Args:
         crop_type
     """
 
@@ -121,10 +130,12 @@ def calc_yield_max(crop_type):
 
 
 def calc_yield_act(crop_type):
-    """Calculates actual crop yield at harvest.
-       "pseudocode_crop" C.10.E.1
+    """
+    Description:
+        Calculates actual crop yield at harvest.
+        "pseudocode_crop" C.10.E.1
 
-    Inputs:
+    Args:
         crop_type
     """
 
@@ -134,10 +145,12 @@ def calc_yield_act(crop_type):
 
 
 def calc_nutrient_removal(crop_type):
-    """Calculates the amount of nitrogen and phosphorus removed in the yield.
-       "pseudocode_crop" C.10.F.1/2
+    """
+    Description:
+        Calculates the amount of nitrogen and phosphorus removed in the yield.
+        "pseudocode_crop" C.10.F.1/2
 
-    Inputs:
+    Args:
         crop_type
     """
 
@@ -146,10 +159,13 @@ def calc_nutrient_removal(crop_type):
 
 
 def calc_residue(soil, crop_type, application, time):
-    """Updates the current residue.
-       "pseudocode_crop" C.10.G.1/4/5
+    """
+    Description:
+        Updates the current residue.
+        "pseudocode_crop" C.10.G.1/4/5
 
-    Inputs:
+    Args:
+        application
         crop_type
         time
         soil
@@ -158,10 +174,11 @@ def calc_residue(soil, crop_type, application, time):
     d_residue = 0
     if time.day == crop_type.kill_day or crop_type.crop_type == 'annual':
         d_residue = crop_type.biomass_actual - crop_type.yield_actual
-        kill(crop_type, application)
+        kill(crop_type, application, time)
     else:
         bio_frac = crop_type.yield_actual / crop_type.biomass_actual
         cut(crop_type, bio_frac)
+
     soil.residue += d_residue
 
 
@@ -170,16 +187,21 @@ def calc_harvest_quality(crop_type):
     crop_type.harvest_quality = "good"
 
 
-def kill(crop_type, application):
-    """Kills the crop
-       "pseudocode_crop" C.10.G.4
+def kill(crop_type, application_management, time):
+    """
+    Description:
+        Kills the crop
+        "pseudocode_crop" C.10.G.4
 
-    Inputs:
+    Args:
         crop_type
-        soil
+        application_management
+        time
     """
 
-    application.tillage_day = True
+    if application_management.management_scheme == 'optimal':
+        application_management.managed_applications['tillage'].applications[(time.year, time.day)] = \
+            application_management.managed_applications['tillage'].applications.pop((time.year, -1))
 
     crop_type.accumulated_HU = 0
     crop_type.prev_accumulated_HU = 0
@@ -209,12 +231,14 @@ def kill(crop_type, application):
 
 
 def cut(crop_type, bio_frac):
-    """Cuts the crop without killing it
-       "pseudocode_crop" C.10.G.2/3
+    """
+    Description:
+        Cuts the crop without killing it
+        "pseudocode_crop" C.10.G.2/3
 
-    Inputs:
+    Args:
         crop_type
-        bio_frac: fraction of biomass removed during harvest
+        bio_frac: fraction of biomass removed during the cut
     """
 
     crop_type.accumulated_HU = crop_type.accumulated_HU * (1 - bio_frac)

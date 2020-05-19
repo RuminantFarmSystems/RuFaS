@@ -56,7 +56,7 @@ class GrowthReport(BaseReportHandler):
         Description:
             Writes variable names and units to the header of the csv
 
-        Inputs:
+        Args:
             output_csv: csv to be written to
             variables: list of variables being reported
         """
@@ -90,7 +90,7 @@ class GrowthReport(BaseReportHandler):
         Description:
             Called daily from the output handler to store simulation values for
              reporting at the end of the year
-        Inputs:
+        Args:
             pen: a growth report is produced for each pen simulated
         """
 
@@ -102,7 +102,7 @@ class GrowthReport(BaseReportHandler):
         """
         Description:
             Called at the end of each simulation year to store annual values
-        Inputs:
+        Args:
             pen: a growth report is produced for each pen simulated
         """
 
