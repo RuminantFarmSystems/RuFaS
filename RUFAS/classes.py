@@ -57,7 +57,7 @@ class State:
 def read_json_file(file_path: Path):
     """Reads the json file sent in
 
-    Input:
+    Args:
         file_path (Path): a file path to a json file
     Returns:
         data: the data read from the json file
@@ -487,7 +487,7 @@ class Time:
 def is_leap_year(year):
     """Helper method determines if the given year is a leap year
 
-    Input:
+    Args:
         year: an int of the year
     Returns:
         bool: True if the year is a leap year

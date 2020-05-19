@@ -3,10 +3,10 @@ RUFAS: Ruminant Farm Systems Model
 
 File name: nitrification_volatilization.py
 
-Author(s): William Donovan, wmdonovan@wisc.edu
-
 Description: Implements the nitrogen cycling processes of nitrification and
              volatilization.
+
+Author(s): William Donovan, wmdonovan@wisc.edu
 """
 
 from math import exp
@@ -18,9 +18,11 @@ def nitrification_volatilization(soil):
        nitrification is the transfer of NH4 to NO3, this method determines when that
        transfer occurs and calculates the magnitude of that transfer.
        "pseudocode_soil" S.4.B
+    Args:
+        soil: an instance of the Soil class specified in soil.py
     """
 
-    for x in range(0, len(soil.soil_layers)):
+    for x in range(len(soil.soil_layers)):
         layer = soil.soil_layers[x]
 
         temp_fac = layer.temp_fac
@@ -29,7 +31,7 @@ def nitrification_volatilization(soil):
 
         # "pseudocode_soil" S.4.B.3
         if x == 0:
-            z_mid = 5
+            z_mid = layer.bottom_depth / 2
         else:
             z_mid = (layer.bottom_depth + soil.soil_layers[x - 1].bottom_depth) / 2
 
@@ -40,10 +42,8 @@ def nitrification_volatilization(soil):
         CEC_fac = 0.15
         volatil_reg = temp_fac * depth_fac * CEC_fac
 
-        #
         # nitrification only occurs when the soil temperature of a given layer
         # exceeds 5ºC
-        #
         nitr_reg = 0
         if layer.temperature >= 5:
             # "pseudocode_soil" S.4.B.4

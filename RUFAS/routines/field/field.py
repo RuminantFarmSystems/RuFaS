@@ -4,51 +4,33 @@ File name: field.py
 Description:
 Author(s): William Donovan, wmdonovan@wisc.edu
            Jacob Johnson, jacob8399@gmail.com
-
-This module needs the following inputs in order to operate correctly:
-
-    "latitude": 43.332708
-
-    These are attributes of a field that need to be specified in the json input
-    file. The values on the right are just examples from a corn crop type.
-
-        "grow_years": [2009],
-        "repeat": 1,
-        "planting_date": 121,
-        "harvest_date": 319
-
-    From the weather class, the following will be needed:
-        T_min
-        T_max
-        radiation
-        T_avg
-
-    From the soil class, the following will be needed:
-        soil_layers
-
-        And the following attributes of a soil layer:
-            bottom_depth
-            Eo_sum = Sum of the Eo values leading up to today
-            trans_max
-            NO3
-            labile_P
-            soil_water
-            fc_water
-            wilting_water
 """
-
-################################################################################
 
 import json
 from RUFAS import util, errors
 from pathlib import Path
 from .crop.crop import Crop
 from .soil.soil import Soil
-from .application_management.application_management import Application
+from .application_management.application_management import ApplicationManagement
 
 
 class Field:
     def __init__(self, field_name, field_data, space, time):
+        """
+        Description:
+            The Field class is an organizational object for aggregating Soil,
+            Crop, and Application objects. This structure simplifies the model,
+            especially for input and output. The primary function of this class
+            is reading the JSON files specified as containing crop, soil, and
+            field management information associated with this field and assigning
+            that data to relevant simulation objects associated with this Field
+            object.
+        Args:
+            field_name: the name of the field specified in the input JSON
+            field_data: data describing the field specified in the input JSON
+            space: an instance of the Space class specified in classes.py
+            time: an instance of the Time class specified in classes.py
+        """
         self.field_name = field_name
 
         input_dir = util.get_base_dir() / 'Inputs'
@@ -57,23 +39,24 @@ class Field:
         self.crop_data = read_json_file(input_dir / 'crop_rotations' / field_data['crop'])
         self.application_data = read_json_file(input_dir / 'applications' / field_data['applications'])
 
-        self.soil = Soil(self.soil_data, time)
-        self.application = Application(self.application_data, time)
+        self.soil = Soil(self.soil_data)
+        self.application_management = ApplicationManagement(self.application_data, time)
         self.crop = Crop(self.crop_data, space, time)
 
 
 def read_json_file(file_path: Path):
-    """Reads the json file, writes information to the simulation variables.
+    """
+    Description:
+        Reads and interprets the JSON file at the given path. Compiles the
+        information into dictionaries used to instantiate simulation objects.
 
-    Reads and interprets the (json) file at the given path. Compiles the
-    information into dictionaries and instantiates the simulation objects with
-    them. Assigns the objects to the global simulation variables.
-
-    Inputs:
+    Args:
         file_path (Path): Path to the input json file
+
     Raises:
         InvalidJSONFileError: If the json file at the given path does not
             conform with the format required
+
     Returns:
         data: the data read from the json file
     """

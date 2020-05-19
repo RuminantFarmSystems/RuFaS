@@ -69,7 +69,7 @@ class WaterBalance(BaseReportHandler):
         Description:
             Writes variable names and units to the header of the csv
 
-        Inputs:
+        Args:
             output_csv: csv to be written to
             variables: list of variables being reported
         """
@@ -104,7 +104,7 @@ class WaterBalance(BaseReportHandler):
         Description:
             Called daily from the output handler to store simulation values for
              reporting at the end of the year
-        Inputs:
+        Args:
             field: a water balance report is produced for each field simulated
         """
 
@@ -118,7 +118,7 @@ class WaterBalance(BaseReportHandler):
         Description:
             Called daily from the output handler to store simulation values for
              reporting at the end of the year
-        Inputs:
+        Args:
             field: a water balance report is produced for each field simulated
         """
 
@@ -178,7 +178,7 @@ class WaterBalance(BaseReportHandler):
         """
         Description:
             Calls functions in graphics.py
-        Inputs:
+        Args:
             is_final: flag indicating that this is the last report being
                         produced
         """

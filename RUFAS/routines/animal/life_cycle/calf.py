@@ -22,7 +22,7 @@ class Calf(AnimalBase):
 	'''
 		Description:
 			initialize calf at the time it was born, determine stillbirth, gender, and birth weight
-		Input:
+		Args:
 			args.breed: breed of the cow
 			args.date: the date of the simulation when the calf was born
 			args.daysBorn: age of the animal
@@ -65,7 +65,7 @@ class Calf(AnimalBase):
 	'''
 		Description:
 			initialize calf value from class calf, for coding purpose
-		Input:
+		Args:
 			calf: initialed values from the first day
 		Output:
 	'''
@@ -110,7 +110,7 @@ class Calf(AnimalBase):
 			controls calf's grow with average daily gain based on user's input until wean day
 			calculate the wean weight at wean day
 			here is the place to change growth rate with calf feeding methods later when we have calf nutrition from the ration furmulation module
-		Input:
+		Args:
 		Output:
 			wean_day: time when calf is weaned -- stop be fed with milk
 	'''

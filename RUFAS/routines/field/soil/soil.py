@@ -8,134 +8,6 @@ Author(s): Kass Chupongstimun, kass_c@hotmail.com
            Jit Patil, spatil5@wisc.edu
            William Donovan, wmdonovan@wisc.edu
            Jacob Johnson, jacob8669@gmail.com
-
-This module needs the following inputs in order to operate correctly:
-
-    These are attributes of a soil profile that need to be specified in the json input
-    file. The values on the right are just examples from a soil profile with 1 layer.
-
-        "profile_depth": 450,
-        "profile_bulk_density": 1.4,
-        "CN2": 85.00
-        "field_slope": 0.02,
-        "slope_length": 3,
-        "manning": 0.4,
-        "field_size": 1.0,
-        "practice_factor": 0.08,
-        "sand": 15,
-        "silt": 65,
-        "soil_albedo": 0.16,
-        "initial_residue": 0,
-        "fresh_N_mineral_rate": 0.05,
-        "soil_cover_type": "BARE",
-
-        These are attributes defined for each layer of the soil profile. Any
-        number of profiles may be specified, but they all require the following
-        information. The values on the right are examples.
-
-        "soil_layers":
-
-            "layer_1":
-
-                "bottom_depth": 150,
-                "wilting_point": 0.1,
-                "field_capacity": 0.30,
-                "saturation": 0.5,
-                "K_sat": 20,
-                "cation_exclusion_fraction": 0.0,
-                "clay": 20,
-                "initial_temperature": 15.77575,
-                "bulk_density": 1.4,
-                "org_C_percent": 0.012,
-                "NH4": 1,
-                "active_N_percent": 0.02,
-                "labile_P": 15,
-                "active_mineral_rate": 0.0003,
-                "volatile_exchange_factor": 0.15,
-                "denitrification_rate": 0.05,
-                "soil_water_percent": 0.3,
-                "OM_percent": 1.9
-
-            "layer_2":
-                ...
-
-        Each layer needs to be specified in a similar manner
-
-        The following are attributes of a fertilizer application. No fertilizer
-        applications need be specified for the module to run, but for any that
-        are specified, the following attributes are needed. Again, the values
-        on the right are simply examples
-
-        "fertilizers":
-
-            "application_1":
-
-                "year": 2008
-                "j_day": 179,
-                "P_mass": 25.0,
-                "depth": 3.0,
-                "surface_percent": 0.25
-
-            "application_2":
-
-                ...
-
-        The following are attributes of a manure application. No manure
-        applications need be specified for the module to run, but for any that
-        are specified, the following attributes are needed. The values on the
-        right should serve as examples.
-
-        "manure_application":
-
-            "application_1":
-
-                "type": "DAIRY",
-                "year": 2009,
-                "j_day": 200
-                "mass": 1000.0,
-                "P_frac": 0.025,
-                "WIP_frac": 0.50,
-                "WOP_frac": 0.05,
-                "dry_matter": 0.05,
-                "cover_percent": 0.5,
-                "depth": 0.0,
-                "surface_percent": 100.0
-
-            "application_2":
-
-                ...
-
-        The following are attributes of a tillage operation. No tillage
-        operation need be specified for the module to run, but for any operation
-        that is specified, the following attributes are needed. Values on the
-        right are examples.
-
-        "tillage":
-
-            "operation_1":
-
-                "year": 2008,
-                "j_day": 365,
-                "percent_incorporated": 0.5,
-                "percent_mixed": 0.30,
-                "depth": 15.0,
-
-            "operation_2":
-
-                ...
-
-    From the weather class, the following will be needed:
-        T_min
-        T_max
-        radiation
-        rainfall
-        T_avg
-
-    From the crop class, the following will be needed:
-        crops_list
-
-        And the following attributes of a crop type:
-            bio_AG (above ground biomass)
 """
 
 from math import exp, log
@@ -147,24 +19,28 @@ from .nitrogen_cycling import nitrogen_cycling
 from .phosphorus_cycling import phosphorus_cycling
 
 
-def daily_soil_routine(soil, crop, application, weather, time):
+def daily_soil_routine(soil, crop, application_management, weather, time):
     """
     Description:
-        Executes all the daily soil routines.
+        Called form simulation_engine.py. Executes the daily soil routines.
 
     Args:
-        soil: instance of the Soil class
-        crop: instance of the Crop class
-        application: instance of the Application class
-        weather: instance of the Weather class
-        time: instance of the Time class
+        soil: instance of the Soil class specified in soil.py
+        crop: instance of the Crop class specified in crop.py
+        application_management: instance of the ApplicationManagement class
+            specified in application_management.py
+        weather: instance of the Weather class specified in classes.py
+        time: instance of the Time class specified in classes.py
     """
+    R = weather.rainfall[time.year - 1][time.day - 1]
 
     # calculate and update the temperature of the soil layers
     soil_temp.update_all(soil, crop, weather, time)
 
     # calculate daily runoff
-    infiltration.update_all(soil, weather, time)
+
+    if R > 0:
+        infiltration.update_all(soil, weather, time)
 
     # calculate daily transpiration
     evapotranspiration.update_all(soil, crop, weather, time)
@@ -180,30 +56,28 @@ def daily_soil_routine(soil, crop, application, weather, time):
     soil_water.update_all(soil, weather, time)
 
     # calculate daily soil erosion
-    soil_erosion.update_all(soil, crop, weather, time)
+    if R > 0:
+        soil_erosion.update_all(soil, crop, weather, time)
 
     # calculate and update the contents of 3 organic and 2 inorganic nitrogen
     # pools
-    nitrogen_cycling.update_all(soil, application, weather, time)
+    nitrogen_cycling.update_all(soil, application_management.managed_applications['manure'], weather, time)
 
     # implementation of Peter Vadas' SurPhos (Surface Phosphorus Runoff) model
-    phosphorus_cycling.update_all(soil, application, weather, time)
+    phosphorus_cycling.update_all(soil, application_management, weather, time)
 
     # update annual sums at the end of each day
-    annual_variable_update(soil, application)
+    annual_variable_update(soil)
 
 
-def annual_variable_update(soil, application):
+def annual_variable_update(soil):
     """
     Definition:
-        Update variables tracked on an annual scale and reset condition
-        variables
+        Update variables tracked at annual level and reset condition variables
+
+    Args:
+        soil: instance of the Soil class specified in soil.py
     """
-
-    application.manure_day = False
-    application.fertilizer_day = False
-    application.tillage_day = False
-
     soil.ET_max_annual += soil.ET_max
 
     soil.drainage_annual += soil.drainage
@@ -215,133 +89,97 @@ def annual_variable_update(soil, application):
     soil.p_act_annual += soil.p_act
 
 
-def application_years(app_data, time, application):
-    """
-    Definition:
-        Determine years in which each application occurs and construct list
-        for module use.
-
-    Input:
-        app_data: data representing the given application set
-        application: the type of application represented by app_data
-    """
-
-    years = app_data['app_years']
-    repeat = app_data['repeat']
-    app_years = []
-
-    # if years is not empty
-    if len(years) != 0:
-        for year in years:
-            if year - time.start_year >= len(time.years) or year - time.start_year < 0:
-                print('\nCannot apply', application, 'in year', year,
-                      'because', year, '\nis outside of the scope of the simulation.')
-            else:
-                if year not in app_years:
-                    app_years.append(year)
-                    if repeat != 0:
-                        temp_year = year + repeat
-                        while temp_year - time.start_year < len(time.years):
-                            if temp_year not in app_years:
-                                app_years.append(temp_year)
-                            temp_year += repeat
-
-    app_years.sort()
-    return app_years
-
-
 class Soil:
-    """
-    Contains the state of the farm's soil.
-    """
 
-    def __init__(self, data, time):
+    def __init__(self, data):
         """
         Description:
-            Constructs an instance of the Soil class by populating its arrays
-            and the necessary values.
+            An instance of the Soil class contains all of the information
+            relevant to describe the soil profile at a given moment in order
+            for the simulation to function.
 
         Args:
             data: the information from the json input file
         """
 
-        # Values Initialized by Input
-        self.soil_layers = []
-        self.start_year = time.start_year
-
+        # soil profile
+        self.area = data['field_size']
         self.profile_bulk_density = data['profile_bulk_density']
-        self.CN2 = data['CN2']  # unitless, user-defined curve number (empirical)
 
-        # soil erosion attributes
+        # soil layers
+        self.soil_layers = []
+
+        for layer_name, layer_data in data['soil_layers'].items():
+            self.soil_layers.append(self.SoilLayer(layer_name, layer_data))
+
+        self.soil_layers.sort(key=lambda ly: ly.bottom_depth)
+        self.profile_depth = self.soil_layers[-1].bottom_depth
+        self.calculate_layer_thickness()
+
+        # soil water
+        self.profile_SW = 0.0
+
+        self.initialize_soil_water()
+
+        # water balance
+        self.initial_annual_SW = self.profile_SW
+
+        # intermediate daily water balance
+        self.evap_max = 0.0
+        self.trans_max = 0.0
+        self.ET_max = 0.0
+
+        # daily water balance
+        self.delta_SW = 0.0
+        self.runoff = 0.0
+        self.evap_sum = 0.0
+        self.trans_sum = 0.0
+        self.drainage = 0.0
+
+        self.p_act = 0.0
+        self.p_calc = 0.0
+
+        self.water_balance_difference = 0.0
+
+        # intermediate annual water balance
+        self.ET_max_annual = 0.0
+
+        # annual water balance
+        self.delta_SW_annual = 0.0
+        self.runoff_annual = 0.0
+        self.evap_annual = 0.0
+        self.trans_annual = 0.0
+        self.ET_annual = 0.0
+        self.drainage_annual = 0.0
+
+        self.p_act_annual = 0.0
+        self.p_calc_annual = 0.0
+
+        self.annual_water_balance_difference = 0.0
+
+        self.infiltration = 0.0
+
+        # runoff and erosion
         self.field_slope = data['field_slope']
         self.slope_length = data['slope_length']
         self.manning = data['manning']
-        self.field_size = data['field_size']
         self.practice_factor = data['practice_factor']
         self.sand = data['sand']
         self.silt = data['silt']
 
-        # soil temperature attributes
+        self.CN2 = data['CN2']  # unitless, user-defined curve number (empirical)
+
+        # soil temperature
         self.soil_albedo = data['soil_albedo']
         self.T_surf = data['soil_layers']['layer_1']['initial_temperature']
 
-        # create soil layers
-        for layer_name, layer_data in data['soil_layers'].items():
-            self.soil_layers.append(self.SoilLayer(layer_name, layer_data))
-
-        # sort layers by bottom_depth
-        self.soil_layers.sort(key=lambda ly: ly.bottom_depth)
-
-        # determine profile depth
-        self.profile_depth = self.soil_layers[-1].bottom_depth
-
-        # calculate initial depth of each soil layer
-        curr_thickness = 0
-        for layer in self.soil_layers:
-            layer.thickness = layer.bottom_depth - curr_thickness
-            layer.thickness_cm = layer.thickness / 10
-            curr_thickness = layer.bottom_depth
-
-        self.start_year = time.start_year
-
+        # soil cover
         self.cover = data['soil_cover_type']
-        if self.cover == "GRASSED":
-            self.cover_factor = 0.8
-        elif self.cover == "RESIDUE COVER":
-            self.cover_factor = 0.667
-        else:
-            self.cover_factor = 0.5333
+        self.cover_factor = \
+            self.set_cover_factor()  # sets the cover factor based on type
 
-        self.leach = 0.0
-        self.area = data['field_size']
-
-        # Initialize phosphorus variables
-        # "pseudocode_soil" S.5.A
-        for layer in self.soil_layers:
-
-            # S.5.A.1
-            layer.PSP_max = -0.045 * log(layer.clay) + 0.001 * \
-                            layer.labile_P - 0.035 * layer.org_C + 0.43
-            layer.PSP_act = max(0.05, min(0.7, layer.PSP_max))
-            layer.PSP_avg = layer.PSP_act
-
-            # S.5.A.2
-            layer.labile_P = layer.labile_P * layer.bulk_density \
-                             * layer.thickness_cm * 0.1
-
-            # S.5.A.3
-            layer.active_P = layer.labile_P * (1.0 - layer.PSP_act) / layer.PSP_act
-
-            # S.5.A.4
-            layer.stable_P = layer.active_P * 4.0
-
-            # S.5.A.5 TODO organic soil pools (labile_O, and active_O) are not being tracked
-            layer.org_P = layer.org_C / 8.0 / 14.0 * 10000 * layer.bulk_density \
-                          * layer.thickness_cm * 0.1
-
-            # S.5.A.6
-            layer.mass = layer.bulk_density * layer.thickness_cm * 10000
-
+        # soil P
+        # Peter Vadas' SurPhos. TODO: Hardcoded Values are temporary
         self.manure_moisture = 0.5
         self.CNT = 1
         self.manure_cov = 0.0
@@ -352,8 +190,8 @@ class Soil:
         self.fert_applied_sum = 0.0
         self.no_rains = 0.0
         self.fert_CNT = 0.0
-        self.fert_P_available = 0.0  # avfrtp
-        self.fert_P_released = 0.0  # rsfrtp
+        self.fert_P_available = 0.0
+        self.fert_P_released = 0.0
         self.depth_fact = 0.0
 
         # manure
@@ -404,61 +242,16 @@ class Soil:
         self.WIP_leachate_annual = 0.0
         self.WOP_leachate_annual = 0.0
 
-        self.calculate_soil_water()  # calculate soil water in layer
-        self.calculate_wilting_water()  # calculate wilting water in layer
-        self.calculate_FC_water()  # calculate field capacity water in layer
-        self.calculate_SAT_water()  # calculate saturation water in layer
-
-        self.profile_SW = 0.0
-
-        for layer in self.soil_layers:
-            self.profile_SW += layer.soil_water
-
-        self.initial_annual_SW = self.profile_SW
-
-        # daily output values
-        self.evap_max = 0.0
-        self.trans_max = 0.0
-        self.ET_max = 0.0
-
-        # daily water balance
-        self.delta_SW = 0.0
-        self.runoff = 0.0
-        self.evap_sum = 0.0
-        self.trans_sum = 0.0
-        self.drainage = 0.0
-
-        self.p_act = 0.0
-        self.p_calc = 0.0
-
-        self.water_balance_difference = 0.0
-
-        # annual variables
-        self.ET_max_annual = 0.0
-        self.ET_annual = 0.0
-
-        # annual water balance
-        self.delta_SW_annual = 0.0
-        self.runoff_annual = 0.0
-        self.evap_annual = 0.0
-        self.trans_annual = 0.0
-        self.ET_annual = 0.0
-        self.drainage_annual = 0.0
-
-        self.p_act_annual = 0.0
-        self.p_calc_annual = 0.0
-
-        self.annual_water_balance_difference = 0.0
-
-        self.infiltration = 0.0
-
+        # sediment P
         self.sed = 0.0
         self.sed_P = 0.0
         self.sed_P_conc = 0.0
         self.enrichment_P = 0.0
         self.runoff_conc = 0.0
 
-        # daily soil nitrogen values
+        self.initialize_soil_P()
+
+        # daily soil nitrogen
         self.residue = data['initial_residue']
         self.freshNMineralRate = data['fresh_N_mineral_rate']
         self.decay_rate = 0.0
@@ -472,6 +265,7 @@ class Soil:
         self.stable_N_erosion = 0.0
         self.fresh_N_erosion = 0.0
 
+        # annual soil nitrogen
         self.NO3_runoff_annual = 0.0
         self.NH4_runoff_annual = 0.0
 
@@ -484,8 +278,84 @@ class Soil:
         self.NH4_drainage_annual = 0.0
         self.active_N_drainage_annual = 0.0
 
-        # Initialize Soil Nitrogen
-        # "pseudocode_soil" S.4.A
+        self.initialize_soil_N()
+
+    def calculate_layer_thickness(self):
+        """
+        Definition:
+            Calculates and updates the thickness (cm) of each layer
+        """
+        curr_thickness = 0
+        for layer in self.soil_layers:
+            layer.thickness = layer.bottom_depth - curr_thickness
+            layer.thickness_cm = layer.thickness / 10
+            curr_thickness = layer.bottom_depth
+
+    def set_cover_factor(self):
+        """
+        Definition:
+            Determines the initial cover factor based on the type of cover
+            specified in the JSON file
+
+        Returns:
+            int: the cover factor
+        """
+        if self.cover == "GRASSED":
+            return 0.8
+        elif self.cover == "RESIDUE COVER":
+            return 0.667
+        else:
+            return 0.5333
+
+    def initialize_soil_water(self):
+        """
+        Description:
+            Initialize information for the soil water sub-module
+        """
+        for layer in self.soil_layers:
+            layer.soil_water = layer.thickness * layer.soil_water_percent
+            layer.fc_water = layer.thickness * layer.field_capacity
+            layer.sat_water = layer.thickness * layer.saturation
+            layer.wilting_water = layer.thickness * layer.wilting_point
+            self.profile_SW += layer.soil_water
+
+    def initialize_soil_P(self):
+        """
+        Description:
+            Initialize information for the soil Phosphorus sub-module
+            "pseudocode_soil" S.5.A
+        """
+        for layer in self.soil_layers:
+
+            # S.5.A.1
+            layer.PSP_max = -0.045 * log(layer.clay) + 0.001 * \
+                            layer.labile_P - 0.035 * layer.org_C + 0.43
+            layer.PSP_act = max(0.05, min(0.7, layer.PSP_max))
+            layer.PSP_avg = layer.PSP_act
+
+            # S.5.A.2
+            layer.labile_P = layer.labile_P * layer.bulk_density \
+                             * layer.thickness_cm * 0.1
+
+            # S.5.A.3
+            layer.active_P = layer.labile_P * (1.0 - layer.PSP_act) / layer.PSP_act
+
+            # S.5.A.4
+            layer.stable_P = layer.active_P * 4.0
+
+            # S.5.A.5 TODO organic soil pools (labile_O, and active_O) are not being tracked
+            layer.org_P = layer.org_C / 8.0 / 14.0 * 10000 * layer.bulk_density \
+                          * layer.thickness_cm * 0.1
+
+            # S.5.A.6
+            layer.mass = layer.bulk_density * layer.thickness_cm * 10000
+
+    def initialize_soil_N(self):
+        """
+        Description:
+            Initialize information for the soil nitrogen sub-module
+            "pseudocode_soil" S.4.A
+        """
         for layer in self.soil_layers:
             z = layer.bottom_depth
 
@@ -523,238 +393,10 @@ class Soil:
             layer.NH4 = NH4 * unit_adjustment
             layer.top_layer_fresh_N = fresh_N * unit_adjustment
 
-    class SoilLayer:
-        """
-        An instance of this class represents a layer in the soil.
-        """
-
-        def __init__(self, layer_name, layer_data):
-            """
-            Description:
-                Populates the characteristic values of a soil layer.
-
-            Input:
-                layer_name: a string which is the name of this layer
-                layer_data: a dictionary which stores the information for this layer
-            """
-            self.name = layer_name
-
-            self.bottom_depth = layer_data['bottom_depth']
-            self.bottom_depth_cm = self.bottom_depth / 10
-            self.wilting_point = layer_data['wilting_point']
-            self.field_capacity = layer_data['field_capacity']
-            self.saturation = layer_data['saturation']
-            self.soil_water_percent = layer_data['soil_water_percent']
-
-            self.thickness = 0.0  # thickness of soil layer
-            self.thickness_cm = 0.0
-
-            self.fc_water = 0.0  # constant
-            self.sat_water = 0.0  # constant
-            self.wilting_water = 0.0  # constant
-            self.soil_water = 0.0  # mm water in the soil profile
-
-            self.bulk_density = layer_data['bulk_density']
-            self.mass = 0
-
-            # Variables to calculate daily evapotranspiration
-            self.top_evap = 0.0  # evaporation demand at top of layer
-            self.bottom_evap = 0.0  # evaporation demand at bottom of layer
-            self.evap = 0.0  # evaporation demand at layer
-            self.trans_act = 0.0  # actual transpiration for the layer (updated in crop)
-
-            # Variables used for soil temperature
-            self.temperature = layer_data['initial_temperature']
-
-            # Variables to calculate dailyPercolation
-            self.ksat = layer_data['K_sat']  # saturated hydraulic conductivity (mm/h)
-            self.TT = 0.0
-            self.perc = 0.0  # amount of water that percolates to next layer
-
-            self.clay = layer_data['clay']  # soil clay % in soil layer
-
-            # Variable to simulate nitrogen Cycling
-            self.org_C = layer_data['org_C_percent']
-            self.active_mineral_rate = layer_data['active_mineral_rate']
-            self.cation_exclusion_fraction = layer_data['cation_exclusion_fraction']
-            self.denitrification_rate = layer_data['denitrification_rate']
-            self.NH4 = layer_data['NH4']
-
-            self.temp_fac = 0.0
-            self.water_fac = 0.0
-
-            # Initial NO3 levels (kg/ha) in the soil layer:
-            self.NO3 = 0.0
-
-            # Organic N (Active + Stable, mg/kg):
-            self.org_N = 0.0
-
-            # Initial Active N in layer:
-            self.active_N = 0.0
-
-            # Initial Stable N in layer:
-            self.stable_N = 0.0
-
-            self.NO3_perc = 0.0
-            self.NH4_perc = 0.0
-            self.active_perc = 0.0
-            self.N_min_act = 0.0
-            self.nitrification = 0.0
-            self.volatilization = 0.0
-            self.denitrification = 0.0
-            self.N_trans = 0.0
-            self.tot_nitri_volatil = 0.0
-
-            self.de_N_rate = layer_data['denitrification_rate']
-            self.active_N_percent = layer_data['active_N_percent']
-            self.volatile_exchange_factor = layer_data['volatile_exchange_factor']
-
-            # Variables to simulate phosphorus cycling
-            self.OM_percent = layer_data['OM_percent']
-
-            # P in the soil layer
-            self.soil_P = 0.0
-
-            self.iso_slope = 0.0  # the slope of the isotherm curve
-            self.iso_inter = 0.0  # the intercept of the isotherm curve
-
-            self.DRP_leachate = 0.0
-            self.DRP_leachate_act = 0.0
-            self.DRP_runoff = 0.0
-
-            self.labile_P = layer_data['labile_P']  # labile P in soil layer
-            self.active_P = 0.0
-            self.stable_P = 0.0
-            self.org_P = 0.0
-            self.P_uptake = 0.00
-
-            self.labile_P_uptake = 0.0
-            self.labile_P_sum = 0.0
-            self.PSP_max = 0.0
-            self.PSP_act = 0.0
-            self.PSP_avg = 0.0
-
-            self.pbal = 0.0
-            self.days_unbalanced_labile = 0.0
-            self.days_unbalanced_active = 0.0
-
-    # ---------------------------------------------------------------------------
-    # Class: Fertilizer
-    # An instance of this class represents a particular fertilizer and the date
-    # of its application
-    # ---------------------------------------------------------------------------
-    class Fertilizer:
-        """
-        An instance of this class represents a particular fertilizer and the date
-        of its application
-        """
-
-        def __init__(self, fert_data):
-            """
-            Args:
-                fert_data: a dictionary which holds the rest of the information about
-                    this fertilizer
-            """
-            self.year = fert_data['year']
-            self.day = fert_data['day']
-            self.mass = fert_data['mass']
-            self.depth = [x / 10 for x in fert_data['depth']]
-            self.surface_percent = fert_data['surf_perc']
-
-    # ---------------------------------------------------------------------------
-    # Class: Manure
-    # An instance of this class represents a particular manure and the date
-    # of its application
-    # ---------------------------------------------------------------------------
-    class Manure:
-        """
-        An instance of this class represents a particular manure and the date
-        of its application
-        """
-
-        def __init__(self, manure_data):
-            """
-            Args:
-                manure_data: a dictionary which stores the information for this manure
-            """
-            self.type = manure_data['type']
-            self.year = manure_data['year']
-            self.day = manure_data['day']
-            self.mass = manure_data['mass']
-            self.P_frac = manure_data['P_frac']
-            self.N_frac = manure_data['N_frac']
-            self.NH4_frac = manure_data['NH4_frac']
-            self.WIP_frac = manure_data['WIP_frac']
-            self.WOP_frac = manure_data['WOP_frac']
-            self.DM = manure_data['dry_matter']
-            self.percent_cover = manure_data['percent_cover']
-            self.depth = [x / 10 for x in manure_data['depth']]
-            self.surface_percent = manure_data['surf_perc']
-
-    # ---------------------------------------------------------------------------
-    # Class: Tillage
-    # An instance of this class represents a particular tillage and the date
-    # of its application
-    # ---------------------------------------------------------------------------
-    class Tillage:
-        """
-        An instance of this class represents a particular tillage and the date
-        of its application
-        """
-
-        def __init__(self, tillage_data):
-            """
-            Args:
-                tillage_data: a dictionary which stores the information for this tillage
-            """
-            self.year = tillage_data['year']
-            self.day = tillage_data['day']
-            self.percent_incorporated = tillage_data['perc_incorporated']
-            self.percent_mixed = tillage_data['perc_mixed']
-            self.depth = [x / 10 for x in tillage_data['depth']]
-
-    def calculate_soil_water(self):
-        """
-        Description:
-            Calculates the amount of water in soil profile for a given layer at
-            a certain ratio. Called when soil portion of input is read.
-        """
-
-        for layer in self.soil_layers:
-            layer.soil_water = layer.thickness * layer.soil_water_percent
-
-    def calculate_FC_water(self):
-        """
-        Description:
-            Calculates the amount of water in soil profile for a given layer at
-            field capacity (mm H2O). Called when soil portion of input is read.
-        """
-
-        for layer in self.soil_layers:
-            layer.fc_water = layer.thickness * layer.field_capacity
-
-    def calculate_SAT_water(self):
-        """
-        Description:
-            Calculates the amount of water in soil profile for a given layer at
-            saturation (mm H2O). Called when soil portion of input is read.
-        """
-        for layer in self.soil_layers:
-            layer.sat_water = layer.thickness * layer.saturation
-
-    def calculate_wilting_water(self):
-        """
-        Description:
-            Calculates the amount of water in soil profile for a given layer at
-            wilting point (mm H2O). Called when soil portion of input is read.
-        """
-        for layer in self.soil_layers:
-            layer.wilting_water = layer.thickness * layer.wilting_point
-
     def calculate_annual_water_balance(self):
         """
         Description:
-            Calculates annual water balance
+            Calculates annual water balance.
         """
         self.delta_SW_annual = self.profile_SW - self.initial_annual_SW
 
@@ -767,7 +409,7 @@ class Soil:
     def annual_reset(self):
         """
         Description:
-            Resets the annual values for the next year.
+            Resets annual values for the soil profile in anticipation of the next year.
         """
 
         self.ET_max_annual = 0.0
@@ -814,3 +456,112 @@ class Soil:
 
         self.TIP_runoff_annual = 0.0
         self.M_DRP_runoff_annual = 0.0
+
+    class SoilLayer:
+        def __init__(self, layer_name, layer_data):
+            """
+            Description:
+                An instance of this class represents a layer in the soil profile.
+
+            Args:
+                layer_name: a string which is the name of this layer
+                layer_data: a dictionary which stores the information for this layer
+            """
+            self.name = layer_name
+
+            # profile
+            self.bottom_depth = layer_data['bottom_depth']
+            self.bottom_depth_cm = self.bottom_depth / 10
+
+            self.bulk_density = layer_data['bulk_density']
+            self.mass = 0
+
+            self.thickness = 0.0
+            self.thickness_cm = 0.0
+
+            self.clay = layer_data['clay']
+
+            # temperature
+            self.temperature = layer_data['initial_temperature']
+
+            # soil water
+            self.wilting_point = layer_data['wilting_point']
+            self.field_capacity = layer_data['field_capacity']
+            self.saturation = layer_data['saturation']
+            self.soil_water_percent = layer_data['soil_water_percent']
+
+            self.fc_water = 0.0
+            self.sat_water = 0.0
+            self.wilting_water = 0.0
+            self.soil_water = 0.0
+
+            # daily evapotranspiration
+            self.top_evap = 0.0
+            self.bottom_evap = 0.0
+            self.evap = 0.0
+            self.trans_act = 0.0
+
+            # daily percolation
+            self.ksat = layer_data['K_sat']  # saturated hydraulic conductivity (mm/h)
+            self.TT = 0.0
+            self.perc = 0.0
+
+            # nitrogen cycling
+            self.org_C = layer_data['org_C_percent']
+            self.active_mineral_rate = layer_data['active_mineral_rate']
+            self.cation_exclusion_fraction = layer_data['cation_exclusion_fraction']
+            self.denitrification_rate = layer_data['denitrification_rate']
+            self.NH4 = layer_data['NH4']
+
+            # the coefficient of extraction for leaching is calibrated to 2.5
+            self.Cl = 2.5
+
+            self.temp_fac = 0.0
+            self.water_fac = 0.0
+
+            self.NO3 = 0.0
+            self.org_N = 0.0
+            self.active_N = 0.0
+            self.stable_N = 0.0
+
+            self.NO3_perc = 0.0
+            self.NH4_perc = 0.0
+            self.active_perc = 0.0
+
+            self.N_min_act = 0.0
+            self.nitrification = 0.0
+            self.volatilization = 0.0
+            self.denitrification = 0.0
+            self.N_trans = 0.0
+            self.tot_nitri_volatil = 0.0
+
+            self.de_N_rate = layer_data['denitrification_rate']
+            self.active_N_percent = layer_data['active_N_percent']
+            self.volatile_exchange_factor = layer_data['volatile_exchange_factor']
+
+            # phosphorus cycling
+            self.OM_percent = layer_data['OM_percent']
+            self.soil_P = 0.0
+
+            self.iso_slope = 0.0  # the slope of the isotherm curve
+            self.iso_inter = 0.0  # the intercept of the isotherm curve
+
+            self.DRP_leachate = 0.0
+            self.DRP_leachate_act = 0.0
+            self.DRP_runoff = 0.0
+
+            self.labile_P = layer_data['labile_P']
+            self.active_P = 0.0
+            self.stable_P = 0.0
+            self.org_P = 0.0
+            self.P_uptake = 0.00
+
+            self.labile_P_uptake = 0.0
+            self.labile_P_sum = 0.0
+            self.PSP_max = 0.0
+            self.PSP_act = 0.0
+            self.PSP_avg = 0.0
+
+            self.pbal = 0.0
+            self.days_unbalanced_labile = 0.0
+            self.days_unbalanced_active = 0.0

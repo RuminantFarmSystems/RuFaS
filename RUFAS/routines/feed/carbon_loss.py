@@ -23,6 +23,8 @@ def update_all(storage):
     """
     Description:
         The only external function call. Runs the carbon loss sub-module
+    Args:
+        storage: the storage receptacle for which loss is being calculated
     """
 
     harvest_loss(storage)
@@ -38,6 +40,8 @@ def harvest_loss(storage):
     """
     Description:
         Carbon loss during harvest
+    Args:
+        storage
     """
 
     storage.C_harvest_gas = storage.C * storage.C_harvest_gas_percent
@@ -49,6 +53,8 @@ def storage_loss(storage):
     """
     Description:
         Carbon loss during feed storage
+    Args:
+        storage
     """
 
     storage.C_storage_gas = storage.C * storage.C_storage_gas_percent
@@ -60,6 +66,8 @@ def feed_out_loss(storage):
     """
     Description:
         Carbon loss during feed out
+    Args:
+        storage
     """
 
     storage.C_feed_out_gas = storage.C * storage.C_feed_out_gas_percent
@@ -71,6 +79,8 @@ def update_carbon(storage):
     """
     Description:
         Update stored carbon based on calculated losses
+    Args:
+        storage
     """
 
     storage.C_loss = (storage.C_harvest_gas + storage.C_harvest_particle +

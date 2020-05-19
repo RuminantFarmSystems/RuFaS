@@ -53,7 +53,7 @@ class RationReport(BaseReportHandler):
         Description:
             Writes variable names and units to the header of the csv
 
-        Inputs:
+        Args:
             output_csv: csv to be written to
             variables: list of variables being reported
         """
@@ -93,7 +93,7 @@ class RationReport(BaseReportHandler):
         Description:
             Called daily from the output handler to store simulation values for
              reporting at the end of the year
-        Inputs:
+        Args:
             pen: a ration report is produced for each pen simulated
         """
 
@@ -105,7 +105,7 @@ class RationReport(BaseReportHandler):
         """
         Description:
             Called at the end of each simulation year to store annual values
-        Inputs:
+        Args:
             pen: a ration report is produced for each pen simulated
         """
 

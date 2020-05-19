@@ -39,11 +39,13 @@ from math import exp
 
 
 def update_all(soil, crop_type):
-    """This function updates all of a crop's soil water uptake information.
+    """
+    Description:
+        This function updates all of a crop's soil water uptake information.
 
-    Inputs:
-        crop_type
-        soil
+    Args:
+        soil:
+        crop_type:
     """
 
     max_uptakes_ly = calc_max_water_uptake_each_layer(soil, crop_type)
@@ -52,21 +54,24 @@ def update_all(soil, crop_type):
     adj_uptakes_ly = inc_lower_layer_uptake(soil, crop_type, max_uptakes_ly)
 
     # Second adjustment of water uptakes
-    adj_uptakes_ly = decrease_effic_of_uptake(soil, adj_uptakes_ly)
+    adj_uptakes_ly = decrease_efficiency_of_uptake(soil, adj_uptakes_ly)
 
     # Calculate total actual water uptake
     calc_act_water_uptake(soil, crop_type, adj_uptakes_ly)
 
 
 def calc_max_water_uptake_each_layer(soil, crop_type):
-    """Calculates the maximum potential water uptake from each soil layer and
-       returns these values in a list ordered shallow to deep. The soil layers
-       in soil.soil_layers should already be in this order.
-       "pseudocode_crop" C.4.A
+    """
+    Description:
+        Calculates the maximum potential water uptake from each soil layer and
+        returns these values in a list ordered shallow to deep. The soil layers
+        in soil.soil_layers should already be in this order.
+        "pseudocode_crop" C.4.A
 
-    Inputs:
-        crop_type
+    Args:
         soil
+        crop_type
+
     Returns:
         list: maximum uptake for each layer
     """
@@ -87,14 +92,17 @@ def calc_max_water_uptake_each_layer(soil, crop_type):
 
 
 def calc_max_water_uptake_z(soil, crop_type, z):
-    """Calculates potential water uptake from the soil surface to a specified depth
-       z (mm H2O).
-       "pseudocode_crop" C.4.A.1
+    """
+    Description:
+        Calculates potential water uptake from the soil surface to a specified depth
+        z (mm H2O).
+        "pseudocode_crop" C.4.A.1
 
-    Inputs:
-        crop_type
+    Args:
         soil
-        z: a depth
+        crop_type
+        z: the given depth
+
     Returns:
         int: water uptake potential from the surface to a certain depth
     """
@@ -108,18 +116,21 @@ def calc_max_water_uptake_z(soil, crop_type, z):
 
 
 def inc_lower_layer_uptake(soil, crop_type, uptake_each_layer):
-    """In some cases, actual soil water content in layers overlying a layer may not
-       be sufficient to meet the potential uptake of those layers as calculated by
-       calc_max_water_uptake_each_layer(). In these cases, lower soil layers may be
-       allowed to compensate by increasing their potential uptake.
-       This function takes in the initially calculated potential uptakes, and returns
-       a list of adjusted potential uptakes that compensate for this situation.
-       "pseudocode_crop" C.4.B.1/2/3
+    """
+    Description:
+        In some cases, actual soil water content in layers overlying a layer may not
+        be sufficient to meet the potential uptake of those layers as calculated by
+        calc_max_water_uptake_each_layer(). In these cases, lower soil layers may be
+        allowed to compensate by increasing their potential uptake.
+        This function takes in the initially calculated potential uptakes, and returns
+        a list of adjusted potential uptakes that compensate for this situation.
+        "pseudocode_crop" C.4.B.1/2/3
 
-    Inputs:
-        crop_type
+    Args:
         soil
-        uptake_each_layer
+        crop_type
+        uptake_each_layer: water uptake for each layer of the soil profile
+
     Returns:
         list: uptake values adjusted
     """
@@ -152,16 +163,19 @@ def inc_lower_layer_uptake(soil, crop_type, uptake_each_layer):
     return adjusted_uptakes
 
 
-def decrease_effic_of_uptake(soil, uptake_each_layer):
-    """As water content decreases, the soil holds remaining water more tightly,
-       resulting in a decrease in the efficiency of uptake. This function takes in
-       a list of potential uptakes, and returns a list of adjusted potential uptakes
-       that compensate for this situation.
-       "pseudocode_crop" C.4.B.4/5
+def decrease_efficiency_of_uptake(soil, uptake_each_layer):
+    """
+    Description:
+        As water content decreases, the soil holds remaining water more tightly,
+        resulting in a decrease in the efficiency of uptake. This function takes in
+        a list of potential uptakes, and returns a list of adjusted potential uptakes
+        that compensate for this situation.
+        "pseudocode_crop" C.4.B.4/5
 
-    Inputs:
+    Args:
         soil
-        uptake_each_layer
+        uptake_each_layer: water uptake for each layer of the soil profile
+
     Returns:
         list: uptake values adjusted
     """
@@ -185,15 +199,18 @@ def decrease_effic_of_uptake(soil, uptake_each_layer):
     return adjusted_uptakes
 
 
-def calc_act_water_uptake(soil, crop_type, adjusted_uptakes):
-    """Calculates the actual water uptake by the plant. It uses this value to
-       update trans_act and water_act_up.
-       "pseudocode_crop" C.4.C.2/3
+def calc_act_water_uptake(soil, crop_type, uptake_each_layer):
+    """
+    Description:
+        Calculates the actual water uptake by the plant. It uses this value to
+        update trans_act and water_act_up.
+        "pseudocode_crop" C.4.C.2/3
 
-    Inputs:
-        crop_type
+    Args:
         soil
-        adjusted_uptakes
+        crop_type
+        uptake_each_layer: water uptake for each layer of the soil profile
+
     Returns:
         int: actual water uptake
     """
@@ -202,7 +219,7 @@ def calc_act_water_uptake(soil, crop_type, adjusted_uptakes):
 
     # Calculate actual uptake for each layer
     # C.4.C.1
-    for uptake, layer in zip(adjusted_uptakes, soil.soil_layers):
+    for uptake, layer in zip(uptake_each_layer, soil.soil_layers):
         act_uptake = min(uptake, layer.soil_water - layer.wilting_water)
 
         layer.trans_act = act_uptake

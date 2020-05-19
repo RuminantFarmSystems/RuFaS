@@ -33,7 +33,7 @@ class Cow(HeiferIII):
     '''
 		Description:
 			initialize the cow from heifer
-		Input:
+		Args:
 			heiferIII: third stage of heifer, pass heifer information from heiferIII
 			args.repro_program: reproduction program used in cow, three of them: ED, TAI, and ED-TAI programs
 			args.presynch_method: presych protocols used for presynch programs, four of them: PreSynch, Double OvSynch, G6G, and user_defined
@@ -95,7 +95,7 @@ class Cow(HeiferIII):
     '''
 		Description:
             initialize the cow in this stage from the third stage of heifer and initialize the repro program parameters for coding purpose
-		Input:
+		Args:
 			heiferIII: another heifer out of the herd
 		Output:
 	'''
@@ -145,7 +145,7 @@ class Cow(HeiferIII):
     '''
 		Description:
 			determine parameter value distribution for lactation curve model parameters
-		Input:
+		Args:
 			mean: mean of the parameter value for l, m, n in wood's model
 			std: standard deviation of the parameter value for l, m, n in wood's model
 		Output:
@@ -160,7 +160,7 @@ class Cow(HeiferIII):
 			update milking status for lactating cows
 			start at calving, daily milk production estimated by breed and parity specific lactation curves
 			TEMP: fat percent, FCM, body weight during lactation, and dry matter intake are coded here with equations with hard-coded parameters just for valid the simulation model indication of the place for future adjustment with ration formulation and ecnomics caculation
-		Input:
+		Args:
 		Output:
 			estimated_daily_milk_produced: estimated daily milk production from the lactation curve
 			fat_percent: calculated with days in milk, for temporary use
@@ -317,7 +317,7 @@ class Cow(HeiferIII):
 		Description:
 			update cow status from the moment of calving, parity+1, milking start, pregnancy stop, and estrus restart
 			TEMP: calculate cost and income related values for validating model
-		Input:
+		Args:
 			record_econ_stats: record cost and income in different functions for temporary use
 		Output:
 			estimated_daily_milk_produced: estimated daily milk production from the lactation curve
@@ -381,7 +381,7 @@ class Cow(HeiferIII):
     '''
 		Description:
 			in estrus detection program, determine estrus day and estrus note
-		Input:
+		Args:
 			start_date: start day of a estrus cycle, 1st day when breeding start after calving or last estrus happend or return estrus from preg loss
 			estrus_note: note of this estrus
 			avg: average length for an estrus cycle
@@ -485,7 +485,7 @@ class Cow(HeiferIII):
     '''
 		Description:
 			determine the program start time when pass voluntary waiting period
-		Input:
+		Args:
 			date: the time tai program start
 		Output:
 			_tai_program_start_day_c = date: at this day, the tai program starts
@@ -518,7 +518,7 @@ class Cow(HeiferIII):
     '''
 		Description:
 			OvSynch56 protocol for tai method
-		Input:
+		Args:
 			record_econ_stats: record injection counts in this protocol, for temparary use
 		Output:
 	'''
@@ -540,7 +540,7 @@ class Cow(HeiferIII):
     '''
 		Description:
 			OvSynch48 protocol for tai method
-		Input:
+		Args:
 			record_econ_stats: record injection counts in this protocol, for temparary use
 		Output:
 	'''
@@ -562,7 +562,7 @@ class Cow(HeiferIII):
     '''
 		Description:
 			CoSynch72 protocol for tai method
-		Input:
+		Args:
 			record_econ_stats: record injection counts in this protocol, for temparary use
 		Output:
 	'''
@@ -583,7 +583,7 @@ class Cow(HeiferIII):
     '''
 		Description:
 			5dCoSynch protocol for tai method
-		Input:
+		Args:
 			record_econ_stats: record injection counts in this protocol, for temparary use
 		Output:
 	'''
@@ -617,7 +617,7 @@ class Cow(HeiferIII):
     '''
 		Description:
 			determine the presynch program start time when pass voluntary waiting period
-		Input:
+		Args:
 			date: the time presynch program start
 		Output:
 			_presynch_program_start_day = date: at this day, the presynch program starts
@@ -629,7 +629,7 @@ class Cow(HeiferIII):
     '''
 		Description:
 			presynch protocol for presynch method
-		Input:
+		Args:
 			record_econ_stats: record injection counts in this protocol, for temparary use
 		Output:
 	'''
@@ -648,7 +648,7 @@ class Cow(HeiferIII):
     '''
 		Description:
 			oubleovsynch protocol for presynch method
-		Input:
+		Args:
 			record_econ_stats: record injection counts in this protocol, for temparary use
 		Output:
 	'''
@@ -670,7 +670,7 @@ class Cow(HeiferIII):
     '''
 		Description:
 			g6g protocol for presynch method
-		Input:
+		Args:
 			record_econ_stats: record injection counts in this protocol, for temparary use
 		Output:
 	'''
@@ -698,7 +698,7 @@ class Cow(HeiferIII):
     '''
 		Description:
 			assign tai and presynch method, update time AI method status, TAI can be performed with or without presynch
-		Input:
+		Args:
 			record_econ_stats: record injection counts in this protocol, for temparary use
 		Output:
 	'''
@@ -736,7 +736,7 @@ class Cow(HeiferIII):
     '''
 		Description:
 			update ED-TAI method, perform estrus detection before the TAI program
-		Input:
+		Args:
 			record_econ_stats: record injection counts in this protocol, for temparary use
 		Output:
 	'''
@@ -785,7 +785,7 @@ class Cow(HeiferIII):
     '''
 		Description:
 			using ED at the resynch period of ED-TAI
-		Input:
+		Args:
 			record_econ_stats: record injection counts in this protocol, for temparary use
 		Output:
 	'''
@@ -815,7 +815,7 @@ class Cow(HeiferIII):
 		Description:
 			assign breeding method for open cows after spot open at preg check
 			three methods can be assigned: ED, TAI, ED-TAI
-		Input:
+		Args:
 			record_econ_stats: record injection counts in this protocol, for temparary use
 		Output:
 	'''
@@ -834,7 +834,7 @@ class Cow(HeiferIII):
 			by comparing with conception rate, if conception success, gestion length determined
 			for preg chek 1, confirm the conception
 			for preg chek 2 and 3, confirm pregnacy, there are chances of preg loss in each period of time between preg checks
-		Input:
+		Args:
 			record_econ_stats: record injection counts in this protocol, for temparary use
 		Output:
 	'''
@@ -920,7 +920,7 @@ class Cow(HeiferIII):
 		Description:
 			update culling time and cull reasons for cow to leave the herd
 			the reasons are reproduction failure, low production, and health issues
-		Input:
+		Args:
 			record_econ_stats: record income from beef for temporary use
 		Output:
 			not culled
@@ -993,7 +993,7 @@ class Cow(HeiferIII):
     '''
 		Description:
 			TEMP: update cost and income calculation for feed cost, fixed cost and milking income
-		Input:
+		Args:
 			AnimalBasecull_stage, estimated_daily_milk_produced, record_econ_stats from temp use
 		Output:
 	'''
@@ -1011,7 +1011,7 @@ class Cow(HeiferIII):
     '''
 		Description:
 			TEMP: update breeding method cost and slaughter value of culled cows
-		Input:
+		Args:
 			_repro_cost, semen_cost, AI_cost, preg_check_cost, _feed_cost, _fixed_cost, _milk_income, slaughter_value for temp use
 		Output:
 	'''

@@ -45,13 +45,16 @@ from math import exp
 
 
 def update_all(soil, crop_type, weather, time):
-    """This function updates all biomass information
+    """
+    Description:
+        Called from crop.py, This function updates all biomass information
 
-    Inputs:
-        crop_type
-        soil
-        time
-        weather
+    Args:
+        soil: the current instance of soil in which the crop is growing
+        crop_type: an instance of a crop class
+        weather: an instance of the Weather class specified in classes.py,
+            contains environmental information
+        time: an instance of the Time class specified in classes.py
     """
 
     # update biomass values
@@ -63,13 +66,15 @@ def update_all(soil, crop_type, weather, time):
 
 
 def calc_act_biomass(crop_type, weather, time):
-    """Calculates current actual biomass
+    """
+    Description:
+        Calculates current actual biomass
        "pseudocode_crop" C.9.A.2/3
 
-    Inputs:
+    Args:
         crop_type
-        time
         weather
+        time
     """
 
     H_phosyn = calc_intercepted_radiation(crop_type, weather, time)
@@ -88,14 +93,17 @@ def calc_act_biomass(crop_type, weather, time):
 
 
 def calc_intercepted_radiation(crop_type, weather, time):
-    """Calculates amount of intercepted photosynthetically active radiation
-       on a given day (MJ m^-2).
-       "pseudocode_crop" C.9.A.1
+    """
+    Description:
+        Calculates amount of intercepted photosynthetically active radiation
+        on a given day (MJ m^-2).
+        "pseudocode_crop" C.9.A.1
 
-    Inputs:
+    Args:
         crop_type
-        time
         weather
+        time
+
     Returns:
         int: intercepted radiation
     """
@@ -105,10 +113,12 @@ def calc_intercepted_radiation(crop_type, weather, time):
 
 
 def calc_bio_AG(crop_type):
-    """Calculates above ground biomass.
-       "pseudocode_crop" C.9.B.1
+    """
+    Description:
+        Calculates above ground biomass.
+        "pseudocode_crop" C.9.B.1
 
-    Inputs:
+    Args:
         crop_type
     """
 
@@ -116,12 +126,14 @@ def calc_bio_AG(crop_type):
 
 
 def calc_gamma_wu(soil, crop_type):
-    """Calculates water deficiency factor (AKA gamma_wu).
-       "pseudocode_crop" C.9.C.1
+    """
+    Description:
+        Calculates water deficiency factor (AKA gamma_wu).
+        "pseudocode_crop" C.9.C.1
 
-    Inputs:
-        crop_type
+    Args:
         soil
+        crop_type
     """
 
     if soil.ET_max_annual == 0:
