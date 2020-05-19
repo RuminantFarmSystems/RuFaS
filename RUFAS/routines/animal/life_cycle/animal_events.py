@@ -21,7 +21,7 @@ class AnimalEvents(object):
 	'''
 		Description:
 			add a cow life event
-		Input:
+		Args:
 			date: the date counter for the cow (from birth)
 			description: the event happened on that day
 		Output:

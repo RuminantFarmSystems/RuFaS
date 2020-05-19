@@ -13,16 +13,13 @@ Description: This module contains the necessary functions for calculating and
 
 Soil attribute definitions
 
-    perc = amount of water that percolates to the underlying soil layer (mm H20)
+    perc = amount of water that percolates to the underlying soil layer (mm H2O)
 
     t = time step (24h)
 
     TT = travel time for percolation (h)
 
     K_sat = saturated hydraulic conductivity (mm/h)
-
-Soil values updated by calling update_all():
-    soil.soil_layers.perc
 """
 
 from math import exp
@@ -33,6 +30,9 @@ def update_all(soil):
     Definition:
         This function calls all the necessary functions to update information related
         to percolation
+
+    Args:
+        soil: an instance of the Soil class specified in soil.py
     """
 
     calc_daily_percolation(soil)
@@ -44,6 +44,9 @@ def calc_daily_percolation(soil):
         Calculates daily percolation as a function of the water available for
         percolation (SW_perc) in a soil layer.
         "pseudocode_soil" S.2.C.1/2
+
+    Args:
+        soil
     """
     for layer in soil.soil_layers:
         SAT = layer.sat_water

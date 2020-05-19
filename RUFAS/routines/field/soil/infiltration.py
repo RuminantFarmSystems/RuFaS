@@ -13,11 +13,11 @@ Description: This module contains the necessary functions for calculating and
 
 Soil attribute definitions
 
-    runoff = daily runoff (mm H20)
+    runoff = daily runoff (mm H2O)
 
-    R = daily rainfall depth (mm H20)
+    R = daily rainfall depth (mm H2O)
 
-    S = retention parameter (mm H20)
+    S = retention parameter (mm H2O)
 
     CN1 = Curve Number 1 (empirical value used to determine the retention
                             parameter S)
@@ -26,25 +26,20 @@ Soil attribute definitions
 
     CN3 = Curve Number 3
 
-    S_max = maximum value for S on any given day (mm H20)
+    S_max = maximum value for S on any given day (mm H2O)
 
     SW = soil water content of entire profile, excluding water held at wilting
-            point (mm H20)
+            point (mm H2O)
 
     w1 = shape coefficient
 
     w2 = shape coefficient
 
-    FC = amount of water in soil profile at field capacity (mm H20)
+    FC = amount of water in soil profile at field capacity (mm H2O)
 
-    SAT = amount of water in soil profile at saturation (mm H20)
+    SAT = amount of water in soil profile at saturation (mm H2O)
 
     S_frz = retention parameter when the top layer of soil is frozen
-
-
-Soil values updated by calling update_all():
-    soil.runoff
-    soil.infiltration
 """
 
 from math import exp, log
@@ -55,6 +50,11 @@ def update_all(soil, weather, time):
     Definition:
         This function calls all the necessary functions to update information related
         to infiltration
+
+    Args:
+        soil: instance of the Soil class specified in soil.py
+        weather: instance of the Weather class specified in classes.py
+        time: instance of the Time class specified in classes.py
     """
 
     calc_runoff(soil, weather, time)
@@ -65,8 +65,13 @@ def update_all(soil, weather, time):
 def calc_runoff(soil, weather, time):
     """
     Definition:
-        Calculates the daily runoff (mm H20)
+        Calculates the daily runoff (mm H2O)
         "pseudocode_soil" S.2.A.1
+
+    Args:
+        soil
+        weather
+        time
     """
 
     R = weather.rainfall[time.year-1][time.day-1]
@@ -89,9 +94,15 @@ def calc_runoff(soil, weather, time):
 def calc_S(soil):
     """
     Definition:
-        Calculates the retention parameter S (mm H20) for use in calculating daily
-        runoff (mm H20)
+        Calculates the retention parameter S (mm H2O) for use in calculating daily
+        runoff (mm H2O)
         "pseudocode_soil" S.2.A.4
+
+    Args:
+        soil
+
+    Returns:
+        int: S, retention parameter (mm H2O)
     """
 
     CN3 = calc_CN3(soil)
@@ -112,6 +123,12 @@ def calc_CN1(soil):
     Definition:
         Calculates Curve Number 1 for use in calculating S_max
         "pseudocode_soil" S.2.A.2
+
+    Args:
+        soil
+
+    Returns:
+        int: CN1, unitless Curve Number 1 for use in calculating S_max
     """
 
     CN2 = soil.CN2
@@ -124,6 +141,12 @@ def calc_CN3(soil):
     Definition:
         Calculates Curve Number 3 for use in calculating S3
         "pseudocode_soil" S.2.A.3
+
+    Args:
+        soil
+
+    Returns:
+        int: CN3, unitless Curve Number 3 for use in calculating S3
     """
 
     CN2 = soil.CN2
@@ -134,9 +157,16 @@ def calc_CN3(soil):
 def calc_S_max(soil):
     """
     Definition:
-        Calculates S_max, the maximum value for S on any given day (mm H20)
+        Calculates S_max, the maximum value for S on the current given day (mm H2O)
         "pseudocode_soil" S.2.A.5
+
+    Args:
+        soil
+
+    Returns:
+        int: S_max, the maximum value for retention parameter S on the current day (mm H2O)
     """
+
     CN1 = calc_CN1(soil)
     return 25.4 * ((1000 / CN1) - 10)
 
@@ -147,10 +177,14 @@ def calc_w1(soil, S_max, CN3, w2):
         Calculates the shape coefficient w1
         "pseudocode_soil" S.2.A.6
 
-    Inputs:
+    Args:
+        soil
         S_max: Maximum value for retention parameter S on a given day
-        CN3: Curve Number 3. Calculated above
+        CN3: unitless Curve Number 3
         w2: shape coefficient w2
+
+    Returns:
+        int: w1, unitless shape coefficient
     """
 
     FC = soil.profile_depth * soil.soil_layers[0].field_capacity
@@ -168,10 +202,13 @@ def calc_w2(soil, S_max, CN3):
         Calculates the shape coefficient w2
         "pseudocode_soil" S.2.A.7
 
-    Inputs:
+    Args:
+        soil
         S_max: Maximum value for the retention parameter S on a given day
         CN3: Curve Number 3. Calculated above
 
+    Returns:
+        int: w2, unitless shape coefficient
     """
 
     FC = soil.profile_depth * soil.soil_layers[0].field_capacity
@@ -192,40 +229,67 @@ def calc_S3(CN3):
         Calculates S3 for use in calculating shape coefficients w1/w2
         "pseudocode_soil" S. 2.A.8
 
-    Inputs:
-        CN3: Curve Number 3. Calculated above
+    Args:
+        CN3: Curve Number 3
+
+    Returns:
+        int: S3, used in calculating unitless shape coefficients w1, w2
     """
+
     return 25.4 * ((1000 / CN3) - 10)
 
 
-#
-# Calculates soil water content of the entire profile for use in calculating S
-# "pseudocode_soil" S.2.A.4
-#
 def sum_SW(soil):
+    """
+    Description:
+        Calculates soil water content of the entire profile for use in calculating S
+        "pseudocode_soil" S.2.A.4
+
+    Args:
+        soil
+
+    Returns:
+        int: SW, the total soil water content of the profile (mm H2O)
+    """
+
     SW = 0.0
     for layer in soil.soil_layers:
         SW += layer.soil_water
     return SW
 
 
-#
-# Calculates the quantity of water held at wilting point in the entire profile
-# for use in calculating S
-# "pseudocode_soil" S.2.A.4
-#
 def sum_WW(soil):
+    """
+    Description:
+        Calculates the quantity of water held at wilting point in the entire profile
+        for use in calculating S
+        "pseudocode_soil" S.2.A.4
+
+    Args:
+        soil
+
+    Returns:
+        int: WW, the total quantity of water held at wilting point for the profile (mm H2O)
+    """
+
     WW = 0.0
     for layer in soil.soil_layers:
         WW += layer.wilting_water
     return WW
 
 
-#
-# Calculates and updates daily infiltration as rainfall - runoff
-# "pseudocode_soil" S.2.A.10
-#
 def calc_daily_infiltration(soil, weather, time):
+    """
+    Description:
+        Calculates and updates daily infiltration as rainfall - runoff
+        "pseudocode_soil" S.2.A.10
+
+    Args:
+        soil
+        weather
+        time
+    """
+
     R = weather.rainfall[time.year-1][time.day-1]
     runoff = soil.runoff
     soil.infiltration = R - runoff

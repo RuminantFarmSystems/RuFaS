@@ -25,7 +25,7 @@ class HeiferII(HeiferI):
 	'''
 		Description:
 			initialize the heifer in this stage from the first stage and initialize the repro program parameters
-		Input:
+		Args:
 			heiferI: first stage of heifer, pass heifer information from heiferI
 			args.repro_program: reproduction program used in heifer, three of them: ED, TAI, and synch-ED programs
 			args.tai_method_h: timed-AI protocols used for reproduction programs, three of them: 5dCG2P, 5dCGP, and user-defined
@@ -61,7 +61,7 @@ class HeiferII(HeiferI):
 	'''
 		Description:
 			initialize the heifer in this stage from the first stage and initialize the repro program parameters for coding purpose
-		Input:
+		Args:
 			heiferII: another heifer out of the herd
 		Output:
 	'''
@@ -123,7 +123,7 @@ class HeiferII(HeiferI):
 			breeding start with assigned reproduction program
 			time to move to the 3rd stage -- replacement stage determined based on gestion length and user input of replacement timw
 			culling for reproduction problem occur when heifer doesn't get pregnant for a long time
-		Input:
+		Args:
 		Output:
 			cull_stage: culling for reproduction failure
 			third_stage: move to next stage -- heiferIII stage when time comes
@@ -177,7 +177,7 @@ class HeiferII(HeiferI):
 	'''
 		Description:
 			in estrus detection program, determine estrus day and estrus note
-		Input:
+		Args:
 			start_date: start day of a estrus cycle, 1st day when breeding start or last estrus happend or return estrus from preg loss
 			estrus_note: note of this estrus
 		Output:
@@ -243,7 +243,7 @@ class HeiferII(HeiferI):
 	'''
 		Description:
 			determine the program start time when reach breeding start time
-		Input:
+		Args:
 			date: the time breeding program start
 		Output:
 	'''
@@ -316,7 +316,7 @@ class HeiferII(HeiferI):
 	'''
 		Description:
 			determine the program start time when reach breeding start time
-		Input:
+		Args:
 			date: the time breeding program start
 		Output:
 	'''
@@ -326,7 +326,7 @@ class HeiferII(HeiferI):
 	'''
 		Description:
 			determine synch ed leading estrus start day, with nornal distribution
-		Input:
+		Args:
 			date: start of the synch ed day
 			avg: average of estrus occur after synch ed
 			std: standard diviation of synch ed

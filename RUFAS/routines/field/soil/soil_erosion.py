@@ -63,12 +63,6 @@ Soil attribute definitions
     L_hill = hill slope length (m)
 
     alpha_hill = angle of the hill slope defined arctan(slope) (m/m)
-
-
-Soil values updated by calling update_all():
-    sed
-
-
 """
 
 from math import exp, log, atan, sin
@@ -78,6 +72,12 @@ def update_all(soil, crop, weather, time):
     """
     Description:
         Updates all soil erosion information
+
+    Args:
+        soil: instance of the Soil class specified in soil.py
+        crop: instance of the Crop class specified in crop.py
+        weather: instance of the Weather class specified in classes.py
+        time: instance of the Time class specified in classes.py
     """
 
     calc_sed(soil, crop, weather, time)
@@ -88,6 +88,12 @@ def calc_sed(soil, crop, weather, time):
     Description:
         Calculates sed, sediment yield on a given day (metric tons)
         "pseudocode_soil" S.3.A.1/17
+
+    Args:
+        soil
+        crop
+        weather
+        time
     """
 
     runoff = soil.runoff
@@ -101,6 +107,7 @@ def calc_sed(soil, crop, weather, time):
 
     # Sediment yield is adjusted for snow on the range day < 60 or day > 350
     # "pseudocode_soil" S.3.A.17
+    # TODO: arbitrary snow flag
     if time.day < 60 or time.day > 350:
         exp_part = exp(3 * 20 / 25.4)
         sed = sed / exp_part
@@ -113,20 +120,26 @@ def calc_peak_runoff(soil, weather, time):
     Description:
         Calculates the peak runoff rate (m^3/sec)
         "pseudocode_soil" S.3.A.2/3
+
+    Args:
+        soil
+        weather
+        time
+
+    Returns:
+        int: peak_runoff, the peak runoff rate on the current day (m^3/sec
     """
 
-    peak_runoff = 0.0
     R = weather.rainfall[time.year - 1][time.day - 1]
-    if R != 0:
 
-        # "pseudocode_soil" S.3.A.3
-        runoff = soil.runoff
-        RC = runoff / R
+    # "pseudocode_soil" S.3.A.3
+    runoff = soil.runoff
+    RC = runoff / R
 
-        I = calc_I(soil, weather, time)
-        area = soil.field_size
+    I = calc_I(soil, weather, time)
+    area = soil.area
 
-        peak_runoff = (RC * I * area) / 3.6
+    peak_runoff = (RC * I * area) / 3.6
 
     return peak_runoff
 
@@ -136,6 +149,14 @@ def calc_I(soil, weather, time):
     Description:
         Calculates I, the rainfall intensity (mm/hr)
         "pseudocode_soil" S.3.A.4
+
+    Args:
+        soil
+        weather
+        time
+
+    Returns:
+        int: I, rainfall intensity (mm/hr)
     """
 
     T_conc = calc_T_conc(soil)
@@ -149,6 +170,12 @@ def calc_T_conc(soil):
     Description:
         Calculates T_conc (the time of concentration (h))
         "pseudocode_soil" S.3.A.5
+
+    Args:
+        soil
+
+    Returns:
+        int: T_conc, time of greatest concentration (h)
     """
 
     length = soil.slope_length ** 0.6
@@ -163,6 +190,14 @@ def calc_Rtc(soil, weather, time):
     Description:
         Calculates Rtc, the amount of rain during time of concentration (mm)
         "pseudocode_soil" S.3.A.6
+
+    Args:
+        soil
+        weather
+        time
+
+    Returns:
+        int: Rtc, rainfall during time of concentration (mm)
     """
 
     alpha = calc_alpha(soil, weather, time)
@@ -176,6 +211,14 @@ def calc_alpha(soil, weather, time):
     Description:
        Calculates alpha, the fraction of daily rain during the time of concentration
         "pseudocode_soil" S.3.A.7
+
+    Args:
+        soil
+        weather
+        time
+
+    Returns:
+        int: alpha, fraction of rain that occurs during time of concentration
     """
 
     T_conc = calc_T_conc(soil)
@@ -193,6 +236,13 @@ def calc_alpha_05(weather, time):
         Calculates alpha_05, the fraction of daily rain in the 1/2 hour of
         highest intensity.
         "pseudocode_soil" S.3.A.8
+
+    Args:
+        weather
+        time
+
+    Returns:
+        int: alpha_05, fraction of daily rain in the 1/2 hour of highest intensity
     """
 
     R = weather.rainfall[time.year-1][time.day-1]
@@ -207,6 +257,12 @@ def calc_K(soil):
     Description:
         Calculates the soil erodibility factor K.
         "pseudocode_soil" S.3.A.9
+
+    Args:
+        soil
+
+    Returns:
+        int: K, unitless soil erodibility factor
     """
 
     Fc_sand = calc_Fc_sand(soil)
@@ -223,6 +279,12 @@ def calc_Fc_sand(soil):
         Calculates Fc_sand. Fc_sand gives low factors for soils with high sand
         contents and high values for soils with little sand when calculating K
         "pseudocode_soil" S.3.A.10
+
+    Args:
+        soil
+
+    Returns:
+        int: Fc_sand, unitless sand factor
     """
 
     sand = soil.sand
@@ -239,6 +301,12 @@ def calc_Fcl_si(soil):
         Calculates Fcl_si. Fcl_si gives low factors for soils with high clay to silt
         ratios when calculating K
         "pseudocode_soil" S.3.A.11
+
+    Args:
+        soil
+
+    Returns:
+        int: Fcl_si, unitless clay:silt ratio factor
     """
 
     silt = soil.silt
@@ -253,6 +321,12 @@ def calc_F_org_C(soil):
         Calculates F_org_C. F_org_C reduces soil erodibility for soils with
         high organic carbon content when calculating K
         "pseudocode_soil" S.3.A.12
+
+    Args:
+        soil
+
+    Returns:
+        int: F_org_C, unitless organic carbon factor
     """
 
     org_C = soil.soil_layers[0].org_C
@@ -262,15 +336,18 @@ def calc_F_org_C(soil):
     return 1 - ((0.25 * org_C) / (org_C + exp_part))
 
 
-#
-
-#
 def calc_F_sand(soil):
     """
     Description:
         Calculates F_sand. F_sand reduces soil erodibility for soils with high
         sand contents when calculating K
         "pseudocode_soil" S.3.A.13
+
+    Args:
+        soil
+
+    Returns:
+        int: F_sand, unitless sand factor
     """
 
     sand = soil.sand
@@ -288,6 +365,13 @@ def calc_C(soil, crop):
         clean-tilled, continuous fallow. The minimum value for C is estimated
         at 0.05
         "pseudocode_soil" S.3.A.14
+
+    Args:
+        soil
+        crop
+
+    Returns:
+        int: C, unitless cover and management factor
     """
 
     bio_AG = crop.current_crop.bio_AG
@@ -308,6 +392,12 @@ def calc_LS(soil):
         per unit area from a 22.1-m length of uniform 9 percent slope under
         identical conditions
         "pseudocode_soil" S.3.A.15
+
+    Args:
+        soil
+
+    Returns:
+        int: LS, unitless topographic factor
     """
 
     L_hill = soil.slope_length
@@ -326,7 +416,14 @@ def calc_m(soil):
     Description:
         Calculates the exponent m as a function of field slope
         "pseudocode_soil" S.3.A.16
+
+    Args:
+        soil
+
+    Returns:
+        int: m, unitless field slope exponent
     """
+
     slope = soil.field_slope
 
     exp_part = exp(-35.835 * slope)

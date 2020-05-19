@@ -19,7 +19,7 @@ class HeiferI(Calf):
 	'''
 		Description:
 			initialize the 1st heifer group from calf, pass calf information to heiferI
-		Input:
+		Args:
 			calf: class calf with calf parameters
 		Output:
 	'''
@@ -63,7 +63,7 @@ class HeiferI(Calf):
 			controls heifer's grow with average daily gain based on user's input untill breeding start day
 			here is the place to change growth rate with heifer feeding methods later when we have heifer nutrition from the ration furmulation module
 			once reach the breeding start day, this heifer would be move to next stage, the heiferII stage
-		Input:
+		Args:
 		Output:
 			second_stage: the second stage of heifer -- breeding stage starts
 	'''

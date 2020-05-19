@@ -106,37 +106,26 @@ Soil attribute definitions
 
     N_trans = nitrogen transferred between the active and stable pools
 
-    frac_N = fraction of Humic nitrogen in the active pool (0.02)
-
-
-Soil values updated by calling update_all():
-
-    soil_layers
-
-    values updated in each soil layer:
-
-        NO3
-        NH4
-        temp_fac
-        water_fac
-        volatilization
-        active_N
-        org_N
-        stable_N
+    frac_N = fraction of Humic Nitrogen in the active pool (0.02)
 """
 
 from math import exp
 from . import denitrification, humus_mineralization, mineralization_decomp, \
     leaching_runoff_erosion, nitrification_volatilization
-from ...application_management import application_management
 
 
-def update_all(soil, application, weather, time):
+def update_all(soil, manure_management, weather, time):
     """
     Description:
         This function calls all the necessary functions to update information related
         to nitrogen cycling. The order in which each method is called is significant
         and is a matter of active development.
+    Args:
+        soil: instance of the Soil class specified in soil.py
+        manure_management: instance of the ApplicationManagement class
+            specified in application_management.py
+        weather: instance of the Weather class specified in classes.py
+        time: instance of the Time class specified in classes.py
     """
 
     calc_temp_factors(soil)
@@ -153,7 +142,9 @@ def update_all(soil, application, weather, time):
 
     humus_mineralization.humus_mineralization(soil)
 
-    added_manure_N(soil, application, weather, time)
+    if (time.year, time.day) in manure_management:
+        if manure_management.check_conditions(soil, weather, time):
+            added_manure_N(soil, manure_management[(time.year, time.day)])
 
 
 def calc_temp_factors(soil):
@@ -163,6 +154,8 @@ def calc_temp_factors(soil):
         calculations for nitrification, volatilization, denitrification, and
         mineralization
         "pseudocode_soil" S.4.B.1
+    Args:
+        soil
     """
 
     for layer in soil.soil_layers:
@@ -181,6 +174,8 @@ def calc_water_factors(soil):
         calculations for nitrification, volatilization, denitrification, and
         mineralization
         "pseudocode_soil" S.4.B.2
+    Args:
+        soil
     """
 
     for layer in soil.soil_layers:
@@ -197,28 +192,21 @@ def calc_water_factors(soil):
         layer.water_fac = water_fac
 
 
-def added_manure_N(soil, application, weather, time):
+def added_manure_N(soil, manure_application):
     """
     Description:
-        TODO: Temporary method to add manure from weather file
+        TODO: Temporary method
+        Adds specified manure to soil with no availability constraints.
+
+    Args:
+        soil
+        manure_application: an instance of the Manure object specified in
+            application_management.py
     """
-    day = time.day
-    year = time.year
-    m_app = application.manure
-    mass = m_app.mass
 
-    for i in range(0, len(m_app.day)):
-        if (m_app.day[i] == day and m_app.year[i] - soil.start_year + 1 == year) \
-                or (m_app.year[i] - soil.start_year + 1 == year and m_app.day[i] == -1
-                    and application.manure_day is True):
+    total_N = manure_application.mass * manure_application.N_frac
+    active_N = total_N * 0.875
+    stable_N = total_N * 0.125
 
-            m_app.day[i] = time.day
-
-            # if the conditions are good enough to apply manure
-            if not application_management.check_conditions(soil, application, weather, time, i, 'm',):
-                total_N = mass[i] * m_app.N_frac[i]
-                active_N = total_N * 0.875
-                stable_N = total_N * 0.125
-
-                soil.soil_layers[0].active_N += active_N
-                soil.soil_layers[0].stable_N += stable_N
+    soil.soil_layers[0].active_N += active_N
+    soil.soil_layers[0].stable_N += stable_N

@@ -106,7 +106,7 @@ class SoilNitrogen(BaseReportHandler):
         Description:
             Writes variable names and units to the header of the csv
 
-        Inputs:
+        Args:
             output_csv: csv to be written to
             variables: list of variables being reported
         """
@@ -140,7 +140,7 @@ class SoilNitrogen(BaseReportHandler):
         Description:
             Called daily from the output handler to store simulation values for
              reporting at the end of the year
-        Inputs:
+        Args:
             field: a soil nitrogen report is produced for each field simulated
         """
 
@@ -155,7 +155,7 @@ class SoilNitrogen(BaseReportHandler):
         Description:
             Called daily from the output handler to store simulation values for
              reporting at the end of the year
-        Inputs:
+        Args:
             field: a soil nitrogen report is produced for each field simulated
         """
 

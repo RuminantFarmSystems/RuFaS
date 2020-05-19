@@ -63,7 +63,7 @@ class FeedStorage(BaseReportHandler):
         Description:
             Writes variable names and units to the header of the csv
 
-        Inputs:
+        Args:
             output_csv: csv to be written to
             variables: list of variables being reported
         """

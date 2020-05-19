@@ -1,35 +1,46 @@
-################################################################################
 """
+RUFAS
 SurPhos
+
 File name: erosion.py
-Author(s): Jacob Johnson, jacob8399@gmail.com,
-           William Donovan, wmdonovan@wisc.edu
+
+Author(s):  DR. Peter A. Vadas
+            USDA-ARS Dairy Forage Research Center
+            E-mail: peter.vadas@ars.usda.gov
+
+Coder(s):   Jacob Johnson jacob8399@gmail.com
+            William Donovan wmdonovan@wisc.edu
 """
-################################################################################
 
 
-# Calculates sediment P transported in runoff using SWAT
-# S.5.I TODO: Peter was skeptical about the compatibility of this module with SurPhos
-def update_all(S):
-    S.runoff_conc = 0
-    S.enrichment_P = 0
-    if S.runoff != 0:
+def update_all(soil):
+    """
+    Description:
+        TODO: This module is currently incompatible with SurPhos (05.18.20)
+        Calculates sediment P transported in runoff using SWAT
+        "pseudocode_soil" S.5.I
+    Args:
+        soil: instance of the Soil class specified in soil.py
+    """
+    soil.runoff_conc = 0
+    soil.enrichment_P = 0
+    if soil.runoff != 0:
 
         # S.5.I.4
-        S.runoff_conc = S.sed / (10 * S.area * S.runoff)
+        soil.runoff_conc = soil.sed / (10 * soil.area * soil.runoff)
 
         # S.5.I.3
-        S.enrichment_P = 0.78 * (S.runoff_conc ** -0.2468)
+        soil.enrichment_P = 0.78 * (soil.runoff_conc ** -0.2468)
 
     # S.5.I.2
-    S.sed_P_conc = 100 * (S.soil_layers[0].active_P + S.soil_layers[0].stable_P) \
-                   / (S.soil_layers[0].bulk_density * S.soil_layers[0].bottom_depth)
+    soil.sed_P_conc = 100 * (soil.soil_layers[0].active_P + soil.soil_layers[0].stable_P) \
+                      / (soil.soil_layers[0].bulk_density * soil.soil_layers[0].bottom_depth)
 
     # S.5.I.1
-    S.sed_P = 0.001 * S.sed_P_conc * (S.sed / S.area) * S.enrichment_P
+    soil.sed_P = 0.001 * soil.sed_P_conc * (soil.sed / soil.area) * soil.enrichment_P
 
-    S.soil_layers[0].active_P -= S.soil_layers[0].active_P * \
-                                 (S.sed_P / S.soil_layers[0].active_P + S.soil_layers[0].stable_P)
+    soil.soil_layers[0].active_P -= soil.soil_layers[0].active_P * \
+                                    (soil.sed_P / soil.soil_layers[0].active_P + soil.soil_layers[0].stable_P)
 
-    S.soil_layers[0].stable_P -= S.soil_layers[0].stable_P * \
-                                 (S.sed_P / S.soil_layers[0].active_P + S.soil_layers[0].stable_P)
+    soil.soil_layers[0].stable_P -= soil.soil_layers[0].stable_P * \
+                                    (soil.sed_P / soil.soil_layers[0].active_P + soil.soil_layers[0].stable_P)
