@@ -10,11 +10,6 @@ Description: This module contains the necessary functions for calculating
              The only function meant to be used outside of this file is the
              update_all() function. The other functions are meant to serve as
              helper functions within this file.
-
-Feed attribute definitions:
-
-Feed values updated by update_all():
-
 """
 
 

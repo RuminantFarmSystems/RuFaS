@@ -27,6 +27,7 @@ def daily_feed_routine(feed, fields):
         Runs the feed storage routine. Yield is stored at harvest in available storage grouped by crop type and quality.
         Once used, that storage receptacle is removed from the list of available storage.
         If insufficient storage is specified, a "standard" storage receptacle is generated.
+
     Args:
         feed: an instance of the Feed object
         fields: an instance of the Field object (contains harvest information)
@@ -269,11 +270,15 @@ class Feed:
             self.NPN += storage.NPN
 
     class Storage:
-        """
-        Description:
-            A subclass of feed storage specifying a single storage receptacle.
-        """
         def __init__(self, data):
+            """
+            Description:
+                A subclass of feed storage specifying a single storage receptacle.
+
+            Args:
+                data: a dictionary containing information to define the storage
+                    receptacle
+            """
             self.storage_type = data['storage_type']
             self.moisture = data['moisture']
             self.additive = data['additive']
@@ -339,6 +344,7 @@ class Feed:
             Description:
                 Calibrates the feed storage loss model to the crop being stored in the receptacle.
                 Based on information provided by Kevin Painke-Buisse of the DFRC 2019
+                "pseudocode_feed" F.1.4
             Args:
                 crop: The crop to be stored
             """
@@ -456,14 +462,15 @@ class Feed:
                 crop: the crop to be stored
             """
             if self.storage:
+                # "pseudocode_feed" F.1.1
                 self.DM += crop.yield_actual
-                self.CP += crop.yield_actual * self.CP_percent
-
                 self.N += crop.yield_N
                 self.P += crop.yield_P
-
                 # TODO: C_percent is a temp work around. Update to yield_C when carbon model is implemented.
                 self.C += crop.yield_actual * self.C_percent
+
+                # "pseudocode_feed" F.1.2
+                self.CP += 6.25 * self.N / self.DM
 
                 # Reset harvest quality for the crop
                 crop.harvest_quality = ''
@@ -472,11 +479,11 @@ class Feed:
             """
             Description:
                 Calculates mineral losses for the storage method once all crops are stored
+                "pseudocode_feed" F.1.3
             """
             carbon_loss.update_all(self)
             nitrogen_loss.update_all(self)
-
-            # TODO: no protein degradation is currently being simulated
+            # TODO: No protein degradation currently implemented
             protein_degradation.update_all()
 
         def reset_storage(self):

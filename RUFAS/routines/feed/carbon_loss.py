@@ -11,11 +11,6 @@ Description: This module contains the necessary functions for calculating and
              The only function meant to be used outside of this file is the
              update_all() function. The other functions are meant to serve as
              helper functions within this file.
-
-Feed attribute definitions:
-
-Feed values updated by update_all():
-
 """
 
 
@@ -23,6 +18,8 @@ def update_all(storage):
     """
     Description:
         The only external function call. Runs the carbon loss sub-module
+        "pseudocode_feed" F.1.3
+
     Args:
         storage: the storage receptacle for which loss is being calculated
     """
@@ -40,6 +37,8 @@ def harvest_loss(storage):
     """
     Description:
         Carbon loss during harvest
+        "pseudocode_feed" F.1.3
+
     Args:
         storage
     """
@@ -53,6 +52,8 @@ def storage_loss(storage):
     """
     Description:
         Carbon loss during feed storage
+        "pseudocode_feed" F.1.3
+
     Args:
         storage
     """
@@ -66,6 +67,8 @@ def feed_out_loss(storage):
     """
     Description:
         Carbon loss during feed out
+        "pseudocode_feed" F.1.3
+
     Args:
         storage
     """
@@ -79,6 +82,8 @@ def update_carbon(storage):
     """
     Description:
         Update stored carbon based on calculated losses
+        "pseudocode_feed" F.1.3
+
     Args:
         storage
     """

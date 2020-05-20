@@ -10,11 +10,6 @@ Description: This module contains the necessary functions for calculating and
              The only function meant to be used outside of this file is the
              update_all() function. The other functions are meant to serve as
              helper functions within this file.
-
-Feed attribute definitions:
-
-Feed values updated by update_all():
-
 """
 
 
@@ -22,6 +17,8 @@ def update_all(storage):
     """
     Description:
         The only external function call. Runs the nitrogen loss sub-module
+        "pseudocode_feed" F.1.3
+
     Args:
         storage: the storage receptacle for which loss is being calculated
     """
@@ -36,6 +33,8 @@ def CP_loss(storage):
     """
     Description:
         Crude protein loss to gas and leaching
+        "pseudocode_feed" F.1.3
+
     Args:
         storage
     """
@@ -49,7 +48,9 @@ def NPN_loss(storage):
     """
     Description:
         Non-Protein-Nitrogen loss
+        "pseudocode_feed" F.1.3
         TODO: Value never used
+
     Args:
         storage
     """
@@ -61,6 +62,8 @@ def update_CP(storage):
     """
     Description:
         Account for crude protein loss in relevant pools
+        "pseudocode_feed" F.1.3
+
     Args:
         storage
     """
