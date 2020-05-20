@@ -63,15 +63,15 @@ CropType values updated by update_all():
 from math import exp
 
 
-def update_all(soil, crop_type, application_management, time):
+def update_all(soil, crop_type, field_management, time):
     """Runs all the yield calculations
 
     Args:
         soil: an instance of the Soil class specified in soil.py representing
             the current state of the soil profile
         crop_type: an instance of a crop class
-        application_management: an instance of the ApplicationManagement class
-            specified in application_management.py
+        field_management: an instance of the FieldManagement class
+            specified in field_management.py
         time: an instance of the Time class specified in classes.py
     """
 
@@ -81,7 +81,7 @@ def update_all(soil, crop_type, application_management, time):
     calc_yield_act(crop_type)
     calc_harvest_quality(crop_type)
     calc_nutrient_removal(crop_type)
-    calc_residue(soil, crop_type, application_management, time)
+    calc_residue(soil, crop_type, field_management, time)
 
 
 def calc_HI_max(crop_type):
@@ -158,23 +158,23 @@ def calc_nutrient_removal(crop_type):
     crop_type.yield_P = crop_type.fr_P * crop_type.yield_actual
 
 
-def calc_residue(soil, crop_type, application, time):
+def calc_residue(soil, crop_type, field_management, time):
     """
     Description:
         Updates the current residue.
         "pseudocode_crop" C.10.G.1/4/5
 
     Args:
-        application
-        crop_type
-        time
         soil
+        crop_type
+        field_management
+        time
     """
 
     d_residue = 0
     if time.day == crop_type.kill_day or crop_type.crop_type == 'annual':
         d_residue = crop_type.biomass_actual - crop_type.yield_actual
-        kill(crop_type, application, time)
+        kill(crop_type, field_management, time)
     else:
         bio_frac = crop_type.yield_actual / crop_type.biomass_actual
         cut(crop_type, bio_frac)
@@ -182,12 +182,19 @@ def calc_residue(soil, crop_type, application, time):
     soil.residue += d_residue
 
 
-# TODO: Stand in for more sophisticated method
 def calc_harvest_quality(crop_type):
+    """
+    Description:
+        # TODO: Stand in for more sophisticated method
+        Calculate quality of yield for grouping in feed storage
+
+    Args:
+        crop_type
+    """
     crop_type.harvest_quality = "good"
 
 
-def kill(crop_type, application_management, time):
+def kill(crop_type, field_management, time):
     """
     Description:
         Kills the crop
@@ -195,13 +202,13 @@ def kill(crop_type, application_management, time):
 
     Args:
         crop_type
-        application_management
+        field_management
         time
     """
 
-    if application_management.management_scheme == 'optimal':
-        application_management.managed_applications['tillage'].applications[(time.year, time.day)] = \
-            application_management.managed_applications['tillage'].applications.pop((time.year, -1))
+    till_management = field_management.managemed_applications['tillage']
+    if field_management.management_scheme == 'optimal' and (time.year, -1) in till_management.applications:
+        till_management.schedule_application(time)
 
     crop_type.accumulated_HU = 0
     crop_type.prev_accumulated_HU = 0

@@ -22,10 +22,13 @@ def update_all(soil, fert_app):
     Args:
         soil: an instance of the Soil class specified in soil.py
         fert_app: an instance of the Fertilizer class specified in
-            application_management.py
+            field_management.py
     """
+    mass = fert_app['mass']
+    surf_perc = fert_app['surface_percent']
+    depth = fert_app['depth']
 
-    soil.fert_applied_sum += fert_app.mass
+    soil.fert_applied_sum += mass
     soil.no_rains = 0
     soil.fert_CNT = 1
 
@@ -33,8 +36,8 @@ def update_all(soil, fert_app):
     # available to be released by rain. Until the first rain event,
     # that P is gradually adsorbed by the soil.
     # S.5.B.1/2
-    soil.fert_P_available += fert_app.mass * 0.75 * fert_app.surface_percent
-    soil.fert_P_released += fert_app.mass * 0.25 * fert_app.surface_percent
+    soil.fert_P_available += mass * 0.75 * surf_perc
+    soil.fert_P_released += mass * 0.25 * surf_perc
 
     sum_fac = 0.0
     last_layer = 0
@@ -44,9 +47,9 @@ def update_all(soil, fert_app):
 
         # for each layer above the application depth
         # S.5.B.5/6
-        if layer.bottom_depth_cm < fert_app.depth:
-            soil.depth_fact = layer.bottom_depth_cm / fert_app.depth
-            layer.labile_P += fert_app.mass * soil.depth_fact * (1.0 - fert_app.surface_percent)
+        if layer.bottom_depth_cm < depth:
+            soil.depth_fact = layer.bottom_depth_cm / depth
+            layer.labile_P += mass * soil.depth_fact * (1.0 - surf_perc)
 
             sum_fac += soil.depth_fact
             last_layer += 1
@@ -54,8 +57,8 @@ def update_all(soil, fert_app):
     # for the layer at the application depth
     # S.5.B.5/7
     soil.depth_fact = 1.0 - sum_fac
-    soil.soil_layers[last_layer].labile_P += fert_app.mass * soil.depth_fact * \
-                                             (1.0 - fert_app.surface_percent)
+    soil.soil_layers[last_layer].labile_P += mass * soil.depth_fact * \
+                                             (1.0 - surf_perc)
 
     # S.B.4
     for layer in soil.soil_layers:
