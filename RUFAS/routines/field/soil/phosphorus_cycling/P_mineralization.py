@@ -2,7 +2,7 @@
 RUFAS
 SurPhos
 
-File name: p_mineralization.py
+File name: P_mineralization.py
 
 Author(s):  DR. Peter A. Vadas
             USDA-ARS Dairy Forage Research Center

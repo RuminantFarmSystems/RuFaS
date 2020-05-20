@@ -122,8 +122,9 @@ def update_all(soil, manure_management, weather, time):
         and is a matter of active development.
     Args:
         soil: instance of the Soil class specified in soil.py
-        manure_management: instance of the ApplicationManagement class
-            specified in application_management.py
+        manure_management: instance of the BaseApplicationManagement class
+            specified in field_management.py representing the management scheme
+            for manure applications
         weather: instance of the Weather class specified in classes.py
         time: instance of the Time class specified in classes.py
     """
@@ -195,16 +196,16 @@ def calc_water_factors(soil):
 def added_manure_N(soil, manure_application):
     """
     Description:
-        TODO: Temporary method
+        TODO: Temporary method pending link to manure storage
         Adds specified manure to soil with no availability constraints.
 
     Args:
         soil
-        manure_application: an instance of the Manure object specified in
-            application_management.py
+        manure_application: an instance of the BaseApplication object specified in
+            field_management.py representing a manure application
     """
 
-    total_N = manure_application.mass * manure_application.N_frac
+    total_N = manure_application['mass'] * manure_application['N_frac']
     active_N = total_N * 0.875
     stable_N = total_N * 0.125
 

@@ -11,7 +11,7 @@ from RUFAS import util, errors
 from pathlib import Path
 from .crop.crop import Crop
 from .soil.soil import Soil
-from .application_management.application_management import ApplicationManagement
+from .field_management.field_management import FieldManagement
 
 
 class Field:
@@ -37,10 +37,10 @@ class Field:
 
         self.soil_data = read_json_file(input_dir / 'soil_profiles' / field_data['soil'])
         self.crop_data = read_json_file(input_dir / 'crop_rotations' / field_data['crop'])
-        self.application_data = read_json_file(input_dir / 'applications' / field_data['applications'])
+        self.application_data = read_json_file(input_dir / 'field_management' / field_data['field_management'])
 
         self.soil = Soil(self.soil_data)
-        self.application_management = ApplicationManagement(self.application_data, time)
+        self.field_management = FieldManagement(self.application_data, time)
         self.crop = Crop(self.crop_data, space, time)
 
 

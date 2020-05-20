@@ -96,7 +96,7 @@
             "field_1": {
                 "soil": "input_w_feedlib_soil.json",
                 "crop": "corn_rotation.json",
-                "applications": "barnyard_applications.json"
+                "field_management": "barnyard_field_management.json"
             }
         },
         "animal": "animal_management_animal.json",
