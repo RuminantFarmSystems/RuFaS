@@ -23,9 +23,10 @@ def daily_feed_routine(feed, crop):
         Runs the feed storage routine. Yield is stored at harvest in available storage.
         Once used, that storage receptacle is removed from the list of available storage.
         If insufficient storage is specified, a "standard" storage receptacle is generated.
+
     Args:
-        feed: an instance of the Feed object
-        crop: an instance of the Crop object
+        feed: an instance of the Feed object specified in feed.py
+        crop: an instance of the Crop object specified in crop.py
     """
     current_crop = crop.current_crop
 
@@ -221,11 +222,15 @@ class Feed:
         self.CP_loss = 0.0
 
     class Storage:
-        """
-        Description:
-            A subclass of feed storage specifying a single storage receptacle.
-        """
         def __init__(self, data):
+            """
+            Description:
+                A subclass of feed storage specifying a single storage receptacle.
+
+            Args:
+                data: a dictionary containing information to define the storage
+                    receptacle
+            """
             self.storage_type = data['storage_type']
             self.moisture = data['moisture']
             self.additive = data['additive']
@@ -291,6 +296,7 @@ class Feed:
             Description:
                 Calibrates the feed storage loss model to the crop being stored in the receptacle.
                 Based on information provided by Kevin Painke-Buisse of the DFRC 2019
+                "pseudocode_feed" F.1.4
             Args:
                 crop: The crop to be stored
             """
@@ -406,20 +412,19 @@ class Feed:
             """
 
             if self.storage:
+                # "pseudocode_feed" F.1.1
                 self.DM += crop.yield_actual
-
                 self.N += crop.yield_N
                 self.P += crop.yield_P
-
-                self.CP += 6.25 * self.N / self.DM
-
                 # TODO: no Carbon Cycle currently implemented
                 self.C += crop.yield_actual * self.C_percent
 
+                # "pseudocode_feed" F.1.2
+                self.CP += 6.25 * self.N / self.DM
+
+                # "pseudocode_feed" F.1.3
                 carbon_loss.update_all(self)
-
                 nitrogen_loss.update_all(self)
-
                 # TODO: No protein degradation currently implemented
                 protein_degradation.update_all()
 
