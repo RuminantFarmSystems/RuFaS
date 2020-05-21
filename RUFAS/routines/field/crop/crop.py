@@ -291,7 +291,7 @@ def calculate_start(soil, crop, field_management, weather, space, time):
     crop_type = crop.current_crop
     yearly_T_avg = weather.T_avg[time.year - 1]
 
-    manure_management = field_management.managemed_applications['manure']
+    manure_management = field_management.managed_applications['manure']
     fert_management = field_management.managed_applications['fertilizer']
 
     # if the management scheme is optimal

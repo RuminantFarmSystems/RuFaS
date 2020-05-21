@@ -37,10 +37,10 @@ class Field:
 
         self.soil_data = read_json_file(input_dir / 'soil_profiles' / field_data['soil'])
         self.crop_data = read_json_file(input_dir / 'crop_rotations' / field_data['crop'])
-        self.application_data = read_json_file(input_dir / 'field_management' / field_data['field_management'])
+        self.field_management_data = read_json_file(input_dir / 'field_management' / field_data['field_management'])
 
         self.soil = Soil(self.soil_data)
-        self.field_management = FieldManagement(self.application_data, time)
+        self.field_management = FieldManagement(self.field_management_data, time)
         self.crop = Crop(self.crop_data, space, time)
 
 

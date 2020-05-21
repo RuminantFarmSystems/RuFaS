@@ -59,7 +59,7 @@ class FieldManagement:
 
         self.managed_applications = {}
 
-        for application_name, default_data in self.application_defaults:
+        for application_name, default_data in self.application_defaults.items():
             self.managed_applications[application_name] = \
                 self.BaseApplicationManagement(app_data[application_name], application_name, default_data, time)
 
@@ -83,6 +83,8 @@ class FieldManagement:
                 time: an instance of the Time class specified in classes.py
             """
             self.management_data = management_data
+            self.years = self.management_data.pop('app_years')
+            self.repeat = self.management_data.pop('repeat')
 
             self.application_type = application_type
             self.applications = {}
@@ -90,8 +92,8 @@ class FieldManagement:
             application_no = len(management_data['year'])
             for application in range(application_no):
                 app_data = {}
-                for variable_name in management_data:
-                    app_data[variable_name] = management_data[variable_name].pop()
+                for variable_name in management_data.keys():
+                    app_data[variable_name] = management_data[variable_name][application]
                 self.applications[(app_data['year'], app_data['day'])] = \
                     self.BaseApplication(app_data)
 
@@ -111,12 +113,9 @@ class FieldManagement:
                 time: an instance of the Time class specified in classes.py
             """
 
-            years = self.management_data['app_years']
-            repeat = self.management_data['repeat']
-
             # if there are years in which this application type occurs
-            if len(years) != 0:
-                for year in years:
+            if len(self.years) != 0:
+                for year in self.years:
                     # check specified application years against model boundaries
                     if year - time.start_year >= len(time.years) or year - time.start_year < 0:
                         print('\nCannot apply', self.application_type, 'in year', year,
@@ -126,13 +125,13 @@ class FieldManagement:
                         if year not in self.default_years:
                             self.default_years.append(year)
                             # populate app_years with repeat cycles
-                            if repeat != 0:
-                                temp_year = year + repeat
+                            if self.repeat != 0:
+                                temp_year = year + self.repeat
                                 # until repeat hits model boundaries
                                 while temp_year - time.start_year < len(time.years):
                                     if temp_year not in self.default_years:
                                         self.default_years.append(temp_year)
-                                    temp_year += repeat
+                                    temp_year += self.repeat
 
             self.default_years.sort()
 
