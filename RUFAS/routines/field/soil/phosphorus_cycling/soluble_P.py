@@ -37,8 +37,7 @@ def update_all(soil):
         layer.iso_inter = 4.726 * layer.iso_slope - 8.97
 
         # S.5.E.3
-        # TODO: Large values for soil_P cause this equation to overflow. 709.78 is the max val allowed by exp()
-        layer.DRP_leachate = min(40.0, exp(min(709.78, (layer.soil_P * 1.5 - layer.iso_inter / layer.iso_slope))))
+        layer.DRP_leachate = min(40.0, exp((layer.soil_P * 1.5 - layer.iso_inter) / layer.iso_slope))
 
         # S.5.E.4
         if soil.soil_layers.index(layer) == 0:

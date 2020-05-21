@@ -210,37 +210,58 @@ class Soil:
         self.DRP_runoff_annual = 0.0
         self.DRP_leachate_annual = 0.0
 
-        # fert_leach
+        # fert_P_leach
         self.fert_sorp = 0.0
         self.fert_absorbed_sum = 0.0
-        self.fert_leach = 0.0
+        self.fert_P_leach = 0.0
         self.PD_factor = 0.0
-        self.fert_runoff_P = 0.0
+        self.fert_P_runoff = 0.0
         self.fert_runoff_annual = 0.0
-        self.fert_leachate_annual = 0.0
-        self.fert_run = 0.0
+        self.fert_P_leachate_annual = 0.0
+        self.fert_P_runoff_act = 0.0
 
         # manure_leach
         self.MIP_leach = 0.0
         self.MOP_leach = 0.0
         self.MIP_runoff = 0.0
         self.MOP_runoff = 0.0
-        self.MIP_leach_annual = 0.0
-        self.MOP_leach_annual = 0.0
         self.M_leach = 0.0
         self.DP = 0.0
-        self.N_sum = 0.0
         self.M_DRP_runoff = 0.0
-        self.TIP_runoff = 0.0
 
-        self.TIP_runoff_annual = 0.0
+        self.MIP_runoff_annual = 0.0
+        self.MOP_runoff_annual = 0.0
+        self.MIP_leach_annual = 0.0
+        self.MOP_leach_annual = 0.0
+        self.M_DRP_runoff_annual = 0.0
+
+        self.WIP_runoff = 0.0
+        self.WOP_runoff = 0.0
+        self.WIP_leach = 0.0
+        self.WOP_leach = 0.0
+
+        self.TIP_runoff = 0.0
+        self.TOP_runoff = 0.0
+        self.TIP_leach = 0.0
+        self.TOP_leach = 0.0
+
+        self.TP_runoff = 0.0
+        self.TP_leach = 0.0
+
         self.M_DRP_runoff_annual = 0.0
 
         self.WIP_runoff_annual = 0.0
         self.WOP_runoff_annual = 0.0
-
         self.WIP_leachate_annual = 0.0
         self.WOP_leachate_annual = 0.0
+
+        self.TIP_runoff_annual = 0.0
+        self.TOP_runoff_annual = 0.0
+        self.TIP_leach_annual = 0.0
+        self.TOP_leach_annual = 0.0
+
+        self.TP_runoff_annual = 0.0
+        self.TP_leach_annual = 0.0
 
         # sediment P
         self.sed = 0.0
@@ -554,7 +575,7 @@ class Soil:
             self.active_P = 0.0
             self.stable_P = 0.0
             self.org_P = 0.0
-            self.P_uptake = 0.00
+            self.P_uptake = 0.0
 
             self.labile_P_uptake = 0.0
             self.labile_P_sum = 0.0
