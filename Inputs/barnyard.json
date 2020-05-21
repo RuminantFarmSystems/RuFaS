@@ -93,7 +93,7 @@
         "custom_report":
         {
             "produce_csv": true,
-            "produce_graphics": false,
+            "produce_graphics": true,
             "display_graphics": false,
             "report_name": "Custom Report",
             "file_name": "custom_report.csv"
