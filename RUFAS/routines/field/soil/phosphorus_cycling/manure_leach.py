@@ -212,7 +212,7 @@ def update_all(soil, weather, time):
 
         # S.5.G.IV.2/3
         soil.M_DRP_runoff = layer.soil_P * 0.005
-        soil.TIP_runoff = soil.MIP_runoff + soil.M_DRP_runoff + soil.fert_runoff_P
+        soil.TIP_runoff = soil.MIP_runoff + soil.M_DRP_runoff + soil.fert_P_runoff
 
         soil.M_DRP_runoff_annual += soil.M_DRP_runoff
         soil.TIP_runoff_annual += soil.TIP_runoff
