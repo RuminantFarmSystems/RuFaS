@@ -19,7 +19,7 @@ from .nitrogen_cycling import nitrogen_cycling
 from .phosphorus_cycling import phosphorus_cycling
 
 
-def daily_soil_routine(soil, crop, application_management, weather, time):
+def daily_soil_routine(soil, crop, field_management, weather, time):
     """
     Description:
         Called form simulation_engine.py. Executes the daily soil routines.
@@ -27,8 +27,8 @@ def daily_soil_routine(soil, crop, application_management, weather, time):
     Args:
         soil: instance of the Soil class specified in soil.py
         crop: instance of the Crop class specified in crop.py
-        application_management: instance of the ApplicationManagement class
-            specified in application_management.py
+        field_management: instance of the FieldManagement class
+            specified in field_management.py
         weather: instance of the Weather class specified in classes.py
         time: instance of the Time class specified in classes.py
     """
@@ -61,10 +61,10 @@ def daily_soil_routine(soil, crop, application_management, weather, time):
 
     # calculate and update the contents of 3 organic and 2 inorganic nitrogen
     # pools
-    nitrogen_cycling.update_all(soil, application_management.managed_applications['manure'], weather, time)
+    nitrogen_cycling.update_all(soil, field_management.managed_applications['manure'], weather, time)
 
     # implementation of Peter Vadas' SurPhos (Surface Phosphorus Runoff) model
-    phosphorus_cycling.update_all(soil, application_management, weather, time)
+    phosphorus_cycling.update_all(soil, field_management, weather, time)
 
     # update annual sums at the end of each day
     annual_variable_update(soil)

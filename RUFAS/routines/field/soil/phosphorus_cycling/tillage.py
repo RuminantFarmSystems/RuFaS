@@ -21,8 +21,11 @@ def update_all(soil, till_app):
     Args:
         soil: an instance of the Soil class specified in soil.py
         till_app: an instance of the Tillage class specified in
-            application_management.py
+            field_management.py
     """
+    depth = till_app['depth']
+    perc_incorporated = till_app['percent_incorporated']
+    perc_mixed = till_app['percent_mixed']
 
     till_soil_mass = 0.0
     till_act_P = 0.0
@@ -30,7 +33,7 @@ def update_all(soil, till_app):
 
     # attributes of this specific tillage operation
     for layer in soil.soil_layers:
-        if layer.bottom_depth_cm <= till_app.depth:
+        if layer.bottom_depth_cm <= depth:
             till_soil_mass += layer.mass
             till_act_P += layer.active_P
             till_lab_P += layer.labile_P
@@ -44,24 +47,24 @@ def update_all(soil, till_app):
             layer.active_P *= soil.area
             layer.labile_P *= soil.area
 
-            layer.labile_P += till_app.percent_incorporated * \
+            layer.labile_P += perc_incorporated * \
                               (soil.fert_P_available + soil.fert_P_released)
 
             # S.5.D.2
             soil.fert_P_available = soil.fert_P_available - \
-                                    (soil.fert_P_available * till_app.percent_incorporated)
+                                    (soil.fert_P_available * perc_incorporated)
             soil.fert_P_released = soil.fert_P_released - \
-                                   (soil.fert_P_released * till_app.percent_incorporated)
+                                   (soil.fert_P_released * perc_incorporated)
 
             # S.5.D.3 TODO: RuFaS does not track org P (03.19.20).
-            layer.labile_P += till_app.percent_incorporated * soil.WIP
-            layer.active_P += till_app.percent_incorporated * soil.SIP
+            layer.labile_P += perc_incorporated * soil.WIP
+            layer.active_P += perc_incorporated * soil.SIP
 
-            soil.WIP -= soil.WIP * till_app.percent_incorporated
-            soil.WOP -= soil.WOP * till_app.percent_incorporated
-            soil.SIP -= soil.SIP * till_app.percent_incorporated
-            soil.SOP -= soil.SOP * till_app.percent_incorporated
-            soil.manure_mass -= soil.manure_mass * till_app.percent_incorporated
+            soil.WIP -= soil.WIP * perc_incorporated
+            soil.WOP -= soil.WOP * perc_incorporated
+            soil.SIP -= soil.SIP * perc_incorporated
+            soil.SOP -= soil.SOP * perc_incorporated
+            soil.manure_mass -= soil.manure_mass * perc_incorporated
 
             # S.5.B.4
             layer.active_P /= soil.area
@@ -69,9 +72,9 @@ def update_all(soil, till_app):
 
         # Mix soil in accordance with the tillage operation
         # S.5.D.4
-        if layer.bottom_depth_cm <= till_app.depth:
+        if layer.bottom_depth_cm <= depth:
             ratio = layer.mass / till_soil_mass
-            layer.labile_P = (1.0 - till_app.percent_mixed) * layer.labile_P \
-                             + till_lab_P * ratio * till_app.percent_mixed
-            layer.active_P = (1.0 - till_app.percent_mixed) * layer.active_P \
-                             + till_act_P * ratio * till_app.percent_mixed
+            layer.labile_P = (1.0 - perc_mixed) * layer.labile_P \
+                             + till_lab_P * ratio * perc_mixed
+            layer.active_P = (1.0 - perc_mixed) * layer.active_P \
+                             + till_act_P * ratio * perc_mixed

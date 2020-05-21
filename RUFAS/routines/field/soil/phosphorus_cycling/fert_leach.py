@@ -73,7 +73,7 @@ def update_all(soil, weather, time):
     # calculate the concentration of fertilizer dissolved P in runoff in MG/L
     soil.fert_runoff_P = 0.0
     soil.fert_run = 0.0
-    if runoff > 0.0:
+    if runoff > 0.0 and rainfall > 0.0:
         # S.5.F.II.2
         soil.PD_factor = 0.034 * exp((runoff / rainfall) * 3.4)
 
