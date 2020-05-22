@@ -35,6 +35,7 @@ class InitCrop(BaseCrop):
         # Internally calculated inputs
         self.accumulated_HU = 0
         self.prev_accumulated_HU = 0
+        self.fr_PHU_harvest_min = 0.7
 
         # Outputs
         self.fr_PHU = 0

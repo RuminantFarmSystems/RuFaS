@@ -163,8 +163,7 @@ def dormancy_routine(soil, crop_type, field_management, time):
         crop_type.kill_day = time.day
         yields.update_all(soil, crop_type, field_management, time)
     else:
-        # TODO: This is just our guess. Variable exclusive to perennials. Possibly a component of management
-        fr_PHU_harvest_min = 0.7
+        fr_PHU_harvest_min = crop_type.fr_PHU_harvest_min
         if crop_type.fr_PHU > fr_PHU_harvest_min:
             yields.update_all(soil, crop_type, field_management, time)
         crop_type.LAI_actual = max(0, min(crop_type.LAI_min, crop_type.LAI_actual))

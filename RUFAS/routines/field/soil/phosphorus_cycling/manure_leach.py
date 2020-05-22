@@ -43,8 +43,8 @@ def update_all(soil, weather, time):
     # P leached from manure on surface to rain and runoff water in KG
 
     # S.5.G.I.2
-    soil.MIP_leach = 0.0
-    soil.MOP_leach = 0.0
+    soil.MIP_leachate= 0.0
+    soil.MOP_leachate= 0.0
     soil.MIP_runoff = 0.0
     soil.MOP_runoff = 0.0
     MTF_1 = 1.2
@@ -62,8 +62,8 @@ def update_all(soil, weather, time):
         # S.5.G.II
 
         # S.5.G.II.1
-        soil.MIP_leach = min(max(0.0, manure_extr * soil.WIP), soil.WIP)
-        soil.MOP_leach = min(max(0.0, manure_extr * soil.WOP / 0.6), soil.WOP)
+        soil.MIP_leachate= min(max(0.0, manure_extr * soil.WIP), soil.WIP)
+        soil.MOP_leachate= min(max(0.0, manure_extr * soil.WOP / 0.6), soil.WOP)
 
         # calculates the concentration of all dissolved P in runoff in MG/L
         if runoff > 0.0:
@@ -75,7 +75,7 @@ def update_all(soil, weather, time):
                 min(
                     max(
                         0.0,
-                        (soil.MIP_leach / (rainfall / 10.0) / soil.area * 10.0 * soil.PD_factor) * 0.01 * soil.area
+                        (soil.MIP_leachate/ (rainfall / 10.0) / soil.area * 10.0 * soil.PD_factor) * 0.01 * soil.area
                     ),
                     soil.MIP_leach
                 )
@@ -84,22 +84,22 @@ def update_all(soil, weather, time):
                 min(
                     max(
                         0.0,
-                        ((soil.MOP_leach / (rainfall / 10.0) / soil.area * 10.0 * soil.PD_factor)
+                        ((soil.MOP_leachate/ (rainfall / 10.0) / soil.area * 10.0 * soil.PD_factor)
                          * runoff * 0.01 * soil.area)
                     ),
                     soil.MOP_leach
                 )
 
         # S.5.G.II.4
-        soil.MIP_leach -= soil.MIP_runoff
-        soil.MOP_leach -= soil.MOP_runoff
+        soil.MIP_leachate-= soil.MIP_runoff
+        soil.MOP_leachate-= soil.MOP_runoff
 
-        soil.WIP -= (soil.MIP_leach + soil.MIP_runoff)
-        soil.WOP -= (soil.MIP_leach + soil.MOP_runoff)
+        soil.WIP -= (soil.MIP_leachate+ soil.MIP_runoff)
+        soil.WOP -= (soil.MIP_leachate+ soil.MOP_runoff)
 
         soil.MIP_leach_annual += soil.MIP_leach
         soil.MOP_leach_annual += soil.MOP_leach
-        soil.M_leach = soil.MIP_leach - soil.MIP_runoff + soil.MOP_leach - soil.MOP_runoff
+        soil.M_leachate= soil.MIP_leachate- soil.MIP_runoff + soil.MOP_leachate- soil.MOP_runoff
         # convert soil P from KG/HA to KG and add manure P leached
 
         DF = 0.6
