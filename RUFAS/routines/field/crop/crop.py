@@ -222,7 +222,7 @@ class Crop:
         self.crops_list = [self.alfalfa, self.corn, self.soy]
         self.current_crop = self.init_crop
 
-        self.grow_regimen = [base_crop.BaseCrop() for _ in range(0, len(time.years))]
+        self.grow_regimen = [self.init_crop for _ in range(0, len(time.years))]
         self.set_grow_regimen(time)
 
         # dormancy for perennial crops

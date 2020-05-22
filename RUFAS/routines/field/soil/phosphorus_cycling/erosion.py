@@ -4,9 +4,8 @@ SurPhos
 
 File name: erosion.py
 
-Author(s):  DR. Peter A. Vadas
+Author(s):  DR. Melissa Motew
             USDA-ARS Dairy Forage Research Center
-            E-mail: peter.vadas@ars.usda.gov
 
 Coder(s):   Jacob Johnson jacob8399@gmail.com
             William Donovan wmdonovan@wisc.edu
