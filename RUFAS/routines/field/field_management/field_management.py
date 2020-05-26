@@ -17,7 +17,7 @@ class FieldManagement:
         """
         Description:
             FieldManagement is an organizational object that aggregates the
-            management objects for manure_storage, fertilizer, and tillage by field.
+            management objects for manure, fertilizer, and tillage by field.
 
         Args:
             app_data: data representing the field_management specified in the JSON file

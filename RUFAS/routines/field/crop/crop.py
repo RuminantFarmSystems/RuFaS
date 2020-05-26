@@ -11,7 +11,7 @@ Author(s): Kass Chupongstimun, kass_c@hotmail.com
 """
 
 from math import acos, asin, sin, tan, pi
-from .crop_types import base_crop, init_crop, alfalfa, corn, soybean
+from .crop_types import base_crop, alfalfa, corn, soybean
 from . import heat_units, leaf_area_index, root_development, biomass, yields, \
     phosphorus_uptake, nitrogen_uptake, growth_constraints
 
@@ -214,15 +214,14 @@ class Crop:
             time: an instance of the Time class specified in classes.py
         """
 
-        self.init_crop = init_crop.InitCrop(data)
         self.alfalfa = alfalfa.Alfalfa(data)
         self.corn = corn.Corn(data)
         self.soy = soybean.Soybean(data)
 
         self.crops_list = [self.alfalfa, self.corn, self.soy]
-        self.current_crop = self.init_crop
+        self.current_crop = base_crop.BaseCrop()
 
-        self.grow_regimen = [self.init_crop for _ in range(0, len(time.years))]
+        self.grow_regimen = [self.current_crop for _ in range(0, len(time.years))]
         self.set_grow_regimen(time)
 
         # dormancy for perennial crops
@@ -257,6 +256,8 @@ class Crop:
                                 print('Cannot grow', crop_type.crop_name, 'in', str(year + curr_year) + ',',
                                       self.grow_regimen[curr_year].crop_name, 'is already growing.')
                             curr_year += crop_type.repeat
+
+        list(filter(lambda crop: crop.crop_name != 'null', self.grow_regimen))
 
     def annual_reset(self):
         """
