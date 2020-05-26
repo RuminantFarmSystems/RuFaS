@@ -49,7 +49,7 @@ class CropSummary(BaseReportHandler):
                                 'Bio_P': ['crop_type.bio_P', 'kg P/ha', []],
                                 'z_root': ['crop_type.z_root', 'mm', []],
                                 'yield_act': ['crop_type.yield_actual', 'kg/ha', []],
-                                'N_fix': ['crop_type.N_fix', 'units / Jacob', []]
+                                'N_fix': ['crop_type.N_fix', 'units / units', []]
                                 }
 
         # annual outputs

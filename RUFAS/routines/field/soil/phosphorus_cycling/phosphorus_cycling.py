@@ -24,26 +24,31 @@ def update_all(soil, field_management, weather, time):
         time: instance of the Time class specified in classes.py
     """
 
+    # actual year
+    year = time.start_year + time.year - 1
+
     # check for scheduled fertilizer application and conducive conditions
     fert_management = field_management.managed_applications['fertilizer']
-    if (time.year, time.day) in fert_management.applications:
+    if (year, time.day) in fert_management.applications:
         if fert_management.check_conditions(soil, weather, time):
             # apply fertilizer
-            fertilizer.update_all(soil, fert_management.applications[(time.year, time.day)])
+            fertilizer.update_all(soil, fert_management.applications[(year, time.day)].data)
 
     # check for scheduled manure application and conducive conditions
     manure_management = field_management.managed_applications['manure']
-    if (time.year, time.day) in manure_management.applications:
+    if (year, time.day) in manure_management.applications:
+        print("Here")
         if manure_management.check_conditions(soil, weather, time):
+            print("good conditions")
             # apply manure
-            manure.update_all(soil, manure_management.applications[(time.year, time.day)])
+            manure.update_all(soil, manure_management.applications[(year, time.day)].data)
 
     # check for scheduled tillage operations and conducive conditions
     till_management = field_management.managed_applications['tillage']
-    if (time.year, time.day) in till_management.applications:
+    if (year, time.day) in till_management.applications:
         if till_management.check_conditions(soil, weather, time):
             # till the soil
-            tillage.update_all(soil, till_management.applications[(time.year, time.day)])
+            tillage.update_all(soil, till_management.applications[(year, time.day)].data)
 
     # calculate soluble Phosphorus
     soluble_P.update_all(soil)

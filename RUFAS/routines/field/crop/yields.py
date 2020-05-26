@@ -207,7 +207,7 @@ def kill(crop_type, field_management, time):
     """
 
     till_management = field_management.managed_applications['tillage']
-    if field_management.management_scheme == 'optimal' and (time.year, -1) in till_management.applications:
+    if field_management.management_scheme == 'optimal' and (time.start_year + time.year - 1, -1) in till_management.applications:
         till_management.schedule_application(time)
 
     crop_type.accumulated_HU = 0

@@ -7,7 +7,7 @@ Description: This file constructs and maintains the class structure used by the
     the model.
 
 Author(s): William Donovan, wmdonovan@wisc.edu
-            Jacob Johnson, jacob8669@gmail.com
+            Jacob Johnson, jacob8399@gmail.com
 """
 
 
@@ -143,7 +143,36 @@ class FieldManagement:
             Args:
                 time: an instance of the Time class specified in classes.py
             """
-            self.applications[(time.year, time.day)] = self.applications.pop((time.year, -1))
+            self.applications[(time.start_year + time.year - 1, time.day)] = self.applications.pop((time.start_year + time.year - 1, -1))
+
+        def check_conditions_plant(self, soil, weather, time):
+            """
+            Description:
+                Checks if environmental conditions are conducive to plant.
+            Args:
+                soil: an instance of the Soil class specified in soil.py
+                weather: an instance of the Weather class specified in classes.py
+                    contains information about the environment
+                time: an instance of the Time class specified in classes.py
+
+            Returns:
+                bool: True if conditions are conducive,
+                        False (and iterate application) if otherwise
+            """
+            # the time object begins indexing at 1, but curr is in
+            # reference to the weather object which begins indexing at 0
+            curr_day = time.day - 1
+            curr_year = time.year - 1
+
+            # if soil profile is too saturated for planting
+            if soil.soil_layers[0].soil_water > soil.soil_layers[0].fc_water:
+                return False
+
+            # if it rains on the current day
+            if weather.rainfall[curr_year][curr_day] >= 1.0:
+                return False
+
+            return True
 
         def check_conditions(self, soil, weather, time):
             """
@@ -170,7 +199,7 @@ class FieldManagement:
 
             second_day = next_day + 1
 
-            # if soil profile is too for application
+            # if soil profile is too saturated for application
             if soil.soil_layers[0].soil_water > soil.soil_layers[0].fc_water:
                 self.iterate_application(weather, time)
                 return False
@@ -198,8 +227,6 @@ class FieldManagement:
             if weather.rainfall[curr_year][next_day] >= 1.0:
                 self.iterate_application(weather, time)
                 return False
-
-            curr_year = time.year - 1
 
             # boundary check the second day against length of the current year
             if second_day >= len(weather.rainfall[curr_year]):
@@ -231,13 +258,14 @@ class FieldManagement:
                 time: an instance of the Time class specified in classes.py
             """
             day = time.day
-            year = time.year
+            cal_year = time.start_year + time.year - 1
 
-            if day == len(weather.rainfall[year - 1]):
-                if year < len(weather.rainfall):
-                    self.applications[(year + 1, 0)] = self.applications.pop((year, day))
-                else:
-                    self.applications[(year, day + 1)] = self.applications.pop((year, day))
+            # if it is the last day of the current year
+            if day == len(weather.rainfall[time.year - 1]):
+                if time.year < len(weather.rainfall):
+                    self.applications[(cal_year + 1, 0)] = self.applications.pop((cal_year, day))
+            else:
+                self.applications[(cal_year, day + 1)] = self.applications.pop((cal_year, day))
 
         class BaseApplication:
             def __init__(self, app_data):

@@ -143,9 +143,10 @@ def update_all(soil, manure_management, weather, time):
 
     humus_mineralization.humus_mineralization(soil)
 
-    if (time.year, time.day) in manure_management.applications:
+    if (time.start_year + time.year - 1, time.day) in manure_management.applications:
         if manure_management.check_conditions(soil, weather, time):
-            added_manure_N(soil, manure_management[(time.year, time.day)])
+            added_manure_N(soil, manure_management.applications[(time.start_year + time.year - 1,
+                                                                 time.day)].data)
 
 
 def calc_temp_factors(soil):

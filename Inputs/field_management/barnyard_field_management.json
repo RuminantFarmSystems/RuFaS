@@ -3,8 +3,8 @@
 
     "fertilizer":
     {
-        "app_years": [2009],
-        "repeat": 1,
+        "app_years": [],
+        "repeat": 0,
 
         "year": [],
         "day": [],
@@ -15,8 +15,8 @@
 
     "manure":
     {
-        "app_years": [2009],
-        "repeat": 1,
+        "app_years": [],
+        "repeat": 0,
 
         "type": ["DAIRY", "DAIRY", "DAIRY", "DAIRY", "DAIRY", "DAIRY", "DAIRY", "DAIRY"],
         "year": [2012, 2012, 2012, 2012, 2013, 2013, 2013, 2013],
@@ -35,8 +35,8 @@
 
     "tillage":
     {
-        "app_years": [2009],
-        "repeat": 1,
+        "app_years": [],
+        "repeat": 0,
 
         "year": [],
         "day": [],
