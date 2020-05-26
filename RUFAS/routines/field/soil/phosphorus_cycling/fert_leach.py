@@ -78,7 +78,7 @@ def update_all(soil, weather, time):
         soil.PD_factor = 0.034 * exp((runoff / rainfall) * 3.4)
 
         # S.5.F.II.3
-        soil.fert_P_runoff = soil.fert_P_leachate/ (rainfall / 10.0) / soil.area * 10.0 * soil.PD_factor
+        soil.fert_P_runoff = soil.fert_P_leachate / (rainfall / 10.0) / soil.area * 10.0 * soil.PD_factor
 
         # calculate fertilizer runoff P in KG
         # S.5.F.II.4
@@ -88,7 +88,7 @@ def update_all(soil, weather, time):
     # convert soil P from KG/HA to KG and add fertilizer P leached to each layer
     # S.5.F.II.5
     DF = 0.6
-    soil.fert_P_leachate-= soil.fert_P_runoff_act
+    soil.fert_P_leachate -= soil.fert_P_runoff_act
     fert_not_leached = soil.fert_P_leachate
 
     for layer in soil.soil_layers:
@@ -100,8 +100,8 @@ def update_all(soil, weather, time):
             layer.labile_P += soil.fert_sorp
 
         # S.5.F.II.5
-        layer.labile_P += soil.fert_P_leachate* DF
-        fert_not_leached -= soil.fert_P_leachate* DF
+        layer.labile_P += soil.fert_P_leachate * DF
+        fert_not_leached -= soil.fert_P_leachate * DF
         DF = max(0.0, (DF / 2) - 0.02)
 
         # S.5.B.4
