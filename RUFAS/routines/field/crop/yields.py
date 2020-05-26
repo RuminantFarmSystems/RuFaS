@@ -162,7 +162,7 @@ def calc_residue(soil, crop_type, field_management, time):
     """
     Description:
         Updates the current residue.
-        "pseudocode_crop" C.10.G.1/4/5
+        "pseudocode_crop" C.10.H.1/4/5
 
     Args:
         soil
@@ -187,7 +187,7 @@ def calc_harvest_quality(crop_type):
     Description:
         # TODO: Stand in for more sophisticated method
         Calculate quality of yield for grouping in feed storage
-
+        "pseudocode_crop" C.10.G
     Args:
         crop_type
     """
@@ -198,7 +198,7 @@ def kill(crop_type, field_management, time):
     """
     Description:
         Kills the crop
-        "pseudocode_crop" C.10.G.4
+        "pseudocode_crop" C.10.H.4
 
     Args:
         crop_type
@@ -241,7 +241,7 @@ def cut(crop_type, bio_frac):
     """
     Description:
         Cuts the crop without killing it
-        "pseudocode_crop" C.10.G.2/3
+        "pseudocode_crop" C.10.H.2/3
 
     Args:
         crop_type
