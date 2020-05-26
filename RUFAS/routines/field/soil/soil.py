@@ -7,7 +7,7 @@ Description:
 Author(s): Kass Chupongstimun, kass_c@hotmail.com
            Jit Patil, spatil5@wisc.edu
            William Donovan, wmdonovan@wisc.edu
-           Jacob Johnson, jacob8669@gmail.com
+           Jacob Johnson, jacob8399@gmail.com
 """
 
 from math import exp, log

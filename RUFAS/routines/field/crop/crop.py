@@ -98,12 +98,12 @@ def daily_crop_routine(soil, crop, field_management, weather, space, time):
                         fert_management = field_management.managed_applications['fertilizer']
 
                         # if manure is being applied to the field this year
-                        if (time.year, -1) in manure_management.applications:
+                        if (time.start_year + time.year - 1, -1) in manure_management.applications:
                             # schedule the manure application for today
                             manure_management.schedule_application(time)
 
                         # if fertilizer is being applied to the field this year
-                        if (time.year, -1) in fert_management.applications:
+                        if (time.start_year + time.year - 1, -1) in fert_management.applications:
                             # schedule the fertilizer application
                             fert_management.schedule_application(time)
 
@@ -301,16 +301,16 @@ def calculate_start(soil, crop, field_management, weather, space, time):
             # and it is the planting date
             if time.day == crop_type.planting_date:
                 # check conditions for applying manure and fertilizer
-                if manure_management.check_conditions(soil, weather, time) and \
-                        fert_management.check_conditions(soil, weather, time):
+                if manure_management.check_conditions_plant(soil, weather, time) and \
+                        fert_management.check_conditions_plant(soil, weather, time):
 
                     # if there is an optimal manure application scheduled for this year
-                    if (time.year, -1) in manure_management.applications:
+                    if (time.start_year + time.year - 1, -1) in manure_management.applications:
                         # schedule manure application for today
                         manure_management.schedule_application(time)
 
                     # if there is an optimal fertilizer application scheduled for this year
-                    if (time.year, -1) in fert_management.applications:
+                    if (time.start_year + time.year - 1, -1) in fert_management.applications:
                         # schedule manure application for today
                         fert_management.schedule_application(time)
 
@@ -331,16 +331,16 @@ def calculate_start(soil, crop, field_management, weather, space, time):
             # check growing conditions for the perennial
             elif not in_dormancy(crop, space, time) and yearly_T_avg[time.day - 1] > crop_type.T_base_min:
                 # check conditions for applying manure and fertilizer
-                if manure_management.check_conditions(soil, weather, time) and \
-                        fert_management.check_conditions(soil, weather, time):
+                if manure_management.check_conditions_plant(soil, weather, time) and \
+                        fert_management.check_conditions_plant(soil, weather, time):
 
                     # if there is an optimal manure application scheduled for this year
-                    if (time.year, -1) in manure_management.applications:
+                    if (time.start_year + time.year - 1, -1) in manure_management.applications:
                         # schedule manure application for today
                         manure_management.schedule_application(time)
 
                     # if there is an optimal fertilizer application scheduled for this year
-                    if (time.year, -1) in fert_management.applications:
+                    if (time.start_year + time.year - 1, -1) in fert_management.applications:
                         # schedule manure application for today
                         fert_management.schedule_application(time)
 

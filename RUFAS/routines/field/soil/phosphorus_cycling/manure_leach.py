@@ -66,7 +66,7 @@ def update_all(soil, weather, time):
         soil.MOP_leachate = min(max(0.0, manure_extr * soil.WOP / 0.6), soil.WOP)
 
         # calculates the concentration of all dissolved P in runoff in MG/L
-        if runoff > 0.0:
+        if runoff > 0.0 and rainfall > 0.0:  # TODO added rainfall > 0.0 because of a divide by zero error
             # S.5.G.II.2
             soil.PD_factor = (runoff / rainfall) ** 0.225
 
@@ -77,7 +77,7 @@ def update_all(soil, weather, time):
                         0.0,
                         (soil.MIP_leachate / (rainfall / 10.0) / soil.area * 10.0 * soil.PD_factor) * 0.01 * soil.area
                     ),
-                    soil.MIP_leach
+                    soil.MIP_leachate
                 )
 
             soil.MOP_runoff = \
@@ -87,7 +87,7 @@ def update_all(soil, weather, time):
                         ((soil.MOP_leachate / (rainfall / 10.0) / soil.area * 10.0 * soil.PD_factor)
                          * runoff * 0.01 * soil.area)
                     ),
-                    soil.MOP_leach
+                    soil.MOP_leachate
                 )
 
         # S.5.G.II.4
@@ -97,18 +97,18 @@ def update_all(soil, weather, time):
         soil.WIP -= (soil.MIP_leachate + soil.MIP_runoff)
         soil.WOP -= (soil.MIP_leachate + soil.MOP_runoff)
 
-        soil.MIP_leach_annual += soil.MIP_leach
-        soil.MOP_leach_annual += soil.MOP_leach
+        soil.MIP_leach_annual += soil.MIP_leachate
+        soil.MOP_leach_annual += soil.MOP_leachate
         soil.M_leachate = soil.MIP_leachate - soil.MIP_runoff + soil.MOP_leachate - soil.MOP_runoff
         # convert soil P from KG/HA to KG and add manure P leached
 
         DF = 0.6
-        M_not_leached = soil.M_leach
+        M_not_leached = soil.M_leachate
         for layer in soil.soil_layers:
             layer.labile_P *= soil.area
 
-            layer.labile_P += DF * soil.M_leach
-            M_not_leached -= DF * soil.M_leach
+            layer.labile_P += DF * soil.M_leachate
+            M_not_leached -= DF * soil.M_leachate
 
             layer.labile_P /= soil.area
 
@@ -119,8 +119,8 @@ def update_all(soil, weather, time):
         soil.WIP_runoff_annual += soil.MIP_runoff
         soil.WOP_runoff_annual += soil.MOP_runoff
 
-        soil.WIP_leachate_annual += soil.MIP_leach
-        soil.WOP_leachate_annual += soil.MOP_leach
+        soil.WIP_leachate_annual += soil.MIP_leachate
+        soil.WOP_leachate_annual += soil.MOP_leachate
 
         # Manure Decomposition
         # S.5.G.III

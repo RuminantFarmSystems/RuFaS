@@ -24,12 +24,11 @@ def update_all(soil, m_app):
         m_app: an instance of the Manure class specified in
             field_management.py
     """
-
     manure_type = m_app['type']
     mass = m_app['mass']
     depth = m_app['depth']
     P_frac = m_app['P_frac']
-    DM = m_app['DM']
+    DM = m_app['dry_matter']
     WIP_frac = m_app['WIP_frac']
     WOP_frac = m_app['WOP_frac']
     
@@ -55,7 +54,7 @@ def update_all(soil, m_app):
     # application factors
     # S.5.C.II.1
     I_fac = 1.0 - infiltration
-    S_fac = 1.0 - m_app.surface_percent
+    S_fac = 1.0 - m_app['surf_perc']
     W_fac = 1.0 - (WIP_frac + WOP_frac)
 
     # concentration factors
@@ -86,8 +85,8 @@ def update_all(soil, m_app):
     soil.manure_mass += mass * S_fac_mass
     soil.WIP += P_app * WIP_frac * S_fac
     soil.WOP += P_app * WOP_frac * S_fac
-    soil.SOP += P_app * W_fac * 0.75 * m_app.surface_percent * S_fac
-    soil.SIP += P_app * W_fac * 0.25 * m_app.surface_percent * S_fac
+    soil.SOP += P_app * W_fac * 0.75 * m_app['surf_perc'] * S_fac
+    soil.SIP += P_app * W_fac * 0.25 * m_app['surf_perc'] * S_fac
 
     # update active and labile soil pools for each layer affected by the application
     # S.5.C.II.6
