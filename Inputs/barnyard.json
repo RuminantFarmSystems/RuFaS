@@ -95,11 +95,9 @@
                 "file_name": "growth_report.csv"
             }
         },
-        "feed_storage":
-        {
+        "feed_storage": {
             "produce_csv": true,
             "produce_graphics": false,
-
             "report_name": "Feed Storage",
             "file_name": "feed_storage.csv"
         }
