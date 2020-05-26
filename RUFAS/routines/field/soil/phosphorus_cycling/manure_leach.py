@@ -75,7 +75,7 @@ def update_all(soil, weather, time):
                 min(
                     max(
                         0.0,
-                        (soil.MIP_leachate/ (rainfall / 10.0) / soil.area * 10.0 * soil.PD_factor) * 0.01 * soil.area
+                        (soil.MIP_leachate / (rainfall / 10.0) / soil.area * 10.0 * soil.PD_factor) * 0.01 * soil.area
                     ),
                     soil.MIP_leach
                 )
@@ -84,22 +84,22 @@ def update_all(soil, weather, time):
                 min(
                     max(
                         0.0,
-                        ((soil.MOP_leachate/ (rainfall / 10.0) / soil.area * 10.0 * soil.PD_factor)
+                        ((soil.MOP_leachate / (rainfall / 10.0) / soil.area * 10.0 * soil.PD_factor)
                          * runoff * 0.01 * soil.area)
                     ),
                     soil.MOP_leach
                 )
 
         # S.5.G.II.4
-        soil.MIP_leachate-= soil.MIP_runoff
-        soil.MOP_leachate-= soil.MOP_runoff
+        soil.MIP_leachate -= soil.MIP_runoff
+        soil.MOP_leachate -= soil.MOP_runoff
 
-        soil.WIP -= (soil.MIP_leachate+ soil.MIP_runoff)
-        soil.WOP -= (soil.MIP_leachate+ soil.MOP_runoff)
+        soil.WIP -= (soil.MIP_leachate + soil.MIP_runoff)
+        soil.WOP -= (soil.MIP_leachate + soil.MOP_runoff)
 
         soil.MIP_leach_annual += soil.MIP_leach
         soil.MOP_leach_annual += soil.MOP_leach
-        soil.M_leachate = soil.MIP_leachate- soil.MIP_runoff + soil.MOP_leachate- soil.MOP_runoff
+        soil.M_leachate = soil.MIP_leachate - soil.MIP_runoff + soil.MOP_leachate - soil.MOP_runoff
         # convert soil P from KG/HA to KG and add manure P leached
 
         DF = 0.6
