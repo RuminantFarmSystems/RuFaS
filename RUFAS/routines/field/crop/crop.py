@@ -229,11 +229,15 @@ class Crop:
         self.t_dorm = calculate_t_dorm(space.latitude)
         self.solar_declination = 0.0
 
-        # Each crop in crops_list has a list of grow years. This loop iterates
-        # through those lists and populates a grow regimen with the crop grown
-        # in each year
-
     def set_grow_regimen(self, time):
+        """
+        Description:
+            Resolves conflicts in the specified grow_regimen and finalizes
+            the years in which each crop is growing in this field
+            "pseudocode_crop" C.A.1
+        Args:
+            time: an instance of the Time class specified in classes.py
+        """
         for crop_type in self.crops_list:
             for year in crop_type.grow_years:
                 # checks requested grow years against model boundaries
