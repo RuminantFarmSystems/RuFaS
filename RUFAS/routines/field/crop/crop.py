@@ -147,6 +147,7 @@ def dormancy_routine(soil, crop_type, field_management, time):
         dormancy_routine runs on the first day of dormancy if there is a crop growing.
         LAI is set to minimum LAI, 10% of biomass is added to residue, and the crop
         is signalled to be dormant.
+        "pseudocode_crop" C.11.C
 
     Args:
         soil: an instance of the Soil class specified in soil.py representing
@@ -159,21 +160,24 @@ def dormancy_routine(soil, crop_type, field_management, time):
 
     # if crop is perennial and in it's final year, then call yields
     # to kill it
+    # C.11.C.1
     if crop_type.kill_year:
         crop_type.kill_day = time.day
         yields.update_all(soil, crop_type, field_management, time)
     else:
         fr_PHU_harvest_min = crop_type.fr_PHU_harvest_min
+        # C.11.C.2
         if crop_type.fr_PHU > fr_PHU_harvest_min:
             yields.update_all(soil, crop_type, field_management, time)
         crop_type.LAI_actual = max(0, min(crop_type.LAI_min, crop_type.LAI_actual))
-        crop_type.fr_LAI_max = 0
 
+        # C.11.C.3
         soil.residue += crop_type.biomass_actual * 0.1
         crop_type.biomass_actual -= crop_type.biomass_actual * 0.1
         crop_type.bio_N -= crop_type.bio_N * 0.1
         crop_type.bio_P -= crop_type.bio_P * 0.1
 
+        crop_type.fr_LAI_max = 0
         crop_type.accumulated_HU = 0
         crop_type.fr_PHU = 0
 
@@ -229,11 +233,15 @@ class Crop:
         self.t_dorm = calculate_t_dorm(space.latitude)
         self.solar_declination = 0.0
 
-        # Each crop in crops_list has a list of grow years. This loop iterates
-        # through those lists and populates a grow regimen with the crop grown
-        # in each year
-
     def set_grow_regimen(self, time):
+        """
+        Description:
+            Resolves conflicts in the specified grow_regimen and finalizes
+            the years in which each crop is growing in this field
+            "pseudocode_crop" C.1.A
+        Args:
+            time: an instance of the Time class specified in classes.py
+        """
         for crop_type in self.crops_list:
             for year in crop_type.grow_years:
                 # checks requested grow years against model boundaries
@@ -272,7 +280,7 @@ def calculate_start(soil, crop, field_management, weather, space, time):
     """
     Description:
         Calculates the start day for the crop
-       "pseudocode_crop" section C.1.A
+       "pseudocode_crop" section C.1.B
 
     Args:
         soil: an instance of the Soil class specified in soil.py representing
@@ -297,6 +305,7 @@ def calculate_start(soil, crop, field_management, weather, space, time):
     # if the management scheme is optimal
     if field_management.management_scheme == 'optimal':
         # and the crop is annual
+        # C.1.B.1
         if crop_type.crop_type == 'annual':
             # and it is the planting date
             if time.day == crop_type.planting_date:
@@ -323,6 +332,7 @@ def calculate_start(soil, crop, field_management, weather, space, time):
                     # iterate the planting date to try again tomorrow
                     crop_type.planting_date = time.day + 1
         # the crop is perennial
+        # C.1.B.2
         else:
             # edge case for when a planting date that occurs before the
             # simulation begins (usually the result of a rotation)
@@ -349,6 +359,7 @@ def calculate_start(soil, crop, field_management, weather, space, time):
                     crop_type.growing = True
 
                 # conditions were not conducive to fertilizer and manure application
+
                 else:
                     # iterate the planting date to try again tomorrow
                     crop_type.planting_date = time.day + 1
@@ -356,6 +367,7 @@ def calculate_start(soil, crop, field_management, weather, space, time):
     # if application type is scheduled
     elif field_management.management_scheme == 'scheduled':
         # and the crop is annual
+        # C.1.B.3
         if crop_type.crop_type == 'annual':
             # and it is the planting date
             if time.day == crop_type.planting_date:
@@ -363,6 +375,7 @@ def calculate_start(soil, crop, field_management, weather, space, time):
                 crop_type.planted = True
                 crop_type.growing = True
         # the crop is perennial
+        # C.1.B.4
         else:
             # edge case for when a planting date that occurs before the
             # simulation begins (usually the result of a rotation)
