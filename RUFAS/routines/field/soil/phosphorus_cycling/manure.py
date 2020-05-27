@@ -54,7 +54,7 @@ def update_all(soil, m_app):
     # application factors
     # S.5.C.II.1
     I_fac = 1.0 - infiltration
-    S_fac = 1.0 - m_app['surf_perc']
+    S_fac = 1.0 - m_app['surface_percent']
     W_fac = 1.0 - (WIP_frac + WOP_frac)
 
     # concentration factors
@@ -85,8 +85,8 @@ def update_all(soil, m_app):
     soil.manure_mass += mass * S_fac_mass
     soil.WIP += P_app * WIP_frac * S_fac
     soil.WOP += P_app * WOP_frac * S_fac
-    soil.SOP += P_app * W_fac * 0.75 * m_app['surf_perc'] * S_fac
-    soil.SIP += P_app * W_fac * 0.25 * m_app['surf_perc'] * S_fac
+    soil.SOP += P_app * W_fac * 0.75 * m_app['surface_percent'] * S_fac
+    soil.SIP += P_app * W_fac * 0.25 * m_app['surface_percent'] * S_fac
 
     # update active and labile soil pools for each layer affected by the application
     # S.5.C.II.6

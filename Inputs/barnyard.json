@@ -43,7 +43,7 @@
             "soil_phosphorus":
             {
                 "produce_csv": true,
-                "produce_graphics": false,
+                "produce_graphics": true,
 
                 "report_name": "Soil Phosphorus",
                 "file_name": "soil_phosphorus.csv"

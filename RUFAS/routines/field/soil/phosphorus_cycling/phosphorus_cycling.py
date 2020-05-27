@@ -37,9 +37,7 @@ def update_all(soil, field_management, weather, time):
     # check for scheduled manure application and conducive conditions
     manure_management = field_management.managed_applications['manure']
     if (year, time.day) in manure_management.applications:
-        print("Here")
         if manure_management.check_conditions(soil, weather, time):
-            print("good conditions")
             # apply manure
             manure.update_all(soil, manure_management.applications[(year, time.day)].data)
 

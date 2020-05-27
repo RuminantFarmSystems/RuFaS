@@ -36,7 +36,7 @@ class FieldManagement:
                 'NH4_frac': 0,
                 'WIP_frac': 0.6,
                 'WOP_frac': 0.05,
-                'DM': 0.05,
+                'dry_matter': 0.05,
                 'percent_cover': 0.95,
                 'depth': 0.0,
                 'surface_percent': 1.0
@@ -143,7 +143,8 @@ class FieldManagement:
             Args:
                 time: an instance of the Time class specified in classes.py
             """
-            self.applications[(time.start_year + time.year - 1, time.day)] = self.applications.pop((time.start_year + time.year - 1, -1))
+            self.applications[(time.start_year + time.year - 1, time.day + 1)] = \
+                self.applications.pop((time.start_year + time.year - 1, -1))
 
         def check_conditions_plant(self, soil, weather, time):
             """

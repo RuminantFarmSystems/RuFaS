@@ -3,20 +3,20 @@
 
     "fertilizer":
     {
-        "app_years": [],
-        "repeat": 0,
+        "app_years": [2009],
+        "repeat": 1,
 
         "year": [],
         "day": [],
         "mass": [],
         "depth": [],
-        "surf_perc": []
+        "surface_percent": []
     },
 
     "manure":
     {
-        "app_years": [],
-        "repeat": 0,
+        "app_years": [2009],
+        "repeat": 1,
 
         "type": ["DAIRY", "DAIRY", "DAIRY", "DAIRY", "DAIRY", "DAIRY", "DAIRY", "DAIRY"],
         "year": [2012, 2012, 2012, 2012, 2013, 2013, 2013, 2013],
@@ -30,7 +30,7 @@
         "dry_matter": [0.04, 0.07, 0.04, 0.04, 0.05, 0.05, 0.07, 0.06],
         "percent_cover": [0.95, 0.95, 0.95, 0.95, 0.95, 0.95, 0.95, 1.0],
         "depth": [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0],
-        "surf_perc": [1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0]
+        "surface_percent": [1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0]
     },
 
     "tillage":
