@@ -35,8 +35,8 @@
 
     "tillage":
     {
-        "app_years": [],
-        "repeat": 0,
+        "app_years": [2009],
+        "repeat": 1,
 
         "year": [],
         "day": [],

@@ -33,12 +33,12 @@ class Alfalfa(BaseCrop):
         # Inputs
         self.T_base_min = 4
         self.T_base_max = 32  # until dormancy
-        self.PHU = 800  # still unknown
+        self.PHU = 900  # still unknown
 
         # Internally calculated inputs
         self.accumulated_HU = 0.0
         self.prev_accumulated_HU = 0.0
-        self.fr_PHU_harvest_min = 1.0
+        self.fr_PHU_harvest_min = 0.9
 
         # Outputs
         self.fr_PHU = 0.0
