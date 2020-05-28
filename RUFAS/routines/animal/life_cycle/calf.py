@@ -102,32 +102,6 @@ class Calf(AnimalBase):
 		"""
 		self.nutrient_rqmts, self.DMIest, self.DBW = calculate_rqmts()
 
-	def calc_base_manure(self):
-		"""
-		Calculates the values needed for animal class manure calculations.
-
-		Returns:
-			p_urine: amount of P required for urine production (g)
-			p_feces_excrt: amount of P excreted by an animal (g)
-		"""
-		# amount of P required for urine production (g) (A.3.A.1)
-		p_urine = 0.000002 * self.body_weight * 1000
-
-		# excess P in the diet (g) (A.3.A.2)
-		self.p_excess = max(self.p_intake - self.p_req, 0)
-
-		# amount of P excreted by an animal (g) (A.3.A.3)
-		if self.dP_reserves == 0 and self.p_intake >= self.p_req:
-			p_feces_excrt = self.p_intake - self.p_req + self.p_maint_feces
-		elif self.dP_reserves < 0 and self.p_intake >= self.p_req and \
-				self.p_excess >= self.dP_reserves / 0.7:
-			p_feces_excrt = self.p_intake - self.p_req + self.p_maint_feces + \
-							self.dP_reserves / 0.7
-		else:
-			p_feces_excrt = self.p_maint_feces
-
-		return p_urine, p_feces_excrt
-
 	def calc_manure_excretion(self, feed):
 		"""
 		Calculates and sets the manure excretion components.

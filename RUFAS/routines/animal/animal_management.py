@@ -214,21 +214,26 @@ class AnimalManagement:
 
         for calf in self.calves:
             calf.calc_nutrient_rqmts()
+            calf.p_animal = 0.0072 * calf.body_weight * 1000
 
         for heiferI in self.heiferIs:
             heiferI.calc_nutrient_rqmts()
+            heiferI.p_animal = 0.0072 * heiferI.body_weight * 1000
 
         for heiferII in self.heiferIIs:
             heiferII.calc_nutrient_rqmts()
+            heiferII.p_animal = 0.0072 * heiferII.body_weight * 1000
 
         for heiferIII in self.heiferIIIs:
             heiferIII.calc_nutrient_rqmts()
+            heiferIII.p_animal = 0.0072 * heiferIII.body_weight * 1000
 
         for cow in self.cows:
             # uses average distances from pens to milking parlor
             cow.calc_init_nutrient_rqmts(avg_VD_parlor, avg_HD_parlor,
                                          self.housing, self.pasture_concentrate,
                                          feed)
+            cow.p_animal = 0.0072 * cow.body_weight * 1000
 
     def avg_pen_dist(self):
         """
@@ -461,6 +466,7 @@ class AnimalManagement:
         Args:
             feed: instance of the Feed class
         """
+        print(self.simulation_day, end=' ')
         if self.simulate_animals:
             for pen in self.all_pens:
                 pen.pen_populated = len(pen.animals_in_pen) > 0
