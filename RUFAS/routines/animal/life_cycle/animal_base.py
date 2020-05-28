@@ -132,6 +132,8 @@ class AnimalBase(object):
 		self.p_excess = max(self.p_intake - self.p_req, 0)
 
 		# change in body P reserves (g), must be <= 0 (A.1G.A.2)
+		prev_dP_reserves = self.dP_reserves
+
 		if self.p_intake < self.p_req:
 			self.dP_reserves = self.p_intake - self.p_req + self.dP_reserves
 		elif self.p_intake >= self.p_req and self.dP_reserves < 0:
@@ -141,8 +143,8 @@ class AnimalBase(object):
 
 		# amount of P in the animal
 		if self.id == 7417:
-			print(self.p_animal, self.p_intake, self.p_req, self.p_excess, self.dP_reserves)
-		self.p_animal = self.p_animal + self.p_gest + self.p_growth + self.dP_reserves
+			print(self.days_born, self.p_animal, self.p_intake, self.p_req, self.p_excess, self.dP_reserves)
+		self.p_animal = self.p_animal + self.p_gest + self.p_growth + (self.dP_reserves - prev_dP_reserves)
 		# if self.p_animal < 0:
 		# 	print(self.id)
 
