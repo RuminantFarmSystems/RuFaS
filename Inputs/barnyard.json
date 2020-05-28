@@ -19,7 +19,7 @@
             "crop_summary":
             {
                 "produce_csv": true,
-                "produce_graphics": false,
+                "produce_graphics": true,
 
                 "report_name": "Crop Summary",
                 "file_name": "crop_summary.csv"
@@ -35,7 +35,7 @@
             "soil_nitrogen":
             {
                 "produce_csv": true,
-                "produce_graphics": false,
+                "produce_graphics": true,
 
                 "report_name": "Soil Nitrogen",
                 "file_name": "soil_nitrogen.csv"
