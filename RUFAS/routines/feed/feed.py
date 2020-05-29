@@ -13,21 +13,26 @@ import sqlite3
 
 
 class Feed:
-    def __init__(self, data):
-        self.__feed_database = data['feed_database']
+    def __init__(self, json_data):
+        self.nutrient_rqmts = ['FU', 'RU', 'ME_DM', 'RDP_DM', 'RUP_DM']
+
+        self.__feed_database = json_data['feed_database']
         self.feeds_table = 'feeds'
         self.feed_quality_table = 'feed_quality'
         self.nutrient_table = 'nutrients'
 
         self.entries_split_by_maturity = self.get_feeds_split_by_maturity()
 
-        self.purchased_feeds = self.get_purchased_feed_ids(data['purchased_feeds'])
-        self.growing_feeds = data['growing_feeds']
+        self.purchased_feeds = \
+            self.get_purchased_feed_ids(json_data['purchased_feeds'])
+        self.growing_feeds = json_data['growing_feeds']
 
         # dictionary of nutrients needed for this run
         # initially, this only contains information for purchased feeds as none
         # of the growing_feeds have been harvested yet
         self.available_feeds = self.get_nutrient_vals(self.purchased_feeds)
+
+        self.all_feeds = self.purchased_feeds + self.growing_feeds
 
     def get_feeds_split_by_maturity(self):
         try:
@@ -66,16 +71,52 @@ class Feed:
     def get_feed_id(self, grown_feed_entry, DM, NDF):
         rounded_DM = round(DM)
         rounded_NDF = round(NDF)
-        query = "SELECT quality_id FROM " + self.feed_quality_table
+        try:
+            conn = sqlite3.connect(self.__feed_database)
+            conn.row_factory = sqlite3.Row
+            c = conn.cursor()
+
+            nutrient_query = "SELECT DISTINCT differentiating_nutrient FROM " \
+                             + self.feed_quality_table + \
+                             " WHERE entry = " + str(grown_feed_entry)
+
+            c.execute(nutrient_query)
+            rows = c.fetchall()
+
+            nutrient = rows[0][0]
+
+            if nutrient == 'DM':
+                query = "SELECT quality_id FROM " + self.feed_quality_table + \
+                        " WHERE entry = " + str(grown_feed_entry) + \
+                        " AND low_percent <= " + str(rounded_DM) + \
+                        " AND high_percent >= " + str(rounded_DM)
+            else:
+                query = "SELECT quality_id FROM " + self.feed_quality_table + \
+                        " WHERE entry = " + str(grown_feed_entry) + \
+                        " AND low_percent <= " + str(rounded_NDF) + \
+                        " AND high_percent >= " + str(rounded_NDF)
+
+            c.execute(query)
+            rows = c.fetchall()
+
+            return rows[0][0]
+
+        except Exception as e:
+            print(e)
+            exit(1)
 
     def add_to_available_feeds(self, new_grown_feeds, DM_list, NDF_list):
         new_feed_ids = []
         for i, new_feed in enumerate(new_grown_feeds):
             if new_feed in self.entries_split_by_maturity:
-                new_feed_ids.append(self.get_feed_id(new_feed, DM_list[i], NDF_list[i]))
+                new_feed_ids.append(
+                    self.get_feed_id(new_feed, DM_list[i], NDF_list[i]))
             else:
                 new_feed_ids.append(new_feed)
         self.available_feeds.update(self.get_nutrient_vals(new_feed_ids))
+
+    def update_available_feed(self, feed_id, nutrient, new_val):
+        self.available_feeds[feed_id][nutrient] = new_val
 
     def remove_from_available_feeds(self, feeds_to_be_removed):
         for feed_id in feeds_to_be_removed:
@@ -88,7 +129,8 @@ class Feed:
             conn.row_factory = sqlite3.Row
             c = conn.cursor()
 
-            query = "SELECT * FROM " + self.nutrient_table + " WHERE feed_id IN " + str(tuple(feed_ids))
+            query = "SELECT * FROM " + self.nutrient_table + \
+                    " WHERE feed_id IN " + str(tuple(feed_ids))
 
             c.execute(query)
 
@@ -114,6 +156,7 @@ data = {
     'growing_feeds': [8, 87]
 }
 f = Feed(data)
+print(f.get_feed_id(34, 15, 0))
 
 # class FeedNames(IntEnum):
 #     """
