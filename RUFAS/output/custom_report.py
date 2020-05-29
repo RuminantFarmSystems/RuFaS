@@ -46,7 +46,14 @@ class CustomReport(BaseReportHandler):
         # Daily Outputs
         #
         self.daily_variables = {'year': ['time.cal_year', '', []],
-                                'j_day': ['time.day', '', []]
+                                'j_day': ['time.day', '', []],
+                                'precipitation': ['weather.rainfall[time.year - 1][time.day - 1]', 'mm H2O', []],
+                                'runoff': ['soil.runoff', 'mm H2O', []],
+                                'sediment': ['soil.sed', 'metric tons', []],
+                                'labile_P_l1': ['soil.soil_layers[0].labile_P', 'kg', []],
+                                'active_P_l1': ['soil.soil_layers[0].active_P', 'kg', []],
+                                'stable_P_l1': ['soil.soil_layers[0].stable_P', 'kg', []],
+                                'sediment P': ['soil.sed_P', 'kg P / ha', []]
                                 }
 
         #

@@ -60,14 +60,14 @@ class Cow(HeiferIII):
 					and PGFatPD
 		"""
 		super().init_from_heiferIII(heiferIII)
-		
+
 		# current hard-coded values necessary for nutrient requirement
 		# calculations
 		self.BCS = 3.5  # body condition score
 		self.CP_milk = 3.2
 		self.lactose_milk = 4.85
 		self.mPrt = 3.5  # milk protein
-		
+
 		self.DVD = 0  # daily vertical distance, km
 		self.DHD = 0  # daily horizontal distance, km
 		self.CI = 0  # calving interval, days
@@ -117,13 +117,13 @@ class Cow(HeiferIII):
 			cow: another cow out of the herd
 		"""
 		super().init_from_heiferIII(Cow)
-		
+
 		# current hard-coded values necessary for nutrient requirement
 		# calculations
 		self.BCS = 3.5  # body condition score
 		self.CP_milk = 3.2
 		self.lactose_milk = 4.85
-		
+
 		self.daily_growth = cow.daily_growth
 		self.calves = cow.calves
 		self.milking = cow.milking
@@ -223,7 +223,7 @@ class Cow(HeiferIII):
 			n = self._determine_param_value(
 				AnimalBase.config['n'][breed_index][parity_index],
 				AnimalBase.config['n_std'][breed_index][parity_index])
-			
+
 			estimated_daily_milk_produced = \
 				l * math.pow(self.days_in_milk, m) * \
 				math.exp((0 - n) * self.days_in_milk)
@@ -245,9 +245,9 @@ class Cow(HeiferIII):
 		daily_fat_correct_milk_production = \
 			0.4 * estimated_daily_milk_produced + \
 			0.15 * fat_percent * estimated_daily_milk_produced
-		
+
 		prev_weight = self.body_weight
-		
+
 		# calculate body weight when milking
 		if self.calves == 1:
 			self.body_weight = \
@@ -263,7 +263,7 @@ class Cow(HeiferIII):
 					math.exp(-0.006 * self.days_born)) ** 3 - (40 / 75) * \
 				self.days_in_milk * math.exp(1 - self.days_in_milk / 75) + \
 				0.0187 ** 3 * (self.days_in_preg - 50) ** 3
-		
+
 		if not self.milking:
 			self.daily_growth = self.body_weight - prev_weight
 
@@ -1181,7 +1181,7 @@ class Cow(HeiferIII):
 		ax1.spines['right'].set_visible(False)
 		ax1.spines['top'].set_visible(False)
 		ax1.set_title("Milk")
-			
+
 		ax2 = fig.add_subplot(122)
 		ax2.plot(self.body_weight_lst)
 		ax2.spines['right'].set_visible(False)
@@ -1190,7 +1190,7 @@ class Cow(HeiferIII):
 
 		plt.plot()
 		plt.show()
-	
+
 	def __str__(self):
 		res_str = """
 			==> Cow: \n

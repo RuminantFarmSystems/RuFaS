@@ -41,10 +41,10 @@ class Pen:
     classes_in_pen = set()
 
     # vertical distance to milking parlor, km, from input file
-    vertical_parlor_dist = 0
+    vertical_dist_to_parlor = 0
 
     # horizontal distance to milking parlor, km, from input file
-    horizontal_parlor_dist = 0
+    horizontal_dist_to_parlor = 0
 
     # number of stalls, from input file
     num_stalls = 0
@@ -126,8 +126,8 @@ class Pen:
             pen_type: freestall or tiestall
         """
         self.id = id_number
-        self.vertical_parlor_dist = vert_dist
-        self.horizontal_parlor_dist = horiz_dist
+        self.vertical_dist_to_parlor = vert_dist
+        self.horizontal_dist_to_parlor = horiz_dist
         self.num_stalls = num_stalls
         self.housing_type = housing_type
         self.bedding_type = bedding_type
@@ -233,32 +233,25 @@ class Pen:
         while True:
 
             if 'Calf' in self.classes_in_pen:
-                ration_per_animal = calf_optimize()
+                ration_per_animal = calf_optimize(feed, self.avg_nutrient_rqmts)
 
             elif 'HeiferI' in self.classes_in_pen or \
                     'HeiferII' in self.classes_in_pen or \
                     'HeiferIII' in self.classes_in_pen:
                 ration_per_animal = \
-                    growing_heifer_optimize()
+                    growing_heifer_optimize(feed, self.avg_nutrient_rqmts)
 
             elif 'Cow' in self.classes_in_pen and \
                     self.animals_in_pen[0].milking:  # lactating cow
                 set_globals(self.avg_DMIest, self.avg_BW, self.avg_DBW,
                             self.avg_milk, self.avg_CP_milk)
-                # ration_per_animal = {
-                #     'status': 'Optimal',
-                #     'objective': 4.7985611960800005,
-                #     'Corn_grain': 0.065729461,
-                #     'Legume_hay': 12.951222,
-                #     'Cotton_seed': 7.9816535,
-                #     'Roasted_soybean': 2.3135948,
-                #     'Rye_hay': 0.0
-                # }
-                ration_per_animal = lactating_cow_optimize(feed, self.avg_nutrient_rqmts)
+                ration_per_animal = \
+                    lactating_cow_optimize(feed, self.avg_nutrient_rqmts)
 
             elif 'Cow' in self.classes_in_pen and \
                     not self.animals_in_pen[0].milking:  # dry cow
-                ration_per_animal = dry_cow_optimize()
+                ration_per_animal = \
+                    dry_cow_optimize(feed, self.avg_nutrient_rqmts)
 
             else:  # this should never occur
                 print('error in pen ration calculation')
@@ -283,7 +276,8 @@ class Pen:
             self.calc_avg_nutrient_rqmts()
 
         DMI = calc_DMI(ration_per_animal, feed)
-        self.avg_p_intake, p_conc = phosphorus_in_ration(DMI, ration_per_animal, feed)
+        self.avg_p_intake, p_conc = \
+            phosphorus_in_ration(DMI, ration_per_animal, feed)
 
         for animal in self.animals_in_pen:
             animal.set_ration(ration_per_animal, DMI)
@@ -337,8 +331,8 @@ class Pen:
         if 'Cow' in self.classes_in_pen:
             for animal in self.animals_in_pen:
                 if type(animal).__name__ == 'Cow':
-                    animal.calc_daily_walking_dist(self.vertical_parlor_dist,
-                                                   self.horizontal_parlor_dist)
+                    animal.calc_daily_walking_dist(self.vertical_dist_to_parlor,
+                                                   self.horizontal_dist_to_parlor)
 
     def call_p_rqmts(self, feed):
         """
@@ -426,6 +420,7 @@ class Pen:
         # and animals are to be added to it, there are previous initial values
         # that are non-zero.
         self.animals_in_pen = []
+        self.pen_populated = False
         self.classes_in_pen = set()
         self.avg_p_animal = 0
 
@@ -441,7 +436,7 @@ def phosphorus_in_ration(DMI, ration, feed):
 
     Returns: the amount of phosphorus (g) provided by the feed in @ration and
             the concentration of P in @ration (%)
-            
+
     TODO: These calculations could be placed in ration subfolder with ration update
     """
     # amount of P in the formulated ration (g)
