@@ -84,6 +84,14 @@
             "report_name": "Water Balance",
             "file_name": "water_balance.csv"
         },
+        "feed_storage":
+        {
+            "produce_csv": true,
+            "produce_graphics": false,
+            "display_graphics": false,
+            "report_name": "Feed Storage",
+            "file_name": "feed_storage.csv"
+        },
         "custom_report":
         {
             "produce_csv": true,
@@ -94,7 +102,6 @@
         }
     },
 
-
     "farm":
     {
         "crop":
@@ -102,8 +109,8 @@
             "latitude": 43.332708,
             "corn":
             {
-                "grow_years": [],
-                "repeat": 0,
+                "grow_years": [2009],
+                "repeat": 1,
                 "planting_date": 121,
                 "harvest_date": 319,
                 "harvest_type": "optimal"
@@ -125,6 +132,7 @@
                 "harvest_type": "optimal"
             }
         },
+
         "soil":
         {
             "ProfileDepth": 450,
@@ -260,12 +268,12 @@
 
             }
         },
-        
+
         "animal":
         {
             "herd_information":
             {
-            	"calf_num": 160, 
+            	"calf_num": 160,
             	"heiferI_num": 800,
             	"heiferII_num": 820,
             	"heiferIII_num": 50,
@@ -273,7 +281,7 @@
                 "replace_num": 5000,
                 "herd_num": 1000
             },
-            
+
             "animal_config":
             {
             	"num_21_days": 15,
@@ -351,21 +359,21 @@
 				"econ_indicator_range": 365,
 				"heifer_sell_price": 1400,
 				"heifer_buy_price": 1600,
-				"calf_price": 140	
+				"calf_price": 140
             },
-            
+
             "housing": "barn",
             "pasture_concentrate": -1,
-            
+
             "ration":
             {
                 "user_input": false,
                 "formulation_interval": 7
             },
-        
+
 	        "pen_information":
 	        {
-	        	"pen0":
+            "pen0":
 	        	{
 	        		"id": 0,
 	        		"vertical_dist_to_milking_parlor": 0.1,
@@ -375,7 +383,7 @@
 	        		"bedding_type": "sand",
 	        		"pen_type": "freestall"
 	        	},
-	        	
+
 	        	"pen1":
 	        	{
 	        		"id": 1,
@@ -386,7 +394,7 @@
 	        		"bedding_type": "sawdust",
 	        		"pen_type": "freestall"
 	        	},
-	        	
+
 	        	"pen2":
 	        	{
 	        		"id": 2,
@@ -397,7 +405,7 @@
 	        		"bedding_type": "straw",
 	        		"pen_type": "tiestall"
 	        	},
-	        	
+
 	        	"pen3":
 	        	{
 	        		"id": 3,
@@ -408,7 +416,7 @@
 	        		"bedding_type": "sand",
 	        		"pen_type": "tiestall"
 	        	},
-	        	
+
 	        	"pen4":
 	        	{
 	        		"id": 4,
@@ -419,18 +427,49 @@
 	        		"bedding_type": "sand",
 	        		"pen_type": "tiestall"
 	        	},
-	        	
+
 	        	"pen5":
 	        	{
 	        		"id": 5,
 	        		"vertical_dist_to_milking_parlor": 0.1,
+	        		"horizontal_dist_to_milking_parlor": 1.6,
+	        		"number_of_stalls": 200,
+	        		"housing_type": "open air barn",
+	        		"bedding_type": "sand",
+	        		"pen_type": "tiestall"
+	        	},
+            "pen6":
+	        	{
+	        		"id": 6,
+	        		"vertical_dist_to_milking_parlor": 0.1,
+	        		"horizontal_dist_to_milking_parlor": 1.6,
+	        		"number_of_stalls": 300,
+	        		"housing_type": "open air barn",
+	        		"bedding_type": "sand",
+	        		"pen_type": "tiestall"
+	        	},
+            "pen7":
+	        	{
+	        		"id": 7,
+	        		"vertical_dist_to_milking_parlor": 0.2,
+	        		"horizontal_dist_to_milking_parlor": 1.6,
+	        		"number_of_stalls": 250,
+	        		"housing_type": "open air barn",
+	        		"bedding_type": "sand",
+	        		"pen_type": "tiestall"
+	        	},
+            "pen8":
+	        	{
+	        		"id": 8,
+	        		"vertical_dist_to_milking_parlor": 0.2,
 	        		"horizontal_dist_to_milking_parlor": 1.6,
 	        		"number_of_stalls": 400,
 	        		"housing_type": "open air barn",
 	        		"bedding_type": "sand",
 	        		"pen_type": "tiestall"
 	        	}
-	        }            
+
+	        }
         },
 
         "feed":
@@ -445,7 +484,21 @@
               "Cotton_seed",
               "Roasted_soybean",
               "Rye_hay"
-            ]
+            ],
+
+            "storage_options": {
+                "storage_1": {
+                    "storage_type": "bag",
+                    "moisture": "direct_cut",
+                    "additive": "preservative",
+                    "packing_density": 14,
+                    "inoculation": "heterofermentative",
+                    "bunk_type": "open_floor",
+                    "ventilation": true,
+                    "removal_rate": 6,
+                    "initial_dry_matter": 0
+                }
+            }
         }
     }
 }

@@ -27,13 +27,30 @@ class LactatingCowTest(unittest.TestCase):
             "table_name": "feed_library",
 
             "managed_feeds":
-            [
-              "Corn_grain",
-              "Legume_hay",
-              "Cotton_seed",
-              "Roasted_soybean",
-              "Rye_hay"
-            ]
+                [
+                    "Corn_grain",
+                    "Legume_hay",
+                    "Cotton_seed",
+                    "Roasted_soybean",
+                    "Rye_hay"
+                ],
+
+            "storage_options":
+                {
+                    "storage_1":
+                        {
+                            "storage_type": "bag",
+                            "moisture": "direct_cut",
+                            "additive": "preservative",
+                            "packing_density": 14,
+                            "inoculation": "heterofermentative",
+                            "bunk_type": "open_floor",
+                            "ventilation": True,
+                            "removal_rate": 6,
+
+                            "initial_dry_matter": 0
+                        }
+                }
         }
         self.feeds = [Feed(feed_info_0)]
 
