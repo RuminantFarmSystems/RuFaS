@@ -20,6 +20,7 @@ from RUFAS.output.report_handler import BaseReportHandler
 from RUFAS.output.soil_summary import SoilSummary
 from RUFAS.output.soil_nitrogen import SoilNitrogen
 from RUFAS.output.crop_summary import CropSummary
+from RUFAS.output.feed_storage import FeedStorage
 from RUFAS.output.water_balance import WaterBalance
 from RUFAS.output.custom_report import CustomReport
 from RUFAS.output.pen_report import PenReport
@@ -65,6 +66,7 @@ class OutputHandler:
                         'soil_nitrogen': SoilNitrogen(data['soil_nitrogen']),
                         'soil_phosphorus': SoilPhosphorus(data['soil_phosphorus']),
                         'crop_summary': CropSummary(data['crop_summary']),
+                        'feed_storage': FeedStorage(data['feed_storage']),
                         'water_balance': WaterBalance(data['water_balance']),
                         'custom_report': CustomReport(data['custom_report'])
                         }
@@ -94,14 +96,7 @@ class OutputHandler:
 
         # Delete directory if previously exists
         if output_dir.exists():
-            for output in output_dir.iterdir():
-                if output.is_file():
-                    output.unlink()
-                else:
-                    for file in output.iterdir():
-                        file.unlink()
-                    output.rmdir()
-            output_dir.rmdir()
+            shutil.rmtree(output_dir)
 
         output_dir.mkdir(exist_ok=True, parents=False)
         BaseReportHandler.set_dir(output_dir)
@@ -116,9 +111,7 @@ class OutputHandler:
         diagnostic_dir = util.get_base_dir() / diagnostic_dir
 
         if diagnostic_dir.exists():
-            for file in diagnostic_dir.iterdir():
-                shutil.rmtree(file)
-            diagnostic_dir.rmdir()
+            shutil.rmtree(diagnostic_dir)
 
         diagnostic_dir.mkdir(exist_ok=True, parents=False)
 
