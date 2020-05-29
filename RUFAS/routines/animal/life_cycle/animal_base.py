@@ -145,11 +145,7 @@ class AnimalBase(object):
 			self.dP_reserves = 0
 
 		# amount of P in the animal (A.1G.A.3)
-		if self.id == 7417:
-			print(self.days_born, self.p_animal, self.p_intake, self.p_req, self.p_excess, self.dP_reserves)
 		self.p_animal = self.p_animal + self.p_gest + self.p_growth + (self.dP_reserves - prev_dP_reserves)
-		# if self.p_animal < 0:
-		# 	print(self.id)
 
 	def calc_base_manure(self):
 		"""
