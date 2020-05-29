@@ -11,7 +11,7 @@ Description: The class which manages all of the animal routines and keeps track 
     updates the animals daily.
 Author(s): Militsa Sotirova, militsasotirova@gmail.com
            Chris VanKerkhove, cjv47@cornell.edu
-'''
+"""
 ################################################################################
 from RUFAS.routines.animal.pen import Pen
 from RUFAS.routines.animal.clustering_pen_grouping import grouping
@@ -19,6 +19,7 @@ from RUFAS.routines.animal.life_cycle.life_cycle import LifeCycleManager
 from RUFAS.routines.animal.life_cycle.animal_base import AnimalBase
 from collections import deque
 import random
+
 
 def daily_animal_routine(animal_management, feed, weather, time):
     """
@@ -317,7 +318,12 @@ class AnimalManagement:
                 del self.id_pen[i]
 
         for animal in animals_added:
-            pen = self.pens_needing_animals.popleft()
+            if len(self.pens_needing_animals) == 0:
+                # if there hasn't yet been an animal removed from a pen for this
+                # animal to be added, add this animal to the last pen by default
+                pen = len(self.all_pens) - 1
+            else:
+                pen = self.pens_needing_animals.popleft()
             self.id_pen[animal.id] = pen
 
             if type(animal).__name__ == 'Calf':

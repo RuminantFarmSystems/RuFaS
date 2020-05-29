@@ -351,7 +351,6 @@ class LifeCycleManager:
                 self.replacement_market[0].days_born, 'Entered Herd')
             self.replacement_market[0].set_p_purchased()
             animals_added.append(self.replacement_market[0])
-            # cows.append(self.replacement_market[0])
             self.bought_from_market += 1
             daily_bought_from_market += 1
             del self.replacement_market[0]

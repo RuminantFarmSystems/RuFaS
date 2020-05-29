@@ -18,7 +18,7 @@ from RUFAS.routines.animal.ration.dry_cow_ration import \
     optimize as dry_cow_optimize
 from RUFAS.routines.animal.ration.growing_heifer_ration import \
     optimize as growing_heifer_optimize
-from RUFAS.routines.feed.feed import Feeds, Nutrients
+from RUFAS.routines.feed.feed import FeedNames, Nutrients
 
 
 class Pen:
@@ -401,7 +401,7 @@ class Pen:
         # set animal's DVD and DHD if it is a cow
         if type(animal).__name__ == 'Cow':
             animal.calc_daily_walking_dist(
-                self.vertical_parlor_dist, self.horizontal_parlor_dist)
+                self.vertical_dist_to_parlor, self.horizontal_dist_to_parlor)
 
         # set this animal's p_animal to be the average P concentration of other
         # animals in its class times its body weight
@@ -445,7 +445,7 @@ def phosphorus_in_ration(DMI, ration, feed):
     for key in ration:
         # not every key in the ration dictionary refers to a feed
         if key in feed.managed_feed_names:
-            managed_feed = Feeds[key]
+            managed_feed = FeedNames[key]
             nutrients = feed.values(managed_feed)
             p_feed_conc = nutrients[Nutrients.P_DM.name]
             dmi_feed = ration[key]

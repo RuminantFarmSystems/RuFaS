@@ -7,7 +7,7 @@ Description: Determines manure excretion with information from the ration
 Author(s): Militsa Sotirova, militsasotirova@gmail.com
 """
 ################################################################################
-from RUFAS.routines.feed.feed import Feeds, Nutrients
+from RUFAS.routines.feed.feed import FeedNames, Nutrients
 from .general_manure import phosphorus_excreted
 
 
@@ -83,7 +83,7 @@ def manure_calculations(ration_formulation, feed, BW, DIM, mPrt,
         # not every key in the ration_formulation dictionary refers to a feed
         if key in feed.managed_feed_names:
             # percentages of the DM of each nutrient
-            managed_feed = Feeds[key]
+            managed_feed = FeedNames[key]
             nutrients = feed.values(managed_feed)
             DM_feed_content = 0.01 * nutrients[Nutrients.DM.name]
             ADF_feed_content = 0.01 * nutrients[Nutrients.ADF_DM.name]

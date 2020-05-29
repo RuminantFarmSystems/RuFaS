@@ -8,7 +8,7 @@ Author(s): Militsa Sotirova, militsasotirova@gmail.com
 ################################################################################
 
 
-def optimize():
+def optimize(feed, rqmts):
     """
     Sets up the arguments for the linear programming optimization.
 
