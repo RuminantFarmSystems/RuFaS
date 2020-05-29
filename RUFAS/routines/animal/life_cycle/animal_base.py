@@ -2,6 +2,8 @@
 RUFAS: Ruminant Farm Systems Model
 File name: animal_base.py
 Author(s): Manfei Li, mli497@wisc.edu
+           Militsa Sotirova, militsasotrirova@gmail.com
+	   Tayler Hansen, tlhansen@cornell.edu
 Description: This file initialize common parameters including ID, breed,
 			birth date, and age for all animals to be identified.
 """
@@ -166,7 +168,7 @@ class AnimalBase(object):
 		if self.dP_reserves == 0 and self.p_intake >= self.p_req:
 			p_feces_excrt = self.p_intake - self.p_req + self.p_maint_feces
 		elif self.dP_reserves < 0 and self.p_intake >= self.p_req and \
-				self.p_excess >= self.dP_reserves / 0.7:
+				self.p_excess >= (-1) * self.dP_reserves / 0.7:
 			p_feces_excrt = self.p_intake - self.p_req + self.p_maint_feces + \
 							self.dP_reserves / 0.7
 		else:
