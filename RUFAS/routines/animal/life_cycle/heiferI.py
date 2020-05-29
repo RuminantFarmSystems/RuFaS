@@ -69,22 +69,22 @@ class HeiferI(Calf):
 		Args:
 			DMI: the Dry Matter Intake (kg)
 		"""
-		# amount of P required for endogenous losses (g) (A.1A-D.C.1)
+		# amount of P required for endogenous losses (g) (A.1A-D.E.1)
 		self.p_maint_feces = 0.0008 * DMI * 1000
 
-		# amount pf P required for urine production (g) (A.1A-F.C.2)
+		# amount pf P required for urine production (g) (A.1A-F.E.2)
 		p_urine = 0.000002 * self.body_weight * 1000
 
-		# absorbed P retained for growth (g) (A.1A-F.C.3)
+		# absorbed P retained for growth (g) (A.1A-F.E.3)
 		self.p_growth = \
 			(0.0012 + 0.004635 * (self.mature_body_weight ** 0.22) *
 				(self.body_weight ** (-0.22))) * \
 			self.daily_growth / 0.96 * 1000
 
-		# absorbed P required by the animal (g) (A.1A-F.C.6)
+		# absorbed P required by the animal (g) (A.1A-F.E.6)
 		p_absorb = p_urine + self.p_maint_feces + self.p_growth
 
-		# requirement of P from the ration (g) (A.1B-D.C.7)
+		# requirement of P from the ration (g) (A.1B-D.E.7)
 		self.p_req = p_absorb / 0.664
 
 	def update(self):
