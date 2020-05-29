@@ -42,7 +42,8 @@ def daily_feed_routine(feed, fields):
             stored = False
 
             for storage in feed.available_storage.values():
-                if storage.crop_name == crop_name and storage.quality == crop_quality:
+                if storage.crop_name == crop_name and storage.storage is True \
+                        and storage.quality == crop_quality:
                     storage.store_crop(crop)
 
                     stored = True
@@ -57,15 +58,15 @@ def daily_feed_routine(feed, fields):
 
             if not stored:
                 standard_data = {
-                                    "storage_type": "bag",
-                                    "moisture": "direct_cut",
-                                    "additive": "preservative",
-                                    "packing_density": 14,
-                                    "inoculation": "heterofermentative",
-                                    "bunk_type": "open_floor",
-                                    "ventilation": True,
-                                    "removal_rate": 6,
-                                    "initial_dry_matter": 0
+                    "storage_type": "bag",
+                    "moisture": "direct_cut",
+                    "additive": "preservative",
+                    "packing_density": 14,
+                    "inoculation": "heterofermentative",
+                    "bunk_type": "open_floor",
+                    "ventilation": True,
+                    "removal_rate": 6,
+                    "initial_dry_matter": 0
                 }
                 standard_storage_name = str('standard_storage_' + str(feed.standard_storage_count))
 
@@ -146,6 +147,7 @@ class NutrientValues:
     Description: Stores the information from the database source of feed
     information for the feeds listed as managed in the input JSON file.
     """
+
     def __init__(self, database_file: str, table_name, configured_feeds):
         """
         Connects to the @database_file and queries from the @table_name for the
