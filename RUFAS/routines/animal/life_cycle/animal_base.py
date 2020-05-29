@@ -131,6 +131,7 @@ class AnimalBase(object):
 		"""
 		Calculates this animal's daily phosphorus update.
 		"""
+		# Amount of P in diet greater than animal requirements (A.1G.A.1)
 		self.p_excess = max(self.p_intake - self.p_req, 0)
 
 		# change in body P reserves (g), must be <= 0 (A.1G.A.2)
@@ -143,7 +144,7 @@ class AnimalBase(object):
 		else:
 			self.dP_reserves = 0
 
-		# amount of P in the animal
+		# amount of P in the animal (A.1G.A.3)
 		if self.id == 7417:
 			print(self.days_born, self.p_animal, self.p_intake, self.p_req, self.p_excess, self.dP_reserves)
 		self.p_animal = self.p_animal + self.p_gest + self.p_growth + (self.dP_reserves - prev_dP_reserves)
@@ -158,13 +159,13 @@ class AnimalBase(object):
 			p_urine: amount of P required for urine production (g)
 			p_feces_excrt: amount of P excreted by an animal (g)
 		"""
-		# amount of P required for urine production (g) (A.3.A.1)
+		# amount of P required for urine production (g) (A.1G.B.1)
 		p_urine = 0.000002 * self.body_weight * 1000
 
-		# excess P in the diet (g) (A.3.A.2)
+		# excess P in the diet (g) (A.1G.A.1)
 		self.p_excess = max(self.p_intake - self.p_req, 0)
 
-		# amount of P excreted by an animal (g) (A.3.A.3)
+		# amount of P excreted by an animal (g) (A.1G.B.2)
 		if self.dP_reserves == 0 and self.p_intake >= self.p_req:
 			p_feces_excrt = self.p_intake - self.p_req + self.p_maint_feces
 		elif self.dP_reserves < 0 and self.p_intake >= self.p_req and \
@@ -180,7 +181,7 @@ class AnimalBase(object):
 		"""
 		Sets this animal's phosphorus value as a purchased animal.
 		"""
-		# (A.1G.A.1) from P tracking
+		# (A.1G.C.1) from P tracking
 		self.p_animal = 0.0072 * self.body_weight * 1000
 
 	def culled(self):
