@@ -342,10 +342,10 @@ class Cow(HeiferIII):
 		Args:
 			DMI: the Dry Matter Intake (kg)
 		"""
-		# amount of P required for endogenous losses (g) (A.1EF.C.1)
+		# amount of P required for endogenous losses (g) (A.1EF.E.1)
 		self.p_maint_feces = 0.001 * DMI * 1000
 
-		# absorbed P retained for growth (g) (A.1EF.C.3)
+		# absorbed P retained for growth (g) (A.1EF.E.3)
 		if self.body_weight < self.mature_body_weight:
 			self.p_growth = \
 				(0.0012 + 0.004635 * (self.mature_body_weight ** 0.22) *
@@ -354,10 +354,10 @@ class Cow(HeiferIII):
 		else:
 			self.p_growth = 0
 
-		# amount pf P required for urine production (g) (A.1EF.C.2)
+		# amount pf P required for urine production (g) (A.1EF.E.2)
 		p_urine = 0.000002 * self.body_weight * 1000
 
-		# absorbed P retained for fetal growth (g) (A.1EF.C.4)
+		# absorbed P retained for fetal growth (g) (A.1EF.E.4)
 		if self.days_in_preg >= 190:
 			exp_1 = (0.05527 - 0.000075 * self.days_in_preg) * self.days_in_preg
 			exp_2 = (0.05527 - 0.000075 * (self.days_in_preg - 1)) * \
@@ -369,17 +369,17 @@ class Cow(HeiferIII):
 		else:
 			self.p_gest = 0
 
-		# amount of P in milk per animal (g) (A.1E.C.5)
+		# amount of P in milk per animal (g) (A.1E.E.5)
 		if self.milking:
 			p_milk = 0.0009 * self.estimated_daily_milk_produced * 1000
 		else:
 			p_milk = 0
 
-		# absorbed P required by the animal (g) (A.1EF.C.6)
+		# absorbed P required by the animal (g) (A.1EF.E.6)
 		p_absorb = p_urine + self.p_maint_feces + self.p_growth + \
 			self.p_gest + p_milk
 
-		# requirement of P from the ration (g) (A.1EF.C.7)
+		# requirement of P from the ration (g) (A.1EF.E.7)
 		if self.milking:
 			self.p_req = p_absorb / \
 						(1.86696 - 5.01238 * self.p_conc + 5.12286 *
