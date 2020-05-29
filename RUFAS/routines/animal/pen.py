@@ -441,6 +441,8 @@ def phosphorus_in_ration(DMI, ration, feed):
 
     Returns: the amount of phosphorus (g) provided by the feed in @ration and
             the concentration of P in @ration (%)
+            
+    TODO: These calculations could be placed in ration subfolder with ration update
     """
     # amount of P in the formulated ration (g)
     p_intake = 0
