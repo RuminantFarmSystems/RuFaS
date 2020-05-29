@@ -14,24 +14,24 @@ def phosphorus_excreted(milk_prod, total_manure, p_feces_excrt, p_urine):
         WIP (water extractable inorganic P) fraction
         WOP (water extractable organic P) fraction
     """
-    # P fraction of manure (A.3.A.4)
+    # P fraction of manure (A.3.A.1)
     p_frac = (p_feces_excrt + p_urine) / (total_manure * 1000)
 
     # Water extractable Inorganic P (WIP) fraction - fraction of manure
-    # compromised of inorganic water extractable P (A.3.A.5)
+    # compromised of inorganic water extractable P (A.3.A.2)
     WIP_frac = 0.50 * p_frac
 
     # Water extractable Organic P (WOP) fraction - fraction of maure
-    # compromised of organic water extractable P (A.3.A.6)
+    # compromised of organic water extractable P (A.3.A.3)
     WOP_frac = 0.05 * p_frac
 
-    # amount of P in milk per animal (g) (A.1E.A.5)
+    # amount of P in milk per animal (g) (A.3E.B.1)
     p_milk = 0.0009 * milk_prod * 1000
 
-    # amount of P excreted by an animal (g) (A.3.A.7)
+    # manure P excretion for manure module input (g) (A.3.B.2)
+    p_excrt_manure = p_feces_excrt + p_urine
+    
+    # amount of P excreted by an animal (g) (A.3.B.3)
     p_excrt = p_milk + p_feces_excrt + p_urine
     
-    # manure P excretion for manure module input (g) (A.3.A.8)
-    p_excrt_manure = p_feces_excrt + p_urine
-
     return p_excrt, WIP_frac, WOP_frac, p_excrt_manure, p_frac
