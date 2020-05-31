@@ -105,13 +105,15 @@ class Pen:
             stage = type(animal).__name__
             self.classes_in_pen.add(stage)
 
-    def call_animal_nutrient_rqmts(self, housing, pasture_concentrate, feed):
+    def call_animal_nutrient_rqmts(self, housing, pasture_concentrate, feed, temp):
         '''
         Calls each animal's nutrient requirement calculation methods.
         '''
         for animal in self.animals_in_pen:
             if type(animal).__name__ == 'Cow':
                 animal.calc_nutrient_rqmts(housing, pasture_concentrate, feed.nutrient_rqmts)
+            elif type(animal).__name__ == 'Calf':
+                animal.calc_nutrient_rqmts(temp)
             else:
                 animal.calc_nutrient_rqmts()
 
@@ -155,7 +157,7 @@ class Pen:
         self.avg_milk = sum_milk / num_animals
         self.avg_CP_milk = sum_CP_milk / num_animals
 
-    def calc_ration(self, housing, pasture_concentrate, feed):
+    def calc_ration(self, housing, pasture_concentrate, feed, temp):
         '''
         Calculates the ration for the pen using the average nutrient requirements.
         Args:
@@ -197,7 +199,7 @@ class Pen:
                     animal._estimated_daily_milk_produced -= 0.5
 
             # Recalculate animal requirements
-            self.call_animal_nutrient_rqmts(housing, pasture_concentrate, feed)
+            self.call_animal_nutrient_rqmts(housing, pasture_concentrate, feed, temp)
 
             # Recalculate average requirements
             self.calc_avg_nutrient_rqmts()

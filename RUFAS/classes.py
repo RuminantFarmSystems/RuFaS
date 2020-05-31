@@ -36,10 +36,10 @@ class State:
     the future or in an output report in the state object.
     """
 
-    def __init__(self, data, config, time):
+    def __init__(self, data, config, weather, time):
         self.soil = Soil(data['soil'], config)
         self.feed = Feed(data['feed'])
-        self.animal_management = AnimalManagement(data['animal'], config, self.feed)
+        self.animal_management = AnimalManagement(data['animal'], config, self.feed, weather, time)
         self.crop = Crop(data['crop'], time)
 
     # self.fieldOps = FieldOps()
