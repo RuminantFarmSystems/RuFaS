@@ -323,7 +323,7 @@ class AnimalManagement:
             self.life_cycle_manager.daily_update(self.simulation_day, self.sim_length)
 
             if self.end_ration_interval():
-                temp = weather.T_avg[time.year][time.day]
+                temp = weather.T_avg[time.year - 1][time.day - 1]
                 self.calc_nutrient_rqmts(feed, temp)  # per animal, new requirements calculated based on previous ration interval's housing
                 self.clear_pens()
                 self.pen_allocation()
