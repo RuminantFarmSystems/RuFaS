@@ -44,43 +44,44 @@ def calculate_rqmts():
 
 
 
-# nutrient composition of feeds from the feed library
-whole_milk_dm = 12.5
-whole_milk_cp = 25.4
-whole_milk_me = 5.37
-
-milk_replacer_dm = 95
-milk_replacer_cp = 20
-milk_replacer_me = 4.75
-
-starter_dm = 90
-starter_cp = 18
-starter_me = 3.28
-
-# total intake
-dm_intake = 0
-me_intake = 0
-cp_intake = 0
-milk_starter_feed = {}
-
-'''
+def calc_requirements(calf, temp, wean_day, wean_length, milk_type):
+    '''
     Calculate dietary intake and nutrient requirements for the calf. 
-'''
-def calc_requirements(temp, wean_day, wean_length, milk_type, birth_weight, body_weight, days_born):
+
+    Args:
+        calf: the calf to calculate the nutrient requirement for 
+        temp: the average temperature of the simulation day
+        wean_day: the wean day of the calf
+        wean_length: the wean length of the calf
+        milk_type: either "whole" or "replacer"
+    '''
+    # nutrient composition of feeds from the feed library
+    whole_milk_dm = 12.5
+    whole_milk_cp = 25.4
+    whole_milk_me = 5.37
+
+    milk_replacer_dm = 95
+    milk_replacer_cp = 20
+    milk_replacer_me = 4.75
+
+    starter_dm = 90
+    starter_cp = 18
+    starter_me = 3.28
+    
     if milk_type == "whole":
         milk_replacer_dm = 0
     else:
         whole_milk_dm = 0
 
     # milk-based feed intake
-    whole_milk_intake = 0.1 * birth_weight * whole_milk_dm * 0.01 
-    milk_replacer_intake = 0.1 * birth_weight * 0.15 * milk_replacer_dm * 0.01
+    whole_milk_intake = 0.1 * calf._birth_weight * whole_milk_dm * 0.01 
+    milk_replacer_intake = 0.1 * calf._birth_weight * 0.15 * milk_replacer_dm * 0.01
     
     # starter intake
-    if body_weight <= 69.365:
-        starter_intake = -0.24783 + 0.0049567 * body_weight 
+    if calf._body_weight <= 69.365:
+        starter_intake = -0.24783 + 0.0049567 * calf._body_weight 
     else:
-        starter_intake = -6.2263 + 0.091145 * body_weight
+        starter_intake = -6.2263 + 0.091145 * calf._body_weight
 
     # reduction in intake during weaning
     wean_start = wean_day - wean_length - 1
@@ -91,30 +92,24 @@ def calc_requirements(temp, wean_day, wean_length, milk_type, birth_weight, body
         milk_intake_wean = whole_milk_intake * (1 - milk_reduct / (wean_length + 1))
     else:
         milk_intake_wean = milk_replacer_intake * (1 - milk_reduct / (wean_length + 1))
+
+    calf._dm_intake += whole_milk_intake + milk_replacer_intake + starter_intake
+    calf._me_intake += whole_milk_me * whole_milk_intake + milk_replacer_me * milk_replacer_intake + starter_me * starter_intake
+    calf._cp_intake += 0.01 * (whole_milk_cp * whole_milk_intake + milk_replacer_cp * milk_replacer_intake + starter_cp * starter_intake)
+
+    milk_me_proportion = (whole_milk_intake * whole_milk_me + milk_replacer_intake * milk_replacer_me) / calf._me_intake
+    starter_me_proportion = starter_intake * starter_me / calf._me_intake
+
+    calf._milk_starter_feed['milk'] += 0.01 * (whole_milk_cp * whole_milk_intake + milk_replacer_cp * milk_replacer_intake)
+    calf._milk_starter_feed['starter'] += 0.01 * starter_cp * starter_intake 
     
-    # total intake
-    global dm_intake
-    global me_intake
-    global cp_intake
-    global milk_starter_feed
+    adp_intake = (0.93 * calf._milk_starter_feed['milk'] / calf._cp_intake + 0.75 * calf._milk_starter_feed['starter'] / calf._cp_intake) * 1000
 
-    dm_intake += whole_milk_intake + milk_replacer_intake + starter_intake
-    me_intake += whole_milk_me * whole_milk_intake + milk_replacer_me * milk_replacer_intake + starter_me * starter_intake
-    cp_intake += 0.01 * (whole_milk_cp * whole_milk_intake + milk_replacer_cp * milk_replacer_intake + starter_cp * starter_intake)
-
-    milk_me_proportion = (whole_milk_intake * whole_milk_me + milk_replacer_intake * milk_replacer_me) / me_intake
-    starter_me_proportion = starter_intake * starter_me / me_intake
-
-    milk_starter_feed['milk'] += 0.01 * (whole_milk_cp * whole_milk_intake + milk_replacer_cp * milk_replacer_intake)
-    milk_starter_feed['starter'] += 0.01 * starter_cp * starter_intake 
-    
-    adp_intake = (0.93 * milk_starter_feed['milk'] / cp_intake + 0.75 * milk_starter_feed['starter'] / cp_intake) * 1000
-
-    milk_proportion = (whole_milk_intake + milk_replacer_intake) / dm_intake
-    starter_proportion = starter_intake / dm_intake
+    milk_proportion = (whole_milk_intake + milk_replacer_intake) / calf._dm_intake
+    starter_proportion = starter_intake / calf._dm_intake
 
     # maintainance requirements
-    if days_born <= 60:
+    if calf._days_born <= 60:
         if temp < -30: 
             t_factor = 1.34
         elif temp < 15:
@@ -129,21 +124,21 @@ def calc_requirements(temp, wean_day, wean_length, milk_type, birth_weight, body
         else:
             t_factor = 0
     
-    ne_maint = 0.086 * body_weight ** 0.75 * (1 + t_factor) 
+    ne_maint = 0.086 * calf._body_weight ** 0.75 * (1 + t_factor) 
     me_maint = ne_maint / (0.86 * milk_proportion + 0.75 * starter_proportion)
 
-    bio_val = 0.8 * milk_starter_feed['milk'] / cp_intake + 0.7 * milk_starter_feed['starter'] / cp_intake 
+    bio_val = 0.8 * calf._milk_starter_feed['milk'] / calf._cp_intake + 0.7 * calf._milk_starter_feed['starter'] / calf._cp_intake 
 
-    endo_urine_N = 0.0002 * body_weight ** 0.75 * 1000
+    endo_urine_N = 0.0002 * calf._body_weight ** 0.75 * 1000
     meta_fecal_N = (0.0019 * (whole_milk_intake + milk_replacer_intake) + 0.0033 * starter_intake) * 1000
 
     adp_maint = 6.25 * (1 / bio_val * (endo_urine_N + meta_fecal_N) - meta_fecal_N)
 
     # growth requirements
-    me_gain = me_intake - me_maint
+    me_gain = calf._me_intake - me_maint
     ne_gain = me_gain * (0.69 * milk_me_proportion + 0.57 * starter_me_proportion)
 
-    energy_allow_gain = math.exp(0.833 * math.log((1.19 * ne_gain)/(0.69 * body_weight ** 0.355)))
+    energy_allow_gain = math.exp(0.833 * math.log((1.19 * ne_gain)/(0.69 * calf._body_weight ** 0.355)))
     adp_allow_gain = (adp_intake - adp_maint) * bio_val / 0.188 * 0.001
     live_weight_change = min(energy_allow_gain, adp_allow_gain)
 
@@ -154,9 +149,9 @@ def calc_requirements(temp, wean_day, wean_length, milk_type, birth_weight, body
         'wean_start': wean_start,
         'milk_reduction': milk_reduct,
         'milk_intake_wean': milk_intake_wean,
-        'dm_intake': dm_intake,
-        'me_intake': me_intake,
-        'cp_intake': cp_intake,
+        'dm_intake': calf._dm_intake,
+        'me_intake': calf._me_intake,
+        'cp_intake': calf._cp_intake,
         'adp_intake': adp_intake,
         'milk_me_proportion': milk_me_proportion,
         'starter_me_proportion': starter_me_proportion,

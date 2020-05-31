@@ -16,6 +16,7 @@ import numpy as np
 from random import random
 from RUFAS.routines.animal.life_cycle.animal_base import AnimalBase
 from RUFAS.routines.animal.ration.calf_ration import calculate_rqmts
+from RUFAS.routines.animal.ration.calf_ration import calc_requirements
 from RUFAS.routines.animal.manure.calf_manure_excretion import manure_calculations
 
 class Calf(AnimalBase):
@@ -62,6 +63,12 @@ class Calf(AnimalBase):
 		self._body_weight = self._birth_weight
 		self._wean_weight = 0
 
+		# feed intake
+		self._dm_intake = 0
+		self._me_intake = 0
+		self._cp_intake = 0
+		self._milk_starter_feed = {'milk': 0, 'starter': 0}
+
 	'''
 		Description:
 			initialize calf value from class calf, for coding purpose
@@ -82,9 +89,17 @@ class Calf(AnimalBase):
 	'''
        	Calculates this calf's nutrient requirements.
     '''
-	def calc_nutrient_rqmts(self):
+	def calc_nutrient_rqmts(self, temp):
 		self._nutrient_rqmts, self._DMIest, self._DBW = calculate_rqmts()
-		
+		# print(self._id, self._DMIest, self._DBW)
+
+		wean_day = AnimalBase.config['wean_day']
+		wean_length = AnimalBase.config['wean_length']
+		milk_type = AnimalBase.config['milk_type']
+		animal_intake, nutrient_rqmts = calc_requirements(self, temp, wean_day, wean_length, milk_type)
+		self._DBW = nutrient_rqmts['live_weight_change']
+		# print(self._id, self._dm_intake, self._DBW, '\n')
+	
 	'''
 		Calculates and sets the manure excretion components.
 	'''  

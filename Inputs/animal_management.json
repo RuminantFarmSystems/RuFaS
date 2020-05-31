@@ -287,6 +287,8 @@
 				"birth_weight_std_je": 0.9,
 				"keep_female_calf_rate": 1,
 				"wean_day": 60,
+				"wean_length": 7,
+				"milk_type": "whole",
 				"avg_daily_gain_c": 0.8,
 				"std_daily_gain_c": 0.02,
 				"breeding_start_day_h": 400,
