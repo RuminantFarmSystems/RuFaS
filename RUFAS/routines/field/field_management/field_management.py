@@ -32,7 +32,7 @@ class FieldManagement:
                 'day': -1,
                 'mass': 1600,
                 'P_frac': 0.007,
-                'N_frac': 0.4,
+                'N_frac': 0.25,
                 'NH4_frac': 0,
                 'WIP_frac': 0.6,
                 'WOP_frac': 0.05,
