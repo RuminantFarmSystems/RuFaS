@@ -43,7 +43,6 @@ def calculate_rqmts():
     return nutrient_rqmts, DMIest, DBW
 
 
-
 def calc_requirements(calf, temp, wean_day, wean_length, milk_type):
     '''
     Calculate dietary intake and nutrient requirements for the calf. 
@@ -138,7 +137,11 @@ def calc_requirements(calf, temp, wean_day, wean_length, milk_type):
     me_gain = calf._me_intake - me_maint
     ne_gain = me_gain * (0.69 * milk_me_proportion + 0.57 * starter_me_proportion)
 
-    energy_allow_gain = math.exp(0.833 * math.log((1.19 * ne_gain)/(0.69 * calf._body_weight ** 0.355)))
+    if ne_gain >= 0:
+        energy_allow_gain = math.exp(0.833 * math.log((1.19 * ne_gain)/(0.69 * calf._body_weight ** 0.355)))
+    else:
+        energy_allow_gain = 0
+    
     adp_allow_gain = (adp_intake - adp_maint) * bio_val / 0.188 * 0.001
     live_weight_change = min(energy_allow_gain, adp_allow_gain)
 
