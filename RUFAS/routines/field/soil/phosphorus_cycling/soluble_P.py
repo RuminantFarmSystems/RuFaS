@@ -37,7 +37,13 @@ def update_all(soil):
         layer.iso_inter = 4.726 * layer.iso_slope - 8.97
 
         # S.5.E.3
-        layer.DRP_leachate = min(40.0, exp((layer.soil_P * 1.5 - layer.iso_inter) / layer.iso_slope))
+        # this if statement is to avoid a math range error that happens while running alfalfa
+        # it is pretty rudimentary but works. The number within exp can not exceed 710 but if
+        # the value is over 3.7 then the min will be set to 40 through the original equations
+        if (layer.soil_P * 1.5 - layer.iso_inter) / layer.iso_slope < 3.7:
+            layer.DRP_leachate = min(40.0, exp((layer.soil_P * 1.5 - layer.iso_inter) / layer.iso_slope))
+        else:
+            layer.DRP_leachate = 40
 
         # S.5.E.4
         if soil.soil_layers.index(layer) == 0:
