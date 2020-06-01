@@ -13,7 +13,7 @@ Author(s): Kass Chupongstimun, kass_c@hotmail.com,
 
 from enum import IntEnum
 from RUFAS.util import DatabaseReader
-
+import sqlite3
 from . import nitrogen_loss, carbon_loss, protein_degradation
 
 
@@ -657,10 +657,10 @@ class FeedTest:
             exit(1)
 
 
-data = {
-    'feed_database': 'Inputs/feeds.sqlite',
-    'purchased_feeds': [9, 34, 46, 92],
-    'growing_feeds': [8, 87]
-}
-f = Feed(data)
-print(f.get_feed_id(34, 15, 0))
+# data = {
+#     'feed_database': 'Inputs/feeds.sqlite',
+#     'purchased_feeds': [9, 34, 46, 92],
+#     'growing_feeds': [8, 87]
+# }
+# f = FeedTest(data)
+# print(f.get_feed_id(34, 15, 0))
