@@ -31,7 +31,7 @@ class Alfalfa:
         # Inputs
         self.T_base_min = 4
         self.T_base_max = 32  # until dormancy
-        self.PHU = 800  # still unknown
+        self.PHU = 900  # still unknown
 
         # Internally calculated inputs
         self.accumulated_HU = 0.0
