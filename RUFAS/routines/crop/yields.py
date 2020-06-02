@@ -124,6 +124,19 @@ def calc_nutrient_removal(crop_type):
     crop_type.yield_P = crop_type.fr_P * crop_type.yield_actual
 
 
+def calc_quality_assessment(crop_type):
+    """
+    Description:
+        TODO: Stand in for more sophisticated method
+        Assesses quality of feed at harvest
+        "Feed Inventory Pseudocode" F.1.1
+    Args:
+        crop_type: the crop for which a quality is being assessed
+    """
+    crop_type.harvest_quality = 'good'
+    crop_type.feed_id = crop_type.feed_id
+
+
 #
 # Updates the current residue.
 # "pseudocode_crop" C.10.G.1/4/5

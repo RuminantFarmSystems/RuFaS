@@ -14,6 +14,8 @@ class Corn:
 
         self.crop_name = 'corn'
         self.crop_type = 'annual'
+        self.harvest_quality = 'null'
+        self.feed_id = 'g_34'
 
         self.kill_day = -1
         self.kill_year = True

@@ -186,7 +186,7 @@ class Feed:
         """
         Sets up the data for the feeds managed by the farm.
         Currently stores and updates the Feed Inventory Information
-        TODO: Oncce there is a function to modify data in the database we will
+        TODO: Once there is a function to modify data in the database we will
         use that to store inventory information, but for now we will store in the object
 
         Args:
@@ -260,14 +260,15 @@ class Feed:
             self.ventilation = data['ventilation']
             self.removal_rate = data['removal_rate']
 
+            self.DM = data['initial_dry_matter']
+
             self.crop_name = 'null'
             self.prev_crop_name = 'null'
+            self.feed_id = 'null'
+            self.forage_quality = 'null'
 
             self.storage = True
 
-            self.DM = data['initial_dry_matter']
-            self.crop_qual_assessment = 'low'
-            self.feed_id = 1
             self.DMI_intake_max = {'calves': 0, 'heiferIs': 0, 'heiferIIs': 0, 'heiferIIIs': 0, 'dry_cows': 0, 'lactating_cows': 0}
             self.days_since_feedout = 0
             self.req_inv = {}
@@ -434,12 +435,13 @@ class Feed:
             """
             Description:
                 Updates mineral components and losses as a crop is stored.
+                "pseudocode_feed" F.1.1
             Args:
                 crop: The crop being stored.
             """
 
             if self.storage:
-                # "pseudocode_feed" F.1.1
+                self.feed_id = crop.feed_id
                 self.DM += crop.yield_actual
                 self.N += crop.yield_N
                 self.P += crop.yield_P
@@ -551,26 +553,22 @@ class Feed:
         #            allocation[animal][feed] = self.feed_inv[feed] / 6
         #self.allocation = allocation
 
-    def forage_quality_assessment(self, feed):
-        '''
-        Asseses quality of forage and populates self.high_quality_forage
-        '''
-        pass
 
     def days_since_feedout(self):
-        '''
+        """
         populations the days_since_feedout variable in Feed class
-        '''
+        """
         pass
 
+
     def required_inventory(self, animal_management):
-        '''
+        """
         Computes the required inventory necesary across all animals for a given forage based on
         the amount of the animals, the body weight, and inclusion percent assoiciated with the inputed forage
         Args:
             storage: a storage object that contains the given forage being assessed
             animal_management: the class object animal_management which tracks the state of the animals
-        '''
+        """
         #Begingin by creating a dictionary of all the current animals and animal information
         animals = {'calves': animal_management.calves, 'heiferIs': animal_management.heiferIs, 'heiferIIs': animal_management.heiferIIs,
         'heiferIIIs' : animal_management.heiferIIIs}
@@ -627,13 +625,13 @@ class Feed:
 
     def forage_inv_plan(self, storage):
 
-        '''
+        """
         Assess farm grown forage stocks and plans maximum intake of each forage to ensure there is enough forage to last a FULL YEAR.
         Forage inventory is conducted at least 1x/year after harvest and then at a user specified number of times.
         Note that the inventory should be executed at the end of the ‘simulation day’, preferably on the last day of a ration formulation interval
         Args:
             storage: the storage object containing the forage being assessed
-        '''
+        """
         ##Next, setting the max feed intake for each forage so it will be available all year##
         ##TODO## Warning Message for insuffiecent Inventory
         DMI_Forage_max = {'calves': 0, 'heiferIs': 0, 'heiferIIs': 0, 'heiferIIIs': 0, 'dry_cows': 0, 'lactating_cows': 0}

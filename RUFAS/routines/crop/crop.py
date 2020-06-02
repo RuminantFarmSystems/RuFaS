@@ -239,6 +239,8 @@ class InitCrop:
 
         self.crop_name = 'null'
         self.crop_type = ''
+        self.harvest_quality = 'null'
+        self.feed_id = 'null'
 
         self.kill_day = -1
         self.kill_year = True
