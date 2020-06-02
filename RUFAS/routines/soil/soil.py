@@ -336,12 +336,12 @@ class Soil:
         # fert_leach
         self.fert_sorp = 0.0
         self.fert_absorbed_sum = 0.0
-        self.fert_leach = 0.0
+        self.fert_P_leached = 0.0
         self.PD_factor = 0.0
-        self.fert_runoff_P = 0.0
-        self.fert_runoff_annual = 0.0
-        self.fert_leachate_annual = 0.0
-        self.fert_run = 0.0
+        self.fert_P_runoff = 0.0
+        self.fert_P_runoff_annual = 0.0
+        self.fert_P_leachate_annual = 0.0
+        self.fert_P_runoff_act = 0.0
 
         # manure_leach
         self.MIP_leach = 0.0
