@@ -14,6 +14,8 @@ class Soybean:
 
         self.crop_name = 'soybean'
         self.crop_type = 'annual'
+        self.harvest_quality = 'null'
+        self.feed_id = 'g_121'
 
         self.kill_day = -1
         self.kill_year = True

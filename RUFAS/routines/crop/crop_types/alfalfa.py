@@ -18,6 +18,8 @@ class Alfalfa:
 
         self.crop_name = 'alfalfa'
         self.crop_type = 'perennial'
+        self.harvest_quality = 'null'
+        self.feed_id = 'g_1'
 
         self.kill_day = -1
         self.kill_year = False
