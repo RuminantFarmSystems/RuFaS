@@ -111,6 +111,7 @@
                 "repeat": 0,
                 "planting_date": 121,
                 "harvest_date": 319,
+                "fr_PHU_harvest_min": 0.9,
                 "harvest_type": "optimal"
             },
             "soybean":
@@ -119,6 +120,7 @@
                 "repeat": 0,
                 "planting_date": 121,
                 "harvest_date": 319,
+                "fr_PHU_harvest_min": 0.9,
                 "harvest_type": "scheduled"
             },
             "alfalfa":
@@ -127,6 +129,7 @@
                 "repeat": 0,
                 "planting_date": 121,
                 "harvest_date": 319,
+                "fr_PHU_harvest_min": 0.9,
                 "harvest_type": "optimal"
             }
         },
