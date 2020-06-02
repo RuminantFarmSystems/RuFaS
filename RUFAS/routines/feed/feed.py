@@ -59,112 +59,6 @@ def annual_feed_routine():
     pass
 
 
-class FeedNames(IntEnum):
-    """
-    Each enum member is the name of a feed in the feed information database. The
-    values correspond to the ID column in the database table.
-
-    Note: if a feed is added to the database source of feed information, the
-    name of the feed along with its ID must be added here.
-    """
-    Corn_grain = 1
-    Legume_hay = 2
-    Cotton_seed = 3
-    Roasted_soybean = 4
-    Rye_hay = 5
-    Corn_silage = 6
-    Barley = 7
-    Canola_meal = 8
-    Corn_gluten = 9
-    Blood_meal = 10
-    Fish_meal = 11
-
-
-class Nutrients(IntEnum):
-    """
-    Each enum member is the name of either a nutrient or characteristic of a
-    feed in the database source of feed information.
-
-    Note: if a nutrient or characteristic column is added to the database
-    source of feed information, the nutrient or characteristic must be added
-    here.
-    """
-    # TODO change names in the enum
-    DM = 0
-    Ash_DM = 1
-    CP_DM = 2
-    dFA_FA_base = 3
-    dRUP_RUP = 4
-    dStarch_Starch_base = 5
-    FA_DM = 6
-    IVNDFD_NDF = 7
-    FU = 8
-    RU = 9
-    NDF_DM = 10
-    NDIP_DM = 11
-    RUP_CP = 12
-    Starch_DM = 13
-    sNPNCPE_DM = 14
-    ADF_DM = 15
-    LIG_DM = 16
-    Price = 17
-    Limits = 18
-    Units = 19
-
-
-class NutrientValues:
-    """
-    Description: Stores the information from the database source of feed
-    information for the feeds listed as managed in the input JSON file.
-    """
-    def __init__(self, database_file: str, table_name, configured_feeds):
-        """
-        Connects to the @database_file and queries from the @table_name for the
-        nutrient and characteristic information of the list of
-        @configured_feeds. If an exception is raised, the method prints a
-        message and the program exits.
-
-        Args:
-            database_file: the name of the database file
-            table_name: the name of the table in the database which is queried
-            configured_feeds: a list of the feeds provided by the input JSON
-                file as feeds managed by the farm, and therefore the feeds
-                for which information will be stored
-        """
-        # To obtain data from a database table, we form and execute a query
-        # through the DatabaseReader class.
-        # The table we are querying from with the following code looks like:
-        # ID    Name    Nutrient1   Nutrient2   ...
-        # 0     Feed1   value       value       ...
-        # 1     Feed2   value       value       ...
-        # ...
-        #
-        # The query will be in the following format:
-        # SELECT * FROM table_name WHERE name IN [list_of_feed_names]
-        #
-        # SELECT * FROM table_name:
-        #       The * indicates that information from all of the columns in
-        #       "table_name" are desired (otherwise, the names of specific
-        #       columns would be provided).
-        #
-        # WHERE name IN [list_of_feed_names]:
-        #       If we do not specify which rows we want information from, we
-        #       will get information from every row. We specify which feeds
-        #       (rows) we want information from by filtering. We specify
-        #       that we want each in the result to have a "name" that is in
-        #       list_of_feed_names. (Note that the column in the table is
-        #       "Name" - this is case insensitive.)
-        #
-        # Thus, the query selects all of the columns from the database with
-        # the additional specification that we only obtain information from
-        # the rows that correspond to the feeds listed in the input JSON
-        # file as managed by the farm (specified by the argument
-        # configured_feeds).
-        reader = DatabaseReader(database_file, table_name, identifier="name",
-                                desired_rows=configured_feeds)
-        self.values = reader.values
-
-
 class Feed:
     """
     Description:
@@ -181,27 +75,25 @@ class Feed:
             data: the feed information from the input JSON file
         """
         self.__feed_database = data["feed_database"]
-        self.__table_name = data["table_name"]
-        self.managed_feed_names = data["managed_feeds"]
+        self.__feeds_table = 'user_feeds'
+        self.__feed_quality_table = 'feed_quality'
+        self.__nutrient_table = 'nutrients'
 
-        # The managed_feeds are the collection of feeds should be used
-        # in calculations.
-        self.managed_feeds = []
+        self.entries_split_by_maturity = self.get_feeds_split_by_maturity()
+        self.growing_feeds = data['growing_feeds']
+        self.purchased_feeds = []  # set in the next method call
 
-        # Populate managed_feeds. The key to retrieve a feed type from
-        # available_feeds is the name of the feed as specified in the database
-        # table. The feed_keys are specified in the input json file.
-        for feed_key in self.managed_feed_names:
-            self.managed_feeds.append(FeedNames[feed_key])
+        self.all_feed_ids = \
+            self.get_all_feed_units(data['purchased_feeds'], data['growing_feeds'])
+
+        # dictionary of nutrients needed for this run
+        # initially, this only contains information for purchased feeds as none
+        # of the growing_feeds have been harvested yet
+        self.available_feeds = \
+            self.get_nutrient_vals(self.purchased_feeds, False)
 
         # The nutrient requirements used in the ration calculations.
         self.nutrient_rqmts = ['FU', 'RU', 'ME_DM', 'RDP_DM', 'RUP_DM']
-
-        # The values in the database at the time of this object's
-        # initialization.
-        self.__cached_values = NutrientValues(self.__feed_database,
-                                              self.__table_name,
-                                              self.managed_feed_names)
 
         self.storage_options = {}
 
@@ -464,38 +356,6 @@ class Feed:
         self.C_loss += storage.C_loss
         self.CP_loss += storage.CP_loss
 
-    def initial_values(self) -> NutrientValues:
-        """
-        Returns: a NutrientValues object which holds the values in the database
-        table at the time of program initialization.
-        """
-        return self.__cached_values
-
-    def current_values(self) -> NutrientValues:
-        """
-        Returns: a new NutrientValues object which holds the values in the
-        database table at the time of the method call.
-        """
-        return NutrientValues(self.__feed_database,
-                              self.__table_name,
-                              self.managed_feed_names)
-
-    def values(self, desired_feed: FeedNames, current: bool = False):
-        """
-        Args:
-            desired_feed: a member of the FeedNames enum
-            current: if the values should be taken from the database at the time
-                of the method call, this value is true. The default value is
-                False, which means the cached values will be returned (stored at
-                the time of program initialization)
-
-        Returns: the dictionary which represents the characteristics and
-        nutrients of the @desired_feed
-        """
-        feeds = self.current_values() if current else self.initial_values()
-        index = self.managed_feeds.index(desired_feed)
-        return feeds.values[index]
-
     def annual_reset(self):
         """
         Description:
@@ -516,30 +376,39 @@ class Feed:
         #  Similar structure should be used in feed out
         # for storage in self.storage_options.values():
         #     storage.reset_storage()
-        #
-        # self.available_storage = self.storage_options
 
-class FeedTest:
-    def __init__(self, json_data):
-        self.nutrient_rqmts = ['FU', 'RU', 'ME_DM', 'RDP_DM', 'RUP_DM']
+    def get_all_feed_units(self, purchased_feeds, grown_feeds):
+        try:
+            result = []
+            conn = sqlite3.connect(self.__feed_database)
+            conn.row_factory = sqlite3.Row
+            c = conn.cursor()
 
-        self.__feed_database = json_data['feed_database']
-        self.feeds_table = 'feeds'
-        self.feed_quality_table = 'feed_quality'
-        self.nutrient_table = 'nutrients'
+            combined_feeds = purchased_feeds + grown_feeds
+            query = "SELECT units FROM " + self.__feeds_table + \
+                    " WHERE entry IN " + str(tuple(combined_feeds))
 
-        self.entries_split_by_maturity = self.get_feeds_split_by_maturity()
+            c.execute(query)
 
-        self.purchased_feeds = \
-            self.get_purchased_feed_ids(json_data['purchased_feeds'])
-        self.growing_feeds = json_data['growing_feeds']
+            row = c.fetchone()
+            units = []
+            while row is not None:
+                units.append(dict(row)['units'])
+                row = c.fetchone()
+            self.purchased_feeds = self.get_purchased_feed_ids(purchased_feeds)
 
-        # dictionary of nutrients needed for this run
-        # initially, this only contains information for purchased feeds as none
-        # of the growing_feeds have been harvested yet
-        self.available_feeds = self.get_nutrient_vals(self.purchased_feeds)
+            purchased_feeds_str = [str(feed) for feed in self.purchased_feeds]
+            grown_feeds_str = [str(feed) + 'g' for feed in grown_feeds]
+            for feed, unit in zip(purchased_feeds_str + grown_feeds_str, units):
+                result.append((feed, unit))
 
-        self.all_feeds = self.purchased_feeds + self.growing_feeds
+            conn.close()
+            return result
+
+        except Exception as e:
+            print(e)
+            print("Exiting.")
+            exit(1)
 
     def get_feeds_split_by_maturity(self):
         try:
@@ -548,7 +417,7 @@ class FeedTest:
             conn.row_factory = sqlite3.Row
             c = conn.cursor()
 
-            query = "SELECT DISTINCT entry FROM " + self.feed_quality_table
+            query = "SELECT DISTINCT entry FROM " + self.__feed_quality_table
 
             c.execute(query)
 
@@ -561,6 +430,7 @@ class FeedTest:
             return result
 
         except Exception as e:
+            # todo make these more descriptive
             print(e)
             print("Exiting.")
             exit(1)
@@ -584,7 +454,7 @@ class FeedTest:
             c = conn.cursor()
 
             nutrient_query = "SELECT DISTINCT differentiating_nutrient FROM " \
-                             + self.feed_quality_table + \
+                             + self.__feed_quality_table + \
                              " WHERE entry = " + str(grown_feed_entry)
 
             c.execute(nutrient_query)
@@ -593,13 +463,13 @@ class FeedTest:
             nutrient = rows[0][0]
 
             if nutrient == 'DM':
-                query = "SELECT quality_id FROM " + self.feed_quality_table + \
-                        " WHERE entry = " + str(grown_feed_entry) + \
+                query = "SELECT quality_id FROM " + self.__feed_quality_table \
+                        + " WHERE entry = " + str(grown_feed_entry) + \
                         " AND low_percent <= " + str(rounded_DM) + \
                         " AND high_percent >= " + str(rounded_DM)
             else:
-                query = "SELECT quality_id FROM " + self.feed_quality_table + \
-                        " WHERE entry = " + str(grown_feed_entry) + \
+                query = "SELECT quality_id FROM " + self.__feed_quality_table \
+                        + " WHERE entry = " + str(grown_feed_entry) + \
                         " AND low_percent <= " + str(rounded_NDF) + \
                         " AND high_percent >= " + str(rounded_NDF)
 
@@ -620,7 +490,7 @@ class FeedTest:
                     self.get_feed_id(new_feed, DM_list[i], NDF_list[i]))
             else:
                 new_feed_ids.append(new_feed)
-        self.available_feeds.update(self.get_nutrient_vals(new_feed_ids))
+        self.available_feeds.update(self.get_nutrient_vals(new_feed_ids, True))
 
     def update_available_feed(self, feed_id, nutrient, new_val):
         self.available_feeds[feed_id][nutrient] = new_val
@@ -629,14 +499,14 @@ class FeedTest:
         for feed_id in feeds_to_be_removed:
             self.available_feeds.pop(feed_id)
 
-    def get_nutrient_vals(self, feed_ids):
+    def get_nutrient_vals(self, feed_ids, is_grown):
         try:
             nutrient_vals = {}
             conn = sqlite3.connect(self.__feed_database)
             conn.row_factory = sqlite3.Row
             c = conn.cursor()
 
-            query = "SELECT * FROM " + self.nutrient_table + \
+            query = "SELECT * FROM " + self.__nutrient_table + \
                     " WHERE feed_id IN " + str(tuple(feed_ids))
 
             c.execute(query)
@@ -645,7 +515,14 @@ class FeedTest:
             while row is not None:
                 vals = dict(row)
                 feed_id = vals['feed_id']
-                nutrient_vals[feed_id] = vals
+
+                # the key in the available_feeds dictionary has a 'g' as the
+                # suffix if it is a grown feed
+                feed_key = str(feed_id)
+                if is_grown:
+                    feed_key += 'g'
+
+                nutrient_vals[feed_key] = vals
                 row = c.fetchone()
 
             conn.close()
@@ -655,12 +532,3 @@ class FeedTest:
             print(e)
             print("Exiting.")
             exit(1)
-
-
-# data = {
-#     'feed_database': 'Inputs/feeds.sqlite',
-#     'purchased_feeds': [9, 34, 46, 92],
-#     'growing_feeds': [8, 87]
-# }
-# f = FeedTest(data)
-# print(f.get_feed_id(34, 15, 0))

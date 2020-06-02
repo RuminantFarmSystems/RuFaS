@@ -11,7 +11,6 @@ Author(s): Kass Chupongstimun, kass_c@hotmail.com
 from numpy import exp
 from RUFAS import util
 import math
-from RUFAS.routines.feed.feed import Nutrients
 
 # These values are needed and calculated in calculate_rqmts() but they are also
 # needed in optimize(), so when they are calculated in calculate_rqmts(),

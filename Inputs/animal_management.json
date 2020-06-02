@@ -475,16 +475,12 @@
         "feed":
         {
             "feed_database": "Inputs/feeds.sqlite",
-            "table_name": "feed_library",
+            "feeds_table": "feeds",
+            "feed_quality_table": "feed_quality",
+            "nutrient_table": "nutrients",
 
-            "managed_feeds":
-            [
-              "Corn_grain",
-              "Legume_hay",
-              "Cotton_seed",
-              "Roasted_soybean",
-              "Rye_hay"
-            ],
+            "purchased_feeds": [9, 34, 46, 92],
+            "growing_feeds": [8, 87],
 
             "storage_options": {
                 "storage_1": {

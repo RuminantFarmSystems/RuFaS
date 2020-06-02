@@ -7,7 +7,6 @@ Description: Determines manure excretion with information from the ration formul
 Author(s): Militsa Sotirova, militsasotirova@gmail.com
 """
 ################################################################################
-from RUFAS.routines.feed.feed import FeedNames, Nutrients
 
 def manure_calculations(ration_formulation, feed, BW, DIM, mPrt):
     '''

@@ -100,7 +100,7 @@ class Calf(AnimalBase):
 		self._ration_formulation = ration_formulation  
 		self._dry_matter_intake = 0
 		for key in ration_formulation:
-			if key in feed.managed_feed_names:
+			if not key == 'status':
 				DM_feed_amount = ration_formulation[key]
 				self._dry_matter_intake += DM_feed_amount
 		
