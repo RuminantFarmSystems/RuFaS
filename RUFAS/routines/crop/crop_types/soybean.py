@@ -29,7 +29,7 @@ class Soybean:
 
         # Inputs
         self.T_base_min = 10
-        self.T_base_max = 30  # corn
+        self.T_base_max = 30  # TODO: value taken from corn, value for soybean unknown
         self.PHU = 1150
 
         # Internally calculated inputs
@@ -49,7 +49,7 @@ class Soybean:
         self.fr_LAI_1 = 0.05
         self.fr_LAI_2 = 0.95
         self.fr_PHU_sen = 0.9
-        self.fr_PHU_harvest = 1.0  # TODO: If soybean has drydown, this is 1.2
+        self.fr_PHU_harvest = 1.0  # TODO: If soybean has dry down, this is 1.2
         self.LAI_max = 3
         self.LAI_min = 0
 
@@ -93,8 +93,8 @@ class Soybean:
         # ===================================================================
         ''' Soil Water Uptake Data '''
 
-        self.beta_w = 10  # water-use distribution parameter  # corn
-        self.epco = 0.5  # corn
+        self.beta_w = 10  # water-use distribution parameter  # TODO: value taken from corn, value for soybean unknown
+        self.epco = 0.5  # TODO: value taken from corn, value for soybean unknown
 
         # Outputs
         self.prev_LAI_actual = 0
@@ -103,7 +103,7 @@ class Soybean:
         # ===================================================================
         ''' Nitrogen Uptake Data '''
 
-        self.beta_n = 10  # corn
+        self.beta_n = 10  # TODO: value taken from corn, value for soybean unknown
 
         self.bio_N_opt = 0
         self.bio_N = 0
@@ -122,7 +122,7 @@ class Soybean:
         # ===================================================================
         ''' Phosphorus Uptake Data '''
 
-        self.beta_p = 10  # corn
+        self.beta_p = 10  # TODO: value taken from corn, value for soybean unknown
 
         self.bio_P_opt = 0
         self.bio_P = 0
