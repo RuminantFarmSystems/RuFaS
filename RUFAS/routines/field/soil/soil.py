@@ -37,12 +37,10 @@ def daily_soil_routine(soil, crop, field_management, weather, time):
     # calculate and update the temperature of the soil layers
     soil_temp.update_all(soil, crop, weather, time)
 
-    # calculate daily runoff
+    # calculate daily runoff and infiltration
+    infiltration.update_all(soil, weather, time)
 
-    if R > 0:
-        infiltration.update_all(soil, weather, time)
-
-    # calculate daily transpiration
+    # calculate daily evapotranspiration
     evapotranspiration.update_all(soil, crop, weather, time)
 
     # transpiration is defined in the crop module, but called here as a

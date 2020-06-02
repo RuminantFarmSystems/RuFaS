@@ -52,17 +52,17 @@ class WaterBalance(BaseReportHandler):
 
         # annual outputs
         self.annual_variables = {'year': ['time.calendar_year', '', 0],
-                                 'delta_SW': ['round(soil.delta_SW_annual, 3)', 'mmH2O', 0],
-                                 'runoff': ['round(soil.runoff_annual, 3)', 'mmH2O', 0],
-                                 'evaporation': ['round(soil.evap_annual, 3)', 'mmH2O', 0],
-                                 'transpiration': ['round(soil.trans_annual, 3)', 'mmH2O', 0],
-                                 'drainage': ['round(soil.drainage_annual, 3)', 'mmH2O', 0],
+                                 'delta_SW': ['round(soil.delta_SW_annual, 2)', 'mmH2O', 0],
+                                 'runoff': ['round(soil.runoff_annual, 2)', 'mmH2O', 0],
+                                 'evaporation': ['round(soil.evap_annual, 2)', 'mmH2O', 0],
+                                 'transpiration': ['round(soil.trans_annual, 2)', 'mmH2O', 0],
+                                 'drainage': ['round(soil.drainage_annual, 2)', 'mmH2O', 0],
                                  # new variables need to be added below here
 
                                  # new variables need to be added above here
-                                 'precipitation': ['round(soil.p_act_annual, 3)', 'mmH2O', 0],
-                                 'calculated water': ['round(soil.p_calc_annual, 3)', 'mmH2O', 0],
-                                 'difference': ['round(soil.annual_water_balance_difference, 3)', 'mmH2O', 0]}
+                                 'precipitation': ['round(soil.p_act_annual, 2)', 'mmH2O', 0],
+                                 'calculated water': ['round(soil.p_calc_annual, 2)', 'mmH2O', 0],
+                                 'difference': ['round(soil.annual_water_balance_difference, 2)', 'mmH2O', 0]}
 
     def write_headers(self, output_csv, variables):
         """
