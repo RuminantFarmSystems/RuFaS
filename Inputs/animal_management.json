@@ -68,6 +68,14 @@
             "report_name": "Soil Phosphorus",
             "file_name": "soil_phosphorus.csv"
         },
+        "soil_carbon":
+        {
+            "produce_csv": true,
+            "produce_graphics": false,
+            "display_graphics": false,
+            "report_name": "Soil Carbon",
+            "file_name": "soil_carbon.csv"
+        },
         "crop_summary":
         {
             "produce_csv": true,

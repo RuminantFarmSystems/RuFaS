@@ -5,7 +5,7 @@ File name: nitrification_volatilization.py
 
 Author(s): William Donovan, wmdonovan@wisc.edu
 
-Description: Implements the nitrogen cycling processes of nitrification and
+Description: Implements the nitrogen cycle processes of nitrification and
              volatilization.
 """
 

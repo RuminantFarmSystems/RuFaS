@@ -141,8 +141,9 @@ from math import exp, log
 from . import infiltration, \
     evapotranspiration, percolation, soil_temp, soil_erosion, soil_water
 from ..crop import transpiration
-from .nitrogen_cycling import nitrogen_cycling
-from .phosphorus_cycling import phosphorus_cycling
+from .nitrogen_cycle import nitrogen_cycle
+from .phosphorus_cycle import phosphorus_cycle
+from .carbon_cycle import carbon_cycle
 
 
 # ------------------------------------------------------------------------------
@@ -184,9 +185,12 @@ def daily_soil_routine(soil, crop, weather, time):
 
     # calculate and update the contents of 3 organic and 2 inorganic nitrogen
     # pools
-    nitrogen_cycling.update_all(soil, weather, time)
+    nitrogen_cycle.update_all(soil, weather, time)
 
-    phosphorus_cycling.update_all(soil, weather, time)
+    phosphorus_cycle.update_all(soil, weather, time)
+
+    # TODO: Not currently implemented
+    carbon_cycle.update_all()
 
     annual_variable_update(soil)
 
@@ -546,7 +550,7 @@ class Soil:
 
             self.clay = layer_data['Clay']  # soil clay % in soil layer
 
-            # Variable to simulate nitrogen Cycling
+            # Variable to simulate nitrogen cycle
             self.org_C = layer_data['OrgC%']
             self.activeMineralRate = layer_data['ActiveMineralRate']
             self.cationExclusionFraction = layer_data['CationExclusionFraction']
@@ -582,7 +586,7 @@ class Soil:
             self.fracActiveN = layer_data['FracActiveN']
             self.volatileExchangeFactor = layer_data['VolatileExchangeFac']
 
-            # Variables to simulate phosphorus cycling
+            # Variables to simulate phosphorus cycle
             self.OM_percent = layer_data['OM%']
 
             # P in the soil layer

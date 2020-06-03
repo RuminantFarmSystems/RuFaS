@@ -2,7 +2,7 @@
 #
 # RUFAS: Ruminant Farm Systems Model
 #
-# phosphorus_cycling.py
+# phosphorus_cycle.py
 #
 # Authors: DR. Peter A. Vadas
 #          USDA-ARS Dairy Forage Research Center

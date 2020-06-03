@@ -1,7 +1,7 @@
 """
 RUFAS: Ruminant Farm Systems Model
 
-File name: nitrogen_cycling.py
+File name: nitrogen_cycle.py
 
 Author(s): William Donovan, wmdonovan@wisc.edu
 

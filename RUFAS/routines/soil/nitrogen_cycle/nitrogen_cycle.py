@@ -1,11 +1,11 @@
 """
 RUFAS: Ruminant Farm Systems Model
 
-File name: nitrogen_cycling.py
+File name: nitrogen_cycle.py
 
 Author(s): William Donovan, wmdonovan@wisc.edu
 
-Description: Nitrogen Cycling driver class.
+Description: Nitrogen Cycle driver class.
              Calls the necessary functions for calculating and
              updating the content of three organic N pools (Fresh, Active, and
              Stable) and two inorganic pools (NO3 and NH4) associated with a
@@ -136,7 +136,7 @@ from . import denitrification, humus_mineralization, mineralization_decomp, \
 
 #
 # This function calls all the necessary functions to update information related
-# to nitrogen cycling. The order in which each method is called is significant
+# to the nitrogen cycle. The order in which each method is called is significant
 # and is still being worked out.
 #
 def update_all(soil, weather, time):

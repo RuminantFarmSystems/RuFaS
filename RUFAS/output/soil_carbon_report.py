@@ -1,7 +1,7 @@
 ################################################################################
 """
 RUFAS: Ruminant Farm Systems Model
-File name: soil_phosphorus.py
+File name: soil_carbon.py
 Description:
 Author(s): Kass Chupongstimun, kass_c@hotmail.com
            Jit Patil, spatil5@wisc.edu
@@ -17,10 +17,10 @@ from RUFAS.output.report_handler import BaseReportHandler
 
 
 # -------------------------------------------------------------------------------
-# Class: SoilPhosphorus
-# Creates and prints to the file soil_phosphorus.csv
+# Class: SoilCarbon
+# Creates and prints to the file soil_carbon.csv
 # -------------------------------------------------------------------------------
-class SoilPhosphorus(BaseReportHandler):
+class SoilCarbon(BaseReportHandler):
 
     def __init__(self, data):
 
