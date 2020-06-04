@@ -139,7 +139,7 @@ from . import denitrification, humus_mineralization, mineralization_decomp, \
 # to nitrogen cycling. The order in which each method is called is significant
 # and is still being worked out.
 #
-def update_all(soil, weather, time):
+def update_all(soil, field_management, weather, time):
 
     calc_temp_factors(soil)
 
@@ -155,7 +155,10 @@ def update_all(soil, weather, time):
 
     humus_mineralization.humus_mineralization(soil)
 
-    added_manure_N(soil, weather, time)
+    manure_management = field_management.managed_applications['manure']
+    if (time.year, time.day) in manure_management.applications:
+        if manure_management.check_conditions(soil, weather, time):
+            added_manure_N(soil, manure_management.applications[(time.year, time.day)].data)
 
 
 #
@@ -194,8 +197,9 @@ def calc_water_factors(soil):
 
         layer.water_fac = water_fac
 
-def added_manure_N(soil, weather, time):
-    totalN = weather.manureN[time.year - 1][time.day - 1]
+
+def added_manure_N(soil, m_app):
+    totalN = m_app['N_frac'] * m_app['mass']
 
     activeN = totalN * 0.875
     stableN = totalN * 0.125

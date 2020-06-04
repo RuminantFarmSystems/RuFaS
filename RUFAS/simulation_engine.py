@@ -81,7 +81,7 @@ def daily_simulation():
     # Daily routines
     #
     routines.daily_animal_routine(state.animal_management, state.feed, weather, time)
-    routines.daily_soil_routine(state.soil, state.crop, weather, time)
+    routines.daily_soil_routine(state.soil, state.crop, state.field_management, weather, time)
     routines.daily_crop_routine(state.crop, weather, time, state.soil)
     routines.daily_feed_routine(state.feed, state.crop)
 

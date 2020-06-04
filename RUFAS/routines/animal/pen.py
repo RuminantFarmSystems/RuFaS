@@ -16,6 +16,7 @@ from RUFAS.routines.animal.ration.calf_ration import optimize as calf_optimize
 from RUFAS.routines.animal.ration.dry_cow_ration import optimize as dry_cow_optimize
 from RUFAS.routines.animal.ration.growing_heifer_ration import optimize as growing_heifer_optimize
 
+
 class Pen:
     # unique pen ID, from input file
     id = -1
@@ -77,7 +78,8 @@ class Pen:
     # average growth of the animals in the pen
     avg_growth = 0
 
-    def __init__(self, id, vert_dist, horiz_dist, num_stalls, housing_type, bedding_type, pen_type):
+    def __init__(self, id, vert_dist, horiz_dist, num_stalls, housing_type,
+                 bedding_type, pen_type, manure_handling, manure_separator, manure_storage):
         '''
         Initializes a pen with the arguments. More information about each above.
         '''
@@ -88,6 +90,10 @@ class Pen:
         self.housing_type = housing_type
         self.bedding_type = bedding_type
         self.pen_type = pen_type
+
+        self.manure_handling = manure_handling
+        self.manure_separator = manure_separator
+        self.manure_storage = manure_storage
 
     def update_animals(self, new_animals):
         '''
