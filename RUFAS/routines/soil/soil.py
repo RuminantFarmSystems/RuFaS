@@ -149,7 +149,7 @@ from .phosphorus_cycling import phosphorus_cycling
 # Function: daily_soil_routine
 # Executes all the daily soil routines
 # ------------------------------------------------------------------------------
-def daily_soil_routine(soil, crop, weather, time):
+def daily_soil_routine(soil, crop, field_management, weather, time):
     """
     Description:
         Executes all the daily soil routines.
@@ -157,6 +157,8 @@ def daily_soil_routine(soil, crop, weather, time):
     Args:
         soil: instance of the Soil class
         crop: instance of the Crop class
+        field_management: instance of the FieldManagement class implemented in
+            field_management.py
         weather: instance of the Weather class
         time: instance of the Time class
     """
@@ -184,9 +186,9 @@ def daily_soil_routine(soil, crop, weather, time):
 
     # calculate and update the contents of 3 organic and 2 inorganic nitrogen
     # pools
-    nitrogen_cycling.update_all(soil, weather, time)
+    nitrogen_cycling.update_all(soil, field_management, weather, time)
 
-    phosphorus_cycling.update_all(soil, weather, time)
+    phosphorus_cycling.update_all(soil, field_management, weather, time)
 
     annual_variable_update(soil)
 

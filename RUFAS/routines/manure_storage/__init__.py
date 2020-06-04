@@ -1,0 +1,1 @@
+from .manure_storage import ManureStorage

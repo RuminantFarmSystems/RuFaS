@@ -102,7 +102,12 @@ class AnimalManagement:
             housing_type = pen_data['housing_type']
             bedding_type = pen_data['bedding_type']
             pen_type = pen_data['pen_type']
-            pen = Pen(pen_id, vertical_dist_to_parlor, horizontal_dist_to_parlor, num_stalls, housing_type, bedding_type, pen_type)
+            manure_handling = pen_data['manure_handling']
+            manure_separator = pen_data['manure_separator']
+            manure_storage = pen_data['manure_storage']
+            pen = Pen(pen_id, vertical_dist_to_parlor, horizontal_dist_to_parlor,
+                      num_stalls, housing_type, bedding_type, pen_type, manure_handling,
+                      manure_separator, manure_storage)
             self.all_pens.append(pen)
         herd_num = herd_data['herd_num']
 

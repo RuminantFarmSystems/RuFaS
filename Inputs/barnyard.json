@@ -130,8 +130,7 @@
                 "harvest_type": "optimal"
             }
         },
-        "soil":
-        {
+        "soil": {
             "ProfileBulkDensity": 1.4,
             "CN2": 85.00,
             "FieldSlope": 0.02,
@@ -145,11 +144,8 @@
             "initial_residue": 0,
             "FreshNMineralRate": 0.05,
             "SoilCoverType": "BARE",
-
-            "SoilLayers":
-            {
-                "Layer1":
-                {
+            "SoilLayers": {
+                "Layer1": {
                     "BottomDepth": 150,
                     "WiltingPoint": 0.1,
                     "FieldCapacity": 0.30,
@@ -169,8 +165,7 @@
                     "SoilWaterRatio": 0.3,
                     "OM%": 1.9
                 },
-                "Layer2":
-                {
+                "Layer2": {
                     "BottomDepth": 300,
                     "WiltingPoint": 0.1,
                     "FieldCapacity": 0.3,
@@ -190,8 +185,7 @@
                     "SoilWaterRatio": 0.3,
                     "OM%": 1.9
                 },
-                "Layer3":
-                {
+                "Layer3": {
                     "BottomDepth": 450,
                     "WiltingPoint": 0.1,
                     "FieldCapacity": 0.30,
@@ -211,9 +205,11 @@
                     "SoilWaterRatio": 0.3,
                     "OM%": 1.9
                 }
-            },
-
-            "FertilizerApplication":
+            }
+        },
+        "field_management":
+        {
+            "fertilizer":
             {
                 "year": [0],
                 "day": [0],
@@ -221,8 +217,7 @@
                 "depth": [0.0],
                 "surf_perc": [0.0]
             },
-
-            "ManureApplication":
+            "manure":
             {
                 "type": ["DAIRY", "DAIRY", "DAIRY", "DAIRY", "DAIRY", "DAIRY", "DAIRY", "DAIRY"],
                 "year": [2012, 2012, 2012, 2012, 2013, 2013, 2013, 2013],
@@ -238,29 +233,13 @@
                 "depth": [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0],
                 "surf_perc": [1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0]
             },
-
-            "TillageApplication":
+            "tillage":
             {
                 "year": [0],
                 "day": [0],
                 "perc_incorporated": [0.0],
                 "perc_mixed": [0.0],
                 "depth": [0.0]
-            },
-
-            "CropPUptake":
-            {
-                "Uptake1":
-                {
-                    "Year": 2008,
-                    "PUptake": 15.0
-                },
-                "Uptake2":
-                {
-                    "Year": 2009,
-                    "PUptake": 15.0
-                }
-
             }
         },
 
@@ -366,74 +345,8 @@
                 "formulation_interval": 7
             },
 
-	        "pen_information":
-	        {
-	        	"pen0":
-	        	{
-	        		"id": 0,
-	        		"vertical_dist_to_milking_parlor": 0.1,
-	        		"horizontal_dist_to_milking_parlor": 1.6,
-	        		"number_of_stalls": 100,
-	        		"housing_type": "open air barn",
-	        		"bedding_type": "sand",
-	        		"pen_type": "freestall"
-	        	},
-
-	        	"pen1":
-	        	{
-	        		"id": 1,
-	        		"vertical_dist_to_milking_parlor": 0.1,
-	        		"horizontal_dist_to_milking_parlor": 1.6,
-	        		"number_of_stalls": 200,
-	        		"housing_type": "open air barn",
-	        		"bedding_type": "sawdust",
-	        		"pen_type": "freestall"
-	        	},
-
-	        	"pen2":
-	        	{
-	        		"id": 2,
-	        		"vertical_dist_to_milking_parlor": 0.1,
-	        		"horizontal_dist_to_milking_parlor": 1.6,
-	        		"number_of_stalls": 300,
-	        		"housing_type": "open air barn",
-	        		"bedding_type": "straw",
-	        		"pen_type": "tiestall"
-	        	},
-
-	        	"pen3":
-	        	{
-	        		"id": 3,
-	        		"vertical_dist_to_milking_parlor": 0.1,
-	        		"horizontal_dist_to_milking_parlor": 1.6,
-	        		"number_of_stalls": 400,
-	        		"housing_type": "open air barn",
-	        		"bedding_type": "sand",
-	        		"pen_type": "tiestall"
-	        	},
-
-	        	"pen4":
-	        	{
-	        		"id": 4,
-	        		"vertical_dist_to_milking_parlor": 0.1,
-	        		"horizontal_dist_to_milking_parlor": 1.6,
-	        		"number_of_stalls": 400,
-	        		"housing_type": "open air barn",
-	        		"bedding_type": "sand",
-	        		"pen_type": "tiestall"
-	        	},
-
-	        	"pen5":
-	        	{
-	        		"id": 5,
-	        		"vertical_dist_to_milking_parlor": 0.1,
-	        		"horizontal_dist_to_milking_parlor": 1.6,
-	        		"number_of_stalls": 400,
-	        		"housing_type": "open air barn",
-	        		"bedding_type": "sand",
-	        		"pen_type": "tiestall"
-	        	}
-	        }
+	        "pen_information": {
+            }
         },
 
         "feed":
