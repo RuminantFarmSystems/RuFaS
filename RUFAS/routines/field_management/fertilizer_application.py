@@ -1,7 +1,7 @@
 ################################################################################
 """
 RuFaS
-File name: fertilizer.py
+File name: fertilizer_application.py
 Author(s): Jacob Johnson, jacob8399@gmail.com,
            William Donovan, wmdonovan@wisc.edu
 """

@@ -10,6 +10,7 @@ Author(s): William Donovan, wmdonovan@wisc.edu
             Jacob Johnson, jacob8399@gmail.com
 """
 
+from . import fertilizer_application, manure_application, tillage_application
 
 class FieldManagement:
 
@@ -64,6 +65,37 @@ class FieldManagement:
                 self.BaseApplicationManagement(app_data[application_name], application_name, default_data, time)
 
         self.management_scheme = str(app_data['management_scheme']).lower()
+
+    def daily_field_management_routine(self, soil, manure_storage, weather, time):
+        """
+        Description:
+            Manages the function calls for simulating field management
+
+        Args:
+            soil: an instance of the Soil class defined in soil.py representing
+                the soil profile of the field being managed
+            manure_storage: an instance of the ManureStorage class defined in
+                manure_storage.py representing available manure
+            weather: an instance of the Weather class defined in classes.py
+            time: an instance of the Time class defined in classes.py
+        """
+
+        fert_management = self.managed_applications['fertilizer']
+        if (time.year, time.day) in fert_management.applications:
+            if fert_management.check_conditions_plant(soil, weather, time):
+                fertilizer_application.update_all(soil, fert_management.applications[(time.year, time.day)].data)
+
+        manure_management = self.managed_applications['manure']
+        if (time.year, time.day) in manure_management.applications:
+            if manure_management.check_conditions_plant(soil, weather, time):
+                manure_application.update_all(soil, manure_storage,
+                                              manure_management.applications[(time.year, time.day)].data)
+
+        till_management = self.managed_applications['tillage']
+        if (time.year, time.day) in till_management.applications:
+            if manure_management.check_conditions_plant(soil, weather, time):
+                tillage_application.update_all(soil, till_management.applications[(time.year, time.day)].data)
+
 
     class BaseApplicationManagement:
         def __init__(self, management_data, application_type, default_data, time):

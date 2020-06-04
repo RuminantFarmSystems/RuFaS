@@ -1,7 +1,7 @@
 ################################################################################
 """
 SurPhos
-File name: tillage.py
+File name: tillage_application.py
 Author(s): Jacob Johnson, jacob8399@gmail.com,
            William Donovan, wmdonovan@wisc.edu
 """

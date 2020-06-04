@@ -129,14 +129,12 @@ class ManureStorage:
             self.raw_manure = pen.manure['Mkg']
             self.density = 994.0
 
-            # TODO: Total solids will be calculated in animal module
-            self.TS_excreted = 0.11 * self.raw_manure
-
             self.VS_excreted = pen.manure['VSd'] + pen.manure['VSnd']
+            self.TS_excreted = self.raw_manure - self.VS_excreted
             self.N_excreted = pen.manure['MN']
+            self.P_excreted = pen.manure['p_excrt_manure']
 
-            # TODO: Excreted Phosphorus/Potassium will be calculated in animal module
-            self.P_excreted = 0.048 * self.cow_num
+            # TODO: Excreted Potassium will eventually be calculated in animal module
             self.K_excreted = 0.181 * self.cow_num
 
             self.bedding_added = 0
@@ -341,9 +339,8 @@ class ManureStorage:
             self.P_liquid = 0
             self.K_liquid = 0
 
-            # TODO: These values need to be calculated
-            self.WOP_frac = 0.05
-            self.WIP_frac = 0.06
+            self.WOP_frac = pen.manure['WOP_frac']
+            self.WIP_frac = pen.manure['WIP_frac']
 
     def annual_reset(self):
         pass

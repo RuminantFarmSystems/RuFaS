@@ -1,7 +1,7 @@
 ################################################################################
 """
 SurPhos
-File name: manure.py
+File name: manure_application.py
 Author(s): Jacob Johnson, jacob8399@gmail.com,
            William Donovan, wmdonovan@wisc.edu
 """
@@ -12,7 +12,7 @@ Author(s): Jacob Johnson, jacob8399@gmail.com,
 # in manure, adds P to surface manure pools, and updates cumulative manure
 # and TP added during model run
 # "pseudocode_soil" S.6.C
-def update_all(soil, m_app):
+def update_all(soil, manure_storage, m_app):
 
     m_type = m_app['type']
     mass = m_app['mass']
@@ -104,3 +104,13 @@ def update_all(soil, m_app):
         layer.labile_P /= soil.area
 
     soil.manure_mass_app = soil.manure_mass
+
+
+def added_manure_N(soil, m_app):
+    totalN = m_app['N_frac'] * m_app['mass']
+
+    activeN = totalN * 0.875
+    stableN = totalN * 0.125
+
+    soil.soil_layers[0].activeN += activeN
+    soil.soil_layers[0].stableN += stableN

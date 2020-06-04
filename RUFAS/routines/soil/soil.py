@@ -145,67 +145,6 @@ from .nitrogen_cycling import nitrogen_cycling
 from .phosphorus_cycling import phosphorus_cycling
 
 
-# ------------------------------------------------------------------------------
-# Function: daily_soil_routine
-# Executes all the daily soil routines
-# ------------------------------------------------------------------------------
-def daily_soil_routine(soil, crop, field_management, weather, time):
-    """
-    Description:
-        Executes all the daily soil routines.
-
-    Args:
-        soil: instance of the Soil class
-        crop: instance of the Crop class
-        field_management: instance of the FieldManagement class implemented in
-            field_management.py
-        weather: instance of the Weather class
-        time: instance of the Time class
-    """
-    # calculate and update the temperature of the soil layers
-    soil_temp.update_all(soil, crop, weather, time)
-
-    # calculate daily runoff
-    infiltration.update_all(soil, weather, time)
-
-    # calculate daily transpiration
-    evapotranspiration.update_all(soil, crop, weather, time)
-
-    # transpiration is defined in the crop module, but called here as a
-    # component of water balance
-    transpiration.update_all(crop.current_crop, soil, time)
-
-    # calculate daily percolation
-    percolation.update_all(soil)
-
-    # updates daily soil water fluxes
-    soil_water.update_all(soil, weather, time)
-
-    # calculate daily soil erosion
-    soil_erosion.update_all(soil, crop, weather, time)
-
-    # calculate and update the contents of 3 organic and 2 inorganic nitrogen
-    # pools
-    nitrogen_cycling.update_all(soil, field_management, weather, time)
-
-    phosphorus_cycling.update_all(soil, field_management, weather, time)
-
-    annual_variable_update(soil)
-
-
-def annual_variable_update(soil):
-
-    soil.ET_max_annual += soil.ET_max
-
-    soil.drainage_annual += soil.drainage
-    soil.runoff_annual += soil.runoff
-    soil.trans_annual += soil.trans_sum
-    soil.evap_annual += soil.evap_sum
-    soil.ET_annual += soil.ET_act
-
-    soil.p_act_annual += soil.p_act
-
-
 # -------------------------------------------------------------------------------
 # Class: Soil
 #        Contains the state of the farm's soil
@@ -383,6 +322,7 @@ class Soil:
         self.evap_max = 0.0
         self.trans_max = 0.0
         self.ET_max = 0.0
+        self.ET_act = 0.0
 
         # daily water balance
         self.delta_SW = 0.0
@@ -493,6 +433,65 @@ class Soil:
             layer.stableN = stableN * unit_adjustment
             layer.NH4 = NH4 * unit_adjustment
             layer.topLayerFreshN = FreshN * unit_adjustment
+
+    # ------------------------------------------------------------------------------
+    # Function: daily_soil_routine
+    # Executes all the daily soil routines
+    # ------------------------------------------------------------------------------
+    def daily_soil_routine(self, crop, field_management, weather, time):
+        """
+        Description:
+            Executes all the daily soil routines.
+
+        Args:
+            self: instance of the Soil class
+            crop: instance of the Crop class
+            field_management: instance of the FieldManagement class implemented in
+                field_management.py
+            weather: instance of the Weather class
+            time: instance of the Time class
+        """
+        # calculate and update the temperature of the soil layers
+        soil_temp.update_all(self, crop, weather, time)
+
+        # calculate daily runoff
+        infiltration.update_all(self, weather, time)
+
+        # calculate daily transpiration
+        evapotranspiration.update_all(self, crop, weather, time)
+
+        # transpiration is defined in the crop module, but called here as a
+        # component of water balance
+        transpiration.update_all(crop.current_crop, self, time)
+
+        # calculate daily percolation
+        percolation.update_all(self)
+
+        # updates daily soil water fluxes
+        soil_water.update_all(self, weather, time)
+
+        # calculate daily soil erosion
+        soil_erosion.update_all(self, crop, weather, time)
+
+        # calculate and update the contents of 3 organic and 2 inorganic nitrogen
+        # pools
+        nitrogen_cycling.update_all(self, field_management, weather, time)
+
+        phosphorus_cycling.update_all(self, field_management, weather, time)
+
+        self.annual_variable_update()
+
+    def annual_variable_update(self):
+
+        self.ET_max_annual += self.ET_max
+
+        self.drainage_annual += self.drainage
+        self.runoff_annual += self.runoff
+        self.trans_annual += self.trans_sum
+        self.evap_annual += self.evap_sum
+        self.ET_annual += self.ET_act
+
+        self.p_act_annual += self.p_act
 
     # ---------------------------------------------------------------------------
     # Class: SoilLayer
@@ -612,7 +611,6 @@ class Soil:
             self.pbal = 0.0
             self.days_unbalanced_labile = 0.0
             self.days_unbalanced_active = 0.0
-
 
     # ---------------------------------------------------------------------------
     # Class: Fertilizer
@@ -825,4 +823,3 @@ class Soil:
 
         self.TIP_runoff_annual = 0.0
         self.M_DRP_runoff_annual = 0.0
-

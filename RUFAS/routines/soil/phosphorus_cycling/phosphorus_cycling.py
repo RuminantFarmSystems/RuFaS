@@ -16,26 +16,10 @@
 #
 ################################################################################
 
-from . import fert_leach, fertilizer, manure, manure_leach, p_mineralization,\
-    tillage, soluble_P, erosion
+from . import fert_leach, manure_leach, p_mineralization, soluble_P, erosion
 
 
-def update_all(soil, field_management, weather, time):
-
-    fert_management = field_management.managed_applications['fertilizer']
-    if (time.year, time.day) in fert_management.applications:
-        if fert_management.check_conditions(soil, weather, time):
-            fertilizer.update_all(soil, fert_management.applications[(time.year, time.day)].data)
-
-    manure_management = field_management.managed_applications['manure']
-    if (time.year, time.day) in manure_management.applicaitons:
-        if manure_management.check_conditions(soil, weather, time):
-            manure.update_all(soil, manure_management.applications[(time.year, time.day)].data)
-
-    till_management = field_management.managed_applications['tillage']
-    if (time.year, time.day) in till_management.applications:
-        if till_management.check_conditions(soil, weather, time):
-            tillage.update_all(soil, till_management.applications[(time.year, time.day)].data)
+def update_all(soil, weather, time):
 
     soluble_P.update_all(soil)
 
