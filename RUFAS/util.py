@@ -77,7 +77,6 @@ class DatabaseReader:
             while row is not None:
                 self.values.append(dict(row))
                 row = c.fetchone()
-
             conn.close()
         except Exception as e:
             print("The program has encountered the following exception while"

@@ -97,8 +97,7 @@ class Config:
             raise errors.JSONfileData("WEATHER",
                                       "\tWeather file specified does not exist")
         # reads database and stores dictionnary values in ValuesDB list
-        readDB = DatabaseReader(self.weather_full_path, self.weather_table,
-                                identifier=None,desired_rows=None)
+        readDB = DatabaseReader(str(self.weather_full_path), self.weather_table)
         ValuesDB=readDB.values
         # keeps track of how many lines are in the weather file
         line = len(ValuesDB)
@@ -329,7 +328,7 @@ class Weather:
                                       "\tWeather file specified does not exist")
 
         # reads database and stores dictionnary values in ValuesDB list
-        readDB = DatabaseReader(self.weather_full_path, self.weather_table,
+        readDB = DatabaseReader(str(self.weather_full_path), self.weather_table,
                                 identifier=None,desired_rows=None)
         ValuesDB=readDB.values
 
