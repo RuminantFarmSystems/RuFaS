@@ -224,7 +224,6 @@ class Config:
                     days = [_ for _ in range(1, year_length + 1)]
 
             self.years.append(days)
-        
         self.sim_length = self.calc_sim_length(leap_year_length, year_length)
         self.output_dir = data['output_dir']
         self.diagnostic_dir = data['diagnostic_dir']
@@ -299,7 +298,6 @@ class Weather:
                 else:
                     days_to_start += year_length
                 temp_year += 1
-
         # fill the weather arrays with zeros for the size of each year in years[]
         for year in years:
             self.rainfall.append([0 for _ in range(len(year))])
@@ -338,7 +336,7 @@ class Weather:
         # this for loop takes the weather data and parses it into multiple
         # 2D arrays [year][day] for different weather variables used by the
         # module
-        current_row = 0
+        current_row=1
         year = 0
         counter = 0
         day = start_day
@@ -359,37 +357,34 @@ class Weather:
                 counter += 1
                 continue
 
-            # row 0 contains variable names
-            if current_row != 0:
-                # try/except statement to catch faulty weather data
-                try:
-                    # fill data at appropriate location
-                    self.rainfall[year][day - offset] = float(row[2])
-                    self.T_max[year][day - offset] = float(row[3])
-                    self.T_min[year][day - offset] = float(row[4])
-                    self.T_avg[year][day - offset] = float(row[5])
-                    self.biomass[year][day - offset] = float(row[6])
-                    self.radiation[year][day - offset] = float(row[7])
-                    self.manureN[year][day - offset] = float(row[8])  # TODO: manureN is a temporary weather file input until the manure module is linked with the rest of the program
-                except(IndexError, ValueError):
-                    # prints out each problematic row in the weather CSV file
-                    skips += 1
-                    if skips == 1:
-                        print("Weather CSV file has invalid data in: " + self.weather_full_path.name
-                              + "\nInvalid rows that are skipped:")
-                    if skips <= 5:
-                        print("Row: " + str(current_row + skips + days_to_start) + "")
-                    continue
+            
+            # try/except statement to catch faulty weather data
+            try:
+                # fill data at appropriate location
+                self.rainfall[year][day - offset] = float(row["precip"])
+                self.T_max[year][day - offset] = float(row["high"])
+                self.T_min[year][day - offset] = float(row["low"])
+                self.T_avg[year][day - offset] = float(row["avg"])
+                self.biomass[year][day - offset] = float(row["0"])
+                self.radiation[year][day - offset] = float(row["Hday"])
+                self.manureN[year][day - offset] = float(row["manureN"])  # TODO: manureN is a temporary weather file input until the manure module is linked with the rest of the program
+            except(IndexError, ValueError):
+                # prints out each problematic row in the weather CSV file
+                skips += 1
+                if skips == 1:
+                    print("Weather CSV file has invalid data in: " + self.weather_full_path.name
+                          + "\nInvalid rows that are skipped:")
+                if skips <= 5:
+                    print("Row: " + str(current_row + skips + days_to_start) + "")
+                continue
 
-                # iterate year counter accounting for leap years
-                if day == len(years[year]):
-                    year += 1
-                    day = 0
+            # iterate year counter accounting for leap years
+            if day == len(years[year]):
+                year += 1
+                day = 0
 
-                day += 1
-
-                current_row += 1
-
+            day += 1
+            current_row +=1
             # prints if there are more than 5 skipped lines in order to
             # prevent console clutter
             if skips > 5:
@@ -400,8 +395,7 @@ class Weather:
             for i in range(len(years)):
                 avg = sum(self.T_avg[i]) / (len(years[i]))
                 self.T_avg_annual.append(avg)
-
-
+            
 # Class: Time
 # -------------------------------------------------------------------------------
 class Time:
