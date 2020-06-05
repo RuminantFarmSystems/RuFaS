@@ -48,6 +48,10 @@ class DatabaseReader:
             # To obtain data from a database table, we form and execute a query.
             if desired_rows is None or identifier is None:
                 query = "SELECT * FROM " + table_name
+                # Since identifier and desired_rows are None, the following 
+                # command will execute the query as formulated above on all the
+                # rows of the database.
+                c.execute(query)
 
             else:
                 # SELECT * FROM table_name WHERE identifier IN [desired_rows]
@@ -59,12 +63,11 @@ class DatabaseReader:
                         identifier + \
                         " IN " + \
                         "({})".format(','.join(['?'] * len(desired_rows)))
-
-            # Here, desired_rows is a parameter to the query as the list of
-            # rows for which information is wanted. This list will be
-            # formatted as specified in the query above (i.e. all elements are
-            # separated by a comma and the list is surrounded by parentheses.
-            c.execute(query, desired_rows)
+                # Here, desired_rows is a parameter to the query as the list of
+                # rows for which information is wanted. This list will be
+                # formatted as specified in the query above (i.e. all elements are
+                # separated by a comma and the list is surrounded by parentheses.
+                c.execute(query, desired_rows)
 
             # self.values is a list of dictionaries, where each dictionary in
             # the list corresponds to a row in the database table storing
@@ -76,7 +79,6 @@ class DatabaseReader:
                 row = c.fetchone()
 
             conn.close()
-
         except Exception as e:
             print("The program has encountered the following exception while"
                   "connecting to and querying the database table ", table_name,
