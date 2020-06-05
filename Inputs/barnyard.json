@@ -10,8 +10,8 @@
 
     "weather":
     {
-     "weather_database": "Inputs/barnyard_weather.db",
-     "weather_table_name": "weather"
+     "weather_database": "Inputs/weather.db",
+     "weather_table_name": "barnyard_weather"
     },
     
     "output":
