@@ -16,6 +16,7 @@ from RUFAS import util
 from RUFAS import errors
 from RUFAS.routines import Soil, Feed, Crop
 from RUFAS.routines.animal.animal_management import AnimalManagement
+from RUFAS.util import DatabaseReader
 
 
 # -------------------------------------------------------------------------------
@@ -70,10 +71,13 @@ class State:
 class Config:
     """Contains configuration information of the simulation"""
 
-    def __init__(self, data, weather_path_str):
+    def __init__(self, data, weather_data):
 
         # gets a start/end date in the format year:julian-day. That way the program
         # can start in the middle of the year
+        self.weather_path_str= weather_data["weather_database"]
+        self.weather_table=weather_data["weather_table_name"]
+        
         self.start_date = data['start_date'].split(':')
         self.end_date = data['end_date'].split(':')
         self.start_year = int(self.start_date[0])
@@ -87,54 +91,49 @@ class Config:
         leap_year_length = 366
 
         # read in the input csv file
-        weather_full_path = util.get_base_dir() / weather_path_str
+        self.weather_full_path = util.get_base_dir() / self.weather_path_str
 
-        if not weather_full_path.is_file():
+        if not self.weather_full_path.is_file():
             raise errors.JSONfileData("WEATHER",
                                       "\tWeather file specified does not exist")
+        # reads database and stores dictionnary values in ValuesDB list
+        readDB = DatabaseReader(self.weather_full_path, self.weather_table,
+                                identifier=None,desired_rows=None)
+        ValuesDB=readDB.values
+        # keeps track of how many lines are in the weather file
+        line = len(ValuesDB)
+        # sets the starting and ending weather dates
+        w_start_year=ValuesDB[0]["year"]
+        w_start_day=ValuesDB[0]["jday"]
+        
+        w_end_year=ValuesDB[len(ValuesDB)-1]["year"]
+        w_end_day=ValuesDB[len(ValuesDB)-1]["jday"]
 
-        with weather_full_path.open('r') as f:
-            readCSV = csv.reader(f, delimiter=',')
-
-            # keeps track of how many lines are in the weather file
-            line = 1
-            # sets the starting and ending weather dates
-            for row in readCSV:
-                if len(row) == 0:
-                    continue
-                if line == 2:
-                    w_start_year = int(row[0])
-                    w_start_day = int(row[1])
-                elif line > 2:
-                    w_end_year = int(row[0])
-                    w_end_day = int(row[1])
-                line += 1
-
-            # expected size of the csv file from start to end
-            # to determine if the weather file has any gaps
-            expected_weather_size = 0
-            if is_leap_year(w_start_year):
-                expected_weather_size += leap_year_length + 1 - w_start_day
+        # expected size of the csv file from start to end
+        # to determine if the weather file has any gaps
+        expected_weather_size = 0
+        if is_leap_year(w_start_year):
+            expected_weather_size += leap_year_length + 1 - w_start_day
+        else:
+            expected_weather_size += year_length + 1 - w_start_day
+        for x in range(w_start_year + 1, w_end_year):
+            if is_leap_year(x):
+                expected_weather_size += leap_year_length
             else:
-                expected_weather_size += year_length + 1 - w_start_day
+                expected_weather_size += year_length
 
-            for x in range(w_start_year + 1, w_end_year):
-                if is_leap_year(x):
-                    expected_weather_size += leap_year_length
-                else:
-                    expected_weather_size += year_length
 
-            expected_weather_size += w_end_day
+        expected_weather_size += w_end_day
 
-            # compares actual size of the file to expected size
-            if line - 1 != expected_weather_size + 1:
-                print("Start and end dates of the Weather CSV file do not match the size.")
-                if line - 1 > expected_weather_size + 1:
-                    print("There may be duplicate days in: " + weather_full_path.name)
-                else:
-                    print("There may be missing days in: " + weather_full_path.name)
-                print("\tWeather File Size: " + str(line - 1)
-                      + "\n\tExpected size: " + str(expected_weather_size + 1) + "\n")
+        # compares actual size of the file to expected size
+        if line != expected_weather_size:
+            print("Start and end dates of the Weather CSV file do not match the size.")
+            if line > expected_weather_size:
+                print("There may be duplicate days in: " + self.weather_full_path.name)
+            else:
+                print("There may be missing days in: " + self.weather_full_path.name)
+            print("\tWeather File Size: " + str(line)
+                  + "\n\tExpected size: " + str(expected_weather_size) + "\n")
 
         self.w_start_year = w_start_year
         self.w_start_day = w_start_day
