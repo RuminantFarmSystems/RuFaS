@@ -1,25 +1,24 @@
 ################################################################################
-'''
+"""
 RUFAS: Ruminant Farm Systems Model
 File name: calf_ration.py
 Description: Calculates the ration for calves.
 Author(s): Militsa Sotirova, militsasotirova@gmail.com
-'''
+"""
 ################################################################################
 import math
 
+
 def optimize(feed, rqmts):
     """
-    TEMPORARY PLACEHOLDER
     Sets up the arguments for the linear programming optimization.
 
-    Args:
-        feed : instance of the Feed class
-        rqmts : dict which represents the dietary requirements of the cows
-
-    Returns:
+    Returns: a TEMPORARY PLACE HOlDER for the ration formulation
     """
-    return {'Corn_grain': 0.0, 'Cotton_seed': 6.0651063, 'Legume_hay': 13.669348, 'Roasted_soybean': 2.4089406, 'Rye_hay': 0.0, 'status': 'Optimal', 'objective': 4.536948317}
+    return {'Corn_grain': 0.0, 'Cotton_seed': 6.0651063,
+            'Legume_hay': 13.669348, 'Roasted_soybean': 2.4089406,
+            'Rye_hay': 0.0, 'status': 'Optimal', 'objective': 4.536948317}
+
 
 def calculate_rqmts():
     """
@@ -31,14 +30,18 @@ def calculate_rqmts():
     Args:
 
     Returns:
-        dict : a dictionary that represents the dietary requirements of the cows,
-            where the left hand side is nutrients_list and the right hand side is
-            calculated in this method
+        dict: a dictionary that represents the dietary requirements of the
+            cows, where the left hand side is nutrients_list and the right hand
+            side is calculated in this method
         DMIest: dry matter intake estimation, kg
         DBW: Body weight change (delta body weight = DBW), kg
     """
-    nutrient_rqmts = {'FU': {'op': '<=', 'val': 7.566673489860807}, 'RU': {'op': '>=', 'val': 0}, 'ME_DM': {'op': '>=', 'val': 57.238188330372566}, 'RDP_DM': {'op': '>=', 'val': 2.0347001114951313}, 'RUP_DM': {'op': '>=', 'val': 1.2716733909335047}}
-    DMIest = 27.620363504458798 
+    nutrient_rqmts = {'FU': {'op': '<=', 'val': 7.566673489860807},
+                      'RU': {'op': '>=', 'val': 0},
+                      'ME_DM': {'op': '>=', 'val': 57.238188330372566},
+                      'RDP_DM': {'op': '>=', 'val': 2.0347001114951313},
+                      'RUP_DM': {'op': '>=', 'val': 1.2716733909335047}}
+    DMIest = 27.620363504458798
     DBW = -0.4125
     return nutrient_rqmts, DMIest, DBW
 
@@ -64,7 +67,7 @@ cp_intake = 0
 milk_starter_feed = {}
 
 '''
-    Calculate dietary intake and nutrient requirements for the calf. 
+    Calculate dietary intake and nutrient requirements for the calf.
 '''
 def calc_requirements(temp, wean_day, wean_length, milk_type, birth_weight, body_weight, days_born):
     if milk_type == "whole":
@@ -73,25 +76,25 @@ def calc_requirements(temp, wean_day, wean_length, milk_type, birth_weight, body
         whole_milk_dm = 0
 
     # milk-based feed intake
-    whole_milk_intake = 0.1 * birth_weight * whole_milk_dm * 0.01 
+    whole_milk_intake = 0.1 * birth_weight * whole_milk_dm * 0.01
     milk_replacer_intake = 0.1 * birth_weight * 0.15 * milk_replacer_dm * 0.01
-    
+
     # starter intake
     if body_weight <= 69.365:
-        starter_intake = -0.24783 + 0.0049567 * body_weight 
+        starter_intake = -0.24783 + 0.0049567 * body_weight
     else:
         starter_intake = -6.2263 + 0.091145 * body_weight
 
     # reduction in intake during weaning
     wean_start = wean_day - wean_length - 1
 
-    milk_reduct = round(0.5 * wean_length) 
+    milk_reduct = round(0.5 * wean_length)
 
     if whole_milk_intake != 0:
         milk_intake_wean = whole_milk_intake * (1 - milk_reduct / (wean_length + 1))
     else:
         milk_intake_wean = milk_replacer_intake * (1 - milk_reduct / (wean_length + 1))
-    
+
     # total intake
     global dm_intake
     global me_intake
@@ -106,8 +109,8 @@ def calc_requirements(temp, wean_day, wean_length, milk_type, birth_weight, body
     starter_me_proportion = starter_intake * starter_me / me_intake
 
     milk_starter_feed['milk'] += 0.01 * (whole_milk_cp * whole_milk_intake + milk_replacer_cp * milk_replacer_intake)
-    milk_starter_feed['starter'] += 0.01 * starter_cp * starter_intake 
-    
+    milk_starter_feed['starter'] += 0.01 * starter_cp * starter_intake
+
     adp_intake = (0.93 * milk_starter_feed['milk'] / cp_intake + 0.75 * milk_starter_feed['starter'] / cp_intake) * 1000
 
     milk_proportion = (whole_milk_intake + milk_replacer_intake) / dm_intake
@@ -115,12 +118,12 @@ def calc_requirements(temp, wean_day, wean_length, milk_type, birth_weight, body
 
     # maintainance requirements
     if days_born <= 60:
-        if temp < -30: 
+        if temp < -30:
             t_factor = 1.34
         elif temp < 15:
-            t_factor = -0.0272 * temp + 0.4751 
+            t_factor = -0.0272 * temp + 0.4751
         else:
-            t_factor = 0     
+            t_factor = 0
     else:
         if temp < -30:
             t_factor = 1.07
@@ -128,11 +131,11 @@ def calc_requirements(temp, wean_day, wean_length, milk_type, birth_weight, body
             t_factor = -0.0271 * temp + 0.2002
         else:
             t_factor = 0
-    
-    ne_maint = 0.086 * body_weight ** 0.75 * (1 + t_factor) 
+
+    ne_maint = 0.086 * body_weight ** 0.75 * (1 + t_factor)
     me_maint = ne_maint / (0.86 * milk_proportion + 0.75 * starter_proportion)
 
-    bio_val = 0.8 * milk_starter_feed['milk'] / cp_intake + 0.7 * milk_starter_feed['starter'] / cp_intake 
+    bio_val = 0.8 * milk_starter_feed['milk'] / cp_intake + 0.7 * milk_starter_feed['starter'] / cp_intake
 
     endo_urine_N = 0.0002 * body_weight ** 0.75 * 1000
     meta_fecal_N = (0.0019 * (whole_milk_intake + milk_replacer_intake) + 0.0033 * starter_intake) * 1000
@@ -161,7 +164,7 @@ def calc_requirements(temp, wean_day, wean_length, milk_type, birth_weight, body
         'milk_me_proportion': milk_me_proportion,
         'starter_me_proportion': starter_me_proportion,
         'milk_proportion': milk_proportion,
-        'starter_proportion': starter_proportion        
+        'starter_proportion': starter_proportion
     }
 
     nutrient_requirements = {
