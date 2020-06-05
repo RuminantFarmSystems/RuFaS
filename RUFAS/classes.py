@@ -254,7 +254,7 @@ class Weather:
     Data lists are in the format Data[year][julian_day].
     """
 
-    def __init__(self, weather_path_str, years, w_start_year, w_start_day, start_year, start_day):
+    def __init__(self, weather_data, years, w_start_year, w_start_day, start_year, start_day):
 
         # initialize data sets
         self.rainfall = []
@@ -320,68 +320,73 @@ class Weather:
             # self.beef.append([0 for _ in range(len(year))])
             # self.beefCalf.append([0 for _ in range(len(year))])
 
-        # read in the input csv file
-        weather_full_path = util.get_base_dir() / weather_path_str
+        # read in the input db file
+        self.weather_path_str=weather_data["weather_database"]
+        self.weather_table=weather_data["weather_table_name"]
+        
+        self.weather_full_path = util.get_base_dir() / self.weather_path_str
 
-        if not weather_full_path.is_file():
+        if not self.weather_full_path.is_file():
             raise errors.JSONfileData("WEATHER",
                                       "\tWeather file specified does not exist")
 
-        with weather_full_path.open('r') as f:
-            readCSV = csv.reader(f, delimiter=',')
+        # reads database and stores dictionnary values in ValuesDB list
+        readDB = DatabaseReader(self.weather_full_path, self.weather_table,
+                                identifier=None,desired_rows=None)
+        ValuesDB=readDB.values
 
-            # this for loop takes the weather data and parses it into multiple
-            # 2D arrays [year][day] for different weather variables used by the
-            # module
-            current_row = 0
-            year = 0
-            counter = 0
-            day = start_day
-            skips = 0
-            offset = 1
-            for row in readCSV:
-                # limits weather data read in to the length of the simulation
-                if year > len(years) - 1:
-                    break
+        # this for loop takes the weather data and parses it into multiple
+        # 2D arrays [year][day] for different weather variables used by the
+        # module
+        current_row = 0
+        year = 0
+        counter = 0
+        day = start_day
+        skips = 0
+        offset = 1
+        for row in ValuesDB:
+            # limits weather data read in to the length of the simulation
+            if year > len(years) - 1:
+                break
 
-                # if a line is empty then skip it
-                if len(row) == 0:
+            # if a line is empty then skip it
+            if len(row) == 0:
+                skips += 1
+                continue
+
+            # sets a pointer to the start date of the simulation in the weather file
+            if counter < days_to_start:
+                counter += 1
+                continue
+
+            # row 0 contains variable names
+            if current_row != 0:
+                # try/except statement to catch faulty weather data
+                try:
+                    # fill data at appropriate location
+                    self.rainfall[year][day - offset] = float(row[2])
+                    self.T_max[year][day - offset] = float(row[3])
+                    self.T_min[year][day - offset] = float(row[4])
+                    self.T_avg[year][day - offset] = float(row[5])
+                    self.biomass[year][day - offset] = float(row[6])
+                    self.radiation[year][day - offset] = float(row[7])
+                    self.manureN[year][day - offset] = float(row[8])  # TODO: manureN is a temporary weather file input until the manure module is linked with the rest of the program
+                except(IndexError, ValueError):
+                    # prints out each problematic row in the weather CSV file
                     skips += 1
+                    if skips == 1:
+                        print("Weather CSV file has invalid data in: " + self.weather_full_path.name
+                              + "\nInvalid rows that are skipped:")
+                    if skips <= 5:
+                        print("Row: " + str(current_row + skips + days_to_start) + "")
                     continue
 
-                # sets a pointer to the start date of the simulation in the weather file
-                if counter < days_to_start:
-                    counter += 1
-                    continue
+                # iterate year counter accounting for leap years
+                if day == len(years[year]):
+                    year += 1
+                    day = 0
 
-                # row 0 contains variable names
-                if current_row != 0:
-                    # try/except statement to catch faulty weather data
-                    try:
-                        # fill data at appropriate location
-                        self.rainfall[year][day - offset] = float(row[2])
-                        self.T_max[year][day - offset] = float(row[3])
-                        self.T_min[year][day - offset] = float(row[4])
-                        self.T_avg[year][day - offset] = float(row[5])
-                        self.biomass[year][day - offset] = float(row[6])
-                        self.radiation[year][day - offset] = float(row[7])
-                        self.manureN[year][day - offset] = float(row[8])  # TODO: manureN is a temporary weather file input until the manure module is linked with the rest of the program
-                    except(IndexError, ValueError):
-                        # prints out each problematic row in the weather CSV file
-                        skips += 1
-                        if skips == 1:
-                            print("Weather CSV file has invalid data in: " + weather_full_path.name
-                                  + "\nInvalid rows that are skipped:")
-                        if skips <= 5:
-                            print("Row: " + str(current_row + skips + days_to_start) + "")
-                        continue
-
-                    # iterate year counter accounting for leap years
-                    if day == len(years[year]):
-                        year += 1
-                        day = 0
-
-                    day += 1
+                day += 1
 
                 current_row += 1
 
