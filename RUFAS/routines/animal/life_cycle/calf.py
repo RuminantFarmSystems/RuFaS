@@ -70,8 +70,12 @@ class Calf(AnimalBase):
 		# birthweight determined by breed specific distribution
 		if self._breed == 'HO':
 			self._birth_weight = np.random.normal(AnimalBase.config['birth_weight_avg_ho'], AnimalBase.config['birth_weight_std_ho'])
+			while self._birth_weight < AnimalBase.config['birth_weight_avg_ho'] - 2 * AnimalBase.config['birth_weight_std_ho'] or self._birth_weight > AnimalBase.config['birth_weight_avg_ho'] + 2 * AnimalBase.config['birth_weight_std_ho']:
+				self._birth_weight = np.random.normal(AnimalBase.config['birth_weight_avg_ho'], AnimalBase.config['birth_weight_std_ho'])
 		elif self._breed == 'JE':
 			self._birth_weight = np.random.normal(AnimalBase.config['birth_weight_avg_je'], AnimalBase.config['birth_weight_std_je'])
+			while self._birth_weight < AnimalBase.config['birth_weight_avg_je'] - 2 * AnimalBase.config['birth_weight_std_je'] or self._birth_weight > AnimalBase.config['birth_weight_avg_je'] + 2 * AnimalBase.config['birth_weight_std_je']:
+				self._birth_weight = np.random.normal(AnimalBase.config['birth_weight_avg_je'], AnimalBase.config['birth_weight_std_je'])
 		self._body_weight = self._birth_weight
 		self._wean_weight = 0
 	
@@ -150,7 +154,10 @@ class Calf(AnimalBase):
 			self._events.add_event(self._days_born, 'Wean Day')
 			self._days_born -= 1 # will increment by 1 again in heifer update
 		else:
-			self._body_weight += np.random.normal(AnimalBase.config['avg_daily_gain_c'], AnimalBase.config['std_daily_gain_c'])
+			gained_weight = np.random.normal(AnimalBase.config['avg_daily_gain_c'], AnimalBase.config['std_daily_gain_c'])
+			while gained_weight < AnimalBase.config['avg_daily_gain_c'] - 2 * AnimalBase.config['std_daily_gain_c'] or gained_weight > AnimalBase.config['avg_daily_gain_c'] + 2 * AnimalBase.config['std_daily_gain_c']:
+				gained_weight = np.random.normal(AnimalBase.config['avg_daily_gain_c'], AnimalBase.config['std_daily_gain_c'])
+			self._body_weight += gained_weight
 		
 		self._daily_growth = self._body_weight - prev_weight
 		

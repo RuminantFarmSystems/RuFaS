@@ -70,8 +70,12 @@ class HeiferI(Calf):
 		second_stage = False
 		
 		prev_weight = self._body_weight
+
+		gained_weight = np.random.normal(AnimalBase.config['avg_daily_gain_h'], AnimalBase.config['std_daily_gain_h'])
+		while gained_weight < AnimalBase.config['avg_daily_gain_h'] - 2 * AnimalBase.config['std_daily_gain_h'] or gained_weight > AnimalBase.config['avg_daily_gain_h'] + 2 * AnimalBase.config['std_daily_gain_h']:
+			gained_weight = np.random.normal(AnimalBase.config['avg_daily_gain_h'], AnimalBase.config['std_daily_gain_h'])
 		
-		self._body_weight += np.random.normal(AnimalBase.config['avg_daily_gain_h'], AnimalBase.config['std_daily_gain_h'])
+		self._body_weight += gained_weight
 		
 		self._daily_growth = self._body_weight - prev_weight
 		

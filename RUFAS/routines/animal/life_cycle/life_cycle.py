@@ -107,7 +107,7 @@ class LifeCycleManager:
             replace_num: replacements in the market
             sim_days: simulation length of this herd, to make sure they reach to the heiferIII stage
         '''
-        self.animal_initializer = AnimalInitalization()
+        self.animal_initializer = AnimalInitalization(False)
         self.herd_num = herd_num
         self.calves = self.animal_initializer.get_calves(calf_num)
         self.heiferIs = self.animal_initializer.get_heiferIs(heiferI_num)

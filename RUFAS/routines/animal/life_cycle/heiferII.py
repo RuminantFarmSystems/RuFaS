@@ -181,7 +181,10 @@ class HeiferII(HeiferI):
 		if self._days_born < AnimalBase.config['grow_end_day']:
 			# Heifer can only grow to a maximum weight of mature_body_weight
 			if self._body_weight < AnimalBase.config['mature_body_weight']:
-				self._body_weight += np.random.normal(AnimalBase.config['avg_daily_gain_h'], AnimalBase.config['std_daily_gain_h'])
+				gained_weight = np.random.normal(AnimalBase.config['avg_daily_gain_h'], AnimalBase.config['std_daily_gain_h'])
+				while gained_weight < AnimalBase.config['avg_daily_gain_h'] - 2 * AnimalBase.config['std_daily_gain_h'] or gained_weight > AnimalBase.config['avg_daily_gain_h'] + 2 * AnimalBase.config['std_daily_gain_h']:
+					gained_weight = np.random.normal(AnimalBase.config['avg_daily_gain_h'], AnimalBase.config['std_daily_gain_h'])
+				self._body_weight += gained_weight
 			if self._body_weight > AnimalBase.config['mature_body_weight']:
 				self._body_weight = AnimalBase.config['mature_body_weight']
 				self._mature_body_weight = self._body_weight
@@ -227,7 +230,10 @@ class HeiferII(HeiferI):
 			estrus_day: the day when this estrus should occur
 	'''
 	def _determine_estrus_day(self, start_date, estrus_note):
-		estrus_day =  int(start_date + np.random.normal(AnimalBase.config['avg_estrus_cycle_h'], AnimalBase.config['std_estrus_cycle_h']))
+		estrus_cycle = np.random.normal(AnimalBase.config['avg_estrus_cycle_h'], AnimalBase.config['std_estrus_cycle_h'])
+		while estrus_cycle < AnimalBase.config['avg_estrus_cycle_h'] - 2 * AnimalBase.config['std_estrus_cycle_h'] or estrus_cycle > AnimalBase.config['avg_estrus_cycle_h'] + 2 * AnimalBase.config['std_estrus_cycle_h']:
+			estrus_cycle = np.random.normal(AnimalBase.config['avg_estrus_cycle_h'], AnimalBase.config['std_estrus_cycle_h'])
+		estrus_day =  int(start_date + estrus_cycle)
 		self._events.add_event(estrus_day, estrus_note)
 		return estrus_day
 
@@ -377,7 +383,10 @@ class HeiferII(HeiferI):
 		Output:
 	'''
 	def _determine_synch_ed_estrus_day(self, date, avg, std, max):
-		norm = abs(np.random.normal(avg, std))
+		synch_ed_estrus = np.random.normal(avg, std)
+		while synch_ed_estrus < avg - 2 * std or synch_ed_estrus > avg + 2 * std:
+			synch_ed_estrus = np.random.normal(avg, std)
+		norm = abs(synch_ed_estrus)
 		if norm >= max:
 			norm = max - 1
 		self._synch_ed_estrus_day = int(date + norm)
@@ -500,6 +509,8 @@ class HeiferII(HeiferI):
 				self._days_in_preg = 1
 				self._preg = True
 				self._gestation_length = int(np.random.normal(AnimalBase.config['avg_gestation_len'], AnimalBase.config['std_gestation_len']))
+				while self._gestation_length < AnimalBase.config['avg_gestation_len'] - 2 * AnimalBase.config['std_gestation_len'] or self._gestation_length > AnimalBase.config['avg_gestation_len'] + 2 * AnimalBase.config['std_gestation_len']:
+					self._gestation_length = int(np.random.normal(AnimalBase.config['avg_gestation_len'], AnimalBase.config['std_gestation_len']))
 				self._events.add_event(self._days_born, 'Heifer pregnant')
 			else:
 				self._events.add_event(self._days_born, 'Heifer not pregnant')
