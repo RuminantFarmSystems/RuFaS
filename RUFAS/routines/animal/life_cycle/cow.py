@@ -314,7 +314,10 @@ class Cow(HeiferIII):
 			estrus_day: the day when this estrus should occur
 	'''
 	def _determine_estrus_day(self, start_date, estrus_note, avg, std):
-		estrus_day = int(start_date + abs(np.random.normal(avg, std)))
+		estrus_cycle = np.random.normal(avg, std)
+		while estrus_cycle < avg - 2 * std or estrus_cycle > avg + 2 * std:
+			estrus_cycle = np.random.normal(avg, std)
+		estrus_day = int(start_date + abs(estrus_cycle))
 		self._events.add_event(estrus_day, estrus_note)
 		return estrus_day
 
@@ -743,6 +746,9 @@ class Cow(HeiferIII):
 				self._days_in_preg = 1
 				self._preg = True
 				self._gestation_length = int(np.random.normal(
+					AnimalBase.config['avg_gestation_len'], AnimalBase.config['std_gestation_len']))
+				while self._gestation_length < AnimalBase.config['avg_gestation_len'] - 2 * AnimalBase.config['std_gestation_len'] or self._gestation_length > AnimalBase.config['avg_gestation_len'] + 2 * AnimalBase.config['std_gestation_len']:
+					self._gestation_length = int(np.random.normal(
 					AnimalBase.config['avg_gestation_len'], AnimalBase.config['std_gestation_len']))
 				self._events.add_event(self._days_born, 'Cow pregnant')
 			else:

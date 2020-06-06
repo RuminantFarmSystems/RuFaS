@@ -14,7 +14,7 @@ import numpy as np
 
 # initial a cow with ID
 class AnimalBase(object):
-	config = []
+	config = {}
 	nutrients = None
 	
 	@staticmethod
