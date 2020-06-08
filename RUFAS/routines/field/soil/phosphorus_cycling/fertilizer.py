@@ -57,8 +57,7 @@ def update_all(soil, fert_app):
     # for the layer at the application depth
     # S.5.B.5/7
     soil.depth_fact = 1.0 - sum_fac
-    soil.soil_layers[last_layer].labile_P += mass * soil.depth_fact * \
-                                             (1.0 - surface_percent)
+    soil.soil_layers[last_layer].labile_P += mass * soil.depth_fact * (1.0 - surface_percent)
 
     # S.B.4
     for layer in soil.soil_layers:
