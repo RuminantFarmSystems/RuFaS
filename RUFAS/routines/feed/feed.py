@@ -83,8 +83,8 @@ class Feed:
         self.growing_feeds = data['growing_feeds']
         self.purchased_feeds = []  # set in the next method call
 
-        self.all_feed_ids = \
-            self.get_all_feed_units(data['purchased_feeds'], data['growing_feeds'])
+        self.all_feed_ids = self.get_all_feed_units(data['purchased_feeds'],
+                                                    data['growing_feeds'])
 
         # dictionary of nutrients needed for this run
         # initially, this only contains information for purchased feeds as none
@@ -406,8 +406,9 @@ class Feed:
             return result
 
         except Exception as e:
-            print(e)
-            print("Exiting.")
+            print("The program has encountered the following exception while"
+                  "connecting to and querying the feed database:", e,
+                  "\nExiting.")
             exit(1)
 
     def get_feeds_split_by_maturity(self):
@@ -430,9 +431,9 @@ class Feed:
             return result
 
         except Exception as e:
-            # todo make these more descriptive
-            print(e)
-            print("Exiting.")
+            print("The program has encountered the following exception while"
+                  "connecting to and querying the feed database:", e,
+                  "\nExiting.")
             exit(1)
 
     def get_purchased_feed_ids(self, entries):
@@ -479,7 +480,9 @@ class Feed:
             return rows[0][0]
 
         except Exception as e:
-            print(e)
+            print("The program has encountered the following exception while"
+                  "connecting to and querying the feed database:", e,
+                  "\nExiting.")
             exit(1)
 
     def add_to_available_feeds(self, new_grown_feeds, DM_list, NDF_list):
@@ -529,6 +532,7 @@ class Feed:
             return nutrient_vals
 
         except Exception as e:
-            print(e)
-            print("Exiting.")
+            print("The program has encountered the following exception while"
+                  "connecting to and querying the feed database:", e,
+                  "\nExiting.")
             exit(1)
