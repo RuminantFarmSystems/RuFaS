@@ -132,6 +132,9 @@ def calc_peak_runoff(soil, weather, time):
 
     R = weather.rainfall[time.year - 1][time.day - 1]
 
+    if R == 0:
+        return 0
+
     # "pseudocode_soil" S.3.A.3
     runoff = soil.runoff
     RC = runoff / R

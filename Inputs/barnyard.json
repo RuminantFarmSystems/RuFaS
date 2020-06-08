@@ -27,7 +27,7 @@
             "soil_summary":
             {
                 "produce_csv": true,
-                "produce_graphics": false,
+                "produce_graphics": true,
 
                 "report_name": "Soil Summary",
                 "file_name": "soil_summary.csv"
