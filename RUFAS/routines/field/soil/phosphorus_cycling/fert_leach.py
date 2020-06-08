@@ -56,15 +56,15 @@ def update_all(soil, weather, time):
 
     # S.5.F.II.1
     if rainfall > 0.0:
-        soil.no_rains += 1
+        soil.num_rains += 1
 
         release_factor = 0
-        if soil.no_rains == 1:
+        if soil.num_rains == 1:
             release_factor = 1
         else:
-            if soil.no_rains == 2:
+            if soil.num_rains == 2:
                 release_factor = 0.4
-            if soil.no_rains > 2:
+            if soil.num_rains > 2:
                 release_factor = 0.075
 
         soil.fert_P_leachate = soil.fert_P_available * release_factor

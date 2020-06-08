@@ -29,7 +29,7 @@ def update_all(soil, fert_app):
     depth = fert_app['depth']
 
     soil.fert_applied_sum += mass
-    soil.no_rains = 0
+    soil.num_rains = 0
     soil.fert_CNT = 1
 
     # At the time of application, 75% of applied fertilizer P is
