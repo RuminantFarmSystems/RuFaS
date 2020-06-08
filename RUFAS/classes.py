@@ -123,7 +123,7 @@ class Config:
 
 
         expected_weather_size += w_end_day
-
+        
         # compares actual size of the file to expected size
         if line != expected_weather_size:
             print("Start and end dates of the Weather CSV file do not match the size.")
@@ -303,7 +303,7 @@ class Weather:
             self.T_max.append([0 for _ in range(len(year))])
             self.T_min.append([0 for _ in range(len(year))])
             self.T_avg.append([0 for _ in range(len(year))])
-            self.biomass.append([0 for _ in range(len(year))])
+            #self.biomass.append([0 for _ in range(len(year))])
             self.radiation.append([0 for _ in range(len(year))])
             self.manureN.append([0 for _ in range(len(year))])  # TODO: manureN is a temporary weather file input until the manure module is linked with the rest of the program
 
@@ -364,7 +364,7 @@ class Weather:
                 self.T_max[year][day - offset] = float(row["high"])
                 self.T_min[year][day - offset] = float(row["low"])
                 self.T_avg[year][day - offset] = float(row["avg"])
-                self.biomass[year][day - offset] = float(row["0"])
+                #self.biomass[year][day - offset] = float(row["0"])
                 self.radiation[year][day - offset] = float(row["Hday"])
                 self.manureN[year][day - offset] = float(row["manureN"])  # TODO: manureN is a temporary weather file input until the manure module is linked with the rest of the program
             except(IndexError, ValueError):
