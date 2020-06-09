@@ -53,6 +53,9 @@ class HeiferII(HeiferI):
 		else:
 			self.init_values(args)
 		
+	'''
+		Initialize repro program values
+	'''
 	def init_values(self, args):
 		self._repro_program = args['repro_program']
 		self._mature_body_weight = 0
@@ -78,6 +81,9 @@ class HeiferII(HeiferI):
 		self._preg = False
 		self._gestation_length = 0
 
+	'''
+		Assign the repro program with given vales
+	'''
 	def assign_heiferII_values(self, args):
 		self._repro_program = args['repro_program']
 		self._mature_body_weight = args['mature_body_weight']
@@ -104,7 +110,7 @@ class HeiferII(HeiferI):
 		self._gestation_length = args['gestation_length']
 
 	'''
-		get current information from the heiferII
+		Get current information from the heiferII
 	'''
 	def get_heiferII_values(self):
 		values = {
