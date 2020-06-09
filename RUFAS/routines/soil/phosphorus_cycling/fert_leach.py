@@ -79,7 +79,7 @@ def update_all(S, weather, time):
     fert_not_leached = S.fert_P_leached
     for layer in S.soil_layers:
 
-        # S.6.B.3
+        # S.5.B.3
         layer.labile_P *= S.area
 
         if S.soil_layers.index(layer) == 0:

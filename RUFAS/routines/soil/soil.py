@@ -277,30 +277,30 @@ class Soil:
         self.area = data['FieldSize']
 
         # Initialize phosphorus variables
-        # "pseudocode_soil" S.6.A
+        # "pseudocode_soil" S.5.A
         for layer in self.soil_layers:
 
-            # S.6.A.1
+            # S.5.A.1
             layer.PSP_max = -0.045 * log(layer.clay) + 0.001 * \
                             layer.labile_P - 0.035 * layer.org_C + 0.43
             layer.PSP_act = max(0.05, min(0.7, layer.PSP_max))
             layer.PSP_avg = layer.PSP_act
 
-            # S.6.A.2
+            # S.5.A.2
             layer.labile_P = layer.labile_P * layer.bulk_density \
                              * layer.thickness_cm * 0.1
 
-            # S.6.A.3
+            # S.5.A.3
             layer.active_P = layer.labile_P * (1.0 - layer.PSP_act) / layer.PSP_act
 
-            # S.6.A.4
+            # S.5.A.4
             layer.stable_P = layer.active_P * 4.0
 
-            # S.6.A.5 TODO organic soil pools (labile_O, and active_O) are not being tracked
+            # S.5.A.5 TODO organic soil pools (labile_O, and active_O) are not being tracked
             layer.org_P = layer.org_C / 8.0 / 14.0 * 10000 * layer.bulk_density \
                           * layer.thickness_cm * 0.1
 
-            # S.6.A.6
+            # S.5.A.6
             layer.mass = layer.bulk_density * layer.thickness_cm * 10000
 
         self.manure_moisture = 0.5
