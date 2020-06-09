@@ -65,7 +65,7 @@ class ManureReport(BaseReportHandler):
     # ---------------------------------------------------------------------------
     # Method: daily_update
     # ---------------------------------------------------------------------------
-    def daily_update(self, pen, weather, time):
+    def daily_update(self, feed, pen, weather, time):
         """Stores the daily values that need to be printed in the report."""
         for variable in self.daily_variables:
             self.daily_variables[variable][2].append(

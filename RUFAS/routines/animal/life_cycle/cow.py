@@ -297,7 +297,10 @@ class Cow(HeiferIII):
 			self.DBW = result[2]
 			self.daily_growth = self.DBW
 		else:
-			self.nutrient_rqmts = dry_calculate_rqmts()
+			result = dry_calculate_rqmts()
+			self.nutrient_rqmts = result[0]
+			self.DMIest = result[1]
+			self.DBW = result[2]
 
 	def calc_init_nutrient_rqmts(
 			self, vertical_distance, horizontal_distance, housing,

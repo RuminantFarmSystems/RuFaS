@@ -61,7 +61,7 @@ class RationReport(BaseReportHandler):
         feed_ids = state.feed.all_feed_ids
         for (feed, units) in feed_ids:
             self.daily_variables[feed] = \
-                ['pen.ration[\'%s\'] if pen.pen_populated else 0' % feed, units,
+                ['pen.ration[\'%s\'] if pen.pen_populated and \'%s\' in feed.available_feeds else 0' % (feed, feed), units,
                  []]
 
         self.write_headers(self.get_fPath(), self.daily_variables)
@@ -71,7 +71,7 @@ class RationReport(BaseReportHandler):
     # ---------------------------------------------------------------------------
     # Method: daily_update
     # ---------------------------------------------------------------------------
-    def daily_update(self, pen, weather, time):
+    def daily_update(self, feed, pen, weather, time):
         """Stores the daily values that need to be printed in the report."""
         for variable in self.daily_variables:
             self.daily_variables[variable][2].append(
