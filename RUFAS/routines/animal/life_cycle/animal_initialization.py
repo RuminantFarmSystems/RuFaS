@@ -38,7 +38,7 @@ class AnimalInitalization:
     animal_id = 0
 
     '''
-        generates an id
+        Generates an id
     '''
     def next_id(self):
         self.animal_id += 1
@@ -71,7 +71,11 @@ class AnimalInitalization:
         
 
     '''
-        Simulate animals to be stored in the database
+        Description:
+            Simulate animals to be stored in the database
+        Inputs:
+            animal_num: number of animals to simulate
+            sim_days: number of days to simulate
     '''
     def init_animals(self, animal_num = 20000, sim_days=3000):
         calves = []
@@ -163,17 +167,18 @@ class AnimalInitalization:
 
     '''
         Description:
-            Take animal values from the database to initialize new animals
+            Get calf values from the database for initialization
         Input:
-            num = number of animals to initialize
+            num: number of calves to initialize
     '''
     def get_calves(self, num):
         calves = []
         conn = sqlite3.connect('Inputs/animals.sqlite')
         cur = conn.cursor()
-        cur.execute('SELECT * FROM calves')
-        for _ in range(num):
-            row = cur.fetchone()
+        while cur.execute('SELECT COUNT() FROM calves').fetchone()[0] < num:
+            self.init_animals()
+        rows = cur.execute('SELECT * FROM calves LIMIT ' + str(num)).fetchall()
+        for row in rows:
             args = {
                 'id': int(row[AnimalValues.id]),
                 'breed': row[AnimalValues.breed],
@@ -189,13 +194,20 @@ class AnimalInitalization:
         conn.close()
         return calves
 
+    '''
+        Description:
+            Get heiferI values from the database for initialization
+        Input:
+            num: number of heiferIs to initialize
+    '''
     def get_heiferIs(self, num):
         heiferIs = []
         conn = sqlite3.connect('Inputs/animals.sqlite')
         cur = conn.cursor()
-        cur.execute('SELECT * FROM heiferIs')
-        for _ in range(num):
-            row = cur.fetchone()
+        while cur.execute('SELECT COUNT() FROM heiferIs').fetchone()[0] < num:
+            self.init_animals()
+        rows = cur.execute('SELECT * FROM heiferIs LIMIT ' + str(num)).fetchall()
+        for row in rows:
             args = {
                 'id': int(row[AnimalValues.id]),
                 'breed': row[AnimalValues.breed],
@@ -211,13 +223,20 @@ class AnimalInitalization:
         conn.close()
         return heiferIs
 
+    '''
+        Description:
+            Get heiferII values from the database for initialization
+        Input:
+            num: number of heiferIIs to initialize
+    '''
     def get_heiferIIs(self, num):
         heiferIIs = []
         conn = sqlite3.connect('Inputs/animals.sqlite')
         cur = conn.cursor()
-        cur.execute('SELECT * FROM heiferIIs')
-        for _ in range(num):
-            row = cur.fetchone()
+        while cur.execute('SELECT COUNT() FROM heiferIIs').fetchone()[0] < num:
+            self.init_animals()
+        rows = cur.execute('SELECT * FROM heiferIIs LIMIT ' + str(num)).fetchall()
+        for row in rows:
             args = {
                 'id': int(row[AnimalValues.id]),
                 'breed': row[AnimalValues.breed],
@@ -236,13 +255,20 @@ class AnimalInitalization:
         conn.close()
         return heiferIIs
 
+    '''
+        Description:
+            Get heiferIII values from the database for initialization
+        Input:
+            num: number of heiferIIIs to initialize
+    '''
     def get_heiferIIIs(self, num):
         heiferIIIs = []
         conn = sqlite3.connect('Inputs/animals.sqlite')
         cur = conn.cursor()
-        cur.execute('SELECT * FROM heiferIIIs')
-        for _ in range(num):
-            row = cur.fetchone()
+        while cur.execute('SELECT COUNT() FROM heiferIIIs').fetchone()[0] < num:
+            self.init_animals()
+        rows = cur.execute('SELECT * FROM heiferIIIs LIMIT ' + str(num)).fetchall()
+        for row in rows:
             args = {
                 'id': int(row[AnimalValues.id]),
                 'breed': row[AnimalValues.breed],
@@ -273,13 +299,20 @@ class AnimalInitalization:
         conn.close()
         return heiferIIIs
 
+    '''
+        Description:
+            Get cow values from the database for initialization
+        Input:
+            num: number of cows to initialize
+    '''
     def get_cows(self, num):
         cows = []
         conn = sqlite3.connect('Inputs/animals.sqlite')
         cur = conn.cursor()
-        cur.execute('SELECT * FROM cows')
-        for _ in range(num):
-            row = cur.fetchone()
+        while cur.execute('SELECT COUNT() FROM cows').fetchone()[0] < num:
+            self.init_animals()
+        rows = cur.execute('SELECT * FROM cows LIMIT ' + str(num)).fetchall()
+        for row in rows:
             args = {
                 'id': int(row[AnimalValues.id]),
                 'breed': row[AnimalValues.breed],
