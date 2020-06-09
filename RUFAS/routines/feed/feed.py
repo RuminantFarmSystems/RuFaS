@@ -11,7 +11,6 @@ Author(s): Kass Chupongstimun, kass_c@hotmail.com,
 """
 ################################################################################
 
-from enum import IntEnum
 from RUFAS.util import DatabaseReader
 import sqlite3
 from . import nitrogen_loss, carbon_loss, protein_degradation
@@ -377,41 +376,15 @@ class Feed:
         # for storage in self.storage_options.values():
         #     storage.reset_storage()
 
-    def get_all_feed_units(self, purchased_feeds, grown_feeds):
-        try:
-            result = []
-            conn = sqlite3.connect(self.__feed_database)
-            conn.row_factory = sqlite3.Row
-            c = conn.cursor()
-
-            combined_feeds = purchased_feeds + grown_feeds
-            query = "SELECT units FROM " + self.__feeds_table + \
-                    " WHERE entry IN " + str(tuple(combined_feeds))
-
-            c.execute(query)
-
-            row = c.fetchone()
-            units = []
-            while row is not None:
-                units.append(dict(row)['units'])
-                row = c.fetchone()
-            self.purchased_feeds = self.get_purchased_feed_ids(purchased_feeds)
-
-            purchased_feeds_str = [str(feed) for feed in self.purchased_feeds]
-            grown_feeds_str = [str(feed) + 'g' for feed in grown_feeds]
-            for feed, unit in zip(purchased_feeds_str + grown_feeds_str, units):
-                result.append((feed, unit))
-
-            conn.close()
-            return result
-
-        except Exception as e:
-            print("The program has encountered the following exception while"
-                  "connecting to and querying the feed database:", e,
-                  "\nExiting.")
-            exit(1)
-
     def get_feeds_split_by_maturity(self):
+        """
+        Returns the feed entries in the database which have different qualities
+        based on nutrient values at harvest. Quits the program if an exception
+        is raised when querying the database.
+
+        Returns: a set-like list of the entries listed in the table which splits
+            feeds by quality
+        """
         try:
             result = []
             conn = sqlite3.connect(self.__feed_database)
@@ -436,7 +409,72 @@ class Feed:
                   "\nExiting.")
             exit(1)
 
+    def get_all_feed_units(self, purchased_feeds, grown_feeds):
+        """
+        Constructs and returns the list of tuples of the feed entries given by
+        the user and their units.  Quits the program if an exception
+        is raised when querying the database.
+
+        Args:
+            purchased_feeds: the list of entries (ints) of feeds that are
+                purchased
+            grown_feeds: the list of entries (ints) of feeds that will be grown
+
+        Returns:
+            a list of tuples of the form (ID, units) for each feed, where
+            - if the feed is purchased, ID is the string form of the ID
+            (e.g. '2')
+            - if the feed is grown, ID is the string form of the ID plus 'g'
+            (e.g. '8g')
+            - units is the string representing the units for the feed
+        """
+        try:
+            result = []
+            conn = sqlite3.connect(self.__feed_database)
+            conn.row_factory = sqlite3.Row
+            c = conn.cursor()
+
+            combined_feeds = purchased_feeds + grown_feeds
+            query = "SELECT units FROM " + self.__feeds_table + \
+                    " WHERE entry IN " + str(tuple(combined_feeds))
+
+            c.execute(query)
+
+            row = c.fetchone()
+            units = []
+            while row is not None:
+                units.append(dict(row)['units'])
+                row = c.fetchone()
+
+            self.purchased_feeds = self.get_purchased_feed_ids(purchased_feeds)
+
+            purchased_feeds_str = [str(feed) for feed in self.purchased_feeds]
+            grown_feeds_str = [str(feed) + 'g' for feed in grown_feeds]
+            for feed, unit in zip(purchased_feeds_str + grown_feeds_str, units):
+                result.append((feed, unit))
+
+            conn.close()
+            return result
+
+        except Exception as e:
+            print("The program has encountered the following exception while"
+                  "connecting to and querying the feed database:", e,
+                  "\nExiting.")
+            exit(1)
+
     def get_purchased_feed_ids(self, entries):
+        """
+        Constructs and returns a list of the purchased feed IDs based on
+        whether the quality of each feed can be determined at harvest. Quits
+        the program if an exception is raised when querying the database.
+
+        Args:
+            entries: the purchased feed entries
+
+        Returns:
+            a list of the feed IDs that can be used to find nutrient values in
+            the nutrients table
+        """
         purchased_feed_ids = []
         for entry in entries:
             if entry in self.entries_split_by_maturity:
@@ -447,6 +485,23 @@ class Feed:
         return purchased_feed_ids
 
     def get_feed_id(self, grown_feed_entry, DM, NDF):
+        """
+        First queries the database to find which nutrient must be used to find
+        the quality of the feed, then uses the feed's value for that nutrient
+        to find the quality by finding which range it belongs to. Returns
+        the feed ID associated with that quality. Quits the program if an
+        exception is raised when querying the database.
+
+        Args:
+            grown_feed_entry: the entry of the feed that needs to be added to
+                available_feeds
+            DM: the dry matter percentage
+            NDF: the NDF percentage
+
+        Returns: the feed ID corresponding to the appropriate quality of the
+        grown_feed_entry according to its specific differentiating nutrient
+        """
+        # round both values to the nearest integer
         rounded_DM = round(DM)
         rounded_NDF = round(NDF)
         try:
@@ -486,6 +541,20 @@ class Feed:
             exit(1)
 
     def add_to_available_feeds(self, new_grown_feeds, DM_list, NDF_list):
+        """
+        Appends the nutrient values of new_grown_feeds to the available_feeds
+        dictionary according to their quality (if applicable). If a feed is
+        not split by quality, then the values at the respective indices of
+        DM_list and NDF_list are ignored.
+
+        Args:
+            new_grown_feeds: the list of feed entries to be added to
+                available_feeds with nutrient values based on their quality
+            DM_list: the list of dry matter percentages for each feed in
+                new_grown_feeds (indices match up)
+            NDF_list: the list of NDF percentages for each feed in
+                new_grown_feeds (indices match up)
+        """
         new_feed_ids = []
         for i, new_feed in enumerate(new_grown_feeds):
             if new_feed in self.entries_split_by_maturity:
@@ -496,13 +565,41 @@ class Feed:
         self.available_feeds.update(self.get_nutrient_vals(new_feed_ids, True))
 
     def update_available_feed(self, feed_id, nutrient, new_val):
+        """
+        Updates the dictionary of available feeds with a particular nutrient
+        value.
+
+        Args:
+            feed_id: the ID of the feed to be modified
+            nutrient: the nutrient to be modified
+            new_val: the new value of the nutrient
+        """
         self.available_feeds[feed_id][nutrient] = new_val
 
     def remove_from_available_feeds(self, feeds_to_be_removed):
+        """
+        Removes the IDs in feeds_to_be_removed from available_feeds.
+
+        Args:
+            feeds_to_be_removed: a list of feed IDs
+        """
         for feed_id in feeds_to_be_removed:
             self.available_feeds.pop(feed_id)
 
     def get_nutrient_vals(self, feed_ids, is_grown):
+        """
+        Constructs and returns the dictionary of nutrient values for the feeds
+        represented by feed_ids. Quits the program if an exception
+        is raised when querying the database.
+
+        Args:
+            feed_ids: list of feed IDs
+            is_grown: boolean - true if the feeds represented by feed_ids are
+                grown, false if purchased
+
+        Returns: a dictionary where the keys are the the feed identifiers and
+        the values are nutrient dictionaries
+        """
         try:
             nutrient_vals = {}
             conn = sqlite3.connect(self.__feed_database)
