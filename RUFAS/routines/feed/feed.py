@@ -78,6 +78,8 @@ class Feed:
         self.__feed_quality_table = 'feed_quality'
         self.__nutrient_table = 'nutrients'
 
+        self.db_reader = DatabaseReader(self.__feed_database)
+
         self.entries_split_by_maturity = self.get_feeds_split_by_maturity()
         self.growing_feeds = data['growing_feeds']
         self.purchased_feeds = []  # set in the next method call
@@ -93,6 +95,8 @@ class Feed:
 
         # The nutrient requirements used in the ration calculations.
         self.nutrient_rqmts = ['FU', 'RU', 'ME_DM', 'RDP_DM', 'RUP_DM']
+
+        self.get_feed_id(34, 40, 5)
 
         self.storage_options = {}
 
@@ -385,29 +389,10 @@ class Feed:
         Returns: a set-like list of the entries listed in the table which splits
             feeds by quality
         """
-        try:
-            result = []
-            conn = sqlite3.connect(self.__feed_database)
-            conn.row_factory = sqlite3.Row
-            c = conn.cursor()
-
-            query = "SELECT DISTINCT entry FROM " + self.__feed_quality_table
-
-            c.execute(query)
-
-            row = c.fetchone()
-            while row is not None:
-                result.append(dict(row)['entry'])
-                row = c.fetchone()
-
-            conn.close()
-            return result
-
-        except Exception as e:
-            print("The program has encountered the following exception while"
-                  "connecting to and querying the feed database:", e,
-                  "\nExiting.")
-            exit(1)
+        column = 'entry'
+        dict_list = self.db_reader.get_values(self.__feed_quality_table,
+                                              distinct=True, cols=[column])
+        return [result[column] for result in dict_list]
 
     def get_all_feed_units(self, purchased_feeds, grown_feeds):
         """
@@ -428,39 +413,22 @@ class Feed:
             (e.g. '8g')
             - units is the string representing the units for the feed
         """
-        try:
-            result = []
-            conn = sqlite3.connect(self.__feed_database)
-            conn.row_factory = sqlite3.Row
-            c = conn.cursor()
+        column = 'units'
+        all_feeds = purchased_feeds + grown_feeds
+        dict_list = self.db_reader.get_values(self.__feeds_table, cols=[column],
+                                              identifier='entry',
+                                              desired_rows=tuple(all_feeds))
+        units = [result[column] for result in dict_list]
 
-            combined_feeds = purchased_feeds + grown_feeds
-            query = "SELECT units FROM " + self.__feeds_table + \
-                    " WHERE entry IN " + str(tuple(combined_feeds))
+        self.purchased_feeds = self.get_purchased_feed_ids(purchased_feeds)
 
-            c.execute(query)
+        purchased_feeds_str = [str(feed) for feed in self.purchased_feeds]
+        grown_feeds_str = [str(feed) + 'g' for feed in grown_feeds]
+        result = []
+        for feed, unit in zip(purchased_feeds_str + grown_feeds_str, units):
+            result.append((feed, unit))
 
-            row = c.fetchone()
-            units = []
-            while row is not None:
-                units.append(dict(row)['units'])
-                row = c.fetchone()
-
-            self.purchased_feeds = self.get_purchased_feed_ids(purchased_feeds)
-
-            purchased_feeds_str = [str(feed) for feed in self.purchased_feeds]
-            grown_feeds_str = [str(feed) + 'g' for feed in grown_feeds]
-            for feed, unit in zip(purchased_feeds_str + grown_feeds_str, units):
-                result.append((feed, unit))
-
-            conn.close()
-            return result
-
-        except Exception as e:
-            print("The program has encountered the following exception while"
-                  "connecting to and querying the feed database:", e,
-                  "\nExiting.")
-            exit(1)
+        return result
 
     def get_purchased_feed_ids(self, entries):
         """
@@ -504,41 +472,34 @@ class Feed:
         # round both values to the nearest integer
         rounded_DM = round(DM)
         rounded_NDF = round(NDF)
-        try:
-            conn = sqlite3.connect(self.__feed_database)
-            conn.row_factory = sqlite3.Row
-            c = conn.cursor()
+        column = 'differentiating_nutrient'
+        dict_list = self.db_reader.get_values(self.__feed_quality_table,
+                                              distinct=True, cols=[column],
+                                              identifier='entry',
+                                              desired_rows=(grown_feed_entry,))
+        nutrient = dict_list[0][column]
 
-            nutrient_query = "SELECT DISTINCT differentiating_nutrient FROM " \
-                             + self.__feed_quality_table + \
-                             " WHERE entry = " + str(grown_feed_entry)
-
-            c.execute(nutrient_query)
-            rows = c.fetchall()
-
-            nutrient = rows[0][0]
-
-            if nutrient == 'DM':
-                query = "SELECT quality_id FROM " + self.__feed_quality_table \
-                        + " WHERE entry = " + str(grown_feed_entry) + \
-                        " AND low_percent <= " + str(rounded_DM) + \
-                        " AND high_percent >= " + str(rounded_DM)
-            else:
-                query = "SELECT quality_id FROM " + self.__feed_quality_table \
-                        + " WHERE entry = " + str(grown_feed_entry) + \
-                        " AND low_percent <= " + str(rounded_NDF) + \
-                        " AND high_percent >= " + str(rounded_NDF)
-
-            c.execute(query)
-            rows = c.fetchall()
-
-            return rows[0][0]
-
-        except Exception as e:
-            print("The program has encountered the following exception while"
-                  "connecting to and querying the feed database:", e,
-                  "\nExiting.")
-            exit(1)
+        column = 'quality_id'
+        rounded_nutrient = rounded_DM if nutrient == 'DM' else rounded_NDF
+        # TODO make some optional?
+        dict_list = self.db_reader.get_values_range(self.__feed_quality_table,
+                                                    [column], 'entry',
+                                                    str(grown_feed_entry),
+                                                    'low_percent',
+                                                    'high_percent',
+                                                    str(rounded_nutrient))
+        if nutrient == 'DM':
+            query = "SELECT quality_id FROM " + self.__feed_quality_table \
+                    + " WHERE entry = " + str(grown_feed_entry) + \
+                    " AND low_percent <= " + str(rounded_DM) + \
+                    " AND high_percent >= " + str(rounded_DM)
+        else:
+            query = "SELECT quality_id FROM " + self.__feed_quality_table \
+                    + " WHERE entry = " + str(grown_feed_entry) + \
+                    " AND low_percent <= " + str(rounded_NDF) + \
+                    " AND high_percent >= " + str(rounded_NDF)
+        # return rows[0][0]
+        pass
 
     def add_to_available_feeds(self, new_grown_feeds, DM_list, NDF_list):
         """
@@ -600,36 +561,17 @@ class Feed:
         Returns: a dictionary where the keys are the the feed identifiers and
         the values are nutrient dictionaries
         """
-        try:
-            nutrient_vals = {}
-            conn = sqlite3.connect(self.__feed_database)
-            conn.row_factory = sqlite3.Row
-            c = conn.cursor()
+        dict_list = self.db_reader.get_values(self.__nutrient_table,
+                                              identifier='feed_id',
+                                              desired_rows=tuple(feed_ids))
+        nutrient_vals = {}
+        for dictionary in dict_list:
+            feed_id = dictionary['feed_id']
+            # the key in the available_feeds dictionary has a 'g' as the
+            # suffix if it is a grown feed
+            feed_key = str(feed_id)
 
-            query = "SELECT * FROM " + self.__nutrient_table + \
-                    " WHERE feed_id IN " + str(tuple(feed_ids))
+            if is_grown:
+                feed_key += 'g'
 
-            c.execute(query)
-
-            row = c.fetchone()
-            while row is not None:
-                vals = dict(row)
-                feed_id = vals['feed_id']
-
-                # the key in the available_feeds dictionary has a 'g' as the
-                # suffix if it is a grown feed
-                feed_key = str(feed_id)
-                if is_grown:
-                    feed_key += 'g'
-
-                nutrient_vals[feed_key] = vals
-                row = c.fetchone()
-
-            conn.close()
-            return nutrient_vals
-
-        except Exception as e:
-            print("The program has encountered the following exception while"
-                  "connecting to and querying the feed database:", e,
-                  "\nExiting.")
-            exit(1)
+            nutrient_vals[feed_key] = dictionary
