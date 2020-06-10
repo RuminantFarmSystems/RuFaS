@@ -87,8 +87,7 @@ def update_all(soil, crop, weather, time):
 #
 def calc_Tsoil(soil, weather, time):
     L = 0.8
-    # Taair = weather.T_avg_annual[time.year-1]
-    Taair = 8.18  # TODO: spreadsheet model fix. Note in pseudocode
+    Taair = 8.18  # TODO: Taair will be pulled from the weather database. This is a temp fix.
     dd = calc_dd(soil)
     for x in range(len(soil.soil_layers)):
 
@@ -180,7 +179,7 @@ def calc_Tsurf(soil, crop, weather, time):
 # "pseudocode_soil" S.1.A.7
 #
 def calc_Tbare(soil, crop, weather, time):
-    Tav = weather.T_avg[time.year-1][time.day-1]
+    Tav = weather.T_avg[time.year - 1][time.day - 1]
     radiate = calc_radiate(soil, crop, weather, time)
 
     return Tav + radiate * Tav
@@ -191,7 +190,7 @@ def calc_Tbare(soil, crop, weather, time):
 # "pseudocode_soil" S.1.A.8
 #
 def calc_radiate(soil, crop, weather, time):
-    Hday = weather.radiation[time.year-1][time.day-1]
+    Hday = weather.radiation[time.year - 1][time.day - 1]
     albedo = calc_albedo(soil, crop)
 
     return (Hday * (1 - albedo) - 14) / 20

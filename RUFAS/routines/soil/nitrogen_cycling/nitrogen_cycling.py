@@ -194,6 +194,7 @@ def calc_water_factors(soil):
 
         layer.water_fac = water_fac
 
+
 def added_manure_N(soil, weather, time):
     totalN = weather.manureN[time.year - 1][time.day - 1]
 
