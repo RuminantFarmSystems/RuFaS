@@ -3,6 +3,7 @@
 RUFAS: Ruminant Farm Systems Model
 File name: lactating_cow_ration_NLP.py
 <<<<<<< HEAD
+<<<<<<< HEAD
 Description: Calculates the ration for lactating cows using a Non-Linear
     programming method utilizing the scipy package. The NLP is formulated using
     constraint functions. Note NLP (Non-linear Program) will be used throughout
@@ -13,10 +14,15 @@ Author(s):
 Description: Calculates the ration for lactating cows using a NLP solver.
 Author(s): Chris VanKerkhove, cjv47@cornell.edu
 >>>>>>> Creating NLP Cow Ration File
+=======
+Description: Calculates the ration for lactating cows using a NLP solver.
+Author(s): Chris VanKerkhove, cjv47@cornell.edu
+>>>>>>> Creating NLP Cow Ration File
 """
 ################################################################################
 import numpy as np
 from scipy.optimize import minimize
+<<<<<<< HEAD
 <<<<<<< HEAD
 #from RUFAS.routines.feed.feed import Feed
 
@@ -457,6 +463,8 @@ print(solution.success)
 rounded = [round(num, 2) for num in solution.x]
 print(rounded)
 =======
+=======
+>>>>>>> Creating NLP Cow Ration File
 
 
 #retreiving decision variables (feeds) from the feed library
@@ -494,4 +502,7 @@ x = solution.x
 
 print(x)
 print(objective(x))
+<<<<<<< HEAD
+>>>>>>> Creating NLP Cow Ration File
+=======
 >>>>>>> Creating NLP Cow Ration File
