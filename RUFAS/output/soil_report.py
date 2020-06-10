@@ -1,7 +1,7 @@
 ################################################################################
 """
 RUFAS: Ruminant Farm Systems Model
-File name: soil_summary.py
+File name: soil_report.py
 Description:
 Author(s): Kass Chupongstimun, kass_c@hotmail.com
            Jit Patil, spatil5@wisc.edu
@@ -16,10 +16,10 @@ from RUFAS.output.graphics import daily_graphics, annual_graphics
 
 
 # -------------------------------------------------------------------------------
-# Class: SoilSummary
-# Creates and prints to the file soil_summary.csv
+# Class: SoilReport
+# Creates and prints to the file soil_report.csv
 # -------------------------------------------------------------------------------
-class SoilSummary(BaseReportHandler):
+class SoilReport(BaseReportHandler):
 
     def __init__(self, data):
 

@@ -97,4 +97,4 @@ def update_all(S, weather, time):
 
     # add fertilizer P leached and in runoff to running total
     S.fert_P_runoff_annual += S.fert_P_runoff_act
-    S.fert_P_leachate_annual += S.fert_P_leach
+    S.fert_P_leachate_annual += S.fert_P_leached

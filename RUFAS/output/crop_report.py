@@ -1,7 +1,7 @@
 ################################################################################
 """
 RUFAS: Ruminant Farm Systems Model
-File name: crop_summary.py
+File name: crop_report.py
 Description:
 Author(s): William Donovan, wmdonovan@wisc.edu
            Jacob Johnson, jacob8399@gmail.com
@@ -13,7 +13,7 @@ from RUFAS.output.graphics import daily_graphics, annual_graphics
 from RUFAS.output.report_handler import BaseReportHandler
 
 
-class CropSummary(BaseReportHandler):
+class CropReport(BaseReportHandler):
 
     def __init__(self, data):
 

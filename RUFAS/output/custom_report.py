@@ -15,7 +15,7 @@ from RUFAS.output.report_handler import BaseReportHandler
 
 
 # -------------------------------------------------------------------------------
-# Class: SoilSummary
+# Class: SoilReport
 # Creates and prints to the file water_balance.csv
 # -------------------------------------------------------------------------------
 class CustomReport(BaseReportHandler):

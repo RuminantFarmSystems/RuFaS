@@ -17,9 +17,9 @@ from RUFAS.output.report_handler import BaseReportHandler
 #
 # Import report handlers here
 #
-from RUFAS.output.soil_summary import SoilSummary
+from RUFAS.output.soil_report import SoilReport
 from RUFAS.output.soil_nitrogen import SoilNitrogen
-from RUFAS.output.crop_summary import CropSummary
+from RUFAS.output.crop_report import CropReport
 from RUFAS.output.feed_storage import FeedStorage
 from RUFAS.output.water_balance import WaterBalance
 from RUFAS.output.custom_report import CustomReport
@@ -62,10 +62,10 @@ class OutputHandler:
         # Instantiate Report Handler Objects here
         self.reports = {
                         # 'farm_summary': FarmSummary(data['farm_summary']),
-                        'soil_summary': SoilSummary(data['soil_summary']),
+                        'soil_report': SoilReport(data['soil_report']),
                         'soil_nitrogen': SoilNitrogen(data['soil_nitrogen']),
                         'soil_phosphorus': SoilPhosphorus(data['soil_phosphorus']),
-                        'crop_summary': CropSummary(data['crop_summary']),
+                        'crop_report': CropReport(data['crop_report']),
                         'feed_storage': FeedStorage(data['feed_storage']),
                         'water_balance': WaterBalance(data['water_balance']),
                         'custom_report': CustomReport(data['custom_report'])

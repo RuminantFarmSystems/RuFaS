@@ -706,7 +706,8 @@ class Feed:
                         tot_req_inv_nl_cows += storage.inclusion_rate_est[animal]
 
                 available_forage = storage.DM - tot_req_inv_nl_cows
-                storage.DMI_forage_max['lactating_cows'] = available_forage / storage.cow_days['lactating_cows']
+                if storage.cow_days['lactating_cows'] > 0:
+                    storage.DMI_forage_max['lactating_cows'] = available_forage / storage.cow_days['lactating_cows']
 
             else:
                 while round(tot_req_inv) > round(storage.DM):
@@ -801,7 +802,7 @@ class Feed:
         self.CP_loss = 0.0
 
         # TODO: method for resetting storage allocation. Makes use of reset_storage helper method.
-        #  Similar structure should be used in feed out
+        #  Similar structure should be used when feed out is implemented
         # for storage in self.storage_options.values():
         #     storage.reset_storage()
         #

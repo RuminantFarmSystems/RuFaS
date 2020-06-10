@@ -222,7 +222,7 @@ def calc_bcv(crop, time):
     bcv = CV / (CV + exp_part)
 
     SNOW = 0
-    # TODO: these time ranges for snowfall are taken from the barnyard spreadsheet model and seem largely arbitrary
+    # TODO: these are rough time ranges for snowfall in WI. They are taken from the barnyard spreadsheet model
     if time.day > 335 or time.day < 59:
         albedo_snow = 0.8
         SNOW = 10 * albedo_snow

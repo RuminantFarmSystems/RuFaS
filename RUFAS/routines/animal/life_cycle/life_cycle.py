@@ -488,7 +488,6 @@ class LifeCycleManager:
         print(self.cows[150])
         self.cows[150].draw_curves()
 
-
     def draw_stat(self, sim_length):
         '''
         Plots the ending statistics of the simulation.

@@ -44,13 +44,13 @@
                 "file_name": "growth_report.csv"
             }
         },
-        "soil_summary":
+        "soil_report":
         {
             "produce_csv": true,
             "produce_graphics": false,
             "display_graphics": false,
             "report_name": "Soil Summary",
-            "file_name": "soil_summary.csv"
+            "file_name": "soil_report.csv"
         },
         "soil_nitrogen":
         {
@@ -68,13 +68,13 @@
             "report_name": "Soil Phosphorus",
             "file_name": "soil_phosphorus.csv"
         },
-        "crop_summary":
+        "crop_report":
         {
             "produce_csv": true,
             "produce_graphics": false,
             "display_graphics": false,
             "report_name": "Crop Summary",
-            "file_name": "crop_summary.csv"
+            "file_name": "crop_report.csv"
         },
         "water_balance":
         {

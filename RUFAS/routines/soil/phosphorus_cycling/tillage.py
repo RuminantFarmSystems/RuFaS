@@ -48,7 +48,8 @@ def update_all(S, time):
                     S.fert_P_available = S.fert_P_available - (S.fert_P_available * till_app.percent_incorporated[x])
                     S.fert_P_released = S.fert_P_released - (S.fert_P_released * till_app.percent_incorporated[x])
 
-                    # S.5.D.3 TODO: RuFaS does not track org P (03.19.20). When it does, WOP/SOP will be incorporated into organic pools
+                    # S.5.D.3
+                    # TODO: RuFaS does not track org P (03.19.20). WOP/SOP will be incorporated into organic pools
                     layer.labile_P += till_app.percent_incorporated[x] * S.WIP
                     layer.active_P += till_app.percent_incorporated[x] * S.SIP
 
