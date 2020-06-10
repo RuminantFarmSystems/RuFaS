@@ -53,7 +53,7 @@ class FieldManagement:
                 'day': -1,
                 'percent_incorporated': 0.8,
                 'percent_mixed': 0.6,
-                'depth': 25.0
+                'depth': 250.0
             }
         }
 
