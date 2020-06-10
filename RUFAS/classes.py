@@ -231,13 +231,13 @@ class Config:
         self.diagnostic_dir = data['diagnostic_dir']
 
     def calc_sim_length(self, leap_year_length, year_length):
-        '''
+        """
         Calculates and returns the length of the simulation in days.
-        '''
+        """
         sim_length = 0
         for i in range(len(self.years)):
             if i == 0:
-                #check for +-1
+                # check for leap year
                 if is_leap_year(self.start_year):
                     sim_length += leap_year_length - self.start_day
                 else:
@@ -246,6 +246,8 @@ class Config:
                 sim_length += len(self.years[i])
                 
         return sim_length + 1
+
+
 # -------------------------------------------------------------------------------
 # Class: Weather
 # -------------------------------------------------------------------------------
@@ -262,18 +264,9 @@ class Weather:
         self.T_max = []
         self.T_min = []
         self.T_avg = []
-        self.biomass = []
         self.radiation = []
-        self.manureN = []  # TODO: manureN is a temporary weather file input until the manure module is linked with the rest of the program
-        self.T_avg_annual = []
-
-        self.evaporation = []
-        self.lCows = []
-        self.dCows = []
-        self.heifer = []
-        self.calf = []
-        self.beef = []
-        self.beefCalf = []
+        self.manureN = []
+        # TODO: manureN is a temporary weather file input until the manure module is implemented
 
         year_length = 365
         leap_year_length = 366
@@ -307,19 +300,9 @@ class Weather:
             self.T_max.append([0 for _ in range(len(year))])
             self.T_min.append([0 for _ in range(len(year))])
             self.T_avg.append([0 for _ in range(len(year))])
-            self.biomass.append([0 for _ in range(len(year))])
             self.radiation.append([0 for _ in range(len(year))])
-            self.manureN.append([0 for _ in range(len(year))])  # TODO: manureN is a temporary weather file input until the manure module is linked with the rest of the program
-
-            # These are not currently inputs into the weather file. They may
-            # be/may have been at some point.
-            # self.evaporation.append([0 for _ in range(len(year))])
-            # self.lCows.append([0 for _ in range(len(year))])
-            # self.dCows.append([0 for _ in range(len(year))])
-            # self.heifer.append([0 for _ in range(len(year))])
-            # self.calf.append([0 for _ in range(len(year))])
-            # self.beef.append([0 for _ in range(len(year))])
-            # self.beefCalf.append([0 for _ in range(len(year))])
+            self.manureN.append([0 for _ in range(len(year))])
+            # TODO: manureN is a temporary weather file input until manure storage is implemented
 
         # read in the input csv file
         weather_full_path = util.get_base_dir() / weather_path_str
@@ -364,9 +347,10 @@ class Weather:
                         self.T_max[year][day - offset] = float(row[3])
                         self.T_min[year][day - offset] = float(row[4])
                         self.T_avg[year][day - offset] = float(row[5])
-                        self.biomass[year][day - offset] = float(row[6])
-                        self.radiation[year][day - offset] = float(row[7])
-                        self.manureN[year][day - offset] = float(row[8])  # TODO: manureN is a temporary weather file input until the manure module is linked with the rest of the program
+                        self.radiation[year][day - offset] = float(row[6])
+                        self.manureN[year][day - offset] = float(row[7])
+                        # TODO: manureN is a temporary weather file input until the manure module is implemented
+
                     except(IndexError, ValueError):
                         # prints out each problematic row in the weather CSV file
                         skips += 1
@@ -391,11 +375,6 @@ class Weather:
             if skips > 5:
                 print("Only printing first 5 invalid rows, there are " + str(skips)
                       + " total invalid rows")
-
-            # calculates T_avg_annual for each year
-            for i in range(len(years)):
-                avg = sum(self.T_avg[i]) / (len(years[i]))
-                self.T_avg_annual.append(avg)
 
 
 # Class: Time
