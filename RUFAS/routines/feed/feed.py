@@ -12,7 +12,6 @@ Author(s): Kass Chupongstimun, kass_c@hotmail.com,
 ################################################################################
 
 from RUFAS.util import DatabaseReader
-import sqlite3
 from . import nitrogen_loss, carbon_loss, protein_degradation
 
 
@@ -95,8 +94,6 @@ class Feed:
 
         # The nutrient requirements used in the ration calculations.
         self.nutrient_rqmts = ['FU', 'RU', 'ME_DM', 'RDP_DM', 'RUP_DM']
-
-        self.get_feed_id(34, 40, 5)
 
         self.storage_options = {}
 
@@ -383,22 +380,20 @@ class Feed:
     def get_feeds_split_by_maturity(self):
         """
         Returns the feed entries in the database which have different qualities
-        based on nutrient values at harvest. Quits the program if an exception
-        is raised when querying the database.
+        based on nutrient values at harvest.
 
-        Returns: a set-like list of the entries listed in the table which splits
-            feeds by quality
+        Returns: a set-like list (no duplicates) of the entries listed in the
+            table which splits feeds by quality
         """
         column = 'entry'
-        dict_list = self.db_reader.get_values(self.__feed_quality_table,
-                                              distinct=True, cols=[column])
+        dict_list = self.db_reader.query(self.__feed_quality_table,
+                                         distinct=True, cols=[column])
         return [result[column] for result in dict_list]
 
     def get_all_feed_units(self, purchased_feeds, grown_feeds):
         """
         Constructs and returns the list of tuples of the feed entries given by
-        the user and their units.  Quits the program if an exception
-        is raised when querying the database.
+        the user and their units.
 
         Args:
             purchased_feeds: the list of entries (ints) of feeds that are
@@ -412,12 +407,13 @@ class Feed:
             - if the feed is grown, ID is the string form of the ID plus 'g'
             (e.g. '8g')
             - units is the string representing the units for the feed
+            (e.g. 'kg')
         """
         column = 'units'
         all_feeds = purchased_feeds + grown_feeds
-        dict_list = self.db_reader.get_values(self.__feeds_table, cols=[column],
-                                              identifier='entry',
-                                              desired_rows=tuple(all_feeds))
+        dict_list = self.db_reader.query(self.__feeds_table, cols=[column],
+                                         identifier='entry',
+                                         desired_rows=tuple(all_feeds))
         units = [result[column] for result in dict_list]
 
         self.purchased_feeds = self.get_purchased_feed_ids(purchased_feeds)
@@ -433,8 +429,7 @@ class Feed:
     def get_purchased_feed_ids(self, entries):
         """
         Constructs and returns a list of the purchased feed IDs based on
-        whether the quality of each feed can be determined at harvest. Quits
-        the program if an exception is raised when querying the database.
+        whether the quality of each feed can be determined at harvest.
 
         Args:
             entries: the purchased feed entries
@@ -457,8 +452,7 @@ class Feed:
         First queries the database to find which nutrient must be used to find
         the quality of the feed, then uses the feed's value for that nutrient
         to find the quality by finding which range it belongs to. Returns
-        the feed ID associated with that quality. Quits the program if an
-        exception is raised when querying the database.
+        the feed ID associated with that quality.
 
         Args:
             grown_feed_entry: the entry of the feed that needs to be added to
@@ -473,33 +467,22 @@ class Feed:
         rounded_DM = round(DM)
         rounded_NDF = round(NDF)
         column = 'differentiating_nutrient'
-        dict_list = self.db_reader.get_values(self.__feed_quality_table,
-                                              distinct=True, cols=[column],
-                                              identifier='entry',
-                                              desired_rows=(grown_feed_entry,))
+        dict_list = self.db_reader.query(self.__feed_quality_table,
+                                         distinct=True, cols=[column],
+                                         identifier='entry',
+                                         desired_rows=(grown_feed_entry,))
         nutrient = dict_list[0][column]
 
         column = 'quality_id'
         rounded_nutrient = rounded_DM if nutrient == 'DM' else rounded_NDF
-        # TODO make some optional?
-        dict_list = self.db_reader.get_values_range(self.__feed_quality_table,
-                                                    [column], 'entry',
-                                                    str(grown_feed_entry),
-                                                    'low_percent',
-                                                    'high_percent',
-                                                    str(rounded_nutrient))
-        if nutrient == 'DM':
-            query = "SELECT quality_id FROM " + self.__feed_quality_table \
-                    + " WHERE entry = " + str(grown_feed_entry) + \
-                    " AND low_percent <= " + str(rounded_DM) + \
-                    " AND high_percent >= " + str(rounded_DM)
-        else:
-            query = "SELECT quality_id FROM " + self.__feed_quality_table \
-                    + " WHERE entry = " + str(grown_feed_entry) + \
-                    " AND low_percent <= " + str(rounded_NDF) + \
-                    " AND high_percent >= " + str(rounded_NDF)
-        # return rows[0][0]
-        pass
+        dict_list = self.db_reader.query(self.__feed_quality_table,
+                                         cols=[column], identifier='entry',
+                                         desired_rows=(str(grown_feed_entry),),
+                                         compare_val=str(rounded_nutrient),
+                                         low_col='low_percent',
+                                         high_col='high_percent',)
+
+        return dict_list[0][column]
 
     def add_to_available_feeds(self, new_grown_feeds, DM_list, NDF_list):
         """
@@ -531,7 +514,8 @@ class Feed:
         value.
 
         Args:
-            feed_id: the ID of the feed to be modified
+            feed_id: string - the ID of the feed to be modified (string should
+                end in 'g' if it is a grown feed
             nutrient: the nutrient to be modified
             new_val: the new value of the nutrient
         """
@@ -550,8 +534,7 @@ class Feed:
     def get_nutrient_vals(self, feed_ids, is_grown):
         """
         Constructs and returns the dictionary of nutrient values for the feeds
-        represented by feed_ids. Quits the program if an exception
-        is raised when querying the database.
+        represented by feed_ids.
 
         Args:
             feed_ids: list of feed IDs
@@ -561,9 +544,9 @@ class Feed:
         Returns: a dictionary where the keys are the the feed identifiers and
         the values are nutrient dictionaries
         """
-        dict_list = self.db_reader.get_values(self.__nutrient_table,
-                                              identifier='feed_id',
-                                              desired_rows=tuple(feed_ids))
+        dict_list = self.db_reader.query(self.__nutrient_table,
+                                         identifier='feed_id',
+                                         desired_rows=tuple(feed_ids))
         nutrient_vals = {}
         for dictionary in dict_list:
             feed_id = dictionary['feed_id']
@@ -575,3 +558,5 @@ class Feed:
                 feed_key += 'g'
 
             nutrient_vals[feed_key] = dictionary
+
+        return nutrient_vals
