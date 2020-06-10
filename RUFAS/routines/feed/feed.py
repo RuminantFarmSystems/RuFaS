@@ -73,9 +73,9 @@ class Feed:
             data: the feed information from the input JSON file
         """
         self.__feed_database = data["feed_database"]
-        self.__feeds_table = 'user_feeds'
-        self.__feed_quality_table = 'feed_quality'
-        self.__nutrient_table = 'nutrients'
+        self.__feeds_table = data['feeds_table']
+        self.__feed_quality_table = data['feed_quality_table']
+        self.__nutrient_table = data['nutrient_table']
 
         self.db_reader = DatabaseReader(self.__feed_database)
 

@@ -475,7 +475,7 @@
         "feed":
         {
             "feed_database": "Inputs/feeds.sqlite",
-            "feeds_table": "feeds",
+            "feeds_table": "user_feeds",
             "feed_quality_table": "feed_quality",
             "nutrient_table": "nutrients",
 
