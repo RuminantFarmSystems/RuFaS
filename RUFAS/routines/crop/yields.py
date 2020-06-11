@@ -144,6 +144,7 @@ def calc_residue(crop_type, time, soil):
 # "pseudocode_crop" C.10.G.4
 #
 def kill(crop_type):
+
     crop_type.accumulated_HU = 0
     crop_type.prev_accumulated_HU = 0
 
