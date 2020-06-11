@@ -96,6 +96,7 @@ def calc_potential_evap(soil, crop, weather, time):
 
     soil.ET_max = max(0.001, ET_max)
 
+
 #
 # Calculates LHV (latent heat of vaporization (MJ kg^-1)) for use in
 # determining potential evapotranspiration

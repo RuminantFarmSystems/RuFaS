@@ -190,13 +190,12 @@ def daily_soil_routine(soil, crop, weather, time):
     phosphorus_cycle.update_all(soil, weather, time)
 
     # TODO: Not currently implemented
-    carbon_cycle.update_all()
+    carbon_cycle.update_all(soil)
 
     annual_variable_update(soil)
 
 
 def annual_variable_update(soil):
-
     soil.ET_max_annual += soil.ET_max
 
     soil.drainage_annual += soil.drainage
@@ -283,7 +282,6 @@ class Soil:
         # Initialize phosphorus variables
         # "pseudocode_soil" S.6.A
         for layer in self.soil_layers:
-
             # S.6.A.1
             layer.PSP_max = -0.045 * log(layer.clay) + 0.001 * \
                             layer.labile_P - 0.035 * layer.org_C + 0.43
@@ -423,7 +421,7 @@ class Soil:
         self.enrichment_P = 0.0
         self.runoff_conc = 0.0
 
-        # daily soil nitrogen values
+        # soil nitrogen attributes
         self.residue = data['initial_residue']
         self.freshNMineralRate = data['FreshNMineralRate']
         self.decayRate = 0.0
@@ -454,6 +452,10 @@ class Soil:
         self.NO3_drainage_annual = 0.0
         self.NH4_drainage_annual = 0.0
         self.activeN_drainage_annual = 0.0
+
+        # soil carbon attributes
+        self.plant_moisture = 0.0
+        self.residue_DM = 0.0
 
         # ------ INITIALIZE SOIL NITROGEN POOLS ------------------------------------
         # Calculate initial amount of NO3 in each soil layer;
@@ -615,7 +617,6 @@ class Soil:
             self.days_unbalanced_labile = 0.0
             self.days_unbalanced_active = 0.0
 
-
     # ---------------------------------------------------------------------------
     # Class: Fertilizer
     # An instance of this class represents a particular fertilizer and the date
@@ -772,8 +773,8 @@ class Soil:
         self.delta_SW_annual = self.profile_SW - self.initial_annual_SW
 
         self.p_calc_annual = self.delta_SW_annual \
-            + self.runoff_annual + self.evap_annual + self.trans_annual \
-            + self.drainage_annual
+                             + self.runoff_annual + self.evap_annual + self.trans_annual \
+                             + self.drainage_annual
 
         self.annual_water_balance_difference = self.p_act_annual - self.p_calc_annual
 
@@ -827,4 +828,3 @@ class Soil:
 
         self.TIP_runoff_annual = 0.0
         self.M_DRP_runoff_annual = 0.0
-
