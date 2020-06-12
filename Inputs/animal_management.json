@@ -10,7 +10,11 @@
         "run_tests": true
     },
 
-    "weather": "Inputs/barnyard_weather.csv",
+    "weather":
+    {
+     "weather_database": "Inputs/weather.db",
+     "weather_table_name": "barnyard_weather"
+    },
 
     "output":
     {
