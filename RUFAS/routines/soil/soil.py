@@ -189,8 +189,7 @@ def daily_soil_routine(soil, crop, weather, time):
 
     phosphorus_cycle.update_all(soil, weather, time)
 
-    # TODO: Not currently implemented
-    carbon_cycle.update_all(soil)
+    carbon_cycle.update_all(crop.current_crop, soil, weather, time)
 
     annual_variable_update(soil)
 
@@ -456,6 +455,11 @@ class Soil:
         # soil carbon attributes
         self.plant_moisture = 0.0
         self.residue_DM = 0.0
+        self.LN_ratio_AG = 0.0
+        self.lignin_residue = 0.0
+        self.metabolic_AG = 0.0
+        self.metabolic_BG = 0.0
+        self.fr_tillage = 0.0  # TODO used in carbon but the variable should probably be relocated
 
         # ------ INITIALIZE SOIL NITROGEN POOLS ------------------------------------
         # Calculate initial amount of NO3 in each soil layer;
@@ -532,6 +536,7 @@ class Soil:
             self.sat_water = 0.0  # constant
             self.wilting_water = 0.0  # constant
             self.soil_water = 0.0  # mm water in the soil profile
+            self.wfps = 0.0
 
             self.bulk_density = layer_data['BulkDensity']
             self.mass = 0
@@ -616,6 +621,8 @@ class Soil:
             self.pbal = 0.0
             self.days_unbalanced_labile = 0.0
             self.days_unbalanced_active = 0.0
+
+            # C in the soil layer
 
     # ---------------------------------------------------------------------------
     # Class: Fertilizer
