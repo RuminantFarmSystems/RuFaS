@@ -98,8 +98,8 @@ entry, feed_name, description, type, units
 130,WHEAT,"Silage, early head",Forage,kg
 131,WHEAT,Straw,Forage,kg
 132,WHEY,"Wet, cattle",Conc,kg
-133,MILK,"Skim, dried powder",NA,kg
-134,Bone Meal,Steamed,NA,kg
+133,MILK,"Skim, dried powder",,kg
+134,Bone Meal,Steamed,,kg
 135,Calcium carbonate,CaCO3,Mineral,kg
 136,"Dicalcium Phosphate, dibasic",CaHPO4,Mineral,kg
 137,Calcium Phosphate monobasic,Ca(H2PO4)2,Mineral,kg
@@ -120,3 +120,6 @@ entry, feed_name, description, type, units
 152,Calcium Choride dihydrate,CaCl2.2H20,Mineral,kg
 153,"Calcium Choride,anhydrous",CaCl2,Mineral,kg
 154,"Magnesium Chloride, Hexahydrate",MgCl2.6H20,Mineral,kg
+155,Whole Milk,Whole Milk,Milk,kg
+156,Milk Replacer,Milk Replacer,Milk,kg
+157,Starter,Calf Starter,Starter,kg
