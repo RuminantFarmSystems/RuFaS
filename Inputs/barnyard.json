@@ -11,7 +11,8 @@
     "weather":
     {
      "weather_database": "Inputs/weather.db",
-     "weather_table_name": "barnyard_weather"
+     "weather_table_name": "Observations",
+     "dataset_ID": 1
     },
     
     "output":

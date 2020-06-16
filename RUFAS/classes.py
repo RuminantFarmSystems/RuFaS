@@ -77,6 +77,7 @@ class Config:
         # can start in the middle of the year
         self.weather_path_str= weather_data["weather_database"]
         self.weather_table=weather_data["weather_table_name"]
+        self.dataset_ID=weather_data["dataset_ID"]
         
         self.start_date = data['start_date'].split(':')
         self.end_date = data['end_date'].split(':')
@@ -97,7 +98,8 @@ class Config:
             raise errors.JSONfileData("WEATHER",
                                       "\tWeather file specified does not exist")
         # reads database and stores dictionnary values in ValuesDB list
-        readDB = DatabaseReader(str(self.weather_full_path), self.weather_table)
+        readDB = DatabaseReader(str(self.weather_full_path), self.weather_table,
+                                "ID",[self.dataset_ID])
         ValuesDB=readDB.values
         # keeps track of how many lines are in the weather file
         line = len(ValuesDB)
@@ -107,6 +109,7 @@ class Config:
         
         w_end_year=ValuesDB[len(ValuesDB)-1]["year"]
         w_end_day=ValuesDB[len(ValuesDB)-1]["jday"]
+
 
         # expected size of the csv file from start to end
         # to determine if the weather file has any gaps
@@ -262,7 +265,7 @@ class Weather:
         self.biomass = []
         self.radiation = []
         self.manureN = []  # TODO: manureN is a temporary weather file input until the manure module is linked with the rest of the program
-        self.T_avg_annual = []
+        self.Taair = []
 
         self.evaporation = []
         self.lCows = []
@@ -306,7 +309,8 @@ class Weather:
             #self.biomass.append([0 for _ in range(len(year))])
             self.radiation.append([0 for _ in range(len(year))])
             self.manureN.append([0 for _ in range(len(year))])  # TODO: manureN is a temporary weather file input until the manure module is linked with the rest of the program
-
+            self.Taair.append([0 for _ in range(len(year))])
+            
             # These are not currently inputs into the weather file. They may
             # be/may have been at some point.
             # self.evaporation.append([0 for _ in range(len(year))])
@@ -320,6 +324,7 @@ class Weather:
         # read in the input db file
         self.weather_path_str=weather_data["weather_database"]
         self.weather_table=weather_data["weather_table_name"]
+        self.dataset_ID=weather_data["dataset_ID"]
         
         self.weather_full_path = util.get_base_dir() / self.weather_path_str
 
@@ -329,7 +334,7 @@ class Weather:
 
         # reads database and stores dictionnary values in ValuesDB list
         readDB = DatabaseReader(str(self.weather_full_path), self.weather_table,
-                                identifier=None,desired_rows=None)
+                                identifier="ID",desired_rows=[self.dataset_ID])
         ValuesDB=readDB.values
 
         # this for loop takes the weather data and parses it into multiple
@@ -367,6 +372,7 @@ class Weather:
                 #self.biomass[year][day - offset] = float(row["0"])
                 self.radiation[year][day - offset] = float(row["Hday"])
                 self.manureN[year][day - offset] = float(row["manureN"])  # TODO: manureN is a temporary weather file input until the manure module is linked with the rest of the program
+                self.Taair[year][day - offset] =float(row["Taair"])
             except(IndexError, ValueError):
                 # prints out each problematic row in the weather CSV file
                 skips += 1
@@ -390,10 +396,10 @@ class Weather:
                 print("Only printing first 5 invalid rows, there are " + str(skips)
                       + " total invalid rows")
 
-            # calculates T_avg_annual for each year
+            """# calculates T_avg_annual for each year
             for i in range(len(years)):
                 avg = sum(self.T_avg[i]) / (len(years[i]))
-                self.T_avg_annual.append(avg)
+                self.T_avg_annual.append(avg)""" #Deleted and replaced by Taair
             
 # Class: Time
 # -------------------------------------------------------------------------------
