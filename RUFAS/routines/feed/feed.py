@@ -52,7 +52,10 @@ def daily_feed_routine(feed, crop, animal_management, time):
 
         feed.summarize_feed_storage(feed.storage_options[storage_name])
 
+        #adding this crop to new forages list
         feed.new_forages.append(storage)
+        #setting variable so that this forage will be fed out 30 days after harvest
+        storage.days_since_feedout = -30
 
     feed.daily_updates(animal_management)
 
@@ -152,7 +155,7 @@ class Feed:
 
             self.DM = data['initial_dry_matter']
             self.crop_qual_assessment = 'low'
-            self.feed_id = 1
+            self.feed_id = 36
             self.DMI_intake_max = {'calves': 0, 'heiferIs': 0, 'heiferIIs': 0, 'heiferIIIs': 0, 'dry_cows': 0, 'lactating_cows': 0}
             self.days_since_feedout = -30
             self.req_inv = {}
@@ -376,37 +379,6 @@ class Feed:
         self.C_loss += storage.C_loss
         self.CP_loss += storage.CP_loss
 
-    def initial_values(self) -> NutrientValues:
-        """
-        Returns: a NutrientValues object which holds the values in the database
-        table at the time of program initialization.
-        """
-        return self.__cached_values
-
-    def current_values(self) -> NutrientValues:
-        """
-        Returns: a new NutrientValues object which holds the values in the
-        database table at the time of the method call.
-        """
-        return NutrientValues(self.__feed_database,
-                              self.__table_name,
-                              self.managed_feed_names)
-
-    def values(self, desired_feed: FeedNames, current: bool = False):
-        """
-        Args:
-            desired_feed: a member of the FeedNames enum
-            current: if the values should be taken from the database at the time
-                of the method call, this value is true. The default value is
-                False, which means the cached values will be returned (stored at
-                the time of program initialization)
-
-        Returns: the dictionary which represents the characteristics and
-        nutrients of the @desired_feed
-        """
-        feeds = self.current_values() if current else self.initial_values()
-        index = self.managed_feeds.index(desired_feed)
-        return feeds.values[index]
 
     #The Following Functions are used for Updating Feed Inventory and Feed allocation
     def feed_allocation(self):
@@ -462,7 +434,7 @@ class Feed:
         lactating_cows = []
         dry_cows = []
         for cow in animal_management.cows:
-            if cow._milking:
+            if cow.milking:
                 lactating_cows.append(cow)
             else:
                 dry_cows.append(cow)
@@ -476,7 +448,7 @@ class Feed:
         for key in animals:
             BW = 0
             for animal in animals[key]:
-                BW += animal._body_weight
+                BW += animal.body_weight
             animal_class_size_avg[key] = len(animals[key])
             if len(animals[key]) > 0:
                 avg_BW[key] = BW / len(animals[key])
@@ -591,7 +563,7 @@ class Feed:
         self.DMI_Forage_max = DMI_Forage_max
 
     def daily_updates(self, animal_management):
-
+        #Running inventory plan for new forages for the entire year
         for storage_unit in self.new_forages:
             if storage_unit.days_since_feedout >= 0:
                 self.required_inventory(storage_unit, animal_management)
@@ -600,11 +572,15 @@ class Feed:
             else:
                 storage_unit.days_since_feedout += 1
 
-
-
-
-        if animal_management.end_ration_interval():
-            pass
+        #Daily feedout for silos with farm grown forages in them per pen based on ration formulated
+        for silo in self.storage_options:
+            if self.storage_options[silo].days_since_feedout >=0 and self.storage_options[silo].DM > 0:
+                for pen in animal_management.all_pens:
+                    if (self.storage_options[silo].DM - pen.ration[str(self.storage_options[silo].feed_id)]) > 0:
+                        self.storage_options[silo].DM -= pen.ration[str(self.storage_options[silo].feed_id)]
+                    else:
+                        self.storage_options[silo].DM = 0
+                        break
 
 
     def annual_reset(self):
