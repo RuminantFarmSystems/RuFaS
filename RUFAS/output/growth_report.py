@@ -31,7 +31,9 @@ class GrowthReport(BaseReportHandler):
                                 'j_day': ['time.day', '', []],
                                 'num_animals_in_pen': ['len(pen.animals_in_pen)', '', []],
                                 'average_growth': ['pen.avg_growth', 'kg', []],
-                                'average_milk': ['pen.avg_milk', 'kg', []]
+                                'average_milk': ['pen.avg_milk', 'kg', []],
+                                'average_p_animal': ['pen.avg_p_animal', 'g', []],
+                                'average_p_req': ['pen.avg_p_req', 'g', []]
                                 }
 
         self.annual_variables = {'year': ['time.cal_year', '', 0]
@@ -61,7 +63,7 @@ class GrowthReport(BaseReportHandler):
     # ---------------------------------------------------------------------------
     # Method: daily_update
     # ---------------------------------------------------------------------------
-    def daily_update(self, pen, weather, time):
+    def daily_update(self, feed, pen, weather, time):
         """Stores the daily values that need to be printed in the report."""
         for variable in self.daily_variables:
             self.daily_variables[variable][2].append(
