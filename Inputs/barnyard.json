@@ -69,7 +69,7 @@
         "crop_summary":
         {
             "produce_csv": true,
-            "produce_graphics": false,
+            "produce_graphics": true,
             "display_graphics": false,
             "report_name": "Crop Summary",
             "file_name": "crop_summary.csv"
@@ -107,8 +107,8 @@
             "latitude": 43.332708,
             "corn":
             {
-                "grow_years": [],
-                "repeat": 0,
+                "grow_years": [2009],
+                "repeat": 1,
                 "planting_date": 121,
                 "harvest_date": 319,
                 "harvest_type": "optimal"
