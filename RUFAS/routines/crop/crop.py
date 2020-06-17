@@ -77,7 +77,7 @@ def daily_crop_routine(crop, weather, time, soil):
             if crop_type.growing:
                 heat_units.update_all(crop_type, T_min, T_max)
 
-                root_development.update_all(crop_type)
+                root_development.update_all(crop_type, soil)
 
                 # transpiration.update_all(crop_type, soil, time)
 

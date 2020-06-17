@@ -453,9 +453,8 @@ class Soil:
         self.activeN_drainage_annual = 0.0
 
         # soil carbon attributes
-        self.plant_moisture = 0.0
+        self.plant_moisture = 0.15  # TODO temporary value from Hector  # TODO should probably be in crop
         self.residue_DM = 0.0
-        self.LN_ratio_AG = 0.0
         self.lignin_residue = 0.0
         self.metabolic_AG = 0.0
         self.metabolic_BG = 0.0

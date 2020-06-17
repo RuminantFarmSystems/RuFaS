@@ -35,9 +35,9 @@ CropType values updated by calling update_all():
 # This function calls the functions in this module necessary to update the
 # root development of the given crop.
 #
-def update_all(crop_type):
+def update_all(crop_type, soil):
     calc_daily_root_biomass(crop_type)
-    calc_z_root(crop_type)
+    calc_z_root(crop_type, soil)
 
 
 #
@@ -52,10 +52,10 @@ def calc_daily_root_biomass(crop_type):
 
 #
 # Calculates depth of root development in the soil on a given
-# day (AKA z_root).
-# "pseudocode_crop" C.3.A.2/3
+# day (AKA z_root) and below ground biomass.
+# "pseudocode_crop" C.3.A.2/3/4/5
 #
-def calc_z_root(crop_type):
+def calc_z_root(crop_type, soil):
 
     if not crop_type.z_root == crop_type.z_root_max:
 
@@ -66,6 +66,11 @@ def calc_z_root(crop_type):
         else:  # self.fr_PHU <= 0.4
             crop_type.z_root = 2.5 * crop_type.fr_PHU * crop_type.z_root_max
 
+    # TODO should these be in biomass?
+    crop_type.bio_BG = crop_type.fr_root * crop_type.biomass_actual
+    crop_type.bio_BG_DM = crop_type.bio_BG * (1 - soil.plant_moisture)
+
+    # TODO
     # if crop_type.crop_type == "perennial" and crop_type.planted:
     #     crop_type.z_root = crop_type.z_root_max
     #

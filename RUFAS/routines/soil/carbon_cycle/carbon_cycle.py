@@ -24,20 +24,19 @@ def update_all(crop_type, soil, weather, time):
     """
 
     # residue from annual crops
-    soil.plant_moisture = 0.15  # TODO temporary value from Hector
     soil.residue_DM = soil.residue * (1 - soil.plant_moisture)
 
     # residue partitioning
     soil.lignin_residue = 0  # TODO get from database
     # TODO fr_N might need a different calculation in the future
-    soil.LN_ratio_AG = 0
+    LN_ratio_AG = 0
     if crop_type.fr_N != 0:
-        soil.LN_ratio_AG = (soil.lignin_residue / 100) / crop_type.fr_N
-    metabolic_AG_frac = 0.85 - 0.18 * soil.LN_ratio_AG
+        LN_ratio_AG = (soil.lignin_residue / 100) / crop_type.fr_N
+    metabolic_AG_frac = 0.85 - 0.18 * LN_ratio_AG
 
     K2 = 0.28
     metabolic_AG_active_decomp = K2
-    # TODO get from database, using course temporarily
+    # TODO get from database, using coarse temporarily
     a = 0.55
     b = 1.7
     c = -0.007
@@ -58,10 +57,35 @@ def update_all(crop_type, soil, weather, time):
 
     metabolic_AG_to_C_active = metabolic_AG_active_decomp * M_d * T_d * soil.metabolic_AG
 
-    metabolic_AG_to_BG = soil.metabolic_AG * soil.fr_tillage  # TODO fr_tillage
+    metabolic_AG_to_BG = soil.metabolic_AG * soil.fr_tillage  # TODO fr_tillage, percent_incorp?
 
     d_metabolic_AG = soil.metabolic_AG - ((metabolic_AG_to_C_active - metabolic_AG_to_BG)
                                           + metabolic_AG_to_BG)
     soil.metabolic_AG = soil.residue_DM * metabolic_AG_frac - d_metabolic_AG
 
     # above ground structural residue
+    K1 = 0.076
+    struct_AG_decomp = K1 * math.exp(-3) * (1 - metabolic_AG_frac)
+    struct_AG_to_C_active = struct_AG_decomp * M_d * T_d * soil.structural_AG
+    struct_AG_to_C_slow = struct_AG_decomp * M_d * T_d * soil.structural_AG
+
+    struct_AG_to_BG = soil.structural_AG * soil.fr_tillage
+
+    d_structural_AG = soil.structural_AG - ((struct_AG_to_C_active + struct_AG_to_C_slow - struct_AG_to_BG)
+                                            + struct_AG_to_BG)
+    soil.structural_AG = (soil.residue_DM * (1 - metabolic_AG_frac)) - d_structural_AG
+
+    # below ground metabolic residue and roots
+
+    residue_DM_incorp = 0  # TODO
+    fr_lignin_residue_DM = residue_DM_incorp / (residue_DM_incorp + crop_type.bio_BG_DM)
+    LN_ratio_BG = LN_ratio_AG * fr_lignin_residue_DM + ((soil.lignin_residue / 100) / crop_type.fr_N) \
+                  * (1 - fr_lignin_residue_DM) / 100
+    metabolic_BG_frac = 0.85 - 0.18 * LN_ratio_BG
+
+    K4 = 0.35
+    metabolic_BG_active_decomp = K4
+    metabolic_BG_to_C_active = metabolic_BG_active_decomp * M_d * T_d * soil.metabolic_BG
+    d_metabolic_BG = soil.metabolic_BG - metabolic_BG_to_C_active
+
+    soil.metabolic_BG = metabolic_AG_to_BG + crop_type.bio_BG_DM * metabolic_BG_frac - d_metabolic_BG
