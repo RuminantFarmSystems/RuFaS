@@ -85,6 +85,7 @@ def daily_simulation():
     routines.daily_crop_routine(state.crop, weather, time, state.soil)
     routines.daily_feed_routine(state.feed, state.crop, state.animal_management, weather, time)
 
+
     #
     # Daily Output Updates
     #

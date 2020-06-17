@@ -48,7 +48,7 @@ class PenReport:
                     if self.pen_id == pen.id:
                         for report in self.pen_reports.values():
                             if report.produce_csv:
-                                report.daily_update(pen, weather, time)
+                                report.daily_update(state.feed, pen, weather, time)
 
     def annual_update(self, state, weather, time):
         if self.produce_csv:

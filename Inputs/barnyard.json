@@ -107,8 +107,8 @@
             "latitude": 43.332708,
             "corn":
             {
-                "grow_years": [],
-                "repeat": 0,
+                "grow_years": [2009],
+                "repeat": 3,
                 "planting_date": 121,
                 "harvest_date": 319,
                 "fr_PHU_harvest_min": 0.9,
@@ -116,8 +116,8 @@
             },
             "soybean":
             {
-                "grow_years": [],
-                "repeat": 0,
+                "grow_years": [2010],
+                "repeat": 3,
                 "planting_date": 121,
                 "harvest_date": 319,
                 "fr_PHU_harvest_min": 0.9,
@@ -125,8 +125,8 @@
             },
             "alfalfa":
             {
-                "grow_years": [],
-                "repeat": 0,
+                "grow_years": [2011],
+                "repeat": 3,
                 "planting_date": 121,
                 "harvest_date": 319,
                 "fr_PHU_harvest_min": 0.9,
@@ -442,16 +442,12 @@
         "feed":
         {
             "feed_database": "Inputs/feeds.sqlite",
-            "table_name": "feed_library",
+            "feeds_table": "user_feeds",
+            "feed_quality_table": "feed_quality",
+            "nutrient_table": "nutrients",
 
-            "managed_feeds":
-            [
-              "Corn_grain",
-              "Legume_hay",
-              "Cotton_seed",
-              "Roasted_soybean",
-              "Rye_hay"
-            ],
+            "purchased_feeds": [2, 24, 34, 38, 91, 102, 137],
+            "growing_feeds": [8, 87],
 
             "storage_options": {
                 "storage_1": {

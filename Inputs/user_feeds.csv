@@ -1,0 +1,122 @@
+entry, feed_name, description, type, units
+1,ALFALFA,"Meal, 17% CP",Forage,kg
+2,ALMOND,Hulls,Conc,kg
+3,APPLE,"Pomace, wet",Conc,kg
+4,BAKERY BYPRODUCT,Byproduct meal,Conc,kg
+5,BAKERY BYPRODUCT,"Bread, waste",Conc,kg
+6,BAKERY BYPRODUCT,Cereal byproduct,Conc,kg
+7,BAKERY BYPRODUCT,Cookie byproduct,Conc,kg
+8,BARLEY,"Grain, rolled",Conc,kg
+9,BARLEY,Malt sprouts,Conc,kg
+10,BARLEY,"Silage, headed",Forage,kg
+11,"BEET, SUGAR",Pulp dried,Conc,kg
+12,BERMUDAGRASS,"Coastal, hay, early head",Forage,kg
+13,BERMUDAGRASS,"Tifton-85, hay, 3-4wk growth",Forage,kg
+14,BLOOD,"Meal, ring dried",Conc,kg
+15,BLOOD,"Meal, batch dried",Conc,kg
+16,BREWERS GRAINS,Dried,Conc,kg
+17,BREWERS GRAINS,Wet,Conc,kg
+18,CANOLA,Seed,Conc,kg
+19,CANOLA,"Meal, mech. Extracted",Conc,kg
+20,CHOCOLATE,Byproduct,Conc,kg
+21,CITRUS,Pulp dried,Conc,kg
+22,"CORN, YELLOW",Cobs,Conc,kg
+23,"CORN, YELLOW","Distillers grains with solubles, dried",Conc,kg
+24,"CORN, YELLOW","Gluten feed, dried",Conc,kg
+25,"CORN, YELLOW","Gluten meal, dried",Conc,kg
+26,"CORN, YELLOW","Grain, cracked, dry",Conc,kg
+27,"CORN, YELLOW","Grain, ground, dry",Conc,kg
+28,"CORN, YELLOW","Grain, steam-flaked",Conc,kg
+29,"CORN, YELLOW","Grain, rolled, high moisture",Conc,kg
+30,"CORN, YELLOW","Grain, ground, high moisture",Conc,kg
+31,"CORN, YELLOW","Grain and cob, dry, ground",Conc,kg
+32,"CORN, YELLOW","Grain and cob, high moisture, ground",Conc,kg
+33,"CORN, YELLOW",Hominy,Conc,kg
+34,"CORN, YELLOW",Silage,Forage,kg
+38,COTTON SEED,Whole seeds with lint,Conc,kg
+39,COTTON SEED,Hulls,Conc,kg
+40,COTTON SEED,"Meal, solvent, 41% CP",Conc,kg
+41,FATS AND OILS,Calcium soaps,Conc,kg
+42,FATS AND OILS,Hydrolyzed tallow fatty acids,Conc,kg
+43,FATS AND OILS,Partially hydrogenated tallow,Conc,kg
+44,FATS AND OILS,Tallow,Conc,kg
+45,FATS AND OILS,Vegetable oil,Conc,kg
+46,FEATHERS,Hydrolyzed meal,Conc,kg
+47,FEATHERS,Hydrolyzed meal with some viscera,Conc,kg
+48,FISH BYPRODUCTS,"Anchovy, meal, mech.",Conc,kg
+49,FISH BYPRODUCTS,"Menhaden, meal, mech.",Conc,kg
+50,"GRASSES, COOL SEASON","Pasture, intensively managed",Forage,kg
+51,"GRASSES, COOL SEASON","Hay, all samples",Forage,kg
+52,"GRASSES, COOL SEASON",Hay,Forage,kg
+56,"GRASSES, COOL SEASON","Silage, all samples",Forage,kg
+57,"GRASSES, COOL SEASON",Silage,Forage,kg
+61,GRASS-Legume MIXTURES Pr. GR.  (17-22% Hcel.),Hay,Forage,kg
+65,GRASS-Legume MIXTURES Pr. GR.  (17-22% Hcel.),Silage,Forage,kg
+69,Mixed grass-legume (12-15% Hcel.),Hay,Forage,kg
+73,Mixed grass-legume (12-15% Hcel.),Silage,Forage,kg
+77,Grass-LEGUME MIXTURES Pr. LG. (10-13% HCEL.),Hay,Forage,kg
+81,Grass-LEGUME MIXTURES Pr. LG. (10-13% HCEL.),Silage,Forage,kg
+85,"LEGUMES, FORAGE","Pasture, intensively managed",Forage,kg
+86,"LEGUMES, FORAGE","Hay, all samples",Forage,kg
+87,"LEGUMES, FORAGE",Hay,Forage,kg
+91,"LEGUMES, FORAGE","Silage, all samples",Forage,kg
+92,"LEGUMES, FORAGE",Silage,Forage,kg
+96,LINSEED (FLAX),"Meal, solvent",Conc,kg
+97,MEAT,"Meal, rendered",Conc,kg
+98,MEAT,"Meat and bone, rendered",Conc,kg
+99,MOLASSES,Beet sugar,Conc,kg
+100,MOLASSES,Sugarcane,Conc,kg
+101,OATS,"Grain, rolled",Conc,kg
+102,OATS,"Hay, headed",Forage,kg
+103,OATS,"Silage, headed",Forage,kg
+104,PEANUT,"Meal, solvent",Conc,kg
+105,POTATO,Byproduct meal,Conc,kg
+106,RICE,Bran,Conc,kg
+107,"RYE, ANNUAL","Silage, vegetative",Forage,kg
+108,SAFFLOWER,"Meal, solvent",Conc,kg
+109,"SORGHUM, GRAIN TYPE","Grain, dry rolled",Conc,kg
+110,"SORGHUM, GRAIN TYPE","Grain, steam-flaked",Conc,kg
+111,"SORGHUM, GRAIN TYPE",Silage,Forage,kg
+112,"SORGHUM, SUDAN TYPE",Hay,Forage,kg
+113,"SORGHUM, SUDAN TYPE",Silage,Forage,kg
+114,SOYBEAN,Hulls,Conc,kg
+115,SOYBEAN,"Meal, expellers, 45% CP",Conc,kg
+116,SOYBEAN,"Meal, nonenzymatically browned",Conc,kg
+117,SOYBEAN,"Meal, solvent, 44% CP",Conc,kg
+118,SOYBEAN,"Meal, solvent, 48% CP",Conc,kg
+119,SOYBEAN,"Seeds, whole",Conc,kg
+120,SOYBEAN,"Seeds, whole roasted",Conc,kg
+121,SOYBEAN,"Silage, early maturity",Forage,kg
+122,SUNFLOWER,"Meal, solvent",Conc,kg
+123,SUNFLOWER,"Oil seeds, whole",Conc,kg
+124,TOMATO,Pomace,Conc,kg
+125,TRITICALE,"Silage, headed",Forage,kg
+126,WHEAT,Bran,Conc,kg
+127,WHEAT,"Grain, rolled",Conc,kg
+128,WHEAT,"Hay, headed",Forage,kg
+129,WHEAT,Middlings,Conc,kg
+130,WHEAT,"Silage, early head",Forage,kg
+131,WHEAT,Straw,Forage,kg
+132,WHEY,"Wet, cattle",Conc,kg
+133,MILK,"Skim, dried powder",NA,kg
+134,Bone Meal,Steamed,NA,kg
+135,Calcium carbonate,CaCO3,Mineral,kg
+136,"Dicalcium Phosphate, dibasic",CaHPO4,Mineral,kg
+137,Calcium Phosphate monobasic,Ca(H2PO4)2,Mineral,kg
+138,"Calcium Sulfate, dihydrate",CaSO4.2H20,Mineral,kg
+139,"Limestone, ground",NA,Mineral,kg
+140,"Limestone, dolomite",NA,Mineral,kg
+141,Magnesium Oxide,MgO,Mineral,kg
+142,Potassium Chloride,KCl,Mineral,kg
+143,Phosphate rock,NA,Mineral,kg
+144,Sodium Choride,NaCl,Mineral,kg
+145,Sodium Bicarbonate,NaHCO3,Mineral,kg
+146,"Sodium Phosphate, Monohydrate",NaH2PO4.H20,Mineral,kg
+147,Sodium Sulfate decahydrate,Na2SO4.10H20,Mineral,kg
+148,Potassium Sulfate,K2SO4,Mineral,kg
+149,Ammonium Sulfate,(NH4)2SO4,Mineral,kg
+150,"Ammonium Phosphate, dibasic",(NH4)H2PO4,Mineral,kg
+151,Ammonium Chloride,NA,Mineral,kg
+152,Calcium Choride dihydrate,CaCl2.2H20,Mineral,kg
+153,"Calcium Choride,anhydrous",CaCl2,Mineral,kg
+154,"Magnesium Chloride, Hexahydrate",MgCl2.6H20,Mineral,kg
