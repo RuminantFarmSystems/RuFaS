@@ -78,9 +78,15 @@ def update_all(crop_type, soil, weather, time):
     # below ground metabolic residue and roots
 
     residue_DM_incorp = 0  # TODO
-    fr_lignin_residue_DM = residue_DM_incorp / (residue_DM_incorp + crop_type.bio_BG_DM)
-    LN_ratio_BG = LN_ratio_AG * fr_lignin_residue_DM + ((soil.lignin_residue / 100) / crop_type.fr_N) \
-                  * (1 - fr_lignin_residue_DM) / 100
+    fr_lignin_residue_DM = 0
+    if residue_DM_incorp + crop_type.bio_BG_DM != 0:
+        fr_lignin_residue_DM = residue_DM_incorp / (residue_DM_incorp + crop_type.bio_BG_DM)
+
+    LN_ratio_BG = 0
+    if crop_type.fr_N != 0:
+        LN_ratio_BG = LN_ratio_AG * fr_lignin_residue_DM + ((soil.lignin_residue / 100) / crop_type.fr_N) \
+                      * (1 - fr_lignin_residue_DM) / 100
+
     metabolic_BG_frac = 0.85 - 0.18 * LN_ratio_BG
 
     K4 = 0.35

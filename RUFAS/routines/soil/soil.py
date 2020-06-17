@@ -458,6 +458,8 @@ class Soil:
         self.lignin_residue = 0.0
         self.metabolic_AG = 0.0
         self.metabolic_BG = 0.0
+        self.structural_AG = 0.0
+        self.structural_BG = 0.0
         self.fr_tillage = 0.0  # TODO used in carbon but the variable should probably be relocated
 
         # ------ INITIALIZE SOIL NITROGEN POOLS ------------------------------------

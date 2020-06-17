@@ -374,6 +374,8 @@ class InitCrop:
         self.gamma_wu = 0
 
         self.bio_AG = 0
+        self.bio_BG = 0
+        self.bio_BG_DM = 0
         self.yield_max = 0
         self.yield_actual = 0
         self.yield_N = 0
