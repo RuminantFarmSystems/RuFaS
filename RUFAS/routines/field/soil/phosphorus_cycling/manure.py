@@ -27,6 +27,9 @@ def update_all(soil, m_app):
     manure_type = m_app['type']
     mass = m_app['mass']
     depth = m_app['depth']
+    # adjustment to cm because SurPhos was originally created in cm but
+    # RuFaS uses mm
+    depth_cm = depth / 10
     P_frac = m_app['P_frac']
     DM = m_app['dry_matter']
     WIP_frac = m_app['WIP_frac']
@@ -75,7 +78,7 @@ def update_all(soil, m_app):
     # S.5.C.II.4
     D_fac_1 = 1.0
     D_fac_2 = 1.0
-    if depth > 0.0:
+    if depth_cm > 0.0:
         D_fac_1 = S_fac * C_WIP * C_WOP
         D_fac_2 = S_fac
 
@@ -93,8 +96,8 @@ def update_all(soil, m_app):
     last_layer = 0
     D_fac_sum = 0
     for layer in soil.soil_layers:
-        if layer.bottom_depth_cm < depth:
-            D_fac = layer.bottom_depth_cm / depth
+        if layer.bottom_depth_cm < depth_cm:
+            D_fac = layer.bottom_depth_cm / depth_cm
             layer.active_P += P_app * W_fac * 0.25 * I_fac * D_fac_1 * D_fac
             layer.labile_P += C_WIP + C_WOP + (P_app * W_fac * 0.75 * 0.95 * I_fac * D_fac_2) * D_fac
 

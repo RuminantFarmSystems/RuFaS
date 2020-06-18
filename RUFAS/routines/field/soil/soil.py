@@ -54,8 +54,7 @@ def daily_soil_routine(soil, crop, field_management, weather, time):
     soil_water.update_all(soil, weather, time)
 
     # calculate daily soil erosion
-    if R > 0:
-        soil_erosion.update_all(soil, crop, weather, time)
+    soil_erosion.update_all(soil, crop, weather, time)
 
     # calculate and update the contents of 3 organic and 2 inorganic nitrogen
     # pools
@@ -173,8 +172,7 @@ class Soil:
 
         # soil cover
         self.cover = data['soil_cover_type']
-        self.cover_factor = \
-            self.set_cover_factor()  # sets the cover factor based on type
+        self.cover_factor = self.set_cover_factor()  # sets the cover factor based on type
 
         # soil P
         # Peter Vadas' SurPhos. TODO: Hardcoded Values are temporary
@@ -186,7 +184,7 @@ class Soil:
 
         # fertilizer
         self.fert_applied_sum = 0.0
-        self.no_rains = 0.0
+        self.num_rains = 0.0
         self.fert_CNT = 0.0
         self.fert_P_available = 0.0
         self.fert_P_released = 0.0
