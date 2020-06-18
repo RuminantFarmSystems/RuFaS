@@ -24,6 +24,7 @@ def update_all(crop_type, soil, weather, time):
     """
 
     # residue from annual crops
+    # above ground metabolic residue
     soil.residue_DM = soil.residue * (1 - soil.plant_moisture)
 
     # residue partitioning
@@ -76,8 +77,7 @@ def update_all(crop_type, soil, weather, time):
     soil.structural_AG = (soil.residue_DM * (1 - metabolic_AG_frac)) - d_structural_AG
 
     # below ground metabolic residue and roots
-
-    residue_DM_incorp = 0  # TODO
+    residue_DM_incorp = soil.fr_tillage * soil.residue_DM
     fr_lignin_residue_DM = 0
     if residue_DM_incorp + crop_type.bio_BG_DM != 0:
         fr_lignin_residue_DM = residue_DM_incorp / (residue_DM_incorp + crop_type.bio_BG_DM)
@@ -92,6 +92,20 @@ def update_all(crop_type, soil, weather, time):
     K4 = 0.35
     metabolic_BG_active_decomp = K4
     metabolic_BG_to_C_active = metabolic_BG_active_decomp * M_d * T_d * soil.metabolic_BG
+
     d_metabolic_BG = soil.metabolic_BG - metabolic_BG_to_C_active
 
     soil.metabolic_BG = metabolic_AG_to_BG + crop_type.bio_BG_DM * metabolic_BG_frac - d_metabolic_BG
+
+    # below ground structural residue and roots
+    K3 = 0.094
+    struct_BG_decomp = K3
+    struct_BG_to_C_active = struct_BG_decomp * M_d * T_d * soil.structural_BG
+    struct_BG_to_C_slow = struct_BG_decomp * M_d * T_d * soil.structural_BG
+
+    d_structural_BG = soil.structural_BG - (struct_BG_to_C_active + struct_BG_to_C_slow) + struct_AG_to_BG
+
+    soil.structural_BG = struct_AG_to_BG + crop_type.bio_BG_DM * (1 - metabolic_BG_frac) - d_structural_BG
+
+    # partitioning active and slow carbon decomposition to carbon pools or gas loss
+    # above ground metabolic C
