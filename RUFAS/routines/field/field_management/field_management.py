@@ -125,7 +125,7 @@ class FieldManagement:
                         if year not in self.default_years:
                             self.default_years.append(year)
                             # populate app_years with repeat cycles
-                            if self.repeat != 0:
+                            if self.repeat > 0:
                                 temp_year = year + self.repeat
                                 # until repeat hits model boundaries
                                 while temp_year - time.start_year < len(time.years):

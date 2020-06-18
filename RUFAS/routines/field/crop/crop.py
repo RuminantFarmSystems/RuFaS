@@ -255,7 +255,7 @@ class Crop:
                         self.grow_regimen[curr_year] = crop_type
                     # populate grow regimen based on repeat if another crop is
                     # not already set for those years
-                    else:
+                    elif crop_type.repeat > 0:
                         curr_year = year - time.start_year
                         while curr_year < len(self.grow_regimen):
                             if self.grow_regimen[curr_year].crop_name == 'null':

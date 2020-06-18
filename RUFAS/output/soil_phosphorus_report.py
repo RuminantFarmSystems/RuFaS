@@ -41,7 +41,10 @@ class SoilPhosphorus(BaseReportHandler):
         #
 
         self.daily_variables = {'year': ['time.calendar_year', '', []],
-                                'j_day': ['time.day', '', []]
+                                'j_day': ['time.day', '', []],
+                                'labile_P_l1': ['soil.soil_layers[0].labile_P', '', []],
+                                'labile_P_l2': ['soil.soil_layers[1].labile_P', '', []],
+                                'labile_P_l3': ['soil.soil_layers[2].labile_P', '', []]
                                 }
 
         self.annual_variables = {'year': ['time.calendar_year', '', 0]
