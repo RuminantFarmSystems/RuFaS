@@ -27,9 +27,12 @@ def update_all(soil, fert_app):
     mass = fert_app['mass']
     surface_percent = fert_app['surface_percent']
     depth = fert_app['depth']
+    # adjustment to cm because SurPhos was originally created in cm but
+    # RuFaS uses mm
+    depth_cm = depth / 10
 
     soil.fert_applied_sum += mass
-    soil.no_rains = 0
+    soil.num_rains = 0
     soil.fert_CNT = 1
 
     # At the time of application, 75% of applied fertilizer P is
@@ -47,8 +50,8 @@ def update_all(soil, fert_app):
 
         # for each layer above the application depth
         # S.5.B.5/6
-        if layer.bottom_depth_cm < depth:
-            soil.depth_fact = layer.bottom_depth_cm / depth
+        if layer.bottom_depth_cm < depth_cm:
+            soil.depth_fact = layer.bottom_depth_cm / depth_cm
             layer.labile_P += mass * soil.depth_fact * (1.0 - surface_percent)
 
             sum_fac += soil.depth_fact
@@ -57,8 +60,7 @@ def update_all(soil, fert_app):
     # for the layer at the application depth
     # S.5.B.5/7
     soil.depth_fact = 1.0 - sum_fac
-    soil.soil_layers[last_layer].labile_P += mass * soil.depth_fact * \
-                                             (1.0 - surface_percent)
+    soil.soil_layers[last_layer].labile_P += mass * soil.depth_fact * (1.0 - surface_percent)
 
     # S.B.4
     for layer in soil.soil_layers:

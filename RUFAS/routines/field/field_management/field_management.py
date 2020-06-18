@@ -32,8 +32,8 @@ class FieldManagement:
                 'day': -1,
                 'mass': 1600,
                 'P_frac': 0.007,
-                'N_frac': 0.25,
-                'NH4_frac': 0,
+                'N_frac': 0.1,
+                'NH4_frac': 0.05,
                 'WIP_frac': 0.6,
                 'WOP_frac': 0.05,
                 'dry_matter': 0.05,
@@ -53,7 +53,7 @@ class FieldManagement:
                 'day': -1,
                 'percent_incorporated': 0.8,
                 'percent_mixed': 0.6,
-                'depth': 25.0
+                'depth': 250.0
             }
         }
 

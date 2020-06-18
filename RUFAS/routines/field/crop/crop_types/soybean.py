@@ -49,7 +49,7 @@ class Soybean(BaseCrop):
         self.fr_PHU_2 = 0.50
         self.fr_LAI_1 = 0.05
         self.fr_LAI_2 = 0.95
-        self.fr_PHU_sen = 0.9
+        self.fr_PHU_sen = 0.90
         self.fr_PHU_harvest = 1.0  # TODO: If soybean has drydown, this is 1.2
         self.LAI_max = 3
         self.LAI_min = 0

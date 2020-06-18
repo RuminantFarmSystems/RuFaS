@@ -24,6 +24,9 @@ def update_all(soil, till_app):
             field_management.py
     """
     depth = till_app['depth']
+    # adjustment to cm because SurPhos was originally created in cm but
+    # RuFaS uses mm
+    depth_cm = depth / 10
     percent_incorporated = till_app['percent_incorporated']
     percent_mixed = till_app['percent_mixed']
 
@@ -33,7 +36,7 @@ def update_all(soil, till_app):
 
     # attributes of this specific tillage operation
     for layer in soil.soil_layers:
-        if layer.bottom_depth_cm <= depth:
+        if layer.bottom_depth_cm <= depth_cm:
             till_soil_mass += layer.mass
             till_act_P += layer.active_P
             till_lab_P += layer.labile_P
@@ -72,7 +75,7 @@ def update_all(soil, till_app):
 
         # Mix soil in accordance with the tillage operation
         # S.5.D.4
-        if layer.bottom_depth_cm <= depth:
+        if layer.bottom_depth_cm <= depth_cm:
             ratio = layer.mass / till_soil_mass
             layer.labile_P = (1.0 - percent_mixed) * layer.labile_P \
                              + till_lab_P * ratio * percent_mixed
