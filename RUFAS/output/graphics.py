@@ -1,12 +1,11 @@
 """
 RUFAS: Ruminant Farm Systems Model
-
 File name: graphics.py
+
+Description: Produces graphical representations of RuFaS output data.
 
 Author(s): Jacob Johnson, jacob8399@gmail.com
            William Donovan, wmdonovan@wisc.edu
-
-Description: Produces graphical representations of RuFaS output data.
 """
 
 import csv
@@ -14,18 +13,13 @@ import datetime as dt
 import matplotlib.pyplot as mp
 import random
 
-#
-# Produces graphical representations of data passed in from a csv file.
-#
-from RUFAS import util
-
 
 # reads all the data from a csv and puts it in a dictionary with each variable
-def read_data(output_csv):
-    output_full_path = util.get_base_dir() / 'Outputs/Sample_Farm_Outputs' / output_csv
+def read_data(report, output_csv):
+    output_full_path = str(report.csv_dir) + output_csv
 
-    with open(output_full_path) as csvfile:
-        read_csv = csv.reader(csvfile, delimiter=',')
+    with open(output_full_path) as csv_file:
+        read_csv = csv.reader(csv_file, delimiter=',')
 
         variables = {}
         units = []
@@ -49,12 +43,13 @@ def read_data(output_csv):
 
 
 # data analytics for ration
-def ration_graphics(output_csv, display_graphics, produce_graphics, is_final, ration_interval):
+def ration_graphics(report):
 
-    if produce_graphics:
-        variables, units = read_data(output_csv)
+    if report.produce_graphics:
+        output_csv = report.file_name
+        variables, units = read_data(report, output_csv)
 
-        save_dir = util.get_base_dir() / 'Outputs/diagnostics/' / output_csv.split('.')[0]
+        save_dir = report.diagnostic_dir
 
         start_year = int(variables['year'][0])
         start_day = int(variables['j_day'][0])
@@ -64,7 +59,7 @@ def ration_graphics(output_csv, display_graphics, produce_graphics, is_final, ra
         dates = []
         for i in range(len(variables['j_day'])):
             dates.append(date)
-            date += dt.timedelta(days=ration_interval)
+            date += dt.timedelta(days=report.ration_interval)
 
         counter = 0
         for variable in variables:
@@ -76,97 +71,62 @@ def ration_graphics(output_csv, display_graphics, produce_graphics, is_final, ra
                 mp.ylabel(variable + ' ' + units[counter])
                 path = str(save_dir / variable)
                 mp.savefig(path + '')
-                if not display_graphics:
-                    mp.close()
+                mp.close()
             counter += 1
 
-    show_figures(is_final)
 
+def annual_mass_balance_graphics(report):
+    if report.produce_graphics:
+        annual_file_name = str(report.file_name).split('.')[0] + "_annual.csv"
+        variables, units = read_data(report, annual_file_name)
 
-# produces the annual data analytics
-def annual_water_balance_graphic(output_csv, show_annual, produce_graphics):
-    if produce_graphics:
-        variables, units = read_data(output_csv)
-
-        save_dir = util.get_base_dir() / 'Outputs/diagnostics/' / output_csv.split('.')[0].replace('_annual', '')
+        save_dir = report.diagnostic_dir
 
         mp.figure()
-        counter = 0
-        years = variables['year']
+
         legend = []
-        prev_vars = [0 for x in range(len(years))]
         width = 0.35
-        table_vals = []
-        row_labs = []
+        table_dict = {
+            'year': variables.pop('year'),
+            'actual': variables.pop('actual'),
+            'calculated': variables.pop('calculated'),
+            'difference': variables.pop('difference'),
+            'delta': variables.pop('delta')
+        }
+        prev_vars = [0 for _ in range(len(table_dict['year']))]
 
-        added_variables = len(variables) - 9
+        colors = ['#ffffff', '#DC267F', '#648FFF', '#FFB000', '#FE6100', '#785EF0', '#8B0000']
 
-        colors = ['#ffffff', '#DC267F', '#648FFF', '#FFB000',  '#FE6100', '#785EF0', '#8B0000']
+        mp.scatter(table_dict['year'], table_dict['actual'], c='#8B0000', marker='x', zorder=2)
         for variable in variables:
-            # assigns a random color to variables not originally included
-            if len(colors) - 2 < counter < len(variables) - 3:
-                colors.insert(counter, "#"+''.join([random.choice('1236789ABCDE') for j in range(6)]))
+            if len(colors) == 0:
+                colors.append("#" + ''.join([random.choice('1236789ABCDE') for _ in range(6)]))
 
-            # 0 through 6 are outputs we would not change
-            # 6 is precip which we do not want as a bar in the graph
-            if 0 < counter < len(variables) - 3:
-                mp.bar(years, variables[variable], width, color=colors[counter], bottom=prev_vars)
-                legend.append(variable)
-                prev_vars = [sum(x) for x in zip(prev_vars, variables[variable])]
-            elif counter == len(variables) - 3:
-                precip = variables[variable]
-                legend.insert(0, variable)
-                mp.scatter(years, precip, c='#8B0000', marker='x', zorder=2)
-            if counter > 0:
-                variables[variable].insert(0, "")
-                table_vals.append(variables[variable])
-                row_labs.append(variable)
-            counter += 1
-
-        cell_colors = [['#ffffff' for i in range(len(years) + 1)] for j in range(len(variables) - 1)]
-        for x in range(len(colors)):
-            cell_colors[x - 1][0] = colors[x]
-
-        # original bbox values with 9 variables ( len(variables) )
-        table_bot = -1.08
-        table_height = 0.75
-
-        # added bbox adjustments when there are more variables
-        table_bot -= 0.08 * added_variables
-        table_height += 0.08 * added_variables
+            mp.bar(table_dict['year'], variables[variable], width, colors=colors.pop(), bottom=prev_vars)
+            prev_vars = [sum(x) for x in zip(prev_vars, variables[variable])]
+            table_dict[variable] = variables[variable]
+            legend.append(variable)
 
         mp.xticks(rotation=45)
-
         mp.axis('tight')
-        table = mp.table(cellText=table_vals,
-                         rowLabels=row_labs,
-                         cellColours=cell_colors,
-                         bbox=[0, table_bot, 1, table_height])
-
-        # creates the color indicator in the table
-        cellDict = table.get_celld()
-        for x in range(len(cell_colors)):
-            cellDict[(x, 0)].set_width(0.02)
-
-        # legend toggle
-        # mp.legend(legend, loc='upper center', bbox_to_anchor=(-0.35, 1.3), ncol=1, prop={'size': 9})
+        mp.table(cellText=table_dict.values(), rowLabels=table_dict.keys())
+        mp.title(report.report_name)
         mp.subplots_adjust(left=0.31, bottom=0.5)
-        mp.ylabel('mm H2O')
-        mp.title('Annual Water Balance')
-        path = str(save_dir / 'annual_water_balance')
+
+        path = str(save_dir / 'annual_' + report.report_name)
         mp.savefig(path + '')
 
-        if not show_annual:
-            mp.close()
+        mp.close()
 
 
 # produces the daily data analysis
-def daily_graphics(output_csv, display_graphics, produce_graphics, is_final):
+def daily_graphics(report):
 
-    if produce_graphics:
-        variables, units = read_data(output_csv)
+    if report.produce_graphics:
+        output_csv = report.file_name
+        variables, units = read_data(report, output_csv)
 
-        save_dir = util.get_base_dir() / 'Outputs/diagnostics/' / output_csv.split('.')[0]
+        save_dir = report.diagnostic_dir
 
         start_year = int(variables['year'][0])
         start_day = int(variables['j_day'][0])
@@ -188,17 +148,15 @@ def daily_graphics(output_csv, display_graphics, produce_graphics, is_final):
                 mp.tight_layout()
                 path = str(save_dir / variable)
                 mp.savefig(path + '')
-                if not display_graphics:
-                    mp.close()
+                mp.close()
             counter += 1
 
-    show_figures(is_final)
 
-
-def annual_graphics(output_csv, show_annual, produce_graphics, is_final):
-    if produce_graphics:
-        variables, units = read_data(output_csv)
-        save_dir = util.get_base_dir() / 'Outputs/diagnostics/' / output_csv.split('.')[0].replace('_annual', '')
+def annual_graphics(report):
+    if report.produce_graphics:
+        annual_file_name = str(report.file_name).split('.')[0] + "_annual.csv"
+        variables, units = read_data(report, annual_file_name)
+        save_dir = report.diagnostic_dir
 
         start_year = int(variables['year'][0])
         end_year = int(variables['year'][-1])
@@ -217,14 +175,5 @@ def annual_graphics(output_csv, show_annual, produce_graphics, is_final):
                 mp.tight_layout()
                 path = str(save_dir / variable) + '_annual'
                 mp.savefig(path + '')
-                if not show_annual:
-                    mp.close()
+                mp.close()
             counter += 1
-
-    show_figures(is_final)
-
-
-# shows figures on screen
-def show_figures(is_final):
-    if is_final:
-        mp.show()
