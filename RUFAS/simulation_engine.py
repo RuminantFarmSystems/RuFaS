@@ -51,7 +51,7 @@ def simulate(input_fPath: Path):
     #
     output.initialize_output_dir(config.output_dir)
     output.initialize_diagnostic_dir(config.diagnostic_dir)
-    output.initialize_reports(state)
+    output.initialize_reports()
 
     print("\nSimulating: {}".format(input_fPath.name))
 
