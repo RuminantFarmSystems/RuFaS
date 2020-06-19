@@ -104,18 +104,18 @@ def annual_mass_balance_graphics(report):
             if len(colors) == 0:
                 colors.append("#" + ''.join([random.choice('1236789ABCDE') for _ in range(6)]))
 
-            mp.bar(table_dict['year'], variables[variable], width, colors=colors.pop(), bottom=prev_vars)
+            mp.bar(table_dict['year'], variables[variable], width, color=colors.pop(), bottom=prev_vars)
             prev_vars = [sum(x) for x in zip(prev_vars, variables[variable])]
             table_dict[variable] = variables[variable]
             legend.append(variable)
 
         mp.xticks(rotation=45)
         mp.axis('tight')
-        mp.table(cellText=table_dict.values(), rowLabels=table_dict.keys())
+        mp.table(cellText=list(table_dict.values()), rowLabels=list(table_dict.keys()))
         mp.title(report.report_name)
         mp.subplots_adjust(left=0.31, bottom=0.5)
 
-        path = str(save_dir / 'annual_' + report.report_name)
+        path = str(save_dir) + '/' + 'annual_' + report.report_name
         mp.savefig(path + '')
 
         mp.close()
