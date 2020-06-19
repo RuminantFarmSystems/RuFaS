@@ -175,7 +175,7 @@ class MassBalanceReport:
                 'actual': ['soil.manure_N_annual', 'kg', 0],
                 'calculated': ['soil.N_calc_annual', 'kg', 0],
                 'difference': ['soil.N_balance_difference_annual', 'kg', 0],
-                'delta_N': ['soil.delta_N_annual', 'kg', 0],
+                'delta': ['soil.delta_N_annual', 'kg', 0],
                 'N_drainage': ['soil.N_drainage_annual', 'kg', 0],
                 'N_runoff': ['soil.N_runoff_annual', 'kg', 0],
                 'N_erosion': ['soil.N_erosion_annual', 'kg', 0],
