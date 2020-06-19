@@ -10,13 +10,15 @@ Author(s): Jacob Johnson, jacob8399@gmail.com
 
 import csv
 import datetime as dt
+from pathlib import Path
+
 import matplotlib.pyplot as mp
 import random
 
 
 # reads all the data from a csv and puts it in a dictionary with each variable
 def read_data(report, output_csv):
-    output_full_path = str(report.csv_dir) + output_csv
+    output_full_path = Path(str(report.csv_dir) + '/' + output_csv)
 
     with open(output_full_path) as csv_file:
         read_csv = csv.reader(csv_file, delimiter=',')
