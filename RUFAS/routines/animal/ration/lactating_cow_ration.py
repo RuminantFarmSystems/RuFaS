@@ -18,7 +18,8 @@ def set_globals(DMIest, BW, DBW, milk, CP_milk):
 def calculate_requirements(BW, MW, DOP, housing, distance, parity, CI, TP_Milk, Fat_Milk, Lactose_Milk, Milk):
     '''
     Calculate the dietary requirements of the cows. These values are used
-    on the RHS of the linear program. Each calculation has a reference to the
+    on the RHS of the linear program and furthermore will be used in constraint
+    generation functions. Each calculation has a reference to the
     respective calculation in the pseudocode.
 
     Args:
