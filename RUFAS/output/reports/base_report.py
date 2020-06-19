@@ -39,9 +39,6 @@ class BaseReport:
             'year': ['time.cal_year', '', 0]
         }
 
-    #
-    # writes header names and units to the csv
-    #
     @staticmethod
     def write_headers(output_csv, variables):
 
@@ -63,15 +60,13 @@ class BaseReport:
         self.write_headers(Path(str(self.csv_dir) + '/' + self.file_name), self.daily_variables)
         self.write_headers(Path(str(self.csv_dir) + '/' + self.annual_file_name), self.annual_variables)
 
-    #
     # stores specified daily values. NOTE: the eval() method is limited
     # to the scope of variables. If a specified output is not a soil
-    # variable, this will throw an error. See comment at the top of the file.
-    #
+    # variable, this will throw an error.
     def daily_update(self, state, weather, time):
 
         soil = state.soil
-        crop = state.crop
+        crop_type = state.crop.current_crop
         animal_management = state.animal_management
         feed = state.feed
 
@@ -82,7 +77,7 @@ class BaseReport:
     def annual_update(self, state, weather, time):
         """Stores the yearly values that need to be printed in the report."""
         soil = state.soil
-        crop = state.crop
+        crop_type = state.crop.current_crop
         animal_management = state.animal_management
         feed = state.feed
 
@@ -97,9 +92,9 @@ class BaseReport:
     #
     def write_annual_report(self):
 
-        mode = 'a+' if (self.csv_dir + '/' + self.file_name).exists() else 'w+'
+        mode = 'a+' if Path(str(self.csv_dir) + '/' + self.file_name).exists() else 'w+'
 
-        with (self.csv_dir + '/' + self.file_name).open(mode) as csv_file:
+        with Path(str(self.csv_dir) + '/' + self.file_name).open(mode) as csv_file:
             # Write data day by day
             writer = csv.DictWriter(csv_file, fieldnames=self.daily_variables.keys(),
                                     lineterminator='\n')
@@ -110,9 +105,9 @@ class BaseReport:
                     row[variable] = self.daily_variables[variable][2][day]
                 writer.writerow(row)
 
-        mode = 'a+' if (self.csv_dir + '/' + self.annual_file_name).exists() else 'w+'
+        mode = 'a+' if Path(str(self.csv_dir) + '/' + self.annual_file_name).exists() else 'w+'
 
-        with (self.csv_dir + '/' + self.annual_file_name).open(mode) as csv_file:
+        with Path(str(self.csv_dir) + '/' + self.annual_file_name).open(mode) as csv_file:
             writer = csv.DictWriter(csv_file, fieldnames=self.annual_variables.keys(),
                                     lineterminator='\n')
             row = {}

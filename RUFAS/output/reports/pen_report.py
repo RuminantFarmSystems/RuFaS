@@ -79,7 +79,18 @@ class PenReport:
         def __init__(self, data, pen_id):
             super().__init__(data)
             self.pen_id = pen_id
-            self.file_name = 'pen_' + str(pen_id) + '/' + self.file_name
+
+        def daily_update(self, state, weather, time):
+            soil = state.soil
+            crop_type = state.crop.current_crop
+            animal_management = state.animal_management
+            feed = state.feed
+
+            pen = state.animal_management.all_pens[self.pen_id]
+
+            for variable in self.daily_variables:
+                self.daily_variables[variable][2].append(
+                    eval(self.daily_variables[variable][0], globals(), locals()))
 
     class GrowthReport(BasePenReport):
         def __init__(self, data, pen_id):
