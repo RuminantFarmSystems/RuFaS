@@ -78,7 +78,7 @@ class OutputHandler:
             if report.produce_csv:
                 csv_dir = util.get_base_dir() / output_dir / report_name
                 csv_dir.mkdir(exist_ok=True, parents=False)
-                self.reports[report_name].csv_dir = csv_dir
+                report.csv_dir = csv_dir
                 if report_name.startswith('pen'):
                     report.initialize_pen_csv_dir(csv_dir)
                 elif report_name.startswith('mass'):
@@ -100,11 +100,11 @@ class OutputHandler:
                 diagnostic_dir = util.get_base_dir() / diagnostic_dir / report_name
                 diagnostic_dir.mkdir(exist_ok=True, parents=False)
                 report.diagnostic_dir = diagnostic_dir
-                if report.report_name.startswith('pen'):
+                if report_name.startswith('pen'):
                     report.initialize_pen_diagnostic_dir(diagnostic_dir)
-                elif report.report_name.startswith('mass'):
+                elif report_name.startswith('mass'):
                     report.initialize_mass_balance_diagnostic_dir(diagnostic_dir)
-                elif report.report_name.startswith('field'):
+                elif report_name.startswith('field'):
                     report.initialize_field_diagnostic_dir(diagnostic_dir)
 
     def initialize_reports(self):
