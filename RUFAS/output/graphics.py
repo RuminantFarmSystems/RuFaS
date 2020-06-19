@@ -46,7 +46,6 @@ def read_data(report, output_csv):
 
 # data analytics for ration
 def ration_graphics(report):
-
     if report.produce_graphics:
         output_csv = report.file_name
         variables, units = read_data(report, output_csv)
@@ -111,8 +110,13 @@ def annual_mass_balance_graphics(report):
 
         mp.xticks(rotation=45)
         mp.axis('tight')
-        mp.table(cellText=list(table_dict.values()), rowLabels=list(table_dict.keys()))
+        table_bot = -1.08
+        table_height = 0.75
+        mp.table(cellText=list(table_dict.values()),
+                 rowLabels=list(table_dict.keys()),
+                 bbox=[0, table_bot, 1, table_height])
         mp.title(report.report_name)
+        mp.legend(legend)
         mp.subplots_adjust(left=0.31, bottom=0.5)
 
         path = str(save_dir) + '/' + 'annual_' + report.report_name
@@ -123,7 +127,6 @@ def annual_mass_balance_graphics(report):
 
 # produces the daily data analysis
 def daily_graphics(report):
-
     if report.produce_graphics:
         output_csv = report.file_name
         variables, units = read_data(report, output_csv)
