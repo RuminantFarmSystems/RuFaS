@@ -90,14 +90,14 @@ class Calf(AnimalBase):
        	Calculates this calf's nutrient requirements.
     '''
 	def calc_nutrient_rqmts(self, temp):
-		self._nutrient_rqmts, self._DMIest, self._DBW = calculate_rqmts()
+		# self._nutrient_rqmts, self._DMIest, self._DBW = calculate_rqmts()
 		# print(self._id, self._DMIest, self._DBW)
 
 		wean_day = AnimalBase.config['wean_day']
 		wean_length = AnimalBase.config['wean_length']
 		milk_type = AnimalBase.config['milk_type']
-		animal_intake, nutrient_rqmts = calc_requirements(self, temp, wean_day, wean_length, milk_type)
-		self._DBW = nutrient_rqmts['live_weight_change']
+		animal_intake, self._nutrient_rqmts = calc_requirements(self, temp, wean_day, wean_length, milk_type)
+		self._DBW = self._nutrient_rqmts['live_weight_change']['val']
 		# print(self._id, self._dm_intake, self._DBW, '\n')
 	
 	'''
