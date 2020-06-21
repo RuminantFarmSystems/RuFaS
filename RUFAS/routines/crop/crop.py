@@ -127,13 +127,6 @@ def annual_variable_update(crop_type):
     crop_type.DM_yield_annual += crop_type.DM_yield
 
 
-def annual_reset(crop_type):
-    crop_type.yield_N_annual = 0.0
-    crop_type.yield_P_annual = 0.0
-    crop_type.DM_yield_annual = 0.0
-    crop_type.yield_annual = 0.0
-
-
 # -------------------------------------------------------------------------------
 # Function: annual_crop_routine determines the current crop and whether it is
 # a kill year for that crop
@@ -226,6 +219,12 @@ class Crop:
                                 print('Cannot grow', crop_type.crop_name, 'in', str(year + x) + ',',
                                       self.grow_regimen[x].crop_name, 'is already growing.')
                             x += crop_type.repeat
+
+    def annual_reset(self):
+        self.current_crop.yield_N_annual = 0.0
+        self.current_crop.yield_P_annual = 0.0
+        self.current_crop.DM_yield_annual = 0.0
+        self.current_crop.yield_annual = 0.0
 
 
 #
