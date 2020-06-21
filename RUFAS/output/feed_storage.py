@@ -1,19 +1,20 @@
 ################################################################################
 """
 RUFAS: Ruminant Farm Systems Model
-File name: crop_summary.py
+File name: feed_storage.py
 Description:
 Author(s): William Donovan, wmdonovan@wisc.edu
            Jacob Johnson, jacob8399@gmail.com
 """
-###############################################################################
+#############################################
 import csv
 from pathlib import Path
+
 from RUFAS.output.graphics import daily_graphics, annual_graphics
 from RUFAS.output.report_handler import BaseReportHandler
 
 
-class CropSummary(BaseReportHandler):
+class FeedStorage(BaseReportHandler):
 
     def __init__(self, data):
 
@@ -31,7 +32,7 @@ class CropSummary(BaseReportHandler):
         #
 
         #
-        # Sets produce_csv, report_name, file_name using data
+        # Sets active, report_name, file_name using data
         #
         self.set_properties(data)
         self.fieldNames = None
@@ -41,18 +42,18 @@ class CropSummary(BaseReportHandler):
         # 1D Lists [julianDay]
         #
         self.daily_variables = {'year': ['time.cal_year', '', []],
-                                'j_day': ['time.day', '', []],
-                                'fr_PHU': ['crop_type.fr_PHU', '%', []],
-                                'biomass': ['crop_type.biomass_actual', 'kg ha^-1', []],
-                                'LAI_actual': ['crop_type.LAI_actual', 'm^2/m^2', []],
-                                'Bio_N': ['crop_type.bio_N', 'kg N ha^-1', []],
-                                'Bio_P': ['crop_type.bio_P', 'kg P ha^-1', []],
-                                'rooting_depth': ['crop_type.z_root', 'mm', []],
-                                'yield_actual': ['crop_type.yield_actual', 'kg ha^-1', []]
+                                'j_day': ['time.day', '', []]
                                 }
 
         self.annual_variables = {'year': ['time.cal_year', '', 0],
-                                 'yield': ['crop_type.yield_annual', 'kg/ha', 0]
+                                 'DM': ['feed.DM', 'kg', 0],
+                                 'C': ['feed.C', 'kg', 0],
+                                 'N': ['feed.N', 'kg', 0],
+                                 'P': ['feed.P', 'kg', 0],
+                                 'CP': ['feed.CP', 'kg', 0],
+                                 'NPN': ['feed.NPN', 'kg', 0],
+                                 'C_loss': ['feed.C_loss', 'kg', 0],
+                                 'CP_loss': ['feed.CP_loss', 'kg', 0]
                                  }
 
     #
@@ -79,6 +80,7 @@ class CropSummary(BaseReportHandler):
         annual_path = Path(str(self.get_fPath()).split('.csv')[0] + "_annual.csv")
         self.write_headers(annual_path, self.annual_variables)
 
+
     #
     # stores specified daily values. NOTE: the eval() method is limited
     # to the scope of variables. If a specified output is not a soil
@@ -87,7 +89,7 @@ class CropSummary(BaseReportHandler):
     def daily_update(self, state, weather, time):
         """Stores the daily values that need to be printed in the report."""
 
-        crop_type = state.crop.current_crop
+        feed = state.feed
         # Copy daily output values here
 
         for variable in self.daily_variables:
@@ -96,21 +98,25 @@ class CropSummary(BaseReportHandler):
 
     def annual_update(self, state, weather, time):
         """Stores the yearly values that need to be printed in the report."""
-        crop_type = state.crop.current_crop
+
+        feed = state.feed
 
         for variable in self.annual_variables:
             self.annual_variables[variable][2] = \
                 eval(self.annual_variables[variable][0], globals(), locals())
 
+        pass
+
     #
     # writes stored values to the csv at the end of the year
     #
     def write_annual_report(self):
+        """Appends the annual report to the output file."""
 
         mode = 'a+' if self.get_fPath().exists() else 'w+'
 
         with self.get_fPath().open(mode) as csvfile:
-            writer = csv.DictWriter(csvfile, fieldnames=self.daily_variables.keys(),
+            writer = csv.DictWriter(csvfile, fieldnames=self.daily_variables,
                                     lineterminator='\n')
             for day in range(len(self.daily_variables['j_day'][2])):
                 row = {}
@@ -134,6 +140,7 @@ class CropSummary(BaseReportHandler):
     # clears stored values at the end of the year
     #
     def annual_flush(self):
+        """Sets all of the values in the output object to the default value."""
 
         for variable in self.daily_variables:
             self.daily_variables[variable][2] = []
@@ -142,6 +149,6 @@ class CropSummary(BaseReportHandler):
             self.annual_variables[variable][2] = 0
 
     def produce_report_graphics(self, is_final):
+        daily_graphics(self.file_name, self.display_graphics, self.produce_graphics, is_final)
         annual_file_name = str(self.file_name).split('.')[0] + "_annual.csv"
         annual_graphics(annual_file_name, self.display_graphics, self.produce_graphics, is_final)
-        daily_graphics(self.file_name, self.display_graphics, self.produce_graphics, is_final)
