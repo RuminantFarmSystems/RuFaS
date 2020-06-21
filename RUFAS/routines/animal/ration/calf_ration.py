@@ -163,17 +163,17 @@ def calc_requirements(calf, temp, wean_day, wean_length, milk_type):
     }
 
     nutrient_requirements = {
-        'ne_maint': ne_maint,
-        'me_maint': me_maint,
-        'bio_val': bio_val,
-        'endo_urine_N': endo_urine_N,
-        'meta_fecal_N': meta_fecal_N,
-        'adp_maint': adp_maint,
-        'me_gain': me_gain,
-        'ne_gain': ne_gain, 
-        'energy_allow_gain': energy_allow_gain,
-        'adp_allow_gain': adp_allow_gain,
-        'live_weight_change': live_weight_change
+        'ne_maint': {'op': '=', 'val': ne_maint},
+        'me_maint': {'op': '=', 'val': me_maint},
+        'bio_val': {'op': '=', 'val': bio_val},
+        'endo_urine_N': {'op': '=', 'val': endo_urine_N},
+        'meta_fecal_N': {'op': '=', 'val': meta_fecal_N},
+        'adp_maint': {'op': '=', 'val': adp_maint},
+        'me_gain': {'op': '=', 'val': me_gain},
+        'ne_gain': {'op': '=', 'val': ne_gain}, 
+        'energy_allow_gain': {'op': '=', 'val': energy_allow_gain},
+        'adp_allow_gain': {'op': '=', 'val': adp_allow_gain},
+        'live_weight_change': {'op': '=', 'val': live_weight_change}
     }
 
     return animal_intake, nutrient_requirements
