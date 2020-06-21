@@ -151,10 +151,16 @@ class Corn:
 
         self.gamma_wu = 0
 
+        self.DM_perc_harvest = 0.15  # TODO: Hard coded dry matter percent at harvest
+
         self.bio_AG = 0
         self.yield_max = 0
         self.yield_actual = 0
+        self.DM_yield = 0.0
         self.yield_N = 0
         self.yield_P = 0
 
+        self.yield_N_annual = 0.0
+        self.yield_P_annual = 0.0
+        self.DM_yield_annual = 0.0
         self.yield_annual = 0
