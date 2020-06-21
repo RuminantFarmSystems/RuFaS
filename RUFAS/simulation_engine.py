@@ -21,10 +21,10 @@ from RUFAS.test import test_handler
 # -------------------------------------------------------------------------------
 # Function: simulate
 # -------------------------------------------------------------------------------
-def simulate(input_fPath:Path):
+def simulate(input_fPath: Path):
     """Executes the simulation with the json file specified.
 
-    Executes the similation with the json file at the path specified. Skips over
+    Executes the simulation with the json file at the path specified. Skips over
     the simulation (immediately returns) when an error is present in the json
     file. Prints out the error message to the console.
     The parameters of the simulation are all specified by the input file.
@@ -83,15 +83,16 @@ def daily_simulation():
     routines.daily_animal_routine(state.animal_management, state.feed, weather, time)
     routines.daily_soil_routine(state.soil, state.crop, weather, time)
     routines.daily_crop_routine(state.crop, weather, time, state.soil)
+    routines.daily_feed_routine(state.feed, state.crop)
 
     #
     # Daily Output Updates
     #
     output.daily_update(state, weather, time)
 
-    #print("simulating: " + time.to_str()) # Print out current day of simulation
+    # print("simulating: " + time.to_str()) # Print out current day of simulation
     time.advance()
-    #have to increment simulation_day here so that the daily output has the correct simulation day
+    # have to increment simulation_day here so that the daily output has the correct simulation day
     state.animal_management.simulation_day += 1
 
 
@@ -110,6 +111,7 @@ def annual_simulation():
     # Pre-annual Routines
     #
     routines.annual_crop_routine(state.crop, time)
+    routines.annual_feed_routine()
 
     while not time.end_year():
         daily_simulation()
@@ -127,7 +129,7 @@ def annual_simulation():
 # -------------------------------------------------------------------------------
 # Function: read_json_file
 # -------------------------------------------------------------------------------
-def read_json_file(fPath:Path):
+def read_json_file(fPath: Path):
     """Reads the json file, writes information to the simulation variables.
 
     Reads and inteprets the (json) file at the given path. Compiles the
@@ -135,7 +137,7 @@ def read_json_file(fPath:Path):
     them. Assigns the objects to the global simulation variables.
 
     Args:
-        fpath (Path): Path to the input json file
+        fPath (Path): Path to the input json file
 
     Raises:
         InvalidJSONfileError: If the json file at the given path does not
