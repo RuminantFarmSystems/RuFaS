@@ -94,6 +94,8 @@ def annual_mass_balance_graphics(report):
             'difference': variables.pop('difference'),
             'delta': variables.pop('delta')
         }
+
+        legend.append('actual')
         prev_vars = [0 for _ in range(len(table_dict['year']))]
 
         colors = ['#ffffff', '#DC267F', '#648FFF', '#FFB000', '#FE6100', '#785EF0', '#8B0000']
