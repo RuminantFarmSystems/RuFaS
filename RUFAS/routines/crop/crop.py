@@ -122,6 +122,16 @@ def daily_crop_routine(crop, weather, time, soil):
 def annual_variable_update(crop_type):
 
     crop_type.yield_annual += crop_type.yield_actual
+    crop_type.yield_N_annual += crop_type.yield_N
+    crop_type.yield_P_annual += crop_type.yield_P
+    crop_type.DM_yield_annual += crop_type.DM_yield
+
+
+def annual_reset(crop_type):
+    crop_type.yield_N_annual = 0.0
+    crop_type.yield_P_annual = 0.0
+    crop_type.DM_yield_annual = 0.0
+    crop_type.yield_annual = 0.0
 
 
 # -------------------------------------------------------------------------------
@@ -216,9 +226,6 @@ class Crop:
                                 print('Cannot grow', crop_type.crop_name, 'in', str(year + x) + ',',
                                       self.grow_regimen[x].crop_name, 'is already growing.')
                             x += crop_type.repeat
-
-    def annual_reset(self):
-        self.current_crop.yield_annual = 0
 
 
 #
@@ -374,12 +381,18 @@ class InitCrop:
 
         self.gamma_wu = 0
 
+        self.DM_perc_harvest = 0.15  # TODO: Hard coded dry matter percent at harvest
+
         self.bio_AG = 0
         self.yield_max = 0
         self.yield_actual = 0
+        self.DM_yield = 0.0
         self.yield_N = 0
         self.yield_P = 0
 
+        self.yield_N_annual = 0.0
+        self.yield_P_annual = 0.0
+        self.DM_yield_annual = 0.0
         self.yield_annual = 0
 
 

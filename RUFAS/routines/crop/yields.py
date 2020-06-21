@@ -112,7 +112,9 @@ def calc_yield_max(crop_type):
 def calc_yield_act(crop_type):
     crop_type.yield_actual = crop_type.yield_max * crop_type.harvest_eff
 
-    crop_type.yield_annual += crop_type.yield_actual
+
+def calc_DM_yield(crop_type):
+    crop_type.DM_yield = crop_type.yield_actual * crop_type.DM_perc_harvest
 
 
 #

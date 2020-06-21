@@ -33,7 +33,7 @@ def daily_feed_routine(feed, crop, animal_management, weather, time):
 
     current_crop = crop.current_crop
 
-    if current_crop.yield_actual != 0:
+    if current_crop.DM_yield != 0:
         if len(feed.available_storage) == 0:
             standard_data = {
                 "storage_type": "bag",
@@ -346,7 +346,7 @@ class Feed:
 
             if self.storage:
                 self.feed_id = crop.feed_id
-                self.DM += crop.yield_actual
+                self.DM += crop.DM_yield
                 self.N += crop.yield_N
                 self.P += crop.yield_P
                 # TODO: no Carbon Cycle currently implemented
