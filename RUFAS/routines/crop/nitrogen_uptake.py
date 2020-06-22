@@ -173,7 +173,7 @@ def calc_act_N_up_each_layer(crop_type, soil):
         act_N_up = min((pot_N_up + N_demand), soilLayer.NO3)
 
         # C.5.C.7
-        soilLayer.N_uptake = act_N_up_each_layer
+        soilLayer.N_uptake = act_N_up
         act_N_up_each_layer.append(act_N_up)
 
         # Update values so ready for the next layer
