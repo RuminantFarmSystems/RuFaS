@@ -192,6 +192,11 @@ def daily_soil_routine(soil, crop, weather, time):
 
 
 def annual_variable_update(soil):
+    soil.N_uptake = 0.0
+    for layer in soil.soil_layers:
+        soil.N_uptake += layer.N_uptake
+
+    soil.N_uptake_annual += soil.N_uptake
 
     soil.ET_max_annual += soil.ET_max
 
@@ -434,6 +439,8 @@ class Soil:
         self.NO3_runoff = 0.0
         self.NH4_runoff = 0.0
 
+        self.N_uptake = 0.0
+
         self.NH4_erosion = 0.0
         self.activeN_erosion = 0.0
         self.stableN_erosion = 0.0
@@ -441,6 +448,8 @@ class Soil:
 
         self.NO3_runoff_annual = 0.0
         self.NH4_runoff_annual = 0.0
+
+        self.N_uptake_annual = 0.0
 
         self.NH4_erosion_annual = 0.0
         self.activeN_erosion_annual = 0.0
@@ -581,6 +590,8 @@ class Soil:
             self.deNrate = layer_data['DenitrificationRate']
             self.fracActiveN = layer_data['FracActiveN']
             self.volatileExchangeFactor = layer_data['VolatileExchangeFac']
+
+            self.N_uptake = 0.0
 
             # Variables to simulate phosphorus cycling
             self.OM_percent = layer_data['OM%']
@@ -796,6 +807,8 @@ class Soil:
 
         self.NO3_runoff_annual = 0.0
         self.NH4_runoff_annual = 0.0
+
+        self.N_uptake_annual = 0.0
 
         self.NH4_erosion_annual = 0.0
         self.activeN_erosion_annual = 0.0
