@@ -14,7 +14,7 @@ from RUFAS.routines.animal.life_cycle.animal_events import AnimalEvents
 
 class AnimalBase(object):
 	global_id = 0
-	config = []
+	config = {}
 	nutrients = None
 	
 	@staticmethod
