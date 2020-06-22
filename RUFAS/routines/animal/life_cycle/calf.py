@@ -14,7 +14,7 @@ Description: This file updates the calf form birth to wean.
 import numpy as np
 from random import random
 from RUFAS.routines.animal.life_cycle.animal_base import AnimalBase
-from RUFAS.routines.animal.ration.calf_ration import calc_requirements
+from RUFAS.routines.animal.ration.calf_ration import calculate_rqmts, calc_requirements
 from RUFAS.routines.animal.manure.calf_manure_excretion import\
 	manure_calculations
 
@@ -80,10 +80,10 @@ class Calf(AnimalBase):
 		self.p_animal = args['p_init']
 
 		# feed intake
-		self._dm_intake = 0
-		self._me_intake = 0
-		self._cp_intake = 0
-		self._milk_starter_feed = {'milk': 0, 'starter': 0}
+		self.dm_intake = 0
+		self.me_intake = 0
+		self.cp_intake = 0
+		self.milk_starter_feed = {'milk': 0, 'starter': 0}
 
 	def init_from_calf(self, calf):
 		"""
@@ -110,8 +110,8 @@ class Calf(AnimalBase):
 		wean_day = AnimalBase.config['wean_day']
 		wean_length = AnimalBase.config['wean_length']
 		milk_type = AnimalBase.config['milk_type']
-		animal_intake, self._nutrient_rqmts = calc_requirements(self, temp, wean_day, wean_length, milk_type)
-		self._DBW = self._nutrient_rqmts['live_weight_change']['val']
+		animal_intake, self.nutrient_rqmts = calc_requirements(self, temp, wean_day, wean_length, milk_type)
+		self._DBW = self.nutrient_rqmts['live_weight_change']['val']
 
 	def calc_manure_excretion(self, feed):
 		"""

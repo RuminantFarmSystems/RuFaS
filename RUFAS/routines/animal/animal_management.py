@@ -34,7 +34,7 @@ def daily_animal_routine(animal_management, feed, weather, time):
         weather: instance of the Weather class
         time: instance of the Time class
     """
-    animal_management.daily_updates(feed)
+    animal_management.daily_updates(feed, weather, time)
 
 
 class AnimalManagement:
@@ -99,7 +99,7 @@ class AnimalManagement:
     heiferIII_p_comp = 0
     cow_p_comp = 0
 
-    def __init__(self, data, config, feed):
+    def __init__(self, data, config, feed, weather, time):
         """
         Initializes the pens and animals in the simulation with data from the
         JSON file by calling init_pens() and init_animals(). Creates instance
@@ -162,7 +162,7 @@ class AnimalManagement:
             pen_3 = Pen(2, 0.1, 1.6, 300, 'open air barn', 'straw', 'tiestall')
             self.all_pens.append(pen_3)
 
-    def init_animals(self, herd_data, pen_data, feed):
+    def init_animals(self, herd_data, pen_data, feed, weather, time):
         """
         Populates the list of animals with the information from the
         input JSON file: constructs the calves, heiferI’s, heiferII’s,
@@ -283,7 +283,7 @@ class AnimalManagement:
         """
         for pen in self.all_pens:
             pen.call_animal_nutrient_rqmts(self.housing,
-                                           self.pasture_concentrate, feed)
+                                           self.pasture_concentrate, feed, temp)
 
     def fully_update_id_pen(self):
         """
