@@ -55,7 +55,7 @@ class LactatingCowTest(unittest.TestCase):
 
     def setUp(self):
         """
-        Sets up the input and expected outputs for the unit tests.
+        Sets up the inputs and expected outputs for the unit tests.
         """
         self.inputs_outputs = animal_inputs_outputs.AnimalinputOutputs()
         self.set_up_feeds()
@@ -66,16 +66,16 @@ class LactatingCowTest(unittest.TestCase):
         expected_ration = self.inputs_outputs.lactating_cow_expected_ration_1
         feed = self.feeds[0]
 
-        rqmts, _, _ = ration.calculate_rqmts(input['BW'], input['BCS'],
-                                             input['CBW'], input['CI'],
-                                             input['concentrate'],
-                                             input['CP_Milk'],
-                                             input['DOP'], input['DHD'],
-                                             input['DVD'], input['DIM'],
-                                             input['fat_milk'],
-                                             input['lactose_milk'],
-                                             input['milk'], input['parity'],
-                                             input['type'],
+        rqmts, _, _ = ration.calculate_rqmts(inputs['BW'], inputs['BCS'],
+                                             inputs['CBW'], inputs['CI'],
+                                             inputs['concentrate'],
+                                             inputs['CP_Milk'],
+                                             inputs['DOP'], inputs['DHD'],
+                                             inputs['DVD'], inputs['DIM'],
+                                             inputs['fat_milk'],
+                                             inputs['lactose_milk'],
+                                             inputs['milk'], inputs['parity'],
+                                             inputs['type'],
                                              feed.nutrient_rqmts)
 
         self.assertEqual(rqmts, expected_rqmts)
@@ -85,14 +85,14 @@ class LactatingCowTest(unittest.TestCase):
         self.assertEqual(formulated_ration, expected_ration)
 
     def test_manure_1(self):
-        input = self.inputs_outputs.lactating_cow_input_1
+        inputs = self.inputs_outputs.lactating_cow_input_1
         input_ration = self.inputs_outputs.lactating_cow_input_ration_1
         expected_manure = self.inputs_outputs.lactating_cow_expected_manure_1
         feed = self.feeds[0]
 
         manure = manure_excretion.manure_calculations(input_ration, feed,
-                                                      input['BW'], input['DIM'],
-                                                      input['mPrt'])
+                                                      inputs['BW'], inputs['DIM'],
+                                                      inputs['mPrt'])
 
         self.assertEqual(manure, expected_manure)
 

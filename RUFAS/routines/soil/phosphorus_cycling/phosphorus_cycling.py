@@ -58,7 +58,7 @@ def update_P(soil):
     soil.manure_P_annual += soil.manure_P
 
     profile_P = soil.labile_P + soil.active_P + \
-                     soil.stable_P + soil.org_P + soil.soil_P
+                     soil.stable_P + soil.org_P
 
     soil.delta_P = soil.profile_P - profile_P
 

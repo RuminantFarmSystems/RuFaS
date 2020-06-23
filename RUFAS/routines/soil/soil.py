@@ -203,6 +203,9 @@ def annual_variable_update(soil):
 
     soil.p_act_annual += soil.p_act
 
+    soil.manure_app_annual += soil.manure_app
+    soil.manure_P_annual += soil.manure_P
+
 
 # -------------------------------------------------------------------------------
 # Class: Soil
@@ -329,9 +332,10 @@ class Soil:
         self.depth_fact = 0.0
 
         # manure
+        self.manure_app = 0.0
+
         self.manure_type = 0
-        self.manure_annual = 0
-        self.manure_P_annual = 0
+        self.manure_app_annual = 0
 
         self.WIP = 0.0
         self.WOP = 0.0
@@ -541,7 +545,7 @@ class Soil:
         self.profile_P = 0.0
         for layer in self.soil_layers:
             self.profile_P += layer.labile_P + layer.active_P + \
-                              layer.stable_P + layer.org_P + layer.soil_P
+                              layer.stable_P + layer.org_P
 
         self.initial_profile_P = self.profile_P
 
@@ -895,6 +899,8 @@ class Soil:
 
         self.initial_profile_P = self.profile_P
 
+        self.manure_app_annual = 0.0
+
         self.manure_P_annual = 0.0
         self.P_calc_annual = 0.0
         self.P_drainage_annual = 0.0
@@ -917,9 +923,6 @@ class Soil:
         self.NO3_drainage_annual = 0.0
         self.NH4_drainage_annual = 0.0
         self.active_N_drainage_annual = 0.0
-
-        self.manure_annual = 0.0
-        self.manure_P_annual = 0
 
         self.DRP_runoff_annual = 0.0
         self.DRP_leachate_annual = 0.0
