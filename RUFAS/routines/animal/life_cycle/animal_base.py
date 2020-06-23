@@ -3,9 +3,9 @@ RUFAS: Ruminant Farm Systems Model
 File name: animal_base.py
 Author(s): Manfei Li, mli497@wisc.edu
            Militsa Sotirova, militsasotrirova@gmail.com
-	   Tayler Hansen, tlhansen@cornell.edu
+           Tayler Hansen, tlhansen@cornell.edu
 Description: This file initialize common parameters including ID, breed,
-			birth date, and age for all animals to be identified.
+birth date, and age for all animals to be identified.
 """
 ###############################################################################
 
@@ -16,7 +16,7 @@ class AnimalBase(object):
 	global_id = 0
 	config = []
 	nutrients = None
-	
+
 	@staticmethod
 	def set_nutrient_list(nutrients):
 		AnimalBase.nutrients = nutrients
@@ -25,7 +25,7 @@ class AnimalBase(object):
 	def next_id():
 		AnimalBase.global_id += 1
 		return AnimalBase.global_id
-	
+
 	@staticmethod
 	def set_config(config):
 		AnimalBase.config = config
@@ -46,7 +46,7 @@ class AnimalBase(object):
 		self.culled = False
 		self.do_not_breed = False
 		self.events = AnimalEvents()
-		
+
 		self.daily_growth = 0
 		self.nutrient_rqmts = {}
 		self.set_default_nutrient_rqmts()
@@ -78,7 +78,7 @@ class AnimalBase(object):
 		self.events = animal.events
 		self.body_weight = animal.body_weight
 		self.mature_body_weight = animal.mature_body_weight
-		
+
 		self.daily_growth = animal.daily_growth
 		self.nutrient_rqmts = animal.nutrient_rqmts
 		self.set_default_nutrient_rqmts()
@@ -135,7 +135,7 @@ class AnimalBase(object):
 		self.p_excess = max(self.p_intake - self.p_req, 0)
 
 		# change in body P reserves (g), must be <= 0 (A.1G.A.2)
-		prev_dP_reserves = self.dP_reserves
+		dP_reserves_prev = self.dP_reserves
 
 		if self.p_intake < self.p_req:
 			self.dP_reserves = self.p_intake - self.p_req + self.dP_reserves
@@ -145,7 +145,8 @@ class AnimalBase(object):
 			self.dP_reserves = 0
 
 		# amount of P in the animal (A.1G.A.3)
-		self.p_animal = self.p_animal + self.p_gest + self.p_growth + (self.dP_reserves - prev_dP_reserves)
+		self.p_animal = self.p_animal + self.p_gest + self.p_growth + \
+			(self.dP_reserves - dP_reserves_prev)
 
 	def calc_base_manure(self):
 		"""
@@ -165,7 +166,7 @@ class AnimalBase(object):
 		if self.dP_reserves == 0 and self.p_intake >= self.p_req:
 			p_feces_excrt = self.p_intake - self.p_req + self.p_maint_feces
 		elif self.dP_reserves < 0 and self.p_intake >= self.p_req and \
-				self.p_excess >= (-1) * self.dP_reserves / 0.7:
+			self.p_excess >= (-1) * self.dP_reserves / 0.7:
 			p_feces_excrt = self.p_intake - self.p_req + self.p_maint_feces + \
 							self.dP_reserves / 0.7
 		else:

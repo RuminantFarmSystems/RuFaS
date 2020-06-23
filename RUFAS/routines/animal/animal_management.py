@@ -347,6 +347,7 @@ class AnimalManagement:
         for calf in calves_born:
             # TODO: this is the hard coded calf pen value
             pen = 0
+            self.id_pen[calf.id] = pen
             self.calves.append(calf)
             self.all_pens[pen].set_up_new_animal(calf, -1)
 
@@ -401,6 +402,8 @@ class AnimalManagement:
             #Assigning Lactating Cows to Pens based on the grouping output
                 for key in pen_grouping:
                     self.all_pens[key].update_animals(pen_grouping[key])
+
+        self.fully_update_id_pen()
 
     def clear_pens(self):
         """
