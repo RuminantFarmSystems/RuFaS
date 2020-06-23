@@ -85,7 +85,7 @@
         "feed_storage":
         {
             "produce_csv": true,
-            "produce_graphics": false,
+            "produce_graphics": true,
             "display_graphics": false,
             "report_name": "Feed Storage",
             "file_name": "feed_storage.csv"

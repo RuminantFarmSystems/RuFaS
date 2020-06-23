@@ -72,6 +72,7 @@ def update_all(crop_type, time, soil):
     calc_yield_act(crop_type)
     calc_nutrient_removal(crop_type)
     calc_residue(crop_type, time, soil)
+    calc_DM_yield(crop_type)
 
 
 #
