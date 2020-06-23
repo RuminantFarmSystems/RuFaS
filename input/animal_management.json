@@ -1,23 +1,23 @@
 
 {
-
     "config":
     {
-         "start_date" : "2009:244",
-        "end_date" : "2011:243",
-        "output_dir": "Outputs/Sample_Farm_Outputs/",
-        "diagnostic_dir": "Outputs/diagnostics/",
-        "run_tests": true
+        "start_date" : "2009:244",
+        "end_date" : "2016:243",
+        "csv_dir": "output/CSVs/",
+        "graphic_dir": "output/graphics/",
+        "run_tests": false
     },
 
-    "weather": "Inputs/barnyard_weather.csv",
+    "weather": "input/barnyard_weather.csv",
 
-    "output":
+    "output_handler":
     {
         "pen_report":
         {
             "produce_csv": true,
             "produce_graphics": true,
+            "report_name": "pen_report",
 
             "ration_report":
             {
@@ -38,32 +38,36 @@
                 "report_name": "growth_report"
             }
         },
-        "mass_balance":
+        "mass_balance_report":
         {
             "produce_csv": true,
             "produce_graphics": true,
-            "report_name": "mass_balance",
+            "report_name": "mass_balance_report",
 
             "water_balance":
             {
                 "produce_csv": true,
-                "produce_graphics": true,
-                "report_name": "water_balance"
+                "produce_graphics": false,
+                "report_name": "water_balance_report"
             },
             "phosphorus_balance":
             {
                 "produce_csv": true,
-                "produce_graphics": true,
-                "report_name": "phosphorus_balance"
+                "produce_graphics": false,
+                "report_name": "phosphorus_balance_report"
             },
             "nitrogen_balance":
             {
                 "produce_csv": true,
-                "produce_graphics": true,
-                "report_name": "nitrogen_balance"
+                "produce_graphics": false,
+                "report_name": "nitrogen_balance_report"
             }
         },
         "field_report": {
+            "produce_csv": true,
+            "produce_graphics": true,
+            "report_name": "field_report",
+
             "soil_report": {
                 "produce_csv": true,
                 "produce_graphics": false,
@@ -94,7 +98,7 @@
         "custom_report":
         {
             "produce_csv": true,
-            "produce_graphics": true,
+            "produce_graphics": false,
             "report_name": "custom_report"
         }
     },
@@ -471,7 +475,7 @@
 
         "feed":
         {
-            "feed_database": "Inputs/feeds.sqlite",
+            "feed_database": "input/feeds.sqlite",
             "table_name": "feed_library",
 
             "managed_feeds":

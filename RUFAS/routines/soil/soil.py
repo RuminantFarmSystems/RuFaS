@@ -7,7 +7,7 @@ Author(s): Kass Chupongstimun, kass_c@hotmail.com
            Jit Patil, spatil5@wisc.edu
            William Donovan, wmdonovan@wisc.edu
 
-This module needs the following inputs in order to operate correctly:
+This module needs the following input in order to operate correctly:
 
     These are attributes of a soil profile that need to be specified in the json input
     file. The values on the right are just examples from a soil profile with 1 layer.
@@ -383,7 +383,7 @@ class Soil:
         self.calculateFcWater()  # calculate field capacity water in layer
         self.calculateSatWater()  # calculate saturation water in layer
 
-        # daily output values
+        # daily output_handler values
         self.evap_max = 0.0
         self.trans_max = 0.0
         self.ET_max = 0.0

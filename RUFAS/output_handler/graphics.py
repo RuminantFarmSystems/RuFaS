@@ -2,7 +2,7 @@
 RUFAS: Ruminant Farm Systems Model
 File name: graphics.py
 
-Description: Produces graphical representations of RuFaS output data.
+Description: Produces graphical representations of RuFaS output_handler data.
 
 Author(s): Jacob Johnson, jacob8399@gmail.com
            William Donovan, wmdonovan@wisc.edu
@@ -50,7 +50,7 @@ def ration_graphics(report):
         output_csv = report.file_name
         variables, units = read_data(report, output_csv)
 
-        save_dir = report.diagnostic_dir
+        save_dir = report.graphic_dir
 
         start_year = int(variables['year'][0])
         start_day = int(variables['j_day'][0])
@@ -81,7 +81,7 @@ def annual_mass_balance_graphics(report):
         annual_file_name = str(report.file_name).split('.')[0] + "_annual.csv"
         variables, units = read_data(report, annual_file_name)
 
-        save_dir = report.diagnostic_dir
+        save_dir = report.graphic_dir
 
         mp.figure()
 
@@ -133,7 +133,7 @@ def daily_graphics(report):
         output_csv = report.file_name
         variables, units = read_data(report, output_csv)
 
-        save_dir = report.diagnostic_dir
+        save_dir = report.graphic_dir
 
         start_year = int(variables['year'][0])
         start_day = int(variables['j_day'][0])
@@ -163,7 +163,7 @@ def annual_graphics(report):
     if report.produce_graphics:
         annual_file_name = str(report.file_name).split('.')[0] + "_annual.csv"
         variables, units = read_data(report, annual_file_name)
-        save_dir = report.diagnostic_dir
+        save_dir = report.graphic_dir
 
         start_year = int(variables['year'][0])
         end_year = int(variables['year'][-1])

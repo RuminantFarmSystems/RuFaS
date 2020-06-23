@@ -6,14 +6,14 @@ Author(s): William Donovan, wmdonovan@wisc.edu
 """
 from pathlib import Path
 
-from RUFAS.output.reports import BaseReport
+from RUFAS.output_handler.reports import BaseReport
 from .. import graphics
 
 
 class PenReport:
     def __init__(self, data, pen_id):
 
-        self.diagnostic_dir = Path
+        self.graphic_dir = Path
         self.csv_dir = Path
         self.report_name = data['report_name']
         self.produce_csv = data['produce_csv']
@@ -34,17 +34,15 @@ class PenReport:
                 if report.produce_csv:
                     report.initialize()
 
-    def initialize_pen_csv_dir(self, pen_dir):
+    def initialize_pen_csv_dir(self):
         for report_name in self.pen_reports:
-            csv_dir = pen_dir / report_name
-            csv_dir.mkdir(exist_ok=True, parents=False)
-            self.pen_reports[report_name].csv_dir = csv_dir
+            self.pen_reports[report_name].csv_dir = Path(str(self.csv_dir) + '/' + report_name)
+            self.pen_reports[report_name].csv_dir.mkdir(exist_ok=True, parents=False)
 
-    def initialize_pen_diagnostic_dir(self, pen_dir):
+    def initialize_pen_graphic_dir(self):
         for report_name in self.pen_reports:
-            diagnostic_dir = pen_dir / report_name
-            diagnostic_dir.mkdir(exist_ok=True, parents=False)
-            self.pen_reports[report_name].diagnostic_dir = diagnostic_dir
+            self.pen_reports[report_name].graphic_dir = Path(str(self.graphic_dir) + '/' + report_name)
+            self.pen_reports[report_name].graphic_dir.mkdir(exist_ok=True, parents=False)
 
     def daily_update(self, state, weather, time):
         if self.produce_csv:
@@ -125,8 +123,7 @@ class PenReport:
 
             self.daily_variables = {'year': ['time.cal_year', '', []],
                                     'j_day': ['time.day', '', []],
-                                    'num_animals': ['len(pen.animals_in_pen)', '', []],
-                                    'achieved_price': ['pen.ration[\'objective\'] if pen.pen_populated else 0', '', []]
+                                    'num_animals': ['len(pen.animals_in_pen)', '', []]
                                     }
 
             self.annual_variables = {

@@ -11,7 +11,7 @@ Author(s): Militsa Sotirova, militsasotirova@gmail.com
 def manure_calculations():
     '''
     TEMPORARY PLACEHOLDER
-    Calculates inputs for manure module with information from the ration formulation. 
+    Calculates input for manure module with information from the ration formulation.
     Equations referenced are from pseudocode.
     
     Returns:

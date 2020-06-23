@@ -14,7 +14,7 @@ from pathlib import Path
 
 from RUFAS import routines, errors
 from RUFAS.classes import Config, State, Weather, Time
-from RUFAS.output import OutputHandler
+from RUFAS.output_handler import OutputHandler
 from RUFAS.test import test_handler
 
 
@@ -45,12 +45,12 @@ def simulate(input_fPath: Path):
         return
 
     #
-    # Creates a new directory for the output files (if doesn't already exist)
-    # Deletes existing output files of the same name from previous simulation
+    # Creates a new directory for the output_handler files (if doesn't already exist)
+    # Deletes existing output_handler files of the same name from previous simulation
     # Transfer needed (initial) data from state to report handlers
     #
-    output.initialize_output_dir(config.output_dir)
-    output.initialize_diagnostic_dir(config.diagnostic_dir)
+    output.initialize_csv_dir(config.csv_dir)
+    output.initialize_graphic_dir(config.graphic_dir)
     output.initialize_reports()
 
     print("\nSimulating: {}".format(input_fPath.name))
@@ -92,7 +92,7 @@ def daily_simulation():
 
     # print("simulating: " + time.to_str()) # Print out current day of simulation
     time.advance()
-    # have to increment simulation_day here so that the daily output has the correct simulation day
+    # have to increment simulation_day here so that the daily output_handler has the correct simulation day
     state.animal_management.simulation_day += 1
 
 
@@ -102,8 +102,8 @@ def daily_simulation():
 def annual_simulation():
     """Executes the annual simulation routines.
 
-    Writes the annual report to the output files
-    Flushes the data in the output object
+    Writes the annual report to the output_handler files
+    Flushes the data in the output_handler object
     Resets the state for the following year
     """
 
@@ -163,7 +163,7 @@ def read_json_file(fPath: Path):
                               config.w_start_day, config.start_year, config.start_day)
             time = Time(config.years, config.start_year)
             state = State(data['farm'], config, time)
-            output = OutputHandler(data['output'], state)
+            output = OutputHandler(data['output_handler'], state)
 
         except errors.JSONfileData as e:
             print("JSON FILE ERROR: " +

@@ -3,14 +3,14 @@
     {
         "start_date" : "2009:244",
         "end_date" : "2016:243",
-        "output_dir": "Outputs/Sample_Farm_Outputs/",
-        "diagnostic_dir": "Outputs/diagnostics/",
+        "csv_dir": "output/CSVs/",
+        "graphic_dir": "output/graphics/",
         "run_tests": false
     },
 
-    "weather": "Inputs/barnyard_weather.csv",
+    "weather": "input/barnyard_weather.csv",
 
-    "output":
+    "output_handler":
     {
         "pen_report":
         {
@@ -440,7 +440,7 @@
 
         "feed":
         {
-            "feed_database": "Inputs/feeds.sqlite",
+            "feed_database": "input/feeds.sqlite",
             "table_name": "feed_library",
 
             "managed_feeds":

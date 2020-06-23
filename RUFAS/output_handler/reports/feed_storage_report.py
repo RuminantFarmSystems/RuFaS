@@ -4,7 +4,7 @@ File name: feed_storage_report.py
 Description:
 Author(s): William Donovan, wmdonovan@wisc.edu
 """
-from RUFAS.output.reports.base_report import BaseReport
+from RUFAS.output_handler.reports.base_report import BaseReport
 
 
 class FeedStorageReport(BaseReport):

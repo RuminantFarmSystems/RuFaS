@@ -28,7 +28,7 @@ class BaseReport:
         self.file_name = self.report_name + '.csv'
         self.annual_file_name = self.report_name + '_annual.csv'
         self.csv_dir = ''
-        self.diagnostic_dir = ''
+        self.graphic_dir = ''
 
         self.daily_variables = {
             'year': ['time.cal_year', '', []],
@@ -61,7 +61,7 @@ class BaseReport:
         self.write_headers(Path(str(self.csv_dir) + '/' + self.annual_file_name), self.annual_variables)
 
     # stores specified daily values. NOTE: the eval() method is limited
-    # to the scope of variables. If a specified output is not a soil
+    # to the scope of variables. If a specified output_handler is not a soil
     # variable, this will throw an error.
     def daily_update(self, state, weather, time):
 

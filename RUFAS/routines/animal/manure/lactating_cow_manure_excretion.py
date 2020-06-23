@@ -11,12 +11,12 @@ from RUFAS.routines.feed.feed import FeedNames, Nutrients
 
 def manure_calculations(ration_formulation, feed, BW, DIM, mPrt):
     '''
-    Calculates inputs for manure module with information from the ration formulation. 
+    Calculates input for manure module with information from the ration formulation.
     Equations referenced are from pseudocode.
     
     Args:
         ration_formulation: dictionary which stores the calculated ration
-            For n available feeds, the output of the linear programming for the ration formulation 
+            For n available feeds, the output_handler of the linear programming for the ration formulation
             is a dictionary that looks like:
             {    
                 'feed1': amount of feed 1 in kg,

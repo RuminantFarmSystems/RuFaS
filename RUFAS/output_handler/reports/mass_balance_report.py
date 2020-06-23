@@ -6,14 +6,14 @@ Author(s): William Donovan, wmdonovan@wisc.edu
 """
 from pathlib import Path
 
-from RUFAS.output import graphics
-from RUFAS.output.reports.base_report import BaseReport
+from RUFAS.output_handler import graphics
+from RUFAS.output_handler.reports.base_report import BaseReport
 
 
 class MassBalanceReport:
     def __init__(self, data):
 
-        self.diagnostic_dir = Path
+        self.graphic_dir = Path
         self.csv_dir = Path
         self.report_name = data['report_name']
         self.produce_csv = data['produce_csv']
@@ -33,17 +33,15 @@ class MassBalanceReport:
                 if report.produce_csv:
                     report.initialize()
 
-    def initialize_mass_balance_csv_dir(self, mass_balance_dir):
+    def initialize_mass_balance_csv_dir(self):
         for report_name in self.mass_balance_reports:
-            csv_dir = mass_balance_dir / report_name
-            csv_dir.mkdir(exist_ok=True, parents=False)
-            self.mass_balance_reports[report_name].csv_dir = csv_dir
+            self.mass_balance_reports[report_name].csv_dir = Path(str(self.csv_dir) + '/' + report_name)
+            self.mass_balance_reports[report_name].csv_dir.mkdir(exist_ok=True, parents=False)
 
-    def initialize_mass_balance_diagnostic_dir(self, mass_balance_dir):
+    def initialize_mass_balance_graphic_dir(self):
         for report_name in self.mass_balance_reports:
-            diagnostic_dir = mass_balance_dir / report_name
-            diagnostic_dir.mkdir(exist_ok=True, parents=False)
-            self.mass_balance_reports[report_name].diagnostic_dir = diagnostic_dir
+            self.mass_balance_reports[report_name].graphic_dir = Path(str(self.graphic_dir) + '/' + report_name)
+            self.mass_balance_reports[report_name].graphic_dir.mkdir(exist_ok=True, parents=False)
 
     def daily_update(self, state, weather, time):
         if self.produce_csv:
