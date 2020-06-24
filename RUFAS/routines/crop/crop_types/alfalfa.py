@@ -20,7 +20,7 @@ class Alfalfa:
         self.crop_name = 'alfalfa'
         self.crop_type = 'perennial'
         self.harvest_quality = 'null'
-        self.feed_id = 'g_1'
+        self.feed_id = '1g'
 
         self.kill_day = -1
         self.kill_year = False
@@ -154,16 +154,19 @@ class Alfalfa:
 
         self.gamma_wu = 0
 
-        self.DM_perc_harvest = 0.15  # TODO: Hard coded dry matter percent at harvest
+        self.DM_harvest_perc = 0.15  # TODO: Hard coded dry matter percent at harvest
+        self.NDF_harvest_perc = 0.416
 
         self.bio_AG = 0
         self.yield_max = 0
         self.yield_actual = 0
         self.DM_yield = 0.0
-        self.yield_N = 0
-        self.yield_P = 0
+        self.NDF_yield = 0.0
+        self.N_yield = 0
+        self.P_yield = 0
 
-        self.yield_N_annual = 0.0
-        self.yield_P_annual = 0.0
+        self.N_yield_annual = 0.0
+        self.P_yield_annual = 0.0
         self.DM_yield_annual = 0.0
+        self.NDF_yield_annual = 0.0
         self.yield_annual = 0

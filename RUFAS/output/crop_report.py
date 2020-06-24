@@ -48,13 +48,15 @@ class CropReport(BaseReportHandler):
                                 'Bio_N': ['crop_type.bio_N', 'kg N ha^-1', []],
                                 'Bio_P': ['crop_type.bio_P', 'kg P ha^-1', []],
                                 'rooting_depth': ['crop_type.z_root', 'mm', []],
-                                'yield_actual': ['crop_type.yield_actual', 'kg ha^-1', []],
-                                'DM_yield': ['crop_type.DM_yield', 'kg ha^-1', []]
+                                'yield_actual': ['crop_type.yield_actual', 'kg', []],
+                                'DM_yield': ['crop_type.DM_yield', 'kg', []],
+                                'NDF_yield': ['crop_type.NDF_yield', 'kg', []]
                                 }
 
         self.annual_variables = {'year': ['time.cal_year', '', 0],
-                                 'yield': ['crop_type.yield_annual', 'kg/ha', 0],
-                                 'DM_yield': ['crop_type.DM_yield_annual', 'kg / ha', 0]
+                                 'yield': ['crop_type.yield_annual', 'kg', 0],
+                                 'DM_yield': ['crop_type.DM_yield_annual', 'kg', 0],
+                                 'NDF_yield': ['crop_type.NDF_yield_annual', 'kg', 0]
                                  }
 
     #

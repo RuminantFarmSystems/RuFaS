@@ -16,7 +16,7 @@ class Soybean:
         self.crop_name = 'soybean'
         self.crop_type = 'annual'
         self.harvest_quality = 'null'
-        self.feed_id = 'g_121'
+        self.feed_id = '121g'
 
         self.kill_day = -1
         self.kill_year = True
@@ -151,16 +151,19 @@ class Soybean:
 
         self.gamma_wu = 0
 
-        self.DM_perc_harvest = 0.15  # TODO: Hard coded dry matter percent at harvest
+        self.DM_harvest_perc = 0.15  # TODO: Hard coded dry matter percent at harvest
+        self.NDF_harvest_perc = 0.466
 
         self.bio_AG = 0
         self.yield_max = 0
         self.yield_actual = 0
         self.DM_yield = 0.0
-        self.yield_N = 0
-        self.yield_P = 0
+        self.NDF_yield = 0.0
+        self.N_yield = 0
+        self.P_yield = 0
 
-        self.yield_N_annual = 0.0
-        self.yield_P_annual = 0.0
+        self.N_yield_annual = 0.0
+        self.P_yield_annual = 0.0
         self.DM_yield_annual = 0.0
+        self.NDF_yield_annual = 0.0
         self.yield_annual = 0

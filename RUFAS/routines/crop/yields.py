@@ -37,9 +37,9 @@ CropType attribute definitions:
 
     yield_actual = Actual crop yield at harvest (kg/ha)
 
-    yield_N = Amount of nitrogen removed in the yield
+    N_yield = Amount of nitrogen removed in the yield
 
-    yield_P = Amount of phosphorus removed in the yield
+    P_yield = Amount of phosphorus removed in the yield
 
     residue = Material in the residue pool for the top 10mm of soil on current
               day (kg/ha)
@@ -53,8 +53,8 @@ CropType values updated by update_all():
     HI_actual
     yield_max
     yield_actual
-    yield_N
-    yield_P
+    N_yield
+    P_yield
     residue
 """
 ###############################################################################
@@ -72,7 +72,9 @@ def update_all(crop_type, time, soil):
     calc_yield_act(crop_type)
     calc_nutrient_removal(crop_type)
     calc_residue(crop_type, time, soil)
+    calc_quality_assessment(crop_type)
     calc_DM_yield(crop_type)
+    calc_NDF_yield(crop_type)
 
 
 #
@@ -115,7 +117,11 @@ def calc_yield_act(crop_type):
 
 
 def calc_DM_yield(crop_type):
-    crop_type.DM_yield = crop_type.yield_actual * crop_type.DM_perc_harvest
+    crop_type.DM_yield = crop_type.yield_actual * crop_type.DM_harvest_perc
+
+
+def calc_NDF_yield(crop_type):
+    crop_type.NDF_yield = crop_type.yield_actual * crop_type.NDF_harvest_perc
 
 
 #
@@ -123,8 +129,8 @@ def calc_DM_yield(crop_type):
 # "pseudocode_crop" C.10.F.1/2
 #
 def calc_nutrient_removal(crop_type):
-    crop_type.yield_N = crop_type.fr_N * crop_type.yield_actual
-    crop_type.yield_P = crop_type.fr_P * crop_type.yield_actual
+    crop_type.N_yield = crop_type.fr_N * crop_type.yield_actual
+    crop_type.P_yield = crop_type.fr_P * crop_type.yield_actual
 
 
 def calc_quality_assessment(crop_type):
@@ -136,8 +142,18 @@ def calc_quality_assessment(crop_type):
     Args:
         crop_type: the crop for which a quality is being assessed
     """
-    crop_type.harvest_quality = 'good'
+    crop_type.harvest_quality = 'mature'
     crop_type.feed_id = crop_type.feed_id
+    if crop_type.crop_name.startswith('corn'):
+        if crop_type.harvest_quality == 'immature':
+            crop_type.feed_id = '35g'
+            crop_type.NDF_harvest_perc = 0.541
+        elif crop_type.harvest_quality == 'mid_mature':
+            crop_type.feed_id = '36g'
+            crop_type.NDF_harvest_perc = 0.45
+        elif crop_type.harvest_quality == 'mature':
+            crop_type.feed_id = '37g'
+            crop_type.NDF_harvest_perc = 0.445
 
 
 #
