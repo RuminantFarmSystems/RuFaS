@@ -461,6 +461,18 @@ class Soil:
         self.structural_AG = 0.0
         self.structural_BG = 0.0
         self.fr_tillage = 0.0  # TODO used in carbon but the variable should probably be relocated
+        self.metabolic_AG_to_active_loss = 0.0
+        self.metabolic_AG_to_active_actual = 0.0
+        self.struct_AG_to_active_loss = 0.0
+        self.struct_AG_to_active_actual = 0.0
+        self.struct_AG_to_slow_loss = 0.0
+        self.struct_AG_to_slow_actual = 0.0
+        self.metabolic_BG_to_active_loss = 0.0
+        self.metabolic_BG_to_active_actual = 0.0
+        self.struct_BG_to_active_loss = 0.0
+        self.struct_BG_to_active_actual = 0.0
+        self.struct_BG_to_slow_loss = 0.0
+        self.struct_BG_to_slow_actual = 0.0
 
         # ------ INITIALIZE SOIL NITROGEN POOLS ------------------------------------
         # Calculate initial amount of NO3 in each soil layer;

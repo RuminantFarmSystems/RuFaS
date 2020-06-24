@@ -113,14 +113,14 @@ def update_all(crop_type, soil, weather, time):
     # partitioning active and slow carbon decomposition to carbon pools or gas loss
 
     # above ground metabolic C
-    fr_CO2_met_to_active = 0.55  # TODO hesitant, Michael does this make sense?
+    fr_CO2_met_to_active = 0.55
     soil.metabolic_AG_to_active_loss = metabolic_AG_to_C_active * fr_CO2_met_to_active
     soil.metabolic_AG_to_active_actual = metabolic_AG_to_C_active * (1 - fr_CO2_met_to_active)
 
     # above ground structural C
     fr_CO2_struct_to_active = 0.45
     soil.struct_AG_to_active_loss = struct_AG_to_C_active * fr_CO2_struct_to_active
-    soil.struct_AG_to_active_actual = struct_AG_to_C_active (1 - fr_CO2_struct_to_active)
+    soil.struct_AG_to_active_actual = struct_AG_to_C_active * (1 - fr_CO2_struct_to_active)
 
     fr_CO2_struct_to_slow = 0.3
     soil.struct_AG_to_slow_loss = struct_AG_to_C_slow * fr_CO2_struct_to_slow
