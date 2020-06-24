@@ -21,6 +21,8 @@ def update_all(crop_type, soil, weather, time):
     Args:
         soil
         crop_type
+        weather
+        time
     """
 
     # residue from annual crops
