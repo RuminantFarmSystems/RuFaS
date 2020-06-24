@@ -17,7 +17,7 @@ from . import nitrogen_loss, carbon_loss, protein_degradation
 from RUFAS.routines.animal.ration import hardcoded_ration
 
 
-def daily_feed_routine(feed, crop, animal_management, weather, time):
+def daily_feed_routine(feed, crop, animal_managemen):
     """
     Description:
         Runs the feed storage routine. Yield is stored at harvest in available storage.
@@ -64,7 +64,7 @@ def daily_feed_routine(feed, crop, animal_management, weather, time):
         # forage will be fed out 30 days after harvest
         storage.days_since_feedout = -30
 
-    feed.daily_updates(animal_management, weather, time)
+    feed.daily_updates(animal_management)
 
 
 def annual_feed_routine():
@@ -395,18 +395,19 @@ class Feed:
         self.C_loss += storage.C_loss
         self.CP_loss += storage.CP_loss
 
-    def required_inventory(self, storage, animal_management, weather, time):
+    def required_inventory(self, storage, animal_management):
         """
         Description:
-            Computes the required inventory necessary across all animals for a given forage based on
-            the amount of the animals, the body weight, and inclusion percent associated with the input forage
+            Computes the required inventory necessary across all animals for a
+            given forage based on the count of the animals, the body weight,
+            and inclusion percent associated with the input forage. This class
+            method for the feed calss updates feed class variables along with class
+            variables on the input storage object.
         Args:
             storage: a storage object that contains the given forage being assessed
             animal_management: the class object animal_management which tracks the state of the animals
-            weather
-            time
         """
-        # Current animals and animal information
+        # current animals and animal information
         animals = {'calves': animal_management.calves,
                    'heiferIs': animal_management.heiferIs,
                    'heiferIIs': animal_management.heiferIIs,
@@ -425,7 +426,7 @@ class Feed:
 
         avg_BW = {}
         animal_class_size_avg = {}
-
+        # calculating average body weight of animals
         for key in animals:
             BW = 0
             for animal in animals[key]:
@@ -446,7 +447,7 @@ class Feed:
                    }
 
         # hard-coded recommended inclusion rate as a percentage of body weight per animal
-        #currently not unique across different feeds
+        # (currently not unique across different feeds)
         inclusion_pct = {'calves': 2.0,
                          'heiferIs': 2.0,
                          'heiferIIs': 2.0,
@@ -499,27 +500,33 @@ class Feed:
         Args:
             storage: the storage object containing the forage being assessed
         """
-
         # set max feed intake based on available forage
         # TODO: Error message for insufficient inventory
 
-        # allocation for high quality forage
+        # HIGH QUALITY FORAGE
+        # Calculating DMI for Lactating Cows only
+        #------------------------------
         if storage.forage_quality == 'high':
             if 1.1 * storage.req_inv['lactating_cows'] >= storage.DM:
                 storage.DMI_forage_max['lactating_cows'] = storage.DM / storage.cow_days['lactating_cows']
             else:
                 storage.DMI_forage_max['lactating_cows'] = 1.1 * storage.inclusion_rate_est['lactating_cows']
 
-        # allocation for low quality forage
+        # LOW QUALITY FORAGE
+        # Calculating DMI for all EXCEPT Lactating Cows
+        #------------------------------
         elif storage.forage_quality == 'low':
             tot_req_inv_non_lactating_cows = 0
+            # updating required inventory for non lactating cows
             for animal in storage.req_inv:
                 if animal != 'lactating_cows':
                     tot_req_inv_non_lactating_cows += storage.req_inv[animal]
-
+            # Assigning DMI when there is sufficient inventory
             if tot_req_inv_non_lactating_cows <= storage.DM:
                 storage.DMI_forage_max = storage.inclusion_rate_est
                 storage.DMI_forage_max['lactating_cows'] = 0
+            # updating inclusion rate estimate until inventory is sufficient to
+            # satisfy that newly calculated inclusion rate estimate
             else:
                 while round(tot_req_inv_non_lactating_cows) > round(storage.DM):
                     inv_delta = tot_req_inv_non_lactating_cows - storage.DM
@@ -547,9 +554,13 @@ class Feed:
                 storage.DMI_forage_max = storage.inclusion_rate_est
                 storage.DMI_forage_max['lactating_cows'] = 0
 
-        # allocation for forage with no quality assessment
+        # NO QUALITY ASSESMENT
+        # Calculating DMI for all animal classes
+        # -----------------------------
         else:
+            # calculating total required inventory across all animal classes
             tot_req_inv = sum(storage.req_inv.values())
+            # assigning DMI when there is sufficient inventory
             if tot_req_inv <= storage.DM:
                 tot_req_inv_non_lactating_cows = 0
 
@@ -561,6 +572,8 @@ class Feed:
                 available_forage = storage.DM - tot_req_inv_non_lactating_cows
                 if storage.cow_days['lactating_cows'] > 0:
                     storage.DMI_forage_max['lactating_cows'] = available_forage / storage.cow_days['lactating_cows']
+            # updating inclusion rate estimate until inventory is sufficient to
+            # satisfy that newly calculated inclusion rate estimate
             else:
                 while round(tot_req_inv) > round(storage.DM):
                     inv_delta = tot_req_inv - storage.DM
@@ -592,7 +605,17 @@ class Feed:
                 storage.DMI_forage_max = storage.inclusion_rate_est
                 storage.DMI_forage_max['lactating_cows'] = 0
 
-    def daily_updates(self, animal_management, weather, time):
+    def daily_updates(self, animal_management):
+        """
+        Description:
+            Executes daily routines relating to feed management, specifcally a
+            daily feedout process and checking for new forages that need an
+            inventory plan. If the list new_forages contains a forage which
+            had been harvested at least 30 days ago, forage_in_plan will be called.
+
+        Args:
+            animal_management: The state of the AnimalManagement class object
+        """
         # Daily feedout for silos with farm grown forages in them per pen based on ration formulated
         for silo in self.storage_options:
             if self.storage_options[silo].days_since_feedout >= 0 and self.storage_options[silo].DM > 0:
@@ -605,10 +628,10 @@ class Feed:
                             self.storage_options[silo].DM = 0
                             break
                     silo.days_since_feedout += 1
-        # Run inventory plan for new forages
+        # inventory plan for new forages
         for silo in self.new_forages:
             if silo.days_since_feedout >= -1:
-                self.required_inventory(silo, animal_management, weather, time)
+                self.required_inventory(silo, animal_management)
                 self.forage_inv_plan(silo)
                 self.add_to_available_feeds(silo.feed_id, .5, .5)
                 self.new_forages.pop()
