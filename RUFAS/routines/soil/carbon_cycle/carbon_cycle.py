@@ -26,6 +26,7 @@ def update_all(crop_type, soil, weather, time):
     """
 
     # residue from annual crops
+
     # above ground metabolic residue
     soil.residue_DM = soil.residue * (1 - soil.plant_moisture)
 
@@ -110,4 +111,28 @@ def update_all(crop_type, soil, weather, time):
     soil.structural_BG = struct_AG_to_BG + crop_type.bio_BG_DM * (1 - metabolic_BG_frac) - d_structural_BG
 
     # partitioning active and slow carbon decomposition to carbon pools or gas loss
+
     # above ground metabolic C
+    fr_CO2_met_to_active = 0.55  # TODO hesitant, Michael does this make sense?
+    soil.metabolic_AG_to_active_loss = metabolic_AG_to_C_active * fr_CO2_met_to_active
+    soil.metabolic_AG_to_active_actual = metabolic_AG_to_C_active * (1 - fr_CO2_met_to_active)
+
+    # above ground structural C
+    fr_CO2_struct_to_active = 0.45
+    soil.struct_AG_to_active_loss = struct_AG_to_C_active * fr_CO2_struct_to_active
+    soil.struct_AG_to_active_actual = struct_AG_to_C_active (1 - fr_CO2_struct_to_active)
+
+    fr_CO2_struct_to_slow = 0.3
+    soil.struct_AG_to_slow_loss = struct_AG_to_C_slow * fr_CO2_struct_to_slow
+    soil.struct_AG_to_slow_actual = struct_AG_to_C_slow * (1 - fr_CO2_struct_to_slow)
+
+    # below ground metabolic C
+    soil.metabolic_BG_to_active_loss = metabolic_BG_to_C_active * fr_CO2_met_to_active
+    soil.metabolic_BG_to_active_actual = metabolic_BG_to_C_active * (1 - fr_CO2_met_to_active)
+
+    # below ground structural C
+    soil.struct_BG_to_active_loss = struct_BG_to_C_active * fr_CO2_struct_to_active
+    soil.struct_BG_to_active_actual = struct_BG_to_C_active * (1 - fr_CO2_struct_to_active)
+
+    soil.struct_BG_to_slow_loss = struct_BG_to_C_slow * fr_CO2_struct_to_slow
+    soil.struct_BG_to_slow_actual = struct_BG_to_C_slow * (1 - fr_CO2_struct_to_slow)
