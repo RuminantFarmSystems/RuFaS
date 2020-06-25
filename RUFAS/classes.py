@@ -414,8 +414,6 @@ class Weather:
             elif i==len(years)-1 and end_day < 365:
                 self.T_avg_annual.append(long_term_avg)
             else: self.T_avg_annual.append(self.Taair[i][0])
-        print(len(years))
-        print(self.T_avg_annual)
             
 # Class: Time
 # -------------------------------------------------------------------------------
