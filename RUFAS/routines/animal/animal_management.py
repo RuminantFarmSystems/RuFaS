@@ -459,6 +459,32 @@ class AnimalManagement:
             if pen.pen_populated:
                 pen.calc_avg_growth()
 
+    def record_pen_history(self):
+        for calf in self.calves:
+            curr_pen = self.id_pen[calf.id]
+            classes_in_pen = self.all_pens[curr_pen].classes_in_pen
+            calf.update_pen_history(curr_pen, self.simulation_day, classes_in_pen)
+
+        for heiferI in self.heiferIs:
+            curr_pen = self.id_pen[heiferI.id]
+            classes_in_pen = self.all_pens[curr_pen].classes_in_pen
+            heiferI.update_pen_history(curr_pen, self.simulation_day, classes_in_pen)
+
+        for heiferII in self.heiferIIs:
+            curr_pen = self.id_pen[heiferII.id]
+            classes_in_pen = self.all_pens[curr_pen].classes_in_pen
+            heiferII.update_pen_history(curr_pen, self.simulation_day, classes_in_pen)
+
+        for heiferIII in self.heiferIIIs:
+            curr_pen = self.id_pen[heiferIII.id]
+            classes_in_pen = self.all_pens[curr_pen].classes_in_pen
+            heiferIII.update_pen_history(curr_pen, self.simulation_day, classes_in_pen)
+
+        for cow in self.cows:
+            curr_pen = self.id_pen[cow.id]
+            classes_in_pen = self.all_pens[curr_pen].classes_in_pen
+            cow.update_pen_history(curr_pen, self.simulation_day, classes_in_pen)
+
     @staticmethod
     def p_comp(animals):
         """
@@ -553,6 +579,8 @@ class AnimalManagement:
             self.daily_p_update()  # per animal
 
             self.calc_all_p_comp()  # per animal
+
+            self.record_pen_history()
 
     def end_ration_interval(self):
         """

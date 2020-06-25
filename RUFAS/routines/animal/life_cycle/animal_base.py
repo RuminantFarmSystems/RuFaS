@@ -12,6 +12,17 @@ birth date, and age for all animals to be identified.
 from RUFAS.routines.animal.life_cycle.animal_events import AnimalEvents
 
 
+class PenHistory:
+	def __init__(self, start, end, pen, classes_in_pen):
+		self.start_date = start
+		self.end_date = end
+		self.pen = pen
+		self.classes_in_pen = classes_in_pen
+
+	# def __str__(self):
+	# 	return "in " + str(self.pen) + " from " + str(self.start_date) + " to " + str(self.end_date) + " with " + str(self.classes_in_pen)
+
+
 class AnimalBase(object):
 	global_id = 0
 	config = []
@@ -46,6 +57,7 @@ class AnimalBase(object):
 		self.culled = False
 		self.do_not_breed = False
 		self.events = AnimalEvents()
+		self.pen_history = []
 
 		self.daily_growth = 0
 		self.nutrient_rqmts = {}
@@ -78,6 +90,7 @@ class AnimalBase(object):
 		self.events = animal.events
 		self.body_weight = animal.body_weight
 		self.mature_body_weight = animal.mature_body_weight
+		self.pen_history = animal.pen_history
 
 		self.daily_growth = animal.daily_growth
 		self.nutrient_rqmts = animal.nutrient_rqmts
@@ -186,3 +199,24 @@ class AnimalBase(object):
 		Returns: True/False value indicating if culled
 		"""
 		return self.culled
+
+	def get_last_pen(self):
+		return self.pen_history[-1].pen if len(self.pen_history) > 0 else None
+
+	# def print_pen_history(self):
+	# 	print('[', end='')
+	# 	for p in self.pen_history:
+	# 		print(p, end=', ')
+	# 	print(']')
+
+	def update_pen_history(self, curr_pen, curr_day, classes_in_pen):
+		# if self.id == 7783:
+		# 	print(curr_day, type(self).__name__, end=' ')
+		# 	self.print_pen_history()
+
+		last_pen = self.get_last_pen()
+		if last_pen is None or last_pen != curr_pen:
+			self.pen_history.append(PenHistory(curr_day, curr_day, curr_pen, classes_in_pen))
+		else:  # last_pen == curr_pen
+			self.pen_history[-1].end_date = curr_day
+			self.pen_history[-1].classes_in_pen = classes_in_pen
