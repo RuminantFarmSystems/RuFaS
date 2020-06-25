@@ -255,7 +255,8 @@ class Weather:
     Data lists are in the format Data[year][julian_day].
     """
 
-    def __init__(self, weather_data, years, w_start_year, w_start_day, start_year, start_day):
+    def __init__(self, weather_data, years, w_start_year, w_start_day, start_year,
+                 start_day,end_day):
 
         # initialize data sets
         self.rainfall = []
@@ -266,6 +267,7 @@ class Weather:
         self.radiation = []
         self.manureN = []  # TODO: manureN is a temporary weather file input until the manure module is linked with the rest of the program
         self.Taair = []
+        self.T_avg_annual =[]
 
         self.evaporation = []
         self.lCows = []
@@ -396,10 +398,24 @@ class Weather:
                 print("Only printing first 5 invalid rows, there are " + str(skips)
                       + " total invalid rows")
 
-            """# calculates T_avg_annual for each year
-            for i in range(len(years)):
-                avg = sum(self.T_avg[i]) / (len(years[i]))
-                self.T_avg_annual.append(avg)""" #Deleted and replaced by Taair
+        # calculates a long term average temperature over all years
+        sum=0
+        for i in range(len(years)):
+            if i==0:
+                sum += self.Taair[i][start_day]
+            else: sum += self.Taair[i][0]
+        long_term_avg=sum/len(years)
+        
+        
+        # calculates T_avg_annual for each year and 
+        for i in range(len(years)):
+            if i==0 and start_day !=0:
+                self.T_avg_annual.append(long_term_avg)
+            elif i==len(years)-1 and end_day < 365:
+                self.T_avg_annual.append(long_term_avg)
+            else: self.T_avg_annual.append(self.Taair[i][0])
+        print(len(years))
+        print(self.T_avg_annual)
             
 # Class: Time
 # -------------------------------------------------------------------------------

@@ -158,7 +158,8 @@ def read_json_file(fPath:Path):
                 test_handler.run_tests()
         
             weather = Weather(data['weather'], config.years, config.w_start_year,
-                              config.w_start_day, config.start_year, config.start_day)
+                              config.w_start_day, config.start_year, config.start_day,
+                              config.end_day)
             time = Time(config.years, config.start_year)
             state = State(data['farm'], config, time)
             output = OutputHandler(data['output'], state)
