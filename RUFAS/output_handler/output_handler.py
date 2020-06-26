@@ -111,7 +111,7 @@ class OutputHandler:
         for report_name in self.reports:
             report = self.reports[report_name]
             if not report.produce_csv and report.produce_graphics:
-                print("Warning: Cannot produce graphics for inactive report:", report.report_name,
+                print("Warning: Cannot produce graphics_1 for inactive report:", report.report_name,
                       ". Setting produce_graphics to False")
                 report.produce_graphics = False
             if report.produce_csv:

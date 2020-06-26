@@ -1,0 +1,481 @@
+{
+    "config":
+    {
+        "start_date" : "2009:244",
+        "end_date" : "2016:243",
+        "csv_dir": "output/CSVs/",
+        "graphic_dir": "output/graphics/",
+        "run_tests": false
+    },
+
+    "weather": "input/barnyard_weather.csv",
+
+    "output_handler":
+    {
+        "pen_report":
+        {
+            "produce_csv": true,
+            "produce_graphics": true,
+            "report_name": "pen_report",
+
+            "ration_report":
+            {
+                "produce_csv": true,
+                "produce_graphics": false,
+                "report_name": "ration_report",
+                "ration_interval": 7
+            },
+            "manure_report":
+            {
+        	    "produce_csv": true,
+                "produce_graphics": false,
+        	    "report_name": "manure_report"
+            },
+            "growth_report": {
+                "produce_csv": true,
+                "produce_graphics": false,
+                "report_name": "growth_report"
+            }
+        },
+        "mass_balance_report":
+        {
+            "produce_csv": true,
+            "produce_graphics": true,
+            "report_name": "mass_balance_report",
+
+            "water_balance":
+            {
+                "produce_csv": true,
+                "produce_graphics": true,
+                "report_name": "water_balance_report"
+            },
+            "phosphorus_balance":
+            {
+                "produce_csv": true,
+                "produce_graphics": true,
+                "report_name": "phosphorus_balance_report"
+            },
+            "nitrogen_balance":
+            {
+                "produce_csv": true,
+                "produce_graphics": true,
+                "report_name": "nitrogen_balance_report"
+            }
+        },
+        "field_report": {
+            "produce_csv": true,
+            "produce_graphics": true,
+            "report_name": "field_report",
+
+            "soil_report": {
+                "produce_csv": true,
+                "produce_graphics": false,
+                "report_name": "soil_report"
+            },
+            "soil_nitrogen_report": {
+                "produce_csv": true,
+                "produce_graphics": false,
+                "report_name": "soil_nitrogen_report"
+            },
+            "soil_phosphorus_report": {
+                "produce_csv": true,
+                "produce_graphics": false,
+                "report_name": "soil_phosphorus_report"
+            },
+            "crop_report": {
+                "produce_csv": true,
+                "produce_graphics": false,
+                "report_name": "crop_report"
+            }
+        },
+        "feed_storage_report":
+        {
+            "produce_csv": true,
+            "produce_graphics": false,
+            "report_name": "feed_storage_report"
+        },
+        "custom_report":
+        {
+            "produce_csv": true,
+            "produce_graphics": false,
+            "report_name": "custom_report"
+        }
+    },
+
+    "farm":
+    {
+        "crop":
+        {
+            "latitude": 43.332708,
+            "corn":
+            {
+                "grow_years": [],
+                "repeat": 0,
+                "planting_date": 121,
+                "harvest_date": 319,
+                "harvest_type": "optimal"
+            },
+            "soybean":
+            {
+                "grow_years": [],
+                "repeat": 0,
+                "planting_date": 121,
+                "harvest_date": 319,
+                "harvest_type": "scheduled"
+            },
+            "alfalfa":
+            {
+                "grow_years": [],
+                "repeat": 0,
+                "planting_date": 121,
+                "harvest_date": 319,
+                "harvest_type": "optimal"
+            }
+        },
+        "soil":
+        {
+            "ProfileBulkDensity": 1.4,
+            "CN2": 85.00,
+            "FieldSlope": 0.02,
+            "SlopeLength": 3,
+            "Manning": 0.4,
+            "FieldSize": 1.0,
+            "PracticeFactor": 0.08,
+            "Sand": 15,
+            "Silt": 65,
+            "SoilAlbedo": 0.16,
+            "initial_residue": 0,
+            "fresh_NMineralRate": 0.05,
+            "SoilCoverType": "BARE",
+
+            "SoilLayers":
+            {
+                "Layer1":
+                {
+                    "BottomDepth": 150,
+                    "WiltingPoint": 0.1,
+                    "FieldCapacity": 0.30,
+                    "Saturation": 0.5,
+                    "Ksat": 20,
+                    "CationExclusionFraction": 0.0,
+                    "Clay": 20,
+                    "InitialTemperature": 15.77575,
+                    "BulkDensity": 1.3,
+                    "org_C%": 1.2,
+                    "NH4": 1,
+                    "active_N_frac": 0.02,
+                    "LabileP": 23.7,
+                    "ActiveMineralRate": 0.0003,
+                    "VolatileExchangeFac": 0.15,
+                    "DenitrificationRate": 0.1,
+                    "SoilWaterRatio": 0.3,
+                    "OM%": 1.9
+                },
+                "Layer2":
+                {
+                    "BottomDepth": 300,
+                    "WiltingPoint": 0.1,
+                    "FieldCapacity": 0.3,
+                    "Saturation": 0.5,
+                    "Ksat": 20,
+                    "CationExclusionFraction": 0.0,
+                    "Clay": 20,
+                    "InitialTemperature": 14.50797297,
+                    "BulkDensity": 1.3,
+                    "org_C%": 1.2,
+                    "NH4": 1,
+                    "active_N_frac": 0.02,
+                    "LabileP": 10,
+                    "ActiveMineralRate": 0.0003,
+                    "VolatileExchangeFac": 0.15,
+                    "DenitrificationRate": 0.1,
+                    "SoilWaterRatio": 0.3,
+                    "OM%": 1.9
+                },
+                "Layer3":
+                {
+                    "BottomDepth": 450,
+                    "WiltingPoint": 0.1,
+                    "FieldCapacity": 0.30,
+                    "Saturation": 0.5,
+                    "Ksat": 20,
+                    "CationExclusionFraction": 0.0,
+                    "Clay": 20,
+                    "InitialTemperature": 13.38623,
+                    "BulkDensity": 1.3,
+                    "org_C%": 1.2,
+                    "NH4": 1,
+                    "active_N_frac": 0.02,
+                    "LabileP": 10,
+                    "ActiveMineralRate": 0.0003,
+                    "VolatileExchangeFac": 0.15,
+                    "DenitrificationRate": 0.1,
+                    "SoilWaterRatio": 0.3,
+                    "OM%": 1.9
+                }
+            },
+
+            "FertilizerApplication":
+            {
+                "year": [0],
+                "day": [0],
+                "mass": [0.0],
+                "depth": [0.0],
+                "surf_perc": [0.0]
+            },
+
+            "ManureApplication":
+            {
+                "type": ["DAIRY", "DAIRY", "DAIRY", "DAIRY", "DAIRY", "DAIRY", "DAIRY", "DAIRY"],
+                "year": [2012, 2012, 2012, 2012, 2013, 2013, 2013, 2013],
+                "day": [103 ,176, 226, 283, 46, 155, 241, 273],
+                "mass": [1320.0, 2120.0, 1329.0, 2228.0, 1250.0, 1587.0, 1750.0, 1555.0],
+                "P_frac": [0.00820, 0.00866, 0.00941, 0.00656, 0.00748, 0.00698, 0.00721, 0.00646],
+                "WIP_frac": [0.6, 0.6, 0.6, 0.6, 0.6, 0.6, 0.6, 0.6],
+                "WOP_frac": [0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05],
+                "N_frac": [0, 0, 0, 0, 0, 0, 0, 0],
+                "NH4_frac": [0, 0, 0, 0, 0, 0, 0, 0],
+                "dry_matter": [0.04, 0.07, 0.04, 0.04, 0.05, 0.05, 0.07, 0.06],
+                "percent_cover": [0.95, 0.95, 0.95, 0.95, 0.95, 0.95, 0.95, 1.0],
+                "depth": [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0],
+                "surf_perc": [1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0]
+            },
+
+            "TillageApplication":
+            {
+                "year": [0],
+                "day": [0],
+                "perc_incorporated": [0.0],
+                "perc_mixed": [0.0],
+                "depth": [0.0]
+            },
+
+            "CropPUptake":
+            {
+                "Uptake1":
+                {
+                    "Year": 2008,
+                    "PUptake": 15.0
+                },
+                "Uptake2":
+                {
+                    "Year": 2009,
+                    "PUptake": 15.0
+                }
+
+            }
+        },
+
+        "animal":
+        {
+            "herd_information":
+            {
+            	"calf_num": 0,
+            	"heiferI_num": 0,
+            	"heiferII_num": 0,
+            	"heiferIII_num": 0,
+                "cow_num": 0,
+                "replace_num": 0,
+                "herd_num": 0
+            },
+
+            "animal_config":
+            {
+            	"num_21_days": 15,
+            	"cow_times_milked_per_day": 1,
+            	"still_birth_rate": 0.065,
+				"male_calf_rate_sexed_semen": 0.1,
+				"male_calf_rate_conventional_semen": 0.53,
+				"birth_weight_avg_ho": 43.9,
+				"birth_weight_std_ho": 1.0,
+				"birth_weight_avg_je": 35.2,
+				"birth_weight_std_je": 0.9,
+				"keep_female_calf_rate": 1,
+				"wean_day": 60,
+				"avg_daily_gain_c": 0.8,
+				"std_daily_gain_c": 0.02,
+				"breeding_start_day_h": 400,
+				"avg_daily_gain_h": 0.91,
+				"std_daily_gain_h": 0.02,
+				"grow_end_day": 780,
+				"mature_body_weight": 500,
+				"avg_estrus_cycle_h": 21,
+				"std_estrus_cycle_h": 3,
+				"estrus_detection_rate": 0.4,
+				"estrus_service_rate": 0.9,
+				"ed_conception_rate": 0.4,
+				"m5dCG2P_conception_rate": 0.48,
+				"m5dCGP_conception_rate": 0.48,
+				"tai_program_length": 0,
+				"defined_conception_rate": 0.0,
+				"semen_type": "conventional",
+				"avg_gestation_len": 278,
+				"std_gestation_len": 6,
+				"preg_check_day_1": 32,
+				"preg_loss_rate_1": 0.02,
+				"preg_check_day_2": 91,
+				"preg_loss_rate_2": 0.096,
+				"preg_check_day_3": 200,
+				"preg_loss_rate_3": 0.017,
+				"heifer_repro_cull_time": 650,
+				"replacement_day": 30,
+				"dry_period": 60,
+				"lactation_curve": "wood",
+				"l": [[16.13, 23.61, 23.81], [14.07, 19.26, 19.21]],
+				"m": [[0.235, 0.227, 0.244], [0.186, 0.173, 0.190]],
+				"n": [[0.0019, 0.0032, 0.0036], [0.0021, 0.0028, 0.0032]],
+				"l_std": [[0.28, 0.54, 0.51], [0.39, 0.49, 0.47]],
+				"m_std": [[0.0046, 0.0064, 0.0060], [0.0076, 0.0071, 0.0069]],
+				"n_std": [[3.77e-5, 5.82e-5, 5.54e-5], [6.60e-5, 6.69e-5, 6.53e-5]],
+				"vwp": 60,
+				"avg_estrus_cycle_r": 19,
+				"std_estrus_cycle_r": 11,
+				"avg_estrus_cycle_c": 21,
+				"std_estrus_cycle_c": 2.5,
+				"avg_estrus_cycle_p": 10,
+				"std_estrus_cycle_p": 2,
+				"presynch_program_length": 0,
+				"ovsynch56_conception_rate": 0.48,
+				"ovsynch48_conception_rate": 0.4,
+				"cosynch72_conception_rate": 0.4,
+				"_5dcosynch_conception_rate": 0.4,
+				"defined_conception_rate_c": 0.0,
+				"conception_rate_decrease": 0.026,
+				"tai_program_start_day": 72,
+				"repro_cull_time": 300,
+				"do_not_breed_time" : 300,
+				"cull_milk_production": 22,
+				"parity_cull_prob": [0.169, 0.233, 0.301, 0.408],
+				"mastitis_cp": [0, 0.06, 0.12, 0.19, 0.30, 0.43, 0.56, 0.68, 0.78, 0.85, 0.90, 0.94, 0.97, 1],
+				"feet_leg_cp": [0, 0.03, 0.08, 0.16, 0.25, 0.36, 0.48, 0.59, 0.69, 0.78, 0.85, 0.90, 0.95, 1],
+				"injury_cp": [0, 0.08, 0.18, 0.28, 0.38, 0.47, 0.56, 0.64, 0.71, 0.78, 0.85, 0.90, 0.95, 1],
+				"disease_cp": [0, 0.04, 0.12, 0.24, 0.34, 0.42, 0.50, 0.57, 0.64, 0.72, 0.81, 0.89, 0.95, 1],
+				"udder_cp": [0, 0.12, 0.24, 0.33, 0.41, 0.48, 0.55, 0.62, 0.68, 0.76, 0.82, 0.89, 0.95, 1],
+				"unkown_cp": [0, 0.05, 0.11, 0.18, 0.27, 0.37, 0.45, 0.54, 0.62, 0.70, 0.77, 0.84, 0.92, 1],
+				"cull_day_count": [0, 5, 15, 45, 90, 135, 180, 225, 270, 330, 380, 430, 280, 530],
+				"econ_indicator_range": 365,
+				"heifer_sell_price": 1400,
+				"heifer_buy_price": 1600,
+				"calf_price": 140
+            },
+
+            "housing": "barn",
+            "pasture_concentrate": -1,
+
+            "ration":
+            {
+                "user_input": false,
+                "formulation_interval": 7
+            },
+
+	        "pen_information":
+	        {
+	        	"pen0":
+	        	{
+	        		"id": 0,
+	        		"vertical_dist_to_milking_parlor": 0.1,
+	        		"horizontal_dist_to_milking_parlor": 1.6,
+	        		"number_of_stalls": 100,
+	        		"housing_type": "open air barn",
+	        		"bedding_type": "sand",
+	        		"pen_type": "freestall"
+	        	},
+
+	        	"pen1":
+	        	{
+	        		"id": 1,
+	        		"vertical_dist_to_milking_parlor": 0.1,
+	        		"horizontal_dist_to_milking_parlor": 1.6,
+	        		"number_of_stalls": 200,
+	        		"housing_type": "open air barn",
+	        		"bedding_type": "sawdust",
+	        		"pen_type": "freestall"
+	        	},
+
+	        	"pen2":
+	        	{
+	        		"id": 2,
+	        		"vertical_dist_to_milking_parlor": 0.1,
+	        		"horizontal_dist_to_milking_parlor": 1.6,
+	        		"number_of_stalls": 300,
+	        		"housing_type": "open air barn",
+	        		"bedding_type": "straw",
+	        		"pen_type": "tiestall"
+	        	},
+
+	        	"pen3":
+	        	{
+	        		"id": 3,
+	        		"vertical_dist_to_milking_parlor": 0.1,
+	        		"horizontal_dist_to_milking_parlor": 1.6,
+	        		"number_of_stalls": 400,
+	        		"housing_type": "open air barn",
+	        		"bedding_type": "sand",
+	        		"pen_type": "tiestall"
+	        	},
+
+	        	"pen4":
+	        	{
+	        		"id": 4,
+	        		"vertical_dist_to_milking_parlor": 0.1,
+	        		"horizontal_dist_to_milking_parlor": 1.6,
+	        		"number_of_stalls": 400,
+	        		"housing_type": "open air barn",
+	        		"bedding_type": "sand",
+	        		"pen_type": "tiestall"
+	        	},
+
+	        	"pen5":
+	        	{
+	        		"id": 5,
+	        		"vertical_dist_to_milking_parlor": 0.1,
+	        		"horizontal_dist_to_milking_parlor": 1.6,
+	        		"number_of_stalls": 400,
+	        		"housing_type": "open air barn",
+	        		"bedding_type": "sand",
+	        		"pen_type": "tiestall"
+	        	}
+	        }
+        },
+
+        "feed":
+        {
+            "feed_database": "input/feeds.sqlite",
+            "table_name": "feed_library",
+
+            "managed_feeds":
+            [
+              "Corn_grain",
+              "Legume_hay",
+              "Cotton_seed",
+              "Roasted_soybean",
+              "Rye_hay"
+            ],
+
+            "storage_options": {
+                "storage_1": {
+                    "storage_type": "bag",
+                    "moisture": "direct_cut",
+                    "additive": "preservative",
+                    "packing_density": 14,
+                    "inoculation": "heterofermentative",
+                    "bunk_type": "open_floor",
+                    "ventilation": true,
+                    "removal_rate": 6,
+                    "initial_dry_matter": 0
+                },
+                "storage_2": {
+                    "storage_type": "bag",
+                    "moisture": "direct_cut",
+                    "additive": "preservative",
+                    "packing_density": 14,
+                    "inoculation": "heterofermentative",
+                    "bunk_type": "open_floor",
+                    "ventilation": true,
+                    "removal_rate": 6,
+                    "initial_dry_matter": 0
+                }
+            }
+        }
+    }
+}

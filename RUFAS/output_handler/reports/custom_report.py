@@ -14,13 +14,13 @@ class CustomReport(BaseReport):
         super().__init__(data)
         # Output can be added in this single place in the following format:
         # 'output_name': ['variable_name', 'unit', []],
-        # 'output_name' is a user defined key that will show up in outputs/graphics.
+        # 'output_name' is a user defined key that will show up in outputs/graphics_1.
         # avoid spaces.
         # 'variable_name' is very important. This has to be a variable defined
         # and initialized in the object. If you are interested in tracking
         # a variable not defined in the class, you need to create it there
         # first. The output_handler handler will not work if the variable is incorrect.
-        # 'unit' is user defined but will, again, show up in outputs/graphics.
+        # 'unit' is user defined but will, again, show up in outputs/graphics_1.
         # [] is an empty list
 
         self.daily_variables = {'year': ['time.cal_year', '', []],
