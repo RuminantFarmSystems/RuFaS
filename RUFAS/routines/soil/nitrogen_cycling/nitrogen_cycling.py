@@ -17,9 +17,9 @@ Soil attribute definitions
 
     z = depth of the soil layer's lower boundary
 
-    OrgN = initial Organic N (Active + Stable) (mg/kg)
+    org_N = initial Organic N (Active + Stable) (mg/kg)
 
-    OrgC = Organic carbon in a soil layer (%, user input)
+    org_C = Organic carbon in a soil layer (%, user input)
 
     NH4 = initial NO4 levels (0 mg/kg)
     
@@ -88,7 +88,7 @@ Soil attribute definitions
 
     deNrate = user defined denitrification rate coefficient (0.1)
 
-    OrgC = soil organic matter content (%)
+    org_C = soil organic matter content (%)
 
     Nminact = mineralization from active N pool (kg/ha)
 
@@ -120,9 +120,9 @@ Soil values updated by calling update_all():
         temp_fac
         water_fac
         volatilization
-        activeN
-        orgN
-        stableN
+        active_N
+        org_N
+        stable_N
 
 
 """
@@ -156,6 +156,8 @@ def update_all(soil, weather, time):
     humus_mineralization.humus_mineralization(soil)
 
     added_manure_N(soil, weather, time)
+
+    update_N(soil)
 
 
 #
@@ -194,11 +196,50 @@ def calc_water_factors(soil):
 
         layer.water_fac = water_fac
 
+
 def added_manure_N(soil, weather, time):
-    totalN = weather.manureN[time.year - 1][time.day - 1]
+    total_N = weather.manureN[time.year - 1][time.day - 1]
 
-    activeN = totalN * 0.875
-    stableN = totalN * 0.125
+    active_N = total_N * 0.875
+    stable_N = total_N * 0.125
 
-    soil.soil_layers[0].activeN += activeN
-    soil.soil_layers[0].stableN += stableN
+    soil.soil_layers[0].active_N += active_N
+    soil.soil_layers[0].stable_N += stable_N
+    soil.manure_N = total_N
+
+
+def update_N(soil):
+    soil.NH4 = 0.0
+    soil.NO3 = 0.0
+    soil.org_N = 0.0
+    soil.active_N = 0.0
+    soil.stable_N = 0.0
+    for layer in soil.soil_layers:
+        soil.NH4 += layer.NH4
+        soil.NO3 += layer.NO3
+        soil.org_N += layer.org_N
+        soil.active_N += layer.active_N
+        soil.stable_N += layer.stable_N
+
+    soil.manure_N_annual += soil.manure_N
+
+    profile_N = soil.NH4 + soil.NO3 + soil.org_N + \
+                soil.active_N + soil.stable_N + soil.fresh_N
+
+    soil.delta_N = soil.profile_N - profile_N
+
+    soil.profile_N = profile_N
+
+    soil.N_drainage = soil.NH4_drainage + soil.NO3_drainage + \
+                      soil.active_N_drainage
+
+    soil.N_drainage_annual += soil.N_drainage
+
+    soil.N_runoff = soil.NH4_runoff + soil.NO3_runoff
+    soil.N_runoff_annual += soil.N_runoff
+
+    soil.N_erosion = soil.NH4_erosion + soil.active_N_erosion + \
+                     soil.fresh_N_erosion
+    soil.N_erosion_annual += soil.N_erosion
+
+    soil.N_uptake_annual += soil.N_uptake

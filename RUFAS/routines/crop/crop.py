@@ -8,7 +8,7 @@ Author(s): Kass Chupongstimun, kass_c@hotmail.com
            William Donovan, wmdonovan@wisc.edu
            Jacob Johnson, jacob8399@gmail.com
 
-This module needs the following inputs in order to operate correctly:
+This module needs the following input in order to operate correctly:
 
     "latitude": 43.332708
 
@@ -62,7 +62,7 @@ def daily_crop_routine(crop, weather, time, soil):
     if crop_type.crop_name != 'null':
 
         # yield is reset to 0 at the beginning of the next day so it can be
-        # accessed by the output handler.
+        # accessed by the output_handler handler.
         crop_type.yield_actual = 0
         crop_type.yield_N = 0
         crop_type.yield_P = 0
@@ -250,23 +250,23 @@ class InitCrop:
         # ===================================================================
         ''' HEAT UNIT DATA '''
 
-        # Inputs
+        # input
         self.T_base_min = 0
         self.T_base_max = 0
         self.PHU = 0
 
-        # Internally calculated inputs
+        # Internally calculated input
         self.accumulated_HU = 0
         self.prev_accumulated_HU = 0
 
-        # Outputs
+        # output
         self.fr_PHU = 0
         self.prev_fr_PHU = 0
 
         # ===================================================================
         ''' LEAF AREA INDEX (LAI) DATA '''
 
-        # Inputs
+        # input
         self.fr_PHU_1 = 0
         self.fr_PHU_2 = 0
         self.fr_LAI_1 = 0
@@ -276,40 +276,40 @@ class InitCrop:
         self.LAI_max = 0
         self.LAI_min = 0
 
-        # Internally calculated inputs
+        # Internally calculated input
         self.prev_fr_LAI_max = 0
         self.fr_LAI_max = 0
 
-        # Outputs
+        # output
         self.prev_LAI_actual = 0
         self.LAI_actual = 0
 
         # ===================================================================
         ''' ROOT DEPTH DATA '''
 
-        # Inputs
+        # input
         self.z_root_max = 0  # maximum depth of root development
 
-        # Internally calculated inputs
+        # Internally calculated input
         self.fr_root = 0
 
-        # Outputs
+        # output
         self.z_root = 0
 
         # ===================================================================
         ''' BIOMASS DATA '''
 
-        # Inputs
+        # input
         self.kl = 0
         self.RUE = 0
         self.T_opt = 0
 
-        # Internally calculated inputs
+        # Internally calculated input
         self.gamma_reg = 0
         self.d_biomass_max = 0
         self.d_biomass_actual = 0
 
-        # Outputs
+        # output
         self.biomass_actual = 0
         self.prev_biomass_actual = 0
 
