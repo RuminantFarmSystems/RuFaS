@@ -58,6 +58,7 @@ class AnimalBase(object):
 		self.do_not_breed = False
 		self.events = AnimalEvents()
 		self.pen_history = []
+		self.semen_used = self.config['semen_type']
 
 		self.daily_growth = 0
 		self.nutrient_rqmts = {}
@@ -91,6 +92,7 @@ class AnimalBase(object):
 		self.body_weight = animal.body_weight
 		self.mature_body_weight = animal.mature_body_weight
 		self.pen_history = animal.pen_history
+		self.semen_used = animal.semen_used
 
 		self.daily_growth = animal.daily_growth
 		self.nutrient_rqmts = animal.nutrient_rqmts

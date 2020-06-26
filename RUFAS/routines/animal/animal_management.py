@@ -50,6 +50,8 @@ class AnimalManagement:
     heiferIIs = []
     heiferIIIs = []
     cows = []
+    heifers_sold = []
+    cows_culled = []
 
     # list of all the pens on the farm
     all_pens = []
@@ -592,3 +594,107 @@ class AnimalManagement:
 
     def annual_reset(self):
         pass
+
+    def generate_animal_output(self, animal_type, index,
+                               is_heifer_repr=False, is_cow=False):
+        if animal_type == 'calf':
+            animal = self.calves[index]
+        elif animal_type == 'heiferI':
+            animal = self.heiferIs[index]
+        elif animal_type == 'heiferII':
+            animal = self.heiferIIs[index]
+        elif animal_type == 'heiferIII':
+            animal = self.heiferIIIs[index]
+        elif animal_type == 'cow':
+            animal = self.cows[index]
+        elif animal_type == 'sold_heifer':
+            animal = self.life_cycle_manager.sold_heifers[index]
+        else:  # animal_type == 'culled_cow':
+            animal = self.life_cycle_manager.culled_cows[index]
+
+        return {
+            'ID': animal.id,
+            'breed': animal.breed,
+            'birthday': animal.birth_date,
+            'repro_program': None if not is_cow else animal.repro_program,
+            'tai_method_h': None if not is_heifer_repr else animal.tai_method_h,
+            'synch_ed_method_h':
+                None if not is_heifer_repr else animal.synch_ed_method_h,
+            'presynch_method': None if not is_cow else animal.presynch_method,
+            'tai_method_c': None if not is_cow else animal.tai_method_c,
+            'resynch_method': None if not is_cow else animal.resynch_method,
+            'semen_used': animal.semen_used,
+            'pen_history': animal.pen_history,
+            'bodyweight_history': 0, # animal.body_weight_lst,  # todo create this
+            'milk_production_history':
+                None if not is_cow else
+                animal.estimated_daily_milk_produced_lst,
+            'event_history': animal.events
+        }
+
+    def get_life_cycle_output(self, num_animals):
+        minimum_num = min(len(self.calves), len(self.heiferIs),
+                          len(self.heiferIIs), len(self.heiferIIIs),
+                          len(self.cows),
+                          len(self.life_cycle_manager.sold_heifers),
+                          len(self.life_cycle_manager.culled_cows))
+        if num_animals > minimum_num:
+            print('The smallest animal list is of size ' + str(minimum_num) +
+                  ' so ' + str(num_animals) + ' of each animal class cannot ' +
+                  'be in the life cycle output. Only ' + str(minimum_num) +
+                  ' of each animal type will be in the life cycle output.')
+            num_animals = minimum_num
+
+        output = {
+            'calves': {},
+            'heiferIs': {},
+            'heiferIIs': {},
+            'heiferIIIs': {},
+            'cows': {},
+            'sold_heifers': {},
+            'culled_cows': {},
+            'num_calves_sold': 0,
+            'num_sold_heifers': 0,
+            'num_cows_culled': 0
+        }
+        indices = random.sample(range(len(self.calves)), num_animals)
+        for i in indices:
+            output['calves'][i] = self.generate_animal_output('calf', i)
+
+        indices = random.sample(range(len(self.heiferIs)), num_animals)
+        for i in indices:
+            output['heiferIs'][i] = self.generate_animal_output('heiferI', i)
+
+        indices = random.sample(range(len(self.heiferIIs)), num_animals)
+        for i in indices:
+            output['heiferIIs'][i] = \
+                self.generate_animal_output('heiferII', i, is_heifer_repr=True)
+
+        indices = random.sample(range(len(self.heiferIIIs)), num_animals)
+        for i in indices:
+            output['heiferIIIs'][i] = \
+                self.generate_animal_output('heiferIII', i, is_heifer_repr=True)
+
+        indices = random.sample(range(len(self.cows)), num_animals)
+        for i in indices:
+            output['cows'][i] = \
+                self.generate_animal_output('cow', i, is_cow=True)
+
+        indices = random.sample(
+            range(len(self.life_cycle_manager.sold_heifers)), num_animals)
+        for i in indices:
+            output['sold_heifers'][i] = \
+                self.generate_animal_output('sold_heifer', i,
+                                            is_heifer_repr=True)
+
+        indices = random.sample(
+            range(len(self.life_cycle_manager.culled_cows)), num_animals)
+        for i in indices:
+            output['culled_cows'][i] = \
+                self.generate_animal_output('culled_cow', i, is_cow=True)
+
+        output['num_calves_sold'] = len(self.life_cycle_manager.sold_calves)
+        output['num_sold_heifers'] = len(self.life_cycle_manager.sold_heifers)
+        output['num_cows_culled'] = len(self.life_cycle_manager.culled_cows)
+
+        return output
