@@ -145,6 +145,52 @@ from .nitrogen_cycling import nitrogen_cycling
 from .phosphorus_cycling import phosphorus_cycling
 
 
+# ------------------------------------------------------------------------------
+# Function: daily_soil_routine
+# Executes all the daily soil routines
+# ------------------------------------------------------------------------------
+def daily_soil_routine(soil, crop, weather, time):
+    """
+    Description:
+        Executes all the daily soil routines.
+
+    Args:
+        soil: instance of the Soil class
+        crop: instance of the Crop class
+        weather: instance of the Weather class
+        time: instance of the Time class
+    """
+    # calculate and update the temperature of the soil layers
+    soil_temp.update_all(soil, crop, weather, time)
+
+    # calculate daily runoff
+    infiltration.update_all(soil, weather, time)
+
+    # calculate daily transpiration
+    evapotranspiration.update_all(soil, crop, weather, time)
+
+    # transpiration is defined in the crop module, but called here as a
+    # component of water balance
+    transpiration.update_all(crop.current_crop, soil, time)
+
+    # calculate daily percolation
+    percolation.update_all(soil)
+
+    # updates daily soil water fluxes
+    soil_water.update_all(soil, weather, time)
+
+    # calculate daily soil erosion
+    soil_erosion.update_all(soil, crop, weather, time)
+
+    # calculate and update the contents of 3 organic and 2 inorganic nitrogen
+    # pools
+    nitrogen_cycling.update_all(soil)
+
+    phosphorus_cycling.update_all(soil, weather, time)
+
+    soil.annual_variable_update()
+
+
 # -------------------------------------------------------------------------------
 # Class: Soil
 #        Contains the state of the farm's soil
@@ -166,10 +212,6 @@ class Soil:
             config: instance of the Config class
         """
         # Values Initialized by Input
-        self.manure = Soil.Manure(data['ManureApplication'])
-        self.fertilizer = Soil.Fertilizer(data['FertilizerApplication'])
-        self.tillage = Soil.Tillage(data['TillageApplication'])
-
         self.profileBulkDensity = data['ProfileBulkDensity']
         self.CN2 = data['CN2']  # unitless, user-defined curve number (empirical)
 
@@ -433,53 +475,6 @@ class Soil:
             layer.stableN = stableN * unit_adjustment
             layer.NH4 = NH4 * unit_adjustment
             layer.topLayerFreshN = FreshN * unit_adjustment
-
-    # ------------------------------------------------------------------------------
-    # Function: daily_soil_routine
-    # Executes all the daily soil routines
-    # ------------------------------------------------------------------------------
-    def daily_soil_routine(self, crop, field_management, weather, time):
-        """
-        Description:
-            Executes all the daily soil routines.
-
-        Args:
-            self: instance of the Soil class
-            crop: instance of the Crop class
-            field_management: instance of the FieldManagement class implemented in
-                field_management.py
-            weather: instance of the Weather class
-            time: instance of the Time class
-        """
-        # calculate and update the temperature of the soil layers
-        soil_temp.update_all(self, crop, weather, time)
-
-        # calculate daily runoff
-        infiltration.update_all(self, weather, time)
-
-        # calculate daily transpiration
-        evapotranspiration.update_all(self, crop, weather, time)
-
-        # transpiration is defined in the crop module, but called here as a
-        # component of water balance
-        transpiration.update_all(crop.current_crop, self, time)
-
-        # calculate daily percolation
-        percolation.update_all(self)
-
-        # updates daily soil water fluxes
-        soil_water.update_all(self, weather, time)
-
-        # calculate daily soil erosion
-        soil_erosion.update_all(self, crop, weather, time)
-
-        # calculate and update the contents of 3 organic and 2 inorganic nitrogen
-        # pools
-        nitrogen_cycling.update_all(self, field_management, weather, time)
-
-        phosphorus_cycling.update_all(self, field_management, weather, time)
-
-        self.annual_variable_update()
 
     def annual_variable_update(self):
 

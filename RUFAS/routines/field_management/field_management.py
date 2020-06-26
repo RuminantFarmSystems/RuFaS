@@ -12,6 +12,40 @@ Author(s): William Donovan, wmdonovan@wisc.edu
 
 from . import fertilizer_application, manure_application, tillage_application
 
+
+def daily_field_management_routine(soil, manure_storage, field_management, weather, time):
+    """
+    Description:
+        Manages the function calls for simulating field management
+
+    Args:
+        soil: an instance of the Soil class defined in soil.py representing
+            the soil profile of the field being managed
+        manure_storage: an instance of the ManureStorage class defined in
+            manure_storage.py representing available manure
+        field_management: an instance of the FieldManagement class defined in
+            field_management.py
+        weather: an instance of the Weather class defined in classes.py
+        time: an instance of the Time class defined in classes.py
+    """
+
+    fert_management = field_management.managed_applications['fertilizer']
+    if (time.cal_year, time.day) in fert_management.applications:
+        if fert_management.check_conditions_plant(soil, weather, time):
+            fertilizer_application.update_all(soil, fert_management.applications[(time.cal_year, time.day)].data)
+
+    manure_management = field_management.managed_applications['manure']
+    if (time.cal_year, time.day) in manure_management.applications:
+        if manure_management.check_conditions_plant(soil, weather, time):
+            manure_application.update_all(soil, manure_storage,
+                                          manure_management.applications[(time.cal_year, time.day)].data)
+
+    till_management = field_management.managed_applications['tillage']
+    if (time.cal_year, time.day) in till_management.applications:
+        if manure_management.check_conditions_plant(soil, weather, time):
+            tillage_application.update_all(soil, till_management.applications[(time.cal_year, time.day)].data)
+
+
 class FieldManagement:
 
     def __init__(self, app_data, time):
@@ -31,13 +65,8 @@ class FieldManagement:
                 'type': "DAIRY",
                 'year': -1,
                 'day': -1,
-                'mass': 1500,
-                'P_frac': 0.007,
-                'N_frac': 0,
-                'NH4_frac': 0,
-                'WIP_frac': 0.6,
-                'WOP_frac': 0.05,
-                'dry_matter': 0.05,
+                'N_mass': 520,
+                'P_mass': 300,
                 'percent_cover': 0.95,
                 'depth': 0.0,
                 'surface_percent': 1.0
@@ -65,37 +94,6 @@ class FieldManagement:
                 self.BaseApplicationManagement(app_data[application_name], application_name, default_data, time)
 
         self.management_scheme = str(app_data['management_scheme']).lower()
-
-    def daily_field_management_routine(self, soil, manure_storage, weather, time):
-        """
-        Description:
-            Manages the function calls for simulating field management
-
-        Args:
-            soil: an instance of the Soil class defined in soil.py representing
-                the soil profile of the field being managed
-            manure_storage: an instance of the ManureStorage class defined in
-                manure_storage.py representing available manure
-            weather: an instance of the Weather class defined in classes.py
-            time: an instance of the Time class defined in classes.py
-        """
-
-        fert_management = self.managed_applications['fertilizer']
-        if (time.year, time.day) in fert_management.applications:
-            if fert_management.check_conditions_plant(soil, weather, time):
-                fertilizer_application.update_all(soil, fert_management.applications[(time.year, time.day)].data)
-
-        manure_management = self.managed_applications['manure']
-        if (time.year, time.day) in manure_management.applications:
-            if manure_management.check_conditions_plant(soil, weather, time):
-                manure_application.update_all(soil, manure_storage,
-                                              manure_management.applications[(time.year, time.day)].data)
-
-        till_management = self.managed_applications['tillage']
-        if (time.year, time.day) in till_management.applications:
-            if manure_management.check_conditions_plant(soil, weather, time):
-                tillage_application.update_all(soil, till_management.applications[(time.year, time.day)].data)
-
 
     class BaseApplicationManagement:
         def __init__(self, management_data, application_type, default_data, time):
@@ -175,8 +173,8 @@ class FieldManagement:
             Args:
                 time: an instance of the Time class specified in classes.py
             """
-            self.applications[(time.start_year + time.year - 1, time.day + 1)] = \
-                self.applications.pop((time.start_year + time.year - 1, -1))
+            self.applications[(time.cal_year, time.day + 1)] = \
+                self.applications.pop((time.cal_year, -1))
 
         @staticmethod
         def check_conditions_plant(soil, weather, time):
@@ -291,15 +289,13 @@ class FieldManagement:
                     contains information about the environment
                 time: an instance of the Time class specified in classes.py
             """
-            day = time.day
-            cal_year = time.start_year + time.year - 1
 
             # if it is the last day of the current year
-            if day == len(weather.rainfall[time.year - 1]):
+            if time.day == len(weather.rainfall[time.year - 1]):
                 if time.year < len(weather.rainfall):
-                    self.applications[(cal_year + 1, 0)] = self.applications.pop((cal_year, day))
+                    self.applications[(time.cal_year, 1)] = self.applications.pop((time.cal_year, time.day))
             else:
-                self.applications[(cal_year, day + 1)] = self.applications.pop((cal_year, day))
+                self.applications[(time.cal_year, time.day + 1)] = self.applications.pop((time.cal_year, time.day))
 
         class BaseApplication:
             def __init__(self, app_data):
