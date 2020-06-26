@@ -102,16 +102,14 @@ def annual_mass_balance_graphics(report):
         colors = ['#ffffff', '#DC267F', '#648FFF', '#FFB000', '#FE6100', '#785EF0']
 
         mp.scatter(table_dict['year'], table_dict['actual'], c='#8B0000', marker='x', zorder=2)
-        x = 1
         for variable in variables:
             if len(colors) == 0:
                 colors.append("#" + ''.join([random.choice('1236789ABCDE') for _ in range(6)]))
 
-            # add row color
-            cell_colors[len(table_dict)][0] = colors[x]
-            x += 1
+            color = colors.pop()
+            cell_colors[len(table_dict)][0] = color
 
-            mp.bar(table_dict['year'], variables[variable], width, color=colors[x - 1], bottom=prev_vars)
+            mp.bar(table_dict['year'], variables[variable], width, color=color, bottom=prev_vars)
             prev_vars = [sum(x) for x in zip(prev_vars, variables[variable])]
             table_dict[variable] = variables[variable]
 
