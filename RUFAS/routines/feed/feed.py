@@ -17,7 +17,7 @@ from . import nitrogen_loss, carbon_loss, protein_degradation
 from RUFAS.routines.animal.ration import hardcoded_ration
 
 
-def daily_feed_routine(feed, crop, animal_managemen):
+def daily_feed_routine(feed, crop, animal_management):
     """
     Description:
         Runs the feed storage routine. Yield is stored at harvest in available storage.
@@ -405,13 +405,14 @@ class Feed:
             Computes the required inventory necessary across all animals for a
             given forage based on the count of the animals, the body weight,
             and inclusion percent associated with the input forage. This class
-            method for the feed calss updates feed class variables along with class
-            variables on the input storage object.
+            method for the feed class updates feed class variables along with class
+            variables associated with the input storage object. Each calculation
+            has a reference to the respective calculation in the pseudocode
         Args:
-            storage: a storage object that contains the given forage being assessed
-            animal_management: the class object animal_management which tracks the state of the animals
+            storage: a storage object that contains forage being assessed
+            animal_management: the class object Animal Management which tracks the state of the animals
         """
-        # current animals and animal information
+        # animals = dictionary with animals as keys and animal objects as values
         animals = {'calves': animal_management.calves,
                    'heiferIs': animal_management.heiferIs,
                    'heiferIIs': animal_management.heiferIIs,
@@ -430,7 +431,7 @@ class Feed:
 
         avg_BW = {}
         animal_class_size_avg = {}
-        # calculating average body weight of animals
+        # avg_BW = Average bodyweight of specified Animal Class (kg)
         for key in animals:
             BW = 0
             for animal in animals[key]:
@@ -441,16 +442,7 @@ class Feed:
             else:
                 avg_BW[key] = 0
 
-        # required inventory for corresponding animal class (kg DM)
-        req_inv = {'calves': 0,
-                   'heiferIs': 0,
-                   'heiferIIs': 0,
-                   'heiferIIIs': 0,
-                   'dry_cows': 0,
-                   'lactating_cows': 0
-                   }
-
-        # hard-coded recommended inclusion rate as a percentage of body weight per animal
+        # inclusion_pct = recommended inclusion rate as a percentage of bodyweight for Animal Class
         # (currently not unique across different feeds)
         inclusion_pct = {'calves': 2.0,
                          'heiferIs': 2.0,
@@ -460,15 +452,15 @@ class Feed:
                          'lactating_cows': 2.0
                          }
 
-        # estimated inclusion rate to meet animal class requirements
-        inclusion_rate_est = {}
+        # inclusion_rate_est = Estimated inclusion rate to meet Animal Class requirements
+        inclusion_rate_est = {}     #[F.2.A.4]
         for animal in inclusion_pct:
             inclusion_rate_est[animal] = (inclusion_pct[animal] / 100) * avg_BW[animal]
 
-        # days until expected feed out
+        # days_remaining = the number of days until the expected start date for feedout from the next harvest
         days_remaining = 365 - storage.days_since_feedout
 
-        # days until next year's feed out
+        # cow_days = total number of feeding days until next year’s forage begins to be fed out
         cow_days = {'calves': {},
                     'heiferIs': {},
                     'heiferIIs': {},
@@ -480,11 +472,19 @@ class Feed:
         for animal in cow_days:
             cow_days[animal] = animal_class_size_avg[animal] * days_remaining
 
-        # populate req_inv dictionary with input feed
-        for animal in cow_days:
+        # req_inv = required inventory for corresponding animal class (kg DM)
+        req_inv = {'calves': 0,
+                   'heiferIs': 0,
+                   'heiferIIs': 0,
+                   'heiferIIIs': 0,
+                   'dry_cows': 0,
+                   'lactating_cows': 0
+                   }
+
+        for animal in cow_days:     #[F.2.A.4]
             req_inv[animal] = inclusion_rate_est[animal] * cow_days[animal]
 
-        # update class variables for storage object input
+        # updating class variables for input storage object input
         storage.req_inv = req_inv
         storage.cow_days = cow_days
         storage.inclusion_rate_est = inclusion_rate_est
@@ -496,22 +496,24 @@ class Feed:
         Description:
             Assess farm grown forage stocks and plan maximum intake of each
             forage to ensure there is enough forage to last a FULL YEAR.
-            forage inventory is conducted at least 1x/year after harvest and
-            then at a user specified number of times. Note that the inventory
-            should be executed at the end of the ‘simulation day’, preferably
-            on the last day of a ration formulation interval.
+            Forage inventory is conducted at least 1x/year after harvest and
+            then at a user specified number of times. This function calculates
+            those values and stores it in the input storage object. Each calculation
+            has a reference to its respective calculation in the pseduocode
 
         Args:
             storage: the storage object containing the forage being assessed
         """
         # set max feed intake based on available forage
+        # TODO: Incorporate User Specificed input
         # TODO: Error message for insufficient inventory
+        # TODO: Add remaining forage to other forage types
 
         # HIGH QUALITY FORAGE
         # Calculating DMI for Lactating Cows only
         #------------------------------
         if storage.forage_quality == 'high':
-            if 1.1 * storage.req_inv['lactating_cows'] >= storage.DM:
+            if 1.1 * storage.req_inv['lactating_cows'] >= storage.DM:   #[F.2.A.6]
                 storage.DMI_forage_max['lactating_cows'] = storage.DM / storage.cow_days['lactating_cows']
             else:
                 storage.DMI_forage_max['lactating_cows'] = 1.1 * storage.inclusion_rate_est['lactating_cows']
@@ -615,7 +617,7 @@ class Feed:
             Executes daily routines relating to feed management, specifcally a
             daily feedout process and checking for new forages that need an
             inventory plan. If the list new_forages contains a forage which
-            had been harvested at least 30 days ago, forage_in_plan will be called.
+            had been harvested at least 30 days ago, forage_inv_plan will be called.
 
         Args:
             animal_management: The state of the AnimalManagement class object
@@ -634,7 +636,7 @@ class Feed:
                     silo.days_since_feedout += 1
         # inventory plan for new forages
         for silo in self.new_forages:
-            if silo.days_since_feedout >= -1:
+            if silo.days_since_feedout >= -1 and animal_management.end_ration_interval():
                 self.required_inventory(silo, animal_management)
                 self.forage_inv_plan(silo)
                 self.add_to_available_feeds(silo.feed_id, .5, .5)
