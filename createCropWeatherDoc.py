@@ -1,4 +1,4 @@
-# This was just used to generate Inputs/crop_module_testWeather_3.4.csv so the
+# This was just used to generate input/crop_module_testWeather_3.4.csv so the
 # results can match those in adjusted_model_PlantGrowth_3.5.xlsx
 import openpyxl
 
@@ -21,7 +21,7 @@ def rearrange(row):
 	return newRow
 
 limit = 2
-with open("Inputs/crop_module_testWeather_3.4.csv","w") as outFile:
+with open("input/crop_module_testWeather_3.4.csv", "w") as outFile:
 	for row in weatherSheet:
 		if not isEmpty(row[0]):
 			valueList = [str(x.value) for x in row]
