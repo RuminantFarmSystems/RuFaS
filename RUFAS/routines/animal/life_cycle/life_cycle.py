@@ -338,6 +338,7 @@ class LifeCycleManager:
             removed = heiferIIIs.pop()
             ids_removed.append(removed.id)
             self.sold_to_market += 1
+            self.sold_heifers.append(removed)
             daily_heifer_sold += 1
             if record_econ_stats:
                 self.total_heifer_sold += 1
@@ -425,6 +426,7 @@ class LifeCycleManager:
                 if new_calf.sold:
                     self.total_calf_sold += 1
                     self.total_calf_value += self.config["calf_price"]
+                    self.sold_calves.append(new_calf)
 
             # calculate reproduction indications
             if date >= sim_length - 21 * self.config["num_21_days"]:
