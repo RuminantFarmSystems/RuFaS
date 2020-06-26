@@ -33,7 +33,7 @@ class Alfalfa(BaseCrop):
 
         # Inputs
         self.T_base_min = 4
-        self.T_base_max = 32  # until dormancy
+        self.T_base_max = 43.33
         self.PHU = 900  # still unknown
 
         # Internally calculated inputs
@@ -54,7 +54,7 @@ class Alfalfa(BaseCrop):
         self.fr_LAI_1 = 0.01
         self.fr_LAI_2 = 0.95
         self.fr_PHU_sen = 0.90
-        self.fr_PHU_harvest = 1.0  # TODO: If alfalfa is a hay, PHU to cut is 0.6
+        self.fr_PHU_harvest = 1.2
         self.LAI_max = 4
         self.LAI_min = 0.75
 
@@ -99,7 +99,7 @@ class Alfalfa(BaseCrop):
         ''' Soil Water Uptake Data '''
 
         self.beta_w = 10  # water-use distribution parameter  # corn
-        self.epco = 0.5  # corn
+        self.epco = 1
 
         self.water_actual_up = 0
         self.water_uptake_each_layer = []
@@ -109,7 +109,7 @@ class Alfalfa(BaseCrop):
 
         self.N_fix = 0.0
 
-        self.beta_n = 10  # corn
+        self.beta_n = 10
 
         self.bio_N_opt = 0
         self.bio_N = 0
@@ -128,7 +128,7 @@ class Alfalfa(BaseCrop):
         # ===================================================================
         ''' Phosphorus Uptake Data '''
 
-        self.beta_p = 10  # corn
+        self.beta_p = 10
 
         self.bio_P_opt = 0
         self.bio_P = 0

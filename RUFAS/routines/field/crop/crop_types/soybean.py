@@ -29,7 +29,7 @@ class Soybean(BaseCrop):
 
         # Inputs
         self.T_base_min = 10
-        self.T_base_max = 30  # corn
+        self.T_base_max = 43.33
         self.PHU = 1150
 
         # Internally calculated inputs
@@ -50,7 +50,7 @@ class Soybean(BaseCrop):
         self.fr_LAI_1 = 0.05
         self.fr_LAI_2 = 0.95
         self.fr_PHU_sen = 0.90
-        self.fr_PHU_harvest = 1.0  # TODO: If soybean has drydown, this is 1.2
+        self.fr_PHU_harvest = 1.2
         self.LAI_max = 3
         self.LAI_min = 0
 
@@ -95,7 +95,7 @@ class Soybean(BaseCrop):
         ''' Soil Water Uptake Data '''
 
         self.beta_w = 10  # water-use distribution parameter  # corn
-        self.epco = 0.5  # corn
+        self.epco = 1
 
         # Outputs
         self.prev_LAI_actual = 0
@@ -106,7 +106,7 @@ class Soybean(BaseCrop):
 
         self.N_fix = 0.0
 
-        self.beta_n = 10  # corn
+        self.beta_n = 10
 
         self.bio_N_opt = 0
         self.bio_N = 0
@@ -125,7 +125,7 @@ class Soybean(BaseCrop):
         # ===================================================================
         ''' Phosphorus Uptake Data '''
 
-        self.beta_p = 10  # corn
+        self.beta_p = 10
 
         self.bio_P_opt = 0
         self.bio_P = 0
