@@ -1,3 +1,12 @@
+'''
+RUFAS: Ruminant Farm Systems Model
+File name: animal_base.py
+Author(s): Katrina Wang, kw433@cornell.edu
+Description: This file stores and draws values of simulated 
+                animals in and from the database
+'''
+###############################################################################
+
 from RUFAS.routines.animal.life_cycle.calf import Calf
 from RUFAS.routines.animal.life_cycle.heiferI import HeiferI
 from RUFAS.routines.animal.life_cycle.heiferII import HeiferII

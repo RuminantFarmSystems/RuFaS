@@ -212,7 +212,7 @@ class LifeCycleManager:
 
         # if the number of heifers is less than needed for the herd, buy replacement from the market
         while len(self.cows) + len(self.heiferIIIs) < self.herd_num * 1.01 and date > 1:
-            self.replacement_market[0]._events.add_event(self.replacement_market[0]._days_born, 'Entered Herd')
+            self.replacement_market[0].events.add_event(self.replacement_market[0].days_born, 'Entered Herd')
             self.heiferIIIs.append(self.replacement_market[0])
             self.bought_from_market += 1
             daily_bought_from_market += 1
@@ -236,20 +236,20 @@ class LifeCycleManager:
                     self.total_slaughter_value += slaughter_value
                     self.num_culled_range += 1
                     self.avg_slaughter_value = self.total_slaughter_value / self.num_culled_range
-                    if cow._cull_reason in self.cull_reason_stats_range:
-                        self.cull_reason_stats_range[cow._cull_reason] += 1
+                    if cow.cull_reason in self.cull_reason_stats_range:
+                        self.cull_reason_stats_range[cow.cull_reason] += 1
                     else:
-                        self.cull_reason_stats_range[cow._cull_reason] = 1
-                    parity = cow._calves if cow._calves <= 3 else '4+'
-                    if cow._calves in self.parity_culling_stats_range:
+                        self.cull_reason_stats_range[cow.cull_reason] = 1
+                    parity = cow.calves if cow.calves <= 3 else '4+'
+                    if cow.calves in self.parity_culling_stats_range:
                         self.parity_culling_stats_range[parity] += 1
                     else:
                         self.parity_culling_stats_range[parity] = 1
 
-                if cow._cull_reason in self.cull_reason_stats:
-                    self.cull_reason_stats[cow._cull_reason] += 1
+                if cow.cull_reason in self.cull_reason_stats:
+                    self.cull_reason_stats[cow.cull_reason] += 1
                 else:
-                    self.cull_reason_stats[cow._cull_reason] = 1
+                    self.cull_reason_stats[cow.cull_reason] = 1
                 self.total_culled += 1
                 daily_cow_cull_num += 1
 
@@ -266,24 +266,24 @@ class LifeCycleManager:
                     'days_born': 0
                 }
                 new_calf = Calf(args)
-                if not (new_calf._culled or new_calf._sold):
-                    new_calf._events.add_event(new_calf._days_born, 'Entered Herd')
+                if not (new_calf.culled or new_calf.sold):
+                    new_calf.events.add_event(new_calf.days_born, 'Entered Herd')
                     self.calves.append(new_calf)
                     self.total_new_born += 1
-                if new_calf._sold:
+                if new_calf.sold:
                     self.total_calf_sold += 1
                     self.total_calf_value += self.config["calf_price"]
 
             # calculate reproduction indications
             if date >= sim_length - 21 * self.config["num_21_days"]:
-                if cow._ai_day == cow._days_born:
+                if cow.ai_day == cow.days_born:
                     self.num_ai_21_days += 1
-                if cow._days_in_milk > self.config["vwp"] and not cow._preg:
+                if cow.days_in_milk > self.config["vwp"] and not cow.preg:
                     self.num_cow_btw_vwp_preg_21_days += 1
-                if cow._days_in_preg == 1:
+                if cow.days_in_preg == 1:
                     self.num_preg_21_days += 1
 
-            if cow._milking:
+            if cow.milking:
                 daily_cow_milking += 1
 
         # calculate service rate and conception rate
@@ -315,14 +315,14 @@ class LifeCycleManager:
 
         # count stats
         for heiferII in self.heiferIIs:
-            if heiferII._preg:
+            if heiferII.preg:
                 self.num_heiferII_preg += 1
         for cow in self.cows:
-            if cow._preg:
+            if cow.preg:
                 self.num_cow_preg += 1
-            if cow._milking:
+            if cow.milking:
                 self.num_cow_milking += 1
-            if cow._days_in_milk < self.config['vwp']:
+            if cow.days_in_milk < self.config['vwp']:
                 self.num_cow_in_vwp += 1
 
             # calculate economy date
@@ -342,7 +342,7 @@ class LifeCycleManager:
             income_over_feed_cost = self.total_milk_income + self.total_slaughter_value + self.total_heifer_value + self.total_calf_value - self.total_feed_cost
             net_return = income_over_feed_cost - self.total_replacement_cost - self.total_fixed_cost
 
-        parity_lst = [cow._calves if cow._calves <= 2 else '3+' for cow in self.cows ]
+        parity_lst = [cow.calves if cow.calves <= 2 else '3+' for cow in self.cows ]
         parity_count_tuple = Counter(parity_lst)
         avg_service_rate = self.service_rate_sum_21_days / float(self.config["num_21_days"]) * 21.0
         avg_conception_rate = self.conception_rate_sum_21_days / float(self.config["num_21_days"])

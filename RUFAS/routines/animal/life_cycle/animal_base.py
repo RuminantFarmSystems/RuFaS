@@ -36,25 +36,25 @@ class AnimalBase(object):
 		Output:
 	'''
 	def __init__(self, args):
-		self._id = args['id']
-		self._breed = args['breed']
-		self._birth_date = args['birth_date']
-		self._days_born = args['days_born']
-		self._culled = False
-		self._do_not_breed = False
-		self._events = AnimalEvents()
+		self.id = args['id']
+		self.breed = args['breed']
+		self.birth_date = args['birth_date']
+		self.days_born = args['days_born']
+		self.culled = False
+		self.do_not_breed = False
+		self.events = AnimalEvents()
 		
-		self._daily_growth = 0
+		self.daily_growth = 0
 		self.set_default_nutrient_rqmts()
-		self._manure_excretion = {}
-		self._ration_formulation = {'objective': 0.00}
-		self._DMIest = 0
-		self._DBW = 0
+		self.manure_excretion = {}
+		self.ration_formulation = {'objective': 0.00}
+		self.DMIest = 0
+		self.DBW = 0
 
 	def set_default_nutrient_rqmts(self):
-		self._nutrient_rqmts = {}
+		self.nutrient_rqmts = {}
 		for key in self.nutrients:
-			self._nutrient_rqmts[key] = {'op': '', 'val': 0}
+			self.nutrient_rqmts[key] = {'op': '', 'val': 0}
 
 	# Method: is_culled
 	'''
@@ -66,4 +66,4 @@ class AnimalBase(object):
 			True/False value inidicating if culled
 	'''
 	def culled(self):
-		return self._culled
+		return self.culled

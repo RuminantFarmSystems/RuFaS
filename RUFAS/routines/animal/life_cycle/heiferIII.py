@@ -40,13 +40,13 @@ class HeiferIII(HeiferII):
            Calculates this heiferIII's nutrient requirements.
     '''
     def calc_nutrient_rqmts(self):
-        self._nutrient_rqmts, self._DMIest, self._DBW = calculate_rqmts()
+        self.nutrient_rqmts, self.DMIest, self.DBW = calculate_rqmts()
         
     '''
         Calculates and sets the manure excretion components.
     '''  
     def calc_manure_excretion(self, feed):
-        self._manure_excretion = manure_calculations() 
+        self.manure_excretion = manure_calculations() 
         
     '''
         Sets this animal's ration formulation.
@@ -54,12 +54,12 @@ class HeiferIII(HeiferII):
             ration_formulation: dictionary representing the calculated ration
     '''
     def set_ration(self, ration_formulation, feed):
-        self._ration_formulation = ration_formulation
-        self._dry_matter_intake = 0
+        self.ration_formulation = ration_formulation
+        self.dry_matter_intake = 0
         for key in ration_formulation:
             if key in feed.managed_feed_names:
                 DM_feed_amount = ration_formulation[key]
-                self._dry_matter_intake += DM_feed_amount
+                self.dry_matter_intake += DM_feed_amount
 
     '''
 		Description:
@@ -72,34 +72,35 @@ class HeiferIII(HeiferII):
 	'''
     def update(self):
         cow_stage = False
-        self._days_born += 1
+        self.days_born += 1
 
-        if self._preg:
-            self._days_in_preg += 1
+        if self.preg:
+            self.days_in_preg += 1
             
-        prev_weight = self._body_weight
+        prev_weight = self.body_weight
 
-        if self._days_born < AnimalBase.config['grow_end_day']:
+        if self.days_born < AnimalBase.config['grow_end_day']:
             # Heifer can only grow to a maximum weight of mature_body_weight
-            if self._body_weight < AnimalBase.config['mature_body_weight']:
+            if self.body_weight < AnimalBase.config['mature_body_weight']:
                 gained_weight = np.random.normal(AnimalBase.config['avg_daily_gain_h'], AnimalBase.config['std_daily_gain_h'])
-                while gained_weight < AnimalBase.config['avg_daily_gain_h'] - 2 * AnimalBase.config['std_daily_gain_h'] or gained_weight > AnimalBase.config['avg_daily_gain_h'] + 2 * AnimalBase.config['std_daily_gain_h']:
+                while gained_weight < AnimalBase.config['avg_daily_gain_h'] - 2 * AnimalBase.config['std_daily_gain_h'] \
+                    or gained_weight > AnimalBase.config['avg_daily_gain_h'] + 2 * AnimalBase.config['std_daily_gain_h']:
                     gained_weight = np.random.normal(AnimalBase.config['avg_daily_gain_h'], AnimalBase.config['std_daily_gain_h'])
-                self._body_weight += gained_weight
-            if self._body_weight > AnimalBase.config['mature_body_weight']:
-                self._body_weight = AnimalBase.config['mature_body_weight']
-                self._mature_body_weight = self._body_weight
-                self._events.add_event(self._days_born, 'Mature body weight prior to grow end day')
+                self.body_weight += gained_weight
+            if self.body_weight > AnimalBase.config['mature_body_weight']:
+                self.body_weight = AnimalBase.config['mature_body_weight']
+                self.mature_body_weight = self.body_weight
+                self.events.add_event(self.days_born, 'Mature body weight prior to grow end day')
         
-        self._daily_growth = self._body_weight - prev_weight
+        self.daily_growth = self.body_weight - prev_weight
         
-        if self._days_born == AnimalBase.config['grow_end_day']:
-            self._mature_body_weight = self._body_weight
-            self._events.add_event(self._days_born, 'Mature body weight')
+        if self.days_born == AnimalBase.config['grow_end_day']:
+            self.mature_body_weight = self.body_weight
+            self.events.add_event(self.days_born, 'Mature body weight')
 
 
-        if self._days_in_preg == self._gestation_length:
-            self._days_born -= 1 # will be incremented again in next stage
+        if self.days_in_preg == self.gestation_length:
+            self.days_born -= 1 # will be incremented again in next stage
             cow_stage = True
         return cow_stage
 
@@ -116,14 +117,14 @@ class HeiferIII(HeiferII):
             Gestation Length: {}\n
 			Life Events: \n
 			{}
-		""".format(self._id,
-				   self._birth_date,
-				   self._days_born,
-				   self._body_weight,
+		""".format(self.id,
+				   self.birth_date,
+				   self.days_born,
+				   self.body_weight,
 				   AnimalBase.config['breeding_start_day_h'],
-				   self._repro_program,
-				   self._days_in_preg,
-                   self._gestation_length,
-				   str(self._events))
+				   self.repro_program,
+				   self.days_in_preg,
+                   self.gestation_length,
+				   str(self.events))
 
         return res_str

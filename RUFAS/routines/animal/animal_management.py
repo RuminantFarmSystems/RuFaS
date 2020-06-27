@@ -245,7 +245,7 @@ class AnimalManagement:
         dry_cows = []
 
         for cow in self.cows:
-            if cow._milking:
+            if cow.milking:
                 lactating_cows.append(cow)
             else:
                 dry_cows.append(cow)
