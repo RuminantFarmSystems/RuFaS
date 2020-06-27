@@ -87,7 +87,8 @@ class SoilNitrogen(BaseReportHandler):
                                 'NH4_erosion': ['soil.NH4_erosion', 'kg/ha', []],
                                 'activeN_erosion': ['soil.activeN_erosion', 'kg/ha', []],
                                 'stableN_erosion': ['soil.stableN_erosion', 'kg/ha', []],
-                                'freshN_erosion': ['soil.freshN_erosion', 'kg/ha', []]
+                                'freshN_erosion': ['soil.freshN_erosion', 'kg/ha', []],
+                                'N_uptake': ['soil.N_uptake', 'kg / ha', []]
                                 }
 
         self.annual_variables = {'year': ['time.cal_year', '', 0],
@@ -99,7 +100,8 @@ class SoilNitrogen(BaseReportHandler):
                                  'freshN_erosion': ['soil.freshN_erosion_annual', 'kg/ha', 0],
                                  'NO3_drainage': ['soil.NO3_drainage_annual', 'kg/ha', 0],
                                  'NH4_drainage': ['soil.NH4_drainage_annual', 'kg/ha', 0],
-                                 'activeN_drainage': ['soil.activeN_drainage_annual', 'kg/ha', 0]
+                                 'activeN_drainage': ['soil.activeN_drainage_annual', 'kg/ha', 0],
+                                 'N_uptake': ['soil.N_uptake_annual', 'kg/ha', 0]
                                  }
 
     #
