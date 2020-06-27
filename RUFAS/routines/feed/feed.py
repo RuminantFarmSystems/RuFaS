@@ -35,7 +35,7 @@ def daily_feed_routine(feed, crop, animal_management):
 
     current_crop = crop.current_crop
 
-    if current_crop.yield_actual != 0:
+    if current_crop.DM_yield != 0:
         if len(feed.available_storage) == 0:
             standard_data = {
                 "storage_type": "bag",
@@ -118,6 +118,7 @@ class Feed:
         self.N = 0.0
         self.P = 0.0
         self.DM = 0.0
+        self.NDF = 0.0
         self.CP = 0.0
         self.NPN = 0.0
 
@@ -175,6 +176,7 @@ class Feed:
 
             self.C_percent = 0.0
 
+            self.NDF = 0.0
             self.C = 0.0
             self.N = 0.0
             self.P = 0.0
@@ -264,7 +266,7 @@ class Feed:
                     self.C_feed_out_particle_percent = 0
                 else:
                     if self.error_1:
-                        print('"' + self.moisture + '"', 'is not a recognized moisture category for', self.crop_name)
+                        # print('"' + self.moisture + '"', 'is not a recognized moisture category for', self.crop_name)
                         self.error_1 = False
 
             elif self.crop_name == 'alfalfa':
@@ -322,11 +324,11 @@ class Feed:
                     self.C_feed_out_particle_percent = 0.01
                 else:
                     if self.error_2:
-                        print('"' + self.moisture + '"', 'is not a recognized moisture category for', self.crop_name)
+                        # print('"' + self.moisture + '"', 'is not a recognized moisture category for', self.crop_name)
                         self.error_2 = False
             else:
                 if self.error_3:
-                    print('"' + self.crop_name + '"', 'storage is not currently implemented')
+                    # print('"' + self.crop_name + '"', 'storage is not currently implemented')
                     self.storage = False
                     self.error_3 = False
 
@@ -342,9 +344,10 @@ class Feed:
 
             if self.storage:
                 self.feed_id = crop.feed_id
-                self.DM += crop.yield_actual
-                self.N += crop.yield_N
-                self.P += crop.yield_P
+                self.DM += crop.DM_yield
+                self.NDF += crop.NDF_yield
+                self.N += crop.N_yield
+                self.P += crop.P_yield
                 # TODO: no Carbon Cycle currently implemented
                 self.C += crop.yield_actual * self.C_percent
 
@@ -389,6 +392,7 @@ class Feed:
         self.N += storage.N
         self.P += storage.P
         self.DM += storage.DM
+        self.NDF += storage.NDF
         self.CP += storage.CP
         self.NPN += storage.NPN
 
@@ -652,6 +656,7 @@ class Feed:
         self.N = 0.0
         self.P = 0.0
         self.DM = 0.0
+        self.NDF = 0.0
         self.CP = 0.0
         self.NPN = 0.0
 

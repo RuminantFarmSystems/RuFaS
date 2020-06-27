@@ -64,8 +64,8 @@ def daily_crop_routine(crop, weather, time, soil):
         # yield is reset to 0 at the beginning of the next day so it can be
         # accessed by the output handler.
         crop_type.yield_actual = 0
-        crop_type.yield_N = 0
-        crop_type.yield_P = 0
+        crop_type.N_yield = 0
+        crop_type.P_yield = 0
 
         # If the crop is not planted yet, determine whether it is planted today
         if not crop_type.planted:
@@ -122,6 +122,10 @@ def daily_crop_routine(crop, weather, time, soil):
 def annual_variable_update(crop_type):
 
     crop_type.yield_annual += crop_type.yield_actual
+    crop_type.N_yield_annual += crop_type.N_yield
+    crop_type.P_yield_annual += crop_type.P_yield
+    crop_type.DM_yield_annual += crop_type.DM_yield
+    crop_type.NDF_yield_annual += crop_type.NDF_yield
 
 
 # -------------------------------------------------------------------------------
@@ -218,7 +222,11 @@ class Crop:
                             x += crop_type.repeat
 
     def annual_reset(self):
-        self.current_crop.yield_annual = 0
+        self.current_crop.N_yield_annual = 0.0
+        self.current_crop.P_yield_annual = 0.0
+        self.current_crop.DM_yield_annual = 0.0
+        self.current_crop.NDF_yield_annual = 0.0
+        self.current_crop.yield_annual = 0.0
 
 
 #
@@ -374,13 +382,21 @@ class InitCrop:
 
         self.gamma_wu = 0
 
+        self.DM_harvest_perc = 0.15  # TODO: Hard coded dry matter percent at harvest
+
         self.bio_AG = 0
         self.yield_max = 0
         self.yield_actual = 0
-        self.yield_N = 0
-        self.yield_P = 0
+        self.DM_yield = 0.0
+        self.NDF_yield = 0.0
+        self.N_yield = 0
+        self.P_yield = 0
 
-        self.yield_annual = 0
+        self.N_yield_annual = 0.0
+        self.P_yield_annual = 0.0
+        self.DM_yield_annual = 0.0
+        self.NDF_yield_annual = 0.0
+        self.yield_annual = 0.0
 
 
 # -----------------------------------------------------------------------
