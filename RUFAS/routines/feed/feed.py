@@ -29,8 +29,6 @@ def daily_feed_routine(feed, crop, animal_management):
         crop: an instance of the Crop object specified in crop.py
         animal_management: an instance of the AnimalManagement object specified
             in animal_management.py
-        weather: an instance of the Weather class specified in classes.py
-        time: an instance of the Time class specified in classes.py
     """
 
     current_crop = crop.current_crop
@@ -154,7 +152,6 @@ class Feed:
             self.DM = data['initial_dry_matter']
 
             self.crop_name = 'null'
-            self.prev_crop_name = 'null'
             self.feed_id = 'null'
             self.forage_quality = 'null'
 
@@ -453,7 +450,8 @@ class Feed:
                          }
 
         # inclusion_rate_est = Estimated inclusion rate to meet Animal Class requirements
-        inclusion_rate_est = {}     #[F.2.A.5]
+        # [F.2.A.5]
+        inclusion_rate_est = {}
         for animal in inclusion_pct:
             inclusion_rate_est[animal] = (inclusion_pct[animal] / 100) * avg_BW[animal]
 
@@ -481,7 +479,8 @@ class Feed:
                    'lactating_cows': 0
                    }
 
-        for animal in cow_days:     #[F.2.A.4]
+        # [F.2.A.4]
+        for animal in cow_days:
             req_inv[animal] = inclusion_rate_est[animal] * cow_days[animal]
 
         # updating class variables for input storage object input
@@ -511,16 +510,17 @@ class Feed:
 
         # HIGH QUALITY FORAGE
         # Calculating DMI for Lactating Cows only
-        #------------------------------
+        # ------------------------------
         if storage.forage_quality == 'high':
-            if 1.1 * storage.req_inv['lactating_cows'] >= storage.DM:   #[F.2.A.6]
+            # [F.2.A.6]
+            if 1.1 * storage.req_inv['lactating_cows'] >= storage.DM:
                 storage.DMI_forage_max['lactating_cows'] = storage.DM / storage.cow_days['lactating_cows']
             else:
                 storage.DMI_forage_max['lactating_cows'] = 1.1 * storage.inclusion_rate_est['lactating_cows']
 
         # LOW QUALITY FORAGE
         # Calculating DMI for all EXCEPT Lactating Cows
-        #------------------------------
+        # ------------------------------
         elif storage.forage_quality == 'low':
             tot_req_inv_non_lactating_cows = 0
             # updating required inventory for non lactating cows
@@ -528,12 +528,14 @@ class Feed:
                 if animal != 'lactating_cows':
                     tot_req_inv_non_lactating_cows += storage.req_inv[animal]
             # Assigning DMI when there is sufficient inventory
-            if tot_req_inv_non_lactating_cows <= storage.DM:        #[F.2.A.7]
+            # [F.2.A.7]
+            if tot_req_inv_non_lactating_cows <= storage.DM:
                 storage.DMI_forage_max = storage.inclusion_rate_est
                 storage.DMI_forage_max['lactating_cows'] = 0
             # updating inclusion rate estimate until inventory is sufficient to
-            # satisfy that newly calculated inclusion rate estimate
-            else:       #[F.2.A.8]
+            # satisfy the newly calculated inclusion rate estimate
+            # [F.2.A.8]
+            else:
                 while round(tot_req_inv_non_lactating_cows) > round(storage.DM):
                     inv_delta = tot_req_inv_non_lactating_cows - storage.DM
                     denominator = 0
@@ -560,14 +562,15 @@ class Feed:
                 storage.DMI_forage_max = storage.inclusion_rate_est
                 storage.DMI_forage_max['lactating_cows'] = 0
 
-        # NO QUALITY ASSESMENT
+        # NO QUALITY ASSESSMENT
         # Calculating DMI for all animal classes
         # -----------------------------
         else:
             # calculating total required inventory across all animal classes
             tot_req_inv = sum(storage.req_inv.values())
             # assigning DMI when there is sufficient inventory
-            if tot_req_inv <= storage.DM:       #[F.2.A.9]
+            # [F.2.A.9]
+            if tot_req_inv <= storage.DM:
                 tot_req_inv_non_lactating_cows = 0
 
                 for animal in storage.DMI_forage_max:
@@ -580,7 +583,8 @@ class Feed:
                     storage.DMI_forage_max['lactating_cows'] = available_forage / storage.cow_days['lactating_cows']
             # updating inclusion rate estimate until inventory is sufficient to
             # satisfy that newly calculated inclusion rate estimate
-            else:       #[F.2.A.10]
+            # [F.2.A.10]
+            else:
                 while round(tot_req_inv) > round(storage.DM):
                     inv_delta = tot_req_inv - storage.DM
                     denominator = 0
