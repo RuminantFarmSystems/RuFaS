@@ -504,14 +504,14 @@ class Feed:
             storage: the storage object containing the forage being assessed
         """
         # set max feed intake based on available forage
-        # TODO: Incorporate User Specificed input for frequency of inventory plan
+        # TODO: Incorporate user specified input for frequency of inventory plan
         # TODO: Raise warning for when additional forage needs to be purchased
         # TODO: Add remaining forage to other silos with same forage type
 
         # HIGH QUALITY FORAGE
         # Calculating DMI for Lactating Cows only
         # ------------------------------
-        if storage.forage_quality == 'high':
+        if storage.forage_quality == 'mature' or storage.forage_quality == 'mid_mature':
             # [F.2.A.6]
             if 1.1 * storage.req_inv['lactating_cows'] >= storage.DM:
                 storage.DMI_forage_max['lactating_cows'] = storage.DM / storage.cow_days['lactating_cows']
@@ -521,7 +521,7 @@ class Feed:
         # LOW QUALITY FORAGE
         # Calculating DMI for all EXCEPT Lactating Cows
         # ------------------------------
-        elif storage.forage_quality == 'low':
+        elif storage.forage_quality == 'immature':
             tot_req_inv_non_lactating_cows = 0
             # updating required inventory for non lactating cows
             for animal in storage.req_inv:
