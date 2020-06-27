@@ -42,7 +42,15 @@ class FeedStorage(BaseReportHandler):
         # 1D Lists [julianDay]
         #
         self.daily_variables = {'year': ['time.cal_year', '', []],
-                                'j_day': ['time.day', '', []]
+                                'j_day': ['time.day', '', []],
+                                'DM': ['feed.DM', 'kg', []],
+                                'NDF': ['feed.NDF', 'kg', []],
+                                'C': ['feed.C', 'kg', []],
+                                'N': ['feed.N', 'kg', []],
+                                'CP': ['feed.CP', 'kg', []],
+                                'NPN': ['feed.NPN', 'kg', []],
+                                'C_loss': ['feed.C_loss', 'kg', []],
+                                'CP_loss': ['feed.CP_loss', 'kg', []]
                                 }
 
         self.annual_variables = {'year': ['time.cal_year', '', 0],
