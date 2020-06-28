@@ -28,7 +28,8 @@ class ManureReport(BaseReportHandler):
 
         self.daily_variables = {'year': ['time.cal_year', '', []],
                                 'j_day': ['time.day', '', []],
-                                'num_animals': ['len(pen.animals_in_pen)', '', []]
+                                'num_animals': ['len(pen.animals_in_pen)', '', []],
+                                'manure': ['pen.manure[\'p_excrt_manure\']', 'g', []]
                                 }
         self.annual_variables = {'year': ['time.cal_year', '', 0]}
 
@@ -55,7 +56,7 @@ class ManureReport(BaseReportHandler):
 
         for manure_type in self.manure_info.keys():
             self.daily_variables[manure_type] = ['pen.manure[\'%s\'] if pen.pen_populated else 0' % manure_type,
-                                                 self.manure_info[manure_type]['Units'], []]
+                                                 'g', []]
 
         self.write_headers(self.get_fPath(), self.daily_variables)
         annual_path = Path(str(self.get_fPath()).split('.csv')[0] + "_annual.csv")
