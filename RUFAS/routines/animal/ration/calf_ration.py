@@ -1,5 +1,6 @@
 from .hardcoded_ration import get_nutrient_rqmts, get_ration
 import math
+import sqlite3
 
 
 def optimize(feed, rqmts):
@@ -21,17 +22,33 @@ def calc_requirements(calf, temp, wean_day, wean_length, milk_type):
         milk_type: either "whole" or "replacer"
     '''
     # nutrient composition of feeds from the feed library
-    whole_milk_dm = 12.5
-    whole_milk_cp = 25.4
-    whole_milk_me = 5.37
+    whole_milk_id = 155
+    milk_replacer_id = 156
+    starter_id = 157
 
-    milk_replacer_dm = 95
-    milk_replacer_cp = 20
-    milk_replacer_me = 4.75
+    conn = sqlite3.connect('Inputs/feeds.sqlite')
+    cur = conn.cursor()
+    cur.execute('SELECT * FROM nutrients WHERE feed_id = ?', (whole_milk_id,))
+    whole_milk = cur.fetchone()
+    whole_milk_dm = whole_milk[2]
+    whole_milk_cp = whole_milk[3]
+    whole_milk_de = whole_milk[26]
+    whole_milk_me = 0.96 * whole_milk_de
 
-    starter_dm = 90
-    starter_cp = 18
-    starter_me = 3.28
+    cur.execute('SELECT * FROM nutrients WHERE feed_id = ?', (milk_replacer_id,))
+    milk_replacer = cur.fetchone()
+    milk_replacer_dm = milk_replacer[2]
+    milk_replacer_cp = milk_replacer[3]
+    milk_replacer_de = milk_replacer[26]
+    milk_replacer_me = 0.96 * milk_replacer_de
+
+    cur.execute('SELECT * FROM nutrients WHERE feed_id = ?', (starter_id,))
+    starter = cur.fetchone()
+    starter_cp = starter[3]
+    starter_de = starter[26]
+    starter_ee = starter[6]
+    starter_me = (1.01 * starter_de - 0.45) + 0.0046 * (starter_ee - 3)
+    conn.close()
     
     if milk_type == "whole":
         milk_replacer_dm = 0

@@ -190,6 +190,7 @@ class Pen:
         # animal in the pen
         for animal in self.animals_in_pen:
             curr_rqmts = animal.nutrient_rqmts
+            
             for key in sum_dict.keys():
                 sum_dict[key] += curr_rqmts[key]['val']
 
@@ -423,7 +424,7 @@ class Pen:
         self.pen_populated = False
         self.classes_in_pen = set()
         self.avg_p_animal = 0
-
+        self.avg_nutrient_rqmts = {}
 
 # methods used for additional ration calculations
 def phosphorus_in_ration(DMI, ration, feed):
