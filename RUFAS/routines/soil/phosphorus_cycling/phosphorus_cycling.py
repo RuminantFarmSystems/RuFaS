@@ -60,7 +60,7 @@ def update_P(soil):
     profile_P = soil.labile_P + soil.active_P + \
                      soil.stable_P + soil.org_P
 
-    soil.delta_P = soil.profile_P - profile_P
+    soil.delta_P = profile_P - soil.profile_P
 
     soil.profile_P = profile_P
 
