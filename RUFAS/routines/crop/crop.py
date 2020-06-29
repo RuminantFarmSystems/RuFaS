@@ -382,7 +382,9 @@ class InitCrop:
 
         self.gamma_wu = 0
 
-        self.DM_harvest_perc = 0.15  # TODO: Hard coded dry matter percent at harvest
+        self.biomass_dry_down_perc = 0.0
+        self.DM_harvest_perc = 0.0
+        self.NDF_harvest_perc = 0.0
 
         self.bio_AG = 0
         self.yield_max = 0
