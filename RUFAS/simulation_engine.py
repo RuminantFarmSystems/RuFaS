@@ -144,9 +144,7 @@ def read_json_file(fPath: Path):
             conform with the format required
     """
 
-    #
     # Designate as module-global variables
-    #
     global config, state, output, weather, time
 
     with fPath.open('r') as f:
@@ -159,10 +157,8 @@ def read_json_file(fPath: Path):
             if config.run_tests:
                 test_handler.run_tests()
 
-            weather = Weather(data['weather'], config.years, config.w_start_year,
-                              config.w_start_day, config.start_year, config.start_day,
-                              config.end_day)
-            time = Time(config.years, config.start_year)
+            weather = Weather(data['weather'], config)
+            time = Time(config)
             state = State(data['farm'], config, time)
             output = OutputHandler(data['output'], state)
 

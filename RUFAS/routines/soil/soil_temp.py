@@ -87,8 +87,7 @@ def update_all(soil, crop, weather, time):
 #
 def calc_Tsoil(soil, weather, time):
     L = 0.8
-    # Taair = weather.T_avg_annual[time.year-1]
-    Taair = 8.18  # TODO: spreadsheet model fix. Note in pseudocode
+    Taair = weather.Taair[time.year - 1][time.day - 1]
     dd = calc_dd(soil)
     for x in range(len(soil.soil_layers)):
 

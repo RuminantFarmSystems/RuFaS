@@ -1,4 +1,3 @@
-# TODO: Nitrogen Fixation currently returns large negative numbers 11/05/19. This is not biologically feasible
 """
 RUFAS: Ruminant Farm Systems Model
 
@@ -23,13 +22,10 @@ CropType attribute definitions:
 
     act_N_up_each_layer = List of actual nitrogen uptakes from each soil layer.
 """
-###############################################################################
 
 
-#
 # Calculates the amount of nitrogen added to the plant biomass by fixation.
 # "pseudocode_crop" C.5.D.1
-#
 def calc_N_fixation(crop_type, soil):
     # Check if this crop can form symbiotic nitrogen fixation associations
     if not crop_type.fix_nitrogen:
