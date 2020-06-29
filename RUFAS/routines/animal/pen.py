@@ -289,13 +289,16 @@ class Pen:
 
         # set ration for whole pen by multiplying calculated ration by number
         # of animals in the pen
+        ration = {}
         num_animals = len(self.animals_in_pen)
         for key in ration_per_animal:
             if key == 'status':
-                self.ration[key] = ration_per_animal[key]
+                ration[key] = ration_per_animal[key]
 
             else:  # feeds and price
-                self.ration[key] = ration_per_animal[key] * num_animals
+                ration[key] = ration_per_animal[key] * num_animals
+
+        return ration
 
     def calc_manure(self, feed):
         """
@@ -303,21 +306,28 @@ class Pen:
 
         Args:
             feed: instance of the Feed class
+
+        Returns:
+            a dictionary for the total manure of the animals in the pen
         """
         for animal in self.animals_in_pen:
             animal.calc_manure_excretion(feed)
 
+        manure = {}
+
         # obtain keys of manure composition calculations
         first_animal_manure = self.animals_in_pen[0].manure_excretion
         for key in first_animal_manure.keys():
-            self.manure[key] = 0
+            manure[key] = 0
 
         # find sums of manure components for each animal in the pen for
         # total manure in pen
         for animal in self.animals_in_pen:
             curr_manure = animal.manure_excretion
-            for key in self.manure.keys():
-                self.manure[key] += curr_manure[key]
+            for key in manure.keys():
+                manure[key] += curr_manure[key]
+
+        return manure
 
     def calc_avg_growth(self):
         """
