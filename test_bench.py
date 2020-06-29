@@ -8,25 +8,25 @@ Author(s): Kass Chupongstimun, kass_c@hotmail.com
 """
 ################################################################################
 
-#!/usr/bin/env python3
+# !/usr/bin/env python3
 
-from tests import *
+from RUFAS.test import *
+
 
 def test():
-
     #
     # TEST LP ROUTINE
     #
-    #test_LP()
+    # test_LP()
 
     #
     # TEST RATION FORMULATION ROUTINE
     #
-	test_ration()
+    # test_ration()
+    pass
+
 
 # -------------------------------------------------------------------------------
 # PROGRAM ENTRY POINT
 # -------------------------------------------------------------------------------
 if __name__ == '__main__': test()
-        
-    
