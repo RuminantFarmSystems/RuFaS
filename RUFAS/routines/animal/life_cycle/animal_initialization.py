@@ -23,11 +23,11 @@ class AnimalValues(IntEnum):
     birth_weight = 4
     body_weight = 5
     wean_weight = 6
-    events = 7
-    repro_program = 8
-    tai_method_h = 9
-    synch_ed_method_h = 10
-    mature_body_weight = 11
+    mature_body_weight = 7
+    events = 8
+    repro_program = 9
+    tai_method_h = 10
+    synch_ed_method_h = 11
     estrus_count = 12
     estrus_day = 13
     tai_program_start_day_h = 14
@@ -39,9 +39,10 @@ class AnimalValues(IntEnum):
     abortion_day = 20
     days_in_preg = 21
     gestation_length = 22
-    presynch_method = 23
-    tai_method_c = 24
-    resynch_method = 25
+    p_gest_for_calf = 23
+    presynch_method = 24
+    tai_method_c = 25
+    resynch_method = 26
 
 class AnimalInitalization:
     animal_id = 0
@@ -60,6 +61,7 @@ class AnimalInitalization:
             init: whether or not update the database with new animals
     '''
     def __init__(self, init = True):
+        init = True
         if init:
             conn = sqlite3.connect('Inputs/animals.sqlite')
             cur = conn.cursor()
@@ -68,11 +70,11 @@ class AnimalInitalization:
             cur.execute('DROP TABLE IF EXISTS heiferIIs')
             cur.execute('DROP TABLE IF EXISTS heiferIIIs')
             cur.execute('DROP TABLE IF EXISTS cows')
-            cur.execute('CREATE TABLE IF NOT EXISTS calves (id VARCHAR, breed VARCHAR, birth_date VARCHAR, days_born VARCHAR, birth_weight VARCHAR, body_weight VARCHAR, wean_weight VARCHAR, events VARCHAR)')
-            cur.execute('CREATE TABLE IF NOT EXISTS heiferIs (id VARCHAR, breed VARCHAR, birth_date VARCHAR, days_born VARCHAR, birth_weight VARCHAR, body_weight VARCHAR, wean_weight VARCHAR, events VARCHAR)')
-            cur.execute('CREATE TABLE IF NOT EXISTS heiferIIs (id VARCHAR, breed VARCHAR, birth_date VARCHAR, days_born VARCHAR, birth_weight VARCHAR, body_weight VARCHAR, wean_weight VARCHAR, events VARCHAR, repro_program VARCHAR, tai_method_h VARCHAR, synch_ed_method_h VARCHAR)')
-            cur.execute('CREATE TABLE IF NOT EXISTS heiferIIIs (id VARCHAR, breed VARCHAR, birth_date VARCHAR, days_born VARCHAR, birth_weight VARCHAR, body_weight VARCHAR, wean_weight VARCHAR, events VARCHAR, repro_program VARCHAR, tai_method_h VARCHAR, synch_ed_method_h VARCHAR, mature_body_weight VARCHAR, estrus_count VARCHAR, estrus_day VARCHAR, tai_program_start_day_h VARCHAR, synch_ed_program_start_day_h VARCHAR, synch_ed_estrus_day VARCHAR, stop_day VARCHAR, conception_rate VARCHAR, ai_day VARCHAR, abortion_day VARCHAR, days_in_preg VARCHAR, gestation_length VARCHAR)')
-            cur.execute('CREATE TABLE IF NOT EXISTS cows (id VARCHAR, breed VARCHAR, birth_date VARCHAR, days_born VARCHAR, birth_weight VARCHAR, body_weight VARCHAR, wean_weight VARCHAR, events VARCHAR, repro_program VARCHAR, tai_method_h VARCHAR, synch_ed_method_h VARCHAR, mature_body_weight VARCHAR, estrus_count VARCHAR, estrus_day VARCHAR, tai_program_start_day_h VARCHAR, synch_ed_program_start_day_h VARCHAR, synch_ed_estrus_day VARCHAR, stop_day VARCHAR, conception_rate VARCHAR, ai_day VARCHAR, abortion_day VARCHAR, days_in_preg VARCHAR, gestation_length VARCHAR, presynch_method VARCHAR, tai_method_c VARCHAR, resynch_method VARCHAR)')
+            cur.execute('CREATE TABLE IF NOT EXISTS calves (id VARCHAR, breed VARCHAR, birth_date VARCHAR, days_born VARCHAR, birth_weight VARCHAR, body_weight VARCHAR, wean_weight VARCHAR, mature_body_weight VARCHAR, events VARCHAR)')
+            cur.execute('CREATE TABLE IF NOT EXISTS heiferIs (id VARCHAR, breed VARCHAR, birth_date VARCHAR, days_born VARCHAR, birth_weight VARCHAR, body_weight VARCHAR, wean_weight VARCHAR, mature_body_weight VARCHAR, events VARCHAR)')
+            cur.execute('CREATE TABLE IF NOT EXISTS heiferIIs (id VARCHAR, breed VARCHAR, birth_date VARCHAR, days_born VARCHAR, birth_weight VARCHAR, body_weight VARCHAR, wean_weight VARCHAR, mature_body_weight VARCHAR, events VARCHAR, repro_program VARCHAR, tai_method_h VARCHAR, synch_ed_method_h VARCHAR)')
+            cur.execute('CREATE TABLE IF NOT EXISTS heiferIIIs (id VARCHAR, breed VARCHAR, birth_date VARCHAR, days_born VARCHAR, birth_weight VARCHAR, body_weight VARCHAR, wean_weight VARCHAR, mature_body_weight VARCHAR, events VARCHAR, repro_program VARCHAR, tai_method_h VARCHAR, synch_ed_method_h VARCHAR, estrus_count VARCHAR, estrus_day VARCHAR, tai_program_start_day_h VARCHAR, synch_ed_program_start_day_h VARCHAR, synch_ed_estrus_day VARCHAR, stop_day VARCHAR, conception_rate VARCHAR, ai_day VARCHAR, abortion_day VARCHAR, days_in_preg VARCHAR, gestation_length VARCHAR, p_gest_for_calf VARCHAR)')
+            cur.execute('CREATE TABLE IF NOT EXISTS cows (id VARCHAR, breed VARCHAR, birth_date VARCHAR, days_born VARCHAR, birth_weight VARCHAR, body_weight VARCHAR, wean_weight VARCHAR, mature_body_weight VARCHAR, events VARCHAR, repro_program VARCHAR, tai_method_h VARCHAR, synch_ed_method_h VARCHAR, estrus_count VARCHAR, estrus_day VARCHAR, tai_program_start_day_h VARCHAR, synch_ed_program_start_day_h VARCHAR, synch_ed_estrus_day VARCHAR, stop_day VARCHAR, conception_rate VARCHAR, ai_day VARCHAR, abortion_day VARCHAR, days_in_preg VARCHAR, gestation_length VARCHAR, p_gest_for_calf, VARCHAR, presynch_method VARCHAR, tai_method_c VARCHAR, resynch_method VARCHAR)')
             conn.commit()
             conn.close()
             self.init_animals()
@@ -101,13 +103,14 @@ class AnimalInitalization:
                 'id' : self.next_id(),
                 'breed': 'HO',
                 'birth_date': 0,
-                'days_born': 0
+                'days_born': 0,
+                'p_init': 0
             }
             calf = Calf(args)
-            if not (calf._culled or calf._sold):
+            if not (calf.culled or calf.sold):
                 calves.append(calf)
 
-                cur.execute('INSERT INTO calves (id, breed, birth_date, days_born, birth_weight, body_weight, wean_weight, events) VALUES (?,?,?,?,?,?,?,?)', (calf._id, calf._breed, calf._birth_date, calf._days_born, calf._birth_weight, calf._body_weight, calf._wean_weight, str(calf._events)))
+                cur.execute('INSERT INTO calves (id, breed, birth_date, days_born, birth_weight, body_weight, wean_weight, mature_body_weight, events) VALUES (?,?,?,?,?,?,?,?,?)', (calf.id, calf.breed, calf.birth_date, calf.days_born, calf.birth_weight, calf.body_weight, calf.wean_weight, calf.mature_body_weight, str(calf.events)))
                 conn.commit()
 
         for _ in range(sim_days):
@@ -121,7 +124,7 @@ class AnimalInitalization:
                     heiferIs.append(heiferI)
                     calves.remove(calf)
 
-                    cur.execute('INSERT INTO heiferIs (id, breed, birth_date, days_born, birth_weight, body_weight, wean_weight, events) VALUES (?,?,?,?,?,?,?,?)', (heiferI._id, heiferI._breed, heiferI._birth_date, heiferI._days_born, heiferI._birth_weight, heiferI._body_weight, heiferI._wean_weight, str(heiferI._events)))
+                    cur.execute('INSERT INTO heiferIs (id, breed, birth_date, days_born, birth_weight, body_weight, wean_weight, mature_body_weight, events) VALUES (?,?,?,?,?,?,?,?,?)', (heiferI.id, heiferI.breed, heiferI.birth_date, heiferI.days_born, heiferI.birth_weight, heiferI.body_weight, heiferI.wean_weight, heiferI.mature_body_weight, str(heiferI.events)))
                     conn.commit()
 
             for heiferI in heiferIs:
@@ -137,7 +140,7 @@ class AnimalInitalization:
                     heiferIIs.append(heiferII)
                     heiferIs.remove(heiferI)
 
-                    cur.execute('INSERT INTO heiferIIs (id, breed, birth_date, days_born, birth_weight, body_weight, wean_weight, events, repro_program, tai_method_h, synch_ed_method_h) VALUES (?,?,?,?,?,?,?,?,?,?,?)', (heiferII._id, heiferII._breed, heiferII._birth_date, heiferII._days_born, heiferII._birth_weight, heiferII._body_weight, heiferII._wean_weight, str(heiferII._events), heiferII._repro_program, heiferII._tai_method_h, heiferII._synch_ed_method_h))
+                    cur.execute('INSERT INTO heiferIIs (id, breed, birth_date, days_born, birth_weight, body_weight, wean_weight, mature_body_weight, events, repro_program, tai_method_h, synch_ed_method_h) VALUES (?,?,?,?,?,?,?,?,?,?,?,?)', (heiferII.id, heiferII.breed, heiferII.birth_date, heiferII.days_born, heiferII.birth_weight, heiferII.body_weight, heiferII.wean_weight, heiferII.mature_body_weight, str(heiferII.events), heiferII.repro_program, heiferII.tai_method_h, heiferII.synch_ed_method_h))
                     conn.commit()
 
             for heiferII in heiferIIs:
@@ -152,7 +155,7 @@ class AnimalInitalization:
                     heiferIIIs.append(heiferIII)
                     heiferIIs.remove(heiferII)
 
-                    cur.execute('INSERT INTO heiferIIIs (id, breed, birth_date, days_born, birth_weight, body_weight, wean_weight, events, repro_program, tai_method_h, synch_ed_method_h, mature_body_weight, estrus_count, estrus_day, tai_program_start_day_h, synch_ed_program_start_day_h, synch_ed_estrus_day, stop_day, conception_rate, ai_day, abortion_day, days_in_preg, gestation_length) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)', (heiferIII._id, heiferIII._breed, heiferIII._birth_date, heiferIII._days_born, heiferIII._birth_weight, heiferIII._body_weight, heiferIII._wean_weight, str(heiferIII._events), heiferIII._repro_program, heiferIII._tai_method_h, heiferIII._synch_ed_method_h, heiferIII._mature_body_weight, heiferIII._estrus_count, heiferIII._estrus_day, heiferIII._tai_program_start_day_h, heiferIII._synch_ed_program_start_day_h, heiferIII._synch_ed_estrus_day, heiferIII._stop_day, heiferIII._conception_rate, heiferIII._ai_day, heiferIII._abortion_day, heiferIII._days_in_preg, heiferIII._gestation_length))
+                    cur.execute('INSERT INTO heiferIIIs (id, breed, birth_date, days_born, birth_weight, body_weight, wean_weight, mature_body_weight, events, repro_program, tai_method_h, synch_ed_method_h, estrus_count, estrus_day, tai_program_start_day_h, synch_ed_program_start_day_h, synch_ed_estrus_day, stop_day, conception_rate, ai_day, abortion_day, days_in_preg, gestation_length, p_gest_for_calf) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)', (heiferIII.id, heiferIII.breed, heiferIII.birth_date, heiferIII.days_born, heiferIII.birth_weight, heiferIII.body_weight, heiferIII.wean_weight, heiferIII.mature_body_weight, str(heiferIII.events), heiferIII.repro_program, heiferIII.tai_method_h, heiferIII.synch_ed_method_h, heiferIII.estrus_count, heiferIII.estrus_day, heiferIII.tai_program_start_day_h, heiferIII.synch_ed_program_start_day_h, heiferIII.synch_ed_estrus_day, heiferIII.stop_day, heiferIII.conception_rate, heiferIII.ai_day, heiferIII.abortion_day, heiferIII.days_in_preg, heiferIII.gestation_length, heiferIII.p_gest_for_calf))
                     conn.commit()
 
             for heiferIII in heiferIIIs:
@@ -169,7 +172,7 @@ class AnimalInitalization:
                     cows.append(cow)
                     heiferIIIs.remove(heiferIII)
                     
-                    cur.execute('INSERT INTO cows (id, breed, birth_date, days_born, birth_weight, body_weight, wean_weight, events, repro_program, tai_method_h, synch_ed_method_h, mature_body_weight, estrus_count, estrus_day, tai_program_start_day_h, synch_ed_program_start_day_h, synch_ed_estrus_day, stop_day, conception_rate, ai_day, abortion_day, days_in_preg, gestation_length, presynch_method, tai_method_c, resynch_method) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)', (cow._id, cow._breed, cow._birth_date, cow._days_born, cow._birth_weight, cow._body_weight, cow._wean_weight, str(cow._events), cow._repro_program, cow._tai_method_h, cow._synch_ed_method_h, cow._mature_body_weight, cow._estrus_count, cow._estrus_day, cow._tai_program_start_day_h, cow._synch_ed_program_start_day_h, cow._synch_ed_estrus_day, cow._stop_day, cow._conception_rate, cow._ai_day, cow._abortion_day, cow._days_in_preg, cow._gestation_length, cow._presynch_method, cow._tai_method_c, cow._resynch_method))
+                    cur.execute('INSERT INTO cows (id, breed, birth_date, days_born, birth_weight, body_weight, wean_weight, mature_body_weight, events, repro_program, tai_method_h, synch_ed_method_h, estrus_count, estrus_day, tai_program_start_day_h, synch_ed_program_start_day_h, synch_ed_estrus_day, stop_day, conception_rate, ai_day, abortion_day, days_in_preg, gestation_length, p_gest_for_calf, presynch_method, tai_method_c, resynch_method) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)', (cow.id, cow.breed, cow.birth_date, cow.days_born, cow.birth_weight, cow.body_weight, cow.wean_weight, cow.mature_body_weight, str(cow.events), cow.repro_program, cow.tai_method_h, cow.synch_ed_method_h, cow.estrus_count, cow.estrus_day, cow.tai_program_start_day_h, cow.synch_ed_program_start_day_h, cow.synch_ed_estrus_day, cow.stop_day, cow.conception_rate, cow.ai_day, cow.abortion_day, cow.days_in_preg, cow.gestation_length, cow.p_gest_for_calf, cow.presynch_method, cow.tai_method_c, cow.resynch_method))
                     conn.commit()
         conn.close()
 
@@ -194,8 +197,10 @@ class AnimalInitalization:
                 'birth_date': int(row[AnimalValues.birth_date]),
                 'days_born': int(row[AnimalValues.days_born]),
                 'birth_weight': float(row[AnimalValues.birth_weight]),
+                'p_init': 0, #change later
                 'body_weight': float(row[AnimalValues.body_weight]),
                 'wean_weight': float(row[AnimalValues.wean_weight]),
+                'mature_body_weight': float(row[AnimalValues.mature_body_weight]),
                 'events': row[AnimalValues.events]
             }
             calf = Calf(args)
@@ -225,6 +230,7 @@ class AnimalInitalization:
                 'birth_weight': float(row[AnimalValues.birth_weight]),
                 'body_weight': float(row[AnimalValues.body_weight]),
                 'wean_weight': float(row[AnimalValues.wean_weight]),
+                'mature_body_weight': float(row[AnimalValues.mature_body_weight]),
                 'events': row[AnimalValues.events]
             }
             heiferI = HeiferI(args)
@@ -254,6 +260,7 @@ class AnimalInitalization:
                 'birth_weight': float(row[AnimalValues.birth_weight]),
                 'body_weight': float(row[AnimalValues.body_weight]),
                 'wean_weight': float(row[AnimalValues.wean_weight]),
+                'mature_body_weight': float(row[AnimalValues.mature_body_weight]),
                 'events': row[AnimalValues.events],
                 'repro_program': row[AnimalValues.repro_program],
                 'tai_method_h': row[AnimalValues.tai_method_h],
@@ -286,11 +293,11 @@ class AnimalInitalization:
                 'birth_weight': float(row[AnimalValues.birth_weight]),
                 'body_weight': float(row[AnimalValues.body_weight]),
                 'wean_weight': float(row[AnimalValues.wean_weight]),
+                'mature_body_weight': float(row[AnimalValues.mature_body_weight]),
                 'events': row[AnimalValues.events],
                 'repro_program': row[AnimalValues.repro_program],
                 'tai_method_h': row[AnimalValues.tai_method_h],
                 'synch_ed_method_h': row[AnimalValues.synch_ed_method_h],
-                'mature_body_weight': float(row[AnimalValues.mature_body_weight]),
                 'estrus_count': int(row[AnimalValues.estrus_count]),
                 'estrus_day': int(row[AnimalValues.estrus_day]),
                 'tai_program_start_day_h': int(row[AnimalValues.tai_program_start_day_h]),
@@ -301,7 +308,8 @@ class AnimalInitalization:
                 'ai_day': int(row[AnimalValues.ai_day]),
                 'abortion_day': int(row[AnimalValues.abortion_day]),
                 'days_in_preg': int(row[AnimalValues.days_in_preg]),
-                'gestation_length': int(row[AnimalValues.gestation_length])
+                'gestation_length': int(row[AnimalValues.gestation_length]),
+                'p_gest_for_calf': int(row[AnimalValues.p_gest_for_calf])
             }
             heiferIII = HeiferIII(args)
             heiferIIIs.append(heiferIII)
@@ -330,11 +338,11 @@ class AnimalInitalization:
                 'birth_weight': float(row[AnimalValues.birth_weight]),
                 'body_weight': float(row[AnimalValues.body_weight]),
                 'wean_weight': float(row[AnimalValues.wean_weight]),
+                'mature_body_weight': float(row[AnimalValues.mature_body_weight]),
                 'events': row[AnimalValues.events],
                 'repro_program': row[AnimalValues.repro_program],
                 'tai_method_h': row[AnimalValues.tai_method_h],
                 'synch_ed_method_h': row[AnimalValues.synch_ed_method_h],
-                'mature_body_weight': float(row[AnimalValues.mature_body_weight]),
                 'estrus_count': int(row[AnimalValues.estrus_count]),
                 'estrus_day': int(row[AnimalValues.estrus_day]),
                 'tai_program_start_day_h': int(row[AnimalValues.tai_program_start_day_h]),
@@ -346,6 +354,7 @@ class AnimalInitalization:
                 'abortion_day': int(row[AnimalValues.abortion_day]),
                 'days_in_preg': int(row[AnimalValues.days_in_preg]),
                 'gestation_length': int(row[AnimalValues.gestation_length]),
+                'p_gest_for_calf': int(row[AnimalValues.p_gest_for_calf]),
                 'presynch_method': row[AnimalValues.presynch_method],
                 'tai_method_c': row[AnimalValues.tai_method_c],
                 'resynch_method': row[AnimalValues.resynch_method]
