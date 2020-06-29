@@ -15,6 +15,7 @@ from RUFAS.routines.animal.life_cycle.cow import Cow
 import sqlite3
 from enum import IntEnum
 
+
 class AnimalValues(IntEnum):
     id = 0
     breed = 1
@@ -44,6 +45,7 @@ class AnimalValues(IntEnum):
     tai_method_c = 25
     resynch_method = 26
 
+
 class AnimalInitalization:
     animal_id = 0
 
@@ -63,7 +65,7 @@ class AnimalInitalization:
     def __init__(self, init = True):
         init = True
         if init:
-            conn = sqlite3.connect('Inputs/animals.sqlite')
+            conn = sqlite3.connect('input/animals.sqlite')
             cur = conn.cursor()
             cur.execute('DROP TABLE IF EXISTS calves')
             cur.execute('DROP TABLE IF EXISTS heiferIs')
@@ -78,8 +80,6 @@ class AnimalInitalization:
             conn.commit()
             conn.close()
             self.init_animals()
-        
-        
 
     '''
         Description:
@@ -88,14 +88,14 @@ class AnimalInitalization:
             animal_num: number of animals to simulate
             sim_days: number of days to simulate
     '''
-    def init_animals(self, animal_num = 20000, sim_days=3000):
+    def init_animals(self, animal_num=20000, sim_days=3000):
         calves = []
         heiferIs = []
         heiferIIs = []
         heiferIIIs = []
         cows = []
 
-        conn = sqlite3.connect('Inputs/animals.sqlite')
+        conn = sqlite3.connect('input/animals.sqlite')
         cur = conn.cursor()
 
         for _ in range(animal_num):
@@ -185,7 +185,7 @@ class AnimalInitalization:
     '''
     def get_calves(self, num):
         calves = []
-        conn = sqlite3.connect('Inputs/animals.sqlite')
+        conn = sqlite3.connect('input/animals.sqlite')
         cur = conn.cursor()
         while cur.execute('SELECT COUNT() FROM calves').fetchone()[0] < num:
             self.init_animals()
@@ -216,7 +216,7 @@ class AnimalInitalization:
     '''
     def get_heiferIs(self, num):
         heiferIs = []
-        conn = sqlite3.connect('Inputs/animals.sqlite')
+        conn = sqlite3.connect('input/animals.sqlite')
         cur = conn.cursor()
         while cur.execute('SELECT COUNT() FROM heiferIs').fetchone()[0] < num:
             self.init_animals()
@@ -246,7 +246,7 @@ class AnimalInitalization:
     '''
     def get_heiferIIs(self, num):
         heiferIIs = []
-        conn = sqlite3.connect('Inputs/animals.sqlite')
+        conn = sqlite3.connect('input/animals.sqlite')
         cur = conn.cursor()
         while cur.execute('SELECT COUNT() FROM heiferIIs').fetchone()[0] < num:
             self.init_animals()
@@ -279,7 +279,7 @@ class AnimalInitalization:
     '''
     def get_heiferIIIs(self, num):
         heiferIIIs = []
-        conn = sqlite3.connect('Inputs/animals.sqlite')
+        conn = sqlite3.connect('input/animals.sqlite')
         cur = conn.cursor()
         while cur.execute('SELECT COUNT() FROM heiferIIIs').fetchone()[0] < num:
             self.init_animals()
@@ -324,7 +324,7 @@ class AnimalInitalization:
     '''
     def get_cows(self, num):
         cows = []
-        conn = sqlite3.connect('Inputs/animals.sqlite')
+        conn = sqlite3.connect('input/animals.sqlite')
         cur = conn.cursor()
         while cur.execute('SELECT COUNT() FROM cows').fetchone()[0] < num:
             self.init_animals()
