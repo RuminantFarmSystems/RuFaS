@@ -405,6 +405,30 @@ class AnimalManagement:
 
         self.fully_update_id_pen()
 
+    def pen_optimization(self):
+        animal_count = len(self.heiferIs) + len(self.heiferIIs) + len(self.heiferIIIs) + len(self.cows)
+        stall_count = 0
+        for pen in self.all_pens:
+            stall_count += pen.num_stalls
+        if animal_count > stall_count:
+            print('Warning: Insufficient number of stalls for animals on the farm')
+        else:
+            dry_cows = []
+            lactating_cows = []
+            for cow in self.cows:
+                if cow.milking:
+                    lactating_cows.append(cow)
+                else:
+                    dry_cows.append(cow)
+            if len(self.all_pens) >= 7:
+                dict = {'calves': null, 'heiferIs': null, 'heiferIIs': null, 'heiferIIIs': null, 'dry_cows': null}
+                pens = self.all_pens
+                for pen in pens:
+                    n = 0
+
+
+
+
     def clear_pens(self):
         """
         Removes animals from pens for re-allocation. This is part of the
@@ -543,6 +567,7 @@ class AnimalManagement:
             if self.end_ration_interval():
                 self.calc_nutrient_rqmts(feed)  # per animal
                 self.clear_pens()
+                self.pen_optimization()
                 self.pen_allocation()
                 self.calc_avg_nutrient_rqmts()  # per pen
                 self.calc_ration(feed)  # per pen
