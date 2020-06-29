@@ -39,6 +39,12 @@ class BaseReport:
             'year': ['time.cal_year', '', 0]
         }
 
+    def initialize_csv_dir(self):
+        pass
+
+    def initialize_graphic_dir(self):
+        pass
+
     @staticmethod
     def write_headers(output_csv, variables):
 
