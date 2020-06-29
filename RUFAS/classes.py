@@ -337,7 +337,7 @@ class Weather:
                         self.T_max[year][day - offset] = float(row[3])
                         self.T_min[year][day - offset] = float(row[4])
                         self.T_avg[year][day - offset] = float(row[5])
-                        self.radiation[year][day - offset] = float(row[7])
+                        self.radiation[year][day - offset] = float(row[6])
                     except(IndexError, ValueError):
                         # prints out each problematic row in the weather CSV file
                         skips += 1
