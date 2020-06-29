@@ -117,7 +117,7 @@
             "soybean":
             {
                 "grow_years": [],
-                "repeat": 3,
+                "repeat": 0,
                 "planting_date": 121,
                 "harvest_date": 319,
                 "fr_PHU_harvest_min": 0.9,
@@ -126,7 +126,7 @@
             "alfalfa":
             {
                 "grow_years": [],
-                "repeat": 3,
+                "repeat": 0,
                 "planting_date": 121,
                 "harvest_date": 319,
                 "fr_PHU_harvest_min": 0.9,
