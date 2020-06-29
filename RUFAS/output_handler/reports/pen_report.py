@@ -98,7 +98,9 @@ class PenReport:
                                     'j_day': ['time.day', '', []],
                                     'num_animals_in_pen': ['len(pen.animals_in_pen)', '', []],
                                     'average_growth': ['pen.avg_growth', 'kg', []],
-                                    'average_milk': ['pen.avg_milk', 'kg', []]
+                                    'average_milk': ['pen.avg_milk', 'kg', []],
+                                    'average_p_animal': ['pen.avg_p_animal', 'g', []],
+                                    'average_p_req': ['pen.avg_p_req', 'g', []]
                                     }
 
             self.annual_variables = {'year': ['time.cal_year', '', 0]
@@ -110,8 +112,10 @@ class PenReport:
 
             self.daily_variables = {'year': ['time.cal_year', '', []],
                                     'j_day': ['time.day', '', []],
-                                    'num_animals': ['len(pen.animals_in_pen)', '', []]
+                                    'num_animals': ['len(pen.animals_in_pen)', '', []],
+                                    'manure': ['pen.manure[\'p_excrt_manure\']', 'g', []]
                                     }
+
             self.annual_variables = {'year': ['time.cal_year', '', 0]}
 
             self.manure_info = {}
