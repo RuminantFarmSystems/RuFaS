@@ -25,7 +25,7 @@ class AnimalEvents(object):
 		Args:
 			events_str: string representation of events
 		"""
-		split_by_date = list(filter(lambda x : x != '', list(map(lambda x: x.strip(), events_str.split('Days born ')))))
+		split_by_date = list(filter(lambda x: x != '', list(map(lambda x: x.strip(), events_str.split('days born ')))))
 
 		for day in split_by_date:
 			split = day.split(': ')
@@ -34,7 +34,6 @@ class AnimalEvents(object):
 			for event in events:
 				self.add_event(date, event)
 
-	
 	def add_event(self, date, description):
 		"""
 		Add a cow life event
