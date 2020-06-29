@@ -44,6 +44,7 @@ class OutputHandler:
                         'field_report': FieldReport(data['field_report']),
                         'feed_storage_report': FeedStorageReport(data['feed_storage_report']),
                         'mass_balance_report': MassBalanceReport(data['mass_balance_report']),
+                        'life_cycle_report': LifeCycleReport(data['life_cycle_report']),
                         'custom_report': CustomReport(data['custom_report'])
                         }
 

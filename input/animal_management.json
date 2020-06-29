@@ -95,6 +95,25 @@
             "produce_graphics": false,
             "report_name": "feed_storage_report"
         },
+        "life_cycle_report":
+        {
+            "produce_csv": true,
+            "produce_graphics": true,
+            "report_name": "life_cycle_report",
+
+            "individual_animal_report":
+            {
+              "produce_csv": true,
+              "produce_graphics": false,
+              "report_name": "individual_animal_report"
+            },
+            "herd_report":
+            {
+              "produce_csv": true,
+              "produce_graphics": false,
+              "report_name": "herd_report"
+            }
+        },
         "custom_report":
         {
             "produce_csv": true,
