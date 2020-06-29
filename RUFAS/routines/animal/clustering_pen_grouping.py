@@ -1,27 +1,23 @@
-################################################################################
-'''
+"""
 RUFAS: Ruminant Farm Systems Model
 File name: clustering_pen_grouping.py
-Description: This file's main function is grouping(list) (line 54) which returns
-    a 2D list with each list in the matrix being a pen grouping of cows based on
-    nutritional requirments. This function is called in animal_management.py for
-    each ration cycle if there are more than 7 pens in the input.
+Description: This file's main function is grouping(list, pens) (line 44) which returns
+    a Dictionary of lists of cows, with the key being the pen those cows are
+    assigned to based on nutritional requirements. This function is called in
+    animal_management.py for each ration cycle if there are more than 7 pens in
+    the input (>=2 pens for lactating cows)
 Author(s): Chris VanKerkhove, cjv47@cornell.edu
-'''
-################################################################################
+"""
 import pandas as pd
 import numpy as np
 from scipy.stats import percentileofscore
-import matplotlib
-import csv
-import xlsxwriter
-import time as timer
 
 
 def norm(x):
-    '''Helper function that
-       normalizes a list of values and returns that normalized list
-    '''
+    """
+        Description:
+            Helper function to normalize a list of values and return that normalized list
+    """
     x = np.array(x)
     if max(x) != min(x):
         normalized = (x - min(x)) / (max(x) - min(x))
@@ -29,276 +25,131 @@ def norm(x):
     else:
         return x
 
+
 def percentile_list(l):
-    '''Helper function that returns a list of percentiles corresponding
-    to its matching value in the original list
-    '''
-    percentile_list = []
+    """
+        Description:
+            Helper function that returns a list of percentiles corresponding
+            to its matching value in the original list
+    """
+    perc_list = []
     for e in l:
         x = percentileofscore(l, e)
-        percentile_list.append(x/100)
-    return(percentile_list)
+        perc_list.append(x / 100)
+    return perc_list
 
 
-def grouping(list):
-    '''Grouping algorithim that utilizes k-means clustering and takes an input
-       that is a list of objects of class Cow (see cow.py) and groups them into
-       exactly 1 of 14 different pens. This function returns a list of 14 lists
-       of cow groupings (lists of objects of class Cow)
-    '''
+def grouping(cow_list, pens):
+    """
+        Description:
+            Grouping algorithm that utilizes k-means clustering and takes an input
+            that is a list of objects of class cow (see cow.py) and a list of
+            pen objects (from pen.py), and then groups the lactating cows into the
+            available pens based on their nutritional requirements relative to the
+            rest of the cows.
 
+        Input:
+            cow_list: a list of lactating cows
+            pens: the number of pens allocated for lactating cows
+    """
 
-#############################################
-#Initial Data Manipulation
-#############################################
-    #Each of the Following lists contain the following attributes corresponding
-    #to the list of cows input in the grouping function
-    ID = []  #Cow ID number
-    weekn = []  #week number of the cow
-    DIM = []  #Days In Milk
-    LACT = [] #Lactation Number
-    RecDNED = []  #Required net energy density (Units= Mcal per kg of dry matter (DM) (Mcal/kg of DM))
-    RecDMPD = []  #Required Metabolizing Protein Density (Units= g of crude protein per kg of DM (g/kg of DM))
-    AVGMILK_kg = [] #Daily Milk Produced in kg
+    # Initial Data Manipulation
+    # Each of the following lists contain the following attributes corresponding
+    # to the list of cows input in the grouping function
+    DNED_req = []  # Required net energy density (Units= Mcal per kg of dry matter (DM) (Mcal/kg of DM))
+    DMPD_req = []  # Required Metabolizing Protein Density (Units= g of crude protein per kg of DM (g/kg of DM))
+    milk_avg = []  # Average milk produced
 
-    for cow in list:
-        ID.append(cow.ID)
-        weekn.append(cow.weekn)
-        DIM.append(cow._days_in_milk)
-        LACT.append(cow.LACT)
-        RecDNED.append(cow.RecDNED)
-        RecDMPD.append(cow.RecDMPD)
-        AVGMILK_kg.append(cow.AVGMILK_kg)
+    for cow in cow_list:
+        DNED_req.append(cow.DNED_req)
+        DMPD_req.append(cow.DMPD_req)
+        milk_avg.append(cow.lactose_milk)
 
+    # Create a pandas data frame with cow objects and relevant nutrition information
+    cow_nutr_df = pd.DataFrame()  # cow nutrition data frame
+    cow_nutr_df['DNED_req'] = DNED_req
+    cow_nutr_df['DMPD_req'] = DMPD_req
+    cow_nutr_df['milk_avg'] = milk_avg
+    cow_nutr_df['cow'] = cow_list
 
-    Cowrd = pd.DataFrame()
-    Cowrd['ID'] = ID
-    Cowrd['weekn'] = weekn
-    Cowrd['DIM'] = DIM
-    Cowrd['LACT'] = LACT
-    Cowrd['RecDNED'] = RecDNED
-    Cowrd['RecDMPD'] = RecDMPD
-    Cowrd['AVGMILK_kg'] = AVGMILK_kg
+    # Use the various nutrition requirement variables to create and assign a
+    # percentile value to each cow
+    # Grouping By Ranking Methodology
+    rank_data = cow_nutr_df[["DNED_req", "DMPD_req", "milk_avg"]]  # Rank data frame to create percentile vector
+    rank_data = rank_data.dropna()
 
-    #list of pen groups by ration requirments
-    mygroups = [2, 3, 4, 6, 7, 8, 9, 22, 23, 24, 25, 26, 27, 28]
+    DNED_req = rank_data['DNED_req'].to_list()
+    DMPD_req = rank_data['DMPD_req'].to_list()
+    milk_avg = rank_data['milk_avg'].to_list()
 
-    #Aggregate the data for nutritional requirements per cow per week (using mean metric)
-    AggNGdata = Cowrd.groupby(['weekn', 'ID']).mean()
-    AggNGdata = AggNGdata.drop(columns = ['DIM', 'LACT'])
-    #Data grouped using the "maximum" metric
-    MergData = Cowrd[['ID', 'DIM', 'LACT', 'weekn']]
-    MergData = MergData.groupby(['weekn', 'ID']).max()
-    #Joining the two grouped datasets into one
-    NGdata = AggNGdata.join(MergData, how = 'left' )
+    # Normalize Vectors DNED_req, DMPD_req, milk_avg
+    sc_DNED = norm(DNED_req).tolist()
+    sc_DMPD = norm(DMPD_req).tolist()
+    sc_milk = norm(milk_avg).tolist()
 
+    # Add the normalized vectors to the rank_data data frame
+    n = len(rank_data.columns)
+    rank_data.insert(n, 'sc_DNED', sc_DNED)
+    rank_data.insert(n + 1, 'sc_DMPD', sc_DMPD)
+    rank_data.insert(n + 2, 'sc_milk', sc_milk)
 
-    #############################################
-    #Categorizing Lactation number#
-    #############################################
-    LACT = NGdata['LACT'].tolist()
-    LACTcat = []
+    # Sum standard nutrient requirement values
+    std = rank_data[['sc_DNED', 'sc_DMPD', 'sc_milk']].sum(axis=1, skipna=True).to_list()
+    rank_data.insert(n + 3, 'std', std)
 
-    for i in range(len(LACT)):
-        if (LACT[i] == 1):
-            LACTcat.append(1)
-        else:
-            LACTcat.append(2)
-    n = len(NGdata.columns)
-    NGdata.insert(n, 'LACTcat', LACTcat)
-    ##############################################
-    #Setting the number of nutritional groups and number of cows per group
-    ##############################################
-    #Ordering by weekn, LACTcat, and DIM
-    NGdata = NGdata.sort_values(by = ['weekn', 'LACTcat','DIM'], ascending = [True, True, True])
+    # Create a nutrient requirement percentile vector (with respect to all cows)
+    percentile = percentile_list(std)
 
-    ###Creating Rank Array (ranking of cows by Days in Milk)###
-    LACTcat = NGdata['LACTcat'].tolist()
-    NGdata_1 = NGdata.reset_index()
-    weeknlist = NGdata_1['weekn'].tolist()
-    weeknn = []
-    for num in weeknlist:
-        if num not in weeknn:
-            weeknn.append(num)
+    rank_data.insert(n + 4, 'percentile', percentile)
+    cow_nutr_df['percentile'] = percentile
+    cow_nutr_df['percentile'] = 1 - cow_nutr_df['percentile']
 
-    rank = []
-    for n in weeknn:
-        u = 1
-        v = 1
-        for i in range(len(weeknlist)):
-            if (n == weeknlist[i] and LACTcat[i] == 1):
-                rank.append(u)
-                u += 1
-            elif (n == weeknlist[i] and LACTcat[i] == 2):
-                rank.append(v)
-                v += 1
-    n = len(NGdata.columns)
-    NGdata.insert(n, 'rank', rank)
+    # Group by nutrient requirement percentile percentile and num of stalls in each pen
+    num_cows = len(cow_list)  # total number of cows
+    index = {4: 0}  # Cutoff values for percentiles for each pen
 
-    ##Size per pen category##
-    SFPenP=148 #Size Fresh Pens Pimiparous
-    SFPenM=148 #Size Fresh Pens Multiparous
-    SEPenP=148 #Size Early Pens Pimiparous
-    SEPenM=148 #Size Early Pens Multiparous
-    SPPenP=444 #Size Peak Pens Pimiparous
-    SPPenM=444 #Size Peak Pens Multiparous
+    # Create a list of percentile partitions for grouping
+    for pen in pens:
+        index[pen.id] = (pen.num_stalls / num_cows) + index[(pen.id - 1)]
+        if index[pen.id] > 1:
+            index[pen.id] = 1
 
-    #Adding column DIMcat (Days in Milk Categorization number)
-    ## 1=Fresh, 2=Early, 3=Peak, 4=Late##
-    LACTcat = NGdata['LACTcat'].tolist()
-    DIMcat = []
+    pen_assignment = []  # List of pen assignments to be added to the data frame
+    percentile = rank_data['percentile'].to_list()
 
-    for i in range(len(LACTcat)):
-        if (LACTcat[i] == 1 and rank[i] <= SFPenP):
-            DIMcat.append(1)
-        elif (LACTcat[i] == 2 and rank[i] <=SFPenP):
-            DIMcat.append(1)
-        elif (LACTcat[i] == 1 and rank[i] > SFPenP and rank[i] <= SFPenP + SEPenP):
-            DIMcat.append(2)
-        elif (LACTcat[i] == 2 and rank[i] > SFPenM and rank[i] <= SFPenM + SEPenM):
-            DIMcat.append(2)
-        elif (LACTcat[i] == 1 and rank[i] > SFPenP + SEPenP and rank[i] <= SFPenP+SEPenP+SPPenP):
-            DIMcat.append(3)
-        elif (LACTcat[i] == 2 and rank[i] > SFPenM + SEPenM and rank[i] <= SFPenM+SEPenM+SPPenM):
-            DIMcat.append(3)
-        else:
-            DIMcat.append(4)
-    n = len(NGdata.columns)
-    NGdata.insert(n, 'DIMcat', DIMcat)
-    ##Grouping By Ranking Methology##
-    RNKdat = NGdata[["RecDNED", "RecDMPD", "AVGMILK_kg","DIM", "DIMcat", "LACTcat"]]
-    RNKdat = RNKdat.dropna()
+    # Adding pen_assignment number to list based on percentile
+    for i in range(len(percentile)):
+        key = 5
+        while percentile[i] <= index[key-1] or percentile[i] > index[key]:
+            key += 1
+        pen_assignment.append(key)
 
-    #Clustering By ranking
-    index = [0]
-    DIMcat = RNKdat['DIMcat'].to_list()
-    for i in range(len(DIMcat) - 1):
-        if DIMcat[i] != DIMcat[i+1]:
-            index.append(i + 1)
-    index.append(len(DIMcat))
+    # Adding the pen_assignment assignment vector to the DataFrame
+    n = len(rank_data.columns)
+    rank_data.insert(n, 'pen_assignment', pen_assignment)
+    cow_nutr_df["pen_assignment"] = pen_assignment
 
-    ScDNED = [] #normalized list of the RecDNED list
-    ScDMPD = [] #normalized list of the RecDNED list
-    ScMilk = [] #normalized list of the AVGMILK_kg
-    RecDNED = RNKdat['RecDNED'].to_list()
-    RecDMPD = RNKdat['RecDMPD'].to_list()
-    AVGMILK_kg = RNKdat['AVGMILK_kg'].to_list()
-    #Normalizing Vectors RecDNED, RecDMPD, AVGMILK_kg
-    if len(RecDNED) > 0:
-        for i in range(len(index) - 1):
-            x = norm(RecDNED[index[i] : index[i+1]]).tolist()
-            y = norm(RecDMPD[index[i] : index[i+1]]).tolist()
-            z = norm(AVGMILK_kg[index[i] : index[i+1]]).tolist()
-            ScDNED = ScDNED + x
-            ScDMPD = ScDMPD + y
-            ScMilk = ScMilk + z
-        #Adding the vectors to the RNKdat dataframe
-        n = len(RNKdat.columns)
-        RNKdat.insert(n, 'ScDNED', ScDNED)
-        RNKdat.insert(n +1, 'ScDMPD', ScDMPD)
-        RNKdat.insert(n +2, 'ScMilk', ScMilk)
-        std = RNKdat[['ScDNED', 'ScDMPD', 'ScMilk']].sum(axis= 1, skipna = True).to_list()
-        RNKdat.insert(n +3, 'std', std)
+    # Pen assignment summary
+    # Sort the data frame by pen assignment
+    # Return a dictionary of lists of cow objects, with keys corresponding to pen IDs
 
-        #Creating Percentile Vector
-        Percentile = []
-        for i in range(len(index) - 1):
-            x = percentile_list(std[index[i] : index[i+1]])
-            Percentile = Percentile + x
-        n = len(RNKdat.columns)
-        RNKdat.insert(10, 'Percentile', Percentile)
+    pen_data = cow_nutr_df.sort_values(by='pen_assignment', ascending=True)
+    # creating a list of values that keep track of the index for the start of each pen in the ID list
+    separating_index = [0]
+    pen_assignment = pen_data['pen_assignment'].to_list()
+    cow = pen_data['cow'].to_list()
+    for i in range(len(pen_assignment)):
+        if i != (len(pen_assignment) - 1) and pen_assignment[i] != pen_assignment[i + 1]:
+            separating_index.append(i + 1)
+    separating_index.append(len(pen_assignment))
 
-        #Grouping By percentile
-        ## 1=Firstlact, 2=Mature##
-        ## 1=TransitionFresh, 2=Fresh, 3=Peack lact, 4=Late lactation##
-        index2 = [0]
-        for i in range(len(weeknlist) -1):
-            if weeknlist[i] != weeknlist[i+1]:
-                index2.append(i+1)
-        index2.append(len(weeknlist))
+    # Create Dictionary with lists of ID's for each pen (5,6,7...)
+    grouping_data = {}
+    key = 5
+    for i in range(len(separating_index) - 1):
+        group = cow[separating_index[i]: separating_index[i + 1]]
+        grouping_data[key] = group
+        key += 1
 
-        NGgroup = []
-        LACTcat = RNKdat['LACTcat'].to_list()
-        DIMcat = RNKdat['DIMcat'].to_list()
-        Percentile = RNKdat['Percentile'].to_list()
-        for i in range(len(index2) - 1):
-            for ii in range(index2[i], index2[i+1]):
-                if (LACTcat[ii] == 1 and DIMcat[ii] == 1):
-                    NGgroup.append(28)
-                elif (LACTcat[ii] == 2 and DIMcat[ii] == 1):
-                    NGgroup.append(27)
-                elif (LACTcat[ii] == 1 and DIMcat[ii] == 2):
-                    NGgroup.append(25)
-                elif (LACTcat[ii] == 2 and DIMcat[ii] == 2):
-                    NGgroup.append(26)
-                elif (LACTcat[ii] == 2 and DIMcat[ii] == 3 and Percentile[ii] <= 0.3333):
-                    NGgroup.append(22)
-                elif (LACTcat[ii] == 2 and DIMcat[ii] == 3 and 0.3333 < Percentile[ii] <= 0.6666):
-                    NGgroup.append(23)
-                elif (LACTcat[ii] == 2 and DIMcat[ii] == 3 and Percentile[ii] > 0.6666):
-                    NGgroup.append(24)
-                elif (LACTcat[ii] == 1 and DIMcat[ii] == 3 and Percentile[ii] <= 0.3333):
-                    NGgroup.append(7)
-                elif (LACTcat[ii] == 1 and DIMcat[ii] == 3 and 0.3333 < Percentile[ii] <=0.6666):
-                    NGgroup.append(8)
-                elif (LACTcat[ii] == 1 and DIMcat[ii] == 3 and Percentile[ii] > 0.6666):
-                    NGgroup.append(9)
-                elif ((LACTcat[ii] == 1 or LACTcat[ii] == 2) and DIMcat[ii] == 4 and Percentile[ii] <= 0.25):
-                    NGgroup.append(2)
-                elif ((LACTcat[ii] == 1 or LACTcat[ii] == 2) and DIMcat[ii] == 4 and 0.25 < Percentile[ii] <=0.50):
-                    NGgroup.append(3)
-                elif ((LACTcat[ii] == 1 or LACTcat[ii] == 2) and DIMcat[ii] == 4 and 0.50 < Percentile[ii] <=0.75):
-                    NGgroup.append(4)
-                elif ((LACTcat[ii] == 1 or LACTcat[ii] == 2) and DIMcat[ii] == 4 and Percentile[ii] > 0.75):
-                    NGgroup.append(6)
-                else:
-                    NGgroup.append(0)
-        n = len(RNKdat.columns)
-        RNKdat.insert(n, 'NGgroup', NGgroup)
-
-
-        Clustoutp = RNKdat['NGgroup']
-        NGdata = NGdata.join(Clustoutp, how = 'left')
-
-        ######Pen Summary#######
-        PenDat = NGdata[['DIMcat', 'LACTcat', 'NGgroup']]
-        LACTcategory = []  #Lactiation categorization by english description
-        LACTcat = PenDat['LACTcat'].to_list()
-        for x in LACTcat:
-            if (x == 1):
-                LACTcategory.append('Primiparous')
-            else:
-                LACTcategory.append('Multiparous')
-        DIMcategory = []  #Days in Milk categorization by english description
-        DIMcat = PenDat['DIMcat'].to_list()
-        for x in DIMcat:
-            if (x == 1):
-                DIMcategory.append('Fresh')
-            elif (x == 2):
-                DIMcategory.append('Early')
-            elif (x == 3):
-                DIMcategory.append('Peak')
-            else:
-                DIMcategory.append('Late')
-        n = len(PenDat.columns)
-        PenDat.insert(n, 'LACTcategory', LACTcategory)
-        PenDat.insert(n+1, 'DIMcategory', DIMcategory)
-        PenDat = PenDat.dropna()
-
-        col_num = PenDat.shape[0]
-        Freq = [1] * col_num
-        PenDat.insert(n+2, 'Freq', Freq)
-        df = PenDat.reset_index()
-
-        PenDat = df.groupby(['DIMcategory', 'LACTcategory', 'NGgroup', 'weekn', 'ID']).count()
-        PenDat = PenDat['Freq']
-        PenDat = PenDat.reset_index()
-        PenDat= PenDat[['weekn', 'NGgroup', 'LACTcategory', 'DIMcategory', 'Freq', 'ID']]
-        Grouping_Data = PenDat[['ID', 'NGgroup']]
-
-        ID = Grouping_Data['ID'].to_list()
-        NGgroup = Grouping_Data['NGgroup'].to_list()
-        Grouping_Data = [ID, NGgroup]
-        return(Grouping_Data) #returning a 2D list with Cow ID and Pen Group
-
-################################################################################
+    # returning the dictionary of groupings
+    return grouping_data

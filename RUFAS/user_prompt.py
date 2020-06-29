@@ -14,6 +14,7 @@ from RUFAS import util
 from RUFAS import errors
 import fileReader
 
+
 # -------------------------------------------------------------------------------
 # Function: input_prompt
 # -------------------------------------------------------------------------------
@@ -38,13 +39,13 @@ def input_prompt():
     """
 
     print("\nSingle Simulation:\n\t" +
-                "Enter a json file name\n" +
+          "Enter a json file name\n" +
           "Batch Simulation:\n\t" +
-                "Enter a directory containing json files\n" +
+          "Enter a directory containing json files\n" +
           "Print Base Directory:\n\t" +
-                "Enter \'dir\'\n" +
+          "Enter \'dir\'\n" +
           "Exit RUFAS:\n\t" +
-                "Enter \'Q\' or \'q\'")
+          "Enter \'Q\' or \'q\'")
 
     while True:
 
@@ -112,4 +113,4 @@ def input_prompt():
         # Handles bad user inputs, prints out error messages
         #
         except errors.UserInput as e:
-                print(e.msg)
+            print(e.msg)

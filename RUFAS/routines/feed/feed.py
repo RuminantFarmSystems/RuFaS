@@ -6,11 +6,57 @@ Description:
 Author(s): Kass Chupongstimun, kass_c@hotmail.com,
            Andy Achenreiner, achenreiner@wisc.edu
            Militsa Sotirova, militsasotirova@gmail.com
+           William Donovan, william.m.donovan@gmail.com
+           Jacob Johnson, jacob8339@gmail.com
 """
 ################################################################################
+
 from enum import IntEnum
-import sqlite3
 from RUFAS.util import DatabaseReader
+
+from . import nitrogen_loss, carbon_loss, protein_degradation
+
+
+def daily_feed_routine(feed, crop):
+    """
+    Description:
+        Runs the feed storage routine. Yield is stored at harvest in available storage.
+        Once used, that storage receptacle is removed from the list of available storage.
+        If insufficient storage is specified, a "standard" storage receptacle is generated.
+
+    Args:
+        feed: an instance of the Feed object specified in feed.py
+        crop: an instance of the Crop object specified in crop.py
+    """
+    current_crop = crop.current_crop
+
+    if current_crop.yield_actual != 0:
+        if len(feed.available_storage) == 0:
+            standard_data = {
+                "storage_type": "bag",
+                "moisture": "direct_cut",
+                "additive": "preservative",
+                "packing_density": 14,
+                "inoculation": "heterofermentative",
+                "bunk_type": "open_floor",
+                "ventilation": True,
+                "removal_rate": 6,
+                "initial_dry_matter": 0
+            }
+
+            standard_name = 'standard_storage_' + str(feed.standard_storage_count)
+            feed.available_storage[standard_name] = feed.Storage(standard_data)
+            feed.storage_options[standard_name] = feed.available_storage[standard_name]
+
+        storage_name, storage = feed.available_storage.popitem()
+        feed.storage_options[storage_name].calibrate_storage(current_crop)
+        feed.storage_options[storage_name].store_crop(current_crop)
+
+        feed.summarize_feed_storage(feed.storage_options[storage_name])
+
+
+def annual_feed_routine():
+    pass
 
 
 class FeedNames(IntEnum):
@@ -64,6 +110,9 @@ class Nutrients(IntEnum):
     Price = 17
     Limits = 18
     Units = 19
+    P_DM = 20
+    CA_DM = 21
+    K_DM = 22
 
 
 class NutrientValues:
@@ -121,7 +170,10 @@ class NutrientValues:
 
 class Feed:
     """
-    Description: Stores the information for the feeds managed by the farm.
+    Description:
+        Stores the information for the feeds managed by the farm, and the methods
+        for storage.
+
     """
 
     def __init__(self, data):
@@ -153,6 +205,267 @@ class Feed:
         self.__cached_values = NutrientValues(self.__feed_database,
                                               self.__table_name,
                                               self.managed_feed_names)
+
+        self.storage_options = {}
+
+        for storage_name, storage_data in data['storage_options'].items():
+            self.storage_options[storage_name] = self.Storage(storage_data)
+
+        self.available_storage = dict(self.storage_options)
+        self.standard_storage_count = 0
+
+        self.C = 0.0
+        self.N = 0.0
+        self.P = 0.0
+        self.DM = 0.0
+        self.CP = 0.0
+        self.NPN = 0.0
+
+        self.C_loss = 0.0
+        self.CP_loss = 0.0
+
+    class Storage:
+        def __init__(self, data):
+            """
+            Description:
+                A subclass of feed storage specifying a single storage receptacle.
+
+            Args:
+                data: a dictionary containing information to define the storage
+                    receptacle
+            """
+            self.storage_type = data['storage_type']
+            self.moisture = data['moisture']
+            self.additive = data['additive']
+            self.packing_density = data['packing_density']
+
+            self.inoculation = data['inoculation']
+            self.bunk_type = data['bunk_type']
+            self.ventilation = data['ventilation']
+            self.removal_rate = data['removal_rate']
+
+            self.crop_name = 'null'
+            self.prev_crop_name = 'null'
+
+            self.storage = True
+
+            self.DM = data['initial_dry_matter']
+
+            self.C_percent = 0.0
+
+            self.C = 0.0
+            self.N = 0.0
+            self.P = 0.0
+
+            self.C_harvest_gas = 0.0
+            self.C_harvest_particle = 0.0
+
+            self.C_storage_gas = 0.0
+            self.C_storage_leachate = 0.0
+
+            self.C_feed_out_gas = 0.0
+            self.C_feed_out_particle = 0.0
+
+            self.C_loss = 0.0
+
+            self.CP = 0.0
+
+            self.CP_gas = 0.0
+            self.CP_leachate = 0.0
+
+            self.CP_loss = 0.0
+
+            self.NPN = 0.0
+
+            self.C_harvest_gas_percent = 0.0
+            self.C_harvest_particle_percent = 0.0
+
+            self.C_storage_gas_percent = 0.0
+            self.C_storage_leachate_percent = 0.0
+
+            self.C_feed_out_gas_percent = 0.0
+            self.C_feed_out_particle_percent = 0.0
+
+            self.CP_gas_percent = 0.0
+            self.CP_leachate_percent = 0.0
+            self.NPN_min_percent = 0.0
+
+            self.error_1 = True
+            self.error_2 = True
+            self.error_3 = True
+
+        def calibrate_storage(self, crop):
+            """
+            Description:
+                Calibrates the feed storage loss model to the crop being stored in the receptacle.
+                Based on information provided by Kevin Painke-Buisse of the DFRC 2019
+                "pseudocode_feed" F.1.4
+            Args:
+                crop: The crop to be stored
+            """
+            self.crop_name = crop.crop_name
+
+            if self.crop_name == 'corn':
+                self.storage = True
+                self.C_percent = 0.58
+                if self.moisture == 'direct_cut':
+                    self.CP_gas_percent = 0
+                    self.CP_leachate_percent = 0.02
+                    self.NPN_min_percent = 0.50
+                    self.C_harvest_gas_percent = 0.01
+                    self.C_harvest_particle_percent = 0.005
+                    self.C_storage_gas_percent = 0.08
+                    self.C_storage_leachate_percent = 0.02
+                    self.C_feed_out_gas_percent = 0.02
+                    self.C_feed_out_particle_percent = 0
+                elif self.moisture == 'wilted':
+                    self.CP_gas_percent = 0
+                    self.CP_leachate_percent = 0
+                    self.NPN_min_percent = 0.45
+                    self.C_harvest_gas_percent = 0.015
+                    self.C_harvest_particle_percent = 0.005
+                    self.C_storage_gas_percent = 0.07
+                    self.C_storage_leachate_percent = 0
+                    self.C_feed_out_gas_percent = 0.02
+                    self.C_feed_out_particle_percent = 0
+                elif self.moisture == 'baleage':
+                    self.CP_gas_percent = 0
+                    self.CP_leachate_percent = 0
+                    self.NPN_min_percent = 0.40
+                    self.C_harvest_gas_percent = 0.015
+                    self.C_harvest_particle_percent = 0.005
+                    self.C_storage_gas_percent = 0.12
+                    self.C_storage_leachate_percent = 0
+                    self.C_feed_out_gas_percent = 0.02
+                    self.C_feed_out_particle_percent = 0
+                else:
+                    if self.error_1:
+                        print('"' + self.moisture + '"', 'is not a recognized moisture category for', self.crop_name)
+                        self.error_1 = False
+
+            elif self.crop_name == 'alfalfa':
+                self.storage = True
+                self.C_percent = 0.58
+                if self.moisture == 'direct_cut':
+                    self.CP_gas_percent = 0
+                    self.CP_leachate_percent = 0.025
+                    self.NPN_min_percent = 0.40
+                    self.C_harvest_gas_percent = 0.03
+                    self.C_harvest_particle_percent = 0
+                    self.C_storage_gas_percent = 0.095
+                    self.C_storage_leachate_percent = 0.025
+                    self.C_feed_out_gas_percent = 0.02
+                    self.C_feed_out_particle_percent = 0
+                elif self.moisture == 'wilted':
+                    self.CP_gas_percent = 0
+                    self.CP_leachate_percent = 0
+                    self.NPN_min_percent = 0.40
+                    self.C_harvest_gas_percent = 0.035
+                    self.C_harvest_particle_percent = 0.015
+                    self.C_storage_gas_percent = 0.09
+                    self.C_storage_leachate_percent = 0
+                    self.C_feed_out_gas_percent = 0.02
+                    self.C_feed_out_particle_percent = 0
+                elif self.moisture == 'haylage':
+                    self.CP_gas_percent = 0
+                    self.CP_leachate_percent = 0
+                    self.NPN_min_percent = 0.35
+                    self.C_harvest_gas_percent = 0.045
+                    self.C_harvest_particle_percent = 0.025
+                    self.C_storage_gas_percent = 0.07
+                    self.C_storage_leachate_percent = 0
+                    self.C_feed_out_gas_percent = 0.02
+                    self.C_feed_out_particle_percent = 0
+                elif self.moisture == 'moist_hay':
+                    self.CP_gas_percent = 0
+                    self.CP_leachate_percent = 0
+                    self.NPN_min_percent = 0.30
+                    self.C_harvest_gas_percent = 0.07
+                    self.C_harvest_particle_percent = 0.10
+                    self.C_storage_gas_percent = 0.03
+                    self.C_storage_leachate_percent = 0
+                    self.C_feed_out_gas_percent = 0
+                    self.C_feed_out_particle_percent = 0.01
+                elif self.moisture == 'dry_hay':
+                    self.CP_gas_percent = 0
+                    self.CP_leachate_percent = 0
+                    self.NPN_min_percent = 0.20
+                    self.C_harvest_gas_percent = 0.07
+                    self.C_harvest_particle_percent = 0.16
+                    self.C_storage_gas_percent = 0.02
+                    self.C_storage_leachate_percent = 0
+                    self.C_feed_out_gas_percent = 0
+                    self.C_feed_out_particle_percent = 0.01
+                else:
+                    if self.error_2:
+                        print('"' + self.moisture + '"', 'is not a recognized moisture category for', self.crop_name)
+                        self.error_2 = False
+            else:
+                if self.error_3:
+                    print('"' + self.crop_name + '"', 'storage is not currently implemented')
+                    self.storage = False
+                    self.error_3 = False
+
+        def store_crop(self, crop):
+            """
+            Description:
+                Updates mineral components and losses as a crop is stored.
+            Args:
+                crop: The crop being stored.
+            """
+
+            if self.storage:
+                # "pseudocode_feed" F.1.1
+                self.DM += crop.yield_actual
+                self.N += crop.yield_N
+                self.P += crop.yield_P
+                # TODO: no Carbon Cycle currently implemented
+                self.C += crop.yield_actual * self.C_percent
+
+                # "pseudocode_feed" F.1.2
+                self.CP += 6.25 * self.N / self.DM
+
+                # "pseudocode_feed" F.1.3
+                carbon_loss.update_all(self)
+                nitrogen_loss.update_all(self)
+                # TODO: No protein degradation currently implemented
+                protein_degradation.update_all()
+
+        def reset_storage(self):
+            """
+            Description:
+                Resets storage receptacle to initial settings.
+            """
+            reset_data = {
+                "storage_type": self.storage_type,
+                "moisture": self.moisture,
+                "additive": self.additive,
+                "packing_density": self.packing_density,
+                "inoculation": self.inoculation,
+                "bunk_type": self.bunk_type,
+                "ventilation": self.ventilation,
+                "removal_rate": self.removal_rate,
+                "initial_dry_matter": 0
+            }
+
+            self.__init__(reset_data)
+
+    def summarize_feed_storage(self, storage):
+        """
+        Description:
+            Accumulates feed storage data as feed is stored in various receptacles
+        Args:
+            storage: The storage receptacle from which information is currently being aggregated
+        """
+        self.C += storage.C
+        self.N += storage.N
+        self.P += storage.P
+        self.DM += storage.DM
+        self.CP += storage.CP
+        self.NPN += storage.NPN
+
+        self.C_loss += storage.C_loss
+        self.CP_loss += storage.CP_loss
 
     def initial_values(self) -> NutrientValues:
         """
@@ -188,7 +501,23 @@ class Feed:
 
     def annual_reset(self):
         """
-        This method resets the data in the available_feeds array
-        for another cycle.
+        Description:
+            Resets the accumulated data so they can be interpreted as annual sums.
+            Option to reset feed storage model entirely each year.
         """
-        pass
+        self.C = 0.0
+        self.N = 0.0
+        self.P = 0.0
+        self.DM = 0.0
+        self.CP = 0.0
+        self.NPN = 0.0
+
+        self.C_loss = 0.0
+        self.CP_loss = 0.0
+
+        # TODO: method for resetting storage allocation. Makes use of reset_storage helper method.
+        #  Similar structure should be used in feed out
+        # for storage in self.storage_options.values():
+        #     storage.reset_storage()
+        #
+        # self.available_storage = self.storage_options
