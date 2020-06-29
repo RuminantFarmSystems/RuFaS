@@ -636,6 +636,7 @@ class Feed:
                             self.storage_options[silo].DM -= pen.ration[str(self.storage_options[silo].feed_id)]
                         else:
                             self.storage_options[silo].DM = 0
+                            self.storage_options[silo].reset_storage()
                             break
                     silo.days_since_feedout += 1
         # inventory plan for new forages
