@@ -21,19 +21,19 @@
             "ration_report":
             {
                 "produce_csv": true,
-                "produce_graphics": true,
+                "produce_graphics": false,
                 "report_name": "ration_report",
                 "ration_interval": 7
             },
             "manure_report":
             {
         	    "produce_csv": true,
-                "produce_graphics": true,
+                "produce_graphics": false,
         	    "report_name": "manure_report"
             },
             "growth_report": {
                 "produce_csv": true,
-                "produce_graphics": true,
+                "produce_graphics": false,
                 "report_name": "growth_report"
             }
         },
@@ -91,13 +91,13 @@
         "feed_storage_report":
         {
             "produce_csv": true,
-            "produce_graphics": true,
+            "produce_graphics": false,
             "report_name": "feed_storage_report"
         },
         "custom_report":
         {
             "produce_csv": true,
-            "produce_graphics": true,
+            "produce_graphics": false,
             "report_name": "custom_report"
         }
     },
@@ -110,7 +110,7 @@
             "corn":
             {
                 "grow_years": [2009],
-                "repeat": 3,
+                "repeat": 1,
                 "planting_date": 121,
                 "harvest_date": 319,
                 "fr_PHU_harvest_min": 0.9,
@@ -118,8 +118,8 @@
             },
             "soybean":
             {
-                "grow_years": [2010],
-                "repeat": 3,
+                "grow_years": [],
+                "repeat": 0,
                 "planting_date": 121,
                 "harvest_date": 319,
                 "fr_PHU_harvest_min": 0.9,
@@ -127,8 +127,8 @@
             },
             "alfalfa":
             {
-                "grow_years": [2011],
-                "repeat": 3,
+                "grow_years": [],
+                "repeat": 0,
                 "planting_date": 121,
                 "harvest_date": 319,
                 "fr_PHU_harvest_min": 0.9,
@@ -148,7 +148,6 @@
             "Silt": 65,
             "SoilAlbedo": 0.16,
             "initial_residue": 0,
-            "fresh_NMineralRate": 0.05,
             "SoilCoverType": "BARE",
 
             "SoilLayers":
@@ -160,19 +159,13 @@
                     "FieldCapacity": 0.30,
                     "Saturation": 0.5,
                     "Ksat": 20,
-                    "CationExclusionFraction": 0.0,
                     "Clay": 20,
                     "InitialTemperature": 15.77575,
                     "BulkDensity": 1.3,
                     "org_C%": 1.2,
-                    "NH4": 1,
-                    "active_N_frac": 0.02,
                     "LabileP": 23.7,
-                    "ActiveMineralRate": 0.0003,
-                    "VolatileExchangeFac": 0.15,
-                    "DenitrificationRate": 0.1,
-                    "SoilWaterRatio": 0.3,
-                    "OM%": 1.9
+                    "DenitrificationRate": 0.05,
+                    "SoilWaterRatio": 0.3
                 },
                 "Layer2":
                 {
@@ -181,19 +174,13 @@
                     "FieldCapacity": 0.3,
                     "Saturation": 0.5,
                     "Ksat": 20,
-                    "CationExclusionFraction": 0.0,
                     "Clay": 20,
                     "InitialTemperature": 14.50797297,
                     "BulkDensity": 1.3,
                     "org_C%": 1.2,
-                    "NH4": 1,
-                    "active_N_frac": 0.02,
                     "LabileP": 10,
-                    "ActiveMineralRate": 0.0003,
-                    "VolatileExchangeFac": 0.15,
-                    "DenitrificationRate": 0.1,
-                    "SoilWaterRatio": 0.3,
-                    "OM%": 1.9
+                    "DenitrificationRate": 0.05,
+                    "SoilWaterRatio": 0.3
                 },
                 "Layer3":
                 {
@@ -202,19 +189,13 @@
                     "FieldCapacity": 0.30,
                     "Saturation": 0.5,
                     "Ksat": 20,
-                    "CationExclusionFraction": 0.0,
                     "Clay": 20,
                     "InitialTemperature": 13.38623,
                     "BulkDensity": 1.3,
                     "org_C%": 1.2,
-                    "NH4": 1,
-                    "active_N_frac": 0.02,
                     "LabileP": 10,
-                    "ActiveMineralRate": 0.0003,
-                    "VolatileExchangeFac": 0.15,
                     "DenitrificationRate": 0.1,
-                    "SoilWaterRatio": 0.3,
-                    "OM%": 1.9
+                    "SoilWaterRatio": 0.3
                 }
             },
 

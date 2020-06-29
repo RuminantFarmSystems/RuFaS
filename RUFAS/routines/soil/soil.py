@@ -441,7 +441,6 @@ class Soil:
 
         # daily soil nitrogen values
         self.residue = data['initial_residue']
-        self.fresh_NMineralRate = data['fresh_NMineralRate']
         self.decayRate = 0.0
 
         # soil phosphorus attributes
@@ -517,8 +516,6 @@ class Soil:
             layer.stable_N = stable_N * unit_adjustment
             layer.NH4 = NH4 * unit_adjustment
             self.fresh_N = fresh_N * unit_adjustment
-        # daily nitrogen balance
-        self.fresh_N = 0.0
 
         self.profile_N = 0.0
         for layer in self.soil_layers:
@@ -634,24 +631,15 @@ class Soil:
 
             # Variable to simulate nitrogen Cycling
             self.org_C = layer_data['org_C%']
-            self.activeMineralRate = layer_data['ActiveMineralRate']
-            self.cationExclusionFraction = layer_data['CationExclusionFraction']
-            self.denitrificationRate = layer_data['DenitrificationRate']
-            self.NH4 = layer_data['NH4']
 
             self.temp_fac = 0.0
             self.water_fac = 0.0
 
             # Initial NO3 levels (kg/ha) in the soil layer:
             self.NO3 = 0.0
-
-            # Organic N (Active + Stable, mg/kg):
+            self.NH4 = 0.0
             self.org_N = 0.0
-
-            # Initial Active N in layer:
             self.active_N = 0.0
-
-            # Initial Stable N in layer:
             self.stable_N = 0.0
 
             self.NO3_perc = 0.0
@@ -665,13 +653,8 @@ class Soil:
             self.totNitriVolatil = 0.0
 
             self.deNrate = layer_data['DenitrificationRate']
-            self.active_N_frac = layer_data['active_N_frac']
-            self.volatileExchangeFactor = layer_data['VolatileExchangeFac']
 
             self.N_uptake = 0.0
-
-            # Variables to simulate phosphorus cycling
-            self.OM_percent = layer_data['OM%']
 
             # P in the soil layer
             self.soil_P = 0.0

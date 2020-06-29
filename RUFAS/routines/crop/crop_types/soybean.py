@@ -151,6 +151,7 @@ class Soybean:
 
         self.gamma_wu = 0
 
+        self.biomass_dry_down_perc = 0.0
         self.DM_harvest_perc = 0.15  # TODO: Hard coded dry matter percent at harvest
         self.NDF_harvest_perc = 0.466
 

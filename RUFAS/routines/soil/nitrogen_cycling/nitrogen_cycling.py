@@ -243,3 +243,7 @@ def update_N(soil):
     soil.N_erosion_annual += soil.N_erosion
 
     soil.N_uptake_annual += soil.N_uptake
+
+    soil.calc = soil.delta_N + soil.N_drainage + soil.N_runoff + soil.N_erosion + soil.N_uptake
+
+    soil.N_balance_difference = soil.manure_N - soil.calc

@@ -55,7 +55,7 @@ def daily_feed_routine(feed, crop, animal_management):
         feed.storage_options[storage_name].calibrate_storage(current_crop)
         feed.storage_options[storage_name].store_crop(current_crop)
 
-        feed.summarize_feed_storage(feed.storage_options[storage_name])
+        feed.summarize_feed_storage(storage)
 
         feed.new_forages.append(storage)
 
@@ -65,8 +65,8 @@ def daily_feed_routine(feed, crop, animal_management):
     feed.daily_updates(animal_management)
 
 
-def annual_feed_routine():
-    pass
+def annual_feed_routine(feed):
+    feed.reset_feed()
 
 
 class Feed:
@@ -511,7 +511,7 @@ class Feed:
         # HIGH QUALITY FORAGE
         # Calculating DMI for Lactating Cows only
         # ------------------------------
-        if storage.forage_quality == 'mature' or storage.forage_quality == 'mid_mature':
+        if storage.forage_quality == 'immature' or storage.forage_quality == 'mid_mature':
             # [F.2.A.6]
             if 1.1 * storage.req_inv['lactating_cows'] >= storage.DM:
                 storage.DMI_forage_max['lactating_cows'] = storage.DM / storage.cow_days['lactating_cows']
@@ -521,7 +521,7 @@ class Feed:
         # LOW QUALITY FORAGE
         # Calculating DMI for all EXCEPT Lactating Cows
         # ------------------------------
-        elif storage.forage_quality == 'immature':
+        elif storage.forage_quality == 'mature':
             tot_req_inv_non_lactating_cows = 0
             # updating required inventory for non lactating cows
             for animal in storage.req_inv:
@@ -649,7 +649,7 @@ class Feed:
             else:
                 silo.days_since_feedout += 1
 
-    def annual_reset(self):
+    def reset_feed(self):
         """
         Description:
             Resets the accumulated data so they can be interpreted as annual sums.
@@ -666,11 +666,6 @@ class Feed:
 
         self.C_loss = 0.0
         self.CP_loss = 0.0
-
-        # TODO: method for resetting storage allocation. Makes use of reset_storage helper method.
-        #  Similar structure should be used when feed out is implemented
-        # for storage in self.storage_options.values():
-        #     storage.reset_storage()
 
     def get_feeds_split_by_maturity(self):
         """

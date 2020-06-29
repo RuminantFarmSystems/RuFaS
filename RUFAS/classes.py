@@ -56,12 +56,6 @@ class State:
         self.soil.annual_reset()
         self.crop.annual_reset()
         self.animal_management.annual_reset()
-        self.feed.annual_reset()
-
-    # self.fieldOps.annual_reset()
-    # self.herd.annual_reset()
-    # self.housing.annual_reset()
-    # self.manure.annual_reset()
 
 
 # -------------------------------------------------------------------------------

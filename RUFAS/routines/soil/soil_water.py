@@ -1,4 +1,3 @@
-###############################################################################
 """
 RUFAS: Ruminant Farm Systems Model
 
@@ -36,7 +35,6 @@ Soil values updated by calling update_all():
     Soil Layer attributes updated:
         SW
 """
-###############################################################################
 
 
 #
