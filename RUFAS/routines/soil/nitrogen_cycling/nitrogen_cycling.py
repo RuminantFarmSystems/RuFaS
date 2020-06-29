@@ -226,7 +226,7 @@ def update_N(soil):
     profile_N = soil.NH4 + soil.NO3 + soil.org_N + \
                 soil.active_N + soil.stable_N + soil.fresh_N
 
-    soil.delta_N = soil.profile_N - profile_N
+    soil.delta_N = profile_N - soil.profile_N
 
     soil.profile_N = profile_N
 
