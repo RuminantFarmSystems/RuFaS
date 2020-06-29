@@ -33,7 +33,7 @@ class State:
     The state object should ONLY store persistent data that WILL be used in
     future calculations and/or reports.
     DO NOT store immediate operands or values that do not NEED to be accessed in
-    the future or in an output report in the state object.
+    the future or in an output_handler report in the state object.
     """
 
     def __init__(self, data, config, time):
@@ -227,8 +227,8 @@ class Config:
             self.years.append(days)
         
         self.sim_length = self.calc_sim_length(leap_year_length, year_length)
-        self.output_dir = data['output_dir']
-        self.diagnostic_dir = data['diagnostic_dir']
+        self.csv_dir = data['csv_dir']
+        self.graphic_dir = data['graphic_dir']
 
     def calc_sim_length(self, leap_year_length, year_length):
         """

@@ -28,23 +28,23 @@ class Corn:
         # ===================================================================
         ''' HEAT UNIT DATA '''
 
-        # Inputs
+        # input
         self.T_base_min = 10
         self.T_base_max = 30
         self.PHU = 1200
 
-        # Internally calculated inputs
+        # Internally calculated input
         self.accumulated_HU = 0.0
         self.prev_accumulated_HU = 0.0
 
-        # Outputs
+        # output
         self.fr_PHU = 0.0
         self.prev_fr_PHU = 0.0
 
         # ===================================================================
         ''' LEAF AREA INDEX (LAI) DATA '''
 
-        # Inputs
+        # input
         self.fr_PHU_1 = 0.15
         self.fr_PHU_2 = 0.50
         self.fr_LAI_1 = 0.05
@@ -54,40 +54,40 @@ class Corn:
         self.LAI_max = 3
         self.LAI_min = 0
 
-        # Internally calculated inputs
+        # Internally calculated input
         self.prev_fr_LAI_max = 0
         self.fr_LAI_max = 0
 
-        # Outputs
+        # output
         self.prev_LAI_actual = 0
         self.LAI_actual = 0
 
         # ===================================================================
         ''' ROOT DEPTH DATA '''
 
-        # Inputs
+        # input
         self.z_root_max = 2000  # maximum depth of root development
 
-        # Internally calculated inputs
+        # Internally calculated input
         self.fr_root = 0
 
-        # Outputs
+        # output
         self.z_root = 0
 
         # ===================================================================
         ''' BIOMASS DATA '''
 
-        # Inputs
+        # input
         self.kl = 0.65
         self.RUE = 39
         self.T_opt = 25
 
-        # Internally calculated inputs
+        # Internally calculated input
         self.gamma_reg = 0
         self.d_biomass_max = 0
         self.d_biomass_actual = 0.0
 
-        # Outputs
+        # output
         self.biomass_actual = 0
         self.prev_biomass_actual = 0
 

@@ -23,7 +23,7 @@ class LactatingCowTest(unittest.TestCase):
         Sets up the list of various feeds that will be used for the unit tests.
         """
         feed_info_0 = {
-            "feed_database": "Inputs/feeds.sqlite",
+            "feed_database": "input/feeds.sqlite",
             "table_name": "feed_library",
 
             "managed_feeds":
@@ -58,7 +58,7 @@ class LactatingCowTest(unittest.TestCase):
         """
         Sets up the inputs and expected outputs for the unit tests.
         """
-        self.inputs_outputs = animal_inputs_outputs.AnimalInputsOutputs()
+        self.inputs_outputs = animal_inputs_outputs.AnimalinputOutputs()
         self.set_up_feeds()
 
     def test_ration_1(self):

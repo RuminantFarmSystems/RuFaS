@@ -43,4 +43,5 @@ def update_all(S):
         # S.5.E.6
         S.DRP_runoff_annual += layer.DRP_runoff * S.area
 
-    S.DRP_leachate_annual += DRP_leachate_prev_layer
+    S.DRP_leached = DRP_leachate_prev_layer
+    S.DRP_leachate_annual += S.DRP_leached
