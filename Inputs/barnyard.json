@@ -209,6 +209,7 @@
         },
         "field_management":
         {
+            "management_scheme": "optimal",
             "fertilizer":
             {
                 "app_years": [],
