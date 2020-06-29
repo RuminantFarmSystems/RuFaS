@@ -88,8 +88,6 @@ Soil attribute definitions
 
     deNrate = user defined denitrification rate coefficient (0.1)
 
-    org_C = soil organic matter content (%)
-
     Nminact = mineralization from active N pool (kg/ha)
 
     CN = daily rate constant, ratio of Carbon to Nitrogen
