@@ -21,19 +21,19 @@
             "ration_report":
             {
                 "produce_csv": true,
-                "produce_graphics": false,
+                "produce_graphics": true,
                 "report_name": "ration_report",
                 "ration_interval": 7
             },
             "manure_report":
             {
         	    "produce_csv": true,
-                "produce_graphics": false,
+                "produce_graphics": true,
         	    "report_name": "manure_report"
             },
             "growth_report": {
                 "produce_csv": true,
-                "produce_graphics": false,
+                "produce_graphics": true,
                 "report_name": "growth_report"
             }
         },
@@ -69,35 +69,35 @@
 
             "soil_report": {
                 "produce_csv": true,
-                "produce_graphics": false,
+                "produce_graphics": true,
                 "report_name": "soil_report"
             },
             "soil_nitrogen_report": {
                 "produce_csv": true,
-                "produce_graphics": false,
+                "produce_graphics": true,
                 "report_name": "soil_nitrogen_report"
             },
             "soil_phosphorus_report": {
                 "produce_csv": true,
-                "produce_graphics": false,
+                "produce_graphics": true,
                 "report_name": "soil_phosphorus_report"
             },
             "crop_report": {
                 "produce_csv": true,
-                "produce_graphics": false,
+                "produce_graphics": true,
                 "report_name": "crop_report"
             }
         },
         "feed_storage_report":
         {
             "produce_csv": true,
-            "produce_graphics": false,
+            "produce_graphics": true,
             "report_name": "feed_storage_report"
         },
         "custom_report":
         {
             "produce_csv": true,
-            "produce_graphics": false,
+            "produce_graphics": true,
             "report_name": "custom_report"
         }
     },
@@ -109,24 +109,24 @@
             "latitude": 43.332708,
             "corn":
             {
-                "grow_years": [],
-                "repeat": 0,
+                "grow_years": [2009],
+                "repeat": 3,
                 "planting_date": 121,
                 "harvest_date": 319,
                 "harvest_type": "optimal"
             },
             "soybean":
             {
-                "grow_years": [],
-                "repeat": 0,
+                "grow_years": [2010],
+                "repeat": 3,
                 "planting_date": 121,
                 "harvest_date": 319,
                 "harvest_type": "scheduled"
             },
             "alfalfa":
             {
-                "grow_years": [],
-                "repeat": 0,
+                "grow_years": [2011],
+                "repeat": 3,
                 "planting_date": 121,
                 "harvest_date": 319,
                 "harvest_type": "optimal"

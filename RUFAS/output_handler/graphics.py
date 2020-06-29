@@ -82,43 +82,60 @@ def annual_mass_balance_graphics(report):
         variables, units = read_data(report, annual_file_name)
 
         save_dir = report.graphic_dir
-
         mp.figure()
 
-        legend = []
+        variables_size = len(variables)
         width = 0.35
+
         table_dict = {
             'year': variables.pop('year'),
             'actual': variables.pop('actual'),
             'calculated': variables.pop('calculated'),
-            'difference': variables.pop('difference'),
-            'delta': variables.pop('delta')
+            'difference': variables.pop('difference')
         }
 
-        legend.append('actual')
         prev_vars = [0 for _ in range(len(table_dict['year']))]
 
-        colors = ['#ffffff', '#DC267F', '#648FFF', '#FFB000', '#FE6100', '#785EF0', '#8B0000']
+        cell_colors = [['#ffffff' for _ in range(len(table_dict['year']) + 1)] for _ in range(variables_size)]
+        cell_colors[1][0] = '#8B0000'
+
+        colors = ['#ffffff', '#DC267F', '#648FFF', '#FFB000', '#FE6100', '#785EF0']
 
         mp.scatter(table_dict['year'], table_dict['actual'], c='#8B0000', marker='x', zorder=2)
         for variable in variables:
             if len(colors) == 0:
                 colors.append("#" + ''.join([random.choice('1236789ABCDE') for _ in range(6)]))
 
-            mp.bar(table_dict['year'], variables[variable], width, color=colors.pop(), bottom=prev_vars)
+            color = colors.pop()
+            cell_colors[len(table_dict)][0] = color
+
+            mp.bar(table_dict['year'], variables[variable], width, color=color, bottom=prev_vars)
             prev_vars = [sum(x) for x in zip(prev_vars, variables[variable])]
             table_dict[variable] = variables[variable]
-            legend.append(variable)
 
         mp.xticks(rotation=45)
         mp.axis('tight')
         table_bot = -1.08
         table_height = 0.75
-        mp.table(cellText=list(table_dict.values()),
-                 rowLabels=list(table_dict.keys()),
-                 bbox=[0, table_bot, 1, table_height])
+
+        # creation of the blank cell to store the color
+        cell_text = list(table_dict.values())
+        for x in range(len(cell_text)):
+            cell_text[x].insert(0, "")
+
+        table = mp.table(cellText=cell_text,
+                         rowLabels=list(table_dict.keys()),
+                         cellColours=cell_colors,
+                         bbox=[0, table_bot, 1, table_height])
+
+        # creates the color indicator in the table
+        cell_dict = table.get_celld()
+        for x in range(len(cell_text)):
+            cell_dict[(x, 0)].set_width(0.02)
+
         mp.title(report.report_name)
-        mp.legend(legend)
+        # legend = ['actual']
+        # mp.legend(legend, loc="upper left")
         mp.subplots_adjust(left=0.31, bottom=0.5)
 
         path = str(save_dir) + '/' + 'annual_' + report.report_name
