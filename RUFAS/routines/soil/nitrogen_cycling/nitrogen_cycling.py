@@ -88,8 +88,6 @@ Soil attribute definitions
 
     deNrate = user defined denitrification rate coefficient (0.1)
 
-    org_C = soil organic matter content (%)
-
     Nminact = mineralization from active N pool (kg/ha)
 
     CN = daily rate constant, ratio of Carbon to Nitrogen
@@ -226,7 +224,7 @@ def update_N(soil):
     profile_N = soil.NH4 + soil.NO3 + soil.org_N + \
                 soil.active_N + soil.stable_N + soil.fresh_N
 
-    soil.delta_N = soil.profile_N - profile_N
+    soil.delta_N = profile_N - soil.profile_N
 
     soil.profile_N = profile_N
 

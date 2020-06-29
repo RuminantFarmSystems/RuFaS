@@ -79,12 +79,7 @@ class OutputHandler:
             if report.produce_csv:
                 report.csv_dir = csv_dir / report_name
                 report.csv_dir.mkdir(exist_ok=True, parents=False)
-                if report_name.startswith('pen'):
-                    report.initialize_pen_csv_dir()
-                elif report_name.startswith('mass'):
-                    report.initialize_mass_balance_csv_dir()
-                elif report_name.startswith('field'):
-                    report.initialize_field_csv_dir()
+                report.initialize_csv_dir()
 
     def initialize_graphic_dir(self, graphic_dir):
         graphic_dir = util.get_base_dir() / graphic_dir
@@ -99,12 +94,7 @@ class OutputHandler:
             if report.produce_graphics:
                 report.graphic_dir = graphic_dir / report_name
                 report.graphic_dir.mkdir(exist_ok=True, parents=False)
-                if report_name.startswith('pen'):
-                    report.initialize_pen_graphic_dir()
-                elif report_name.startswith('mass'):
-                    report.initialize_mass_balance_graphic_dir()
-                elif report_name.startswith('field'):
-                    report.initialize_field_graphic_dir()
+                report.initialize_graphic_dir()
 
     def initialize_reports(self):
         """Transfer needed (initial) data from state to report handlers."""

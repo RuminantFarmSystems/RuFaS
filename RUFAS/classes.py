@@ -231,13 +231,13 @@ class Config:
         self.graphic_dir = data['graphic_dir']
 
     def calc_sim_length(self, leap_year_length, year_length):
-        '''
+        """
         Calculates and returns the length of the simulation in days.
-        '''
+        """
         sim_length = 0
         for i in range(len(self.years)):
             if i == 0:
-                #check for +-1
+                # check for +-1
                 if is_leap_year(self.start_year):
                     sim_length += leap_year_length - self.start_day
                 else:
@@ -246,6 +246,8 @@ class Config:
                 sim_length += len(self.years[i])
                 
         return sim_length + 1
+
+
 # -------------------------------------------------------------------------------
 # Class: Weather
 # -------------------------------------------------------------------------------
@@ -264,7 +266,8 @@ class Weather:
         self.T_avg = []
         self.biomass = []
         self.radiation = []
-        self.manureN = []  # TODO: manureN is a temporary weather file input until the manure module is linked with the rest of the program
+        # TODO: manureN is a temporary weather file input until the manure module is implemented
+        self.manureN = []
         self.T_avg_annual = []
 
         self.evaporation = []
@@ -309,7 +312,8 @@ class Weather:
             self.T_avg.append([0 for _ in range(len(year))])
             self.biomass.append([0 for _ in range(len(year))])
             self.radiation.append([0 for _ in range(len(year))])
-            self.manureN.append([0 for _ in range(len(year))])  # TODO: manureN is a temporary weather file input until the manure module is linked with the rest of the program
+            # TODO: manureN is a temporary weather file input until the manure module is implemented
+            self.manureN.append([0 for _ in range(len(year))])
 
             # These are not currently input into the weather file. They may
             # be/may have been at some point.

@@ -4,75 +4,21 @@ File name: mass_balance_report.py
 Description:
 Author(s): William Donovan, wmdonovan@wisc.edu
 """
-from pathlib import Path
 
-from RUFAS.output_handler import graphics
-from RUFAS.output_handler.reports.base_report import BaseReport
+from .. import graphics
+from .base_report_driver import BaseReportDriver
+from .base_report import BaseReport
 
 
-class MassBalanceReport:
+class MassBalanceReport(BaseReportDriver):
     def __init__(self, data):
+        super().__init__(data)
+        self.reports = {"water_balance": self.WaterBalance(data['water_balance']),
+                        "phosphorus_balance": self.PhosphorusBalance(data['phosphorus_balance']),
+                        "nitrogen_balance": self.NitrogenBalance(data['nitrogen_balance'])
+                        }
 
-        self.graphic_dir = Path
-        self.csv_dir = Path
-        self.report_name = data['report_name']
-        self.produce_csv = data['produce_csv']
-        self.produce_graphics = data['produce_graphics']
-        self.mass_balance_reports = {"water_balance": self.WaterBalance(data['water_balance']),
-                                     "phosphorus_balance": self.PhosphorusBalance(data['phosphorus_balance']),
-                                     "nitrogen_balance": self.NitrogenBalance(data['nitrogen_balance'])
-                                     }
-
-    def initialize(self):
-        if self.produce_csv:
-            for report in self.mass_balance_reports.values():
-                if not report.produce_csv and report.produce_graphics:
-                    print("Warning: Cannot produce graphics_1 for inactive report:", report.report_name,
-                          ". Setting produce_graphics to False")
-                    report.produce_graphics = False
-                if report.produce_csv:
-                    report.initialize()
-
-    def initialize_mass_balance_csv_dir(self):
-        for report_name in self.mass_balance_reports:
-            self.mass_balance_reports[report_name].csv_dir = Path(str(self.csv_dir) + '/' + report_name)
-            self.mass_balance_reports[report_name].csv_dir.mkdir(exist_ok=True, parents=False)
-
-    def initialize_mass_balance_graphic_dir(self):
-        for report_name in self.mass_balance_reports:
-            self.mass_balance_reports[report_name].graphic_dir = Path(str(self.graphic_dir) + '/' + report_name)
-            self.mass_balance_reports[report_name].graphic_dir.mkdir(exist_ok=True, parents=False)
-
-    def daily_update(self, state, weather, time):
-        if self.produce_csv:
-            for report in self.mass_balance_reports.values():
-                if report.produce_csv:
-                    report.daily_update(state, weather, time)
-
-    def annual_update(self, state, weather, time):
-        if self.produce_csv:
-            for report in self.mass_balance_reports.values():
-                if report.produce_csv:
-                    report.annual_update(state, weather, time)
-
-    def write_annual_report(self):
-        if self.produce_csv:
-            for report in self.mass_balance_reports.values():
-                if report.produce_csv:
-                    report.write_annual_report()
-
-    def annual_flush(self):
-        if self.produce_csv:
-            for report in self.mass_balance_reports.values():
-                if report.produce_csv:
-                    report.annual_flush()
-
-    def produce_report_graphics(self):
-        if self.produce_graphics:
-            for report in self.mass_balance_reports.values():
-                report.produce_report_graphics()
-
-    class MassBalanceReport(BaseReport):
+    class BaseMassBalanceReport(BaseReport):
         def __init__(self, data):
             super().__init__(data)
 
@@ -80,7 +26,7 @@ class MassBalanceReport:
             super().produce_report_graphics()
             graphics.annual_mass_balance_graphics(self)
 
-    class WaterBalance(MassBalanceReport):
+    class WaterBalance(BaseMassBalanceReport):
         def __init__(self, data):
             super().__init__(data)
 
@@ -108,7 +54,7 @@ class MassBalanceReport:
                                      # all new variables should be added below here
                                      }
 
-    class PhosphorusBalance(MassBalanceReport):
+    class PhosphorusBalance(BaseMassBalanceReport):
         def __init__(self, data):
             super().__init__(data)
 
@@ -137,7 +83,7 @@ class MassBalanceReport:
                 'P_uptake': ['soil.P_uptake_annual', 'kg', 0]
             }
 
-    class NitrogenBalance(MassBalanceReport):
+    class NitrogenBalance(BaseMassBalanceReport):
         def __init__(self, data):
             super().__init__(data)
 
