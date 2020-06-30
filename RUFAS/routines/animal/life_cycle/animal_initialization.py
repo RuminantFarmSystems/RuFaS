@@ -61,7 +61,6 @@ class AnimalInitalization:
             init: whether or not update the database with new animals
     '''
     def __init__(self, init = True):
-        init = True
         if init:
             conn = sqlite3.connect('Inputs/animals.sqlite')
             cur = conn.cursor()
