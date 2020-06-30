@@ -144,3 +144,8 @@ class OutputHandler:
         for report_name in self.reports:
             report = self.reports[report_name]
             report.produce_report_graphics()
+
+    def finalize(self):
+        for report_name in self.reports:
+            report = self.reports[report_name]
+            report.finalize()

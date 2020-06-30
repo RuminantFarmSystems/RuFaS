@@ -135,3 +135,6 @@ class BaseReport:
     def produce_report_graphics(self):
         graphics.annual_graphics(self)
         graphics.daily_graphics(self)
+
+    def finalize(self):
+        pass
