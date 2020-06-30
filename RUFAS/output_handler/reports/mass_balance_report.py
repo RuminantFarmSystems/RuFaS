@@ -37,8 +37,8 @@ class MassBalanceReport(BaseReportDriver):
                                     'difference': ['soil.water_balance_difference', 'mmH2O', []],
                                     'delta': ['soil.delta_SW', 'mmH2O', []],
                                     'runoff': ['soil.runoff', 'mmH2O', []],
-                                    'evaporation': ['soil.evap_sum', 'mmH2O', []],
-                                    'transpiration': ['soil.trans_sum', 'mmH2O', []],
+                                    'evaporation': ['soil.evap', 'mmH2O', []],
+                                    'transpiration': ['soil.trans', 'mmH2O', []],
                                     'drainage': ['soil.drainage', 'mmH2O', []]
                                     }
 

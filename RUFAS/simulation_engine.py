@@ -1,4 +1,3 @@
-################################################################################
 """
 RUFAS: Ruminant Farm Systems Model
 File name: simulation_engine.py
@@ -6,8 +5,8 @@ Description: Contains the main routines that drive the simulation
 Author(s): Kass Chupongstimun, kass_c@hotmail.com
            Jit Patil, spatil5@wisc.edu
 """
-################################################################################
 
+import sys
 import json
 import time as timer
 from pathlib import Path
@@ -39,6 +38,7 @@ def simulate(input_fPath: Path):
     # simulation global variables
     #
     try:
+        sys.stdout.write("Loading Data...")
         read_json_file(input_fPath)
     except errors.InvalidJSONfile as e:
         print(e.msg)
@@ -49,26 +49,26 @@ def simulate(input_fPath: Path):
     # Deletes existing output_handler files of the same name from previous simulation
     # Transfer needed (initial) data from state to report handlers
     #
+
     output.initialize_csv_dir(config.csv_dir)
     output.initialize_graphic_dir(config.graphic_dir)
     output.initialize_reports()
 
-    print("\nSimulating: {}".format(input_fPath.name))
+    sys.stdout.write('\b' * len('Loading Data...') + "Simulating: {}...".format(input_fPath.name))
 
     t_start_sim = timer.time()
 
-    #
     # MAIN Simulation Loop
-    #
-
     while not time.end_simulation():
+        sys.stdout.write('\b' * 3)
         annual_simulation()
 
     output.produce_graphics()
     t_end_sim = timer.time()
 
-    print("Simulation Successful: {}".format(input_fPath.name))
-    print("Total Run Time: {} seconds\n".format(str(t_end_sim - t_start_sim)))
+    sys.stdout.write('\b' * len("Simulating: {}...".format(input_fPath.name)) +
+                     "Simulation Successful: {}".format(input_fPath.name))
+    print("\nTotal Run Time: {} seconds\n".format(str(t_end_sim - t_start_sim)))
 
 
 # -------------------------------------------------------------------------------
@@ -84,7 +84,6 @@ def daily_simulation():
     routines.daily_soil_routine(state.soil, state.crop, weather, time)
     routines.daily_crop_routine(state.crop, weather, time, state.soil)
     routines.daily_feed_routine(state.feed, state.crop, state.animal_management)
-
 
     #
     # Daily Output Updates
@@ -120,6 +119,7 @@ def annual_simulation():
     #
     # Post-Annual Routines
     #
+    sys.stdout.write('...')
     output.annual_updates(state, weather, time)
     output.write_annual_reports()
     output.annual_flushes()
@@ -159,17 +159,12 @@ def read_json_file(fPath: Path):
 
             if config.run_tests:
                 test_handler.run_tests()
-
             weather = Weather(data['weather'], config.years, config.w_start_year,
                               config.w_start_day, config.start_year, config.start_day)
             time = Time(config.years, config.start_year)
             state = State(data['farm'], config, time)
             output = OutputHandler(data['output_handler'], state)
-
         except errors.JSONfileData as e:
             print("JSON FILE ERROR: " +
                   "{} \n\t{} Section\n{}\n".format(fPath.name, e.section, e.msg))
             raise errors.InvalidJSONfile(fPath.name)
-
-
-# =======================================================================================

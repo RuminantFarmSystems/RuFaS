@@ -1,11 +1,9 @@
-################################################################################
 """
 RUFAS: Ruminant Farm Systems Model
 File name: user_prompt.py
 Description:
 Author(s): Kass Chupongstimun, kass_c@hotmail.com
 """
-################################################################################
 
 import sys
 from pathlib import Path
@@ -50,8 +48,7 @@ def input_prompt():
     while True:
 
         try:
-            # user_input = input("\nEnter RUFAS Input: ")
-            user_input = "input/barnyard.json"
+            user_input = input("\nEnter RUFAS Input: ")
             #
             # Handle user exiting program
             #
@@ -87,7 +84,7 @@ def input_prompt():
                 if not input_path.is_file():
                     raise errors.UserInput("Specified file does not exist")
                 else:
-                    print("json file Detected...\n")
+                    print("json file detected...\n")
                 return [input_path]
 
             #

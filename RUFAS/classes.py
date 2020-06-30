@@ -1,4 +1,3 @@
-################################################################################
 """
 RUFAS: Ruminant Farm Systems Model
 File name: classes.py
@@ -8,7 +7,6 @@ Author(s): Kass Chupongstimun, kass_c@hotmail.com
            William Donovan, wmdonovan@wisc.edu
            Jacob Johnson, jacob8399@gmail.com
 """
-################################################################################
 
 import csv
 
@@ -37,7 +35,7 @@ class State:
     """
 
     def __init__(self, data, config, time):
-        self.soil = Soil(data['soil'], config)
+        self.soil = Soil(data['soil'])
         self.feed = Feed(data['feed'])
         self.animal_management = AnimalManagement(data['animal'], config, self.feed)
         self.crop = Crop(data['crop'], time)
