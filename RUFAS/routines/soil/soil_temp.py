@@ -135,7 +135,7 @@ def calc_dd(soil):
 def calc_scale(soil):
     SW = sum_soil_water(soil)
     Ztot = soil.profile_depth
-    bd = soil.profileBulkDensity
+    bd = soil.profile_bulk_density
 
     return SW / ((0.356 - 0.144 * bd) * Ztot)
 
@@ -145,7 +145,7 @@ def calc_scale(soil):
 # "pseudocode_soil" S.1.A.6
 #
 def calc_ddmax(soil):
-    bd = soil.profileBulkDensity
+    bd = soil.profile_bulk_density
     exp_part = exp(-5.63 * bd)
     return 1000 + (2500 * bd) / (bd + 686 * exp_part)
 
@@ -202,7 +202,7 @@ def calc_radiate(soil, crop, weather, time):
 #
 def calc_albedo(soil, crop):
     CV = crop.current_crop.bio_AG
-    albedoSoil = soil.soilAlbedo
+    albedoSoil = soil.soil_albedo
 
     # "pseudocode_soil" S.1.A.10
     cover = exp(-0.00005 * CV)

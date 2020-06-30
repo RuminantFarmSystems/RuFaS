@@ -19,7 +19,7 @@ def update_all(S, time):
 
     # determine whether there is a tillage application
     for x in range(len(till_app.day)):
-        if till_app.day[x] == day and till_app.year[x] - S.start_year + 1 == year:
+        if till_app.day[x] == day and till_app.year[x] - time.start_year + 1 == year:
 
             till_soil_mass = 0.0
             till_act_P = 0.0

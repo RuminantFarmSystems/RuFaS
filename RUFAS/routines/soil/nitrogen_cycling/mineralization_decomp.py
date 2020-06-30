@@ -25,13 +25,13 @@ def mineralization_decomp(soil):
         water_fac = layer.water_fac
 
         # "pseudocode_soil" S.4.E.1
-        nMinAct = 0
+        N_min_act = 0
         if layer.temperature > 0:
-            nMinAct = minrate * ((temp_fac * water_fac) ** 0.5) * active_N
+            N_min_act = minrate * ((temp_fac * water_fac) ** 0.5) * active_N
 
-        nMinAct = min(layer.active_N, nMinAct)
-        layer.active_N -= nMinAct
-        layer.NH4 += nMinAct
+        N_min_act = min(layer.active_N, N_min_act)
+        layer.active_N -= N_min_act
+        layer.NH4 += N_min_act
 
         #
         # Decomposition and mineralization of Fresh N only occur in the first
@@ -67,13 +67,10 @@ def mineralization_decomp(soil):
             resComp = min(term1, term2, term3)
 
             # "pseudocode_soil" S.4.E.4
-            Decay = minCoeff * resComp * ((temp_fac * water_fac) ** 0.5)
-
-            # decay rate used in calculating residue for crop
-            soil.decayRate = Decay
+            soil.decay_rate = minCoeff * resComp * ((temp_fac * water_fac) ** 0.5)
 
             # "pseudocode_soil" S.4.E.6
-            FreshMin = Decay * fresh_N
+            FreshMin = soil.decay_rate * fresh_N
 
             FreshMin = min(soil.fresh_N, FreshMin)
             soil.fresh_N -= FreshMin
@@ -83,5 +80,5 @@ def mineralization_decomp(soil):
 
     # "pseudocode_soil" S.4.E.7/8
     soil.fresh_N += 0.0015 * soil.residue
-    soil.residue = soil.residue * (1 - soil.decayRate)
+    soil.residue = soil.residue * (1 - soil.decay_rate)
 

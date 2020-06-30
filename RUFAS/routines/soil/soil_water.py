@@ -10,30 +10,6 @@ Description: This module contains the necessary functions for calculating and
              Currently the only function meant to be used outside of this file
              is the update_all() function. The other functions are meant to
              serve as helper functions within this file.
-
-Soil attribute definitions
-
-    runoff = daily runoff (mm H20)
-
-    R = daily rainfall depth (mm H20)
-
-    SW = soil water content of entire profile (mm H20)
-
-    FC = amount of water in soil profile at field capacity (mm H20)
-
-    WP = amount of water in the soil profile held at wilting point (mm H20)
-
-    perc = the amount of water percolated to the next layer (mm H20)
-
-    trans_act = the amount of water lost to transpiration on a given day (mm H20)
-                (this value is taken from the crop module)
-
-Soil values updated by calling update_all():
-    soil.SW
-    soil.soil_layers
-
-    Soil Layer attributes updated:
-        SW
 """
 
 
@@ -43,13 +19,13 @@ Soil values updated by calling update_all():
 #
 def update_all(soil, weather, time):
 
-    update_SW(soil, weather, time)
+    update_profile_SW(soil, weather, time)
 
 
-def update_SW(soil, weather, time):
+def update_profile_SW(soil, weather, time):
 
-    soil.trans_sum = 0.0
-    soil.evap_sum = 0.0
+    soil.trans = 0.0
+    soil.evap = 0.0
     soil.ET_act = 0.0
 
     profile_SW = 0
@@ -81,8 +57,8 @@ def update_SW(soil, weather, time):
         SW = min(SAT, SW)
 
         profile_SW += SW
-        soil.trans_sum += trans
-        soil.evap_sum += evap
+        soil.trans += trans
+        soil.evap += evap
         soil.ET_act += (evap + trans)
 
         layer.soil_water = SW
@@ -98,4 +74,17 @@ def update_SW(soil, weather, time):
     soil.p_calc = soil.delta_SW + soil.ET_act + soil.drainage + soil.runoff
 
     soil.water_balance_difference = soil.p_act - soil.p_calc
+
+
+def update_annual_SW(soil):
+    soil.ET_max_annual += soil.ET_max
+
+    soil.drainage_annual += soil.drainage
+    soil.runoff_annual += soil.runoff
+    soil.trans_annual += soil.trans
+    soil.evap_annual += soil.evap
+    soil.ET_annual += soil.ET_act
+
+    soil.p_act_annual += soil.p_act
+
 

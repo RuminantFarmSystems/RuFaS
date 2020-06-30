@@ -1,11 +1,9 @@
-################################################################################
 """
 SurPhos
 File name: manure_leach.py
 Author(s): Jacob Johnson, jacob8399@gmail.com,
            William Donovan, wmdonovan@wisc.edu
 """
-################################################################################
 from math import exp
 
 
@@ -81,6 +79,7 @@ def update_all(S, weather, time):
         S.MIP_leach_annual += S.MIP_leach
         S.MOP_leach_annual += S.MOP_leach
         S.M_leach = S.MIP_leach - S.MIP_runoff + S.MOP_leach - S.MOP_runoff
+        S.M_leach_annual += S.M_leach
         # convert soil P from KG/HA to KG and add manure P leached
 
         DF = 0.6
@@ -95,20 +94,20 @@ def update_all(S, weather, time):
 
             DF = max(0.0, (DF / 2) - 0.02)
 
-        S.DRP_leachate_annual += M_not_leached
+        S.DRP_leach_annual += M_not_leached
 
-        S.WIP_runoff_annual += S.MIP_runoff
-        S.WOP_runoff_annual += S.MOP_runoff
+        S.MIP_runoff_annual += S.MIP_runoff
+        S.MOP_runoff_annual += S.MOP_runoff
 
-        S.WIP_leachate_annual += S.MIP_leach
-        S.WOP_leachate_annual += S.MOP_leach
+        S.MIP_leach_annual += S.MIP_leach
+        S.MOP_leach_annual += S.MOP_leach
 
         # Manure Decomposition
         # S.5.G.III
 
         # S.5.G.III.1
         wet_rate = -0.3 * S.manure_moisture + 0.27
-        dry_rate = (-0.05 * (S.manure_mass / S.manure_mass_app) + 0.075) * TFA
+        dry_rate = (-0.05 * (S.manure_mass / S.manure_mass_applied) + 0.075) * TFA
 
         # S.5.G.III.2
         if rainfall > 4.0:
@@ -180,7 +179,7 @@ def update_all(S, weather, time):
 
             DF = max(0.0, (DF / 2) - 0.02)
 
-        S.DRP_leachate_annual += DP_not_decomposed
+        S.DRP_leach_annual += DP_not_decomposed
 
     # calculate manure runoff P in MG/L
     # S.5.G.IV
