@@ -1,21 +1,21 @@
-from pathlib import Path
-
-from RUFAS.output_handler.reports import BaseReport
+from .base_report import BaseReport
 from .base_report_driver import BaseReportDriver
-from .. import graphics
+import json
 
 
 class LifeCycleReport(BaseReportDriver):
     def __init__(self, data):
         super().__init__(data)
         self.reports = {
-            'individual_animal_report': self.IndividualAnimalReport(data['individual_animal_report']),
+            'individual_animal_report':
+                self.IndividualAnimalReport(data['individual_animal_report']),
             'herd_report': self.HerdReport(data['herd_report'])
         }
 
     class IndividualAnimalReport(BaseReport):
         def __init__(self, data):
             super().__init__(data)
+            self.num_animals = data['num_animals']
 
             self.daily_variables = {'year': ['time.cal_year', '', []],
                                     'j_day': ['time.day', '', []]
@@ -24,7 +24,10 @@ class LifeCycleReport(BaseReportDriver):
                                      }
 
         def finalize(self, state, weather, time):
-            print('individual done')
+            output = state.animal_management.get_life_cycle_output(
+                self.num_animals)
+            with open(str(self.csv_dir) + '/' + self.report_name + '.json', 'w') as outfile:
+                json.dump(output, outfile, sort_keys=True, indent=4)
 
     class HerdReport(BaseReport):
         def __init__(self, data):

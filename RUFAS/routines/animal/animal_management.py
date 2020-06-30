@@ -624,12 +624,12 @@ class AnimalManagement:
             'tai_method_c': None if not is_cow else animal.tai_method_c,
             'resynch_method': None if not is_cow else animal.resynch_method,
             'semen_used': animal.semen_used,
-            'pen_history': animal.pen_history,
+            'pen_history': [pen_hist.__dict__ for pen_hist in animal.pen_history],
             'bodyweight_history': 0, # animal.body_weight_lst,  # todo create this
             'milk_production_history':
                 None if not is_cow else
                 animal.estimated_daily_milk_produced_lst,
-            'event_history': animal.events
+            'event_history': animal.events.events
         }
 
     def get_life_cycle_output(self, num_animals):

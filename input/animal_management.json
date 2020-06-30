@@ -105,7 +105,8 @@
             {
               "produce_csv": true,
               "produce_graphics": false,
-              "report_name": "individual_animal_report"
+              "report_name": "individual_animal_report",
+              "num_animals": 3
             },
             "herd_report":
             {
