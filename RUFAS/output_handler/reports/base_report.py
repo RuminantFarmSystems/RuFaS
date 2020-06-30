@@ -136,5 +136,5 @@ class BaseReport:
         graphics.annual_graphics(self)
         graphics.daily_graphics(self)
 
-    def finalize(self):
+    def finalize(self, state, weather, time):
         pass

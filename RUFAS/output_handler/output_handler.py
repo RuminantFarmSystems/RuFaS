@@ -145,7 +145,7 @@ class OutputHandler:
             report = self.reports[report_name]
             report.produce_report_graphics()
 
-    def finalize(self):
+    def finalize(self, state, weather, time):
         for report_name in self.reports:
             report = self.reports[report_name]
-            report.finalize()
+            report.finalize(state, weather, time)
