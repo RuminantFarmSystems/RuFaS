@@ -332,8 +332,9 @@ class Cow(HeiferIII):
 				self.days_in_milk, self.mPrt,
 				self.estimated_daily_milk_produced, p_feces_excrt, p_urine)
 		else:
-			self.p_excrt, self.manure_excretion = \
-				dry_manure_calculations(p_feces_excrt, p_urine)
+			self.p_excrt, self.manure_excretion = dry_manure_calculations(
+                self.ration_formulation, feed, self.body_weight, 
+                self.estimated_daily_milk_produced, p_feces_excrt, p_urine)
 
 	def phosphorus_rqmts(self, DMI):
 		"""
