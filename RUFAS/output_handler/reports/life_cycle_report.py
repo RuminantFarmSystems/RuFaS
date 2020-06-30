@@ -23,7 +23,7 @@ class LifeCycleReport(BaseReportDriver):
             self.annual_variables = {'year': ['time.cal_year', '', []]
                                      }
 
-        def finalize(self):
+        def finalize(self, state, weather, time):
             print('individual done')
 
     class HerdReport(BaseReport):
@@ -35,5 +35,5 @@ class LifeCycleReport(BaseReportDriver):
             self.annual_variables = {'year': ['time.cal_year', '', []]
                                      }
 
-        def finalize(self):
+        def finalize(self, state, weather, time):
             print('herd done')
