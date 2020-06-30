@@ -363,9 +363,11 @@ class AnimalManagement:
     def pen_allocation(self):
         """
         Allocates the animals in all_animals to pens in all_pens based on the animals' characteristics.
+        All animals except lactating cows are grouped into pens first (and therefore the first pens
+        in the input json). The lactating cows are then grouped in the last pens leftover and are
+        grouped up to a stocking density of no more than 120%
         """
-
-        # assigning non-cows to pens
+        #Assiging non-cows to pens
         if len(self.all_pens) == 3:
             self.all_pens[0].update_animals(self.calves)
         elif len(self.all_pens) == 4:
@@ -403,44 +405,36 @@ class AnimalManagement:
             self.all_pens[len(self.all_pens) - 1].update_animals(lactating_cows)
         else:
             self.all_pens[4].update_animals(dry_cows)
-
-            # TODO: Temporary process to randomly assign nutrition requirments
+        #Pen Allocation for Lactating Cows
             if len(lactating_cows) > 0:
                 for i in range(len(lactating_cows)):
-                    lactating_cows[i].ID = i + 1
+                    #Temporary process below to randomly assign nutrition requirments
                     lactating_cows[i].DMPD_req = 90 + random.random() * 34
                     lactating_cows[i].DNED_req = 1.4 + random.random() * 0.3
-                pen_grouping = grouping(lactating_cows, self.all_pens[5:])
+                total_stalls = 0
+                for pen in self.all_pens[5:]:
+                    total_stalls += pen.num_stalls
+                #Grouping for Lactating Cows if there are more stalls than animals
+                if len(lactating_cows) <= total_stalls:
+                    pen_grouping = grouping(lactating_cows, self.all_pens[5:], 1)
+                #Grouping for Lactating Cows if the stocking density would be <= 120%
+                elif len(lactating_cows) <= total_stalls * 1.2:
+                    stocking_density = len(lactating_cows) / total_stalls
+                    pen_grouping = grouping(lactating_cows, self.all_pens[5:], stocking_density)
+                #Grouping if the stocking denisty would be > 120% (extra pen created)
+                else:
+                    extra_stalls = len(lactating_cows) - total_stalls + 100
+                    print('Warning: Stocking Density for Lactating Cows is above 120%: Initializing an extra pen with ' +
+                    str(extra_stalls) + ' stalls')
+                    new_pen = Pen(len(self.all_pens), 0.1, 1.6, extra_stalls, 'open air barn', 'straw', 'tiestall')
+                    self.all_pens.append(new_pen)
+                    pen_grouping = grouping(lactating_cows, self.all_pens[5:], 1)
 
-                # assigning lactating cows to pens based on the grouping output
+            #Assigning Lactating Cows to Pens based on the grouping output
                 for key in pen_grouping:
                     self.all_pens[key].update_animals(pen_grouping[key])
 
         self.fully_update_id_pen()
-
-    def pen_optimization(self):
-        animal_count = len(self.heiferIs) + len(self.heiferIIs) + len(self.heiferIIIs) + len(self.cows)
-        stall_count = 0
-        for pen in self.all_pens:
-            stall_count += pen.num_stalls
-        if animal_count > stall_count:
-            print('Warning: Insufficient number of stalls for animals on the farm')
-        else:
-            dry_cows = []
-            lactating_cows = []
-            for cow in self.cows:
-                if cow.milking:
-                    lactating_cows.append(cow)
-                else:
-                    dry_cows.append(cow)
-            if len(self.all_pens) >= 7:
-                dict = {'calves': null, 'heiferIs': null, 'heiferIIs': null, 'heiferIIIs': null, 'dry_cows': null}
-                pens = self.all_pens
-                for pen in pens:
-                    n = 0
-
-
-
 
     def clear_pens(self):
         """
@@ -588,7 +582,6 @@ class AnimalManagement:
             if self.end_ration_interval():
                 self.calc_nutrient_rqmts(feed)  # per animal
                 self.clear_pens()
-                self.pen_optimization()
                 self.pen_allocation()
                 self.calc_avg_nutrient_rqmts()  # per pen
                 self.calc_ration(feed)  # per pen

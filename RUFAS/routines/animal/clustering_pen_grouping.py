@@ -16,7 +16,10 @@ from scipy.stats import percentileofscore
 def norm(x):
     """
         Description:
-            Helper function to normalize a list of values and return that normalized list
+            Helper function to normalize a list of values and returnthat normalized list
+
+        Args:
+            x: A list of values
     """
     x = np.array(x)
     if max(x) != min(x):
@@ -39,7 +42,7 @@ def percentile_list(l):
     return perc_list
 
 
-def grouping(cow_list, pens):
+def grouping(cow_list, pens, stocking_density):
     """
         Description:
             Grouping algorithm that utilizes k-means clustering and takes an input
@@ -51,6 +54,7 @@ def grouping(cow_list, pens):
         Args:
             cow_list: a list of lactating cows
             pens: the number of pens allocated for lactating cows
+            stocking_density: The required stocking density to group all cows
     """
 
     # Initial Data Manipulation
@@ -110,7 +114,8 @@ def grouping(cow_list, pens):
 
     # Create a list of percentile partitions for grouping
     for pen in pens:
-        index[pen.id] = (pen.num_stalls / num_cows) + index[(pen.id - 1)]
+        #filling pens based on input stocking density
+        index[pen.id] = (round(pen.num_stalls*stocking_density +0.5) / num_cows) + index[(pen.id - 1)]
         if index[pen.id] > 1:
             index[pen.id] = 1
 
