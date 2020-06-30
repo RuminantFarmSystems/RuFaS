@@ -625,7 +625,7 @@ class AnimalManagement:
             'resynch_method': None if not is_cow else animal.resynch_method,
             'semen_used': animal.semen_used,
             'pen_history': [pen_hist.__dict__ for pen_hist in animal.pen_history],
-            'bodyweight_history': 0, # animal.body_weight_lst,  # todo create this
+            'bodyweight_history': animal.body_weight_lst,  # todo create this
             'milk_production_history':
                 None if not is_cow else
                 animal.estimated_daily_milk_produced_lst,

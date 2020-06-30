@@ -106,7 +106,6 @@ class Cow(HeiferIII):
 
 		# figures
 		self.estimated_daily_milk_produced_lst = []
-		self.body_weight_lst = []
 
 	def init_from_cow(self, cow):
 		"""
@@ -199,7 +198,6 @@ class Cow(HeiferIII):
 			self.estimated_daily_milk_produced = 0
 			self.estimated_daily_milk_produced_lst.append(
 				self.estimated_daily_milk_produced)
-			self.body_weight_lst.append(self.body_weight)
 			return 0, 0, 0
 
 		breed_index = 0
@@ -269,7 +267,6 @@ class Cow(HeiferIII):
 
 		self.estimated_daily_milk_produced_lst.append(
 			self.estimated_daily_milk_produced)
-		self.body_weight_lst.append(self.body_weight)
 
 		return estimated_daily_milk_produced, fat_percent, \
 			daily_fat_correct_milk_production
@@ -422,6 +419,7 @@ class Cow(HeiferIII):
 			cull_stage: True if a cow is culled, false if it stays in the herd
 			new_born: True if a calf is born
 		"""
+		self.body_weight_lst.append(self.body_weight)
 		if self.culled:
 			return None
 

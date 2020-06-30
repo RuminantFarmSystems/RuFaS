@@ -172,6 +172,7 @@ class HeiferII(HeiferI):
 			cull_stage: culling for reproduction failure
 			third_stage: move to next stage -- heiferIII stage when time comes
 		"""
+		self.body_weight_lst.append(self.body_weight)
 		cull_stage = False
 		third_stage = False
 

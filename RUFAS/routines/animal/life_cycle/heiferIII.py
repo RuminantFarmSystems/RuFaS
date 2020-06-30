@@ -70,6 +70,7 @@ class HeiferIII(HeiferII):
 
         Returns: cow_stage - heifer close to calving, move to cow stage
         """
+        self.body_weight_lst.append(self.body_weight)
         cow_stage = False
         self.days_born += 1
 

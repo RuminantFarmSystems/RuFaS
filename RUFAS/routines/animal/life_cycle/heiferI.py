@@ -97,6 +97,7 @@ class HeiferI(Calf):
 
 		Returns: the second stage of heifer -- breeding stage starts
 		"""
+		self.body_weight_lst.append(self.body_weight)
 		second_stage = False
 		
 		prev_weight = self.body_weight

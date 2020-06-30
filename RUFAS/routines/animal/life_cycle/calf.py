@@ -148,6 +148,8 @@ class Calf(AnimalBase):
 
 		Returns: time when calf is weaned -- stop be fed with milk
 		"""
+		self.body_weight_lst.append(self.body_weight)
+
 		wean_day = False
 		
 		prev_weight = self.body_weight
