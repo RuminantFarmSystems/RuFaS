@@ -127,7 +127,7 @@ class LifeCycleManager:
         heiferIIs = self.animal_initializer.get_heiferIIs(heiferII_num)
         heiferIIIs = self.animal_initializer.get_heiferIIIs(heiferIII_num)
         cows = self.animal_initializer.get_cows(cow_num)
-        self.replacement_market = self.animal_initializer.get_heiferIIIs(replace_num)
+        self.replacement_market = self.animal_initializer.get_replacement_heiferIIIs(replace_num)
         return calves, heiferIs, heiferIIs, heiferIIIs, cows
 
     def daily_update(self, date, sim_length, calves, heiferIs, heiferIIs,
