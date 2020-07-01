@@ -79,6 +79,13 @@ class AnimalInitalization:
             conn.commit()
             conn.close()
             self.init_animals()
+        else:
+            conn = sqlite3.connect('Inputs/animals.sqlite')
+            cur = conn.cursor()
+            cur.execute('SELECT * FROM cows ORDER BY rowid DESC LIMIT 1')
+            row = cur.fetchone()
+            self.animal_id = int(row[AnimalValues.id])
+            conn.close()
         
         
 
