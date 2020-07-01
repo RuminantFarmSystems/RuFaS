@@ -2,7 +2,7 @@
 RUFAS: Ruminant Farm Systems Model
 File name: graphics_1.py
 
-Description: Produces graphical representations of RuFaS output_handler data.
+Description: Produces graphical representations of RuFaS output data.
 
 Author(s): Jacob Johnson, jacob8399@gmail.com
            William Donovan, wmdonovan@wisc.edu
@@ -99,7 +99,7 @@ def annual_mass_balance_graphics(report):
         cell_colors = [['#ffffff' for _ in range(len(table_dict['year']) + 1)] for _ in range(variables_size)]
         cell_colors[1][0] = '#8B0000'
 
-        colors = ['#ffffff', '#DC267F', '#648FFF', '#FFB000', '#FE6100', '#785EF0']
+        colors = ['#ffffff', '#785EF0', '#FE6100', '#FFB000', '#648FFF', '#DC267F']
 
         mp.scatter(table_dict['year'], table_dict['actual'], c='#8B0000', marker='x', zorder=2)
         for variable in variables:

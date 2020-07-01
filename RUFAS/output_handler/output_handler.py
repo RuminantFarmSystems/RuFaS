@@ -1,6 +1,6 @@
 """
 RUFAS: Ruminant Farm Systems Model
-File name: output_handler.py
+File name: output.py
 Description: Contains the definition of the OutputHandler object
 Author(s): William Donovan, wmdonovan@wisc.edu
            Jacob Johnson, jacob8399@gmail.com
@@ -13,15 +13,15 @@ from .reports import *
 
 
 class OutputHandler:
-    """Handles all output_handler related interactions.
+    """Handles all output related interactions.
 
-    Contains a list of all the report handlers, which handles all output_handler-related
+    Contains a list of all the report handlers, which handles all output-related
     functionality. This object is the (only) bridge between the simulation
-    engine and the output_handler routines.
+    engine and the output routines.
 
     Output values are updated at the end of each day, and the each report is
     printed at the end of each year, using the values (that are written daily)
-    for the year period and also any yearly output_handler values. After each the report
+    for the year period and also any yearly output values. After each the report
     for the year is printed, every single report handler object is flushed,
     leaving absolutely nothing. The report handler begins accumulating
     information again for the next year.
@@ -54,13 +54,13 @@ class OutputHandler:
     def initialize_csv_dir(self, csv_dir):
         """
         If a directory of the same name exists, it and its contents are deleted,
-        then a directory for each output_handler report is created.
-        Sets output_handler file path for all reports through the class attribute of the
+        then a directory for each output report is created.
+        Sets output file path for all reports through the class attribute of the
         BaseReportHandler class.
 
         Args:
             csv_dir (Path): The path to the directory that will store all
-                output_handler report files.
+                output report files.
         """
 
         # Initialize path for reports
@@ -116,7 +116,7 @@ class OutputHandler:
                 report.daily_update(state, weather, time)
 
     def annual_updates(self, state, weather, time):
-        """Updates the report handler with annual output_handler values."""
+        """Updates the report handler with annual output values."""
 
         for report_name in self.reports:
             report = self.reports[report_name]
@@ -132,7 +132,7 @@ class OutputHandler:
                 report.write_annual_report()
 
     def annual_flushes(self):
-        """Sets all of the reports in the output_handler object to the default."""
+        """Sets all of the reports in the output object to the default."""
 
         for report_name in self.reports:
             report = self.reports[report_name]

@@ -11,8 +11,7 @@ import json
 import time as timer
 from pathlib import Path
 
-from RUFAS import routines, errors
-from RUFAS.classes import Config, State, Weather, Time
+from RUFAS import classes, util, routines, errors
 from RUFAS.output_handler import OutputHandler
 from RUFAS.test import test_handler
 
@@ -45,8 +44,8 @@ def simulate(input_fPath: Path):
         return
 
     #
-    # Creates a new directory for the output_handler files (if doesn't already exist)
-    # Deletes existing output_handler files of the same name from previous simulation
+    # Creates a new directory for the output files (if doesn't already exist)
+    # Deletes existing output files of the same name from previous simulation
     # Transfer needed (initial) data from state to report handlers
     #
 
@@ -92,7 +91,7 @@ def daily_simulation():
 
     # print("simulating: " + time.to_str()) # Print out current day of simulation
     time.advance()
-    # have to increment simulation_day here so that the daily output_handler has the correct simulation day
+    # have to increment simulation_day here so that the daily output has the correct simulation day
     state.animal_management.simulation_day += 1
 
 
@@ -102,8 +101,8 @@ def daily_simulation():
 def annual_simulation():
     """Executes the annual simulation routines.
 
-    Writes the annual report to the output_handler files
-    Flushes the data in the output_handler object
+    Writes the annual report to the output files
+    Flushes the data in the output object
     Resets the state for the following year
     """
 
@@ -155,15 +154,17 @@ def read_json_file(fPath: Path):
 
         # Instantiate objects using dictionary data from .json file
         try:
-            config = Config(data['config'], data['weather'])
+            config = classes.Config(data['config'], data['weather'])
 
             if config.run_tests:
                 test_handler.run_tests()
-            weather = Weather(data['weather'], config.years, config.w_start_year,
-                              config.w_start_day, config.start_year, config.start_day)
-            time = Time(config.years, config.start_year)
-            state = State(data['farm'], config, time)
-            output = OutputHandler(data['output_handler'], state)
+
+            weather = classes.Weather(data['weather'], config.years, config.w_start_year,
+                                      config.w_start_day, config.start_year, config.start_day)
+            time = classes.Time(config.years, config.start_year)
+            state = classes.State(data['farm'], config, time)
+            output = OutputHandler(classes.read_json_file(util.get_base_dir() / 'input/output' / data['output']), state)
+
         except errors.JSONfileData as e:
             print("JSON FILE ERROR: " +
                   "{} \n\t{} Section\n{}\n".format(fPath.name, e.section, e.msg))

@@ -48,7 +48,8 @@ def input_prompt():
     while True:
 
         try:
-            user_input = input("\nEnter RUFAS Input: ")
+            user_input = 'input/' + input("\nEnter RUFAS Input: ")
+
             #
             # Handle user exiting program
             #

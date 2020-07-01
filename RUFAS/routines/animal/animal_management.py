@@ -400,7 +400,7 @@ class AnimalManagement:
                     lactating_cows[i].DMPD_req = 90 + random.random() * 34
                     lactating_cows[i].DNED_req = 1.4 + random.random() * 0.3
                 pen_grouping = grouping(lactating_cows, self.all_pens[5:])
-                # Assigning Lactating Cows to Pens based on the grouping output_handler
+            #Assigning Lactating Cows to Pens based on the grouping output
                 for key in pen_grouping:
                     self.all_pens[key].update_animals(pen_grouping[key])
 

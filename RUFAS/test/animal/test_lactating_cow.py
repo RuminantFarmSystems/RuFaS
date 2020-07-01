@@ -23,7 +23,7 @@ class LactatingCowTest(unittest.TestCase):
         Sets up the list of various feeds that will be used for the unit tests.
         """
         feed_info_0 = {
-            "feed_database": "input/feeds.sqlite",
+            "feed_database": "input/databases/feeds.sqlite",
             "table_name": "feed_library",
 
             "managed_feeds":
