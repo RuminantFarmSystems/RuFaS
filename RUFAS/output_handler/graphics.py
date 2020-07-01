@@ -2,7 +2,7 @@
 RUFAS: Ruminant Farm Systems Model
 File name: graphics_1.py
 
-Description: Produces graphical representations of RuFaS output_handler data.
+Description: Produces graphical representations of RuFaS output data.
 
 Author(s): Jacob Johnson, jacob8399@gmail.com
            William Donovan, wmdonovan@wisc.edu

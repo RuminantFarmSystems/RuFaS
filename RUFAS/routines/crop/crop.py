@@ -62,7 +62,7 @@ def daily_crop_routine(crop, weather, time, soil):
     if crop_type.crop_name != 'null':
 
         # yield is reset to 0 at the beginning of the next day so it can be
-        # accessed by the output_handler handler.
+        # accessed by the output handler.
         crop_type.yield_actual = 0
         crop_type.yield_N = 0
         crop_type.yield_P = 0
