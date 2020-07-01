@@ -166,11 +166,19 @@ class AnimalBase(object):
 		"""
 		return self.culled
 
-	def get_last_pen(self):
-		return self.pen_history[-1].pen if len(self.pen_history) > 0 else None
-
 	def update_pen_history(self, curr_pen, curr_day, classes_in_pen):
-		last_pen = self.get_last_pen()
+		"""
+		Updates the animal's pen history by either appending to the existing
+		history if the animal is in a different pen than it was the last time
+		this method is called or modifying the last element in the pen_history
+		list to reflect the current simulation day.
+
+		Args:
+			curr_pen: the pen that the animal is currently in
+			curr_day: the current simulation day
+			classes_in_pen: the classes in the animal's current pen
+		"""
+		last_pen = self.pen_history[-1].pen if len(self.pen_history) > 0 else None
 		if last_pen is None or last_pen != curr_pen:
 			self.pen_history.append(PenHistory(curr_day, curr_day, curr_pen,
 											   list(classes_in_pen)))
