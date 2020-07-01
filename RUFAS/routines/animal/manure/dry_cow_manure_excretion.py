@@ -45,11 +45,7 @@ def manure_calculations(ration_formulation, feed, BW, milk_prod, p_feces_excrt,
     Further calculations to account for entire diet:
     DMI: dry matter intake, kg
     DM: dietary dry matter, % of diet
-    ADF: dietary ADF, % of DM
     CP: dietary crude protein, % of DM
-    LIG: dietary lignin, % of DM
-    Ash: dietary Ash, % of DM
-    NDF: dietary NDF, % of DM
     """
     DMI = 0
     total_diet = 0  # in kg
@@ -87,8 +83,8 @@ def manure_calculations(ration_formulation, feed, BW, milk_prod, p_feces_excrt,
         phosphorus_excreted(milk_prod, Mkg, p_feces_excrt, p_urine)
     
     return p_excrt, \
-           {"U": 0.340,      #TODO: Implement with correct equation
-            "TAN_s": 0.14,   #TODO: Implement with correct equation
+           {"U": 0.340, #TODO: Implement with correct equation
+            "TAN_s": 0.14, #TODO: Implement with correct equation
             "MN": MN,
             "Mkg": Mkg,
             "VSd": 7087.413, #TODO: Implement with correct equation
