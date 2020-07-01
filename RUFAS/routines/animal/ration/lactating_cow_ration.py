@@ -37,10 +37,12 @@ def calculate_requirements(BW, MW, DOP, housing, distance, parity, CI, TP_Milk, 
 
     '''
 
-    # ENERGY REQUIREMENTS (divided into the following 5 components: maintenance,
-    # activity, growth, pregnancy, and lactation requirements):
+    # A: ENERGY REQUIREMENTS:
+    # (divided into the following 5 components: maintenance,
+    # activity, growth, pregnancy, and lactation requirements)
+    #--------------------------------------------
     # Maintenance requirements
-    # ------------------------
+    # ---------------------
     #Calf birth weight (kg)
     CBW = MW * 0.06275  #[A.Cow.A.1]
     #Conceptus weight (kg)
@@ -103,12 +105,45 @@ def calculate_requirements(BW, MW, DOP, housing, distance, parity, CI, TP_Milk, 
     #Net energy requirement for lactation (Mcal)
     NELact = Milken * Milk      #[A.Cow.A.18]
 
-    #DMI ESTIMATION:
-    #Dry matter intake estimation is different for lactating cow and dry cow.
+    # C: MINERAL REQUIREMENTS
+    #Calcium and Phosphorus are the only requirements tracked currently
+    #--------------------------------------------
+    #Calcium Requirements
+    #----------------------
+    #Calcium maintenance requirement (g)
+    Ca_maint = 0.031 * BW + 0.08 * (BW/100)     #[A.Cow.C.1]
+    #Calcium growth requirement (g)
+    Ca_growth = 9.83 * MW**0.22 * BW**(-0.22) * (ADG/0.96)     #[A.Cow.C.2]
+    #Calcium pregnancy requirement (g)
+    if DOP > 190:       #[A.Cow.C.3]
+        Ca_preg = 0.02456 * exp((0.05581-0.00007*DOP)*DOP) - 0.02456 * exp((0.05581-0.00007*(DOP-1)) * (DOP -1))
+    else:
+        Ca_preg = 0
+    #Calcium lactation requirement (g)
+    Ca_lact = 1.22 * Milk       #[A.Cow.C.4]
+    #Total calcium requirement (g)
+    Ca_req = Ca_maint + Ca_growth + Ca_preg + Ca_lact       #[A.Cow.C.5]
+    #Phosphorus Requirements
+    #----------------------
+    #Phosphorus maintenance requirement (g)
+    P_maint = 1*DMI + 0.002*BW      #[A.Cow.C.6]
+    #Phosphorus growth requirement (g)
+    P_growth = (1.2+4.635 * MW**0.22 * BW**(-0.22)) * (ADG/0.96)        #[A.Cow.C.7]
+    #Phosphorus pregnancy requirement (g)
+    if DOP > 190:       #[A.Cow.C.8]
+        P_preg = 0.02743 * exp((0.05527-0.000075*DOP)*DOP) - 0.02743 * exp((0.05527-0.000075*(DOP-1)) * (DOP -1))
+    else:
+        P_preg = 0
+    #Phosphorus lactation requirement (g)
+    P_lact = 0.9 * Milk         #A.Cow.C.9]
+    #Total phosphorus requirement (g)
+    P_req = P_maint + P_growth + P_preg + P_lact        #[A.Cow.C.10]
+    
+    # D: DMI ESTIMATION:
     #The sum of dry matter intake of each feed is assumed to be less than
     #dry matter intake estimation (Sum of Feed < DMIest).
-
+    #--------------------------------------------
     #Fat corrected milk (kg)
     FCM = (0.4 * Milk) + (15 * Fat_Milk * (Milk/100))   #[A.Cow.D.1]
     #Dry matter intake estimation (kg)
-    DMIest = (0.372 * FCM + 0.0968 * BW**0.75) * (1- exp(-0.192 *((DIM/7) + 3.67)))
+    DMIest = (0.372 * FCM + 0.0968 * BW**0.75) * (1- exp(-0.192 *((DIM/7) + 3.67))) #[A.Cow.D.2]
