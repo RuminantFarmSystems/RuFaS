@@ -76,7 +76,7 @@ def manure_calculations(ration_formulation, feed, BW, milk_prod, p_feces_excrt,
     # Amount of manure, kg [A.3D.A.1]
     Mkg = 0.022 * BW + 21.844
     
-    # Amount of nitrogen , kg [A.3D.B.1]
+    # Nitrogen in liquid and solid manure , g [A.3D.B.1]
     MN = 12.747 * DMI + 1606.290 * CP/100 - 117.5 
     
     p_excrt, WIP_frac, WOP_frac, p_excrt_manure, p_frac = \
