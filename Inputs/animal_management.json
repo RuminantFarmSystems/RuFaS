@@ -4,7 +4,7 @@
     "config":
     {
          "start_date" : "2009:244",
-        "end_date" : "2011:243",
+        "end_date" : "2016:243",
         "output_dir": "Outputs/Sample_Farm_Outputs/",
         "diagnostic_dir": "Outputs/diagnostics/",
         "run_tests": true
@@ -22,7 +22,7 @@
             "ration_report":
             {
                 "produce_csv": true,
-                "produce_graphics": false,
+                "produce_graphics": true,
                 "display_graphics": false,
                 "report_name": "Ration Report",
                 "file_name": "ration_report.csv",
@@ -31,14 +31,14 @@
             "manure_report":
             {
         	    "produce_csv": true,
-                "produce_graphics": false,
+                "produce_graphics": true,
                 "display_graphics": false,
         	    "report_name": "Manure Report",
         	    "file_name": "manure_report.csv"
             },
             "growth_report": {
                 "produce_csv": true,
-                "produce_graphics": false,
+                "produce_graphics": true,
                 "display_graphics": false,
                 "report_name": "Growth Report",
                 "file_name": "growth_report.csv"
@@ -47,7 +47,7 @@
         "soil_summary":
         {
             "produce_csv": true,
-            "produce_graphics": false,
+            "produce_graphics": true,
             "display_graphics": false,
             "report_name": "Soil Summary",
             "file_name": "soil_summary.csv"
@@ -55,7 +55,7 @@
         "soil_nitrogen":
         {
             "produce_csv": true,
-            "produce_graphics": false,
+            "produce_graphics": true,
             "display_graphics": false,
             "report_name": "Soil Nitrogen",
             "file_name": "soil_nitrogen.csv"
@@ -63,7 +63,7 @@
         "soil_phosphorus":
         {
             "produce_csv": true,
-            "produce_graphics": false,
+            "produce_graphics": true,
             "display_graphics": false,
             "report_name": "Soil Phosphorus",
             "file_name": "soil_phosphorus.csv"
@@ -71,7 +71,7 @@
         "crop_summary":
         {
             "produce_csv": true,
-            "produce_graphics": false,
+            "produce_graphics": true,
             "display_graphics": false,
             "report_name": "Crop Summary",
             "file_name": "crop_summary.csv"
@@ -87,7 +87,7 @@
         "feed_storage":
         {
             "produce_csv": true,
-            "produce_graphics": false,
+            "produce_graphics": true,
             "display_graphics": false,
             "report_name": "Feed Storage",
             "file_name": "feed_storage.csv"
@@ -214,32 +214,38 @@
         },
         "field_management":
         {
+            "management_scheme": "optimal",
             "fertilizer":
             {
+                "app_years": [],
+                "repeat": 0,
+
                 "year": [0],
                 "day": [0],
                 "mass": [0.0],
                 "depth": [0.0],
                 "surf_perc": [0.0]
             },
+
             "manure":
             {
-                "type": ["DAIRY", "DAIRY", "DAIRY", "DAIRY", "DAIRY", "DAIRY", "DAIRY", "DAIRY"],
-                "year": [2012, 2012, 2012, 2012, 2013, 2013, 2013, 2013],
-                "day": [103 ,176, 226, 283, 46, 155, 241, 273],
-                "mass": [1320.0, 2120.0, 1329.0, 2228.0, 1250.0, 1587.0, 1750.0, 1555.0],
-                "P_frac": [0.00820, 0.00866, 0.00941, 0.00656, 0.00748, 0.00698, 0.00721, 0.00646],
-                "WIP_frac": [0.6, 0.6, 0.6, 0.6, 0.6, 0.6, 0.6, 0.6],
-                "WOP_frac": [0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05],
-                "N_frac": [0, 0, 0, 0, 0, 0, 0, 0],
-                "NH4_frac": [0, 0, 0, 0, 0, 0, 0, 0],
-                "dry_matter": [0.04, 0.07, 0.04, 0.04, 0.05, 0.05, 0.07, 0.06],
-                "percent_cover": [0.95, 0.95, 0.95, 0.95, 0.95, 0.95, 0.95, 1.0],
-                "depth": [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0],
-                "surf_perc": [1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0]
+                "app_years": [],
+                "repeat": 0,
+
+                "year": [2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019],
+                "day": [-1, -1, -1, -1, -1, -1, -1, -1, -1, -1],
+                "N_mass": [532.8, 658.8, 432, 540, 446.4, 421.2, 532.8, 658.8, 432, 540],
+                "P_mass": [239.2, 322.4, 187.2, 348.4, 286, 244.4, 239.2, 322.4, 187.2, 348.4, 286],
+                "percent_cover": [0.95, 0.95, 0.95, 0.95, 0.95, 0.95, 0.95, 0.95, 0.95, 0.95],
+                "depth": [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0],
+                "surf_perc": [1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0]
             },
+
             "tillage":
             {
+                "app_years": [],
+                "repeat": 0,
+
                 "year": [0],
                 "day": [0],
                 "perc_incorporated": [0.0],
@@ -350,144 +356,116 @@
                 "formulation_interval": 7
             },
 
-	        "pen_information":
-	        {
-	        "pen_information":
-	        {
-	        	"pen0":
-	        	{
-	        		"id": 0,
-	        		"vertical_dist_to_milking_parlor": 0.1,
-	        		"horizontal_dist_to_milking_parlor": 1.6,
-	        		"number_of_stalls": 100,
-	        		"housing_type": "open air barn",
-	        		"bedding_type": "sand",
-	        		"pen_type": "freestall",
-
-			        "manure_handling": "manual_scraping",
+	        "pen_information": {
+                "pen0": {
+                    "id": 0,
+                    "vertical_dist_to_milking_parlor": 0.1,
+                    "horizontal_dist_to_milking_parlor": 1.6,
+                    "number_of_stalls": 100,
+                    "housing_type": "open air barn",
+                    "bedding_type": "sand",
+                    "pen_type": "freestall",
+                    "manure_handling": "manual_scraping",
                     "manure_separator": "sedimentation",
-			        "manure_storage": "storage_pit"
-	        	},
-
-	        	"pen1":
-	        	{
-	        		"id": 1,
-	        		"vertical_dist_to_milking_parlor": 0.1,
-	        		"horizontal_dist_to_milking_parlor": 1.6,
-	        		"number_of_stalls": 200,
-	        		"housing_type": "open air barn",
-	        		"bedding_type": "sawdust",
-	        		"pen_type": "freestall",
-
-			        "manure_handling": "manual_scraping",
+                    "manure_storage": "storage_pit"
+                },
+                "pen1": {
+                    "id": 1,
+                    "vertical_dist_to_milking_parlor": 0.1,
+                    "horizontal_dist_to_milking_parlor": 1.6,
+                    "number_of_stalls": 200,
+                    "housing_type": "open air barn",
+                    "bedding_type": "sawdust",
+                    "pen_type": "freestall",
+                    "manure_handling": "manual_scraping",
                     "manure_separator": "sedimentation",
-			        "manure_storage": "storage_pit"
-	        	},
-
-	        	"pen2":
-	        	{
-	        		"id": 2,
-	        		"vertical_dist_to_milking_parlor": 0.1,
-	        		"horizontal_dist_to_milking_parlor": 1.6,
-	        		"number_of_stalls": 300,
-	        		"housing_type": "open air barn",
-	        		"bedding_type": "straw",
-	        		"pen_type": "tiestall",
-
-			        "manure_handling": "manual_scraping",
+                    "manure_storage": "storage_pit"
+                },
+                "pen2": {
+                    "id": 2,
+                    "vertical_dist_to_milking_parlor": 0.1,
+                    "horizontal_dist_to_milking_parlor": 1.6,
+                    "number_of_stalls": 300,
+                    "housing_type": "open air barn",
+                    "bedding_type": "straw",
+                    "pen_type": "tiestall",
+                    "manure_handling": "manual_scraping",
                     "manure_separator": "sedimentation",
-			        "manure_storage": "storage_pit"
-	        	},
-
-	        	"pen3":
-	        	{
-	        		"id": 3,
-	        		"vertical_dist_to_milking_parlor": 0.1,
-	        		"horizontal_dist_to_milking_parlor": 1.6,
-	        		"number_of_stalls": 400,
-	        		"housing_type": "open air barn",
-	        		"bedding_type": "sand",
-	        		"pen_type": "tiestall",
-
-			        "manure_handling": "manual_scraping",
+                    "manure_storage": "storage_pit"
+                },
+                "pen3": {
+                    "id": 3,
+                    "vertical_dist_to_milking_parlor": 0.1,
+                    "horizontal_dist_to_milking_parlor": 1.6,
+                    "number_of_stalls": 400,
+                    "housing_type": "open air barn",
+                    "bedding_type": "sand",
+                    "pen_type": "tiestall",
+                    "manure_handling": "manual_scraping",
                     "manure_separator": "sedimentation",
-			        "manure_storage": "storage_pit"
-	        	},
-
-	        	"pen4":
-	        	{
-	        		"id": 4,
-	        		"vertical_dist_to_milking_parlor": 0.1,
-	        		"horizontal_dist_to_milking_parlor": 1.6,
-	        		"number_of_stalls": 400,
-	        		"housing_type": "open air barn",
-	        		"bedding_type": "sand",
-	        		"pen_type": "tiestall",
-
-			        "manure_handling": "manual_scraping",
+                    "manure_storage": "storage_pit"
+                },
+                "pen4": {
+                    "id": 4,
+                    "vertical_dist_to_milking_parlor": 0.1,
+                    "horizontal_dist_to_milking_parlor": 1.6,
+                    "number_of_stalls": 400,
+                    "housing_type": "open air barn",
+                    "bedding_type": "sand",
+                    "pen_type": "tiestall",
+                    "manure_handling": "manual_scraping",
                     "manure_separator": "sedimentation",
-			        "manure_storage": "storage_pit"
-	        	},
-
-	        	"pen5":
-	        	{
-	        		"id": 5,
-	        		"vertical_dist_to_milking_parlor": 0.1,
-	        		"horizontal_dist_to_milking_parlor": 1.6,
-	        		"number_of_stalls": 400,
-	        		"housing_type": "open air barn",
-	        		"bedding_type": "sand",
-	        		"pen_type": "tiestall",
-
-			        "manure_handling": "manual_scraping",
+                    "manure_storage": "storage_pit"
+                },
+                "pen5": {
+                    "id": 5,
+                    "vertical_dist_to_milking_parlor": 0.1,
+                    "horizontal_dist_to_milking_parlor": 1.6,
+                    "number_of_stalls": 400,
+                    "housing_type": "open air barn",
+                    "bedding_type": "sand",
+                    "pen_type": "tiestall",
+                    "manure_handling": "manual_scraping",
                     "manure_separator": "sedimentation",
-			        "manure_storage": "storage_pit"
-	        	}
-	        },
-            "pen6":
-	        	{
-	        		"id": 6,
-	        		"vertical_dist_to_milking_parlor": 0.1,
-	        		"horizontal_dist_to_milking_parlor": 1.6,
-	        		"number_of_stalls": 300,
-	        		"housing_type": "open air barn",
-	        		"bedding_type": "sand",
-	        		"pen_type": "tiestall",
-
-			        "manure_handling": "manual_scraping",
+                    "manure_storage": "storage_pit"
+                },
+                "pen6": {
+                    "id": 6,
+                    "vertical_dist_to_milking_parlor": 0.1,
+                    "horizontal_dist_to_milking_parlor": 1.6,
+                    "number_of_stalls": 300,
+                    "housing_type": "open air barn",
+                    "bedding_type": "sand",
+                    "pen_type": "tiestall",
+                    "manure_handling": "manual_scraping",
                     "manure_separator": "sedimentation",
-			        "manure_storage": "storage_pit"
-	        	},
-            "pen7":
-	        	{
-	        		"id": 7,
-	        		"vertical_dist_to_milking_parlor": 0.2,
-	        		"horizontal_dist_to_milking_parlor": 1.6,
-	        		"number_of_stalls": 250,
-	        		"housing_type": "open air barn",
-	        		"bedding_type": "sand",
-	        		"pen_type": "tiestall",
-
-			        "manure_handling": "manual_scraping",
+                    "manure_storage": "storage_pit"
+                },
+                "pen7": {
+                    "id": 7,
+                    "vertical_dist_to_milking_parlor": 0.2,
+                    "horizontal_dist_to_milking_parlor": 1.6,
+                    "number_of_stalls": 250,
+                    "housing_type": "open air barn",
+                    "bedding_type": "sand",
+                    "pen_type": "tiestall",
+                    "manure_handling": "manual_scraping",
                     "manure_separator": "sedimentation",
-			        "manure_storage": "storage_pit"
-	        	},
-            "pen8":
-	        	{
-	        		"id": 8,
-	        		"vertical_dist_to_milking_parlor": 0.2,
-	        		"horizontal_dist_to_milking_parlor": 1.6,
-	        		"number_of_stalls": 400,
-	        		"housing_type": "open air barn",
-	        		"bedding_type": "sand",
-	        		"pen_type": "tiestall",
-
-			        "manure_handling": "manual_scraping",
+                    "manure_storage": "storage_pit"
+                },
+                "pen8": {
+                    "id": 8,
+                    "vertical_dist_to_milking_parlor": 0.2,
+                    "horizontal_dist_to_milking_parlor": 1.6,
+                    "number_of_stalls": 400,
+                    "housing_type": "open air barn",
+                    "bedding_type": "sand",
+                    "pen_type": "tiestall",
+                    "manure_handling": "manual_scraping",
                     "manure_separator": "sedimentation",
-			        "manure_storage": "storage_pit"
-	        	}
-
-	        }
+                    "manure_storage": "storage_pit"
+                }
+            }
         },
 
         "feed":

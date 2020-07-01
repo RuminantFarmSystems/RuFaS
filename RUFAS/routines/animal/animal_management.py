@@ -352,6 +352,7 @@ class AnimalManagement:
         for calf in calves_born:
             # TODO: this is the hard coded calf pen value
             pen = 0
+            self.id_pen[calf.id] = pen
             self.calves.append(calf)
             self.all_pens[pen].set_up_new_animal(calf, -1)
 
@@ -407,6 +408,8 @@ class AnimalManagement:
                 for key in pen_grouping:
                     self.all_pens[key].update_animals(pen_grouping[key])
 
+        self.fully_update_id_pen()
+
     def clear_pens(self):
         """
         Removes animals from pens for re-allocation. This is part of the
@@ -433,9 +436,10 @@ class AnimalManagement:
         Args:
             feed: instance of the Feed class
         """
-        for pen in self.all_pens:
+        for i, pen in enumerate(self.all_pens):
             if pen.pen_populated:
-                pen.calc_ration(self.housing, self.pasture_concentrate, feed)
+                self.all_pens[i].ration = self.all_pens[i].calc_ration(
+                    self.housing, self.pasture_concentrate, feed)
 
     def calc_manure_excretion(self, feed):
         """
@@ -446,9 +450,9 @@ class AnimalManagement:
         Args:
             feed: instance of the feed class
         """
-        for pen in self.all_pens:
+        for i, pen in enumerate(self.all_pens):
             if pen.pen_populated:
-                pen.calc_manure(feed)
+                self.all_pens[i].manure = self.all_pens[i].calc_manure(feed)
 
     def calc_avg_growth(self):
         """
