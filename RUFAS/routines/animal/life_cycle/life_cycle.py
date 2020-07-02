@@ -124,9 +124,11 @@ class LifeCycleManager:
     service_rate_sum_21_days = 0
     num_preg_21_days = 0
     conception_rate_sum_21_days = 0
+    
     avg_service_rate = 0
     avg_conception_rate = 0
     pregnancy_rate = 0
+    num_ai = 0
 
     config = None
 
@@ -226,6 +228,7 @@ class LifeCycleManager:
         GnRH_injections = 0
         PGF_injections = 0
         preg_check = 0
+        ai_num = 0
         self.calf_num = len(calves)
         self.heiferI_num = len(heiferIs)
         self.heiferII_num = len(heiferIIs) + len(self.culled_heifers)
@@ -451,8 +454,8 @@ class LifeCycleManager:
 
             GnRH_injections += cow.GnRH_injections
             PGF_injections += cow.PGF_injections
-
             preg_check += cow.preg_diagnoses
+            ai_num += cow.AI_times
 
         # calculate service rate and conception rate
         if date >= sim_length - 21 * self.config["num_21_days"]:
@@ -460,7 +463,7 @@ class LifeCycleManager:
             if self.count_21_days % 21 == 0:
                 self.service_rate_sum_21_days += \
                     float(self.num_ai_21_days) / \
-                    float(self.num_cow_btw_vwp_preg_21_days)
+                    float(self.num_cow_btw_vwp_preg_21_days) * 21
                 self.conception_rate_sum_21_days += \
                     float(self.num_preg_21_days) / \
                     float(self.num_ai_21_days)
@@ -477,6 +480,7 @@ class LifeCycleManager:
         self.GnRH_injection_num = GnRH_injections
         self.PGF_injection_num = PGF_injections
         self.preg_check_num = preg_check
+        self.ai_num = ai_num
         if daily_cow_milking == 0:
             self.avg_days_in_milk = 0
         else:
@@ -487,7 +491,7 @@ class LifeCycleManager:
             self.avg_days_in_preg = total_days_in_preg / daily_cow_preg
 
         self.avg_service_rate = self.service_rate_sum_21_days / \
-            float(self.config["num_21_days"]) * 21.0
+            float(self.config["num_21_days"])
         self.avg_conception_rate = self.conception_rate_sum_21_days / \
             float(self.config["num_21_days"])
         self.pregnancy_rate = self.avg_service_rate * self.avg_conception_rate
@@ -566,7 +570,7 @@ class LifeCycleManager:
                       for cow in cows]
         parity_count_tuple = Counter(parity_lst)
         avg_service_rate = self.service_rate_sum_21_days / \
-            float(self.config["num_21_days"]) * 21.0
+            float(self.config["num_21_days"])
         avg_conception_rate = self.conception_rate_sum_21_days / \
             float(self.config["num_21_days"])
         pregnancy_rate = avg_service_rate * avg_conception_rate
