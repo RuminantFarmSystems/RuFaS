@@ -1,3 +1,10 @@
+"""
+RUFAS: Ruminant Farm Systems Model
+File name: life_cycle_report.py
+Description: Report for the life cycle submodule.
+Author(s): Militsa Sotirova, militsasotirova@gmail.com
+            Katrina Wang, kw433@cornell.edu
+"""
 from .base_report import BaseReport
 from .base_report_driver import BaseReportDriver
 from RUFAS.routines.animal.life_cycle.life_cycle import LifeCycleManager
@@ -27,7 +34,8 @@ class LifeCycleReport(BaseReportDriver):
         def finalize(self, state, weather, time):
             output = state.animal_management.get_life_cycle_output(
                 self.num_animals)
-            with open(str(self.csv_dir) + '/' + self.report_name + '.json', 'w') as outfile:
+            with open(str(self.csv_dir) + '/' + self.report_name + '.json',
+                      'w') as outfile:
                 json.dump(output, outfile, sort_keys=True, indent=4)
 
     class HerdReport(BaseReport):
