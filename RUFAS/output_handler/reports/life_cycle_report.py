@@ -73,9 +73,9 @@ class LifeCycleReport(BaseReportDriver):
                 'pregnancy_rate': ['life_cycle_manager.pregnancy_rate', '', []],
                 'GnRH_injections': ['life_cycle_manager.GnRH_injection_num', '', []],
                 'PGF_injections': ['life_cycle_manager.PGF_injection_num', '', []],
-                'num_ai_21_days': ['life_cycle_manager.num_ai_21_days', '', []],
-                'num_preg_check': ['life_cycle_manager.preg_check_num', '', []],
-                'sold_calves': ['life_cycle_manager.total_calf_sold', '', []]
+                'ai_num': ['life_cycle_manager.ai_num', '', []],
+                'preg_check_num': ['life_cycle_manager.preg_check_num', '', []],
+                'sold_calf_num': ['life_cycle_manager.total_calf_sold', '', []]
             }
 
             self.production_performance = {
