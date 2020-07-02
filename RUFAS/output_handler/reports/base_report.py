@@ -75,6 +75,7 @@ class BaseReport:
         crop_type = state.crop.current_crop
         animal_management = state.animal_management
         feed = state.feed
+        life_cycle_manager = animal_management.life_cycle_manager
 
         for variable in self.daily_variables:
             self.daily_variables[variable][2].append(

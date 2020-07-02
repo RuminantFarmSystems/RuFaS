@@ -46,6 +46,36 @@ class LifeCycleManager:
     replacement_bought_lst = []
     milking_cows_lst = []
 
+    calf_num = 0
+    calf_percent = 0
+    heiferI_num = 0
+    heiferI_percent = 0
+    heiferII_num = 0
+    heiferII_percent = 0
+    heiferIII_num = 0
+    heiferIII_percent = 0
+    cow_num = 0
+    cow_percent = 0
+
+    parity_num = {
+        1: 0,
+        2: 0,
+        3: 0
+    }
+    parity_percent = {
+        1: 0,
+        2: 0,
+        3: 0
+    }
+
+    preg_check_num = 0
+    GnRH_injection_num = 0
+    PGF_injection_num = 0
+
+    total_milk_production = 0
+    avg_days_in_milk = 0
+    avg_days_in_preg = 0
+
     num_culled_range = 0
     num_heiferII_preg = 0
     num_cow_preg = 0
@@ -66,7 +96,24 @@ class LifeCycleManager:
     total_heifer_sold = 0
     total_heifer_value = 0
     total_milk_income = 0
-    cull_reason_stats = {}
+    cull_reason_stats = {
+        'Low production': 0,
+        'Lameness': 0,
+        'Injury': 0,
+        'Mastitis': 0,
+        'Disease': 0,
+        'Udder': 0,
+        'Unknown': 0
+    }
+    cull_reason_stats_percent = {
+        'Low production': 0,
+        'Lameness': 0,
+        'Injury': 0,
+        'Mastitis': 0,
+        'Disease': 0,
+        'Udder': 0,
+        'Unknown': 0
+    }
     cull_reason_stats_range = {}
     parity_culling_stats_range = {}
 
@@ -76,6 +123,9 @@ class LifeCycleManager:
     service_rate_sum_21_days = 0
     num_preg_21_days = 0
     conception_rate_sum_21_days = 0
+    avg_service_rate = 0
+    avg_conception_rate = 0
+    pregnancy_rate = 0
 
     config = None
 
@@ -252,11 +302,38 @@ class LifeCycleManager:
         daily_heifer_sold = 0
         daily_bought_from_market = 0
         daily_cow_milking = 0
+        total_days_in_milk = 0
+        daily_cow_preg = 0
+        total_days_in_preg = 0
         self.daily_calf_num.append(len(calves))
         self.daily_heiferI_num.append(len(heiferIs))
         self.daily_heiferII_num.append(len(heiferIIs))
         self.daily_heiferIII_num.append(len(heiferIIIs))
         self.daily_cow_num.append(len(cows))
+
+        GnRH_injections = 0
+        PGF_injections = 0
+        preg_check = 0
+        self.calf_num = len(calves)
+        self.heiferI_num = len(heiferIs)
+        self.heiferII_num = len(heiferIIs) + len(self.culled_heifers)
+        self.heiferIII_num = len(heiferIIIs)
+        self.cow_num = len(cows) + len(self.culled_cows)
+        total_aniaml_num = self.calf_num + self.heiferI_num + self.heiferII_num + self.heiferIII_num + self.cow_num
+        self.calf_percent = self.calf_num / total_aniaml_num * 100
+        self.heiferI_percent = self.heiferI_num / total_aniaml_num * 100
+        self.heiferII_percent = self.heiferII_num / total_aniaml_num * 100
+        self.heiferIII_percent = self.heiferIII_num / total_aniaml_num * 100
+        self.cow_percent = self.cow_num / total_aniaml_num * 100
+
+        # for parity in self.parity_num:
+        #     parity.append(0)
+        # for parity_percent in self.parity_percent:
+        #     parity_percent.append
+        # for cull_reason in self.cull_reason_stats:
+        #     cull_reason.append(0)
+        # for cull_reason_percent in self.cull_reason_stats_percent:
+        #     cull_reason_percent.append(0)
 
         record_econ_stats = False
         if sim_length - date <= self.config["econ_indicator_range"]:
@@ -368,6 +445,9 @@ class LifeCycleManager:
             #     return
 
             # culled cows, calculate slaughter value and record culling reasons
+            if cow.calves == 0:
+                print('this cow has 0 calves')
+
             if culled:
                 repro_cost, semen_cost, AI_cost, preg_check_cost, feed_cost, \
                     fixed_cost, milk_income, slaughter_value = \
@@ -387,14 +467,17 @@ class LifeCycleManager:
                     else:
                         self.parity_culling_stats_range[parity] = 1
 
+                self.culled_cows.append(cow)
                 if cow.cull_reason in self.cull_reason_stats:
                     self.cull_reason_stats[cow.cull_reason] += 1
+                    self.cull_reason_stats_percent[cow.cull_reason] = \
+                        self.cull_reason_stats[cow.cull_reason] / len(self.culled_cows)
                 else:
                     self.cull_reason_stats[cow.cull_reason] = 1
+                    self.cull_reason_stats_percent[cow.cull_reason] = 1 / len(self.culled_cows)
                 self.total_culled += 1
                 daily_cow_cull_num += 1
 
-                self.culled_cows.append(cow)
                 # print(len(culled_cows))
                 ids_removed.append(cow.id)
                 del cows[index]
@@ -439,6 +522,24 @@ class LifeCycleManager:
 
             if cow.milking:
                 daily_cow_milking += 1
+                total_days_in_milk += cow.days_in_milk
+                self.total_milk_production += cow.estimated_daily_milk_produced
+
+            if cow.preg:
+                daily_cow_preg += 1
+                total_days_in_preg += cow.days_in_preg
+
+            if cow.calves not in self.parity_num:
+                self.parity_num[cow.calves] = 1
+                self.parity_percent[cow.calves] = 1 / self.cow_num * 100
+            else:
+                self.parity_num[cow.calves] += 1
+                self.parity_percent[cow.calves] = self.parity_num[cow.calves] / self.cow_num * 100
+
+            GnRH_injections += cow.GnRH_injections
+            PGF_injections += cow.PGF_injections
+
+            preg_check += cow.preg_diagnoses
 
         # calculate service rate and conception rate
         if date >= sim_length - 21 * self.config["num_21_days"]:
@@ -459,6 +560,24 @@ class LifeCycleManager:
         self.heifer_sold_lst.append(daily_heifer_sold)
         self.replacement_bought_lst.append(daily_bought_from_market)
         self.milking_cows_lst.append(daily_cow_milking)
+
+        self.GnRH_injection_num = GnRH_injections
+        self.PGF_injection_num = PGF_injections
+        self.preg_check_num = preg_check
+        if daily_cow_milking == 0:
+            self.avg_days_in_milk = 0
+        else:
+            self.avg_days_in_milk = total_days_in_milk / daily_cow_milking
+        if daily_cow_preg == 0:
+            self.avg_days_in_preg = 0
+        else:
+            self.avg_days_in_preg = total_days_in_preg / daily_cow_preg
+
+        self.avg_service_rate = self.service_rate_sum_21_days / \
+            float(self.config["num_21_days"]) * 21.0
+        self.avg_conception_rate = self.conception_rate_sum_21_days / \
+            float(self.config["num_21_days"])
+        self.pregnancy_rate = self.avg_service_rate * self.avg_conception_rate
 
         return animals_added, ids_removed, calves_born, calves, heiferIs, \
             heiferIIs, heiferIIIs, cows
