@@ -17,7 +17,9 @@ def update_all(soil, manure_storage, m_app):
 
 
 def formulate_manure_application(manure_storage, m_app):
-    manure_application = m_app
+    manure_application = dict(m_app)
+    manure_application['N_mass'] = 0.0
+    manure_application['P_mass'] = 0.0
     manure_application['mass'] = 0.0
     manure_application['DM'] = 0.0
     manure_application['WIP'] = 0.0
@@ -90,10 +92,11 @@ def formulate_manure_application(manure_storage, m_app):
         if desired_P != 0:
             manure_application['P_mass'] += desired_P
 
-        manure_application['mass'] = max(manure_application['N_mass'] if N_frac == 0
-                                         else manure_application['N_mass'] / N_frac,
-                                         manure_application['P_mass'] if P_frac == 0
-                                         else manure_application['P_mass'] / P_frac)
+        N_frac = 0.05 if N_frac == 0 else N_frac
+        P_frac = 0.06 if P_frac == 0 else P_frac
+        solid_ratio = 0.65 if solid_ratio == 0 else solid_ratio
+        manure_application['mass'] = max(manure_application['N_mass'] / N_frac,
+                                         manure_application['P_mass'] / P_frac)
 
         manure_application['N_mass'] = manure_application['mass'] * N_frac
         manure_application['P_mass'] = manure_application['mass'] * P_frac
@@ -103,12 +106,12 @@ def formulate_manure_application(manure_storage, m_app):
 
 
 def added_manure_P(soil, m_app):
-    m_type = m_app['type']
+    m_type = "DAIRY"
     mass = m_app['mass']
-    percent_cover = m_app['percent_cover']
+    cover_perc = m_app['cover_perc']
     P_mass = m_app['P_mass']
     DM = m_app['DM']
-    surf_perc = m_app['surface_percent']
+    surf_perc = m_app['surf_perc']
     WIP = m_app['WIP']
     WOP = m_app['WOP']
     depth = m_app['depth']
@@ -120,7 +123,7 @@ def added_manure_P(soil, m_app):
 
     # Update manure characteristics
     # S.6.C.I.1-6
-    cover_app = percent_cover * soil.area
+    cover_app = cover_perc * soil.area
     soil.manure_annual += mass
     soil.manure_P_annual += P_mass
 

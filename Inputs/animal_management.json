@@ -95,7 +95,7 @@
         "custom_report":
         {
             "produce_csv": true,
-            "produce_graphics": false,
+            "produce_graphics": true,
             "display_graphics": false,
             "report_name": "Custom Report",
             "file_name": "custom_report.csv"
@@ -111,8 +111,8 @@
             {
                 "grow_years": [2009],
                 "repeat": 1,
-                "planting_date": 121,
-                "harvest_date": 319,
+                "planting_date": 60,
+                "harvest_date": 200,
                 "harvest_type": "optimal"
             },
             "soybean":
@@ -229,16 +229,16 @@
 
             "manure":
             {
-                "app_years": [],
-                "repeat": 0,
+                "app_years": [2009],
+                "repeat": 1,
 
-                "year": [2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019],
-                "day": [-1, -1, -1, -1, -1, -1, -1, -1, -1, -1],
-                "N_mass": [532.8, 658.8, 432, 540, 446.4, 421.2, 532.8, 658.8, 432, 540],
-                "P_mass": [239.2, 322.4, 187.2, 348.4, 286, 244.4, 239.2, 322.4, 187.2, 348.4, 286],
-                "percent_cover": [0.95, 0.95, 0.95, 0.95, 0.95, 0.95, 0.95, 0.95, 0.95, 0.95],
-                "depth": [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0],
-                "surf_perc": [1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0]
+                "year": [],
+                "day": [],
+                "N_mass": [],
+                "P_mass": [],
+                "cover_perc": [],
+                "depth": [],
+                "surf_perc": []
             },
 
             "tillage":

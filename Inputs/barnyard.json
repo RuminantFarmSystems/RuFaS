@@ -53,7 +53,7 @@
         "soil_nitrogen":
         {
             "produce_csv": true,
-            "produce_graphics": false,
+            "produce_graphics": true,
             "display_graphics": false,
             "report_name": "Soil Nitrogen",
             "file_name": "soil_nitrogen.csv"
@@ -61,7 +61,7 @@
         "soil_phosphorus":
         {
             "produce_csv": true,
-            "produce_graphics": false,
+            "produce_graphics": true,
             "display_graphics": false,
             "report_name": "Soil Phosphorus",
             "file_name": "soil_phosphorus.csv"
@@ -212,8 +212,8 @@
             "management_scheme": "optimal",
             "fertilizer":
             {
-                "app_years": [],
-                "repeat": 0,
+                "app_years": [2009],
+                "repeat": 1,
 
                 "year": [0],
                 "day": [0],
@@ -227,19 +227,19 @@
                 "app_years": [],
                 "repeat": 0,
 
-                "year": [2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019],
-                "day": [-1, -1, -1, -1, -1, -1, -1, -1, -1, -1],
-                "N_mass": [532.8, 658.8, 432, 540, 446.4, 421.2, 532.8, 658.8, 432, 540],
-                "P_mass": [239.2, 322.4, 187.2, 348.4, 286, 244.4, 239.2, 322.4, 187.2, 348.4, 286],
-                "percent_cover": [0.95, 0.95, 0.95, 0.95, 0.95, 0.95, 0.95, 0.95, 0.95, 0.95],
-                "depth": [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0],
-                "surf_perc": [1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0]
+                "year": [2010],
+                "day": [1],
+                "N_mass": [1000],
+                "P_mass": [0],
+                "cover_perc": [0.95],
+                "depth": [0.0],
+                "surf_perc": [1.0]
             },
 
             "tillage":
             {
-                "app_years": [],
-                "repeat": 0,
+                "app_years": [2009],
+                "repeat": 1,
 
                 "year": [0],
                 "day": [0],
