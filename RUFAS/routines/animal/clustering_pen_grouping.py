@@ -1,13 +1,15 @@
+################################################################################
 """
 RUFAS: Ruminant Farm Systems Model
 File name: clustering_pen_grouping.py
-Description: This file's main function is grouping(list, pens) (line 44) which returns
-    a Dictionary of lists of cows, with the key being the pen those cows are
-    assigned to based on nutritional requirements. This function is called in
-    animal_management.py for each ration cycle if there are more than 7 pens in
-    the input (>=2 pens for lactating cows)
+Description: This file's main function is grouping(list, pens) (line 44) which
+    returns a Dictionary of lists of cows, with the key being the pen those cows
+    are assigned to based on nutritional requirements. This function is called
+    in animal_management.py for each ration cycle if there are more than 7 pens
+    in the input (>=2 pens for lactating cows).
 Author(s): Chris VanKerkhove, cjv47@cornell.edu
 """
+################################################################################
 import pandas as pd
 import numpy as np
 from scipy.stats import percentileofscore
@@ -15,8 +17,8 @@ from scipy.stats import percentileofscore
 
 def norm(x):
     """
-        Description:
-            Helper function to normalize a list of values and returnthat normalized list
+        Helper function to normalize a list of values and returnthat normalized
+        list.
 
         Args:
             x: A list of values
@@ -31,9 +33,11 @@ def norm(x):
 
 def percentile_list(l):
     """
-        Description:
-            Helper function that returns a list of percentiles corresponding
-            to its matching value in the original list
+        Helper function that returns a list of percentiles corresponding
+        to its matching value in the original list.
+
+        Args:
+            l: a list of values
     """
     perc_list = []
     for e in l:
@@ -44,12 +48,11 @@ def percentile_list(l):
 
 def grouping(cow_list, pens, stocking_density):
     """
-        Description:
-            Grouping algorithm that utilizes k-means clustering and takes an input
-            that is a list of objects of class cow (see cow.py) and a list of
-            pen objects (from pen.py), and then groups the lactating cows into the
-            available pens based on their nutritional requirements relative to the
-            rest of the cows.
+        Grouping algorithm that utilizes k-means clustering and takes an input
+        that is a list of objects of class cow (see cow.py) and a list of
+        pen objects (from pen.py), and then groups the lactating cows into the
+        available pens based on their nutritional requirements relative to the
+        rest of the cows.
 
         Args:
             cow_list: a list of lactating cows
@@ -57,12 +60,17 @@ def grouping(cow_list, pens, stocking_density):
             stocking_density: The required stocking density to group all cows
     """
 
-    # Initial Data Manipulation
+    #########################
+    # Data manipulation and pen sorting
     # Each of the following lists contain the following attributes corresponding
     # to the list of cows input in the grouping function
-    DNED_req = []  # Required net energy density (Units= Mcal per kg of dry matter (DM) (Mcal/kg of DM))
-    DMPD_req = []  # Required Metabolizing Protein Density (Units= g of crude protein per kg of DM (g/kg of DM))
-    milk_avg = []  # Average milk produced
+    #########################
+    # Required net energy density (Units= Mcal per kg of dry matter (DM) (Mcal/kg of DM))
+    DNED_req = []
+    # Required Metabolizing Protein Density (Units= g of crude protein per kg of DM (g/kg of DM))
+    DMPD_req = []
+    # Average milk produced (kg)
+    milk_avg = []
 
     for cow in cow_list:
         DNED_req.append(cow.DNED_req)
@@ -108,9 +116,12 @@ def grouping(cow_list, pens, stocking_density):
     cow_nutr_df['percentile'] = percentile
     cow_nutr_df['percentile'] = 1 - cow_nutr_df['percentile']
 
-    # Group by nutrient requirement percentile percentile and num of stalls in each pen
-    num_cows = len(cow_list)  # total number of cows
-    index = {4: 0}  # Cutoff values for percentiles for each pen
+    # Group by nutrient requirement percentile percentile and num of stalls in
+    # each pen
+    # total number of cows
+    num_cows = len(cow_list)
+    # cutoff values for percentiles for each pen
+    index = {4: 0}
 
     # Create a list of percentile partitions for grouping
     for pen in pens:
@@ -119,7 +130,8 @@ def grouping(cow_list, pens, stocking_density):
         if index[pen.id] > 1:
             index[pen.id] = 1
 
-    pen_assignment = []  # List of pen assignments to be added to the data frame
+     # list of pen assignments to be added to the data frame
+    pen_assignment = []
     percentile = rank_data['percentile'].to_list()
 
     # Adding pen_assignment number to list based on percentile
@@ -134,12 +146,13 @@ def grouping(cow_list, pens, stocking_density):
     rank_data.insert(n, 'pen_assignment', pen_assignment)
     cow_nutr_df["pen_assignment"] = pen_assignment
 
+    #########################
     # Pen assignment summary
-    # Sort the data frame by pen assignment
-    # Return a dictionary of lists of cow objects, with keys corresponding to pen IDs
-
+    # Sort the data frame by pen assignment and return a dictionary of
+    # lists of cow objects, with keys corresponding to pen IDs
+    #########################
     pen_data = cow_nutr_df.sort_values(by='pen_assignment', ascending=True)
-    # creating a list of values that keep track of the index for the start of each pen in the ID list
+    # Creating a list of values that keep track of the index for the start of each pen in the ID list
     separating_index = [0]
     pen_assignment = pen_data['pen_assignment'].to_list()
     cow = pen_data['cow'].to_list()

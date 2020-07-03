@@ -352,13 +352,15 @@ class AnimalManagement:
             self.all_pens[pen].set_up_new_animal(calf, -1)
 
     def pen_allocation(self):
-        '''
+        """
         Allocates the animals in all_animals to pens in all_pens based on the animals' characteristics.
         All animals except lactating cows are grouped into pens first (and therefore the first pens
         in the input json). The lactating cows are then grouped in the last pens leftover and are
         grouped up to a stocking density of no more than 120%
-        '''
-        #Assiging non-cows to pens
+        """
+        #####################
+        #Pen Allocation for non-cows
+        #####################
         if len(self.all_pens) == 3:
             self.all_pens[0].update_animals(self.calves)
         elif len(self.all_pens) == 4:
@@ -376,6 +378,9 @@ class AnimalManagement:
             self.all_pens[2].update_animals(self.heiferIIs)
             self.all_pens[3].update_animals(self.heiferIIIs)
 
+        #####################
+        # Pen Allocation for dry cows
+        #####################
         #separate into lactating and dry cow pens
         lactating_cows = []
         dry_cows = []
@@ -395,7 +400,10 @@ class AnimalManagement:
             self.all_pens[len(self.all_pens) -1].update_animals(lactating_cows)
         else:
             self.all_pens[4].update_animals(dry_cows)
-        #Pen Allocation for Lactating Cows
+
+        #####################
+        # Pen Allocation for lactating cows
+        #####################
             if len(lactating_cows) > 0:
                 for i in range(len(lactating_cows)):
                     #Temporary process below to randomly assign nutrition requirments
@@ -420,7 +428,7 @@ class AnimalManagement:
                     self.all_pens.append(new_pen)
                     pen_grouping = grouping(lactating_cows, self.all_pens[5:], 1)
 
-            #Assigning Lactating Cows to Pens based on the grouping output
+                #Assigning Lactating Cows to Pens based on the grouping output
                 for key in pen_grouping:
                     self.all_pens[key].update_animals(pen_grouping[key])
 
