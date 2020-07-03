@@ -57,7 +57,7 @@ class SoilNitrogen(BaseReportHandler):
                                 'StableN_L1': ['soil.soil_layers[0].stableN', 'kg', []],
                                 'StableN_L2': ['soil.soil_layers[1].stableN', 'kg', []],
                                 'StableN_L3': ['soil.soil_layers[2].stableN', 'kg', []],
-                                'FreshN': ['soil.topLayerFreshN', 'kg', []],
+                                'FreshN': ['soil.soil_layers[0].topLayerFreshN', 'kg', []],
                                 'Nitri_L1': ['soil.soil_layers[0].nitrification', 'kg/ha', []],
                                 'Nitri_L2': ['soil.soil_layers[1].nitrification', 'kg/ha', []],
                                 'Nitri_L3': ['soil.soil_layers[2].nitrification', 'kg/ha', []],

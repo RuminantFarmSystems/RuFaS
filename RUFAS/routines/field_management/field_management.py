@@ -62,12 +62,11 @@ class FieldManagement:
 
         self.application_defaults = {
             "manure": {
-                'type': "DAIRY",
                 'year': -1,
                 'day': -1,
                 'N_mass': 520,
                 'P_mass': 300,
-                'percent_cover': 0.95,
+                'cover_perc': 0.95,
                 'depth': 0.0,
                 'surface_percent': 1.0
             },
