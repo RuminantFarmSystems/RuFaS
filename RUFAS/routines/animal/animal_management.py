@@ -94,6 +94,12 @@ class AnimalManagement:
     # the popped pen.
     pens_needing_animals = deque([])
 
+    daily_avg_milk = 0
+
+    daily_total_milk = 0
+
+    daily_total_manure = 0
+
     # these variables are the P compositions of each class of animal. They
     # are calculated daily and are used when an animal is added to the
     # herd, whether by birth or replacement herd purchase. They are calculated
@@ -104,6 +110,15 @@ class AnimalManagement:
     heiferII_p_comp = 0
     heiferIII_p_comp = 0
     cow_p_comp = 0
+
+    num_calf_lst = []
+    num_heiferI_lst = []
+    num_heiferII_lst = []
+    num_heiferIII_lst = []
+    num_cow_lst = []
+    avg_milk_lst = []
+
+    annual_manure_prod = 0
 
     @staticmethod
     def get_animal_config(data):
@@ -418,6 +433,20 @@ class AnimalManagement:
             self.all_pens[pen].set_up_new_animal(calf, self.pasture_concentrate, feed, temp)
             # self.all_pens[pen].animals_in_pen.append(calf)
 
+    def update_daily_nums(self):
+        """
+        Appends the daily animal numbers to the appropriate list.
+        """
+        self.num_calf_lst.append(len(self.calves))
+        self.num_heiferI_lst.append(len(self.heiferIs))
+        self.num_heiferII_lst.append(len(self.heiferIIs))
+        self.num_heiferIII_lst.append(len(self.heiferIIIs))
+        self.num_cow_lst.append(len(self.cows))
+
+        self.annual_manure_prod += self.daily_total_manure
+
+        self.avg_milk_lst.append(self.daily_avg_milk)
+
     def pen_allocation(self):
         """
         Allocates the animals in all_animals to pens in all_pens based on the
@@ -634,6 +663,23 @@ class AnimalManagement:
             if pen.pen_populated:
                 pen.daily_p_update()
 
+    def calc_milk_nums(self):
+        self.daily_total_milk = 0
+        self.daily_avg_milk = 0
+        num_pens_producing_milk = 0
+
+        self.daily_total_manure = 0
+        for pen in self.all_pens:
+            self.daily_total_manure += pen.manure['Mkg']
+
+            if pen.pen_populated and pen.avg_milk > 0:
+                self.daily_total_milk += pen.avg_milk * len(pen.animals_in_pen)
+                self.daily_avg_milk += pen.avg_milk
+                num_pens_producing_milk += 1
+
+        if num_pens_producing_milk > 0:
+            self.daily_avg_milk /= num_pens_producing_milk
+
     def daily_updates(self, feed, weather, time):
         """
         Executes the daily routines relating to Animals. All animals are
@@ -680,6 +726,8 @@ class AnimalManagement:
             self.calc_all_p_comp()  # per animal
 
             self.record_pen_history()
+            self.calc_milk_nums()
+            self.update_daily_nums()
 
     def end_ration_interval(self):
         """
@@ -690,7 +738,13 @@ class AnimalManagement:
                self.formulation_interval == 1
 
     def annual_reset(self):
-        pass
+        self.annual_manure_prod = 0
+        self.num_calf_lst = []
+        self.num_heiferI_lst = []
+        self.num_heiferII_lst = []
+        self.num_heiferIII_lst = []
+        self.num_cow_lst = []
+        self.avg_milk_lst = []
 
     def generate_animal_output(self, animal_type, index):
         """

@@ -171,5 +171,12 @@
         "produce_csv": true,
         "produce_graphics": true,
         "report_name": "custom_report"
+    },
+    "db_report": {
+        "produce_csv": false,
+        "produce_graphics": false,
+        "report_name": "rufas_test",
+        "version": "pre_v1",
+        "user": "default"
     }
 }

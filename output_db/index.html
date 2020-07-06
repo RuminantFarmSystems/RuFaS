@@ -1,0 +1,614 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>RUFAS DB</title>
+
+    <style>
+        body {
+            font: 14px Verdana;
+        }
+
+        #message_info {
+            color: crimson;
+        }
+
+        table, th, td {
+            border: solid 1px #DDD;
+            border-collapse: collapse;
+            padding: 2px 3px;
+            text-align: center;
+        }
+
+        th {
+            font-weight: bold;
+        }
+
+        div.scroll_overflow {
+            overflow: scroll;
+            height: 300px;
+            width: fit-content;
+        }
+
+        summary {
+            width: fit-content;
+        }
+
+    </style>
+
+</head>
+
+<body>
+<h1>RUFAS Outputs Database</h1>
+<details>
+    <summary>Information</summary>
+        Here's how you can interact with the stored outputs database: <br>
+        <ol>
+            <li>Hit 'Refresh' to see the result IDs currently stored.</li>
+            <li>You can do one of three actions:
+                <ul>
+                    <li>Export data: select <b>one (or more)</b> result IDs to export <br>
+                        as a group of files (CSV and JSON) to MASM/output/db_output. <br>
+                        You can also select which of the columns you want to export in <br>
+                        the CSV files for the daily and annual results.</li>
+                    <li>Delete data: select <b>one</b> result ID to delete from the database. <br>
+                        Warning: you cannot undo this action.</li>
+                    <li>Rename data: select <b>one</b> result ID to rename. Type the new <br>
+                        name into the text box.</li>
+                </ul>
+            </li>
+            <li>Once you have selected the result(s) and an action, hit the 'Enter'<br>
+                 button at the bottom of the page. A success or failure message <br>
+                should appear in red text below the filter box.</li>
+        </ol>
+        Note that the timestamp column is in the format YYYY-MM-DD hh:mm:ss.
+</details>
+    <br>
+<input type="button" onclick="getResultsRequest()" value="Refresh"/><br>
+<br>
+<label for="filter">Filter By: </label>
+<input type="text" id="filter" size="50">
+<input type="button" onclick="filter()" value="Filter"/>
+<br><br>
+<details>
+    <summary>Filter Information</summary>
+    You can filter the results that you see in the table below by entering the <br>
+    body of a SQL WHERE clause. For example, if you wanted to see all results <br>
+    for which the user column is 'bob', you would type <i>user='bob'</i>. You can <br>
+    filter by any of the columns shown in the table. <br>
+    Here are some more examples of filters you can apply:
+    <ul>
+        <li><i>result_id > 186</i></li>
+        <li><i>title = 'rufas_test'</i></li>
+        <li><i>created_at < '2020-07-21 11:30:00'</i> (any time 'less' than a timestamp <br>
+        happened before that time, any time 'greater' happened after)</li>
+        <li><i>version = 'pre_v1'</i> (currently this is the only version available) </li>
+        <li><i>result_id <= 192 AND created_at > '2020-07-21 11:30:00'</i></li>
+        <li><i>created_at BETWEEN '2020-07-21 11:30:00' AND '2020-07-22 11:30:00'</i> <br>
+        (specify a range)</li>
+        <li><i>result_id IN (184, 186, 194)</i> (specify multiple possible values, equivalent to <br>
+            <i>result_id = 184 OR result_id = 186 OR result_id = 194</i>)</li>
+        <li><i>title LIKE 'demo%'</i> (specify a pattern)</li>
+    </ul>
+    Note that when specifying values from the title, created_at, version, and user <br>
+    columns the values must be in quotes because the columns are of type string.
+</details>
+<p id="message_info"></p>
+
+<div id="showData" class="scroll_overflow"></div>
+<br>
+<form>
+    <input type="radio" id="export" name="action" disabled="disabled" value="export" onclick="exportOnClick()">
+    <label for="export">Export Result Set</label><br>
+    <details>
+        <summary>Select Daily Variables to Export (default: all variables are selected)</summary>
+            <div id="daily_var_checklist"></div>
+    </details>
+    <br>
+    <details>
+        <summary>Select Annual Variables to Export (default: all variables are selected)</summary>
+            <div id="annual_var_checklist"></div>
+    </details>
+    <br>
+    <input type="radio" id="delete" name="action" disabled="disabled" value="delete" onclick="deleteOnClick()">
+    <label for="delete">Delete Result Set</label><br>
+
+    <input type="radio" id="rename" name="action" disabled="disabled" value="rename" onclick="renameOnClick()">
+    <label for="rename">Rename Result Set</label><br>
+    <label for="new_title">New Title:</label>
+    <input type="text" id="new_title" size="50" disabled="disabled"><br><br>
+
+    <input type="button" onclick="doAction()" value="Enter">
+
+</form>
+<script>
+    /**
+     * Calls getResultsRequest() with the text in the Filter By text box if
+     * the text box is not empty.
+     */
+    function filter() {
+        let filter = document.getElementById('filter').value;
+        if (filter.length > 0) {
+            getResultsRequest(filter);
+        }
+    }
+
+    /**
+     * Enables the 'export' radio button.
+     */
+    function enableExport() {
+        document.getElementById('export').disabled = false;
+    }
+
+    /**
+     * Disables and un-checks the 'export' radio button.
+     */
+    function disableExport() {
+        document.getElementById('export').disabled = true;
+        document.getElementById('export').checked = false;
+    }
+
+    /**
+     * Enables the 'delete' radio button.
+     */
+    function enableDelete() {
+        document.getElementById('delete').disabled = false;
+    }
+
+    /**
+     * Disables and un-checks the 'delete' radio button.
+     */
+    function disableDelete() {
+        document.getElementById('delete').disabled = true;
+        document.getElementById('delete').checked = false;
+    }
+
+    /**
+     * Enables the 'rename' radio button.
+     */
+    function enableRename() {
+        document.getElementById('rename').disabled = false;
+    }
+
+    /**
+     * Disables and un-checks the 'export' radio button.
+     */
+    function disableRename() {
+        document.getElementById('rename').disabled = true;
+        document.getElementById('rename').checked = false;
+    }
+
+    /**
+     * Enables the 'rename' text area.
+     */
+    function enableRenameText() {
+        document.getElementById('new_title').disabled = false;
+    }
+
+    /**
+     * Disables the 'rename' text area.
+     */
+    function disableRenameText() {
+        document.getElementById('new_title').disabled = true;
+    }
+
+    /**
+     * Enables all of the radio buttons.
+     */
+    function enableAllRadio() {
+        enableExport();
+        enableDelete();
+        enableRename();
+    }
+
+    /**
+     * Disables all of the radio buttons.
+     */
+    function disableAllRadio() {
+        disableExport();
+        disableDelete();
+        disableRename();
+    }
+
+    /**
+     * Enable the checkboxes which represent the daily_results and
+     * annual_results columns.
+     */
+    function enableCheckboxes() {
+        // enable daily checkboxes
+        let daily_vars = document.getElementsByClassName('daily_var');
+        for (let i = 0; i < daily_vars.length; i++) {
+            daily_vars[i].disabled = false;
+        }
+
+        // enable annual checkboxes
+        let annual_vars = document.getElementsByClassName('annual_var');
+        for (let i = 0; i < annual_vars.length; i++) {
+            annual_vars[i].disabled = false;
+        }
+    }
+
+    /**
+     * Disables and un-checks the checkboxes which represent the daily_results
+     * and annual_results columns.
+     */
+    function disableCheckboxes() {
+        // disable daily checkboxes
+        let daily_vars = document.getElementsByClassName('daily_var');
+        for (let i = 0; i < daily_vars.length; i++) {
+            daily_vars[i].disabled = true;
+            daily_vars[i].checked = true;
+        }
+
+        // disable annual checkboxes
+        let annual_vars = document.getElementsByClassName('annual_var');
+        for (let i = 0; i < annual_vars.length; i++) {
+            annual_vars[i].disabled = true;
+            annual_vars[i].checked = true;
+        }
+    }
+
+    /**
+     * The onclick function for the export radio button - disables the rename
+     * text area and enables the checkboxes for column names under the export
+     * radio button.
+     */
+    function exportOnClick() {
+        // for export radio button
+        disableRenameText();
+        enableCheckboxes();
+    }
+
+    /**
+     * The onclick function for the delete radio button - disables the rename
+     * text area and the checkboxes for column names under the export
+     * radio button.
+     */
+    function deleteOnClick() {
+        // for delete radio button
+        disableRenameText();
+        disableCheckboxes();
+    }
+
+    /**
+     * The onclick function for the rename radio button - enables the rename
+     * text area and disables the checkboxes for column names under the export
+     * radio button.
+     */
+    function renameOnClick() {
+        // for rename radio button
+        enableRenameText();
+        disableCheckboxes();
+    }
+
+    /**
+     * Un-selects all of the checkboxes in the grid referencing the rows in the
+     * results table in the database. Also disables the radio buttons, the
+     * rename text area, and the checkboxes relating to the column names in the
+     * daily and annual results tables.
+     */
+    function unselectAllRows() {
+        let grid = document.getElementById("table");
+        let checkBoxes = grid.getElementsByTagName("input");
+        for (let i = 0; i < checkBoxes.length; i++) {
+            checkBoxes[i].checked = false;
+        }
+
+        disableAllRadio();
+        disableRenameText();
+        disableCheckboxes();
+    }
+
+    /**
+     * Iterates through the checkboxes for the results to accumulate a list of
+     * the selected ones. Returns this list.
+     *
+     * @returns {Array} an array of strings of the IDs of the selected results
+     */
+    function getSelected() {
+        let grid = document.getElementById("table");
+        let checkBoxes = grid.getElementsByTagName("input");
+        let selected = [];
+        for (let i = 0; i < checkBoxes.length; i++) {
+            if (checkBoxes[i].checked) {
+                let row = checkBoxes[i].parentNode.parentNode;
+                selected.push(row.cells[1].innerHTML);
+            }
+        }
+        return selected;
+    }
+
+    /**
+     * Calls getSelected() to see how many of the results are selected. If none
+     * are selected, all radio buttons and column name checkboxes are disabled.
+     * If one is selected, all radio buttons are enabled. If more than one is
+     * selected, only the export radio button is enabled.
+     */
+    function checkNumSelected() {
+        let selected = getSelected();
+        if (selected.length === 0) {
+            disableAllRadio();
+            disableCheckboxes();
+        }
+        else if (selected.length === 1) {
+            enableAllRadio();
+        }
+        else { // selected.length > 1
+            enableExport();
+            disableDelete();
+            disableRename();
+            disableRenameText();
+        }
+    }
+
+    /**
+     * Iterates through the checkboxes for the names of the daily_results
+     * columns and returns the list of the selected ones.
+     *
+     * @returns {Array} an array of strings of the checked daily column names
+     */
+    function getDailyColumnCheckboxes() {
+        let daily_cols = document.getElementsByClassName('daily_var');
+        let result = [];
+        for (let i = 0; i < daily_cols.length; i++) {
+            if (daily_cols[i].checked) {
+                result.push(daily_cols[i].getAttribute('value'));
+            }
+        }
+        return result;
+    }
+
+    /**
+     * Iterates through the checkboxes for the names of the annual_results
+     * columns and returns the list of the selected ones.
+     *
+     * @returns {Array} an array of the strings of the checked annual column
+     * names
+     */
+    function getAnnualColumnCheckboxes() {
+        let annual_cols = document.getElementsByClassName('annual_var');
+        let result = [];
+        for (let i = 0; i < annual_cols.length; i++) {
+            if (annual_cols[i].checked) {
+                result.push(annual_cols[i].getAttribute('value'));
+            }
+        }
+        return result;
+    }
+
+    /**
+     * Sends the Delete request to the server. Displays the
+     * response's message.
+     *
+     * @param selected A list of the IDs of the selected results. Since this is
+     * the delete method, there should only be one item in this list.
+     */
+    function doDelete(selected) {
+        let selectedID = selected[0];
+        if (! confirm('Are you sure you want to delete ' + selectedID + '? This action cannot be undone.')) {
+            return;
+        }
+        let xhttp = new XMLHttpRequest();
+        xhttp.onreadystatechange = function () {
+            if (this.readyState === 4 && this.status === 200) {
+                document.getElementById("message_info").innerHTML = "Success: delete results.";
+                let response_json = JSON.parse(this.responseText);
+                refresh(response_json);
+            } else {
+                document.getElementById("message_info").innerHTML = "Failure: delete results.\n" + this.responseText;
+            }
+        };
+
+        xhttp.open("DELETE", "/delete?id=" + selectedID.toString(), true);
+        xhttp.send();
+
+        unselectAllRows();
+
+    }
+
+    /**
+     * Sends the Rename request to the server. Ensures that the new name (from
+     * the rename text area) is between 1 and 50 characters long. Displays the
+     * response's message.
+     *
+     * @param selected A list of the IDs of the selected results. Since this is
+     * the rename method, there should only be one item in this list.
+     */
+    function doRename(selected) {
+        let selectedID = selected[0];
+        let new_title = document.getElementById('new_title').value;
+        let new_title_len = new_title.length;
+        if (new_title_len === 0 || new_title_len > 50) {
+            document.getElementById("message_info").innerHTML = "New title has to be longer than 0 characters and shorter than 50.";
+            return;
+        }
+
+        let xhttp = new XMLHttpRequest();
+        xhttp.onreadystatechange = function () {
+            if (this.readyState === 4 && this.status === 200) {
+                document.getElementById("message_info").innerHTML ="Success: rename results.";
+                let response_json = JSON.parse(this.responseText);
+                refresh(response_json);
+            } else {
+                document.getElementById("message_info").innerHTML = "Failure: rename results.\n" + this.responseText;
+            }
+        };
+        let url = "/rename?id=" + selectedID.toString() + "&new_title=" + new_title;
+        xhttp.open("POST", url, true);
+        xhttp.send();
+
+        document.getElementById('new_title').value = "";
+        unselectAllRows();
+    }
+
+    /**
+     * Sends the Export request to the server. Displays the response's message.
+     *
+     * @param selected A list of the IDs of the selected results.
+     */
+    function doExport(selected) {
+        let xhttp = new XMLHttpRequest();
+        xhttp.onreadystatechange = function () {
+            if (this.readyState === 4 && this.status === 200) {
+                document.getElementById("message_info").innerHTML = "Success: export results.\n" + this.responseText;
+            } else {
+                document.getElementById("message_info").innerHTML = "Failure: export results.\n" + this.responseText;
+            }
+        };
+        let url = "/export?id=" + selected.join() + "&daily=" + getDailyColumnCheckboxes().join() + "&annual=" + getAnnualColumnCheckboxes().join();
+        xhttp.open("GET", url, true);
+        xhttp.send();
+
+        unselectAllRows();
+    }
+
+    /**
+     * This is the onclick function of the Enter button. It calls the appropriate
+     * function based on which radio button is selected. If no radio button is
+     * selected or no result set is selected, a warning message is displayed on
+     * the page.
+     */
+    function doAction() {
+        let options = document.getElementsByName('action');
+
+        let selected = getSelected();
+        if (selected.length === 0) {
+            document.getElementById("message_info").innerHTML = "Please select a result.";
+            return;
+        }
+
+        if (options[0].checked) { // export
+            doExport(selected);
+        } else if (options[1].checked) { // delete
+            doDelete(selected);
+        } else if (options[2].checked) { //rename
+            doRename(selected);
+        } else { // none selected
+            document.getElementById("message_info").innerHTML = "Please select an action.";
+            // return;
+        }
+    }
+
+    /**
+     * Sends the getResults request to the server and displays the table as well
+     * as the column names of daily_results and annual_results.
+     *
+     * @param filter (optional) the filter text to be appended to the end of the
+     * query to obtain the results in the database
+     */
+    function getResultsRequest(filter = "") {
+        let xhttp = new XMLHttpRequest();
+        xhttp.onreadystatechange = function () {
+            if (this.readyState === 4 && this.status === 200) {
+                document.getElementById("message_info").innerHTML = "Success: get results";
+                let response_json = JSON.parse(this.responseText);
+                refresh(response_json);
+            } else {
+                document.getElementById("message_info").innerHTML = "Failure: get results<br>" + this.responseText;
+            }
+        };
+        let url = "/getResults?filter=" + filter;
+        xhttp.open("GET", url, true);
+        xhttp.send();
+    }
+
+    /**
+     * Calls createTable(), displayDailyVarChecklist(), and displayAnnualVarChecklist()
+     * with the information provided by the server about what should go in the
+     * respective parts of the HTML page.
+     *
+     * @param response_json The json that contains all of the information to be
+     * displayed.
+     */
+    function refresh(response_json) {
+        createTable(response_json["results_table"]);
+        displayDailyVarChecklist(response_json["daily_columns"]);
+        displayAnnualVarChecklist(response_json["annual_columns"]);
+    }
+
+    /**
+     * Inserts the HTML for daily variable columns.
+     *
+     * @param daily_vars The list of column names of the daily_results table
+     */
+    function displayDailyVarChecklist(daily_vars) {
+        let divContainer = document.getElementById("daily_var_checklist");
+        divContainer.innerHTML = "";
+        for(let i = 0; i < daily_vars.length; i++) {
+            let variable = daily_vars[i];
+            let element_id = "daily_" + variable;
+            divContainer.innerHTML += "<input type=\"checkbox\" id=" + element_id + " class=\"daily_var\" value=" + variable + " checked=true disabled=true> <label for=" + element_id + ">" + variable + "</label><br>";
+        }
+    }
+
+    /**
+     * Inserts the HTML for annual variable columns.
+     *
+     * @param annual_vars The list of column names of the annual_results table
+     */
+    function displayAnnualVarChecklist(annual_vars) {
+        let divContainer = document.getElementById("annual_var_checklist");
+        divContainer.innerHTML = "";
+        for(let i = 0; i < annual_vars.length; i++) {
+            let variable = annual_vars[i];
+            let element_id = "annual_" + variable;
+            divContainer.innerHTML += "<input type=\"checkbox\" id=" + element_id + " class=\"annual_var\" value=" + variable + " checked=true disabled=true> <label for=" + element_id + ">" + variable + "</label><br>";
+        }
+    }
+
+    /**
+     * Creates the table from the argument for the results table. Inserts the
+     * HTML for this table into the page. If there are no entries in the results
+     * table, displays a message.
+     *
+     * @param jsonData The json with the information from the results table
+     */
+    function createTable(jsonData) {
+        if (jsonData.length === 0) {
+            document.getElementById("showData").innerHTML = "There are currently no stored results.";
+            return;
+        }
+
+        // values of column names
+        let columns = Object.keys(jsonData[0]);
+
+        // create table element
+        let table = document.createElement("table");
+        table.setAttribute('id', 'table');
+
+        // new table row: -1 results in a new row being inserted at the last position.
+        let tr = table.insertRow(-1);
+
+        let th_empty = document.createElement("th");
+        th_empty.innerHTML = "";
+        tr.appendChild(th_empty);
+
+        for (let i = 0; i < columns.length; i++) {
+            // table header with name of respective column
+            let th = document.createElement("th");
+            th.innerHTML = columns[i];
+            tr.appendChild(th);
+        }
+
+        // add the json data to the table as rows
+        for (let i = 0; i < jsonData.length; i++) {
+            tr = table.insertRow(-1);
+
+            let th = document.createElement("th");
+            th.innerHTML = "<input type=\"checkbox\" onchange='checkNumSelected()'/>";
+            tr.appendChild(th);
+
+            for (let j = 0; j < columns.length; j++) {
+                let tabCell = tr.insertCell(-1);
+                tabCell.innerHTML = jsonData[i][columns[j]];
+            }
+        }
+
+        // add the created table to a container
+        let divContainer = document.getElementById("showData");
+        divContainer.innerHTML = "";
+        divContainer.appendChild(table);
+    }
+</script>
+</body>
+</html>

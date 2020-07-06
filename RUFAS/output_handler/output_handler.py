@@ -37,7 +37,7 @@ class OutputHandler:
     directly.
     """
 
-    def __init__(self, data, state):
+    def __init__(self, data, state, fPath):
         """Initializes the report handlers with the given data"""
 
         # Instantiate Report Handler Objects here
@@ -49,6 +49,7 @@ class OutputHandler:
                         'pens_report': PensReport(data['pens_report'], state),
                         'mass_balance': MassBalanceReport(data['mass_balance']),
                         'life_cycle_report': LifeCycleReport(data['life_cycle_report']),
+                        'db_report': DBReport(data['db_report'], fPath)
                         }
 
     def initialize_dir(self, csv_dir, graphic_dir):
@@ -136,7 +137,7 @@ class OutputHandler:
                 sys.stdout.write("|")
             else:
                 sys.stdout.write("/")
-                
+
             report = self.reports[report_name]
             report.produce_report_graphics()
             sys.stdout.write("\b")

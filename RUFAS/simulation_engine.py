@@ -161,7 +161,7 @@ def initialize_simulation(file_path: Path, data):
         weather = Weather(data['weather'], config)
         time = Time(config)
         state = State(data['farm'], config, weather, time)
-        output = OutputHandler(classes.read_json_file(get_base_dir() / 'input/output' / data['output']), state)
+        output = OutputHandler(classes.read_json_file(get_base_dir() / 'input/output' / data['output']), state, file_path)
 
     except errors.JSONfileData as e:
         print("JSON FILE ERROR: " +

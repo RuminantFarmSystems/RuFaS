@@ -6,3 +6,4 @@ from .pen_report import PensReport
 from .mass_balance_report import MassBalanceReport
 from .manure_storage_report import ManureStorageReport
 from .life_cycle_report import LifeCycleReport
+from .db_report import DBReport
