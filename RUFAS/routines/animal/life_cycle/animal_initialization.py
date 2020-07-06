@@ -73,17 +73,50 @@ class AnimalInitalization:
             cur.execute('DROP TABLE IF EXISTS cows')
             cur.execute('DROP TABLE IF EXISTS replacement')
             cur.execute('CREATE TABLE IF NOT EXISTS calves \
-                (id VARCHAR, breed VARCHAR, birth_date VARCHAR, days_born VARCHAR, birth_weight VARCHAR, body_weight VARCHAR, wean_weight VARCHAR, mature_body_weight VARCHAR, events VARCHAR)')
+                (id VARCHAR, breed VARCHAR, birth_date VARCHAR, days_born VARCHAR, \
+                    birth_weight VARCHAR, body_weight VARCHAR, wean_weight VARCHAR, \
+                        mature_body_weight VARCHAR, events VARCHAR)')
             cur.execute('CREATE TABLE IF NOT EXISTS heiferIs \
-                (id VARCHAR, breed VARCHAR, birth_date VARCHAR, days_born VARCHAR, birth_weight VARCHAR, body_weight VARCHAR, wean_weight VARCHAR, mature_body_weight VARCHAR, events VARCHAR)')
+                (id VARCHAR, breed VARCHAR, birth_date VARCHAR, days_born VARCHAR, \
+                    birth_weight VARCHAR, body_weight VARCHAR, wean_weight VARCHAR, \
+                        mature_body_weight VARCHAR, events VARCHAR)')
             cur.execute('CREATE TABLE IF NOT EXISTS heiferIIs \
-                (id VARCHAR, breed VARCHAR, birth_date VARCHAR, days_born VARCHAR, birth_weight VARCHAR, body_weight VARCHAR, wean_weight VARCHAR, mature_body_weight VARCHAR, events VARCHAR, repro_program VARCHAR, tai_method_h VARCHAR, synch_ed_method_h VARCHAR)')
+                (id VARCHAR, breed VARCHAR, birth_date VARCHAR, days_born VARCHAR, \
+                    birth_weight VARCHAR, body_weight VARCHAR, wean_weight VARCHAR, \
+                        mature_body_weight VARCHAR, events VARCHAR, repro_program VARCHAR, \
+                            tai_method_h VARCHAR, synch_ed_method_h VARCHAR)')
             cur.execute('CREATE TABLE IF NOT EXISTS heiferIIIs \
-                (id VARCHAR, breed VARCHAR, birth_date VARCHAR, days_born VARCHAR, birth_weight VARCHAR, body_weight VARCHAR, wean_weight VARCHAR, mature_body_weight VARCHAR, events VARCHAR, repro_program VARCHAR, tai_method_h VARCHAR, synch_ed_method_h VARCHAR, estrus_count VARCHAR, estrus_day VARCHAR, tai_program_start_day_h VARCHAR, synch_ed_program_start_day_h VARCHAR, synch_ed_estrus_day VARCHAR, stop_day VARCHAR, conception_rate VARCHAR, ai_day VARCHAR, abortion_day VARCHAR, days_in_preg VARCHAR, gestation_length VARCHAR, p_gest_for_calf VARCHAR)')
+                (id VARCHAR, breed VARCHAR, birth_date VARCHAR, days_born VARCHAR, \
+                    birth_weight VARCHAR, body_weight VARCHAR, wean_weight VARCHAR, \
+                        mature_body_weight VARCHAR, events VARCHAR, repro_program VARCHAR, \
+                            tai_method_h VARCHAR, synch_ed_method_h VARCHAR, estrus_count VARCHAR, \
+                                estrus_day VARCHAR, tai_program_start_day_h VARCHAR, \
+                                    synch_ed_program_start_day_h VARCHAR, synch_ed_estrus_day VARCHAR, \
+                                        stop_day VARCHAR, conception_rate VARCHAR, ai_day VARCHAR, \
+                                            abortion_day VARCHAR, days_in_preg VARCHAR, gestation_length VARCHAR, \
+                                                p_gest_for_calf VARCHAR)')
             cur.execute('CREATE TABLE IF NOT EXISTS cows \
-                (id VARCHAR, breed VARCHAR, birth_date VARCHAR, days_born VARCHAR, birth_weight VARCHAR, body_weight VARCHAR, wean_weight VARCHAR, mature_body_weight VARCHAR, events VARCHAR, repro_program VARCHAR, tai_method_h VARCHAR, synch_ed_method_h VARCHAR, estrus_count VARCHAR, estrus_day VARCHAR, tai_program_start_day_h VARCHAR, synch_ed_program_start_day_h VARCHAR, synch_ed_estrus_day VARCHAR, stop_day VARCHAR, conception_rate VARCHAR, ai_day VARCHAR, abortion_day VARCHAR, days_in_preg VARCHAR, gestation_length VARCHAR, p_gest_for_calf VARCHAR, presynch_method VARCHAR, tai_method_c VARCHAR, resynch_method VARCHAR, days_in_milk VARCHAR, parity VARCHAR)')
+                (id VARCHAR, breed VARCHAR, birth_date VARCHAR, days_born VARCHAR, \
+                    birth_weight VARCHAR, body_weight VARCHAR, wean_weight VARCHAR, \
+                        mature_body_weight VARCHAR, events VARCHAR, repro_program VARCHAR, \
+                            tai_method_h VARCHAR, synch_ed_method_h VARCHAR, estrus_count VARCHAR, \
+                                estrus_day VARCHAR, tai_program_start_day_h VARCHAR, \
+                                    synch_ed_program_start_day_h VARCHAR, synch_ed_estrus_day VARCHAR, \
+                                        stop_day VARCHAR, conception_rate VARCHAR, ai_day VARCHAR, \
+                                            abortion_day VARCHAR, days_in_preg VARCHAR, gestation_length VARCHAR, \
+                                                p_gest_for_calf VARCHAR, presynch_method VARCHAR, tai_method_c VARCHAR, \
+                                                    resynch_method VARCHAR, days_in_milk VARCHAR, parity VARCHAR)')
             cur.execute('CREATE TABLE IF NOT EXISTS replacement \
-                (id VARCHAR, breed VARCHAR, birth_date VARCHAR, days_born VARCHAR, birth_weight VARCHAR, body_weight VARCHAR, wean_weight VARCHAR, mature_body_weight VARCHAR, events VARCHAR, repro_program VARCHAR, tai_method_h VARCHAR, synch_ed_method_h VARCHAR, estrus_count VARCHAR, estrus_day VARCHAR, tai_program_start_day_h VARCHAR, synch_ed_program_start_day_h VARCHAR, synch_ed_estrus_day VARCHAR, stop_day VARCHAR, conception_rate VARCHAR, ai_day VARCHAR, abortion_day VARCHAR, days_in_preg VARCHAR, gestation_length VARCHAR, p_gest_for_calf VARCHAR, presynch_method VARCHAR, tai_method_c VARCHAR, resynch_method VARCHAR, days_in_milk VARCHAR, parity VARCHAR)')
+                (id VARCHAR, breed VARCHAR, birth_date VARCHAR, days_born VARCHAR, \
+                    birth_weight VARCHAR, body_weight VARCHAR, wean_weight VARCHAR, \
+                        mature_body_weight VARCHAR, events VARCHAR, repro_program VARCHAR, \
+                            tai_method_h VARCHAR, synch_ed_method_h VARCHAR, estrus_count VARCHAR, \
+                                estrus_day VARCHAR, tai_program_start_day_h VARCHAR, \
+                                    synch_ed_program_start_day_h VARCHAR, synch_ed_estrus_day VARCHAR, \
+                                        stop_day VARCHAR, conception_rate VARCHAR, ai_day VARCHAR, \
+                                            abortion_day VARCHAR, days_in_preg VARCHAR, gestation_length VARCHAR, \
+                                                p_gest_for_calf VARCHAR, presynch_method VARCHAR, tai_method_c VARCHAR, \
+                                                    resynch_method VARCHAR, days_in_milk VARCHAR, parity VARCHAR)')
             cur.execute('CREATE TABLE IF NOT EXISTS animal_id (id VARCHAR)')
             cur.execute('INSERT INTO animal_id VALUES (' + str(self.animal_id) + ')')
             conn.commit()
@@ -203,17 +236,74 @@ class AnimalInitalization:
                         calves.append(calf)
 
         for calf in calves:
-            cur.execute('INSERT INTO calves (id, breed, birth_date, days_born, birth_weight, body_weight, wean_weight, mature_body_weight, events) VALUES (?,?,?,?,?,?,?,?,?)', (calf.id, calf.breed, calf.birth_date, calf.days_born, calf.birth_weight, calf.body_weight, calf.wean_weight, calf.mature_body_weight, str(calf.events)))
+            cur.execute('INSERT INTO calves (id, breed, birth_date, days_born, birth_weight, \
+                body_weight, wean_weight, mature_body_weight, events) VALUES (?,?,?,?,?,?,?,?,?)', 
+                (calf.id, calf.breed, calf.birth_date, calf.days_born, calf.birth_weight, 
+                calf.body_weight, calf.wean_weight, calf.mature_body_weight, str(calf.events)))
         for heiferI in heiferIs:
-            cur.execute('INSERT INTO heiferIs (id, breed, birth_date, days_born, birth_weight, body_weight, wean_weight, mature_body_weight, events) VALUES (?,?,?,?,?,?,?,?,?)', (heiferI.id, heiferI.breed, heiferI.birth_date, heiferI.days_born, heiferI.birth_weight, heiferI.body_weight, heiferI.wean_weight, heiferI.mature_body_weight, str(heiferI.events)))
+            cur.execute('INSERT INTO heiferIs (id, breed, birth_date, days_born, birth_weight, \
+                body_weight, wean_weight, mature_body_weight, events) VALUES (?,?,?,?,?,?,?,?,?)', 
+                (heiferI.id, heiferI.breed, heiferI.birth_date, heiferI.days_born, 
+                heiferI.birth_weight, heiferI.body_weight, heiferI.wean_weight, 
+                heiferI.mature_body_weight, str(heiferI.events)))
         for heiferII in heiferIIs:
-            cur.execute('INSERT INTO heiferIIs (id, breed, birth_date, days_born, birth_weight, body_weight, wean_weight, mature_body_weight, events, repro_program, tai_method_h, synch_ed_method_h) VALUES (?,?,?,?,?,?,?,?,?,?,?,?)', (heiferII.id, heiferII.breed, heiferII.birth_date, heiferII.days_born, heiferII.birth_weight, heiferII.body_weight, heiferII.wean_weight, heiferII.mature_body_weight, str(heiferII.events), heiferII.repro_program, heiferII.tai_method_h, heiferII.synch_ed_method_h))
+            cur.execute('INSERT INTO heiferIIs (id, breed, birth_date, days_born, birth_weight, \
+                body_weight, wean_weight, mature_body_weight, events, repro_program, tai_method_h, \
+                    synch_ed_method_h) VALUES (?,?,?,?,?,?,?,?,?,?,?,?)', 
+                    (heiferII.id, heiferII.breed, heiferII.birth_date, heiferII.days_born, 
+                    heiferII.birth_weight, heiferII.body_weight, heiferII.wean_weight, 
+                    heiferII.mature_body_weight, str(heiferII.events), heiferII.repro_program, 
+                    heiferII.tai_method_h, heiferII.synch_ed_method_h))
         for heiferIII in heiferIIIs:
-            cur.execute('INSERT INTO heiferIIIs (id, breed, birth_date, days_born, birth_weight, body_weight, wean_weight, mature_body_weight, events, repro_program, tai_method_h, synch_ed_method_h, estrus_count, estrus_day, tai_program_start_day_h, synch_ed_program_start_day_h, synch_ed_estrus_day, stop_day, conception_rate, ai_day, abortion_day, days_in_preg, gestation_length, p_gest_for_calf) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)', (heiferIII.id, heiferIII.breed, heiferIII.birth_date, heiferIII.days_born, heiferIII.birth_weight, heiferIII.body_weight, heiferIII.wean_weight, heiferIII.mature_body_weight, str(heiferIII.events), heiferIII.repro_program, heiferIII.tai_method_h, heiferIII.synch_ed_method_h, heiferIII.estrus_count, heiferIII.estrus_day, heiferIII.tai_program_start_day_h, heiferIII.synch_ed_program_start_day_h, heiferIII.synch_ed_estrus_day, heiferIII.stop_day, heiferIII.conception_rate, heiferIII.ai_day, heiferIII.abortion_day, heiferIII.days_in_preg, heiferIII.gestation_length, heiferIII.p_gest_for_calf))
+            cur.execute('INSERT INTO heiferIIIs (id, breed, birth_date, days_born, birth_weight, \
+                body_weight, wean_weight, mature_body_weight, events, repro_program, tai_method_h, \
+                    synch_ed_method_h, estrus_count, estrus_day, tai_program_start_day_h, \
+                        synch_ed_program_start_day_h, synch_ed_estrus_day, stop_day, conception_rate, \
+                            ai_day, abortion_day, days_in_preg, gestation_length, p_gest_for_calf) \
+                                VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)', 
+                                (heiferIII.id, heiferIII.breed, heiferIII.birth_date, heiferIII.days_born, 
+                                heiferIII.birth_weight, heiferIII.body_weight, heiferIII.wean_weight, 
+                                heiferIII.mature_body_weight, str(heiferIII.events), heiferIII.repro_program, 
+                                heiferIII.tai_method_h, heiferIII.synch_ed_method_h, heiferIII.estrus_count, 
+                                heiferIII.estrus_day, heiferIII.tai_program_start_day_h, 
+                                heiferIII.synch_ed_program_start_day_h, heiferIII.synch_ed_estrus_day, 
+                                heiferIII.stop_day, heiferIII.conception_rate, heiferIII.ai_day, 
+                                heiferIII.abortion_day, heiferIII.days_in_preg, heiferIII.gestation_length, 
+                                heiferIII.p_gest_for_calf))
         for cow in cows:
-            cur.execute('INSERT INTO cows (id, breed, birth_date, days_born, birth_weight, body_weight, wean_weight, mature_body_weight, events, repro_program, tai_method_h, synch_ed_method_h, estrus_count, estrus_day, tai_program_start_day_h, synch_ed_program_start_day_h, synch_ed_estrus_day, stop_day, conception_rate, ai_day, abortion_day, days_in_preg, gestation_length, p_gest_for_calf, presynch_method, tai_method_c, resynch_method, days_in_milk, parity) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)', (cow.id, cow.breed, cow.birth_date, cow.days_born, cow.birth_weight, cow.body_weight, cow.wean_weight, cow.mature_body_weight, str(cow.events), cow.repro_program, cow.tai_method_h, cow.synch_ed_method_h, cow.estrus_count, cow.estrus_day, cow.tai_program_start_day_h, cow.synch_ed_program_start_day_h, cow.synch_ed_estrus_day, cow.stop_day, cow.conception_rate, cow.ai_day, cow.abortion_day, cow.days_in_preg, cow.gestation_length, cow.p_gest_for_calf, cow.presynch_method, cow.tai_method_c, cow.resynch_method, cow.days_in_milk, cow.calves))
+            cur.execute('INSERT INTO cows (id, breed, birth_date, days_born, birth_weight, \
+                body_weight, wean_weight, mature_body_weight, events, repro_program, tai_method_h, \
+                    synch_ed_method_h, estrus_count, estrus_day, tai_program_start_day_h, \
+                        synch_ed_program_start_day_h, synch_ed_estrus_day, stop_day, conception_rate, \
+                            ai_day, abortion_day, days_in_preg, gestation_length, p_gest_for_calf, \
+                                presynch_method, tai_method_c, resynch_method, days_in_milk, parity) \
+                                    VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)', 
+                                    (cow.id, cow.breed, cow.birth_date, cow.days_born, cow.birth_weight, 
+                                    cow.body_weight, cow.wean_weight, cow.mature_body_weight, 
+                                    str(cow.events), cow.repro_program, cow.tai_method_h, 
+                                    cow.synch_ed_method_h, cow.estrus_count, cow.estrus_day, 
+                                    cow.tai_program_start_day_h, cow.synch_ed_program_start_day_h, 
+                                    cow.synch_ed_estrus_day, cow.stop_day, cow.conception_rate, 
+                                    cow.ai_day, cow.abortion_day, cow.days_in_preg, cow.gestation_length, 
+                                    cow.p_gest_for_calf, cow.presynch_method, cow.tai_method_c, 
+                                    cow.resynch_method, cow.days_in_milk, cow.calves))
         for cow in replacement:
-            cur.execute('INSERT INTO replacement (id, breed, birth_date, days_born, birth_weight, body_weight, wean_weight, mature_body_weight, events, repro_program, tai_method_h, synch_ed_method_h, estrus_count, estrus_day, tai_program_start_day_h, synch_ed_program_start_day_h, synch_ed_estrus_day, stop_day, conception_rate, ai_day, abortion_day, days_in_preg, gestation_length, p_gest_for_calf, presynch_method, tai_method_c, resynch_method, days_in_milk, parity) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)', (cow.id, cow.breed, cow.birth_date, cow.days_born, cow.birth_weight, cow.body_weight, cow.wean_weight, cow.mature_body_weight, str(cow.events), cow.repro_program, cow.tai_method_h, cow.synch_ed_method_h, cow.estrus_count, cow.estrus_day, cow.tai_program_start_day_h, cow.synch_ed_program_start_day_h, cow.synch_ed_estrus_day, cow.stop_day, cow.conception_rate, cow.ai_day, cow.abortion_day, cow.days_in_preg, cow.gestation_length, cow.p_gest_for_calf, cow.presynch_method, cow.tai_method_c, cow.resynch_method, cow.days_in_milk, cow.calves))
+            cur.execute('INSERT INTO replacement (id, breed, birth_date, days_born, birth_weight, \
+                body_weight, wean_weight, mature_body_weight, events, repro_program, tai_method_h, \
+                    synch_ed_method_h, estrus_count, estrus_day, tai_program_start_day_h, \
+                        synch_ed_program_start_day_h, synch_ed_estrus_day, stop_day, conception_rate, \
+                            ai_day, abortion_day, days_in_preg, gestation_length, p_gest_for_calf, \
+                                presynch_method, tai_method_c, resynch_method, days_in_milk, parity) \
+                                    VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)', 
+                                    (cow.id, cow.breed, cow.birth_date, cow.days_born, cow.birth_weight, 
+                                    cow.body_weight, cow.wean_weight, cow.mature_body_weight, 
+                                    str(cow.events), cow.repro_program, cow.tai_method_h, 
+                                    cow.synch_ed_method_h, cow.estrus_count, cow.estrus_day, 
+                                    cow.tai_program_start_day_h, cow.synch_ed_program_start_day_h, 
+                                    cow.synch_ed_estrus_day, cow.stop_day, cow.conception_rate, 
+                                    cow.ai_day, cow.abortion_day, cow.days_in_preg, cow.gestation_length, 
+                                    cow.p_gest_for_calf, cow.presynch_method, cow.tai_method_c, 
+                                    cow.resynch_method, cow.days_in_milk, cow.calves))
         cur.execute('UPDATE animal_id SET id = ' + str(self.animal_id))
         conn.commit()
         conn.close()
