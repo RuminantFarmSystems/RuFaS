@@ -473,6 +473,10 @@ class Soil:
         self.struct_BG_to_active_actual = 0.0
         self.struct_BG_to_slow_loss = 0.0
         self.struct_BG_to_slow_actual = 0.0
+        self.carbon_active = 5000  # TODO initial condition, need to decide if in json or here
+        self.silt_and_clay_frac = 0.5  # TODO database item
+        self.carbon_slow = 5000  # TODO above
+        self.carbon_passive = 5000  # TODO above
 
         # ------ INITIALIZE SOIL NITROGEN POOLS ------------------------------------
         # Calculate initial amount of NO3 in each soil layer;

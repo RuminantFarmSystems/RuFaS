@@ -63,9 +63,10 @@ def update_all(crop_type, soil, weather, time):
 
     metabolic_AG_to_BG = soil.metabolic_AG * soil.fr_tillage  # TODO fr_tillage, percent_incorp?
 
-    d_metabolic_AG = soil.metabolic_AG - ((metabolic_AG_to_C_active - metabolic_AG_to_BG)
-                                          + metabolic_AG_to_BG)
-    soil.metabolic_AG = soil.residue_DM * metabolic_AG_frac - d_metabolic_AG
+    d_metabolic_AG = soil.residue_DM * metabolic_AG_frac - (
+            (metabolic_AG_to_C_active - metabolic_AG_to_BG) + metabolic_AG_to_BG)
+
+    soil.metabolic_AG += d_metabolic_AG
 
     # above ground structural residue
     K1 = 0.076
@@ -75,9 +76,10 @@ def update_all(crop_type, soil, weather, time):
 
     struct_AG_to_BG = soil.structural_AG * soil.fr_tillage
 
-    d_structural_AG = soil.structural_AG - ((struct_AG_to_C_active + struct_AG_to_C_slow - struct_AG_to_BG)
-                                            + struct_AG_to_BG)
-    soil.structural_AG = (soil.residue_DM * (1 - metabolic_AG_frac)) - d_structural_AG
+    d_structural_AG = (soil.residue_DM * (1 - metabolic_AG_frac)) - \
+                      ((struct_AG_to_C_active + struct_AG_to_C_slow - struct_AG_to_BG) + struct_AG_to_BG)
+
+    soil.structural_AG += d_structural_AG
 
     # below ground metabolic residue and roots
     residue_DM_incorp = soil.fr_tillage * soil.residue_DM
@@ -96,9 +98,10 @@ def update_all(crop_type, soil, weather, time):
     metabolic_BG_active_decomp = K4
     metabolic_BG_to_C_active = metabolic_BG_active_decomp * M_d * T_d * soil.metabolic_BG
 
-    d_metabolic_BG = soil.metabolic_BG - metabolic_BG_to_C_active
+    d_metabolic_BG = metabolic_AG_to_BG + crop_type.bio_BG_DM * metabolic_BG_frac - (
+            soil.metabolic_BG - metabolic_BG_to_C_active)
 
-    soil.metabolic_BG = metabolic_AG_to_BG + crop_type.bio_BG_DM * metabolic_BG_frac - d_metabolic_BG
+    soil.metabolic_BG += d_metabolic_BG
 
     # below ground structural residue and roots
     K3 = 0.094
@@ -106,9 +109,10 @@ def update_all(crop_type, soil, weather, time):
     struct_BG_to_C_active = struct_BG_decomp * M_d * T_d * soil.structural_BG
     struct_BG_to_C_slow = struct_BG_decomp * M_d * T_d * soil.structural_BG
 
-    d_structural_BG = soil.structural_BG - (struct_BG_to_C_active + struct_BG_to_C_slow) + struct_AG_to_BG
+    d_structural_BG = (struct_AG_to_BG + crop_type.bio_BG_DM * (1 - metabolic_BG_frac)) - (
+            struct_BG_to_C_active + struct_BG_to_C_slow) + struct_AG_to_BG
 
-    soil.structural_BG = struct_AG_to_BG + crop_type.bio_BG_DM * (1 - metabolic_BG_frac) - d_structural_BG
+    soil.structural_BG += d_structural_BG
 
     # partitioning active and slow carbon decomposition to carbon pools or gas loss
 
@@ -136,3 +140,48 @@ def update_all(crop_type, soil, weather, time):
 
     soil.struct_BG_to_slow_loss = struct_BG_to_C_slow * fr_CO2_struct_to_slow
     soil.struct_BG_to_slow_actual = struct_BG_to_C_slow * (1 - fr_CO2_struct_to_slow)
+
+    # active, slow and lost CO2 pools
+
+    # inputs to the active carbon pool
+    K5 = 0.14
+    active_decomp = K5 * (1 - 0.75 * soil.silt_and_clay_frac)
+    carbon_active_decomp = active_decomp * M_d * T_d * soil.carbon_active
+
+    d_carbon_active = (soil.metabolic_AG_to_active_actual + soil.struct_AG_to_active_actual +
+                       soil.metabolic_BG_to_active_actual + soil.struct_BG_to_active_actual +
+                       passive_to_active + slow_to_active) - carbon_active_decomp
+    soil.carbon_active += d_carbon_active
+
+    # inputs to the slow carbon pool
+    K6 = 0.0038
+    carbon_slow_decomp = K6 * M_d * T_d * soil.carbon_slow
+    d_carbon_slow = (soil.struct_AG_to_slow_actual + soil.struct_BG_to_slow_actual +
+                     active_to_slow) - carbon_slow_decomp
+    soil.carbon_slow += d_carbon_slow
+
+    # inputs to the passive carbon pool
+    K7 = 0.00013
+    carbon_passive_decomp = K7 * M_d * T_d * soil.carbon_passive  # TODO comment
+    d_carbon_passive = (slow_to_passive + active_to_passive) - carbon_passive_decomp
+    soil.carbon_passive += d_carbon_passive
+
+    # Partitioning The Active  and Slow Carbon Pools (in soil) Decomposition to Alternative Carbon Pools
+    # (e.g., Active Carbon Pool to Slow Carbon Pool) or Gas Loss
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
