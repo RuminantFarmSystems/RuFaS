@@ -477,6 +477,12 @@ class Soil:
         self.silt_and_clay_frac = 0.5  # TODO database item
         self.carbon_slow = 5000  # TODO above
         self.carbon_passive = 5000  # TODO above
+        # TODO all need initial conditions
+        self.active_to_slow = 0
+        self.active_to_passive = 0
+        self.slow_to_active = 0
+        self.slow_to_passive = 0
+        self.passive_to_active = 0
 
         # ------ INITIALIZE SOIL NITROGEN POOLS ------------------------------------
         # Calculate initial amount of NO3 in each soil layer;

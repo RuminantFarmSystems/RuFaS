@@ -25,12 +25,12 @@ def update_all(crop_type, soil, weather, time):
         time
     """
 
-    # residue from annual crops
+    # A. residue from annual crops
 
     # above ground metabolic residue
     soil.residue_DM = soil.residue * (1 - soil.plant_moisture)
 
-    # residue partitioning
+    # B. residue partitioning
     soil.lignin_residue = 0  # TODO get from database
     # TODO fr_N might need a different calculation in the future
     LN_ratio_AG = 0
@@ -114,7 +114,7 @@ def update_all(crop_type, soil, weather, time):
 
     soil.structural_BG += d_structural_BG
 
-    # partitioning active and slow carbon decomposition to carbon pools or gas loss
+    # C. partitioning active and slow carbon decomposition to carbon pools or gas loss
 
     # above ground metabolic C
     fr_CO2_met_to_active = 0.55
@@ -141,7 +141,7 @@ def update_all(crop_type, soil, weather, time):
     soil.struct_BG_to_slow_loss = struct_BG_to_C_slow * fr_CO2_struct_to_slow
     soil.struct_BG_to_slow_actual = struct_BG_to_C_slow * (1 - fr_CO2_struct_to_slow)
 
-    # active, slow and lost CO2 pools
+    # D. active, slow and lost CO2 pools
 
     # inputs to the active carbon pool
     K5 = 0.14
@@ -150,27 +150,45 @@ def update_all(crop_type, soil, weather, time):
 
     d_carbon_active = (soil.metabolic_AG_to_active_actual + soil.struct_AG_to_active_actual +
                        soil.metabolic_BG_to_active_actual + soil.struct_BG_to_active_actual +
-                       passive_to_active + slow_to_active) - carbon_active_decomp
+                       soil.passive_to_active + soil.slow_to_active) - carbon_active_decomp
     soil.carbon_active += d_carbon_active
 
     # inputs to the slow carbon pool
     K6 = 0.0038
     carbon_slow_decomp = K6 * M_d * T_d * soil.carbon_slow
     d_carbon_slow = (soil.struct_AG_to_slow_actual + soil.struct_BG_to_slow_actual +
-                     active_to_slow) - carbon_slow_decomp
+                     soil.active_to_slow) - carbon_slow_decomp
     soil.carbon_slow += d_carbon_slow
 
     # inputs to the passive carbon pool
     K7 = 0.00013
-    carbon_passive_decomp = K7 * M_d * T_d * soil.carbon_passive  # TODO comment
-    d_carbon_passive = (slow_to_passive + active_to_passive) - carbon_passive_decomp
+    carbon_passive_decomp = K7 * M_d * T_d * soil.carbon_passive
+    d_carbon_passive = (soil.slow_to_passive + soil.active_to_passive) - carbon_passive_decomp
     soil.carbon_passive += d_carbon_passive
 
-    # Partitioning The Active  and Slow Carbon Pools (in soil) Decomposition to Alternative Carbon Pools
+    # E. Partitioning The Active  and Slow Carbon Pools (in soil) Decomposition to Alternative Carbon Pools
     # (e.g., Active Carbon Pool to Slow Carbon Pool) or Gas Loss
 
+    Es = 0.85 - 0.68 * soil.silt_and_clay_frac
+    soil.active_to_slow = carbon_active_decomp * (1 - Es - 0.004)
 
+    carbon_active_loss = carbon_active_decomp * Es
 
+    soil.active_to_passive = carbon_active_decomp * 0.004
+
+    soil.slow_to_active = carbon_slow_decomp * (1 - fr_CO2_carbon_slow_loss - fr_slow_to_passive)
+
+    carbon_slow_loss = carbon_slow_decomp * (1 - fr_CO2_carbon_slow_loss)
+
+    soil.slow_to_passive = carbon_slow_decomp * fr_slow_to_passive
+
+    soil.passive_to_active = carbon_passive_decomp * (1 - fr_CO2_carbon_passive_loss)
+
+    carbon_passive_loss = carbon_passive_decomp * fr_CO2_carbon_passive_loss
+
+    # F. Aggregate Soil Carbon Pools (Active, Slow, and Passive) and CO2 Gas Flux.
+
+    # Carbon pool conversion to percentages and their aggregation (i.e., Total %C)
 
 
 
