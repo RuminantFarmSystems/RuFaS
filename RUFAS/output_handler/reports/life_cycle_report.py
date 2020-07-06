@@ -54,7 +54,9 @@ class LifeCycleReport(BaseReportDriver):
                 'heiferIII_num': ['life_cycle_manager.heiferIII_num', '', []],
                 'heiferIII_percent': ['life_cycle_manager.heiferIII_percent', '%', []],
                 'cow_num': ['life_cycle_manager.cow_num', '', []],
-                'cow_percent': ['life_cycle_manager.cow_percent', '%', []],}
+                'cow_percent': ['life_cycle_manager.cow_percent', '%', []],
+                'culled_heifer_num': ['life_cycle_manager.culled_heifer_num', '', []],
+                'culled_cow_num': ['life_cycle_manager.culled_cow_num', '', []],}
 
             
             for parity in LifeCycleManager.parity_num:
@@ -79,7 +81,7 @@ class LifeCycleReport(BaseReportDriver):
             }
 
             self.production_performance = {
-                'cumulated_milk_production': ['life_cycle_manager.total_milk_production', 'kg', []]
+                'cumulated_milk_production': ['life_cycle_manager.daily_milk_production', 'kg', []]
             }
 
             self.preg = {
@@ -89,8 +91,7 @@ class LifeCycleReport(BaseReportDriver):
 
             self.daily_variables = {**self.herd_structure, **self.reproduction_performance, **self.production_performance, **self.preg}
             
-            self.annual_variables = {'year': ['time.cal_year', '', []]
-                                     }
+            self.annual_variables = {'year': ['time.cal_year', '', []]}
 
         def finalize(self, state, weather, time):
             print('herd done')
