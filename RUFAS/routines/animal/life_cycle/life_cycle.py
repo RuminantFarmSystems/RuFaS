@@ -61,14 +61,16 @@ class LifeCycleManager:
     culled_cow_num = 0
 
     parity_num = {
-        1: 0,
-        2: 0,
-        3: 0
+        '1': 0,
+        '2': 0,
+        '3': 0,
+        '>3': 0
     }
     parity_percent = {
-        1: 0,
-        2: 0,
-        3: 0
+        '1': 0,
+        '2': 0,
+        '3': 0,
+        '>3': 0
     }
 
     preg_check_num = 0
@@ -447,13 +449,13 @@ class LifeCycleManager:
                 daily_cow_preg += 1
                 total_days_in_preg += cow.days_in_preg
 
-            if cow.calves not in self.parity_num:
-                self.parity_num[cow.calves] = 1
-                self.parity_percent[cow.calves] = 1 / self.cow_num * 100
+            if cow.calves <=3:
+                self.parity_num[str(cow.calves)] += 1
+                self.parity_percent[str(cow.calves)] = self.parity_num[str(cow.calves)] / self.cow_num * 100
             else:
-                self.parity_num[cow.calves] += 1
-                self.parity_percent[cow.calves] = self.parity_num[cow.calves] / self.cow_num * 100
-
+                self.parity_num['>3'] += 1
+                self.parity_percent['>3'] = self.parity_num['>3'] / self.cow_num * 100
+                
             GnRH_injections += cow.GnRH_injections
             PGF_injections += cow.PGF_injections
             preg_check += cow.preg_diagnoses
