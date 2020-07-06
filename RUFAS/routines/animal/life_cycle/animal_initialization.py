@@ -500,7 +500,7 @@ class AnimalInitalization:
 
     def get_replacement_cows(self, num):
         cows = []
-        conn = sqlite3.connect('Inputs/animals.sqlite')
+        conn = sqlite3.connect('input/animals.sqlite')
         cur = conn.cursor()
         while cur.execute('SELECT COUNT() FROM replacement').fetchone()[0] < num:
             self.init_animals()

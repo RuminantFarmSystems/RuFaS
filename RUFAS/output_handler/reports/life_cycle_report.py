@@ -60,8 +60,10 @@ class LifeCycleReport(BaseReportDriver):
 
             
             for parity in LifeCycleManager.parity_num:
-                self.herd_structure['cow_num_for_parity: ' + str(parity)] = ['life_cycle_manager.parity_num[' + str(parity) + ']', '', []]
-                self.herd_structure['cow_percent_for_parity: ' + str(parity)] = ['life_cycle_manager.parity_percent[' + str(parity) + ']', '%', []]
+                self.herd_structure['cow_num_for_parity: ' + parity] = \
+                    ['life_cycle_manager.parity_num[\'' + parity + '\']', '', []]
+                self.herd_structure['cow_percent_for_parity: ' + parity] = \
+                    ['life_cycle_manager.parity_percent[\'' + parity + '\']', '%', []]
 
             for cull_reason in LifeCycleManager.cull_reason_stats:
                 self.herd_structure['cow_num_culled_for_reason: \'' + cull_reason + '\''] = \
@@ -89,7 +91,11 @@ class LifeCycleReport(BaseReportDriver):
                 'average_days_in_preg': ['life_cycle_manager.avg_days_in_preg', 'd', []]
             }
 
-            self.daily_variables = {**self.herd_structure, **self.reproduction_performance, **self.production_performance, **self.preg}
+            self.daily_variables = {
+                **self.herd_structure, 
+                **self.reproduction_performance, 
+                **self.production_performance, 
+                **self.preg}
             
             self.annual_variables = {'year': ['time.cal_year', '', []]}
 
