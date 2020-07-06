@@ -61,6 +61,9 @@ class Cow(HeiferIII):
 				args.resynch_method: resynch protocols used for resynch
 					programs, three of them: TAIafterPD, TAIbeforePD,
 					and PGFatPD
+				(optional)
+				args.days_in_milk: cow's current day in milk
+				args.parity: parity of the cow
 		"""
 		super().__init__(args)
 
@@ -110,6 +113,10 @@ class Cow(HeiferIII):
 		#figures
 		self.estimated_daily_milk_produced_lst = []
 		self.body_weight_lst = []
+
+		if 'days_in_milk' in args:
+			self.days_in_milk = args['days_in_milk']
+			self.calves = args['parity']
 
 	def _determine_param_value(self, mean, std):
 		"""
