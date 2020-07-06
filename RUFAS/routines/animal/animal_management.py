@@ -651,10 +651,11 @@ class AnimalManagement:
             'semen_used': animal.semen_used,
             'pen_history':
                 [pen_hist.__dict__ for pen_hist in animal.pen_history],
-            'bodyweight_history': animal.body_weight_lst,
+            'bodyweight_history':
+                [weight_hist.__dict__ for weight_hist in animal.body_weight_history],
             'milk_production_history':
                 None if not is_cow else
-                animal.estimated_daily_milk_produced_lst,
+                [milk_hist.__dict__ for milk_hist in animal.milk_production_history],
             'event_history': animal.events.events
         }
 
