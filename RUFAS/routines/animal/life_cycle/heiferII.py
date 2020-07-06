@@ -198,7 +198,7 @@ class HeiferII(HeiferI):
 		# requirement of P from the ration (g) (A.1B-D.E.7)
 		self.p_req = p_absorb / 0.664
 
-	def update(self):
+	def update(self, sim_day):
 		"""
 		Controls heifer's grow with average daily gain based on user's input
 		until breeding start day. Here is the place to change growth rate with
@@ -213,7 +213,7 @@ class HeiferII(HeiferI):
 			cull_stage: culling for reproduction failure
 			third_stage: move to next stage -- heiferIII stage when time comes
 		"""
-		self.body_weight_lst.append(self.body_weight)
+		self.update_body_weight_history(sim_day)
 		cull_stage = False
 		third_stage = False
 		

@@ -177,7 +177,7 @@ class Calf(AnimalBase):
 		# requirement of P from the ration (g) (A.1A.E.7)
 		self.p_req = p_absorb / 0.90
 
-	def update(self):
+	def update(self, sim_day):
 		"""
 		Controls calf's grow with average daily gain based on user's input until
 		wean day. Calculate the wean weight at wean day. Here is the place to
@@ -186,7 +186,7 @@ class Calf(AnimalBase):
 
 		Returns: time when calf is weaned -- stop be fed with milk
 		"""
-		self.body_weight_lst.append(self.body_weight)
+		self.update_body_weight_history(sim_day)
 
 		wean_day = False
 		

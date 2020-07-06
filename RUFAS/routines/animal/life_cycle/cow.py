@@ -35,6 +35,13 @@ from RUFAS.routines.animal.manure.dry_cow_manure_excretion import \
 from random import random
 
 
+class MilkProductionHistory:
+	def __init__(self, sim_day, days_in_milk, milk_prod):
+		self.simulation_day = sim_day
+		self.days_in_milk = days_in_milk
+		self.milk_production = milk_prod
+
+
 class Cow(HeiferIII):
 	# TODO: different body weight for different lactations and individual mature
 	#  body weight.
@@ -109,14 +116,17 @@ class Cow(HeiferIII):
 		self.feed_cost = 0
 		self.fixed_cost = 0
 		self.milk_income = 0
+		self.milk_production_history = []
 
 		#figures
-		self.estimated_daily_milk_produced_lst = []
-		self.body_weight_lst = []
+		# self.estimated_daily_milk_produced_lst = []
 
 		if 'days_in_milk' in args:
 			self.days_in_milk = args['days_in_milk']
 			self.calves = args['parity']
+
+	def update_milk_production_history(self, sim_day):
+		self.milk_production_history.append(MilkProductionHistory(sim_day, self.days_in_milk, self.estimated_daily_milk_produced))
 
 	def _determine_param_value(self, mean, std):
 		"""
@@ -133,7 +143,7 @@ class Cow(HeiferIII):
 		"""
 		return np.random.normal(mean, std)
 
-	def _milking_update(self):
+	def _milking_update(self, sim_day):
 		"""
 		Update milking status for lactating cows.
 		start at calving, daily milk production estimated by breed and parity
@@ -156,8 +166,7 @@ class Cow(HeiferIII):
 			self.events.add_event(self.days_born, 'dry')
 			self.days_in_milk = 0
 			self.estimated_daily_milk_produced = 0
-			self.estimated_daily_milk_produced_lst.append(
-				self.estimated_daily_milk_produced)
+			self.update_milk_production_history(sim_day)
 			return 0, 0, 0
 
 		breed_index = 0
@@ -225,8 +234,7 @@ class Cow(HeiferIII):
 		if not self.milking:
 			self.daily_growth = self.body_weight - prev_weight
 
-		self.estimated_daily_milk_produced_lst.append(
-			self.estimated_daily_milk_produced)
+		self.update_milk_production_history(sim_day)
 
 		return estimated_daily_milk_produced, fat_percent, \
 			daily_fat_correct_milk_production
@@ -360,7 +368,7 @@ class Cow(HeiferIII):
 		self.DHD = 2 * horizontal_dist_to_parlor * \
 			AnimalBase.config['cow_times_milked_per_day']
 
-	def update(self, record_econ_stats):
+	def update(self, record_econ_stats, sim_day):
 		"""
 		Update cow status from the moment of calving, parity+1,
 		milking start, pregnancy stop, and estrus restart.
@@ -379,7 +387,7 @@ class Cow(HeiferIII):
 			cull_stage: True if a cow is culled, false if it stays in the herd
 			new_born: True if a calf is born
 		"""
-		self.body_weight_lst.append(self.body_weight)
+		self.update_body_weight_history(sim_day)
 		if self.culled:
 			return None
 
@@ -409,7 +417,7 @@ class Cow(HeiferIII):
 
 		# if self.milking:
 		estimated_daily_milk_produced, fat_percent, \
-			daily_fat_correct_milk_production = self._milking_update()
+			daily_fat_correct_milk_production = self._milking_update(sim_day)
 		if self.repro_program == 'ED':
 			self._ed_update(record_econ_stats)
 		elif self.repro_program == 'ED-TAI':
@@ -1009,8 +1017,10 @@ class Cow(HeiferIII):
 					'Preg loss happened between 2nd and 3rd preg check')
 		if not self.preg and self.days_in_milk > \
 			AnimalBase.config['do_not_breed_time']:
+			# only add to events if it is the first time this occurs
+			if not self.do_not_breed:
+				self.events.add_event(self.days_born, 'Do not breed')
 			self.do_not_breed = True
-			self.events.add_event(self.days_born, 'Do not breed')
 			return True
 
 	# Cull methods
@@ -1144,17 +1154,17 @@ class Cow(HeiferIII):
 		"""
 		fig = plt.figure()
 
-		ax1 = fig.add_subplot(121)
-		ax1.plot(self.estimated_daily_milk_produced_lst)
-		ax1.spines['right'].set_visible(False)
-		ax1.spines['top'].set_visible(False)
-		ax1.set_title("Milk")
+		# ax1 = fig.add_subplot(121)
+		# ax1.plot(self.estimated_daily_milk_produced_lst)
+		# ax1.spines['right'].set_visible(False)
+		# ax1.spines['top'].set_visible(False)
+		# ax1.set_title("Milk")
 
-		ax2 = fig.add_subplot(122)
-		ax2.plot(self.body_weight_lst)
-		ax2.spines['right'].set_visible(False)
-		ax2.spines['top'].set_visible(False)
-		ax2.set_title("Weight")
+		# ax2 = fig.add_subplot(122)
+		# ax2.plot(self.body_weight_lst)
+		# ax2.spines['right'].set_visible(False)
+		# ax2.spines['top'].set_visible(False)
+		# ax2.set_title("Weight")
 
 		plt.plot()
 		plt.show()

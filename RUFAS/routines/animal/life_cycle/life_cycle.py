@@ -258,7 +258,7 @@ class LifeCycleManager:
 
         # calf to heiferI
         for index, calf in enumerate(calves):
-            wean_day = calf.update()
+            wean_day = calf.update(date)
             if wean_day:
                 args = calf.get_calf_values()
                 new_heiferI = HeiferI(args)
@@ -271,7 +271,7 @@ class LifeCycleManager:
 
         # heiferI to heiferII, assign repro programs
         for index, heiferI in enumerate(heiferIs):
-            second_stage = heiferI.update()
+            second_stage = heiferI.update(date)
             if second_stage:
                 args = heiferI.get_heiferI_values()
                 args.update(repro_program = 'TAI')
@@ -287,7 +287,7 @@ class LifeCycleManager:
 
         # heiferII to heiferIII
         for index, heiferII in enumerate(heiferIIs):
-            cull_stage, third_stage = heiferII.update()
+            cull_stage, third_stage = heiferII.update(date)
             if cull_stage:
                 self.total_culled += 1
                 self.culled_heifer_num += 1
@@ -309,9 +309,9 @@ class LifeCycleManager:
             # TODO why can cows be added to the list of HeiferIII's so that the
             #  following if statement is necessary?
             if type(heiferIII).__name__ == 'HeiferIII':
-                cow_stage = heiferIII.update()
+                cow_stage = heiferIII.update(date)
             else:
-                cow_stage = heiferIII.update(record_econ_stats)
+                cow_stage = heiferIII.update(record_econ_stats, date)
 
             if cow_stage:
                 args = heiferIII.get_heiferIII_values()
@@ -356,7 +356,7 @@ class LifeCycleManager:
 
         # cow culling action and economic stats
         for index, cow in enumerate(cows):
-            _, _, _, culled, new_born = cow.update(record_econ_stats)
+            _, _, _, culled, new_born = cow.update(record_econ_stats, date)
             # if date == 2000:
             #     print(len(cows))
             #     print(cows[20])

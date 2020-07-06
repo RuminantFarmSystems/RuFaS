@@ -12,16 +12,19 @@ birth date, and age for all animals to be identified.
 from RUFAS.routines.animal.life_cycle.animal_events import AnimalEvents
 
 
-
-class PenHistory():
+class PenHistory:
 	def __init__(self, start, end, pen, classes_in_pen):
 		self.start_date = start
 		self.end_date = end
 		self.pen = pen
 		self.classes_in_pen = classes_in_pen
 
-	# def __str__(self):
-	# 	return "in " + str(self.pen) + " from " + str(self.start_date) + " to " + str(self.end_date) + " with " + str(self.classes_in_pen)
+
+class BodyWeightHistory:
+	def __init__(self, sim_day, days_born, body_weight):
+		self.simulation_day = sim_day
+		self.days_born = days_born
+		self.body_weight = body_weight
 
 
 class AnimalBase(object):
@@ -54,7 +57,7 @@ class AnimalBase(object):
 		self.events = AnimalEvents()
 		self.pen_history = []
 		self.semen_used = self.config['semen_type']
-		self.body_weight_lst = []
+		self.body_weight_history = []
 
 		self.daily_growth = 0
 		self.nutrient_rqmts = {}
@@ -185,3 +188,6 @@ class AnimalBase(object):
 		else:  # last_pen == curr_pen
 			self.pen_history[-1].end_date = curr_day
 			self.pen_history[-1].classes_in_pen = list(classes_in_pen)
+
+	def update_body_weight_history(self, sim_day):
+		self.body_weight_history.append(BodyWeightHistory(sim_day, self.days_born, self.body_weight))
