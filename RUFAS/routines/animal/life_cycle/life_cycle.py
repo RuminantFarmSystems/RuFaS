@@ -57,6 +57,8 @@ class LifeCycleManager:
     heiferIII_percent = 0
     cow_num = 0
     cow_percent = 0
+    culled_heifer_num = 0
+    culled_cow_num = 0
 
     parity_num = {
         1: 0,
@@ -73,7 +75,7 @@ class LifeCycleManager:
     GnRH_injection_num = 0
     PGF_injection_num = 0
 
-    total_milk_production = 0
+    daily_milk_production = 0
     avg_days_in_milk = 0
     avg_days_in_preg = 0
 
@@ -225,15 +227,19 @@ class LifeCycleManager:
         self.daily_heiferIII_num.append(len(heiferIIIs))
         self.daily_cow_num.append(len(cows))
 
+        milk_production = 0
         GnRH_injections = 0
         PGF_injections = 0
         preg_check = 0
         ai_num = 0
         self.calf_num = len(calves)
         self.heiferI_num = len(heiferIs)
-        self.heiferII_num = len(heiferIIs) + len(self.culled_heifers)
+        self.heiferII_num = len(heiferIIs)
         self.heiferIII_num = len(heiferIIIs)
-        self.cow_num = len(cows) + len(self.culled_cows)
+        self.cow_num = len(cows)
+        self.culled_heifer_num = 0
+        self.culled_cow_num = 0
+
         total_aniaml_num = self.calf_num + self.heiferI_num + self.heiferII_num + self.heiferIII_num + self.cow_num
         self.calf_percent = self.calf_num / total_aniaml_num * 100
         self.heiferI_percent = self.heiferI_num / total_aniaml_num * 100
@@ -241,14 +247,8 @@ class LifeCycleManager:
         self.heiferIII_percent = self.heiferIII_num / total_aniaml_num * 100
         self.cow_percent = self.cow_num / total_aniaml_num * 100
 
-        # for parity in self.parity_num:
-        #     parity.append(0)
-        # for parity_percent in self.parity_percent:
-        #     parity_percent.append
-        # for cull_reason in self.cull_reason_stats:
-        #     cull_reason.append(0)
-        # for cull_reason_percent in self.cull_reason_stats_percent:
-        #     cull_reason_percent.append(0)
+        for parity in self.parity_num:
+            self.parity_num[parity] = 0
 
         record_econ_stats = False
         if sim_length - date <= self.config["econ_indicator_range"]:
@@ -288,6 +288,7 @@ class LifeCycleManager:
             cull_stage, third_stage = heiferII.update()
             if cull_stage:
                 self.total_culled += 1
+                self.culled_heifer_num += 1
                 self.culled_heifers.append(heiferII)
                 del heiferIIs[index]
             if third_stage:
@@ -391,6 +392,7 @@ class LifeCycleManager:
                     self.cull_reason_stats[cow.cull_reason] = 1
                     self.cull_reason_stats_percent[cow.cull_reason] = 1 / len(self.culled_cows)
                 self.total_culled += 1
+                self.culled_cow_num += 1
                 daily_cow_cull_num += 1
 
                 # print(len(culled_cows))
@@ -439,7 +441,7 @@ class LifeCycleManager:
             if cow.milking:
                 daily_cow_milking += 1
                 total_days_in_milk += cow.days_in_milk
-                self.total_milk_production += cow.estimated_daily_milk_produced
+                milk_production += cow.estimated_daily_milk_produced
 
             if cow.preg:
                 daily_cow_preg += 1
@@ -477,6 +479,7 @@ class LifeCycleManager:
         self.replacement_bought_lst.append(daily_bought_from_market)
         self.milking_cows_lst.append(daily_cow_milking)
 
+        self.daily_milk_production = milk_production
         self.GnRH_injection_num = GnRH_injections
         self.PGF_injection_num = PGF_injections
         self.preg_check_num = preg_check
