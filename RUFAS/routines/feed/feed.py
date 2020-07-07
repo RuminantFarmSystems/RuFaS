@@ -81,7 +81,7 @@ class Feed:
             data: the feed information from the input JSON file
         """
 
-        self.__feed_database = data["feed_database"]
+        self.__feed_database = data['feed_database']
         self.__feeds_table = data['feeds_table']
         self.__feed_quality_table = data['feed_quality_table']
         self.__nutrient_table = data['nutrient_table']
@@ -263,7 +263,6 @@ class Feed:
                     self.C_feed_out_particle_percent = 0
                 else:
                     if self.error_1:
-                        # print('"' + self.moisture + '"', 'is not a recognized moisture category for', self.crop_name)
                         self.error_1 = False
 
             elif self.crop_name == 'alfalfa':
@@ -321,11 +320,9 @@ class Feed:
                     self.C_feed_out_particle_percent = 0.01
                 else:
                     if self.error_2:
-                        # print('"' + self.moisture + '"', 'is not a recognized moisture category for', self.crop_name)
                         self.error_2 = False
             else:
                 if self.error_3:
-                    # print('"' + self.crop_name + '"', 'storage is not currently implemented')
                     self.storage = False
                     self.error_3 = False
 
