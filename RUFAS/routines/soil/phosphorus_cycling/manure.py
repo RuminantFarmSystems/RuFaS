@@ -18,6 +18,8 @@ def update_all(S, time):
     year = time.year
     m_app = S.manure
     mass = m_app.mass
+    S.manure_P = 0.0
+    S.manure_app = 0.0
 
     for i in range(0, len(m_app.day)):
         if m_app.day[i] == day and m_app.year[i] - S.start_year + 1 == year:
@@ -28,8 +30,8 @@ def update_all(S, time):
             # S.6.C.I.1-6
             cover_app = m_app.percent_cover[i] * S.area
             P_app = mass[i] * m_app.P_frac[i]
-            S.manure_annual += mass[i]
-            S.manure_P_annual += P_app
+            S.manure_app = mass[i]
+            S.manure_P = P_app
 
             S.manure_moisture = (S.manure_moisture * S.manure_mass + (1.0 - m_app.DM[i]) * mass[i]) \
                          / (S.manure_mass + mass[i])
