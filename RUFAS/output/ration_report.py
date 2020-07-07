@@ -58,10 +58,14 @@ class RationReport(BaseReportHandler):
             writer.writerow(units)
 
     def initialize(self, state):
-        feed_ids = state.feed.all_feed_ids
-        for (feed, units) in feed_ids:
-            self.daily_variables[feed] = \
-                ['pen.ration[\'%s\'] if pen.pen_populated and \'%s\' in feed.available_feeds else 0' % (feed, feed), units,
+        all_feeds = state.feed.all_feed_ids
+
+        for feed_id in all_feeds:
+            feed_name = all_feeds[feed_id]['feed_name']
+            units = all_feeds[feed_id]['units']
+
+            self.daily_variables[feed_id + "(" + feed_name + ")"] = \
+                ['pen.ration[\'%s\'] if pen.pen_populated and \'%s\' in feed.available_feeds else 0' % (feed_id, feed_id), units,
                  []]
 
         self.write_headers(self.get_fPath(), self.daily_variables)
