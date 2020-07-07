@@ -1,4 +1,3 @@
-# TODO: Nitrogen Fixation currently returns large negative numbers 11/05/19. This is not biologically feasible
 """
 RUFAS: Ruminant Farm Systems Model
 
