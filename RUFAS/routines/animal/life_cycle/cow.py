@@ -171,7 +171,11 @@ class Cow(HeiferIII):
 
 		breed_index = 0
 		parity_index = 0
-		self.days_in_milk += 1
+		if self.milking:
+			self.days_in_milk += 1
+		else:
+			self.days_in_milk = 0
+
 		if self.breed == 'HO':
 			breed_index = 0
 			parity_index = 2 if self.calves - 1 > 2 else self.calves - 1
@@ -206,12 +210,16 @@ class Cow(HeiferIII):
 		self.single_acc_milk_prod += estimated_daily_milk_produced
 
 		# calculate fat percent in milk and fat corrected milk production
-		fat_percent = 12.86 * self.days_in_milk ** (-1.081) * math.exp(
-			0.0926 * (math.log(self.days_in_milk)) ** 2) * \
-			(math.log(self.days_in_milk) ** 1.107)
-		daily_fat_correct_milk_production = \
-			0.4 * estimated_daily_milk_produced + \
-			0.15 * fat_percent * estimated_daily_milk_produced
+		if self.milking:
+			fat_percent = 12.86 * self.days_in_milk ** (-1.081) * math.exp(
+				0.0926 * (math.log(self.days_in_milk)) ** 2) * \
+				(math.log(self.days_in_milk) ** 1.107)
+			daily_fat_correct_milk_production = \
+				0.4 * estimated_daily_milk_produced + \
+				0.15 * fat_percent * estimated_daily_milk_produced
+		else:
+			fat_percent = 0
+			daily_fat_correct_milk_production = 0
 
 		prev_weight = self.body_weight
 
