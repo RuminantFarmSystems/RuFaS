@@ -72,7 +72,6 @@ class OutputHandler:
 
         csv_dir.mkdir(exist_ok=True, parents=False)
 
-        # TODO: Would really love to generalize directory creation for nested reports
         for report_name in self.reports:
             report = self.reports[report_name]
             if report.produce_csv:
