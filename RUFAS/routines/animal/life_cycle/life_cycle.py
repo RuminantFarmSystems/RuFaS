@@ -344,7 +344,7 @@ class LifeCycleManager:
         while len(cows) + len(heiferIIIs) + daily_bought_from_market < self.herd_num * 1.01 and \
                 date > 1:
             self.replacement_market[0].events.add_event(
-                self.replacement_market[0].days_born, 'Entered Herd')
+                self.replacement_market[0].days_born, date, 'Entered Herd')
             self.replacement_market[0].set_p_purchased()
             animals_added.append(self.replacement_market[0])
             self.bought_from_market += 1
@@ -422,7 +422,7 @@ class LifeCycleManager:
 
                 if not (new_calf.culled or new_calf.sold):
                     new_calf.events.add_event(
-                        new_calf.days_born, 'Entered Herd')
+                        new_calf.days_born, date, 'Entered Herd')
                     # calves.append(new_calf)
                     self.total_new_born += 1
                     calves_born.append(new_calf)

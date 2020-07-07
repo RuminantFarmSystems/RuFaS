@@ -93,14 +93,15 @@ class HeiferIII(HeiferII):
             if self.body_weight > AnimalBase.config['mature_body_weight']:
                 self.body_weight = AnimalBase.config['mature_body_weight']
                 self.mature_body_weight = self.body_weight
-                self.events.add_event(self.days_born, 
-                'Mature body weight prior to grow end day')
+                self.events.add_event(self.days_born,
+                                      sim_day, 'Mature body weight '
+                                               'prior to grow end day')
         
         self.daily_growth = self.body_weight - prev_weight
         
         if self.days_born == AnimalBase.config['grow_end_day']:
             self.mature_body_weight = self.body_weight
-            self.events.add_event(self.days_born, 'Mature body weight')
+            self.events.add_event(self.days_born, sim_day, 'Mature body weight')
 
         if self.days_in_preg == self.gestation_length:
             self.days_born -= 1  # will be incremented again in next stage
