@@ -32,21 +32,22 @@ class AnimalEvents(object):
 			date = int(split[0])
 			events = list(filter(lambda x: (x != '[' and x != ']' and x != ', '), split[1].split('\'')))
 			for event in events:
-				self.add_event(date, event)
+				self.add_event(date, 0, event)
 
-	
-	def add_event(self, date, description):
+	def add_event(self, animal_age, simulation_day, description):
 		"""
 		Add a cow life event
 
 		Args:
-			date: the date counter for the cow (from birth)
+			animal_age: the date counter for the cow (from birth)
 			description: the event happened on that day
 		"""
-		if date in self.events:
-			self.events[date].append(description)
+		if animal_age in self.events:
+			self.events[animal_age]['description'].append(description)
 		else:
-			self.events[date] = [description]
+			self.events[animal_age] = {}
+			self.events[animal_age]['simulation_day'] = simulation_day
+			self.events[animal_age]['description'] = [description]
 
 	def __str__(self):
 		res_str = ''

@@ -112,7 +112,7 @@ class HeiferI(Calf):
 		self.days_born += 1
 		if self.days_born == AnimalBase.config['breeding_start_day_h']:
 			second_stage = True
-			self.events.add_event(self.days_born, 'Breeding start')
+			self.events.add_event(self.days_born, sim_day, 'Breeding start')
 			self.days_born -= 1  # will increment in next stage again
 
 		return second_stage
