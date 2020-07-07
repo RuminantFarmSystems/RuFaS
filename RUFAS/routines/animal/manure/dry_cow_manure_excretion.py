@@ -1,4 +1,3 @@
-################################################################################
 """
 RUFAS: Ruminant Farm Systems Model
 File name: dry_cow_manure_excretion.py
@@ -6,7 +5,6 @@ Description: Determines manure excretion with information from the ration
     formulation, outputs used by the manure module.
 Author(s): Militsa Sotirova, militsasotirova@gmail.com
 """
-################################################################################
 from RUFAS.routines.feed.feed import FeedNames, Nutrients
 from .general_manure import phosphorus_excreted
 
@@ -83,12 +81,12 @@ def manure_calculations(ration_formulation, feed, BW, milk_prod, p_feces_excrt,
         phosphorus_excreted(milk_prod, Mkg, p_feces_excrt, p_urine)
     
     return p_excrt, \
-           {"U": 0.340, #TODO: Implement with correct equation
-            "TAN_s": 0.14, #TODO: Implement with correct equation
+           {"U": 0.340,  # TODO: Implement with correct equation
+            "TAN_s": 0.14,  # TODO: Implement with correct equation
             "MN": MN,
             "Mkg": Mkg,
-            "VSd": 7087.413, #TODO: Implement with correct equation
-            "VSnd": 859.390, #TODO: Implement with correct equation
+            "VSd": 7087.413,  # TODO: Implement with correct equation
+            "VSnd": 859.390,  # TODO: Implement with correct equation
             "WIP_frac": WIP_frac,
             "WOP_frac": WOP_frac,
             "p_excrt_manure": p_excrt_manure,
