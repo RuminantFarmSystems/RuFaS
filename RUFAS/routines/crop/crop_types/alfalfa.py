@@ -28,23 +28,23 @@ class Alfalfa:
         # ===================================================================
         ''' HEAT UNIT DATA '''
 
-        # Inputs
+        # input
         self.T_base_min = 4
         self.T_base_max = 32  # until dormancy
         self.PHU = 800  # still unknown
 
-        # Internally calculated inputs
+        # Internally calculated input
         self.accumulated_HU = 0.0
         self.prev_accumulated_HU = 0.0
 
-        # Outputs
+        # output
         self.fr_PHU = 0.0
         self.prev_fr_PHU = 0.0
 
         # ===================================================================
         ''' LEAF AREA INDEX (LAI) DATA '''
 
-        # Inputs
+        # input
         self.fr_PHU_1 = 0.15
         self.fr_PHU_2 = 0.50
         self.fr_LAI_1 = 0.01
@@ -54,40 +54,40 @@ class Alfalfa:
         self.LAI_max = 4
         self.LAI_min = 0.75
 
-        # Internally calculated inputs
+        # Internally calculated input
         self.prev_fr_LAI_max = 0
         self.fr_LAI_max = 0
 
-        # Outputs
+        # output
         self.prev_LAI_actual = 0
         self.LAI_actual = 0
 
         # ===================================================================
         ''' ROOT DEPTH DATA '''
 
-        # Inputs
+        # input
         self.z_root_max = 3000  # maximum depth of root development
 
-        # Internally calculated inputs
+        # Internally calculated input
         self.fr_root = 0
 
-        # Outputs
+        # output
         self.z_root = 0
 
         # ===================================================================
         ''' BIOMASS DATA '''
 
-        # Inputs
+        # input
         self.kl = 0.65
         self.RUE = 20
         self.T_opt = 25
 
-        # Internally calculated inputs
+        # Internally calculated input
         self.gamma_reg = 0
         self.d_biomass_max = 0
         self.d_biomass_actual = 0.0
 
-        # Outputs
+        # output
         self.biomass_actual = 0
         self.prev_biomass_actual = 0
 

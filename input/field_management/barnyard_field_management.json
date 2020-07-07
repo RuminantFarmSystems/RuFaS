@@ -1,0 +1,40 @@
+{
+            "management_scheme": "optimal",
+            "fertilizer":
+            {
+                "app_years": [2009],
+                "repeat": 1,
+
+                "year": [0],
+                "day": [0],
+                "mass": [0.0],
+                "depth": [0.0],
+                "surf_perc": [0.0]
+            },
+
+            "manure":
+            {
+                "app_years": [],
+                "repeat": 0,
+
+                "year": [2010],
+                "day": [1],
+                "N_mass": [1000],
+                "P_mass": [0],
+                "cover_perc": [0.95],
+                "depth": [0.0],
+                "surf_perc": [1.0]
+            },
+
+            "tillage":
+            {
+                "app_years": [2009],
+                "repeat": 1,
+
+                "year": [0],
+                "day": [0],
+                "perc_incorporated": [0.0],
+                "perc_mixed": [0.0],
+                "depth": [0.0]
+            }
+        }
