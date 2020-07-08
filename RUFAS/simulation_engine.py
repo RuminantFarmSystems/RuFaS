@@ -120,6 +120,7 @@ def annual_simulation():
     # Post-Annual Routines
     #
     sys.stdout.write('...')
+    state.annual_mass_balance()
     output.annual_updates(state, weather, time)
     output.write_annual_reports()
     output.annual_flushes()

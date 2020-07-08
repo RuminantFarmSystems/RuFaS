@@ -58,6 +58,10 @@ class State:
         self.animal_management.annual_reset()
         self.manure_storage.annual_reset()
 
+    def annual_mass_balance(self):
+        self.soil.annual_mass_balance()
+        self.manure_storage.annual_mass_balance()
+
 
 def read_json_file(file_path: Path):
     try:

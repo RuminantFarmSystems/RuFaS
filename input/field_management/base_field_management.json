@@ -5,17 +5,17 @@
                 "app_years": [],
                 "repeat": 0,
 
-                "year": [0],
-                "day": [0],
-                "mass": [0.0],
-                "depth": [0.0],
-                "surf_perc": [0.0]
+                "year": [],
+                "day": [],
+                "mass": [],
+                "depth": [],
+                "surf_perc": []
             },
 
             "manure":
             {
-                "app_years": [2009],
-                "repeat": 1,
+                "app_years": [],
+                "repeat": 0,
 
                 "year": [],
                 "day": [],
@@ -31,10 +31,10 @@
                 "app_years": [],
                 "repeat": 0,
 
-                "year": [0],
-                "day": [0],
-                "perc_incorporated": [0.0],
-                "perc_mixed": [0.0],
-                "depth": [0.0]
+                "year": [],
+                "day": [],
+                "perc_incorporated": [],
+                "perc_mixed": [],
+                "depth": []
             }
         }

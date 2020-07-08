@@ -70,11 +70,11 @@ class BaseReport:
     # to the scope of variables. If a specified output is not a soil
     # variable, this will throw an error.
     def daily_update(self, state, weather, time):
-
         soil = state.soil
         crop_type = state.crop.current_crop
         animal_management = state.animal_management
         feed = state.feed
+        manure_storage = state.manure_storage
 
         for variable in self.daily_variables:
             self.daily_variables[variable][2].append(
@@ -86,6 +86,7 @@ class BaseReport:
         crop_type = state.crop.current_crop
         animal_management = state.animal_management
         feed = state.feed
+        manure_storage = state.manure_storage
 
         soil.annual_mass_balance()
 

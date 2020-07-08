@@ -56,7 +56,61 @@ class ManureStorage:
         self.CH4_collection_efficiency = 0.0
         self.CH4_emissions = 0
 
-        self.TS_storage = 0
+        self.raw_manure = 0.0
+
+        self.raw_manure_annual = 0.0
+
+        self.initial_manure = 0.0
+        self.manure_calc = 0.0
+        self.manure_delta = 0.0
+        self.manure_storage_balance_difference = 0.0
+
+        self.initial_manure_annual = 0.0
+        self.manure_calc_annual = 0.0
+        self.manure_delta_annual = 0.0
+        self.manure_storage_balance_difference_annual = 0.0
+
+        self.TS = 0
+        self.VS = 0
+        self.N = 0
+        self.P = 0
+        self.K = 0
+
+        self.TS_liquid = 0
+        self.VS_liquid = 0
+        self.N_liquid = 0
+        self.P_liquid = 0
+        self.K_liquid = 0
+
+        self.CH4_emissions_annual = 0
+
+        self.TS_annual = 0
+        self.VS_annual = 0
+        self.N_annual = 0
+        self.P_annual = 0
+        self.K_annual = 0
+
+        self.TS_liquid_annual = 0
+        self.VS_liquid_annual = 0
+        self.N_liquid_annual = 0
+        self.P_liquid_annual = 0
+        self.K_liquid_annual = 0
+
+        self.TS_loss = 0.0
+        self.VS_loss = 0.0
+
+        self.TS_loss_annual = 0.0
+        self.VS_loss_annual = 0.0
+
+        self.TS_DM_effluent = 0.0
+
+        self.TS_DM_effluent_annual = 0.0
+
+        self.other_solids = 0.0
+        self.other_liquids = 0.0
+
+        self.other_solids_annual = 0.0
+        self.other_liquids_annual = 0.0
 
     def initialize_pens(self, animal_management):
         """
@@ -105,10 +159,83 @@ class ManureStorage:
             Class method summarizes whole-model variables from components for
             output
         """
+        self.TS_loss = 0.0
+        self.VS_loss = 0.0
+        self.raw_manure = 0.0
+        for pen in self.pens.values():
+            self.raw_manure += pen.raw_manure
+            self.TS_loss += pen.TS_loss
+            self.VS_loss += pen.VS_loss
 
-        self.TS_storage = 0
+        self.TS_DM_effluent = 0.0
+        for separator in self.separators.values():
+            self.TS_DM_effluent += separator.TS_DM_effluent
+
+        self.TS = 0
+        self.VS = 0
+        self.N = 0
+        self.P = 0
+        self.K = 0
+
+        self.TS_liquid = 0
+        self.VS_liquid = 0
+        self.N_liquid = 0
+        self.P_liquid = 0
+        self.K_liquid = 0
+
         for storage in self.separators.values():
-            self.TS_storage += storage.TS
+            self.TS += storage.TS
+            self.VS += storage.VS
+            self.N += storage.N
+            self.P += storage.P
+            self.K += storage.K
+
+            self.TS_liquid += storage.TS_liquid
+            self.VS_liquid += storage.VS_liquid
+            self.N_liquid += storage.N_liquid
+            self.P_liquid += storage.P_liquid
+            self.K_liquid += storage.K_liquid
+
+        manure = self.TS + self.TS_liquid
+        self.manure_delta = manure - self.initial_manure
+        self.initial_manure = manure
+        self.manure_calc = self.manure_delta + self.TS + self.TS_liquid + self.TS_DM_effluent
+        self.manure_storage_balance_difference = self.raw_manure - self.manure_calc
+        self.other_solids = self.TS - (self.VS + self.N + self.P + self.K)
+        self.other_liquids = self.TS_liquid - (self.VS_liquid + self.N_liquid + self.P_liquid + self.K_liquid)
+
+    def summarize_annual_variables(self):
+        self.raw_manure_annual += self.raw_manure
+
+        self.CH4_emissions_annual += self.CH4_emissions
+
+        self.TS_annual += self.TS
+        self.VS_annual += self.VS
+        self.N_annual += self.N
+        self.P_annual += self.P
+        self.K_annual += self.K
+
+        self.TS_liquid_annual += self.TS_liquid
+        self.VS_liquid_annual += self.VS_liquid
+        self.N_liquid_annual += self.N_liquid
+        self.P_liquid_annual += self.P_liquid
+        self.K_liquid_annual += self.K_liquid
+
+        self.TS_loss_annual += self.TS_loss
+        self.VS_loss_annual += self.VS_loss
+
+        self.TS_DM_effluent_annual += self.TS_DM_effluent
+
+        self.other_solids_annual += self.other_solids
+        self.other_liquids_annual += self.other_liquids
+
+    def annual_mass_balance(self):
+        manure = self.TS + self.TS_liquid
+        self.manure_delta_annual = manure - self.initial_manure_annual
+        self.initial_manure_annual = manure
+        self.manure_calc_annual = self.manure_delta_annual + self.TS_annual + \
+                                  self.TS_liquid_annual + self.TS_DM_effluent_annual
+        self.manure_storage_balance_difference_annual = self.raw_manure_annual - self.manure_calc_annual
 
     class Pen:
         def __init__(self, pen):
@@ -144,8 +271,11 @@ class ManureStorage:
             self.bedding_washed = 0
             self.bedding_dry_matter = 0
 
-            self.TS_loss = 0.02
-            self.VS_loss = 0.85
+            self.TS_loss = 0.0
+            self.VS_loss = 0.0
+
+            self.TS_loss_perc = 0.02
+            self.VS_loss_perc = 0.85
             self.flow_rate = 0
             self.NH4 = 0
 
@@ -224,6 +354,8 @@ class ManureStorage:
             self.N_liquid = 0
             self.P_liquid = 0
             self.K_liquid = 0
+
+            self.TS_DM_effluent = 0.0
 
             self.TS_removal_efficiency = 0
             self.VS_removal_efficiency = 0
@@ -343,4 +475,15 @@ class ManureStorage:
             self.WIP_frac = pen.manure['WIP_frac']
 
     def annual_reset(self):
-        pass
+        self.CH4_emissions_annual = 0.0
+
+        self.TS_liquid_annual = 0.0
+        self.VS_liquid_annual = 0.0
+        self.N_liquid_annual = 0.0
+        self.P_liquid_annual = 0.0
+        self.K_liquid_annual = 0.0
+
+        self.TS_loss_annual = 0.0
+        self.VS_loss_annual = 0.0
+
+        self.TS_DM_effluent_annual = 0.0

@@ -15,12 +15,19 @@ class MassBalanceReport(BaseReportDriver):
         super().__init__(data)
         self.reports = {"water_balance": self.WaterBalance(data['water_balance']),
                         "phosphorus_balance": self.PhosphorusBalance(data['phosphorus_balance']),
-                        "nitrogen_balance": self.NitrogenBalance(data['nitrogen_balance'])
+                        "nitrogen_balance": self.NitrogenBalance(data['nitrogen_balance']),
+                        "manure_storage_balance": self.ManureStorageBalance(data['manure_storage_balance'])
                         }
 
     class BaseMassBalanceReport(BaseReport):
         def __init__(self, data):
             super().__init__(data)
+            self.daily_variables = {
+
+            }
+            self.annual_variables = {
+
+            }
 
         def produce_report_graphics(self):
             super().produce_report_graphics()
@@ -124,4 +131,43 @@ class MassBalanceReport(BaseReportDriver):
                 'N_runoff': ['soil.N_runoff_annual', 'kg', 0],
                 'N_erosion': ['soil.N_erosion_annual', 'kg', 0],
                 'N_uptake': ['soil.N_uptake_annual', 'kg', 0]
+            }
+
+    class ManureStorageBalance(BaseMassBalanceReport):
+        def __init__(self, data):
+            super().__init__(data)
+
+            self.daily_variables = {
+                'year': ['time.cal_year', '', []],
+                'j_day': ['time.day', '', []],
+                'actual': ['manure_storage.raw_manure', 'kg', []],
+                'calculated': ['manure_storage.manure_calc', 'kg', []],
+                'difference': ['manure_storage.manure_storage_balance_difference', 'kg', []],
+                'delta': ['manure_storage.manure_delta', 'kg', []],
+                'VS': ['manure_storage.VS', 'kg', []],
+                'N': ['manure_storage.N', 'kg', []],
+                'P': ['manure_storage.P', 'kg', []],
+                'other_solids': ['manure_storage.other_solids', 'kg', []],
+                'VS_liquid': ['manure_storage.VS_liquid', 'kg', []],
+                'N_liquid': ['manure_storage.N_liquid', 'kg', []],
+                'P_liquid': ['manure_storage.P_liquid', 'kg', []],
+                'TS_DM_effluent': ['manure_storage.TS_DM_effluent', 'kg', []],
+                'other_liquids': ['manure_storage.other_liquids', 'kg', []]
+            }
+
+            self.annual_variables = {
+                'year': ['time.cal_year', '', 0],
+                'actual': ['manure_storage.raw_manure_annual', 'kg', 0],
+                'calculated': ['manure_storage.manure_calc_annual', 'kg', 0],
+                'difference': ['manure_storage.manure_storage_balance_difference_annual', 'kg', 0],
+                'delta': ['manure_storage.manure_delta_annual', 'kg', 0],
+                'VS': ['manure_storage.VS_annual', 'kg', 0],
+                'N': ['manure_storage.N_annual', 'kg', 0],
+                'P': ['manure_storage.P_annual', 'kg', 0],
+                'other_solids': ['manure_storage.other_solids_annual', 'kg', 0],
+                'VS_liquid': ['manure_storage.VS_liquid_annual', 'kg', 0],
+                'N_liquid': ['manure_storage.N_liquid_annual', 'kg', 0],
+                'P_liquid': ['manure_storage.P_liquid_annual', 'kg', 0],
+                'TS_DM_effluent': ['manure_storage.TS_DM_effluent_annual', 'kg', 0],
+                'other_liquids': ['manure_storage.other_liquids_annual', 'kg', 0]
             }
