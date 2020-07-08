@@ -3,7 +3,7 @@
     "config":
     {
         "start_date" : "2009:244",
-        "end_date" : "2011:243",
+        "end_date" : "2016:243",
         "csv_dir": "output/CSVs/",
         "graphic_dir": "output/graphics/",
         "run_tests": false
@@ -106,7 +106,7 @@
               "produce_csv": true,
               "produce_graphics": false,
               "report_name": "individual_animal_report",
-              "num_animals": 3
+              "num_animals": 7
             },
             "herd_report":
             {
@@ -322,7 +322,7 @@
 				"avg_daily_gain_h": 0.91,
 				"std_daily_gain_h": 0.02,
 				"grow_end_day": 780,
-				"mature_body_weight": 500,
+				"mature_body_weight": 760,
 				"avg_estrus_cycle_h": 21,
 				"std_estrus_cycle_h": 3,
 				"estrus_detection_rate": 0.4,

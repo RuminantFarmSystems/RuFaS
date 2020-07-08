@@ -64,7 +64,7 @@ class Calf(AnimalBase):
 		# calf born, with stillbirth probability
 		if random() < AnimalBase.config['still_birth_rate']:
 			self.culled = True
-			self.events.add_event(0, 'Still birth')
+			self.events.add_event(0, 0, 'Still birth')
 
 		# sell the male calves and the unwanted female calves
 		# (if AnimalBase.config['keep_female_calf_rate'] = 1,
@@ -177,7 +177,7 @@ class Calf(AnimalBase):
 		# requirement of P from the ration (g) (A.1A.E.7)
 		self.p_req = p_absorb / 0.90
 
-	def update(self):
+	def update(self, sim_day):
 		"""
 		Controls calf's grow with average daily gain based on user's input until
 		wean day. Calculate the wean weight at wean day. Here is the place to
@@ -186,7 +186,7 @@ class Calf(AnimalBase):
 
 		Returns: time when calf is weaned -- stop be fed with milk
 		"""
-		self.body_weight_lst.append(self.body_weight)
+		self.update_body_weight_history(sim_day)
 
 		wean_day = False
 		
@@ -196,7 +196,7 @@ class Calf(AnimalBase):
 		if self.days_born == AnimalBase.config['wean_day']:
 			wean_day = True
 			self.wean_weight = self.body_weight
-			self.events.add_event(self.days_born, 'Wean Day')
+			self.events.add_event(self.days_born, sim_day, 'Wean Day')
 			self.days_born -= 1 # will increment by 1 again in heifer update
 		else:
 			gained_weight = np.random.normal(

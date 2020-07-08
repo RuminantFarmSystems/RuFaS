@@ -57,7 +57,7 @@ class HeiferIII(HeiferII):
         self.p_excrt, self.manure_excretion = \
             manure_calculations(p_feces_excrt, p_urine)
 
-    def update(self):
+    def update(self, sim_day):
         """
         Controls heifer's grow with average daily gain based on user's input
         until breeding start day here is the place to change growth rate with
@@ -67,7 +67,7 @@ class HeiferIII(HeiferII):
 
         Returns: cow_stage - heifer close to calving, move to cow stage
         """
-        self.body_weight_lst.append(self.body_weight)
+        self.update_body_weight_history(sim_day)
         cow_stage = False
         self.days_born += 1
 
@@ -93,14 +93,15 @@ class HeiferIII(HeiferII):
             if self.body_weight > AnimalBase.config['mature_body_weight']:
                 self.body_weight = AnimalBase.config['mature_body_weight']
                 self.mature_body_weight = self.body_weight
-                self.events.add_event(self.days_born, 
-                'Mature body weight prior to grow end day')
+                self.events.add_event(self.days_born,
+                                      sim_day, 'Mature body weight '
+                                               'prior to grow end day')
         
         self.daily_growth = self.body_weight - prev_weight
         
         if self.days_born == AnimalBase.config['grow_end_day']:
             self.mature_body_weight = self.body_weight
-            self.events.add_event(self.days_born, 'Mature body weight')
+            self.events.add_event(self.days_born, sim_day, 'Mature body weight')
 
         if self.days_in_preg == self.gestation_length:
             self.days_born -= 1  # will be incremented again in next stage

@@ -79,7 +79,7 @@ class HeiferI(Calf):
 		# requirement of P from the ration (g) (A.1B-D.E.7)
 		self.p_req = p_absorb / 0.664
 
-	def update(self):
+	def update(self, sim_day):
 		"""
 		Controls heifer's grow with average daily gain based on user's input
 		until breeding start day. Here is the place to change growth rate with
@@ -89,7 +89,7 @@ class HeiferI(Calf):
 
 		Returns: the second stage of heifer -- breeding stage starts
 		"""
-		self.body_weight_lst.append(self.body_weight)
+		self.update_body_weight_history(sim_day)
 		second_stage = False
 		
 		prev_weight = self.body_weight
@@ -112,7 +112,7 @@ class HeiferI(Calf):
 		self.days_born += 1
 		if self.days_born == AnimalBase.config['breeding_start_day_h']:
 			second_stage = True
-			self.events.add_event(self.days_born, 'Breeding start')
+			self.events.add_event(self.days_born, sim_day, 'Breeding start')
 			self.days_born -= 1  # will increment in next stage again
 
 		return second_stage
