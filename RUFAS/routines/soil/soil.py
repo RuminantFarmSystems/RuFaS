@@ -456,33 +456,8 @@ class Soil:
         self.plant_moisture = 0.85  # TODO temporary value from Hector  # TODO should probably be in crop
         self.residue_DM = 0.0
         self.lignin_residue = 0.0
-        self.metabolic_AG = 0.0
-        self.metabolic_BG = 0.0
-        self.structural_AG = 0.0
-        self.structural_BG = 0.0
-        self.fr_tillage = 0.0  # TODO used in carbon but the variable should probably be relocated
-        self.metabolic_AG_to_active_loss = 0.0
-        self.metabolic_AG_to_active_actual = 0.0
-        self.struct_AG_to_active_loss = 0.0
-        self.struct_AG_to_active_actual = 0.0
-        self.struct_AG_to_slow_loss = 0.0
-        self.struct_AG_to_slow_actual = 0.0
-        self.metabolic_BG_to_active_loss = 0.0
-        self.metabolic_BG_to_active_actual = 0.0
-        self.struct_BG_to_active_loss = 0.0
-        self.struct_BG_to_active_actual = 0.0
-        self.struct_BG_to_slow_loss = 0.0
-        self.struct_BG_to_slow_actual = 0.0
-        self.carbon_active = 5000  # TODO initial condition, need to decide if in json or here
+
         self.silt_and_clay_frac = 0.5  # TODO database item
-        self.carbon_slow = 5000  # TODO above
-        self.carbon_passive = 5000  # TODO above
-        # TODO all need initial conditions
-        self.active_to_slow = 0
-        self.active_to_passive = 0
-        self.slow_to_active = 0
-        self.slow_to_passive = 0
-        self.passive_to_active = 0
 
         # ------ INITIALIZE SOIL NITROGEN POOLS ------------------------------------
         # Calculate initial amount of NO3 in each soil layer;
@@ -646,6 +621,46 @@ class Soil:
             self.days_unbalanced_active = 0.0
 
             # C in the soil layer
+            self.wfps = 0.0
+            self.M_d = 0.0
+
+            self.metabolic_AG = 500
+            self.metabolic_BG = 500
+            self.structural_AG = 500
+            self.structural_BG = 500
+            self.fr_tillage = 0.0  # TODO used in carbon but the variable should probably be relocated
+
+            self.metabolic_AG_to_active_loss = 0.0
+            self.metabolic_AG_to_active_actual = 0.0
+            self.struct_AG_to_active_loss = 0.0
+            self.struct_AG_to_active_actual = 0.0
+            self.struct_AG_to_slow_loss = 0.0
+            self.struct_AG_to_slow_actual = 0.0
+
+            self.metabolic_BG_to_active_loss = 0.0
+            self.metabolic_BG_to_active_actual = 0.0
+            self.struct_BG_to_active_loss = 0.0
+            self.struct_BG_to_active_actual = 0.0
+            self.struct_BG_to_slow_loss = 0.0
+            self.struct_BG_to_slow_actual = 0.0
+
+            self.carbon_active = 5000  # TODO initial condition, need to decide if in json or here
+            self.carbon_slow = 5000  # TODO above
+            self.carbon_passive = 5000  # TODO above
+
+            # TODO all need initial conditions
+            self.active_to_slow = 0
+            self.active_to_passive = 0
+            self.slow_to_active = 0
+            self.slow_to_passive = 0
+            self.passive_to_active = 0
+            # TODO ^
+
+            self.carbon_percent = 0
+            self.total_carbon = 0
+            self.total_carbon_mg = 0
+            self.total_carbon_g = 0
+            self.total_CO2_C_loss = 0
 
     # ---------------------------------------------------------------------------
     # Class: Fertilizer

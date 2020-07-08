@@ -69,7 +69,7 @@
         "soil_carbon":
         {
             "produce_csv": true,
-            "produce_graphics": false,
+            "produce_graphics": true,
             "display_graphics": false,
             "report_name": "Soil Carbon",
             "file_name": "soil_carbon.csv"
