@@ -233,6 +233,17 @@ class LifeCycleManager:
         self.daily_heiferIII_num.append(len(heiferIIIs))
         self.daily_cow_num.append(len(cows))
 
+        self.open_cow_num = 0
+        self.dry_cow_num = 0
+        self.milking_cow_num = 0
+        self.preg_cow_num = 0
+        self.num_cow_in_vwp = 0
+        self.daily_milk_production = 0
+        self.preg_check_num = 0
+        self.GnRH_injection_num = 0
+        self.PGF_injection_num = 0
+        self.ai_num = 0
+
         self.calf_num = len(calves)
         self.heiferI_num = len(heiferIs)
         self.heiferII_num = len(heiferIIs)
@@ -248,6 +259,9 @@ class LifeCycleManager:
 
         for parity in self.parity_num:
             self.parity_num[parity] = 0
+
+        for cull_reason in self.cull_reason_stats:
+            self.cull_reason_stats[cull_reason] = 0
 
         record_econ_stats = False
         if sim_length - date <= self.config["econ_indicator_range"]:
