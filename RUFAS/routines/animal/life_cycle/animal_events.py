@@ -18,6 +18,22 @@ class AnimalEvents(object):
 		"""
 		self.events = {}
 
+	def init_from_string(self, events_str):
+		"""
+		Initialize event from a string
+
+		Args:
+			events_str: string representation of events
+		"""
+		split_by_date = list(filter(lambda x: x != '', list(map(lambda x: x.strip(), events_str.split('days born ')))))
+
+		for day in split_by_date:
+			split = day.split(': ')
+			date = int(split[0])
+			events = list(filter(lambda x: (x != '[' and x != ']' and x != ', '), split[1].split('\'')))
+			for event in events:
+				self.add_event(date, event)
+
 	def add_event(self, date, description):
 		"""
 		Add a cow life event
@@ -34,7 +50,7 @@ class AnimalEvents(object):
 	def __str__(self):
 		res_str = ''
 		for key, value in sorted(self.events.items()):
-			res_str += '\tDays born {}: {} \n'.format(key, value)
+			res_str += '\tdays born {}: {} \n'.format(key, value)
 
 		return res_str
 	

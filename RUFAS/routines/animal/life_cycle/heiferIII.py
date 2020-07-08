@@ -23,24 +23,21 @@ class HeiferIII(HeiferII):
     # TODO: Body weight changed could be based on nutrition intake later from
     #  Ration Formulation.
     # TODO: Rank heifers to enter the herd or sold
+    
+    def __init__(self, args):
+        """
+        Description:
+			initialize the heifer in this stage from the second stage
+        Input:
+			args: same as heiferII
+        """
+        super().__init__(args)
 
-    def __init__(self, heiferII):
+    def get_heiferIII_values(self):
         """
-        Args:
-            heiferII: the heifer from the second stage that has grown into a
-            heifer of the third stage
+        Get current information from the heiferIII
         """
-        super().init_from_heiferII(heiferII)
-
-    def init_from_heiferIII(self, heiferIII):
-        """
-        Initialize the heifer in this stage from the second stage and initialize
-        the repro program parameters for coding purposes
-
-        Args:
-            heiferIII: another heifer out of the herd
-        """
-        super().init_from_heiferII(heiferIII)
+        return self.get_heiferII_values()
 
     def calc_nutrient_rqmts(self):
         """
@@ -82,18 +79,25 @@ class HeiferIII(HeiferII):
         if self.days_born < AnimalBase.config['grow_end_day']:
             # Heifer can only grow to a maximum weight of mature_body_weight
             if self.body_weight < AnimalBase.config['mature_body_weight']:
-                self.body_weight += np.random.normal(
-                    AnimalBase.config['avg_daily_gain_h'],
+                gained_weight = np.random.normal(
+                    AnimalBase.config['avg_daily_gain_h'], 
                     AnimalBase.config['std_daily_gain_h'])
+                while gained_weight < AnimalBase.config['avg_daily_gain_h'] \
+                    - 2 * AnimalBase.config['std_daily_gain_h'] \
+                    or gained_weight > AnimalBase.config['avg_daily_gain_h'] \
+                        + 2 * AnimalBase.config['std_daily_gain_h']:
+                    gained_weight = np.random.normal(
+                        AnimalBase.config['avg_daily_gain_h'], 
+                        AnimalBase.config['std_daily_gain_h'])
+                self.body_weight += gained_weight
             if self.body_weight > AnimalBase.config['mature_body_weight']:
                 self.body_weight = AnimalBase.config['mature_body_weight']
                 self.mature_body_weight = self.body_weight
-                self.events.add_event(
-                    self.days_born,
-                    'Mature body weight prior to grow end day')
-
+                self.events.add_event(self.days_born, 
+                'Mature body weight prior to grow end day')
+        
         self.daily_growth = self.body_weight - prev_weight
-
+        
         if self.days_born == AnimalBase.config['grow_end_day']:
             self.mature_body_weight = self.body_weight
             self.events.add_event(self.days_born, 'Mature body weight')
@@ -108,11 +112,11 @@ class HeiferIII(HeiferII):
         ==> Heifer III: \n
         ID: {} \n
         Birth Date: {}\n
-        Days Born: {}\n
+        days Born: {}\n
         Body Weight: {}kg\n
         Breed Start Day: {}\n
         Repro Method: {}\n
-        Days in pregnancy: {}\n
+        days in pregnancy: {}\n
         Gestation Length: {}\n
         Life Events: \n
         {}

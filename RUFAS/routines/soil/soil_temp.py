@@ -87,8 +87,7 @@ def update_all(soil, crop, weather, time):
 #
 def calc_Tsoil(soil, weather, time):
     L = 0.8
-    # Taair = weather.T_avg_annual[time.year-1]
-    Taair = 8.18  # TODO: spreadsheet model fix. Note in pseudocode
+    Taair = 8.18  # TODO: Taair will be pulled from the weather database. This is a temp fix.
     dd = calc_dd(soil)
     for x in range(len(soil.soil_layers)):
 
@@ -136,7 +135,7 @@ def calc_dd(soil):
 def calc_scale(soil):
     SW = sum_soil_water(soil)
     Ztot = soil.profile_depth
-    bd = soil.profileBulkDensity
+    bd = soil.profile_bulk_density
 
     return SW / ((0.356 - 0.144 * bd) * Ztot)
 
@@ -146,7 +145,7 @@ def calc_scale(soil):
 # "pseudocode_soil" S.1.A.6
 #
 def calc_ddmax(soil):
-    bd = soil.profileBulkDensity
+    bd = soil.profile_bulk_density
     exp_part = exp(-5.63 * bd)
     return 1000 + (2500 * bd) / (bd + 686 * exp_part)
 
@@ -180,7 +179,7 @@ def calc_Tsurf(soil, crop, weather, time):
 # "pseudocode_soil" S.1.A.7
 #
 def calc_Tbare(soil, crop, weather, time):
-    Tav = weather.T_avg[time.year-1][time.day-1]
+    Tav = weather.T_avg[time.year - 1][time.day - 1]
     radiate = calc_radiate(soil, crop, weather, time)
 
     return Tav + radiate * Tav
@@ -191,7 +190,7 @@ def calc_Tbare(soil, crop, weather, time):
 # "pseudocode_soil" S.1.A.8
 #
 def calc_radiate(soil, crop, weather, time):
-    Hday = weather.radiation[time.year-1][time.day-1]
+    Hday = weather.radiation[time.year - 1][time.day - 1]
     albedo = calc_albedo(soil, crop)
 
     return (Hday * (1 - albedo) - 14) / 20
@@ -203,7 +202,7 @@ def calc_radiate(soil, crop, weather, time):
 #
 def calc_albedo(soil, crop):
     CV = crop.current_crop.bio_AG
-    albedoSoil = soil.soilAlbedo
+    albedoSoil = soil.soil_albedo
 
     # "pseudocode_soil" S.1.A.10
     cover = exp(-0.00005 * CV)
@@ -223,7 +222,7 @@ def calc_bcv(crop, time):
     bcv = CV / (CV + exp_part)
 
     SNOW = 0
-    # TODO: these time ranges for snowfall are taken from the barnyard spreadsheet model and seem largely arbitrary
+    # TODO: these are rough time ranges for snowfall in WI. They are taken from the barnyard spreadsheet model
     if time.day > 335 or time.day < 59:
         albedo_snow = 0.8
         SNOW = 10 * albedo_snow

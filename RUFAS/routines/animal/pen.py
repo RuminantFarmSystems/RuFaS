@@ -18,7 +18,6 @@ from RUFAS.routines.animal.ration.dry_cow_ration import \
     optimize as dry_cow_optimize
 from RUFAS.routines.animal.ration.growing_heifer_ration import \
     optimize as growing_heifer_optimize
-from RUFAS.routines.feed.feed import FeedNames, Nutrients
 
 
 class Pen:
@@ -458,10 +457,9 @@ def phosphorus_in_ration(DMI, ration, feed):
 
     for key in ration:
         # not every key in the ration dictionary refers to a feed
-        if key in feed.managed_feed_names:
-            managed_feed = FeedNames[key]
-            nutrients = feed.values(managed_feed)
-            p_feed_conc = nutrients[Nutrients.P_DM.name]
+        if not (key == 'status' or key == 'objective'):
+            nutrients = feed.available_feeds[key]
+            p_feed_conc = nutrients['phosphorus']
             dmi_feed = ration[key]
 
             # amount of P from feed (g) (A.4.A.1)
@@ -486,7 +484,7 @@ def calc_DMI(ration, feed):
     """
     DMI = 0
     for key in ration:
-        if key in feed.managed_feed_names:
+        if not (key == 'status' or key == 'objective'):
             DM_feed_amount = ration[key]
             DMI += DM_feed_amount
     return DMI

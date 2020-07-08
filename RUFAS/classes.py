@@ -1,4 +1,3 @@
-################################################################################
 """
 RUFAS: Ruminant Farm Systems Model
 File name: classes.py
@@ -8,7 +7,6 @@ Author(s): Kass Chupongstimun, kass_c@hotmail.com
            William Donovan, wmdonovan@wisc.edu
            Jacob Johnson, jacob8399@gmail.com
 """
-################################################################################
 
 import csv
 import json
@@ -40,7 +38,7 @@ class State:
 
     def __init__(self, data, config, time):
         input_dir = util.get_base_dir() / 'input'
-        self.soil = Soil(read_json_file(input_dir / 'soil' / data['soil']), config)
+        self.soil = Soil(read_json_file(input_dir / 'soil' / data['soil']))
         self.field_management = FieldManagement(read_json_file(
             input_dir / 'field_management' / data['field_management']), time)
         self.feed = Feed(read_json_file(input_dir / 'feed' / data['feed']))
@@ -59,7 +57,6 @@ class State:
         self.crop.annual_reset()
         self.animal_management.annual_reset()
         self.manure_storage.annual_reset()
-        self.feed.annual_reset()
 
 
 def read_json_file(file_path: Path):
@@ -252,7 +249,7 @@ class Config:
         sim_length = 0
         for i in range(len(self.years)):
             if i == 0:
-                # check for +-1
+                # check for leap year
                 if is_leap_year(self.start_year):
                     sim_length += leap_year_length - self.start_day
                 else:
@@ -384,11 +381,6 @@ class Weather:
             if skips > 5:
                 print("Only printing first 5 invalid rows, there are " + str(skips)
                       + " total invalid rows")
-
-            # calculates T_avg_annual for each year
-            for i in range(len(years)):
-                avg = sum(self.T_avg[i]) / (len(years[i]))
-                self.T_avg_annual.append(avg)
 
 
 # Class: Time

@@ -1,6 +1,8 @@
 {
     "feed_database": "input/databases/feeds.sqlite",
-    "table_name": "feed_library",
+    "feeds_table": "input/feed/user_feeds.csv",
+    "feed_quality_table": "input/feed/user_feeds.csv",
+    "nutrient_table": "input/feed/user_feeds.csv",
     "managed_feeds": [
         "Corn_grain",
         "Legume_hay",
