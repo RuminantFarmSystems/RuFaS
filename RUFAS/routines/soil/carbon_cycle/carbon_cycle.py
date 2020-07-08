@@ -159,6 +159,7 @@ def update_all(crop_type, soil, weather, time):
         # inputs to the slow carbon pool
         K6 = 0.0038
         carbon_slow_decomp = K6 * M_d * T_d * layer.carbon_slow
+
         d_carbon_slow = (layer.struct_AG_to_slow_actual + layer.struct_BG_to_slow_actual +
                          layer.active_to_slow) - carbon_slow_decomp
         layer.carbon_slow += d_carbon_slow
@@ -166,6 +167,7 @@ def update_all(crop_type, soil, weather, time):
         # inputs to the passive carbon pool
         K7 = 0.00013
         carbon_passive_decomp = K7 * M_d * T_d * layer.carbon_passive
+
         d_carbon_passive = (layer.slow_to_passive + layer.active_to_passive) - carbon_passive_decomp
         layer.carbon_passive += d_carbon_passive
 

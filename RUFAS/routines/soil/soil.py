@@ -621,9 +621,6 @@ class Soil:
             self.days_unbalanced_active = 0.0
 
             # C in the soil layer
-            self.wfps = 0.0
-            self.M_d = 0.0
-
             self.metabolic_AG = 500
             self.metabolic_BG = 500
             self.structural_AG = 500

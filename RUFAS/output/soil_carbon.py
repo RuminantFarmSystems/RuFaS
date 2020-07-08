@@ -46,7 +46,29 @@ class SoilCarbon(BaseReportHandler):
                                 'j_day': ['time.day', '', []],
                                 'total_carbon_L1': ['soil.soil_layers[0].total_carbon', 'kg/ha', []],
                                 'total_carbon_L2': ['soil.soil_layers[1].total_carbon', 'kg/ha', []],
-                                'total_carbon_L3': ['soil.soil_layers[2].total_carbon', 'kg/ha', []]
+                                'total_carbon_L3': ['soil.soil_layers[2].total_carbon', 'kg/ha', []],
+                                'active_L1': ['soil.soil_layers[0].carbon_active', 'kg/ha', []],
+                                'active_L2': ['soil.soil_layers[1].carbon_active', 'kg/ha', []],
+                                'active_L3': ['soil.soil_layers[2].carbon_active', 'kg/ha', []],
+                                'slow_L1': ['soil.soil_layers[0].carbon_slow', 'kg/ha', []],
+                                'slow_L2': ['soil.soil_layers[1].carbon_slow', 'kg/ha', []],
+                                'slow_L3': ['soil.soil_layers[2].carbon_slow', 'kg/ha', []],
+                                'passive_L1': ['soil.soil_layers[0].carbon_passive', 'kg/ha', []],
+                                'passive_L2': ['soil.soil_layers[1].carbon_passive', 'kg/ha', []],
+                                'passive_L3': ['soil.soil_layers[2].carbon_passive', 'kg/ha', []],
+                                'metabolic_AG_L1': ['soil.soil_layers[0].metabolic_AG', 'kg/ha', []],
+                                'metabolic_AG_L2': ['soil.soil_layers[1].metabolic_AG', 'kg/ha', []],
+                                'metabolic_AG_L3': ['soil.soil_layers[2].metabolic_AG', 'kg/ha', []],
+                                'metabolic_BG_L1': ['soil.soil_layers[0].metabolic_BG', 'kg/ha', []],
+                                'metabolic_BG_L2': ['soil.soil_layers[1].metabolic_BG', 'kg/ha', []],
+                                'metabolic_BG_L3': ['soil.soil_layers[2].metabolic_BG', 'kg/ha', []],
+                                'structural_AG_L1': ['soil.soil_layers[0].structural_AG', 'kg/ha', []],
+                                'structural_AG_L2': ['soil.soil_layers[1].structural_AG', 'kg/ha', []],
+                                'structural_AG_L3': ['soil.soil_layers[2].structural_AG', 'kg/ha', []],
+                                'structural_BG_L1': ['soil.soil_layers[0].structural_BG', 'kg/ha', []],
+                                'structural_BG_L2': ['soil.soil_layers[1].structural_BG', 'kg/ha', []],
+                                'structural_BG_L3': ['soil.soil_layers[2].structural_BG', 'kg/ha', []],
+
                                 }
 
         self.annual_variables = {'year': ['time.cal_year', '', 0]
