@@ -55,7 +55,8 @@ class LifeCycleReport(BaseReportDriver):
                 'heiferIII_percent': ['life_cycle_manager.heiferIII_percent', '%', []],
                 'cow_num': ['life_cycle_manager.cow_num', '', []],
                 'cow_percent': ['life_cycle_manager.cow_percent', '%', []],
-                'culled_heifer_num': ['life_cycle_manager.culled_heifer_num', '', []],
+                'sold_heifer_num': ['life_cycle_manager.sold_heifer_num', '', []],
+                'bought_heifer_num': ['life_cycle_manager.bought_heifer_num', '', []],
                 'culled_cow_num': ['life_cycle_manager.culled_cow_num', '', []],}
 
             
@@ -87,6 +88,11 @@ class LifeCycleReport(BaseReportDriver):
             }
 
             self.preg = {
+                'open_cow_num': ['life_cycle_manager.open_cow_num', '', []],
+                'preg_cow_num': ['life_cycle_manager.preg_cow_num', '', []],
+                'num_cow_in_vwp': ['life_cycle_manager.num_cow_in_vwp', '', []],
+                'milking_cow_num': ['life_cycle_manager.milking_cow_num', '', []],
+                'dry_cow_num': ['life_cycle_manager.dry_cow_num', '', []],
                 'average_days_in_milk': ['life_cycle_manager.avg_days_in_milk', 'd', []],
                 'average_days_in_preg': ['life_cycle_manager.avg_days_in_preg', 'd', []]
             }
