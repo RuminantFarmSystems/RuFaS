@@ -72,6 +72,7 @@ class AnimalInitalization:
             cur.execute('DROP TABLE IF EXISTS heiferIIIs')
             cur.execute('DROP TABLE IF EXISTS cows')
             cur.execute('DROP TABLE IF EXISTS replacement')
+            cur.execute('DROP TABLE IF EXISTS animal_id')
             cur.execute('CREATE TABLE IF NOT EXISTS calves \
                 (id VARCHAR, breed VARCHAR, birth_date VARCHAR, days_born VARCHAR, \
                     birth_weight VARCHAR, body_weight VARCHAR, wean_weight VARCHAR, \
@@ -116,7 +117,7 @@ class AnimalInitalization:
                                         stop_day VARCHAR, conception_rate VARCHAR, ai_day VARCHAR, \
                                             abortion_day VARCHAR, days_in_preg VARCHAR, gestation_length VARCHAR, \
                                                 p_gest_for_calf VARCHAR, presynch_method VARCHAR, tai_method_c VARCHAR, \
-                                                    resynch_method VARCHAR, days_in_milk VARCHAR, parity VARCHAR)')
+                                                    resynch_method VARCHAR)')
             cur.execute('CREATE TABLE IF NOT EXISTS animal_id (id VARCHAR)')
             cur.execute('INSERT INTO animal_id VALUES (' + str(self.animal_id) + ')')
             conn.commit()
@@ -217,7 +218,7 @@ class AnimalInitalization:
                     
             for cow in cows:
                 _, _, _, culled, new_born = cow.update(False)
-                if culled:
+                if culled or cow.calves > 4:
                     cows.remove(cow)
                 if new_born:
                     args = {
@@ -293,8 +294,8 @@ class AnimalInitalization:
                     synch_ed_method_h, estrus_count, estrus_day, tai_program_start_day_h, \
                         synch_ed_program_start_day_h, synch_ed_estrus_day, stop_day, conception_rate, \
                             ai_day, abortion_day, days_in_preg, gestation_length, p_gest_for_calf, \
-                                presynch_method, tai_method_c, resynch_method, days_in_milk, parity) \
-                                    VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)', 
+                                presynch_method, tai_method_c, resynch_method) \
+                                    VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)', 
                                     (cow.id, cow.breed, cow.birth_date, cow.days_born, cow.birth_weight, 
                                     cow.body_weight, cow.wean_weight, cow.mature_body_weight, 
                                     str(cow.events), cow.repro_program, cow.tai_method_h, 
@@ -303,7 +304,7 @@ class AnimalInitalization:
                                     cow.synch_ed_estrus_day, cow.stop_day, cow.conception_rate, 
                                     cow.ai_day, cow.abortion_day, cow.days_in_preg, cow.gestation_length, 
                                     cow.p_gest_for_calf, cow.presynch_method, cow.tai_method_c, 
-                                    cow.resynch_method, cow.days_in_milk, cow.calves))
+                                    cow.resynch_method))
         cur.execute('UPDATE animal_id SET id = ' + str(self.animal_id))
         conn.commit()
         conn.close()
@@ -321,7 +322,7 @@ class AnimalInitalization:
         cur = conn.cursor()
         while cur.execute('SELECT COUNT() FROM calves').fetchone()[0] < num:
             self.init_animals()
-        rows = cur.execute('SELECT * FROM calves LIMIT ' + str(num)).fetchall()
+        rows = cur.execute('SELECT * FROM calves ORDER BY RANDOM() LIMIT ' + str(num)).fetchall()
         for row in rows:
             args = {
                 'id': int(row[AnimalValues.id]),
@@ -352,7 +353,7 @@ class AnimalInitalization:
         cur = conn.cursor()
         while cur.execute('SELECT COUNT() FROM heiferIs').fetchone()[0] < num:
             self.init_animals()
-        rows = cur.execute('SELECT * FROM heiferIs LIMIT ' + str(num)).fetchall()
+        rows = cur.execute('SELECT * FROM heiferIs ORDER BY RANDOM() LIMIT ' + str(num)).fetchall()
         for row in rows:
             args = {
                 'id': int(row[AnimalValues.id]),
@@ -382,7 +383,7 @@ class AnimalInitalization:
         cur = conn.cursor()
         while cur.execute('SELECT COUNT() FROM heiferIIs').fetchone()[0] < num:
             self.init_animals()
-        rows = cur.execute('SELECT * FROM heiferIIs LIMIT ' + str(num)).fetchall()
+        rows = cur.execute('SELECT * FROM heiferIIs ORDER BY RANDOM() LIMIT ' + str(num)).fetchall()
         for row in rows:
             args = {
                 'id': int(row[AnimalValues.id]),
@@ -415,7 +416,7 @@ class AnimalInitalization:
         cur = conn.cursor()
         while cur.execute('SELECT COUNT() FROM heiferIIIs').fetchone()[0] < num:
             self.init_animals()
-        rows = cur.execute('SELECT * FROM heiferIIIs LIMIT ' + str(num)).fetchall()
+        rows = cur.execute('SELECT * FROM heiferIIIs ORDER BY RANDOM() LIMIT ' + str(num)).fetchall()
         for row in rows:
             args = {
                 'id': int(row[AnimalValues.id]),
@@ -460,7 +461,7 @@ class AnimalInitalization:
         cur = conn.cursor()
         while cur.execute('SELECT COUNT() FROM cows').fetchone()[0] < num:
             self.init_animals()
-        rows = cur.execute('SELECT * FROM cows LIMIT ' + str(num)).fetchall()
+        rows = cur.execute('SELECT * FROM cows ORDER BY RANDOM() LIMIT ' + str(num)).fetchall()
         for row in rows:
             args = {
                 'id': int(row[AnimalValues.id]),
@@ -504,7 +505,7 @@ class AnimalInitalization:
         cur = conn.cursor()
         while cur.execute('SELECT COUNT() FROM replacement').fetchone()[0] < num:
             self.init_animals()
-        rows = cur.execute('SELECT * FROM replacement LIMIT ' + str(num)).fetchall()
+        rows = cur.execute('SELECT * FROM replacement ORDER BY RANDOM() LIMIT ' + str(num)).fetchall()
         for row in rows:
             args = {
                 'id': int(row[AnimalValues.id]),
@@ -533,9 +534,7 @@ class AnimalInitalization:
                 'p_gest_for_calf': int(row[AnimalValues.p_gest_for_calf]),
                 'presynch_method': row[AnimalValues.presynch_method],
                 'tai_method_c': row[AnimalValues.tai_method_c],
-                'resynch_method': row[AnimalValues.resynch_method],
-                'days_in_milk': int(row[AnimalValues.days_in_milk]),
-                'parity': int(row[AnimalValues.parity])
+                'resynch_method': row[AnimalValues.resynch_method]
             }
             cow = Cow(args)
             cows.append(cow)
