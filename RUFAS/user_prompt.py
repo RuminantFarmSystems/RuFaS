@@ -48,8 +48,8 @@ def input_prompt():
     while True:
 
         try:
-            user_input = 'input/' + input("\nEnter RUFAS Input: ")
-
+            # user_input = 'input/' + input("\nEnter RUFAS Input: ")
+            user_input = 'input/animal_management.json'
             #
             # Handle user exiting program
             #

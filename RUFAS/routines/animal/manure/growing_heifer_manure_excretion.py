@@ -5,7 +5,6 @@ Description: Determines manure excretion with information from the
     ration formulation, outputs used by the manure module.
 Author(s): Militsa Sotirova, militsasotirova@gmail.com
 """
-from RUFAS.routines.feed.feed import FeedNames, Nutrients
 from .general_manure import phosphorus_excreted
 
 
@@ -42,12 +41,11 @@ def manure_calculations(ration_formulation, feed, BW, p_feces_excrt, p_urine):
     CP_diet_content = 0
     for key in ration_formulation:
         # not every key in the ration_formulation dictionary refers to a feed
-        if key in feed.managed_feed_names:
+        if key in feed.available_feeds:
             # percentages of the DM of each nutrient
-            managed_feed = FeedNames[key]
-            nutrients = feed.values(managed_feed)
-            DM_feed_content = 0.01 * nutrients[Nutrients.DM.name]
-            CP_feed_content = 0.01 * nutrients[Nutrients.CP_DM.name]
+            nutrients = feed.available_feeds[key]
+            DM_feed_content = 0.01 * nutrients['DM']
+            CP_feed_content = 0.01 * nutrients['CP']
 
             # kg of each nutrient
             DM_feed_amount = ration_formulation[key]
@@ -71,12 +69,12 @@ def manure_calculations(ration_formulation, feed, BW, p_feces_excrt, p_urine):
     p_excrt, WIP_frac, WOP_frac, p_excrt_manure, p_frac = \
         phosphorus_excreted(0, Mkg, p_feces_excrt, p_urine)
     return p_excrt, \
-           {"U": 0.340, #TODO: Implement with correct equation
-            "TAN_s": 0.14, #TODO: Implement with correct equation
+           {"U": 0.340,  # TODO: Implement with correct equation
+            "TAN_s": 0.14,  # TODO: Implement with correct equation
             "MN": MN,
             "Mkg": Mkg,
-            "VSd": 7087.413, #TODO: Implement with correct equation
-            "VSnd": 859.390, #TODO: Implement with correct equation
+            "VSd": 7087.413,  # TODO: Implement with correct equation
+            "VSnd": 859.390,  # TODO: Implement with correct equation
             "WIP_frac": WIP_frac,
             "WOP_frac": WOP_frac,
             "p_excrt_manure": p_excrt_manure,

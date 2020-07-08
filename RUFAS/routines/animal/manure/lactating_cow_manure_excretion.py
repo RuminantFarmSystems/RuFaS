@@ -78,7 +78,7 @@ def manure_calculations(ration_formulation, feed, BW, DIM, mPrt,
     NDF_diet_content = 0
     for key in ration_formulation:
         # not every key in the ration_formulation dictionary refers to a feed
-        if not (key == 'status' or key == 'objective'):
+        if key in feed.available_feeds:
             # percentages of the DM of each nutrient
             nutrients = feed.available_feeds[key]
             DM_feed_content = 0.01 * nutrients['DM']

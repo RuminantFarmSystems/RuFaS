@@ -6,7 +6,6 @@ Author(s): Manfei Li, mli497@wisc.edu
 Description: This file initialize life events with the age of the animal
 				when event happens and the description of the event.
 """
-###############################################################################
 
 import copy
 
@@ -25,7 +24,8 @@ class AnimalEvents(object):
 		Args:
 			events_str: string representation of events
 		"""
-		split_by_date = list(filter(lambda x: x != '', list(map(lambda x: x.strip(), events_str.split('days born ')))))
+		split_by_date = list(filter(lambda x: x != '', list(map(lambda x: x.strip(),
+																events_str.lower().split('days born ')))))
 
 		for day in split_by_date:
 			split = day.split(': ')

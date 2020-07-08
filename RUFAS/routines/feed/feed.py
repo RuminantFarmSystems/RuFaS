@@ -81,12 +81,12 @@ class Feed:
             data: the feed information from the input JSON file
         """
 
-        self.__feed_database = data['feed_database']
-        self.__feeds_table = data['feeds_table']
-        self.__feed_quality_table = data['feed_quality_table']
-        self.__nutrient_table = data['nutrient_table']
+        self.feed_database = data['feed_database']
+        self.feeds_table = data['feeds_table']
+        self.feed_quality_table = data['feed_quality_table']
+        self.nutrient_table = data['nutrient_table']
 
-        self.db_reader = DatabaseReader(self.__feed_database)
+        self.db_reader = DatabaseReader(self.feed_database)
 
         self.entries_split_by_maturity = self.get_feeds_split_by_maturity()
         self.growing_feeds = data['growing_feeds']
@@ -674,7 +674,7 @@ class Feed:
             table which splits feeds by quality
         """
         column = 'entry'
-        dict_list = self.db_reader.query(self.__feed_quality_table,
+        dict_list = self.db_reader.query(self.feed_quality_table,
                                          distinct=True, cols=[column])
         return [result[column] for result in dict_list]
 
@@ -699,7 +699,7 @@ class Feed:
         """
         column = 'units'
         all_feeds = purchased_feeds + grown_feeds
-        dict_list = self.db_reader.query(self.__feeds_table, cols=[column],
+        dict_list = self.db_reader.query(self.feeds_table, cols=[column],
                                          identifier='entry',
                                          desired_rows=tuple(all_feeds))
         units = [result[column] for result in dict_list]
@@ -755,7 +755,7 @@ class Feed:
         rounded_DM = round(DM)
         rounded_NDF = round(NDF)
         column = 'differentiating_nutrient'
-        dict_list = self.db_reader.query(self.__feed_quality_table,
+        dict_list = self.db_reader.query(self.feed_quality_table,
                                          distinct=True, cols=[column],
                                          identifier='entry',
                                          desired_rows=(grown_feed_entry,))
@@ -763,7 +763,7 @@ class Feed:
 
         column = 'quality_id'
         rounded_nutrient = rounded_DM if nutrient == 'DM' else rounded_NDF
-        dict_list = self.db_reader.query(self.__feed_quality_table,
+        dict_list = self.db_reader.query(self.feed_quality_table,
                                          cols=[column], identifier='entry',
                                          desired_rows=(str(grown_feed_entry),),
                                          compare_val=str(rounded_nutrient),
@@ -832,7 +832,7 @@ class Feed:
         Returns: a dictionary where the keys are the the feed identifiers and
         the values are nutrient dictionaries
         """
-        dict_list = self.db_reader.query(self.__nutrient_table,
+        dict_list = self.db_reader.query(self.nutrient_table,
                                          identifier='feed_id',
                                          desired_rows=tuple(feed_ids))
         nutrient_vals = {}

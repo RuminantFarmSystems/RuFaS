@@ -1,14 +1,20 @@
 {
     "feed_database": "input/databases/feeds.sqlite",
-    "feeds_table": "input/feed/user_feeds.csv",
-    "feed_quality_table": "input/feed/user_feeds.csv",
-    "nutrient_table": "input/feed/user_feeds.csv",
-    "managed_feeds": [
-        "Corn_grain",
-        "Legume_hay",
-        "Cotton_seed",
-        "Roasted_soybean",
-        "Rye_hay"
+    "feeds_table": "user_feeds",
+    "feed_quality_table": "feed_quality",
+    "nutrient_table": "nutrients",
+    "purchased_feeds": [
+        2,
+        24,
+        34,
+        38,
+        91,
+        102,
+        137
+    ],
+    "growing_feeds": [
+        8,
+        87
     ],
     "storage_options": {
         "storage_1": {

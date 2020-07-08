@@ -242,7 +242,7 @@ class InitCrop:
         self.planting_date = 0
         self.harvest_date = 0
         self.harvest_type = ''
-        self.fr_PHU_harvest_min = 0
+        self.fr_PHU_harvest_min = 0.0
 
         self.crop_name = 'null'
         self.crop_type = ''

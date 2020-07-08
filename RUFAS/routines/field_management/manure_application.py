@@ -201,8 +201,8 @@ def added_manure_P(soil, m_app):
 def added_manure_N(soil, m_app):
     totalN = m_app['N_mass']
 
-    activeN = totalN * 0.875
-    stableN = totalN * 0.125
+    active_N = totalN * 0.875
+    stable_N = totalN * 0.125
 
-    soil.soil_layers[0].activeN += activeN
-    soil.soil_layers[0].stableN += stableN
+    soil.soil_layers[0].active_N += active_N
+    soil.soil_layers[0].stable_N += stable_N

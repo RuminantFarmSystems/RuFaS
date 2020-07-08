@@ -41,12 +41,12 @@ def manure_calculations(BW, p_feces_excrt, p_urine):
     p_excrt, WIP_frac, WOP_frac, p_excrt_manure, p_frac = \
         phosphorus_excreted(0, Mkg, p_feces_excrt, p_urine)
     return p_excrt, \
-           {"U": 0.340, #TODO: Implement with correct equation
-            "TAN_s": 0.14, #TODO: Implement with correct equation
-            "MN": 532.407, #TODO: Implement with correct equation
+           {"U": 0.340,  # TODO: Implement with correct equation
+            "TAN_s": 0.14,  # TODO: Implement with correct equation
+            "MN": 532.407,  # TODO: Implement with correct equation
             "Mkg": Mkg,
-            "VSd": 7087.413, #TODO: Implement with correct equation
-            "VSnd": 859.390, #TODO: Implement with correct equation
+            "VSd": 7087.413,  # TODO: Implement with correct equation
+            "VSnd": 859.390,  # TODO: Implement with correct equation
             "WIP_frac": WIP_frac,
             "WOP_frac": WOP_frac,
             "p_excrt_manure": p_excrt_manure,

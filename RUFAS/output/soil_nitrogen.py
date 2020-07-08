@@ -51,12 +51,12 @@ class SoilNitrogen(BaseReportHandler):
                                 'NH4_L1': ['soil.soil_layers[0].NH4', 'kg', []],
                                 'NH4_L2': ['soil.soil_layers[1].NH4', 'kg', []],
                                 'NH4_L3': ['soil.soil_layers[2].NH4', 'kg', []],
-                                'ActiveN_L1': ['soil.soil_layers[0].activeN', 'kg', []],
-                                'ActiveN_L2': ['soil.soil_layers[1].activeN', 'kg', []],
-                                'ActiveN_L3': ['soil.soil_layers[2].activeN', 'kg', []],
-                                'StableN_L1': ['soil.soil_layers[0].stableN', 'kg', []],
-                                'StableN_L2': ['soil.soil_layers[1].stableN', 'kg', []],
-                                'StableN_L3': ['soil.soil_layers[2].stableN', 'kg', []],
+                                'active_N_L1': ['soil.soil_layers[0].active_N', 'kg', []],
+                                'active_N_L2': ['soil.soil_layers[1].active_N', 'kg', []],
+                                'active_N_L3': ['soil.soil_layers[2].active_N', 'kg', []],
+                                'stable_N_L1': ['soil.soil_layers[0].stable_N', 'kg', []],
+                                'stable_N_L2': ['soil.soil_layers[1].stable_N', 'kg', []],
+                                'stable_N_L3': ['soil.soil_layers[2].stable_N', 'kg', []],
                                 'FreshN': ['soil.soil_layers[0].topLayerFreshN', 'kg', []],
                                 'Nitri_L1': ['soil.soil_layers[0].nitrification', 'kg/ha', []],
                                 'Nitri_L2': ['soil.soil_layers[1].nitrification', 'kg/ha', []],
@@ -85,8 +85,8 @@ class SoilNitrogen(BaseReportHandler):
                                 'active_perc_L2': ['soil.soil_layers[1].active_perc', 'kg/ha', []],
                                 'active_perc_L3': ['soil.soil_layers[2].active_perc', 'kg/ha', []],
                                 'NH4_erosion': ['soil.NH4_erosion', 'kg/ha', []],
-                                'activeN_erosion': ['soil.activeN_erosion', 'kg/ha', []],
-                                'stableN_erosion': ['soil.stableN_erosion', 'kg/ha', []],
+                                'active_N_erosion': ['soil.active_N_erosion', 'kg/ha', []],
+                                'stable_N_erosion': ['soil.stable_N_erosion', 'kg/ha', []],
                                 'freshN_erosion': ['soil.freshN_erosion', 'kg/ha', []]
                                 }
 
@@ -94,12 +94,12 @@ class SoilNitrogen(BaseReportHandler):
                                  'NO3_runoff': ['soil.NO3_runoff_annual', 'kg/ha', 0],
                                  'NH4_runoff': ['soil.NH4_runoff_annual', 'kg/ha', 0],
                                  'NH4_erosion': ['soil.NH4_erosion_annual', 'kg/ha', 0],
-                                 'activeN_erosion': ['soil.activeN_erosion_annual', 'kg/ha', 0],
-                                 'stableN_erosion': ['soil.stableN_erosion_annual', 'kg/ha', 0],
+                                 'active_N_erosion': ['soil.active_N_erosion_annual', 'kg/ha', 0],
+                                 'stable_N_erosion': ['soil.stable_N_erosion_annual', 'kg/ha', 0],
                                  'freshN_erosion': ['soil.freshN_erosion_annual', 'kg/ha', 0],
                                  'NO3_drainage': ['soil.NO3_drainage_annual', 'kg/ha', 0],
                                  'NH4_drainage': ['soil.NH4_drainage_annual', 'kg/ha', 0],
-                                 'activeN_drainage': ['soil.activeN_drainage_annual', 'kg/ha', 0]
+                                 'active_N_drainage': ['soil.active_N_drainage_annual', 'kg/ha', 0]
                                  }
 
     #
