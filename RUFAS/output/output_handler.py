@@ -25,6 +25,7 @@ from RUFAS.output.water_balance import WaterBalance
 from RUFAS.output.custom_report import CustomReport
 from RUFAS.output.pen_report import PenReport
 from RUFAS.output.soil_phosphorus import SoilPhosphorus
+from RUFAS.output.soil_carbon import SoilCarbon
 
 
 # -------------------------------------------------------------------------------
@@ -65,6 +66,7 @@ class OutputHandler:
                         'soil_summary': SoilSummary(data['soil_summary']),
                         'soil_nitrogen': SoilNitrogen(data['soil_nitrogen']),
                         'soil_phosphorus': SoilPhosphorus(data['soil_phosphorus']),
+                        'soil_carbon': SoilCarbon(data['soil_carbon']),
                         'crop_summary': CropSummary(data['crop_summary']),
                         'feed_storage': FeedStorage(data['feed_storage']),
                         'water_balance': WaterBalance(data['water_balance']),

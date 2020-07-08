@@ -25,7 +25,7 @@ Soil attribute definitions
     
     tempfac = temperature factor
     
-    waterfac = water factor
+    water_fac = water factor
     
     soilTemp = temperature of the soil layer (ºC)
     

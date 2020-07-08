@@ -43,7 +43,10 @@ class SoilCarbon(BaseReportHandler):
         self.set_properties(data)
 
         self.daily_variables = {'year': ['time.cal_year', '', []],
-                                'j_day': ['time.day', '', []]
+                                'j_day': ['time.day', '', []],
+                                'total_carbon_L1': ['soil.soil_layers[0].total_carbon', 'kg/ha', []],
+                                'total_carbon_L2': ['soil.soil_layers[1].total_carbon', 'kg/ha', []],
+                                'total_carbon_L3': ['soil.soil_layers[2].total_carbon', 'kg/ha', []]
                                 }
 
         self.annual_variables = {'year': ['time.cal_year', '', 0]
