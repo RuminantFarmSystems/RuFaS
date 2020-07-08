@@ -33,7 +33,7 @@ class AnimalValues(IntEnum):
     tai_program_start_day_h = 14
     synch_ed_program_start_day_h = 15
     synch_ed_estrus_day = 16
-    stop_day = 17
+    synch_ed_stop_day = 17
     conception_rate = 18
     ai_day = 19
     abortion_day = 20
@@ -93,7 +93,7 @@ class AnimalInitalization:
                             tai_method_h VARCHAR, synch_ed_method_h VARCHAR, estrus_count VARCHAR, \
                                 estrus_day VARCHAR, tai_program_start_day_h VARCHAR, \
                                     synch_ed_program_start_day_h VARCHAR, synch_ed_estrus_day VARCHAR, \
-                                        stop_day VARCHAR, conception_rate VARCHAR, ai_day VARCHAR, \
+                                        synch_ed_stop_day VARCHAR, conception_rate VARCHAR, ai_day VARCHAR, \
                                             abortion_day VARCHAR, days_in_preg VARCHAR, gestation_length VARCHAR, \
                                                 p_gest_for_calf VARCHAR)')
             cur.execute('CREATE TABLE IF NOT EXISTS cows \
@@ -103,7 +103,7 @@ class AnimalInitalization:
                             tai_method_h VARCHAR, synch_ed_method_h VARCHAR, estrus_count VARCHAR, \
                                 estrus_day VARCHAR, tai_program_start_day_h VARCHAR, \
                                     synch_ed_program_start_day_h VARCHAR, synch_ed_estrus_day VARCHAR, \
-                                        stop_day VARCHAR, conception_rate VARCHAR, ai_day VARCHAR, \
+                                        synch_ed_stop_day VARCHAR, conception_rate VARCHAR, ai_day VARCHAR, \
                                             abortion_day VARCHAR, days_in_preg VARCHAR, gestation_length VARCHAR, \
                                                 p_gest_for_calf VARCHAR, presynch_method VARCHAR, tai_method_c VARCHAR, \
                                                     resynch_method VARCHAR, days_in_milk VARCHAR, parity VARCHAR)')
@@ -114,7 +114,7 @@ class AnimalInitalization:
                             tai_method_h VARCHAR, synch_ed_method_h VARCHAR, estrus_count VARCHAR, \
                                 estrus_day VARCHAR, tai_program_start_day_h VARCHAR, \
                                     synch_ed_program_start_day_h VARCHAR, synch_ed_estrus_day VARCHAR, \
-                                        stop_day VARCHAR, conception_rate VARCHAR, ai_day VARCHAR, \
+                                        synch_ed_stop_day VARCHAR, conception_rate VARCHAR, ai_day VARCHAR, \
                                             abortion_day VARCHAR, days_in_preg VARCHAR, gestation_length VARCHAR, \
                                                 p_gest_for_calf VARCHAR, presynch_method VARCHAR, tai_method_c VARCHAR, \
                                                     resynch_method VARCHAR)')
@@ -163,7 +163,7 @@ class AnimalInitalization:
 
         for _ in range(sim_days):
             for calf in calves:
-                wean_day = calf.update()
+                wean_day = calf.update(0)
                 if wean_day:
                     args = calf.get_calf_values()
                     args.update(id = self.next_id())
@@ -173,7 +173,7 @@ class AnimalInitalization:
                     calves.remove(calf)
 
             for heiferI in heiferIs:
-                second_stage = heiferI.update()
+                second_stage = heiferI.update(0)
                 if second_stage:
                     args = heiferI.get_heiferI_values()
                     args.update(id = self.next_id())
@@ -186,7 +186,7 @@ class AnimalInitalization:
                     heiferIs.remove(heiferI)
 
             for heiferII in heiferIIs:
-                cull_stage, third_stage = heiferII.update()
+                cull_stage, third_stage = heiferII.update(0)
                 if cull_stage:
                     heiferIIs.remove(heiferII)
                 if third_stage:
@@ -198,7 +198,7 @@ class AnimalInitalization:
                     heiferIIs.remove(heiferII)
 
             for heiferIII in heiferIIIs:
-                cow_stage = heiferIII.update()
+                cow_stage = heiferIII.update(0)
                 if cow_stage:
                     args = heiferIII.get_heiferIII_values()
                     args.update(id = self.next_id())
@@ -217,7 +217,7 @@ class AnimalInitalization:
                     heiferIIIs.remove(heiferIII)
                     
             for cow in cows:
-                _, _, _, culled, new_born = cow.update(False)
+                _, _, _, culled, new_born = cow.update(False, 0)
                 if culled or cow.calves > 4:
                     cows.remove(cow)
                 if new_born:
@@ -259,7 +259,7 @@ class AnimalInitalization:
             cur.execute('INSERT INTO heiferIIIs (id, breed, birth_date, days_born, birth_weight, \
                 body_weight, wean_weight, mature_body_weight, events, repro_program, tai_method_h, \
                     synch_ed_method_h, estrus_count, estrus_day, tai_program_start_day_h, \
-                        synch_ed_program_start_day_h, synch_ed_estrus_day, stop_day, conception_rate, \
+                        synch_ed_program_start_day_h, synch_ed_estrus_day, synch_ed_stop_day, conception_rate, \
                             ai_day, abortion_day, days_in_preg, gestation_length, p_gest_for_calf) \
                                 VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)', 
                                 (heiferIII.id, heiferIII.breed, heiferIII.birth_date, heiferIII.days_born, 
@@ -268,14 +268,14 @@ class AnimalInitalization:
                                 heiferIII.tai_method_h, heiferIII.synch_ed_method_h, heiferIII.estrus_count, 
                                 heiferIII.estrus_day, heiferIII.tai_program_start_day_h, 
                                 heiferIII.synch_ed_program_start_day_h, heiferIII.synch_ed_estrus_day, 
-                                heiferIII.stop_day, heiferIII.conception_rate, heiferIII.ai_day, 
+                                heiferIII.synch_ed_stop_day, heiferIII.conception_rate, heiferIII.ai_day,
                                 heiferIII.abortion_day, heiferIII.days_in_preg, heiferIII.gestation_length, 
                                 heiferIII.p_gest_for_calf))
         for cow in cows:
             cur.execute('INSERT INTO cows (id, breed, birth_date, days_born, birth_weight, \
                 body_weight, wean_weight, mature_body_weight, events, repro_program, tai_method_h, \
                     synch_ed_method_h, estrus_count, estrus_day, tai_program_start_day_h, \
-                        synch_ed_program_start_day_h, synch_ed_estrus_day, stop_day, conception_rate, \
+                        synch_ed_program_start_day_h, synch_ed_estrus_day, synch_ed_stop_day, conception_rate, \
                             ai_day, abortion_day, days_in_preg, gestation_length, p_gest_for_calf, \
                                 presynch_method, tai_method_c, resynch_method, days_in_milk, parity) \
                                     VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)', 
@@ -284,7 +284,7 @@ class AnimalInitalization:
                                     str(cow.events), cow.repro_program, cow.tai_method_h, 
                                     cow.synch_ed_method_h, cow.estrus_count, cow.estrus_day, 
                                     cow.tai_program_start_day_h, cow.synch_ed_program_start_day_h, 
-                                    cow.synch_ed_estrus_day, cow.stop_day, cow.conception_rate, 
+                                    cow.synch_ed_estrus_day, cow.synch_ed_stop_day, cow.conception_rate,
                                     cow.ai_day, cow.abortion_day, cow.days_in_preg, cow.gestation_length, 
                                     cow.p_gest_for_calf, cow.presynch_method, cow.tai_method_c, 
                                     cow.resynch_method, cow.days_in_milk, cow.calves))
@@ -292,7 +292,7 @@ class AnimalInitalization:
             cur.execute('INSERT INTO replacement (id, breed, birth_date, days_born, birth_weight, \
                 body_weight, wean_weight, mature_body_weight, events, repro_program, tai_method_h, \
                     synch_ed_method_h, estrus_count, estrus_day, tai_program_start_day_h, \
-                        synch_ed_program_start_day_h, synch_ed_estrus_day, stop_day, conception_rate, \
+                        synch_ed_program_start_day_h, synch_ed_estrus_day, synch_ed_stop_day, conception_rate, \
                             ai_day, abortion_day, days_in_preg, gestation_length, p_gest_for_calf, \
                                 presynch_method, tai_method_c, resynch_method) \
                                     VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)', 
@@ -301,7 +301,7 @@ class AnimalInitalization:
                                     str(cow.events), cow.repro_program, cow.tai_method_h, 
                                     cow.synch_ed_method_h, cow.estrus_count, cow.estrus_day, 
                                     cow.tai_program_start_day_h, cow.synch_ed_program_start_day_h, 
-                                    cow.synch_ed_estrus_day, cow.stop_day, cow.conception_rate, 
+                                    cow.synch_ed_estrus_day, cow.synch_ed_stop_day, cow.conception_rate,
                                     cow.ai_day, cow.abortion_day, cow.days_in_preg, cow.gestation_length, 
                                     cow.p_gest_for_calf, cow.presynch_method, cow.tai_method_c, 
                                     cow.resynch_method))
@@ -436,7 +436,7 @@ class AnimalInitalization:
                 'tai_program_start_day_h': int(row[AnimalValues.tai_program_start_day_h]),
                 'synch_ed_program_start_day_h': int(row[AnimalValues.synch_ed_program_start_day_h]),
                 'synch_ed_estrus_day': int(row[AnimalValues.synch_ed_estrus_day]),
-                'stop_day': int(row[AnimalValues.stop_day]),
+                'synch_ed_stop_day': int(row[AnimalValues.synch_ed_stop_day]),
                 'conception_rate': float(row[AnimalValues.conception_rate]),
                 'ai_day': int(row[AnimalValues.ai_day]),
                 'abortion_day': int(row[AnimalValues.abortion_day]),
@@ -481,7 +481,7 @@ class AnimalInitalization:
                 'tai_program_start_day_h': int(row[AnimalValues.tai_program_start_day_h]),
                 'synch_ed_program_start_day_h': int(row[AnimalValues.synch_ed_program_start_day_h]),
                 'synch_ed_estrus_day': int(row[AnimalValues.synch_ed_estrus_day]),
-                'stop_day': int(row[AnimalValues.stop_day]),
+                'synch_ed_stop_day': int(row[AnimalValues.synch_ed_stop_day]),
                 'conception_rate': float(row[AnimalValues.conception_rate]),
                 'ai_day': int(row[AnimalValues.ai_day]),
                 'abortion_day': int(row[AnimalValues.abortion_day]),
@@ -525,7 +525,7 @@ class AnimalInitalization:
                 'tai_program_start_day_h': int(row[AnimalValues.tai_program_start_day_h]),
                 'synch_ed_program_start_day_h': int(row[AnimalValues.synch_ed_program_start_day_h]),
                 'synch_ed_estrus_day': int(row[AnimalValues.synch_ed_estrus_day]),
-                'stop_day': int(row[AnimalValues.stop_day]),
+                'synch_ed_stop_day': int(row[AnimalValues.synch_ed_stop_day]),
                 'conception_rate': float(row[AnimalValues.conception_rate]),
                 'ai_day': int(row[AnimalValues.ai_day]),
                 'abortion_day': int(row[AnimalValues.abortion_day]),
