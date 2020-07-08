@@ -427,10 +427,10 @@ class LifeCycleManager:
                     self.sold_calves.append(new_calf)
 
             # calculate reproduction indications
-            if date >= sim_length - 21 * self.config["num_21_days"]:
+            if date >= sim_length - 21 * self.config["num_21_days_repro"]:
                 if cow.ai_day == cow.days_born:
                     self.num_ai_21_days += 1
-                if cow.days_in_milk > self.config["vwp"] and not cow.preg:
+                if cow.days_in_milk > self.config["voluntary_waiting_period"] and not cow.preg:
                     self.num_cow_btw_vwp_preg_21_days += 1
                 if cow.days_in_preg == 1:
                     self.num_preg_21_days += 1
@@ -443,7 +443,7 @@ class LifeCycleManager:
             else:
                 self.dry_cow_num += 1
 
-            if cow.days_in_milk < self.config['vwp']:
+            if cow.days_in_milk < self.config['voluntary_waiting_period']:
                 self.num_cow_in_vwp += 1
                 if not cow.preg:
                     self.open_cow_num += 1
@@ -465,7 +465,7 @@ class LifeCycleManager:
             self.ai_num += cow.AI_times
 
         # calculate service rate and conception rate
-        if date >= sim_length - 21 * self.config["num_21_days"]:
+        if date >= sim_length - 21 * self.config["num_21_days_repro"]:
             self.count_21_days += 1
             if self.count_21_days % 21 == 0:
                 self.service_rate_sum_21_days += \
@@ -497,9 +497,9 @@ class LifeCycleManager:
             self.avg_days_in_preg = total_days_in_preg / self.preg_cow_num
 
         self.avg_service_rate = self.service_rate_sum_21_days / \
-            float(self.config["num_21_days"])
+            float(self.config["num_21_days_repro"])
         self.avg_conception_rate = self.conception_rate_sum_21_days / \
-            float(self.config["num_21_days"])
+            float(self.config["num_21_days_repro"])
         self.pregnancy_rate = self.avg_service_rate * self.avg_conception_rate
 
         return animals_added, ids_removed, calves_born, calves, heiferIs, \
@@ -539,7 +539,7 @@ class LifeCycleManager:
                 self.num_cow_preg += 1
             if cow.milking:
                 self.num_cow_milking += 1
-            if cow.days_in_milk < self.config['vwp']:
+            if cow.days_in_milk < self.config['voluntary_waiting_period']:
                 self.num_cow_in_vwp += 1
 
             # calculate economy date
@@ -576,9 +576,9 @@ class LifeCycleManager:
                       for cow in cows]
         parity_count_tuple = Counter(parity_lst)
         avg_service_rate = self.service_rate_sum_21_days / \
-            float(self.config["num_21_days"])
+            float(self.config["num_21_days_repro"])
         avg_conception_rate = self.conception_rate_sum_21_days / \
-            float(self.config["num_21_days"])
+            float(self.config["num_21_days_repro"])
         pregnancy_rate = avg_service_rate * avg_conception_rate
 
         print("\n=================== Herd structure at the end of the "

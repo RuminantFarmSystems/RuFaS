@@ -41,7 +41,7 @@ class HeiferII(HeiferI):
 			args.tai_program_start_day_h
 			args.synch_ed_program_start_day_h
 			args.synch_ed_estrus_day
-			args.stop_day
+			args.synch_ed_stop_day
 			args.conception_rate
 			args.ai_day
 			args.abortion_day
@@ -54,6 +54,21 @@ class HeiferII(HeiferI):
 			self.assign_heiferII_values(args)
 		else:
 			self.init_values(args)
+
+		self.target_adg_heifer_preg = 0
+
+	def set_adg_preg(self):
+		"""
+		Sets the target average daily gain for an animal that is pregnant.
+		If the gestation_length of the animal is equal to its days_in_preg,
+		the difference is set to 1 (otherwise results in a division by 0 error).
+		"""
+		divisor = (self.gestation_length - self.days_in_preg)
+		if divisor == 0:
+			divisor = 1
+		self.target_adg_heifer_preg = \
+			(0.82 * 0.96 * self.mature_body_weight - 0.96 * self.body_weight) \
+			/ divisor
 		
 	def init_values(self, args):
 		"""
@@ -73,7 +88,7 @@ class HeiferII(HeiferI):
 		self.synch_ed_method_h = args['synch_ed_method_h']
 		self.synch_ed_program_start_day_h = 0
 		self.synch_ed_estrus_day = 0
-		self.stop_day = 0
+		self.synch_ed_stop_day = 0
 
 		self.conception_rate = 0
 		self.ai_day = 0
@@ -101,7 +116,7 @@ class HeiferII(HeiferI):
 		self.synch_ed_method_h = args['synch_ed_method_h']
 		self.synch_ed_program_start_day_h = args['synch_ed_program_start_day_h']
 		self.synch_ed_estrus_day = args['synch_ed_estrus_day']
-		self.stop_day = args['stop_day']
+		self.synch_ed_stop_day = args['synch_ed_stop_day']
 
 		self.conception_rate = args['conception_rate']
 		self.ai_day = args['ai_day']
@@ -133,7 +148,7 @@ class HeiferII(HeiferI):
             'tai_program_start_day_h': self.tai_program_start_day_h,
             'synch_ed_program_start_day_h': self.synch_ed_program_start_day_h,
             'synch_ed_estrus_day': self.synch_ed_estrus_day,
-            'stop_day': self.stop_day,
+            'synch_ed_stop_day': self.synch_ed_stop_day,
             'conception_rate': self.conception_rate,
             'ai_day': self.ai_day,
             'abortion_day': self.abortion_day,
@@ -222,18 +237,13 @@ class HeiferII(HeiferI):
 
 		if self.days_born < AnimalBase.config['grow_end_day']:
 			# Heifer can only grow to a maximum weight of mature_body_weight
-			if self.body_weight < self.mature_body_weight:
-				gained_weight = np.random.normal(
-					AnimalBase.config['avg_daily_gain_h'], 
-					AnimalBase.config['std_daily_gain_h'])
-				while gained_weight < AnimalBase.config['avg_daily_gain_h'] \
-					- 2 * AnimalBase.config['std_daily_gain_h'] \
-					or gained_weight > AnimalBase.config['avg_daily_gain_h'] \
-						+ 2 * AnimalBase.config['std_daily_gain_h']:
-					gained_weight = np.random.normal(
-						AnimalBase.config['avg_daily_gain_h'], 
-						AnimalBase.config['std_daily_gain_h'])
-				self.body_weight += gained_weight
+			if self.preg:
+				self.set_adg_preg()
+				self.body_weight += self.target_adg_heifer_preg
+			else:
+				self.set_agd_non_preg()
+				self.body_weight += self.target_adg_heifer_non_preg
+
 			if self.body_weight > self.mature_body_weight:
 				self.body_weight = self.mature_body_weight
 				self.events.add_event(self.days_born, sim_day,
@@ -257,7 +267,7 @@ class HeiferII(HeiferI):
 			self._preg_update(sim_day)
 			# prior to calving, heifer move to replacement group
 			if self.days_in_preg == self.gestation_length - \
-				AnimalBase.config['replacement_day']:
+				AnimalBase.config['prefresh_day']:
 				self.days_born -= 1  # will be increment again in next stage
 				third_stage = True
 				self.events.add_event(self.days_born, sim_day, 'moving to heiferIII')
@@ -285,15 +295,15 @@ class HeiferII(HeiferI):
 
 		"""
 		estrus_cycle = np.random.normal(
-			AnimalBase.config['avg_estrus_cycle_h'], 
-			AnimalBase.config['std_estrus_cycle_h'])
-		while estrus_cycle < AnimalBase.config['avg_estrus_cycle_h'] \
-			- 2 * AnimalBase.config['std_estrus_cycle_h'] \
-			or estrus_cycle > AnimalBase.config['avg_estrus_cycle_h'] \
-				+ 2 * AnimalBase.config['std_estrus_cycle_h']:
+			AnimalBase.config['avg_estrus_cycle_heifer'],
+			AnimalBase.config['std_estrus_cycle_heifer'])
+		while estrus_cycle < AnimalBase.config['avg_estrus_cycle_heifer'] \
+			- 2 * AnimalBase.config['std_estrus_cycle_heifer'] \
+			or estrus_cycle > AnimalBase.config['avg_estrus_cycle_heifer'] \
+				+ 2 * AnimalBase.config['std_estrus_cycle_heifer']:
 			estrus_cycle = np.random.normal(
-				AnimalBase.config['avg_estrus_cycle_h'], 
-				AnimalBase.config['std_estrus_cycle_h'])
+				AnimalBase.config['avg_estrus_cycle_heifer'],
+				AnimalBase.config['std_estrus_cycle_heifer'])
 		estrus_day =  int(start_date + estrus_cycle)
 		self.events.add_event(estrus_day, sim_day, estrus_note)
 		return estrus_day
@@ -489,11 +499,11 @@ class HeiferII(HeiferI):
 					else:
 						# second round of injection also failed,
 						# roll back to return_synch
-						self.stop_day = self.synch_ed_program_start_day_h + 21
-						self._determine_synch_ed_program_day(self.stop_day)
+						self.synch_ed_stop_day = self.synch_ed_program_start_day_h + 21
+						self._determine_synch_ed_program_day(self.synch_ed_stop_day)
 			else:
-				self.stop_day = self.synch_ed_program_start_day_h + 21
-				self._determine_synch_ed_program_day(self.stop_day)
+				self.synch_ed_stop_day = self.synch_ed_program_start_day_h + 21
+				self._determine_synch_ed_program_day(self.synch_ed_stop_day)
 
 	def _CP_update(self, sim_day):
 		"""
@@ -518,11 +528,11 @@ class HeiferII(HeiferI):
 					self.conception_rate = \
 						AnimalBase.config['ed_conception_rate']
 				else:
-					self.stop_day = self.synch_ed_program_start_day_h + 14
-					self._determine_synch_ed_program_day(self.stop_day)
+					self.synch_ed_stop_day = self.synch_ed_program_start_day_h + 14
+					self._determine_synch_ed_program_day(self.synch_ed_stop_day)
 			else:
-				self.stop_day = self.synch_ed_program_start_day_h + 14
-				self._determine_synch_ed_program_day(self.stop_day)
+				self.synch_ed_stop_day = self.synch_ed_program_start_day_h + 14
+				self._determine_synch_ed_program_day(self.synch_ed_stop_day)
 
 	def _synch_ed_update(self, sim_day):
 		"""

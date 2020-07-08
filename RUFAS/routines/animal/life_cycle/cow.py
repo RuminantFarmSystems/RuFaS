@@ -182,14 +182,14 @@ class Cow(HeiferIII):
 		estimated_daily_milk_produced = 0
 		if AnimalBase.config['lactation_curve'] == 'wood':
 			l = self._determine_param_value(
-				AnimalBase.config['l'][breed_index][parity_index],
-				AnimalBase.config['l_std'][breed_index][parity_index])
+				AnimalBase.config['wood_l'][breed_index][parity_index],
+				AnimalBase.config['wood_l_std'][breed_index][parity_index])
 			m = self._determine_param_value(
-				AnimalBase.config['m'][breed_index][parity_index],
-				AnimalBase.config['m_std'][breed_index][parity_index])
+				AnimalBase.config['wood_m'][breed_index][parity_index],
+				AnimalBase.config['wood_m_std'][breed_index][parity_index])
 			n = self._determine_param_value(
-				AnimalBase.config['n'][breed_index][parity_index],
-				AnimalBase.config['n_std'][breed_index][parity_index])
+				AnimalBase.config['wood_n'][breed_index][parity_index],
+				AnimalBase.config['wood_n_std'][breed_index][parity_index])
 
 			estimated_daily_milk_produced = \
 				l * math.pow(self.days_in_milk, m) * \
@@ -427,7 +427,7 @@ class Cow(HeiferIII):
 		elif self.repro_program == 'ED-TAI':
 			self._ed_tai_update(record_econ_stats, sim_day)
 		elif self.repro_program == 'TAI':
-			if self.days_in_milk >= AnimalBase.config['vwp']:
+			if self.days_in_milk >= AnimalBase.config['voluntary_waiting_period']:
 				self._tai_update(record_econ_stats, sim_day)
 
 		self.fat_percent = fat_percent
@@ -468,8 +468,8 @@ class Cow(HeiferIII):
 		"""
 		self._estrus_day = self._determine_estrus_day(
 			self.days_born, '1st estrus after calving',
-			AnimalBase.config['avg_estrus_cycle_r'],
-			AnimalBase.config['std_estrus_cycle_r'], sim_day)
+			AnimalBase.config['avg_estrus_cycle_return'],
+			AnimalBase.config['std_estrus_cycle_return'], sim_day)
 
 	def _later_estrus(self, sim_day):
 		"""
@@ -477,8 +477,8 @@ class Cow(HeiferIII):
 		"""
 		self.estrus_day = self._determine_estrus_day(
 			self.estrus_day, 'estrus occur before vwp',
-			AnimalBase.config['avg_estrus_cycle_c'],
-			AnimalBase.config['std_estrus_cycle_c'], sim_day)
+			AnimalBase.config['avg_estrus_cycle_cow'],
+			AnimalBase.config['std_estrus_cycle_cow'], sim_day)
 
 	def _return_estrus(self, sim_day):
 		"""
@@ -486,8 +486,8 @@ class Cow(HeiferIII):
 		"""
 		self.estrus_day = self._determine_estrus_day(
 			self.estrus_day, 'Estrus',
-			AnimalBase.config['avg_estrus_cycle_c'],
-			AnimalBase.config['std_estrus_cycle_c'], sim_day)
+			AnimalBase.config['avg_estrus_cycle_cow'],
+			AnimalBase.config['std_estrus_cycle_cow'], sim_day)
 
 	def _after_ai_estrus(self, sim_day):
 		"""
@@ -495,8 +495,8 @@ class Cow(HeiferIII):
 		"""
 		self.estrus_day = self._determine_estrus_day(
 			self.estrus_day, 'Estrus after AI',
-			AnimalBase.config['avg_estrus_cycle_c'],
-			AnimalBase.config['std_estrus_cycle_c'], sim_day)
+			AnimalBase.config['avg_estrus_cycle_cow'],
+			AnimalBase.config['std_estrus_cycle_cow'], sim_day)
 
 	def _after_abortion_estrus(self, sim_day):
 		"""
@@ -504,8 +504,8 @@ class Cow(HeiferIII):
 		"""
 		self.estrus_day = self._determine_estrus_day(
 			self.abortion_day, 'Estrus after abortion',
-			AnimalBase.config['avg_estrus_cycle_c'],
-			AnimalBase.config['std_estrus_cycle_c'], sim_day)
+			AnimalBase.config['avg_estrus_cycle_cow'],
+			AnimalBase.config['std_estrus_cycle_cow'], sim_day)
 
 	def _ed_update(self, record_econ_stats, sim_day):
 		"""
@@ -522,7 +522,7 @@ class Cow(HeiferIII):
 		if self.days_born == self._estrus_day:
 			self.estrus_count += 1
 
-			if 1 <= self.days_in_milk <= AnimalBase.config['vwp']:
+			if 1 <= self.days_in_milk <= AnimalBase.config['voluntary_waiting_period']:
 				self._later_estrus(sim_day)
 			else:
 				estrus_detection_rand = random()
@@ -789,7 +789,7 @@ class Cow(HeiferIII):
 			record_econ_stats: record injection counts in this protocol,
 			for temporary use
 		"""
-		if self.days_in_milk == AnimalBase.config['vwp']:
+		if self.days_in_milk == AnimalBase.config['voluntary_waiting_period']:
 			if self.presynch_method:
 				self._determine_presynch_program_day(self.days_born)
 			else:
@@ -830,7 +830,7 @@ class Cow(HeiferIII):
 			self.days_in_milk < AnimalBase.config['tai_program_start_day']:
 			self.estrus_count += 1
 
-			if 1 <= self.days_in_milk <= AnimalBase.config['vwp']:
+			if 1 <= self.days_in_milk <= AnimalBase.config['voluntary_waiting_period']:
 				self._later_estrus(sim_day)
 			else:
 				estrus_detection_rand = random()
@@ -1071,36 +1071,36 @@ class Cow(HeiferIII):
 		cull_rand = random()
 		if cull_rand <= inv_cull_rate:
 			cull_reason_rand = random()
-			# cull_reason_cp = []
+			# cull_reason_cull_prob = []
 			if cull_reason_rand <= 0.1633:
-				cull_reason_cp = AnimalBase.config['feet_leg_cp']
+				cull_reason_cull_prob = AnimalBase.config['feet_leg_cull_prob']
 				self.cull_reason = "Lameness"
 			elif cull_reason_rand <= 0.4516:
-				cull_reason_cp = AnimalBase.config['injury_cp']
+				cull_reason_cull_prob = AnimalBase.config['injury_cull_prob']
 				self.cull_reason = "Injury"
 			elif cull_reason_rand <= 0.6955:
-				cull_reason_cp = AnimalBase.config['mastitis_cp']
+				cull_reason_cull_prob = AnimalBase.config['mastitis_cull_prob']
 				self.cull_reason = "Mastitis"
 			elif cull_reason_rand <= 0.8346:
-				cull_reason_cp = AnimalBase.config['disease_cp']
+				cull_reason_cull_prob = AnimalBase.config['disease_cull_prob']
 				self.cull_reason = "Disease"
 			elif cull_reason_rand <= 0.8991:
-				cull_reason_cp = AnimalBase.config['udder_cp']
+				cull_reason_cull_prob = AnimalBase.config['udder_cull_prob']
 				self.cull_reason = "Udder"
 			else:
-				cull_reason_cp = AnimalBase.config['unkown_cp']
+				cull_reason_cull_prob = AnimalBase.config['unkown_cull_prob']
 				self.cull_reason = "Unknown"
 
-			c_upper = c_lower = x_upper = x_lower = 0
-			for i in range(len(cull_reason_cp) - 1):
-				if cull_reason_cp[i] <= cull_reason_rand < cull_reason_cp[i+1]:
-					c_lower = cull_reason_cp[i]
-					c_upper = cull_reason_cp[i+1]
-					x_lower = AnimalBase.config['cull_day_count'][i]
-					x_upper = AnimalBase.config['cull_day_count'][i+1]
-			ai = (x_upper-x_lower) / (c_upper-c_lower)
+			cull_reason_upper_limit = cull_reason_lower_limit = cull_time_upper_limit = cull_time_lower_limit = 0
+			for i in range(len(cull_reason_cull_prob) - 1):
+				if cull_reason_cull_prob[i] <= cull_reason_rand < cull_reason_cull_prob[i+1]:
+					cull_reason_lower_limit = cull_reason_cull_prob[i]
+					cull_reason_upper_limit = cull_reason_cull_prob[i+1]
+					cull_time_lower_limit = AnimalBase.config['cull_day_count'][i]
+					cull_time_upper_limit = AnimalBase.config['cull_day_count'][i+1]
+			x = (cull_time_upper_limit-cull_time_lower_limit) / (cull_reason_upper_limit-cull_reason_lower_limit)
 			self.future_cull_date = round(
-				x_lower + ai * (cull_reason_rand - c_lower) + self.days_born)
+				cull_time_lower_limit + x * (cull_reason_rand - cull_reason_lower_limit) + self.days_born)
 
 	def _economy_update(
 			self, cull_stage, estimated_daily_milk_produced, record_econ_stats):
