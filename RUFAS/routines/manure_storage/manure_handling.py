@@ -101,7 +101,8 @@ def solids(pen, manure):
         pen
         manure
     """
+    pen.TS_loss = pen.flush_water_volume * pen.TS_loss_perc
+    pen.VS_loss = pen.TS_loss * pen.VS_loss_perc
 
-    TS = pen.flush_water_volume * pen.TS_loss
-    manure.separators[pen.separator].TS += TS
-    manure.separators[pen.separator].VS += TS * pen.VS_loss
+    manure.separators[pen.separator].TS += pen.TS_loss
+    manure.separators[pen.separator].VS += pen.VS_loss

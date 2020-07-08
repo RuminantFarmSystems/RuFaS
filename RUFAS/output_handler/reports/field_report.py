@@ -144,3 +144,34 @@ class FieldReport(BaseReportDriver):
     class SoilPhosphorusReport(BaseFieldReport):
         def __init__(self, data):
             super().__init__(data)
+
+            self.daily_variables = {'year': ['time.cal_year', '', []],
+                                    'j_day': ['time.day', '', []],
+                                    'manure_P': ['soil.manure_P', 'kg', []],
+                                    'labile_P': ['soil.labile_P', 'kg', []],
+                                    'active_P': ['soil.active_P', 'kg', []],
+                                    'stable_P': ['soil.stable_P', 'kg', []],
+                                    'org_P': ['soil.org_P', 'kg', []],
+                                    'P_uptake': ['soil.P_uptake', 'kg', []],
+                                    'fert_P_leach': ['soil.fert_P_leach', 'kg', []],
+                                    'M_leach': ['soil.M_leach', 'kg', []],
+                                    'DRP_leach': ['soil.DRP_leach', 'kg', []],
+                                    'M_DRP_runoff': ['soil.M_DRP_runoff', 'kg', []],
+                                    'fert_P_runoff': ['soil.fert_P_runoff_act', 'kg', []],
+                                    'DRP_runoff': ['soil.DRP_runoff', 'kg', []],
+                                    'MIP_runoff': ['soil.MIP_runoff', 'kg', []],
+                                    'MOP_runoff': ['soil.MOP_runoff', 'kg', []]
+                                    }
+
+            self.annual_variables = {'year': ['time.cal_year', '', 0],
+                                     'manure_P': ['soil.manure_P_annual', 'kg', []],
+                                     'P_uptake': ['soil.P_uptake_annual', 'kg', []],
+                                     'fert_P_leach': ['soil.fert_P_leach_annual', 'kg', []],
+                                     'M_leach': ['soil.M_leach_annual', 'kg', []],
+                                     'DRP_leach': ['soil.DRP_leach_annual', 'kg', []],
+                                     'M_DRP_runoff': ['soil.M_DRP_runoff_annual', 'kg', []],
+                                     'fert_P_runoff': ['soil.fert_P_runoff_annual', 'kg', []],
+                                     'DRP_runoff': ['soil.DRP_runoff_annual', 'kg', []],
+                                     'MIP_runoff': ['soil.MIP_runoff_annual', 'kg', []],
+                                     'MOP_runoff': ['soil.MOP_runoff_annual', 'kg', []]
+                                     }

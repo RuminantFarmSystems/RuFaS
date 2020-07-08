@@ -38,6 +38,11 @@
             "produce_csv": true,
             "produce_graphics": false,
             "report_name": "nitrogen_balance_report"
+        },
+        "manure_storage_balance": {
+            "produce_csv": true,
+            "produce_graphics": false,
+            "report_name": "manure_storage_balance_report"
         }
     },
     "field_report": {
@@ -69,6 +74,11 @@
         "produce_csv": true,
         "produce_graphics": false,
         "report_name": "feed_storage_report"
+    },
+    "manure_storage_report": {
+        "produce_csv": true,
+        "produce_graphics": false,
+        "report_name": "manure_storage_report"
     },
     "custom_report": {
         "produce_csv": true,

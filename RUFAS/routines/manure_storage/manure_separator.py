@@ -59,7 +59,8 @@ def effluent_solid(separator):
     """
 
     separator.TS -= separator.TS_liquid
-    separator.TS -= separator.TS * separator.TS_DM_effluent_rate
+    separator.TS_DM_effluent = separator.TS * separator.TS_DM_effluent_rate
+    separator.TS -= separator.TS_DM_effluent
 
     separator.VS -= separator.VS_liquid
     separator.N -= separator.N_liquid
