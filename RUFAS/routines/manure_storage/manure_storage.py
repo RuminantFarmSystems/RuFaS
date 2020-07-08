@@ -10,9 +10,10 @@ Author(s): William Donovan, wmdonovan@wisc.edu
 from RUFAS.routines.manure_storage import manure_emissions, manure_handling, manure_separator
 
 
-def daily_manure_routine(manure):
+def daily_manure_routine(manure, animal_management):
     for pen_id in manure.pens:
         pen = manure.pens[pen_id]
+        pen.update_pen(animal_management)
         manure_handling.update_all(pen, manure)
 
     for separator_type in manure.separators:
@@ -249,12 +250,12 @@ class ManureStorage:
                 pen: an instance of the Pen class specified in pen.py
             """
 
+            self.pen_id = pen.id
             self.handling_system = pen.manure_handling
             self.bedding = pen.bedding_type
             self.separator = pen.manure_separator
             self.cow_num = len(pen.animals_in_pen)
             self.raw_manure = pen.manure['Mkg']
-            self.density = 994.0
 
             self.VS_excreted = pen.manure['VSd'] + pen.manure['VSnd']
             self.TS_excreted = self.raw_manure - self.VS_excreted
@@ -263,6 +264,8 @@ class ManureStorage:
 
             # TODO: Excreted Potassium will eventually be calculated in animal module
             self.K_excreted = 0.181 * self.cow_num
+
+            self.density = 994.0
 
             self.bedding_added = 0
             self.water_use_rate = 0
@@ -284,6 +287,17 @@ class ManureStorage:
 
             self.bedding_washed = self.bedding_washed_perc * self.bedding_added
             self.flush_water_daily = self.water_use_rate * self.cow_num
+
+        def update_pen(self, animal_management):
+            pen = animal_management.all_pens[self.pen_id]
+            self.raw_manure += pen.manure['Mkg']
+            self.VS_excreted += pen.manure['VSd'] + pen.manure['VSnd']
+            self.TS_excreted += (self.raw_manure - self.VS_excreted)
+            self.N_excreted += pen.manure['MN']
+            self.P_excreted += pen.manure['p_excrt_manure']
+
+            # TODO: Excreted Potassium will eventually be calculated in animal module
+            self.K_excreted += 0.181 * self.cow_num
 
         def calibrate_water_use(self):
             """

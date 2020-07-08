@@ -326,7 +326,7 @@ class Pen:
             for key in manure.keys():
                 manure[key] += curr_manure[key]
 
-        return manure
+        self.manure = manure
 
     def calc_avg_growth(self):
         """

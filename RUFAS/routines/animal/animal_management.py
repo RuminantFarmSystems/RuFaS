@@ -457,9 +457,9 @@ class AnimalManagement:
         Args:
             feed: instance of the feed class
         """
-        for i, pen in enumerate(self.all_pens):
+        for pen in self.all_pens:
             if pen.pen_populated:
-                self.all_pens[i].manure = self.all_pens[i].calc_manure(feed)
+                pen.calc_manure(feed)
 
     def calc_avg_growth(self):
         """
