@@ -188,10 +188,13 @@ def daily_soil_routine(soil, crop, weather, time):
 
     phosphorus_cycling.update_all(soil, weather, time)
 
-    soil.annual_variable_update()
+    annual_variable_update(soil)
 
-    soil.manure_app_annual += soil.manure_app
-    soil.manure_P_annual += soil.manure_P
+
+def annual_variable_update(soil):
+    soil_water.update_annual_SW(soil)
+    phosphorus_cycling.update_annual_P(soil)
+    nitrogen_cycling.update_annual_N(soil)
 
 
 # -------------------------------------------------------------------------------
@@ -554,17 +557,6 @@ class Soil:
         self.P_erosion_annual = 0.0
         self.P_uptake_annual = 0.0
 
-    def annual_variable_update(self):
-
-        self.ET_max_annual += self.ET_max
-
-        self.drainage_annual += self.drainage
-        self.runoff_annual += self.runoff
-        self.trans_annual += self.trans_sum
-        self.evap_annual += self.evap_sum
-        self.ET_annual += self.ET_act
-
-        self.p_act_annual += self.p_act
 
     # ---------------------------------------------------------------------------
     # Class: SoilLayer

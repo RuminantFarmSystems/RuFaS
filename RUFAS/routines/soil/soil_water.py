@@ -45,10 +45,10 @@ Soil values updated by calling update_all():
 #
 def update_all(soil, weather, time):
 
-    update_SW(soil, weather, time)
+    update_profile_SW(soil, weather, time)
 
 
-def update_SW(soil, weather, time):
+def update_profile_SW(soil, weather, time):
 
     soil.trans_sum = 0.0
     soil.evap_sum = 0.0
@@ -101,3 +101,14 @@ def update_SW(soil, weather, time):
 
     soil.water_balance_difference = soil.p_act - soil.p_calc
 
+
+def update_annual_SW(soil):
+    soil.ET_max_annual += soil.ET_max
+
+    soil.drainage_annual += soil.drainage
+    soil.runoff_annual += soil.runoff
+    soil.trans_annual += soil.trans_sum
+    soil.evap_annual += soil.evap_sum
+    soil.ET_annual += soil.ET_act
+
+    soil.p_act_annual += soil.p_act

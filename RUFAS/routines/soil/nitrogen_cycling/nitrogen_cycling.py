@@ -153,7 +153,7 @@ def update_all(soil):
 
     humus_mineralization.humus_mineralization(soil)
 
-    update_N(soil)
+    update_profile_N(soil)
 
 
 #
@@ -193,7 +193,7 @@ def calc_water_factors(soil):
         layer.water_fac = water_fac
 
 
-def update_N(soil):
+def update_profile_N(soil):
     soil.NH4 = 0.0
     soil.NO3 = 0.0
     soil.org_N = 0.0
@@ -206,8 +206,6 @@ def update_N(soil):
         soil.active_N += layer.active_N
         soil.stable_N += layer.stable_N
 
-    soil.manure_N_annual += soil.manure_N
-
     profile_N = soil.NH4 + soil.NO3 + soil.org_N + \
                 soil.active_N + soil.stable_N + soil.fresh_N
 
@@ -218,13 +216,15 @@ def update_N(soil):
     soil.N_drainage = soil.NH4_drainage + soil.NO3_drainage + \
                       soil.active_N_drainage
 
-    soil.N_drainage_annual += soil.N_drainage
-
     soil.N_runoff = soil.NH4_runoff + soil.NO3_runoff
-    soil.N_runoff_annual += soil.N_runoff
 
     soil.N_erosion = soil.NH4_erosion + soil.active_N_erosion + \
                      soil.fresh_N_erosion
-    soil.N_erosion_annual += soil.N_erosion
 
+
+def update_annual_N(soil):
+    soil.manure_N_annual += soil.manure_N
+    soil.N_drainage_annual += soil.N_drainage
+    soil.N_runoff_annual += soil.N_runoff
+    soil.N_erosion_annual += soil.N_erosion
     soil.N_uptake_annual += soil.N_uptake

@@ -124,8 +124,6 @@ def added_manure_P(soil, m_app):
     # Update manure characteristics
     # S.6.C.I.1-6
     cover_app = cover_perc * soil.area
-    soil.manure_annual += mass
-    soil.manure_P_annual += P_mass
 
     soil.manure_moisture = (soil.manure_moisture * soil.manure_mass + (1.0 - DM) * mass) \
                            / (soil.manure_mass + mass)
