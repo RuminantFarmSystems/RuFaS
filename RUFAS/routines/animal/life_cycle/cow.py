@@ -119,6 +119,7 @@ class Cow(HeiferIII):
 
 		if 'days_in_milk' in args:
 			self.days_in_milk = args['days_in_milk']
+			self.milking = self.days_in_milk != 0
 			self.calves = args['parity']
 
 	def update_milk_production_history(self, sim_day):
