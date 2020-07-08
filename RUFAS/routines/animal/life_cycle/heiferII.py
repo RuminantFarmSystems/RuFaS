@@ -222,7 +222,7 @@ class HeiferII(HeiferI):
 
 		if self.days_born < AnimalBase.config['grow_end_day']:
 			# Heifer can only grow to a maximum weight of mature_body_weight
-			if self.body_weight < AnimalBase.config['mature_body_weight']:
+			if self.body_weight < self.mature_body_weight:
 				gained_weight = np.random.normal(
 					AnimalBase.config['avg_daily_gain_h'], 
 					AnimalBase.config['std_daily_gain_h'])
@@ -234,9 +234,8 @@ class HeiferII(HeiferI):
 						AnimalBase.config['avg_daily_gain_h'], 
 						AnimalBase.config['std_daily_gain_h'])
 				self.body_weight += gained_weight
-			if self.body_weight > AnimalBase.config['mature_body_weight']:
-				self.body_weight = AnimalBase.config['mature_body_weight']
-				self.mature_body_weight = self.body_weight
+			if self.body_weight > self.mature_body_weight:
+				self.body_weight = self.mature_body_weight
 				self.events.add_event(self.days_born, sim_day,
 				'Mature body weight prior to grow end day')
 		

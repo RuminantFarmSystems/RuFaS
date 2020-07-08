@@ -3,7 +3,7 @@
     "config":
     {
         "start_date" : "2009:244",
-        "end_date" : "2016:243",
+        "end_date" : "2011:243",
         "csv_dir": "output/CSVs/",
         "graphic_dir": "output/graphics/",
         "run_tests": false
@@ -316,13 +316,13 @@
 				"birth_weight_std_je": 0.9,
 				"keep_female_calf_rate": 1,
 				"wean_day": 60,
-				"avg_daily_gain_c": 0.8,
-				"std_daily_gain_c": 0.02,
 				"breeding_start_day_h": 400,
 				"avg_daily_gain_h": 0.91,
 				"std_daily_gain_h": 0.02,
 				"grow_end_day": 780,
-				"mature_body_weight": 760,
+				"mature_body_weight_left": 550,
+                "mature_body_weight_mode": 700,
+                "mature_body_weight_right": 1000,
 				"avg_estrus_cycle_h": 21,
 				"std_estrus_cycle_h": 3,
 				"estrus_detection_rate": 0.4,
