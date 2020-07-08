@@ -13,7 +13,7 @@ from math import exp
 
 
 #
-# Nitrification is the transfer of NH4 to NO3, this method determines when that
+# nitrification is the transfer of NH4 to NO3, this method determines when that
 # transfer occurs and calculates the magnitude of that transfer.
 # "pseudocode_soil" S.4.B
 #
@@ -39,7 +39,7 @@ def nitrification_volatilization(soil):
         VolatilReg = temp_fac * DepthFac * CECFac
 
         #
-        # Nitrification only occurs when the soil temperature of a given layer
+        # nitrification only occurs when the soil temperature of a given layer
         # exceeds 5ºC
         #
         NitrReg = 0
@@ -49,10 +49,10 @@ def nitrification_volatilization(soil):
 
         # "pseudocode_soil" S.4.B.6
         exp_part = exp(-NitrReg - VolatilReg)
-        TotNitriVolatil = layer.NH4 * (1 - exp_part)
+        nitri_volatil = layer.NH4 * (1 - exp_part)
 
-        TotNitriVolatil = min(layer.NH4, TotNitriVolatil)
-        layer.NH4 -= TotNitriVolatil
+        nitri_volatil = min(layer.NH4, nitri_volatil)
+        layer.NH4 -= nitri_volatil
 
         # "pseudocode_soil" S.4.B.7
         FracNitr = 1 - exp(-NitrReg)
@@ -62,18 +62,18 @@ def nitrification_volatilization(soil):
 
         # "pseudocode_soil" S.4.B.9/10
         if FracNitr + FracVolatil == 0:
-            Nitrification = 0
-            Volatilization = 0
+            nitrification = 0
+            volatilization = 0
 
         else:
-            Nitrification = (FracNitr / (FracNitr + FracVolatil)) * \
-                            TotNitriVolatil
-            Volatilization = (FracVolatil / (FracNitr + FracVolatil)) * \
-                             TotNitriVolatil
+            nitrification = (FracNitr / (FracNitr + FracVolatil)) * \
+                            nitri_volatil
+            volatilization = (FracVolatil / (FracNitr + FracVolatil)) * \
+                             nitri_volatil
 
-        layer.nitrification = Nitrification
-        layer.volatilization = Volatilization
-        layer.totNitriVolatil = TotNitriVolatil
+        layer.nitrification = nitrification
+        layer.volatilization = volatilization
+        layer.nitri_volatil = nitri_volatil
 
-        layer.NO3 += Nitrification
+        layer.NO3 += nitrification
 

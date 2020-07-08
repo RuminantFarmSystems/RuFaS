@@ -11,9 +11,12 @@ class Soybean:
         self.planting_date = soy_data['planting_date']
         self.harvest_date = soy_data['harvest_date']
         self.harvest_type = soy_data['harvest_type']
+        self.fr_PHU_harvest_min = soy_data['fr_PHU_harvest_min']
 
         self.crop_name = 'soybean'
         self.crop_type = 'annual'
+        self.harvest_quality = 'null'
+        self.feed_id = '121g'
 
         self.kill_day = -1
         self.kill_year = True
@@ -26,7 +29,7 @@ class Soybean:
 
         # input
         self.T_base_min = 10
-        self.T_base_max = 30  # corn
+        self.T_base_max = 30  # TODO: value taken from corn, value for soybean unknown
         self.PHU = 1150
 
         # Internally calculated input
@@ -46,7 +49,7 @@ class Soybean:
         self.fr_LAI_1 = 0.05
         self.fr_LAI_2 = 0.95
         self.fr_PHU_sen = 0.9
-        self.fr_PHU_harvest = 1.0  # TODO: If soybean has drydown, this is 1.2
+        self.fr_PHU_harvest = 1.0  # TODO: If soybean has dry down, this is 1.2
         self.LAI_max = 3
         self.LAI_min = 0
 
@@ -90,8 +93,8 @@ class Soybean:
         # ===================================================================
         ''' Soil Water Uptake Data '''
 
-        self.beta_w = 10  # water-use distribution parameter  # corn
-        self.epco = 0.5  # corn
+        self.beta_w = 10  # water-use distribution parameter  # TODO: value taken from corn, value for soybean unknown
+        self.epco = 0.5  # TODO: value taken from corn, value for soybean unknown
 
         # output
         self.prev_LAI_actual = 0
@@ -100,7 +103,7 @@ class Soybean:
         # ===================================================================
         ''' Nitrogen Uptake Data '''
 
-        self.beta_n = 10  # corn
+        self.beta_n = 10  # TODO: value taken from corn, value for soybean unknown
 
         self.bio_N_opt = 0
         self.bio_N = 0
@@ -119,7 +122,7 @@ class Soybean:
         # ===================================================================
         ''' Phosphorus Uptake Data '''
 
-        self.beta_p = 10  # corn
+        self.beta_p = 10  # TODO: value taken from corn, value for soybean unknown
 
         self.bio_P_opt = 0
         self.bio_P = 0
@@ -148,10 +151,20 @@ class Soybean:
 
         self.gamma_wu = 0
 
+        self.biomass_dry_down_perc = 0.0
+        self.DM_harvest_perc = 0.15  # TODO: Hard coded dry matter percent at harvest
+        self.NDF_harvest_perc = 0.466
+
         self.bio_AG = 0
         self.yield_max = 0
         self.yield_actual = 0
-        self.yield_N = 0
-        self.yield_P = 0
+        self.DM_yield = 0.0
+        self.NDF_yield = 0.0
+        self.N_yield = 0
+        self.P_yield = 0
 
+        self.N_yield_annual = 0.0
+        self.P_yield_annual = 0.0
+        self.DM_yield_annual = 0.0
+        self.NDF_yield_annual = 0.0
         self.yield_annual = 0

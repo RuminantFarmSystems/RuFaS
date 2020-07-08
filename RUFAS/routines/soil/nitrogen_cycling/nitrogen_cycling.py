@@ -48,15 +48,15 @@ Soil attribute definitions
 
     CECFac = volatilization cation exchange factor (0.15)
 
-    TotNitriVolatil = total combined nitrification and volatilization (kg/ha)
+    nitri_volatil = total combined nitrification and volatilization (kg/ha)
 
     FracNitr = fraction of total that is nitrification
 
     FracVolatil = fraction of total that is volatilization
 
-    Nitrification = mass of nitrification (kg/ha)
+    nitrification = mass of nitrification (kg/ha)
 
-    Volatilization = mass of Volatilization
+    volatilization = mass of volatilization
 
     NO3/NH4Conc1 = concentration of NO3 or NH4 in the top soil layer (kg N/mm H2O)
 
@@ -86,7 +86,7 @@ Soil attribute definitions
 
     DenitrN = denitrification (kg/ha)
 
-    deNrate = user defined denitrification rate coefficient (0.1)
+    de_N_rate = user defined denitrification rate coefficient (0.1)
 
     Nminact = mineralization from active N pool (kg/ha)
 
@@ -94,7 +94,7 @@ Soil attribute definitions
 
     CP = ratio of the residue
 
-    Decay = decay rate constant defining the fraction of residue decomposed
+    decay_rate = decay rate constant defining the fraction of residue decomposed
 
     minCoeff = fresh residue mineralization coefficient (0.05)
 
@@ -199,12 +199,14 @@ def update_profile_N(soil):
     soil.org_N = 0.0
     soil.active_N = 0.0
     soil.stable_N = 0.0
+    soil.N_uptake = 0.0
     for layer in soil.soil_layers:
         soil.NH4 += layer.NH4
         soil.NO3 += layer.NO3
         soil.org_N += layer.org_N
         soil.active_N += layer.active_N
         soil.stable_N += layer.stable_N
+        soil.N_uptake += layer.N_uptake
 
     profile_N = soil.NH4 + soil.NO3 + soil.org_N + \
                 soil.active_N + soil.stable_N + soil.fresh_N
@@ -221,10 +223,13 @@ def update_profile_N(soil):
     soil.N_erosion = soil.NH4_erosion + soil.active_N_erosion + \
                      soil.fresh_N_erosion
 
+    soil.N_calc = soil.delta_N + soil.N_drainage + soil.N_runoff + soil.N_erosion + soil.N_uptake
+
+    soil.N_balance_difference = soil.manure_N - soil.N_calc
+
 
 def update_annual_N(soil):
     soil.manure_N_annual += soil.manure_N
-    soil.N_drainage_annual += soil.N_drainage
     soil.N_runoff_annual += soil.N_runoff
     soil.N_erosion_annual += soil.N_erosion
     soil.N_uptake_annual += soil.N_uptake

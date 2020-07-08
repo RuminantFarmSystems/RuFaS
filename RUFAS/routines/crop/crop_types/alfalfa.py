@@ -10,6 +10,7 @@ class Alfalfa:
         self.repeat = alfalfa_data['repeat']
         self.planting_date = alfalfa_data['planting_date']
         self.harvest_date = alfalfa_data['harvest_date']
+        self.fr_PHU_harvest_min = alfalfa_data['fr_PHU_harvest_min']
 
         if alfalfa_data['harvest_type'] != 'optimal':
             print('Perennial crops are always optimally harvested')
@@ -18,6 +19,8 @@ class Alfalfa:
 
         self.crop_name = 'alfalfa'
         self.crop_type = 'perennial'
+        self.harvest_quality = 'null'
+        self.feed_id = '1g'
 
         self.kill_day = -1
         self.kill_year = False
@@ -31,7 +34,7 @@ class Alfalfa:
         # input
         self.T_base_min = 4
         self.T_base_max = 32  # until dormancy
-        self.PHU = 800  # still unknown
+        self.PHU = 900  # TODO: value taken from corn, value for alfalfa unknown
 
         # Internally calculated input
         self.accumulated_HU = 0.0
@@ -94,8 +97,8 @@ class Alfalfa:
         # ===================================================================
         ''' Soil Water Uptake Data '''
 
-        self.beta_w = 10  # water-use distribution parameter  # corn
-        self.epco = 0.5  # corn
+        self.beta_w = 10  # water-use distribution parameter  # TODO: value taken from corn, value for alfalfa unknown
+        self.epco = 0.5  # TODO: value taken from corn, value for alfalfa unknown
 
         self.water_actual_up = 0
         self.water_uptake_each_layer = []
@@ -103,7 +106,7 @@ class Alfalfa:
         # ===================================================================
         ''' Nitrogen Uptake Data '''
 
-        self.beta_n = 10  # corn
+        self.beta_n = 10  # TODO: value taken from corn, value for alfalfa unknown
 
         self.bio_N_opt = 0
         self.bio_N = 0
@@ -122,7 +125,7 @@ class Alfalfa:
         # ===================================================================
         ''' Phosphorus Uptake Data '''
 
-        self.beta_p = 10  # corn
+        self.beta_p = 10  # TODO: value taken from corn, value for alfalfa unknown
 
         self.bio_P_opt = 0
         self.bio_P = 0
@@ -151,10 +154,20 @@ class Alfalfa:
 
         self.gamma_wu = 0
 
+        self.biomass_dry_down_perc = 0.0
+        self.DM_harvest_perc = 0.15  # TODO: Hard coded dry matter percent at harvest
+        self.NDF_harvest_perc = 0.416
+
         self.bio_AG = 0
         self.yield_max = 0
         self.yield_actual = 0
-        self.yield_N = 0
-        self.yield_P = 0
+        self.DM_yield = 0.0
+        self.NDF_yield = 0.0
+        self.N_yield = 0
+        self.P_yield = 0
 
+        self.N_yield_annual = 0.0
+        self.P_yield_annual = 0.0
+        self.DM_yield_annual = 0.0
+        self.NDF_yield_annual = 0.0
         self.yield_annual = 0

@@ -5,8 +5,6 @@ Description: Determines manure excretion with information from the ration
     formulation, outputs used by the manure module.
 Author(s): Militsa Sotirova, militsasotirova@gmail.com
 """
-
-from RUFAS.routines.feed.feed import FeedNames, Nutrients
 from .general_manure import phosphorus_excreted
 
 
@@ -80,16 +78,15 @@ def manure_calculations(ration_formulation, feed, BW, DIM, mPrt,
     NDF_diet_content = 0
     for key in ration_formulation:
         # not every key in the ration_formulation dictionary refers to a feed
-        if key in feed.managed_feed_names:
+        if not (key == 'status' or key == 'objective'):
             # percentages of the DM of each nutrient
-            managed_feed = FeedNames[key]
-            nutrients = feed.values(managed_feed)
-            DM_feed_content = 0.01 * nutrients[Nutrients.DM.name]
-            ADF_feed_content = 0.01 * nutrients[Nutrients.ADF_DM.name]
-            CP_feed_content = 0.01 * nutrients[Nutrients.CP_DM.name]
-            LIG_feed_content = 0.01 * nutrients[Nutrients.LIG_DM.name]
-            Ash_feed_content = 0.01 * nutrients[Nutrients.Ash_DM.name]
-            NDF_feed_content = 0.01 * nutrients[Nutrients.NDF_DM.name]
+            nutrients = feed.available_feeds[key]
+            DM_feed_content = 0.01 * nutrients['DM']
+            ADF_feed_content = 0.01 * nutrients['ADF']
+            CP_feed_content = 0.01 * nutrients['CP']
+            LIG_feed_content = 0.01 * nutrients['lignin']
+            Ash_feed_content = 0.01 * nutrients['ash']
+            NDF_feed_content = 0.01 * nutrients['NDF']
 
             # kg of each nutrient
             DM_feed_amount = ration_formulation[key]

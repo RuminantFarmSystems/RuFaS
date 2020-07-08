@@ -15,6 +15,7 @@ from RUFAS.routines.animal.life_cycle.heiferI import HeiferI
 from RUFAS.routines.animal.life_cycle.heiferII import HeiferII
 from RUFAS.routines.animal.life_cycle.heiferIII import HeiferIII
 from RUFAS.routines.animal.life_cycle.cow import Cow
+from RUFAS.routines.animal.life_cycle.animal_initialization import AnimalInitalization
 from collections import Counter
 import matplotlib as mpl
 import matplotlib.pyplot as plt
@@ -83,6 +84,8 @@ class LifeCycleManager:
 
     herd_num = 0
 
+    animal_initializer = None
+
     def __init__(self, data):
         """
         Initializes the necessary configuration data.
@@ -111,112 +114,21 @@ class LifeCycleManager:
                 the heiferIII stage
 
         Returns:
-            res_calves: list of calves for the simulation
-            res_heiferIs: list of heiferIs for the simulation
-            res_heiferIIs: list of heiferIIs for the simulation
-            res_heiferIIIs: list of heiferIIIs for the simulation
-            res_cows: list of cows for the simulation
+            calves: list of calves for the simulation
+            heiferIs: list of heiferIs for the simulation
+            heiferIIs: list of heiferIIs for the simulation
+            heiferIIIs: list of heiferIIIs for the simulation
+            cows: list of cows for the simulation
         """
+        self.animal_initializer = AnimalInitalization(False)
         self.herd_num = herd_num
-
-        calves = []
-        heiferIs = []
-        heiferIIs = []
-        heiferIIIs = []
-        cows = []
-
-        # reserve: gathers simulated animals for the initial stage
-        res_calves = []
-        res_heiferIs = []
-        res_heiferIIs = []
-        res_heiferIIIs = []
-        res_cows = []
-
-        for _ in range(calf_num + heiferI_num + heiferII_num + heiferIII_num +
-                       cow_num + replace_num):
-            args = {
-                'breed': 'HO',
-                'date': 0,
-                'days_born': 0,
-                'p_init': 0
-            }
-            new_calf = Calf(args)
-            if not (new_calf.culled or new_calf.sold):
-                calves.append(new_calf)
-
-        while len(res_calves) < calf_num:
-            calf = calves.pop()
-            calf.events.add_event(calf.days_born, 'Entered Herd')
-            res_calves.append(calf)
-
-        for date in range(sim_days):
-            for index, calf in enumerate(calves):
-                wean_day = calf.update()
-                if wean_day:
-                    new_heiferI = HeiferI(calf)
-                    if len(res_heiferIs) < heiferI_num:
-                        res_heiferIs.append(new_heiferI)
-                        new_heiferI.events.add_event(
-                            new_heiferI.days_born, 'Entered Herd')
-                    else:
-                        heiferIs.append(new_heiferI)
-                    del calves[index]
-
-            for index, heiferI in enumerate(heiferIs):
-                second_stage = heiferI.update()
-                if second_stage:
-                    args = {
-                        'repro_program': 'TAI',
-                        'tai_method_h': '5dCG2P',
-                        'synch_ed_method_h': '2P'
-                    }
-                    new_heiferII = HeiferII(heiferI, args)
-                    if len(res_heiferIIs) < heiferII_num:
-                        res_heiferIIs.append(new_heiferII)
-                        new_heiferII.events.add_event(
-                            new_heiferII.days_born, 'Entered Herd')
-                    else:
-                        heiferIIs.append(new_heiferII)
-                    del heiferIs[index]
-
-            for index, heiferII in enumerate(heiferIIs):
-                cull_stage, third_stage = heiferII.update()
-                # if date == 900:
-                #     print(len(calves))
-                #     print(heiferIIs[0])
-                #     return
-                if cull_stage:
-                    del heiferIIs[index]
-                if third_stage:
-                    new_heiferIII = HeiferIII(heiferII)
-                    if len(res_heiferIIIs) < heiferIII_num:
-                        res_heiferIIIs.append(new_heiferIII)
-                        new_heiferIII.events.add_event(
-                            new_heiferIII.days_born, 'Entered Herd')
-                    else:
-                        heiferIIIs.append(new_heiferIII)
-                    del heiferIIs[index]
-
-            for index, heiferIII in enumerate(heiferIIIs):
-                cow_stage = heiferIII.update()
-                if cow_stage:
-                    args = {
-                        'repro_program': 'TAI',
-                        'presynch_method': 'PreSynch',
-                        'tai_method_c': 'OvSynch 56',
-                        'resynch_method': 'TAIafterPD'
-                    }
-                    new_cow = Cow(heiferIII, args)
-                    if len(res_cows) < cow_num:
-                        res_cows.append(new_cow)
-                        new_cow.events.add_event(
-                            new_cow.days_born, 'Entered Herd')
-                    else:
-                        cows.append(new_cow)
-                    del heiferIIIs[index]
-
-        self.replacement_market = cows
-        return res_calves, res_heiferIs, res_heiferIIs, res_heiferIIIs, res_cows
+        calves = self.animal_initializer.get_calves(calf_num)
+        heiferIs = self.animal_initializer.get_heiferIs(heiferI_num)
+        heiferIIs = self.animal_initializer.get_heiferIIs(heiferII_num)
+        heiferIIIs = self.animal_initializer.get_heiferIIIs(heiferIII_num)
+        cows = self.animal_initializer.get_cows(cow_num)
+        self.replacement_market = self.animal_initializer.get_replacement_heiferIIIs(replace_num)
+        return calves, heiferIs, heiferIIs, heiferIIIs, cows
 
     def daily_update(self, date, sim_length, calves, heiferIs, heiferIIs,
                      heiferIIIs, cows):
@@ -266,7 +178,8 @@ class LifeCycleManager:
         for index, calf in enumerate(calves):
             wean_day = calf.update()
             if wean_day:
-                new_heiferI = HeiferI(calf)
+                args = calf.get_calf_values()
+                new_heiferI = HeiferI(args)
                 heiferIs.append(new_heiferI)
                 del calves[index]
             # if date == 50:
@@ -278,12 +191,11 @@ class LifeCycleManager:
         for index, heiferI in enumerate(heiferIs):
             second_stage = heiferI.update()
             if second_stage:
-                args = {
-                    'repro_program': 'TAI',
-                    'tai_method_h': '5dCG2P',
-                    'synch_ed_method_h': '2P'
-                }
-                new_heiferII = HeiferII(heiferI, args)
+                args = heiferI.get_heiferI_values()
+                args.update(repro_program = 'TAI')
+                args.update(tai_method_h = '5dCG2P')
+                args.update(synch_ed_method_h = '2P')
+                new_heiferII = HeiferII(args)
                 heiferIIs.append(new_heiferII)
                 del heiferIs[index]
             # if date == 350:
@@ -299,7 +211,8 @@ class LifeCycleManager:
                 self.culled_heifers.append(heiferII)
                 del heiferIIs[index]
             if third_stage:
-                new_heiferIII = HeiferIII(heiferII)
+                args = args = heiferII.get_heiferII_values()
+                new_heiferIII = HeiferIII(args)
                 heiferIIIs.append(new_heiferIII)
                 del heiferIIs[index]
             # if date == 650:
@@ -318,13 +231,12 @@ class LifeCycleManager:
                 cow_stage = heiferIII.update(record_econ_stats)
 
             if cow_stage:
-                args = {
-                    'repro_program': 'TAI',
-                    'presynch_method': 'PreSynch',
-                    'tai_method_c': 'OvSynch 56',
-                    'resynch_method': 'TAIafterPD'
-                }
-                new_cow = Cow(heiferIII, args)
+                args = heiferIII.get_heiferIII_values()
+                args.update(repro_program = 'TAI')
+                args.update(presynch_method = 'PreSynch')
+                args.update(tai_method_c = 'OvSynch 56')
+                args.update(resynch_method = 'TAIafterPD')
+                new_cow = Cow(args)
                 cows.append(new_cow)
                 del heiferIIIs[index]
             # if date == 850:
@@ -401,8 +313,9 @@ class LifeCycleManager:
             # calculate income from sold calves
             if new_born:
                 args = {
+                    'id': self.animal_initializer.next_id(),
                     'breed': 'HO',
-                    'date': 0,
+                    'birth_date': 0,
                     'days_born': 0,
                     'p_init': cow.p_gest_for_calf
                 }
