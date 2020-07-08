@@ -46,6 +46,8 @@ class Calf(AnimalBase):
 		else:
 			self.init_values(args)
 
+		self.target_adg_calf = self.birth_weight / AnimalBase.config['wean_day']
+
 	def init_values(self, args):
 		"""
 		Determine stillbirth, gender, and birth weight
@@ -101,7 +103,10 @@ class Calf(AnimalBase):
 					AnimalBase.config['birth_weight_std_je'])
 		self.body_weight = self.birth_weight
 		self.wean_weight = 0
-		self.mature_body_weight = np.random.triangular(550, 700, 1000)
+		self.mature_body_weight = np.random.triangular(
+			AnimalBase.config['mature_body_weight_left'],
+			AnimalBase.config['mature_body_weight_mode'],
+			AnimalBase.config['mature_body_weight_right'])
 		self.p_animal = args['p_init']
 
 	def assign_calf_values(self, args):
@@ -199,17 +204,7 @@ class Calf(AnimalBase):
 			self.events.add_event(self.days_born, sim_day, 'Wean Day')
 			self.days_born -= 1 # will increment by 1 again in heifer update
 		else:
-			gained_weight = np.random.normal(
-				AnimalBase.config['avg_daily_gain_c'], 
-				AnimalBase.config['std_daily_gain_c'])
-			while gained_weight < AnimalBase.config['avg_daily_gain_c'] \
-				- 2 * AnimalBase.config['std_daily_gain_c'] \
-				or gained_weight > AnimalBase.config['avg_daily_gain_c'] \
-					+ 2 * AnimalBase.config['std_daily_gain_c']:
-				gained_weight = np.random.normal(
-					AnimalBase.config['avg_daily_gain_c'], 
-					AnimalBase.config['std_daily_gain_c'])
-			self.body_weight += gained_weight
+			self.body_weight += self.target_adg_calf
 		
 		self.daily_growth = self.body_weight - prev_weight
 		

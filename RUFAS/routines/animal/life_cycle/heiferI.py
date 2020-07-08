@@ -30,6 +30,8 @@ class HeiferI(Calf):
 		"""
 		super().__init__(args)
 
+		self.target_adg_heifer_non_preg = 0
+
 	def get_heiferI_values(self):
 		"""
 		Get current information from the heiferI
@@ -79,6 +81,19 @@ class HeiferI(Calf):
 		# requirement of P from the ration (g) (A.1B-D.E.7)
 		self.p_req = p_absorb / 0.664
 
+	def set_agd_non_preg(self):
+		"""
+		Sets the target average daily gain for an animal that is not pregnant.
+		If the days_born of the animal is equal to 400,
+		the difference is set to 1 (otherwise results in a division by 0 error).
+		"""
+		divisor = abs(400 - self.days_born)
+		if divisor == 0:
+			divisor = 1
+		self.target_adg_heifer_non_preg = \
+			(0.55 * 0.96 * self.mature_body_weight - 0.96 * self.body_weight) \
+			/ divisor
+
 	def update(self, sim_day):
 		"""
 		Controls heifer's grow with average daily gain based on user's input
@@ -94,18 +109,8 @@ class HeiferI(Calf):
 		
 		prev_weight = self.body_weight
 
-		gained_weight = np.random.normal(
-			AnimalBase.config['avg_daily_gain_h'], 
-			AnimalBase.config['std_daily_gain_h'])
-		while gained_weight < AnimalBase.config['avg_daily_gain_h'] \
-			- 2 * AnimalBase.config['std_daily_gain_h'] \
-			or gained_weight > AnimalBase.config['avg_daily_gain_h'] \
-				+ 2 * AnimalBase.config['std_daily_gain_h']:
-			gained_weight = np.random.normal(
-				AnimalBase.config['avg_daily_gain_h'], 
-				AnimalBase.config['std_daily_gain_h'])
-		
-		self.body_weight += gained_weight
+		self.set_agd_non_preg()
+		self.body_weight += self.target_adg_heifer_non_preg
 		
 		self.daily_growth = self.body_weight - prev_weight
 		
