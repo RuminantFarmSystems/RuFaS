@@ -387,7 +387,7 @@ class Soil:
         self.calculateFcWater()  # calculate field capacity water in layer
         self.calculateSatWater()  # calculate saturation water in layer
 
-        # daily output_handler values
+        # daily output values
         self.evap_max = 0.0
         self.trans_max = 0.0
         self.ET_max = 0.0
