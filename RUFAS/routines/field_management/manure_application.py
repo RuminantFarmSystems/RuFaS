@@ -32,11 +32,11 @@ def formulate_manure_application(manure_storage, m_app):
     P_frac = 0.0
     solid_ratio = 0.0
 
-    for storage in manure_storage.storage:
-        available_N = sum(storage.N, storage.N_liquid)
-        available_P = sum(storage.P, storage.P_liquid)
+    for storage in manure_storage.storage.values():
+        available_N = storage.N + storage.N_liquid
+        available_P = storage.P + storage.P_liquid
 
-        available_manure = sum(storage.TS, storage.TS_liquid)
+        available_manure = storage.TS + storage.TS_liquid
 
         N_frac = available_N / available_manure
         P_frac = available_P / available_manure
@@ -167,6 +167,7 @@ def added_manure_P(soil, m_app):
     # S.6.C.II.5
     soil.manure_cov = min(soil.area, soil.manure_cov + cover_app * S_fac_cover)
     soil.manure_mass += mass * S_fac_mass
+    soil.manure_P += P_mass
     soil.WIP += P_mass * WIP_frac * S_fac
     soil.WOP += P_mass * WOP_frac * S_fac
     soil.SOP += P_mass * W_fac * 0.75 * surf_perc * S_fac

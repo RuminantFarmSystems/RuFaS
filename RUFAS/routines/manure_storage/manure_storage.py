@@ -10,21 +10,22 @@ Author(s): William Donovan, wmdonovan@wisc.edu
 from RUFAS.routines.manure_storage import manure_emissions, manure_handling, manure_separator
 
 
-def daily_manure_routine(manure, animal_management):
-    for pen_id in manure.pens:
-        pen = manure.pens[pen_id]
+def daily_manure_storage_routine(manure_storage, animal_management):
+    for pen_id in manure_storage.pens:
+        pen = manure_storage.pens[pen_id]
         pen.update_pen(animal_management)
-        manure_handling.update_all(pen, manure)
+        manure_handling.update_all(pen, manure_storage)
 
-    for separator_type in manure.separators:
-        separator = manure.separators[separator_type]
-        manure_separator.update_all(separator, manure)
+    for separator_type in manure_storage.separators:
+        separator = manure_storage.separators[separator_type]
+        manure_separator.update_all(separator, manure_storage)
 
-    for storage_type in manure.storage:
-        storage_system = manure.storage[storage_type]
-        manure_emissions.update_all(storage_system, manure)
+    for storage_type in manure_storage.storage:
+        storage_system = manure_storage.storage[storage_type]
+        manure_emissions.update_all(storage_system, manure_storage)
 
-    manure.summarize_manure_storage()
+    manure_storage.summarize_manure_storage()
+    manure_storage.summarize_annual_variables()
 
 
 class ManureStorage:
