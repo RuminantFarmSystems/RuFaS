@@ -230,7 +230,6 @@ class Feed:
                     self.C_feed_out_particle_percent = 0
                 else:
                     if self.error_1:
-                        print('"' + self.moisture + '"', 'is not a recognized moisture category for', self.crop_name)
                         self.error_1 = False
 
             elif self.crop_name == 'alfalfa':
@@ -288,11 +287,9 @@ class Feed:
                     self.C_feed_out_particle_percent = 0.01
                 else:
                     if self.error_2:
-                        print('"' + self.moisture + '"', 'is not a recognized moisture category for', self.crop_name)
                         self.error_2 = False
             else:
                 if self.error_3:
-                    print('"' + self.crop_name + '"', 'storage is not currently implemented')
                     self.storage = False
                     self.error_3 = False
 
