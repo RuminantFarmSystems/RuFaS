@@ -9,7 +9,7 @@ def convert_to_json(filename):
     Strips the commented text file from comments. For a comment to be stripped from the text
     file, the user must use '#' to begin the comment at the very beginning of the line.
     Stripping inline comments is not supported, i.e. the comment must be contained within
-    one line. See Inputs/test.txt for an example.
+    one line. See input/test.txt for an example.
     """
     file_base = filename.replace('.txt','')
     json_filename = file_base + '.json'
