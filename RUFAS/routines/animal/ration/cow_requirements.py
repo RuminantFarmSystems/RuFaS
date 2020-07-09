@@ -6,20 +6,12 @@ Description: Calculates the following energy, mineral, and dry matter intake
     estimation for a single cow using the function in this file.
 """
 ################################################################################
-<<<<<<< HEAD
 ###TODO: Find out what units the percent values come in from the cow when linking###
-=======
-###TODO: Find out what the percent values come in from the cow when linking###
->>>>>>> Reformatting NLP file and adding Requirements file.
 ###TODO: Edit function for dry cow requirement calculations as well
 def calculate_requirements(BW, MW, DOP, housing, distance, parity, CI, TP_Milk,
                             Fat_Milk, Lactose_Milk, Milk
                             ):
-<<<<<<< HEAD
     """
-=======
-    '''
->>>>>>> Reformatting NLP file and adding Requirements file.
     Calculate the dietary requirements of the cows. These values are used
     on the RHS of the linear program and furthermore will be used in constraint
     generation functions. This function calculates requirements for both
@@ -39,11 +31,7 @@ def calculate_requirements(BW, MW, DOP, housing, distance, parity, CI, TP_Milk,
         Lactose_Milk: Milk lactose content (% of milk)
         Milk: Milk production (kg)
 
-<<<<<<< HEAD
     """
-=======
-    '''
->>>>>>> Reformatting NLP file and adding Requirements file.
 
     # A: ENERGY REQUIREMENTS:
     # (divided into the following 5 components: maintenance,
@@ -111,7 +99,6 @@ def calculate_requirements(BW, MW, DOP, housing, distance, parity, CI, TP_Milk,
     #Milk energy (Mcal/kg of milk production)
     Milken = 0.0929 * Fat_Milk + (0.0547/0.93) * TP_Milk + 0.0395 * Lactose_Milk    #[A.Cow.A.17]
     #Net energy requirement for lactation (Mcal)
-<<<<<<< HEAD
     NEl = Milken * Milk      #[A.Cow.A.18]
 
     # B: PROTIEN REQUIREMENTS:
@@ -150,9 +137,6 @@ def calculate_requirements(BW, MW, DOP, housing, distance, parity, CI, TP_Milk,
     # Total Protien Requirement  (g)
     # ---------------------
     MPreq = MPm + MPg + MPpreg + MPlact       #[A.Cow.B.7]
-=======
-    NELact = Milken * Milk      #[A.Cow.A.18]
->>>>>>> Reformatting NLP file and adding Requirements file.
 
     # C: MINERAL REQUIREMENTS
     #Calcium and Phosphorus are the only requirements tracked currently
@@ -175,12 +159,8 @@ def calculate_requirements(BW, MW, DOP, housing, distance, parity, CI, TP_Milk,
     #Phosphorus Requirements
     #----------------------
     #Phosphorus maintenance requirement (g)
-<<<<<<< HEAD
     #***This requirement must be calculated in the non-linear program***
 
-=======
-    P_maint = 1*DMI + 0.002*BW      #[A.Cow.C.6]
->>>>>>> Reformatting NLP file and adding Requirements file.
     #Phosphorus growth requirement (g)
     P_growth = (1.2+4.635 * MW**0.22 * BW**(-0.22)) * (ADG/0.96)        #[A.Cow.C.7]
     #Phosphorus pregnancy requirement (g)
@@ -189,17 +169,11 @@ def calculate_requirements(BW, MW, DOP, housing, distance, parity, CI, TP_Milk,
     else:
         P_preg = 0
     #Phosphorus lactation requirement (g)
-<<<<<<< HEAD
     P_lact = 0.9 * Milk         #[A.Cow.C.9]
     #Total phosphorus requirement (g)
     # (note this sum does not include the maintenance requirement which will
     # be calculated within the NLP and added to this sum)
     P_req =  P_growth + P_preg + P_lact        #[A.Cow.C.10]
-=======
-    P_lact = 0.9 * Milk         #A.Cow.C.9]
-    #Total phosphorus requirement (g)
-    P_req = P_maint + P_growth + P_preg + P_lact        #[A.Cow.C.10]
->>>>>>> Reformatting NLP file and adding Requirements file.
 
     # D: DMI ESTIMATION:
     #The sum of dry matter intake of each feed is assumed to be less than
@@ -209,11 +183,8 @@ def calculate_requirements(BW, MW, DOP, housing, distance, parity, CI, TP_Milk,
     FCM = (0.4 * Milk) + (15 * Fat_Milk * (Milk/100))   #[A.Cow.D.1]
     #Dry matter intake estimation (kg)
     DMIest = (0.372 * FCM + 0.0968 * BW**0.75) * (1- exp(-0.192 *((DIM/7) + 3.67))) #[A.Cow.D.2]
-<<<<<<< HEAD
 
     # Requirements summary dictionary
     req = {'NEmaint' : NEmaint, 'NEa' : NEa, 'NEg' : NEg, 'NEpreg' : NEpreg,
             'NEl' : NEl, 'MP_req': MP_req, 'Ca_req' : Ca_req, 'P_req' : P_req, DMIest : 'DMIest'}
     return req
-=======
->>>>>>> Reformatting NLP file and adding Requirements file.
