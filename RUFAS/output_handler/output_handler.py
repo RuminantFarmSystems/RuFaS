@@ -49,7 +49,7 @@ class OutputHandler:
 
         # TODO: move field report to loop in dj_fields
         for pen in state.animal_management.all_pens:
-            self.reports['pen_' + str(pen.id)] = PenReport(data['pen_report'], pen.id)
+            self.reports['pen_' + str(pen.id)] = PenReport(data['pen_report'], state.feed, pen.id)
 
     def initialize_csv_dir(self, csv_dir):
         """
