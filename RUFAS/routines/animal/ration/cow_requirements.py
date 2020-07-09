@@ -6,12 +6,12 @@ Description: Calculates the following energy, mineral, and dry matter intake
     estimation for a single cow using the function in this file.
 """
 ################################################################################
-###TODO: Find out what the percent values come in from the cow when linking###
+###TODO: Find out what units the percent values come in from the cow when linking###
 ###TODO: Edit function for dry cow requirement calculations as well
 def calculate_requirements(BW, MW, DOP, housing, distance, parity, CI, TP_Milk,
                             Fat_Milk, Lactose_Milk, Milk
                             ):
-    '''
+    """
     Calculate the dietary requirements of the cows. These values are used
     on the RHS of the linear program and furthermore will be used in constraint
     generation functions. This function calculates requirements for both
@@ -31,7 +31,7 @@ def calculate_requirements(BW, MW, DOP, housing, distance, parity, CI, TP_Milk,
         Lactose_Milk: Milk lactose content (% of milk)
         Milk: Milk production (kg)
 
-    '''
+    """
 
     # A: ENERGY REQUIREMENTS:
     # (divided into the following 5 components: maintenance,
@@ -99,7 +99,44 @@ def calculate_requirements(BW, MW, DOP, housing, distance, parity, CI, TP_Milk,
     #Milk energy (Mcal/kg of milk production)
     Milken = 0.0929 * Fat_Milk + (0.0547/0.93) * TP_Milk + 0.0395 * Lactose_Milk    #[A.Cow.A.17]
     #Net energy requirement for lactation (Mcal)
-    NELact = Milken * Milk      #[A.Cow.A.18]
+    NEl = Milken * Milk      #[A.Cow.A.18]
+
+    # B: PROTIEN REQUIREMENTS:
+    # divided into 4 components: maintenance, growth, pregnancy, and lactation
+    #--------------------------------------------
+    # Maintenance Requirement
+    # ---------------------
+    #Metabolizable protein requirement for maintenance (g)
+    # (note this is not the full calculation which will be completed within the
+    # non-linear program)
+    MPm = 0.3 * (BW -CW)**0.6 + 4.1 * (BW-CW)**0.5      #[A.Cow.B.1]
+    # Growth Requirement
+    # ---------------------
+    #Net protein requirement for growth (g)
+    if ADG == 0:        #[A.Cow.B.2]
+        NPg = 0
+    else:
+        NPg = ADG*(268 - 29.4* (NEg/ADG))
+    #Efficiency of converting metabolizable protein to net protein
+    if EQSBW <= 478:    #[A.Cow.B.3]
+        EffMP_NPg = (83.4-0.114*EQSBW) / 100
+    else:
+        EffMP_NPg = 0.28908
+    #Metabolizable protein requirement for growth (g)
+    MPg = NPg / EffMP_NPg       #[A.Cow.B.4]
+    # Pregnancy Requirement
+    # ---------------------
+    #Metabolizable protein requirement for pregnancy (g)
+    if DOP > 190:       #[A.Cow.B.5]
+        MPpreg = (0.69*DOP-69.2) * (CBW/(45*0.33))
+    else:
+        MPpreg = 0
+    # Lactation Requirement
+    # ---------------------
+    MPlact = Milk * (TP_Milk/100) * (1000/0.67)     #[A.Cow.B.6]
+    # Total Protien Requirement  (g)
+    # ---------------------
+    MPreq = MPm + MPg + MPpreg + MPlact       #[A.Cow.B.7]
 
     # C: MINERAL REQUIREMENTS
     #Calcium and Phosphorus are the only requirements tracked currently
@@ -122,7 +159,8 @@ def calculate_requirements(BW, MW, DOP, housing, distance, parity, CI, TP_Milk,
     #Phosphorus Requirements
     #----------------------
     #Phosphorus maintenance requirement (g)
-    P_maint = 1*DMI + 0.002*BW      #[A.Cow.C.6]
+    #***This requirement must be calculated in the non-linear program***
+
     #Phosphorus growth requirement (g)
     P_growth = (1.2+4.635 * MW**0.22 * BW**(-0.22)) * (ADG/0.96)        #[A.Cow.C.7]
     #Phosphorus pregnancy requirement (g)
@@ -131,9 +169,11 @@ def calculate_requirements(BW, MW, DOP, housing, distance, parity, CI, TP_Milk,
     else:
         P_preg = 0
     #Phosphorus lactation requirement (g)
-    P_lact = 0.9 * Milk         #A.Cow.C.9]
+    P_lact = 0.9 * Milk         #[A.Cow.C.9]
     #Total phosphorus requirement (g)
-    P_req = P_maint + P_growth + P_preg + P_lact        #[A.Cow.C.10]
+    # (note this sum does not include the maintenance requirement which will
+    # be calculated within the NLP and added to this sum)
+    P_req =  P_growth + P_preg + P_lact        #[A.Cow.C.10]
 
     # D: DMI ESTIMATION:
     #The sum of dry matter intake of each feed is assumed to be less than
@@ -143,3 +183,8 @@ def calculate_requirements(BW, MW, DOP, housing, distance, parity, CI, TP_Milk,
     FCM = (0.4 * Milk) + (15 * Fat_Milk * (Milk/100))   #[A.Cow.D.1]
     #Dry matter intake estimation (kg)
     DMIest = (0.372 * FCM + 0.0968 * BW**0.75) * (1- exp(-0.192 *((DIM/7) + 3.67))) #[A.Cow.D.2]
+
+    # Requirements summary dictionary
+    req = {'NEmaint' : NEmaint, 'NEa' : NEa, 'NEg' : NEg, 'NEpreg' : NEpreg,
+            'NEl' : NEl, 'MP_req': MP_req, 'Ca_req' : Ca_req, 'P_req' : P_req, DMIest : 'DMIest'}
+    return req

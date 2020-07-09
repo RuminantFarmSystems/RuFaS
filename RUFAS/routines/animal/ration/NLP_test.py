@@ -5,8 +5,8 @@ from scipy.optimize import minimize
 def objective(x):
     return x[0]+x[3]+(x[0]+x[1]+x[2])+x[2]
 
-def constraint1(x):
-    return -(x[0]+x[1]+x[2]+x[3])+1.0
+def constraint1(x,y):
+    return -(x[0]+x[1]+x[2]*y[2]+x[3]*y[3])+1.0
 
 def constraint2(x):
     return x[0] - 3
