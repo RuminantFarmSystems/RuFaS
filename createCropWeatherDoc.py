@@ -21,7 +21,7 @@ def rearrange(row):
 	return newRow
 
 limit = 2
-with open("input/crop_module_testWeather_3.4.csv", "w") as outFile:
+with open("input/weather/crop_module_testWeather_3.4.csv", "w") as outFile:
 	for row in weatherSheet:
 		if not isEmpty(row[0]):
 			valueList = [str(x.value) for x in row]

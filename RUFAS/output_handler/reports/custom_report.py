@@ -19,7 +19,7 @@ class CustomReport(BaseReport):
         # 'variable_name' is very important. This has to be a variable defined
         # and initialized in the object. If you are interested in tracking
         # a variable not defined in the class, you need to create it there
-        # first. The output_handler handler will not work if the variable is incorrect.
+        # first. The output handler will not work if the variable is incorrect.
         # 'unit' is user defined but will, again, show up in outputs/graphics_1.
         # [] is an empty list
 
