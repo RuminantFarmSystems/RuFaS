@@ -72,6 +72,14 @@ class ManureStorage:
         self.manure_delta_annual = 0.0
         self.manure_storage_balance_difference_annual = 0.0
 
+        self.manure_applied = 0.0
+        self.N_applied = 0.0
+        self.P_applied = 0.0
+
+        self.manure_applied_annual = 0.0
+        self.N_applied_annual = 0.0
+        self.P_applied_annual = 0.0
+
         self.TS = 0
         self.VS = 0
         self.N = 0
@@ -209,6 +217,10 @@ class ManureStorage:
     def summarize_annual_variables(self):
         self.raw_manure_annual += self.raw_manure
 
+        self.manure_applied_annual += self.manure_applied
+        self.N_applied_annual += self.N_applied
+        self.P_applied_annual += self.P_applied
+
         self.CH4_emissions_annual += self.CH4_emissions
 
         self.TS_annual += self.TS
@@ -236,7 +248,8 @@ class ManureStorage:
         self.manure_delta_annual = manure - self.initial_manure_annual
         self.initial_manure_annual = manure
         self.manure_calc_annual = self.manure_delta_annual + self.TS_annual + \
-                                  self.TS_liquid_annual + self.TS_DM_effluent_annual
+                                  self.TS_liquid_annual + self.TS_DM_effluent_annual + \
+                                  self.manure_applied_annual
         self.manure_storage_balance_difference_annual = self.raw_manure_annual - self.manure_calc_annual
 
     class Pen:
@@ -490,6 +503,10 @@ class ManureStorage:
             self.WIP_frac = pen.manure['WIP_frac']
 
     def annual_reset(self):
+        self.manure_applied_annual = 0.0
+        self.N_applied_annual = 0.0
+        self.P_applied_annual = 0.0
+
         self.CH4_emissions_annual = 0.0
 
         self.TS_liquid_annual = 0.0

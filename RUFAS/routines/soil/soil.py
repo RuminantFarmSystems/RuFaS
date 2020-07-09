@@ -1,4 +1,3 @@
-################################################################################
 """
 RUFAS: Ruminant Farm Systems Model
 File name: soil.py
@@ -65,6 +64,7 @@ def daily_soil_routine(soil, crop, weather, time):
 
 
 def annual_variable_update(soil):
+    soil.manure_applied_annual += soil.manure_applied
     soil_water.update_annual_SW(soil)
     phosphorus_cycling.update_annual_P(soil)
     nitrogen_cycling.update_annual_N(soil)
@@ -188,7 +188,7 @@ class Soil:
         self.manure_applied_annual = 0.0
 
         self.manure_mass = 0.0
-        self.manure_mass_applied = 0.0
+        self.manure_applied = 0.0
 
         self.WIP = 0.0
         self.WOP = 0.0
@@ -252,7 +252,7 @@ class Soil:
 
         self.initial_profile_P = self.profile_P
 
-        self.manure_P = 0.0
+        self.manure_P_applied = 0.0
         self.P_calc = 0.0
         self.P_balance_difference = 0.0
         self.delta_P = 0.0
@@ -263,7 +263,7 @@ class Soil:
         self.P_uptake = 0.0
 
         # annual phosphorus balance
-        self.manure_P_annual = 0.0
+        self.manure_P_applied_annual = 0.0
         self.P_calc_annual = 0.0
         self.P_balance_difference_annual = 0.0
         self.delta_P_annual = 0.0
@@ -400,7 +400,7 @@ class Soil:
         self.profile_N += self.fresh_N
         self.initial_profile_N = self.profile_N
 
-        self.manure_N = 0.0
+        self.manure_N_applied = 0.0
         self.N_calc = 0.0
         self.N_balance_difference = 0.0
         self.delta_N = 0.0
@@ -411,7 +411,8 @@ class Soil:
         self.N_uptake = 0.0
 
         # annual nitrogen balance
-        self.manure_N_annual = 0.0
+        self.manure_N_applied_annual = 0.0
+        self.manure_N_applied_annual = 0.0
         self.N_calc_annual = 0.0
         self.N_balance_difference_annual = 0.0
         self.delta_N_annual = 0.0
@@ -678,7 +679,7 @@ class Soil:
                              self.P_runoff_annual + self.P_drainage_annual + \
                              self.P_erosion_annual + self.P_uptake_annual
 
-        self.P_balance_difference_annual = self.manure_P_annual - self.P_calc_annual
+        self.P_balance_difference_annual = self.manure_P_applied_annual - self.P_calc_annual
 
     def annual_nitrogen_balance(self):
         self.delta_N_annual = self.profile_N - self.initial_profile_N
@@ -687,7 +688,7 @@ class Soil:
                              self.N_runoff_annual + self.N_drainage_annual + \
                              self.N_erosion_annual + self.N_uptake_annual
 
-        self.N_balance_difference_annual = self.manure_N_annual - self.N_calc_annual
+        self.N_balance_difference_annual = self.manure_N_applied_annual - self.N_calc_annual
 
     def annual_reset(self):
         """
@@ -709,7 +710,8 @@ class Soil:
         # Nitrogen
         self.initial_profile_N = self.profile_N
 
-        self.manure_N_annual = 0.0
+        self.manure_N_applied_annual = 0.0
+        self.manure_N_applied_annual = 0.0
         self.N_calc_annual = 0.0
         self.N_drainage_annual = 0.0
         self.N_runoff_annual = 0.0
@@ -720,7 +722,7 @@ class Soil:
 
         self.manure_applied_annual = 0.0
 
-        self.manure_P_annual = 0.0
+        self.manure_P_applied_annual = 0.0
         self.P_calc_annual = 0.0
         self.P_drainage_annual = 0.0
         self.P_runoff_annual = 0.0

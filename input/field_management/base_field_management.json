@@ -1,8 +1,7 @@
 {
-            "management_scheme": "optimal",
             "fertilizer":
             {
-                "app_years": [],
+                "rotation_years": [],
                 "repeat": 0,
 
                 "year": [],
@@ -14,7 +13,7 @@
 
             "manure":
             {
-                "app_years": [],
+                "rotation_years": [],
                 "repeat": 0,
 
                 "year": [],
@@ -28,7 +27,7 @@
 
             "tillage":
             {
-                "app_years": [],
+                "rotation_years": [],
                 "repeat": 0,
 
                 "year": [],

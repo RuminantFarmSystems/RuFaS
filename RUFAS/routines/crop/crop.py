@@ -1,4 +1,3 @@
-################################################################################
 """
 RUFAS: Ruminant Farm Systems Model
 File name: crop.py
@@ -39,7 +38,6 @@ This module needs the following input in order to operate correctly:
             fc_water
             wilting_water
 """
-################################################################################
 
 from math import acos, asin, sin, tan, pi
 from .crop_types import alfalfa, corn, soybean

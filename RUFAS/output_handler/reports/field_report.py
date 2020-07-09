@@ -47,6 +47,7 @@ class FieldReport(BaseReportDriver):
 
             self.daily_variables = {'year': ['time.cal_year', '', []],
                                     'j_day': ['time.day', '', []],
+                                    'manure_applied': ['soil.manure_applied', 'kg', []],
                                     'precip': ['weather.rainfall[time.year - 1][time.day - 1]', 'mm', []],
                                     'runoff': ['soil.runoff', 'mm', []],
                                     'ET_max': ['soil.ET_max', 'mm d^-1', []],
@@ -74,6 +75,7 @@ class FieldReport(BaseReportDriver):
                                     }
 
             self.annual_variables = {'year': ['time.cal_year', '', 0],
+                                     'manure_applied': ['soil.manure_applied_annual', 'kg', 0],
                                      'ET_max': ['soil.ET_max_annual', 'mm H20', 0],
                                      'ET': ['soil.ET_annual', 'mm H20', 0]
                                      }
@@ -84,6 +86,7 @@ class FieldReport(BaseReportDriver):
 
             self.daily_variables = {'year': ['time.cal_year', '', []],
                                     'j_day': ['time.day', '', []],
+                                    'manure_N_applied': ['soil.manure_N_applied', 'kg', []],
                                     'NO3_L1': ['soil.soil_layers[0].NO3', 'kg', []],
                                     'NO3_L2': ['soil.soil_layers[1].NO3', 'kg', []],
                                     'NO3_L3': ['soil.soil_layers[2].NO3', 'kg', []],
@@ -130,6 +133,7 @@ class FieldReport(BaseReportDriver):
                                     }
 
             self.annual_variables = {'year': ['time.cal_year', '', 0],
+                                     'manure_N_applied': ['soil.manure_N_applied_annual', 'kg', 0],
                                      'NO3_runoff': ['soil.NO3_runoff_annual', 'kg/ha', 0],
                                      'NH4_runoff': ['soil.NH4_runoff_annual', 'kg/ha', 0],
                                      'NH4_erosion': ['soil.NH4_erosion_annual', 'kg/ha', 0],
@@ -147,7 +151,7 @@ class FieldReport(BaseReportDriver):
 
             self.daily_variables = {'year': ['time.cal_year', '', []],
                                     'j_day': ['time.day', '', []],
-                                    'manure_P': ['soil.manure_P', 'kg', []],
+                                    'manure_P_applied': ['soil.manure_P_applied', 'kg', []],
                                     'labile_P': ['soil.labile_P', 'kg', []],
                                     'active_P': ['soil.active_P', 'kg', []],
                                     'stable_P': ['soil.stable_P', 'kg', []],
@@ -166,7 +170,7 @@ class FieldReport(BaseReportDriver):
                                     }
 
             self.annual_variables = {'year': ['time.cal_year', '', 0],
-                                     'manure_P': ['soil.manure_P_annual', 'kg', 0],
+                                     'manure_P_applied': ['soil.manure_P_applied_annual', 'kg', 0],
                                      'P_uptake': ['soil.P_uptake_annual', 'kg', 0],
                                      'fert_P_leach': ['soil.fert_P_leach_annual', 'kg', 0],
                                      'M_leach': ['soil.M_leach_annual', 'kg', 0],

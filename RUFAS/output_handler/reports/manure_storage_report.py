@@ -24,7 +24,10 @@ class ManureStorageReport(BaseReport):
                                 'N_liquid': ['manure_storage.N_liquid', 'kg', []],
                                 'P_liquid': ['manure_storage.P_liquid', 'kg', []],
                                 'K_liquid': ['manure_storage.K_liquid', 'kg', []],
-                                'TS_DM_effluent': ['manure_storage.TS_DM_effluent', 'kg', []]
+                                'TS_DM_effluent': ['manure_storage.TS_DM_effluent', 'kg', []],
+                                'manure_applied': ['manure_storage.manure_applied', 'kg', []],
+                                'N_applied': ['manure_storage.N_applied', 'kg', []],
+                                'P_applied': ['manure_storage.P_applied', 'kg', []]
                                 }
 
         self.annual_variables = {'year': ['time.cal_year', '', 0],
@@ -38,5 +41,8 @@ class ManureStorageReport(BaseReport):
                                  'N_liquid': ['manure_storage.N_liquid_annual', 'kg', 0],
                                  'P_liquid': ['manure_storage.P_liquid_annual', 'kg', 0],
                                  'K_liquid': ['manure_storage.K_liquid_annual', 'kg', 0],
-                                 'TS_DM_effluent': ['manure_storage.TS_DM_effluent_annual', 'kg', 0]
+                                 'TS_DM_effluent': ['manure_storage.TS_DM_effluent_annual', 'kg', 0],
+                                 'manure_applied': ['manure_storage.manure_applied_annual', 'kg', 0],
+                                 'N_applied': ['manure_storage.N_applied_annual', 'kg', 0],
+                                 'P_applied': ['manure_storage.P_applied_annual', 'kg', 0]
                                  }

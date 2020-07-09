@@ -3,7 +3,6 @@ RUFAS: Ruminant Farm Systems Model
 
 phosphorus_cycling.py
 
-<<<<<<< HEAD
 Authors: DR. Peter A. Vadas
          USDA-ARS Dairy Forage Research Center
          1925 Linden Dr. West
@@ -65,12 +64,11 @@ def update_profile_P(soil):
 
     soil.P_calc = soil.delta_P + soil.P_erosion + soil.P_drainage + soil.P_runoff + soil.P_uptake
 
-    soil.P_balance_difference = soil.manure_P - soil.P_calc
+    soil.P_balance_difference = soil.manure_P_applied - soil.P_calc
 
 
 def update_annual_P(soil):
-    soil.manure_P_annual += soil.manure_P
-    soil.manure_applied_annual += soil.manure_applied
+    soil.manure_P_applied_annual += soil.manure_P_applied
     soil.P_erosion_annual += soil.P_erosion
     soil.P_drainage_annual += soil.P_drainage
     soil.P_runoff_annual += soil.P_runoff

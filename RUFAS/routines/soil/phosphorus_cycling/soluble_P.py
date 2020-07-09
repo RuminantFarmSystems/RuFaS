@@ -1,11 +1,9 @@
-################################################################################
 """
 SurPhos
 File name: soluble_P.py
 Author(s): Jacob Johnson, jacob8399@gmail.com,
            William Donovan, wmdonovan@wisc.edu
 """
-################################################################################
 from math import exp, log
 
 
@@ -25,12 +23,14 @@ def update_all(S):
         layer.iso_inter = 4.726 * layer.iso_slope - 8.97
 
         # S.5.E.3
-        layer.DRP_leach = min(40.0, exp((layer.soil_P * 1.5 - layer.iso_inter / layer.iso_slope)))
+        layer.DRP_leach = min(40.0, exp((layer.soil_P * (1.5 - layer.iso_inter) / layer.iso_slope)))
 
         # S.5.E.4
+        layer.DRP_runoff = 0.0
         if S.soil_layers.index(layer) == 0:
             layer.DRP_runoff = min(layer.labile_P, layer.soil_P * 0.005 * runoff * 0.01)
             layer.labile_P -= layer.DRP_runoff
+            S.DRP_runoff = layer.DRP_runoff
 
         # S.5.E.5
         layer.DRP_leach_act = min(layer.labile_P, layer.DRP_leach * layer.perc * 0.01)
@@ -40,8 +40,8 @@ def update_all(S):
 
         DRP_leach_prev_layer = layer.DRP_leach_act
 
-        # S.5.E.6
-        S.DRP_runoff_annual += layer.DRP_runoff * S.area
+    # S.5.E.6
+    S.DRP_runoff_annual += S.DRP_runoff * S.area
 
     S.DRP_leach = DRP_leach_prev_layer
     S.DRP_leach_annual += S.DRP_leach

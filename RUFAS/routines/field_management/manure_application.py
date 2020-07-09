@@ -83,6 +83,10 @@ def formulate_manure_application(manure_storage, m_app):
         if desired_N == 0 and desired_P == 0:
             break
 
+    manure_storage.manure_applied = manure_application['mass']
+    manure_storage.N_applied = manure_application['N_mass']
+    manure_storage.P_applied = manure_application['P_mass']
+
     # TODO: this is a rudimentary method for satisfying purchased manure. A
     #  more robust method would require drawing purchased manure from some
     #  variety of input (likely a database)
@@ -106,28 +110,26 @@ def formulate_manure_application(manure_storage, m_app):
 
 
 def added_manure_P(soil, m_app):
-    m_type = "DAIRY"
-    mass = m_app['mass']
+    soil.manure_type = "DAIRY"
+    soil.manure_applied = m_app['mass']
     cover_perc = m_app['cover_perc']
-    P_mass = m_app['P_mass']
+    soil.manure_P_applied = m_app['P_mass']
     DM = m_app['DM']
     surf_perc = m_app['surf_perc']
-    WIP = m_app['WIP']
-    WOP = m_app['WOP']
+    soil.WIP_applied = m_app['WIP']
+    soil.WOP_applied = m_app['WOP']
     depth = m_app['depth']
 
-    WIP_frac = WIP / mass
-    WOP_frac = WOP / mass
-
-    soil.manure_type = m_type
+    WIP_frac = soil.WIP_applied / soil.manure_applied
+    WOP_frac = soil.WOP_applied / soil.manure_applied
 
     # Update manure characteristics
     # S.6.C.I.1-6
     cover_app = cover_perc * soil.area
 
-    soil.manure_moisture = (soil.manure_moisture * soil.manure_mass + (1.0 - DM) * mass) \
-                           / (soil.manure_mass + mass)
-    wet_rate = mass / DM / cover_app
+    soil.manure_moisture = (soil.manure_moisture * soil.manure_mass + (1.0 - DM) * soil.manure_applied) \
+                           / (soil.manure_mass + soil.manure_applied)
+    wet_rate = soil.manure_applied / DM / cover_app
     infiltration = min(0.9, 0.000002 * wet_rate + 0.267)
 
     # S.6.B.3
@@ -143,8 +145,8 @@ def added_manure_P(soil, m_app):
 
     # concentration factors
     # S.6.C.II.2
-    C_WIP = P_mass * WIP_frac * I_fac
-    C_WOP = P_mass * WOP_frac * 0.95 * I_fac
+    C_WIP = soil.manure_P_applied * WIP_frac * I_fac
+    C_WOP = soil.manure_P_applied * WOP_frac * 0.95 * I_fac
 
     # slurry factors
     # S.6.C.II.3
@@ -166,12 +168,11 @@ def added_manure_P(soil, m_app):
     # update manure features and composition
     # S.6.C.II.5
     soil.manure_cov = min(soil.area, soil.manure_cov + cover_app * S_fac_cover)
-    soil.manure_mass += mass * S_fac_mass
-    soil.manure_P += P_mass
-    soil.WIP += P_mass * WIP_frac * S_fac
-    soil.WOP += P_mass * WOP_frac * S_fac
-    soil.SOP += P_mass * W_fac * 0.75 * surf_perc * S_fac
-    soil.SIP += P_mass * W_fac * 0.25 * surf_perc * S_fac
+    soil.manure_mass += soil.manure_applied * S_fac_mass
+    soil.WIP += soil.manure_P_applied * WIP_frac * S_fac
+    soil.WOP += soil.manure_P_applied * WOP_frac * S_fac
+    soil.SOP += soil.manure_P_applied * W_fac * 0.75 * surf_perc * S_fac
+    soil.SIP += soil.manure_P_applied * W_fac * 0.25 * surf_perc * S_fac
 
     # update active and labile soil pools for each layer affected by the application
     # S.6.C.II.6
@@ -180,30 +181,27 @@ def added_manure_P(soil, m_app):
     for layer in soil.soil_layers:
         if layer.bottom_depth_cm < depth:
             D_fac = layer.bottom_depth_cm / depth
-            layer.active_P += P_mass * W_fac * 0.25 * I_fac * D_fac_1 * D_fac
-            layer.labile_P += C_WIP + C_WOP + (P_mass * W_fac * 0.75 * 0.95 * I_fac * D_fac_2) * D_fac
+            layer.active_P += soil.manure_P_applied * W_fac * 0.25 * I_fac * D_fac_1 * D_fac
+            layer.labile_P += C_WIP + C_WOP + (soil.manure_P_applied * W_fac * 0.75 * 0.95 * I_fac * D_fac_2) * D_fac
 
             D_fac_sum += D_fac
             last_layer += 1
 
     D_fac = 1 - D_fac_sum
-    soil.soil_layers[last_layer].active_P += P_mass * W_fac * 0.25 * I_fac * D_fac_1 * D_fac
+    soil.soil_layers[last_layer].active_P += soil.manure_P_applied * W_fac * 0.25 * I_fac * D_fac_1 * D_fac
     soil.soil_layers[last_layer].labile_P += C_WIP + C_WOP + \
-                                             (P_mass * W_fac * 0.75 * 0.95 * I_fac * D_fac_2) * D_fac
+                                             (soil.manure_P_applied * W_fac * 0.75 * 0.95 * I_fac * D_fac_2) * D_fac
 
     # S.6.B.4
     for layer in soil.soil_layers:
         layer.active_P /= soil.area
         layer.labile_P /= soil.area
 
-    soil.manure_mass_app = soil.manure_mass
+    soil.manure_mass += soil.manure_applied
 
 
 def added_manure_N(soil, m_app):
-    totalN = m_app['N_mass']
+    soil.manure_N_applied = m_app['N_mass']
 
-    active_N = totalN * 0.875
-    stable_N = totalN * 0.125
-
-    soil.soil_layers[0].active_N += active_N
-    soil.soil_layers[0].stable_N += stable_N
+    soil.soil_layers[0].active_N += soil.manure_N_applied * 0.875
+    soil.soil_layers[0].stable_N += soil.manure_N_applied * 0.125

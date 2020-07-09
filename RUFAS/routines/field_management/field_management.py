@@ -34,6 +34,9 @@ def daily_field_management_routine(soil, manure_storage, field_management, weath
         if fert_management.check_conditions_plant(soil, weather, time):
             fertilizer_application.update_all(soil, fert_management.applications[(time.cal_year, time.day)].data)
 
+    soil.manure_applied = 0.0
+    soil.manure_P_applied = 0.0
+    soil.manure_N_applied = 0.0
     manure_management = field_management.managed_applications['manure']
     if (time.cal_year, time.day) in manure_management.applications:
         if manure_management.check_conditions_plant(soil, weather, time):
@@ -92,8 +95,6 @@ class FieldManagement:
             self.managed_applications[application_name] = \
                 self.BaseApplicationManagement(app_data[application_name], application_name, default_data, time)
 
-        self.management_scheme = str(app_data['management_scheme']).lower()
-
     class BaseApplicationManagement:
         def __init__(self, management_data, application_type, default_data, time):
             """
@@ -111,28 +112,30 @@ class FieldManagement:
                 default_data: default settings for an application of this type
                 time: an instance of the Time class specified in classes.py
             """
+            self.default_data = default_data
             self.management_data = management_data
-            self.years = self.management_data.pop('app_years')
+            self.rotation_years = self.management_data.pop('rotation_years')
             self.repeat = self.management_data.pop('repeat')
 
             self.application_type = application_type
             self.applications = {}
 
-            application_no = len(management_data['year'])
+            self.populate_scheduled_applications(time)
+            self.populate_rotations(time)
+
+            i = "here"
+
+        def populate_scheduled_applications(self, time):
+            application_no = len(self.management_data['year'])
             for application in range(application_no):
                 app_data = {}
-                for variable_name in management_data.keys():
-                    app_data[variable_name] = management_data[variable_name][application]
+                for variable_name in self.management_data.keys():
+                    app_data[variable_name] = self.management_data[variable_name][application]
+
                 self.applications[(app_data['year'], app_data['day'])] = \
-                    self.BaseApplication(app_data)
+                        self.BaseApplication(app_data)
 
-            self.default_years = []
-            self.set_default_years(time)
-
-            for app_year in self.default_years:
-                self.applications[(app_year, -1)] = self.BaseApplication(default_data)
-
-        def set_default_years(self, time):
+        def populate_rotations(self, time):
             """
             Definition:
                 Determine years in which each application occurs and construct list
@@ -143,26 +146,18 @@ class FieldManagement:
             """
 
             # if there are years in which this application type occurs
-            if len(self.years) != 0:
-                for year in self.years:
-                    # check specified application years against model boundaries
-                    if year - time.start_year >= len(time.years) or year - time.start_year < 0:
-                        print('\nCannot apply', self.application_type, 'in year', year,
-                              'because', year, '\nis outside of the scope of the simulation.')
-                    else:
-                        # populate app_years with uniquely specified years
-                        if year not in self.default_years:
-                            self.default_years.append(year)
-                            # populate app_years with repeat cycles
-                            if self.repeat != 0:
-                                temp_year = year + self.repeat
-                                # until repeat hits model boundaries
-                                while temp_year - time.start_year < len(time.years):
-                                    if temp_year not in self.default_years:
-                                        self.default_years.append(temp_year)
-                                    temp_year += self.repeat
-
-            self.default_years.sort()
+            if len(self.rotation_years) != 0:
+                for year in self.rotation_years:
+                    self.applications[(year, -1)] = self.BaseApplication(self.default_data)
+                    # populate rotation_years with repeat cycles
+                    if self.repeat != 0:
+                        temp_year = year + self.repeat
+                        # until repeat hits model boundaries
+                        while temp_year - time.start_year < len(time.years):
+                            if temp_year not in self.rotation_years:
+                                self.rotation_years.append(temp_year)
+                                self.applications[(temp_year, -1)] = self.BaseApplication(self.default_data)
+                            temp_year += self.repeat
 
         def schedule_application(self, time):
             """

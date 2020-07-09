@@ -68,7 +68,7 @@ class MassBalanceReport(BaseReportDriver):
             self.daily_variables = {
                 'year': ['time.cal_year', '', []],
                 'j_day': ['time.day', '', []],
-                'actual': ['soil.manure_P', 'kg', []],
+                'actual': ['soil.manure_P_applied', 'kg', []],
                 'calculated': ['soil.P_calc', 'kg', []],
                 'difference': ['soil.P_balance_difference', 'kg', []],
                 'delta': ['soil.delta_P', 'kg', []],
@@ -80,7 +80,7 @@ class MassBalanceReport(BaseReportDriver):
 
             self.annual_variables = {
                 'year': ['time.cal_year', '', 0],
-                'actual': ['soil.manure_P_annual', 'kg', 0],
+                'actual': ['soil.manure_P_applied_annual', 'kg', 0],
                 'calculated': ['soil.P_calc_annual', 'kg', 0],
                 'difference': ['soil.P_balance_difference_annual', 'kg', 0],
                 'delta': ['soil.delta_P_annual', 'kg', 0],
@@ -97,7 +97,7 @@ class MassBalanceReport(BaseReportDriver):
             self.daily_variables = {
                 'year': ['time.cal_year', '', []],
                 'j_day': ['time.day', '', []],
-                'actual': ['soil.manure_N', 'kg', []],
+                'actual': ['soil.manure_N_applied', 'kg', []],
                 'calculated': ['soil.N_calc', 'kg', []],
                 'difference': ['soil.N_balance_difference', 'kg', []],
                 'delta': ['soil.delta_N', 'kg N', []],
@@ -123,7 +123,7 @@ class MassBalanceReport(BaseReportDriver):
 
             self.annual_variables = {
                 'year': ['time.cal_year', '', 0],
-                'actual': ['soil.manure_N_annual', 'kg', 0],
+                'actual': ['soil.manure_N_applied_annual', 'kg', 0],
                 'calculated': ['soil.N_calc_annual', 'kg', 0],
                 'difference': ['soil.N_balance_difference_annual', 'kg', 0],
                 'delta': ['soil.delta_N_annual', 'kg', 0],
@@ -152,7 +152,8 @@ class MassBalanceReport(BaseReportDriver):
                 'N_liquid': ['manure_storage.N_liquid', 'kg', []],
                 'P_liquid': ['manure_storage.P_liquid', 'kg', []],
                 'TS_DM_effluent': ['manure_storage.TS_DM_effluent', 'kg', []],
-                'other_liquids': ['manure_storage.other_liquids', 'kg', []]
+                'other_liquids': ['manure_storage.other_liquids', 'kg', []],
+                'manure_applied': ['manure_storage.manure_applied', 'kg', []]
             }
 
             self.annual_variables = {
@@ -169,5 +170,6 @@ class MassBalanceReport(BaseReportDriver):
                 'N_liquid': ['manure_storage.N_liquid_annual', 'kg', 0],
                 'P_liquid': ['manure_storage.P_liquid_annual', 'kg', 0],
                 'TS_DM_effluent': ['manure_storage.TS_DM_effluent_annual', 'kg', 0],
-                'other_liquids': ['manure_storage.other_liquids_annual', 'kg', 0]
+                'other_liquids': ['manure_storage.other_liquids_annual', 'kg', 0],
+                'manure_applied': ['manure_storage.manure_applied_annual', 'kg', 0]
             }

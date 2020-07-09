@@ -225,11 +225,11 @@ def update_profile_N(soil):
 
     soil.N_calc = soil.delta_N + soil.N_drainage + soil.N_runoff + soil.N_erosion + soil.N_uptake
 
-    soil.N_balance_difference = soil.manure_N - soil.N_calc
+    soil.N_balance_difference = soil.manure_N_applied - soil.N_calc
 
 
 def update_annual_N(soil):
-    soil.manure_N_annual += soil.manure_N
+    soil.manure_N_applied_annual += soil.manure_N_applied
     soil.N_runoff_annual += soil.N_runoff
     soil.N_erosion_annual += soil.N_erosion
     soil.N_uptake_annual += soil.N_uptake
