@@ -52,13 +52,12 @@ class AnimalBase(object):
 		self.breed = args['breed']
 		self.birth_date = args['birth_date']
 		self.days_born = args['days_born']
+		self.semen_used = self.config['semen_type']
 		self.culled = False
 		self.do_not_breed = False
+		self.body_weight_history = []
 		self.events = AnimalEvents()
 		self.pen_history = []
-		self.semen_used = self.config['semen_type']
-		self.body_weight_history = []
-
 		self.daily_growth = 0
 		self.nutrient_rqmts = {}
 		self.set_default_nutrient_rqmts()

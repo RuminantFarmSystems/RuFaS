@@ -43,11 +43,12 @@ class AnimalEvents(object):
 			description: the event happened on that day
 		"""
 		if animal_age in self.events:
-			self.events[animal_age]['description'].append(description)
+			self.events[animal_age].append(description)
 		else:
-			self.events[animal_age] = {}
-			self.events[animal_age]['simulation_day'] = simulation_day
-			self.events[animal_age]['description'] = [description]
+			if simulation_day == 0:
+				self.events[animal_age] = [description]
+			else:
+				self.events[animal_age] = ['simulation_day=' + str(simulation_day), description]
 
 	def __str__(self):
 		res_str = ''
