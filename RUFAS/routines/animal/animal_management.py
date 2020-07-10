@@ -417,13 +417,14 @@ class AnimalManagement:
                 total_stalls = 0
                 for pen in self.all_pens[5:]:
                     total_stalls += pen.num_stalls
-                #Grouping for Lactating Cows if there are more stalls than animals
-                if len(lactating_cows) <= total_stalls:
-                    pen_grouping = grouping(lactating_cows, self.all_pens[5:], 1)
+               
+
+                stocking_density = len(lactating_cows) / total_stalls
+
                 #Grouping for Lactating Cows if the stocking density would be <= 120%
-                elif len(lactating_cows) <= total_stalls * 1.2:
-                    stocking_density = len(lactating_cows) / total_stalls
+                if stocking_density < 1.2:
                     pen_grouping = grouping(lactating_cows, self.all_pens[5:], stocking_density)
+
                 #Grouping if the stocking denisty would be > 120% (extra pen created)
                 else:
                     extra_stalls = len(lactating_cows) - total_stalls + 100
@@ -431,7 +432,8 @@ class AnimalManagement:
                     str(extra_stalls) + ' stalls')
                     new_pen = Pen(len(self.all_pens), 0.1, 1.6, extra_stalls, 'open air barn', 'straw', 'tiestall')
                     self.all_pens.append(new_pen)
-                    pen_grouping = grouping(lactating_cows, self.all_pens[5:], 1)
+                    stocking_density = len(lactating_cows)/(total_stalls + extra_stalls)
+                    pen_grouping = grouping(lactating_cows, self.all_pens[5:], stocking_density)
 
                 #Assigning Lactating Cows to Pens based on the grouping output
                 for key in pen_grouping:
