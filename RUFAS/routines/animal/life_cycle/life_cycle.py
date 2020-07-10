@@ -415,7 +415,7 @@ class LifeCycleManager:
                 args = {
                     'id': self.animal_initializer.next_id(),
                     'breed': 'HO',
-                    'birth_date': 0,
+                    'birth_date': date,
                     'days_born': 0,
                     'p_init': cow.p_gest_for_calf
                 }
