@@ -455,7 +455,7 @@ class Soil:
         # soil carbon attributes
         self.plant_moisture = 0.85  # TODO temporary value from Hector  # TODO should probably be in crop
         self.residue_DM = 0.0
-        self.lignin_residue = 0.0
+        self.lignin_residue_percent = 17  # TODO this 0.17 will be a crop type lignin percent
 
         self.silt_and_clay_frac = 0.5  # TODO database item
 
@@ -627,31 +627,9 @@ class Soil:
             self.structural_BG = 500
             self.fr_tillage = 0.0  # TODO used in carbon but the variable should probably be relocated
 
-            self.metabolic_AG_to_active_loss = 0.0
-            self.metabolic_AG_to_active_actual = 0.0
-            self.struct_AG_to_active_loss = 0.0
-            self.struct_AG_to_active_actual = 0.0
-            self.struct_AG_to_slow_loss = 0.0
-            self.struct_AG_to_slow_actual = 0.0
-
-            self.metabolic_BG_to_active_loss = 0.0
-            self.metabolic_BG_to_active_actual = 0.0
-            self.struct_BG_to_active_loss = 0.0
-            self.struct_BG_to_active_actual = 0.0
-            self.struct_BG_to_slow_loss = 0.0
-            self.struct_BG_to_slow_actual = 0.0
-
             self.carbon_active = 5000  # TODO initial condition, need to decide if in json or here
             self.carbon_slow = 5000  # TODO above
             self.carbon_passive = 5000  # TODO above
-
-            # TODO all need initial conditions
-            self.active_to_slow = 0
-            self.active_to_passive = 0
-            self.slow_to_active = 0
-            self.slow_to_passive = 0
-            self.passive_to_active = 0
-            # TODO ^
 
             self.carbon_percent = 0
             self.total_carbon = 0
