@@ -83,6 +83,7 @@ class Cow(HeiferIII):
 		self.DVD = 0  # daily vertical distance, km
 		self.DHD = 0  # daily horizontal distance, km
 		self.CI = 0  # calving interval, days
+		self.CI_history = []
 		self.CBW = 0  # weight of cow when she gives birth
 		self.daily_growth = 0  # change in body weight, kg
 		self.calves = 0
@@ -411,6 +412,7 @@ class Cow(HeiferIII):
 				last_time_given_birth = \
 					self.events.get_most_recent_date(birth_description)
 				self.CI = self.days_born - last_time_given_birth
+				self.CI_history.append(self.CI)
 			self.CBW = self.body_weight
 			self.events.add_event(self.days_born, sim_day, birth_description)
 			self._health_cull_update()
