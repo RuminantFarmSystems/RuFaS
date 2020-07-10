@@ -449,7 +449,7 @@ class Feed:
                          'lactating_cows': 2.0
                          }
 
-        # inclusion_rate_est = Estimated inclusion rate to meet Animal Class requirements
+        # inclusion_rate_est = Estimated inclusion rate to meet Animal Class requirements (kg DM)
         # [F.2.A.5]
         inclusion_rate_est = {}
         for animal in inclusion_pct:
