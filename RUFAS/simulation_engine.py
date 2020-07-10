@@ -83,7 +83,7 @@ def daily_simulation():
     routines.daily_manure_storage_routine(state.manure_storage, state.animal_management)
     routines.daily_field_management_routine(state.soil, state.manure_storage, state.field_management, weather, time)
     routines.daily_soil_routine(state.soil, state.crop, weather, time)
-    routines.daily_crop_routine(state.crop, weather, time, state.soil)
+    routines.daily_crop_routine(state.soil, state.crop, state.field_management, weather, time)
     routines.daily_feed_routine(state.feed, state.crop, state.animal_management)
 
     #

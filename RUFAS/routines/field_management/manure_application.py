@@ -112,10 +112,10 @@ def formulate_manure_application(manure_storage, m_app):
 def added_manure_P(soil, m_app):
     soil.manure_type = "DAIRY"
     soil.manure_applied = m_app['mass']
-    cover_perc = m_app['cover_perc']
+    cover_perc = m_app['cover_percent']
     soil.manure_P_applied = m_app['P_mass']
     DM = m_app['DM']
-    surf_perc = m_app['surf_perc']
+    surf_perc = m_app['surface_percent']
     soil.WIP_applied = m_app['WIP']
     soil.WOP_applied = m_app['WOP']
     depth = m_app['depth']

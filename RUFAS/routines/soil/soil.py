@@ -65,6 +65,7 @@ def daily_soil_routine(soil, crop, weather, time):
 
 def annual_variable_update(soil):
     soil.manure_applied_annual += soil.manure_applied
+    soil.fert_applied_annual += soil.fert_applied
     soil_water.update_annual_SW(soil)
     phosphorus_cycling.update_annual_P(soil)
     nitrogen_cycling.update_annual_N(soil)
@@ -172,6 +173,7 @@ class Soil:
             layer.mass = layer.bulk_density * layer.thickness_cm * 10000
 
         # fertilizer
+        self.fert_applied = 0.0
         self.fert_applied_annual = 0.0
         self.no_rains = 0.0
         self.fert_CNT = 0.0

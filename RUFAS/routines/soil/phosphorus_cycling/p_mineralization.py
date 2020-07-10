@@ -22,7 +22,7 @@ def update_all(S, time):
         layer = S.soil_layers[x]
         prev_layer = S.soil_layers[x + 1]
 
-        uptake_fact = layer.labile_P / layer.labile_P + prev_layer.labile_P * 0.9
+        uptake_fact = layer.labile_P / (layer.labile_P + (prev_layer.labile_P * 0.9))
 
         layer.labile_P_uptake = min(layer.labile_P, layer.P_uptake * uptake_fact)
         layer.labile_P -= layer.labile_P_uptake

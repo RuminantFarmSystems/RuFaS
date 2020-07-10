@@ -1,5 +1,3 @@
-
-
 class Soybean:
 
     def __init__(self, data):
@@ -22,6 +20,7 @@ class Soybean:
         self.kill_year = True
         self.planted = False
         self.growing = False
+        self.harvested = False
 
         self.fix_nitrogen = True
         # ===================================================================

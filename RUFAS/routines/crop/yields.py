@@ -17,7 +17,7 @@ from math import exp
 
 
 # Runs yield calculations
-def update_all(crop_type, time, soil):
+def update_all(soil, crop_type, field_management, weather, time):
 
     calc_HI_max(crop_type)
     calc_HI_act(crop_type)
@@ -28,7 +28,7 @@ def update_all(crop_type, time, soil):
     calc_yield_max(crop_type)
     calc_yield_act(crop_type)
     calc_nutrient_removal(crop_type)
-    calc_residue(crop_type, time, soil)
+    calc_residue(soil, crop_type, field_management, weather, time)
     calc_quality_assessment(crop_type)
     calc_DM_yield(crop_type)
     calc_NDF_yield(crop_type)
@@ -120,11 +120,11 @@ def calc_nutrient_removal(crop_type):
 # Updates the current residue.
 # "pseudocode_crop" C.10.G.1/4/5
 #
-def calc_residue(crop_type, time, soil):
+def calc_residue(soil, crop_type, field_management, weather, time):
     d_residue = 0
     if time.day == crop_type.kill_day or crop_type.crop_type == 'annual':
         d_residue = crop_type.biomass_actual - crop_type.yield_actual
-        kill(crop_type)
+        kill(soil, crop_type, field_management, weather, time)
     else:
         bio_frac = crop_type.yield_actual / crop_type.biomass_actual
         cut(crop_type, bio_frac)
@@ -135,7 +135,8 @@ def calc_residue(crop_type, time, soil):
 # Kills the crop
 # "pseudocode_crop" C.10.G.4
 #
-def kill(crop_type):
+def kill(soil, crop_type, field_management, weather, time):
+
     crop_type.accumulated_HU = 0
     crop_type.prev_accumulated_HU = 0
 
@@ -161,6 +162,11 @@ def kill(crop_type):
 
     crop_type.planted = False
     crop_type.growing = False
+    crop_type.harvested = True
+
+    till_management = field_management.managed_applications['tillage']
+    if (time.cal_year, -1) in till_management.applications:
+        till_management.schedule_application(time)
 
 
 #

@@ -1,11 +1,9 @@
-################################################################################
 """
 SurPhos
 File name: tillage_application.py
 Author(s): Jacob Johnson, jacob8399@gmail.com,
            William Donovan, wmdonovan@wisc.edu
 """
-################################################################################
 
 
 # conducts tillage operations and mixes any manure or fertilizer on
@@ -14,8 +12,8 @@ Author(s): Jacob Johnson, jacob8399@gmail.com,
 def update_all(soil, till_app):
 
     depth = till_app['depth']
-    perc_incorporated = till_app['perc_incorporated']
-    perc_mixed = till_app['perc_mixed']
+    perc_incorporated = till_app['percent_incorporated']
+    perc_mixed = till_app['percent_mixed']
 
     till_soil_mass = 0.0
     till_act_P = 0.0

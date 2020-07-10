@@ -13,7 +13,7 @@
 
     "farm":
     {
-        "crop": "custom_rotation.json",
+        "crop": "no_crop.json",
         "soil": "barnyard_soil.json",
         "field_management": "barnyard_field_management.json",
 

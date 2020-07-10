@@ -31,22 +31,22 @@ def daily_field_management_routine(soil, manure_storage, field_management, weath
 
     fert_management = field_management.managed_applications['fertilizer']
     if (time.cal_year, time.day) in fert_management.applications:
-        if fert_management.check_conditions_plant(soil, weather, time):
-            fertilizer_application.update_all(soil, fert_management.applications[(time.cal_year, time.day)].data)
+        fertilizer_application.update_all(soil, fert_management.applications[(time.cal_year, time.day)].data)
 
     soil.manure_applied = 0.0
     soil.manure_P_applied = 0.0
     soil.manure_N_applied = 0.0
     manure_management = field_management.managed_applications['manure']
     if (time.cal_year, time.day) in manure_management.applications:
-        if manure_management.check_conditions_plant(soil, weather, time):
-            manure_application.update_all(soil, manure_storage,
-                                          manure_management.applications[(time.cal_year, time.day)].data)
+        manure_application.update_all(soil, manure_storage,
+                                        manure_management.applications[(time.cal_year, time.day)].data)
 
     till_management = field_management.managed_applications['tillage']
     if (time.cal_year, time.day) in till_management.applications:
-        if manure_management.check_conditions_plant(soil, weather, time):
+        if field_management.check_conditions(soil, weather, time):
             tillage_application.update_all(soil, till_management.applications[(time.cal_year, time.day)].data)
+        else:
+            till_management.iterate_application(time)
 
 
 class FieldManagement:
@@ -69,7 +69,7 @@ class FieldManagement:
                 'day': -1,
                 'N_mass': 520,
                 'P_mass': 300,
-                'cover_perc': 0.95,
+                'cover_percent': 0.95,
                 'depth': 0.0,
                 'surface_percent': 1.0
             },
@@ -94,6 +94,76 @@ class FieldManagement:
         for application_name, default_data in self.application_defaults.items():
             self.managed_applications[application_name] = \
                 self.BaseApplicationManagement(app_data[application_name], application_name, default_data, time)
+
+    @staticmethod
+    def check_conditions(soil, weather, time):
+        """
+        Description:
+            Checks if environmental conditions are conducive to application.
+            Iterates field_management scheduled for non-conducive dates
+        Args:
+            soil: an instance of the Soil class specified in soil.py
+            weather: an instance of the Weather class specified in classes.py
+                contains information about the environment
+            time: an instance of the Time class specified in classes.py
+
+        Returns:
+            bool: True if conditions are conducive,
+                    False (and iterate application) if otherwise
+        """
+        # the time object begins indexing at 1, but curr, next, and second
+        # are in reference to the weather object which begins indexing at 0
+        curr_day = time.day - 1
+        curr_year = time.year - 1
+
+        next_day = curr_day + 1
+        next_year = curr_day + 1
+
+        second_day = next_day + 1
+
+        # if soil profile is too saturated for application
+        if soil.soil_layers[0].soil_water > soil.soil_layers[0].fc_water:
+            return False
+
+        # if it rains on the current day
+        if weather.rainfall[curr_year][curr_day] >= 1.0:
+            return False
+
+        # boundary check the next day against length of the current year
+        if next_day >= len(time.years[curr_year]):
+            # boundary check the next year against length of simulation
+            if next_year < len(time.years):
+                # update year and day to the start of the next year
+                curr_year += 1
+                curr_day = 0
+
+                next_day = curr_day + 1
+            # the next day and current year are outside of the scope of the simulation
+            else:
+                return False
+
+        # if it rains on the following day
+        if weather.rainfall[curr_year][next_day] >= 1.0:
+            return False
+
+        # boundary check the second day against length of the current year
+        if second_day >= len(time.years[curr_year]):
+            # boundary check the next year against length of simulation
+            if next_year < len(time.years):
+                # update current year and day to the start of the next year
+                curr_year += 1
+                curr_day = 0
+
+                second_day = curr_day + 2
+            # the second day and current year are outside of the scope of the simulation
+            else:
+                return False
+
+        # if it rains on the second day
+        if weather.rainfall[curr_year][second_day] >= 1.0:
+            return False
+
+        return True
 
     class BaseApplicationManagement:
         def __init__(self, management_data, application_type, default_data, time):
@@ -120,12 +190,10 @@ class FieldManagement:
             self.application_type = application_type
             self.applications = {}
 
-            self.populate_scheduled_applications(time)
+            self.populate_scheduled_applications()
             self.populate_rotations(time)
 
-            i = "here"
-
-        def populate_scheduled_applications(self, time):
+        def populate_scheduled_applications(self):
             application_no = len(self.management_data['year'])
             for application in range(application_no):
                 app_data = {}
@@ -136,15 +204,6 @@ class FieldManagement:
                         self.BaseApplication(app_data)
 
         def populate_rotations(self, time):
-            """
-            Definition:
-                Determine years in which each application occurs and construct list
-                for module use.
-
-            Args:
-                time: an instance of the Time class specified in classes.py
-            """
-
             # if there are years in which this application type occurs
             if len(self.rotation_years) != 0:
                 for year in self.rotation_years:
@@ -167,129 +226,32 @@ class FieldManagement:
             Args:
                 time: an instance of the Time class specified in classes.py
             """
-            self.applications[(time.cal_year, time.day + 1)] = \
-                self.applications.pop((time.cal_year, -1))
+            if time.day >= len(time.years[time.year - 1]):
+                pass
+            else:
+                self.applications[(time.cal_year, time.day + 1)] = \
+                    self.applications.pop(
+                        ((time.cal_year, -1) if (time.cal_year, -1) in self.applications else (time.cal_year, time.day))
+                    )
 
-        @staticmethod
-        def check_conditions_plant(soil, weather, time):
-            """
-            Description:
-                Checks if environmental conditions are conducive to plant.
-            Args:
-                soil: an instance of the Soil class specified in soil.py
-                weather: an instance of the Weather class specified in classes.py
-                    contains information about the environment
-                time: an instance of the Time class specified in classes.py
-
-            Returns:
-                bool: True if conditions are conducive,
-                        False (and iterate application) if otherwise
-            """
-            # the time object begins indexing at 1, but curr is in
-            # reference to the weather object which begins indexing at 0
-            curr_day = time.day - 1
-            curr_year = time.year - 1
-
-            # if soil profile is too saturated for planting
-            if soil.soil_layers[0].soil_water > soil.soil_layers[0].fc_water:
-                return False
-
-            # if it rains on the current day
-            if weather.rainfall[curr_year][curr_day] >= 1.0:
-                return False
-
-            return True
-
-        def check_conditions(self, soil, weather, time):
-            """
-            Description:
-                Checks if environmental conditions are conducive to application.
-                Iterates field_management scheduled for non-conducive dates
-            Args:
-                soil: an instance of the Soil class specified in soil.py
-                weather: an instance of the Weather class specified in classes.py
-                    contains information about the environment
-                time: an instance of the Time class specified in classes.py
-
-            Returns:
-                bool: True if conditions are conducive,
-                        False (and iterate application) if otherwise
-            """
-            # the time object begins indexing at 1, but curr, next, and second
-            # are in reference to the weather object which begins indexing at 0
-            curr_day = time.day - 1
-            curr_year = time.year - 1
-
-            next_day = curr_day + 1
-            next_year = curr_day + 1
-
-            second_day = next_day + 1
-
-            # if soil profile is too saturated for application
-            if soil.soil_layers[0].soil_water > soil.soil_layers[0].fc_water:
-                self.iterate_application(weather, time)
-                return False
-
-            # if it rains on the current day
-            if weather.rainfall[curr_year][curr_day] >= 1.0:
-                self.iterate_application(weather, time)
-                return False
-
-            # boundary check the next day against length of the current year
-            if next_day >= len(weather.rainfall[curr_year]):
-                # boundary check the next year against length of simulation
-                if next_year < len(weather.rainfall):
-                    # update year and day to the start of the next year
-                    curr_year += 1
-                    curr_day = 0
-
-                    next_day = curr_day + 1
-
-                # the next day and current year are outside of the scope of the simulation
-                else:
-                    return False
-
-            # if it rains on the following day
-            if weather.rainfall[curr_year][next_day] >= 1.0:
-                self.iterate_application(weather, time)
-                return False
-
-            # boundary check the second day against length of the current year
-            if second_day >= len(weather.rainfall[curr_year]):
-                # boundary check the next year against length of simulation
-                if next_year < len(weather.rainfall):
-                    # update current year and day to the start of the next year
-                    curr_year += 1
-                    curr_day = 0
-
-                    second_day = curr_day + 2
-                # the second day and current year are outside of the scope of the simulation
-                else:
-                    return False
-
-            # if it rains on the second day
-            if weather.rainfall[curr_year][second_day] >= 1.0:
-                self.iterate_application(weather, time)
-                return False
-
-            return True
-
-        def iterate_application(self, weather, time):
+        def iterate_application(self, time):
             """
             Description:
                 Moves field_management to the next day– called from check_conditions.
             Args:
-                weather: an instance of the Weather class specified in classes.py
-                    contains information about the environment
                 time: an instance of the Time class specified in classes.py
             """
 
             # if it is the last day of the current year
-            if time.day == len(weather.rainfall[time.year - 1]):
-                if time.year < len(weather.rainfall):
-                    self.applications[(time.cal_year, 1)] = self.applications.pop((time.cal_year, time.day))
+            if time.day == len(time.years[time.year - 1]):
+                if time.year < len(time.years):
+                    self.applications[(time.cal_year, 1)] = self.applications.pop(
+                        ((time.cal_year, -1) if (time.cal_year, -1) in self.applications else (time.cal_year, time.day))
+                    )
             else:
-                self.applications[(time.cal_year, time.day + 1)] = self.applications.pop((time.cal_year, time.day))
+                self.applications[(time.cal_year, time.day + 1)] = self.applications.pop(
+                    ((time.cal_year, -1) if (time.cal_year, -1) in self.applications else (time.cal_year, time.day))
+                )
 
         class BaseApplication:
             def __init__(self, app_data):

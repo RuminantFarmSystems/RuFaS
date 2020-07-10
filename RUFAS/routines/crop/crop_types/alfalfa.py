@@ -1,5 +1,3 @@
-
-
 class Alfalfa:
 
     def __init__(self, data):
@@ -26,6 +24,7 @@ class Alfalfa:
         self.kill_year = False
         self.planted = False
         self.growing = False
+        self.harvested = False
 
         self.fix_nitrogen = True
         # ===================================================================

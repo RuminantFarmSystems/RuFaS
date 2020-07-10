@@ -1,11 +1,9 @@
-################################################################################
 """
 RuFaS
 File name: fertilizer_application.py
 Author(s): Jacob Johnson, jacob8399@gmail.com,
            William Donovan, wmdonovan@wisc.edu
 """
-################################################################################
 
 
 # calculates P added in fertilizer, adds fertilizer P to surface pool,
@@ -14,10 +12,10 @@ Author(s): Jacob Johnson, jacob8399@gmail.com,
 def update_all(soil, fert_app):
 
     mass = fert_app['mass']
-    surf_perc = fert_app['surf_perc']
+    surf_perc = fert_app['surface_percent']
     depth = fert_app['depth']
 
-    soil.fert_applied_sum += mass
+    soil.fert_applied = mass
     soil.no_rains = 0
     soil.fert_CNT = 1.0
 
