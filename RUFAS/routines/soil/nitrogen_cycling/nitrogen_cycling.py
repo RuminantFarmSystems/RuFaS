@@ -208,8 +208,7 @@ def update_profile_N(soil):
         soil.stable_N += layer.stable_N
         soil.N_uptake += layer.N_uptake
 
-    profile_N = soil.NH4 + soil.NO3 + soil.org_N + \
-                soil.active_N + soil.stable_N + soil.fresh_N
+    profile_N = soil.NH4 + soil.NO3 + soil.org_N + soil.fresh_N
 
     soil.delta_N = profile_N - soil.profile_N
 
@@ -231,5 +230,6 @@ def update_profile_N(soil):
 def update_annual_N(soil):
     soil.manure_N_applied_annual += soil.manure_N_applied
     soil.N_runoff_annual += soil.N_runoff
+    soil.N_drainage_annual += soil.N_drainage
     soil.N_erosion_annual += soil.N_erosion
     soil.N_uptake_annual += soil.N_uptake
