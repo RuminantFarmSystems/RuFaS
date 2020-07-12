@@ -637,6 +637,13 @@ class AnimalManagement:
             animal = self.life_cycle_manager.culled_cows[index]
             is_cow = True
 
+        CI_avg = None
+        if is_cow:
+            if len(animal.CI_history) == 0:
+                CI_avg = 0
+            else:
+                CI_avg = sum(animal.CI_history) / len(animal.CI_history)
+
         return {
             'ID': animal.id,
             'breed': animal.breed,
@@ -656,7 +663,8 @@ class AnimalManagement:
             'milk_production_history':
                 None if not is_cow else
                 [milk_hist.__dict__ for milk_hist in animal.milk_production_history],
-            'event_history': animal.events.events
+            'event_history': animal.events.events,
+            'CI_avg': CI_avg
         }
 
     def get_life_cycle_output(self, num_animals):
