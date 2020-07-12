@@ -12,9 +12,8 @@ import json
 import time as timer
 from pathlib import Path
 
-from RUFAS import routines, errors
-from RUFAS.classes import Config, State, Weather, Time
-from RUFAS.output import OutputHandler
+from RUFAS import classes, util, routines, errors
+from RUFAS.output_handler import OutputHandler
 from RUFAS.test import test_handler
 
 
@@ -49,9 +48,9 @@ def simulate(input_fPath: Path):
     # Deletes existing output files of the same name from previous simulation
     # Transfer needed (initial) data from state to report handlers
     #
-    output.initialize_output_dir(config.output_dir)
-    output.initialize_diagnostic_dir(config.diagnostic_dir)
-    output.initialize_reports(state)
+    output.initialize_csv_dir(config.csv_dir)
+    output.initialize_graphic_dir(config.graphic_dir)
+    output.initialize_reports()
 
     print("\nSimulating: {}".format(input_fPath.name))
 
@@ -154,21 +153,18 @@ def read_json_file(fPath: Path):
 
         # Instantiate objects using dictionary data from .json file
         try:
-            config = Config(data['config'], data['weather'])
+            config = classes.Config(data['config'], data['weather'])
 
             if config.run_tests:
                 test_handler.run_tests()
 
-            weather = Weather(data['weather'], config.years, config.w_start_year,
-                              config.w_start_day, config.start_year, config.start_day)
-            time = Time(config.years, config.start_year)
-            state = State(data['farm'], config, weather, time)
-            output = OutputHandler(data['output'], state)
+            weather = classes.Weather(data['weather'], config.years, config.w_start_year,
+                                      config.w_start_day, config.start_year, config.start_day)
+            time = classes.Time(config.years, config.start_year)
+            state = classes.State(data['farm'], config, weather, time)
+            output = OutputHandler(classes.read_json_file(util.get_base_dir() / 'input/output' / data['output']), state)
 
         except errors.JSONfileData as e:
             print("JSON FILE ERROR: " +
                   "{} \n\t{} Section\n{}\n".format(fPath.name, e.section, e.msg))
             raise errors.InvalidJSONfile(fPath.name)
-
-
-# =======================================================================================
