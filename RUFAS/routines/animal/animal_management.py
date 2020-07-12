@@ -252,7 +252,7 @@ class AnimalManagement:
             # uses average distances from pens to milking parlor
             cow.calc_init_nutrient_rqmts(avg_VD_parlor, avg_HD_parlor,
                                          self.housing, self.pasture_concentrate,
-                                         feed)
+                                         feed.nutrient_rqmts)
             cow.p_animal = 0.0072 * cow.body_weight * 1000
 
     def avg_pen_dist(self):
