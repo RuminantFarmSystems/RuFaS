@@ -20,7 +20,7 @@ import numpy as np
 class HeiferI(Calf):
 	# TODO: Body weight changed could be based on nutrition intake later from
 	#  Ration Formulation
-	
+
 	def __init__(self, args):
 		"""
 		Description:
@@ -44,7 +44,7 @@ class HeiferI(Calf):
 		Get current information from the heiferI
 		"""
 		return self.get_calf_values()
-		
+
 	def calc_nutrient_rqmts(self):
 		"""
 		Calculates this heiferI's nutrient requirements.
@@ -99,24 +99,24 @@ class HeiferI(Calf):
 		Returns: the second stage of heifer -- breeding stage starts
 		"""
 		second_stage = False
-		
+
 		prev_weight = self.body_weight
 
 		gained_weight = np.random.normal(
-			AnimalBase.config['avg_daily_gain_h'], 
+			AnimalBase.config['avg_daily_gain_h'],
 			AnimalBase.config['std_daily_gain_h'])
 		while gained_weight < AnimalBase.config['avg_daily_gain_h'] \
 			- 2 * AnimalBase.config['std_daily_gain_h'] \
 			or gained_weight > AnimalBase.config['avg_daily_gain_h'] \
 				+ 2 * AnimalBase.config['std_daily_gain_h']:
 			gained_weight = np.random.normal(
-				AnimalBase.config['avg_daily_gain_h'], 
+				AnimalBase.config['avg_daily_gain_h'],
 				AnimalBase.config['std_daily_gain_h'])
-		
+
 		self.body_weight += gained_weight
-		
+
 		self.daily_growth = self.body_weight - prev_weight
-		
+
 		self.days_born += 1
 		if self.days_born == AnimalBase.config['breeding_start_day_h']:
 			second_stage = True

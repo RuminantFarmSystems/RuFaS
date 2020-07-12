@@ -32,7 +32,7 @@ class Calf(AnimalBase):
 			args.breed: breed of the cow
 			args.birth_date: the date of the simulation when the calf was born
 			args.daysBorn: age of the animal
-			(optional: include the following to assign cow information) 
+			(optional: include the following to assign cow information)
 			args.birth_weight: the birth weight of the cow
 			args.body_weight: current body weight of the cow
 			args.wean_weight: the wean weight of the cow
@@ -40,7 +40,7 @@ class Calf(AnimalBase):
 			args.events: events of the cow
 		"""
 		super().__init__(args)
-		
+
 		if 'birth_weight' in args:
 			self.assign_calf_values(args)
 		else:
@@ -79,25 +79,25 @@ class Calf(AnimalBase):
 		# birth weight determined by breed specific distribution
 		if self.breed == 'HO':
 			self.birth_weight = np.random.normal(
-				AnimalBase.config['birth_weight_avg_ho'], 
+				AnimalBase.config['birth_weight_avg_ho'],
 				AnimalBase.config['birth_weight_std_ho'])
 			while self.birth_weight < AnimalBase.config['birth_weight_avg_ho'] \
 				- 2 * AnimalBase.config['birth_weight_std_ho'] \
 				or self.birth_weight > AnimalBase.config['birth_weight_avg_ho'] \
 					+ 2 * AnimalBase.config['birth_weight_std_ho']:
 				self.birth_weight = np.random.normal(
-					AnimalBase.config['birth_weight_avg_ho'], 
+					AnimalBase.config['birth_weight_avg_ho'],
 					AnimalBase.config['birth_weight_std_ho'])
 		elif self.breed == 'JE':
 			self.birth_weight = np.random.normal(
-				AnimalBase.config['birth_weight_avg_je'], 
+				AnimalBase.config['birth_weight_avg_je'],
 				AnimalBase.config['birth_weight_std_je'])
 			while self.birth_weight < AnimalBase.config['birth_weight_avg_je'] \
 				- 2 * AnimalBase.config['birth_weight_std_je'] \
 				or self.birth_weight > AnimalBase.config['birth_weight_avg_je'] \
 					+ 2 * AnimalBase.config['birth_weight_std_je']:
 				self.birth_weight = np.random.normal(
-					AnimalBase.config['birth_weight_avg_je'], 
+					AnimalBase.config['birth_weight_avg_je'],
 					AnimalBase.config['birth_weight_std_je'])
 		self.body_weight = self.birth_weight
 		self.wean_weight = 0
@@ -133,7 +133,7 @@ class Calf(AnimalBase):
             'events' : str(self.events)
 		}
 		return values
-	
+
 	def calc_nutrient_rqmts(self):
 		"""
 		Calculates this calf's nutrient requirements.
@@ -187,9 +187,9 @@ class Calf(AnimalBase):
 		Returns: time when calf is weaned -- stop be fed with milk
 		"""
 		wean_day = False
-		
+
 		prev_weight = self.body_weight
-		
+
 		self.days_born += 1
 		if self.days_born == AnimalBase.config['wean_day']:
 			wean_day = True
@@ -198,19 +198,19 @@ class Calf(AnimalBase):
 			self.days_born -= 1 # will increment by 1 again in heifer update
 		else:
 			gained_weight = np.random.normal(
-				AnimalBase.config['avg_daily_gain_c'], 
+				AnimalBase.config['avg_daily_gain_c'],
 				AnimalBase.config['std_daily_gain_c'])
 			while gained_weight < AnimalBase.config['avg_daily_gain_c'] \
 				- 2 * AnimalBase.config['std_daily_gain_c'] \
 				or gained_weight > AnimalBase.config['avg_daily_gain_c'] \
 					+ 2 * AnimalBase.config['std_daily_gain_c']:
 				gained_weight = np.random.normal(
-					AnimalBase.config['avg_daily_gain_c'], 
+					AnimalBase.config['avg_daily_gain_c'],
 					AnimalBase.config['std_daily_gain_c'])
 			self.body_weight += gained_weight
-		
+
 		self.daily_growth = self.body_weight - prev_weight
-		
+
 		return wean_day
 
 	def __str__(self):
