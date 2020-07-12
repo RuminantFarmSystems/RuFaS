@@ -18,7 +18,7 @@ from math import exp
 #
 def denitrification(soil):
     for layer in soil.soil_layers:
-        OrgC = layer.org_C
+        org_C = layer.org_C
         deNrate = layer.deNrate
         SW = layer.soil_water
         FC = layer.fc_water
@@ -28,7 +28,7 @@ def denitrification(soil):
         # "pseudocode_soil" S.4.D.1
         DenitrN = 0
         if SW > FC:
-            exp_part = exp(-deNrate * temp_fac * OrgC)
+            exp_part = exp(-deNrate * temp_fac * org_C)
             DenitrN = layer.NO3 * (1 - exp_part)
 
         DenitrN = min(layer.NO3, DenitrN)

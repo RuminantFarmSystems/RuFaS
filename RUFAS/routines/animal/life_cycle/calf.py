@@ -25,17 +25,36 @@ class Calf(AnimalBase):
 
 	def __init__(self, args):
 		"""
-		Initialize calf at the time it was born, determine stillbirth, gender,
-		and birth weight.
-
-		Args:
-			args:
-				args.breed: breed of the cow
-				args.date: the date of the simulation when the calf was born
-				args.daysBorn: age of the animal
+		Description:
+			initialize calf at the time it was born
+		Input:
+			args.id: id of the cow
+			args.breed: breed of the cow
+			args.birth_date: the date of the simulation when the calf was born
+			args.daysBorn: age of the animal
+			(optional: include the following to assign cow information)
+			args.birth_weight: the birth weight of the cow
+			args.body_weight: current body weight of the cow
+			args.wean_weight: the wean weight of the cow
+			args.mature_body_weight: the mature body weight of the cow
+			args.events: events of the cow
 		"""
 		super().__init__(args)
-		self.sold = False
+
+		if 'birth_weight' in args:
+			self.assign_calf_values(args)
+		else:
+			self.init_values(args)
+		# feed intake
+		self.dm_intake = 0
+		self.me_intake = 0
+		self.cp_intake = 0
+		self.milk_starter_feed = {'milk': 0, 'starter': 0}
+
+	def init_values(self, args):
+		"""
+		Determine stillbirth, gender, and birth weight
+		"""
 		# gender determined with gender ratio relates to semen type
 		if AnimalBase.config['semen_type'] == 'conventional':
 			male_calf_rate = \
@@ -51,7 +70,6 @@ class Calf(AnimalBase):
 		if random() < AnimalBase.config['still_birth_rate']:
 			self.culled = True
 			self.events.add_event(0, 'Still birth')
-			return
 
 		# sell the male calves and the unwanted female calves
 		# (if AnimalBase.config['keep_female_calf_rate'] = 1,
@@ -61,7 +79,6 @@ class Calf(AnimalBase):
 		if self.gender == 'male' or random() > \
 			AnimalBase.config['keep_female_calf_rate']:
 			self.sold = True
-			return
 		else:
 			self.sold = False
 		# birth weight determined by breed specific distribution
@@ -69,38 +86,58 @@ class Calf(AnimalBase):
 			self.birth_weight = np.random.normal(
 				AnimalBase.config['birth_weight_avg_ho'],
 				AnimalBase.config['birth_weight_std_ho'])
+			while self.birth_weight < AnimalBase.config['birth_weight_avg_ho'] \
+				- 2 * AnimalBase.config['birth_weight_std_ho'] \
+				or self.birth_weight > AnimalBase.config['birth_weight_avg_ho'] \
+					+ 2 * AnimalBase.config['birth_weight_std_ho']:
+				self.birth_weight = np.random.normal(
+					AnimalBase.config['birth_weight_avg_ho'],
+					AnimalBase.config['birth_weight_std_ho'])
 		elif self.breed == 'JE':
 			self.birth_weight = np.random.normal(
 				AnimalBase.config['birth_weight_avg_je'],
 				AnimalBase.config['birth_weight_std_je'])
+			while self.birth_weight < AnimalBase.config['birth_weight_avg_je'] \
+				- 2 * AnimalBase.config['birth_weight_std_je'] \
+				or self.birth_weight > AnimalBase.config['birth_weight_avg_je'] \
+					+ 2 * AnimalBase.config['birth_weight_std_je']:
+				self.birth_weight = np.random.normal(
+					AnimalBase.config['birth_weight_avg_je'],
+					AnimalBase.config['birth_weight_std_je'])
 		self.body_weight = self.birth_weight
 		self.wean_weight = 0
 		self.mature_body_weight = np.random.triangular(550, 700, 1000)
-
 		self.p_animal = args['p_init']
 
-		# feed intake
-		self.dm_intake = 0
-		self.me_intake = 0
-		self.cp_intake = 0
-		self.milk_starter_feed = {'milk': 0, 'starter': 0}
-
-	def init_from_calf(self, calf):
+	def assign_calf_values(self, args):
 		"""
-		Initialize calf value from class calf, for coding purposes
-
-		Args:
-			calf: initialized values from the first day
+		Assign calf with given values
 		"""
-		super().init_from_animal(calf)
-		self.culled = calf.culled
-		self.sold = calf.sold
-		self.gender = calf.gender
-		self.sold = calf.sold
-		self.birth_weight = calf.birth_weight
-		self.body_weight = calf.body_weight
-		self.wean_weight = calf.wean_weight
-		self.mature_body_weight = calf.mature_body_weight
+		self.culled = False
+		self.sold = False
+		self.gender = 'female'
+		self.birth_weight = args['birth_weight']
+		self.body_weight = args['body_weight']
+		self.wean_weight = args['wean_weight']
+		self.mature_body_weight = args['mature_body_weight']
+		self.events.init_from_string(args['events'])
+
+	def get_calf_values(self):
+		"""
+		Get current information from the calf
+		"""
+		values = {
+            'id' : self.id,
+            'breed' : self.breed,
+            'birth_date' : self.birth_date,
+            'days_born' : self.days_born,
+            'birth_weight' : self.birth_weight,
+            'body_weight' : self.body_weight,
+            'wean_weight' : self.wean_weight,
+			'mature_body_weight': self.mature_body_weight,
+            'events' : str(self.events)
+		}
+		return values
 
 	def calc_nutrient_rqmts(self, temp):
 		"""
@@ -168,11 +205,19 @@ class Calf(AnimalBase):
 			wean_day = True
 			self.wean_weight = self.body_weight
 			self.events.add_event(self.days_born, 'Wean Day')
-			self.days_born -= 1  # will increment by 1 again in heifer update
+			self.days_born -= 1 # will increment by 1 again in heifer update
 		else:
-			self.body_weight += np.random.normal(
+			gained_weight = np.random.normal(
 				AnimalBase.config['avg_daily_gain_c'],
 				AnimalBase.config['std_daily_gain_c'])
+			while gained_weight < AnimalBase.config['avg_daily_gain_c'] \
+				- 2 * AnimalBase.config['std_daily_gain_c'] \
+				or gained_weight > AnimalBase.config['avg_daily_gain_c'] \
+					+ 2 * AnimalBase.config['std_daily_gain_c']:
+				gained_weight = np.random.normal(
+					AnimalBase.config['avg_daily_gain_c'],
+					AnimalBase.config['std_daily_gain_c'])
+			self.body_weight += gained_weight
 
 		self.daily_growth = self.body_weight - prev_weight
 
