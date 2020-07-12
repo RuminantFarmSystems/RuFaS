@@ -26,7 +26,7 @@ def calc_requirements(calf, temp, wean_day, wean_length, milk_type):
     milk_replacer_id = 156
     starter_id = 157
 
-    conn = sqlite3.connect('Inputs/feeds.sqlite')
+    conn = sqlite3.connect('input/databases/feeds.sqlite')
     cur = conn.cursor()
     cur.execute('SELECT * FROM nutrients WHERE feed_id = ?', (whole_milk_id,))
     whole_milk = cur.fetchone()
