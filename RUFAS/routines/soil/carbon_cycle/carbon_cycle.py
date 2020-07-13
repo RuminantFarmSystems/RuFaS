@@ -31,7 +31,7 @@ def update_all(crop_type, soil, weather, time):
     soil.residue_DM = soil.residue * (1 - soil.plant_moisture)
 
     # B. residue partitioning
-    # TODO delete 100's eventually, check lignin residue percent
+    # TODO delete 100's eventually, check lignin residue percent in soil.py
     # TODO fr_N might need a different calculation in the future
     LN_ratio_AG = 0
     if crop_type.fr_N != 0:
@@ -63,6 +63,7 @@ def update_all(crop_type, soil, weather, time):
         base_2 = (layer.water_fac - c) / (a - c)
         M_d = (base_1 ** e1) * (base_2 ** e2)
 
+        # above ground metabolic residue
         metabolic_AG_to_C_active = metabolic_AG_active_decomp * M_d * T_d * layer.metabolic_AG
 
         metabolic_AG_to_BG = layer.metabolic_AG * layer.fr_tillage  # TODO fr_tillage, percent_incorp?
@@ -88,14 +89,14 @@ def update_all(crop_type, soil, weather, time):
 
         # below ground metabolic residue and roots
         residue_DM_incorp = layer.fr_tillage * soil.residue_DM
-        fr_lignin_residue_DM = 0
+        fr_residue_DM = 0
         if residue_DM_incorp + crop_type.bio_BG_DM != 0:
-            fr_lignin_residue_DM = residue_DM_incorp / (residue_DM_incorp + crop_type.bio_BG_DM)
+            fr_residue_DM = residue_DM_incorp / (residue_DM_incorp + crop_type.bio_BG_DM)
 
         LN_ratio_BG = 0
         if crop_type.fr_N != 0:
-            LN_ratio_BG = LN_ratio_AG * fr_lignin_residue_DM + ((soil.lignin_residue_percent / 100) / crop_type.fr_N) \
-                          * (1 - fr_lignin_residue_DM) / 100
+            LN_ratio_BG = LN_ratio_AG * fr_residue_DM + ((soil.lignin_residue_percent / 100) / crop_type.fr_N) \
+                          * (1 - fr_residue_DM)
 
         metabolic_BG_frac = 0.85 - 0.18 * LN_ratio_BG
 
@@ -169,7 +170,7 @@ def update_all(crop_type, soil, weather, time):
         fr_slow_to_passive = 0.03
 
         slow_to_active = carbon_slow_decomp * (1 - fr_CO2_carbon_slow_loss - fr_slow_to_passive)
-        carbon_slow_loss = carbon_slow_decomp * (1 - fr_CO2_carbon_slow_loss)
+        carbon_slow_loss = carbon_slow_decomp * fr_CO2_carbon_slow_loss
         slow_to_passive = carbon_slow_decomp * fr_slow_to_passive
 
         fr_CO2_carbon_passive_loss = 0.55
@@ -202,7 +203,8 @@ def update_all(crop_type, soil, weather, time):
             depth = layer.bottom_depth - curr_depth
         curr_depth += depth
 
-        soil_volume = depth / 10 * soil.area
+        # depth below in meters
+        soil_volume = depth * 10 * soil.area
         soil_mass = (layer.bulk_density / 0.001) * soil_volume
 
         # G. aggregate Soil Carbon Pools (Active, Slow, and Passive) and CO2 Gas Flux.
