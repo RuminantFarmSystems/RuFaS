@@ -49,15 +49,15 @@ def set_globals():
     global dRUP
 
     price = [5, 8, 10, 12, 6]
-    NEmaint = 20
-    NEa = 30
-    NEpreg = 20
-    NEl = 40
-    NEg = 50
-    MP_req = 40
-    C_req = 30
-    P_req = 40
-    DMIest = 60
+    NEmaint = 10
+    NEa = 15
+    NEpreg = 8
+    NEl = 4
+    NEg = 5
+    MP_req = 4
+    C_req = 3
+    P_req = 4
+    DMIest = 6
     TDN = [56, 55.91, 53.2, 51, 60]
     DE = [3.2, 2, 4.2, 3, 5]
     EE = [3.2, 2, 6, 90, 5]
@@ -75,7 +75,13 @@ def set_globals():
     CP = [23.4, 26, 27, 21, 24]
     dRUP = [70, 67, 56, 76, 82]
 
-
+def list_reconfig(list):
+    list_reconfig = []
+    for i in list:
+        list_reconfig.append(i)
+        list_reconfig.append(i)
+        list_reconfig.append(i)
+    return list_reconfig
 
 def objective(x):
     """
@@ -253,7 +259,10 @@ def protien_constraint(x):
             is_conc.append(1)
         else:
             is_conc.append(0)
-    PercentConc = (sum(np.multiply(x, is_conc)) / DMI) * 100
+    if DMI != 0:
+        PercentConc = (sum(np.multiply(x, is_conc)) / DMI) * 100
+    else:
+        PercentConc = 0
     #Protein passage rate of feed i (%/h)
     Kp = []
     for i in range(len(type)):      #[A.Cow.E.9]
@@ -364,6 +373,17 @@ def DMI_constraint(x):
     """
     return (-(sum(x)) + DMIest)
 
+def NEmact_limit_constraint(x):
+    n = len(price) / 3
+    list = []
+    for i in range(int(n)):
+        a = i*3
+        list.append(x[a]*x[a+1])
+        list.append(x[a]*x[a+2])
+        list.append(x[a+1]*x[a+2])
+    #print(sum(list) == x[0]*x[1]+x[1]*x[2]+x[0]*x[2]+x[3]*x[4]+x[3]*x[5]+x[4]*x[5]+x[6]*x[7]+x[7]*x[8]+x[6]*x[8]+x[9]*x[10]+x[9]*x[11]+x[10]*x[11]+x[12]*x[13]+x[12]*x[14]+x[13]*x[14])
+    #return sum(list)
+    return x[0]*x[1]+x[1]*x[2]+x[0]*x[2]+x[3]*x[4]+x[3]*x[5]+x[4]*x[5]+x[6]*x[7]+x[7]*x[8]+x[6]*x[8]+x[9]*x[10]+x[9]*x[11]+x[10]*x[11]+x[12]*x[13]+x[12]*x[14]+x[13]*x[14]
 
 def optimize():
     """
@@ -378,15 +398,16 @@ def optimize():
     """
 
     n = len(price)
-    x0 = np.zeros(n)
+    x0 = [1] * n
 
     ## OPTIMIZE:
     #establishing the bounds of the NLP
-    b= (0.01, 100)
+    b= (0, 100)
     bnds = []
     for i in range(len(price)):
         bnds.append(b)
     bnds = tuple(bnds)
+
     #establishing the constraints of the NLP
     con1 = {'type': 'ineq', 'fun': NEmact_constraint}
     con2 = {'type': 'ineq', 'fun': NEl_constraint}
@@ -399,14 +420,33 @@ def optimize():
     con9 = {'type': 'ineq', 'fun': fat_constraint}
     con10 = {'type': 'ineq', 'fun': DMI_constraint}
     con11 = {'type': 'ineq', 'fun': protien_constraint}
-    cons = ([con1, con2, con3, con4, con5, con6, con7, con8, con9, con10, con11])
+    con12 = {'type': 'eq', 'fun': NEmact_limit_constraint}
+    cons = ([con1, con2, con3, con4, con5, con6, con7, con8, con9, con10, con11, con12])
 
     solution = minimize(objective, x0, method='SLSQP', bounds=bnds, constraints=cons)
 
     return(solution)
 
 set_globals()
+price = list_reconfig(price)
+TDN = list_reconfig(TDN)
+DE = list_reconfig(DE)
+EE = list_reconfig(EE)
+is_fat = list_reconfig(is_fat)
+Ca = list_reconfig(Ca)
+P = list_reconfig(P)
+NDF = list_reconfig(NDF)
+type = list_reconfig(type)
+is_wetforage = list_reconfig(is_wetforage)
+Kd = list_reconfig(Kd)
+NA = list_reconfig(NA)
+NB = list_reconfig(NB)
+CP = list_reconfig(CP)
+dRUP = list_reconfig(dRUP)
+
 solution = optimize()
 print(solution.x)
 print(objective(solution.x))
 print(solution.success)
+rounded = [round(num, 2) for num in solution.x]
+print(rounded)
