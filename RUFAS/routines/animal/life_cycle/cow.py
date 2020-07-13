@@ -51,25 +51,49 @@ class Cow(HeiferIII):
 		"""
 		Description:
 			initialize the cow from heifer
-		Args:
-			heiferIII: third stage of heifer, pass heifer information from
-				heiferIII
-			args:
-				(in addition to heiferIII information)
-				args.repro_program: reproduction program used in cow,
+		Input:
+			args.id: id of the cow
+			args.breed: breed of the cow
+			args.birth_date: the date of the simulation when the calf was born
+			args.daysBorn: age of the animal
+			args.repro_program: reproduction program used in heifer, 
+				three of them: ED, TAI, and synch-ED programs
+			args.tai_method_h: timed-AI protocols used for 
+				reproduction programs, three of them: 5dCG2P, 
+				5dCGP, and user-defined
+			args.synch_ed_method_h: synch ed protocols used for 
+				reproduction programs, two of them: 2P and CP
+			args.repro_program: reproduction program used in cow,
 					three of them: ED, TAI, and ED-TAI programs
-				args.presynch_method: presych protocols used for presynch
-					programs, four of them: PreSynch, Double OvSynch, G6G,
-					and user_defined
-				args.tai_method_c: timed-AI protocols used for reproduction
-					programs, five of them: OvSynch 56, OvSynch 48, CoSynch 72,
-					5d CoSynch, and user-defined
-				args.resynch_method: resynch protocols used for resynch
-					programs, three of them: TAIafterPD, TAIbeforePD,
-					and PGFatPD
-				(optional)
-				args.days_in_milk: cow's current day in milk
-				args.parity: parity of the cow
+			args.presynch_method: presych protocols used for presynch
+				programs, four of them: PreSynch, Double OvSynch, G6G,
+				and user_defined
+			args.tai_method_c: timed-AI protocols used for reproduction
+				programs, five of them: OvSynch 56, OvSynch 48, CoSynch 72,
+				5d CoSynch, and user-defined
+			args.resynch_method: resynch protocols used for resynch
+				programs, three of them: TAIafterPD, TAIbeforePD,
+				and PGFatPD
+			(optional: include the following to assign cow information) 
+			args.birth_weight: the birth weight of the cow
+			args.body_weight: current body weight of the cow
+			args.wean_weight: the wean weight of the cow
+			args.mature_body_weight: the mature body weight of the cow
+			args.events: events of the cow
+			args.estrus_count
+			args.estrus_day
+			args.tai_program_start_day_h
+			args.synch_ed_program_start_day_h
+			args.synch_ed_estrus_day
+			args.stop_day
+			args.conception_rate
+			args.ai_day
+			args.abortion_day
+			args.days_in_preg
+			args.gestation_length
+			args.p_gest_for_calf
+			args.days_in_milk: cow's current day in milk
+			args.parity: parity of the cow
 		"""
 		super().__init__(args)
 
@@ -268,7 +292,10 @@ class Cow(HeiferIII):
 			self.DBW = result[2]
 			self.daily_growth = self.DBW
 		else:
-			self.nutrient_rqmts = dry_calculate_rqmts()
+			result = dry_calculate_rqmts()
+			self.nutrient_rqmts = result[0]
+			self.DMIest = result[1]
+			self.DBW = result[2]
 
 	def calc_init_nutrient_rqmts(
 			self, vertical_distance, horizontal_distance, housing,

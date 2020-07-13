@@ -11,11 +11,11 @@ from .. import graphics
 
 
 class PenReport(BaseReportDriver):
-    def __init__(self, data, pen_id):
+    def __init__(self, data, feed, pen_id):
         super().__init__(data)
         self.pen_id = pen_id
         self.reports = {
-            'ration_report': self.RationReport(data['ration_report'], self.pen_id),
+            'ration_report': self.RationReport(data['ration_report'], feed, self.pen_id),
             'growth_report': self.GrowthReport(data['growth_report'], self.pen_id),
             'manure_report': self.ManureReport(data['manure_report'], self.pen_id)
         }
@@ -68,7 +68,7 @@ class PenReport(BaseReportDriver):
             self.manure_info = {}
 
     class RationReport(BasePenReport):
-        def __init__(self, data, pen_id):
+        def __init__(self, data, feed, pen_id):
             super().__init__(data, pen_id)
             self.ration_interval = data['ration_interval']
 
@@ -76,6 +76,17 @@ class PenReport(BaseReportDriver):
                                     'j_day': ['time.day', '', []],
                                     'num_animals': ['len(pen.animals_in_pen)', '', []]
                                     }
+
+            all_feeds = feed.all_feed_ids
+            for feed_id in all_feeds:
+                feed_name = all_feeds[feed_id]['feed_name']
+                units = all_feeds[feed_id]['units']
+
+                self.daily_variables[feed_id + "(" + feed_name + ")"] = \
+                    [
+                        'pen.ration[\'%s\'] if pen.pen_populated and \'%s\' in feed.available_feeds else 0' % (
+                        feed_id, feed_id), units,
+                        []]
 
             self.annual_variables = {
                 'year': ['time.cal_year', '', 0]
