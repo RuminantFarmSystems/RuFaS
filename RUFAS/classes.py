@@ -1,4 +1,3 @@
-################################################################################
 """
 RUFAS: Ruminant Farm Systems Model
 File name: classes.py
@@ -8,9 +7,10 @@ Author(s): Kass Chupongstimun, kass_c@hotmail.com
            William Donovan, wmdonovan@wisc.edu
            Jacob Johnson, jacob8399@gmail.com
 """
-################################################################################
 
 import csv
+import json
+from pathlib import Path
 
 from RUFAS import util
 from RUFAS import errors
@@ -37,10 +37,12 @@ class State:
     """
 
     def __init__(self, data, config, time):
-        self.soil = Soil(data['soil'], config)
-        self.feed = Feed(data['feed'])
-        self.animal_management = AnimalManagement(data['animal'], config, self.feed)
-        self.crop = Crop(data['crop'], time)
+        input_dir = util.get_base_dir() / 'input'
+        self.soil = Soil(read_json_file(input_dir / 'soil' / data['soil']), config)
+        self.feed = Feed(read_json_file(input_dir / 'feed' / data['feed']))
+        self.animal_management = AnimalManagement(read_json_file(input_dir / 'animal' / data['animal']),
+                                                  config, self.feed)
+        self.crop = Crop(read_json_file(input_dir / 'crop' / data['crop']), time)
 
     # self.fieldOps = FieldOps()
     # self.herd = Herd()
@@ -56,6 +58,23 @@ class State:
         self.soil.annual_reset()
         self.crop.annual_reset()
         self.animal_management.annual_reset()
+
+
+def read_json_file(file_path: Path):
+    try:
+        if file_path.suffix == '.json':
+            if not file_path.is_file():
+                raise errors.UserInput(str(file_path) + ' does not exist')
+        else:
+            raise errors.UserInput(str(file_path) + ' is not a JSON file')
+
+        with file_path.open('r') as f:
+            data = json.load(f)
+
+        return data
+
+    except errors.UserInput as e:
+        print(e.msg)
 
 
 # -------------------------------------------------------------------------------
@@ -81,7 +100,7 @@ class Config:
         leap_year_length = 366
 
         # read in the input csv file
-        weather_full_path = util.get_base_dir() / weather_path_str
+        weather_full_path = util.get_base_dir() / 'input/weather' / weather_path_str
 
         if not weather_full_path.is_file():
             raise errors.JSONfileData("WEATHER",
@@ -221,8 +240,8 @@ class Config:
             self.years.append(days)
         
         self.sim_length = self.calc_sim_length(leap_year_length, year_length)
-        self.output_dir = data['output_dir']
-        self.diagnostic_dir = data['diagnostic_dir']
+        self.csv_dir = data['csv_dir']
+        self.graphic_dir = data['graphic_dir']
 
     def calc_sim_length(self, leap_year_length, year_length):
         """
@@ -299,7 +318,7 @@ class Weather:
             # TODO: manureN is a temporary weather file input until manure storage is implemented
 
         # read in the input csv file
-        weather_full_path = util.get_base_dir() / weather_path_str
+        weather_full_path = util.get_base_dir() / 'input/weather' / weather_path_str
 
         if not weather_full_path.is_file():
             raise errors.JSONfileData("WEATHER",

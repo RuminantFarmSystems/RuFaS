@@ -1,4 +1,3 @@
-
 """
 RUFAS: Ruminant Farm Systems Model
 
@@ -23,7 +22,6 @@ CropType attribute definitions:
 
     act_N_up_each_layer = List of actual nitrogen uptakes from each soil layer.
 """
-###############################################################################
 
 
 #

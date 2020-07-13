@@ -7,7 +7,7 @@ Author(s): Kass Chupongstimun, kass_c@hotmail.com
            Jit Patil, spatil5@wisc.edu
            William Donovan, wmdonovan@wisc.edu
 
-This module needs the following inputs in order to operate correctly:
+This module needs the following input in order to operate correctly:
 
     These are attributes of a soil profile that need to be specified in the json input
     file. The values on the right are just examples from a soil profile with 1 layer.
@@ -24,7 +24,7 @@ This module needs the following inputs in order to operate correctly:
         "Silt": 65,
         "SoilAlbedo": 0.16,
         "initial_residue": 0,
-        "FreshNMineralRate": 0.05,
+        "fresh_NMineralRate": 0.05,
         "SoilCoverType": "BARE",
 
         These are attributes defined for each layer of the soil profile. Any
@@ -44,9 +44,9 @@ This module needs the following inputs in order to operate correctly:
                 "Clay": 20,
                 "InitialTemperature": 15.77575,
                 "BulkDensity": 1.4,
-                "OrgC%": 1.2,
+                "org_C%": 1.2,
                 "NH4": 1,
-                "FracActiveN": 0.02,
+                "active_N_frac": 0.02,
                 "LabileP": 15,
                 "ActiveMineralRate": 0.0003,
                 "VolatileExchangeFac": 0.15,
@@ -208,6 +208,9 @@ def annual_variable_update(soil):
 
     soil.p_act_annual += soil.p_act
 
+    soil.manure_app_annual += soil.manure_app
+    soil.manure_P_annual += soil.manure_P
+
 
 # -------------------------------------------------------------------------------
 # Class: Soil
@@ -282,7 +285,13 @@ class Soil:
         self.area = data['FieldSize']
 
         # Initialize phosphorus variables
-        # "pseudocode_soil" S.5.A
+        # "pseudocode_soil" S.6.A
+        self.labile_P = 0.0
+        self.active_P = 0.0
+        self.stable_P = 0.0
+        self.org_P = 0.0
+        self.soil_P = 0.0
+
         for layer in self.soil_layers:
 
             # S.5.A.1
@@ -294,16 +303,20 @@ class Soil:
             # S.5.A.2
             layer.labile_P = layer.labile_P * layer.bulk_density \
                              * layer.thickness_cm * 0.1
+            self.labile_P += layer.labile_P
 
             # S.5.A.3
             layer.active_P = layer.labile_P * (1.0 - layer.PSP_act) / layer.PSP_act
+            self.active_P += layer.active_P
 
             # S.5.A.4
             layer.stable_P = layer.active_P * 4.0
+            self.stable_P += layer.stable_P
 
             # S.5.A.5 TODO organic soil pools (labile_O, and active_O) are not being tracked
             layer.org_P = layer.org_C / 8.0 / 14.0 * 10000 * layer.bulk_density \
                           * layer.thickness_cm * 0.1
+            self.org_P += layer.org_P
 
             # S.5.A.6
             layer.mass = layer.bulk_density * layer.thickness_cm * 10000
@@ -323,9 +336,10 @@ class Soil:
         self.depth_fact = 0.0
 
         # manure
+        self.manure_app = 0.0
+
         self.manure_type = 0
-        self.manure_annual = 0
-        self.manure_P_annual = 0
+        self.manure_app_annual = 0
 
         self.WIP = 0.0
         self.WOP = 0.0
@@ -335,6 +349,9 @@ class Soil:
         self.manure_mass_app = 0.0
 
         # soluble_p
+        self.DRP_leached = 0.0
+        self.M_DRP_runoff = 0.0
+
         self.DRP_runoff_annual = 0.0
         self.DRP_leachate_annual = 0.0
 
@@ -358,7 +375,6 @@ class Soil:
         self.M_leach = 0.0
         self.DP = 0.0
         self.N_sum = 0.0
-        self.M_DRP_runoff = 0.0
         self.TIP_runoff = 0.0
 
         self.TIP_runoff_annual = 0.0
@@ -375,46 +391,44 @@ class Soil:
         self.calculateFcWater()  # calculate field capacity water in layer
         self.calculateSatWater()  # calculate saturation water in layer
 
-        self.profile_SW = 0.0
-
-        for layer in self.soil_layers:
-            self.profile_SW += layer.soil_water
-
-        self.initial_annual_SW = self.profile_SW
-
         # daily output values
         self.evap_max = 0.0
         self.trans_max = 0.0
         self.ET_max = 0.0
 
         # daily water balance
+        self.profile_SW = 0.0
+
+        for layer in self.soil_layers:
+            self.profile_SW += layer.soil_water
+
+        self.initial_profile_SW = self.profile_SW
+
+        self.p_act = 0.0
+        self.p_calc = 0.0
+        self.water_balance_difference = 0.0
         self.delta_SW = 0.0
+
         self.runoff = 0.0
         self.evap_sum = 0.0
         self.trans_sum = 0.0
         self.drainage = 0.0
-
-        self.p_act = 0.0
-        self.p_calc = 0.0
-
-        self.water_balance_difference = 0.0
 
         # annual variables
         self.ET_max_annual = 0.0
         self.ET_annual = 0.0
 
         # annual water balance
+        self.p_act_annual = 0.0
+        self.p_calc_annual = 0.0
+        self.water_balance_difference_annual = 0.0
         self.delta_SW_annual = 0.0
+
         self.runoff_annual = 0.0
         self.evap_annual = 0.0
         self.trans_annual = 0.0
         self.ET_annual = 0.0
         self.drainage_annual = 0.0
-
-        self.p_act_annual = 0.0
-        self.p_calc_annual = 0.0
-
-        self.annual_water_balance_difference = 0.0
 
         self.infiltration = 0.0
 
@@ -426,9 +440,8 @@ class Soil:
 
         # daily soil nitrogen values
         self.residue = data['initial_residue']
-        self.freshNMineralRate = data['FreshNMineralRate']
+        self.fresh_NMineralRate = data['fresh_NMineralRate']
         self.decayRate = 0.0
-        self.topLayerFreshN = 0.0
 
         # soil phosphorus attributes
         self.lightFactor = []
@@ -440,11 +453,14 @@ class Soil:
         self.NH4_runoff = 0.0
 
         self.N_uptake = 0.0
+        self.NO3_drainage = 0.0
+        self.NH4_drainage = 0.0
+        self.active_N_drainage = 0.0
 
         self.NH4_erosion = 0.0
-        self.activeN_erosion = 0.0
-        self.stableN_erosion = 0.0
-        self.freshN_erosion = 0.0
+        self.active_N_erosion = 0.0
+        self.stable_N_erosion = 0.0
+        self.fresh_N_erosion = 0.0
 
         self.NO3_runoff_annual = 0.0
         self.NH4_runoff_annual = 0.0
@@ -452,13 +468,13 @@ class Soil:
         self.N_uptake_annual = 0.0
 
         self.NH4_erosion_annual = 0.0
-        self.activeN_erosion_annual = 0.0
-        self.stableN_erosion_annual = 0.0
-        self.freshN_erosion_annual = 0.0
+        self.active_N_erosion_annual = 0.0
+        self.stable_N_erosion_annual = 0.0
+        self.fresh_N_erosion_annual = 0.0
 
         self.NO3_drainage_annual = 0.0
         self.NH4_drainage_annual = 0.0
-        self.activeN_drainage_annual = 0.0
+        self.active_N_drainage_annual = 0.0
 
         # ------ INITIALIZE SOIL NITROGEN POOLS ------------------------------------
         # Calculate initial amount of NO3 in each soil layer;
@@ -472,19 +488,19 @@ class Soil:
             NO3 = 7 * exp_part
 
             # "pseudocode_soil" S.4.A.2
-            OrgC = layer.org_C
-            OrgN = (10 ** 4) * (OrgC / 14)
+            org_C = layer.org_C
+            org_N = (10 ** 4) * (org_C / 14)
 
             # "pseudocode_soil" S.4.A.3
             FracN = 0.02
-            activeN = FracN * OrgN
+            active_N = FracN * org_N
 
             # "pseudocode_soil" S.4.A.4
-            stableN = (1 - FracN) * OrgN
+            stable_N = (1 - FracN) * org_N
 
             # "pseudocode_soil" S.4.A.5
             res = self.residue
-            FreshN = 0.0015 * res
+            fresh_N = 0.0015 * res
 
             # "pseudocode_soil" S.4.A.6
             NH4 = layer.NH4
@@ -495,11 +511,71 @@ class Soil:
             unit_adjustment = (BD * thickness) / 100
 
             layer.NO3 = NO3 * unit_adjustment
-            layer.orgN = OrgN
-            layer.activeN = activeN * unit_adjustment
-            layer.stableN = stableN * unit_adjustment
+            layer.org_N = org_N
+            layer.active_N = active_N * unit_adjustment
+            layer.stable_N = stable_N * unit_adjustment
             layer.NH4 = NH4 * unit_adjustment
-            layer.topLayerFreshN = FreshN * unit_adjustment
+            self.fresh_N = fresh_N * unit_adjustment
+        # daily nitrogen balance
+        self.fresh_N = 0.0
+
+        self.profile_N = 0.0
+        for layer in self.soil_layers:
+            self.profile_N += layer.NO3 + layer.NH4 + \
+                              layer.org_N + layer.active_N + layer.stable_N
+
+        self.profile_N += self.fresh_N
+        self.initial_profile_N = self.profile_N
+
+        self.manure_N = 0.0
+        self.N_calc = 0.0
+        self.N_balance_difference = 0.0
+        self.delta_N = 0.0
+
+        self.N_drainage = 0.0
+        self.N_runoff = 0.0
+        self.N_erosion = 0.0
+        self.N_uptake = 0.0
+
+        # annual nitrogen balance
+        self.manure_N_annual = 0.0
+        self.N_calc_annual = 0.0
+        self.N_balance_difference_annual = 0.0
+        self.delta_N_annual = 0.0
+
+        self.N_drainage_annual = 0.0
+        self.N_runoff_annual = 0.0
+        self.N_erosion_annual = 0.0
+        self.N_uptake_annual = 0.0
+
+        # daily phosphorus balance
+        self.profile_P = 0.0
+        for layer in self.soil_layers:
+            self.profile_P += layer.labile_P + layer.active_P + \
+                              layer.stable_P + layer.org_P
+
+        self.initial_profile_P = self.profile_P
+
+        self.manure_P = 0.0
+        self.P_calc = 0.0
+        self.P_balance_difference = 0.0
+        self.delta_P = 0.0
+
+        self.P_drainage = 0.0
+        self.P_runoff = 0.0
+        self.P_erosion = 0.0
+        self.P_uptake = 0.0
+
+        # annual phosphorus balance
+        self.manure_P_annual = 0.0
+        self.P_calc_annual = 0.0
+        self.P_balance_difference_annual = 0.0
+        self.delta_P_annual = 0.0
+
+        self.P_drainage_annual = 0.0
+        self.P_runoff_annual = 0.0
+        self.P_erosion_annual = 0.0
+        self.P_uptake_annual = 0.0
 
     # ---------------------------------------------------------------------------
     # Class: SoilLayer
@@ -556,7 +632,7 @@ class Soil:
             self.clay = layer_data['Clay']  # soil clay % in soil layer
 
             # Variable to simulate nitrogen Cycling
-            self.org_C = layer_data['OrgC%']
+            self.org_C = layer_data['org_C%']
             self.activeMineralRate = layer_data['ActiveMineralRate']
             self.cationExclusionFraction = layer_data['CationExclusionFraction']
             self.denitrificationRate = layer_data['DenitrificationRate']
@@ -569,17 +645,17 @@ class Soil:
             self.NO3 = 0.0
 
             # Organic N (Active + Stable, mg/kg):
-            self.orgN = 0.0
+            self.org_N = 0.0
 
             # Initial Active N in layer:
-            self.activeN = 0.0
+            self.active_N = 0.0
 
             # Initial Stable N in layer:
-            self.stableN = 0.0
+            self.stable_N = 0.0
 
             self.NO3_perc = 0.0
             self.NH4_perc = 0.0
-            self.active_perc = 0.0
+            self.active_N_perc = 0.0
             self.nMinAct = 0.0
             self.nitrification = 0.0
             self.volatilization = 0.0
@@ -588,7 +664,7 @@ class Soil:
             self.totNitriVolatil = 0.0
 
             self.deNrate = layer_data['DenitrificationRate']
-            self.fracActiveN = layer_data['FracActiveN']
+            self.active_N_frac = layer_data['active_N_frac']
             self.volatileExchangeFactor = layer_data['VolatileExchangeFac']
 
             self.N_uptake = 0.0
@@ -621,7 +697,6 @@ class Soil:
             self.pbal = 0.0
             self.days_unbalanced_labile = 0.0
             self.days_unbalanced_active = 0.0
-
 
     # ---------------------------------------------------------------------------
     # Class: Fertilizer
@@ -771,18 +846,41 @@ class Soil:
         for layer in self.soil_layers:
             layer.wilting_water = layer.thickness * layer.wilting_point
 
-    def calculate_annual_water_balance(self):
+    def annual_mass_balance(self):
         """
         Description:
             Calculates annual water balance
         """
-        self.delta_SW_annual = self.profile_SW - self.initial_annual_SW
+        self.annual_water_balance()
+        self.annual_phosphorus_balance()
+        self.annual_nitrogen_balance()
+
+    def annual_water_balance(self):
+        self.delta_SW_annual = self.profile_SW - self.initial_profile_SW
 
         self.p_calc_annual = self.delta_SW_annual \
             + self.runoff_annual + self.evap_annual + self.trans_annual \
             + self.drainage_annual
 
-        self.annual_water_balance_difference = self.p_act_annual - self.p_calc_annual
+        self.water_balance_difference_annual = self.p_act_annual - self.p_calc_annual
+
+    def annual_phosphorus_balance(self):
+        self.delta_P_annual = self.profile_P - self.initial_profile_P
+
+        self.P_calc_annual = self.delta_P_annual + \
+                             self.P_runoff_annual + self.P_drainage_annual + \
+                             self.P_erosion_annual + self.P_uptake_annual
+
+        self.P_balance_difference_annual = self.manure_P_annual - self.P_calc_annual
+
+    def annual_nitrogen_balance(self):
+        self.delta_N_annual = self.profile_N - self.initial_profile_N
+
+        self.N_calc_annual = self.delta_N_annual + \
+                             self.N_runoff_annual + self.N_drainage_annual + \
+                             self.N_erosion_annual + self.N_uptake_annual
+
+        self.N_balance_difference_annual = self.manure_N_annual - self.N_calc_annual
 
     def annual_reset(self):
         """
@@ -790,20 +888,38 @@ class Soil:
             Resets the annual values for the next year.
         """
 
-        self.ET_max_annual = 0.0
-        self.evap_annual = 0.0
-        self.trans_annual = 0.0
-        self.ET_annual = 0.0
-        self.drainage_annual = 0.0
-        self.runoff_annual = 0.0
-        self.ET_annual = 0.0
+        # annual mass balance reset
+        self.initial_profile_SW = self.profile_SW
 
         self.p_act_annual = 0
         self.p_calc_annual = 0
+        self.drainage_annual = 0.0
+        self.runoff_annual = 0.0
+        self.evap_annual = 0.0
+        self.trans_annual = 0.0
 
-        # initial annual soil water is set to soil water on the last day of the
-        # previous year
-        self.initial_annual_SW = self.profile_SW
+        self.initial_profile_N = self.profile_N
+
+        self.manure_N_annual = 0.0
+        self.N_calc_annual = 0.0
+        self.N_drainage_annual = 0.0
+        self.N_runoff_annual = 0.0
+        self.N_erosion_annual = 0.0
+
+        self.initial_profile_P = self.profile_P
+
+        self.manure_app_annual = 0.0
+
+        self.manure_P_annual = 0.0
+        self.P_calc_annual = 0.0
+        self.P_drainage_annual = 0.0
+        self.P_runoff_annual = 0.0
+        self.P_erosion_annual = 0.0
+
+        self.ET_max_annual = 0.0
+        self.ET_annual = 0.0
+
+        self.ET_annual = 0.0
 
         self.NO3_runoff_annual = 0.0
         self.NH4_runoff_annual = 0.0
@@ -811,16 +927,13 @@ class Soil:
         self.N_uptake_annual = 0.0
 
         self.NH4_erosion_annual = 0.0
-        self.activeN_erosion_annual = 0.0
-        self.stableN_erosion_annual = 0.0
-        self.freshN_erosion_annual = 0.0
+        self.active_N_erosion_annual = 0.0
+        self.stable_N_erosion_annual = 0.0
+        self.fresh_N_erosion_annual = 0.0
 
         self.NO3_drainage_annual = 0.0
         self.NH4_drainage_annual = 0.0
-        self.activeN_drainage_annual = 0.0
-
-        self.manure_annual = 0.0
-        self.manure_P_annual = 0
+        self.active_N_drainage_annual = 0.0
 
         self.DRP_runoff_annual = 0.0
         self.DRP_leachate_annual = 0.0
@@ -836,4 +949,3 @@ class Soil:
 
         self.TIP_runoff_annual = 0.0
         self.M_DRP_runoff_annual = 0.0
-
