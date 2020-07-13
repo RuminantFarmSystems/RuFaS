@@ -1193,13 +1193,13 @@ class Cow(HeiferIII):
 			==> Cow: \n
 			ID: {} \n
 			Enter herd date: {}\n
-			Days Born: {}\n
+			days Born: {}\n
 			Body Weight: {}kg\n
 			Repro program: {}\n
 			Parity: {}\n
-			Days in milk: {}\n
+			days in milk: {}\n
 			Milk produced: {}kg\n
-			Days in preg: {}\n
+			days in preg: {}\n
 			Gestation Length: {}\n
 			Life Events: \n
 			{}

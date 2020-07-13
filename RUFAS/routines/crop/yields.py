@@ -4,6 +4,7 @@ RUFAS: Ruminant Farm Systems Model
 File name: yields.py
 
 Author(s): Andy Achenreiner, achenreiner@wisc.edu
+            William Donovan, wmdonovan@wisc.edu
 
 Description: This module contains the necessary functions for calculating and
              updating the yield values of a crop_type. Currently the only
@@ -11,73 +12,30 @@ Description: This module contains the necessary functions for calculating and
              function. The other functions are meant to serve as helper
              functions within this file.
 
-CropType attribute definitions:
-
-    HI_min = Harvest index for the plants in drought conditions
-
-    HI_max = Max potential harvest index for a given day
-
-    gamma_wu = Water deficiency factor
-
-    ET_annual = Sum of actual evapotranspiration from day 1 up to today (mm H20)
-
-    ET_max_annual = Sum of potential evapotranspiration from day 1 up to today (mm H20)
-
-    HI_actual = Actual harvest index
-
-    HI_opt = Potential harvest for the plant at maturity given ideal growing
-             conditions
-
-    bio_AG = Aboveground biomass (kg/ha)
-
-    harvest_eff = Efficiency of the harvest operation, i.e. fraction of yield
-                  biomass removed by the harvesting equipment.
-
-    yield_max = maximum crop yield at harvest (kg/ha)
-
-    yield_actual = Actual crop yield at harvest (kg/ha)
-
-    yield_N = Amount of nitrogen removed in the yield
-
-    yield_P = Amount of phosphorus removed in the yield
-
-    residue = Material in the residue pool for the top 10mm of soil on current
-              day (kg/ha)
-
-
-CropType values updated by update_all():
-
-    gamma_wu
-    HI_max
-    bio_AG
-    HI_actual
-    yield_max
-    yield_actual
-    yield_N
-    yield_P
-    residue
 """
-###############################################################################
 from math import exp
 
 
-#
-# Runs all the yield calculations
-#
+# Runs yield calculations
 def update_all(crop_type, time, soil):
 
     calc_HI_max(crop_type)
     calc_HI_act(crop_type)
+
+    if crop_type.fr_PHU > 1.0:
+        calc_dry_down(crop_type)
+
     calc_yield_max(crop_type)
     calc_yield_act(crop_type)
     calc_nutrient_removal(crop_type)
     calc_residue(crop_type, time, soil)
+    calc_quality_assessment(crop_type)
+    calc_DM_yield(crop_type)
+    calc_NDF_yield(crop_type)
 
 
-#
 # Calculates max potential harvest index for a given day.
 # "pseudocode_crop" C.10.C.1
-#
 def calc_HI_max(crop_type):
     top = 100 * crop_type.fr_PHU
     bottom = 100 * crop_type.fr_PHU + exp(11.1 - (10 * crop_type.fr_PHU))
@@ -97,6 +55,11 @@ def calc_HI_act(crop_type):
     crop_type.HI_actual = term1 * term2 + crop_type.HI_min
 
 
+def calc_dry_down(crop_type):
+    # TODO: stand in for more sophisticated dry down method
+    crop_type.bio_AG -= (crop_type.bio_AG * crop_type.biomass_dry_down_perc)
+
+
 #
 # Calculates maximum crop yield at harvest.
 # "pseudocode_crop" C.10.D.1
@@ -112,7 +75,36 @@ def calc_yield_max(crop_type):
 def calc_yield_act(crop_type):
     crop_type.yield_actual = crop_type.yield_max * crop_type.harvest_eff
 
-    crop_type.yield_annual += crop_type.yield_actual
+
+def calc_quality_assessment(crop_type):
+    """
+    Description:
+        TODO: Stand in for more sophisticated method
+        Assesses quality of feed at harvest
+        "Feed Inventory Pseudocode" F.1.1
+    Args:
+        crop_type: the crop for which a quality is being assessed
+    """
+    crop_type.harvest_quality = 'mid_mature'
+    crop_type.feed_id = crop_type.feed_id
+    if crop_type.crop_name.startswith('corn'):
+        if crop_type.harvest_quality == 'immature':
+            crop_type.feed_id = '35g'
+            crop_type.NDF_harvest_perc = 0.541
+        elif crop_type.harvest_quality == 'mid_mature':
+            crop_type.feed_id = '36g'
+            crop_type.NDF_harvest_perc = 0.45
+        elif crop_type.harvest_quality == 'mature':
+            crop_type.feed_id = '37g'
+            crop_type.NDF_harvest_perc = 0.445
+
+
+def calc_DM_yield(crop_type):
+    crop_type.DM_yield = crop_type.yield_actual * crop_type.DM_harvest_perc
+
+
+def calc_NDF_yield(crop_type):
+    crop_type.NDF_yield = crop_type.yield_actual * crop_type.NDF_harvest_perc
 
 
 #
@@ -120,8 +112,8 @@ def calc_yield_act(crop_type):
 # "pseudocode_crop" C.10.F.1/2
 #
 def calc_nutrient_removal(crop_type):
-    crop_type.yield_N = crop_type.fr_N * crop_type.yield_actual
-    crop_type.yield_P = crop_type.fr_P * crop_type.yield_actual
+    crop_type.N_yield = crop_type.fr_N * crop_type.yield_actual
+    crop_type.P_yield = crop_type.fr_P * crop_type.yield_actual
 
 
 #

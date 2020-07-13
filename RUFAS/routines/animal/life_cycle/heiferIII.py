@@ -139,11 +139,11 @@ class HeiferIII(HeiferII):
         ==> Heifer III: \n
         ID: {} \n
         Birth Date: {}\n
-        Days Born: {}\n
+        days Born: {}\n
         Body Weight: {}kg\n
         Breed Start Day: {}\n
         Repro Method: {}\n
-        Days in pregnancy: {}\n
+        days in pregnancy: {}\n
         Gestation Length: {}\n
         Life Events: \n
         {}

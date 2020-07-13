@@ -52,7 +52,7 @@ class AnimalEvents(object):
 	def __str__(self):
 		res_str = ''
 		for key, value in sorted(self.events.items()):
-			res_str += '\tDays born {}: {} \n'.format(key, value)
+			res_str += '\tdays born {}: {} \n'.format(key, value)
 
 		return res_str
 	

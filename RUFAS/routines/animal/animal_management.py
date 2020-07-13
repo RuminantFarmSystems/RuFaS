@@ -1,4 +1,3 @@
-################################################################################
 """
 RUFAS: Ruminant Farm Systems Model
 File name: animal_management.py
@@ -12,7 +11,7 @@ Description: The class which manages all of the animal routines and keeps track 
 Author(s): Militsa Sotirova, militsasotirova@gmail.com
            Chris VanKerkhove, cjv47@cornell.edu
 """
-################################################################################
+
 from RUFAS.routines.animal.pen import Pen
 from RUFAS.routines.animal.clustering_pen_grouping import grouping
 from RUFAS.routines.animal.life_cycle.life_cycle import LifeCycleManager
@@ -21,7 +20,7 @@ from collections import deque
 import random
 
 
-def daily_animal_routine(animal_management, feed, weather, time):
+def daily_animal_routine(animal_management, feed):
     """
     Executes daily routines relating to Animals. This method is called every day
     in the simulation and calls @animal_management's daily_updates() method
@@ -31,8 +30,6 @@ def daily_animal_routine(animal_management, feed, weather, time):
     Args:
         animal_management: instance of the AnimalManagement class
         feed: instance of the Feed class
-        weather: instance of the Weather class
-        time: instance of the Time class
     """
     animal_management.daily_updates(feed)
 
@@ -122,11 +119,12 @@ class AnimalManagement:
         self.formulation_interval = data['ration']['formulation_interval']
 
     def init_pens(self, pen_info, herd_data):
-        '''
+        """
         Populates the list of pens with the information from the input json file.
         Args:
-            data: dictionary with the pen information from the input json file
-        '''
+            pen_info: dictionary containing information about the pens
+            herd_data: dictionary containing information about the herd
+        """
 
         for pen_name in pen_info:
             pen_data = pen_info[pen_name]
@@ -139,7 +137,8 @@ class AnimalManagement:
             housing_type = pen_data['housing_type']
             bedding_type = pen_data['bedding_type']
             pen_type = pen_data['pen_type']
-            pen = Pen(pen_id, vertical_dist_to_parlor, horizontal_dist_to_parlor, num_stalls, housing_type, bedding_type, pen_type)
+            pen = Pen(pen_id, vertical_dist_to_parlor, horizontal_dist_to_parlor, num_stalls, housing_type,
+                      bedding_type, pen_type)
             self.all_pens.append(pen)
         herd_num = herd_data['herd_num']
 
@@ -172,7 +171,8 @@ class AnimalManagement:
         are calculated and the animals are allocated to pens.
 
         Args:
-            data: dictionary with the herd information from the input json file
+            herd_data: dictionary containing information about the herd
+            pen_data: dictionary containing information about the pens
             feed: instance of the Feed class
         """
         calf_num = herd_data['calf_num']
@@ -208,11 +208,12 @@ class AnimalManagement:
         else:
             self.simulate_animals = True
 
-        self.calves, self.heiferIs, self.heiferIIs, self.heiferIIIs, self.cows \
-            = self.life_cycle_manager.initialize_herd(herd_num, calf_num,
-                                                      heiferI_num, heiferII_num,
-                                                      heiferIII_num, cow_num,
-                                                      replace_num)
+        if self.simulate_animals:
+            self.calves, self.heiferIs, self.heiferIIs, self.heiferIIIs, self.cows \
+                = self.life_cycle_manager.initialize_herd(herd_num, calf_num,
+                                                          heiferI_num, heiferII_num,
+                                                          heiferIII_num, cow_num,
+                                                          replace_num)
 
         if len(pen_data) > 0:
             self.init_nutrient_rqmts(feed)
@@ -352,10 +353,11 @@ class AnimalManagement:
             self.all_pens[pen].set_up_new_animal(calf, -1)
 
     def pen_allocation(self):
-        '''
+        """
         Allocates the animals in all_animals to pens in all_pens based on the animals' characteristics.
-        '''
-        #Assiging non-cows to pens
+        """
+
+        # assigning non-cows to pens
         if len(self.all_pens) == 3:
             self.all_pens[0].update_animals(self.calves)
         elif len(self.all_pens) == 4:
@@ -373,7 +375,7 @@ class AnimalManagement:
             self.all_pens[2].update_animals(self.heiferIIs)
             self.all_pens[3].update_animals(self.heiferIIIs)
 
-        #separate into lactating and dry cow pens
+        # separate into lactating and dry cow pens
         lactating_cows = []
         dry_cows = []
 
@@ -382,24 +384,24 @@ class AnimalManagement:
                 lactating_cows.append(cow)
             else:
                 dry_cows.append(cow)
-        #Asigning Dry Cows to Pens
+        # assigning dry cows to pens
         if len(self.all_pens) == 3:
             dry_and_heifers = self.heiferIs + self.heiferIIs + self.heiferIIIs + dry_cows
             self.all_pens[1].update_animals(dry_and_heifers)
             self.all_pens[2].update_animals(lactating_cows)
-        elif (4 <= len(self.all_pens) <= 6):
-            self.all_pens[len(self.all_pens)-2].update_animals(dry_cows)
-            self.all_pens[len(self.all_pens) -1].update_animals(lactating_cows)
+        elif 4 <= len(self.all_pens) <= 6:
+            self.all_pens[len(self.all_pens) - 2].update_animals(dry_cows)
+            self.all_pens[len(self.all_pens) - 1].update_animals(lactating_cows)
         else:
             self.all_pens[4].update_animals(dry_cows)
-        ###Temporary process below to randomly assign nutrition requirments###
+            # TODO: Temporary process to randomly assign nutrition requirments
             if len(lactating_cows) > 0:
                 for i in range(len(lactating_cows)):
                     lactating_cows[i].ID = i + 1
                     lactating_cows[i].DMPD_req = 90 + random.random() * 34
                     lactating_cows[i].DNED_req = 1.4 + random.random() * 0.3
                 pen_grouping = grouping(lactating_cows, self.all_pens[5:])
-            #Assigning Lactating Cows to Pens based on the grouping output
+                # assigning lactating cows to pens based on the grouping output
                 for key in pen_grouping:
                     self.all_pens[key].update_animals(pen_grouping[key])
 
@@ -527,7 +529,7 @@ class AnimalManagement:
                 pen.pen_populated = len(pen.animals_in_pen) > 0
 
             ids_added, ids_removed, calves_born, self.calves, self.heiferIs, \
-                self.heiferIIs, self.heiferIIIs, self.cows = \
+            self.heiferIIs, self.heiferIIIs, self.cows = \
                 self.life_cycle_manager.daily_update(self.simulation_day,
                                                      self.sim_length,
                                                      self.calves,
@@ -560,7 +562,7 @@ class AnimalManagement:
                 false otherwise.
         """
         return (self.simulation_day % self.formulation_interval) == 1 or \
-            self.formulation_interval == 1
+               self.formulation_interval == 1
 
     def annual_reset(self):
         pass
