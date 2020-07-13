@@ -564,7 +564,7 @@ class Feed:
 
                 storage.DMI_forage_max = storage.inclusion_rate_est
                 storage.DMI_forage_max['lactating_cows'] = 0
-                
+
         # NO QUALITY ASSESSMENT
         # Calculating DMI for all animal classes
         # -----------------------------
@@ -633,6 +633,7 @@ class Feed:
         # Daily feedout for silos with farm grown forages in them per pen based on ration formulated
         for silo in self.storage_options:
             if self.storage_options[silo].days_since_feedout >= 0 and self.storage_options[silo].DM > 0:
+                # TODO: change for when ration formulation is implemented
                 ration = hardcoded_ration.get_ration()
                 if self.storage_options[silo].feed_id in ration:
                     for pen in animal_management.all_pens:
