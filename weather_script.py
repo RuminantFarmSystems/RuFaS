@@ -1,16 +1,33 @@
-from RUFAS import util
 from pathlib import Path
 from RUFAS import errors
-import os
+import csv
 
 
 def main():
+    """
+    Main function of weather_script.py. It executes all the necessary commands to edit the csv_file (using Excel and
+    SQLiteStudio 3) into the correct format and imports it into the Weather Database.
+    """
 
     print("\nRUFAS: Importing Weather Dataset into Database")
-    file = weather_input()
+    in_file = weather_input()
+    out_file = weather_input()
+    with open(in_file, 'r') as data_in:
+        with open(out_file, 'r+') as data_out:
+            delete_extra_rows(data_in, data_out)
 
 
 def weather_input():
+    """
+    Prompts the user for an input file. The function will be called twice: once to input the original weather csv file
+    as downloaded from DAYMET as data_in, and a second time to select a csv where the updated table will be stored as
+    data_out.
+    A valid input is:
+        Valid path to a csv file.
+
+    Returns:
+        A string of the weather csv file path.
+    """
     user_input = input("\nEnter Weather csv File: ")
     print(user_input.lower())
 
@@ -21,10 +38,22 @@ def weather_input():
             raise errors.UserInput("Specified file does not exist")
         else:
             print("Weather csv file Detected...\n")
-        return [input_path]
+        return str(input_path)
     else:
         raise errors.UserInput("Invalid Input")
 
+
+def delete_extra_rows(data_in, data_out):
+    """
+    Deletes the first 7 rows of the csv file. In DAYMET, the first 7 rows contain general information about the
+    dataset. To be in the correct format, the row containing the parameter names should be the first row of the table.
+    """
+    line = 1
+    for row in data_in:
+        if line <= 7:
+            line += 1
+        else:
+            data_out.write(row)
 
 # -------------------------------------------------------------------------------
 # SCRIPT ENTRY POINT
