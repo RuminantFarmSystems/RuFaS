@@ -6,10 +6,18 @@ Author(s): Jacob Johnson, jacob8399@gmail.com,
 """
 
 
-# conducts tillage operations and mixes any manure or fertilizer on
-# the surface into the soil and mixes the soil itself
-# "pseudocode_soil" S.6.D
 def update_all(soil, till_app):
+    """
+    Description:
+        Conducts tillage operations and mixes any manure or fertilizer on
+        the surface into the soil and mixes the soil itself
+        "pseudocode_soil" FM.5
+
+    Args:
+        soil: an instance of the Soil class defined in sol.py
+        till_app: an instance of the BaseApplication class defined in
+            field_management.py representing a user defined tillage application
+    """
 
     depth = till_app['depth']
     perc_incorporated = till_app['percent_incorporated']
@@ -29,7 +37,7 @@ def update_all(soil, till_app):
     for layer in soil.soil_layers:
 
         # incorporate surface manure and fertilizer into the first layer
-        # S.6.D.1
+        # FM.5.1
         if soil.soil_layers.index(layer) == 0:
             # S.6.B.3
             layer.active_P *= soil.area
@@ -38,11 +46,11 @@ def update_all(soil, till_app):
             layer.labile_P += perc_incorporated * \
                               (soil.fert_P_available + soil.fert_P_released)
 
-            # S.6.D.2
+            # FM.5.2
             soil.fert_P_available = soil.fert_P_available - (soil.fert_P_available * perc_incorporated)
             soil.fert_P_released = soil.fert_P_released - (soil.fert_P_released * perc_incorporated)
 
-            # S.6.D.3
+            # FM.5.3
             # TODO: RuFaS does not track org P (03.19.20). When it does, WOP/SOP will be incorporated into organic pools
             layer.labile_P += perc_incorporated * soil.WIP
             layer.active_P += perc_incorporated * soil.SIP
@@ -58,7 +66,7 @@ def update_all(soil, till_app):
             layer.labile_P /= soil.area
 
         # Mix soil in accordance with the tillage operation
-        # S.6.D.4
+        # FM.5.4
         if layer.bottom_depth_cm <= depth:
             ratio = layer.mass / till_soil_mass
             layer.labile_P = (1.0 - perc_mixed) * layer.labile_P \
