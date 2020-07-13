@@ -24,8 +24,8 @@ class AnimalEvents(object):
 		Args:
 			events_str: string representation of events
 		"""
-		split_by_date = list(filter(lambda x: x != '', list(map(lambda x: x.strip(),
-																events_str.lower().split('days born ')))))
+		split_by_date = list(filter(lambda x: x != '', list(
+			map(lambda x: x.strip(), events_str.lower().split('days born ')))))
 
 		for day in split_by_date:
 			split = day.split(': ')

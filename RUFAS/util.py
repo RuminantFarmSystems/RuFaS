@@ -23,9 +23,9 @@ class DatabaseReader:
     def query(self, table, distinct=False, cols=None, identifier=None,
               desired_rows=None, compare_val=None, low_col=None, high_col=None):
         """
-        Based on the parameters given, constructs and executes a query on @table
-        of the following form (all clauses in square brackets are optional,
-        depending on parameters given):
+        Constructs and executes a query on @table of the following form
+        (all clauses in square brackets are optional, depending on parameters
+        given):
         SELECT [DISTINCT] * FROM table [WHERE low_col <= compare_val AND
             high_col >= compare_val] [AND/WHERE identifier IN (desired_rows)]
         or, if columns are specified using @cols:

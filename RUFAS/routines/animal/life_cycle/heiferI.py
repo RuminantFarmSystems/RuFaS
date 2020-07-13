@@ -20,13 +20,22 @@ import numpy as np
 class HeiferI(Calf):
 	# TODO: Body weight changed could be based on nutrition intake later from
 	#  Ration Formulation
-	
+
 	def __init__(self, args):
 		"""
 		Description:
 			initialize the 1st heifer group from calf information
 		Input:
-			args: same as calf
+			args.id: id of the cow
+			args.breed: breed of the cow
+			args.birth_date: the date of the simulation when the calf was born
+			args.daysBorn: age of the animal
+			(optional: include the following to assign cow information) 
+			args.birth_weight: the birth weight of the cow
+			args.body_weight: current body weight of the cow
+			args.wean_weight: the wean weight of the cow
+			args.mature_body_weight: the mature body weight of the cow
+			args.events: events of the cow
 		"""
 		super().__init__(args)
 
@@ -35,7 +44,7 @@ class HeiferI(Calf):
 		Get current information from the heiferI
 		"""
 		return self.get_calf_values()
-		
+
 	def calc_nutrient_rqmts(self):
 		"""
 		Calculates this heiferI's nutrient requirements.
@@ -95,16 +104,16 @@ class HeiferI(Calf):
 		prev_weight = self.body_weight
 
 		gained_weight = np.random.normal(
-			AnimalBase.config['avg_daily_gain_h'], 
+			AnimalBase.config['avg_daily_gain_h'],
 			AnimalBase.config['std_daily_gain_h'])
 		while gained_weight < AnimalBase.config['avg_daily_gain_h'] \
 			- 2 * AnimalBase.config['std_daily_gain_h'] \
 			or gained_weight > AnimalBase.config['avg_daily_gain_h'] \
 				+ 2 * AnimalBase.config['std_daily_gain_h']:
 			gained_weight = np.random.normal(
-				AnimalBase.config['avg_daily_gain_h'], 
+				AnimalBase.config['avg_daily_gain_h'],
 				AnimalBase.config['std_daily_gain_h'])
-		
+
 		self.body_weight += gained_weight
 
 		self.daily_growth = self.body_weight - prev_weight
