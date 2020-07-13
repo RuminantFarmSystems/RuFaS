@@ -416,7 +416,7 @@ class AnimalInitalization:
                 'tai_program_start_day_h': int(row[AnimalValues.tai_program_start_day_h]),
                 'synch_ed_program_start_day_h': int(row[AnimalValues.synch_ed_program_start_day_h]),
                 'synch_ed_estrus_day': int(row[AnimalValues.synch_ed_estrus_day]),
-                'stop_day': int(row[AnimalValues.stop_day]),
+                'synch_ed_stop_day': int(row[AnimalValues.synch_ed_stop_day]),
                 'conception_rate': float(row[AnimalValues.conception_rate]),
                 'ai_day': int(row[AnimalValues.ai_day]),
                 'abortion_day': int(row[AnimalValues.abortion_day]),
