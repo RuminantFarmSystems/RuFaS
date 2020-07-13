@@ -1,4 +1,3 @@
-################################################################################
 """
 RUFAS: Ruminant Farm Systems Model
 File name: feed.py
@@ -10,7 +9,6 @@ Author(s): Kass Chupongstimun, kass_c@hotmail.com,
            Jacob Johnson, jacob8339@gmail.com
            Chris Vankerkhove, cjv47@cornell.edu
 """
-################################################################################
 
 from RUFAS.util import DatabaseReader
 from . import nitrogen_loss, carbon_loss, protein_degradation
@@ -80,16 +78,16 @@ class Feed:
         Args:
             data: the feed information from the input JSON file
         """
-
-        self.__feed_database = data["feed_database"]
-        self.__feeds_table = data['feeds_table']
-        self.__feed_quality_table = data['feed_quality_table']
+        self.d_database = data['feed_database']
+        self.ds_table = data['feeds_table']
+        self.d_quality_table = data['feed_quality_table']
         self.__nutrient_table = data['nutrient_table']
 
-        self.db_reader = DatabaseReader(self.__feed_database)
+        self.db_reader = DatabaseReader(self.d_database)
 
         self.entries_split_by_maturity = self.get_feeds_split_by_maturity()
         self.growing_feeds = data['growing_feeds']
+        self.purchased_feeds_entries = data['purchased_feeds']
         self.purchased_feeds = []  # set in the next method call
 
         self.all_feed_ids = self.get_all_feed_units(data['purchased_feeds'],
@@ -263,7 +261,6 @@ class Feed:
                     self.C_feed_out_particle_percent = 0
                 else:
                     if self.error_1:
-                        # print('"' + self.moisture + '"', 'is not a recognized moisture category for', self.crop_name)
                         self.error_1 = False
 
             elif self.crop_name == 'alfalfa':
@@ -321,11 +318,9 @@ class Feed:
                     self.C_feed_out_particle_percent = 0.01
                 else:
                     if self.error_2:
-                        # print('"' + self.moisture + '"', 'is not a recognized moisture category for', self.crop_name)
                         self.error_2 = False
             else:
                 if self.error_3:
-                    # print('"' + self.crop_name + '"', 'storage is not currently implemented')
                     self.storage = False
                     self.error_3 = False
 
@@ -676,14 +671,15 @@ class Feed:
             table which splits feeds by quality
         """
         column = 'entry'
-        dict_list = self.db_reader.query(self.__feed_quality_table,
+        dict_list = self.db_reader.query(self.d_quality_table,
                                          distinct=True, cols=[column])
         return [result[column] for result in dict_list]
 
     def get_all_feed_units(self, purchased_feeds, grown_feeds):
         """
-        Constructs and returns the list of tuples of the feed entries given by
-        the user and their units.
+        Constructs and returns a dictionary of where the keys are the feed IDs
+        and the values are dictionaries containing the name and the units of
+        the feed.
 
         Args:
             purchased_feeds: the list of entries (ints) of feeds that are
@@ -691,50 +687,64 @@ class Feed:
             grown_feeds: the list of entries (ints) of feeds that will be grown
 
         Returns:
-            a list of tuples of the form (ID, units) for each feed, where
+            a dictionary where the keys are the feed IDs and the values are
+            dictionaries with feed information:
             - if the feed is purchased, ID is the string form of the ID
             (e.g. '2')
             - if the feed is grown, ID is the string form of the ID plus 'g'
             (e.g. '8g')
+            - feed name is as it is in the user_feeds table
             - units is the string representing the units for the feed
             (e.g. 'kg')
         """
-        column = 'units'
+        columns = ['entry', 'feed_name', 'units']
         all_feeds = purchased_feeds + grown_feeds
-        dict_list = self.db_reader.query(self.__feeds_table, cols=[column],
+        dict_list = self.db_reader.query(self.ds_table, cols=columns,
                                          identifier='entry',
                                          desired_rows=tuple(all_feeds))
-        units = [result[column] for result in dict_list]
 
-        self.purchased_feeds = self.get_purchased_feed_ids(purchased_feeds)
+        all_feed_info = {str(result['entry']): {
+            'feed_name': result['feed_name'],
+            'units': result['units']
+            }
+            for result in dict_list}
 
-        purchased_feeds_str = [str(feed) for feed in self.purchased_feeds]
-        grown_feeds_str = [str(feed) + 'g' for feed in grown_feeds]
-        result = []
-        for feed, unit in zip(purchased_feeds_str + grown_feeds_str, units):
-            result.append((feed, unit))
+        purchased_mapping = self.get_purchased_feed_ids(purchased_feeds)
+        self.purchased_feeds = list(purchased_mapping.values())
 
-        return result
+        grown_feeds_mapping = {str(feed): str(feed) + 'g'
+                               for feed in grown_feeds}
+
+        all_feeds_mapping = purchased_mapping.copy()
+        all_feeds_mapping.update(grown_feeds_mapping)
+
+        for entry in all_feeds_mapping:
+            if not entry == all_feeds_mapping[entry]:
+                all_feed_info[all_feeds_mapping[entry]] = \
+                    all_feed_info.pop(entry)
+
+        return all_feed_info
 
     def get_purchased_feed_ids(self, entries):
         """
-        Constructs and returns a list of the purchased feed IDs based on
+        Constructs and returns a dictionary of the purchased feed IDs based on
         whether the quality of each feed can be determined at harvest.
 
         Args:
             entries: the purchased feed entries
 
         Returns:
-            a list of the feed IDs that can be used to find nutrient values in
+            a dictionary where the keys are the feed entries and the keys are
+            the feed IDs that can be used to find nutrient values in
             the nutrients table
         """
-        purchased_feed_ids = []
+        purchased_feed_ids = {}
         for entry in entries:
             if entry in self.entries_split_by_maturity:
                 # making the assumption that purchased feeds are at mid-maturity
-                purchased_feed_ids.append(entry + 2)
+                purchased_feed_ids[str(entry)] = str(entry + 2)
             else:
-                purchased_feed_ids.append(entry)
+                purchased_feed_ids[str(entry)] = str(entry)
         return purchased_feed_ids
 
     def get_feed_id(self, grown_feed_entry, DM, NDF):
@@ -757,7 +767,7 @@ class Feed:
         rounded_DM = round(DM)
         rounded_NDF = round(NDF)
         column = 'differentiating_nutrient'
-        dict_list = self.db_reader.query(self.__feed_quality_table,
+        dict_list = self.db_reader.query(self.d_quality_table,
                                          distinct=True, cols=[column],
                                          identifier='entry',
                                          desired_rows=(grown_feed_entry,))
@@ -765,7 +775,7 @@ class Feed:
 
         column = 'quality_id'
         rounded_nutrient = rounded_DM if nutrient == 'DM' else rounded_NDF
-        dict_list = self.db_reader.query(self.__feed_quality_table,
+        dict_list = self.db_reader.query(self.d_quality_table,
                                          cols=[column], identifier='entry',
                                          desired_rows=(str(grown_feed_entry),),
                                          compare_val=str(rounded_nutrient),
