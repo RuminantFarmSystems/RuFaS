@@ -39,8 +39,12 @@ class AnimalBase(object):
 		self.days_born = args['days_born']
 		self.culled = False
 		self.do_not_breed = False
+		self.sold = False
 		self.events = AnimalEvents()
+		self.gender = ''
 
+		self.birth_weight = 0.0
+		self.wean_weight = 0.0
 		self.daily_growth = 0
 		self.nutrient_rqmts = {}
 		self.set_default_nutrient_rqmts()
