@@ -1,4 +1,3 @@
-
 """
 RUFAS: Ruminant Farm Systems Model
 

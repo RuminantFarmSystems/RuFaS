@@ -15,15 +15,15 @@ Description: Implements the nitrogen cycling process of humus mineralization
 #
 def humus_mineralization(soil):
     for layer in soil.soil_layers:
-        activeN = layer.activeN
-        stableN = layer.stableN
+        active_N = layer.active_N
+        stable_N = layer.stable_N
         FracN = 0.02
 
         # "pseudocode_soil" S.4.F.1
-        Ntrans = 0.00001 * (activeN * ((1 / FracN) - 1) - stableN)
+        Ntrans = 0.00001 * (active_N * ((1 / FracN) - 1) - stable_N)
 
-        layer.activeN -= Ntrans
-        layer.stableN += Ntrans
+        layer.active_N -= Ntrans
+        layer.stable_N += Ntrans
 
         layer.nTrans = Ntrans
 

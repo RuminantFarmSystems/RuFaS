@@ -21,28 +21,29 @@ class HeiferI(Calf):
 	# TODO: Body weight changed could be based on nutrition intake later from
 	#  Ration Formulation
 
-	def __init__(self, calf):
+	def __init__(self, args):
 		"""
-		Initialize the 1st heifer group from calf, pass calf information to
-		heiferI.
-
-		Args:
-			calf: class calf with calf parameters
+		Description:
+			initialize the 1st heifer group from calf information
+		Input:
+			args.id: id of the cow
+			args.breed: breed of the cow
+			args.birth_date: the date of the simulation when the calf was born
+			args.daysBorn: age of the animal
+			(optional: include the following to assign cow information) 
+			args.birth_weight: the birth weight of the cow
+			args.body_weight: current body weight of the cow
+			args.wean_weight: the wean weight of the cow
+			args.mature_body_weight: the mature body weight of the cow
+			args.events: events of the cow
 		"""
-		super().init_from_calf(calf)
+		super().__init__(args)
 
-	def init_from_heiferI(self, heiferI):
+	def get_heiferI_values(self):
 		"""
-		Initialize the 1st heifer group from animal base,
-		pass animal information to heiferI
-
-		Args:
-			heiferI: animal to pass into the calf initialization
-
-		Returns:
-
+		Get current information from the heiferI
 		"""
-		super().init_from_calf(heiferI)
+		return self.get_calf_values()
 
 	def calc_nutrient_rqmts(self):
 		"""
@@ -101,9 +102,18 @@ class HeiferI(Calf):
 
 		prev_weight = self.body_weight
 
-		self.body_weight += np.random.normal(
+		gained_weight = np.random.normal(
 			AnimalBase.config['avg_daily_gain_h'],
 			AnimalBase.config['std_daily_gain_h'])
+		while gained_weight < AnimalBase.config['avg_daily_gain_h'] \
+			- 2 * AnimalBase.config['std_daily_gain_h'] \
+			or gained_weight > AnimalBase.config['avg_daily_gain_h'] \
+				+ 2 * AnimalBase.config['std_daily_gain_h']:
+			gained_weight = np.random.normal(
+				AnimalBase.config['avg_daily_gain_h'],
+				AnimalBase.config['std_daily_gain_h'])
+
+		self.body_weight += gained_weight
 
 		self.daily_growth = self.body_weight - prev_weight
 
