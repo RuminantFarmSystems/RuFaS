@@ -6,12 +6,9 @@ Description:
 Author(s): Kass Chupongstimun, kass_c@hotmail.com
            Jit Patil, spatil5@wisc.edu
            William Donovan, wmdonovan@wisc.edu
-
 This module needs the following input in order to operate correctly:
-
     These are attributes of a soil profile that need to be specified in the json input
     file. The values on the right are just examples from a soil profile with 1 layer.
-
         "ProfileDepth": 450,
         "ProfileBulkDensity": 1.4,
         "CN2": 85.00
@@ -26,15 +23,11 @@ This module needs the following input in order to operate correctly:
         "initial_residue": 0,
         "fresh_NMineralRate": 0.05,
         "SoilCoverType": "BARE",
-
         These are attributes defined for each layer of the soil profile. Any
         number of profiles may be specified, but they all require the following
         information. The values on the right are examples.
-
         "SoilLayers":
-
             "Layer1":
-
                 "BottomDepth": 150,
                 "WiltingPoint": 0.1,
                 "FieldCapacity": 0.30,
@@ -53,40 +46,28 @@ This module needs the following input in order to operate correctly:
                 "DenitrificationRate": 0.05,
                 "SoilWaterRatio": 0.3,
                 "OM%": 1.9
-
             "Layer2":
                 ...
-
         Each layer needs to be specified in a similar manner
-
         The following are attributes of a fertilizer application. No fertilizer
         applications need be specified for the module to run, but for any that
         are specified, the following attributes are needed. Again, the values
         on the right are simply examples
-
         "Fertilizers":
-
             "Application1":
-
                 "Year": 2008
                 "JDay": 179,
                 "PMass": 25.0,
                 "Depth": 3.0,
                 "%onSurface": 0.25
-
             "Application2":
-
                 ...
-
         The following are attributes of a manure application. No manure
         applications need be specified for the module to run, but for any that
         are specified, the following attributes are needed. The values on the
         right should serve as examples.
-
         "ManureApplication":
-
             "Application1":
-
                 "Type": "DAIRY",
                 "Year": 2009,
                 "Jday": 200
@@ -98,40 +79,29 @@ This module needs the following input in order to operate correctly:
                 "%Cover": 0.5,
                 "Depth": 0.0,
                 "%onSurface": 100.0
-
             "Application2":
-
                 ...
-
         The following are attributes of a tillage operation. No tillage
         operation need be specified for the module to run, but for any operation
         that is specified, the following attributes are needed. Values on the
         right are examples.
-
         "TillageOperations":
-
             "Operation1":
-
                 "Year": 2008,
                 "Jday": 365,
                 "%Incorporate": 0.5,
                 "%Mixed": 0.30,
                 "Depth": 15.0,
-
             "Operation2":
-
                 ...
-
     From the weather class, the following will be needed:
         T_min
         T_max
         radiation
         rainfall
         T_avg
-
     From the crop class, the following will be needed:
         crops_list
-
         And the following attributes of a crop type:
             bio_AG (aboveground biomass)
 """
@@ -153,7 +123,6 @@ def daily_soil_routine(soil, crop, weather, time):
     """
     Description:
         Executes all the daily soil routines.
-
     Args:
         soil: instance of the Soil class
         crop: instance of the Crop class
@@ -192,11 +161,6 @@ def daily_soil_routine(soil, crop, weather, time):
 
 
 def annual_variable_update(soil):
-    soil.N_uptake = 0.0
-    for layer in soil.soil_layers:
-        soil.N_uptake += layer.N_uptake
-
-    soil.N_uptake_annual += soil.N_uptake
 
     soil.ET_max_annual += soil.ET_max
 
@@ -227,7 +191,6 @@ class Soil:
         Description:
             Constructs an instance of the Soil class by populating its arrays
             and the necessary values.
-
         Args:
             data: the information from the json input file
             config: instance of the Config class
@@ -294,31 +257,31 @@ class Soil:
 
         for layer in self.soil_layers:
 
-            # S.5.A.1
+            # S.6.A.1
             layer.PSP_max = -0.045 * log(layer.clay) + 0.001 * \
                             layer.labile_P - 0.035 * layer.org_C + 0.43
             layer.PSP_act = max(0.05, min(0.7, layer.PSP_max))
             layer.PSP_avg = layer.PSP_act
 
-            # S.5.A.2
+            # S.6.A.2
             layer.labile_P = layer.labile_P * layer.bulk_density \
                              * layer.thickness_cm * 0.1
             self.labile_P += layer.labile_P
 
-            # S.5.A.3
+            # S.6.A.3
             layer.active_P = layer.labile_P * (1.0 - layer.PSP_act) / layer.PSP_act
             self.active_P += layer.active_P
 
-            # S.5.A.4
+            # S.6.A.4
             layer.stable_P = layer.active_P * 4.0
             self.stable_P += layer.stable_P
 
-            # S.5.A.5 TODO organic soil pools (labile_O, and active_O) are not being tracked
+            # S.6.A.5 TODO organic soil pools (labile_O, and active_O) are not being tracked
             layer.org_P = layer.org_C / 8.0 / 14.0 * 10000 * layer.bulk_density \
                           * layer.thickness_cm * 0.1
             self.org_P += layer.org_P
 
-            # S.5.A.6
+            # S.6.A.6
             layer.mass = layer.bulk_density * layer.thickness_cm * 10000
 
         self.manure_moisture = 0.5
@@ -465,8 +428,6 @@ class Soil:
         self.NO3_runoff_annual = 0.0
         self.NH4_runoff_annual = 0.0
 
-        self.N_uptake_annual = 0.0
-
         self.NH4_erosion_annual = 0.0
         self.active_N_erosion_annual = 0.0
         self.stable_N_erosion_annual = 0.0
@@ -590,7 +551,6 @@ class Soil:
             """
             Description:
                 Populates the characteristic values of a soil layer.
-
             Args:
                 layer_name: a string which is the name of this layer
                 layer_data: a dictionary which stores the information for this layer
@@ -666,8 +626,6 @@ class Soil:
             self.deNrate = layer_data['DenitrificationRate']
             self.active_N_frac = layer_data['active_N_frac']
             self.volatileExchangeFactor = layer_data['VolatileExchangeFac']
-
-            self.N_uptake = 0.0
 
             # Variables to simulate phosphorus cycling
             self.OM_percent = layer_data['OM%']
@@ -923,8 +881,6 @@ class Soil:
 
         self.NO3_runoff_annual = 0.0
         self.NH4_runoff_annual = 0.0
-
-        self.N_uptake_annual = 0.0
 
         self.NH4_erosion_annual = 0.0
         self.active_N_erosion_annual = 0.0
