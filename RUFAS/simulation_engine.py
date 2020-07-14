@@ -11,16 +11,16 @@ Author(s): Kass Chupongstimun, kass_c@hotmail.com
 import json
 import time as timer
 from pathlib import Path
-
 from RUFAS import routines, errors
-from RUFAS.classes import Config, State, Weather, Space, Time
-from RUFAS.output import OutputHandler
+from RUFAS.classes import Config, State, Weather, Time, read_json_file
+from RUFAS.util import get_base_dir
+from RUFAS.output_handler import OutputHandler
 from RUFAS.test import test_handler
 
-global config, state, output, weather, space, time
+global config, state, output, weather, time
 
 
-def simulate(input_fPath: Path):
+def simulate(input_file_path: Path):
     """Executes the simulation with the json file specified.
 
     Executes the simulation with the json file at the path specified. Skips over
@@ -29,7 +29,7 @@ def simulate(input_fPath: Path):
     The parameters of the simulation are all specified by the input file.
 
     Args:
-        input_fPath (Path): Path to the json file that contains all the input
+        input_file_path (Path): Path to the json file that contains all the input
             parameters to the simulation. Passed to read_json_file().
     """
 
@@ -38,7 +38,7 @@ def simulate(input_fPath: Path):
     # simulation global variables
     #
     try:
-        read_json_file(input_fPath)
+        read_json_file(input_file_path)
     except errors.InvalidJSONfile as e:
         print(e.msg)
         return
@@ -48,11 +48,11 @@ def simulate(input_fPath: Path):
     # Deletes existing output files of the same name from previous simulation
     # Transfer needed (initial) data from state to report handlers
     #
-    output.initialize_output_dir(config.output_dir)
-    output.initialize_diagnostic_dir(config.diagnostic_dir)
-    output.initialize_reports(state)
+    output.initialize_csv_dir(config.csv_dir)
+    output.initialize_graphic_dir(config.graphic_dir)
+    output.initialize_reports()
 
-    print("\nSimulating: {}".format(input_fPath.name))
+    print("\nSimulating: {}".format(input_file_path.name))
 
     t_start_sim = timer.time()
 
@@ -66,7 +66,7 @@ def simulate(input_fPath: Path):
     output.produce_graphics()
     t_end_sim = timer.time()
 
-    print("Simulation Successful: {}".format(input_fPath.name))
+    print("Simulation Successful: {}".format(input_file_path.name))
     print("Total Run Time: {} seconds\n".format(str(t_end_sim - t_start_sim)))
 
 
@@ -77,11 +77,12 @@ def daily_simulation():
     # Daily routines
     #
     routines.daily_animal_routine(state.animal_management, state.feed)
+
     for field in state.fields:
         routines.daily_soil_routine(field.soil, field.crop, field.field_management, weather, time)
-        routines.daily_crop_routine(field.soil, field.crop, field.field_management, weather, space, time)
+        routines.daily_crop_routine(field.soil, field.crop, field.field_management, weather, time)
 
-    routines.daily_feed_routine(state.feed, state.fields)
+    routines.daily_feed_routine(state.feed, state.fields, state.animal_management)
 
     #
     # Daily Output Updates
@@ -107,6 +108,7 @@ def annual_simulation():
     #
     for field in state.fields:
         routines.annual_crop_routine(field.crop, time)
+        routines.annual_feed_routine(state.feed)
 
     while not time.end_year():
         daily_simulation()
@@ -121,7 +123,7 @@ def annual_simulation():
     time.advance()
 
 
-def read_json_file(fPath: Path):
+def read_json_file(file_path: Path):
     """Reads the json file, writes information to the simulation variables.
 
     Reads and interprets the (json) file at the given path. Compiles the
@@ -129,16 +131,16 @@ def read_json_file(fPath: Path):
     them. Assigns the objects to the global simulation variables.
 
     Args:
-        fPath (Path): Path to the input json file
+        file_path (Path): Path to the input json file
 
     Raises:
         InvalidJSONFileError: If the json file at the given path does not
             conform with the format required
     """
 
-    global config, state, output, weather, space, time
+    global config, state, output, weather, time
 
-    with fPath.open('r') as f:
+    with file_path.open('r') as f:
         data = json.load(f)
 
         # Instantiate objects using dictionary data from .json file
@@ -149,12 +151,11 @@ def read_json_file(fPath: Path):
                 test_handler.run_tests()
 
             weather = Weather(data['weather'], config)
-            space = Space(config)
             time = Time(config)
-            state = State(data['farm'], config, space, time)
-            output = OutputHandler(data['output'], state)
+            state = State(data['farm'], config, time)
+            output = OutputHandler(get_base_dir() / 'input/output' / data['output'], state)
 
         except errors.JSONfileData as e:
             print("JSON FILE ERROR: " +
-                  "{} \n\t{} Section\n{}\n".format(fPath.name, e.section, e.msg))
-            raise errors.InvalidJSONfile(fPath.name)
+                  "{} \n\t{} Section\n{}\n".format(file_path.name, e.section, e.msg))
+            raise errors.InvalidJSONfile(file_path.name)

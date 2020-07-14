@@ -24,9 +24,11 @@ def update_all(soil, till_app):
             field_management.py
     """
     depth = till_app['depth']
+
     # adjustment to cm because SurPhos was originally created in cm but
     # RuFaS uses mm
     depth_cm = depth / 10
+
     percent_incorporated = till_app['percent_incorporated']
     percent_mixed = till_app['percent_mixed']
 

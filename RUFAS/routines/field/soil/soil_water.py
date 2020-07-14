@@ -1,7 +1,7 @@
 """
 RUFAS: Ruminant Farm Systems Model
 
-File name: infiltration.py
+File name: soil_water.py
 
 Author(s): William Donovan, wmdonovan@wisc.edu
 

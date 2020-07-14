@@ -59,7 +59,7 @@ def calc_daily_percolation(soil):
         if SW > FC:
             SW_perc = SW - FC
 
-        K_sat = layer.ksat
+        K_sat = layer.k_sat
 
         # Travel Time for each soil layer
         # "pseudocode_soil" S.2.C.2

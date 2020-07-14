@@ -14,5 +14,6 @@ def run_tests():
     """
     Calls the unit test functions for each routine that has them.
     """
+
     animal.run_tests()
     print('Tests completed.\n')

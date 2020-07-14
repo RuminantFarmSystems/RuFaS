@@ -77,13 +77,23 @@ def update_all(soil, crop_type, field_management, time):
 
     calc_HI_max(crop_type)
     calc_HI_act(crop_type)
+
+    if crop_type.fr_PHU > 1.0:
+        calc_dry_down(crop_type)
+
     calc_yield_max(crop_type)
     calc_yield_act(crop_type)
     calc_harvest_quality(crop_type)
     calc_nutrient_removal(crop_type)
     calc_residue(soil, crop_type, field_management, time)
+    calc_quality_assessment(crop_type)
+    calc_DM_yield(crop_type)
+    calc_NDF_yield(crop_type)
 
-
+#
+# Calculates max potential harvest index for a given day.
+# "pseudocode_crop" C.10.C.1
+#
 def calc_HI_max(crop_type):
     """
     Description:
@@ -116,6 +126,15 @@ def calc_HI_act(crop_type):
     crop_type.HI_actual = term1 * term2 + crop_type.HI_min
 
 
+def calc_dry_down(crop_type):
+    # TODO: stand in for more sophisticated dry down method
+    crop_type.bio_AG -= (crop_type.bio_AG * crop_type.biomass_dry_down_perc)
+
+
+#
+# Calculates maximum crop yield at harvest.
+# "pseudocode_crop" C.10.D.1
+#
 def calc_yield_max(crop_type):
     """
     Description:
@@ -141,7 +160,36 @@ def calc_yield_act(crop_type):
 
     crop_type.yield_actual = crop_type.yield_max * crop_type.harvest_eff
 
-    crop_type.yield_annual += crop_type.yield_actual
+
+def calc_quality_assessment(crop_type):
+    """
+    Description:
+        TODO: Stand in for more sophisticated method
+        Assesses quality of feed at harvest
+        "Feed Inventory Pseudocode" F.1.1
+    Args:
+        crop_type: the crop for which a quality is being assessed
+    """
+    crop_type.harvest_quality = 'mid_mature'
+    crop_type.feed_id = crop_type.feed_id
+    if crop_type.crop_name.startswith('corn'):
+        if crop_type.harvest_quality == 'immature':
+            crop_type.feed_id = '35g'
+            crop_type.NDF_harvest_perc = 0.541
+        elif crop_type.harvest_quality == 'mid_mature':
+            crop_type.feed_id = '36g'
+            crop_type.NDF_harvest_perc = 0.45
+        elif crop_type.harvest_quality == 'mature':
+            crop_type.feed_id = '37g'
+            crop_type.NDF_harvest_perc = 0.445
+
+
+def calc_DM_yield(crop_type):
+    crop_type.DM_yield = crop_type.yield_actual * crop_type.DM_harvest_perc
+
+
+def calc_NDF_yield(crop_type):
+    crop_type.NDF_yield = crop_type.yield_actual * crop_type.NDF_harvest_perc
 
 
 def calc_nutrient_removal(crop_type):
@@ -154,8 +202,8 @@ def calc_nutrient_removal(crop_type):
         crop_type
     """
 
-    crop_type.yield_N = crop_type.fr_N * crop_type.yield_actual
-    crop_type.yield_P = crop_type.fr_P * crop_type.yield_actual
+    crop_type.N_yield = crop_type.fr_N * crop_type.yield_actual
+    crop_type.P_yield = crop_type.fr_P * crop_type.yield_actual
 
 
 def calc_residue(soil, crop_type, field_management, time):

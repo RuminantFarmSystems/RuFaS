@@ -62,7 +62,6 @@ Soil attribute definitions
     snow = snow water content on the current day (mm)
 """
 
-
 from math import exp, log
 
 
@@ -119,7 +118,7 @@ def calc_T_soil(soil, weather, time):
 
         # "pseudocode_soil" S.1.A.1
         T_soil = (L * T_soil_prev_day) + (1 - L) * \
-                (df * (T_a_air - soil.T_surf) + soil.T_surf)
+                 (df * (T_a_air - soil.T_surf) + soil.T_surf)
         soil.soil_layers[x].temperature = T_soil
 
 
@@ -141,7 +140,7 @@ def calc_dd(soil):
     dd_max = calc_dd_max(soil)
 
     part_1 = log(500 / dd_max)
-    part_2 = ((1 - scale)/(1 + scale)) ** 2
+    part_2 = ((1 - scale) / (1 + scale)) ** 2
     exp_part = exp(part_1 * part_2)
 
     return dd_max * exp_part
@@ -241,7 +240,7 @@ def calc_T_bare(soil, crop, weather, time):
     Returns:
         int: T_bare, the theoretical temperature of the bare soil (ºC)
     """
-    T_av = weather.T_avg[time.year-1][time.day-1]
+    T_av = weather.T_avg[time.year - 1][time.day - 1]
     radiate = calc_radiate(soil, crop, weather, time)
 
     return T_av + radiate * T_av
@@ -263,7 +262,7 @@ def calc_radiate(soil, crop, weather, time):
         int: radiate, the radiation term for the temperature of bare soil
     """
 
-    H_day = weather.radiation[time.year-1][time.day-1]
+    H_day = weather.radiation[time.year - 1][time.day - 1]
     albedo = calc_albedo(soil, crop)
 
     return (H_day * (1 - albedo) - 14) / 20

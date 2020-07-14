@@ -32,7 +32,6 @@ def daily_soil_routine(soil, crop, field_management, weather, time):
         weather: instance of the Weather class specified in classes.py
         time: instance of the Time class specified in classes.py
     """
-    R = weather.rainfall[time.year - 1][time.day - 1]
 
     # calculate and update the temperature of the soil layers
     soil_temp.update_all(soil, crop, weather, time)
@@ -85,6 +84,9 @@ def annual_variable_update(soil):
 
     soil.p_act_annual += soil.p_act
 
+    soil.manure_app_annual += soil.manure_app
+    soil.manure_P_annual += soil.manure_P
+
 
 class Soil:
 
@@ -100,7 +102,6 @@ class Soil:
         """
 
         # soil profile
-        self.area = data['field_size']
         self.profile_bulk_density = data['profile_bulk_density']
 
         # soil layers
@@ -109,7 +110,9 @@ class Soil:
         for layer_name, layer_data in data['soil_layers'].items():
             self.soil_layers.append(self.SoilLayer(layer_name, layer_data))
 
+        # sort layers by bottom_depth
         self.soil_layers.sort(key=lambda ly: ly.bottom_depth)
+
         self.profile_depth = self.soil_layers[-1].bottom_depth
         self.calculate_layer_thickness()
 
@@ -117,6 +120,11 @@ class Soil:
         self.profile_SW = 0.0
 
         self.initialize_soil_water()
+
+        self.calculate_soil_water()  # calculate soil water in layer
+        self.calculateWiltingWater()  # calculate wilting water in layer
+        self.calculateFcWater()  # calculate field capacity water in layer
+        self.calculateSatWater()  # calculate saturation water in layer
 
         # water balance
         self.initial_annual_SW = self.profile_SW
@@ -127,14 +135,15 @@ class Soil:
         self.ET_max = 0.0
 
         # daily water balance
+        self.p_act = 0.0
+        self.p_calc = 0.0
+        self.water_balance_difference = 0.0
         self.delta_SW = 0.0
+
         self.runoff = 0.0
         self.evap_sum = 0.0
         self.trans_sum = 0.0
         self.drainage = 0.0
-
-        self.p_act = 0.0
-        self.p_calc = 0.0
 
         self.water_balance_difference = 0.0
 
@@ -142,21 +151,21 @@ class Soil:
         self.ET_max_annual = 0.0
 
         # annual water balance
+        self.p_act_annual = 0.0
+        self.p_calc_annual = 0.0
+        self.water_balance_difference_annual = 0.0
         self.delta_SW_annual = 0.0
+
         self.runoff_annual = 0.0
         self.evap_annual = 0.0
         self.trans_annual = 0.0
         self.ET_annual = 0.0
         self.drainage_annual = 0.0
 
-        self.p_act_annual = 0.0
-        self.p_calc_annual = 0.0
-
-        self.annual_water_balance_difference = 0.0
-
         self.infiltration = 0.0
 
         # runoff and erosion
+        self.area = data['field_size']
         self.field_slope = data['field_slope']
         self.slope_length = data['slope_length']
         self.manning = data['manning']
@@ -191,9 +200,14 @@ class Soil:
         self.depth_fact = 0.0
 
         # manure
+        self.manure_app = 0.0
+
         self.manure_type = 0
-        self.manure_annual = 0
-        self.manure_P_annual = 0
+        self.manure_app_annual = 0
+
+        # self.manure_type = 0
+        # self.manure_annual = 0
+        # self.manure_P_annual = 0
 
         self.WIP = 0.0
         self.WOP = 0.0
@@ -268,6 +282,12 @@ class Soil:
         self.enrichment_P = 0.0
         self.runoff_conc = 0.0
 
+        # soil phosphorus attributes
+        self.lightFactor = []
+        self.yieldFactor = []
+        self.summan = 0.0
+        self.summanP = 0.0
+
         self.initialize_soil_P()
 
         # daily soil nitrogen
@@ -278,6 +298,10 @@ class Soil:
 
         self.NO3_runoff = 0.0
         self.NH4_runoff = 0.0
+
+        self.NO3_drainage = 0.0
+        self.NH4_drainage = 0.0
+        self.active_N_drainage = 0.0
 
         self.NH4_erosion = 0.0
         self.active_N_erosion = 0.0
@@ -298,6 +322,67 @@ class Soil:
         self.active_N_drainage_annual = 0.0
 
         self.initialize_soil_N()
+
+        # daily nitrogen balance
+        self.fresh_N = 0.0
+
+        self.profile_N = 0.0
+        for layer in self.soil_layers:
+            self.profile_N += layer.NO3 + layer.NH4 + \
+                              layer.org_N + layer.active_N + layer.stable_N
+
+        self.profile_N += self.fresh_N
+        self.initial_profile_N = self.profile_N
+
+        self.manure_N = 0.0
+        self.N_calc = 0.0
+        self.N_balance_difference = 0.0
+        self.delta_N = 0.0
+
+        self.N_drainage = 0.0
+        self.N_runoff = 0.0
+        self.N_erosion = 0.0
+        self.N_uptake = 0.0
+
+        # annual nitrogen balance
+        self.manure_N_annual = 0.0
+        self.N_calc_annual = 0.0
+        self.N_balance_difference_annual = 0.0
+        self.delta_N_annual = 0.0
+
+        self.N_drainage_annual = 0.0
+        self.N_runoff_annual = 0.0
+        self.N_erosion_annual = 0.0
+        self.N_uptake_annual = 0.0
+
+        # daily phosphorus balance
+        self.profile_P = 0.0
+        for layer in self.soil_layers:
+            self.profile_P += layer.labile_P + layer.active_P + \
+                              layer.stable_P + layer.org_P
+
+        self.initial_profile_P = self.profile_P
+
+        self.manure_P = 0.0
+        self.P_calc = 0.0
+        self.P_balance_difference = 0.0
+        self.delta_P = 0.0
+
+        self.P_drainage = 0.0
+        self.P_runoff = 0.0
+        self.P_erosion = 0.0
+        self.P_uptake = 0.0
+
+        # annual phosphorus balance
+        self.manure_P_annual = 0.0
+        self.P_calc_annual = 0.0
+        self.P_balance_difference_annual = 0.0
+        self.delta_P_annual = 0.0
+
+        self.P_drainage_annual = 0.0
+        self.P_runoff_annual = 0.0
+        self.P_erosion_annual = 0.0
+        self.P_uptake_annual = 0.0
 
     def calculate_layer_thickness(self):
         """
@@ -326,6 +411,57 @@ class Soil:
         else:
             return 0.5333
 
+    # ---------------------------------------------------------------------------
+    # Function: calculate_soil_water
+    # Calculates the amount of water in soil profile for a given layer at.
+    # Called when soil portion of input is read.
+    # ---------------------------------------------------------------------------
+    def calculate_soil_water(self):
+        for layer in self.soil_layers:
+            layer.soil_water = layer.thickness * layer.soil_water_percent
+
+    # ---------------------------------------------------------------------------
+    # Function: calculateFcWater
+    # Calculates the amount of water in soil profile for a given layer at
+    # field capacity (mm H2O). Called when soil portion of input is read.
+    # ---------------------------------------------------------------------------
+    def calculateFcWater(self):
+        """
+        Description:
+            Calculates the amount of water in soil profile for a given layer at
+            field capacity (mm H2O). Called when soil portion of input is read.
+        """
+        for layer in self.soil_layers:
+            layer.fc_water = layer.thickness * layer.field_capacity
+
+    # ---------------------------------------------------------------------------
+    # Function: calculateSatWater
+    # Calculates the amount of water in soil profile for a given layer at
+    # saturation (mm H2O). Called when soil portion of input is read.
+    # ---------------------------------------------------------------------------
+    def calculateSatWater(self):
+        """
+        Description:
+            Calculates the amount of water in soil profile for a given layer at
+            saturation (mm H2O). Called when soil portion of input is read.
+        """
+        for layer in self.soil_layers:
+            layer.sat_water = layer.thickness * layer.saturation
+
+    # ---------------------------------------------------------------------------
+    # Function: calculateWiltingWater
+    # Calculates the amount of water in soil profile for a given layer at
+    # wilting point (mm H2O). Called when soil portion of input is read.
+    # ---------------------------------------------------------------------------
+    def calculateWiltingWater(self):
+        """
+        Description:
+            Calculates the amount of water in soil profile for a given layer at
+            wilting point (mm H2O). Called when soil portion of input is read.
+        """
+        for layer in self.soil_layers:
+            layer.wilting_water = layer.thickness * layer.wilting_point
+
     def initialize_soil_water(self):
         """
         Description:
@@ -345,7 +481,6 @@ class Soil:
             "pseudocode_soil" S.5.A
         """
         for layer in self.soil_layers:
-
             # S.5.A.1
             layer.PSP_max = -0.045 * log(layer.clay) + 0.001 * \
                             layer.labile_P - 0.035 * layer.org_C + 0.43
@@ -353,8 +488,7 @@ class Soil:
             layer.PSP_avg = layer.PSP_act
 
             # S.5.A.2
-            layer.labile_P = layer.labile_P * layer.bulk_density \
-                             * layer.thickness_cm * 0.1
+            layer.labile_P = layer.labile_P * layer.bulk_density * layer.thickness_cm * 0.1
 
             # S.5.A.3
             layer.active_P = layer.labile_P * (1.0 - layer.PSP_act) / layer.PSP_act
@@ -412,18 +546,41 @@ class Soil:
             layer.NH4 = NH4 * unit_adjustment
             layer.top_layer_fresh_N = fresh_N * unit_adjustment
 
-    def calculate_annual_water_balance(self):
+    def annual_mass_balance(self):
         """
         Description:
-            Calculates annual water balance.
+            Calculates annual water balance
         """
+        self.annual_water_balance()
+        self.annual_phosphorus_balance()
+        self.annual_nitrogen_balance()
+
+    def annual_water_balance(self):
         self.delta_SW_annual = self.profile_SW - self.initial_annual_SW
 
         self.p_calc_annual = self.delta_SW_annual \
                              + self.runoff_annual + self.evap_annual + self.trans_annual \
                              + self.drainage_annual
 
-        self.annual_water_balance_difference = self.p_act_annual - self.p_calc_annual
+        self.water_balance_difference_annual = self.p_act_annual - self.p_calc_annual
+
+    def annual_phosphorus_balance(self):
+        self.delta_P_annual = self.profile_P - self.initial_profile_P
+
+        self.P_calc_annual = self.delta_P_annual + \
+                             self.P_runoff_annual + self.P_drainage_annual + \
+                             self.P_erosion_annual + self.P_uptake_annual
+
+        self.P_balance_difference_annual = self.manure_P_annual - self.P_calc_annual
+
+    def annual_nitrogen_balance(self):
+        self.delta_N_annual = self.profile_N - self.initial_profile_N
+
+        self.N_calc_annual = self.delta_N_annual + \
+                             self.N_runoff_annual + self.N_drainage_annual + \
+                             self.N_erosion_annual + self.N_uptake_annual
+
+        self.N_balance_difference_annual = self.manure_N_annual - self.N_calc_annual
 
     def annual_reset(self):
         """
@@ -431,20 +588,36 @@ class Soil:
             Resets annual values for the soil profile in anticipation of the next year.
         """
 
-        self.ET_max_annual = 0.0
-        self.evap_annual = 0.0
-        self.trans_annual = 0.0
-        self.ET_annual = 0.0
-        self.drainage_annual = 0.0
-        self.runoff_annual = 0.0
-        self.ET_annual = 0.0
+        # annual mass balance reset
+        self.initial_annual_SW = self.profile_SW
 
         self.p_act_annual = 0
         self.p_calc_annual = 0
+        self.drainage_annual = 0.0
+        self.runoff_annual = 0.0
+        self.evap_annual = 0.0
+        self.trans_annual = 0.0
 
-        # initial annual soil water is set to soil water on the last day of the
-        # previous year
-        self.initial_annual_SW = self.profile_SW
+        self.initial_profile_N = self.profile_N
+
+        self.manure_N_annual = 0.0
+        self.N_calc_annual = 0.0
+        self.N_drainage_annual = 0.0
+        self.N_runoff_annual = 0.0
+        self.N_erosion_annual = 0.0
+
+        self.initial_profile_P = self.profile_P
+
+        self.manure_app_annual = 0.0
+
+        self.manure_P_annual = 0.0
+        self.P_calc_annual = 0.0
+        self.P_drainage_annual = 0.0
+        self.P_runoff_annual = 0.0
+        self.P_erosion_annual = 0.0
+
+        self.ET_max_annual = 0.0
+        self.ET_annual = 0.0
 
         self.NO3_runoff_annual = 0.0
         self.NH4_runoff_annual = 0.0
@@ -457,9 +630,6 @@ class Soil:
         self.NO3_drainage_annual = 0.0
         self.NH4_drainage_annual = 0.0
         self.active_N_drainage_annual = 0.0
-
-        self.manure_annual = 0.0
-        self.manure_P_annual = 0
 
         self.DRP_runoff_annual = 0.0
         self.DRP_leachate_annual = 0.0
@@ -495,12 +665,12 @@ class Soil:
             self.bulk_density = layer_data['bulk_density']
             self.mass = 0
 
-            self.thickness = 0.0
+            self.thickness = 0.0  # thickness of soil layer
             self.thickness_cm = 0.0
 
             self.clay = layer_data['clay']
 
-            # temperature
+            # Variables used for soil temperature
             self.temperature = layer_data['initial_temperature']
 
             # soil water
@@ -509,23 +679,23 @@ class Soil:
             self.saturation = layer_data['saturation']
             self.soil_water_percent = layer_data['soil_water_percent']
 
-            self.fc_water = 0.0
-            self.sat_water = 0.0
-            self.wilting_water = 0.0
-            self.soil_water = 0.0
+            self.fc_water = 0.0  # constant
+            self.sat_water = 0.0  # constant
+            self.wilting_water = 0.0  # constant
+            self.soil_water = 0.0  # mm water in the soil profile
 
-            # daily evapotranspiration
-            self.top_evap = 0.0
-            self.bottom_evap = 0.0
-            self.evap = 0.0
-            self.trans_act = 0.0
+            # Variables to calculate daily evapotranspiration
+            self.top_evap = 0.0  # evaporation demand at top of layer
+            self.bottom_evap = 0.0  # evaporation demand at bottom of layer
+            self.evap = 0.0  # evaporation demand at layer
+            self.trans_act = 0.0  # actual transpiration for the layer (updated in crop)
 
-            # daily percolation
-            self.ksat = layer_data['K_sat']  # saturated hydraulic conductivity (mm/h)
+            # Variables to calculate dailyPercolation
+            self.k_sat = layer_data['K_sat']  # saturated hydraulic conductivity (mm/h)
             self.TT = 0.0
-            self.perc = 0.0
+            self.perc = 0.0  # amount of water that percolates to next layer
 
-            # nitrogen cycling
+            # Variable to simulate nitrogen Cycling
             self.org_C = layer_data['org_C_percent']
             self.active_mineral_rate = layer_data['active_mineral_rate']
             self.cation_exclusion_fraction = layer_data['cation_exclusion_fraction']
@@ -538,9 +708,16 @@ class Soil:
             self.temp_fac = 0.0
             self.water_fac = 0.0
 
+            # Initial NO3 levels (kg/ha) in the soil layer:
             self.NO3 = 0.0
+
+            # Organic N (Active + Stable, mg/kg):
             self.org_N = 0.0
+
+            # Initial Active N in layer:
             self.active_N = 0.0
+
+            # Initial Stable N in layer:
             self.stable_N = 0.0
 
             self.NO3_perc = 0.0
@@ -558,8 +735,9 @@ class Soil:
             self.active_N_percent = layer_data['active_N_percent']
             self.volatile_exchange_factor = layer_data['volatile_exchange_factor']
 
-            # phosphorus cycling
+            # Variables to simulate phosphorus cycling
             self.OM_percent = layer_data['OM_percent']
+
             self.soil_P = 0.0
 
             self.iso_slope = 0.0  # the slope of the isotherm curve

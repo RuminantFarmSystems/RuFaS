@@ -34,12 +34,12 @@ class State:
     the future or in an output report in the state object.
     """
 
-    def __init__(self, data, config, space, time):
+    def __init__(self, data, config, time):
         self.fields = []
         self.fields_data = data['fields']
         for field_name, field_data in self.fields_data.items():
-            self.fields.append(Field(field_name, field_data, space, time))
-        input_dir = util.get_base_dir() / 'Inputs'
+            self.fields.append(Field(field_name, field_data, time))
+        input_dir = util.get_base_dir() / 'input'
         self.feed = Feed(read_json_file(input_dir / 'feed_storage' / data['feed']))
         self.animal_management = AnimalManagement(
             read_json_file(input_dir / 'animals' / data['animal']), config, self.feed)
@@ -93,8 +93,6 @@ class Config:
         self.start_day = int(self.start_full_date[1])
         self.end_day = int(self.end_full_date[1])
 
-        self.latitude = data['latitude']
-
         # boolean to determine if the tests should be run
         self.run_tests = data['run_tests']
 
@@ -102,7 +100,8 @@ class Config:
         leap_year_length = 366
 
         # read in the input csv file
-        weather_full_path = util.get_base_dir() / 'Inputs/weather' / weather_file
+
+        weather_full_path = util.get_base_dir() / 'input/weather' / weather_file
 
         if not weather_full_path.is_file():
             raise errors.JSONfileData("WEATHER",
@@ -243,16 +242,29 @@ class Config:
 
             self.years.append(days)
 
-        # file_line is the how many lines are in the weather file,
-        # the - 2 is for the header and one extra iteration while
-        # creating the variable. This accounts for invalid weather
-        # files
-        self.sim_length = file_line - 2
-        self.output_dir = data['output_dir']
-        self.diagnostic_dir = data['diagnostic_dir']
-
         self.leap_year_length = leap_year_length
         self.year_length = year_length
+
+        self.sim_length = self.calc_sim_length()
+        self.csv_dir = data['csv_dir']
+        self.graphic_dir = data['graphic_dir']
+
+    def calc_sim_length(self):
+        """
+        Calculates and returns the length of the simulation in days.
+        """
+        sim_length = 0
+        for i in range(len(self.years)):
+            if i == 0:
+                # check for leap year
+                if is_leap_year(self.start_year):
+                    sim_length += self.leap_year_length - self.start_day
+                else:
+                    sim_length += self.year_length - self.start_day
+            else:
+                sim_length += len(self.years[i])
+
+        return sim_length + 1
 
 
 class Weather:
@@ -276,6 +288,7 @@ class Weather:
         self.T_avg = []
         self.radiation = []
         self.T_avg_annual = []
+        self.manure_N = []
 
         year_length = config.year_length
         leap_year_length = config.leap_year_length
@@ -305,14 +318,16 @@ class Weather:
 
         # fill the weather arrays with zeros for the size of each year in years[]
         for year in years:
-            self.rainfall.append([0.0 for _ in range(len(year))])
-            self.T_max.append([0.0 for _ in range(len(year))])
-            self.T_min.append([0.0 for _ in range(len(year))])
-            self.T_avg.append([0.0 for _ in range(len(year))])
-            self.radiation.append([0.0 for _ in range(len(year))])
+            self.rainfall.append([0 for _ in range(len(year))])
+            self.T_max.append([0 for _ in range(len(year))])
+            self.T_min.append([0 for _ in range(len(year))])
+            self.T_avg.append([0 for _ in range(len(year))])
+            self.radiation.append([0 for _ in range(len(year))])
+            self.manure_N.append([0 for _ in range(len(year))])
+            # TODO: manureN is a temporary weather file input until manure storage is implemented
 
         # read in the input csv file
-        weather_full_path = util.get_base_dir() / 'Inputs/weather' / weather_file
+        weather_full_path = util.get_base_dir() / 'input/weather' / weather_file
 
         if not weather_full_path.is_file():
             raise errors.JSONfileData("WEATHER",
@@ -357,6 +372,9 @@ class Weather:
                         self.T_min[year][day - offset] = float(row[4])
                         self.T_avg[year][day - offset] = float(row[5])
                         self.radiation[year][day - offset] = float(row[6])
+                        self.manure_N[year][day - offset] = float(row[7])
+                        # TODO: manureN is a temporary weather file input until the manure module is implemented
+
                     except(IndexError, ValueError):
                         # prints out each problematic row in the weather CSV file
                         skips += 1
@@ -396,16 +414,6 @@ class Weather:
 
             self.T_avg_annual[0] = T_avg
             self.T_avg_annual[len(self.T_avg_annual) - 1] = T_avg
-
-
-class Space:
-    """
-    This object is responsible for creating and tracking the farm's relevant spatial information.
-    Right now it currently represents a latitude only.
-    """
-
-    def __init__(self, config):
-        self.latitude = abs(config.latitude)
 
 
 class Time:
