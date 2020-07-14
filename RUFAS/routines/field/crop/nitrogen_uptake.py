@@ -67,7 +67,8 @@ def update_all(soil, crop_type):
     calc_N_up(crop_type)
     calc_act_N_up_each_layer(soil, crop_type)
     crop_type.N_act_up = sum(crop_type.act_N_up_each_layer)
-    calc_bio_N(soil, crop_type)
+    calc_bio_N(crop_type, soil)
+    N_uptake(crop_type, soil)
 
 
 def calc_fr_N(crop_type):
@@ -229,6 +230,7 @@ def calc_act_N_up_each_layer(soil, crop_type):
         act_N_up = min((pot_N_up + N_demand), soilLayer.NO3)
 
         # C.5.C.7
+        soilLayer.N_uptake = act_N_up
         act_N_up_each_layer.append(act_N_up)
 
         # Update values so ready for the next layer
@@ -246,7 +248,12 @@ def calc_act_N_up_each_layer(soil, crop_type):
     crop_type.act_N_up_each_layer = act_N_up_each_layer
 
 
-def calc_N_up_each_layer(soil, crop_type):
+def N_uptake(crop_type, soil):
+    for layer in soil.soil_layers:
+        layer.NO3 -= layer.N_uptake
+
+
+def calc_N_up_each_layer(crop_type, soil):
     """
     Description:
         Calculates the potential nitrogen uptake from soil solution in each
@@ -315,5 +322,4 @@ def calc_bio_N(soil, crop_type):
     """
 
     crop_type.N_fix = calc_N_fixation(soil, crop_type)
-
     crop_type.bio_N = crop_type.bio_N + crop_type.N_act_up + crop_type.N_fix

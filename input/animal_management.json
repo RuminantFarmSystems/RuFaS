@@ -1,0 +1,36 @@
+
+{
+    "config":
+    {
+        "start_date" : "2009:244",
+        "end_date" : "2016:243",
+        "csv_dir": "output/CSVs/",
+        "graphic_dir": "output/graphics/",
+        "run_tests": false
+    },
+
+    "weather": "barnyard_weather.csv",
+
+    "output": "all_reports.json",
+
+    "farm":
+    {
+        "fields":
+        {
+            "field_1":
+            {
+                "soil": "barnyard_soil.json",
+                "crop": "corn_rotation.json",
+                "field_management": "default_field_management.json"
+            },
+            "field_2":
+            {
+                "soil": "barnyard_soil.json",
+                "crop": "corn_rotation.json",
+                "field_management": "barnyard_field_management.json"
+            }
+        },
+        "animal": "barnyard_animal.json",
+        "feed": "buisse_storage.json"
+    }
+}

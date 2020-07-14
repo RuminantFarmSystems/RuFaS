@@ -16,7 +16,7 @@ from . import heat_units, leaf_area_index, root_development, biomass, yields, \
     phosphorus_uptake, nitrogen_uptake, growth_constraints
 
 
-def daily_crop_routine(soil, crop, field_management, weather, space, time):
+def daily_crop_routine(soil, crop, field_management, weather, time):
     """
     Description:
         Executes all the daily crop routines.
@@ -30,8 +30,6 @@ def daily_crop_routine(soil, crop, field_management, weather, space, time):
             in field_management.py
         weather: an instance of the Weather class specified in classes.py
             containing environmental information
-        space: an instance of the Space class specified in classes.py containing
-            spatial information (e.g. latitude for calculating day length)
         time: an instance of the Time class specified in classes.py
     """
 
@@ -49,7 +47,7 @@ def daily_crop_routine(soil, crop, field_management, weather, space, time):
         crop_type.yield_P = 0
         # If the crop is not planted yet, determine whether it is planted today
         if not crop_type.planted:
-            calculate_start(soil, crop, field_management, weather, space, time)
+            calculate_start(soil, crop, field_management, weather, time)
 
         # Once the crop is planted:
         else:
@@ -88,10 +86,10 @@ def daily_crop_routine(soil, crop, field_management, weather, space, time):
                 # if it is, run the dormancy routine and set growing to false
                 # (This method is only called once on the first day when crop
                 # enters dormancy)
-                if in_dormancy(crop, space, time) and crop_type.growing:
+                if in_dormancy(crop, time) and crop_type.growing:
                     dormancy_routine(soil, crop_type, field_management, time)
                     crop_type.growing = False
-                elif not in_dormancy(crop, space, time):
+                elif not in_dormancy(crop, time):
                     if crop_type.growing is False and field_management.management_scheme == 'optimal':
                         # schedule a manure and fertilizer application
                         manure_management = field_management.managed_applications['manure']
@@ -202,7 +200,7 @@ def is_kill_year(crop, time):
 
 class Crop:
 
-    def __init__(self, data, space, time):
+    def __init__(self, data, time):
         """
         Description:
             An instance of the Crop class represents the crop module and contains
@@ -229,8 +227,9 @@ class Crop:
         self.set_grow_regimen(time)
 
         # dormancy for perennial crops
-        self.T_dl_min = calculate_minimum_day_length(space.latitude)
-        self.t_dorm = calculate_t_dorm(space.latitude)
+        self.latitude = abs(data['latitude'])
+        self.T_dl_min = calculate_minimum_day_length(self.latitude)
+        self.t_dorm = calculate_t_dorm(self.latitude)
         self.solar_declination = 0.0
 
     def set_grow_regimen(self, time):
@@ -276,7 +275,7 @@ class Crop:
         self.current_crop.yield_annual = 0
 
 
-def calculate_start(soil, crop, field_management, weather, space, time):
+def calculate_start(soil, crop, field_management, weather, time):
     """
     Description:
         Calculates the start day for the crop
@@ -291,8 +290,6 @@ def calculate_start(soil, crop, field_management, weather, space, time):
             specified in field_management.py
         weather: an instance of the Weather class specified in classes.py
             containing environmental information
-        space: an instance of the Space class specified in classes.py containing
-            spatial information (e.g. latitude for calculating day length)
         time: an instance of the Time class specified in classes.py
     """
 
@@ -339,7 +336,7 @@ def calculate_start(soil, crop, field_management, weather, space, time):
             if time.year == 1 and time.day > crop_type.planting_date:
                 pass
             # check growing conditions for the perennial
-            elif not in_dormancy(crop, space, time) and yearly_T_avg[time.day - 1] > crop_type.T_base_min:
+            elif not in_dormancy(crop, time) and yearly_T_avg[time.day - 1] > crop_type.T_base_min:
                 # check conditions for applying manure and fertilizer
                 if manure_management.check_conditions_plant(soil, weather, time) and \
                         fert_management.check_conditions_plant(soil, weather, time):
@@ -382,7 +379,7 @@ def calculate_start(soil, crop, field_management, weather, space, time):
             if time.year == 1 and time.day > crop_type.planting_date:
                 pass
             # check growing conditions for perennial
-            elif not in_dormancy(crop, space, time) and yearly_T_avg[time.day - 1] > crop_type.T_base_min:
+            elif not in_dormancy(crop, time) and yearly_T_avg[time.day - 1] > crop_type.T_base_min:
                 # plant the crop
                 crop_type.planted = True
                 crop_type.growing = True
@@ -440,7 +437,7 @@ def calculate_t_dorm(latitude):
         return 0.0
 
 
-def in_dormancy(crop, space, time):
+def in_dormancy(crop, time):
     """
     Description:
         Returns a boolean indicating whether the given day is within the dormant
@@ -450,8 +447,6 @@ def in_dormancy(crop, space, time):
     Args:
         crop: an instance of the Crop class specified in crop.py containing
             information relevant to simulating crop growth
-        space: an instance of the Space class specified in classes.py containing
-            spatial information (e.g. latitude for calculating day length)
         time: an instance of the Time class specified in classes.py
 
     Returns:
@@ -464,7 +459,7 @@ def in_dormancy(crop, space, time):
     solar_declination = asin(0.4 * sin(2 * pi / year_length * (time.day - 82)))
 
     angular_velocity = 0.2618
-    latitude_radians = space.latitude * pi / 180
+    latitude_radians = crop.latitude * pi / 180
 
     T_dl = 2 * acos(-tan(solar_declination) * tan(latitude_radians)) / angular_velocity
 

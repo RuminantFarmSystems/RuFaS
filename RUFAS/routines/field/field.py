@@ -15,7 +15,7 @@ from .field_management.field_management import FieldManagement
 
 
 class Field:
-    def __init__(self, field_name, field_data, space, time):
+    def __init__(self, field_name, field_data, time):
         """
         Description:
             The Field class is an organizational object for aggregating Soil,
@@ -28,7 +28,6 @@ class Field:
         Args:
             field_name: the name of the field specified in the input JSON
             field_data: data describing the field specified in the input JSON
-            space: an instance of the Space class specified in classes.py
             time: an instance of the Time class specified in classes.py
         """
         self.field_name = field_name
@@ -41,7 +40,7 @@ class Field:
 
         self.soil = Soil(self.soil_data)
         self.field_management = FieldManagement(self.field_management_data, time)
-        self.crop = Crop(self.crop_data, space, time)
+        self.crop = Crop(self.crop_data, time)
 
 
 def read_json_file(file_path: Path):

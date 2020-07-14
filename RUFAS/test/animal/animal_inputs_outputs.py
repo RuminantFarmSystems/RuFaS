@@ -2,14 +2,14 @@
 """
 RUFAS: Ruminant Farm Systems Model
 File name: animal_test_handler.py
-Description: This file contains the class which stores the inputs and expected
+Description: This file contains the class which stores the input and expected
     outputs of the animal routines unit tests.
 Author(s): Militsa Sotirova
 """
 ################################################################################
 
 
-class AnimalInputsOutputs:
+class AnimalinputOutputs:
     lactating_cow_input_1 = { 
         'BW': 650,
         'BCS': 3.5,
@@ -63,5 +63,9 @@ class AnimalInputsOutputs:
         'MN':  532.4074003089993,
         'Mkg':  70.82359257209554,
         'VSd':  7087.427669573749,
-        'VSnd':  859.3916402321569
+        'VSnd':  859.3916402321569,
+        'WIP_frac': 1.4119588737072899e-05,
+        'WOP_frac': 1.4119588737072899e-06,
+        'p_excrt_manure': 2,
+        "p_frac": 2.8239177474145797e-05
     }

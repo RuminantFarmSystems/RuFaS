@@ -20,7 +20,7 @@ def input_prompt():
     or more json files (for a batch simulation).
     Loops back to the prompt until the user either chooses to quit or enters a
     valid input.
-    Valid inputs are:
+    Valid input are:
         Valid path to a json file: single simulation mode
         Valid path to directory of json files: batch simulation mode
         'Q' or 'q': quit the program
@@ -44,7 +44,7 @@ def input_prompt():
     while True:
 
         try:
-            user_input = input("\nEnter RUFAS Input: ")
+            user_input = 'input/' + input("\nEnter RUFAS Input: ")
 
             #
             # Handle user exiting program
@@ -98,13 +98,13 @@ def input_prompt():
                     return path_list
 
             #
-            # Handle bad inputs
+            # Handle bad input
             #
             else:
                 raise errors.UserInput("Invalid Input")
 
         #
-        # Handles bad user inputs, prints out error messages
+        # Handles bad user input, prints out error messages
         #
         except errors.UserInput as e:
             print(e.msg)
