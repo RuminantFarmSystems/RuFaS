@@ -39,7 +39,7 @@ def update_all(soil, till_app):
         # incorporate surface manure and fertilizer into the first layer
         # FM.5.1
         if soil.soil_layers.index(layer) == 0:
-            # S.6.B.3
+            # S.5.A.7
             layer.active_P *= soil.area
             layer.labile_P *= soil.area
 
@@ -61,7 +61,7 @@ def update_all(soil, till_app):
             soil.SOP -= soil.SOP * perc_incorporated
             soil.manure_mass -= soil.manure_mass * perc_incorporated
 
-            # S.6.B.4
+            # S.5.A.8
             layer.active_P /= soil.area
             layer.labile_P /= soil.area
 
