@@ -121,8 +121,8 @@ class AnimalManagement:
         """
         Populates the list of pens with the information from the input json file.
         Args:
-            :param herd_data:
-            :param pen_info:
+            pen_info: dictionary containing information about the pens
+            herd_data: dictionary containing information about the herd
         """
 
         for pen_name in pen_info:
@@ -136,6 +136,7 @@ class AnimalManagement:
             housing_type = pen_data['housing_type']
             bedding_type = pen_data['bedding_type']
             pen_type = pen_data['pen_type']
+
             manure_handling = pen_data['manure_handling']
             manure_separator = pen_data['manure_separator']
             manure_storage = pen_data['manure_storage']
@@ -183,9 +184,9 @@ class AnimalManagement:
         are calculated and the animals are allocated to pens.
 
         Args:
-            :param feed:
-            :param pen_data:
-            :param herd_data:
+            herd_data: dictionary containing information about the herd
+            pen_data: dictionary containing information about the pens
+            feed: instance of the Feed class
         """
         calf_num = herd_data['calf_num']
         heiferI_num = herd_data['heiferI_num']
@@ -226,9 +227,9 @@ class AnimalManagement:
                                                           heiferIII_num, cow_num,
                                                           replace_num)
 
-            if len(pen_data) > 0:
-                self.init_nutrient_rqmts(feed)
-                self.pen_allocation()
+        if len(pen_data) > 0:
+            self.init_nutrient_rqmts(feed)
+            self.pen_allocation()
 
     def init_nutrient_rqmts(self, feed):
         """
@@ -367,7 +368,7 @@ class AnimalManagement:
         """
         Allocates the animals in all_animals to pens in all_pens based on the animals' characteristics.
         """
-        # Assigning non-cows to pens
+        # assigning non-cows to pens
         if len(self.all_pens) == 3:
             self.all_pens[0].update_animals(self.calves)
         elif len(self.all_pens) == 4:
@@ -394,7 +395,7 @@ class AnimalManagement:
                 lactating_cows.append(cow)
             else:
                 dry_cows.append(cow)
-        # Assigning Dry Cows to Pens
+        # assigning dry cows to pens
         if len(self.all_pens) == 3:
             dry_and_heifers = self.heiferIs + self.heiferIIs + self.heiferIIIs + dry_cows
             self.all_pens[1].update_animals(dry_and_heifers)
@@ -404,14 +405,14 @@ class AnimalManagement:
             self.all_pens[len(self.all_pens) - 1].update_animals(lactating_cows)
         else:
             self.all_pens[4].update_animals(dry_cows)
-            # TODO: Temporary process below to randomly assign nutrition requirments
+            # TODO: Temporary process to randomly assign nutrition requirements
             if len(lactating_cows) > 0:
                 for i in range(len(lactating_cows)):
                     lactating_cows[i].ID = i + 1
                     lactating_cows[i].DMPD_req = 90 + random.random() * 34
                     lactating_cows[i].DNED_req = 1.4 + random.random() * 0.3
                 pen_grouping = grouping(lactating_cows, self.all_pens[5:])
-                # Assigning Lactating Cows to Pens based on the grouping output
+                # assigning lactating cows to pens based on the grouping output
                 for key in pen_grouping:
                     self.all_pens[key].update_animals(pen_grouping[key])
 
@@ -539,13 +540,13 @@ class AnimalManagement:
                 pen.pen_populated = len(pen.animals_in_pen) > 0
 
             ids_added, ids_removed, calves_born, self.calves, self.heiferIs, \
-            self.heiferIIs, self.heiferIIIs, self.cows = self.life_cycle_manager.daily_update(self.simulation_day,
-                                                                                              self.sim_length,
-                                                                                              self.calves,
-                                                                                              self.heiferIs,
-                                                                                              self.heiferIIs,
-                                                                                              self.heiferIIIs,
-                                                                                              self.cows)
+            self.heiferIIs, self.heiferIIIs, self.cows = \
+                self.life_cycle_manager.daily_update(self.simulation_day,
+                                                     self.sim_length,
+                                                     self.calves,
+                                                     self.heiferIs,
+                                                     self.heiferIIs,
+                                                     self.heiferIIIs, self.cows)
 
             self.daily_update_id_pen(ids_added, ids_removed, calves_born)
 

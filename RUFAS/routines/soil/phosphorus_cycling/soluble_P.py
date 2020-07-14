@@ -4,7 +4,7 @@ File name: soluble_P.py
 Author(s): Jacob Johnson, jacob8399@gmail.com,
            William Donovan, wmdonovan@wisc.edu
 """
-from math import exp, log
+from math import exp
 
 
 # calculates the transfer of phosphorus through hydrological processes
@@ -23,7 +23,10 @@ def update_all(S):
         layer.iso_inter = 4.726 * layer.iso_slope - 8.97
 
         # S.5.E.3
-        layer.DRP_leach = min(40.0, exp((layer.soil_P * (1.5 - layer.iso_inter) / layer.iso_slope)))
+        try:
+            layer.DRP_leach = min(40.0, exp((layer.soil_P * 1.5 - layer.iso_inter) / layer.iso_slope))
+        except OverflowError:
+            layer.DRP_leach = 40.0
 
         # S.5.E.4
         layer.DRP_runoff = 0.0

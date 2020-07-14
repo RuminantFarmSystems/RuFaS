@@ -96,7 +96,7 @@ class Config:
         self.end_year = int(self.end_date[0])
         self.start_day = int(self.start_date[1])
         self.end_day = int(self.end_date[1])
-        
+
         self.run_tests = data['run_tests']
 
         year_length = 365
@@ -241,7 +241,7 @@ class Config:
                     days = [_ for _ in range(1, year_length + 1)]
 
             self.years.append(days)
-        
+
         self.sim_length = self.calc_sim_length(leap_year_length, year_length)
         self.csv_dir = data['csv_dir']
         self.graphic_dir = data['graphic_dir']
@@ -260,7 +260,7 @@ class Config:
                     sim_length += year_length - self.start_day
             else:
                 sim_length += len(self.years[i])
-                
+
         return sim_length + 1
 
 

@@ -34,8 +34,11 @@ def daily_field_management_routine(soil, manure_storage, field_management, weath
         fertilizer_application.update_all(soil, fert_management.applications[(time.cal_year, time.day)].data)
 
     soil.manure_applied = 0.0
+    manure_storage.manure_applied = 0.0
     soil.manure_P_applied = 0.0
+    manure_storage.P_applied = 0.0
     soil.manure_N_applied = 0.0
+    manure_storage.N_applied = 0.0
     manure_management = field_management.managed_applications['manure']
     if (time.cal_year, time.day) in manure_management.applications:
         manure_application.update_all(soil, manure_storage,

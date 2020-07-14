@@ -25,7 +25,6 @@ def daily_soil_routine(soil, crop, weather, time):
     """
     Description:
         Executes all the daily soil routines.
-
     Args:
         soil: instance of the Soil class
         crop: instance of the Crop class
@@ -86,7 +85,6 @@ class Soil:
         Description:
             Constructs an instance of the Soil class by populating its arrays
             and the necessary values.
-
         Args:
             data: the information from the json input file
         """
@@ -136,8 +134,8 @@ class Soil:
         self.leach = 0.0
         self.area = data['FieldSize']
 
-        # Initialize phosphorus pools and variables
-        # "pseudocode_soil" S.5.A
+        # Initialize phosphorus variables
+        # "pseudocode_soil" S.6.A
         self.labile_P = 0.0
         self.active_P = 0.0
         self.stable_P = 0.0
@@ -145,31 +143,31 @@ class Soil:
         self.soil_P = 0.0
 
         for layer in self.soil_layers:
-            # S.5.A.1
+            # S.6.A.1
             layer.PSP_max = -0.045 * log(layer.clay) + 0.001 * \
                             layer.labile_P - 0.035 * layer.org_C + 0.43
             layer.PSP_act = max(0.05, min(0.7, layer.PSP_max))
             layer.PSP_avg = layer.PSP_act
 
-            # S.5.A.2
+            # S.6.A.2
             layer.labile_P = layer.labile_P * layer.bulk_density \
                              * layer.thickness_cm * 0.1
             self.labile_P += layer.labile_P
 
-            # S.5.A.3
+            # S.6.A.3
             layer.active_P = layer.labile_P * (1.0 - layer.PSP_act) / layer.PSP_act
             self.active_P += layer.active_P
 
-            # S.5.A.4
+            # S.6.A.4
             layer.stable_P = layer.active_P * 4.0
             self.stable_P += layer.stable_P
 
-            # S.5.A.5 TODO organic soil pools (labile_O, and active_O) are not being tracked
+            # S.6.A.5 TODO organic soil pools (labile_O, and active_O) are not being tracked
             layer.org_P = layer.org_C / 8.0 / 14.0 * 10000 * layer.bulk_density \
                           * layer.thickness_cm * 0.1
             self.org_P += layer.org_P
 
-            # S.5.A.6
+            # S.6.A.6
             layer.mass = layer.bulk_density * layer.thickness_cm * 10000
 
         # fertilizer
@@ -437,7 +435,6 @@ class Soil:
             """
             Description:
                 Populates the characteristic values of a soil layer.
-
             Args:
                 layer_name: a string which is the name of this layer
                 layer_data: a dictionary which stores the information for this layer
@@ -503,8 +500,6 @@ class Soil:
             self.de_N_rate = layer_data['DenitrificationRate']
 
             self.N_uptake = 0.0
-
-            # Phosphorus
             self.soil_P = 0.0
 
             self.iso_slope = 0.0  # the slope of the isotherm curve
@@ -662,8 +657,6 @@ class Soil:
         # soil Nitrogen
         self.NO3_runoff_annual = 0.0
         self.NH4_runoff_annual = 0.0
-
-        self.N_uptake_annual = 0.0
 
         self.NH4_erosion_annual = 0.0
         self.active_N_erosion_annual = 0.0

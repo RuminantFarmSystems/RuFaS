@@ -1,18 +1,16 @@
-################################################################################
 """
 SurPhos
 File name: fert_leach.py
 Author(s): Jacob Johnson, jacob8399@gmail.com,
            William Donovan, wmdonovan@wisc.edu
 """
-################################################################################
 
 from math import log, exp
 
 
 # estimates P leaching from surface fertilizer with rainfall and
 # P infiltration into soil and loss in runoff
-# "pseudocode_soil" S.5.F
+# "pseudocode_soil" S.6.F
 def update_all(S, weather, time):
 
     day = time.day
@@ -21,26 +19,25 @@ def update_all(S, weather, time):
     runoff = S.runoff
 
     # Sorption
-    # S.5.F.I
+    # S.6.F.I
 
-    # S.5.F.I.1
+    # S.6.F.I.1
     sorp_percent = 0.0
     if S.fert_CNT > 0.0:
         sorp_percent = -0.16 * log(S.fert_CNT) + S.cover_factor
 
-    # S.5.F.1
-    S.fert_sorp = min(max(0.0, S.fert_P_available * sorp_percent), S.fert_P_available)
+    # S.6.F.I.2
+    S.fert_sorp = min(max(0.0, S.fert_sorp), S.fert_P_available * sorp_percent)
 
-    # S.5.F.2
     S.fert_P_available -= S.fert_sorp
     S.fert_absorbed_sum += S.fert_sorp
 
     S.fert_CNT += 1.0
 
     # Runoff and Leaching
-    # S.5.F.II
+    # S.6.F.II
 
-    # S.5.F.II.1
+    # S.6.F.II.1
     if rainfall > 0.0:
         S.no_rains += 1
 
@@ -53,7 +50,7 @@ def update_all(S, weather, time):
             if S.no_rains > 2:
                 release_factor = 0.075
 
-        # S.5.F.2
+        # S.6.F.2
         S.fert_P_leach = min(max(0.0, S.fert_P_released * release_factor), S.fert_P_released)
         S.fert_P_released -= S.fert_P_leach
 
@@ -61,36 +58,36 @@ def update_all(S, weather, time):
     S.fert_P_runoff = 0.0
     S.fert_P_runoff_act = 0.0
     if runoff > 0.0:
-        # S.5.F.II.2
+        # S.6.F.II.2
         S.PD_factor = 0.034 * exp((runoff / rainfall) * 3.4)
 
-        # S.5.F.II.3
+        # S.6.F.II.3
         S.fert_P_runoff = S.fert_P_leach / (rainfall / 10.0) \
                           / S.area * 10.0 * S.PD_factor
 
         # calculate fertilizer runoff P in KG
-        # S.5.F.II.4
+        # S.6.F.II.4
         S.fert_P_runoff_act = min(max(0.0, S.fert_P_runoff * runoff * 0.01 * S.area), S.fert_P_leach)
 
     # convert soil P from KG/HA to KG and add fertilizer P leached to each layer
-    # S.5.F.II.5
+    # S.6.F.II.5
     DF = 0.6
     S.fert_P_leach -= S.fert_P_runoff_act
     fert_not_leached = S.fert_P_leach
     for layer in S.soil_layers:
 
-        # S.5.B.3
+        # S.6.B.3
         layer.labile_P *= S.area
 
         if S.soil_layers.index(layer) == 0:
             layer.labile_P += S.fert_sorp
 
-        # S.5.F.II.5
+        # S.6.F.II.5
         layer.labile_P += S.fert_P_leach * DF
         fert_not_leached -= S.fert_P_leach * DF
         DF = max(0.0, (DF / 2) - 0.02)
 
-        # S.5.B.4
+        # S.6.B.4
         layer.labile_P /= S.area
 
     S.DRP_leach_annual += fert_not_leached
