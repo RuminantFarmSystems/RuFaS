@@ -166,7 +166,7 @@ def added_manure_P(soil, m_app):
     wet_rate = soil.manure_applied / DM / cover_app
     infiltration = min(0.9, 0.000002 * wet_rate + 0.267)
 
-    # S.6.B.3
+    # S.5.A.7
     for layer in soil.soil_layers:
         layer.active_P *= soil.area
         layer.labile_P *= soil.area
@@ -226,7 +226,7 @@ def added_manure_P(soil, m_app):
     soil.soil_layers[last_layer].labile_P += C_WIP + C_WOP + \
                                              (soil.manure_P_applied * W_fac * 0.75 * 0.95 * I_fac * D_fac_2) * D_fac
 
-    # S.6.B.4
+    # S.5.A.8
     for layer in soil.soil_layers:
         layer.active_P /= soil.area
         layer.labile_P /= soil.area
