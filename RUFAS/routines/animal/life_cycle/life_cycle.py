@@ -183,11 +183,28 @@ class LifeCycleManager:
         """
         self.animal_initializer = AnimalInitalization(False)
         self.herd_num = herd_num
+
+        entered_herd = 'entered herd through initialization'
         calves = self.animal_initializer.get_calves(calf_num)
+        for calf in calves:
+            calf.events.add_event(calf.days_born, 0, entered_herd)
+
         heiferIs = self.animal_initializer.get_heiferIs(heiferI_num)
+        for heiferI in heiferIs:
+            heiferI.events.add_event(heiferI.days_born, 0, entered_herd)
+
         heiferIIs = self.animal_initializer.get_heiferIIs(heiferII_num)
+        for heiferII in heiferIIs:
+            heiferII.events.add_event(heiferII.days_born, 0, entered_herd)
+
         heiferIIIs = self.animal_initializer.get_heiferIIIs(heiferIII_num)
+        for heiferIII in heiferIIIs:
+            heiferIII.events.add_event(heiferIII.days_born, 0, entered_herd)
+
         cows = self.animal_initializer.get_cows(cow_num)
+        for cow in cows:
+            cow.events.add_event(cow.days_born, 0, entered_herd)
+
         self.replacement_market = self.animal_initializer.get_replacement_cows(replace_num)
         return calves, heiferIs, heiferIIs, heiferIIIs, cows
 
@@ -272,6 +289,10 @@ class LifeCycleManager:
             wean_day = calf.update(date)
             if wean_day:
                 args = calf.get_calf_values()
+                args.update({
+                    'body_weight_history': calf.body_weight_history,
+                    'pen_history': calf.pen_history
+                     })
                 new_heiferI = HeiferI(args)
                 heiferIs.append(new_heiferI)
                 del calves[index]
@@ -285,6 +306,10 @@ class LifeCycleManager:
             second_stage = heiferI.update(date)
             if second_stage:
                 args = heiferI.get_heiferI_values()
+                args.update({
+                    'body_weight_history': heiferI.body_weight_history,
+                    'pen_history': heiferI.pen_history
+                     })
                 args.update(repro_program = 'TAI')
                 args.update(tai_method_h = '5dCG2P')
                 args.update(synch_ed_method_h = '2P')
@@ -304,7 +329,11 @@ class LifeCycleManager:
                 self.culled_heifers.append(heiferII)
                 del heiferIIs[index]
             if third_stage:
-                args = args = heiferII.get_heiferII_values()
+                args = heiferII.get_heiferII_values()
+                args.update({
+                    'body_weight_history': heiferII.body_weight_history,
+                    'pen_history': heiferII.pen_history
+                     })
                 new_heiferIII = HeiferIII(args)
                 heiferIIIs.append(new_heiferIII)
                 del heiferIIs[index]
@@ -325,6 +354,10 @@ class LifeCycleManager:
 
             if cow_stage:
                 args = heiferIII.get_heiferIII_values()
+                args.update({
+                    'body_weight_history': heiferIII.body_weight_history,
+                    'pen_history': heiferIII.pen_history
+                     })
                 args.update(repro_program = 'TAI')
                 args.update(presynch_method = 'PreSynch')
                 args.update(tai_method_c = 'OvSynch 56')

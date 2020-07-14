@@ -557,7 +557,7 @@ class AnimalManagement:
             for pen in self.all_pens:
                 pen.pen_populated = len(pen.animals_in_pen) > 0
 
-            ids_added, ids_removed, calves_born, self.calves, self.heiferIs, \
+            animals_added, ids_removed, calves_born, self.calves, self.heiferIs, \
                 self.heiferIIs, self.heiferIIIs, self.cows = \
                 self.life_cycle_manager.daily_update(self.simulation_day,
                                                      self.sim_length,
@@ -566,7 +566,7 @@ class AnimalManagement:
                                                      self.heiferIIs,
                                                      self.heiferIIIs, self.cows)
 
-            self.daily_update_id_pen(ids_added, ids_removed, calves_born)
+            self.daily_update_id_pen(animals_added, ids_removed, calves_born)
 
             # phosphorus requirements for daily updates
             self.calc_p_rqmts(feed)  # per animal

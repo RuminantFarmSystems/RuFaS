@@ -108,6 +108,10 @@ class AnimalBase(object):
 			self.p_growth = 0
 			self.p_maint_feces = 0
 
+		if 'body_weight_history' in args:
+			self.body_weight_history = args['body_weight_history']
+			self.pen_history = args['pen_history']
+
 	def set_default_nutrient_rqmts(self):
 		"""
 		Sets the default nutrient requirement values to be 0.
