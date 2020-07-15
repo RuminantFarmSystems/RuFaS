@@ -35,10 +35,11 @@ from random import random
 
 
 class MilkProductionHistory:
-	def __init__(self, sim_day, days_in_milk, milk_prod):
+	def __init__(self, sim_day, days_in_milk, milk_prod, days_born):
 		self.simulation_day = sim_day
 		self.days_in_milk = days_in_milk
 		self.milk_production = milk_prod
+		self.days_born = days_born
 
 
 class Cow(HeiferIII):
@@ -148,7 +149,7 @@ class Cow(HeiferIII):
 			self.calves = args['parity']
 
 	def update_milk_production_history(self, sim_day):
-		self.milk_production_history.append(MilkProductionHistory(sim_day, self.days_in_milk, self.estimated_daily_milk_produced))
+		self.milk_production_history.append(MilkProductionHistory(sim_day, self.days_in_milk, self.estimated_daily_milk_produced, self.days_born))
 
 	def _determine_param_value(self, mean, std):
 		"""
@@ -188,7 +189,7 @@ class Cow(HeiferIII):
 			self.events.add_event(self.days_born, sim_day, 'dry')
 			self.days_in_milk = 0
 			self.estimated_daily_milk_produced = 0
-			self.update_milk_production_history(sim_day)
+
 			return 0, 0, 0
 
 		breed_index = 0
@@ -263,8 +264,6 @@ class Cow(HeiferIII):
 
 		if not self.milking:
 			self.daily_growth = self.body_weight - prev_weight
-
-		self.update_milk_production_history(sim_day)
 
 		return estimated_daily_milk_produced, fat_percent, \
 			daily_fat_correct_milk_production
@@ -421,6 +420,7 @@ class Cow(HeiferIII):
 			new_born: True if a calf is born
 		"""
 		self.update_body_weight_history(sim_day)
+		self.update_milk_production_history(sim_day)
 		if self.culled:
 			return None
 
