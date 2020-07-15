@@ -84,9 +84,6 @@ def annual_variable_update(soil):
 
     soil.p_act_annual += soil.p_act
 
-    soil.manure_app_annual += soil.manure_app
-    soil.manure_P_annual += soil.manure_P
-
 
 class Soil:
 
@@ -120,11 +117,6 @@ class Soil:
         self.profile_SW = 0.0
 
         self.initialize_soil_water()
-
-        self.calculate_soil_water()  # calculate soil water in layer
-        self.calculateWiltingWater()  # calculate wilting water in layer
-        self.calculateFcWater()  # calculate field capacity water in layer
-        self.calculateSatWater()  # calculate saturation water in layer
 
         # water balance
         self.initial_annual_SW = self.profile_SW
@@ -200,14 +192,8 @@ class Soil:
         self.depth_fact = 0.0
 
         # manure
-        self.manure_app = 0.0
-
         self.manure_type = 0
         self.manure_app_annual = 0
-
-        # self.manure_type = 0
-        # self.manure_annual = 0
-        # self.manure_P_annual = 0
 
         self.WIP = 0.0
         self.WOP = 0.0
@@ -411,57 +397,6 @@ class Soil:
         else:
             return 0.5333
 
-    # ---------------------------------------------------------------------------
-    # Function: calculate_soil_water
-    # Calculates the amount of water in soil profile for a given layer at.
-    # Called when soil portion of input is read.
-    # ---------------------------------------------------------------------------
-    def calculate_soil_water(self):
-        for layer in self.soil_layers:
-            layer.soil_water = layer.thickness * layer.soil_water_percent
-
-    # ---------------------------------------------------------------------------
-    # Function: calculateFcWater
-    # Calculates the amount of water in soil profile for a given layer at
-    # field capacity (mm H2O). Called when soil portion of input is read.
-    # ---------------------------------------------------------------------------
-    def calculateFcWater(self):
-        """
-        Description:
-            Calculates the amount of water in soil profile for a given layer at
-            field capacity (mm H2O). Called when soil portion of input is read.
-        """
-        for layer in self.soil_layers:
-            layer.fc_water = layer.thickness * layer.field_capacity
-
-    # ---------------------------------------------------------------------------
-    # Function: calculateSatWater
-    # Calculates the amount of water in soil profile for a given layer at
-    # saturation (mm H2O). Called when soil portion of input is read.
-    # ---------------------------------------------------------------------------
-    def calculateSatWater(self):
-        """
-        Description:
-            Calculates the amount of water in soil profile for a given layer at
-            saturation (mm H2O). Called when soil portion of input is read.
-        """
-        for layer in self.soil_layers:
-            layer.sat_water = layer.thickness * layer.saturation
-
-    # ---------------------------------------------------------------------------
-    # Function: calculateWiltingWater
-    # Calculates the amount of water in soil profile for a given layer at
-    # wilting point (mm H2O). Called when soil portion of input is read.
-    # ---------------------------------------------------------------------------
-    def calculateWiltingWater(self):
-        """
-        Description:
-            Calculates the amount of water in soil profile for a given layer at
-            wilting point (mm H2O). Called when soil portion of input is read.
-        """
-        for layer in self.soil_layers:
-            layer.wilting_water = layer.thickness * layer.wilting_point
-
     def initialize_soil_water(self):
         """
         Description:
@@ -514,7 +449,7 @@ class Soil:
 
             # "pseudocode_soil" S.4.A.1
             exp_part = exp(-z / 1000)
-            NO3 = 7 * exp_part
+            NO3 = 28 * exp_part
 
             # "pseudocode_soil" S.4.A.2
             org_C = layer.org_C

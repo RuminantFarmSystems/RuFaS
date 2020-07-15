@@ -21,7 +21,7 @@
             {
                 "soil": "barnyard_soil.json",
                 "crop": "corn_rotation.json",
-                "field_management": "default_field_management.json"
+                "field_management": "barnyard_field_management.json"
             },
             "field_2":
             {
@@ -31,6 +31,6 @@
             }
         },
         "animal": "barnyard_animal.json",
-        "feed": "buisse_storage.json"
+        "feed": "painke_buisse_feed.json"
     }
 }

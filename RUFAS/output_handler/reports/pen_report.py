@@ -26,8 +26,8 @@ class PenReport(BaseReportDriver):
             self.pen_id = pen_id
 
         def daily_update(self, state, weather, time):
-            soil = state.soil
-            crop_type = state.crop.current_crop
+            soil = state.fields[0].soil
+            crop_type = state.fields[0].crop.current_crop
             animal_management = state.animal_management
             feed = state.feed
 
@@ -41,7 +41,7 @@ class PenReport(BaseReportDriver):
         def __init__(self, data, pen_id):
             super().__init__(data, pen_id)
 
-            self.daily_variables = {'year': ['time.cal_year', '', []],
+            self.daily_variables = {'year': ['time.calendar_year', '', []],
                                     'j_day': ['time.day', '', []],
                                     'num_animals_in_pen': ['len(pen.animals_in_pen)', '', []],
                                     'average_growth': ['pen.avg_growth', 'kg', []],
@@ -50,20 +50,20 @@ class PenReport(BaseReportDriver):
                                     'average_p_req': ['pen.avg_p_req', 'g', []]
                                     }
 
-            self.annual_variables = {'year': ['time.cal_year', '', 0]
+            self.annual_variables = {'year': ['time.calendar_year', '', 0]
                                      }
 
     class ManureReport(BasePenReport):
         def __init__(self, data, pen_id):
             super().__init__(data, pen_id)
 
-            self.daily_variables = {'year': ['time.cal_year', '', []],
+            self.daily_variables = {'year': ['time.calendar_year', '', []],
                                     'j_day': ['time.day', '', []],
                                     'num_animals': ['len(pen.animals_in_pen)', '', []],
                                     'manure': ['pen.manure[\'p_excrt_manure\']', 'g', []]
                                     }
 
-            self.annual_variables = {'year': ['time.cal_year', '', 0]}
+            self.annual_variables = {'year': ['time.calendar_year', '', 0]}
 
             self.manure_info = {}
 
@@ -72,7 +72,7 @@ class PenReport(BaseReportDriver):
             super().__init__(data, pen_id)
             self.ration_interval = data['ration_interval']
 
-            self.daily_variables = {'year': ['time.cal_year', '', []],
+            self.daily_variables = {'year': ['time.calendar_year', '', []],
                                     'j_day': ['time.day', '', []],
                                     'num_animals': ['len(pen.animals_in_pen)', '', []]
                                     }
@@ -89,7 +89,7 @@ class PenReport(BaseReportDriver):
                         []]
 
             self.annual_variables = {
-                'year': ['time.cal_year', '', 0]
+                'year': ['time.calendar_year', '', 0]
             }
 
         def produce_report_graphics(self):

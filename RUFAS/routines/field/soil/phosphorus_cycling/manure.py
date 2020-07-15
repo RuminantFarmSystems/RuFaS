@@ -41,7 +41,7 @@ def update_all(soil, m_app):
     # S.5.C.I.1-6
     cover_app = m_app['percent_cover'] * soil.area
     P_app = mass * P_frac
-    soil.manure_annual += mass
+    soil.manure_app_annual += mass
     soil.manure_P_annual += P_app
 
     soil.manure_moisture = (soil.manure_moisture * soil.manure_mass + (1.0 - DM) * mass) \

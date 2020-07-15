@@ -40,9 +40,9 @@ class State:
         for field_name, field_data in self.fields_data.items():
             self.fields.append(Field(field_name, field_data, time))
         input_dir = util.get_base_dir() / 'input'
-        self.feed = Feed(read_json_file(input_dir / 'feed_storage' / data['feed']))
+        self.feed = Feed(read_json_file(input_dir / 'feed' / data['feed']))
         self.animal_management = AnimalManagement(
-            read_json_file(input_dir / 'animals' / data['animal']), config, self.feed)
+            read_json_file(input_dir / 'animal' / data['animal']), config, self.feed)
 
     def annual_reset(self):
         """Resets all annual variables that require reset"""
@@ -288,7 +288,6 @@ class Weather:
         self.T_avg = []
         self.radiation = []
         self.T_avg_annual = []
-        self.manure_N = []
 
         year_length = config.year_length
         leap_year_length = config.leap_year_length
@@ -323,8 +322,6 @@ class Weather:
             self.T_min.append([0 for _ in range(len(year))])
             self.T_avg.append([0 for _ in range(len(year))])
             self.radiation.append([0 for _ in range(len(year))])
-            self.manure_N.append([0 for _ in range(len(year))])
-            # TODO: manureN is a temporary weather file input until manure storage is implemented
 
         # read in the input csv file
         weather_full_path = util.get_base_dir() / 'input/weather' / weather_file
@@ -372,8 +369,6 @@ class Weather:
                         self.T_min[year][day - offset] = float(row[4])
                         self.T_avg[year][day - offset] = float(row[5])
                         self.radiation[year][day - offset] = float(row[6])
-                        self.manure_N[year][day - offset] = float(row[7])
-                        # TODO: manureN is a temporary weather file input until the manure module is implemented
 
                     except(IndexError, ValueError):
                         # prints out each problematic row in the weather CSV file

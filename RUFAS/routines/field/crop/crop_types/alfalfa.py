@@ -12,7 +12,6 @@ class Alfalfa(BaseCrop):
         self.repeat = alfalfa_data['repeat']
         self.planting_date = alfalfa_data['planting_date']
         self.harvest_date = alfalfa_data['harvest_date']
-        self.fr_PHU_harvest_min = 0.7
 
         if alfalfa_data['harvest_type'] != 'optimal':
             print('Perennial crops are always optimally harvested')

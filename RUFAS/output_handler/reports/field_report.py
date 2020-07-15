@@ -13,21 +13,33 @@ class FieldReport(BaseReportDriver):
         super().__init__(data)
         self.field_name = field_name
         self.reports = {
-            'crop_report': self.CropReport(data['crop_report']),
-            'soil_report': self.SoilReport(data['soil_report']),
-            'soil_nitrogen_report': self.SoilNitrogenReport(data['soil_nitrogen_report']),
-            'soil_phosphorus_report': self.SoilPhosphorusReport(data['soil_phosphorus_report'])
+            'crop_report': self.CropReport(data['crop_report'], field_name),
+            'soil_report': self.SoilReport(data['soil_report'], field_name),
+            'soil_nitrogen_report': self.SoilNitrogenReport(data['soil_nitrogen_report'], field_name),
+            'soil_phosphorus_report': self.SoilPhosphorusReport(data['soil_phosphorus_report'], field_name)
         }
 
     class BaseFieldReport(BaseReport):
-        def __init__(self, data):
+        def __init__(self, data, field_name):
             super().__init__(data)
-            # TODO: add field_name in dj_fields
+            self.field_name = field_name
+
+        def daily_update(self, state, weather, time):
+            for field in state.fields:
+                if field.field_name == self.field_name:
+                    soil = field.soil
+                    crop_type = field.crop.current_crop
+            animal_management = state.animal_management
+            feed = state.feed
+
+            for variable in self.daily_variables:
+                self.daily_variables[variable][2].append(
+                    eval(self.daily_variables[variable][0], globals(), locals()))
 
     class CropReport(BaseFieldReport):
-        def __init__(self, data):
-            super().__init__(data)
-            self.daily_variables = {'year': ['time.cal_year', '', []],
+        def __init__(self, data, field_name):
+            super().__init__(data, field_name)
+            self.daily_variables = {'year': ['time.calendar_year', '', []],
                                     'j_day': ['time.day', '', []],
                                     'fr_PHU': ['crop_type.fr_PHU', '%', []],
                                     'biomass': ['crop_type.biomass_actual', 'kg ha^-1', []],
@@ -38,15 +50,15 @@ class FieldReport(BaseReportDriver):
                                     'yield_actual': ['crop_type.yield_actual', 'kg ha^-1', []]
                                     }
 
-            self.annual_variables = {'year': ['time.cal_year', '', 0],
+            self.annual_variables = {'year': ['time.calendar_year', '', 0],
                                      'yield': ['crop_type.yield_annual', 'kg/ha', 0]
                                      }
 
     class SoilReport(BaseFieldReport):
-        def __init__(self, data):
-            super().__init__(data)
+        def __init__(self, data, field_name):
+            super().__init__(data, field_name)
 
-            self.daily_variables = {'year': ['time.cal_year', '', []],
+            self.daily_variables = {'year': ['time.calendar_year', '', []],
                                     'j_day': ['time.day', '', []],
                                     'precip': ['weather.rainfall[time.year - 1][time.day - 1]', 'mm', []],
                                     'runoff': ['soil.runoff', 'mm', []],
@@ -54,7 +66,7 @@ class FieldReport(BaseReportDriver):
                                     'ET_act': ['soil.ET_act', 'mm H20', []],
                                     'trans_max': ['soil.trans_max', 'mm H20', []],
                                     'evap_max': ['soil.evap_max', 'mm H20', []],
-                                    'surface_temp': ['soil.Tsurf', 'C', []],
+                                    'surface_temp': ['soil.T_surf', 'C', []],
                                     'sediment_yield': ['soil.sed', 'metric tons', []],
                                     'residue': ['soil.residue', 'kg/ha', []],
                                     'trans_act_L1': ['soil.soil_layers[0].trans_act', 'mm H20', []],
@@ -74,16 +86,16 @@ class FieldReport(BaseReportDriver):
                                     'temperature_L3': ['soil.soil_layers[2].temperature', 'C', []],
                                     }
 
-            self.annual_variables = {'year': ['time.cal_year', '', 0],
+            self.annual_variables = {'year': ['time.calendar_year', '', 0],
                                      'ET_max': ['soil.ET_max_annual', 'mm H20', 0],
                                      'ET': ['soil.ET_annual', 'mm H20', 0]
                                      }
 
     class SoilNitrogenReport(BaseFieldReport):
-        def __init__(self, data):
-            super().__init__(data)
+        def __init__(self, data, field_name):
+            super().__init__(data, field_name)
 
-            self.daily_variables = {'year': ['time.cal_year', '', []],
+            self.daily_variables = {'year': ['time.calendar_year', '', []],
                                     'j_day': ['time.day', '', []],
                                     'NO3_L1': ['soil.soil_layers[0].NO3', 'kg', []],
                                     'NO3_L2': ['soil.soil_layers[1].NO3', 'kg', []],
@@ -107,12 +119,12 @@ class FieldReport(BaseReportDriver):
                                     'Denitri_L1': ['soil.soil_layers[0].denitrification', 'kg/ha', []],
                                     'Denitri_L2': ['soil.soil_layers[1].denitrification', 'kg/ha', []],
                                     'Denitri_L3': ['soil.soil_layers[2].denitrification', 'kg/ha', []],
-                                    'Tot_Nitri_Vol_L1': ['soil.soil_layers[0].totNitriVolatil', 'kg/ha', []],
-                                    'Tot_Nitri_Vol_L2': ['soil.soil_layers[1].totNitriVolatil', 'kg/ha', []],
-                                    'Tot_Nitri_Vol_L3': ['soil.soil_layers[2].totNitriVolatil', 'kg/ha', []],
-                                    'N_trans_L1': ['soil.soil_layers[0].nTrans', 'kg', []],
-                                    'N_trans_L2': ['soil.soil_layers[1].nTrans', 'kg', []],
-                                    'N_trans_L3': ['soil.soil_layers[2].nTrans', 'kg', []],
+                                    'Tot_Nitri_Vol_L1': ['soil.soil_layers[0].tot_nitri_volatil', 'kg/ha', []],
+                                    'Tot_Nitri_Vol_L2': ['soil.soil_layers[1].tot_nitri_volatil', 'kg/ha', []],
+                                    'Tot_Nitri_Vol_L3': ['soil.soil_layers[2].tot_nitri_volatil', 'kg/ha', []],
+                                    'N_trans_L1': ['soil.soil_layers[0].N_trans', 'kg', []],
+                                    'N_trans_L2': ['soil.soil_layers[1].N_trans', 'kg', []],
+                                    'N_trans_L3': ['soil.soil_layers[2].N_trans', 'kg', []],
                                     'NO3_runoff': ['soil.NO3_runoff', 'kg/ha', []],
                                     'NH4_runoff': ['soil.NH4_runoff', 'kg/ha', []],
                                     'NO3_perc_L1': ['soil.soil_layers[0].NO3_perc', 'kg/ha', []],
@@ -121,16 +133,14 @@ class FieldReport(BaseReportDriver):
                                     'NH4_perc_L1': ['soil.soil_layers[0].NH4_perc', 'kg/ha', []],
                                     'NH4_perc_L2': ['soil.soil_layers[1].NH4_perc', 'kg/ha', []],
                                     'NH4_perc_L3': ['soil.soil_layers[2].NH4_perc', 'kg/ha', []],
-                                    'active_N_perc_L1': ['soil.soil_layers[0].active_N_perc', 'kg/ha', []],
-                                    'active_N_perc_L2': ['soil.soil_layers[1].active_N_perc', 'kg/ha', []],
-                                    'active_N_perc_L3': ['soil.soil_layers[2].active_N_perc', 'kg/ha', []],
+                                    'active_N_drainage': ['soil.active_N_drainage', 'kg/ha', []],
                                     'NH4_erosion': ['soil.NH4_erosion', 'kg/ha', []],
                                     'active_N_erosion': ['soil.active_N_erosion', 'kg/ha', []],
                                     'stable_N_erosion': ['soil.stable_N_erosion', 'kg/ha', []],
                                     'fresh_N_erosion': ['soil.fresh_N_erosion', 'kg/ha', []]
                                     }
 
-            self.annual_variables = {'year': ['time.cal_year', '', 0],
+            self.annual_variables = {'year': ['time.calendar_year', '', 0],
                                      'NO3_runoff': ['soil.NO3_runoff_annual', 'kg/ha', 0],
                                      'NH4_runoff': ['soil.NH4_runoff_annual', 'kg/ha', 0],
                                      'NH4_erosion': ['soil.NH4_erosion_annual', 'kg/ha', 0],
@@ -143,5 +153,5 @@ class FieldReport(BaseReportDriver):
                                      }
 
     class SoilPhosphorusReport(BaseFieldReport):
-        def __init__(self, data):
-            super().__init__(data)
+        def __init__(self, data, field_name):
+            super().__init__(data, field_name)

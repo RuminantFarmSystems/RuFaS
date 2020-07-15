@@ -259,14 +259,14 @@ class FieldManagement:
                 time: an instance of the Time class specified in classes.py
             """
             day = time.day
-            cal_year = time.start_year + time.year - 1
+            calendar_year = time.start_year + time.year - 1
 
             # if it is the last day of the current year
             if day == len(weather.rainfall[time.year - 1]):
                 if time.year < len(weather.rainfall):
-                    self.applications[(cal_year + 1, 0)] = self.applications.pop((cal_year, day))
+                    self.applications[(calendar_year + 1, 0)] = self.applications.pop((calendar_year, day))
             else:
-                self.applications[(cal_year, day + 1)] = self.applications.pop((cal_year, day))
+                self.applications[(calendar_year, day + 1)] = self.applications.pop((calendar_year, day))
 
         class BaseApplication:
             def __init__(self, app_data):

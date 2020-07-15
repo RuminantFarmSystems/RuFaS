@@ -30,7 +30,7 @@ class MassBalanceReport(BaseReportDriver):
         def __init__(self, data):
             super().__init__(data)
 
-            self.daily_variables = {'year': ['time.cal_year', '', []],
+            self.daily_variables = {'year': ['time.calendar_year', '', []],
                                     'j_day': ['time.day', '', []],
                                     'actual': ['soil.p_act', 'mmH2O', []],
                                     'calculated': ['soil.p_calc', 'mmH2O', []],
@@ -42,7 +42,7 @@ class MassBalanceReport(BaseReportDriver):
                                     'drainage': ['soil.drainage', 'mmH2O', []]
                                     }
 
-            self.annual_variables = {'year': ['time.cal_year', '', 0],
+            self.annual_variables = {'year': ['time.calendar_year', '', 0],
                                      'actual': ['round(soil.p_act_annual, 3)', 'mmH2O', 0],
                                      'calculated': ['round(soil.p_calc_annual, 3)', 'mmH2O', 0],
                                      'difference': ['round(soil.water_balance_difference_annual, 3)', 'mmH2O', 0],
@@ -59,7 +59,7 @@ class MassBalanceReport(BaseReportDriver):
             super().__init__(data)
 
             self.daily_variables = {
-                'year': ['time.cal_year', '', []],
+                'year': ['time.calendar_year', '', []],
                 'j_day': ['time.day', '', []],
                 'actual': ['soil.manure_P', 'kg', []],
                 'calculated': ['soil.P_calc', 'kg', []],
@@ -72,7 +72,7 @@ class MassBalanceReport(BaseReportDriver):
             }
 
             self.annual_variables = {
-                'year': ['time.cal_year', '', 0],
+                'year': ['time.calendar_year', '', 0],
                 'actual': ['soil.manure_P_annual', 'kg', 0],
                 'calculated': ['soil.P_calc_annual', 'kg', 0],
                 'difference': ['soil.P_balance_difference_annual', 'kg', 0],
@@ -88,7 +88,7 @@ class MassBalanceReport(BaseReportDriver):
             super().__init__(data)
 
             self.daily_variables = {
-                'year': ['time.cal_year', '', []],
+                'year': ['time.calendar_year', '', []],
                 'j_day': ['time.day', '', []],
                 'actual': ['soil.manure_N', 'kg', []],
                 'calculated': ['soil.N_calc', 'kg', []],
@@ -115,7 +115,7 @@ class MassBalanceReport(BaseReportDriver):
             }
 
             self.annual_variables = {
-                'year': ['time.cal_year', '', 0],
+                'year': ['time.calendar_year', '', 0],
                 'actual': ['soil.manure_N_annual', 'kg', 0],
                 'calculated': ['soil.N_calc_annual', 'kg', 0],
                 'difference': ['soil.N_balance_difference_annual', 'kg', 0],

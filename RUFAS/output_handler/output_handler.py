@@ -64,16 +64,19 @@ class OutputHandler:
                 output report files.
         """
 
+        field_folder = 'fields/'
+        pen_folder = 'pen/'
+
         # Initialize path for reports
         base_csv_dir = util.get_base_dir() / csv_dir
-        fields_dir = csv_dir / 'fields/'
-        pen_dir = csv_dir / 'pen/'
+        fields_dir = base_csv_dir / field_folder
+        pen_dir = base_csv_dir / pen_folder
 
         # Delete directory if previously exists
-        if csv_dir.exists():
-            shutil.rmtree(csv_dir)
+        if base_csv_dir.exists():
+            shutil.rmtree(base_csv_dir)
 
-        csv_dir.mkdir(exist_ok=True, parents=False)
+        base_csv_dir.mkdir(exist_ok=True, parents=False)
         fields_dir.mkdir(exist_ok=True, parents=False)
         pen_dir.mkdir(exist_ok=True, parents=False)
 
@@ -90,16 +93,30 @@ class OutputHandler:
                 report.initialize_csv_dir()
 
     def initialize_graphic_dir(self, graphic_dir):
-        graphic_dir = util.get_base_dir() / graphic_dir
+        field_folder = 'fields/'
+        pen_folder = 'pen/'
 
-        if graphic_dir.exists():
-            shutil.rmtree(graphic_dir)
+        # Initialize path for reports
+        base_graphic_dir = util.get_base_dir() / graphic_dir
+        fields_dir = base_graphic_dir / field_folder
+        pen_dir = base_graphic_dir / pen_folder
 
-        graphic_dir.mkdir(exist_ok=True, parents=False)
+        # Delete directory if previously exists
+        if base_graphic_dir.exists():
+            shutil.rmtree(base_graphic_dir)
+
+        base_graphic_dir.mkdir(exist_ok=True, parents=False)
+        fields_dir.mkdir(exist_ok=True, parents=False)
+        pen_dir.mkdir(exist_ok=True, parents=False)
 
         for report_name in self.reports:
             report = self.reports[report_name]
             if report.produce_graphics:
+                graphic_dir = base_graphic_dir
+                if report.report_name.startswith('field'):
+                    graphic_dir = fields_dir
+                if report.report_name.startswith('pen'):
+                    graphic_dir = pen_dir
                 report.graphic_dir = graphic_dir / report_name
                 report.graphic_dir.mkdir(exist_ok=True, parents=False)
                 report.initialize_graphic_dir()

@@ -11,8 +11,8 @@ Author(s): Kass Chupongstimun, kass_c@hotmail.com
 import json
 import time as timer
 from pathlib import Path
-from RUFAS import routines, errors
-from RUFAS.classes import Config, State, Weather, Time, read_json_file
+from RUFAS import routines, errors, classes
+from RUFAS.classes import Config, State, Weather, Time
 from RUFAS.util import get_base_dir
 from RUFAS.output_handler import OutputHandler
 from RUFAS.test import test_handler
@@ -153,7 +153,7 @@ def read_json_file(file_path: Path):
             weather = Weather(data['weather'], config)
             time = Time(config)
             state = State(data['farm'], config, time)
-            output = OutputHandler(get_base_dir() / 'input/output' / data['output'], state)
+            output = OutputHandler(classes.read_json_file(get_base_dir() / 'input/output' / data['output']), state)
 
         except errors.JSONfileData as e:
             print("JSON FILE ERROR: " +

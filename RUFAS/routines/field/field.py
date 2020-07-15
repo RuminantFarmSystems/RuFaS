@@ -32,10 +32,10 @@ class Field:
         """
         self.field_name = field_name
 
-        input_dir = util.get_base_dir() / 'Inputs'
+        input_dir = util.get_base_dir() / 'input'
 
-        self.soil_data = read_json_file(input_dir / 'soil_profiles' / field_data['soil'])
-        self.crop_data = read_json_file(input_dir / 'crop_rotations' / field_data['crop'])
+        self.soil_data = read_json_file(input_dir / 'soil' / field_data['soil'])
+        self.crop_data = read_json_file(input_dir / 'crop' / field_data['crop'])
         self.field_management_data = read_json_file(input_dir / 'field_management' / field_data['field_management'])
 
         self.soil = Soil(self.soil_data)

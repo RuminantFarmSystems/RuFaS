@@ -67,8 +67,8 @@ def update_all(soil, crop_type):
     calc_N_up(crop_type)
     calc_act_N_up_each_layer(soil, crop_type)
     crop_type.N_act_up = sum(crop_type.act_N_up_each_layer)
-    calc_bio_N(crop_type, soil)
-    N_uptake(crop_type, soil)
+    calc_bio_N(soil, crop_type)
+    N_uptake(soil, crop_type)
 
 
 def calc_fr_N(crop_type):
@@ -224,20 +224,20 @@ def calc_act_N_up_each_layer(soil, crop_type):
     # Nitrogen uptake demand not met in overlying soil layers
     N_demand = 0
 
-    for pot_N_up, soilLayer in zip(crop_type.pot_N_up_each_layer, soil.soil_layers):
+    for pot_N_up, soil_layer in zip(crop_type.pot_N_up_each_layer, soil.soil_layers):
 
         # C.5.C.4
-        act_N_up = min((pot_N_up + N_demand), soilLayer.NO3)
+        act_N_up = min((pot_N_up + N_demand), soil_layer.NO3)
 
         # C.5.C.7
-        soilLayer.N_uptake = act_N_up
+        soil_layer.N_uptake = act_N_up
         act_N_up_each_layer.append(act_N_up)
 
         # Update values so ready for the next layer
         N_up_over += pot_N_up
 
         # C.5.C.6
-        NO3_over += soilLayer.NO3
+        NO3_over += soil_layer.NO3
 
         # C.5.C.5
         N_demand = max(N_up_over - NO3_over, 0)
@@ -248,12 +248,12 @@ def calc_act_N_up_each_layer(soil, crop_type):
     crop_type.act_N_up_each_layer = act_N_up_each_layer
 
 
-def N_uptake(crop_type, soil):
+def N_uptake(soil, crop_type):
     for layer in soil.soil_layers:
         layer.NO3 -= layer.N_uptake
 
 
-def calc_N_up_each_layer(crop_type, soil):
+def calc_N_up_each_layer(soil, crop_type):
     """
     Description:
         Calculates the potential nitrogen uptake from soil solution in each

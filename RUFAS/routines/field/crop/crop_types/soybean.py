@@ -13,7 +13,6 @@ class Soybean(BaseCrop):
         self.planting_date = soy_data['planting_date']
         self.harvest_date = soy_data['harvest_date']
         self.harvest_type = soy_data['harvest_type']
-        self.fr_PHU_harvest_min = 0.7
 
         self.crop_name = 'soybean'
         self.crop_type = 'annual'

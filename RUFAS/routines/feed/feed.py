@@ -85,7 +85,7 @@ def daily_feed_routine(feed, fields, animal_management):
                 storage.calculate_losses()
                 feed.available_storage.pop(storage_name)
 
-            feed.summarize_feed_storage(storage)
+            feed.summarize_feed_storage()
             feed.new_forages.append(storage)
 
             # forage will be fed out 30 days after harvest

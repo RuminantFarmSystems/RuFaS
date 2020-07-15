@@ -13,11 +13,11 @@ Description: Nitrogen Cycling driver class.
 
 Soil attribute definitions
 
-    NO3 = initial NO3 levels (mg/kg)
+    NO3 = initial NO3 levels (kg/ha)
 
     z = depth of the soil layer's lower boundary
 
-    org_N = initial Organic N (Active + Stable) (mg/kg)
+    org_N = initial Organic N (Active + Stable) (kg/ha)
 
     org_C = Organic carbon in a soil layer (%, user input)
 
