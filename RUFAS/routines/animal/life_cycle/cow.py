@@ -554,7 +554,7 @@ class Cow(HeiferIII):
 
 			if 1 <= self.days_in_milk <= AnimalBase.config['voluntary_waiting_period']:
 				self._later_estrus(sim_day)
-			else:
+			elif not self.do_not_breed:
 				estrus_detection_rand = random()
 				if estrus_detection_rand < \
 					AnimalBase.config['estrus_detection_rate']:
@@ -572,7 +572,7 @@ class Cow(HeiferIII):
 				else:
 					self._return_estrus(sim_day)
 
-		if self.milking:
+		if self.milking and not self.do_not_breed:
 			self.ED_days += 1
 			if record_econ_stats:
 				self.ED_econ_days += 1
@@ -621,21 +621,22 @@ class Cow(HeiferIII):
 			record_econ_stats: record injection counts in this protocol,
 				for temporary use
 		"""
-		if self.days_born == self.tai_program_start_day_c:
-			self.events.add_event(self.days_born, sim_day, 'Inject GnRH')
-			self.GnRH_injections = self.GnRH_injections + 1 \
-				if record_econ_stats else self.GnRH_injections
-		elif self.days_born == self.tai_program_start_day_c + 7:
-			self.events.add_event(self.days_born, sim_day, 'Inject PGF')
-			self.PGF_injections = self.PGF_injections + 1 \
-				if record_econ_stats else self.PGF_injections
-		elif self.days_born == self.tai_program_start_day_c + 9:
-			self.events.add_event(self.days_born, sim_day, 'Inject GnRH')
-			self.GnRH_injections = self.GnRH_injections + 1 \
-				if record_econ_stats else self.GnRH_injections
-		elif self.days_born == self.tai_program_start_day_c + 10:
-			self.ai_day = self.days_born
-			self.conception_rate = AnimalBase.config['ovsynch56_conception_rate']
+		if not self.do_not_breed:
+			if self.days_born == self.tai_program_start_day_c:
+				self.events.add_event(self.days_born, sim_day, 'Inject GnRH')
+				self.GnRH_injections = self.GnRH_injections + 1 \
+					if record_econ_stats else self.GnRH_injections
+			elif self.days_born == self.tai_program_start_day_c + 7:
+				self.events.add_event(self.days_born, sim_day, 'Inject PGF')
+				self.PGF_injections = self.PGF_injections + 1 \
+					if record_econ_stats else self.PGF_injections
+			elif self.days_born == self.tai_program_start_day_c + 9:
+				self.events.add_event(self.days_born, sim_day, 'Inject GnRH')
+				self.GnRH_injections = self.GnRH_injections + 1 \
+					if record_econ_stats else self.GnRH_injections
+			elif self.days_born == self.tai_program_start_day_c + 10:
+				self.ai_day = self.days_born
+				self.conception_rate = AnimalBase.config['ovsynch56_conception_rate']
 
 	def _OvSynch48_update(self, record_econ_stats, sim_day):
 		"""
@@ -645,22 +646,23 @@ class Cow(HeiferIII):
 			record_econ_stats: record injection counts in this protocol,
 				for temporary use
 		"""
-		if self.days_born == self.tai_program_start_day_c:
-			self.events.add_event(self.days_born, sim_day, 'Inject GnRH')
-			self.GnRH_injections = self.GnRH_injections + 1 \
-				if record_econ_stats else self.GnRH_injections
-		elif self.days_born == self.tai_program_start_day_c + 7:
-			self.events.add_event(self.days_born, sim_day, 'Inject PGF')
-			self.PGF_injections = self.PGF_injections + 1 \
-				if record_econ_stats else self.PGF_injections
-		elif self.days_born == self.tai_program_start_day_c + 9:
-			self.events.add_event(self.days_born, sim_day, 'Inject GnRH')
-			self.GnRH_injections = self.GnRH_injections + 1 \
-				if record_econ_stats else self.GnRH_injections
-		elif self.days_born == self.tai_program_start_day_c + 10:
-			self.ai_day = self.days_born
-			self.conception_rate = \
-				AnimalBase.config['ovsynch48_conception_rate']
+		if not self.do_not_breed:
+			if self.days_born == self.tai_program_start_day_c:
+				self.events.add_event(self.days_born, sim_day, 'Inject GnRH')
+				self.GnRH_injections = self.GnRH_injections + 1 \
+					if record_econ_stats else self.GnRH_injections
+			elif self.days_born == self.tai_program_start_day_c + 7:
+				self.events.add_event(self.days_born, sim_day, 'Inject PGF')
+				self.PGF_injections = self.PGF_injections + 1 \
+					if record_econ_stats else self.PGF_injections
+			elif self.days_born == self.tai_program_start_day_c + 9:
+				self.events.add_event(self.days_born, sim_day, 'Inject GnRH')
+				self.GnRH_injections = self.GnRH_injections + 1 \
+					if record_econ_stats else self.GnRH_injections
+			elif self.days_born == self.tai_program_start_day_c + 10:
+				self.ai_day = self.days_born
+				self.conception_rate = \
+					AnimalBase.config['ovsynch48_conception_rate']
 
 	def _CoSynch72_update(self, record_econ_stats, sim_day):
 		"""
@@ -670,21 +672,22 @@ class Cow(HeiferIII):
 			record_econ_stats: record injection counts in this protocol,
 				for temporary use
 		"""
-		if self.days_born == self.tai_program_start_day_c:
-			self.events.add_event(self.days_born, sim_day, 'Inject GnRH')
-			self.GnRH_injections = self.GnRH_injections + 1 \
-				if record_econ_stats else self.GnRH_injections
-		elif self.days_born == self.tai_program_start_day_c + 7:
-			self.events.add_event(self.days_born, sim_day, 'Inject PGF')
-			self.PGF_injections = self.PGF_injections + 1 \
-				if record_econ_stats else self.PGF_injections
-		elif self.days_born == self.tai_program_start_day_c + 10:
-			self.events.add_event(self.days_born, sim_day, 'Inject GnRH')
-			self.GnRH_injections = self.GnRH_injections + 1 \
-				if record_econ_stats else self.GnRH_injections
-			self.ai_day = self.days_born
-			self.conception_rate = \
-				AnimalBase.config['cosynch72_conception_rate']
+		if not self.do_not_breed:
+			if self.days_born == self.tai_program_start_day_c:
+				self.events.add_event(self.days_born, sim_day, 'Inject GnRH')
+				self.GnRH_injections = self.GnRH_injections + 1 \
+					if record_econ_stats else self.GnRH_injections
+			elif self.days_born == self.tai_program_start_day_c + 7:
+				self.events.add_event(self.days_born, sim_day, 'Inject PGF')
+				self.PGF_injections = self.PGF_injections + 1 \
+					if record_econ_stats else self.PGF_injections
+			elif self.days_born == self.tai_program_start_day_c + 10:
+				self.events.add_event(self.days_born, sim_day, 'Inject GnRH')
+				self.GnRH_injections = self.GnRH_injections + 1 \
+					if record_econ_stats else self.GnRH_injections
+				self.ai_day = self.days_born
+				self.conception_rate = \
+					AnimalBase.config['cosynch72_conception_rate']
 
 	def _5dCoSynch_update(self, record_econ_stats, sim_day):
 		"""
@@ -694,35 +697,37 @@ class Cow(HeiferIII):
 			record_econ_stats: record injection counts in this protocol,
 				for temporary use
 		"""
-		if self.days_born == self.tai_program_start_day_c:
-			self.events.add_event(self.days_born, sim_day, 'Inject GnRH')
-			self.GnRH_injections = self.GnRH_injections + 1 \
-				if record_econ_stats else self.GnRH_injections
-		elif self.days_born == self.tai_program_start_day_c + 5:
-			self.events.add_event(self.days_born, sim_day, 'Inject PGF')
-			self.PGF_injections = self.PGF_injections + 1 \
-				if record_econ_stats else self.PGF_injections
-		elif self.days_born == self.tai_program_start_day_c + 6:
-			self.events.add_event(self.days_born, sim_day, 'Inject PGF')
-			self.PGF_injections = self.PGF_injections + 1 \
-				if record_econ_stats else self.PGF_injections
-		elif self.days_born == self.tai_program_start_day_c + 8:
-			self.events.add_event(self.days_born, sim_day, 'Inject GnRH')
-			self.GnRH_injections = self.GnRH_injections + 1 \
-				if record_econ_stats else self.GnRH_injections
-			self.ai_day = self.days_born
-			self.conception_rate = \
-				AnimalBase.config['_5dcosynch_conception_rate']
+		if not self.do_not_breed:
+			if self.days_born == self.tai_program_start_day_c:
+				self.events.add_event(self.days_born, sim_day, 'Inject GnRH')
+				self.GnRH_injections = self.GnRH_injections + 1 \
+					if record_econ_stats else self.GnRH_injections
+			elif self.days_born == self.tai_program_start_day_c + 5:
+				self.events.add_event(self.days_born, sim_day, 'Inject PGF')
+				self.PGF_injections = self.PGF_injections + 1 \
+					if record_econ_stats else self.PGF_injections
+			elif self.days_born == self.tai_program_start_day_c + 6:
+				self.events.add_event(self.days_born, sim_day, 'Inject PGF')
+				self.PGF_injections = self.PGF_injections + 1 \
+					if record_econ_stats else self.PGF_injections
+			elif self.days_born == self.tai_program_start_day_c + 8:
+				self.events.add_event(self.days_born, sim_day, 'Inject GnRH')
+				self.GnRH_injections = self.GnRH_injections + 1 \
+					if record_econ_stats else self.GnRH_injections
+				self.ai_day = self.days_born
+				self.conception_rate = \
+					AnimalBase.config['_5dcosynch_conception_rate']
 
 	def _user_defined_update(self):
 		"""
 		User_defined protocol for tai method
 		"""
-		if self.days_born == self.tai_program_start_day_c + \
-			AnimalBase.config['tai_program_length']:
-			self.ai_day = self.days_born
-			self.conception_rate = \
-				AnimalBase.config['defined_conception_rate_c']
+		if not self.do_not_breed:
+			if self.days_born == self.tai_program_start_day_c + \
+				AnimalBase.config['tai_program_length']:
+				self.ai_day = self.days_born
+				self.conception_rate = \
+					AnimalBase.config['defined_conception_rate_c']
 
 	def _determine_presynch_program_day(self, date):
 		"""
