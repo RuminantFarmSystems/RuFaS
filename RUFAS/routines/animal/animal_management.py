@@ -780,5 +780,5 @@ class AnimalManagement:
         ax2.plot(list(body_weight.keys()), list(body_weight.values()), color='blue')
         ax2.set_ylabel('Body Weight (kg)', color='blue')
 
-        plt.savefig(str(animal.id) + '.png')
+        # plt.savefig(str(animal.id) + '.png')
         plt.close()
