@@ -136,7 +136,7 @@ class HeiferI(Calf):
 			==> Heifer I: \n
 			ID: {} \n
 			Birth Date: {}\n
-			Days Born: {}\n
+			days Born: {}\n
 			Birth Weight: {}kg\n
 			Wean Weight: {}kg\n
 			Body Weight: {}kg\n

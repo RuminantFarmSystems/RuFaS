@@ -11,9 +11,12 @@ class Corn:
         self.planting_date = corn_data['planting_date']
         self.harvest_date = corn_data['harvest_date']
         self.harvest_type = corn_data['harvest_type']
+        self.fr_PHU_harvest_min = 0.7
 
         self.crop_name = 'corn'
         self.crop_type = 'annual'
+        self.harvest_quality = 'null'
+        self.feed_id = '34g'
 
         self.kill_day = -1
         self.kill_year = True
@@ -148,10 +151,20 @@ class Corn:
 
         self.gamma_wu = 0
 
+        self.biomass_dry_down_perc = 0.0  # TODO: Hard coded total dry down until daily method is modeled
+        self.DM_harvest_perc = 0.35  # TODO: Hard coded dry matter percent at harvest
+        self.NDF_harvest_perc = 0.0
+
         self.bio_AG = 0
         self.yield_max = 0
         self.yield_actual = 0
-        self.yield_N = 0
-        self.yield_P = 0
+        self.DM_yield = 0.0
+        self.NDF_yield = 0.0
+        self.N_yield = 0
+        self.P_yield = 0
 
+        self.N_yield_annual = 0.0
+        self.P_yield_annual = 0.0
+        self.DM_yield_annual = 0.0
+        self.NDF_yield_annual = 0.0
         self.yield_annual = 0

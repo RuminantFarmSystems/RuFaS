@@ -69,7 +69,7 @@ def update_all(soil, weather, time):
 # "pseudocode_soil" S.2.A.1
 #
 def calc_runoff(soil, weather, time):
-    R = weather.rainfall[time.year-1][time.day-1]
+    R = weather.rainfall[time.year - 1][time.day - 1]
     S = calc_S(soil)
 
     # modifies S if the top layer of soil is frozen
@@ -202,6 +202,6 @@ def sum_WW(soil):
 # "pseudocode_soil" S.2.A.10
 #
 def calc_daily_infiltration(soil, weather, time):
-    R = weather.rainfall[time.year-1][time.day-1]
+    R = weather.rainfall[time.year - 1][time.day - 1]
     runoff = soil.runoff
     soil.infiltration = R - runoff
