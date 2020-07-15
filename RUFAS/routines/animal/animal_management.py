@@ -19,6 +19,7 @@ from RUFAS.routines.animal.life_cycle.life_cycle import LifeCycleManager
 from RUFAS.routines.animal.life_cycle.animal_base import AnimalBase
 from collections import deque
 import random
+import matplotlib.pyplot as plt
 
 
 def daily_animal_routine(animal_management, feed, weather, time):
@@ -644,6 +645,8 @@ class AnimalManagement:
             else:
                 CI_avg = sum(animal.CI_history) / len(animal.CI_history)
 
+        self.graph_bw_milk(animal, is_cow, animal_type)
+
         return {
             'ID': animal.id,
             'breed': animal.breed,
@@ -658,11 +661,11 @@ class AnimalManagement:
             'semen_used': animal.semen_used,
             'pen_history':
                 [pen_hist.__dict__ for pen_hist in animal.pen_history],
-            'bodyweight_history':
-                [weight_hist.__dict__ for weight_hist in animal.body_weight_history],
-            'milk_production_history':
-                None if not is_cow else
-                [milk_hist.__dict__ for milk_hist in animal.milk_production_history],
+            # 'bodyweight_history':
+            #     [weight_hist.__dict__ for weight_hist in animal.body_weight_history],
+            # 'milk_production_history':
+            #     None if not is_cow else
+            #     [milk_hist.__dict__ for milk_hist in animal.milk_production_history],
             'event_history': animal.events.events,
             'CI_avg': CI_avg
         }
@@ -744,3 +747,36 @@ class AnimalManagement:
         output['num_cows_culled'] = len(self.life_cycle_manager.culled_cows)
 
         return output
+
+    def graph_bw_milk(self, animal, is_cow, animal_type):
+        body_weight = [weight_hist.__dict__
+                       for weight_hist in animal.body_weight_history]
+        body_weight = {bw['days_born']: bw['body_weight'] for bw in body_weight}
+
+        days_born = body_weight.keys()
+        first_day_born_on_farm = min(days_born)
+
+        if is_cow:
+            milk_production = [milk_hist.__dict__
+                               for milk_hist in animal.milk_production_history]
+            milk_production = {milk['days_born']: (milk['milk_production'] if milk['milk_production'] > 0 else None)
+                               for milk in milk_production}
+
+            for i in range(first_day_born_on_farm, min(milk_production.keys())):
+                milk_production[i] = None
+
+        else:
+            milk_production = {day: None for day in days_born}
+
+        fig, ax = plt.subplots()
+        fig.suptitle(animal_type + ' ' + str(animal.id))
+        ax.plot(list(milk_production.keys()), list(milk_production.values()), color='red')
+        ax.set_xlabel('Days Born')
+        ax.set_ylabel('Milk Production (kg)', color='red')
+
+        ax2 = ax.twinx()
+        ax2.plot(list(body_weight.keys()), list(body_weight.values()), color='blue')
+        ax2.set_ylabel('Body Weight (kg)', color='blue')
+
+        plt.savefig(str(animal.id) + '.png')
+        plt.close()
