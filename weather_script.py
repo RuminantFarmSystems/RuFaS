@@ -10,18 +10,21 @@ def main():
     """
 
     print("\nRUFAS: Importing Weather Dataset into Database")
-    in_file = weather_input()
-    out_file = weather_input()
-    with open(in_file, 'r') as data_in:
-        with open(out_file, 'r+') as data_out:
-            delete_extra_rows(data_in, data_out)
+    data_in = weather_input()
+    data_out = weather_input()
+
+    """"# Deletes unnecessary rows at the top of the file
+    delete_extra_rows(data_in, data_out)"""
+
+    # Adds leap days (DAYMET does not report data for leap days)
+    add_leap_days(data_out)
 
 
 def weather_input():
     """
     Prompts the user for an input file. The function will be called twice: once to input the original weather csv file
-    as downloaded from DAYMET as data_in, and a second time to select a csv where the updated table will be stored as
-    data_out.
+    as downloaded from DAYMET as data_in, and a second time to select the black csv file that will be used to format
+    the data accordingly.
     A valid input is:
         Valid path to a csv file.
 
@@ -48,12 +51,19 @@ def delete_extra_rows(data_in, data_out):
     Deletes the first 7 rows of the csv file. In DAYMET, the first 7 rows contain general information about the
     dataset. To be in the correct format, the row containing the parameter names should be the first row of the table.
     """
-    line = 1
-    for row in data_in:
-        if line <= 7:
-            line += 1
-        else:
-            data_out.write(row)
+    with open(data_out, 'r+') as data_out:
+        with open(data_in, 'r') as data_in:
+            line = 1
+            for row in data_in:
+                if line <= 7:
+                    line += 1
+                else:
+                    data_out.write(row)
+
+
+def add_leap_days(data_out):
+    return
+
 
 # -------------------------------------------------------------------------------
 # SCRIPT ENTRY POINT
