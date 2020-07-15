@@ -25,25 +25,54 @@ import math
 class HeiferII(HeiferI):
 	# TODO: Body weight changed could be based on nutrition intake later from
 	#  Ration Formulation.
-
-	def __init__(self, heiferI, args):
+	
+	def __init__(self, args):
 		"""
-		Initialize the heifer in this stage from the first stage and initialize
-		the repro program parameters.
-
-		Args:
-			heiferI: first stage of heifer, pass heifer information from heiferI
-			args:
-				args.repro_program: reproduction program used in heifer,
-					three of them: ED, TAI, and synch-ED programs
-				args.tai_method_h: timed-AI protocols used for reproduction
-					programs, three of them: 5dCG2P, 5dCGP, and user-defined
-				args.synch_ed_method_h: synch ed protocols used for reproduction
-					programs, two of them: 2P and CP
+		Description:
+			initialize the heifer in this stage from the first stage and initialize or assigns the repro program parameters
+		Input:
+			args.id: id of the cow
+			args.breed: breed of the cow
+			args.birth_date: the date of the simulation when the calf was born
+			args.daysBorn: age of the animal
+			args.repro_program: reproduction program used in heifer, 
+				three of them: ED, TAI, and synch-ED programs
+			args.tai_method_h: timed-AI protocols used for 
+				reproduction programs, three of them: 5dCG2P, 
+				5dCGP, and user-defined
+			args.synch_ed_method_h: synch ed protocols used for 
+				reproduction programs, two of them: 2P and CP
+			(optional: include the following to assign cow information) 
+			args.birth_weight: the birth weight of the cow
+			args.body_weight: current body weight of the cow
+			args.wean_weight: the wean weight of the cow
+			args.mature_body_weight: the mature body weight of the cow
+			args.events: events of the cow
+			args.estrus_count
+			args.estrus_day
+			args.tai_program_start_day_h
+			args.synch_ed_program_start_day_h
+			args.synch_ed_estrus_day
+			args.stop_day
+			args.conception_rate
+			args.ai_day
+			args.abortion_day
+			args.days_in_preg
+			args.gestation_length
+			args.p_gest_for_calf
 		"""
-		super().init_from_heiferI(heiferI)
+		super().__init__(args)
+
+		if 'estrus_count' in args:
+			self.assign_heiferII_values(args)
+		else:
+			self.init_values(args)
+		
+	def init_values(self, args):
+		"""
+		Initialize repro program values
+		"""
 		self.repro_program = args['repro_program']
-		self.mature_body_weight = 0
 
 		# Estrus variables
 		self.estrus_count = 0
@@ -67,40 +96,65 @@ class HeiferII(HeiferI):
 		self.gestation_length = 0
 		self.p_gest_for_calf = 0
 
-	def init_from_heiferII(self, heiferII):
+	def assign_heiferII_values(self, args):
 		"""
-		Initialize the heifer in this stage from the first stage and initialize
-		the repro program parameters for coding purposes.
-
-		Args:
-			heiferII: another heifer out of the herd
+			Assign the repro program with given vales
 		"""
-		super().init_from_heiferI(heiferII)
-		self.repro_program = heiferII.repro_program
-		self.mature_body_weight = heiferII.mature_body_weight
+		self.repro_program = args['repro_program']
 
-		# ED variables
-		self.estrus_count = heiferII.estrus_count
-		self.estrus_day = heiferII.estrus_day
+		# Estrus variables
+		self.estrus_count = args['estrus_count']
+		self.estrus_day = args['estrus_day']
 
 		# TAI variables
-		self.tai_method_h = heiferII.tai_method_h
-		self.tai_program_start_day_h = heiferII.tai_program_start_day_h
+		self.tai_method_h = args['tai_method_h']
+		self.tai_program_start_day_h = args['tai_program_start_day_h']
 
 		# synch_ED variables
-		self.synch_ed_method_h = heiferII.synch_ed_method_h
-		self.synch_ed_program_start_day_h = \
-			heiferII.synch_ed_program_start_day_h
-		self.synch_ed_estrus_day = heiferII.synch_ed_estrus_day
-		self.stop_day = heiferII.stop_day
+		self.synch_ed_method_h = args['synch_ed_method_h']
+		self.synch_ed_program_start_day_h = args['synch_ed_program_start_day_h']
+		self.synch_ed_estrus_day = args['synch_ed_estrus_day']
+		self.stop_day = args['stop_day']
 
-		self.conception_rate = heiferII.conception_rate
-		self.ai_day = heiferII.ai_day
-		self.abortion_day = heiferII.abortion_day
-		self.days_in_preg = heiferII.days_in_preg
-		self.preg = heiferII.preg
-		self.gestation_length = heiferII.gestation_length
-		self.p_gest_for_calf = heiferII.p_gest_for_calf
+		self.conception_rate = args['conception_rate']
+		self.ai_day = args['ai_day']
+		self.abortion_day = args['abortion_day']
+		self.days_in_preg = args['days_in_preg']
+		self.preg = self.days_in_preg != 0
+		self.gestation_length = args['gestation_length']
+		self.p_gest_for_calf = args['p_gest_for_calf']
+
+	def get_heiferII_values(self):
+		"""
+		Get current information from the heiferII
+		"""
+		values = {
+            'id' : self.id,
+            'breed' : self.breed,
+            'birth_date' : self.birth_date,
+            'days_born' : self.days_born,
+            'birth_weight' : self.birth_weight,
+            'body_weight' : self.body_weight,
+            'wean_weight' : self.wean_weight,
+            'events' : str(self.events),
+            'repro_program': self.repro_program,
+            'tai_method_h': self.tai_method_h,
+            'synch_ed_method_h': self.synch_ed_method_h,
+            'mature_body_weight': self.mature_body_weight,
+            'estrus_count': self.estrus_count,
+            'estrus_day': self.estrus_day,
+            'tai_program_start_day_h': self.tai_program_start_day_h,
+            'synch_ed_program_start_day_h': self.synch_ed_program_start_day_h,
+            'synch_ed_estrus_day': self.synch_ed_estrus_day,
+            'stop_day': self.stop_day,
+            'conception_rate': self.conception_rate,
+            'ai_day': self.ai_day,
+            'abortion_day': self.abortion_day,
+            'days_in_preg': self.days_in_preg,
+            'gestation_length': self.gestation_length,
+			'p_gest_for_calf': self.p_gest_for_calf
+        }
+		return values
 
 	def calc_nutrient_rqmts(self):
 		"""
@@ -174,25 +228,32 @@ class HeiferII(HeiferI):
 		"""
 		cull_stage = False
 		third_stage = False
-
+		
 		prev_weight = self.body_weight
 		self.days_born += 1
 
 		if self.days_born < AnimalBase.config['grow_end_day']:
 			# Heifer can only grow to a maximum weight of mature_body_weight
 			if self.body_weight < AnimalBase.config['mature_body_weight']:
-				self.body_weight += np.random.normal(
-					AnimalBase.config['avg_daily_gain_h'],
+				gained_weight = np.random.normal(
+					AnimalBase.config['avg_daily_gain_h'], 
 					AnimalBase.config['std_daily_gain_h'])
+				while gained_weight < AnimalBase.config['avg_daily_gain_h'] \
+					- 2 * AnimalBase.config['std_daily_gain_h'] \
+					or gained_weight > AnimalBase.config['avg_daily_gain_h'] \
+						+ 2 * AnimalBase.config['std_daily_gain_h']:
+					gained_weight = np.random.normal(
+						AnimalBase.config['avg_daily_gain_h'], 
+						AnimalBase.config['std_daily_gain_h'])
+				self.body_weight += gained_weight
 			if self.body_weight > AnimalBase.config['mature_body_weight']:
 				self.body_weight = AnimalBase.config['mature_body_weight']
 				self.mature_body_weight = self.body_weight
-				self.events.add_event(
-					self.days_born,
-					'Mature body weight prior to grow end day')
-
+				self.events.add_event(self.days_born, 
+				'Mature body weight prior to grow end day')
+		
 		self.daily_growth = self.body_weight - prev_weight
-
+		
 		# Mature body weight
 		if self.days_born == AnimalBase.config['grow_end_day']:
 			self.mature_body_weight = self.body_weight
@@ -236,9 +297,17 @@ class HeiferII(HeiferI):
 		Returns: the day when this estrus should occur
 
 		"""
-		estrus_day = int(start_date + np.random.normal(
-			AnimalBase.config['avg_estrus_cycle_h'],
-			AnimalBase.config['std_estrus_cycle_h']))
+		estrus_cycle = np.random.normal(
+			AnimalBase.config['avg_estrus_cycle_h'], 
+			AnimalBase.config['std_estrus_cycle_h'])
+		while estrus_cycle < AnimalBase.config['avg_estrus_cycle_h'] \
+			- 2 * AnimalBase.config['std_estrus_cycle_h'] \
+			or estrus_cycle > AnimalBase.config['avg_estrus_cycle_h'] \
+				+ 2 * AnimalBase.config['std_estrus_cycle_h']:
+			estrus_cycle = np.random.normal(
+				AnimalBase.config['avg_estrus_cycle_h'], 
+				AnimalBase.config['std_estrus_cycle_h'])
+		estrus_day =  int(start_date + estrus_cycle)
 		self.events.add_event(estrus_day, estrus_note)
 		return estrus_day
 
@@ -385,9 +454,13 @@ class HeiferII(HeiferI):
 			max_val: max value can go for the normal distribution,
 				avoiding negative value
 		"""
-		norm = abs(np.random.normal(avg, std))
-		if norm >= max_val:
-			norm = max_val - 1
+		synch_ed_estrus = np.random.normal(avg, std)
+		while synch_ed_estrus < avg - 2 * std \
+			or synch_ed_estrus > avg + 2 * std:
+			synch_ed_estrus = np.random.normal(avg, std)
+		norm = abs(synch_ed_estrus)
+		if norm >= max:
+			norm = max - 1
 		self.synch_ed_estrus_day = int(date + norm)
 
 	def _synch_ed_program_day_after_abortion(self):
@@ -516,9 +589,15 @@ class HeiferII(HeiferI):
 			if conception_rand < self.conception_rate:
 				self.days_in_preg = 1
 				self.preg = True
-				self.gestation_length = int(
-					np.random.normal(
-						AnimalBase.config['avg_gestation_len'],
+				self.gestation_length = int(np.random.normal(
+					AnimalBase.config['avg_gestation_len'], 
+					AnimalBase.config['std_gestation_len']))
+				while self.gestation_length < AnimalBase.config['avg_gestation_len'] \
+					- 2 * AnimalBase.config['std_gestation_len'] \
+					or self.gestation_length > AnimalBase.config['avg_gestation_len'] \
+						+ 2 * AnimalBase.config['std_gestation_len']:
+					self.gestation_length = int(np.random.normal(
+						AnimalBase.config['avg_gestation_len'], 
 						AnimalBase.config['std_gestation_len']))
 				self.events.add_event(self.days_born, 'Heifer pregnant')
 			else:
@@ -584,11 +663,11 @@ class HeiferII(HeiferI):
 			==> Heifer II: \n
 			ID: {} \n
 			Birth Date: {}\n
-			Days Born: {}\n
+			days Born: {}\n
 			Body Weight: {}kg\n
 			Breed Start Day: {}\n
 			Repro Method: {}\n
-			Days in pregnancy: {}\n
+			days in pregnancy: {}\n
 			Gestation Length: {}\n
 			Life Events: \n
 			{}

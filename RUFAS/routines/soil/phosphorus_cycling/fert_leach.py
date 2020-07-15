@@ -52,29 +52,29 @@ def update_all(S, weather, time):
             if S.no_rains > 2:
                 release_factor = 0.075
 
-        S.fert_leach = S.fert_P_available * release_factor
-        S.fert_P_released -= S.fert_leach
+        S.fert_P_leached = S.fert_P_available * release_factor
+        S.fert_P_released -= S.fert_P_leached
 
     # calculate the concentration of fertilizer dissolved P in runoff in MG/L
-    S.fert_runoff_P = 0.0
-    S.fert_run = 0.0
+    S.fert_P_runoff = 0.0
+    S.fert_P_runoff_act = 0.0
     if runoff > 0.0:
         # S.6.F.II.2
         S.PD_factor = 0.034 * exp((runoff / rainfall) * 3.4)
 
         # S.6.F.II.3
-        S.fert_runoff_P = S.fert_leach / (rainfall / 10.0) \
+        S.fert_P_runoff = S.fert_P_leached / (rainfall / 10.0) \
                           / S.area * 10.0 * S.PD_factor
 
         # calculate fertilizer runoff P in KG
         # S.6.F.II.4
-        S.fert_run = min(max(0.0, S.fert_runoff_P * runoff * 0.01 * S.area), S.fert_leach)
+        S.fert_P_runoff_act = min(max(0.0, S.fert_P_runoff * runoff * 0.01 * S.area), S.fert_P_leached)
 
     # convert soil P from KG/HA to KG and add fertilizer P leached to each layer
     # S.6.F.II.5
     DF = 0.6
-    S.fert_leach -= S.fert_run
-    fert_not_leached = S.fert_leach
+    S.fert_P_leached -= S.fert_P_runoff_act
+    fert_not_leached = S.fert_P_leached
     for layer in S.soil_layers:
 
         # S.6.B.3
@@ -84,8 +84,8 @@ def update_all(S, weather, time):
             layer.labile_P += S.fert_sorp
 
         # S.6.F.II.5
-        layer.labile_P += S.fert_leach * DF
-        fert_not_leached -= S.fert_leach * DF
+        layer.labile_P += S.fert_P_leached * DF
+        fert_not_leached -= S.fert_P_leached * DF
         DF = max(0.0, (DF / 2) - 0.02)
 
         # S.6.B.4
@@ -94,5 +94,5 @@ def update_all(S, weather, time):
     S.DRP_leachate_annual += fert_not_leached
 
     # add fertilizer P leached and in runoff to running total
-    S.fert_runoff_annual += S.fert_run
-    S.fert_leachate_annual += S.fert_leach
+    S.fert_P_runoff_annual += S.fert_P_runoff_act
+    S.fert_P_leachate_annual += S.fert_P_leached

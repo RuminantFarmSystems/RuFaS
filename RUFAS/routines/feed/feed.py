@@ -1,4 +1,3 @@
-################################################################################
 """
 RUFAS: Ruminant Farm Systems Model
 File name: feed.py
@@ -8,16 +7,15 @@ Author(s): Kass Chupongstimun, kass_c@hotmail.com,
            Militsa Sotirova, militsasotirova@gmail.com
            William Donovan, william.m.donovan@gmail.com
            Jacob Johnson, jacob8339@gmail.com
+           Chris Vankerkhove, cjv47@cornell.edu
 """
-################################################################################
 
-from enum import IntEnum
 from RUFAS.util import DatabaseReader
-
 from . import nitrogen_loss, carbon_loss, protein_degradation
+from RUFAS.routines.animal.ration import hardcoded_ration
 
 
-def daily_feed_routine(feed, crop):
+def daily_feed_routine(feed, crop, animal_management):
     """
     Description:
         Runs the feed storage routine. Yield is stored at harvest in available storage.
@@ -27,10 +25,13 @@ def daily_feed_routine(feed, crop):
     Args:
         feed: an instance of the Feed object specified in feed.py
         crop: an instance of the Crop object specified in crop.py
+        animal_management: an instance of the AnimalManagement object specified
+            in animal_management.py
     """
+
     current_crop = crop.current_crop
 
-    if current_crop.yield_actual != 0:
+    if current_crop.DM_yield != 0:
         if len(feed.available_storage) == 0:
             standard_data = {
                 "storage_type": "bag",
@@ -52,159 +53,54 @@ def daily_feed_routine(feed, crop):
         feed.storage_options[storage_name].calibrate_storage(current_crop)
         feed.storage_options[storage_name].store_crop(current_crop)
 
-        feed.summarize_feed_storage(feed.storage_options[storage_name])
+        feed.summarize_feed_storage(storage)
+
+        feed.new_forages.append(storage)
+
+        # forage will be fed out 30 days after harvest
+        storage.days_since_feedout = -30
+
+    feed.daily_updates(animal_management)
 
 
-def annual_feed_routine():
-    pass
-
-
-class FeedNames(IntEnum):
-    """
-    Each enum member is the name of a feed in the feed information database. The
-    values correspond to the ID column in the database table.
-
-    Note: if a feed is added to the database source of feed information, the
-    name of the feed along with its ID must be added here.
-    """
-    Corn_grain = 1
-    Legume_hay = 2
-    Cotton_seed = 3
-    Roasted_soybean = 4
-    Rye_hay = 5
-    Corn_silage = 6
-    Barley = 7
-    Canola_meal = 8
-    Corn_gluten = 9
-    Blood_meal = 10
-    Fish_meal = 11
-
-
-class Nutrients(IntEnum):
-    """
-    Each enum member is the name of either a nutrient or characteristic of a
-    feed in the database source of feed information.
-
-    Note: if a nutrient or characteristic column is added to the database
-    source of feed information, the nutrient or characteristic must be added
-    here.
-    """
-    # TODO change names in the enum
-    DM = 0
-    Ash_DM = 1
-    CP_DM = 2
-    dFA_FA_base = 3
-    dRUP_RUP = 4
-    dStarch_Starch_base = 5
-    FA_DM = 6
-    IVNDFD_NDF = 7
-    FU = 8
-    RU = 9
-    NDF_DM = 10
-    NDIP_DM = 11
-    RUP_CP = 12
-    Starch_DM = 13
-    sNPNCPE_DM = 14
-    ADF_DM = 15
-    LIG_DM = 16
-    Price = 17
-    Limits = 18
-    Units = 19
-    P_DM = 20
-    CA_DM = 21
-    K_DM = 22
-
-
-class NutrientValues:
-    """
-    Description: Stores the information from the database source of feed
-    information for the feeds listed as managed in the input JSON file.
-    """
-    def __init__(self, database_file: str, table_name, configured_feeds):
-        """
-        Connects to the @database_file and queries from the @table_name for the
-        nutrient and characteristic information of the list of
-        @configured_feeds. If an exception is raised, the method prints a
-        message and the program exits.
-
-        Args:
-            database_file: the name of the database file
-            table_name: the name of the table in the database which is queried
-            configured_feeds: a list of the feeds provided by the input JSON
-                file as feeds managed by the farm, and therefore the feeds
-                for which information will be stored
-        """
-        # To obtain data from a database table, we form and execute a query
-        # through the DatabaseReader class.
-        # The table we are querying from with the following code looks like:
-        # ID    Name    Nutrient1   Nutrient2   ...
-        # 0     Feed1   value       value       ...
-        # 1     Feed2   value       value       ...
-        # ...
-        #
-        # The query will be in the following format:
-        # SELECT * FROM table_name WHERE name IN [list_of_feed_names]
-        #
-        # SELECT * FROM table_name:
-        #       The * indicates that information from all of the columns in
-        #       "table_name" are desired (otherwise, the names of specific
-        #       columns would be provided).
-        #
-        # WHERE name IN [list_of_feed_names]:
-        #       If we do not specify which rows we want information from, we
-        #       will get information from every row. We specify which feeds
-        #       (rows) we want information from by filtering. We specify
-        #       that we want each in the result to have a "name" that is in
-        #       list_of_feed_names. (Note that the column in the table is
-        #       "Name" - this is case insensitive.)
-        #
-        # Thus, the query selects all of the columns from the database with
-        # the additional specification that we only obtain information from
-        # the rows that correspond to the feeds listed in the input JSON
-        # file as managed by the farm (specified by the argument
-        # configured_feeds).
-        reader = DatabaseReader(database_file, table_name, identifier="name",
-                                desired_rows=configured_feeds)
-        self.values = reader.values
+def annual_feed_routine(feed):
+    feed.reset_feed()
 
 
 class Feed:
-    """
-    Description:
-        Stores the information for the feeds managed by the farm, and the methods
-        for storage.
-
-    """
-
     def __init__(self, data):
         """
-        Sets up the data for the feeds managed by the farm.
+        Description:
+            Stores the information for the feeds managed by the farm, and the methods
+            for storage.
+            TODO: Store inventory information in database once write function is implemented
 
         Args:
             data: the feed information from the input JSON file
         """
-        self.__feed_database = data["feed_database"]
-        self.__table_name = data["table_name"]
-        self.managed_feed_names = data["managed_feeds"]
+        self.feed_database = data['feed_database']
+        self.feeds_table = data['feeds_table']
+        self.feed_quality_table = data['feed_quality_table']
+        self.nutrient_table = data['nutrient_table']
 
-        # The managed_feeds are the collection of feeds should be used
-        # in calculations.
-        self.managed_feeds = []
+        self.db_reader = DatabaseReader(self.feed_database)
 
-        # Populate managed_feeds. The key to retrieve a feed type from
-        # available_feeds is the name of the feed as specified in the database
-        # table. The feed_keys are specified in the input json file.
-        for feed_key in self.managed_feed_names:
-            self.managed_feeds.append(FeedNames[feed_key])
+        self.entries_split_by_maturity = self.get_feeds_split_by_maturity()
+        self.growing_feeds = data['growing_feeds']
+        self.purchased_feeds_entries = data['purchased_feeds']
+        self.purchased_feeds = []  # set in the next method call
+
+        self.all_feed_ids = self.get_all_feed_units(data['purchased_feeds'],
+                                                    data['growing_feeds'])
+
+        # dictionary of nutrients needed for this run
+        # initially, this only contains information for purchased feeds as none
+        # of the growing_feeds have been harvested yet
+        self.available_feeds = \
+            self.get_nutrient_vals(self.purchased_feeds, False)
 
         # The nutrient requirements used in the ration calculations.
         self.nutrient_rqmts = ['FU', 'RU', 'ME_DM', 'RDP_DM', 'RUP_DM']
-
-        # The values in the database at the time of this object's
-        # initialization.
-        self.__cached_values = NutrientValues(self.__feed_database,
-                                              self.__table_name,
-                                              self.managed_feed_names)
 
         self.storage_options = {}
 
@@ -218,11 +114,18 @@ class Feed:
         self.N = 0.0
         self.P = 0.0
         self.DM = 0.0
+        self.NDF = 0.0
         self.CP = 0.0
         self.NPN = 0.0
 
         self.C_loss = 0.0
         self.CP_loss = 0.0
+
+        # a list of storage objects with new crops
+        self.new_forages = []
+        # this variable is a placeholder for average body weight of animals for
+        # max intake calculations
+        self.animal_avg_BW = {}
 
     class Storage:
         def __init__(self, data):
@@ -234,6 +137,7 @@ class Feed:
                 data: a dictionary containing information to define the storage
                     receptacle
             """
+
             self.storage_type = data['storage_type']
             self.moisture = data['moisture']
             self.additive = data['additive']
@@ -244,15 +148,31 @@ class Feed:
             self.ventilation = data['ventilation']
             self.removal_rate = data['removal_rate']
 
+            self.DM = data['initial_dry_matter']
+
             self.crop_name = 'null'
-            self.prev_crop_name = 'null'
+            self.feed_id = 'null'
+            self.forage_quality = 'null'
 
             self.storage = True
 
-            self.DM = data['initial_dry_matter']
+            self.DMI_forage_max = {'calves': 0,
+                                   'heiferIs': 0,
+                                   'heiferIIs': 0,
+                                   'heiferIIIs': 0,
+                                   'dry_cows': 0,
+                                   'lactating_cows': 0
+                                   }
+
+            self.days_since_feedout = -1
+            self.req_inv = {}
+            self.cow_days = {}
+            self.inclusion_rate_est = {}
+            self.inclusion_pct = {}
 
             self.C_percent = 0.0
 
+            self.NDF = 0.0
             self.C = 0.0
             self.N = 0.0
             self.P = 0.0
@@ -300,9 +220,11 @@ class Feed:
                 Calibrates the feed storage loss model to the crop being stored in the receptacle.
                 Based on information provided by Kevin Painke-Buisse of the DFRC 2019
                 "pseudocode_feed" F.1.4
+
             Args:
                 crop: The crop to be stored
             """
+
             self.crop_name = crop.crop_name
 
             if self.crop_name == 'corn':
@@ -340,7 +262,6 @@ class Feed:
                     self.C_feed_out_particle_percent = 0
                 else:
                     if self.error_1:
-                        print('"' + self.moisture + '"', 'is not a recognized moisture category for', self.crop_name)
                         self.error_1 = False
 
             elif self.crop_name == 'alfalfa':
@@ -398,11 +319,9 @@ class Feed:
                     self.C_feed_out_particle_percent = 0.01
                 else:
                     if self.error_2:
-                        print('"' + self.moisture + '"', 'is not a recognized moisture category for', self.crop_name)
                         self.error_2 = False
             else:
                 if self.error_3:
-                    print('"' + self.crop_name + '"', 'storage is not currently implemented')
                     self.storage = False
                     self.error_3 = False
 
@@ -410,15 +329,18 @@ class Feed:
             """
             Description:
                 Updates mineral components and losses as a crop is stored.
+                "pseudocode_feed" F.1.1
+
             Args:
                 crop: The crop being stored.
             """
 
             if self.storage:
-                # "pseudocode_feed" F.1.1
-                self.DM += crop.yield_actual
-                self.N += crop.yield_N
-                self.P += crop.yield_P
+                self.feed_id = crop.feed_id
+                self.DM += crop.DM_yield
+                self.NDF += crop.NDF_yield
+                self.N += crop.N_yield
+                self.P += crop.P_yield
                 # TODO: no Carbon Cycle currently implemented
                 self.C += crop.yield_actual * self.C_percent
 
@@ -434,7 +356,7 @@ class Feed:
         def reset_storage(self):
             """
             Description:
-                Resets storage receptacle to initial settings.
+                Storage class method resets receptacle to initial settings.
             """
             reset_data = {
                 "storage_type": self.storage_type,
@@ -454,70 +376,498 @@ class Feed:
         """
         Description:
             Accumulates feed storage data as feed is stored in various receptacles
+
         Args:
             storage: The storage receptacle from which information is currently being aggregated
         """
+
         self.C += storage.C
         self.N += storage.N
         self.P += storage.P
         self.DM += storage.DM
+        self.NDF += storage.NDF
         self.CP += storage.CP
         self.NPN += storage.NPN
 
         self.C_loss += storage.C_loss
         self.CP_loss += storage.CP_loss
 
-    def initial_values(self) -> NutrientValues:
+    def required_inventory(self, storage, animal_management):
         """
-        Returns: a NutrientValues object which holds the values in the database
-        table at the time of program initialization.
-        """
-        return self.__cached_values
-
-    def current_values(self) -> NutrientValues:
-        """
-        Returns: a new NutrientValues object which holds the values in the
-        database table at the time of the method call.
-        """
-        return NutrientValues(self.__feed_database,
-                              self.__table_name,
-                              self.managed_feed_names)
-
-    def values(self, desired_feed: FeedNames, current: bool = False):
-        """
+        Description:
+            Computes the required inventory necessary across all animals for a
+            given forage based on the count of the animals, the body weight,
+            and inclusion percent associated with the input forage. This class
+            method for the feed class updates feed class variables along with class
+            variables associated with the input storage object. Each calculation
+            has a reference to the respective calculation in the pseudocode
         Args:
-            desired_feed: a member of the FeedNames enum
-            current: if the values should be taken from the database at the time
-                of the method call, this value is true. The default value is
-                False, which means the cached values will be returned (stored at
-                the time of program initialization)
-                
-        Returns: the dictionary which represents the characteristics and
-        nutrients of the @desired_feed
+            storage: a storage object that contains forage being assessed
+            animal_management: the class object Animal Management which tracks the state of the animals
         """
-        feeds = self.current_values() if current else self.initial_values()
-        index = self.managed_feeds.index(desired_feed)
-        return feeds.values[index]
+        # animals = dictionary with animals as keys and animal objects as values
+        animals = {'calves': animal_management.calves,
+                   'heiferIs': animal_management.heiferIs,
+                   'heiferIIs': animal_management.heiferIIs,
+                   'heiferIIIs': animal_management.heiferIIIs
+                   }
+        lactating_cows = []
+        dry_cows = []
+        for cow in animal_management.cows:
+            if cow.milking:
+                lactating_cows.append(cow)
+            else:
+                dry_cows.append(cow)
 
-    def annual_reset(self):
+        animals['dry_cows'] = dry_cows
+        animals['lactating_cows'] = lactating_cows
+
+        avg_BW = {}
+        animal_class_size_avg = {}
+        # avg_BW = Average bodyweight of specified Animal Class (kg)
+        for key in animals:
+            BW = 0
+            for animal in animals[key]:
+                BW += animal.body_weight
+            animal_class_size_avg[key] = len(animals[key])
+            if len(animals[key]) > 0:
+                avg_BW[key] = BW / len(animals[key])
+            else:
+                avg_BW[key] = 0
+
+        # inclusion_pct = recommended inclusion rate as a percentage of
+        # bodyweight for Animal Class
+        # (currently not unique across different feeds)
+        inclusion_pct = {'calves': 2.0,
+                         'heiferIs': 2.0,
+                         'heiferIIs': 2.0,
+                         'heiferIIIs': 2.0,
+                         'dry_cows': 1.7,
+                         'lactating_cows': 2.0
+                         }
+
+        # inclusion_rate_est = Estimated inclusion rate to meet Animal Class
+        # requirements (kg DM)
+        # [F.2.A.5]
+        inclusion_rate_est = {}
+        for animal in inclusion_pct:
+            inclusion_rate_est[animal] = (inclusion_pct[animal] / 100) * avg_BW[animal]
+
+        # days_remaining = the number of days until the expected start date for
+        # feedout from the next harvest
+        days_remaining = 365 - storage.days_since_feedout
+
+        # cow_days = total number of feeding days until next year’s forage
+        # begins to be fed out
+        cow_days = {'calves': {},
+                    'heiferIs': {},
+                    'heiferIIs': {},
+                    'heiferIIIs': {},
+                    'dry_cows': {},
+                    'lactating_cows': {}
+                    }
+
+        for animal in cow_days:
+            cow_days[animal] = animal_class_size_avg[animal] * days_remaining
+
+        # req_inv = required inventory for corresponding animal class (kg DM)
+        req_inv = {'calves': 0,
+                   'heiferIs': 0,
+                   'heiferIIs': 0,
+                   'heiferIIIs': 0,
+                   'dry_cows': 0,
+                   'lactating_cows': 0
+                   }
+
+        # [F.2.A.4]
+        for animal in cow_days:
+            req_inv[animal] = inclusion_rate_est[animal] * cow_days[animal]
+
+        # updating class variables for input storage object input
+        storage.req_inv = req_inv
+        storage.cow_days = cow_days
+        storage.inclusion_rate_est = inclusion_rate_est
+        storage.inclusion_pct = inclusion_pct
+        self.animal_avg_BW = avg_BW
+
+    def forage_inv_plan(self, storage):
+        """
+        Description:
+            Assess farm grown forage stocks and plan maximum intake of each
+            forage to ensure there is enough forage to last a FULL YEAR.
+            Forage inventory is conducted at least 1x/year after harvest and
+            then at a user specified number of times. This function calculates
+            those values and stores it in the input storage object. Each calculation
+            has a reference to its respective calculation in the pseduocode
+
+        Args:
+            storage: the storage object containing the forage being assessed
+        """
+        # TODO: Incorporate user specified input for frequency of inventory plan
+        # TODO: Raise warning for when additional forage needs to be purchased
+        # TODO: Add remaining forage to other silos with same forage type
+
+        # HIGH QUALITY FORAGE
+        # Calculating DMI for Lactating Cows only
+        # ------------------------------
+        if storage.forage_quality == 'immature' or storage.forage_quality == 'mid_mature':
+            # [F.2.A.6]
+            if 1.1 * storage.req_inv['lactating_cows'] >= storage.DM:
+                storage.DMI_forage_max['lactating_cows'] = storage.DM / \
+                                            storage.cow_days['lactating_cows']
+            else:
+                storage.DMI_forage_max['lactating_cows'] = 1.1 * \
+                                    storage.inclusion_rate_est['lactating_cows']
+
+        # LOW QUALITY FORAGE
+        # Calculating DMI for all EXCEPT Lactating Cows
+        # ------------------------------
+        elif storage.forage_quality == 'mature':
+            tot_req_inv_non_lactating_cows = 0
+            # updating required inventory for non lactating cows
+            for animal in storage.req_inv:
+                if animal != 'lactating_cows':
+                    tot_req_inv_non_lactating_cows += storage.req_inv[animal]
+            # Assigning DMI when there is sufficient inventory
+            # [F.2.A.9]
+            if tot_req_inv_non_lactating_cows <= storage.DM:
+                storage.DMI_forage_max = storage.inclusion_rate_est
+                storage.DMI_forage_max['lactating_cows'] = 0
+            # updating inclusion rate estimate until inventory is sufficient to
+            # satisfy the newly calculated inclusion rate estimate
+            # [F.2.A.10]
+            else:
+                while round(tot_req_inv_non_lactating_cows) > round(storage.DM):
+                    inv_delta = tot_req_inv_non_lactating_cows - storage.DM
+                    denominator = 0
+
+                    for animal in self.animal_avg_BW:
+                        if animal != 'lactating_cows':
+                            denominator += (self.animal_avg_BW[animal] * storage.cow_days[animal])
+
+                    inclusion_pct_delta = inv_delta / denominator
+
+                    for animal in storage.inclusion_rate_est:
+                        storage.inclusion_pct[animal] = max(
+                            storage.inclusion_pct[animal] / 100 - inclusion_pct_delta, 0) * \
+                                                        100
+                        storage.inclusion_rate_est[animal] = (storage.inclusion_pct[animal] / 100) * \
+                                                        self.animal_avg_BW[animal]
+                        storage.req_inv[animal] = storage.inclusion_rate_est[animal] * \
+                                                        storage.cow_days[animal]
+
+                    tot_req_inv_non_lactating_cows = 0
+
+                    for animal in storage.req_inv:
+                        if animal != 'lactating_cows':
+                            tot_req_inv_non_lactating_cows += storage.req_inv[animal]
+
+                storage.DMI_forage_max = storage.inclusion_rate_est
+                storage.DMI_forage_max['lactating_cows'] = 0
+
+        # NO QUALITY ASSESSMENT
+        # Calculating DMI for all animal classes
+        # -----------------------------
+        else:
+            # calculating total required inventory across all animal classes
+            tot_req_inv = sum(storage.req_inv.values())
+            # assigning DMI when there is sufficient inventory
+            # [F.2.A.7]
+            if tot_req_inv <= storage.DM:
+                tot_req_inv_non_lactating_cows = 0
+
+                for animal in storage.DMI_forage_max:
+                    if animal != 'lactating_cows':
+                        storage.DMI_forage_max[animal] = storage.inclusion_rate_est[animal]
+                        tot_req_inv_non_lactating_cows += storage.inclusion_rate_est[animal]
+
+                available_forage = storage.DM - tot_req_inv_non_lactating_cows
+                if storage.cow_days['lactating_cows'] > 0:
+                    storage.DMI_forage_max['lactating_cows'] = available_forage \
+                                            / storage.cow_days['lactating_cows']
+            # updating inclusion rate estimate until inventory is sufficient to
+            # satisfy that newly calculated inclusion rate estimate
+            # [F.2.A.8]
+            else:
+                while round(tot_req_inv) > round(storage.DM):
+                    inv_delta = tot_req_inv - storage.DM
+                    denominator = 0
+                    for animal in self.animal_avg_BW:
+                        if animal != 'lactating_cows':
+                            denominator += (self.animal_avg_BW[animal] * storage.cow_days[animal])
+
+                    inclusion_pct_delta = inv_delta / denominator
+
+                    for animal in storage.inclusion_rate_est:
+                        storage.inclusion_pct[animal] = max(storage.inclusion_pct[animal] / 100 - inclusion_pct_delta,
+                                                            0) * 100
+                        storage.inclusion_rate_est[animal] = (storage.inclusion_pct[animal] / 100) * \
+                                                        self.animal_avg_BW[animal]
+                        storage.req_inv[animal] = storage.inclusion_rate_est[animal] * storage.cow_days[animal]
+
+                    tot_req_inv = sum(storage.req_inv.values())
+
+                tot_req_inv_non_lactating_cows = 0
+                for animal in storage.DMI_forage_max:
+                    if animal != 'lactating_cows':
+                        storage.DMI_forage_max[animal] = storage.inclusion_rate_est[animal]
+                        tot_req_inv_non_lactating_cows += storage.inclusion_rate_est[animal]
+
+                available_forage = storage.DM - tot_req_inv_non_lactating_cows
+                storage.DMI_forage_max['lactating_cows'] = available_forage / storage.cow_days['lactating_cows']
+
+                storage.DMI_forage_max = storage.inclusion_rate_est
+                storage.DMI_forage_max['lactating_cows'] = 0
+
+    def daily_updates(self, animal_management):
+        """
+        Description:
+            Executes daily routines relating to feed management, specifcally a
+            daily feedout process and checking for new forages that need an
+            inventory plan. If the list new_forages contains a forage which
+            had been harvested at least 30 days ago, forage_inv_plan will be called.
+
+        Args:
+            animal_management: The state of the AnimalManagement class object
+        """
+        # Daily feedout for silos with farm grown forages in them per pen based on ration formulated
+        for silo in self.storage_options:
+            if self.storage_options[silo].days_since_feedout >= 0 and self.storage_options[silo].DM > 0:
+                # TODO: change for when ration formulation is implemented
+                ration = hardcoded_ration.get_ration()
+                if self.storage_options[silo].feed_id in ration:
+                    for pen in animal_management.all_pens:
+                        if (self.storage_options[silo].DM - pen.ration[str(self.storage_options[silo].feed_id)]) > 0:
+                            self.storage_options[silo].DM -= pen.ration[str(self.storage_options[silo].feed_id)]
+                        else:
+                            self.storage_options[silo].DM = 0
+                            self.storage_options[silo].reset_storage()
+                            break
+                    silo.days_since_feedout += 1
+        # inventory plan for new forages
+        for silo in self.new_forages:
+            if silo.days_since_feedout >= -1 and animal_management.end_ration_interval():
+                self.required_inventory(silo, animal_management)
+                self.forage_inv_plan(silo)
+                self.add_to_available_feeds(silo.feed_id, .5, .5)
+                self.new_forages.pop()
+                silo.days_since_feedout += 1
+            else:
+                silo.days_since_feedout += 1
+
+    def reset_feed(self):
         """
         Description:
             Resets the accumulated data so they can be interpreted as annual sums.
             Option to reset feed storage model entirely each year.
         """
+
         self.C = 0.0
         self.N = 0.0
         self.P = 0.0
         self.DM = 0.0
+        self.NDF = 0.0
         self.CP = 0.0
         self.NPN = 0.0
 
         self.C_loss = 0.0
         self.CP_loss = 0.0
 
-        # TODO: method for resetting storage allocation. Makes use of reset_storage helper method.
-        #  Similar structure should be used in feed out
-        # for storage in self.storage_options.values():
-        #     storage.reset_storage()
-        #
-        # self.available_storage = self.storage_options
+    def get_feeds_split_by_maturity(self):
+        """
+        Returns the feed entries in the database which have different qualities
+        based on nutrient values at harvest.
+
+        Returns: a set-like list (no duplicates) of the entries listed in the
+            table which splits feeds by quality
+        """
+        column = 'entry'
+        dict_list = self.db_reader.query(self.feed_quality_table,
+                                         distinct=True, cols=[column])
+        return [result[column] for result in dict_list]
+
+    def get_all_feed_units(self, purchased_feeds, grown_feeds):
+        """
+        Constructs and returns a dictionary of where the keys are the feed IDs
+        and the values are dictionaries containing the name and the units of
+        the feed.
+
+        Args:
+            purchased_feeds: the list of entries (ints) of feeds that are
+                purchased
+            grown_feeds: the list of entries (ints) of feeds that will be grown
+
+        Returns:
+            a dictionary where the keys are the feed IDs and the values are
+            dictionaries with feed information:
+            - if the feed is purchased, ID is the string form of the ID
+            (e.g. '2')
+            - if the feed is grown, ID is the string form of the ID plus 'g'
+            (e.g. '8g')
+            - feed name is as it is in the user_feeds table
+            - units is the string representing the units for the feed
+            (e.g. 'kg')
+        """
+        columns = ['entry', 'feed_name', 'units']
+        all_feeds = purchased_feeds + grown_feeds
+        dict_list = self.db_reader.query(self.feeds_table, cols=columns,
+                                         identifier='entry',
+                                         desired_rows=tuple(all_feeds))
+
+        all_feed_info = {str(result['entry']): {
+            'feed_name': result['feed_name'],
+            'units': result['units']
+            }
+            for result in dict_list}
+
+        purchased_mapping = self.get_purchased_feed_ids(purchased_feeds)
+        self.purchased_feeds = list(purchased_mapping.values())
+
+        grown_feeds_mapping = {str(feed): str(feed) + 'g'
+                               for feed in grown_feeds}
+
+        all_feeds_mapping = purchased_mapping.copy()
+        all_feeds_mapping.update(grown_feeds_mapping)
+
+        for entry in all_feeds_mapping:
+            if not entry == all_feeds_mapping[entry]:
+                all_feed_info[all_feeds_mapping[entry]] = \
+                    all_feed_info.pop(entry)
+
+        return all_feed_info
+
+    def get_purchased_feed_ids(self, entries):
+        """
+        Constructs and returns a dictionary of the purchased feed IDs based on
+        whether the quality of each feed can be determined at harvest.
+
+        Args:
+            entries: the purchased feed entries
+
+        Returns:
+            a dictionary where the keys are the feed entries and the keys are
+            the feed IDs that can be used to find nutrient values in
+            the nutrients table
+        """
+        purchased_feed_ids = {}
+        for entry in entries:
+            if entry in self.entries_split_by_maturity:
+                # making the assumption that purchased feeds are at mid-maturity
+                purchased_feed_ids[str(entry)] = str(entry + 2)
+            else:
+                purchased_feed_ids[str(entry)] = str(entry)
+        return purchased_feed_ids
+
+    def get_feed_id(self, grown_feed_entry, DM, NDF):
+        """
+        First queries the database to find which nutrient must be used to find
+        the quality of the feed, then uses the feed's value for that nutrient
+        to find the quality by finding which range it belongs to. Returns
+        the feed ID associated with that quality.
+
+        Args:
+            grown_feed_entry: the entry of the feed that needs to be added to
+                available_feeds
+            DM: the dry matter percentage
+            NDF: the NDF percentage
+
+        Returns: the feed ID corresponding to the appropriate quality of the
+        grown_feed_entry according to its specific differentiating nutrient
+        """
+        # round both values to the nearest integer
+        rounded_DM = round(DM)
+        rounded_NDF = round(NDF)
+        column = 'differentiating_nutrient'
+        dict_list = self.db_reader.query(self.feed_quality_table,
+                                         distinct=True, cols=[column],
+                                         identifier='entry',
+                                         desired_rows=(grown_feed_entry,))
+        nutrient = dict_list[0][column]
+
+        column = 'quality_id'
+        rounded_nutrient = rounded_DM if nutrient == 'DM' else rounded_NDF
+        dict_list = self.db_reader.query(self.feed_quality_table,
+                                         cols=[column], identifier='entry',
+                                         desired_rows=(str(grown_feed_entry),),
+                                         compare_val=str(rounded_nutrient),
+                                         low_col='low_percent',
+                                         high_col='high_percent',)
+
+        return dict_list[0][column]
+
+    def add_to_available_feeds(self, new_grown_feeds, DM_list, NDF_list):
+        """
+        Appends the nutrient values of new_grown_feeds to the available_feeds
+        dictionary according to their quality (if applicable). If a feed is
+        not split by quality, then the values at the respective indices of
+        DM_list and NDF_list are ignored.
+
+        Args:
+            new_grown_feeds: the list of feed entries to be added to
+                available_feeds with nutrient values based on their quality
+            DM_list: the list of dry matter percentages for each feed in
+                new_grown_feeds (indices match up)
+            NDF_list: the list of NDF percentages for each feed in
+                new_grown_feeds (indices match up)
+        """
+        new_feed_ids = []
+        for i, new_feed in enumerate(new_grown_feeds):
+            if new_feed in self.entries_split_by_maturity:
+                new_feed_ids.append(
+                    self.get_feed_id(new_feed, DM_list[i], NDF_list[i]))
+            else:
+                new_feed_ids.append(new_feed)
+        self.available_feeds.update(self.get_nutrient_vals(new_feed_ids, True))
+
+    def update_available_feed(self, feed_id, nutrient, new_val):
+        """
+        Updates the dictionary of available feeds with a particular nutrient
+        value.
+
+        Args:
+            feed_id: string - the ID of the feed to be modified (string should
+                end in 'g' if it is a grown feed
+            nutrient: the nutrient to be modified
+            new_val: the new value of the nutrient
+        """
+        self.available_feeds[feed_id][nutrient] = new_val
+
+    def remove_from_available_feeds(self, feeds_to_be_removed):
+        """
+        Removes the IDs in feeds_to_be_removed from available_feeds.
+
+        Args:
+            feeds_to_be_removed: a list of feed IDs
+        """
+        for feed_id in feeds_to_be_removed:
+            self.available_feeds.pop(feed_id)
+
+    def get_nutrient_vals(self, feed_ids, is_grown):
+        """
+        Constructs and returns the dictionary of nutrient values for the feeds
+        represented by feed_ids.
+
+        Args:
+            feed_ids: list of feed IDs
+            is_grown: boolean - true if the feeds represented by feed_ids are
+                grown, false if purchased
+
+        Returns: a dictionary where the keys are the the feed identifiers and
+        the values are nutrient dictionaries
+        """
+        dict_list = self.db_reader.query(self.nutrient_table,
+                                         identifier='feed_id',
+                                         desired_rows=tuple(feed_ids))
+        nutrient_vals = {}
+        for dictionary in dict_list:
+            feed_id = dictionary['feed_id']
+            # the key in the available_feeds dictionary has a 'g' as the
+            # suffix if it is a grown feed
+            feed_key = str(feed_id)
+
+            if is_grown:
+                feed_key += 'g'
+
+            nutrient_vals[feed_key] = dictionary
+
+        return nutrient_vals

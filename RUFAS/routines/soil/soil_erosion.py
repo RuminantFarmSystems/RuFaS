@@ -54,7 +54,7 @@ Soil attribute definitions
 
     Fcl_si = gives low factors for soils with high clay to silt ratios
 
-    Forgc = reduces soil erodibility for soils with high organic carbon content
+    Forg_C = reduces soil erodibility for soils with high organic carbon content
 
     Fsand = reduces soil erodibility for soils with high sand contents
 
@@ -112,7 +112,7 @@ def calc_sed(soil, crop, weather, time):
 #
 def calc_peak_runoff(soil, weather, time):
     peak_runoff = 0.0
-    R = weather.rainfall[time.year-1][time.day-1]
+    R = weather.rainfall[time.year - 1][time.day - 1]
     if R != 0:
 
         # "pseudocode_soil" S.3.A.3
@@ -156,7 +156,7 @@ def calc_Tconc(soil):
 #
 def calc_Rtc(soil, weather, time):
     alpha = calc_alpha(soil, weather, time)
-    R = weather.rainfall[time.year-1][time.day-1]
+    R = weather.rainfall[time.year - 1][time.day - 1]
 
     return alpha * R
 
@@ -181,7 +181,7 @@ def calc_alpha(soil, weather, time):
 # "pseudocode_soil" S.3.A.8
 #
 def calc_alpha05(weather, time):
-    R = weather.rainfall[time.year-1][time.day-1]
+    R = weather.rainfall[time.year - 1][time.day - 1]
 
     exp_part = exp(-125 / (R + 5))
 
@@ -195,10 +195,10 @@ def calc_alpha05(weather, time):
 def calc_K(soil):
     Fcsand = calc_Fcsand(soil)
     Fcl_si = calc_Fcl_si(soil)
-    Forgc = calc_Forgc(soil)
+    Forg_C = calc_Forg_C(soil)
     Fsand = calc_Fsand(soil)
 
-    return Fcsand * Fcl_si * Forgc * Fsand
+    return Fcsand * Fcl_si * Forg_C * Fsand
 
 
 #
@@ -228,11 +228,11 @@ def calc_Fcl_si(soil):
 
 
 #
-# Calculates Forgc. Forgc reduces soil erodibility for soils with high organic
+# Calculates Forg_C. Forg_C reduces soil erodibility for soils with high organic
 # carbon content when calculating K
 # "pseudocode_soil" S.3.A.12
 #
-def calc_Forgc(soil):
+def calc_Forg_C(soil):
     org_C = soil.soil_layers[0].org_C
 
     exp_part = exp(3.72 - 2.95 * org_C)

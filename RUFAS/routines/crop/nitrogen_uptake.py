@@ -62,6 +62,7 @@ def update_all(crop_type, soil):
     calc_act_N_up_each_layer(crop_type, soil)
     crop_type.N_act_up = sum(crop_type.act_N_up_each_layer)
     calc_bio_N(crop_type, soil)
+    N_uptake(crop_type, soil)
 
 
 #
@@ -172,6 +173,7 @@ def calc_act_N_up_each_layer(crop_type, soil):
         act_N_up = min((pot_N_up + N_demand), soilLayer.NO3)
 
         # C.5.C.7
+        soilLayer.N_uptake = act_N_up
         act_N_up_each_layer.append(act_N_up)
 
         # Update values so ready for the next layer
@@ -187,6 +189,11 @@ def calc_act_N_up_each_layer(crop_type, soil):
             N_demand = 0
 
     crop_type.act_N_up_each_layer = act_N_up_each_layer
+
+
+def N_uptake(crop_type, soil):
+    for layer in soil.soil_layers:
+        layer.NO3 -= layer.N_uptake
 
 
 #
@@ -233,7 +240,6 @@ def calc_N_up_z(crop_type, z):
 # "pseudocode_crop" C.5.E.1
 #
 def calc_bio_N(crop_type, soil):
-    # TODO: Nitrogen Fixation currently returns large negative numbers 11/05/19. This is not biologically feasible.
     N_fix = calc_N_fixation(crop_type, soil)
 
     crop_type.bio_N = crop_type.bio_N + crop_type.N_act_up + N_fix

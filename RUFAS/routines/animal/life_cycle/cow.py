@@ -41,25 +41,55 @@ class Cow(HeiferIII):
 	# TODO: Dry Matter Intake and Body Weight changed could be based on
 	#  nutrition intake later from Ration Formulation.
 
-	def __init__(self, heiferIII, args):
+	def __init__(self, args):
 		"""
-		Args:
-			heiferIII: third stage of heifer, pass heifer information from
-				heiferIII
-			args:
-				args.repro_program: reproduction program used in cow,
+		Description:
+			initialize the cow from heifer
+		Input:
+			args.id: id of the cow
+			args.breed: breed of the cow
+			args.birth_date: the date of the simulation when the calf was born
+			args.daysBorn: age of the animal
+			args.repro_program: reproduction program used in heifer, 
+				three of them: ED, TAI, and synch-ED programs
+			args.tai_method_h: timed-AI protocols used for 
+				reproduction programs, three of them: 5dCG2P, 
+				5dCGP, and user-defined
+			args.synch_ed_method_h: synch ed protocols used for 
+				reproduction programs, two of them: 2P and CP
+			args.repro_program: reproduction program used in cow,
 					three of them: ED, TAI, and ED-TAI programs
-				args.presynch_method: presych protocols used for presynch
-					programs, four of them: PreSynch, Double OvSynch, G6G,
-					and user_defined
-				args.tai_method_c: timed-AI protocols used for reproduction
-					programs, five of them: OvSynch 56, OvSynch 48, CoSynch 72,
-					5d CoSynch, and user-defined
-				args.resynch_method: resynch protocols used for resynch
-					programs, three of them: TAIafterPD, TAIbeforePD,
-					and PGFatPD
+			args.presynch_method: presych protocols used for presynch
+				programs, four of them: PreSynch, Double OvSynch, G6G,
+				and user_defined
+			args.tai_method_c: timed-AI protocols used for reproduction
+				programs, five of them: OvSynch 56, OvSynch 48, CoSynch 72,
+				5d CoSynch, and user-defined
+			args.resynch_method: resynch protocols used for resynch
+				programs, three of them: TAIafterPD, TAIbeforePD,
+				and PGFatPD
+			(optional: include the following to assign cow information) 
+			args.birth_weight: the birth weight of the cow
+			args.body_weight: current body weight of the cow
+			args.wean_weight: the wean weight of the cow
+			args.mature_body_weight: the mature body weight of the cow
+			args.events: events of the cow
+			args.estrus_count
+			args.estrus_day
+			args.tai_program_start_day_h
+			args.synch_ed_program_start_day_h
+			args.synch_ed_estrus_day
+			args.stop_day
+			args.conception_rate
+			args.ai_day
+			args.abortion_day
+			args.days_in_preg
+			args.gestation_length
+			args.p_gest_for_calf
+			args.days_in_milk: cow's current day in milk
+			args.parity: parity of the cow
 		"""
-		super().init_from_heiferIII(heiferIII)
+		super().__init__(args)
 
 		# current hard-coded values necessary for nutrient requirement
 		# calculations
@@ -104,60 +134,14 @@ class Cow(HeiferIII):
 		self.fixed_cost = 0
 		self.milk_income = 0
 
-		# figures
+		#figures
 		self.estimated_daily_milk_produced_lst = []
 		self.body_weight_lst = []
 
-	def init_from_cow(self, cow):
-		"""
-		Initialize the cow in this stage from the third stage of heifer and
-		initialize the repro program parameters for coding purpose
-
-		Args:
-			cow: another cow out of the herd
-		"""
-		super().init_from_heiferIII(Cow)
-
-		# current hard-coded values necessary for nutrient requirement
-		# calculations
-		self.BCS = 3.5  # body condition score
-		self.CP_milk = 3.2
-		self.lactose_milk = 4.85
-
-		self.daily_growth = cow.daily_growth
-		self.calves = cow.calves
-		self.milking = cow.milking
-		self.days_in_milk = cow.days_in_milk
-		self.estimated_daily_milk_produced = cow.estimated_daily_milk_produced
-		self.single_acc_milk_prod = cow.single_acc_milk_prod
-		self.future_cull_date = cow.future_cull_date
-		self.cull_reason = cow.cull_reason
-		self.repro_program = cow.repro_program
-		self.first_ai = cow.first_ai
-		self.mature_body_weight = cow.mature_body_weight
-
-		# TAI params
-		self.presynch_method = cow.presynch_method
-		self.tai_method_c = cow.tai_method_c
-		self.presynch_program_start_day = cow.presynch_program_start_day
-		self.tai_program_start_day_c = cow.tai_program_start_day_c
-		self.resynch_method = cow.resynch_method
-
-		# economics counts
-		self.ED_days = cow.ED_days
-		self.GnRH_injections = cow.GnRH_injections
-		self.PGF_injections = cow.PGF_injections
-		self.semen_used = cow.semen_used
-		self.AI_times = cow.AI_times
-		self.preg_diagnoses = cow.preg_diagnoses
-		self.feed_cost = cow.feed_cost
-		self.fixed_cost = cow.fixed_cost
-		self.milk_income = cow.milk_income
-
-		# figures
-		self.estimated_daily_milk_produced_lst = \
-			cow.estimated_daily_milk_produced_lst
-		self.body_weight_lst = cow.body_weight_lst
+		if 'days_in_milk' in args:
+			self.days_in_milk = args['days_in_milk']
+			self.milking = self.days_in_milk != 0
+			self.calves = args['parity']
 
 	def _determine_param_value(self, mean, std):
 		"""
@@ -297,7 +281,10 @@ class Cow(HeiferIII):
 			self.DBW = result[2]
 			self.daily_growth = self.DBW
 		else:
-			self.nutrient_rqmts = dry_calculate_rqmts()
+			result = dry_calculate_rqmts()
+			self.nutrient_rqmts = result[0]
+			self.DMIest = result[1]
+			self.DBW = result[2]
 
 	def calc_init_nutrient_rqmts(
 			self, vertical_distance, horizontal_distance, housing,
@@ -485,7 +472,10 @@ class Cow(HeiferIII):
 
 		Returns: the day when this estrus should occur
 		"""
-		estrus_day = int(start_date + abs(np.random.normal(avg, std)))
+		estrus_cycle = np.random.normal(avg, std)
+		while estrus_cycle < avg - 2 * std or estrus_cycle > avg + 2 * std:
+			estrus_cycle = np.random.normal(avg, std)
+		estrus_day = int(start_date + abs(estrus_cycle))
 		self.events.add_event(estrus_day, estrus_note)
 		return estrus_day
 
@@ -977,7 +967,14 @@ class Cow(HeiferIII):
 				self.days_in_preg = 1
 				self.preg = True
 				self.gestation_length = int(np.random.normal(
-					AnimalBase.config['avg_gestation_len'],
+					AnimalBase.config['avg_gestation_len'], 
+					AnimalBase.config['std_gestation_len']))
+				while self.gestation_length < AnimalBase.config['avg_gestation_len'] \
+					- 2 * AnimalBase.config['std_gestation_len'] \
+					or self.gestation_length > AnimalBase.config['avg_gestation_len'] \
+						+ 2 * AnimalBase.config['std_gestation_len']:
+					self.gestation_length = int(np.random.normal(
+					AnimalBase.config['avg_gestation_len'], 
 					AnimalBase.config['std_gestation_len']))
 				self.events.add_event(self.days_born, 'Cow pregnant')
 			else:
@@ -1196,13 +1193,13 @@ class Cow(HeiferIII):
 			==> Cow: \n
 			ID: {} \n
 			Enter herd date: {}\n
-			Days Born: {}\n
+			days Born: {}\n
 			Body Weight: {}kg\n
 			Repro program: {}\n
 			Parity: {}\n
-			Days in milk: {}\n
+			days in milk: {}\n
 			Milk produced: {}kg\n
-			Days in preg: {}\n
+			days in preg: {}\n
 			Gestation Length: {}\n
 			Life Events: \n
 			{}

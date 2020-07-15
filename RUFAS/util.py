@@ -18,70 +18,129 @@ class DatabaseReader:
     """
     Description: Stores the information from the database source specified.
     """
+    def __init__(self, database_file: str):
+        self.db_file = database_file
 
-    def __init__(self, database_file: str, table_name, identifier=None,
-                 desired_rows=None):
+    def query(self, table, distinct=False, cols=None, identifier=None,
+              desired_rows=None, compare_val=None, low_col=None, high_col=None):
         """
-        Connects to the @database_file and queries from the @table_name.
-        If an exception is raised, the method prints a message and the program
-        exits.
+        Constructs and executes a query on @table of the following form
+        (all clauses in square brackets are optional, depending on parameters
+        given):
+        SELECT [DISTINCT] * FROM table [WHERE low_col <= compare_val AND
+            high_col >= compare_val] [AND/WHERE identifier IN (desired_rows)]
+        or, if columns are specified using @cols:
+        SELECT [DISTINCT] cols FROM table [WHERE low_col <= compare_val AND
+            high_col >= compare_val] [AND/WHERE identifier IN (desired_rows)]
+        The result of this query is returned.
+        If an exception is raised when connecting/querying the database, this
+        method prints the error message and quits the program.
 
         Args:
-            database_file: the name of the database file
-            table_name: the name of the table in the database which is queried
-            identifier (optional): string that is the name of the column from
-                which values are used to populate @desired_rows
-                (case insenstive)
-            desired_rows (optional): a list of the values in the @identifier
-                column in the table which are in the rows that are desired
+            table: string - the name of the table to be queried
+            distinct: (optional) boolean - if true, the query result contains no
+                duplicates
+            cols: (optional) list of strings - each string in this list is a
+                column name that will be returned. If this argument is not
+                specified, all columns from the specified table will be returned
+            identifier: (optional) string - the column name which will be
+                compared to the desired_rows values. If this argument is
+                specified, desired_rows must also be specified, otherwise both
+                will be treated as None.
+            desired_rows: (optional) tuple of strings - the values of the
+                identifier column which are being queried. If this argument is
+                specified, identifier must also be specified, otherwise both
+                will be treated as None.
+            compare_val: (optional) string - the value which should fall in the
+                range of [low_col, high_col]. If this argument is specified,
+                low_col and high_col must also be specified, otherwise these
+                three arguments will be treated as None.
+            low_col: (optional) string - the column name of the lower bound of
+                the desired range. If this argument is specified, compare_val
+                and high_col must also be specified, otherwise these three
+                arguments will be treated as None.
+            high_col: (optional) string - the column name of the upper bound of
+                the desired range. If this argument is specified, compare_val
+                and low_col must also be specified, otherwise these three
+                arguments will be treated as None.
 
-            Note - if either @desired_rows or @row_identifier is None, all rows
-            of the table will be queried. If they are not None, only those rows
-            will be queried.
+        Returns:
+            the result of the query formed as a list of dictionaries where each
+            dictionary represents a row returned (the keys in each dictionary
+            are the column names and they are mapped to the values in the
+            database)
         """
         try:
             # Forms a connection to the database
-            conn = sqlite3.connect(database_file)
+            conn = sqlite3.connect(self.db_file)
             conn.row_factory = sqlite3.Row
             c = conn.cursor()
 
-            # To obtain data from a database table, we form and execute a query.
+            # the query starts with SELECT
+            query = "SELECT "
+
+            # if distinct is true, append the DISTINCT keyword
+            if distinct:
+                query += "DISTINCT "
+
+            # if cols is not specified, all columns are returned, otherwise
+            # the specified column names are joined by commas and inserted
+            # into the query
+            if cols is None:
+                query += "* FROM " + table
+            else:
+                query += ",".join(cols) + " FROM " + table
+
+            # appends the range part of the query if all 3 components are
+            # specified
+            append_range = compare_val is not None and \
+                low_col is not None and \
+                high_col is not None
+            if append_range:
+                query += " WHERE " + low_col + " <= " + compare_val + \
+                         " AND " + high_col + " >= " + compare_val
+
             if desired_rows is None or identifier is None:
-                query = "SELECT * FROM " + table_name
-                # Since identifier and desired_rows are None, the following 
+                # Since identifier and desired_rows are None, the following
                 # command will execute the query as formulated above on all the
                 # rows of the database.
                 c.execute(query)
 
             else:
-                # SELECT * FROM table_name WHERE identifier IN [desired_rows]
-                # For an example about how this specific query works, see the
-                # documentation of NutrientValues class in feed.py
-                query = "SELECT * FROM " + \
-                        table_name + \
-                        " WHERE " + \
-                        identifier + \
-                        " IN " + \
-                        "({})".format(','.join(['?'] * len(desired_rows)))
+                # if the range has already been appending, the identifier part
+                # of the query is another AND clause, otherwise it is the
+                # beginning of the WHERE clause
+                if append_range:
+                    query += " AND "
+                else:
+                    query += " WHERE "
+                # filters which rows should be returned from the query
+                query += identifier + " IN " + \
+                    "({})".format(','.join(['?'] * len(desired_rows)))
                 # Here, desired_rows is a parameter to the query as the list of
                 # rows for which information is wanted. This list will be
-                # formatted as specified in the query above (i.e. all elements are
-                # separated by a comma and the list is surrounded by parentheses.
+                # formatted as specified in the query above (i.e. all elements
+                # are separated by a comma and the list is surrounded by
+                # parentheses).
                 c.execute(query, desired_rows)
 
-            # self.values is a list of dictionaries, where each dictionary in
+            # construct a list of dictionaries, where each dictionary in
             # the list corresponds to a row in the database table storing
             # the information for the row
-            self.values = []
+            result = []
             row = c.fetchone()
             while row is not None:
-                self.values.append(dict(row))
+                result.append(dict(row))
                 row = c.fetchone()
+
             conn.close()
+
+            return result
+
         except Exception as e:
-            print("The program has encountered the following exception while"
-                  "connecting to and querying the database table ", table_name,
-                  ": ", e, "\nExiting.")
+            print("DatabaseReader.query(): The program encountered the "
+                  "following exception while connecting to and querying table",
+                  table, "from database", self.db_file, ":", e, "\nExiting.")
             exit(1)
 
 

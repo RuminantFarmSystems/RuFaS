@@ -1,5 +1,5 @@
-PuLP~=2.1
-matplotlib~=3.2.2
-numpy~=1.19.0
-pandas~=1.0.5
-scipy~=1.5.0
+PuLP
+matplotlib
+numpy
+pandas
+scipy

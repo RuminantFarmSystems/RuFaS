@@ -10,6 +10,7 @@ class Alfalfa:
         self.repeat = alfalfa_data['repeat']
         self.planting_date = alfalfa_data['planting_date']
         self.harvest_date = alfalfa_data['harvest_date']
+        self.fr_PHU_harvest_min = 0.7
 
         if alfalfa_data['harvest_type'] != 'optimal':
             print('Perennial crops are always optimally harvested')
@@ -18,6 +19,8 @@ class Alfalfa:
 
         self.crop_name = 'alfalfa'
         self.crop_type = 'perennial'
+        self.harvest_quality = 'null'
+        self.feed_id = '1g'
 
         self.kill_day = -1
         self.kill_year = False
@@ -28,23 +31,23 @@ class Alfalfa:
         # ===================================================================
         ''' HEAT UNIT DATA '''
 
-        # Inputs
+        # input
         self.T_base_min = 4
         self.T_base_max = 32  # until dormancy
-        self.PHU = 800  # still unknown
+        self.PHU = 900  # TODO: value taken from corn, value for alfalfa unknown
 
-        # Internally calculated inputs
+        # Internally calculated input
         self.accumulated_HU = 0.0
         self.prev_accumulated_HU = 0.0
 
-        # Outputs
+        # output
         self.fr_PHU = 0.0
         self.prev_fr_PHU = 0.0
 
         # ===================================================================
         ''' LEAF AREA INDEX (LAI) DATA '''
 
-        # Inputs
+        # input
         self.fr_PHU_1 = 0.15
         self.fr_PHU_2 = 0.50
         self.fr_LAI_1 = 0.01
@@ -54,48 +57,48 @@ class Alfalfa:
         self.LAI_max = 4
         self.LAI_min = 0.75
 
-        # Internally calculated inputs
+        # Internally calculated input
         self.prev_fr_LAI_max = 0
         self.fr_LAI_max = 0
 
-        # Outputs
+        # output
         self.prev_LAI_actual = 0
         self.LAI_actual = 0
 
         # ===================================================================
         ''' ROOT DEPTH DATA '''
 
-        # Inputs
+        # input
         self.z_root_max = 3000  # maximum depth of root development
 
-        # Internally calculated inputs
+        # Internally calculated input
         self.fr_root = 0
 
-        # Outputs
+        # output
         self.z_root = 0
 
         # ===================================================================
         ''' BIOMASS DATA '''
 
-        # Inputs
+        # input
         self.kl = 0.65
         self.RUE = 20
         self.T_opt = 25
 
-        # Internally calculated inputs
+        # Internally calculated input
         self.gamma_reg = 0
         self.d_biomass_max = 0
         self.d_biomass_actual = 0.0
 
-        # Outputs
+        # output
         self.biomass_actual = 0
         self.prev_biomass_actual = 0
 
         # ===================================================================
         ''' Soil Water Uptake Data '''
 
-        self.beta_w = 10  # water-use distribution parameter  # corn
-        self.epco = 0.5  # corn
+        self.beta_w = 10  # water-use distribution parameter  # TODO: value taken from corn, value for alfalfa unknown
+        self.epco = 0.5  # TODO: value taken from corn, value for alfalfa unknown
 
         self.water_actual_up = 0
         self.water_uptake_each_layer = []
@@ -103,7 +106,7 @@ class Alfalfa:
         # ===================================================================
         ''' Nitrogen Uptake Data '''
 
-        self.beta_n = 10  # corn
+        self.beta_n = 10  # TODO: value taken from corn, value for alfalfa unknown
 
         self.bio_N_opt = 0
         self.bio_N = 0
@@ -122,7 +125,7 @@ class Alfalfa:
         # ===================================================================
         ''' Phosphorus Uptake Data '''
 
-        self.beta_p = 10  # corn
+        self.beta_p = 10  # TODO: value taken from corn, value for alfalfa unknown
 
         self.bio_P_opt = 0
         self.bio_P = 0
@@ -151,10 +154,20 @@ class Alfalfa:
 
         self.gamma_wu = 0
 
+        self.biomass_dry_down_perc = 0.0
+        self.DM_harvest_perc = 0.15  # TODO: Hard coded dry matter percent at harvest
+        self.NDF_harvest_perc = 0.416
+
         self.bio_AG = 0
         self.yield_max = 0
         self.yield_actual = 0
-        self.yield_N = 0
-        self.yield_P = 0
+        self.DM_yield = 0.0
+        self.NDF_yield = 0.0
+        self.N_yield = 0
+        self.P_yield = 0
 
+        self.N_yield_annual = 0.0
+        self.P_yield_annual = 0.0
+        self.DM_yield_annual = 0.0
+        self.NDF_yield_annual = 0.0
         self.yield_annual = 0

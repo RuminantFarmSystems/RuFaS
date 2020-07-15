@@ -1,0 +1,24 @@
+{
+    "config":
+    {
+        "start_date" : "2009:244",
+        "end_date" : "2016:243",
+        "csv_dir": "output/CSVs/",
+        "graphic_dir": "output/graphics/",
+        "run_tests": false
+    },
+
+    "weather": "barnyard_weather.csv",
+
+    "output": "all_reports.json",
+
+    "farm":
+    {
+        "crop": "custom_rotation.json",
+        "soil": "barnyard_soil.json",
+
+        "animal": "barnyard_animal.json",
+
+        "feed": "panke_buisse_feed.json"
+    }
+}
