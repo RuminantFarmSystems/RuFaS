@@ -256,7 +256,7 @@ class AnimalInitalization:
             cur.execute('INSERT INTO heiferIIs (id, breed, birth_date, days_born, birth_weight, \
                 body_weight, wean_weight, mature_body_weight, events, repro_program, tai_method_h, \
                     synch_ed_method_h, estrus_count, estrus_day, tai_program_start_day_h, \
-                        synch_ed_program_start_day_h, synch_ed_estrus_day, stop_day, conception_rate, \
+                        synch_ed_program_start_day_h, synch_ed_estrus_day, synch_ed_stop_day, conception_rate, \
                             ai_day, abortion_day, days_in_preg, gestation_length, p_gest_for_calf) \
                                 VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)',
                                 (heiferII.id, heiferII.breed, heiferII.birth_date, heiferII.days_born,
