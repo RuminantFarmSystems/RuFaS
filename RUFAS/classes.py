@@ -112,9 +112,8 @@ class Config:
                                       "\tWeather file specified does not exist")
 
         # reads database and stores dictionary values in values_DB list
-        read_DB = DatabaseReader(str(self.weather_full_path), self.weather_table,
-                                 "ID", [self.dataset_ID])
-        values_DB = read_DB.values
+        DB_reader = DatabaseReader(str(self.weather_full_path))
+        values_DB = DB_reader.query(table="Observations", identifier="ID", desired_rows=[self.dataset_ID])
 
         # keeps track of how many lines are in the weather file
         line = len(values_DB)
@@ -340,9 +339,8 @@ class Weather:
                                       "\tWeather file specified does not exist")
 
         # reads database and stores dictionnary values in values_DB list
-        read_DB = DatabaseReader(str(self.weather_full_path), self.weather_table,
-                                 identifier="ID", desired_rows=[self.dataset_ID])
-        values_DB = read_DB.values
+        DB_reader = DatabaseReader(str(self.weather_full_path))
+        values_DB = DB_reader.query(table="Observations", identifier="ID", desired_rows=[self.dataset_ID])
 
         # this for loop takes the weather data and parses it into multiple
         # 2D arrays [year][day] for different weather variables used by the
@@ -429,10 +427,10 @@ class Time:
     Time is currently represented as a year and day only.
     """
 
-    def __init__(self, config):
+    def __init__(self, years, cal_year):
 
-        years = config.years
-        cal_year = config.start_year
+        years = years
+        cal_year = cal_year
         self.start_year = cal_year
         self.cal_year = cal_year
         self.years = years

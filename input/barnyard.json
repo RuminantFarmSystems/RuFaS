@@ -8,7 +8,12 @@
         "run_tests": false
     },
 
-    "weather": "barnyard_weather.csv",
+    "weather":
+    {
+     "weather_database": "Inputs/weather.db",
+     "weather_table_name": "Observations",
+     "dataset_ID": 1
+    },
 
     "output": "all_reports.json",
 
