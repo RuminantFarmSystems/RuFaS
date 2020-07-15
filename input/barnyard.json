@@ -10,7 +10,7 @@
 
     "weather":
     {
-     "weather_database": "Inputs/weather.db",
+     "weather_database": "input/weather/weather.db",
      "weather_table_name": "Observations",
      "dataset_ID": 1
     },
