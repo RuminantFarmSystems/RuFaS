@@ -99,6 +99,19 @@ class AnimalManagement:
     heiferIII_p_comp = 0
     cow_p_comp = 0
 
+    def get_animal_config(self, data):
+        config = {}
+        config.update(data['management_decisions'])
+        config.update(data['user_interactions']['calf'])
+        config.update(data['user_interactions']['repro'])
+        config.update(data['user_interactions']['bodyweight'])
+        config.update(data['user_interactions']['econ'])
+        config.update(data['default']['repro'])
+        config.update(data['default']['milking'])
+        config.update(data['default']['culling'])
+        config.update(data['default']['life_cycle'])
+        return config
+
     def __init__(self, data, config, feed):
         """
         Initializes the pens and animals in the simulation with data from the
@@ -111,8 +124,9 @@ class AnimalManagement:
             feed: instance of the Feed class
         """
         self.sim_length = config.sim_length
-        self.life_cycle_manager = LifeCycleManager(data['animal_config'])
-        AnimalBase.set_config(data['animal_config'])
+        config = self.get_animal_config(data['animal_config'])
+        self.life_cycle_manager = LifeCycleManager(config)
+        AnimalBase.set_config(config)
         AnimalBase.set_nutrient_list(feed.nutrient_rqmts)
         self.init_pens(data['pen_information'], data['herd_information'])
         self.init_animals(data['herd_information'], self.all_pens, feed)
@@ -647,9 +661,7 @@ class AnimalManagement:
             else:
                 CI_avg = sum(animal.CI_history) / len(animal.CI_history)
 
-        self.graph_bw_milk(animal, is_cow, animal_type)
-
-        return {
+        return animal, is_cow, {
             'ID': animal.id,
             'breed': animal.breed,
             'birthday': animal.birth_date,
@@ -663,11 +675,6 @@ class AnimalManagement:
             'semen_used': animal.semen_used,
             'pen_history':
                 [pen_hist.__dict__ for pen_hist in animal.pen_history],
-            # 'bodyweight_history':
-            #     [weight_hist.__dict__ for weight_hist in animal.body_weight_history],
-            # 'milk_production_history':
-            #     None if not is_cow else
-            #     [milk_hist.__dict__ for milk_hist in animal.milk_production_history],
             'event_history': animal.events.events,
             'CI_avg': CI_avg
         }
@@ -711,74 +718,53 @@ class AnimalManagement:
             'num_sold_heifers': 0,
             'num_cows_culled': 0
         }
+        animals = []
         indices = random.sample(range(len(self.calves)), num_animals)
         for i in indices:
-            output['calves'][i] = self.generate_animal_output('calf', i)
+            animal, is_cow, output['calves'][i] = \
+                self.generate_animal_output('calf', i)
+            animals.append((animal, 'calf', is_cow))
 
         indices = random.sample(range(len(self.heiferIs)), num_animals)
         for i in indices:
-            output['heiferIs'][i] = self.generate_animal_output('heiferI', i)
+            animal, is_cow, output['heiferIs'][i] = \
+                self.generate_animal_output('heiferI', i)
+            animals.append((animal, 'heiferI', is_cow))
 
         indices = random.sample(range(len(self.heiferIIs)), num_animals)
         for i in indices:
-            output['heiferIIs'][i] = self.generate_animal_output('heiferII', i)
+            animal, is_cow, output['heiferIIs'][i] = \
+                self.generate_animal_output('heiferII', i)
+            animals.append((animal, 'heiferII', is_cow))
 
         indices = random.sample(range(len(self.heiferIIIs)), num_animals)
         for i in indices:
-            output['heiferIIIs'][i] = \
+            animal, is_cow, output['heiferIIIs'][i] = \
                 self.generate_animal_output('heiferIII', i)
+            animals.append((animal, 'heiferIII', is_cow))
 
         indices = random.sample(range(len(self.cows)), num_animals)
         for i in indices:
-            output['cows'][i] = self.generate_animal_output('cow', i)
+            animal, is_cow, output['cows'][i] = \
+                self.generate_animal_output('cow', i)
+            animals.append((animal, 'cow', is_cow))
 
         indices = random.sample(
             range(len(self.life_cycle_manager.sold_heifers)), num_animals)
         for i in indices:
-            output['sold_heifers'][i] = \
+            animal, is_cow, output['sold_heifers'][i] = \
                 self.generate_animal_output('sold_heifer', i)
+            animals.append((animal, 'sold_heifer', is_cow))
 
         indices = random.sample(
             range(len(self.life_cycle_manager.culled_cows)), num_animals)
         for i in indices:
-            output['culled_cows'][i] = \
+            animal, is_cow, output['culled_cows'][i] = \
                 self.generate_animal_output('culled_cow', i)
+            animals.append((animal, 'culled_cow', is_cow))
 
         output['num_calves_sold'] = len(self.life_cycle_manager.sold_calves)
         output['num_sold_heifers'] = len(self.life_cycle_manager.sold_heifers)
         output['num_cows_culled'] = len(self.life_cycle_manager.culled_cows)
 
-        return output
-
-    def graph_bw_milk(self, animal, is_cow, animal_type):
-        body_weight = [weight_hist.__dict__
-                       for weight_hist in animal.body_weight_history]
-        body_weight = {bw['days_born']: bw['body_weight'] for bw in body_weight}
-
-        days_born = body_weight.keys()
-        first_day_born_on_farm = min(days_born)
-
-        if is_cow:
-            milk_production = [milk_hist.__dict__
-                               for milk_hist in animal.milk_production_history]
-            milk_production = {milk['days_born']: (milk['milk_production'] if milk['milk_production'] > 0 else None)
-                               for milk in milk_production}
-
-            for i in range(first_day_born_on_farm, min(milk_production.keys())):
-                milk_production[i] = None
-
-        else:
-            milk_production = {day: None for day in days_born}
-
-        fig, ax = plt.subplots()
-        fig.suptitle(animal_type + ' ' + str(animal.id))
-        ax.plot(list(milk_production.keys()), list(milk_production.values()), color='red')
-        ax.set_xlabel('Days Born')
-        ax.set_ylabel('Milk Production (kg)', color='red')
-
-        ax2 = ax.twinx()
-        ax2.plot(list(body_weight.keys()), list(body_weight.values()), color='blue')
-        ax2.set_ylabel('Body Weight (kg)', color='blue')
-
-        # plt.savefig(str(animal.id) + '.png')
-        plt.close()
+        return animals, output

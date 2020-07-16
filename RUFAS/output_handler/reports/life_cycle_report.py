@@ -5,6 +5,7 @@ Description: Report for the life cycle submodule.
 Author(s): Militsa Sotirova, militsasotirova@gmail.com
             Katrina Wang, kw433@cornell.edu
 """
+from .. import graphics
 from .base_report import BaseReport
 from .base_report_driver import BaseReportDriver
 from RUFAS.routines.animal.life_cycle.life_cycle import LifeCycleManager
@@ -25,6 +26,8 @@ class LifeCycleReport(BaseReportDriver):
             super().__init__(data)
             self.num_animals = data['num_animals']
 
+            self.animals = []
+
             self.daily_variables = {'year': ['time.cal_year', '', []],
                                     'j_day': ['time.day', '', []]
                                     }
@@ -32,11 +35,15 @@ class LifeCycleReport(BaseReportDriver):
                                      }
 
         def finalize(self, state, weather, time):
-            output = state.animal_management.get_life_cycle_output(
+            self.animals, output = state.animal_management.get_life_cycle_output(
                 self.num_animals)
             with open(str(self.csv_dir) + '/' + self.report_name + '.json',
                       'w') as outfile:
                 json.dump(output, outfile, sort_keys=True, indent=4)
+
+        def produce_report_graphics(self):
+            # super().produce_report_graphics()
+            graphics.individual_animal_graphics(self)
 
     class HerdReport(BaseReport):
         def __init__(self, data):
