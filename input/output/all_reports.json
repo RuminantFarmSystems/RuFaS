@@ -20,7 +20,7 @@
             "report_name": "growth_report"
         }
     },
-     "field_report": {
+    "field_report": {
         "produce_csv": true,
         "produce_graphics": true,
         "report_name": "field_report",
@@ -44,26 +44,26 @@
             "produce_graphics": true,
             "report_name": "crop_report"
         },
-        "mass_balance_report": {
+        "water_balance": {
             "produce_csv": true,
             "produce_graphics": true,
-            "report_name": "mass_balance_report",
-            "water_balance": {
-                "produce_csv": true,
-                "produce_graphics": true,
-                "report_name": "water_balance_report"
-            },
-            "phosphorus_balance": {
-                "produce_csv": true,
-                "produce_graphics": true,
-                "report_name": "phosphorus_balance_report"
-            },
-            "nitrogen_balance": {
-                "produce_csv": true,
-                "produce_graphics": true,
-                "report_name": "nitrogen_balance_report"
-            }
+            "report_name": "water_balance_report"
+        },
+        "phosphorus_balance": {
+            "produce_csv": true,
+            "produce_graphics": true,
+            "report_name": "phosphorus_balance_report"
+        },
+        "nitrogen_balance": {
+            "produce_csv": true,
+            "produce_graphics": true,
+            "report_name": "nitrogen_balance_report"
         }
+    },
+    "mass_balance": {
+        "produce_csv": true,
+        "produce_graphics": true,
+        "report_name": "mass_balance_report"
     },
     "feed_storage_report": {
         "produce_csv": true,
