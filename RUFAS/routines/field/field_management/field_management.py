@@ -146,7 +146,8 @@ class FieldManagement:
             self.applications[(time.start_year + time.year - 1, time.day + 1)] = \
                 self.applications.pop((time.start_year + time.year - 1, -1))
 
-        def check_conditions_plant(self, soil, weather, time):
+        @staticmethod
+        def check_conditions_plant(soil, weather, time):
             """
             Description:
                 Checks if environmental conditions are conducive to plant.
