@@ -11,24 +11,39 @@ from .base_report import BaseReport
 
 
 class MassBalanceReport(BaseReportDriver):
-    def __init__(self, data):
+    def __init__(self, data, field_name):
         super().__init__(data)
-        self.reports = {"water_balance": self.WaterBalance(data['water_balance']),
-                        "phosphorus_balance": self.PhosphorusBalance(data['phosphorus_balance']),
-                        "nitrogen_balance": self.NitrogenBalance(data['nitrogen_balance'])
+        self.field_name = field_name
+        self.reports = {"water_balance": self.WaterBalance(data['water_balance'], field_name),
+                        "phosphorus_balance": self.PhosphorusBalance(data['phosphorus_balance'], field_name),
+                        "nitrogen_balance": self.NitrogenBalance(data['nitrogen_balance'], field_name)
                         }
 
     class BaseMassBalanceReport(BaseReport):
-        def __init__(self, data):
+        def __init__(self, data, field_name):
             super().__init__(data)
+            self.field_name = field_name
+
+        def daily_update(self, state, weather, time):
+            for field in state.fields:
+                if field.field_name == self.field_name:
+                    soil = field.soil
+                    crop_type = field.crop.current_crop
+                    break
+            animal_management = state.animal_management
+            feed = state.feed
+
+            for variable in self.daily_variables:
+                self.daily_variables[variable][2].append(
+                    eval(self.daily_variables[variable][0], globals(), locals()))
 
         def produce_report_graphics(self):
             super().produce_report_graphics()
             graphics.annual_mass_balance_graphics(self)
 
     class WaterBalance(BaseMassBalanceReport):
-        def __init__(self, data):
-            super().__init__(data)
+        def __init__(self, data, field_name):
+            super().__init__(data, field_name)
 
             self.daily_variables = {'year': ['time.calendar_year', '', []],
                                     'j_day': ['time.day', '', []],
@@ -55,8 +70,8 @@ class MassBalanceReport(BaseReportDriver):
                                      }
 
     class PhosphorusBalance(BaseMassBalanceReport):
-        def __init__(self, data):
-            super().__init__(data)
+        def __init__(self, data, field_name):
+            super().__init__(data, field_name)
 
             self.daily_variables = {
                 'year': ['time.calendar_year', '', []],
@@ -84,8 +99,8 @@ class MassBalanceReport(BaseReportDriver):
             }
 
     class NitrogenBalance(BaseMassBalanceReport):
-        def __init__(self, data):
-            super().__init__(data)
+        def __init__(self, data, field_name):
+            super().__init__(data, field_name)
 
             self.daily_variables = {
                 'year': ['time.calendar_year', '', []],

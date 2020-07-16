@@ -90,6 +90,7 @@ def update_all(soil, crop_type, field_management, time):
     calc_DM_yield(crop_type)
     calc_NDF_yield(crop_type)
 
+
 #
 # Calculates max potential harvest index for a given day.
 # "pseudocode_crop" C.10.C.1
@@ -298,6 +299,7 @@ def cut(crop_type, bio_frac):
     """
 
     crop_type.accumulated_HU = crop_type.accumulated_HU * (1 - bio_frac)
+    crop_type.fr_PHU = crop_type.accumulated_HU / crop_type.PHU
 
     crop_type.LAI_actual = crop_type.LAI_actual * (1 - bio_frac)
     crop_type.fr_LAI_max = 0

@@ -42,7 +42,6 @@ class OutputHandler:
         # Instantiate Report Handler Objects here
         self.reports = {
                         'feed_storage_report': FeedStorageReport(data['feed_storage_report']),
-                        'mass_balance_report': MassBalanceReport(data['mass_balance_report']),
                         'custom_report': CustomReport(data['custom_report'])
                         }
 

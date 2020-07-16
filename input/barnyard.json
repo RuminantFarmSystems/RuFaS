@@ -10,7 +10,7 @@
 
     "weather": "barnyard_weather.csv",
 
-    "output": "field_report.json",
+    "output": "all_reports.json",
 
     "farm":
     {
@@ -26,7 +26,7 @@
             {
                 "soil": "barnyard_soil.json",
                 "crop": "alfalfa_rotation.json",
-                "field_management": "barnyard_field_management.json"
+                "field_management": "default_field_management.json"
             }
         },
         "animal": "barnyard_animal.json",

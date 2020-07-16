@@ -36,7 +36,7 @@ class Alfalfa(BaseCrop):
         # input
         self.T_base_min = 4
         self.T_base_max = 43.33
-        self.PHU = 900  # still unknown
+        self.PHU = 800  # still unknown
 
         # Internally calculated input
         self.accumulated_HU = 0.0

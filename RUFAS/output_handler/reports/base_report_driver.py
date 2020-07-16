@@ -25,11 +25,15 @@ class BaseReportDriver:
         for report_name in self.reports:
             self.reports[report_name].csv_dir = Path(str(self.csv_dir) + '/' + report_name)
             self.reports[report_name].csv_dir.mkdir(exist_ok=True, parents=False)
+            if report_name == "mass_balance_report":
+                self.reports[report_name].initialize_csv_dir()
 
     def initialize_graphic_dir(self):
         for report_name in self.reports:
             self.reports[report_name].graphic_dir = Path(str(self.graphic_dir) + '/' + report_name)
             self.reports[report_name].graphic_dir.mkdir(exist_ok=True, parents=False)
+            if report_name == "mass_balance_report":
+                self.reports[report_name].initialize_graphic_dir()
 
     def daily_update(self, state, weather, time):
         if self.produce_csv:

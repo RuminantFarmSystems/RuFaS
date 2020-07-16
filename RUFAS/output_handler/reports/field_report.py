@@ -6,6 +6,7 @@ Author(s): William Donovan, wmdonovan@wisc.edu
 """
 from .base_report import BaseReport
 from .base_report_driver import BaseReportDriver
+from .mass_balance_report import MassBalanceReport
 
 
 class FieldReport(BaseReportDriver):
@@ -16,7 +17,8 @@ class FieldReport(BaseReportDriver):
             'crop_report': self.CropReport(data['crop_report'], field_name),
             'soil_report': self.SoilReport(data['soil_report'], field_name),
             'soil_nitrogen_report': self.SoilNitrogenReport(data['soil_nitrogen_report'], field_name),
-            'soil_phosphorus_report': self.SoilPhosphorusReport(data['soil_phosphorus_report'], field_name)
+            'soil_phosphorus_report': self.SoilPhosphorusReport(data['soil_phosphorus_report'], field_name),
+            'mass_balance_report': MassBalanceReport(data['mass_balance_report'], field_name)
         }
 
     class BaseFieldReport(BaseReport):
@@ -29,6 +31,7 @@ class FieldReport(BaseReportDriver):
                 if field.field_name == self.field_name:
                     soil = field.soil
                     crop_type = field.crop.current_crop
+                    break
             animal_management = state.animal_management
             feed = state.feed
 
@@ -155,3 +158,10 @@ class FieldReport(BaseReportDriver):
     class SoilPhosphorusReport(BaseFieldReport):
         def __init__(self, data, field_name):
             super().__init__(data, field_name)
+
+            self.daily_variables = {'year': ['time.calendar_year', '', []],
+                                    'j_day': ['time.day', '', []]
+                                    }
+
+            self.annual_variables = {'year': ['time.calendar_year', '', 0]
+                                     }
