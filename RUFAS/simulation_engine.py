@@ -116,6 +116,8 @@ def annual_simulation():
     #
     # Post-Annual Routines
     #
+    for field in state.fields:
+        field.soil.annual_mass_balance()
     output.annual_updates(state, weather, time)
     output.write_annual_reports()
     output.annual_flushes()
