@@ -26,11 +26,8 @@ class PenReport(BaseReportDriver):
             self.pen_id = pen_id
 
         def daily_update(self, state, weather, time):
-            soil = state.fields[0].soil
-            crop_type = state.fields[0].crop.current_crop
             animal_management = state.animal_management
             feed = state.feed
-
             pen = state.animal_management.all_pens[self.pen_id]
 
             for variable in self.daily_variables:
