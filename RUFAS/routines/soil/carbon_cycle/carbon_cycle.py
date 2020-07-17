@@ -62,6 +62,7 @@ def update_all(crop_type, soil, weather, time):
         base_1 = (layer.water_fac - b) / (a - b)
         base_2 = (layer.water_fac - c) / (a - c)
         M_d = (base_1 ** e1) * (base_2 ** e2)
+        soil.M_d = M_d
 
         # above ground metabolic residue
         metabolic_AG_to_C_active = metabolic_AG_active_decomp * M_d * T_d * layer.metabolic_AG
@@ -227,13 +228,3 @@ def update_all(crop_type, soil, weather, time):
         layer.CO2_C_pool_loss_decomp = carbon_active_loss + carbon_slow_loss + carbon_passive_loss
 
         layer.total_CO2_C_loss = CO2_AG_loss + CO2_BG_loss + layer.CO2_C_pool_loss_decomp
-
-
-
-
-
-
-
-
-
-

@@ -458,6 +458,7 @@ class Soil:
         self.lignin_residue_percent = 17  # TODO this 0.17 will be a crop type lignin percent
 
         self.silt_and_clay_frac = 0.5  # TODO database item
+        self.M_d = 0
 
         # ------ INITIALIZE SOIL NITROGEN POOLS ------------------------------------
         # Calculate initial amount of NO3 in each soil layer;
