@@ -1,3 +1,4 @@
+
 """
 RUFAS: Ruminant Farm Systems Model
 File name: cow.py
@@ -160,14 +161,11 @@ class Cow(HeiferIII):
 		"""
 		Determine parameter value distribution for lactation curve model
 		parameters.
-
 		Args:
 			mean: mean of the parameter value for l, m, n in wood's model
 			std: standard deviation of the parameter value for l, m, n in
 				wood's model
-
 		Returns: a random value draw from distribution of parameters
-
 		"""
 		return np.random.normal(mean, std)
 
@@ -180,7 +178,6 @@ class Cow(HeiferIII):
 		intake are coded here with equations with hard-coded parameters just
 		for valid the simulation model indication of the place for future
 		adjustment with ration formulation and economics calculation.
-
 		Returns:
 			estimated_daily_milk_produced: estimated daily milk production
 				from the lactation curve
@@ -279,7 +276,6 @@ class Cow(HeiferIII):
 	def calc_nutrient_rqmts(self, housing, pasture_concentrate, nutrients):
 		"""
 		Calculates this cow's nutrient requirements.
-
 		Args:
 			housing: "pasture" or "barn"
 			pasture_concentrate: concentrate supplementation when farming type
@@ -309,7 +305,6 @@ class Cow(HeiferIII):
 			pasture_concentrate, nutrients):
 		"""
 		Calculates this cow's nutrient requirements.
-
 		Args:
 			vertical_distance: vertical distance to milking parlor, km
 			horizontal_distance: horizontal distance to milking parlor, km
@@ -325,7 +320,6 @@ class Cow(HeiferIII):
 	def calc_manure_excretion(self, feed):
 		"""
 		Calculates and sets the manure excretion components.
-
 		Args:
 			feed: instance of the Feed class
 		"""
@@ -343,7 +337,6 @@ class Cow(HeiferIII):
 	def phosphorus_rqmts(self, DMI):
 		"""
 		Calculates and sets the animal's phosphorus requirement.
-
 		Args:
 			DMI: the Dry Matter Intake (kg)
 		"""
@@ -397,7 +390,6 @@ class Cow(HeiferIII):
 		"""
 		Calculates and sets the animal's daily vertical and horizontal
 		walking distance (DVD and DHD).
-
 		Args:
 			vertical_dist_to_parlor: vertical distance to milking parlor, km
 			horizontal_dist_to_parlor: horizontal distance to milking parlor, km
@@ -463,11 +455,9 @@ class Cow(HeiferIII):
 		Update cow status from the moment of calving, parity+1,
 		milking start, pregnancy stop, and estrus restart.
 		TEMP: calculate cost and income related values for validating model
-
 		Args:
 			record_econ_stats: record cost and income in different functions for
 				temporary use
-
 		Returns:
 			estimated_daily_milk_produced: estimated daily milk production
 				from the lactation curve
@@ -532,7 +522,6 @@ class Cow(HeiferIII):
 	def _determine_estrus_day(self, start_date, estrus_note, avg, std, sim_day):
 		"""
 		In estrus detection program, determine estrus day and estrus note.
-
 		Args:
 			start_date: start day of a estrus cycle, 1st day when breeding start
 				after calving or last estrus happened or return estrus
@@ -540,7 +529,6 @@ class Cow(HeiferIII):
 			estrus_note: note of this estrus
 			avg: average length for an estrus cycle
 			std: standard deviation for an estrus cycle
-
 		Returns: the day when this estrus should occur
 		"""
 		estrus_cycle = np.random.normal(avg, std)
@@ -601,7 +589,6 @@ class Cow(HeiferIII):
 		estrus detected with detection rate,
 		service performed with service rate,
 		conception successed with conception rate
-
 		Args:
 			record_econ_stats: record injection counts in this protocol,
 				for temporary use
@@ -639,7 +626,6 @@ class Cow(HeiferIII):
 	def _determine_tai_program_day(self, date):
 		"""
 		Determine the program start time when pass voluntary waiting period.
-
 		Args:
 			date: the time tai program start
 		"""
@@ -674,7 +660,6 @@ class Cow(HeiferIII):
 	def _OvSynch56_update(self, record_econ_stats, sim_day):
 		"""
 		OvSynch56 protocol for tai method
-
 		Args:
 			record_econ_stats: record injection counts in this protocol,
 				for temporary use
@@ -699,7 +684,6 @@ class Cow(HeiferIII):
 	def _OvSynch48_update(self, record_econ_stats, sim_day):
 		"""
 		OvSynch48 protocol for tai method
-
 		Args:
 			record_econ_stats: record injection counts in this protocol,
 				for temporary use
@@ -725,7 +709,6 @@ class Cow(HeiferIII):
 	def _CoSynch72_update(self, record_econ_stats, sim_day):
 		"""
 		CoSynch72 protocol for tai method
-
 		Args:
 			record_econ_stats: record injection counts in this protocol,
 				for temporary use
@@ -750,7 +733,6 @@ class Cow(HeiferIII):
 	def _5dCoSynch_update(self, record_econ_stats, sim_day):
 		"""
 		5dCoSynch protocol for tai method
-
 		Args:
 			record_econ_stats: record injection counts in this protocol,
 				for temporary use
@@ -791,19 +773,15 @@ class Cow(HeiferIII):
 		"""
 		Determine the presynch program start time when pass voluntary
 		waiting period.
-
 		Args:
 			date: the time presynch program start
-
 		Returns: day on which the presynch program starts
-
 		"""
 		self.presynch_program_start_day = date
 
 	def _presynch_update(self, record_econ_stats, sim_day):
 		"""
 		Presynch protocol for presynch method
-
 		Args:
 			record_econ_stats: record injection counts in this protocol,
 				for temporary use
@@ -823,7 +801,6 @@ class Cow(HeiferIII):
 	def _doubleovsynch_update(self, record_econ_stats, sim_day):
 		"""
 		Doubleovsynch protocol for presynch method
-
 		Args:
 			record_econ_stats: record injection counts in this protocol,
 			for temporary use
@@ -847,7 +824,6 @@ class Cow(HeiferIII):
 	def _g6g_update(self, record_econ_stats, sim_day):
 		"""
 		g6g protocol for presynch method.
-
 		Args:
 			record_econ_stats: record injection counts in this protocol,
 			for temporary use
@@ -877,7 +853,6 @@ class Cow(HeiferIII):
 		"""
 		Assign tai and presynch method, update time AI method status, TAI can
 		be performed with or without presynch.
-
 		Args:
 			record_econ_stats: record injection counts in this protocol,
 			for temporary use
@@ -913,7 +888,6 @@ class Cow(HeiferIII):
 	def _ed_tai_update(self, record_econ_stats, sim_day):
 		"""
 		Update ED-TAI method, perform estrus detection before the TAI program
-
 		Args:
 			record_econ_stats: record injection counts in this protocol,
 			for temporary use
@@ -967,7 +941,6 @@ class Cow(HeiferIII):
 	def _resynch_ed_tai(self, record_econ_stats, sim_day):
 		"""
 		Using ED at the resynch period of ED-TAI.
-
 		Args:
 			record_econ_stats: record injection counts in this protocol,
 			for temporary use
@@ -1002,7 +975,6 @@ class Cow(HeiferIII):
 		"""
 		Assign breeding method for open cows after spot open at preg check
 		three methods can be assigned: ED, TAI, ED-TAI
-
 		Args:
 			record_econ_stats: record injection counts in this protocol,
 			for temporary use
@@ -1034,7 +1006,6 @@ class Cow(HeiferIII):
 		for preg check 2 and 3, confirm pregnancy,
 			there are chances of preg loss in each period of time
 			between preg checks
-
 		Args:
 			record_econ_stats: record injection counts in this protocol,
 			for temporary use
@@ -1149,7 +1120,6 @@ class Cow(HeiferIII):
 		"""
 		Update culling time and cull reasons for cow to leave the herd
 		The reasons are reproduction failure, low production, and health issues
-
 		Returns: not culled
 		"""
 		# if not self.preg and self.days_in_milk >
@@ -1224,7 +1194,6 @@ class Cow(HeiferIII):
 		"""
 		TEMP: update cost and income calculation for feed cost, fixed cost and
 		milking income.
-
 		Args:
 			cull_stage: from temp use
 			estimated_daily_milk_produced: from temp use
@@ -1242,7 +1211,6 @@ class Cow(HeiferIII):
 	def get_economy_stats(self):
 		"""
 		TEMP: update breeding method cost and slaughter value of culled cows
-
 		Returns: _repro_cost, semen_cost, AI_cost, preg_check_cost, _feed_cost,
 			_fixed_cost, _milk_income, slaughter_value for temp use
 		"""
