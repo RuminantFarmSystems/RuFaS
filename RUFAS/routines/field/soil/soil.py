@@ -212,7 +212,7 @@ class Soil:
         self.fert_P_leachate = 0.0
         self.PD_factor = 0.0
         self.fert_P_runoff = 0.0
-        self.fert_runoff_annual = 0.0
+        self.fert_P_runoff_annual = 0.0
         self.fert_P_leachate_annual = 0.0
         self.fert_P_runoff_act = 0.0
 

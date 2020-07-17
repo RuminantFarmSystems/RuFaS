@@ -12,7 +12,7 @@ Coder(s):   Jacob Johnson jacob8399@gmail.com
             William Donovan wmdonovan@wisc.edu
 """
 
-from math import exp
+from math import exp, log
 
 
 def update_all(soil, weather, time):
@@ -37,14 +37,12 @@ def update_all(soil, weather, time):
     # S.5.F.I
 
     # S.5.F.I.1
-    # TODO: sorp_percent is unused. Vadas indicated there is a missing equation
-    # sorp_percent = 0.0
+    sorp_percent = 0.0
     if soil.fert_CNT > 0.0:
-        # sorp_percent = -0.16 * log(soil.fert_CNT) + soil.cover_factor
-        pass
+        sorp_percent = -0.16 * log(soil.fert_CNT) + soil.cover_factor
 
     # S.5.F.I.2
-    soil.fert_sorp = min(max(0.0, soil.fert_sorp), soil.fert_P_available)
+    soil.fert_sorp = min(max(0.0, soil.fert_sorp), soil.fert_P_available * sorp_percent)
 
     soil.fert_P_available -= soil.fert_sorp
     soil.fert_absorbed_sum += soil.fert_sorp
@@ -110,5 +108,5 @@ def update_all(soil, weather, time):
     soil.DRP_leachate_annual += fert_not_leached
 
     # add fertilizer P leached and in runoff to running total
-    soil.fert_runoff_annual += soil.fert_P_runoff_act
+    soil.fert_P_runoff_annual += soil.fert_P_runoff_act
     soil.fert_P_leachate_annual += soil.fert_P_leachate

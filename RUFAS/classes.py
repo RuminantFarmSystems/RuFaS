@@ -20,21 +20,29 @@ from RUFAS.routines.animal.animal_management import AnimalManagement
 
 
 class State:
-    """Contains information about the current state of the farm.
-
-    The state object represents the state of the farm at a certain instant in
-    time. It contains information arranged in different objects by what routine
-    they (mostly) relate to. The state object (or some of its sub-objects) will
-    be passed to routines during the simulation, which may access the
-    information in the different sub-objects in the state to use in its
-    calculations.
-    The state object should ONLY store persistent data that WILL be used in
-    future calculations and/or reports.
-    DO NOT store immediate operands or values that do not NEED to be accessed in
-    the future or in an output report in the state object.
-    """
-
     def __init__(self, data, config, time):
+        """
+        Description:
+            Contains information about the current state of the farm.
+            The state object represents the state of the farm at a certain instant in
+            time. It contains information arranged in different objects by what routine
+            they (mostly) relate to. The state object (or some of its sub-objects) will
+            be passed to routines during the simulation, which may access the
+            information in the different sub-objects in the state to use in its
+            calculations.
+            The state object should ONLY store persistent data that WILL be used in
+            future calculations and/or reports.
+            DO NOT store immediate operands or values that do not NEED to be accessed in
+            the future or in an output report in the state object.
+
+        Args:
+            data: dictionary containing parsed information from the json file
+                necessary to initialize the state
+            config: instance of the Config class containing information necessary
+                to initialize the state
+            time: instance of the Time class containing information necessary to
+                initialize the state
+        """
         self.fields = []
         self.fields_data = data['fields']
         for field_name, field_data in self.fields_data.items():
@@ -45,17 +53,21 @@ class State:
             read_json_file(input_dir / 'animal' / data['animal']), config, self.feed)
 
     def annual_reset(self):
-        """Resets all annual variables that require reset"""
+        """
+        Description:
+            Resets all annual variables that require reset
+        """
 
         for field in self.fields:
             field.crop.annual_reset()
             field.soil.annual_reset()
         self.animal_management.annual_reset()
-        self.feed.annual_reset()
 
 
 def read_json_file(file_path: Path):
-    """Reads the json file sent in
+    """
+    Description:
+        Reads the json file sent in
 
     Args:
         file_path (Path): a file path to a json file
@@ -80,9 +92,17 @@ def read_json_file(file_path: Path):
 
 
 class Config:
-    """Contains configuration information of the simulation"""
 
     def __init__(self, data, weather_file):
+        """
+        Description:
+            Object containing configuration information of the simulation
+
+        Args:
+            data: dictionary containing information from the json file specified
+                under "config"
+            weather_file: path to the weather file specified in the json file
+        """
 
         # gets a start/end date in the format year:julian-day. That way the program
         # can start in the middle of the year
@@ -251,7 +271,8 @@ class Config:
 
     def calc_sim_length(self):
         """
-        Calculates and returns the length of the simulation in days.
+        Description:
+            Calculates and returns the length of the simulation in days.
         """
         sim_length = 0
         for i in range(len(self.years)):
@@ -268,12 +289,21 @@ class Config:
 
 
 class Weather:
-    """
-    Contains daily weather information stored in 2D lists
-    Data lists are in the format Data[year][julian_day].
-    """
 
     def __init__(self, weather_file, config):
+        """
+        Description:
+            Contains daily weather information stored in 2D lists
+            Data lists are in the format Data[year][julian_day].
+            Allows daily information to be accessed by indexing to
+            [time.year - 1][time.day - 1] (list indexing starts at 0,
+            time starts at 1)
+
+        Args:
+            weather_file: path to the weather file specified in the json file
+            config: instance of the Config class containing information necessary
+                to initialize the Weather object
+        """
 
         years = config.years
         w_start_year = config.w_start_year
@@ -317,11 +347,11 @@ class Weather:
 
         # fill the weather arrays with zeros for the size of each year in years[]
         for year in years:
-            self.rainfall.append([0 for _ in range(len(year))])
-            self.T_max.append([0 for _ in range(len(year))])
-            self.T_min.append([0 for _ in range(len(year))])
-            self.T_avg.append([0 for _ in range(len(year))])
-            self.radiation.append([0 for _ in range(len(year))])
+            self.rainfall.append([0.0 for _ in range(len(year))])
+            self.T_max.append([0.0 for _ in range(len(year))])
+            self.T_min.append([0.0 for _ in range(len(year))])
+            self.T_avg.append([0.0 for _ in range(len(year))])
+            self.radiation.append([0.0 for _ in range(len(year))])
 
         # read in the input csv file
         weather_full_path = util.get_base_dir() / 'input/weather' / weather_file
@@ -412,21 +442,23 @@ class Weather:
 
 
 class Time:
-    """
-    This object is responsible for creating and tracking time in the simulation.
-    Time is currently represented as a year and day only.
-    """
-
     def __init__(self, config):
+        """
+        Description:
+            This object is responsible for creating and tracking time in the simulation.
+        Args:
+            config: instance of the Config class containing information necessary
+                to initialize time
+        """
 
         calendar_year = config.start_year
-        # amount of years
+        # number of years
         years = config.years
 
         self.start_year = calendar_year
         self.calendar_year = calendar_year
         self.years = years
-        self.year = 1  # Current Year
+        self.year = 1  # current year
         self.leap_year_length = config.leap_year_length
         self.year_length = config.year_length
 
@@ -439,8 +471,9 @@ class Time:
                 break
 
     def to_str(self):
-        """Returns a string representation of the current time.
-
+        """
+        Description:
+            Returns a string representation of the current time.
         Returns:
             str: a String representation of the current time in the simulation
                 in the format "Year: <year> Day: <day>"
@@ -449,9 +482,10 @@ class Time:
         return "Year: {} Day: {}".format(self.year, self.day)
 
     def advance(self):
-        """Advances the time in the simulation by 1 day
-
-        Automatically detects end of months and years
+        """
+        Description:
+            Advances the time in the simulation by 1 day
+            Automatically detects end of months and years
         """
 
         if self.end_year():
@@ -462,8 +496,9 @@ class Time:
             self.day += 1
 
     def end_year(self):
-        """Returns a bool signifying the end of a year.
-
+        """
+        Description:
+            Returns a bool signifying the end of a year.
         Returns:
             bool: True if it is the end of a year, False otherwise
         """
@@ -472,8 +507,9 @@ class Time:
         return self.day > len(self.years[self.year - 1])
 
     def end_simulation(self):
-        """Checks whether the simulation has ended
-
+        """
+        Description:
+            Checks whether the simulation has ended
         Returns:
             bool: True if the simulation has ended, false otherwise
         """
@@ -488,8 +524,9 @@ class Time:
 
 
 def is_leap_year(year):
-    """Helper method determines if the given year is a leap year
-
+    """
+    Description:
+        Helper method determines if the given year is a leap year
     Args:
         year: an int of the year
     Returns:
