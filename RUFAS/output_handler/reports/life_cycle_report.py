@@ -16,10 +16,29 @@ class LifeCycleReport(BaseReportDriver):
     def __init__(self, data):
         super().__init__(data)
         self.reports = {
+            'initialization_db_summary':
+                self.InitializationDBSummary(data['initialization_db_summary']),
             'individual_animal_report':
                 self.IndividualAnimalReport(data['individual_animal_report']),
             'herd_report': self.HerdReport(data['herd_report'])
         }
+
+    class InitializationDBSummary(BaseReport):
+        def __init__(self, data):
+            super().__init__(data)
+
+            self.daily_variables = {'year': ['time.cal_year', '', []],
+                                    'j_day': ['time.day', '', []]
+                                    }
+            self.annual_variables = {'year': ['time.cal_year', '', []]
+                                     }
+
+        def finalize(self, state, weather, time):
+            initialize_db_summary = \
+                state.animal_management.get_initialize_db_summary()
+            with open(str(self.csv_dir) + '/' + self.report_name + '.json',
+                      'w') as outfile:
+                json.dump(initialize_db_summary, outfile, sort_keys=True, indent=4)
 
     class IndividualAnimalReport(BaseReport):
         def __init__(self, data):

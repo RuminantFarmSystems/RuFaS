@@ -156,6 +156,7 @@ class LifeCycleManager:
         """
         self.config = data
         self.avg_daily_cow_milking = 0
+        self.initialize_db_summary = {}
 
     def initialize_herd(self, herd_num, calf_num, heiferI_num, heiferII_num,
                         heiferIII_num, cow_num, replace_num, sim_days=1500):
@@ -182,6 +183,8 @@ class LifeCycleManager:
             cows: list of cows for the simulation
         """
         self.animal_initializer = AnimalInitalization(False)
+        self.initialize_db_summary = \
+            self.animal_initializer.initialization_db_summary()
         self.herd_num = herd_num
 
         entered_herd = 'entered herd through initialization'

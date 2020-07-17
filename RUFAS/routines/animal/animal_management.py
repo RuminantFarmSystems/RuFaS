@@ -768,3 +768,6 @@ class AnimalManagement:
         output['num_cows_culled'] = len(self.life_cycle_manager.culled_cows)
 
         return animals, output
+
+    def get_initialize_db_summary(self):
+        return self.life_cycle_manager.initialize_db_summary
