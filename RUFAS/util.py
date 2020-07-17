@@ -5,12 +5,15 @@ Description:
 Author(s): Kass Chupongstimun, kass_c@hotmail.com
            Jit Patil, spatil5@wisc.edu
 """
+import json
 
 import pulp
 import sys
 from pathlib import Path
 
 import sqlite3
+
+from RUFAS import errors
 
 
 class DatabaseReader:
@@ -173,6 +176,39 @@ def get_base_dir():
         #                     parent[0] = base_dir/RUFAS
         #                     parent[1] = base_dir/
         return Path(__file__).resolve().parents[1]
+
+
+def read_json_file(file_path: Path):
+    """
+    Description:
+        Reads and interprets the JSON file at the given path. Compiles the
+        information into dictionaries used to instantiate simulation objects.
+
+    Args:
+        file_path (Path): Path to the input json file
+
+    Raises:
+        InvalidJSONFileError: If the json file at the given path does not
+            conform with the format required
+
+    Returns:
+        data: the data read from the json file
+    """
+
+    try:
+        if file_path.suffix == '.json':
+            if not file_path.is_file():
+                raise errors.UserInput((str(file_path), 'does not exist'))
+        else:
+            raise errors.UserInput((str(file_path), 'is not a JSON file'))
+
+        with file_path.open('r') as f:
+            data = json.load(f)
+
+        return data
+
+    except errors.UserInput as e:
+        print(e.msg)
 
 
 def LP_solve(LHS, RHS, objective, var_names, operators,

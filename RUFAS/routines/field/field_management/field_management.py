@@ -260,7 +260,7 @@ class FieldManagement:
                 time: an instance of the Time class specified in classes.py
             """
             day = time.day
-            calendar_year = time.start_year + time.year - 1
+            calendar_year = time.calendar_year
 
             # if it is the last day of the current year
             if day == len(weather.rainfall[time.year - 1]):
