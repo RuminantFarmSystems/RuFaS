@@ -1,8 +1,8 @@
 from pathlib import Path
 from RUFAS import errors
 import sqlite3
-import RUFAS.errors as e
 import ntpath
+import pandas as pd
 
 
 def main():
@@ -12,24 +12,30 @@ def main():
     """
 
     print("\nRUFAS: Importing Weather Dataset into Database")
-    # Database input
+    # 1 Database input
     database = database_input()
 
-    # Selecting a dataset ID for the set to be added
+    # 2 Selecting a dataset ID for the set to be added
     dataset_ID = id_input(database)
 
-    # Selecting the csv file corresponding to the dataset
+    # 3 Selecting the csv file corresponding to the dataset
     data_in = weather_input()
+    csv_path = Path(data_in)
+    csv_name = ntpath.basename(csv_path)
 
-    # Adding new entry in the Datasets table
-    add_dataset(dataset_ID, database, data_in)
+    # 4 Connects to the given database
+    conn = sqlite3.connect(database)
+
+    # 5 Adding new entry in the Datasets table
+    #add_dataset(conn, dataset_ID, csv_name)
+
+    # 6 Importing csv file into Skeleton file
+    import_data(conn, csv_path)
 
 
 def weather_input():
     """
-    Prompts the user for an input file. The function will be called twice: once to input the original weather csv file
-    as downloaded from DAYMET as data_in, and a second time to select the black csv file that will be used to format
-    the data accordingly.
+    Prompts the user for an input file. The function will be called to input a weather csv file.
     A valid input is:
         Valid path to a csv file in the correct format. The guidelines to format the csv file correctly can be found
         on Basecamp: https://3.basecamp.com/3486446/buckets/5296287/vaults/2784812933
@@ -52,15 +58,12 @@ def weather_input():
 
 def database_input():
     """
-    Prompts the user for an input file. The function will be called twice: once to input the original weather csv file
-    as downloaded from DAYMET as data_in, and a second time to select the black csv file that will be used to format
-    the data accordingly.
+    Prompts the user for an input file. The function will be called to input a weather database file.
     A valid input is:
-        Valid path to a csv file in the correct format. The guidelines to format the csv file correctly can be found
-        on Basecamp: https://3.basecamp.com/3486446/buckets/5296287/vaults/2784812933
+        Valid path to a database file similar in structure to input/weather/weather.db.
 
     Returns:
-        A string of the weather csv file path.
+        A string of the weather database file path.
     """
     user_input = input("\nEnter Weather Database File: ")
     print(user_input.lower())
@@ -78,6 +81,15 @@ def database_input():
 
 
 def id_input(database):
+    """"
+    Each dataset in the weather database has its own dataset_ID, a unique positive integer. This function prints
+    out the IDs that are already in use and prompts the user to input an ID for the new dataset being added.
+    A valid input is:
+        Positive integer that is not already being used by another dataset.
+
+    Returns:
+        The ID entered by the user.
+    """
     # Connects to the given database
     conn = sqlite3.connect(database)
     c = conn.cursor()
@@ -92,7 +104,7 @@ def id_input(database):
 
     user_input = None
     while user_input in used_ID or user_input is None:
-        user_input = input("\nThe following IDs are already in use: " + ", ".join(str(f) for f in used_ID) + \
+        user_input = input("\nThe following IDs are already in use: " + ", ".join(str(f) for f in used_ID) +
                            "\nPlease enter a unique positive integer ID: ")
         user_input = int(user_input)
         if user_input in used_ID:
@@ -103,11 +115,12 @@ def id_input(database):
     return user_input
 
 
-def add_dataset(dataset_id, database, csv_file):
-
-    # Extracts csv file name from full path
-    csv_name = Path(csv_file)
-    csv_name = ntpath.basename(csv_name)
+def add_dataset(connection, dataset_id, csv_name):
+    """"
+    This function will prompt the user to input additional geographic details about the dataset (state, city or county,
+    latitude, longitude, and any additional notes if necessary). The function then stores this information and creates
+    a new entry in the Datasets table.
+    """
 
     # Input geographic details
     "Please enter the following details about the location of the dataset:"
@@ -119,13 +132,23 @@ def add_dataset(dataset_id, database, csv_file):
 
     params = (dataset_id, csv_name, state, county, lat, long, notes)
 
-    # Connects to the given database
-    conn = sqlite3.connect(database)
-    c = conn.cursor()
+    # Creates a cursor in the given database
+    c = connection.cursor()
 
     # Adds new entry in Datasets table
     c.execute("INSERT INTO Datasets VALUES (?, ?, ?, ?, ?, ?, ?)", params)
-    conn.commit()
+    connection.commit()
+
+
+def import_data(connection, csv_path):
+    c = connection.cursor()
+    # load data
+    df = pd.read_csv(csv_path)
+    # strip whitespace from from headers
+    df.columns = df.columns.str.strip()
+    # import data to table
+    df.to_sql("Skeleton", connection, if_exists="append", index=False)
+    connection.commit()
 
 
 # -------------------------------------------------------------------------------
