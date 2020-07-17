@@ -37,12 +37,13 @@ def update_all(soil, weather, time):
     # S.5.F.I
 
     # S.5.F.I.1
-    sorp_percent = 0.0
+    # sorp_percent = 0.0  # TODO, unused
     if soil.fert_CNT > 0.0:
-        sorp_percent = -0.16 * log(soil.fert_CNT) + soil.cover_factor
+        # sorp_percent = -0.16 * log(soil.fert_CNT) + soil.cover_factor
+        pass
 
     # S.5.F.I.2
-    soil.fert_sorp = min(max(0.0, soil.fert_sorp), soil.fert_P_available * sorp_percent)
+    soil.fert_sorp = min(max(0.0, soil.fert_sorp), soil.fert_P_available)
 
     soil.fert_P_available -= soil.fert_sorp
     soil.fert_absorbed_sum += soil.fert_sorp
