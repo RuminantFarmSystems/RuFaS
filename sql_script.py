@@ -23,14 +23,18 @@ def main():
     csv_path = Path(data_in)
     csv_name = ntpath.basename(csv_path)
 
-    # 4 Connects to the given database
+    # 4 Connecting to the given database
     conn = sqlite3.connect(database)
 
     # 5 Adding new entry in the Datasets table
-    #add_dataset(conn, dataset_ID, csv_name)
+    add_dataset(conn, dataset_ID, csv_name)
 
     # 6 Importing csv file into Skeleton file
     import_data(conn, csv_path)
+
+    # 7 Calculating Taair and left joining to Skeleton:
+    calc_taair(conn)
+    left_join(conn)
 
 
 def weather_input():
@@ -148,6 +152,12 @@ def import_data(connection, csv_path):
     df.columns = df.columns.str.strip()
     # import data to table
     df.to_sql("Skeleton", connection, if_exists="append", index=False)
+    connection.commit()
+
+
+def calc_taair(connection):
+    c = connection.cursor()
+    c.execute("CREATE VIEW Taair AS SELECT year,avg(avg) as Taair FROM Skeleton GROUP BY year")
     connection.commit()
 
 
