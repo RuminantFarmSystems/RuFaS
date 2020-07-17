@@ -70,6 +70,7 @@ def update_all(soil, crop_type):
     calc_P_up(crop_type)
     calc_act_P_up_each_layer(soil, crop_type)
     calc_bio_P(soil, crop_type)
+    P_uptake(soil)
 
 
 def calc_fr_P(crop_type):
@@ -299,3 +300,8 @@ def calc_bio_P(soil, crop_type):
 
     for layer in soil.soil_layers:
         crop_type.bio_P += layer.P_uptake
+
+
+def P_uptake(soil):
+    for layer in soil.soil_layers:
+        layer.labile_P -= layer.P_uptake

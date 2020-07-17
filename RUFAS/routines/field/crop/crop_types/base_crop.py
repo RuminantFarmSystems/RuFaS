@@ -10,6 +10,8 @@ class BaseCrop:
 
         self.crop_name = 'null'
         self.crop_type = ''
+        self.harvest_quality = 'null'
+        self.feed_id = 'null'
 
         # Necessary variables for a null crop to run
         # These variables are used within the soil module and must

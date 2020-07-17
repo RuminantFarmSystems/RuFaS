@@ -34,6 +34,15 @@ class PenReport(BaseReportDriver):
                 self.daily_variables[variable][2].append(
                     eval(self.daily_variables[variable][0], globals(), locals()))
 
+        def annual_update(self, state, weather, time):
+            animal_management = state.animal_management
+            feed = state.feed
+            pen = state.animal_management.all_pens[self.pen_id]
+
+            for variable in self.annual_variables:
+                self.annual_variables[variable][2] = \
+                    eval(self.daily_variables[variable][0], globals(), locals())
+
     class GrowthReport(BasePenReport):
         def __init__(self, data, pen_id):
             super().__init__(data, pen_id)

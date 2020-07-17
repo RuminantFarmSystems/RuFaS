@@ -65,7 +65,7 @@ class OutputHandler:
         """
 
         field_folder = 'fields/'
-        pen_folder = 'pen/'
+        pen_folder = 'pens/'
 
         # Initialize path for reports
         base_csv_dir = util.get_base_dir() / csv_dir
@@ -94,7 +94,7 @@ class OutputHandler:
 
     def initialize_graphic_dir(self, graphic_dir):
         field_folder = 'fields/'
-        pen_folder = 'pen/'
+        pen_folder = 'pens/'
 
         # Initialize path for reports
         base_graphic_dir = util.get_base_dir() / graphic_dir
