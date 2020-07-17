@@ -161,6 +161,12 @@ def calc_taair(connection):
     connection.commit()
 
 
+def left_join(connection):
+    c = connection.cursor()
+    c.execute("CREATE TABLE final AS SELECT Skeleton.*,Taair.Taair "
+              "FROM Skeleton LEFT JOIN Taair ON Skeleton.year=Taair.year")
+    connection.commit()
+
 # -------------------------------------------------------------------------------
 # SCRIPT ENTRY POINT
 # -------------------------------------------------------------------------------
