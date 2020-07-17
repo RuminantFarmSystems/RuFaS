@@ -18,6 +18,7 @@ Author(s): Kass Chupongstimun, kass_c@hotmail.com,
 from RUFAS.util import DatabaseReader
 from . import nitrogen_loss, carbon_loss, protein_degradation
 from RUFAS.routines.animal.ration import hardcoded_ration
+from RUFAS.routines.animal.ration import ration_driver
 
 
 def daily_feed_routine(feed, fields, animal_management):
