@@ -17,6 +17,7 @@ from pathlib import Path
 from RUFAS import util, errors
 from RUFAS.routines import Field, Feed
 from RUFAS.routines.animal.animal_management import AnimalManagement
+from RUFAS.util import read_json_file
 
 
 class State:
@@ -52,31 +53,6 @@ class State:
             field.soil.annual_reset()
         self.animal_management.annual_reset()
         self.feed.annual_reset()
-
-
-def read_json_file(file_path: Path):
-    """Reads the json file sent in
-
-    Args:
-        file_path (Path): a file path to a json file
-    Returns:
-        data: the data read from the json file
-    """
-
-    try:
-        if file_path.suffix == '.json':
-            if not file_path.is_file():
-                raise errors.UserInput(str(file_path) + ' does not exist')
-        else:
-            raise errors.UserInput(str(file_path) + ' is not a JSON file')
-
-        with file_path.open('r') as f:
-            data = json.load(f)
-
-        return data
-
-    except errors.UserInput as e:
-        print(e.msg)
 
 
 class Config:

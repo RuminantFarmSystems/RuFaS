@@ -13,7 +13,7 @@ import time as timer
 from pathlib import Path
 from RUFAS import routines, errors, classes
 from RUFAS.classes import Config, State, Weather, Time
-from RUFAS.util import get_base_dir
+from RUFAS.util import get_base_dir, read_json_file
 from RUFAS.output_handler import OutputHandler
 from RUFAS.test import test_handler
 
@@ -37,11 +37,8 @@ def simulate(input_file_path: Path):
     # Reads the json input file and uses the information to instantiate the
     # simulation global variables
     #
-    try:
-        read_json_file(input_file_path)
-    except errors.InvalidJSONfile as e:
-        print(e.msg)
-        return
+
+    initialize_simulation(input_file_path, read_json_file(input_file_path))
 
     #
     # Creates a new directory for the output files (if doesn't already exist)
@@ -125,7 +122,7 @@ def annual_simulation():
     time.advance()
 
 
-def read_json_file(file_path: Path):
+def initialize_simulation(file_path: Path, data):
     """Reads the json file, writes information to the simulation variables.
 
     Reads and interprets the (json) file at the given path. Compiles the
@@ -134,6 +131,7 @@ def read_json_file(file_path: Path):
 
     Args:
         file_path (Path): Path to the input json file
+        data: initial simulation data
 
     Raises:
         InvalidJSONFileError: If the json file at the given path does not
@@ -142,22 +140,19 @@ def read_json_file(file_path: Path):
 
     global config, state, output, weather, time
 
-    with file_path.open('r') as f:
-        data = json.load(f)
+    # Instantiate objects using dictionary data from .json file
+    try:
+        config = Config(data['config'], data['weather'])
 
-        # Instantiate objects using dictionary data from .json file
-        try:
-            config = Config(data['config'], data['weather'])
+        if config.run_tests:
+            test_handler.run_tests()
 
-            if config.run_tests:
-                test_handler.run_tests()
+        weather = Weather(data['weather'], config)
+        time = Time(config)
+        state = State(data['farm'], config, time)
+        output = OutputHandler(classes.read_json_file(get_base_dir() / 'input/output' / data['output']), state)
 
-            weather = Weather(data['weather'], config)
-            time = Time(config)
-            state = State(data['farm'], config, time)
-            output = OutputHandler(classes.read_json_file(get_base_dir() / 'input/output' / data['output']), state)
-
-        except errors.JSONfileData as e:
-            print("JSON FILE ERROR: " +
-                  "{} \n\t{} Section\n{}\n".format(file_path.name, e.section, e.msg))
-            raise errors.InvalidJSONfile(file_path.name)
+    except errors.JSONfileData as e:
+        print("JSON FILE ERROR: " +
+              "{} \n\t{} Section\n{}\n".format(file_path.name, e.section, e.msg))
+        raise errors.InvalidJSONfile(file_path.name)
