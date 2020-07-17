@@ -145,6 +145,8 @@ def annual_mass_balance_graphics(report):
 
 
 def individual_animal_graphics(report):
+    # for selected animals, days_born on x-axis and body_weight and
+    # milk_production on y-axes
     if report.produce_graphics:
         animals = report.animals
         save_dir = report.graphic_dir

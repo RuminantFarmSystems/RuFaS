@@ -222,4 +222,11 @@ class AnimalBase(object):
 			self.pen_history[-1].classes_in_pen = list(classes_in_pen)
 
 	def update_body_weight_history(self, sim_day):
+		"""
+		Updates the animal's body weight history by appending a
+		BodyWeightHistory object to the list.
+
+		Args:
+			sim_day: simulation day
+		"""
 		self.body_weight_history.append(BodyWeightHistory(sim_day, self.days_born, self.body_weight))

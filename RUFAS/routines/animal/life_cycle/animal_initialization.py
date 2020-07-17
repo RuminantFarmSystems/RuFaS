@@ -568,6 +568,10 @@ class AnimalInitalization:
         return cows
 
     def initialization_db_summary(self):
+        """
+        Returns: a dictionary which stores the summary of the initialization
+        database
+        """
         try:
             conn = sqlite3.connect('input/animal/animals.sqlite')
             conn.row_factory = sqlite3.Row

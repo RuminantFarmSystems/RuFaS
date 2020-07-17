@@ -770,4 +770,8 @@ class AnimalManagement:
         return animals, output
 
     def get_initialize_db_summary(self):
+        """
+        Returns: a dictionary which is the summary of the animal intialization
+        database
+        """
         return self.life_cycle_manager.initialize_db_summary
