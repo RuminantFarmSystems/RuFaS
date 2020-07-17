@@ -20,7 +20,7 @@ from collections import deque
 import random
 
 
-def daily_animal_routine(animal_management, feed):
+def daily_animal_routine(animal_management, feed, weather, time):
     """
     Executes daily routines relating to Animals. This method is called every day
     in the simulation and calls @animal_management's daily_updates() method
