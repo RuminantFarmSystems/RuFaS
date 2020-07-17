@@ -6,12 +6,11 @@ Author(s): William Donovan, wmdonovan@wisc.edu
            Jacob Johnson, jacob8399@gmail.com
 """
 
-import json
-from RUFAS import util, errors
-from pathlib import Path
+from RUFAS import util
 from .crop.crop import Crop
 from .soil.soil import Soil
 from .field_management.field_management import FieldManagement
+from ...util import read_json_file
 
 
 class Field:
@@ -41,36 +40,3 @@ class Field:
         self.soil = Soil(self.soil_data)
         self.field_management = FieldManagement(self.field_management_data, time)
         self.crop = Crop(self.crop_data, time)
-
-
-def read_json_file(file_path: Path):
-    """
-    Description:
-        Reads and interprets the JSON file at the given path. Compiles the
-        information into dictionaries used to instantiate simulation objects.
-
-    Args:
-        file_path (Path): Path to the input json file
-
-    Raises:
-        InvalidJSONFileError: If the json file at the given path does not
-            conform with the format required
-
-    Returns:
-        data: the data read from the json file
-    """
-
-    try:
-        if file_path.suffix == '.json':
-            if not file_path.is_file():
-                raise errors.UserInput((str(file_path), 'does not exist'))
-        else:
-            raise errors.UserInput((str(file_path), 'is not a JSON file'))
-
-        with file_path.open('r') as f:
-            data = json.load(f)
-
-        return data
-
-    except errors.UserInput as e:
-        print(e.msg)
