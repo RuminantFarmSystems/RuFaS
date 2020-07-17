@@ -229,7 +229,7 @@ class Calf(AnimalBase):
 				==> Calf: \n
 				ID: {} \n
 				Birth Date: {}\n
-				Days Born: {}\n
+				days Born: {}\n
 				Birth Weight: {}kg\n
 				Body Weight: {}kg\n
 				Wean Day: {}\n
@@ -249,7 +249,7 @@ class Calf(AnimalBase):
 				Still Birth: True \n
 				ID: {} \n
 				Birth Date: {}\n
-				Days Born: {}\n
+				days Born: {}\n
 				Life Events: \n
 				{}
 			""".format(

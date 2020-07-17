@@ -25,7 +25,8 @@ class AnimalEvents(object):
 		Args:
 			events_str: string representation of events
 		"""
-		split_by_date = list(filter(lambda x : x != '', list(map(lambda x: x.strip(), events_str.split('Days born ')))))
+		split_by_date = list(filter(lambda x : x != '', list(
+			map(lambda x: x.strip(), events_str.lower().split('days born ')))))
 
 		for day in split_by_date:
 			split = day.split(': ')
@@ -51,7 +52,7 @@ class AnimalEvents(object):
 	def __str__(self):
 		res_str = ''
 		for key, value in sorted(self.events.items()):
-			res_str += '\tDays born {}: {} \n'.format(key, value)
+			res_str += '\tdays born {}: {} \n'.format(key, value)
 
 		return res_str
 	

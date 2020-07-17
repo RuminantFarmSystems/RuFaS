@@ -11,11 +11,11 @@
 
     "weather": "barnyard_weather.csv",
 
-    "output": "pen_report.json",
+    "output": "all_reports.json",
 
     "farm":
     {
-        "crop": "no_crop.json",
+        "crop": "custom_rotation.json",
         "soil": "barnyard_soil.json",
 
         "animal": "animal_management_animal.json",

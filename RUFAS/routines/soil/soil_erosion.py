@@ -112,7 +112,7 @@ def calc_sed(soil, crop, weather, time):
 #
 def calc_peak_runoff(soil, weather, time):
     peak_runoff = 0.0
-    R = weather.rainfall[time.year-1][time.day-1]
+    R = weather.rainfall[time.year - 1][time.day - 1]
     if R != 0:
 
         # "pseudocode_soil" S.3.A.3
@@ -156,7 +156,7 @@ def calc_Tconc(soil):
 #
 def calc_Rtc(soil, weather, time):
     alpha = calc_alpha(soil, weather, time)
-    R = weather.rainfall[time.year-1][time.day-1]
+    R = weather.rainfall[time.year - 1][time.day - 1]
 
     return alpha * R
 
@@ -181,7 +181,7 @@ def calc_alpha(soil, weather, time):
 # "pseudocode_soil" S.3.A.8
 #
 def calc_alpha05(weather, time):
-    R = weather.rainfall[time.year-1][time.day-1]
+    R = weather.rainfall[time.year - 1][time.day - 1]
 
     exp_part = exp(-125 / (R + 5))
 

@@ -6,12 +6,9 @@ Description:
 Author(s): Kass Chupongstimun, kass_c@hotmail.com
            Jit Patil, spatil5@wisc.edu
            William Donovan, wmdonovan@wisc.edu
-
 This module needs the following input in order to operate correctly:
-
     These are attributes of a soil profile that need to be specified in the json input
     file. The values on the right are just examples from a soil profile with 1 layer.
-
         "ProfileDepth": 450,
         "ProfileBulkDensity": 1.4,
         "CN2": 85.00
@@ -26,15 +23,11 @@ This module needs the following input in order to operate correctly:
         "initial_residue": 0,
         "fresh_NMineralRate": 0.05,
         "SoilCoverType": "BARE",
-
         These are attributes defined for each layer of the soil profile. Any
         number of profiles may be specified, but they all require the following
         information. The values on the right are examples.
-
         "SoilLayers":
-
             "Layer1":
-
                 "BottomDepth": 150,
                 "WiltingPoint": 0.1,
                 "FieldCapacity": 0.30,
@@ -53,40 +46,28 @@ This module needs the following input in order to operate correctly:
                 "DenitrificationRate": 0.05,
                 "SoilWaterRatio": 0.3,
                 "OM%": 1.9
-
             "Layer2":
                 ...
-
         Each layer needs to be specified in a similar manner
-
         The following are attributes of a fertilizer application. No fertilizer
         applications need be specified for the module to run, but for any that
         are specified, the following attributes are needed. Again, the values
         on the right are simply examples
-
         "Fertilizers":
-
             "Application1":
-
                 "Year": 2008
                 "JDay": 179,
                 "PMass": 25.0,
                 "Depth": 3.0,
                 "%onSurface": 0.25
-
             "Application2":
-
                 ...
-
         The following are attributes of a manure application. No manure
         applications need be specified for the module to run, but for any that
         are specified, the following attributes are needed. The values on the
         right should serve as examples.
-
         "ManureApplication":
-
             "Application1":
-
                 "Type": "DAIRY",
                 "Year": 2009,
                 "Jday": 200
@@ -98,40 +79,29 @@ This module needs the following input in order to operate correctly:
                 "%Cover": 0.5,
                 "Depth": 0.0,
                 "%onSurface": 100.0
-
             "Application2":
-
                 ...
-
         The following are attributes of a tillage operation. No tillage
         operation need be specified for the module to run, but for any operation
         that is specified, the following attributes are needed. Values on the
         right are examples.
-
         "TillageOperations":
-
             "Operation1":
-
                 "Year": 2008,
                 "Jday": 365,
                 "%Incorporate": 0.5,
                 "%Mixed": 0.30,
                 "Depth": 15.0,
-
             "Operation2":
-
                 ...
-
     From the weather class, the following will be needed:
         T_min
         T_max
         radiation
         rainfall
         T_avg
-
     From the crop class, the following will be needed:
         crops_list
-
         And the following attributes of a crop type:
             bio_AG (aboveground biomass)
 """
@@ -153,7 +123,6 @@ def daily_soil_routine(soil, crop, weather, time):
     """
     Description:
         Executes all the daily soil routines.
-
     Args:
         soil: instance of the Soil class
         crop: instance of the Crop class
@@ -222,7 +191,6 @@ class Soil:
         Description:
             Constructs an instance of the Soil class by populating its arrays
             and the necessary values.
-
         Args:
             data: the information from the json input file
             config: instance of the Config class
@@ -281,7 +249,6 @@ class Soil:
 
         # Initialize phosphorus variables
         # "pseudocode_soil" S.6.A
-
         self.labile_P = 0.0
         self.active_P = 0.0
         self.stable_P = 0.0
@@ -354,12 +321,12 @@ class Soil:
         # fert_leach
         self.fert_sorp = 0.0
         self.fert_absorbed_sum = 0.0
-        self.fert_leach = 0.0
+        self.fert_P_leached = 0.0
         self.PD_factor = 0.0
-        self.fert_runoff_P = 0.0
-        self.fert_runoff_annual = 0.0
-        self.fert_leachate_annual = 0.0
-        self.fert_run = 0.0
+        self.fert_P_runoff = 0.0
+        self.fert_P_runoff_annual = 0.0
+        self.fert_P_leachate_annual = 0.0
+        self.fert_P_runoff_act = 0.0
 
         # manure_leach
         self.MIP_leach = 0.0
@@ -448,6 +415,7 @@ class Soil:
         self.NO3_runoff = 0.0
         self.NH4_runoff = 0.0
 
+        self.N_uptake = 0.0
         self.NO3_drainage = 0.0
         self.NH4_drainage = 0.0
         self.active_N_drainage = 0.0
@@ -583,7 +551,6 @@ class Soil:
             """
             Description:
                 Populates the characteristic values of a soil layer.
-
             Args:
                 layer_name: a string which is the name of this layer
                 layer_data: a dictionary which stores the information for this layer

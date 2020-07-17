@@ -26,7 +26,16 @@ class HeiferI(Calf):
 		Description:
 			initialize the 1st heifer group from calf information
 		Input:
-			args: same as calf
+			args.id: id of the cow
+			args.breed: breed of the cow
+			args.birth_date: the date of the simulation when the calf was born
+			args.daysBorn: age of the animal
+			(optional: include the following to assign cow information) 
+			args.birth_weight: the birth weight of the cow
+			args.body_weight: current body weight of the cow
+			args.wean_weight: the wean weight of the cow
+			args.mature_body_weight: the mature body weight of the cow
+			args.events: events of the cow
 		"""
 		super().__init__(args)
 
@@ -121,7 +130,7 @@ class HeiferI(Calf):
 			==> Heifer I: \n
 			ID: {} \n
 			Birth Date: {}\n
-			Days Born: {}\n
+			days Born: {}\n
 			Birth Weight: {}kg\n
 			Wean Weight: {}kg\n
 			Body Weight: {}kg\n

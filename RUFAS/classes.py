@@ -1,4 +1,3 @@
-################################################################################
 """
 RUFAS: Ruminant Farm Systems Model
 File name: classes.py
@@ -8,7 +7,6 @@ Author(s): Kass Chupongstimun, kass_c@hotmail.com
            William Donovan, wmdonovan@wisc.edu
            Jacob Johnson, jacob8399@gmail.com
 """
-################################################################################
 
 import csv
 import json
@@ -60,12 +58,6 @@ class State:
         self.soil.annual_reset()
         self.crop.annual_reset()
         self.animal_management.annual_reset()
-        self.feed.annual_reset()
-
-    # self.fieldOps.annual_reset()
-    # self.herd.annual_reset()
-    # self.housing.annual_reset()
-    # self.manure.annual_reset()
 
 
 def read_json_file(file_path: Path):
@@ -101,7 +93,7 @@ class Config:
         self.end_year = int(self.end_date[0])
         self.start_day = int(self.start_date[1])
         self.end_day = int(self.end_date[1])
-        
+
         self.run_tests = data['run_tests']
 
         year_length = 365
@@ -246,7 +238,7 @@ class Config:
                     days = [_ for _ in range(1, year_length + 1)]
 
             self.years.append(days)
-        
+
         self.sim_length = self.calc_sim_length(leap_year_length, year_length)
         self.csv_dir = data['csv_dir']
         self.graphic_dir = data['graphic_dir']
@@ -258,14 +250,14 @@ class Config:
         sim_length = 0
         for i in range(len(self.years)):
             if i == 0:
-                # check for +-1
+                # check for leap year
                 if is_leap_year(self.start_year):
                     sim_length += leap_year_length - self.start_day
                 else:
                     sim_length += year_length - self.start_day
             else:
                 sim_length += len(self.years[i])
-                
+
         return sim_length + 1
 
 
@@ -285,19 +277,9 @@ class Weather:
         self.T_max = []
         self.T_min = []
         self.T_avg = []
-        self.biomass = []
         self.radiation = []
-        # TODO: manureN is a temporary weather file input until the manure module is implemented
         self.manureN = []
-        self.T_avg_annual = []
-
-        self.evaporation = []
-        self.lCows = []
-        self.dCows = []
-        self.heifer = []
-        self.calf = []
-        self.beef = []
-        self.beefCalf = []
+        # TODO: manureN is a temporary weather file input until the manure module is implemented
 
         year_length = 365
         leap_year_length = 366
@@ -331,20 +313,9 @@ class Weather:
             self.T_max.append([0 for _ in range(len(year))])
             self.T_min.append([0 for _ in range(len(year))])
             self.T_avg.append([0 for _ in range(len(year))])
-            self.biomass.append([0 for _ in range(len(year))])
             self.radiation.append([0 for _ in range(len(year))])
-            # TODO: manureN is a temporary weather file input until the manure module is implemented
             self.manureN.append([0 for _ in range(len(year))])
-
-            # These are not currently input into the weather file. They may
-            # be/may have been at some point.
-            # self.evaporation.append([0 for _ in range(len(year))])
-            # self.lCows.append([0 for _ in range(len(year))])
-            # self.dCows.append([0 for _ in range(len(year))])
-            # self.heifer.append([0 for _ in range(len(year))])
-            # self.calf.append([0 for _ in range(len(year))])
-            # self.beef.append([0 for _ in range(len(year))])
-            # self.beefCalf.append([0 for _ in range(len(year))])
+            # TODO: manureN is a temporary weather file input until manure storage is implemented
 
         # read in the input csv file
         weather_full_path = util.get_base_dir() / 'input/weather' / weather_path_str
@@ -389,9 +360,10 @@ class Weather:
                         self.T_max[year][day - offset] = float(row[3])
                         self.T_min[year][day - offset] = float(row[4])
                         self.T_avg[year][day - offset] = float(row[5])
-                        self.biomass[year][day - offset] = float(row[6])
-                        self.radiation[year][day - offset] = float(row[7])
-                        self.manureN[year][day - offset] = float(row[8])  # TODO: manureN is a temporary weather file input until the manure module is linked with the rest of the program
+                        self.radiation[year][day - offset] = float(row[6])
+                        self.manureN[year][day - offset] = float(row[7])
+                        # TODO: manureN is a temporary weather file input until the manure module is implemented
+
                     except(IndexError, ValueError):
                         # prints out each problematic row in the weather CSV file
                         skips += 1
@@ -416,11 +388,6 @@ class Weather:
             if skips > 5:
                 print("Only printing first 5 invalid rows, there are " + str(skips)
                       + " total invalid rows")
-
-            # calculates T_avg_annual for each year
-            for i in range(len(years)):
-                avg = sum(self.T_avg[i]) / (len(years[i]))
-                self.T_avg_annual.append(avg)
 
 
 # Class: Time
