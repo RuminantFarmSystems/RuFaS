@@ -140,7 +140,7 @@
         },
         "soil":
         {
-            "ProfileBulkDensity": 1.4,
+            "ProfileBulkDensity": 1.3,
             "CN2": 85.00,
             "FieldSlope": 0.02,
             "SlopeLength": 3,
