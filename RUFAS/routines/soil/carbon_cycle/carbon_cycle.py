@@ -28,7 +28,6 @@ def update_all(crop_type, soil, weather, time):
     # A. residue from annual crops
 
     # above ground metabolic residue
-    soil.residue_DM = soil.residue * (1 - soil.plant_moisture)
 
     # B. residue partitioning
     # TODO delete 100's eventually, check lignin residue percent in soil.py
@@ -55,7 +54,6 @@ def update_all(crop_type, soil, weather, time):
     T_d = (teff_2 + (teff_3 / math.pi) * math.atan(math.pi * teff_4 * (weather.T_avg[time.year - 1][time.day - 1]
                                                                        - teff_1))) / normalizer
 
-    soil.soil_layers[0].fr_tillage = 0.55
     curr_depth = 0
 
     for layer in soil.soil_layers:
@@ -211,9 +209,9 @@ def update_all(crop_type, soil, weather, time):
         # G. aggregate Soil Carbon Pools (Active, Slow, and Passive) and CO2 Gas Flux.
 
         # carbon pool conversion to percentages and their aggregation (i.e., Total %C)
-        active_C_percent = layer.carbon_active / soil_mass
-        slow_C_percent = layer.carbon_slow / soil_mass
-        passive_C_percent = layer.carbon_passive / soil_mass
+        active_C_percent = (layer.carbon_active / soil_mass) * 100
+        slow_C_percent = (layer.carbon_slow / soil_mass) * 100
+        passive_C_percent = (layer.carbon_passive / soil_mass) * 100
 
         layer.carbon_percent = active_C_percent + slow_C_percent + passive_C_percent
 

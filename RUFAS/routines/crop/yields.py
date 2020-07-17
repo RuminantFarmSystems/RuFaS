@@ -129,6 +129,12 @@ def calc_nutrient_removal(crop_type):
 # "pseudocode_crop" C.10.G.1/4/5
 #
 def calc_residue(crop_type, time, soil):
+
+    # for carbon, needs to be calculated only at harvest
+    crop_type.bio_BG = crop_type.fr_root * crop_type.biomass_actual
+    crop_type.bio_BG_DM = crop_type.bio_BG * (1 - soil.plant_moisture)
+    soil.soil_layers[0].fr_tillage = 0.55
+
     d_residue = 0
     if time.day == crop_type.kill_day or crop_type.crop_type == 'annual':
         d_residue = crop_type.biomass_actual - crop_type.yield_actual
@@ -137,6 +143,8 @@ def calc_residue(crop_type, time, soil):
         bio_frac = crop_type.yield_actual / crop_type.biomass_actual
         cut(crop_type, bio_frac)
     soil.residue += d_residue
+
+    soil.residue_DM = soil.residue * (1 - soil.plant_moisture)
 
 
 #

@@ -65,21 +65,3 @@ def calc_z_root(crop_type, soil):
 
         else:  # self.fr_PHU <= 0.4
             crop_type.z_root = 2.5 * crop_type.fr_PHU * crop_type.z_root_max
-
-    # TODO should these be in biomass?
-    crop_type.bio_BG = crop_type.fr_root * crop_type.biomass_actual
-    crop_type.bio_BG_DM = crop_type.bio_BG * (1 - soil.plant_moisture)
-
-    # TODO
-    # if crop_type.crop_type == "perennial" and crop_type.planted:
-    #     crop_type.z_root = crop_type.z_root_max
-    #
-    # elif after_harvest:
-    #     crop_type.z_root = 0
-    #
-    # # C.3.A.3
-    # elif crop_type.crop_type == "annual" and crop_type.fr_PHU > 0.4:
-    #     crop_type.z_root = crop_type.z_root_max
-    #
-    # else:  # crop_type == "annual" and self.fr_PHU <= 0.4
-    #     crop_type.z_root = 2.5 * crop_type.fr_PHU * crop_type.z_root_max
