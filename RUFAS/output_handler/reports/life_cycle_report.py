@@ -57,14 +57,15 @@ class LifeCycleReport(BaseReportDriver):
                 'cow_percent': ['life_cycle_manager.cow_percent', '%', []],
                 'sold_heifer_num': ['life_cycle_manager.sold_heifer_num', '', []],
                 'bought_heifer_num': ['life_cycle_manager.bought_heifer_num', '', []],
-                'culled_cow_num': ['life_cycle_manager.culled_cow_num', '', []],}
-
+                'culled_heifer_num': ['life_cycle_manager.culled_heifer_num', '', []],
+                'culled_cow_num': ['life_cycle_manager.culled_cow_num', '', []],
+            }
             
-            for parity in LifeCycleManager.parity_num:
+            for parity in LifeCycleManager.num_cow_for_parity:
                 self.herd_structure['cow_num_for_parity: ' + parity] = \
-                    ['life_cycle_manager.parity_num[\'' + parity + '\']', '', []]
+                    ['life_cycle_manager.num_cow_for_parity[\'' + parity + '\']', '', []]
                 self.herd_structure['cow_percent_for_parity: ' + parity] = \
-                    ['life_cycle_manager.parity_percent[\'' + parity + '\']', '%', []]
+                    ['life_cycle_manager.percent_cow_for_parity[\'' + parity + '\']', '%', []]
 
             for cull_reason in LifeCycleManager.cull_reason_stats:
                 self.herd_structure['cow_num_culled_for_reason: \'' + cull_reason + '\''] = \
@@ -94,14 +95,30 @@ class LifeCycleReport(BaseReportDriver):
                 'milking_cow_num': ['life_cycle_manager.milking_cow_num', '', []],
                 'dry_cow_num': ['life_cycle_manager.dry_cow_num', '', []],
                 'average_days_in_milk': ['life_cycle_manager.avg_days_in_milk', 'd', []],
-                'average_days_in_preg': ['life_cycle_manager.avg_days_in_preg', 'd', []]
+                'average_days_in_preg': ['life_cycle_manager.avg_days_in_preg', 'd', []],
+                'average_cow_body_weight': ['life_cycle_manager.avg_cow_body_weight', 'kg', []],
+                'average_parity_number': ['life_cycle_manager.avg_parity_num', '', []]
             }
+
+            self.average_animal_profile = {
+                'avg_caving_interval': ['life_cycle_manager.avg_calving_interval', 'd', []],
+                'avg_breeding_to_preg_time': ['life_cycle_manager.avg_breeding_to_preg_time', 'd', []],
+                'avg_heifer_culling_age': ['life_cycle_manager.avg_heifer_culling_age', 'd', []],
+                'avg_cow_culling_age': ['life_cycle_manager.avg_cow_culling_age', 'd', []],
+                'avg_mature_body_weight': ['life_cycle_manager.avg_mature_body_weight', 'kg', []],
+            }
+
+            for parity in LifeCycleManager.avg_calving_to_preg_time:
+                self.average_animal_profile['avg_calving_to_preg_time_for_parity: ' + parity] = \
+                    ['life_cycle_manager.avg_calving_to_preg_time[\'' + parity + '\']', 'd', []]
 
             self.daily_variables = {
                 **self.herd_structure, 
                 **self.reproduction_performance, 
                 **self.production_performance, 
-                **self.preg}
+                **self.preg,
+                **self.average_animal_profile
+            }
             
             self.annual_variables = {'year': ['time.cal_year', '', []]}
 

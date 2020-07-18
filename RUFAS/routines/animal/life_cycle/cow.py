@@ -112,6 +112,7 @@ class Cow(HeiferIII):
 		self.CBW = 0  # weight of cow when she gives birth
 		self.daily_growth = 0  # change in body weight, kg
 		self.calves = 0
+		self.calving_to_preg_time = 0
 		self.milking = False
 		self.days_in_milk = 0
 		self.estimated_daily_milk_produced = 0
@@ -984,6 +985,10 @@ class Cow(HeiferIII):
 			if conception_rand < self.conception_rate:
 				self.days_in_preg = 1
 				self.preg = True
+				if self.calves != 0:
+					last_time_given_birth = \
+						self.events.get_most_recent_date('New birth, start milking')
+					self.calving_to_preg_time = self.days_born - last_time_given_birth
 				self.gestation_length = int(np.random.normal(
 					AnimalBase.config['avg_gestation_len'],
 					AnimalBase.config['std_gestation_len']))

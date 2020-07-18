@@ -69,6 +69,7 @@ class HeiferII(HeiferI):
 			self.init_values(args)
 
 		self.target_adg_heifer_preg = 0
+		self.breeding_to_preg_time = 0
 
 	def set_adg_preg(self):
 		"""
@@ -600,6 +601,7 @@ class HeiferII(HeiferI):
 			if conception_rand < self.conception_rate:
 				self.days_in_preg = 1
 				self.preg = True
+				self.breeding_to_preg_time = self.days_born - AnimalBase.config['breeding_start_day_h']
 				self.gestation_length = int(np.random.normal(
 					AnimalBase.config['avg_gestation_len'], 
 					AnimalBase.config['std_gestation_len']))
