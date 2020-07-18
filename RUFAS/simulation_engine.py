@@ -63,8 +63,8 @@ def simulate(input_fPath: Path):
     while not time.end_simulation():
         annual_simulation()
 
-    output.produce_graphics()
     output.finalize(state, weather, time)
+    output.produce_graphics()
     t_end_sim = timer.time()
 
     print("Simulation Successful: {}".format(input_fPath.name))

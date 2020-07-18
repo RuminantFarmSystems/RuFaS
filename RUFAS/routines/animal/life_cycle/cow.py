@@ -150,6 +150,13 @@ class Cow(HeiferIII):
 			self.calves = args['parity']
 
 	def update_milk_production_history(self, sim_day):
+		"""
+		Updates the animal's milk production history by appending a
+		MilkProductionHistory object to the list.
+
+		Args:
+			sim_day: simulation day
+		"""
 		self.milk_production_history.append(MilkProductionHistory(sim_day, self.days_in_milk, self.estimated_daily_milk_produced, self.days_born))
 
 	def _determine_param_value(self, mean, std):

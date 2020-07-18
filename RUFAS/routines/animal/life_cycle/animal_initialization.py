@@ -63,6 +63,7 @@ class AnimalInitalization:
             init: whether or not update the database with new animals
     '''
     def __init__(self, init = True):
+        self.initialization_db_summary()
         if init:
             conn = sqlite3.connect('input/animal/animals.sqlite')
             cur = conn.cursor()
@@ -565,3 +566,100 @@ class AnimalInitalization:
             cows.append(cow)
         conn.close()
         return cows
+
+    def initialization_db_summary(self):
+        """
+        Returns: a dictionary which stores the summary of the initialization
+        database
+        """
+        try:
+            conn = sqlite3.connect('input/animal/animals.sqlite')
+            conn.row_factory = sqlite3.Row
+            c = conn.cursor()
+
+            query = "SELECT COUNT(*) FROM calves"
+            c.execute(query)
+            num_calf = dict(c.fetchone())['COUNT(*)']
+
+            query = "SELECT COUNT(*) FROM heiferIs"
+            c.execute(query)
+            num_heiferI = dict(c.fetchone())['COUNT(*)']
+
+            query = "SELECT COUNT(*) FROM heiferIIs"
+            c.execute(query)
+            num_heiferII = dict(c.fetchone())['COUNT(*)']
+
+            query = "SELECT COUNT(*) FROM heiferIIIs"
+            c.execute(query)
+            num_heiferIII = dict(c.fetchone())['COUNT(*)']
+
+            query = "SELECT COUNT(*) FROM cows"
+            c.execute(query)
+            num_cow = dict(c.fetchone())['COUNT(*)']
+
+            query = "SELECT COUNT(*) FROM replacement"
+            c.execute(query)
+            num_replacement = dict(c.fetchone())['COUNT(*)']
+
+            query = "SELECT AVG(days_born) FROM calves"
+            c.execute(query)
+            avg_calf_age = dict(c.fetchone())['AVG(days_born)']
+
+            query = "SELECT AVG(days_born) FROM heiferIs"
+            c.execute(query)
+            avg_heiferI_age = dict(c.fetchone())['AVG(days_born)']
+
+            query = "SELECT AVG(days_born) FROM heiferIIs"
+            c.execute(query)
+            avg_heiferII_age = dict(c.fetchone())['AVG(days_born)']
+
+            query = "SELECT AVG(days_born) FROM heiferIIIs"
+            c.execute(query)
+            avg_heiferIII_age = dict(c.fetchone())['AVG(days_born)']
+
+            query = "SELECT AVG(days_born) FROM cows"
+            c.execute(query)
+            avg_cow_age = dict(c.fetchone())['AVG(days_born)']
+
+            query = "SELECT AVG(days_born) FROM replacement"
+            c.execute(query)
+            avg_replacement_age = dict(c.fetchone())['AVG(days_born)']
+
+            query = "SELECT AVG(days_in_preg) FROM cows WHERE days_in_preg > 0"
+            c.execute(query)
+            cow_avg_days_in_preg = dict(c.fetchone())['AVG(days_in_preg)']
+
+            query = "SELECT AVG(days_in_milk) FROM cows WHERE days_in_milk > 0"
+            c.execute(query)
+            cow_avg_days_in_milk = dict(c.fetchone())['AVG(days_in_milk)']
+
+            query = "SELECT AVG(parity) FROM cows"
+            c.execute(query)
+            cow_avg_parity = dict(c.fetchone())['AVG(parity)']
+
+            summary = {
+                'num_calf': num_calf,
+                'num_heiferI': num_heiferI,
+                'num_heiferII': num_heiferII,
+                'num_heiferIII': num_heiferIII,
+                'num_cow': num_cow,
+                'num_replacement': num_replacement,
+
+                'avg_calf_age': avg_calf_age,
+                'avg_heiferI_age': avg_heiferI_age,
+                'avg_heiferII_age': avg_heiferII_age,
+                'avg_heiferIII_age': avg_heiferIII_age,
+                'avg_cow_age': avg_cow_age,
+                'avg_replacement_age': avg_replacement_age,
+
+                'cow_avg_days_in_preg': cow_avg_days_in_preg,
+                'cow_avg_days_in_milk': cow_avg_days_in_milk,
+                'cow_avg_parity': cow_avg_parity
+            }
+            return summary
+
+        except Exception as e:
+            print("The program encountered the following exception while "
+                  "connecting to and querying the animal initialization "
+                  "database: ", e, "\nExiting.")
+            exit(1)
