@@ -144,6 +144,51 @@ def annual_mass_balance_graphics(report):
         mp.close()
 
 
+def individual_animal_graphics(report):
+    # for selected animals, days_born on x-axis and body_weight and
+    # milk_production on y-axes
+    if report.produce_graphics:
+        animals = report.animals
+        save_dir = report.graphic_dir
+
+        for (animal, animal_type, is_cow) in animals:
+            body_weight = [weight_hist.__dict__
+                           for weight_hist in animal.body_weight_history]
+            body_weight = {bw['days_born']: bw['body_weight'] for bw in body_weight}
+
+            days_born = body_weight.keys()
+            first_day_born_on_farm = min(days_born)
+
+            if is_cow:
+                milk_production = [milk_hist.__dict__
+                                   for milk_hist in animal.milk_production_history]
+                milk_production = {milk['days_born']: (
+                    milk['milk_production'] if milk[
+                                                   'milk_production'] > 0 else None)
+                                   for milk in milk_production}
+
+                for i in range(first_day_born_on_farm, min(milk_production.keys())):
+                    milk_production[i] = None
+
+            else:
+                milk_production = {day: None for day in days_born}
+
+            fig, ax = mp.subplots()
+            fig.suptitle(animal_type + ' ' + str(animal.id))
+            ax.plot(list(milk_production.keys()), list(milk_production.values()),
+                    color='red')
+            ax.set_xlabel('Days Born')
+            ax.set_ylabel('Milk Production (kg)', color='red')
+
+            ax2 = ax.twinx()
+            ax2.plot(list(body_weight.keys()), list(body_weight.values()),
+                     color='blue')
+            ax2.set_ylabel('Body Weight (kg)', color='blue')
+
+            mp.savefig(str(save_dir) + '/' + str(animal.id) + '.png')
+            mp.close()
+
+
 # produces the daily data analysis
 def daily_graphics(report):
     if report.produce_graphics:

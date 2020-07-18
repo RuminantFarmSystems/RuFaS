@@ -76,6 +76,13 @@
         "produce_graphics": true,
         "report_name": "life_cycle_report",
 
+        "initialization_db_summary":
+        {
+            "produce_csv": true,
+            "produce_graphics": true,
+            "report_name": "initialization_db_summary"
+        },
+
         "individual_animal_report":
         {
           "produce_csv": true,
