@@ -75,6 +75,12 @@ class LifeCycleManager:
         '3': 0,
         '>3': 0
     }
+    avg_age_for_parity = {
+        '1': 0,
+        '2': 0,
+        '3': 0,
+        '>3': 0
+    }
 
     preg_check_num = 0
     GnRH_injection_num = 0
@@ -276,6 +282,12 @@ class LifeCycleManager:
             '>3': 0
         }
         total_calving_to_preg_num = {
+            '1': 0,
+            '2': 0,
+            '3': 0,
+            '>3': 0
+        }
+        total_age_for_parity = {
             '1': 0,
             '2': 0,
             '3': 0,
@@ -555,12 +567,14 @@ class LifeCycleManager:
             if cow.calves <=3:
                 self.num_cow_for_parity[str(cow.calves)] += 1
                 self.percent_cow_for_parity[str(cow.calves)] = self.num_cow_for_parity[str(cow.calves)] / self.cow_num * 100
+                total_age_for_parity[str(cow.calves)] += cow.days_born
                 if cow.calving_to_preg_time != 0:
                     total_calving_to_preg_time[str(cow.calves)] += cow.calving_to_preg_time
                     total_calving_to_preg_num[str(cow.calves)] += 1
             else:
                 self.num_cow_for_parity['>3'] += 1
                 self.percent_cow_for_parity['>3'] = self.num_cow_for_parity['>3'] / self.cow_num * 100
+                total_age_for_parity['>3'] += cow.days_born
                 total_calving_to_preg_time['>3'] += cow.calving_to_preg_time
                 total_calving_to_preg_num['>3'] += 1
             
@@ -613,7 +627,9 @@ class LifeCycleManager:
         self.avg_conception_rate = self.conception_rate_sum_21_days / \
             float(self.config["num_21_days_repro"])
         self.pregnancy_rate = self.avg_service_rate * self.avg_conception_rate
-
+        for parity in self.num_cow_for_parity:
+            if self.num_cow_for_parity[parity] != 0:
+                self.avg_age_for_parity[parity] = total_age_for_parity[parity] / self.num_cow_for_parity[parity]
         self.avg_cow_body_weight = total_cow_body_weight / self.cow_num
         self.avg_parity_num = total_parity_num / self.cow_num
         if total_calving_interval_num != 0:
