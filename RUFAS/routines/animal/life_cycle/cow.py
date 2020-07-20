@@ -964,16 +964,16 @@ class Cow(HeiferIII):
 		elif self.repro_program == 'ED-TAI':
 			self._resynch_ed_tai(record_econ_stats, sim_day)
 
-	def _get_conception_rand(self):
+	def _adjust_conception(self):
 		"""
-		Generate a random conception rate based on the parity of the cow
+		Adjust conception rate based on the parity of the cow
 		"""
 		if self.calves <= 1:
-			return random()
+			return self.conception_rate
 		elif self.calves == 2:
-			return 0.95 * random()
+			return self.conception_rate - 0.05
 		else:
-			return 0.9 * random()
+			return self.conception_rate - 0.1
 
 	def _preg_update(self, record_econ_stats, sim_day):
 		"""
@@ -999,8 +999,8 @@ class Cow(HeiferIII):
 			if record_econ_stats:
 				self.semen_used += 1
 				self.AI_times += 1
-			conception_rand = self._get_conception_rand()
-			if conception_rand < self.conception_rate:
+			conception_rand = random()
+			if conception_rand < self._adjust_conception():
 				self.days_in_preg = 1
 				self.preg = True
 				if self.calves != 0:
