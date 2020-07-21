@@ -36,6 +36,12 @@ def main():
     calc_taair(conn)
     left_join(conn)
 
+    # 8 Appending new dataset to Observations table:
+    add_observations(conn)
+
+    # 9 Cleaning up unnecessary tables and views:
+    cleanup(conn)
+
 
 def weather_input():
     """
@@ -166,6 +172,22 @@ def left_join(connection):
     c.execute("CREATE TABLE final AS SELECT Skeleton.*,Taair.Taair "
               "FROM Skeleton LEFT JOIN Taair ON Skeleton.year=Taair.year")
     connection.commit()
+
+
+def add_observations(connection):
+    c = connection.cursor()
+    c.execute("INSERT INTO Observations SELECT * FROM final")
+    connection.commit()
+
+
+def cleanup(connection):
+    c=connection.cursor()
+    c.execute("DROP TABLE final")
+    c.execute("DROP VIEW Taair")
+    c.execute("DELETE FROM Skeleton")
+    connection.commit()
+    return
+
 
 # -------------------------------------------------------------------------------
 # SCRIPT ENTRY POINT
