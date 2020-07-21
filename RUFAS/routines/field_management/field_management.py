@@ -79,7 +79,8 @@ class FieldManagement:
             "fertilizer": {
                 'year': -1,
                 'day': -1,
-                'mass': 100,
+                'N_mass': 100,
+                'P_mass': 100,
                 'depth': 0.0,
                 'surface_percent': 1.0
             },
