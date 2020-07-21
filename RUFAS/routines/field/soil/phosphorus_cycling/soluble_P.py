@@ -12,7 +12,7 @@ Coder(s):   Jacob Johnson jacob8399@gmail.com
             William Donovan wmdonovan@wisc.edu
 """
 
-from math import exp
+from math import exp, log
 
 
 def update_all(soil):
@@ -37,10 +37,8 @@ def update_all(soil):
         layer.iso_inter = 4.726 * layer.iso_slope - 8.97
 
         # S.5.E.3
-        # this if statement is to avoid a math range error that happens while running alfalfa
-        # it is pretty rudimentary but works. The number within exp can not exceed 710 but if
-        # the value is over 3.7 then the min will be set to 40 through the original equations
-        if (layer.soil_P * 1.5 - layer.iso_inter) / layer.iso_slope < 3.7:
+        # this if statement avoids a range error that can happen within the exp()
+        if ((layer.soil_P * 1.5 - layer.iso_inter) / layer.iso_slope) <= log(40):
             layer.DRP_leachate = min(40.0, exp((layer.soil_P * 1.5 - layer.iso_inter) / layer.iso_slope))
         else:
             layer.DRP_leachate = 40
