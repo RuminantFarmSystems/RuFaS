@@ -27,12 +27,6 @@ class LifeCycleReport(BaseReportDriver):
         def __init__(self, data):
             super().__init__(data)
 
-            self.daily_variables = {'year': ['time.cal_year', '', []],
-                                    'j_day': ['time.day', '', []]
-                                    }
-            self.annual_variables = {'year': ['time.cal_year', '', []]
-                                     }
-
         def finalize(self, state, weather, time):
             initialize_db_summary = \
                 state.animal_management.get_initialize_db_summary()
@@ -40,18 +34,26 @@ class LifeCycleReport(BaseReportDriver):
                       'w') as outfile:
                 json.dump(initialize_db_summary, outfile, sort_keys=True, indent=4)
 
+        def initialize(self):
+            pass
+
+        def daily_update(self, state, weather, time):
+            pass
+
+        def annual_update(self, state, weather, time):
+            pass
+
+        def write_annual_report(self):
+            pass
+
+        def produce_report_graphics(self):
+            pass
+
     class IndividualAnimalReport(BaseReport):
         def __init__(self, data):
             super().__init__(data)
             self.num_animals = data['num_animals']
-
             self.animals = []
-
-            self.daily_variables = {'year': ['time.cal_year', '', []],
-                                    'j_day': ['time.day', '', []]
-                                    }
-            self.annual_variables = {'year': ['time.cal_year', '', []]
-                                     }
 
         def finalize(self, state, weather, time):
             self.animals, output = state.animal_management.get_life_cycle_output(
@@ -63,6 +65,18 @@ class LifeCycleReport(BaseReportDriver):
         def produce_report_graphics(self):
             # super().produce_report_graphics()
             graphics.individual_animal_graphics(self)
+
+        def initialize(self):
+            pass
+
+        def daily_update(self, state, weather, time):
+            pass
+
+        def annual_update(self, state, weather, time):
+            pass
+
+        def write_annual_report(self):
+            pass
 
     class HerdReport(BaseReport):
         def __init__(self, data):
@@ -151,6 +165,3 @@ class LifeCycleReport(BaseReportDriver):
             }
             
             self.annual_variables = {'year': ['time.cal_year', '', []]}
-
-        def finalize(self, state, weather, time):
-            print('herd done')
