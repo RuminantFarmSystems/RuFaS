@@ -462,7 +462,7 @@ class LifeCycleManager:
         # cow culling action and economic stats
         for index, cow in enumerate(cows):
             total_mature_body_weight += cow.mature_body_weight
-            _, _, _, culled, new_born = cow.update(record_econ_stats, date)
+            _, _, _, culled, new_born = cow.update(record_econ_stats, date, self.initialize_db_summary)
             # if date == 2000:
             #     print(len(cows))
             #     print(cows[20])
