@@ -157,6 +157,11 @@ def individual_animal_graphics(report):
             body_weight = {bw['days_born']: bw['body_weight'] for bw in body_weight}
 
             days_born = body_weight.keys()
+
+            # skip this animal if there is no data (i.e. calf born on last day)
+            if not days_born:  # equivalent to days_born == []
+                continue
+
             first_day_born_on_farm = min(days_born)
 
             if is_cow:

@@ -71,18 +71,34 @@ class HeiferII(HeiferI):
 		self.target_adg_heifer_preg = 0
 		self.breeding_to_preg_time = 0
 
-	def set_adg_preg(self):
+	def get_bw_change(self):
 		"""
-		Sets the target average daily gain for an animal that is pregnant.
+		Calculates the body weight change for a heifer, depending on if she
+		is pregnant or not.
 		If the gestation_length of the animal is equal to its days_in_preg,
 		the difference is set to 1 (otherwise results in a division by 0 error).
+
+		Returns: the daily body weight change for a heifer
 		"""
-		divisor = (self.gestation_length - self.days_in_preg)
-		if divisor == 0:
-			divisor = 1
-		self.target_adg_heifer_preg = \
-			(0.82 * 0.96 * self.mature_body_weight - 0.96 * self.body_weight) \
-			/ divisor
+		if self.preg:
+			divisor = (self.gestation_length - self.days_in_preg)
+			if divisor == 0:
+				divisor = 1
+			target_ADG_heifer_preg = (0.82 * 0.96 * self.mature_body_weight -
+											0.96 * self.body_weight) / divisor
+
+			CBW = AnimalBase.config['birth_weight_avg_ho']
+			if self.days_in_preg > 190:
+				conceptus_growth = 0.665 * CBW / 45
+			elif self.days_in_preg == 190:
+				conceptus_growth = 18 * CBW / 45
+			else:
+				conceptus_growth = 0
+
+			return target_ADG_heifer_preg + conceptus_growth
+
+		else:
+			return self.get_non_preg_bw_change()
 		
 	def init_values(self, args):
 		"""
@@ -246,25 +262,19 @@ class HeiferII(HeiferI):
 		cull_stage = False
 		third_stage = False
 		
-		prev_weight = self.body_weight
 		self.days_born += 1
 
 		if self.days_born < AnimalBase.config['grow_end_day']:
 			# Heifer can only grow to a maximum weight of mature_body_weight
-			if self.preg:
-				self.set_adg_preg()
-				self.body_weight += self.target_adg_heifer_preg
-			else:
-				self.set_agd_non_preg()
-				self.body_weight += self.target_adg_heifer_non_preg
+			self.daily_growth = self.get_bw_change()
+
+			self.body_weight += self.daily_growth
 
 			if self.body_weight > self.mature_body_weight:
 				self.body_weight = self.mature_body_weight
 				self.events.add_event(self.days_born, sim_day,
 				'Mature body weight prior to grow end day')
-		
-		self.daily_growth = self.body_weight - prev_weight
-		
+
 		# Mature body weight
 		if self.days_born == AnimalBase.config['grow_end_day']:
 			self.mature_body_weight = self.body_weight

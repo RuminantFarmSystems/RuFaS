@@ -39,8 +39,6 @@ class HeiferI(Calf):
 		"""
 		super().__init__(args)
 
-		self.target_adg_heifer_non_preg = 0
-
 	def get_heiferI_values(self):
 		"""
 		Get current information from the heiferI
@@ -90,18 +88,19 @@ class HeiferI(Calf):
 		# requirement of P from the ration (g) (A.1B-D.E.7)
 		self.p_req = p_absorb / 0.664
 
-	def set_agd_non_preg(self):
+	def get_non_preg_bw_change(self):
 		"""
-		Sets the target average daily gain for an animal that is not pregnant.
+		Calculates the body weight change for a heifer that is not pregnant.
 		If the days_born of the animal is equal to 400,
 		the difference is set to 1 (otherwise results in a division by 0 error).
+
+		Returns: the daily body weight change for a heifer that is not pregnant
 		"""
 		divisor = abs(400 - self.days_born)
 		if divisor == 0:
 			divisor = 1
-		self.target_adg_heifer_non_preg = \
-			(0.55 * 0.96 * self.mature_body_weight - 0.96 * self.body_weight) \
-			/ divisor
+		return (0.55 * 0.96 * self.mature_body_weight -
+										0.96 * self.body_weight) / divisor
 
 	def update(self, sim_day):
 		"""
@@ -116,12 +115,9 @@ class HeiferI(Calf):
 		self.update_body_weight_history(sim_day)
 		second_stage = False
 
-		prev_weight = self.body_weight
+		self.daily_growth = self.get_non_preg_bw_change()
 
-		self.set_agd_non_preg()
-		self.body_weight += self.target_adg_heifer_non_preg
-
-		self.daily_growth = self.body_weight - prev_weight
+		self.body_weight += self.daily_growth
 
 		self.days_born += 1
 		if self.days_born == AnimalBase.config['breeding_start_day_h']:
