@@ -33,6 +33,7 @@ def update_all(crop_type, soil, weather, time):
     # TODO delete 100's eventually, check lignin residue percent in soil.py
     # TODO fr_N might need a different calculation in the future
     LN_ratio_AG = 0
+    crop_type.fr_N = 0.4
     if crop_type.fr_N != 0:
         LN_ratio_AG = (soil.lignin_residue_percent / 100) / crop_type.fr_N
     metabolic_AG_frac = 0.85 - 0.18 * LN_ratio_AG
@@ -53,6 +54,7 @@ def update_all(crop_type, soil, weather, time):
     normalizer = 20.80546
     T_d = (teff_2 + (teff_3 / math.pi) * math.atan(math.pi * teff_4 * (weather.T_avg[time.year - 1][time.day - 1]
                                                                        - teff_1))) / normalizer
+    soil.T_d = T_d
 
     curr_depth = 0
 

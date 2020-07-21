@@ -49,6 +49,7 @@ class CustomReport(BaseReportHandler):
                                 'j_day': ['time.day', '', []],
                                 'RSD': ['soil.residue', '', []],
                                 'M_d': ['soil.M_d', '', []],
+                                'T_d': ['soil.T_d', '', []],
                                 'fr_tillage_L1': ['soil.soil_layers[0].fr_tillage', '', []],
                                 'fr_N': ['crop_type.fr_N', '', []],
                                 'water_fac_L1': ['soil.soil_layers[0].water_fac', '', []],
