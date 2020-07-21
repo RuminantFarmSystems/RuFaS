@@ -6,7 +6,9 @@
 
                 "year": [],
                 "day": [],
-                "mass": [],
+                "N_mass": [],
+                "P_mass": [],
+                "K_mass": [],
                 "depth": [],
                 "surface_percent": []
             },

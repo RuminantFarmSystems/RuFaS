@@ -64,7 +64,7 @@ def daily_soil_routine(soil, crop, weather, time):
 
 def annual_variable_update(soil):
     soil.manure_applied_annual += soil.manure_applied
-    soil.fert_applied_annual += soil.fert_applied
+    soil.fert_applied_annual += soil.fert_P_applied
     soil_water.update_annual_SW(soil)
     phosphorus_cycling.update_annual_P(soil)
     nitrogen_cycling.update_annual_N(soil)
