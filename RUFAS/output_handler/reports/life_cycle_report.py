@@ -94,6 +94,8 @@ class LifeCycleReport(BaseReportDriver):
                     ['life_cycle_manager.percent_cow_for_parity[\'' + parity + '\']', '%', []]
                 self.herd_structure['avg_age_for_parity: ' + parity] = \
                     ['life_cycle_manager.avg_age_for_parity[\'' + parity + '\']', 'd', []]
+                self.herd_structure['avg_age_for_calving: ' + parity] = \
+                    ['life_cycle_manager.avg_age_for_calving[\'' + parity + '\']', 'd', []]
 
             for cull_reason in LifeCycleManager.cull_reason_stats:
                 self.herd_structure['cow_num_culled_for_reason: \'' + cull_reason + '\''] = \
@@ -109,7 +111,7 @@ class LifeCycleReport(BaseReportDriver):
                 'PGF_injections': ['life_cycle_manager.PGF_injection_num', '', []],
                 'ai_num': ['life_cycle_manager.ai_num', '', []],
                 'preg_check_num': ['life_cycle_manager.preg_check_num', '', []],
-                'sold_calf_num': ['life_cycle_manager.total_calf_sold', '', []]
+                'sold_calf_num': ['life_cycle_manager.sold_calf_num', '', []]
             }
 
             self.production_performance = {
@@ -119,7 +121,7 @@ class LifeCycleReport(BaseReportDriver):
             self.preg = {
                 'open_cow_num': ['life_cycle_manager.open_cow_num', '', []],
                 'preg_cow_num': ['life_cycle_manager.preg_cow_num', '', []],
-                'num_cow_in_vwp': ['life_cycle_manager.num_cow_in_vwp', '', []],
+                'vwp_cow_num': ['life_cycle_manager.vwp_cow_num', '', []],
                 'milking_cow_num': ['life_cycle_manager.milking_cow_num', '', []],
                 'dry_cow_num': ['life_cycle_manager.dry_cow_num', '', []],
                 'average_days_in_milk': ['life_cycle_manager.avg_days_in_milk', 'd', []],
