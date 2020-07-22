@@ -43,11 +43,6 @@ class MilkProductionHistory:
 
 
 class Cow(HeiferIII):
-	# TODO: different body weight for different lactations and individual mature
-	#  body weight.
-	# TODO: Dry Matter Intake and Body Weight changed could be based on
-	#  nutrition intake later from Ration Formulation.
-
 	def __init__(self, args):
 		"""
 		Description:

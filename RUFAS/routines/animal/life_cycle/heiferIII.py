@@ -20,8 +20,6 @@ from RUFAS.routines.animal.manure.growing_heifer_manure_excretion import \
 
 
 class HeiferIII(HeiferII):
-    # TODO: Body weight changed could be based on nutrition intake later from
-    #  Ration Formulation.
     # TODO: Rank heifers to enter the herd or sold
     
     def __init__(self, args):

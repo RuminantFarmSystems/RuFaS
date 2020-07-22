@@ -20,9 +20,6 @@ from RUFAS.routines.animal.manure.calf_manure_excretion import\
 
 
 class Calf(AnimalBase):
-	# TODO: Body weight changed could be based on nutrition intake later from
-	#  Ration Formulation
-
 	def __init__(self, args):
 		"""
 		Description:

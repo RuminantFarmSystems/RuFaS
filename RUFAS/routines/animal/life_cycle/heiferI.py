@@ -18,9 +18,6 @@ import numpy as np
 
 
 class HeiferI(Calf):
-	# TODO: Body weight changed could be based on nutrition intake later from
-	#  Ration Formulation
-
 	def __init__(self, args):
 		"""
 		Description:
