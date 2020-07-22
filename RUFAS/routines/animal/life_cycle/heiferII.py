@@ -23,9 +23,6 @@ import math
 
 
 class HeiferII(HeiferI):
-	# TODO: Body weight changed could be based on nutrition intake later from
-	#  Ration Formulation.
-	
 	def __init__(self, args):
 		"""
 		Description:
