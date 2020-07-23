@@ -210,7 +210,7 @@ class LifeCycleManager:
             heiferIIIs: list of heiferIIIs for the simulation
             cows: list of cows for the simulation
         """
-        self.animal_initializer = AnimalInitalization(True)
+        self.animal_initializer = AnimalInitalization()
         self.initialize_db_summary = \
             self.animal_initializer.initialization_db_summary()
         self.herd_num = herd_num

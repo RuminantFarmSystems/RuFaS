@@ -90,6 +90,7 @@ class Cow(HeiferIII):
 			args.p_gest_for_calf
 			args.days_in_milk: cow's current day in milk
 			args.parity: parity of the cow
+			args.calving_interval: cow's most recent calving interval
 		"""
 		super().__init__(args)
 
@@ -143,6 +144,7 @@ class Cow(HeiferIII):
 			self.days_in_milk = args['days_in_milk']
 			self.milking = self.days_in_milk != 0
 			self.calves = args['parity']
+			self.CI = args['calving_interval']
 
 	def update_milk_production_history(self, sim_day):
 		"""
