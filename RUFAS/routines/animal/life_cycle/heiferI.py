@@ -93,7 +93,7 @@ class HeiferI(Calf):
 
 		Returns: the daily body weight change for a heifer that is not pregnant
 		"""
-		divisor = abs(400 - self.days_born)
+		divisor = abs(AnimalBase.config['target_heifer_preg_day'] - self.days_born)
 		if divisor == 0:
 			divisor = 1
 		return (0.55 * 0.96 * self.mature_body_weight -
