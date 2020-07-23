@@ -53,17 +53,21 @@ def weather_input():
     Returns:
         A string of the weather csv file path.
     """
-    user_input = input("\nEnter Weather csv File: ")
-    input_path = Path(user_input.strip())
+    user_input = None
+    while user_input is None or not Path(user_input).is_file()  :
+        user_input = input("\nEnter Weather csv File: ")
+        input_path = Path(user_input.strip())
 
-    if input_path.suffix == '.csv':
-        if not input_path.is_file():
-            raise errors.UserInput("Specified file does not exist")
+        if input_path.suffix == '.csv':
+            if not input_path.is_file():
+                print("Specified file does not exist. Enter a valid csv file: ")
+                continue
+            else:
+                print("Weather csv file Detected...\n")
+            return str(input_path)
         else:
-            print("Weather csv file Detected...\n")
-        return str(input_path)
-    else:
-        raise errors.UserInput("Invalid Input")
+            print("Invalid Input. Enter a valid csv file: ")
+            continue
 
 
 def database_input():
@@ -75,19 +79,20 @@ def database_input():
     Returns:
         A string of the weather database file path.
     """
-    user_input = input("\nEnter Weather Database File: ")
-    print(user_input.lower())
+    user_input = None
+    while user_input is None or not Path(user_input).is_file():
 
-    input_path = Path(user_input.strip())
+        user_input = input("\nEnter Weather Database File: ")
+        input_path = Path(user_input.strip())
 
-    if input_path.suffix == '.db':
-        if not input_path.is_file():
-            raise errors.UserInput("Specified file does not exist")
+        if input_path.suffix == '.db':
+            if not input_path.is_file():
+                print("Specified file does not exist. Enter a valid .db file: ")
+            else:
+                print("Weather Database file Detected...\n")
+            return str(input_path)
         else:
-            print("Weather Database file Detected...\n")
-        return str(input_path)
-    else:
-        raise errors.UserInput("Invalid Input")
+            print("Invalid Input. Enter a valid .db file: ")
 
 
 def id_input(database):
