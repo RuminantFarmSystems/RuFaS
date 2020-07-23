@@ -10,9 +10,85 @@ Description: Main file in the ration formulation process that connects all
 #from RUFAS.routines.feed.feed import Feed
 #from RUFAS.routines.animal.animal_management import AnimalManagement
 from RUFAS.routines.animal.ration import cow_requirements
+from RUFAS.routines.animal.ration import lactating_cow_ration_NLP as NLP
 import statistics as stat
+import math
+import random
 
 
+def ration_formulation(requirements, available_feeds):
+    #TODO do a real values
+    BW = 480
+    SBW = 480*0.96
+    price = NLP.list_reconfig(available_feeds.price)
+    TDN = NLP.list_reconfig(available_feeds.TDN)
+    DE = NLP.list_reconfig(available_feeds.DE)
+    EE = NLP.list_reconfig(available_feeds.EE)
+    is_fat = NLP.list_reconfig(available_feeds.is_fat)
+    calcium = NLP.list_reconfig(available_feeds.calcium)
+    phosphorus = NLP.list_reconfig(available_feeds.phosphorus)
+    NDF = NLP.list_reconfig(available_feeds.NDF)
+    type = NLP.list_reconfig(available_feeds.type)
+    is_wetforage = NLP.list_reconfig(available_feeds.is_wetforage)
+    Kd = NLP.list_reconfig(available_feeds.Kd)
+    N_A = NLP.list_reconfig(available_feeds.N_A)
+    N_B = NLP.list_reconfig(available_feeds.N_B)
+    CP = NLP.list_reconfig(available_feeds.CP)
+    dRUP = NLP.list_reconfig(available_feeds.dRUP)
+    NLP.set_globals(price, requirements.NEmaint, requirements.NEa, requirements.NEpreg,
+                            requirements.NEl, requirements.NEg, requirements.MP_req,
+                            requirements.Ca_req, requirements.P_req, requirements.DMIest,
+                            TDN, DE, EE, is_fat, BW, SBW, calcium, phosphorus, NDF,
+                            type, is_wetforage, Kd, N_A, N_B, CP, dRUP)
+    x0 = [0]*int(len(price))
+    solution = NLP.optimize(x0)
+    count = 0
+    while not solution.success and count < 30:
+        '''
+        for i in range(int(len(price))):
+            x0[i] = (random.random()*4)
+        '''
+        rounded = [round(num, 2) for num in solution.x]
+        x0 = solution.x
+        solution = NLP.optimize(x0)
+        #print(x0)
+        #print('X: ')
+        #print(NLP.objective(solution.x))
+        #print(rounded)
+        #print(solution.success)
+        count += 1
+
+        print('Con_1')
+        print(NLP.NEmact_constraint(solution.x))
+        print('Con_2')
+        print(NLP.NEl_constraint(solution.x))
+        print('Con_3')
+        print(NLP.NEgact_constraint(solution.x))
+        print('Con_4')
+        '''
+        print(NLP.calcium_constraint(solution.x))
+        print('Con_5')
+        print(NLP.phosphorus_constraint(solution.x))
+        print('Con_6')
+        print(NLP.protien_constraint(solution.x))
+        print('Con_7')
+        print(NLP.NDF_constraint_1(solution.x))
+        print('Con_8')
+        print(NLP.NDF_constraint_2(solution.x))
+        print('Con_9')
+        print(NLP.forage_NDF_constraint(solution.x))
+        print('Con_10')
+        print(NLP.fat_constraint(solution.x))
+        print('Con_11')
+        print(NLP.DMI_constraint(solution.x))
+        '''
+        print('Con_12')
+        print(NLP.energy_req_limit_constraint(solution.x))
+        
+    rounded = [round(num, 2) for num in solution.x]
+    print(solution.success)
+    print(rounded)
+    print('Break')
 class Requirements:
     """
     Stores the information for the calculated requirements of animals to
@@ -62,16 +138,13 @@ class Requirements:
         DMIest = []
         #TODO find where these values come from. Confirm other values
         fat_milk = 3
-        parity = 1
-        distance = 10
-        CI = 4
 
         # iterating through each animal in the pen and calculating requirements
         for animal in pen.animals_in_pen:
             req = cow_requirements.calculate_requirements(animal.body_weight, animal.mature_body_weight,
-                            animal.days_in_preg, pen.housing_type,distance, parity,CI,
-                            animal.mPrt, fat_milk, animal.lactose_milk,
-                            animal.estimated_daily_milk_produced_lst[0],
+                            animal.days_in_preg, pen.housing_type,(math.sqrt((animal.DVD)**2 + (animal.DHD)**2)),
+                            animal.calves, animal.CI, animal.mPrt, fat_milk,
+                            animal.lactose_milk,animal.estimated_daily_milk_produced_lst[0],
                             animal.days_in_milk)
             NEmaint.append(req['NEmaint'])
             NEa.append(req['NEa'])
@@ -102,7 +175,8 @@ class AvailableFeeds:
     def __init__(self):
         # id of the feed in the feed database
         self.feed_id = []
-        #self.price = []
+        # price of the feed ($/KG)
+        self.price = []
         # Total digestible nutrient (% of DM)
         self.TDN = []
         # Digestible energy (Mcal/kg)
@@ -144,7 +218,8 @@ class AvailableFeeds:
         """
         available_feeds = feed.available_feeds
         feed_id = []
-        #price = []
+        ##TODO find where price comes from
+        price = []
         TDN = []
         DE = []
         EE = []
@@ -163,7 +238,7 @@ class AvailableFeeds:
 
         for key in available_feeds:
             feed_id.append(available_feeds[key]['feed_id'])
-            #price.append(available_feeds[key]['price'])
+            price.append(random.random() * 5)
             TDN.append(available_feeds[key]['TDN'])
             DE.append(available_feeds[key]['DE'])
             EE.append(available_feeds[key]['EE'])
@@ -181,6 +256,7 @@ class AvailableFeeds:
             limit.append(available_feeds[key]['limit'])
 
         self.feed_id = feed_id
+        self.price = price
         self.TDN = TDN
         self.DE = DE
         self.EE = EE
@@ -193,12 +269,9 @@ class AvailableFeeds:
         self.Kd = Kd
         self.N_A = N_A
         self.N_B = N_B
+        self.CP = CP
         self.dRUP = dRUP
         self.limit = limit
-
-
-
-
 
 
 

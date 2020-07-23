@@ -74,9 +74,9 @@ def calculate_requirements(BW, MW, DOP, housing, distance, parity, CI, TP_Milk,
     # Equivalent shrunk bodyweight (kg)
     EQSBW = (SBW - CW) * (478/MSBW)       #[A.Cow.A.10]
     # Average Daily Gain (kg)
-    if parity == 1:         #[A.Cow.A.11]
+    if parity == 1 and CI != 0:         #[A.Cow.A.11]
         ADG = ((0.92-0.82) * MSBW) / CI
-    elif parity == 2:
+    elif parity == 2 and CI!=0:
         ADG = ((1 - 0.92) * MSBW) / CI
     else:
         ADG = 0
