@@ -169,7 +169,7 @@ class Cow(HeiferIII):
 		"""
 		return np.random.normal(mean, std)
 
-	def _milking_update(self, sim_day, initialization_db_summary):
+	def _milking_update(self, sim_day, calving_interval):
 		"""
 		Update milking status for lactating cows.
 		start at calving, daily milk production estimated by breed and parity
@@ -264,8 +264,7 @@ class Cow(HeiferIII):
 		# 			math.exp(-0.006 * self.days_born)) ** 3 - (40 / 75) * \
 		# 		self.days_in_milk * math.exp(1 - self.days_in_milk / 75) + \
 		# 		0.0187 ** 3 * (self.days_in_preg - 50) ** 3
-
-		self.daily_growth = self.get_bw_change(initialization_db_summary)
+		self.daily_growth = self.get_bw_change(calving_interval)
 
 		self.body_weight += self.daily_growth
 
@@ -407,13 +406,13 @@ class Cow(HeiferIII):
 		self.DHD = 2 * horizontal_dist_to_parlor * \
 			AnimalBase.config['cow_times_milked_per_day']
 
-	def get_bw_change(self, initialization_db_summary):
+	def get_bw_change(self, CI):
 		"""
 		Calculates the body weight change for a cow.
 
 		Args:
-			initialization_db_summary: a dictionary representing the summary
-				of the animal initialization database
+			CI: the calving interval used in the body weight
+				change calculation
 
 		Returns: the daily body weight change for a cow.
 
@@ -431,16 +430,12 @@ class Cow(HeiferIII):
 		else:
 			conceptus_growth = 0
 
-		avg_days_in_preg = initialization_db_summary['cow_avg_days_in_preg']
-		avg_days_in_milk = initialization_db_summary['cow_avg_days_in_milk']
-		avg_CI = avg_days_in_milk - avg_days_in_preg + 278
-
 		if self.calves == 1:
 			target_adg_cow = \
-				(0.92 - 0.82) * 0.96 * self.mature_body_weight / avg_CI
+				(0.92 - 0.82) * 0.96 * self.mature_body_weight / CI
 		elif self.calves == 2:
 			target_adg_cow = \
-				(1 - 0.92) * 0.96 * self.mature_body_weight / avg_CI
+				(1 - 0.92) * 0.96 * self.mature_body_weight / CI
 		else:  # parity > 2
 			target_adg_cow = 0
 
@@ -461,7 +456,7 @@ class Cow(HeiferIII):
 		return target_adg_cow + conceptus_growth + bodyweight_tissue
 
 
-	def update(self, record_econ_stats, sim_day, initialization_db_summary):
+	def update(self, record_econ_stats, sim_day, calving_interval):
 		"""
 		Update cow status from the moment of calving, parity+1,
 		milking start, pregnancy stop, and estrus restart.
@@ -512,7 +507,7 @@ class Cow(HeiferIII):
 
 		# if self.milking:
 		estimated_daily_milk_produced, fat_percent, \
-			daily_fat_correct_milk_production = self._milking_update(sim_day, initialization_db_summary)
+			daily_fat_correct_milk_production = self._milking_update(sim_day, calving_interval)
 		if self.repro_program == 'ED':
 			self._ed_update(record_econ_stats, sim_day)
 		elif self.repro_program == 'ED-TAI':

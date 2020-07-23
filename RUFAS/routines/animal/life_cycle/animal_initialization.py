@@ -6,7 +6,6 @@ Description: This file stores and draws values of simulated
                 animals in and from the database
 '''
 ###############################################################################
-
 from RUFAS.routines.animal.life_cycle.calf import Calf
 from RUFAS.routines.animal.life_cycle.heiferI import HeiferI
 from RUFAS.routines.animal.life_cycle.heiferII import HeiferII
@@ -60,10 +59,11 @@ class AnimalInitalization:
         Description:
             Initialize the database to store animal values. Simulate animals to store in database in init is True.
         Input:
+            CI: the calving interval used in initialization
             init: whether or not update the database with new animals
     '''
-    def __init__(self, init = True):
-        self.initialization_db_summary()
+    def __init__(self, CI, init=True):
+        self.CI = CI
         if init:
             conn = sqlite3.connect('input/animal/animals.sqlite')
             cur = conn.cursor()
@@ -240,7 +240,7 @@ class AnimalInitalization:
                     heiferIIIs.remove(heiferIII)
 
             for cow in cows:
-                _, _, _, culled, new_born = cow.update(False, 0, db_summary)
+                _, _, _, culled, new_born = cow.update(False, 0, self.CI)
                 if culled or cow.calves > 4:
                     cows.remove(cow)
                 if new_born:
@@ -654,6 +654,11 @@ class AnimalInitalization:
             c.execute(query)
             cow_avg_parity = dict(c.fetchone())['AVG(parity)']
 
+            # query = "SELECT AVG(calving_interval) FROM cows"
+            # c.execute(query)
+            # cow_avg_CI = dict(c.fetchone())['AVG(calving_interval)']
+            cow_avg_CI = 1
+
             summary = {
                 'num_calf': num_calf,
                 'num_heiferI': num_heiferI,
@@ -671,7 +676,8 @@ class AnimalInitalization:
 
                 'cow_avg_days_in_preg': cow_avg_days_in_preg,
                 'cow_avg_days_in_milk': cow_avg_days_in_milk,
-                'cow_avg_parity': cow_avg_parity
+                'cow_avg_parity': cow_avg_parity,
+                'cow_avg_CI': cow_avg_CI
             }
             return summary
 

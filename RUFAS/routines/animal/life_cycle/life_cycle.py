@@ -185,6 +185,7 @@ class LifeCycleManager:
         self.config = data
         self.avg_daily_cow_milking = 0
         self.initialize_db_summary = {}
+        self.avg_CI = 0
 
     def initialize_herd(self, herd_num, calf_num, heiferI_num, heiferII_num,
                         heiferIII_num, cow_num, replace_num, sim_days=1500):
@@ -210,9 +211,13 @@ class LifeCycleManager:
             heiferIIIs: list of heiferIIIs for the simulation
             cows: list of cows for the simulation
         """
-        self.animal_initializer = AnimalInitalization(True)
-        self.initialize_db_summary = \
-            self.animal_initializer.initialization_db_summary()
+        self.animal_initializer = AnimalInitalization(self.config['calving_interval'], False)
+        if self.config['use_input_calving_interval']:
+            self.avg_CI = self.config['calving_interval']
+        else:
+            self.initialize_db_summary = \
+                self.animal_initializer.initialization_db_summary()
+            self.avg_CI = self.initialize_db_summary['cow_avg_CI']
         self.herd_num = herd_num
 
         entered_herd = 'entered herd through initialization'
@@ -489,7 +494,7 @@ class LifeCycleManager:
 
         # cow culling action and economic stats
         for index, cow in enumerate(cows):
-            _, _, _, culled, new_born = cow.update(record_econ_stats, date, self.initialize_db_summary)
+            _, _, _, culled, new_born = cow.update(record_econ_stats, date, self.avg_CI)
             # if date == 2000:
             #     print(len(cows))
             #     print(cows[20])
