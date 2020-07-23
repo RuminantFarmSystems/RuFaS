@@ -67,6 +67,7 @@ class HeiferII(HeiferI):
 
 		self.target_adg_heifer_preg = 0
 		self.breeding_to_preg_time = 0
+		self.conceptus_weight = 0
 
 	def get_bw_change(self):
 		"""
@@ -87,8 +88,13 @@ class HeiferII(HeiferI):
 			CBW = AnimalBase.config['birth_weight_avg_ho']
 			if self.days_in_preg > 190:
 				conceptus_growth = 0.665 * CBW / 45
+				self.conceptus_weight += conceptus_growth
 			elif self.days_in_preg == 190:
 				conceptus_growth = 18 * CBW / 45
+				self.conceptus_weight += conceptus_growth
+			elif self.days_in_preg == self.gestation_length:
+				conceptus_growth = - self.conceptus_weight
+				self.conceptus_weight = 0
 			else:
 				conceptus_growth = 0
 
