@@ -45,6 +45,7 @@ class AnimalValues(IntEnum):
     resynch_method = 26
     days_in_milk = 27
     parity = 28
+    calving_interval = 29
 
 class AnimalInitalization:
     animal_id = 0
@@ -62,7 +63,7 @@ class AnimalInitalization:
         Input:
             init: whether or not update the database with new animals
     '''
-    def __init__(self, init = True):
+    def __init__(self, init = False):
         self.initialization_db_summary()
         if init:
             conn = sqlite3.connect('input/animal/animals.sqlite')
@@ -89,7 +90,7 @@ class AnimalInitalization:
                             tai_method_h VARCHAR, synch_ed_method_h VARCHAR, estrus_count VARCHAR, \
                                 estrus_day VARCHAR, tai_program_start_day_h VARCHAR, \
                                     synch_ed_program_start_day_h VARCHAR, synch_ed_estrus_day VARCHAR, \
-                                        stop_day VARCHAR, conception_rate VARCHAR, ai_day VARCHAR, \
+                                        synch_ed_stop_day VARCHAR, conception_rate VARCHAR, ai_day VARCHAR, \
                                             abortion_day VARCHAR, days_in_preg VARCHAR, gestation_length VARCHAR, \
                                                 p_gest_for_calf VARCHAR)')
             cur.execute('CREATE TABLE IF NOT EXISTS heiferIIIs \
@@ -112,7 +113,8 @@ class AnimalInitalization:
                                         synch_ed_stop_day VARCHAR, conception_rate VARCHAR, ai_day VARCHAR, \
                                             abortion_day VARCHAR, days_in_preg VARCHAR, gestation_length VARCHAR, \
                                                 p_gest_for_calf VARCHAR, presynch_method VARCHAR, tai_method_c VARCHAR, \
-                                                    resynch_method VARCHAR, days_in_milk VARCHAR, parity VARCHAR)')
+                                                    resynch_method VARCHAR, days_in_milk VARCHAR, parity VARCHAR, \
+                                                        calving_interval VARCHAR)')
             cur.execute('CREATE TABLE IF NOT EXISTS replacement \
                 (id VARCHAR, breed VARCHAR, birth_date VARCHAR, days_born VARCHAR, \
                     birth_weight VARCHAR, body_weight VARCHAR, wean_weight VARCHAR, \
@@ -184,7 +186,7 @@ class AnimalInitalization:
             if not (calf.culled or calf.sold):
                 calves.append(calf)
 
-        for _ in range(sim_days):
+        for day in range(sim_days):
             for calf in calves:
                 wean_day = calf.update(0)
                 if wean_day:
@@ -233,9 +235,10 @@ class AnimalInitalization:
                     cow = Cow(args)
                     cows.append(cow)
 
-                    args.update(id = self.next_id())
-                    replacement_cow = Cow(args)
-                    replacement.append(replacement_cow)
+                    if day >= 3000:
+                        args.update(id = self.next_id())
+                        replacement_cow = Cow(args)
+                        replacement.append(replacement_cow)
 
                     heiferIIIs.remove(heiferIII)
 
@@ -283,7 +286,7 @@ class AnimalInitalization:
                                 heiferII.tai_method_h, heiferII.synch_ed_method_h, heiferII.estrus_count,
                                 heiferII.estrus_day, heiferII.tai_program_start_day_h,
                                 heiferII.synch_ed_program_start_day_h, heiferII.synch_ed_estrus_day,
-                                heiferII.stop_day, heiferII.conception_rate, heiferII.ai_day,
+                                heiferII.synch_ed_stop_day, heiferII.conception_rate, heiferII.ai_day,
                                 heiferII.abortion_day, heiferII.days_in_preg, heiferII.gestation_length,
                                 heiferII.p_gest_for_calf))
         for heiferIII in heiferIIIs:
@@ -308,8 +311,8 @@ class AnimalInitalization:
                     synch_ed_method_h, estrus_count, estrus_day, tai_program_start_day_h, \
                         synch_ed_program_start_day_h, synch_ed_estrus_day, synch_ed_stop_day, conception_rate, \
                             ai_day, abortion_day, days_in_preg, gestation_length, p_gest_for_calf, \
-                                presynch_method, tai_method_c, resynch_method, days_in_milk, parity) \
-                                    VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)',
+                                presynch_method, tai_method_c, resynch_method, days_in_milk, parity, calving_interval) \
+                                    VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)',
                                     (cow.id, cow.breed, cow.birth_date, cow.days_born, cow.birth_weight,
                                     cow.body_weight, cow.wean_weight, cow.mature_body_weight,
                                     str(cow.events), cow.repro_program, cow.tai_method_h,
@@ -318,7 +321,7 @@ class AnimalInitalization:
                                     cow.synch_ed_estrus_day, cow.synch_ed_stop_day, cow.conception_rate,
                                     cow.ai_day, cow.abortion_day, cow.days_in_preg, cow.gestation_length,
                                     cow.p_gest_for_calf, cow.presynch_method, cow.tai_method_c,
-                                    cow.resynch_method, cow.days_in_milk, cow.calves))
+                                    cow.resynch_method, cow.days_in_milk, cow.calves, cow.CI))
         for cow in replacement:
             cur.execute('INSERT INTO replacement (id, breed, birth_date, days_born, birth_weight, \
                 body_weight, wean_weight, mature_body_weight, events, repro_program, tai_method_h, \
@@ -535,7 +538,8 @@ class AnimalInitalization:
                 'tai_method_c': row[AnimalValues.tai_method_c],
                 'resynch_method': row[AnimalValues.resynch_method],
                 'days_in_milk': int(row[AnimalValues.days_in_milk]),
-                'parity': int(row[AnimalValues.parity])
+                'parity': int(row[AnimalValues.parity]),
+                'calving_interval': int(row[AnimalValues.calving_interval])
             }
             cow = Cow(args)
             cows.append(cow)
@@ -654,6 +658,10 @@ class AnimalInitalization:
             c.execute(query)
             cow_avg_parity = dict(c.fetchone())['AVG(parity)']
 
+            query = "SELECT AVG(calving_interval) FROM cows"
+            c.execute(query)
+            cow_avg_CI = dict(c.fetchone())['AVG(calving_interval)']
+
             summary = {
                 'num_calf': num_calf,
                 'num_heiferI': num_heiferI,
@@ -671,7 +679,8 @@ class AnimalInitalization:
 
                 'cow_avg_days_in_preg': cow_avg_days_in_preg,
                 'cow_avg_days_in_milk': cow_avg_days_in_milk,
-                'cow_avg_parity': cow_avg_parity
+                'cow_avg_parity': cow_avg_parity,
+                'cow_avg_CI': cow_avg_CI
             }
             return summary
 
