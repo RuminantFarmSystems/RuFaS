@@ -81,6 +81,11 @@ class FieldManagement:
                 'surface_percent': 1.0
             },
             "fertilizer": {
+                'composition': {
+                    'N': 0.13,
+                    'P': 0.13,
+                    'K': 0.13
+                },
                 'year': -1,
                 'day': -1,
                 'N_mass': 100,
@@ -241,6 +246,10 @@ class FieldManagement:
             """
             self.default_data = default_data
             self.management_data = management_data
+
+            self.composition = None
+            if 'composition' in self.management_data.keys():
+                self.composition = self.management_data.pop('composition')
             self.rotation_years = self.management_data.pop('rotation_years')
             self.repeat = self.management_data.pop('repeat')
 

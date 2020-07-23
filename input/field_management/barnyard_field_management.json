@@ -1,6 +1,11 @@
 {
             "fertilizer":
             {
+                "composition": {
+                    "N": 0.4,
+                    "P": 0.2,
+                    "K": 0.1
+                },
                 "rotation_years": [2009],
                 "repeat": 1,
 

@@ -469,6 +469,8 @@ class Soil:
             self.temp_fac = 0.0
             self.water_fac = 0.0
 
+            self.K = 0.0
+
             self.NO3 = 0.0
             self.NH4 = 0.0
             self.org_N = 0.0

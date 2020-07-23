@@ -1,8 +1,13 @@
 {
             "fertilizer":
             {
-                "rotation_years": [2009],
-                "repeat": 1,
+                "composition": {
+                    "N": 0.0,
+                    "P": 0.0,
+                    "K": 0.0
+                },
+                "rotation_years": [],
+                "repeat": 0,
 
                 "year": [],
                 "day": [],

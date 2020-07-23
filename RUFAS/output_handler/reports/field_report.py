@@ -73,6 +73,7 @@ class FieldReport(BaseReportDriver):
                                     'temperature_L1': ['soil.soil_layers[0].temperature', 'C', []],
                                     'temperature_L2': ['soil.soil_layers[1].temperature', 'C', []],
                                     'temperature_L3': ['soil.soil_layers[2].temperature', 'C', []],
+                                    'K': ['soil.soil_layers[0].K', 'kg', []]
                                     }
 
             self.annual_variables = {'year': ['time.cal_year', '', 0],
