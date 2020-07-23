@@ -217,10 +217,6 @@ class ManureStorage:
     def summarize_annual_variables(self):
         self.raw_manure_annual += self.raw_manure
 
-        self.manure_applied_annual += self.manure_applied
-        self.N_applied_annual += self.N_applied
-        self.P_applied_annual += self.P_applied
-
         self.CH4_emissions_annual += self.CH4_emissions
 
         self.TS_annual += self.TS

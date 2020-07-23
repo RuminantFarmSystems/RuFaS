@@ -73,6 +73,7 @@ class BaseReport:
         soil = state.soil
         crop_type = state.crop.current_crop
         animal_management = state.animal_management
+        field_management = state.field_management
         feed = state.feed
         manure_storage = state.manure_storage
 
@@ -85,10 +86,9 @@ class BaseReport:
         soil = state.soil
         crop_type = state.crop.current_crop
         animal_management = state.animal_management
+        field_management = state.field_management
         feed = state.feed
         manure_storage = state.manure_storage
-
-        soil.annual_mass_balance()
 
         for variable in self.annual_variables:
             self.annual_variables[variable][2] = \

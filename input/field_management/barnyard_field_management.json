@@ -4,13 +4,13 @@
                 "rotation_years": [2009],
                 "repeat": 1,
 
-                "year": [],
-                "day": [],
-                "N_mass": [],
-                "P_mass": [],
-                "K_mass": [],
-                "depth": [],
-                "surface_percent": []
+                "year": [2010],
+                "day": [200],
+                "N_mass": [1000],
+                "P_mass": [5],
+                "K_mass": [400],
+                "depth": [0.0],
+                "surface_percent": [1.0]
             },
 
             "manure":

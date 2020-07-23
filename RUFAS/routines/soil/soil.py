@@ -21,13 +21,14 @@ from .phosphorus_cycling import phosphorus_cycling
 # Function: daily_soil_routine
 # Executes all the daily soil routines
 # ------------------------------------------------------------------------------
-def daily_soil_routine(soil, crop, weather, time):
+def daily_soil_routine(soil, crop, field_management, weather, time):
     """
     Description:
         Executes all the daily soil routines.
     Args:
         soil: instance of the Soil class
         crop: instance of the Crop class
+        field_management: instance of the FieldManagement class
         weather: instance of the Weather class
         time: instance of the Time class
     """
@@ -55,16 +56,14 @@ def daily_soil_routine(soil, crop, weather, time):
 
     # calculate and update the contents of 3 organic and 2 inorganic nitrogen
     # pools
-    nitrogen_cycling.update_all(soil)
+    nitrogen_cycling.update_all(soil, field_management)
 
-    phosphorus_cycling.update_all(soil, weather, time)
+    phosphorus_cycling.update_all(soil, field_management, weather, time)
 
     annual_variable_update(soil)
 
 
 def annual_variable_update(soil):
-    soil.manure_applied_annual += soil.manure_applied
-    soil.fert_applied_annual += soil.fert_P_applied
     soil_water.update_annual_SW(soil)
     phosphorus_cycling.update_annual_P(soil)
     nitrogen_cycling.update_annual_N(soil)
@@ -171,8 +170,6 @@ class Soil:
             layer.mass = layer.bulk_density * layer.thickness_cm * 10000
 
         # fertilizer
-        self.fert_applied = 0.0
-        self.fert_applied_annual = 0.0
         self.no_rains = 0.0
         self.fert_CNT = 0.0
         self.fert_P_available = 0.0  # avfrtp
@@ -184,11 +181,7 @@ class Soil:
         self.manure_moisture = 0.5
         self.manure_cov = 0.0
 
-        self.manure_applied = 0.0
-        self.manure_applied_annual = 0.0
-
         self.manure_mass = 0.0
-        self.manure_applied = 0.0
 
         self.WIP = 0.0
         self.WOP = 0.0
@@ -252,7 +245,6 @@ class Soil:
 
         self.initial_profile_P = self.profile_P
 
-        self.manure_P_applied = 0.0
         self.P_calc = 0.0
         self.P_balance_difference = 0.0
         self.delta_P = 0.0
@@ -263,7 +255,6 @@ class Soil:
         self.P_uptake = 0.0
 
         # annual phosphorus balance
-        self.manure_P_applied_annual = 0.0
         self.P_calc_annual = 0.0
         self.P_balance_difference_annual = 0.0
         self.delta_P_annual = 0.0
@@ -400,7 +391,6 @@ class Soil:
         self.profile_N += self.fresh_N
         self.initial_profile_N = self.profile_N
 
-        self.manure_N_applied = 0.0
         self.N_calc = 0.0
         self.N_balance_difference = 0.0
         self.delta_N = 0.0
@@ -411,8 +401,6 @@ class Soil:
         self.N_uptake = 0.0
 
         # annual nitrogen balance
-        self.manure_N_applied_annual = 0.0
-        self.manure_N_applied_annual = 0.0
         self.N_calc_annual = 0.0
         self.N_balance_difference_annual = 0.0
         self.delta_N_annual = 0.0
@@ -576,14 +564,14 @@ class Soil:
         for layer in self.soil_layers:
             layer.wilting_water = layer.thickness * layer.wilting_point
 
-    def annual_mass_balance(self):
+    def annual_mass_balance(self, field_management):
         """
         Description:
             Calculates annual water balance
         """
         self.annual_water_balance()
-        self.annual_phosphorus_balance()
-        self.annual_nitrogen_balance()
+        self.annual_phosphorus_balance(field_management)
+        self.annual_nitrogen_balance(field_management)
 
     def annual_water_balance(self):
         self.delta_SW_annual = self.profile_SW - self.initial_profile_SW
@@ -594,23 +582,23 @@ class Soil:
 
         self.water_balance_difference_annual = self.p_act_annual - self.p_calc_annual
 
-    def annual_phosphorus_balance(self):
+    def annual_phosphorus_balance(self, field_management):
         self.delta_P_annual = self.profile_P - self.initial_profile_P
 
         self.P_calc_annual = self.delta_P_annual + \
                              self.P_runoff_annual + self.P_drainage_annual + \
                              self.P_erosion_annual + self.P_uptake_annual
 
-        self.P_balance_difference_annual = self.manure_P_applied_annual - self.P_calc_annual
+        self.P_balance_difference_annual = field_management.manure_P_applied_annual - self.P_calc_annual
 
-    def annual_nitrogen_balance(self):
+    def annual_nitrogen_balance(self, field_management):
         self.delta_N_annual = self.profile_N - self.initial_profile_N
 
         self.N_calc_annual = self.delta_N_annual + \
                              self.N_runoff_annual + self.N_drainage_annual + \
                              self.N_erosion_annual + self.N_uptake_annual
 
-        self.N_balance_difference_annual = self.manure_N_applied_annual - self.N_calc_annual
+        self.N_balance_difference_annual = field_management.manure_N_applied_annual - self.N_calc_annual
 
     def annual_reset(self):
         """
@@ -632,8 +620,6 @@ class Soil:
         # Nitrogen
         self.initial_profile_N = self.profile_N
 
-        self.manure_N_applied_annual = 0.0
-        self.manure_N_applied_annual = 0.0
         self.N_calc_annual = 0.0
         self.N_drainage_annual = 0.0
         self.N_runoff_annual = 0.0
@@ -642,9 +628,6 @@ class Soil:
         # Phosphorus
         self.initial_profile_P = self.profile_P
 
-        self.manure_applied_annual = 0.0
-
-        self.manure_P_applied_annual = 0.0
         self.P_calc_annual = 0.0
         self.P_drainage_annual = 0.0
         self.P_runoff_annual = 0.0
@@ -668,8 +651,6 @@ class Soil:
         self.active_N_drainage_annual = 0.0
 
         # soil Phosphorus
-        self.fert_applied_annual = 0.0
-
         self.DRP_runoff_annual = 0.0
         self.DRP_leach_annual = 0.0
 

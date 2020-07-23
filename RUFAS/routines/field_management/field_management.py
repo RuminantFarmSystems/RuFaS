@@ -29,19 +29,21 @@ def daily_field_management_routine(soil, manure_storage, field_management, weath
         time: an instance of the Time class defined in classes.py
     """
 
+    field_management.fert_applied = 0.0
+    field_management.fert_N_applied = 0.0
+    field_management.fert_P_applied = 0.0
+    field_management.fert_K_applied = 0.0
     fert_management = field_management.managed_applications['fertilizer']
     if (time.cal_year, time.day) in fert_management.applications:
-        fertilizer_application.update_all(soil, fert_management.applications[(time.cal_year, time.day)].data)
+        fertilizer_application.update_all(soil, field_management,
+                                          fert_management.applications[(time.cal_year, time.day)].data)
 
-    soil.manure_applied = 0.0
-    manure_storage.manure_applied = 0.0
-    soil.manure_P_applied = 0.0
-    manure_storage.P_applied = 0.0
-    soil.manure_N_applied = 0.0
-    manure_storage.N_applied = 0.0
+    field_management.manure_applied = 0.0
+    field_management.manure_N_applied = 0.0
+    field_management.manure_P_applied = 0.0
     manure_management = field_management.managed_applications['manure']
     if (time.cal_year, time.day) in manure_management.applications:
-        manure_application.update_all(soil, manure_storage,
+        manure_application.update_all(soil, field_management, manure_storage,
                                         manure_management.applications[(time.cal_year, time.day)].data)
 
     till_management = field_management.managed_applications['tillage']
@@ -50,6 +52,8 @@ def daily_field_management_routine(soil, manure_storage, field_management, weath
             tillage_application.update_all(soil, till_management.applications[(time.cal_year, time.day)].data)
         else:
             till_management.iterate_application(time)
+
+    field_management.update_annual_variables(manure_storage)
 
 
 class FieldManagement:
@@ -81,6 +85,7 @@ class FieldManagement:
                 'day': -1,
                 'N_mass': 100,
                 'P_mass': 100,
+                'K_mass': 100,
                 'depth': 0.0,
                 'surface_percent': 1.0
             },
@@ -99,12 +104,32 @@ class FieldManagement:
             self.managed_applications[application_name] = \
                 self.BaseApplicationManagement(app_data[application_name], application_name, default_data, time)
 
+        self.manure_applied = 0.0
+        self.manure_N_applied = 0.0
+        self.manure_P_applied = 0.0
+
+        self.manure_applied_annual = 0.0
+        self.manure_N_applied_annual = 0.0
+        self.manure_P_applied_annual = 0.0
+
+        self.fert_applied = 0.0
+        self.fert_N_applied = 0.0
+        self.fert_P_applied = 0.0
+        self.fert_K_applied = 0.0
+
+        self.fert_applied_annual = 0.0
+        self.fert_N_applied_annual = 0.0
+        self.fert_P_applied_annual = 0.0
+        self.fert_K_applied_annual = 0.0
+
     @staticmethod
     def check_conditions(soil, weather, time):
         """
         Description:
             Checks if environmental conditions are conducive to application.
             Iterates field_management scheduled for non-conducive dates
+            "pseudocode_field_management" FM.2.3
+
         Args:
             soil: an instance of the Soil class specified in soil.py
             weather: an instance of the Weather class specified in classes.py
@@ -168,6 +193,34 @@ class FieldManagement:
             return False
 
         return True
+
+    def update_annual_variables(self, manure_storage):
+        manure_storage.manure_applied = self.manure_applied
+        manure_storage.N_applied = self.manure_N_applied
+        manure_storage.P_applied = self.manure_P_applied
+
+        manure_storage.manure_applied_annual += manure_storage.manure_applied
+        manure_storage.N_applied_annual += manure_storage.N_applied
+        manure_storage.P_applied_annual += manure_storage.P_applied
+
+        self.manure_applied_annual += self.manure_applied
+        self.manure_N_applied_annual += self.manure_N_applied
+        self.manure_P_applied_annual += self.manure_P_applied
+
+        self.fert_applied_annual += self.fert_applied
+        self.fert_N_applied_annual += self.fert_N_applied
+        self.fert_P_applied_annual += self.fert_P_applied
+        self.fert_K_applied_annual += self.fert_K_applied
+
+    def annual_reset(self):
+        self.fert_applied_annual = 0.0
+        self.fert_N_applied_annual = 0.0
+        self.fert_P_applied_annual = 0.0
+        self.fert_K_applied_annual = 0.0
+
+        self.manure_applied_annual = 0.0
+        self.manure_N_applied_annual = 0.0
+        self.manure_P_applied_annual = 0.0
 
     class BaseApplicationManagement:
         def __init__(self, management_data, application_type, default_data, time):

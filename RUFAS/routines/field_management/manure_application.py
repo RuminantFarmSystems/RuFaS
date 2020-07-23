@@ -6,21 +6,23 @@ Author(s): Jacob Johnson, jacob8399@gmail.com,
 """
 
 
-def update_all(soil, manure_storage, m_app):
+def update_all(soil, field_management, manure_storage, m_app):
     """
     Description:
         Simulates a manure application. Interface between storage and field
         "pseudocode_field_management" FM.4
     Args:
         soil: an instance of the Soil class defined in soil.py
+        field_management: an instance of the FieldManagement class defined in
+            field_management.py
         manure_storage: an instance of the ManureStorage class defined in
             manure_storage.py
         m_app: an instance of the BaseApplication class specified in
             field_management.py representing a user specified manure application.
     """
     manure_application = formulate_manure_application(manure_storage, m_app)
-    added_manure_P(soil, manure_application)
-    added_manure_N(soil, manure_application)
+    added_manure_P(soil, field_management, manure_application)
+    added_manure_N(soil, field_management, manure_application)
 
 
 def formulate_manure_application(manure_storage, m_app):
@@ -109,10 +111,6 @@ def formulate_manure_application(manure_storage, m_app):
         if desired_N == 0 and desired_P == 0:
             break
 
-    manure_storage.manure_applied = manure_application['mass']
-    manure_storage.N_applied = manure_application['N_mass']
-    manure_storage.P_applied = manure_application['P_mass']
-
     # TODO: this is a rudimentary method for satisfying purchased manure. A
     #  more robust method would require drawing purchased manure from some
     #  variety of input (likely a database)
@@ -136,34 +134,37 @@ def formulate_manure_application(manure_storage, m_app):
     return manure_application
 
 
-def added_manure_P(soil, m_app):
+def added_manure_P(soil, field_management, m_app):
     """
     Description:
         Apply manure Phosphorus
     Args:
         soil
+        field_management
         m_app: the manure application formulated above
     """
     soil.manure_type = "DAIRY"
-    soil.manure_applied = m_app['mass']
     cover_perc = m_app['cover_percent']
-    soil.manure_P_applied = m_app['P_mass']
+    field_management.manure_applied = m_app['mass']
+    field_management.manure_P_applied = m_app['P_mass']
     DM = m_app['DM']
     surf_perc = m_app['surface_percent']
     soil.WIP_applied = m_app['WIP']
     soil.WOP_applied = m_app['WOP']
     depth = m_app['depth']
 
-    WIP_frac = soil.WIP_applied / soil.manure_applied
-    WOP_frac = soil.WOP_applied / soil.manure_applied
+    WIP_frac = soil.WIP_applied / field_management.manure_applied
+    WOP_frac = soil.WOP_applied / field_management.manure_applied
 
     # Update manure characteristics
     # FM.4.B.1-5
     cover_app = cover_perc * soil.area
 
-    soil.manure_moisture = (soil.manure_moisture * soil.manure_mass + (1.0 - DM) * soil.manure_applied) \
-                           / (soil.manure_mass + soil.manure_applied)
-    wet_rate = soil.manure_applied / DM / cover_app
+    soil.manure_moisture = (soil.manure_moisture * soil.manure_mass + (1.0 - DM) *
+                            field_management.manure_applied) / \
+                           (soil.manure_mass + field_management.manure_applied)
+
+    wet_rate = field_management.manure_applied / DM / cover_app
     infiltration = min(0.9, 0.000002 * wet_rate + 0.267)
 
     # S.5.A.7
@@ -179,8 +180,8 @@ def added_manure_P(soil, m_app):
 
     # concentration factors
     # FM.4.C.2
-    C_WIP = soil.manure_P_applied * WIP_frac * I_fac
-    C_WOP = soil.manure_P_applied * WOP_frac * 0.95 * I_fac
+    C_WIP = field_management.manure_P_applied * WIP_frac * I_fac
+    C_WOP = field_management.manure_P_applied * WOP_frac * 0.95 * I_fac
 
     # slurry factors
     # FM.4.C.3
@@ -202,11 +203,11 @@ def added_manure_P(soil, m_app):
     # update manure features and composition
     # FM.4.C.5
     soil.manure_cov = min(soil.area, soil.manure_cov + cover_app * S_fac_cover)
-    soil.manure_mass += soil.manure_applied * S_fac_mass
-    soil.WIP += soil.manure_P_applied * WIP_frac * S_fac
-    soil.WOP += soil.manure_P_applied * WOP_frac * S_fac
-    soil.SOP += soil.manure_P_applied * W_fac * 0.75 * surf_perc * S_fac
-    soil.SIP += soil.manure_P_applied * W_fac * 0.25 * surf_perc * S_fac
+    soil.manure_mass += field_management.manure_applied * S_fac_mass
+    soil.WIP += field_management.manure_P_applied * WIP_frac * S_fac
+    soil.WOP += field_management.manure_P_applied * WOP_frac * S_fac
+    soil.SOP += field_management.manure_P_applied * W_fac * 0.75 * surf_perc * S_fac
+    soil.SIP += field_management.manure_P_applied * W_fac * 0.25 * surf_perc * S_fac
 
     # update active and labile soil pools for each layer affected by the application
     # FM.4.C.6
@@ -215,26 +216,29 @@ def added_manure_P(soil, m_app):
     for layer in soil.soil_layers:
         if layer.bottom_depth_cm < depth:
             D_fac = layer.bottom_depth_cm / depth
-            layer.active_P += soil.manure_P_applied * W_fac * 0.25 * I_fac * D_fac_1 * D_fac
-            layer.labile_P += C_WIP + C_WOP + (soil.manure_P_applied * W_fac * 0.75 * 0.95 * I_fac * D_fac_2) * D_fac
+            layer.active_P += field_management.manure_P_applied * W_fac * 0.25 * \
+                              I_fac * D_fac_1 * D_fac
+            layer.labile_P += C_WIP + C_WOP + \
+                              (field_management.manure_P_applied * W_fac * 0.75 * 0.95 *
+                               I_fac * D_fac_2) * D_fac
 
             D_fac_sum += D_fac
             last_layer += 1
 
     D_fac = 1 - D_fac_sum
-    soil.soil_layers[last_layer].active_P += soil.manure_P_applied * W_fac * 0.25 * I_fac * D_fac_1 * D_fac
+    soil.soil_layers[last_layer].active_P += field_management.manure_P_applied * W_fac * 0.25 * \
+                                             I_fac * D_fac_1 * D_fac
     soil.soil_layers[last_layer].labile_P += C_WIP + C_WOP + \
-                                             (soil.manure_P_applied * W_fac * 0.75 * 0.95 * I_fac * D_fac_2) * D_fac
+                                             (field_management.manure_P_applied * W_fac * 0.75 * 0.95
+                                              * I_fac * D_fac_2) * D_fac
 
     # S.5.A.8
     for layer in soil.soil_layers:
         layer.active_P /= soil.area
         layer.labile_P /= soil.area
 
-    soil.manure_mass += soil.manure_applied
 
-
-def added_manure_N(soil, m_app):
+def added_manure_N(soil, field_management, m_app):
     """
     Description:
         Apply manure Nitrogen
@@ -242,10 +246,11 @@ def added_manure_N(soil, m_app):
 
     Args:
         soil
+        field_management
         m_app
     """
-    soil.manure_N_applied = m_app['N_mass']
+    field_management.manure_N_applied = m_app['N_mass']
 
     # FM.4.D.1
-    soil.soil_layers[0].active_N += soil.manure_N_applied * 0.875
-    soil.soil_layers[0].stable_N += soil.manure_N_applied * 0.125
+    soil.soil_layers[0].active_N += field_management.manure_N_applied * 0.875
+    soil.soil_layers[0].stable_N += field_management.manure_N_applied * 0.125

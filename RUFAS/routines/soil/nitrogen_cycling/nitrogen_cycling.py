@@ -137,7 +137,7 @@ from . import denitrification, humus_mineralization, mineralization_decomp, \
 # to nitrogen cycling. The order in which each method is called is significant
 # and is still being worked out.
 #
-def update_all(soil):
+def update_all(soil, field_management):
 
     calc_temp_factors(soil)
 
@@ -153,7 +153,7 @@ def update_all(soil):
 
     humus_mineralization.humus_mineralization(soil)
 
-    update_profile_N(soil)
+    update_profile_N(soil, field_management)
 
 
 #
@@ -193,7 +193,7 @@ def calc_water_factors(soil):
         layer.water_fac = water_fac
 
 
-def update_profile_N(soil):
+def update_profile_N(soil, field_management):
     soil.NH4 = 0.0
     soil.NO3 = 0.0
     soil.org_N = 0.0
@@ -224,11 +224,10 @@ def update_profile_N(soil):
 
     soil.N_calc = soil.delta_N + soil.N_drainage + soil.N_runoff + soil.N_erosion + soil.N_uptake
 
-    soil.N_balance_difference = soil.manure_N_applied - soil.N_calc
+    soil.N_balance_difference = field_management.manure_N_applied - soil.N_calc
 
 
 def update_annual_N(soil):
-    soil.manure_N_applied_annual += soil.manure_N_applied
     soil.N_runoff_annual += soil.N_runoff
     soil.N_drainage_annual += soil.N_drainage
     soil.N_erosion_annual += soil.N_erosion

@@ -17,22 +17,22 @@ Coders:  Jacob Johnson
 from . import fert_leach, manure_leach, p_mineralization, soluble_P, erosion
 
 
-def update_all(soil, weather, time):
+def update_all(soil, field_management, weather, time):
 
     soluble_P.update_all(soil)
 
     fert_leach.update_all(soil, weather, time)
 
-    manure_leach.update_all(soil, weather, time)
+    manure_leach.update_all(soil, field_management, weather, time)
 
     p_mineralization.update_all(soil, time)
 
     erosion.update_all(soil)
 
-    update_profile_P(soil)
+    update_profile_P(soil, field_management)
 
 
-def update_profile_P(soil):
+def update_profile_P(soil, field_management):
     soil.labile_P = 0.0
     soil.active_P = 0.0
     soil.stable_P = 0.0
@@ -64,11 +64,10 @@ def update_profile_P(soil):
 
     soil.P_calc = soil.delta_P + soil.P_erosion + soil.P_drainage + soil.P_runoff + soil.P_uptake
 
-    soil.P_balance_difference = soil.manure_P_applied - soil.P_calc
+    soil.P_balance_difference = field_management.manure_P_applied - soil.P_calc
 
 
 def update_annual_P(soil):
-    soil.manure_P_applied_annual += soil.manure_P_applied
     soil.P_erosion_annual += soil.P_erosion
     soil.P_drainage_annual += soil.P_drainage
     soil.P_runoff_annual += soil.P_runoff

@@ -53,20 +53,16 @@ def simulate(input_fPath: Path):
     output.initialize_graphic_dir(config.graphic_dir)
     output.initialize_reports()
 
-    sys.stdout.write('\b' * len('Loading Data...') + "Simulating: {}...".format(input_fPath.name))
-
     t_start_sim = timer.time()
 
     # MAIN Simulation Loop
     while not time.end_simulation():
-        sys.stdout.write('\b' * 3)
         annual_simulation()
 
     output.produce_graphics()
     t_end_sim = timer.time()
 
-    sys.stdout.write('\b' * len("Simulating: {}...".format(input_fPath.name)) +
-                     "Simulation Successful: {}".format(input_fPath.name))
+    sys.stdout.write("Simulation Successful: {}".format(input_fPath.name))
     print("\nTotal Run Time: {} seconds\n".format(str(t_end_sim - t_start_sim)))
 
 
@@ -82,7 +78,7 @@ def daily_simulation():
     routines.daily_animal_routine(state.animal_management, state.feed)
     routines.daily_manure_storage_routine(state.manure_storage, state.animal_management)
     routines.daily_field_management_routine(state.soil, state.manure_storage, state.field_management, weather, time)
-    routines.daily_soil_routine(state.soil, state.crop, weather, time)
+    routines.daily_soil_routine(state.soil, state.crop, state.field_management, weather, time)
     routines.daily_crop_routine(state.soil, state.crop, state.field_management, weather, time)
     routines.daily_feed_routine(state.feed, state.crop, state.animal_management)
 
@@ -120,7 +116,6 @@ def annual_simulation():
     #
     # Post-Annual Routines
     #
-    sys.stdout.write('...')
     state.annual_mass_balance()
     output.annual_updates(state, weather, time)
     output.write_annual_reports()

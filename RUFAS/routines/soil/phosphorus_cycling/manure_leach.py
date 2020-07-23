@@ -10,7 +10,7 @@ from math import exp
 # this subroutine estimates P leaching from surface manure with rainfall
 # and P infiltration into soil and loss in runoff
 # "pseudocode_soil" S.5.D
-def update_all(S, weather, time):
+def update_all(S, field_management, weather, time):
 
     day = time.day
     year = time.year
@@ -108,7 +108,8 @@ def update_all(S, weather, time):
         # S.5.D.III.1
         wet_rate = -0.3 * S.manure_moisture + 0.27
         dry_rate = (-0.05 *
-                    (0 if S.manure_applied == 0 else (S.manure_mass / S.manure_applied)) +
+                    (0 if field_management.manure_applied == 0 else
+                     (S.manure_mass / field_management.manure_applied)) +
                     0.075) * TFA
 
         # S.5.D.III.2

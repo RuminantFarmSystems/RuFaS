@@ -57,9 +57,10 @@ class State:
         self.crop.annual_reset()
         self.animal_management.annual_reset()
         self.manure_storage.annual_reset()
+        self.field_management.annual_reset()
 
     def annual_mass_balance(self):
-        self.soil.annual_mass_balance()
+        self.soil.annual_mass_balance(self.field_management)
         self.manure_storage.annual_mass_balance()
 
 

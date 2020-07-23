@@ -68,6 +68,11 @@
             "produce_csv": true,
             "produce_graphics": false,
             "report_name": "crop_report"
+        },
+        "field_management_report": {
+            "produce_csv": true,
+            "produce_graphics": false,
+            "report_name": "field_management_report"
         }
     },
     "feed_storage_report": {

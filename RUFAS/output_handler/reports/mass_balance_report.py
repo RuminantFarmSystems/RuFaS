@@ -22,12 +22,6 @@ class MassBalanceReport(BaseReportDriver):
     class BaseMassBalanceReport(BaseReport):
         def __init__(self, data):
             super().__init__(data)
-            self.daily_variables = {
-
-            }
-            self.annual_variables = {
-
-            }
 
         def produce_report_graphics(self):
             super().produce_report_graphics()
@@ -68,7 +62,7 @@ class MassBalanceReport(BaseReportDriver):
             self.daily_variables = {
                 'year': ['time.cal_year', '', []],
                 'j_day': ['time.day', '', []],
-                'actual': ['soil.manure_P_applied', 'kg', []],
+                'actual': ['field_management.manure_P_applied', 'kg', []],
                 'calculated': ['soil.P_calc', 'kg', []],
                 'difference': ['soil.P_balance_difference', 'kg', []],
                 'delta': ['soil.delta_P', 'kg', []],
@@ -80,7 +74,7 @@ class MassBalanceReport(BaseReportDriver):
 
             self.annual_variables = {
                 'year': ['time.cal_year', '', 0],
-                'actual': ['soil.manure_P_applied_annual', 'kg', 0],
+                'actual': ['field_management.manure_P_applied_annual', 'kg', 0],
                 'calculated': ['soil.P_calc_annual', 'kg', 0],
                 'difference': ['soil.P_balance_difference_annual', 'kg', 0],
                 'delta': ['soil.delta_P_annual', 'kg', 0],
@@ -97,7 +91,7 @@ class MassBalanceReport(BaseReportDriver):
             self.daily_variables = {
                 'year': ['time.cal_year', '', []],
                 'j_day': ['time.day', '', []],
-                'actual': ['soil.manure_N_applied', 'kg', []],
+                'actual': ['field_management.manure_N_applied', 'kg', []],
                 'calculated': ['soil.N_calc', 'kg', []],
                 'difference': ['soil.N_balance_difference', 'kg', []],
                 'delta': ['soil.delta_N', 'kg N', []],
@@ -123,7 +117,7 @@ class MassBalanceReport(BaseReportDriver):
 
             self.annual_variables = {
                 'year': ['time.cal_year', '', 0],
-                'actual': ['soil.manure_N_applied_annual', 'kg', 0],
+                'actual': ['field_management.manure_N_applied_annual', 'kg', 0],
                 'calculated': ['soil.N_calc_annual', 'kg', 0],
                 'difference': ['soil.N_balance_difference_annual', 'kg', 0],
                 'delta': ['soil.delta_N_annual', 'kg', 0],
