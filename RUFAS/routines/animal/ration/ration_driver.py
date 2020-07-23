@@ -18,8 +18,8 @@ import random
 
 def ration_formulation(requirements, available_feeds):
     #TODO do a real values
-    BW = 480
-    SBW = 480*0.96
+    BW = 600
+    SBW = 600*0.96
     price = NLP.list_reconfig(available_feeds.price)
     TDN = NLP.list_reconfig(available_feeds.TDN)
     DE = NLP.list_reconfig(available_feeds.DE)
@@ -44,20 +44,16 @@ def ration_formulation(requirements, available_feeds):
     solution = NLP.optimize(x0)
     count = 0
     while not solution.success and count < 30:
-        '''
-        for i in range(int(len(price))):
-            x0[i] = (random.random()*4)
-        '''
-        rounded = [round(num, 2) for num in solution.x]
-        x0 = solution.x
-        solution = NLP.optimize(x0)
+        solution = NLP.optimize()
         #print(x0)
         #print('X: ')
         #print(NLP.objective(solution.x))
         #print(rounded)
         #print(solution.success)
+        rounded = [round(num, 2) for num in solution.x]
+        print('X: ')
+        print(rounded)
         count += 1
-
         print('Con_1')
         print(NLP.NEmact_constraint(solution.x))
         print('Con_2')
@@ -65,7 +61,6 @@ def ration_formulation(requirements, available_feeds):
         print('Con_3')
         print(NLP.NEgact_constraint(solution.x))
         print('Con_4')
-        '''
         print(NLP.calcium_constraint(solution.x))
         print('Con_5')
         print(NLP.phosphorus_constraint(solution.x))
@@ -81,14 +76,17 @@ def ration_formulation(requirements, available_feeds):
         print(NLP.fat_constraint(solution.x))
         print('Con_11')
         print(NLP.DMI_constraint(solution.x))
-        '''
+
         print('Con_12')
         print(NLP.energy_req_limit_constraint(solution.x))
-        
+
     rounded = [round(num, 2) for num in solution.x]
     print(solution.success)
     print(rounded)
     print('Break')
+
+
+
 class Requirements:
     """
     Stores the information for the calculated requirements of animals to
