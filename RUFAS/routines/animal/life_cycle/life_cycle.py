@@ -210,7 +210,7 @@ class LifeCycleManager:
             heiferIIIs: list of heiferIIIs for the simulation
             cows: list of cows for the simulation
         """
-        self.animal_initializer = AnimalInitalization(False)
+        self.animal_initializer = AnimalInitalization(True)
         self.initialize_db_summary = \
             self.animal_initializer.initialization_db_summary()
         self.herd_num = herd_num
@@ -442,7 +442,7 @@ class LifeCycleManager:
                     'pen_history': heiferIII.pen_history
                      })
                 args.update(repro_program = 'TAI')
-                args.update(presynch_method = 'PreSynch')
+                args.update(presynch_method = 'Double OvSynch')
                 args.update(tai_method_c = 'OvSynch 56')
                 args.update(resynch_method = 'TAIafterPD')
                 new_cow = Cow(args)

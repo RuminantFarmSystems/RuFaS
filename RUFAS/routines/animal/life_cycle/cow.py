@@ -421,8 +421,13 @@ class Cow(HeiferIII):
 		CBW = AnimalBase.config['birth_weight_avg_ho']
 		if self.days_in_preg > 190:
 			conceptus_growth = 0.665 * CBW / 45
+			self.conceptus_weight += conceptus_growth
 		elif self.days_in_preg == 190:
 			conceptus_growth = 18 * CBW / 45
+			self.conceptus_weight += conceptus_growth
+		elif self.days_in_preg == self.gestation_length:
+			conceptus_growth = - self.conceptus_weight
+			self.conceptus_weight = 0
 		else:
 			conceptus_growth = 0
 
@@ -439,16 +444,19 @@ class Cow(HeiferIII):
 		else:  # parity > 2
 			target_adg_cow = 0
 
-		if self.calves == 1:
-			bodyweight_tissue = \
-				-20 / 65 * math.exp(1 - self.days_in_milk / 65) + \
-				20 / (65 ** 2) * self.days_in_milk * \
-				math.exp(1 - self.days_in_milk / 65)
-		else:  # parity > 1
-			bodyweight_tissue = \
-				-40 / 70 * math.exp(1 - self.days_in_milk / 70) + \
-				40 / (70 ** 2) * self.days_in_milk * \
-				math.exp(1 - self.days_in_milk / 70)
+		if self.days_in_milk == 0:
+			bodyweight_tissue = 0
+		else:
+			if self.calves == 1:
+				bodyweight_tissue = \
+					-20 / 65 * math.exp(1 - self.days_in_milk / 65) + \
+					20 / (65 ** 2) * self.days_in_milk * \
+					math.exp(1 - self.days_in_milk / 65)
+			else:  # parity > 1
+				bodyweight_tissue = \
+					-40 / 70 * math.exp(1 - self.days_in_milk / 70) + \
+					40 / (70 ** 2) * self.days_in_milk * \
+					math.exp(1 - self.days_in_milk / 70)
 
 		return target_adg_cow + conceptus_growth + bodyweight_tissue
 

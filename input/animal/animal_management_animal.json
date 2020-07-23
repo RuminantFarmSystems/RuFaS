@@ -1,8 +1,8 @@
 {
 	"herd_information": {
-		"calf_num": 160,
-		"heiferI_num": 800,
-		"heiferII_num": 820,
+		"calf_num": 80,
+		"heiferI_num": 440,
+		"heiferII_num": 380,
 		"heiferIII_num": 50,
 		"cow_num": 1000,
 		"replace_num": 5000,
@@ -10,7 +10,7 @@
 	},
 	"animal_config": {
 		"management_decisions": {
-			"breeding_start_day_h": 400,
+			"breeding_start_day_h": 360,
 			"heifer_repro_cull_time": 650,
 			"dry_period": 60,
 			"lactation_curve": "wood",
@@ -60,7 +60,7 @@
 			"repro": {
 				"avg_estrus_cycle_heifer": 21,
 				"std_estrus_cycle_heifer": 3,
-				"m5dCG2P_conception_rate": 0.48,
+				"m5dCG2P_conception_rate": 0.6,
 				"m5dCGP_conception_rate": 0.48,
 				"defined_conception_rate": 0.0,
 				"preg_check_day_1": 32,
@@ -76,7 +76,7 @@
 				"avg_estrus_cycle_p": 10,
 				"std_estrus_cycle_p": 2,
 				"presynch_program_length": 0,
-				"ovsynch56_conception_rate": 0.48,
+				"ovsynch56_conception_rate": 0.55,
 				"ovsynch48_conception_rate": 0.4,
 				"cosynch72_conception_rate": 0.4,
 				"_5dcosynch_conception_rate": 0.4,
