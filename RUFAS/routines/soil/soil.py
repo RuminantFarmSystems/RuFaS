@@ -454,7 +454,7 @@ class Soil:
 
         # soil carbon attributes
         self.plant_moisture = 0.85  # TODO temporary value from Hector  # TODO should probably be in crop
-        self.residue_DM = 0.0
+        self.residue_DM_harvest = 0.0
         self.lignin_residue_percent = 17  # TODO this 0.17 will be a crop type lignin percent
 
         self.silt_and_clay_frac = 0.5  # TODO database item

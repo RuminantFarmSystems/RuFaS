@@ -63,7 +63,7 @@ def daily_crop_routine(crop, weather, time, soil):
 
         # yield is reset to 0 at the beginning of the next day so it can be
         # accessed by the output handler.
-        soil.residue_DM = 0
+        soil.residue_DM_harvest = 0
         soil.soil_layers[0].fr_tillage = 0
         crop_type.bio_BG_DM = 0
         crop_type.yield_actual = 0

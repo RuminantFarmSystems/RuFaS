@@ -33,7 +33,6 @@ def update_all(crop_type, soil, weather, time):
     # TODO delete 100's eventually, check lignin residue percent in soil.py
     # TODO fr_N might need a different calculation in the future
     LN_ratio_AG = 0
-    crop_type.fr_N = 0.4
     if crop_type.fr_N != 0:
         LN_ratio_AG = (soil.lignin_residue_percent / 100) / crop_type.fr_N
     metabolic_AG_frac = 0.85 - 0.18 * LN_ratio_AG
@@ -69,7 +68,7 @@ def update_all(crop_type, soil, weather, time):
 
         metabolic_AG_to_BG = layer.metabolic_AG * layer.fr_tillage  # TODO fr_tillage, percent_incorp?
 
-        d_metabolic_AG = soil.residue_DM * metabolic_AG_frac - (
+        d_metabolic_AG = soil.residue_DM_harvest * metabolic_AG_frac - (
                 (metabolic_AG_to_C_active - metabolic_AG_to_BG) + metabolic_AG_to_BG)
 
         layer.metabolic_AG += d_metabolic_AG
@@ -83,13 +82,13 @@ def update_all(crop_type, soil, weather, time):
 
         struct_AG_to_BG = layer.structural_AG * layer.fr_tillage
 
-        d_structural_AG = ((soil.residue_DM * (1 - metabolic_AG_frac)) - struct_AG_to_BG) - \
+        d_structural_AG = ((soil.residue_DM_harvest * (1 - metabolic_AG_frac)) - struct_AG_to_BG) - \
                           (struct_AG_to_C_active + struct_AG_to_C_slow)
 
         layer.structural_AG += d_structural_AG
 
         # below ground metabolic residue and roots
-        residue_DM_incorp = layer.fr_tillage * soil.residue_DM
+        residue_DM_incorp = layer.fr_tillage * soil.residue_DM_harvest
         fr_residue_DM = 0
         if residue_DM_incorp + crop_type.bio_BG_DM != 0:
             fr_residue_DM = residue_DM_incorp / (residue_DM_incorp + crop_type.bio_BG_DM)

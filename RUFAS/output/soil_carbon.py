@@ -44,7 +44,7 @@ class SoilCarbon(BaseReportHandler):
 
         self.daily_variables = {'year': ['time.cal_year', '', []],
                                 'j_day': ['time.day', '', []],
-                                'residue_DM': ['soil.residue_DM', 'kg/ha', []],
+                                'residue_DM_harvest': ['soil.residue_DM_harvest', 'kg/ha', []],
                                 'bio_BG_DM': ['crop.current_crop.bio_BG_DM', 'kg/ha', []],
                                 'soil_C_percent_L1': ['soil.soil_layers[0].carbon_percent', '', []],
                                 'soil_C_percent_L2': ['soil.soil_layers[1].carbon_percent', '', []],

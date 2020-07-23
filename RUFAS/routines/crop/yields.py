@@ -144,7 +144,7 @@ def calc_residue(crop_type, time, soil):
         cut(crop_type, bio_frac)
     soil.residue += d_residue
 
-    soil.residue_DM = soil.residue * (1 - soil.plant_moisture)
+    soil.residue_DM_harvest = soil.residue * (1 - soil.plant_moisture)
 
 
 #
