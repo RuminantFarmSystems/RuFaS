@@ -410,7 +410,8 @@ class LifeCycleManager:
                 args = heiferII.get_heiferII_values()
                 args.update({
                     'body_weight_history': heiferII.body_weight_history,
-                    'pen_history': heiferII.pen_history
+                    'pen_history': heiferII.pen_history,
+                    'conceptus_weight': heiferII.conceptus_weight
                      })
                 new_heiferIII = HeiferIII(args)
                 heiferIIIs.append(new_heiferIII)
@@ -444,7 +445,8 @@ class LifeCycleManager:
                 args = heiferIII.get_heiferIII_values()
                 args.update({
                     'body_weight_history': heiferIII.body_weight_history,
-                    'pen_history': heiferIII.pen_history
+                    'pen_history': heiferIII.pen_history,
+                    'conceptus_weight': heiferIII.conceptus_weight
                      })
                 args.update(repro_program = 'TAI')
                 args.update(presynch_method = 'Double OvSynch')

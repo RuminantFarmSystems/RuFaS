@@ -81,6 +81,7 @@ class AnimalBase(object):
 			self.p_gest = self.p_gest
 			self.p_growth = self.p_growth
 			self.p_maint_feces = self.p_maint_feces
+			self.conceptus_weight = self.conceptus_weight
 		except Exception as e:
 			self.culled = False
 			self.do_not_breed = False
@@ -107,10 +108,13 @@ class AnimalBase(object):
 			self.p_gest = 0
 			self.p_growth = 0
 			self.p_maint_feces = 0
+			self.conceptus_weight = 0
 
 		if 'body_weight_history' in args:
 			self.body_weight_history = args['body_weight_history']
 			self.pen_history = args['pen_history']
+		if 'conceptus_weight' in args:
+			self.conceptus_weight = args['conceptus_weight']
 
 	def set_default_nutrient_rqmts(self):
 		"""
