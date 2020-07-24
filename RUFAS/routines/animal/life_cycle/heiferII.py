@@ -32,14 +32,14 @@ class HeiferII(HeiferI):
 			args.breed: breed of the cow
 			args.birth_date: the date of the simulation when the calf was born
 			args.daysBorn: age of the animal
-			args.repro_program: reproduction program used in heifer, 
+			args.repro_program: reproduction program used in heifer,
 				three of them: ED, TAI, and synch-ED programs
-			args.tai_method_h: timed-AI protocols used for 
-				reproduction programs, three of them: 5dCG2P, 
+			args.tai_method_h: timed-AI protocols used for
+				reproduction programs, three of them: 5dCG2P,
 				5dCGP, and user-defined
-			args.synch_ed_method_h: synch ed protocols used for 
+			args.synch_ed_method_h: synch ed protocols used for
 				reproduction programs, two of them: 2P and CP
-			(optional: include the following to assign cow information) 
+			(optional: include the following to assign cow information)
 			args.birth_weight: the birth weight of the cow
 			args.body_weight: current body weight of the cow
 			args.wean_weight: the wean weight of the cow
@@ -102,7 +102,7 @@ class HeiferII(HeiferI):
 
 		else:
 			return self.get_non_preg_bw_change()
-		
+
 	def init_values(self, args):
 		"""
 		Initialize repro program values
@@ -264,7 +264,7 @@ class HeiferII(HeiferI):
 		self.update_body_weight_history(sim_day)
 		cull_stage = False
 		third_stage = False
-		
+
 		self.days_born += 1
 
 		if self.days_born < AnimalBase.config['grow_end_day']:
@@ -389,7 +389,6 @@ class HeiferII(HeiferI):
 				self._return_estrus(sim_day)
 
 	# TAI methods
-
 	def _determine_tai_program_day(self, date):
 		"""
 		Determine the program start time when reach breeding start time
@@ -458,7 +457,6 @@ class HeiferII(HeiferI):
 			self._user_defined_update()
 
 	# synch-ED methods
-
 	def _determine_synch_ed_program_day(self, date):
 		"""
 		Determine the program start time when reach breeding start time
@@ -616,14 +614,14 @@ class HeiferII(HeiferI):
 				self.preg = True
 				self.breeding_to_preg_time = self.days_born - AnimalBase.config['breeding_start_day_h']
 				self.gestation_length = int(np.random.normal(
-					AnimalBase.config['avg_gestation_len'], 
+					AnimalBase.config['avg_gestation_len'],
 					AnimalBase.config['std_gestation_len']))
 				while self.gestation_length < AnimalBase.config['avg_gestation_len'] \
 					- 2 * AnimalBase.config['std_gestation_len'] \
 					or self.gestation_length > AnimalBase.config['avg_gestation_len'] \
 						+ 2 * AnimalBase.config['std_gestation_len']:
 					self.gestation_length = int(np.random.normal(
-						AnimalBase.config['avg_gestation_len'], 
+						AnimalBase.config['avg_gestation_len'],
 						AnimalBase.config['std_gestation_len']))
 				self.events.add_event(self.days_born, sim_day, 'Heifer pregnant')
 			else:

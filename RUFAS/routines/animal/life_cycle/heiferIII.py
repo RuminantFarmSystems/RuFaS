@@ -21,40 +21,40 @@ from RUFAS.routines.animal.manure.growing_heifer_manure_excretion import \
 
 class HeiferIII(HeiferII):
     # TODO: Rank heifers to enter the herd or sold
-    
+
     def __init__(self, args):
         """
         Description:
-			initialize the heifer in this stage from the second stage
-        Input:
-			args.id: id of the cow
-			args.breed: breed of the cow
-			args.birth_date: the date of the simulation when the calf was born
-			args.daysBorn: age of the animal
-			args.repro_program: reproduction program used in heifer, 
-				three of them: ED, TAI, and synch-ED programs
-			args.tai_method_h: timed-AI protocols used for 
-				reproduction programs, three of them: 5dCG2P, 
-				5dCGP, and user-defined
-			args.synch_ed_method_h: synch ed protocols used for 
-				reproduction programs, two of them: 2P and CP
-			(optional: include the following to assign cow information) 
-			args.birth_weight: the birth weight of the cow
-			args.body_weight: current body weight of the cow
-			args.wean_weight: the wean weight of the cow
-			args.mature_body_weight: the mature body weight of the cow
-			args.events: events of the cow
-			args.estrus_count
-			args.estrus_day
-			args.tai_program_start_day_h
-			args.synch_ed_program_start_day_h
-			args.synch_ed_estrus_day
-			args.stop_day
-			args.conception_rate
-			args.ai_day
-			args.abortion_day
-			args.days_in_preg
-			args.gestation_length
+            initialize the heifer in this stage from the second stage
+        Args:
+            args.id: id of the cow
+            args.breed: breed of the cow
+            args.birth_date: the date of the simulation when the calf was born
+            args.daysBorn: age of the animal
+            args.repro_program: reproduction program used in heifer,
+                three of them: ED, TAI, and synch-ED programs
+            args.tai_method_h: timed-AI protocols used for
+                reproduction programs, three of them: 5dCG2P,
+                5dCGP, and user-defined
+            args.synch_ed_method_h: synch ed protocols used for
+                reproduction programs, two of them: 2P and CP
+            (optional: include the following to assign cow information)
+            args.birth_weight: the birth weight of the cow
+            args.body_weight: current body weight of the cow
+            args.wean_weight: the wean weight of the cow
+            args.mature_body_weight: the mature body weight of the cow
+            args.events: events of the cow
+            args.estrus_count
+            args.estrus_day
+            args.tai_program_start_day_h
+            args.synch_ed_program_start_day_h
+            args.synch_ed_estrus_day
+            args.stop_day
+            args.conception_rate
+            args.ai_day
+            args.abortion_day
+            args.days_in_preg
+            args.gestation_length
             args.p_gest_for_calf
         """
         super().__init__(args)
@@ -136,7 +136,7 @@ class HeiferIII(HeiferII):
         Gestation Length: {}\n
         Life Events: \n
         {}
-        """.\
+        """. \
             format(self.id,
                    self.birth_date,
                    self.days_born,

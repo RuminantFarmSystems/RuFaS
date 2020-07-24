@@ -57,7 +57,7 @@ class AnimalEvents(object):
 			res_str += '\tdays born {}: {} \n'.format(key, value)
 
 		return res_str
-	
+
 	def get_most_recent_date(self, event_description):
 		"""
 		Returns the most recent age at which the @event_description happened
