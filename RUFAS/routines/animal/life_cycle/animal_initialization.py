@@ -154,23 +154,6 @@ class AnimalInitalization:
 
         conn = sqlite3.connect('input/animal/animals.sqlite')
         cur = conn.cursor()
-        db_summary = {
-                "avg_calf_age": 30.448579823702254,
-                "avg_cow_age": 1349.5328565418595,
-                "avg_heiferIII_age": 717.9557291666666,
-                "avg_heiferII_age": 554.9424166855588,
-                "avg_heiferI_age": 227.0618984714097,
-                "avg_replacement_age": 731.1613496796506,
-                "cow_avg_days_in_milk": 160.99207353065182,
-                "cow_avg_days_in_preg": 130.54560327198365,
-                "cow_avg_parity": 1.9724863273033235,
-                "num_calf": 1021,
-                "num_cow": 11885,
-                "num_heiferI": 5299,
-                "num_heiferII": 4411,
-                "num_heiferIII": 384,
-                "num_replacement": 45107
-            }
 
         for _ in range(animal_num):
             args = {
