@@ -83,7 +83,7 @@ class LifeCycleReport(BaseReportDriver):
             super().__init__(data)
 
             self.herd_structure = {
-                'year': ['time.cal_year', '', []],
+                'year': ['time.calendar_year', '', []],
                 'j_day': ['time.day', '', []],
                 'calf_num': ['life_cycle_manager.calf_num', '', []],
                 'calf_percent': ['life_cycle_manager.calf_percent', '%', []],
@@ -164,4 +164,4 @@ class LifeCycleReport(BaseReportDriver):
                 **self.average_animal_profile
             }
             
-            self.annual_variables = {'year': ['time.cal_year', '', []]}
+            self.annual_variables = {'year': ['time.calendar_year', '', []]}
