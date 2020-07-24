@@ -641,10 +641,9 @@ class AnimalInitalization:
             c.execute(query)
             cow_avg_parity = dict(c.fetchone())['AVG(parity)']
 
-            # query = "SELECT AVG(calving_interval) FROM cows"
-            # c.execute(query)
-            # cow_avg_CI = dict(c.fetchone())['AVG(calving_interval)']
-            cow_avg_CI = 1
+            query = "SELECT AVG(calving_interval) FROM cows"
+            c.execute(query)
+            cow_avg_CI = dict(c.fetchone())['AVG(calving_interval)']
 
             summary = {
                 'num_calf': num_calf,
