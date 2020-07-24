@@ -14,7 +14,7 @@
 			"heifer_repro_cull_time": 650,
 			"dry_period": 60,
 			"lactation_curve": "wood",
-			"voluntary_waiting_period": 60,
+			"voluntary_waiting_period": 45,
 			"tai_program_start_day": 72,
 			"repro_cull_time": 300,
 			"do_not_breed_time" : 300,
