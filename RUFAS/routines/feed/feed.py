@@ -1,12 +1,17 @@
 """
 RUFAS: Ruminant Farm Systems Model
 File name: feed.py
-Description:
+
+
+Description: Main driver for the feed storage module. Calibrates storage and models
+                protein degradation as well as reductions in Carbon, Nitrogen, and
+                Phosphorus content during harvest, storage, and feed out.
+
 Author(s): Kass Chupongstimun, kass_c@hotmail.com,
            Andy Achenreiner, achenreiner@wisc.edu
+           William Donovan, wmdonovan@wisc.edu
+           Jacob Johnson, jacob8399@gmail.com
            Militsa Sotirova, militsasotirova@gmail.com
-           William Donovan, william.m.donovan@gmail.com
-           Jacob Johnson, jacob8339@gmail.com
            Chris Vankerkhove, cjv47@cornell.edu
 """
 
@@ -15,50 +20,75 @@ from . import nitrogen_loss, carbon_loss, protein_degradation
 from RUFAS.routines.animal.ration import hardcoded_ration
 
 
-def daily_feed_routine(feed, crop, animal_management):
+def daily_feed_routine(feed, fields, animal_management):
     """
     Description:
-        Runs the feed storage routine. Yield is stored at harvest in available storage.
-        Once used, that storage receptacle is removed from the list of available storage.
-        If insufficient storage is specified, a "standard" storage receptacle is generated.
+        Runs the feed storage routine. Yield is stored at harvest in available
+        storage grouped by crop type and quality. Once used, that storage
+        receptacle is removed from the list of available storage. If insufficient
+        storage is specified, a "standard" storage receptacle is generated.
 
     Args:
-        feed: an instance of the Feed object specified in feed.py
-        crop: an instance of the Crop object specified in crop.py
-        animal_management: an instance of the AnimalManagement object specified
-            in animal_management.py
+        feed: an instance of the Feed object
+        fields: an instance of the Field object (contains harvest information)
+        animal_management: an instance of the AnimalManagement object
     """
 
-    current_crop = crop.current_crop
+    # aggregate crop yield across fields
+    for field in fields:
+        crop = field.crop.current_crop
+        # there is forage to be stored
+        if crop.yield_actual != 0:
+            stored = False
+            # search for matching storage profile
+            for storage in feed.available_storage.values():
+                if storage.feed_id == crop.feed_id and storage.storage is True \
+                        and storage.storage_quality == crop.harvest_quality:
+                    storage.store_crop(crop)
+                    stored = True
 
-    if current_crop.DM_yield != 0:
-        if len(feed.available_storage) == 0:
-            standard_data = {
-                "storage_type": "bag",
-                "moisture": "direct_cut",
-                "additive": "preservative",
-                "packing_density": 14,
-                "inoculation": "heterofermentative",
-                "bunk_type": "open_floor",
-                "ventilation": True,
-                "removal_rate": 6,
-                "initial_dry_matter": 0
-            }
+            # search for available, empty storage
+            if not stored:
+                for storage in feed.available_storage.values():
+                    if storage.DM == 0:
+                        storage.calibrate_storage(crop)
+                        storage.store_crop(crop)
+                        stored = True
 
-            standard_name = 'standard_storage_' + str(feed.standard_storage_count)
-            feed.available_storage[standard_name] = feed.Storage(standard_data)
-            feed.storage_options[standard_name] = feed.available_storage[standard_name]
+            # generate standard storage
+            if not stored:
+                if len(feed.available_storage) == 0:
+                    standard_data = {
+                        "storage_type": "bag",
+                        "moisture": "direct_cut",
+                        "additive": "preservative",
+                        "packing_density": 14,
+                        "inoculation": "heterofermentative",
+                        "bunk_type": "open_floor",
+                        "ventilation": True,
+                        "removal_rate": 6,
+                        "initial_dry_matter": 0
+                    }
+                    standard_name = 'standard_storage_' + str(feed.standard_storage_count)
+                    feed.available_storage[standard_name] = feed.Storage(standard_data)
+                    feed.storage_options[standard_name] = feed.available_storage[standard_name]
 
-        storage_name, storage = feed.available_storage.popitem()
-        feed.storage_options[storage_name].calibrate_storage(current_crop)
-        feed.storage_options[storage_name].store_crop(current_crop)
+                    feed.standard_storage_count += 1
 
-        feed.summarize_feed_storage(storage)
+                storage_name, storage = feed.available_storage.popitem()
+                feed.storage_options[storage_name].calibrate_storage(crop)
+                feed.storage_options[storage_name].store_crop(crop)
 
+    # calculate losses and update storage options after crop allocation
+    for storage_name, storage in feed.storage_options.items():
+        if storage_name in feed.available_storage and storage.DM != 0:
+            storage.calculate_losses()
+            feed.available_storage.pop(storage_name)
+
+        feed.summarize_feed_storage()
         feed.new_forages.append(storage)
-
         # forage will be fed out 30 days after harvest
-        storage.days_since_feedout = -30
+        # storage.days_since_feedout = -30
 
     feed.daily_updates(animal_management)
 
@@ -102,6 +132,7 @@ class Feed:
         # The nutrient requirements used in the ration calculations.
         self.nutrient_rqmts = ['FU', 'RU', 'ME_DM', 'RDP_DM', 'RUP_DM']
 
+        # Storage receptacles managed by the feed module
         self.storage_options = {}
 
         for storage_name, storage_data in data['storage_options'].items():
@@ -110,6 +141,7 @@ class Feed:
         self.available_storage = dict(self.storage_options)
         self.standard_storage_count = 0
 
+        # Summary variables tracked for output
         self.C = 0.0
         self.N = 0.0
         self.P = 0.0
@@ -126,6 +158,23 @@ class Feed:
         # this variable is a placeholder for average body weight of animals for
         # max intake calculations
         self.animal_avg_BW = {}
+
+    def summarize_feed_storage(self):
+        """
+        Description:
+            Summarize nutrients and losses over the managed storage receptacles
+        """
+        for storage in self.storage_options.values():
+            self.C += storage.C
+            self.N += storage.C
+            self.P += storage.C
+            self.DM += storage.C
+            self.CP += storage.C
+
+            self.C_loss += storage.C_loss
+            self.CP_loss += storage.CP_loss
+
+            self.NPN += storage.NPN
 
     class Storage:
         def __init__(self, data):
@@ -151,10 +200,16 @@ class Feed:
             self.DM = data['initial_dry_matter']
 
             self.crop_name = 'null'
-            self.feed_id = 'null'
-            self.forage_quality = 'null'
+
+            self.storage_quality = 'null'
 
             self.storage = True
+
+            self.CP_percent = 0.0
+            self.C_percent = 0
+
+            self.feed_id = 'null'
+            self.forage_quality = 'null'
 
             self.DMI_forage_max = {'calves': 0,
                                    'heiferIs': 0,
@@ -192,7 +247,6 @@ class Feed:
 
             self.CP_gas = 0.0
             self.CP_leachate = 0.0
-
             self.CP_loss = 0.0
 
             self.NPN = 0.0
@@ -210,10 +264,6 @@ class Feed:
             self.CP_leachate_percent = 0.0
             self.NPN_min_percent = 0.0
 
-            self.error_1 = True
-            self.error_2 = True
-            self.error_3 = True
-
         def calibrate_storage(self, crop):
             """
             Description:
@@ -226,9 +276,12 @@ class Feed:
             """
 
             self.crop_name = crop.crop_name
+            self.storage_quality = crop.harvest_quality
+            self.feed_id = crop.feed_id
 
             if self.crop_name == 'corn':
                 self.storage = True
+                self.CP_percent = 0.08
                 self.C_percent = 0.58
                 if self.moisture == 'direct_cut':
                     self.CP_gas_percent = 0
@@ -260,9 +313,6 @@ class Feed:
                     self.C_storage_leachate_percent = 0
                     self.C_feed_out_gas_percent = 0.02
                     self.C_feed_out_particle_percent = 0
-                else:
-                    if self.error_1:
-                        self.error_1 = False
 
             elif self.crop_name == 'alfalfa':
                 self.storage = True
@@ -317,24 +367,17 @@ class Feed:
                     self.C_storage_leachate_percent = 0
                     self.C_feed_out_gas_percent = 0
                     self.C_feed_out_particle_percent = 0.01
-                else:
-                    if self.error_2:
-                        self.error_2 = False
-            else:
-                if self.error_3:
-                    self.storage = False
-                    self.error_3 = False
 
         def store_crop(self, crop):
             """
             Description:
+                Helper method for "storing" the specified crop
                 Updates mineral components and losses as a crop is stored.
                 "pseudocode_feed" F.1.1
 
             Args:
-                crop: The crop being stored.
+                crop: the crop to be stored
             """
-
             if self.storage:
                 self.feed_id = crop.feed_id
                 self.DM += crop.DM_yield
@@ -347,11 +390,19 @@ class Feed:
                 # "pseudocode_feed" F.1.2
                 self.CP += 6.25 * self.N / self.DM
 
-                # "pseudocode_feed" F.1.3
-                carbon_loss.update_all(self)
-                nitrogen_loss.update_all(self)
-                # TODO: No protein degradation currently implemented
-                protein_degradation.update_all()
+                # Reset harvest quality for the crop
+                crop.harvest_quality = ''
+
+        def calculate_losses(self):
+            """
+            Description:
+                Calculates mineral losses for the storage method once all crops are stored
+                "pseudocode_feed" F.1.3
+            """
+            carbon_loss.update_all(self)
+            nitrogen_loss.update_all(self)
+            # TODO: No protein degradation currently implemented
+            protein_degradation.update_all()
 
         def reset_storage(self):
             """
@@ -372,26 +423,6 @@ class Feed:
 
             self.__init__(reset_data)
 
-    def summarize_feed_storage(self, storage):
-        """
-        Description:
-            Accumulates feed storage data as feed is stored in various receptacles
-
-        Args:
-            storage: The storage receptacle from which information is currently being aggregated
-        """
-
-        self.C += storage.C
-        self.N += storage.N
-        self.P += storage.P
-        self.DM += storage.DM
-        self.NDF += storage.NDF
-        self.CP += storage.CP
-        self.NPN += storage.NPN
-
-        self.C_loss += storage.C_loss
-        self.CP_loss += storage.CP_loss
-
     def required_inventory(self, storage, animal_management):
         """
         Description:
@@ -401,6 +432,7 @@ class Feed:
             method for the feed class updates feed class variables along with class
             variables associated with the input storage object. Each calculation
             has a reference to the respective calculation in the pseudocode
+
         Args:
             storage: a storage object that contains forage being assessed
             animal_management: the class object Animal Management which tracks the state of the animals
@@ -673,10 +705,16 @@ class Feed:
         self.C_loss = 0.0
         self.CP_loss = 0.0
 
+        for storage in self.storage_options.values():
+            storage.reset_storage()
+
+        self.available_storage = dict(self.storage_options)
+
     def get_feeds_split_by_maturity(self):
         """
-        Returns the feed entries in the database which have different qualities
-        based on nutrient values at harvest.
+        Description:
+            Returns the feed entries in the database which have different qualities
+            based on nutrient values at harvest.
 
         Returns: a set-like list (no duplicates) of the entries listed in the
             table which splits feeds by quality
@@ -688,9 +726,10 @@ class Feed:
 
     def get_all_feed_units(self, purchased_feeds, grown_feeds):
         """
-        Constructs and returns a dictionary of where the keys are the feed IDs
-        and the values are dictionaries containing the name and the units of
-        the feed.
+        Description:
+            Constructs and returns a dictionary of where the keys are the feed IDs
+            and the values are dictionaries containing the name and the units of
+            the feed.
 
         Args:
             purchased_feeds: the list of entries (ints) of feeds that are
@@ -738,8 +777,9 @@ class Feed:
 
     def get_purchased_feed_ids(self, entries):
         """
-        Constructs and returns a dictionary of the purchased feed IDs based on
-        whether the quality of each feed can be determined at harvest.
+        Description:
+            Constructs and returns a dictionary of the purchased feed IDs based on
+            whether the quality of each feed can be determined at harvest.
 
         Args:
             entries: the purchased feed entries
@@ -760,10 +800,11 @@ class Feed:
 
     def get_feed_id(self, grown_feed_entry, DM, NDF):
         """
-        First queries the database to find which nutrient must be used to find
-        the quality of the feed, then uses the feed's value for that nutrient
-        to find the quality by finding which range it belongs to. Returns
-        the feed ID associated with that quality.
+        Description:
+            First queries the database to find which nutrient must be used to find
+            the quality of the feed, then uses the feed's value for that nutrient
+            to find the quality by finding which range it belongs to. Returns
+            the feed ID associated with that quality.
 
         Args:
             grown_feed_entry: the entry of the feed that needs to be added to
@@ -797,10 +838,11 @@ class Feed:
 
     def add_to_available_feeds(self, new_grown_feeds, DM_list, NDF_list):
         """
-        Appends the nutrient values of new_grown_feeds to the available_feeds
-        dictionary according to their quality (if applicable). If a feed is
-        not split by quality, then the values at the respective indices of
-        DM_list and NDF_list are ignored.
+        Description:
+            Appends the nutrient values of new_grown_feeds to the available_feeds
+            dictionary according to their quality (if applicable). If a feed is
+            not split by quality, then the values at the respective indices of
+            DM_list and NDF_list are ignored.
 
         Args:
             new_grown_feeds: the list of feed entries to be added to
@@ -821,8 +863,9 @@ class Feed:
 
     def update_available_feed(self, feed_id, nutrient, new_val):
         """
-        Updates the dictionary of available feeds with a particular nutrient
-        value.
+        Description:
+            Updates the dictionary of available feeds with a particular nutrient
+            value.
 
         Args:
             feed_id: string - the ID of the feed to be modified (string should
@@ -834,7 +877,8 @@ class Feed:
 
     def remove_from_available_feeds(self, feeds_to_be_removed):
         """
-        Removes the IDs in feeds_to_be_removed from available_feeds.
+        Description:
+            Removes the IDs in feeds_to_be_removed from available_feeds.
 
         Args:
             feeds_to_be_removed: a list of feed IDs
@@ -844,8 +888,9 @@ class Feed:
 
     def get_nutrient_vals(self, feed_ids, is_grown):
         """
-        Constructs and returns the dictionary of nutrient values for the feeds
-        represented by feed_ids.
+        Description:
+            Constructs and returns the dictionary of nutrient values for the feeds
+            represented by feed_ids.
 
         Args:
             feed_ids: list of feed IDs

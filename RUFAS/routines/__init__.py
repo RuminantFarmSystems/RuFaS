@@ -1,5 +1,3 @@
-from .soil import *
+from .field import *
 from .animal import *
-from .crop import *
 from .feed import *
-from .soil import *

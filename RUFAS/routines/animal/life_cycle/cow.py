@@ -2,20 +2,20 @@
 RUFAS: Ruminant Farm Systems Model
 File name: cow.py
 Author(s): Manfei Li, mli497@wisc.edu
-			Militsa Sotirova, militsasotirova@gmail.com
+            Militsa Sotirova, militsasotirova@gmail.com
 Description: This file updates the cow form first calving to leaving the herd.
-			Temp: Body weight change uses equations for lactation cows
-			(decrease for the first 50 days and increase later on)
-			Temp: Dry matter intake is calculated by body weight and FCM
-			production. Reproduction program could be chosen from the ED, TAI,
-			ED-TAI projects, reference:
-			http://www.dcrcouncil.org/wp-content/uploads/2019/04/Dairy-Cow-Protocol-Sheet-Updated-2018.pdf
-			Preg check follows AI for three times.
-			Daily milk production is based on breed and parity specific
-			lactation curve model (Wood's and Milkbot) parameters.
-			Culling including 3 components: repro, production, and health,
-				health culling for 6 reasons: Lameness, Injury, Mastitis,
-				Disease, Udder, and Unknown
+            Temp: Body weight change uses equations for lactation cows
+            (decrease for the first 50 days and increase later on)
+            Temp: Dry matter intake is calculated by body weight and FCM
+            production. Reproduction program could be chosen from the ED, TAI,
+            ED-TAI projects, reference:
+            http://www.dcrcouncil.org/wp-content/uploads/2019/04/Dairy-Cow-Protocol-Sheet-Updated-2018.pdf
+            Preg check follows AI for three times.
+            Daily milk production is based on breed and parity specific
+            lactation curve model (Wood's and Milkbot) parameters.
+            Culling including 3 components: repro, production, and health,
+                health culling for 6 reasons: Lameness, Injury, Mastitis,
+                Disease, Udder, and Unknown
 """
 ###############################################################################
 
@@ -24,13 +24,13 @@ import numpy as np
 from RUFAS.routines.animal.life_cycle.heiferIII import HeiferIII
 from RUFAS.routines.animal.life_cycle.animal_base import AnimalBase
 from RUFAS.routines.animal.ration.lactating_cow_ration import calculate_rqmts \
-	as lactating_calculate_rqmts
+    as lactating_calculate_rqmts
 from RUFAS.routines.animal.ration.dry_cow_ration import calculate_rqmts \
-	as dry_calculate_rqmts
+    as dry_calculate_rqmts
 from RUFAS.routines.animal.manure.lactating_cow_manure_excretion import \
-	manure_calculations as lactating_manure_calculations
+    manure_calculations as lactating_manure_calculations
 from RUFAS.routines.animal.manure.dry_cow_manure_excretion import \
-	manure_calculations as dry_manure_calculations
+    manure_calculations as dry_manure_calculations
 from random import random
 
 
@@ -52,12 +52,12 @@ class Cow(HeiferIII):
 			args.breed: breed of the cow
 			args.birth_date: the date of the simulation when the calf was born
 			args.daysBorn: age of the animal
-			args.repro_program: reproduction program used in heifer, 
+			args.repro_program: reproduction program used in heifer,
 				three of them: ED, TAI, and synch-ED programs
-			args.tai_method_h: timed-AI protocols used for 
-				reproduction programs, three of them: 5dCG2P, 
+			args.tai_method_h: timed-AI protocols used for
+				reproduction programs, three of them: 5dCG2P,
 				5dCGP, and user-defined
-			args.synch_ed_method_h: synch ed protocols used for 
+			args.synch_ed_method_h: synch ed protocols used for
 				reproduction programs, two of them: 2P and CP
 			args.repro_program: reproduction program used in cow,
 					three of them: ED, TAI, and ED-TAI programs
@@ -70,7 +70,7 @@ class Cow(HeiferIII):
 			args.resynch_method: resynch protocols used for resynch
 				programs, three of them: TAIafterPD, TAIbeforePD,
 				and PGFatPD
-			(optional: include the following to assign cow information) 
+			(optional: include the following to assign cow information)
 			args.birth_weight: the birth weight of the cow
 			args.body_weight: current body weight of the cow
 			args.wean_weight: the wean weight of the cow
