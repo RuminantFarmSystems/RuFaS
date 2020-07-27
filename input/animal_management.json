@@ -15,11 +15,22 @@
 
     "farm":
     {
-        "crop": "custom_rotation.json",
-        "soil": "barnyard_soil.json",
-
-        "animal": "animal_management_animal.json",
-
+        "fields":
+        {
+            "field_1":
+            {
+                "soil": "barnyard_soil.json",
+                "crop": "corn_rotation.json",
+                "field_management": "barnyard_field_management.json"
+            },
+            "field_2":
+            {
+                "soil": "barnyard_soil.json",
+                "crop": "corn_rotation.json",
+                "field_management": "barnyard_field_management.json"
+            }
+        },
+        "animal": "barnyard_animal.json",
         "feed": "panke_buisse_feed.json"
     }
 }
