@@ -43,16 +43,21 @@ def daily_feed_routine(feed, fields, animal_management):
             # search for matching storage profile
             for storage in feed.available_storage.values():
                 if storage.feed_id == crop.feed_id and storage.storage is True \
-                        and storage.storage_quality == crop.harvest_quality:
+                        and storage.storage_quality == crop.harvest_quality \
+                        and not stored:
                     storage.store_crop(crop)
+                    if storage not in feed.new_forages:
+                        feed.new_forages.append(storage)
                     stored = True
 
             # search for available, empty storage
             if not stored:
                 for storage in feed.available_storage.values():
-                    if storage.DM == 0:
+                    if storage.DM == 0 and not stored:
                         storage.calibrate_storage(crop)
                         storage.store_crop(crop)
+                        if storage not in feed.new_forages:
+                            feed.new_forages.append(storage)
                         stored = True
 
             # generate standard storage
@@ -78,6 +83,8 @@ def daily_feed_routine(feed, fields, animal_management):
                 storage_name, storage = feed.available_storage.popitem()
                 feed.storage_options[storage_name].calibrate_storage(crop)
                 feed.storage_options[storage_name].store_crop(crop)
+                if storage not in feed.new_forages:
+                    feed.new_forages.append(storage)
 
     # calculate losses and update storage options after crop allocation
     for storage_name, storage in feed.storage_options.items():
@@ -86,11 +93,9 @@ def daily_feed_routine(feed, fields, animal_management):
             feed.available_storage.pop(storage_name)
 
         feed.summarize_feed_storage()
-        feed.new_forages.append(storage)
-        # forage will be fed out 30 days after harvest
-        # storage.days_since_feedout = -30
 
-    feed.daily_updates(animal_management)
+    # feed management routines to be run daily
+    feed.daily_feed_management(animal_management)
 
 
 def annual_feed_routine(feed):
@@ -379,6 +384,9 @@ class Feed:
                 crop: the crop to be stored
             """
             if self.storage:
+                if self.DM == 0:
+                    # forage to be fed out 30 days after harvest for new yield
+                    self.days_since_feedout = -30
                 self.feed_id = crop.feed_id
                 self.DM += crop.DM_yield
                 self.NDF += crop.NDF_yield
@@ -651,7 +659,7 @@ class Feed:
                 storage.DMI_forage_max = storage.inclusion_rate_est
                 storage.DMI_forage_max['lactating_cows'] = 0
 
-    def daily_updates(self, animal_management):
+    def daily_feed_management(self, animal_management):
         """
         Description:
             Executes daily routines relating to feed management, specifcally a
@@ -675,17 +683,26 @@ class Feed:
                             self.storage_options[silo].DM = 0
                             self.storage_options[silo].reset_storage()
                             break
-                    silo.days_since_feedout += 1
+                self.storage_options[silo].days_since_feedout += 1
+            elif self.storage_options[silo] not in self.new_forages:
+                self.storage_options[silo].days_since_feedout += 1
         # inventory plan for new forages
         for silo in self.new_forages:
             if silo.days_since_feedout >= -1 and animal_management.end_ration_interval():
                 self.required_inventory(silo, animal_management)
                 self.forage_inv_plan(silo)
-                self.add_to_available_feeds(silo.feed_id, .5, .5)
-                self.new_forages.pop()
+                self.add_to_available_feeds(silo.feed_id, silo.DM, silo.NDF)
                 silo.days_since_feedout += 1
+                self.new_forages.pop(self.new_forages.index(silo))
             else:
                 silo.days_since_feedout += 1
+        # yearly reset of silos
+        # TODO: modify when ration formulation is implemented
+        # When ration formulation is in, the silos will automatically be fedout
+        for silo in self.storage_options:
+            if self.storage_options[silo].days_since_feedout > 365:
+                self.storage_options[silo].reset_storage()
+                self.available_storage[silo] = self.storage_options[silo]
 
     def reset_feed(self):
         """
@@ -704,11 +721,6 @@ class Feed:
 
         self.C_loss = 0.0
         self.CP_loss = 0.0
-
-        for storage in self.storage_options.values():
-            storage.reset_storage()
-
-        self.available_storage = dict(self.storage_options)
 
     def get_feeds_split_by_maturity(self):
         """
