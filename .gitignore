@@ -19,11 +19,11 @@
 build
 others
 
-# Ignore contents of Outputs directory, except for .keep file
-# This is because we want to keep the Outputs direcectory, and git
+# Ignore contents of output directory, except for .keep file
+# This is because we want to keep the output direcectory, and git
 # only stores non-empty directories
-Outputs/*
-!Outputs/.keep
+output/*
+!output/.keep
 
 # ignore project files
 *.sublime-project
