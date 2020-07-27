@@ -41,13 +41,14 @@ class OutputHandler:
 
         # Instantiate Report Handler Objects here
         self.reports = {
-                        'field_report': FieldReport(data['field_report']),
                         'feed_storage_report': FeedStorageReport(data['feed_storage_report']),
-                        'mass_balance_report': MassBalanceReport(data['mass_balance_report']),
-                        'custom_report': CustomReport(data['custom_report'])
+                        'custom_report': CustomReport(data['custom_report']),
+                        'mass_balance': MassBalanceReport(data['mass_balance'])
                         }
 
-        # TODO: move field report to loop in dj_fields
+        for field in state.fields:
+            self.reports[field.field_name] = FieldReport(data['field_report'], field.field_name)
+
         for pen in state.animal_management.all_pens:
             self.reports['pen_' + str(pen.id)] = PenReport(data['pen_report'], state.feed, pen.id)
 
@@ -63,33 +64,59 @@ class OutputHandler:
                 output report files.
         """
 
+        field_folder = 'fields/'
+        pen_folder = 'pens/'
+
         # Initialize path for reports
-        csv_dir = util.get_base_dir() / csv_dir
+        base_csv_dir = util.get_base_dir() / csv_dir
+        fields_dir = base_csv_dir / field_folder
+        pen_dir = base_csv_dir / pen_folder
 
         # Delete directory if previously exists
-        if csv_dir.exists():
-            shutil.rmtree(csv_dir)
+        if base_csv_dir.exists():
+            shutil.rmtree(base_csv_dir)
 
-        csv_dir.mkdir(exist_ok=True, parents=False)
+        base_csv_dir.mkdir(exist_ok=True, parents=False)
+        fields_dir.mkdir(exist_ok=True, parents=False)
+        pen_dir.mkdir(exist_ok=True, parents=False)
 
         for report_name in self.reports:
             report = self.reports[report_name]
             if report.produce_csv:
+                csv_dir = base_csv_dir
+                if report.report_name.startswith('field'):
+                    csv_dir = fields_dir
+                if report.report_name.startswith('pen'):
+                    csv_dir = pen_dir
                 report.csv_dir = csv_dir / report_name
                 report.csv_dir.mkdir(exist_ok=True, parents=False)
                 report.initialize_csv_dir()
 
     def initialize_graphic_dir(self, graphic_dir):
-        graphic_dir = util.get_base_dir() / graphic_dir
+        field_folder = 'fields/'
+        pen_folder = 'pens/'
 
-        if graphic_dir.exists():
-            shutil.rmtree(graphic_dir)
+        # Initialize path for reports
+        base_graphic_dir = util.get_base_dir() / graphic_dir
+        fields_dir = base_graphic_dir / field_folder
+        pen_dir = base_graphic_dir / pen_folder
 
-        graphic_dir.mkdir(exist_ok=True, parents=False)
+        # Delete directory if previously exists
+        if base_graphic_dir.exists():
+            shutil.rmtree(base_graphic_dir)
+
+        base_graphic_dir.mkdir(exist_ok=True, parents=False)
+        fields_dir.mkdir(exist_ok=True, parents=False)
+        pen_dir.mkdir(exist_ok=True, parents=False)
 
         for report_name in self.reports:
             report = self.reports[report_name]
             if report.produce_graphics:
+                graphic_dir = base_graphic_dir
+                if report.report_name.startswith('field'):
+                    graphic_dir = fields_dir
+                if report.report_name.startswith('pen'):
+                    graphic_dir = pen_dir
                 report.graphic_dir = graphic_dir / report_name
                 report.graphic_dir.mkdir(exist_ok=True, parents=False)
                 report.initialize_graphic_dir()
