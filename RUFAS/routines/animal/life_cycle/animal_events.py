@@ -35,7 +35,6 @@ class AnimalEvents(object):
 			for event in events:
 				self.add_event(date, event)
 
-	
 	def add_event(self, date, description):
 		"""
 		Add a cow life event
