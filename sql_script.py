@@ -1,8 +1,8 @@
 from pathlib import Path
-from RUFAS import errors
 import sqlite3
 import ntpath
 import pandas as pd
+from RUFAS import errors
 
 
 def main():
@@ -88,11 +88,12 @@ def database_input():
         if input_path.suffix == '.db':
             if not input_path.is_file():
                 print("Specified file does not exist. Enter a valid .db file: ")
+                continue
             else:
                 print("Weather Database file Detected...\n")
             return str(input_path)
         else:
-            print("Invalid Input. Enter a valid .db file: ")
+            raise errors.UserInput("Invalid Input. Enter a valid .db file")
 
 
 def id_input(database):
