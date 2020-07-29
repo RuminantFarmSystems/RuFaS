@@ -79,7 +79,7 @@
         "initialization_db_summary":
         {
             "produce_csv": true,
-            "produce_graphics": true,
+            "produce_graphics": false,
             "report_name": "initialization_db_summary"
         },
 

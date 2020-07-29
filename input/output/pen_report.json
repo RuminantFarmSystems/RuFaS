@@ -79,14 +79,14 @@
         "initialization_db_summary":
         {
             "produce_csv": true,
-            "produce_graphics": true,
+            "produce_graphics": false,
             "report_name": "initialization_db_summary"
         },
 
         "individual_animal_report":
         {
           "produce_csv": true,
-          "produce_graphics": true,
+          "produce_graphics": false,
           "report_name": "individual_animal_report",
           "num_animals": 3
         },
