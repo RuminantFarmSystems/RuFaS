@@ -67,25 +67,25 @@ class LifeCycleManager:
         '1': 0,
         '2': 0,
         '3': 0,
-        '>3': 0
+        'greater_than_3': 0
     }
     percent_cow_for_parity = {
         '1': 0,
         '2': 0,
         '3': 0,
-        '>3': 0
+        'greater_than_3': 0
     }
     avg_age_for_parity = {
         '1': 0,
         '2': 0,
         '3': 0,
-        '>3': 0
+        'greater_than_3': 0
     }
     avg_age_for_calving = {
         '1': 0,
         '2': 0,
         '3': 0,
-        '>3': 0
+        'greater_than_3': 0
     }
 
     preg_check_num = 0
@@ -108,7 +108,7 @@ class LifeCycleManager:
         '1': 0,
         '2': 0,
         '3': 0,
-        '>3': 0
+        'greater_than_3': 0
     }
     avg_heifer_culling_age = 0
     avg_cow_culling_age = 0
@@ -324,13 +324,13 @@ class LifeCycleManager:
             '1': 0,
             '2': 0,
             '3': 0,
-            '>3': 0
+            'greater_than_3': 0
         }
         calving_to_preg_time_available_num = {
             '1': 0,
             '2': 0,
             '3': 0,
-            '>3': 0
+            'greater_than_3': 0
         }
 
         for parity in self.num_cow_for_parity:
@@ -585,24 +585,24 @@ class LifeCycleManager:
                                     self.avg_calving_to_preg_time[str(cow.calves)],
                                     cow.calving_to_preg_time)
                 else:
-                    self.num_cow_for_parity['>3'], \
-                        self.avg_age_for_parity['>3'] = self._calc_average(
-                            self.num_cow_for_parity['>3'],
-                            self.avg_age_for_parity['>3'], cow.days_born)
+                    self.num_cow_for_parity['greater_than_3'], \
+                        self.avg_age_for_parity['greater_than_3'] = self._calc_average(
+                            self.num_cow_for_parity['greater_than_3'],
+                            self.avg_age_for_parity['greater_than_3'], cow.days_born)
                     calving_age = cow.events.get_most_recent_date('New birth, start milking')
                     if calving_age != -1:
-                        calving_age_available_num['>3'], \
-                            self.avg_age_for_calving['>3'] = \
+                        calving_age_available_num['greater_than_3'], \
+                            self.avg_age_for_calving['greater_than_3'] = \
                                 self._calc_average(
-                                    calving_age_available_num['>3'],
-                                    self.avg_age_for_calving['>3'],
+                                    calving_age_available_num['greater_than_3'],
+                                    self.avg_age_for_calving['greater_than_3'],
                                     calving_age)
                     if cow.calving_to_preg_time != 0:
-                        calving_to_preg_time_available_num['>3'], \
-                            self.avg_calving_to_preg_time['>3'] = \
+                        calving_to_preg_time_available_num['greater_than_3'], \
+                            self.avg_calving_to_preg_time['greater_than_3'] = \
                                 self._calc_average(
-                                    calving_to_preg_time_available_num['>3'],
-                                    self.avg_calving_to_preg_time['>3'],
+                                    calving_to_preg_time_available_num['greater_than_3'],
+                                    self.avg_calving_to_preg_time['greater_than_3'],
                                     cow.calving_to_preg_time)
 
                 if cow.CI != 0:
