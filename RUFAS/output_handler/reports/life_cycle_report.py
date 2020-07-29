@@ -102,19 +102,19 @@ class LifeCycleReport(BaseReportDriver):
             }
             
             for parity in LifeCycleManager.num_cow_for_parity:
-                self.herd_structure['cow_num_for_parity: ' + parity] = \
+                self.herd_structure['cow_num_for_parity_' + parity] = \
                     ['life_cycle_manager.num_cow_for_parity[\'' + parity + '\']', '', []]
-                self.herd_structure['cow_percent_for_parity: ' + parity] = \
+                self.herd_structure['cow_percent_for_parity_' + parity] = \
                     ['life_cycle_manager.percent_cow_for_parity[\'' + parity + '\']', '%', []]
-                self.herd_structure['avg_age_for_parity: ' + parity] = \
+                self.herd_structure['avg_age_for_parity_' + parity] = \
                     ['life_cycle_manager.avg_age_for_parity[\'' + parity + '\']', 'd', []]
-                self.herd_structure['avg_age_for_calving: ' + parity] = \
+                self.herd_structure['avg_age_for_calving_' + parity] = \
                     ['life_cycle_manager.avg_age_for_calving[\'' + parity + '\']', 'd', []]
 
             for cull_reason in LifeCycleManager.cull_reason_stats:
-                self.herd_structure['cow_num_culled_for_reason: \'' + cull_reason + '\''] = \
+                self.herd_structure['cow_num_culled_for_reason_\'' + cull_reason + '\''] = \
                     ['life_cycle_manager.cull_reason_stats[\'' + cull_reason + '\']', '', []]
-                self.herd_structure['cow_percent_culled_for_reason: \'' + cull_reason + '\''] = \
+                self.herd_structure['cow_percent_culled_for_reason_\'' + cull_reason + '\''] = \
                     ['life_cycle_manager.cull_reason_stats_percent[\'' + cull_reason + '\']', '', []]
                         
             self.reproduction_performance = {
@@ -153,7 +153,7 @@ class LifeCycleReport(BaseReportDriver):
             }
 
             for parity in LifeCycleManager.avg_calving_to_preg_time:
-                self.average_animal_profile['avg_calving_to_preg_time_for_parity: ' + parity] = \
+                self.average_animal_profile['avg_calving_to_preg_time_for_parity_' + parity] = \
                     ['life_cycle_manager.avg_calving_to_preg_time[\'' + parity + '\']', 'd', []]
 
             self.daily_variables = {
