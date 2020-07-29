@@ -20,31 +20,6 @@
             "report_name": "growth_report"
         }
     },
-    "mass_balance_report": {
-        "produce_csv": true,
-        "produce_graphics": true,
-        "report_name": "mass_balance_report",
-        "water_balance": {
-            "produce_csv": true,
-            "produce_graphics": true,
-            "report_name": "water_balance_report"
-        },
-        "phosphorus_balance": {
-            "produce_csv": true,
-            "produce_graphics": true,
-            "report_name": "phosphorus_balance_report"
-        },
-        "nitrogen_balance": {
-            "produce_csv": true,
-            "produce_graphics": true,
-            "report_name": "nitrogen_balance_report"
-        },
-        "manure_storage_balance": {
-            "produce_csv": true,
-            "produce_graphics": true,
-            "report_name": "manure_storage_balance_report"
-        }
-    },
     "field_report": {
         "produce_csv": true,
         "produce_graphics": true,
@@ -73,11 +48,31 @@
             "produce_csv": true,
             "produce_graphics": false,
             "report_name": "field_management_report"
+        },
+        "water_balance": {
+            "produce_csv": true,
+            "produce_graphics": true,
+            "report_name": "water_balance_report"
+        },
+        "phosphorus_balance": {
+            "produce_csv": true,
+            "produce_graphics": true,
+            "report_name": "phosphorus_balance_report"
+        },
+        "nitrogen_balance": {
+            "produce_csv": true,
+            "produce_graphics": true,
+            "report_name": "nitrogen_balance_report"
         }
+    },
+    "mass_balance": {
+        "produce_csv": true,
+        "produce_graphics": true,
+        "report_name": "mass_balance_report"
     },
     "feed_storage_report": {
         "produce_csv": true,
-        "produce_graphics": true,
+        "produce_graphics": false,
         "report_name": "feed_storage_report"
     },
     "manure_storage_report": {
@@ -87,7 +82,7 @@
     },
     "custom_report": {
         "produce_csv": true,
-        "produce_graphics": true,
+        "produce_graphics": false,
         "report_name": "custom_report"
     }
 }
