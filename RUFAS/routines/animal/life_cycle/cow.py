@@ -1141,7 +1141,7 @@ class Cow(HeiferIII):
 			# only add to events if it is the first time this occurs
 			if not self.do_not_breed:
 				self.events.add_event(self.days_born, sim_day, 'Do not breed')
-			self.do_not_breed = True
+				self.do_not_breed = True
 			return True
 
 	# Cull methods
