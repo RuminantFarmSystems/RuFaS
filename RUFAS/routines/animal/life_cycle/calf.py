@@ -24,7 +24,7 @@ class Calf(AnimalBase):
 		"""
 		Description:
 			initialize calf at the time it was born
-		Input:
+		Args:
 			args.id: id of the cow
 			args.breed: breed of the cow
 			args.birth_date: the date of the simulation when the calf was born
