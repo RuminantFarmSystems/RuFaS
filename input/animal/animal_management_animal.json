@@ -276,7 +276,10 @@
 			"number_of_stalls": 100,
 			"housing_type": "open air barn",
 			"bedding_type": "sand",
-			"pen_type": "freestall"
+			"pen_type": "freestall",
+			"manure_handling": "manual_scraping",
+			"manure_separator": "sedimentation",
+			"manure_storage": "storage_pit"
 		},
 		"pen1": {
 			"id": 1,
@@ -285,7 +288,10 @@
 			"number_of_stalls": 200,
 			"housing_type": "open air barn",
 			"bedding_type": "sawdust",
-			"pen_type": "freestall"
+			"pen_type": "freestall",
+			"manure_handling": "manual_scraping",
+			"manure_separator": "sedimentation",
+			"manure_storage": "storage_pit"
 		},
 		"pen2": {
 			"id": 2,
@@ -294,7 +300,10 @@
 			"number_of_stalls": 300,
 			"housing_type": "open air barn",
 			"bedding_type": "straw",
-			"pen_type": "tiestall"
+			"pen_type": "tiestall",
+			"manure_handling": "manual_scraping",
+			"manure_separator": "sedimentation",
+			"manure_storage": "storage_pit"
 		},
 		"pen3": {
 			"id": 3,
@@ -303,7 +312,10 @@
 			"number_of_stalls": 400,
 			"housing_type": "open air barn",
 			"bedding_type": "sand",
-			"pen_type": "tiestall"
+			"pen_type": "tiestall",
+			"manure_handling": "manual_scraping",
+			"manure_separator": "sedimentation",
+			"manure_storage": "storage_pit"
 		},
 		"pen4": {
 			"id": 4,
@@ -312,7 +324,10 @@
 			"number_of_stalls": 400,
 			"housing_type": "open air barn",
 			"bedding_type": "sand",
-			"pen_type": "tiestall"
+			"pen_type": "tiestall",
+			"manure_handling": "manual_scraping",
+			"manure_separator": "sedimentation",
+			"manure_storage": "storage_pit"
 		},
 		"pen5": {
 			"id": 5,
@@ -321,7 +336,10 @@
 			"number_of_stalls": 200,
 			"housing_type": "open air barn",
 			"bedding_type": "sand",
-			"pen_type": "tiestall"
+			"pen_type": "tiestall",
+			"manure_handling": "manual_scraping",
+			"manure_separator": "sedimentation",
+			"manure_storage": "storage_pit"
 		},
 		"pen6": {
 			"id": 6,
@@ -330,7 +348,10 @@
 			"number_of_stalls": 300,
 			"housing_type": "open air barn",
 			"bedding_type": "sand",
-			"pen_type": "tiestall"
+			"pen_type": "tiestall",
+			"manure_handling": "manual_scraping",
+			"manure_separator": "sedimentation",
+			"manure_storage": "storage_pit"
 		},
 		"pen7": {
 			"id": 7,
@@ -339,7 +360,10 @@
 			"number_of_stalls": 250,
 			"housing_type": "open air barn",
 			"bedding_type": "sand",
-			"pen_type": "tiestall"
+			"pen_type": "tiestall",
+			"manure_handling": "manual_scraping",
+			"manure_separator": "sedimentation",
+			"manure_storage": "storage_pit"
 		},
 		"pen8": {
 			"id": 8,
@@ -348,7 +372,10 @@
 			"number_of_stalls": 400,
 			"housing_type": "open air barn",
 			"bedding_type": "sand",
-			"pen_type": "tiestall"
+			"pen_type": "tiestall",
+			"manure_handling": "manual_scraping",
+			"manure_separator": "sedimentation",
+			"manure_storage": "storage_pit"
 		}
 	}
 }

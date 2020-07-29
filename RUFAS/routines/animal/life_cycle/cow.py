@@ -1108,7 +1108,7 @@ class Cow(HeiferIII):
                 cull_reason_cp = AnimalBase.config['udder_cp']
                 self.cull_reason = "Udder"
             else:
-                cull_reason_cp = AnimalBase.config['unkown_cp']
+                cull_reason_cp = AnimalBase.config['unknown_cp']
                 self.cull_reason = "Unknown"
 
             c_upper = c_lower = x_upper = x_lower = 0
