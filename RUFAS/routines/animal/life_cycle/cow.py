@@ -1087,6 +1087,9 @@ class Cow(HeiferIII):
 					self._preg = False
 					self._abortion_day = self.days_born
 					self._open(record_econ_stats, sim_day)
+					self.body_weight -= self.conceptus_weight
+					self.conceptus_weight = 0
+					self.p_gest_for_calf = 0
 					self.events.add_event(
 						self.days_born, sim_day,
 						'Preg loss happened before 1st preg check')
@@ -1108,6 +1111,9 @@ class Cow(HeiferIII):
 				self.preg = False
 				self.abortion_day = self.days_born
 				self._open(record_econ_stats, sim_day)
+				self.body_weight -= self.conceptus_weight
+				self.conceptus_weight = 0
+				self.p_gest_for_calf = 0
 				self.events.add_event(
 					self.days_born, sim_day,
 					'Preg loss happened between 1st and 2nd preg check')
@@ -1124,6 +1130,9 @@ class Cow(HeiferIII):
 				self._preg = False
 				self._abortion_day = self.days_born
 				self._open(record_econ_stats, sim_day)
+				self.body_weight -= self.conceptus_weight
+				self.conceptus_weight = 0
+				self.p_gest_for_calf = 0
 				self.events.add_event(
 					self.days_born, sim_day,
 					'Preg loss happened between 2nd and 3rd preg check')
