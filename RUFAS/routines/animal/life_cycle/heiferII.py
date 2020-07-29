@@ -285,7 +285,6 @@ class HeiferII(HeiferI):
 		return cull_stage, third_stage
 
 	# ED methods
-
 	def _determine_estrus_day(self, start_date, estrus_note):
 		"""
 		In estrus detection program, determine estrus day and estrus note
@@ -365,7 +364,6 @@ class HeiferII(HeiferI):
 				self._return_estrus()
 
 	# TAI methods
-
 	def _determine_tai_program_day(self, date):
 		"""
 		Determine the program start time when reach breeding start time
@@ -434,7 +432,6 @@ class HeiferII(HeiferI):
 			self._user_defined_update()
 
 	# synch-ED methods
-
 	def _determine_synch_ed_program_day(self, date):
 		"""
 		Determine the program start time when reach breeding start time

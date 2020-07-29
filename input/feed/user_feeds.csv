@@ -103,7 +103,7 @@ entry, feed_name, description, type, units
 135,Calcium carbonate,CaCO3,Mineral,kg
 136,"Dicalcium Phosphate, dibasic",CaHPO4,Mineral,kg
 137,Calcium Phosphate monobasic,Ca(H2PO4)2,Mineral,kg
-138,"Calcium Sulfate, dihydrate",CaSO4.2H20,Mineral,kg
+138,"Calcium Sulfate, dihydrate",CaSO4.2H2O,Mineral,kg
 139,"Limestone, ground",NA,Mineral,kg
 140,"Limestone, dolomite",NA,Mineral,kg
 141,Magnesium Oxide,MgO,Mineral,kg
@@ -111,15 +111,15 @@ entry, feed_name, description, type, units
 143,Phosphate rock,NA,Mineral,kg
 144,Sodium Choride,NaCl,Mineral,kg
 145,Sodium Bicarbonate,NaHCO3,Mineral,kg
-146,"Sodium Phosphate, Monohydrate",NaH2PO4.H20,Mineral,kg
-147,Sodium Sulfate decahydrate,Na2SO4.10H20,Mineral,kg
+146,"Sodium Phosphate, Monohydrate",NaH2PO4.H2O,Mineral,kg
+147,Sodium Sulfate decahydrate,Na2SO4.10H2O,Mineral,kg
 148,Potassium Sulfate,K2SO4,Mineral,kg
 149,Ammonium Sulfate,(NH4)2SO4,Mineral,kg
 150,"Ammonium Phosphate, dibasic",(NH4)H2PO4,Mineral,kg
 151,Ammonium Chloride,NA,Mineral,kg
-152,Calcium Choride dihydrate,CaCl2.2H20,Mineral,kg
+152,Calcium Choride dihydrate,CaCl2.2H2O,Mineral,kg
 153,"Calcium Choride,anhydrous",CaCl2,Mineral,kg
-154,"Magnesium Chloride, Hexahydrate",MgCl2.6H20,Mineral,kg
+154,"Magnesium Chloride, Hexahydrate",MgCl2.6H2O,Mineral,kg
 155,Whole Milk,Whole Milk,Milk,kg
 156,Milk Replacer,Milk Replacer,Milk,kg
 157,Starter,Calf Starter,Starter,kg

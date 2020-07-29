@@ -12,7 +12,7 @@ class ManureStorageReport(BaseReport):
     def __init__(self, data):
         super().__init__(data)
 
-        self.daily_variables = {'year': ['time.cal_year', '', []],
+        self.daily_variables = {'year': ['time.calendar_year', '', []],
                                 'j_day': ['time.day', '', []],
                                 'TS': ['manure_storage.TS', 'kg', []],
                                 'VS': ['manure_storage.VS', 'kg', []],
@@ -30,7 +30,7 @@ class ManureStorageReport(BaseReport):
                                 'P_applied': ['manure_storage.P_applied', 'kg', []]
                                 }
 
-        self.annual_variables = {'year': ['time.cal_year', '', 0],
+        self.annual_variables = {'year': ['time.calendar_year', '', 0],
                                  'TS': ['manure_storage.TS_annual', 'kg', 0],
                                  'VS': ['manure_storage.VS_annual', 'kg', 0],
                                  'N': ['manure_storage.N_annual', 'kg', 0],

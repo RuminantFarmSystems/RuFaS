@@ -23,9 +23,9 @@ class CustomReport(BaseReport):
         # 'unit' is user defined but will, again, show up in outputs/graphics_1.
         # [] is an empty list
 
-        self.daily_variables = {'year': ['time.cal_year', '', []],
+        self.daily_variables = {'year': ['time.calendar_year', '', []],
                                 'j_day': ['time.day', '', []],
                                 }
 
-        self.annual_variables = {'year': ['time.cal_year', '', 0]
+        self.annual_variables = {'year': ['time.calendar_year', '', 0]
                                  }

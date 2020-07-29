@@ -5,12 +5,13 @@ Description:
 Author(s): Kass Chupongstimun, kass_c@hotmail.com
            Jit Patil, spatil5@wisc.edu
 """
-
-import sys
+import json
 import pulp
+import sys
 from pathlib import Path
-from time import sleep
 import sqlite3
+
+from RUFAS import errors
 
 
 class DatabaseReader:
@@ -69,6 +70,7 @@ class DatabaseReader:
             are the column names and they are mapped to the values in the
             database)
         """
+
         try:
             # Forms a connection to the database
             conn = sqlite3.connect(Path(self.db_file))
@@ -143,13 +145,10 @@ class DatabaseReader:
             exit(1)
 
 
-# -------------------------------------------------------------------------------
-# Function: get_base_dir
-# -------------------------------------------------------------------------------
 def get_base_dir():
     """Gets the base directory as reference for all relative paths.
 
-    Unfrozen appliaction - gets the project directory
+    Unfrozen application - gets the project directory
     Frozen application - gets the executable directory
 
     Returns:
@@ -163,6 +162,7 @@ def get_base_dir():
         # Resolve to absolute path
         # Take the parent base_dir/RUFAS_exe
         #                 parent = base_dir/
+
         return Path(sys.executable).resolve().parent
 
     # Unfrozen
@@ -176,9 +176,39 @@ def get_base_dir():
         return Path(__file__).resolve().parents[1]
 
 
-# -------------------------------------------------------------------------------
-# Function: LP_solve
-# -------------------------------------------------------------------------------
+def read_json_file(file_path: Path):
+    """
+    Description:
+        Reads and interprets the JSON file at the given path. Compiles the
+        information into dictionaries used to instantiate simulation objects.
+
+    Args:
+        file_path (Path): Path to the input json file
+
+    Raises:
+        InvalidJSONFileError: If the json file at the given path does not
+            conform with the format required
+
+    Returns:
+        data: the data read from the json file
+    """
+
+    try:
+        if file_path.suffix == '.json':
+            if not file_path.is_file():
+                raise errors.UserInput((str(file_path), 'does not exist'))
+        else:
+            raise errors.UserInput((str(file_path), 'is not a JSON file'))
+
+        with file_path.open('r') as f:
+            data = json.load(f)
+
+        return data
+
+    except errors.UserInput as e:
+        print(e.msg)
+
+
 def LP_solve(LHS, RHS, objective, var_names, operators,
              mode="min", name="LP", lower_var_bounds=None, upper_var_bounds=None):
     """Solves the linear program using the PULP package solver.
@@ -210,8 +240,8 @@ def LP_solve(LHS, RHS, objective, var_names, operators,
         dict: a dictionary with the names of variables as keys and the values of
             that variable at the optimal solution (if possible).
             {
-             'status': "Infeasible" or "Optimal",
-             'objective':  optimized value of the objective function,
+            'status': "Infeasible" or "Optimal",
+            'objective':  optimized value of the objective function,
             'variable1_name': variable value,
             'variable2_name': variable value,
             .
@@ -221,7 +251,6 @@ def LP_solve(LHS, RHS, objective, var_names, operators,
             'variableN_name': variable value
             }
     """
-
     num_variables = len(var_names)
 
     # Ensure the LP is structured correctly
@@ -251,8 +280,12 @@ def LP_solve(LHS, RHS, objective, var_names, operators,
     return results
 
 
-# Initializes the LP problem
 def create_LP_problem(name, mode):
+    """
+    Description:
+        Initializes the LP problem
+    """
+
     LP = None
     if mode.lower().startswith("min"):
         LP = pulp.LpProblem(name, pulp.LpMinimize)
@@ -264,9 +297,13 @@ def create_LP_problem(name, mode):
     return LP
 
 
-# Checks if there are equal number of constraints and RHS values
-# Checks that objective and each constraint have all variables
 def is_correct_structure(LHS, RHS, objective, var_names):
+    """
+    Description:
+        Checks if there are equal number of constraints and RHS values
+        Checks that objective and each constraint have all variables
+    """
+
     if len(LHS) != len(RHS) or len(objective) != len(var_names):
         return False
     for constraint_eq in LHS:
@@ -275,10 +312,14 @@ def is_correct_structure(LHS, RHS, objective, var_names):
     return True
 
 
-# Initializes the LP variables, and returns a list containing them.
-# Each variable represents the quantity of a feed type. The variables
-# are organized in order of the feed types alphabetically.
 def generate_LP_vars(var_names, lower_bounds, upper_bounds):
+    """
+    Description:
+        Initializes the LP variables, and returns a list containing them.
+        Each variable represents the quantity of a feed type. The variables
+        are organized in order of the feed types alphabetically.
+    """
+
     num_vars = len(var_names)
 
     # If max and min values for variables were not given
@@ -297,9 +338,13 @@ def generate_LP_vars(var_names, lower_bounds, upper_bounds):
     return LP_vars
 
 
-# Adds the constraints to the LP problem. Each constraint represents the needed
-# amount of a certain nutrient in the ration for the cow.
 def add_LP_constraints(LHS, RHS, LP_Vars, operators, LP):
+    """
+    Description:
+        Adds the constraints to the LP problem. Each constraint represents the needed
+        amount of a certain nutrient in the ration for the cow.
+    """
+
     num_vars = len(LP_Vars)
     for constraint_eq, constraint_value, operator in zip(LHS, RHS, operators):
         terms_in_equation = [constraint_eq[v] * LP_Vars[v] for v in range(num_vars)]
@@ -311,8 +356,9 @@ def add_LP_constraints(LHS, RHS, LP_Vars, operators, LP):
             LP += pulp.lpSum(terms_in_equation) == constraint_value
 
 
-# Finds the fastest solver available, and uses it to solve the LP.
 def solve_with_fastest_solver(LP):
+    """Finds the fastest solver available, and uses it to solve the LP."""
+
     try:
         LP.solve(pulp.GUROBI_CMD(msg=0))
     except pulp.PulpSolverError:
@@ -325,10 +371,14 @@ def solve_with_fastest_solver(LP):
                 LP.solve(pulp.COIN_CMD(msg=0))
 
 
-# Organizes the results in a dictionary such that the names of variables
-# pair up with their optimal value (if possible), 'objective' with the optimal
-# value of the objective, and the LP status with 'status'.
 def organize_results(LP):
+    """
+    Description:
+        Organizes the results in a dictionary such that the names of variables
+        pair up with their optimal value (if possible), 'objective' with the optimal
+        value of the objective, and the LP status with 'status'.
+    """
+
     results = {}
     for v in LP.variables():
         results[v.name] = v.varValue
@@ -338,12 +388,12 @@ def organize_results(LP):
     return results
 
 
-# -------------------------------------------------------------------------------
-# Function: LP_print
-# -------------------------------------------------------------------------------
 def LP_print(LHS, RHS, objective, variables, operators,
              mode="min", name="LP", min_v=None, max_v=None):
-    """Text representation of the Linear Programming problem."""
+    """
+    Description:
+        Text representation of the Linear Programming problem.
+    """
 
     LHS = [[round(x, 4) for x in row] for row in LHS]
     RHS = [round(x, 4) for x in RHS]
@@ -371,7 +421,7 @@ def LP_print(LHS, RHS, objective, variables, operators,
             objective_text += "+ "
     LP_text += objective_text + '\n'
 
-    # Contraint Equations
+    # Constraint Equations
     constraint_text = "Subject to:\n"
     for c in range(len(LHS)):
         constraint_text += '\t'

@@ -1,6 +1,7 @@
 """
 RUFAS: Ruminant Farm Systems Model
 File name: animal_management.py
+
 Description: The class which manages all of the animal routines and keeps track of
     all animals and pens. All operations are as described in the Animal Module
     Information Flow document on Basecamp (such as daily animal updates and
@@ -8,6 +9,7 @@ Description: The class which manages all of the animal routines and keeps track 
     class to pen to each individual animal in that pen. The life cycle of each animal
     is controlled by an instance of the LifeCycleManager class, and this instance
     updates the animals daily.
+
 Author(s): Militsa Sotirova, militsasotirova@gmail.com
            Chris VanKerkhove, cjv47@cornell.edu
 """
@@ -30,6 +32,7 @@ def daily_animal_routine(animal_management, feed):
         animal_management: instance of the AnimalManagement class
         feed: instance of the Feed class
     """
+
     animal_management.daily_updates(feed)
 
 
@@ -106,6 +109,7 @@ class AnimalManagement:
             config: instance of the Config class
             feed: instance of the Feed class
         """
+
         self.sim_length = config.sim_length
         self.life_cycle_manager = LifeCycleManager(data['animal_config'])
         AnimalBase.set_config(data['animal_config'])
@@ -117,16 +121,16 @@ class AnimalManagement:
         self.ration_user_input = data['ration']['user_input']
         self.formulation_interval = data['ration']['formulation_interval']
 
-    def init_pens(self, pen_info, herd_data):
+    def init_pens(self, all_pens_data, herd_data):
         """
         Populates the list of pens with the information from the input json file.
         Args:
-            pen_info: dictionary containing information about the pens
+            all_pens_data: dictionary containing information about the pens
             herd_data: dictionary containing information about the herd
         """
 
-        for pen_name in pen_info:
-            pen_data = pen_info[pen_name]
+        for pen_name in all_pens_data:
+            pen_data = all_pens_data[pen_name]
             pen_id = pen_data['id']
             vertical_dist_to_parlor = \
                 pen_data['vertical_dist_to_milking_parlor']
@@ -143,7 +147,9 @@ class AnimalManagement:
             pen = Pen(pen_id, vertical_dist_to_parlor, horizontal_dist_to_parlor,
                       num_stalls, housing_type, bedding_type, pen_type, manure_handling,
                       manure_separator, manure_storage)
+
             self.all_pens.append(pen)
+
         herd_num = herd_data['herd_num']
 
         manure_handling = "manual_scraping"
@@ -188,6 +194,7 @@ class AnimalManagement:
             pen_data: dictionary containing information about the pens
             feed: instance of the Feed class
         """
+
         calf_num = herd_data['calf_num']
         heiferI_num = herd_data['heiferI_num']
         heiferII_num = herd_data['heiferII_num']
@@ -195,6 +202,7 @@ class AnimalManagement:
         cow_num = herd_data['cow_num']
         replace_num = herd_data['replace_num']
         herd_num = herd_data['herd_num']
+
         if herd_num == 0:
             self.simulate_animals = False
             if not calf_num == 0:
@@ -241,6 +249,7 @@ class AnimalManagement:
         Args:
             feed: instance of the Feed class
         """
+
         # average vertical & horizontal distance (VD, HD) of pens to the
         # milking parlor
         avg_VD_parlor, avg_HD_parlor = self.avg_pen_dist()
@@ -271,10 +280,10 @@ class AnimalManagement:
     def avg_pen_dist(self):
         """
         Calculates the average distance from a pen to the milking parlor.
-
         Returns: a tuple of (average vertical distance from milking parlor,
             average horizontal distance from milking parlor)
         """
+
         # vertical distance
         VD_sum = 0
 
@@ -395,6 +404,7 @@ class AnimalManagement:
                 lactating_cows.append(cow)
             else:
                 dry_cows.append(cow)
+
         # assigning dry cows to pens
         if len(self.all_pens) == 3:
             dry_and_heifers = self.heiferIs + self.heiferIIs + self.heiferIIIs + dry_cows
@@ -412,6 +422,7 @@ class AnimalManagement:
                     lactating_cows[i].DMPD_req = 90 + random.random() * 34
                     lactating_cows[i].DNED_req = 1.4 + random.random() * 0.3
                 pen_grouping = grouping(lactating_cows, self.all_pens[5:])
+
                 # assigning lactating cows to pens based on the grouping output
                 for key in pen_grouping:
                     self.all_pens[key].update_animals(pen_grouping[key])
@@ -423,6 +434,7 @@ class AnimalManagement:
         Removes animals from pens for re-allocation. This is part of the
         routines that happen every ration interval.
         """
+
         for pen in self.all_pens:
             pen.clear()
 
@@ -432,6 +444,7 @@ class AnimalManagement:
         of the animals inside it. This is part of the routines that happen every
         ration interval.
         """
+
         for pen in self.all_pens:
             if pen.pen_populated:
                 pen.calc_avg_nutrient_rqmts()
@@ -444,6 +457,7 @@ class AnimalManagement:
         Args:
             feed: instance of the Feed class
         """
+
         for i, pen in enumerate(self.all_pens):
             if pen.pen_populated:
                 self.all_pens[i].ration = self.all_pens[i].calc_ration(
@@ -468,6 +482,7 @@ class AnimalManagement:
         the pen. This is part of the routines that happen every
         ration interval.
         """
+
         for pen in self.all_pens:
             if pen.pen_populated:
                 pen.calc_avg_growth()
@@ -478,11 +493,10 @@ class AnimalManagement:
         Args:
             animals: the list of animals for which the P composition should be
                 calculated
-
         Returns:
             p_comp: the P composition of @animals
-
         """
+
         if len(animals) == 0:
             return 0
         else:
@@ -497,6 +511,7 @@ class AnimalManagement:
         """
         Calculates each animal class's P concentration.
         """
+
         self.calf_p_comp = self.p_comp(self.calves)
         self.heiferI_p_comp = self.p_comp(self.heiferIs)
         self.heiferII_p_comp = self.p_comp(self.heiferIIs)
@@ -511,6 +526,7 @@ class AnimalManagement:
         Args:
             feed: instance of the Feed class
         """
+
         for pen in self.all_pens:
             if pen.pen_populated:
                 pen.call_p_rqmts(feed)
@@ -520,6 +536,7 @@ class AnimalManagement:
         Calls each pen's method to calculate each animal's daily phosphorus
         update. This method is called daily.
         """
+
         for pen in self.all_pens:
             if pen.pen_populated:
                 pen.daily_p_update()
@@ -535,6 +552,7 @@ class AnimalManagement:
         Args:
             feed: instance of the Feed class
         """
+
         if self.simulate_animals:
             for pen in self.all_pens:
                 pen.pen_populated = len(pen.animals_in_pen) > 0
@@ -564,7 +582,6 @@ class AnimalManagement:
 
             # phosphorus updates
             self.daily_p_update()  # per animal
-
             self.calc_all_p_comp()  # per animal
 
     def end_ration_interval(self):
