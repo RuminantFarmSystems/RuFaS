@@ -216,11 +216,27 @@ class Crop:
             time: an instance of the Time class specified in classes.py
         """
 
-        self.alfalfa = alfalfa.Alfalfa(data)
-        self.corn = corn.Corn(data)
-        self.soy = soybean.Soybean(data)
+        self.crops_list = []
+        self.crops_data = data['crops']
+        for crop_name, crop_data in self.crops_data.items():
+            if crop_name.startswith("alfalfa"):
+                crop = alfalfa.Alfalfa(crop_name, crop_data)
+            elif crop_name.startswith("corn"):
+                crop = corn.Corn(crop_name, crop_data)
+            elif crop_name.startswith("soybean"):
+                crop = soybean.Soybean(crop_name, crop_data)
+            else:
+                print(crop_name, "is an invalid crop_type.")
+                continue
 
-        self.crops_list = [self.alfalfa, self.corn, self.soy]
+            self.crops_list.append(crop)
+
+        # self.alfalfa = alfalfa.Alfalfa(data)
+        # self.corn = corn.Corn(data)
+        # self.soybean = soybean.Soybean(data)
+        #
+        # self.crops_list = [self.alfalfa, self.corn, self.soybean]
+
         self.current_crop = base_crop.BaseCrop()
 
         self.grow_regimen = [self.current_crop for _ in range(0, len(time.years))]

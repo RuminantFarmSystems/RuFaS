@@ -3,19 +3,19 @@ from .base_crop import BaseCrop
 
 class Corn(BaseCrop):
 
-    def __init__(self, data):
+    def __init__(self, crop_name, data):
         super().__init__()
 
         """GENERAL PLANT INFO"""
 
-        corn_data = data['corn']
+        corn_data = data
         self.grow_years = corn_data['grow_years']
         self.repeat = corn_data['repeat']
         self.planting_date = corn_data['planting_date']
         self.harvest_date = corn_data['harvest_date']
         self.harvest_type = corn_data['harvest_type']
 
-        self.crop_name = 'corn'
+        self.crop_name = crop_name
         self.crop_type = 'annual'
         self.harvest_quality = 'null'
         self.feed_id = '34g'
