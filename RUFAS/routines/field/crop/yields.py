@@ -248,7 +248,9 @@ def calc_harvest_quality(crop_type):
 def kill(crop_type, field_management, time):
     """
     Description:
-        Kills the crop
+        Kills the crop.
+        NOTE: Any day-of-yield values reset here will be reported to the output
+        handler as 0. To reset after reporting see crop.daily_reset()
         "pseudocode_crop" C.10.H.4
 
     Args:
@@ -256,10 +258,6 @@ def kill(crop_type, field_management, time):
         field_management
         time
     """
-    till_management = field_management.managed_applications['tillage']
-    if (time.calendar_year, -1) in till_management.applications:
-        till_management.schedule_application(time)
-
     crop_type.accumulated_HU = 0
     crop_type.prev_accumulated_HU = 0
 
@@ -278,8 +276,6 @@ def kill(crop_type, field_management, time):
 
     crop_type.bio_P = 0
     crop_type.bio_N = 0
-
-    crop_type.HI_actual = 0
 
     crop_type.ET_annual = 0
 

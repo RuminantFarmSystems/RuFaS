@@ -22,15 +22,10 @@ def daily_crop_routine(soil, crop, field_management, weather, time):
     # Current crop is set at the beginning of the year in annual_crop_routine
     crop_type = crop.current_crop
 
+    daily_reset(crop_type)
     # If there is no crop in rotation this year, current crop will be named
     # 'null'. The routine is skipped in this case
     if crop_type.crop_name != 'null':
-
-        # yield is reset to 0 at the beginning of the next day so it can be
-        # accessed by the output handler.
-        crop_type.yield_actual = 0
-        crop_type.N_yield = 0
-        crop_type.P_yield = 0
 
         # If the crop is not planted yet, determine whether it is planted today
         if not crop_type.planted and not crop_type.harvested:
@@ -80,6 +75,18 @@ def daily_crop_routine(soil, crop, field_management, weather, time):
                     crop_type.growing = True
 
         annual_variable_update(crop_type)
+
+
+def daily_reset(crop_type):
+    """
+    Description:
+        Some variables are reset at the beginning of next day instead of at the
+        end of the previous one so that they can be accessed by the output handler.
+    """
+    crop_type.HI_actual = 0
+    crop_type.yield_actual = 0
+    crop_type.N_yield = 0
+    crop_type.P_yield = 0
 
 
 def annual_variable_update(crop_type):
