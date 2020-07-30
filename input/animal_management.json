@@ -11,7 +11,7 @@
 
     "weather": "barnyard_weather.csv",
 
-    "output": "standard_output.json",
+    "output": "life_cycle_report.json",
 
     "farm":
     {
