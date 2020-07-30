@@ -510,16 +510,18 @@ class Cow(HeiferIII):
 		# if self.milking:
 		estimated_daily_milk_produced, fat_percent, \
 			daily_fat_correct_milk_production = self._milking_update(sim_day, calving_interval)
-		if self.repro_program == 'ED':
-			self._ed_update(record_econ_stats, sim_day)
-		elif self.repro_program == 'ED-TAI':
-			self._ed_tai_update(record_econ_stats, sim_day)
-		elif self.repro_program == 'TAI':
-			if self.days_in_milk >= AnimalBase.config['voluntary_waiting_period']:
-				self._tai_update(record_econ_stats, sim_day)
+		if not self.do_not_breed:
+			if self.repro_program == 'ED':
+				self._ed_update(record_econ_stats, sim_day)
+			elif self.repro_program == 'ED-TAI':
+				self._ed_tai_update(record_econ_stats, sim_day)
+			elif self.repro_program == 'TAI':
+				if self.days_in_milk >= AnimalBase.config['voluntary_waiting_period']:
+					self._tai_update(record_econ_stats, sim_day)
 
 		self.fat_percent = fat_percent
-		self._preg_update(record_econ_stats, sim_day)
+		if not self.do_not_breed:
+			self._preg_update(record_econ_stats, sim_day)
 		cull_stage = self._cull_update(estimated_daily_milk_produced, sim_day)
 
 		self._economy_update(
