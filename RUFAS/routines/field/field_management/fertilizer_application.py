@@ -74,7 +74,7 @@ def fertilizer_P(soil, field_management, fert_app):
     """
 
     P_mass = fert_app['P_mass']
-    surf_perc = fert_app['surface_percent']
+    surface_percent = fert_app['surface_percent']
     depth = fert_app['depth']
 
     field_management.fert_P_applied = P_mass
@@ -85,8 +85,8 @@ def fertilizer_P(soil, field_management, fert_app):
     # available to be released by rain. Until the first rain event,
     # that P is gradually adsorbed by the soil.
     # FM.3.B.1/2
-    soil.fert_P_available += P_mass * 0.75 * surf_perc
-    soil.fert_P_released += P_mass * 0.25 * surf_perc
+    soil.fert_P_available += P_mass * 0.75 * surface_percent
+    soil.fert_P_released += P_mass * 0.25 * surface_percent
 
     sum_fac = 0.0
     last_layer = 0
@@ -98,7 +98,7 @@ def fertilizer_P(soil, field_management, fert_app):
         if layer.bottom_depth_cm < depth:
             # FM.3.B.4
             soil.depth_fact = layer.bottom_depth_cm / depth
-            layer.labile_P += P_mass * soil.depth_fact * (1.0 - surf_perc)
+            layer.labile_P += P_mass * soil.depth_fact * (1.0 - surface_percent)
 
             sum_fac += soil.depth_fact
             last_layer += 1
@@ -108,7 +108,7 @@ def fertilizer_P(soil, field_management, fert_app):
     soil.depth_fact = 1.0 - sum_fac
 
     # FM.3.B.3 with FM.3.B.5
-    soil.soil_layers[last_layer].labile_P += P_mass * soil.depth_fact * (1.0 - surf_perc)
+    soil.soil_layers[last_layer].labile_P += P_mass * soil.depth_fact * (1.0 - surface_percent)
 
     # S.5.A.8
     for layer in soil.soil_layers:

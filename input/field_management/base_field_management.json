@@ -27,9 +27,9 @@
                 "day": [],
                 "N_mass": [],
                 "P_mass": [],
-                "cover_perc": [],
+                "cover_percent": [],
                 "depth": [],
-                "surf_perc": []
+                "surface_percent": []
             },
 
             "tillage":
