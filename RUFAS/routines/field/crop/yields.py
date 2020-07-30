@@ -110,7 +110,6 @@ def calc_HI_max(crop_type):
     top = 100 * crop_type.fr_PHU
     bottom = 100 * crop_type.fr_PHU + exp(11.1 - (10 * crop_type.fr_PHU))
     crop_type.HI_max = crop_type.HI_opt * top / bottom
-    print(crop_type.HI_max)
 
 
 def calc_HI_act(crop_type):
@@ -128,7 +127,6 @@ def calc_HI_act(crop_type):
     term2 = crop_type.gamma_wu / (crop_type.gamma_wu + exp_part)
 
     crop_type.HI_actual = term1 * term2 + crop_type.HI_min
-    print(crop_type.HI_actual)
 
 
 def calc_dry_down(crop_type):
@@ -281,7 +279,6 @@ def kill(crop_type, field_management, time):
     crop_type.bio_P = 0
     crop_type.bio_N = 0
 
-    print(time.calendar_year, time.day)
     crop_type.HI_actual = 0
 
     crop_type.ET_annual = 0
