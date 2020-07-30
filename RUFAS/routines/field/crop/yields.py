@@ -285,8 +285,6 @@ def kill(crop_type, field_management, time):
     crop_type.bio_P = 0
     crop_type.bio_N = 0
 
-    crop_type.HI_actual = 0
-
     crop_type.ET_annual = 0
 
     crop_type.planted = False

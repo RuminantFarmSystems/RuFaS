@@ -45,6 +45,11 @@ def daily_crop_routine(soil, crop, field_management, weather, time):
         crop_type.yield_actual = 0
         crop_type.yield_N = 0
         crop_type.yield_P = 0
+        crop_type.HI_actual = 0
+        crop_type.bio_BG_DM = 0
+        soil.residue_DM_harvest = 0
+        soil.fr_tillage = 0
+
         # If the crop is not planted yet, determine whether it is planted today
         if not crop_type.planted:
             calculate_start(soil, crop, field_management, weather, time)
