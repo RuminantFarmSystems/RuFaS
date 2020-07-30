@@ -63,6 +63,11 @@
             "produce_csv": true,
             "produce_graphics": false,
             "report_name": "nitrogen_balance_report"
+        },
+        "custom_field_report": {
+            "produce_csv": true,
+            "produce_graphics": true,
+            "report_name": "custom_field_report"
         }
     },
     "mass_balance": {

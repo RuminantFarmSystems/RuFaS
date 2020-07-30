@@ -21,7 +21,8 @@ class FieldReport(BaseReportDriver):
             'field_management_report': self.FieldManagementReport(data['field_management_report'], field_name),
             'nitrogen_mass_balance': self.NitrogenBalance(data['nitrogen_balance'], field_name),
             'phosphorus_mass_balance': self.PhosphorusBalance(data['phosphorus_balance'], field_name),
-            'water_balance': self.WaterBalance(data['water_balance'], field_name)
+            'water_balance': self.WaterBalance(data['water_balance'], field_name),
+            'custom_field_report': self.CustomFieldReport(data['custom_field_report'], field_name)
         }
 
     def daily_update(self, state, weather, time):
@@ -242,6 +243,38 @@ class FieldReport(BaseReportDriver):
                 'fert_N_applied': ['field_management.fert_N_applied_annual', 'kg', 0],
                 'fert_P_applied': ['field_management.fert_P_applied_annual', 'kg', 0],
                 'fert_K_applied': ['field_management.fert_K_applied_annual', 'kg', 0]
+            }
+
+    class CustomFieldReport(BaseFieldReport):
+        def __init__(self, data, field_name):
+            super().__init__(data, field_name)
+
+            self.daily_variables = {
+                'year': ['time.calendar_year', '', []],
+                'j_day': ['time.day', '', []],
+                'manure_applied': ['field_management.manure_applied', 'kg', []],
+                'manure_N_applied': ['field_management.manure_N_applied', 'kg', []],
+                'fert_N_applied': ['field_management.fert_N_applied', 'kg', []],
+                'NO3_L1': ['soil.soil_layers[0].NO3', 'kg', []],
+                'NO3_L2': ['soil.soil_layers[1].NO3', 'kg', []],
+                'NO3_L3': ['soil.soil_layers[2].NO3', 'kg', []],
+                'NH4_L1': ['soil.soil_layers[0].NH4', 'kg', []],
+                'NH4_L2': ['soil.soil_layers[1].NH4', 'kg', []],
+                'NH4_L3': ['soil.soil_layers[2].NH4', 'kg', []],
+                'active_N_L1': ['soil.soil_layers[0].active_N', 'kg', []],
+                'active_N_L2': ['soil.soil_layers[1].active_N', 'kg', []],
+                'active_N_L3': ['soil.soil_layers[2].active_N', 'kg', []],
+                'stable_N_L1': ['soil.soil_layers[0].stable_N', 'kg', []],
+                'stable_N_L2': ['soil.soil_layers[1].stable_N', 'kg', []],
+                'stable_N_L3': ['soil.soil_layers[2].stable_N', 'kg', []],
+                'N_uptake': ['soil.N_uptake', 'kg', []],
+                'biomass': ['crop_type.biomass_actual', 'kg ha^-1', []],
+                'bio_N': ['crop_type.bio_N', 'kg N ha^-1', []],
+                'yield_actual': ['crop_type.yield_actual', 'kg ha^-1', []]
+            }
+
+            self.annual_variables = {
+                'year': ['time.calendar_year', '', 0]
             }
 
     class BaseFieldMassBalanceReport(BaseFieldReport):
