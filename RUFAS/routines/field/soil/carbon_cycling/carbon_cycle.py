@@ -25,10 +25,6 @@ def update_all(crop_type, soil, weather, time):
         time
     """
 
-    # A. residue from annual crops
-
-    # above ground metabolic residue
-
     # B. residue partitioning
     # TODO delete 100's eventually, check lignin residue percent in soil.py
     # TODO fr_N might need a different calculation in the future
@@ -66,7 +62,7 @@ def update_all(crop_type, soil, weather, time):
         # above ground metabolic residue
         metabolic_AG_to_C_active = metabolic_AG_active_decomp * M_d * T_d * layer.metabolic_AG
 
-        metabolic_AG_to_BG = layer.metabolic_AG * layer.fr_tillage  # TODO fr_tillage, percent_incorp?
+        metabolic_AG_to_BG = layer.metabolic_AG * layer.fr_tillage
 
         d_metabolic_AG = soil.residue_DM_harvest * metabolic_AG_frac - (
                 (metabolic_AG_to_C_active - metabolic_AG_to_BG) + metabolic_AG_to_BG)
