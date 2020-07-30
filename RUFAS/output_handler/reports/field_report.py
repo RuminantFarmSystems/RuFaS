@@ -68,6 +68,9 @@ class FieldReport(BaseReportDriver):
                                     'Bio_N': ['crop_type.bio_N', 'kg N ha^-1', []],
                                     'Bio_P': ['crop_type.bio_P', 'kg P ha^-1', []],
                                     'rooting_depth': ['crop_type.z_root', 'mm', []],
+                                    'HI_act': ['crop_type.HI_actual', '', []],
+                                    'HI_min': ['crop_type.HI_min', '', []],
+                                    'HI_max': ['crop_type.HI_max', '', []],
                                     'yield_actual': ['crop_type.yield_actual', 'kg ha^-1', []]
                                     }
 

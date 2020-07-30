@@ -10,7 +10,7 @@ def update_all(soil, field_management, fert_app):
     """
     Description:
         Calls the methods necessary to simulate a fertilizer application
-
+        pseudocode_field_management FM.3
     Args:
         soil: an instance of the Soil class defined in soil.py
         field_management: an instance of the FieldManagement class defined in
@@ -135,6 +135,7 @@ def fertilizer_K(soil, field_management, fert_app):
     """
     Description:
         Applies fertilizer Potassium to the soil
+        pseudocode_field_management FM.3.D
     Args:
         soil
         field_management

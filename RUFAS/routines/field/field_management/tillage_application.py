@@ -52,6 +52,7 @@ def update_all(soil, till_app):
 
             # FM.5.3
             # TODO: RuFaS does not track org P (03.19.20). When it does, WOP/SOP will be incorporated into organic pools
+            # TODO: RuFaS does not track org P (03.19.20). When it does, WOP/SOP will be incorporated into organic pools
             layer.labile_P += perc_incorporated * soil.WIP
             layer.active_P += perc_incorporated * soil.SIP
 

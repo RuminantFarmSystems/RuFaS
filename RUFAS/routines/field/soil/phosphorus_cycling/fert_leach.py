@@ -20,7 +20,7 @@ def update_all(soil, weather, time):
     Description:
         estimates P leaching from surface fertilizer with rainfall and
         P infiltration into soil and loss in runoff
-        "pseudocode_soil" S.5.F
+        "pseudocode_soil" S.5.C
 
     Args:
         soil: instance of the Soil class specified in soil.py

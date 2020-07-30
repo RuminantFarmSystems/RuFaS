@@ -19,7 +19,7 @@ def update_all(soil, time):
     """
     Description:
         computes P flux between labile and active P pools
-        "pseudocode_soil" S.5.H
+        "pseudocode_soil" S.5.E
     Args:
         soil: instance of the Soil class specified in soil.py
         time: instance of the Time class specified in classes.py
