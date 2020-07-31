@@ -126,7 +126,7 @@ def id_input(database):
         if user_input in used_ID:
             print("The ID you have entered is already in use. Please try again.")
         else:
-            print("The ID has been recorded. Please go ahead and add it to your csv file if you haven't already "
+            print("The ID has been recorded. Go ahead and add it to your csv file if you haven't already "
                   "before moving on to the next input.")
     return user_input
 
@@ -140,13 +140,25 @@ def add_dataset(connection, dataset_id, csv_name):
 
     # Input geographic details
     "Please enter the following details about the location of the dataset:"
-    state = input("Enter the corresponding US State (can be null): ")
-    county = input("Enter the corresponding county or city (can be null): ")
-    lat = float(input("Enter the corresponding latitude (required): "))
-    long = float(input("Enter the corresponding longitude (required): "))
+    state = input("Enter the corresponding US State: ")
+    county = input("Enter the corresponding county or city: ")
+    lat = None
+    while lat is None or lat < -90 or lat > 90 or not lat.isnumeric():
+        lat = input("Enter the corresponding latitude: ")
+        if lat.isnumeric():
+            lat = float(lat)
+            if lat < -90 or lat > 90:
+                print("Latitude has to be between -90 and 90")
+        else:
+            print("Invalid input.")
+
+    long = float(input("Enter the corresponding longitude: "))
     notes = input("Enter any additional notes you might have: ")
 
     params = (dataset_id, csv_name, state, county, lat, long, notes)
+    for i in range(0,len(params)):
+        if params[i] == "":
+            params[i] = "NULL"
 
     # Creates a cursor in the given database
     c = connection.cursor()
