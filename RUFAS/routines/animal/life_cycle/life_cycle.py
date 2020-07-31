@@ -15,10 +15,12 @@ from RUFAS.routines.animal.life_cycle.heiferI import HeiferI
 from RUFAS.routines.animal.life_cycle.heiferII import HeiferII
 from RUFAS.routines.animal.life_cycle.heiferIII import HeiferIII
 from RUFAS.routines.animal.life_cycle.cow import Cow
-from RUFAS.routines.animal.life_cycle.animal_initialization import AnimalInitalization
+from RUFAS.routines.animal.life_cycle.animal_initialization import \
+    AnimalInitalization
 from collections import Counter
 import matplotlib as mpl
 import matplotlib.pyplot as plt
+import RUFAS.routines.animal.life_cycle.animal_events_constants as c
 mpl.use('TkAgg')
 
 
@@ -220,26 +222,25 @@ class LifeCycleManager:
             self.avg_CI = self.initialize_db_summary['cow_avg_CI']
         self.herd_num = herd_num
 
-        entered_herd = 'entered herd through initialization'
         calves = self.animal_initializer.get_calves(calf_num)
         for calf in calves:
-            calf.events.add_event(calf.days_born, 0, entered_herd)
+            calf.events.add_event(calf.days_born, 0, c.INIT_HERD)
 
         heiferIs = self.animal_initializer.get_heiferIs(heiferI_num)
         for heiferI in heiferIs:
-            heiferI.events.add_event(heiferI.days_born, 0, entered_herd)
+            heiferI.events.add_event(heiferI.days_born, 0, c.INIT_HERD)
 
         heiferIIs = self.animal_initializer.get_heiferIIs(heiferII_num)
         for heiferII in heiferIIs:
-            heiferII.events.add_event(heiferII.days_born, 0, entered_herd)
+            heiferII.events.add_event(heiferII.days_born, 0, c.INIT_HERD)
 
         heiferIIIs = self.animal_initializer.get_heiferIIIs(heiferIII_num)
         for heiferIII in heiferIIIs:
-            heiferIII.events.add_event(heiferIII.days_born, 0, entered_herd)
+            heiferIII.events.add_event(heiferIII.days_born, 0, c.INIT_HERD)
 
         cows = self.animal_initializer.get_cows(cow_num)
         for cow in cows:
-            cow.events.add_event(cow.days_born, 0, entered_herd)
+            cow.events.add_event(cow.days_born, 0, c.INIT_HERD)
 
         self.replacement_market = self.animal_initializer.get_replacement_cows(replace_num)
         return calves, heiferIs, heiferIIs, heiferIIIs, cows
@@ -483,7 +484,7 @@ class LifeCycleManager:
         while len(cows) + len(heiferIIIs) + daily_bought_from_market < self.herd_num * 1.01 and \
                 date > 1:
             self.replacement_market[0].events.add_event(
-                self.replacement_market[0].days_born, date, 'Entered Herd')
+                self.replacement_market[0].days_born, date, c.ENTER_HERD)
             self.replacement_market[0].set_p_purchased()
             animals_added.append(self.replacement_market[0])
             self.bought_from_market += 1
@@ -637,7 +638,7 @@ class LifeCycleManager:
 
                 if not (new_calf.culled or new_calf.sold):
                     new_calf.events.add_event(
-                        new_calf.days_born, date, 'Entered Herd')
+                        new_calf.days_born, date, c.ENTER_HERD)
                     # calves.append(new_calf)
                     self.total_new_born += 1
                     calves_born.append(new_calf)
