@@ -7,15 +7,16 @@ Description: These constants are all of the event descriptions for the animal
 """
 # calf
 WEAN_DAY = "wean day"
-STILL_BIRTH = "still birth"
+STILL_BIRTH = "still birth happened"
 
 
 # reproduction
 INSEMINATED_W_BASE = "inseminated with "
 
-BREEDING_START = "breeding started"
-DO_NOT_BREED = "do not breed"
+BREEDING_START = "breeding start"
+DO_NOT_BREED = "mark as do not breed"
 
+#estrus occurred
 ESTRUS_DETECTED = "estrus detected"
 BASIC_ESTRUS_NOTE = "estrus"
 ESTRUS_AFTER_AI_NOTE = "estrus after AI"
@@ -25,13 +26,17 @@ ESTRUS_AFTER_CALVING_NOTE = "1st estrus after calving"
 ESTRUS_BEFORE_VWP_NOTE = "estrus occurred before vwp"
 ESTRUS_AFTER_PGF_NOTE = "estrus after PGF"
 
+#TAI injections
 INJECT_GNRH = "inject GnRH"
 INJECT_PGF = "inject PGF"
-ESTRUS_OCCURRED = "estrus occurred"
+
+#heifer repro
+ESTRUS_OCCURRED = "estrus"
 INJECT_CIDR = "inject CIDR"
 
-PRESYNCH_END = "presynch ended"
-DOUBLE_OVSYNCH_END = "double OvSynch ended"
+#presynch protocols
+PRESYNCH_END = "Presynch ended"
+DOUBLE_OVSYNCH_END = "Double OvSynch ended"
 C6G_END = "G6G ended"
 
 
@@ -62,9 +67,7 @@ DRY = "dry"
 
 # culling
 CULL_REASON_BASE = "culled for "
-HEIFER_REPRO_CULL = "culled for heifer reproduction problem"
+HEIFER_REPRO_CULL = "culled for heifer reproductive problem"
 LOW_PROD_CULL = "culled for low production"
 
 
-# potentially will be deleted (referenced only in commented code)
-COW_REPRO_CULL = "cull for cow reproduction problem"
