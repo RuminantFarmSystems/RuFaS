@@ -39,9 +39,9 @@ CropType attribute definitions:
 
     yield_actual = Actual crop yield at harvest (kg/ha)
 
-    yield_N = Amount of nitrogen removed in the yield
+    N_yield = Amount of nitrogen removed in the yield
 
-    yield_P = Amount of phosphorus removed in the yield
+    P_yield = Amount of phosphorus removed in the yield
 
     residue = Material in the residue pool for the top 10mm of soil on current
               day (kg/ha)
@@ -55,8 +55,8 @@ CropType values updated by update_all():
     HI_actual
     yield_max
     yield_actual
-    yield_N
-    yield_P
+    N_yield
+    P_yield
     residue
 """
 

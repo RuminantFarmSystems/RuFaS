@@ -1,5 +1,5 @@
 {
-    "pen_report": {
+    "pens_report": {
         "produce_csv": true,
         "produce_graphics": true,
         "report_name": "pen_report",
@@ -18,9 +18,14 @@
             "produce_csv": true,
             "produce_graphics": true,
             "report_name": "growth_report"
+        },
+        "pens_summary": {
+            "produce_csv": true,
+            "produce_graphics": true,
+            "report_name": "pens_summary"
         }
     },
-    "field_report": {
+    "fields_report": {
         "produce_csv": true,
         "produce_graphics": true,
         "report_name": "field_report",
@@ -63,6 +68,16 @@
             "produce_csv": true,
             "produce_graphics": true,
             "report_name": "nitrogen_balance_report"
+        },
+        "custom_field_report": {
+            "produce_csv": true,
+            "produce_graphics": true,
+            "report_name": "custom_field_report"
+        },
+        "fields_summary": {
+            "produce_csv": true,
+            "produce_graphics": true,
+            "report_name": "fields_summary"
         }
     },
     "mass_balance": {
@@ -73,12 +88,42 @@
     "feed_storage_report": {
         "produce_csv": true,
         "produce_graphics": true,
-        "report_name": "feed_storage_report"
+        "report_name": "feed_storage_report",
+        "storage_report": {
+            "produce_csv": true,
+            "produce_graphics": true,
+            "report_name": "storage_report"
+        },
+        "feed_storage_summary": {
+            "produce_csv": true,
+            "produce_graphics": true,
+            "report_name": "feed_storage_summary"
+        }
     },
     "manure_storage_report": {
         "produce_csv": true,
         "produce_graphics": true,
-        "report_name": "manure_storage_report"
+        "report_name": "manure_storage_report",
+        "handling_report": {
+            "produce_csv": true,
+            "produce_graphics": true,
+            "report_name": "handling_report"
+        },
+        "separator_report": {
+            "produce_csv": true,
+            "produce_graphics": true,
+            "report_name": "separator_report"
+        },
+        "storage_report": {
+            "produce_csv": true,
+            "produce_graphics": true,
+            "report_name": "storage_report"
+        },
+        "manure_storage_summary": {
+            "produce_csv": true,
+            "produce_graphics": true,
+            "report_name": "manure_storage_summary"
+        }
     },
     "custom_report": {
         "produce_csv": true,

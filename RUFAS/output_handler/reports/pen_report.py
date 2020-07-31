@@ -10,10 +10,34 @@ from .base_report import BaseReport
 from .. import graphics
 
 
+class PensReport(BaseReportDriver):
+    def __init__(self, data, state):
+        super().__init__(data)
+        for pen in state.animal_management.all_pens:
+            self.reports['pen_' + str(pen.id)] = PenReport(data, state.feed, pen.id)
+
+        self.reports['pens_summary'] = PensSummary(data['pens_summary'])
+
+
+class PensSummary(BaseReport):
+    def __init__(self, data):
+        super().__init__(data)
+
+        self.daily_variables = {
+            'year': ['time.calendar_year', '', []],
+            'j_day': ['time.day', '', []]
+        }
+
+        self.annual_variables = {
+            'year': ['time.calendar_year', '', 0]
+        }
+
+
 class PenReport(BaseReportDriver):
     def __init__(self, data, feed, pen_id):
         super().__init__(data)
         self.pen_id = pen_id
+        self.report_name = 'pen_' + str(pen_id)
         self.reports = {
             'ration_report': self.RationReport(data['ration_report'], feed, self.pen_id),
             'growth_report': self.GrowthReport(data['growth_report'], self.pen_id),
