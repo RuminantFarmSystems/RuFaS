@@ -94,9 +94,9 @@ def daily_feed_routine(feed, fields, animal_management):
 
         feed.summarize_feed_storage()
 
-    # feed management routines to be run daily
-    feed.daily_feed_management(animal_management)
-
+    # animal feed management routines to be run daily
+    if animal_management.simulate_animals:
+        feed.daily_animal_feed_management(animal_management)
 
 def annual_feed_routine(feed):
     feed.reset_feed()
@@ -386,6 +386,8 @@ class Feed:
             if self.storage:
                 if self.DM == 0:
                     # forage to be fed out 30 days after harvest for new yield
+                    # if there is already forage in the receptacle days_since_feedout
+                    # is not reset
                     self.days_since_feedout = -30
                 self.feed_id = crop.feed_id
                 self.DM += crop.DM_yield
@@ -654,12 +656,10 @@ class Feed:
                         tot_req_inv_non_lactating_cows += storage.inclusion_rate_est[animal]
 
                 available_forage = storage.DM - tot_req_inv_non_lactating_cows
-                storage.DMI_forage_max['lactating_cows'] = available_forage / storage.cow_days['lactating_cows']
+                if storage.cow_days['lactating_cows'] > 0:
+                    storage.DMI_forage_max['lactating_cows'] = available_forage / storage.cow_days['lactating_cows']
 
-                storage.DMI_forage_max = storage.inclusion_rate_est
-                storage.DMI_forage_max['lactating_cows'] = 0
-
-    def daily_feed_management(self, animal_management):
+    def daily_animal_feed_management(self, animal_management):
         """
         Description:
             Executes daily routines relating to feed management, specifcally a
