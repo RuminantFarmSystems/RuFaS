@@ -9,6 +9,7 @@ Description: These constants are all of the event descriptions for the animal
 WEAN_DAY = "wean day"
 STILL_BIRTH = "still birth"
 
+
 # reproduction
 INSEMINATED_W_BASE = "inseminated with "
 
@@ -33,6 +34,7 @@ PRESYNCH_END = "presynch ended"
 DOUBLE_OVSYNCH_END = "double OvSynch ended"
 C6G_END = "G6G ended"
 
+
 # pregnancy
 HEIFER_PREG = "heifer pregnant"
 HEIFER_NOT_PREG = "heifer not pregnant"
@@ -47,6 +49,7 @@ PREG_LOSS_BTWN_1_AND_2 = "pregnancy loss happened between 1st and 2nd pregnancy 
 PREG_CHECK_3_PREG = "pregnancy check 3: confirmed"
 PREG_LOSS_BTWN_2_AND_3 = "pregnancy loss happened between 2nd and 3rd pregnancy check"
 
+
 # life cycle
 INIT_HERD = "entered herd through initialization"
 ENTER_HERD = "entered herd"
@@ -56,10 +59,12 @@ HEIFERII_TO_III = "heiferII moving to heiferIII"
 NEW_BIRTH = "new birth, start milking"
 DRY = "dry"
 
+
 # culling
 CULL_REASON_BASE = "culled for "
 HEIFER_REPRO_CULL = "culled for heifer reproduction problem"
 LOW_PROD_CULL = "culled for low production"
+
 
 # potentially will be deleted (referenced only in commented code)
 COW_REPRO_CULL = "cull for cow reproduction problem"
