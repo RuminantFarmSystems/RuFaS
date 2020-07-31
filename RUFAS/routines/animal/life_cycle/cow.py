@@ -32,7 +32,7 @@ from RUFAS.routines.animal.manure.lactating_cow_manure_excretion import \
 from RUFAS.routines.animal.manure.dry_cow_manure_excretion import \
     manure_calculations as dry_manure_calculations
 from random import random
-import RUFAS.routines.animal.life_cycle.animal_events_constants as c
+from RUFAS.routines.animal.life_cycle import animal_events_constants as c
 
 
 class MilkProductionHistory:

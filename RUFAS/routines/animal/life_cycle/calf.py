@@ -17,7 +17,7 @@ from RUFAS.routines.animal.life_cycle.animal_base import AnimalBase
 from RUFAS.routines.animal.ration.calf_ration import calculate_rqmts
 from RUFAS.routines.animal.manure.calf_manure_excretion import\
 	manure_calculations
-import RUFAS.routines.animal.life_cycle.animal_events_constants as c
+from RUFAS.routines.animal.life_cycle import animal_events_constants as c
 
 
 class Calf(AnimalBase):

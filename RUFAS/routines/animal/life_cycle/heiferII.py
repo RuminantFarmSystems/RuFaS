@@ -20,7 +20,7 @@ from RUFAS.routines.animal.manure.growing_heifer_manure_excretion import \
 	manure_calculations
 from random import random
 import math
-import RUFAS.routines.animal.life_cycle.animal_events_constants as c
+from RUFAS.routines.animal.life_cycle import animal_events_constants as c
 
 
 class HeiferII(HeiferI):

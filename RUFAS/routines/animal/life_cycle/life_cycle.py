@@ -20,7 +20,7 @@ from RUFAS.routines.animal.life_cycle.animal_initialization import \
 from collections import Counter
 import matplotlib as mpl
 import matplotlib.pyplot as plt
-import RUFAS.routines.animal.life_cycle.animal_events_constants as c
+from RUFAS.routines.animal.life_cycle import animal_events_constants as c
 mpl.use('TkAgg')
 
 
