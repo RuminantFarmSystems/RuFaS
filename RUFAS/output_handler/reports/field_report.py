@@ -9,10 +9,68 @@ from .base_report_driver import BaseReportDriver
 from .. import graphics
 
 
+class FieldsReport(BaseReportDriver):
+    def __init__(self, data, state):
+        super().__init__(data)
+        for field in state.fields.fields.values():
+            self.reports[field.field_name] = FieldReport(data, field.field_name)
+
+        self.reports['fields_summary'] = FieldsSummary(data['fields_summary'])
+
+
+class FieldsSummary(BaseReport):
+    def __init__(self, data):
+        super().__init__(data)
+        self.daily_variables = {
+            'year': ['time.calendar_year', '', []],
+            'j_day': ['time.day', '', []],
+            'profile_SW': ['fields.profile_SW', 'mm H2O', []],
+            'runoff': ['fields.runoff', 'mm H2O', []],
+            'drainage': ['fields.drainage', 'mm H2O', []],
+            'erosion': ['fields.erosion', 'ton / ha', []],
+            'ET': ['fields.ET', 'mm H2O', []],
+            'manure_applied': ['fields.manure_applied', 'kg', []],
+            'manure_N_applied': ['fields.manure_N_applied', 'kg', []],
+            'manure_P_applied': ['fields.manure_P_applied', 'kg', []],
+            'profile_N': ['fields.profile_N', 'kg', []],
+            'profile_P': ['fields.profile_P', 'kg', []],
+            'N_runoff': ['fields.N_runoff', 'kg', []],
+            'P_runoff': ['fields.P_runoff', 'kg', []],
+            'N_drainage': ['fields.N_drainage', 'kg', []],
+            'P_drainage': ['fields.P_drainage', 'kg', []],
+            'N_erosion': ['fields.N_erosion', 'kg', []],
+            'P_erosion': ['fields.P_erosion', 'kg', []],
+            'yield': ['fields.yield_actual', 'kg', []],
+            'N_yield': ['fields.N_yield', 'kg', []],
+            'P_yield': ['fields.P_yield', 'kg', []]
+        }
+
+        self.annual_variables = {
+            'year': ['time.calendar_year', '', 0],
+            'runoff': ['fields.runoff_annual', 'mm H2O', 0],
+            'drainage': ['fields.drainage_annual', 'mm H2O', 0],
+            'erosion': ['fields.erosion_annual', 'ton / ha', 0],
+            'ET': ['fields.ET_annual', 'mm H2O', 0],
+            'manure_applied': ['fields.manure_applied_annual', 'kg', 0],
+            'manure_N_applied': ['fields.manure_N_applied_annual', 'kg', 0],
+            'manure_P_applied': ['fields.manure_P_applied_annual', 'kg', 0],
+            'N_runoff': ['fields.N_runoff_annual', 'kg', 0],
+            'P_runoff': ['fields.P_runoff_annual', 'kg', 0],
+            'N_drainage': ['fields.N_drainage_annual', 'kg', 0],
+            'P_drainage': ['fields.P_drainage_annual', 'kg', 0],
+            'N_erosion': ['fields.N_erosion_annual', 'kg', 0],
+            'P_erosion': ['fields.P_erosion_annual', 'kg', 0],
+            'yield': ['fields.yield_annual', 'kg', 0],
+            'N_yield': ['fields.yield_N_annual', 'kg', 0],
+            'P_yield': ['fields.yield_P_annual', 'kg', 0]
+        }
+
+
 class FieldReport(BaseReportDriver):
     def __init__(self, data, field_name):
         super().__init__(data)
         self.field_name = field_name
+        self.report_name = self.field_name
         self.reports = {
             'crop_report': self.CropReport(data['crop_report'], field_name),
             'soil_report': self.SoilReport(data['soil_report'], field_name),
@@ -26,23 +84,20 @@ class FieldReport(BaseReportDriver):
         }
 
     def daily_update(self, state, weather, time):
-        for field in state.fields:
-            if field.field_name == self.field_name:
-                for report in self.reports.values():
-                    report.daily_update(field, weather, time)
+        for report in self.reports.values():
+            report.daily_update(state, weather, time)
 
     def annual_update(self, state, weather, time):
-        for field in state.fields:
-            if field.field_name == self.field_name:
-                for report in self.reports.values():
-                    report.annual_update(field, weather, time)
+        for report in self.reports.values():
+            report.annual_update(state, weather, time)
 
     class BaseFieldReport(BaseReport):
         def __init__(self, data, field_name):
             super().__init__(data)
             self.field_name = field_name
 
-        def daily_update(self, field, weather, time):
+        def daily_update(self, state, weather, time):
+            field = state.fields.fields[self.field_name]
             soil = field.soil
             crop_type = field.crop.current_crop
             field_management = field.field_management
@@ -50,7 +105,8 @@ class FieldReport(BaseReportDriver):
                 self.daily_variables[variable][2].append(
                     eval(self.daily_variables[variable][0], globals(), locals()))
 
-        def annual_update(self, field, weather, time):
+        def annual_update(self, state, weather, time):
+            field = state.fields.fields[self.field_name]
             soil = field.soil
             crop_type = field.crop.current_crop
             field_management = field.field_management

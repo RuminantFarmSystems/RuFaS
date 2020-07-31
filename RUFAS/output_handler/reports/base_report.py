@@ -39,11 +39,14 @@ class BaseReport:
             'year': ['time.calendar_year', '', 0]
         }
 
-    def initialize_csv_dir(self):
-        pass
+    def initialize_dir(self, base_csv_dir, base_graphic_dir):
+        if self.produce_csv:
+            self.csv_dir = base_csv_dir / self.report_name
+            self.csv_dir.mkdir(exist_ok=True, parents=False)
 
-    def initialize_graphic_dir(self):
-        pass
+        if self.produce_graphics:
+            self.graphic_dir = base_graphic_dir / self.report_name
+            self.graphic_dir.mkdir(exist_ok=True, parents=False)
 
     @staticmethod
     def write_headers(output_csv, variables):
@@ -73,6 +76,7 @@ class BaseReport:
         animal_management = state.animal_management
         feed = state.feed
         manure_storage = state.manure_storage
+        fields = state.fields
 
         for variable in self.daily_variables:
             self.daily_variables[variable][2].append(
@@ -83,6 +87,7 @@ class BaseReport:
         animal_management = state.animal_management
         feed = state.feed
         manure_storage = state.manure_storage
+        fields = state.fields
 
         for variable in self.annual_variables:
             self.annual_variables[variable][2] = \

@@ -35,7 +35,7 @@ def daily_feed_routine(feed, fields, animal_management):
     """
 
     # aggregate crop yield across fields
-    for field in fields:
+    for field in fields.fields.values():
         crop = field.crop.current_crop
         # there is forage to be stored
         if crop.yield_actual != 0:

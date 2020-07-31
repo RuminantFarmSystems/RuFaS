@@ -7,10 +7,186 @@ Author(s): William Donovan, wmdonovan@wisc.edu
 """
 
 from RUFAS import util
-from .crop.crop import Crop
-from .soil.soil import Soil
-from .field_management.field_management import FieldManagement
+from .crop.crop import *
+from .soil.soil import *
+from .field_management.field_management import *
 from ...util import read_json_file
+
+
+def daily_fields_routine(fields, manure_storage, weather, time):
+    for field in fields.fields.values():
+        soil = field.soil
+        crop = field.crop
+        field_management = field.field_management
+        daily_field_management_routine(soil, manure_storage, field_management, weather, time)
+        daily_soil_routine(soil, crop, field_management, weather, time)
+        daily_crop_routine(soil, crop, field_management, weather, time)
+
+    fields.summarize_fields()
+    fields.summarize_annual_variables()
+
+
+def annual_fields_routine(fields, time):
+    for field in fields.fields.values():
+        annual_crop_routine(field.crop, time)
+
+
+class Fields:
+    def __init__(self, fields_data, time):
+        self.fields = {}
+        for field_name, field_data in fields_data.items():
+            self.fields[field_name] = Field(field_name, field_data, time)
+
+        self.profile_SW = 0.0
+        self.runoff = 0.0
+        self.drainage = 0.0
+        self.erosion = 0.0
+        self.ET = 0.0
+
+        self.runoff_annual = 0.0
+        self.drainage_annual = 0.0
+        self.erosion_annual = 0.0
+        self.ET_annual = 0.0
+
+        self.manure_applied = 0.0
+        self.manure_N_applied = 0.0
+        self.manure_P_applied = 0.0
+
+        self.manure_applied_annual = 0.0
+        self.manure_N_applied_annual = 0.0
+        self.manure_P_applied_annual = 0.0
+
+        self.profile_N = 0.0
+        self.profile_P = 0.0
+
+        self.N_runoff = 0.0
+        self.P_runoff = 0.0
+
+        self.N_drainage = 0.0
+        self.P_drainage = 0.0
+
+        self.N_erosion = 0.0
+        self.P_erosion = 0.0
+
+        self.N_runoff_annual = 0.0
+        self.P_runoff_annual = 0.0
+        self.N_drainage_annual = 0.0
+        self.P_drainage_annual = 0.0
+        self.N_erosion_annual = 0.0
+        self.P_erosion_annual = 0.0
+
+        self.yield_actual = 0.0
+        self.N_yield = 0.0
+        self.P_yield = 0.0
+
+        self.yield_annual = 0.0
+        self.yield_N_annual = 0.0
+        self.yield_P_annual = 0.0
+
+    def summarize_fields(self):
+        self.profile_SW = 0.0
+        self.runoff = 0.0
+        self.drainage = 0.0
+        self.erosion = 0.0
+        self.ET = 0.0
+
+        self.manure_applied = 0.0
+        self.manure_N_applied = 0.0
+        self.manure_P_applied = 0.0
+
+        self.profile_N = 0.0
+        self.profile_P = 0.0
+
+        self.N_runoff = 0.0
+        self.P_runoff = 0.0
+
+        self.N_drainage = 0.0
+        self.P_drainage = 0.0
+
+        self.N_erosion = 0.0
+        self.P_erosion = 0.0
+
+        self.yield_actual = 0.0
+        self.N_yield = 0.0
+        self.P_yield = 0.0
+
+        for field in self.fields.values():
+            soil = field.soil
+            crop = field.crop.current_crop
+            field_management = field.field_management
+
+            self.profile_SW += soil.profile_SW
+            self.runoff += soil.runoff
+            self.drainage += soil.drainage
+            self.erosion += soil.sed
+            self.ET += soil.ET_act
+
+            self.manure_applied += field_management.manure_applied
+            self.manure_N_applied += field_management.manure_N_applied
+            self.manure_P_applied += field_management.manure_P_applied
+
+            self.profile_N += soil.profile_N
+            self.profile_P += soil.profile_P
+
+            self.N_runoff += soil.N_runoff
+            self.P_runoff += soil.P_runoff
+
+            self.N_drainage += soil.N_drainage
+            self.P_drainage += soil.P_drainage
+
+            self.N_erosion += soil.N_erosion
+            self.P_erosion += soil.P_erosion
+
+            self.yield_actual += crop.yield_actual
+            self.N_yield += crop.N_yield
+            self.P_yield += crop.P_yield
+
+    def summarize_annual_variables(self):
+        self.runoff_annual += self.runoff
+        self.drainage_annual += self.drainage
+        self.erosion_annual += self.erosion
+        self.ET_annual += self.ET
+
+        self.manure_applied_annual += self.manure_applied
+        self.manure_N_applied_annual += self.manure_N_applied
+        self.manure_P_applied_annual += self.manure_P_applied
+
+        self.N_runoff_annual += self.N_runoff
+        self.P_runoff_annual += self.P_runoff
+        self.N_drainage_annual += self.N_drainage
+        self.P_drainage_annual += self.P_drainage
+        self.N_erosion_annual += self.N_erosion
+        self.P_erosion_annual += self.P_erosion
+
+        self.yield_annual += self.yield_actual
+        self.yield_N_annual += self.N_yield
+        self.yield_P_annual += self.P_yield
+
+    def annual_reset(self):
+        for field in self.fields.values():
+            field.crop.annual_reset()
+            field.soil.annual_reset()
+            field.field_management.annual_reset()
+
+        self.runoff_annual = 0.0
+        self.drainage_annual = 0.0
+        self.erosion_annual = 0.0
+        self.ET_annual = 0.0
+
+        self.manure_applied_annual = 0.0
+        self.manure_N_applied_annual = 0.0
+        self.manure_P_applied_annual = 0.0
+
+        self.N_runoff_annual = 0.0
+        self.P_runoff_annual = 0.0
+        self.N_drainage_annual = 0.0
+        self.P_drainage_annual = 0.0
+        self.N_erosion_annual = 0.0
+        self.P_erosion_annual = 0.0
+
+        self.yield_annual = 0.0
+        self.yield_N_annual = 0.0
+        self.yield_P_annual = 0.0
 
 
 class Field:
@@ -33,10 +209,10 @@ class Field:
 
         input_dir = util.get_base_dir() / 'input'
 
-        self.soil_data = read_json_file(input_dir / 'soil' / field_data['soil'])
-        self.crop_data = read_json_file(input_dir / 'crop' / field_data['crop'])
-        self.field_management_data = read_json_file(input_dir / 'field_management' / field_data['field_management'])
+        soil_data = read_json_file(input_dir / 'soil' / field_data['soil'])
+        crop_data = read_json_file(input_dir / 'crop' / field_data['crop'])
+        field_management_data = read_json_file(input_dir / 'field_management' / field_data['field_management'])
 
-        self.soil = Soil(self.soil_data)
-        self.field_management = FieldManagement(self.field_management_data, time)
-        self.crop = Crop(self.crop_data, time)
+        self.soil = Soil(soil_data)
+        self.field_management = FieldManagement(field_management_data, time)
+        self.crop = Crop(crop_data, time)

@@ -45,8 +45,7 @@ def simulate(input_file_path: Path):
     # Transfer needed (initial) data from state to report handlers
     #
 
-    output.initialize_csv_dir(config.csv_dir)
-    output.initialize_graphic_dir(config.graphic_dir)
+    output.initialize_dir(config.csv_dir, config.graphic_dir)
     output.initialize_reports()
 
     t_start_sim = timer.time()
@@ -70,12 +69,7 @@ def daily_simulation():
     #
     routines.daily_animal_routine(state.animal_management, state.feed)
     routines.daily_manure_storage_routine(state.manure_storage, state.animal_management)
-
-    for field in state.fields:
-        routines.daily_soil_routine(field.soil, field.crop, field.field_management, weather, time)
-        routines.daily_crop_routine(field.soil, field.crop, field.field_management, weather, time)
-        routines.daily_field_management_routine(field.soil, state.manure_storage, field.field_management, weather, time)
-
+    routines.daily_fields_routine(state.fields, state.manure_storage, weather, time)
     routines.daily_feed_routine(state.feed, state.fields, state.animal_management)
 
     #
@@ -97,12 +91,9 @@ def annual_simulation():
     Resets the state for the following year
     """
 
-    #
-    # Pre-annual Routines
-    #
-    for field in state.fields:
-        routines.annual_crop_routine(field.crop, time)
-        routines.annual_feed_routine(state.feed)
+    # Pre-annual routines
+    routines.annual_fields_routine(state.fields, time)
+    routines.annual_feed_routine(state.feed)
 
     while not time.end_year():
         daily_simulation()

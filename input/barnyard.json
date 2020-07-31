@@ -10,7 +10,7 @@
 
     "weather": "barnyard_weather.csv",
 
-    "output": "standard_output.json",
+    "output": "all_reports.json",
 
     "farm":
     {

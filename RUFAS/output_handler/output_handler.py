@@ -41,18 +41,14 @@ class OutputHandler:
 
         # Instantiate Report Handler Objects here
         self.reports = {
-                        'feed_storage_report': FeedStorageReport(data['feed_storage_report']),
-                        'manure_storage_report': ManureStorageReport(data['manure_storage_report']),
-                        'custom_report': CustomReport(data['custom_report'])
+                        'feed_storage_report': FeedStorageReport(data['feed_storage_report'], state),
+                        'manure_storage_report': ManureStorageReport(data['manure_storage_report'], state),
+                        'custom_report': CustomReport(data['custom_report']),
+                        'fields_report': FieldsReport(data['fields_report'], state),
+                        'pens_report': PensReport(data['pens_report'], state)
                         }
 
-        for field in state.fields:
-            self.reports[field.field_name] = FieldReport(data['field_report'], field.field_name)
-
-        for pen in state.animal_management.all_pens:
-            self.reports['pen_' + str(pen.id)] = PenReport(data['pen_report'], state.feed, pen.id)
-
-    def initialize_csv_dir(self, csv_dir):
+    def initialize_dir(self, csv_dir, graphic_dir):
         """
         If a directory of the same name exists, it and its contents are deleted,
         then a directory for each output report is created.
@@ -61,65 +57,25 @@ class OutputHandler:
 
         Args:
             csv_dir (Path): The path to the directory that will store all
-                output report files.
+                output report csv files.
+            graphic_dir (Path): The path to the directory that will store
+                all the output report graphics
         """
-
-        field_folder = 'fields/'
-        pen_folder = 'pens/'
-
         # Initialize path for reports
         base_csv_dir = util.get_base_dir() / csv_dir
-        fields_dir = base_csv_dir / field_folder
-        pen_dir = base_csv_dir / pen_folder
+        base_graphic_dir = util.get_base_dir() / graphic_dir
 
         # Delete directory if previously exists
         if base_csv_dir.exists():
             shutil.rmtree(base_csv_dir)
-
-        base_csv_dir.mkdir(exist_ok=True, parents=False)
-        fields_dir.mkdir(exist_ok=True, parents=False)
-        pen_dir.mkdir(exist_ok=True, parents=False)
-
-        for report_name in self.reports:
-            report = self.reports[report_name]
-            if report.produce_csv:
-                csv_dir = base_csv_dir
-                if report.report_name.startswith('field'):
-                    csv_dir = fields_dir
-                if report.report_name.startswith('pen'):
-                    csv_dir = pen_dir
-                report.csv_dir = csv_dir / report_name
-                report.csv_dir.mkdir(exist_ok=True, parents=False)
-                report.initialize_csv_dir()
-
-    def initialize_graphic_dir(self, graphic_dir):
-        field_folder = 'fields/'
-        pen_folder = 'pens/'
-
-        # Initialize path for reports
-        base_graphic_dir = util.get_base_dir() / graphic_dir
-        fields_dir = base_graphic_dir / field_folder
-        pen_dir = base_graphic_dir / pen_folder
-
-        # Delete directory if previously exists
         if base_graphic_dir.exists():
             shutil.rmtree(base_graphic_dir)
 
+        base_csv_dir.mkdir(exist_ok=True, parents=False)
         base_graphic_dir.mkdir(exist_ok=True, parents=False)
-        fields_dir.mkdir(exist_ok=True, parents=False)
-        pen_dir.mkdir(exist_ok=True, parents=False)
 
-        for report_name in self.reports:
-            report = self.reports[report_name]
-            if report.produce_graphics:
-                graphic_dir = base_graphic_dir
-                if report.report_name.startswith('field'):
-                    graphic_dir = fields_dir
-                if report.report_name.startswith('pen'):
-                    graphic_dir = pen_dir
-                report.graphic_dir = graphic_dir / report_name
-                report.graphic_dir.mkdir(exist_ok=True, parents=False)
-                report.initialize_graphic_dir()
+        for report in self.reports.values():
+            report.initialize_dir(base_csv_dir, base_graphic_dir)
 
     def initialize_reports(self):
         """Transfer needed (initial) data from state to report handlers."""
@@ -127,7 +83,7 @@ class OutputHandler:
         for report_name in self.reports:
             report = self.reports[report_name]
             if not report.produce_csv and report.produce_graphics:
-                print("Warning: Cannot produce graphics_1 for inactive report:", report.report_name,
+                print("Warning: Cannot produce graphics for inactive report:", report.report_name,
                       ". Setting produce_graphics to False")
                 report.produce_graphics = False
             if report.produce_csv:
