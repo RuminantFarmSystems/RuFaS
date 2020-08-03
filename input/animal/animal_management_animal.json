@@ -12,7 +12,7 @@
 		"management_decisions": {
 			"breeding_start_day_h": 360,
 			"heifer_repro_cull_time": 650,
-			"dry_period": 60,
+			"dip_dry": 218,
 			"lactation_curve": "wood",
 			"voluntary_waiting_period": 45,
 			"tai_program_start_day": 72,
@@ -22,7 +22,7 @@
 			"semen_type": "conventional",
 			"cow_times_milked_per_day": 1
 		},
-		"user_interactions": {
+		"farm_level": {
 			"calf": {
 				"male_calf_rate_sexed_semen": 0.1,
 				"male_calf_rate_conventional_semen": 0.53,
@@ -52,7 +52,7 @@
 				"mature_body_weight_left": 550,
 				"mature_body_weight_mode": 700,
 				"mature_body_weight_right": 1000,
-				"target_heifer_preg_day": 400
+				"target_heifer_preg_day": 420
 			},
 			"econ": {
 				"econ_indicator_range": 365,
@@ -61,7 +61,7 @@
 				"calf_price": 140
 			}
 		},
-		"default": {
+		"from_literature": {
 			"repro": {
 				"avg_estrus_cycle_heifer": 21,
 				"std_estrus_cycle_heifer": 3,
