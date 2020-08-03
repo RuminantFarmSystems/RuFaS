@@ -20,6 +20,7 @@ from RUFAS.routines.animal.life_cycle.life_cycle import LifeCycleManager
 from RUFAS.routines.animal.life_cycle.animal_base import AnimalBase
 from collections import deque
 import random
+import matplotlib.pyplot as plt
 
 
 def daily_animal_routine(animal_management, feed):
@@ -50,6 +51,8 @@ class AnimalManagement:
     heiferIIs = []
     heiferIIIs = []
     cows = []
+    heifers_sold = []
+    cows_culled = []
 
     # list of all the pens on the farm
     all_pens = []
@@ -99,6 +102,19 @@ class AnimalManagement:
     heiferIII_p_comp = 0
     cow_p_comp = 0
 
+    def get_animal_config(self, data):
+        config = {}
+        config.update(data['management_decisions'])
+        config.update(data['user_interactions']['calf'])
+        config.update(data['user_interactions']['repro'])
+        config.update(data['user_interactions']['bodyweight'])
+        config.update(data['user_interactions']['econ'])
+        config.update(data['default']['repro'])
+        config.update(data['default']['milking'])
+        config.update(data['default']['culling'])
+        config.update(data['default']['life_cycle'])
+        return config
+
     def __init__(self, data, config, feed):
         """
         Initializes the pens and animals in the simulation with data from the
@@ -112,8 +128,9 @@ class AnimalManagement:
         """
 
         self.sim_length = config.sim_length
-        self.life_cycle_manager = LifeCycleManager(data['animal_config'])
-        AnimalBase.set_config(data['animal_config'])
+        config = self.get_animal_config(data['animal_config'])
+        self.life_cycle_manager = LifeCycleManager(config)
+        AnimalBase.set_config(config)
         AnimalBase.set_nutrient_list(feed.nutrient_rqmts)
         self.init_pens(data['pen_information'], data['herd_information'])
         self.init_animals(data['herd_information'], self.all_pens, feed)
@@ -477,6 +494,35 @@ class AnimalManagement:
             if pen.pen_populated:
                 pen.calc_avg_growth()
 
+    def record_pen_history(self):
+        """
+        Records the pen history of all of the animals.
+        """
+        for calf in self.calves:
+            curr_pen = self.id_pen[calf.id]
+            classes_in_pen = self.all_pens[curr_pen].classes_in_pen
+            calf.update_pen_history(curr_pen, self.simulation_day, classes_in_pen)
+
+        for heiferI in self.heiferIs:
+            curr_pen = self.id_pen[heiferI.id]
+            classes_in_pen = self.all_pens[curr_pen].classes_in_pen
+            heiferI.update_pen_history(curr_pen, self.simulation_day, classes_in_pen)
+
+        for heiferII in self.heiferIIs:
+            curr_pen = self.id_pen[heiferII.id]
+            classes_in_pen = self.all_pens[curr_pen].classes_in_pen
+            heiferII.update_pen_history(curr_pen, self.simulation_day, classes_in_pen)
+
+        for heiferIII in self.heiferIIIs:
+            curr_pen = self.id_pen[heiferIII.id]
+            classes_in_pen = self.all_pens[curr_pen].classes_in_pen
+            heiferIII.update_pen_history(curr_pen, self.simulation_day, classes_in_pen)
+
+        for cow in self.cows:
+            curr_pen = self.id_pen[cow.id]
+            classes_in_pen = self.all_pens[curr_pen].classes_in_pen
+            cow.update_pen_history(curr_pen, self.simulation_day, classes_in_pen)
+
     @staticmethod
     def p_comp(animals):
         """
@@ -547,8 +593,8 @@ class AnimalManagement:
             for pen in self.all_pens:
                 pen.pen_populated = len(pen.animals_in_pen) > 0
 
-            ids_added, ids_removed, calves_born, self.calves, self.heiferIs, \
-            self.heiferIIs, self.heiferIIIs, self.cows = \
+            animals_added, ids_removed, calves_born, self.calves, self.heiferIs, \
+                self.heiferIIs, self.heiferIIIs, self.cows = \
                 self.life_cycle_manager.daily_update(self.simulation_day,
                                                      self.sim_length,
                                                      self.calves,
@@ -556,7 +602,7 @@ class AnimalManagement:
                                                      self.heiferIIs,
                                                      self.heiferIIIs, self.cows)
 
-            self.daily_update_id_pen(ids_added, ids_removed, calves_born)
+            self.daily_update_id_pen(animals_added, ids_removed, calves_born)
 
             # phosphorus requirements for daily updates
             self.calc_p_rqmts(feed)  # per animal
@@ -574,6 +620,8 @@ class AnimalManagement:
             self.daily_p_update()  # per animal
             self.calc_all_p_comp()  # per animal
 
+            self.record_pen_history()
+
     def end_ration_interval(self):
         """
         Returns: True if today is the day a new ration has to be formulated,
@@ -585,3 +633,164 @@ class AnimalManagement:
 
     def annual_reset(self):
         pass
+
+    def generate_animal_output(self, animal_type, index):
+        """
+        Returns the information (ID, breed, birthday, breeding method,
+        semen used, pen history, bodyweight history, milk production history,
+        event history) of the animal at the index of the respective
+        animal_type list.
+
+        Args:
+            animal_type: a string. One of 'calf', 'heiferI', 'heiferII',
+                'heiferIII', 'cow', 'sold_heifer', or 'culled cow'
+            index: the index of the animal in the respective animal_type list
+                whose information will be returned
+
+        Returns: a dictionary with an animal of animal_type's information. Not
+            all information is available for each animal_type.
+        """
+        is_cow = False
+        is_heifer_repr = False  # True if animal is heiferII or heiferIII
+
+        if animal_type == 'calf':
+            animal = self.calves[index]
+        elif animal_type == 'heiferI':
+            animal = self.heiferIs[index]
+        elif animal_type == 'heiferII':
+            animal = self.heiferIIs[index]
+            is_heifer_repr = True
+        elif animal_type == 'heiferIII':
+            animal = self.heiferIIIs[index]
+            is_heifer_repr = True
+        elif animal_type == 'cow':
+            animal = self.cows[index]
+            is_cow = True
+        elif animal_type == 'sold_heifer':
+            animal = self.life_cycle_manager.sold_heifers[index]
+            is_heifer_repr = True
+        else:  # animal_type == 'culled_cow':
+            animal = self.life_cycle_manager.culled_cows[index]
+            is_cow = True
+
+        CI_avg = None
+        if is_cow:
+            if len(animal.CI_history) == 0:
+                CI_avg = 0
+            else:
+                CI_avg = sum(animal.CI_history) / len(animal.CI_history)
+
+        return animal, is_cow, {
+            'ID': animal.id,
+            'breed': animal.breed,
+            'birthday': animal.birth_date,
+            'repro_program': None if not is_cow else animal.repro_program,
+            'tai_method_h': None if not is_heifer_repr else animal.tai_method_h,
+            'synch_ed_method_h':
+                None if not is_heifer_repr else animal.synch_ed_method_h,
+            'presynch_method': None if not is_cow else animal.presynch_method,
+            'tai_method_c': None if not is_cow else animal.tai_method_c,
+            'resynch_method': None if not is_cow else animal.resynch_method,
+            'semen_used': animal.semen_used,
+            'pen_history':
+                [pen_hist.__dict__ for pen_hist in animal.pen_history],
+            'event_history': animal.events.events,
+            'CI_avg': CI_avg
+        }
+
+    def get_life_cycle_output(self, num_animals):
+        """
+        Returns the life cycle output on an individual level, which is the
+        information of some of each type of animal as well as some animal
+        statistics.
+
+        Args:
+            num_animals: the number of each type of animal (calves, heiferIs,
+            heiferIIs, heiferIIIs, cows, sold_heifers, and culled_cows) for
+            which information will be collected and returned. If num_animals is
+            larger than the minimum length of the animal lists, then num_animals
+            will be set to the minimum length of the animal lists
+
+        Returns: a dictionary which contains the individual life cycle output
+        """
+        minimum_num = min(len(self.calves), len(self.heiferIs),
+                          len(self.heiferIIs), len(self.heiferIIIs),
+                          len(self.cows),
+                          len(self.life_cycle_manager.sold_heifers),
+                          len(self.life_cycle_manager.culled_cows))
+        if num_animals > minimum_num:
+            print('The smallest animal list is of size ' + str(minimum_num) +
+                  ' so ' + str(num_animals) + ' of each animal class cannot ' +
+                  'be in the life cycle output. Only ' + str(minimum_num) +
+                  ' of each animal type will be in the life cycle output.')
+            num_animals = minimum_num
+
+        output = {
+            'calves': {},
+            'heiferIs': {},
+            'heiferIIs': {},
+            'heiferIIIs': {},
+            'cows': {},
+            'sold_heifers': {},
+            'culled_cows': {},
+            'num_calves_sold': 0,
+            'num_sold_heifers': 0,
+            'num_cows_culled': 0
+        }
+        animals = []
+        indices = random.sample(range(len(self.calves)), num_animals)
+        for i in indices:
+            animal, is_cow, output['calves'][i] = \
+                self.generate_animal_output('calf', i)
+            animals.append((animal, 'calf', is_cow))
+
+        indices = random.sample(range(len(self.heiferIs)), num_animals)
+        for i in indices:
+            animal, is_cow, output['heiferIs'][i] = \
+                self.generate_animal_output('heiferI', i)
+            animals.append((animal, 'heiferI', is_cow))
+
+        indices = random.sample(range(len(self.heiferIIs)), num_animals)
+        for i in indices:
+            animal, is_cow, output['heiferIIs'][i] = \
+                self.generate_animal_output('heiferII', i)
+            animals.append((animal, 'heiferII', is_cow))
+
+        indices = random.sample(range(len(self.heiferIIIs)), num_animals)
+        for i in indices:
+            animal, is_cow, output['heiferIIIs'][i] = \
+                self.generate_animal_output('heiferIII', i)
+            animals.append((animal, 'heiferIII', is_cow))
+
+        indices = random.sample(range(len(self.cows)), num_animals)
+        for i in indices:
+            animal, is_cow, output['cows'][i] = \
+                self.generate_animal_output('cow', i)
+            animals.append((animal, 'cow', is_cow))
+
+        indices = random.sample(
+            range(len(self.life_cycle_manager.sold_heifers)), num_animals)
+        for i in indices:
+            animal, is_cow, output['sold_heifers'][i] = \
+                self.generate_animal_output('sold_heifer', i)
+            animals.append((animal, 'sold_heifer', is_cow))
+
+        indices = random.sample(
+            range(len(self.life_cycle_manager.culled_cows)), num_animals)
+        for i in indices:
+            animal, is_cow, output['culled_cows'][i] = \
+                self.generate_animal_output('culled_cow', i)
+            animals.append((animal, 'culled_cow', is_cow))
+
+        output['num_calves_sold'] = len(self.life_cycle_manager.sold_calves)
+        output['num_sold_heifers'] = len(self.life_cycle_manager.sold_heifers)
+        output['num_cows_culled'] = len(self.life_cycle_manager.culled_cows)
+
+        return animals, output
+
+    def get_initialize_db_summary(self):
+        """
+        Returns: a dictionary which is the summary of the animal intialization
+        database
+        """
+        return self.life_cycle_manager.initialize_db_summary
