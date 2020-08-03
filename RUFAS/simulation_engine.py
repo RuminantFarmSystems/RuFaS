@@ -60,6 +60,7 @@ def simulate(input_file_path: Path):
     while not time.end_simulation():
         annual_simulation()
 
+    output.finalize(state, weather, time)
     output.produce_graphics()
     t_end_sim = timer.time()
 
