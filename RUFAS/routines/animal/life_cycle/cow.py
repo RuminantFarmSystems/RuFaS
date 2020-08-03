@@ -427,7 +427,7 @@ class Cow(HeiferIII):
 			self.conceptus_weight = 0
 		elif self.days_in_preg > 50:
 			conceptus_total_weight = (0.0148 * self.gestation_length - 2.408) * CBW
-			conceptus_param = conceptus_total_weight ** (1 / 3) / (self.days_in_preg - 50)
+			conceptus_param = conceptus_total_weight ** (1 / 3) / (self.gestation_length - 50)
 			conceptus_growth = 3 * conceptus_param ** 3 * (self.days_in_preg - 50) ** 2
 			self.conceptus_weight += conceptus_growth
 		else:
