@@ -105,14 +105,14 @@ class AnimalManagement:
     def get_animal_config(self, data):
         config = {}
         config.update(data['management_decisions'])
-        config.update(data['user_interactions']['calf'])
-        config.update(data['user_interactions']['repro'])
-        config.update(data['user_interactions']['bodyweight'])
-        config.update(data['user_interactions']['econ'])
-        config.update(data['default']['repro'])
-        config.update(data['default']['milking'])
-        config.update(data['default']['culling'])
-        config.update(data['default']['life_cycle'])
+        config.update(data['farm_level']['calf'])
+        config.update(data['farm_level']['repro'])
+        config.update(data['farm_level']['bodyweight'])
+        config.update(data['farm_level']['econ'])
+        config.update(data['from_literature']['repro'])
+        config.update(data['from_literature']['milking'])
+        config.update(data['from_literature']['culling'])
+        config.update(data['from_literature']['life_cycle'])
         return config
 
     def __init__(self, data, config, feed):

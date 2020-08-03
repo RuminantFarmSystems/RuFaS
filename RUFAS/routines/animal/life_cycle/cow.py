@@ -190,7 +190,7 @@ class Cow(HeiferIII):
 				milk production and fat percent, for temporary use
 		"""
 		if self.days_in_preg == self.gestation_length - \
-			AnimalBase.config['dry_period']:
+			AnimalBase.config['dip_dry']:
 			self.milking = False
 			self.events.add_event(self.days_born, sim_day, c.DRY)
 			self.days_in_milk = 0
