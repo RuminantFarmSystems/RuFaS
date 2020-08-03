@@ -421,15 +421,15 @@ class Cow(HeiferIII):
 
 		"""
 		CBW = AnimalBase.config['birth_weight_avg_ho']
-		if self.days_in_preg > 190:
-			conceptus_growth = 0.665 * CBW / 45
-			self.conceptus_weight += conceptus_growth
-		elif self.days_in_preg == 190:
-			conceptus_growth = 18 * CBW / 45
-			self.conceptus_weight += conceptus_growth
-		elif self.days_in_preg == self.gestation_length:
+
+		if self.days_in_preg == self.gestation_length:
 			conceptus_growth = - self.conceptus_weight
 			self.conceptus_weight = 0
+		elif self.days_in_preg > 50:
+			conceptus_total_weight = (0.0148 * self.gestation_length - 2.408) * CBW
+			conceptus_param = conceptus_total_weight ** (1 / 3) / (self.days_in_preg - 50)
+			conceptus_growth = 3 * conceptus_param ** 3 * (self.days_in_preg - 50) ** 2
+			self.conceptus_weight += conceptus_growth
 		else:
 			conceptus_growth = 0
 
