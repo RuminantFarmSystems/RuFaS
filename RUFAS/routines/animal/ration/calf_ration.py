@@ -6,10 +6,6 @@ import sqlite3
 def optimize(feed, rqmts):
     return get_ration()
 
-
-def calculate_rqmts():
-    return get_nutrient_rqmts()
-
 def calc_requirements(calf, temp, wean_day, wean_length, milk_type):
     '''
     Calculate dietary intake and nutrient requirements for the calf. 

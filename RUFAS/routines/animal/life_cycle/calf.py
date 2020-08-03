@@ -14,7 +14,7 @@ Description: This file updates the calf form birth to wean.
 import numpy as np
 from random import random
 from RUFAS.routines.animal.life_cycle.animal_base import AnimalBase
-from RUFAS.routines.animal.ration.calf_ration import calculate_rqmts, calc_requirements
+from RUFAS.routines.animal.ration.calf_ration import calc_requirements
 from RUFAS.routines.animal.manure.calf_manure_excretion import\
 	manure_calculations
 
