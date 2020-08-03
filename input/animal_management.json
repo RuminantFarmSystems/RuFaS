@@ -11,7 +11,7 @@
 
     "weather": "barnyard_weather.csv",
 
-    "output": "all_reports.json",
+    "output": "standard_output.json",
 
     "farm":
     {
@@ -30,7 +30,7 @@
                 "field_management": "barnyard_field_management.json"
             }
         },
-        "animal": "barnyard_animal.json",
+        "animal": "animal_management_animal.json",
         "feed": "panke_buisse_feed.json"
     }
 }
