@@ -1163,12 +1163,12 @@ class Cow(HeiferIII):
 			AnimalBase.config['cull_milk_production']:
 			self.culled = True
 			self.events.add_event(self.days_born, sim_day, c.LOW_PROD_CULL)
-			self.cull_reason = "Low production"
+			self.cull_reason = c.LOW_PROD_CULL
 			return True
 		if self.days_born == self.future_cull_date:
 			self.culled = True
 			self.events.add_event(
-				self.days_born, sim_day, c.CULL_REASON_BASE + self.cull_reason)
+				self.days_born, sim_day, self.cull_reason)
 			return True
 		return False
 
@@ -1191,22 +1191,22 @@ class Cow(HeiferIII):
 			# cull_reason_cull_prob = []
 			if cull_reason_rand <= 0.1633:
 				cull_reason_cull_prob = AnimalBase.config['feet_leg_cull_prob']
-				self.cull_reason = "Lameness"
+				self.cull_reason = c.LAMENESS_CULL
 			elif cull_reason_rand <= 0.4516:
 				cull_reason_cull_prob = AnimalBase.config['injury_cull_prob']
-				self.cull_reason = "Injury"
+				self.cull_reason = c.INJURY_CULL
 			elif cull_reason_rand <= 0.6955:
 				cull_reason_cull_prob = AnimalBase.config['mastitis_cull_prob']
-				self.cull_reason = "Mastitis"
+				self.cull_reason = c.MASTITIS_CULL
 			elif cull_reason_rand <= 0.8346:
 				cull_reason_cull_prob = AnimalBase.config['disease_cull_prob']
-				self.cull_reason = "Disease"
+				self.cull_reason = c.DISEASE_CULL
 			elif cull_reason_rand <= 0.8991:
 				cull_reason_cull_prob = AnimalBase.config['udder_cull_prob']
-				self.cull_reason = "Udder"
+				self.cull_reason = c.UDDER_CULL
 			else:
 				cull_reason_cull_prob = AnimalBase.config['unkown_cull_prob']
-				self.cull_reason = "Unknown"
+				self.cull_reason = c.UNKNOWN_CULL
 
 			cull_reason_upper_limit = cull_reason_lower_limit = cull_time_upper_limit = cull_time_lower_limit = 0
 			for i in range(len(cull_reason_cull_prob) - 1):

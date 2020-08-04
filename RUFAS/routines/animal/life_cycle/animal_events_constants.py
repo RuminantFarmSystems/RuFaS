@@ -69,5 +69,11 @@ DRY = "dry"
 CULL_REASON_BASE = "culled for "
 HEIFER_REPRO_CULL = "culled for heifer reproductive problem"
 LOW_PROD_CULL = "culled for low production"
+LAMENESS_CULL = "culled for lameness"
+INJURY_CULL = "culled for injury"
+MASTITIS_CULL = "culled for mastitis"
+DISEASE_CULL = "culled for disease"
+UDDER_CULL = "culled for udder"
+UNKNOWN_CULL = "culled for unknown"
 
 

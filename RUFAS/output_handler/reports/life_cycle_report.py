@@ -112,9 +112,9 @@ class LifeCycleReport(BaseReportDriver):
                     ['life_cycle_manager.avg_age_for_calving[\'' + parity + '\']', 'd', []]
 
             for cull_reason in LifeCycleManager.cull_reason_stats:
-                self.herd_structure['cow_num_culled_for_reason_\'' + cull_reason + '\''] = \
+                self.herd_structure[cull_reason + '_num'] = \
                     ['life_cycle_manager.cull_reason_stats[\'' + cull_reason + '\']', '', []]
-                self.herd_structure['cow_percent_culled_for_reason_\'' + cull_reason + '\''] = \
+                self.herd_structure[cull_reason + '_percent'] = \
                     ['life_cycle_manager.cull_reason_stats_percent[\'' + cull_reason + '\']', '', []]
                         
             self.reproduction_performance = {
