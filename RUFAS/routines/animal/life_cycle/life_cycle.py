@@ -134,22 +134,22 @@ class LifeCycleManager:
     total_heifer_value = 0
     total_milk_income = 0
     cull_reason_stats = {
-        'Low production': 0,
-        'Lameness': 0,
-        'Injury': 0,
-        'Mastitis': 0,
-        'Disease': 0,
-        'Udder': 0,
-        'Unknown': 0
+        c.LOW_PROD_CULL: 0,
+        c.LAMENESS_CULL: 0,
+        c.INJURY_CULL: 0,
+        c.MASTITIS_CULL: 0,
+        c.DISEASE_CULL: 0,
+        c.UDDER_CULL: 0,
+        c.UNKNOWN_CULL: 0
     }
     cull_reason_stats_percent = {
-        'Low production': 0,
-        'Lameness': 0,
-        'Injury': 0,
-        'Mastitis': 0,
-        'Disease': 0,
-        'Udder': 0,
-        'Unknown': 0
+        c.LOW_PROD_CULL: 0,
+        c.LAMENESS_CULL: 0,
+        c.INJURY_CULL: 0,
+        c.MASTITIS_CULL: 0,
+        c.DISEASE_CULL: 0,
+        c.UDDER_CULL: 0,
+        c.UNKNOWN_CULL: 0
     }
     cull_reason_stats_range = {}
     parity_culling_stats_range = {}
