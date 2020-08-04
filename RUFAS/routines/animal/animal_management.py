@@ -23,7 +23,7 @@ import random
 import matplotlib.pyplot as plt
 
 
-def daily_animal_routine(animal_management, feed):
+def daily_animal_routine(animal_management, feed, weather, time):
     """
     Executes daily routines relating to Animals. This method is called every day
     in the simulation and calls @animal_management's daily_updates() method
@@ -35,7 +35,7 @@ def daily_animal_routine(animal_management, feed):
         feed: instance of the Feed class
     """
 
-    animal_management.daily_updates(feed)
+    animal_management.daily_updates(feed, weather, time)
 
 
 class AnimalManagement:
@@ -115,7 +115,7 @@ class AnimalManagement:
         config.update(data['from_literature']['life_cycle'])
         return config
 
-    def __init__(self, data, config, feed):
+    def __init__(self, data, config, feed, weather, time):
         """
         Initializes the pens and animals in the simulation with data from the
         JSON file by calling init_pens() and init_animals(). Creates instance
@@ -133,7 +133,7 @@ class AnimalManagement:
         AnimalBase.set_config(config)
         AnimalBase.set_nutrient_list(feed.nutrient_rqmts)
         self.init_pens(data['pen_information'], data['herd_information'])
-        self.init_animals(data['herd_information'], self.all_pens, feed)
+        self.init_animals(data['herd_information'], self.all_pens, feed, weather, time)
         self.housing = data['housing']
         self.pasture_concentrate = data['pasture_concentrate']
         self.ration_user_input = data['ration']['user_input']
@@ -184,7 +184,7 @@ class AnimalManagement:
             pen_3 = Pen(2, 0.1, 1.6, 300, 'open air barn', 'straw', 'tiestall')
             self.all_pens.append(pen_3)
 
-    def init_animals(self, herd_data, pen_data, feed):
+    def init_animals(self, herd_data, pen_data, feed, weather, time):
         """
         Populates the list of animals with the information from the
         input JSON file: constructs the calves, heiferI’s, heiferII’s,
@@ -240,10 +240,10 @@ class AnimalManagement:
                                                           replace_num)
 
         if len(pen_data) > 0:
-            self.init_nutrient_rqmts(feed)
+            self.init_nutrient_rqmts(feed, weather, time)
             self.pen_allocation()
 
-    def init_nutrient_rqmts(self, feed):
+    def init_nutrient_rqmts(self, feed, weather, time):
         """
         Calculates initial nutrient requirements at the beginning of the
         simulation for initial pen allocation. For the nutrient requirements
@@ -259,7 +259,8 @@ class AnimalManagement:
         avg_VD_parlor, avg_HD_parlor = self.avg_pen_dist()
 
         for calf in self.calves:
-            calf.calc_nutrient_rqmts()
+            temp = weather.T_avg[time.year - 1][time.day - 1]
+            calf.calc_nutrient_rqmts(temp)
             calf.p_animal = 0.0072 * calf.body_weight * 1000
 
         for heiferI in self.heiferIs:
@@ -299,7 +300,7 @@ class AnimalManagement:
 
         return VD_sum / len(self.all_pens), HD_sum / len(self.all_pens)
 
-    def calc_nutrient_rqmts(self, feed):
+    def calc_nutrient_rqmts(self, feed, temp):
         """
         Calls each animal's method to calculate its nutrient requirements.
 
@@ -308,7 +309,7 @@ class AnimalManagement:
         """
         for pen in self.all_pens:
             pen.call_animal_nutrient_rqmts(self.housing,
-                                           self.pasture_concentrate, feed)
+                                           self.pasture_concentrate, feed, temp)
 
     def fully_update_id_pen(self):
         """
@@ -432,7 +433,7 @@ class AnimalManagement:
                 # assigning lactating cows to pens based on the grouping output
                 for key in pen_grouping:
                     self.all_pens[key].update_animals(pen_grouping[key])
-
+        
         self.fully_update_id_pen()
 
     def clear_pens(self):
@@ -455,7 +456,7 @@ class AnimalManagement:
             if pen.pen_populated:
                 pen.calc_avg_nutrient_rqmts()
 
-    def calc_ration(self, feed):
+    def calc_ration(self, feed, temp):
         """
         Calls each pens's method to calculate the ration for that pen. This is
         part of the routines that happen every ration interval.
@@ -467,7 +468,7 @@ class AnimalManagement:
         for i, pen in enumerate(self.all_pens):
             if pen.pen_populated:
                 self.all_pens[i].ration = self.all_pens[i].calc_ration(
-                    self.housing, self.pasture_concentrate, feed)
+                    self.housing, self.pasture_concentrate, feed, temp)
 
     def calc_manure_excretion(self, feed):
         """
@@ -577,7 +578,7 @@ class AnimalManagement:
             if pen.pen_populated:
                 pen.daily_p_update()
 
-    def daily_updates(self, feed):
+    def daily_updates(self, feed, weather, time):
         """
         Executes the daily routines relating to Animals. All animals are
         updated through the life_cycle_manager's daily_update() method. The
@@ -608,11 +609,12 @@ class AnimalManagement:
             self.calc_p_rqmts(feed)  # per animal
 
             if self.end_ration_interval():
-                self.calc_nutrient_rqmts(feed)  # per animal
+                temp = weather.T_avg[time.year - 1][time.day - 1]
+                self.calc_nutrient_rqmts(feed, temp)  # per animal
                 self.clear_pens()
                 self.pen_allocation()
                 self.calc_avg_nutrient_rqmts()  # per pen
-                self.calc_ration(feed)  # per pen
+                self.calc_ration(feed, temp)  # per pen
                 self.calc_manure_excretion(feed)  # per animal
                 self.calc_avg_growth()  # per pen
 

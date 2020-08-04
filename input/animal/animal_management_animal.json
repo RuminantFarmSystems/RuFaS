@@ -31,7 +31,9 @@
 				"birth_weight_avg_je": 35.2,
 				"birth_weight_std_je": 0.9,
 				"keep_female_calf_rate": 1,
-				"wean_day": 60
+				"wean_day": 60,
+				"wean_length": 7,
+				"milk_type": "whole"
 			},
 			"repro": {
 				"estrus_detection_rate": 0.4,
