@@ -74,7 +74,7 @@ def daily_simulation():
     #
     # Daily routines
     #
-    routines.daily_animal_routine(state.animal_management, state.feed)
+    routines.daily_animal_routine(state.animal_management, state.feed, weather, time)
 
     for field in state.fields:
         routines.daily_soil_routine(field.soil, field.crop, field.field_management, weather, time)
@@ -150,7 +150,7 @@ def initialize_simulation(file_path: Path, data):
 
         weather = Weather(data['weather'], config)
         time = Time(config)
-        state = State(data['farm'], config, time)
+        state = State(data['farm'], config, weather, time)
         output = OutputHandler(classes.read_json_file(get_base_dir() / 'input/output' / data['output']), state)
 
     except errors.JSONfileData as e:
