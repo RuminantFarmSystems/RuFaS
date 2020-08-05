@@ -3,6 +3,7 @@ import sqlite3
 import ntpath
 import pandas as pd
 from RUFAS import errors
+import atexit
 
 
 def main():
@@ -40,7 +41,7 @@ def main():
     add_observations(conn)
 
     # 9 Cleaning up unnecessary tables and views:
-    cleanup(conn)
+    atexit.register(cleanup, conn)
 
 
 def weather_input():
@@ -54,19 +55,21 @@ def weather_input():
         A string of the weather csv file path.
     """
     user_input = None
-    while user_input is None or not Path(user_input).is_file()  :
+    while user_input is None or not Path(user_input).is_file():
         user_input = input("\nEnter Weather csv File: ")
         input_path = Path(user_input.strip())
 
         if input_path.suffix == '.csv':
             if not input_path.is_file():
-                print("Specified file does not exist. Enter a valid csv file: ")
+                print("Specified file does not exist. Enter a valid csv file")
+                user_input = None
                 continue
             else:
                 print("Weather csv file Detected...\n")
             return str(input_path)
         else:
-            print("Invalid Input. Enter a valid csv file: ")
+            print("Invalid Input. Enter a valid csv file")
+            user_input = None
             continue
 
 
@@ -87,13 +90,16 @@ def database_input():
 
         if input_path.suffix == '.db':
             if not input_path.is_file():
-                print("Specified file does not exist. Enter a valid .db file: ")
+                print("Specified file does not exist. Enter a valid .db file")
+                user_input = None
                 continue
             else:
                 print("Weather Database file Detected...\n")
             return str(input_path)
         else:
-            raise errors.UserInput("Invalid Input. Enter a valid .db file")
+            print("Invalid Input. Enter a valid .db file")
+            user_input = None
+            continue
 
 
 def id_input(database):
@@ -119,12 +125,20 @@ def id_input(database):
         used_ID[i] = j[0]
 
     user_input = None
-    while user_input in used_ID or user_input is None:
+    while user_input in used_ID or user_input is None or user_input <= 0:
         user_input = input("\nThe following IDs are already in use: " + ", ".join(str(f) for f in used_ID) +
                            "\nPlease enter a unique positive integer ID: ")
-        user_input = int(user_input)
+        try:
+            user_input = int(user_input)
+        except ValueError:
+            print("Invalid input. ID must be a positive integer")
+            user_input = None
+            continue
+
         if user_input in used_ID:
             print("The ID you have entered is already in use. Please try again.")
+        elif user_input <= 0:
+            print("Invalid input. ID must be a positive integer")
         else:
             print("The ID has been recorded. Go ahead and add it to your csv file if you haven't already "
                   "before moving on to the next input.")
