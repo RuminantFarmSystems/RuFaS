@@ -68,6 +68,7 @@ class ManureStorageSummary(BaseReport):
 class BaseHandlingReport(BaseReport):
     def __init__(self, data, handler):
         super().__init__(data)
+        self.report_name = 'handler_' + str(handler)
         self.handler_name = handler
 
     def daily_update(self, state, weather, time):
@@ -86,6 +87,7 @@ class BaseHandlingReport(BaseReport):
 class BaseSeparatorReport(BaseReport):
     def __init__(self, data, separator):
         super().__init__(data)
+        self.report_name = 'separator_' + separator
         self.separator_name = separator
 
     def daily_update(self, state, weather, time):
@@ -104,6 +106,7 @@ class BaseSeparatorReport(BaseReport):
 class BaseStorageReport(BaseReport):
     def __init__(self, data, storage):
         super().__init__(data)
+        self.report_name = 'storage_' + storage
         self.storage_name = storage
 
     def daily_update(self, state, weather, time):

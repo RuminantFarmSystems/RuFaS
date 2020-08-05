@@ -13,8 +13,8 @@ class Alfalfa(BaseCrop):
         self.planting_date = alfalfa_data['planting_date']
         self.harvest_date = alfalfa_data['harvest_date']
 
-        if alfalfa_data['harvest_type'] != 'optimal':
-            print('Perennial crops are always optimally harvested')
+        # if alfalfa_data['harvest_type'] != 'optimal':
+        #     print('Perennial crops are always optimally harvested')
 
         self.harvest_type = 'optimal'
 
