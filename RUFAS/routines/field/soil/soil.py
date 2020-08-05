@@ -63,7 +63,6 @@ def daily_soil_routine(soil, crop, field_management, weather, time):
     # implementation of Peter Vadas' SurPhos (Surface Phosphorus Runoff) model
     phosphorus_cycling.update_all(soil, field_management, weather, time)
 
-
     carbon_cycle.update_all(crop.current_crop, soil, weather, time)
 
     # update annual sums at the end of each day
@@ -315,9 +314,8 @@ class Soil:
         self.plant_moisture = 0.85  # TODO temporary value from Hector  # TODO should probably be in crop
         self.residue_DM_harvest = 0.0
         self.lignin_residue_percent = 17  # TODO this 0.17 will be a crop type lignin percent
-
+        self.curr_layer_depth = 0
         self.silt_and_clay_frac = 0.5  # TODO database item
-        self.M_d = 0
 
         self.initialize_soil_N()
 
@@ -711,6 +709,8 @@ class Soil:
             self.days_unbalanced_active = 0.0
 
             # C in the soil layer
+            self.M_d = 0
+
             self.metabolic_AG = 500
             self.metabolic_BG = 500
             self.structural_AG = 500
@@ -720,6 +720,24 @@ class Soil:
             self.carbon_active = 5000  # TODO initial condition, need to decide if in json or here
             self.carbon_slow = 5000  # TODO above
             self.carbon_passive = 5000  # TODO above
+
+            self.metabolic_AG_to_C_active = 0
+            self.struct_AG_to_C_active = 0
+            self.struct_AG_to_C_slow = 0
+            self.metabolic_BG_to_C_active = 0
+            self.struct_BG_to_C_active = 0
+            self.struct_BG_to_C_slow = 0
+
+            self.metabolic_AG_to_active_loss = 0
+            self.struct_AG_to_active_loss = 0
+            self.struct_AG_to_slow_loss = 0
+            self.metabolic_BG_to_active_loss = 0
+            self.struct_BG_to_active_loss = 0
+            self.struct_BG_to_slow_loss = 0
+
+            self.carbon_active_loss = 0
+            self.carbon_slow_loss = 0
+            self.carbon_passive_loss = 0
 
             self.carbon_percent = 0
             self.total_carbon = 0
