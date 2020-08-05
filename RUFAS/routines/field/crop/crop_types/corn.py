@@ -157,8 +157,8 @@ class Corn(BaseCrop):
         self.gamma_wu = 0
 
         self.biomass_dry_down_perc = 0.0  # TODO: Hard coded total dry down until daily method is modeled
-        self.DM_harvest_perc = 0.35  # TODO: Hard coded dry matter percent at harvest
-        self.NDF_harvest_perc = 0.0
+        self.DM_harvest_percent = 0.35  # TODO: Hard coded dry matter percent at harvest
+        self.NDF_harvest_percent = 0.0
 
         self.bio_AG = 0
         self.yield_max = 0
