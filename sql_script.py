@@ -30,7 +30,7 @@ def main():
     add_dataset(conn, dataset_ID, csv_name)
 
     # 6 Importing csv file into Skeleton file
-    import_data(conn, csv_path)
+    import_data(conn, csv_path, dataset_ID)
 
     # 7 Calculating Taair and left joining to Skeleton:
     calc_taair(conn)
@@ -97,7 +97,7 @@ def database_input():
 
 
 def id_input(database):
-    """"
+    """
     Each dataset in the weather database has its own dataset_ID, a unique positive integer. This function prints
     out the IDs that are already in use and prompts the user to input an ID for the new dataset being added.
     A valid input is:
@@ -140,35 +140,57 @@ def add_dataset(connection, dataset_id, csv_name):
 
     # Input geographic details
     "Please enter the following details about the location of the dataset:"
-    state = input("Enter the corresponding US State: ")
-    county = input("Enter the corresponding county or city: ")
-    lat = None
-    while lat is None or lat < -90 or lat > 90 or not lat.isnumeric():
-        lat = input("Enter the corresponding latitude: ")
-        if lat.isnumeric():
-            lat = float(lat)
-            if lat < -90 or lat > 90:
-                print("Latitude has to be between -90 and 90")
-        else:
-            print("Invalid input.")
+    state = input("Enter the corresponding US State: (if null, press Enter) ")
 
-    long = float(input("Enter the corresponding longitude: "))
-    notes = input("Enter any additional notes you might have: ")
+    county = input("Enter the corresponding county or city: (if null, press Enter) ")
+
+    lat = None
+    while lat is None or lat < -90 or lat > 90:
+        lat = input("Enter the corresponding latitude: (if null, press Enter) ")
+        if lat == "":
+            break
+        try:
+            lat = float(lat)
+        except ValueError:
+            print("Invalid Input: Latitude has to be a numeric")
+            lat = None
+            continue
+        if lat < -90 or lat > 90:
+            print("Invalid Input: Latitude has to be between -90 and 90")
+
+    long = None
+    while long is None or long < -180 or long > 80:
+        long = input("Enter the corresponding longitude: (if null, press Enter) ")
+        if long == "":
+            break
+        try:
+            long = float(long)
+        except ValueError:
+            print("Invalid Input: Longitude has to be a numeric")
+            long = None
+            continue
+        if long < -180 or long > 80:
+            print("Invalid Input: Longitude has to be between -180 and 80")
+
+    notes = input("Enter any additional notes you might have: (if null, press Enter) ")
 
     params = (dataset_id, csv_name, state, county, lat, long, notes)
-    for i in range(0,len(params)):
-        if params[i] == "":
-            params[i] = "NULL"
 
     # Creates a cursor in the given database
     c = connection.cursor()
 
     # Adds new entry in Datasets table
     c.execute("INSERT INTO Datasets VALUES (?, ?, ?, ?, ?, ?, ?)", params)
+    c.execute("UPDATE Datasets SET state = NULL WHERE state = '' ")
+    c.execute("UPDATE Datasets SET county = NULL WHERE county = '' ")
+    c.execute("UPDATE Datasets SET latitude = NULL WHERE latitude = '' ")
+    c.execute("UPDATE Datasets SET longitude = NULL WHERE longitude = '' ")
+    c.execute("UPDATE Datasets SET Notes = NULL WHERE Notes = '' ")
+
     connection.commit()
 
 
-def import_data(connection, csv_path):
+def import_data(connection, csv_path, dataset_ID):
     c = connection.cursor()
     # load data
     df = pd.read_csv(csv_path)
@@ -176,6 +198,7 @@ def import_data(connection, csv_path):
     df.columns = df.columns.str.strip()
     # import data to table
     df.to_sql("Skeleton", connection, if_exists="append", index=False)
+    c.execute("UPDATE Skeleton SET ID = ?", (dataset_ID,))
     connection.commit()
 
 
@@ -199,7 +222,7 @@ def add_observations(connection):
 
 
 def cleanup(connection):
-    c=connection.cursor()
+    c = connection.cursor()
     c.execute("DROP TABLE final")
     c.execute("DROP VIEW Taair")
     c.execute("DELETE FROM Skeleton")
