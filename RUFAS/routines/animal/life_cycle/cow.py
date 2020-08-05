@@ -24,8 +24,6 @@ import math
 import numpy as np
 from RUFAS.routines.animal.life_cycle.heiferIII import HeiferIII
 from RUFAS.routines.animal.life_cycle.animal_base import AnimalBase
-from RUFAS.routines.animal.ration.lactating_cow_ration import calculate_rqmts \
-    as lactating_calculate_rqmts
 from RUFAS.routines.animal.ration.dry_cow_ration import calculate_rqmts \
     as dry_calculate_rqmts
 from RUFAS.routines.animal.manure.lactating_cow_manure_excretion import \
@@ -284,15 +282,14 @@ class Cow(HeiferIII):
 				calculated
 		"""
 		if self.milking:
-			result = lactating_calculate_rqmts(
-				self.body_weight, self.BCS, self.CBW, pasture_concentrate,
-				self.CP_milk, self.days_in_preg, self.DHD, self.DVD,
-				self.days_in_milk, self.fat_percent, self.lactose_milk,
-				self.estimated_daily_milk_produced, self.calves, housing,
-				nutrients)
-			self.nutrient_rqmts = result[0]
-			self.DMIest = result[1]
-			self.DBW = result[2]
+			#TODO add requirements calculations
+			self.nutrient_rqmts = {'FU': {'op': '<=', 'val': 7.566673489860807},
+                      'RU': {'op': '>=', 'val': 0},
+                      'ME_DM': {'op': '>=', 'val': 57.238188330372566},
+                      'RDP_DM': {'op': '>=', 'val': 2.0347001114951313},
+                      'RUP_DM': {'op': '>=', 'val': 1.2716733909335047}}
+			self.DMIest = 27.620363504458798
+			self.DBW = -0.4125
 			self.daily_growth = self.DBW
 		else:
 			result = dry_calculate_rqmts()

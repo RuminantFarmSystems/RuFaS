@@ -15,8 +15,8 @@ import random
 from scipy.optimize import minimize
 
 def set_globals(price_, NEmaint_, NEa_, NEpreg_, NEl_, NEg_, MP_req_, C_req_, P_req_,
-                DMIest_, TDN_, DE_, EE_, is_fat_, BW_, SBW_, Ca_, P_, NDF_, type_, is_wetforage_,
-                Kd_, NA_, NB_, CP_, dRUP_):
+                DMIest_, TDN_, DE_, EE_, is_fat_, BW_, SBW_, calcium_, phosphorus_, NDF_, type_, is_wetforage_,
+                Kd_, N_A_, N_B_, CP_, dRUP_):
     """
     Sets the global variables with the feed information to be used in the
     constraint functions below.
@@ -38,14 +38,14 @@ def set_globals(price_, NEmaint_, NEa_, NEpreg_, NEl_, NEg_, MP_req_, C_req_, P_
     global is_fat
     global BW
     global SBW
-    global Ca
-    global P
+    global calcium
+    global phosphorus
     global NDF
     global type
     global is_wetforage
     global Kd
-    global NA
-    global NB
+    global N_A
+    global N_B
     global CP
     global dRUP
 
@@ -66,14 +66,14 @@ def set_globals(price_, NEmaint_, NEa_, NEpreg_, NEl_, NEg_, MP_req_, C_req_, P_
     is_fat = is_fat_
     BW = BW_
     SBW = SBW_
-    Ca = Ca_
-    P = P_
+    calcium = calcium_
+    phosphorus = phosphorus_
     NDF = NDF_
     type = type_
     is_wetforage = is_wetforage_
     Kd = Kd_
-    NA = NA_
-    NB = NB_
+    N_A = N_A_
+    N_B = N_B_
     CP = CP_
     dRUP = dRUP_
 
@@ -81,10 +81,10 @@ def list_reconfig(list):
     """
     Helper function that takes an input of a list and returns that list with
     each value occuring a total of 3 times. This method is required for matching
-    the decision variables to each energy constraint.
+    the decision variables to one of the three energy constraint.
 
     Args:
-        list: A list of integers
+        list: A list of values
     """
     list_reconfig = []
     for i in list:
@@ -248,7 +248,7 @@ def calcium_constraint(x):
         else:
             dCa.append(0)
     # [A.Cow.E.15]
-    return (sum(np.multiply(x,np.multiply(np.multiply(Ca,0.01) ,dCa))) - (C_req/1000))
+    return (sum(np.multiply(x,np.multiply(np.multiply(calcium,0.01) ,dCa))) - (C_req/1000))
 
 def phosphorus_constraint(x):
     """
@@ -280,7 +280,7 @@ def phosphorus_constraint(x):
     # Phosphorus maintenance requirement (g)
     P_maint = 1*DMI + 0.002*BW
     # [A.Cow.E.15]
-    return (sum(np.multiply(x,np.multiply(np.multiply(P,0.01),dP))) - ((P_req+P_maint)/1000))
+    return (sum(np.multiply(x,np.multiply(np.multiply(phosphorus,0.01),dP))) - ((P_req+P_maint)/1000))
 
 def protien_constraint(x):
     """
@@ -322,7 +322,7 @@ def protien_constraint(x):
     RDP = []
     for i in range(len(Kd)):
         if Kp[i] > -Kd[i]:
-            RDP.append((Kd[i]/(Kd[i]+Kp[i])) * (NB[i]/100) * CP[i] + (NA[i]/100)*CP[i])
+            RDP.append((Kd[i]/(Kd[i]+Kp[i])) * (N_B[i]/100) * CP[i] + (N_A[i]/100)*CP[i])
         else:
             RDP.append(0)
     # [A.Cow.E.11]
@@ -451,6 +451,7 @@ def optimize():
     """
 
     n = len(price)
+    #TODO: Method for initial guess besides random
     x0 = []
     for i in range(n):
         x0.append(random.random()*10)
@@ -460,6 +461,7 @@ def optimize():
     '''
     ## OPTIMIZE:
     #establishing the bounds of the NLP
+    #TODO limits as bounds for farm grown feeds
     b= (0, 100)
     bnds = []
     for i in range(len(price)):
@@ -478,42 +480,6 @@ def optimize():
     con9 = {'type': 'ineq', 'fun': forage_NDF_constraint}
     con10 = {'type': 'ineq', 'fun': fat_constraint}
     con11 = {'type': 'ineq', 'fun': DMI_constraint}
-    con12 = {'type': 'eq', 'fun': energy_req_limit_constraint}
-    cons = ([con1,con2,con3,con4, con5,con6,con7,con8,con9,con10,con12])
+    cons = ([con1,con2,con3,con4, con5,con6,con7,con8,con9,con10,con11])
 
-    solution = minimize(objective, x0, method='SLSQP', bounds=bnds, constraints=cons)
-
-    return(solution)
-
-
-'''
-solution = optimize()
-print(objective(solution.x))
-print(solution.success)
-rounded = [round(num, 2) for num in solution.x]
-print(rounded)
-print('Con_1')
-print(NEmact_constraint(solution.x))
-print('Con_2')
-print(NEl_constraint(solution.x))
-print('Con_3')
-print(NEgact_constraint(solution.x))
-print('Con_4')
-print(calcium_constraint(solution.x))
-print('Con_5')
-print(phosphorus_constraint(solution.x))
-print('Con_6')
-print(protien_constraint(solution.x))
-print('Con_7')
-print(NDF_constraint_1(solution.x))
-print('Con_8')
-print(NDF_constraint_2(solution.x))
-print('Con_9')
-print(forage_NDF_constraint(solution.x))
-print('Con_10')
-print(fat_constraint(solution.x))
-print('Con_11')
-print(DMI_constraint(solution.x))
-print('Con_12')
-print(NEmact_limit_constraint(solution.x))
-'''
+    return(minimize(objective, x0, method='SLSQP', bounds=bnds, constraints=cons))

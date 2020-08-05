@@ -18,6 +18,7 @@ from RUFAS.routines.animal.pen import Pen
 from RUFAS.routines.animal.clustering_pen_grouping import grouping
 from RUFAS.routines.animal.life_cycle.life_cycle import LifeCycleManager
 from RUFAS.routines.animal.life_cycle.animal_base import AnimalBase
+from RUFAS.routines.animal.ration import ration_driver as ration_driver
 from collections import deque
 import random
 import matplotlib.pyplot as plt
@@ -433,7 +434,7 @@ class AnimalManagement:
                 # assigning lactating cows to pens based on the grouping output
                 for key in pen_grouping:
                     self.all_pens[key].update_animals(pen_grouping[key])
-        
+
         self.fully_update_id_pen()
 
     def clear_pens(self):
@@ -464,11 +465,12 @@ class AnimalManagement:
         Args:
             feed: instance of the Feed class
         """
-
+        available_feeds = ration_driver.AvailableFeeds()
+        available_feeds.feed_nutrients(feed)
         for i, pen in enumerate(self.all_pens):
             if pen.pen_populated:
                 self.all_pens[i].ration = self.all_pens[i].calc_ration(
-                    self.housing, self.pasture_concentrate, feed, temp)
+                    self.housing, self.pasture_concentrate, feed, available_feeds)
 
     def calc_manure_excretion(self, feed):
         """
