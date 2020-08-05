@@ -1,45 +1,13 @@
 {
     "latitude": 43.332708,
-    "corn": {
-        "grow_years": [],
-        "repeat": 0,
-        "planting_date": 121,
-        "harvest_date": 319,
-        "harvest_type": "optimal"
-    },
-    "soybean": {
-        "grow_years": [],
-        "repeat": 0,
-        "planting_date": 121,
-        "harvest_date": 319,
-        "harvest_type": "optimal"
-    },
-    "alfalfa": {
-        "grow_years": [2009],
-        "repeat": 1,
-        "planting_date": 121,
-        "harvest_date": 319,
-        "harvest_type": "optimal"
-    },
-    "tall_fescue": {
-        "grow_years": [],
-        "repeat": 0,
-        "planting_date": 121,
-        "harvest_date": 319,
-        "harvest_type": "optimal"
-    },
-    "spring_barley": {
-        "grow_years": [],
-        "repeat": 0,
-        "planting_date": 121,
-        "harvest_date": 319,
-        "harvest_type": "optimal"
-    },
-    "potato": {
-        "grow_years": [],
-        "repeat": 0,
-        "planting_date": 121,
-        "harvest_date": 319,
-        "harvest_type": "optimal"
+
+    "crops": {
+        "alfalfa": {
+            "grow_years": [2009],
+            "repeat": 1,
+            "planting_date": 121,
+            "harvest_date": 319,
+            "harvest_type": "optimal"
+        }
     }
 }
