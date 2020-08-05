@@ -10,14 +10,12 @@ Description: The class which represents a pen on the farm. Each pen has
 Author(s): Militsa Sotirova, militsasotirova@gmail.com
 """
 ################################################################################
-from RUFAS.routines.animal.ration.lactating_cow_ration import set_globals
-from RUFAS.routines.animal.ration.lactating_cow_ration import \
-    optimize as lactating_cow_optimize
 from RUFAS.routines.animal.ration.calf_ration import optimize as calf_optimize
 from RUFAS.routines.animal.ration.dry_cow_ration import \
     optimize as dry_cow_optimize
 from RUFAS.routines.animal.ration.growing_heifer_ration import \
     optimize as growing_heifer_optimize
+from RUFAS.routines.animal.ration import ration_driver as ration_driver
 
 
 class Pen:
@@ -192,7 +190,7 @@ class Pen:
         # animal in the pen
         for animal in self.animals_in_pen:
             curr_rqmts = animal.nutrient_rqmts
-            
+
             for key in sum_dict.keys():
                 sum_dict[key] += curr_rqmts[key]['val']
 
@@ -222,7 +220,7 @@ class Pen:
         self.avg_milk = sum_milk / num_animals
         self.avg_CP_milk = sum_CP_milk / num_animals
 
-    def calc_ration(self, housing, pasture_concentrate, feed, temp):
+    def calc_ration(self, housing, pasture_concentrate, feed, available_feeds):
         """
         Calculates and sets the ration for the pen using the average nutrient
         requirements of the animals in the pen.
@@ -251,11 +249,8 @@ class Pen:
 
             elif 'Cow' in self.classes_in_pen and \
                     self.animals_in_pen[0].milking:  # lactating cow
-                set_globals(self.avg_DMIest, self.avg_BW, self.avg_DBW,
-                            self.avg_milk, self.avg_CP_milk)
-                ration_per_animal = \
-                    lactating_cow_optimize(feed, self.avg_nutrient_rqmts)
-
+                ration_per_animal = ration_driver.ration_formulation(self, available_feeds)
+                #print(ration_per_animal)
             elif 'Cow' in self.classes_in_pen and \
                     not self.animals_in_pen[0].milking:  # dry cow
                 ration_per_animal = \
@@ -267,21 +262,6 @@ class Pen:
 
             if ration_per_animal['status'] == 'Optimal':
                 break
-
-            # According to lactating cow ration formulation pseudocode,
-            # if a ration isn't feasible, milk production is reduced by 0.5 kg
-            # and the formulation is re-run until a feasible ration is obtained.
-
-            # Reduce estimated milk production by 0.5 kg
-            for animal in self.animals_in_pen:
-                if type(animal).__name__ == 'Cow' and animal.milking:
-                    animal.estimated_daily_milk_produced -= 0.5
-
-            # Recalculate animal requirements
-            self.call_animal_nutrient_rqmts(housing, pasture_concentrate, feed, temp)
-
-            # Recalculate average requirements
-            self.calc_avg_nutrient_rqmts()
 
         DMI = calc_DMI(ration_per_animal, feed)
         self.avg_p_intake, p_conc = \
