@@ -22,7 +22,7 @@
             },
             "field_2": {
                 "soil": "barnyard_soil.json",
-                "crop": "alfalfa_rotation.json",
+                "crop": "custom_rotation.json",
                 "field_management": "barnyard_field_management.json"
             }
         },
