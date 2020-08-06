@@ -44,6 +44,11 @@
                 "soil": "barnyard_soil.json",
                 "crop": "alfalfa_rotation.json",
                 "field_management": "hector_4.json"
+            },
+            "field_7": {
+                "soil": "barnyard_soil.json",
+                "crop": "custom_rotation.json",
+                "field_management": "hector_3.json"
             }
         },
         "animal": "animal_management_animal.json",
