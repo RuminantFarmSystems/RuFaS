@@ -222,7 +222,7 @@ def calc_residue(soil, crop_type, field_management, time):
     # for carbon, needs to be calculated only at harvest
     crop_type.bio_BG = crop_type.fr_root * crop_type.biomass_actual
     crop_type.bio_BG_DM = crop_type.bio_BG * (1 - soil.plant_moisture)
-    soil.soil_layers[0].fr_tillage = 0.55
+    # soil.soil_layers[0].fr_tillage = 0.55  # TODO
 
     d_residue = 0
     if time.day == crop_type.kill_day or crop_type.crop_type == 'annual':
