@@ -20,8 +20,6 @@ from RUFAS.routines.animal.manure.growing_heifer_manure_excretion import \
 
 
 class HeiferIII(HeiferII):
-    # TODO: Body weight changed could be based on nutrition intake later from
-    #  Ration Formulation.
     # TODO: Rank heifers to enter the herd or sold
 
     def __init__(self, args):
@@ -60,6 +58,8 @@ class HeiferIII(HeiferII):
             args.p_gest_for_calf
         """
         super().__init__(args)
+        if 'conceptus_weight' in args:
+            self.conceptus_weight = args['conceptus_weight']
 
     def get_heiferIII_values(self):
         """
@@ -86,7 +86,7 @@ class HeiferIII(HeiferII):
             manure_calculations(self.ration_formulation, feed, 
                             self.body_weight, p_feces_excrt, p_urine)
 
-    def update(self):
+    def update(self, sim_day):
         """
         Controls heifer's grow with average daily gain based on user's input
         until breeding start day here is the place to change growth rate with
@@ -96,39 +96,28 @@ class HeiferIII(HeiferII):
 
         Returns: cow_stage - heifer close to calving, move to cow stage
         """
+        self.update_body_weight_history(sim_day)
         cow_stage = False
         self.days_born += 1
 
         if self.preg:
             self.days_in_preg += 1
 
-        prev_weight = self.body_weight
-
         if self.days_born < AnimalBase.config['grow_end_day']:
             # Heifer can only grow to a maximum weight of mature_body_weight
-            if self.body_weight < AnimalBase.config['mature_body_weight']:
-                gained_weight = np.random.normal(
-                    AnimalBase.config['avg_daily_gain_h'],
-                    AnimalBase.config['std_daily_gain_h'])
-                while gained_weight < AnimalBase.config['avg_daily_gain_h'] \
-                        - 2 * AnimalBase.config['std_daily_gain_h'] \
-                        or gained_weight > AnimalBase.config['avg_daily_gain_h'] \
-                        + 2 * AnimalBase.config['std_daily_gain_h']:
-                    gained_weight = np.random.normal(
-                        AnimalBase.config['avg_daily_gain_h'],
-                        AnimalBase.config['std_daily_gain_h'])
-                self.body_weight += gained_weight
-            if self.body_weight > AnimalBase.config['mature_body_weight']:
-                self.body_weight = AnimalBase.config['mature_body_weight']
-                self.mature_body_weight = self.body_weight
-                self.events.add_event(self.days_born,
-                                      'Mature body weight prior to grow end day')
+            self.daily_growth = self.get_bw_change()
 
-        self.daily_growth = self.body_weight - prev_weight
+            self.body_weight += self.daily_growth
+
+            if self.body_weight > self.mature_body_weight:
+                self.body_weight = self.mature_body_weight
+                self.events.add_event(self.days_born,
+                                      sim_day, 'Mature body weight '
+                                               'prior to grow end day')
 
         if self.days_born == AnimalBase.config['grow_end_day']:
             self.mature_body_weight = self.body_weight
-            self.events.add_event(self.days_born, 'Mature body weight')
+            self.events.add_event(self.days_born, sim_day, 'Mature body weight')
 
         if self.days_in_preg == self.gestation_length:
             self.days_born -= 1  # will be incremented again in next stage

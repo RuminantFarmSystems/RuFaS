@@ -54,6 +54,7 @@ def simulate(input_file_path: Path):
     while not time.end_simulation():
         annual_simulation()
 
+    output.finalize(state, weather, time)
     output.produce_graphics()
     t_end_sim = timer.time()
 
@@ -64,10 +65,8 @@ def simulate(input_file_path: Path):
 def daily_simulation():
     """Executes the daily simulation routines."""
 
-    #
     # Daily routines
-    #
-    routines.daily_animal_routine(state.animal_management, state.feed)
+    routines.daily_animal_routine(state.animal_management, state.feed, weather, time)
     routines.daily_manure_storage_routine(state.manure_storage, state.animal_management)
     routines.daily_fields_routine(state.fields, state.manure_storage, weather, time)
     routines.daily_feed_routine(state.feed, state.fields, state.animal_management)
@@ -136,7 +135,7 @@ def initialize_simulation(file_path: Path, data):
 
         weather = Weather(data['weather'], config)
         time = Time(config)
-        state = State(data['farm'], config, time)
+        state = State(data['farm'], config, weather, time)
         output = OutputHandler(classes.read_json_file(get_base_dir() / 'input/output' / data['output']), state)
 
     except errors.JSONfileData as e:
