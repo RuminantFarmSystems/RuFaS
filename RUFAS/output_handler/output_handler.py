@@ -45,7 +45,9 @@ class OutputHandler:
                         'manure_storage_report': ManureStorageReport(data['manure_storage_report'], state),
                         'custom_report': CustomReport(data['custom_report']),
                         'fields_report': FieldsReport(data['fields_report'], state),
-                        'pens_report': PensReport(data['pens_report'], state)
+                        'pens_report': PensReport(data['pens_report'], state),
+                        'mass_balance': MassBalanceReport(data['mass_balance']),
+                        'life_cycle_report': LifeCycleReport(data['life_cycle_report']),
                         }
 
     def initialize_dir(self, csv_dir, graphic_dir):
@@ -125,3 +127,8 @@ class OutputHandler:
         for report_name in self.reports:
             report = self.reports[report_name]
             report.produce_report_graphics()
+
+    def finalize(self, state, weather, time):
+        for report_name in self.reports:
+            report = self.reports[report_name]
+            report.finalize(state, weather, time)

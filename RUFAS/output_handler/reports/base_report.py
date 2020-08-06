@@ -77,6 +77,7 @@ class BaseReport:
         feed = state.feed
         manure_storage = state.manure_storage
         fields = state.fields
+        life_cycle_manager = animal_management.life_cycle_manager
 
         for variable in self.daily_variables:
             self.daily_variables[variable][2].append(
@@ -135,3 +136,6 @@ class BaseReport:
     def produce_report_graphics(self):
         graphics.annual_graphics(self)
         graphics.daily_graphics(self)
+
+    def finalize(self, state, weather, time):
+        pass
