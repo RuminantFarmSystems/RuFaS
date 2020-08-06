@@ -1058,7 +1058,7 @@ class Cow(HeiferIII):
 				self.preg = True
 				if self.calves != 0:
 					last_time_given_birth = \
-						self.events.get_most_recent_date('New birth, start milking')
+						self.events.get_most_recent_date(c.NEW_BIRTH)
 					self.calving_to_preg_time = self.days_born - last_time_given_birth
 				self.gestation_length = int(np.random.normal(
 					AnimalBase.config['avg_gestation_len'],
