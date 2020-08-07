@@ -59,11 +59,11 @@ def manure_calculations(ration_formulation, feed, BW, p_feces_excrt, p_urine):
 
     # to find total percentages
     CP = CP_diet_content / DMI * 100
-
     # Amount of manure, kg [A.3B.A.1]
     Mkg = 3.886 * DMI - 0.029 * BW + 5.641
-    
-    # nitrogen in liquid and solid manure, g [A.3D.B.1]
+    # Total solids, kg/day [A.3B.A.2]
+    TSd = 0.0084 * BW
+    # Nitrogen in liquid and solid manure, g [A.3D.B.1]
     MN = 78.390 * DMI * CP / 100 + 51.35
 
     p_excrt, WIP_frac, WOP_frac, p_excrt_manure, p_frac = \
@@ -73,6 +73,7 @@ def manure_calculations(ration_formulation, feed, BW, p_feces_excrt, p_urine):
             "TAN_s": 0.14,  # TODO: Implement with correct equation
             "MN": MN,
             "Mkg": Mkg,
+            "TSd": TSd,
             "VSd": 7087.413,  # TODO: Implement with correct equation
             "VSnd": 859.390,  # TODO: Implement with correct equation
             "WIP_frac": WIP_frac,

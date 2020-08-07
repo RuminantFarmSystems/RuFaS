@@ -121,6 +121,8 @@ def manure_calculations(ration_formulation, feed, BW, DIM, mPrt,
     U_E = -7.742 + 0.388 * DMI + 0.726 * CP + 2.066 * mPrt
     # Amount of manure, kg (Eq 1.1)
     Mkg = F_water + F_DM + U_E
+    # Total solids, kg/d [A.3C.A.2]
+    TSd = -0.576 + 0.370 * DMI + 0.059 * ADF - 0.075 * CP
 
     # Faecal nitrogen, g (Eq 2.2)
     F_N = (-0.0368 +
@@ -158,6 +160,7 @@ def manure_calculations(ration_formulation, feed, BW, DIM, mPrt,
             "TAN_s": TAN_s,
             "MN": MN,
             "Mkg": Mkg,
+            "TSd": TSd,
             "VSd": VSd,
             "VSnd": VSnd,
             "WIP_frac": WIP_frac,

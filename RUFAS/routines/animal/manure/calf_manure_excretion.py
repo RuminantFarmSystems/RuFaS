@@ -37,7 +37,9 @@ def manure_calculations(BW, p_feces_excrt, p_urine):
     """
     # Amount of manure, kg [A.3A.A.1]
     Mkg = 0.0567 * BW
-    
+    # Total solids, kg/day [A.3A.A.2]
+    TSd = 0.0093 * BW
+
     p_excrt, WIP_frac, WOP_frac, p_excrt_manure, p_frac = \
         phosphorus_excreted(0, Mkg, p_feces_excrt, p_urine)
     return p_excrt, \
@@ -45,6 +47,7 @@ def manure_calculations(BW, p_feces_excrt, p_urine):
             "TAN_s": 0.14,  # TODO: Implement with correct equation
             "MN": 532.407,  # TODO: Implement with correct equation
             "Mkg": Mkg,
+            "TSd": TSd,
             "VSd": 7087.413,  # TODO: Implement with correct equation
             "VSnd": 859.390,  # TODO: Implement with correct equation
             "WIP_frac": WIP_frac,

@@ -68,10 +68,10 @@ def manure_calculations(ration_formulation, feed, BW, milk_prod, p_feces_excrt,
 
     # to find total percentages
     CP = CP_diet_content / DMI * 100
-    
     # Amount of manure, kg [A.3D.A.1]
     Mkg = 0.022 * BW + 21.844
-    
+    # Total solids, kg/d [A.3D.A.2]
+    TSd = 0.178 * DMI + 2.733
     # Nitrogen in liquid and solid manure , g [A.3D.B.1]
     MN = 12.747 * DMI + 1606.290 * CP/100 - 117.5 
     
@@ -83,6 +83,7 @@ def manure_calculations(ration_formulation, feed, BW, milk_prod, p_feces_excrt,
             "TAN_s": 0.14,  # TODO: Implement with correct equation
             "MN": MN,
             "Mkg": Mkg,
+            "TSd": TSd,
             "VSd": 7087.413,  # TODO: Implement with correct equation
             "VSnd": 859.390,  # TODO: Implement with correct equation
             "WIP_frac": WIP_frac,
