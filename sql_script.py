@@ -140,8 +140,7 @@ def id_input(database):
         elif user_input <= 0:
             print("Invalid input. ID must be a positive integer")
         else:
-            print("The ID has been recorded. Go ahead and add it to your csv file if you haven't already "
-                  "before moving on to the next input.")
+            print("The ID has been recorded.")
     return user_input
 
 
