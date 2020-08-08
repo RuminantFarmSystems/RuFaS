@@ -99,6 +99,16 @@ def ration_formulation(pen, available_feeds):
     ration['status'] = 'Optimal'
     ration['objective'] = NLP.objective(solution.x)
     return ration
+def hardcoded_rat():
+    return {'2': 0.75,
+            '24': 5,
+            '36': 2,
+            '38': 4,
+            '91': 5,
+            '102': 3,
+            '137': 0.32,
+            'status': 'Optimal',
+            'objective': 4.5}
 
 class Requirements:
     """

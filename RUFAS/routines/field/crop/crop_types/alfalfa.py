@@ -21,6 +21,7 @@ class Alfalfa(BaseCrop):
         self.crop_name = 'alfalfa'
         self.crop_type = 'perennial'
         self.harvest_quality = 'null'
+        self.raw_id = 1
         self.feed_id = '1g'
 
         self.kill_day = -1

@@ -381,7 +381,8 @@ class AnimalManagement:
 
     def pen_allocation(self):
         """
-        Allocates the animals in all_animals to pens in all_pens based on the animals' characteristics.
+        Allocates the animals in all_animals to pens in all_pens based on the
+        animals' characteristics.
         """
 
         # assigning non-cows to pens
@@ -414,7 +415,8 @@ class AnimalManagement:
 
         # assigning dry cows to pens
         if len(self.all_pens) == 3:
-            dry_and_heifers = self.heiferIs + self.heiferIIs + self.heiferIIIs + dry_cows
+            dry_and_heifers = self.heiferIs + self.heiferIIs + self.heiferIIIs \
+                                                                    + dry_cows
             self.all_pens[1].update_animals(dry_and_heifers)
             self.all_pens[2].update_animals(lactating_cows)
         elif 4 <= len(self.all_pens) <= 6:
