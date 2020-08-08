@@ -17,6 +17,7 @@ class Soybean(BaseCrop):
         self.crop_name = 'soybean'
         self.crop_type = 'annual'
         self.harvest_quality = 'null'
+        self.raw_id = 121
         self.feed_id = '121g'
 
         self.kill_day = -1

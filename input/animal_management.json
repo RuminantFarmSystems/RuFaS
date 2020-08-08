@@ -20,7 +20,7 @@
             "field_1":
             {
                 "soil": "barnyard_soil.json",
-                "crop": "corn_rotation.json",
+                "crop": "custom_rotation.json",
                 "field_management": "barnyard_field_management.json"
             },
             "field_2":
