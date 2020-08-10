@@ -199,7 +199,16 @@ class FieldReport(BaseReportDriver):
                                     'total_CO2_C_loss_L3': ['soil.soil_layers[2].total_CO2_C_loss', 'kg/ha', []],
                                     'total_carbon_L1': ['soil.soil_layers[0].total_carbon', 'kg/ha', []],
                                     'total_carbon_L2': ['soil.soil_layers[1].total_carbon', 'kg/ha', []],
-                                    'total_carbon_L3': ['soil.soil_layers[2].total_carbon', 'kg/ha', []]
+                                    'total_carbon_L3': ['soil.soil_layers[2].total_carbon', 'kg/ha', []],
+                                    'M_d_L1': ['soil.soil_layers[0].M_d', '', []],
+                                    'M_d_L2': ['soil.soil_layers[1].M_d', '', []],
+                                    'M_d_L3': ['soil.soil_layers[2].M_d', '', []],
+                                    'T_d': ['soil.T_d', '', []],
+                                    'fr_tillage_L1': ['soil.soil_layers[0].fr_tillage', '', []],
+                                    'fr_N': ['crop_type.fr_N', '', []],
+                                    'water_fac_L1': ['soil.soil_layers[0].water_fac', '', []],
+                                    'water_fac_L2': ['soil.soil_layers[1].water_fac', '', []],
+                                    'water_fac_L3': ['soil.soil_layers[2].water_fac', '', []]
                                     # 'active_L1': ['soil.soil_layers[0].carbon_active', 'kg/ha', []],
                                     # 'active_L2': ['soil.soil_layers[1].carbon_active', 'kg/ha', []],
                                     # 'active_L3': ['soil.soil_layers[2].carbon_active', 'kg/ha', []],

@@ -715,6 +715,7 @@ class Soil:
             self.metabolic_BG = 500
             self.structural_AG = 500
             self.structural_BG = 500
+
             self.fr_tillage = 0.0  # TODO used in carbon but the variable should probably be relocated
 
             self.carbon_active = 5000  # TODO initial condition, need to decide if in json or here
