@@ -19,7 +19,7 @@ from RUFAS.util import read_json_file
 
 
 class State:
-    def __init__(self, data, config, time):
+    def __init__(self, data, config, weather, time):
         """
         Description:
             Contains information about the current state of the farm.
@@ -49,7 +49,7 @@ class State:
         input_dir = util.get_base_dir() / 'input'
         self.feed = Feed(read_json_file(input_dir / 'feed' / data['feed']))
         self.animal_management = AnimalManagement(
-            read_json_file(input_dir / 'animal' / data['animal']), config, self.feed)
+            read_json_file(input_dir / 'animal' / data['animal']), config, self.feed, weather, time)
 
     def annual_reset(self):
         """
