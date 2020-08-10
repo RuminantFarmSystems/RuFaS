@@ -46,6 +46,7 @@ def residue_partitioning(crop_type, soil, weather, time):
     # TODO delete 100's eventually, check lignin residue percent in soil.py
     # TODO fr_N might need a different calculation in the future
     LN_ratio_AG = 0
+    crop_type.fr_N = 0.4  # TODO
     if crop_type.fr_N != 0:
         LN_ratio_AG = (soil.lignin_residue_percent / 100) / crop_type.fr_N
     metabolic_AG_frac = 0.85 - 0.18 * LN_ratio_AG
@@ -232,7 +233,7 @@ def soil_carbon_aggregation(soil):
 
         # F. soil mass calculations
 
-        if layer.name == "Layer1":
+        if layer.name == "layer_1":
             depth = layer.bottom_depth
         else:
             depth = layer.bottom_depth - soil.curr_layer_depth
@@ -262,3 +263,6 @@ def soil_carbon_aggregation(soil):
         layer.CO2_C_pool_loss_decomp = layer.carbon_active_loss + layer.carbon_slow_loss + layer.carbon_passive_loss
 
         layer.total_CO2_C_loss = CO2_AG_loss + CO2_BG_loss + layer.CO2_C_pool_loss_decomp
+
+    soil.curr_layer_depth = 0
+
