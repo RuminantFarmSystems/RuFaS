@@ -16,10 +16,17 @@
             "harvest_date": 319,
             "harvest_type": "optimal"
         },
-        "corn": {
+        "corn_1": {
             "grow_years": [2011],
             "repeat": 3,
             "planting_date": 121,
+            "harvest_date": 319,
+            "harvest_type": "optimal"
+        },
+        "corn_2": {
+            "grow_years": [2011],
+            "repeat": 3,
+            "planting_date": 30,
             "harvest_date": 319,
             "harvest_type": "optimal"
         }
