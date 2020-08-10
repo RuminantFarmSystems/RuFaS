@@ -147,13 +147,13 @@ def calc_t_stress(crop_type, weather, time):
     elif T_base_min < T_avg <= T_opt:
         top_half_eq = -0.1054 * (T_opt - T_avg) ** 2
         bottom_half_eq = (T_avg - T_base_min) ** 2
-        t_stress = 1 - exp(top_half_eq / bottom_half_eq)
+        t_stress = 1 - (0 if bottom_half_eq == 0 else exp(top_half_eq / bottom_half_eq))
 
     # C.7.B.3
     elif T_opt < T_avg <= (2 * T_opt - T_base_min):
         top_half_eq = -0.1054 * (T_opt - T_avg) ** 2
         bottom_half_eq = ((2 * T_opt - T_avg) - T_base_min) ** 2
-        t_stress = 1 - exp(top_half_eq / bottom_half_eq)
+        t_stress = 1 - (0 if bottom_half_eq == 0 else exp(top_half_eq / bottom_half_eq))
 
     # C.7.B.4
     else:  # T_avg > (2*T_opt - T_base_min):
