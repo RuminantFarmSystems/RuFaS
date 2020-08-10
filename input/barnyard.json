@@ -22,8 +22,8 @@
             },
             "field_2": {
                 "soil": "barnyard_soil.json",
-                "crop": "tall_fescue.json",
-                "field_management": ".json"
+                "crop": "spring_barley_rotation.json",
+                "field_management": "barnyard_field_management.json"
             },
             "field_3": {
                 "soil": "barnyard_soil.json",
