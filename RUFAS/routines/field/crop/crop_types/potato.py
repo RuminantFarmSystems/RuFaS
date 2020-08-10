@@ -3,19 +3,19 @@ from .base_crop import BaseCrop
 
 class Potato(BaseCrop):
 
-    def __init__(self, data):
+    def __init__(self, crop_name, data):
         super().__init__()
 
         """GENERAL PLANT INFO"""
 
-        potato_data = data['potato']
+        potato_data = data
         self.grow_years = potato_data['grow_years']
         self.repeat = potato_data['repeat']
         self.planting_date = potato_data['planting_date']
         self.harvest_date = potato_data['harvest_date']
         self.harvest_type = potato_data['harvest_type']
 
-        self.crop_name = 'potato'
+        self.crop_name = crop_name
         self.crop_type = 'annual'
         self.harvest_quality = 'null'
         self.feed_id = ''  # need
@@ -32,8 +32,8 @@ class Potato(BaseCrop):
 
         # input
         self.T_base_min = 10  # unknown
-        self.T_base_max = 30  # unknown
-        self.PHU = 1200  # unknown
+        self.T_base_max = 40
+        self.PHU = 1000
 
         # Internally calculated input
         self.accumulated_HU = 0.0
@@ -48,14 +48,14 @@ class Potato(BaseCrop):
         ''' LEAF AREA INDEX (LAI) DATA '''
 
         # input
-        self.fr_PHU_1 = 0.15  # unknown
-        self.fr_PHU_2 = 0.50  # unknown
-        self.fr_LAI_1 = 0.05  # unknown
-        self.fr_LAI_2 = 0.95  # unknown
-        self.fr_PHU_sen = 0.90  # unknown
-        self.fr_PHU_harvest = 1.2  # unknown
-        self.LAI_max = 3  # unknown
-        self.LAI_min = 0  # unknown
+        self.fr_PHU_1 = 0.15
+        self.fr_PHU_2 = 0.50
+        self.fr_LAI_1 = 0.01
+        self.fr_LAI_2 = 0.95
+        self.fr_PHU_sen = 0.90
+        self.fr_PHU_harvest = 1.2
+        self.LAI_max = 4
+        self.LAI_min = 0
 
         # Internally calculated input
         self.prev_fr_LAI_max = 0
@@ -69,7 +69,7 @@ class Potato(BaseCrop):
         ''' ROOT DEPTH DATA '''
 
         # input
-        self.z_root_max = 2000  # maximum depth of root development  # unknown
+        self.z_root_max = 600  # maximum depth of root development
 
         # Internally calculated input
         self.fr_root = 0
@@ -81,9 +81,9 @@ class Potato(BaseCrop):
         ''' BIOMASS DATA '''
 
         # input
-        self.kl = 0.65  # unknown
-        self.RUE = 39  # unknown
-        self.T_opt = 25  # unknown
+        self.kl = 0.65
+        self.RUE = 25
+        self.T_opt = 22
 
         # Internally calculated input
         self.gamma_reg = 0
@@ -97,8 +97,8 @@ class Potato(BaseCrop):
         # ===================================================================
         ''' Soil Water Uptake Data '''
 
-        self.beta_w = 10  # water-use distribution parameter  # unknown
-        self.epco = 0.5  # unknown
+        self.beta_w = 10  # water-use distribution parameter
+        self.epco = 0.5
 
         self.water_actual_up = 0
         self.water_uptake_each_layer = []
@@ -106,67 +106,67 @@ class Potato(BaseCrop):
         # ===================================================================
         ''' Nitrogen Uptake Data '''
 
-        self.N_fix = 0.0  # unknown
+        self.N_fix = 0.0
 
-        self.beta_n = 10  # unknown
+        self.beta_n = 10
 
-        self.bio_N_opt = 0  # unknown
-        self.bio_N = 0  # unknown
+        self.bio_N_opt = 0
+        self.bio_N = 0
 
-        self.fr_n1 = 0.047  # unknown
-        self.fr_n2 = 0.0177  # unknown
-        self.fr_n3 = 0.0138  # unknown
-        self.fr_n3ish = 0.01381  # unknown
+        self.fr_n1 = 0.055
+        self.fr_n2 = 0.02
+        self.fr_n3 = 0.012
+        self.fr_n3ish = 0.0121
 
-        self.fr_N = 0  # unknown
-        self.fr_N_up = 0  # unknown
-        self.N_up = 0  # unknown
+        self.fr_N = 0
+        self.fr_N_up = 0
+        self.N_up = 0
         self.act_N_up_each_layer = []
         self.N_actual_up = 0
 
         # ===================================================================
         ''' Phosphorus Uptake Data '''
 
-        self.beta_p = 10  # unknown
+        self.beta_p = 10
 
-        self.bio_P_opt = 0  # unknown
-        self.bio_P = 0  # unknown
+        self.bio_P_opt = 0
+        self.bio_P = 0
 
-        self.fr_PHU_50 = 0.5  # unknown
-        self.fr_PHU_100 = 1.0  # unknown
-        self.fr_p1 = 0.0048  # unknown
-        self.fr_p2 = 0.0018  # unknown
-        self.fr_p3 = 0.0014  # unknown
-        self.fr_p3ish = 0.00141  # unknown
+        self.fr_PHU_50 = 0.5
+        self.fr_PHU_100 = 1.0
+        self.fr_p1 = 0.006
+        self.fr_p2 = 0.0025
+        self.fr_p3 = 0.0019
+        self.fr_p3ish = 0.00191
 
-        self.fr_P = 0  # unknown
-        self.P_up = 0  # unknown
+        self.fr_P = 0
+        self.P_up = 0
         self.act_P_up_each_layer = []
         self.P_act_up = 0
 
         # ===================================================================
         ''' Yields Data '''
 
-        self.HI_max = 0  # unknown
-        self.HI_min = 0.3  # unknown
-        self.HI_actual = 0  # unknown
-        self.HI_opt = 0.6  # unknown
+        self.HI_max = 0
+        self.HI_min = 0.95
+        self.HI_actual = 0
+        self.HI_opt = 0.95
 
-        self.harvest_eff = 0.9  # unknown
+        self.harvest_eff = 1.2
 
-        self.gamma_wu = 0  # unknown
+        self.gamma_wu = 0
 
-        self.biomass_dry_down_perc = 0.0  # TODO: Hard coded total dry down until daily method is modeled
-        self.DM_harvest_perc = 0.35  # TODO: Hard coded dry matter percent at harvest
-        self.NDF_harvest_perc = 0.0  # unknown
+        self.biomass_dry_down_percent = 0.0001  # TODO: Hard coded total dry down until daily method is modeled
+        self.DM_harvest_percent = 0.416  # TODO: Hard coded dry matter percent at harvest
+        self.NDF_harvest_percent = 0.0
 
-        self.bio_AG = 0  # unknown
-        self.yield_max = 0  # unknown
+        self.bio_AG = 0
+        self.yield_max = 0
         self.yield_actual = 0
         self.DM_yield = 0.0
         self.NDF_yield = 0.0
-        self.N_yield = 0  # unknown
-        self.P_yield = 0  # unknown
+        self.N_yield = 0
+        self.P_yield = 0
 
         self.N_yield_annual = 0.0
         self.P_yield_annual = 0.0

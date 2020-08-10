@@ -129,7 +129,7 @@ def calc_HI_act(crop_type):
 
 def calc_dry_down(crop_type):
     # TODO: stand in for more sophisticated dry down method
-    crop_type.bio_AG -= (crop_type.bio_AG * crop_type.biomass_dry_down_perc)
+    crop_type.bio_AG -= (crop_type.bio_AG * crop_type.biomass_dry_down_percent)
 
 
 #
