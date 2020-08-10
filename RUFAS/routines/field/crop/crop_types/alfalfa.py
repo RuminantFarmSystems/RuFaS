@@ -160,7 +160,7 @@ class Alfalfa(BaseCrop):
 
         self.gamma_wu = 0
 
-        self.biomass_dry_down_perc = 0.0
+        self.biomass_dry_down_percent = 0.0
         self.DM_harvest_percent = 0.15  # TODO: Hard coded dry matter percent at harvest
         self.NDF_harvest_percent = 0.416
 
