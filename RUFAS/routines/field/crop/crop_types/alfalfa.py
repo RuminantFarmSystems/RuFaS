@@ -3,11 +3,11 @@ from .base_crop import BaseCrop
 
 class Alfalfa(BaseCrop):
 
-    def __init__(self, data):
+    def __init__(self, crop_name, data):
         super().__init__()
 
         """GENERAL PLANT INFO"""
-        alfalfa_data = data['alfalfa']
+        alfalfa_data = data
         self.grow_years = alfalfa_data['grow_years']
         self.repeat = alfalfa_data['repeat']
         self.planting_date = alfalfa_data['planting_date']
@@ -18,7 +18,7 @@ class Alfalfa(BaseCrop):
 
         self.harvest_type = 'optimal'
 
-        self.crop_name = 'alfalfa'
+        self.crop_name = crop_name
         self.crop_type = 'perennial'
         self.harvest_quality = 'null'
         self.feed_id = '1g'
@@ -161,8 +161,8 @@ class Alfalfa(BaseCrop):
         self.gamma_wu = 0
 
         self.biomass_dry_down_perc = 0.0
-        self.DM_harvest_perc = 0.15  # TODO: Hard coded dry matter percent at harvest
-        self.NDF_harvest_perc = 0.416
+        self.DM_harvest_percent = 0.15  # TODO: Hard coded dry matter percent at harvest
+        self.NDF_harvest_percent = 0.416
 
         self.bio_AG = 0
         self.yield_max = 0

@@ -17,23 +17,18 @@
         "fields": {
             "field_1": {
                 "soil": "barnyard_soil.json",
-                "crop": "corn_rotation.json",
-                "field_management": "hector_1.json"
+                "crop": "tall_fescue_rotation.json",
+                "field_management": "barnyard_field_management.json"
             },
             "field_2": {
                 "soil": "barnyard_soil.json",
-                "crop": "corn_rotation.json",
-                "field_management": "hector_2.json"
+                "crop": "spring_barley_rotation.json",
+                "field_management": "barnyard_field_management.json"
             },
             "field_3": {
                 "soil": "barnyard_soil.json",
-                "crop": "corn_rotation.json",
-                "field_management": "hector_3.json"
-            },
-            "field_4": {
-                "soil": "barnyard_soil.json",
-                "crop": "corn_rotation.json",
-                "field_management": "hector_4.json"
+                "crop": "potato_rotation.json",
+                "field_management": "barnyard_field_management.json"
             }
         },
         "animal": "barnyard_animal.json",

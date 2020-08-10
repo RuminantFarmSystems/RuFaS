@@ -131,7 +131,7 @@ def calc_HI_act(crop_type):
 
 def calc_dry_down(crop_type):
     # TODO: stand in for more sophisticated dry down method
-    crop_type.bio_AG -= (crop_type.bio_AG * crop_type.biomass_dry_down_perc)
+    crop_type.bio_AG -= (crop_type.bio_AG * crop_type.biomass_dry_down_percent)
 
 
 #
@@ -178,21 +178,21 @@ def calc_quality_assessment(crop_type):
     if crop_type.crop_name.startswith('corn'):
         if crop_type.harvest_quality == 'immature':
             crop_type.feed_id = '35g'
-            crop_type.NDF_harvest_perc = 0.541
+            crop_type.NDF_harvest_percent = 0.541
         elif crop_type.harvest_quality == 'mid_mature':
             crop_type.feed_id = '36g'
-            crop_type.NDF_harvest_perc = 0.45
+            crop_type.NDF_harvest_percent = 0.45
         elif crop_type.harvest_quality == 'mature':
             crop_type.feed_id = '37g'
-            crop_type.NDF_harvest_perc = 0.445
+            crop_type.NDF_harvest_percent = 0.445
 
 
 def calc_DM_yield(crop_type):
-    crop_type.DM_yield = crop_type.yield_actual * crop_type.DM_harvest_perc
+    crop_type.DM_yield = crop_type.yield_actual * crop_type.DM_harvest_percent
 
 
 def calc_NDF_yield(crop_type):
-    crop_type.NDF_yield = crop_type.yield_actual * crop_type.NDF_harvest_perc
+    crop_type.NDF_yield = crop_type.yield_actual * crop_type.NDF_harvest_percent
 
 
 def calc_nutrient_removal(crop_type):

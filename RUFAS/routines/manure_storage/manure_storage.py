@@ -39,7 +39,7 @@ class ManureStorage:
 
         Args:
             animal_management: an instance of the AnimalManagement class
-                specified in animal_managment.py
+                specified in animal_management.py
         """
         self.pens = {}
         self.separators = {}
