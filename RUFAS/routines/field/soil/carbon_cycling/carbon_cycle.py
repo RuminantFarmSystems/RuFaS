@@ -233,10 +233,7 @@ def soil_carbon_aggregation(soil):
 
         # F. soil mass calculations
 
-        if layer.name == "layer_1":
-            depth = layer.bottom_depth
-        else:
-            depth = layer.bottom_depth - soil.curr_layer_depth
+        depth = layer.bottom_depth - soil.curr_layer_depth
         soil.curr_layer_depth += depth
 
         # depth below in meters
