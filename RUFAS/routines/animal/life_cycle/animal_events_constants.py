@@ -16,7 +16,7 @@ INSEMINATED_W_BASE = "inseminated with "
 BREEDING_START = "breeding start"
 DO_NOT_BREED = "mark as do not breed"
 
-#estrus occurred
+# estrus occurred
 ESTRUS_DETECTED = "estrus detected"
 BASIC_ESTRUS_NOTE = "estrus"
 ESTRUS_AFTER_AI_NOTE = "estrus after AI"
@@ -26,15 +26,15 @@ ESTRUS_AFTER_CALVING_NOTE = "1st estrus after calving"
 ESTRUS_BEFORE_VWP_NOTE = "estrus occurred before vwp"
 ESTRUS_AFTER_PGF_NOTE = "estrus after PGF"
 
-#TAI injections
+# TAI injections
 INJECT_GNRH = "inject GnRH"
 INJECT_PGF = "inject PGF"
 
-#heifer repro
+# heifer repro
 ESTRUS_OCCURRED = "estrus"
 INJECT_CIDR = "inject CIDR"
 
-#presynch protocols
+# presynch protocols
 PRESYNCH_END = "Presynch ended"
 DOUBLE_OVSYNCH_END = "Double OvSynch ended"
 C6G_END = "G6G ended"
@@ -66,7 +66,6 @@ DRY = "dry"
 
 
 # culling
-CULL_REASON_BASE = "culled for "
 HEIFER_REPRO_CULL = "culled for heifer reproductive problem"
 LOW_PROD_CULL = "culled for low production"
 LAMENESS_CULL = "culled for lameness"
@@ -75,5 +74,3 @@ MASTITIS_CULL = "culled for mastitis"
 DISEASE_CULL = "culled for disease"
 UDDER_CULL = "culled for udder"
 UNKNOWN_CULL = "culled for unknown"
-
-

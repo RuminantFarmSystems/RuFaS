@@ -189,8 +189,8 @@ class Cow(HeiferIII):
 			daily_fat_correct_milk_production: calculated form estimated
 				milk production and fat percent, for temporary use
 		"""
-		if self.days_in_preg == self.gestation_length - \
-			AnimalBase.config['dip_dry']:
+		if self.days_in_preg == AnimalBase.config['dip_dry'] :
+			#self.gestation_length - \ AnimalBase.config['dip_dry']:
 			self.milking = False
 			self.events.add_event(self.days_born, sim_day, c.DRY)
 			self.days_in_milk = 0

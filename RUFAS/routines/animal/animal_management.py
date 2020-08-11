@@ -321,7 +321,7 @@ class AnimalManagement:
             for animal in animals_in_pen:
                 self.id_pen[animal.id] = pen.id
 
-    def daily_update_id_pen(self, animals_added, ids_removed, calves_born):
+    def daily_update_id_pen(self, animals_added, ids_removed, calves_born, feed, temp):
         """
         For animals removed from the herd in daily animal updates, the ids of
         the pens from which they were removed are stored in the
@@ -345,12 +345,17 @@ class AnimalManagement:
                 del self.id_pen[i]
 
         for animal in animals_added:
+
             if len(self.pens_needing_animals) == 0:
                 # if there hasn't yet been an animal removed from a pen for this
                 # animal to be added, add this animal to the last pen by default
                 pen = len(self.all_pens) - 1
             else:
                 pen = self.pens_needing_animals.popleft()
+            #
+            # if type(animal).__name__ == 'Cow':
+            #     pen = len(self.all_pens) - 1
+
             self.id_pen[animal.id] = pen
 
             if type(animal).__name__ == 'Calf':
@@ -369,14 +374,14 @@ class AnimalManagement:
                 animal_p_conc = self.cow_p_comp
                 self.cows.append(animal)
 
-            self.all_pens[pen].set_up_new_animal(animal, animal_p_conc)
+            self.all_pens[pen].set_up_new_animal(animal, animal_p_conc, self.housing, self.pasture_concentrate, feed, temp)
 
         for calf in calves_born:
             # TODO: this is the hard coded calf pen value
             pen = 0
             self.id_pen[calf.id] = pen
             self.calves.append(calf)
-            self.all_pens[pen].set_up_new_animal(calf, -1)
+            self.all_pens[pen].set_up_new_animal(calf, -1, self.housing, self.pasture_concentrate, feed, temp)
 
     def pen_allocation(self):
         """
@@ -589,7 +594,6 @@ class AnimalManagement:
         Args:
             feed: instance of the Feed class
         """
-
         if self.simulate_animals:
             for pen in self.all_pens:
                 pen.pen_populated = len(pen.animals_in_pen) > 0
@@ -603,13 +607,13 @@ class AnimalManagement:
                                                      self.heiferIIs,
                                                      self.heiferIIIs, self.cows)
 
-            self.daily_update_id_pen(animals_added, ids_removed, calves_born)
+            temp = weather.T_avg[time.year - 1][time.day - 1]
+            self.daily_update_id_pen(animals_added, ids_removed, calves_born, feed, temp)
 
             # phosphorus requirements for daily updates
             self.calc_p_rqmts(feed)  # per animal
 
             if self.end_ration_interval():
-                temp = weather.T_avg[time.year - 1][time.day - 1]
                 self.calc_nutrient_rqmts(feed, temp)  # per animal
                 self.clear_pens()
                 self.pen_allocation()

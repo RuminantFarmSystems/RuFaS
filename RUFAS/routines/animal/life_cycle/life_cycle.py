@@ -440,7 +440,7 @@ class LifeCycleManager:
             if type(heiferIII).__name__ == 'HeiferIII':
                 cow_stage = heiferIII.update(date)
             else:
-                cow_stage = heiferIII.update(record_econ_stats, date)
+                cow_stage = heiferIII.update(record_econ_stats, date, self.avg_CI)
 
             if cow_stage:
                 args = heiferIII.get_heiferIII_values()
@@ -468,7 +468,7 @@ class LifeCycleManager:
 
         # if the number of heifers is more than needed for the herd, sell
         # those as replacement
-        while len(heiferIIIs) + len(cows) > self.herd_num * 1.03:
+        while len(heiferIIIs) + len(cows) > self.herd_num * 1.03 and len(heiferIIIs) > 0:
             removed = heiferIIIs.pop()
             ids_removed.append(removed.id)
             self.sold_to_market += 1
@@ -660,7 +660,7 @@ class LifeCycleManager:
         # calculate service rate and conception rate
         if date >= sim_length - 21 * self.config["num_21_days_repro"]:
             self.count_21_days += 1
-            if self.count_21_days % 21 == 0:
+            if self.count_21_days % 21 == 0 and self.herd_num > 50:
                 self.service_rate_sum_21_days += \
                     float(self.num_ai_21_days) / \
                     float(self.num_cow_btw_vwp_preg_21_days) * 21
@@ -677,11 +677,18 @@ class LifeCycleManager:
         self.replacement_bought_lst.append(daily_bought_from_market)
         self.milking_cows_lst.append(daily_cow_milking)
 
-        self.calf_percent = self.calf_num / total_animal_num * 100
-        self.heiferI_percent = self.heiferI_num / total_animal_num * 100
-        self.heiferII_percent = self.heiferII_num / total_animal_num * 100
-        self.heiferIII_percent = self.heiferIII_num / total_animal_num * 100
-        self.cow_percent = self.cow_num / total_animal_num * 100
+        if total_animal_num == 0:
+            self.calf_percent = 0
+            self.heiferI_percent = 0
+            self.heiferII_percent = 0
+            self.heiferIII_percent = 0
+            self.cow_percent = 0
+        else:
+            self.calf_percent = self.calf_num / total_animal_num * 100
+            self.heiferI_percent = self.heiferI_num / total_animal_num * 100
+            self.heiferII_percent = self.heiferII_num / total_animal_num * 100
+            self.heiferIII_percent = self.heiferIII_num / total_animal_num * 100
+            self.cow_percent = self.cow_num / total_animal_num * 100
 
         for cull_reason in self.cull_reason_stats:
             if self.culled_cow_num != 0:
@@ -689,8 +696,11 @@ class LifeCycleManager:
                     self.cull_reason_stats[cull_reason] / \
                         self.culled_cow_num * 100
         for parity in self.num_cow_for_parity:
-            self.percent_cow_for_parity[parity] = \
-                self.num_cow_for_parity[parity] / self.cow_num * 100
+            if self.cow_num == 0:
+                self.percent_cow_for_parity[parity] = 0
+            else:
+                self.percent_cow_for_parity[parity] = \
+                    self.num_cow_for_parity[parity] / self.cow_num * 100
 
         self.avg_service_rate = self.service_rate_sum_21_days / \
             float(self.config["num_21_days_repro"])
