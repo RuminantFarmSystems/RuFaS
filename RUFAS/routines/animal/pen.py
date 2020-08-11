@@ -360,7 +360,8 @@ class Pen:
                 total_p_animal += animal.p_animal
             self.avg_p_animal = total_p_animal / len(self.animals_in_pen)
 
-    def set_up_new_animal(self, animal, p_comp):
+    def set_up_new_animal(self, animal, p_comp, housing, pasture_concentrate,
+                          feed, temp):
         """
         Sets the necessary attributes for @animal to be a replacement in this
         pen.
@@ -380,6 +381,10 @@ class Pen:
             num_animals = 1
 
         # set animal's ration to be the intake of all other animals in pen
+        if self.ration == {}:
+            self.ration = self.calc_ration(housing, pasture_concentrate, feed,
+                                           temp)
+
         for key in self.ration:
             if key == 'status':
                 animal.ration_formulation[key] = self.ration[key]
