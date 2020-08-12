@@ -12,6 +12,21 @@ birth date, and age for all animals to be identified.
 from RUFAS.routines.animal.life_cycle.animal_events import AnimalEvents
 
 
+class PenHistory:
+	def __init__(self, start, end, pen, classes_in_pen):
+		self.start_date = start
+		self.end_date = end
+		self.pen = pen
+		self.classes_in_pen = classes_in_pen
+
+
+class BodyWeightHistory:
+	def __init__(self, sim_day, days_born, body_weight):
+		self.simulation_day = sim_day
+		self.days_born = days_born
+		self.body_weight = body_weight
+
+
 class AnimalBase(object):
 	config = {}
 	nutrients = None
@@ -37,30 +52,69 @@ class AnimalBase(object):
 		self.breed = args['breed']
 		self.birth_date = args['birth_date']
 		self.days_born = args['days_born']
-		self.culled = False
-		self.do_not_breed = False
-		self.events = AnimalEvents()
+		self.semen_used = self.config['semen_type']
 
-		self.daily_growth = 0
-		self.nutrient_rqmts = {}
-		self.set_default_nutrient_rqmts()
-		self.dry_matter_intake = 0
-		self.manure_excretion = {}
-		self.ration_formulation = {'objective': 0.00}
-		self.DMIest = 0
-		self.DBW = 0
-		self.p_animal = 0
-		self.p_intake = 0
-		self.p_conc = 0
-		self.p_excrt = 0
-		self.body_weight = 0
-		self.mature_body_weight = 0
-		self.p_req = 0
-		self.dP_reserves = 0
-		self.p_excess = 0
-		self.p_gest = 0
-		self.p_growth = 0
-		self.p_maint_feces = 0
+		# TODO is there a better way to preserve variable values when the
+		#  animal is aging up?
+		try:
+			self.culled = self.culled
+			self.do_not_breed = self.do_not_breed
+			self.body_weight_history = self.body_weight_history
+			self.events = self.events
+			self.pen_history = self.pen_history
+			self.daily_growth = self.daily_growth
+			self.nutrient_rqmts = self.nutrient_rqmts
+			self.dry_matter_intake = self.dry_matter_intake
+			self.manure_excretion = self.manure_excretion
+			self.ration_formulation = self.ration_formulation
+			self.DMIest = self.DMIest
+			self.DBW = self.DBW
+			self.p_animal = self.p_animal
+			self.p_intake = self.p_intake
+			self.p_conc = self.p_conc
+			self.p_excrt = self.p_excrt
+			self.body_weight = self.body_weight
+			self.mature_body_weight = self.mature_body_weight
+			self.p_req = self.p_req
+			self.dP_reserves = self.dP_reserves
+			self.p_excess = self.p_excess
+			self.p_gest = self.p_gest
+			self.p_growth = self.p_growth
+			self.p_maint_feces = self.p_maint_feces
+			self.conceptus_weight = self.conceptus_weight
+		except Exception as e:
+			self.culled = False
+			self.do_not_breed = False
+			self.body_weight_history = []
+			self.events = AnimalEvents()
+			self.pen_history = []
+			self.daily_growth = 0
+			self.nutrient_rqmts = {}
+			self.set_default_nutrient_rqmts()
+			self.dry_matter_intake = 0
+			self.manure_excretion = {}
+			self.ration_formulation = {'objective': 0.00}
+			self.DMIest = 0
+			self.DBW = 0
+			self.p_animal = 0
+			self.p_intake = 0
+			self.p_conc = 0
+			self.p_excrt = 0
+			self.body_weight = 0
+			self.mature_body_weight = 0
+			self.p_req = 0
+			self.dP_reserves = 0
+			self.p_excess = 0
+			self.p_gest = 0
+			self.p_growth = 0
+			self.p_maint_feces = 0
+			self.conceptus_weight = 0
+
+		if 'body_weight_history' in args:
+			self.body_weight_history = args['body_weight_history']
+			self.pen_history = args['pen_history']
+		if 'conceptus_weight' in args:
+			self.conceptus_weight = args['conceptus_weight']
 
 	def set_default_nutrient_rqmts(self):
 		"""
@@ -150,3 +204,33 @@ class AnimalBase(object):
 		Returns: True/False value indicating if culled
 		"""
 		return self.culled
+
+	def update_pen_history(self, curr_pen, curr_day, classes_in_pen):
+		"""
+		Updates the animal's pen history by either appending to the existing
+		history if the animal is in a different pen than it was the last time
+		this method is called or modifying the last element in the pen_history
+		list to reflect the current simulation day.
+
+		Args:
+			curr_pen: the pen that the animal is currently in
+			curr_day: the current simulation day
+			classes_in_pen: the classes in the animal's current pen
+		"""
+		last_pen = self.pen_history[-1].pen if len(self.pen_history) > 0 else None
+		if last_pen is None or last_pen != curr_pen:
+			self.pen_history.append(PenHistory(curr_day, curr_day, curr_pen,
+											   list(classes_in_pen)))
+		else:  # last_pen == curr_pen
+			self.pen_history[-1].end_date = curr_day
+			self.pen_history[-1].classes_in_pen = list(classes_in_pen)
+
+	def update_body_weight_history(self, sim_day):
+		"""
+		Updates the animal's body weight history by appending a
+		BodyWeightHistory object to the list.
+
+		Args:
+			sim_day: simulation day
+		"""
+		self.body_weight_history.append(BodyWeightHistory(sim_day, self.days_born, self.body_weight))

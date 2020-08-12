@@ -59,3 +59,8 @@ class BaseReportDriver:
         if self.produce_graphics:
             for report in self.reports.values():
                 report.produce_report_graphics()
+
+    def finalize(self, state, weather, time):
+        if self.produce_csv:
+            for report in self.reports.values():
+                report.finalize(state, weather, time)

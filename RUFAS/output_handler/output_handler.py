@@ -43,7 +43,8 @@ class OutputHandler:
         self.reports = {
                         'feed_storage_report': FeedStorageReport(data['feed_storage_report']),
                         'custom_report': CustomReport(data['custom_report']),
-                        'mass_balance': MassBalanceReport(data['mass_balance'])
+                        'mass_balance': MassBalanceReport(data['mass_balance']),
+                        'life_cycle_report': LifeCycleReport(data['life_cycle_report']),
                         }
 
         for field in state.fields:
@@ -169,3 +170,8 @@ class OutputHandler:
         for report_name in self.reports:
             report = self.reports[report_name]
             report.produce_report_graphics()
+
+    def finalize(self, state, weather, time):
+        for report_name in self.reports:
+            report = self.reports[report_name]
+            report.finalize(state, weather, time)
