@@ -17,18 +17,8 @@
         "fields": {
             "field_1": {
                 "soil": "barnyard_soil.json",
-                "crop": "tall_fescue_rotation.json",
-                "field_management": "barnyard_field_management.json"
-            },
-            "field_2": {
-                "soil": "barnyard_soil.json",
-                "crop": "spring_barley_rotation.json",
-                "field_management": "barnyard_field_management.json"
-            },
-            "field_3": {
-                "soil": "barnyard_soil.json",
-                "crop": "potato_rotation.json",
-                "field_management": "barnyard_field_management.json"
+                "crop": "corn_rotation.json",
+                "field_management": "default_field_management.json"
             }
         },
         "animal": "barnyard_animal.json",

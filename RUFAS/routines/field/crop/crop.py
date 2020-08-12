@@ -11,7 +11,7 @@ Author(s): Kass Chupongstimun, kass_c@hotmail.com
 """
 
 from math import acos, asin, sin, tan, pi
-from .crop_types import base_crop, alfalfa, corn, soybean, tall_fescue, spring_barley, potato
+from .crop_types import base_crop, alfalfa, corn, soybean, tall_fescue, spring_barley, potato, sugar_beet, spring_wheat
 from . import heat_units, leaf_area_index, root_development, biomass, yields, \
     phosphorus_uptake, nitrogen_uptake, growth_constraints
 
@@ -231,6 +231,10 @@ class Crop:
                 crop = spring_barley.SpringBarley(crop_name, crop_data)
             elif crop_name.startswith("potato"):
                 crop = potato.Potato(crop_name, crop_data)
+            elif crop_name.startswith("sugar_beet"):
+                crop = sugar_beet.SugarBeet(crop_name, crop_data)
+            elif crop_name.startswith("spring_wheat"):
+                crop = spring_wheat.SpringWheat(crop_name, crop_data)
             else:
                 print(crop_name, "is an invalid crop_type.")
                 continue
