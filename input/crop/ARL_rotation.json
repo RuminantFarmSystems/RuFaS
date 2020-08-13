@@ -7,7 +7,7 @@
             "repeat": 4,
             "planting_date": 121,
             "harvest_date": 319,
-            "harvest_type": "optimal"
+            "harvest_type": "scheduled"
         },
         "alfalfa": {
             "grow_years": [1990, 1991, 1992],

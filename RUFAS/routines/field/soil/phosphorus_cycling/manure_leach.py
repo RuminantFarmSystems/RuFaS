@@ -77,7 +77,8 @@ def update_all(soil, field_management, weather, time):
                 min(
                     max(
                         0.0,
-                        (soil.MIP_leach / (rainfall / 10.0) / soil.area * 10.0 * soil.PD_factor) * 0.01 * soil.area
+                        (soil.MIP_leach / (rainfall / 10.0) / soil.area * 10.0 * soil.PD_factor)
+                        * 0.01 * soil.area
                     ),
                     soil.MIP_leach
                 )
@@ -99,7 +100,7 @@ def update_all(soil, field_management, weather, time):
         soil.WIP -= (soil.MIP_leach + soil.MIP_runoff)
         soil.WOP -= (soil.MIP_leach + soil.MOP_runoff)
 
-        soil.M_leach = soil.MIP_leach - soil.MIP_runoff + soil.MOP_leach - soil.MOP_runoff
+        soil.M_leach = soil.MIP_leach + soil.MOP_leach
         # convert soil P from KG/HA to KG and add manure P leached
 
         DF = 0.6
@@ -107,8 +108,10 @@ def update_all(soil, field_management, weather, time):
         for layer in soil.soil_layers:
             layer.labile_P *= soil.area
 
-            layer.labile_P += DF * soil.M_leach
-            M_not_leached -= DF * soil.M_leach
+            M_leached = min(M_not_leached, DF * soil.M_leach)
+
+            layer.labile_P += M_leached
+            M_not_leached -= M_leached
 
             layer.labile_P /= soil.area
 
@@ -186,8 +189,9 @@ def update_all(soil, field_management, weather, time):
             layer.labile_P *= soil.area
 
             # S.5.D.IV.14
-            layer.labile_P += DF * soil.DP
-            DP_not_decomposed -= DF * soil.DP
+            DP_decomposed = min(DP_not_decomposed, DF * soil.DP)
+            layer.labile_P += DP_decomposed
+            DP_not_decomposed -= DP_decomposed
 
             # S.5.A.8
             layer.labile_P /= soil.area
