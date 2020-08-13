@@ -51,10 +51,10 @@ def nitrification_volatilization(soil):
 
         # "pseudocode_soil" S.4.B.6
         exp_part = exp(-nitr_reg - volatil_reg)
-        tot_nitri_volatil = layer.NH4 * (1 - exp_part)
+        nitri_volatil = layer.NH4 * (1 - exp_part)
 
-        tot_nitri_volatil = min(layer.NH4, tot_nitri_volatil)
-        layer.NH4 -= tot_nitri_volatil
+        nitri_volatil = min(layer.NH4, nitri_volatil)
+        layer.NH4 -= nitri_volatil
 
         # "pseudocode_soil" S.4.B.7
         frac_nitr = 1 - exp(-nitr_reg)
@@ -69,12 +69,12 @@ def nitrification_volatilization(soil):
 
         else:
             nitrification = (frac_nitr / (frac_nitr + frac_volatil)) * \
-                            tot_nitri_volatil
+                            nitri_volatil
             volatilization = (frac_volatil / (frac_nitr + frac_volatil)) * \
-                             tot_nitri_volatil
+                             nitri_volatil
 
         layer.nitrification = nitrification
         layer.volatilization = volatilization
-        layer.tot_nitri_volatil = tot_nitri_volatil
+        layer.nitri_volatil = nitri_volatil
 
         layer.NO3 += nitrification

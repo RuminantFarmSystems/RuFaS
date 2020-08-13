@@ -601,3 +601,6 @@ class Soil:
         self.M_DRP_runoff_annual = 0.0
 
         self.P_uptake_annual = 0.0
+
+        self.fert_P_leached_annual = 0.0
+        self.fert_P_runoff_annual = 0.0

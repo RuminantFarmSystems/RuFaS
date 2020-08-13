@@ -29,18 +29,13 @@ def daily_field_management_routine(soil, manure_storage, field_management, weath
         time: an instance of the Time class defined in classes.py
     """
 
-    field_management.fert_applied = 0.0
-    field_management.fert_N_applied = 0.0
-    field_management.fert_P_applied = 0.0
-    field_management.fert_K_applied = 0.0
+    daily_field_management_reset(field_management)
+
     fert_management = field_management.managed_applications['fertilizer']
     if (time.calendar_year, time.day) in fert_management.applications:
         fertilizer_application.update_all(soil, field_management,
                                           fert_management.applications[(time.calendar_year, time.day)].data)
 
-    field_management.manure_applied = 0.0
-    field_management.manure_N_applied = 0.0
-    field_management.manure_P_applied = 0.0
     manure_management = field_management.managed_applications['manure']
     if (time.calendar_year, time.day) in manure_management.applications:
         manure_application.update_all(soil, field_management, manure_storage,
@@ -54,6 +49,17 @@ def daily_field_management_routine(soil, manure_storage, field_management, weath
             till_management.iterate_application(time)
 
     field_management.update_annual_variables(manure_storage)
+
+
+def daily_field_management_reset(field_management):
+    field_management.fert_applied = 0.0
+    field_management.fert_N_applied = 0.0
+    field_management.fert_P_applied = 0.0
+    field_management.fert_K_applied = 0.0
+
+    field_management.manure_applied = 0.0
+    field_management.manure_N_applied = 0.0
+    field_management.manure_P_applied = 0.0
 
 
 class FieldManagement:
@@ -247,9 +253,6 @@ class FieldManagement:
             self.default_data = default_data
             self.management_data = management_data
 
-            self.composition = None
-            if 'composition' in self.management_data.keys():
-                self.composition = self.management_data.pop('composition')
             self.rotation_years = self.management_data.pop('rotation_years')
             self.repeat = self.management_data.pop('repeat')
 
@@ -297,7 +300,10 @@ class FieldManagement:
             else:
                 self.applications[(time.calendar_year, time.day + 1)] = \
                     self.applications.pop(
-                        ((time.calendar_year, -1) if (time.calendar_year, -1) in self.applications else (time.calendar_year, time.day))
+                        (
+                            (time.calendar_year, -1) if (time.calendar_year, -1) in self.applications
+                            else (time.calendar_year, time.day)
+                        )
                     )
 
         def iterate_application(self, time):
@@ -311,13 +317,21 @@ class FieldManagement:
             # if it is the last day of the current year
             if time.day == len(time.years[time.year - 1]):
                 if time.year < len(time.years):
-                    self.applications[(time.calendar_year, 1)] = self.applications.pop(
-                        ((time.calendar_year, -1) if (time.calendar_year, -1) in self.applications else (time.calendar_year, time.day))
-                    )
+                    self.applications[(time.calendar_year, 1)] = \
+                        self.applications.pop(
+                            (
+                                (time.calendar_year, -1) if (time.calendar_year, -1) in self.applications
+                                else (time.calendar_year, time.day)
+                            )
+                        )
             else:
-                self.applications[(time.calendar_year, time.day + 1)] = self.applications.pop(
-                    ((time.calendar_year, -1) if (time.calendar_year, -1) in self.applications else (time.calendar_year, time.day))
-                )
+                self.applications[(time.calendar_year, time.day + 1)] = \
+                    self.applications.pop(
+                        (
+                            (time.calendar_year, -1) if (time.calendar_year, -1) in self.applications
+                            else (time.calendar_year, time.day)
+                        )
+                    )
 
         class BaseApplication:
             def __init__(self, app_data):

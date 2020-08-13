@@ -43,9 +43,9 @@ def formulate_fert_app(soil, field_management, fert_app):
     fertilizer_application = dict(fert_app)
 
     # FM.3.A.1
-    N_frac = field_management.managed_applications['fertilizer'].composition['N']
-    P_frac = field_management.managed_applications['fertilizer'].composition['P']
-    K_frac = field_management.managed_applications['fertilizer'].composition['K']
+    N_frac = fert_app['composition']['N']
+    P_frac = fert_app['composition']['P']
+    K_frac = fert_app['composition']['K']
     N_requested_mass = (0 if N_frac == 0 else (fert_app['N_mass'] / N_frac)) * soil.area
     P_requested_mass = (0 if P_frac == 0 else (fert_app['P_mass'] / P_frac)) * soil.area
     K_requested_mass = (0 if K_frac == 0 else (fert_app['K_mass'] / K_frac)) * soil.area
