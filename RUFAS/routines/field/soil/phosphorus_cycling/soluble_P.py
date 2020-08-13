@@ -56,7 +56,7 @@ def update_all(soil):
 
         DRP_leach_prev_layer = layer.DRP_leach_act
 
-        # S.5..6
-        soil.DRP_runoff_annual += layer.DRP_runoff * soil.area
+        # S.5.B.6
+        soil.DRP_runoff += layer.DRP_runoff * soil.area
 
-    soil.DRP_leach_annual += DRP_leach_prev_layer
+    soil.DRP_drainage += DRP_leach_prev_layer

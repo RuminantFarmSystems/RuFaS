@@ -16,10 +16,6 @@ from .nitrogen_cycling import nitrogen_cycling
 from .phosphorus_cycling import phosphorus_cycling
 
 
-# ------------------------------------------------------------------------------
-# Function: daily_soil_routine
-# Executes all the daily soil routines
-# ------------------------------------------------------------------------------
 def daily_soil_routine(soil, crop, field_management, weather, time):
     """
     Description:
@@ -31,6 +27,8 @@ def daily_soil_routine(soil, crop, field_management, weather, time):
         weather: instance of the Weather class
         time: instance of the Time class
     """
+    daily_soil_reset(soil)
+
     # calculate and update the temperature of the soil layers
     soil_temp.update_all(soil, crop, weather, time)
 
@@ -62,6 +60,11 @@ def daily_soil_routine(soil, crop, field_management, weather, time):
     annual_variable_update(soil)
 
 
+def daily_soil_reset(soil):
+    soil.DRP_runoff = 0.0
+    soil.DRP_drainage = 0.0
+
+
 def annual_variable_update(soil):
     soil_water.update_annual_SW(soil)
     phosphorus_cycling.update_annual_P(soil)
@@ -81,7 +84,6 @@ class Soil:
 
         # soil profile
         self.CN2 = data['CN2']  # unitless, user-defined curve number (empirical)
-        self.profile_bulk_density = data['profile_bulk_density']
         self.field_slope = data['field_slope']
         self.slope_length = data['slope_length']
         self.manning = data['manning']
@@ -104,10 +106,10 @@ class Soil:
 
         # determine profile depth
         self.profile_depth = self.soil_layers[-1].bottom_depth
-        self.calculate_layer_thickness()
+        self.profile_bulk_density = 0.0
 
         self.cover = data['soil_cover_type']
-        self.cover_factor = self.set_cover_factor()
+        self.cover_factor = 0.0
 
         self.leach = 0.0
         self.area = data['field_size']
@@ -117,8 +119,6 @@ class Soil:
         self.stable_P = 0.0
         self.org_P = 0.0
         self.soil_P = 0.0
-
-        self.initialize_soil_P()
 
         # fertilizer Phosphorus
         self.no_rains = 0.0
@@ -140,11 +140,11 @@ class Soil:
         self.SOP = 0.0
 
         # soluble_p
-        self.DRP_leach = 0.0
+        self.DRP_drainage = 0.0
         self.DRP_runoff = 0.0
 
         self.DRP_runoff_annual = 0.0
-        self.DRP_leach_annual = 0.0
+        self.DRP_drainage_annual = 0.0
 
         self.M_DRP_runoff = 0.0
         self.M_DRP_runoff_annual = 0.0
@@ -152,11 +152,11 @@ class Soil:
         # fertilizer Phosphorus leaching
         self.fert_sorp = 0.0
         self.fert_absorbed_sum = 0.0
-        self.fert_P_leach = 0.0
+        self.fert_P_leached = 0.0
         self.PD_factor = 0.0
         self.fert_P_runoff = 0.0
         self.fert_P_runoff_annual = 0.0
-        self.fert_P_leach_annual = 0.0
+        self.fert_P_leached_annual = 0.0
         self.fert_P_runoff_act = 0.0
 
         # manure Phosphorus leaching
@@ -190,11 +190,7 @@ class Soil:
 
         # Phosphorus mass balance
         self.profile_P = 0.0
-        for layer in self.soil_layers:
-            self.profile_P += layer.labile_P + layer.active_P + \
-                              layer.stable_P + layer.org_P
-
-        self.initial_profile_P = self.profile_P
+        self.initial_profile_P = 0.0
 
         self.P_calc = 0.0
         self.P_balance_difference = 0.0
@@ -217,8 +213,7 @@ class Soil:
 
         # soil hydrology
         self.profile_SW = 0.0
-        self.initialize_soil_water()  # calculate soil water in layer and sum for profile
-        self.initial_profile_SW = self.profile_SW
+        self.initial_profile_SW = 0.0
 
         self.evap_max = 0.0
         self.trans_max = 0.0
@@ -282,16 +277,10 @@ class Soil:
         self.N_uptake = 0.0
         self.N_uptake_annual = 0.0
         self.fresh_N = 0.0
-        self.initialize_soil_N()
 
         # Nitrogen mass balance
         self.profile_N = 0.0
-        for layer in self.soil_layers:
-            self.profile_N += layer.NO3 + layer.NH4 + \
-                              layer.org_N + layer.active_N + layer.stable_N
-
-        self.profile_N += self.fresh_N
-        self.initial_profile_N = self.profile_N
+        self.initial_profile_N = 0.0
 
         self.N_calc = 0.0
         self.N_balance_difference = 0.0
@@ -311,6 +300,8 @@ class Soil:
         self.N_runoff_annual = 0.0
         self.N_erosion_annual = 0.0
         self.N_uptake_annual = 0.0
+
+        self.initialize_profile_characteristics()
 
     class SoilLayer:
         def __init__(self, layer_name, layer_data):
@@ -411,52 +402,29 @@ class Soil:
             self.days_unbalanced_labile = 0.0
             self.days_unbalanced_active = 0.0
 
-    def calculate_layer_thickness(self):
-        """
-        Definition:
-            Calculates and updates the thickness (cm) of each layer
-        """
+    def initialize_profile_characteristics(self):
+        if self.cover == "GRASSED":
+            self.cover_factor = 0.8
+        elif self.cover == "RESIDUE COVER":
+            self.cover_factor = 0.667
+        else:
+            self.cover_factor = 0.5333
+
         curr_thickness = 0
+        bulk_density_avg = 0.0
         for layer in self.soil_layers:
+            bulk_density_avg += layer.bulk_density
+
             layer.thickness = layer.bottom_depth - curr_thickness
             layer.thickness_cm = layer.thickness / 10
             curr_thickness = layer.bottom_depth
 
-    def set_cover_factor(self):
-        """
-        Definition:
-            Determines the initial cover factor based on the type of cover
-            specified in the JSON file
-
-        Returns:
-            int: the cover factor
-        """
-        if self.cover == "GRASSED":
-            return 0.8
-        elif self.cover == "RESIDUE COVER":
-            return 0.667
-        else:
-            return 0.5333
-
-    def initialize_soil_water(self):
-        """
-        Description:
-            Initialize information for the soil water sub-module
-        """
-        for layer in self.soil_layers:
             layer.soil_water = layer.thickness * layer.soil_water_percent
             layer.fc_water = layer.thickness * layer.field_capacity
             layer.sat_water = layer.thickness * layer.saturation
             layer.wilting_water = layer.thickness * layer.wilting_point
             self.profile_SW += layer.soil_water
 
-    def initialize_soil_P(self):
-        """
-        Description:
-            Initialize information for the soil Phosphorus sub-module
-            "pseudocode_soil" S.5.A
-        """
-        for layer in self.soil_layers:
             # S.5.A.1
             layer.PSP_max = -0.045 * log(layer.clay) + 0.001 * \
                             layer.labile_P - 0.035 * layer.org_C + 0.43
@@ -484,13 +452,6 @@ class Soil:
             # S.5.A.6
             layer.mass = layer.bulk_density * layer.thickness_cm * 10000
 
-    def initialize_soil_N(self):
-        """
-        Description:
-            Initialize information for the soil nitrogen sub-module
-            "pseudocode_soil" S.4.A
-        """
-        for layer in self.soil_layers:
             z = layer.bottom_depth
 
             # S.4.A.1
@@ -521,10 +482,22 @@ class Soil:
             layer.active_N = active_N * unit_adjustment
             layer.stable_N = stable_N * unit_adjustment
             layer.NH4 = NH4 * unit_adjustment
+
+            self.profile_N += layer.NO3 + layer.NH4 + \
+                              layer.org_N + layer.active_N + layer.stable_N
+
+            self.profile_P += layer.labile_P + layer.active_P + \
+                              layer.stable_P + layer.org_P
+
+        self.profile_bulk_density = bulk_density_avg / len(self.soil_layers)
         # S.4.A.5
         unit_adjustment = self.soil_layers[0].bulk_density * self.soil_layers[0].thickness / 100
         fresh_N = 0.0015 * self.residue
         self.fresh_N = fresh_N * unit_adjustment
+        self.profile_N += self.fresh_N
+        self.initial_profile_P = self.profile_P
+        self.initial_profile_SW = self.profile_SW
+        self.initial_profile_N = self.profile_N
 
     def annual_mass_balance(self, field_management):
         """
@@ -614,7 +587,7 @@ class Soil:
 
         # soil Phosphorus
         self.DRP_runoff_annual = 0.0
-        self.DRP_leach_annual = 0.0
+        self.DRP_drainage_annual = 0.0
 
         self.MIP_runoff_annual = 0.0
         self.MOP_runoff_annual = 0.0
@@ -626,3 +599,5 @@ class Soil:
 
         self.TIP_runoff_annual = 0.0
         self.M_DRP_runoff_annual = 0.0
+
+        self.P_uptake_annual = 0.0

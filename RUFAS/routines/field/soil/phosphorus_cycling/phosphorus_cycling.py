@@ -66,7 +66,7 @@ def update_profile_P(soil, field_management):
 
     soil.P_erosion = soil.sed_P
 
-    soil.P_drainage = soil.fert_P_leach + soil.M_leach + soil.DRP_leach
+    soil.P_drainage = soil.fert_P_leached + soil.M_leach + soil.DRP_drainage
 
     soil.P_runoff = soil.M_DRP_runoff + soil.fert_P_runoff_act + \
                     soil.DRP_runoff + soil.MIP_runoff + soil.MOP_runoff
@@ -77,6 +77,14 @@ def update_profile_P(soil, field_management):
 
 
 def update_annual_P(soil):
+    soil.M_DRP_runoff_annual += soil.M_DRP_runoff
+    soil.TIP_runoff_annual += soil.TIP_runoff
+    soil.MIP_leach_annual += soil.MIP_leach
+    soil.MOP_leach_annual += soil.MOP_leach
+    soil.fert_P_runoff_annual += soil.fert_P_runoff_act
+    soil.fert_P_leached_annual += soil.fert_P_leached
+    soil.DRP_runoff_annual += soil.DRP_runoff
+    soil.DRP_drainage_annual += soil.DRP_drainage
     soil.P_erosion_annual += soil.P_erosion
     soil.P_drainage_annual += soil.P_drainage
     soil.P_runoff_annual += soil.P_runoff

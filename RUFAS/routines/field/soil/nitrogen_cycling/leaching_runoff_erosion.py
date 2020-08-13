@@ -58,9 +58,6 @@ def leaching_runoff_erosion(soil):
     soil.NH4_runoff = min(layer.NH4, NH4_runoff)
     layer.NH4 -= soil.NH4_runoff
 
-    soil.NO3_runoff_annual += soil.NO3_runoff
-    soil.NH4_runoff_annual += soil.NH4_runoff
-
     # "pseudocode_soil" S.4.C.3
     active_N_eros_conc = (100 * layer.active_N) / (BD * thickness)
     stable_N_eros_conc = (100 * layer.stable_N) / (BD * thickness)
@@ -115,7 +112,7 @@ def leaching_runoff_erosion(soil):
         perc = layer.perc
         NO3_perc = 0
         NH4_perc = 0
-        active_perc = 0
+        active_N_perc = 0
 
         if perc > 0:
             # "pseudocode_soil" S.4.C.6
@@ -128,25 +125,25 @@ def leaching_runoff_erosion(soil):
             # "pseudocode_soil" S.4.C.8
             NO3_perc = NO3_perc_conc * perc / layer.Cl
             NH4_perc = NH4_perc_conc * perc
-            active_perc = active_conc * perc
+            active_N_perc = active_conc * perc
 
         layer.NO3_perc = min(layer.NO3, NO3_perc)
         layer.NH4_perc = min(layer.NH4, NH4_perc)
-        layer.active_perc = min(layer.active_N, active_perc)
+        layer.active_N_perc = min(layer.active_N, active_N_perc)
 
     # Updates each pool with calculated leaching information
     for x in range(len(soil.soil_layers)):
         layer = soil.soil_layers[x]
         layer.NO3 -= layer.NO3_perc
         layer.NH4 -= layer.NH4_perc
-        layer.active_N -= layer.active_perc
+        layer.active_N -= layer.active_N_perc
 
         if x != 0:
             prev_layer = soil.soil_layers[x - 1]
             layer.NO3 += prev_layer.NO3_perc
             layer.NH4 += prev_layer.NH4_perc
-            layer.active_N += prev_layer.active_perc
+            layer.active_N += prev_layer.active_N_perc
 
-    soil.NO3_drainage_annual += soil.soil_layers[-1].NO3_perc
-    soil.NH4_drainage_annual += soil.soil_layers[-1].NH4_perc
-    soil.active_N_drainage_annual += soil.soil_layers[-1].active_perc
+    soil.NO3_drainage = soil.soil_layers[-1].NO3_perc
+    soil.NH4_drainage = soil.soil_layers[-1].NH4_perc
+    soil.active_N_drainage = soil.soil_layers[-1].active_N_perc

@@ -126,6 +126,10 @@ def update_profile_N(soil, field_management):
 
 
 def update_annual_N(soil):
+    soil.M_leach_annual += soil.M_leach
+    soil.active_N_drainage_annual += soil.active_N_drainage
+    soil.NO3_runoff_annual += soil.NO3_runoff
+    soil.NH4_runoff_annual += soil.NH4_runoff
     soil.N_runoff_annual += soil.N_runoff
     soil.N_drainage_annual += soil.N_drainage
     soil.N_erosion_annual += soil.N_erosion

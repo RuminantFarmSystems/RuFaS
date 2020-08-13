@@ -16,21 +16,25 @@
     {
         "fields": {
             "field_1": {
-                "soil": "barnyard_soil.json",
+                "soil": "ARL_soil.json",
                 "crop": "ARL_rotation.json",
                 "field_management": "ARL_field_management_1.json"
             },
             "field_2": {
-                "soil": "barnyard_soil.json",
+                "soil": "ARL_soil.json",
                 "crop": "ARL_rotation.json",
                 "field_management": "ARL_field_management_2.json"
             },
             "field_3": {
-                "soil": "barnyard_soil.json",
+                "soil": "ARL_soil.json",
                 "crop": "ARL_rotation.json",
                 "field_management": "ARL_field_management_3.json"
+            },
+            "field_4": {
+                "soil": "ARL_soil.json",
+                "crop": "ARL_rotation.json",
+                "field_management": "ARL_field_management_4.json"
             }
-
         },
         "animal": "barnyard_animal.json",
         "feed": "panke_buisse_feed.json"

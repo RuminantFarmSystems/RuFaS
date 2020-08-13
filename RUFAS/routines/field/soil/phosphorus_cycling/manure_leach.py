@@ -99,8 +99,6 @@ def update_all(soil, field_management, weather, time):
         soil.WIP -= (soil.MIP_leach + soil.MIP_runoff)
         soil.WOP -= (soil.MIP_leach + soil.MOP_runoff)
 
-        soil.MIP_leach_annual += soil.MIP_leach
-        soil.MOP_leach_annual += soil.MOP_leach
         soil.M_leach = soil.MIP_leach - soil.MIP_runoff + soil.MOP_leach - soil.MOP_runoff
         # convert soil P from KG/HA to KG and add manure P leached
 
@@ -116,7 +114,7 @@ def update_all(soil, field_management, weather, time):
 
             DF = max(0.0, (DF / 2) - 0.02)
 
-        soil.DRP_leach_annual += M_not_leached
+        soil.DRP_drainage += M_not_leached
 
         # Manure Decomposition
         # S.5.D.III
@@ -196,7 +194,7 @@ def update_all(soil, field_management, weather, time):
 
             DF = max(0.0, (DF / 2) - 0.02)
 
-        soil.DRP_leach_annual += DP_not_decomposed
+        soil.DRP_drainage += DP_not_decomposed
 
     # calculate manure runoff P in MG/L
     # S.5.D.IV
@@ -210,6 +208,3 @@ def update_all(soil, field_management, weather, time):
         # S.5.D.IV.2/3
         soil.M_DRP_runoff = layer.soil_P * 0.005
         soil.TIP_runoff = soil.MIP_runoff + soil.M_DRP_runoff + soil.fert_P_runoff
-
-        soil.M_DRP_runoff_annual += soil.M_DRP_runoff
-        soil.TIP_runoff_annual += soil.TIP_runoff

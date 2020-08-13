@@ -8,6 +8,7 @@ Author(s): Kass Chupongstimun, kass_c@hotmail.com
            Jit Patil, spatil5@wisc.edu
 """
 
+import warnings
 import time as timer
 from pathlib import Path
 from RUFAS import routines, errors, classes
@@ -32,19 +33,13 @@ def simulate(input_file_path: Path):
             parameters to the simulation. Passed to read_json_file().
     """
 
-    #
     # Reads the json input file and uses the information to instantiate the
     # simulation global variables
-    #
-
     initialize_simulation(input_file_path, read_json_file(input_file_path))
 
-    #
     # Creates a new directory for the output files (if doesn't already exist)
     # Deletes existing output files of the same name from previous simulation
     # Transfer needed (initial) data from state to report handlers
-    #
-
     output.initialize_dir(config.csv_dir, config.graphic_dir)
     output.initialize_reports()
 
@@ -97,9 +92,7 @@ def annual_simulation():
     while not time.end_year():
         daily_simulation()
 
-    #
     # Post-Annual Routines
-    #
     state.annual_mass_balance()
     output.annual_updates(state, weather, time)
     output.write_annual_reports()

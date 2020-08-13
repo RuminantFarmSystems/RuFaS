@@ -66,8 +66,8 @@ def update_all(soil, weather, time):
                 release_factor = 0.075
 
         # S.5.C.2
-        soil.fert_P_leach = min(max(0.0, soil.fert_P_released * release_factor), soil.fert_P_released)
-        soil.fert_P_released -= soil.fert_P_leach
+        soil.fert_P_leached = min(max(0.0, soil.fert_P_released * release_factor), soil.fert_P_released)
+        soil.fert_P_released -= soil.fert_P_leached
 
     # calculate the concentration of fertilizer dissolved P in runoff in MG/L
     soil.fert_P_runoff = 0.0
@@ -77,18 +77,18 @@ def update_all(soil, weather, time):
         soil.PD_factor = 0.034 * exp((runoff / rainfall) * 3.4)
 
         # S.5.C.II.3
-        soil.fert_P_runoff = soil.fert_P_leach / (rainfall / 10.0) \
+        soil.fert_P_runoff = soil.fert_P_leached / (rainfall / 10.0) \
                           / soil.area * 10.0 * soil.PD_factor
 
         # calculate fertilizer runoff P in KG
         # S.5.C.II.4
-        soil.fert_P_runoff_act = min(max(0.0, soil.fert_P_runoff * runoff * 0.01 * soil.area), soil.fert_P_leach)
+        soil.fert_P_runoff_act = min(max(0.0, soil.fert_P_runoff * runoff * 0.01 * soil.area), soil.fert_P_leached)
 
     # convert soil P from KG/HA to KG and add fertilizer P leached to each layer
     # S.5.C.II.5
     DF = 0.6
-    soil.fert_P_leach -= soil.fert_P_runoff_act
-    fert_not_leached = soil.fert_P_leach
+    soil.fert_P_leached -= soil.fert_P_runoff_act
+    fert_not_leached = soil.fert_P_leached
     for layer in soil.soil_layers:
 
         # S.5.A.7
@@ -98,15 +98,11 @@ def update_all(soil, weather, time):
             layer.labile_P += soil.fert_sorp
 
         # S.5.C.II.5
-        layer.labile_P += soil.fert_P_leach * DF
-        fert_not_leached -= soil.fert_P_leach * DF
+        layer.labile_P += soil.fert_P_leached * DF
+        fert_not_leached -= soil.fert_P_leached * DF
         DF = max(0.0, (DF / 2) - 0.02)
 
         # S.5.A.8
         layer.labile_P /= soil.area
 
-    soil.DRP_leach_annual += fert_not_leached
-
-    # add fertilizer P leached and in runoff to running total
-    soil.fert_P_runoff_annual += soil.fert_P_runoff_act
-    soil.fert_P_leach_annual += soil.fert_P_leach
+    soil.DRP_drainage += fert_not_leached
