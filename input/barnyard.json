@@ -22,12 +22,12 @@
             },
             "field_2": {
                 "soil": "barnyard_soil.json",
-                "crop": "tall_fescue_rotation.json",
+                "crop": "sugar_beet_rotation.json",
                 "field_management": "barnyard_field_management.json"
             },
             "field_3": {
                 "soil": "barnyard_soil.json",
-                "crop": "potato_rotation.json",
+                "crop": "spring_wheat_rotation.json",
                 "field_management": "barnyard_field_management.json"
             }
         },
