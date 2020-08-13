@@ -249,8 +249,9 @@ class Pen:
 
             elif 'Cow' in self.classes_in_pen and \
                     self.animals_in_pen[0].milking:  # lactating cow
-                ration_per_animal = ration_driver.hardcoded_rat()
-                #ration_per_animal = ration_driver.ration_formulation(self, available_feeds)
+                #ration_per_animal = ration_driver.hardcoded_rat()
+                ration_per_animal = \
+                        ration_driver.ration_formulation(self, available_feeds)
                 #print(ration_per_animal)
             elif 'Cow' in self.classes_in_pen and \
                     not self.animals_in_pen[0].milking:  # dry cow
@@ -272,6 +273,11 @@ class Pen:
             animal.set_ration(ration_per_animal, DMI)
             animal.set_p_intake(self.avg_p_intake, p_conc)
 
+        # recording ration nutrition information in pen
+        nutrient_amount, nutrient_conc = ration_driver.ration_report( \
+                                        ration_per_animal, feed.available_feeds)
+        self.ration_nutrient_amount = nutrient_amount
+        self.ration_nutrient_conc = nutrient_conc
         # set ration for whole pen by multiplying calculated ration by number
         # of animals in the pen
         ration = {}

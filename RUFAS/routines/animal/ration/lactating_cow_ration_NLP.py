@@ -16,7 +16,7 @@ from scipy.optimize import minimize
 
 def set_globals(price_, NEmaint_, NEa_, NEpreg_, NEl_, NEg_, MP_req_, C_req_, P_req_,
                 DMIest_, TDN_, DE_, EE_, is_fat_, BW_, SBW_, calcium_, phosphorus_, NDF_, type_, is_wetforage_,
-                Kd_, N_A_, N_B_, CP_, dRUP_):
+                Kd_, N_A_, N_B_, CP_, dRUP_, limit_):
     """
     Sets the global variables with the feed information to be used in the
     constraint functions below.
@@ -48,6 +48,7 @@ def set_globals(price_, NEmaint_, NEa_, NEpreg_, NEl_, NEg_, MP_req_, C_req_, P_
     global N_B
     global CP
     global dRUP
+    global limit
 
     price = price_
     n = len(price)
@@ -76,12 +77,14 @@ def set_globals(price_, NEmaint_, NEa_, NEpreg_, NEl_, NEg_, MP_req_, C_req_, P_
     N_B = N_B_
     CP = CP_
     dRUP = dRUP_
+    limit = limit_
 
 def list_reconfig(list):
     """
     Helper function that takes an input of a list and returns that list with
-    each value occuring a total of 3 times. This method is required for matching
-    the decision variables to one of the three energy constraint.
+    each value occuring a total of 3 times consecutively. This method is
+    required for matching the decision variables to one of the three energy
+    constraint.
 
     Args:
         list: A list of values
@@ -455,17 +458,13 @@ def optimize():
     x0 = []
     for i in range(n):
         x0.append(random.random()*10)
-    '''
-    for i in range(n):
-        x0[i] = x1[i] +.1
-    '''
     ## OPTIMIZE:
     #establishing the bounds of the NLP
-    #TODO limits as bounds for farm grown feeds
     b= (0, 100)
     bnds = []
-    for i in range(len(price)):
-        bnds.append(b)
+    #Dividing limit by 3 for tri-decision variables for farm grown feeds
+    for i in range(len(limit)):
+        bnds.append((0,limit[i]/3))
     bnds = tuple(bnds)
 
     #establishing the constraints of the NLP

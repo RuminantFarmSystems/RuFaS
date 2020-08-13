@@ -38,7 +38,6 @@ def daily_feed_routine(feed, fields, animal_management):
     # feed management routines to be run daily
     feed.daily_feed_management(animal_management)
 
-
 def annual_feed_routine(feed):
     feed.reset_feed_data()
 
@@ -64,16 +63,25 @@ class Feed:
         self.growing_feeds = data['growing_feeds']
         self.purchased_feeds_entries = data['purchased_feeds']
         self.purchased_feeds = []  # set in the next method call
-        self.feed_costs = data['purchased_feeds_costs']
 
         self.all_feed_ids = self.get_all_feed_units(data['purchased_feeds'],
                                                     data['growing_feeds'])
-
         # dictionary of nutrients needed for this run
         # initially, this only contains information for purchased feeds as none
         # of the growing_feeds have been harvested yet
         self.available_feeds = \
             self.get_nutrient_vals(self.purchased_feeds, False)
+        # setting up the feed costs based on the input
+        self.feed_costs = data['purchased_feeds_costs']
+        ids = []
+        for key in self.feed_costs:
+            ids.append(int(key))
+        feed_ids = self.get_purchased_feed_ids(ids)
+        updated_costs = {}
+        for key, val in self.feed_costs.items():
+            updated_costs[feed_ids[key]] = val
+        # feed value costs according to feeds split by maturity
+        self.feed_costs = updated_costs
 
         # The nutrient requirements used in the ration calculations.
         self.nutrient_rqmts = ['FU', 'RU', 'ME_DM', 'RDP_DM', 'RUP_DM']
@@ -152,6 +160,7 @@ class Feed:
             self.C_percent = 0
 
             self.feed_id = 'null'
+            # string representation of the feed key to available feeds
             self.feed_key = 'null'
             self.forage_quality = 'null'
 
@@ -603,7 +612,6 @@ class Feed:
                             denominator += (val * storage.cow_days[animal])
 
                     inclusion_pct_delta = inv_delta / denominator
-                    print(inclusion_pct_delta)
                     for animal, val in storage.inclusion_rate_est.items():
                         storage.inclusion_pct[animal] = max( \
                                         storage.inclusion_pct[animal] / 100 - \
@@ -703,32 +711,39 @@ class Feed:
             Executes daily routines relating to feed management, specifically a
             daily feedout process and checking for new forages that need an
             inventory plan. If the list new_forages contains a forage which
-            had been harvested at least 30 days ago, forage_inv_plan will be called.
+            had been harvested at least 30 days ago, forage_inv_plan will be
+            called.
 
         Args:
             animal_management: The state of the AnimalManagement class object
         """
-        # Daily feedout for silos with farm grown forages in them per pen based on ration formulated
+        # Daily feedout for silos with farm grown forages in them per pen based
+        # on ration formulated
+        feeds_fed = []
         for key, silo in self.storage_options.items():
             if silo.days_since_feedout >= 0 and silo.DM > 0:
-                # TODO: change for when ration formulation is implemented
-                ration = hardcoded_ration.get_ration()
-                if False:
-                #if silo.feed_key in ration:
-                    for pen in animal_management.all_pens:
-                        if (silo.DM - pen.ration[str(silo.feed_id)]) > 0:
-                            silo.DM -= pen.ration[str(silo.feed_id)]
+                for pen in animal_management.all_pens:
+                    # TODO: change for when ration formulation is implemented
+                    if silo.feed_key in pen.ration and silo.feed_key not in \
+                                                                    feeds_fed:
+                        if (silo.DM - pen.ration[silo.feed_key]) > 0:
+                            silo.DM -= pen.ration[silo.feed_key]
                         else:
                             silo.DM = 0
                             silo.reset_storage()
-                            break
+                            self.available_storage[key] = silo
+                        break
+                feeds_fed.append(silo.feed_key)
                 silo.days_since_feedout += 1
             elif silo not in self.new_forages and silo.DM > 0:
                 silo.days_since_feedout += 1
         # inventory plan for new forages
+        # if it is the day before the ration interval will be caculated
+        ration_interval = ((animal_management.simulation_day+1) % \
+                            animal_management.formulation_interval) == 1 or \
+                                    animal_management.formulation_interval == 1
         for silo in self.new_forages:
-            if silo.days_since_feedout >= -1 and \
-                                        animal_management.end_ration_interval():
+            if silo.days_since_feedout >= -1 and ration_interval:
                 silo.forage_quality_assesment(self)
                 self.required_inventory(silo, animal_management)
                 self.forage_inventory_plan(silo, animal_management)
@@ -741,12 +756,12 @@ class Feed:
             else:
                 silo.days_since_feedout += 1
         # yearly reset of silos
-        # TODO: modify when ration formulation is implemented
+        # TODO: How often do we want to reset? 
         # When ration formulation is in, the silos will automatically be fedout
-        for silo in self.storage_options:
-            if self.storage_options[silo].days_since_feedout > 365:
-                self.storage_options[silo].reset_storage()
-                self.available_storage[silo] = self.storage_options[silo]
+        for key, silo in self.storage_options.items():
+            if silo.days_since_feedout > 365:
+                silo.reset_storage()
+                self.available_storage[key] = silo
 
     def reset_feed_data(self):
         """
