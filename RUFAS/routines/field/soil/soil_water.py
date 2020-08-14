@@ -86,7 +86,7 @@ def update_profile_SW(soil, weather, time):
     soil.delta_SW = profile_SW - soil.profile_SW
     soil.profile_SW = profile_SW
 
-    R = weather.rainfall[time.year - 1][time.day - 1]
+    R = weather.rainfall[time.year - 1][time.day - 1] + weather.irrigation[time.year - 1][time.day - 1]
 
     soil.p_act = R
     soil.p_calc = soil.delta_SW + soil.ET_act + soil.drainage + soil.runoff

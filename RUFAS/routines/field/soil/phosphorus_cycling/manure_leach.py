@@ -31,7 +31,7 @@ def update_all(soil, field_management, weather, time):
 
     day = time.day
     year = time.year
-    rainfall = weather.rainfall[year - 1][day - 1]
+    rainfall = weather.rainfall[year - 1][day - 1] + weather.irrigation[year - 1][day - 1]
     runoff = soil.runoff
     temp = weather.T_avg[year - 1][day - 1]
 

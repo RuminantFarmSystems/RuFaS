@@ -8,7 +8,7 @@ Author(s): Kass Chupongstimun, kass_c@hotmail.com
            Jit Patil, spatil5@wisc.edu
 """
 
-import warnings
+import sys
 import time as timer
 from pathlib import Path
 from RUFAS import routines, errors, classes
@@ -45,16 +45,34 @@ def simulate(input_file_path: Path):
 
     t_start_sim = timer.time()
 
+    sys.stdout.write("Simulating ")
     # MAIN Simulation Loop
     while not time.end_simulation():
+        case = time.year % 4
+        if case == 0:
+            sys.stdout.write("—")
+        elif case == 1:
+            sys.stdout.write("\\")
+        elif case == 2:
+            sys.stdout.write("|")
+        else:
+            sys.stdout.write("/")
         annual_simulation()
+        sys.stdout.write("\b")
 
     output.finalize(state, weather, time)
-    output.produce_graphics()
     t_end_sim = timer.time()
+    print("\nSimulation Successful: {}".format(input_file_path.name))
+    print("Total Simulation Time: {} seconds\n".format(str(t_end_sim - t_start_sim)))
 
-    print("Simulation Successful: {}".format(input_file_path.name))
-    print("Total Run Time: {} seconds\n".format(str(t_end_sim - t_start_sim)))
+    t_start_graphics = timer.time()
+    print('Producing Graphics...')
+    output.produce_graphics()
+    t_end_graphics = timer.time()
+    print("Output Successful. Graphics stored in: {}".format(config.graphic_dir))
+    print("Time to produce graphics: {}. Total Run Time: {} seconds".format(str(t_end_graphics - t_start_graphics),
+                                                                            str((t_end_sim - t_start_sim) +
+                                                                                (t_end_graphics - t_start_graphics))))
 
 
 def daily_simulation():

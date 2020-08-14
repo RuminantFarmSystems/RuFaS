@@ -30,7 +30,7 @@ def update_all(soil, weather, time):
 
     day = time.day
     year = time.year
-    rainfall = weather.rainfall[year - 1][day - 1]
+    rainfall = weather.rainfall[year - 1][day - 1] + weather.irrigation[year - 1][day - 1]
     runoff = soil.runoff
 
     # Sorption
@@ -98,8 +98,9 @@ def update_all(soil, weather, time):
             layer.labile_P += soil.fert_sorp
 
         # S.5.C.II.5
-        layer.labile_P += soil.fert_P_leached * DF
-        fert_not_leached -= soil.fert_P_leached * DF
+        fert_P_leached = min(fert_not_leached, soil.fert_P_leached * DF)
+        layer.labile_P += fert_P_leached
+        fert_not_leached -= fert_P_leached
         DF = max(0.0, (DF / 2) - 0.02)
 
         # S.5.A.8

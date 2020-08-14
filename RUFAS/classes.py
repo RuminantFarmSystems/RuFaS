@@ -293,6 +293,7 @@ class Weather:
         self.T_min = []
         self.T_avg = []
         self.radiation = []
+        self.irrigation = []
         self.T_avg_annual = []
 
         year_length = config.year_length
@@ -328,6 +329,7 @@ class Weather:
             self.T_min.append([0.0 for _ in range(len(year))])
             self.T_avg.append([0.0 for _ in range(len(year))])
             self.radiation.append([0.0 for _ in range(len(year))])
+            self.irrigation.append([0.0 for _ in range(len(year))])
 
         # read in the input csv file
         weather_full_path = util.get_base_dir() / 'input/weather' / weather_file
@@ -375,6 +377,7 @@ class Weather:
                         self.T_min[year][day - offset] = float(row[4])
                         self.T_avg[year][day - offset] = float(row[5])
                         self.radiation[year][day - offset] = float(row[6])
+                        self.irrigation[year][day - offset] = float(row[7])
                     except(IndexError, ValueError):
                         # prints out each problematic row in the weather CSV file
                         skips += 1

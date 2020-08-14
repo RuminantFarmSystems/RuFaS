@@ -1,0 +1,48 @@
+{
+    "latitude": 42.5338019,
+
+    "crops": {
+        "sugar_beet_1": {
+            "grow_years": [2012],
+            "repeat": 0,
+            "planting_date": 135,
+            "harvest_date": 253,
+            "harvest_type": "scheduled"
+        },
+        "sugar_beet_2": {
+            "grow_years": [2013],
+            "repeat": 0,
+            "planting_date": 91,
+            "harvest_date": 224,
+            "harvest_type": "scheduled"
+        },
+        "sugar_beet_3": {
+            "grow_years": [2014],
+            "repeat": 0,
+            "planting_date": 118,
+            "harvest_date": 280,
+            "harvest_type": "scheduled"
+        },
+        "sugar_beet_4": {
+            "grow_years": [2015],
+            "repeat": 0,
+            "planting_date": 89,
+            "harvest_date": 215,
+            "harvest_type": "scheduled"
+        },
+        "sugar_beet_5": {
+            "grow_years": [2016],
+            "repeat": 0,
+            "planting_date": 129,
+            "harvest_date": 313,
+            "harvest_type": "scheduled"
+        },
+        "sugar_beet_6": {
+            "grow_years": [2017],
+            "repeat": 0,
+            "planting_date": 94,
+            "harvest_date": 319,
+            "harvest_type": "scheduled"
+        }
+    }
+}

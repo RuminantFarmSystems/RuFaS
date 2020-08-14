@@ -166,7 +166,7 @@ class FieldManagement:
             return False
 
         # if it rains on the current day
-        if weather.rainfall[curr_year][curr_day] >= 1.0:
+        if (weather.rainfall[curr_year][curr_day] + weather.irrigation[curr_year][curr_day]) >= 1.0:
             return False
 
         # boundary check the next day against length of the current year
@@ -183,7 +183,7 @@ class FieldManagement:
                 return False
 
         # if it rains on the following day
-        if weather.rainfall[curr_year][next_day] >= 1.0:
+        if (weather.rainfall[curr_year][next_day] + weather.irrigation[curr_year][next_day]) >= 1.0:
             return False
 
         # boundary check the second day against length of the current year
@@ -200,7 +200,7 @@ class FieldManagement:
                 return False
 
         # if it rains on the second day
-        if weather.rainfall[curr_year][second_day] >= 1.0:
+        if (weather.rainfall[curr_year][second_day] + weather.irrigation[curr_year][second_day]) >= 1.0:
             return False
 
         return True

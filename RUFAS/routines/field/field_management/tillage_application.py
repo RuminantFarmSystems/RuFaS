@@ -20,8 +20,8 @@ def update_all(soil, till_app):
     """
 
     depth = till_app['depth']
-    perc_incorporated = till_app['percent_incorporated']
-    perc_mixed = till_app['percent_mixed']
+    percent_incorporated = till_app['percent_incorporated']
+    percent_mixed = till_app['percent_mixed']
 
     till_soil_mass = 0.0
     till_act_P = 0.0
@@ -43,24 +43,24 @@ def update_all(soil, till_app):
             layer.active_P *= soil.area
             layer.labile_P *= soil.area
 
-            layer.labile_P += perc_incorporated * \
+            layer.labile_P += percent_incorporated * \
                               (soil.fert_P_available + soil.fert_P_released)
 
             # FM.5.2
-            soil.fert_P_available = soil.fert_P_available - (soil.fert_P_available * perc_incorporated)
-            soil.fert_P_released = soil.fert_P_released - (soil.fert_P_released * perc_incorporated)
+            soil.fert_P_available = soil.fert_P_available - (soil.fert_P_available * percent_incorporated)
+            soil.fert_P_released = soil.fert_P_released - (soil.fert_P_released * percent_incorporated)
 
             # FM.5.3
             # TODO: RuFaS does not track org P (03.19.20). When it does, WOP/SOP will be incorporated into organic pools
             # TODO: RuFaS does not track org P (03.19.20). When it does, WOP/SOP will be incorporated into organic pools
-            layer.labile_P += perc_incorporated * soil.WIP
-            layer.active_P += perc_incorporated * soil.SIP
+            layer.labile_P += percent_incorporated * soil.WIP
+            layer.active_P += percent_incorporated * soil.SIP
 
-            soil.WIP -= soil.WIP * perc_incorporated
-            soil.WOP -= soil.WOP * perc_incorporated
-            soil.SIP -= soil.SIP * perc_incorporated
-            soil.SOP -= soil.SOP * perc_incorporated
-            soil.manure_mass -= soil.manure_mass * perc_incorporated
+            soil.WIP -= soil.WIP * percent_incorporated
+            soil.WOP -= soil.WOP * percent_incorporated
+            soil.SIP -= soil.SIP * percent_incorporated
+            soil.SOP -= soil.SOP * percent_incorporated
+            soil.manure_mass -= soil.manure_mass * percent_incorporated
 
             # S.5.A.8
             layer.active_P /= soil.area
@@ -70,7 +70,7 @@ def update_all(soil, till_app):
         # FM.5.4
         if layer.bottom_depth_cm <= depth:
             ratio = layer.mass / till_soil_mass
-            layer.labile_P = (1.0 - perc_mixed) * layer.labile_P \
-                             + till_lab_P * ratio * perc_mixed
-            layer.active_P = (1.0 - perc_mixed) * layer.active_P \
-                             + till_act_P * ratio * perc_mixed
+            layer.labile_P = (1.0 - percent_mixed) * layer.labile_P \
+                             + till_lab_P * ratio * percent_mixed
+            layer.active_P = (1.0 - percent_mixed) * layer.active_P \
+                             + till_act_P * ratio * percent_mixed

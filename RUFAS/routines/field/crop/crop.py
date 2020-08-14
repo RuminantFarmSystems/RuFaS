@@ -527,7 +527,7 @@ def check_conditions_plant(soil, weather, time):
         return False
 
     # if it rains on the current day
-    if weather.rainfall[curr_year][curr_day] >= 1.0:
+    if (weather.rainfall[curr_year][curr_day] + weather.irrigation[curr_year][curr_day]) >= 1.0:
         return False
 
     return True

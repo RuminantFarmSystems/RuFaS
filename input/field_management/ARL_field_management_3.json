@@ -31,8 +31,8 @@
         "repeat": 0,
         "year": [],
         "day": [],
-        "perc_incorporated": [],
-        "perc_mixed": [],
+        "percent_incorporated": [],
+        "percent_mixed": [],
         "depth": []
     }
 }

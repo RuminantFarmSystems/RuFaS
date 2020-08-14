@@ -1,46 +1,38 @@
 {
-            "fertilizer":
-            {
-                "composition": {
-                    "N": 0.0,
-                    "P": 0.0,
-                    "K": 0.0
-                },
-                "rotation_years": [],
-                "repeat": 0,
-
-                "year": [],
-                "day": [],
-                "N_mass": [],
-                "P_mass": [],
-                "K_mass": [],
-                "depth": [],
-                "surface_percent": []
-            },
-
-            "manure":
-            {
-                "rotation_years": [],
-                "repeat": 0,
-
-                "year": [],
-                "day": [],
-                "N_mass": [],
-                "P_mass": [],
-                "cover_percent": [],
-                "depth": [],
-                "surface_percent": []
-            },
-
-            "tillage":
-            {
-                "rotation_years": [],
-                "repeat": 0,
-
-                "year": [],
-                "day": [],
-                "perc_incorporated": [],
-                "perc_mixed": [],
-                "depth": []
-            }
-        }
+    "fertilizer": {
+        "composition": {
+            "N": 0.0,
+            "P": 0.0,
+            "K": 0.0
+        },
+        "rotation_years": [],
+        "repeat": 0,
+        "year": [],
+        "day": [],
+        "N_mass": [],
+        "P_mass": [],
+        "K_mass": [],
+        "depth": [],
+        "surface_percent": []
+    },
+    "manure": {
+        "rotation_years": [],
+        "repeat": 0,
+        "year": [],
+        "day": [],
+        "N_mass": [],
+        "P_mass": [],
+        "cover_percent": [],
+        "depth": [],
+        "surface_percent": []
+    },
+    "tillage": {
+        "rotation_years": [],
+        "repeat": 0,
+        "year": [],
+        "day": [],
+        "percent_incorporated": [],
+        "percent_mixed": [],
+        "depth": []
+    }
+}

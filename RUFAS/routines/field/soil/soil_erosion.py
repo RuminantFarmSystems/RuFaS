@@ -77,7 +77,7 @@ def calc_peak_runoff(soil, weather, time):
         int: peak_runoff, the peak runoff rate on the current day (m^3/sec
     """
 
-    R = weather.rainfall[time.year - 1][time.day - 1]
+    R = weather.rainfall[time.year - 1][time.day - 1] + weather.irrigation[time.year - 1][time.day - 1]
 
     if R == 0:
         return 0
@@ -151,7 +151,7 @@ def calc_Rtc(soil, weather, time):
     """
 
     alpha = calc_alpha(soil, weather, time)
-    R = weather.rainfall[time.year - 1][time.day - 1]
+    R = weather.rainfall[time.year - 1][time.day - 1] + weather.irrigation[time.year - 1][time.day - 1]
 
     return alpha * R
 
@@ -195,7 +195,7 @@ def calc_alpha_05(weather, time):
         int: alpha_05, fraction of daily rain in the 1/2 hour of highest intensity
     """
 
-    R = weather.rainfall[time.year-1][time.day-1]
+    R = weather.rainfall[time.year - 1][time.day - 1] + weather.irrigation[time.year - 1][time.day - 1]
 
     exp_part = exp(-125 / (R + 5))
 
