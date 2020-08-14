@@ -593,7 +593,7 @@ class Feed:
 
                 for animal, val in storage.DMI_forage_max.items():
                     if animal != 'lactating_cows':
-                        DMI_forage_max[animal] = storage.inclusion_rate_est[animal]
+                        storage.DMI_forage_max[animal] = storage.inclusion_rate_est[animal]
                         tot_req_inv_non_lactating_cows += val
 
                 available_forage = storage.DM - tot_req_inv_non_lactating_cows
@@ -756,7 +756,7 @@ class Feed:
             else:
                 silo.days_since_feedout += 1
         # yearly reset of silos
-        # TODO: How often do we want to reset? 
+        # TODO: How often do we want to reset?
         # When ration formulation is in, the silos will automatically be fedout
         for key, silo in self.storage_options.items():
             if silo.days_since_feedout > 365:

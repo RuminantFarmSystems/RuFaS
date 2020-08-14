@@ -24,8 +24,6 @@ import math
 import numpy as np
 from RUFAS.routines.animal.life_cycle.heiferIII import HeiferIII
 from RUFAS.routines.animal.life_cycle.animal_base import AnimalBase
-from RUFAS.routines.animal.ration.dry_cow_ration import calculate_rqmts \
-    as dry_calculate_rqmts
 from RUFAS.routines.animal.manure.lactating_cow_manure_excretion import \
     manure_calculations as lactating_manure_calculations
 from RUFAS.routines.animal.manure.dry_cow_manure_excretion import \
@@ -292,10 +290,14 @@ class Cow(HeiferIII):
 			self.DBW = -0.4125
 			self.daily_growth = self.DBW
 		else:
-			result = dry_calculate_rqmts()
-			self.nutrient_rqmts = result[0]
-			self.DMIest = result[1]
-			self.DBW = result[2]
+            # TODO add requirements to replace hard coded values
+			self.nutrient_rqmts =  {'FU': {'op': '<=', 'val': 7.566673489860807},
+                      'RU': {'op': '>=', 'val': 0},
+                      'ME_DM': {'op': '>=', 'val': 57.238188330372566},
+                      'RDP_DM': {'op': '>=', 'val': 2.0347001114951313},
+                      'RUP_DM': {'op': '>=', 'val': 1.2716733909335047}}
+			self.DMIest = 27.620363504458798
+			self.DBW = -0.4125
 
 	def calc_init_nutrient_rqmts(
 			self, vertical_distance, horizontal_distance, housing,

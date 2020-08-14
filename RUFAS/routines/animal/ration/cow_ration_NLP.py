@@ -15,8 +15,9 @@ import random
 from scipy.optimize import minimize
 
 def set_globals(price_, NEmaint_, NEa_, NEpreg_, NEl_, NEg_, MP_req_, C_req_, P_req_,
-                DMIest_, TDN_, DE_, EE_, is_fat_, BW_, SBW_, calcium_, phosphorus_, NDF_, type_, is_wetforage_,
-                Kd_, N_A_, N_B_, CP_, dRUP_, limit_):
+                DMIest_, TDN_, DE_, EE_, is_fat_, BW_, SBW_, calcium_, phosphorus_,
+                NDF_, type_, is_wetforage_, Kd_, N_A_, N_B_, CP_, dRUP_, limit_,
+                cow_type_):
     """
     Sets the global variables with the feed information to be used in the
     constraint functions below.
@@ -49,6 +50,7 @@ def set_globals(price_, NEmaint_, NEa_, NEpreg_, NEl_, NEg_, MP_req_, C_req_, P_
     global CP
     global dRUP
     global limit
+    global cow_type
 
     price = price_
     n = len(price)
@@ -78,6 +80,7 @@ def set_globals(price_, NEmaint_, NEa_, NEpreg_, NEl_, NEg_, MP_req_, C_req_, P_
     CP = CP_
     dRUP = dRUP_
     limit = limit_
+    cow_type = type_
 
 def list_reconfig(list):
     """
@@ -281,7 +284,10 @@ def phosphorus_constraint(x):
     #----------------------
     # [A.Cow.C.6]
     # Phosphorus maintenance requirement (g)
-    P_maint = 1*DMI + 0.002*BW
+    if type:
+        P_maint = 1*DMI + 0.002*BW
+    else:
+        P_maint = 0.08*DMI + 0.002 * BW
     # [A.Cow.E.15]
     return (sum(np.multiply(x,np.multiply(np.multiply(phosphorus,0.01),dP))) - ((P_req+P_maint)/1000))
 

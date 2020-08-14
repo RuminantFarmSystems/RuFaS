@@ -10,7 +10,7 @@ import math
 ###TODO: Find out what units the percent values come in from the cow when linking###
 ###TODO: Edit function for dry cow requirement calculations as well
 def calculate_requirements(BW, MW, DOP, housing, distance, parity, CI, TP_Milk,
-                            Fat_Milk, Lactose_Milk, Milk, DIM
+                            Fat_Milk, Lactose_Milk, Milk, DIM, type
                             ):
     """
     Calculate the dietary requirements of a single cow. These values are used
@@ -31,6 +31,8 @@ def calculate_requirements(BW, MW, DOP, housing, distance, parity, CI, TP_Milk,
         Fat_Milk: Milk fat content (% of milk)
         Lactose_Milk: Milk lactose content (% of milk)
         Milk: Milk production (kg)
+        type: Boolean value which is true for lactating cowns and false for dry
+        cows
 
     """
 
@@ -165,14 +167,18 @@ def calculate_requirements(BW, MW, DOP, housing, distance, parity, CI, TP_Milk,
     #----------------------
     # [A.Cow.C.1]
     # Calcium maintenance requirement (g)
-    Ca_maint = 0.031 * BW + 0.08 * (BW/100)
+    if type:
+        Ca_maint = 0.031 * BW + 0.08 * (BW/100)
+    else:
+        Ca_maint = 0.0154 * BW + 0.08 * (BW/100)
     # [A.Cow.C.2]
     # Calcium growth requirement (g)
     Ca_growth = 9.83 * MW**0.22 * BW**(-0.22) * (ADG/0.96)
     # [A.Cow.C.3]
     # Calcium pregnancy requirement (g)
     if DOP > 190:
-        Ca_preg = 0.02456 * math.exp((0.05581-0.00007*DOP)*DOP) - 0.02456 * math.exp((0.05581-0.00007*(DOP-1)) * (DOP -1))
+        Ca_preg = 0.02456 * math.exp((0.05581-0.00007*DOP)*DOP) - 0.02456 * \
+                                math.exp((0.05581-0.00007*(DOP-1)) * (DOP -1))
     else:
         Ca_preg = 0
     # [A.Cow.C.4]
@@ -189,7 +195,8 @@ def calculate_requirements(BW, MW, DOP, housing, distance, parity, CI, TP_Milk,
     # [A.Cow.C.8]
     # Phosphorus pregnancy requirement (g)
     if DOP > 190:
-        P_preg = 0.02743 * math.exp((0.05527-0.000075*DOP)*DOP) - 0.02743 * math.exp((0.05527-0.000075*(DOP-1)) * (DOP -1))
+        P_preg = 0.02743 * math.exp((0.05527-0.000075*DOP)*DOP) - 0.02743 * \
+                                math.exp((0.05527-0.000075*(DOP-1)) * (DOP -1))
     else:
         P_preg = 0
     # [A.Cow.C.9]
@@ -210,8 +217,12 @@ def calculate_requirements(BW, MW, DOP, housing, distance, parity, CI, TP_Milk,
     FCM = (0.4 * Milk) + (15 * Fat_Milk * (Milk/100))
     # [A.Cow.D.2]
     # Dry matter intake estimation (kg)
-    DMIest = (0.372 * FCM + 0.0968 * BW**0.75) * (1- math.exp(-0.192 *((DIM/7) + 3.67)))
-
+    if type:
+        DMIest = (0.372 * FCM + 0.0968 * BW**0.75) * (1- math.exp(-0.192 \
+                                                            *((DIM/7) + 3.67)))
+    else:
+        DMIest = ( (1.97-0.75*math.exp(0.16 * (DOP-280))) / 100 ) * BW
     # Requirements summary dictionary
     return {'NEmaint' : NEmaint, 'NEa' : NEa, 'NEg' : NEg, 'NEpreg' : NEpreg,
-            'NEl' : NEl, 'MP_req': MP_req, 'Ca_req' : Ca_req, 'P_req' : P_req, 'DMIest' : DMIest}
+            'NEl' : NEl, 'MP_req': MP_req, 'Ca_req' : Ca_req, 'P_req' : P_req,
+            'DMIest' : DMIest}

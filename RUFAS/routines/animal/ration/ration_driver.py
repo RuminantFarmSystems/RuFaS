@@ -8,12 +8,12 @@ Description: Main file in the ration formulation process that connects all
 """
 ################################################################################
 from RUFAS.routines.animal.ration import cow_requirements
-from RUFAS.routines.animal.ration import lactating_cow_ration_NLP as NLP
+from RUFAS.routines.animal.ration import cow_ration_NLP as NLP
 import statistics as stat
 import math
 import random
 
-def optimization(pen, requirements, available_feeds, BW, SBW):
+def optimization(pen, requirements, available_feeds, BW, SBW, cow_type):
     """
     Function that sets up the nutrients and requirements lists into structured
     inputs for the non-linear program and calls the optimization function.
@@ -40,17 +40,21 @@ def optimization(pen, requirements, available_feeds, BW, SBW):
     N_B = NLP.list_reconfig(available_feeds.N_B)
     CP = NLP.list_reconfig(available_feeds.CP)
     dRUP = NLP.list_reconfig(available_feeds.dRUP)
-    limit = NLP.list_reconfig(available_feeds.lactating_cow_limit)
+    if cow_type:
+        limit = NLP.list_reconfig(available_feeds.lactating_cow_limit)
+    else:
+        limit = NLP.list_reconfig(available_feeds.dry_cow_limit)
     NLP.set_globals(price, requirements.NEmaint, requirements.NEa, requirements.NEpreg,
                             requirements.NEl, requirements.NEg, requirements.MP_req,
                             requirements.Ca_req, requirements.P_req, requirements.DMIest,
                             TDN, DE, EE, is_fat, BW, SBW, calcium, phosphorus, NDF,
-                            type, is_wetforage, Kd, N_A, N_B, CP, dRUP, limit)
+                            type, is_wetforage, Kd, N_A, N_B, CP, dRUP, limit,
+                            cow_type)
     solution = NLP.optimize()
     #print(solution.success)
     return solution
 
-def ration_formulation(pen, available_feeds):
+def ration_formulation(pen, available_feeds, cow_type):
     """
     Function that links the ration_driver file with the calc_ration function in
     pen.py. Returns a dictionary of the rations by feed and status of the NLP
@@ -60,10 +64,13 @@ def ration_formulation(pen, available_feeds):
         pen: an object of class Pen
         available_feeds: an object of class AvailableFeeds
     """
+    # creating instance of class requirements
     req = Requirements()
-    req.pen_requirements(pen)
+    # calculating requirements based on pen info
+    req.set_requirements(pen)
     BW = pen.avg_BW
-    solution = optimization(pen, req, available_feeds, BW, BW*0.953)
+    SBW = BW*0.891
+    solution = optimization(pen, req, available_feeds, BW, SBW, cow_type)
     #Reduction of milk production estimate process to achieve feasible solution
     while not solution.success:
         #TODO: Time analysis for hardcoded reduction values
@@ -79,8 +86,8 @@ def ration_formulation(pen, available_feeds):
             #TODO: Code below is useful for time analysis
             #if animal.estimated_daily_milk_produced < 0:
             #    print('negative')
-        req.pen_requirements(pen)
-        solution = optimization(pen, req, available_feeds, BW, BW*0.953)
+        req.set_requirements(pen)
+        solution = optimization(pen, req, available_feeds, BW, SBW, cow_type)
 
     ration = {}
     for id in range(len(available_feeds.feed_id)):
@@ -106,6 +113,13 @@ def hardcoded_rat():
             'objective': 4.5}
 def ration_report(ration, available_feeds):
     """
+    Calculates information in the ration about nutrient information including
+    nutrient amounts and concentrations. Returns a dictionary of nutrient amounts
+    and nutrient calculations respectively.
+
+    Args:
+        ration: a dictionary of the calculated ration
+        available_feeds: available feeds dictionary from the Feed class object
     """
     nutrient_amount = {'dm_amount': 0, 'cp_amount': 0, 'adf_amount': 0,
                         'ndf_amount': 0, 'lignin_amount': 0, 'ash_amount': 0,
@@ -115,6 +129,7 @@ def ration_report(ration, available_feeds):
     ration.pop('status')
     ration.pop('objective')
     for key, val in ration.items():
+        #TODO: Code condesentation
         nutrient_amount['dm_amount'] += (available_feeds[key]['DM']/100) * val
         nutrient_amount['cp_amount'] += (available_feeds[key]['CP']/100) * val
         nutrient_amount['adf_amount'] += (available_feeds[key]['ADF']/100) * val
@@ -180,7 +195,7 @@ class Requirements:
         # dry matter intake estimation (kg)
         self.DMIest = 0
 
-    def pen_requirements(self, pen):
+    def set_requirements(self, pen):
         """
         Calculates the average requirements utilizing cow_requirements.py and an
         input pen to generate the average requirements across a pen. It then
@@ -205,7 +220,7 @@ class Requirements:
                             animal.days_in_preg, pen.housing_type,(math.sqrt((animal.DVD)**2 + (animal.DHD)**2)),
                             animal.calves, animal.CI, animal.mPrt, animal.fat_percent,
                             animal.lactose_milk,animal.estimated_daily_milk_produced,
-                            animal.days_in_milk)
+                            animal.days_in_milk,animal.milking)
             NEmaint.append(req['NEmaint'])
             NEa.append(req['NEa'])
             NEg.append(req['NEg'])
@@ -235,6 +250,8 @@ class AvailableFeeds:
     def __init__(self):
         # id of the feed in the feed database
         self.feed_id = []
+        # list to keep track of dictionary keys
+        self.feed_key = []
         # price of the feed ($/KG)
         self.price = []
         # Total digestible nutrient (% of DM)
@@ -293,83 +310,28 @@ class AvailableFeeds:
         # dictionary of feed costs
         feed_costs = feed.feed_costs
 
-        feed_key = []
-        feed_id = []
-        price = []
-        TDN = []
-        DE = []
-        EE = []
-        is_fat = []
-        calcium = []
-        phosphorus = []
-        NDF = []
-        type = []
-        is_wetforage = []
-        Kd = []
-        N_A = []
-        N_B = []
-        CP = []
-        dRUP = []
-        lactating_cow_limit = []
-        dry_cow_limit = []
-        heiferIII_limit = []
-        heiferII_limit = []
-        heiferI_limit = []
-        calf_limit = []
-
         for key, feed in available_feeds.items():
-            feed_key.append(key)
-            feed_id.append(feed['feed_id'])
-            price.append(feed_costs[str(key)])
-            TDN.append(feed['TDN'])
-            DE.append(feed['DE'])
-            EE.append(feed['EE'])
-            is_fat.append(feed['is_fat'])
-            calcium.append(feed['calcium'])
-            phosphorus.append(feed['phosphorus'])
-            NDF.append(feed['NDF'])
-            type.append(feed['type'])
-            is_wetforage.append(feed['is_wetforage'])
-            Kd.append(feed['Kd'])
-            N_A.append(feed['N_A'])
-            N_B.append(feed['N_B'])
-            CP.append(feed['CP'])
-            dRUP.append(feed['dRUP'])
+            self.feed_key.append(key)
+            self.feed_id.append(feed['feed_id'])
+            self.price.append(feed_costs[str(key)])
+            self.TDN.append(feed['TDN'])
+            self.DE.append(feed['DE'])
+            self.EE.append(feed['EE'])
+            self.is_fat.append(feed['is_fat'])
+            self.calcium.append(feed['calcium'])
+            self.phosphorus.append(feed['phosphorus'])
+            self.NDF.append(feed['NDF'])
+            self.type.append(feed['type'])
+            self.is_wetforage.append(feed['is_wetforage'])
+            self.Kd.append(feed['Kd'])
+            self.N_A.append(feed['N_A'])
+            self.N_B.append(feed['N_B'])
+            self.CP.append(feed['CP'])
+            self.dRUP.append(feed['dRUP'])
             if isinstance(feed['limit'], dict):
-                lactating_cow_limit.append(feed['limit']['lactating_cows'])
-                dry_cow_limit.append(feed['limit']['dry_cows'])
-                heiferIII_limit.append(feed['limit']['heiferIIIs'])
-                heiferII_limit.append(feed['limit']['heiferIIs'])
-                heiferI_limit.append(feed['limit']['heiferIs'])
-                calf_limit.append(feed['limit']['calves'])
-            else:
-                lactating_cow_limit.append(feed['limit'])
-                dry_cow_limit.append(feed['limit'])
-                heiferIII_limit.append(feed['limit'])
-                heiferII_limit.append(feed['limit'])
-                heiferI_limit.append(feed['limit'])
-                calf_limit.append(feed['limit'])
+                self.lactating_cow_limit.append(feed['limit']['lactating_cows'])
+                self.dry_cow_limit.append(feed['limit']['dry_cows'])
 
-        self.feed_key = feed_key
-        self.feed_id = feed_id
-        self.price = price
-        self.TDN = TDN
-        self.DE = DE
-        self.EE = EE
-        self.is_fat = is_fat
-        self.calcium = calcium
-        self.phosphorus = phosphorus
-        self.NDF = NDF
-        self.type = type
-        self.is_wetforage = is_wetforage
-        self.Kd = Kd
-        self.N_A = N_A
-        self.N_B = N_B
-        self.CP = CP
-        self.dRUP = dRUP
-        self.lactating_cow_limit = lactating_cow_limit
-        self.dry_cow_limit = dry_cow_limit
-        self.heiferIII_limit = heiferIII_limit
-        self.heiferII_limit = heiferII_limit
-        self.heiferI_limit = heiferI_limit
-        self.calf_limit = calf_limit
+            else:
+                self.lactating_cow_limit.append(feed['limit'])
+                self.dry_cow_limit.append(feed['limit'])

@@ -627,9 +627,7 @@ class AnimalManagement:
             self.calc_all_p_comp()  # per animal
 
             self.record_pen_history()
-            for pen in self.all_pens:
-                print(pen.ration_nutrient_amount)
-                print(pen.ration_nutrient_conc)
+
     def end_ration_interval(self):
         """
         Returns: True if today is the day a new ration has to be formulated,

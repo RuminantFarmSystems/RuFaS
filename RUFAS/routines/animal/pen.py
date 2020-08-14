@@ -11,8 +11,6 @@ Author(s): Militsa Sotirova, militsasotirova@gmail.com
 """
 ################################################################################
 from RUFAS.routines.animal.ration.calf_ration import optimize as calf_optimize
-from RUFAS.routines.animal.ration.dry_cow_ration import \
-    optimize as dry_cow_optimize
 from RUFAS.routines.animal.ration.growing_heifer_ration import \
     optimize as growing_heifer_optimize
 from RUFAS.routines.animal.ration import ration_driver as ration_driver
@@ -251,12 +249,13 @@ class Pen:
                     self.animals_in_pen[0].milking:  # lactating cow
                 #ration_per_animal = ration_driver.hardcoded_rat()
                 ration_per_animal = \
-                        ration_driver.ration_formulation(self, available_feeds)
+                    ration_driver.ration_formulation(self, available_feeds,True)
                 #print(ration_per_animal)
             elif 'Cow' in self.classes_in_pen and \
                     not self.animals_in_pen[0].milking:  # dry cow
+                print('dry')
                 ration_per_animal = \
-                    dry_cow_optimize(feed, self.avg_nutrient_rqmts)
+                    ration_driver.ration_formulation(self,available_feeds,False)
 
             else:  # this should never occur
                 print('error in pen ration calculation')
