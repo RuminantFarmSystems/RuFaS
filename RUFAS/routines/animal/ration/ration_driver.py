@@ -216,7 +216,7 @@ class Requirements:
 
         # iterating through each animal in the pen and calculating requirements
         for animal in pen.animals_in_pen:
-            req = cow_requirements.calculate_requirements(animal.body_weight, animal.mature_body_weight,
+            req = cow_requirements.ration_requirements(animal.body_weight, animal.mature_body_weight,
                             animal.days_in_preg, pen.housing_type,(math.sqrt((animal.DVD)**2 + (animal.DHD)**2)),
                             animal.calves, animal.CI, animal.mPrt, animal.fat_percent,
                             animal.lactose_milk,animal.estimated_daily_milk_produced,

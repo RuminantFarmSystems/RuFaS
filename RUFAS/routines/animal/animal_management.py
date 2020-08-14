@@ -424,18 +424,12 @@ class AnimalManagement:
             self.all_pens[len(self.all_pens) - 1].update_animals(lactating_cows)
         else:
             self.all_pens[4].update_animals(dry_cows)
+            # calling pen grouping algorithm
+            pen_grouping = grouping(lactating_cows, self.all_pens[5:])
 
-            # TODO: Temporary process to randomly assign nutrition requirments
-            if len(lactating_cows) > 0:
-                for i in range(len(lactating_cows)):
-                    lactating_cows[i].ID = i + 1
-                    lactating_cows[i].DMPD_req = 90 + random.random() * 34
-                    lactating_cows[i].DNED_req = 1.4 + random.random() * 0.3
-                pen_grouping = grouping(lactating_cows, self.all_pens[5:])
-
-                # assigning lactating cows to pens based on the grouping output
-                for key in pen_grouping:
-                    self.all_pens[key].update_animals(pen_grouping[key])
+            # assigning lactating cows to pens based on the grouping output
+            for key in pen_grouping:
+                self.all_pens[key].update_animals(pen_grouping[key])
 
         self.fully_update_id_pen()
 

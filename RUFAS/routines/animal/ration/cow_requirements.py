@@ -4,16 +4,16 @@ RUFAS: Ruminant Farm Systems Model
 File name: cow_requirements.py
 Description: Calculates the following energy, mineral, and dry matter intake
     estimation for a single cow using the function in this file.
+Author(s): Chris VanKerkhove, cjv47@cornell.edu
 """
 ################################################################################
 import math
 ###TODO: Find out what units the percent values come in from the cow when linking###
-###TODO: Edit function for dry cow requirement calculations as well
-def calculate_requirements(BW, MW, DOP, housing, distance, parity, CI, TP_Milk,
+def ration_requirements(BW, MW, DOP, housing, distance, parity, CI, TP_Milk,
                             Fat_Milk, Lactose_Milk, Milk, DIM, type
                             ):
     """
-    Calculate the dietary requirements of a single cow. These values are used
+    Calculates the dietary requirements of a single cow. These values are used
     on the RHS of the linear program and furthermore will be used in constraint
     generation functions. This function calculates requirements for both
     lactating and dry cows. Each calculation has a reference to the
@@ -226,3 +226,99 @@ def calculate_requirements(BW, MW, DOP, housing, distance, parity, CI, TP_Milk,
     return {'NEmaint' : NEmaint, 'NEa' : NEa, 'NEg' : NEg, 'NEpreg' : NEpreg,
             'NEl' : NEl, 'MP_req': MP_req, 'Ca_req' : Ca_req, 'P_req' : P_req,
             'DMIest' : DMIest}
+
+def grouping_requirements(DIM, Prt, BW, MW, MY, PCMP, PCMF, CI, DOP):
+    """
+    Calculates the nutrient requirements of a single cow that are necessary for
+    pen grouping purposes. References to these equations are referenced and can
+    be found in 'Grouping management PseudoCode'. Returns the requirements.
+
+    Args:
+        DIM: Days in milk
+        Prt: Parity (number of lactations)
+        BW: Body Weight (kg)
+        MW: Mature Body Weight (kg)
+        MY: Milk yield per day (kg)
+        PCMP: Milk protien (%)
+        PCMF: Milk fat (%)
+        CI: Calving interval (days)
+        DOP: Days in pregnancy
+    """
+    # A: PRODUCTION PARAMETERS
+    # [A.#.A.1]
+    # Fat corrected milk (FCM)
+    FCM = (0.4*MY) + (15*MY*(PCMF/100))
+    # [A.#.A.2]
+    # Energy corrected milk
+    ECM = (12.82*MY*(PCMF/100)) + (7.13*MY*(PCMP/100)) + (0.323*MY)
+    # B: BODY PARAMETERS
+    # The following calculations for EQEBW and EQEBG are from the ration
+    # requirement calculations above
+    CBW = MW * 0.06275
+    if DOP > 190:
+        CW = (18 + (DOP - 190) * 0.665) * (CBW/45)
+    else:
+        CW = 0
+    MSBW = 0.96 * MW
+    SBW = 0.96 * BW
+    EBW = 0.891 * SBW
+    EQSBW = (SBW - CW) * (478/MSBW)
+    if Prt == 1 and CI != 0:
+        ADG = ((0.92-0.82) * MSBW) / CI
+    elif Prt == 2 and CI!=0:
+        ADG = ((1 - 0.92) * MSBW) / CI
+    else:
+        ADG = 0
+    # Equivalent empty weight gain (kg)
+    EQEBG = 0.956 * ADG
+    # Equivalent shrunk body weight (kg)
+    EQEBW = 0.891 * EQSBW
+    # Fat corrected milk (kg)
+    FCM = (0.4 * MY) + (15 * PCMF * (MY/100))
+    # C: NUTRIENT REQUIREMENTS
+    # [A.#.C.1]
+    # Dry matter intake estimation (kg)
+    DMIest = (0.372 * FCM + 0.0968 * BW**0.75) * (1- math.exp(-0.192 \
+                                                        *((DIM/7) + 3.67)))
+    # Net Energy :
+    #[A.#.C.2]
+    # Net energy for maintenance (Mcal/cow/day)
+    NEm = 0.079*BW**(0.75)
+    # Net energy for milk production (Mcal/cow/day)
+    NEl = MY* ((0.0929*PCMF) + (0.0563*PCMP) + 0.192)
+    # Net energy for gain (Mcal/cow/day)
+    NEg = 0.0635 * EQEBW**0.75 * EQEBG**1.097
+    # Net energy (Mcal/cow/day)
+    NE = NEm + NEl
+    # Net energy density (Mcal/cow/day)
+    NEd = NE / DMIest
+    # Metabolizable energy (Mcal/cow/day)
+    ME = NE / 0.644
+    # Metabolizable Protien :
+    #[A.#.C.3]
+    # Metabolizable protein for milk production (g/cow/day)
+    MPl = MY* ((PCMP/67)*1000)
+    # Metabolizable protein for gain (g/cow/day)
+    if ADG != 0:
+        MPg = (ADG*(268-(29.4*(NEg/ADG)))) / 0.28908
+    else:
+        MPg = 0
+    # Scurf protein requirement (g/cow/day)
+    SR = 0.3 * (BW**0.6)
+    # Endogenous urinary protein requirement (g/cow/day)
+    UR = 4.1 * (BW**0.5)
+    # Total digestible nutrients (% per kg of DM)
+    TDN = (((NEl/DMIest)*0.92) + 0.12) / 0.0245
+    MicroCP = (DMIest) * (TDN/100) * 130
+    # Metabolic fecal protein (g/cow/day)
+    MFR = (30*DMIest) - (0.5*((MicroCP/0.8) - MicroCP))
+    # MP required for Endogenous Protein (g/cow/day)
+    MPEndoRec = (0.4*11.8*DMIest)
+    # Metabolizable protein for maintenance (g/cow/day)
+    MPm = SR + UR + MFR + MPEndoRec
+    # Metabolizable protein (g/cow/day)
+    MP = MPl + MPg + MPm
+    # Metabolizable protein (g/kg of DMI)
+    MPd = MP / DMIest
+    # returning nutrient grouping values
+    return DMIest, NEd, MPd, ADG
