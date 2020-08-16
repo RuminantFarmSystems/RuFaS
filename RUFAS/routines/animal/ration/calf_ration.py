@@ -4,7 +4,19 @@ import sqlite3
 
 
 def optimize(feed, rqmts):
-    return get_ration()
+    # return get_ration()
+    return {'2': 0,
+            '24': 0,
+            '36': 0,
+            '38': 0,
+            '91': 0,
+            '102': 0,
+            '137': 0,
+            '155': 1,
+            '156': 1,
+            '157': 1,
+            'status': 'Optimal',
+            'objective': 4.5}
 
 def calc_requirements(calf, temp, wean_day, wean_length, milk_type):
     '''
