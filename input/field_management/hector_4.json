@@ -1,12 +1,15 @@
 {
     "fertilizer": {
-        "composition": {
-            "N": 0.0,
-            "P": 0.0,
-            "K": 0.0
+        "mixes": {
+            "fert_1": {
+                "N": 0.0,
+                "P": 0.0,
+                "K": 0.0
+            }
         },
-        "rotation_years": [2009],
-        "repeat": 1,
+        "rotation_years": [],
+        "repeat": 0,
+        "mix": [],
         "year": [],
         "day": [],
         "N_mass": [],

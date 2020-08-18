@@ -262,7 +262,9 @@ class FieldReport(BaseReportDriver):
                                     'MIP_runoff': ['soil.MIP_runoff', 'kg', []],
                                     'MOP_runoff': ['soil.MOP_runoff', 'kg', []],
                                     'WIP': ['soil.WIP', 'kg', []],
-                                    'WOP': ['soil.WOP', 'kg', []]
+                                    'WOP': ['soil.WOP', 'kg', []],
+                                    'profile_P': ['soil.profile_P', 'kg', []],
+                                    'STP': ['soil.STP', 'kg', []]
                                     }
 
             self.annual_variables = {'year': ['time.calendar_year', '', 0],
@@ -275,7 +277,9 @@ class FieldReport(BaseReportDriver):
                                      'fert_P_runoff': ['soil.fert_P_runoff_annual', 'kg', 0],
                                      'DRP_runoff': ['soil.DRP_runoff_annual', 'kg', 0],
                                      'MIP_runoff': ['soil.MIP_runoff_annual', 'kg', 0],
-                                     'MOP_runoff': ['soil.MOP_runoff_annual', 'kg', 0]
+                                     'MOP_runoff': ['soil.MOP_runoff_annual', 'kg', 0],
+                                     'profile_P': ['soil.profile_P_annual', 'kg', 0],
+                                     'STP': ['soil.STP_annual', 'kg', 0]
                                      }
 
     class FieldManagementReport(BaseFieldReport):

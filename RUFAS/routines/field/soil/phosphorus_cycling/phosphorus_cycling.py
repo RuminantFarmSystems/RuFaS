@@ -57,6 +57,8 @@ def update_profile_P(soil, field_management):
         soil.soil_P += layer.soil_P
         soil.P_uptake += layer.P_uptake
 
+    soil.STP = soil.soil_layers[0].labile_P + soil.soil_layers[0].active_P + soil.soil_layers[0].stable_P
+
     profile_P = soil.labile_P + soil.active_P + \
                 soil.stable_P + soil.org_P
 
@@ -89,3 +91,4 @@ def update_annual_P(soil):
     soil.P_drainage_annual += soil.P_drainage
     soil.P_runoff_annual += soil.P_runoff
     soil.P_uptake_annual += soil.P_uptake
+    soil.STP_annual += soil.STP

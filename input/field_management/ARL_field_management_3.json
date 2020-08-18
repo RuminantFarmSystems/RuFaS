@@ -1,12 +1,15 @@
 {
     "fertilizer": {
-        "composition": {
-            "N": 0.0,
-            "P": 0.0,
-            "K": 0.0
+        "mixes": {
+            "fert_1": {
+                "N": 0.0,
+                "P": 0.0,
+                "K": 0.0
+            }
         },
         "rotation_years": [],
         "repeat": 0,
+        "mix": [],
         "year": [],
         "day": [],
         "N_mass": [],
@@ -29,10 +32,10 @@
     "tillage": {
         "rotation_years": [],
         "repeat": 0,
-        "year": [],
-        "day": [],
-        "percent_incorporated": [],
-        "percent_mixed": [],
-        "depth": []
+        "year": [1989],
+        "day": [305],
+        "percent_incorporated": [disk+chisel],
+        "percent_mixed": [disk+chisel],
+        "depth": [disk+chisel]
     }
 }

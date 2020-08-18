@@ -1,35 +1,22 @@
 {
     "fertilizer": {
-        "composition": {
-            "N": 0.4,
-            "P": 0.2,
-            "K": 0.1
+        "mixes": {
+            "barnyard_fert": {
+                "N": 0.4,
+                "P": 0.2,
+                "K": 0.1
+            }
         },
-        "rotation_years": [
-            2009
-        ],
+        "rotation_years": [2009],
         "repeat": 1,
-        "year": [
-            2010
-        ],
-        "day": [
-            200
-        ],
-        "N_mass": [
-            1000
-        ],
-        "P_mass": [
-            5
-        ],
-        "K_mass": [
-            400
-        ],
-        "depth": [
-            0.0
-        ],
-        "surface_percent": [
-            1.0
-        ]
+        "mix": ["barnyard_fert"],
+        "year": [2010],
+        "day": [200],
+        "N_mass": [1000],
+        "P_mass": [5],
+        "K_mass": [400],
+        "depth": [0.0],
+        "surface_percent": [1.0]
     },
     "manure": {
         "rotation_years": [

@@ -43,10 +43,7 @@ def daily_field_management_routine(soil, manure_storage, field_management, weath
 
     till_management = field_management.managed_applications['tillage']
     if (time.calendar_year, time.day) in till_management.applications:
-        if field_management.check_conditions(soil, weather, time):
-            tillage_application.update_all(soil, till_management.applications[(time.calendar_year, time.day)].data)
-        else:
-            till_management.iterate_application(time)
+        tillage_application.update_all(soil, till_management.applications[(time.calendar_year, time.day)].data)
 
     field_management.update_annual_variables(manure_storage)
 
@@ -92,6 +89,7 @@ class FieldManagement:
                     'P': 0.13,
                     'K': 0.13
                 },
+                'mix': "default",
                 'year': -1,
                 'day': -1,
                 'N_mass': 100,
@@ -112,8 +110,12 @@ class FieldManagement:
         self.managed_applications = {}
 
         for application_name, default_data in self.application_defaults.items():
-            self.managed_applications[application_name] = \
-                self.BaseApplicationManagement(app_data[application_name], application_name, default_data, time)
+            if application_name.startswith('fert'):
+                self.managed_applications[application_name] = \
+                    self.FertApplicationManagement(app_data[application_name], application_name, default_data, time)
+            else:
+                self.managed_applications[application_name] = \
+                    self.BaseApplicationManagement(app_data[application_name], application_name, default_data, time)
 
         self.manure_applied = 0.0
         self.manure_N_applied = 0.0
@@ -345,3 +347,12 @@ class FieldManagement:
                 self.data = {}
                 for variable_name, variable_data in app_data.items():
                     self.data[variable_name] = variable_data
+
+    class FertApplicationManagement(BaseApplicationManagement):
+        def __init__(self, management_data, application_type, default_data, time):
+            self.mixes = management_data.pop('mixes')
+            super().__init__(management_data, application_type, default_data, time)
+
+            for application in self.applications.values():
+                if application.data['mix'] != 'default':
+                    application.data['composition'] = self.mixes[application.data['mix']]

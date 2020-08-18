@@ -31,8 +31,7 @@
             "active_mineral_rate": 0.0003,
             "volatile_exchange_factor": 0.15,
             "denitrification_rate": 0.1,
-            "soil_water_percent": 0.3,
-            "OM_percent": 0.019
+            "soil_water_percent": 0.3
         },
         "layer_2":
         {

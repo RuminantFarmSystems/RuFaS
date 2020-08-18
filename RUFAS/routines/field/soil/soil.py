@@ -189,8 +189,12 @@ class Soil:
         self.runoff_conc = 0.0
 
         # Phosphorus mass balance
+        self.STP = 0.0
+        self.STP_annual = 0.0
+
         self.profile_P = 0.0
-        self.initial_profile_P = 0.0
+
+        self.profile_P_annual = 0.0
 
         self.P_calc = 0.0
         self.P_balance_difference = 0.0
@@ -518,6 +522,8 @@ class Soil:
         self.water_balance_difference_annual = self.p_act_annual - self.p_calc_annual
 
     def annual_phosphorus_balance(self, field_management):
+        self.STP_annual = self.STP_annual / 365
+
         self.delta_P_annual = self.profile_P - self.initial_profile_P
 
         self.P_calc_annual = self.delta_P_annual + \
