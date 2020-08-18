@@ -6,7 +6,8 @@
 		"heiferIII_num": 0,
 		"cow_num": 0,
 		"replace_num": 0,
-		"herd_num": 0
+		"herd_num": 0,
+		"herd_init": false
 	},
 	"animal_config": {
 		"management_decisions": {
