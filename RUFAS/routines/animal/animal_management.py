@@ -730,7 +730,7 @@ class AnimalManagement:
                           len(self.life_cycle_manager.sold_heifers),
                           len(self.life_cycle_manager.culled_cows))
         if num_animals > minimum_num:
-            print('The smallest animal list is of size ' + str(minimum_num) +
+            print('\nThe smallest animal list is of size ' + str(minimum_num) +
                   ' so ' + str(num_animals) + ' of each animal class cannot ' +
                   'be in the life cycle output. Only ' + str(minimum_num) +
                   ' of each animal type will be in the life cycle output.')

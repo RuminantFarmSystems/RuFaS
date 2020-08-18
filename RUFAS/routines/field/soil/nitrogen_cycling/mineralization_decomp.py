@@ -63,11 +63,19 @@ def mineralization_decomp(soil):
     min_coeff = 0.05
 
     # "pseudocode_soil" S.4.E.5
-    term1 = exp(-0.693 * (CN - 25) / 25)
-    term2 = exp(-0.693 * (CP - 200) / 200)
-    term3 = 1.0
+    try:
+        term1 = exp(-0.693 * (CN - 25) / 25)
+        term2 = exp(-0.693 * (CP - 200) / 200)
+        term3 = 1.0
+    except Exception:
+        term1 = soil.term1
+        term2 = soil.term2
+        term3 = soil.term3
 
     res_comp = min(term1, term2, term3)
+    soil.term1 = term1
+    soil.term2 = term2
+    soil.term3 = term3
 
     # "pseudocode_soil" S.4.E.4
     decay = min_coeff * res_comp * ((layer.temp_fac * layer.water_fac) ** 0.5)

@@ -305,6 +305,10 @@ class Soil:
         self.N_erosion_annual = 0.0
         self.N_uptake_annual = 0.0
 
+        self.term1 = 0.0
+        self.term2 = 0.0
+        self.term3 = 0.0
+
         self.initialize_profile_characteristics()
 
     class SoilLayer:
