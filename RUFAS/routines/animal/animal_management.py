@@ -237,12 +237,14 @@ class AnimalManagement:
         else:
             self.simulate_animals = True
 
+        herd_init = herd_data['herd_init']
+
         if self.simulate_animals:
             self.calves, self.heiferIs, self.heiferIIs, self.heiferIIIs, self.cows \
                 = self.life_cycle_manager.initialize_herd(herd_num, calf_num,
                                                           heiferI_num, heiferII_num,
                                                           heiferIII_num, cow_num,
-                                                          replace_num)
+                                                          replace_num, herd_init)
 
         if len(pen_data) > 0:
             self.init_nutrient_rqmts(weather, time)
@@ -605,6 +607,7 @@ class AnimalManagement:
             weather: instance of the Weather class defined in classes.py
             time: instance of the Time class defined in classes.py
         """
+        print(self.simulation_day)
         if self.simulate_animals:
             for pen in self.all_pens:
                 pen.pen_populated = len(pen.animals_in_pen) > 0
