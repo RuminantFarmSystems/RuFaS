@@ -236,7 +236,7 @@ class Crop:
             elif crop_name.startswith("spring_wheat"):
                 crop = spring_wheat.SpringWheat(crop_name, crop_data)
             else:
-                print(crop_name, "is an invalid crop_type.")
+                print(crop_name, "is an invalid crop_type. Please consult the list of crop_types")
                 continue
 
             self.crops_list.append(crop)
