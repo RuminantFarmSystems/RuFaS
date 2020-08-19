@@ -100,10 +100,15 @@ def update_profile_N(soil, field_management):
     soil.N_uptake = 0.0
     for layer in soil.soil_layers:
         soil.NH4 += layer.NH4
+        layer.NH4_average += layer.NH4
         soil.NO3 += layer.NO3
+        layer.NO3_average += layer.NO3
         soil.org_N += layer.org_N
+        layer.org_N_average += layer.org_N
         soil.active_N += layer.active_N
+        layer.active_N_average += layer.active_N
         soil.stable_N += layer.stable_N
+        layer.stable_N_average += layer.stable_N
         soil.N_uptake += layer.N_uptake
 
     profile_N = soil.NH4 + soil.NO3 + soil.org_N + soil.fresh_N
@@ -126,6 +131,8 @@ def update_profile_N(soil, field_management):
 
 
 def update_annual_N(soil):
+    soil.profile_N_average += soil.profile_N
+    soil.fresh_N_average += soil.fresh_N
     soil.NO3_drainage_annual += soil.NO3_drainage
     soil.NH4_drainage_annual += soil.NH4_drainage
     soil.M_leach_annual += soil.M_leach
