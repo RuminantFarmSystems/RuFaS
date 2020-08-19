@@ -193,6 +193,7 @@ class Soil:
         self.STP_annual = 0.0
 
         self.profile_P = 0.0
+        self.initial_profile_P = 0.0
 
         self.profile_P_annual = 0.0
 
@@ -309,6 +310,9 @@ class Soil:
         self.term2 = 0.0
         self.term3 = 0.0
 
+        self.fresh_N_average = 0.0
+        self.profile_N_average = 0.0
+
         self.initialize_profile_characteristics()
 
     class SoilLayer:
@@ -410,6 +414,12 @@ class Soil:
             self.days_unbalanced_labile = 0.0
             self.days_unbalanced_active = 0.0
 
+            self.NO3_average = 0.0
+            self.NH4_average = 0.0
+            self.active_N_average = 0.0
+            self.stable_N_average = 0.0
+            self.org_N_average = 0.0
+
     def initialize_profile_characteristics(self):
         if self.cover == "GRASSED":
             self.cover_factor = 0.8
@@ -507,14 +517,14 @@ class Soil:
         self.initial_profile_SW = self.profile_SW
         self.initial_profile_N = self.profile_N
 
-    def annual_mass_balance(self, field_management):
+    def annual_mass_balance(self, field_management, time):
         """
         Description:
             Calculates annual water balance
         """
         self.annual_water_balance()
-        self.annual_phosphorus_balance(field_management)
-        self.annual_nitrogen_balance(field_management)
+        self.annual_phosphorus_balance(field_management, time)
+        self.annual_nitrogen_balance(field_management, time)
 
     def annual_water_balance(self):
         self.delta_SW_annual = self.profile_SW - self.initial_profile_SW
@@ -525,8 +535,8 @@ class Soil:
 
         self.water_balance_difference_annual = self.p_act_annual - self.p_calc_annual
 
-    def annual_phosphorus_balance(self, field_management):
-        self.STP_annual = self.STP_annual / 365
+    def annual_phosphorus_balance(self, field_management, time):
+        self.STP_annual = self.STP_annual / len(time.years[time.year - 1])
 
         self.delta_P_annual = self.profile_P - self.initial_profile_P
 
@@ -536,7 +546,17 @@ class Soil:
 
         self.P_balance_difference_annual = field_management.manure_P_applied_annual - self.P_calc_annual
 
-    def annual_nitrogen_balance(self, field_management):
+    def annual_nitrogen_balance(self, field_management, time):
+        for layer in self.soil_layers:
+            layer.NO3_average = layer.NO3_average / len(time.years[time.year - 1])
+            layer.NH4_average = layer.NH4_average / len(time.years[time.year - 1])
+            layer.active_N_average = layer.active_N_average / len(time.years[time.year - 1])
+            layer.stable_N_average = layer.stable_N_average / len(time.years[time.year - 1])
+            layer.org_N_average = layer.org_N_average / len(time.years[time.year - 1])
+
+        self.fresh_N_average = self.fresh_N_average / len(time.years[time.year - 1])
+        self.profile_N_average = self.profile_N_average / len(time.years[time.year - 1])
+
         self.delta_N_annual = self.profile_N - self.initial_profile_N
 
         self.N_calc_annual = self.delta_N_annual + \
@@ -614,3 +634,13 @@ class Soil:
 
         self.fert_P_leached_annual = 0.0
         self.fert_P_runoff_annual = 0.0
+
+        for layer in self.soil_layers:
+            layer.NO3_average = 0.0
+            layer.NH4_average = 0.0
+            layer.active_N_average = 0.0
+            layer.stable_N_average = 0.0
+            layer.org_N_average = 0.0
+
+        self.fresh_N_average = 0.0
+        self.profile_N_average = 0.0

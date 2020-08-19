@@ -111,7 +111,7 @@ def annual_simulation():
         daily_simulation()
 
     # Post-Annual Routines
-    state.annual_mass_balance()
+    state.annual_mass_balance(time)
     output.annual_updates(state, weather, time)
     output.write_annual_reports()
     output.annual_flushes()
