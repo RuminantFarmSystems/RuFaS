@@ -43,7 +43,10 @@ def residue_partitioning(crop_type, soil, weather, time):
     """
 
     # B. residue partitioning
-    # TODO delete 100's eventually, check lignin residue percent in soil.py
+
+    d_lignin_residue_percent = 0.12 * weather.rainfall[time.year - 1][time.day - 1] * 0.01
+    soil.lignin_residue_percent += d_lignin_residue_percent
+
     # TODO fr_N might need a different calculation in the future
     LN_ratio_AG = 0
     crop_type.fr_N = 0.4  # TODO
@@ -65,8 +68,10 @@ def residue_partitioning(crop_type, soil, weather, time):
     teff_3 = 29.700
     teff_4 = 0.03
     normalizer = 20.80546
-    T_d = (teff_2 + (teff_3 / math.pi) * math.atan(math.pi * teff_4 * (weather.T_avg[time.year - 1][time.day - 1]
-                                                                       - teff_1))) / normalizer
+
+    T_d = max(0.0, (teff_2 + (teff_3 / math.pi) * math.atan(math.pi * teff_4 * (
+            weather.T_avg[time.year - 1][time.day - 1] - teff_1))) / normalizer)
+
     soil.T_d = T_d
 
     for layer in soil.soil_layers:
@@ -76,12 +81,12 @@ def residue_partitioning(crop_type, soil, weather, time):
         layer.M_d = M_d
 
         # above ground metabolic residue
-        metabolic_AG_to_C_active = metabolic_AG_active_decomp * layer.M_d * soil.T_d * layer.metabolic_AG
+        layer.metabolic_AG_to_C_active = metabolic_AG_active_decomp * layer.M_d * soil.T_d * layer.metabolic_AG
 
         metabolic_AG_to_BG = layer.metabolic_AG * layer.fr_tillage
 
         d_metabolic_AG = soil.residue_DM_harvest * metabolic_AG_frac - (
-                (metabolic_AG_to_C_active - metabolic_AG_to_BG) + metabolic_AG_to_BG)
+                (layer.metabolic_AG_to_C_active - metabolic_AG_to_BG) + metabolic_AG_to_BG)
 
         layer.metabolic_AG += d_metabolic_AG
 
@@ -89,21 +94,21 @@ def residue_partitioning(crop_type, soil, weather, time):
         K1 = 0.076
         struct_AG_decomp = K1 * math.exp(-3) * (1 - metabolic_AG_frac)
 
-        struct_AG_to_C_active = struct_AG_decomp * layer.M_d * soil.T_d * layer.structural_AG
-        struct_AG_to_C_slow = struct_AG_decomp * layer.M_d * soil.T_d * layer.structural_AG
+        layer.struct_AG_to_C_active = struct_AG_decomp * layer.M_d * soil.T_d * layer.structural_AG
+        layer.struct_AG_to_C_slow = struct_AG_decomp * layer.M_d * soil.T_d * layer.structural_AG
 
         struct_AG_to_BG = layer.structural_AG * layer.fr_tillage
 
         d_structural_AG = ((soil.residue_DM_harvest * (1 - metabolic_AG_frac)) - struct_AG_to_BG) - \
-                          (struct_AG_to_C_active + struct_AG_to_C_slow)
+                          (layer.struct_AG_to_C_active + layer.struct_AG_to_C_slow)
 
         layer.structural_AG += d_structural_AG
 
         # below ground metabolic residue and roots
         residue_DM_incorp = layer.fr_tillage * soil.residue_DM_harvest
         fr_residue_DM = 0
-        if residue_DM_incorp + crop_type.bio_BG_DM != 0:
-            fr_residue_DM = residue_DM_incorp / (residue_DM_incorp + crop_type.bio_BG_DM)
+        if residue_DM_incorp + crop_type.bio_BG != 0:
+            fr_residue_DM = residue_DM_incorp / (residue_DM_incorp + crop_type.bio_BG)
 
         LN_ratio_BG = 0
         if crop_type.fr_N != 0:
@@ -114,20 +119,20 @@ def residue_partitioning(crop_type, soil, weather, time):
 
         K4 = 0.35
         metabolic_BG_active_decomp = K4
-        metabolic_BG_to_C_active = metabolic_BG_active_decomp * layer.M_d * soil.T_d * layer.metabolic_BG
+        layer.metabolic_BG_to_C_active = metabolic_BG_active_decomp * layer.M_d * soil.T_d * layer.metabolic_BG
 
-        d_metabolic_BG = metabolic_AG_to_BG + (crop_type.bio_BG_DM * metabolic_BG_frac) - metabolic_BG_to_C_active
+        d_metabolic_BG = metabolic_AG_to_BG + (crop_type.bio_BG * metabolic_BG_frac) - layer.metabolic_BG_to_C_active
 
         layer.metabolic_BG += d_metabolic_BG
 
         # below ground structural residue and roots
         K3 = 0.094
         struct_BG_decomp = K3
-        struct_BG_to_C_active = struct_BG_decomp * layer.M_d * soil.T_d * layer.structural_BG
-        struct_BG_to_C_slow = struct_BG_decomp * layer.M_d * soil.T_d * layer.structural_BG
+        layer.struct_BG_to_C_active = struct_BG_decomp * layer.M_d * soil.T_d * layer.structural_BG
+        layer.struct_BG_to_C_slow = struct_BG_decomp * layer.M_d * soil.T_d * layer.structural_BG
 
-        d_structural_BG = (struct_AG_to_BG + crop_type.bio_BG_DM * (1 - metabolic_BG_frac)) - ((
-                struct_BG_to_C_active + struct_BG_to_C_slow) + struct_AG_to_BG)
+        d_structural_BG = (struct_AG_to_BG + crop_type.bio_BG * (1 - metabolic_BG_frac)) - ((
+                layer.struct_BG_to_C_active + layer.struct_BG_to_C_slow) + struct_AG_to_BG)
 
         layer.structural_BG += d_structural_BG
 
@@ -154,21 +159,26 @@ def pools_and_gas_partitioning(soil):
         fr_CO2_struct_to_active = 0.45
         layer.struct_AG_to_active_loss = layer.struct_AG_to_C_active * fr_CO2_struct_to_active
         struct_AG_to_active_actual = layer.struct_AG_to_C_active * (1 - fr_CO2_struct_to_active)
+        layer.struct_AG_to_active_actual = struct_AG_to_active_actual
 
         fr_CO2_struct_to_slow = 0.3
         layer.struct_AG_to_slow_loss = layer.struct_AG_to_C_slow * fr_CO2_struct_to_slow
         struct_AG_to_slow_actual = layer.struct_AG_to_C_slow * (1 - fr_CO2_struct_to_slow)
+        layer.struct_AG_to_slow_actual = struct_AG_to_slow_actual
 
         # below ground metabolic C
         layer.metabolic_BG_to_active_loss = layer.metabolic_BG_to_C_active * fr_CO2_met_to_active
         metabolic_BG_to_active_actual = layer.metabolic_BG_to_C_active * (1 - fr_CO2_met_to_active)
+        layer.metabolic_BG_to_active_actual = metabolic_BG_to_active_actual
 
         # below ground structural C
         layer.struct_BG_to_active_loss = layer.struct_BG_to_C_active * fr_CO2_struct_to_active
         struct_BG_to_active_actual = layer.struct_BG_to_C_active * (1 - fr_CO2_struct_to_active)
+        layer.struct_BG_to_active_actual = struct_BG_to_active_actual
 
         layer.struct_BG_to_slow_loss = layer.struct_BG_to_C_slow * fr_CO2_struct_to_slow
         struct_BG_to_slow_actual = layer.struct_BG_to_C_slow * (1 - fr_CO2_struct_to_slow)
+        layer.struct_BG_to_slow_actual = struct_BG_to_slow_actual
 
         # D. partitioning The Active and Slow Carbon Pools (in soil) Decomposition to Alternative Carbon Pools
         # (e.g., Active Carbon Pool to Slow Carbon Pool) or Gas Loss
@@ -186,20 +196,25 @@ def pools_and_gas_partitioning(soil):
         Es = 0.85 - 0.68 * soil.silt_and_clay_frac
 
         active_to_slow = carbon_active_decomp * (1 - Es - 0.004)
+        layer.active_to_slow = active_to_slow
         layer.carbon_active_loss = carbon_active_decomp * Es
 
         active_to_passive = carbon_active_decomp * 0.004
+        layer.active_to_passive = active_to_passive
 
         fr_CO2_carbon_slow_loss = 0.55
         fr_slow_to_passive = 0.03
 
         slow_to_active = carbon_slow_decomp * (1 - fr_CO2_carbon_slow_loss - fr_slow_to_passive)
+        layer.slow_to_active = slow_to_active
         layer.carbon_slow_loss = carbon_slow_decomp * fr_CO2_carbon_slow_loss
         slow_to_passive = carbon_slow_decomp * fr_slow_to_passive
+        layer.slow_to_passive = slow_to_passive
 
         fr_CO2_carbon_passive_loss = 0.55
 
         passive_to_active = carbon_passive_decomp * (1 - fr_CO2_carbon_passive_loss)
+        layer.passive_to_active = passive_to_active
         layer.carbon_passive_loss = carbon_passive_decomp * fr_CO2_carbon_passive_loss
 
         # E. active, slow and lost CO2 pools
@@ -248,6 +263,7 @@ def soil_carbon_aggregation(soil):
         passive_C_percent = (layer.carbon_passive / soil_mass) * 100
 
         layer.carbon_percent = active_C_percent + slow_C_percent + passive_C_percent
+        # layer.org_C = layer.carbon_percent
 
         # total soil carbon
         layer.total_carbon = layer.carbon_active + layer.carbon_slow + layer.carbon_passive

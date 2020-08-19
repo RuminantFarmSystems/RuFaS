@@ -162,7 +162,6 @@ class Soybean(BaseCrop):
 
         self.bio_AG = 0
         self.bio_BG = 0
-        self.bio_BG_DM = 0
         self.yield_max = 0
         self.yield_actual = 0
         self.DM_yield = 0.0

@@ -47,7 +47,7 @@ def daily_crop_routine(soil, crop, field_management, weather, time):
         crop_type.yield_P = 0
 
         crop_type.HI_actual = 0
-        crop_type.bio_BG_DM = 0
+        crop_type.bio_BG = 0
         soil.residue_DM_harvest = 0
         soil.soil_layers[0].fr_tillage = 0
 
