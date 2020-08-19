@@ -276,32 +276,6 @@ class Cow(HeiferIII):
         return estimated_daily_milk_produced, fat_percent, \
             daily_fat_correct_milk_production
 
-    def calc_nutrient_rqmts(self, housing, pasture_concentrate, nutrients):
-        """
-        Calculates this cow's nutrient requirements.
-        Args:
-            housing: "pasture" or "barn"
-            pasture_concentrate: concentrate supplementation when farming type
-                is "pasture", kg
-            nutrients: the list of the nutrients for which requirements are
-                calculated
-        """
-        #self.nutrient_rqmts = {'FU': {'op': '<=', 'val': 7.566673489860807},
-        #          'RU': {'op': '>=', 'val': 0},
-        #          'ME_DM': {'op': '>=', 'val': 57.238188330372566},
-        #          'RDP_DM': {'op': '>=', 'val': 2.0347001114951313},
-        #          'RUP_DM': {'op': '>=', 'val': 1.2716733909335047}}
-        DMIest, NEd, MPd, ADG = req.grouping_requirements(self.days_in_milk,
-        self.calves, self.body_weight, self.mature_body_weight,
-         self.estimated_daily_milk_produced, self.mPrt, self.fat_percent, self.CI,
-         self.days_in_preg)
-        self.DMIest = DMIest
-        self.DNED_req = NEd
-        self.DMPD_req = MPd
-        #TODO: Change hardcoded
-        self.DBW = -0.4125
-        self.daily_growth = self.DBW
-
     def calc_init_nutrient_rqmts(
             self, vertical_distance, horizontal_distance, housing,
             pasture_concentrate, nutrients):
@@ -317,7 +291,6 @@ class Cow(HeiferIII):
                 calculated
         """
         self.calc_daily_walking_dist(vertical_distance, horizontal_distance)
-        self.calc_nutrient_rqmts(housing, pasture_concentrate, nutrients)
 
     def calc_manure_excretion(self, feed):
         """

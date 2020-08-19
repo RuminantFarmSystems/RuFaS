@@ -19,6 +19,7 @@ from RUFAS.routines.animal.clustering_pen_grouping import grouping
 from RUFAS.routines.animal.life_cycle.life_cycle import LifeCycleManager
 from RUFAS.routines.animal.life_cycle.animal_base import AnimalBase
 from RUFAS.routines.animal.ration import ration_driver as ration_driver
+from RUFAS.routines.animal.ration import cow_requirements as req
 from collections import deque
 import random
 import matplotlib.pyplot as plt
@@ -408,6 +409,21 @@ class AnimalManagement:
         dry_cows = []
 
         for cow in self.cows:
+            requirements = req.calc_rqmts(cow.body_weight, cow.mature_body_weight,
+                cow.days_in_preg, cow.calves, cow.CI, cow.mPrt, cow.fat_percent,
+                cow.lactose_milk, cow.estimated_daily_milk_produced, cow.days_in_milk,
+                cow.milking)
+            cow.NEmaint = requirements['NEmaint']
+            cow.NEg = requirements['NEg']
+            cow.NEpreg = requirements['NEpreg']
+            cow.NEl = requirements['NEl']
+            cow.MP_req = requirements['MP_req']
+            cow.Ca_req = requirements['Ca_req']
+            cow.P_req = requirements['P_req']
+            cow.DMIest = requirements['DMIest']
+            cow.DNED_req = (requirements['NEmaint'] + requirements['NEl'])/ \
+                                                                    cow.DMIest
+            cow.DMDP_req = (requirements['MP_req']) / cow.DMIest
             if cow.milking:
                 lactating_cows.append(cow)
             else:

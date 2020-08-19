@@ -12,6 +12,7 @@ from RUFAS.routines.animal.ration import cow_ration_NLP as NLP
 import statistics as stat
 import math
 import random
+import time as timer
 
 def optimization(pen, requirements, available_feeds, BW, SBW, cow_type):
     """
@@ -50,8 +51,11 @@ def optimization(pen, requirements, available_feeds, BW, SBW, cow_type):
                             TDN, DE, EE, is_fat, BW, SBW, calcium, phosphorus, NDF,
                             type, is_wetforage, Kd, N_A, N_B, CP, dRUP, limit,
                             cow_type)
+    t_start_sim = timer.time()
     solution = NLP.optimize()
-    #print(solution.success)
+    t_end_sim = timer.time()
+    print(solution.success)
+    print("Total NLP Run Time: {} seconds\n".format(str(t_end_sim - t_start_sim)))
     return solution
 
 def ration_formulation(pen, available_feeds, cow_type):
@@ -66,27 +70,29 @@ def ration_formulation(pen, available_feeds, cow_type):
     """
     # creating instance of class requirements
     req = Requirements()
-    # calculating requirements based on pen info
-    req.set_requirements(pen)
+    # setting requirements based on animals information in pen
+    req.set_requirements(pen, False)
     BW = pen.avg_BW
     SBW = BW*0.891
     solution = optimization(pen, req, available_feeds, BW, SBW, cow_type)
     #Reduction of milk production estimate process to achieve feasible solution
     while not solution.success:
-        #TODO: Time analysis for hardcoded reduction values
-        #print(NLP.NEl_constraint(solution.x))
+        # This values for reduction are not from pseduocode, but the vales below
+        # are based on fastest case runtime testing
+        # print(NLP.NEl_constraint(solution.x))
         NEl_con = NLP.NEl_constraint(solution.x)
         if NEl_con < -0.5:
             reduction = 3*(-NEl_con)
         else:
-            reduction = 1
+            reduction = 1.5
 
         for animal in pen.animals_in_pen:
             animal.estimated_daily_milk_produced -= reduction
             #TODO: Code below is useful for time analysis
             #if animal.estimated_daily_milk_produced < 0:
             #    print('negative')
-        req.set_requirements(pen)
+        # recalculating requirements after reduct=ion
+        req.set_requirements(pen, True)
         solution = optimization(pen, req, available_feeds, BW, SBW, cow_type)
 
     ration = {}
@@ -98,7 +104,7 @@ def ration_formulation(pen, available_feeds, cow_type):
         ration[available_feeds.feed_key[id]] = round(num, 6)
     ration['status'] = 'Optimal'
     ration['objective'] = NLP.objective(solution.x)
-    print(ration)
+    #print(ration)
     return ration
 
 def hardcoded_rat():
@@ -195,7 +201,7 @@ class Requirements:
         # dry matter intake estimation (kg)
         self.DMIest = 0
 
-    def set_requirements(self, pen):
+    def set_requirements(self, pen, recalc):
         """
         Calculates the average requirements utilizing cow_requirements.py and an
         input pen to generate the average requirements across a pen. It then
@@ -203,6 +209,7 @@ class Requirements:
 
         Args:
             pen: an instance of an object of class Pen
+            recalc: boolean to see if requirements need to be recalculated since grouping
         """
         NEmaint = []
         NEa = []
@@ -214,22 +221,41 @@ class Requirements:
         P_req = []
         DMIest = []
 
-        # iterating through each animal in the pen and calculating requirements
-        for animal in pen.animals_in_pen:
-            req = cow_requirements.ration_requirements(animal.body_weight, animal.mature_body_weight,
-                            animal.days_in_preg, pen.housing_type,(math.sqrt((animal.DVD)**2 + (animal.DHD)**2)),
-                            animal.calves, animal.CI, animal.mPrt, animal.fat_percent,
-                            animal.lactose_milk,animal.estimated_daily_milk_produced,
-                            animal.days_in_milk,animal.milking)
-            NEmaint.append(req['NEmaint'])
-            NEa.append(req['NEa'])
-            NEg.append(req['NEg'])
-            NEpreg.append(req['NEpreg'])
-            NEl.append(req['NEl'])
-            MP_req.append(req['MP_req'])
-            Ca_req.append(req['Ca_req'])
-            P_req.append(req['P_req'])
-            DMIest.append(req['DMIest'])
+        if recalc:
+            # iterating through each animal in the pen and calculating requirements
+            for animal in pen.animals_in_pen:
+                req = cow_requirements.calc_rqmts(animal.body_weight, animal.mature_body_weight,
+                                animal.days_in_preg, animal.calves, animal.CI, animal.mPrt,
+                                animal.fat_percent, animal.lactose_milk,
+                                animal.estimated_daily_milk_produced, animal.days_in_milk,
+                                animal.milking
+                                )
+                # caclulating the activity requirement for energy
+                NEa_val = cow_requirements.energy_activity_rqmts(animal.body_weight,
+                    pen.housing_type,(math.sqrt((animal.DVD)**2 + (animal.DHD)**2)))
+                NEmaint.append(req['NEmaint'])
+                NEa.append(NEa_val)
+                NEg.append(req['NEg'])
+                NEpreg.append(req['NEpreg'])
+                NEl.append(req['NEl'])
+                MP_req.append(req['MP_req'])
+                Ca_req.append(req['Ca_req'])
+                P_req.append(req['P_req'])
+                DMIest.append(req['DMIest'])
+        else:
+            # iterating through each animal in the pen and setting requirements
+            for animal in pen.animals_in_pen:
+                NEa_val = cow_requirements.energy_activity_rqmts(animal.body_weight,
+                pen.housing_type,(math.sqrt((animal.DVD)**2 + (animal.DHD)**2)))
+                NEmaint.append(animal.NEmaint)
+                NEa.append(NEa_val)
+                NEg.append(animal.NEg)
+                NEpreg.append(animal.NEpreg)
+                NEl.append(animal.NEl)
+                MP_req.append(animal.MP_req)
+                Ca_req.append(animal.Ca_req)
+                P_req.append(animal.P_req)
+                DMIest.append(animal.DMIest)
         # populating the class variables as an average across cows for each requirement
         self.NEmaint = stat.mean(NEmaint)
         self.NEa = stat.mean(NEa)

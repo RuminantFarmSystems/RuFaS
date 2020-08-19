@@ -161,7 +161,10 @@ class Pen:
             # currently, only lactating cows have ration calculations, so there
             # are different arguments
             if type(animal).__name__ == 'Cow':
-                animal.calc_nutrient_rqmts(housing, pasture_concentrate, feed.nutrient_rqmts)
+                #old hard coded variable updates from the deleted calc_requirements in
+                # cow.py
+                self.DBW = -0.4125
+                self.daily_growth = self.DBW
             elif type(animal).__name__ == 'Calf':
                 animal.calc_nutrient_rqmts(temp)
             else:
@@ -253,7 +256,6 @@ class Pen:
                 #print(ration_per_animal)
             elif 'Cow' in self.classes_in_pen and \
                     not self.animals_in_pen[0].milking:  # dry cow
-                print('dry')
                 ration_per_animal = \
                     ration_driver.ration_formulation(self,available_feeds,False)
 
