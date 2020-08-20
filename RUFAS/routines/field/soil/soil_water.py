@@ -23,7 +23,7 @@ Soil attribute definitions
 
     WP = amount of water in the soil profile held at wilting point (mm H2O)
 
-    perc = the amount of water percolated to the next layer (mm H2O)
+    percolation = the amount of water percolated to the next layer (mm H2O)
 
     trans_act = the amount of water lost to transpiration on a given day (mm H2O)
                 (this value is taken from the crop module)
@@ -64,7 +64,7 @@ def update_SW(soil, weather, time):
     soil.ET_act = 0.0
 
     profile_SW = 0
-    perc = 0
+    percolation = 0
     for x in range(len(soil.soil_layers)):
         layer = soil.soil_layers[x]
 
@@ -72,23 +72,23 @@ def update_SW(soil, weather, time):
         WP = layer.wilting_water
         SAT = layer.sat_water
 
-        perc = layer.perc
+        percolation = layer.percolation
         evap = layer.evap
         trans = layer.trans_act
         I = soil.infiltration
 
         if x == 0:
-            perc_in = I
+            percolation_in = I
         else:
-            perc_in = soil.soil_layers[x - 1].perc
+            percolation_in = soil.soil_layers[x - 1].percolation
 
-        SW = SW + perc_in - evap - perc - trans
+        SW = SW + percolation_in - evap - percolation - trans
 
         if SW < WP:
-            layer.perc -= WP - SW
+            layer.percolation -= WP - SW
         SW = max(WP, SW)
         if SW > SAT:
-            layer.perc += SW - SAT
+            layer.percolation += SW - SAT
         SW = min(SAT, SW)
 
         profile_SW += SW
@@ -99,7 +99,7 @@ def update_SW(soil, weather, time):
         layer.soil_water = SW
         soil.soil_layers[x] = layer
 
-    soil.drainage = perc
+    soil.drainage = percolation
     soil.delta_SW = profile_SW - soil.profile_SW
     soil.profile_SW = profile_SW
 
