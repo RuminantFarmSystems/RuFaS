@@ -394,8 +394,8 @@ class Soil:
             self.iso_slope = 0.0  # the slope of the isotherm curve
             self.iso_inter = 0.0  # the intercept of the isotherm curve
 
-            self.DRP_leach = 0.0
-            self.DRP_leach_act = 0.0
+            self.DRP_leachate = 0.0
+            self.DRP_leachate_act = 0.0
             self.DRP_runoff = 0.0
 
             self.labile_P = layer_data['labile_P']  # labile P in soil layer
