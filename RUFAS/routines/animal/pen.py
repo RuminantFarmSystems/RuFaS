@@ -250,10 +250,8 @@ class Pen:
 
             elif 'Cow' in self.classes_in_pen and \
                     self.animals_in_pen[0].milking:  # lactating cow
-                #ration_per_animal = ration_driver.hardcoded_rat()
                 ration_per_animal = \
                     ration_driver.ration_formulation(self, available_feeds,True)
-                #print(ration_per_animal)
             elif 'Cow' in self.classes_in_pen and \
                     not self.animals_in_pen[0].milking:  # dry cow
                 ration_per_animal = \

@@ -15,7 +15,7 @@ import random
 from scipy.optimize import minimize
 
 def set_globals(price_, NEmaint_, NEa_, NEpreg_, NEl_, NEg_, MP_req_, C_req_, P_req_,
-                DMIest_, TDN_, DE_, EE_, is_fat_, BW_, SBW_, calcium_, phosphorus_,
+                DMIest_, TDN_, DE_, EE_, is_fat_, BW_, calcium_, phosphorus_,
                 NDF_, type_, is_wetforage_, Kd_, N_A_, N_B_, CP_, dRUP_, limit_,
                 cow_type_):
     """
@@ -38,7 +38,6 @@ def set_globals(price_, NEmaint_, NEa_, NEpreg_, NEl_, NEg_, MP_req_, C_req_, P_
     global EE
     global is_fat
     global BW
-    global SBW
     global calcium
     global phosphorus
     global NDF
@@ -68,7 +67,6 @@ def set_globals(price_, NEmaint_, NEa_, NEpreg_, NEl_, NEg_, MP_req_, C_req_, P_
     EE = EE_
     is_fat = is_fat_
     BW = BW_
-    SBW = SBW_
     calcium = calcium_
     phosphorus = phosphorus_
     NDF = NDF_
@@ -131,6 +129,7 @@ def NEmact_constraint(x):
         TDNconc = (TotalTDN / DMI) * 100
     else:
         TDNconc = 0
+    SBW = BW*0.96
     # [A.Cow.E.2]
     # The amount of intake needed to meet the maintenance requirement, dimensionless
     if TotalTDN < (0.035 * BW**0.75):

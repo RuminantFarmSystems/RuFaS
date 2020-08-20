@@ -18,7 +18,6 @@ Author(s): Kass Chupongstimun, kass_c@hotmail.com,
 from RUFAS.util import DatabaseReader
 from . import nitrogen_loss, carbon_loss, protein_degradation
 from RUFAS.routines.animal.ration import hardcoded_ration
-from RUFAS.routines.animal.ration import ration_driver
 
 
 def daily_feed_routine(feed, fields, animal_management):
@@ -723,7 +722,6 @@ class Feed:
         for key, silo in self.storage_options.items():
             if silo.days_since_feedout >= 0 and silo.DM > 0:
                 for pen in animal_management.all_pens:
-                    # TODO: change for when ration formulation is implemented
                     if silo.feed_key in pen.ration and silo.feed_key not in \
                                                                     feeds_fed:
                         if (silo.DM - pen.ration[silo.feed_key]) > 0:

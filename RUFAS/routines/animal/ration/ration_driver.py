@@ -14,7 +14,7 @@ import math
 import random
 import time as timer
 
-def optimization(pen, requirements, available_feeds, BW, SBW, cow_type):
+def optimization(pen, requirements, available_feeds, BW, cow_type):
     """
     Function that sets up the nutrients and requirements lists into structured
     inputs for the non-linear program and calls the optimization function.
@@ -24,7 +24,6 @@ def optimization(pen, requirements, available_feeds, BW, SBW, cow_type):
         requirements: object of class Requirements
         available_feeds: object of class AvailableFeeds
         BW: Average Body weight of the input pen
-        SBW: Average Shrunk Body weight of pen
     """
     price = NLP.list_reconfig(available_feeds.price)
     TDN = NLP.list_reconfig(available_feeds.TDN)
@@ -48,14 +47,10 @@ def optimization(pen, requirements, available_feeds, BW, SBW, cow_type):
     NLP.set_globals(price, requirements.NEmaint, requirements.NEa, requirements.NEpreg,
                             requirements.NEl, requirements.NEg, requirements.MP_req,
                             requirements.Ca_req, requirements.P_req, requirements.DMIest,
-                            TDN, DE, EE, is_fat, BW, SBW, calcium, phosphorus, NDF,
+                            TDN, DE, EE, is_fat, BW, calcium, phosphorus, NDF,
                             type, is_wetforage, Kd, N_A, N_B, CP, dRUP, limit,
                             cow_type)
-    t_start_sim = timer.time()
     solution = NLP.optimize()
-    t_end_sim = timer.time()
-    print(solution.success)
-    print("Total NLP Run Time: {} seconds\n".format(str(t_end_sim - t_start_sim)))
     return solution
 
 def ration_formulation(pen, available_feeds, cow_type):
@@ -73,13 +68,12 @@ def ration_formulation(pen, available_feeds, cow_type):
     # setting requirements based on animals information in pen
     req.set_requirements(pen, False)
     BW = pen.avg_BW
-    SBW = BW*0.891
-    solution = optimization(pen, req, available_feeds, BW, SBW, cow_type)
+    solution = optimization(pen, req, available_feeds, BW, cow_type)
     #Reduction of milk production estimate process to achieve feasible solution
     while not solution.success:
         # This values for reduction are not from pseduocode, but the vales below
         # are based on fastest case runtime testing
-        # print(NLP.NEl_constraint(solution.x))
+        # TODO: continue testing for more effecient reductions
         NEl_con = NLP.NEl_constraint(solution.x)
         if NEl_con < -0.5:
             reduction = 3*(-NEl_con)
@@ -88,12 +82,9 @@ def ration_formulation(pen, available_feeds, cow_type):
 
         for animal in pen.animals_in_pen:
             animal.estimated_daily_milk_produced -= reduction
-            #TODO: Code below is useful for time analysis
-            #if animal.estimated_daily_milk_produced < 0:
-            #    print('negative')
         # recalculating requirements after reduct=ion
         req.set_requirements(pen, True)
-        solution = optimization(pen, req, available_feeds, BW, SBW, cow_type)
+        solution = optimization(pen, req, available_feeds, BW, cow_type)
 
     ration = {}
     for id in range(len(available_feeds.feed_id)):
@@ -104,19 +95,8 @@ def ration_formulation(pen, available_feeds, cow_type):
         ration[available_feeds.feed_key[id]] = round(num, 6)
     ration['status'] = 'Optimal'
     ration['objective'] = NLP.objective(solution.x)
-    #print(ration)
     return ration
 
-def hardcoded_rat():
-    return {'2': 0.75,
-            '24': 5,
-            '36': 2,
-            '38': 4,
-            '91': 5,
-            '102': 3,
-            '137': 0.32,
-            'status': 'Optimal',
-            'objective': 4.5}
 def ration_report(ration, available_feeds):
     """
     Calculates information in the ration about nutrient information including
@@ -156,7 +136,6 @@ def ration_report(ration, available_feeds):
         nutrient_amount['N_amount'] += (available_feeds[key]['CP'] / \
                                                         (denom*100)) * val
     dm_amount = nutrient_amount['dm_amount']
-    # TODO: ask about DM conc
     nutrient_conc['dm_conc'] = 100
     nutrient_conc['cp_conc'] = (nutrient_amount['cp_amount'] / dm_amount) * 100
     nutrient_conc['adf_conc'] = (nutrient_amount['adf_amount']/dm_amount) * 100

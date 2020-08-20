@@ -603,7 +603,6 @@ class AnimalManagement:
         Args:
             feed: instance of the Feed class
         """
-        print('Day: ' + str(self.simulation_day))
         if self.simulate_animals:
             for pen in self.all_pens:
                 pen.pen_populated = len(pen.animals_in_pen) > 0

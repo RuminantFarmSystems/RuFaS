@@ -8,7 +8,7 @@ Author(s): Chris VanKerkhove, cjv47@cornell.edu
 """
 ################################################################################
 import math
-###TODO: Find out what units the percent values come in from the cow when linking###
+
 def calc_rqmts(BW, MW, DOP, parity, CI, TP_Milk, Fat_Milk, Lactose_Milk,
                     Milk, DIM, type
                     ):
