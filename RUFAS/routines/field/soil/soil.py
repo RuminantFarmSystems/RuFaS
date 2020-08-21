@@ -640,7 +640,8 @@ class Soil:
             self.perc = 0.0  # amount of water that percolates to next layer
 
             # Variable to simulate nitrogen Cycling
-            self.org_C = layer_data['org_C_percent']
+            # self.org_C = layer_data['org_C_percent']
+            self.org_C = 0
             self.active_mineral_rate = layer_data['active_mineral_rate']
             self.cation_exclusion_fraction = layer_data['cation_exclusion_fraction']
             self.denitrification_rate = layer_data['denitrification_rate']
