@@ -263,7 +263,7 @@ def soil_carbon_aggregation(soil):
         passive_C_percent = (layer.carbon_passive / soil_mass) * 100
 
         layer.carbon_percent = active_C_percent + slow_C_percent + passive_C_percent
-        # layer.org_C = layer.carbon_percent
+        layer.org_C = layer.carbon_percent
 
         # total soil carbon
         layer.total_carbon = layer.carbon_active + layer.carbon_slow + layer.carbon_passive
