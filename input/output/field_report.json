@@ -56,17 +56,17 @@
         },
         "water_balance": {
             "produce_csv": true,
-            "produce_graphics": false,
+            "produce_graphics": true,
             "report_name": "water_balance_report"
         },
         "phosphorus_balance": {
             "produce_csv": true,
-            "produce_graphics": false,
+            "produce_graphics": true,
             "report_name": "phosphorus_balance_report"
         },
         "nitrogen_balance": {
             "produce_csv": true,
-            "produce_graphics": false,
+            "produce_graphics": true,
             "report_name": "nitrogen_balance_report"
         },
         "custom_field_report": {
