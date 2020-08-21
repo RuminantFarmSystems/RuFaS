@@ -45,17 +45,66 @@
             "harvest_type": "scheduled"
         },
         "alfalfa_02": {
-            "grow_years": [2002],
+            "grow_years": [2002, 2003, 2004],
             "repeat": 0,
             "planting_date": 98,
-            "harvest_date": 226,
+            "harvest_date": 253,
             "harvest_type": "scheduled"
         },
-        "corn_03": {
-            "grow_years": [2003],
+        "corn_05": {
+            "grow_years": [2005],
             "repeat": 0,
-            "planting_date": 119,
-            "harvest_date": 290,
+            "planting_date": 120,
+            "harvest_date": 293,
+            "harvest_type": "scheduled"
+        },
+        "alfalfa_06": {
+            "grow_years": [2006, 2007, 2008],
+            "repeat": 0,
+            "planting_date": 97,
+            "harvest_date": 256,
+            "harvest_type": "scheduled"
+        },
+        "corn_09": {
+            "grow_years": [2009],
+            "repeat": 0,
+            "planting_date": 168,
+            "harvest_date": 281,
+            "harvest_type": "scheduled"
+        },
+        "alfalfa_11": {
+            "grow_years": [2011, 2012, 2013],
+            "repeat": 0,
+            "planting_date": 89,
+            "harvest_date": 179,
+            "harvest_type": "scheduled"
+        },
+        "corn_13": {
+            "grow_years": [2013],
+            "repeat": 0,
+            "planting_date": 127,
+            "harvest_date": 298,
+            "harvest_type": "scheduled"
+        },
+        "alfalfa_14": {
+            "grow_years": [2014, 2015, 2016],
+            "repeat": 0,
+            "planting_date": 89,
+            "harvest_date": 179,
+            "harvest_type": "scheduled"
+        },
+        "corn_17": {
+            "grow_years": [2017],
+            "repeat": 0,
+            "planting_date": 125,
+            "harvest_date":300,
+            "harvest_type": "scheduled"
+        },
+        "alfalfa_18": {
+            "grow_years": [2018, 2019],
+            "repeat": 0,
+            "planting_date": 120,
+            "harvest_date": 180,
             "harvest_type": "scheduled"
         }
     }
