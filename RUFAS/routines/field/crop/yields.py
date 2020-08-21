@@ -77,7 +77,6 @@ def update_all(soil, crop_type, field_management, time):
         time: an instance of the Time class specified in classes.py
     """
 
-    print(crop_type.crop_name, time.calendar_year, time.day)
 
     calc_HI_max(crop_type)
     calc_HI_act(crop_type)
