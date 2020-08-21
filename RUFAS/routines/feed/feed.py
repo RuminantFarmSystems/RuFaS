@@ -654,10 +654,12 @@ class Feed:
                         tot_req_inv_non_lactating_cows += storage.inclusion_rate_est[animal]
 
                 available_forage = storage.DM - tot_req_inv_non_lactating_cows
-                storage.DMI_forage_max['lactating_cows'] = available_forage / storage.cow_days['lactating_cows']
+
+                storage.DMI_forage_max['lactating_cows'] = 0
+                if storage.cow_days['lactating_cows'] != 0:
+                    storage.DMI_forage_max['lactating_cows'] = available_forage / storage.cow_days['lactating_cows']
 
                 storage.DMI_forage_max = storage.inclusion_rate_est
-                storage.DMI_forage_max['lactating_cows'] = 0
 
     def daily_feed_management(self, animal_management):
         """
