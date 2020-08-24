@@ -312,7 +312,7 @@ class Soil:
 
         # soil carbon attributes  # TODO decide if any below should be in crop
         self.residue_DM_harvest = 0.0
-        self.lignin_residue_percent = 2.6  # tied to the reset of this variable in yields, if changed, change together
+        self.lignin_residue_percent = 17  # tied to the reset of this variable in yields, if changed, change together
         self.lignin_residue_AG_percent = 2.6  # tied to the reset of this variable in yields, if changed, change together
         self.lignin_residue_BG_percent = 2.6  # tied to the reset of this variable in yields, if changed, change together
         self.curr_layer_depth = 0
