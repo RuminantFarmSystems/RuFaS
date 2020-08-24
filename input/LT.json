@@ -16,17 +16,17 @@
     {
         "fields": {
             "field_1": {
-                "soil": "ARL_soil.json",
+                "soil": "LT_soil.json",
                 "crop": "LT_rotation.json",
                 "field_management": "LT_field_management_1.json"
             },
             "field_2": {
-                "soil": "ARL_soil.json",
+                "soil": "LT_soil.json",
                 "crop": "LT_rotation.json",
                 "field_management": "LT_field_management_2.json"
             },
             "field_3": {
-                "soil": "ARL_soil.json",
+                "soil": "LT_soil.json",
                 "crop": "LT_rotation.json",
                 "field_management": "LT_field_management_3.json"
             }
