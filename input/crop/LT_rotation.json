@@ -2,32 +2,32 @@
     "latitude": 42.5338019,
 
     "crops": {
-        "spring_wheat_13": {
+        "corn_13": {
             "grow_years": [2013],
             "repeat": 0,
-            "planting_date": 94,
-            "harvest_date": 319,
+            "planting_date": 92,
+            "harvest_date": 225,
             "harvest_type": "scheduled"
         },
-        "potato_14": {
+        "corn_14": {
             "grow_years": [2014],
             "repeat": 0,
-            "planting_date": 94,
-            "harvest_date": 319,
+            "planting_date": 119,
+            "harvest_date": 281,
             "harvest_type": "scheduled"
         },
-        "sugar_beet_15": {
+        "corn_15": {
             "grow_years": [2015],
             "repeat": 0,
-            "planting_date": 94,
-            "harvest_date": 319,
+            "planting_date": 90,
+            "harvest_date": 215,
             "harvest_type": "scheduled"
         },
-        "spring_barley_16": {
+        "corn_16": {
             "grow_years": [2016],
             "repeat": 0,
-            "planting_date": 94,
-            "harvest_date": 319,
+            "planting_date": 129,
+            "harvest_date": 313,
             "harvest_type": "scheduled"
         }
     }

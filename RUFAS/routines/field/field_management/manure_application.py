@@ -127,8 +127,8 @@ def formulate_manure_application(manure_storage, m_app):
         manure_application['mass'] = max(manure_application['N_mass'] / N_frac,
                                          manure_application['P_mass'] / P_frac)
 
-        manure_application['N_mass'] = manure_application['mass'] * N_frac
-        manure_application['P_mass'] = manure_application['mass'] * P_frac
+        # manure_application['N_mass'] = manure_application['mass'] * N_frac
+        # manure_application['P_mass'] = manure_application['mass'] * P_frac
         manure_application['DM'] = manure_application['mass'] * solid_ratio
 
     return manure_application
