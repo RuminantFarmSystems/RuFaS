@@ -624,7 +624,7 @@ class AnimalManagement:
                 self.clear_pens()
                 self.pen_allocation()
                 self.calc_avg_nutrient_rqmts()  # per pen
-                self.calc_ration(feed)  # per pen
+                self.calc_ration(feed, temp)  # per pen
                 self.calc_avg_growth()  # per pen
 
             self.calc_manure_excretion(feed)  # per animal
