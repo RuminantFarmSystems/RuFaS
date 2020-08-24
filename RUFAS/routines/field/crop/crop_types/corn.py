@@ -119,7 +119,6 @@ class Corn(BaseCrop):
         self.fr_n3ish = 0.01381
 
         self.fr_N = 0
-        self.fr_N_up = 0
         self.N_up = 0
         self.act_N_up_each_layer = []
         self.N_actual_up = 0
