@@ -13,7 +13,7 @@ def manure_calculations(ration_formulation, feed, BW, milk_prod, p_feces_excrt,
     """
     TEMPORARY PLACEHOLDER
     Calculates inputs for manure module with information from the
-    ration formulation.
+    ration formulation. Equations referenced are from pseudocode.
 
     Args:
         ration_formulation: dictionary which stores the calculated ration

@@ -18,9 +18,6 @@ import numpy as np
 
 
 class HeiferI(Calf):
-	# TODO: Body weight changed could be based on nutrition intake later from
-	#  Ration Formulation
-
 	def __init__(self, args):
 		"""
 		Description:
@@ -30,7 +27,7 @@ class HeiferI(Calf):
 			args.breed: breed of the cow
 			args.birth_date: the date of the simulation when the calf was born
 			args.daysBorn: age of the animal
-			(optional: include the following to assign cow information) 
+			(optional: include the following to assign cow information)
 			args.birth_weight: the birth weight of the cow
 			args.body_weight: current body weight of the cow
 			args.wean_weight: the wean weight of the cow
@@ -89,7 +86,21 @@ class HeiferI(Calf):
 		# requirement of P from the ration (g) (A.1B-D.E.7)
 		self.p_req = p_absorb / 0.664
 
-	def update(self):
+	def get_non_preg_bw_change(self):
+		"""
+		Calculates the body weight change for a heifer that is not pregnant.
+		If the days_born of the animal is equal to 400,
+		the difference is set to 1 (otherwise results in a division by 0 error).
+
+		Returns: the daily body weight change for a heifer that is not pregnant
+		"""
+		divisor = abs(AnimalBase.config['target_heifer_preg_day'] - self.days_born)
+		if divisor == 0:
+			divisor = 1
+		return (0.55 * 0.96 * self.mature_body_weight -
+										0.96 * self.body_weight) / divisor
+
+	def update(self, sim_day):
 		"""
 		Controls heifer's grow with average daily gain based on user's input
 		until breeding start day. Here is the place to change growth rate with
@@ -99,29 +110,17 @@ class HeiferI(Calf):
 
 		Returns: the second stage of heifer -- breeding stage starts
 		"""
+		self.update_body_weight_history(sim_day)
 		second_stage = False
 
-		prev_weight = self.body_weight
+		self.daily_growth = self.get_non_preg_bw_change()
 
-		gained_weight = np.random.normal(
-			AnimalBase.config['avg_daily_gain_h'],
-			AnimalBase.config['std_daily_gain_h'])
-		while gained_weight < AnimalBase.config['avg_daily_gain_h'] \
-			- 2 * AnimalBase.config['std_daily_gain_h'] \
-			or gained_weight > AnimalBase.config['avg_daily_gain_h'] \
-				+ 2 * AnimalBase.config['std_daily_gain_h']:
-			gained_weight = np.random.normal(
-				AnimalBase.config['avg_daily_gain_h'],
-				AnimalBase.config['std_daily_gain_h'])
-
-		self.body_weight += gained_weight
-
-		self.daily_growth = self.body_weight - prev_weight
+		self.body_weight += self.daily_growth
 
 		self.days_born += 1
 		if self.days_born == AnimalBase.config['breeding_start_day_h']:
 			second_stage = True
-			self.events.add_event(self.days_born, 'Breeding start')
+			self.events.add_event(self.days_born, sim_day, 'Breeding start')
 			self.days_born -= 1  # will increment in next stage again
 
 		return second_stage

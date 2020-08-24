@@ -20,46 +20,46 @@ from RUFAS.routines.animal.manure.growing_heifer_manure_excretion import \
 
 
 class HeiferIII(HeiferII):
-    # TODO: Body weight changed could be based on nutrition intake later from
-    #  Ration Formulation.
     # TODO: Rank heifers to enter the herd or sold
-    
+
     def __init__(self, args):
         """
         Description:
-			initialize the heifer in this stage from the second stage
-        Input:
-			args.id: id of the cow
-			args.breed: breed of the cow
-			args.birth_date: the date of the simulation when the calf was born
-			args.daysBorn: age of the animal
-			args.repro_program: reproduction program used in heifer, 
-				three of them: ED, TAI, and synch-ED programs
-			args.tai_method_h: timed-AI protocols used for 
-				reproduction programs, three of them: 5dCG2P, 
-				5dCGP, and user-defined
-			args.synch_ed_method_h: synch ed protocols used for 
-				reproduction programs, two of them: 2P and CP
-			(optional: include the following to assign cow information) 
-			args.birth_weight: the birth weight of the cow
-			args.body_weight: current body weight of the cow
-			args.wean_weight: the wean weight of the cow
-			args.mature_body_weight: the mature body weight of the cow
-			args.events: events of the cow
-			args.estrus_count
-			args.estrus_day
-			args.tai_program_start_day_h
-			args.synch_ed_program_start_day_h
-			args.synch_ed_estrus_day
-			args.stop_day
-			args.conception_rate
-			args.ai_day
-			args.abortion_day
-			args.days_in_preg
-			args.gestation_length
+            initialize the heifer in this stage from the second stage
+        Args:
+            args.id: id of the cow
+            args.breed: breed of the cow
+            args.birth_date: the date of the simulation when the calf was born
+            args.daysBorn: age of the animal
+            args.repro_program: reproduction program used in heifer,
+                three of them: ED, TAI, and synch-ED programs
+            args.tai_method_h: timed-AI protocols used for
+                reproduction programs, three of them: 5dCG2P,
+                5dCGP, and user-defined
+            args.synch_ed_method_h: synch ed protocols used for
+                reproduction programs, two of them: 2P and CP
+            (optional: include the following to assign cow information)
+            args.birth_weight: the birth weight of the cow
+            args.body_weight: current body weight of the cow
+            args.wean_weight: the wean weight of the cow
+            args.mature_body_weight: the mature body weight of the cow
+            args.events: events of the cow
+            args.estrus_count
+            args.estrus_day
+            args.tai_program_start_day_h
+            args.synch_ed_program_start_day_h
+            args.synch_ed_estrus_day
+            args.stop_day
+            args.conception_rate
+            args.ai_day
+            args.abortion_day
+            args.days_in_preg
+            args.gestation_length
             args.p_gest_for_calf
         """
         super().__init__(args)
+        if 'conceptus_weight' in args:
+            self.conceptus_weight = args['conceptus_weight']
 
     def get_heiferIII_values(self):
         """
@@ -86,7 +86,7 @@ class HeiferIII(HeiferII):
             manure_calculations(self.ration_formulation, feed, 
                             self.body_weight, p_feces_excrt, p_urine)
 
-    def update(self):
+    def update(self, sim_day):
         """
         Controls heifer's grow with average daily gain based on user's input
         until breeding start day here is the place to change growth rate with
@@ -96,39 +96,28 @@ class HeiferIII(HeiferII):
 
         Returns: cow_stage - heifer close to calving, move to cow stage
         """
+        self.update_body_weight_history(sim_day)
         cow_stage = False
         self.days_born += 1
 
         if self.preg:
             self.days_in_preg += 1
 
-        prev_weight = self.body_weight
-
         if self.days_born < AnimalBase.config['grow_end_day']:
             # Heifer can only grow to a maximum weight of mature_body_weight
-            if self.body_weight < AnimalBase.config['mature_body_weight']:
-                gained_weight = np.random.normal(
-                    AnimalBase.config['avg_daily_gain_h'], 
-                    AnimalBase.config['std_daily_gain_h'])
-                while gained_weight < AnimalBase.config['avg_daily_gain_h'] \
-                    - 2 * AnimalBase.config['std_daily_gain_h'] \
-                    or gained_weight > AnimalBase.config['avg_daily_gain_h'] \
-                        + 2 * AnimalBase.config['std_daily_gain_h']:
-                    gained_weight = np.random.normal(
-                        AnimalBase.config['avg_daily_gain_h'], 
-                        AnimalBase.config['std_daily_gain_h'])
-                self.body_weight += gained_weight
-            if self.body_weight > AnimalBase.config['mature_body_weight']:
-                self.body_weight = AnimalBase.config['mature_body_weight']
-                self.mature_body_weight = self.body_weight
-                self.events.add_event(self.days_born, 
-                'Mature body weight prior to grow end day')
-        
-        self.daily_growth = self.body_weight - prev_weight
-        
+            self.daily_growth = self.get_bw_change()
+
+            self.body_weight += self.daily_growth
+
+            if self.body_weight > self.mature_body_weight:
+                self.body_weight = self.mature_body_weight
+                self.events.add_event(self.days_born,
+                                      sim_day, 'Mature body weight '
+                                               'prior to grow end day')
+
         if self.days_born == AnimalBase.config['grow_end_day']:
             self.mature_body_weight = self.body_weight
-            self.events.add_event(self.days_born, 'Mature body weight')
+            self.events.add_event(self.days_born, sim_day, 'Mature body weight')
 
         if self.days_in_preg == self.gestation_length:
             self.days_born -= 1  # will be incremented again in next stage
@@ -148,7 +137,7 @@ class HeiferIII(HeiferII):
         Gestation Length: {}\n
         Life Events: \n
         {}
-        """.\
+        """. \
             format(self.id,
                    self.birth_date,
                    self.days_born,

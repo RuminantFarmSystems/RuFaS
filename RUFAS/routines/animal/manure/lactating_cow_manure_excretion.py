@@ -12,7 +12,7 @@ def manure_calculations(ration_formulation, feed, BW, DIM, mPrt,
                         milk_prod, p_feces_excrt, p_urine):
     """
     Calculates inputs for manure module with information from the
-    ration formulation.
+    ration formulation. Equations referenced are from pseudocode.
 
     Args:
         milk_prod: milk production, kg

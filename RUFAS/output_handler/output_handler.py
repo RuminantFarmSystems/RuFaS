@@ -41,18 +41,16 @@ class OutputHandler:
 
         # Instantiate Report Handler Objects here
         self.reports = {
-                        'field_report': FieldReport(data['field_report']),
-                        'feed_storage_report': FeedStorageReport(data['feed_storage_report']),
-                        'manure_storage_report': ManureStorageReport(data['manure_storage_report']),
-                        'mass_balance_report': MassBalanceReport(data['mass_balance_report']),
-                        'custom_report': CustomReport(data['custom_report'])
+                        'feed_storage_report': FeedStorageReport(data['feed_storage_report'], state),
+                        'manure_storage_report': ManureStorageReport(data['manure_storage_report'], state),
+                        'custom_report': CustomReport(data['custom_report']),
+                        'fields_report': FieldsReport(data['fields_report'], state),
+                        'pens_report': PensReport(data['pens_report'], state),
+                        'mass_balance': MassBalanceReport(data['mass_balance']),
+                        'life_cycle_report': LifeCycleReport(data['life_cycle_report']),
                         }
 
-        # TODO: move field report to loop in dj_fields
-        for pen in state.animal_management.all_pens:
-            self.reports['pen_' + str(pen.id)] = PenReport(data['pen_report'], state.feed, pen.id)
-
-    def initialize_csv_dir(self, csv_dir):
+    def initialize_dir(self, csv_dir, graphic_dir):
         """
         If a directory of the same name exists, it and its contents are deleted,
         then a directory for each output report is created.
@@ -61,39 +59,25 @@ class OutputHandler:
 
         Args:
             csv_dir (Path): The path to the directory that will store all
-                output report files.
+                output report csv files.
+            graphic_dir (Path): The path to the directory that will store
+                all the output report graphics
         """
-
         # Initialize path for reports
-        csv_dir = util.get_base_dir() / csv_dir
+        base_csv_dir = util.get_base_dir() / csv_dir
+        base_graphic_dir = util.get_base_dir() / graphic_dir
 
         # Delete directory if previously exists
-        if csv_dir.exists():
-            shutil.rmtree(csv_dir)
+        if base_csv_dir.exists():
+            shutil.rmtree(base_csv_dir)
+        if base_graphic_dir.exists():
+            shutil.rmtree(base_graphic_dir)
 
-        csv_dir.mkdir(exist_ok=True, parents=False)
+        base_csv_dir.mkdir(exist_ok=True, parents=False)
+        base_graphic_dir.mkdir(exist_ok=True, parents=False)
 
-        for report_name in self.reports:
-            report = self.reports[report_name]
-            if report.produce_csv:
-                report.csv_dir = csv_dir / report_name
-                report.csv_dir.mkdir(exist_ok=True, parents=False)
-                report.initialize_csv_dir()
-
-    def initialize_graphic_dir(self, graphic_dir):
-        graphic_dir = util.get_base_dir() / graphic_dir
-
-        if graphic_dir.exists():
-            shutil.rmtree(graphic_dir)
-
-        graphic_dir.mkdir(exist_ok=True, parents=False)
-
-        for report_name in self.reports:
-            report = self.reports[report_name]
-            if report.produce_graphics:
-                report.graphic_dir = graphic_dir / report_name
-                report.graphic_dir.mkdir(exist_ok=True, parents=False)
-                report.initialize_graphic_dir()
+        for report in self.reports.values():
+            report.initialize_dir(base_csv_dir, base_graphic_dir)
 
     def initialize_reports(self):
         """Transfer needed (initial) data from state to report handlers."""
@@ -101,7 +85,7 @@ class OutputHandler:
         for report_name in self.reports:
             report = self.reports[report_name]
             if not report.produce_csv and report.produce_graphics:
-                print("Warning: Cannot produce graphics_1 for inactive report:", report.report_name,
+                print("Warning: Cannot produce graphics for inactive report:", report.report_name,
                       ". Setting produce_graphics to False")
                 report.produce_graphics = False
             if report.produce_csv:
@@ -143,3 +127,8 @@ class OutputHandler:
         for report_name in self.reports:
             report = self.reports[report_name]
             report.produce_report_graphics()
+
+    def finalize(self, state, weather, time):
+        for report_name in self.reports:
+            report = self.reports[report_name]
+            report.finalize(state, weather, time)

@@ -14,12 +14,24 @@
 
     "farm":
     {
-        "crop": "no_crop.json",
-        "soil": "barnyard_soil.json",
-        "field_management": "barnyard_field_management.json",
-
+        "fields": {
+            "field_1": {
+                "soil": "barnyard_soil.json",
+                "crop": "custom_rotation.json",
+                "field_management": "barnyard_field_management.json"
+            },
+            "field_2": {
+                "soil": "barnyard_soil.json",
+                "crop": "sugar_beet_rotation.json",
+                "field_management": "barnyard_field_management.json"
+            },
+            "field_3": {
+                "soil": "barnyard_soil.json",
+                "crop": "spring_wheat_rotation.json",
+                "field_management": "barnyard_field_management.json"
+            }
+        },
         "animal": "barnyard_animal.json",
-
         "feed": "panke_buisse_feed.json"
     }
 }

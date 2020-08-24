@@ -15,21 +15,23 @@ class BaseReportDriver:
         if self.produce_csv:
             for report in self.reports.values():
                 if not report.produce_csv and report.produce_graphics:
-                    print("Warning: Cannot produce graphics_1 for inactive report:", report.report_name,
+                    print("Warning: Cannot produce graphics for inactive report:", report.report_name,
                           ". Setting produce_graphics to False")
                     report.produce_graphics = False
                 if report.produce_csv:
                     report.initialize()
 
-    def initialize_csv_dir(self):
-        for report_name in self.reports:
-            self.reports[report_name].csv_dir = Path(str(self.csv_dir) + '/' + report_name)
-            self.reports[report_name].csv_dir.mkdir(exist_ok=True, parents=False)
+    def initialize_dir(self, base_csv_dir, base_graphic_dir):
+        if self.produce_csv:
+            self.csv_dir = base_csv_dir / self.report_name
+            self.csv_dir.mkdir(exist_ok=True, parents=False)
+        if self.produce_graphics:
+            self.graphic_dir = base_graphic_dir / self.report_name
+            self.graphic_dir.mkdir(exist_ok=True, parents=False)
 
-    def initialize_graphic_dir(self):
-        for report_name in self.reports:
-            self.reports[report_name].graphic_dir = Path(str(self.graphic_dir) + '/' + report_name)
-            self.reports[report_name].graphic_dir.mkdir(exist_ok=True, parents=False)
+        for report in self.reports.values():
+            if self.produce_csv or self.produce_graphics:
+                report.initialize_dir(self.csv_dir, self.graphic_dir)
 
     def daily_update(self, state, weather, time):
         if self.produce_csv:
@@ -59,3 +61,8 @@ class BaseReportDriver:
         if self.produce_graphics:
             for report in self.reports.values():
                 report.produce_report_graphics()
+
+    def finalize(self, state, weather, time):
+        if self.produce_csv:
+            for report in self.reports.values():
+                report.finalize(state, weather, time)

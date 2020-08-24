@@ -1,253 +1,79 @@
 {
-    "ProfileBulkDensity": 1.4,
     "CN2": 85.00,
-    "FieldSlope": 0.02,
-    "SlopeLength": 3,
-    "Manning": 0.4,
-    "FieldSize": 1.0,
-    "PracticeFactor": 0.08,
-    "Sand": 15,
-    "Silt": 65,
-    "SoilAlbedo": 0.16,
+    "field_slope": 0.02,
+    "slope_length": 3,
+    "manning": 0.4,
+    "field_size": 1.0,
+    "practice_factor": 0.08,
+    "sand": 15,
+    "silt": 65,
+    "soil_albedo": 0.16,
     "initial_residue": 0,
-    "fresh_NMineralRate": 0.05,
-    "SoilCoverType": "BARE",
-    "SoilLayers": {
-        "Layer1": {
-            "BottomDepth": 150,
-            "WiltingPoint": 0.1,
-            "FieldCapacity": 0.30,
-            "Saturation": 0.5,
-            "Ksat": 20,
-            "CationExclusionFraction": 0.0,
-            "Clay": 20,
-            "InitialTemperature": 15.77575,
-            "BulkDensity": 1.3,
-            "org_C%": 1.2,
+    "fresh_N_mineral_rate": 0.05,
+    "soil_cover_type": "BARE",
+    "soil_layers":
+    {
+        "layer_1":
+        {
+            "bottom_depth": 150,
+            "wilting_point": 0.1,
+            "field_capacity": 0.30,
+            "saturation": 0.5,
+            "K_sat": 20,
+
+            "clay": 20,
+            "initial_temperature": 15.77575,
+            "bulk_density": 1.3,
+            "org_C_percent": 0.012,
             "NH4": 1,
-            "active_N_frac": 0.02,
-            "LabileP": 23.7,
-            "ActiveMineralRate": 0.0003,
-            "VolatileExchangeFac": 0.15,
-            "DenitrificationRate": 0.1,
-            "SoilWaterRatio": 0.3,
-            "OM%": 1.9
+            "active_N_percent": 0.02,
+            "labile_P": 23.7,
+            "active_mineral_rate": 0.0003,
+            "volatile_exchange_factor": 0.15,
+            "denitrification_rate": 0.1,
+            "soil_water_percent": 0.3
         },
-        "Layer2": {
-            "BottomDepth": 300,
-            "WiltingPoint": 0.1,
-            "FieldCapacity": 0.3,
-            "Saturation": 0.5,
-            "Ksat": 20,
-            "CationExclusionFraction": 0.0,
-            "Clay": 20,
-            "InitialTemperature": 14.50797297,
-            "BulkDensity": 1.3,
-            "org_C%": 1.2,
+        "layer_2":
+        {
+            "bottom_depth": 300,
+            "wilting_point": 0.1,
+            "field_capacity": 0.3,
+            "saturation": 0.5,
+            "K_sat": 20,
+
+            "clay": 20,
+            "initial_temperature": 14.50797297,
+            "bulk_density": 1.3,
+            "org_C_percent": 0.012,
             "NH4": 1,
-            "active_N_frac": 0.02,
-            "LabileP": 10,
-            "ActiveMineralRate": 0.0003,
-            "VolatileExchangeFac": 0.15,
-            "DenitrificationRate": 0.1,
-            "SoilWaterRatio": 0.3,
-            "OM%": 1.9
+            "active_N_percent": 0.02,
+            "labile_P": 10,
+            "active_mineral_rate": 0.0003,
+            "volatile_exchange_factor": 0.15,
+            "denitrification_rate": 0.1,
+            "soil_water_percent": 0.3,
+            "OM_percent": 0.019
         },
-        "Layer3": {
-            "BottomDepth": 450,
-            "WiltingPoint": 0.1,
-            "FieldCapacity": 0.30,
-            "Saturation": 0.5,
-            "Ksat": 20,
-            "CationExclusionFraction": 0.0,
-            "Clay": 20,
-            "InitialTemperature": 13.38623,
-            "BulkDensity": 1.3,
-            "org_C%": 1.2,
+        "layer_3":
+        {
+            "bottom_depth": 450,
+            "wilting_point": 0.1,
+            "field_capacity": 0.30,
+            "saturation": 0.5,
+            "K_sat": 20,
+
+            "clay": 20,
+            "initial_temperature": 13.38623,
+            "bulk_density": 1.3,
+            "org_C_percent": 0.012,
             "NH4": 1,
-            "active_N_frac": 0.02,
-            "LabileP": 10,
-            "ActiveMineralRate": 0.0003,
-            "VolatileExchangeFac": 0.15,
-            "DenitrificationRate": 0.1,
-            "SoilWaterRatio": 0.3,
-            "OM%": 1.9
-        }
-    },
-    "FertilizerApplication": {
-        "year": [
-            0
-        ],
-        "day": [
-            0
-        ],
-        "mass": [
-            0.0
-        ],
-        "depth": [
-            0.0
-        ],
-        "surf_perc": [
-            0.0
-        ]
-    },
-    "ManureApplication": {
-        "type": [
-            "DAIRY",
-            "DAIRY",
-            "DAIRY",
-            "DAIRY",
-            "DAIRY",
-            "DAIRY",
-            "DAIRY",
-            "DAIRY"
-        ],
-        "year": [
-            2012,
-            2012,
-            2012,
-            2012,
-            2013,
-            2013,
-            2013,
-            2013
-        ],
-        "day": [
-            103,
-            176,
-            226,
-            283,
-            46,
-            155,
-            241,
-            273
-        ],
-        "mass": [
-            1320.0,
-            2120.0,
-            1329.0,
-            2228.0,
-            1250.0,
-            1587.0,
-            1750.0,
-            1555.0
-        ],
-        "P_frac": [
-            0.00820,
-            0.00866,
-            0.00941,
-            0.00656,
-            0.00748,
-            0.00698,
-            0.00721,
-            0.00646
-        ],
-        "WIP_frac": [
-            0.6,
-            0.6,
-            0.6,
-            0.6,
-            0.6,
-            0.6,
-            0.6,
-            0.6
-        ],
-        "WOP_frac": [
-            0.05,
-            0.05,
-            0.05,
-            0.05,
-            0.05,
-            0.05,
-            0.05,
-            0.05
-        ],
-        "N_frac": [
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0
-        ],
-        "NH4_frac": [
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0
-        ],
-        "dry_matter": [
-            0.04,
-            0.07,
-            0.04,
-            0.04,
-            0.05,
-            0.05,
-            0.07,
-            0.06
-        ],
-        "percent_cover": [
-            0.95,
-            0.95,
-            0.95,
-            0.95,
-            0.95,
-            0.95,
-            0.95,
-            1.0
-        ],
-        "depth": [
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0
-        ],
-        "surf_perc": [
-            1.0,
-            1.0,
-            1.0,
-            1.0,
-            1.0,
-            1.0,
-            1.0,
-            1.0
-        ]
-    },
-    "TillageApplication": {
-        "year": [
-            0
-        ],
-        "day": [
-            0
-        ],
-        "perc_incorporated": [
-            0.0
-        ],
-        "perc_mixed": [
-            0.0
-        ],
-        "depth": [
-            0.0
-        ]
-    },
-    "CropPUptake": {
-        "Uptake1": {
-            "Year": 2008,
-            "PUptake": 15.0
-        },
-        "Uptake2": {
-            "Year": 2009,
-            "PUptake": 15.0
+            "active_N_percent": 0.02,
+            "labile_P": 10,
+            "active_mineral_rate": 0.0003,
+            "volatile_exchange_factor": 0.15,
+            "denitrification_rate": 0.1,
+            "soil_water_percent": 0.3,
+            "OM_percent": 0.019
         }
     }
 }

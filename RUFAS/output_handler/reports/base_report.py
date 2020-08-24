@@ -31,19 +31,22 @@ class BaseReport:
         self.graphic_dir = ''
 
         self.daily_variables = {
-            'year': ['time.cal_year', '', []],
+            'year': ['time.calendar_year', '', []],
             'j_day': ['time.day', '', []]
         }
 
         self.annual_variables = {
-            'year': ['time.cal_year', '', 0]
+            'year': ['time.calendar_year', '', 0]
         }
 
-    def initialize_csv_dir(self):
-        pass
+    def initialize_dir(self, base_csv_dir, base_graphic_dir):
+        if self.produce_csv:
+            self.csv_dir = base_csv_dir / self.report_name
+            self.csv_dir.mkdir(exist_ok=True, parents=False)
 
-    def initialize_graphic_dir(self):
-        pass
+        if self.produce_graphics:
+            self.graphic_dir = base_graphic_dir / self.report_name
+            self.graphic_dir.mkdir(exist_ok=True, parents=False)
 
     @staticmethod
     def write_headers(output_csv, variables):
@@ -70,12 +73,11 @@ class BaseReport:
     # to the scope of variables. If a specified output is not a soil
     # variable, this will throw an error.
     def daily_update(self, state, weather, time):
-        soil = state.soil
-        crop_type = state.crop.current_crop
         animal_management = state.animal_management
-        field_management = state.field_management
         feed = state.feed
         manure_storage = state.manure_storage
+        fields = state.fields
+        life_cycle_manager = animal_management.life_cycle_manager
 
         for variable in self.daily_variables:
             self.daily_variables[variable][2].append(
@@ -83,12 +85,10 @@ class BaseReport:
 
     def annual_update(self, state, weather, time):
         """Stores the yearly values that need to be printed in the report."""
-        soil = state.soil
-        crop_type = state.crop.current_crop
         animal_management = state.animal_management
-        field_management = state.field_management
         feed = state.feed
         manure_storage = state.manure_storage
+        fields = state.fields
 
         for variable in self.annual_variables:
             self.annual_variables[variable][2] = \
@@ -136,3 +136,6 @@ class BaseReport:
     def produce_report_graphics(self):
         graphics.annual_graphics(self)
         graphics.daily_graphics(self)
+
+    def finalize(self, state, weather, time):
+        pass
