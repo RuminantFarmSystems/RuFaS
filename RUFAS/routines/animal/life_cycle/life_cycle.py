@@ -99,6 +99,10 @@ class LifeCycleManager:
     milking_cow_num = 0
     preg_cow_num = 0
     vwp_cow_num = 0
+    dry_cow_percent = 0
+    milking_cow_percent = 0
+    preg_cow_percent = 0
+    non_preg_cow_percent = 0
     daily_milk_production = 0
     avg_days_in_milk = 0
     avg_days_in_preg = 0
@@ -692,6 +696,17 @@ class LifeCycleManager:
             self.heiferII_percent = self.heiferII_num / total_animal_num * 100
             self.heiferIII_percent = self.heiferIII_num / total_animal_num * 100
             self.cow_percent = self.cow_num / total_animal_num * 100
+
+        if self.cow_num == 0:
+            self.dry_cow_percent = 0
+            self.milking_cow_percent = 0
+            self.preg_cow_percent = 0
+            self.non_preg_cow_percent = 0
+        else:
+            self.dry_cow_percent = self.dry_cow_num / self.cow_num * 100
+            self.milking_cow_percent = self.milking_cow_num / self.cow_num * 100
+            self.preg_cow_percent = self.preg_cow_num / self.cow_num * 100
+            self.non_preg_cow_percent = (self.open_cow_num + self.vwp_cow_num) / self.cow_num * 100
 
         for cull_reason in self.cull_reason_stats:
             if self.culled_cow_num != 0:
