@@ -13,7 +13,7 @@ Description: This module contains the necessary functions for calculating and
 
 Soil attribute definitions
 
-    perc = amount of water that percolates to the underlying soil layer (mm H2O)
+    percolation = amount of water that percolates to the underlying soil layer (mm H2O)
 
     t = time step (24h)
 
@@ -55,9 +55,9 @@ def calc_daily_percolation(soil):
         FC = layer.fc_water
         WP = layer.wilting_water
 
-        SW_perc = 0.0
+        SW_percolation = 0.0
         if SW > FC:
-            SW_perc = SW - FC
+            SW_percolation = SW - FC
 
         K_sat = layer.k_sat
 
@@ -69,5 +69,5 @@ def calc_daily_percolation(soil):
         t = 24
 
         exp_part = exp((-t) / layer.TT)
-        perc = SW_perc * (1 - exp_part)
-        layer.perc = min(SW - WP, perc)
+        percolation = SW_percolation * (1 - exp_part)
+        layer.percolation = min(SW - WP, percolation)
