@@ -21,7 +21,7 @@ class TallFescue(BaseCrop):
         self.crop_name = crop_name
         self.crop_type = 'perennial'
         self.harvest_quality = 'null'
-        self.feed_id = ''  # need
+        self.feed_id = ''  # TODO need
 
         self.kill_day = -1
         self.kill_year = False

@@ -18,7 +18,7 @@
             "field_1": {
                 "soil": "ARL_soil.json",
                 "crop": "ARL_rotation.json",
-                "field_management": "ARL_field_management.json"
+                "field_management": "ARL_no_fert_field_management.json"
             }
         },
         "animal": "barnyard_animal.json",
