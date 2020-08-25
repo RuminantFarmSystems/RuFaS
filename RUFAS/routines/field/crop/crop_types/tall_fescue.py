@@ -1,27 +1,30 @@
 from .base_crop import BaseCrop
 
 
-class Corn(BaseCrop):
+class TallFescue(BaseCrop):
 
     def __init__(self, crop_name, data):
         super().__init__()
 
         """GENERAL PLANT INFO"""
+        tall_fescue_data = data
+        self.grow_years = tall_fescue_data['grow_years']
+        self.repeat = tall_fescue_data['repeat']
+        self.planting_date = tall_fescue_data['planting_date']
+        self.harvest_date = tall_fescue_data['harvest_date']
 
-        corn_data = data
-        self.grow_years = corn_data['grow_years']
-        self.repeat = corn_data['repeat']
-        self.planting_date = corn_data['planting_date']
-        self.harvest_date = corn_data['harvest_date']
-        self.harvest_type = corn_data['harvest_type']
+        if tall_fescue_data['harvest_type'] != 'optimal':
+            print('Perennial crops are always optimally harvested')
+
+        self.harvest_type = 'optimal'
 
         self.crop_name = crop_name
-        self.crop_type = 'annual'
+        self.crop_type = 'perennial'
         self.harvest_quality = 'null'
-        self.feed_id = '34g'
+        self.feed_id = ''  # need
 
         self.kill_day = -1
-        self.kill_year = True
+        self.kill_year = False
         self.planted = False
         self.growing = False
 
@@ -31,14 +34,14 @@ class Corn(BaseCrop):
         ''' HEAT UNIT DATA '''
 
         # input
-        self.T_base_min = 10
-        self.T_base_max = 30
-        self.PHU = 1200
+        self.T_base_min = 10  # unknown
+        self.T_base_max = 40
+        self.PHU = 648
 
         # Internally calculated input
         self.accumulated_HU = 0.0
         self.prev_accumulated_HU = 0.0
-        self.fr_PHU_harvest_min = 0.7
+        self.fr_PHU_harvest_min = 0.9
 
         # output
         self.fr_PHU = 0.0
@@ -49,13 +52,13 @@ class Corn(BaseCrop):
 
         # input
         self.fr_PHU_1 = 0.15
-        self.fr_PHU_2 = 0.50
-        self.fr_LAI_1 = 0.05
+        self.fr_PHU_2 = 0.5
+        self.fr_LAI_1 = 0.01
         self.fr_LAI_2 = 0.95
-        self.fr_PHU_sen = 0.90
-        self.fr_PHU_harvest = 1.2
-        self.LAI_max = 3
-        self.LAI_min = 0
+        self.fr_PHU_sen = 0.8
+        self.fr_PHU_harvest = 0.6
+        self.LAI_max = 4
+        self.LAI_min = 0.75
 
         # Internally calculated input
         self.prev_fr_LAI_max = 0
@@ -82,8 +85,8 @@ class Corn(BaseCrop):
 
         # input
         self.kl = 0.65
-        self.RUE = 39
-        self.T_opt = 25
+        self.RUE = 30
+        self.T_opt = 15
 
         # Internally calculated input
         self.gamma_reg = 0
@@ -97,7 +100,7 @@ class Corn(BaseCrop):
         # ===================================================================
         ''' Soil Water Uptake Data '''
 
-        self.beta_w = 10  # water-use distribution parameter
+        self.beta_w = 10  # water-use distribution parameter  # corn  # unknown
         self.epco = 0.5
 
         self.water_actual_up = 0
@@ -113,10 +116,10 @@ class Corn(BaseCrop):
         self.bio_N_opt = 0
         self.bio_N = 0
 
-        self.fr_n1 = 0.047
-        self.fr_n2 = 0.0177
-        self.fr_n3 = 0.0138
-        self.fr_n3ish = 0.01381
+        self.fr_n1 = 0.0560
+        self.fr_n2 = 0.0210
+        self.fr_n3 = 0.0120
+        self.fr_n3ish = 0.0121
 
         self.fr_N = 0
         self.fr_N_up = 0
@@ -134,10 +137,10 @@ class Corn(BaseCrop):
 
         self.fr_PHU_50 = 0.5
         self.fr_PHU_100 = 1.0
-        self.fr_p1 = 0.0048
-        self.fr_p2 = 0.0018
-        self.fr_p3 = 0.0014
-        self.fr_p3ish = 0.00141
+        self.fr_p1 = 0.0099
+        self.fr_p2 = 0.0022
+        self.fr_p3 = 0.0019
+        self.fr_p3ish = 0.00191
 
         self.fr_P = 0
         self.P_up = 0
@@ -148,17 +151,17 @@ class Corn(BaseCrop):
         ''' Yields Data '''
 
         self.HI_max = 0
-        self.HI_min = 0.3
+        self.HI_min = 0.9
         self.HI_actual = 0
-        self.HI_opt = 0.6
+        self.HI_opt = 0.9
 
         self.harvest_eff = 0.9
 
         self.gamma_wu = 0
 
         self.biomass_dry_down_percent = 0.0
-        self.DM_harvest_percent = 0.35  # TODO: Hard coded dry matter percent at harvest
-        self.NDF_harvest_percent = 0.0
+        self.DM_harvest_percent = 0.0001  # TODO: Hard coded dry matter percent at harvest
+        self.NDF_harvest_percent = 0.416
 
         self.bio_AG = 0
         self.yield_max = 0
