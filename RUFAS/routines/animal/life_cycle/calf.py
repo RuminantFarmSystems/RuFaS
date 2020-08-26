@@ -2,12 +2,12 @@
 RUFAS: Ruminant Farm Systems Model
 File name: calf.py
 Author(s): Manfei Li, mli497@wisc.edu
-            Militsa Sotirova, militsasotirova@gmail.com
+        Militsa Sotirova, militsasotirova@gmail.com
 Description: This file updates the calf form birth to wean.
-            Birth weight initialized with breed specific distributions,
-            Gender determined with the semen type used,
-            Sold or keep decision made by user input,
-            Body weight gain with user input calf average daily gain.
+        Birth weight initialized with breed specific distributions,
+        Gender determined with the semen type used,
+        Sold or keep decision made by user input,
+        Body weight gain with user input calf average daily gain.
 """
 
 import numpy as np
@@ -15,7 +15,8 @@ from random import random
 from RUFAS.routines.animal.life_cycle.animal_base import AnimalBase
 from RUFAS.routines.animal.ration.calf_ration import calc_requirements
 from RUFAS.routines.animal.manure.calf_manure_excretion import\
-    manure_calculations
+manure_calculations
+from RUFAS.routines.animal.life_cycle import animal_events_constants as c
 
 
 class Calf(AnimalBase):
@@ -62,7 +63,7 @@ class Calf(AnimalBase):
         # calf born, with stillbirth probability
         if random() < AnimalBase.config['still_birth_rate']:
             self.culled = True
-            self.events.add_event(0, 0, 'Still birth')
+            self.events.add_event(0, 0, c.STILL_BIRTH)
 
         # sell the male calves and the unwanted female calves
         # (if AnimalBase.config['keep_female_calf_rate'] = 1,
@@ -153,6 +154,7 @@ class Calf(AnimalBase):
         Args:
             feed: instance of the Feed class
         """
+
         p_urine, p_feces_excrt = self.calc_base_manure()
 
         self.p_excrt, self.manure_excretion = \
@@ -161,6 +163,7 @@ class Calf(AnimalBase):
     def phosphorus_rqmts(self, DMI):
         """
         Calculates and sets the animal's phosphorus requirement.
+
         Args:
             DMI: the Dry Matter Intake (kg)
         """
@@ -173,14 +176,11 @@ class Calf(AnimalBase):
         # absorbed P retained for growth (g) (A.1A-F.E.3)
         self.p_growth = \
             (0.0012 + 0.004635 * (self.mature_body_weight ** 0.22) *
-             (self.body_weight ** (-0.22))) * \
+                (self.body_weight ** (-0.22))) * \
             self.daily_growth / 0.96 * 1000
 
         # absorbed P required by the animal (g) (A.1A-F.E.6)
         p_absorb = p_urine + self.p_maint_feces + self.p_growth
-
-        # requirement of P from the ration (g) (A.1A.E.7)
-        self.p_req = p_absorb / 0.90
 
         # requirement of P from the ration (g) (A.1A.E.7)
         self.p_req = p_absorb / 0.90
@@ -204,7 +204,7 @@ class Calf(AnimalBase):
         if self.days_born == AnimalBase.config['wean_day']:
             wean_day = True
             self.wean_weight = self.body_weight
-            self.events.add_event(self.days_born, sim_day, 'Wean Day')
+            self.events.add_event(self.days_born, sim_day, c.WEAN_DAY)
             self.days_born -= 1 # will increment by 1 again in heifer update
         else:
             self.body_weight += self.target_adg_calf
@@ -216,11 +216,10 @@ class Calf(AnimalBase):
     def __str__(self):
         if not self.culled:
             res_str = """
->>>>>>> ffca2b932ae7bfd86b1f6e0781bbc95ac3c6f8e7
                 ==> Calf: \n
                 ID: {} \n
                 Birth Date: {}\n
-                Days Born: {}\n
+                days Born: {}\n
                 Birth Weight: {}kg\n
                 Body Weight: {}kg\n
                 Wean Day: {}\n
@@ -240,7 +239,7 @@ class Calf(AnimalBase):
                 Still Birth: True \n
                 ID: {} \n
                 Birth Date: {}\n
-                Days Born: {}\n
+                days Born: {}\n
                 Life Events: \n
                 {}
             """.format(

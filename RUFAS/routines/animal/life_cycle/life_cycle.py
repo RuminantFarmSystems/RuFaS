@@ -15,10 +15,12 @@ from RUFAS.routines.animal.life_cycle.heiferI import HeiferI
 from RUFAS.routines.animal.life_cycle.heiferII import HeiferII
 from RUFAS.routines.animal.life_cycle.heiferIII import HeiferIII
 from RUFAS.routines.animal.life_cycle.cow import Cow
-from RUFAS.routines.animal.life_cycle.animal_initialization import AnimalInitalization
+from RUFAS.routines.animal.life_cycle.animal_initialization import \
+    AnimalInitalization
 from collections import Counter
 import matplotlib as mpl
 import matplotlib.pyplot as plt
+from RUFAS.routines.animal.life_cycle import animal_events_constants as c
 mpl.use('TkAgg')
 
 
@@ -97,6 +99,10 @@ class LifeCycleManager:
     milking_cow_num = 0
     preg_cow_num = 0
     vwp_cow_num = 0
+    dry_cow_percent = 0
+    milking_cow_percent = 0
+    preg_cow_percent = 0
+    non_preg_cow_percent = 0
     daily_milk_production = 0
     avg_days_in_milk = 0
     avg_days_in_preg = 0
@@ -135,22 +141,22 @@ class LifeCycleManager:
     total_heifer_value = 0
     total_milk_income = 0
     cull_reason_stats = {
-        'Low production': 0,
-        'Lameness': 0,
-        'Injury': 0,
-        'Mastitis': 0,
-        'Disease': 0,
-        'Udder': 0,
-        'Unknown': 0
+        c.LOW_PROD_CULL: 0,
+        c.LAMENESS_CULL: 0,
+        c.INJURY_CULL: 0,
+        c.MASTITIS_CULL: 0,
+        c.DISEASE_CULL: 0,
+        c.UDDER_CULL: 0,
+        c.UNKNOWN_CULL: 0
     }
     cull_reason_stats_percent = {
-        'Low production': 0,
-        'Lameness': 0,
-        'Injury': 0,
-        'Mastitis': 0,
-        'Disease': 0,
-        'Udder': 0,
-        'Unknown': 0
+        c.LOW_PROD_CULL: 0,
+        c.LAMENESS_CULL: 0,
+        c.INJURY_CULL: 0,
+        c.MASTITIS_CULL: 0,
+        c.DISEASE_CULL: 0,
+        c.UDDER_CULL: 0,
+        c.UNKNOWN_CULL: 0
     }
     cull_reason_stats_range = {}
     parity_culling_stats_range = {}
@@ -188,12 +194,15 @@ class LifeCycleManager:
         self.avg_CI = 0
 
     def initialize_herd(self, herd_num, calf_num, heiferI_num, heiferII_num,
-                        heiferIII_num, cow_num, replace_num, sim_days=1500):
+                        heiferIII_num, cow_num, replace_num, herd_init,
+                        sim_days=1500):
         """
         Generates a replacement herd to simulate the market, for the herd to get
          replacements. Initializes the herd.
 
         Args:
+            herd_init: boolean - true to populate database with new animals,
+                false to use current database
             herd_num: what the number of cows should be maintained at
             calf_num: the number of calves to start the simulation with
             heiferI_num: the number of heiferIs to start the simulation with
@@ -211,7 +220,7 @@ class LifeCycleManager:
             heiferIIIs: list of heiferIIIs for the simulation
             cows: list of cows for the simulation
         """
-        self.animal_initializer = AnimalInitalization(self.config['calving_interval'], False)
+        self.animal_initializer = AnimalInitalization(self.config['calving_interval'], herd_init)
         if self.config['use_input_calving_interval']:
             self.avg_CI = self.config['calving_interval']
         else:
@@ -220,26 +229,25 @@ class LifeCycleManager:
             self.avg_CI = self.initialize_db_summary['cow_avg_CI']
         self.herd_num = herd_num
 
-        entered_herd = 'entered herd through initialization'
         calves = self.animal_initializer.get_calves(calf_num)
         for calf in calves:
-            calf.events.add_event(calf.days_born, 0, entered_herd)
+            calf.events.add_event(calf.days_born, 0, c.INIT_HERD)
 
         heiferIs = self.animal_initializer.get_heiferIs(heiferI_num)
         for heiferI in heiferIs:
-            heiferI.events.add_event(heiferI.days_born, 0, entered_herd)
+            heiferI.events.add_event(heiferI.days_born, 0, c.INIT_HERD)
 
         heiferIIs = self.animal_initializer.get_heiferIIs(heiferII_num)
         for heiferII in heiferIIs:
-            heiferII.events.add_event(heiferII.days_born, 0, entered_herd)
+            heiferII.events.add_event(heiferII.days_born, 0, c.INIT_HERD)
 
         heiferIIIs = self.animal_initializer.get_heiferIIIs(heiferIII_num)
         for heiferIII in heiferIIIs:
-            heiferIII.events.add_event(heiferIII.days_born, 0, entered_herd)
+            heiferIII.events.add_event(heiferIII.days_born, 0, c.INIT_HERD)
 
         cows = self.animal_initializer.get_cows(cow_num)
         for cow in cows:
-            cow.events.add_event(cow.days_born, 0, entered_herd)
+            cow.events.add_event(cow.days_born, 0, c.INIT_HERD)
 
         self.replacement_market = self.animal_initializer.get_replacement_cows(replace_num)
         return calves, heiferIs, heiferIIs, heiferIIIs, cows
@@ -439,7 +447,7 @@ class LifeCycleManager:
             if type(heiferIII).__name__ == 'HeiferIII':
                 cow_stage = heiferIII.update(date)
             else:
-                cow_stage = heiferIII.update(record_econ_stats, date)
+                cow_stage = heiferIII.update(record_econ_stats, date, self.avg_CI)
 
             if cow_stage:
                 args = heiferIII.get_heiferIII_values()
@@ -467,7 +475,7 @@ class LifeCycleManager:
 
         # if the number of heifers is more than needed for the herd, sell
         # those as replacement
-        while len(heiferIIIs) + len(cows) > self.herd_num * 1.03:
+        while len(heiferIIIs) + len(cows) > self.herd_num * 1.03 and len(heiferIIIs) > 0:
             removed = heiferIIIs.pop()
             ids_removed.append(removed.id)
             self.sold_to_market += 1
@@ -483,7 +491,7 @@ class LifeCycleManager:
         while len(cows) + len(heiferIIIs) + daily_bought_from_market < self.herd_num * 1.01 and \
                 date > 1:
             self.replacement_market[0].events.add_event(
-                self.replacement_market[0].days_born, date, 'Entered Herd')
+                self.replacement_market[0].days_born, date, c.ENTER_HERD)
             self.replacement_market[0].set_p_purchased()
             animals_added.append(self.replacement_market[0])
             self.bought_from_market += 1
@@ -637,7 +645,7 @@ class LifeCycleManager:
 
                 if not (new_calf.culled or new_calf.sold):
                     new_calf.events.add_event(
-                        new_calf.days_born, date, 'Entered Herd')
+                        new_calf.days_born, date, c.ENTER_HERD)
                     # calves.append(new_calf)
                     self.total_new_born += 1
                     calves_born.append(new_calf)
@@ -659,7 +667,7 @@ class LifeCycleManager:
         # calculate service rate and conception rate
         if date >= sim_length - 21 * self.config["num_21_days_repro"]:
             self.count_21_days += 1
-            if self.count_21_days % 21 == 0:
+            if self.count_21_days % 21 == 0 and self.herd_num > 50:
                 self.service_rate_sum_21_days += \
                     float(self.num_ai_21_days) / \
                     float(self.num_cow_btw_vwp_preg_21_days) * 21
@@ -676,11 +684,29 @@ class LifeCycleManager:
         self.replacement_bought_lst.append(daily_bought_from_market)
         self.milking_cows_lst.append(daily_cow_milking)
 
-        self.calf_percent = self.calf_num / total_animal_num * 100
-        self.heiferI_percent = self.heiferI_num / total_animal_num * 100
-        self.heiferII_percent = self.heiferII_num / total_animal_num * 100
-        self.heiferIII_percent = self.heiferIII_num / total_animal_num * 100
-        self.cow_percent = self.cow_num / total_animal_num * 100
+        if total_animal_num == 0:
+            self.calf_percent = 0
+            self.heiferI_percent = 0
+            self.heiferII_percent = 0
+            self.heiferIII_percent = 0
+            self.cow_percent = 0
+        else:
+            self.calf_percent = self.calf_num / total_animal_num * 100
+            self.heiferI_percent = self.heiferI_num / total_animal_num * 100
+            self.heiferII_percent = self.heiferII_num / total_animal_num * 100
+            self.heiferIII_percent = self.heiferIII_num / total_animal_num * 100
+            self.cow_percent = self.cow_num / total_animal_num * 100
+
+        if self.cow_num == 0:
+            self.dry_cow_percent = 0
+            self.milking_cow_percent = 0
+            self.preg_cow_percent = 0
+            self.non_preg_cow_percent = 0
+        else:
+            self.dry_cow_percent = self.dry_cow_num / self.cow_num * 100
+            self.milking_cow_percent = self.milking_cow_num / self.cow_num * 100
+            self.preg_cow_percent = self.preg_cow_num / self.cow_num * 100
+            self.non_preg_cow_percent = (self.open_cow_num + self.vwp_cow_num) / self.cow_num * 100
 
         for cull_reason in self.cull_reason_stats:
             if self.culled_cow_num != 0:
@@ -688,8 +714,11 @@ class LifeCycleManager:
                     self.cull_reason_stats[cull_reason] / \
                         self.culled_cow_num * 100
         for parity in self.num_cow_for_parity:
-            self.percent_cow_for_parity[parity] = \
-                self.num_cow_for_parity[parity] / self.cow_num * 100
+            if self.cow_num == 0:
+                self.percent_cow_for_parity[parity] = 0
+            else:
+                self.percent_cow_for_parity[parity] = \
+                    self.num_cow_for_parity[parity] / self.cow_num * 100
 
         self.avg_service_rate = self.service_rate_sum_21_days / \
             float(self.config["num_21_days_repro"])

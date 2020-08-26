@@ -112,9 +112,9 @@ class LifeCycleReport(BaseReportDriver):
                     ['life_cycle_manager.avg_age_for_calving[\'' + parity + '\']', 'd', []]
 
             for cull_reason in LifeCycleManager.cull_reason_stats:
-                self.herd_structure['cow_num_culled_for_reason_\'' + cull_reason + '\''] = \
+                self.herd_structure[cull_reason + '_num'] = \
                     ['life_cycle_manager.cull_reason_stats[\'' + cull_reason + '\']', '', []]
-                self.herd_structure['cow_percent_culled_for_reason_\'' + cull_reason + '\''] = \
+                self.herd_structure[cull_reason + '_percent'] = \
                     ['life_cycle_manager.cull_reason_stats_percent[\'' + cull_reason + '\']', '', []]
                         
             self.reproduction_performance = {
@@ -134,10 +134,14 @@ class LifeCycleReport(BaseReportDriver):
 
             self.preg = {
                 'open_cow_num': ['life_cycle_manager.open_cow_num', '', []],
-                'preg_cow_num': ['life_cycle_manager.preg_cow_num', '', []],
                 'vwp_cow_num': ['life_cycle_manager.vwp_cow_num', '', []],
+                'non_preg_cow_percent': ['life_cycle_manager.non_preg_cow_percent', '%', []],
+                'preg_cow_num': ['life_cycle_manager.preg_cow_num', '', []],
+                'preg_cow_percent': ['life_cycle_manager.preg_cow_percent', '%', []],
                 'milking_cow_num': ['life_cycle_manager.milking_cow_num', '', []],
+                'milking_cow_percent': ['life_cycle_manager.milking_cow_percent', '%', []],
                 'dry_cow_num': ['life_cycle_manager.dry_cow_num', '', []],
+                'dry_cow_percent': ['life_cycle_manager.dry_cow_percent', '%', []],
                 'average_days_in_milk': ['life_cycle_manager.avg_days_in_milk', 'd', []],
                 'average_days_in_preg': ['life_cycle_manager.avg_days_in_preg', 'd', []],
                 'average_cow_body_weight': ['life_cycle_manager.avg_cow_body_weight', 'kg', []],
