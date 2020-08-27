@@ -212,39 +212,3 @@ class Calf(AnimalBase):
 		self.daily_growth = self.body_weight - prev_weight
 
 		return wean_day
-
-	def __str__(self):
-		if not self.culled:
-			res_str = """
-				==> Calf: \n
-				ID: {} \n
-				Birth Date: {}\n
-				days Born: {}\n
-				Birth Weight: {}kg\n
-				Body Weight: {}kg\n
-				Wean Day: {}\n
-				Life Events: \n
-				{}
-			""".format(
-				self.id,
-				self.birth_date,
-				self.days_born,
-				self.birth_weight,
-				self.body_weight,
-				AnimalBase.config['wean_day'],
-				str(self.events))
-		else:
-			res_str = """
-				==> Calf: \n
-				Still Birth: True \n
-				ID: {} \n
-				Birth Date: {}\n
-				days Born: {}\n
-				Life Events: \n
-				{}
-			""".format(
-				self.id,
-				self.birth_date,
-				self.days_born,
-				str(self.events))
-		return res_str
