@@ -7,7 +7,8 @@
 		"cow_num": 0,
 		"replace_num": 0,
 		"herd_num": 0,
-		"herd_init": false
+		"herd_init": false,
+		"breed": "HO"
 	},
 	"animal_config": {
 		"management_decisions": {
