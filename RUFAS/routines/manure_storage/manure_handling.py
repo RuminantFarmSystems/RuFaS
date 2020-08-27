@@ -60,7 +60,7 @@ def N_loss(pen, manure):
         manure
     """
 
-    manure.separators[pen.separator].N += pen.N_excreted
+    manure.separators[pen.separator].N = pen.N_excreted
 
 
 def P_loss(pen, manure):
@@ -74,7 +74,7 @@ def P_loss(pen, manure):
         manure
     """
 
-    manure.separators[pen.separator].P += pen.P_excreted
+    manure.separators[pen.separator].P = pen.P_excreted
 
 
 def K_loss(pen, manure):
@@ -88,7 +88,7 @@ def K_loss(pen, manure):
         manure
     """
 
-    manure.separators[pen.separator].K += pen.K_excreted
+    manure.separators[pen.separator].K = pen.K_excreted
 
 
 def solids(pen, manure):

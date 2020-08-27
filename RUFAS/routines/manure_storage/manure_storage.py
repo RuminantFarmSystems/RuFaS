@@ -11,17 +11,22 @@ from RUFAS.routines.manure_storage import manure_emissions, manure_handling, man
 
 
 def daily_manure_storage_routine(manure_storage, animal_management):
+    manure_storage.reset_daily_variables()
+
     for pen_id in manure_storage.pens:
         pen = manure_storage.pens[pen_id]
+        pen.reset_daily_variables()
         pen.update_pen(animal_management)
         manure_handling.update_all(pen, manure_storage)
 
     for separator_type in manure_storage.separators:
         separator = manure_storage.separators[separator_type]
+        separator.reset_daily_variables()
         manure_separator.update_all(separator, manure_storage)
 
     for storage_type in manure_storage.storage:
         storage_system = manure_storage.storage[storage_type]
+        storage_system.reset_daily_variables()
         manure_emissions.update_all(storage_system, manure_storage)
 
     manure_storage.summarize_manure_storage()
@@ -193,7 +198,7 @@ class ManureStorage:
         self.P_liquid = 0
         self.K_liquid = 0
 
-        for storage in self.separators.values():
+        for storage in self.storage.values():
             self.TS += storage.TS
             self.VS += storage.VS
             self.N += storage.N
@@ -213,6 +218,24 @@ class ManureStorage:
         self.manure_storage_balance_difference = self.raw_manure - self.manure_calc
         self.other_solids = self.TS - (self.VS + self.N + self.P + self.K)
         self.other_liquids = self.TS_liquid - (self.VS_liquid + self.N_liquid + self.P_liquid + self.K_liquid)
+
+    def reset_daily_variables(self):
+        self.CH4_emissions = 0.0
+        self.TS = 0.0
+        self.VS = 0.0
+        self.N = 0.0
+        self.P = 0.0
+        self.K = 0.0
+        self.TS_liquid = 0.0
+        self.VS_liquid = 0.0
+        self.N_liquid = 0.0
+        self.P_liquid = 0.0
+        self.K_liquid = 0.0
+        self.TS_loss = 0.0
+        self.VS_loss = 0.0
+        self.TS_DM_effluent = 0.0
+        self.other_solids = 0.0
+        self.other_liquids = 0.0
 
     def summarize_annual_variables(self):
         self.raw_manure_annual += self.raw_manure
@@ -297,6 +320,17 @@ class ManureStorage:
 
             self.bedding_washed = self.bedding_washed_perc * self.bedding_added
             self.flush_water_daily = self.water_use_rate * self.cow_num
+
+        def reset_daily_variables(self):
+            self.bedding_added = 0
+            self.water_use_rate = 0
+            self.flush_water_volume = 0
+            self.bedding_washed_perc = 0
+            self.bedding_washed = 0
+            self.bedding_dry_matter = 0
+
+            self.TS_loss = 0.0
+            self.VS_loss = 0.0
 
         def update_pen(self, animal_management):
             pen = animal_management.all_pens[self.pen_id]
@@ -391,6 +425,23 @@ class ManureStorage:
             self.TS_DM_effluent_rate = 0
 
             self.calibrate_separator()
+
+        def reset_daily_variables(self):
+            self.flush_water_volume = 0
+
+            self.TS = 0
+            self.VS = 0
+            self.N = 0
+            self.P = 0
+            self.K = 0
+
+            self.TS_liquid = 0
+            self.VS_liquid = 0
+            self.N_liquid = 0
+            self.P_liquid = 0
+            self.K_liquid = 0
+
+            self.TS_DM_effluent = 0.0
 
         def calibrate_separator(self):
             """
@@ -497,6 +548,19 @@ class ManureStorage:
 
             self.WOP_frac = pen.manure['WOP_frac']
             self.WIP_frac = pen.manure['WIP_frac']
+
+        def reset_daily_variables(self):
+            self.TS = 0
+            self.VS = 0
+            self.N = 0
+            self.P = 0
+            self.K = 0
+
+            self.TS_liquid = 0
+            self.VS_liquid = 0
+            self.N_liquid = 0
+            self.P_liquid = 0
+            self.K_liquid = 0
 
     def annual_reset(self):
         self.manure_applied_annual = 0.0

@@ -56,7 +56,7 @@ class TallFescue(BaseCrop):
         self.fr_LAI_1 = 0.01
         self.fr_LAI_2 = 0.95
         self.fr_PHU_sen = 0.8
-        self.fr_PHU_harvest = 0.6
+        self.fr_PHU_harvest = 0.3
         self.LAI_max = 4
         self.LAI_min = 0.75
 
