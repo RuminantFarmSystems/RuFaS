@@ -18,14 +18,14 @@ class SpringBarley(BaseCrop):
         self.crop_name = crop_name
         self.crop_type = 'annual'
         self.harvest_quality = 'null'
-        self.feed_id = ''  # need
+        self.feed_id = ''  # TODO need
 
         self.kill_day = -1
         self.kill_year = True
         self.planted = False
         self.growing = False
 
-        self.fix_nitrogen = False
+        self.fix_nitrogen = True  # TODO: change back
 
         # ===================================================================
         ''' HEAT UNIT DATA '''

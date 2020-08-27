@@ -1,0 +1,12 @@
+{
+    "calves": {},
+    "cows": {},
+    "culled_cows": {},
+    "heiferIIIs": {},
+    "heiferIIs": {},
+    "heiferIs": {},
+    "num_calves_sold": 0,
+    "num_cows_culled": 0,
+    "num_sold_heifers": 0,
+    "sold_heifers": {}
+}
