@@ -25,7 +25,7 @@ class Corn(BaseCrop):
         self.growing = False
         self.harvested = False
 
-        self.fix_nitrogen = False
+        self.fix_nitrogen = True  # TODO: change back
 
         # ===================================================================
         ''' HEAT UNIT DATA '''

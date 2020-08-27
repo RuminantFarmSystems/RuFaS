@@ -1,0 +1,13 @@
+{
+    "latitude": 43.332708,
+
+    "crops": {
+        "corn": {
+            "grow_years": [2009],
+            "repeat": 1,
+            "planting_date": 90,
+            "harvest_date": 200,
+            "harvest_type": "scheduled"
+        }
+    }
+}

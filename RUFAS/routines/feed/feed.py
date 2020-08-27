@@ -16,11 +16,12 @@ Author(s): Kass Chupongstimun, kass_c@hotmail.com,
 """
 
 from RUFAS.util import DatabaseReader
+from RUFAS.output_handler.reports.feed_storage_report import StorageReport
 from . import nitrogen_loss, carbon_loss, protein_degradation
 from RUFAS.routines.animal.ration import hardcoded_ration
 
 
-def daily_feed_routine(feed, fields, animal_management):
+def daily_feed_routine(feed, fields, animal_management, feed_report):
     """
     Description:
         Runs the feed storage routine. Yield is stored at harvest in available
@@ -32,6 +33,9 @@ def daily_feed_routine(feed, fields, animal_management):
         feed: an instance of the Feed object
         fields: an instance of the Field object (contains harvest information)
         animal_management: an instance of the AnimalManagement object
+        feed_report: an instance of the FeedStorageReport class defined in
+            RUFAS.output_handler.reports.feed_storage_report.py. Included here
+            in order to add generated storage receptacles to the feed storage report.
     """
 
     # aggregate crop yield across fields
@@ -77,6 +81,11 @@ def daily_feed_routine(feed, fields, animal_management):
                     standard_name = 'standard_storage_' + str(feed.standard_storage_count)
                     feed.available_storage[standard_name] = feed.Storage(standard_data)
                     feed.storage_options[standard_name] = feed.available_storage[standard_name]
+                    report = feed_report.reports[standard_name] = StorageReport(feed_report.storage_report_data,
+                                                                                standard_name)
+                    report.initialize_dir(feed_report.csv_dir, feed_report.graphic_dir)
+
+                    report.initialize()
 
                     feed.standard_storage_count += 1
 
