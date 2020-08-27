@@ -205,6 +205,7 @@ class AnimalManagement:
         cow_num = herd_data['cow_num']
         replace_num = herd_data['replace_num']
         herd_num = herd_data['herd_num']
+        breed = herd_data['breed']
 
         if herd_num == 0:
             self.simulate_animals = False
@@ -238,7 +239,8 @@ class AnimalManagement:
                 = self.life_cycle_manager.initialize_herd(herd_num, calf_num,
                                                           heiferI_num, heiferII_num,
                                                           heiferIII_num, cow_num,
-                                                          replace_num, herd_init)
+                                                          replace_num, herd_init,
+                                                          breed)
 
         if len(pen_data) > 0:
             self.init_nutrient_rqmts(feed, weather, time)
@@ -595,7 +597,6 @@ class AnimalManagement:
         Args:
             feed: instance of the Feed class
         """
-        print(self.simulation_day)
         if self.simulate_animals:
             for pen in self.all_pens:
                 pen.pen_populated = len(pen.animals_in_pen) > 0

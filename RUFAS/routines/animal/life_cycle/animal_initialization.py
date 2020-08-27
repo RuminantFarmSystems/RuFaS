@@ -65,7 +65,7 @@ class AnimalInitalization:
             CI: the calving interval used in initialization
             init: whether or not update the database with new animals
     '''
-    def __init__(self, CI, init=True):
+    def __init__(self, CI, breed, init=True):
         self.CI = CI
         if init:
             conn = sqlite3.connect('input/animal/animals.sqlite')
@@ -132,7 +132,7 @@ class AnimalInitalization:
             cur.execute('INSERT INTO animal_id VALUES (' + str(self.animal_id) + ')')
             conn.commit()
             conn.close()
-            self.init_animals()
+            self.init_animals(breed)
         else:
             conn = sqlite3.connect('input/animal/animals.sqlite')
             cur = conn.cursor()
@@ -148,7 +148,7 @@ class AnimalInitalization:
             animal_num: number of animals to simulate
             sim_days: number of days to simulate
     '''
-    def init_animals(self, animal_num = 20000, sim_days=5000):
+    def init_animals(self, breed, animal_num = 20000, sim_days=5000):
         calves = []
         heiferIs = []
         heiferIIs = []
@@ -161,8 +161,8 @@ class AnimalInitalization:
 
         for _ in range(animal_num):
             args = {
-                'id' : self.next_id(),
-                'breed': 'HO',
+                'id': self.next_id(),
+                'breed': breed,
                 'birth_date': 0,
                 'days_born': 0,
                 'p_init': 0
@@ -235,7 +235,7 @@ class AnimalInitalization:
                 if new_born:
                     args = {
                         'id': self.next_id(),
-                        'breed': 'HO',
+                        'breed': breed,
                         'birth_date': 0,
                         'days_born': 0,
                         'p_init': cow.p_gest_for_calf

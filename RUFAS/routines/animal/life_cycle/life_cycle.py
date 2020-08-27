@@ -184,7 +184,7 @@ class LifeCycleManager:
         self.avg_CI = 0
 
     def initialize_herd(self, herd_num, calf_num, heiferI_num, heiferII_num,
-                        heiferIII_num, cow_num, replace_num, herd_init,
+                        heiferIII_num, cow_num, replace_num, herd_init, breed,
                         sim_days=1500):
         """
         Generates a replacement herd to simulate the market, for the herd to get
@@ -210,7 +210,7 @@ class LifeCycleManager:
             heiferIIIs: list of heiferIIIs for the simulation
             cows: list of cows for the simulation
         """
-        self.animal_initializer = AnimalInitalization(self.config['calving_interval'], herd_init)
+        self.animal_initializer = AnimalInitalization(self.config['calving_interval'], breed, herd_init)
         if self.config['use_input_calving_interval']:
             self.avg_CI = self.config['calving_interval']
         else:
