@@ -2,6 +2,7 @@
 RUFAS: Ruminant Farm Systems Model
 File name: animal_base.py
 Author(s): Katrina Wang, kw433@cornell.edu
+            Manfei Li, mli497@wisc.edu
 Description: This file stores and draws values of simulated
                 animals in and from the database
 """
@@ -11,6 +12,7 @@ from RUFAS.routines.animal.life_cycle.heiferI import HeiferI
 from RUFAS.routines.animal.life_cycle.heiferII import HeiferII
 from RUFAS.routines.animal.life_cycle.heiferIII import HeiferIII
 from RUFAS.routines.animal.life_cycle.cow import Cow
+from RUFAS.routines.animal.life_cycle.animal_base import AnimalBase
 import sqlite3
 from enum import IntEnum
 
@@ -66,7 +68,7 @@ class AnimalInitalization:
             CI: the calving interval used in initialization
             init: whether or not update the database with new animals
     '''
-    def __init__(self, CI, init=True):
+    def __init__(self, CI, breed, init=True):
         self.CI = CI
         if init:
             conn = sqlite3.connect('input/animal/animals.sqlite')
@@ -133,7 +135,7 @@ class AnimalInitalization:
             cur.execute('INSERT INTO animal_id VALUES (' + str(self.animal_id) + ')')
             conn.commit()
             conn.close()
-            self.init_animals()
+            self.init_animals(breed)
 
         else:
             conn = sqlite3.connect('input/animal/animals.sqlite')
@@ -151,7 +153,7 @@ class AnimalInitalization:
             sim_days: number of days to simulate
     '''
 
-    def init_animals(self, animal_num=20000, sim_days=5000):
+    def init_animals(self, breed, animal_num = 20000, sim_days=5000):
         calves = []
         heiferIs = []
         heiferIIs = []
@@ -165,7 +167,7 @@ class AnimalInitalization:
         for _ in range(animal_num):
             args = {
                 'id': self.next_id(),
-                'breed': 'HO',
+                'breed': breed,
                 'birth_date': 0,
                 'days_born': 0,
                 'p_init': 0
@@ -189,10 +191,10 @@ class AnimalInitalization:
                 second_stage = heiferI.update(0)
                 if second_stage:
                     args = heiferI.get_heiferI_values()
-                    args.update(id=self.next_id())
-                    args.update(repro_program='TAI')
-                    args.update(tai_method_h='5dCG2P')
-                    args.update(synch_ed_method_h='2P')
+                    args.update(id = self.next_id())
+                    args.update(repro_program = AnimalBase.config['heifer_repro_method'])
+                    args.update(tai_method_h = AnimalBase.config['heifer_TAI_protocol'])
+                    args.update(synch_ed_method_h = AnimalBase.config['heifer_synchED_protocol'])
 
                     heiferII = HeiferII(args)
                     heiferIIs.append(heiferII)
@@ -214,12 +216,14 @@ class AnimalInitalization:
                 cow_stage = heiferIII.update(0)
                 if cow_stage:
                     args = heiferIII.get_heiferIII_values()
-                    args.update(id=self.next_id())
-                    args.update(repro_program='TAI')
-                    args.update(presynch_method='PreSynch')
-                    args.update(tai_method_c='OvSynch 56')
-                    args.update(resynch_method='TAIafterPD')
+                    args.update(id = self.next_id())
+                    args.update(repro_program = AnimalBase.config['cow_repro_method'])
+                    args.update(presynch_method = AnimalBase.config['cow_presynch_protocol'])
+                    args.update(tai_method_c = AnimalBase.config['cow_TAI_protocol'])
+                    args.update(resynch_method = AnimalBase.config['cow_resynch_protocol'])
+
                     cow = Cow(args)
+
                     cows.append(cow)
                     if day >= 3000:
                         args.update(id=self.next_id())
@@ -235,7 +239,7 @@ class AnimalInitalization:
                 if new_born:
                     args = {
                         'id': self.next_id(),
-                        'breed': 'HO',
+                        'breed': breed,
                         'birth_date': 0,
                         'days_born': 0,
                         'p_init': cow.p_gest_for_calf

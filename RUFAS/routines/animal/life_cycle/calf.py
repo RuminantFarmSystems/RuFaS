@@ -2,19 +2,19 @@
 RUFAS: Ruminant Farm Systems Model
 File name: calf.py
 Author(s): Manfei Li, mli497@wisc.edu
-        Militsa Sotirova, militsasotirova@gmail.com
+    Militsa Sotirova, militsasotirova@gmail.com
 Description: This file updates the calf form birth to wean.
-        Birth weight initialized with breed specific distributions,
-        Gender determined with the semen type used,
-        Sold or keep decision made by user input,
-        Body weight gain with user input calf average daily gain.
+    Birth weight initialized with breed specific distributions,
+    Gender determined with the semen type used,
+    Sold or keep decision made by user input,
+    Body weight gain with user input calf average daily gain.
 """
 
 import numpy as np
 from random import random
 from RUFAS.routines.animal.life_cycle.animal_base import AnimalBase
 from RUFAS.routines.animal.ration.calf_ration import calc_requirements
-from RUFAS.routines.animal.manure.calf_manure_excretion import\
+from RUFAS.routines.animal.manure.calf_manure_excretion import \
 manure_calculations
 from RUFAS.routines.animal.life_cycle import animal_events_constants as c
 
@@ -71,7 +71,7 @@ class Calf(AnimalBase):
         # if AnimalBase.config['keep_female_calf_rate = 0,
         # sell all female calves)
         if self.gender == 'male' or random() > \
-            AnimalBase.config['keep_female_calf_rate']:
+                AnimalBase.config['keep_female_calf_rate']:
             self.sold = True
         else:
             self.sold = False
@@ -81,8 +81,8 @@ class Calf(AnimalBase):
                 AnimalBase.config['birth_weight_avg_ho'],
                 AnimalBase.config['birth_weight_std_ho'])
             while self.birth_weight < AnimalBase.config['birth_weight_avg_ho'] \
-                - 2 * AnimalBase.config['birth_weight_std_ho'] \
-                or self.birth_weight > AnimalBase.config['birth_weight_avg_ho'] \
+                    - 2 * AnimalBase.config['birth_weight_std_ho'] \
+                    or self.birth_weight > AnimalBase.config['birth_weight_avg_ho'] \
                     + 2 * AnimalBase.config['birth_weight_std_ho']:
                 self.birth_weight = np.random.normal(
                     AnimalBase.config['birth_weight_avg_ho'],
@@ -92,8 +92,8 @@ class Calf(AnimalBase):
                 AnimalBase.config['birth_weight_avg_je'],
                 AnimalBase.config['birth_weight_std_je'])
             while self.birth_weight < AnimalBase.config['birth_weight_avg_je'] \
-                - 2 * AnimalBase.config['birth_weight_std_je'] \
-                or self.birth_weight > AnimalBase.config['birth_weight_avg_je'] \
+                    - 2 * AnimalBase.config['birth_weight_std_je'] \
+                    or self.birth_weight > AnimalBase.config['birth_weight_avg_je'] \
                     + 2 * AnimalBase.config['birth_weight_std_je']:
                 self.birth_weight = np.random.normal(
                     AnimalBase.config['birth_weight_avg_je'],
@@ -124,16 +124,17 @@ class Calf(AnimalBase):
         Get current information from the calf
         """
         values = {
-            'id' : self.id,
-            'breed' : self.breed,
-            'birth_date' : self.birth_date,
-            'days_born' : self.days_born,
-            'birth_weight' : self.birth_weight,
-            'body_weight' : self.body_weight,
-            'wean_weight' : self.wean_weight,
+            'id': self.id,
+            'breed': self.breed,
+            'birth_date': self.birth_date,
+            'days_born': self.days_born,
+            'birth_weight': self.birth_weight,
+            'body_weight': self.body_weight,
+            'wean_weight': self.wean_weight,
             'mature_body_weight': self.mature_body_weight,
-            'events' : str(self.events)
+            'events': str(self.events)
         }
+
         return values
 
     def calc_nutrient_rqmts(self, temp):
@@ -176,7 +177,7 @@ class Calf(AnimalBase):
         # absorbed P retained for growth (g) (A.1A-F.E.3)
         self.p_growth = \
             (0.0012 + 0.004635 * (self.mature_body_weight ** 0.22) *
-                (self.body_weight ** (-0.22))) * \
+             (self.body_weight ** (-0.22))) * \
             self.daily_growth / 0.96 * 1000
 
         # absorbed P required by the animal (g) (A.1A-F.E.6)
@@ -205,46 +206,10 @@ class Calf(AnimalBase):
             wean_day = True
             self.wean_weight = self.body_weight
             self.events.add_event(self.days_born, sim_day, c.WEAN_DAY)
-            self.days_born -= 1 # will increment by 1 again in heifer update
+            self.days_born -= 1  # will increment by 1 again in heifer update
         else:
             self.body_weight += self.target_adg_calf
 
         self.daily_growth = self.body_weight - prev_weight
 
         return wean_day
-
-    def __str__(self):
-        if not self.culled:
-            res_str = """
-                ==> Calf: \n
-                ID: {} \n
-                Birth Date: {}\n
-                days Born: {}\n
-                Birth Weight: {}kg\n
-                Body Weight: {}kg\n
-                Wean Day: {}\n
-                Life Events: \n
-                {}
-            """.format(
-                self.id,
-                self.birth_date,
-                self.days_born,
-                self.birth_weight,
-                self.body_weight,
-                AnimalBase.config['wean_day'],
-                str(self.events))
-        else:
-            res_str = """
-                ==> Calf: \n
-                Still Birth: True \n
-                ID: {} \n
-                Birth Date: {}\n
-                days Born: {}\n
-                Life Events: \n
-                {}
-            """.format(
-                self.id,
-                self.birth_date,
-                self.days_born,
-                str(self.events))
-        return res_str

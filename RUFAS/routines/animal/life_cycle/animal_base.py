@@ -54,61 +54,32 @@ class AnimalBase(object):
 		self.days_born = args['days_born']
 		self.semen_used = self.config['semen_type']
 
-		# TODO is there a better way to preserve variable values when the
-		#  animal is aging up?
-		try:
-			self.culled = self.culled
-			self.do_not_breed = self.do_not_breed
-			self.body_weight_history = self.body_weight_history
-			self.events = self.events
-			self.pen_history = self.pen_history
-			self.daily_growth = self.daily_growth
-			self.nutrient_rqmts = self.nutrient_rqmts
-			self.dry_matter_intake = self.dry_matter_intake
-			self.manure_excretion = self.manure_excretion
-			self.ration_formulation = self.ration_formulation
-			self.DMIest = self.DMIest
-			self.DBW = self.DBW
-			self.p_animal = self.p_animal
-			self.p_intake = self.p_intake
-			self.p_conc = self.p_conc
-			self.p_excrt = self.p_excrt
-			self.body_weight = self.body_weight
-			self.mature_body_weight = self.mature_body_weight
-			self.p_req = self.p_req
-			self.dP_reserves = self.dP_reserves
-			self.p_excess = self.p_excess
-			self.p_gest = self.p_gest
-			self.p_growth = self.p_growth
-			self.p_maint_feces = self.p_maint_feces
-			self.conceptus_weight = self.conceptus_weight
-		except Exception as e:
-			self.culled = False
-			self.do_not_breed = False
-			self.body_weight_history = []
-			self.events = AnimalEvents()
-			self.pen_history = []
-			self.daily_growth = 0
-			self.nutrient_rqmts = {}
-			self.set_default_nutrient_rqmts()
-			self.dry_matter_intake = 0
-			self.manure_excretion = {}
-			self.ration_formulation = {'objective': 0.00}
-			self.DMIest = 0
-			self.DBW = 0
-			self.p_animal = 0
-			self.p_intake = 0
-			self.p_conc = 0
-			self.p_excrt = 0
-			self.body_weight = 0
-			self.mature_body_weight = 0
-			self.p_req = 0
-			self.dP_reserves = 0
-			self.p_excess = 0
-			self.p_gest = 0
-			self.p_growth = 0
-			self.p_maint_feces = 0
-			self.conceptus_weight = 0
+		self.culled = False
+		self.do_not_breed = False
+		self.body_weight_history = []
+		self.events = AnimalEvents()
+		self.pen_history = []
+		self.daily_growth = 0
+		self.nutrient_rqmts = {}
+		self.set_default_nutrient_rqmts()
+		self.dry_matter_intake = 0
+		self.manure_excretion = {}
+		self.ration_formulation = {'objective': 0.00}
+		self.DMIest = 0
+		self.DBW = 0
+		self.p_animal = 0
+		self.p_intake = 0
+		self.p_conc = 0
+		self.p_excrt = 0
+		self.body_weight = 0
+		self.mature_body_weight = 0
+		self.p_req = 0
+		self.dP_reserves = 0
+		self.p_excess = 0
+		self.p_gest = 0
+		self.p_growth = 0
+		self.p_maint_feces = 0
+		self.conceptus_weight = 0
 
 		if 'body_weight_history' in args:
 			self.body_weight_history = args['body_weight_history']
@@ -198,12 +169,6 @@ class AnimalBase(object):
 		"""
 		# (A.1G.C.1) from P tracking
 		self.p_animal = 0.0072 * self.body_weight * 1000
-
-	def culled(self):
-		"""
-		Returns: True/False value indicating if culled
-		"""
-		return self.culled
 
 	def update_pen_history(self, curr_pen, curr_day, classes_in_pen):
 		"""

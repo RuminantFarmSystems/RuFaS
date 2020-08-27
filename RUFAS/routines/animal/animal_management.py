@@ -107,7 +107,6 @@ class AnimalManagement:
         config.update(data['farm_level']['calf'])
         config.update(data['farm_level']['repro'])
         config.update(data['farm_level']['bodyweight'])
-        config.update(data['farm_level']['econ'])
         config.update(data['from_literature']['repro'])
         config.update(data['from_literature']['milking'])
         config.update(data['from_literature']['culling'])
@@ -219,6 +218,7 @@ class AnimalManagement:
         cow_num = herd_data['cow_num']
         replace_num = herd_data['replace_num']
         herd_num = herd_data['herd_num']
+        breed = herd_data['breed']
 
         if herd_num == 0:
             self.simulate_animals = False
@@ -252,7 +252,8 @@ class AnimalManagement:
                 = self.life_cycle_manager.initialize_herd(herd_num, calf_num,
                                                           heiferI_num, heiferII_num,
                                                           heiferIII_num, cow_num,
-                                                          replace_num, herd_init)
+                                                          replace_num, herd_init,
+                                                          breed)
 
         if len(pen_data) > 0:
             self.init_nutrient_rqmts(feed, weather, time)
