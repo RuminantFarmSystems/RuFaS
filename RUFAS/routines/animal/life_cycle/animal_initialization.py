@@ -2,6 +2,7 @@
 RUFAS: Ruminant Farm Systems Model
 File name: animal_base.py
 Author(s): Katrina Wang, kw433@cornell.edu
+            Manfei Li, mli497@wisc.edu
 Description: This file stores and draws values of simulated
                 animals in and from the database
 '''
@@ -11,6 +12,7 @@ from RUFAS.routines.animal.life_cycle.heiferI import HeiferI
 from RUFAS.routines.animal.life_cycle.heiferII import HeiferII
 from RUFAS.routines.animal.life_cycle.heiferIII import HeiferIII
 from RUFAS.routines.animal.life_cycle.cow import Cow
+from RUFAS.routines.animal.life_cycle.animal_base import AnimalBase
 import sqlite3
 from enum import IntEnum
 
@@ -185,9 +187,9 @@ class AnimalInitalization:
                 if second_stage:
                     args = heiferI.get_heiferI_values()
                     args.update(id = self.next_id())
-                    args.update(repro_program = 'TAI')
-                    args.update(tai_method_h = '5dCG2P')
-                    args.update(synch_ed_method_h = '2P')
+                    args.update(repro_program = AnimalBase.config['heifer_repro_method'])
+                    args.update(tai_method_h = AnimalBase.config['heifer_TAI_protocol'])
+                    args.update(synch_ed_method_h = AnimalBase.config['heifer_synchED_protocol'])
 
                     heiferII = HeiferII(args)
                     heiferIIs.append(heiferII)
@@ -210,12 +212,13 @@ class AnimalInitalization:
                 if cow_stage:
                     args = heiferIII.get_heiferIII_values()
                     args.update(id = self.next_id())
-                    args.update(repro_program = 'TAI')
-                    args.update(presynch_method = 'PreSynch')
-                    args.update(tai_method_c = 'OvSynch 56')
-                    args.update(resynch_method = 'TAIafterPD')
+                    args.update(repro_program = AnimalBase.config['cow_repro_method'])
+                    args.update(presynch_method = AnimalBase.config['cow_presynch_protocol'])
+                    args.update(tai_method_c = AnimalBase.config['cow_TAI_protocol'])
+                    args.update(resynch_method = AnimalBase.config['cow_resynch_protocol'])
 
                     cow = Cow(args)
+
                     cows.append(cow)
 
                     if day >= 3000:

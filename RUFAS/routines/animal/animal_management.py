@@ -108,7 +108,6 @@ class AnimalManagement:
         config.update(data['farm_level']['calf'])
         config.update(data['farm_level']['repro'])
         config.update(data['farm_level']['bodyweight'])
-        config.update(data['farm_level']['econ'])
         config.update(data['from_literature']['repro'])
         config.update(data['from_literature']['milking'])
         config.update(data['from_literature']['culling'])

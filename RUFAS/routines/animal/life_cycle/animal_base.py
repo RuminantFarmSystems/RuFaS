@@ -199,12 +199,6 @@ class AnimalBase(object):
 		# (A.1G.C.1) from P tracking
 		self.p_animal = 0.0072 * self.body_weight * 1000
 
-	def culled(self):
-		"""
-		Returns: True/False value indicating if culled
-		"""
-		return self.culled
-
 	def update_pen_history(self, curr_pen, curr_day, classes_in_pen):
 		"""
 		Updates the animal's pen history by either appending to the existing
