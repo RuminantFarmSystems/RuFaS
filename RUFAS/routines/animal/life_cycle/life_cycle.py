@@ -18,11 +18,8 @@ from RUFAS.routines.animal.life_cycle.cow import Cow
 from RUFAS.routines.animal.life_cycle.animal_base import AnimalBase
 from RUFAS.routines.animal.life_cycle.animal_initialization import \
     AnimalInitalization
-from collections import Counter
 import matplotlib as mpl
-import matplotlib.pyplot as plt
 from RUFAS.routines.animal.life_cycle import animal_events_constants as c
-mpl.use('TkAgg')
 
 
 class LifeCycleManager:
