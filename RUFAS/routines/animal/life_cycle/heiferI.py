@@ -123,26 +123,4 @@ class HeiferI(Calf):
 
 		return second_stage
 
-	def __str__(self):
-		res_str = """
-			==> Heifer I: \n
-			ID: {} \n
-			Birth Date: {}\n
-			days Born: {}\n
-			Birth Weight: {}kg\n
-			Wean Weight: {}kg\n
-			Body Weight: {}kg\n
-			Breeding Start Day: {}\n
-			Life Events: \n
-			{}
-		""".format(
-			self.id,
-			self.birth_date,
-			self.days_born,
-			self.birth_weight,
-			self.wean_weight,
-			self.body_weight,
-			AnimalBase.config['breeding_start_day_h'],
-			str(self.events))
-
-		return res_str
+	
