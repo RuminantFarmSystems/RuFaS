@@ -120,28 +120,3 @@ class HeiferIII(HeiferII):
             cow_stage = True
         return cow_stage
 
-    def __str__(self):
-        res_str = """
-        ==> Heifer III: \n
-        ID: {} \n
-        Birth Date: {}\n
-        days Born: {}\n
-        Body Weight: {}kg\n
-        Breed Start Day: {}\n
-        Repro Method: {}\n
-        days in pregnancy: {}\n
-        Gestation Length: {}\n
-        Life Events: \n
-        {}
-        """. \
-            format(self.id,
-                   self.birth_date,
-                   self.days_born,
-                   self.body_weight,
-                   AnimalBase.config['breeding_start_day_h'],
-                   self.repro_program,
-                   self.days_in_preg,
-                   self.gestation_length,
-                   str(self.events))
-
-        return res_str
