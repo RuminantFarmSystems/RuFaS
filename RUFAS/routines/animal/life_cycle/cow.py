@@ -136,47 +136,47 @@ class Cow(HeiferIII):
 
     def update_milk_production_history(self, sim_day):
         """
-		Updates the animal's milk production history by appending a
-		MilkProductionHistory object to the list.
+        Updates the animal's milk production history by appending a
+        MilkProductionHistory object to the list.
 
-		Args:
-			sim_day: simulation day
-		"""
+        Args:
+            sim_day: simulation day
+        """
         self.milk_production_history.append(
             MilkProductionHistory(sim_day, self.days_in_milk, self.estimated_daily_milk_produced, self.days_born))
 
     def _determine_param_value(self, mean, std):
         """
-		Determine parameter value distribution for lactation curve model
-		parameters.
+        Determine parameter value distribution for lactation curve model
+        parameters.
 
-		Args:
-			mean: mean of the parameter value for l, m, n in wood's model
-			std: standard deviation of the parameter value for l, m, n in
-				wood's model
+        Args:
+            mean: mean of the parameter value for l, m, n in wood's model
+            std: standard deviation of the parameter value for l, m, n in
+                wood's model
 
-		Returns: a random value draw from distribution of parameters
+        Returns: a random value draw from distribution of parameters
 
-		"""
+        """
         return np.random.normal(mean, std)
 
     def _milking_update(self, sim_day, calving_interval):
         """
-		Update milking status for lactating cows.
-		start at calving, daily milk production estimated by breed and parity
-		specific lactation curves.
-		TEMP: fat percent, FCM, body weight during lactation, and dry matter
-		intake are coded here with equations with hard-coded parameters just
-		for valid the simulation model indication of the place for future
-		adjustment with ration formulation and economics calculation.
+        Update milking status for lactating cows.
+        start at calving, daily milk production estimated by breed and parity
+        specific lactation curves.
+        TEMP: fat percent, FCM, body weight during lactation, and dry matter
+        intake are coded here with equations with hard-coded parameters just
+        for valid the simulation model indication of the place for future
+        adjustment with ration formulation and economics calculation.
 
-		Returns:
-			estimated_daily_milk_produced: estimated daily milk production
-				from the lactation curve
-			fat_percent: calculated with days in milk, for temporary use
-			daily_fat_correct_milk_production: calculated form estimated
-				milk production and fat percent, for temporary use
-		"""
+        Returns:
+            estimated_daily_milk_produced: estimated daily milk production
+                from the lactation curve
+            fat_percent: calculated with days in milk, for temporary use
+            daily_fat_correct_milk_production: calculated form estimated
+                milk production and fat percent, for temporary use
+        """
         if self.days_in_preg == AnimalBase.config['dip_dry']:
             # self.gestation_length - \ AnimalBase.config['dip_dry']:
             self.milking = False
@@ -268,15 +268,15 @@ class Cow(HeiferIII):
 
     def calc_nutrient_rqmts(self, housing, pasture_concentrate, nutrients):
         """
-		Calculates this cow's nutrient requirements.
+        Calculates this cow's nutrient requirements.
 
-		Args:
-			housing: "pasture" or "barn"
-			pasture_concentrate: concentrate supplementation when farming type
-				is "pasture", kg
-			nutrients: the list of the nutrients for which requirements are
-				calculated
-		"""
+        Args:
+            housing: "pasture" or "barn"
+            pasture_concentrate: concentrate supplementation when farming type
+                is "pasture", kg
+            nutrients: the list of the nutrients for which requirements are
+                calculated
+        """
         if self.milking:
             result = lactating_calculate_rqmts(
                 self.body_weight, self.BCS, self.CBW, pasture_concentrate,
@@ -298,27 +298,27 @@ class Cow(HeiferIII):
             self, vertical_distance, horizontal_distance, housing,
             pasture_concentrate, nutrients):
         """
-		Calculates this cow's nutrient requirements.
+        Calculates this cow's nutrient requirements.
 
-		Args:
-			vertical_distance: vertical distance to milking parlor, km
-			horizontal_distance: horizontal distance to milking parlor, km
-			housing: "pasture" or "barn"
-			pasture_concentrate: concentrate supplementation when farming type
-				is "pasture", kg
-			nutrients: the list of the nutrients for which requirements are
-				calculated
-		"""
+        Args:
+            vertical_distance: vertical distance to milking parlor, km
+            horizontal_distance: horizontal distance to milking parlor, km
+            housing: "pasture" or "barn"
+            pasture_concentrate: concentrate supplementation when farming type
+                is "pasture", kg
+            nutrients: the list of the nutrients for which requirements are
+                calculated
+        """
         self.calc_daily_walking_dist(vertical_distance, horizontal_distance)
         self.calc_nutrient_rqmts(housing, pasture_concentrate, nutrients)
 
     def calc_manure_excretion(self, feed):
         """
-		Calculates and sets the manure excretion components.
+        Calculates and sets the manure excretion components.
 
-		Args:
-			feed: instance of the Feed class
-		"""
+        Args:
+            feed: instance of the Feed class
+        """
 
         p_urine, p_feces_excrt = self.calc_base_manure()
 
@@ -334,11 +334,11 @@ class Cow(HeiferIII):
 
     def phosphorus_rqmts(self, DMI):
         """
-		Calculates and sets the animal's phosphorus requirement.
+        Calculates and sets the animal's phosphorus requirement.
 
-		Args:
-			DMI: the Dry Matter Intake (kg)
-		"""
+        Args:
+            DMI: the Dry Matter Intake (kg)
+        """
         # amount of P required for endogenous losses (g) (A.1EF.E.1)
         self.p_maint_feces = 0.001 * DMI * 1000
 
@@ -387,13 +387,13 @@ class Cow(HeiferIII):
     def calc_daily_walking_dist(
             self, vertical_dist_to_parlor, horizontal_dist_to_parlor):
         """
-		Calculates and sets the animal's daily vertical and horizontal
-		walking distance (DVD and DHD).
+        Calculates and sets the animal's daily vertical and horizontal
+        walking distance (DVD and DHD).
 
-		Args:
-			vertical_dist_to_parlor: vertical distance to milking parlor, km
-			horizontal_dist_to_parlor: horizontal distance to milking parlor, km
-		"""
+        Args:
+            vertical_dist_to_parlor: vertical distance to milking parlor, km
+            horizontal_dist_to_parlor: horizontal distance to milking parlor, km
+        """
         # multiplied by 2 for return trip
         self.DVD = 2 * vertical_dist_to_parlor * \
                    AnimalBase.config['cow_times_milked_per_day']
@@ -402,15 +402,15 @@ class Cow(HeiferIII):
 
     def get_bw_change(self, CI):
         """
-		Calculates the body weight change for a cow.
+        Calculates the body weight change for a cow.
 
-		Args:
-			CI: the calving interval used in the body weight
-				change calculation
+        Args:
+            CI: the calving interval used in the body weight
+                change calculation
 
-		Returns: the daily body weight change for a cow.
+        Returns: the daily body weight change for a cow.
 
-		"""
+        """
         CBW = AnimalBase.config['birth_weight_avg_ho']
 
         if self.days_in_preg == self.gestation_length:
@@ -451,22 +451,22 @@ class Cow(HeiferIII):
 
     def update(self, sim_day, calving_interval):
         """
-		Update cow status from the moment of calving, parity+1,
-		milking start, pregnancy stop, and estrus restart.
-	
+        Update cow status from the moment of calving, parity+1,
+        milking start, pregnancy stop, and estrus restart.
 
-		Args:
-			
 
-		Returns:
-			estimated_daily_milk_produced: estimated daily milk production
-				from the lactation curve
-			fat_percent: calculated with days in milk, for temporary use
-			daily_fat_correct_milk_production: calculated form estimated milk
-				production and fat percent, for temporary use
-			cull_stage: True if a cow is culled, false if it stays in the herd
-			new_born: True if a calf is born
-		"""
+        Args:
+
+
+        Returns:
+            estimated_daily_milk_produced: estimated daily milk production
+                from the lactation curve
+            fat_percent: calculated with days in milk, for temporary use
+            daily_fat_correct_milk_production: calculated form estimated milk
+                production and fat percent, for temporary use
+            cull_stage: True if a cow is culled, false if it stays in the herd
+            new_born: True if a calf is born
+        """
         self.update_body_weight_history(sim_day)
         self.update_milk_production_history(sim_day)
         if self.culled:
@@ -519,18 +519,18 @@ class Cow(HeiferIII):
     # ED methods
     def _determine_estrus_day(self, start_date, estrus_note, avg, std, sim_day):
         """
-		In estrus detection program, determine estrus day and estrus note.
+        In estrus detection program, determine estrus day and estrus note.
 
-		Args:
-			start_date: start day of a estrus cycle, 1st day when breeding start
-				after calving or last estrus happened or return estrus
-				from preg loss
-			estrus_note: note of this estrus
-			avg: average length for an estrus cycle
-			std: standard deviation for an estrus cycle
+        Args:
+            start_date: start day of a estrus cycle, 1st day when breeding start
+                after calving or last estrus happened or return estrus
+                from preg loss
+            estrus_note: note of this estrus
+            avg: average length for an estrus cycle
+            std: standard deviation for an estrus cycle
 
-		Returns: the day when this estrus should occur
-		"""
+        Returns: the day when this estrus should occur
+        """
         estrus_cycle = np.random.normal(avg, std)
         while estrus_cycle < avg - 2 * std or estrus_cycle > avg + 2 * std:
             estrus_cycle = np.random.normal(avg, std)
@@ -540,8 +540,8 @@ class Cow(HeiferIII):
 
     def _restart_estrus(self, sim_day):
         """
-		Return estrus after calving.
-		"""
+        Return estrus after calving.
+        """
         self._estrus_day = self._determine_estrus_day(
             self.days_born, c.ESTRUS_AFTER_CALVING_NOTE,
             AnimalBase.config['avg_estrus_cycle_return'],
@@ -549,8 +549,8 @@ class Cow(HeiferIII):
 
     def _later_estrus(self, sim_day):
         """
-		Return estrus after first estrus.
-		"""
+        Return estrus after first estrus.
+        """
         self.estrus_day = self._determine_estrus_day(
             self.estrus_day, c.ESTRUS_BEFORE_VWP_NOTE,
             AnimalBase.config['avg_estrus_cycle_cow'],
@@ -558,8 +558,8 @@ class Cow(HeiferIII):
 
     def _return_estrus(self, sim_day):
         """
-		Return estrus after estrus not detected or not serveded.
-		"""
+        Return estrus after estrus not detected or not serveded.
+        """
         self.estrus_day = self._determine_estrus_day(
             self.estrus_day, c.BASIC_ESTRUS_NOTE,
             AnimalBase.config['avg_estrus_cycle_cow'],
@@ -567,8 +567,8 @@ class Cow(HeiferIII):
 
     def _after_ai_estrus(self, sim_day):
         """
-		Return estrus after AI.
-		"""
+        Return estrus after AI.
+        """
         self.estrus_day = self._determine_estrus_day(
             self.estrus_day, c.ESTRUS_AFTER_AI_NOTE,
             AnimalBase.config['avg_estrus_cycle_cow'],
@@ -576,8 +576,8 @@ class Cow(HeiferIII):
 
     def _after_abortion_estrus(self, sim_day):
         """
-		Return estrus after abortion at preg check
-		"""
+        Return estrus after abortion at preg check
+        """
         self.estrus_day = self._determine_estrus_day(
             self.abortion_day, c.ESTRUS_AFTER_ABORTION_NOTE,
             AnimalBase.config['avg_estrus_cycle_cow'],
@@ -585,12 +585,12 @@ class Cow(HeiferIII):
 
     def _ed_update(self, sim_day):
         """
-		Estrus occur at estrus day,
-		estrus detected with detection rate,
-		service performed with service rate,
-		conception succeed with conception rate
+        Estrus occur at estrus day,
+        estrus detected with detection rate,
+        service performed with service rate,
+        conception succeed with conception rate
 
-		"""
+        """
         # if on estrus day, start detecting estrus
         if self.days_born == self._estrus_day:
             self.estrus_count += 1
@@ -621,17 +621,17 @@ class Cow(HeiferIII):
     # TAI methods
     def _determine_tai_program_day(self, date):
         """
-		Determine the program start time when pass voluntary waiting period.
+        Determine the program start time when pass voluntary waiting period.
 
-		Args:
-			date: the time tai program start
-		"""
+        Args:
+            date: the time tai program start
+        """
         self.tai_program_start_day_c = date
 
     '''
-		Description:
-			resynch start after calving, resynch method assigned
-	'''
+        Description:
+            resynch start after calving, resynch method assigned
+    '''
 
     def _tai_program_day_after_preg_check(self, sim_day):
         if self.resynch_method == 'TAIafterPD':
@@ -655,10 +655,10 @@ class Cow(HeiferIII):
 
     def _OvSynch56_update(self, sim_day):
         """
-		OvSynch56 protocol for tai method
+        OvSynch56 protocol for tai method
 
-		
-		"""
+
+        """
         if not self.do_not_breed:
             if self.days_born == self.tai_program_start_day_c:
                 self.events.add_event(self.days_born, sim_day, c.INJECT_GNRH)
@@ -675,9 +675,9 @@ class Cow(HeiferIII):
 
     def _OvSynch48_update(self, sim_day):
         """
-		OvSynch48 protocol for tai method
+        OvSynch48 protocol for tai method
 
-		"""
+        """
         if not self.do_not_breed:
             if self.days_born == self.tai_program_start_day_c:
                 self.events.add_event(self.days_born, sim_day, c.INJECT_GNRH)
@@ -695,9 +695,9 @@ class Cow(HeiferIII):
 
     def _CoSynch72_update(self, sim_day):
         """
-		CoSynch72 protocol for tai method
+        CoSynch72 protocol for tai method
 
-		"""
+        """
         if not self.do_not_breed:
             if self.days_born == self.tai_program_start_day_c:
                 self.events.add_event(self.days_born, sim_day, c.INJECT_GNRH)
@@ -714,9 +714,9 @@ class Cow(HeiferIII):
 
     def _5dCoSynch_update(self, sim_day):
         """
-		5dCoSynch protocol for tai method
+        5dCoSynch protocol for tai method
 
-		"""
+        """
         if not self.do_not_breed:
             if self.days_born == self.tai_program_start_day_c:
                 self.events.add_event(self.days_born, sim_day, c.INJECT_GNRH)
@@ -736,8 +736,8 @@ class Cow(HeiferIII):
 
     def _user_defined_update(self):
         """
-		User_defined protocol for tai method
-		"""
+        User_defined protocol for tai method
+        """
         if not self.do_not_breed:
             if self.days_born == self.tai_program_start_day_c + \
                     AnimalBase.config['user_define_tai_length']:
@@ -747,23 +747,23 @@ class Cow(HeiferIII):
 
     def _determine_presynch_program_day(self, date):
         """
-		Determine the presynch program start time when pass voluntary
-		waiting period.
+        Determine the presynch program start time when pass voluntary
+        waiting period.
 
-		Args:
-			date: the time presynch program start
+        Args:
+            date: the time presynch program start
 
-		Returns: day on which the presynch program starts
+        Returns: day on which the presynch program starts
 
-		"""
+        """
         self.presynch_program_start_day = date
 
     def _presynch_update(self, sim_day):
         """
-		Presynch protocol for presynch method
+        Presynch protocol for presynch method
 
-	
-		"""
+
+        """
         if self.days_born == self.presynch_program_start_day:
             self.events.add_event(self.days_born, sim_day, c.INJECT_PGF)
             self.PGF_injections = self.PGF_injections + 1
@@ -776,9 +776,9 @@ class Cow(HeiferIII):
 
     def _doubleovsynch_update(self, sim_day):
         """
-		Doubleovsynch protocol for presynch method
+        Doubleovsynch protocol for presynch method
 
-		"""
+        """
         if self.days_born == self.presynch_program_start_day:
             self.events.add_event(self.days_born, sim_day, c.INJECT_GNRH)
             self.GnRH_injections = self.GnRH_injections + 1
@@ -794,9 +794,9 @@ class Cow(HeiferIII):
 
     def _g6g_update(self, sim_day):
         """
-		g6g protocol for presynch method.
+        g6g protocol for presynch method.
 
-		"""
+        """
         if self.days_born == self.presynch_program_start_day:
             self.events.add_event(self.days_born, sim_day, c.INJECT_PGF)
             self.PGF_injections = self.PGF_injections + 1
@@ -809,8 +809,8 @@ class Cow(HeiferIII):
 
     def _user_defined_presynch_update(self):
         """
-		User_defined_presynch protocol for presynch method
-		"""
+        User_defined_presynch protocol for presynch method
+        """
 
         if self.days_born == self.presynch_program_start_day:
             self.tai_program_start_day_c = \
@@ -818,11 +818,11 @@ class Cow(HeiferIII):
 
     def _tai_update(self, sim_day):
         """
-		Assign tai and presynch method, update time AI method status, TAI can
-		be performed with or without presynch.
+        Assign tai and presynch method, update time AI method status, TAI can
+        be performed with or without presynch.
 
-		
-		"""
+
+        """
         if self.days_in_milk == AnimalBase.config['voluntary_waiting_period']:
             if self.presynch_method:
                 self._determine_presynch_program_day(self.days_born)
@@ -853,9 +853,9 @@ class Cow(HeiferIII):
     # ED-TAI methods
     def _ed_tai_update(self, sim_day):
         """
-		Update ED-TAI method, perform estrus detection before the TAI program
+        Update ED-TAI method, perform estrus detection before the TAI program
 
-		"""
+        """
         # if on estrus day, start detecting estrus
         if self.days_born == self.estrus_day and \
                 self.days_in_milk < AnimalBase.config['tai_program_start_day']:
@@ -905,10 +905,10 @@ class Cow(HeiferIII):
 
     def _resynch_ed_tai(self, sim_day):
         """
-		Using ED at the resynch period of ED-TAI.
+        Using ED at the resynch period of ED-TAI.
 
-		
-		"""
+
+        """
         if self.resynch_method == 'TAIafterPD':
             self.tai_program_start_day_c = self.abortion_day + 1
             self.conception_rate -= \
@@ -935,11 +935,11 @@ class Cow(HeiferIII):
     # Preg methods
     def _open(self, sim_day):
         """
-		Assign breeding method for open cows after spot open at preg check
-		three methods can be assigned: ED, TAI, ED-TAI
+        Assign breeding method for open cows after spot open at preg check
+        three methods can be assigned: ED, TAI, ED-TAI
 
 
-		"""
+        """
         if self.repro_program == 'ED':
             self._after_abortion_estrus(sim_day)
         elif self.repro_program == 'TAI':
@@ -949,8 +949,8 @@ class Cow(HeiferIII):
 
     def _adjust_conception(self):
         """
-		Adjust conception rate based on the parity of the cow
-		"""
+        Adjust conception rate based on the parity of the cow
+        """
         if self.calves <= 1:
             return self.conception_rate
         elif self.calves == 2:
@@ -960,16 +960,16 @@ class Cow(HeiferIII):
 
     def _preg_update(self, sim_day):
         """
-		Update AI for cows reach ai day, inseminate the cow with specific semen
-		type. By comparing with conception rate, if conception success,
-		gestation length determined
-		for preg check 1, confirm the conception
-		for preg check 2 and 3, confirm pregnancy,
-			there are chances of preg loss in each period of time
-			between preg checks
+        Update AI for cows reach ai day, inseminate the cow with specific semen
+        type. By comparing with conception rate, if conception success,
+        gestation length determined
+        for preg check 1, confirm the conception
+        for preg check 2 and 3, confirm pregnancy,
+            there are chances of preg loss in each period of time
+            between preg checks
 
-		
-		"""
+
+        """
         if self.preg:
             self.days_in_preg += 1
 
@@ -1071,11 +1071,11 @@ class Cow(HeiferIII):
     # Cull methods
     def _cull_update(self, sim_day):
         """
-		Update culling time and cull reasons for cow to leave the herd
-		The reasons are reproduction failure, low production, and health issues
+        Update culling time and cull reasons for cow to leave the herd
+        The reasons are reproduction failure, low production, and health issues
 
-		Returns: not culled
-		"""
+        Returns: not culled
+        """
         # if not self.preg and self.days_in_milk >
         # 	AnimalBase.config['repro_cull_time:
         # 	self.culled = True
@@ -1098,11 +1098,11 @@ class Cow(HeiferIII):
 
     def _health_cull_update(self):
         """
-		Update cows culled for health problem, first cull or not in this parity
-		will be determined with parity specific culling rate, then a cull reason
-		will be determined by random draw. Then a cull day will be identified by
-		reverse a distribution for cases of this reason.
-		"""
+        Update cows culled for health problem, first cull or not in this parity
+        will be determined with parity specific culling rate, then a cull reason
+        will be determined by random draw. Then a cull day will be identified by
+        reverse a distribution for cases of this reason.
+        """
         # inv_cull_rate = 0
         if self.calves >= 4:
             inv_cull_rate = AnimalBase.config['parity_cull_prob'][3]
