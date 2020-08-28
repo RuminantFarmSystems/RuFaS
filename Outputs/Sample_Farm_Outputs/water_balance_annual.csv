@@ -1,5 +1,0 @@
-year,delta_SW,runoff,evaporation,transpiration,drainage,precipitation,calculated water,difference
-,mmH2O,mmH2O,mmH2O,mmH2O,mmH2O,mmH2O,mmH2O,mmH2O
-2009,0.929,66.818,63.775,0.0,131.368,262.89,262.89,0.0
-2010,-1.547,269.132,240.144,132.945,386.756,1027.43,1027.43,-0.0
-2011,-41.975,132.075,128.603,137.066,218.779,574.548,574.548,0.0
