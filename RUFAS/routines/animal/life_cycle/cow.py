@@ -276,22 +276,6 @@ class Cow(HeiferIII):
         return estimated_daily_milk_produced, fat_percent, \
             daily_fat_correct_milk_production
 
-    def calc_init_nutrient_rqmts(
-            self, vertical_distance, horizontal_distance, housing,
-            pasture_concentrate, nutrients):
-        """
-        Calculates this cow's nutrient requirements.
-        Args:
-            vertical_distance: vertical distance to milking parlor, km
-            horizontal_distance: horizontal distance to milking parlor, km
-            housing: "pasture" or "barn"
-            pasture_concentrate: concentrate supplementation when farming type
-                is "pasture", kg
-            nutrients: the list of the nutrients for which requirements are
-                calculated
-        """
-        self.calc_daily_walking_dist(vertical_distance, horizontal_distance)
-
     def calc_manure_excretion(self, feed):
         """
         Calculates and sets the manure excretion components.

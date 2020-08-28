@@ -571,7 +571,8 @@ class Feed:
                             tot_req_inv_non_lactating_cows += storage.req_inv[animal]
                 # booleans to check if new calculated inclusion rate > 0
                 if tot_req_inv_non_lactating_cows == 0:
-                    tot_cow_days = sum(cow_days.values()) - cow_days['lactating_cows']
+                    tot_cow_days = sum(storage.cow_days.values()) - \
+                                            storage.cow_days['lactating_cows']
                     for animal, val in storage.cow_days.items():
                         storage.DMI_forage_max = ((val / tot_cow_days) * \
                                                     storage.DM) / val

@@ -17,39 +17,48 @@ from scipy.optimize import minimize
 def set_globals(price_, NEmaint_, NEa_, NEpreg_, NEl_, NEg_, MP_req_, C_req_, P_req_,
                 DMIest_, TDN_, DE_, EE_, is_fat_, BW_, calcium_, phosphorus_,
                 NDF_, type_, is_wetforage_, Kd_, N_A_, N_B_, CP_, dRUP_, limit_,
-                cow_type_):
+                ):
     """
     Sets the global variables with the feed information to be used in the
-    constraint functions below.
+    constraint functions below. If the input described below is a list, it is a
+    list with a length of the decision vector.
+
+    Args:
+        price_: A list of the price of each feed
+        n_: the length of the decision vector of the NLP
+        NEmaint_: Net energy for maintenance requirement (Mcal)
+        NEa_: Net energy for activity requirement (Mcal)
+        NEpreg_: Net energy requirement for pregnancy (Mcal)
+        NEl_: Net energy requirement for lactation (Mcal)
+        NEg_: Net energy for growth requirement (Mcal)
+        MP_req_: Metabolizable protein requirement for growth (g)
+        C_req_: Calcium requirement (g)
+        P_req_: Phosphorus requirement (g)
+        DMIest_: dry matter intake estimation (kg)
+        TDN_: A list of otal digestible nutrient in each feed (% of DM)
+        DE_: A list of digestible energy in each feed (Mcal/kg)
+        EE_: A list of ether extract, crude fat in each feed (% of DM)
+        is_fat_: A list of booleans, if the feed is fat supplement or not
+                (yes = 1; no = 0)
+        BW_: the average body weight of the pen
+        calcium_: A list of the calcium content of each feed (% of DM)
+        phosphorus_: A list of phosphorus content of each feed (% of DM)
+        NDF_: A list of neutral detergent fiber in each feed (% of DM)
+        type_: A list of feed types (Forage, Concentrate, or Mineral)
+        is_wetforage_: A list of booleans, if the feed is wet forage or not
+                    (yes = 1; no = 0)
+        Kd_: A list of the rumen protein degradation rate in each feed (%/h)
+        N_A_: A list of fraction A of protein, degraded immediately in rumen for
+            each feed (% of CP)
+        N_B_: A list of fraction B of protein, potentially degradable protein,
+            require time to generally degrade in rumen in each feed (% of CP)
+        CP_: A list of crude protein in each feed (% of DM)
+        dRUP_: A list of RUP degradability in each feed (% of RUP)
+        limit_: A list of the limiting upper bounds for each feed (kg)
     """
-    global price
-    global n
-    global NEmaint
-    global NEa
-    global NEpreg
-    global NEl
-    global NEg
-    global MP_req
-    global C_req
-    global P_req
-    global DMIest
-    global TDN
-    global DE
-    global EE
-    global is_fat
-    global BW
-    global calcium
-    global phosphorus
-    global NDF
-    global type
-    global is_wetforage
-    global Kd
-    global N_A
-    global N_B
-    global CP
-    global dRUP
-    global limit
-    global cow_type
+    global price, n, NEmaint, NEa, NEpreg, NEl, NEg, MP_req, C_req, P_req, \
+    DMIest, TDN, DE, EE, is_fat, BW, calcium, phosphorus, NDF, type, \
+    is_wetforage, Kd, N_A, N_B, CP, dRUP, limit, cow_type
 
     price = price_
     n = len(price)
@@ -78,7 +87,6 @@ def set_globals(price_, NEmaint_, NEa_, NEpreg_, NEl_, NEg_, MP_req_, C_req_, P_
     CP = CP_
     dRUP = dRUP_
     limit = limit_
-    cow_type = type_
 
 def list_reconfig(list):
     """
@@ -99,7 +107,13 @@ def list_reconfig(list):
 
 def objective(x):
     """
-    Sets up the objective function in the optimize function for the NLP.
+    Sets up the objective function in the optimize function for the non-linear
+    program. Whenever the paramert x is used, it refers to the "decision vetor
+    of the NLP" which means it is a list of solutions where each value in the
+    list corresponds to the amount of a given feed (kg) in the formulated diet.
+    The goal of this NLP is to minimize the cost of all feeds while satisfying
+    all "constraints", which just means the diet fulfills the average nutrient
+    requirements in the pen.
 
     Args:
         x: The decision vector of the NLP
@@ -459,13 +473,11 @@ def optimize():
     """
 
     n = len(price)
-    #TODO: Method for initial guess besides random
     x0 = []
     for i in range(n):
         x0.append(random.random()*10)
     ## OPTIMIZE:
     #establishing the bounds of the NLP
-    b= (0, 100)
     bnds = []
     #Dividing limit by 3 for tri-decision variables for farm grown feeds
     for i in range(len(limit)):

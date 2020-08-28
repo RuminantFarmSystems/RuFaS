@@ -278,10 +278,6 @@ class AnimalManagement:
             heiferIII.p_animal = 0.0072 * heiferIII.body_weight * 1000
 
         for cow in self.cows:
-            # uses average distances from pens to milking parlor
-            cow.calc_init_nutrient_rqmts(avg_VD_parlor, avg_HD_parlor,
-                                         self.housing, self.pasture_concentrate,
-                                         feed.nutrient_rqmts)
             cow.p_animal = 0.0072 * cow.body_weight * 1000
 
     def avg_pen_dist(self):
@@ -310,8 +306,7 @@ class AnimalManagement:
             feed: instance of the feed class
         """
         for pen in self.all_pens:
-            pen.call_animal_nutrient_rqmts(self.housing,
-                                           self.pasture_concentrate, feed, temp)
+            pen.call_animal_nutrient_rqmts(feed, temp)
 
     def fully_update_id_pen(self):
         """
@@ -469,7 +464,7 @@ class AnimalManagement:
             if pen.pen_populated:
                 pen.calc_avg_nutrient_rqmts()
 
-    def calc_ration(self, feed, temp):
+    def calc_ration(self, feed):
         """
         Calls each pens's method to calculate the ration for that pen. This is
         part of the routines that happen every ration interval.
@@ -481,8 +476,8 @@ class AnimalManagement:
         available_feeds.feed_nutrients(feed)
         for i, pen in enumerate(self.all_pens):
             if pen.pen_populated:
-                self.all_pens[i].ration = self.all_pens[i].calc_ration(
-                    self.housing, self.pasture_concentrate, feed, available_feeds)
+                self.all_pens[i].ration = self.all_pens[i].calc_ration(feed,
+                                                                available_feeds)
 
     def calc_manure_excretion(self, feed):
         """
@@ -627,7 +622,7 @@ class AnimalManagement:
                 self.clear_pens()
                 self.pen_allocation()
                 self.calc_avg_nutrient_rqmts()  # per pen
-                self.calc_ration(feed, temp)  # per pen
+                self.calc_ration(feed)  # per pen
                 self.calc_manure_excretion(feed)  # per animal
                 self.calc_avg_growth()  # per pen
 

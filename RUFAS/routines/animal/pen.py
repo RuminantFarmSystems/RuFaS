@@ -84,6 +84,14 @@ class Pen:
     # ration for all the animals in the pen
     ration = {}
 
+    # total amount of different nutrients in current ration
+    ration_nutrient_amount = {'dm_amount': 0, 'cp_amount': 0, 'adf_amount': 0,
+                        'ndf_amount': 0, 'lignin_amount': 0, 'ash_amount': 0,
+                        'P_amount': 0, 'K_amount': 0, 'N_amount': 0}
+
+    # concentration of different nutrients in current ration
+    ration_nutrient_conc = {}
+
     # total manure excretion of the animals in the pen
     manure = {"U": 0,
               "TAN_s": 0,
@@ -147,7 +155,7 @@ class Pen:
             stage = type(animal).__name__
             self.classes_in_pen.add(stage)
 
-    def call_animal_nutrient_rqmts(self, housing, pasture_concentrate, feed, temp):
+    def call_animal_nutrient_rqmts(self, feed, temp):
         """
         Calls each animal's nutrient requirement calculation methods.
 
@@ -221,15 +229,12 @@ class Pen:
         self.avg_milk = sum_milk / num_animals
         self.avg_CP_milk = sum_CP_milk / num_animals
 
-    def calc_ration(self, housing, pasture_concentrate, feed, available_feeds):
+    def calc_ration(self, feed, available_feeds):
         """
         Calculates and sets the ration for the pen using the average nutrient
         requirements of the animals in the pen.
 
         Args:
-            housing: housing type ("barn" or "pasture")
-            pasture_concentrate: concentrate supplementation when farming type
-                is "pasture", kg
             feed: instance of the Feed class
 
         Returns:
@@ -264,19 +269,16 @@ class Pen:
             if ration_per_animal['status'] == 'Optimal':
                 break
 
-        DMI = calc_DMI(ration_per_animal, feed)
-        self.avg_p_intake, p_conc = \
-            phosphorus_in_ration(DMI, ration_per_animal, feed)
-
-        for animal in self.animals_in_pen:
-            animal.set_ration(ration_per_animal, DMI)
-            animal.set_p_intake(self.avg_p_intake, p_conc)
-
         # recording ration nutrition information in pen
         nutrient_amount, nutrient_conc = ration_driver.ration_report( \
                                         ration_per_animal, feed.available_feeds)
         self.ration_nutrient_amount = nutrient_amount
         self.ration_nutrient_conc = nutrient_conc
+
+        for animal in self.animals_in_pen:
+            animal.set_ration(ration_per_animal, nutrient_amount['dm_amount'])
+            animal.set_p_intake(nutrient_amount['P_amount'], \
+                                                        nutrient_conc['P_conc'])
         # set ration for whole pen by multiplying calculated ration by number
         # of animals in the pen
         ration = {}
@@ -347,7 +349,7 @@ class Pen:
         """
         # since each animal in the pen receives the same ration
         if len(self.animals_in_pen) > 0:
-            DMI = calc_DMI(self.animals_in_pen[0].ration_formulation, feed)
+            DMI = self.ration_nutrient_amount['dm_amount']
 
             total_p_req = 0
             for animal in self.animals_in_pen:
@@ -388,8 +390,7 @@ class Pen:
 
         # set animal's ration to be the intake of all other animals in pen
         if self.ration == {}:
-            self.ration = self.calc_ration(housing, pasture_concentrate, feed,
-                                           temp)
+            self.ration = self.calc_ration( feed, temp)
 
         for key in self.ration:
             if key == 'status':
@@ -435,54 +436,3 @@ class Pen:
         self.pen_populated = False
         self.classes_in_pen = set()
         self.avg_p_animal = 0
-
-# methods used for additional ration calculations
-def phosphorus_in_ration(DMI, ration, feed):
-    """
-    Args:
-        DMI: the total dry matter intake of the ration
-        feed: instance of the Feed class, used to determine characteristics
-            of available feeds
-        ration: the dictionary representing the ration formulation
-
-    Returns: the amount of phosphorus (g) provided by the feed in @ration and
-            the concentration of P in @ration (%)
-
-    TODO: These calculations could be placed in ration subfolder with ration update
-    """
-    # amount of P in the formulated ration (g)
-    p_intake = 0
-
-    for key in ration:
-        # not every key in the ration dictionary refers to a feed
-        if not (key == 'status' or key == 'objective'):
-            nutrients = feed.available_feeds[key]
-            p_feed_conc = nutrients['phosphorus']
-            dmi_feed = ration[key]
-
-            # amount of P from feed (g) (A.4.A.1)
-            p_feed_intake = p_feed_conc / 100 * dmi_feed * 1000
-
-            # P intake from ration (g) (A.4.A.2)
-            p_intake += p_feed_intake
-
-    # P concentration in ration (%) (A.4.A.3)
-    p_conc = p_intake / DMI * (1 / 1000) * 100
-
-    return p_intake, p_conc
-
-
-def calc_DMI(ration, feed):
-    """
-    Args:
-        ration: the ration formulation for which the DMI is calculated
-        feed: an instance of the Feed class
-
-    Returns: the total Dry Matter Intake from @ration.
-    """
-    DMI = 0
-    for key in ration:
-        if not (key == 'status' or key == 'objective'):
-            DM_feed_amount = ration[key]
-            DMI += DM_feed_amount
-    return DMI

@@ -29,8 +29,7 @@ def calc_rqmts(BW, MW, DOP, parity, CI, TP_Milk, Fat_Milk, Lactose_Milk,
         Fat_Milk: Milk fat content (% of milk)
         Lactose_Milk: Milk lactose content (% of milk)
         Milk: Milk production (kg)
-        type: Boolean value which is true for lactating cowns and false for dry
-        cows
+        type: Boolean value which is true for lactating cowns and false for dry cows
 
     """
 

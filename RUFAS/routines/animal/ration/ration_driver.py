@@ -11,19 +11,17 @@ from RUFAS.routines.animal.ration import cow_requirements
 from RUFAS.routines.animal.ration import cow_ration_NLP as NLP
 import statistics as stat
 import math
-import random
-import time as timer
 
-def optimization(pen, requirements, available_feeds, BW, cow_type):
+def optimization(requirements, available_feeds, BW, cow_type):
     """
     Function that sets up the nutrients and requirements lists into structured
     inputs for the non-linear program and calls the optimization function.
 
     Args:
-        pen: object of class pen
         requirements: object of class Requirements
         available_feeds: object of class AvailableFeeds
         BW: Average Body weight of the input pen
+        cow_type: Boolean which is True if cow is lactating, False otherwise
     """
     price = NLP.list_reconfig(available_feeds.price)
     TDN = NLP.list_reconfig(available_feeds.TDN)
@@ -48,8 +46,7 @@ def optimization(pen, requirements, available_feeds, BW, cow_type):
                             requirements.NEl, requirements.NEg, requirements.MP_req,
                             requirements.Ca_req, requirements.P_req, requirements.DMIest,
                             TDN, DE, EE, is_fat, BW, calcium, phosphorus, NDF,
-                            type, is_wetforage, Kd, N_A, N_B, CP, dRUP, limit,
-                            cow_type)
+                            type, is_wetforage, Kd, N_A, N_B, CP, dRUP, limit)
     solution = NLP.optimize()
     return solution
 
@@ -62,13 +59,14 @@ def ration_formulation(pen, available_feeds, cow_type):
     Args:
         pen: an object of class Pen
         available_feeds: an object of class AvailableFeeds
+        cow_type: Boolean which is True if cow is lactating, False otherwise
     """
     # creating instance of class requirements
     req = Requirements()
     # setting requirements based on animals information in pen
     req.set_requirements(pen, False)
     BW = pen.avg_BW
-    solution = optimization(pen, req, available_feeds, BW, cow_type)
+    solution = optimization(req, available_feeds, BW, cow_type)
     #Reduction of milk production estimate process to achieve feasible solution
     while not solution.success:
         # This values for reduction are not from pseduocode, but the vales below
@@ -82,9 +80,9 @@ def ration_formulation(pen, available_feeds, cow_type):
 
         for animal in pen.animals_in_pen:
             animal.estimated_daily_milk_produced -= reduction
-        # recalculating requirements after reduct=ion
+        # recalculating requirements after reduction
         req.set_requirements(pen, True)
-        solution = optimization(pen, req, available_feeds, BW, cow_type)
+        solution = optimization(req, available_feeds, BW, cow_type)
 
     ration = {}
     for id in range(len(available_feeds.feed_id)):
@@ -210,6 +208,8 @@ class Requirements:
                                 animal.milking
                                 )
                 # caclulating the activity requirement for energy
+                animal.calc_daily_walking_dist(pen.vertical_dist_to_parlor,
+                                                pen.horizontal_dist_to_parlor)
                 NEa_val = cow_requirements.energy_activity_rqmts(animal.body_weight,
                     pen.housing_type,(math.sqrt((animal.DVD)**2 + (animal.DHD)**2)))
                 NEmaint.append(req['NEmaint'])
@@ -224,6 +224,9 @@ class Requirements:
         else:
             # iterating through each animal in the pen and setting requirements
             for animal in pen.animals_in_pen:
+                #calculating the activity requirement for energy
+                animal.calc_daily_walking_dist(pen.vertical_dist_to_parlor,
+                                                pen.horizontal_dist_to_parlor)
                 NEa_val = cow_requirements.energy_activity_rqmts(animal.body_weight,
                 pen.housing_type,(math.sqrt((animal.DVD)**2 + (animal.DHD)**2)))
                 NEmaint.append(animal.NEmaint)
