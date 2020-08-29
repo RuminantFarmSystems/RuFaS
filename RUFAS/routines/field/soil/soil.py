@@ -358,7 +358,7 @@ class Soil:
             # percolation
             self.k_sat = layer_data['K_sat']  # saturated hydraulic conductivity (mm/h)
             self.TT = 0.0
-            self.perc = 0.0  # amount of water that percolates to next layer
+            self.percolation = 0.0  # amount of water that percolates to next layer
 
             self.clay = layer_data['clay']  # soil clay % in soil layer
 
@@ -376,9 +376,9 @@ class Soil:
             self.active_N = 0.0
             self.stable_N = 0.0
 
-            self.NO3_perc = 0.0
-            self.NH4_perc = 0.0
-            self.active_N_perc = 0.0
+            self.NO3_percolation = 0.0
+            self.NH4_percolation = 0.0
+            self.active_N_percolation = 0.0
             self.N_min_act = 0.0
             self.nitrification = 0.0
             self.volatilization = 0.0
