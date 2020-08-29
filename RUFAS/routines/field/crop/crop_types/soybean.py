@@ -3,18 +3,18 @@ from .base_crop import BaseCrop
 
 class Soybean(BaseCrop):
 
-    def __init__(self, data):
+    def __init__(self, crop_name, data):
         super().__init__()
         """GENERAL PLANT INFO"""
 
-        soy_data = data['soybean']
+        soy_data = data
         self.grow_years = soy_data['grow_years']
         self.repeat = soy_data['repeat']
         self.planting_date = soy_data['planting_date']
         self.harvest_date = soy_data['harvest_date']
         self.harvest_type = soy_data['harvest_type']
 
-        self.crop_name = 'soybean'
+        self.crop_name = crop_name
         self.crop_type = 'annual'
         self.harvest_quality = 'null'
         self.raw_id = 121
@@ -157,9 +157,9 @@ class Soybean(BaseCrop):
 
         self.gamma_wu = 0
 
-        self.biomass_dry_down_perc = 0.0
-        self.DM_harvest_perc = 0.15  # TODO: Hard coded dry matter percent at harvest
-        self.NDF_harvest_perc = 0.466
+        self.biomass_dry_down_percent = 0.0
+        self.DM_harvest_percent = 0.15  # TODO: Hard coded dry matter percent at harvest
+        self.NDF_harvest_percent = 0.466
 
         self.bio_AG = 0
         self.yield_max = 0
