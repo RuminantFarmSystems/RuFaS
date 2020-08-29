@@ -2,7 +2,7 @@
     "latitude": 43.332708,
 
     "crops": {
-        "alfalfa": {
+        "sugar_beet": {
             "grow_years": [2009],
             "repeat": 1,
             "planting_date": 121,

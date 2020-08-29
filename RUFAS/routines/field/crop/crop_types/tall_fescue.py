@@ -1,19 +1,19 @@
 from .base_crop import BaseCrop
 
 
-class Alfalfa(BaseCrop):
+class TallFescue(BaseCrop):
 
     def __init__(self, crop_name, data):
         super().__init__()
 
         """GENERAL PLANT INFO"""
-        alfalfa_data = data
-        self.grow_years = alfalfa_data['grow_years']
-        self.repeat = alfalfa_data['repeat']
-        self.planting_date = alfalfa_data['planting_date']
-        self.harvest_date = alfalfa_data['harvest_date']
+        tall_fescue_data = data
+        self.grow_years = tall_fescue_data['grow_years']
+        self.repeat = tall_fescue_data['repeat']
+        self.planting_date = tall_fescue_data['planting_date']
+        self.harvest_date = tall_fescue_data['harvest_date']
 
-        if alfalfa_data['harvest_type'] != 'optimal':
+        if tall_fescue_data['harvest_type'] != 'optimal':
             print('Perennial crops are always optimally harvested')
 
         self.harvest_type = 'optimal'
@@ -21,23 +21,22 @@ class Alfalfa(BaseCrop):
         self.crop_name = crop_name
         self.crop_type = 'perennial'
         self.harvest_quality = 'null'
-        self.raw_id = 1
-        self.feed_id = '1g'
+        self.feed_id = ''  # need
 
         self.kill_day = -1
         self.kill_year = False
         self.planted = False
         self.growing = False
 
-        self.fix_nitrogen = True
+        self.fix_nitrogen = False
 
         # ===================================================================
         ''' HEAT UNIT DATA '''
 
         # input
-        self.T_base_min = 4
-        self.T_base_max = 43.33
-        self.PHU = 800  # still unknown
+        self.T_base_min = 10  # unknown
+        self.T_base_max = 40
+        self.PHU = 648
 
         # Internally calculated input
         self.accumulated_HU = 0.0
@@ -53,11 +52,11 @@ class Alfalfa(BaseCrop):
 
         # input
         self.fr_PHU_1 = 0.15
-        self.fr_PHU_2 = 0.50
+        self.fr_PHU_2 = 0.5
         self.fr_LAI_1 = 0.01
         self.fr_LAI_2 = 0.95
-        self.fr_PHU_sen = 0.90
-        self.fr_PHU_harvest = 1.2
+        self.fr_PHU_sen = 0.8
+        self.fr_PHU_harvest = 0.6
         self.LAI_max = 4
         self.LAI_min = 0.75
 
@@ -73,7 +72,7 @@ class Alfalfa(BaseCrop):
         ''' ROOT DEPTH DATA '''
 
         # input
-        self.z_root_max = 3000  # maximum depth of root development
+        self.z_root_max = 2000  # maximum depth of root development
 
         # Internally calculated input
         self.fr_root = 0
@@ -86,8 +85,8 @@ class Alfalfa(BaseCrop):
 
         # input
         self.kl = 0.65
-        self.RUE = 20
-        self.T_opt = 25
+        self.RUE = 30
+        self.T_opt = 15
 
         # Internally calculated input
         self.gamma_reg = 0
@@ -101,8 +100,8 @@ class Alfalfa(BaseCrop):
         # ===================================================================
         ''' Soil Water Uptake Data '''
 
-        self.beta_w = 10  # water-use distribution parameter  # corn
-        self.epco = 1
+        self.beta_w = 10  # water-use distribution parameter  # corn  # unknown
+        self.epco = 0.5
 
         self.water_actual_up = 0
         self.water_uptake_each_layer = []
@@ -117,10 +116,10 @@ class Alfalfa(BaseCrop):
         self.bio_N_opt = 0
         self.bio_N = 0
 
-        self.fr_n1 = 0.0417
-        self.fr_n2 = 0.0290
-        self.fr_n3 = 0.0200
-        self.fr_n3ish = 0.02001
+        self.fr_n1 = 0.0560
+        self.fr_n2 = 0.0210
+        self.fr_n3 = 0.0120
+        self.fr_n3ish = 0.0121
 
         self.fr_N = 0
         self.fr_N_up = 0
@@ -138,10 +137,10 @@ class Alfalfa(BaseCrop):
 
         self.fr_PHU_50 = 0.5
         self.fr_PHU_100 = 1.0
-        self.fr_p1 = 0.0035
-        self.fr_p2 = 0.0028
-        self.fr_p3 = 0.0020
-        self.fr_p3ish = 0.00201
+        self.fr_p1 = 0.0099
+        self.fr_p2 = 0.0022
+        self.fr_p3 = 0.0019
+        self.fr_p3ish = 0.00191
 
         self.fr_P = 0
         self.P_up = 0
@@ -161,7 +160,7 @@ class Alfalfa(BaseCrop):
         self.gamma_wu = 0
 
         self.biomass_dry_down_percent = 0.0
-        self.DM_harvest_percent = 0.15  # TODO: Hard coded dry matter percent at harvest
+        self.DM_harvest_percent = 0.0001  # TODO: Hard coded dry matter percent at harvest
         self.NDF_harvest_percent = 0.416
 
         self.bio_AG = 0

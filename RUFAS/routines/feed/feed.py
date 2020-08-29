@@ -522,10 +522,10 @@ class Feed:
             # [F.2.A.6]
             if 1.1 * storage.req_inv['lactating_cows'] >= storage.DM:
                 storage.DMI_forage_max['lactating_cows'] = storage.DM / \
-                                            storage.cow_days['lactating_cows']
+                                                           storage.cow_days['lactating_cows']
             else:
                 storage.DMI_forage_max['lactating_cows'] = 1.1 * \
-                                    storage.inclusion_rate_est['lactating_cows']
+                                                           storage.inclusion_rate_est['lactating_cows']
 
         # LOW QUALITY FORAGE
         # Calculating DMI for all EXCEPT Lactating Cows
@@ -599,7 +599,7 @@ class Feed:
                 available_forage = storage.DM - tot_req_inv_non_lactating_cows
                 if storage.cow_days['lactating_cows'] > 0:
                     storage.DMI_forage_max['lactating_cows'] = available_forage \
-                                            / storage.cow_days['lactating_cows']
+                                                               / storage.cow_days['lactating_cows']
             # updating inclusion rate estimate until inventory is sufficient to
             # satisfy that newly calculated inclusion rate estimate
             # [F.2.A.8]
@@ -828,7 +828,7 @@ class Feed:
         all_feed_info = {str(result['entry']): {
             'feed_name': result['feed_name'],
             'units': result['units']
-            }
+        }
             for result in dict_list}
 
         purchased_mapping = self.get_purchased_feed_ids(purchased_feeds)
@@ -904,7 +904,7 @@ class Feed:
                                          desired_rows=(str(grown_feed_entry),),
                                          compare_val=str(rounded_nutrient),
                                          low_col='low_percent',
-                                         high_col='high_percent',)
+                                         high_col='high_percent', )
 
         return dict_list[0][column]
 
