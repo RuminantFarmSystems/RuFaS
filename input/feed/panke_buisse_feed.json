@@ -4,7 +4,9 @@
     "feed_quality_table": "feed_quality",
     "nutrient_table": "nutrients",
 
-    "purchased_feeds": [2, 24, 34, 38, 91, 102, 137, 155, 156, 157],
+    "purchased_feeds": [2, 24, 34, 38, 91, 102, 137],
+    "purchased_feeds_costs": {"2": 0.2, "24": 0.3, "34": 0.5, "38":0.5,
+                          "91": 0.7, "102":0.25, "137": 0.7},
     "growing_feeds": [8, 87],
 
     "storage_options": {
