@@ -18,6 +18,8 @@ from RUFAS.routines.animal.pen import Pen
 from RUFAS.routines.animal.clustering_pen_grouping import grouping
 from RUFAS.routines.animal.life_cycle.life_cycle import LifeCycleManager
 from RUFAS.routines.animal.life_cycle.animal_base import AnimalBase
+from RUFAS.routines.animal.ration import ration_driver as ration_driver
+from RUFAS.routines.animal.ration import cow_requirements as req
 from collections import deque
 import random
 import matplotlib.pyplot as plt
@@ -279,10 +281,6 @@ class AnimalManagement:
             heiferIII.p_animal = 0.0072 * heiferIII.body_weight * 1000
 
         for cow in self.cows:
-            # uses average distances from pens to milking parlor
-            cow.calc_init_nutrient_rqmts(avg_VD_parlor, avg_HD_parlor,
-                                         self.housing, self.pasture_concentrate,
-                                         feed.nutrient_rqmts)
             cow.p_animal = 0.0072 * cow.body_weight * 1000
 
     def avg_pen_dist(self):
@@ -311,8 +309,7 @@ class AnimalManagement:
             feed: instance of the feed class
         """
         for pen in self.all_pens:
-            pen.call_animal_nutrient_rqmts(self.housing,
-                                           self.pasture_concentrate, feed, temp)
+            pen.call_animal_nutrient_rqmts(feed, temp)
 
     def fully_update_id_pen(self):
         """
@@ -388,7 +385,8 @@ class AnimalManagement:
 
     def pen_allocation(self):
         """
-        Allocates the animals in all_animals to pens in all_pens based on the animals' characteristics.
+        Allocates the animals in all_animals to pens in all_pens based on the
+        animals' characteristics.
         """
 
         # assigning non-cows to pens
@@ -414,6 +412,21 @@ class AnimalManagement:
         dry_cows = []
 
         for cow in self.cows:
+            requirements = req.calc_rqmts(cow.body_weight, cow.mature_body_weight,
+                cow.days_in_preg, cow.calves, cow.CI, cow.mPrt, cow.fat_percent,
+                cow.lactose_milk, cow.estimated_daily_milk_produced, cow.days_in_milk,
+                cow.milking)
+            cow.NEmaint = requirements['NEmaint']
+            cow.NEg = requirements['NEg']
+            cow.NEpreg = requirements['NEpreg']
+            cow.NEl = requirements['NEl']
+            cow.MP_req = requirements['MP_req']
+            cow.Ca_req = requirements['Ca_req']
+            cow.P_req = requirements['P_req']
+            cow.DMIest = requirements['DMIest']
+            cow.DNED_req = (requirements['NEmaint'] + requirements['NEl'])/ \
+                                                                    cow.DMIest
+            cow.DMDP_req = (requirements['MP_req']) / cow.DMIest
             if cow.milking:
                 lactating_cows.append(cow)
             else:
@@ -421,7 +434,8 @@ class AnimalManagement:
 
         # assigning dry cows to pens
         if len(self.all_pens) == 3:
-            dry_and_heifers = self.heiferIs + self.heiferIIs + self.heiferIIIs + dry_cows
+            dry_and_heifers = self.heiferIs + self.heiferIIs + self.heiferIIIs \
+                                                                    + dry_cows
             self.all_pens[1].update_animals(dry_and_heifers)
             self.all_pens[2].update_animals(lactating_cows)
         elif 4 <= len(self.all_pens) <= 6:
@@ -429,19 +443,13 @@ class AnimalManagement:
             self.all_pens[len(self.all_pens) - 1].update_animals(lactating_cows)
         else:
             self.all_pens[4].update_animals(dry_cows)
+            # calling pen grouping algorithm
+            pen_grouping = grouping(lactating_cows, self.all_pens[5:])
 
-            # TODO: Temporary process to randomly assign nutrition requirments
-            if len(lactating_cows) > 0:
-                for i in range(len(lactating_cows)):
-                    lactating_cows[i].ID = i + 1
-                    lactating_cows[i].DMPD_req = 90 + random.random() * 34
-                    lactating_cows[i].DNED_req = 1.4 + random.random() * 0.3
-                pen_grouping = grouping(lactating_cows, self.all_pens[5:])
+            # assigning lactating cows to pens based on the grouping output
+            for key in pen_grouping:
+                self.all_pens[key].update_animals(pen_grouping[key])
 
-                # assigning lactating cows to pens based on the grouping output
-                for key in pen_grouping:
-                    self.all_pens[key].update_animals(pen_grouping[key])
-        
         self.fully_update_id_pen()
 
     def clear_pens(self):
@@ -464,7 +472,7 @@ class AnimalManagement:
             if pen.pen_populated:
                 pen.calc_avg_nutrient_rqmts()
 
-    def calc_ration(self, feed, temp):
+    def calc_ration(self, feed):
         """
         Calls each pens's method to calculate the ration for that pen. This is
         part of the routines that happen every ration interval.
@@ -472,11 +480,12 @@ class AnimalManagement:
         Args:
             feed: instance of the Feed class
         """
-
+        available_feeds = ration_driver.AvailableFeeds()
+        available_feeds.feed_nutrients(feed)
         for i, pen in enumerate(self.all_pens):
             if pen.pen_populated:
-                self.all_pens[i].ration = self.all_pens[i].calc_ration(
-                    self.housing, self.pasture_concentrate, feed, temp)
+                self.all_pens[i].ration = self.all_pens[i].calc_ration(feed,
+                                                                available_feeds)
 
     def calc_manure_excretion(self, feed):
         """
@@ -621,7 +630,7 @@ class AnimalManagement:
                 self.clear_pens()
                 self.pen_allocation()
                 self.calc_avg_nutrient_rqmts()  # per pen
-                self.calc_ration(feed, temp)  # per pen
+                self.calc_ration(feed)  # per pen
                 self.calc_manure_excretion(feed)  # per animal
                 self.calc_avg_growth()  # per pen
 
