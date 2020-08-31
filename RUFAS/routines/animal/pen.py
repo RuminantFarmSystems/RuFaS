@@ -386,8 +386,6 @@ class Pen:
                 for later computations
         """
         num_animals = len(self.animals_in_pen)
-        if animal.id == 446354:
-            print('ehy')
         if num_animals == 0:
             # for the case that there are no animals currently in this pen.
             # Avoids a division by 0 error in below calculations
