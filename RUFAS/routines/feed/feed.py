@@ -742,7 +742,8 @@ class Feed:
                             animal_management.formulation_interval) == 1 or \
                                     animal_management.formulation_interval == 1
         for silo in self.new_forages:
-            if silo.days_since_feedout >= -1 and ration_interval:
+            if silo.days_since_feedout >= -1 and ration_interval and \
+                                                    silo.feed_id != 'null':
                 silo.forage_quality_assesment(self)
                 self.required_inventory(silo, animal_management)
                 self.forage_inventory_plan(silo, animal_management)
