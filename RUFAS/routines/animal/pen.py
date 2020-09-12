@@ -1,4 +1,3 @@
-################################################################################
 """
 RUFAS: Ruminant Farm Systems Model
 File name: pen.py
@@ -9,7 +8,6 @@ Description: The class which represents a pen on the farm. Each pen has
     management class to pen to each individual animal in that pen.
 Author(s): Militsa Sotirova, militsasotirova@gmail.com
 """
-################################################################################
 from RUFAS.routines.animal.ration.calf_ration import optimize as calf_optimize
 from RUFAS.routines.animal.ration.growing_heifer_ration import \
     optimize as growing_heifer_optimize
@@ -86,8 +84,8 @@ class Pen:
 
     # total amount of different nutrients in current ration
     ration_nutrient_amount = {'dm_amount': 0, 'cp_amount': 0, 'adf_amount': 0,
-                        'ndf_amount': 0, 'lignin_amount': 0, 'ash_amount': 0,
-                        'P_amount': 0, 'K_amount': 0, 'N_amount': 0}
+                              'ndf_amount': 0, 'lignin_amount': 0, 'ash_amount': 0,
+                              'P_amount': 0, 'K_amount': 0, 'N_amount': 0}
 
     # concentration of different nutrients in current ration
     ration_nutrient_conc = {}
@@ -136,6 +134,8 @@ class Pen:
         self.housing_type = housing_type
         self.bedding_type = bedding_type
         self.pen_type = pen_type
+        self.DBW = 0.0
+        self.daily_growth = 0.0
 
     def update_animals(self, new_animals):
         """
@@ -155,21 +155,18 @@ class Pen:
             stage = type(animal).__name__
             self.classes_in_pen.add(stage)
 
-    def call_animal_nutrient_rqmts(self, feed, temp):
+    def call_animal_nutrient_rqmts(self, temp):
         """
         Calls each animal's nutrient requirement calculation methods.
 
         Args:
-            housing: housing type ("barn" or "pasture")
-            pasture_concentrate: concentrate supplementation when farming type
-                is "pasture", kg
-            feed: an instance of the Feed class
+            temp: the temperature on the current day
         """
         for animal in self.animals_in_pen:
             # currently, only lactating cows have ration calculations, so there
             # are different arguments
             if type(animal).__name__ == 'Cow':
-                #old hard coded variable updates from the deleted calc_requirements in
+                # old hard coded variable updates from the deleted calc_requirements in
                 # cow.py
                 self.DBW = -0.4125
                 self.daily_growth = self.DBW
@@ -236,9 +233,7 @@ class Pen:
 
         Args:
             feed: instance of the Feed class
-
-        Returns:
-
+            available_feeds: instance of the AvailableFeeds class defined in ration_driver.py
         """
         # sets ration's necessary fields for ration formulation calculation
         # there should only be one group of animals in a pen
@@ -256,11 +251,11 @@ class Pen:
             elif 'Cow' in self.classes_in_pen and \
                     self.animals_in_pen[0].milking:  # lactating cow
                 ration_per_animal = \
-                    ration_driver.ration_formulation(self, available_feeds,True)
+                    ration_driver.ration_formulation(self, available_feeds, True)
             elif 'Cow' in self.classes_in_pen and \
                     not self.animals_in_pen[0].milking:  # dry cow
                 ration_per_animal = \
-                    ration_driver.ration_formulation(self,available_feeds,False)
+                    ration_driver.ration_formulation(self, available_feeds, False)
 
             else:  # this should never occur
                 print('error in pen ration calculation')
@@ -270,15 +265,15 @@ class Pen:
                 break
 
         # recording ration nutrition information in pen
-        nutrient_amount, nutrient_conc = ration_driver.ration_report( \
-                                        ration_per_animal, feed.available_feeds)
+        nutrient_amount, nutrient_conc = ration_driver.ration_report(
+            ration_per_animal, feed.available_feeds)
         self.ration_nutrient_amount = nutrient_amount
         self.ration_nutrient_conc = nutrient_conc
 
         for animal in self.animals_in_pen:
             animal.set_ration(ration_per_animal, nutrient_amount['dm_amount'])
-            animal.set_p_intake(nutrient_amount['P_amount'], \
-                                                        nutrient_conc['P_conc'])
+            animal.set_p_intake(nutrient_amount['P_amount'],
+                                nutrient_conc['P_conc'])
         # set ration for whole pen by multiplying calculated ration by number
         # of animals in the pen
         ration = {}
@@ -340,12 +335,9 @@ class Pen:
                     animal.calc_daily_walking_dist(self.vertical_dist_to_parlor,
                                                    self.horizontal_dist_to_parlor)
 
-    def call_p_rqmts(self, feed):
+    def call_p_rqmts(self):
         """
         Calls each animal's method to calculate phosphorus requirements.
-
-        Args:
-            feed: instance of the Feed class
         """
         # since each animal in the pen receives the same ration
         if len(self.animals_in_pen) > 0:
@@ -368,18 +360,19 @@ class Pen:
                 total_p_animal += animal.p_animal
             self.avg_p_animal = total_p_animal / len(self.animals_in_pen)
 
-    def set_up_new_animal(self, animal, p_comp, housing, pasture_concentrate,
-                          feed, temp):
+    def set_up_new_animal(self, animal, p_comp, feed, temp):
         """
         Sets the necessary attributes for @animal to be a replacement in this
         pen.
 
         Args:
+            animal: the replacement animal which needs to have necessary values
+                for later computations
             p_comp: P composition of @animal's class, used to calculate the
                 P in @animal. -1 for this value indicates that @animal is a
                 calf and that its p_animal attribute has already been calculated
-            animal: the replacement animal which needs to have necessary values
-                for later computations
+            feed: instance of the Feed class defined in feed.py
+            temp: temperature on the current day
         """
         num_animals = len(self.animals_in_pen)
         if num_animals == 0:
@@ -390,7 +383,7 @@ class Pen:
 
         # set animal's ration to be the intake of all other animals in pen
         if self.ration == {}:
-            self.ration = self.calc_ration( feed, temp)
+            self.ration = self.calc_ration(feed, temp)
 
         for key in self.ration:
             if key == 'status':

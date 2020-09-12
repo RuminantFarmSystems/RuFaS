@@ -37,7 +37,7 @@ class Alfalfa(BaseCrop):
         # input
         self.T_base_min = 4
         self.T_base_max = 43.33
-        self.PHU = 800  # still unknown
+        self.PHU = 800  # TODO: still unknown
 
         # Internally calculated input
         self.accumulated_HU = 0.0
@@ -101,7 +101,7 @@ class Alfalfa(BaseCrop):
         # ===================================================================
         ''' Soil Water Uptake Data '''
 
-        self.beta_w = 10  # water-use distribution parameter  # corn
+        self.beta_w = 10  # water-use distribution parameter  # TODO: taken from corn
         self.epco = 1
 
         self.water_actual_up = 0

@@ -97,7 +97,7 @@ class Soybean(BaseCrop):
         # ===================================================================
         ''' Soil Water Uptake Data '''
 
-        self.beta_w = 10  # water-use distribution parameter  # corn
+        self.beta_w = 10  # water-use distribution parameter  # TODO: taken from corn
         self.epco = 1
 
         # output
