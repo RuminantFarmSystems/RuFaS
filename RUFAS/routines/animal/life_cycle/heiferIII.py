@@ -9,7 +9,6 @@ Description: This file updates the heifer form close to calving to calving,
             average daily gain, once mature body weight or grow end day reached,
             grow stop.
 """
-###############################################################################
 
 import numpy as np
 from RUFAS.routines.animal.life_cycle.heiferII import HeiferII
