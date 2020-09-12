@@ -351,7 +351,8 @@ class Feed:
 
             Args:
                 feed: instance of the Feed class
-                crop: the crop to be stored, an instance of class Crop
+                crop: the crop to be stored,
+                    an instance of the family of classes under BaseCrop defined in the crop_types folder
             """
 
             if self.storage:
