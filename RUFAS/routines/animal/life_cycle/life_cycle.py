@@ -27,25 +27,9 @@ class LifeCycleManager:
     Manages the life cycles of the animals.
     """
     # statistics
-    sold_calves = []
     sold_heifers = []
     culled_heifers = []
     culled_cows = []
-    total_culled = 0
-    total_new_born = 0
-    sold_to_market = 0
-    bought_from_market = 0
-
-    # figures
-    daily_calf_num = []
-    daily_heiferI_num = []
-    daily_heiferII_num = []
-    daily_heiferIII_num = []
-    daily_cow_num = []
-    culled_cows_lst = []
-    heifer_sold_lst = []
-    replacement_bought_lst = []
-    milking_cows_lst = []
 
     calf_num = 0
     calf_percent = 0
@@ -118,14 +102,6 @@ class LifeCycleManager:
     avg_cow_culling_age = 0
     avg_mature_body_weight = 0
 
-    num_culled_range = 0
-    num_heiferII_preg = 0
-    num_cow_preg = 0
-    num_cow_milking = 0
-    num_cow_in_vwp = 0 
-    total_replacement_bought = 0
-    total_calf_sold = 0
-    total_heifer_sold = 0
     cull_reason_stats = {
         c.LOW_PROD_CULL: 0,
         c.LAMENESS_CULL: 0,
@@ -268,18 +244,6 @@ class LifeCycleManager:
         animals_added = []
         calves_born = []
 
-        # record the last days stats
-        daily_cow_cull_num = 0
-        daily_heifer_culled_num = 0
-        daily_heifer_sold = 0
-        daily_bought_from_market = 0
-        daily_cow_milking = 0
-        self.daily_calf_num.append(len(calves))
-        self.daily_heiferI_num.append(len(heiferIs))
-        self.daily_heiferII_num.append(len(heiferIIs))
-        self.daily_heiferIII_num.append(len(heiferIIIs))
-        self.daily_cow_num.append(len(cows))
-
         self.calf_num = 0
         self.heiferI_num = 0
         self.heiferII_num = 0
@@ -391,8 +355,6 @@ class LifeCycleManager:
         for index, heiferII in enumerate(heiferIIs):
             cull_stage, third_stage = heiferII.update(date)
             if cull_stage:
-                self.total_culled += 1
-                daily_heifer_culled_num += 1
                 self.culled_heifer_num, self.avg_heifer_culling_age = \
                     self._calc_average(self.culled_heifer_num,
                     self.avg_heifer_culling_age, heiferII.days_born)
@@ -462,21 +424,17 @@ class LifeCycleManager:
         while len(heiferIIIs) + len(cows) > self.herd_num * 1.03 and len(heiferIIIs) > 0:
             removed = heiferIIIs.pop()
             ids_removed.append(removed.id)
-            self.sold_to_market += 1
             self.sold_heifers.append(removed)
-            daily_heifer_sold += 1
             self.sold_heifer_num += 1
 
         # if the number of heifers is less than needed for the herd,
         # buy replacement from the market
-        while len(cows) + len(heiferIIIs) + daily_bought_from_market < self.herd_num * 1.01 and \
+        while len(cows) + len(heiferIIIs) + self.bought_heifer_num < self.herd_num * 1.01 and \
                 date > 1:
             self.replacement_market[0].events.add_event(
                 self.replacement_market[0].days_born, date, c.ENTER_HERD)
             self.replacement_market[0].set_p_purchased()
             animals_added.append(self.replacement_market[0])
-            self.bought_from_market += 1
-            daily_bought_from_market += 1
             self.bought_heifer_num += 1
             del self.replacement_market[0]
 
@@ -502,8 +460,6 @@ class LifeCycleManager:
 
                 self.culled_cows.append(cow)
                 self.cull_reason_stats[cow.cull_reason] += 1
-                self.total_culled += 1
-                daily_cow_cull_num += 1
                 self.culled_cow_num, self.avg_cow_culling_age = \
                     self._calc_average(self.culled_cow_num,
                     self.avg_cow_culling_age, cow.days_born)
@@ -522,7 +478,6 @@ class LifeCycleManager:
                     self.avg_mature_body_weight, cow.mature_body_weight)
 
                 if cow.milking:
-                    daily_cow_milking += 1
                     self.daily_milk_production += cow.estimated_daily_milk_produced
                     self.milking_cow_num, self.avg_days_in_milk = \
                         self._calc_average(self.milking_cow_num,
@@ -618,12 +573,9 @@ class LifeCycleManager:
                     new_calf.events.add_event(
                         new_calf.days_born, date, c.ENTER_HERD)
                     # calves.append(new_calf)
-                    self.total_new_born += 1
                     calves_born.append(new_calf)
                 if new_calf.sold:
-                    self.total_calf_sold += 1
                     self.sold_calf_num += 1
-                    self.sold_calves.append(new_calf)
 
             # calculate reproduction indications
             if date >= sim_length - 21 * self.config["num_21_days_repro"]:
@@ -647,12 +599,6 @@ class LifeCycleManager:
                 self.num_ai_21_days = 0
                 self.num_cow_btw_vwp_preg_21_days = 0
                 self.num_preg_21_days = 0
-
-        # for figures
-        self.culled_cows_lst.append(daily_cow_cull_num)
-        self.heifer_sold_lst.append(daily_heifer_sold)
-        self.replacement_bought_lst.append(daily_bought_from_market)
-        self.milking_cows_lst.append(daily_cow_milking)
 
         if total_animal_num == 0:
             self.calf_percent = 0

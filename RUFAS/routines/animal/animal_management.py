@@ -800,7 +800,7 @@ class AnimalManagement:
                 self.generate_animal_output('culled_cow', i)
             animals.append((animal, 'culled_cow', is_cow))
 
-        output['num_calves_sold'] = len(self.life_cycle_manager.sold_calves)
+        output['num_calves_sold'] = self.life_cycle_manager.sold_calf_num
         output['num_sold_heifers'] = len(self.life_cycle_manager.sold_heifers)
         output['num_cows_culled'] = len(self.life_cycle_manager.culled_cows)
 
