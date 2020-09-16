@@ -310,7 +310,7 @@ class Soil:
         self.NH4_drainage_annual = 0.0
         self.active_N_drainage_annual = 0.0
 
-        # soil carbon attributes  # TODO decide if any below should be in crop
+        # soil carbon attributes
         self.residue_DM_harvest = 0.0
         self.lignin_residue_percent = 17  # tied to the reset of this variable in yields, if changed, change together
         self.lignin_residue_AG_percent = 2.6  # tied to the reset of this variable in yields, if changed, change together
@@ -643,7 +643,7 @@ class Soil:
             # Variables to calculate dailyPercolation
             self.k_sat = layer_data['K_sat']  # saturated hydraulic conductivity (mm/h)
             self.TT = 0.0
-            self.perc = 0.0  # amount of water that percolates to next layer
+            self.percolation = 0.0  # amount of water that percolates to next layer
 
             # Variable to simulate nitrogen Cycling
             # self.org_C = layer_data['org_C_percent']
@@ -671,9 +671,9 @@ class Soil:
             # Initial Stable N in layer:
             self.stable_N = 0.0
 
-            self.NO3_perc = 0.0
-            self.NH4_perc = 0.0
-            self.active_perc = 0.0
+            self.NO3_percolation = 0.0
+            self.NH4_percolation = 0.0
+            self.active_percolation = 0.0
 
             self.N_min_act = 0.0
             self.nitrification = 0.0

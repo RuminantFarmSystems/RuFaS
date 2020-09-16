@@ -81,7 +81,7 @@ Soil attribute definitions
 
     NO3/NH4_conc = concentration of NO3 or NH4 for leaching (kg N / mm H2O)
 
-    NO3/NH4_perc = mass of NO3 or NH4 loss in percolation water from all soil layers
+    NO3/NH4_percolation = mass of NO3 or NH4 loss in percolation water from all soil layers
                 (kg/ha)
 
     denitr_N = denitrified Nitrogen(kg/ha)

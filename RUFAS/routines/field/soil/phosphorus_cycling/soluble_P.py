@@ -49,7 +49,7 @@ def update_all(soil):
             layer.labile_P -= layer.DRP_runoff
 
         # S.5.E.5
-        layer.DRP_leachate_act = min(layer.labile_P, layer.DRP_leachate * layer.perc * 0.01)
+        layer.DRP_leachate_act = min(layer.labile_P, layer.DRP_leachate * layer.percolation * 0.01)
 
         layer.labile_P += DRP_leachate_prev_layer
         layer.labile_P -= layer.DRP_leachate_act
