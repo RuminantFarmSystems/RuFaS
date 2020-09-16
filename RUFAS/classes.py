@@ -78,10 +78,10 @@ class Config:
 
         self.start_full_date = data['start_date'].split(':')
         self.end_full_date = data['end_date'].split(':')
-        self.start_year = int(self.start_date[0])
-        self.end_year = int(self.end_date[0])
-        self.start_day = int(self.start_date[1])
-        self.end_day = int(self.end_date[1])
+        self.start_year = int(self.start_full_date[0])
+        self.end_year = int(self.end_full_date[0])
+        self.start_day = int(self.start_full_date[1])
+        self.end_day = int(self.end_full_date[1])
         self.run_tests = data['run_tests']
         year_length = 365
         leap_year_length = 366
@@ -343,7 +343,7 @@ class Weather:
         # 2D arrays [year][day] for different weather variables used by the
         # module
         current_row = 1
-        year = 0
+        year = 1
         counter = 0
         day = start_day
         skips = 0
@@ -371,8 +371,7 @@ class Weather:
                 self.T_min[year][day - offset] = float(row["low"])
                 self.T_avg[year][day - offset] = float(row["avg"])
                 self.radiation[year][day - offset] = float(row["Hday"])
-                # TODO: manureN is a temporary weather file input until the manure module is implemented
-                self.manureN[year][day - offset] = float(row["manureN"])
+                self.manureN[year][day - offset] = float(row["manureN"]) # TODO: delete after manure is implemented
                 self.Taair[year][day - offset] = float(row["Taair"])
             except(IndexError, ValueError):
                 # prints out each problematic row in the weather CSV file
@@ -407,13 +406,12 @@ class Weather:
 
         # set average annual air temperature to long term average for years with incomplete data
         for year in range(len(years)):
-            if year == 0 and start_day != 0:
-                for day in range(len(self.Taair[year])):
+            if year == 1 and start_day != 0:
+                for day in range(1,len(self.Taair[year])):
                     self.Taair[year][day] = long_term_avg
             elif year == len(years) - 1 and end_day < 365:
                 for day in range(len(self.Taair[year])):
                     self.Taair[year][day] = long_term_avg
-
 
 class Time:
     def __init__(self, config):

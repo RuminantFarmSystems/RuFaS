@@ -95,7 +95,9 @@ def calc_T_soil(soil, weather, time):
     """
 
     L = 0.8
-    T_a_air = weather.T_avg_annual[time.year - 1]
+    print(time.year)
+    print(time.day)
+    T_a_air = weather.Taair[time.year-1][0]
     dd = calc_dd(soil)
 
     for x in range(len(soil.soil_layers)):
