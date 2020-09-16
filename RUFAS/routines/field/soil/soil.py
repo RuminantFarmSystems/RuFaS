@@ -312,9 +312,15 @@ class Soil:
 
         # soil carbon attributes  # TODO decide if any below should be in crop
         self.residue_DM_harvest = 0.0
-        self.lignin_residue_percent = 17
+        self.lignin_residue_percent = 17  # tied to the reset of this variable in yields, if changed, change together
+        self.lignin_residue_AG_percent = 2.6  # tied to the reset of this variable in yields, if changed, change together
+        self.lignin_residue_BG_percent = 2.6  # tied to the reset of this variable in yields, if changed, change together
         self.curr_layer_depth = 0
         self.silt_and_clay_frac = 0.5  # TODO database item
+
+        self.LN_ratio_AG = 0
+        self.LN_ratio_BG = 0
+        self.LN_ratio_AG_BG = 0
 
         self.initialize_soil_N()
 
