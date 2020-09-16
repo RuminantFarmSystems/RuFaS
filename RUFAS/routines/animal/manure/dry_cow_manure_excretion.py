@@ -12,7 +12,7 @@ def manure_calculations(p_feces_excrt, p_urine):
     """
     TEMPORARY PLACEHOLDER
     Calculates inputs for manure module with information from the
-    ration formulation.
+    ration formulation. Equations referenced are from pseudocode.
 
     Args:
         p_feces_excrt: amount of P excreted by an animal (g)
