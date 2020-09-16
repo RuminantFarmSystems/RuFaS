@@ -1,7 +1,9 @@
 """
 RUFAS: Ruminant Farm Systems Model
 File name: classes.py
+
 Description: Contains top level class definitions for RUFAS
+
 Author(s): Kass Chupongstimun, kass_c@hotmail.com
            Jit Patil, spatil5@wisc.edu
            William Donovan, wmdonovan@wisc.edu
@@ -11,77 +13,60 @@ Author(s): Kass Chupongstimun, kass_c@hotmail.com
 import csv
 import json
 from pathlib import Path
-from RUFAS import util
-from RUFAS import errors
-from RUFAS.routines import Soil, Feed, Crop
+from RUFAS import util, errors
+from RUFAS.routines import Field, Soil, Feed, Crop
 from RUFAS.routines.animal.animal_management import AnimalManagement
 from RUFAS.util import DatabaseReader
+from RUFAS.util import read_json_file
 
 
-# -------------------------------------------------------------------------------
-# Class: State
-# -------------------------------------------------------------------------------
+
 class State:
-    """Contains information about the current state of the farm.
+    def __init__(self, data, config, weather, time):
+        """
+        Description:
+            Contains information about the current state of the farm.
+            The state object represents the state of the farm at a certain instant in
+            time. It contains information arranged in different objects by what routine
+            they (mostly) relate to. The state object (or some of its sub-objects) will
+            be passed to routines during the simulation, which may access the
+            information in the different sub-objects in the state to use in its
+            calculations.
+            The state object should ONLY store persistent data that WILL be used in
+            future calculations and/or reports.
+            DO NOT store immediate operands or values that do not NEED to be accessed in
+            the future or in an output report in the state object.
 
-    The state object represents the state of the farm at a certain instant in
-    time. It contains information arranged in different objects by what routine
-    they (mostly) relate to. The state object (or some of its sub-objects) will
-    be passed to routines during the simulation, which may access the
-    information in the different sub-objects in the state to use in its
-    calculations.
-    The state object should ONLY store persistent data that WILL be used in
-    future calculations and/or reports.
-    DO NOT store immediate operands or values that do not NEED to be accessed in
-    the future or in an output report in the state object.
-    """
-
-    def __init__(self, data, config, time):
+        Args:
+            data: dictionary containing parsed information from the json file
+                necessary to initialize the state
+            config: instance of the Config class containing information necessary
+                to initialize the state
+            time: instance of the Time class containing information necessary to
+                initialize the state
+        """
+        self.fields = []
+        self.fields_data = data['fields']
+        for field_name, field_data in self.fields_data.items():
+            self.fields.append(Field(field_name, field_data, time))
         input_dir = util.get_base_dir() / 'input'
-        self.soil = Soil(read_json_file(input_dir / 'soil' / data['soil']), config)
         self.feed = Feed(read_json_file(input_dir / 'feed' / data['feed']))
-        self.animal_management = AnimalManagement(read_json_file(input_dir / 'animal' / data['animal']),
-                                                  config, self.feed)
-        self.crop = Crop(read_json_file(input_dir / 'crop' / data['crop']), time)
+        self.animal_management = AnimalManagement(
+            read_json_file(input_dir / 'animal' / data['animal']), config, self.feed, weather, time)
 
-    # self.fieldOps = FieldOps()
-    # self.herd = Herd()
-    # self.housing = Housing()
-    # self.manure = Manure()
-
-    # ---------------------------------------------------------------------------
-    # Method: annual_reset
-    # ---------------------------------------------------------------------------
     def annual_reset(self):
-        """Annual Reset"""
+        """
+        Description:
+            Resets all annual variables that require reset
+        """
 
-        self.soil.annual_reset()
-        self.crop.annual_reset()
+        for field in self.fields:
+            field.crop.annual_reset()
+            field.soil.annual_reset()
         self.animal_management.annual_reset()
 
 
-def read_json_file(file_path: Path):
-    try:
-        if file_path.suffix == '.json':
-            if not file_path.is_file():
-                raise errors.UserInput(str(file_path) + ' does not exist')
-        else:
-            raise errors.UserInput(str(file_path) + ' is not a JSON file')
-
-        with file_path.open('r') as f:
-            data = json.load(f)
-
-        return data
-
-    except errors.UserInput as e:
-        print(e.msg)
-
-
-# -------------------------------------------------------------------------------
-# Class: Config
-# -------------------------------------------------------------------------------
 class Config:
-    """Contains configuration information of the simulation"""
 
     def __init__(self, data, weather_data):
 
@@ -91,22 +76,18 @@ class Config:
         self.weather_table = weather_data["weather_table_name"]
         self.dataset_ID = weather_data["dataset_ID"]
 
-        self.start_date = data['start_date'].split(':')
-        self.end_date = data['end_date'].split(':')
+        self.start_full_date = data['start_date'].split(':')
+        self.end_full_date = data['end_date'].split(':')
         self.start_year = int(self.start_date[0])
         self.end_year = int(self.end_date[0])
         self.start_day = int(self.start_date[1])
         self.end_day = int(self.end_date[1])
-
         self.run_tests = data['run_tests']
-
         year_length = 365
         leap_year_length = 366
 
         # read in the input csv file
         self.weather_full_path = util.get_base_dir() / self.weather_path_str
-
-
         if not self.weather_full_path.is_file():
             raise errors.JSONfileData("WEATHER",
                                       "\tWeather file specified does not exist")
@@ -240,13 +221,17 @@ class Config:
 
             self.years.append(days)
 
-        self.sim_length = self.calc_sim_length(leap_year_length, year_length)
+        self.leap_year_length = leap_year_length
+        self.year_length = year_length
+
+        self.sim_length = self.calc_sim_length()
         self.csv_dir = data['csv_dir']
         self.graphic_dir = data['graphic_dir']
 
-    def calc_sim_length(self, leap_year_length, year_length):
+    def calc_sim_length(self):
         """
-        Calculates and returns the length of the simulation in days.
+        Description:
+            Calculates and returns the length of the simulation in days.
         """
 
         sim_length = 0
@@ -254,25 +239,37 @@ class Config:
             if i == 0:
                 # check for leap year
                 if is_leap_year(self.start_year):
-                    sim_length += leap_year_length - self.start_day
+                    sim_length += self.leap_year_length - self.start_day
                 else:
-                    sim_length += year_length - self.start_day
+                    sim_length += self.year_length - self.start_day
             else:
                 sim_length += len(self.years[i])
 
         return sim_length + 1
 
 
-# -------------------------------------------------------------------------------
-# Class: Weather
-# -------------------------------------------------------------------------------
 class Weather:
-    """
-    Contains daily weather information stored in 2D lists
-    Data lists are in the format Data[year][julian_day].
-    """
 
     def __init__(self, weather_data, config):
+        """
+        Description:
+            Contains daily weather information stored in 2D lists
+            Data lists are in the format Data[year][julian_day].
+            Allows daily information to be accessed by indexing to
+            [time.year - 1][time.day - 1] (list indexing starts at 0,
+            time starts at 1)
+
+        Args:
+            weather_data: json section with the necessary weather database files
+            config: instance of the Config class containing information necessary
+                to initialize the Weather object
+        """
+
+        years = config.years
+        w_start_year = config.w_start_year
+        w_start_day = config.w_start_day
+        start_year = config.start_year
+        start_day = config.start_day
 
         # initialize data sets
         self.rainfall = []
@@ -283,9 +280,8 @@ class Weather:
         self.manureN = []
         self.Taair = []
 
-
-        year_length = 365
-        leap_year_length = 366
+        year_length = config.year_length
+        leap_year_length = config.leap_year_length
 
         w_start_year = config.w_start_year
         w_start_day = config.w_start_day
@@ -332,13 +328,14 @@ class Weather:
         self.weather_table = weather_data["weather_table_name"]
         self.dataset_ID = weather_data["dataset_ID"]
 
+
         self.weather_full_path = util.get_base_dir() / self.weather_path_str
 
         if not self.weather_full_path.is_file():
             raise errors.JSONfileData("WEATHER",
                                       "\tWeather file specified does not exist")
 
-        # reads database and stores dictionnary values in values_DB list
+        # reads database and stores dictionary values in values_DB list
         DB_reader = DatabaseReader(str(self.weather_full_path))
         values_DB = DB_reader.query(table="Observations", identifier="ID", desired_rows=[self.dataset_ID])
 
@@ -391,7 +388,6 @@ class Weather:
             if day == len(years[year]):
                 year += 1
                 day = 0
-
             day += 1
             current_row += 1
             # prints if there are more than 5 skipped lines in order to
@@ -419,37 +415,38 @@ class Weather:
                     self.Taair[year][day] = long_term_avg
 
 
-# Class: Time
-# -------------------------------------------------------------------------------
 class Time:
-    """
-    This object is responsible for creating and tracking time in the simulation.
-    Time is currently represented as a year and day only.
-    """
+    def __init__(self, config):
+        """
+        Description:
+            This object is responsible for creating and tracking time in the simulation.
+        Args:
+            config: instance of the Config class containing information necessary
+                to initialize time
+        """
 
-    def __init__(self, years, cal_year):
-
-        years = years
-        cal_year = cal_year
-        self.start_year = cal_year
-        self.cal_year = cal_year
+        calendar_year = config.start_year
+        # number of years
+        years = config.years
+        self.start_year = calendar_year
+        self.calendar_year = calendar_year
         self.years = years
-        self.year = 1  # Current Year
+        self.year = 1  # current year
+        self.leap_year_length = config.leap_year_length
+        self.year_length = config.year_length
 
         # finds the first non-null day of the first year
-        for i in range(0, len(years[0])):
-            if years[0][i] is None:
+        for i in range(0, len(self.years[0])):
+            if self.years[0][i] is None:
                 continue
             else:
-                self.day = years[0][i]
+                self.day = self.years[0][i]
                 break
 
-    # ---------------------------------------------------------------------------
-    # Method: to_str
-    # ---------------------------------------------------------------------------
     def to_str(self):
-        """Returns a string representation of the current time.
-
+        """
+        Description:
+            Returns a string representation of the current time.
         Returns:
             str: a String representation of the current time in the simulation
                 in the format "Year: <year> Day: <day>"
@@ -457,28 +454,24 @@ class Time:
 
         return "Year: {} Day: {}".format(self.year, self.day)
 
-    # ---------------------------------------------------------------------------
-    # Method: advance
-    # ---------------------------------------------------------------------------
     def advance(self):
-        """Advances the time in the simulation by 1 day
-
-        Automatically detects end of months and years
+        """
+        Description:
+            Advances the time in the simulation by 1 day
+            Automatically detects end of months and years
         """
 
         if self.end_year():
             self.day = 1
             self.year += 1
-            self.cal_year += 1
+            self.calendar_year += 1
         else:
             self.day += 1
 
-    # ---------------------------------------------------------------------------
-    # Method: end_year
-    # ---------------------------------------------------------------------------
     def end_year(self):
-        """Returns a bool signifying the end of a year.
-
+        """
+        Description:
+            Returns a bool signifying the end of a year.
         Returns:
             bool: True if it is the end of a year, False otherwise
         """
@@ -486,12 +479,10 @@ class Time:
         # if the day is > the length of the current year, then the year is over
         return self.day > len(self.years[self.year - 1])
 
-    # -------------------------------------------------------------------------------
-    # Function: end_simulation
-    # -------------------------------------------------------------------------------
     def end_simulation(self):
-        """Checks whether the simulation has ended
-
+        """
+        Description:
+            Checks whether the simulation has ended
         Returns:
             bool: True if the simulation has ended, false otherwise
         """
@@ -505,10 +496,15 @@ class Time:
         return False
 
 
-#
-# Helper method determines if the given year is a leap year
-#
 def is_leap_year(year):
+    """
+    Description:
+        Helper method determines if the given year is a leap year
+    Args:
+        year: an int of the year
+    Returns:
+        bool: True if the year is a leap year
+    """
     if year % 400 == 0:
         return True
     elif year % 100 == 0:

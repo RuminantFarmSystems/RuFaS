@@ -20,26 +20,6 @@
             "report_name": "growth_report"
         }
     },
-    "mass_balance_report": {
-        "produce_csv": true,
-        "produce_graphics": true,
-        "report_name": "mass_balance_report",
-        "water_balance": {
-            "produce_csv": true,
-            "produce_graphics": true,
-            "report_name": "water_balance_report"
-        },
-        "phosphorus_balance": {
-            "produce_csv": true,
-            "produce_graphics": true,
-            "report_name": "phosphorus_balance_report"
-        },
-        "nitrogen_balance": {
-            "produce_csv": true,
-            "produce_graphics": true,
-            "report_name": "nitrogen_balance_report"
-        }
-    },
     "field_report": {
         "produce_csv": true,
         "produce_graphics": true,
@@ -63,12 +43,59 @@
             "produce_csv": true,
             "produce_graphics": true,
             "report_name": "crop_report"
+        },
+        "water_balance": {
+            "produce_csv": true,
+            "produce_graphics": true,
+            "report_name": "water_balance_report"
+        },
+        "phosphorus_balance": {
+            "produce_csv": true,
+            "produce_graphics": true,
+            "report_name": "phosphorus_balance_report"
+        },
+        "nitrogen_balance": {
+            "produce_csv": true,
+            "produce_graphics": true,
+            "report_name": "nitrogen_balance_report"
         }
+    },
+    "mass_balance": {
+        "produce_csv": true,
+        "produce_graphics": true,
+        "report_name": "mass_balance_report"
     },
     "feed_storage_report": {
         "produce_csv": true,
         "produce_graphics": true,
         "report_name": "feed_storage_report"
+    },
+    "life_cycle_report":
+    {
+        "produce_csv": true,
+        "produce_graphics": true,
+        "report_name": "life_cycle_report",
+
+        "initialization_db_summary":
+        {
+            "produce_csv": true,
+            "produce_graphics": true,
+            "report_name": "initialization_db_summary"
+        },
+
+        "individual_animal_report":
+        {
+          "produce_csv": true,
+          "produce_graphics": true,
+          "report_name": "individual_animal_report",
+          "num_animals": 3
+        },
+        "herd_report":
+        {
+          "produce_csv": true,
+          "produce_graphics": true,
+          "report_name": "herd_report"
+        }
     },
     "custom_report": {
         "produce_csv": true,

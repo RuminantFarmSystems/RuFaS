@@ -31,12 +31,12 @@ class BaseReport:
         self.graphic_dir = ''
 
         self.daily_variables = {
-            'year': ['time.cal_year', '', []],
+            'year': ['time.calendar_year', '', []],
             'j_day': ['time.day', '', []]
         }
 
         self.annual_variables = {
-            'year': ['time.cal_year', '', 0]
+            'year': ['time.calendar_year', '', 0]
         }
 
     def initialize_csv_dir(self):
@@ -70,11 +70,9 @@ class BaseReport:
     # to the scope of variables. If a specified output is not a soil
     # variable, this will throw an error.
     def daily_update(self, state, weather, time):
-
-        soil = state.soil
-        crop_type = state.crop.current_crop
         animal_management = state.animal_management
         feed = state.feed
+        life_cycle_manager = animal_management.life_cycle_manager
 
         for variable in self.daily_variables:
             self.daily_variables[variable][2].append(
@@ -82,12 +80,8 @@ class BaseReport:
 
     def annual_update(self, state, weather, time):
         """Stores the yearly values that need to be printed in the report."""
-        soil = state.soil
-        crop_type = state.crop.current_crop
         animal_management = state.animal_management
         feed = state.feed
-
-        soil.annual_mass_balance()
 
         for variable in self.annual_variables:
             self.annual_variables[variable][2] = \
@@ -135,3 +129,6 @@ class BaseReport:
     def produce_report_graphics(self):
         graphics.annual_graphics(self)
         graphics.daily_graphics(self)
+
+    def finalize(self, state, weather, time):
+        pass
