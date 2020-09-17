@@ -63,7 +63,7 @@ def daily_soil_routine(soil, crop, field_management, weather, time):
     # implementation of Peter Vadas' SurPhos (Surface Phosphorus Runoff) model
     phosphorus_cycling.update_all(soil, field_management, weather, time)
 
-    carbon_cycle.update_all(crop.current_crop, soil, weather, time)
+    carbon_cycle.update_all(soil, crop.current_crop, weather, time)
 
     # update annual sums at the end of each day
     annual_variable_update(soil)
