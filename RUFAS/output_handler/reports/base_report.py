@@ -72,6 +72,7 @@ class BaseReport:
     def daily_update(self, state, weather, time):
         animal_management = state.animal_management
         feed = state.feed
+        life_cycle_manager = animal_management.life_cycle_manager
 
         for variable in self.daily_variables:
             self.daily_variables[variable][2].append(
@@ -128,3 +129,6 @@ class BaseReport:
     def produce_report_graphics(self):
         graphics.annual_graphics(self)
         graphics.daily_graphics(self)
+
+    def finalize(self, state, weather, time):
+        pass
