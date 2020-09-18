@@ -13,7 +13,7 @@ from RUFAS.routines.animal.life_cycle.heiferI import HeiferI
 from RUFAS.routines.animal.life_cycle.heiferII import HeiferII
 from RUFAS.routines.animal.life_cycle.heiferIII import HeiferIII
 from RUFAS.routines.animal.life_cycle.cow import Cow
-from RUFAS.routines.animal.life_cycle.animal_initialization import AnimalInitalization
+from RUFAS.routines.animal.life_cycle.animal_initialization import AnimalInitialization
 from collections import Counter
 import matplotlib as mpl
 import matplotlib.pyplot as plt
@@ -208,7 +208,7 @@ class LifeCycleManager:
             heiferIIIs: list of heiferIIIs for the simulation
             cows: list of cows for the simulation
         """
-        self.animal_initializer = AnimalInitalization(self.config['calving_interval'], False)
+        self.animal_initializer = AnimalInitialization(self.config['calving_interval'], False)
         if self.config['use_input_calving_interval']:
             self.avg_CI = self.config['calving_interval']
         else:
