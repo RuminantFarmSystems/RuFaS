@@ -240,13 +240,13 @@ class Pen:
         while True:
 
             if 'Calf' in self.classes_in_pen:
-                ration_per_animal = calf_optimize(feed, self.avg_calf_nutrient_rqmts)
+                ration_per_animal = calf_optimize()
 
             elif 'HeiferI' in self.classes_in_pen or \
                     'HeiferII' in self.classes_in_pen or \
                     'HeiferIII' in self.classes_in_pen:
                 ration_per_animal = \
-                    growing_heifer_optimize(feed, self.avg_nutrient_rqmts)
+                    growing_heifer_optimize()
 
             elif 'Cow' in self.classes_in_pen and \
                     self.animals_in_pen[0].milking:  # lactating cow

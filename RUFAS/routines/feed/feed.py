@@ -32,7 +32,7 @@ def daily_feed_routine(feed, fields, animal_management):
     """
 
     # feed storage routines to be run daily
-    feed.daily_feed_storage(fields, animal_management)
+    feed.daily_feed_storage(fields)
     # feed management routines to be run daily
     feed.daily_feed_management(animal_management)
 

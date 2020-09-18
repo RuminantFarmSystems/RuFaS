@@ -25,7 +25,7 @@ class AnimalEvents(object):
 		Args:
 			events_str: string representation of events
 		"""
-		split_by_date = list(filter(lambda x : x != '', list(
+		split_by_date = list(filter(lambda x: x != '', list(
 			map(lambda x: x.strip(), events_str.lower().split('days born ')))))
 
 		for day in split_by_date:
@@ -41,6 +41,7 @@ class AnimalEvents(object):
 
 		Args:
 			animal_age: the date counter for the cow (from birth)
+			simulation_day: day in the simulation
 			description: the event happened on that day
 		"""
 		if animal_age in self.events:
