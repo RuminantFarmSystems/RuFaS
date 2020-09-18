@@ -571,13 +571,12 @@ class AnimalManagement:
         self.heiferIII_p_comp = self.p_comp(self.heiferIIIs)
         self.cow_p_comp = self.p_comp(self.cows)
 
-    def calc_p_rqmts(self, feed):
+    def calc_p_rqmts(self):
         """
         Calls each pen's method to calculate each animal's phosphorus
         requirements. This method is called daily.
 
         Args:
-            feed: instance of the Feed class
         """
 
         for pen in self.all_pens:
@@ -624,7 +623,7 @@ class AnimalManagement:
             self.daily_update_id_pen(animals_added, ids_removed, calves_born, feed, temp)
 
             # phosphorus requirements for daily updates
-            self.calc_p_rqmts(feed)  # per animal
+            self.calc_p_rqmts()  # per animal
 
             if self.end_ration_interval():
                 self.calc_nutrient_rqmts(feed, temp)  # per animal
