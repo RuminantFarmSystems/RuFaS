@@ -311,7 +311,7 @@ class AnimalManagement:
             temp: the temperature on the current day
         """
         for pen in self.all_pens:
-            pen.call_animal_nutrient_rqmts(feed, temp)
+            pen.call_animal_nutrient_rqmts(temp)
 
     def fully_update_id_pen(self):
         """
@@ -373,15 +373,14 @@ class AnimalManagement:
                 animal_p_conc = self.cow_p_comp
                 self.cows.append(animal)
 
-            self.all_pens[pen].set_up_new_animal(animal, animal_p_conc, self.housing,
-                                                 self.pasture_concentrate, feed, temp)
+            self.all_pens[pen].set_up_new_animal(animal, animal_p_conc, feed, temp)
 
         for calf in calves_born:
             # TODO: this is the hard coded calf pen value
             pen = 0
             self.id_pen[calf.id] = pen
             self.calves.append(calf)
-            self.all_pens[pen].set_up_new_animal(calf, -1, self.housing, self.pasture_concentrate, feed, temp)
+            self.all_pens[pen].set_up_new_animal(calf, self.pasture_concentrate, feed, temp)
 
     def pen_allocation(self):
         """
@@ -571,13 +570,12 @@ class AnimalManagement:
         self.heiferIII_p_comp = self.p_comp(self.heiferIIIs)
         self.cow_p_comp = self.p_comp(self.cows)
 
-    def calc_p_rqmts(self, feed):
+    def calc_p_rqmts(self):
         """
         Calls each pen's method to calculate each animal's phosphorus
         requirements. This method is called daily.
 
         Args:
-            feed: instance of the Feed class
         """
 
         for pen in self.all_pens:
@@ -624,7 +622,7 @@ class AnimalManagement:
             self.daily_update_id_pen(animals_added, ids_removed, calves_born, feed, temp)
 
             # phosphorus requirements for daily updates
-            self.calc_p_rqmts(feed)  # per animal
+            self.calc_p_rqmts()  # per animal
 
             if self.end_ration_interval():
                 self.calc_nutrient_rqmts(feed, temp)  # per animal

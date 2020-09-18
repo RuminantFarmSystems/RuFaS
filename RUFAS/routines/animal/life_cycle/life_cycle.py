@@ -559,7 +559,7 @@ class LifeCycleManager:
                         self._calc_average(self.preg_cow_num,
                                            self.avg_days_in_preg, cow.days_in_preg)
 
-                if cow.calves <= 3:
+                if 0 < cow.calves <= 3:
                     self.num_cow_for_parity[str(cow.calves)], \
                     self.avg_age_for_parity[str(cow.calves)] = \
                         self._calc_average(
