@@ -582,7 +582,7 @@ class AnimalManagement:
 
         for pen in self.all_pens:
             if pen.pen_populated:
-                pen.call_p_rqmts(feed)
+                pen.call_p_rqmts()
 
     def daily_p_update(self):
         """
