@@ -158,12 +158,14 @@ class LifeCycleManager:
 
     def initialize_herd(self, herd_num, calf_num, heiferI_num, heiferII_num,
                         heiferIII_num, cow_num, replace_num, herd_init, breed,
-                        sim_days=1500):
+                        config, sim_days=1500):
         """
         Generates a replacement herd to simulate the market, for the herd to get
          replacements. Initializes the herd.
 
         Args:
+            config: stores (among other things) information on whether the seed
+                has been set by the user
             herd_init: boolean - true to populate database with new animals,
                 false to use current database
             herd_num: what the number of cows should be maintained at
@@ -183,7 +185,7 @@ class LifeCycleManager:
             heiferIIIs: list of heiferIIIs for the simulation
             cows: list of cows for the simulation
         """
-        self.animal_initializer = AnimalInitalization(self.config['calving_interval'], breed, herd_init)
+        self.animal_initializer = AnimalInitalization(self.config['calving_interval'], breed, config.set_seed, herd_init)
         if self.config['use_input_calving_interval']:
             self.avg_CI = self.config['calving_interval']
         else:

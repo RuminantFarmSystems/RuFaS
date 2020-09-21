@@ -129,12 +129,12 @@ class AnimalManagement:
         """
 
         self.sim_length = config.sim_length
-        config = self.get_animal_config(data['animal_config'])
-        self.life_cycle_manager = LifeCycleManager(config)
-        AnimalBase.set_config(config)
+        animal_config = self.get_animal_config(data['animal_config'])
+        self.life_cycle_manager = LifeCycleManager(animal_config)
+        AnimalBase.set_config(animal_config)
         AnimalBase.set_nutrient_list(feed.nutrient_rqmts)
         self.init_pens(data['pen_information'], data['herd_information'])
-        self.init_animals(data['herd_information'], self.all_pens, feed, weather, time)
+        self.init_animals(data['herd_information'], self.all_pens, feed, weather, time, config)
         self.housing = data['housing']
         self.pasture_concentrate = data['pasture_concentrate']
         self.ration_user_input = data['ration']['user_input']
@@ -185,7 +185,7 @@ class AnimalManagement:
             pen_3 = Pen(2, 0.1, 1.6, 300, 'open air barn', 'straw', 'tiestall')
             self.all_pens.append(pen_3)
 
-    def init_animals(self, herd_data, pen_data, feed, weather, time):
+    def init_animals(self, herd_data, pen_data, feed, weather, time, config):
         """
         Populates the list of animals with the information from the
         input JSON file: constructs the calves, heiferI’s, heiferII’s,
@@ -242,7 +242,7 @@ class AnimalManagement:
                                                           heiferI_num, heiferII_num,
                                                           heiferIII_num, cow_num,
                                                           replace_num, herd_init,
-                                                          breed)
+                                                          breed, config)
 
         if len(pen_data) > 0:
             self.init_nutrient_rqmts(feed, weather, time)
