@@ -65,8 +65,13 @@ class AnimalInitalization:
             CI: the calving interval used in initialization
             init: whether or not update the database with new animals
     '''
-    def __init__(self, CI, breed, init=True):
+    def __init__(self, CI, breed, set_seed, init=True):
         self.CI = CI
+
+        # If set_seed is True, then we do not want the results to be ordered
+        # randomly. If set_seed is False, then we do want this.
+        self.order_by_random = not set_seed
+
         if init:
             conn = sqlite3.connect('input/animal/animals.sqlite')
             cur = conn.cursor()
@@ -342,7 +347,12 @@ class AnimalInitalization:
         cur = conn.cursor()
         while cur.execute('SELECT COUNT() FROM calves').fetchone()[0] < num:
             self.init_animals()
-        rows = cur.execute('SELECT * FROM calves ORDER BY RANDOM() LIMIT ' + str(num)).fetchall()
+
+        if self.order_by_random:
+            rows = cur.execute('SELECT * FROM calves ORDER BY RANDOM() LIMIT ' + str(num)).fetchall()
+        else:
+            rows = cur.execute('SELECT * FROM calves LIMIT ' + str(num)).fetchall()
+
         for row in rows:
             args = {
                 'id': int(row[AnimalValues.id]),
@@ -373,7 +383,12 @@ class AnimalInitalization:
         cur = conn.cursor()
         while cur.execute('SELECT COUNT() FROM heiferIs').fetchone()[0] < num:
             self.init_animals()
-        rows = cur.execute('SELECT * FROM heiferIs ORDER BY RANDOM() LIMIT ' + str(num)).fetchall()
+
+        if self.order_by_random:
+            rows = cur.execute('SELECT * FROM heiferIs ORDER BY RANDOM() LIMIT ' + str(num)).fetchall()
+        else:
+            rows = cur.execute('SELECT * FROM heiferIs LIMIT ' + str(num)).fetchall()
+
         for row in rows:
             args = {
                 'id': int(row[AnimalValues.id]),
@@ -403,7 +418,12 @@ class AnimalInitalization:
         cur = conn.cursor()
         while cur.execute('SELECT COUNT() FROM heiferIIs').fetchone()[0] < num:
             self.init_animals()
-        rows = cur.execute('SELECT * FROM heiferIIs ORDER BY RANDOM() LIMIT ' + str(num)).fetchall()
+
+        if self.order_by_random:
+            rows = cur.execute('SELECT * FROM heiferIIs ORDER BY RANDOM() LIMIT ' + str(num)).fetchall()
+        else:
+            rows = cur.execute('SELECT * FROM heiferIIs LIMIT ' + str(num)).fetchall()
+
         for row in rows:
             args = {
                 'id': int(row[AnimalValues.id]),
@@ -448,7 +468,12 @@ class AnimalInitalization:
         cur = conn.cursor()
         while cur.execute('SELECT COUNT() FROM heiferIIIs').fetchone()[0] < num:
             self.init_animals()
-        rows = cur.execute('SELECT * FROM heiferIIIs ORDER BY RANDOM() LIMIT ' + str(num)).fetchall()
+
+        if self.order_by_random:
+            rows = cur.execute('SELECT * FROM heiferIIIs ORDER BY RANDOM() LIMIT ' + str(num)).fetchall()
+        else:
+            rows = cur.execute('SELECT * FROM heiferIIIs LIMIT ' + str(num)).fetchall()
+
         for row in rows:
             args = {
                 'id': int(row[AnimalValues.id]),
@@ -493,7 +518,12 @@ class AnimalInitalization:
         cur = conn.cursor()
         while cur.execute('SELECT COUNT() FROM cows').fetchone()[0] < num:
             self.init_animals()
-        rows = cur.execute('SELECT * FROM cows ORDER BY RANDOM() LIMIT ' + str(num)).fetchall()
+
+        if self.order_by_random:
+            rows = cur.execute('SELECT * FROM cows ORDER BY RANDOM() LIMIT ' + str(num)).fetchall()
+        else:
+            rows = cur.execute('SELECT * FROM cows LIMIT ' + str(num)).fetchall()
+
         for row in rows:
             args = {
                 'id': int(row[AnimalValues.id]),
@@ -538,7 +568,12 @@ class AnimalInitalization:
         cur = conn.cursor()
         while cur.execute('SELECT COUNT() FROM replacement').fetchone()[0] < num:
             self.init_animals()
-        rows = cur.execute('SELECT * FROM replacement ORDER BY RANDOM() LIMIT ' + str(num)).fetchall()
+
+        if self.order_by_random:
+            rows = cur.execute('SELECT * FROM replacement ORDER BY RANDOM() LIMIT ' + str(num)).fetchall()
+        else:
+            rows = cur.execute('SELECT * FROM replacement LIMIT ' + str(num)).fetchall()
+
         for row in rows:
             args = {
                 'id': int(row[AnimalValues.id]),
