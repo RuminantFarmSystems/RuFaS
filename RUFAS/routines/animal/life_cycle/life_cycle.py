@@ -194,27 +194,27 @@ class LifeCycleManager:
             self.avg_CI = self.initialize_db_summary['cow_avg_CI']
         self.herd_num = herd_num
 
-        calves = self.animal_initializer.get_calves(calf_num)
+        calves = self.animal_initializer.get_calves(calf_num, breed)
         for calf in calves:
             calf.events.add_event(calf.days_born, 0, c.INIT_HERD)
 
-        heiferIs = self.animal_initializer.get_heiferIs(heiferI_num)
+        heiferIs = self.animal_initializer.get_heiferIs(heiferI_num, breed)
         for heiferI in heiferIs:
             heiferI.events.add_event(heiferI.days_born, 0, c.INIT_HERD)
 
-        heiferIIs = self.animal_initializer.get_heiferIIs(heiferII_num)
+        heiferIIs = self.animal_initializer.get_heiferIIs(heiferII_num, breed)
         for heiferII in heiferIIs:
             heiferII.events.add_event(heiferII.days_born, 0, c.INIT_HERD)
 
-        heiferIIIs = self.animal_initializer.get_heiferIIIs(heiferIII_num)
+        heiferIIIs = self.animal_initializer.get_heiferIIIs(heiferIII_num, breed)
         for heiferIII in heiferIIIs:
             heiferIII.events.add_event(heiferIII.days_born, 0, c.INIT_HERD)
 
-        cows = self.animal_initializer.get_cows(cow_num)
+        cows = self.animal_initializer.get_cows(cow_num, breed)
         for cow in cows:
             cow.events.add_event(cow.days_born, 0, c.INIT_HERD)
 
-        self.replacement_market = self.animal_initializer.get_replacement_cows(replace_num)
+        self.replacement_market = self.animal_initializer.get_replacement_cows(replace_num, breed)
         return calves, heiferIs, heiferIIs, heiferIIIs, cows
 
     def daily_update(self, date, sim_length, calves, heiferIs, heiferIIs,
