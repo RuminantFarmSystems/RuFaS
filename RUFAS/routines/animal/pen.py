@@ -177,7 +177,7 @@ class Pen:
                 self.DBW = -0.4125
                 self.daily_growth = self.DBW
             elif type(animal).__name__ == 'Calf':
-                animal.calc_nutrient_rqmts(temp)
+                animal.calc_nutrient_rqmts(feed, temp)
             else:
                 animal.calc_nutrient_rqmts()
 
@@ -416,7 +416,7 @@ class Pen:
             animal.nutrient_rqmts = self.avg_nutrient_rqmts
 
         if animal.nutrient_rqmts == {} and type(animal).__name__ == 'Calf':
-            animal.calc_nutrient_rqmts(temp)
+            animal.calc_nutrient_rqmts(feed, temp)
         elif animal.nutrient_rqmts == {} and not type(animal).__name__ == 'Calf':
             animal.calc_nutrient_rqmts()
 

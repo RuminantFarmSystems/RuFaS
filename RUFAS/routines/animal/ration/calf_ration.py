@@ -18,7 +18,7 @@ def optimize(feed, rqmts):
             'status': 'Optimal',
             'objective': 4.5}
 
-def calc_requirements(calf, temp, wean_day, wean_length, milk_type):
+def calc_requirements(calf, feed, temp, wean_day, wean_length, milk_type):
     '''
     Calculate dietary intake and nutrient requirements for the calf. 
 
@@ -33,34 +33,26 @@ def calc_requirements(calf, temp, wean_day, wean_length, milk_type):
     whole_milk_id = 155
     milk_replacer_id = 156
     starter_id = 157
+    calf_feeds = feed.calf_feeds
 
-    conn = sqlite3.connect('input/databases/feeds.sqlite')
-    cur = conn.cursor()
-    cur.execute('SELECT * FROM nutrients WHERE feed_id = ?', (whole_milk_id,))
-    whole_milk = cur.fetchone()
-    whole_milk_dm = whole_milk[2]
-    whole_milk_cp = whole_milk[3]
-    whole_milk_de = whole_milk[26]
+    whole_milk_dm = calf_feeds[whole_milk_id]['DM']
+    whole_milk_cp = calf_feeds[whole_milk_id]['CP']
+    whole_milk_de = calf_feeds[whole_milk_id]['DE']
     # [A.1B.C.1]
     whole_milk_me = 0.96 * whole_milk_de
 
-    cur.execute('SELECT * FROM nutrients WHERE feed_id = ?', (milk_replacer_id,))
-    milk_replacer = cur.fetchone()
-    milk_replacer_dm = milk_replacer[2]
-    milk_replacer_cp = milk_replacer[3]
-    milk_replacer_de = milk_replacer[26]
+    milk_replacer_dm = calf_feeds[milk_replacer_id]['DM']
+    milk_replacer_cp = calf_feeds[milk_replacer_id]['CP']
+    milk_replacer_de = calf_feeds[milk_replacer_id]['DE']
     # [A.1B.C.1]
     milk_replacer_me = 0.96 * milk_replacer_de
 
-    cur.execute('SELECT * FROM nutrients WHERE feed_id = ?', (starter_id,))
-    starter = cur.fetchone()
-    starter_cp = starter[3]
-    starter_de = starter[26]
-    starter_ee = starter[6]
+    starter_cp = calf_feeds[starter_id]['CP']
+    starter_de = calf_feeds[starter_id]['DE']
+    starter_ee = calf_feeds[starter_id]['EE']
     # [A.1B.C.2]
     starter_me = (1.01 * starter_de - 0.45) + 0.0046 * (starter_ee - 3)
-    conn.close()
-    
+
     if milk_type == "whole":
         milk_replacer_dm = 0
     else:

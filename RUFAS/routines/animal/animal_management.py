@@ -265,7 +265,7 @@ class AnimalManagement:
 
         for calf in self.calves:
             temp = weather.T_avg[time.year - 1][time.day - 1]
-            calf.calc_nutrient_rqmts(temp)
+            calf.calc_nutrient_rqmts(feed, temp)
             calf.p_animal = 0.0072 * calf.body_weight * 1000
 
         for heiferI in self.heiferIs:
