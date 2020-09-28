@@ -45,7 +45,7 @@ def residue_partitioning(crop_type, soil, weather, time):
     """
 
     # S.6.A.1
-    d_lignin_residue_percent = 0.12 * weather.rainfall[time.year - 1][time.day - 1] * 0.01
+    d_lignin_residue_percent = 0.12 * weather.rainfall[time.year - 1][time.day - 1] * 0.1
     soil.lignin_residue_percent += d_lignin_residue_percent
 
     # TODO fr_N might need a different calculation in the future
@@ -96,7 +96,7 @@ def residue_partitioning(crop_type, soil, weather, time):
         metabolic_AG_to_BG = layer.metabolic_AG * layer.fr_tillage
 
         # S.6.A.8
-        d_metabolic_AG = soil.residue_DM_harvest * metabolic_AG_frac - (
+        d_metabolic_AG = soil.residue_harvest * metabolic_AG_frac - (
                 (layer.metabolic_AG_to_C_active - metabolic_AG_to_BG) + metabolic_AG_to_BG)
         layer.metabolic_AG += d_metabolic_AG
 
@@ -114,28 +114,28 @@ def residue_partitioning(crop_type, soil, weather, time):
         struct_AG_to_BG = layer.structural_AG * layer.fr_tillage
 
         # S.6.A.12
-        d_structural_AG = ((soil.residue_DM_harvest * (1 - metabolic_AG_frac)) - struct_AG_to_BG) - \
+        d_structural_AG = ((soil.residue_harvest * (1 - metabolic_AG_frac)) - struct_AG_to_BG) - \
                           (layer.struct_AG_to_C_active + layer.struct_AG_to_C_slow)
         layer.structural_AG += d_structural_AG
 
         # below ground metabolic residue and roots
         # S.6.A.13
-        residue_DM_incorp = layer.fr_tillage * soil.residue_DM_harvest
+        residue_incorp = layer.fr_tillage * soil.residue_harvest
 
         # S.6.A.14
-        fr_lignin_residue_DM = 0
-        if residue_DM_incorp + crop_type.bio_BG != 0:
-            fr_lignin_residue_DM = residue_DM_incorp / (residue_DM_incorp + crop_type.bio_BG)
+        fr_lignin_residue = 0
+        if residue_incorp + crop_type.bio_BG != 0:
+            fr_lignin_residue = residue_incorp / (residue_incorp + crop_type.bio_BG)
 
         # S.6.A.15
-        soil.lignin_residue_BG_percent = soil.lignin_residue_BG_percent - 0.15 \
-                                         * weather.rainfall[time.year - 1][time.day - 1] * 0.01
+        soil.lignin_residue_BG_percent = max(0.0, soil.lignin_residue_BG_percent - 0.15
+                                             * weather.rainfall[time.year - 1][time.day - 1] * 0.1)
 
         # S.6.A.16
         LN_ratio_BG = 0
         if crop_type.fr_N != 0:
-            LN_ratio_BG = LN_ratio_AG * fr_lignin_residue_DM + ((soil.lignin_residue_percent / 100) / crop_type.fr_N) \
-                          * (1 - fr_lignin_residue_DM)
+            LN_ratio_BG = LN_ratio_AG * fr_lignin_residue + ((soil.lignin_residue_percent / 100) / crop_type.fr_N) \
+                          * (1 - fr_lignin_residue)
 
         # S.6.A.17
         metabolic_BG_frac = 0.85 - 0.18 * LN_ratio_BG

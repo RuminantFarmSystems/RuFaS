@@ -388,7 +388,7 @@ class Feed:
                     # forage to be fed out 30 days after harvest for new yield
                     self.days_since_feedout = -30
                 self.feed_id = crop.feed_id
-                self.DM += crop.DM_yield
+                self.DM += crop.yield_actual
                 self.NDF += crop.NDF_yield
                 self.N += crop.N_yield
                 self.P += crop.P_yield
