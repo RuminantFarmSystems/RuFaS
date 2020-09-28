@@ -210,6 +210,7 @@ def calc_residue(soil, crop_type, field_management, time):
         time
     """
     # for carbon, needs to be calculated only at harvest
+    # C.3.A.4
     crop_type.bio_BG = crop_type.fr_root * crop_type.biomass_actual
     soil.soil_layers[0].fr_tillage = 0.55
     soil.lignin_residue_percent = 17
