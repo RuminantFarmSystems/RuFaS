@@ -311,7 +311,7 @@ class Soil:
         self.active_N_drainage_annual = 0.0
 
         # soil carbon attributes
-        self.residue_DM_harvest = 0.0
+        self.residue_harvest = 0.0
         self.lignin_residue_percent = 17  # tied to the reset of this variable in yields, if changed, change together
         self.lignin_residue_AG_percent = 2.6  # tied to the reset of this variable in yields, if changed, change together
         self.lignin_residue_BG_percent = 2.6  # tied to the reset of this variable in yields, if changed, change together
