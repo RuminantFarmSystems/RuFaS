@@ -119,7 +119,6 @@ class Corn(BaseCrop):
         self.fr_n3ish = 0.01381
 
         self.fr_N = 0
-        self.fr_N_up = 0
         self.N_up = 0
         self.act_N_up_each_layer = []
         self.N_actual_up = 0
@@ -161,9 +160,9 @@ class Corn(BaseCrop):
         self.NDF_harvest_percent = 0.0
 
         self.bio_AG = 0
+        self.bio_BG = 0
         self.yield_max = 0
         self.yield_actual = 0
-        self.DM_yield = 0.0
         self.NDF_yield = 0.0
         self.N_yield = 0
         self.P_yield = 0
