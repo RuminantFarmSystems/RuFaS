@@ -61,8 +61,8 @@ class FieldsSummary(BaseReport):
             'N_erosion': ['fields.N_erosion_annual', 'kg', 0],
             'P_erosion': ['fields.P_erosion_annual', 'kg', 0],
             'yield': ['fields.yield_annual', 'kg', 0],
-            'N_yield': ['fields.yield_N_annual', 'kg', 0],
-            'P_yield': ['fields.yield_P_annual', 'kg', 0]
+            'N_yield': ['fields.N_yield_annual', 'kg', 0],
+            'P_yield': ['fields.P_yield_annual', 'kg', 0]
         }
 
 
@@ -123,10 +123,8 @@ class FieldReport(BaseReportDriver):
                                     'Bio_N': ['crop_type.bio_N', 'kg N ha^-1', []],
                                     'Bio_P': ['crop_type.bio_P', 'kg P ha^-1', []],
                                     'rooting_depth': ['crop_type.z_root', 'mm', []],
-                                    'HI_act': ['crop_type.HI_actual', '', []],
-                                    'HI_min': ['crop_type.HI_min', '', []],
-                                    'HI_max': ['crop_type.HI_max', '', []],
-                                    'yield_actual': ['crop_type.yield_actual', 'kg ha^-1', []]
+                                    'yield_actual': ['crop_type.yield_actual', 'kg ha^-1', []],
+                                    'HI_act': ['crop_type.HI_actual', 'dmnl', []]
                                     }
 
             self.annual_variables = {'year': ['time.calendar_year', '', 0],
@@ -141,6 +139,7 @@ class FieldReport(BaseReportDriver):
             self.reports = {
                 'soil_nitrogen_report': self.SoilNitrogenReport(data['soil_nitrogen_report'], field_name),
                 'soil_phosphorus_report': self.SoilPhosphorusReport(data['soil_phosphorus_report'], field_name),
+                'soil_carbon_report': self.SoilCarbonReport(data['soil_carbon_report'], field_name),
                 'soil_summary': self.SoilSummary(data['soil_summary'], field_name)
             }
 
@@ -158,6 +157,7 @@ class FieldReport(BaseReportDriver):
             def daily_update(self, state, weather, time):
                 field = state.fields.fields[self.field_name]
                 soil = field.soil
+                crop_type = field.crop.current_crop
                 field_management = field.field_management
 
                 for variable in self.daily_variables:
@@ -167,6 +167,7 @@ class FieldReport(BaseReportDriver):
             def annual_update(self, state, weather, time):
                 field = state.fields.fields[self.field_name]
                 soil = field.soil
+                crop_type = field.crop.current_crop
                 field_management = field.field_management
 
                 for variable in self.annual_variables:
@@ -215,7 +216,16 @@ class FieldReport(BaseReportDriver):
                     'nitrification_volatilization': ['layer.nitri_volatil', 'kg/ha', []],
                     'N_trans': ['layer.N_trans', 'kg', []],
                     'NO3_percolation': ['layer.NO3_percolation', 'kg', []],
-                    'NH4_percolation': ['layer.NH4_percolation', 'kg', []]
+                    'NH4_percolation': ['layer.NH4_percolation', 'kg', []],
+                    'soil_C_percent': ['layer.carbon_percent', '%', []],
+                    'total_CO2_C_loss': ['layer.total_CO2_C_loss', 'kg/ha', []],
+                    'total_carbon': ['layer.total_carbon', 'kg/ha', []],
+                    'M_d': ['layer.M_d', '', []],
+                    'fr_tillage': ['layer.fr_tillage', '', []],
+                    'water_fac': ['layer.water_fac', '', []],
+                    'active': ['layer.carbon_active', 'kg/ha', []],
+                    'slow': ['layer.carbon_slow', 'kg/ha', []],
+                    'passive': ['layer.carbon_passive', 'kg/ha', []]
                 }
 
                 self.annual_variables = {
@@ -301,6 +311,23 @@ class FieldReport(BaseReportDriver):
                                          'MOP_runoff': ['soil.MOP_runoff_annual', 'kg', 0],
                                          'profile_P': ['soil.profile_P_annual', 'kg', 0],
                                          'STP': ['soil.STP_annual', 'kg', 0]
+                                         }
+
+        class SoilCarbonReport(BaseSoilReport):
+            def __init__(self, data, field_name):
+                super().__init__(data, field_name)
+
+                self.daily_variables = {'year': ['time.calendar_year', '', []],
+                                        'j_day': ['time.day', '', []],
+                                        'residue_harvest': ['soil.residue_harvest', 'kg/ha', []],
+                                        'bio_BG': ['crop_type.bio_BG', 'kg/ha', []],
+                                        'fr_N': ['crop_type.fr_N', '', []],
+                                        'lignin_residue_percent': ['soil.lignin_residue_percent', '', []],
+                                        'precipitation': ['weather.rainfall[time.year - 1][time.day - 1]', 'mm', []],
+                                        'T_d': ['soil.T_d', '', []],
+                                        }
+
+                self.annual_variables = {'year': ['time.calendar_year', '', 0]
                                          }
 
         class SoilSummary(BaseSoilReport):

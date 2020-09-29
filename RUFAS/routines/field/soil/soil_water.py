@@ -80,6 +80,9 @@ def update_profile_SW(soil, weather, time):
         soil.ET_act += (evap + trans)
 
         layer.soil_water = SW
+
+        layer.wfps = SW / layer.sat_water
+
         soil.soil_layers[x] = layer
 
     soil.drainage = percolation

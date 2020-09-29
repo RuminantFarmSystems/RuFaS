@@ -80,8 +80,8 @@ class Fields:
         self.P_yield = 0.0
 
         self.yield_annual = 0.0
-        self.yield_N_annual = 0.0
-        self.yield_P_annual = 0.0
+        self.N_yield_annual = 0.0
+        self.P_yield_annual = 0.0
 
     def summarize_fields(self):
         self.profile_SW = 0.0
@@ -159,8 +159,8 @@ class Fields:
         self.P_erosion_annual += self.P_erosion
 
         self.yield_annual += self.yield_actual
-        self.yield_N_annual += self.N_yield
-        self.yield_P_annual += self.P_yield
+        self.N_yield_annual += self.N_yield
+        self.P_yield_annual += self.P_yield
 
     def annual_reset(self):
         for field in self.fields.values():
@@ -185,8 +185,8 @@ class Fields:
         self.P_erosion_annual = 0.0
 
         self.yield_annual = 0.0
-        self.yield_N_annual = 0.0
-        self.yield_P_annual = 0.0
+        self.N_yield_annual = 0.0
+        self.P_yield_annual = 0.0
 
 
 class Field:

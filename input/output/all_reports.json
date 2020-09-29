@@ -53,6 +53,11 @@
                 "produce_graphics": true,
                 "report_name": "soil_phosphorus_report"
             },
+            "soil_carbon_report": {
+                "produce_csv": true,
+                "produce_graphics": true,
+                "report_name": "soil_carbon_report"
+            },
             "soil_summary": {
                 "produce_csv": true,
                 "produce_graphics": true,

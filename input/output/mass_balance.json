@@ -53,6 +53,11 @@
                 "produce_graphics": false,
                 "report_name": "soil_phosphorus_report"
             },
+            "soil_carbon_report": {
+                "produce_csv": true,
+                "produce_graphics": false,
+                "report_name": "soil_carbon_report"
+            },
             "soil_summary": {
                 "produce_csv": true,
                 "produce_graphics": false,
@@ -89,9 +94,10 @@
             "produce_graphics": false,
             "report_name": "fields_summary"
         }
-    },    "mass_balance": {
+    },
+    "mass_balance": {
         "produce_csv": true,
-        "produce_graphics": false,
+        "produce_graphics": true,
         "report_name": "mass_balance_report"
     },
     "feed_storage_report": {
