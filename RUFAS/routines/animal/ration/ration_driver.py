@@ -129,12 +129,12 @@ def ration_report(ration, available_feeds):
                                        * val
         nutrient_amount['K_amount'] += (available_feeds[key]['potassium'] / 100) \
                                        * val
-        # [A.2.A.1]
-        if key[:3] in ['121', '122', '155', '157']:
-            denom = 6.25
         # [A.2.A.2]
-        else:
+        if key[:3] in ['121', '122', '155', '157']:
             denom = 6.38
+        # [A.2.A.1]
+        else:
+            denom = 6.25
         nutrient_amount['N_amount'] += (available_feeds[key]['CP'] / (denom * 100)) * val
     dm_amount = nutrient_amount['dm_amount']
     nutrient_conc['dm_conc'] = 100
