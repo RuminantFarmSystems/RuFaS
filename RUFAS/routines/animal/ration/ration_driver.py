@@ -109,7 +109,7 @@ def ration_report(ration, available_feeds):
         ration: a dictionary of the calculated ration
         available_feeds: available feeds dictionary from the Feed class object
     """
-    nutrient_amount = {'dm_amount': 0, 'cp_amount': 0, 'adf_amount': 0,
+    nutrient_amount = {'dm_amount': 0, 'as_fed_amount': 0, 'cp_amount': 0, 'adf_amount': 0,
                        'ndf_amount': 0, 'lignin_amount': 0, 'ash_amount': 0,
                        'P_amount': 0, 'K_amount': 0, 'N_amount': 0}
     nutrient_conc = {}
@@ -118,7 +118,9 @@ def ration_report(ration, available_feeds):
     ration.pop('objective')
     for key, val in ration.items():
         # TODO: Code condensation
-        nutrient_amount['dm_amount'] += (available_feeds[key]['DM'] / 100) * val
+        nutrient_amount['dm_amount'] += val
+        nutrient_amount['as_fed_amount'] += val / (available_feeds[key]['DM'] / 100)
+        # all values on a 100% dry matter basis
         nutrient_amount['cp_amount'] += (available_feeds[key]['CP'] / 100) * val
         nutrient_amount['adf_amount'] += (available_feeds[key]['ADF'] / 100) * val
         nutrient_amount['ndf_amount'] += (available_feeds[key]['NDF'] / 100) * val
@@ -137,7 +139,8 @@ def ration_report(ration, available_feeds):
             denom = 6.25
         nutrient_amount['N_amount'] += (available_feeds[key]['CP'] / (denom * 100)) * val
     dm_amount = nutrient_amount['dm_amount']
-    nutrient_conc['dm_conc'] = 100
+    nutrient_conc['dm_conc'] = dm_amount / nutrient_amount['as_fed_amount']
+    # all values on a 100% dry matter basis
     nutrient_conc['cp_conc'] = (nutrient_amount['cp_amount'] / dm_amount) * 100
     nutrient_conc['adf_conc'] = (nutrient_amount['adf_amount'] / dm_amount) * 100
     nutrient_conc['ndf_conc'] = (nutrient_amount['ndf_amount'] / dm_amount) * 100
