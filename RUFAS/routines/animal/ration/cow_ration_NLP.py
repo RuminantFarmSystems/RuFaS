@@ -133,6 +133,7 @@ def NEmact_constraint(x):
     """
     global MEact
     global TDNact
+    global DEact
     # DMI calculated by the NLP
     DMI = sum(x)
     # Dietary TDN content, kg
@@ -167,7 +168,9 @@ def NEmact_constraint(x):
     # Actual metabolizable energy of feed i, Mcal/kg
     MEact = []
     for i in range(len(DEact)):
-        if is_fat[i] == 1:
+        if type[i] == 'Mineral':
+            MEact.append(0)
+        elif is_fat[i] == 1:
             MEact.append(DE[i])
         elif EE[i] >= 3:
             MEact.append(1.01 * DEact[i] - 0.45 + 0.0046 * (EE[i] - 3))
@@ -205,8 +208,10 @@ def NEl_constraint(x):
     NElact = []
     # [A.Cow.E.6]
     for i in range(len(MEact)):
-        if is_fat[i] == 1:
-            NElact.append(0.8 * MEact[i])
+        if type[i] == 'Mineral':
+            NElact.append(0)
+        elif is_fat[i] == 1:
+            NElact.append(0.8 * DEact[i])
         elif EE[i] >= 3:
             NElact.append(0.703 * MEact[i] - 0.19 + ((0.097 * MEact[i] + 0.19) / 97) * (EE[i] - 3))
         else:
@@ -235,7 +240,9 @@ def NEgact_constraint(x):
     NEgact = []
     # [A.Cow.E.8]
     for i in range(len(MEact)):
-        if is_fat[i] == 1:
+        if type[i] == 'Mineral':
+            NEgact.append(0)
+        elif is_fat[i] == 1:
             NEgact.append(0.55 * MEact[i])
         else:
             NEgact.append(1.42 * MEact[i] - 0.174 * MEact[i] ** 2 + 0.0122 * MEact[i] ** 3 - 1.65)
@@ -340,7 +347,7 @@ def protien_constraint(x):
         if type[i] == 'Conc':
             Kp.append(2.904 + 1.375 * (DMI / BW) * 100 - 0.02 * PercentConc)
         elif type[i] == 'Forage' and is_wetforage[i] == 0:
-            Kp.append(3.362 + 0.479 * (DMI / BW) * 100 - 0.17 * NDF[i] - 0.007 * PercentConc)
+            Kp.append(3.362 + 0.479 * (DMI / BW) * 100 - 0.017 * NDF[i] - 0.007 * PercentConc)
         elif is_wetforage[i] == 1:
             Kp.append(3.054 + 0.614 * (DMI / BW) * 100)
         else:
