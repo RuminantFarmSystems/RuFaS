@@ -18,7 +18,8 @@ class SpringWheat(BaseCrop):
         self.crop_name = crop_name
         self.crop_type = 'annual'
         self.harvest_quality = 'null'
-        self.feed_id = ''  # need
+        self.feed_id = '130g'
+        self.raw_id = 130
 
         self.kill_day = -1
         self.kill_year = True

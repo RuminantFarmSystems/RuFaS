@@ -1,4 +1,3 @@
-################################################################################
 """
 RUFAS: Ruminant Farm Systems Model
 File name: lactating_cow_ration.py
@@ -6,7 +5,6 @@ Description: Calculates the ration for lactating cows.
 Author(s): Kass Chupongstimun, kass_c@hotmail.com
            Militsa Sotirova, militsasotirova@gmail.com
 """
-################################################################################
 
 from numpy import exp
 from RUFAS import util
