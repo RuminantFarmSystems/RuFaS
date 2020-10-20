@@ -1,22 +1,23 @@
-from .hardcoded_ration import get_nutrient_rqmts, get_ration
+from .hardcoded_ration import get_ration
 import math
 import sqlite3
 
 
-def optimize(feed, rqmts):
+def optimize():
     return get_ration()
 
+
 def calc_requirements(calf, temp, wean_day, wean_length, milk_type):
-    '''
-    Calculate dietary intake and nutrient requirements for the calf. 
+    """
+    Calculate dietary intake and nutrient requirements for the calf.
 
     Args:
-        calf: the calf to calculate the nutrient requirement for 
+        calf: the calf to calculate the nutrient requirement for
         temp: the average temperature of the simulation day
         wean_day: the wean day of the calf
         wean_length: the wean length of the calf
         milk_type: either "whole" or "replacer"
-    '''
+    """
     # nutrient composition of feeds from the feed library
     whole_milk_id = 155
     milk_replacer_id = 156
@@ -82,9 +83,11 @@ def calc_requirements(calf, temp, wean_day, wean_length, milk_type):
     # [A.1B.D.1]
     dm_intake = whole_milk_intake + milk_replacer_intake + starter_intake
     # [A.1B.C.4]
-    me_intake = whole_milk_me * whole_milk_intake + milk_replacer_me * milk_replacer_intake + starter_me * starter_intake
+    me_intake = whole_milk_me * whole_milk_intake + milk_replacer_me * \
+                milk_replacer_intake + starter_me * starter_intake
     # [A.1B.E.1]
-    cp_intake = 0.01 * (whole_milk_cp * whole_milk_intake + milk_replacer_cp * milk_replacer_intake + starter_cp * starter_intake)
+    cp_intake = 0.01 * (whole_milk_cp * whole_milk_intake + milk_replacer_cp *
+                        milk_replacer_intake + starter_cp * starter_intake)
 
     # [A.1B.C.5]
     milk_me_proportion = (whole_milk_intake * whole_milk_me + milk_replacer_intake * milk_replacer_me) / me_intake
@@ -183,4 +186,3 @@ def calc_requirements(calf, temp, wean_day, wean_length, milk_type):
     }
 
     return animal_intake, nutrient_requirements
-

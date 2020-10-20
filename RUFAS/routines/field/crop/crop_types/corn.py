@@ -18,6 +18,7 @@ class Corn(BaseCrop):
         self.crop_name = crop_name
         self.crop_type = 'annual'
         self.harvest_quality = 'null'
+        self.raw_id = 34
         self.feed_id = '34g'
 
         self.kill_day = -1

@@ -1,7 +1,7 @@
 from .hardcoded_ration import get_nutrient_rqmts, get_ration
 
 
-def optimize(feed, rqmts):
+def optimize():
     return get_ration()
 
 

@@ -1,15 +1,12 @@
-################################################################################
 """
 RUFAS: Ruminant Farm Systems Model
 File name: calf_ration.py
 Description: Calculates the ration for calves.
 Author(s): Militsa Sotirova, militsasotirova@gmail.com
 """
-################################################################################
-import math
 
 
-def optimize(feed, rqmts):
+def optimize():
     """
     Sets up the arguments for the linear programming optimization.
 
