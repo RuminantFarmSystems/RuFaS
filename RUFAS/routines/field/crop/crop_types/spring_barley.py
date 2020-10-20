@@ -18,7 +18,8 @@ class SpringBarley(BaseCrop):
         self.crop_name = crop_name
         self.crop_type = 'annual'
         self.harvest_quality = 'null'
-        self.feed_id = ''  # need
+        self.feed_id = '11g'
+        self.raw_id = 11
 
         self.kill_day = -1
         self.kill_year = True
@@ -31,7 +32,7 @@ class SpringBarley(BaseCrop):
         ''' HEAT UNIT DATA '''
 
         # input
-        self.T_base_min = 10  # unknown
+        self.T_base_min = 10  # TODO: unknown
         self.T_base_max = 35
         self.PHU = 952
 
@@ -163,7 +164,6 @@ class SpringBarley(BaseCrop):
         self.bio_AG = 0
         self.yield_max = 0
         self.yield_actual = 0
-        self.DM_yield = 0.0
         self.NDF_yield = 0.0
         self.N_yield = 0
         self.P_yield = 0

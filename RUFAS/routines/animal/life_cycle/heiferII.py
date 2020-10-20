@@ -17,7 +17,7 @@ from RUFAS.routines.animal.life_cycle.heiferI import HeiferI
 from RUFAS.routines.animal.life_cycle.animal_base import AnimalBase
 from RUFAS.routines.animal.ration.growing_heifer_ration import calculate_rqmts
 from RUFAS.routines.animal.manure.growing_heifer_manure_excretion import \
-	manure_calculations
+    manure_calculations
 from random import random
 import math
 from RUFAS.routines.animal.life_cycle import animal_events_constants as c
@@ -171,31 +171,31 @@ class HeiferII(HeiferI):
 		Get current information from the heiferII
 		"""
 		values = {
-            'id' : self.id,
-            'breed' : self.breed,
-            'birth_date' : self.birth_date,
-            'days_born' : self.days_born,
-            'birth_weight' : self.birth_weight,
-            'body_weight' : self.body_weight,
-            'wean_weight' : self.wean_weight,
-            'events' : str(self.events),
-            'repro_program': self.repro_program,
-            'tai_method_h': self.tai_method_h,
-            'synch_ed_method_h': self.synch_ed_method_h,
-            'mature_body_weight': self.mature_body_weight,
-            'estrus_count': self.estrus_count,
-            'estrus_day': self.estrus_day,
-            'tai_program_start_day_h': self.tai_program_start_day_h,
-            'synch_ed_program_start_day_h': self.synch_ed_program_start_day_h,
-            'synch_ed_estrus_day': self.synch_ed_estrus_day,
-            'synch_ed_stop_day': self.synch_ed_stop_day,
-            'conception_rate': self.conception_rate,
-            'ai_day': self.ai_day,
-            'abortion_day': self.abortion_day,
-            'days_in_preg': self.days_in_preg,
-            'gestation_length': self.gestation_length,
+			'id': self.id,
+			'breed': self.breed,
+			'birth_date': self.birth_date,
+			'days_born': self.days_born,
+			'birth_weight': self.birth_weight,
+			'body_weight': self.body_weight,
+			'wean_weight': self.wean_weight,
+			'events': str(self.events),
+			'repro_program': self.repro_program,
+			'tai_method_h': self.tai_method_h,
+			'synch_ed_method_h': self.synch_ed_method_h,
+			'mature_body_weight': self.mature_body_weight,
+			'estrus_count': self.estrus_count,
+			'estrus_day': self.estrus_day,
+			'tai_program_start_day_h': self.tai_program_start_day_h,
+			'synch_ed_program_start_day_h': self.synch_ed_program_start_day_h,
+			'synch_ed_estrus_day': self.synch_ed_estrus_day,
+			'synch_ed_stop_day': self.synch_ed_stop_day,
+			'conception_rate': self.conception_rate,
+			'ai_day': self.ai_day,
+			'abortion_day': self.abortion_day,
+			'days_in_preg': self.days_in_preg,
+			'gestation_length': self.gestation_length,
 			'p_gest_for_calf': self.p_gest_for_calf
-        }
+		}
 		return values
 
 	def calc_nutrient_rqmts(self):
@@ -232,17 +232,17 @@ class HeiferII(HeiferI):
 		# absorbed P retained for growth (g) (A.1A-F.E.3)
 		self.p_growth = \
 			(0.0012 + 0.004635 * (self.mature_body_weight ** 0.22) *
-				(self.body_weight ** (-0.22))) * \
+			 (self.body_weight ** (-0.22))) * \
 			self.daily_growth / 0.96 * 1000
 
 		# absorbed P retained for fetal growth (g) (A.1C-F.E.4)
 		if self.days_in_preg >= 190:
 			exp_1 = (0.05527 - 0.000075 * self.days_in_preg) * self.days_in_preg
 			exp_2 = (0.05527 - 0.000075 * (self.days_in_preg - 1)) * \
-				(self.days_in_preg - 1)
+					(self.days_in_preg - 1)
 			self.p_gest = (
-					0.00002743 * math.exp(exp_1) -
-					0.00002743 * math.exp(exp_2)) * 1000
+								  0.00002743 * math.exp(exp_1) -
+								  0.00002743 * math.exp(exp_2)) * 1000
 			self.p_gest_for_calf += self.p_gest
 		else:
 			self.p_gest = 0
@@ -496,7 +496,7 @@ class HeiferII(HeiferI):
 		"""
 		synch_ed_estrus = np.random.normal(avg, std)
 		while synch_ed_estrus < avg - 2 * std \
-			or synch_ed_estrus > avg + 2 * std:
+				or synch_ed_estrus > avg + 2 * std:
 			synch_ed_estrus = np.random.normal(avg, std)
 		norm = abs(synch_ed_estrus)
 		if norm >= max_val:

@@ -1,14 +1,12 @@
-################################################################################
 """
 RUFAS: Ruminant Farm Systems Model
 File name: dry_cow_ration.py
 Description: Calculates the ration for dry cows.
 Author(s): Militsa Sotirova, militsasotirova@gmail.com
 """
-################################################################################
 
 
-def optimize(feed, rqmts):
+def optimize():
     """
     Sets up the arguments for the linear programming optimization.
 
