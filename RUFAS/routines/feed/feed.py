@@ -360,12 +360,12 @@ class Feed:
                     # forage to be fed out 30 days after harvest for new yield
                     self.days_since_feedout = -30
                 self.feed_id = crop.raw_id
-                self.DM += crop.DM_yield
+                self.DM += crop.yield_actual*crop.DM_harvest_percent
                 self.NDF += crop.NDF_yield
                 self.N += crop.N_yield
                 self.P += crop.P_yield
-                self.DM_percent = crop.DM_yield / crop.yield_actual
-                self.NDF_percent = crop.NDF_yield / crop.yield_actual
+                self.DM_percent = self.DM / crop.yield_actual
+                self.NDF_percent = self.NDF / crop.yield_actual
                 # TODO: no Carbon Cycle currently implemented
                 self.C += crop.yield_actual * self.C_percent
 
