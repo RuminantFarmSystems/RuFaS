@@ -18,6 +18,7 @@ class BaseCrop:
         # These variables are used within the soil module and must
         # be declared and initialized even when a crop is not growing
         self.fr_PHU = 0
+        self.fr_N = 0
         self.LAI_actual = 0
         self.z_root = 0
         self.biomass_actual = 0
@@ -26,5 +27,7 @@ class BaseCrop:
         self.bio_N = 0
         self.bio_P = 0
         self.bio_AG = 0
+        self.bio_BG = 0
+        self.HI_actual = 0
         self.yield_actual = 0
         self.yield_annual = 0
