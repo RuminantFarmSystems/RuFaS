@@ -237,7 +237,7 @@ class AnimalInitialization:
                     heiferIIIs.remove(heiferIII)
 
             for cow in cows:
-                _, _, _, culled, new_born = cow.update(False, 0, self.CI)
+                _, _, _, culled, new_born = cow.update(0, self.CI)
                 if culled or cow.calves > 4:
                     cows.remove(cow)
                 if new_born:
