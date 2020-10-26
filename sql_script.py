@@ -207,7 +207,7 @@ def import_data(connection, csv_path, dataset_ID):
     c = connection.cursor()
     # load data
     df = pd.read_csv(csv_path)
-    # strip whitespace from from headers
+    # strip whitespace from headers
     df.columns = df.columns.str.strip()
     # import data to table
     df.to_sql("Skeleton", connection, if_exists="append", index=False)
