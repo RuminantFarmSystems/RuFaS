@@ -1,4 +1,3 @@
-################################################################################
 """
 RUFAS: Ruminant Farm Systems Model
 File name: growing_heifer_ration.py
@@ -6,10 +5,9 @@ Description: Calculates the ration for growing heifers
     (classes HeiferI, HeiferII, HeiferIII).
 Author(s): Militsa Sotirova, militsasotirova@gmail.com
 """
-################################################################################
 
 
-def optimize(feed, rqmts):
+def optimize():
     """
     Sets up the arguments for the linear programming optimization.
 

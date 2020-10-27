@@ -40,6 +40,7 @@ class AnimalEvents(object):
 
 		Args:
 			animal_age: the date counter for the cow (from birth)
+			simulation_day: day in the simulation
 			description: the event happened on that day
 		"""
 		if animal_age in self.events:

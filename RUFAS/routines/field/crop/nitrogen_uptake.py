@@ -68,7 +68,7 @@ def update_all(soil, crop_type):
     calc_act_N_up_each_layer(soil, crop_type)
     crop_type.N_act_up = sum(crop_type.act_N_up_each_layer)
     calc_bio_N(soil, crop_type)
-    N_uptake(soil, crop_type)
+    N_uptake(soil)
 
 
 def calc_fr_N(crop_type):
@@ -248,7 +248,7 @@ def calc_act_N_up_each_layer(soil, crop_type):
     crop_type.act_N_up_each_layer = act_N_up_each_layer
 
 
-def N_uptake(soil, crop_type):
+def N_uptake(soil):
     for layer in soil.soil_layers:
         layer.NO3 -= layer.N_uptake
 
