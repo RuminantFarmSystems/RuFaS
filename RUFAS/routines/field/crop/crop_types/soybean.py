@@ -17,6 +17,7 @@ class Soybean(BaseCrop):
         self.crop_name = crop_name
         self.crop_type = 'annual'
         self.harvest_quality = 'null'
+        self.raw_id = 121
         self.feed_id = '121g'
 
         self.kill_day = -1
@@ -97,7 +98,7 @@ class Soybean(BaseCrop):
         # ===================================================================
         ''' Soil Water Uptake Data '''
 
-        self.beta_w = 10  # water-use distribution parameter  # corn
+        self.beta_w = 10  # water-use distribution parameter  # TODO: taken from corn
         self.epco = 1
 
         # output

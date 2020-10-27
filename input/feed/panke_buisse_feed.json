@@ -3,8 +3,10 @@
     "feeds_table": "user_feeds",
     "feed_quality_table": "feed_quality",
     "nutrient_table": "nutrients",
-    "purchased_feeds": [2, 24, 34, 38, 91, 102, 137, 155, 156, 157],
-    "growing_feeds": [8, 87],
+    "purchased_feeds": [2, 26, 36, 86, 118, 136, 139],
+    "purchased_feeds_costs": {"2": 0.17, "26": 0.1, "36": 0, "86":0,
+                          "118": 0.39, "136":0.53, "139": 0.25},
+    "growing_feeds": [87],
 
     "storage_options": {
         "storage_1": {

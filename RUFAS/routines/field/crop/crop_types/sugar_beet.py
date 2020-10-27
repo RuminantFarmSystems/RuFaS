@@ -18,7 +18,9 @@ class SugarBeet(BaseCrop):
         self.crop_name = crop_name
         self.crop_type = 'annual'
         self.harvest_quality = 'null'
-        self.feed_id = ''  # TODO need
+
+        self.feed_id = '11g'
+        self.raw_id = 11
 
         self.kill_day = -1
         self.kill_year = True
