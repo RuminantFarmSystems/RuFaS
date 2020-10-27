@@ -74,6 +74,7 @@ class Feed:
         # of the growing_feeds have been harvested yet
         self.available_feeds = \
             self.get_nutrient_vals(self.purchased_feeds, False)
+        self.calf_feeds = self.get_calf_feeds()
         # setting up the feed costs based on the input
         self.feed_costs = data['purchased_feeds_costs']
         ids = []
@@ -1029,3 +1030,14 @@ class Feed:
 
             nutrient_vals[feed_key] = dictionary
         return nutrient_vals
+
+    def get_calf_feeds(self): 
+        feed_ids = [155, 156, 157]
+        columns = ['DM', 'CP', 'EE', 'DE']
+        nutrients = self.db_reader.query(
+            self.nutrient_table, 
+            cols=columns, 
+            identifier='feed_id', 
+            desired_rows=tuple(feed_ids))
+        calf_feeds = {155: nutrients[0], 156: nutrients[1], 157: nutrients[2]}
+        return calf_feeds

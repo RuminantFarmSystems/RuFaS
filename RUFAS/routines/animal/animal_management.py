@@ -130,12 +130,12 @@ class AnimalManagement:
         """
 
         self.sim_length = config.sim_length
-        config = self.get_animal_config(data['animal_config'])
-        self.life_cycle_manager = LifeCycleManager(config)
-        AnimalBase.set_config(config)
+        animal_config = self.get_animal_config(data['animal_config'])
+        self.life_cycle_manager = LifeCycleManager(animal_config)
+        AnimalBase.set_config(animal_config)
         AnimalBase.set_nutrient_list(feed.nutrient_rqmts)
         self.init_pens(data['pen_information'], data['herd_information'])
-        self.init_animals(data['herd_information'], self.all_pens, weather, time)
+        self.init_animals(data['herd_information'], self.all_pens, weather, time, config, feed)
         self.housing = data['housing']
         self.pasture_concentrate = data['pasture_concentrate']
         self.ration_user_input = data['ration']['user_input']
@@ -200,7 +200,7 @@ class AnimalManagement:
                         manure_handling, manure_separator, manure_storage)
             self.all_pens.append(pen_3)
 
-    def init_animals(self, herd_data, pen_data, weather, time):
+    def init_animals(self, herd_data, pen_data, weather, time, config, feed):
         """
         Populates the list of animals with the information from the
         input JSON file: constructs the calves, heiferI’s, heiferII’s,
@@ -210,6 +210,9 @@ class AnimalManagement:
         are calculated and the animals are allocated to pens.
 
         Args:
+            feed: an instance of the Feed class defined in feed.py
+            config: an instance of the Config class defined in classes.py
+                contains model configuration information
             herd_data: dictionary containing information about the herd
             pen_data: dictionary containing information about the pens
             weather: instance of the Weather class defined in classes.py
@@ -258,13 +261,13 @@ class AnimalManagement:
                                                           heiferI_num, heiferII_num,
                                                           heiferIII_num, cow_num,
                                                           replace_num, herd_init,
-                                                          breed)
+                                                          breed, config)
 
         if len(pen_data) > 0:
-            self.init_nutrient_rqmts(weather, time)
+            self.init_nutrient_rqmts(weather, time, feed)
             self.pen_allocation()
 
-    def init_nutrient_rqmts(self, weather, time):
+    def init_nutrient_rqmts(self, weather, time, feed):
         """
         Calculates initial nutrient requirements at the beginning of the
         simulation for initial pen allocation. For the nutrient requirements
@@ -272,6 +275,7 @@ class AnimalManagement:
         is used.
 
         Args:
+            feed: an instance of the Feed class defined in feed.py
             weather: instance of the Weather class defined in classes.py
             time: instance of the Time class defined in classes.py
         """
@@ -282,7 +286,7 @@ class AnimalManagement:
 
         for calf in self.calves:
             temp = weather.T_avg[time.year - 1][time.day - 1]
-            calf.calc_nutrient_rqmts(temp)
+            calf.calc_nutrient_rqmts(feed, temp)
             calf.p_animal = 0.0072 * calf.body_weight * 1000
 
         for heiferI in self.heiferIs:
@@ -402,7 +406,7 @@ class AnimalManagement:
             pen = 0
             self.id_pen[calf.id] = pen
             self.calves.append(calf)
-            self.all_pens[pen].set_up_new_animal(calf, -1, self.housing, self.pasture_concentrate, feed, temp)
+            self.all_pens[pen].set_up_new_animal(calf, self.pasture_concentrate, feed, temp)
 
     def pen_allocation(self):
         """
@@ -445,7 +449,7 @@ class AnimalManagement:
             cow.P_req = requirements['P_req']
             cow.DMIest = requirements['DMIest']
             cow.DNED_req = (requirements['NEmaint'] + requirements['NEl']) / cow.DMIest
-            cow.DMDP_req = (requirements['MP_req']) / cow.DMIest
+            cow.DMPD_req = (requirements['MP_req']) / cow.DMIest
             if cow.milking:
                 lactating_cows.append(cow)
             else:
@@ -617,7 +621,7 @@ class AnimalManagement:
             if pen.pen_populated:
                 pen.daily_p_update()
 
-    def daily_updates(self, feed, weather, time):
+    def daily_updates(self, record_econ_stats, feed, weather, time):
         """
         Executes the daily routines relating to Animals. All animals are
         updated through the life_cycle_manager's daily_update() method. The
@@ -626,10 +630,12 @@ class AnimalManagement:
         manure calculations are done.
 
         Args:
+            record_econ_stats:
             feed: instance of the Feed class defined in feed.py
             weather: instance of the Weather class defined in classes.py
             time: instance of the Time class defined in classes.py
         """
+        print(self.simulation_day)
         if self.simulate_animals:
             for pen in self.all_pens:
                 pen.pen_populated = len(pen.animals_in_pen) > 0
@@ -638,11 +644,11 @@ class AnimalManagement:
             self.heiferIIs, self.heiferIIIs, self.cows = \
                 self.life_cycle_manager.daily_update(self.simulation_day,
                                                      self.sim_length,
+                                                     record_econ_stats,
                                                      self.calves,
                                                      self.heiferIs,
                                                      self.heiferIIs,
                                                      self.heiferIIIs, self.cows)
-
             temp = weather.T_avg[time.year - 1][time.day - 1]
             self.daily_update_id_pen(animals_added, ids_removed, calves_born, feed, temp)
 
@@ -654,10 +660,9 @@ class AnimalManagement:
                 self.clear_pens()
                 self.pen_allocation()
                 self.calc_avg_nutrient_rqmts()  # per pen
-                self.calc_ration(feed, temp)  # per pen
+                self.calc_ration(feed)  # per pen
                 self.calc_manure_excretion(feed)  # per animal
                 self.calc_avg_growth()  # per pen
-
 
             # phosphorus updates
             self.daily_p_update()  # per animal
@@ -824,7 +829,7 @@ class AnimalManagement:
                 self.generate_animal_output('culled_cow', i)
             animals.append((animal, 'culled_cow', is_cow))
 
-        output['num_calves_sold'] = len(self.life_cycle_manager.sold_calves)
+        output['num_calves_sold'] = self.life_cycle_manager.sold_calf_num
         output['num_sold_heifers'] = len(self.life_cycle_manager.sold_heifers)
         output['num_cows_culled'] = len(self.life_cycle_manager.culled_cows)
 

@@ -14,6 +14,16 @@ from RUFAS.routines.animal.ration.growing_heifer_ration import \
 from RUFAS.routines.animal.ration import ration_driver as ration_driver
 
 
+def phosphorus_in_ration(DMI, ration_per_animal, feed):
+    # TODO: referenced below, not implemented
+    return 0
+
+
+def calc_DMI(ration_per_animal, feed):
+    # TODO: referenced below, not implemented
+    return 0
+
+
 class Pen:
     """
     Manages a pen's operation. Stores the characteristics of the pen and the
@@ -162,11 +172,14 @@ class Pen:
             stage = type(animal).__name__
             self.classes_in_pen.add(stage)
 
-    def call_animal_nutrient_rqmts(self, housing, pasture_concentrate, feed, temp)
+    def call_animal_nutrient_rqmts(self, housing, pasture_concentrate, feed, temp):
         """
         Calls each animal's nutrient requirement calculation methods.
 
         Args:
+            feed: an instance of the Feed class defined in feed.py
+            pasture_concentrate: TODO: needs description
+            housing: TODO: needs description
             temp: the temperature on the current day
         """
         for animal in self.animals_in_pen:
@@ -178,11 +191,11 @@ class Pen:
                 self.DBW = -0.4125
                 self.daily_growth = self.DBW
             elif type(animal).__name__ == 'Calf':
-                animal.calc_nutrient_rqmts(temp)
+                animal.calc_nutrient_rqmts(feed, temp)
             else:
                 animal.calc_nutrient_rqmts()
 
-    def calc_avg_nutrient_rqmts(self, avg_of_all_animals=True):
+    def calc_avg_nutrient_rqmts(self):
         """
         Calculates and sets the average nutrient requirements and necessary
         ration statistics of the animals in the pen.
@@ -201,13 +214,10 @@ class Pen:
 
         # find sums of nutrients and necessary ration statistics for each
         # animal in the pen
-        if avg_of_all_animals:
-            animals = self.animals_in_pen
-        else:
-            animals = self.animals_in_pen[:-1]
-
-        for animal in animals:
+        for animal in self.animals_in_pen:
             curr_rqmts = animal.nutrient_rqmts
+            if curr_rqmts == {}:
+                print(type(animal).__name__, animal.id, self.id, self.avg_calf_nutrient_rqmts)
 
             for key in sum_dict.keys():
                 sum_dict[key] += curr_rqmts[key]['val']
@@ -244,6 +254,9 @@ class Pen:
         requirements of the animals in the pen.
 
         Args:
+            temp: the temperature on the given day. Taken from the weather object
+            pasture_concentrate: TODO: needs description
+            housing: TODO: needs description
             feed: instance of the Feed class
             available_feeds: instance of the AvailableFeeds class defined in ration_driver.py
         """
@@ -294,6 +307,7 @@ class Pen:
         DMI = calc_DMI(ration_per_animal, feed)
         self.avg_p_intake, p_conc = \
             phosphorus_in_ration(DMI, ration_per_animal, feed)
+
         # recording ration nutrition information in pen
         nutrient_amount, nutrient_conc = ration_driver.ration_report(
             ration_per_animal, feed.available_feeds)
@@ -390,12 +404,15 @@ class Pen:
                 total_p_animal += animal.p_animal
             self.avg_p_animal = total_p_animal / len(self.animals_in_pen)
 
-    def set_up_new_animal(self, animal, p_comp, housing, pasture_concentrate, feed, temp):
+    def set_up_new_animal(self, animal, p_comp, housing, pasture_concentrate, feed, available_feeds, temp):
         """
         Sets the necessary attributes for @animal to be a replacement in this
         pen.
 
         Args:
+            available_feeds:
+            pasture_concentrate:
+            housing:
             animal: the replacement animal which needs to have necessary values
                 for later computations
             p_comp: P composition of @animal's class, used to calculate the
@@ -413,7 +430,7 @@ class Pen:
 
         # set animal's ration to be the intake of all other animals in pen
         if self.ration == {}:
-            self.ration = self.calc_ration(feed, temp)
+            self.ration = self.calc_ration(housing, pasture_concentrate, feed, available_feeds, temp)
 
         for key in self.ration:
             if key == 'status':
@@ -429,19 +446,15 @@ class Pen:
 
         # set animal's nutrient requirements to be the average requirements of
         # all other animals in pen
-        # if self.avg_nutrient_rqmts == {}:
-        #     avg_of_all_animals = animal not in self.animals_in_pen
-        #     self.calc_avg_nutrient_rqmts(avg_of_all_animals=avg_of_all_animals)
-        # if type(animal).__name__ == 'Calf':
-        #     animal.nutrient_rqmts = self.avg_calf_nutrient_rqmts
-        # else:
-        #     animal.nutrient_rqmts = self.avg_nutrient_rqmts
-        if not self.classes_in_pen:
-            self.classes_in_pen.add(type(animal).__name__)
-        self.animals_in_pen.append(animal)
+        if type(animal).__name__ == 'Calf':
+            animal.nutrient_rqmts = self.avg_calf_nutrient_rqmts
+        else:
+            animal.nutrient_rqmts = self.avg_nutrient_rqmts
 
-        self.call_animal_nutrient_rqmts(housing,
-                                           pasture_concentrate, feed, temp)
+        if animal.nutrient_rqmts == {} and type(animal).__name__ == 'Calf':
+            animal.calc_nutrient_rqmts(feed, temp)
+        elif animal.nutrient_rqmts == {} and not type(animal).__name__ == 'Calf':
+            animal.calc_nutrient_rqmts()
 
         # set animal's DVD and DHD if it is a cow
         if type(animal).__name__ == 'Cow':
@@ -455,17 +468,7 @@ class Pen:
 
         animal.p_intake = self.avg_p_intake
 
-        # set animal's ration to be the intake of all other animals in pen
-        if self.ration == {}:
-            self.ration = self.calc_ration(housing, pasture_concentrate, feed,
-                                           temp)
-
-        for key in self.ration:
-            if key == 'status':
-                animal.ration_formulation[key] = self.ration[key]
-
-            else:  # feeds and price
-                animal.ration_formulation[key] = self.ration[key] / num_animals
+        # self.animals_in_pen.append(animal)
 
     def clear(self):
         """
