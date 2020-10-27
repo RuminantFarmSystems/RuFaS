@@ -5,7 +5,9 @@
         "end_date" : "2012:243",
         "csv_dir": "output/CSVs/",
         "graphic_dir": "output/graphics/",
-        "run_tests": false
+        "run_tests": false,
+        "set_seed": true,
+        "seed": 0
     },
 
     "weather": "barnyard_weather.csv",

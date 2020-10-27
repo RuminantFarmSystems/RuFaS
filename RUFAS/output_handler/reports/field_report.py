@@ -405,6 +405,48 @@ class FieldReport(BaseReportDriver):
                 'year': ['time.calendar_year', '', 0]
             }
 
+    class SoilCarbonReport(BaseFieldReport):
+        def __init__(self, data, field_name):
+            super().__init__(data, field_name)
+
+            self.daily_variables = {'year': ['time.calendar_year', '', []],
+                                    'j_day': ['time.day', '', []],
+                                    'residue_harvest': ['soil.residue_harvest', 'kg/ha', []],
+                                    'bio_BG': ['crop_type.bio_BG', 'kg/ha', []],
+                                    'soil_C_percent_L1': ['soil.soil_layers[0].carbon_percent', '', []],
+                                    'soil_C_percent_L2': ['soil.soil_layers[1].carbon_percent', '', []],
+                                    'soil_C_percent_L3': ['soil.soil_layers[2].carbon_percent', '', []],
+                                    'total_CO2_C_loss_L1': ['soil.soil_layers[0].total_CO2_C_loss', 'kg/ha', []],
+                                    'total_CO2_C_loss_L2': ['soil.soil_layers[1].total_CO2_C_loss', 'kg/ha', []],
+                                    'total_CO2_C_loss_L3': ['soil.soil_layers[2].total_CO2_C_loss', 'kg/ha', []],
+                                    'total_carbon_L1': ['soil.soil_layers[0].total_carbon', 'kg/ha', []],
+                                    'total_carbon_L2': ['soil.soil_layers[1].total_carbon', 'kg/ha', []],
+                                    'total_carbon_L3': ['soil.soil_layers[2].total_carbon', 'kg/ha', []],
+                                    # 'M_d_L1': ['soil.soil_layers[0].M_d', '', []],
+                                    # 'M_d_L2': ['soil.soil_layers[1].M_d', '', []],
+                                    # 'M_d_L3': ['soil.soil_layers[2].M_d', '', []],
+                                    # 'T_d': ['soil.T_d', '', []],
+                                    'fr_tillage_L1': ['soil.soil_layers[0].fr_tillage', '', []],
+                                    'fr_N': ['crop_type.fr_N', '', []],
+                                    # 'water_fac_L1': ['soil.soil_layers[0].water_fac', '', []],
+                                    # 'water_fac_L2': ['soil.soil_layers[1].water_fac', '', []],
+                                    # 'water_fac_L3': ['soil.soil_layers[2].water_fac', '', []],
+                                    # 'lignin_residue_percent': ['soil.lignin_residue_percent', '', []],
+                                    'precipitation': ['weather.rainfall[time.year - 1][time.day - 1]', 'mm', []],
+                                    'active_L1': ['soil.soil_layers[0].carbon_active', 'kg/ha', []],
+                                    'active_L2': ['soil.soil_layers[1].carbon_active', 'kg/ha', []],
+                                    'active_L3': ['soil.soil_layers[2].carbon_active', 'kg/ha', []],
+                                    'slow_L1': ['soil.soil_layers[0].carbon_slow', 'kg/ha', []],
+                                    'slow_L2': ['soil.soil_layers[1].carbon_slow', 'kg/ha', []],
+                                    'slow_L3': ['soil.soil_layers[2].carbon_slow', 'kg/ha', []],
+                                    'passive_L1': ['soil.soil_layers[0].carbon_passive', 'kg/ha', []],
+                                    'passive_L2': ['soil.soil_layers[1].carbon_passive', 'kg/ha', []],
+                                    'passive_L3': ['soil.soil_layers[2].carbon_passive', 'kg/ha', []]
+                                    }
+
+            self.annual_variables = {'year': ['time.calendar_year', '', 0]
+                                     }
+
     class BaseFieldMassBalanceReport(BaseFieldReport):
         def __init__(self, data, field_name):
             super().__init__(data, field_name)

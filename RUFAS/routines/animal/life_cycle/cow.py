@@ -48,8 +48,6 @@ class Cow(HeiferIII):
             args.breed: breed of the cow
             args.birth_date: the date of the simulation when the calf was born
             args.daysBorn: age of the animal
-            args.repro_program: reproduction program used in heifer,
-                three of them: ED, TAI, and synch-ED programs
             args.tai_method_h: timed-AI protocols used for
                 reproduction programs, three of them: 5dCG2P,
                 5dCGP, and user-defined
@@ -118,17 +116,13 @@ class Cow(HeiferIII):
         self.repro_program = args['repro_program']
         self.first_ai = False
         self.fat_percent = 0
-
         self.repro_cost = 0
-
         # TAI params
         self.presynch_method = args['presynch_method']
         self.tai_method_c = args['tai_method_c']
         self.presynch_program_start_day = 0
         self.tai_program_start_day_c = 0
         self.resynch_method = args['resynch_method']
-
-        self.milk_production_history = []
 
         # economics counts
         self.ED_days = 0
@@ -141,6 +135,7 @@ class Cow(HeiferIII):
         self.feed_cost = 0
         self.fixed_cost = 0
         self.milk_income = 0
+
         self.milk_production_history = []
 
         # grouping nutrition requirement values
@@ -163,8 +158,9 @@ class Cow(HeiferIII):
         Args:
             sim_day: simulation day
         """
-        self.milk_production_history.append(
-            MilkProductionHistory(sim_day, self.days_in_milk, self.estimated_daily_milk_produced, self.days_born))
+
+        self.milk_production_history.append(MilkProductionHistory(sim_day, self.days_in_milk,
+                                                                  self.estimated_daily_milk_produced, self.days_born))
 
     @staticmethod
     def _determine_param_value(mean, std):
@@ -197,10 +193,8 @@ class Cow(HeiferIII):
                 milk production and fat percent, for temporary use
         """
         if self.days_in_preg == AnimalBase.config['dip_dry']:
-            # self.gestation_length - \ AnimalBase.config['dip_dry']:
             self.milking = False
             self.events.add_event(self.days_born, sim_day, c.DRY)
-
             self.days_in_milk = 0
             self.estimated_daily_milk_produced = 0
 
@@ -231,7 +225,7 @@ class Cow(HeiferIII):
             n = self._determine_param_value(
                 AnimalBase.config['wood_n'][breed_index][parity_index],
                 AnimalBase.config['wood_n_std'][breed_index][parity_index])
-
+            # TODO adding milkbot parameters
             estimated_daily_milk_produced = \
                 l * math.pow(self.days_in_milk, m) * \
                 math.exp((0 - n) * self.days_in_milk)
@@ -260,7 +254,7 @@ class Cow(HeiferIII):
 
         # prev_weight = self.body_weight
 
-        # calculate body weight when milking
+        # calculate body weight when milking with de Vries equation
         # if self.calves == 1:
         #     self.body_weight = \
         #         self.mature_body_weight * \
@@ -423,12 +417,12 @@ class Cow(HeiferIII):
         """
         Update cow status from the moment of calving, parity+1,
         milking start, pregnancy stop, and estrus restart.
-        TEMP: calculate cost and income related values for validating model
+
         Args:
             record_econ_stats: record cost and income in different functions for
                 temporary use
-            calving_interval:
-            sim_day:
+            sim_day: simulation day
+            calving_interval: the calving interval used for the daily update
         Returns:
             estimated_daily_milk_produced: estimated daily milk production
                 from the lactation curve
@@ -453,14 +447,13 @@ class Cow(HeiferIII):
             self.preg = False
             self.days_in_preg = 0
             self.gestation_length = 0
-            birth_description = 'New birth, start milking'
             if self.calves >= 2:
                 last_time_given_birth = \
-                    self.events.get_most_recent_date(birth_description)
+                    self.events.get_most_recent_date(c.NEW_BIRTH)
                 self.CI = self.days_born - last_time_given_birth
                 self.CI_history.append(self.CI)
             self.CBW = self.body_weight
-            self.events.add_event(self.days_born, sim_day, birth_description)
+            self.events.add_event(self.days_born, sim_day, c.NEW_BIRTH)
             self._health_cull_update()
             new_born = True
 
@@ -555,15 +548,14 @@ class Cow(HeiferIII):
             AnimalBase.config['avg_estrus_cycle_cow'],
             AnimalBase.config['std_estrus_cycle_cow'], sim_day)
 
-    def _ed_update(self, record_econ_stats, sim_day):
+    def _ed_update(self, sim_day):
         """
         Estrus occur at estrus day,
         estrus detected with detection rate,
         service performed with service rate,
-        conception successed with conception rate
+        conception succeed with conception rate
         Args:
-            record_econ_stats: record injection counts in this protocol,
-                for temporary use
+            sim_day: simulation day
         """
         # if on estrus day, start detecting estrus
         if self.days_born == self._estrus_day:
@@ -591,8 +583,6 @@ class Cow(HeiferIII):
 
         if self.milking and not self.do_not_breed:
             self.ED_days += 1
-            if record_econ_stats:
-                self.ED_econ_days += 1
 
     # TAI methods
     def _determine_tai_program_day(self, date):
@@ -607,7 +597,6 @@ class Cow(HeiferIII):
         Description:
             resynch start after calving, resynch method assigned
     '''
-
     def _tai_program_day_after_preg_check(self, record_econ_stats, sim_day):
         if self.resynch_method == 'TAIafterPD':
             self.tai_program_start_day_c = self.abortion_day + 1
@@ -633,7 +622,8 @@ class Cow(HeiferIII):
     def _OvSynch56_update(self, record_econ_stats, sim_day):
         """
         OvSynch56 protocol for tai method
-
+        Args:
+            sim_day: the simulation day
         """
         if not self.do_not_breed:
             if self.days_born == self.tai_program_start_day_c:
@@ -656,8 +646,7 @@ class Cow(HeiferIII):
         """
         OvSynch48 protocol for tai method
         Args:
-            record_econ_stats: record injection counts in this protocol,
-                for temporary use
+            sim_day: the simulation day
         """
         if not self.do_not_breed:
             if self.days_born == self.tai_program_start_day_c:
@@ -681,8 +670,7 @@ class Cow(HeiferIII):
         """
         CoSynch72 protocol for tai method
         Args:
-            record_econ_stats: record injection counts in this protocol,
-                for temporary use
+            sim_day: the simulation day
         """
         if not self.do_not_breed:
             if self.days_born == self.tai_program_start_day_c:
@@ -705,8 +693,7 @@ class Cow(HeiferIII):
         """
         5dCoSynch protocol for tai method
         Args:
-            record_econ_stats: record injection counts in this protocol,
-                for temporary use
+            sim_day: the simulation day
         """
         if not self.do_not_breed:
             if self.days_born == self.tai_program_start_day_c:
@@ -727,7 +714,7 @@ class Cow(HeiferIII):
                     if record_econ_stats else self.GnRH_injections
                 self.ai_day = self.days_born
                 self.conception_rate = \
-                    AnimalBase.config['_5dcosynch_conception_rate']
+                    AnimalBase.config['cosynch5d_conception_rate']
 
     def _user_defined_update(self):
         """
@@ -735,7 +722,7 @@ class Cow(HeiferIII):
         """
         if not self.do_not_breed:
             if self.days_born == self.tai_program_start_day_c + \
-                    AnimalBase.config['user_define_tai_length']:
+                AnimalBase.config['user_define_tai_length']:
                 self.ai_day = self.days_born
                 self.conception_rate = \
                     AnimalBase.config['cow_user_defined_tai_cr']
@@ -754,8 +741,7 @@ class Cow(HeiferIII):
         """
         Presynch protocol for presynch method
         Args:
-            record_econ_stats: record injection counts in this protocol,
-                for temporary use
+            sim_day: the simulation day
         """
         if self.days_born == self.presynch_program_start_day:
             self.events.add_event(self.days_born, sim_day, c.INJECT_PGF)
@@ -773,8 +759,7 @@ class Cow(HeiferIII):
         """
         Doubleovsynch protocol for presynch method
         Args:
-            record_econ_stats: record injection counts in this protocol,
-            for temporary use
+            sim_day: the simulation day
         """
         if self.days_born == self.presynch_program_start_day:
             self.events.add_event(self.days_born, sim_day, c.INJECT_GNRH)
@@ -796,8 +781,7 @@ class Cow(HeiferIII):
         """
         g6g protocol for presynch method.
         Args:
-            record_econ_stats: record injection counts in this protocol,
-            for temporary use
+            sim_day: the simulation day
         """
         if self.days_born == self.presynch_program_start_day:
             self.events.add_event(self.days_born, sim_day, c.INJECT_PGF)
@@ -818,15 +802,14 @@ class Cow(HeiferIII):
 
         if self.days_born == self.presynch_program_start_day:
             self.tai_program_start_day_c = \
-                self.days_born + AnimalBase.config['presynch_program_length']
+                self.days_born + AnimalBase.config['user_defined_presynch_length']
 
     def _tai_update(self, record_econ_stats, sim_day):
         """
         Assign tai and presynch method, update time AI method status, TAI can
         be performed with or without presynch.
         Args:
-            record_econ_stats: record injection counts in this protocol,
-            for temporary use
+            sim_day: the simulation day
         """
         if self.days_in_milk == AnimalBase.config['voluntary_waiting_period']:
             if self.presynch_method:
@@ -860,8 +843,7 @@ class Cow(HeiferIII):
         """
         Update ED-TAI method, perform estrus detection before the TAI program
         Args:
-            record_econ_stats: record injection counts in this protocol,
-            for temporary use
+            sim_day: the simulation day
         """
         # if on estrus day, start detecting estrus
         if self.days_born == self.estrus_day and \
@@ -875,8 +857,7 @@ class Cow(HeiferIII):
                 if estrus_detection_rand < \
                         AnimalBase.config['estrus_detection_rate']:
                     # Estrus detected
-                    self.events.add_event(self.days_born, sim_day,
-                                          c.ESTRUS_DETECTED)
+                    self.events.add_event(self.days_born, sim_day, c.ESTRUS_DETECTED)
                     estrus_service_rand = random()
                     if estrus_service_rand < \
                             AnimalBase.config['estrus_service_rate']:
@@ -914,8 +895,7 @@ class Cow(HeiferIII):
         """
         Using ED at the resynch period of ED-TAI.
         Args:
-            record_econ_stats: record injection counts in this protocol,
-            for temporary use
+            sim_day: the simulation day
         """
         if self.resynch_method == 'TAIafterPD':
             self.tai_program_start_day_c = self.abortion_day + 1
@@ -948,8 +928,7 @@ class Cow(HeiferIII):
         Assign breeding method for open cows after spot open at preg check
         three methods can be assigned: ED, TAI, ED-TAI
         Args:
-            record_econ_stats: record injection counts in this protocol,
-            for temporary use
+            sim_day: the simulation day
         """
         if self.repro_program == 'ED':
             self._after_abortion_estrus(sim_day)
@@ -979,8 +958,7 @@ class Cow(HeiferIII):
             there are chances of preg loss in each period of time
             between preg checks
         Args:
-            record_econ_stats: record injection counts in this protocol,
-            for temporary use
+            sim_day: the simulation day
         """
         if self.preg:
             self.days_in_preg += 1
@@ -1009,6 +987,7 @@ class Cow(HeiferIII):
                     self.gestation_length = int(np.random.normal(
                         AnimalBase.config['avg_gestation_len'],
                         AnimalBase.config['std_gestation_len']))
+
                 self.events.add_event(self.days_born, sim_day, c.COW_PREG)
             else:
                 if self.repro_program in ['ED', 'ED-TAI']:
@@ -1091,7 +1070,7 @@ class Cow(HeiferIII):
         # if not self.preg and self.days_in_milk >
         #     AnimalBase.config['repro_cull_time:
         #     self.culled = True
-        #     self.events.add_event(self.days_born, sim_day, 'Cull for repro problem')
+        #     self.events.add_event(self.days_born, sim_day, c.COW_REPRO_CULL)
         #     self.cull_reason = "Reproduction failure"
         #     return True
         if self.do_not_breed and self.days_in_milk > 80 and \

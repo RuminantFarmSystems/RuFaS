@@ -6,7 +6,6 @@ Author(s): Katrina Wang, kw433@cornell.edu
 Description: This file stores and draws values of simulated
                 animals in and from the database
 """
-
 from RUFAS.routines.animal.life_cycle.calf import Calf
 from RUFAS.routines.animal.life_cycle.heiferI import HeiferI
 from RUFAS.routines.animal.life_cycle.heiferII import HeiferII
@@ -68,8 +67,13 @@ class AnimalInitialization:
             CI: the calving interval used in initialization
             init: whether or not update the database with new animals
     '''
-    def __init__(self, CI, breed, init=True):
+    def __init__(self, CI, breed, record_econ_stats, set_seed, init=True):
         self.CI = CI
+
+        # If set_seed is True, then we do not want the results to be ordered
+        # randomly. If set_seed is False, then we do want this.
+        self.order_by_random = not set_seed
+
         if init:
             conn = sqlite3.connect('input/animal/animals.sqlite')
             cur = conn.cursor()
@@ -135,7 +139,7 @@ class AnimalInitialization:
             cur.execute('INSERT INTO animal_id VALUES (' + str(self.animal_id) + ')')
             conn.commit()
             conn.close()
-            self.init_animals(breed)
+            self.init_animals(breed, record_econ_stats)
 
         else:
             conn = sqlite3.connect('input/animal/animals.sqlite')
@@ -153,7 +157,7 @@ class AnimalInitialization:
             sim_days: number of days to simulate
     '''
 
-    def init_animals(self, breed, animal_num=20000, sim_days=5000):
+    def init_animals(self, breed, record_econ_stats, animal_num=20000, sim_days=5000):
         calves = []
         heiferIs = []
         heiferIIs = []
@@ -233,7 +237,7 @@ class AnimalInitialization:
                     heiferIIIs.remove(heiferIII)
 
             for cow in cows:
-                _, _, _, culled, new_born = cow.update(False, 0, self.CI)
+                _, _, _, culled, new_born = cow.update(record_econ_stats, 0, self.CI)
                 if culled or cow.calves > 4:
                     cows.remove(cow)
                 if new_born:
@@ -338,15 +342,20 @@ class AnimalInitialization:
             Get calf values from the database for initialization
         Input:
             num: number of calves to initialize
+            breed: cow breed
     '''
-
-    def get_calves(self, num):
+    def get_calves(self, num, record_econ_stats, breed):
         calves = []
         conn = sqlite3.connect('input/animal/animals.sqlite')
         cur = conn.cursor()
         while cur.execute('SELECT COUNT() FROM calves').fetchone()[0] < num:
-            self.init_animals()
-        rows = cur.execute('SELECT * FROM calves ORDER BY RANDOM() LIMIT ' + str(num)).fetchall()
+            self.init_animals(record_econ_stats, breed)
+
+        if self.order_by_random:
+            rows = cur.execute('SELECT * FROM calves ORDER BY RANDOM() LIMIT ' + str(num)).fetchall()
+        else:
+            rows = cur.execute('SELECT * FROM calves LIMIT ' + str(num)).fetchall()
+
         for row in rows:
             args = {
                 'id': int(row[AnimalValues.id]),
@@ -370,15 +379,20 @@ class AnimalInitialization:
             Get heiferI values from the database for initialization
         Input:
             num: number of heiferIs to initialize
+            breed: cow breed
     '''
-
-    def get_heiferIs(self, num):
+    def get_heiferIs(self, num, record_econ_stats, breed):
         heiferIs = []
         conn = sqlite3.connect('input/animal/animals.sqlite')
         cur = conn.cursor()
         while cur.execute('SELECT COUNT() FROM heiferIs').fetchone()[0] < num:
-            self.init_animals()
-        rows = cur.execute('SELECT * FROM heiferIs ORDER BY RANDOM() LIMIT ' + str(num)).fetchall()
+            self.init_animals(record_econ_stats, breed)
+
+        if self.order_by_random:
+            rows = cur.execute('SELECT * FROM heiferIs ORDER BY RANDOM() LIMIT ' + str(num)).fetchall()
+        else:
+            rows = cur.execute('SELECT * FROM heiferIs LIMIT ' + str(num)).fetchall()
+
         for row in rows:
             args = {
                 'id': int(row[AnimalValues.id]),
@@ -401,15 +415,20 @@ class AnimalInitialization:
             Get heiferII values from the database for initialization
         Input:
             num: number of heiferIIs to initialize
+            breed: cow breed
     '''
-
-    def get_heiferIIs(self, num):
+    def get_heiferIIs(self, num, record_econ_stats, breed):
         heiferIIs = []
         conn = sqlite3.connect('input/animal/animals.sqlite')
         cur = conn.cursor()
         while cur.execute('SELECT COUNT() FROM heiferIIs').fetchone()[0] < num:
-            self.init_animals()
-        rows = cur.execute('SELECT * FROM heiferIIs ORDER BY RANDOM() LIMIT ' + str(num)).fetchall()
+            self.init_animals(record_econ_stats, breed)
+
+        if self.order_by_random:
+            rows = cur.execute('SELECT * FROM heiferIIs ORDER BY RANDOM() LIMIT ' + str(num)).fetchall()
+        else:
+            rows = cur.execute('SELECT * FROM heiferIIs LIMIT ' + str(num)).fetchall()
+
         for row in rows:
             args = {
                 'id': int(row[AnimalValues.id]),
@@ -447,15 +466,20 @@ class AnimalInitialization:
             Get heiferIII values from the database for initialization
         Input:
             num: number of heiferIIIs to initialize
+            breed: cow breed
     '''
-
-    def get_heiferIIIs(self, num):
+    def get_heiferIIIs(self, num, record_econ_stats, breed):
         heiferIIIs = []
         conn = sqlite3.connect('input/animal/animals.sqlite')
         cur = conn.cursor()
         while cur.execute('SELECT COUNT() FROM heiferIIIs').fetchone()[0] < num:
-            self.init_animals()
-        rows = cur.execute('SELECT * FROM heiferIIIs ORDER BY RANDOM() LIMIT ' + str(num)).fetchall()
+            self.init_animals(record_econ_stats, breed)
+
+        if self.order_by_random:
+            rows = cur.execute('SELECT * FROM heiferIIIs ORDER BY RANDOM() LIMIT ' + str(num)).fetchall()
+        else:
+            rows = cur.execute('SELECT * FROM heiferIIIs LIMIT ' + str(num)).fetchall()
+
         for row in rows:
             args = {
                 'id': int(row[AnimalValues.id]),
@@ -493,15 +517,20 @@ class AnimalInitialization:
             Get cow values from the database for initialization
         Input:
             num: number of cows to initialize
+            breed: cow breed
     '''
-
-    def get_cows(self, num):
+    def get_cows(self, num, record_econ_stats, breed):
         cows = []
         conn = sqlite3.connect('input/animal/animals.sqlite')
         cur = conn.cursor()
         while cur.execute('SELECT COUNT() FROM cows').fetchone()[0] < num:
-            self.init_animals()
-        rows = cur.execute('SELECT * FROM cows ORDER BY RANDOM() LIMIT ' + str(num)).fetchall()
+            self.init_animals(record_econ_stats, breed)
+
+        if self.order_by_random:
+            rows = cur.execute('SELECT * FROM cows ORDER BY RANDOM() LIMIT ' + str(num)).fetchall()
+        else:
+            rows = cur.execute('SELECT * FROM cows LIMIT ' + str(num)).fetchall()
+
         for row in rows:
             args = {
                 'id': int(row[AnimalValues.id]),
@@ -540,13 +569,25 @@ class AnimalInitialization:
         conn.close()
         return cows
 
-    def get_replacement_cows(self, num):
+    '''
+        Description:
+            Get replacement cow values from the database for initialization
+        Input:
+            num: number of replacement cows to initialize
+            breed: cow breed
+    '''
+    def get_replacement_cows(self, num, record_econ_stats, breed):
         cows = []
         conn = sqlite3.connect('input/animal/animals.sqlite')
         cur = conn.cursor()
         while cur.execute('SELECT COUNT() FROM replacement').fetchone()[0] < num:
-            self.init_animals()
-        rows = cur.execute('SELECT * FROM replacement ORDER BY RANDOM() LIMIT ' + str(num)).fetchall()
+            self.init_animals(record_econ_stats, breed)
+
+        if self.order_by_random:
+            rows = cur.execute('SELECT * FROM replacement ORDER BY RANDOM() LIMIT ' + str(num)).fetchall()
+        else:
+            rows = cur.execute('SELECT * FROM replacement LIMIT ' + str(num)).fetchall()
+
         for row in rows:
             args = {
                 'id': int(row[AnimalValues.id]),

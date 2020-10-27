@@ -44,7 +44,6 @@ class Calf(AnimalBase):
             self.init_values(args)
 
         self.target_adg_calf = self.birth_weight / AnimalBase.config['wean_day']
-
         self.gender = ''
         self.sold = False
         self.wean_weight = 0
@@ -54,8 +53,8 @@ class Calf(AnimalBase):
 
     def init_values(self, args):
         """
-		Determine stillbirth, gender, and birth weight
-		"""
+        Determine stillbirth, gender, and birth weight
+        """
         # gender determined with gender ratio relates to semen type
         if AnimalBase.config['semen_type'] == 'conventional':
             male_calf_rate = \
@@ -143,24 +142,24 @@ class Calf(AnimalBase):
         }
         return values
 
-    def calc_nutrient_rqmts(self, temp):
+    def calc_nutrient_rqmts(self, feed, temp):
         """
-		Calculates this calf's nutrient requirements.
-		"""
+        Calculates this calf's nutrient requirements.
+        """
         # self.nutrient_rqmts, self.DMIest, self.DBW = calculate_rqmts()
         wean_day = AnimalBase.config['wean_day']
         wean_length = AnimalBase.config['wean_length']
         milk_type = AnimalBase.config['milk_type']
-        self.animal_intake, self.nutrient_rqmts = calc_requirements(self, temp, wean_day, wean_length, milk_type)
+        self.animal_intake, self.nutrient_rqmts = calc_requirements(self, feed, temp, wean_day, wean_length, milk_type)
         self._DBW = self.nutrient_rqmts['live_weight_change']['val']
 
     def calc_manure_excretion(self, feed):
         """
-		Calculates and sets the manure excretion components.
+        Calculates and sets the manure excretion components.
 
-		Args:
-			feed: instance of the Feed class
-		"""
+        Args:
+            feed: instance of the Feed class
+        """
         p_urine, p_feces_excrt = self.calc_base_manure()
 
         self.p_excrt, self.manure_excretion = \

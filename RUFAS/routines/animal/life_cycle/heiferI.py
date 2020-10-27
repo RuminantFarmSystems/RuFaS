@@ -124,5 +124,3 @@ class HeiferI(Calf):
 			self.days_born -= 1  # will increment in next stage again
 
 		return second_stage
-
-	
