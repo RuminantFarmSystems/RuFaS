@@ -427,7 +427,7 @@ class AnimalManagement:
             cow.P_req = requirements['P_req']
             cow.DMIest = requirements['DMIest']
             cow.DNED_req = (requirements['NEmaint'] + requirements['NEl']) / cow.DMIest
-            cow.DMDP_req = (requirements['MP_req']) / cow.DMIest
+            cow.DMPD_req = (requirements['MP_req']) / cow.DMIest
             if cow.milking:
                 lactating_cows.append(cow)
             else:
