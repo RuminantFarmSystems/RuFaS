@@ -3,6 +3,7 @@ import sqlite3
 import ntpath
 import sql_script
 import pandas as pd
+from RUFAS.classes import is_leap_year
 from RUFAS import errors
 import atexit
 
@@ -29,11 +30,9 @@ def main():
 
     # 4 Importing csv file into Skeleton file
     import_data(conn, csv_path)
-    """# Deletes unnecessary rows at the top of the file
-    delete_extra_rows(data_in)
 
-    # Adds leap days (DAYMET does not report data for leap days)
-    add_leap_days(data_out)"""
+    # 5 Adds leap days (DAYMET does not report data for leap days)
+    add_leap_days(conn)
 
 
 def import_data(connection, csv_path):
@@ -42,11 +41,39 @@ def import_data(connection, csv_path):
     df = pd.read_csv(csv_path,skiprows=7)
     # strip whitespace from headers
     df.columns = df.columns.str.strip()
+    df.columns = ["year", "jday", "dayl", "precip", "srad", "swe", "high", "low", "vp"]
 
     # import data to table
-    # df.to_sql("Skeleton", connection, if_exists="append", index=False)
-    # c.execute("UPDATE Skeleton SET ID = ?", (dataset_ID,))
-    # connection.commit()
+    df.to_sql("Skeleton2", connection, if_exists="append", index=False)
+    connection.commit()
+
+
+def add_leap_days(connection):
+    c = connection.cursor()
+    # find first and last year, last day
+    c.execute("SELECT min(year) from Skeleton2")
+    start_year = c.fetchone()[0]
+    c.execute("SELECT max(year) from Skeleton2")
+    end_year = c.fetchone()[0]
+    c.execute("SELECT max(jday) from Skeleton2 WHERE year=(SELECT max(year) from Skeleton2)")
+    end_day = c.fetchone()[0]
+
+    y = start_year
+    while not is_leap_year(y):
+        y += 1
+
+    if is_leap_year(y):
+        if y == end_year:
+            """if end_day == 365:
+            c.execute()"""
+            return
+        else:
+            while y <= end_year:
+                c.execute("INSERT INTO Skeleton2\
+                SELECT ?, 366, dayl, precip, srad, swe, high, low, vp FROM Skeleton2 WHERE year = ? AND jday = 365", (y,y))
+                y += 4
+    connection.commit()
+
 
 # -------------------------------------------------------------------------------
 # SCRIPT ENTRY POINT
