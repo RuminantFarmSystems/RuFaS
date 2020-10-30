@@ -213,9 +213,9 @@ def calc_residue(soil, crop_type, field_management, time):
     # C.3.A.4
     crop_type.bio_BG = crop_type.fr_root * crop_type.biomass_actual
     soil.soil_layers[0].fr_tillage = 0.55
-    soil.lignin_residue_percent = 17
-    soil.lignin_residue_AG_percent = 2.6  # TODO this will be a crop type lignin percent
-    soil.lignin_residue_BG_percent = 2.6  # TODO this will be a crop type lignin percent
+    # lignin residue reset at harvest
+    soil.lignin_residue_AG_percent = 17  # TODO
+    soil.lignin_residue_BG_percent = 17  # TODO
 
     d_residue = 0
     if time.day == crop_type.kill_day or crop_type.crop_type == 'annual':

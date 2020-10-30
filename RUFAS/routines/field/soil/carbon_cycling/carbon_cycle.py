@@ -45,15 +45,14 @@ def residue_partitioning(crop_type, soil, weather, time):
     """
 
     # S.6.A.1
-    d_lignin_residue_percent = 0.12 * weather.rainfall[time.year - 1][time.day - 1] * 0.1
-    soil.lignin_residue_percent += d_lignin_residue_percent
+    d_lignin_residue_AG_percent = 0.12 * weather.rainfall[time.year - 1][time.day - 1] * 0.01
+    soil.lignin_residue_AG_percent += d_lignin_residue_AG_percent
 
-    # TODO fr_N might need a different calculation in the future
     # S.6.A.2
     LN_ratio_AG = 0
-    crop_type.fr_N = 0.4  # TODO
+    crop_type.fr_N = 0.4  # TODO calculate in RuFaS but not "accurate" for carbon use
     if crop_type.fr_N != 0:
-        LN_ratio_AG = (soil.lignin_residue_percent / 100) / crop_type.fr_N
+        LN_ratio_AG = (soil.lignin_residue_AG_percent / 100) / crop_type.fr_N
 
     # S.6.A.3
     metabolic_AG_frac = 0.85 - 0.18 * LN_ratio_AG
@@ -62,6 +61,7 @@ def residue_partitioning(crop_type, soil, weather, time):
 
     K2 = 0.28
     metabolic_AG_active_decomp = K2
+
     # TODO get from database, using coarse temporarily
     a = 0.55
     b = 1.7
@@ -129,12 +129,12 @@ def residue_partitioning(crop_type, soil, weather, time):
 
         # S.6.A.15
         soil.lignin_residue_BG_percent = max(0.0, soil.lignin_residue_BG_percent - 0.15
-                                             * weather.rainfall[time.year - 1][time.day - 1] * 0.1)
+                                             * weather.rainfall[time.year - 1][time.day - 1] * 0.01)
 
         # S.6.A.16
         LN_ratio_BG = 0
         if crop_type.fr_N != 0:
-            LN_ratio_BG = LN_ratio_AG * fr_lignin_residue + ((soil.lignin_residue_percent / 100) / crop_type.fr_N) \
+            LN_ratio_BG = LN_ratio_AG * fr_lignin_residue + (((soil.lignin_residue_BG_percent / 100) / crop_type.fr_N)/100) \
                           * (1 - fr_lignin_residue)
 
         # S.6.A.17

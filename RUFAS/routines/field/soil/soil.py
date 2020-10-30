@@ -312,10 +312,9 @@ class Soil:
 
         # soil carbon attributes
         self.residue_harvest = 0.0
-        self.lignin_residue_percent = 17  # tied to the reset of this variable in yields, if changed, change together
-        # TODO Lignin AG and BG are currently not implemented
-        self.lignin_residue_AG_percent = 2.6  # tied to the reset of this variable in yields, if changed, change together
-        self.lignin_residue_BG_percent = 2.6  # tied to the reset of this variable in yields, if changed, change together
+        self.lignin_residue_AG_percent = 17  # tied to the reset of this variable in yields, if changed, change together
+        # TODO unsure what this should be initialized as
+        self.lignin_residue_BG_percent = 17  # tied to the reset of this variable in yields, if changed, change together
         self.curr_layer_depth = 0
         self.silt_and_clay_frac = 0.5  # TODO database item
 
