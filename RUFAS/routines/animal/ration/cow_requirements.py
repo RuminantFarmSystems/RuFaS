@@ -241,3 +241,4 @@ def energy_activity_rqmts(BW, housing, distance):
     # Total net energy for activity requirement (Mcal)
     NEa = distance * 0.00045 * BW + NEa1
     return NEa
+        
