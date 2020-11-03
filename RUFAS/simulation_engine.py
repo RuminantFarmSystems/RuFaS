@@ -8,7 +8,6 @@ Author(s): Kass Chupongstimun, kass_c@hotmail.com
            Jit Patil, spatil5@wisc.edu
 """
 
-import json
 import time as timer
 from pathlib import Path
 from RUFAS import routines, errors, classes

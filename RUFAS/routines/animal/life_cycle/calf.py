@@ -45,6 +45,13 @@ class Calf(AnimalBase):
 
 		self.target_adg_calf = self.birth_weight / AnimalBase.config['wean_day']
 
+		self.gender = ''
+		self.sold = False
+		self.wean_weight = 0
+		self.birth_weight = 0
+		self.animal_intake = 0
+		self._DBW = 0
+
 	def init_values(self, args):
 		"""
 		Determine stillbirth, gender, and birth weight
@@ -124,15 +131,15 @@ class Calf(AnimalBase):
 		Get current information from the calf
 		"""
 		values = {
-            'id' : self.id,
-            'breed' : self.breed,
-            'birth_date' : self.birth_date,
-            'days_born' : self.days_born,
-            'birth_weight' : self.birth_weight,
-            'body_weight' : self.body_weight,
-            'wean_weight' : self.wean_weight,
+            'id': self.id,
+            'breed': self.breed,
+            'birth_date': self.birth_date,
+            'days_born': self.days_born,
+            'birth_weight': self.birth_weight,
+            'body_weight': self.body_weight,
+            'wean_weight': self.wean_weight,
 			'mature_body_weight': self.mature_body_weight,
-            'events' : str(self.events)
+            'events': str(self.events)
 		}
 		return values
 
@@ -204,7 +211,7 @@ class Calf(AnimalBase):
 			wean_day = True
 			self.wean_weight = self.body_weight
 			self.events.add_event(self.days_born, sim_day, 'Wean Day')
-			self.days_born -= 1 # will increment by 1 again in heifer update
+			self.days_born -= 1  # will increment by 1 again in heifer update
 		else:
 			self.body_weight += self.target_adg_calf
 
