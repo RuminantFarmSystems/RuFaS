@@ -34,6 +34,9 @@ def main():
     # 5 Adds leap days (DAYMET does not report data for leap days)
     add_leap_days(conn)
 
+    # 6 Add average temperature and daily radiation
+    avg_and_radiation(conn)
+
 
 def import_data(connection, csv_path):
     c = connection.cursor()
@@ -59,7 +62,7 @@ def add_leap_days(connection):
     end_day = c.fetchone()[0]
 
     y = start_year
-    while not is_leap_year(y):
+    while not is_leap_year(y) and y < start_year:
         y += 1
 
     if is_leap_year(y):
@@ -72,6 +75,13 @@ def add_leap_days(connection):
                 c.execute("INSERT INTO Skeleton2\
                 SELECT ?, 366, dayl, precip, srad, swe, high, low, vp FROM Skeleton2 WHERE year = ? AND jday = 365", (y,y))
                 y += 4
+    connection.commit()
+
+
+def avg_and_radiation(connection):
+    c = connection.cursor()
+    c.execute("ALTER TABLE Skeleton2 Add COLUMN avg")
+    c.execute("UPDATE Skeleton2 SET avg = (high+low)/2")
     connection.commit()
 
 
