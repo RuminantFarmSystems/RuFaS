@@ -3,7 +3,7 @@
     "config":
     {
         "start_date" : "2009:244",
-        "end_date" : "2016:243",
+        "end_date" : "2012:243",
         "csv_dir": "output/CSVs/",
         "graphic_dir": "output/graphics/",
         "run_tests": false
@@ -25,7 +25,7 @@
             "field_1":
             {
                 "soil": "barnyard_soil.json",
-                "crop": "corn_rotation.json",
+                "crop": "custom_rotation.json",
                 "field_management": "barnyard_field_management.json"
             },
             "field_2":

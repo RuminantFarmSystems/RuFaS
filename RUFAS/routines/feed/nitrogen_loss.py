@@ -49,7 +49,6 @@ def NPN_loss(storage):
     Description:
         Non-Protein-Nitrogen loss
         "pseudocode_feed" F.1.3
-        TODO: Value never used
 
     Args:
         storage
