@@ -8,8 +8,8 @@ Description: Main file in the ration formulation process that connects all
 
 Author(s): Chris VanKerkhove, cjv47@cornell.edu
 """
-from RUFAS.routines.animal.ration import cow_requirements
-from RUFAS.routines.animal.ration import cow_ration_NLP as NLP
+from RUFAS.routines.animal.ration import animal_requirements
+from RUFAS.routines.animal.ration import ration_NLP as NLP
 import statistics as stat
 import math
 
@@ -46,9 +46,9 @@ def optimization(requirements, available_feeds, BW, cow_type):
         limit = NLP.list_reconfig(available_feeds.dry_cow_limit)
     NLP.set_globals(price, requirements.NEmaint, requirements.NEa, requirements.NEpreg,
                     requirements.NEl, requirements.NEg, requirements.MP_req,
-                    requirements.Ca_req, requirements.P_req, requirements.DMIest,
-                    TDN, DE, EE, is_fat, BW, calcium, phosphorus, NDF,
-                    feed_type, is_wetforage, Kd, N_A, N_B, CP, dRUP, limit)
+                    requirements.Ca_req, requirements.P_req, TDN, DE, EE, is_fat,
+                    BW, calcium, phosphorus, NDF, feed_type, is_wetforage, Kd,
+                    N_A, N_B, CP, dRUP, limit, DMIest_ = requirements.DMIest)
     solution = NLP.optimize()
     return solution
 
@@ -208,7 +208,7 @@ class Requirements:
         if recalc:
             # iterating through each animal in the pen and calculating requirements
             for animal in pen.animals_in_pen:
-                req = cow_requirements.calc_rqmts(animal.body_weight, animal.mature_body_weight,
+                req = animal_requirements.calc_rqmts(animal.body_weight, animal.mature_body_weight,
                                                   animal.days_in_preg, animal.calves, animal.CI, animal.mPrt,
                                                   animal.fat_percent, animal.lactose_milk,
                                                   animal.estimated_daily_milk_produced, animal.days_in_milk,
@@ -217,7 +217,7 @@ class Requirements:
                 # calculating the activity requirement for energy
                 animal.calc_daily_walking_dist(pen.vertical_dist_to_parlor,
                                                pen.horizontal_dist_to_parlor)
-                NEa_val = cow_requirements.energy_activity_rqmts(animal.body_weight,
+                NEa_val = animal_requirements.energy_activity_rqmts(animal.body_weight,
                                                                  pen.housing_type,
                                                                  (math.sqrt(animal.DVD ** 2 + animal.DHD ** 2)))
                 NEmaint.append(req['NEmaint'])
@@ -235,7 +235,7 @@ class Requirements:
                 # calculating the activity requirement for energy
                 animal.calc_daily_walking_dist(pen.vertical_dist_to_parlor,
                                                pen.horizontal_dist_to_parlor)
-                NEa_val = cow_requirements.energy_activity_rqmts(animal.body_weight,
+                NEa_val = animal_requirements.energy_activity_rqmts(animal.body_weight,
                                                                  pen.housing_type,
                                                                  (math.sqrt(animal.DVD ** 2 + animal.DHD ** 2)))
                 NEmaint.append(animal.NEmaint)

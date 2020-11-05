@@ -171,4 +171,3 @@ def calc_rqmts(BW, MW, DOP, BCS5, PrevTemp, bred):
     # be calculated within the NLP and added to this sum)
     # [A.Heifer.C.8]
     P_req = P_growth + P_preg
-    

@@ -7,7 +7,7 @@ Author(s): Kass Chupongstimun, kass_c@hotmail.com
 """
 import json
 
-import pulp
+#import pulp
 import sys
 from pathlib import Path
 
@@ -249,7 +249,7 @@ def LP_solve(LHS, RHS, objective, var_names, operators,
             .
             .
             .
-            
+
             'variableN_name': variable value
             }
     """
