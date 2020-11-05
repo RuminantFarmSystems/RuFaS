@@ -11,7 +11,8 @@ k-> potassium
 rfw-> recycled flush water
 mcf-> methane conversion factor
 ms -> manure handled in system
-
+sls -> solid liquid separator
+strg_p -> Storage Pond
 
 
 $Constants
@@ -20,8 +21,9 @@ $Constants
 TOTAL_HOURS_IN_A_DAY = 24
 MINS_IN_AN_HOUR = 60
 CENT = 100
-LTRS_IN_M3 = 1000
+M3_IN_LTRS = 1000
 DAYS_IN_A_YEAR = 365 or 366
+KG_TO_G = 1000
 #Considering separating constants for both types of pens
 
 #Excreta and related constants
@@ -115,7 +117,7 @@ time_spent_per_day_mlk = (average_time_spent_milking * number_of_milkings)/MINS_
 percent_time_spent_per_day_mlk = time_spent_per_day * CENT/ HOURS_IN_A_DAY                        # in %
 
 MANURE GENREATED
-total_waste_volume_received_mlk = (raw_manure/manure_density)*(percent_time_spent_per_day/CENT) + (fresh_water/LTRS_IN_M3)     #m3/day
+total_waste_volume_received_mlk = (raw_manure/manure_density)*(percent_time_spent_per_day/CENT) + (fresh_water/M3_IN_LTRS)     #m3/day
 total_solids_mlk = total_solids_excreted * (percent_time_spent_per_day/CENT)                                                   #kg/day
 volatile_solids_mlk = volatile_solids_excreted * (percent_time_spent_per_day/CENT)                                             #kg/day
 nitrogen_mlk = n_as_excreted * (percent_time_spent_per_day/CENT)                                                               #kg/day
@@ -166,7 +168,6 @@ percent_time_spent_per_day_fr = CENT - percent_time_spent_per_day_lc       # som
 
 MANURE GENERATED
 total_waste_volume_fr = ((raw_manure/manure_densiy)*percent_time_spent_per_day/CENT) + (flush_water/1000) + total_waste_volume_received_mlk + sand_volume_separated  #m3/day
-****Some numbers not understood, ask Varma****
 ts_manure_bedding_rfw_percent = [1-2] % #some input
 ts_manure_bedding_rfw = (total_solids_excreted * percent_time_spent_per_day/CENT) + total_solids_mlk + ts_rfw_contribution      #kg/day
 ts_g_per_L = total_solids_manure_bedding_rfw / total_waste_volume         #g/L
@@ -221,7 +222,7 @@ FACULTATIVE LAGOON
 \\\\\\\\\\\\\\\\\\\\\\\\\\\\
 
 waste_water_volume_lag = total_waste_volume_fr                                                                        #m3/day, Day1 (why this)
-flushing_recycled = flush_water / LTRS_IN_M3                                                                      #m3/day
+flushing_recycled = flush_water / M3_IN_LTRS                                                                      #m3/day
 reduced_volume = waste_water_volume_lag - flushing_recycled                                                           #m3/day, Day2-Day180 (why this)
 ts_lag = ts_manure_bedding_rfw                                                                                    #kg/day
 ts_lag_g_per_L = ts_lag / waste_water_volume_lag                                                                      #g/L
@@ -258,19 +259,26 @@ methane_emission_yearly = vs_per_year * bo * mcf * ms * factor_m3_CH4_to_kg_per_
 co2_equivalent_daily = methane_emission_yearly * CH4_to_CO2                           #kg/animal/year
 
 --------- 
-Direct
-n_excretion_rate_daily = n_manure_bedding_rfw / total_animals                                                               #kg N/animal/day
+n_excretion_rate_daily_direct = n_manure_bedding_rfw / total_animals                                                        #kg N/animal/day
 n_excretion_rate_yearly = n_excretion_rate_daily * DAYS_IN_A_YEAR                                                           #kg N/animal/day
+kg_n20n_to_kg_co2 = 44/28 = 1.57                                                                                            #kg co2/kg n2o/animal/day
+n2o_to_co2 = 310                                                                                                            #kg co2/kg n2o
+
+Direct
 fraction_mms = [0.70 .. 1.00]                                                                                               #some fraction % , input
 emission_factor_n20_direct = 0.002                                                                                          #kg N2O-N/kg N, some fraction input
-kg_n20n_to_kg_co2 = 44/28 = 1.57                                                                                            #kg co2/kg n2o/animal/day
-direct_nitrus_oxide_daily = n_excretion_rate_daily * fraction_mms * emission_factor_n20_direct * kg_n20n_to_kg_n2o          #kg n2o/animal/day
-n2o_to_co2 = 310                                                                                                            #kg co2/kg n2o
+direct_nitrus_oxide_daily = n_excretion_rate_daily * fraction_mms * emission_factor_n20_direct * kg_n20n_to_kg_co2          #kg n2o/animal/day
 co2_from_n2o_daily = direct_nitrus_oxide_daily * n2o_to_co2                                                                 #kg co2/animal/day 
-direct_nitrus_oxide_yearly = n_excretion_rate_yearly * fraction_mms * emission_factor_n20_direct * kg_n20n_to_kg_n2o        #kg n2o/animal/year
+direct_nitrus_oxide_yearly = n_excretion_rate_yearly * fraction_mms * emission_factor_n20_direct * kg_n20n_to_kg_co2        #kg n2o/animal/year
 co2_from_n2o_yearly = direct_nitrus_oxide_yearly * n2o_to_co2                                                               #kg co2/animal/year  
 
-Another set of N? Indirect, translate
+Indirect
+fraction_n_to_nh3_nox = 0.25                                                                                                            #some fraction % , input
+emission_factor_n20_indirect = 0.01                                                                                                     #kg N2O-N/kg N, some fraction input
+indirect_nitrus_oxide_daily = n_excretion_rate_daily * fraction_n_to_nh3_nox * emission_factor_n20_indirect * kg_n20n_to_kg_co2         #kg n2o/animal/day
+co2_from_n2o_daily =  indirect_nitrus_oxide_daily * n2o_to_co2                                                                          #kg co2/animal/day 
+direct_nitrus_oxide_yearly = n_excretion_rate_yearly * fraction_n_to_nh3_nox * emission_factor_n20_indirect * kg_n20n_to_kg_co2         #kg n2o/animal/year
+co2_from_n2o_yearly = indirect_nitrus_oxide_yearly * n2o_to_co2                                                                         #kg co2/animal/year  
 
 
 FACULTATIVE LAGOON EFFLUENT CHARACTERISTICS
@@ -301,7 +309,81 @@ p_lag_val = p_lag_vaue_g_per_l * sludge_volume                               #kg
 k_lag_vaue_g_per_l = 1.10 .. 1.75                                            #g/L, some input [1.10 .. 1.75]
 k_lag_val = k_lag_vaue_g_per_l * sludge_volume                               #kg 
 
+
+
+
+
+
+SOLID LIQUID SEPARATOR
 \\\\\\\\\\\\\\\\\\\\\\\\\\\\
--
+
+ROTATION SCREEN (DT360 MANURE SEPARATOR)
+
+Digestor Effluent
+rotating_screen_and_roller_press = 0.75 mm                                                #some input/ constant
+total_volume_sls = total_waste_volume_received_fr * M3_IN_LTRS                            #ltrs/day
+ts_sls = ts_manure_bedding_rfw                                                            #kg/day,   from fr
+ts_sls_g_per_l = ts_sls * G_TO_KG / total_volume_sls                                      #g/ltrs
+vs_sls = vs_manure_bedding_rfw                                                            #kg/day
+vs_sls_g_per_l = vs_sls * G_TO_KG / total_volume_sls                                      #g/ltrs
+n_sls = n_manure_bedding_rfw                                                              #kg/day
+n_sls_g_per_l = n_sls * G_TO_KG / total_volume_sls                                        #g/ltrs  
+tan_sls = tan_manure_bedding_rfw                                                          #kg/day
+tan_sls_g_per_l = tan_sls * G_TO_KG / total_volume_sls                                    #g/ltrs  
+p_sls = p_manure_bedding_rfw                                                              #kg/day
+p_sls_g_per_l = p_sls * G_TO_KG / total_volume_sls                                        #g/ltrs  
+k_sls = k_manure_bedding_rfw                                                              #kg/day
+k_sls_g_per_l = k_sls * G_TO_KG / total_volume_sls                                        #g/ltrs  
+
+
+Removal Efficiency
+flow_rate = total_volume_sls                                                              #ltrs/day
+ts_efficiency = [0.20-0.40]                                                               #Some input, %
+ts_removed_sls = ts_sls * ts_efficiency                                                   #kg/day
+ts_removed_sls_g_per_l = ts_sls_g_per_l * ts_efficiency                                   #g/ltrs
+vs_efficiency = 0.85                                                                      #Some input, %
+vs_removed_sls = vs_sls * vs_efficiency                                                   #kg/day
+vs_removed_sls_g_per_l = vs_sls_g_per_l * vs_efficiency                                   #g/ltrs
+n_efficiency = [0.10-0.50]                                                                #Some input, %
+n_removed_sls = n_sls * n_efficiency                                                      #kg/day
+p_efficiency = [0.10-0.50]                                                                #Some input, %
+p_removed_sls = p_sls * p_efficiency                                                      #kg/day
+k_efficiency = [0.10-0.50]                                                                #Some input, %
+k_removed_sls = k_sls * k_efficiency                                                      #kg/day
+
+Effluent Solid
+dry_solid = ts_removed_sls                                                                #kg/day
+vs_effluent_s = vs_removed_sls                                                            #kg/day
+n_effluent_s = n_removed_sls                                                              #kg/day
+p_effluent_s = p_removed_sls                                                              #kg/day
+k_effluent_s = k_removed_sls                                                              #kg/day
+total_wet_weight_mass_fraction = [0.25-0.32]                                              #some faction
+total_wet_weight_mass = dry_solid / total_wet_weight_mass_fraction                        #kg/day
+
+Effluent Liquid - Storage Pond, Significance? 
+volume_factor = 0.7                                                                       #Some fractional input
+volume_eff_liq_ltrs = flow_rate - total_mass_wet_weight                                   #ltrs/day  
+volume_eff_liq_m3 = volume_eff_liq_ltrs / M3_IN_LTRS                                      #m3/day
+ts_effluent_liq = ts_sls - ts_removed_sls                                                 #kg/day
+ts_effluent_liq_g_per_l = ts_sls_g_per_l - ts_removed_sls_g_per_l                         #g/l
+vs_effluent_liq = vs_sls - vs_removed_sls                                                 #kg/day
+vs_effluent_liq_g_per_l = vs_sls_g_per_l - vs_removed_sls_g_per_l                         #g/l
+n_effluent_liq = n_sls - n_removed_sls                                                    #kg/day
+n_effluent_liq_g_per_l = n_effluent_liq * KG_TO_G/volume_eff_liq_ltrs                     #g/l
+p_effluent_liq = p_sls - p_removed_sls                                                    #kg/day
+p_effluent_liq_g_per_l = p_effluent_liq * KG_TO_G/volume_eff_liq_ltrs                     #g/l
+k_effluent_liq = n_sls - k_removed_sls                                                    #kg/day
+k_effluent_liq_g_per_l = k_effluent_liq * KG_TO_G/volume_eff_liq_ltrs                     #g/l
+
+
+Storage Pond
+waste_water_volume_strg_p
+
+
+
+
+
+
+
 
 """
