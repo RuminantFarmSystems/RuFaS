@@ -503,8 +503,9 @@ def optimize():
     bnds = []
     # Dividing limit by 3 for tri-decision variables for farm grown feeds
     for i in range(len(limit)):
-        bnds.append((0, limit[i] / 3))
+        bnds.append((0, (limit[i] / 3) + 0.0001))
     bnds = tuple(bnds)
+    #print(bnds)
 
     # establishing the constraints of the NLP
     con1 = {'type': 'ineq', 'fun': NEmact_constraint}
