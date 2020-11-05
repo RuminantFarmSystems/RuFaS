@@ -19,7 +19,7 @@ from RUFAS.routines.animal.clustering_pen_grouping import grouping
 from RUFAS.routines.animal.life_cycle.life_cycle import LifeCycleManager
 from RUFAS.routines.animal.life_cycle.animal_base import AnimalBase
 from RUFAS.routines.animal.ration import ration_driver as ration_driver
-from RUFAS.routines.animal.ration import cow_requirements as req
+from RUFAS.routines.animal.ration import animal_requirements as req
 from collections import deque
 import random
 
