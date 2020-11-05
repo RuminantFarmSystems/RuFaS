@@ -1,7 +1,7 @@
 """
 RUFAS: Ruminant Farm Systems Model
-File name: lactating_cow_ration_NLP.py
-Description: Calculates the ration for lactating cows using a Non-Linear
+File name: ration_NLP.py
+Description: Calculates the ration for animals using a Non-Linear
     programming method utilizing the scipy package. The NLP is formulated using
     constraint functions. Note NLP (Non-linear Program) will be used throughout
     descriptions for functions in this file.
@@ -14,9 +14,9 @@ from scipy.optimize import minimize
 
 
 def set_globals(price_, NEmaint_, NEa_, NEpreg_, NEl_, NEg_, MP_req_, C_req_, P_req_,
-                DMIest_, TDN_, DE_, EE_, is_fat_, BW_, calcium_, phosphorus_,
-                NDF_, type_, is_wetforage_, Kd_, N_A_, N_B_, CP_, dRUP_, limit_,
-                ):
+                 TDN_, DE_, EE_, is_fat_, BW_, calcium_, phosphorus_, NDF_, type_,
+                 is_wetforage_, Kd_, N_A_, N_B_, CP_, dRUP_, limit_,
+                 animal_type_ = 'cow', DMIest_= None):
     """
     Sets the global variables with the feed information to be used in the
     constraint functions below. If the input described below is a list, it is a
@@ -53,10 +53,11 @@ def set_globals(price_, NEmaint_, NEa_, NEpreg_, NEl_, NEg_, MP_req_, C_req_, P_
         CP_: A list of crude protein in each feed (% of DM)
         dRUP_: A list of RUP degradability in each feed (% of RUP)
         limit_: A list of the limiting upper bounds for each feed (kg)
+        animal_type: A string representing the type of the animal
     """
     global price, n, NEmaint, NEa, NEpreg, NEl, NEg, MP_req, C_req, P_req, \
         DMIest, TDN, DE, EE, is_fat, BW, calcium, phosphorus, NDF, type, \
-        is_wetforage, Kd, N_A, N_B, CP, dRUP, limit, cow_type
+        is_wetforage, Kd, N_A, N_B, CP, dRUP, limit, animal_type
 
     price = price_
     n = len(price)
@@ -85,6 +86,7 @@ def set_globals(price_, NEmaint_, NEa_, NEpreg_, NEl_, NEg_, MP_req_, C_req_, P_
     CP = CP_
     dRUP = dRUP_
     limit = limit_
+    animal_type = animal_type_
 
 
 def list_reconfig(list):
@@ -139,32 +141,32 @@ def NEmact_constraint(x):
     # Dietary TDN content, kg
     TotalTDN = sum(np.multiply(x, TDN))
     TotalTDN = np.multiply(TotalTDN, 0.01)
-    # [A.Cow.E.1]
+    # [A.Cow.E.1]-[A.Heifer.E.1]
     # TDN concentration, %
     if DMI != 0:
         TDNconc = (TotalTDN / DMI) * 100
     else:
         TDNconc = 0
     SBW = BW * 0.96
-    # [A.Cow.E.2]
+    # [A.Cow.E.2]-[A.Heifer.E.2]
     # The amount of intake needed to meet the maintenance requirement, dimensionless
     if TotalTDN < (0.035 * BW ** 0.75):
         DMI_to_maint = 1
     else:
         DMI_to_maint = (TotalTDN / (0.035 * SBW ** 0.75))
-    # [A.Cow.E.3]
+    # [A.Cow.E.3]-[A.Heifer.E.3]
     # TDN discount, TDN digestibility decrease caused by DMI and TDNconc
     if TDNconc < 60:
         Discount = 1
     else:
         Discount = (TDNconc - ((0.18 * TDNconc - 10.3) * (DMI_to_maint - 1))) / TDNconc
-    # [A.Cow.E.4]
+    # [A.Cow.E.4]-[A.Heifer.E.4]
     # Actual TDN content of feed i, %
     TDNact = np.multiply(TDN, Discount)
-    # [A.Cow.E.5]
+    # [A.Cow.E.5]-[A.Heifer.E.5]
     # Actual digestible energy of feed i, Mcal/kg
     DEact = np.multiply(DE, Discount)
-    # [A.Cow.E.5]
+    # [A.Cow.E.6]-[A.Heifer.E.6]
     # Actual metabolizable energy of feed i, Mcal/kg
     MEact = []
     for i in range(len(DEact)):
@@ -176,7 +178,7 @@ def NEmact_constraint(x):
             MEact.append(1.01 * DEact[i] - 0.45 + 0.0046 * (EE[i] - 3))
         else:
             MEact.append(1.01 * DEact[i] - 0.45)
-    # [A.Cow.E.7]
+    # [A.Cow.E.8]-[A.Heifer.E.8]
     # Actual net energy for maintenance of feed i, Mcal/kg
     NEm_act = []
     for i in range(len(MEact)):
@@ -203,10 +205,10 @@ def NEl_constraint(x):
 
     Args:
         x: The decision vector of the NLP
-    """
+"""
     # Actual net energy for lactation of feed i, Mcal/kg
     NElact = []
-    # [A.Cow.E.6]
+    # [A.Cow.E.7]-[A.Heifer.E.7]
     for i in range(len(MEact)):
         if type[i] == 'Mineral':
             NElact.append(0)
@@ -238,7 +240,7 @@ def NEgact_constraint(x):
     """
     # Actual net energy for growth of feed i, Mcal/kg
     NEgact = []
-    # [A.Cow.E.8]
+    # [A.Cow.E.9]-[A.Heifer.E.9]
     for i in range(len(MEact)):
         if type[i] == 'Mineral':
             NEgact.append(0)
@@ -277,7 +279,7 @@ def calcium_constraint(x):
             dCa.append(.95)
         else:
             dCa.append(0)
-    # [A.Cow.E.15]
+    # [A.Cow.E.16]-[A.Heifer.E.16]
     return (sum(np.multiply(x, np.multiply(np.multiply(calcium, 0.01), dCa))) - (C_req / 1000))
 
 
@@ -307,13 +309,13 @@ def phosphorus_constraint(x):
             dP.append(0)
     # Phosphorus Requirements
     # ----------------------
-    # [A.Cow.C.6]
+    # [A.Cow.C.6]-[A.Heifer.C.5]
     # Phosphorus maintenance requirement (g)
-    if type:
+    if type and (animal_type == 'cow'):
         P_maint = 1 * DMI + 0.002 * BW
     else:
         P_maint = 0.08 * DMI + 0.002 * BW
-    # [A.Cow.E.15]
+    # [A.Cow.E.16]-[A.Heifer.16]
     return sum(np.multiply(x, np.multiply(np.multiply(phosphorus, 0.01), dP))) - ((P_req + P_maint) / 1000)
 
 
@@ -340,7 +342,7 @@ def protien_constraint(x):
         PercentConc = (sum(np.multiply(x, is_conc)) / DMI) * 100
     else:
         PercentConc = 0
-    # [A.Cow.E.9]
+    # [A.Cow.E.10]-[A.Heifer.E.10]
     # Protein passage rate of feed i (%/h)
     Kp = []
     for i in range(len(type)):
@@ -352,7 +354,7 @@ def protien_constraint(x):
             Kp.append(3.054 + 0.614 * (DMI / BW) * 100)
         else:
             Kp.append(0)
-    # [A.Cow.E.10]
+    # [A.Cow.E.11]-[A.Heifer.E.11]
     # Rumen degradable protein of feed i (% of DM)
     RDP = []
     for i in range(len(Kd)):
@@ -360,7 +362,7 @@ def protien_constraint(x):
             RDP.append((Kd[i] / (Kd[i] + Kp[i])) * (N_B[i] / 100) * CP[i] + (N_A[i] / 100) * CP[i])
         else:
             RDP.append(0)
-    # [A.Cow.E.11]
+    # [A.Cow.E.12]-[A.Cow.E.12]
     # Rumen undegradable protein of feed i (% of DM)
     RUP = []
     for i in range(len(CP)):
@@ -369,20 +371,20 @@ def protien_constraint(x):
     TDNact_diet = sum(np.multiply(x, np.multiply(TDNact, 0.01)))
     # Dietary RDP (kg)
     RDP_diet = sum(np.multiply(x, np.multiply(RDP, 0.01)))
-    # [A.Cow.E.12]
+    # [A.Cow.E.13]-[A.Cow.E.13]
     # Metabolizable bacterial protein production (g)
     MPbact = 0.64 * min(1000 * .13 * TDNact_diet, 1000 * 0.85 * RDP_diet)
-    # [A.Cow.E.13]
+    # [A.Cow.E.14]-[A.Heifer.E.14]
     # Dietary RUP (kg)
     RUP_diet = sum(np.multiply(x, np.multiply(np.multiply(RUP, 0.01), np.multiply(dRUP, 0.01))))
-    # [A.Cow.E.14]
+    # [A.Cow.E.15]
     # Total metabolizable protein supply
     MP_supply = MPbact + RUP_diet + 0.4 * 11.8 * DMI
 
     # B: PROTIEN REQUIREMENTS:
     # Maintenance Requirement
     # ---------------------
-    # [A.Cow.B.1]
+    # [A.Cow.B.1]-[A.Heifer.B.1]
     # Metabolizable protein requirement for maintenance (g)
     MPm = (DMI * 1000 * 0.03 - 0.5 * ((MPbact / 0.8) - MPbact)) + 0.4 * 11.8 * (DMI / 0.67)
     return (MP_supply - ((MP_req + MPm) / 1000))
@@ -396,7 +398,7 @@ def NDF_constraint_1(x):
     Args:
         x: The decision vector of the NLP
     """
-    # From E: OTHER REQUIREMENTS
+    # From E/D: OTHER REQUIREMENTS
     DMI = sum(x)
     if DMI != 0:
         return (sum(np.multiply(x, NDF)) / DMI) - 25
@@ -410,7 +412,7 @@ def NDF_constraint_2(x):
     Args:
         x: The decision vector of the NLP
     """
-    # From E: OTHER REQUIREMENTS
+    # From E/D: OTHER REQUIREMENTS
     DMI = sum(x)
     if DMI != 0:
         return (-(sum(np.multiply(x, NDF)) / DMI) + 45)
@@ -425,7 +427,7 @@ def forage_NDF_constraint(x):
     Args:
         x: The decision vector of the NLP
     """
-    # From E: OTHER REQUIREMENTS
+    # From E/D: OTHER REQUIREMENTS
     is_forage = []
     for i in range(len(type)):
         if type[i] == 'Forage':
@@ -445,7 +447,7 @@ def fat_constraint(x):
     Args:
         x: The decision vector of the NLP
     """
-    # From E: OTHER REQUIREMENTS
+    # From E/D: OTHER REQUIREMENTS
     DMI = sum(x)
     if DMI != 0:
         return -(sum(np.multiply(x, EE)) / DMI) + 7
@@ -516,6 +518,10 @@ def optimize():
     con9 = {'type': 'ineq', 'fun': forage_NDF_constraint}
     con10 = {'type': 'ineq', 'fun': fat_constraint}
     con11 = {'type': 'ineq', 'fun': DMI_constraint}
-    cons = ([con1, con2, con3, con4, con5, con6, con7, con8, con9, con10, con11])
+    cow_cons = [con1, con2, con3, con4, con5, con6, con7, con8, con9, con10, con11]
+    heifer_cons = [con1, con3, con4, con5, con6, con7, con8, con9, con10]
 
-    return minimize(objective, x0, method='SLSQP', bounds=bnds, constraints=cons)
+    if animal_type ==  'cow':
+        return minimize(objective, x0, method='SLSQP', bounds=bnds, constraints=cow_cons)
+    elif animal_type == 'heifer':
+        return minimize(objective, x0, method='SLSQP', bounds=bnds, constraints=heifer_cons)
