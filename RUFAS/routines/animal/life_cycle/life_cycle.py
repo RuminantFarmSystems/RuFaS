@@ -119,16 +119,6 @@ class LifeCycleManager:
     cull_reason_stats_range = {}
     parity_culling_stats_range = {}
 
-    count_21_days = 0
-    num_ai_21_days = 0
-    num_cow_btw_vwp_preg_21_days = 0
-    service_rate_sum_21_days = 0
-    num_preg_21_days = 0
-    conception_rate_sum_21_days = 0
-
-    avg_service_rate = 0
-    avg_conception_rate = 0
-    pregnancy_rate = 0
     ai_num = 0
     semen_num = 0
 
@@ -573,29 +563,6 @@ class LifeCycleManager:
                 if new_calf.sold:
                     self.sold_calf_num += 1
 
-            # calculate reproduction indications
-            if date >= sim_length - 21 * self.config["num_21_days_repro"]:
-                if cow.ai_day == cow.days_born:
-                    self.num_ai_21_days += 1
-                if cow.days_in_milk > self.config["voluntary_waiting_period"] and not cow.preg:
-                    self.num_cow_btw_vwp_preg_21_days += 1
-                if cow.days_in_preg == 1:
-                    self.num_preg_21_days += 1
-
-        # calculate service rate and conception rate
-        if date >= sim_length - 21 * self.config["num_21_days_repro"]:
-            self.count_21_days += 1
-            if self.count_21_days % 21 == 0 and self.herd_num > 50:
-                self.service_rate_sum_21_days += \
-                    float(self.num_ai_21_days) / \
-                    float(self.num_cow_btw_vwp_preg_21_days) * 21
-                self.conception_rate_sum_21_days += \
-                    float(self.num_preg_21_days) / \
-                    float(self.num_ai_21_days)
-                self.num_ai_21_days = 0
-                self.num_cow_btw_vwp_preg_21_days = 0
-                self.num_preg_21_days = 0
-
         if total_animal_num == 0:
             self.calf_percent = 0
             self.heiferI_percent = 0
@@ -631,12 +598,6 @@ class LifeCycleManager:
             else:
                 self.percent_cow_for_parity[parity] = \
                     self.num_cow_for_parity[parity] / self.cow_num * 100
-
-        self.avg_service_rate = self.service_rate_sum_21_days / \
-                                float(self.config["num_21_days_repro"])
-        self.avg_conception_rate = self.conception_rate_sum_21_days / \
-                                   float(self.config["num_21_days_repro"])
-        self.pregnancy_rate = self.avg_service_rate * self.avg_conception_rate
 
         return animals_added, ids_removed, calves_born, calves, heiferIs, \
                heiferIIs, heiferIIIs, cows
