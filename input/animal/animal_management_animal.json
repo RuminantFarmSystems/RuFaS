@@ -1,207 +1,205 @@
 {
-	"herd_information": {
-		"calf_num": 80,
-		"heiferI_num": 440,
-		"heiferII_num": 380,
-		"heiferIII_num": 50,
-		"cow_num": 1000,
-		"replace_num": 5000,
-		"herd_num": 1000,
-		"herd_init": false,
-		"breed": "HO"
-	},
-	"animal_config": {
-		"management_decisions": {
-			"breeding_start_day_h": 360,
-			"heifer_repro_method": "TAI",
-			"cow_repro_method": "TAI",
-			"semen_type": "conventional",
-			"dip_dry": 218,
-			"lactation_curve": "wood",
-			"heifer_repro_cull_time": 650,
-			"repro_cull_time": 300,
-			"do_not_breed_time" : 300,
-			"cull_milk_production": 22,
-			"cow_times_milked_per_day": 1
-		},
-		"farm_level": {
-			"calf": {
-				"male_calf_rate_sexed_semen": 0.1,
-				"male_calf_rate_conventional_semen": 0.53,
-				"birth_weight_avg_ho": 43.9,
-				"birth_weight_std_ho": 1.0,
-				"birth_weight_avg_je": 35.2,
-				"birth_weight_std_je": 0.9,
-				"keep_female_calf_rate": 1,
-				"wean_day": 60,
-				"wean_length": 7,
-				"milk_type": "whole"
-			},
-			"repro": {
-				"estrus_detection_rate": 0.4,
-				"estrus_service_rate": 0.9,
-				"ed_conception_rate": 0.4,
-				"heifer_TAI_protocol": "5dCG2P",
-				"m5dCG2P_conception_rate": 0.6,
-				"m5dCGP_conception_rate": 0.48,
-				"heifer_user_defined_tai_cr": 0.0,
-				"heifer_synchED_protocol": "2P",
-				"cow_presynch_protocol": "Double OvSynch",
-				"user_defined_presynch_length": 0,
-				"cow_TAI_protocol": "OvSynch 56",
-				"ovsynch56_conception_rate": 0.55,
-				"ovsynch48_conception_rate": 0.4,
-				"cosynch72_conception_rate": 0.4,
-				"cosynch5d_conception_rate": 0.4,
-				"cow_user_defined_tai_cr": 0.0,
-				"cow_resynch_protocol": "TAIafterPD",
-				"user_define_tai_length": 0,
-				"voluntary_waiting_period": 45,
-				"tai_program_start_day": 72,
-				"conception_rate_decrease": 0.026,
-				"avg_gestation_len": 278,
-				"std_gestation_len": 6,
-				"prefresh_day": 30,
-				"num_21_days_repro": 15,
-				"calving_interval": 400,
-				"use_input_calving_interval": false
-				
-			},
-			"bodyweight": {
-				"grow_end_day": 780,
-				"mature_body_weight_left": 550,
-				"mature_body_weight_mode": 700,
-				"mature_body_weight_right": 1000,
-				"target_heifer_preg_day": 420
-			}		
-		},
-		"from_literature": {
-			"repro": {
-				"avg_estrus_cycle_heifer": 21,
-				"std_estrus_cycle_heifer": 3,				
-				"preg_check_day_1": 32,
-				"preg_loss_rate_1": 0.02,
-				"preg_check_day_2": 91,
-				"preg_loss_rate_2": 0.096,
-				"preg_check_day_3": 200,
-				"preg_loss_rate_3": 0.017,
-				"avg_estrus_cycle_return": 19,
-				"std_estrus_cycle_return": 11,
-				"avg_estrus_cycle_cow": 21,
-				"std_estrus_cycle_cow": 2.5,
-				"avg_estrus_cycle_p": 10,
-				"std_estrus_cycle_p": 2	
-			},
-			"milking": {
-				"wood_l": [[16.13, 23.61, 23.81], [14.07, 19.26, 19.21]],
-				"wood_m": [[0.235, 0.227, 0.244], [0.186, 0.173, 0.190]],
-				"wood_n": [[0.0019, 0.0032, 0.0036], [0.0021, 0.0028, 0.0032]],
-				"wood_l_std": [[0.28, 0.54, 0.51], [0.39, 0.49, 0.47]],
-				"wood_m_std": [[0.0046, 0.0064, 0.0060], [0.0076, 0.0071, 0.0069]],
-				"wood_n_std": [[3.77e-5, 5.82e-5, 5.54e-5], [6.60e-5, 6.69e-5, 6.53e-5]]
-			},
-			"culling": {
-				"parity_cull_prob": [0.169, 0.233, 0.301, 0.408],
-				"mastitis_cull_prob": [0, 0.06, 0.12, 0.19, 0.30, 0.43, 0.56, 0.68, 0.78, 0.85, 0.90, 0.94, 0.97, 1],
-				"feet_leg_cull_prob": [0, 0.03, 0.08, 0.16, 0.25, 0.36, 0.48, 0.59, 0.69, 0.78, 0.85, 0.90, 0.95, 1],
-				"injury_cull_prob": [0, 0.08, 0.18, 0.28, 0.38, 0.47, 0.56, 0.64, 0.71, 0.78, 0.85, 0.90, 0.95, 1],
-				"disease_cull_prob": [0, 0.04, 0.12, 0.24, 0.34, 0.42, 0.50, 0.57, 0.64, 0.72, 0.81, 0.89, 0.95, 1],
-				"udder_cull_prob": [0, 0.12, 0.24, 0.33, 0.41, 0.48, 0.55, 0.62, 0.68, 0.76, 0.82, 0.89, 0.95, 1],
-				"unkown_cull_prob": [0, 0.05, 0.11, 0.18, 0.27, 0.37, 0.45, 0.54, 0.62, 0.70, 0.77, 0.84, 0.92, 1],
-				"cull_day_count": [0, 5, 15, 45, 90, 135, 180, 225, 270, 330, 380, 430, 480, 530]
-			},
-			"life_cycle": {
-				"still_birth_rate": 0.065
-			}
-		}
-	},
-	"housing": "barn",
-	"pasture_concentrate": -1,
-	"ration": {
-		"user_input": false,
-		"formulation_interval": 7
-	},
-	"pen_information": {
-		"pen0": {
-			"id": 0,
-			"vertical_dist_to_milking_parlor": 0.1,
-			"horizontal_dist_to_milking_parlor": 1.6,
-			"number_of_stalls": 100,
-			"housing_type": "open air barn",
-			"bedding_type": "sand",
-			"pen_type": "freestall"
-		},
-		"pen1": {
-			"id": 1,
-			"vertical_dist_to_milking_parlor": 0.1,
-			"horizontal_dist_to_milking_parlor": 1.6,
-			"number_of_stalls": 200,
-			"housing_type": "open air barn",
-			"bedding_type": "sawdust",
-			"pen_type": "freestall"
-		},
-		"pen2": {
-			"id": 2,
-			"vertical_dist_to_milking_parlor": 0.1,
-			"horizontal_dist_to_milking_parlor": 1.6,
-			"number_of_stalls": 300,
-			"housing_type": "open air barn",
-			"bedding_type": "straw",
-			"pen_type": "tiestall"
-		},
-		"pen3": {
-			"id": 3,
-			"vertical_dist_to_milking_parlor": 0.1,
-			"horizontal_dist_to_milking_parlor": 1.6,
-			"number_of_stalls": 400,
-			"housing_type": "open air barn",
-			"bedding_type": "sand",
-			"pen_type": "tiestall"
-		},
-		"pen4": {
-			"id": 4,
-			"vertical_dist_to_milking_parlor": 0.1,
-			"horizontal_dist_to_milking_parlor": 1.6,
-			"number_of_stalls": 400,
-			"housing_type": "open air barn",
-			"bedding_type": "sand",
-			"pen_type": "tiestall"
-		},
-		"pen5": {
-			"id": 5,
-			"vertical_dist_to_milking_parlor": 0.1,
-			"horizontal_dist_to_milking_parlor": 1.6,
-			"number_of_stalls": 200,
-			"housing_type": "open air barn",
-			"bedding_type": "sand",
-			"pen_type": "tiestall"
-		},
-		"pen6": {
-			"id": 6,
-			"vertical_dist_to_milking_parlor": 0.1,
-			"horizontal_dist_to_milking_parlor": 1.6,
-			"number_of_stalls": 300,
-			"housing_type": "open air barn",
-			"bedding_type": "sand",
-			"pen_type": "tiestall"
-		},
-		"pen7": {
-			"id": 7,
-			"vertical_dist_to_milking_parlor": 0.2,
-			"horizontal_dist_to_milking_parlor": 1.6,
-			"number_of_stalls": 250,
-			"housing_type": "open air barn",
-			"bedding_type": "sand",
-			"pen_type": "tiestall"
-		},
-		"pen8": {
-			"id": 8,
-			"vertical_dist_to_milking_parlor": 0.2,
-			"horizontal_dist_to_milking_parlor": 1.6,
-			"number_of_stalls": 400,
-			"housing_type": "open air barn",
-			"bedding_type": "sand",
-			"pen_type": "tiestall"
-		}
-	}
+    "herd_information": {
+        "calf_num": 75,
+        "heiferI_num": 225,
+        "heiferII_num": 150,
+        "heiferIII_num": 40,
+        "cow_num": 500,
+        "replace_num": 10000,
+        "herd_num": 1000,
+        "herd_init": false,
+        "breed": "HO"
+    },
+    "animal_config": {
+        "management_decisions": {
+            "breeding_start_day_h": 360,
+            "heifer_repro_method": "TAI",
+            "cow_repro_method": "ED-TAI",
+            "semen_type": "conventional",
+            "dip_dry": 218,
+            "lactation_curve": "wood",
+            "heifer_repro_cull_time": 650,
+            "repro_cull_time": 300,
+            "do_not_breed_time" : 300,
+            "cull_milk_production": 22,
+            "cow_times_milked_per_day": 1
+        },
+        "farm_level": {
+            "calf": {
+                "male_calf_rate_sexed_semen": 0.1,
+                "male_calf_rate_conventional_semen": 0.53,
+                "birth_weight_avg_ho": 43.9,
+                "birth_weight_std_ho": 1.0,
+                "birth_weight_avg_je": 35.2,
+                "birth_weight_std_je": 0.9,
+                "keep_female_calf_rate": 1,
+                "wean_day": 60,
+                "wean_length": 7,
+                "milk_type": "whole"
+            },
+            "repro": {
+                "estrus_detection_rate": 0.4,
+                "estrus_service_rate": 0.9,
+                "ed_conception_rate": 0.4,
+                "heifer_TAI_protocol": "5dCG2P",
+                "m5dCG2P_conception_rate": 0.6,
+                "m5dCGP_conception_rate": 0.48,
+                "heifer_user_defined_tai_cr": 0.0,
+                "heifer_synchED_protocol": "2P",
+                "cow_presynch_protocol": "Double OvSynch",
+                "user_defined_presynch_length": 0,
+                "cow_TAI_protocol": "OvSynch 56",
+                "ovsynch56_conception_rate": 0.55,
+                "ovsynch48_conception_rate": 0.4,
+                "cosynch72_conception_rate": 0.4,
+                "cosynch5d_conception_rate": 0.4,
+                "cow_user_defined_tai_cr": 0.0,
+                "cow_resynch_protocol": "TAIafterPD",
+                "user_define_tai_length": 0,
+                "voluntary_waiting_period": 45,
+                "tai_program_start_day": 72,
+                "conception_rate_decrease": 0.026,
+                "avg_gestation_len": 278,
+                "std_gestation_len": 6,
+                "prefresh_day": 30,
+                "calving_interval": 400,
+                "use_input_calving_interval": false
+            },
+            "bodyweight": {
+                "grow_end_day": 780,
+                "mature_body_weight_left": 550,
+                "mature_body_weight_mode": 700,
+                "mature_body_weight_right": 1000,
+                "target_heifer_preg_day": 420
+            }
+        },
+        "from_literature": {
+            "repro": {
+                "avg_estrus_cycle_heifer": 21,
+                "std_estrus_cycle_heifer": 3,
+                "preg_check_day_1": 32,
+                "preg_loss_rate_1": 0.02,
+                "preg_check_day_2": 91,
+                "preg_loss_rate_2": 0.096,
+                "preg_check_day_3": 200,
+                "preg_loss_rate_3": 0.017,
+                "avg_estrus_cycle_return": 19,
+                "std_estrus_cycle_return": 11,
+                "avg_estrus_cycle_cow": 21,
+                "std_estrus_cycle_cow": 2.5,
+                "avg_estrus_cycle_p": 10,
+                "std_estrus_cycle_p": 2
+            },
+            "milking": {
+                "wood_l": [[16.13, 23.61, 23.81], [14.07, 19.26, 19.21]],
+                "wood_m": [[0.235, 0.227, 0.244], [0.186, 0.173, 0.190]],
+                "wood_n": [[0.0019, 0.0032, 0.0036], [0.0021, 0.0028, 0.0032]],
+                "wood_l_std": [[0.28, 0.54, 0.51], [0.39, 0.49, 0.47]],
+                "wood_m_std": [[0.0046, 0.0064, 0.0060], [0.0076, 0.0071, 0.0069]],
+                "wood_n_std": [[3.77e-5, 5.82e-5, 5.54e-5], [6.60e-5, 6.69e-5, 6.53e-5]]
+            },
+            "culling": {
+                "parity_cull_prob": [0.169, 0.233, 0.301, 0.408],
+                "mastitis_cull_prob": [0, 0.06, 0.12, 0.19, 0.30, 0.43, 0.56, 0.68, 0.78, 0.85, 0.90, 0.94, 0.97, 1],
+                "feet_leg_cull_prob": [0, 0.03, 0.08, 0.16, 0.25, 0.36, 0.48, 0.59, 0.69, 0.78, 0.85, 0.90, 0.95, 1],
+                "injury_cull_prob": [0, 0.08, 0.18, 0.28, 0.38, 0.47, 0.56, 0.64, 0.71, 0.78, 0.85, 0.90, 0.95, 1],
+                "disease_cull_prob": [0, 0.04, 0.12, 0.24, 0.34, 0.42, 0.50, 0.57, 0.64, 0.72, 0.81, 0.89, 0.95, 1],
+                "udder_cull_prob": [0, 0.12, 0.24, 0.33, 0.41, 0.48, 0.55, 0.62, 0.68, 0.76, 0.82, 0.89, 0.95, 1],
+                "unkown_cull_prob": [0, 0.05, 0.11, 0.18, 0.27, 0.37, 0.45, 0.54, 0.62, 0.70, 0.77, 0.84, 0.92, 1],
+                "cull_day_count": [0, 5, 15, 45, 90, 135, 180, 225, 270, 330, 380, 430, 480, 530]
+            },
+            "life_cycle": {
+                "still_birth_rate": 0.065
+            }
+        }
+    },
+    "housing": "barn",
+    "pasture_concentrate": -1,
+    "ration": {
+        "user_input": false,
+        "formulation_interval": 30
+    },
+    "pen_information": {
+        "pen0": {
+            "id": 0,
+            "vertical_dist_to_milking_parlor": 0.1,
+            "horizontal_dist_to_milking_parlor": 1.6,
+            "number_of_stalls": 75,
+            "housing_type": "open air barn",
+            "bedding_type": "sand",
+            "pen_type": "tiestall"
+        },
+        "pen1": {
+            "id": 1,
+            "vertical_dist_to_milking_parlor": 0.1,
+            "horizontal_dist_to_milking_parlor": 1.6,
+            "number_of_stalls": 225,
+            "housing_type": "open air barn",
+            "bedding_type": "sawdust",
+            "pen_type": "freestall"
+        },
+        "pen2": {
+            "id": 2,
+            "vertical_dist_to_milking_parlor": 0.1,
+            "horizontal_dist_to_milking_parlor": 1.6,
+            "number_of_stalls": 150,
+            "housing_type": "open air barn",
+            "bedding_type": "straw",
+            "pen_type": "tiestall"
+        },
+        "pen3": {
+            "id": 3,
+            "vertical_dist_to_milking_parlor": 0.1,
+            "horizontal_dist_to_milking_parlor": 1.6,
+            "number_of_stalls": 40,
+            "housing_type": "open air barn",
+            "bedding_type": "sand",
+            "pen_type": "tiestall"
+        },
+        "pen4": {
+            "id": 4,
+            "vertical_dist_to_milking_parlor": 0.1,
+            "horizontal_dist_to_milking_parlor": 1.6,
+            "number_of_stalls": 100,
+            "housing_type": "open air barn",
+            "bedding_type": "sand",
+            "pen_type": "tiestall"
+        },
+        "pen5": {
+            "id": 5,
+            "vertical_dist_to_milking_parlor": 0.1,
+            "horizontal_dist_to_milking_parlor": 1.6,
+            "number_of_stalls": 100,
+            "housing_type": "open air barn",
+            "bedding_type": "sand",
+            "pen_type": "tiestall"
+        },
+        "pen6": {
+            "id": 6,
+            "vertical_dist_to_milking_parlor": 0.1,
+            "horizontal_dist_to_milking_parlor": 1.6,
+            "number_of_stalls": 200,
+            "housing_type": "open air barn",
+            "bedding_type": "sand",
+            "pen_type": "tiestall"
+        },
+        "pen7": {
+            "id": 7,
+            "vertical_dist_to_milking_parlor": 0.1,
+            "horizontal_dist_to_milking_parlor": 1.6,
+            "number_of_stalls": 150,
+            "housing_type": "open air barn",
+            "bedding_type": "sand",
+            "pen_type": "tiestall"
+        },
+        "pen8": {
+            "id": 8,
+            "vertical_dist_to_milking_parlor": 0.1,
+            "horizontal_dist_to_milking_parlor": 1.6,
+            "number_of_stalls": 50,
+            "housing_type": "open air barn",
+            "bedding_type": "sand",
+            "pen_type": "tiestall"
+        }
+    }
 }
