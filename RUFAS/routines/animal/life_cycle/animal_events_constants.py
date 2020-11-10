@@ -66,7 +66,6 @@ DRY = "dry"
 
 # culling
 HEIFER_REPRO_CULL = "culled for heifer reproductive problem"
-DEATH_CULL = "culled for death"
 LOW_PROD_CULL = "culled for low production"
 LAMENESS_CULL = "culled for lameness"
 INJURY_CULL = "culled for injury"
