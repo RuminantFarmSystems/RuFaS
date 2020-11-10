@@ -16,7 +16,7 @@
             "heifer_repro_method": "TAI",
             "cow_repro_method": "ED-TAI",
             "semen_type": "conventional",
-            "dip_dry": 218,
+            "days_in_preg_when_dry": 218,
             "lactation_curve": "wood",
             "heifer_repro_cull_time": 650,
             "repro_cull_time": 300,
@@ -66,7 +66,6 @@
                 "use_input_calving_interval": false
             },
             "bodyweight": {
-                "grow_end_day": 780,
                 "mature_body_weight_left": 550,
                 "mature_body_weight_mode": 700,
                 "mature_body_weight_right": 1000,
@@ -99,6 +98,8 @@
                 "wood_n_std": [[3.77e-5, 5.82e-5, 5.54e-5], [6.60e-5, 6.69e-5, 6.53e-5]]
             },
             "culling": {
+                "parity_death_prob": [0.039,0.056,0.085,0.117],
+				"death_cull_prob": [0, 0.18, 0.32, 0.42, 0.48, 0.54, 0.60, 0.65, 0.70, 0.77, 0.83, 0.89, 0.95, 1],
                 "parity_cull_prob": [0.169, 0.233, 0.301, 0.408],
                 "mastitis_cull_prob": [0, 0.06, 0.12, 0.19, 0.30, 0.43, 0.56, 0.68, 0.78, 0.85, 0.90, 0.94, 0.97, 1],
                 "feet_leg_cull_prob": [0, 0.03, 0.08, 0.16, 0.25, 0.36, 0.48, 0.59, 0.69, 0.78, 0.85, 0.90, 0.95, 1],

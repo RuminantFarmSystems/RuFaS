@@ -58,8 +58,7 @@ PREG_LOSS_BTWN_2_AND_3 = "pregnancy loss happened between 2nd and 3rd pregnancy 
 # life cycle
 INIT_HERD = "entered herd through initialization"
 ENTER_HERD = "entered herd"
-MATURE_BODY_WEIGHT_EARLY = "mature body weight reached prior to grow end day"
-MATURE_BODY_WEIGHT_REGULAR = "mature body reached"
+MATURE_BODY_WEIGHT = "mature body reached"
 HEIFERII_TO_III = "heiferII moving to heiferIII"
 NEW_BIRTH = "new birth, start milking"
 DRY = "dry"
@@ -67,6 +66,7 @@ DRY = "dry"
 
 # culling
 HEIFER_REPRO_CULL = "culled for heifer reproductive problem"
+DEATH_CULL = "culled for death"
 LOW_PROD_CULL = "culled for low production"
 LAMENESS_CULL = "culled for lameness"
 INJURY_CULL = "culled for injury"

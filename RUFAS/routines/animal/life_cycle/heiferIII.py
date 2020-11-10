@@ -26,8 +26,8 @@ class HeiferIII(HeiferII):
         Description:
             initialize the heifer in this stage from the second stage
         Args:
-            args.id: id of the cow
-            args.breed: breed of the cow
+            args.id: id of the animal
+            args.breed: breed of the animal
             args.birth_date: the date of the simulation when the calf was born
             args.daysBorn: age of the animal
             args.repro_program: reproduction program used in heifer,
@@ -38,23 +38,23 @@ class HeiferIII(HeiferII):
             args.synch_ed_method_h: synch ed protocols used for
                 reproduction programs, two of them: 2P and CP
             (optional: include the following to assign cow information)
-            args.birth_weight: the birth weight of the cow
-            args.body_weight: current body weight of the cow
-            args.wean_weight: the wean weight of the cow
-            args.mature_body_weight: the mature body weight of the cow
-            args.events: events of the cow
-            args.estrus_count
-            args.estrus_day
-            args.tai_program_start_day_h
-            args.synch_ed_program_start_day_h
-            args.synch_ed_estrus_day
-            args.stop_day
-            args.conception_rate
-            args.ai_day
-            args.abortion_day
-            args.days_in_preg
-            args.gestation_length
-            args.p_gest_for_calf
+            args.birth_weight: the birth weight of the animal
+            args.body_weight: current body weight of the animal
+            args.wean_weight: the wean weight of the animal
+            args.mature_body_weight: the mature body weight of the animal
+            args.events: events of the animal
+            args.estrus_count : number of estrus during ED program
+			args.estrus_day: the age when the heifer is estrus in ED program
+			args.tai_program_start_day_h: start day for heifers in TAI program
+			args.synch_ed_program_start_day_h: start day for heifers in synch_ED program
+			args.synch_ed_estrus_day: the age when the heifer is estrus in synch_ED program
+			args.synch_ed_stop_day: the age the the synch protocol stop for this round
+			args.conception_rate: conception rate associated with repro programs and protocols
+			args.ai_day: the age of animal for scheduled AI
+			args.abortion_day: the age of the animal when abortion happens
+			args.days_in_preg: days science pregnancy
+			args.gestation_length: the prejected gestation
+			args.p_gest_for_calf
         """
         super().__init__(args)
         if 'conceptus_weight' in args:
@@ -101,21 +101,15 @@ class HeiferIII(HeiferII):
         if self.preg:
             self.days_in_preg += 1
 
-        if self.days_born < AnimalBase.config['grow_end_day']:
-            # Heifer can only grow to a maximum weight of mature_body_weight
+        if self.body_weight < self.mature_body_weight:
+			# Heifer can only grow to a maximum weight of mature_body_weight
             self.daily_growth = self.get_bw_change()
 
             self.body_weight += self.daily_growth
 
-            if self.body_weight > self.mature_body_weight:
-                self.body_weight = self.mature_body_weight
-                self.events.add_event(self.days_born,
-                                      sim_day, c.MATURE_BODY_WEIGHT_EARLY)
-
-        if self.days_born == AnimalBase.config['grow_end_day']:
-            self.mature_body_weight = self.body_weight
-            self.events.add_event(self.days_born, sim_day,
-                                  c.MATURE_BODY_WEIGHT_REGULAR)
+        else:
+            self.body_weight = self.mature_body_weight
+            self.events.add_event(self.days_born, sim_day, c.MATURE_BODY_WEIGHT)
 
         if self.days_in_preg == self.gestation_length:
             self.days_born -= 1  # will be incremented again in next stage

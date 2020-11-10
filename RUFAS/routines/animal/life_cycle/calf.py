@@ -26,16 +26,16 @@ class Calf(AnimalBase):
 		Description:
 			initialize calf at the time it was born
 		Args:
-			args.id: id of the cow
-			args.breed: breed of the cow
+			args.id: id of the animal
+			args.breed: breed of the animal
 			args.birth_date: the date of the simulation when the calf was born
 			args.daysBorn: age of the animal
-			(optional: include the following to assign cow information)
-			args.birth_weight: the birth weight of the cow
-			args.body_weight: current body weight of the cow
-			args.wean_weight: the wean weight of the cow
-			args.mature_body_weight: the mature body weight of the cow
-			args.events: events of the cow
+			(optional: include the following to assign animal information)
+			args.birth_weight: the birth weight of the animal
+			args.body_weight: current body weight of the animal
+			args.wean_weight: the wean weight of the animal
+			args.mature_body_weight: the mature body weight of the animal
+			args.events: events of the animal
 		"""
 		super().__init__(args)
 
@@ -78,11 +78,13 @@ class Calf(AnimalBase):
 		# keep all the female calves in farm.
 		# if AnimalBase.config['keep_female_calf_rate = 0,
 		# sell all female calves)
+
 		if self.gender == 'male' or random() > \
 			AnimalBase.config['keep_female_calf_rate']:
 			self.sold = True
 		else:
 			self.sold = False
+		
 		# birth weight determined by breed specific distribution
 		if self.breed == 'HO':
 			self.birth_weight = np.random.normal(
