@@ -101,9 +101,9 @@ class HeiferI(Calf):
 
 	def update(self, sim_day):
 		"""
-		Controls heifer's grow with average daily gain based on non-preg ADG based on NRC. 
-		Here is the place to change growth rate with heifer feeding methods later 
-		when we have heifer nutrition from the ration furmulation module. 
+		Controls heifer's grow with average daily gain based on non-preg ADG based on NRC.
+		Here is the place to change growth rate with heifer feeding methods later
+		when we have heifer nutrition from the ration furmulation module.
 		Once reach the breeding start day,
 		this heifer would be move to next stage, the heiferII stage
 
