@@ -84,7 +84,7 @@ class Calf(AnimalBase):
 			self.sold = True
 		else:
 			self.sold = False
-		
+
 		# birth weight determined by breed specific distribution
 		if self.breed == 'HO':
 			self.birth_weight = np.random.normal(

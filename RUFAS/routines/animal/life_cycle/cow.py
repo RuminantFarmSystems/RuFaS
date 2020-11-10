@@ -1016,7 +1016,7 @@ class Cow(HeiferIII):
                 self.days_born, sim_day, self.cull_reason)
             return True
         return False
- 
+
     def _health_cull_update(self):
         """
         Update cows culled for health problem, first cull or not in this parity
