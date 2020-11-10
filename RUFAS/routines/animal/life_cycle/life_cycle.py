@@ -99,6 +99,7 @@ class LifeCycleManager:
     avg_mature_body_weight = 0
 
     cull_reason_stats = {
+        c.DEATH_CULL: 0,
         c.LOW_PROD_CULL: 0,
         c.LAMENESS_CULL: 0,
         c.INJURY_CULL: 0,
@@ -108,6 +109,7 @@ class LifeCycleManager:
         c.UNKNOWN_CULL: 0
     }
     cull_reason_stats_percent = {
+        c.DEATH_CULL: 0,
         c.LOW_PROD_CULL: 0,
         c.LAMENESS_CULL: 0,
         c.INJURY_CULL: 0,
@@ -307,10 +309,7 @@ class LifeCycleManager:
                 total_animal_num, self.avg_mature_body_weight = \
                     self._calc_average(total_animal_num,
                                        self.avg_mature_body_weight, calf.mature_body_weight)
-            # if date == 50:
-            #     print(len(calves))
-            #     print(calves[0])
-            #     return
+
 
         # heiferI to heiferII, assign repro programs
         for index, heiferI in enumerate(heiferIs):
@@ -332,10 +331,7 @@ class LifeCycleManager:
                 total_animal_num, self.avg_mature_body_weight = \
                     self._calc_average(total_animal_num,
                                        self.avg_mature_body_weight, heiferI.mature_body_weight)
-            # if date == 350:
-            #     print(len(heiferIs))
-            #     print(heiferIs[20])
-            #     return
+
 
         # heiferII to heiferIII
         for index, heiferII in enumerate(heiferIIs):
@@ -366,10 +362,7 @@ class LifeCycleManager:
                         self._calc_average(preg_heifer_num,
                                            self.avg_breeding_to_preg_time,
                                            heiferII.breeding_to_preg_time)
-            # if date == 650:
-            #     print(len(heiferIIs))
-            #     print(heiferIIs[20])
-            #     return
+
 
         # heiferIII to cow, assign repro programs
         for index, heiferIII in enumerate(heiferIIIs):
@@ -400,10 +393,7 @@ class LifeCycleManager:
                 total_animal_num, self.avg_mature_body_weight = \
                     self._calc_average(total_animal_num,
                                        self.avg_mature_body_weight, heiferIII.mature_body_weight)
-            # if date == 850:
-            #     print(len(heiferIIIs))
-            #     print(heiferIIIs[2])
-            #     return
+
 
         # if the number of heifers is more than needed for the herd, sell
         # those as replacement
@@ -424,13 +414,9 @@ class LifeCycleManager:
             self.bought_heifer_num += 1
             del self.replacement_market[0]
 
-        # cow culling action and economic stats
+        # cow culling action and stats
         for index, cow in enumerate(cows):
             _, _, _, culled, new_born = cow.update(date, self.avg_CI)
-            # if date == 2000:
-            #     print(len(cows))
-            #     print(cows[20])
-            #     return
 
             # culled cows, calculate slaughter value and record culling reasons
             if culled:
