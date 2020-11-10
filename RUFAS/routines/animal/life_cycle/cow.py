@@ -11,7 +11,7 @@ Description: This file updates the cow form first calving to leaving the herd.
             Preg check follows AI for three times.
             Daily milk production is based on breed and parity specific
             lactation curve model (Wood's and Milkbot) parameters.
-            Health culling including 4 components: death, repro, production, and health,
+            Health culling including 4 components: #TODO death, repro, production, and health,
                 health culling for 6 reasons: Lameness, Injury, Mastitis,
                 Disease, Udder, and Unknown
 """
@@ -419,7 +419,6 @@ class Cow(HeiferIII):
                 self.CI_history.append(self.CI)
             self.CBW = self.body_weight
             self.events.add_event(self.days_born, sim_day, c.NEW_BIRTH)
-            self._death_update()
             self._health_cull_update()
             new_born = True
 
@@ -1004,11 +1003,6 @@ class Cow(HeiferIII):
         The reasons are reproduction failure, low production, and health issues
         Returns: not culled
         """
-        if self.days_born == self.future_death_date:
-            self.culled = True
-            self.events.add_event(self.days_born, sim_day, c.DEATH_CULL)
-            self.cull_reason = c.DEATH_CULL
-            return True
         if self.do_not_breed and self.days_in_milk > 80 and \
                 self.estimated_daily_milk_produced < \
                 AnimalBase.config['cull_milk_production']:
@@ -1023,31 +1017,6 @@ class Cow(HeiferIII):
             return True
         return False
  
-    def _death_update(self):
-        """
-        Update cows culled for death, first death happen or not in this parity
-        will be determined with parity specific death culling rate, 
-        then a cull day will be identified by reverse a distribution for death.
-        """
-        death_rate = 0
-        if self.calves >= 4:
-            death_rate = AnimalBase.config['parity_death_prob'][3]
-        else:
-            death_rate = AnimalBase.config['parity_death_prob'][self.calves-1]
-        death_rand = random()
-        if (death_rand <= death_rate):
-            death_upper_limit = death_lower_limit = death_time_upper_limit = death_time_lower_limit = 0
-            death_date_random = random()
-            for i in range(len(AnimalBase.config['death_cull_prob']) - 1):
-                if (AnimalBase.config['death_cull_prob'][i] <= death_date_random < AnimalBase.config['death_cull_prob'][i+1]):
-                    death_lower_limit = AnimalBase.config['death_cull_prob'][i]
-                    death_upper_limit = AnimalBase.config['death_cull_prob'][i+1]
-                    death_time_lower_limit = AnimalBase.config['death_cull_prob'][i]
-                    death_time_upper_limit = AnimalBase.config['death_cull_prob'][i+1]
-            n = (death_time_upper_limit-death_time_lower_limit) / (death_upper_limit-death_lower_limit)
-            self.future_death_date = round(death_time_lower_limit + n * (death_date_random - death_lower_limit) + self.days_born)
-    
-
     def _health_cull_update(self):
         """
         Update cows culled for health problem, first cull or not in this parity

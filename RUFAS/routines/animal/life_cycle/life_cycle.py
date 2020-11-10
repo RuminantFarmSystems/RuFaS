@@ -99,7 +99,6 @@ class LifeCycleManager:
     avg_mature_body_weight = 0
 
     cull_reason_stats = {
-        c.DEATH_CULL: 0,
         c.LOW_PROD_CULL: 0,
         c.LAMENESS_CULL: 0,
         c.INJURY_CULL: 0,
@@ -109,7 +108,6 @@ class LifeCycleManager:
         c.UNKNOWN_CULL: 0
     }
     cull_reason_stats_percent = {
-        c.DEATH_CULL: 0,
         c.LOW_PROD_CULL: 0,
         c.LAMENESS_CULL: 0,
         c.INJURY_CULL: 0,
