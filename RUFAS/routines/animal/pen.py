@@ -159,7 +159,7 @@ class Pen:
             stage = type(animal).__name__
             self.classes_in_pen.add(stage)
 
-    def call_animal_nutrient_rqmts(self, temp):
+    def call_animal_nutrient_rqmts(self, feed, temp):
         """
         Calls each animal's nutrient requirement calculation methods.
 

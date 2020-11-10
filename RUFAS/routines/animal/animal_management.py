@@ -314,7 +314,7 @@ class AnimalManagement:
             temp: the temperature on the current day
         """
         for pen in self.all_pens:
-            pen.call_animal_nutrient_rqmts(temp)
+            pen.call_animal_nutrient_rqmts(feed, temp)
 
     def fully_update_id_pen(self):
         """
