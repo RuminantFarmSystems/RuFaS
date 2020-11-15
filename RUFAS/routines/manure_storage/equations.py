@@ -13,6 +13,11 @@ mcf-> methane conversion factor
 ms -> manure handled in system
 sls -> solid liquid separator
 strg_p -> Storage Pond
+hrt-> hydraulic retention time
+vsdf-> volatile solids destroyed
+mcf-> methane conversion factor
+ms-> manure handled in system
+
 
 
 $Constants
@@ -109,7 +114,7 @@ number_of_milkings_day = 2                                                      
 
 cleaning_method = CLEANING_METHOD                                                             #Always Flushing
 fresh_water = [cleaning_method]_water_volume_mlk * total_animals                              #ltrs/day
-flush_water_rfw = 
+
 
 time_of_cleaning = ERROR: EQUATION DOES NOT SEEM RIGHT                                        #times/day
 
@@ -211,6 +216,10 @@ k2o_rfw = (rfw * k2o_rfw_g_per_L)/1000                  #kg/day
 
 
 ANAEROBIC LAGOON
+
+Input for anaerobic lagoon could come from main barn/cleaning or any other pre-treatment methods. Equations here so far just reflects the main barn equations. Need to add the dynamism when coding up in python. We could do some processingof the input before passing it to the anaerobic lagoon.
+
+
 
 Side Calculations
 vs_per_day = 
@@ -376,11 +385,80 @@ k_effluent_liq = n_sls - k_removed_sls                                          
 k_effluent_liq_g_per_l = k_effluent_liq * KG_TO_G/volume_eff_liq_ltrs                     #g/l
 
 
+
+
+
 Storage Pond
-waste_water_volume_strg_p
+--------------
+Input for storage pond could come from main barn/cleaning or any other pre-treatment methods. Equations here so far just reflects the main barn equations. Need to add the dynamism when coding up in python. We could do some processingof the input before passing it to the storage pond.
+Storage Pond (Attributes)
+waste_water_volume_strg_p = volume_eff_liq_ltrs / M3_IN_LITRES                                                          #m3/day
+flushing_recycled_strg_p = flush_water / M3_IN_LITRES                                                                   #m3/day
+reduced_volume_strg_p = waste_water_volume_strg_p - flushing_recycled_strg_p                                            #m3/day
+ts_strg_p = ts_manure_bedding_rfw                                                                                       #kg/day
+ts_strg_p_g_per_l = ts_strg_p / waste_water_volume_strg_p                                                               #g/L
+vs_loading_strg_p = vs_manure_bedding_rfw                                                                               #kg/day
+vs_strg_p_g_per_l = vs_strg_p / waste_water_volume_strg_p                                                               #g/L
+hrt_strg_p = [90..180]                                                                                                  #days, some input
+manure_and_waste_water_volume_strg_p = waste_water_volume_strg_p + (reduced_volume_strg_p * hrt_strg_p)                 #m3
+total_pond_volume = manure_and_waste_water_volume_strg_p                                                                #m3
 
+Gas Emission Calculations
+CH4
+vs_strg_p_per_animal_day = vs_loading_strg_p / total_animals                                                            #kg/animal/day
+vs_strg_p_per_animal_day = vs_strg_p_per_animal_day * DAYS_IN_A_YEAR                                                    #kg/animal/year
+vsdf = None                                                                                                             #dummy for now
+bo = 0.24                                                                                                               #m3 CH4 / kg VS, some input/constant      
+mcf = 0.79                                                                                                              #some percentage
+ms = 0.90                                                                                                               #some percentage
+m3_CH4_to_kg_per_m3 = 0.67                                                                                              #kg/m3 , some input/constant
+methane_collection_efficiency = 0.0                                                                                     #some percentage, input/constant  Dummy for now.
+methane_emmision_daily = vs_strg_p_per_animal_day * bo * mcf * ms *  m3_CH4_to_kg_per_m3                                #kg/animal/day
+co2_from_methane_daily = methane_emmision_daily * CH4_to_CO2                                                            #kg/animal/day
+methane_emmision_yearly = vs_strg_p_per_animal_year * bo * mcf * ms *  m3_CH4_to_kg_per_m3                              #kg/animal/year
+co2_from_methane_yearly = methane_emmision_yearly * CH4_to_CO2                                                          #kg/animal/year
+---N---
+n_excretion_rate_daily_direct = n_manure_bedding_rfw / total_animals                                                        #kg N/animal/day       
+n_excretion_rate_yearly = n_excretion_rate_daily * DAYS_IN_A_YEAR                                                           #kg N/animal/day        
+kg_n20n_to_kg_co2 = 44/28 = 1.57                                                                                            #kg co2/kg n2o/animal/day
+n2o_to_co2 = 310                                                                                                            #kg co2/kg n2o
+---N Direct---
+fraction_mms = [0.70 .. 1.00]                                                                                               #some fraction % , input
+emission_factor_n20_direct = 0.002                                                                                          #kg N2O-N/kg N, some fraction input
+direct_nitrus_oxide_daily = n_excretion_rate_daily * fraction_mms * emission_factor_n20_direct * kg_n20n_to_kg_co2          #kg n2o/animal/day
+co2_from_dir_n2o_daily = direct_nitrus_oxide_daily * n2o_to_co2                                                             #kg co2/animal/day 
+direct_nitrus_oxide_yearly = n_excretion_rate_yearly * fraction_mms * emission_factor_n20_direct * kg_n20n_to_kg_co2        #kg n2o/animal/year
+co2_from_dir_n2o_yearly = direct_nitrus_oxide_yearly * n2o_to_co2                                                           #kg co2/animal/year  
+---N Indirect---
+fraction_n_to_nh3_nox = 0.25                                                                                                            #some fraction % , input
+emission_factor_n20_indirect = 0.01                                                                                                     #kg N2O-N/kg N, some fraction input
+indirect_nitrus_oxide_daily = n_excretion_rate_daily * fraction_n_to_nh3_nox * emission_factor_n20_indirect * kg_n20n_to_kg_co2         #kg n2o/animal/day
+co2_from_indir_n2o_daily =  indirect_nitrus_oxide_daily * n2o_to_co2                                                                    #kg co2/animal/day 
+direct_nitrus_oxide_yearly = n_excretion_rate_yearly * fraction_n_to_nh3_nox * emission_factor_n20_indirect * kg_n20n_to_kg_co2         #kg n2o/animal/year
+co2_from_indir_n2o_yearly = indirect_nitrus_oxide_yearly * n2o_to_co2                                                                   #kg n2o/animal/year
 
+Storage Pond (Gas Attributes)
+methane_emission_strg_p = methane_emmision_daily                                                                      #kg/animal/day
+co2_equivalent_of_methane_strg_p = co2_from_methane_daily                                                             #kg/animal/day
+direct_nitrous_oxide_strg_p = direct_nitrus_oxide_daily                                                               #kg NO2/animal/day
+co2_from_dir_n2o_strg_p = co2_from_dir_n2o_daily                                                                      #kg CO2/animal/day
+indirect_nitrous_oxide_strg_p = direct_nitrus_oxide_daily                                                             #kg NO2/animal/day
+co2_from_indir_n2o_strg_p = co2_from_indir_n2o_daily                                                                  #kg CO2/animal/day
 
+Pond Effluent Characteristics
+waste_water_volume_strg_p_eff = waste_water_volume_strg_p                                                             #m3/day
+ts_strg_p_eff_ratio = [0.10..0.30]                                                                                    #some input percentage
+ts_strg_p_eff = ts_strg_p_g_per_l - (ts_strg_p / waste_water_volume_strg_p) * ts_strg_p_eff_ratio                     #g/L
+vs_loading_strg_p_eff_ratio = 0.85                                                                                    #some constant/input percentage
+vs_loading_strg_p_eff = vs_loading_strg_p_eff_ratio * ts_strg_p_eff                                                   #g/L
+n_strg_p_eff_ratio = [0.10..0.30]                                                                                                       #some input percentage
+n_strg_p_eff = n_manure_bedding_rfw_g_per_L - ((n_manure_bedding_rfw / waste_water_volume_strg_p) * n_strg_p_eff_ratio)                 #g/L
+tan_strg_p_eff_ratio = [0.10..0.30]                                                                                                     #some input percentage
+tan_strg_p_eff = tan_manure_bedding_rfw_g_per_L - ((tan_manure_bedding_rfw / waste_water_volume_strg_p) * tan_strg_p_eff_ratio)         #g/L
+p_strg_p_eff_ratio = [0.10..0.30]                                                                                                       #some input percentage
+p_strg_p_eff = p_manure_bedding_rfw_g_per_L - ((p_manure_bedding_rfw / waste_water_volume_strg_p) * p_strg_p_eff_ratio)                 #g/L
+k_strg_p_eff_ratio = [0.10..0.30]                                                                                                       #some input percentage
+k_strg_p_eff = k_manure_bedding_rfw_g_per_L - ((k_manure_bedding_rfw / waste_water_volume_strg_p) * k_strg_p_eff_ratio)                 #g/L
 
 
 
