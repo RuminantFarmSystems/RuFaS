@@ -479,7 +479,7 @@ class Pen:
 
         animal.p_intake = self.avg_p_intake
 
-        # self.animals_in_pen.append(animal)
+        self.animals_in_pen.append(animal)
 
     def clear(self):
         """
