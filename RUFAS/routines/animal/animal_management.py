@@ -374,7 +374,7 @@ class AnimalManagement:
                 self.heiferIIIs.append(animal)
             else:  # animal is of class Cow
                 animal_p_conc = self.cow_p_comp
-                self.all_pens[pen].animals_in_pen.append(animal)
+                # self.all_pens[pen].animals_in_pen.append(animal)
                 self.cows.append(animal)
 
             self.all_pens[pen].set_up_new_animal(animal, animal_p_conc, feed, temp)
@@ -392,6 +392,7 @@ class AnimalManagement:
             self.id_pen[calf.id] = pen
             self.calves.append(calf)
             self.all_pens[pen].set_up_new_animal(calf, self.pasture_concentrate, feed, temp)
+            # self.all_pens[pen].animals_in_pen.append(calf)
 
     def pen_allocation(self):
         """
