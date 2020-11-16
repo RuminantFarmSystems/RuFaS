@@ -1053,13 +1053,14 @@ class Cow(HeiferIII):
                 cull_reason_cull_prob = AnimalBase.config['unkown_cull_prob']
                 self.cull_reason = c.UNKNOWN_CULL
 
+            cull_time_rand = random()
             cull_reason_upper_limit = cull_reason_lower_limit = cull_time_upper_limit = cull_time_lower_limit = 0
             for i in range(len(cull_reason_cull_prob) - 1):
-                if cull_reason_cull_prob[i] <= cull_reason_rand < cull_reason_cull_prob[i + 1]:
+                if cull_reason_cull_prob[i] <= cull_time_rand < cull_reason_cull_prob[i + 1]:
                     cull_reason_lower_limit = cull_reason_cull_prob[i]
                     cull_reason_upper_limit = cull_reason_cull_prob[i + 1]
                     cull_time_lower_limit = AnimalBase.config['cull_day_count'][i]
                     cull_time_upper_limit = AnimalBase.config['cull_day_count'][i + 1]
             x = (cull_time_upper_limit - cull_time_lower_limit) / (cull_reason_upper_limit - cull_reason_lower_limit)
             self.future_cull_date = round(
-                cull_time_lower_limit + x * (cull_reason_rand - cull_reason_lower_limit) + self.days_born)
+                cull_time_lower_limit + x * (cull_time_rand - cull_reason_lower_limit) + self.days_born)
