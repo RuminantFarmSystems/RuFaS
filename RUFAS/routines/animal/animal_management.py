@@ -148,6 +148,8 @@ class AnimalManagement:
         for pen_name in all_pens_data:
             pen_data = all_pens_data[pen_name]
             pen_id = pen_data['id']
+            classes = pen_data['classes']
+            time_in_milking_parlor = pen_data['time_in_milking_parlor']
             vertical_dist_to_parlor = \
                 pen_data['vertical_dist_to_milking_parlor']
             horizontal_dist_to_parlor = \
@@ -157,43 +159,43 @@ class AnimalManagement:
             bedding_type = pen_data['bedding_type']
             pen_type = pen_data['pen_type']
 
-            manure_handling = pen_data['manure_handling']
-            manure_separator = pen_data['manure_separator']
-            manure_storage = pen_data['manure_storage']
-            pen = Pen(pen_id, vertical_dist_to_parlor, horizontal_dist_to_parlor,
-                      num_stalls, housing_type, bedding_type, pen_type, manure_handling,
-                      manure_separator, manure_storage)
+            manure_management = pen_data['manure_management']
+            pen = Pen(pen_id, classes, time_in_milking_parlor, vertical_dist_to_parlor,
+                      horizontal_dist_to_parlor, num_stalls, housing_type, bedding_type,
+                      pen_type, manure_management)
 
             self.all_pens.append(pen)
 
         herd_num = herd_data['herd_num']
 
-        manure_handling = "manual_scraping"
-        manure_separator = "sedimentation"
-        manure_storage = "storage_pit"
+        time_in_milking_parlor = 0.0
+        manure_management = 'default'
         if (len(self.all_pens) == 0) and (herd_num > 0):
             print('Warning: herd_num > 0, but pen_num = 0. Initilizing 3 default pens.')
-            pen_1 = Pen(0, 0.1, 1.6, 100, 'open air barn', 'sand', 'freestall',
-                        manure_handling, manure_separator, manure_storage)
-            pen_2 = Pen(1, 0.1, 1.6, 200, 'open air barn', 'sawdust', 'freestall',
-                        manure_handling, manure_separator, manure_storage)
-            pen_3 = Pen(2, 0.1, 1.6, 100, 'open air barn', 'sand', 'freestall',
-                        manure_handling, manure_separator, manure_storage)
+            # LC
+            pen_1 = Pen(0, ['LC'], time_in_milking_parlor, 0.1, 1.6, 100, 'open air barn',
+                        'sand', 'freestall', manure_management)
+            # C
+            pen_2 = Pen(1, ['C'], time_in_milking_parlor, 0.1, 1.6, 200, 'open air barn',
+                        'sawdust', 'freestall', manure_management)
+            # misc
+            pen_3 = Pen(2, ['HI', 'HII', 'HIII', 'DC'], time_in_milking_parlor, 0.1, 1.6, 100, 'open air barn',
+                        'sand', 'freestall', manure_management)
             self.all_pens.append(pen_1)
             self.all_pens.append(pen_2)
             self.all_pens.append(pen_3)
         elif (len(self.all_pens) == 1) and (herd_num > 0):
             print('Warning: herd_num > 0, but pen_num = 1. Initilizing 2 default pens.')
-            pen_2 = Pen(1, 0.1, 1.6, 300, 'open air barn', 'sawdust', 'freestall',
-                        manure_handling, manure_separator, manure_storage)
-            pen_3 = Pen(2, 0.1, 1.6, 300, 'open air barn', 'straw', 'tiestall',
-                        manure_handling, manure_separator, manure_storage)
+            pen_2 = Pen(1, ['LC'], time_in_milking_parlor, 0.1, 1.6, 200, 'open air barn',
+                        'sawdust', 'freestall', manure_management)
+            pen_3 = Pen(2, classes, time_in_milking_parlor, 0.1, 1.6, 100, 'open air barn',
+                        'sand', 'freestall', manure_management)
             self.all_pens.append(pen_2)
             self.all_pens.append(pen_3)
         elif (len(self.all_pens) == 2) and (herd_num > 0):
             print('Warning: herd_num > 0, but pen_num = 2. Initilizing 1 default pen.')
-            pen_3 = Pen(2, 0.1, 1.6, 300, 'open air barn', 'straw', 'tiestall',
-                        manure_handling, manure_separator, manure_storage)
+            pen_3 = Pen(2, classes, time_in_milking_parlor, 0.1, 1.6, 100, 'open air barn',
+                        'sand', 'freestall', manure_management)
             self.all_pens.append(pen_3)
 
     def init_animals(self, herd_data, pen_data, feed, weather, time):
@@ -403,25 +405,7 @@ class AnimalManagement:
         """
         Allocates the animals in all_animals to pens in all_pens based on the animals' characteristics.
         """
-        # assigning non-cows to pens
-        if len(self.all_pens) == 3:
-            self.all_pens[0].update_animals(self.calves)
-        elif len(self.all_pens) == 4:
-            heifers = self.heiferIs + self.heiferIIs + self.heiferIIIs
-            self.all_pens[0].update_animals(self.calves)
-            self.all_pens[1].update_animals(heifers)
-        elif len(self.all_pens) == 5:
-            heifers = self.heiferIIs + self.heiferIIIs
-            self.all_pens[0].update_animals(self.calves)
-            self.all_pens[1].update_animals(self.heiferIs)
-            self.all_pens[2].update_animals(heifers)
-        else:
-            self.all_pens[0].update_animals(self.calves)
-            self.all_pens[1].update_animals(self.heiferIs)
-            self.all_pens[2].update_animals(self.heiferIIs)
-            self.all_pens[3].update_animals(self.heiferIIIs)
-
-        # separate into lactating and dry cow pens
+        # separate into lactating and dry cows
         lactating_cows = []
         dry_cows = []
 
@@ -431,29 +415,158 @@ class AnimalManagement:
             else:
                 dry_cows.append(cow)
 
-        # assigning dry cows to pens
-        if len(self.all_pens) == 3:
-            dry_and_heifers = self.heiferIs + self.heiferIIs + self.heiferIIIs + dry_cows
-            self.all_pens[1].update_animals(dry_and_heifers)
-            self.all_pens[2].update_animals(lactating_cows)
-        elif 4 <= len(self.all_pens) <= 6:
-            self.all_pens[len(self.all_pens) - 2].update_animals(dry_cows)
-            self.all_pens[len(self.all_pens) - 1].update_animals(lactating_cows)
-        else:
-            self.all_pens[4].update_animals(dry_cows)
-            # TODO: Temporary process to randomly assign nutrition requirements
-            if len(lactating_cows) > 0:
-                for i in range(len(lactating_cows)):
-                    lactating_cows[i].ID = i + 1
-                    lactating_cows[i].DMPD_req = 90 + random.random() * 34
-                    lactating_cows[i].DNED_req = 1.4 + random.random() * 0.3
-                pen_grouping = grouping(lactating_cows, self.all_pens[5:])
+        # determine cows per pen
+        LC_pens = 0
+        C_pens = 0
+        HI_pens = 0
+        HII_pens = 0
+        HIII_pens = 0
+        DC_pens = 0
+        for pen in self.all_pens:
+            if 'LC' in pen.classes:
+                LC_pens += 1
+            if 'C' in pen.classes:
+                C_pens += 1
+            if 'HI' in pen.classes:
+                HI_pens += 1
+            if 'HII' in pen.classes:
+                HII_pens += 1
+            if 'HIII' in pen.classes:
+                HIII_pens += 1
+            if 'DC' in pen.classes:
+                DC_pens += 1
 
-                # assigning lactating cows to pens based on the grouping output
-                for key in pen_grouping:
-                    self.all_pens[key].update_animals(pen_grouping[key])
-        
-        self.fully_update_id_pen()
+        if LC_pens == 0 and len(lactating_cows) != 0:
+            "Insufficient pen allocation for lactating cows."
+            self.all_pens[0].classes.appen('LC')
+            LC_pens += 1
+
+        if C_pens == 0 and len(self.calves) != 0:
+            "Insufficient pen allocation for calves"
+            self.all_pens[0].classes.appen('C')
+            C_pens += 1
+
+        if DC_pens == 0 and len(dry_cows) != 0:
+            "Insufficient pen allocation for dry cows"
+            self.all_pens[0].classes.appen('DC')
+            DC_pens += 1
+
+        if HI_pens == 0 and len(self.heiferIs) != 0:
+            "Insufficient pen allocation for heifer Is"
+            self.all_pens[0].classes.appen('HI')
+            HI_pens += 1
+
+        if HII_pens == 0 and len(self.heiferIIs) != 0:
+            "Insufficient pen allocation for heifer IIs"
+            self.all_pens[0].classes.appen('HII')
+            HII_pens += 1
+
+        if HIII_pens == 0 and len(self.heiferIIIs) != 0:
+            "Insufficient pen allocation for heifer IIIs"
+            self.all_pens[0].classes.appen('HIII')
+            HIII_pens += 1
+
+        LC_per_pen = int(len(lactating_cows) / LC_pens)
+        C_per_pen = int(len(self.calves) / C_pens)
+        HI_per_pen = int(len(self.heiferIs) / HI_pens)
+        HII_per_pen = int(len(self.heiferIIs) / HII_pens)
+        HIII_per_pen = int(len(self.heiferIIIs) / HIII_pens)
+        DC_per_pen = int(len(dry_cows) / DC_pens)
+
+        LC_allocated = 0
+        C_allocated = 0
+        HI_allocated = 0
+        HII_allocated = 0
+        HIII_allocated = 0
+        DC_allocated = 0
+        for pen in self.all_pens:
+            if 'LC' in pen.classes:
+                LC_in_pen = lactating_cows[LC_allocated:((LC_allocated + LC_per_pen) if
+                                                         (LC_allocated + LC_per_pen) < len(lactating_cows)
+                                                         else len(lactating_cows))]
+                pen.update_animals(LC_in_pen)
+                LC_allocated += len(LC_in_pen)
+            if 'C' in pen.classes:
+                C_in_pen = self.calves[C_allocated:((C_allocated + C_per_pen) if
+                                                         (C_allocated + C_per_pen) < len(self.calves)
+                                                         else len(self.calves))]
+                pen.update_animals(C_in_pen)
+                C_allocated += len(C_in_pen)
+            if 'HI' in pen.classes:
+                HI_in_pen = self.heiferIs[HI_allocated:((HI_allocated + HI_per_pen) if
+                                                         (HI_allocated + HI_per_pen) < len(self.heiferIs)
+                                                         else len(self.heiferIs))]
+                pen.update_animals(HI_in_pen)
+                HI_allocated += len(HI_in_pen)
+            if 'HII' in pen.classes:
+                HII_in_pen = self.heiferIIs[HI_allocated:((HII_allocated + HII_per_pen) if
+                                                        (HII_allocated + HII_per_pen) < len(self.heiferIIs)
+                                                        else len(self.heiferIIs))]
+                pen.update_animals(HII_in_pen)
+                HII_allocated += len(HII_in_pen)
+            if 'HIII' in pen.classes:
+                HIII_in_pen = self.heiferIIIs[HI_allocated:((HIII_allocated + HIII_per_pen) if
+                                                          (HIII_allocated + HIII_per_pen) < len(self.heiferIIIs)
+                                                          else len(self.heiferIIIs))]
+                pen.update_animals(HIII_in_pen)
+                HII_allocated += len(HIII_in_pen)
+            if 'DC' in pen.classes:
+                DC_in_pen = lactating_cows[DC_allocated:((DC_allocated + DC_per_pen) if
+                                                         (DC_allocated + DC_per_pen) < len(dry_cows)
+                                                         else len(dry_cows))]
+                pen.update_animals(DC_in_pen)
+                DC_allocated += len(DC_in_pen)
+
+        # if len(self.all_pens) == 3:
+        #     self.all_pens[0].update_animals(self.calves)
+        # elif len(self.all_pens) == 4:
+        #     heifers = self.heiferIs + self.heiferIIs + self.heiferIIIs
+        #     self.all_pens[0].update_animals(self.calves)
+        #     self.all_pens[1].update_animals(heifers)
+        # elif len(self.all_pens) == 5:
+        #     heifers = self.heiferIIs + self.heiferIIIs
+        #     self.all_pens[0].update_animals(self.calves)
+        #     self.all_pens[1].update_animals(self.heiferIs)
+        #     self.all_pens[2].update_animals(heifers)
+        # else:
+        #     self.all_pens[0].update_animals(self.calves)
+        #     self.all_pens[1].update_animals(self.heiferIs)
+        #     self.all_pens[2].update_animals(self.heiferIIs)
+        #     self.all_pens[3].update_animals(self.heiferIIIs)
+        #
+        # # separate into lactating and dry cow pens
+        # lactating_cows = []
+        # dry_cows = []
+        #
+        # for cow in self.cows:
+        #     if cow.milking:
+        #         lactating_cows.append(cow)
+        #     else:
+        #         dry_cows.append(cow)
+        #
+        # # assigning dry cows to pens
+        # if len(self.all_pens) == 3:
+        #     dry_and_heifers = self.heiferIs + self.heiferIIs + self.heiferIIIs + dry_cows
+        #     self.all_pens[1].update_animals(dry_and_heifers)
+        #     self.all_pens[2].update_animals(lactating_cows)
+        # elif 4 <= len(self.all_pens) <= 6:
+        #     self.all_pens[len(self.all_pens) - 2].update_animals(dry_cows)
+        #     self.all_pens[len(self.all_pens) - 1].update_animals(lactating_cows)
+        # else:
+        #     self.all_pens[4].update_animals(dry_cows)
+        #     # TODO: Temporary process to randomly assign nutrition requirements
+        #     if len(lactating_cows) > 0:
+        #         for i in range(len(lactating_cows)):
+        #             lactating_cows[i].ID = i + 1
+        #             lactating_cows[i].DMPD_req = 90 + random.random() * 34
+        #             lactating_cows[i].DNED_req = 1.4 + random.random() * 0.3
+        #         pen_grouping = grouping(lactating_cows, self.all_pens[5:])
+        #
+        #         # assigning lactating cows to pens based on the grouping output
+        #         for key in pen_grouping:
+        #             self.all_pens[key].update_animals(pen_grouping[key])
+        #
+        # self.fully_update_id_pen()
 
     def clear_pens(self):
         """

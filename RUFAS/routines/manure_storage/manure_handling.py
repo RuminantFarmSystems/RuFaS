@@ -31,6 +31,8 @@ def update_all(pen, manure):
     P_loss(pen, manure)
     K_loss(pen, manure)
     solids(pen, manure)
+    if pen.bedding == 'sand':
+        sand_lane(pen, manure)
 
 
 def flush_water(pen, manure):
@@ -106,3 +108,20 @@ def solids(pen, manure):
 
     manure.separators[pen.separator].TS += pen.TS_loss
     manure.separators[pen.separator].VS += pen.VS_loss
+
+
+def sand_lane(pen, manure):
+    """
+    Description:
+        Sand separation lane. Method only called for sand bedding.
+    Args:
+        pen:
+        manure:
+
+    Returns:
+
+    """
+    sand_lane = manure.separators[pen.separator]
+    sand_lane.sand_washed_with_water = pen.bedding_mass_per_day  # kg/day
+    sand_lane.sand_mass_separated = sand_lane.sand_separation_efficiency * sand_lane.sand_washed_with_water  # kg/day
+    sand_lane.sand_volume_separated = sand_lane.sand_mass_separated / pen.bedding_density  # m3/day

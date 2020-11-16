@@ -51,28 +51,6 @@ animal C K2O = ANIMAL_C_K2O     # kg/[(head)(day)]
 manure_density = MANURE_DENSITY     # kg/m3
 
 
-Cleaning Constants
-Milking and Holding
-flushing_water_volume_mlk = 50    #ltrs/day
-scraping_water_volume_mlk = 10    #ltrs/day
-
-FreeStall
-flushing_water_volume_fr = 830    #ltrs/day
-scraping_water_volume_fr = 10    #ltrs/day
-
-
-
-Bedding
-LCOB = 1.97 kg/animal/day
-LCOB_density = 250 kg/m3
-
-LCSB = 22.23 kg/animal/day
-LCSB_density = 1500 kg/m2
-
-
-
-
-
 Equations
 ------------
 
@@ -146,11 +124,7 @@ Cleaning
 cleaning_method = [flushing/scraping]
 flush_water = [cleaning_method]_water_volume_fr * total_animals  #ltrs/day
 
-Sand Sepation Lane
-**sand_washed_with_water = bedding_mass_per_day   #kg/day
-sand_separation_efficiency = [60 to 90]%          #some input
-sand_mass_separated = sand_separation_efficiency * sand_washed_with_water  #kg/day
-sand_volume_sepatated = sand_mass_separated / LC[SB or OB]_density    #m3/day
+
 
 time_spent_per_day_fr = HOURS_IN_A_DAY - time_spent_per_day_lc   #hrs
 percent_time_spent_per_day_fr = CENT - percent_time_spent_per_day_lc       # some percentage

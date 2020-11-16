@@ -1,0 +1,158 @@
+{
+    "management_methods":
+    {
+        "not_default":
+        {
+            "handling": "manual_scraping",
+            "separator": "sedimentation",
+            "storage": "storage_pond"
+        },
+        "manual_scraping":
+        {
+            "handling": "manual_scraping",
+            "separator": "rotary_screen",
+            "storage": "anaerobic_lagoon"
+        },
+        "flush_system":
+        {
+            "handling": "flush_system",
+            "storage": "anaerobic_lagoon"
+        },
+        "anaerobic_lagoon_2":
+        {
+            "handling": "flush_system",
+            "storage": "anaerobic_lagoon_2"
+        },
+        "anaerobic_lagoon_3":
+        {
+            "handling": "flush_system",
+            "storage": "anaerobic_lagoon_3"
+        }
+    },
+    "handling":
+    {
+        "manual_scraping": {
+            "default": "false",
+            "water_use_rate": 200,
+            "time_per_cleaning": 8,
+            "cleanings_per_day": 2
+        },
+        "flush_system": {
+            "default": "false",
+            "water_use_rate": 500,
+            "time_per_cleaning": 8,
+            "cleanings_per_day": 3
+        },
+        "automatic_alley_scrapers": {
+            "default": "false",
+            "water_use_rate": 100,
+            "time_per_cleaning": 8,
+            "cleanings_per_day": 2
+        },
+        "sand_separation_lane": {
+            "default": "false",
+            "sand_separated": 0.6
+        }
+    },
+    "separators": {
+        "rotary_screen": {
+            "default": true
+        },
+        "my_rotary_screen": {
+            "default": false,
+            "TS_removal_efficiency": 0.35,
+            "VS_removal_efficiency": 0.85,
+            "N_removal_efficiency": 0.45,
+            "P_removal_efficiency": 0.5,
+            "K_removal_efficiency": 0.5,
+            "TS_DM_effluent_rate": 0.2
+        },
+        "my_sedimentation": {
+            "default": false,
+            "TS_removal_efficiency": 0.3,
+            "VS_removal_efficiency": 0.55,
+            "N_removal_efficiency": 0.3,
+            "P_removal_efficiency": 0.4,
+            "K_removal_efficiency": 0.15,
+            "TS_DM_effluent_rate": 0.2
+        },
+        "my_decanting_centrifuge": {
+            "default": false,
+            "TS_removal_efficiency": 0.3,
+            "VS_removal_efficiency": 0.55,
+            "N_removal_efficiency": 0.3,
+            "P_removal_efficiency": 0.4,
+            "K_removal_efficiency": 0.15,
+            "TS_DM_effluent_rate": 0.2
+        },
+        "screw_press": {
+            "default": false,
+            "TS_removal_efficiency": 0.3,
+            "VS_removal_efficiency": 0.55,
+            "N_removal_efficiency": 0.3,
+            "P_removal_efficiency": 0.4,
+            "K_removal_efficiency": 0.15,
+            "TS_DM_effluent_rate": 0.2
+        },
+        "slope_screen": {
+            "default": false,
+            "TS_removal_efficiency": 0.3,
+            "VS_removal_efficiency": 0.55,
+            "N_removal_efficiency": 0.3,
+            "P_removal_efficiency": 0.4,
+            "K_removal_efficiency": 0.15,
+            "TS_DM_effluent_rate": 0.2
+        },
+        "belt_press": {
+            "default": false,
+            "TS_removal_efficiency": 0.3,
+            "VS_removal_efficiency": 0.55,
+            "N_removal_efficiency": 0.3,
+            "P_removal_efficiency": 0.4,
+            "K_removal_efficiency": 0.15,
+            "TS_DM_effluent_rate": 0.2
+        },
+        "moving_disc_press": {
+            "default": false,
+            "TS_removal_efficiency": 0.3,
+            "VS_removal_efficiency": 0.55,
+            "N_removal_efficiency": 0.3,
+            "P_removal_efficiency": 0.4,
+            "K_removal_efficiency": 0.15,
+            "TS_DM_effluent_rate": 0.2
+        },
+        "sand_separator": {
+            "default": false,
+            "TS_removal_efficiency": 0.3,
+            "VS_removal_efficiency": 0.55,
+            "N_removal_efficiency": 0.3,
+            "P_removal_efficiency": 0.4,
+            "K_removal_efficiency": 0.15,
+            "TS_DM_effluent_rate": 0.2,
+            "sand_separation_efficiency": 0.7
+        }
+
+    },
+    "treatment_methods": {
+        "anaerobic_digestor": {
+            "default": true
+        }
+    },
+    "storage_options": {
+        "anaerobic_lagoon": {
+            "default": true
+        },
+        "anaerobic_lagoon_3": {
+            "default": true
+        },
+        "anaerobic_lagoon_2": {
+            "default": false,
+            "sludge_accumulation_volume": 0.00251,
+            "hydraulic_retention_time": 180,
+            "sludge_accumulation_period": 5.0
+        },
+        "storage_pond": {
+            "default": true
+        }
+    }
+}

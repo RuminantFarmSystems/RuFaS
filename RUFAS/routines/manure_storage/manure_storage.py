@@ -34,7 +34,7 @@ def daily_manure_storage_routine(manure_storage, animal_management):
 
 
 class ManureStorage:
-    def __init__(self, animal_management):
+    def __init__(self, manure_management_data, animal_management):
         """
         Description:
             The ManureStorage class aggregates the components of the manure
@@ -51,7 +51,7 @@ class ManureStorage:
         self.storage = {}
 
         # MS.1.2
-        self.initialize_pens(animal_management)
+        self.initialize_pens(manure_management_data, animal_management)
         self.initialize_separators(animal_management)
         self.initialize_storage(animal_management)
 
@@ -127,7 +127,7 @@ class ManureStorage:
         self.other_solids_annual = 0.0
         self.other_liquids_annual = 0.0
 
-    def initialize_pens(self, animal_management):
+    def initialize_pens(self, manure_management_data, animal_management):
         """
         Description:
             Class helper method initializes ManureStorage's dictionary of pens
@@ -138,9 +138,9 @@ class ManureStorage:
         """
 
         for pen in animal_management.all_pens:
-            self.pens[pen.id] = (ManureStorage.Pen(pen))
+            self.pens[pen.id] = (ManureStorage.Pen(manure_management_data, pen))
 
-    def initialize_separators(self, animal_management):
+    def initialize_separators(self, separator_data, animal_management):
         """
         Description:
             Class helper method initializes ManureStorage's dictionary of
@@ -152,9 +152,11 @@ class ManureStorage:
 
         for pen in animal_management.all_pens:
             if not self.separators.keys().__contains__(pen.manure_separator):
-                self.separators[pen.manure_separator] = (ManureStorage.Separator(pen))
+                self.separators[pen.manure_separator] = (ManureStorage.Separator(
+                    separator_data[pen.manure_separator],
+                    pen))
 
-    def initialize_storage(self, animal_management):
+    def initialize_storage(self, storage_data, animal_management):
         """
         Description:
             Class helper method initializes ManureStorage's dictionary of
@@ -166,7 +168,7 @@ class ManureStorage:
 
         for pen in animal_management.all_pens:
             if not self.storage.keys().__contains__(pen.manure_storage):
-                self.storage[pen.manure_storage] = (ManureStorage.Storage(pen))
+                self.storage[pen.manure_storage] = (ManureStorage.Storage(storage_data[pen.manure_storage], pen))
 
     def summarize_manure_storage(self):
         """
@@ -237,6 +239,24 @@ class ManureStorage:
         self.other_solids = 0.0
         self.other_liquids = 0.0
 
+    def annual_reset(self):
+        self.manure_applied_annual = 0.0
+        self.N_applied_annual = 0.0
+        self.P_applied_annual = 0.0
+
+        self.CH4_emissions_annual = 0.0
+
+        self.TS_liquid_annual = 0.0
+        self.VS_liquid_annual = 0.0
+        self.N_liquid_annual = 0.0
+        self.P_liquid_annual = 0.0
+        self.K_liquid_annual = 0.0
+
+        self.TS_loss_annual = 0.0
+        self.VS_loss_annual = 0.0
+
+        self.TS_DM_effluent_annual = 0.0
+
     def summarize_annual_variables(self):
         self.raw_manure_annual += self.raw_manure
 
@@ -272,7 +292,7 @@ class ManureStorage:
         self.manure_storage_balance_difference_annual = self.raw_manure_annual - self.manure_calc_annual
 
     class Pen:
-        def __init__(self, pen):
+        def __init__(self, manure_management_data, pen):
             """
             Description:
                 An instance of this class represents an animal pen for manure
@@ -284,9 +304,11 @@ class ManureStorage:
             """
 
             self.pen_id = pen.id
-            self.handling_system = pen.manure_handling
+            self.management_method = pen.manure_management
+            self.handling_system = manure_management_data[self.management_method]['handling_system']
+            self.separator = manure_management_data[self.management_method]['separator']
+            self.storage = manure_management_data[self.management_method]['storage']
             self.bedding = pen.bedding_type
-            self.separator = pen.manure_separator
             self.cow_num = len(pen.animals_in_pen)
             self.raw_manure = pen.manure['Mkg']
 
@@ -385,8 +407,69 @@ class ManureStorage:
                 self.bedding = "organic"
                 self.calibrate_bedding()
 
+    class Handling:
+        def __init__(self, handling_data, pen):
+            # Cleaning
+            # Constants
+            # Milking and Holding
+            self.flushing_water_volume_mlk = 0  # ltrs/day
+            self.scraping_water_volume_mlk = 0  # ltrs/day
+
+            # FreeStall
+            self.flushing_water_volume_fr = 830  # ltrs/day
+            self.scraping_water_volume_fr = 10  # ltrs/day
+
+            self.sand_lane = None
+
+            # Bedding
+            if pen.bedding == 'organic':
+                self.bedding_added = 1.97
+                self.bedding_density = 250
+            elif pen.bedding == 'sand':
+                self.bedding_added = 22.4
+                self.bedding_density = 1500
+                self.sand_lane = self.SandLane(handling_data['sand_lane'])
+
+            if 'LC' in pen.classes:
+                self.flushing_water_volume_mlk = 50  # ltrs/day
+                self.scraping_water_volume_mlk = 10  # ltrs/day
+
+            if handling_data['default']:
+                self.default_handling(pen.manure_handling)
+            else:
+                self.water_use_rate = handling_data['water_use_rate']
+                self.time_per_cleaning = handling_data['time_per_cleaning']
+                self.cleanings_per_day = handling_data['cleanings_per_day']
+
+        def default_handling(self, manure_handler):
+            if manure_handler == "manual_scraping":
+                self.water_use_rate = 200
+                self.time_per_cleaning = 8
+                self.cleanings_per_day = 2
+            elif manure_handler == "flush_system":
+                self.water_use_rate = 500
+                self.time_per_cleaning = 8
+                self.cleanings_per_day = 2
+            elif manure_handler == "automatic_alley_scrapers":
+                self.water_use_rate = 100
+                self.time_per_cleaning = 8
+                self.cleanings_per_day = 2
+            else:
+                print(manure_handler, "does not have default settings. Setting to manual scraping.")
+                self.default_handling("manual_scraping")
+
+        class SandLane:
+            def __init__(self, sand_lane_data):
+                if sand_lane_data['default']:
+                    self.default_sand_lane()
+                else:
+                    self.sand_separated = sand_lane_data['sand_separated']
+
+            def default_sand_lane(self):
+                self.sand_separated = 0.6
+
     class Separator:
-        def __init__(self, pen):
+        def __init__(self, separator_data, pen):
             """
             Description:
                 An instance of this class represents an manure separator.
@@ -395,9 +478,21 @@ class ManureStorage:
             Args:
                 pen: an instance of the Pen class specified in pen.py
             """
-
             self.separator = pen.manure_separator
             self.storage_system = pen.manure_storage
+
+            if separator_data['default']:
+                self.calibrate_separator()
+
+            else:
+                self.TS_removal_efficiency = separator_data['TS_removal_efficiency']
+                self.VS_removal_efficiency = separator_data['TS_removal_efficiency']
+                self.N_removal_efficiency = separator_data["N_removal_efficiency"]
+                self.P_removal_efficiency = separator_data["P_removal_efficiency"]
+                self.K_removal_efficiency = separator_data["K_removal_efficiency"]
+                self.TS_DM_effluent_rate = separator_data["TS_DM_effluent_rate"]
+                if self.separator == 'sand_separator':
+                    self.sand_separation_efficiency = separator_data['sand_separation_efficiency']
 
             self.flush_water_volume = 0
 
@@ -413,18 +508,7 @@ class ManureStorage:
             self.P_liquid = 0
             self.K_liquid = 0
 
-            self.TS_DM_effluent = 0.0
-
-            self.TS_removal_efficiency = 0
-            self.VS_removal_efficiency = 0
-            self.N_removal_efficiency = 0
-            self.P_removal_efficiency = 0
-            self.K_removal_efficiency = 0
-            self.flow_rate_evaporation = 0
-
-            self.TS_DM_effluent_rate = 0
-
-            self.calibrate_separator()
+            self.TS_DM_effluent = 0
 
         def reset_daily_variables(self):
             self.flush_water_volume = 0
@@ -522,7 +606,7 @@ class ManureStorage:
                 self.calibrate_separator()
 
     class Storage:
-        def __init__(self, pen):
+        def __init__(self, storage_data, pen):
             """
             Description:
                 An instance of this class represents an storage receptacle.
@@ -533,6 +617,13 @@ class ManureStorage:
             """
 
             self.storage = pen.manure_storage
+
+            if storage_data['default']:
+                self.calibrate_storage()
+            else:
+                self.sludge_accumulation_volume = storage_data["sludge_accumulation_volume"]
+                self.hydraulic_retention_time = storage_data["hydraulic_retention_time"]
+                self.sludge_accumulation_period = storage_data["sludge_accumulation_period"]
 
             self.TS = 0
             self.VS = 0
@@ -549,33 +640,7 @@ class ManureStorage:
             self.WOP_frac = pen.manure['WOP_frac']
             self.WIP_frac = pen.manure['WIP_frac']
 
-        def reset_daily_variables(self):
-            self.TS = 0
-            self.VS = 0
-            self.N = 0
-            self.P = 0
-            self.K = 0
-
-            self.TS_liquid = 0
-            self.VS_liquid = 0
-            self.N_liquid = 0
-            self.P_liquid = 0
-            self.K_liquid = 0
-
-    def annual_reset(self):
-        self.manure_applied_annual = 0.0
-        self.N_applied_annual = 0.0
-        self.P_applied_annual = 0.0
-
-        self.CH4_emissions_annual = 0.0
-
-        self.TS_liquid_annual = 0.0
-        self.VS_liquid_annual = 0.0
-        self.N_liquid_annual = 0.0
-        self.P_liquid_annual = 0.0
-        self.K_liquid_annual = 0.0
-
-        self.TS_loss_annual = 0.0
-        self.VS_loss_annual = 0.0
-
-        self.TS_DM_effluent_annual = 0.0
+        def calibrate_storage(self):
+            self.sludge_accumulation_volume = 0.00251
+            self.hydraulic_retention_time = 180
+            self.sludge_accumulation_period = 5.0

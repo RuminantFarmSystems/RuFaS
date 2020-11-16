@@ -103,8 +103,8 @@ class Pen:
     # average growth of the animals in the pen
     avg_growth = 0
 
-    def __init__(self, id_number, vert_dist, horiz_dist, num_stalls, housing_type,
-                 bedding_type, pen_type, manure_handling, manure_separator, manure_storage):
+    def __init__(self, id_number, classes, time_in_parlor, vert_dist, horiz_dist,
+                 num_stalls, housing_type, bedding_type, pen_type, manure_management):
         """
         Initializes a pen with the given arguments.
 
@@ -116,12 +116,12 @@ class Pen:
             housing_type: housing type of the pen
             bedding_type: bedding type of the pen
             pen_type: freestall or tiestall
-            manure_handling: the manure handling method used to clean the pen
-            manure_separator: the manure separator that processes manure excreted in this pen
-            manure_storage: the manure storage receptacle that stores manure excreted in this pen
         """
         self.id = id_number
 
+        self.classes = classes
+
+        self.time_in_parlor = time_in_parlor
         self.vertical_dist_to_parlor = vert_dist
         self.horizontal_dist_to_parlor = horiz_dist
         self.num_stalls = num_stalls
@@ -129,9 +129,7 @@ class Pen:
         self.bedding_type = bedding_type
         self.pen_type = pen_type
 
-        self.manure_handling = manure_handling
-        self.manure_separator = manure_separator
-        self.manure_storage = manure_storage
+        self.manure_management = manure_management
 
         self.avg_p_intake = 0
         self.avg_p_req = 0
