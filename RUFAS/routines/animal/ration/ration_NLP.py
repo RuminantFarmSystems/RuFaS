@@ -522,6 +522,23 @@ def optimize():
     cow_cons = [con1, con2, con3, con4, con5, con6, con7, con8, con9, con10, con11]
     heifer_cons = [con1, con3, con4, con5, con6, con7, con8, con9, con10]
 
+    #t_start_1 = timer.time()
+    #sol1 = minimize(objective, x0, method='SLSQP', bounds=bnds, constraints=cons,
+    #options = { 'maxiter': 50, 'ftol': 1e-06, 'iprint': 1, 'disp': False,
+    #'eps': 1.4901161193847656e-08, 'finite_diff_rel_step': None})
+    #t_end_1 = timer.time()
+    #print('Sol1: 50 max iterates' , sol1.x)
+    #obj1 = objective(sol1.x)
+    #print("Time Results: ")
+    #print("Total Run Time 50 its seconds", str(t_end_1 - t_start_1))
+
+    #def write_csv(data):
+    #    with open('/Users/cvankerkhove/Desktop/example.csv', 'a') as outfile:
+    #        writer = csv.writer(outfile)
+    #        writer.writerow(data)
+    #t1 = t_end_2 - t_end_1
+    #write_csv([t1, obj1])
+    
     if animal_type ==  'cow':
         return minimize(objective, x0, method='SLSQP', bounds=bnds, constraints=cow_cons)
     elif animal_type == 'heifer':
