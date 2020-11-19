@@ -17,6 +17,8 @@ hrt-> hydraulic retention time
 vsdf-> volatile solids destroyed
 mcf-> methane conversion factor
 ms-> manure handled in system
+anae_lag-> anaerobic lagoon
+anae_dig-> anaerobic digestion
 
 
 
@@ -392,7 +394,7 @@ Storage Pond
 --------------
 Input for storage pond could come from main barn/cleaning or any other pre-treatment methods. Equations here so far just reflects the main barn equations. Need to add the dynamism when coding up in python. We could do some processingof the input before passing it to the storage pond.
 Storage Pond (Attributes)
-waste_water_volume_strg_p = volume_eff_liq_ltrs / M3_IN_LITRES                                                          #m3/day
+waste_water_volume_strg_p = total_waste_volume_fr                                                                       #m3/day
 flushing_recycled_strg_p = flush_water / M3_IN_LITRES                                                                   #m3/day
 reduced_volume_strg_p = waste_water_volume_strg_p - flushing_recycled_strg_p                                            #m3/day
 ts_strg_p = ts_manure_bedding_rfw                                                                                       #kg/day
@@ -462,6 +464,46 @@ k_strg_p_eff = k_manure_bedding_rfw_g_per_L - ((k_manure_bedding_rfw / waste_wat
 
 
 
+
+
+Anaerobic Digestion
+--------------------
+
+Anaerobic Digestion-Complete Stirred Tank Reactor
+
+waste_water_volume_anae_dig = total_waste_volume_fr                                                                                                                               #m3/day
+ts_anae_dig = ts_manure_bedding_rfw                                                                                                                                               #kg/day 
+ts_anae_dig_g_per_l = ts_anae_dig / waste_water_volume_anae_dig                                                                                                                   #g/L
+vs_loading_anae_dig = vs_manure_bedding_rfw                                                                                                                                       #kg/day
+vs_anae_dig_g_per_l = vs_anae_dig / waste_water_volume_anae_dig                                                                                                                   #g/L
+sludge_accumulation_rate_anae_dig = [0.02..0.4]                                                                                                                                   #some input percentage between 0.02 and 0.04 (i.e 2% and 4%)
+sludge_accumulation_period_anae_dig = [1..5]                                                                                                                                      #years, Some input between 1 and 5 years
+sludge_accumulation_volume_anae_dig = vs_loading_anae_dig * sludge_accumulation_rate_anae_dig * sludge_accumulation_period_anae_dig * DAYS_IN_A_YEAR/ M3_IN_LTRS                  #m3
+hrt_anae_dig = [20..30]                                                                                                                                                           #days,  some input between 20 and 30 days
+minimum_volume_treatment_anae_dig = waste_water_volume_anae_dig * hrt_anae_dig                                                                                                    #m3
+top_cover_volume_anae_dig_percent (gas storage) = [0.1..0.3]                                                                                                                      #some percentage between 10% and 30%
+top_cover_volume_anae_dig (gas strorage) = top_cover_volume_anae_dig_percent * minimum_volume_treatment_anae_dig                                                                  #m3
+digestor_volume_anae_dig = minimum_volume_treatment_anae_dig + sludge_accumulation_volume_anae_dig + top_cover_volume_anae_dig                                                    #m3
+vs_loading_rate_anae_dig = vs_loading_anae_dig / digestor_volume_anae_dig                                                                                                         #kg/m3/day
+biogas_generation_percent_anae_dig = [0.15..0.38]                                                                                                                                 #m3/kg of VS Some input between 0.15 and 0.38 m3/kg of VS
+biogas_generated_anae_dig = vs_loading_anae_dig * biogas_generation_percent_anae_dig                                                                                              #m3/day 
+methane_generation_percent_anae_dig = [0.5..0.65]                                                                                                                                 #Some percentage input between 50% and 65% 
+methane_generated_anae_dig = methane_generation_percent_anae_dig * biogas_generated_anae_dig                                                                                      #m3/day 
+
+
+Digestor Effluent Characteristics
+waste_water_volume_eff_anae_dig = waste_water_volume_anae_dig                                                                                                                     #m3/day
+waste_water_volume_evaporation_anae_dig = [0.02..0.05]                                                                                                                            #some input between 2% and 5%
+ts_eff_loss_percent_anae_dig = [0.40..0.60]                                                                                                                                       #some input 40% and 60%
+ts_eff_anae_dig = ts_anae_dig_g_per_l - (ts_anae_dig_g_per_l * ts_eff_percent_anae_dig)                                                                                           #g/L
+vs_loading_eff_loss_percent_anae_dig = [0.30..0.40]                                                                                                                               #some input 30% and 40%
+vs_loading_eff_anae_dig = vs_loading_anae_dig_g_per_l - (vs_loading_anae_dig_g_per_l * vs_loading_eff_percent_anae_dig)                                                           #g/L
+n_eff_loss_percent_anae_dig = [0.00..0.05]                                                                                                                                        #percent, some input between 0 and 5%
+n_eff_anae_dig = n_manure_bedding_rfw_g_per_l - (n_manure_bedding_rfw_g_per_l * n_eff_loss_percent_anae_dig)                                                                      #g/L
+p_eff_loss_percent_anae_dig = [0.00..0.05]                                                                                                                                        #percent, some input between 0 and 5%
+p_eff_anae_dig = p_manure_bedding_rfw_g_per_l - (p_manure_bedding_rfw_g_per_l * p_eff_loss_percent_anae_dig)                                                                      #g/L
+k_eff_loss_percent_anae_dig = [0.00..0.05]                                                                                                                                        #percent, some input between 0 and 5%
+k_eff_anae_dig = k_manure_bedding_rfw_g_per_l - (k_manure_bedding_rfw_g_per_l * k_eff_loss_percent_anae_dig)                                                                      #g/L
 
 
 """
