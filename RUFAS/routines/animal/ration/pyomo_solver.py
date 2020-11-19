@@ -28,6 +28,7 @@ N_B = [23,26,27]
 CP = [9.4,5.6,8.9]
 dRUP = [50,45,65]
 n = len(price)
+limit = [10, 10, 10]
 
 #creating the model
 model = pyo.ConcreteModel()
@@ -51,6 +52,7 @@ N_A_dat = {}
 N_B_dat = {}
 CP_dat = {}
 dRUP_dat = {}
+limit_dat = {}
 
 for i in range(n):
     for j in model.nrg:
@@ -69,6 +71,7 @@ for i in range(n):
         N_B_dat[i+1, j] = N_B[i]
         CP_dat[i+1, j] = CP[i]
         dRUP_dat[i+1, j] = dRUP[i]
+        limit_dat[i+1, j] = limit[i]
 
 #crearing an initialize model parameters with the data
 model.price = pyo.Param(model.feed, model.nrg, initialize = price_dat)
@@ -86,3 +89,12 @@ model.N_A = pyo.Param(model.feed, model.nrg, initialize = N_A_dat)
 model.N_B = pyo.Param(model.feed, model.nrg, initialize = N_B_dat)
 model.CP = pyo.Param(model.feed, model.nrg, initialize = CP_dat)
 model.dRUP = pyo.Param(model.feed, model.nrg, initialize = dRUP_dat)
+
+#variables
+
+def fb(model, i, j):
+    return(0, limit_dat[i,j])
+model.feed_amount = pyo.Var(model.feed*model.nrg, domain = pyo.PositiveReals,
+                                            bounds =fb, initialize=3)
+
+print(model.feed_amount.items())
