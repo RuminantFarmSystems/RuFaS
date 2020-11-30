@@ -313,14 +313,13 @@ class Soil:
         # soil carbon attributes
         self.residue_harvest = 0.0
         # TODO unsure what this should be initialized as
-        self.lignin_residue_AG_percent = 17  # tied to the reset of this variable in yields, if changed, change together
-        self.lignin_residue_BG_percent = 17  # tied to the reset of this variable in yields, if changed, change together
+        self.AG_lignin_res_percent = 17  # tied to the reset of this variable in yields, if changed, change together
+        self.BG_lignin_res_percent = 17  # tied to the reset of this variable in yields, if changed, change together
         self.curr_layer_depth = 0
-        self.silt_and_clay_frac = 0.5  # TODO database item
+        self.silt_to_clay_percent = 0.5  # TODO database item
 
-        self.LN_ratio_AG = 0
-        self.LN_ratio_BG = 0
-        self.LN_ratio_AG_BG = 0
+        self.LN_AG = 0
+        self.LN_BG = 0
 
         self.initialize_soil_N()
 
@@ -717,49 +716,53 @@ class Soil:
             # C in the soil layer
             self.M_d = 0
 
-            self.metabolic_AG = 500
-            self.metabolic_BG = 500
-            self.structural_AG = 500
-            self.structural_BG = 500
+            self.AG_met = 500
+            self.BG_met = 500
+            self.AG_struct = 500
+            self.BG_struct = 500
 
-            self.fr_tillage = 0.0
+            self.tillage_percent = 0.0
 
-            self.carbon_active = 5000
-            self.carbon_slow = 5000
-            self.carbon_passive = 5000
+            self.C_active = 5000
+            self.C_slow = 5000
+            self.C_passive = 5000
 
-            self.metabolic_AG_to_C_active = 0
-            self.struct_AG_to_C_active = 0
-            self.struct_AG_to_C_slow = 0
-            self.metabolic_BG_to_C_active = 0
-            self.struct_BG_to_C_active = 0
-            self.struct_BG_to_C_slow = 0
+            self.AG_met_to_C_active = 0
+            self.AG_struct_to_C_active = 0
+            self.AG_struct_to_C_slow = 0
+            self.BG_met_to_C_active = 0
+            self.BG_struct_to_C_active = 0
+            self.BG_struct_to_C_slow = 0
 
-            self.metabolic_AG_to_active_loss = 0
-            self.struct_AG_to_active_loss = 0
-            self.struct_AG_to_slow_loss = 0
-            self.metabolic_BG_to_active_loss = 0
-            self.struct_BG_to_active_loss = 0
-            self.struct_BG_to_slow_loss = 0
+            self.AG_met_to_C_active_loss = 0
+            self.AG_struct_to_C_active_loss = 0
+            self.AG_struct_to_C_slow_loss = 0
+            self.BG_met_to_C_active_loss = 0
+            self.BG_struct_to_C_active_loss = 0
+            self.BG_struct_to_C_slow_loss = 0
 
-            self.struct_AG_to_active_actual = 0
-            self.struct_AG_to_slow_actual = 0
-            self.metabolic_BG_to_active_actual = 0
-            self.struct_BG_to_active_actual = 0
-            self.struct_BG_to_slow_actual = 0
+            self.AG_struct_to_C_active_act = 0
+            self.AG_struct_to_C_slow_act = 0
+            self.BG_met_to_C_active_act = 0
+            self.BG_struct_to_C_active_act = 0
+            self.BG_struct_to_C_slow_act = 0
 
-            self.active_to_slow = 0
-            self.active_to_passive = 0
-            self.slow_to_active = 0
-            self.slow_to_passive = 0
-            self.passive_to_active = 0
+            self.C_active_to_slow = 0
+            self.C_active_to_passive = 0
+            self.C_slow_to_active = 0
+            self.C_slow_to_passive = 0
+            self.C_passive_to_active = 0
 
-            self.carbon_active_loss = 0
-            self.carbon_slow_loss = 0
-            self.carbon_passive_loss = 0
+            self.C_active_loss = 0
+            self.C_slow_loss = 0
+            self.C_passive_loss = 0
 
-            self.carbon_percent = 0
-            self.total_carbon = 0
-            self.total_carbon_mg = 0
-            self.total_carbon_g = 0
-            self.total_CO2_C_loss = 0
+            self.C_percent = 0
+            self.C = 0
+            self.C_mg = 0
+            self.C_g = 0
+            self.C_CO2_loss = 0
+
+            self.C_active_decomp = 0
+            self.C_slow_decomp = 0
+            self.C_passive_decomp = 0
