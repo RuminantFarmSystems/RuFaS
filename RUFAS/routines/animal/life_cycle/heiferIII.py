@@ -9,7 +9,6 @@ Description: This file updates the heifer form close to calving to calving,
             average daily gain, once mature body weight or grow end day reached,
             grow stop.
 """
-###############################################################################
 from RUFAS.routines.animal.life_cycle.heiferII import HeiferII
 from RUFAS.routines.animal.life_cycle.animal_base import AnimalBase
 from RUFAS.routines.animal.ration.growing_heifer_ration import calculate_rqmts
@@ -122,4 +121,3 @@ class HeiferIII(HeiferII):
             self.days_born -= 1  # will be incremented again in next stage
             cow_stage = True
         return cow_stage
-

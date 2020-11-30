@@ -2,10 +2,12 @@
     "config":
     {
         "start_date" : "2009:244",
-        "end_date" : "2016:243",
+        "end_date" : "2012:243",
         "csv_dir": "output/CSVs/",
         "graphic_dir": "output/graphics/",
-        "run_tests": false
+        "run_tests": false,
+        "set_seed": true,
+        "seed": 0
     },
 
     "weather": "barnyard_weather.csv",
@@ -27,8 +29,8 @@
             },
             "field_3": {
                 "soil": "barnyard_soil.json",
-                "crop": "corn_rotation.json",
-                "field_management": "hector_2.json"
+                "crop": "custom_rotation.json",
+                "field_management": "barnyard_field_management.json"
             },
             "field_4": {
                 "soil": "barnyard_soil.json",

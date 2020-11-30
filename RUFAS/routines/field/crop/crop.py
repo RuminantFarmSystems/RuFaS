@@ -31,7 +31,7 @@ def daily_crop_routine(soil, crop, field_management, weather, time):
     # Current crop is set at the beginning of the year in annual_crop_routine
     crop_type = crop.current_crop
 
-    daily_reset(crop_type)
+    daily_reset(crop_type, soil)
 
     # If there is no crop in rotation this year, current crop will be named
     # 'null'. The routine is skipped in this case
@@ -87,18 +87,24 @@ def daily_crop_routine(soil, crop, field_management, weather, time):
         annual_variable_update(crop_type)
 
 
-def daily_reset(crop_type):
+def daily_reset(crop_type, soil):
     """
     Description:
         Some variables are reset at the beginning of next day instead of at the
         end of the previous one so that they can be accessed by the output handler.
     Args:
         crop_type: the crop for which attributes are being reset
+        soil: an instance of the Soil class defined in soil.py
     """
     crop_type.HI_actual = 0
     crop_type.yield_actual = 0
     crop_type.N_yield = 0
     crop_type.P_yield = 0
+
+    crop_type.HI_actual = 0
+    crop_type.bio_BG = 0
+    soil.residue_harvest = 0
+    soil.soil_layers[0].fr_tillage = 0
 
 
 def annual_variable_update(crop_type):
@@ -114,7 +120,6 @@ def annual_variable_update(crop_type):
     crop_type.yield_annual += crop_type.yield_actual
     crop_type.N_yield_annual += crop_type.N_yield
     crop_type.P_yield_annual += crop_type.P_yield
-    crop_type.DM_yield_annual += crop_type.DM_yield
     crop_type.NDF_yield_annual += crop_type.NDF_yield
 
 
@@ -292,7 +297,6 @@ class Crop:
     def annual_reset(self):
         self.current_crop.N_yield_annual = 0.0
         self.current_crop.P_yield_annual = 0.0
-        self.current_crop.DM_yield_annual = 0.0
         self.current_crop.NDF_yield_annual = 0.0
         self.current_crop.yield_annual = 0.0
 

@@ -14,6 +14,7 @@ from . import infiltration, evapotranspiration, percolation, soil_temp, soil_ero
 from ..crop import transpiration
 from .nitrogen_cycling import nitrogen_cycling
 from .phosphorus_cycling import phosphorus_cycling
+from .carbon_cycling import carbon_cycle
 
 
 def daily_soil_routine(soil, crop, field_management, weather, time):
@@ -57,6 +58,9 @@ def daily_soil_routine(soil, crop, field_management, weather, time):
 
     phosphorus_cycling.update_all(soil, field_management, weather, time)
 
+    carbon_cycle.update_all(soil, crop.current_crop, weather, time)
+
+    # update annual sums at the end of each day
     annual_variable_update(soil)
 
 
@@ -281,6 +285,27 @@ class Soil:
 
         self.N_uptake = 0.0
         self.N_uptake_annual = 0.0
+
+        self.NO3_drainage_annual = 0.0
+        self.NH4_drainage_annual = 0.0
+        self.active_N_drainage_annual = 0.0
+
+        # soil carbon attributes
+        self.residue_harvest = 0.0
+
+        # TODO: the following 3 variables should be reset to this same value in yields
+        # TODO Lignin AG and BG are currently not implemented
+        self.lignin_residue_percent = 17
+        self.lignin_residue_AG_percent = 2.6
+        self.lignin_residue_BG_percent = 2.6
+
+        self.curr_layer_depth = 0
+        self.silt_and_clay_frac = 0.5  # TODO database item
+
+        self.LN_ratio_AG = 0
+        self.LN_ratio_BG = 0
+        self.LN_ratio_AG_BG = 0
+
         self.fresh_N = 0.0
 
         # Nitrogen mass balance
@@ -419,6 +444,56 @@ class Soil:
             self.active_N_average = 0.0
             self.stable_N_average = 0.0
             self.org_N_average = 0.0
+
+            # C in the soil layer
+            self.M_d = 0
+
+            self.metabolic_AG = 500
+            self.metabolic_BG = 500
+            self.structural_AG = 500
+            self.structural_BG = 500
+
+            self.fr_tillage = 0.0
+
+            self.carbon_active = 5000
+            self.carbon_slow = 5000
+            self.carbon_passive = 5000
+
+            self.metabolic_AG_to_C_active = 0
+            self.struct_AG_to_C_active = 0
+            self.struct_AG_to_C_slow = 0
+            self.metabolic_BG_to_C_active = 0
+            self.struct_BG_to_C_active = 0
+            self.struct_BG_to_C_slow = 0
+
+            self.metabolic_AG_to_active_loss = 0
+            self.struct_AG_to_active_loss = 0
+            self.struct_AG_to_slow_loss = 0
+            self.metabolic_BG_to_active_loss = 0
+            self.struct_BG_to_active_loss = 0
+            self.struct_BG_to_slow_loss = 0
+
+            self.struct_AG_to_active_actual = 0
+            self.struct_AG_to_slow_actual = 0
+            self.metabolic_BG_to_active_actual = 0
+            self.struct_BG_to_active_actual = 0
+            self.struct_BG_to_slow_actual = 0
+
+            self.active_to_slow = 0
+            self.active_to_passive = 0
+            self.slow_to_active = 0
+            self.slow_to_passive = 0
+            self.passive_to_active = 0
+
+            self.carbon_active_loss = 0
+            self.carbon_slow_loss = 0
+            self.carbon_passive_loss = 0
+
+            self.carbon_percent = 0
+            self.total_carbon = 0
+            self.total_carbon_mg = 0
+            self.total_carbon_g = 0
+            self.total_CO2_C_loss = 0
 
     def initialize_profile_characteristics(self):
         if self.cover == "GRASSED":
@@ -631,7 +706,6 @@ class Soil:
         self.M_DRP_runoff_annual = 0.0
 
         self.P_uptake_annual = 0.0
-
         self.fert_P_leached_annual = 0.0
         self.fert_P_runoff_annual = 0.0
 

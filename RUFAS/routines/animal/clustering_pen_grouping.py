@@ -56,14 +56,14 @@ def grouping(cow_list, pens):
     # Initial Data Manipulation
     # Each of the following lists contain the following attributes corresponding
     # to the list of cows input in the grouping function
-    DNED_req = []  # Required net energy density (Units= Mcal per kg of dry matter (DM) (Mcal/kg of DM))
-    DMPD_req = []  # Required Metabolizing Protein Density (Units= g of crude protein per kg of DM (g/kg of DM))
+    DNED_req = []  # Required net energy density (Mcal/kg of DM)
+    DMPD_req = []  # Required Metabolizing Protein Density (g/kg of DM)
     milk_avg = []  # Average milk produced
 
     for cow in cow_list:
         DNED_req.append(cow.DNED_req)
         DMPD_req.append(cow.DMPD_req)
-        milk_avg.append(cow.lactose_milk)
+        milk_avg.append(cow.estimated_daily_milk_produced)
 
     # Create a pandas data frame with cow objects and relevant nutrition information
     cow_nutr_df = pd.DataFrame()  # cow nutrition data frame

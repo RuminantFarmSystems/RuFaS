@@ -17,6 +17,7 @@ class Soybean(BaseCrop):
         self.crop_name = crop_name
         self.crop_type = 'annual'
         self.harvest_quality = 'null'
+        self.raw_id = 121
         self.feed_id = '121g'
 
         self.kill_day = -1
@@ -97,7 +98,7 @@ class Soybean(BaseCrop):
         # ===================================================================
         ''' Soil Water Uptake Data '''
 
-        self.beta_w = 10  # water-use distribution parameter  # corn
+        self.beta_w = 10  # water-use distribution parameter  # TODO: taken from corn
         self.epco = 1
 
         # output
@@ -120,7 +121,6 @@ class Soybean(BaseCrop):
         self.fr_n3ish = 0.02581
 
         self.fr_N = 0
-        self.fr_N_up = 0
         self.N_up = 0
         self.act_N_up_each_layer = []
         self.N_actual_up = 0
@@ -162,15 +162,14 @@ class Soybean(BaseCrop):
         self.NDF_harvest_percent = 0.466
 
         self.bio_AG = 0
+        self.bio_BG = 0
         self.yield_max = 0
         self.yield_actual = 0
-        self.DM_yield = 0.0
         self.NDF_yield = 0.0
         self.N_yield = 0
         self.P_yield = 0
 
         self.N_yield_annual = 0.0
         self.P_yield_annual = 0.0
-        self.DM_yield_annual = 0.0
         self.NDF_yield_annual = 0.0
         self.yield_annual = 0
