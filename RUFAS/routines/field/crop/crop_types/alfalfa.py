@@ -3,11 +3,11 @@ from .base_crop import BaseCrop
 
 class Alfalfa(BaseCrop):
 
-    def __init__(self, data):
+    def __init__(self, crop_name, data):
         super().__init__()
 
         """GENERAL PLANT INFO"""
-        alfalfa_data = data['alfalfa']
+        alfalfa_data = data
         self.grow_years = alfalfa_data['grow_years']
         self.repeat = alfalfa_data['repeat']
         self.planting_date = alfalfa_data['planting_date']
@@ -18,9 +18,10 @@ class Alfalfa(BaseCrop):
 
         self.harvest_type = 'optimal'
 
-        self.crop_name = 'alfalfa'
+        self.crop_name = crop_name
         self.crop_type = 'perennial'
         self.harvest_quality = 'null'
+        self.raw_id = 1
         self.feed_id = '1g'
 
         self.kill_day = -1
@@ -36,7 +37,7 @@ class Alfalfa(BaseCrop):
         # input
         self.T_base_min = 4
         self.T_base_max = 43.33
-        self.PHU = 800  # still unknown
+        self.PHU = 800  # TODO: still unknown
 
         # Internally calculated input
         self.accumulated_HU = 0.0
@@ -100,7 +101,7 @@ class Alfalfa(BaseCrop):
         # ===================================================================
         ''' Soil Water Uptake Data '''
 
-        self.beta_w = 10  # water-use distribution parameter  # corn
+        self.beta_w = 10  # water-use distribution parameter  # TODO: taken from corn
         self.epco = 1
 
         self.water_actual_up = 0
@@ -122,7 +123,6 @@ class Alfalfa(BaseCrop):
         self.fr_n3ish = 0.02001
 
         self.fr_N = 0
-        self.fr_N_up = 0
         self.N_up = 0
         self.act_N_up_each_layer = []
         self.N_actual_up = 0
@@ -159,14 +159,14 @@ class Alfalfa(BaseCrop):
 
         self.gamma_wu = 0
 
-        self.biomass_dry_down_perc = 0.0
-        self.DM_harvest_perc = 0.15  # TODO: Hard coded dry matter percent at harvest
-        self.NDF_harvest_perc = 0.416
+        self.biomass_dry_down_percent = 0.0
+        self.DM_harvest_percent = 0.15  # TODO: Hard coded dry matter percent at harvest
+        self.NDF_harvest_percent = 0.416
 
         self.bio_AG = 0
+        self.bio_BG = 0
         self.yield_max = 0
         self.yield_actual = 0
-        self.DM_yield = 0.0
         self.NDF_yield = 0.0
         self.N_yield = 0
         self.P_yield = 0

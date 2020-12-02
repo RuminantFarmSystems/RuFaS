@@ -16,7 +16,6 @@ Description: This module contains the necessary functions for calculating
 def update_all():
     """
     Description:
-        TODO: No protein_degradation currently implemented
     """
     degrade_protein()
 

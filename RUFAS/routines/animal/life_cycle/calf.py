@@ -14,30 +14,28 @@ Description: This file updates the calf form birth to wean.
 import numpy as np
 from random import random
 from RUFAS.routines.animal.life_cycle.animal_base import AnimalBase
-from RUFAS.routines.animal.ration.calf_ration import calculate_rqmts
+from RUFAS.routines.animal.ration.calf_ration import calc_requirements
 from RUFAS.routines.animal.manure.calf_manure_excretion import\
 	manure_calculations
+from RUFAS.routines.animal.life_cycle import animal_events_constants as c
 
 
 class Calf(AnimalBase):
-	# TODO: Body weight changed could be based on nutrition intake later from
-	#  Ration Formulation
-
 	def __init__(self, args):
 		"""
 		Description:
 			initialize calf at the time it was born
 		Args:
-			args.id: id of the cow
-			args.breed: breed of the cow
+			args.id: id of the animal
+			args.breed: breed of the animal
 			args.birth_date: the date of the simulation when the calf was born
 			args.daysBorn: age of the animal
-			(optional: include the following to assign cow information)
-			args.birth_weight: the birth weight of the cow
-			args.body_weight: current body weight of the cow
-			args.wean_weight: the wean weight of the cow
-			args.mature_body_weight: the mature body weight of the cow
-			args.events: events of the cow
+			(optional: include the following to assign animal information)
+			args.birth_weight: the birth weight of the animal
+			args.body_weight: current body weight of the animal
+			args.wean_weight: the wean weight of the animal
+			args.mature_body_weight: the mature body weight of the animal
+			args.events: events of the animal
 		"""
 		super().__init__(args)
 
@@ -45,6 +43,15 @@ class Calf(AnimalBase):
 			self.assign_calf_values(args)
 		else:
 			self.init_values(args)
+
+		self.target_adg_calf = self.birth_weight / AnimalBase.config['wean_day']
+
+		self.gender = ''
+		self.sold = False
+		self.wean_weight = 0
+		self.birth_weight = 0
+		self.animal_intake = 0
+		self._DBW = 0
 
 	def init_values(self, args):
 		"""
@@ -64,18 +71,20 @@ class Calf(AnimalBase):
 		# calf born, with stillbirth probability
 		if random() < AnimalBase.config['still_birth_rate']:
 			self.culled = True
-			self.events.add_event(0, 'Still birth')
+			self.events.add_event(0, 0, c.STILL_BIRTH)
 
 		# sell the male calves and the unwanted female calves
 		# (if AnimalBase.config['keep_female_calf_rate'] = 1,
 		# keep all the female calves in farm.
 		# if AnimalBase.config['keep_female_calf_rate = 0,
 		# sell all female calves)
+
 		if self.gender == 'male' or random() > \
 			AnimalBase.config['keep_female_calf_rate']:
 			self.sold = True
 		else:
 			self.sold = False
+
 		# birth weight determined by breed specific distribution
 		if self.breed == 'HO':
 			self.birth_weight = np.random.normal(
@@ -101,7 +110,10 @@ class Calf(AnimalBase):
 					AnimalBase.config['birth_weight_std_je'])
 		self.body_weight = self.birth_weight
 		self.wean_weight = 0
-		self.mature_body_weight = np.random.triangular(550, 700, 1000)
+		self.mature_body_weight = np.random.triangular(
+			AnimalBase.config['mature_body_weight_left'],
+			AnimalBase.config['mature_body_weight_mode'],
+			AnimalBase.config['mature_body_weight_right'])
 		self.p_animal = args['p_init']
 
 	def assign_calf_values(self, args):
@@ -122,23 +134,28 @@ class Calf(AnimalBase):
 		Get current information from the calf
 		"""
 		values = {
-            'id' : self.id,
-            'breed' : self.breed,
-            'birth_date' : self.birth_date,
-            'days_born' : self.days_born,
-            'birth_weight' : self.birth_weight,
-            'body_weight' : self.body_weight,
-            'wean_weight' : self.wean_weight,
+            'id': self.id,
+            'breed': self.breed,
+            'birth_date': self.birth_date,
+            'days_born': self.days_born,
+            'birth_weight': self.birth_weight,
+            'body_weight': self.body_weight,
+            'wean_weight': self.wean_weight,
 			'mature_body_weight': self.mature_body_weight,
-            'events' : str(self.events)
+            'events': str(self.events)
 		}
 		return values
 
-	def calc_nutrient_rqmts(self):
+	def calc_nutrient_rqmts(self, feed, temp):
 		"""
 		Calculates this calf's nutrient requirements.
 		"""
-		self.nutrient_rqmts, self.DMIest, self.DBW = calculate_rqmts()
+		# self.nutrient_rqmts, self.DMIest, self.DBW = calculate_rqmts()
+		wean_day = AnimalBase.config['wean_day']
+		wean_length = AnimalBase.config['wean_length']
+		milk_type = AnimalBase.config['milk_type']
+		self.animal_intake, self.nutrient_rqmts = calc_requirements(self, feed, temp, wean_day, wean_length, milk_type)
+		self._DBW = self.nutrient_rqmts['live_weight_change']['val']
 
 	def calc_manure_excretion(self, feed):
 		"""
@@ -177,7 +194,7 @@ class Calf(AnimalBase):
 		# requirement of P from the ration (g) (A.1A.E.7)
 		self.p_req = p_absorb / 0.90
 
-	def update(self):
+	def update(self, sim_day):
 		"""
 		Controls calf's grow with average daily gain based on user's input until
 		wean day. Calculate the wean weight at wean day. Here is the place to
@@ -186,6 +203,8 @@ class Calf(AnimalBase):
 
 		Returns: time when calf is weaned -- stop be fed with milk
 		"""
+		self.update_body_weight_history(sim_day)
+
 		wean_day = False
 
 		prev_weight = self.body_weight
@@ -194,57 +213,11 @@ class Calf(AnimalBase):
 		if self.days_born == AnimalBase.config['wean_day']:
 			wean_day = True
 			self.wean_weight = self.body_weight
-			self.events.add_event(self.days_born, 'Wean Day')
+			self.events.add_event(self.days_born, sim_day, c.WEAN_DAY)
 			self.days_born -= 1 # will increment by 1 again in heifer update
 		else:
-			gained_weight = np.random.normal(
-				AnimalBase.config['avg_daily_gain_c'],
-				AnimalBase.config['std_daily_gain_c'])
-			while gained_weight < AnimalBase.config['avg_daily_gain_c'] \
-				- 2 * AnimalBase.config['std_daily_gain_c'] \
-				or gained_weight > AnimalBase.config['avg_daily_gain_c'] \
-					+ 2 * AnimalBase.config['std_daily_gain_c']:
-				gained_weight = np.random.normal(
-					AnimalBase.config['avg_daily_gain_c'],
-					AnimalBase.config['std_daily_gain_c'])
-			self.body_weight += gained_weight
+			self.body_weight += self.target_adg_calf
 
 		self.daily_growth = self.body_weight - prev_weight
 
 		return wean_day
-
-	def __str__(self):
-		if not self.culled:
-			res_str = """
-				==> Calf: \n
-				ID: {} \n
-				Birth Date: {}\n
-				days Born: {}\n
-				Birth Weight: {}kg\n
-				Body Weight: {}kg\n
-				Wean Day: {}\n
-				Life Events: \n
-				{}
-			""".format(
-				self.id,
-				self.birth_date,
-				self.days_born,
-				self.birth_weight,
-				self.body_weight,
-				AnimalBase.config['wean_day'],
-				str(self.events))
-		else:
-			res_str = """
-				==> Calf: \n
-				Still Birth: True \n
-				ID: {} \n
-				Birth Date: {}\n
-				days Born: {}\n
-				Life Events: \n
-				{}
-			""".format(
-				self.id,
-				self.birth_date,
-				self.days_born,
-				str(self.events))
-		return res_str

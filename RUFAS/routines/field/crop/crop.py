@@ -11,7 +11,7 @@ Author(s): Kass Chupongstimun, kass_c@hotmail.com
 """
 
 from math import acos, asin, sin, tan, pi
-from .crop_types import base_crop, alfalfa, corn, soybean
+from .crop_types import base_crop, alfalfa, corn, soybean, tall_fescue, spring_barley, potato, sugar_beet, spring_wheat
 from . import heat_units, leaf_area_index, root_development, biomass, yields, \
     phosphorus_uptake, nitrogen_uptake, growth_constraints
 
@@ -45,6 +45,12 @@ def daily_crop_routine(soil, crop, field_management, weather, time):
         crop_type.yield_actual = 0
         crop_type.yield_N = 0
         crop_type.yield_P = 0
+
+        crop_type.HI_actual = 0
+        crop_type.bio_BG = 0
+        soil.residue_harvest = 0
+        soil.soil_layers[0].fr_tillage = 0
+
         # If the crop is not planted yet, determine whether it is planted today
         if not crop_type.planted:
             calculate_start(soil, crop, field_management, weather, time)
@@ -216,11 +222,37 @@ class Crop:
             time: an instance of the Time class specified in classes.py
         """
 
-        self.alfalfa = alfalfa.Alfalfa(data)
-        self.corn = corn.Corn(data)
-        self.soy = soybean.Soybean(data)
+        self.crops_list = []
+        self.crops_data = data['crops']
+        for crop_name, crop_data in self.crops_data.items():
+            if crop_name.startswith("alfalfa"):
+                crop = alfalfa.Alfalfa(crop_name, crop_data)
+            elif crop_name.startswith("corn"):
+                crop = corn.Corn(crop_name, crop_data)
+            elif crop_name.startswith("soybean"):
+                crop = soybean.Soybean(crop_name, crop_data)
+            elif crop_name.startswith("tall_fescue"):
+                crop = tall_fescue.TallFescue(crop_name, crop_data)
+            elif crop_name.startswith("spring_barley"):
+                crop = spring_barley.SpringBarley(crop_name, crop_data)
+            elif crop_name.startswith("potato"):
+                crop = potato.Potato(crop_name, crop_data)
+            elif crop_name.startswith("sugar_beet"):
+                crop = sugar_beet.SugarBeet(crop_name, crop_data)
+            elif crop_name.startswith("spring_wheat"):
+                crop = spring_wheat.SpringWheat(crop_name, crop_data)
+            else:
+                print(crop_name, "is an invalid crop_type. Please consult the list of crop_types")
+                continue
 
-        self.crops_list = [self.alfalfa, self.corn, self.soy]
+            self.crops_list.append(crop)
+
+        # self.alfalfa = alfalfa.Alfalfa(data)
+        # self.corn = corn.Corn(data)
+        # self.soybean = soybean.Soybean(data)
+        #
+        # self.crops_list = [self.alfalfa, self.corn, self.soybean]
+
         self.current_crop = base_crop.BaseCrop()
 
         self.grow_regimen = [self.current_crop for _ in range(0, len(time.years))]

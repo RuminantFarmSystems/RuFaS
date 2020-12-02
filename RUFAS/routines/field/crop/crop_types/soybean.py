@@ -3,20 +3,21 @@ from .base_crop import BaseCrop
 
 class Soybean(BaseCrop):
 
-    def __init__(self, data):
+    def __init__(self, crop_name, data):
         super().__init__()
         """GENERAL PLANT INFO"""
 
-        soy_data = data['soybean']
+        soy_data = data
         self.grow_years = soy_data['grow_years']
         self.repeat = soy_data['repeat']
         self.planting_date = soy_data['planting_date']
         self.harvest_date = soy_data['harvest_date']
         self.harvest_type = soy_data['harvest_type']
 
-        self.crop_name = 'soybean'
+        self.crop_name = crop_name
         self.crop_type = 'annual'
         self.harvest_quality = 'null'
+        self.raw_id = 121
         self.feed_id = '121g'
 
         self.kill_day = -1
@@ -96,7 +97,7 @@ class Soybean(BaseCrop):
         # ===================================================================
         ''' Soil Water Uptake Data '''
 
-        self.beta_w = 10  # water-use distribution parameter  # corn
+        self.beta_w = 10  # water-use distribution parameter  # TODO: taken from corn
         self.epco = 1
 
         # output
@@ -119,7 +120,6 @@ class Soybean(BaseCrop):
         self.fr_n3ish = 0.02581
 
         self.fr_N = 0
-        self.fr_N_up = 0
         self.N_up = 0
         self.act_N_up_each_layer = []
         self.N_actual_up = 0
@@ -156,14 +156,14 @@ class Soybean(BaseCrop):
 
         self.gamma_wu = 0
 
-        self.biomass_dry_down_perc = 0.0
-        self.DM_harvest_perc = 0.15  # TODO: Hard coded dry matter percent at harvest
-        self.NDF_harvest_perc = 0.466
+        self.biomass_dry_down_percent = 0.0
+        self.DM_harvest_percent = 0.15  # TODO: Hard coded dry matter percent at harvest
+        self.NDF_harvest_percent = 0.466
 
         self.bio_AG = 0
+        self.bio_BG = 0
         self.yield_max = 0
         self.yield_actual = 0
-        self.DM_yield = 0.0
         self.NDF_yield = 0.0
         self.N_yield = 0
         self.P_yield = 0

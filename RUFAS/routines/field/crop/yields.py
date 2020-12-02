@@ -87,8 +87,6 @@ def update_all(soil, crop_type, field_management, time):
     calc_nutrient_removal(crop_type)
     calc_residue(soil, crop_type, field_management, time)
     calc_quality_assessment(crop_type)
-    calc_DM_yield(crop_type)
-    calc_NDF_yield(crop_type)
 
 
 #
@@ -129,7 +127,7 @@ def calc_HI_act(crop_type):
 
 def calc_dry_down(crop_type):
     # TODO: stand in for more sophisticated dry down method
-    crop_type.bio_AG -= (crop_type.bio_AG * crop_type.biomass_dry_down_perc)
+    crop_type.bio_AG -= (crop_type.bio_AG * crop_type.biomass_dry_down_percent)
 
 
 #
@@ -176,21 +174,13 @@ def calc_quality_assessment(crop_type):
     if crop_type.crop_name.startswith('corn'):
         if crop_type.harvest_quality == 'immature':
             crop_type.feed_id = '35g'
-            crop_type.NDF_harvest_perc = 0.541
+            crop_type.NDF_harvest_percent = 0.541
         elif crop_type.harvest_quality == 'mid_mature':
             crop_type.feed_id = '36g'
-            crop_type.NDF_harvest_perc = 0.45
+            crop_type.NDF_harvest_percent = 0.45
         elif crop_type.harvest_quality == 'mature':
             crop_type.feed_id = '37g'
-            crop_type.NDF_harvest_perc = 0.445
-
-
-def calc_DM_yield(crop_type):
-    crop_type.DM_yield = crop_type.yield_actual * crop_type.DM_harvest_perc
-
-
-def calc_NDF_yield(crop_type):
-    crop_type.NDF_yield = crop_type.yield_actual * crop_type.NDF_harvest_perc
+            crop_type.NDF_harvest_percent = 0.445
 
 
 def calc_nutrient_removal(crop_type):
@@ -219,6 +209,13 @@ def calc_residue(soil, crop_type, field_management, time):
         field_management
         time
     """
+    # for carbon, needs to be calculated only at harvest
+    # C.3.A.4
+    crop_type.bio_BG = crop_type.fr_root * crop_type.biomass_actual
+    soil.soil_layers[0].fr_tillage = 0.55
+    soil.lignin_residue_percent = 17
+    soil.lignin_residue_AG_percent = 2.6  # TODO this will be a crop type lignin percent
+    soil.lignin_residue_BG_percent = 2.6  # TODO this will be a crop type lignin percent
 
     d_residue = 0
     if time.day == crop_type.kill_day or crop_type.crop_type == 'annual':
@@ -229,6 +226,8 @@ def calc_residue(soil, crop_type, field_management, time):
         cut(crop_type, bio_frac)
 
     soil.residue += d_residue
+
+    soil.residue_harvest = soil.residue
 
 
 def calc_harvest_quality(crop_type):
@@ -278,8 +277,6 @@ def kill(crop_type, field_management, time):
 
     crop_type.bio_P = 0
     crop_type.bio_N = 0
-
-    crop_type.HI_actual = 0
 
     crop_type.ET_annual = 0
 

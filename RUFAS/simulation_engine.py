@@ -8,7 +8,6 @@ Author(s): Kass Chupongstimun, kass_c@hotmail.com
            Jit Patil, spatil5@wisc.edu
 """
 
-import json
 import time as timer
 from pathlib import Path
 from RUFAS import routines, errors, classes
@@ -16,6 +15,8 @@ from RUFAS.classes import Config, State, Weather, Time
 from RUFAS.util import get_base_dir, read_json_file
 from RUFAS.output_handler import OutputHandler
 from RUFAS.test import test_handler
+import random
+import numpy
 
 global config, state, output, weather, time
 
@@ -60,6 +61,7 @@ def simulate(input_file_path: Path):
     while not time.end_simulation():
         annual_simulation()
 
+    output.finalize(state, weather, time)
     output.produce_graphics()
     t_end_sim = timer.time()
 
@@ -73,7 +75,7 @@ def daily_simulation():
     #
     # Daily routines
     #
-    routines.daily_animal_routine(state.animal_management, state.feed)
+    routines.daily_animal_routine(state.animal_management, state.feed, weather, time)
 
     for field in state.fields:
         routines.daily_soil_routine(field.soil, field.crop, field.field_management, weather, time)
@@ -144,12 +146,16 @@ def initialize_simulation(file_path: Path, data):
     try:
         config = Config(data['config'], data['weather'])
 
+        if config.set_seed:
+            random.seed(config.seed)
+            numpy.random.seed(config.seed)
+
         if config.run_tests:
             test_handler.run_tests()
 
         weather = Weather(data['weather'], config)
         time = Time(config)
-        state = State(data['farm'], config, time)
+        state = State(data['farm'], config, weather, time)
         output = OutputHandler(classes.read_json_file(get_base_dir() / 'input/output' / data['output']), state)
 
     except errors.JSONfileData as e:

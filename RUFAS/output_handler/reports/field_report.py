@@ -18,6 +18,7 @@ class FieldReport(BaseReportDriver):
             'soil_report': self.SoilReport(data['soil_report'], field_name),
             'soil_nitrogen_report': self.SoilNitrogenReport(data['soil_nitrogen_report'], field_name),
             'soil_phosphorus_report': self.SoilPhosphorusReport(data['soil_phosphorus_report'], field_name),
+            'soil_carbon_report': self.SoilCarbonReport(data['soil_carbon_report'], field_name),
             'nitrogen_mass_balance': self.NitrogenBalance(data['nitrogen_balance'], field_name),
             'phosphorus_mass_balance': self.PhosphorusBalance(data['phosphorus_balance'], field_name),
             'water_balance': self.WaterBalance(data['water_balance'], field_name)
@@ -65,7 +66,8 @@ class FieldReport(BaseReportDriver):
                                     'Bio_N': ['crop_type.bio_N', 'kg N ha^-1', []],
                                     'Bio_P': ['crop_type.bio_P', 'kg P ha^-1', []],
                                     'rooting_depth': ['crop_type.z_root', 'mm', []],
-                                    'yield_actual': ['crop_type.yield_actual', 'kg ha^-1', []]
+                                    'yield_actual': ['crop_type.yield_actual', 'kg ha^-1', []],
+                                    'HI_act': ['crop_type.HI_actual', 'dmnl', []]
                                     }
 
             self.annual_variables = {'year': ['time.calendar_year', '', 0],
@@ -96,9 +98,9 @@ class FieldReport(BaseReportDriver):
                                     'evap_L1': ['soil.soil_layers[0].evap', 'mm H2O', []],
                                     'evap_L2': ['soil.soil_layers[1].evap', 'mm H2O', []],
                                     'evap_L3': ['soil.soil_layers[2].evap', 'mm H2O', []],
-                                    'perc_L1': ['soil.soil_layers[0].perc', 'mm H2O', []],
-                                    'perc_L2': ['soil.soil_layers[1].perc', 'mm H2O', []],
-                                    'perc_L3': ['soil.soil_layers[2].perc', 'mm H2O', []],
+                                    'percolation_L1': ['soil.soil_layers[0].percolation', 'mm H2O', []],
+                                    'percolation_L2': ['soil.soil_layers[1].percolation', 'mm H2O', []],
+                                    'percolation_L3': ['soil.soil_layers[2].percolation', 'mm H2O', []],
                                     'temperature_L1': ['soil.soil_layers[0].temperature', 'C', []],
                                     'temperature_L2': ['soil.soil_layers[1].temperature', 'C', []],
                                     'temperature_L3': ['soil.soil_layers[2].temperature', 'C', []],
@@ -145,12 +147,12 @@ class FieldReport(BaseReportDriver):
                                     'N_trans_L3': ['soil.soil_layers[2].N_trans', 'kg', []],
                                     'NO3_runoff': ['soil.NO3_runoff', 'kg/ha', []],
                                     'NH4_runoff': ['soil.NH4_runoff', 'kg/ha', []],
-                                    'NO3_perc_L1': ['soil.soil_layers[0].NO3_perc', 'kg/ha', []],
-                                    'NO3_perc_L2': ['soil.soil_layers[1].NO3_perc', 'kg/ha', []],
-                                    'NO3_perc_L3': ['soil.soil_layers[2].NO3_perc', 'kg/ha', []],
-                                    'NH4_perc_L1': ['soil.soil_layers[0].NH4_perc', 'kg/ha', []],
-                                    'NH4_perc_L2': ['soil.soil_layers[1].NH4_perc', 'kg/ha', []],
-                                    'NH4_perc_L3': ['soil.soil_layers[2].NH4_perc', 'kg/ha', []],
+                                    'NO3_percolation_L1': ['soil.soil_layers[0].NO3_percolation', 'kg/ha', []],
+                                    'NO3_percolation_L2': ['soil.soil_layers[1].NO3_percolation', 'kg/ha', []],
+                                    'NO3_percolation_L3': ['soil.soil_layers[2].NO3_percolation', 'kg/ha', []],
+                                    'NH4_percolation_L1': ['soil.soil_layers[0].NH4_percolation', 'kg/ha', []],
+                                    'NH4_percolation_L2': ['soil.soil_layers[1].NH4_percolation', 'kg/ha', []],
+                                    'NH4_percolation_L3': ['soil.soil_layers[2].NH4_percolation', 'kg/ha', []],
                                     'active_N_drainage': ['soil.active_N_drainage', 'kg/ha', []],
                                     'NH4_erosion': ['soil.NH4_erosion', 'kg/ha', []],
                                     'active_N_erosion': ['soil.active_N_erosion', 'kg/ha', []],
@@ -176,6 +178,48 @@ class FieldReport(BaseReportDriver):
 
             self.daily_variables = {'year': ['time.calendar_year', '', []],
                                     'j_day': ['time.day', '', []]
+                                    }
+
+            self.annual_variables = {'year': ['time.calendar_year', '', 0]
+                                     }
+
+    class SoilCarbonReport(BaseFieldReport):
+        def __init__(self, data, field_name):
+            super().__init__(data, field_name)
+
+            self.daily_variables = {'year': ['time.calendar_year', '', []],
+                                    'j_day': ['time.day', '', []],
+                                    'residue_harvest': ['soil.residue_harvest', 'kg/ha', []],
+                                    'bio_BG': ['crop_type.bio_BG', 'kg/ha', []],
+                                    'soil_C_percent_L1': ['soil.soil_layers[0].carbon_percent', '', []],
+                                    'soil_C_percent_L2': ['soil.soil_layers[1].carbon_percent', '', []],
+                                    'soil_C_percent_L3': ['soil.soil_layers[2].carbon_percent', '', []],
+                                    'total_CO2_C_loss_L1': ['soil.soil_layers[0].total_CO2_C_loss', 'kg/ha', []],
+                                    'total_CO2_C_loss_L2': ['soil.soil_layers[1].total_CO2_C_loss', 'kg/ha', []],
+                                    'total_CO2_C_loss_L3': ['soil.soil_layers[2].total_CO2_C_loss', 'kg/ha', []],
+                                    'total_carbon_L1': ['soil.soil_layers[0].total_carbon', 'kg/ha', []],
+                                    'total_carbon_L2': ['soil.soil_layers[1].total_carbon', 'kg/ha', []],
+                                    'total_carbon_L3': ['soil.soil_layers[2].total_carbon', 'kg/ha', []],
+                                    # 'M_d_L1': ['soil.soil_layers[0].M_d', '', []],
+                                    # 'M_d_L2': ['soil.soil_layers[1].M_d', '', []],
+                                    # 'M_d_L3': ['soil.soil_layers[2].M_d', '', []],
+                                    # 'T_d': ['soil.T_d', '', []],
+                                    'fr_tillage_L1': ['soil.soil_layers[0].fr_tillage', '', []],
+                                    'fr_N': ['crop_type.fr_N', '', []],
+                                    # 'water_fac_L1': ['soil.soil_layers[0].water_fac', '', []],
+                                    # 'water_fac_L2': ['soil.soil_layers[1].water_fac', '', []],
+                                    # 'water_fac_L3': ['soil.soil_layers[2].water_fac', '', []],
+                                    # 'lignin_residue_percent': ['soil.lignin_residue_percent', '', []],
+                                    'precipitation': ['weather.rainfall[time.year - 1][time.day - 1]', 'mm', []],
+                                    'active_L1': ['soil.soil_layers[0].carbon_active', 'kg/ha', []],
+                                    'active_L2': ['soil.soil_layers[1].carbon_active', 'kg/ha', []],
+                                    'active_L3': ['soil.soil_layers[2].carbon_active', 'kg/ha', []],
+                                    'slow_L1': ['soil.soil_layers[0].carbon_slow', 'kg/ha', []],
+                                    'slow_L2': ['soil.soil_layers[1].carbon_slow', 'kg/ha', []],
+                                    'slow_L3': ['soil.soil_layers[2].carbon_slow', 'kg/ha', []],
+                                    'passive_L1': ['soil.soil_layers[0].carbon_passive', 'kg/ha', []],
+                                    'passive_L2': ['soil.soil_layers[1].carbon_passive', 'kg/ha', []],
+                                    'passive_L3': ['soil.soil_layers[2].carbon_passive', 'kg/ha', []]
                                     }
 
             self.annual_variables = {'year': ['time.calendar_year', '', 0]

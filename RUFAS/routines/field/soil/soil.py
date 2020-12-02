@@ -17,6 +17,7 @@ from . import infiltration, \
 from RUFAS.routines.field.crop import transpiration
 from .nitrogen_cycling import nitrogen_cycling
 from .phosphorus_cycling import phosphorus_cycling
+from .carbon_cycling import carbon_cycle
 
 
 def daily_soil_routine(soil, crop, field_management, weather, time):
@@ -61,6 +62,8 @@ def daily_soil_routine(soil, crop, field_management, weather, time):
 
     # implementation of Peter Vadas' SurPhos (Surface Phosphorus Runoff) model
     phosphorus_cycling.update_all(soil, field_management, weather, time)
+
+    carbon_cycle.update_all(soil, crop.current_crop, weather, time)
 
     # update annual sums at the end of each day
     annual_variable_update(soil)
@@ -306,6 +309,19 @@ class Soil:
         self.NO3_drainage_annual = 0.0
         self.NH4_drainage_annual = 0.0
         self.active_N_drainage_annual = 0.0
+
+        # soil carbon attributes
+        self.residue_harvest = 0.0
+        self.lignin_residue_percent = 17  # tied to the reset of this variable in yields, if changed, change together
+        # TODO Lignin AG and BG are currently not implemented
+        self.lignin_residue_AG_percent = 2.6  # tied to the reset of this variable in yields, if changed, change together
+        self.lignin_residue_BG_percent = 2.6  # tied to the reset of this variable in yields, if changed, change together
+        self.curr_layer_depth = 0
+        self.silt_and_clay_frac = 0.5  # TODO database item
+
+        self.LN_ratio_AG = 0
+        self.LN_ratio_BG = 0
+        self.LN_ratio_AG_BG = 0
 
         self.initialize_soil_N()
 
@@ -628,10 +644,11 @@ class Soil:
             # Variables to calculate dailyPercolation
             self.k_sat = layer_data['K_sat']  # saturated hydraulic conductivity (mm/h)
             self.TT = 0.0
-            self.perc = 0.0  # amount of water that percolates to next layer
+            self.percolation = 0.0  # amount of water that percolates to next layer
 
             # Variable to simulate nitrogen Cycling
-            self.org_C = layer_data['org_C_percent']
+            # self.org_C = layer_data['org_C_percent']
+            self.org_C = 0
             self.active_mineral_rate = layer_data['active_mineral_rate']
             self.cation_exclusion_fraction = layer_data['cation_exclusion_fraction']
             self.denitrification_rate = layer_data['denitrification_rate']
@@ -655,9 +672,9 @@ class Soil:
             # Initial Stable N in layer:
             self.stable_N = 0.0
 
-            self.NO3_perc = 0.0
-            self.NH4_perc = 0.0
-            self.active_perc = 0.0
+            self.NO3_percolation = 0.0
+            self.NH4_percolation = 0.0
+            self.active_percolation = 0.0
 
             self.N_min_act = 0.0
             self.nitrification = 0.0
@@ -697,3 +714,53 @@ class Soil:
             self.pbal = 0.0
             self.days_unbalanced_labile = 0.0
             self.days_unbalanced_active = 0.0
+
+            # C in the soil layer
+            self.M_d = 0
+
+            self.metabolic_AG = 500
+            self.metabolic_BG = 500
+            self.structural_AG = 500
+            self.structural_BG = 500
+
+            self.fr_tillage = 0.0
+
+            self.carbon_active = 5000
+            self.carbon_slow = 5000
+            self.carbon_passive = 5000
+
+            self.metabolic_AG_to_C_active = 0
+            self.struct_AG_to_C_active = 0
+            self.struct_AG_to_C_slow = 0
+            self.metabolic_BG_to_C_active = 0
+            self.struct_BG_to_C_active = 0
+            self.struct_BG_to_C_slow = 0
+
+            self.metabolic_AG_to_active_loss = 0
+            self.struct_AG_to_active_loss = 0
+            self.struct_AG_to_slow_loss = 0
+            self.metabolic_BG_to_active_loss = 0
+            self.struct_BG_to_active_loss = 0
+            self.struct_BG_to_slow_loss = 0
+
+            self.struct_AG_to_active_actual = 0
+            self.struct_AG_to_slow_actual = 0
+            self.metabolic_BG_to_active_actual = 0
+            self.struct_BG_to_active_actual = 0
+            self.struct_BG_to_slow_actual = 0
+
+            self.active_to_slow = 0
+            self.active_to_passive = 0
+            self.slow_to_active = 0
+            self.slow_to_passive = 0
+            self.passive_to_active = 0
+
+            self.carbon_active_loss = 0
+            self.carbon_slow_loss = 0
+            self.carbon_passive_loss = 0
+
+            self.carbon_percent = 0
+            self.total_carbon = 0
+            self.total_carbon_mg = 0
+            self.total_carbon_g = 0
+            self.total_CO2_C_loss = 0
