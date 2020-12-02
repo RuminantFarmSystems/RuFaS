@@ -459,7 +459,8 @@ class AnimalManagement:
         else:
             self.all_pens[4].update_animals(dry_cows)
             # calling pen grouping algorithm
-            pen_grouping = grouping(lactating_cows, self.all_pens[5:])
+            #current hard-coded stocking density
+            pen_grouping = grouping(lactating_cows, self.all_pens[5:], 1.2)
 
         #####################
         # Pen Allocation for lactating cows
