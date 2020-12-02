@@ -711,7 +711,7 @@ class Feed:
 
             self.summarize_feed_storage()
 
-    def daily_animal_feed_management(self, animal_management):
+    def daily_feed_management(self, animal_management):
         """
         Description:
             Executes daily routines relating to feed management, specifically a
