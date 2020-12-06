@@ -621,7 +621,7 @@ class AnimalManagement:
             if pen.pen_populated:
                 pen.daily_p_update()
 
-    def daily_updates(self, record_econ_stats, feed, weather, time):
+    def daily_updates(self, feed, weather, time):
         """
         Executes the daily routines relating to Animals. All animals are
         updated through the life_cycle_manager's daily_update() method. The
@@ -635,7 +635,6 @@ class AnimalManagement:
             weather: instance of the Weather class defined in classes.py
             time: instance of the Time class defined in classes.py
         """
-        print(self.simulation_day)
         if self.simulate_animals:
             for pen in self.all_pens:
                 pen.pen_populated = len(pen.animals_in_pen) > 0
