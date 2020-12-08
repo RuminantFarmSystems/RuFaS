@@ -35,13 +35,16 @@ def main():
     add_leap_days(conn)
 
     # 6 Add average temperature and daily radiation
-    avg_and_radiation(conn)
+    avg_radiation_manureN_ID(conn)  # TODO: delete manureN when dm_manure is merged
+
+    # 7 Drop unnecessary columns and rearrange order:
+    drop_rearrange(conn)
 
 
 def import_data(connection, csv_path):
     c = connection.cursor()
     # load data (skip first 7 rows, specific to DAYMET format)
-    df = pd.read_csv(csv_path,skiprows=7)
+    df = pd.read_csv(csv_path, skiprows=7)
     # strip whitespace from headers
     df.columns = df.columns.str.strip()
     df.columns = ["year", "jday", "dayl", "precip", "srad", "swe", "high", "low", "vp"]
@@ -73,15 +76,37 @@ def add_leap_days(connection):
         else:
             while y <= end_year:
                 c.execute("INSERT INTO Skeleton2\
-                SELECT ?, 366, dayl, precip, srad, swe, high, low, vp FROM Skeleton2 WHERE year = ? AND jday = 365", (y,y))
+                SELECT ?, 366, dayl, precip, srad, swe, high, low, vp FROM Skeleton2 WHERE year = ? AND jday = 365",
+                          (y, y))
                 y += 4
     connection.commit()
 
 
-def avg_and_radiation(connection):
+def avg_radiation_manureN_ID(connection):
     c = connection.cursor()
-    c.execute("ALTER TABLE Skeleton2 Add COLUMN avg")
+    c.execute("ALTER TABLE Skeleton2 Add COLUMN avg double")
     c.execute("UPDATE Skeleton2 SET avg = (high+low)/2")
+
+    c.execute("ALTER TABLE Skeleton2 Add COLUMN Hday double")
+    c.execute("UPDATE Skeleton2 SET Hday = (srad*dayl)/1000000")
+
+    c.execute("ALTER TABLE Skeleton2 Add COLUMN manureN double")  # TODO: delete when dm_manure is merged
+    c.execute("UPDATE Skeleton2 SET manureN = 0") # TODO: delete when dm_manure is merged
+
+    c.execute("ALTER TABLE Skeleton2 Add COLUMN ID integer")
+    connection.commit()
+
+
+def drop_rearrange(connection):
+    c = connection.cursor()
+    c.execute("CREATE TABLE s2_backup(ID INTEGER,year INTEGER,jday INTEGER,precip DOUBLE,high DOUBLE,"
+              "low DOUBLE,avg DOUBLE,Hday DOUBLE,manureN INTEGER)")
+    c.execute("INSERT INTO s2_backup SELECT ID,year,jday,precip,high,low,avg,Hday,manureN FROM Skeleton2")
+    c.execute(" DROP TABLE Skeleton2")
+    c.execute("CREATE TABLE Skeleton2(ID INTEGER,year INTEGER,jday INTEGER,precip DOUBLE,high DOUBLE,"
+              "low DOUBLE,avg DOUBLE,Hday DOUBLE,manureN INTEGER)")
+    c.execute("INSERT INTO Skeleton2 SELECT * FROM s2_backup")
+    c.execute("DROP TABLE s2_backup")
     connection.commit()
 
 
