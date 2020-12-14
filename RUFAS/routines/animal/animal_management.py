@@ -466,7 +466,7 @@ class AnimalManagement:
         # Pen Allocation for lactating cows
         #####################
             if len(lactating_cows) > 0:
-                for i in range(len(lactating_cows)):
+                #for i in range(len(lactating_cows)):
                     #Temporary process below to randomly assign nutrition requirments
                     #lactating_cows[i].DMPD_req = 90 + random.random() * 34
                     #lactating_cows[i].DNED_req = 1.4 + random.random() * 0.3
@@ -493,11 +493,14 @@ class AnimalManagement:
 
                 #Assigning Lactating Cows to Pens based on the grouping output
                 for key in pen_grouping:
-                    self.all_pens[key].update_animals(pen_grouping[key])
+                    pen_key = 5 + key
+                    self.all_pens[pen_key].update_animals(pen_grouping[key])
 
         self.fully_update_id_pen()
 
     def pen_allocation_new(self):
+        ###TODO create default pens 
+        ###TODO Print message when creating default pens
         # separate into lactating and dry cow pens
         lactating_cows = []
         dry_cows = []
@@ -621,7 +624,7 @@ class AnimalManagement:
             #loop ensures there is room for stocking in this pen,
             # and also animals to be groups
             while len(list) < (pen.num_stalls * pen.stocking_density) and \
-                (len(heiferIs) > 0 or len(heiferIIs) > 0 or len(heiferIIIs >0):
+                (len(heiferIs) > 0 or len(heiferIIs) > 0 or len(heiferIIIs >0)):
                 if len(heiferIs) > 0:
                     list.append(heiferIs.pop(0))
                 elif len(heiferIIs) > 0:
@@ -645,7 +648,38 @@ class AnimalManagement:
             grouped.append(pen)
             calf_pens.remove(pen)
 
+        #####################
+        # Pen Allocation for lactating cows
+        #####################
+            #for i in range(len(lactating_cows)):
+                #Temporary process below to randomly assign nutrition requirments
+                #lactating_cows[i].DMPD_req = 90 + random.random() * 34
+                #lactating_cows[i].DNED_req = 1.4 + random.random() * 0.3
+        total_stalls = 0
+        for pen in self.all_pens[5:]:
+            total_stalls += pen.num_stalls
 
+
+        stocking_density = len(lactating_cows) / total_stalls
+
+        #Grouping for Lactating Cows if the stocking density would be <= 120%
+        if stocking_density < 1.2:
+            pen_grouping = grouping(lactating_cows, self.all_pens[5:], stocking_density)
+
+        #Grouping if the stocking denisty would be > 120% (extra pen created)
+        else:
+            extra_stalls = len(lactating_cows) - total_stalls + 100
+            print('Warning: Stocking Density for Lactating Cows is above 120%: Initializing an extra pen with ' +
+            str(extra_stalls) + ' stalls')
+            new_pen = Pen(len(self.all_pens), 0.1, 1.6, extra_stalls, 'open air barn', 'straw', 'tiestall')
+            self.all_pens.append(new_pen)
+            stocking_density = len(lactating_cows)/(total_stalls + extra_stalls)
+            pen_grouping = grouping(lactating_cows, self.all_pens[5:], stocking_density)
+
+        #Assigning Lactating Cows to Pens based on the grouping output
+        for key in pen_grouping:
+            pen_key = 5 + key
+            self.all_pens[pen_key].update_animals(pen_grouping[key])
 
 
     def clear_pens(self):

@@ -519,6 +519,4 @@ def optimize():
     con11 = {'type': 'ineq', 'fun': DMI_constraint}
     cons = ([con1, con2, con3, con4, con5, con6, con7, con8, con9, con10, con11])
 
-    print('x0', x0)
-    print('bnds', bnds)
     return minimize(objective, x0, method='SLSQP', bounds=bnds, constraints=cons)
