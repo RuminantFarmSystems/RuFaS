@@ -14,6 +14,7 @@ from RUFAS.routines.animal.life_cycle.animal_base import AnimalBase
 from RUFAS.routines.animal.ration.growing_heifer_ration import calculate_rqmts
 from RUFAS.routines.animal.manure.growing_heifer_manure_excretion import \
 	manure_calculations
+from RUFAS.routines.animal.life_cycle import animal_events_constants as c
 
 
 class HeiferI(Calf):
@@ -100,9 +101,9 @@ class HeiferI(Calf):
 
 	def update(self, sim_day):
 		"""
-		Controls heifer's grow with average daily gain based on non-preg ADG based on NRC. 
-		Here is the place to change growth rate with heifer feeding methods later 
-		when we have heifer nutrition from the ration furmulation module. 
+		Controls heifer's grow with average daily gain based on non-preg ADG based on NRC.
+		Here is the place to change growth rate with heifer feeding methods later
+		when we have heifer nutrition from the ration furmulation module.
 		Once reach the breeding start day,
 		this heifer would be move to next stage, the heiferII stage
 
@@ -118,7 +119,7 @@ class HeiferI(Calf):
 		self.days_born += 1
 		if self.days_born == AnimalBase.config['breeding_start_day_h']:
 			second_stage = True
-			self.events.add_event(self.days_born, sim_day, 'Breeding start')
+			self.events.add_event(self.days_born, sim_day, c.BREEDING_START)
 			self.days_born -= 1  # will increment in next stage again
 
 		return second_stage
