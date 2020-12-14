@@ -131,12 +131,12 @@ class AnimalManagement:
         """
 
         self.sim_length = config.sim_length
-        config = self.get_animal_config(data['animal_config'])
-        self.life_cycle_manager = LifeCycleManager(config)
-        AnimalBase.set_config(config)
+        animal_config = self.get_animal_config(data['animal_config'])
+        self.life_cycle_manager = LifeCycleManager(animal_config)
+        AnimalBase.set_config(animal_config)
         AnimalBase.set_nutrient_list(feed.nutrient_rqmts)
         self.init_pens(data['pen_information'], data['herd_information'])
-        self.init_animals(data['herd_information'], self.all_pens, weather, time)
+        self.init_animals(data['herd_information'], self.all_pens, weather, time, config, feed)
         self.housing = data['housing']
         self.pasture_concentrate = data['pasture_concentrate']
         self.ration_user_input = data['ration']['user_input']
@@ -187,7 +187,7 @@ class AnimalManagement:
             pen_3 = Pen(2, 0.1, 1.6, 300, 'open air barn', 'straw', 'tiestall')
             self.all_pens.append(pen_3)
 
-    def init_animals(self, herd_data, pen_data, weather, time):
+    def init_animals(self, herd_data, pen_data, weather, time, config, feed):
         """
         Populates the list of animals with the information from the
         input JSON file: constructs the calves, heiferI’s, heiferII’s,
@@ -245,13 +245,13 @@ class AnimalManagement:
                                                           heiferI_num, heiferII_num,
                                                           heiferIII_num, cow_num,
                                                           replace_num, herd_init,
-                                                          breed)
+                                                          breed, config)
 
         if len(pen_data) > 0:
-            self.init_nutrient_rqmts(weather, time)
+            self.init_nutrient_rqmts(weather, time, feed)
             self.pen_allocation()
 
-    def init_nutrient_rqmts(self, weather, time):
+    def init_nutrient_rqmts(self, weather, time, feed):
         """
         Calculates initial nutrient requirements at the beginning of the
         simulation for initial pen allocation. For the nutrient requirements
@@ -358,6 +358,10 @@ class AnimalManagement:
                 pen = len(self.all_pens) - 1
             else:
                 pen = self.pens_needing_animals.popleft()
+            #
+            # if type(animal).__name__ == 'Cow':
+            #     pen = len(self.all_pens) - 1
+
             self.id_pen[animal.id] = pen
 
             if type(animal).__name__ == 'Calf':
