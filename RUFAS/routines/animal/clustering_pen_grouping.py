@@ -121,14 +121,16 @@ def grouping(cow_list, pens, stocking_density):
     # total number of cows
     num_cows = len(cow_list)
     # cutoff values for percentiles for each pen
-    index = {4: 0}
+    index = {-1: 0}
 
     # Create a list of percentile partitions for grouping
+    key = 0
     for pen in pens:
         #filling pens based on input stocking density
-        index[pen.id] = (round(pen.num_stalls*stocking_density +0.5) / num_cows) + index[(pen.id - 1)]
-        if index[pen.id] > 1:
-            index[pen.id] = 1
+        index[key] = (round(pen.num_stalls*stocking_density +0.5) / num_cows) + index[(key - 1)]
+        if index[key] > 1:
+            index[key] = 1
+        key += 1
 
      # list of pen assignments to be added to the data frame
     pen_assignment = []
@@ -136,7 +138,7 @@ def grouping(cow_list, pens, stocking_density):
 
     # Adding pen_assignment number to list based on percentile
     for i in range(len(percentile)):
-        key = 5
+        key = 0
         while percentile[i] <= index[key-1] or percentile[i] > index[key]:
             key += 1
         pen_assignment.append(key)
