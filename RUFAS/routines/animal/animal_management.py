@@ -468,8 +468,8 @@ class AnimalManagement:
             if len(lactating_cows) > 0:
                 for i in range(len(lactating_cows)):
                     #Temporary process below to randomly assign nutrition requirments
-                    lactating_cows[i].DMPD_req = 90 + random.random() * 34
-                    lactating_cows[i].DNED_req = 1.4 + random.random() * 0.3
+                    #lactating_cows[i].DMPD_req = 90 + random.random() * 34
+                    #lactating_cows[i].DNED_req = 1.4 + random.random() * 0.3
                 total_stalls = 0
                 for pen in self.all_pens[5:]:
                     total_stalls += pen.num_stalls
@@ -496,6 +496,157 @@ class AnimalManagement:
                     self.all_pens[key].update_animals(pen_grouping[key])
 
         self.fully_update_id_pen()
+
+    def pen_allocation_new(self):
+        # separate into lactating and dry cow pens
+        lactating_cows = []
+        dry_cows = []
+
+        for cow in self.cows:
+            requirements = req.calc_rqmts(cow.body_weight, cow.mature_body_weight,
+                                          cow.days_in_preg, cow.calves, cow.CI, cow.mPrt, cow.fat_percent,
+                                          cow.lactose_milk, cow.estimated_daily_milk_produced, cow.days_in_milk,
+                                          cow.milking)
+            cow.NEmaint = requirements['NEmaint']
+            cow.NEg = requirements['NEg']
+            cow.NEpreg = requirements['NEpreg']
+            cow.NEl = requirements['NEl']
+            cow.MP_req = requirements['MP_req']
+            cow.Ca_req = requirements['Ca_req']
+            cow.P_req = requirements['P_req']
+            cow.DMIest = requirements['DMIest']
+            cow.DNED_req = (requirements['NEmaint'] + requirements['NEl']) / cow.DMIest
+            cow.DMPD_req = (requirements['MP_req']) / cow.DMIest
+            if cow.milking:
+                lactating_cows.append(cow)
+            else:
+                dry_cows.append(cow)
+        #lists for sorting the type of pen types
+        l_cow_pens = []
+        d_cow_pens = []
+        heifer_pens = []
+        calf_pens = []
+        mixed_type_pens = []
+        #dictionary showing the shortage of animals
+        stall_shortage = {'calf': len(self.calves), 'heifer': (len(self.heiferIs) \
+        + len(self.heiferIIs)+ len(self.heiferIIIs)), 'd_cow':len(dry_cows), 'l_cow': len(lactating_cows)}
+        calves_grouped = False
+        heifers_grouped = False
+        #heiferIIs_grouped = False
+        #heiferIIIs_grouped = False
+        d_cows_grouped = False
+        pens = self.all_pens
+        #list to keep track of already grouped pens
+        grouped = []
+        #sorting the available pen types
+        for pen in self.all_pens:
+            if 'calf' in pen.pen_types and len(pen.pen_types) ==1 :
+                calf_pens.append(pen)
+                stall_shortage['calf'] -= pen.num_stalls  * pen.stocking_density
+            elif 'heifer' in pen.pen_types and len(pen.pen_types) == 1:
+                calf_pens.append(pen)
+                stall_shortage['heifer'] -= pen.num_stalls * pen.stocking_density
+            elif 'd_cow' in pen.pen_types and len(pen.pen_types) == 1:
+                d_cow_pens.append(pen)
+                stall_shortage['d_cow'] -= pen.num_stalls * pen.stocking_density
+            elif 'l_cow' in pen.pen_types and len(pen.pen_types) == 1:
+                l_cow_pens.append(pen)
+                stall_shortage['l_cow'] -= pen.num_stalls * pen.stocking_density
+            else:
+                mixed_type_pens.append(pen)
+        # organzing pens by class and ensuring sufficeint storage
+        while True:
+            #TODO in this loop:
+            #   -instead of popping 0 index, pop pen with most stalls
+            #   -further stratify the mixed_pen_types
+            max_value = max(stall_shortage.values())
+            if max_value > 0:
+                max_key = [k for k, v in stall_shortage.items() if v == max_value]
+                if max_key[0] == 'calf':
+                    if len(mixed_type_pens) > 0:
+                        pen = mixed_type_pens.pop(0)
+                        calf_pens.append(pen)
+                        stall_shortage['calf'] -= pen.num_stalls * pen.stocking_density
+                    else:
+                        #TODO: create new pen for calves
+                        pass
+                elif max_key[0] == 'heifer':
+                    if len(mixed_type_pens) > 0:
+                        pen = mixed_type_pens.pop(0)
+                        heifer_pens.append(pen)
+                        stall_shortage['heifer'] -= pen.num_stalls * pen.stocking_density
+                    else:
+                        #TODO: create new pen for heifers
+                        pass
+                elif max_key[0] == 'd_cows':
+                    if len(mixed_type_pens) >0:
+                        pen = mixed_type_pens.pop(0)
+                        d_cow_pens.append(pen)
+                        stall_shortage['d_cows'] -= pen.num_stalls * pen.stocking_density
+                    else:
+                        #TODO: create new pen for d_cows
+                        pass
+                elif max_key[0] == 'l_cows':
+                    if len(mixed_type_pens) >0:
+                        pen = mixed_type_pens.pop(0)
+                        l_cow_pens.append(pen)
+                        stall_shortage['l_cows'] -= pen.num_stalls * pen.stocking_density
+                    else:
+                        #TODO: create new pen for l_cows
+                        pass
+            else:
+                break
+
+        #Assigning animals to appropriate pens_needing_animals
+
+        #calf pen allocation
+        calves = self.calves
+        for pen in calf_pens:
+            list = []
+            #loop ensures there is room for stocking in this pen,
+            # and also animals to be groups
+            while len(list) < (pen.num_stalls * pen.stocking_density) and \
+                                                                len(calves) > 0:
+                list.append(calves.pop(0))
+            pen.update_animals(list)
+            grouped.append(pen)
+            calf_pens.remove(pen)
+
+        #heifer pen allocation
+        heiferIs = self.heiferIs
+        heiferIIs = self.heiferIIs
+        heiferIIIs = self.heiferIIIs
+        for pen in heifer_pens:
+            list = []
+            #loop ensures there is room for stocking in this pen,
+            # and also animals to be groups
+            while len(list) < (pen.num_stalls * pen.stocking_density) and \
+                (len(heiferIs) > 0 or len(heiferIIs) > 0 or len(heiferIIIs >0):
+                if len(heiferIs) > 0:
+                    list.append(heiferIs.pop(0))
+                elif len(heiferIIs) > 0:
+                    list.append(heiferIIs.pop(0))
+                else:
+                    list.append(heiferIIIs.pop(0))
+
+            pen.update_animals(list)
+            grouped.append(pen)
+            calf_pens.remove(pen)
+
+        #dry cow pen allocation
+        for pen in d_cow_pens:
+            list = []
+            #loop ensures there is room for stocking in this pen,
+            # and also animals to be groups
+            while len(list) < (pen.num_stalls * pen.stocking_density) and \
+                                                        len(dry_cows) > 0:
+                list.append(dry_cows[0])
+            pen.update_animals(list)
+            grouped.append(pen)
+            calf_pens.remove(pen)
+
+
+
 
     def clear_pens(self):
         """
