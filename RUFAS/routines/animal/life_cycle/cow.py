@@ -88,9 +88,9 @@ class Cow(HeiferIII):
 
         # current hard-coded values necessary for nutrient requirement
         # calculations
-        self.gestation_length = 0
-        self.days_in_preg = 0
-        self.preg = False
+        #self.gestation_length = 0
+        #self.days_in_preg = 0
+        #self.preg = False
         self.BCS = 3.5  # body condition score
         self.CP_milk = 3.2
         self.lactose_milk = 4.85
@@ -210,6 +210,7 @@ class Cow(HeiferIII):
                 AnimalBase.config['wood_n'][breed_index][parity_index],
                 AnimalBase.config['wood_n_std'][breed_index][parity_index])
             # TODO adding milkbot parameters
+
             estimated_daily_milk_produced = \
                 l * math.pow(self.days_in_milk, m) * \
                 math.exp((0 - n) * self.days_in_milk)
@@ -469,7 +470,7 @@ class Cow(HeiferIII):
         """
         Return estrus after calving.
         """
-        self._estrus_day = self._determine_estrus_day(
+        self.estrus_day = self._determine_estrus_day(
             self.days_born, c.ESTRUS_AFTER_CALVING_NOTE,
             AnimalBase.config['avg_estrus_cycle_return'],
             AnimalBase.config['std_estrus_cycle_return'], sim_day)
@@ -520,7 +521,7 @@ class Cow(HeiferIII):
             sim_day: simulation day
         """
         # if on estrus day, start detecting estrus
-        if self.days_born == self._estrus_day:
+        if self.days_born == self.estrus_day:
             self.estrus_count += 1
 
             if 1 <= self.days_in_milk <= AnimalBase.config['voluntary_waiting_period']:
@@ -537,7 +538,7 @@ class Cow(HeiferIII):
                         # serviced
                         self.ai_day = self.estrus_day + 1
                         self.conception_rate = \
-                            AnimalBase.config['ed_conception_rate']
+                            AnimalBase.config['estrus_conception_rate']
                     else:
                         self._return_estrus(sim_day)
                 else:
@@ -804,7 +805,7 @@ class Cow(HeiferIII):
                         # serviced
                         self.ai_day = self.estrus_day + 1
                         self.conception_rate = \
-                            AnimalBase.config['ed_conception_rate']
+                            AnimalBase.config['estrus_conception_rate']
                     else:
                         self._return_estrus(sim_day)
                 else:

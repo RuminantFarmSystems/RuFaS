@@ -522,7 +522,7 @@ class HeiferII(HeiferI):
                 if ed_service_rand < AnimalBase.config['estrus_service_rate']:
                     self.ai_day = self.synch_ed_estrus_day + 1
                     self.conception_rate = \
-                        AnimalBase.config['ed_conception_rate']
+                        AnimalBase.config['estrus_conception_rate']
                 else:
                     if self.days_born - \
                             self.synch_ed_program_start_day_h < 14:
@@ -564,7 +564,7 @@ class HeiferII(HeiferI):
                 if ed_service_rand < AnimalBase.config['ed_service_rate']:
                     self.ai_day = self.synch_ed_estrus_day + 1
                     self.conception_rate = \
-                        AnimalBase.config['ed_conception_rate']
+                        AnimalBase.config['estrus_conception_rate']
                 else:
                     self.synch_ed_stop_day = self.synch_ed_program_start_day_h + 14
                     self._determine_synch_ed_program_day(self.synch_ed_stop_day)
