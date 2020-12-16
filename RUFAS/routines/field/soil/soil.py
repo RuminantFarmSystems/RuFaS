@@ -318,8 +318,8 @@ class Soil:
         self.curr_layer_depth = 0
         self.silt_to_clay_percent = 0.5  # TODO database item
 
-        self.LN_AG = 0
-        self.LN_BG = 0
+        self.AG_L_to_N = 0
+        self.BG_L_to_N = 0
 
         self.initialize_soil_N()
 
