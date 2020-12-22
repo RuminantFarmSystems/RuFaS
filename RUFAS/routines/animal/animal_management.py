@@ -331,7 +331,7 @@ class AnimalManagement:
             temp: the temperature on the current day
         """
         for pen in self.all_pens:
-            pen.call_animal_nutrient_rqmts(temp)
+            pen.call_animal_nutrient_rqmts(feed, temp)
 
     def fully_update_id_pen(self):
         """
@@ -398,8 +398,7 @@ class AnimalManagement:
                 animal_p_conc = self.cow_p_comp
                 self.cows.append(animal)
 
-            self.all_pens[pen].set_up_new_animal(animal, animal_p_conc, self.housing,
-                                                 self.pasture_concentrate, feed, temp)
+            self.all_pens[pen].set_up_new_animal(animal, animal_p_conc, feed, temp)
 
         for calf in calves_born:
             # TODO: this is the hard coded calf pen value
@@ -621,7 +620,7 @@ class AnimalManagement:
             if pen.pen_populated:
                 pen.daily_p_update()
 
-    def daily_updates(self, record_econ_stats, feed, weather, time):
+    def daily_updates(self, feed, weather, time):
         """
         Executes the daily routines relating to Animals. All animals are
         updated through the life_cycle_manager's daily_update() method. The
@@ -630,7 +629,6 @@ class AnimalManagement:
         manure calculations are done.
 
         Args:
-            record_econ_stats:
             feed: instance of the Feed class defined in feed.py
             weather: instance of the Weather class defined in classes.py
             time: instance of the Time class defined in classes.py
@@ -644,7 +642,6 @@ class AnimalManagement:
             self.heiferIIs, self.heiferIIIs, self.cows = \
                 self.life_cycle_manager.daily_update(self.simulation_day,
                                                      self.sim_length,
-                                                     record_econ_stats,
                                                      self.calves,
                                                      self.heiferIs,
                                                      self.heiferIIs,
