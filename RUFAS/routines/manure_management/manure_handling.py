@@ -24,7 +24,7 @@ def update_all(pen, manure):
         pen: an instance of the Pen class specified in pen.py representing
             the pen from which manure is being collected
         manure: an instance of the ManureStorage class specified in
-            manure_storage.py
+            manure_management.py
     """
     flush_water(pen, manure)
     N_loss(pen, manure)

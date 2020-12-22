@@ -109,13 +109,15 @@ class Pen:
               "VSnd": 0,
               "WIP_frac": 0,
               "WOP_frac": 0,
-              "p_excrt_manure": 0,
-              "p_frac": 0}
+              "P_excrt_manure": 0,
+              "P_frac": 0,
+              "K_excrt_manure": 0,
+              "K_frac": 0}
 
     # average growth of the animals in the pen
     avg_growth = 0
 
-    def __init__(self, id_number, time_in_parlor, vert_dist, horiz_dist,
+    def __init__(self, id_number, percent_time_in_parlor, vert_dist, horiz_dist,
                  num_stalls, housing_type, bedding_type, pen_type, manure_management):
         """
         Initializes a pen with the given arguments.
@@ -131,7 +133,7 @@ class Pen:
         """
         self.id = id_number
 
-        self.time_in_parlor = time_in_parlor
+        self.percent_time_in_parlor = percent_time_in_parlor
         self.vertical_dist_to_parlor = vert_dist
         self.horizontal_dist_to_parlor = horiz_dist
         self.num_stalls = num_stalls
@@ -142,6 +144,7 @@ class Pen:
         self.daily_growth = 0.0
 
         self.manure_management = manure_management
+        self.manure_handler = None
 
         self.avg_p_intake = 0
         self.avg_p_req = 0

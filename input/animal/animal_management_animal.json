@@ -124,7 +124,8 @@
 	"pen_information": {
 		"pen_types": {
 			"lactating_cows": {
-				"time_in_milking_parlor": 0.02,
+				"time_milking": 8,
+				"milking_per_day": 2,
 				"vertical_dist_to_milking_parlor": 0.1,
 				"horizontal_dist_to_milking_parlor": 1.6,
 				"number_of_stalls": 100,
@@ -134,8 +135,8 @@
 				"manure_management": "default"
 			},
 			"heifers_and_dry_cows": {
-				"classes": ["HI", "HII"],
-				"time_in_milking_parlor": 0.0,
+				"time_milking": 0.0,
+				"milking_per_day": 0.0,
 				"vertical_dist_to_milking_parlor": 0.1,
 				"horizontal_dist_to_milking_parlor": 1.6,
 				"number_of_stalls": 200,
@@ -145,8 +146,8 @@
 				"manure_management": "anaerobic_lagoon_2"
 			},
 			"calves": {
-				"classes": ["C"],
-				"time_in_milking_parlor": 0.0,
+				"time_milking": 0.0,
+				"milking_per_day": 0.0,
 				"vertical_dist_to_milking_parlor": 0.1,
 				"horizontal_dist_to_milking_parlor": 1.6,
 				"number_of_stalls": 400,

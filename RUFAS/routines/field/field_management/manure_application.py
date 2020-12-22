@@ -16,7 +16,7 @@ def update_all(soil, field_management, manure_storage, m_app):
         field_management: an instance of the FieldManagement class defined in
             field_management.py
         manure_storage: an instance of the ManureStorage class defined in
-            manure_storage.py
+            manure_management.py
         m_app: an instance of the BaseApplication class specified in
             field_management.py representing a user specified manure application.
     """
@@ -28,7 +28,7 @@ def update_all(soil, field_management, manure_storage, m_app):
 def formulate_manure_application(manure_storage, m_app):
     """
     Description:
-        Interfaces with manure_storage module to formulate an application meeting
+        Interfaces with manure_management module to formulate an application meeting
         user requested nutrient levels
         "pseudocode_field_management" FM.4.A
 

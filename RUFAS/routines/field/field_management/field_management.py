@@ -22,7 +22,7 @@ def daily_field_management_routine(soil, manure_storage, field_management, weath
         soil: an instance of the Soil class defined in soil.py representing
             the soil profile of the field being managed
         manure_storage: an instance of the ManureStorage class defined in
-            manure_storage.py representing available manure
+            manure_management.py representing available manure
         field_management: an instance of the FieldManagement class defined in
             field_management.py
         weather: an instance of the Weather class defined in classes.py

@@ -32,6 +32,7 @@
             }
         },
         "animal": "barnyard_animal.json",
-        "feed": "panke_buisse_feed.json"
+        "feed": "panke_buisse_feed.json",
+        "manure_management": "manure_management.json"
     }
 }

@@ -22,9 +22,9 @@ def update_all(separator, manure):
 
     Args:
         separator: an instance of the Separator class defined in
-            manure_storage.py
+            manure_management.py
         manure: an instance of the ManureStorage class defined in
-            manure_storage.py
+            manure_management.py
     """
     effluent_liquid(separator)
     effluent_solid(separator)

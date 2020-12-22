@@ -148,11 +148,16 @@ class AnimalManagement:
             all_pens_data: dictionary containing information about the pens
             herd_data: dictionary containing information about the herd
         """
-
+        pen_types = all_pens_data.pop('pen_types')
         for pen_name in all_pens_data:
-            pen_data = all_pens_data[pen_name]
-            pen_id = pen_data['id']
-            time_in_milking_parlor = pen_data['time_in_milking_parlor']
+            init_pen_data = all_pens_data[pen_name]
+            pen_id = init_pen_data['id']
+            pen_type = init_pen_data['pen_type']
+            pen_data = pen_types[pen_type]
+
+            time_milking = pen_data['time_milking']
+            milking_per_day = pen_data['milking_per_day']
+            percent_time_in_parlor = (time_milking * milking_per_day) / 60 * (1 / 24)
             vertical_dist_to_parlor = \
                 pen_data['vertical_dist_to_milking_parlor']
             horizontal_dist_to_parlor = \
@@ -163,7 +168,7 @@ class AnimalManagement:
             pen_type = pen_data['pen_type']
 
             manure_management = pen_data['manure_management']
-            pen = Pen(pen_id, time_in_milking_parlor, vertical_dist_to_parlor,
+            pen = Pen(pen_id, percent_time_in_parlor, vertical_dist_to_parlor,
                       horizontal_dist_to_parlor, num_stalls, housing_type, bedding_type,
                       pen_type, manure_management)
 
