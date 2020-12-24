@@ -457,10 +457,10 @@ class LifeCycleManager:
 
                 if cow.days_in_milk < self.config['voluntary_waiting_period']:
                     self.vwp_cow_num += 1
-                    if not cow.preg:
+                    if cow.days_in_preg == 0:
                         self.open_cow_num += 1
 
-                if cow.preg:
+                if cow.days_in_preg > 0:
                     self.preg_cow_num, self.avg_days_in_preg = \
                         self._calc_average(self.preg_cow_num,
                                            self.avg_days_in_preg, cow.days_in_preg)
