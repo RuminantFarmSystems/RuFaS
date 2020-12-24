@@ -86,7 +86,7 @@ class HeiferII(HeiferI):
 
         Returns: the daily body weight change for a heifer
         """
-        if self.preg:
+        if self.days_in_preg > 0:
             divisor = (self.gestation_length - self.days_in_preg)
             if divisor == 0:
                 divisor = 1
@@ -134,7 +134,6 @@ class HeiferII(HeiferI):
         self.ai_day = 0
         self.abortion_day = 0
         self.days_in_preg = 0
-        self.preg = False
         self.gestation_length = 0
         self.p_gest_for_calf = 0
 
@@ -162,7 +161,6 @@ class HeiferII(HeiferI):
         self.ai_day = args['ai_day']
         self.abortion_day = args['abortion_day']
         self.days_in_preg = args['days_in_preg']
-        self.preg = self.days_in_preg != 0
         self.gestation_length = args['gestation_length']
         self.p_gest_for_calf = args['p_gest_for_calf']
 
@@ -300,7 +298,7 @@ class HeiferII(HeiferI):
                 third_stage = True
                 self.events.add_event(self.days_born, sim_day, c.HEIFERII_TO_III)
         # cull heifer for reproduction reason
-        if not self.preg and \
+        if self.days_in_preg == 0 and \
             self.days_born > AnimalBase.config['heifer_repro_cull_time']:
             self.events.add_event(
                 self.days_born, sim_day, c.HEIFER_REPRO_CULL)
@@ -612,7 +610,7 @@ class HeiferII(HeiferI):
         for preg check 2 and 3, confirm pregnancy, there are chances of preg
             loss in each period of time between preg checks
         """
-        if self.preg:
+        if self.days_in_preg > 0:
             self.days_in_preg += 1
 
         # AI
@@ -623,7 +621,6 @@ class HeiferII(HeiferI):
             conception_rand = random()
             if conception_rand < self.conception_rate:
                 self.days_in_preg = 1
-                self.preg = True
                 self.breeding_to_preg_time = self.days_born - AnimalBase.config['breeding_start_day_h']
                 self.gestation_length = int(np.random.normal(
                     AnimalBase.config['avg_gestation_len'],
@@ -642,14 +639,13 @@ class HeiferII(HeiferI):
         elif self.days_born == self.ai_day + \
             AnimalBase.config['preg_check_day_1']:
             self.preg_diagnoses += 1
-            if self.preg:
+            if self.days_in_preg > 0:
                 preg_loss_rand = random()
                 if preg_loss_rand > AnimalBase.config['preg_loss_rate_1']:
                     self.events.add_event(
                         self.days_born, sim_day, c.PREG_CHECK_1_PREG)
                 else:
                     self.days_in_preg = 0
-                    self.preg = False
                     self.abortion_day = self.days_born
                     self._open(sim_day)
                     self.body_weight -= self.conceptus_weight
@@ -673,7 +669,6 @@ class HeiferII(HeiferI):
                     self.days_born, sim_day, c.PREG_CHECK_2_PREG)
             else:
                 self.days_in_preg = 0
-                self.preg = False
                 self.abortion_day = self.days_born
                 self._open(sim_day)
                 self.body_weight -= self.conceptus_weight
@@ -691,7 +686,6 @@ class HeiferII(HeiferI):
                     self.days_born, sim_day, c.PREG_CHECK_3_PREG)
             else:
                 self.days_in_preg = 0
-                self.preg = False
                 self.abortion_day = self.days_born
                 self._open(sim_day)
                 self.body_weight -= self.conceptus_weight
