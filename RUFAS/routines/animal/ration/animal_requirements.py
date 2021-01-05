@@ -11,7 +11,7 @@ import math
 
 def calc_rqmts(BW, MW, DOP, parity, CI, TP_Milk, Fat_Milk, Lactose_Milk,
                Milk, DIM, lactating, animal_type='cow', BCS5= None, PrevTemp = None,
-               bred = None, Age1stBred = None, Age1st = None, Age = None):
+                ADG_heifer = None, Age = None):
     """
     Calculates the dietary requirements of a single animal. These values are used
     on the RHS of the linear program and furthermore will be used in constraint
@@ -22,8 +22,8 @@ def calc_rqmts(BW, MW, DOP, parity, CI, TP_Milk, Fat_Milk, Lactose_Milk,
         BW: Body weight (kg)
         MW: Mature body weight(kg)
         animal_type: the type of animal (string)
-    (Args for just cow requirements):
         DOP: Days of pregnancy (d)
+    (Args for just cow requirements):
         parity: Number of parity
         CI: Calving interval (d)
         TP_Milk: Milk true protein content  (% of milk)
@@ -35,9 +35,7 @@ def calc_rqmts(BW, MW, DOP, parity, CI, TP_Milk, Fat_Milk, Lactose_Milk,
     (Args for just heifer requirements):
         BCS5: Body Condition Score (1-5 basis)
         PrevTemp: Average daily temperature of last month, °C
-        bred: A boolean if the animal has been bred or not
-        Age1stBred: 1st breeding age, month
-        Age1st: First calving age, month
+        ADG_heifer: Average daily gain of a heifer
         Age: Current age, month
 
     """
@@ -53,7 +51,9 @@ def calc_rqmts(BW, MW, DOP, parity, CI, TP_Milk, Fat_Milk, Lactose_Milk,
     CBW = MW * 0.06275
     # [A.Cow.A.2]-[A.Heifer.A.2]
     # Conceptus weight (kg)
-    if DOP > 190:
+    if DOP == None:
+        CW = 0
+    elif DOP > 190:
         CW = (18 + (DOP - 190) * 0.665) * (CBW / 45)
     else:
         CW = 0
@@ -66,7 +66,7 @@ def calc_rqmts(BW, MW, DOP, parity, CI, TP_Milk, Fat_Milk, Lactose_Milk,
     # [A.Heifer.A.3]
     elif animal_type == 'heifer':
         # BCS9 = Body condition score, 1 - 9 basis
-        BCS9 = (BCS5 -1) * 2 + 1
+        BCDS9 = (BCS5 -1) * 2 + 1
         # [A.Heifer.A.4]
         # Net energy for maintenance requirement, Mcal
         NEmaint = (BW-CW)**(0.75) * (0.086*(0.8+ (BCDS9 - 1) * 0.5)) + 0.0007*(20-PrevTemp)
@@ -100,10 +100,7 @@ def calc_rqmts(BW, MW, DOP, parity, CI, TP_Milk, Fat_Milk, Lactose_Milk,
     # [A.Heifer.A.12]
     # Average Daily Gain (kg)
     elif animal_type == 'heifer':
-        if not bred:
-            ADG = (0.55*MSBW - SBW) / (Age1stBred-Age)*30.4
-        else:
-            (0.82*MSBW-SBW) / (Age1st - Age)
+        ADG = max(ADG_heifer, 0)
     # [A.Cow.A.12]-[A.Heifer.A.13]
     # Equivalent empty weight gain (kg)
     EQEBG = 0.956 * ADG
@@ -117,7 +114,9 @@ def calc_rqmts(BW, MW, DOP, parity, CI, TP_Milk, Fat_Milk, Lactose_Milk,
     # ---------------------
     # [A.Cow.A.15]-[A.Heifer.A.16]
     # Metabolizable energy requirement for pregnancy (Mcal)
-    if DOP > 190:
+    if DOP == None:
+        MEpreg = 0
+    elif DOP > 190:
         MEpreg = (2 * 0.00159 * DOP - 0.0352) * (CBW / (45 * 0.14))
     else:
         MEpreg = 0
@@ -167,7 +166,9 @@ def calc_rqmts(BW, MW, DOP, parity, CI, TP_Milk, Fat_Milk, Lactose_Milk,
     # ---------------------
     # [A.Cow.B.5]-[A.Heifer.B.5]
     # Metabolizable protein requirement for pregnancy (g)
-    if DOP > 190:
+    if DOP == None:
+        MPpreg = 0
+    elif DOP > 190:
         MPpreg = (0.69 * DOP - 69.2) * (CBW / (45 * 0.33))
     else:
         MPpreg = 0
@@ -206,7 +207,9 @@ def calc_rqmts(BW, MW, DOP, parity, CI, TP_Milk, Fat_Milk, Lactose_Milk,
     Ca_growth = 9.83 * MW ** 0.22 * BW ** (-0.22) * (ADG / 0.96)
     # [A.Cow.C.3]-[A.Heifer.C.3]
     # Calcium pregnancy requirement (g)
-    if DOP > 190:
+    if DOP == None:
+        Ca_preg = 0
+    elif DOP > 190:
         Ca_preg = 0.02456 * math.exp((0.05581 - 0.00007 * DOP) * DOP) - 0.02456 * \
                   math.exp((0.05581 - 0.00007 * (DOP - 1)) * (DOP - 1))
     else:
@@ -230,7 +233,9 @@ def calc_rqmts(BW, MW, DOP, parity, CI, TP_Milk, Fat_Milk, Lactose_Milk,
     P_growth = (1.2 + 4.635 * MW ** 0.22 * BW ** (-0.22)) * (ADG / 0.96)
     # [A.Cow.C.8]-[A.Heifer.C.7]
     # Phosphorus pregnancy requirement (g)
-    if DOP > 190:
+    if DOP == None:
+        P_preg = 0
+    elif DOP > 190:
         P_preg = 0.02743 * math.exp((0.05527 - 0.000075 * DOP) * DOP) - 0.02743 * \
                  math.exp((0.05527 - 0.000075 * (DOP - 1)) * (DOP - 1))
     else:
@@ -265,7 +270,8 @@ def calc_rqmts(BW, MW, DOP, parity, CI, TP_Milk, Fat_Milk, Lactose_Milk,
         else:
             DMIest = ((1.97 - 0.75 * math.exp(0.16 * (DOP - 280))) / 100) * BW
     elif animal_type == 'heifer':
-        DMIest = None
+        #TODO: Actual calculation for DMIest
+        DMIest = 0
     # Requirements summary dictionary
     return {'NEmaint': NEmaint, 'NEg': NEg, 'NEpreg': NEpreg,
             'NEl': NEl, 'MP_req': MP_req, 'Ca_req': Ca_req, 'P_req': P_req,

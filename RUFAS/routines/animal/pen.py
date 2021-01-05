@@ -9,8 +9,6 @@ Description: The class which represents a pen on the farm. Each pen has
 Author(s): Militsa Sotirova, militsasotirova@gmail.com
 """
 from RUFAS.routines.animal.ration.calf_ration import optimize as calf_optimize
-from RUFAS.routines.animal.ration.growing_heifer_ration import \
-    optimize as growing_heifer_optimize
 from RUFAS.routines.animal.ration import ration_driver as ration_driver
 
 
@@ -238,7 +236,9 @@ class Pen:
         # sets ration's necessary fields for ration formulation calculation
         # there should only be one group of animals in a pen
         while True:
-
+            #TODO: Instead of checking if animal is in a class, check pen tag
+            #an error may be caused as result of heifers and dry cows in same pen
+            #if we only simulate with 3 pens
             if 'Calf' in self.classes_in_pen:
                 ration_per_animal = calf_optimize()
 
@@ -246,16 +246,20 @@ class Pen:
                     'HeiferII' in self.classes_in_pen or \
                     'HeiferIII' in self.classes_in_pen:
                 ration_per_animal = \
-                    growing_heifer_optimize()
+                    ration_driver.ration_formulation(self, available_feeds, \
+                                                            'heifer', False)
 
             elif 'Cow' in self.classes_in_pen and \
                     self.animals_in_pen[0].milking:  # lactating cow
                 ration_per_animal = \
-                    ration_driver.ration_formulation(self, available_feeds, True)
+                    ration_driver.ration_formulation(self, available_feeds, \
+                                                                'cow', True)
+
             elif 'Cow' in self.classes_in_pen and \
                     not self.animals_in_pen[0].milking:  # dry cow
                 ration_per_animal = \
-                    ration_driver.ration_formulation(self, available_feeds, False)
+                    ration_driver.ration_formulation(self, available_feeds, \
+                                                                'cow', False)
 
             else:  # this should never occur
                 print('error in pen ration calculation')

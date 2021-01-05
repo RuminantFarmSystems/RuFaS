@@ -14,7 +14,7 @@ import statistics as stat
 import math
 
 
-def optimization(requirements, available_feeds, BW, cow_type):
+def optimization(requirements, available_feeds, BW, animal_type, cow_type):
     """
     Function that sets up the nutrients and requirements lists into structured
     inputs for the non-linear program and calls the optimization function.
@@ -23,6 +23,7 @@ def optimization(requirements, available_feeds, BW, cow_type):
         requirements: object of class Requirements
         available_feeds: object of class AvailableFeeds
         BW: Average Body weight of the input pen
+        animal_type: string representation of the animal
         cow_type: Boolean which is True if cow is lactating, False otherwise
     """
     price = NLP.list_reconfig(available_feeds.price)
@@ -48,12 +49,12 @@ def optimization(requirements, available_feeds, BW, cow_type):
                     requirements.NEl, requirements.NEg, requirements.MP_req,
                     requirements.Ca_req, requirements.P_req, TDN, DE, EE, is_fat,
                     BW, calcium, phosphorus, NDF, feed_type, is_wetforage, Kd,
-                    N_A, N_B, CP, dRUP, limit, DMIest_ = requirements.DMIest)
+                    N_A, N_B, CP, dRUP, limit, cow_type, animal_type, requirements.DMIest)
     solution = NLP.optimize()
     return solution
 
 
-def ration_formulation(pen, available_feeds, cow_type):
+def ration_formulation(pen, available_feeds, animal_type, cow_type):
     """
     Function that links the ration_driver file with the calc_ration function in
     pen.py. Returns a dictionary of the rations by feed and status of the NLP
@@ -62,30 +63,36 @@ def ration_formulation(pen, available_feeds, cow_type):
     Args:
         pen: an object of class Pen
         available_feeds: an object of class AvailableFeeds
+        animal_type: string representation of the type of animal (cow, heifer)
         cow_type: Boolean which is True if cow is lactating, False otherwise
     """
     # creating instance of class requirements
     req = Requirements()
     # setting requirements based on animals information in pen
-    req.set_requirements(pen, False)
+    if animal_type == 'heifer':
+        #setting recalc to true, heifers  dont have req calculations for grouping
+        req.set_requirements(pen, animal_type, True)
+    else:
+        req.set_requirements(pen, animal_type, False)
     BW = pen.avg_BW
-    solution = optimization(req, available_feeds, BW, cow_type)
+    solution = optimization(req, available_feeds, BW, animal_type, cow_type)
     # Reduction of milk production estimate process to achieve feasible solution
-    while not solution.success:
-        # This values for reduction are not from pseudocode, but the vales below
-        # are based on fastest case runtime testing
-        # TODO: continue testing for more efficient reductions
-        NEl_con = NLP.NEl_constraint(solution.x)
-        if NEl_con < -0.5:
-            reduction = 3 * (-NEl_con)
-        else:
-            reduction = 1.5
+    if animal_type == 'cow':
+        while not solution.success:
+            # This values for reduction are not from pseudocode, but the vales below
+            # are based on fastest case runtime testing
+            # TODO: continue testing for more efficient reductions
+            NEl_con = NLP.NEl_constraint(solution.x)
+            if NEl_con < -0.5:
+                reduction = 3 * (-NEl_con)
+            else:
+                reduction = 1.5
 
-        for animal in pen.animals_in_pen:
-            animal.estimated_daily_milk_produced -= reduction
-        # recalculating requirements after reduction
-        req.set_requirements(pen, True)
-        solution = optimization(req, available_feeds, BW, cow_type)
+            for animal in pen.animals_in_pen:
+                animal.estimated_daily_milk_produced -= reduction
+            # recalculating requirements after reduction
+            req.set_requirements(pen, animal_type, True)
+            solution = optimization(req, available_feeds, BW, animal_type, cow_type)
 
     ration = {}
     for feed_id in range(len(available_feeds.feed_id)):
@@ -185,7 +192,7 @@ class Requirements:
         # dry matter intake estimation (kg)
         self.DMIest = 0
 
-    def set_requirements(self, pen, recalc):
+    def set_requirements(self, pen, animal_type, recalc):
         """
         Calculates the average requirements utilizing cow_requirements.py and an
         input pen to generate the average requirements across a pen. It then
@@ -193,6 +200,7 @@ class Requirements:
 
         Args:
             pen: an instance of an object of class Pen
+            animal_type: string representation of the animal
             recalc: boolean to see if requirements need to be recalculated since grouping
         """
         NEmaint = []
@@ -208,18 +216,52 @@ class Requirements:
         if recalc:
             # iterating through each animal in the pen and calculating requirements
             for animal in pen.animals_in_pen:
-                req = animal_requirements.calc_rqmts(animal.body_weight, animal.mature_body_weight,
+                a_type = type(animal).__name__
+                if a_type == 'HeiferI':
+                    req = animal_requirements.calc_rqmts(animal.body_weight, animal.mature_body_weight,
+                                                      None, None, None, None, None, None, None,
+                                                      None, None, animal_type = 'heifer',
+                                                      BCS5 = 3, PrevTemp = 13,
+                                                      ADG_heifer = animal.daily_growth,
+                                                      Age = animal.days_born
+                                                      )
+                elif a_type == 'HeiferII' or a_type == 'HeiferIII':
+                    req = animal_requirements.calc_rqmts(animal.body_weight, animal.mature_body_weight,
+                                                        animal.days_in_preg,
+                                                       None, None, None, None, None, None,
+                                                      None, None, animal_type = 'heifer',
+                                                      BCS5 = 3, PrevTemp = 13,
+                                                      ADG_heifer = animal.daily_growth,
+                                                      Age = animal.days_born
+                                                      )
+                else:
+                    req = animal_requirements.calc_rqmts(animal.body_weight, animal.mature_body_weight,
                                                   animal.days_in_preg, animal.calves, animal.CI, animal.mPrt,
                                                   animal.fat_percent, animal.lactose_milk,
                                                   animal.estimated_daily_milk_produced, animal.days_in_milk,
                                                   animal.milking
                                                   )
-                # calculating the activity requirement for energy
-                animal.calc_daily_walking_dist(pen.vertical_dist_to_parlor,
-                                               pen.horizontal_dist_to_parlor)
-                NEa_val = animal_requirements.energy_activity_rqmts(animal.body_weight,
-                                                                 pen.housing_type,
-                                                                 (math.sqrt(animal.DVD ** 2 + animal.DHD ** 2)))
+                animal.NEmaint = req['NEmaint']
+                animal.NEg = req['NEg']
+                animal.NEpreg = req['NEpreg']
+                animal.NEl = req['NEl']
+                animal.MP_req = req['MP_req']
+                animal.Ca_req = req['Ca_req']
+                animal.P_req = req['P_req']
+                animal.DMIest = req['DMIest']
+                if animal_type == 'cow':
+                    animal.DNED_req = (req['NEmaint'] + req['NEl']) / animal.DMIest
+                    animal.DMDP_req = (req['MP_req']) / animal.DMIest
+
+                    # calculating the activity requirement for energy
+                    animal.calc_daily_walking_dist(pen.vertical_dist_to_parlor,
+                                                   pen.horizontal_dist_to_parlor)
+                    NEa_val = animal_requirements.energy_activity_rqmts(animal.body_weight,
+                                                                     pen.housing_type,
+                                                                     (math.sqrt(animal.DVD ** 2 + animal.DHD ** 2)))
+                else:
+                    NEa_val = 0
+
                 NEmaint.append(req['NEmaint'])
                 NEa.append(NEa_val)
                 NEg.append(req['NEg'])

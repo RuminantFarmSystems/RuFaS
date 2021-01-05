@@ -115,7 +115,7 @@
 	"pasture_concentrate": -1,
 	"ration": {
 		"user_input": false,
-		"formulation_interval": 7
+		"formulation_interval": 21
 	},
 	"pen_information": {
 		"pen0": {

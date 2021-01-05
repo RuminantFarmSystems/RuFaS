@@ -15,7 +15,7 @@ from scipy.optimize import minimize
 
 def set_globals(price_, NEmaint_, NEa_, NEpreg_, NEl_, NEg_, MP_req_, C_req_, P_req_,
                  TDN_, DE_, EE_, is_fat_, BW_, calcium_, phosphorus_, NDF_, type_,
-                 is_wetforage_, Kd_, N_A_, N_B_, CP_, dRUP_, limit_,
+                 is_wetforage_, Kd_, N_A_, N_B_, CP_, dRUP_, limit_, cow_type_,
                  animal_type_ = 'cow', DMIest_= None):
     """
     Sets the global variables with the feed information to be used in the
@@ -54,10 +54,11 @@ def set_globals(price_, NEmaint_, NEa_, NEpreg_, NEl_, NEg_, MP_req_, C_req_, P_
         dRUP_: A list of RUP degradability in each feed (% of RUP)
         limit_: A list of the limiting upper bounds for each feed (kg)
         animal_type: A string representing the type of the animal
+        cow_type_: A boolean which is True if cow is lactating, False else
     """
     global price, n, NEmaint, NEa, NEpreg, NEl, NEg, MP_req, C_req, P_req, \
         DMIest, TDN, DE, EE, is_fat, BW, calcium, phosphorus, NDF, type, \
-        is_wetforage, Kd, N_A, N_B, CP, dRUP, limit, animal_type
+        is_wetforage, Kd, N_A, N_B, CP, dRUP, limit, animal_type, cow_type
 
     price = price_
     n = len(price)
@@ -87,6 +88,7 @@ def set_globals(price_, NEmaint_, NEa_, NEpreg_, NEl_, NEg_, MP_req_, C_req_, P_
     dRUP = dRUP_
     limit = limit_
     animal_type = animal_type_
+    cow_type = cow_type_
 
 
 def list_reconfig(list):
@@ -311,9 +313,11 @@ def phosphorus_constraint(x):
     # ----------------------
     # [A.Cow.C.6]-[A.Heifer.C.5]
     # Phosphorus maintenance requirement (g)
-    if type and (animal_type == 'cow'):
+    if cow_type:
+        #lactating cows
         P_maint = 1 * DMI + 0.002 * BW
     else:
+        #all other animals 
         P_maint = 0.8 * DMI + 0.002 * BW
     # [A.Cow.E.16]-[A.Heifer.16]
     return sum(np.multiply(x, np.multiply(np.multiply(phosphorus, 0.01), dP))) - ((P_req + P_maint) / 1000)

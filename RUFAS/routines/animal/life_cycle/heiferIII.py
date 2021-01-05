@@ -11,7 +11,6 @@ Description: This file updates the heifer form close to calving to calving,
 """
 from RUFAS.routines.animal.life_cycle.heiferII import HeiferII
 from RUFAS.routines.animal.life_cycle.animal_base import AnimalBase
-from RUFAS.routines.animal.ration.growing_heifer_ration import calculate_rqmts
 from RUFAS.routines.animal.manure.growing_heifer_manure_excretion import \
     manure_calculations
 
@@ -68,7 +67,7 @@ class HeiferIII(HeiferII):
         """
         Calculates this heiferIII's nutrient requirements.
         """
-        self.nutrient_rqmts, self.DMIest, self.DBW = calculate_rqmts()
+        #self.nutrient_rqmts, self.DMIest, self.DBW = calculate_rqmts()
 
     def calc_manure_excretion(self, feed):
         """
