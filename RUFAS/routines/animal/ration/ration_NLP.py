@@ -314,7 +314,7 @@ def phosphorus_constraint(x):
     if type and (animal_type == 'cow'):
         P_maint = 1 * DMI + 0.002 * BW
     else:
-        P_maint = 0.08 * DMI + 0.002 * BW
+        P_maint = 0.8 * DMI + 0.002 * BW
     # [A.Cow.E.16]-[A.Heifer.16]
     return sum(np.multiply(x, np.multiply(np.multiply(phosphorus, 0.01), dP))) - ((P_req + P_maint) / 1000)
 
@@ -538,7 +538,7 @@ def optimize():
     #        writer.writerow(data)
     #t1 = t_end_2 - t_end_1
     #write_csv([t1, obj1])
-    
+
     if animal_type ==  'cow':
         return minimize(objective, x0, method='SLSQP', bounds=bnds, constraints=cow_cons)
     elif animal_type == 'heifer':

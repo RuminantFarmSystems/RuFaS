@@ -96,5 +96,3 @@ def fb(model, i, j):
     return(0, limit_dat[i,j])
 model.feed_amount = pyo.Var(model.feed*model.nrg, domain = pyo.PositiveReals,
                                             bounds =fb, initialize=3)
-
-print(model.feed_amount.items())
