@@ -15,7 +15,7 @@ import csv
 from RUFAS import util, errors
 from RUFAS.routines import Fields, Feed
 from RUFAS.routines.animal.animal_management import AnimalManagement
-from RUFAS.routines.manure_management.manure_storage import ManureStorage
+from RUFAS.routines.manure_management.manure_management import ManureStorage
 from RUFAS.util import read_json_file
 
 

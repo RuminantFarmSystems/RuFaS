@@ -37,3 +37,10 @@ class BaseStorage:
         self.sludge_accumulation_volume = 0.00251
         self.hydraulic_retention_time = 180
         self.sludge_accumulation_period = 5.0
+
+    def update_all(self, manure):
+        self.methane(manure)
+
+    def methane(self, manure):
+        manure.CH4_emissions = self.VS * manure.Bo * manure.MCF * manure.MS * \
+                               manure.m3 * manure.CH4_collection_efficiency

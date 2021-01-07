@@ -7,27 +7,29 @@ Description: Driver for the manure storage model
 
 Author(s): William Donovan, wmdonovan@wisc.edu
 """
-from RUFAS.routines.manure_storage import manure_emissions, manure_handling, manure_separator
+from RUFAS.routines.manure_management import handlers, separators, treatments, storage_options
 
 
 def daily_manure_storage_routine(manure_storage, animal_management):
     manure_storage.reset_daily_variables()
 
-    for pen_id in manure_storage.pens:
-        pen = manure_storage.pens[pen_id]
+    for pen in manure_storage.pens.values():
         pen.reset_daily_variables()
         pen.update_pen(animal_management)
-        manure_handling.update_all(pen, manure_storage)
+        pen.handler.reset_daily_variables()
+        pen.handler.update_all(pen, manure_storage)
 
-    for separator_type in manure_storage.separators:
-        separator = manure_storage.separators[separator_type]
+    for separator in manure_storage.separators.values():
         separator.reset_daily_variables()
-        manure_separator.update_all(separator, manure_storage)
+        separator.update_all(manure_storage)
 
-    for storage_type in manure_storage.storage:
-        storage_system = manure_storage.storage[storage_type]
-        storage_system.reset_daily_variables()
-        manure_emissions.update_all(storage_system, manure_storage)
+    for treatment in manure_storage.treatments:
+        treatment.reset_daily_variables()
+        treatment.update_all(manure_storage)
+
+    for storage in manure_storage.storage.values():
+        storage.reset_daily_variables()
+        storage.update_all(manure_storage)
 
     manure_storage.summarize_manure_storage()
     manure_storage.summarize_annual_variables()
@@ -47,13 +49,22 @@ class ManureStorage:
                 specified in animal_management.py
         """
         self.pens = {}
+        self.handlers = {}
         self.separators = {}
+        self.treatments = {}
         self.storage = {}
 
         # MS.1.2
+        handler_data = manure_management_data['handling']
+        separator_data = manure_management_data['separators']
+        treatment_data = manure_management_data['treatment_methods']
+        storage_data = manure_management_data['storage_options']
+
         self.initialize_pens(manure_management_data, animal_management)
-        self.initialize_separators(animal_management)
-        self.initialize_storage(animal_management)
+        self.initialize_handlers(handler_data)
+        self.initialize_separators(separator_data)
+        self.initialize_treatment(treatment_data)
+        self.initialize_storage(storage_data)
 
         self.Bo = 0.24
         self.MCF = 0.01
@@ -134,41 +145,56 @@ class ManureStorage:
             based on the Animal model
 
         Args:
+            manure_management_data
             animal_management
         """
 
         for pen in animal_management.all_pens:
             self.pens[pen.id] = (ManureStorage.Pen(manure_management_data, pen))
 
-    def initialize_separators(self, separator_data, animal_management):
+    def initialize_handlers(self, handler_data):
+        for pen in self.pens:
+            if pen.handler not in self.handlers.keys():
+                self.handlers[pen.handler] = handlers.base_handler.BaseHandler(handler_data[pen.handler])
+
+    def initialize_separators(self, separator_data):
         """
         Description:
             Class helper method initializes ManureStorage's dictionary of
             separators based on the Animal model
 
         Args:
-            animal_management
+            separator_data
         """
 
-        for pen in animal_management.all_pens:
-            if not self.separators.keys().__contains__(pen.manure_separator):
-                self.separators[pen.manure_separator] = (ManureStorage.Separator(
-                    separator_data[pen.manure_separator],
+        for pen in self.pens:
+            if pen.manure_separator not in self.separators.keys():
+                self.separators[pen.manure_separator] = (separators.base_separator.BaseSeparator(
+                    separator_data[pen.separator],
                     pen))
 
-    def initialize_storage(self, storage_data, animal_management):
+    def initialize_treatment(self, treatment_data):
+        for pen in self.pens:
+            next_treatment = pen.storage
+            for treatment in range(len(pen.treatments), 0, -1):
+                if pen.treatments[treatment] not in self.treatments.keys():
+                    self.treatments[treatment] = treatments.base_treatment.BaseTreatment(treatment_data[treatment],
+                                                                                         next_treatment)
+                    next_treatment = self.treatments[treatment]
+
+    def initialize_storage(self, storage_data):
         """
         Description:
             Class helper method initializes ManureStorage's dictionary of
             storage receptacles based on the Animal model
 
         Args:
-            animal_management
+            storage_data
         """
 
-        for pen in animal_management.all_pens:
-            if not self.storage.keys().__contains__(pen.manure_storage):
-                self.storage[pen.manure_storage] = (ManureStorage.Storage(storage_data[pen.manure_storage], pen))
+        for pen in self.pens:
+            if pen.storage not in self.storage.keys():
+                self.storage[pen.storage] = (storage_options.base_storage.BaseStorage(storage_data[pen.storage]))
 
     def summarize_manure_storage(self):
         """
@@ -315,10 +341,10 @@ class ManureStorage:
             self.VS_excreted = pen.manure['VSd'] + pen.manure['VSnd']
             self.TS_excreted = self.raw_manure - self.VS_excreted
             self.N_excreted = pen.manure['MN']
-            self.P_excreted = pen.manure['p_excrt_manure']
+            self.P_excreted = pen.manure['P_excrt_manure']
 
-            # TODO: Excreted Potassium will eventually be calculated in animal module
-            self.K_excreted = 0.181 * self.cow_num
+            self.K_excreted = pen.manure['K_excrt_manure']
+            # self.K_excreted = 0.181 * self.cow_num
 
             self.density = 994.0
 
