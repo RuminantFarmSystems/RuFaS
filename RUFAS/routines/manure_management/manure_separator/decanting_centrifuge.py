@@ -1,7 +1,27 @@
+"""
+RUFAS: Ruminant Farm Systems Model
+
+File name: decanting_centrifuge.py
+
+Description:
+
+Author(s):  William Donovan, wmdonovan@wisc.edu
+            Yunus Mohammed, ymm26@cornell.edu 
+"""
+
+
 from .base_separator import BaseTreatment
 
 
-class SandSeparator(BaseTreatment):
+class DecantingCentrifuge(BaseTreatment):
+    """
+    Description
+    ------------
+
+    Attributes
+    ----------
+
+    """ 
     def __init__(self, treatment_data, pen):
         super().__init__(treatment_data, pen)
         if self.default: self.set_defaults()

@@ -1,7 +1,25 @@
-from .base_separator import BaseTreatment
+"""
+RUFAS: Ruminant Farm Systems Model
+
+File name: sand_separator.py
+
+Description:
+
+Author(s): Yunus Mohammed, ymm26@cornell.edu
+"""
 
 
-class MovingDiscPress(BaseTreatment):
+
+class SandSeparator():
+     """
+    Description
+    ------------
+
+    Attributes
+    ----------
+
+    """
+    
     def __init__(self, treatment_data, pen):
         super().__init__(treatment_data, pen)
         if self.default: self.set_defaults()

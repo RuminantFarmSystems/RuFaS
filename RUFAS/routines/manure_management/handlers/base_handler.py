@@ -1,7 +1,29 @@
+"""
+RUFAS: Ruminant Farm Systems Model
+
+File name: base_handler.py
+
+Description:
+
+Author(s):  William Donovan, wmdonovan@wisc.edu
+            Yunus Mohammed, ymm26@cornell.edu 
+"""
+
+
+
 from .sand_lane import SandLane
 
 
 class BaseHandler:
+    """
+    Description
+    ------------
+
+    Attributes
+    ----------
+
+    """ 
+
     def __init__(self, handler_data):
 
         self.sand_lane = None

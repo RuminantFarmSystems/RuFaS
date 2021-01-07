@@ -1,7 +1,29 @@
+"""
+RUFAS: Ruminant Farm Systems Model
+
+File name: slope_screen.py
+
+Description:
+
+Author(s):  William Donovan, wmdonovan@wisc.edu
+            Yunus Mohammed, ymm26@cornell.edu
+"""
+
+
+
 from .base_separator import BaseTreatment
 
 
-class ScrewPress(BaseTreatment):
+class SlopeScreen(BaseTreatment):
+    """
+    Description
+    ------------
+
+    Attributes
+    ----------
+
+    """
+    
     def __init__(self, treatment_data, pen):
         super().__init__(treatment_data, pen)
         if self.default: self.set_defaults()

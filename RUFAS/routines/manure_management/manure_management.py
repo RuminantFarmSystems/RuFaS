@@ -1,12 +1,14 @@
 """
 RUFAS: Ruminant Farm Systems Model
-File name: manure_storage.py
+File name: manure_management.py
 
 Description:
-Description: Driver for the manure storage model
 
-Author(s): William Donovan, wmdonovan@wisc.edu
+
+Author(s):  William Donovan, wmdonovan@wisc.edu
+            Yunus Mohammed, ymm26@cornell.edu  
 """
+
 from RUFAS.routines.manure_management import handlers, separators, treatments, storage_options
 
 
@@ -33,6 +35,19 @@ def daily_manure_storage_routine(manure_storage, animal_management):
 
     manure_storage.summarize_manure_storage()
     manure_storage.summarize_annual_variables()
+
+
+class ManureManagement:
+    """ 
+    Description:
+
+    Attributes
+    ----------
+    
+    """
+
+
+
 
 
 class ManureStorage:

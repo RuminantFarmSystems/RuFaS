@@ -1,4 +1,26 @@
+"""
+RUFAS: Ruminant Farm Systems Model
+
+File name: storage_pond.py
+
+Description:
+
+Author(s):  William Donovan, wmdonovan@wisc.edu 
+            Yunus Mohammed, ymm26@cornell.edu
+"""
+
+
 class BaseStorage:
+    """
+        Description
+        ------------
+
+        Attributes
+        ----------
+
+    """
+
+
     def __init__(self, storage_data):
         """
         Description:

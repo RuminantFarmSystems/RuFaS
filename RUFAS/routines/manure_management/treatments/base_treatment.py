@@ -1,4 +1,27 @@
+"""
+RUFAS: Ruminant Farm Systems Model
+
+File name: base_treatment.py
+
+Description: 
+
+Author(s):  William Donovan, wmdonovan@wisc.edu
+            Yunus Mohammed, ymm26@cornell.edu
+"""
+
+
+
 class BaseTreatment:
+    """
+    Description
+    ------------
+
+
+    Attributes
+    ----------
+
+    """
+    
     def __init__(self, treatment_data, next_treatment):
         self.next_treatment = next_treatment
         if treatment_data is None or treatment_data['default']:

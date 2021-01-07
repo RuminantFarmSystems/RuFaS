@@ -1,7 +1,28 @@
+"""
+RUFAS: Ruminant Farm Systems Model
+
+File name: mechanical_separator.py
+
+Description:
+
+Author(s):  William Donovan, wmdonovan@wisc.edu
+            Yunus Mohammed, ymm26@cornell.edu
+"""
+
+
 from .base_treatment import BaseTreatment
 
 
 class AnaerobicDigestor(BaseTreatment):
+    """
+    Description
+    ------------
+
+    Attributes
+    ----------
+
+    """
+    
     def __init__(self, treatment_data, next_treatment):
         super().__init__(treatment_data, next_treatment)
         if self.default: self.set_defaults()

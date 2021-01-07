@@ -1,4 +1,24 @@
+"""
+RUFAS: Ruminant Farm Systems Model
+
+File name: base_separator.py
+
+Description:
+
+Author(s):  William Donovan, wmdonovan@wisc.edu
+            Yunus Mohammed, ymm26@cornell.edu 
+"""
+
 class BaseSeparator:
+    """
+    Description
+    ------------
+
+    Attributes
+    ----------
+
+    """ 
+
     def __init__(self, separator_data, pen):
         """
         Description:
