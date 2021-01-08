@@ -341,7 +341,10 @@ class Cow(HeiferIII):
         Returns: the daily body weight change for a cow.
 
         """
-        CBW = AnimalBase.config['birth_weight_avg_ho']
+        if self.breed == "HO":
+            CBW = AnimalBase.config['birth_weight_avg_ho']
+        elif self.breed == 'JE':
+            CBW = AnimalBase.config['birth_weight_avg_je']
         if self.days_in_preg == self.gestation_length:
             conceptus_growth = - self.conceptus_weight
             self.conceptus_weight = 0
