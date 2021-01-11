@@ -49,7 +49,16 @@ def optimization(requirements, available_feeds, BW, cow_type):
                     requirements.Ca_req, requirements.P_req, requirements.DMIest,
                     TDN, DE, EE, is_fat, BW, calcium, phosphorus, NDF,
                     feed_type, is_wetforage, Kd, N_A, N_B, CP, dRUP, limit)
-    solution = NLP.optimize()
+    #try block for catching scipy SLSQP error
+    i = 0
+    while i < 1:
+        try:
+            solution = NLP.optimize()
+        except:
+            i -= 1
+        finally:
+            i += 1
+
     return solution
 
 

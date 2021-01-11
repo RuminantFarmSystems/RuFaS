@@ -88,6 +88,10 @@ class Config:
         # boolean to determine if the tests should be run
         self.run_tests = data['run_tests']
 
+        # set seed attributes
+        self.set_seed = data['set_seed']
+        self.seed = data['seed']
+
         year_length = 365
         leap_year_length = 366
 

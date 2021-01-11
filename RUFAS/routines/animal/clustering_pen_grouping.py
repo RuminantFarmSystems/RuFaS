@@ -63,7 +63,7 @@ def grouping(cow_list, pens):
     for cow in cow_list:
         DNED_req.append(cow.DNED_req)
         DMPD_req.append(cow.DMPD_req)
-        milk_avg.append(cow.lactose_milk)
+        milk_avg.append(cow.estimated_daily_milk_produced)
 
     # Create a pandas data frame with cow objects and relevant nutrition information
     cow_nutr_df = pd.DataFrame()  # cow nutrition data frame
