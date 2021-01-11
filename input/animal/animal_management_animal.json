@@ -4,7 +4,7 @@
         "heiferI_num": 225,
         "heiferII_num": 150,
         "heiferIII_num": 40,
-        "cow_num": 500,
+        "cow_num": 1000,
         "replace_num": 10000,
         "herd_num": 1000,
         "herd_init": false,
@@ -14,7 +14,7 @@
         "management_decisions": {
             "breeding_start_day_h": 360,
             "heifer_repro_method": "TAI",
-            "cow_repro_method": "ED-TAI",
+            "cow_repro_method": "TAI",
             "semen_type": "conventional",
             "days_in_preg_when_dry": 218,
             "lactation_curve": "wood",
@@ -40,7 +40,7 @@
             "repro": {
                 "estrus_detection_rate": 0.4,
                 "estrus_service_rate": 0.9,
-                "ed_conception_rate": 0.4,
+                "estrus_conception_rate": 0.4,
                 "heifer_TAI_protocol": "5dCG2P",
                 "m5dCG2P_conception_rate": 0.6,
                 "m5dCGP_conception_rate": 0.48,
@@ -168,7 +168,7 @@
             "id": 5,
             "vertical_dist_to_milking_parlor": 0.1,
             "horizontal_dist_to_milking_parlor": 1.6,
-            "number_of_stalls": 100,
+            "number_of_stalls": 300,
             "housing_type": "open air barn",
             "bedding_type": "sand",
             "pen_type": "tiestall"
@@ -177,7 +177,7 @@
             "id": 6,
             "vertical_dist_to_milking_parlor": 0.1,
             "horizontal_dist_to_milking_parlor": 1.6,
-            "number_of_stalls": 200,
+            "number_of_stalls": 300,
             "housing_type": "open air barn",
             "bedding_type": "sand",
             "pen_type": "tiestall"
@@ -186,7 +186,7 @@
             "id": 7,
             "vertical_dist_to_milking_parlor": 0.1,
             "horizontal_dist_to_milking_parlor": 1.6,
-            "number_of_stalls": 150,
+            "number_of_stalls": 250,
             "housing_type": "open air barn",
             "bedding_type": "sand",
             "pen_type": "tiestall"
@@ -195,7 +195,7 @@
             "id": 8,
             "vertical_dist_to_milking_parlor": 0.1,
             "horizontal_dist_to_milking_parlor": 1.6,
-            "number_of_stalls": 50,
+            "number_of_stalls": 200,
             "housing_type": "open air barn",
             "bedding_type": "sand",
             "pen_type": "tiestall"

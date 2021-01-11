@@ -98,7 +98,7 @@ class HeiferIII(HeiferII):
         cow_stage = False
         self.days_born += 1
 
-        if self.preg:
+        if self.days_in_preg > 0:
             self.days_in_preg += 1
 
         if self.body_weight < self.mature_body_weight:

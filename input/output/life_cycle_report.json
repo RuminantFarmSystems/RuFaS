@@ -11,7 +11,7 @@
         },
         "manure_report": {
             "produce_csv": true,
-            "produce_graphics": false,
+            "produce_graphics": true,
             "report_name": "manure_report"
         },
         "growth_report": {
@@ -21,8 +21,8 @@
         }
     },
     "field_report": {
-        "produce_csv": true,
-        "produce_graphics": true,
+        "produce_csv": false,
+        "produce_graphics": false,
         "report_name": "field_report",
         "soil_report": {
             "produce_csv": true,
@@ -45,33 +45,33 @@
             "report_name": "soil_carbon_report"
         },
         "crop_report": {
-            "produce_csv": true,
+            "produce_csv": false,
             "produce_graphics": false,
             "report_name": "crop_report"
         },
         "water_balance": {
-            "produce_csv": true,
+            "produce_csv": false,
             "produce_graphics": false,
             "report_name": "water_balance_report"
         },
         "phosphorus_balance": {
-            "produce_csv": true,
+            "produce_csv": false,
             "produce_graphics": false,
             "report_name": "phosphorus_balance_report"
         },
         "nitrogen_balance": {
-            "produce_csv": true,
+            "produce_csv": false,
             "produce_graphics": false,
             "report_name": "nitrogen_balance_report"
         }
     },
     "mass_balance": {
-        "produce_csv": true,
+        "produce_csv": false,
         "produce_graphics": false,
         "report_name": "mass_balance_report"
     },
     "feed_storage_report": {
-        "produce_csv": true,
+        "produce_csv": false,
         "produce_graphics": false,
         "report_name": "feed_storage_report"
     },
@@ -103,7 +103,7 @@
         }
     },
     "custom_report": {
-        "produce_csv": true,
+        "produce_csv": false,
         "produce_graphics": false,
         "report_name": "custom_report"
     }
