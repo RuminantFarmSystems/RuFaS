@@ -558,11 +558,11 @@ class Cow(HeiferIII):
         self.tai_program_start_day_c = date
 
     def _tai_program_day_after_preg_check(self, sim_day):
-	"""
+        """
         Description:
             resynch start after calving, resynch method assigned
-	Args:
-	    sim_day: simulation day
+        Args:
+            sim_day: simulation day
         """
         if self.resynch_method == 'TAIafterPD':
             self.tai_program_start_day_c = self.abortion_day + 1
