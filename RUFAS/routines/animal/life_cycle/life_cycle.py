@@ -14,15 +14,8 @@ from RUFAS.routines.animal.life_cycle.heiferII import HeiferII
 from RUFAS.routines.animal.life_cycle.heiferIII import HeiferIII
 from RUFAS.routines.animal.life_cycle.cow import Cow
 from RUFAS.routines.animal.life_cycle.animal_base import AnimalBase
-from RUFAS.routines.animal.life_cycle import animal_events_constants as c
 from RUFAS.routines.animal.life_cycle.animal_initialization import AnimalInitialization
-from collections import Counter
-import matplotlib as mpl
-import matplotlib.pyplot as plt
-
-mpl.use('TkAgg')
-
-# TODO: a number of variables referenced within this file are never initialized
+from RUFAS.routines.animal.life_cycle import animal_events_constants as c
 
 
 class LifeCycleManager:
@@ -179,6 +172,7 @@ class LifeCycleManager:
         """
         self.animal_initializer = AnimalInitialization(self.config['calving_interval'], breed,
                                                        config.set_seed, herd_init)
+
         if self.config['use_input_calving_interval']:
             self.avg_CI = self.config['calving_interval']
         else:
@@ -210,7 +204,7 @@ class LifeCycleManager:
         self.replacement_market = self.animal_initializer.get_replacement_cows(replace_num, breed)
         return calves, heiferIs, heiferIIs, heiferIIIs, cows
 
-    def daily_update(self, date, sim_length, calves, heiferIs, heiferIIs,
+    def daily_update(self, date, calves, heiferIs, heiferIIs,
                      heiferIIIs, cows):
         """
         Updates the status of the animals.
@@ -222,7 +216,6 @@ class LifeCycleManager:
             heiferIs: list of HeiferI objects to be updated
             calves: list of Calf objects to be updated
             date: day number
-            sim_length: length of the simulation, days
 
         Returns:
             animals_added: list of animals added from replacement herd
@@ -366,7 +359,7 @@ class LifeCycleManager:
                         self._calc_average(preg_heifer_num,
                                            self.avg_breeding_to_preg_time,
                                            heiferII.breeding_to_preg_time)
-            
+
         # heiferIII to cow, assign repro programs
         for index, heiferIII in enumerate(heiferIIIs):
 
@@ -396,7 +389,7 @@ class LifeCycleManager:
                 total_animal_num, self.avg_mature_body_weight = \
                     self._calc_average(total_animal_num,
                                        self.avg_mature_body_weight, heiferIII.mature_body_weight)
-            
+
         # if the number of heifers is more than needed for the herd, sell
         # those as replacement
         while len(heiferIIIs) + len(cows) > self.herd_num * 1.03 and len(heiferIIIs) > 0:
@@ -416,9 +409,10 @@ class LifeCycleManager:
             self.bought_heifer_num += 1
             del self.replacement_market[0]
 
+        # cow culling action and stats
         for index, cow in enumerate(cows):
             _, _, _, culled, new_born = cow.update(date, self.avg_CI)
-            
+
             # culled cows, calculate slaughter value and record culling reasons
             if culled:
                 if cow.cull_reason in self.cull_reason_stats_range:
@@ -430,6 +424,7 @@ class LifeCycleManager:
                     self.parity_culling_stats_range[parity] += 1
                 else:
                     self.parity_culling_stats_range[parity] = 1
+
                 self.culled_cows.append(cow)
                 self.cull_reason_stats[cow.cull_reason] += 1
                 self.culled_cow_num, self.avg_cow_culling_age = \
@@ -459,10 +454,10 @@ class LifeCycleManager:
 
                 if cow.days_in_milk < self.config['voluntary_waiting_period']:
                     self.vwp_cow_num += 1
-                    if not cow.preg:
+                    if cow.days_in_preg == 0:
                         self.open_cow_num += 1
 
-                if cow.preg:
+                if cow.days_in_preg > 0:
                     self.preg_cow_num, self.avg_days_in_preg = \
                         self._calc_average(self.preg_cow_num,
                                            self.avg_days_in_preg, cow.days_in_preg)
@@ -474,7 +469,7 @@ class LifeCycleManager:
                             self.num_cow_for_parity[str(cow.calves)],
                             self.avg_age_for_parity[str(cow.calves)],
                             cow.days_born)
-                    calving_age = cow.events.get_most_recent_date('New birth, start milking')
+                    calving_age = cow.events.get_most_recent_date(c.NEW_BIRTH)
                     if calving_age != -1:
                         calving_age_available_num[str(cow.calves)], \
                         self.avg_age_for_calving[str(cow.calves)] = \
@@ -494,7 +489,7 @@ class LifeCycleManager:
                     self.avg_age_for_parity['greater_than_3'] = self._calc_average(
                         self.num_cow_for_parity['greater_than_3'],
                         self.avg_age_for_parity['greater_than_3'], cow.days_born)
-                    calving_age = cow.events.get_most_recent_date('New birth, start milking')
+                    calving_age = cow.events.get_most_recent_date(c.NEW_BIRTH)
                     if calving_age != -1:
                         calving_age_available_num['greater_than_3'], \
                         self.avg_age_for_calving['greater_than_3'] = \
@@ -604,4 +599,5 @@ class LifeCycleManager:
         """
         new_num_values = num_values + 1
         new_avg = (cur_avg * num_values + new_value) / new_num_values
+
         return new_num_values, new_avg
