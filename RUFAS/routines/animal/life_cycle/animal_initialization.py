@@ -226,6 +226,7 @@ class AnimalInitialization:
                     args.update(presynch_method='PreSynch')
                     args.update(tai_method_c='OvSynch 56')
                     args.update(resynch_method='TAIafterPD')
+
                     cow = Cow(args)
 
                     cows.append(cow)
