@@ -149,21 +149,21 @@
         "initialization_db_summary":
         {
             "produce_csv": true,
-            "produce_graphics": false,
+            "produce_graphics": true,
             "report_name": "initialization_db_summary"
         },
 
         "individual_animal_report":
         {
           "produce_csv": true,
-          "produce_graphics": false,
+          "produce_graphics": true,
           "report_name": "individual_animal_report",
           "num_animals": 3
         },
         "herd_report":
         {
           "produce_csv": true,
-          "produce_graphics": false,
+          "produce_graphics": true,
           "report_name": "herd_report"
         }
     },

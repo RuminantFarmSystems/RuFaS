@@ -292,19 +292,15 @@ class Soil:
 
         # soil carbon attributes
         self.residue_harvest = 0.0
-
-        # TODO: the following 3 variables should be reset to this same value in yields
-        # TODO Lignin AG and BG are currently not implemented
-        self.lignin_residue_percent = 17
-        self.lignin_residue_AG_percent = 2.6
-        self.lignin_residue_BG_percent = 2.6
+        # TODO unsure what this should be initialized as
+        self.AG_lignin_res_percent = 17  # tied to the reset of this variable in yields, if changed, change together
+        self.BG_lignin_res_percent = 17  # tied to the reset of this variable in yields, if changed, change together
 
         self.curr_layer_depth = 0
-        self.silt_and_clay_frac = 0.5  # TODO database item
+        self.silt_to_clay_percent = 0.5  # TODO database item
 
-        self.LN_ratio_AG = 0
-        self.LN_ratio_BG = 0
-        self.LN_ratio_AG_BG = 0
+        self.AG_L_to_N = 0
+        self.BG_L_to_N = 0
 
         self.fresh_N = 0.0
 
@@ -331,6 +327,8 @@ class Soil:
         self.N_erosion_annual = 0.0
         self.N_uptake_annual = 0.0
 
+        self.K = 0.0
+
         self.term1 = 0.0
         self.term2 = 0.0
         self.term3 = 0.0
@@ -344,76 +342,100 @@ class Soil:
         def __init__(self, layer_name, layer_data):
             """
             Description:
-                Populates the characteristic values of a soil layer.
+                An instance of this class represents a layer in the soil profile.
+
             Args:
                 layer_name: a string which is the name of this layer
                 layer_data: a dictionary which stores the information for this layer
             """
             self.name = layer_name
 
+            # profile
             self.bottom_depth = layer_data['bottom_depth']
             self.bottom_depth_cm = self.bottom_depth / 10
+
+            self.bulk_density = layer_data['bulk_density']
+            self.mass = 0
+
+            self.thickness = 0.0  # thickness of soil layer
+            self.thickness_cm = 0.0
+
+            self.clay = layer_data['clay']
+
+            # Variables used for soil temperature
+            self.temperature = layer_data['initial_temperature']
+
+            # soil water
             self.wilting_point = layer_data['wilting_point']
             self.field_capacity = layer_data['field_capacity']
             self.saturation = layer_data['saturation']
             self.soil_water_percent = layer_data['soil_water_percent']
-
-            self.Cl = 2.5  # pseudocode_soil S.4.C.8
-
-            self.thickness = 0.0  # thickness of soil layer
-            self.thickness_cm = 0.0
 
             self.fc_water = 0.0  # constant
             self.sat_water = 0.0  # constant
             self.wilting_water = 0.0  # constant
             self.soil_water = 0.0  # mm water in the soil profile
 
-            self.bulk_density = layer_data['bulk_density']
-            self.mass = 0
-
-            # evapotranspiration
+            # Variables to calculate daily evapotranspiration
             self.top_evap = 0.0  # evaporation demand at top of layer
             self.bottom_evap = 0.0  # evaporation demand at bottom of layer
             self.evap = 0.0  # evaporation demand at layer
             self.trans_act = 0.0  # actual transpiration for the layer (updated in crop)
 
-            # soil temperature
-            self.temperature = layer_data['initial_temperature']
-
-            # percolation
+            # Variables to calculate dailyPercolation
             self.k_sat = layer_data['K_sat']  # saturated hydraulic conductivity (mm/h)
             self.TT = 0.0
             self.percolation = 0.0  # amount of water that percolates to next layer
 
-            self.clay = layer_data['clay']  # soil clay % in soil layer
+            # Variable to simulate nitrogen Cycling
+            # self.org_C = layer_data['org_C_percent']
+            self.org_C = 0
+            self.active_mineral_rate = layer_data['active_mineral_rate']
+            self.denitrification_rate = layer_data['denitrification_rate']
+            self.NH4 = layer_data['NH4']
 
-            # Nitrogen
-            self.org_C = layer_data['org_C_percent']
+            # the coefficient of extraction for leaching is calibrated to 2.5
+            self.Cl = 2.5
 
             self.temp_fac = 0.0
             self.water_fac = 0.0
 
-            self.K = 0.0
-
+            # Initial NO3 levels (kg/ha) in the soil layer:
             self.NO3 = 0.0
-            self.NH4 = 0.0
+            self.NH4_average = 0.0
+            self.NO3_average = 0.0
+            self.org_N_average = 0.0
+            self.active_N_average = 0.0
+            self.stable_N_average = 0.0
+            self.N_uptake = 0.0
+
+            # Organic N (Active + Stable, mg/kg):
             self.org_N = 0.0
+
+            # Initial Active N in layer:
             self.active_N = 0.0
+
+            # Initial Stable N in layer:
             self.stable_N = 0.0
 
             self.NO3_percolation = 0.0
             self.NH4_percolation = 0.0
-            self.active_N_percolation = 0.0
+            self.active_percolation = 0.0
+
             self.N_min_act = 0.0
             self.nitrification = 0.0
             self.volatilization = 0.0
             self.denitrification = 0.0
             self.N_trans = 0.0
-            self.nitri_volatil = 0.0
+            self.tot_nitri_volatil = 0.0
 
             self.de_N_rate = layer_data['denitrification_rate']
+            self.active_N_percent = layer_data['active_N_percent']
+            self.volatile_exchange_factor = layer_data['volatile_exchange_factor']
 
-            self.N_uptake = 0.0
+            # Variables to simulate phosphorus cycling
+            self.OM_percent = layer_data['OM_percent']
+
             self.soil_P = 0.0
 
             self.iso_slope = 0.0  # the slope of the isotherm curve
@@ -423,11 +445,11 @@ class Soil:
             self.DRP_leachate_act = 0.0
             self.DRP_runoff = 0.0
 
-            self.labile_P = layer_data['labile_P']  # labile P in soil layer
+            self.labile_P = layer_data['labile_P']
             self.active_P = 0.0
             self.stable_P = 0.0
             self.org_P = 0.0
-            self.P_uptake = 0.00
+            self.P_uptake = 0.0
 
             self.labile_P_uptake = 0.0
             self.labile_P_sum = 0.0
@@ -439,61 +461,61 @@ class Soil:
             self.days_unbalanced_labile = 0.0
             self.days_unbalanced_active = 0.0
 
-            self.NO3_average = 0.0
-            self.NH4_average = 0.0
-            self.active_N_average = 0.0
-            self.stable_N_average = 0.0
-            self.org_N_average = 0.0
-
             # C in the soil layer
             self.M_d = 0
 
-            self.metabolic_AG = 500
-            self.metabolic_BG = 500
-            self.structural_AG = 500
-            self.structural_BG = 500
+            self.AG_met = 500
+            self.BG_met = 500
+            self.AG_struct = 500
+            self.BG_struct = 500
 
-            self.fr_tillage = 0.0
+            self.tillage_percent = 0.0
 
-            self.carbon_active = 5000
-            self.carbon_slow = 5000
-            self.carbon_passive = 5000
+            self.C_active = 5000
+            self.C_slow = 5000
+            self.C_passive = 5000
 
-            self.metabolic_AG_to_C_active = 0
-            self.struct_AG_to_C_active = 0
-            self.struct_AG_to_C_slow = 0
-            self.metabolic_BG_to_C_active = 0
-            self.struct_BG_to_C_active = 0
-            self.struct_BG_to_C_slow = 0
+            self.AG_met_to_C_active = 0
+            self.AG_struct_to_C_active = 0
+            self.AG_struct_to_C_slow = 0
+            self.BG_met_to_C_active = 0
+            self.BG_struct_to_C_active = 0
+            self.BG_struct_to_C_slow = 0
 
-            self.metabolic_AG_to_active_loss = 0
-            self.struct_AG_to_active_loss = 0
-            self.struct_AG_to_slow_loss = 0
-            self.metabolic_BG_to_active_loss = 0
-            self.struct_BG_to_active_loss = 0
-            self.struct_BG_to_slow_loss = 0
+            self.AG_met_to_C_active_loss = 0
+            self.AG_struct_to_C_active_loss = 0
+            self.AG_struct_to_C_slow_loss = 0
+            self.BG_met_to_C_active_loss = 0
+            self.BG_struct_to_C_active_loss = 0
+            self.BG_struct_to_C_slow_loss = 0
 
-            self.struct_AG_to_active_actual = 0
-            self.struct_AG_to_slow_actual = 0
-            self.metabolic_BG_to_active_actual = 0
-            self.struct_BG_to_active_actual = 0
-            self.struct_BG_to_slow_actual = 0
+            self.AG_struct_to_C_active_act = 0
+            self.AG_struct_to_C_slow_act = 0
+            self.BG_met_to_C_active_act = 0
+            self.BG_struct_to_C_active_act = 0
+            self.BG_struct_to_C_slow_act = 0
 
-            self.active_to_slow = 0
-            self.active_to_passive = 0
-            self.slow_to_active = 0
-            self.slow_to_passive = 0
-            self.passive_to_active = 0
+            self.C_active_to_slow = 0
+            self.C_active_to_passive = 0
+            self.C_slow_to_active = 0
+            self.C_slow_to_passive = 0
+            self.C_passive_to_active = 0
 
-            self.carbon_active_loss = 0
-            self.carbon_slow_loss = 0
-            self.carbon_passive_loss = 0
+            self.C_active_loss = 0
+            self.C_slow_loss = 0
+            self.C_passive_loss = 0
 
-            self.carbon_percent = 0
-            self.total_carbon = 0
-            self.total_carbon_mg = 0
-            self.total_carbon_g = 0
-            self.total_CO2_C_loss = 0
+            self.C_percent = 0
+            self.C = 0
+            self.C_mg = 0
+            self.C_g = 0
+            self.C_CO2_loss = 0
+
+            self.C_active_decomp = 0
+            self.C_slow_decomp = 0
+            self.C_passive_decomp = 0
+
+            self.K = 0.0
 
     def initialize_profile_characteristics(self):
         if self.cover == "GRASSED":
