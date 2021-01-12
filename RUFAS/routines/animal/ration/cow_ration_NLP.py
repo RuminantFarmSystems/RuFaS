@@ -493,15 +493,16 @@ def optimize():
     """
 
     n = len(price)
-    x0 = []
-    for i in range(n):
-        x0.append(random.random() * 10)
+    x0 = [1]
+    for i in range(n-1):
+        #x0.append(random.random() * 10)
+        x0.append(0)
     # OPTIMIZE:
     # establishing the bounds of the NLP
     bnds = []
     # Dividing limit by 3 for tri-decision variables for farm grown feeds
     for i in range(len(limit)):
-        bnds.append((0, limit[i] / 3))
+        bnds.append((0, (limit[i] / 3) + 0.0001))
     bnds = tuple(bnds)
 
     # establishing the constraints of the NLP

@@ -11,7 +11,7 @@ Description: This file updates the heifer form breeding to close to calving.
             http://www.dcrcouncil.org/wp-content/uploads/2018/12/Dairy-Heifer-Protocol-Sheet-Updated-2018.pdf
             Preg check follows AI for three times.
 """
-###############################################################################
+
 import numpy as np
 from RUFAS.routines.animal.life_cycle.heiferI import HeiferI
 from RUFAS.routines.animal.life_cycle.animal_base import AnimalBase
@@ -30,8 +30,8 @@ class HeiferII(HeiferI):
             initialize the heifer in this stage from the first stage and
              initialize or assigns the repro program parameters
         Input:
-            args.id: id of the cow
-            args.breed: breed of the cow
+            args.id: id of the animal
+            args.breed: breed of the animal
             args.birth_date: the date of the simulation when the calf was born
             args.daysBorn: age of the animal
             args.repro_program: reproduction program used in heifer,
@@ -41,23 +41,23 @@ class HeiferII(HeiferI):
                 5dCGP, and user-defined
             args.synch_ed_method_h: synch ed protocols used for
                 reproduction programs, two of them: 2P and CP
-            (optional: include the following to assign cow information)
-            args.birth_weight: the birth weight of the cow
-            args.body_weight: current body weight of the cow
-            args.wean_weight: the wean weight of the cow
-            args.mature_body_weight: the mature body weight of the cow
-            args.events: events of the cow
-            args.estrus_count
-            args.estrus_day
-            args.tai_program_start_day_h
-            args.synch_ed_program_start_day_h
-            args.synch_ed_estrus_day
-            args.synch_ed_stop_day
-            args.conception_rate
-            args.ai_day
-            args.abortion_day
-            args.days_in_preg
-            args.gestation_length
+            (optional: include the following to assign animal information)
+            args.birth_weight: the birth weight of the animal
+            args.body_weight: current body weight of the animal
+            args.wean_weight: the wean weight of the animal
+            args.mature_body_weight: the mature body weight of the animal
+            args.events: events of the animal
+            args.estrus_count : number of estrus during ED program
+            args.estrus_day: the age when the heifer is estrus in ED program
+            args.tai_program_start_day_h: start day for heifers in TAI program
+            args.synch_ed_program_start_day_h: start day for heifers in synch_ED program
+            args.synch_ed_estrus_day: the age when the heifer is estrus in synch_ED program
+            args.synch_ed_stop_day: the age the the synch protocol stop for this round
+            args.conception_rate: conception rate associated with repro programs and protocols
+            args.ai_day: the age of animal for scheduled AI
+            args.abortion_day: the age of the animal when abortion happens
+            args.days_in_preg: days science pregnancy
+            args.gestation_length: the prejected gestation
             args.p_gest_for_calf
         """
         super().__init__(args)
@@ -87,23 +87,22 @@ class HeiferII(HeiferI):
 
         Returns: the daily body weight change for a heifer
         """
-        if self.preg:
+        if self.days_in_preg > 0:
             divisor = (self.gestation_length - self.days_in_preg)
             if divisor == 0:
                 divisor = 1
             target_ADG_heifer_preg = (0.82 * 0.96 * self.mature_body_weight -
-                                      0.96 * self.body_weight) / divisor
+                                            0.96 * self.body_weight) / divisor
 
             CBW = AnimalBase.config['birth_weight_avg_ho']
-            if self.days_in_preg > 190:
-                conceptus_growth = 0.665 * CBW / 45
-                self.conceptus_weight += conceptus_growth
-            elif self.days_in_preg == 190:
-                conceptus_growth = 18 * CBW / 45
-                self.conceptus_weight += conceptus_growth
-            elif self.days_in_preg == self.gestation_length:
+            if self.days_in_preg == self.gestation_length:
                 conceptus_growth = - self.conceptus_weight
                 self.conceptus_weight = 0
+            elif self.days_in_preg > 50:
+                conceptus_total_weight = (0.0148 * self.gestation_length - 2.408) * CBW
+                conceptus_param = conceptus_total_weight ** (1 / 3) / (self.gestation_length - 50)
+                conceptus_growth = 3 * conceptus_param ** 3 * (self.days_in_preg - 50) ** 2
+                self.conceptus_weight += conceptus_growth
             else:
                 conceptus_growth = 0
 
@@ -137,6 +136,7 @@ class HeiferII(HeiferI):
         self.abortion_day = 0
         self.days_in_preg = 0
         self.preg = False
+
         self.gestation_length = 0
         self.p_gest_for_calf = 0
 
@@ -164,7 +164,6 @@ class HeiferII(HeiferI):
         self.ai_day = args['ai_day']
         self.abortion_day = args['abortion_day']
         self.days_in_preg = args['days_in_preg']
-        self.preg = self.days_in_preg != 0
         self.gestation_length = args['gestation_length']
         self.p_gest_for_calf = args['p_gest_for_calf']
 
@@ -277,21 +276,15 @@ class HeiferII(HeiferI):
 
         self.days_born += 1
 
-        if self.days_born < AnimalBase.config['grow_end_day']:
+        if self.body_weight < self.mature_body_weight:
             # Heifer can only grow to a maximum weight of mature_body_weight
             self.daily_growth = self.get_bw_change()
 
             self.body_weight += self.daily_growth
 
-            if self.body_weight > self.mature_body_weight:
-                self.body_weight = self.mature_body_weight
-                self.events.add_event(self.days_born, sim_day,
-                                      'Mature body weight prior to grow end day')
-
-        # Mature body weight
-        if self.days_born == AnimalBase.config['grow_end_day']:
-            self.mature_body_weight = self.body_weight
-            self.events.add_event(self.days_born, sim_day, 'Mature body weight')
+        else:
+            self.body_weight = self.mature_body_weight
+            self.events.add_event(self.days_born, sim_day, c.MATURE_BODY_WEIGHT)
 
         # breeding method assign to heifer
         if self.days_born >= AnimalBase.config['breeding_start_day_h']:
@@ -302,15 +295,15 @@ class HeiferII(HeiferI):
             elif self.repro_program == 'synch-ED':
                 self._synch_ed_update(sim_day)
             self._preg_update(sim_day)
-            # prior to calving, heifer move to replacement group
+            # prior to calving, heifer move to replacement group (heiferIII)
             if self.days_in_preg == self.gestation_length - \
-                    AnimalBase.config['prefresh_day']:
+                AnimalBase.config['prefresh_day']:
                 self.days_born -= 1  # will be increment again in next stage
                 third_stage = True
                 self.events.add_event(self.days_born, sim_day, c.HEIFERII_TO_III)
         # cull heifer for reproduction reason
-        if not self.preg and \
-                self.days_born > AnimalBase.config['heifer_repro_cull_time']:
+        if self.days_in_preg == 0 and \
+            self.days_born > AnimalBase.config['heifer_repro_cull_time']:
             self.events.add_event(
                 self.days_born, sim_day, c.HEIFER_REPRO_CULL)
             cull_stage = True
@@ -335,8 +328,8 @@ class HeiferII(HeiferI):
             AnimalBase.config['avg_estrus_cycle_heifer'],
             AnimalBase.config['std_estrus_cycle_heifer'])
         while estrus_cycle < AnimalBase.config['avg_estrus_cycle_heifer'] \
-                - 2 * AnimalBase.config['std_estrus_cycle_heifer'] \
-                or estrus_cycle > AnimalBase.config['avg_estrus_cycle_heifer'] \
+            - 2 * AnimalBase.config['std_estrus_cycle_heifer'] \
+            or estrus_cycle > AnimalBase.config['avg_estrus_cycle_heifer'] \
                 + 2 * AnimalBase.config['std_estrus_cycle_heifer']:
             estrus_cycle = np.random.normal(
                 AnimalBase.config['avg_estrus_cycle_heifer'],
@@ -350,7 +343,7 @@ class HeiferII(HeiferI):
         Return estrus after estrus not detected or not serviced
         """
         self.estrus_day = self._determine_estrus_day(
-            self.estrus_day, 'Estrus', sim_day)
+            self.estrus_day, c.BASIC_ESTRUS_NOTE, sim_day)
 
     def _after_ai_estrus(self, sim_day):
         """
@@ -375,7 +368,7 @@ class HeiferII(HeiferI):
         """
         if self.days_born == AnimalBase.config['breeding_start_day_h']:
             self.estrus_day = self._determine_estrus_day(
-                AnimalBase.config['breeding_start_day_h'], 'First estrus',
+                AnimalBase.config['breeding_start_day_h'], c.FIRST_ESTRUS_NOTE,
                 sim_day)
 
         # if on estrus day, start detecting estrus
@@ -384,7 +377,7 @@ class HeiferII(HeiferI):
 
             estrus_detection_rand = random()
             if estrus_detection_rand < \
-                    AnimalBase.config['estrus_detection_rate']:
+                AnimalBase.config['estrus_detection_rate']:
                 # Estrus detected
                 self.events.add_event(self.days_born, sim_day, c.ESTRUS_DETECTED)
                 ed_service_rand = random()
@@ -397,6 +390,8 @@ class HeiferII(HeiferI):
                     self._return_estrus(sim_day)
             else:
                 self._return_estrus(sim_day)
+
+        self.ED_days += 1
 
     # TAI methods
     def _determine_tai_program_day(self, date):
@@ -454,9 +449,9 @@ class HeiferII(HeiferI):
         User defined protocol for tai method
         """
         if self.days_born == self.tai_program_start_day_h + \
-                AnimalBase.config['tai_program_length']:
+            AnimalBase.config['user_define_tai_length']:
             self.ai_day = self.days_born
-            self.conception_rate = AnimalBase.config['defined_conception_rate']
+            self.conception_rate = AnimalBase.config['heifer_user_defined_tai_cr']
 
     def _tai_update(self, sim_day):
         """
@@ -529,7 +524,7 @@ class HeiferII(HeiferI):
                 if ed_service_rand < AnimalBase.config['estrus_service_rate']:
                     self.ai_day = self.synch_ed_estrus_day + 1
                     self.conception_rate = \
-                        AnimalBase.config['ed_conception_rate']
+                        AnimalBase.config['estrus_conception_rate']
                 else:
                     if self.days_born - \
                             self.synch_ed_program_start_day_h < 14:
@@ -571,7 +566,7 @@ class HeiferII(HeiferI):
                 if ed_service_rand < AnimalBase.config['ed_service_rate']:
                     self.ai_day = self.synch_ed_estrus_day + 1
                     self.conception_rate = \
-                        AnimalBase.config['ed_conception_rate']
+                        AnimalBase.config['estrus_conception_rate']
                 else:
                     self.synch_ed_stop_day = self.synch_ed_program_start_day_h + 14
                     self._determine_synch_ed_program_day(self.synch_ed_stop_day)
@@ -619,7 +614,7 @@ class HeiferII(HeiferI):
         for preg check 2 and 3, confirm pregnancy, there are chances of preg
             loss in each period of time between preg checks
         """
-        if self.preg:
+        if self.days_in_preg > 0:
             self.days_in_preg += 1
 
         # AI
@@ -630,7 +625,6 @@ class HeiferII(HeiferI):
             conception_rand = random()
             if conception_rand < self.conception_rate:
                 self.days_in_preg = 1
-                self.preg = True
                 self.breeding_to_preg_time = self.days_born - AnimalBase.config['breeding_start_day_h']
                 self.gestation_length = int(np.random.normal(
                     AnimalBase.config['avg_gestation_len'],
@@ -649,14 +643,14 @@ class HeiferII(HeiferI):
         elif self.days_born == self.ai_day + \
             AnimalBase.config['preg_check_day_1']:
             self.preg_diagnoses += 1
-            if self.preg:
+
+            if self.days_in_preg > 0:
                 preg_loss_rand = random()
                 if preg_loss_rand > AnimalBase.config['preg_loss_rate_1']:
                     self.events.add_event(
                         self.days_born, sim_day, c.PREG_CHECK_1_PREG)
                 else:
                     self.days_in_preg = 0
-                    self.preg = False
                     self.abortion_day = self.days_born
                     self._open(sim_day)
                     self.body_weight -= self.conceptus_weight
@@ -680,7 +674,6 @@ class HeiferII(HeiferI):
                     self.days_born, sim_day, c.PREG_CHECK_2_PREG)
             else:
                 self.days_in_preg = 0
-                self.preg = False
                 self.abortion_day = self.days_born
                 self._open(sim_day)
                 self.body_weight -= self.conceptus_weight
@@ -698,7 +691,6 @@ class HeiferII(HeiferI):
                     self.days_born, sim_day, c.PREG_CHECK_3_PREG)
             else:
                 self.days_in_preg = 0
-                self.preg = False
                 self.abortion_day = self.days_born
                 self._open(sim_day)
                 self.body_weight -= self.conceptus_weight

@@ -16,7 +16,7 @@
 			"heifer_repro_method": "TAI",
 			"cow_repro_method": "TAI",
 			"semen_type": "conventional",
-			"dip_dry": 218,
+			"days_in_preg_when_dry": 218,
 			"lactation_curve": "wood",
 			"heifer_repro_cull_time": 650,
 			"repro_cull_time": 300,
@@ -68,7 +68,6 @@
 				
 			},
 			"bodyweight": {
-				"grow_end_day": 780,
 				"mature_body_weight_left": 550,
 				"mature_body_weight_mode": 700,
 				"mature_body_weight_right": 1000,
