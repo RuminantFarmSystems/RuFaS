@@ -9,7 +9,7 @@ all the getters and setters of attributes of an instance of Manure.
 Author(s): Yunus Mohammed, ymm26@cornell.edu
 """
 
-from .bedding.organic_bedding import *
+from .bedding import OrganicBedding
 
 class Manure:
     """
