@@ -25,16 +25,16 @@ class Calf(AnimalBase):
 		Description:
 			initialize calf at the time it was born
 		Args:
-			args.id: id of the cow
-			args.breed: breed of the cow
+			args.id: id of the animal
+			args.breed: breed of the animal
 			args.birth_date: the date of the simulation when the calf was born
 			args.daysBorn: age of the animal
-			(optional: include the following to assign cow information)
-			args.birth_weight: the birth weight of the cow
-			args.body_weight: current body weight of the cow
-			args.wean_weight: the wean weight of the cow
-			args.mature_body_weight: the mature body weight of the cow
-			args.events: events of the cow
+			(optional: include the following to assign animal information)
+			args.birth_weight: the birth weight of the animal
+			args.body_weight: current body weight of the animal
+			args.wean_weight: the wean weight of the animal
+			args.mature_body_weight: the mature body weight of the animal
+			args.events: events of the animal
 		"""
         super().__init__(args)
 
@@ -217,39 +217,3 @@ class Calf(AnimalBase):
         self.daily_growth = self.body_weight - prev_weight
 
         return wean_day
-
-    def __str__(self):
-        if not self.culled:
-            res_str = """
-				==> Calf: \n
-				ID: {} \n
-				Birth Date: {}\n
-				days Born: {}\n
-				Birth Weight: {}kg\n
-				Body Weight: {}kg\n
-				Wean Day: {}\n
-				Life Events: \n
-				{}
-			""".format(
-                self.id,
-                self.birth_date,
-                self.days_born,
-                self.birth_weight,
-                self.body_weight,
-                AnimalBase.config['wean_day'],
-                str(self.events))
-        else:
-            res_str = """
-				==> Calf: \n
-				Still Birth: True \n
-				ID: {} \n
-				Birth Date: {}\n
-				days Born: {}\n
-				Life Events: \n
-				{}
-			""".format(
-                self.id,
-                self.birth_date,
-                self.days_born,
-                str(self.events))
-        return res_str

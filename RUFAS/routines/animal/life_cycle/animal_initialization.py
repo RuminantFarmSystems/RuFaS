@@ -156,9 +156,7 @@ class AnimalInitialization:
             animal_num: number of animals to simulate
             sim_days: number of days to simulate
     '''
-
-    def init_animals(self, breed, animal_num=20000, sim_days=5000):
-        print('inside init_animals')
+    def init_animals(self, breed, animal_num = 20000, sim_days=5000):
         calves = []
         heiferIs = []
         heiferIIs = []
@@ -196,10 +194,10 @@ class AnimalInitialization:
                 second_stage = heiferI.update(0)
                 if second_stage:
                     args = heiferI.get_heiferI_values()
-                    args.update(id=self.next_id())
-                    args.update(repro_program=AnimalBase.config['heifer_repro_method'])
-                    args.update(tai_method_h=AnimalBase.config['heifer_TAI_protocol'])
-                    args.update(synch_ed_method_h=AnimalBase.config['heifer_synchED_protocol'])
+                    args.update(id = self.next_id())
+                    args.update(repro_program = AnimalBase.config['heifer_repro_method'])
+                    args.update(tai_method_h = AnimalBase.config['heifer_TAI_protocol'])
+                    args.update(synch_ed_method_h = AnimalBase.config['heifer_synchED_protocol'])
 
                     heiferII = HeiferII(args)
                     heiferIIs.append(heiferII)
@@ -221,11 +219,11 @@ class AnimalInitialization:
                 cow_stage = heiferIII.update(0)
                 if cow_stage:
                     args = heiferIII.get_heiferIII_values()
-                    args.update(id=self.next_id())
-                    args.update(repro_program='TAI')
-                    args.update(presynch_method='PreSynch')
-                    args.update(tai_method_c='OvSynch 56')
-                    args.update(resynch_method='TAIafterPD')
+                    args.update(id = self.next_id())
+                    args.update(repro_program = AnimalBase.config['cow_repro_method'])
+                    args.update(presynch_method = AnimalBase.config['cow_presynch_protocol'])
+                    args.update(tai_method_c = AnimalBase.config['cow_TAI_protocol'])
+                    args.update(resynch_method = AnimalBase.config['cow_resynch_protocol'])
 
                     cow = Cow(args)
 

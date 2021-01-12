@@ -11,7 +11,7 @@ def calc_requirements(calf, feed, temp, wean_day, wean_length, milk_type):
     Calculate dietary intake and nutrient requirements for the calf.
 
     Args:
-        feed: instance of Feed class defined in feed.py
+        feed: instance of feed class
         calf: the calf to calculate the nutrient requirement for
         temp: the average temperature of the simulation day
         wean_day: the wean day of the calf
