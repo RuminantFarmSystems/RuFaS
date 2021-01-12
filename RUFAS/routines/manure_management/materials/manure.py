@@ -3,22 +3,29 @@ RUFAS: Ruminant Farm Systems Model
 
 File name: manure.py
 
-Description: This module contains the implementation of the Manure class with all the
-getters and setters of attributes of an instance of Manure. 
+Description: This module contains the implementation of the Manure class with 
+all the getters and setters of attributes of an instance of Manure. 
 
 Author(s): Yunus Mohammed, ymm26@cornell.edu
 """
 
+from .bedding.organic_bedding import *
 
 class Manure:
     """
     Description
     ------------
-    An instance of Manure represents gathered or aggregated manure in any given component.
+    An instance of Manure represents gathered or aggregated manure in any given 
+    component. It has the aggregateManure() function for aggregation of manure. 
+    Each instance has the following attribute as well as the corresponding 
+    invariances, getters, and setters.
 
 
     Attributes
     ----------
+    Attribute _bedding: The bedding material in this manure
+    Invariant: Must be an instance of Bedding
+
     Attribute _K: Total Potassium (K2O) present
     Invariant: Non negative float in units of kg
 
@@ -39,18 +46,13 @@ class Manure:
 
     Attribute _VS: Total volatile solids contained in this manure object
     Invariant: Non negative float in units of kg
-
-
-    Main Method(s)
-    --------------
-    aggregateManure(self, other) - adds other (Manure) to self
     """   
 
-    def __init__(self, k=0, n=0, p=0, tan=0, ts=0, twv=0, vs=0):
+    def __init__(self, bedding, k=0, n=0, p=0, tan=0, ts=0, twv=0, vs=0):
         """
         Description: initializes a Manure object.
 
-        
+        Parameter bedding: The bedding material
         Parameter k : the mass of potassium
         Parameter n: the mass of nitrogen
         Parameter p: the mass of potassium
@@ -58,9 +60,10 @@ class Manure:
         Parameter twv: the total waste volume
         Parameter vs: the total mass of volatile solids
 
-        Preconditions: the values of the parameters should truthify corresponding 
-        invariances 
+        Preconditions: the values of the parameters should make corresponding 
+        invariants true 
         """
+        self._bedding = bedding
         self._K = k
         self._N = n
         self._P = p
@@ -84,8 +87,22 @@ class Manure:
         self._TWV += other._TWV
         self._VS += other._VS
 
+        #Aggregating the bedding material
+        if isinstance(self._bedding, OrganicBedding) and not isinstance(other._bedding, OrganicBedding):
+            other._bedding.aggregateBedding(self._bedding)
+            self._bedding = other._bedding
+        else:
+            self._bedding.aggregateBedding(other._bedding)
+
+
 
     #Getters
+    def getBedding(self):
+        """
+        Returns _bedding in this Manure
+        """
+        return self._bedding
+
     def getK(self):
         """
         Returns the value of _K 
@@ -102,7 +119,7 @@ class Manure:
         """
         Returns the value of _P to p
         """
-        return self._P = p
+        return self._P 
 
     def getTAN(self):
         """
