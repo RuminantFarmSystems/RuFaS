@@ -50,11 +50,12 @@ def optimization(requirements, available_feeds, BW, animal_type, cow_type):
                     requirements.Ca_req, requirements.P_req,
                     TDN, DE, EE, is_fat, BW, calcium, phosphorus, NDF,
                     feed_type, is_wetforage, Kd, N_A, N_B, CP, dRUP, limit, cow_type,
+                    animal_type_ = animal_type,
                     DMIest_ = requirements.DMIest)
     #try block for catching scipy SLSQP error
     i = 0
     count = 0
-    while i < 1 or count < 20:
+    while i < 1:
         try:
             solution = NLP.optimize()
         except:
@@ -62,9 +63,10 @@ def optimization(requirements, available_feeds, BW, animal_type, cow_type):
         finally:
             i += 1
             count += 1
-    #throwing non Scipy SLSQP error
-    if count > 20:
-        solution = NLP.optimize()
+    #this case should not be called, but is in place to not crash the
+    #simulation if bounds error is not resolved
+        if count > 30:
+            solution = None
 
     return solution
 
@@ -108,17 +110,25 @@ def ration_formulation(pen, available_feeds, animal_type, cow_type):
             # recalculating requirements after reduction
             req.set_requirements(pen, animal_type, True)
             solution = optimization(req, available_feeds, BW, animal_type, cow_type)
+            #in case of scipy error
+            if solution == None:
+                break
 
-    ration = {}
-    for feed_id in range(len(available_feeds.feed_id)):
-        i = feed_id * 3
-        num = solution.x[i]
-        num += solution.x[i + 1]
-        num += solution.x[i + 2]
-        ration[available_feeds.feed_key[feed_id]] = round(num, 6)
-    ration['status'] = 'Optimal'
-    ration['objective'] = NLP.objective(solution.x)
-    return ration
+    if solution != None:
+        ration = {}
+        for feed_id in range(len(available_feeds.feed_id)):
+            i = feed_id * 3
+            num = solution.x[i]
+            num += solution.x[i + 1]
+            num += solution.x[i + 2]
+            ration[available_feeds.feed_key[feed_id]] = round(num, 6)
+        ration['status'] = 'Optimal'
+        ration['objective'] = NLP.objective(solution.x)
+        return ration
+    #safeguard if scipy SLSQP bounds error still occurs after many iterations
+    #using previous cycles ration for this pen
+    else:
+        return pen.ration / len(pen.animals_in_pen)
 
 
 def ration_report(ration, available_feeds):
@@ -233,10 +243,11 @@ class Requirements:
             for animal in pen.animals_in_pen:
                 a_type = type(animal).__name__
                 if a_type == 'HeiferI':
-                    req = animal_requirements.calc_rqmts(animal.body_weight, animal.mature_body_weight,
-                                                      None, None, None, None, None, None, None,
-                                                      None, None, animal_type = 'heifer',
-                                                      BCS5 = 3, PrevTemp = 13,
+                    req = animal_requirements.calc_rqmts(animal.body_weight, \
+                            animal.mature_body_weight, None, None, None, None,\
+                                                        None, None, None,
+                                            None, None, animal_type = 'heifer',
+                                                        BCS5 = 3, PrevTemp = 13,
                                                       ADG_heifer = animal.daily_growth,
                                                       Age = animal.days_born
                                                       )

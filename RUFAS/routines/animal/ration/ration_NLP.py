@@ -501,8 +501,7 @@ def optimize():
     n = len(price)
     x0 = [1]
     for i in range(n-1):
-        #x0.append(random.random() * 10)
-        x0.append(0)
+        x0.append(random.random() * 10)
     # OPTIMIZE:
     # establishing the bounds of the NLP
     bnds = []
@@ -543,7 +542,6 @@ def optimize():
     #        writer.writerow(data)
     #t1 = t_end_2 - t_end_1
     #write_csv([t1, obj1])
-
     if animal_type ==  'cow':
         return minimize(objective, x0, method='SLSQP', bounds=bnds, constraints=cow_cons)
     elif animal_type == 'heifer':
