@@ -317,7 +317,7 @@ def phosphorus_constraint(x):
         #lactating cows
         P_maint = 1 * DMI + 0.002 * BW
     else:
-        #all other animals 
+        #all other animals
         P_maint = 0.8 * DMI + 0.002 * BW
     # [A.Cow.E.16]-[A.Heifer.16]
     return sum(np.multiply(x, np.multiply(np.multiply(phosphorus, 0.01), dP))) - ((P_req + P_maint) / 1000)

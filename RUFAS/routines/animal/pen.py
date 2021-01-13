@@ -10,7 +10,7 @@ Author(s): Militsa Sotirova, militsasotirova@gmail.com
 """
 from RUFAS.routines.animal.ration.calf_ration import optimize as calf_optimize
 from RUFAS.routines.animal.ration import ration_driver as ration_driver
-
+from RUFAS.routines.animal.ration import animal_requirements as req
 
 class Pen:
     """
