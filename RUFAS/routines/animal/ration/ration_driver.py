@@ -47,10 +47,19 @@ def optimization(requirements, available_feeds, BW, animal_type, cow_type):
         limit = NLP.list_reconfig(available_feeds.dry_cow_limit)
     NLP.set_globals(price, requirements.NEmaint, requirements.NEa, requirements.NEpreg,
                     requirements.NEl, requirements.NEg, requirements.MP_req,
-                    requirements.Ca_req, requirements.P_req, TDN, DE, EE, is_fat,
-                    BW, calcium, phosphorus, NDF, feed_type, is_wetforage, Kd,
-                    N_A, N_B, CP, dRUP, limit, cow_type, animal_type, requirements.DMIest)
-    solution = NLP.optimize()
+                    requirements.Ca_req, requirements.P_req, requirements.DMIest,
+                    TDN, DE, EE, is_fat, BW, calcium, phosphorus, NDF,
+                    feed_type, is_wetforage, Kd, N_A, N_B, CP, dRUP, limit)
+    #try block for catching scipy SLSQP error
+    i = 0
+    while i < 1:
+        try:
+            solution = NLP.optimize()
+        except:
+            i -= 1
+        finally:
+            i += 1
+
     return solution
 
 

@@ -143,17 +143,20 @@ class Pen:
         Args:
             new_animals: list of new animals in the pen
         """
-        self.animals_in_pen = new_animals
+        # self.animals_in_pen = new_animals
+        for animal in new_animals:
+            self.animals_in_pen.append(animal)
         self.pen_populated = not (len(self.animals_in_pen) == 0)
         self.stocking_density = len(self.animals_in_pen) / self.num_stalls * 100
         self.calc_daily_walking_dist()
 
         # sets the current animal classes in the pen
+        self.classes_in_pen = set()
         for animal in self.animals_in_pen:
             stage = type(animal).__name__
             self.classes_in_pen.add(stage)
 
-    def call_animal_nutrient_rqmts(self, temp):
+    def call_animal_nutrient_rqmts(self, feed, temp):
         """
         Calls each animal's nutrient requirement calculation methods.
 
@@ -169,7 +172,7 @@ class Pen:
                 self.DBW = -0.4125
                 self.daily_growth = self.DBW
             elif type(animal).__name__ == 'Calf':
-                animal.calc_nutrient_rqmts(temp)
+                animal.calc_nutrient_rqmts(feed, temp)
             else:
                 animal.calc_nutrient_rqmts()
 
@@ -194,6 +197,8 @@ class Pen:
         # animal in the pen
         for animal in self.animals_in_pen:
             curr_rqmts = animal.nutrient_rqmts
+            if curr_rqmts == {}:
+                print(type(animal).__name__, animal.id, self.id, self.avg_calf_nutrient_rqmts)
 
             for key in sum_dict.keys():
                 sum_dict[key] += curr_rqmts[key]['val']
@@ -223,6 +228,35 @@ class Pen:
         self.avg_DBW = sum_DBW / num_animals
         self.avg_milk = sum_milk / num_animals
         self.avg_CP_milk = sum_CP_milk / num_animals
+
+    def calc_avg_stats(self):
+        """
+        Calculates the pen's average statistics for a ration calculation that
+        is not during the normal ration formulation, i.e. when animals are
+        added to a pen with no animals currently in it and the ration needs
+        to be calculated for those animals.
+        """
+        num_animals = len(self.animals_in_pen)
+        sum_BW = 0
+        sum_DMIest = 0
+        sum_DBW = 0
+        sum_milk = 0
+        sum_CP_milk = 0
+
+        for animal in self.animals_in_pen:
+            sum_BW += animal.body_weight
+            sum_DMIest += animal.DMIest
+            sum_DBW += animal.DBW
+            if type(animal).__name__ == 'Cow':
+                sum_milk += animal.estimated_daily_milk_produced
+                sum_CP_milk += animal.CP_milk
+
+        self.avg_BW = sum_BW / num_animals
+        self.avg_DMIest = sum_DMIest / num_animals
+        self.avg_DBW = sum_DBW / num_animals
+        self.avg_milk = sum_milk / num_animals
+        self.avg_CP_milk = sum_CP_milk / num_animals
+
 
     def calc_ration(self, feed, available_feeds):
         """
@@ -385,9 +419,32 @@ class Pen:
             # TODO is there a better way?
             num_animals = 1
 
+        class_name = type(animal).__name__
+        self.classes_in_pen.add(class_name)
+
+        if class_name == 'Cow':
+            requirements = req.calc_rqmts(animal.body_weight, animal.mature_body_weight,
+                                          animal.days_in_preg, animal.calves, animal.CI,
+                                          animal.mPrt, animal.fat_percent,
+                                          animal.lactose_milk,
+                                          animal.estimated_daily_milk_produced,
+                                          animal.days_in_milk,
+                                          animal.milking)
+            animal.NEmaint = requirements['NEmaint']
+            animal.NEg = requirements['NEg']
+            animal.NEpreg = requirements['NEpreg']
+            animal.NEl = requirements['NEl']
+            animal.MP_req = requirements['MP_req']
+            animal.Ca_req = requirements['Ca_req']
+            animal.P_req = requirements['P_req']
+            animal.DMIest = requirements['DMIest']
+            animal.DNED_req = (requirements['NEmaint'] + requirements[
+                'NEl']) / animal.DMIest
+            animal.DMPD_req = (requirements['MP_req']) / animal.DMIest
+
         # set animal's ration to be the intake of all other animals in pen
-        if self.ration == {}:
-            self.ration = self.calc_ration(feed, temp)
+        # if self.ration == {}:
+        #     self.ration = self.calc_ration(feed, temp)
 
         for key in self.ration:
             if key == 'status':
@@ -403,13 +460,19 @@ class Pen:
 
         # set animal's nutrient requirements to be the average requirements of
         # all other animals in pen
-        if type(animal).__name__ == 'Calf':
+        if class_name == 'Calf':
             animal.nutrient_rqmts = self.avg_calf_nutrient_rqmts
         else:
             animal.nutrient_rqmts = self.avg_nutrient_rqmts
 
+        if animal.nutrient_rqmts == {} and class_name == 'Calf':
+            animal.calc_nutrient_rqmts(feed, temp)
+        elif animal.nutrient_rqmts == {} and not class_name == 'Calf':
+            animal.calc_nutrient_rqmts()
+
+
         # set animal's DVD and DHD if it is a cow
-        if type(animal).__name__ == 'Cow':
+        if class_name == 'Cow':
             animal.calc_daily_walking_dist(
                 self.vertical_dist_to_parlor, self.horizontal_dist_to_parlor)
 
@@ -420,7 +483,7 @@ class Pen:
 
         animal.p_intake = self.avg_p_intake
 
-        # self.animals_in_pen.append(animal)
+        self.animals_in_pen.append(animal)
 
     def clear(self):
         """
@@ -431,5 +494,5 @@ class Pen:
         # that are non-zero.
         self.animals_in_pen = []
         self.pen_populated = False
-        self.classes_in_pen = set()
+        # self.classes_in_pen = set()
         self.avg_p_animal = 0

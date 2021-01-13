@@ -109,14 +109,13 @@ class AnimalManagement:
     def get_animal_config(data):
         config = {}
         config.update(data['management_decisions'])
-        config.update(data['user_interactions']['calf'])
-        config.update(data['user_interactions']['repro'])
-        config.update(data['user_interactions']['bodyweight'])
-        config.update(data['user_interactions']['econ'])
-        config.update(data['default']['repro'])
-        config.update(data['default']['milking'])
-        config.update(data['default']['culling'])
-        config.update(data['default']['life_cycle'])
+        config.update(data['farm_level']['calf'])
+        config.update(data['farm_level']['repro'])
+        config.update(data['farm_level']['bodyweight'])
+        config.update(data['from_literature']['repro'])
+        config.update(data['from_literature']['milking'])
+        config.update(data['from_literature']['culling'])
+        config.update(data['from_literature']['life_cycle'])
         return config
 
     def __init__(self, data, config, feed, weather, time):
@@ -132,12 +131,12 @@ class AnimalManagement:
         """
 
         self.sim_length = config.sim_length
-        config = self.get_animal_config(data['animal_config'])
-        self.life_cycle_manager = LifeCycleManager(config)
-        AnimalBase.set_config(config)
+        animal_config = self.get_animal_config(data['animal_config'])
+        self.life_cycle_manager = LifeCycleManager(animal_config)
+        AnimalBase.set_config(animal_config)
         AnimalBase.set_nutrient_list(feed.nutrient_rqmts)
         self.init_pens(data['pen_information'], data['herd_information'])
-        self.init_animals(data['herd_information'], self.all_pens, weather, time)
+        self.init_animals(data['herd_information'], self.all_pens, weather, time, config, feed)
         self.housing = data['housing']
         self.pasture_concentrate = data['pasture_concentrate']
         self.ration_user_input = data['ration']['user_input']
@@ -188,7 +187,7 @@ class AnimalManagement:
             pen_3 = Pen(2, 0.1, 1.6, 300, 'open air barn', 'straw', 'tiestall')
             self.all_pens.append(pen_3)
 
-    def init_animals(self, herd_data, pen_data, weather, time):
+    def init_animals(self, herd_data, pen_data, weather, time, config, feed):
         """
         Populates the list of animals with the information from the
         input JSON file: constructs the calves, heiferI’s, heiferII’s,
@@ -211,6 +210,7 @@ class AnimalManagement:
         cow_num = herd_data['cow_num']
         replace_num = herd_data['replace_num']
         herd_num = herd_data['herd_num']
+        breed = herd_data['breed']
 
         if herd_num == 0:
             self.simulate_animals = False
@@ -237,18 +237,21 @@ class AnimalManagement:
         else:
             self.simulate_animals = True
 
+        herd_init = herd_data['herd_init']
+
         if self.simulate_animals:
             self.calves, self.heiferIs, self.heiferIIs, self.heiferIIIs, self.cows \
                 = self.life_cycle_manager.initialize_herd(herd_num, calf_num,
                                                           heiferI_num, heiferII_num,
                                                           heiferIII_num, cow_num,
-                                                          replace_num)
+                                                          replace_num, herd_init,
+                                                          breed, config)
 
         if len(pen_data) > 0:
-            self.init_nutrient_rqmts(weather, time)
+            self.init_nutrient_rqmts(weather, time, feed)
             self.pen_allocation()
 
-    def init_nutrient_rqmts(self, weather, time):
+    def init_nutrient_rqmts(self, weather, time, feed):
         """
         Calculates initial nutrient requirements at the beginning of the
         simulation for initial pen allocation. For the nutrient requirements
@@ -266,7 +269,7 @@ class AnimalManagement:
 
         for calf in self.calves:
             temp = weather.T_avg[time.year - 1][time.day - 1]
-            calf.calc_nutrient_rqmts(temp)
+            calf.calc_nutrient_rqmts(feed, temp)
             calf.p_animal = 0.0072 * calf.body_weight * 1000
 
         for heiferI in self.heiferIs:
@@ -311,7 +314,7 @@ class AnimalManagement:
             temp: the temperature on the current day
         """
         for pen in self.all_pens:
-            pen.call_animal_nutrient_rqmts(temp)
+            pen.call_animal_nutrient_rqmts(feed, temp)
 
     def fully_update_id_pen(self):
         """
@@ -355,6 +358,10 @@ class AnimalManagement:
                 pen = len(self.all_pens) - 1
             else:
                 pen = self.pens_needing_animals.popleft()
+            #
+            # if type(animal).__name__ == 'Cow':
+            #     pen = len(self.all_pens) - 1
+
             self.id_pen[animal.id] = pen
 
             if type(animal).__name__ == 'Calf':
@@ -371,9 +378,17 @@ class AnimalManagement:
                 self.heiferIIIs.append(animal)
             else:  # animal is of class Cow
                 animal_p_conc = self.cow_p_comp
+                # self.all_pens[pen].animals_in_pen.append(animal)
                 self.cows.append(animal)
 
             self.all_pens[pen].set_up_new_animal(animal, animal_p_conc, feed, temp)
+
+        for pen in range(len(self.all_pens)):
+            if len(self.all_pens[pen].animals_in_pen) > 0 and 'Cow' in self.all_pens[pen].classes_in_pen and self.all_pens[pen].ration == {}:
+                available_feeds = ration_driver.AvailableFeeds()
+                available_feeds.feed_nutrients(feed)
+                self.all_pens[pen].calc_avg_stats()
+                self.all_pens[pen].ration = self.all_pens[pen].calc_ration(feed, available_feeds)
 
         for calf in calves_born:
             # TODO: this is the hard coded calf pen value
@@ -381,6 +396,7 @@ class AnimalManagement:
             self.id_pen[calf.id] = pen
             self.calves.append(calf)
             self.all_pens[pen].set_up_new_animal(calf, self.pasture_concentrate, feed, temp)
+            # self.all_pens[pen].animals_in_pen.append(calf)
 
     def pen_allocation(self):
         """
@@ -424,7 +440,7 @@ class AnimalManagement:
             cow.P_req = requirements['P_req']
             cow.DMIest = requirements['DMIest']
             cow.DNED_req = (requirements['NEmaint'] + requirements['NEl']) / cow.DMIest
-            cow.DMDP_req = (requirements['MP_req']) / cow.DMIest
+            cow.DMPD_req = (requirements['MP_req']) / cow.DMIest
             if cow.milking:
                 lactating_cows.append(cow)
             else:
@@ -800,7 +816,7 @@ class AnimalManagement:
                 self.generate_animal_output('culled_cow', i)
             animals.append((animal, 'culled_cow', is_cow))
 
-        output['num_calves_sold'] = len(self.life_cycle_manager.sold_calves)
+        output['num_calves_sold'] = self.life_cycle_manager.sold_calf_num
         output['num_sold_heifers'] = len(self.life_cycle_manager.sold_heifers)
         output['num_cows_culled'] = len(self.life_cycle_manager.culled_cows)
 

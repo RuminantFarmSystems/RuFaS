@@ -13,6 +13,7 @@ from RUFAS.routines.animal.life_cycle.calf import Calf
 from RUFAS.routines.animal.life_cycle.animal_base import AnimalBase
 from RUFAS.routines.animal.manure.growing_heifer_manure_excretion import \
 	manure_calculations
+from RUFAS.routines.animal.life_cycle import animal_events_constants as c
 
 
 class HeiferI(Calf):
@@ -21,16 +22,16 @@ class HeiferI(Calf):
 		Description:
 			initialize the 1st heifer group from calf information
 		Input:
-			args.id: id of the cow
-			args.breed: breed of the cow
+			args.id: id of the animal
+			args.breed: breed of the animal
 			args.birth_date: the date of the simulation when the calf was born
 			args.daysBorn: age of the animal
-			(optional: include the following to assign cow information)
-			args.birth_weight: the birth weight of the cow
-			args.body_weight: current body weight of the cow
-			args.wean_weight: the wean weight of the cow
-			args.mature_body_weight: the mature body weight of the cow
-			args.events: events of the cow
+			(optional: include the following to assign animal information)
+			args.birth_weight: the birth weight of the animal
+			args.body_weight: current body weight of the animal
+			args.wean_weight: the wean weight of the animal
+			args.mature_body_weight: the mature body weight of the animal
+			args.events: events of the animal
 		"""
 		super().__init__(args)
 
@@ -99,10 +100,10 @@ class HeiferI(Calf):
 
 	def update(self, sim_day):
 		"""
-		Controls heifer's grow with average daily gain based on user's input
-		until breeding start day. Here is the place to change growth rate with
-		heifer feeding methods later when we have heifer nutrition from the
-		ration furmulation module. Once reach the breeding start day,
+		Controls heifer's grow with average daily gain based on non-preg ADG based on NRC.
+		Here is the place to change growth rate with heifer feeding methods later
+		when we have heifer nutrition from the ration furmulation module.
+		Once reach the breeding start day,
 		this heifer would be move to next stage, the heiferII stage
 
 		Returns: the second stage of heifer -- breeding stage starts
@@ -117,31 +118,7 @@ class HeiferI(Calf):
 		self.days_born += 1
 		if self.days_born == AnimalBase.config['breeding_start_day_h']:
 			second_stage = True
-			self.events.add_event(self.days_born, sim_day, 'Breeding start')
+			self.events.add_event(self.days_born, sim_day, c.BREEDING_START)
 			self.days_born -= 1  # will increment in next stage again
 
 		return second_stage
-
-	def __str__(self):
-		res_str = """
-			==> Heifer I: \n
-			ID: {} \n
-			Birth Date: {}\n
-			days Born: {}\n
-			Birth Weight: {}kg\n
-			Wean Weight: {}kg\n
-			Body Weight: {}kg\n
-			Breeding Start Day: {}\n
-			Life Events: \n
-			{}
-		""".format(
-			self.id,
-			self.birth_date,
-			self.days_born,
-			self.birth_weight,
-			self.wean_weight,
-			self.body_weight,
-			AnimalBase.config['breeding_start_day_h'],
-			str(self.events))
-
-		return res_str

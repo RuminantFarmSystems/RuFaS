@@ -499,9 +499,10 @@ def optimize():
     """
 
     n = len(price)
-    x0 = []
-    for i in range(n):
-        x0.append(random.random() * 10)
+    x0 = [1]
+    for i in range(n-1):
+        #x0.append(random.random() * 10)
+        x0.append(0)
     # OPTIMIZE:
     # establishing the bounds of the NLP
     bnds = []
