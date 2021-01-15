@@ -266,25 +266,25 @@ class AnimalManagement:
         # average vertical & horizontal distance (VD, HD) of pens to the
         # milking parlor
         # avg_VD_parlor, avg_HD_parlor = self.avg_pen_dist()
-
         for calf in self.calves:
             temp = weather.T_avg[time.year - 1][time.day - 1]
             calf.calc_nutrient_rqmts(feed, temp)
             calf.p_animal = 0.0072 * calf.body_weight * 1000
 
         for heiferI in self.heiferIs:
-            heiferI.calc_nutrient_rqmts()
+            heiferI.set_nutrient_rqmts(temp)
             heiferI.p_animal = 0.0072 * heiferI.body_weight * 1000
 
         for heiferII in self.heiferIIs:
-            heiferII.calc_nutrient_rqmts()
+            heiferII.set_nutrient_rqmts(temp)
             heiferII.p_animal = 0.0072 * heiferII.body_weight * 1000
 
         for heiferIII in self.heiferIIIs:
-            heiferIII.calc_nutrient_rqmts()
+            heiferIII.set_nutrient_rqmts(temp)
             heiferIII.p_animal = 0.0072 * heiferIII.body_weight * 1000
 
         for cow in self.cows:
+            cow.set_nutrient_rqmts()
             cow.p_animal = 0.0072 * cow.body_weight * 1000
 
     def avg_pen_dist(self):
@@ -313,8 +313,20 @@ class AnimalManagement:
             feed: instance of the feed class
             temp: the temperature on the current day
         """
-        for pen in self.all_pens:
-            pen.call_animal_nutrient_rqmts(feed, temp)
+        for calf in self.calves:
+            calf.calc_nutrient_rqmts(feed, temp)
+
+        for heiferI in self.heiferIs:
+            heiferI.set_nutrient_rqmts(temp)
+
+        for heiferII in self.heiferIIs:
+            heiferII.set_nutrient_rqmts(temp)
+
+        for heiferIII in self.heiferIIIs:
+            heiferIII.set_nutrient_rqmts(temp)
+
+        for cow in self.cows:
+            cow.set_nutrient_rqmts()
 
     def fully_update_id_pen(self):
         """
@@ -427,20 +439,6 @@ class AnimalManagement:
         dry_cows = []
 
         for cow in self.cows:
-            requirements = req.calc_rqmts(cow.body_weight, cow.mature_body_weight,
-                                          cow.days_in_preg, cow.calves, cow.CI, cow.mPrt, cow.fat_percent,
-                                          cow.lactose_milk, cow.estimated_daily_milk_produced, cow.days_in_milk,
-                                          cow.milking)
-            cow.NEmaint = requirements['NEmaint']
-            cow.NEg = requirements['NEg']
-            cow.NEpreg = requirements['NEpreg']
-            cow.NEl = requirements['NEl']
-            cow.MP_req = requirements['MP_req']
-            cow.Ca_req = requirements['Ca_req']
-            cow.P_req = requirements['P_req']
-            cow.DMIest = requirements['DMIest']
-            cow.DNED_req = (requirements['NEmaint'] + requirements['NEl']) / cow.DMIest
-            cow.DMPD_req = (requirements['MP_req']) / cow.DMIest
             if cow.milking:
                 lactating_cows.append(cow)
             else:
@@ -499,7 +497,7 @@ class AnimalManagement:
         for i, pen in enumerate(self.all_pens):
             if pen.pen_populated:
                 self.all_pens[i].ration = self.all_pens[i].calc_ration(feed,
-                                                                       available_feeds)
+                                                            available_feeds)
 
     def calc_manure_excretion(self, feed):
         """

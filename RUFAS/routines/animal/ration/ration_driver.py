@@ -85,12 +85,7 @@ def ration_formulation(pen, available_feeds, animal_type, cow_type):
     """
     # creating instance of class requirements
     req = Requirements()
-    # setting requirements based on animals information in pen
-    if animal_type == 'heifer':
-        #setting recalc to true, heifers  dont have req calculations for grouping
-        req.set_requirements(pen, animal_type, True)
-    else:
-        req.set_requirements(pen, animal_type, False)
+    req.set_requirements(pen, animal_type, False)
     BW = pen.avg_BW
     solution = optimization(req, available_feeds, BW, animal_type, cow_type)
     # Reduction of milk production estimate process to achieve feasible solution
@@ -240,33 +235,33 @@ class Requirements:
 
         if recalc:
             # iterating through each animal in the pen and calculating requirements
+            # temp parameter for heifer is hardcoded because heifer req should
+            # never have to be recalculated
             for animal in pen.animals_in_pen:
                 a_type = type(animal).__name__
                 if a_type == 'HeiferI':
-                    req = animal_requirements.calc_rqmts(animal.body_weight, \
-                            animal.mature_body_weight, None, None, None, None,\
-                                                        None, None, None,
-                                            None, None, animal_type = 'heifer',
-                                                        BCS5 = 3, PrevTemp = 13,
-                                                      ADG_heifer = animal.daily_growth,
-                                                      Age = animal.days_born
+                    req = animal_requirements.calc_rqmts(animal.body_weight,
+                        animal.mature_body_weight, None, animal_type = 'heifer',
+                                                    BCS5 = 3, PrevTemp = 15,
+                                              ADG_heifer = animal.daily_growth,
+                                                     Age = animal.days_born
                                                       )
                 elif a_type == 'HeiferII' or a_type == 'HeiferIII':
-                    req = animal_requirements.calc_rqmts(animal.body_weight, animal.mature_body_weight,
-                                                        animal.days_in_preg,
-                                                       None, None, None, None, None, None,
-                                                      None, None, animal_type = 'heifer',
-                                                      BCS5 = 3, PrevTemp = 13,
-                                                      ADG_heifer = animal.daily_growth,
+                    req = animal_requirements.calc_rqmts(animal.body_weight,
+                        animal.mature_body_weight,  animal.days_in_preg,
+                            animal_type = 'heifer', BCS5 = 3, PrevTemp = 15,
+                                            ADG_heifer = animal.daily_growth,
                                                       Age = animal.days_born
                                                       )
                 else:
-                    req = animal_requirements.calc_rqmts(animal.body_weight, animal.mature_body_weight,
-                                                  animal.days_in_preg, animal.calves, animal.CI, animal.mPrt,
-                                                  animal.fat_percent, animal.lactose_milk,
-                                                  animal.estimated_daily_milk_produced, animal.days_in_milk,
-                                                  animal.milking
+                    req = animal_requirements.calc_rqmts(animal.body_weight,
+                                    animal.mature_body_weight, animal.days_in_preg,
+                                    'cow', animal.calves, animal.CI,
+                                    animal.mPrt, animal.fat_percent, animal.lactose_milk,
+                                    animal.estimated_daily_milk_produced,
+                                    animal.days_in_milk, animal.milking
                                                   )
+
                 animal.NEmaint = req['NEmaint']
                 animal.NEg = req['NEg']
                 animal.NEpreg = req['NEpreg']
@@ -275,6 +270,7 @@ class Requirements:
                 animal.Ca_req = req['Ca_req']
                 animal.P_req = req['P_req']
                 animal.DMIest = req['DMIest']
+                #these animal class variables are only used for grouping purposes
                 if animal_type == 'cow':
                     animal.DNED_req = (req['NEmaint'] + req['NEl']) / animal.DMIest
                     animal.DMDP_req = (req['MP_req']) / animal.DMIest
@@ -300,12 +296,16 @@ class Requirements:
         else:
             # iterating through each animal in the pen and setting requirements
             for animal in pen.animals_in_pen:
-                # calculating the activity requirement for energy
-                animal.calc_daily_walking_dist(pen.vertical_dist_to_parlor,
-                                               pen.horizontal_dist_to_parlor)
-                NEa_val = animal_requirements.energy_activity_rqmts(animal.body_weight,
-                                                                 pen.housing_type,
-                                                                 (math.sqrt(animal.DVD ** 2 + animal.DHD ** 2)))
+                if animal_type == 'cow':
+                    # calculating the activity requirement for energy
+                    animal.calc_daily_walking_dist(pen.vertical_dist_to_parlor,
+                                                   pen.horizontal_dist_to_parlor)
+                    NEa_val = animal_requirements.energy_activity_rqmts(animal.body_weight,
+                                                                     pen.housing_type,
+                                                                     (math.sqrt(animal.DVD ** 2 + animal.DHD ** 2)))
+                else:
+                    NEa_val = 0
+
                 NEmaint.append(animal.NEmaint)
                 NEa.append(NEa_val)
                 NEg.append(animal.NEg)

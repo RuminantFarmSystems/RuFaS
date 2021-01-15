@@ -24,6 +24,7 @@ from RUFAS.routines.animal.manure.lactating_cow_manure_excretion import \
     manure_calculations as lactating_manure_calculations
 from RUFAS.routines.animal.manure.dry_cow_manure_excretion import \
     manure_calculations as dry_manure_calculations
+from RUFAS.routines.animal.ration.animal_requirements import calc_rqmts
 from random import random
 from RUFAS.routines.animal.life_cycle import animal_events_constants as c
 
@@ -263,6 +264,26 @@ class Cow(HeiferIII):
         else:
             self.p_excrt, self.manure_excretion = \
                 dry_manure_calculations(p_feces_excrt, p_urine)
+
+    def set_nutrient_rqmts(self):
+        """
+        Calculates this Cow's nutrient requirements.
+        """
+        req = calc_rqmts(self.body_weight, self.mature_body_weight, self.days_in_preg,
+                        'cow', self.calves, self.CI, self.mPrt, self.fat_percent,
+                        self.lactose_milk, self.estimated_daily_milk_produced,
+                        self.days_in_milk, self.milking)
+                        
+        self.NEmaint = req['NEmaint']
+        self.NEg = req['NEg']
+        self.NEpreg = req['NEpreg']
+        self.NEl = req['NEl']
+        self.MP_req = req['MP_req']
+        self.Ca_req = req['Ca_req']
+        self.P_req = req['P_req']
+        self.DMIest = req['DMIest']
+        self.DNED_req = (req['NEmaint'] + req['NEl']) / self.DMIest
+        self.DMDP_req = (req['MP_req']) / self.DMIest
 
     def phosphorus_rqmts(self, DMI):
         """
