@@ -67,7 +67,7 @@ class Pen:
 
     # average daily change in (delta) body weight of the animals in the pen,
     # used for ration formulation
-    avg_DBW = 0
+    #avg_DBW = 0
 
     # average milk production of the animals in the pen,
     # used for (lactating cow) ration formulation
@@ -132,7 +132,7 @@ class Pen:
         self.housing_type = housing_type
         self.bedding_type = bedding_type
         self.pen_type = pen_type
-        self.DBW = 0.0
+        #self.DBW = 0.0
         self.daily_growth = 0.0
 
     def update_animals(self, new_animals):
@@ -156,26 +156,6 @@ class Pen:
             stage = type(animal).__name__
             self.classes_in_pen.add(stage)
 
-    def call_animal_nutrient_rqmts(self, feed, temp):
-        """
-        Calls each animal's nutrient requirement calculation methods.
-
-        Args:
-            temp: the temperature on the current day
-        """
-        for animal in self.animals_in_pen:
-            # currently, only lactating cows have ration calculations, so there
-            # are different arguments
-            if type(animal).__name__ == 'Cow':
-                # old hard coded variable updates from the deleted calc_requirements in
-                # cow.py
-                self.DBW = -0.4125
-                self.daily_growth = self.DBW
-            elif type(animal).__name__ == 'Calf':
-                animal.calc_nutrient_rqmts(feed, temp)
-            else:
-                animal.calc_nutrient_rqmts()
-
     def calc_avg_nutrient_rqmts(self):
         """
         Calculates and sets the average nutrient requirements and necessary
@@ -189,7 +169,7 @@ class Pen:
 
         sum_BW = 0
         sum_DMIest = 0
-        sum_DBW = 0
+        #sum_DBW = 0
         sum_milk = 0
         sum_CP_milk = 0
 
@@ -205,7 +185,8 @@ class Pen:
 
             sum_BW += animal.body_weight
             sum_DMIest += animal.DMIest
-            sum_DBW += animal.DBW
+            #sum_DBW += animal.DBW
+            #sum_DBW += animal.DBW
             if type(animal).__name__ == 'Cow':
                 sum_milk += animal.estimated_daily_milk_produced
                 sum_CP_milk += animal.CP_milk
@@ -225,7 +206,7 @@ class Pen:
 
         self.avg_BW = sum_BW / num_animals
         self.avg_DMIest = sum_DMIest / num_animals
-        self.avg_DBW = sum_DBW / num_animals
+        #self.avg_DBW = sum_DBW / num_animals
         self.avg_milk = sum_milk / num_animals
         self.avg_CP_milk = sum_CP_milk / num_animals
 
@@ -239,21 +220,21 @@ class Pen:
         num_animals = len(self.animals_in_pen)
         sum_BW = 0
         sum_DMIest = 0
-        sum_DBW = 0
+        #sum_DBW = 0
         sum_milk = 0
         sum_CP_milk = 0
 
         for animal in self.animals_in_pen:
             sum_BW += animal.body_weight
             sum_DMIest += animal.DMIest
-            sum_DBW += animal.DBW
+            #sum_DBW += animal.DBW
             if type(animal).__name__ == 'Cow':
                 sum_milk += animal.estimated_daily_milk_produced
                 sum_CP_milk += animal.CP_milk
 
         self.avg_BW = sum_BW / num_animals
         self.avg_DMIest = sum_DMIest / num_animals
-        self.avg_DBW = sum_DBW / num_animals
+        #self.avg_DBW = sum_DBW / num_animals
         self.avg_milk = sum_milk / num_animals
         self.avg_CP_milk = sum_CP_milk / num_animals
 
@@ -281,7 +262,7 @@ class Pen:
                     'HeiferIII' in self.classes_in_pen:
                 ration_per_animal = \
                     ration_driver.ration_formulation(self, available_feeds, \
-                                                            'heifer', False)
+                                                    'heifer', False)
 
             elif 'Cow' in self.classes_in_pen and \
                     self.animals_in_pen[0].milking:  # lactating cow
@@ -424,8 +405,8 @@ class Pen:
 
         if class_name == 'Cow':
             requirements = req.calc_rqmts(animal.body_weight, animal.mature_body_weight,
-                                          animal.days_in_preg, animal.calves, animal.CI,
-                                          animal.mPrt, animal.fat_percent,
+                                          animal.days_in_preg,'cow', animal.calves,
+                                          animal.CI, animal.mPrt, animal.fat_percent,
                                           animal.lactose_milk,
                                           animal.estimated_daily_milk_produced,
                                           animal.days_in_milk,

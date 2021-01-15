@@ -9,20 +9,24 @@ Author(s): Chris VanKerkhove, cjv47@cornell.edu
 import math
 
 
-def calc_rqmts(BW, MW, DOP, parity, CI, TP_Milk, Fat_Milk, Lactose_Milk,
-               Milk, DIM, lactating, animal_type='cow', BCS5= None, PrevTemp = None,
+def calc_rqmts(BW, MW, DOP, animal_type, parity=None, CI=None , TP_Milk=None, Fat_Milk=None,
+                Lactose_Milk=None, Milk=None, DIM=None, lactating=None,
+                BCS5= None, PrevTemp = None,
                 ADG_heifer = None, Age = None):
     """
     Calculates the dietary requirements of a single animal. These values are used
     on the RHS of the linear program and furthermore will be used in constraint
     generation functions. Each calculation has a reference to the
     respective calculation in the pseudocode (both Cow and Heifer).
+    (Note that arguments that are only for a single animal class are instanciated
+    at None however the respective parameters must be set when calling said
+    animal class)
 
     Args:
         BW: Body weight (kg)
         MW: Mature body weight(kg)
         animal_type: the type of animal (string)
-        DOP: Days of pregnancy (d)
+        DOP: Days of pregnancy (d) (except Heifer Is)
     (Args for just cow requirements):
         parity: Number of parity
         CI: Calving interval (d)

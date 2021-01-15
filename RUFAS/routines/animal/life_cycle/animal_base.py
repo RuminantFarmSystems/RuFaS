@@ -72,7 +72,7 @@ class AnimalBase(object):
         self.manure_excretion = {}
         self.ration_formulation = {'objective': 0.00}
         self.DMIest = 0
-        self.DBW = 0
+        #self.DBW = 0
         self.p_animal = 0
         self.p_intake = 0
         self.p_conc = 0
