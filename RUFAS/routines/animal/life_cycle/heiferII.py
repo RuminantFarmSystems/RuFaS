@@ -284,7 +284,7 @@ class HeiferII(HeiferI):
 
         else:
             self.body_weight = self.mature_body_weight
-            self.events.add_event(self.days_born, sim_day, c.MATURE_BODY_WEIGHT)
+            self.events.add_event(self.days_born, sim_day, c.MATURE_BODY_WEIGHT_REGULAR)
 
         # breeding method assign to heifer
         if self.days_born >= AnimalBase.config['breeding_start_day_h']:
