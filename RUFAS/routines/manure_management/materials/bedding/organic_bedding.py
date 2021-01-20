@@ -9,7 +9,7 @@ Class.
 Author(s): Yunus Mohammed, ymm26@cornell.edu
 """
 
-from .base_bedding import *
+from base_bedding import *
 
 class OrganicBedding(Bedding):
     """

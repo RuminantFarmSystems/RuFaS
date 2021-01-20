@@ -16,10 +16,7 @@ class Manure:
     Description
     ------------
     An instance of Manure represents gathered or aggregated manure in any given 
-    component. It has the aggregateManure() function for aggregation of manure. 
-    Each instance has the following attribute as well as the corresponding 
-    invariances, getters, and setters.
-
+    component.  
 
     Attributes
     ----------

@@ -13,7 +13,7 @@ Author(s):  William Donovan, wmdonovan@wisc.edu
 from .base_treatment import BaseTreatment
 
 
-class AnaerobicDigestor(BaseTreatment):
+class AnaerobicDigester(BaseTreatment):
     """
     Description
     ------------
