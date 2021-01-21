@@ -293,25 +293,28 @@ class Pen:
         while True:
             if 'Calf' in self.classes_in_pen:
                 ration_per_animal = calf_optimize()
+                MEact = 0
 
             elif 'HeiferI' in self.classes_in_pen or \
                     'HeiferII' in self.classes_in_pen or \
                     'HeiferIII' in self.classes_in_pen:
                 ration_per_animal = \
                     growing_heifer_optimize()
+                MEact = 0
 
             elif 'Cow' in self.classes_in_pen and \
                     self.animals_in_pen[0].milking:  # lactating cow
-                ration_per_animal = \
+                ration_per_animal, MEact = \
                     ration_driver.ration_formulation(self, available_feeds, True)
             elif 'Cow' in self.classes_in_pen and \
                     not self.animals_in_pen[0].milking:  # dry cow
-                ration_per_animal = \
+                ration_per_animal, MEact = \
                     ration_driver.ration_formulation(self, available_feeds, False)
 
             else:  # this should never occur
                 print('error in pen ration calculation')
                 ration_per_animal = {'status': 'Infeasible'}
+                MEact = None
 
             if ration_per_animal['status'] == 'Optimal':
                 break
@@ -321,6 +324,7 @@ class Pen:
             ration_per_animal, feed.available_feeds)
         self.ration_nutrient_amount = nutrient_amount
         self.ration_nutrient_conc = nutrient_conc
+        self.MEdiet = MEact
 
         for animal in self.animals_in_pen:
             animal.set_ration(ration_per_animal, nutrient_amount['dm_amount'])
