@@ -76,6 +76,7 @@ def manure_calculations(ration_formulation, feed, BW, DIM, mPrt,
     LIG_diet_content = 0
     Ash_diet_content = 0
     NDF_diet_content = 0
+    K_diet_content = 0
     for key in ration_formulation:
         # not every key in the ration_formulation dictionary refers to a feed
         if key in feed.available_feeds:
@@ -87,6 +88,7 @@ def manure_calculations(ration_formulation, feed, BW, DIM, mPrt,
             LIG_feed_content = 0.01 * nutrients['lignin']
             Ash_feed_content = 0.01 * nutrients['ash']
             NDF_feed_content = 0.01 * nutrients['NDF']
+            K_feed_content = 0.01 * nutrients['potassium']
 
             # kg of each nutrient
             DM_feed_amount = ration_formulation[key]
@@ -95,6 +97,7 @@ def manure_calculations(ration_formulation, feed, BW, DIM, mPrt,
             LIG_feed_amount = LIG_feed_content * DM_feed_amount
             Ash_feed_amount = Ash_feed_content * DM_feed_amount
             NDF_feed_amount = NDF_feed_content * DM_feed_amount
+            K_feed_amount = K_feed_content * DM_feed_amount
 
             # add to running sums
             as_fed_feed_amount = DM_feed_amount / DM_feed_content
@@ -105,6 +108,7 @@ def manure_calculations(ration_formulation, feed, BW, DIM, mPrt,
             LIG_diet_content += LIG_feed_amount
             Ash_diet_content += Ash_feed_amount
             NDF_diet_content += NDF_feed_amount
+            K_diet_content += K_feed_amount
 
     # to find total percentages
     DM = DMI / total_diet * 100
@@ -112,6 +116,7 @@ def manure_calculations(ration_formulation, feed, BW, DIM, mPrt,
     CP = CP_diet_content / DMI * 100
     LIG = LIG_diet_content / DMI * 100
     NDF = NDF_diet_content / DMI * 100
+    K_conc = K_diet_content / DMI * 100
 
     # Faecal water, kg (Eq 1.2)
     F_water = 1.987 * DMI + 0.348 * ADF - 0.412 * CP - 0.074 * DM - 0.0057 * DIM
@@ -152,6 +157,9 @@ def manure_calculations(ration_formulation, feed, BW, DIM, mPrt,
     # mol/L (Eq 6.1)
     TAN_s = (-162.4 * U * U + 96.4 * U) / 100
 
+    # Amount of potassium excreted, g/day [A.3C.C.1]
+    K = 1.822 * milk_prod + 2688.88 * (mPrt / 100) + 156.93 * DMI * (K_conc / 100) - 91.755
+
     p_excrt, WIP_frac, WOP_frac, p_excrt_manure, p_frac = \
         phosphorus_excreted(milk_prod, Mkg, p_feces_excrt, p_urine)
 
@@ -166,5 +174,6 @@ def manure_calculations(ration_formulation, feed, BW, DIM, mPrt,
             "WIP_frac": WIP_frac,
             "WOP_frac": WOP_frac,
             "p_excrt_manure": p_excrt_manure,
-            "p_frac": p_frac
+            "p_frac": p_frac,
+            "K" : K
             }
