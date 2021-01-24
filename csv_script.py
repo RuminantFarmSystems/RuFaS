@@ -20,7 +20,10 @@ def main():
     # 1 DAYMET dataset input
     data_in = sql_script.weather_input()
     csv_path = Path(data_in)
-    csv_name = ntpath.basename(csv_path)
+    print(type(csv_path))
+    csv_name = str(ntpath.basename(csv_path))
+    csv_name.index(".")
+    csv_name = csv_name[:csv_name.index(".")]
 
     # 2 Database input
     database = sql_script.database_input()
@@ -37,8 +40,11 @@ def main():
     # 6 Add average temperature and daily radiation
     avg_radiation_manureN_ID(conn)  # TODO: delete manureN when dm_manure is merged
 
-    # 7 Drop unnecessary columns and rearrange order:
+    # 7 Drop unnecessary columns and rearrange order
     drop_rearrange(conn)
+
+    # 8 Convert db table into new csv file
+    db_to_csv(conn, csv_name)
 
 
 def import_data(connection, csv_path):
@@ -108,6 +114,10 @@ def drop_rearrange(connection):
     c.execute("INSERT INTO Skeleton2 SELECT * FROM s2_backup")
     c.execute("DROP TABLE s2_backup")
     connection.commit()
+
+
+def db_to_csv(connection,csv_name):
+    new_csv_name = csv_name + "_adjusted"
 
 
 # -------------------------------------------------------------------------------
