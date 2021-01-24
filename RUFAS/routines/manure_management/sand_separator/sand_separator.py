@@ -53,7 +53,7 @@ class SandSeparator():
         self._sand_removal_efficiency = efficiency
 
 
-    def output(self):
+    def outputManure(self):
         """
         Returns the Manure _manure in this Separator and resets _manure to None.
 

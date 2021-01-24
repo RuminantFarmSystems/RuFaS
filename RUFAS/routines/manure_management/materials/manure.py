@@ -112,7 +112,7 @@ class Manure:
         """
         return self._N 
 
-    def setP(self, p):
+    def getP(self):
         """
         Returns the value of _P to p
         """
