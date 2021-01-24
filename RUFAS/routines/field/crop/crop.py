@@ -37,6 +37,17 @@ def daily_crop_routine(soil, crop, field_management, weather, time):
     # 'null'. The routine is skipped in this case
     if crop_type.crop_name != 'null':
 
+        # yield is reset to 0 at the beginning of the next day so it can be
+        # accessed by the output handler.
+        crop_type.yield_actual = 0
+        crop_type.yield_N = 0
+        crop_type.yield_P = 0
+
+        crop_type.HI_actual = 0
+        crop_type.bio_BG = 0
+        soil.residue_harvest = 0
+        soil.soil_layers[0].tillage_percent = 0
+
         # If the crop is not planted yet, determine whether it is planted today
         if not crop_type.planted and not crop_type.harvested:
             calculate_start(soil, crop, field_management, weather, time)

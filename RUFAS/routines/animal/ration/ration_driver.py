@@ -49,8 +49,19 @@ def optimization(requirements, available_feeds, BW, cow_type):
                     requirements.Ca_req, requirements.P_req, requirements.DMIest,
                     TDN, DE, EE, is_fat, BW, calcium, phosphorus, NDF,
                     feed_type, is_wetforage, Kd, N_A, N_B, CP, dRUP, limit)
-    solution = NLP.optimize()
-    return solution
+    #try block for catching scipy SLSQP error
+    i = 0
+    while i < 1:
+        try:
+            solution = NLP.optimize()
+        except:
+            i -= 1
+        finally:
+            i += 1
+
+    #retrieving MEact from diet
+    MEact = NLP.getME(solution.x)
+    return solution, MEact
 
 
 def ration_formulation(pen, available_feeds, cow_type):
@@ -69,7 +80,7 @@ def ration_formulation(pen, available_feeds, cow_type):
     # setting requirements based on animals information in pen
     req.set_requirements(pen, False)
     BW = pen.avg_BW
-    solution = optimization(req, available_feeds, BW, cow_type)
+    solution, MEact = optimization(req, available_feeds, BW, cow_type)
     # Reduction of milk production estimate process to achieve feasible solution
     while not solution.success:
         # This values for reduction are not from pseudocode, but the vales below
@@ -85,7 +96,7 @@ def ration_formulation(pen, available_feeds, cow_type):
             animal.estimated_daily_milk_produced -= reduction
         # recalculating requirements after reduction
         req.set_requirements(pen, True)
-        solution = optimization(req, available_feeds, BW, cow_type)
+        solution, MEact = optimization(req, available_feeds, BW, cow_type)
 
     ration = {}
     for feed_id in range(len(available_feeds.feed_id)):
@@ -96,7 +107,7 @@ def ration_formulation(pen, available_feeds, cow_type):
         ration[available_feeds.feed_key[feed_id]] = round(num, 6)
     ration['status'] = 'Optimal'
     ration['objective'] = NLP.objective(solution.x)
-    return ration
+    return ration, MEact
 
 
 def ration_report(ration, available_feeds):

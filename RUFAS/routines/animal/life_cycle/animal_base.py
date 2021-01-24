@@ -43,10 +43,16 @@ class AnimalBase(object):
         """
         Initializes common parameters for all animals
         Args:
-            args:
-                args.breed: breed of the cow
-                args.date: the date of the simulation when the calf was born
-                args.daysBorn: age of the animal
+            args.breed: breed of the cow
+            args.birth_date: the date of the simulation when the calf was born
+            args.days_born: age of the animal
+            arg.semen_used: semen used in the dam for the calf
+            (optional: include the following to assign animal information)
+			args.birth_weight: the birth weight of the animal
+			args.body_weight: current body weight of the animal
+			args.wean_weight: the wean weight of the animal
+			args.mature_body_weight: the mature body weight of the animal
+			args.events: events of the animal
         """
         self.id = args['id']
         self.breed = args['breed']
@@ -169,12 +175,6 @@ class AnimalBase(object):
         """
         # (A.1G.C.1) from P tracking
         self.p_animal = 0.0072 * self.body_weight * 1000
-
-    def culled(self):
-        """
-        Returns: True/False value indicating if culled
-        """
-        return self.culled
 
     def update_pen_history(self, curr_pen, curr_day, classes_in_pen):
         """
