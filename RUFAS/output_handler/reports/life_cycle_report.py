@@ -118,9 +118,6 @@ class LifeCycleReport(BaseReportDriver):
                     ['life_cycle_manager.cull_reason_stats_percent[\'' + cull_reason + '\']', '', []]
                         
             self.reproduction_performance = {
-                'avg_service_rate': ['life_cycle_manager.avg_service_rate', '', []],
-                'avg_conception_rate': ['life_cycle_manager.avg_conception_rate', '', []],
-                'pregnancy_rate': ['life_cycle_manager.pregnancy_rate', '', []],
                 'GnRH_injections': ['life_cycle_manager.GnRH_injection_num', '', []],
                 'PGF_injections': ['life_cycle_manager.PGF_injection_num', '', []],
                 'ai_num': ['life_cycle_manager.ai_num', '', []],
