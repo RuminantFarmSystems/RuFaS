@@ -166,6 +166,25 @@ class BaseTreatment:
         self._manure = None
         return manure
 
+    def getManure(self):
+        """
+        Returns the Manure in this BaseTreatment
+        """
+        return self._manure
+
+    def setManure(self, manure):
+        """
+        Adds manure to the Manure currently in this BaseTreatment
+
+        Precondition: self._manure == None
+        """
+        error_message = "Manure already present, call outManure() first"
+        assert self._manure == None, error_message
+             
+        self._manure = manure
+        self._setManureDependentAtt()
+
+
     #hidden methods
     def _updateManure(self):
         """
@@ -202,7 +221,7 @@ class BaseTreatment:
         self._biogas += self.biogas_eff * vs
         self._methane += self.methane_eff * self._biogas
         self._mvt += manure.getTWV() * hrt
-        self._sav += vs * self.sar * self.sap * DAYSINAYEAR / WATERDENSITY
+        self._sav += vs * self.sar * self.sap / WATERDENSITY
         self._tcv += self._mvt * self.tcv_percent
         self._digester_volume += self._mvt + self._tcv + self._sav
         
