@@ -54,7 +54,10 @@ class Manure:
         Parameter n: the mass of nitrogen
         Parameter p: the mass of potassium
         Parameter tan: the mass of total ammoniacal nitrogen
+
         Parameter twv: the total waste volume
+        Invariant: != 0 if any of k, n, p, tan, ts, vs != 0
+
         Parameter vs: the total mass of volatile solids
 
         Preconditions: the values of the parameters should make corresponding 
@@ -106,11 +109,30 @@ class Manure:
         """
         return self._K
 
+    def getKconc(self):
+        """
+        Returns the concentration of potassium in units of g/L (kg/m3)
+        """
+        if not self._K:
+            return 0
+        else:
+            return self._K / self._TWV
+
+
     def getN(self):
         """
         Returns the value of _N
         """
         return self._N 
+
+    def getNconc(self):
+        """
+        Returns the concentration of nitrogen in units of g/L (kg/m3)
+        """
+        if not self._N:
+            return 0
+        else:
+            return self._N / self._TWV
 
     def getP(self):
         """
@@ -118,17 +140,45 @@ class Manure:
         """
         return self._P 
 
+    def getPconc(self):
+        """
+        Returns the concentration of phosphorus in units of g/L (kg/m3)
+        """
+        if not self._P:
+            return 0
+        else:
+            return self._P / self._TWV
+
     def getTAN(self):
         """
         Returns the value of _TAN
         """
         return self._TAN 
 
+    def getTANconc(self):
+        """
+        Returns the concentration of total ammoniacal nitrogen 
+        in units of g/L (kg/m3)
+        """
+        if not self._TAN:
+            return 0
+        else:
+            return self._TAN / self._TWV
+
     def getTS(self):
         """
         Returns the value of _TS
         """
         return self._TS 
+
+    def getTSconc(self):
+        """
+        Returns the concentration of total solids in units of g/L (kg/m3)
+        """
+        if not self._TS:
+            return 0
+        else:
+            return self._TS / self._TWV
 
     def getTWV(self):
         """
@@ -141,6 +191,15 @@ class Manure:
         Return the value of _VS
         """
         return self._VS 
+    
+    def getVSconc(self):
+        """
+        Returns the concentration of volatile solids in units of g/L (kg/m3)
+        """
+        if not self._VS:
+            return 0
+        else:
+            return self._VS / self._TWV
 
 
     #Setters
