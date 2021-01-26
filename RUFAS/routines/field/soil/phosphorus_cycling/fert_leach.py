@@ -12,7 +12,7 @@ Coder(s):   Jacob Johnson jacob8399@gmail.com
             William Donovan wmdonovan@wisc.edu
 """
 
-from math import exp
+from math import exp, log
 
 
 def update_all(soil, weather, time):

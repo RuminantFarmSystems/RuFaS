@@ -337,7 +337,7 @@ class AnimalManagement:
             temp: the temperature on the current day
         """
         for pen in self.all_pens:
-            pen.call_animal_nutrient_rqmts(temp)
+            pen.call_animal_nutrient_rqmts(feed, temp)
 
     def fully_update_id_pen(self):
         """
@@ -375,7 +375,6 @@ class AnimalManagement:
                 del self.id_pen[i]
 
         for animal in animals_added:
-
             if len(self.pens_needing_animals) == 0:
                 # if there hasn't yet been an animal removed from a pen for this
                 # animal to be added, add this animal to the last pen by default
@@ -402,10 +401,17 @@ class AnimalManagement:
                 self.heiferIIIs.append(animal)
             else:  # animal is of class Cow
                 animal_p_conc = self.cow_p_comp
+                # self.all_pens[pen].animals_in_pen.append(animal)
                 self.cows.append(animal)
 
-            self.all_pens[pen].set_up_new_animal(animal, animal_p_conc, self.housing,
-                                                 self.pasture_concentrate, feed, temp)
+            self.all_pens[pen].set_up_new_animal(animal, animal_p_conc, feed, temp)
+
+        for pen in range(len(self.all_pens)):
+            if len(self.all_pens[pen].animals_in_pen) > 0 and 'Cow' in self.all_pens[pen].classes_in_pen and self.all_pens[pen].ration == {}:
+                available_feeds = ration_driver.AvailableFeeds()
+                available_feeds.feed_nutrients(feed)
+                self.all_pens[pen].calc_avg_stats()
+                self.all_pens[pen].ration = self.all_pens[pen].calc_ration(feed, available_feeds)
 
         for calf in calves_born:
             # TODO: this is the hard coded calf pen value
@@ -413,6 +419,7 @@ class AnimalManagement:
             self.id_pen[calf.id] = pen
             self.calves.append(calf)
             self.all_pens[pen].set_up_new_animal(calf, self.pasture_concentrate, feed, temp)
+            # self.all_pens[pen].animals_in_pen.append(calf)
 
     def pen_allocation(self):
         """
@@ -609,7 +616,7 @@ class AnimalManagement:
             if pen.pen_populated:
                 pen.daily_p_update()
 
-    def daily_updates(self, record_econ_stats, feed, weather, time):
+    def daily_updates(self, feed, weather, time):
         """
         Executes the daily routines relating to Animals. All animals are
         updated through the life_cycle_manager's daily_update() method. The
@@ -618,12 +625,10 @@ class AnimalManagement:
         manure calculations are done.
 
         Args:
-            record_econ_stats:
             feed: instance of the Feed class defined in feed.py
             weather: instance of the Weather class defined in classes.py
             time: instance of the Time class defined in classes.py
         """
-        print(self.simulation_day)
         if self.simulate_animals:
             for pen in self.all_pens:
                 pen.pen_populated = len(pen.animals_in_pen) > 0
@@ -631,8 +636,6 @@ class AnimalManagement:
             animals_added, ids_removed, calves_born, self.calves, self.heiferIs, \
             self.heiferIIs, self.heiferIIIs, self.cows = \
                 self.life_cycle_manager.daily_update(self.simulation_day,
-                                                     self.sim_length,
-                                                     record_econ_stats,
                                                      self.calves,
                                                      self.heiferIs,
                                                      self.heiferIIs,
