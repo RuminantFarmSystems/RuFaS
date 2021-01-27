@@ -9,7 +9,7 @@ Author(s):  William Donovan, wmdonovan@wisc.edu
             Yunus Mohammed, ymm26@cornell.edu  
 """
 
-from RUFAS.routines.manure_management import handlers, separators, treatments, storage_options
+from RUFAS.routines.manure_management import handlers, manure_separator, treatments, storage_options
 
 
 def daily_manure_storage_routine(manure_storage, animal_management):
@@ -45,9 +45,6 @@ class ManureManagement:
     ----------
     
     """
-
-
-
 
 
 class ManureStorage:
@@ -184,7 +181,7 @@ class ManureStorage:
 
         for pen in self.pens:
             if pen.manure_separator not in self.separators.keys():
-                self.separators[pen.manure_separator] = (separators.base_separator.BaseSeparator(
+                self.separators[pen.manure_separator] = (manure_separator.base_separator.BaseSeparator(
                     separator_data[pen.separator],
                     pen))
 

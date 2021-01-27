@@ -8,7 +8,8 @@ Description: This module contains the implementation of the SandBedding Class.
 Author(s): Yunus Mohammed, ymm26@cornell.edu
 """
 
-from base_bedding import *
+from .base_bedding import *
+
 
 class SandBedding(Bedding):
     """
@@ -31,6 +32,4 @@ class SandBedding(Bedding):
         Parameter mass: The mass of the sand bedding
         Precondition: A non-negative float with units of kg
         """
-        super().__init__(mass,density)
-
- 
+        super().__init__(mass, density)

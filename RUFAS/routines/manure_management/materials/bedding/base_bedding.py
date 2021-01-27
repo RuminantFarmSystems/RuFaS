@@ -65,8 +65,7 @@ class Bedding:
         self._mass = mass
         self._setVolume()
 
-
-    #getters
+    # getters
     def getMass(self):
         """
         Returns the mass of this bedding
@@ -79,7 +78,7 @@ class Bedding:
         """
         return self._volume
 
-    #setters    
+    # setters
     def setMass(self, mass):
         """
         Sets the _mass attribute to mass.

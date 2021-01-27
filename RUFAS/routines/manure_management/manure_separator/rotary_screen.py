@@ -11,10 +11,10 @@ Author(s):  William Donovan, wmdonovan@wisc.edu
 
 
 
-from .base_separator import BaseTreatment
+from .base_separator import BaseSeparator
 
 
-class RotaryScreen(BaseTreatment):
+class RotaryScreen(BaseSeparator):
     """
     Description
     ------------

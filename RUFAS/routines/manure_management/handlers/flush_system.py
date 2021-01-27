@@ -10,12 +10,11 @@ Author(s):  William Donovan, wmdonovan@wisc.edu
 """
 
 
-
 from .base_handler import BaseHandler
 
 
 class FlushSystem(BaseHandler):
-     """
+    """
     Description
     ------------
 

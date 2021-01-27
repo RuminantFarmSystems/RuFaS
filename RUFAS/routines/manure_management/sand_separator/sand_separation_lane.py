@@ -10,6 +10,7 @@ Author(s): Yunus Mohammed, ymm26@cornell.edu
 
 from .sand_separator import SandSeparator
 
+
 class SandSeparationLane(SandSeparator):
     """
     Description
@@ -19,7 +20,6 @@ class SandSeparationLane(SandSeparator):
     ----------
 
     """
-
 
     def __init__(self, sand_lane_data):
         if sand_lane_data is None or sand_lane_data['default']:

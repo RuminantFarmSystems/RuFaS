@@ -9,9 +9,7 @@ Author(s):  William Donovan, wmdonovan@wisc.edu
             Yunus Mohammed, ymm26@cornell.edu 
 """
 
-
-
-from .sand_lane import SandLane
+from ..sand_separator.sand_separator import SandSeparator
 
 
 class BaseHandler:
@@ -58,7 +56,7 @@ class BaseHandler:
 
     def init_sand_lane(self, sand_lane_data):
         if self.bedding == 'sand':
-            self.sand_lane = SandLane(sand_lane_data)
+            self.sand_lane = SandSeparator(sand_lane_data)
 
     def set_defaults(self):
         if self.bedding.startswith("organic"):
@@ -72,7 +70,7 @@ class BaseHandler:
             self.bedding_washed_percent = 0.8
             self.density = 1500
 
-    def update_all(self, manure):
+    def update_all(self, pen, manure):
         """
         Description:
             Calls functions to calculate nutrient losses and transformations during
@@ -85,15 +83,15 @@ class BaseHandler:
             manure: an instance of the ManureStorage class specified in
                 manure_management.py
         """
-        self.flush_water(manure)
-        self.N_loss(manure)
-        self.P_loss(manure)
-        self.K_loss(manure)
-        self.solids(manure)
+        self.flush_water(pen, manure)
+        self.N_loss(pen, manure)
+        self.P_loss(pen, manure)
+        self.K_loss(pen, manure)
+        self.solids(pen, manure)
         if self.bedding == 'sand':
-            sand_lane(self, manure)
+            self.sand_lane(self, pen, manure)
 
-    def flush_water(pen, manure):
+    def flush_water(self, pen, manure):
         """
         Description:
             Calculates Flush Water Volume in the separator that processes the
@@ -108,7 +106,7 @@ class BaseHandler:
         pen.flush_water_volume = pen.raw_manure + pen.flush_water_daily + pen.bedding_washed
         manure.separators[pen.separator].flush_water_volume += pen.flush_water_volume
 
-    def N_loss(pen, manure):
+    def N_loss(self, pen, manure):
         """
         Description:
             Updates Nitrogen mass in the separator from excreted manure
@@ -121,7 +119,7 @@ class BaseHandler:
 
         manure.separators[pen.separator].N = pen.N_excreted
 
-    def P_loss(pen, manure):
+    def P_loss(self, pen, manure):
         """
         Description:
             Updates Phosphorus mass in the separator from excreted manure
@@ -134,7 +132,7 @@ class BaseHandler:
 
         manure.separators[pen.separator].P = pen.P_excreted
 
-    def K_loss(pen, manure):
+    def K_loss(self, pen, manure):
         """
         Description:
             Updates Potassium mass in the separator from excreted manure
@@ -147,7 +145,7 @@ class BaseHandler:
 
         manure.separators[pen.separator].K = pen.K_excreted
 
-    def solids(pen, manure):
+    def solids(self, pen, manure):
         """
         Description:
             Updates Total and Volatile Solids in the separator from excreted manure
@@ -163,7 +161,7 @@ class BaseHandler:
         manure.separators[pen.separator].TS += pen.TS_loss
         manure.separators[pen.separator].VS += pen.VS_loss
 
-    def sand_lane(pen, manure):
+    def sand_lane(self, pen, manure):
         """
         Description:
             Sand separation lane. Method only called for sand bedding.

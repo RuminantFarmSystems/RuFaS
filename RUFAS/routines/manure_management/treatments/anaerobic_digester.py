@@ -21,7 +21,7 @@ class AnaerobicDigester(BaseTreatment):
     """
     Description
     ------------
-    A class representing an anaerobic digestor in a manure treatment system
+    A class representing an anaerobic digester in a manure treatment system
 
     Attributes
     ----------

@@ -134,7 +134,7 @@
 
     },
     "treatment_methods": {
-        "anaerobic_digestor": {
+        "anaerobic_digester": {
             "default": true
         }
     },

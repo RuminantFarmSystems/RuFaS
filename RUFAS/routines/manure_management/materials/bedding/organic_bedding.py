@@ -9,7 +9,8 @@ Class.
 Author(s): Yunus Mohammed, ymm26@cornell.edu
 """
 
-from base_bedding import *
+from .base_bedding import *
+
 
 class OrganicBedding(Bedding):
     """
@@ -33,8 +34,7 @@ class OrganicBedding(Bedding):
         Parameter mass: The mass of the organic bedding
         Precondition: A non-negative float with units of kg
         """
-        super().__init__(mass,density)
-
+        super().__init__(mass, density)
 
     def aggregateBedding(self, other):
         """

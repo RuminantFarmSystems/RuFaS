@@ -12,7 +12,8 @@ Author(s): Yunus Mohammed, ymm26@cornell.edu
 
 from ..materials.bedding import *
 
-class SandSeparator():
+
+class SandSeparator:
     """
     Description
     ------------
@@ -52,7 +53,6 @@ class SandSeparator():
         self._sand = sand
         self._sand_removal_efficiency = efficiency
 
-
     def outputManure(self):
         """
         Returns the Manure _manure in this Separator and resets _manure to None.
@@ -78,8 +78,7 @@ class SandSeparator():
         self._sand.setMass(separated_sand_mass)
         sand.setMass(remaining_sand_mass)
 
-
-    #getters 
+    # getters
     def getEfficiency(self):
         """
         Returns the effiency of this SandSeparator
@@ -98,7 +97,7 @@ class SandSeparator():
         """
         return self._sand
 
-    #resetters
+    # resetters
     def resetSeparator(self):
         """
         Reset the _sand to None and _sand to 0 mass SandBedding
@@ -112,7 +111,7 @@ class SandSeparator():
         """
         self._sand.setMass(0.0)
 
-    #setters
+    # setters
     def setEfficiency(self, efficiency):
         """
         Sets _efficiency to efficiency
