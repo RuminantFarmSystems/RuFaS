@@ -32,6 +32,9 @@ class Manure:
     Attribute _P: Total Phosphorus (inorganic P2O5) present 
     Invariant: Non negative float in units of kg
 
+    Attribute _RFW: Recycled flush water
+    Invariant: Non negative float in units of m3
+
     Attribute _TAN: Total Ammoniacal Nitrogen contained in this manure object
     Invariant: Non negative float in units of kg
 
@@ -45,7 +48,7 @@ class Manure:
     Invariant: Non negative float in units of kg
     """   
 
-    def __init__(self, bedding, k=0, n=0, p=0, tan=0, ts=0, twv=0, vs=0):
+    def __init__(self, bedding, k=0, n=0, p=0, rfw=0, tan=0, ts=0, twv=0, vs=0):
         """
         Description: initializes a Manure object.
 
@@ -53,6 +56,7 @@ class Manure:
         Parameter k : the mass of potassium
         Parameter n: the mass of nitrogen
         Parameter p: the mass of potassium
+        Parameter rfw: volume of the recycled flush water
         Parameter tan: the mass of total ammoniacal nitrogen
 
         Parameter twv: the total waste volume
@@ -67,6 +71,7 @@ class Manure:
         self._K = k
         self._N = n
         self._P = p
+        self._RFW = rfw
         self._TAN = tan
         self._TS = ts
         self._TWV = twv
@@ -149,6 +154,12 @@ class Manure:
         else:
             return self._P / self._TWV
 
+    def getRFW(self):
+        """
+        Returns the flush water volume of this manure
+        """
+        return self._RFW
+
     def getTAN(self):
         """
         Returns the value of _TAN
@@ -229,6 +240,14 @@ class Manure:
         Precondition: p is a non-negative float in units of kg
         """
         self._P = p
+
+    def setRFW(self, rfw):
+        """
+        Sets the value of _RFW to rfw
+
+        Parameter rfw: the volume of recycled flush water
+        Precondition: A non negative float in units of m3
+        """
 
     def setTAN(self, tan):
         """
