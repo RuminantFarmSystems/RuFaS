@@ -94,9 +94,9 @@ class Pen:
     ration = {}
 
     # total amount of different nutrients in current ration
-    ration_nutrient_amount = {'dm_amount': 0, 'cp_amount': 0, 'adf_amount': 0,
-                              'ndf_amount': 0, 'lignin_amount': 0, 'ash_amount': 0,
-                              'P_amount': 0, 'K_amount': 0, 'N_amount': 0}
+    ration_nutrient_amount = {'dm': 0, 'CP': 0, 'ADF': 0,
+                              'NDF': 0, 'lignin': 0, 'ash': 0,
+                              'phosphorus': 0, 'potassium': 0, 'N': 0}
 
     # concentration of different nutrients in current ration
     ration_nutrient_conc = {}
@@ -293,28 +293,27 @@ class Pen:
         while True:
             if 'Calf' in self.classes_in_pen:
                 ration_per_animal = calf_optimize()
-                MEact = 0
+                ration_vals = {'ME_tot': 0}
 
             elif 'HeiferI' in self.classes_in_pen or \
                     'HeiferII' in self.classes_in_pen or \
                     'HeiferIII' in self.classes_in_pen:
                 ration_per_animal = \
                     growing_heifer_optimize()
-                MEact = 0
+                ration_vals = {'ME_tot': 0}
 
             elif 'Cow' in self.classes_in_pen and \
                     self.animals_in_pen[0].milking:  # lactating cow
-                ration_per_animal, MEact = \
+                ration_per_animal, ration_vals = \
                     ration_driver.ration_formulation(self, available_feeds, True)
             elif 'Cow' in self.classes_in_pen and \
                     not self.animals_in_pen[0].milking:  # dry cow
-                ration_per_animal, MEact = \
+                ration_per_animal, ration_vals = \
                     ration_driver.ration_formulation(self, available_feeds, False)
 
             else:  # this should never occur
                 print('error in pen ration calculation')
                 ration_per_animal = {'status': 'Infeasible'}
-                MEact = None
 
             if ration_per_animal['status'] == 'Optimal':
                 break
@@ -324,12 +323,12 @@ class Pen:
             ration_per_animal, feed.available_feeds)
         self.ration_nutrient_amount = nutrient_amount
         self.ration_nutrient_conc = nutrient_conc
-        self.MEdiet = MEact
+        self.MEdiet = ration_vals['ME_tot']
 
         for animal in self.animals_in_pen:
-            animal.set_ration(ration_per_animal, nutrient_amount['dm_amount'])
-            animal.set_p_intake(nutrient_amount['P_amount'],
-                                nutrient_conc['P_conc'])
+            animal.set_ration(ration_per_animal, nutrient_amount['dm'])
+            animal.set_p_intake(nutrient_amount['phosphorus'],
+                                nutrient_conc['phosphorus'])
         # set ration for whole pen by multiplying calculated ration by number
         # of animals in the pen
         ration = {}
@@ -397,7 +396,7 @@ class Pen:
         """
         # since each animal in the pen receives the same ration
         if len(self.animals_in_pen) > 0:
-            DMI = self.ration_nutrient_amount['dm_amount']
+            DMI = self.ration_nutrient_amount['dm']
 
             total_p_req = 0
             for animal in self.animals_in_pen:
