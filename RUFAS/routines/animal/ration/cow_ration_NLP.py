@@ -479,52 +479,18 @@ def energy_req_limit_constraint(x):
         list.append(x[a + 1] * x[a + 2])
     return -sum(list)
 
-def getME(x):
-    # DMI calculated by the NLP
-    DMI = sum(x)
-    # Dietary TDN content, kg
-    TotalTDN = sum(np.multiply(x, TDN))
-    TotalTDN = np.multiply(TotalTDN, 0.01)
-    # [A.Cow.E.1]
-    # TDN concentration, %
-    if DMI != 0:
-        TDNconc = (TotalTDN / DMI) * 100
-    else:
-        TDNconc = 0
-    SBW = BW * 0.96
-    # [A.Cow.E.2]
-    # The amount of intake needed to meet the maintenance requirement, dimensionless
-    if TotalTDN < (0.035 * BW ** 0.75):
-        DMI_to_maint = 1
-    else:
-        DMI_to_maint = (TotalTDN / (0.035 * SBW ** 0.75))
-    # [A.Cow.E.3]
-    # TDN discount, TDN digestibility decrease caused by DMI and TDNconc
-    if TDNconc < 60:
-        Discount = 1
-    else:
-        Discount = (TDNconc - ((0.18 * TDNconc - 10.3) * (DMI_to_maint - 1))) / TDNconc
-    # [A.Cow.E.4]
-    # Actual TDN content of feed i, %
-    TDNact = np.multiply(TDN, Discount)
-    # [A.Cow.E.5]
-    # Actual digestible energy of feed i, Mcal/kg
-    DEact = np.multiply(DE, Discount)
-    # [A.Cow.E.5]
-    # Actual metabolizable energy of feed i, Mcal/kg
-    MEact = []
-    for i in range(len(DEact)):
-        if type[i] == 'Mineral':
-            MEact.append(0)
-        elif is_fat[i] == 1:
-            MEact.append(DE[i])
-        elif EE[i] >= 3:
-            MEact.append(1.01 * DEact[i] - 0.45 + 0.0046 * (EE[i] - 3))
-        else:
-            MEact.append(1.01 * DEact[i] - 0.45)
-    #total ME
+def get_ration_vals(x):
+    """
+    Function that calculates and retrieves ration values used throughout the
+    ration.
+
+    Args:
+        x: the decision vector of the NLP (should be a completed ration)
+    """
+    #ration vals (subject to adding other ration vals)
     ME_tot = sum(np.multiply(x, MEact))
-    return ME_tot
+    ration_vals = {'ME_tot': ME_tot}
+    return ration_vals
 
 def optimize():
     """
