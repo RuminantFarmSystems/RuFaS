@@ -4,8 +4,10 @@ File name: lactating_cow_manure_excretion.py
 Description: Determines manure excretion with information from the ration
     formulation, outputs used by the manure module.
 Author(s): Militsa Sotirova, militsasotirova@gmail.com
+           Joseph Merhi, jm2257@cornell.edu
 """
 from .general_manure import phosphorus_excreted
+from RUFAS.routines.animal.ration.ration_driver import ration_report
 
 
 def manure_calculations(ration_formulation, feed, BW, DIM, mPrt,
@@ -38,85 +40,18 @@ def manure_calculations(ration_formulation, feed, BW, DIM, mPrt,
             WOP_frac: water extractable organic P fraction
             p_excrt_manure: manure P excretion for manure module input (g)
             p_frac: P fraction of manure
+            K: potassium in manure, g/day
     """
 
-    '''
-    Further calculations to account for entire diet:
-    DMI: dry matter intake, kg
-    DM: dietary dry matter, % of diet
-    ADF: dietary ADF, % of DM
-    CP: dietary crude protein, % of DM
-    LIG: dietary lignin, % of DM
-    Ash: dietary Ash, % of DM
-    NDF: dietary NDF, % of DM
-    -----------------------------------------------------
-    Li's example to highlight difference between DM and DMI, as well as
-    respective calculations:
-    Suppose we have a diet with only feeds A and B and the result from the
-    linear programming is
-    A = 10 kg
-    B = 15 kg
-    Then, since all the variables in the solution are in DM basis, the
-    DMI = 10 + 15 = 25 kg.
-    Let the DM content of A be 80%, of B be 40%.
-    Farmers need to feed 10 / 0.8 = 12.5 kg of A and 15 / 0.4 = 37.5 kg of B
-    (as fed basis).
-    Then, the DM content of the diet is (10 + 15) / (12.5 + 37.5) = 50%.
-
-    For the nutrient compositions:
-    Let the CP content of A be 80%, of B be 40%.
-    Then the CP content of the diet is (10 * 0.8 + 15 * 0.4) / (10 + 15) = 56%
-    in DM basis.
-    Similarly for ADF, LIG, Ash, and NDF.
-    '''
-    DMI = 0
-    total_diet = 0  # in kg
-    ADF_diet_content = 0
-    CP_diet_content = 0
-    LIG_diet_content = 0
-    Ash_diet_content = 0
-    NDF_diet_content = 0
-    K_diet_content = 0
-    for key in ration_formulation:
-        # not every key in the ration_formulation dictionary refers to a feed
-        if key in feed.available_feeds:
-            # percentages of the DM of each nutrient
-            nutrients = feed.available_feeds[key]
-            DM_feed_content = 0.01 * nutrients['DM']
-            ADF_feed_content = 0.01 * nutrients['ADF']
-            CP_feed_content = 0.01 * nutrients['CP']
-            LIG_feed_content = 0.01 * nutrients['lignin']
-            Ash_feed_content = 0.01 * nutrients['ash']
-            NDF_feed_content = 0.01 * nutrients['NDF']
-            K_feed_content = 0.01 * nutrients['potassium']
-
-            # kg of each nutrient
-            DM_feed_amount = ration_formulation[key]
-            ADF_feed_amount = ADF_feed_content * DM_feed_amount
-            CP_feed_amount = CP_feed_content * DM_feed_amount
-            LIG_feed_amount = LIG_feed_content * DM_feed_amount
-            Ash_feed_amount = Ash_feed_content * DM_feed_amount
-            NDF_feed_amount = NDF_feed_content * DM_feed_amount
-            K_feed_amount = K_feed_content * DM_feed_amount
-
-            # add to running sums
-            as_fed_feed_amount = DM_feed_amount / DM_feed_content
-            total_diet += as_fed_feed_amount
-            DMI += DM_feed_amount
-            ADF_diet_content += ADF_feed_amount
-            CP_diet_content += CP_feed_amount
-            LIG_diet_content += LIG_feed_amount
-            Ash_diet_content += Ash_feed_amount
-            NDF_diet_content += NDF_feed_amount
-            K_diet_content += K_feed_amount
-
-    # to find total percentages
-    DM = DMI / total_diet * 100
-    ADF = ADF_diet_content / DMI * 100
-    CP = CP_diet_content / DMI * 100
-    LIG = LIG_diet_content / DMI * 100
-    NDF = NDF_diet_content / DMI * 100
-    K_conc = K_diet_content / DMI * 100
+    amount, conc = ration_report(ration_formulation, feed.available_feeds)
+    DMI = amount['dm_amount']
+    Ash_diet_content = amount['ash_amount']
+    DM = conc['dm_conc']
+    ADF = conc['adf_conc']
+    CP = conc['cp_conc']
+    LIG = conc['lignin_conc']
+    NDF = conc['ndf_conc']
+    K_conc = conc['K_conc']
 
     # Faecal water, kg (Eq 1.2)
     F_water = 1.987 * DMI + 0.348 * ADF - 0.412 * CP - 0.074 * DM - 0.0057 * DIM
@@ -175,5 +110,5 @@ def manure_calculations(ration_formulation, feed, BW, DIM, mPrt,
             "WOP_frac": WOP_frac,
             "p_excrt_manure": p_excrt_manure,
             "p_frac": p_frac,
-            "K" : K
+            "K": K
             }

@@ -4,8 +4,10 @@ File name: growing_heifer_manure_excretion.py
 Description: Determines manure excretion with information from the
     ration formulation, outputs used by the manure module.
 Author(s): Militsa Sotirova, militsasotirova@gmail.com
+           Joseph Merhi, jm2257@cornell.edu
 """
 from .general_manure import phosphorus_excreted
+from RUFAS.routines.animal.ration.ration_driver import ration_report
 
 
 def manure_calculations(ration_formulation, feed, BW, p_feces_excrt, p_urine):
@@ -35,35 +37,13 @@ def manure_calculations(ration_formulation, feed, BW, p_feces_excrt, p_urine):
             WOP_frac: water extractable organic P fraction
             p_excrt_manure: manure P excretion for manure module input (g)
             p_frac: P fraction of manure
+            K: potassium in manure, g/day
+
     """
-    DMI = 0
-    total_diet = 0  # in kg
-    CP_diet_content = 0
-    K_diet_content = 0
-    for key in ration_formulation:
-        # not every key in the ration_formulation dictionary refers to a feed
-        if key in feed.available_feeds:
-            # percentages of the DM of each nutrient
-            nutrients = feed.available_feeds[key]
-            DM_feed_content = 0.01 * nutrients['DM']
-            CP_feed_content = 0.01 * nutrients['CP']
-            K_feed_content = 0.01 * nutrients['potassium']
-
-            # kg of each nutrient
-            DM_feed_amount = ration_formulation[key]
-            CP_feed_amount = CP_feed_content * DM_feed_amount
-            K_feed_amount = K_feed_content * DM_feed_amount
-
-            # add to running sums
-            as_fed_feed_amount = DM_feed_amount / DM_feed_content
-            total_diet += as_fed_feed_amount
-            DMI += DM_feed_amount
-            CP_diet_content += CP_feed_amount
-            K_diet_content += K_feed_amount
-
-    # to find total percentages
-    CP = CP_diet_content / DMI * 100
-    K_conc = K_diet_content / DMI * 100
+    amount, conc = ration_report(ration_formulation, feed.available_feeds)
+    DMI = amount['dm_amount']
+    CP = conc['cp_conc']
+    K_conc = conc['K_conc']
 
     # Amount of manure, kg [A.3B.A.1]
     Mkg = 3.886 * DMI - 0.029 * BW + 5.641
