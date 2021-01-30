@@ -12,6 +12,7 @@ Description: The class which manages all of the animal routines and keeps track 
 
 Author(s): Militsa Sotirova, militsasotirova@gmail.com
            Chris VanKerkhove, cjv47@cornell.edu
+           Joseph Merhi, jm2257@cornell.edu
 """
 from RUFAS.routines.animal.pen import Pen
 from RUFAS.routines.animal.clustering_pen_grouping import grouping
@@ -664,8 +665,10 @@ class AnimalManagement:
                 self.pen_allocation()
                 self.calc_avg_nutrient_rqmts()  # per pen
                 self.calc_ration(feed)  # per pen
-                self.calc_manure_excretion(feed)  # per animal
                 self.calc_avg_growth()  # per pen
+
+            # manure excretion
+            self.calc_manure_excretion(feed)  # per animal
 
             # phosphorus updates
             self.daily_p_update()  # per animal
