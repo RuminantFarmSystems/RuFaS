@@ -57,5 +57,6 @@ def manure_calculations(BW, p_feces_excrt, p_urine):
             "WOP_frac": WOP_frac,
             "p_excrt_manure": p_excrt_manure,
             "p_frac": p_frac,
-            "K": 0
+            "K_manure": 0,
+            "CH4_manure": 0
             }

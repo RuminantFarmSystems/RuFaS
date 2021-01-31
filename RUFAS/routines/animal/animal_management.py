@@ -141,6 +141,8 @@ class AnimalManagement:
         self.pasture_concentrate = data['pasture_concentrate']
         self.ration_user_input = data['ration']['user_input']
         self.formulation_interval = data['ration']['formulation_interval']
+        self.methane_model = data['methane_model']
+
 
     def init_pens(self, all_pens_data, herd_data):
         """
@@ -523,7 +525,7 @@ class AnimalManagement:
                 self.all_pens[i].ration = self.all_pens[i].calc_ration(feed,
                                                                        available_feeds)
 
-    def calc_manure_excretion(self, feed):
+    def calc_manure_excretion(self, feed, methane_model):
         """
         Calls each animal's method to calculate manure excretion to find the
         total for each pen. This is part of the routines that happen every
@@ -531,10 +533,11 @@ class AnimalManagement:
 
         Args:
             feed: instance of the feed class
+            methane_model: methane model used for methane emission calculations
         """
         for pen in self.all_pens:
             if pen.pen_populated:
-                pen.calc_manure(feed)
+                pen.calc_manure(feed,methane_model)
 
     def calc_avg_growth(self):
         """
@@ -668,7 +671,7 @@ class AnimalManagement:
                 self.calc_avg_growth()  # per pen
 
             # manure excretion
-            self.calc_manure_excretion(feed)  # per animal
+            self.calc_manure_excretion(feed, self.methane_model)  # per animal
 
             # phosphorus updates
             self.daily_p_update()  # per animal

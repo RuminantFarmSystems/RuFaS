@@ -248,19 +248,21 @@ class Cow(HeiferIII):
         return estimated_daily_milk_produced, fat_percent, \
                daily_fat_correct_milk_production
 
-    def calc_manure_excretion(self, feed):
+    def calc_manure_excretion(self, feed, methane_model, ME_intake):
         """
         Calculates and sets the manure excretion components.
         Args:
             feed: instance of the Feed class
+            methane_model: methane model used for methane emission calculations
+            ME_intake: metabolizable energy intake, Mcal/kg DM
         """
         p_urine, p_feces_excrt = self.calc_base_manure()
 
         if self.milking:
             self.p_excrt, self.manure_excretion = lactating_manure_calculations(
                 self.ration_formulation, feed, self.body_weight,
-                self.days_in_milk, self.mPrt,
-                self.estimated_daily_milk_produced, p_feces_excrt, p_urine)
+                self.days_in_milk, self.mPrt, self.estimated_daily_milk_produced,
+                p_feces_excrt, p_urine, methane_model, self.fat_percent, ME_intake)
         else:
             self.p_excrt, self.manure_excretion = dry_manure_calculations(
                 self.ration_formulation, feed, self.body_weight,
