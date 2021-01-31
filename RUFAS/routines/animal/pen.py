@@ -395,18 +395,22 @@ class Pen:
 
         return ration
 
-    def calc_manure(self, feed):
+    def calc_manure(self, feed, methane_model):
         """
         Calculates the total manure excretion of the animals in the pen.
 
         Args:
             feed: instance of the Feed class
+            methane_model: methane model used for methane emission calculations
 
         Returns:
             a dictionary for the total manure of the animals in the pen
         """
         for animal in self.animals_in_pen:
-            animal.calc_manure_excretion(feed)
+            if type(animal).__name__ == 'Cow':
+                animal.calc_manure_excretion(feed, methane_model)
+            else:
+                animal.calc_manure_excretion(feed)
 
         manure = {}
         calf_total = {}

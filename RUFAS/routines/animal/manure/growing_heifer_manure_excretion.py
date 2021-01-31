@@ -41,9 +41,9 @@ def manure_calculations(ration_formulation, feed, BW, p_feces_excrt, p_urine):
 
     """
     amount, conc = ration_report(ration_formulation, feed.available_feeds)
-    DMI = amount['dm_amount']
-    CP = conc['cp_conc']
-    K_conc = conc['K_conc']
+    DMI = amount['dm']
+    CP = conc['CP']
+    K_conc = conc['potassium']
 
     # Amount of manure, kg [A.3B.A.1]
     Mkg = 3.886 * DMI - 0.029 * BW + 5.641
@@ -72,5 +72,6 @@ def manure_calculations(ration_formulation, feed, BW, p_feces_excrt, p_urine):
             "WOP_frac": WOP_frac,
             "p_excrt_manure": p_excrt_manure,
             "p_frac": p_frac,
-            "K": K
+            "K": K,
+            "CH4": 0
             }

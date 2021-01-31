@@ -11,7 +11,7 @@ from RUFAS.routines.animal.ration.ration_driver import ration_report
 
 
 def manure_calculations(ration_formulation, feed, BW, DIM, mPrt,
-                        milk_prod, p_feces_excrt, p_urine):
+                        milk_prod, p_feces_excrt, p_urine, methane_model, mFat):
     """
     Calculates inputs for manure module with information from the
     ration formulation. Equations referenced are from pseudocode.
@@ -25,6 +25,8 @@ def manure_calculations(ration_formulation, feed, BW, DIM, mPrt,
         mPrt: milk protein, % of milk (from animal input)
         p_feces_excrt: amount of P excreted by an animal (g)
         p_urine: amount of P required for urine production (g)
+        methane_model: methane model used for methane emission calculations
+        mFat: milk fat, % of milk
 
     Returns:
         p_excrt: amount of P excreted by animal, g
@@ -44,14 +46,14 @@ def manure_calculations(ration_formulation, feed, BW, DIM, mPrt,
     """
 
     amount, conc = ration_report(ration_formulation, feed.available_feeds)
-    DMI = amount['dm_amount']
-    Ash_diet_content = amount['ash_amount']
-    DM = conc['dm_conc']
-    ADF = conc['adf_conc']
-    CP = conc['cp_conc']
-    LIG = conc['lignin_conc']
-    NDF = conc['ndf_conc']
-    K_conc = conc['K_conc']
+    DMI = amount['dm']
+    Ash_diet_content = amount['ash']
+    DM = conc['dm']
+    ADF = conc['ADF']
+    CP = conc['CP']
+    LIG = conc['lignin']
+    NDF = conc['NDF']
+    K_conc = conc['potassium']
 
     # Faecal water, kg (Eq 1.2)
     F_water = 1.987 * DMI + 0.348 * ADF - 0.412 * CP - 0.074 * DM - 0.0057 * DIM
@@ -95,6 +97,14 @@ def manure_calculations(ration_formulation, feed, BW, DIM, mPrt,
     # Amount of potassium excreted, g/day [A.3C.C.1]
     K = 1.822 * milk_prod + 2688.88 * (mPrt / 100) + 156.93 * DMI * (K_conc / 100) - 91.755
 
+    # Methane Emissions
+    if methane_model == 0:  # Mutian
+        CH4 = - 126 + 11.3 * DMI + 2.30 * NDF + 28.8 * mFat + 0.148 * BW
+    elif methane_model == 1:  # Mills
+        CH4 = 1  # TODO: Add correct equation after adding necessary input
+    else:  # IPCC
+        CH4 = 2  # TODO: Add correct equation after adding necessary input
+
     p_excrt, WIP_frac, WOP_frac, p_excrt_manure, p_frac = \
         phosphorus_excreted(milk_prod, Mkg, p_feces_excrt, p_urine)
 
@@ -110,5 +120,6 @@ def manure_calculations(ration_formulation, feed, BW, DIM, mPrt,
             "WOP_frac": WOP_frac,
             "p_excrt_manure": p_excrt_manure,
             "p_frac": p_frac,
-            "K": K
+            "K": K,
+            "CH4": CH4
             }
