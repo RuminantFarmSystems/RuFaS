@@ -113,7 +113,8 @@ class Pen:
               "WOP_frac": 0,
               "p_excrt_manure": 0,
               "p_frac": 0,
-              "K": 0}
+              "K": 0,
+              "CH4": 0}
 
     # total manure excretion of the calves in the pen
     calf_total = {"U": 0,
@@ -126,7 +127,8 @@ class Pen:
                   "WOP_frac": 0,
                   "p_excrt_manure": 0,
                   "p_frac": 0,
-                  "K": 0}
+                  "K": 0,
+                  "CH4": 0}
 
     # total manure excretion of the heifers in the pen
     heifer_total = {"U": 0,
@@ -139,7 +141,8 @@ class Pen:
                     "WOP_frac": 0,
                     "p_excrt_manure": 0,
                     "p_frac": 0,
-                    "K": 0}
+                    "K": 0,
+                    "CH4": 0}
 
     # total manure excretion of the dry cows in the pen
     dry_total = {"U": 0,
@@ -152,7 +155,8 @@ class Pen:
                  "WOP_frac": 0,
                  "p_excrt_manure": 0,
                  "p_frac": 0,
-                 "K": 0}
+                 "K": 0,
+                 "CH4": 0}
 
     # total manure excretion of the lactating cows in the pen
     lactating_total = {"U": 0,
@@ -165,7 +169,8 @@ class Pen:
                        "WOP_frac": 0,
                        "p_excrt_manure": 0,
                        "p_frac": 0,
-                       "K": 0}
+                       "K": 0,
+                       "CH4": 0}
 
     # average growth of the animals in the pen
     avg_growth = 0
@@ -395,18 +400,23 @@ class Pen:
 
         return ration
 
-    def calc_manure(self, feed):
+    def calc_manure(self, feed, methane_model):
         """
         Calculates the total manure excretion of the animals in the pen.
 
         Args:
             feed: instance of the Feed class
+            methane_model: methane model used for methane emission calculations
 
         Returns:
             a dictionary for the total manure of the animals in the pen
         """
+        ME_intake = self.MEdiet
         for animal in self.animals_in_pen:
-            animal.calc_manure_excretion(feed)
+            if type(animal).__name__ == 'Cow':
+                animal.calc_manure_excretion(feed, methane_model, ME_intake)
+            else:
+                animal.calc_manure_excretion(feed)
 
         manure = {}
         calf_total = {}
