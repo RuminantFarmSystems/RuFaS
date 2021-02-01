@@ -20,8 +20,8 @@ class SandSeparationLane(SandSeparator):
     ----------
 
     """
-
     def __init__(self, sand_lane_data):
+        super.__init__()
         if sand_lane_data is None or sand_lane_data['default']:
             self.default_sand_lane()
         else:

@@ -59,7 +59,9 @@ def optimization(requirements, available_feeds, BW, cow_type):
         finally:
             i += 1
 
-    return solution
+    #retrieving MEact from diet
+    ration_vals = NLP.get_ration_vals(solution.x)
+    return solution, ration_vals
 
 
 def ration_formulation(pen, available_feeds, cow_type):
@@ -78,7 +80,7 @@ def ration_formulation(pen, available_feeds, cow_type):
     # setting requirements based on animals information in pen
     req.set_requirements(pen, False)
     BW = pen.avg_BW
-    solution = optimization(req, available_feeds, BW, cow_type)
+    solution, ration_vals = optimization(req, available_feeds, BW, cow_type)
     # Reduction of milk production estimate process to achieve feasible solution
     while not solution.success:
         # This values for reduction are not from pseudocode, but the vales below
@@ -94,7 +96,7 @@ def ration_formulation(pen, available_feeds, cow_type):
             animal.estimated_daily_milk_produced -= reduction
         # recalculating requirements after reduction
         req.set_requirements(pen, True)
-        solution = optimization(req, available_feeds, BW, cow_type)
+        solution, ration_vals = optimization(req, available_feeds, BW, cow_type)
 
     ration = {}
     for feed_id in range(len(available_feeds.feed_id)):
@@ -105,61 +107,58 @@ def ration_formulation(pen, available_feeds, cow_type):
         ration[available_feeds.feed_key[feed_id]] = round(num, 6)
     ration['status'] = 'Optimal'
     ration['objective'] = NLP.objective(solution.x)
-    return ration
+    return ration, ration_vals
 
 
 def ration_report(ration, available_feeds):
     """
     Calculates information in the ration about nutrient information including
     nutrient amounts and concentrations. Returns a dictionary of nutrient amounts
-    and nutrient calculations respectively.
+    and nutrient calculations respectively. Psuedocode for these calculations
+    are located in Ration Class Variables in Animal Module Pseduocode
 
     Args:
         ration: a dictionary of the calculated ration
         available_feeds: available feeds dictionary from the Feed class object
     """
-    nutrient_amount = {'dm_amount': 0, 'as_fed_amount': 0, 'cp_amount': 0, 'adf_amount': 0,
-                       'ndf_amount': 0, 'lignin_amount': 0, 'ash_amount': 0,
-                       'P_amount': 0, 'K_amount': 0, 'N_amount': 0}
+    nutrient_amount = {'dm': 0, 'as_fed': 0, 'CP': 0, 'ADF': 0, 'NDF': 0,
+                        'lignin': 0, 'ash': 0,'phosphorus': 0, 'potassium': 0,
+                                                                'N': 0}
     nutrient_conc = {}
     ration = ration.copy()
     ration.pop('status')
     ration.pop('objective')
+    nutrients = ['DM', 'CP' , 'ADF', 'NDF', 'lignin', 'ash', 'phosphorus',
+                'potassium', 'N']
+    #feed nutrient amounts
     for key, val in ration.items():
-        # TODO: Code condensation
-        nutrient_amount['dm_amount'] += val
-        nutrient_amount['as_fed_amount'] += val / (available_feeds[key]['DM'] / 100)
-        # all values on a 100% dry matter basis
-        nutrient_amount['cp_amount'] += (available_feeds[key]['CP'] / 100) * val
-        nutrient_amount['adf_amount'] += (available_feeds[key]['ADF'] / 100) * val
-        nutrient_amount['ndf_amount'] += (available_feeds[key]['NDF'] / 100) * val
-        nutrient_amount['lignin_amount'] += (available_feeds[key]['lignin'] / 100) \
-                                            * val
-        nutrient_amount['ash_amount'] += (available_feeds[key]['ash'] / 100) * val
-        nutrient_amount['P_amount'] += (available_feeds[key]['phosphorus'] / 100) \
-                                       * val
-        nutrient_amount['K_amount'] += (available_feeds[key]['potassium'] / 100) \
-                                       * val
-        # [A.2.A.2]
-        if key[:3] in ['121', '122', '155', '157']:
-            denom = 6.38
-        # [A.2.A.1]
-        else:
-            denom = 6.25
-        nutrient_amount['N_amount'] += (available_feeds[key]['CP'] / (denom * 100)) * val
-    dm_amount = nutrient_amount['dm_amount']
-    nutrient_conc['dm_conc'] = dm_amount / nutrient_amount['as_fed_amount']
-    # all values on a 100% dry matter basis
-    nutrient_conc['cp_conc'] = (nutrient_amount['cp_amount'] / dm_amount) * 100
-    nutrient_conc['adf_conc'] = (nutrient_amount['adf_amount'] / dm_amount) * 100
-    nutrient_conc['ndf_conc'] = (nutrient_amount['ndf_amount'] / dm_amount) * 100
-    nutrient_conc['lignin_conc'] = (nutrient_amount['lignin_amount'] / dm_amount) \
-                                   * 100
-    nutrient_conc['ash_conc'] = (nutrient_amount['ash_amount'] / dm_amount) * 100
-    nutrient_conc['P_conc'] = (nutrient_amount['P_amount'] / dm_amount) * 100
-    nutrient_conc['K_conc'] = (nutrient_amount['K_amount'] / dm_amount) * 100
-    nutrient_conc['N_conc'] = (nutrient_amount['N_amount'] / dm_amount) * 100
+        nutrient_amount['dm'] += val
+        for nutr in nutrients:
+            # all values on a 100% dry matter basis
+            if nutr == 'DM':
+                nutrient_amount['as_fed'] += val * (available_feeds[key][nutr] / 100)
+            elif nutr == 'N':
+                # [A.2.A.2]
+                if key[:3] in ['121', '122', '155', '157']:
+                    denom = 6.38
+                # [A.2.A.1]
+                else:
+                    denom = 6.25
+                nutrient_amount[nutr] += (available_feeds[key]['CP'] /   \
+                                                            (denom * 100)) * val
+            else:
+                nutrient_amount[nutr] += val * (available_feeds[key][nutr] /100)
 
+    #feed nutrient concentrations
+    dm_amount = nutrient_amount['dm']
+    for nutr in nutrients:
+        if nutr == 'DM':
+            nutrient_conc['dm'] = (nutrient_amount['as_fed'] / dm_amount)\
+                                                                            *100
+        else:
+            # all values on a 100% dry matter basis
+            nutrient_conc[nutr] = (nutrient_amount[nutr] / nutrient_amount[nutr]) \
+                                                                            *100
     return nutrient_amount, nutrient_conc
 
 

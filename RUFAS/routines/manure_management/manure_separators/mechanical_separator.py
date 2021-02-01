@@ -9,7 +9,7 @@ Author(s):  William Donovan, wmdonovan@wisc.edu
             Yunus Mohammed, ymm26@cornell.edu 
 """
 
-from .base_separator import BaseSeparator
+from base_separator import BaseSeparator
 
 
 class MechanicalSeparator(BaseSeparator):

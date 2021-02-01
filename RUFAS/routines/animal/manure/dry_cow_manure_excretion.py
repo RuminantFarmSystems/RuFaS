@@ -4,8 +4,10 @@ File name: dry_cow_manure_excretion.py
 Description: Determines manure excretion with information from the ration
     formulation, outputs used by the manure module.
 Author(s): Militsa Sotirova, militsasotirova@gmail.com
+           Joseph Merhi, jm2257@cornell.edu
 """
 from .general_manure import phosphorus_excreted
+from RUFAS.routines.animal.ration.ration_driver import ration_report
 
 
 def manure_calculations(ration_formulation, feed, BW, milk_prod, p_feces_excrt,
@@ -37,6 +39,8 @@ def manure_calculations(ration_formulation, feed, BW, milk_prod, p_feces_excrt,
             WOP_frac: water extractable organic P fraction
             p_excrt_manure: manure P excretion for manure module input (g)
             p_frac: P fraction of manure
+            K: potassium in manure, g/day
+
 
 
     Further calculations to account for entire diet:
@@ -44,36 +48,22 @@ def manure_calculations(ration_formulation, feed, BW, milk_prod, p_feces_excrt,
     DM: dietary dry matter, % of diet
     CP: dietary crude protein, % of DM
     """
-    DMI = 0
-    total_diet = 0  # in kg
-    CP_diet_content = 0
-    for key in ration_formulation:
-        # not every key in the ration_formulation dictionary refers to a feed
-        if key in feed.available_feeds:
-            
-            # percentages of the DM of the needed nutrients
-            nutrients = feed.available_feeds[key]
-            DM_feed_content = 0.01 * nutrients['DM']
-            CP_feed_content = 0.01 * nutrients['CP']
+    amount, conc = ration_report(ration_formulation, feed.available_feeds)
+    DMI = amount['dm']
+    CP = conc['CP']
+    K_conc = conc['potassium']
 
-            # kg of each nutrient
-            DM_feed_amount = ration_formulation[key]
-            CP_feed_amount = CP_feed_content * DM_feed_amount
-
-            # add to running sums
-            as_fed_feed_amount = DM_feed_amount / DM_feed_content
-            total_diet += as_fed_feed_amount
-            DMI += DM_feed_amount
-            CP_diet_content += CP_feed_amount
-
-    # to find total percentages
-    CP = CP_diet_content / DMI * 100
     # Amount of manure, kg [A.3D.A.1]
     Mkg = 0.022 * BW + 21.844
+
     # Total solids, kg/d [A.3D.A.2]
     TSd = 0.178 * DMI + 2.733
+
     # Nitrogen in liquid and solid manure , g [A.3D.B.1]
-    MN = 12.747 * DMI + 1606.290 * CP/100 - 117.5 
+    MN = 12.747 * DMI + 1606.290 * CP/100 - 117.5
+
+    # Amount of potassium excreted, g/day [A.3D.B.3]
+    K = 1000 * DMI * K_conc / 100
     
     p_excrt, WIP_frac, WOP_frac, p_excrt_manure, p_frac = \
         phosphorus_excreted(milk_prod, Mkg, p_feces_excrt, p_urine)
@@ -89,5 +79,7 @@ def manure_calculations(ration_formulation, feed, BW, milk_prod, p_feces_excrt,
             "WIP_frac": WIP_frac,
             "WOP_frac": WOP_frac,
             "p_excrt_manure": p_excrt_manure,
-            "p_frac": p_frac
+            "p_frac": p_frac,
+            "K": K,
+            "CH4": 0
             }

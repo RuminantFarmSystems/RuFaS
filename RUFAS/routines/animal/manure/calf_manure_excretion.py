@@ -4,6 +4,7 @@ File name: calf_manure_excretion.py
 Description: Determines manure excretion with information from the ration
     formulation, outputs used by the manure module.
 Author(s): Militsa Sotirova, militsasotirova@gmail.com
+           Joseph Merhi, jm2257@cornell.edu
 """
 
 from .general_manure import phosphorus_excreted
@@ -34,6 +35,8 @@ def manure_calculations(BW, p_feces_excrt, p_urine):
             WOP_frac: water extractable organic P fraction
             p_excrt_manure: manure P excretion for manure module input (g)
             p_frac: P fraction of manure
+            K: potassium in manure, g/day
+
     """
     # Amount of manure, kg [A.3A.A.1]
     Mkg = 0.0567 * BW
@@ -53,5 +56,7 @@ def manure_calculations(BW, p_feces_excrt, p_urine):
             "WIP_frac": WIP_frac,
             "WOP_frac": WOP_frac,
             "p_excrt_manure": p_excrt_manure,
-            "p_frac": p_frac
+            "p_frac": p_frac,
+            "K": 0,
+            "CH4": 0
             }

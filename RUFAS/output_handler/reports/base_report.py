@@ -75,7 +75,7 @@ class BaseReport:
     def daily_update(self, state, weather, time):
         animal_management = state.animal_management
         feed = state.feed
-        manure_storage = state.manure_storage
+        manure_management = state.manure_management
         fields = state.fields
         life_cycle_manager = animal_management.life_cycle_manager
 
@@ -87,7 +87,7 @@ class BaseReport:
         """Stores the yearly values that need to be printed in the report."""
         animal_management = state.animal_management
         feed = state.feed
-        manure_storage = state.manure_storage
+        manure_management = state.manure_management
         fields = state.fields
 
         for variable in self.annual_variables:

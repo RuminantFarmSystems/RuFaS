@@ -11,12 +11,13 @@ Author(s): Yunus Mohammed, ymm26@cornell.edu
 
 from .bedding import OrganicBedding
 
+
 class Manure:
     """
     Description
     ------------
     An instance of Manure represents gathered or aggregated manure in any given 
-    component.  
+    component.
 
     Attributes
     ----------

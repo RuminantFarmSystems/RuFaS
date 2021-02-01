@@ -9,6 +9,7 @@ Author(s):  William Donovan, wmdonovan@wisc.edu
             Yunus Mohammed, ymm26@cornell.edu 
 """
 
+
 class BaseSeparator:
     """
     Description
@@ -71,12 +72,12 @@ class BaseSeparator:
         Description:
             Calls functions to calculate nutrient losses and transformations during
             manure separation.
-            "pseudocode_manure_storage" MS.4
+            "pseudocode_manure_management" MS.4
 
         Args:
             self: an instance of the Separator class defined in
                 manure_management.py
-            manure: an instance of the ManureStorage class defined in
+            manure: an instance of the ManureManagement class defined in
                 manure_management.py
         """
         self.effluent_liquid()
@@ -87,7 +88,7 @@ class BaseSeparator:
         """
         Description:
             Calculate liquid nutrient content of the separator
-            "pseudocode_manure_storage" MS.4.A
+            "pseudocode_manure_management" MS.4.A
         """
 
         self.TS_liquid = self.TS - (self.TS * self.TS_removal_efficiency)
@@ -100,7 +101,7 @@ class BaseSeparator:
         """
         Description:
             Update solid nutrient content of the separator
-            "pseudocode_manure_storage" MS.4.B
+            "pseudocode_manure_management" MS.4.B
         """
 
         self.TS -= self.TS_liquid
@@ -116,7 +117,7 @@ class BaseSeparator:
         """
         Description:
             Update solid and liquid nutrient contents of the storage receptacle
-            "pseudocode_manure_storage" MS.4.C
+            "pseudocode_manure_management" MS.4.C
 
         Args:
             self

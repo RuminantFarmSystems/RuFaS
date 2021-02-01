@@ -6,7 +6,7 @@ File name: manure_emissions.py
 Description:
 Description: Calculates nutrient losses and transformations during manure
                 separation and updates storage receptacles. update_all() is
-                called during the daily_manure_storage_routine() and it is the
+                called during the daily_manure_management_routine() and it is the
                 only method intended to be called from this file.
 
 Author(s): William Donovan, wmdonovan@wisc.edu
@@ -18,12 +18,12 @@ def update_all(separator, manure):
     Description:
         Calls functions to calculate nutrient losses and transformations during
         manure separation.
-        "pseudocode_manure_storage" MS.4
+        "pseudocode_manure_management" MS.4
 
     Args:
         separator: an instance of the Separator class defined in
             manure_management.py
-        manure: an instance of the ManureStorage class defined in
+        manure: an instance of the ManureManagement class defined in
             manure_management.py
     """
     effluent_liquid(separator)
@@ -35,7 +35,7 @@ def effluent_liquid(separator):
     """
     Description:
         Calculate liquid nutrient content of the separator
-        "pseudocode_manure_storage" MS.4.A
+        "pseudocode_manure_management" MS.4.A
 
     Args:
         separator
@@ -52,7 +52,7 @@ def effluent_solid(separator):
     """
     Description:
         Update solid nutrient content of the separator
-        "pseudocode_manure_storage" MS.4.B
+        "pseudocode_manure_management" MS.4.B
 
     Args:
         separator
@@ -72,7 +72,7 @@ def update_storage(separator, manure):
     """
     Description:
         Update solid and liquid nutrient contents of the storage receptacle
-        "pseudocode_manure_storage" MS.4.C
+        "pseudocode_manure_management" MS.4.C
 
     Args:
         separator

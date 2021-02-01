@@ -1,20 +1,18 @@
 """
 RUFAS: Ruminant Farm Systems Model
 
-File name: screw_press.py
+File name: slope_screen.py
 
 Description:
 
 Author(s):  William Donovan, wmdonovan@wisc.edu
-            Yunus Mohammed, ymm26@cornell.edu 
+            Yunus Mohammed, ymm26@cornell.edu
 """
-
-
 
 from .base_separator import BaseSeparator
 
 
-class ScrewPress(BaseSeparator):
+class SlopeScreen(BaseSeparator):
     """
     Description
     ------------
@@ -22,7 +20,7 @@ class ScrewPress(BaseSeparator):
     Attributes
     ----------
 
-    """ 
+    """
     
     def __init__(self, treatment_data, pen):
         super().__init__(treatment_data, pen)
