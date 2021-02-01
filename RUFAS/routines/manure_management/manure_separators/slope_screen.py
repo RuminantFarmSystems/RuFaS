@@ -1,18 +1,18 @@
 """
 RUFAS: Ruminant Farm Systems Model
 
-File name: belt_press.py
+File name: slope_screen.py
 
 Description:
 
 Author(s):  William Donovan, wmdonovan@wisc.edu
-            Yunus Mohammed, ymm26@cornell.edu 
+            Yunus Mohammed, ymm26@cornell.edu
 """
 
-from .base_separator import BaseTreatment
+from .base_separator import BaseSeparator
 
 
-class BeltPress(BaseTreatment):
+class SlopeScreen(BaseSeparator):
     """
     Description
     ------------
@@ -20,10 +20,9 @@ class BeltPress(BaseTreatment):
     Attributes
     ----------
 
-    """ 
-
+    """
+    
     def __init__(self, treatment_data, pen):
-
         super().__init__(treatment_data, pen)
         if self.default: self.set_defaults()
 

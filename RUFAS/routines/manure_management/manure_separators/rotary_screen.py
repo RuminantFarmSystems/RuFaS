@@ -1,7 +1,7 @@
 """
 RUFAS: Ruminant Farm Systems Model
 
-File name: screw_press.py
+File name: rotary_screen.py
 
 Description:
 
@@ -9,12 +9,10 @@ Author(s):  William Donovan, wmdonovan@wisc.edu
             Yunus Mohammed, ymm26@cornell.edu 
 """
 
+from .base_separator import BaseSeparator
 
 
-from .base_separator import BaseTreatment
-
-
-class ScrewPress(BaseTreatment):
+class RotaryScreen(BaseSeparator):
     """
     Description
     ------------
@@ -23,7 +21,7 @@ class ScrewPress(BaseTreatment):
     ----------
 
     """ 
-    
+
     def __init__(self, treatment_data, pen):
         super().__init__(treatment_data, pen)
         if self.default: self.set_defaults()

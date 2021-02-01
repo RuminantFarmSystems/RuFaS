@@ -10,10 +10,10 @@ Author(s):  William Donovan, wmdonovan@wisc.edu
 """
 
 
-from .base_separator import BaseTreatment
+from .base_separator import BaseSeparator
 
 
-class MovingDiscPress(BaseTreatment):
+class MovingDiscPress(BaseSeparator):
     """
     Description
     ------------

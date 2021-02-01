@@ -10,8 +10,7 @@ Author(s):  William Donovan, wmdonovan@wisc.edu
 """
 
 
-
-from .sand_lane import SandLane
+from ..sand_separators.sand_separation_lane import SandSeparationLane
 
 
 class BaseHandler:
@@ -26,6 +25,14 @@ class BaseHandler:
 
     def __init__(self, handler_data):
 
+        self.bedding_density = None
+        self.bedding_mass_per_day = None
+        self.K_excreted = None
+        self.P_excreted = None
+        self.N_excreted = None
+        self.flush_water_daily = None
+        self.raw_manure = None
+        self.separator = None
         self.sand_lane = None
 
         if handler_data is None or handler_data['default']:
@@ -58,7 +65,7 @@ class BaseHandler:
 
     def init_sand_lane(self, sand_lane_data):
         if self.bedding == 'sand':
-            self.sand_lane = SandLane(sand_lane_data)
+            self.sand_lane = SandSeparationLane(sand_lane_data)
 
     def set_defaults(self):
         if self.bedding.startswith("organic"):
@@ -77,12 +84,10 @@ class BaseHandler:
         Description:
             Calls functions to calculate nutrient losses and transformations during
             manure handling.
-            "pseudocode_manure_storage" MS.3
+            "pseudocode_manure_management" MS.3
 
         Args:
-            self: an instance of the Pen class specified in pen.py representing
-                the pen from which manure is being collected
-            manure: an instance of the ManureStorage class specified in
+            manure: an instance of the ManureManagement class specified in
                 manure_management.py
         """
         self.flush_water(manure)
@@ -91,90 +96,85 @@ class BaseHandler:
         self.K_loss(manure)
         self.solids(manure)
         if self.bedding == 'sand':
-            sand_lane(self, manure)
+            self.sand_lane(manure)
 
-    def flush_water(pen, manure):
+    def flush_water(self, manure):
         """
         Description:
             Calculates Flush Water Volume in the separator that processes the
             collected manure
-            "pseudocode_manure_storage" MS.3.A
+            "pseudocode_manure_management" MS.3.A
 
         Args:
-            pen
             manure
         """
 
-        pen.flush_water_volume = pen.raw_manure + pen.flush_water_daily + pen.bedding_washed
-        manure.separators[pen.separator].flush_water_volume += pen.flush_water_volume
+        self.flush_water_volume = self.raw_manure + self.flush_water_daily + self.bedding_washed
+        manure.separators[self.separator].flush_water_volume += self.flush_water_volume
 
-    def N_loss(pen, manure):
+    def N_loss(self, manure):
         """
         Description:
             Updates Nitrogen mass in the separator from excreted manure
-            "pseudocode_manure_storage" MS.3.B
+            "pseudocode_manure_management" MS.3.B
 
         Args:
-            pen
             manure
         """
 
-        manure.separators[pen.separator].N = pen.N_excreted
+        manure.separators[self.separator].N = self.N_excreted
 
-    def P_loss(pen, manure):
+    def P_loss(self, manure):
         """
         Description:
             Updates Phosphorus mass in the separator from excreted manure
-    "       pseudocode_manure_storage" MS.3.C
+    "       pseudocode_manure_management" MS.3.C
 
         Args:
-            pen
             manure
         """
 
-        manure.separators[pen.separator].P = pen.P_excreted
+        manure.separators[self.separator].P = self.P_excreted
 
-    def K_loss(pen, manure):
+    def K_loss(self, manure):
         """
         Description:
             Updates Potassium mass in the separator from excreted manure
-            "pseudocode_manure_storage" MS.3.D
+            "pseudocode_manure_management" MS.3.D
 
         Args:
-            pen
             manure
         """
 
-        manure.separators[pen.separator].K = pen.K_excreted
+        manure.separators[self.separator].K = self.K_excreted
 
-    def solids(pen, manure):
+    def solids(self, manure):
         """
         Description:
             Updates Total and Volatile Solids in the separator from excreted manure
-            "pseudocode_manure_storage" MS.3.E
+            "pseudocode_manure_management" MS.3.E
 
         Args:
-            pen
             manure
         """
-        pen.TS_loss = pen.flush_water_volume * pen.TS_loss_perc
-        pen.VS_loss = pen.TS_loss * pen.VS_loss_perc
+        self.TS_loss = self.flush_water_volume * self.TS_loss_perc
+        self.VS_loss = self.TS_loss * self.VS_loss_perc
 
-        manure.separators[pen.separator].TS += pen.TS_loss
-        manure.separators[pen.separator].VS += pen.VS_loss
+        manure.separators[self.separator].TS += self.TS_loss
+        manure.separators[self.separator].VS += self.VS_loss
 
-    def sand_lane(pen, manure):
+    def sand_lane(self, manure):
         """
         Description:
             Sand separation lane. Method only called for sand bedding.
         Args:
-            pen:
             manure:
 
         Returns:
 
         """
-        sand_lane = manure.separators[pen.separator]
-        sand_lane.sand_washed_with_water = pen.bedding_mass_per_day  # kg/day
-        sand_lane.sand_mass_separated = sand_lane.sand_separation_efficiency * sand_lane.sand_washed_with_water  # kg/day
-        sand_lane.sand_volume_separated = sand_lane.sand_mass_separated / pen.bedding_density  # m3/day
+        sand_lane = manure.separators[self.separator]
+        sand_lane.sand_washed_with_water = self.bedding_mass_per_day  # kg/day
+        sand_lane.sand_mass_separated = sand_lane.sand_separation_efficiency * \
+                                        sand_lane.sand_washed_with_water  # kg/day
+        sand_lane.sand_volume_separated = sand_lane.sand_mass_separated / self.bedding_density  # m3/day

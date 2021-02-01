@@ -13,7 +13,7 @@ Author(s): William Donovan, wmdonovan@wisc.edu
 from . import fertilizer_application, manure_application, tillage_application
 
 
-def daily_field_management_routine(soil, manure_storage, field_management, weather, time):
+def daily_field_management_routine(soil, manure_management, field_management, weather, time):
     """
     Description:
         Manages the function calls for simulating field management
@@ -21,7 +21,7 @@ def daily_field_management_routine(soil, manure_storage, field_management, weath
     Args:
         soil: an instance of the Soil class defined in soil.py representing
             the soil profile of the field being managed
-        manure_storage: an instance of the ManureStorage class defined in
+        manure_management: an instance of the ManureManagement class defined in
             manure_management.py representing available manure
         field_management: an instance of the FieldManagement class defined in
             field_management.py
@@ -38,14 +38,14 @@ def daily_field_management_routine(soil, manure_storage, field_management, weath
 
     manure_management = field_management.managed_applications['manure']
     if (time.calendar_year, time.day) in manure_management.applications:
-        manure_application.update_all(soil, field_management, manure_storage,
+        manure_application.update_all(soil, field_management, manure_management,
                                       manure_management.applications[(time.calendar_year, time.day)].data)
 
     till_management = field_management.managed_applications['tillage']
     if (time.calendar_year, time.day) in till_management.applications:
         tillage_application.update_all(soil, till_management.applications[(time.calendar_year, time.day)].data)
 
-    field_management.update_annual_variables(manure_storage)
+    field_management.update_annual_variables(manure_management)
 
 
 def daily_field_management_reset(field_management):
@@ -207,14 +207,14 @@ class FieldManagement:
 
         return True
 
-    def update_annual_variables(self, manure_storage):
-        manure_storage.manure_applied = self.manure_applied
-        manure_storage.N_applied = self.manure_N_applied
-        manure_storage.P_applied = self.manure_P_applied
+    def update_annual_variables(self, manure_management):
+        manure_management.manure_applied = self.manure_applied
+        manure_management.N_applied = self.manure_N_applied
+        manure_management.P_applied = self.manure_P_applied
 
-        manure_storage.manure_applied_annual += manure_storage.manure_applied
-        manure_storage.N_applied_annual += manure_storage.N_applied
-        manure_storage.P_applied_annual += manure_storage.P_applied
+        manure_management.manure_applied_annual += manure_management.manure_applied
+        manure_management.N_applied_annual += manure_management.N_applied
+        manure_management.P_applied_annual += manure_management.P_applied
 
         self.manure_applied_annual += self.manure_applied
         self.manure_N_applied_annual += self.manure_N_applied

@@ -115,10 +115,10 @@
             "report_name": "feed_storage_summary"
         }
     },
-    "manure_storage_report": {
+    "manure_management_report": {
         "produce_csv": true,
         "produce_graphics": false,
-        "report_name": "manure_storage_report",
+        "report_name": "manure_management_report",
         "handling_report": {
             "produce_csv": true,
             "produce_graphics": true,
@@ -134,10 +134,10 @@
             "produce_graphics": true,
             "report_name": "storage_report"
         },
-        "manure_storage_summary": {
+        "manure_management_summary": {
             "produce_csv": true,
             "produce_graphics": true,
-            "report_name": "manure_storage_summary"
+            "report_name": "manure_management_summary"
         }
     },
     "life_cycle_report":

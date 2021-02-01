@@ -42,7 +42,7 @@ class OutputHandler:
         # Instantiate Report Handler Objects here
         self.reports = {
                         'feed_storage_report': FeedStorageReport(data['feed_storage_report'], state),
-                        'manure_storage_report': ManureStorageReport(data['manure_storage_report'], state),
+                        'manure_management_report': ManureManagementReport(data['manure_management_report'], state),
                         'custom_report': CustomReport(data['custom_report']),
                         'fields_report': FieldsReport(data['fields_report'], state),
                         'pens_report': PensReport(data['pens_report'], state),

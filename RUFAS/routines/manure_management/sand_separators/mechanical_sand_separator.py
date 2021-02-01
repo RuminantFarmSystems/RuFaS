@@ -10,6 +10,7 @@ Author(s): Yunus Mohammed, ymm26@cornell.edu
 
 from .sand_separator import SandSeparator
 
+
 class MechanicalSandSeparator(SandSeparator):
     """
     Description

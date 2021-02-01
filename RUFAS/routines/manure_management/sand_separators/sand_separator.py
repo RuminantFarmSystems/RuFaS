@@ -12,7 +12,8 @@ Author(s): Yunus Mohammed, ymm26@cornell.edu
 
 from ..materials.bedding.sand_bedding import *
 
-class SandSeparator():
+
+class SandSeparator:
     """
     Description
     ------------
@@ -35,7 +36,7 @@ class SandSeparator():
     Invariant: A flaot >=0.6 and <=0.9
     """
 
-    def __init__(self,efficiency=0.9,manure=None,sand=SandBedding(0.0)):
+    def __init__(self, efficiency=0.9, manure=None, sand=SandBedding(0.0)):
         """
         Initializes a SandSeparator
 
@@ -52,7 +53,6 @@ class SandSeparator():
         self._sand = sand
         self._sand_removal_efficiency = efficiency
 
-
     def output(self):
         """
         Returns the Manure _manure in this Separator and resets _manure to None.
@@ -67,7 +67,7 @@ class SandSeparator():
         """
         Does one cycle of sand separation on the manure present
         """
-        if not self._manure:  #Max
+        if not self._manure:  # Max
             return
         
         sand = self._manure.getBedding()
@@ -78,8 +78,7 @@ class SandSeparator():
         self._sand.setMass(separated_sand_mass)
         sand.setMass(remaining_sand_mass)
 
-
-    #getters 
+    # getters
     def getEfficiency(self):
         """
         Returns the effiency of this SandSeparator
@@ -98,7 +97,7 @@ class SandSeparator():
         """
         return self._sand
 
-    #resetters
+    # resetters
     def resetSeparator(self):
         """
         Reset the _sand to None and _sand to 0 mass SandBedding
@@ -112,7 +111,7 @@ class SandSeparator():
         """
         self._sand.setMass(0.0)
 
-    #setters
+    # setters
     def setEfficiency(self, efficiency):
         """
         Sets _efficiency to efficiency
@@ -136,12 +135,6 @@ class SandSeparator():
         else:
             self._manure = manure
 
-    
-
-   
-        
-
-    
     # def __init__(self, treatment_data, pen):
     #     super().__init__(treatment_data, pen)
     #     if self.default: self.set_defaults()

@@ -15,7 +15,7 @@ import csv
 from RUFAS import util, errors
 from RUFAS.routines import Fields, Feed
 from RUFAS.routines.animal.animal_management import AnimalManagement
-from RUFAS.routines.manure_management.manure_management import ManureStorage
+from RUFAS.routines.manure_management.manure_management import ManureManagement
 from RUFAS.util import read_json_file
 
 
@@ -49,8 +49,9 @@ class State:
         self.animal_management = AnimalManagement(
             read_json_file(input_dir / 'animal' / data['animal']), config, self.feed, weather, time)
 
-        self.manure_storage = ManureStorage(read_json_file(input_dir / 'manure_management' / data['manure_management']),
-                                            self.animal_management)
+        self.manure_management = ManureManagement(
+            read_json_file(input_dir / 'manure_management' / data['manure_management']),
+            self.animal_management)
 
     def annual_reset(self):
         """
@@ -60,12 +61,12 @@ class State:
 
         self.fields.annual_reset()
         self.animal_management.annual_reset()
-        self.manure_storage.annual_reset()
+        self.manure_management.annual_reset()
 
     def annual_mass_balance(self, time):
         for field in self.fields.fields.values():
             field.soil.annual_mass_balance(field.field_management, time)
-        self.manure_storage.annual_mass_balance()
+        self.manure_management.annual_mass_balance()
 
 
 class Config:

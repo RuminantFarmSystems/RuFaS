@@ -11,6 +11,7 @@ Author(s): Yunus Mohammed, ymm26@cornell.edu
 
 from .bedding.organic_bedding import *
 
+
 class Manure:
     """
     Description
@@ -18,7 +19,7 @@ class Manure:
     An instance of Manure represents gathered or aggregated manure in any given 
     component. It has the aggregateManure() function for aggregation of manure. 
     Each instance has the following attribute as well as the corresponding 
-    invariances, getters, and setters.
+    invariants, getters, and setters.
 
 
     Attributes

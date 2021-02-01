@@ -9,13 +9,11 @@ Author(s):  William Donovan, wmdonovan@wisc.edu
             Yunus Mohammed, ymm26@cornell.edu 
 """
 
-
-
 from .base_handler import BaseHandler
 
 
 class FlushSystem(BaseHandler):
-     """
+    """
     Description
     ------------
 

@@ -116,6 +116,7 @@
 	},
 	"housing": "barn",
 	"pasture_concentrate": -1,
+	"methane_model": 0,
 	"ration": {
 		"user_input": false,
 		"formulation_interval": 7

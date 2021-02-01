@@ -1,20 +1,19 @@
 """
 RUFAS: Ruminant Farm Systems Model
 
-File name: slope_screen.py
+File name: decanting_centrifuge.py
 
 Description:
 
 Author(s):  William Donovan, wmdonovan@wisc.edu
-            Yunus Mohammed, ymm26@cornell.edu
+            Yunus Mohammed, ymm26@cornell.edu 
 """
 
 
+from .base_separator import BaseSeparator
 
-from .base_separator import BaseTreatment
 
-
-class SlopeScreen(BaseTreatment):
+class DecantingCentrifuge(BaseSeparator):
     """
     Description
     ------------
@@ -22,8 +21,7 @@ class SlopeScreen(BaseTreatment):
     Attributes
     ----------
 
-    """
-    
+    """ 
     def __init__(self, treatment_data, pen):
         super().__init__(treatment_data, pen)
         if self.default: self.set_defaults()

@@ -6,7 +6,7 @@ Author(s): Jacob Johnson, jacob8399@gmail.com,
 """
 
 
-def update_all(soil, field_management, manure_storage, m_app):
+def update_all(soil, field_management, manure_management, m_app):
     """
     Description:
         Simulates a manure application. Interface between storage and field
@@ -15,17 +15,17 @@ def update_all(soil, field_management, manure_storage, m_app):
         soil: an instance of the Soil class defined in soil.py
         field_management: an instance of the FieldManagement class defined in
             field_management.py
-        manure_storage: an instance of the ManureStorage class defined in
+        manure_management: an instance of the ManureManagement class defined in
             manure_management.py
         m_app: an instance of the BaseApplication class specified in
             field_management.py representing a user specified manure application.
     """
-    manure_application = formulate_manure_application(manure_storage, m_app)
+    manure_application = formulate_manure_application(manure_management, m_app)
     added_manure_P(soil, field_management, manure_application)
     added_manure_N(soil, field_management, manure_application)
 
 
-def formulate_manure_application(manure_storage, m_app):
+def formulate_manure_application(manure_management, m_app):
     """
     Description:
         Interfaces with manure_management module to formulate an application meeting
@@ -33,7 +33,7 @@ def formulate_manure_application(manure_storage, m_app):
         "pseudocode_field_management" FM.4.A
 
     Args:
-        manure_storage
+        manure_management
         m_app
 
     Return:
@@ -54,7 +54,7 @@ def formulate_manure_application(manure_storage, m_app):
     P_frac = 0.0
     solid_ratio = 0.0
 
-    for storage in manure_storage.storage.values():
+    for storage in manure_management.storage.values():
         available_manure = storage.TS + storage.TS_liquid
 
         if available_manure == 0:

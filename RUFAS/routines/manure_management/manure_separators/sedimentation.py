@@ -1,7 +1,7 @@
 """
 RUFAS: Ruminant Farm Systems Model
 
-File name: rotary_screen.py
+File name: sedimentation.py
 
 Description:
 
@@ -9,12 +9,10 @@ Author(s):  William Donovan, wmdonovan@wisc.edu
             Yunus Mohammed, ymm26@cornell.edu 
 """
 
+from .base_separator import BaseSeparator
 
 
-from .base_separator import BaseTreatment
-
-
-class RotaryScreen(BaseTreatment):
+class Sedimentation(BaseSeparator):
     """
     Description
     ------------

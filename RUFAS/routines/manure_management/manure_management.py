@@ -9,55 +9,43 @@ Author(s):  William Donovan, wmdonovan@wisc.edu
             Yunus Mohammed, ymm26@cornell.edu  
 """
 
-from RUFAS.routines.manure_management import handlers, separators, treatments, storage_options
+from RUFAS.routines.manure_management import handlers, manure_separators, \
+    sand_separators, treatments, storage_options
 
 
-def daily_manure_storage_routine(manure_storage, animal_management):
-    manure_storage.reset_daily_variables()
+def daily_manure_management_routine(manure_management, animal_management):
+    manure_management.reset_daily_variables()
 
-    for pen in manure_storage.pens.values():
+    for pen in manure_management.pens.values():
         pen.reset_daily_variables()
         pen.update_pen(animal_management)
         pen.handler.reset_daily_variables()
-        pen.handler.update_all(pen, manure_storage)
+        pen.handler.update_all(pen, manure_management)
 
-    for separator in manure_storage.separators.values():
+    for separator in manure_management.separators.values():
         separator.reset_daily_variables()
-        separator.update_all(manure_storage)
+        separator.update_all(manure_management)
 
-    for treatment in manure_storage.treatments:
+    for treatment in manure_management.treatments:
         treatment.reset_daily_variables()
-        treatment.update_all(manure_storage)
+        treatment.update_all(manure_management)
 
-    for storage in manure_storage.storage.values():
+    for storage in manure_management.storage.values():
         storage.reset_daily_variables()
-        storage.update_all(manure_storage)
+        storage.update_all(manure_management)
 
-    manure_storage.summarize_manure_storage()
-    manure_storage.summarize_annual_variables()
+    manure_management.summarize_manure_management()
+    manure_management.summarize_annual_variables()
 
 
 class ManureManagement:
-    """ 
-    Description:
-
-    Attributes
-    ----------
-    
-    """
-
-
-
-
-
-class ManureStorage:
     def __init__(self, manure_management_data, animal_management):
         """
         Description:
-            The ManureStorage class aggregates the components of the manure
+            The ManureManagement class aggregates the components of the manure
             storage model and interacts with the animal model to access daily
             excreted manure.
-            "pseudocode_manure_storage" MS.1
+            "pseudocode_manure_management" MS.1
 
         Args:
             animal_management: an instance of the AnimalManagement class
@@ -96,12 +84,12 @@ class ManureStorage:
         self.initial_manure = 0.0
         self.manure_calc = 0.0
         self.manure_delta = 0.0
-        self.manure_storage_balance_difference = 0.0
+        self.manure_management_balance_difference = 0.0
 
         self.initial_manure_annual = 0.0
         self.manure_calc_annual = 0.0
         self.manure_delta_annual = 0.0
-        self.manure_storage_balance_difference_annual = 0.0
+        self.manure_management_balance_difference_annual = 0.0
 
         self.manure_applied = 0.0
         self.N_applied = 0.0
@@ -156,7 +144,7 @@ class ManureStorage:
     def initialize_pens(self, manure_management_data, animal_management):
         """
         Description:
-            Class helper method initializes ManureStorage's dictionary of pens
+            Class helper method initializes ManureManagement's dictionary of pens
             based on the Animal model
 
         Args:
@@ -165,7 +153,7 @@ class ManureStorage:
         """
 
         for pen in animal_management.all_pens:
-            self.pens[pen.id] = (ManureStorage.Pen(manure_management_data, pen))
+            self.pens[pen.id] = (ManureManagement.Pen(manure_management_data, pen))
 
     def initialize_handlers(self, handler_data):
         for pen in self.pens:
@@ -175,7 +163,7 @@ class ManureStorage:
     def initialize_separators(self, separator_data):
         """
         Description:
-            Class helper method initializes ManureStorage's dictionary of
+            Class helper method initializes ManureManagement's dictionary of
             separators based on the Animal model
 
         Args:
@@ -184,7 +172,7 @@ class ManureStorage:
 
         for pen in self.pens:
             if pen.manure_separator not in self.separators.keys():
-                self.separators[pen.manure_separator] = (separators.base_separator.BaseSeparator(
+                self.separators[pen.manure_separator] = (manure_separators.base_separator.BaseSeparator(
                     separator_data[pen.separator],
                     pen))
 
@@ -200,7 +188,7 @@ class ManureStorage:
     def initialize_storage(self, storage_data):
         """
         Description:
-            Class helper method initializes ManureStorage's dictionary of
+            Class helper method initializes ManureManagement's dictionary of
             storage receptacles based on the Animal model
 
         Args:
@@ -211,7 +199,7 @@ class ManureStorage:
             if pen.storage not in self.storage.keys():
                 self.storage[pen.storage] = (storage_options.base_storage.BaseStorage(storage_data[pen.storage]))
 
-    def summarize_manure_storage(self):
+    def summarize_manure_management(self):
         """
         Description:
             Class method summarizes whole-model variables from components for
@@ -258,7 +246,7 @@ class ManureStorage:
         self.manure_delta = manure - self.initial_manure
         self.initial_manure = manure
         self.manure_calc = self.manure_delta + self.TS + self.TS_liquid + self.TS_DM_effluent
-        self.manure_storage_balance_difference = self.raw_manure - self.manure_calc
+        self.manure_management_balance_difference = self.raw_manure - self.manure_calc
         self.other_solids = self.TS - (self.VS + self.N + self.P + self.K)
         self.other_liquids = self.TS_liquid - (self.VS_liquid + self.N_liquid + self.P_liquid + self.K_liquid)
 
@@ -330,7 +318,7 @@ class ManureStorage:
         self.manure_calc_annual = self.manure_delta_annual + self.TS_annual + \
                                   self.TS_liquid_annual + self.TS_DM_effluent_annual + \
                                   self.manure_applied_annual
-        self.manure_storage_balance_difference_annual = self.raw_manure_annual - self.manure_calc_annual
+        self.manure_management_balance_difference_annual = self.raw_manure_annual - self.manure_calc_annual
 
     class Pen:
         def __init__(self, manure_management_data, pen):
@@ -411,7 +399,7 @@ class ManureStorage:
             Description:
                 Class helper method calibrates the empirical manure handling
                 model
-                "pseudocode_manure_storage" MS.2
+                "pseudocode_manure_management" MS.2
             """
 
             if self.handling_system.startswith("flush_system"):
@@ -431,7 +419,7 @@ class ManureStorage:
             Description:
                 Class helper method calibrates the empirical manure handling
                 model
-                "pseudocode_manure_storage" MS.2
+                "pseudocode_manure_management" MS.2
             """
 
             if self.bedding.startswith("organic"):
@@ -520,7 +508,7 @@ class ManureStorage:
                 pen: an instance of the Pen class specified in pen.py
             """
             self.separator = pen.manure_separator
-            self.storage_system = pen.manure_storage
+            self.storage_system = pen.manure_management
 
             if separator_data['default']:
                 self.calibrate_separator()
@@ -573,7 +561,7 @@ class ManureStorage:
             Description:
                 Class helper method calibrates the empirical manure separator
                 model
-                "pseudocode_manure_storage" MS.2
+                "pseudocode_manure_management" MS.2
             """
 
             # TODO these are the options in the spreadsheet but there is no difference (not implemented yet)
@@ -657,7 +645,7 @@ class ManureStorage:
                 pen: an instance of the Pen class specified in pen.py
             """
 
-            self.storage = pen.manure_storage
+            self.storage = pen.manure_management
 
             if storage_data['default']:
                 self.calibrate_storage()

@@ -9,9 +9,10 @@ Author(s):  William Donovan, wmdonovan@wisc.edu
             Yunus Mohammed, ymm26@cornell.edu 
 """
 
-from manure_separator import ManureSeparator
+from base_separator import BaseSeparator
 
-class MechanicalSeparator(ManureSeparator):
+
+class MechanicalSeparator(BaseSeparator):
     """
     Description
     ------------

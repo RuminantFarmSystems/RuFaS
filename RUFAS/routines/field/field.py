@@ -13,12 +13,12 @@ from .field_management.field_management import *
 from ...util import read_json_file
 
 
-def daily_fields_routine(fields, manure_storage, weather, time):
+def daily_fields_routine(fields, manure_management, weather, time):
     for field in fields.fields.values():
         soil = field.soil
         crop = field.crop
         field_management = field.field_management
-        daily_field_management_routine(soil, manure_storage, field_management, weather, time)
+        daily_field_management_routine(soil, manure_management, field_management, weather, time)
         daily_soil_routine(soil, crop, field_management, weather, time)
         daily_crop_routine(soil, crop, field_management, weather, time)
 

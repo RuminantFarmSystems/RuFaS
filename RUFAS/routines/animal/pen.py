@@ -7,6 +7,7 @@ Description: The class which represents a pen on the farm. Each pen has
     manure excretion, etc). Method calls cascade through from the animal
     management class to pen to each individual animal in that pen.
 Author(s): Militsa Sotirova, militsasotirova@gmail.com
+           Joseph Merhi, jm2257@cornell.edu
 """
 from RUFAS.routines.animal.ration.calf_ration import optimize as calf_optimize
 from RUFAS.routines.animal.ration.growing_heifer_ration import \
@@ -94,9 +95,9 @@ class Pen:
     ration = {}
 
     # total amount of different nutrients in current ration
-    ration_nutrient_amount = {'dm_amount': 0, 'cp_amount': 0, 'adf_amount': 0,
-                              'ndf_amount': 0, 'lignin_amount': 0, 'ash_amount': 0,
-                              'P_amount': 0, 'K_amount': 0, 'N_amount': 0}
+    ration_nutrient_amount = {'dm': 0, 'CP': 0, 'ADF': 0,
+                              'NDF': 0, 'lignin': 0, 'ash': 0,
+                              'phosphorus': 0, 'potassium': 0, 'N': 0}
 
     # concentration of different nutrients in current ration
     ration_nutrient_conc = {}
@@ -110,10 +111,61 @@ class Pen:
               "VSnd": 0,
               "WIP_frac": 0,
               "WOP_frac": 0,
-              "P_excrt_manure": 0,
-              "P_frac": 0,
-              "K_excrt_manure": 0,
-              "K_frac": 0}
+              "p_excrt_manure": 0,
+              "p_frac": 0,
+              "K": 0}
+
+    # total manure excretion of the calves in the pen
+    calf_total = {"U": 0,
+                  "TAN_s": 0,
+                  "MN": 0,
+                  "Mkg": 0,
+                  "VSd": 0,
+                  "VSnd": 0,
+                  "WIP_frac": 0,
+                  "WOP_frac": 0,
+                  "p_excrt_manure": 0,
+                  "p_frac": 0,
+                  "K": 0}
+
+    # total manure excretion of the heifers in the pen
+    heifer_total = {"U": 0,
+                    "TAN_s": 0,
+                    "MN": 0,
+                    "Mkg": 0,
+                    "VSd": 0,
+                    "VSnd": 0,
+                    "WIP_frac": 0,
+                    "WOP_frac": 0,
+                    "p_excrt_manure": 0,
+                    "p_frac": 0,
+                    "K": 0}
+
+    # total manure excretion of the dry cows in the pen
+    dry_total = {"U": 0,
+                 "TAN_s": 0,
+                 "MN": 0,
+                 "Mkg": 0,
+                 "VSd": 0,
+                 "VSnd": 0,
+                 "WIP_frac": 0,
+                 "WOP_frac": 0,
+                 "p_excrt_manure": 0,
+                 "p_frac": 0,
+                 "K": 0}
+
+    # total manure excretion of the lactating cows in the pen
+    lactating_total = {"U": 0,
+                       "TAN_s": 0,
+                       "MN": 0,
+                       "Mkg": 0,
+                       "VSd": 0,
+                       "VSnd": 0,
+                       "WIP_frac": 0,
+                       "WOP_frac": 0,
+                       "p_excrt_manure": 0,
+                       "p_frac": 0,
+                       "K": 0}
 
     # average growth of the animals in the pen
     avg_growth = 0
@@ -274,16 +326,12 @@ class Pen:
         self.avg_milk = sum_milk / num_animals
         self.avg_CP_milk = sum_CP_milk / num_animals
 
-
     def calc_ration(self, feed, available_feeds):
         """
         Calculates and sets the ration for the pen using the average nutrient
         requirements of the animals in the pen.
 
         Args:
-            temp: the temperature on the given day. Taken from the weather object
-            pasture_concentrate: TODO: needs description
-            housing: TODO: needs description
             feed: instance of the Feed class
             available_feeds: instance of the AvailableFeeds class defined in ration_driver.py
         """
@@ -292,20 +340,22 @@ class Pen:
         while True:
             if 'Calf' in self.classes_in_pen:
                 ration_per_animal = calf_optimize()
+                ration_vals = {'ME_tot': 0}
 
             elif 'HeiferI' in self.classes_in_pen or \
                     'HeiferII' in self.classes_in_pen or \
                     'HeiferIII' in self.classes_in_pen:
                 ration_per_animal = \
                     growing_heifer_optimize()
+                ration_vals = {'ME_tot': 0}
 
             elif 'Cow' in self.classes_in_pen and \
                     self.animals_in_pen[0].milking:  # lactating cow
-                ration_per_animal = \
+                ration_per_animal, ration_vals = \
                     ration_driver.ration_formulation(self, available_feeds, True)
             elif 'Cow' in self.classes_in_pen and \
                     not self.animals_in_pen[0].milking:  # dry cow
-                ration_per_animal = \
+                ration_per_animal, ration_vals = \
                     ration_driver.ration_formulation(self, available_feeds, False)
 
             else:  # this should never occur
@@ -320,11 +370,12 @@ class Pen:
             ration_per_animal, feed.available_feeds)
         self.ration_nutrient_amount = nutrient_amount
         self.ration_nutrient_conc = nutrient_conc
+        self.MEdiet = ration_vals['ME_tot']
 
         for animal in self.animals_in_pen:
-            animal.set_ration(ration_per_animal, nutrient_amount['dm_amount'])
-            animal.set_p_intake(nutrient_amount['P_amount'],
-                                nutrient_conc['P_conc'])
+            animal.set_ration(ration_per_animal, nutrient_amount['dm'])
+            animal.set_p_intake(nutrient_amount['phosphorus'],
+                                nutrient_conc['phosphorus'])
         # set ration for whole pen by multiplying calculated ration by number
         # of animals in the pen
         ration = {}
@@ -338,34 +389,64 @@ class Pen:
 
         return ration
 
-    def calc_manure(self, feed):
+    def calc_manure(self, feed, methane_model):
         """
         Calculates the total manure excretion of the animals in the pen.
 
         Args:
             feed: instance of the Feed class
+            methane_model: methane model used for methane emission calculations
 
         Returns:
             a dictionary for the total manure of the animals in the pen
         """
         for animal in self.animals_in_pen:
-            animal.calc_manure_excretion(feed)
+            if type(animal).__name__ == 'Cow':
+                animal.calc_manure_excretion(feed, methane_model)
+            else:
+                animal.calc_manure_excretion(feed)
 
         manure = {}
+        calf_total = {}
+        heifer_total = {}
+        dry_total = {}
+        lactating_total = {}
 
         # obtain keys of manure composition calculations
         first_animal_manure = self.animals_in_pen[0].manure_excretion
         for key in first_animal_manure.keys():
             manure[key] = 0
+            calf_total[key] = 0
+            heifer_total[key] = 0
+            dry_total[key] = 0
+            lactating_total[key] = 0
 
         # find sums of manure components for each animal in the pen for
-        # total manure in pen
+        # total manure in pen and total manure by animal type
         for animal in self.animals_in_pen:
             curr_manure = animal.manure_excretion
-            for key in manure.keys():
-                manure[key] += curr_manure[key]
+            if type(animal).__name__ == 'Calf':
+                for key in manure.keys():
+                    manure[key] += curr_manure[key]
+                    calf_total[key] += curr_manure[key]
+            elif type(animal).__name__ == 'Heifer':
+                for key in manure.keys():
+                    manure[key] += curr_manure[key]
+                    heifer_total[key] += curr_manure[key]
+            elif type(animal).__name__ == 'Cow' and not animal.milking:
+                for key in manure.keys():
+                    manure[key] += curr_manure[key]
+                    dry_total[key] += curr_manure[key]
+            elif type(animal).__name__ == 'Cow' and animal.milking:
+                for key in manure.keys():
+                    manure[key] += curr_manure[key]
+                    lactating_total[key] += curr_manure[key]
 
         self.manure = manure
+        self.calf_total = calf_total
+        self.heifer_total = heifer_total
+        self.dry_total = dry_total
+        self.lactating_total = lactating_total
 
     def calc_avg_growth(self):
         """
@@ -392,7 +473,7 @@ class Pen:
         """
         # since each animal in the pen receives the same ration
         if len(self.animals_in_pen) > 0:
-            DMI = self.ration_nutrient_amount['dm_amount']
+            DMI = self.ration_nutrient_amount['dm']
 
             total_p_req = 0
             for animal in self.animals_in_pen:
@@ -482,7 +563,6 @@ class Pen:
             animal.calc_nutrient_rqmts(feed, temp)
         elif animal.nutrient_rqmts == {} and not class_name == 'Calf':
             animal.calc_nutrient_rqmts()
-
 
         # set animal's DVD and DHD if it is a cow
         if class_name == 'Cow':
