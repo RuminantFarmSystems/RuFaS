@@ -49,7 +49,7 @@ def optimization(requirements, available_feeds, BW, cow_type):
                     requirements.Ca_req, requirements.P_req, requirements.DMIest,
                     TDN, DE, EE, is_fat, BW, calcium, phosphorus, NDF,
                     feed_type, is_wetforage, Kd, N_A, N_B, CP, dRUP, limit)
-    #try block for catching scipy SLSQP error
+    # try block for catching scipy SLSQP error
     i = 0
     while i < 1:
         try:
@@ -59,7 +59,7 @@ def optimization(requirements, available_feeds, BW, cow_type):
         finally:
             i += 1
 
-    #retrieving MEact from diet
+    # retrieving MEact from diet
     ration_vals = NLP.get_ration_vals(solution.x)
     return solution, ration_vals
 
@@ -122,15 +122,16 @@ def ration_report(ration, available_feeds):
         available_feeds: available feeds dictionary from the Feed class object
     """
     nutrient_amount = {'dm': 0, 'as_fed': 0, 'CP': 0, 'ADF': 0, 'NDF': 0,
-                        'lignin': 0, 'ash': 0,'phosphorus': 0, 'potassium': 0,
-                                                                'N': 0}
+                       'lignin': 0, 'ash': 0, 'phosphorus': 0, 'potassium': 0,
+                       'N': 0, "EE": 0}
     nutrient_conc = {}
     ration = ration.copy()
     ration.pop('status')
     ration.pop('objective')
-    nutrients = ['DM', 'CP' , 'ADF', 'NDF', 'lignin', 'ash', 'phosphorus',
-                'potassium', 'N']
-    #feed nutrient amounts
+    nutrients = ['DM', 'CP', 'ADF', 'NDF', 'lignin', 'ash', 'phosphorus',
+                 'potassium', 'N', "EE"]
+
+    # feed nutrient amounts
     for key, val in ration.items():
         nutrient_amount['dm'] += val
         for nutr in nutrients:
@@ -144,21 +145,21 @@ def ration_report(ration, available_feeds):
                 # [A.2.A.1]
                 else:
                     denom = 6.25
-                nutrient_amount[nutr] += (available_feeds[key]['CP'] /   \
-                                                            (denom * 100)) * val
+                nutrient_amount[nutr] += (available_feeds[key]['CP'] / \
+                                          (denom * 100)) * val
             else:
-                nutrient_amount[nutr] += val * (available_feeds[key][nutr] /100)
+                nutrient_amount[nutr] += val * (available_feeds[key][nutr] / 100)
 
-    #feed nutrient concentrations
+    # feed nutrient concentrations
     dm_amount = nutrient_amount['dm']
     for nutr in nutrients:
         if nutr == 'DM':
-            nutrient_conc['dm'] = (nutrient_amount['as_fed'] / dm_amount)\
-                                                                            *100
+            nutrient_conc['dm'] = (nutrient_amount['as_fed'] / dm_amount) \
+                                  * 100
         else:
             # all values on a 100% dry matter basis
             nutrient_conc[nutr] = (nutrient_amount[nutr] / nutrient_amount[nutr]) \
-                                                                            *100
+                                  * 100
     return nutrient_amount, nutrient_conc
 
 
