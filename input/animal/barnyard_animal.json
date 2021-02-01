@@ -116,7 +116,7 @@
 	},
 	"housing": "barn",
 	"pasture_concentrate": -1,
-	"methane_model": 0,
+	"methane_model": "Mutian",
 	"ration": {
 		"user_input": false,
 		"formulation_interval": 7

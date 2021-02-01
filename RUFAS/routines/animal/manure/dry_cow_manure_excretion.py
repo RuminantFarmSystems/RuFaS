@@ -52,6 +52,13 @@ def manure_calculations(ration_formulation, feed, BW, milk_prod, p_feces_excrt,
     DMI = amount['dm']
     CP = conc['CP']
     K_conc = conc['potassium']
+    ASH = conc["ash"]
+    NDF = conc['NDF']
+    EE = conc["EE"]
+
+    # Calculating gross energy concentration (Moraes et al. 2014)
+    soluble_residue = (100 - ASH) - NDF - CP - EE
+    GE_conc = 0.263 * CP + 0.522 * EE + 0.198 * NDF + 0.160 * soluble_residue
 
     # Amount of manure, kg [A.3D.A.1]
     Mkg = 0.022 * BW + 21.844
@@ -64,7 +71,10 @@ def manure_calculations(ration_formulation, feed, BW, milk_prod, p_feces_excrt,
 
     # Amount of potassium excreted, g/day [A.3D.B.3]
     K = 1000 * DMI * K_conc / 100
-    
+
+    # Methane Emissions (IPCC)
+    CH4 = (0.065 * (GE_conc / 100) * DMI) / 0.05565
+
     p_excrt, WIP_frac, WOP_frac, p_excrt_manure, p_frac = \
         phosphorus_excreted(milk_prod, Mkg, p_feces_excrt, p_urine)
     
@@ -80,6 +90,6 @@ def manure_calculations(ration_formulation, feed, BW, milk_prod, p_feces_excrt,
             "WOP_frac": WOP_frac,
             "p_excrt_manure": p_excrt_manure,
             "p_frac": p_frac,
-            "K": K,
-            "CH4": 0
+            "K_manure": K,
+            "CH4_manure": CH4
             }
