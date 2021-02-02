@@ -46,7 +46,7 @@ def manure_calculations(ration_formulation, feed, BW, DIM, mPrt,
             p_frac: P fraction of manure
             K: potassium in manure, g/day
     """
-    starch = 0.26  # Temporary placeholder
+    starch = 26  # Temporary placeholder (as %)
     amount, conc = ration_report(ration_formulation, feed.available_feeds)
     DMI = amount['dm']
     Ash_diet_content = amount['ash']

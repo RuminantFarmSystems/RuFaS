@@ -129,7 +129,7 @@ def ration_report(ration, available_feeds):
     ration.pop('status')
     ration.pop('objective')
     nutrients = ['DM', 'CP', 'ADF', 'NDF', 'lignin', 'ash', 'phosphorus',
-                 'potassium', 'N', "EE"]
+                 'potassium', 'N', 'EE']
 
     # feed nutrient amounts
     for key, val in ration.items():
@@ -158,7 +158,7 @@ def ration_report(ration, available_feeds):
                                   * 100
         else:
             # all values on a 100% dry matter basis
-            nutrient_conc[nutr] = (nutrient_amount[nutr] / nutrient_amount[nutr]) \
+            nutrient_conc[nutr] = (nutrient_amount[nutr] / dm_amount) \
                                   * 100
     return nutrient_amount, nutrient_conc
 
