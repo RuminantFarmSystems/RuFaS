@@ -11,8 +11,8 @@ from RUFAS.routines.animal.ration.ration_driver import ration_report
 import math
 
 
-def manure_calculations(ration_formulation, feed, BW, DIM, mPrt,
-                        milk_prod, p_feces_excrt, p_urine, methane_model, mFat, ME_intake):
+def manure_calculations(ration_formulation, feed, bodyweight, days_milk, milk_protein,
+                        milk_prod, p_feces_excrt, p_urine, methane_model, milk_fat, ME_intake):
     """
     Calculates inputs for manure module with information from the
     ration formulation. Equations referenced are from pseudocode.
@@ -21,13 +21,13 @@ def manure_calculations(ration_formulation, feed, BW, DIM, mPrt,
         milk_prod: milk production, kg
         ration_formulation: dictionary which stores the calculated ration
         feed: instance of the Feed class
-        BW: body weight, kg
-        DIM: days in milk, d
-        mPrt: milk protein, % of milk (from animal input)
+        bodyweight: body weight, kg
+        days_milk: days in milk, d
+        milk_protein: milk protein, % of milk (from animal input)
         p_feces_excrt: amount of P excreted by an animal (g)
         p_urine: amount of P required for urine production (g)
         methane_model: methane model used for methane emission calculations
-        mFat: milk fat, % of milk
+        milk_fat: milk fat, % of milk
         ME_intake: metabolizable energy intake, Mcal/kg DM
 
     Returns:
@@ -48,93 +48,90 @@ def manure_calculations(ration_formulation, feed, BW, DIM, mPrt,
     """
     starch = 26  # Temporary placeholder (as %)
     amount, conc = ration_report(ration_formulation, feed.available_feeds)
-    DMI = amount['dm']
+    dm_intake = amount['dm']
     Ash_diet_content = amount['ash']
-    ASH = conc["ash"]
-    DM = conc['dm']
-    ADF = conc['ADF']
-    CP = conc['CP']
-    LIG = conc['lignin']
-    NDF = conc['NDF']
+    ASH_conc = conc["ash"]
+    DM_conc = conc['dm']
+    ADF_conc = conc['ADF']
+    CP_conc = conc['CP']
+    lignin_conc = conc['lignin']
+    NDF_conc = conc['NDF']
     K_conc = conc['potassium']
-    EE = conc["EE"]
+    EE_conc = conc["EE"]
 
-    # Calculating gross energy concentration (Moraes et al. 2014)
-    soluble_residue = (100 - ASH) - NDF - CP - EE
-    GE_conc = 0.263 * CP + 0.522 * EE + 0.198 * NDF + 0.160 * soluble_residue
+    # Faecal water, kg [A.3C.A.1]
+    fecal_water = 1.987 * dm_intake + 0.348 * ADF_conc - 0.412 * CP_conc - 0.074 * DM_conc - 0.0057 * days_milk
 
-    # Faecal water, kg (Eq 1.2)
-    F_water = 1.987 * DMI + 0.348 * ADF - 0.412 * CP - 0.074 * DM - 0.0057 * DIM
+    # Total Solids, kg [A.3C.A.2]
+    total_solids = -0.576 + 0.370 * dm_intake - 0.075 * CP_conc + 0.059 * ADF_conc
 
-    # Faecal dry matter, kg (Eq 1.3)
-    F_DM = -0.576 + 0.370 * DMI - 0.075 * CP + 0.059 * ADF
+    # Total urine, kg [A.3C.A.3]
+    urine = -7.742 + 0.388 * dm_intake + 0.726 * CP_conc + 2.066 * milk_protein
 
-    # Total urine, kg (Eq 1.4)
-    U_E = -7.742 + 0.388 * DMI + 0.726 * CP + 2.066 * mPrt
+    # Amount of manure, kg [A.3C.A.4]
+    manure = fecal_water + total_solids + urine
 
-    # Amount of manure, kg (Eq 1.1)
-    Mkg = F_water + F_DM + U_E
+    # Faecal nitrogen, g [A.3C.B.1]
+    N_feces = (-0.0368 +
+               0.0096 * dm_intake + 0.0022 * CP_conc +
+               0.0034 * lignin_conc -
+               0.000043 * bodyweight) * 1000
 
-    # Total solids, kg/d [A.3C.A.2]
-    TSd = -0.576 + 0.370 * DMI + 0.059 * ADF - 0.075 * CP
+    # Urine nitrogen, g [A.3C.B.2]
+    N_urine = (-0.2837 +
+               0.0068 * dm_intake + 0.0155 * CP_conc +
+               0.00013 * days_milk +
+               0.000092 * bodyweight) * 1000
 
-    # Faecal nitrogen, g (Eq 2.2)
-    F_N = (-0.0368 +
-           0.0096 * DMI + 0.0022 * CP +
-           0.0034 * LIG -
-           0.000043 * BW) * 1000
-
-    # Urine nitrogen, g (Eq 2.3)
-    U_N = (-0.2837 +
-           0.0068 * DMI + 0.0155 * CP +
-           0.00013 * DIM +
-           0.000092 * BW) * 1000
-
-    # Nitrogen in liquid and solid manure, g (Eq 2.1)
-    MN = F_N + U_N
+    # Nitrogen in liquid and solid manure, g [A.3C.B.3]
+    N_manure = N_feces + N_urine
 
     # Organic matter intake, kg
-    OMI = DMI - Ash_diet_content
+    OM_intake = dm_intake - Ash_diet_content
 
-    # Degradable volatile solids, g (Eq 3.1)
-    VSd = (-1.017 + 0.364 * OMI + 0.029 * NDF - 0.023 * CP) * 1000
+    # Degradable volatile solids, g [A.3C.A.5]
+    degradable_volatile_solids = (-1.017 + 0.364 * OM_intake + 0.029 * NDF_conc - 0.023 * CP_conc) * 1000
 
-    # Non-degradable volatile solids, g (Eq 4.1)
-    VSnd = (-0.184 + 0.038 * OMI + 0.007 * NDF - 0.001 * CP) * 1000
+    # Non-degradable volatile solids, g [A.3C.A.6]
+    nondegradable_volatile_solids = (-0.184 + 0.038 * OM_intake + 0.007 * NDF_conc - 0.001 * CP_conc) * 1000
 
     # Urea concentration, mol/L (Eq 5.1)
-    U = (-1.16 + 0.86 * (U_N / U_E)) / 28
+    U = (-1.16 + 0.86 * (N_urine / urine)) / 28
 
     # Total ammoniacal nitrogen concentration in the manure slurry,
     # mol/L (Eq 6.1)
     TAN_s = (-162.4 * U * U + 96.4 * U) / 100
 
     # Amount of potassium excreted, g/day [A.3C.C.1]
-    K = 1.822 * milk_prod + 2688.88 * (mPrt / 100) + 156.93 * DMI * (K_conc / 100) - 91.755
+    K_manure = 1.822 * milk_prod + 2688.88 * (milk_protein / 100) + 156.93 * dm_intake * (K_conc / 100) - 91.755
 
     # Methane Emissions
     if methane_model == "Mutian":  # Mutian
-        CH4 = - 126 + 11.3 * DMI + 2.30 * NDF + 28.8 * mFat + 0.148 * BW
+        methane_emis = - 126 + 11.3 * dm_intake + 2.30 * NDF_conc + 28.8 * milk_fat + 0.148 * bodyweight
     elif methane_model == "Mills":  # Mills
-        CH4 = 45.98 * math.exp(- ((- 0.0011 * starch / ADF) + 0.0045) * ME_intake)
-    elif methane_model == "IPCC":   # IPCC
-        CH4 = (0.065 * (GE_conc / 100) * DMI) / 0.05565
+        methane_emis = 45.98 * math.exp(- ((- 0.0011 * starch / ADF_conc) + 0.0045) * ME_intake)
+    elif methane_model == "IPCC":  # IPCC
+        # Calculating gross energy concentration (Moraes et al. 2014)
+        soluble_residue = (100 - ASH_conc) - NDF_conc - CP_conc - EE_conc
+        gross_energy_conc = 0.263 * CP_conc + 0.522 * EE_conc + 0.198 * NDF_conc + 0.160 * soluble_residue
+
+        methane_emis = (0.065 * (gross_energy_conc / 100) * dm_intake) / 0.05565
 
     p_excrt, WIP_frac, WOP_frac, p_excrt_manure, p_frac = \
-        phosphorus_excreted(milk_prod, Mkg, p_feces_excrt, p_urine)
+        phosphorus_excreted(milk_prod, manure, p_feces_excrt, p_urine)
 
     return p_excrt, \
            {"U": U,
             "TAN_s": TAN_s,
-            "MN": MN,
-            "Mkg": Mkg,
-            "TSd": TSd,
-            "VSd": VSd,
-            "VSnd": VSnd,
+            "MN": N_manure,
+            "Mkg": manure,
+            "TSd": total_solids,
+            "VSd": degradable_volatile_solids,
+            "VSnd": nondegradable_volatile_solids,
             "WIP_frac": WIP_frac,
             "WOP_frac": WOP_frac,
             "p_excrt_manure": p_excrt_manure,
             "p_frac": p_frac,
-            "K_manure": K,
-            "CH4_manure": CH4
+            "K_manure": K_manure,
+            "CH4_manure": methane_emis
             }

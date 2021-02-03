@@ -10,7 +10,7 @@ from .general_manure import phosphorus_excreted
 from RUFAS.routines.animal.ration.ration_driver import ration_report
 
 
-def manure_calculations(ration_formulation, feed, BW, p_feces_excrt, p_urine):
+def manure_calculations(ration_formulation, feed, bodyweight, p_feces_excrt, p_urine):
     """
     TEMPORARY PLACEHOLDER
     Calculates inputs for manure module with information from the
@@ -19,7 +19,7 @@ def manure_calculations(ration_formulation, feed, BW, p_feces_excrt, p_urine):
     Args:
         ration_formulation: dictionary which stores the calculated ration
         feed: instance of the Feed class
-        BW: body weight, kg
+        bodyweight: body weight, kg
         p_feces_excrt: amount of P excreted by an animal (g)
         p_urine: amount of P required for urine production (g)
 
@@ -41,47 +41,47 @@ def manure_calculations(ration_formulation, feed, BW, p_feces_excrt, p_urine):
 
     """
     amount, conc = ration_report(ration_formulation, feed.available_feeds)
-    DMI = amount['dm']
-    CP = conc['CP']
+    dm_intake = amount['dm']
+    cp_conc = conc['CP']
     K_conc = conc['potassium']
-    ASH = conc["ash"]
-    NDF = conc['NDF']
-    EE = conc["EE"]
+    ASH_conc = conc["ash"]
+    NDF_conc = conc['NDF']
+    EE_conc = conc["EE"]
 
     # Calculating gross energy concentration (Moraes et al. 2014)
-    soluble_residue = (100 - ASH) - NDF - CP - EE
-    GE_conc = 0.263 * CP + 0.522 * EE + 0.198 * NDF + 0.160 * soluble_residue
+    soluble_residue = (100 - ASH_conc) - NDF_conc - cp_conc - EE_conc
+    gross_energy_conc = 0.263 * cp_conc + 0.522 * EE_conc + 0.198 * NDF_conc + 0.160 * soluble_residue
 
     # Amount of manure, kg [A.3B.A.1]
-    Mkg = 3.886 * DMI - 0.029 * BW + 5.641
+    manure = 3.886 * dm_intake - 0.029 * bodyweight + 5.641
 
     # Total solids, kg/day [A.3B.A.2]
-    TSd = 0.0084 * BW
+    total_solids = 0.0084 * bodyweight
 
     # Nitrogen in liquid and solid manure, g/day [A.3D.B.1]
-    MN = 78.390 * DMI * CP / 100 + 51.35
+    N_manure = 78.390 * dm_intake * cp_conc / 100 + 51.35
 
     # Amount of potassium excreted, g/day [A.3D.B.3]
-    K = 1000 * DMI * K_conc / 100
+    K_manure = 1000 * dm_intake * K_conc / 100
 
     # Methane Emissions (IPCC)
-    CH4 = (0.065 * (GE_conc / 100) * DMI) / 0.05565
+    methane_emis = (0.065 * (gross_energy_conc / 100) * dm_intake) / 0.05565
 
     p_excrt, WIP_frac, WOP_frac, p_excrt_manure, p_frac = \
-        phosphorus_excreted(0, Mkg, p_feces_excrt, p_urine)
+        phosphorus_excreted(0, manure, p_feces_excrt, p_urine)
 
     return p_excrt, \
            {"U": 0.340,  # TODO: Implement with correct equation
             "TAN_s": 0.14,  # TODO: Implement with correct equation
-            "MN": MN,
-            "Mkg": Mkg,
-            "TSd": TSd,
+            "MN": N_manure,
+            "Mkg": manure,
+            "TSd": total_solids,
             "VSd": 7087.413,  # TODO: Implement with correct equation
             "VSnd": 859.390,  # TODO: Implement with correct equation
             "WIP_frac": WIP_frac,
             "WOP_frac": WOP_frac,
             "p_excrt_manure": p_excrt_manure,
             "p_frac": p_frac,
-            "K_manure": K,
-            "CH4_manure": CH4
+            "K_manure": K_manure,
+            "CH4_manure": methane_emis
             }

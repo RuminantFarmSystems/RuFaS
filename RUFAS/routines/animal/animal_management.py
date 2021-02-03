@@ -538,6 +538,8 @@ class AnimalManagement:
         for pen in self.all_pens:
             if pen.pen_populated:
                 pen.calc_manure(feed,methane_model)
+            else:
+                pen.reset_manure()
 
     def calc_avg_growth(self):
         """
