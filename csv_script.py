@@ -4,7 +4,7 @@ import ntpath
 import sql_script
 import pandas as pd
 from RUFAS.classes import is_leap_year
-from RUFAS import errors
+import csv
 import atexit
 
 
@@ -16,14 +16,17 @@ def main():
     formatted csv file into the database, sql_script.py has to be run separately.
     """
 
-    print("\nRUFAS: Importing Weather Dataset into Database")
+    print("\nRUFAS: Formatting weather dataset")
     # 1 DAYMET dataset input
     data_in = sql_script.weather_input()
+
     csv_path = Path(data_in)
-    print(type(csv_path))
+    csv_path_string = str(csv_path)
+
     csv_name = str(ntpath.basename(csv_path))
-    csv_name.index(".")
     csv_name = csv_name[:csv_name.index(".")]
+
+    new_path = csv_path_string[:csv_path_string.rindex(csv_name)]
 
     # 2 Database input
     database = sql_script.database_input()
@@ -44,7 +47,10 @@ def main():
     drop_rearrange(conn)
 
     # 8 Convert db table into new csv file
-    db_to_csv(conn, csv_name)
+    db_to_csv(conn, csv_name, new_path)
+
+    # 9 Cleaning up unnecessary tables and views:
+    atexit.register(cleanup, conn)
 
 
 def import_data(connection, csv_path):
@@ -116,8 +122,22 @@ def drop_rearrange(connection):
     connection.commit()
 
 
-def db_to_csv(connection,csv_name):
-    new_csv_name = csv_name + "_adjusted"
+def db_to_csv(connection, csv_name, path):
+    c = connection.cursor()
+    data = c.execute("SELECT * from Skeleton2")
+    new_csv_name = csv_name + "_adjusted" + ".csv"
+    new_path = path + new_csv_name
+    new_path = Path(new_path)
+    with open(new_path, 'w') as f:
+        writer = csv.writer(f)
+        writer.writerow(['ID', 'year', 'jday', 'precip', 'high', 'low', 'avg', 'Hday', 'manureN'])
+        writer.writerows(data)
+
+
+def cleanup(connection):
+    c = connection.cursor()
+    c.execute("DELETE FROM Skeleton2")
+    connection.commit()
 
 
 # -------------------------------------------------------------------------------
