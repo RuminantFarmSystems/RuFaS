@@ -63,7 +63,6 @@ def manure_calculations(ration_formulation, feed, bw, milk_prod, p_feces_excrt,
     ADF_conc = conc['ADF']
     starch_conc = conc['starch']
 
-
     # Amount of manure, kg [A.3D.A.1]
     manure = 0.022 * bw + 21.844
 
