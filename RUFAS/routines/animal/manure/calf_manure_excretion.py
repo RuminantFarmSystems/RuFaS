@@ -10,14 +10,14 @@ Author(s): Militsa Sotirova, militsasotirova@gmail.com
 from .general_manure import phosphorus_excreted
 
 
-def manure_calculations(bodyweight, p_feces_excrt, p_urine):
+def manure_calculations(bw, p_feces_excrt, p_urine):
     """
     TEMPORARY PLACEHOLDER
     Calculates inputs for manure module with information from the
     ration formulation. Equations referenced are from pseudocode.
 
     Args:
-        bodyweight: body weight, kg
+        bw: body weight, kg
         p_feces_excrt: amount of P excreted by an animal (g)
         p_urine: amount of P required for urine production (g)
 
@@ -39,9 +39,13 @@ def manure_calculations(bodyweight, p_feces_excrt, p_urine):
 
     """
     # Amount of manure, kg [A.3A.A.1]
-    manure = 0.0567 * bodyweight
+    manure = 0.0567 * bw
+
     # Total solids, kg/day [A.3A.A.2]
-    total_solids = 0.0093 * bodyweight
+    total_solids = 0.0093 * bw
+
+    # Methane Emissions [A.3A.C.1]
+    methane_emis = (0.013 * (bw ** 0.75) * 4.184) / 0.05565
 
     p_excrt, WIP_frac, WOP_frac, p_excrt_manure, p_frac = \
         phosphorus_excreted(0, manure, p_feces_excrt, p_urine)
@@ -59,5 +63,5 @@ def manure_calculations(bodyweight, p_feces_excrt, p_urine):
             "p_excrt_manure": p_excrt_manure,
             "p_frac": p_frac,
             "K_manure": 0,
-            "CH4_manure": 0
+            "CH4_manure": methane_emis
             }

@@ -10,7 +10,7 @@ from .general_manure import phosphorus_excreted
 from RUFAS.routines.animal.ration.ration_driver import ration_report
 
 
-def manure_calculations(ration_formulation, feed, bodyweight, p_feces_excrt, p_urine):
+def manure_calculations(ration_formulation, feed, bw, p_feces_excrt, p_urine):
     """
     TEMPORARY PLACEHOLDER
     Calculates inputs for manure module with information from the
@@ -19,7 +19,7 @@ def manure_calculations(ration_formulation, feed, bodyweight, p_feces_excrt, p_u
     Args:
         ration_formulation: dictionary which stores the calculated ration
         feed: instance of the Feed class
-        bodyweight: body weight, kg
+        bw: body weight, kg
         p_feces_excrt: amount of P excreted by an animal (g)
         p_urine: amount of P required for urine production (g)
 
@@ -48,15 +48,12 @@ def manure_calculations(ration_formulation, feed, bodyweight, p_feces_excrt, p_u
     NDF_conc = conc['NDF']
     EE_conc = conc["EE"]
 
-    # Calculating gross energy concentration (Moraes et al. 2014)
-    soluble_residue = (100 - ASH_conc) - NDF_conc - cp_conc - EE_conc
-    gross_energy_conc = 0.263 * cp_conc + 0.522 * EE_conc + 0.198 * NDF_conc + 0.160 * soluble_residue
 
     # Amount of manure, kg [A.3B.A.1]
-    manure = 3.886 * dm_intake - 0.029 * bodyweight + 5.641
+    manure = 3.886 * dm_intake - 0.029 * bw + 5.641
 
     # Total solids, kg/day [A.3B.A.2]
-    total_solids = 0.0084 * bodyweight
+    total_solids = 0.0084 * bw
 
     # Nitrogen in liquid and solid manure, g/day [A.3D.B.1]
     N_manure = 78.390 * dm_intake * cp_conc / 100 + 51.35
@@ -64,8 +61,8 @@ def manure_calculations(ration_formulation, feed, bodyweight, p_feces_excrt, p_u
     # Amount of potassium excreted, g/day [A.3D.B.3]
     K_manure = 1000 * dm_intake * K_conc / 100
 
-    # Methane Emissions (IPCC)
-    methane_emis = (0.065 * (gross_energy_conc / 100) * dm_intake) / 0.05565
+    # Methane Emissions [A.3B.C.1]
+    methane_emis = (38.62 + 26.44 * dm_intake) * 0.554
 
     p_excrt, WIP_frac, WOP_frac, p_excrt_manure, p_frac = \
         phosphorus_excreted(0, manure, p_feces_excrt, p_urine)

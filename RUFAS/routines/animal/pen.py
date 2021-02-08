@@ -107,70 +107,80 @@ class Pen:
               "TAN_s": 0,
               "MN": 0,
               "Mkg": 0,
+              "TSd": 0,
               "VSd": 0,
               "VSnd": 0,
               "WIP_frac": 0,
               "WOP_frac": 0,
               "p_excrt_manure": 0,
               "p_frac": 0,
-              "K": 0,
-              "CH4": 0}
+              "K_manure": 0,
+              "CH4_manure": 0
+              }
 
     # total manure excretion of the calves in the pen
     calf_total = {"U": 0,
                   "TAN_s": 0,
                   "MN": 0,
                   "Mkg": 0,
+                  "TSd": 0,
                   "VSd": 0,
                   "VSnd": 0,
                   "WIP_frac": 0,
                   "WOP_frac": 0,
                   "p_excrt_manure": 0,
                   "p_frac": 0,
-                  "K": 0,
-                  "CH4": 0}
+                  "K_manure": 0,
+                  "CH4_manure": 0
+                  }
 
     # total manure excretion of the heifers in the pen
     heifer_total = {"U": 0,
                     "TAN_s": 0,
                     "MN": 0,
                     "Mkg": 0,
+                    "TSd": 0,
                     "VSd": 0,
                     "VSnd": 0,
                     "WIP_frac": 0,
                     "WOP_frac": 0,
                     "p_excrt_manure": 0,
                     "p_frac": 0,
-                    "K": 0,
-                    "CH4": 0}
+                    "K_manure": 0,
+                    "CH4_manure": 0
+                    }
 
     # total manure excretion of the dry cows in the pen
     dry_total = {"U": 0,
                  "TAN_s": 0,
                  "MN": 0,
                  "Mkg": 0,
+                 "TSd": 0,
                  "VSd": 0,
                  "VSnd": 0,
                  "WIP_frac": 0,
                  "WOP_frac": 0,
                  "p_excrt_manure": 0,
                  "p_frac": 0,
-                 "K": 0,
-                 "CH4": 0}
+                 "K_manure": 0,
+                 "CH4_manure": 0
+                 }
 
     # total manure excretion of the lactating cows in the pen
     lactating_total = {"U": 0,
                        "TAN_s": 0,
                        "MN": 0,
                        "Mkg": 0,
+                       "TSd": 0,
                        "VSd": 0,
                        "VSnd": 0,
                        "WIP_frac": 0,
                        "WOP_frac": 0,
                        "p_excrt_manure": 0,
                        "p_frac": 0,
-                       "K": 0,
-                       "CH4": 0}
+                       "K_manure": 0,
+                       "CH4_manure": 0
+                       }
 
     # average growth of the animals in the pen
     avg_growth = 0
@@ -460,76 +470,90 @@ class Pen:
         self.dry_total = dry_total
         self.lactating_total = lactating_total
 
+        for i in self.manure.keys():
+            assert self.manure[i] == self.calf_total[i] + self.heifer_total[i] + self.dry_total[i] + \
+                   self.lactating_total[i]
+
     def reset_manure(self):
         # total manure excretion of the animals in the pen
         self.manure = {"U": 0,
                        "TAN_s": 0,
                        "MN": 0,
                        "Mkg": 0,
+                       "TSd": 0,
                        "VSd": 0,
                        "VSnd": 0,
                        "WIP_frac": 0,
                        "WOP_frac": 0,
                        "p_excrt_manure": 0,
                        "p_frac": 0,
-                       "K": 0,
-                       "CH4": 0}
+                       "K_manure": 0,
+                       "CH4_manure": 0
+                       }
 
         # total manure excretion of the calves in the pen
         self.calf_total = {"U": 0,
                            "TAN_s": 0,
                            "MN": 0,
                            "Mkg": 0,
+                           "TSd": 0,
                            "VSd": 0,
                            "VSnd": 0,
                            "WIP_frac": 0,
                            "WOP_frac": 0,
                            "p_excrt_manure": 0,
                            "p_frac": 0,
-                           "K": 0,
-                           "CH4": 0}
+                           "K_manure": 0,
+                           "CH4_manure": 0
+                           }
 
         # total manure excretion of the heifers in the pen
         self.heifer_total = {"U": 0,
                              "TAN_s": 0,
                              "MN": 0,
                              "Mkg": 0,
+                             "TSd": 0,
                              "VSd": 0,
                              "VSnd": 0,
                              "WIP_frac": 0,
                              "WOP_frac": 0,
                              "p_excrt_manure": 0,
                              "p_frac": 0,
-                             "K": 0,
-                             "CH4": 0}
+                             "K_manure": 0,
+                             "CH4_manure": 0
+                             }
 
         # total manure excretion of the dry cows in the pen
         self.dry_total = {"U": 0,
                           "TAN_s": 0,
                           "MN": 0,
                           "Mkg": 0,
+                          "TSd": 0,
                           "VSd": 0,
                           "VSnd": 0,
                           "WIP_frac": 0,
                           "WOP_frac": 0,
                           "p_excrt_manure": 0,
                           "p_frac": 0,
-                          "K": 0,
-                          "CH4": 0}
+                          "K_manure": 0,
+                          "CH4_manure": 0
+                          }
 
         # total manure excretion of the lactating cows in the pen
         self.lactating_total = {"U": 0,
                                 "TAN_s": 0,
                                 "MN": 0,
                                 "Mkg": 0,
+                                "TSd": 0,
                                 "VSd": 0,
                                 "VSnd": 0,
                                 "WIP_frac": 0,
                                 "WOP_frac": 0,
                                 "p_excrt_manure": 0,
                                 "p_frac": 0,
-                                "K": 0,
-                                "CH4": 0}
+                                "K_manure": 0,
+                                "CH4_manure": 0
+                                }
 
     def calc_avg_growth(self):
         """

@@ -10,10 +10,11 @@ from typing import Any, Union
 
 from .general_manure import phosphorus_excreted
 from RUFAS.routines.animal.ration.ration_driver import ration_report
+import math
 
 
-def manure_calculations(ration_formulation, feed, bodyweight, milk_prod, p_feces_excrt,
-                        p_urine):
+def manure_calculations(ration_formulation, feed, bw, milk_prod, p_feces_excrt,
+                        p_urine, ME_intake):
     """
     TEMPORARY PLACEHOLDER
     Calculates inputs for manure module with information from the
@@ -22,10 +23,12 @@ def manure_calculations(ration_formulation, feed, bodyweight, milk_prod, p_feces
     Args:
         ration_formulation: dictionary which stores the calculated ration
         feed: instance of the Feed class
-        bodyweight: body weight, kg
+        bw: body weight, kg
         milk_prod: milk production, kg
         p_feces_excrt: amount of P excreted by an animal (g)
         p_urine: amount of P required for urine production (g)
+        ME_intake: metabolizable energy intake, Mcal/kg DM
+
 
     Returns:
         p_excrt: amount of P excreted by animal, g
@@ -57,13 +60,12 @@ def manure_calculations(ration_formulation, feed, bodyweight, milk_prod, p_feces
     ASH_conc = conc["ash"]
     NDF_conc = conc['NDF']
     EE_conc = conc["EE"]
+    ADF_conc = conc['ADF']
+    starch_conc = conc['starch']
 
-    # Calculating gross energy concentration (Moraes et al. 2014)
-    soluble_residue = (100 - ASH_conc) - NDF_conc - CP_conc - EE_conc
-    gross_energy_conc = 0.263 * CP_conc + 0.522 * EE_conc + 0.198 * NDF_conc + 0.160 * soluble_residue
 
     # Amount of manure, kg [A.3D.A.1]
-    manure = 0.022 * bodyweight + 21.844
+    manure = 0.022 * bw + 21.844
 
     # Total solids, kg/d [A.3D.A.2]
     total_solids = 0.178 * dm_intake + 2.733
@@ -74,8 +76,9 @@ def manure_calculations(ration_formulation, feed, bodyweight, milk_prod, p_feces
     # Amount of potassium excreted, g/day [A.3D.B.3]
     K_manure = 1000 * dm_intake * K_conc / 100
 
-    # Methane Emissions (IPCC)
-    methane_emis = (0.065 * (gross_energy_conc / 100) * dm_intake) / 0.05565
+    # Methane Emissions [A.3F.C.1]
+    methane_emis = (45.98 - 45.98 * math.exp(- ((- 0.0011 * starch_conc / ADF_conc) + 0.0045)
+                                                 * ME_intake * 4.184)) / 0.05565
 
     p_excrt, WIP_frac, WOP_frac, p_excrt_manure, p_frac = \
         phosphorus_excreted(milk_prod, manure, p_feces_excrt, p_urine)
