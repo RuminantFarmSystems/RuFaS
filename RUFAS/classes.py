@@ -20,7 +20,6 @@ from RUFAS.util import DatabaseReader
 from RUFAS.util import read_json_file
 
 
-
 class State:
     def __init__(self, data, config, weather, time):
         """
@@ -83,6 +82,11 @@ class Config:
         self.start_day = int(self.start_full_date[1])
         self.end_day = int(self.end_full_date[1])
         self.run_tests = data['run_tests']
+
+        # set seed attributes
+        self.set_seed = data['set_seed']
+        self.seed = data['seed']
+
         year_length = 365
         leap_year_length = 366
 
@@ -320,14 +324,14 @@ class Weather:
             self.T_min.append([0 for _ in range(len(year))])
             self.T_avg.append([0 for _ in range(len(year))])
             self.radiation.append([0 for _ in range(len(year))])
-            self.manureN.append([0 for _ in range(len(year))]) # TODO: manureN is a temporary weather file input until the manure module is implemented
+            self.manureN.append([0 for _ in range(
+                len(year))])  # TODO: manureN is a temporary weather file input until the manure module is implemented
             self.Taair.append([0 for _ in range(len(year))])
 
         # read in the input db file
         self.weather_path_str = weather_data["weather_database"]
         self.weather_table = weather_data["weather_table_name"]
         self.dataset_ID = weather_data["dataset_ID"]
-
 
         self.weather_full_path = util.get_base_dir() / self.weather_path_str
 
@@ -371,7 +375,7 @@ class Weather:
                 self.T_min[year][day - offset] = float(row["low"])
                 self.T_avg[year][day - offset] = float(row["avg"])
                 self.radiation[year][day - offset] = float(row["Hday"])
-                self.manureN[year][day - offset] = float(row["manureN"]) # TODO: delete after manure is implemented
+                self.manureN[year][day - offset] = float(row["manureN"])  # TODO: delete after manure is implemented
                 self.Taair[year][day - offset] = float(row["Taair"])
             except(IndexError, ValueError):
                 # prints out each problematic row in the weather CSV file
@@ -407,11 +411,12 @@ class Weather:
         # set average annual air temperature to long term average for years with incomplete data
         for year in range(len(years)):
             if year == 1 and start_day != 0:
-                for day in range(1,len(self.Taair[year])):
+                for day in range(1, len(self.Taair[year])):
                     self.Taair[year][day] = long_term_avg
             elif year == len(years) - 1 and end_day < 365:
                 for day in range(len(self.Taair[year])):
                     self.Taair[year][day] = long_term_avg
+
 
 class Time:
     def __init__(self, config):

@@ -1,12 +1,13 @@
-
 {
     "config":
     {
         "start_date" : "2009:244",
-        "end_date" : "2012:243",
+        "end_date" : "2012:246",
         "csv_dir": "output/CSVs/",
         "graphic_dir": "output/graphics/",
-        "run_tests": false
+        "run_tests": false,
+        "set_seed": false,
+        "seed": 0
     },
 
     "weather":
@@ -15,8 +16,7 @@
      "weather_table_name": "Observations",
      "dataset_ID": 1
     },
-
-    "output": "standard_output.json",
+    "output": "life_cycle_report.json",
 
     "farm":
     {

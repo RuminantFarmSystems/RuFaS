@@ -15,6 +15,8 @@ from RUFAS.classes import Config, State, Weather, Time
 from RUFAS.util import get_base_dir, read_json_file
 from RUFAS.output_handler import OutputHandler
 from RUFAS.test import test_handler
+import random
+import numpy
 
 global config, state, output, weather, time
 
@@ -144,6 +146,10 @@ def initialize_simulation(file_path: Path, data):
     # Instantiate objects using dictionary data from .json file
     try:
         config = Config(data['config'], data['weather'])
+
+        if config.set_seed:
+            random.seed(config.seed)
+            numpy.random.seed(config.seed)
 
         if config.run_tests:
             test_handler.run_tests()
