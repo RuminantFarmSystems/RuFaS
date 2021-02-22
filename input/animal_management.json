@@ -5,12 +5,12 @@
         "end_date" : "2012:246",
         "csv_dir": "output/CSVs/",
         "graphic_dir": "output/graphics/",
-        "run_tests": false,
+        "run_tests": true,
         "set_seed": false,
         "seed": 0
     },
     "weather": "barnyard_weather.csv",
-    "output": "life_cycle_report.json",
+    "output": "all_reports.json",
     "farm":
     {
         "fields": {

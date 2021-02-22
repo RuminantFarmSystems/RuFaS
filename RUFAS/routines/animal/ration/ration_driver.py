@@ -145,7 +145,7 @@ def ration_report(ration, available_feeds):
                 # [A.2.A.1]
                 else:
                     denom = 6.25
-                nutrient_amount[nutr] += (available_feeds[key]['CP'] / \
+                nutrient_amount[nutr] += (available_feeds[key]['CP'] /
                                           (denom * 100)) * val
             else:
                 nutrient_amount[nutr] += val * (available_feeds[key][nutr] / 100)

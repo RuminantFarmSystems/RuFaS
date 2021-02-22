@@ -42,6 +42,7 @@ class ManureStorageSummary(BaseReport):
                                 'P_liquid': ['manure_storage.P_liquid', 'kg', []],
                                 'K_liquid': ['manure_storage.K_liquid', 'kg', []],
                                 'TS_DM_effluent': ['manure_storage.TS_DM_effluent', 'kg', []],
+                                'CH4_emissions': ['manure_storage.CH4', 'kg', []],
                                 'manure_applied': ['manure_storage.manure_applied', 'kg', []],
                                 'N_applied': ['manure_storage.N_applied', 'kg', []],
                                 'P_applied': ['manure_storage.P_applied', 'kg', []]
@@ -59,6 +60,7 @@ class ManureStorageSummary(BaseReport):
                                  'P_liquid': ['manure_storage.P_liquid_annual', 'kg', 0],
                                  'K_liquid': ['manure_storage.K_liquid_annual', 'kg', 0],
                                  'TS_DM_effluent': ['manure_storage.TS_DM_effluent_annual', 'kg', 0],
+                                 'CH4_emissions': ['manure_storage.CH4_emissions_annual', 'kg', 0],
                                  'manure_applied': ['manure_storage.manure_applied_annual', 'kg', 0],
                                  'N_applied': ['manure_storage.N_applied_annual', 'kg', 0],
                                  'P_applied': ['manure_storage.P_applied_annual', 'kg', 0]

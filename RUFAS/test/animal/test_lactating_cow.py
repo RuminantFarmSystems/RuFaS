@@ -56,16 +56,15 @@ class LactatingCowTest(unittest.TestCase):
         """
         Sets up the inputs and expected outputs for the unit tests.
         """
-        self.inputs_outputs = animal_inputs_outputs.AnimalinputOutputs()
+        self.inputs_outputs = animal_inputs_outputs.AnimalInputOutputs()
         self.set_up_feeds()
-
 
     def test_manure_1(self):
         inputs = self.inputs_outputs.lactating_cow_input_1
         input_ration = self.inputs_outputs.lactating_cow_input_ration_1
         expected_manure = self.inputs_outputs.lactating_cow_expected_manure_1
         feed = self.feeds[0]
-        #hardcoded for now
+        # hardcoded for now
         DMI = 25
         p_intake, p_conc = 4, 0.3
 

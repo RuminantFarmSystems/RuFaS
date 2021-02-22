@@ -159,7 +159,7 @@ class FieldManagement:
         curr_year = time.year - 1
 
         next_day = curr_day + 1
-        next_year = curr_day + 1
+        next_year = curr_year + 1
 
         second_day = next_day + 1
 

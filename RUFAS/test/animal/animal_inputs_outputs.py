@@ -9,7 +9,7 @@ Author(s): Militsa Sotirova
 ################################################################################
 
 
-class AnimalinputOutputs:
+class AnimalInputOutputs:
     lactating_cow_input_1 = { 
         'BW': 650,
         'BCS': 3.5,
