@@ -54,6 +54,7 @@ class AnimalBase(object):
 			args.mature_body_weight: the mature body weight of the animal
 			args.events: events of the animal
         """
+
         self.id = args['id']
         self.breed = args['breed']
         self.birth_date = args['birth_date']
@@ -141,7 +142,7 @@ class AnimalBase(object):
 
         # amount of P in the animal (A.1G.A.3)
         self.p_animal = self.p_animal + self.p_gest + self.p_growth + \
-            (self.dP_reserves - dP_reserves_prev)
+                        (self.dP_reserves - dP_reserves_prev)
 
     def calc_base_manure(self):
         """
