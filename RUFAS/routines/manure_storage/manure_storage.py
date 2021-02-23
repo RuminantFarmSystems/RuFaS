@@ -334,14 +334,14 @@ class ManureStorage:
 
         def update_pen(self, animal_management):
             pen = animal_management.all_pens[self.pen_id]
-            self.raw_manure += pen.manure['Mkg']
-            self.VS_excreted += pen.manure['VSd'] + pen.manure['VSnd']
-            self.TS_excreted += (self.raw_manure - self.VS_excreted)
-            self.N_excreted += pen.manure['MN']
-            self.P_excreted += pen.manure['p_excrt_manure']
+            self.raw_manure = pen.manure['Mkg']
+            self.VS_excreted = pen.manure['VSd'] + pen.manure['VSnd']
+            self.TS_excreted = (self.raw_manure - self.VS_excreted)
+            self.N_excreted = pen.manure['MN']
+            self.P_excreted = pen.manure['p_excrt_manure']
 
             # TODO: Excreted Potassium will eventually be calculated in animal module
-            self.K_excreted += 0.181 * self.cow_num
+            self.K_excreted = 0.181 * self.cow_num
 
         def calibrate_water_use(self):
             """
@@ -550,17 +550,7 @@ class ManureStorage:
             self.WIP_frac = pen.manure['WIP_frac']
 
         def reset_daily_variables(self):
-            self.TS = 0
-            self.VS = 0
-            self.N = 0
-            self.P = 0
-            self.K = 0
-
-            self.TS_liquid = 0
-            self.VS_liquid = 0
-            self.N_liquid = 0
-            self.P_liquid = 0
-            self.K_liquid = 0
+            pass
 
     def annual_reset(self):
         self.manure_applied_annual = 0.0

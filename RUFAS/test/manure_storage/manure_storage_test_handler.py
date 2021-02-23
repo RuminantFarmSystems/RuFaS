@@ -1,10 +1,8 @@
 """
 RUFAS: Ruminant Farm Systems Model
-File name: test_handler.py
-Description: This file contains the function which runs the unit tests for
-    the routines of RUFAS.
-Author(s): Militsa Sotirova, militsasotirova@gmail.com
-            William Donovan, william.m.donovan@gmail.com
+File name: manure_storage_test_handler.py
+Description: driver for the manure storage unit test module
+Author(s): William Donovan, william.m.donovan@gmail.com
 """
 
 from unittest import main
@@ -13,7 +11,7 @@ from RUFAS.test.manure_storage import handler_test, manure_storage_initializatio
 
 def run_tests():
     """
-    Calls the unit test functions for the field_management routine.
+    Calls the unit test functions for the manure storage routine.
     """
     print('Running manure_storage tests...')
     main(module=handler_test, exit=False)

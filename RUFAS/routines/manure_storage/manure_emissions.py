@@ -14,5 +14,4 @@ def update_all(storage, manure):
 
 
 def methane(storage, manure):
-    manure.CH4_emissions = storage.VS * manure.Bo * manure.MCF * manure.MS * \
-                            manure.m3 * manure.CH4_collection_efficiency
+    manure.CH4_emissions = storage.VS * manure.Bo * manure.MCF * manure.MS * manure.m3
