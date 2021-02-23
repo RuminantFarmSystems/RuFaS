@@ -531,6 +531,9 @@ class AnimalManagement:
         calf_pens = []
         mixed_type_pens = []
         #dictionary showing the shortage of animals
+        ###animal type
+        #growing (heiferIs and heiferIIs)
+        #close-up (period about a month before calving) (heiferIIIs and dry cows)
         stall_shortage = {'calf': len(self.calves), 'heifer': (len(self.heiferIs) \
         + len(self.heiferIIs)+ len(self.heiferIIIs)), 'd_cow':len(dry_cows), 'l_cow': len(lactating_cows)}
         calves_grouped = False
@@ -542,12 +545,14 @@ class AnimalManagement:
         #list to keep track of already grouped pens
         grouped = []
         #sorting the available pen types
+        ##Pen types : [calves, heiferI, heiferIIs, heiferIIIs, d_cows, l_cows ]
+        #[HeiferIIs, heiferIIIs, d_cows]
         for pen in self.all_pens:
             if 'calf' in pen.pen_types and len(pen.pen_types) ==1 :
                 calf_pens.append(pen)
                 stall_shortage['calf'] -= pen.num_stalls  * pen.stocking_density
             elif 'heifer' in pen.pen_types and len(pen.pen_types) == 1:
-                calf_pens.append(pen)
+                heifer_pens.append(pen)
                 stall_shortage['heifer'] -= pen.num_stalls * pen.stocking_density
             elif 'd_cow' in pen.pen_types and len(pen.pen_types) == 1:
                 d_cow_pens.append(pen)
@@ -609,6 +614,7 @@ class AnimalManagement:
         ###########################
 
         #calf pen allocation
+        #TODO: make these lists deep copys
         calves = self.calves
         for pen in calf_pens:
             list = []
