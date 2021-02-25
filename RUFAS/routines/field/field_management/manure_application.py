@@ -63,10 +63,13 @@ def formulate_manure_application(manure_storage, m_app):
         # FM.4.A.1-3
         available_N = storage.N + storage.N_liquid
         available_P = storage.P + storage.P_liquid
+        available_K = storage.K + storage.K_liquid
 
         # FM.4.A.4
         N_frac = available_N / available_manure
         P_frac = available_P / available_manure
+        K_frac = available_K / available_manure
+        CH4_frac = storage.CH4 / available_manure
 
         # FM.4.A.5
         N_mass = min(available_N, desired_N)
@@ -78,6 +81,8 @@ def formulate_manure_application(manure_storage, m_app):
         # FM.4.A.7
         N_mass = applied_manure * N_frac
         P_mass = applied_manure * P_frac
+        K_mass = applied_manure * K_frac
+        CH4_mass = applied_manure * CH4_frac
 
         # FM.4.A.8
         solid_ratio = storage.TS / available_manure
@@ -85,15 +90,29 @@ def formulate_manure_application(manure_storage, m_app):
 
         solid_N_ratio = storage.N / available_N
         solid_P_ratio = storage.P / available_P
+        solid_K_ratio = storage.K / available_K
 
         liquid_N_ratio = storage.N_liquid / available_N
         liquid_P_ratio = storage.P_liquid / available_P
+        liquid_K_ratio = storage.K_liquid / available_K
+
+        VS_ratio = storage.VS / available_manure
+        VS_liquid_ratio = storage.VS_liquid / available_manure
+
+        VS_applied = VS_ratio * applied_manure
+        VS_liquid_applied = VS_liquid_ratio * applied_manure
+
+        storage.VS -= VS_applied
+        storage.VS_liquid -= VS_liquid_applied
 
         storage.N -= N_mass * solid_N_ratio
         storage.P -= P_mass * solid_P_ratio
+        storage.K -= K_mass * solid_K_ratio
+        storage.CH4 -= CH4_mass
 
         storage.N_liquid -= N_mass * liquid_N_ratio
         storage.P_liquid -= P_mass * liquid_P_ratio
+        storage.K_liquid -= K_mass * liquid_K_ratio
 
         storage.TS -= applied_manure * solid_ratio
         storage.TS_liquid -= applied_manure * liquid_ratio
@@ -101,8 +120,14 @@ def formulate_manure_application(manure_storage, m_app):
         desired_N -= N_mass
         desired_P -= P_mass
 
-        manure_application['WIP'] = applied_manure * storage.WIP_frac
-        manure_application['WOP'] = applied_manure * storage.WOP_frac
+        WIP_applied = applied_manure * storage.WIP_frac
+        WOP_applied = applied_manure * storage.WOP_frac
+
+        storage.WIP -= WIP_applied
+        storage.WOP -= WOP_applied
+
+        manure_application['WIP'] = WIP_applied
+        manure_application['WOP'] = WOP_applied
 
         manure_application['mass'] += applied_manure
 

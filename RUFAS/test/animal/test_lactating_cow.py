@@ -23,15 +23,14 @@ class LactatingCowTest(unittest.TestCase):
         feed_info_0 = {
             "feed_database": "input/databases/feeds.sqlite",
             "table_name": "feed_library",
+            "feeds_table": "user_feeds",
+            "feed_quality_table": "feed_quality",
+            "nutrient_table": "nutrients",
+            "purchased_feeds": [2, 26, 36, 86, 118, 136, 139],
+            "purchased_feeds_costs": {"2": 0.17, "26": 0.1, "36": 0, "86": 0,
+                                      "118": 0.39, "136": 0.53, "139": 0.25},
+            "growing_feeds": [],
 
-            "managed_feeds":
-                [
-                    "Corn_grain",
-                    "Legume_hay",
-                    "Cotton_seed",
-                    "Roasted_soybean",
-                    "Rye_hay"
-                ],
 
             "storage_options":
                 {

@@ -141,9 +141,9 @@
 			"horizontal_dist_to_milking_parlor": 1.6,
 			"number_of_stalls": 200,
 			"housing_type": "open air barn",
-			"bedding_type": "sawdust",
+			"bedding_type": "organic",
 			"pen_type": "freestall",
-			"manure_handling": "manual_scraping",
+			"manure_handling": "flush_system",
 			"manure_separator": "sedimentation",
 			"manure_storage": "storage_pit"
 		},
@@ -153,9 +153,9 @@
 			"horizontal_dist_to_milking_parlor": 1.6,
 			"number_of_stalls": 300,
 			"housing_type": "open air barn",
-			"bedding_type": "straw",
+			"bedding_type": "organic",
 			"pen_type": "tiestall",
-			"manure_handling": "manual_scraping",
+			"manure_handling": "automatic_alley_scrapers",
 			"manure_separator": "sedimentation",
 			"manure_storage": "storage_pit"
 		},
@@ -169,7 +169,7 @@
 			"pen_type": "tiestall",
 			"manure_handling": "manual_scraping",
 			"manure_separator": "sedimentation",
-			"manure_storage": "storage_pit"
+			"manure_storage": "anaerobic_lagoon"
 		},
 		"pen4": {
 			"id": 4,
@@ -179,9 +179,9 @@
 			"housing_type": "open air barn",
 			"bedding_type": "sand",
 			"pen_type": "tiestall",
-			"manure_handling": "manual_scraping",
+			"manure_handling": "flush_system",
 			"manure_separator": "sedimentation",
-			"manure_storage": "storage_pit"
+			"manure_storage": "anaerobic_lagoon"
 		},
 		"pen5": {
 			"id": 5,
@@ -191,9 +191,9 @@
 			"housing_type": "open air barn",
 			"bedding_type": "sand",
 			"pen_type": "tiestall",
-			"manure_handling": "manual_scraping",
+			"manure_handling": "automatic_alley_scrapers",
 			"manure_separator": "sedimentation",
-			"manure_storage": "storage_pit"
+			"manure_storage": "anaerobic_lagoon"
 		},
 		"pen6": {
 			"id": 6,
@@ -204,8 +204,8 @@
 			"bedding_type": "sand",
 			"pen_type": "tiestall",
 			"manure_handling": "manual_scraping",
-			"manure_separator": "sedimentation",
-			"manure_storage": "storage_pit"
+			"manure_separator": "rotary_screen",
+			"manure_storage": "storage_pit_2"
 		},
 		"pen7": {
 			"id": 7,
@@ -215,9 +215,9 @@
 			"housing_type": "open air barn",
 			"bedding_type": "sand",
 			"pen_type": "tiestall",
-			"manure_handling": "manual_scraping",
-			"manure_separator": "sedimentation",
-			"manure_storage": "storage_pit"
+			"manure_handling": "flush_system",
+			"manure_separator": "rotary_screen",
+			"manure_storage": "storage_pit_2"
 		},
 		"pen8": {
 			"id": 8,
@@ -227,9 +227,9 @@
 			"housing_type": "open air barn",
 			"bedding_type": "sand",
 			"pen_type": "tiestall",
-			"manure_handling": "manual_scraping",
-			"manure_separator": "sedimentation",
-			"manure_storage": "storage_pit"
+			"manure_handling": "automatic_alley_scrapers",
+			"manure_separator": "rotary_screen",
+			"manure_storage": "storage_pit_2"
 		}
 	}
 }

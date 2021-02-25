@@ -2,13 +2,13 @@
     "fertilizer": {
         "mixes": {
             "fert_1": {
-                "N": 0.0,
-                "P": 0.0,
-                "K": 0.0
+                "N": 0.24,
+                "P": 0.24,
+                "K": 0.24
             }
         },
-        "rotation_years": [],
-        "repeat": 0,
+        "rotation_years": [2009],
+        "repeat": 1,
         "mix": [],
         "year": [],
         "day": [],
@@ -30,8 +30,8 @@
         "surface_percent": []
     },
     "tillage": {
-        "rotation_years": [],
-        "repeat": 0,
+        "rotation_years": [2009],
+        "repeat": 1,
         "year": [],
         "day": [],
         "percent_incorporated": [],

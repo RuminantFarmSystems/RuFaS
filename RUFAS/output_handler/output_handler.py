@@ -6,6 +6,7 @@ Author(s): William Donovan, wmdonovan@wisc.edu
            Jacob Johnson, jacob8399@gmail.com
 """
 import shutil
+import sys
 from pathlib import Path
 
 from RUFAS import util
@@ -124,9 +125,22 @@ class OutputHandler:
                 report.annual_flush()
 
     def produce_graphics(self):
+        report_count = 0
         for report_name in self.reports:
+            case = report_count % 4
+            if case == 0:
+                sys.stdout.write("—")
+            elif case == 1:
+                sys.stdout.write("\\")
+            elif case == 2:
+                sys.stdout.write("|")
+            else:
+                sys.stdout.write("/")
+                
             report = self.reports[report_name]
             report.produce_report_graphics()
+            sys.stdout.write("\b")
+            report_count += 1
 
     def finalize(self, state, weather, time):
         for report_name in self.reports:

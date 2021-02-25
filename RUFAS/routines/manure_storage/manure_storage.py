@@ -15,18 +15,15 @@ def daily_manure_storage_routine(manure_storage, animal_management):
 
     for pen_id in manure_storage.pens:
         pen = manure_storage.pens[pen_id]
-        pen.reset_daily_variables()
         pen.update_pen(animal_management)
         manure_handling.update_all(pen, manure_storage)
 
     for separator_type in manure_storage.separators:
         separator = manure_storage.separators[separator_type]
-        separator.reset_daily_variables()
         manure_separator.update_all(separator, manure_storage)
 
     for storage_type in manure_storage.storage:
         storage_system = manure_storage.storage[storage_type]
-        storage_system.reset_daily_variables()
         manure_emissions.update_all(storage_system, manure_storage)
 
     manure_storage.summarize_manure_storage()
@@ -237,6 +234,8 @@ class ManureStorage:
         self.other_solids = 0.0
         self.other_liquids = 0.0
 
+        [separator.reset_daily_variables() for separator in self.separators.values()]
+
     def summarize_annual_variables(self):
         self.raw_manure_annual += self.raw_manure
 
@@ -291,12 +290,16 @@ class ManureStorage:
             self.raw_manure = pen.manure['Mkg']
 
             self.VS_excreted = pen.manure['VSd'] + pen.manure['VSnd']
-            self.TS_excreted = self.raw_manure - self.VS_excreted
+            self.TS_excreted = pen.manure['TSd']
             self.N_excreted = pen.manure['MN']
             self.P_excreted = pen.manure['p_excrt_manure']
+            self.WIP_frac = pen.manure['WIP_frac']
+            self.WIP = self.raw_manure * self.WIP_frac
+            self.WOP_frac = pen.manure['WOP_frac']
+            self.WOP = self.raw_manure * self.WOP_frac
+            self.CH4 = pen.manure['CH4_manure']
 
-            # TODO: Excreted Potassium will eventually be calculated in animal module
-            self.K_excreted = 0.181 * self.cow_num
+            self.K_excreted = pen.manure['K_manure']
 
             self.density = 994.0
 
@@ -313,7 +316,6 @@ class ManureStorage:
             self.TS_loss_perc = 0.02
             self.VS_loss_perc = 0.85
             self.flow_rate = 0
-            self.NH4 = 0
 
             self.calibrate_water_use()
             self.calibrate_bedding()
@@ -321,27 +323,20 @@ class ManureStorage:
             self.bedding_washed = self.bedding_washed_perc * self.bedding_added
             self.flush_water_daily = self.water_use_rate * self.cow_num
 
-        def reset_daily_variables(self):
-            self.bedding_added = 0
-            self.water_use_rate = 0
-            self.flush_water_volume = 0
-            self.bedding_washed_perc = 0
-            self.bedding_washed = 0
-            self.bedding_dry_matter = 0
-
-            self.TS_loss = 0.0
-            self.VS_loss = 0.0
-
         def update_pen(self, animal_management):
             pen = animal_management.all_pens[self.pen_id]
             self.raw_manure = pen.manure['Mkg']
             self.VS_excreted = pen.manure['VSd'] + pen.manure['VSnd']
-            self.TS_excreted = (self.raw_manure - self.VS_excreted)
+            self.TS_excreted = pen.manure['TSd']
             self.N_excreted = pen.manure['MN']
             self.P_excreted = pen.manure['p_excrt_manure']
+            self.K_excreted = pen.manure['K_manure']
+            self.CH4 = pen.manure['CH4_manure']
 
-            # TODO: Excreted Potassium will eventually be calculated in animal module
-            self.K_excreted = 0.181 * self.cow_num
+            self.WIP_frac = pen.manure['WIP_frac']
+            self.WIP = self.raw_manure * self.WIP_frac
+            self.WOP_frac = pen.manure['WOP_frac']
+            self.WOP = self.raw_manure * self.WOP_frac
 
         def calibrate_water_use(self):
             """
@@ -406,6 +401,9 @@ class ManureStorage:
             self.N = 0
             self.P = 0
             self.K = 0
+            self.CH4 = 0
+            self.WIP = 0
+            self.WOP = 0
 
             self.TS_liquid = 0
             self.VS_liquid = 0
@@ -434,6 +432,9 @@ class ManureStorage:
             self.N = 0
             self.P = 0
             self.K = 0
+            self.CH4 = 0
+            self.WIP = 0
+            self.WOP = 0
 
             self.TS_liquid = 0
             self.VS_liquid = 0
@@ -539,18 +540,17 @@ class ManureStorage:
             self.N = 0
             self.P = 0
             self.K = 0
+            self.CH4 = 0
+            self.WIP = 0
+            self.WIP_frac = 0
+            self.WOP = 0
+            self.WOP_frac = 0
 
             self.TS_liquid = 0
             self.VS_liquid = 0
             self.N_liquid = 0
             self.P_liquid = 0
             self.K_liquid = 0
-
-            self.WOP_frac = pen.manure['WOP_frac']
-            self.WIP_frac = pen.manure['WIP_frac']
-
-        def reset_daily_variables(self):
-            pass
 
     def annual_reset(self):
         self.manure_applied_annual = 0.0

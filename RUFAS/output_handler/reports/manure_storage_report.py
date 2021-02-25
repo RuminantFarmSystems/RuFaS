@@ -42,10 +42,7 @@ class ManureStorageSummary(BaseReport):
                                 'P_liquid': ['manure_storage.P_liquid', 'kg', []],
                                 'K_liquid': ['manure_storage.K_liquid', 'kg', []],
                                 'TS_DM_effluent': ['manure_storage.TS_DM_effluent', 'kg', []],
-                                'CH4_emissions': ['manure_storage.CH4', 'kg', []],
-                                'manure_applied': ['manure_storage.manure_applied', 'kg', []],
-                                'N_applied': ['manure_storage.N_applied', 'kg', []],
-                                'P_applied': ['manure_storage.P_applied', 'kg', []]
+                                'CH4_emissions': ['manure_storage.CH4_emissions', 'kg', []],
                                 }
 
         self.annual_variables = {'year': ['time.calendar_year', '', 0],
@@ -61,9 +58,6 @@ class ManureStorageSummary(BaseReport):
                                  'K_liquid': ['manure_storage.K_liquid_annual', 'kg', 0],
                                  'TS_DM_effluent': ['manure_storage.TS_DM_effluent_annual', 'kg', 0],
                                  'CH4_emissions': ['manure_storage.CH4_emissions_annual', 'kg', 0],
-                                 'manure_applied': ['manure_storage.manure_applied_annual', 'kg', 0],
-                                 'N_applied': ['manure_storage.N_applied_annual', 'kg', 0],
-                                 'P_applied': ['manure_storage.P_applied_annual', 'kg', 0]
                                  }
 
 
@@ -136,12 +130,12 @@ class HandlingReport(BaseHandlingReport):
             'N_excreted': ['handler.N_excreted', 'kg', []],
             'P_excreted': ['handler.P_excreted', 'kg', []],
             'K_excreted': ['handler.K_excreted', 'kg', []],
-            'bedding_added': ['handler.bedding_added', 'kg', []],
             'flush_water_volume': ['handler.flush_water_volume', 'kg', []],
-            'bedding_dry_matter': ['handler.bedding_dry_matter', 'kg', []],
             'TS_loss': ['handler.TS_loss', 'kg', []],
             'VS_loss': ['handler.VS_loss', 'kg', []],
-            'NH4': ['handler.NH4', 'kg', []]
+            'WIP': ['handler.WIP', 'kg', []],
+            'WOP': ['handler.WOP', 'kg', []],
+            'CH4': ['handler.CH4', 'kg', []]
         }
 
         self.annual_variables = {
@@ -166,7 +160,10 @@ class SeparatorReport(BaseSeparatorReport):
             'N_liquid': ['separator.N_liquid', 'kg', []],
             'P_liquid': ['separator.P_liquid', 'kg', []],
             'K_liquid': ['separator.K_liquid', 'kg', []],
-            'TS_DM_effluent': ['separator.TS_DM_effluent', 'kg', []]
+            'TS_DM_effluent': ['separator.TS_DM_effluent', 'kg', []],
+            'WIP': ['separator.WIP', 'kg', []],
+            'WOP': ['separator.WOP', 'kg', []],
+            'CH4': ['separator.CH4', 'kg', []]
         }
 
         self.annual_variables = {
@@ -190,6 +187,9 @@ class StorageReport(BaseStorageReport):
             'N_liquid': ['storage.N_liquid', 'kg', []],
             'P_liquid': ['storage.P_liquid', 'kg', []],
             'K_liquid': ['storage.K_liquid', 'kg', []],
+            'WIP': ['storage.WIP', 'kg', []],
+            'WOP': ['storage.WOP', 'kg', []],
+            'CH4': ['storage.CH4', 'kg', []],
             'WOP_frac': ['storage.WOP_frac', '%', []],
             'WIP_frac': ['storage.WIP_frac', '%', []]
         }
