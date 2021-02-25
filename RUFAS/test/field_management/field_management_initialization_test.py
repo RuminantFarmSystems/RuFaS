@@ -25,7 +25,7 @@ class FieldManagementInitializationTest(FieldManagementTest, unittest.TestCase):
             to test the function check_conditions()
         """
         self.saturated_soil = FMSoil(soil_water=30, fc_water=20)
-        self.dry_soil = FMSoil(fc_water=20, soil_water=30)
+        self.dry_soil = FMSoil(soil_water=20, fc_water=30)
 
     def setUp(self) -> None:
         """
