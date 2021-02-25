@@ -350,9 +350,6 @@ class Pen:
         requirements of the animals in the pen.
 
         Args:
-            temp: the temperature on the given day. Taken from the weather object
-            pasture_concentrate: TODO: needs description
-            housing: TODO: needs description
             feed: instance of the Feed class
             available_feeds: instance of the AvailableFeeds class defined in ration_driver.py
         """
@@ -471,8 +468,8 @@ class Pen:
         self.lactating_total = lactating_total
 
         for i in self.manure.keys():
-            assert self.manure[i] == self.calf_total[i] + self.heifer_total[i] + self.dry_total[i] + \
-                   self.lactating_total[i]
+            assert round(self.manure[i], 3) == round(self.calf_total[i] + self.heifer_total[i] + self.dry_total[i] + \
+                   self.lactating_total[i], 3)
 
     def reset_manure(self):
         # total manure excretion of the animals in the pen

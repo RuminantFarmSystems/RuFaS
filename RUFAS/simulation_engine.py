@@ -68,11 +68,12 @@ def simulate(input_file_path: Path):
     print("Total Simulation Time: {} seconds\n".format(str(t_end_sim - t_start_sim)))
 
     t_start_graphics = timer.time()
-    print('Producing Graphics...')
+    sys.stdout.write('\nProducing Graphics ')
     output.produce_graphics()
     t_end_graphics = timer.time()
-    print("Output Successful. Graphics stored in: {}".format(config.graphic_dir))
-    print("Time to produce graphics: {}. Total Run Time: {} seconds".format(str(t_end_graphics - t_start_graphics),
+    sys.stdout.write("\nOutput Successful. Graphics stored in: {}".format(config.graphic_dir))
+    sys.stdout.write(
+        "\nTime to produce graphics: {}. Total Run Time: {} seconds".format(str(t_end_graphics - t_start_graphics),
                                                                             str((t_end_sim - t_start_sim) +
                                                                                 (t_end_graphics - t_start_graphics))))
 

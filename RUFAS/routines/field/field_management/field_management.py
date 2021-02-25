@@ -208,14 +208,6 @@ class FieldManagement:
         return True
 
     def update_annual_variables(self, manure_storage):
-        manure_storage.manure_applied = self.manure_applied
-        manure_storage.N_applied = self.manure_N_applied
-        manure_storage.P_applied = self.manure_P_applied
-
-        manure_storage.manure_applied_annual += manure_storage.manure_applied
-        manure_storage.N_applied_annual += manure_storage.N_applied
-        manure_storage.P_applied_annual += manure_storage.P_applied
-
         self.manure_applied_annual += self.manure_applied
         self.manure_N_applied_annual += self.manure_N_applied
         self.manure_P_applied_annual += self.manure_P_applied

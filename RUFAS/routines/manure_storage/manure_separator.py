@@ -78,18 +78,24 @@ def update_storage(separator, manure):
         separator
         manure
     """
+    storage = manure.storage[separator.storage_system]
 
-    manure.storage[separator.storage_system].TS += separator.TS
-    manure.storage[separator.storage_system].TS_liquid += separator.TS_liquid
+    storage.TS += separator.TS
+    storage.TS_liquid += separator.TS_liquid
 
-    manure.storage[separator.storage_system].VS += separator.VS
-    manure.storage[separator.storage_system].VS_liquid += separator.VS_liquid
+    storage.VS += separator.VS
+    storage.VS_liquid += separator.VS_liquid
 
-    manure.storage[separator.storage_system].N += separator.N
-    manure.storage[separator.storage_system].N_liquid += separator.N_liquid
+    storage.N += separator.N
+    storage.N_liquid += separator.N_liquid
 
-    manure.storage[separator.storage_system].P += separator.P
-    manure.storage[separator.storage_system].P_liquid += separator.P_liquid
+    storage.P += separator.P
+    storage.P_liquid += separator.P_liquid
 
-    manure.storage[separator.storage_system].K += separator.K
-    manure.storage[separator.storage_system].K_liquid += separator.K_liquid
+    storage.K += separator.K
+    storage.K_liquid += separator.K_liquid
+
+    storage.CH4 += separator.CH4
+
+    storage.WIP += separator.WIP
+    storage.WOP += separator.WOP

@@ -31,6 +31,8 @@ def update_all(pen, manure):
     P_loss(pen, manure)
     K_loss(pen, manure)
     solids(pen, manure)
+    CH4(pen, manure)
+    WIP_WOP(pen, manure)
 
 
 def flush_water(pen, manure):
@@ -106,3 +108,12 @@ def solids(pen, manure):
 
     manure.separators[pen.separator].TS += pen.TS_loss
     manure.separators[pen.separator].VS += pen.VS_loss
+
+
+def CH4(pen, manure):
+    manure.separators[pen.separator].CH4 += pen.CH4
+
+
+def WIP_WOP(pen, manure):
+    manure.separators[pen.separator].WIP += pen.WIP
+    manure.separators[pen.separator].WOP += pen.WOP
