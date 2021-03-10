@@ -91,7 +91,7 @@ model.CP = pyo.Param(model.feed, model.nrg, initialize = CP_dat)
 model.dRUP = pyo.Param(model.feed, model.nrg, initialize = dRUP_dat)
 
 #variables
-
+#bounds functti
 def fb(model, i, j):
     return(0, limit_dat[i,j])
 model.feed_amount = pyo.Var(model.feed*model.nrg, domain = pyo.PositiveReals,
