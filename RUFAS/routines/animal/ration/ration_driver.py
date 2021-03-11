@@ -10,6 +10,7 @@ Author(s): Chris VanKerkhove, cjv47@cornell.edu
 """
 from RUFAS.routines.animal.ration import animal_requirements
 from RUFAS.routines.animal.ration import ration_NLP as NLP
+from RUFAS.routines.animal.ration import pyomo_solver as pslv
 import statistics as stat
 import math
 
@@ -71,7 +72,7 @@ def optimization(requirements, available_feeds, BW, animal_type, cow_type):
     return solution
 
 
-def ration_formulation(pen, available_feeds, animal_type, cow_type):
+def ration_formulation(pen, feed, available_feeds, animal_type, cow_type):
     """
     Function that links the ration_driver file with the calc_ration function in
     pen.py. Returns a dictionary of the rations by feed and status of the NLP
@@ -79,14 +80,24 @@ def ration_formulation(pen, available_feeds, animal_type, cow_type):
 
     Args:
         pen: an object of class Pen
+        feed: an object of class Feed
         available_feeds: an object of class AvailableFeeds
         animal_type: string representation of the type of animal (cow, heifer)
         cow_type: Boolean which is True if cow is lactating, False otherwise
     """
+
     # creating instance of class requirements
     req = Requirements()
     req.set_requirements(pen, animal_type, False)
     BW = pen.avg_BW
+
+    ###
+    #Pyomo Nutrients Stuff
+    available_feeds.pyomo_nutrients_data(feed, animal_type, cow_type)
+    req.pyomo_req['BW'] = BW
+    pslv.create_model(available_feeds.pyomo_data, req.pyomo_req, available_feeds.feeds)
+    ####
+
     solution = optimization(req, available_feeds, BW, animal_type, cow_type)
     # Reduction of milk production estimate process to achieve feasible solution
     if animal_type == 'cow':
@@ -123,7 +134,7 @@ def ration_formulation(pen, available_feeds, animal_type, cow_type):
     #safeguard if scipy SLSQP bounds error still occurs after many iterations
     #using previous cycles ration for this pen
     else:
-        return pen.ration / len(pen.animals_in_pen)
+        return pen.ration
 
 
 def ration_report(ration, available_feeds):
@@ -211,6 +222,8 @@ class Requirements:
         self.P_req = 0
         # dry matter intake estimation (kg)
         self.DMIest = 0
+        # pyomo requirements dictionary
+        self.pyomo_req = {}
 
     def set_requirements(self, pen, animal_type, recalc):
         """
@@ -326,6 +339,16 @@ class Requirements:
         self.P_req = stat.mean(P_req)
         self.DMIest = stat.mean(DMIest)
 
+        #pyomo requirements dictionary
+        self.pyomo_req['NEmaint'] = self.NEmaint
+        self.pyomo_req['NEa'] = self.NEa
+        self.pyomo_req['NEg'] = self.NEg
+        self.pyomo_req['NEpreg'] = self.NEpreg
+        self.pyomo_req['NEl'] = self.NEl
+        self.pyomo_req['MP_req'] = self.MP_req
+        self.pyomo_req['Ca_req'] = self.Ca_req
+        self.pyomo_req['P_req'] = self.P_req
+        self.pyomo_req['DMIest'] = self.DMIest
 
 class AvailableFeeds:
     """
@@ -381,6 +404,10 @@ class AvailableFeeds:
         self.heiferI_limit = []
         # calf limit
         self.calf_limit = []
+        #pyomo dictionary structure
+        self.pyomo_data = {}
+        #list of the feeds used in this ration
+        self.feeds = []
 
     def feed_nutrients(self, feed):
         """
@@ -421,3 +448,62 @@ class AvailableFeeds:
             else:
                 self.lactating_cow_limit.append(feed['limit'])
                 self.dry_cow_limit.append(feed['limit'])
+
+
+    def pyomo_nutrients_data(self, feed, animal_type, cow_type):
+        """
+        Class function that manipulates the available feeds nutrient information
+        into a valid data input for the pyomo structured solver.
+
+        Arg(s):
+            feed: an instance of the Feed class object
+            animal_type: string representation  of the animal type
+            cow_type: boolean, True if cow is lactating
+        """
+        # available feeds dictionary from the feed module
+        available_feeds = feed.available_feeds
+        # dictionary of feed costs
+        feed_costs = feed.feed_costs
+        #list of parameters for non-LP
+        params = ['TDN', 'DE', 'EE', 'is_fat', 'calcium',
+                'phosphorus', 'NDF', 'is_wetforage', 'Kd', 'N_A', 'N_B',
+                    'CP', 'dRUP']
+        #list of different energy types feed decision variable are split across
+        enrg = ['mact', 'lact', 'growth']
+        #structuring empty data container
+        for p in params:
+            self.pyomo_data[p] = {}
+        self.pyomo_data['price'] = {}
+        self.pyomo_data['ftype'] = {}
+        self.pyomo_data['limit'] = {}
+        feeds = []
+        #iterating through each feed available in formulation
+        for key, feed in available_feeds.items():
+            feeds.append(key)
+            #price and type data
+            for s in enrg:
+                self.pyomo_data['price'][key, s] = feed_costs[key]
+                self.pyomo_data['ftype'][key, s] = feed['type']
+            #iterating through all param values for non-LP
+            for p in params:
+                self.pyomo_data[p][key, 'mact'] = feed[p]
+                self.pyomo_data[p][key, 'lact'] = feed[p]
+                self.pyomo_data[p][key, 'growth'] = feed[p]
+            #checking if grown feed available and pop
+            if isinstance(feed['limit'], dict):
+                if cow_type:
+                    for s in enrg:
+                        self.pyomo_data['limit'][key, s] = \
+                                                 feed['limit']['lactating_cows']
+                elif animal_type == 'cow':
+                    for s in  enrg:
+                        self.pyomo_data['limit'][key, s] = feed['limit']['dry_cows']
+                else:
+                    for s in enrg:
+                        self.pyomo_data['limit'][key, s] = feed['limit']['heiferIIIs']
+            #if there are not farm grown feeds in diet
+            else:
+                for s in enrg:
+                    self.pyomo_data['limit'][key, s] = feed['limit']
+        #populating feeds list class variable
+        self.feeds = feeds
