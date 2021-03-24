@@ -93,9 +93,9 @@ def ration_formulation(pen, feed, available_feeds, animal_type, cow_type):
 
     ###
     #Pyomo Nutrients Stuff
-    available_feeds.pyomo_nutrients_data(feed, animal_type, cow_type)
-    req.pyomo_req['BW'] = BW
-    pslv.create_model(available_feeds.pyomo_data, req.pyomo_req, available_feeds.feeds)
+    #available_feeds.pyomo_nutrients_data(feed, animal_type, cow_type)
+    #req.pyomo_req['BW'] = BW
+    #pslv.create_model(available_feeds.pyomo_data, req.pyomo_req, available_feeds.feeds)
     ####
 
     solution = optimization(req, available_feeds, BW, animal_type, cow_type)
