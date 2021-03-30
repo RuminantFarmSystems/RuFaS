@@ -99,7 +99,8 @@ class Cow(HeiferIII):
         self.DHD = 0  # daily horizontal distance, km
         self.CI = 0  # calving interval, days
         self.CI_history = []
-        self.CBW = 0  # weight of cow when she gives birth
+        self.BW_at_calving = 0 # weight of cow when she gives birth
+        self.CBW = 0 # calf birth weight
         self.daily_growth = 0  # change in body weight, kg
         self.calves = 0
         self.calving_to_preg_time = 0
@@ -348,6 +349,7 @@ class Cow(HeiferIII):
         if self.days_in_preg == self.gestation_length:
             conceptus_growth = - self.conceptus_weight
             self.conceptus_weight = 0
+            self.tissue_changed = 0
         elif self.days_in_preg > 50:
             conceptus_total_weight = (0.0148 * self.gestation_length - 2.408) * CBW
             conceptus_param = conceptus_total_weight ** (1 / 3) / (
@@ -357,29 +359,46 @@ class Cow(HeiferIII):
             self.conceptus_weight += conceptus_growth
         else:
             conceptus_growth = 0
+        
 
         if self.calves == 1:
-            target_adg_cow = \
-                (0.92 - 0.82) * 0.96 * self.mature_body_weight / CI
+            if self.days_in_preg < 1:
+                target_adg_cow = \
+                    (0.92 - 0.82) * 0.96 * self.mature_body_weight / CI
+            else:
+                target_adg_cow = \
+                    (0.92 * self.mature_body_weight - self.body_weight)/(self.gestation_length - self.days_in_preg+1)
         elif self.calves == 2:
-            target_adg_cow = \
-                (1 - 0.92) * 0.96 * self.mature_body_weight / CI
+            if self.days_in_preg < 1:
+                target_adg_cow = \
+                    (1 - 0.92) * 0.96 * self.mature_body_weight / CI
+            else:
+                target_adg_cow = \
+                    (self.mature_body_weight - self.body_weight)/(self.gestation_length - self.days_in_preg+1)
+
         else:  # parity > 2
             target_adg_cow = 0
 
         if self.days_in_milk == 0:
-            bodyweight_tissue = 0
+            if self.days_in_preg == 0:
+                bodyweight_tissue = 0
+            else:
+                bodyweight_tissue = self.tissue_changed / (self.gestation_length - AnimalBase.config['days_in_preg_when_dry'])
         else:
             if self.calves == 1:
                 bodyweight_tissue = \
                     -20 / 65 * math.exp(1 - self.days_in_milk / 65) + \
                     20 / (65 ** 2) * self.days_in_milk * \
                     math.exp(1 - self.days_in_milk / 65)
+                if self.days_in_preg == AnimalBase.config['days_in_preg_when_dry'] - 1:
+                    self.tissue_changed = 20 * self.days_in_milk/65 * math.exp(1 - self.days_in_milk/65)
             else:  # parity > 1
                 bodyweight_tissue = \
                     -40 / 70 * math.exp(1 - self.days_in_milk / 70) + \
                     40 / (70 ** 2) * self.days_in_milk * \
                     math.exp(1 - self.days_in_milk / 70)
+                if self.days_in_preg == AnimalBase.config['days_in_preg_when_dry'] - 1:
+                    self.tissue_changed = 40 * self.days_in_milk/70 * math.exp(1 - self.days_in_milk/70)
 
         return target_adg_cow + conceptus_growth + bodyweight_tissue
 
@@ -419,8 +438,9 @@ class Cow(HeiferIII):
                     self.events.get_most_recent_date(c.NEW_BIRTH)
                 self.CI = self.days_born - last_time_given_birth
                 self.CI_history.append(self.CI)
-            self.CBW = self.body_weight
+            self.BW_at_calving = self.body_weight
             self.events.add_event(self.days_born, sim_day, c.NEW_BIRTH)
+            self.death_update()
             self._health_cull_update()
             new_born = True
 
@@ -1015,6 +1035,11 @@ class Cow(HeiferIII):
             self.events.add_event(
                 self.days_born, sim_day, self.cull_reason)
             return True
+        if self.days_born == self.future_death_date:
+            self.culled = True
+            self.events.add_event(self.days_born, sim_day, c.DEATH_CULL)
+            self.cull_reason = c.DEATH_CULL
+            return True
         return False
 
     def _health_cull_update(self):
@@ -1064,3 +1089,22 @@ class Cow(HeiferIII):
             x = (cull_time_upper_limit - cull_time_lower_limit) / (cull_reason_upper_limit - cull_reason_lower_limit)
             self.future_cull_date = round(
                 cull_time_lower_limit + x * (cull_time_rand - cull_reason_lower_limit) + self.days_born)
+
+    def death_update(self):
+        death_rate = 0
+        if self.calves >= 4:
+            death_rate = AnimalBase.config['parity_death_prob'][3]
+        else:
+            death_rate = AnimalBase.config['parity_death_prob'][self.calves-1]
+        death_rand = random()
+        if (death_rand <= death_rate):
+            death_upper_limit = death_lower_limit = death_time_upper_limit = death_time_lower_limit = 0
+            death_date_random = random()
+            for i in range(len(AnimalBase.config['death_cull_prob']) - 1):
+                if (AnimalBase.config['death_cull_prob'][i] <= death_date_random < AnimalBase.config['death_cull_prob'][i+1]):
+                    death_lower_limit = AnimalBase.config['death_cull_prob'][i]
+                    death_upper_limit = AnimalBase.config['death_cull_prob'][i+1]
+                    death_time_lower_limit = AnimalBase.config['death_cull_prob'][i]
+                    death_time_upper_limit = AnimalBase.config['death_cull_prob'][i+1]
+            n = (death_time_upper_limit-death_time_lower_limit) / (death_upper_limit-death_lower_limit)
+            self.future_death_date = round(death_time_lower_limit + n * (death_date_random - death_lower_limit) + self.days_born)   

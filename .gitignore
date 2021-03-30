@@ -18,6 +18,8 @@
 # folders
 build
 others
+env/
+venv/
 
 # Ignore contents of output directory, except for .keep file
 # This is because we want to keep the output direcectory, and git

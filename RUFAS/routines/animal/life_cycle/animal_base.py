@@ -86,6 +86,7 @@ class AnimalBase(object):
         self.p_growth = 0
         self.p_maint_feces = 0
         self.conceptus_weight = 0
+        self.tissue_changed = 0
 
         if 'body_weight_history' in args:
             self.body_weight_history = args['body_weight_history']
