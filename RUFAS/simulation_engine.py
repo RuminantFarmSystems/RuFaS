@@ -47,20 +47,10 @@ def simulate(input_file_path: Path):
 
     t_start_sim = timer.time()
 
-    sys.stdout.write("Simulating ")
+    sys.stdout.write("Simulating  ")
     # MAIN Simulation Loop
     while not time.end_simulation():
-        case = time.year % 4
-        if case == 0:
-            sys.stdout.write("—")
-        elif case == 1:
-            sys.stdout.write("\\")
-        elif case == 2:
-            sys.stdout.write("|")
-        else:
-            sys.stdout.write("/")
         annual_simulation()
-        sys.stdout.write("\b")
 
     output.finalize(state, weather, time)
     t_end_sim = timer.time()
@@ -111,7 +101,23 @@ def annual_simulation():
     routines.annual_fields_routine(state.fields, time)
     routines.annual_feed_routine(state.feed)
 
+    case = 0
     while not time.end_year():
+        if time.day % 50 == 0:
+            sys.stdout.write("\b")
+            if case == 0:
+                sys.stdout.write("—")
+                case += 1
+            elif case == 1:
+                sys.stdout.write("\\")
+                case += 1
+            elif case == 2:
+                sys.stdout.write("|")
+                case += 1
+            else:
+                sys.stdout.write("/")
+                case = 0
+
         daily_simulation()
 
     # Post-Annual Routines

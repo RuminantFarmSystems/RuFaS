@@ -17,7 +17,14 @@ def daily_fields_routine(fields, manure_storage, weather, time):
     for field in fields.fields.values():
         soil = field.soil
         crop = field.crop
+        crop_type = crop.current_crop
         field_management = field.field_management
+
+        # If the crop is not planted yet, determine whether it is planted today
+        # Necessary here so that field management can be scheduled prior to planting
+        if not crop_type.planted and not crop_type.harvested:
+            calculate_start(soil, crop, field_management, weather, time)
+
         daily_field_management_routine(soil, manure_storage, field_management, weather, time)
         daily_soil_routine(soil, crop, field_management, weather, time)
         daily_crop_routine(soil, crop, field_management, weather, time)

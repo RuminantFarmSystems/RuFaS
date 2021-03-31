@@ -16,16 +16,6 @@ from RUFAS.routines.animal.ration import cow_requirements as req
 from RUFAS.routines.animal.ration import ration_driver as ration_driver
 
 
-def phosphorus_in_ration(DMI, ration_per_animal, feed):
-    # TODO: referenced below, not implemented
-    return 0
-
-
-def calc_DMI(ration_per_animal, feed):
-    # TODO: referenced below, not implemented
-    return 0
-
-
 class Pen:
     """
     Manages a pen's operation. Stores the characteristics of the pen and the

@@ -88,9 +88,6 @@ class Cow(HeiferIII):
 
         # current hard-coded values necessary for nutrient requirement
         # calculations
-        self.estrus_count = 0
-        self.gestation_length = 0
-        self.days_in_preg = 0
         self.BCS = 3.5  # body condition score
         self.CP_milk = 3.2
         self.lactose_milk = 4.85

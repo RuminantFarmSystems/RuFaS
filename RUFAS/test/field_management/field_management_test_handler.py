@@ -15,8 +15,8 @@ def run_tests():
         Calls the unit test functions for the field_management routine.
     """
     print('Running field_management tests...')
-    main(module=fertilizer_application_test, exit=False)
-    main(module=field_management_initialization_test, exit=False)
-    main(module=manure_application_test, exit=False)
-    main(module=tillage_application_test, exit=False)
+    main(module=fertilizer_application_test, exit=False, buffer=False)
+    main(module=field_management_initialization_test, exit=False, buffer=False)
+    main(module=manure_application_test, exit=False, buffer=False)
+    main(module=tillage_application_test, exit=False, buffer=False)
     print()

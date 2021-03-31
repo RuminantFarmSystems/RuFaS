@@ -48,12 +48,9 @@ def daily_crop_routine(soil, crop, field_management, weather, time):
         soil.residue_harvest = 0
         soil.soil_layers[0].tillage_percent = 0
 
-        # If the crop is not planted yet, determine whether it is planted today
-        if not crop_type.planted and not crop_type.harvested:
-            calculate_start(soil, crop, field_management, weather, time)
-
         # While the crop is planted:
-        elif not crop_type.harvested:
+        if crop_type.planted and not crop_type.harvested:
+
             # If the crop is growing, run the routines
             if crop_type.growing:
                 heat_units.update_all(crop_type, weather, time)

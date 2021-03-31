@@ -16,10 +16,10 @@ def run_tests():
     Calls the unit test functions for the manure excretion subroutine.
     """
     print('Running manure excretion tests...')
-    main(module=calf_test, exit=False)
-    main(module=heifer_test, exit=False)
-    main(module=dry_cow_test, exit=False)
-    main(module=lactating_cow_test, exit=False)
+    main(module=calf_test, exit=False, buffer=False)
+    main(module=heifer_test, exit=False, buffer=False)
+    main(module=dry_cow_test, exit=False, buffer=False)
+    main(module=lactating_cow_test, exit=False, buffer=False)
     print()
 
 

@@ -14,8 +14,8 @@ def run_tests():
     Calls the unit test functions for the manure storage routine.
     """
     print('Running manure_storage tests...')
-    main(module=handler_test, exit=False)
-    main(module=manure_storage_initialization_test, exit=False)
-    main(module=separator_test, exit=False)
-    main(module=storage_test, exit=False)
+    main(module=handler_test, exit=False, buffer=False)
+    main(module=manure_storage_initialization_test, exit=False, buffer=False)
+    main(module=separator_test, exit=False, buffer=False)
+    main(module=storage_test, exit=False, buffer=False)
     print()
