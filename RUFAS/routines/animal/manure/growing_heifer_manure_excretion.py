@@ -48,7 +48,6 @@ def manure_calculations(ration_formulation, feed, bw, p_feces_excrt, p_urine):
     NDF_conc = conc['NDF']
     EE_conc = conc["EE"]
 
-
     # Amount of manure, kg [A.3B.A.1]
     manure = 3.886 * dm_intake - 0.029 * bw + 5.641
 

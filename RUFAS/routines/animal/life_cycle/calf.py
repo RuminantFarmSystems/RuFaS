@@ -38,19 +38,19 @@ class Calf(AnimalBase):
         """
         super().__init__(args)
 
-        if 'birth_weight' in args:
-            self.assign_calf_values(args)
-        else:
-            self.init_values(args)
-
-        self.target_adg_calf = self.birth_weight / AnimalBase.config['wean_day']
-
         self.gender = ''
         self.sold = False
         self.wean_weight = 0
         self.birth_weight = 0
         self.animal_intake = 0
         self._DBW = 0
+
+        if 'birth_weight' in args:
+            self.assign_calf_values(args)
+        else:
+            self.init_values(args)
+
+        self.target_adg_calf = self.birth_weight / AnimalBase.config['wean_day']
 
     def init_values(self, args):
         """

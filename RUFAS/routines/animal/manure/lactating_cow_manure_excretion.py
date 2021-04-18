@@ -75,13 +75,13 @@ def manure_calculations(ration_formulation, feed, bw, days_milk, milk_protein,
     N_feces = (-0.0368 +
                0.0096 * dm_intake + 0.0022 * CP_conc +
                0.0034 * lignin_conc -
-               0.000043 * bw) * 1000
+               0.000043 * bw)
 
     # Urine nitrogen, g [A.3C.B.2]
     N_urine = (-0.2837 +
                0.0068 * dm_intake + 0.0155 * CP_conc +
                0.00013 * days_milk +
-               0.000092 * bw) * 1000
+               0.000092 * bw)
 
     # Nitrogen in liquid and solid manure, g [A.3C.B.3]
     N_manure = N_feces + N_urine

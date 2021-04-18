@@ -457,10 +457,6 @@ class Pen:
         self.dry_total = dry_total
         self.lactating_total = lactating_total
 
-        for i in self.manure.keys():
-            assert round(self.manure[i], 3) == round(self.calf_total[i] + self.heifer_total[i] + self.dry_total[i] + \
-                   self.lactating_total[i], 3)
-
     def reset_manure(self):
         # total manure excretion of the animals in the pen
         self.manure = {"U": 0,
