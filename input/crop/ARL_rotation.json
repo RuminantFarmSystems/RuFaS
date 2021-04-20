@@ -1,0 +1,111 @@
+{
+    "latitude": 43.304346,
+
+    "crops": {
+        "alfalfa_90": {
+            "grow_years": [1990, 1991, 1992],
+            "repeat": 0,
+            "planting_date": 113,
+            "harvest_date": 237,
+            "harvest_type": "scheduled"
+        },
+        "corn_93": {
+            "grow_years": [1993],
+            "repeat": 0,
+            "planting_date": 121,
+            "harvest_date": 305,
+            "harvest_type": "scheduled"
+        },
+        "alfalfa_94": {
+            "grow_years": [1994, 1995, 1996],
+            "repeat": 0,
+            "planting_date": 108,
+            "harvest_date": 302,
+            "harvest_type": "scheduled"
+        },
+        "corn_97": {
+            "grow_years": [1997],
+            "repeat": 0,
+            "planting_date": 115,
+            "harvest_date": 305,
+            "harvest_type": "scheduled"
+        },
+        "alfalfa_98": {
+            "grow_years": [1998, 1999, 2000],
+            "repeat": 0,
+            "planting_date": 105,
+            "harvest_date": 250,
+            "harvest_type": "scheduled"
+        },
+        "corn_01": {
+            "grow_years": [2001],
+            "repeat": 0,
+            "planting_date": 121,
+            "harvest_date": 288,
+            "harvest_type": "scheduled"
+        },
+        "alfalfa_02": {
+            "grow_years": [2002, 2003, 2004],
+            "repeat": 0,
+            "planting_date": 98,
+            "harvest_date": 253,
+            "harvest_type": "scheduled"
+        },
+        "corn_05": {
+            "grow_years": [2005],
+            "repeat": 0,
+            "planting_date": 120,
+            "harvest_date": 293,
+            "harvest_type": "scheduled"
+        },
+        "alfalfa_06": {
+            "grow_years": [2006, 2007, 2008],
+            "repeat": 0,
+            "planting_date": 97,
+            "harvest_date": 256,
+            "harvest_type": "scheduled"
+        },
+        "corn_09": {
+            "grow_years": [2009],
+            "repeat": 0,
+            "planting_date": 168,
+            "harvest_date": 281,
+            "harvest_type": "scheduled"
+        },
+        "alfalfa_10": {
+            "grow_years": [2010, 2011, 2012],
+            "repeat": 0,
+            "planting_date": 89,
+            "harvest_date": 179,
+            "harvest_type": "scheduled"
+        },
+        "corn_13": {
+            "grow_years": [2013],
+            "repeat": 0,
+            "planting_date": 127,
+            "harvest_date": 298,
+            "harvest_type": "scheduled"
+        },
+        "alfalfa_14": {
+            "grow_years": [2014, 2015, 2016],
+            "repeat": 0,
+            "planting_date": 89,
+            "harvest_date": 179,
+            "harvest_type": "scheduled"
+        },
+        "corn_17": {
+            "grow_years": [2017],
+            "repeat": 0,
+            "planting_date": 125,
+            "harvest_date":300,
+            "harvest_type": "scheduled"
+        },
+        "alfalfa_18": {
+            "grow_years": [2018, 2019],
+            "repeat": 0,
+            "planting_date": 120,
+            "harvest_date": 180,
+            "harvest_type": "scheduled"
+        }
+    }
+}

@@ -1,9 +1,7 @@
 """
 RUFAS: Ruminant Farm Systems Model
 File name: crop.py
-
 Description:
-
 Author(s): Kass Chupongstimun, kass_c@hotmail.com
            Andy Achenreiner, achenreiner@wisc.edu
            William Donovan, wmdonovan@wisc.edu
@@ -19,22 +17,21 @@ from . import heat_units, leaf_area_index, root_development, biomass, yields, \
 def daily_crop_routine(soil, crop, field_management, weather, time):
     """
     Description:
-        Executes all the daily crop routines.
+        Calls the functions necessary to simulate crop growth.
 
     Args:
-        soil: an instance of the Soil class specified in soil.py representing
-            the current state of the soil profile
-        crop: an instance of the Crop class specified in crop.py containing
-            information relevant to simulating crop growth
-        field_management: an instance of the FieldManagement class specified
+        soil: an instance of the Soil class defined in soil.py
+        crop: an instance of the Crop class
+        field_management: an instance of the FieldManagement class defined
             in field_management.py
-        weather: an instance of the Weather class specified in classes.py
-            containing environmental information
-        time: an instance of the Time class specified in classes.py
+        weather: an instance of the Weather class defined in classes.py
+        time: an instance of the Time class defined in classes.py
     """
 
     # Current crop is set at the beginning of the year in annual_crop_routine
     crop_type = crop.current_crop
+
+    daily_reset(crop_type, soil)
 
     # If there is no crop in rotation this year, current crop will be named
     # 'null'. The routine is skipped in this case
@@ -51,12 +48,9 @@ def daily_crop_routine(soil, crop, field_management, weather, time):
         soil.residue_harvest = 0
         soil.soil_layers[0].tillage_percent = 0
 
-        # If the crop is not planted yet, determine whether it is planted today
-        if not crop_type.planted:
-            calculate_start(soil, crop, field_management, weather, time)
+        # While the crop is planted:
+        if crop_type.planted and not crop_type.harvested:
 
-        # Once the crop is planted:
-        else:
             # If the crop is growing, run the routines
             if crop_type.growing:
                 heat_units.update_all(crop_type, weather, time)
@@ -79,41 +73,46 @@ def daily_crop_routine(soil, crop, field_management, weather, time):
                         yields.update_all(soil, crop_type, field_management, time)
 
                 elif crop_type.harvest_type == 'optimal':
-                    if crop_type.fr_PHU >= crop_type.fr_PHU_harvest \
-                            or (crop_type.fr_PHU <= crop_type.prev_fr_PHU and time.day > crop_type.harvest_date):
+                    if crop_type.fr_PHU >= crop_type.fr_PHU_harvest:
                         yields.update_all(soil, crop_type, field_management, time)
+
                 else:
                     print('"' + crop_type.harvest_type + '"', 'is not a recognized harvest type.'
                                                               ' Harvesting on optimal date.')
                     crop_type.harvest_type = 'optimal'
 
-            # if the crop is perennial, determine whether it is dormant
+            # If the crop is perennial, determine whether it is dormant
             if crop_type.crop_type == 'perennial':
-                # if it is, run the dormancy routine and set growing to false
+                # If it is, run the dormancy routine and set growing to false
                 # (This method is only called once on the first day when crop
                 # enters dormancy)
                 if in_dormancy(crop, time) and crop_type.growing:
                     dormancy_routine(soil, crop_type, field_management, time)
                     crop_type.growing = False
                 elif not in_dormancy(crop, time):
-                    if crop_type.growing is False and field_management.management_scheme == 'optimal':
-                        # schedule a manure and fertilizer application
-                        manure_management = field_management.managed_applications['manure']
-                        fert_management = field_management.managed_applications['fertilizer']
-
-                        # if manure is being applied to the field this year
-                        if (time.start_year + time.year - 1, -1) in manure_management.applications:
-                            # schedule the manure application for today
-                            manure_management.schedule_application(time)
-
-                        # if fertilizer is being applied to the field this year
-                        if (time.start_year + time.year - 1, -1) in fert_management.applications:
-                            # schedule the fertilizer application
-                            fert_management.schedule_application(time)
-
                     crop_type.growing = True
 
         annual_variable_update(crop_type)
+
+
+def daily_reset(crop_type, soil):
+    """
+    Description:
+        Some variables are reset at the beginning of next day instead of at the
+        end of the previous one so that they can be accessed by the output handler.
+    Args:
+        crop_type: the crop for which attributes are being reset
+        soil: an instance of the Soil class defined in soil.py
+    """
+    crop_type.HI_actual = 0
+    crop_type.yield_actual = 0
+    crop_type.N_yield = 0
+    crop_type.P_yield = 0
+
+    crop_type.HI_actual = 0
+    crop_type.bio_BG = 0
+    soil.residue_harvest = 0
+    soil.soil_layers[0].fr_tillage = 0
 
 
 def annual_variable_update(crop_type):
@@ -127,13 +126,16 @@ def annual_variable_update(crop_type):
     """
 
     crop_type.yield_annual += crop_type.yield_actual
+    crop_type.N_yield_annual += crop_type.N_yield
+    crop_type.P_yield_annual += crop_type.P_yield
+    crop_type.NDF_yield_annual += crop_type.NDF_yield
 
 
 def annual_crop_routine(crop, time):
     """
     Description:
         Determines the current crop and whether it is a kill year for that crop
-    
+
     Args:
         crop: an instance of the Crop class specified in crop.py on which the
             annual routine is running
@@ -142,6 +144,7 @@ def annual_crop_routine(crop, time):
 
     # current crop is set to the next crop in the regimen
     crop.current_crop = crop.grow_regimen[time.year - 1]
+    crop.current_crop.harvested = False
     crop.current_crop.kill_year = is_kill_year(crop, time)
 
 
@@ -190,22 +193,21 @@ def is_kill_year(crop, time):
     """
     Description:
         Determines whether the crop is killed at harvest
-    
+
     Args:
         crop: an instance of the Crop class specified in crop.py containing
             information relevant to simulating crop growth
         time: an instance of the Time class specified in classes.py
     """
-
-    if crop.current_crop.crop_type == 'annual' or len(crop.grow_regimen) == time.year or \
-            crop.current_crop.crop_name != crop.grow_regimen[time.year].crop_name:
+    if len(crop.grow_regimen) == time.year or \
+            crop.current_crop.crop_name != crop.grow_regimen[time.year].crop_name or \
+            crop.current_crop.crop_type == 'annual':
         crop.current_crop.kill_day = crop.current_crop.harvest_date
         return True
     return False
 
 
 class Crop:
-
     def __init__(self, data, time):
         """
         Description:
@@ -270,9 +272,11 @@ class Crop:
             Resolves conflicts in the specified grow_regimen and finalizes
             the years in which each crop is growing in this field
             "pseudocode_crop" C.1.A
+
         Args:
             time: an instance of the Time class specified in classes.py
         """
+
         for crop_type in self.crops_list:
             for year in crop_type.grow_years:
                 # checks requested grow years against model boundaries
@@ -299,12 +303,16 @@ class Crop:
         list(filter(lambda crop: crop.crop_name != 'null', self.grow_regimen))
 
     def annual_reset(self):
-        """
-        Description:
-            Resets the annual values for the next year.
-        """
+        self.current_crop.N_yield_annual = 0.0
+        self.current_crop.P_yield_annual = 0.0
+        self.current_crop.NDF_yield_annual = 0.0
+        self.current_crop.yield_annual = 0.0
 
-        self.current_crop.yield_annual = 0
+    def iterate_planting_date(self, time):
+        if time.day >= len(time.years[time.year - 1]):
+            pass
+        else:
+            self.current_crop.planting_date = time.day + 1
 
 
 def calculate_start(soil, crop, field_management, weather, time):
@@ -328,100 +336,78 @@ def calculate_start(soil, crop, field_management, weather, time):
     crop_type = crop.current_crop
     yearly_T_avg = weather.T_avg[time.year - 1]
 
-    manure_management = field_management.managed_applications['manure']
     fert_management = field_management.managed_applications['fertilizer']
-
-    # if the management scheme is optimal
-    if field_management.management_scheme == 'optimal':
-        # and the crop is annual
-        # C.1.B.1
-        if crop_type.crop_type == 'annual':
-            # and it is the planting date
-            if time.day == crop_type.planting_date:
-                # check conditions for applying manure and fertilizer
-                if manure_management.check_conditions_plant(soil, weather, time) and \
-                        fert_management.check_conditions_plant(soil, weather, time):
-
-                    # if there is an optimal manure application scheduled for this year
-                    if (time.start_year + time.year - 1, -1) in manure_management.applications:
-                        # schedule manure application for today
-                        manure_management.schedule_application(time)
-
-                    # if there is an optimal fertilizer application scheduled for this year
-                    if (time.start_year + time.year - 1, -1) in fert_management.applications:
-                        # schedule manure application for today
-                        fert_management.schedule_application(time)
-
-                    # schedule crop planting
-                    crop_type.planted = True
-                    crop_type.growing = True
-
-                # conditions were not conducive to fertilizer and manure application
-                else:
-                    # iterate the planting date to try again tomorrow
-                    crop_type.planting_date = time.day + 1
-        # the crop is perennial
-        # C.1.B.2
-        else:
-            # edge case for when a planting date that occurs before the
-            # simulation begins (usually the result of a rotation)
-            if time.year == 1 and time.day > crop_type.planting_date:
-                pass
-            # check growing conditions for the perennial
-            elif not in_dormancy(crop, time) and yearly_T_avg[time.day - 1] > crop_type.T_base_min:
-                # check conditions for applying manure and fertilizer
-                if manure_management.check_conditions_plant(soil, weather, time) and \
-                        fert_management.check_conditions_plant(soil, weather, time):
-
-                    # if there is an optimal manure application scheduled for this year
-                    if (time.start_year + time.year - 1, -1) in manure_management.applications:
-                        # schedule manure application for today
-                        manure_management.schedule_application(time)
-
-                    # if there is an optimal fertilizer application scheduled for this year
-                    if (time.start_year + time.year - 1, -1) in fert_management.applications:
-                        # schedule manure application for today
-                        fert_management.schedule_application(time)
-
-                    # schedule crop planting
-                    crop_type.planted = True
-                    crop_type.growing = True
-
-                # conditions were not conducive to fertilizer and manure application
-
-                else:
-                    # iterate the planting date to try again tomorrow
-                    crop_type.planting_date = time.day + 1
-
-    # if application type is scheduled
-    elif field_management.management_scheme == 'scheduled':
-        # and the crop is annual
-        # C.1.B.3
-        if crop_type.crop_type == 'annual':
-            # and it is the planting date
-            if time.day == crop_type.planting_date:
-                # plant the crop
-                crop_type.planted = True
-                crop_type.growing = True
-        # the crop is perennial
-        # C.1.B.4
-        else:
-            # edge case for when a planting date that occurs before the
-            # simulation begins (usually the result of a rotation)
-            if time.year == 1 and time.day > crop_type.planting_date:
-                pass
-            # check growing conditions for perennial
-            elif not in_dormancy(crop, time) and yearly_T_avg[time.day - 1] > crop_type.T_base_min:
-                # plant the crop
-                crop_type.planted = True
-                crop_type.growing = True
-    # input management scheme is not currently implemented
+    manure_management = field_management.managed_applications['manure']
+    # C.1.B.1/2
+    if crop_type.harvest_type == 'scheduled':
+        if time.day == crop_type.planting_date:
+            if time.calendar_year in manure_management.rotation_years:
+                manure_management.schedule_application(time)
+            if time.calendar_year in fert_management.rotation_years:
+                fert_management.schedule_application(time)
+            crop_type.planted = True
+            crop_type.growing = True
     else:
-        print('"' + field_management.management_scheme + '"',
-              "is not a valid application management scheme, setting type to optimal.")
-        field_management.management_scheme = 'optimal'
+        if crop_type.crop_type == 'annual':
+            if time.day == crop_type.planting_date and check_conditions_plant(soil, weather, time):
+                # C.1.B.1
+                if time.calendar_year in manure_management.rotation_years or \
+                        time.calendar_year in fert_management.rotation_years:
+                    if field_management.check_conditions(soil, weather, time):
+                        if time.calendar_year in manure_management.rotation_years:
+                            manure_management.schedule_application(time)
+                        if time.calendar_year in fert_management.rotation_years:
+                            fert_management.schedule_application(time)
+                        crop_type.planted = True
+                        crop_type.growing = True
+                    else:
+                        if time.calendar_year in manure_management.rotation_years:
+                            manure_management.iterate_application(time)
+                        if time.calendar_year in fert_management.rotation_years:
+                            fert_management.iterate_application(time)
+                        crop.iterate_planting_date(time)
+                # C.1.B.2
+                else:
+                    crop_type.planted = True
+                    crop_type.growing = True
+            elif time.day == crop_type.planting_date:
+                if time.calendar_year in manure_management.rotation_years:
+                    manure_management.iterate_application(time)
+                if time.calendar_year in fert_management.rotation_years:
+                    fert_management.iterate_application(time)
+                crop.iterate_planting_date(time)
+        # C.1.B.3/4
+        else:
+            if time.year == 1 and time.day > crop_type.planting_date:
+                pass
+            # C.1.B.3
+            elif not in_dormancy(crop, time) and \
+                    yearly_T_avg[time.day - 1] > crop_type.T_base_min and \
+                    check_conditions_plant(soil, weather, time):
+                if time.calendar_year in manure_management.rotation_years or \
+                        time.calendar_year in fert_management.rotation_years:
+                    if field_management.check_conditions(soil, weather, time):
+                        if time.calendar_year in manure_management.rotation_years:
+                            manure_management.schedule_application(time)
+                        if time.calendar_year in fert_management.rotation_years:
+                            fert_management.schedule_application(time)
+                        crop_type.planted = True
+                        crop_type.growing = True
+                    else:
+                        if time.calendar_year in manure_management.rotation_years:
+                            manure_management.iterate_application(time)
+                        if time.calendar_year in fert_management.rotation_years:
+                            fert_management.iterate_application(time)
+                # C.1.B.4
+                else:
+                    crop_type.planted = True
+                    crop_type.growing = True
+            else:
+                if time.calendar_year in manure_management.rotation_years:
+                    manure_management.iterate_application(time)
+                if time.calendar_year in fert_management.rotation_years:
+                    fert_management.iterate_application(time)
 
-    # current_crop object is updated
     crop.current_crop = crop_type
 
 
@@ -526,3 +512,34 @@ def get_year_length(time):
         return time.leap_year_length
     else:
         return time.year_length
+
+
+def check_conditions_plant(soil, weather, time):
+    """
+    Description:
+        Checks if environmental conditions are conducive to plant.
+    Args:
+        soil: an instance of the Soil class specified in soil.py
+        weather: an instance of the Weather class specified in classes.py
+            contains information about the environment
+        time: an instance of the Time class specified in classes.py
+
+    Returns:
+        bool: True if conditions are conducive,
+                False (and iterate application) if otherwise
+    """
+    # the time object begins indexing at 1, but curr is in
+    # reference to the weather object which begins indexing at 0
+
+    curr_day = time.day - 1
+    curr_year = time.year - 1
+
+    # if soil profile is too saturated for planting
+    if soil.soil_layers[0].soil_water > soil.soil_layers[0].fc_water:
+        return False
+
+    # if it rains on the current day
+    if (weather.rainfall[curr_year][curr_day] + weather.irrigation[curr_year][curr_day]) >= 1.0:
+        return False
+
+    return True

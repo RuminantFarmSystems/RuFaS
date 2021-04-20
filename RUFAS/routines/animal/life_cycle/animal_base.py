@@ -43,10 +43,10 @@ class AnimalBase(object):
         """
         Initializes common parameters for all animals
         Args:
-            breed: breed of the cow
-            birth date: the date of the simulation when the calf was born
-            days Born: age of the animal
-            semen used: semen used in the dam for the calf
+            args.breed: breed of the cow
+            args.birth_date: the date of the simulation when the calf was born
+            args.days_born: age of the animal
+            arg.semen_used: semen used in the dam for the calf
             (optional: include the following to assign animal information)
 			args.birth_weight: the birth weight of the animal
 			args.body_weight: current body weight of the animal
@@ -141,7 +141,7 @@ class AnimalBase(object):
 
         # amount of P in the animal (A.1G.A.3)
         self.p_animal = self.p_animal + self.p_gest + self.p_growth + \
-            (self.dP_reserves - dP_reserves_prev)
+                        (self.dP_reserves - dP_reserves_prev)
 
     def calc_base_manure(self):
         """

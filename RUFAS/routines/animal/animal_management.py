@@ -12,8 +12,8 @@ Description: The class which manages all of the animal routines and keeps track 
 
 Author(s): Militsa Sotirova, militsasotirova@gmail.com
            Chris VanKerkhove, cjv47@cornell.edu
+           Joseph Merhi, jm2257@cornell.edu
 """
-
 from RUFAS.routines.animal.pen import Pen
 from RUFAS.routines.animal.clustering_pen_grouping import grouping
 from RUFAS.routines.animal.life_cycle.life_cycle import LifeCycleManager
@@ -141,6 +141,8 @@ class AnimalManagement:
         self.pasture_concentrate = data['pasture_concentrate']
         self.ration_user_input = data['ration']['user_input']
         self.formulation_interval = data['ration']['formulation_interval']
+        self.methane_model = data['methane_model']
+
 
     def init_pens(self, all_pens_data, herd_data):
         """
@@ -161,30 +163,44 @@ class AnimalManagement:
             housing_type = pen_data['housing_type']
             bedding_type = pen_data['bedding_type']
             pen_type = pen_data['pen_type']
-            pen = Pen(pen_id, vertical_dist_to_parlor, horizontal_dist_to_parlor, num_stalls, housing_type,
-                      bedding_type, pen_type)
+
+            manure_handling = pen_data['manure_handling']
+            manure_separator = pen_data['manure_separator']
+            manure_storage = pen_data['manure_storage']
+            pen = Pen(pen_id, vertical_dist_to_parlor, horizontal_dist_to_parlor,
+                      num_stalls, housing_type, bedding_type, pen_type, manure_handling,
+                      manure_separator, manure_storage)
 
             self.all_pens.append(pen)
 
         herd_num = herd_data['herd_num']
 
+        manure_handling = "manual_scraping"
+        manure_separator = "sedimentation"
+        manure_storage = "storage_pit"
         if (len(self.all_pens) == 0) and (herd_num > 0):
-            print('Warning: herd_num > 0, but pen_num = 0. Initializing 3 default pens.')
-            pen_1 = Pen(0, 0.1, 1.6, 100, 'open air barn', 'sand', 'freestall')
-            pen_2 = Pen(1, 0.1, 1.6, 200, 'open air barn', 'sawdust', 'freestall')
-            pen_3 = Pen(2, 0.1, 1.6, 100, 'open air barn', 'sand', 'freestall')
+            print('Warning: herd_num > 0, but pen_num = 0. Initilizing 3 default pens.')
+            pen_1 = Pen(0, 0.1, 1.6, 100, 'open air barn', 'sand', 'freestall',
+                        manure_handling, manure_separator, manure_storage)
+            pen_2 = Pen(1, 0.1, 1.6, 200, 'open air barn', 'sawdust', 'freestall',
+                        manure_handling, manure_separator, manure_storage)
+            pen_3 = Pen(2, 0.1, 1.6, 100, 'open air barn', 'sand', 'freestall',
+                        manure_handling, manure_separator, manure_storage)
             self.all_pens.append(pen_1)
             self.all_pens.append(pen_2)
             self.all_pens.append(pen_3)
         elif (len(self.all_pens) == 1) and (herd_num > 0):
-            print('Warning: herd_num > 0, but pen_num = 1. Initializing 2 default pens.')
-            pen_2 = Pen(1, 0.1, 1.6, 300, 'open air barn', 'sawdust', 'freestall')
-            pen_3 = Pen(2, 0.1, 1.6, 300, 'open air barn', 'straw', 'tiestall')
+            print('Warning: herd_num > 0, but pen_num = 1. Initilizing 2 default pens.')
+            pen_2 = Pen(1, 0.1, 1.6, 300, 'open air barn', 'sawdust', 'freestall',
+                        manure_handling, manure_separator, manure_storage)
+            pen_3 = Pen(2, 0.1, 1.6, 300, 'open air barn', 'straw', 'tiestall',
+                        manure_handling, manure_separator, manure_storage)
             self.all_pens.append(pen_2)
             self.all_pens.append(pen_3)
         elif (len(self.all_pens) == 2) and (herd_num > 0):
-            print('Warning: herd_num > 0, but pen_num = 2. Initializing 1 default pen.')
-            pen_3 = Pen(2, 0.1, 1.6, 300, 'open air barn', 'straw', 'tiestall')
+            print('Warning: herd_num > 0, but pen_num = 2. Initilizing 1 default pen.')
+            pen_3 = Pen(2, 0.1, 1.6, 300, 'open air barn', 'straw', 'tiestall',
+                        manure_handling, manure_separator, manure_storage)
             self.all_pens.append(pen_3)
 
     def init_animals(self, herd_data, pen_data, weather, time, config, feed):
@@ -197,6 +213,9 @@ class AnimalManagement:
         are calculated and the animals are allocated to pens.
 
         Args:
+            feed: an instance of the Feed class defined in feed.py
+            config: an instance of the Config class defined in classes.py
+                contains model configuration information
             herd_data: dictionary containing information about the herd
             pen_data: dictionary containing information about the pens
             weather: instance of the Weather class defined in classes.py
@@ -259,6 +278,7 @@ class AnimalManagement:
         is used.
 
         Args:
+            feed: an instance of the Feed class defined in feed.py
             weather: instance of the Weather class defined in classes.py
             time: instance of the Time class defined in classes.py
         """
@@ -403,7 +423,6 @@ class AnimalManagement:
         Allocates the animals in all_animals to pens in all_pens based on the
         animals' characteristics.
         """
-
         # assigning non-cows to pens
         if len(self.all_pens) == 3:
             self.all_pens[0].update_animals(self.calves)
@@ -457,12 +476,17 @@ class AnimalManagement:
             self.all_pens[len(self.all_pens) - 1].update_animals(lactating_cows)
         else:
             self.all_pens[4].update_animals(dry_cows)
-            # calling pen grouping algorithm
-            pen_grouping = grouping(lactating_cows, self.all_pens[5:])
+            # TODO: Temporary process to randomly assign nutrition requirements
+            if len(lactating_cows) > 0:
+                for i in range(len(lactating_cows)):
+                    lactating_cows[i].ID = i + 1
+                    lactating_cows[i].DMPD_req = 90 + random.random() * 34
+                    lactating_cows[i].DNED_req = 1.4 + random.random() * 0.3
+                pen_grouping = grouping(lactating_cows, self.all_pens[5:])
 
-            # assigning lactating cows to pens based on the grouping output
-            for key in pen_grouping:
-                self.all_pens[key].update_animals(pen_grouping[key])
+                # assigning lactating cows to pens based on the grouping output
+                for key in pen_grouping:
+                    self.all_pens[key].update_animals(pen_grouping[key])
 
         self.fully_update_id_pen()
 
@@ -501,7 +525,7 @@ class AnimalManagement:
                 self.all_pens[i].ration = self.all_pens[i].calc_ration(feed,
                                                                        available_feeds)
 
-    def calc_manure_excretion(self, feed):
+    def calc_manure_excretion(self, feed, methane_model):
         """
         Calls each animal's method to calculate manure excretion to find the
         total for each pen. This is part of the routines that happen every
@@ -509,11 +533,13 @@ class AnimalManagement:
 
         Args:
             feed: instance of the feed class
+            methane_model: methane model used for methane emission calculations
         """
-
-        for i, pen in enumerate(self.all_pens):
+        for pen in self.all_pens:
             if pen.pen_populated:
-                self.all_pens[i].manure = self.all_pens[i].calc_manure(feed)
+                pen.calc_manure(feed,methane_model)
+            else:
+                pen.reset_manure()
 
     def calc_avg_growth(self):
         """
@@ -628,12 +654,10 @@ class AnimalManagement:
             animals_added, ids_removed, calves_born, self.calves, self.heiferIs, \
             self.heiferIIs, self.heiferIIIs, self.cows = \
                 self.life_cycle_manager.daily_update(self.simulation_day,
-                                                     self.sim_length,
                                                      self.calves,
                                                      self.heiferIs,
                                                      self.heiferIIs,
                                                      self.heiferIIIs, self.cows)
-
             temp = weather.T_avg[time.year - 1][time.day - 1]
             self.daily_update_id_pen(animals_added, ids_removed, calves_born, feed, temp)
 
@@ -646,8 +670,10 @@ class AnimalManagement:
                 self.pen_allocation()
                 self.calc_avg_nutrient_rqmts()  # per pen
                 self.calc_ration(feed)  # per pen
-                self.calc_manure_excretion(feed)  # per animal
                 self.calc_avg_growth()  # per pen
+
+            # manure excretion
+            self.calc_manure_excretion(feed, self.methane_model)  # per animal
 
             # phosphorus updates
             self.daily_p_update()  # per animal
@@ -660,8 +686,7 @@ class AnimalManagement:
         Returns: True if today is the day a new ration has to be formulated,
                 false otherwise.
         """
-
-        return (self.simulation_day % self.formulation_interval) == 1 or \
+        return self.simulation_day % self.formulation_interval == 1 or \
                self.formulation_interval == 1
 
     def annual_reset(self):
@@ -752,7 +777,7 @@ class AnimalManagement:
                           len(self.life_cycle_manager.sold_heifers),
                           len(self.life_cycle_manager.culled_cows))
         if num_animals > minimum_num:
-            print('The smallest animal list is of size ' + str(minimum_num) +
+            print('\nThe smallest animal list is of size ' + str(minimum_num) +
                   ' so ' + str(num_animals) + ' of each animal class cannot ' +
                   'be in the life cycle output. Only ' + str(minimum_num) +
                   ' of each animal type will be in the life cycle output.')

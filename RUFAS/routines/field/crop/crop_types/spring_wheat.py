@@ -26,7 +26,7 @@ class SpringWheat(BaseCrop):
         self.planted = False
         self.growing = False
 
-        self.fix_nitrogen = False
+        self.fix_nitrogen = True  # TODO: change back
 
         # ===================================================================
         ''' HEAT UNIT DATA '''
@@ -170,6 +170,5 @@ class SpringWheat(BaseCrop):
 
         self.N_yield_annual = 0.0
         self.P_yield_annual = 0.0
-        self.DM_yield_annual = 0.0
         self.NDF_yield_annual = 0.0
         self.yield_annual = 0

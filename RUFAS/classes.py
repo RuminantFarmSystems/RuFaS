@@ -13,8 +13,9 @@ Author(s): Kass Chupongstimun, kass_c@hotmail.com
 import csv
 
 from RUFAS import util, errors
-from RUFAS.routines import Field, Feed
+from RUFAS.routines import Fields, Feed
 from RUFAS.routines.animal.animal_management import AnimalManagement
+from RUFAS.routines.manure_storage.manure_storage import ManureStorage
 from RUFAS.util import read_json_file
 
 
@@ -42,14 +43,13 @@ class State:
             time: instance of the Time class containing information necessary to
                 initialize the state
         """
-        self.fields = []
-        self.fields_data = data['fields']
-        for field_name, field_data in self.fields_data.items():
-            self.fields.append(Field(field_name, field_data, time))
+        self.fields = Fields(data['fields'], time)
         input_dir = util.get_base_dir() / 'input'
         self.feed = Feed(read_json_file(input_dir / 'feed' / data['feed']))
         self.animal_management = AnimalManagement(
             read_json_file(input_dir / 'animal' / data['animal']), config, self.feed, weather, time)
+
+        self.manure_storage = ManureStorage(self.animal_management)
 
     def annual_reset(self):
         """
@@ -57,10 +57,14 @@ class State:
             Resets all annual variables that require reset
         """
 
-        for field in self.fields:
-            field.crop.annual_reset()
-            field.soil.annual_reset()
+        self.fields.annual_reset()
         self.animal_management.annual_reset()
+        self.manure_storage.annual_reset()
+
+    def annual_mass_balance(self, time):
+        for field in self.fields.fields.values():
+            field.soil.annual_mass_balance(field.field_management, time)
+        self.manure_storage.annual_mass_balance()
 
 
 class Config:
@@ -293,6 +297,7 @@ class Weather:
         self.T_min = []
         self.T_avg = []
         self.radiation = []
+        self.irrigation = []
         self.T_avg_annual = []
 
         year_length = config.year_length
@@ -328,6 +333,7 @@ class Weather:
             self.T_min.append([0.0 for _ in range(len(year))])
             self.T_avg.append([0.0 for _ in range(len(year))])
             self.radiation.append([0.0 for _ in range(len(year))])
+            self.irrigation.append([0.0 for _ in range(len(year))])
 
         # read in the input csv file
         weather_full_path = util.get_base_dir() / 'input/weather' / weather_file
@@ -375,7 +381,7 @@ class Weather:
                         self.T_min[year][day - offset] = float(row[4])
                         self.T_avg[year][day - offset] = float(row[5])
                         self.radiation[year][day - offset] = float(row[6])
-
+                        self.irrigation[year][day - offset] = float(row[7])
                     except(IndexError, ValueError):
                         # prints out each problematic row in the weather CSV file
                         skips += 1

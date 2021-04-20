@@ -39,9 +39,9 @@ CropType attribute definitions:
 
     yield_actual = Actual crop yield at harvest (kg/ha)
 
-    yield_N = Amount of nitrogen removed in the yield
+    N_yield = Amount of nitrogen removed in the yield
 
-    yield_P = Amount of phosphorus removed in the yield
+    P_yield = Amount of phosphorus removed in the yield
 
     residue = Material in the residue pool for the top 10mm of soil on current
               day (kg/ha)
@@ -55,8 +55,8 @@ CropType values updated by update_all():
     HI_actual
     yield_max
     yield_actual
-    yield_N
-    yield_P
+    N_yield
+    P_yield
     residue
 """
 
@@ -64,7 +64,9 @@ from math import exp
 
 
 def update_all(soil, crop_type, field_management, time):
-    """Runs all the yield calculations
+    """
+    Description:
+        Runs all the yield calculations
 
     Args:
         soil: an instance of the Soil class specified in soil.py representing
@@ -74,6 +76,7 @@ def update_all(soil, crop_type, field_management, time):
             specified in field_management.py
         time: an instance of the Time class specified in classes.py
     """
+
 
     calc_HI_max(crop_type)
     calc_HI_act(crop_type)
@@ -245,7 +248,9 @@ def calc_harvest_quality(crop_type):
 def kill(crop_type, field_management, time):
     """
     Description:
-        Kills the crop
+        Kills the crop.
+        NOTE: Any day-of-yield values reset here will be reported to the output
+        handler as 0. To reset after reporting see crop.daily_reset()
         "pseudocode_crop" C.10.H.4
 
     Args:
@@ -253,12 +258,6 @@ def kill(crop_type, field_management, time):
         field_management
         time
     """
-
-    till_management = field_management.managed_applications['tillage']
-    if field_management.management_scheme == 'optimal' \
-            and (time.start_year + time.year - 1, -1) in till_management.applications:
-        till_management.schedule_application(time)
-
     crop_type.accumulated_HU = 0
     crop_type.prev_accumulated_HU = 0
 
@@ -282,6 +281,12 @@ def kill(crop_type, field_management, time):
 
     crop_type.planted = False
     crop_type.growing = False
+    crop_type.harvested = True
+
+    # FM.2.2
+    till_management = field_management.managed_applications['tillage']
+    if (time.calendar_year, -1) in till_management.applications:
+        till_management.schedule_application(time)
 
 
 def cut(crop_type, bio_frac):

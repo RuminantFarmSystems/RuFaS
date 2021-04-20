@@ -4,13 +4,15 @@ File name: lactating_cow_manure_excretion.py
 Description: Determines manure excretion with information from the ration
     formulation, outputs used by the manure module.
 Author(s): Militsa Sotirova, militsasotirova@gmail.com
+           Joseph Merhi, jm2257@cornell.edu
 """
-################################################################################
 from .general_manure import phosphorus_excreted
+from RUFAS.routines.animal.ration.ration_driver import ration_report
+import math
 
 
-def manure_calculations(ration_formulation, feed, BW, DIM, mPrt,
-                        milk_prod, p_feces_excrt, p_urine):
+def manure_calculations(ration_formulation, feed, bw, days_milk, milk_protein,
+                        milk_prod, p_feces_excrt, p_urine, methane_model, milk_fat, ME_intake):
     """
     Calculates inputs for manure module with information from the
     ration formulation. Equations referenced are from pseudocode.
@@ -19,11 +21,14 @@ def manure_calculations(ration_formulation, feed, BW, DIM, mPrt,
         milk_prod: milk production, kg
         ration_formulation: dictionary which stores the calculated ration
         feed: instance of the Feed class
-        BW: body weight, kg
-        DIM: days in milk, d
-        mPrt: milk protein, % of milk (from animal input)
+        bw: body weight, kg
+        days_milk: days in milk, d
+        milk_protein: milk protein, % of milk (from animal input)
         p_feces_excrt: amount of P excreted by an animal (g)
         p_urine: amount of P required for urine production (g)
+        methane_model: methane model used for methane emission calculations
+        milk_fat: milk fat, % of milk
+        ME_intake: metabolizable energy intake, Mcal/kg DM
 
     Returns:
         p_excrt: amount of P excreted by animal, g
@@ -39,130 +44,95 @@ def manure_calculations(ration_formulation, feed, BW, DIM, mPrt,
             WOP_frac: water extractable organic P fraction
             p_excrt_manure: manure P excretion for manure module input (g)
             p_frac: P fraction of manure
+            K: potassium in manure, g/day
     """
+    amount, conc = ration_report(ration_formulation, feed.available_feeds)
+    dm_intake = amount['dm']
+    Ash_diet_content = amount['ash']
+    ASH_conc = conc["ash"]
+    DM_conc = conc['dm']
+    ADF_conc = conc['ADF']
+    CP_conc = conc['CP']
+    lignin_conc = conc['lignin']
+    NDF_conc = conc['NDF']
+    K_conc = conc['potassium']
+    EE_conc = conc["EE"]
+    starch_conc = conc['starch']
 
-    '''
-    Further calculations to account for entire diet:
-    DMI: dry matter intake, kg
-    DM: dietary dry matter, % of diet
-    ADF: dietary ADF, % of DM
-    CP: dietary crude protein, % of DM
-    LIG: dietary lignin, % of DM
-    Ash: dietary Ash, % of DM
-    NDF: dietary NDF, % of DM
-    -----------------------------------------------------
-    Li's example to highlight difference between DM and DMI, as well as
-    respective calculations:
-    Suppose we have a diet with only feeds A and B and the result from the
-    linear programming is
-    A = 10 kg
-    B = 15 kg
-    Then, since all the variables in the solution are in DM basis, the
-    DMI = 10 + 15 = 25 kg.
-    Let the DM content of A be 80%, of B be 40%.
-    Farmers need to feed 10 / 0.8 = 12.5 kg of A and 15 / 0.4 = 37.5 kg of B
-    (as fed basis).
-    Then, the DM content of the diet is (10 + 15) / (12.5 + 37.5) = 50%.
+    # Faecal water, kg [A.3C.A.1]
+    fecal_water = 1.987 * dm_intake + 0.348 * ADF_conc - 0.412 * CP_conc - 0.074 * DM_conc - 0.0057 * days_milk
 
-    For the nutrient compositions:
-    Let the CP content of A be 80%, of B be 40%.
-    Then the CP content of the diet is (10 * 0.8 + 15 * 0.4) / (10 + 15) = 56%
-    in DM basis.
-    Similarly for ADF, LIG, Ash, and NDF.
-    '''
-    DMI = 0
-    total_diet = 0  # in kg
-    ADF_diet_content = 0
-    CP_diet_content = 0
-    LIG_diet_content = 0
-    Ash_diet_content = 0
-    NDF_diet_content = 0
-    for key in ration_formulation:
-        # not every key in the ration_formulation dictionary refers to a feed
-        if not (key == 'status' or key == 'objective'):
-            # percentages of the DM of each nutrient
-            nutrients = feed.available_feeds[key]
-            DM_feed_content = 0.01 * nutrients['DM']
-            ADF_feed_content = 0.01 * nutrients['ADF']
-            CP_feed_content = 0.01 * nutrients['CP']
-            LIG_feed_content = 0.01 * nutrients['lignin']
-            Ash_feed_content = 0.01 * nutrients['ash']
-            NDF_feed_content = 0.01 * nutrients['NDF']
+    # Total Solids, kg [A.3C.A.2]
+    total_solids = -0.576 + 0.370 * dm_intake - 0.075 * CP_conc + 0.059 * ADF_conc
 
-            # kg of each nutrient
-            DM_feed_amount = ration_formulation[key]
-            ADF_feed_amount = ADF_feed_content * DM_feed_amount
-            CP_feed_amount = CP_feed_content * DM_feed_amount
-            LIG_feed_amount = LIG_feed_content * DM_feed_amount
-            Ash_feed_amount = Ash_feed_content * DM_feed_amount
-            NDF_feed_amount = NDF_feed_content * DM_feed_amount
+    # Total urine, kg [A.3C.A.3]
+    urine = -7.742 + 0.388 * dm_intake + 0.726 * CP_conc + 2.066 * milk_protein
 
-            # add to running sums
-            as_fed_feed_amount = DM_feed_amount / DM_feed_content
-            total_diet += as_fed_feed_amount
-            DMI += DM_feed_amount
-            ADF_diet_content += ADF_feed_amount
-            CP_diet_content += CP_feed_amount
-            LIG_diet_content += LIG_feed_amount
-            Ash_diet_content += Ash_feed_amount
-            NDF_diet_content += NDF_feed_amount
+    # Amount of manure, kg [A.3C.A.4]
+    manure = fecal_water + total_solids + urine
 
-    # to find total percentages
-    DM = DMI / total_diet * 100
-    ADF = ADF_diet_content / DMI * 100
-    CP = CP_diet_content / DMI * 100
-    LIG = LIG_diet_content / DMI * 100
-    NDF = NDF_diet_content / DMI * 100
+    # Faecal nitrogen, g [A.3C.B.1]
+    N_feces = (-0.0368 +
+               0.0096 * dm_intake + 0.0022 * CP_conc +
+               0.0034 * lignin_conc -
+               0.000043 * bw)
 
-    # Faecal water, kg (Eq 1.2)
-    F_water = 1.987 * DMI + 0.348 * ADF - 0.412 * CP - 0.074 * DM - 0.0057 * DIM
-    # Faecal dry matter, kg (Eq 1.3)
-    F_DM = -0.576 + 0.370 * DMI - 0.075 * CP + 0.059 * ADF
-    # Total urine, kg (Eq 1.4)
-    U_E = -7.742 + 0.388 * DMI + 0.726 * CP + 2.066 * mPrt
-    # Amount of manure, kg (Eq 1.1)
-    Mkg = F_water + F_DM + U_E
+    # Urine nitrogen, g [A.3C.B.2]
+    N_urine = (-0.2837 +
+               0.0068 * dm_intake + 0.0155 * CP_conc +
+               0.00013 * days_milk +
+               0.000092 * bw)
 
-    # Faecal nitrogen, g (Eq 2.2)
-    F_N = (-0.0368 +
-           0.0096 * DMI + 0.0022 * CP +
-           0.0034 * LIG -
-           0.000043 * BW) * 1000
-    # Urine nitrogen, g (Eq 2.3)
-    U_N = (-0.2837 +
-           0.0068 * DMI + 0.0155 * CP +
-           0.00013 * DIM +
-           0.000092 * BW) * 1000
-    # Nitrogen in liquid and solid manure, g (Eq 2.1)
-    MN = F_N + U_N
+    # Nitrogen in liquid and solid manure, g [A.3C.B.3]
+    N_manure = N_feces + N_urine
 
     # Organic matter intake, kg
-    OMI = DMI - Ash_diet_content
-    # Degradable volatile solids, g (Eq 3.1)
-    VSd = (-1.017 + 0.364 * OMI + 0.029 * NDF - 0.023 * CP) * 1000
+    OM_intake = dm_intake - Ash_diet_content
 
-    # Non-degradable volatile solids, g (Eq 4.1)
-    VSnd = (-0.184 + 0.038 * OMI + 0.007 * NDF - 0.001 * CP) * 1000
+    # Degradable volatile solids, g [A.3C.A.5]
+    degradable_volatile_solids = (-1.017 + 0.364 * OM_intake + 0.029 * NDF_conc - 0.023 * CP_conc) * 1000
+
+    # Non-degradable volatile solids, g [A.3C.A.6]
+    nondegradable_volatile_solids = (-0.184 + 0.038 * OM_intake + 0.007 * NDF_conc - 0.001 * CP_conc) * 1000
 
     # Urea concentration, mol/L (Eq 5.1)
-    U = (-1.16 + 0.86 * (U_N / U_E)) / 28
+    U = (-1.16 + 0.86 * (N_urine / urine)) / 28
 
     # Total ammoniacal nitrogen concentration in the manure slurry,
     # mol/L (Eq 6.1)
     TAN_s = (-162.4 * U * U + 96.4 * U) / 100
 
+    # Amount of potassium excreted, g/day [A.3C.C.1]
+    K_manure = 1.822 * milk_prod + 2688.88 * (milk_protein / 100) + 156.93 * dm_intake * (K_conc / 100) - 91.755
+
+    # Methane Emissions
+    if methane_model == "Mutian":  # [A.3E.C.1]
+        methane_emis = - 126 + 11.3 * dm_intake + 2.30 * NDF_conc + 28.8 * milk_fat + 0.148 * bw
+    elif methane_model == "Mills":  # [A.3E.C.2]
+        methane_emis = (45.98 - 45.98 * math.exp(- ((- 0.0011 * starch_conc / ADF_conc) + 0.0045)
+                                                 * ME_intake * 4.184)) / 0.05565
+    elif methane_model == "IPCC":  # IPCC
+        # Calculating gross energy concentration (Moraes et al. 2014)
+        soluble_residue = (100 - ASH_conc) - NDF_conc - CP_conc - EE_conc
+        gross_energy_conc = 0.263 * CP_conc + 0.522 * EE_conc + 0.198 * NDF_conc + 0.160 * soluble_residue  # [A.3E.C.3]
+
+        methane_emis = (0.065 * gross_energy_conc * dm_intake) / 0.05565  # [A.3E.C.4]
+
     p_excrt, WIP_frac, WOP_frac, p_excrt_manure, p_frac = \
-        phosphorus_excreted(milk_prod, Mkg, p_feces_excrt, p_urine)
+        phosphorus_excreted(milk_prod, manure, p_feces_excrt, p_urine)
 
     return p_excrt, \
            {"U": U,
             "TAN_s": TAN_s,
-            "MN": MN,
-            "Mkg": Mkg,
-            "VSd": VSd,
-            "VSnd": VSnd,
+            "MN": N_manure,
+            "Mkg": manure,
+            "TSd": total_solids,
+            "VSd": degradable_volatile_solids,
+            "VSnd": nondegradable_volatile_solids,
             "WIP_frac": WIP_frac,
             "WOP_frac": WOP_frac,
             "p_excrt_manure": p_excrt_manure,
-            "p_frac": p_frac
+            "p_frac": p_frac,
+            "K_manure": K_manure,
+            "CH4_manure": methane_emis
             }

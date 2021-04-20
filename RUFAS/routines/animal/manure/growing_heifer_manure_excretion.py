@@ -4,18 +4,22 @@ File name: growing_heifer_manure_excretion.py
 Description: Determines manure excretion with information from the
     ration formulation, outputs used by the manure module.
 Author(s): Militsa Sotirova, militsasotirova@gmail.com
+           Joseph Merhi, jm2257@cornell.edu
 """
-
 from .general_manure import phosphorus_excreted
+from RUFAS.routines.animal.ration.ration_driver import ration_report
 
 
-def manure_calculations(p_feces_excrt, p_urine):
+def manure_calculations(ration_formulation, feed, bw, p_feces_excrt, p_urine):
     """
     TEMPORARY PLACEHOLDER
     Calculates inputs for manure module with information from the
     ration formulation. Equations referenced are from pseudocode.
 
     Args:
+        ration_formulation: dictionary which stores the calculated ration
+        feed: instance of the Feed class
+        bw: body weight, kg
         p_feces_excrt: amount of P excreted by an animal (g)
         p_urine: amount of P required for urine production (g)
 
@@ -33,19 +37,47 @@ def manure_calculations(p_feces_excrt, p_urine):
             WOP_frac: water extractable organic P fraction
             p_excrt_manure: manure P excretion for manure module input (g)
             p_frac: P fraction of manure
+            K: potassium in manure, g/day
+
     """
-    total_manure = 70.792
+    amount, conc = ration_report(ration_formulation, feed.available_feeds)
+    dm_intake = amount['dm']
+    cp_conc = conc['CP']
+    K_conc = conc['potassium']
+    ASH_conc = conc["ash"]
+    NDF_conc = conc['NDF']
+    EE_conc = conc["EE"]
+
+    # Amount of manure, kg [A.3B.A.1]
+    manure = 3.886 * dm_intake - 0.029 * bw + 5.641
+
+    # Total solids, kg/day [A.3B.A.2]
+    total_solids = 0.0084 * bw
+
+    # Nitrogen in liquid and solid manure, g/day [A.3D.B.1]
+    N_manure = 78.390 * dm_intake * cp_conc / 100 + 51.35
+
+    # Amount of potassium excreted, g/day [A.3D.B.3]
+    K_manure = 1000 * dm_intake * K_conc / 100
+
+    # Methane Emissions [A.3B.C.1]
+    methane_emis = (38.62 + 26.44 * dm_intake) * 0.554
+
     p_excrt, WIP_frac, WOP_frac, p_excrt_manure, p_frac = \
-        phosphorus_excreted(0, total_manure, p_feces_excrt, p_urine)
+        phosphorus_excreted(0, manure, p_feces_excrt, p_urine)
+
     return p_excrt, \
-           {"U": 0.340,
-            "TAN_s": 0.14,
-            "MN": 532.407,
-            "Mkg": total_manure,
-            "VSd": 7087.413,
-            "VSnd": 859.390,
+           {"U": 0.340,  # TODO: Implement with correct equation
+            "TAN_s": 0.14,  # TODO: Implement with correct equation
+            "MN": N_manure,
+            "Mkg": manure,
+            "TSd": total_solids,
+            "VSd": 7087.413,  # TODO: Implement with correct equation
+            "VSnd": 859.390,  # TODO: Implement with correct equation
             "WIP_frac": WIP_frac,
             "WOP_frac": WOP_frac,
             "p_excrt_manure": p_excrt_manure,
-            "p_frac": p_frac
+            "p_frac": p_frac,
+            "K_manure": K_manure,
+            "CH4_manure": methane_emis
             }

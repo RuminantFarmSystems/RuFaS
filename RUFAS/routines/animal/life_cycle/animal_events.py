@@ -6,7 +6,6 @@ Author(s): Manfei Li, mli497@wisc.edu
 Description: This file initialize life events with the age of the animal
 				when event happens and the description of the event.
 """
-###############################################################################
 
 import copy
 
