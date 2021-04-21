@@ -116,64 +116,11 @@
 	},
 	"housing": "barn",
 	"pasture_concentrate": -1,
+	"methane_model": "Mutian",
 	"ration": {
 		"user_input": false,
 		"formulation_interval": 7
 	},
 	"pen_information": {
-		"pen0": {
-			"id": 0,
-			"vertical_dist_to_milking_parlor": 0.1,
-			"horizontal_dist_to_milking_parlor": 1.6,
-			"number_of_stalls": 100,
-			"housing_type": "open air barn",
-			"bedding_type": "sand",
-			"pen_type": "freestall"
-		},
-		"pen1": {
-			"id": 1,
-			"vertical_dist_to_milking_parlor": 0.1,
-			"horizontal_dist_to_milking_parlor": 1.6,
-			"number_of_stalls": 200,
-			"housing_type": "open air barn",
-			"bedding_type": "sawdust",
-			"pen_type": "freestall"
-		},
-		"pen2": {
-			"id": 2,
-			"vertical_dist_to_milking_parlor": 0.1,
-			"horizontal_dist_to_milking_parlor": 1.6,
-			"number_of_stalls": 300,
-			"housing_type": "open air barn",
-			"bedding_type": "straw",
-			"pen_type": "tiestall"
-		},
-		"pen3": {
-			"id": 3,
-			"vertical_dist_to_milking_parlor": 0.1,
-			"horizontal_dist_to_milking_parlor": 1.6,
-			"number_of_stalls": 400,
-			"housing_type": "open air barn",
-			"bedding_type": "sand",
-			"pen_type": "tiestall"
-		},
-		"pen4": {
-			"id": 4,
-			"vertical_dist_to_milking_parlor": 0.1,
-			"horizontal_dist_to_milking_parlor": 1.6,
-			"number_of_stalls": 400,
-			"housing_type": "open air barn",
-			"bedding_type": "sand",
-			"pen_type": "tiestall"
-		},
-		"pen5": {
-			"id": 5,
-			"vertical_dist_to_milking_parlor": 0.1,
-			"horizontal_dist_to_milking_parlor": 1.6,
-			"number_of_stalls": 200,
-			"housing_type": "open air barn",
-			"bedding_type": "sand",
-			"pen_type": "tiestall"
-		}
 	}
 }

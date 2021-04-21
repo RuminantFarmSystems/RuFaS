@@ -10,59 +10,6 @@ Description: This module contains the necessary functions for calculating and
              function meant to be used outside of this file is the update_all()
              function. The other functions are meant to serve as helper
              functions within this file.
-
-Soil attribute definitions
-
-    sed = sediment yield on a given day (metric tons)
-
-    runoff = surface runoff volume (m^3)
-
-    peak_runoff = peak runoff rate (m^3/sec)
-
-    K = USLE soil erodibility factor (Mg MJ^-1mm^-1)
-
-    C = USLE cover and management factor >= 0.05
-
-    P = USLE support practice factor (user defined)
-
-    LS = USLE topographic factor
-
-    RC = Runoff coefficient
-
-    I = rainfall intensity (mm/hr)
-
-    Area = field size (ha)
-
-    Rtc = rain amount during time of concentration (mm)
-
-    T_conc = time of concentration (h)
-
-    length = slope length of field (m)
-
-    n = manning's roughness coefficient
-
-    slope = field slope (m/m)
-
-    R = daily rainfall(mm)
-
-    alpha = fraction of daily rain during time of concentration
-
-    alpha_05 = fraction of daily rain in 1/2 hour of highest intensity
-
-    Fc_sand = gives low factors for soils with high sand content and high values
-                for soils with low sand content
-
-    Fcl_si = gives low factors for soils with high clay to silt ratios
-
-    F_org_C = reduces soil erodibility for soils with high organic carbon content
-
-    F_sand = reduces soil erodibility for soils with high sand contents
-
-    Cover = amount of residue and growing biomass covering the soil surface (kg/ha)
-
-    L_hill = hill slope length (m)
-
-    alpha_hill = angle of the hill slope defined arctan(slope) (m/m)
 """
 
 from math import exp, log, atan, sin
@@ -130,7 +77,7 @@ def calc_peak_runoff(soil, weather, time):
         int: peak_runoff, the peak runoff rate on the current day (m^3/sec
     """
 
-    R = weather.rainfall[time.year - 1][time.day - 1]
+    R = weather.rainfall[time.year - 1][time.day - 1] + weather.irrigation[time.year - 1][time.day - 1]
 
     if R == 0:
         return 0
@@ -204,7 +151,7 @@ def calc_Rtc(soil, weather, time):
     """
 
     alpha = calc_alpha(soil, weather, time)
-    R = weather.rainfall[time.year - 1][time.day - 1]
+    R = weather.rainfall[time.year - 1][time.day - 1] + weather.irrigation[time.year - 1][time.day - 1]
 
     return alpha * R
 
@@ -248,7 +195,7 @@ def calc_alpha_05(weather, time):
         int: alpha_05, fraction of daily rain in the 1/2 hour of highest intensity
     """
 
-    R = weather.rainfall[time.year-1][time.day-1]
+    R = weather.rainfall[time.year - 1][time.day - 1] + weather.irrigation[time.year - 1][time.day - 1]
 
     exp_part = exp(-125 / (R + 5))
 

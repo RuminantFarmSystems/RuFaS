@@ -479,6 +479,18 @@ def energy_req_limit_constraint(x):
         list.append(x[a + 1] * x[a + 2])
     return -sum(list)
 
+def get_ration_vals(x):
+    """
+    Function that calculates and retrieves ration values used throughout the
+    ration.
+
+    Args:
+        x: the decision vector of the NLP (should be a completed ration)
+    """
+    #ration vals (subject to adding other ration vals)
+    ME_tot = sum(np.multiply(x, MEact))
+    ration_vals = {'ME_tot': ME_tot}
+    return ration_vals
 
 def optimize():
     """

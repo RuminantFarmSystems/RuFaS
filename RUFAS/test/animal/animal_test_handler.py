@@ -16,5 +16,5 @@ def run_tests():
     Calls the unit test functions for the animal routine.
     """
     print('Running animal tests...')
-    main(module=test_lactating_cow, exit=False)
+    main(module=test_lactating_cow, exit=False, buffer=False)
     print()

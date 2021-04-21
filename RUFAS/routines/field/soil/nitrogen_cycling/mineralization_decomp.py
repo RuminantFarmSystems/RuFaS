@@ -41,7 +41,7 @@ def mineralization_decomp(soil):
     # soil layer.
     layer = soil.soil_layers[0]
 
-    fresh_N = layer.top_layer_fresh_N
+    fresh_N = soil.fresh_N
     NO3 = layer.NO3
     res = soil.residue
     BD = layer.bulk_density
@@ -63,11 +63,19 @@ def mineralization_decomp(soil):
     min_coeff = 0.05
 
     # "pseudocode_soil" S.4.E.5
-    term1 = exp(-0.693 * (CN - 25) / 25)
-    term2 = exp(-0.693 * (CP - 200) / 200)
-    term3 = 1.0
+    try:
+        term1 = exp(-0.693 * (CN - 25) / 25)
+        term2 = exp(-0.693 * (CP - 200) / 200)
+        term3 = 1.0
+    except Exception:
+        term1 = soil.term1
+        term2 = soil.term2
+        term3 = soil.term3
 
     res_comp = min(term1, term2, term3)
+    soil.term1 = term1
+    soil.term2 = term2
+    soil.term3 = term3
 
     # "pseudocode_soil" S.4.E.4
     decay = min_coeff * res_comp * ((layer.temp_fac * layer.water_fac) ** 0.5)
@@ -78,14 +86,14 @@ def mineralization_decomp(soil):
     # "pseudocode_soil" S.4.E.6
     fresh_min = decay * fresh_N
 
-    fresh_min = min(layer.top_layer_fresh_N, fresh_min)
-    layer.top_layer_fresh_N -= fresh_min
+    fresh_min = min(soil.fresh_N, fresh_min)
+    soil.fresh_N -= fresh_min
 
     layer.active_N += (0.2 * fresh_min)
     layer.NH4 += (0.8 * fresh_min)
 
     # "pseudocode_soil" S.4.E.7/8
-    layer.top_layer_fresh_N += 0.0015 * soil.residue
+    soil.fresh_N += 0.0015 * soil.residue
 
     soil.soil_layers[0] = layer
 
