@@ -59,23 +59,10 @@ class Pen:
     avg_nutrient_rqmts = {}
     avg_calf_nutrient_rqmts = {}
 
-    # average body weight of the animals in the pen, used for ration formulation
-    avg_BW = 0
-
-    # average dry matter intake estimation of the animals in the pen,
-    # used for ration formulation
-    avg_DMIest = 0
-
-    # average daily change in (delta) body weight of the animals in the pen,
-    # used for ration formulation
-    #avg_DBW = 0
-
-    # average milk production of the animals in the pen,
-    # used for (lactating cow) ration formulation
+    # average milk production of the animals in the pen
     avg_milk = 0
 
-    # average milk crude protein content of the animals in the pen,
-    # used for (lactating cow) ration formulation
+    # average milk crude protein content of the animals in the pen
     avg_CP_milk = 0
 
     # ration for all the animals in the pen
@@ -229,34 +216,6 @@ class Pen:
             stage = type(animal).__name__
             self.classes_in_pen.add(stage)
 
-
-    def calc_avg_stats(self):
-        """
-        Calculates the pen's average statistics for a ration calculation that
-        is not during the normal ration formulation, i.e. when animals are
-        added to a pen with no animals currently in it and the ration needs
-        to be calculated for those animals.
-        """
-        num_animals = len(self.animals_in_pen)
-        sum_BW = 0
-        sum_DMIest = 0
-        #sum_DBW = 0
-        sum_milk = 0
-        sum_CP_milk = 0
-
-        for animal in self.animals_in_pen:
-            sum_BW += animal.body_weight
-            sum_DMIest += animal.DMIest
-            #sum_DBW += animal.DBW
-            if type(animal).__name__ == 'Cow':
-                sum_milk += animal.estimated_daily_milk_produced
-                sum_CP_milk += animal.CP_milk
-
-        #self.avg_BW = sum_BW / num_animals
-        #self.avg_DMIest = sum_DMIest / num_animals
-        #self.avg_DBW = sum_DBW / num_animals
-        #self.avg_milk = sum_milk / num_animals
-        #self.avg_CP_milk = sum_CP_milk / num_animals
 
     def calc_ration(self, feed, available_feeds):
         """

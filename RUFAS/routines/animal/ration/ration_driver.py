@@ -247,6 +247,9 @@ class Requirements:
         P_req = []
         DMIest = []
         BW = []
+        milk = []
+        CP_milk = []
+
 
         if recalc:
             # iterating through each animal in the pen and calculating requirements
@@ -294,8 +297,10 @@ class Requirements:
                     animal.calc_daily_walking_dist(pen.vertical_dist_to_parlor,
                                                    pen.horizontal_dist_to_parlor)
                     NEa_val = animal_requirements.energy_activity_rqmts(animal.body_weight,
-                                                                     pen.housing_type,
-                                                                     (math.sqrt(animal.DVD ** 2 + animal.DHD ** 2)))
+                                pen.housing_type,
+                                (math.sqrt(animal.DVD ** 2 + animal.DHD ** 2)))
+                    milk.append(animal.estimated_daily_milk_produced)
+                    CP_milk.append(animal.CP_milk)
                 else:
                     NEa_val = 0
 
@@ -317,8 +322,10 @@ class Requirements:
                     animal.calc_daily_walking_dist(pen.vertical_dist_to_parlor,
                                                    pen.horizontal_dist_to_parlor)
                     NEa_val = animal_requirements.energy_activity_rqmts(animal.body_weight,
-                                                                     pen.housing_type,
-                                                                     (math.sqrt(animal.DVD ** 2 + animal.DHD ** 2)))
+                                     pen.housing_type,
+                                    (math.sqrt(animal.DVD ** 2 + animal.DHD ** 2)))
+                    milk.append(animal.estimated_daily_milk_produced)
+                    CP_milk.append(animal.CP_milk)
                 else:
                     NEa_val = 0
 
@@ -332,6 +339,8 @@ class Requirements:
                 P_req.append(animal.P_req)
                 DMIest.append(animal.DMIest)
                 BW.append(animal.body_weight)
+                milk.append(milk)
+                CP_milk.append(CP_milk)
         # populating the class variables as an average across cows for each requirement
         self.NEmaint = stat.mean(NEmaint)
         self.NEa = stat.mean(NEa)
