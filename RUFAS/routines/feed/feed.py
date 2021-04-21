@@ -363,6 +363,8 @@ class Feed:
             if self.storage:
                 if self.DM == 0:
                     # forage to be fed out 30 days after harvest for new yield
+                    # if there is already forage in the receptacle days_since_feedout
+                    # is not reset
                     self.days_since_feedout = -30
                 self.feed_id = crop.raw_id
                 self.DM += crop.yield_actual*crop.DM_harvest_percent
@@ -1031,13 +1033,13 @@ class Feed:
             nutrient_vals[feed_key] = dictionary
         return nutrient_vals
 
-    def get_calf_feeds(self): 
+    def get_calf_feeds(self):
         feed_ids = [155, 156, 157]
         columns = ['DM', 'CP', 'EE', 'DE']
         nutrients = self.db_reader.query(
-            self.nutrient_table, 
-            cols=columns, 
-            identifier='feed_id', 
+            self.nutrient_table,
+            cols=columns,
+            identifier='feed_id',
             desired_rows=tuple(feed_ids))
         calf_feeds = {155: nutrients[0], 156: nutrients[1], 157: nutrients[2]}
         return calf_feeds
