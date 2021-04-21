@@ -419,7 +419,6 @@ class AnimalManagement:
             if len(self.all_pens[pen].animals_in_pen) > 0 and 'Cow' in self.all_pens[pen].classes_in_pen and self.all_pens[pen].ration == {}:
                 available_feeds = ration_driver.AvailableFeeds()
                 available_feeds.feed_nutrients(feed)
-                self.all_pens[pen].calc_avg_stats()
                 self.all_pens[pen].ration = self.all_pens[pen].calc_ration(feed, available_feeds)
 
         for calf in calves_born:
@@ -496,17 +495,6 @@ class AnimalManagement:
 
         for pen in self.all_pens:
             pen.clear()
-
-    def calc_avg_nutrient_rqmts(self):
-        """
-        Calls each pens's method to calculate the average nutrient requirements
-        of the animals inside it. This is part of the routines that happen every
-        ration interval.
-        """
-
-        for pen in self.all_pens:
-            if pen.pen_populated:
-                pen.calc_avg_nutrient_rqmts()
 
     def calc_ration(self, feed):
         """
@@ -667,7 +655,6 @@ class AnimalManagement:
                 self.calc_nutrient_rqmts(feed, temp)  # per animal
                 self.clear_pens()
                 self.pen_allocation()
-                self.calc_avg_nutrient_rqmts()  # per pen
                 self.calc_ration(feed)  # per pen
                 self.calc_avg_growth()  # per pen
 

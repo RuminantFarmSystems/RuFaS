@@ -15,7 +15,7 @@ import statistics as stat
 import math
 
 
-def optimization(requirements, available_feeds, BW, animal_type, cow_type):
+def optimization(requirements, available_feeds, animal_type, cow_type):
     """
     Function that sets up the nutrients and requirements lists into structured
     inputs for the non-linear program and calls the optimization function.
@@ -23,7 +23,6 @@ def optimization(requirements, available_feeds, BW, animal_type, cow_type):
     Args:
         requirements: object of class Requirements
         available_feeds: object of class AvailableFeeds
-        BW: Average Body weight of the input pen
         animal_type: string representation of the animal
         cow_type: Boolean which is True if cow is lactating, False otherwise
     """
@@ -49,7 +48,7 @@ def optimization(requirements, available_feeds, BW, animal_type, cow_type):
     NLP.set_globals(price, requirements.NEmaint, requirements.NEa, requirements.NEpreg,
                     requirements.NEl, requirements.NEg, requirements.MP_req,
                     requirements.Ca_req, requirements.P_req,
-                    TDN, DE, EE, is_fat, BW, calcium, phosphorus, NDF,
+                    TDN, DE, EE, is_fat, requirements.avg_BW, calcium, phosphorus, NDF,
                     feed_type, is_wetforage, Kd, N_A, N_B, CP, dRUP, limit, cow_type,
                     animal_type_ = animal_type,
                     DMIest_ = requirements.DMIest)
@@ -68,9 +67,13 @@ def optimization(requirements, available_feeds, BW, animal_type, cow_type):
     #simulation if bounds error is not resolved
         if count > 30:
             solution = None
+            break
 
     # retrieving MEact from diet
-    ration_vals = NLP.get_ration_vals(solution.x)
+    if solution == None:
+        ration_vals = None
+    else:
+        ration_vals = NLP.get_ration_vals(solution.x)
     return solution, ration_vals
 
 
@@ -91,7 +94,6 @@ def ration_formulation(pen, feed, available_feeds, animal_type, cow_type):
     # creating instance of class requirements
     req = Requirements()
     req.set_requirements(pen, animal_type, False)
-    BW = pen.avg_BW
 
     ###
     #Pyomo Nutrients Stuff
@@ -100,7 +102,7 @@ def ration_formulation(pen, feed, available_feeds, animal_type, cow_type):
     #pslv.create_model(available_feeds.pyomo_data, req.pyomo_req, available_feeds.feeds)
     ####
 
-    solution = optimization(req, available_feeds, BW, animal_type, cow_type)
+    solution, ration_vals = optimization(req, available_feeds, animal_type, cow_type)
     # Reduction of milk production estimate process to achieve feasible solution
     if animal_type == 'cow':
         while not solution.success:
@@ -117,10 +119,7 @@ def ration_formulation(pen, feed, available_feeds, animal_type, cow_type):
                 animal.estimated_daily_milk_produced -= reduction
             # recalculating requirements after reduction
             req.set_requirements(pen, animal_type, True)
-            solution = optimization(req, available_feeds, BW, animal_type, cow_type)
-            #in case of scipy error
-            if solution == None:
-                break
+            solution, ration_vals = optimization(req, available_feeds, animal_type, cow_type)
 
     if solution != None:
         ration = {}
@@ -132,11 +131,11 @@ def ration_formulation(pen, feed, available_feeds, animal_type, cow_type):
             ration[available_feeds.feed_key[feed_id]] = round(num, 6)
         ration['status'] = 'Optimal'
         ration['objective'] = NLP.objective(solution.x)
-        return ration
+        return ration, ration_vals
     #safeguard if scipy SLSQP bounds error still occurs after many iterations
     #using previous cycles ration for this pen
     else:
-        return pen.ration
+        return pen.ration, ration_vals
 
 
 def ration_report(ration, available_feeds):
@@ -222,6 +221,8 @@ class Requirements:
         self.P_req = 0
         # dry matter intake estimation (kg)
         self.DMIest = 0
+        # average body weigth in pen
+        self.avg_BW = 0
         # pyomo requirements dictionary
         self.pyomo_req = {}
 
@@ -245,6 +246,7 @@ class Requirements:
         Ca_req = []
         P_req = []
         DMIest = []
+        BW = []
 
         if recalc:
             # iterating through each animal in the pen and calculating requirements
@@ -306,6 +308,7 @@ class Requirements:
                 Ca_req.append(req['Ca_req'])
                 P_req.append(req['P_req'])
                 DMIest.append(req['DMIest'])
+                BW.append(animal.body_weight)
         else:
             # iterating through each animal in the pen and setting requirements
             for animal in pen.animals_in_pen:
@@ -328,6 +331,7 @@ class Requirements:
                 Ca_req.append(animal.Ca_req)
                 P_req.append(animal.P_req)
                 DMIest.append(animal.DMIest)
+                BW.append(animal.body_weight)
         # populating the class variables as an average across cows for each requirement
         self.NEmaint = stat.mean(NEmaint)
         self.NEa = stat.mean(NEa)
@@ -338,6 +342,13 @@ class Requirements:
         self.Ca_req = stat.mean(Ca_req)
         self.P_req = stat.mean(P_req)
         self.DMIest = stat.mean(DMIest)
+        self.avg_BW = stat.mean(BW)
+
+        #setting average nutrient requirements pen class variable
+        pen.avg_nutrient_rqmts = {'NEmaint': self.NEmaint, 'NEa': self.NEa,
+                        'NEg': self.NEg, 'NEpreg': self.NEpreg, 'NEl': self.NEl,
+                        'MP_req': self.MP_req, 'Ca_req': self.Ca_req, 'P_req':self.P_req,
+                        'DMIest': self.DMIest, 'avg_BW': self.avg_BW}
 
         #pyomo requirements dictionary
         self.pyomo_req['NEmaint'] = self.NEmaint

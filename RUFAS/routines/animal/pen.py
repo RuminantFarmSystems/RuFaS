@@ -229,59 +229,6 @@ class Pen:
             stage = type(animal).__name__
             self.classes_in_pen.add(stage)
 
-    def calc_avg_nutrient_rqmts(self):
-        """
-        Calculates and sets the average nutrient requirements and necessary
-        ration statistics of the animals in the pen.
-        """
-        first_animal_rqmts = self.animals_in_pen[0].nutrient_rqmts
-        sum_dict = {}
-        avg_dict = {}
-        for key in first_animal_rqmts.keys():
-            sum_dict[key] = 0
-
-        sum_BW = 0
-        sum_DMIest = 0
-        #sum_DBW = 0
-        sum_milk = 0
-        sum_CP_milk = 0
-
-        # find sums of nutrients and necessary ration statistics for each
-        # animal in the pen
-        for animal in self.animals_in_pen:
-            curr_rqmts = animal.nutrient_rqmts
-            if curr_rqmts == {}:
-                print(type(animal).__name__, animal.id, self.id, self.avg_calf_nutrient_rqmts)
-
-            for key in sum_dict.keys():
-                sum_dict[key] += curr_rqmts[key]['val']
-
-            sum_BW += animal.body_weight
-            sum_DMIest += animal.DMIest
-            #sum_DBW += animal.DBW
-            #sum_DBW += animal.DBW
-            if type(animal).__name__ == 'Cow':
-                sum_milk += animal.estimated_daily_milk_produced
-                sum_CP_milk += animal.CP_milk
-
-        # divide by number of animals to find averages
-        num_animals = len(self.animals_in_pen)
-        for key in sum_dict:
-            avg_value = sum_dict[key] / num_animals
-            avg_dict[key] = {
-                'op': self.animals_in_pen[0].nutrient_rqmts[key]['op'],
-                'val': avg_value}
-
-        if 'Calf' in self.classes_in_pen:
-            self.avg_calf_nutrient_rqmts = avg_dict
-        else:
-            self.avg_nutrient_rqmts = avg_dict
-
-        self.avg_BW = sum_BW / num_animals
-        self.avg_DMIest = sum_DMIest / num_animals
-        #self.avg_DBW = sum_DBW / num_animals
-        self.avg_milk = sum_milk / num_animals
-        self.avg_CP_milk = sum_CP_milk / num_animals
 
     def calc_avg_stats(self):
         """
@@ -305,11 +252,11 @@ class Pen:
                 sum_milk += animal.estimated_daily_milk_produced
                 sum_CP_milk += animal.CP_milk
 
-        self.avg_BW = sum_BW / num_animals
-        self.avg_DMIest = sum_DMIest / num_animals
+        #self.avg_BW = sum_BW / num_animals
+        #self.avg_DMIest = sum_DMIest / num_animals
         #self.avg_DBW = sum_DBW / num_animals
-        self.avg_milk = sum_milk / num_animals
-        self.avg_CP_milk = sum_CP_milk / num_animals
+        #self.avg_milk = sum_milk / num_animals
+        #self.avg_CP_milk = sum_CP_milk / num_animals
 
     def calc_ration(self, feed, available_feeds):
         """
@@ -333,19 +280,19 @@ class Pen:
             elif 'HeiferI' in self.classes_in_pen or \
                     'HeiferII' in self.classes_in_pen or \
                     'HeiferIII' in self.classes_in_pen:
-                ration_per_animal = \
+                ration_per_animal, ration_vals = \
                     ration_driver.ration_formulation(self,feed, available_feeds, \
                                                     'heifer', False)
 
             elif 'Cow' in self.classes_in_pen and \
                     self.animals_in_pen[0].milking:  # lactating cow
-                ration_per_animal = \
+                ration_per_animal, ration_vals = \
                     ration_driver.ration_formulation(self, feed,available_feeds, \
                                                                 'cow', True)
 
             elif 'Cow' in self.classes_in_pen and \
                     not self.animals_in_pen[0].milking:  # dry cow
-                ration_per_animal = \
+                ration_per_animal, ration_vals = \
                     ration_driver.ration_formulation(self, feed,available_feeds, \
                                                                 'cow', False)
 
