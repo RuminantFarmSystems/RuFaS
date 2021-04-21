@@ -10,23 +10,6 @@ Description: This module contains the necessary functions for calculating and
              Currently the only function meant to be used outside of this file
              is the update_all() function. The other functions are meant to
              serve as helper functions within this file.
-
-Soil attribute definitions
-
-    runoff = daily runoff (mm H2O)
-
-    R = daily rainfall depth (mm H2O)
-
-    SW = soil water content of entire profile (mm H2O)
-
-    FC = amount of water in soil profile at field capacity (mm H2O)
-
-    WP = amount of water in the soil profile held at wilting point (mm H2O)
-
-    percolation = the amount of water percolated to the next layer (mm H2O)
-
-    trans_act = the amount of water lost to transpiration on a given day (mm H2O)
-                (this value is taken from the crop module)
 """
 
 
@@ -42,10 +25,10 @@ def update_all(soil, weather, time):
         time: instance of the Time class specified in classes.py
     """
 
-    update_SW(soil, weather, time)
+    update_profile_SW(soil, weather, time)
 
 
-def update_SW(soil, weather, time):
+def update_profile_SW(soil, weather, time):
     """
     Description:
         Tracks and updates soil water pools based on calculated fluxes.
@@ -59,8 +42,8 @@ def update_SW(soil, weather, time):
         time
     """
 
-    soil.trans_sum = 0.0
-    soil.evap_sum = 0.0
+    soil.trans = 0.0
+    soil.evap = 0.0
     soil.ET_act = 0.0
 
     profile_SW = 0
@@ -92,8 +75,8 @@ def update_SW(soil, weather, time):
         SW = min(SAT, SW)
 
         profile_SW += SW
-        soil.trans_sum += trans
-        soil.evap_sum += evap
+        soil.trans += trans
+        soil.evap += evap
         soil.ET_act += (evap + trans)
 
         layer.soil_water = SW
@@ -106,9 +89,21 @@ def update_SW(soil, weather, time):
     soil.delta_SW = profile_SW - soil.profile_SW
     soil.profile_SW = profile_SW
 
-    R = weather.rainfall[time.year - 1][time.day - 1]
+    R = weather.rainfall[time.year - 1][time.day - 1] + weather.irrigation[time.year - 1][time.day - 1]
 
     soil.p_act = R
     soil.p_calc = soil.delta_SW + soil.ET_act + soil.drainage + soil.runoff
 
     soil.water_balance_difference = soil.p_act - soil.p_calc
+
+
+def update_annual_SW(soil):
+    soil.ET_max_annual += soil.ET_max
+
+    soil.drainage_annual += soil.drainage
+    soil.runoff_annual += soil.runoff
+    soil.trans_annual += soil.trans
+    soil.evap_annual += soil.evap
+    soil.ET_annual += soil.ET_act
+
+    soil.p_act_annual += soil.p_act

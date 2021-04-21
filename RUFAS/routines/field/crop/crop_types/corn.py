@@ -2,7 +2,6 @@ from .base_crop import BaseCrop
 
 
 class Corn(BaseCrop):
-
     def __init__(self, crop_name, data):
         super().__init__()
 
@@ -25,8 +24,9 @@ class Corn(BaseCrop):
         self.kill_year = True
         self.planted = False
         self.growing = False
+        self.harvested = False
 
-        self.fix_nitrogen = False
+        self.fix_nitrogen = True  # TODO: change back
 
         # ===================================================================
         ''' HEAT UNIT DATA '''
@@ -170,6 +170,5 @@ class Corn(BaseCrop):
 
         self.N_yield_annual = 0.0
         self.P_yield_annual = 0.0
-        self.DM_yield_annual = 0.0
         self.NDF_yield_annual = 0.0
         self.yield_annual = 0

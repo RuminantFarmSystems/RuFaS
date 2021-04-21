@@ -3,110 +3,13 @@ RUFAS: Ruminant Farm Systems Model
 
 File name: nitrogen_cycling.py
 
-Author(s): William Donovan, wmdonovan@wisc.edu
-
 Description: Nitrogen Cycling driver class.
              Calls the necessary functions for calculating and
              updating the content of three organic N pools (Fresh, Active, and
              Stable) and two inorganic pools (NO3 and NH4) associated with a
-             soil profile on a given day 
+             soil profile on a given day
 
-Soil attribute definitions
-
-    NO3 = initial NO3 levels (kg/ha)
-
-    z = depth of the soil layer's lower boundary
-
-    org_N = initial Organic N (Active + Stable) (kg/ha)
-
-    org_C = Organic carbon in a soil layer (%, user input)
-
-    NH4 = initial NO4 levels (0 mg/kg)
-    
-    temp_fac = temperature factor
-    
-    water_fac = water factor
-    
-    soil_temp = temperature of the soil layer (ºC)
-    
-    SW = soil water content of entire profile, excluding water held at wilting
-            point (mm H2O)
-
-    WP = soil water content held at wilting point (mm H2O)
-
-    FC = field capacity (mm H2O)
-    
-    SAT = saturated water content of the soil layer (mm H2O)
-
-    depth_fac = volatilization depth factor
-
-    z_mid = 5mm (assuming a 10mm top layer)
-
-    nitr_reg = nitrification regulator
-
-    volatil_reg = volatilization regulator
-
-    CEC_fac = volatilization cation exchange factor (0.15)
-
-    tot_nitri_volatil = total combined nitrification and volatilization (kg/ha)
-
-    frac_nitr = fraction of total that is nitrification
-
-    frac_volatil = fraction of total that is volatilization
-
-    nitrification = mass of nitrification (kg/ha)
-
-    volatilization = mass of volatilization
-
-    NO3/NH4_conc1 = concentration of NO3 or NH4 in the top soil layer (kg N/mm H2O)
-
-    w = sum of runoff and soil water for the layer
-
-    NO3/NH4_runoff = mass of NO3 or NH4 loss in runoff from soil layer 1 (kg/ha)
-
-    Cr = coefficient of extraction for runoff (0.1)
-
-    N_conc = concentration of nitrogen loss in erosion for each pool except
-                    NO3 (mg/kg)
-
-    BD = soil layer bulk density (g/cm^3)
-
-    depth = soil layer thickness (mm)
-
-    eros_N_loss = N mass loss in erosion for each pool(kg/ha)
-
-    sed = daily soil loss (Metric Tons/ha)
-
-    ER = enrichment ratio
-
-    NO3/NH4_conc = concentration of NO3 or NH4 for leaching (kg N / mm H2O)
-
-    NO3/NH4_percolation = mass of NO3 or NH4 loss in percolation water from all soil layers
-                (kg/ha)
-
-    denitr_N = denitrified Nitrogen(kg/ha)
-
-    de_N_rate = user defined denitrification rate coefficient (0.1)
-
-    org_C = soil organic matter content (%)
-
-    N_min_act = mineralization from active N pool (kg/ha)
-
-    CN = daily rate constant, ratio of Carbon to Nitrogen
-
-    CP = ratio of the residue
-
-    decay = decay rate constant defining the fraction of residue decomposed
-
-    min_coeff = fresh residue mineralization coefficient (0.05)
-
-    res_comp = nutrient cycling residue decomposition factor
-
-    fresh_min = mineralization of Fresh N (kg/ha)
-
-    N_trans = nitrogen transferred between the active and stable pools
-
-    frac_N = fraction of Humic Nitrogen in the active pool (0.02)
+Author(s): William Donovan, wmdonovan@wisc.edu
 """
 
 from math import exp
@@ -114,7 +17,7 @@ from . import denitrification, humus_mineralization, mineralization_decomp, \
     leaching_runoff_erosion, nitrification_volatilization
 
 
-def update_all(soil, manure_management, weather, time):
+def update_all(soil, field_management):
     """
     Description:
         This function calls all the necessary functions to update information related
@@ -122,11 +25,8 @@ def update_all(soil, manure_management, weather, time):
         and is a matter of active development.
     Args:
         soil: instance of the Soil class specified in soil.py
-        manure_management: instance of the BaseApplicationManagement class
-            specified in field_management.py representing the management scheme
-            for manure applications
-        weather: instance of the Weather class specified in classes.py
-        time: instance of the Time class specified in classes.py
+        field_management: instance of the FieldManagement class specified in
+            field_management.py
     """
 
     calc_temp_factors(soil)
@@ -143,10 +43,7 @@ def update_all(soil, manure_management, weather, time):
 
     humus_mineralization.humus_mineralization(soil)
 
-    if (time.start_year + time.year - 1, time.day) in manure_management.applications:
-        if manure_management.check_conditions(soil, weather, time):
-            added_manure_N(soil, manure_management.applications[(time.start_year + time.year - 1,
-                                                                 time.day)].data)
+    update_profile_N(soil, field_management)
 
 
 def calc_temp_factors(soil):
@@ -194,21 +91,55 @@ def calc_water_factors(soil):
         layer.water_fac = water_fac
 
 
-def added_manure_N(soil, manure_application):
-    """
-    Description:
-        TODO: Temporary method pending link to manure storage
-        Adds specified manure to soil with no availability constraints.
+def update_profile_N(soil, field_management):
+    soil.NH4 = 0.0
+    soil.NO3 = 0.0
+    soil.org_N = 0.0
+    soil.active_N = 0.0
+    soil.stable_N = 0.0
+    soil.N_uptake = 0.0
+    for layer in soil.soil_layers:
+        soil.NH4 += layer.NH4
+        layer.NH4_average += layer.NH4
+        soil.NO3 += layer.NO3
+        layer.NO3_average += layer.NO3
+        soil.org_N += layer.org_N
+        layer.org_N_average += layer.org_N
+        soil.active_N += layer.active_N
+        layer.active_N_average += layer.active_N
+        soil.stable_N += layer.stable_N
+        layer.stable_N_average += layer.stable_N
+        soil.N_uptake += layer.N_uptake
 
-    Args:
-        soil
-        manure_application: an instance of the BaseApplication object specified in
-            field_management.py representing a manure application
-    """
+    profile_N = soil.NH4 + soil.NO3 + soil.org_N + soil.fresh_N
 
-    total_N = manure_application['mass'] * manure_application['N_frac']
-    active_N = total_N * 0.875
-    stable_N = total_N * 0.125
+    soil.delta_N = profile_N - soil.profile_N
 
-    soil.soil_layers[0].active_N += active_N
-    soil.soil_layers[0].stable_N += stable_N
+    soil.profile_N = profile_N
+
+    soil.N_drainage = soil.NH4_drainage + soil.NO3_drainage + \
+                      soil.active_N_drainage
+
+    soil.N_runoff = soil.NH4_runoff + soil.NO3_runoff
+
+    soil.N_erosion = soil.NH4_erosion + soil.active_N_erosion + \
+                     soil.fresh_N_erosion
+
+    soil.N_calc = soil.delta_N + soil.N_drainage + soil.N_runoff + soil.N_erosion + soil.N_uptake
+
+    soil.N_balance_difference = field_management.manure_N_applied - soil.N_calc
+
+
+def update_annual_N(soil):
+    soil.profile_N_average += soil.profile_N
+    soil.fresh_N_average += soil.fresh_N
+    soil.NO3_drainage_annual += soil.NO3_drainage
+    soil.NH4_drainage_annual += soil.NH4_drainage
+    soil.M_leach_annual += soil.M_leach
+    soil.active_N_drainage_annual += soil.active_N_drainage
+    soil.NO3_runoff_annual += soil.NO3_runoff
+    soil.NH4_runoff_annual += soil.NH4_runoff
+    soil.N_runoff_annual += soil.N_runoff
+    soil.N_drainage_annual += soil.N_drainage
+    soil.N_erosion_annual += soil.N_erosion
+    soil.N_uptake_annual += soil.N_uptake

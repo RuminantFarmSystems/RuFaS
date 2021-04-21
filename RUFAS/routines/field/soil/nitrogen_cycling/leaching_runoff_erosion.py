@@ -58,13 +58,10 @@ def leaching_runoff_erosion(soil):
     soil.NH4_runoff = min(layer.NH4, NH4_runoff)
     layer.NH4 -= soil.NH4_runoff
 
-    soil.NO3_runoff_annual += soil.NO3_runoff
-    soil.NH4_runoff_annual += soil.NH4_runoff
-
     # "pseudocode_soil" S.4.C.3
     active_N_eros_conc = (100 * layer.active_N) / (BD * thickness)
     stable_N_eros_conc = (100 * layer.stable_N) / (BD * thickness)
-    fresh_N_eros_conc = (100 * layer.top_layer_fresh_N / (BD * thickness))
+    fresh_N_eros_conc = (100 * soil.fresh_N / (BD * thickness))
     NH4_eros_conc = (100 * layer.NH4 / (BD * thickness))
 
     eros_active_N_loss = 0
@@ -90,8 +87,8 @@ def leaching_runoff_erosion(soil):
     soil.stable_N_erosion = min(layer.stable_N, eros_stable_N_loss)
     layer.stable_N -= soil.stable_N_erosion
 
-    soil.fresh_N_erosion = min(layer.top_layer_fresh_N, eros_fresh_N_loss)
-    layer.top_layer_fresh_N -= soil.fresh_N_erosion
+    soil.fresh_N_erosion = min(soil.fresh_N, eros_fresh_N_loss)
+    soil.fresh_N -= soil.fresh_N_erosion
 
     soil.NH4_erosion = min(layer.NH4, eros_NH4_loss)
     layer.NH4 -= soil.NH4_erosion
@@ -115,7 +112,7 @@ def leaching_runoff_erosion(soil):
         percolation = layer.percolation
         NO3_percolation = 0
         NH4_percolation = 0
-        active_percolation = 0
+        active_N_percolation = 0
 
         if percolation > 0:
             # "pseudocode_soil" S.4.C.6
@@ -128,25 +125,25 @@ def leaching_runoff_erosion(soil):
             # "pseudocode_soil" S.4.C.8
             NO3_percolation = NO3_percolation_conc * percolation / layer.Cl
             NH4_percolation = NH4_percolation_conc * percolation
-            active_percolation = active_conc * percolation
+            active_N_percolation = active_conc * percolation
 
         layer.NO3_percolation = min(layer.NO3, NO3_percolation)
         layer.NH4_percolation = min(layer.NH4, NH4_percolation)
-        layer.active_percolation = min(layer.active_N, active_percolation)
+        layer.active_N_percolation = min(layer.active_N, active_N_percolation)
 
     # Updates each pool with calculated leaching information
     for x in range(len(soil.soil_layers)):
         layer = soil.soil_layers[x]
         layer.NO3 -= layer.NO3_percolation
         layer.NH4 -= layer.NH4_percolation
-        layer.active_N -= layer.active_percolation
+        layer.active_N -= layer.active_N_percolation
 
         if x != 0:
             prev_layer = soil.soil_layers[x - 1]
             layer.NO3 += prev_layer.NO3_percolation
             layer.NH4 += prev_layer.NH4_percolation
-            layer.active_N += prev_layer.active_percolation
+            layer.active_N += prev_layer.active_N_percolation
 
-    soil.NO3_drainage_annual += soil.soil_layers[-1].NO3_percolation
-    soil.NH4_drainage_annual += soil.soil_layers[-1].NH4_percolation
-    soil.active_N_drainage_annual += soil.soil_layers[-1].active_percolation
+    soil.NO3_drainage = soil.soil_layers[-1].NO3_percolation
+    soil.NH4_drainage = soil.soil_layers[-1].NH4_percolation
+    soil.active_N_drainage = soil.soil_layers[-1].active_N_percolation

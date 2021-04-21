@@ -1,43 +1,37 @@
 {
-    "management_scheme": "optimal",
-
-    "fertilizer":
-    {
-        "app_years": [2009],
+    "fertilizer": {
+        "mixes": {
+            "fert_1": {
+                "N": 0.0,
+                "P": 0.0,
+                "K": 0.0
+            }
+        },
+        "rotation_years": [2009],
         "repeat": 1,
-
+        "mix": [],
         "year": [],
         "day": [],
-        "mass": [],
+        "N_mass": [],
+        "P_mass": [],
+        "K_mass": [],
         "depth": [],
         "surface_percent": []
     },
-
-    "manure":
-    {
-        "app_years": [2009],
+    "manure": {
+        "rotation_years": [2009],
         "repeat": 1,
-
-        "type": ["DAIRY", "DAIRY", "DAIRY", "DAIRY", "DAIRY", "DAIRY", "DAIRY", "DAIRY"],
-        "year": [2012, 2012, 2012, 2012, 2013, 2013, 2013, 2013],
-        "day": [103 ,176, 226, 283, 46, 155, 241, 273],
-        "mass": [1320.0, 2120.0, 1329.0, 2228.0, 1250.0, 1587.0, 1750.0, 1555.0],
-        "P_frac": [0.00820, 0.00866, 0.00941, 0.00656, 0.00748, 0.00698, 0.00721, 0.00646],
-        "WIP_frac": [0.6, 0.6, 0.6, 0.6, 0.6, 0.6, 0.6, 0.6],
-        "WOP_frac": [0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05],
-        "N_frac": [0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1],
-        "NH4_frac": [0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05],
-        "dry_matter": [0.04, 0.07, 0.04, 0.04, 0.05, 0.05, 0.07, 0.06],
-        "percent_cover": [0.95, 0.95, 0.95, 0.95, 0.95, 0.95, 0.95, 1.0],
-        "depth": [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0],
-        "surface_percent": [1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0]
+        "year": [],
+        "day": [],
+        "N_mass": [],
+        "P_mass": [],
+        "cover_percent": [],
+        "depth": [],
+        "surface_percent": []
     },
-
-    "tillage":
-    {
-        "app_years": [2009],
+    "tillage": {
+        "rotation_years": [2009],
         "repeat": 1,
-
         "year": [],
         "day": [],
         "percent_incorporated": [],
