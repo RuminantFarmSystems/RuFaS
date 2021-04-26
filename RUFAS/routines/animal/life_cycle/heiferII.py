@@ -11,7 +11,7 @@ Description: This file updates the heifer form breeding to close to calving.
             http://www.dcrcouncil.org/wp-content/uploads/2018/12/Dairy-Heifer-Protocol-Sheet-Updated-2018.pdf
             Preg check follows AI for three times.
 """
-###############################################################################
+
 import numpy as np
 from RUFAS.routines.animal.life_cycle.heiferI import HeiferI
 from RUFAS.routines.animal.life_cycle.animal_base import AnimalBase
@@ -27,7 +27,8 @@ class HeiferII(HeiferI):
     def __init__(self, args):
         """
         Description:
-            initialize the heifer in this stage from the first stage and initialize or assigns the repro program parameters
+            initialize the heifer in this stage from the first stage and
+             initialize or assigns the repro program parameters
         Input:
             args.id: id of the animal
             args.breed: breed of the animal
@@ -134,6 +135,8 @@ class HeiferII(HeiferI):
         self.ai_day = 0
         self.abortion_day = 0
         self.days_in_preg = 0
+        self.preg = False
+
         self.gestation_length = 0
         self.p_gest_for_calf = 0
 
@@ -212,7 +215,8 @@ class HeiferII(HeiferI):
         p_urine, p_feces_excrt = self.calc_base_manure()
 
         self.p_excrt, self.manure_excretion = \
-            manure_calculations(p_feces_excrt, p_urine)
+            manure_calculations(self.ration_formulation, feed,
+                                self.body_weight, p_feces_excrt, p_urine)
 
     def phosphorus_rqmts(self, DMI):
         """
@@ -280,7 +284,7 @@ class HeiferII(HeiferI):
 
         else:
             self.body_weight = self.mature_body_weight
-            self.events.add_event(self.days_born, sim_day, c.MATURE_BODY_WEIGHT)
+            self.events.add_event(self.days_born, sim_day, c.MATURE_BODY_WEIGHT_REGULAR)
 
         # breeding method assign to heifer
         if self.days_born >= AnimalBase.config['breeding_start_day_h']:
@@ -639,6 +643,7 @@ class HeiferII(HeiferI):
         elif self.days_born == self.ai_day + \
             AnimalBase.config['preg_check_day_1']:
             self.preg_diagnoses += 1
+
             if self.days_in_preg > 0:
                 preg_loss_rand = random()
                 if preg_loss_rand > AnimalBase.config['preg_loss_rate_1']:

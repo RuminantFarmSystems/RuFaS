@@ -74,7 +74,7 @@ def calc_runoff(soil, weather, time):
         time
     """
 
-    R = weather.rainfall[time.year-1][time.day-1]
+    R = weather.rainfall[time.year - 1][time.day - 1] + weather.irrigation[time.year - 1][time.day - 1]
     S = calc_S(soil)
 
     # modifies S if the top layer of soil is frozen
@@ -290,6 +290,6 @@ def calc_daily_infiltration(soil, weather, time):
         time
     """
 
-    R = weather.rainfall[time.year-1][time.day-1]
+    R = weather.rainfall[time.year - 1][time.day - 1] + weather.irrigation[time.year - 1][time.day - 1]
     runoff = soil.runoff
     soil.infiltration = R - runoff

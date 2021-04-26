@@ -5,27 +5,49 @@
         "end_date" : "2016:243",
         "csv_dir": "output/CSVs/",
         "graphic_dir": "output/graphics/",
-        "run_tests": false,
+        "run_tests": true,
         "set_seed": false,
         "seed": 0
     },
     "weather": "barnyard_weather.csv",
-    "output": "life_cycle_report.json",
+    "output": "custom_output.json",
     "farm":
     {
-        "fields":
-        {
-            "field_1":
-            {
-                "soil": "barnyard_soil.json",
-                "crop": "custom_rotation.json",
-                "field_management": "barnyard_field_management.json"
-            },
-            "field_2":
-            {
+        "fields": {
+            "field_1": {
                 "soil": "barnyard_soil.json",
                 "crop": "corn_rotation.json",
-                "field_management": "barnyard_field_management.json"
+                "field_management": "hector_2.json"
+            },
+            "field_2": {
+                "soil": "barnyard_soil.json",
+                "crop": "alfalfa_rotation.json",
+                "field_management": "hector_2.json"
+            },
+            "field_3": {
+                "soil": "barnyard_soil.json",
+                "crop": "custom_rotation.json",
+                "field_management": "hector_3.json"
+            },
+            "field_4": {
+                "soil": "barnyard_soil.json",
+                "crop": "alfalfa_rotation.json",
+                "field_management": "hector_3.json"
+            },
+            "field_5": {
+                "soil": "barnyard_soil.json",
+                "crop": "corn_rotation.json",
+                "field_management": "hector_4.json"
+            },
+            "field_6": {
+                "soil": "barnyard_soil.json",
+                "crop": "alfalfa_rotation.json",
+                "field_management": "hector_4.json"
+            },
+            "field_7": {
+                "soil": "barnyard_soil.json",
+                "crop": "custom_rotation.json",
+                "field_management": "hector_1.json"
             }
         },
         "animal": "animal_management_animal.json",

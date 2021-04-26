@@ -10,10 +10,34 @@ from .base_report import BaseReport
 from .. import graphics
 
 
+class PensReport(BaseReportDriver):
+    def __init__(self, data, state):
+        super().__init__(data)
+        for pen in state.animal_management.all_pens:
+            self.reports['pen_' + str(pen.id)] = PenReport(data, state.feed, pen.id)
+
+        self.reports['pens_summary'] = PensSummary(data['pens_summary'])
+
+
+class PensSummary(BaseReport):
+    def __init__(self, data):
+        super().__init__(data)
+
+        self.daily_variables = {
+            'year': ['time.calendar_year', '', []],
+            'j_day': ['time.day', '', []]
+        }
+
+        self.annual_variables = {
+            'year': ['time.calendar_year', '', 0]
+        }
+
+
 class PenReport(BaseReportDriver):
     def __init__(self, data, feed, pen_id):
         super().__init__(data)
         self.pen_id = pen_id
+        self.report_name = 'pen_' + str(pen_id)
         self.reports = {
             'ration_report': self.RationReport(data['ration_report'], feed, self.pen_id),
             'growth_report': self.GrowthReport(data['growth_report'], self.pen_id),
@@ -66,7 +90,19 @@ class PenReport(BaseReportDriver):
             self.daily_variables = {'year': ['time.calendar_year', '', []],
                                     'j_day': ['time.day', '', []],
                                     'num_animals': ['len(pen.animals_in_pen)', '', []],
-                                    'manure': ['pen.manure[\'p_excrt_manure\']', 'g', []]
+                                    'manure': ['pen.manure[\'p_excrt_manure\']', 'kg', []],
+                                    'urea_conc': ['pen.manure[\'U\']', 'mol/L', []],
+                                    'ammoniacal_N_conc': ['pen.manure[\'TAN_s\']', 'mol/L', []],
+                                    'manure_N': ['pen.manure[\'MN\']', 'g', []],
+                                    'total_solids': ['pen.manure[\'TSd\']', 'kg', []],
+                                    'manure_VSd': ['pen.manure[\'VSd\']', 'g', []],
+                                    'manure_VSnond': ['pen.manure[\'VSnd\']', 'g', []],
+                                    'WIP_frac': ['pen.manure[\'WIP_frac\']', 'g/g total man', []],
+                                    'WOP_frac': ['pen.manure[\'WOP_frac\']', 'g/g total man', []],
+                                    'manure_P': ['pen.manure[\'p_excrt_manure\']', 'g', []],
+                                    'P_frac': ['pen.manure[\'p_frac\']', 'g/g total man', []],
+                                    'K_manure': ['pen.manure[\'K_manure\']', 'g', []],
+                                    'enteric_methane': ['pen.manure[\'CH4_manure\']', 'g', []]
                                     }
 
             self.annual_variables = {'year': ['time.calendar_year', '', 0]}

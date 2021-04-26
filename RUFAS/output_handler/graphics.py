@@ -1,6 +1,6 @@
 """
 RUFAS: Ruminant Farm Systems Model
-File name: graphics_1.py
+File name: graphics.py
 
 Description: Produces graphical representations of RuFaS output data.
 
@@ -14,6 +14,7 @@ from pathlib import Path
 
 import matplotlib.pyplot as mp
 import random
+from pandas.plotting import register_matplotlib_converters
 
 
 # reads all the data from a csv and puts it in a dictionary with each variable
@@ -47,6 +48,7 @@ def read_data(report, output_csv):
 # data analytics for ration
 def ration_graphics(report):
     if report.produce_graphics:
+        register_matplotlib_converters()
         output_csv = report.file_name
         variables, units = read_data(report, output_csv)
 
@@ -148,6 +150,7 @@ def individual_animal_graphics(report):
     # for selected animals, days_born on x-axis and body_weight and
     # milk_production on y-axes
     if report.produce_graphics:
+        register_matplotlib_converters()
         animals = report.animals
         save_dir = report.graphic_dir
 
@@ -197,6 +200,7 @@ def individual_animal_graphics(report):
 # produces the daily data analysis
 def daily_graphics(report):
     if report.produce_graphics:
+        register_matplotlib_converters()
         output_csv = report.file_name
         variables, units = read_data(report, output_csv)
 
@@ -228,6 +232,7 @@ def daily_graphics(report):
 
 def annual_graphics(report):
     if report.produce_graphics:
+        register_matplotlib_converters()
         annual_file_name = str(report.file_name).split('.')[0] + "_annual.csv"
         variables, units = read_data(report, annual_file_name)
         save_dir = report.graphic_dir

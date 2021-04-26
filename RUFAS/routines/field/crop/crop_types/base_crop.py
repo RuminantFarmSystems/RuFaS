@@ -31,3 +31,6 @@ class BaseCrop:
         self.HI_actual = 0
         self.yield_actual = 0
         self.yield_annual = 0
+        self.HI_min = 0
+        self.HI_actual = 0
+        self.HI_max = 0
