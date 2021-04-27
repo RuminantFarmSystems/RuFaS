@@ -526,6 +526,10 @@ class AnimalManagement:
         self.fully_update_id_pen()
 
     def pen_allocation_new(self):
+        #TODO
+        #-mark pens after grouping
+        #-adding new animals to pens with lowest stocking density
+
         # separate into lactating and dry cow pens
         lactating_cows = []
         dry_cows = []
@@ -694,6 +698,7 @@ class AnimalManagement:
             l_cow_pens[0].update_animals(pen_grouping[key])
             l_cow_pens.remove(l_cow_pens[0])
 
+        self.fully_update_id_pen()
 
     def clear_pens(self):
         """
@@ -862,7 +867,7 @@ class AnimalManagement:
             if self.end_ration_interval():
                 self.calc_nutrient_rqmts(feed, temp)  # per animal
                 self.clear_pens()
-                self.pen_allocation_new()
+                self.pen_allocation()
                 self.calc_ration(feed)  # per pen
                 self.calc_avg_growth()  # per pen
 
