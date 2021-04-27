@@ -22,6 +22,12 @@ class Pen:
     # unique pen ID, from input file
     id = -1
 
+    # list of valid animal groups this pen is reserved for, (if empty any type valid)
+    animal_groups = []
+
+    # maximum stocking density allowed for this pen
+    max_stocking_density = 1
+
     # list of all animals in this pen
     animals_in_pen = []
 
@@ -160,7 +166,8 @@ class Pen:
     avg_growth = 0
 
     def __init__(self, id_number, vert_dist, horiz_dist, num_stalls, housing_type,
-                 bedding_type, pen_type, manure_handling, manure_separator, manure_storage):
+                 bedding_type, pen_type, manure_handling, manure_separator,
+                            manure_storage, animal_groups, max_stocking_density):
         """
         Initializes a pen with the given arguments.
 
@@ -175,8 +182,12 @@ class Pen:
             manure_handling: the manure handling method used to clean the pen
             manure_separator: the manure separator that processes manure excreted in this pen
             manure_storage: the manure storage receptacle that stores manure excreted in this pen
+            animal_groups: list of valid animal groups this pen is reserved for, (if empty any type valid)
+            max_stocking_density: maximum stocking density allowed for pen
         """
         self.id = id_number
+        self.animal_groups = animal_groups
+        self.max_stocking_density = max_stocking_density
 
         self.vertical_dist_to_parlor = vert_dist
         self.horizontal_dist_to_parlor = horiz_dist
@@ -194,6 +205,7 @@ class Pen:
         self.avg_p_intake = 0
         self.avg_p_req = 0
         self.avg_p_animal = 0
+
 
     def update_animals(self, new_animals):
         """

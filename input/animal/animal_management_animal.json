@@ -65,7 +65,7 @@
 				"num_21_days_repro": 15,
 				"calving_interval": 400,
 				"use_input_calving_interval": false
-				
+
 			},
 			"bodyweight": {
 				"grow_end_day": 780,
@@ -73,12 +73,12 @@
 				"mature_body_weight_mode": 700,
 				"mature_body_weight_right": 1000,
 				"target_heifer_preg_day": 420
-			}		
+			}
 		},
 		"from_literature": {
 			"repro": {
 				"avg_estrus_cycle_heifer": 21,
-				"std_estrus_cycle_heifer": 3,				
+				"std_estrus_cycle_heifer": 3,
 				"preg_check_day_1": 32,
 				"preg_loss_rate_1": 0.02,
 				"preg_check_day_2": 91,
@@ -90,7 +90,7 @@
 				"avg_estrus_cycle_cow": 21,
 				"std_estrus_cycle_cow": 2.5,
 				"avg_estrus_cycle_p": 10,
-				"std_estrus_cycle_p": 2	
+				"std_estrus_cycle_p": 2
 			},
 			"milking": {
 				"wood_l": [[16.13, 23.61, 23.81], [14.07, 19.26, 19.21]],
@@ -122,9 +122,11 @@
 		"user_input": false,
 		"formulation_interval": 7
 	},
+
 	"pen_information": {
 		"pen0": {
 			"id": 0,
+			"animal_groups": [],
 			"vertical_dist_to_milking_parlor": 0.1,
 			"horizontal_dist_to_milking_parlor": 1.6,
 			"number_of_stalls": 100,
@@ -133,10 +135,12 @@
 			"pen_type": "freestall",
 			"manure_handling": "manual_scraping",
 			"manure_separator": "sedimentation",
-			"manure_storage": "storage_pit"
+			"manure_storage": "storage_pit",
+			"max_stocking_density": 1.2
 		},
 		"pen1": {
 			"id": 1,
+			"animal_groups": [],
 			"vertical_dist_to_milking_parlor": 0.1,
 			"horizontal_dist_to_milking_parlor": 1.6,
 			"number_of_stalls": 200,
@@ -145,10 +149,12 @@
 			"pen_type": "freestall",
 			"manure_handling": "flush_system",
 			"manure_separator": "sedimentation",
-			"manure_storage": "storage_pit"
+			"manure_storage": "storage_pit",
+			"max_stocking_density": 1.2
 		},
 		"pen2": {
 			"id": 2,
+			"animal_groups": [],
 			"vertical_dist_to_milking_parlor": 0.1,
 			"horizontal_dist_to_milking_parlor": 1.6,
 			"number_of_stalls": 300,
@@ -157,10 +163,12 @@
 			"pen_type": "tiestall",
 			"manure_handling": "automatic_alley_scrapers",
 			"manure_separator": "sedimentation",
-			"manure_storage": "storage_pit"
+			"manure_storage": "storage_pit",
+			"max_stocking_density": 1.2
 		},
 		"pen3": {
 			"id": 3,
+			"animal_groups": [],
 			"vertical_dist_to_milking_parlor": 0.1,
 			"horizontal_dist_to_milking_parlor": 1.6,
 			"number_of_stalls": 400,
@@ -169,10 +177,12 @@
 			"pen_type": "tiestall",
 			"manure_handling": "manual_scraping",
 			"manure_separator": "sedimentation",
-			"manure_storage": "anaerobic_lagoon"
+			"manure_storage": "anaerobic_lagoon",
+			"max_stocking_density": 1.2
 		},
 		"pen4": {
 			"id": 4,
+			"animal_groups": [],
 			"vertical_dist_to_milking_parlor": 0.1,
 			"horizontal_dist_to_milking_parlor": 1.6,
 			"number_of_stalls": 400,
@@ -181,10 +191,12 @@
 			"pen_type": "tiestall",
 			"manure_handling": "flush_system",
 			"manure_separator": "sedimentation",
-			"manure_storage": "anaerobic_lagoon"
+			"manure_storage": "anaerobic_lagoon",
+			"max_stocking_density": 1.2
 		},
 		"pen5": {
 			"id": 5,
+			"animal_groups": [],
 			"vertical_dist_to_milking_parlor": 0.1,
 			"horizontal_dist_to_milking_parlor": 1.6,
 			"number_of_stalls": 200,
@@ -193,10 +205,12 @@
 			"pen_type": "tiestall",
 			"manure_handling": "automatic_alley_scrapers",
 			"manure_separator": "sedimentation",
-			"manure_storage": "anaerobic_lagoon"
+			"manure_storage": "anaerobic_lagoon",
+			"max_stocking_density": 1.2
 		},
 		"pen6": {
 			"id": 6,
+			"animal_groups": [],
 			"vertical_dist_to_milking_parlor": 0.1,
 			"horizontal_dist_to_milking_parlor": 1.6,
 			"number_of_stalls": 300,
@@ -205,10 +219,12 @@
 			"pen_type": "tiestall",
 			"manure_handling": "manual_scraping",
 			"manure_separator": "rotary_screen",
-			"manure_storage": "storage_pit_2"
+			"manure_storage": "storage_pit_2",
+			"max_stocking_density": 1.2
 		},
 		"pen7": {
 			"id": 7,
+			"animal_groups": [],
 			"vertical_dist_to_milking_parlor": 0.2,
 			"horizontal_dist_to_milking_parlor": 1.6,
 			"number_of_stalls": 250,
@@ -217,10 +233,12 @@
 			"pen_type": "tiestall",
 			"manure_handling": "flush_system",
 			"manure_separator": "rotary_screen",
-			"manure_storage": "storage_pit_2"
+			"manure_storage": "storage_pit_2",
+			"max_stocking_density": 1.2
 		},
 		"pen8": {
 			"id": 8,
+			"animal_groups": [],
 			"vertical_dist_to_milking_parlor": 0.2,
 			"horizontal_dist_to_milking_parlor": 1.6,
 			"number_of_stalls": 400,
@@ -229,7 +247,8 @@
 			"pen_type": "tiestall",
 			"manure_handling": "automatic_alley_scrapers",
 			"manure_separator": "rotary_screen",
-			"manure_storage": "storage_pit_2"
+			"manure_storage": "storage_pit_2",
+			"max_stocking_density": 1.2
 		}
 	}
 }
