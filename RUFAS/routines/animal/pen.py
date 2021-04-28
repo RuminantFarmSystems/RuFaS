@@ -207,13 +207,14 @@ class Pen:
         self.avg_p_animal = 0
 
 
-    def update_animals(self, new_animals):
+    def update_animals(self, new_animals, animal_group):
         """
         Sets the list of animals to @new_animals and calculates the stocking
         density and each animal's walking distance.
 
         Args:
             new_animals: list of new animals in the pen
+            animal_group: a string representation of the type of group these animals are
         """
         # self.animals_in_pen = new_animals
         for animal in new_animals:
@@ -227,6 +228,8 @@ class Pen:
         for animal in self.animals_in_pen:
             stage = type(animal).__name__
             self.classes_in_pen.add(stage)
+        # updates the animal class this pen holds
+        self.animal_groups = [animal_group]
 
 
     def calc_ration(self, feed, available_feeds):
@@ -553,7 +556,7 @@ class Pen:
         if animal.nutrient_rqmts == {} and class_name == 'Calf':
             animal.calc_nutrient_rqmts(feed, temp)
         elif animal.nutrient_rqmts == {} and not class_name == 'Calf':
-            animal.calc_nutrient_rqmts()
+            animal.set_nutrient_rqmts(temp)
 
         # set animal's DVD and DHD if it is a cow
         if class_name == 'Cow':
@@ -568,6 +571,8 @@ class Pen:
         animal.p_intake = self.avg_p_intake
 
         self.animals_in_pen.append(animal)
+        #updating stocking density
+        self.stocking_density = len(self.animals_in_pen) / self.num_stalls * 100
 
     def clear(self):
         """
