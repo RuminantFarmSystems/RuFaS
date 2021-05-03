@@ -334,14 +334,15 @@ class Cow(HeiferIII):
 
     def get_bw_change(self, CI):
         """
-        Calculates the body weight change for a cow.
+        life cycle psedocode @[A.1A.C.56/57/58]
+        Calculates the body weight change for a cow. 
 
         Args:
             CI: the calving interval used in the body weight
                 change calculation
 
         Returns: the daily body weight change for a cow.
-
+        
         """
         CBW = 0
         if self.breed == "HO":
@@ -436,6 +437,7 @@ class Cow(HeiferIII):
             self.BW_at_calving = self.body_weight
             self.events.add_event(self.days_born, sim_day, c.NEW_BIRTH)
             self._health_cull_update()
+            self.death_update()
             new_born = True
 
             # restarting estrus
@@ -1041,7 +1043,6 @@ class Cow(HeiferIII):
         return False
 
     def death_update(self):
-        death_rate = 0
         if self.calves >= 4:
             death_rate = AnimalBase.config['parity_death_prob'][3]
         else:
