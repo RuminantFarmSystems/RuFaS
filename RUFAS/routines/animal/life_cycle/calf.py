@@ -109,10 +109,9 @@ class Calf(AnimalBase):
                     AnimalBase.config['birth_weight_std_je'])
         self.body_weight = self.birth_weight
         self.wean_weight = 0
-        self.mature_body_weight = np.random.triangular(
-            AnimalBase.config['mature_body_weight_left'],
-            AnimalBase.config['mature_body_weight_mode'],
-            AnimalBase.config['mature_body_weight_right'])
+        self.mature_body_weight = np.random.normal(
+            AnimalBase.config['mature_body_weight_avg'],
+			AnimalBase.config['mature_body_weight_std'])
         self.p_animal = args['p_init']
 
     def assign_calf_values(self, args):

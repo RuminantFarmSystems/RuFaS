@@ -101,21 +101,15 @@ class HeiferIII(HeiferII):
         if self.days_in_preg > 0:
             self.days_in_preg += 1
 
-        if self.days_born < AnimalBase.config['grow_end_day']:
+        if self.body_weight < self.mature_body_weight:
             # Heifer can only grow to a maximum weight of mature_body_weight
             self.daily_growth = self.get_bw_change()
 
             self.body_weight += self.daily_growth
 
-            if self.body_weight > self.mature_body_weight:
-                self.body_weight = self.mature_body_weight
-                self.events.add_event(self.days_born,
-                                      sim_day, c.MATURE_BODY_WEIGHT_EARLY)
-
-        if self.days_born == AnimalBase.config['grow_end_day']:
-            self.mature_body_weight = self.body_weight
-            self.events.add_event(self.days_born, sim_day,
-                                  c.MATURE_BODY_WEIGHT_REGULAR)
+        else:
+            self.body_weight = self.mature_body_weight
+            self.events.add_event(self.days_born, sim_day, c.MATURE_BODY_WEIGHT_REGULAR)
 
         if self.days_in_preg == self.gestation_length:
             self.days_born -= 1  # will be incremented again in next stage
