@@ -58,7 +58,9 @@ class HeiferIII(HeiferII):
         super().__init__(args)
         if 'conceptus_weight' in args:
             self.conceptus_weight = args['conceptus_weight']
-
+        if 'calf_birth_weight' in args:
+            self.calf_birth_weight = args['calf_birth_weight']
+    
     def get_heiferIII_values(self):
         """
         Get current information from the heiferIII

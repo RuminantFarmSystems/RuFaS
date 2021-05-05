@@ -13,6 +13,7 @@ Description: This file updates the heifer form breeding to close to calving.
 """
 
 import numpy as np
+from scipy.stats import truncnorm
 from RUFAS.routines.animal.life_cycle.heiferI import HeiferI
 from RUFAS.routines.animal.life_cycle.animal_base import AnimalBase
 from RUFAS.routines.animal.ration.growing_heifer_ration import calculate_rqmts
@@ -70,6 +71,7 @@ class HeiferII(HeiferI):
         self.target_adg_heifer_preg = 0
         self.breeding_to_preg_time = 0
         self.conceptus_weight = 0
+        #self.calf_birth_weight = 0
 
         self.ED_days = 0
         self.GnRH_injections = 0
@@ -94,12 +96,15 @@ class HeiferII(HeiferI):
             target_ADG_heifer_preg = (0.82 * 0.96 * self.mature_body_weight -
                                             0.96 * self.body_weight) / divisor
 
-            CBW = AnimalBase.config['birth_weight_avg_ho']
+            self.calf_birth_weight = truncnorm.rvs(-2*AnimalBase.config['birth_weight_std_ho'], 2*AnimalBase.config['birth_weight_std_ho'], \
+                AnimalBase.config['birth_weight_avg_ho'], AnimalBase.config['birth_weight_std_ho'])
+            
             if self.days_in_preg == self.gestation_length:
                 conceptus_growth = - self.conceptus_weight
                 self.conceptus_weight = 0
+                self.calf_birth_weight = 0
             elif self.days_in_preg > 50:
-                conceptus_total_weight = (0.0148 * self.gestation_length - 2.408) * CBW
+                conceptus_total_weight = (0.0148 * self.gestation_length - 2.408) * self.calf_birth_weight
                 conceptus_param = conceptus_total_weight ** (1 / 3) / (self.gestation_length - 50)
                 conceptus_growth = 3 * conceptus_param ** 3 * (self.days_in_preg - 50) ** 2
                 self.conceptus_weight += conceptus_growth
@@ -139,6 +144,7 @@ class HeiferII(HeiferI):
 
         self.gestation_length = 0
         self.p_gest_for_calf = 0
+        self.calf_birth_weight = 0
 
     def assign_heiferII_values(self, args):
         """
@@ -166,6 +172,7 @@ class HeiferII(HeiferI):
         self.days_in_preg = args['days_in_preg']
         self.gestation_length = args['gestation_length']
         self.p_gest_for_calf = args['p_gest_for_calf']
+        self.calf_birth_weight = args['calf_birth_weight']
 
     def get_heiferII_values(self):
         """
@@ -195,7 +202,8 @@ class HeiferII(HeiferI):
             'abortion_day': self.abortion_day,
             'days_in_preg': self.days_in_preg,
             'gestation_length': self.gestation_length,
-            'p_gest_for_calf': self.p_gest_for_calf
+            'p_gest_for_calf': self.p_gest_for_calf,
+            'calf_birth_weight': self.calf_birth_weight
         }
         return values
 
@@ -655,6 +663,7 @@ class HeiferII(HeiferI):
                     self._open(sim_day)
                     self.body_weight -= self.conceptus_weight
                     self.conceptus_weight = 0
+                    self.calf_birth_weight = 0
                     self.p_gest_for_calf = 0
                     self.events.add_event(
                         self.days_born, sim_day, c.PREG_LOSS_BEFORE_1)
@@ -678,6 +687,7 @@ class HeiferII(HeiferI):
                 self._open(sim_day)
                 self.body_weight -= self.conceptus_weight
                 self.conceptus_weight = 0
+                self.calf_birth_weight = 0
                 self.p_gest_for_calf = 0
                 self.events.add_event(
                     self.days_born, sim_day, c.PREG_LOSS_BTWN_1_AND_2)
@@ -695,6 +705,7 @@ class HeiferII(HeiferI):
                 self._open(sim_day)
                 self.body_weight -= self.conceptus_weight
                 self.conceptus_weight = 0
+                self.calf_birth_weight = 0
                 self.p_gest_for_calf = 0
                 self.events.add_event(
                     self.days_born, sim_day, c.PREG_LOSS_BTWN_2_AND_3)

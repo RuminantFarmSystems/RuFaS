@@ -18,6 +18,7 @@ Description: This file updates the cow form first calving to leaving the herd.
 
 import math
 import numpy as np
+from scipy.stats import truncnorm
 from RUFAS.routines.animal.life_cycle.heiferIII import HeiferIII
 from RUFAS.routines.animal.life_cycle.animal_base import AnimalBase
 from RUFAS.routines.animal.manure.lactating_cow_manure_excretion import \
@@ -98,7 +99,7 @@ class Cow(HeiferIII):
         self.CI = 0  # calving interval, days
         self.CI_history = []
         self.BW_at_calving = 0 # weight of cow when she gives birth
-        self.CBW = 0 # calf birth weight
+        #self.calf_birth_weight = 0 # calf birth weight
         self.daily_growth = 0  # change in body weight, kg
         self.calves = 0
         self.calving_to_preg_time = 0
@@ -344,17 +345,20 @@ class Cow(HeiferIII):
         Returns: the daily body weight change for a cow.
         
         """
-        CBW = 0
+        #calf_birth_weight = 0
         if self.breed == "HO":
-            CBW = AnimalBase.config['birth_weight_avg_ho']
+            self.calf_birth_weight = truncnorm.rvs(-2*AnimalBase.config['birth_weight_std_ho'], 2*AnimalBase.config['birth_weight_std_ho'], \
+                AnimalBase.config['birth_weight_avg_ho'], AnimalBase.config['birth_weight_std_ho'])
         elif self.breed == 'JE':
-            CBW = AnimalBase.config['birth_weight_avg_je']
+            self.calf_birth_weight = truncnorm.rvs(-2*AnimalBase.config['birth_weight_std_je'], 2*AnimalBase.config['birth_weight_std_je'], \
+                AnimalBase.config['birth_weight_avg_je'], AnimalBase.config['birth_weigh_std_je'])
         if self.days_in_preg == self.gestation_length:
             conceptus_growth = - self.conceptus_weight
             self.conceptus_weight = 0
+            self.calf_birth_weight = 0
             self.tissue_changed = 0
         elif self.days_in_preg > 50:
-            conceptus_total_weight = (0.0148 * self.gestation_length - 2.408) * CBW
+            conceptus_total_weight = (0.0148 * self.gestation_length - 2.408) * self.calf_birth_weight
             conceptus_param = conceptus_total_weight ** (1 / 3) / (self.gestation_length - 50)
             conceptus_growth = 3 * conceptus_param ** 3 * (self.days_in_preg - 50) ** 2
             self.conceptus_weight += conceptus_growth
@@ -968,6 +972,7 @@ class Cow(HeiferIII):
                     self._open(sim_day)
                     self.body_weight -= self.conceptus_weight
                     self.conceptus_weight = 0
+                    self.calf_birth_weight = 0
                     self.p_gest_for_calf = 0
                     self.events.add_event(
                         self.days_born, sim_day, c.PREG_LOSS_BEFORE_1)
@@ -989,6 +994,7 @@ class Cow(HeiferIII):
                 self._open(sim_day)
                 self.body_weight -= self.conceptus_weight
                 self.conceptus_weight = 0
+                self.calf_birth_weight = 0
                 self.p_gest_for_calf = 0
                 self.events.add_event(
                     self.days_born, sim_day, c.PREG_LOSS_BTWN_1_AND_2)
@@ -1005,6 +1011,7 @@ class Cow(HeiferIII):
                 self._open(sim_day)
                 self.body_weight -= self.conceptus_weight
                 self.conceptus_weight = 0
+                self.calf_birth_weight = 0
                 self.p_gest_for_calf = 0
                 self.events.add_event(
                     self.days_born, sim_day, c.PREG_LOSS_BTWN_2_AND_3)

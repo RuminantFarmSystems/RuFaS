@@ -12,6 +12,7 @@ Body weight gain with user input calf average daily gain.
 
 import numpy as np
 from random import random
+from scipy.stats import truncnorm
 from RUFAS.routines.animal.life_cycle.animal_base import AnimalBase
 from RUFAS.routines.animal.ration.calf_ration import calc_requirements
 from RUFAS.routines.animal.manure.calf_manure_excretion import \
@@ -45,7 +46,7 @@ class Calf(AnimalBase):
         self.animal_intake = 0
         self._DBW = 0
 
-        if 'birth_weight' in args:
+        if 'body_weight' in args:
             self.assign_calf_values(args)
         else:
             self.init_values(args)
@@ -86,27 +87,11 @@ class Calf(AnimalBase):
 
         # birth weight determined by breed specific distribution
         if self.breed == 'HO':
-            self.birth_weight = np.random.normal(
-                AnimalBase.config['birth_weight_avg_ho'],
-                AnimalBase.config['birth_weight_std_ho'])
-            while self.birth_weight < AnimalBase.config['birth_weight_avg_ho'] \
-                    - 2 * AnimalBase.config['birth_weight_std_ho'] \
-                    or self.birth_weight > AnimalBase.config['birth_weight_avg_ho'] \
-                    + 2 * AnimalBase.config['birth_weight_std_ho']:
-                self.birth_weight = np.random.normal(
-                    AnimalBase.config['birth_weight_avg_ho'],
-                    AnimalBase.config['birth_weight_std_ho'])
+            self.birth_weight = truncnorm.rvs(-2*AnimalBase.config['birth_weight_std_ho'], 2*AnimalBase.config['birth_weight_std_ho'], \
+                AnimalBase.config['birth_weight_avg_ho'], AnimalBase.config['birth_weight_std_ho'])
         elif self.breed == 'JE':
-            self.birth_weight = np.random.normal(
-                AnimalBase.config['birth_weight_avg_je'],
-                AnimalBase.config['birth_weight_std_je'])
-            while self.birth_weight < AnimalBase.config['birth_weight_avg_je'] \
-                    - 2 * AnimalBase.config['birth_weight_std_je'] \
-                    or self.birth_weight > AnimalBase.config['birth_weight_avg_je'] \
-                    + 2 * AnimalBase.config['birth_weight_std_je']:
-                self.birth_weight = np.random.normal(
-                    AnimalBase.config['birth_weight_avg_je'],
-                    AnimalBase.config['birth_weight_std_je'])
+            self.birth_weight = truncnorm.rvs(-2*AnimalBase.config['birth_weight_std_je'], 2*AnimalBase.config['birth_weight_std_je'], \
+                AnimalBase.config['birth_weight_avg_je'], AnimalBase.config['birth_weight_std_je'])
         self.body_weight = self.birth_weight
         self.wean_weight = 0
         self.mature_body_weight = np.random.normal(
