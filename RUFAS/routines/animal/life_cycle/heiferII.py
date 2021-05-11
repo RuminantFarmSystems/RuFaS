@@ -71,7 +71,6 @@ class HeiferII(HeiferI):
         self.target_adg_heifer_preg = 0
         self.breeding_to_preg_time = 0
         self.conceptus_weight = 0
-        #self.calf_birth_weight = 0
 
         self.ED_days = 0
         self.GnRH_injections = 0
@@ -90,19 +89,17 @@ class HeiferII(HeiferI):
         Returns: the daily body weight change for a heifer
         """
         if self.days_in_preg > 0:
+            # BW change due to heifer average daily gain
             divisor = (self.gestation_length - self.days_in_preg)
             if divisor == 0:
                 divisor = 1
             target_ADG_heifer_preg = (0.82 * 0.96 * self.mature_body_weight -
                                             0.96 * self.body_weight) / divisor
-
-            self.calf_birth_weight = truncnorm.rvs(-2*AnimalBase.config['birth_weight_std_ho'], 2*AnimalBase.config['birth_weight_std_ho'], \
-                AnimalBase.config['birth_weight_avg_ho'], AnimalBase.config['birth_weight_std_ho'])
             
+            # BW change due to conceptus
             if self.days_in_preg == self.gestation_length:
                 conceptus_growth = - self.conceptus_weight
                 self.conceptus_weight = 0
-                self.calf_birth_weight = 0
             elif self.days_in_preg > 50:
                 conceptus_total_weight = (0.0148 * self.gestation_length - 2.408) * self.calf_birth_weight
                 conceptus_param = conceptus_total_weight ** (1 / 3) / (self.gestation_length - 50)
@@ -644,6 +641,13 @@ class HeiferII(HeiferI):
                     self.gestation_length = int(np.random.normal(
                         AnimalBase.config['avg_gestation_len'],
                         AnimalBase.config['std_gestation_len']))
+                # generate calf birth weight 
+                if self.breed == 'HO':
+                    self.calf_birth_weight = truncnorm.rvs(-2*AnimalBase.config['birth_weight_std_ho'], 2*AnimalBase.config['birth_weight_std_ho'], \
+                        AnimalBase.config['birth_weight_avg_ho'], AnimalBase.config['birth_weight_std_ho'])
+                elif self.breed == 'JE':
+                    self.calf_birth_weight = truncnorm.rvs(-2*AnimalBase.config['birth_weight_std_je'], 2*AnimalBase.config['birth_weight_std_je'], \
+                        AnimalBase.config['birth_weight_avg_je'], AnimalBase.config['birth_weight_std_je'])
                 self.events.add_event(self.days_born, sim_day, c.HEIFER_PREG)
             else:
                 self.events.add_event(self.days_born, sim_day, c.HEIFER_NOT_PREG)

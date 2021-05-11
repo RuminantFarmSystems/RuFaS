@@ -175,7 +175,8 @@ class AnimalInitialization:
                 'breed': breed,
                 'birth_date': 0,
                 'days_born': 0,
-                'p_init': 0
+                'p_init': 0,
+                'birth_weight': 0
             }
             calf = Calf(args)
             if not (calf.culled or calf.sold):

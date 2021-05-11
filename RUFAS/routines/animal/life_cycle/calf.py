@@ -85,18 +85,11 @@ class Calf(AnimalBase):
         else:
             self.sold = False
 
-        # birth weight determined by breed specific distribution
-        if self.breed == 'HO':
-            self.birth_weight = truncnorm.rvs(-2*AnimalBase.config['birth_weight_std_ho'], 2*AnimalBase.config['birth_weight_std_ho'], \
-                AnimalBase.config['birth_weight_avg_ho'], AnimalBase.config['birth_weight_std_ho'])
-        elif self.breed == 'JE':
-            self.birth_weight = truncnorm.rvs(-2*AnimalBase.config['birth_weight_std_je'], 2*AnimalBase.config['birth_weight_std_je'], \
-                AnimalBase.config['birth_weight_avg_je'], AnimalBase.config['birth_weight_std_je'])
-        self.body_weight = self.birth_weight
+        self.birth_weight = args['birth_weight']
+        self.body_weight = args['birth_weight']
+        self.mature_body_weight = truncnorm.rvs(-2*AnimalBase.config['mature_body_weight_std'], 2*AnimalBase.config['mature_body_weight_std'], \
+                        AnimalBase.config['mature_body_weight_avg'], AnimalBase.config['mature_body_weight_std'])
         self.wean_weight = 0
-        self.mature_body_weight = np.random.normal(
-            AnimalBase.config['mature_body_weight_avg'],
-			AnimalBase.config['mature_body_weight_std'])
         self.p_animal = args['p_init']
 
     def assign_calf_values(self, args):

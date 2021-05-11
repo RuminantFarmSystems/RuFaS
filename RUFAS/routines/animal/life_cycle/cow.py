@@ -99,7 +99,7 @@ class Cow(HeiferIII):
         self.CI = 0  # calving interval, days
         self.CI_history = []
         self.BW_at_calving = 0 # weight of cow when she gives birth
-        #self.calf_birth_weight = 0 # calf birth weight
+        self.calf_birth_weight = args['calf_birth_weight'] # calf birth weight
         self.daily_growth = 0  # change in body weight, kg
         self.calves = 0
         self.calving_to_preg_time = 0
@@ -345,18 +345,12 @@ class Cow(HeiferIII):
         Returns: the daily body weight change for a cow.
         
         """
-        #calf_birth_weight = 0
-        if self.breed == "HO":
-            self.calf_birth_weight = truncnorm.rvs(-2*AnimalBase.config['birth_weight_std_ho'], 2*AnimalBase.config['birth_weight_std_ho'], \
-                AnimalBase.config['birth_weight_avg_ho'], AnimalBase.config['birth_weight_std_ho'])
-        elif self.breed == 'JE':
-            self.calf_birth_weight = truncnorm.rvs(-2*AnimalBase.config['birth_weight_std_je'], 2*AnimalBase.config['birth_weight_std_je'], \
-                AnimalBase.config['birth_weight_avg_je'], AnimalBase.config['birth_weigh_std_je'])
+        # on the calving day
         if self.days_in_preg == self.gestation_length:
             conceptus_growth = - self.conceptus_weight
             self.conceptus_weight = 0
-            self.calf_birth_weight = 0
             self.tissue_changed = 0
+        # conceptus weight change during pregnancy
         elif self.days_in_preg > 50:
             conceptus_total_weight = (0.0148 * self.gestation_length - 2.408) * self.calf_birth_weight
             conceptus_param = conceptus_total_weight ** (1 / 3) / (self.gestation_length - 50)
@@ -365,18 +359,19 @@ class Cow(HeiferIII):
         else:
             conceptus_growth = 0
 
+        # growth for 1st and 2nd lactation cows
         if self.calves == 1:
-            if self.days_in_preg < 1:
+            if self.days_in_preg < 1: # before pregnancy
                  target_adg_cow = \
                      (0.92 - 0.82) * 0.96 * self.mature_body_weight / CI
-            else:
+            else: # after pregnancy
                 target_adg_cow = \
                      (0.92 * self.mature_body_weight - self.body_weight)/(self.gestation_length - self.days_in_preg+1)
         elif self.calves == 2:
-            if self.days_in_preg < 1:
+            if self.days_in_preg < 1: # before pregnancy
                 target_adg_cow = \
                      (1 - 0.92) * 0.96 * self.mature_body_weight / CI
-            else:
+            else: # after pregnancy
                 target_adg_cow = \
                      (self.mature_body_weight - self.body_weight)/(self.gestation_length - self.days_in_preg+1)
         else:  # parity > 2
@@ -951,6 +946,13 @@ class Cow(HeiferIII):
                     self.gestation_length = int(np.random.normal(
                         AnimalBase.config['avg_gestation_len'],
                         AnimalBase.config['std_gestation_len']))
+                # generate calf birth weight 
+                if self.breed == 'HO':
+                    self.calf_birth_weight = truncnorm.rvs(-2*AnimalBase.config['birth_weight_std_ho'], 2*AnimalBase.config['birth_weight_std_ho'], \
+                        AnimalBase.config['birth_weight_avg_ho'], AnimalBase.config['birth_weight_std_ho'])
+                elif self.breed == 'JE':
+                    self.calf_birth_weight = truncnorm.rvs(-2*AnimalBase.config['birth_weight_std_je'], 2*AnimalBase.config['birth_weight_std_je'], \
+                        AnimalBase.config['birth_weight_avg_je'], AnimalBase.config['birth_weight_std_je'])
 
                 self.events.add_event(self.days_born, sim_day, c.COW_PREG)
             else:
