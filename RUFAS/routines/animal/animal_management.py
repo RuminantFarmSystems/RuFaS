@@ -457,7 +457,7 @@ class AnimalManagement:
             #updating id_pen variable
             self.id_pen[animal.id] = pen.id
             #setting up new animal
-            self.all_pens[pen].set_up_new_animal(animal, animal_p_conc, feed, temp)
+            self.all_pens[pen.id].set_up_new_animal(animal, animal_p_conc, feed, temp)
 
 
         for pen in range(len(self.all_pens)):

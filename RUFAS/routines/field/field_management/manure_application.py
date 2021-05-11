@@ -57,13 +57,13 @@ def formulate_manure_application(manure_storage, m_app):
     for storage in manure_storage.storage.values():
         available_manure = storage.TS + storage.TS_liquid
 
-        if available_manure == 0:
-            continue
-
         # FM.4.A.1-3
         available_N = storage.N + storage.N_liquid
         available_P = storage.P + storage.P_liquid
         available_K = storage.K + storage.K_liquid
+
+        if available_manure == 0 or available_N ==0 or available_P == 0 or available_K == 0:
+            continue
 
         # FM.4.A.4
         N_frac = available_N / available_manure
