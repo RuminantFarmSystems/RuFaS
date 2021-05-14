@@ -33,3 +33,5 @@ output/*
 *.vscode
 *.settings
 .idea/**
+env/
+venv/

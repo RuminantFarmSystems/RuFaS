@@ -77,6 +77,7 @@ class AnimalBase(object):
         self.p_intake = 0
         self.p_conc = 0
         self.p_excrt = 0
+        self.birth_weight = 0
         self.body_weight = 0
         self.mature_body_weight = 0
         self.p_req = 0
@@ -86,12 +87,16 @@ class AnimalBase(object):
         self.p_growth = 0
         self.p_maint_feces = 0
         self.conceptus_weight = 0
+        self.calf_birth_weight = 0
+        self.tissue_changed = 0
 
         if 'body_weight_history' in args:
             self.body_weight_history = args['body_weight_history']
             self.pen_history = args['pen_history']
         if 'conceptus_weight' in args:
             self.conceptus_weight = args['conceptus_weight']
+        if 'calf_birth_weight' in args:
+            self.calf_birth_weight = args['calf_birth_weight']
 
     def set_default_nutrient_rqmts(self):
         """
