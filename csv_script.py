@@ -15,42 +15,45 @@ def main():
     This script only transforms the raw DAYMET dataset into another csv dataset in the correct format. To integrate the
     formatted csv file into the database, sql_script.py has to be run separately.
     """
+    try:
+        print("\nRUFAS: Formatting weather dataset")
+        # 1 DAYMET dataset input
+        data_in = sql_script.weather_input()
 
-    print("\nRUFAS: Formatting weather dataset")
-    # 1 DAYMET dataset input
-    data_in = sql_script.weather_input()
+        csv_path = Path(data_in)
+        csv_path_string = str(csv_path)
 
-    csv_path = Path(data_in)
-    csv_path_string = str(csv_path)
+        csv_name = str(ntpath.basename(csv_path))
+        csv_name = csv_name[:csv_name.index(".")]
 
-    csv_name = str(ntpath.basename(csv_path))
-    csv_name = csv_name[:csv_name.index(".")]
+        new_path = csv_path_string[:csv_path_string.rindex(csv_name)]
 
-    new_path = csv_path_string[:csv_path_string.rindex(csv_name)]
+        # 2 Database input
+        database = sql_script.database_input()
 
-    # 2 Database input
-    database = sql_script.database_input()
+        # 3 Connecting to the weather database
+        conn = sqlite3.connect(database)
 
-    # 3 Connecting to the weather database
-    conn = sqlite3.connect(database)
+        # 4 Importing csv file into Skeleton file
+        import_data(conn, csv_path)
 
-    # 4 Importing csv file into Skeleton file
-    import_data(conn, csv_path)
+        # 5 Adds leap days (DAYMET does not report data for leap days)
+        add_leap_days(conn)
 
-    # 5 Adds leap days (DAYMET does not report data for leap days)
-    add_leap_days(conn)
+        # 6 Add average temperature and daily radiation
+        avg_radiation_irrigation_ID(conn)
 
-    # 6 Add average temperature and daily radiation
-    avg_radiation_manureN_ID(conn)  # TODO: delete manureN when dm_manure is merged
+        # 7 Drop unnecessary columns and rearrange order
+        drop_rearrange(conn)
 
-    # 7 Drop unnecessary columns and rearrange order
-    drop_rearrange(conn)
+        # 8 Convert db table into new csv file
+        db_to_csv(conn, csv_name, new_path)
 
-    # 8 Convert db table into new csv file
-    db_to_csv(conn, csv_name, new_path)
-
-    # 9 Cleaning up unnecessary tables and views:
-    atexit.register(cleanup, conn)
+        # 9 Cleaning up unnecessary tables and views:
+        atexit.register(cleanup, conn)
+    except:
+        drop_rearrange(conn)
+        cleanup(conn)
 
 
 def import_data(connection, csv_path):
@@ -94,7 +97,7 @@ def add_leap_days(connection):
     connection.commit()
 
 
-def avg_radiation_manureN_ID(connection):
+def avg_radiation_irrigation_ID(connection):
     c = connection.cursor()
     c.execute("ALTER TABLE Skeleton2 Add COLUMN avg double")
     c.execute("UPDATE Skeleton2 SET avg = (high+low)/2")
@@ -102,8 +105,8 @@ def avg_radiation_manureN_ID(connection):
     c.execute("ALTER TABLE Skeleton2 Add COLUMN Hday double")
     c.execute("UPDATE Skeleton2 SET Hday = (srad*dayl)/1000000")
 
-    c.execute("ALTER TABLE Skeleton2 Add COLUMN manureN double")  # TODO: delete when dm_manure is merged
-    c.execute("UPDATE Skeleton2 SET manureN = 0") # TODO: delete when dm_manure is merged
+    c.execute("ALTER TABLE Skeleton2 Add COLUMN irrigation double")
+    c.execute("UPDATE Skeleton2 SET irrigation = 0")
 
     c.execute("ALTER TABLE Skeleton2 Add COLUMN ID integer")
     connection.commit()
@@ -112,31 +115,34 @@ def avg_radiation_manureN_ID(connection):
 def drop_rearrange(connection):
     c = connection.cursor()
     c.execute("CREATE TABLE s2_backup(ID INTEGER,year INTEGER,jday INTEGER,precip DOUBLE,high DOUBLE,"
-              "low DOUBLE,avg DOUBLE,Hday DOUBLE,manureN INTEGER)")
-    c.execute("INSERT INTO s2_backup SELECT ID,year,jday,precip,high,low,avg,Hday,manureN FROM Skeleton2")
-    c.execute(" DROP TABLE Skeleton2")
+              "low DOUBLE,avg DOUBLE,Hday DOUBLE,irrigation INTEGER)")
+    c.execute("INSERT INTO s2_backup SELECT ID,year,jday,precip,high,low,avg,Hday,irrigation FROM Skeleton2")
+    """c.execute(" DROP TABLE Skeleton2")
     c.execute("CREATE TABLE Skeleton2(ID INTEGER,year INTEGER,jday INTEGER,precip DOUBLE,high DOUBLE,"
-              "low DOUBLE,avg DOUBLE,Hday DOUBLE,manureN INTEGER)")
+              "low DOUBLE,avg DOUBLE,Hday DOUBLE,irrigation INTEGER)")
     c.execute("INSERT INTO Skeleton2 SELECT * FROM s2_backup")
-    c.execute("DROP TABLE s2_backup")
+    c.execute("DROP TABLE s2_backup")"""
     connection.commit()
 
 
 def db_to_csv(connection, csv_name, path):
     c = connection.cursor()
-    data = c.execute("SELECT * from Skeleton2")
+    data = c.execute("SELECT * from s2_backup")
     new_csv_name = csv_name + "_adjusted" + ".csv"
     new_path = path + new_csv_name
     new_path = Path(new_path)
     with open(new_path, 'w') as f:
         writer = csv.writer(f)
-        writer.writerow(['ID', 'year', 'jday', 'precip', 'high', 'low', 'avg', 'Hday', 'manureN'])
+        writer.writerow(['ID', 'year', 'jday', 'precip', 'high', 'low', 'avg', 'Hday', 'irrigation'])
         writer.writerows(data)
 
 
 def cleanup(connection):
     c = connection.cursor()
-    c.execute("DELETE FROM Skeleton2")
+    c.execute("DROP table Skeleton2")
+    c.execute("DROP table s2_backup")
+    c.execute("CREATE TABLE Skeleton2(year INTEGER,jday INTEGER,dayl DOUBLE,precip DOUBLE, srad DOUBLE,"
+              "swe DOUBLE, high DOUBLE,low DOUBLE,vp DOUBLE,PRIMARY KEY(year,jday))")
     connection.commit()
 
 
