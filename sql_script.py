@@ -2,7 +2,6 @@ from pathlib import Path
 import sqlite3
 import ntpath
 import pandas as pd
-from RUFAS import errors
 import atexit
 
 
@@ -12,36 +11,54 @@ def main():
      into the correct format and imports it into the Weather Database.
     """
 
-    print("\nRUFAS: Importing Weather Dataset into Database")
-    # 1 Database input
-    database = database_input()
+    try:
+        print("\nRUFAS: Importing Weather Dataset into Database")
+        # 1 Database input
+        database = database_input()
 
-    # 2 Selecting a dataset ID for the set to be added
-    dataset_ID = id_input(database)
+        # 2 Selecting a dataset ID for the set to be added
+        dataset_ID = id_input(database)
 
-    # 3 Selecting the csv file corresponding to the dataset
-    data_in = weather_input()
-    csv_path = Path(data_in)
-    csv_name = ntpath.basename(csv_path)
+        # 3 Selecting the csv file corresponding to the dataset
+        data_in = weather_input()
+        csv_path = Path(data_in)
+        csv_name = ntpath.basename(csv_path)
 
-    # 4 Connecting to the given database
-    conn = sqlite3.connect(database)
+        # 4 Connecting to the given database
+        conn = sqlite3.connect(database)
 
-    # 5 Adding new entry in the Datasets table
-    add_dataset(conn, dataset_ID, csv_name)
+        # 5 Adding new entry in the Datasets table
+        add_dataset(conn, dataset_ID, csv_name)
 
-    # 6 Importing csv file into Skeleton file
-    import_data(conn, csv_path, dataset_ID)
+        # 6 Importing csv file into Skeleton file
+        import_data(conn, csv_path, dataset_ID)
 
-    # 7 Calculating Taair and left joining to Skeleton:
-    calc_taair(conn)
-    left_join(conn)
+        # 7 Calculating Taair and left joining to Skeleton:
+        calc_taair(conn)
+        left_join(conn)
 
-    # 8 Appending new dataset to Observations table:
-    add_observations(conn)
+        # 8 Appending new dataset to Observations table:
+        add_observations(conn)
 
-    # 9 Cleaning up unnecessary tables and views:
-    atexit.register(cleanup, conn)
+        # 9 Cleaning up unnecessary tables and views:
+        atexit.register(cleanup, conn)
+
+    except:
+        cleanup(conn)
+        c = conn.cursor()
+        try:
+            c.execute("DELETE FROM Datasets WHERE data_ID = ?", (dataset_ID,))
+            conn.commit()
+        except:
+            pass
+
+        try:
+            c.execute("DELETE FROM Observations WHERE ID = ?", (dataset_ID,))
+            conn.commit()
+        except:
+            pass
+
+        raise Exception("Error during addition to database")
 
 
 def weather_input():
@@ -236,9 +253,21 @@ def add_observations(connection):
 
 def cleanup(connection):
     c = connection.cursor()
-    c.execute("DROP TABLE final")
-    c.execute("DROP VIEW Taair")
-    c.execute("DELETE FROM Skeleton")
+    try:
+        c.execute("DROP TABLE final")
+    except:
+        pass
+
+    try:
+        c.execute("DROP VIEW Taair")
+    except:
+        pass
+
+    try:
+        c.execute("DELETE FROM Skeleton")
+    except:
+        pass
+
     connection.commit()
     return
 

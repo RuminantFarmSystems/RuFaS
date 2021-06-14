@@ -10,11 +10,12 @@ import atexit
 
 def main():
     """
-    Main function of csv_script.py. It executes all the necessary commands to edit the DAYMET csv_file (using Excel and
-    SQLiteStudio 3) into the correct format to be processed and integrate into the weather database.
+    Main function of csv_script.py. It executes all the necessary commands to edit the DAYMET csv files (using Excel and
+    SQLiteStudio 3) into the correct format to be processed and integrated into the weather database.
     This script only transforms the raw DAYMET dataset into another csv dataset in the correct format. To integrate the
     formatted csv file into the database, sql_script.py has to be run separately.
     """
+
     try:
         print("\nRUFAS: Formatting weather dataset")
         # 1 DAYMET dataset input
@@ -51,9 +52,10 @@ def main():
 
         # 9 Cleaning up unnecessary tables and views:
         atexit.register(cleanup, conn)
+
     except:
-        drop_rearrange(conn)
         cleanup(conn)
+        raise Exception("Error during conversion to csv file")
 
 
 def import_data(connection, csv_path):
@@ -65,6 +67,7 @@ def import_data(connection, csv_path):
     df.columns = ["year", "jday", "dayl", "precip", "srad", "swe", "high", "low", "vp"]
 
     # import data to table
+    c.execute("DELETE FROM Skeleton2")
     df.to_sql("Skeleton2", connection, if_exists="append", index=False)
     connection.commit()
 
@@ -102,6 +105,7 @@ def add_leap_days(connection):
 
 def avg_radiation_irrigation_ID(connection):
     c = connection.cursor()
+
     c.execute("ALTER TABLE Skeleton2 Add COLUMN avg double")
     c.execute("UPDATE Skeleton2 SET avg = (high+low)/2")
 
@@ -142,10 +146,18 @@ def db_to_csv(connection, csv_name, path):
 
 def cleanup(connection):
     c = connection.cursor()
-    c.execute("DROP table Skeleton2")
-    c.execute("DROP table s2_backup")
-    c.execute("CREATE TABLE Skeleton2(year INTEGER,jday INTEGER,dayl DOUBLE,precip DOUBLE, srad DOUBLE,"
-              "swe DOUBLE, high DOUBLE,low DOUBLE,vp DOUBLE,PRIMARY KEY(year,jday))")
+    try:
+        c.execute("DROP table Skeleton2")
+        c.execute("CREATE TABLE Skeleton2(year INTEGER,jday INTEGER,dayl DOUBLE,precip DOUBLE, srad DOUBLE,"
+                  "swe DOUBLE, high DOUBLE,low DOUBLE,vp DOUBLE,PRIMARY KEY(year,jday))")
+    except:
+        pass
+
+    try:
+        c.execute("DROP table s2_backup")
+    except:
+        pass
+
     connection.commit()
 
 
