@@ -85,9 +85,12 @@ def add_leap_days(connection):
 
     if is_leap_year(y):
         if y == end_year:
-            """if end_day == 365:
-            c.execute()"""
+            if end_day == 366:
+                c.execute("INSERT INTO Skeleton2\
+                SELECT ?, 366, dayl, precip, srad, swe, high, low, vp FROM Skeleton2 WHERE year = ? AND jday = 365",
+                          (y, y))
             return
+
         else:
             while y <= end_year:
                 c.execute("INSERT INTO Skeleton2\
