@@ -40,7 +40,7 @@ def manure_calculations(ration_formulation, feed, bw, p_feces_excrt, p_urine):
             K: potassium in manure, g/day
 
     """
-    amount, conc = ration_report(ration_formulation, feed.available_feeds)
+    amount, conc = ration_report(ration_formulation, feed.available_feeds, feed.calf_feeds)
     dm_intake = amount['dm']
     cp_conc = conc['CP']
     K_conc = conc['potassium']

@@ -1,8 +1,8 @@
-from .hardcoded_ration import get_ration
+#from .hardcoded_ration import get_ration
 import math
 
 
-def optimize():
+def get_ration():
     return get_ration()
 
 

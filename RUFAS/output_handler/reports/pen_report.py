@@ -65,7 +65,7 @@ class PenReport(BaseReportDriver):
 
             for variable in self.annual_variables:
                 self.annual_variables[variable][2] = \
-                    eval(self.daily_variables[variable][0], globals(), locals())
+                    eval(self.annual_variables[variable][0], globals(), locals())
 
     class GrowthReport(BasePenReport):
         def __init__(self, data, pen_id):

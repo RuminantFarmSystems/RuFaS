@@ -138,7 +138,7 @@ def ration_formulation(pen, feed, available_feeds, animal_type, cow_type):
         return pen.ration, ration_vals
 
 
-def ration_report(ration, available_feeds):
+def ration_report(ration, available_feeds, calf_feeds):
     """
     Calculates information in the ration about nutrient information including
     nutrient amounts and concentrations. Returns a dictionary of nutrient amounts
@@ -149,34 +149,47 @@ def ration_report(ration, available_feeds):
         ration: a dictionary of the calculated ration
         available_feeds: available feeds dictionary from the Feed class object
     """
-    nutrient_amount = {'dm': 0, 'as_fed': 0, 'CP': 0, 'ADF': 0, 'NDF': 0,
-                       'lignin': 0, 'ash': 0, 'phosphorus': 0, 'potassium': 0,
-                       'N': 0, "EE": 0, "starch": 0}
+
     nutrient_conc = {}
     ration = ration.copy()
     ration.pop('status')
     ration.pop('objective')
-    nutrients = ['DM', 'CP', 'ADF', 'NDF', 'lignin', 'ash', 'phosphorus',
-                 'potassium', 'N', 'EE', 'starch']
 
-    # feed nutrient amounts
+
+    # set different feeds and nutrient values to loop over if the ration is for calves or all other classes
+    # Only calves will have feeds 155, 156, or 157 in their diet
+    # TODO: Is there a way to generalize this so we don't have to query specific calf feeds?
+
+    if 155 in ration or 156 in ration or 157 in ration:
+        report_feeds = calf_feeds
+        nutrient_amount = { 'dm': 0, 'as_fed': 0, 'CP': 0,'phosphorus': 0, 'N': 0, "EE": 0, 'DE':0 }
+        nutrients = ['DM', 'CP','phosphorus', 'N', 'EE', 'DE']
+    else:
+        report_feeds = available_feeds
+        nutrient_amount = {'dm': 0, 'as_fed': 0, 'CP': 0, 'ADF': 0, 'NDF': 0,
+                           'lignin': 0, 'ash': 0, 'phosphorus': 0, 'potassium': 0,
+                           'N': 0, "EE": 0, "starch": 0}
+        nutrients = ['DM', 'CP', 'ADF', 'NDF', 'lignin', 'ash', 'phosphorus',
+                     'potassium', 'N', 'EE', 'starch']
+
+    # sum feed nutrient amounts
     for key, val in ration.items():
         nutrient_amount['dm'] += val
         for nutr in nutrients:
             # all values on a 100% dry matter basis
             if nutr == 'DM':
-                nutrient_amount['as_fed'] += val * (available_feeds[key][nutr] / 100)
+                nutrient_amount['as_fed'] += val * (report_feeds[key][nutr] / 100)
             elif nutr == 'N':
                 # [A.2.A.2]
-                if key[:3] in ['121', '122', '155', '157']:
+                if key in ['121', '122', '155', '157']:
                     denom = 6.38
                 # [A.2.A.1]
                 else:
                     denom = 6.25
-                nutrient_amount[nutr] += (available_feeds[key]['CP'] /
+                nutrient_amount[nutr] += (report_feeds[key]['CP'] /
                                           (denom * 100)) * val
             else:
-                nutrient_amount[nutr] += val * (available_feeds[key][nutr] / 100)
+                nutrient_amount[nutr] += val * (report_feeds[key][nutr] / 100)
 
     # feed nutrient concentrations
     dm_amount = nutrient_amount['dm']
@@ -440,6 +453,7 @@ class AvailableFeeds:
         """
         # available feeds dictionary from the feed module
         available_feeds = feed.available_feeds
+        calf_feeds = feed.calf_feeds
         # dictionary of feed costs
         feed_costs = feed.feed_costs
 

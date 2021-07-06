@@ -53,7 +53,7 @@ def manure_calculations(ration_formulation, feed, bw, milk_prod, p_feces_excrt,
     DM: dietary dry matter, % of diet
     CP: dietary crude protein, % of DM
     """
-    amount, conc = ration_report(ration_formulation, feed.available_feeds)
+    amount, conc = ration_report(ration_formulation, feed.available_feeds, feed.calf_feeds)
     dm_intake = amount['dm']
     CP_conc = conc['CP']
     K_conc = conc['potassium']

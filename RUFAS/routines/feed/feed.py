@@ -66,9 +66,10 @@ class Feed:
         self.growing_feeds = data['growing_feeds']
         self.purchased_feeds_entries = data['purchased_feeds']
         self.purchased_feeds = []  # set in the next method call
+        self.calf_feed_ids = []
 
         self.all_feed_ids = self.get_all_feed_units(data['purchased_feeds'],
-                                                    data['growing_feeds'])
+                                                    data['growing_feeds'], data['calf_feeds'])
         # dictionary of nutrients needed for this run
         # initially, this only contains information for purchased feeds as none
         # of the growing_feeds have been harvested yet
@@ -821,7 +822,7 @@ class Feed:
                                          distinct=True, cols=[column])
         return [result[column] for result in dict_list]
 
-    def get_all_feed_units(self, purchased_feeds, grown_feeds):
+    def get_all_feed_units(self, purchased_feeds, grown_feeds, calf_feeds):
         """
         Description:
             Constructs and returns a dictionary of where the keys are the feed IDs
@@ -845,7 +846,7 @@ class Feed:
             (e.g. 'kg')
         """
         columns = ['entry', 'feed_name', 'units']
-        all_feeds = purchased_feeds + grown_feeds
+        all_feeds = purchased_feeds + grown_feeds + calf_feeds
         dict_list = self.db_reader.query(self.feeds_table, cols=columns,
                                          identifier='entry',
                                          desired_rows=tuple(all_feeds))
@@ -859,10 +860,14 @@ class Feed:
         purchased_mapping = self.get_purchased_feed_ids(purchased_feeds)
         self.purchased_feeds = list(purchased_mapping.values())
 
+        calf_mapping = self.get_purchased_feed_ids(calf_feeds)
+        self.calf_feed_ids = list(calf_mapping.values())
+
         grown_feeds_mapping = {str(feed): str(feed) + 'g'
                                for feed in grown_feeds}
 
         all_feeds_mapping = purchased_mapping.copy()
+        all_feeds_mapping.update(calf_mapping)
         all_feeds_mapping.update(grown_feeds_mapping)
 
         for entry in all_feeds_mapping:
@@ -1035,7 +1040,7 @@ class Feed:
 
     def get_calf_feeds(self):
         feed_ids = [155, 156, 157]
-        columns = ['DM', 'CP', 'EE', 'DE']
+        columns = ['DM', 'CP', 'EE', 'DE', 'phosphorus']
         nutrients = self.db_reader.query(
             self.nutrient_table,
             cols=columns,

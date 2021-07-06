@@ -9,7 +9,7 @@ Description: The class which represents a pen on the farm. Each pen has
 Author(s): Militsa Sotirova, militsasotirova@gmail.com
            Joseph Merhi, jm2257@cornell.edu
 """
-from RUFAS.routines.animal.ration.calf_ration import optimize as calf_optimize
+#from RUFAS.routines.animal.ration.calf_ration import calc_requirements as calf_req
 from RUFAS.routines.animal.ration import ration_driver as ration_driver
 from RUFAS.routines.animal.ration import animal_requirements as req
 
@@ -248,7 +248,7 @@ class Pen:
             #an error may be caused as result of heifers and dry cows in same pen
             #if we only simulate with 3 pens
             if 'Calf' in self.classes_in_pen:
-                ration_per_animal = calf_optimize()
+                ration_per_animal = {155: 1, 157: 2, 'status': 'Optimal', 'objective': 4.5}
                 ration_vals = {'ME_tot': 0}
 
             elif 'HeiferI' in self.classes_in_pen or \
@@ -279,7 +279,7 @@ class Pen:
 
         # recording ration nutrition information in pen
         nutrient_amount, nutrient_conc = ration_driver.ration_report(
-            ration_per_animal, feed.available_feeds)
+            ration_per_animal, feed.available_feeds, feed.calf_feeds)
         self.ration_nutrient_amount = nutrient_amount
         self.ration_nutrient_conc = nutrient_conc
         self.MEdiet = ration_vals['ME_tot']

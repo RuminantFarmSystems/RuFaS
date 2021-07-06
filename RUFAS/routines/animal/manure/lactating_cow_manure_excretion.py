@@ -46,7 +46,7 @@ def manure_calculations(ration_formulation, feed, bw, days_milk, milk_protein,
             p_frac: P fraction of manure
             K: potassium in manure, g/day
     """
-    amount, conc = ration_report(ration_formulation, feed.available_feeds)
+    amount, conc = ration_report(ration_formulation, feed.available_feeds, feed.calf_feeds)
     dm_intake = amount['dm']
     Ash_diet_content = amount['ash']
     ASH_conc = conc["ash"]
