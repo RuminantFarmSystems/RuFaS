@@ -8,6 +8,7 @@ Author(s): Kass Chupongstimun, kass_c@hotmail.com
            Jit Patil, spatil5@wisc.edu
 """
 
+import sys
 import time as timer
 from pathlib import Path
 from RUFAS import routines, errors, classes
@@ -34,54 +35,48 @@ def simulate(input_file_path: Path):
             parameters to the simulation. Passed to read_json_file().
     """
 
-    #
     # Reads the json input file and uses the information to instantiate the
     # simulation global variables
-    #
-
     initialize_simulation(input_file_path, read_json_file(input_file_path))
 
-    #
     # Creates a new directory for the output files (if doesn't already exist)
     # Deletes existing output files of the same name from previous simulation
     # Transfer needed (initial) data from state to report handlers
-    #
-    output.initialize_csv_dir(config.csv_dir)
-    output.initialize_graphic_dir(config.graphic_dir)
+    output.initialize_dir(config.csv_dir, config.graphic_dir)
     output.initialize_reports()
-
-    print("\nSimulating: {}".format(input_file_path.name))
 
     t_start_sim = timer.time()
 
-    #
+    sys.stdout.write("Simulating  ")
     # MAIN Simulation Loop
-    #
-
     while not time.end_simulation():
         annual_simulation()
 
     output.finalize(state, weather, time)
-    output.produce_graphics()
     t_end_sim = timer.time()
+    print("\nSimulation Successful: {}".format(input_file_path.name))
+    print("Total Simulation Time: {} seconds\n".format(str(t_end_sim - t_start_sim)))
 
-    print("Simulation Successful: {}".format(input_file_path.name))
-    print("Total Run Time: {} seconds\n".format(str(t_end_sim - t_start_sim)))
+    t_start_graphics = timer.time()
+    sys.stdout.write('\nProducing Graphics ')
+    output.produce_graphics()
+    t_end_graphics = timer.time()
+    sys.stdout.write("\nOutput Successful. Graphics stored in: {}".format(config.graphic_dir))
+    sys.stdout.write(
+        "\nTime to produce graphics: {}. Total Run Time: {} seconds".format(str(t_end_graphics - t_start_graphics),
+                                                                            str((t_end_sim - t_start_sim) +
+                                                                                (t_end_graphics - t_start_graphics))))
 
 
 def daily_simulation():
     """Executes the daily simulation routines."""
 
-    #
     # Daily routines
-    #
     routines.daily_animal_routine(state.animal_management, state.feed, weather, time)
-
-    for field in state.fields:
-        routines.daily_soil_routine(field.soil, field.crop, field.field_management, weather, time)
-        routines.daily_crop_routine(field.soil, field.crop, field.field_management, weather, time)
-
-    routines.daily_feed_routine(state.feed, state.fields, state.animal_management)
+    routines.daily_manure_storage_routine(state.manure_storage, state.animal_management)
+    routines.daily_fields_routine(state.fields, state.manure_storage, weather, time)
+    routines.daily_feed_routine(state.feed, state.fields, state.animal_management,
+                                output.reports['feed_storage_report'])
 
     #
     # Daily Output Updates
@@ -102,21 +97,31 @@ def annual_simulation():
     Resets the state for the following year
     """
 
-    #
-    # Pre-annual Routines
-    #
-    for field in state.fields:
-        routines.annual_crop_routine(field.crop, time)
-        routines.annual_feed_routine(state.feed)
+    # Pre-annual routines
+    routines.annual_fields_routine(state.fields, time)
+    routines.annual_feed_routine(state.feed)
 
+    case = 0
     while not time.end_year():
+        if time.day % 50 == 0:
+            sys.stdout.write("\b")
+            if case == 0:
+                sys.stdout.write("—")
+                case += 1
+            elif case == 1:
+                sys.stdout.write("\\")
+                case += 1
+            elif case == 2:
+                sys.stdout.write("|")
+                case += 1
+            else:
+                sys.stdout.write("/")
+                case = 0
+
         daily_simulation()
 
-    #
     # Post-Annual Routines
-    #
-    for field in state.fields:
-        field.soil.annual_mass_balance()
+    state.annual_mass_balance(time)
     output.annual_updates(state, weather, time)
     output.write_annual_reports()
     output.annual_flushes()

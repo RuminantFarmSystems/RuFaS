@@ -21,6 +21,7 @@ class TallFescue(BaseCrop):
         self.crop_name = crop_name
         self.crop_type = 'perennial'
         self.harvest_quality = 'null'
+
         self.feed_id = '56g'
         self.raw_id = 56
 
@@ -57,7 +58,7 @@ class TallFescue(BaseCrop):
         self.fr_LAI_1 = 0.01
         self.fr_LAI_2 = 0.95
         self.fr_PHU_sen = 0.8
-        self.fr_PHU_harvest = 0.6
+        self.fr_PHU_harvest = 0.3
         self.LAI_max = 4
         self.LAI_min = 0.75
 
@@ -173,6 +174,5 @@ class TallFescue(BaseCrop):
 
         self.N_yield_annual = 0.0
         self.P_yield_annual = 0.0
-        self.DM_yield_annual = 0.0
         self.NDF_yield_annual = 0.0
         self.yield_annual = 0

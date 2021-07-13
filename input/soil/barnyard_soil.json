@@ -1,5 +1,4 @@
 {
-    "profile_bulk_density": 1.3,
     "CN2": 85.00,
     "field_slope": 0.02,
     "slope_length": 3,
@@ -21,7 +20,7 @@
             "field_capacity": 0.30,
             "saturation": 0.5,
             "K_sat": 20,
-            "cation_exclusion_fraction": 0.0,
+
             "clay": 20,
             "initial_temperature": 15.77575,
             "bulk_density": 1.3,
@@ -42,7 +41,7 @@
             "field_capacity": 0.3,
             "saturation": 0.5,
             "K_sat": 20,
-            "cation_exclusion_fraction": 0.0,
+
             "clay": 20,
             "initial_temperature": 14.50797297,
             "bulk_density": 1.3,
@@ -63,7 +62,7 @@
             "field_capacity": 0.30,
             "saturation": 0.5,
             "K_sat": 20,
-            "cation_exclusion_fraction": 0.0,
+
             "clay": 20,
             "initial_temperature": 13.38623,
             "bulk_density": 1.3,

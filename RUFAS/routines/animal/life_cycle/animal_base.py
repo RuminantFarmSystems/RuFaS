@@ -43,10 +43,10 @@ class AnimalBase(object):
         """
         Initializes common parameters for all animals
         Args:
-            breed: breed of the cow
-            birth date: the date of the simulation when the calf was born
-            days Born: age of the animal
-            semen used: semen used in the dam for the calf
+            args.breed: breed of the cow
+            args.birth_date: the date of the simulation when the calf was born
+            args.days_born: age of the animal
+            arg.semen_used: semen used in the dam for the calf
             (optional: include the following to assign animal information)
 			args.birth_weight: the birth weight of the animal
 			args.body_weight: current body weight of the animal
@@ -78,6 +78,7 @@ class AnimalBase(object):
         self.p_intake = 0
         self.p_conc = 0
         self.p_excrt = 0
+        self.birth_weight = 0
         self.body_weight = 0
         self.mature_body_weight = 0
         self.p_req = 0
@@ -87,12 +88,16 @@ class AnimalBase(object):
         self.p_growth = 0
         self.p_maint_feces = 0
         self.conceptus_weight = 0
+        self.calf_birth_weight = 0
+        self.tissue_changed = 0
 
         if 'body_weight_history' in args:
             self.body_weight_history = args['body_weight_history']
             self.pen_history = args['pen_history']
         if 'conceptus_weight' in args:
             self.conceptus_weight = args['conceptus_weight']
+        if 'calf_birth_weight' in args:
+            self.calf_birth_weight = args['calf_birth_weight']
 
     def set_default_nutrient_rqmts(self):
         """

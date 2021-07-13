@@ -99,6 +99,7 @@ class LifeCycleManager:
     avg_mature_body_weight = 0
 
     cull_reason_stats = {
+        c.DEATH_CULL: 0,
         c.LOW_PROD_CULL: 0,
         c.LAMENESS_CULL: 0,
         c.INJURY_CULL: 0,
@@ -108,6 +109,7 @@ class LifeCycleManager:
         c.UNKNOWN_CULL: 0
     }
     cull_reason_stats_percent = {
+        c.DEATH_CULL: 0,
         c.LOW_PROD_CULL: 0,
         c.LAMENESS_CULL: 0,
         c.INJURY_CULL: 0,
@@ -144,12 +146,13 @@ class LifeCycleManager:
 
     def initialize_herd(self, herd_num, calf_num, heiferI_num, heiferII_num,
                         heiferIII_num, cow_num, replace_num, herd_init, breed,
-                        config, sim_days=1500):
+                        config):
         """
         Generates a replacement herd to simulate the market, for the herd to get
          replacements. Initializes the herd.
 
         Args:
+            breed: TODO: needs description
             config: stores (among other things) information on whether the seed
                 has been set by the user
             herd_init: boolean - true to populate database with new animals,
@@ -169,7 +172,9 @@ class LifeCycleManager:
             heiferIIIs: list of heiferIIIs for the simulation
             cows: list of cows for the simulation
         """
-        self.animal_initializer = AnimalInitialization(self.config['calving_interval'], breed, config.set_seed, herd_init)
+        self.animal_initializer = AnimalInitialization(self.config['calving_interval'], breed,
+                                                       config.set_seed, herd_init)
+
         if self.config['use_input_calving_interval']:
             self.avg_CI = self.config['calving_interval']
         else:
@@ -201,7 +206,7 @@ class LifeCycleManager:
         self.replacement_market = self.animal_initializer.get_replacement_cows(replace_num, breed)
         return calves, heiferIs, heiferIIs, heiferIIIs, cows
 
-    def daily_update(self, date, sim_length, calves, heiferIs, heiferIIs,
+    def daily_update(self, date, calves, heiferIs, heiferIIs,
                      heiferIIIs, cows):
         """
         Updates the status of the animals.
@@ -213,7 +218,6 @@ class LifeCycleManager:
             heiferIs: list of HeiferI objects to be updated
             calves: list of Calf objects to be updated
             date: day number
-            sim_length: length of the simulation, days
 
         Returns:
             animals_added: list of animals added from replacement herd
@@ -289,7 +293,6 @@ class LifeCycleManager:
             self.cull_reason_stats[cull_reason] = 0
             self.cull_reason_stats_percent[cull_reason] = 0
 
-
         # calf to heiferI
         for index, calf in enumerate(calves):
             wean_day = calf.update(date)
@@ -307,7 +310,6 @@ class LifeCycleManager:
                 total_animal_num, self.avg_mature_body_weight = \
                     self._calc_average(total_animal_num,
                                        self.avg_mature_body_weight, calf.mature_body_weight)
-
 
         # heiferI to heiferII, assign repro programs
         for index, heiferI in enumerate(heiferIs):
@@ -330,7 +332,6 @@ class LifeCycleManager:
                     self._calc_average(total_animal_num,
                                        self.avg_mature_body_weight, heiferI.mature_body_weight)
 
-
         # heiferII to heiferIII
         for index, heiferII in enumerate(heiferIIs):
             cull_stage, third_stage = heiferII.update(date)
@@ -345,7 +346,8 @@ class LifeCycleManager:
                 args.update({
                     'body_weight_history': heiferII.body_weight_history,
                     'pen_history': heiferII.pen_history,
-                    'conceptus_weight': heiferII.conceptus_weight
+                    'conceptus_weight': heiferII.conceptus_weight,
+                    'calf_birth_weight': heiferII.calf_birth_weight
                 })
                 new_heiferIII = HeiferIII(args)
                 heiferIIIs.append(new_heiferIII)
@@ -360,7 +362,6 @@ class LifeCycleManager:
                         self._calc_average(preg_heifer_num,
                                            self.avg_breeding_to_preg_time,
                                            heiferII.breeding_to_preg_time)
-
 
         # heiferIII to cow, assign repro programs
         for index, heiferIII in enumerate(heiferIIIs):
@@ -377,7 +378,8 @@ class LifeCycleManager:
                 args.update({
                     'body_weight_history': heiferIII.body_weight_history,
                     'pen_history': heiferIII.pen_history,
-                    'conceptus_weight': heiferIII.conceptus_weight
+                    'conceptus_weight': heiferIII.conceptus_weight,
+                    'calf_birth_weight': heiferIII.calf_birth_weight
                      })
                 args.update(repro_program=AnimalBase.config['cow_repro_method'])
                 args.update(presynch_method=AnimalBase.config['cow_presynch_protocol'])
@@ -391,7 +393,6 @@ class LifeCycleManager:
                 total_animal_num, self.avg_mature_body_weight = \
                     self._calc_average(total_animal_num,
                                        self.avg_mature_body_weight, heiferIII.mature_body_weight)
-
 
         # if the number of heifers is more than needed for the herd, sell
         # those as replacement
@@ -520,14 +521,14 @@ class LifeCycleManager:
                 self.semen_num += cow.semen_num
                 self.ai_num += cow.AI_times
 
-            # sold calves
             if new_born:
                 args = {
                     'id': self.animal_initializer.next_id(),
                     'breed': 'HO',
                     'birth_date': date,
                     'days_born': 0,
-                    'p_init': cow.p_gest_for_calf
+                    'p_init': cow.p_gest_for_calf,
+                    'birth_weight': cow.calf_birth_weight
                 }
                 # at parturition, the sum of P absorbed for gestation rqmts is
                 # subtracted from the animal value. the sum of P absorbed for
@@ -538,6 +539,7 @@ class LifeCycleManager:
 
                 new_calf = Calf(args)
                 cow.p_gest_for_calf = 0
+                cow.calf_birth_weight = 0
 
                 if not (new_calf.culled or new_calf.sold):
                     new_calf.events.add_event(
@@ -602,4 +604,5 @@ class LifeCycleManager:
         """
         new_num_values = num_values + 1
         new_avg = (cur_avg * num_values + new_value) / new_num_values
+
         return new_num_values, new_avg

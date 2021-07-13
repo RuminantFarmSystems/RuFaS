@@ -45,7 +45,6 @@ def input_prompt():
 
         try:
             user_input = 'input/' + input("\nEnter RUFAS Input: ")
-
             #
             # Handle user exiting program
             #
@@ -81,7 +80,7 @@ def input_prompt():
                 if not input_path.is_file():
                     raise errors.UserInput("Specified file does not exist")
                 else:
-                    print("json file Detected...\n")
+                    print("json file detected...\n")
                 return [input_path]
 
             #

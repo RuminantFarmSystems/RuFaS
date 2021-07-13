@@ -16,10 +16,11 @@ Author(s): Kass Chupongstimun, kass_c@hotmail.com,
 """
 
 from RUFAS.util import DatabaseReader
+from RUFAS.output_handler.reports.feed_storage_report import StorageReport
 from . import nitrogen_loss, carbon_loss, protein_degradation
 
 
-def daily_feed_routine(feed, fields, animal_management):
+def daily_feed_routine(feed, fields, animal_management, feed_report):
     """
     Description:
         Executes the functions that run the daily feed routines for both storage
@@ -29,10 +30,14 @@ def daily_feed_routine(feed, fields, animal_management):
         feed: an instance of the Feed object
         fields: an instance of the Field object (contains harvest information)
         animal_management: an instance of the AnimalManagement object
+        feed_report: an instance of the FeedStorageReport class defined in
+            RUFAS.output_handler.reports.feed_storage_report.py. Included here
+            in order to add generated storage receptacles to the feed storage report.
     """
 
     # feed storage routines to be run daily
-    feed.daily_feed_storage(fields)
+    feed.daily_feed_storage(fields, feed_report)
+
     # feed management routines to be run daily
     feed.daily_feed_management(animal_management)
 
@@ -55,7 +60,6 @@ class Feed:
         self.feeds_table = data['feeds_table']
         self.feed_quality_table = data['feed_quality_table']
         self.nutrient_table = data['nutrient_table']
-
         self.db_reader = DatabaseReader(self.feed_database)
 
         self.entries_split_by_maturity = self.get_feeds_split_by_maturity()
@@ -642,7 +646,7 @@ class Feed:
                     storage.DMI_forage_max['lactating_cows'] = available_forage \
                                                                / storage.cow_days['lactating_cows']
 
-    def daily_feed_storage(self, fields):
+    def daily_feed_storage(self, fields, feed_report):
         """
         Description:
             Executes daily routines relating to crop and feed storage, which
@@ -654,9 +658,12 @@ class Feed:
 
         Args:
             fields : an instance of the Field object (contains harvest information)
+            feed_report: an instance of the BaseReport object defined in
+                output_hanler/base_report.py. Included here so that new storage
+                can be added to output.
         """
         # aggregate crop yield across fields
-        for field in fields:
+        for field in fields.fields.values():
             crop = field.crop.current_crop
             # there is forage to be stored
             if crop.yield_actual != 0:
@@ -667,6 +674,8 @@ class Feed:
                             and storage.storage_quality == crop.harvest_quality \
                             and not stored:
                         storage.store_crop(self, crop)
+                        if storage not in self.new_forages:
+                            self.new_forages.append(storage)
                         stored = True
 
                 # search for available, empty storage
@@ -675,6 +684,8 @@ class Feed:
                         if storage.DM == 0 and not stored:
                             storage.calibrate_storage(crop)
                             storage.store_crop(self, crop)
+                            if storage not in self.new_forages:
+                                self.new_forages.append(storage)
                             stored = True
 
                 # generate standard storage
@@ -694,12 +705,19 @@ class Feed:
                         standard_name = 'standard_storage_' + str(self.standard_storage_count)
                         self.available_storage[standard_name] = self.Storage(standard_data)
                         self.storage_options[standard_name] = self.available_storage[standard_name]
+                        report = feed_report.reports[standard_name] = StorageReport(feed_report.storage_report_data,
+                                                                                    standard_name)
+                        report.initialize_dir(feed_report.csv_dir, feed_report.graphic_dir)
+
+                        report.initialize()
 
                         self.standard_storage_count += 1
 
                     storage_name, storage = self.available_storage.popitem()
                     self.storage_options[storage_name].calibrate_storage(crop)
                     self.storage_options[storage_name].store_crop(self, crop)
+                    if storage not in self.new_forages:
+                        self.new_forages.append(storage)
 
         # calculate losses and update storage options after crop allocation
         for storage_name, storage in self.storage_options.items():
@@ -1023,4 +1041,3 @@ class Feed:
             desired_rows=tuple(feed_ids))
         calf_feeds = {155: nutrients[0], 156: nutrients[1], 157: nutrients[2]}
         return calf_feeds
-        
