@@ -1,12 +1,12 @@
 {
 	"herd_information": {
-		"calf_num": 80,
-		"heiferI_num": 440,
-		"heiferII_num": 380,
-		"heiferIII_num": 50,
-		"cow_num": 1000,
+		"calf_num": 25,
+		"heiferI_num": 25,
+		"heiferII_num": 25,
+		"heiferIII_num": 25,
+		"cow_num": 100,
 		"replace_num": 5000,
-		"herd_num": 1000,
+		"herd_num": 100,
 		"herd_init": false,
 		"breed": "HO"
 	},
