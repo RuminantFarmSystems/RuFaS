@@ -74,6 +74,9 @@ class Pen:
     # ration for all the animals in the pen
     ration = {}
 
+    # list of all the ids for the feeds allocated for this pen object
+    feed_ids = []
+
     # total amount of different nutrients in current ration
     ration_nutrient_amount = {'dm': 0, 'CP': 0, 'ADF': 0,
                               'NDF': 0, 'lignin': 0, 'ash': 0,
@@ -293,6 +296,7 @@ class Pen:
         ration = {}
         num_animals = len(self.animals_in_pen)
         for key in ration_per_animal:
+            self.feed_ids.append(key)
             if key == 'status':
                 ration[key] = ration_per_animal[key]
 

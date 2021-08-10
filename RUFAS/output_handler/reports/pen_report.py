@@ -7,14 +7,16 @@ Author(s): William Donovan, wmdonovan@wisc.edu
 
 from .base_report_driver import BaseReportDriver
 from .base_report import BaseReport
+from RUFAS.routines.animal.ration.ration_driver import AvailableFeeds
 from .. import graphics
 
+available_feeds = AvailableFeeds()
 
 class PensReport(BaseReportDriver):
     def __init__(self, data, state):
         super().__init__(data)
         for pen in state.animal_management.all_pens:
-            self.reports['pen_' + str(pen.id)] = PenReport(data, state.feed, pen.id)
+            self.reports['pen_' + str(pen.id)] = PenReport(data, state.feed, pen, pen.id)
 
         self.reports['pens_summary'] = PensSummary(data['pens_summary'])
 
@@ -34,12 +36,12 @@ class PensSummary(BaseReport):
 
 
 class PenReport(BaseReportDriver):
-    def __init__(self, data, feed, pen_id):
+    def __init__(self, data, feed, individual_pen, pen_id):
         super().__init__(data)
         self.pen_id = pen_id
         self.report_name = 'pen_' + str(pen_id)
         self.reports = {
-            'ration_report': self.RationReport(data['ration_report'], feed, self.pen_id),
+            'ration_report': self.RationReport(data['ration_report'], feed, individual_pen,  self.pen_id),
             'growth_report': self.GrowthReport(data['growth_report'], self.pen_id),
             'manure_report': self.ManureReport(data['manure_report'], self.pen_id)
         }
@@ -110,7 +112,7 @@ class PenReport(BaseReportDriver):
             self.manure_info = {}
 
     class RationReport(BasePenReport):
-        def __init__(self, data, feed, pen_id):
+        def __init__(self, data, feed, individual_pen, pen_id):
             super().__init__(data, pen_id)
             self.ration_interval = data['ration_interval']
 
@@ -120,9 +122,21 @@ class PenReport(BaseReportDriver):
                                     }
 
             all_feeds = feed.all_feed_ids
-            for feed_id in all_feeds:
-                feed_name = all_feeds[feed_id]['feed_name']
-                units = all_feeds[feed_id]['units']
+            print(all_feeds)
+
+            individual_pen.calc_ration(feed, available_feeds)
+
+            pen_id_list = individual_pen.feed_ids
+            print(pen_id_list)
+
+            pen_specific_feeds = {x: all_feeds[x] for x in pen_id_list}
+            print(pen_specific_feeds)
+
+
+
+            for feed_id in pen_specific_feeds:
+                feed_name = pen_specific_feeds[feed_id]['feed_name']
+                units = pen_specific_feeds[feed_id]['units']
 
                 self.daily_variables[feed_id + "(" + feed_name + ")"] = \
                     [
