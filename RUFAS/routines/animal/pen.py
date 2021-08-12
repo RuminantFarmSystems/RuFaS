@@ -246,6 +246,8 @@ class Pen:
         """
         # sets ration's necessary fields for ration formulation calculation
         # there should only be one group of animals in a pen
+        self.feed_ids = []
+
         while True:
             #TODO: Instead of checking if animal is in a class, check pen tag
             #an error may be caused as result of heifers and dry cows in same pen
@@ -303,6 +305,8 @@ class Pen:
             else:  # feeds and price
                 ration[key] = ration_per_animal[key] * num_animals
 
+        print(self.feed_ids)
+        print(ration)
         return ration
 
     def calc_manure(self, feed, methane_model):
@@ -560,7 +564,7 @@ class Pen:
         if animal.nutrient_rqmts == {} and class_name == 'Calf':
             animal.calc_nutrient_rqmts(feed, temp)
         elif animal.nutrient_rqmts == {} and not class_name == 'Calf':
-            animal.set_nutrient_rqmts(temp)
+            animal.set_nutrient_rqmts()
 
         # set animal's DVD and DHD if it is a cow
         if class_name == 'Cow':
