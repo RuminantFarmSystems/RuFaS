@@ -7,10 +7,8 @@ Author(s): William Donovan, wmdonovan@wisc.edu
 
 from .base_report_driver import BaseReportDriver
 from .base_report import BaseReport
-from RUFAS.routines.animal.ration.ration_driver import AvailableFeeds
 from .. import graphics
 
-available_feeds = AvailableFeeds()
 
 class PensReport(BaseReportDriver):
     def __init__(self, data, state):
@@ -122,15 +120,12 @@ class PenReport(BaseReportDriver):
                                     }
 
             all_feeds = feed.all_feed_ids
-            print(all_feeds)
-
-            individual_pen.calc_ration(feed, available_feeds)
 
             pen_id_list = individual_pen.feed_ids
-            print(pen_id_list)
+            #print(pen_id_list)
 
             pen_specific_feeds = {x: all_feeds[x] for x in pen_id_list}
-            print(pen_specific_feeds)
+            #print(pen_specific_feeds)
 
 
 
