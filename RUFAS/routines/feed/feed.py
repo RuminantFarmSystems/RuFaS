@@ -63,15 +63,15 @@ class Feed:
         self.db_reader = DatabaseReader(self.feed_database)
 
         self.entries_split_by_maturity = self.get_feeds_split_by_maturity()
-        self.growing_feeds = data['growing_feeds']
+        self.farm_grown_feeds = data['farm_grown_feeds']
         self.purchased_feeds_entries = data['purchased_feeds']
         self.purchased_feeds = []  # set in the next method call
 
         self.all_feed_ids = self.get_all_feed_units(data['purchased_feeds'],
-                                                    data['growing_feeds'])
+                                                    data['farm_grown_feeds'])
         # dictionary of nutrients needed for this run
         # initially, this only contains information for purchased feeds as none
-        # of the growing_feeds have been harvested yet
+        # of the farm_grown_feeds have been harvested yet
         self.available_feeds = \
             self.get_nutrient_vals(self.purchased_feeds, False)
         self.calf_feeds = self.get_calf_feeds()

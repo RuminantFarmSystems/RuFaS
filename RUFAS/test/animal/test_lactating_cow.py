@@ -29,7 +29,7 @@ class LactatingCowTest(unittest.TestCase):
             "purchased_feeds": [2, 26, 36, 86, 118, 136, 139],
             "purchased_feeds_costs": {"2": 0.17, "26": 0.1, "36": 0, "86": 0,
                                       "118": 0.39, "136": 0.53, "139": 0.25},
-            "growing_feeds": [],
+            "farm_grown_feeds": [],
 
 
             "storage_options":

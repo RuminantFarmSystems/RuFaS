@@ -12,6 +12,8 @@ Author(s): Militsa Sotirova, militsasotirova@gmail.com
 from RUFAS.routines.animal.ration.calf_ration import optimize as calf_optimize
 from RUFAS.routines.animal.ration import ration_driver as ration_driver
 from RUFAS.routines.animal.ration import animal_requirements as req
+from RUFAS import util, errors
+from ...util import read_json_file
 
 class Pen:
     """
@@ -305,8 +307,8 @@ class Pen:
             else:  # feeds and price
                 ration[key] = ration_per_animal[key] * num_animals
 
-        print(self.feed_ids)
-        print(ration)
+        #print(self.feed_ids)
+        #print(ration)
         return ration
 
     def calc_manure(self, feed, methane_model):
@@ -593,3 +595,21 @@ class Pen:
         self.pen_populated = False
         # self.classes_in_pen = set()
         self.avg_p_animal = 0
+
+    def panke_buisse_feed_reader(self):
+        assert len(self.animals_in_pen) < 1, "No animal types in pen."
+        assert len(self.animals_in_pen) > 2, "Illegal amount of animal types in pen."
+
+        if len(self.animals_in_pen) == 1:
+            if self.animals_in_pen[0] == 'calf':
+                self.feed_ids.append(data["calf_feeds"])
+            elif self.animals_in_pen[0] == 'growing':
+                self.feed_ids.append(data["growing"])
+            elif self.animals_in_pen[0] == 'close-up':
+                self.feed_ids.append(data["close-up"])
+            elif self.animals_in_pen[0] == 'l_cows':
+                self.feed_ids.append(data["l_cows"])
+        elif len(self.animals_in_pen) == 2:
+            if (self.feed_ids[0] == 'l_cows' and self.feed_ids[1] == 'close-up') or (self.feed_ids[0] == 'close-up' and self.feed_ids[1] == 'l_cows'):
+                self.feed_ids.append(data["l_cows"])
+                self.feed_ids.append(data["close-up"])

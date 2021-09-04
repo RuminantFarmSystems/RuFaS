@@ -14,6 +14,7 @@ class PensReport(BaseReportDriver):
     def __init__(self, data, state):
         super().__init__(data)
         for pen in state.animal_management.all_pens:
+            #print(pen)
             self.reports['pen_' + str(pen.id)] = PenReport(data, state.feed, pen, pen.id)
 
         self.reports['pens_summary'] = PensSummary(data['pens_summary'])
@@ -39,7 +40,7 @@ class PenReport(BaseReportDriver):
         self.pen_id = pen_id
         self.report_name = 'pen_' + str(pen_id)
         self.reports = {
-            'ration_report': self.RationReport(data['ration_report'], feed, individual_pen,  self.pen_id),
+            'ration_report': self.RationReport(data['ration_report'], feed, individual_pen, self.pen_id),
             'growth_report': self.GrowthReport(data['growth_report'], self.pen_id),
             'manure_report': self.ManureReport(data['manure_report'], self.pen_id)
         }
@@ -120,6 +121,7 @@ class PenReport(BaseReportDriver):
                                     }
 
             all_feeds = feed.all_feed_ids
+            #print(all_feeds)
 
             pen_id_list = individual_pen.feed_ids
             #print(pen_id_list)
@@ -127,11 +129,19 @@ class PenReport(BaseReportDriver):
             pen_specific_feeds = {x: all_feeds[x] for x in pen_id_list}
             #print(pen_specific_feeds)
 
+            # for feed_id in pen_id_list:
+            #     feed_name = pen_specific_feeds[feed_id]['feed_name']
+            #     units = pen_specific_feeds[feed_id]['units']
+            #
+            #     self.daily_variables[feed_id + "(" + feed_name + ")"] = \
+            #         [
+            #             'pen.ration[\'%s\'] if pen.pen_populated and \'%s\' in individual_pen.feed_ids else 0' % (
+            #                 feed_id, feed_id), units,
+            #             []]
 
-
-            for feed_id in pen_specific_feeds:
-                feed_name = pen_specific_feeds[feed_id]['feed_name']
-                units = pen_specific_feeds[feed_id]['units']
+            for feed_id in all_feeds:
+                feed_name = all_feeds[feed_id]['feed_name']
+                units = all_feeds[feed_id]['units']
 
                 self.daily_variables[feed_id + "(" + feed_name + ")"] = \
                     [
