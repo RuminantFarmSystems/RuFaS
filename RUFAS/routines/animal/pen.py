@@ -595,30 +595,30 @@ class Pen:
         # self.classes_in_pen = set()
         self.avg_p_animal = 0
 
-    def animal_class_feed_subsetter(self, data):
+    def animal_class_feed_subsetter(self, feed):
         """
         Changes the feed_ids list to appropriately include the feeds necessary for that pen object,
         based on the animal type(s) that are currently in the pen.
 
         Args:
-            data: the panke_buisse_feed.json file passed in to access different lists of animal type feed ids.
+            feed: an object of the Feed class
         """
         assert len(self.animals_in_pen) < 1, "No animal types in pen."
         assert len(self.animals_in_pen) > 2, "Illegal amount of animal types in pen."
 
         if len(self.animals_in_pen) == 1:
             if self.animals_in_pen[0] == 'calf':
-                self.feed_ids.append(data["calf_feeds"])
+                self.feed_ids.append(feed.panke_calf_feeds)
             elif self.animals_in_pen[0] == 'growing':
-                self.feed_ids.append(data["growing"])
+                self.feed_ids.append(feed.panke_growing_feeds)
             elif self.animals_in_pen[0] == 'close-up':
-                self.feed_ids.append(data["close-up"])
+                self.feed_ids.append(feed.panke_close_up_feeds)
             elif self.animals_in_pen[0] == 'l_cows':
-                self.feed_ids.append(data["l_cows"])
+                self.feed_ids.append(feed.panke_l_cows_feeds)
         elif len(self.animals_in_pen) == 2:
             if (self.feed_ids[0] == 'growing' and self.feed_ids[1] == 'close-up') or (self.feed_ids[0] == 'close-up' and self.feed_ids[1] == 'growing'):
-                self.feed_ids.append(data["growing"])
-                self.feed_ids.append(data["close-up"])
+                self.feed_ids.append(feed.panke_growing_feeds)
+                self.feed_ids.append(feed.panke_close_up_feeds)
 
         # we want to import the Feed Module into pen.py
         # this is done to access the panke_buisse_feed.json file that the Feed Object has access to.

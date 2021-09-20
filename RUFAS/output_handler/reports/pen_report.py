@@ -119,7 +119,7 @@ class PenReport(BaseReportDriver):
                                     'j_day': ['time.day', '', []],
                                     'num_animals': ['len(pen.animals_in_pen)', '', []]
                                     }
-
+            individual_pen.animal_class_feed_subsetter(feed)
             all_feeds = feed.all_feed_ids
             #print(all_feeds)
 
@@ -129,23 +129,13 @@ class PenReport(BaseReportDriver):
             pen_specific_feeds = {x: all_feeds[x] for x in pen_id_list}
             #print(pen_specific_feeds)
 
-            # for feed_id in pen_id_list:
-            #     feed_name = pen_specific_feeds[feed_id]['feed_name']
-            #     units = pen_specific_feeds[feed_id]['units']
-            #
-            #     self.daily_variables[feed_id + "(" + feed_name + ")"] = \
-            #         [
-            #             'pen.ration[\'%s\'] if pen.pen_populated and \'%s\' in individual_pen.feed_ids else 0' % (
-            #                 feed_id, feed_id), units,
-            #             []]
-
-            for feed_id in all_feeds:
-                feed_name = all_feeds[feed_id]['feed_name']
-                units = all_feeds[feed_id]['units']
+            for feed_id in pen_id_list:
+                feed_name = pen_specific_feeds[feed_id]['feed_name']
+                units = pen_specific_feeds[feed_id]['units']
 
                 self.daily_variables[feed_id + "(" + feed_name + ")"] = \
                     [
-                        'pen.ration[\'%s\'] if pen.pen_populated and \'%s\' in feed.available_feeds else 0' % (
+                        'pen.ration[\'%s\'] if pen.pen_populated and \'%s\' in individual_pen.feed_ids else 0' % (
                             feed_id, feed_id), units,
                         []]
 
