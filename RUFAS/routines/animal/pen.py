@@ -13,7 +13,6 @@ from RUFAS.routines.animal.ration.calf_ration import optimize as calf_optimize
 from RUFAS.routines.animal.ration import ration_driver as ration_driver
 from RUFAS.routines.animal.ration import animal_requirements as req
 from RUFAS import util, errors
-from ...util import read_json_file
 
 class Pen:
     """
@@ -596,7 +595,14 @@ class Pen:
         # self.classes_in_pen = set()
         self.avg_p_animal = 0
 
-    def panke_buisse_feed_reader(self):
+    def animal_class_feed_subsetter(self, data):
+        """
+        Changes the feed_ids list to appropriately include the feeds necessary for that pen object,
+        based on the animal type(s) that are currently in the pen.
+
+        Args:
+            data: the panke_buisse_feed.json file passed in to access different lists of animal type feed ids.
+        """
         assert len(self.animals_in_pen) < 1, "No animal types in pen."
         assert len(self.animals_in_pen) > 2, "Illegal amount of animal types in pen."
 
@@ -610,6 +616,9 @@ class Pen:
             elif self.animals_in_pen[0] == 'l_cows':
                 self.feed_ids.append(data["l_cows"])
         elif len(self.animals_in_pen) == 2:
-            if (self.feed_ids[0] == 'l_cows' and self.feed_ids[1] == 'close-up') or (self.feed_ids[0] == 'close-up' and self.feed_ids[1] == 'l_cows'):
-                self.feed_ids.append(data["l_cows"])
+            if (self.feed_ids[0] == 'growing' and self.feed_ids[1] == 'close-up') or (self.feed_ids[0] == 'close-up' and self.feed_ids[1] == 'growing'):
+                self.feed_ids.append(data["growing"])
                 self.feed_ids.append(data["close-up"])
+
+        # we want to import the Feed Module into pen.py
+        # this is done to access the panke_buisse_feed.json file that the Feed Object has access to.
