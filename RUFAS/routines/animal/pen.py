@@ -75,8 +75,8 @@ class Pen:
     # ration for all the animals in the pen
     ration = {}
 
-    # list of all the ids for the feeds allocated for this pen object
-    feed_ids = []
+    # # list of all the ids for the feeds allocated for this pen object
+    # feed_ids = []
 
     # total amount of different nutrients in current ration
     ration_nutrient_amount = {'dm': 0, 'CP': 0, 'ADF': 0,
@@ -210,6 +210,9 @@ class Pen:
         self.avg_p_req = 0
         self.avg_p_animal = 0
 
+        self.feed_ids = []
+
+
 
     def update_animals(self, new_animals, animal_group):
         """
@@ -247,7 +250,6 @@ class Pen:
         """
         # sets ration's necessary fields for ration formulation calculation
         # there should only be one group of animals in a pen
-        self.feed_ids = []
 
         while True:
             #TODO: Instead of checking if animal is in a class, check pen tag
@@ -299,15 +301,13 @@ class Pen:
         ration = {}
         num_animals = len(self.animals_in_pen)
         for key in ration_per_animal:
-            self.feed_ids.append(key)
             if key == 'status':
                 ration[key] = ration_per_animal[key]
 
             else:  # feeds and price
                 ration[key] = ration_per_animal[key] * num_animals
 
-        #print(self.feed_ids)
-        #print(ration)
+        print(self.feed_ids)
         return ration
 
     def calc_manure(self, feed, methane_model):
@@ -603,19 +603,22 @@ class Pen:
         Args:
             feed: an object of the Feed class
         """
-        assert len(self.animals_in_pen) < 1, "No animal types in pen."
-        assert len(self.animals_in_pen) > 2, "Illegal amount of animal types in pen."
+        # figure a way to get values of lists into the feed_ids list without passing in the list itself
 
-        if len(self.animals_in_pen) == 1:
-            if self.animals_in_pen[0] == 'calf':
+
+        assert len(self.animal_groups) > -1, "No animal types in pen."
+        assert len(self.animal_groups) < 3, "Illegal amount of animal types in pen."
+
+        if len(self.animal_groups) == 1:
+            if self.animal_groups[0] == 'calf':
                 self.feed_ids.append(feed.panke_calf_feeds)
-            elif self.animals_in_pen[0] == 'growing':
+            elif self.animal_groups[0] == 'growing':
                 self.feed_ids.append(feed.panke_growing_feeds)
-            elif self.animals_in_pen[0] == 'close-up':
+            elif self.animal_groups[0] == 'close-up':
                 self.feed_ids.append(feed.panke_close_up_feeds)
-            elif self.animals_in_pen[0] == 'l_cows':
+            elif self.animal_groups[0] == 'l_cows':
                 self.feed_ids.append(feed.panke_l_cows_feeds)
-        elif len(self.animals_in_pen) == 2:
+        elif len(self.animal_groups) == 2:
             if (self.feed_ids[0] == 'growing' and self.feed_ids[1] == 'close-up') or (self.feed_ids[0] == 'close-up' and self.feed_ids[1] == 'growing'):
                 self.feed_ids.append(feed.panke_growing_feeds)
                 self.feed_ids.append(feed.panke_close_up_feeds)

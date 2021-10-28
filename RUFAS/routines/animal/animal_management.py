@@ -643,7 +643,7 @@ class AnimalManagement:
                 group.append(hef3)
             else:
                 close_up_pens[0].update_animals(group, 'close-up')
-                close_up__pens.pop(0)
+                close_up_pens.pop(0)
                 group = [hef3]
         #continuing with dry cows
         for cow in dry_cows:
