@@ -14,7 +14,8 @@ class PensReport(BaseReportDriver):
     def __init__(self, data, state):
         super().__init__(data)
         for pen in state.animal_management.all_pens:
-            #print(pen)
+            print(pen)
+            print(pen.animal_groups)
             self.reports['pen_' + str(pen.id)] = PenReport(data, state.feed, pen, pen.id)
 
         self.reports['pens_summary'] = PensSummary(data['pens_summary'])
@@ -55,6 +56,7 @@ class PenReport(BaseReportDriver):
             feed = state.feed
             pen = state.animal_management.all_pens[self.pen_id]
 
+            print(self.daily_variables)
             for variable in self.daily_variables:
                 self.daily_variables[variable][2].append(
                     eval(self.daily_variables[variable][0], globals(), locals()))
@@ -119,29 +121,37 @@ class PenReport(BaseReportDriver):
                                     'j_day': ['time.day', '', []],
                                     'num_animals': ['len(pen.animals_in_pen)', '', []]
                                     }
+            # this subsets the pen's allotted feed given the animals type(s)
+            # that are present within the pen that is currently being
+            # simulated
             individual_pen.animal_class_feed_subsetter(feed)
+
             all_feeds = feed.all_feed_ids
             #print(all_feeds)
 
+            #index at 0 because there is a nested list here for some unknown reason
+            print(individual_pen.feed_ids)
             pen_id_list = individual_pen.feed_ids
-            #print(pen_id_list)
+            print(pen_id_list)
 
-            pen_specific_feeds = {x: all_feeds[x] for x in pen_id_list}
-            #print(pen_specific_feeds)
+            pen_specific_feeds = {str(x): all_feeds[str(x)] for x in pen_id_list}
+
+
 
             for feed_id in pen_id_list:
-                feed_name = pen_specific_feeds[feed_id]['feed_name']
-                units = pen_specific_feeds[feed_id]['units']
+                feed_name = pen_specific_feeds[str(feed_id)]['feed_name']
+                units = pen_specific_feeds[str(feed_id)]['units']
 
-                self.daily_variables[feed_id + "(" + feed_name + ")"] = \
+                self.daily_variables[str(feed_id) + "(" + feed_name + ")"] = \
                     [
-                        'pen.ration[\'%s\'] if pen.pen_populated and \'%s\' in individual_pen.feed_ids else 0' % (
+                        'pen.ration[\'%s\'] if pen.pen_populated and \'%s\' in pen.feed_ids else 0' % (
                             feed_id, feed_id), units,
                         []]
 
             self.annual_variables = {
                 'year': ['time.calendar_year', '', 0]
             }
+
 
         def produce_report_graphics(self):
             super().produce_report_graphics()
