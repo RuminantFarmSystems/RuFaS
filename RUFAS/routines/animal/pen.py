@@ -224,7 +224,77 @@ class Pen:
                                 }
 
     # getters
+    def get_id(self):
+        """
+        Returns the id_number: the unique id number of the pen 
+        """
+        return self.id
 
+    def get_vertical_dist_to_parlor(self):
+        """
+        Returns the vertical distance to milking parlor, km 
+        """
+        return self.vertical_dist_to_parlor
+
+    def get_horizontal_dist_to_parlor(self):
+        """
+        Returns the horizontal distance to milking parlor, km
+        """
+        return self.horizontal_dist_to_parlor
+
+    def get_num_stalls(self):
+        """
+        Returns the number of stalls in the pen
+        """
+        return self.num_stalls
+
+    def get_housing_type(self):
+        """
+        Returns the housing type of the pen
+        """
+        return self.housing_type
+
+    def get_bedding_type(self):
+        """
+        Returns the bedding type of the pen
+        """
+        return self.bedding_type
+
+    def get_pen_type(self):
+        """
+        Returns the pen type: freestall or tiestall
+        """
+        return self.pen_type
+
+    def get_manure_handling(self):
+        """
+        Returns the manure handling method used to clean the pen
+        """
+        return self.manure_handling
+
+    def get_manure_separator(self):
+        """
+        Returns the manure separator that processes manure excreted in this pen
+        """
+        return self.manure_separator
+
+    def get_manure_storage(self):
+        """
+        Returns the manure storage receptacle that stores manure excreted in this pen
+        """
+        return self.get_manure_storage
+
+    def get_stocking_density(self):
+        """
+        Returns the stocking density of the pen
+        """
+        return self.stocking_density
+
+    def get_avg_DBW(self):
+        """
+        Returns the average daily change in (delta) body weight of the animals in the pen
+        """
+        return self.avg_DBW
 
     # setters
 
