@@ -22,18 +22,13 @@ class Pen:
     animals that are housed in it any point in the simulation. This class also
     keeps track of some key characteristics of the average animal in the pen.
     """
+    # the following attributes were moved from outside the class' initializer into the
+    # initializer to allow for them to be changed for each individual instance as required:
+    # id, animals_in_pen, pen_populated, classes_in_pen, vertical_dist_to_parlor, horizontal_dist_to_parlor,
+    # num_stalls, stocking_density, housing_type, bedding_type,
+
     # unique pen ID, from input file
     id = -1
-
-    # list of all animals in this pen
-    animals_in_pen = []
-
-    # boolean: False if len(self.animals_in_pen) == 0
-    # (i.e. there are no animals in the pen)
-    pen_populated = False
-
-    # set (no repeats) of all the classes to which the animals in the pen belong
-    classes_in_pen = set()
 
     # vertical distance to milking parlor, km, from input file
     vertical_dist_to_parlor = 0
@@ -57,123 +52,10 @@ class Pen:
     # freestall or tiestall, from input file
     pen_type = ""
 
-    # average nutrient requirements of the animals in the pen, used for
-    # ration formulation
-    avg_nutrient_rqmts = {}
-    avg_calf_nutrient_rqmts = {}
-
-    # average body weight of the animals in the pen, used for ration formulation
-    avg_BW = 0
-
-    # average dry matter intake estimation of the animals in the pen,
-    # used for ration formulation
-    avg_DMIest = 0
-
     # average daily change in (delta) body weight of the animals in the pen,
     # used for ration formulation
     avg_DBW = 0
 
-    # average milk production of the animals in the pen,
-    # used for (lactating cow) ration formulation
-    avg_milk = 0
-
-    # average milk crude protein content of the animals in the pen,
-    # used for (lactating cow) ration formulation
-    avg_CP_milk = 0
-
-    # ration for all the animals in the pen
-    ration = {}
-
-    # total amount of different nutrients in current ration
-    ration_nutrient_amount = {'dm': 0, 'CP': 0, 'ADF': 0,
-                              'NDF': 0, 'lignin': 0, 'ash': 0,
-                              'phosphorus': 0, 'potassium': 0, 'N': 0}
-
-    # concentration of different nutrients in current ration
-    ration_nutrient_conc = {}
-
-    # total manure excretion of the animals in the pen
-    manure = {"U": 0,
-              "TAN_s": 0,
-              "MN": 0,
-              "Mkg": 0,
-              "TSd": 0,
-              "VSd": 0,
-              "VSnd": 0,
-              "WIP_frac": 0,
-              "WOP_frac": 0,
-              "p_excrt_manure": 0,
-              "p_frac": 0,
-              "K_manure": 0,
-              "CH4_manure": 0
-              }
-
-    # total manure excretion of the calves in the pen
-    calf_total = {"U": 0,
-                  "TAN_s": 0,
-                  "MN": 0,
-                  "Mkg": 0,
-                  "TSd": 0,
-                  "VSd": 0,
-                  "VSnd": 0,
-                  "WIP_frac": 0,
-                  "WOP_frac": 0,
-                  "p_excrt_manure": 0,
-                  "p_frac": 0,
-                  "K_manure": 0,
-                  "CH4_manure": 0
-                  }
-
-    # total manure excretion of the heifers in the pen
-    heifer_total = {"U": 0,
-                    "TAN_s": 0,
-                    "MN": 0,
-                    "Mkg": 0,
-                    "TSd": 0,
-                    "VSd": 0,
-                    "VSnd": 0,
-                    "WIP_frac": 0,
-                    "WOP_frac": 0,
-                    "p_excrt_manure": 0,
-                    "p_frac": 0,
-                    "K_manure": 0,
-                    "CH4_manure": 0
-                    }
-
-    # total manure excretion of the dry cows in the pen
-    dry_total = {"U": 0,
-                 "TAN_s": 0,
-                 "MN": 0,
-                 "Mkg": 0,
-                 "TSd": 0,
-                 "VSd": 0,
-                 "VSnd": 0,
-                 "WIP_frac": 0,
-                 "WOP_frac": 0,
-                 "p_excrt_manure": 0,
-                 "p_frac": 0,
-                 "K_manure": 0,
-                 "CH4_manure": 0
-                 }
-
-    # total manure excretion of the lactating cows in the pen
-    lactating_total = {"U": 0,
-                       "TAN_s": 0,
-                       "MN": 0,
-                       "Mkg": 0,
-                       "TSd": 0,
-                       "VSd": 0,
-                       "VSnd": 0,
-                       "WIP_frac": 0,
-                       "WOP_frac": 0,
-                       "p_excrt_manure": 0,
-                       "p_frac": 0,
-                       "K_manure": 0,
-                       "CH4_manure": 0
-                       }
-
-    # average growth of the animals in the pen
-    avg_growth = 0
 
     def __init__(self, id_number, vert_dist, horiz_dist, num_stalls, housing_type,
                  bedding_type, pen_type, manure_handling, manure_separator, manure_storage):
@@ -210,6 +92,142 @@ class Pen:
         self.avg_p_intake = 0
         self.avg_p_req = 0
         self.avg_p_animal = 0
+
+        # __________________MOVED ATTRIBUTES IN___________________________
+
+        # list of all animals in this pen
+        self.animals_in_pen = []
+
+        # boolean: False if len(self.animals_in_pen) == 0
+        # (i.e. there are no animals in the pen)
+        self.pen_populated = False
+
+        # set (no repeats) of all the classes to which the animals in the pen belong
+        self.classes_in_pen = set()
+
+        # stocking density of pen, calculated when animals in pen are updated in
+        # update_animals()
+        self.stocking_density = 0
+
+        # average body weight of the animals in the pen, used for ration formulation
+        self.avg_BW = 0
+
+        # average dry matter intake estimation of the animals in the pen,
+        # used for ration formulation
+        self.avg_DMIest = 0
+
+        # average nutrient requirements of the animals in the pen, used for
+        # ration formulation
+        self.avg_nutrient_rqmts = {}
+        self.avg_calf_nutrient_rqmts = {}
+
+        # average milk production of the animals in the pen,
+        # used for (lactating cow) ration formulation
+        self.avg_milk = 0
+
+        # average milk crude protein content of the animals in the pen,
+        # used for (lactating cow) ration formulation
+        self.avg_CP_milk = 0
+
+        # ration for all the animals in the pen
+        self.ration = {}
+
+        # total amount of different nutrients in current ration
+        self.ration_nutrient_amount = {'dm': 0, 'CP': 0, 'ADF': 0,
+                                       'NDF': 0, 'lignin': 0, 'ash': 0,
+                                       'phosphorus': 0, 'potassium': 0, 'N': 0}
+
+        # concentration of different nutrients in current ration
+        self.ration_nutrient_conc = {}
+
+        # average growth of the animals in the pen
+        self.avg_growth = 0
+
+        # total manure excretion of the animals in the pen
+        self.manure = {"U": 0,
+                       "TAN_s": 0,
+                       "MN": 0,
+                       "Mkg": 0,
+                       "TSd": 0,
+                       "VSd": 0,
+                       "VSnd": 0,
+                       "WIP_frac": 0,
+                       "WOP_frac": 0,
+                       "p_excrt_manure": 0,
+                       "p_frac": 0,
+                       "K_manure": 0,
+                       "CH4_manure": 0
+                       }
+
+        # total manure excretion of the calves in the pen
+        self.calf_total = {"U": 0,
+                           "TAN_s": 0,
+                           "MN": 0,
+                           "Mkg": 0,
+                           "TSd": 0,
+                           "VSd": 0,
+                           "VSnd": 0,
+                           "WIP_frac": 0,
+                           "WOP_frac": 0,
+                           "p_excrt_manure": 0,
+                           "p_frac": 0,
+                           "K_manure": 0,
+                           "CH4_manure": 0
+                           }
+
+        # total manure excretion of the heifers in the pen
+        self.heifer_total = {"U": 0,
+                             "TAN_s": 0,
+                             "MN": 0,
+                             "Mkg": 0,
+                             "TSd": 0,
+                             "VSd": 0,
+                             "VSnd": 0,
+                             "WIP_frac": 0,
+                             "WOP_frac": 0,
+                             "p_excrt_manure": 0,
+                             "p_frac": 0,
+                             "K_manure": 0,
+                             "CH4_manure": 0
+                             }
+
+        # total manure excretion of the dry cows in the pen
+        self.dry_total = {"U": 0,
+                          "TAN_s": 0,
+                          "MN": 0,
+                          "Mkg": 0,
+                          "TSd": 0,
+                          "VSd": 0,
+                          "VSnd": 0,
+                          "WIP_frac": 0,
+                          "WOP_frac": 0,
+                          "p_excrt_manure": 0,
+                          "p_frac": 0,
+                          "K_manure": 0,
+                          "CH4_manure": 0
+                          }
+
+        # total manure excretion of the lactating cows in the pen
+        self.lactating_total = {"U": 0,
+                                "TAN_s": 0,
+                                "MN": 0,
+                                "Mkg": 0,
+                                "TSd": 0,
+                                "VSd": 0,
+                                "VSnd": 0,
+                                "WIP_frac": 0,
+                                "WOP_frac": 0,
+                                "p_excrt_manure": 0,
+                                "p_frac": 0,
+                                "K_manure": 0,
+                                "CH4_manure": 0
+                                }
+
+    # getters
+
+
+    # setters
+
 
     def update_animals(self, new_animals):
         """

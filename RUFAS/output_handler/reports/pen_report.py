@@ -14,7 +14,9 @@ class PensReport(BaseReportDriver):
     def __init__(self, data, state):
         super().__init__(data)
         for pen in state.animal_management.all_pens:
-            self.reports['pen_' + str(pen.id)] = PenReport(data, state.feed, pen.id)
+            print(pen)
+            print(pen.animal_groups)
+            self.reports['pen_' + str(pen.id)] = PenReport(data, state.feed, pen, pen.id)
 
         self.reports['pens_summary'] = PensSummary(data['pens_summary'])
 
@@ -34,12 +36,12 @@ class PensSummary(BaseReport):
 
 
 class PenReport(BaseReportDriver):
-    def __init__(self, data, feed, pen_id):
+    def __init__(self, data, feed, individual_pen, pen_id):
         super().__init__(data)
         self.pen_id = pen_id
         self.report_name = 'pen_' + str(pen_id)
         self.reports = {
-            'ration_report': self.RationReport(data['ration_report'], feed, self.pen_id),
+            'ration_report': self.RationReport(data['ration_report'], feed, individual_pen, self.pen_id),
             'growth_report': self.GrowthReport(data['growth_report'], self.pen_id),
             'manure_report': self.ManureReport(data['manure_report'], self.pen_id)
         }
@@ -54,6 +56,7 @@ class PenReport(BaseReportDriver):
             feed = state.feed
             pen = state.animal_management.all_pens[self.pen_id]
 
+            print(self.daily_variables)
             for variable in self.daily_variables:
                 self.daily_variables[variable][2].append(
                     eval(self.daily_variables[variable][0], globals(), locals()))
@@ -110,7 +113,7 @@ class PenReport(BaseReportDriver):
             self.manure_info = {}
 
     class RationReport(BasePenReport):
-        def __init__(self, data, feed, pen_id):
+        def __init__(self, data, feed, individual_pen, pen_id):
             super().__init__(data, pen_id)
             self.ration_interval = data['ration_interval']
 
@@ -118,21 +121,37 @@ class PenReport(BaseReportDriver):
                                     'j_day': ['time.day', '', []],
                                     'num_animals': ['len(pen.animals_in_pen)', '', []]
                                     }
+            # this subsets the pen's allotted feed given the animals type(s)
+            # that are present within the pen that is currently being
+            # simulated
+            individual_pen.animal_class_feed_subsetter(feed)
 
             all_feeds = feed.all_feed_ids
-            for feed_id in all_feeds:
-                feed_name = all_feeds[feed_id]['feed_name']
-                units = all_feeds[feed_id]['units']
+            #print(all_feeds)
 
-                self.daily_variables[feed_id + "(" + feed_name + ")"] = \
+            #index at 0 because there is a nested list here for some unknown reason
+            print(individual_pen.feed_ids)
+            pen_id_list = individual_pen.feed_ids
+            print(pen_id_list)
+
+            pen_specific_feeds = {str(x): all_feeds[str(x)] for x in pen_id_list}
+
+
+
+            for feed_id in pen_id_list:
+                feed_name = pen_specific_feeds[str(feed_id)]['feed_name']
+                units = pen_specific_feeds[str(feed_id)]['units']
+
+                self.daily_variables[str(feed_id) + "(" + feed_name + ")"] = \
                     [
-                        'pen.ration[\'%s\'] if pen.pen_populated and \'%s\' in feed.available_feeds else 0' % (
+                        'pen.ration[\'%s\'] if pen.pen_populated and \'%s\' in pen.feed_ids else 0' % (
                             feed_id, feed_id), units,
                         []]
 
             self.annual_variables = {
                 'year': ['time.calendar_year', '', 0]
             }
+
 
         def produce_report_graphics(self):
             super().produce_report_graphics()
