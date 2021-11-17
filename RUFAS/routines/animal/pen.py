@@ -21,41 +21,97 @@ class Pen:
     Manages a pen's operation. Stores the characteristics of the pen and the
     animals that are housed in it any point in the simulation. This class also
     keeps track of some key characteristics of the average animal in the pen.
+
+    Attributes
+    -------------
+    id : int
+        This variable represents a pen's unique pen ID, gotten from the input file.
+
+    vertical_dist_to_parlor : float
+        This variable represents the vertical distance to milking parlor, measured in kilometers.
+        It is gotten from the input file.
+
+    horizontal_dist_to_parlor : float
+        This variable represents the horizontal distance to milking parlor, measured in kilometers.
+        It is gotten from the input file
+
+    num_stalls : int
+        This variable represents the number of stalls, gotten from the input file.
+
+    stocking_density : float
+        This variable represents the stocking density of the pen, and is calculated when animals in pen are
+        updated in update_animals()
+
+    housing_type : string
+        This variable represents the housing type of the pen, gotten from the input file.
+
+    bedding_type : string
+        This variable represents the bedding type of the pen, gotten from the input file.
+
+    pen_type : string
+        This variable represents the pen type (freestall or tiestall), gotten from the input file.
+
+    animals_in_pen : animal list
+        This variable represents the list of all animals in this pen
+
+    classes_in_pen : set
+        This variable represents the set (no repeats) of all the classes to which the animals in pen belong.
+
+    pen_populated : bool
+        This variable checks if len(self.animals_in_pen) == 0, that is, if there are any animals in the pen.
+
+    avg_DBW : float
+        This variable represents the average daily change in (delta) body weight of the
+        animals in the pen, and is used for ration formulation.
+
+    avg_BW : float
+        This variable represents the average body weight of the animals in the pen, and is used for ration formulation.
+
+    avg_DMIest : float
+        This variable represents the average dry matter intake estimation of the animals in the pen,
+        and is used for ration formulation
+
+    avg_nutrient_rqmts : dict
+    avg_calf_nutrient_rqmts : dict
+        These variables represent the dictionaries containing the nutrient requirements in the pen, and
+        are used for ration formulation
+
+    avg_milk : float
+        This variable represents the average milk production of the animals in the pen, and is
+        used for (lactating cow) ration formulation
+
+    avg_CP_milk : float
+        This variable represents the average milk crude protein content of the animals in the pen, and is
+        used for (lactating cow) ration formulation
+
+    ration : dict
+        This variable represents the dictionary containing the ration for all the animals in the pen.
+
+    ration_nutrient_amount : dict
+        This variable represents the total amount of different nutrients in the current ration.
+
+    ration_nutrient_conc : dict
+        This variable represents the dictionary containing the concentration of different nutrients
+        in the current ration.
+
+    avg_growth : float
+        This variable represents the average growth of the animals in the pen.
+
+    manure : dict
+        This variable represents a dictionary containing the total manure excretion of the animals in the pen.
+
+    calf_total : dict
+        This variable represents a dictionary containing the total manure excretion of the calves in the pen.
+
+    heifer_total : dict
+        This variable represents a dictionary containing the total manure excretion of the heifers in the pen.
+
+    dry_total : dict
+        This variable represents a dictionary containing the total manure excretion of the dry cows in the pen.
+
+    lacatating_total : dict
+        This variable represents a dictionary containing the total manure excretion of the lactating cows in the pen.
     """
-    # the following attributes were moved from outside the class' initializer into the
-    # initializer to allow for them to be changed for each individual instance as required:
-    # id, animals_in_pen, pen_populated, classes_in_pen, vertical_dist_to_parlor, horizontal_dist_to_parlor,
-    # num_stalls, stocking_density, housing_type, bedding_type,
-
-    # unique pen ID, from input file
-    id = -1
-
-    # vertical distance to milking parlor, km, from input file
-    vertical_dist_to_parlor = 0
-
-    # horizontal distance to milking parlor, km, from input file
-    horizontal_dist_to_parlor = 0
-
-    # number of stalls, from input file
-    num_stalls = 0
-
-    # stocking density of pen, calculated when animals in pen are updated in
-    # update_animals()
-    stocking_density = 0
-
-    # housing type of the pen, from input file
-    housing_type = ""
-
-    # bedding type of the pen, from input file
-    bedding_type = ""
-
-    # freestall or tiestall, from input file
-    pen_type = ""
-
-    # average daily change in (delta) body weight of the animals in the pen,
-    # used for ration formulation
-    avg_DBW = 0
-
 
     def __init__(self, id_number, vert_dist, horiz_dist, num_stalls, housing_type,
                  bedding_type, pen_type, manure_handling, manure_separator, manure_storage):
@@ -84,66 +140,32 @@ class Pen:
         self.pen_type = pen_type
         self.DBW = 0.0
         self.daily_growth = 0.0
-
         self.manure_handling = manure_handling
         self.manure_separator = manure_separator
         self.manure_storage = manure_storage
-
         self.avg_p_intake = 0
         self.avg_p_req = 0
         self.avg_p_animal = 0
-
-        # __________________MOVED ATTRIBUTES IN___________________________
-
-        # list of all animals in this pen
         self.animals_in_pen = []
-
-        # boolean: False if len(self.animals_in_pen) == 0
-        # (i.e. there are no animals in the pen)
         self.pen_populated = False
 
-        # set (no repeats) of all the classes to which the animals in the pen belong
         self.classes_in_pen = set()
-
-        # stocking density of pen, calculated when animals in pen are updated in
-        # update_animals()
         self.stocking_density = 0
 
-        # average body weight of the animals in the pen, used for ration formulation
         self.avg_BW = 0
-
-        # average dry matter intake estimation of the animals in the pen,
-        # used for ration formulation
         self.avg_DMIest = 0
 
-        # average nutrient requirements of the animals in the pen, used for
-        # ration formulation
         self.avg_nutrient_rqmts = {}
         self.avg_calf_nutrient_rqmts = {}
-
-        # average milk production of the animals in the pen,
-        # used for (lactating cow) ration formulation
         self.avg_milk = 0
-
-        # average milk crude protein content of the animals in the pen,
-        # used for (lactating cow) ration formulation
         self.avg_CP_milk = 0
 
-        # ration for all the animals in the pen
         self.ration = {}
-
-        # total amount of different nutrients in current ration
         self.ration_nutrient_amount = {'dm': 0, 'CP': 0, 'ADF': 0,
                                        'NDF': 0, 'lignin': 0, 'ash': 0,
                                        'phosphorus': 0, 'potassium': 0, 'N': 0}
-
-        # concentration of different nutrients in current ration
         self.ration_nutrient_conc = {}
 
-        # average growth of the animals in the pen
-        self.avg_growth = 0
-
-        # total manure excretion of the animals in the pen
         self.manure = {"U": 0,
                        "TAN_s": 0,
                        "MN": 0,
@@ -158,8 +180,6 @@ class Pen:
                        "K_manure": 0,
                        "CH4_manure": 0
                        }
-
-        # total manure excretion of the calves in the pen
         self.calf_total = {"U": 0,
                            "TAN_s": 0,
                            "MN": 0,
@@ -174,8 +194,6 @@ class Pen:
                            "K_manure": 0,
                            "CH4_manure": 0
                            }
-
-        # total manure excretion of the heifers in the pen
         self.heifer_total = {"U": 0,
                              "TAN_s": 0,
                              "MN": 0,
@@ -190,8 +208,6 @@ class Pen:
                              "K_manure": 0,
                              "CH4_manure": 0
                              }
-
-        # total manure excretion of the dry cows in the pen
         self.dry_total = {"U": 0,
                           "TAN_s": 0,
                           "MN": 0,
@@ -206,8 +222,6 @@ class Pen:
                           "K_manure": 0,
                           "CH4_manure": 0
                           }
-
-        # total manure excretion of the lactating cows in the pen
         self.lactating_total = {"U": 0,
                                 "TAN_s": 0,
                                 "MN": 0,
