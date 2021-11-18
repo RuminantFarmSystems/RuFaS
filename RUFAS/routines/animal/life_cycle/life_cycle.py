@@ -282,6 +282,10 @@ class LifeCycleManager:
             'greater_than_3': 0
         }
 
+        daily_cows_culled = 0
+        daily_heifers_sold = 0
+        daily_calves_sold = 0
+
         for parity in self.num_cow_for_parity:
             self.num_cow_for_parity[parity] = 0
             self.percent_cow_for_parity[parity] = 0
@@ -401,6 +405,7 @@ class LifeCycleManager:
             ids_removed.append(removed.id)
             self.sold_heifers.append(removed)
             self.sold_heifer_num += 1
+            daily_heifers_sold += 1
 
         # if the number of heifers is less than needed for the herd,
         # buy replacement from the market
@@ -438,6 +443,9 @@ class LifeCycleManager:
                 # print(len(culled_cows))
                 ids_removed.append(cow.id)
                 del cows[index]
+
+                if cow.cull_reason != c.DEATH_CULL:
+                    daily_cows_culled += 1
 
             else:
                 _, self.avg_cow_body_weight = self._calc_average(
@@ -548,6 +556,7 @@ class LifeCycleManager:
                     calves_born.append(new_calf)
                 if new_calf.sold:
                     self.sold_calf_num += 1
+                    daily_calves_sold += 1
 
         if total_animal_num == 0:
             self.calf_percent = 0
@@ -585,8 +594,8 @@ class LifeCycleManager:
                 self.percent_cow_for_parity[parity] = \
                     self.num_cow_for_parity[parity] / self.cow_num * 100
 
-        return animals_added, ids_removed, calves_born, calves, heiferIs, \
-               heiferIIs, heiferIIIs, cows
+        return daily_cows_culled, daily_heifers_sold, daily_calves_sold, animals_added, \
+            ids_removed, calves_born, calves, heiferIs, heiferIIs, heiferIIIs, cows
 
     @staticmethod
     def _calc_average(num_values, cur_avg, new_value):

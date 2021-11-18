@@ -120,6 +120,13 @@ class AnimalManagement:
 
     annual_manure_prod = 0
 
+    calf_animal_days = 0
+    heiferI_animal_days = 0
+    heiferII_animal_days = 0
+    heiferIII_animal_days = 0
+    lactating_cow_animal_days = 0
+    dry_cow_animal_days = 0
+
     @staticmethod
     def get_animal_config(data):
         config = {}
@@ -158,6 +165,22 @@ class AnimalManagement:
         self.formulation_interval = data['ration']['formulation_interval']
         self.methane_model = data['methane_model']
 
+        self.annual_herd_DMI = 0
+        self.annual_lactating_cow_DMI = 0
+        self.annual_dry_cow_DMI = 0
+        self.annual_heifer_DMI = 0
+
+        self.annual_cows_culled = 0
+        self.annual_heifers_sold = 0
+        self.annual_calves_sold = 0
+
+        self.annual_milk_prod = 0
+        self.annual_milk_protein_prod = 0
+        self.annual_milk_fat_prod = 0
+        self.total_milk_prod_per_lactation = 0
+        self.num_cows_through_300_DIM = 0
+
+        self.purchased_feed_amounts = {}
 
     def init_pens(self, all_pens_data, herd_data):
         """
@@ -447,6 +470,9 @@ class AnimalManagement:
 
         self.avg_milk_lst.append(self.daily_avg_milk)
 
+        for pen in self.all_pens:
+            pen.daily_animal_num_update()
+
     def pen_allocation(self):
         """
         Allocates the animals in all_animals to pens in all_pens based on the
@@ -553,6 +579,17 @@ class AnimalManagement:
             if pen.pen_populated:
                 self.all_pens[i].ration = self.all_pens[i].calc_ration(feed,
                                                                        available_feeds)
+
+        # At this point, every animal should be assigned a ration, so we can calculate the amount
+        # of purchased feeds.
+        for pen in self.all_pens:
+            for animal in pen.animals_in_pen:
+                for key in animal.ration_formulation:
+                    if key != 'objective':
+                        if key in self.purchased_feed_amounts.keys():
+                            self.purchased_feed_amounts[key] += animal.ration_formulation[key]
+                        else:
+                            self.purchased_feed_amounts[key] = animal.ration_formulation[key]
 
     def calc_manure_excretion(self, feed, methane_model):
         """
@@ -697,13 +734,19 @@ class AnimalManagement:
             for pen in self.all_pens:
                 pen.pen_populated = len(pen.animals_in_pen) > 0
 
-            animals_added, ids_removed, calves_born, self.calves, self.heiferIs, \
-            self.heiferIIs, self.heiferIIIs, self.cows = \
+            daily_cows_culled, daily_heifers_sold, daily_calves_sold, animals_added, ids_removed, \
+                calves_born, self.calves, self.heiferIs, \
+                self.heiferIIs, self.heiferIIIs, self.cows = \
                 self.life_cycle_manager.daily_update(self.simulation_day,
                                                      self.calves,
                                                      self.heiferIs,
                                                      self.heiferIIs,
                                                      self.heiferIIIs, self.cows)
+
+            self.annual_cows_culled += daily_cows_culled
+            self.annual_heifers_sold += daily_heifers_sold
+            self.annual_calves_sold += daily_calves_sold
+
             temp = weather.T_avg[time.year - 1][time.day - 1]
             self.daily_update_id_pen(animals_added, ids_removed, calves_born, feed, temp)
 
@@ -728,6 +771,9 @@ class AnimalManagement:
             self.record_pen_history()
             self.calc_milk_nums()
             self.update_daily_nums()
+            self.add_to_animal_days()
+            self.add_to_DMI_totals()
+            self.calc_milk_prod_stats()
 
     def end_ration_interval(self):
         """
@@ -745,6 +791,33 @@ class AnimalManagement:
         self.num_heiferIII_lst = []
         self.num_cow_lst = []
         self.avg_milk_lst = []
+
+        self.calf_animal_days = 0
+        self.heiferI_animal_days = 0
+        self.heiferII_animal_days = 0
+        self.heiferIII_animal_days = 0
+        self.lactating_cow_animal_days = 0
+        self.dry_cow_animal_days = 0
+
+        self.annual_herd_DMI = 0
+        self.annual_lactating_cow_DMI = 0
+        self.annual_dry_cow_DMI = 0
+        self.annual_heifer_DMI = 0
+
+        self.annual_cows_culled = 0
+        self.annual_heifers_sold = 0
+        self.annual_calves_sold = 0
+
+        self.annual_milk_prod = 0
+        self.annual_milk_protein_prod = 0
+        self.annual_milk_fat_prod = 0
+        self.total_milk_prod_per_lactation = 0
+        self.num_cows_through_300_DIM = 0
+
+        self.purchased_feed_amounts = {}
+
+        for pen in self.all_pens:
+            pen.annual_reset()
 
     def generate_animal_output(self, animal_type, index):
         """
@@ -906,3 +979,55 @@ class AnimalManagement:
         database
         """
         return self.life_cycle_manager.initialize_db_summary
+
+    def add_to_animal_days(self):
+        self.calf_animal_days += len(self.calves)
+        self.heiferI_animal_days += len(self.heiferIs)
+        self.heiferII_animal_days += len(self.heiferIIs)
+        self.heiferIII_animal_days += len(self.heiferIIIs)
+        for c in self.cows:
+            if c.milking:
+                self.lactating_cow_animal_days += 1
+            else:
+                self.dry_cow_animal_days += 1
+
+    def get_num_animals_from_pen_id(self, pen_id):
+        for pen in self.all_pens:
+            if pen.id == pen_id:
+                return len(pen.animals_in_pen)
+        raise Exception('get_num_animals_from_pen_id() was called with an invalid pen id: ' +
+                        str(pen_id))
+
+    def get_avg_num_animals_from_pen_id(self, pen_id):
+        for pen in self.all_pens:
+            if pen.id == pen_id:
+                return sum(pen.num_animals_lst)/ len(pen.num_animals_lst)
+        raise Exception('get_num_animals_from_pen_id() was called with an invalid pen id: ' +
+                        str(pen_id))
+
+    def add_to_DMI_totals(self):
+        for calf in self.calves:
+            self.annual_herd_DMI += calf.dry_matter_intake
+
+        for heifer in self.heiferIs + self.heiferIIs + self.heiferIIIs:
+            self.annual_herd_DMI += heifer.dry_matter_intake
+            self.annual_heifer_DMI += heifer.dry_matter_intake
+
+        for cow in self.cows:
+            self.annual_herd_DMI += cow.dry_matter_intake
+            if cow.milking:
+                self.annual_lactating_cow_DMI += cow.dry_matter_intake
+            else:
+                self.annual_dry_cow_DMI += cow.dry_matter_intake
+
+    def calc_milk_prod_stats(self):
+        for cow in self.cows:
+            if cow.milking:
+                self.annual_milk_prod += cow.estimated_daily_milk_produced
+                # TODO note that protein is hardcoded
+                self.annual_milk_protein_prod += cow.mPrt
+                # TODO did i calculate fat percent correctly?
+                self.annual_milk_fat_prod += cow.estimated_daily_milk_produced * cow.fat_percent
+            if cow.days_in_milk == 300:
+                self.total_milk_prod_per_lactation += cow.estimated_daily_milk_produced
+                self.num_cows_through_300_DIM += 1

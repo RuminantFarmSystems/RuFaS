@@ -1,8 +1,8 @@
 {
     "config":
     {
-        "start_date" : "2009:244",
-        "end_date" : "2016:243",
+        "start_date" : "2009:119",
+        "end_date" : "2013:330",
         "csv_dir": "output/CSVs/",
         "graphic_dir": "output/graphics/",
         "run_tests": false,
@@ -16,38 +16,8 @@
         "fields": {
             "field_1": {
                 "soil": "barnyard_soil.json",
-                "crop": "corn_rotation.json",
-                "field_management": "hector_2.json"
-            },
-            "field_2": {
-                "soil": "barnyard_soil.json",
-                "crop": "alfalfa_rotation.json",
-                "field_management": "hector_2.json"
-            },
-            "field_3": {
-                "soil": "barnyard_soil.json",
                 "crop": "custom_rotation.json",
-                "field_management": "hector_3.json"
-            },
-            "field_4": {
-                "soil": "barnyard_soil.json",
-                "crop": "alfalfa_rotation.json",
-                "field_management": "hector_3.json"
-            },
-            "field_5": {
-                "soil": "barnyard_soil.json",
-                "crop": "corn_rotation.json",
-                "field_management": "hector_4.json"
-            },
-            "field_6": {
-                "soil": "barnyard_soil.json",
-                "crop": "alfalfa_rotation.json",
-                "field_management": "hector_4.json"
-            },
-            "field_7": {
-                "soil": "barnyard_soil.json",
-                "crop": "custom_rotation.json",
-                "field_management": "hector_1.json"
+                "field_management": "hector_2.json"
             }
         },
         "animal": "animal_management_animal.json",

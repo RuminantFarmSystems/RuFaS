@@ -34,6 +34,8 @@
             width: fit-content;
         }
 
+        .tab { margin-left: 40px; }
+
     </style>
 
 </head>
@@ -108,6 +110,37 @@
     <details>
         <summary>Select Annual Variables to Export (default: all variables are selected)</summary>
             <div id="annual_var_checklist"></div>
+    </details>
+    <br>
+    <details>
+        <summary>Select FarmES Variables to Export (default: all variables
+            are selected)</summary>
+            <div id="farm_es_checklist">
+                <details class="tab">
+                    <summary>Select Summary Variables to Export</summary>
+                    <div id="summary_checklist"></div>
+                </details>
+
+                 <details class="tab">
+                    <summary>Select Cow Print Variables to Export</summary>
+                    <div id="cow_print_checklist"></div>
+                </details>
+
+                <details class="tab">
+                    <summary>Select Feed Print Variables to Export</summary>
+                    <div id="feed_print_checklist"></div>
+                </details>
+
+                 <details class="tab">
+                    <summary>Select Manure Print Variables to Export</summary>
+                    <div id="manure_print_checklist"></div>
+                </details>
+
+                <details class="tab">
+                    <summary>Select Energy Print Variables to Export</summary>
+                    <div id="energy_print_checklist"></div>
+                </details>
+            </div>
     </details>
     <br>
     <input type="radio" id="delete" name="action" disabled="disabled" value="delete" onclick="deleteOnClick()">
@@ -376,6 +409,17 @@
         return result;
     }
 
+    function getColumnCheckBoxes(className) {
+        let cols = document.getElementsByClassName(className);
+        let result = [];
+        for (let i = 0; i < cols.length; i++) {
+            if (cols[i].checked) {
+                result.push(cols[i].getAttribute('value'));
+            }
+        }
+        return result;
+    }
+
     /**
      * Sends the Delete request to the server. Displays the
      * response's message.
@@ -455,7 +499,14 @@
                 document.getElementById("message_info").innerHTML = "Failure: export results.\n" + this.responseText;
             }
         };
-        let url = "/export?id=" + selected.join() + "&daily=" + getDailyColumnCheckboxes().join() + "&annual=" + getAnnualColumnCheckboxes().join();
+        let url = "/export?id=" + selected.join()
+            + "&daily=" + getDailyColumnCheckboxes().join()
+            + "&annual=" + getAnnualColumnCheckboxes().join()
+            + "&summary=" + getColumnCheckBoxes('summary').join()
+            + "&cow_print=" + getColumnCheckBoxes('cow_print').join()
+            + "&feed_print=" + getColumnCheckBoxes('feed_print').join()
+            + "&manure_print=" + getColumnCheckBoxes('manure_print').join()
+            + "&energy_print=" + getColumnCheckBoxes('energy_print').join();
         xhttp.open("GET", url, true);
         xhttp.send();
 
@@ -524,6 +575,21 @@
         createTable(response_json["results_table"]);
         displayDailyVarChecklist(response_json["daily_columns"]);
         displayAnnualVarChecklist(response_json["annual_columns"]);
+
+        displayVarChecklist("summary_checklist",
+            response_json["farm_es"]["summary"], "summary");
+
+        displayVarChecklist("cow_print_checklist",
+            response_json["farm_es"]["cow_print"], "cow_print");
+
+        displayVarChecklist("feed_print_checklist",
+            response_json["farm_es"]["feed_print"], "feed_print");
+
+        displayVarChecklist("manure_print_checklist",
+            response_json["farm_es"]["manure_print"], "manure_print");
+
+        displayVarChecklist("energy_print_checklist",
+            response_json["farm_es"]["energy_print"], "energy_print");
     }
 
     /**
@@ -553,6 +619,19 @@
             let variable = annual_vars[i];
             let element_id = "annual_" + variable;
             divContainer.innerHTML += "<input type=\"checkbox\" id=" + element_id + " class=\"annual_var\" value=" + variable + " checked=true disabled=true> <label for=" + element_id + ">" + variable + "</label><br>";
+        }
+    }
+
+    function displayVarChecklist(elementID, vars, type) {
+        let divContainer = document.getElementById(elementID);
+        divContainer.innerHTML = "";
+        for (let i = 0; i < vars.length; i++) {
+            let curr_var = vars[i];
+            let curr_elementID = type + '_' + curr_var;
+            divContainer.innerHTML += "<input type=\"checkbox\" id=" + curr_elementID +
+                " class=\"" + type + "\" value=" + curr_var +
+                " checked=true disabled=true> <label for=" + curr_elementID + ">" +
+                curr_var + "</label><br>";
         }
     }
 

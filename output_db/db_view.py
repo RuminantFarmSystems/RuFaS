@@ -121,8 +121,16 @@ class RequestHandler(http.server.BaseHTTPRequestHandler):
             num_ids = [int(str_id) for str_id in params['id'][0].split(',')]
             daily_cols = params['daily'][0]
             annual_cols = params['annual'][0]
+            farm_es_cols = {
+                'summary_cols': params['summary'][0],
+                'cow_print_cols': params['cow_print'][0],
+                'feed_print_cols': params['feed_print'][0],
+                'manure_print_cols': params['manure_print'][0],
+                'energy_print_cols': params['energy_print'][0]
+            }
             status_code, returned_text = \
-                self.multiple_to_csv(num_ids, daily_cols, annual_cols)
+                self.multiple_to_csv(num_ids, daily_cols, annual_cols,
+                                     farm_es_cols)
             self.respond(status_code, returned_text)
 
         else:
@@ -237,12 +245,78 @@ class RequestHandler(http.server.BaseHTTPRequestHandler):
                 annual_columns.append(dict(row)['name'])
                 row = c.fetchone()
 
+            # get columns of the cow_print table
+            cow_print_query = "PRAGMA table_info('cow_print');"
+            c.execute(cow_print_query)
+            row = c.fetchone()
+            cow_print_columns = []
+            while row is not None:
+                cow_print_columns.append(dict(row)['name'])
+                row = c.fetchone()
+
+            # get columns of the feed tables
+            feed_print_query = "PRAGMA table_info('feed_print');"
+            c.execute(feed_print_query)
+            row = c.fetchone()
+            feed_print_columns = []
+            while row is not None:
+                feed_print_columns.append(dict(row)['name'])
+                row = c.fetchone()
+
+            feed_print_columns.append('total_purchased_feed')
+            feed_print_columns.append('purchased_feed_cost')
+            feed_print_columns.append('purchased_feed_embedded_C_footprint')
+            feed_print_columns.append('purchased_feed_blue_water_footprint')
+            feed_print_columns.append('purchased_feed_grey_water_footprint')
+
+            feed_print_columns.append('crop_yield')
+            feed_print_columns.append('total_hectares')
+
+            feed_print_columns.append('total_P_runoff')
+            feed_print_columns.append('total_N_runoff')
+            feed_print_columns.append('total_N_leaching')
+
+            feed_print_columns.remove('result_id')
+            feed_print_columns.remove('year')
+            feed_print_columns.remove('num_days_in_year')
+
+            # get columns of the energy_print table
+            energy_print_query = "PRAGMA table_info('energy_print');"
+            c.execute(energy_print_query)
+            row = c.fetchone()
+            energy_print_columns = []
+            while row is not None:
+                energy_print_columns.append(dict(row)['name'])
+                row = c.fetchone()
+
             conn.close()
+
+            # enumerate columns for FarmES summary report
+            summary_columns = ['ghg_emissions',
+                               'ghg_emission_milk_intensity',
+                               'ghg_emission_land_intensity',
+                               'milk_prod',
+                               'crop_yield',
+                               'total_purchased_feed'
+                               ]
+
+            # enumerate columns for manure print report
+            manure_print_columns = ['methane_emissions',
+                                    'nitrous_oxide_emissions',
+                                    'ammonia_emissions',
+                                    'carbon_dioxide_emissions']
 
             return OK, json.dumps({
                 'results_table': results_table,
                 'daily_columns': daily_columns,
-                'annual_columns': annual_columns
+                'annual_columns': annual_columns,
+                'farm_es': {
+                    'summary': summary_columns,
+                    'cow_print': cow_print_columns,
+                    'feed_print': feed_print_columns,
+                    'manure_print': manure_print_columns,
+                    'energy_print': energy_print_columns
+                }
             })
 
         except Exception as e:
@@ -287,7 +361,7 @@ class RequestHandler(http.server.BaseHTTPRequestHandler):
                             str(id_to_delete) + ":\n" + str(e)
             return BAD_GATEWAY, error_message
 
-    def multiple_to_csv(self, result_ids, daily_cols, annual_cols):
+    def multiple_to_csv(self, result_ids, daily_cols, annual_cols, farm_es_cols):
         """
         Calls to_csv() for each of the ids in @result_ids.
 
@@ -307,14 +381,15 @@ class RequestHandler(http.server.BaseHTTPRequestHandler):
                 text = an error message if the operation was not successful
         """
         for result_id in result_ids:
-            status, message = self.to_csv(result_id, daily_cols, annual_cols)
+            status, message = self.to_csv(result_id, daily_cols, annual_cols,
+                                          farm_es_cols)
             if not status == OK:
                 return status, message
 
         # if none of the above queries resulted in an error, return successful
         return OK, "Successfully created all directories"
 
-    def to_csv(self, result_id, daily_cols, annual_cols):
+    def to_csv(self, result_id, daily_cols, annual_cols, farm_es_cols):
         """
         Connects to the past outputs database and generates the csv files
         corresponding to the the ID @result_id. These files are currently placed
@@ -440,6 +515,8 @@ class RequestHandler(http.server.BaseHTTPRequestHandler):
             var_descr_file.close()
             input_json_file.close()
 
+            self.write_farm_es_outputs(result_id, path, farm_es_cols)
+
             return OK, folder_path_message + " " + path_message
 
         except Exception as e:
@@ -481,6 +558,403 @@ class RequestHandler(http.server.BaseHTTPRequestHandler):
                             self.db_file + " to rename result " + \
                             str(id_to_re_title) + ":\n" + str(e)
             return BAD_GATEWAY, error_message
+
+    def write_farm_es_outputs(self, result_id, write_path, farm_es_cols):
+        write_path += '/Farm ES reports'
+        try:
+            #  folder for specific result set
+            os.mkdir(write_path)
+        except FileExistsError:
+            path_message = "Warning: Directory " + write_path + \
+                           " already exists - old data will be overwritten."
+
+        except OSError as e:
+            path_message = "Creation of the directory " + write_path + \
+                           " failed with exception " + str(e)
+        else:
+            path_message = "Successfully created the directory %s " % write_path
+
+        if len(farm_es_cols['summary_cols']) > 0:
+            self.write_farm_summary_outputs(write_path, result_id,
+                                            farm_es_cols['summary_cols'])
+        if len(farm_es_cols['cow_print_cols']) > 0:
+            self.write_cow_print(write_path, result_id,
+                                 farm_es_cols['cow_print_cols'])
+        if len(farm_es_cols['feed_print_cols']) > 0:
+            self.write_feed_print(write_path, result_id,
+                                  farm_es_cols['feed_print_cols'])
+        if len(farm_es_cols['manure_print_cols']) > 0:
+            self.write_manure_print(write_path, result_id, farm_es_cols[
+                'manure_print_cols'])
+        if len(farm_es_cols['energy_print_cols']) > 0:
+            self.write_energy_print(write_path, result_id,
+                                    farm_es_cols['energy_print_cols'])
+
+    def read_table(self, result_id, table, cols):
+        # cols: comma separated list of columsn
+        try:
+            conn = sqlite3.connect(self.db_file)
+            conn.row_factory = sqlite3.Row
+            c = conn.cursor()
+
+            result_id_param = (result_id,)
+
+            # get data from daily results
+            daily_query = "SELECT " + cols + \
+                          " FROM " + table + " WHERE result_id=?"
+            c.execute(daily_query, result_id_param)
+            result_col_names = [description[0] for description in c.description]
+            result_rows = c.fetchall()
+
+            conn.close()
+
+            return result_col_names, result_rows
+
+        except Exception as e:
+            error_message = "The program has encountered the following " \
+                            "exception while connecting to or querying " + \
+                            self.db_file + " to produce csv files from " \
+                                           "result " + str(result_id) + \
+                            ":\n" + str(e)
+            return BAD_GATEWAY, error_message
+
+    def write_farm_summary_outputs(self, write_path, result_id, summary_vars):
+        summary_dir = write_path + '/summary_report'
+        try:
+            #  folder for specific result set
+            os.mkdir(summary_dir)
+        except FileExistsError:
+            path_message = "Warning: Directory " + summary_dir + \
+                           " already exists - old data will be overwritten."
+
+        except OSError as e:
+            path_message = "Creation of the directory " + summary_dir + \
+                           " failed with exception " + str(e)
+        else:
+            path_message = "Successfully created the directory %s " % summary_dir
+
+        try:
+            conn = sqlite3.connect(self.db_file)
+            conn.row_factory = sqlite3.Row
+            c = conn.cursor()
+
+            # find the intersection of the 'summary_vars' and the columns in
+            # each of the energy_print, cow_print, grown_feed_info,
+            # and purchased_feed_info tables to find the data that the user
+            # specified
+
+            # intersection with energy_print columns
+            query = "PRAGMA table_info('energy_print');"
+            c.execute(query)
+            row = c.fetchone()
+            energy_print_columns = set()
+            while row is not None:
+                energy_print_columns.add(dict(row)['name'])
+                row = c.fetchone()
+
+            desired_energy_print_cols = \
+                list(energy_print_columns.intersection(set(
+                    summary_vars.split(','))))
+
+            # intersection with cow_print columns
+            query = "PRAGMA table_info('cow_print');"
+            c.execute(query)
+            row = c.fetchone()
+            cow_print_columns = set()
+            while row is not None:
+                cow_print_columns.add(dict(row)['name'])
+                row = c.fetchone()
+
+            desired_cow_print_cols = \
+                list(cow_print_columns.intersection(set(
+                    summary_vars.split(','))))
+
+            # intersection with grown_feed_info columns
+            query = "PRAGMA table_info('grown_feed_info');"
+            c.execute(query)
+            row = c.fetchone()
+            grown_feed_info_columns = set()
+            while row is not None:
+                grown_feed_info_columns.add(dict(row)['name'])
+                row = c.fetchone()
+
+            desired_grown_feed_cols = \
+                list(grown_feed_info_columns.intersection(set(
+                    summary_vars.split(','))))
+            # intersection with purchased_feed_info columns
+            query = "PRAGMA table_info('purchased_feed_info');"
+            c.execute(query)
+            row = c.fetchone()
+            purchased_feed_info_columns = set()
+            while row is not None:
+                purchased_feed_info_columns.add(dict(row)['name'])
+                row = c.fetchone()
+
+            desired_purchased_feed_cols = \
+                list(purchased_feed_info_columns.intersection(set(
+                    summary_vars.split(','))))
+
+            cols_in_energy_join_cow = ",".join(desired_energy_print_cols +
+                                               desired_cow_print_cols)
+
+            result_id_param = (result_id,)
+            query = 'SELECT energy_print.result_id, energy_print.year, ' \
+                    '' + cols_in_energy_join_cow + \
+                    ' FROM energy_print JOIN cow_print ' + \
+                    'ON energy_print.result_id = cow_print.result_id AND ' + \
+                    'energy_print.year = cow_print.year WHERE ' + \
+                    'energy_print.result_id =?'
+            c.execute(query, result_id_param)
+            result_col_names = [description[0] for description in c.description]
+            result_rows = c.fetchall()
+
+            conn.close()
+
+            summary_file_name = summary_dir + '/energy_and_cow_summary.csv'
+            summary_file = open(summary_file_name, "w")
+            summary_csv_writer = csv.writer(summary_file)
+            summary_csv_writer.writerow(result_col_names)
+            summary_csv_writer.writerows(result_rows)
+            summary_file.close()
+
+            if len(desired_grown_feed_cols) > 0:
+                desired_grown_feed_cols = 'result_id,year,feed_id,' + \
+                                          ",".join(desired_grown_feed_cols)
+
+                result_col_names, result_rows = \
+                    self.read_table(result_id, 'grown_feed_info',
+                                    desired_grown_feed_cols)
+
+                grown_feed_file_name = summary_dir + '/grown_feed_summary.csv'
+                grown_feed_file = open(grown_feed_file_name, "w")
+                grown_feed_csv_writer = csv.writer(grown_feed_file)
+                grown_feed_csv_writer.writerow(result_col_names)
+                grown_feed_csv_writer.writerows(result_rows)
+                grown_feed_file.close()
+
+            if len(desired_purchased_feed_cols) > 0:
+                desired_purchased_feed_cols = 'result_id,year,feed_id,' + \
+                                          ",".join(desired_purchased_feed_cols)
+
+                result_col_names, result_rows = \
+                    self.read_table(result_id, 'purchased_feed_info',
+                                    desired_purchased_feed_cols)
+
+                purchased_feed_file_name = summary_dir + \
+                                           '/purchased_feed_summary.csv'
+                purchased_feed_file = open(purchased_feed_file_name, "w")
+                purchased_feed_csv_writer = csv.writer(purchased_feed_file)
+                purchased_feed_csv_writer.writerow(result_col_names)
+                purchased_feed_csv_writer.writerows(result_rows)
+                purchased_feed_file.close()
+
+        except Exception as e:
+            error_message = "The program has encountered the following " \
+                            "exception while connecting to or querying " + \
+                            self.db_file + " to produce csv files from " \
+                                           "result " + str(result_id) + \
+                            ":\n" + str(e)
+            return BAD_GATEWAY, error_message
+
+        pass
+
+    def write_cow_print(self, write_path, result_id, cow_print_vars):
+        result_col_names, result_rows = self.read_table(result_id, 'cow_print',
+                                                        cow_print_vars)
+
+        cow_print_file_name = write_path + '/cow_print.csv'
+        cow_print_file = open(cow_print_file_name, "w")
+        cow_print_csv_writer = csv.writer(cow_print_file)
+        cow_print_csv_writer.writerow(result_col_names)
+        cow_print_csv_writer.writerows(result_rows)
+        cow_print_file.close()
+
+    def write_feed_print(self, write_path, result_id, feed_print_vars):
+        feed_dir = write_path + '/feed_print'
+        try:
+            #  folder for specific result set
+            os.mkdir(feed_dir)
+        except FileExistsError:
+            path_message = "Warning: Directory " + feed_dir + \
+                           " already exists - old data will be overwritten."
+
+        except OSError as e:
+            path_message = "Creation of the directory " + feed_dir + \
+                           " failed with exception " + str(e)
+        else:
+            path_message = "Successfully created the directory %s " % feed_dir
+
+        try:
+            conn = sqlite3.connect(self.db_file)
+            conn.row_factory = sqlite3.Row
+            c = conn.cursor()
+
+            # not all of the 'feed_print_vars' are columns of the 'feed_print'
+            # table, so we must find the those that are columns to perform the
+            # query on the table
+            query = "PRAGMA table_info('feed_print');"
+            c.execute(query)
+            row = c.fetchone()
+            feed_print_columns = set()
+            while row is not None:
+                feed_print_columns.add(dict(row)['name'])
+                row = c.fetchone()
+
+            desired_feed_print_cols = \
+                list(feed_print_columns.intersection(set(
+                    feed_print_vars.split(','))))
+
+            # the feed print summary also includes a few variables from other
+            # the annual_results table
+            annual_results_cols = {'total_P_runoff', 'total_N_runoff',
+                                   'total_N_leaching'}
+            desired_annual_cols = list(annual_results_cols.intersection(set(
+                feed_print_vars.split(','))))
+
+            cols_in_annual_join_feed = ",".join(desired_feed_print_cols +
+                                               desired_annual_cols)
+
+            result_id_param = (result_id,)
+            query = 'SELECT annual_results.result_id, annual_results.year, ' \
+                    'annual_results.num_days_in_year,' \
+                    '' + cols_in_annual_join_feed + \
+                    ' FROM annual_results JOIN feed_print ' + \
+                    'ON annual_results.result_id = feed_print.result_id AND '\
+                    + \
+                    'annual_results.year = feed_print.year WHERE ' + \
+                    'annual_results.result_id =?'
+            c.execute(query, result_id_param)
+            result_col_names = [description[0] for description in c.description]
+            result_rows = c.fetchall()
+
+            feed_print_file_name = feed_dir + '/feed_print.csv'
+            feed_print_file = open(feed_print_file_name, "w")
+            feed_print_csv_writer = csv.writer(feed_print_file)
+            feed_print_csv_writer.writerow(result_col_names)
+            feed_print_csv_writer.writerows(result_rows)
+            feed_print_file.close()
+
+            query = "PRAGMA table_info('purhcased_feed_info');"
+            c.execute(query)
+            row = c.fetchone()
+            purchased_feed_columns = set()
+            while row is not None:
+                purchased_feed_columns.add(dict(row)['name'])
+                row = c.fetchone()
+
+            desired_purchased_feed_cols = []
+
+            if 'total_purchased_feed' in feed_print_vars:
+                desired_purchased_feed_cols.append('total_purchased_feed')
+            if 'purchased_feed_cost' in feed_print_vars:
+                desired_purchased_feed_cols.append('total_cost')
+            if 'purchased_feed_embedded_C_footprint' in feed_print_vars:
+                desired_purchased_feed_cols.append('embedded_C_footprint')
+            if 'purchased_feed_blue_water_footprint' in feed_print_vars:
+                desired_purchased_feed_cols.append('blue_water_footprint')
+            if 'purchased_feed_grey_water_footprint' in feed_print_vars:
+                desired_purchased_feed_cols.append('grey_water_footprint')
+
+            if len(desired_purchased_feed_cols) > 0:
+                desired_purchased_feed_cols = ['result_id', 'year', 'feed_id',
+                                               'num_days_in_year'] + \
+                                              desired_purchased_feed_cols
+
+                result_col_names, result_rows = self.read_table(result_id,
+                                                                'purchased_feed_info',
+                                                                ",".join(
+                                                                desired_purchased_feed_cols))
+
+                purchased_feed_print_file_name = feed_dir + \
+                                               '/purchased_feed_print.csv'
+                purchased_feed_print_file = open(purchased_feed_print_file_name,
+                                                 "w")
+                purchased_feed_print_csv_writer = csv.writer(
+                    purchased_feed_print_file)
+                purchased_feed_print_csv_writer.writerow(result_col_names)
+                purchased_feed_print_csv_writer.writerows(result_rows)
+                purchased_feed_print_file.close()
+
+            conn.close()
+
+        except Exception as e:
+            error_message = "The program has encountered the following " \
+                            "exception while connecting to or querying " + \
+                            self.db_file + " to produce csv files from " \
+                                           "result " + str(result_id) + \
+                            ":\n" + str(e)
+            return BAD_GATEWAY, error_message
+
+    def write_manure_print(self, write_path, result_id, manure_print_vars):
+        try:
+            conn = sqlite3.connect(self.db_file)
+            conn.row_factory = sqlite3.Row
+            c = conn.cursor()
+
+            query = "PRAGMA table_info('manure_print');"
+            c.execute(query)
+            row = c.fetchone()
+            manure_print_columns = set()
+            while row is not None:
+                manure_print_columns.add(dict(row)['name'])
+                row = c.fetchone()
+
+            desired_manure_cols = []
+
+            if 'methane_emissions' in manure_print_vars:
+                desired_manure_cols.append('SUM(housing_methane + management_methane) as methane_emissions')
+            if 'nitrous_oxide_emissions' in manure_print_vars:
+                desired_manure_cols.append('SUM(housing_direct_nitrous_oxide '
+                                           '+ housing_indirect_nitrous_oxide '
+                                           '+ management_direct_nitrous_oxide '
+                                           '+ management_indirect_nitrous_oxide) as nitrous_oxide_emissions')
+            if 'ammonia_emissions' in manure_print_vars:
+                desired_manure_cols.append('SUM(housing_ammonia + '
+                                           'management_ammonia) as '
+                                           'ammonia_emissions')
+            if 'carbon_dioxide_emissions' in manure_print_vars:
+                desired_manure_cols.append('SUM(housing_carbon_dioxide + '
+                                           'management_carbon_dioxide) as carbon_dioxide_emissions')
+
+            if len(desired_manure_cols) > 0:
+                result_id_param = (result_id,)
+                query = 'SELECT result_id, year, num_days_in_year, ' + \
+                        ','.join(desired_manure_cols) + ' FROM annual_manure '\
+                        + 'WHERE result_id =? GROUP BY year;'
+
+                c.execute(query, result_id_param)
+                result_col_names = [description[0] for description in
+                                    c.description]
+                result_rows = c.fetchall()
+
+                manure_print_file_name = write_path + '/manure_print.csv'
+                manure_print_file = open(manure_print_file_name, "w")
+                manure_print_csv_writer = csv.writer(manure_print_file)
+                manure_print_csv_writer.writerow(result_col_names)
+                manure_print_csv_writer.writerows(result_rows)
+                manure_print_file.close()
+
+            conn.close()
+
+        except Exception as e:
+            error_message = "The program has encountered the following " \
+                            "exception while connecting to or querying " + \
+                            self.db_file + " to produce csv files from " \
+                                           "result " + str(result_id) + \
+                            ":\n" + str(e)
+            return BAD_GATEWAY, error_message
+
+    def write_energy_print(self, write_path, result_id, energy_print_vars):
+        result_col_names, result_rows = self.read_table(result_id,
+                                                        'energy_print',
+                                                        energy_print_vars)
+
+        energy_print_file_name = write_path + '/energy_print.csv'
+        energy_print_file = open(energy_print_file_name, "w")
+        energy_print_csv_writer = csv.writer(energy_print_file)
+        energy_print_csv_writer.writerow(result_col_names)
+        energy_print_csv_writer.writerows(result_rows)
+        energy_print_file.close()
 
 
 # start the server locally at PORT

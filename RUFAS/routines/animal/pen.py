@@ -211,6 +211,8 @@ class Pen:
         self.avg_p_req = 0
         self.avg_p_animal = 0
 
+        self.num_animals_lst = []
+
     def update_animals(self, new_animals):
         """
         Sets the list of animals to @new_animals and calculates the stocking
@@ -679,3 +681,9 @@ class Pen:
         self.pen_populated = False
         # self.classes_in_pen = set()
         self.avg_p_animal = 0
+
+    def annual_reset(self):
+        self.num_animals_lst = []
+
+    def daily_animal_num_update(self):
+        self.num_animals_lst.append(len(self.animals_in_pen))
