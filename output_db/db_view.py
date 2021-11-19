@@ -121,6 +121,8 @@ class RequestHandler(http.server.BaseHTTPRequestHandler):
             num_ids = [int(str_id) for str_id in params['id'][0].split(',')]
             daily_cols = params['daily'][0]
             annual_cols = params['annual'][0]
+            daily_manure_cols = params['daily_manure'][0]
+            annual_manure_cols = params['annual_manure'][0]
             farm_es_cols = {
                 'summary_cols': params['summary'][0],
                 'cow_print_cols': params['cow_print'][0],
@@ -130,6 +132,7 @@ class RequestHandler(http.server.BaseHTTPRequestHandler):
             }
             status_code, returned_text = \
                 self.multiple_to_csv(num_ids, daily_cols, annual_cols,
+                                     daily_manure_cols, annual_manure_cols,
                                      farm_es_cols)
             self.respond(status_code, returned_text)
 
@@ -245,6 +248,24 @@ class RequestHandler(http.server.BaseHTTPRequestHandler):
                 annual_columns.append(dict(row)['name'])
                 row = c.fetchone()
 
+            # get columns of the daily_manure table
+            daily_manure_query = "PRAGMA table_info('daily_manure');"
+            c.execute(daily_manure_query)
+            row = c.fetchone()
+            daily_manure_columns = []
+            while row is not None:
+                daily_manure_columns.append(dict(row)['name'])
+                row = c.fetchone()
+
+            # get columns of the daily_manure table
+            annual_manure_query = "PRAGMA table_info('annual_manure');"
+            c.execute(annual_manure_query)
+            row = c.fetchone()
+            annual_manure_columns = []
+            while row is not None:
+                annual_manure_columns.append(dict(row)['name'])
+                row = c.fetchone()
+
             # get columns of the cow_print table
             cow_print_query = "PRAGMA table_info('cow_print');"
             c.execute(cow_print_query)
@@ -308,6 +329,10 @@ class RequestHandler(http.server.BaseHTTPRequestHandler):
                 'results_table': results_table,
                 'daily_columns': daily_columns,
                 'annual_columns': annual_columns,
+                'manure': {
+                    'daily': daily_manure_columns,
+                    'annual': annual_manure_columns
+                },
                 'farm_es': {
                     'summary': summary_columns,
                     'cow_print': cow_print_columns,
@@ -359,7 +384,8 @@ class RequestHandler(http.server.BaseHTTPRequestHandler):
                             str(id_to_delete) + ":\n" + str(e)
             return BAD_GATEWAY, error_message
 
-    def multiple_to_csv(self, result_ids, daily_cols, annual_cols, farm_es_cols):
+    def multiple_to_csv(self, result_ids, daily_cols, annual_cols,
+                        daily_manure_cols, annual_manure_cols, farm_es_cols):
         """
         Calls to_csv() for each of the ids in @result_ids.
 
@@ -380,6 +406,7 @@ class RequestHandler(http.server.BaseHTTPRequestHandler):
         """
         for result_id in result_ids:
             status, message = self.to_csv(result_id, daily_cols, annual_cols,
+                                          daily_manure_cols, annual_manure_cols,
                                           farm_es_cols)
             if not status == OK:
                 return status, message
@@ -387,7 +414,8 @@ class RequestHandler(http.server.BaseHTTPRequestHandler):
         # if none of the above queries resulted in an error, return successful
         return OK, "Successfully created all directories"
 
-    def to_csv(self, result_id, daily_cols, annual_cols, farm_es_cols):
+    def to_csv(self, result_id, daily_cols, annual_cols, daily_manure_cols,
+               annual_manure_cols, farm_es_cols):
         """
         Connects to the past outputs database and generates the csv files
         corresponding to the the ID @result_id. These files are currently placed
@@ -435,6 +463,22 @@ class RequestHandler(http.server.BaseHTTPRequestHandler):
             c.execute(annual_query, result_id_param)
             annual_vars = [description[0] for description in c.description]
             annual_rows = c.fetchall()
+
+            # get data from daily manure results
+            daily_manure_query = "SELECT " + daily_manure_cols + \
+                           " FROM daily_manure WHERE result_id=?"
+            c.execute(daily_manure_query, result_id_param)
+            daily_manure_vars = [description[0] for description in
+                                 c.description]
+            daily_manure_rows = c.fetchall()
+
+            # get data from annual manure results
+            annual_manure_query = "SELECT " + annual_manure_cols + \
+                           " FROM annual_manure WHERE result_id=?"
+            c.execute(annual_manure_query, result_id_param)
+            annual_manure_vars = [description[0] for description in
+                                 c.description]
+            annual_manure_rows = c.fetchall()
 
             # get data from variable descriptions table
             c.execute("SELECT * FROM variable_descriptions")
@@ -512,6 +556,34 @@ class RequestHandler(http.server.BaseHTTPRequestHandler):
             annual_file.close()
             var_descr_file.close()
             input_json_file.close()
+
+            manure_dir = path + '/manure_module'
+            try:
+                #  folder for specific result set
+                os.mkdir(manure_dir)
+            except FileExistsError:
+                path_message = "Warning: Directory " + manure_dir + \
+                               " already exists - old data will be overwritten."
+
+            except OSError as e:
+                path_message = "Creation of the directory " + manure_dir + \
+                               " failed with exception " + str(e)
+            else:
+                path_message = "Successfully created the directory %s " % manure_dir
+
+            daily_manure_file_name = manure_dir + '/daily_manure.csv'
+            daily_manure_file = open(daily_manure_file_name, "w")
+            daily_manure_csv_writer = csv.writer(daily_manure_file)
+            daily_manure_csv_writer.writerow(daily_manure_vars)
+            daily_manure_csv_writer.writerows(daily_manure_rows)
+            daily_manure_file.close()
+
+            annual_manure_file_name = manure_dir + '/annual_manure.csv'
+            annual_manure_file = open(annual_manure_file_name, "w")
+            annual_manure_csv_writer = csv.writer(annual_manure_file)
+            annual_manure_csv_writer.writerow(annual_manure_vars)
+            annual_manure_csv_writer.writerows(annual_manure_rows)
+            annual_manure_file.close()
 
             self.write_farm_es_outputs(result_id, path, farm_es_cols)
 
@@ -679,7 +751,7 @@ class RequestHandler(http.server.BaseHTTPRequestHandler):
             desired_grown_feed_cols = \
                 list(grown_feed_info_columns.intersection(set(
                     summary_vars.split(','))))
-            print(summary_vars)
+
             # intersection with purchased_feed_info columns
             query = "PRAGMA table_info('purchased_feed_info');"
             c.execute(query)

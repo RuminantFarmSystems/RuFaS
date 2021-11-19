@@ -113,6 +113,23 @@
     </details>
     <br>
     <details>
+        <summary>Select Manure Module Variables to Export (default: all
+            variables
+            are selected)</summary>
+            <div id="manure_checklist">
+                <details class="tab">
+                    <summary>Select Daily Manure Variables to Export</summary>
+                    <div id="daily_manure_checklist"></div>
+                </details>
+
+                 <details class="tab">
+                    <summary>Select Annual Manure Variables to Export</summary>
+                    <div id="annual_manure_checklist"></div>
+                </details>
+            </div>
+    </details>
+    <br>
+    <details>
         <summary>Select FarmES Variables to Export (default: all variables
             are selected)</summary>
             <div id="farm_es_checklist">
@@ -502,6 +519,8 @@
         let url = "/export?id=" + selected.join()
             + "&daily=" + getDailyColumnCheckboxes().join()
             + "&annual=" + getAnnualColumnCheckboxes().join()
+            + "&daily_manure=" + getColumnCheckBoxes('daily_manure').join()
+            + "&annual_manure=" + getColumnCheckBoxes('annual_manure').join()
             + "&summary=" + getColumnCheckBoxes('summary').join()
             + "&cow_print=" + getColumnCheckBoxes('cow_print').join()
             + "&feed_print=" + getColumnCheckBoxes('feed_print').join()
@@ -575,6 +594,12 @@
         createTable(response_json["results_table"]);
         displayDailyVarChecklist(response_json["daily_columns"]);
         displayAnnualVarChecklist(response_json["annual_columns"]);
+
+        displayVarChecklist("daily_manure_checklist",
+            response_json["manure"]["daily"], "daily_manure");
+
+        displayVarChecklist("annual_manure_checklist",
+            response_json["manure"]["annual"], "annual_manure");
 
         displayVarChecklist("summary_checklist",
             response_json["farm_es"]["summary"], "summary");
