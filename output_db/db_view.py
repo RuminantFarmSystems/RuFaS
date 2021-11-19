@@ -269,9 +269,6 @@ class RequestHandler(http.server.BaseHTTPRequestHandler):
             feed_print_columns.append('purchased_feed_blue_water_footprint')
             feed_print_columns.append('purchased_feed_grey_water_footprint')
 
-            feed_print_columns.append('crop_yield')
-            feed_print_columns.append('total_hectares')
-
             feed_print_columns.append('total_P_runoff')
             feed_print_columns.append('total_N_runoff')
             feed_print_columns.append('total_N_leaching')
@@ -297,6 +294,7 @@ class RequestHandler(http.server.BaseHTTPRequestHandler):
                                'ghg_emission_land_intensity',
                                'milk_prod',
                                'crop_yield',
+                               'total_hectares',
                                'total_purchased_feed'
                                ]
 
@@ -681,6 +679,7 @@ class RequestHandler(http.server.BaseHTTPRequestHandler):
             desired_grown_feed_cols = \
                 list(grown_feed_info_columns.intersection(set(
                     summary_vars.split(','))))
+            print(summary_vars)
             # intersection with purchased_feed_info columns
             query = "PRAGMA table_info('purchased_feed_info');"
             c.execute(query)
