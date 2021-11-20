@@ -118,6 +118,9 @@ class LifeCycleReport(BaseReportDriver):
                     ['life_cycle_manager.cull_reason_stats_percent[\'' + cull_reason + '\']', '', []]
                         
             self.reproduction_performance = {
+                'CIDR_count': ['life_cycle_manager.CIDR_count', '', []],
+                'GnRH_injections_heifer': ['life_cycle_manager.GnRH_injection_num_h', '', []],
+                'PGF_injections_heifer': ['life_cycle_manager.PGF_injection_num_h', '', []],
                 'GnRH_injections': ['life_cycle_manager.GnRH_injection_num', '', []],
                 'PGF_injections': ['life_cycle_manager.PGF_injection_num', '', []],
                 'ai_num': ['life_cycle_manager.ai_num', '', []],

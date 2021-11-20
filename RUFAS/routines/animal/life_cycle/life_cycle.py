@@ -69,6 +69,9 @@ class LifeCycleManager:
     }
 
     preg_check_num = 0
+    CIDR_count = 0
+    GnRH_injection_num_h = 0
+    PGF_injection_num_h = 0
     GnRH_injection_num = 0
     PGF_injection_num = 0
 
@@ -247,6 +250,9 @@ class LifeCycleManager:
         total_animal_num = 0
 
         self.preg_check_num = 0
+        self.CIDR_count = 0
+        self.GnRH_injection_num_h = 0
+        self.PGF_injection_num_h = 0
         self.GnRH_injection_num = 0
         self.PGF_injection_num = 0
         self.ai_num = 0
@@ -515,6 +521,9 @@ class LifeCycleManager:
                         calving_interval_available_num,
                         self.avg_calving_interval, cow.CI)
 
+                self.CIDR_count += heiferII.CIDR_count
+                self.GnRH_injection_num_h += heiferII.GnRH_injections
+                self.PGF_injection_num_h += heiferII.PGF_injections
                 self.GnRH_injection_num += cow.GnRH_injections
                 self.PGF_injection_num += cow.PGF_injections
                 self.preg_check_num += cow.preg_diagnoses

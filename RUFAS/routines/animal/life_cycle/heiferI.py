@@ -94,11 +94,11 @@ class HeiferI(Calf):
 
 		Returns: the daily body weight change for a heifer that is not pregnant
 		"""
-		divisor = abs(AnimalBase.config['target_heifer_preg_day'] - self.days_born)
+		divisor = AnimalBase.config['target_heifer_preg_day'] - AnimalBase.config['wean_day']
 		if divisor == 0:
 			divisor = 1
 		return (0.55 * 0.96 * self.mature_body_weight -
-										0.96 * self.body_weight) / divisor
+										self.wean_weight) / divisor
 
 	def update(self, sim_day):
 		"""

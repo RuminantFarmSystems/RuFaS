@@ -79,6 +79,7 @@ class AnimalBase(object):
         self.p_excrt = 0
         self.birth_weight = 0
         self.body_weight = 0
+        self.wean_weight = 0
         self.mature_body_weight = 0
         self.p_req = 0
         self.dP_reserves = 0

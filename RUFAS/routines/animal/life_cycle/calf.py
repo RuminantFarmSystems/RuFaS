@@ -44,7 +44,7 @@ class Calf(AnimalBase):
         self.wean_weight = 0
         self.birth_weight = 0
         self.animal_intake = 0
-        self._DBW = 0
+        self.DBW = 0
 
         if 'body_weight' in args:
             self.assign_calf_values(args)
@@ -131,7 +131,7 @@ class Calf(AnimalBase):
         wean_length = AnimalBase.config['wean_length']
         milk_type = AnimalBase.config['milk_type']
         self.animal_intake, self.nutrient_rqmts = calc_requirements(self, feed, temp, wean_day, wean_length, milk_type)
-        self._DBW = self.nutrient_rqmts['live_weight_change']['val']
+        self.DBW = self.nutrient_rqmts['live_weight_change']['val']
 
     def calc_manure_excretion(self, feed):
         """
