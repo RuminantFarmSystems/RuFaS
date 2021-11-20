@@ -27,6 +27,73 @@ OK = 200
 BAD_GATEWAY = 502
 NOT_FOUND = 404
 
+# directories
+DB_OUTPUT_PATH = '../output/db_output/'
+MANURE_PATH_SUFFIX = '/manure_module/'
+FARM_ES_PATH_SUFFIX = '/farm_es_reports/'
+FARM_ES_FEED_PRINT_PATH_SUFFIX = 'feed_print/'
+FARM_ES_SUMMARY_PATH_SUFFIX = 'summary_report/'
+
+# mapping from variable user sees/selects to table column name
+VARIABLE_MAPPING = {}
+
+
+def write_csv(file_name, column_headers, data_rows):
+    file = open(file_name, "w")
+    csv_writer = csv.writer(file)
+    csv_writer.writerow(column_headers)
+    csv_writer.writerows(data_rows)
+    file.close()
+
+
+def create_dir(path):
+    try:
+        os.mkdir(path)
+    except FileExistsError:
+        path_message = "Warning: Directory " + path + \
+                       " already exists - old data will be overwritten."
+        status = OK
+
+    except OSError as e:
+        path_message = "Creation of the directory " + path + \
+                       " failed with exception " + str(e)
+        status = BAD_GATEWAY
+
+    else:
+        path_message = "Successfully created the directory %s " % path
+        status = OK
+
+    return status, path_message
+
+
+def create_all_dirs(title, result_id):
+    path = DB_OUTPUT_PATH + str(result_id) + '_' + title
+    status, path_message = create_dir(path)
+    if not status == OK:
+        return status, path_message
+
+    manure_path = path + MANURE_PATH_SUFFIX
+    status, manure_path_message = create_dir(manure_path)
+    if not status == OK:
+        return status, manure_path_message
+
+    farm_es_path = path + FARM_ES_PATH_SUFFIX
+    status, farm_es_path_message = create_dir(farm_es_path)
+    if not status == OK:
+        return status, farm_es_path_message
+
+    feed_print_path = farm_es_path + FARM_ES_FEED_PRINT_PATH_SUFFIX
+    status, feed_print_path_message = create_dir(feed_print_path)
+    if not status == OK:
+        return status, feed_print_path_message
+
+    summary_path = farm_es_path + FARM_ES_SUMMARY_PATH_SUFFIX
+    status, summary_path_message = create_dir(summary_path)
+    if not status == OK:
+        return status, summary_path_message
+
+    return OK, "Successfully created directories", path + "/"
+
 
 class RequestHandler(http.server.BaseHTTPRequestHandler):
     """
@@ -404,6 +471,12 @@ class RequestHandler(http.server.BaseHTTPRequestHandler):
                 text = message for the success of creating the directory
                 text = an error message if the operation was not successful
         """
+        path = '../output/db_output/'
+        status, folder_path_message = create_dir(path)
+
+        if not status == OK:
+            return status, folder_path_message
+
         for result_id in result_ids:
             status, message = self.to_csv(result_id, daily_cols, annual_cols,
                                           daily_manure_cols, annual_manure_cols,
@@ -448,38 +521,6 @@ class RequestHandler(http.server.BaseHTTPRequestHandler):
             title_rows = c.fetchall()
             title = title_rows[0][0]
 
-            result_id_param = (result_id,)
-
-            # get data from daily results
-            daily_query = "SELECT " + daily_cols + \
-                          " FROM daily_results WHERE result_id=?"
-            c.execute(daily_query, result_id_param)
-            daily_vars = [description[0] for description in c.description]
-            daily_rows = c.fetchall()
-
-            # get data from annual results
-            annual_query = "SELECT " + annual_cols + \
-                           " FROM annual_results WHERE result_id=?"
-            c.execute(annual_query, result_id_param)
-            annual_vars = [description[0] for description in c.description]
-            annual_rows = c.fetchall()
-
-            # get data from daily manure results
-            daily_manure_query = "SELECT " + daily_manure_cols + \
-                           " FROM daily_manure WHERE result_id=?"
-            c.execute(daily_manure_query, result_id_param)
-            daily_manure_vars = [description[0] for description in
-                                 c.description]
-            daily_manure_rows = c.fetchall()
-
-            # get data from annual manure results
-            annual_manure_query = "SELECT " + annual_manure_cols + \
-                           " FROM annual_manure WHERE result_id=?"
-            c.execute(annual_manure_query, result_id_param)
-            annual_manure_vars = [description[0] for description in
-                                 c.description]
-            annual_manure_rows = c.fetchall()
-
             # get data from variable descriptions table
             c.execute("SELECT * FROM variable_descriptions")
             descr_cols = [description[0] for description in c.description]
@@ -492,102 +533,38 @@ class RequestHandler(http.server.BaseHTTPRequestHandler):
             input_data = json.loads(input_rows[0][0])
             conn.close()
 
-            # the following two try-except blocks make the directories that will
-            # contain the csv files
-            path = '../output/db_output'
-            try:
-                # create db_output folder
-                os.mkdir(path)
-            except FileExistsError:
-                folder_path_message = "Directory " + path + " already exists."
-            except OSError as e:
-                folder_path_message = "Creation of the directory " + path + \
-                               " failed with exception " + str(e)
-            else:
-                folder_path_message = "Successfully created the directory %s " \
-                                      % path
+            daily_vars, daily_rows = self.read_table(result_id, 'daily_results',
+                                                     daily_cols)
+            annual_vars, annual_rows = self.read_table(result_id,
+                                                       'annual_results',
+                                                       annual_cols)
+            daily_manure_vars, daily_manure_rows = \
+                self.read_table(result_id, 'daily_manure', daily_manure_cols)
+            annual_manure_vars, annual_manure_rows = \
+                self.read_table(result_id, 'annual_manure', annual_manure_cols)
 
-            path += '/' + title
-            try:
-                #  folder for specific result set
-                os.mkdir(path)
-            except FileExistsError:
-                path_message = "Warning: Directory " + path + \
-                               " already exists - old data will be overwritten."
+            _, _, path = create_all_dirs(title, result_id)
 
-            except OSError as e:
-                path_message = "Creation of the directory " + path + \
-                               " failed with exception " + str(e)
-            else:
-                path_message = "Successfully created the directory %s " % path
+            write_csv(path + 'daily_results.csv', daily_vars, daily_rows)
+            write_csv(path + 'annual_results.csv', annual_vars,
+                      annual_rows)
+            write_csv(path + 'variable_descriptions.csv', descr_cols,
+                      descr_rows)
 
-            # create the two csv files using the title as name, the
-            # variable description csv, and the input json file
-            daily_file_name = path + '/' + title + "_daily.csv"
-            annual_file_name = path + '/' + title + "_annual.csv"
-            var_descr_file_name = path + '/' + 'variable_descriptions.csv'
             input_json_file_name = path + '/' + title + '_input.json'
-
-            daily_file = open(daily_file_name, "w")
-            annual_file = open(annual_file_name, "w")
-            var_descr_file = open(var_descr_file_name, "w")
             input_json_file = open(input_json_file_name, "w")
-
-            # open the csv writers
-            csvWriterDaily = csv.writer(daily_file)
-            csvWriterAnnual = csv.writer(annual_file)
-            csvWriterDescr = csv.writer(var_descr_file)
-
-            # write the headers/column names to the csv files
-            csvWriterDaily.writerow(daily_vars)
-            csvWriterAnnual.writerow(annual_vars)
-            csvWriterDescr.writerow(descr_cols)
-
-            # write the data to the csv files
-            csvWriterDaily.writerows(daily_rows)
-            csvWriterAnnual.writerows(annual_rows)
-            csvWriterDescr.writerows(descr_rows)
-
-            # write to input json file
             json.dump(input_data, input_json_file, indent=4)
-
-            # close files
-            daily_file.close()
-            annual_file.close()
-            var_descr_file.close()
             input_json_file.close()
 
-            manure_dir = path + '/manure_module'
-            try:
-                #  folder for specific result set
-                os.mkdir(manure_dir)
-            except FileExistsError:
-                path_message = "Warning: Directory " + manure_dir + \
-                               " already exists - old data will be overwritten."
+            write_csv(path + MANURE_PATH_SUFFIX + 'daily_manure.csv',
+                      daily_manure_vars, daily_manure_rows)
+            write_csv(path + MANURE_PATH_SUFFIX + 'annual_manure.csv',
+                      annual_manure_vars, annual_manure_rows)
 
-            except OSError as e:
-                path_message = "Creation of the directory " + manure_dir + \
-                               " failed with exception " + str(e)
-            else:
-                path_message = "Successfully created the directory %s " % manure_dir
+            self.write_farm_es_outputs(result_id, path + FARM_ES_PATH_SUFFIX,
+                                       farm_es_cols)
 
-            daily_manure_file_name = manure_dir + '/daily_manure.csv'
-            daily_manure_file = open(daily_manure_file_name, "w")
-            daily_manure_csv_writer = csv.writer(daily_manure_file)
-            daily_manure_csv_writer.writerow(daily_manure_vars)
-            daily_manure_csv_writer.writerows(daily_manure_rows)
-            daily_manure_file.close()
-
-            annual_manure_file_name = manure_dir + '/annual_manure.csv'
-            annual_manure_file = open(annual_manure_file_name, "w")
-            annual_manure_csv_writer = csv.writer(annual_manure_file)
-            annual_manure_csv_writer.writerow(annual_manure_vars)
-            annual_manure_csv_writer.writerows(annual_manure_rows)
-            annual_manure_file.close()
-
-            self.write_farm_es_outputs(result_id, path, farm_es_cols)
-
-            return OK, folder_path_message + " " + path_message
+            return OK, "Successfully wrote to result set's outputs."
 
         except Exception as e:
             error_message = "The program has encountered the following " \
@@ -629,33 +606,59 @@ class RequestHandler(http.server.BaseHTTPRequestHandler):
                             str(id_to_re_title) + ":\n" + str(e)
             return BAD_GATEWAY, error_message
 
-    def write_farm_es_outputs(self, result_id, write_path, farm_es_cols):
-        write_path += '/Farm ES reports'
+    def find_desired_cols(self, result_id, table, columns):
+        # intersection with energy_print columns
         try:
-            #  folder for specific result set
-            os.mkdir(write_path)
-        except FileExistsError:
-            path_message = "Warning: Directory " + write_path + \
-                           " already exists - old data will be overwritten."
+            conn = sqlite3.connect(self.db_file)
+            conn.row_factory = sqlite3.Row
+            c = conn.cursor()
 
-        except OSError as e:
-            path_message = "Creation of the directory " + write_path + \
-                           " failed with exception " + str(e)
-        else:
-            path_message = "Successfully created the directory %s " % write_path
+            query = "PRAGMA table_info('" + table + "');"
+            c.execute(query)
+            row = c.fetchone()
+            table_columns = set()
+            while row is not None:
+                table_columns.add(dict(row)['name'])
+                row = c.fetchone()
 
+            conn.close()
+
+            desired_cols = \
+                list(table_columns.intersection(set(
+                    columns.split(','))))
+
+            return desired_cols
+
+        except Exception as e:
+            error_message = "The program has encountered the following " \
+                            "exception while connecting to or querying " + \
+                            self.db_file + " to produce csv files from " \
+                                           "result " + str(result_id) + \
+                            ":\n" + str(e)
+            return BAD_GATEWAY, error_message
+
+    def perform_join(self):
+        pass
+
+    def write_farm_es_outputs(self, result_id, write_path, farm_es_cols):
         if len(farm_es_cols['summary_cols']) > 0:
-            self.write_farm_summary_outputs(write_path, result_id,
+            self.write_farm_summary_outputs(write_path +
+                                            FARM_ES_SUMMARY_PATH_SUFFIX,
+                                            result_id,
                                             farm_es_cols['summary_cols'])
+
         if len(farm_es_cols['cow_print_cols']) > 0:
             self.write_cow_print(write_path, result_id,
                                  farm_es_cols['cow_print_cols'])
+
         if len(farm_es_cols['feed_print_cols']) > 0:
-            self.write_feed_print(write_path, result_id,
-                                  farm_es_cols['feed_print_cols'])
+            self.write_feed_print(write_path + FARM_ES_FEED_PRINT_PATH_SUFFIX,
+                                  result_id, farm_es_cols['feed_print_cols'])
+
         if len(farm_es_cols['manure_print_cols']) > 0:
             self.write_manure_print(write_path, result_id, farm_es_cols[
                 'manure_print_cols'])
+
         if len(farm_es_cols['energy_print_cols']) > 0:
             self.write_energy_print(write_path, result_id,
                                     farm_es_cols['energy_print_cols'])
@@ -689,81 +692,26 @@ class RequestHandler(http.server.BaseHTTPRequestHandler):
             return BAD_GATEWAY, error_message
 
     def write_farm_summary_outputs(self, write_path, result_id, summary_vars):
-        summary_dir = write_path + '/summary_report'
-        try:
-            #  folder for specific result set
-            os.mkdir(summary_dir)
-        except FileExistsError:
-            path_message = "Warning: Directory " + summary_dir + \
-                           " already exists - old data will be overwritten."
-
-        except OSError as e:
-            path_message = "Creation of the directory " + summary_dir + \
-                           " failed with exception " + str(e)
-        else:
-            path_message = "Successfully created the directory %s " % summary_dir
+        # find the intersection of the 'summary_vars' and the columns in
+        # each of the energy_print, cow_print, grown_feed_info,
+        # and purchased_feed_info tables to find the data that the user
+        # specified
+        desired_energy_print_cols = self.find_desired_cols(result_id,
+                                                           'energy_print',
+                                                           summary_vars)
+        desired_cow_print_cols = self.find_desired_cols(result_id, 'cow_print',
+                                                        summary_vars)
+        desired_grown_feed_cols = self.find_desired_cols(result_id,
+                                                         'grown_feed_info',
+                                                         summary_vars)
+        desired_purchased_feed_cols = \
+            self.find_desired_cols(result_id, 'purchased_feed_info',
+                                   summary_vars)
 
         try:
             conn = sqlite3.connect(self.db_file)
             conn.row_factory = sqlite3.Row
             c = conn.cursor()
-
-            # find the intersection of the 'summary_vars' and the columns in
-            # each of the energy_print, cow_print, grown_feed_info,
-            # and purchased_feed_info tables to find the data that the user
-            # specified
-
-            # intersection with energy_print columns
-            query = "PRAGMA table_info('energy_print');"
-            c.execute(query)
-            row = c.fetchone()
-            energy_print_columns = set()
-            while row is not None:
-                energy_print_columns.add(dict(row)['name'])
-                row = c.fetchone()
-
-            desired_energy_print_cols = \
-                list(energy_print_columns.intersection(set(
-                    summary_vars.split(','))))
-
-            # intersection with cow_print columns
-            query = "PRAGMA table_info('cow_print');"
-            c.execute(query)
-            row = c.fetchone()
-            cow_print_columns = set()
-            while row is not None:
-                cow_print_columns.add(dict(row)['name'])
-                row = c.fetchone()
-
-            desired_cow_print_cols = \
-                list(cow_print_columns.intersection(set(
-                    summary_vars.split(','))))
-
-            # intersection with grown_feed_info columns
-            query = "PRAGMA table_info('grown_feed_info');"
-            c.execute(query)
-            row = c.fetchone()
-            grown_feed_info_columns = set()
-            while row is not None:
-                grown_feed_info_columns.add(dict(row)['name'])
-                row = c.fetchone()
-
-            desired_grown_feed_cols = \
-                list(grown_feed_info_columns.intersection(set(
-                    summary_vars.split(','))))
-
-            # intersection with purchased_feed_info columns
-            query = "PRAGMA table_info('purchased_feed_info');"
-            c.execute(query)
-            row = c.fetchone()
-            purchased_feed_info_columns = set()
-            while row is not None:
-                purchased_feed_info_columns.add(dict(row)['name'])
-                row = c.fetchone()
-
-            desired_purchased_feed_cols = \
-                list(purchased_feed_info_columns.intersection(set(
-                    summary_vars.split(','))))
 
             cols_in_energy_join_cow = ",".join(desired_energy_print_cols +
                                                desired_cow_print_cols)
@@ -781,12 +729,8 @@ class RequestHandler(http.server.BaseHTTPRequestHandler):
 
             conn.close()
 
-            summary_file_name = summary_dir + '/energy_and_cow_summary.csv'
-            summary_file = open(summary_file_name, "w")
-            summary_csv_writer = csv.writer(summary_file)
-            summary_csv_writer.writerow(result_col_names)
-            summary_csv_writer.writerows(result_rows)
-            summary_file.close()
+            write_csv(write_path + 'energy_and_cow_summary.csv',
+                      result_col_names, result_rows)
 
             if len(desired_grown_feed_cols) > 0:
                 desired_grown_feed_cols = 'result_id,year,feed_id,' + \
@@ -796,12 +740,8 @@ class RequestHandler(http.server.BaseHTTPRequestHandler):
                     self.read_table(result_id, 'grown_feed_info',
                                     desired_grown_feed_cols)
 
-                grown_feed_file_name = summary_dir + '/grown_feed_summary.csv'
-                grown_feed_file = open(grown_feed_file_name, "w")
-                grown_feed_csv_writer = csv.writer(grown_feed_file)
-                grown_feed_csv_writer.writerow(result_col_names)
-                grown_feed_csv_writer.writerows(result_rows)
-                grown_feed_file.close()
+                write_csv(write_path + 'grown_feed_summary.csv',
+                          result_col_names, result_rows)
 
             if len(desired_purchased_feed_cols) > 0:
                 desired_purchased_feed_cols = 'result_id,year,feed_id,' + \
@@ -811,13 +751,8 @@ class RequestHandler(http.server.BaseHTTPRequestHandler):
                     self.read_table(result_id, 'purchased_feed_info',
                                     desired_purchased_feed_cols)
 
-                purchased_feed_file_name = summary_dir + \
-                                           '/purchased_feed_summary.csv'
-                purchased_feed_file = open(purchased_feed_file_name, "w")
-                purchased_feed_csv_writer = csv.writer(purchased_feed_file)
-                purchased_feed_csv_writer.writerow(result_col_names)
-                purchased_feed_csv_writer.writerows(result_rows)
-                purchased_feed_file.close()
+                write_csv(write_path + 'purchased_feed_summary.csv',
+                          result_col_names, result_rows)
 
         except Exception as e:
             error_message = "The program has encountered the following " \
@@ -827,34 +762,13 @@ class RequestHandler(http.server.BaseHTTPRequestHandler):
                             ":\n" + str(e)
             return BAD_GATEWAY, error_message
 
-        pass
-
     def write_cow_print(self, write_path, result_id, cow_print_vars):
         result_col_names, result_rows = self.read_table(result_id, 'cow_print',
                                                         cow_print_vars)
 
-        cow_print_file_name = write_path + '/cow_print.csv'
-        cow_print_file = open(cow_print_file_name, "w")
-        cow_print_csv_writer = csv.writer(cow_print_file)
-        cow_print_csv_writer.writerow(result_col_names)
-        cow_print_csv_writer.writerows(result_rows)
-        cow_print_file.close()
+        write_csv(write_path + 'cow_print.csv', result_col_names, result_rows)
 
     def write_feed_print(self, write_path, result_id, feed_print_vars):
-        feed_dir = write_path + '/feed_print'
-        try:
-            #  folder for specific result set
-            os.mkdir(feed_dir)
-        except FileExistsError:
-            path_message = "Warning: Directory " + feed_dir + \
-                           " already exists - old data will be overwritten."
-
-        except OSError as e:
-            path_message = "Creation of the directory " + feed_dir + \
-                           " failed with exception " + str(e)
-        else:
-            path_message = "Successfully created the directory %s " % feed_dir
-
         try:
             conn = sqlite3.connect(self.db_file)
             conn.row_factory = sqlite3.Row
@@ -882,8 +796,8 @@ class RequestHandler(http.server.BaseHTTPRequestHandler):
             desired_annual_cols = list(annual_results_cols.intersection(set(
                 feed_print_vars.split(','))))
 
-            cols_in_annual_join_feed = ",".join(desired_feed_print_cols +
-                                               desired_annual_cols)
+            cols_in_annual_join_feed = ",".join(desired_feed_print_cols
+                                                + desired_annual_cols)
 
             result_id_param = (result_id,)
             query = 'SELECT annual_results.result_id, annual_results.year, ' \
@@ -898,12 +812,8 @@ class RequestHandler(http.server.BaseHTTPRequestHandler):
             result_col_names = [description[0] for description in c.description]
             result_rows = c.fetchall()
 
-            feed_print_file_name = feed_dir + '/feed_print.csv'
-            feed_print_file = open(feed_print_file_name, "w")
-            feed_print_csv_writer = csv.writer(feed_print_file)
-            feed_print_csv_writer.writerow(result_col_names)
-            feed_print_csv_writer.writerows(result_rows)
-            feed_print_file.close()
+            write_csv(write_path + 'feed_print.csv', result_col_names,
+                      result_rows)
 
             query = "PRAGMA table_info('purhcased_feed_info');"
             c.execute(query)
@@ -931,20 +841,12 @@ class RequestHandler(http.server.BaseHTTPRequestHandler):
                                                'num_days_in_year'] + \
                                               desired_purchased_feed_cols
 
-                result_col_names, result_rows = self.read_table(result_id,
-                                                                'purchased_feed_info',
-                                                                ",".join(
-                                                                desired_purchased_feed_cols))
+                result_col_names, result_rows = \
+                    self.read_table(result_id, 'purchased_feed_info',
+                                    ",".join(desired_purchased_feed_cols))
 
-                purchased_feed_print_file_name = feed_dir + \
-                                               '/purchased_feed_print.csv'
-                purchased_feed_print_file = open(purchased_feed_print_file_name,
-                                                 "w")
-                purchased_feed_print_csv_writer = csv.writer(
-                    purchased_feed_print_file)
-                purchased_feed_print_csv_writer.writerow(result_col_names)
-                purchased_feed_print_csv_writer.writerows(result_rows)
-                purchased_feed_print_file.close()
+                write_csv(write_path + 'purchased_feed_print.csv',
+                          result_col_names, result_rows)
 
             conn.close()
 
@@ -973,19 +875,24 @@ class RequestHandler(http.server.BaseHTTPRequestHandler):
             desired_manure_cols = []
 
             if 'methane_emissions' in manure_print_vars:
-                desired_manure_cols.append('SUM(housing_methane + management_methane) as methane_emissions')
+                desired_manure_cols.append(
+                    'SUM(housing_methane + management_methane) '
+                    'as methane_emissions')
             if 'nitrous_oxide_emissions' in manure_print_vars:
-                desired_manure_cols.append('SUM(housing_direct_nitrous_oxide '
-                                           '+ housing_indirect_nitrous_oxide '
-                                           '+ management_direct_nitrous_oxide '
-                                           '+ management_indirect_nitrous_oxide) as nitrous_oxide_emissions')
+                desired_manure_cols.append(
+                    'SUM(housing_direct_nitrous_oxide '
+                    '+ housing_indirect_nitrous_oxide '
+                    '+ management_direct_nitrous_oxide '
+                    '+ management_indirect_nitrous_oxide) '
+                    'as nitrous_oxide_emissions')
             if 'ammonia_emissions' in manure_print_vars:
                 desired_manure_cols.append('SUM(housing_ammonia + '
                                            'management_ammonia) as '
                                            'ammonia_emissions')
             if 'carbon_dioxide_emissions' in manure_print_vars:
                 desired_manure_cols.append('SUM(housing_carbon_dioxide + '
-                                           'management_carbon_dioxide) as carbon_dioxide_emissions')
+                                           'management_carbon_dioxide) '
+                                           'as carbon_dioxide_emissions')
 
             if len(desired_manure_cols) > 0:
                 result_id_param = (result_id,)
@@ -998,12 +905,8 @@ class RequestHandler(http.server.BaseHTTPRequestHandler):
                                     c.description]
                 result_rows = c.fetchall()
 
-                manure_print_file_name = write_path + '/manure_print.csv'
-                manure_print_file = open(manure_print_file_name, "w")
-                manure_print_csv_writer = csv.writer(manure_print_file)
-                manure_print_csv_writer.writerow(result_col_names)
-                manure_print_csv_writer.writerows(result_rows)
-                manure_print_file.close()
+                write_csv(write_path + 'manure_print.csv',
+                          result_col_names, result_rows)
 
             conn.close()
 
@@ -1020,12 +923,8 @@ class RequestHandler(http.server.BaseHTTPRequestHandler):
                                                         'energy_print',
                                                         energy_print_vars)
 
-        energy_print_file_name = write_path + '/energy_print.csv'
-        energy_print_file = open(energy_print_file_name, "w")
-        energy_print_csv_writer = csv.writer(energy_print_file)
-        energy_print_csv_writer.writerow(result_col_names)
-        energy_print_csv_writer.writerows(result_rows)
-        energy_print_file.close()
+        write_csv(write_path + 'energy_print.csv',
+                  result_col_names, result_rows)
 
 
 # start the server locally at PORT
