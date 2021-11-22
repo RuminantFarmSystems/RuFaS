@@ -34,8 +34,45 @@ FARM_ES_PATH_SUFFIX = '/farm_es_reports/'
 FARM_ES_FEED_PRINT_PATH_SUFFIX = 'feed_print/'
 FARM_ES_SUMMARY_PATH_SUFFIX = 'summary_report/'
 
-# mapping from variable user sees/selects to table column name
-VARIABLE_MAPPING = {}
+MANURE_PRINT_VARIABLE_MAPPING = \
+    {
+        'methane_emissions': 'SUM(housing_methane + management_methane) '
+                             'as methane_emissions',
+        'nitrous_oxide_emissions': 'SUM(housing_direct_nitrous_oxide '
+                                   '+ housing_indirect_nitrous_oxide '
+                                   '+ management_direct_nitrous_oxide '
+                                   '+ management_indirect_nitrous_oxide) '
+                                   'as nitrous_oxide_emissions',
+        'ammonia_emissions': 'SUM(housing_ammonia + '
+                             'management_ammonia) as '
+                             'ammonia_emissions',
+        'carbon_dioxide_emissions': 'SUM(housing_carbon_dioxide + '
+                                    'management_carbon_dioxide) '
+                                    'as carbon_dioxide_emissions'
+    }
+
+FEED_PRINT_PURCHASED_FEED_VARIABLE_MAPPING = \
+    {
+        'total_purchased_feed': 'total_purchased_feed',
+        'purchased_feed_cost': 'total_cost',
+        'purchased_feed_embedded_C_footprint': 'embedded_C_footprint',
+        'purchased_feed_blue_water_footprint': 'blue_water_footprint',
+        'purchased_feed_grey_water_footprint': 'grey_water_footprint'
+    }
+
+COLUMNS_TO_REMOVE = ['result_id', 'year', 'num_days_in_year']
+FEED_PRINT_COLUMNS_TO_ADD = \
+    ['total_P_runoff', 'total_N_runoff', 'total_N_leaching']
+
+FARM_ES_SUMMARY_REPORT_COLUMNS = [
+    'ghg_emissions',
+    'ghg_emission_milk_intensity',
+    'ghg_emission_land_intensity',
+    'milk_prod',
+    'crop_yield',
+    'total_hectares',
+    'total_purchased_feed'
+]
 
 
 def write_csv(file_name, column_headers, data_rows):
@@ -280,6 +317,7 @@ class RequestHandler(http.server.BaseHTTPRequestHandler):
                     and the daily & annual column names or
                 text = an error message if the operation was not successful
         """
+
         try:
             conn = sqlite3.connect(self.db_file)
             conn.row_factory = sqlite3.Row
@@ -297,100 +335,41 @@ class RequestHandler(http.server.BaseHTTPRequestHandler):
                 results_table.append(dict(row))
                 row = c.fetchone()
 
-            # get columns of the daily_results table
-            daily_query = "PRAGMA table_info('daily_results');"
-            c.execute(daily_query)
-            row = c.fetchone()
-            daily_columns = []
-            while row is not None:
-                daily_columns.append(dict(row)['name'])
-                row = c.fetchone()
-
-            # get columns of the annual_results table
-            annual_query = "PRAGMA table_info('annual_results');"
-            c.execute(annual_query)
-            row = c.fetchone()
-            annual_columns = []
-            while row is not None:
-                annual_columns.append(dict(row)['name'])
-                row = c.fetchone()
-
-            # get columns of the daily_manure table
-            daily_manure_query = "PRAGMA table_info('daily_manure');"
-            c.execute(daily_manure_query)
-            row = c.fetchone()
-            daily_manure_columns = []
-            while row is not None:
-                daily_manure_columns.append(dict(row)['name'])
-                row = c.fetchone()
-
-            # get columns of the daily_manure table
-            annual_manure_query = "PRAGMA table_info('annual_manure');"
-            c.execute(annual_manure_query)
-            row = c.fetchone()
-            annual_manure_columns = []
-            while row is not None:
-                annual_manure_columns.append(dict(row)['name'])
-                row = c.fetchone()
-
-            # get columns of the cow_print table
-            cow_print_query = "PRAGMA table_info('cow_print');"
-            c.execute(cow_print_query)
-            row = c.fetchone()
-            cow_print_columns = []
-            while row is not None:
-                cow_print_columns.append(dict(row)['name'])
-                row = c.fetchone()
-
-            # get columns of the feed tables
-            feed_print_query = "PRAGMA table_info('feed_print');"
-            c.execute(feed_print_query)
-            row = c.fetchone()
-            feed_print_columns = []
-            while row is not None:
-                feed_print_columns.append(dict(row)['name'])
-                row = c.fetchone()
-
-            feed_print_columns.append('total_purchased_feed')
-            feed_print_columns.append('purchased_feed_cost')
-            feed_print_columns.append('purchased_feed_embedded_C_footprint')
-            feed_print_columns.append('purchased_feed_blue_water_footprint')
-            feed_print_columns.append('purchased_feed_grey_water_footprint')
-
-            feed_print_columns.append('total_P_runoff')
-            feed_print_columns.append('total_N_runoff')
-            feed_print_columns.append('total_N_leaching')
-
-            feed_print_columns.remove('result_id')
-            feed_print_columns.remove('year')
-            feed_print_columns.remove('num_days_in_year')
-
-            # get columns of the energy_print table
-            energy_print_query = "PRAGMA table_info('energy_print');"
-            c.execute(energy_print_query)
-            row = c.fetchone()
-            energy_print_columns = []
-            while row is not None:
-                energy_print_columns.append(dict(row)['name'])
-                row = c.fetchone()
-
             conn.close()
 
-            # enumerate columns for FarmES summary report
-            summary_columns = ['ghg_emissions',
-                               'ghg_emission_milk_intensity',
-                               'ghg_emission_land_intensity',
-                               'milk_prod',
-                               'crop_yield',
-                               'total_hectares',
-                               'total_purchased_feed'
-                               ]
+            status, daily_columns = self.get_columns('daily_results')
+            if not status == OK:
+                return status, daily_columns
 
-            # enumerate columns for manure print report
-            manure_print_columns = ['methane_emissions',
-                                    'nitrous_oxide_emissions',
-                                    'ammonia_emissions',
-                                    'carbon_dioxide_emissions']
+            status, annual_columns = self.get_columns('annual_results')
+            if not status == OK:
+                return status, annual_columns
+
+            status, daily_manure_columns = self.get_columns('daily_manure')
+            if not status == OK:
+                return status, daily_manure_columns
+
+            status, annual_manure_columns = self.get_columns('annual_manure')
+            if not status == OK:
+                return status, annual_manure_columns
+
+            status, cow_print_columns = self.get_columns('cow_print')
+            if not status == OK:
+                return status, cow_print_columns
+
+            status, energy_print_columns = self.get_columns('energy_print')
+            if not status == OK:
+                return status, energy_print_columns
+
+            status, feed_print_columns = self.get_columns('feed_print')
+            if not status == OK:
+                return status, feed_print_columns
+
+            feed_print_columns += FEED_PRINT_COLUMNS_TO_ADD
+            feed_print_columns += \
+                list(FEED_PRINT_PURCHASED_FEED_VARIABLE_MAPPING.keys())
+            for col in COLUMNS_TO_REMOVE:
+                feed_print_columns.remove(col)
 
             return OK, json.dumps({
                 'results_table': results_table,
@@ -401,10 +380,10 @@ class RequestHandler(http.server.BaseHTTPRequestHandler):
                     'annual': annual_manure_columns
                 },
                 'farm_es': {
-                    'summary': summary_columns,
+                    'summary': FARM_ES_SUMMARY_REPORT_COLUMNS,
                     'cow_print': cow_print_columns,
                     'feed_print': feed_print_columns,
-                    'manure_print': manure_print_columns,
+                    'manure_print': list(MANURE_PRINT_VARIABLE_MAPPING.keys()),
                     'energy_print': energy_print_columns
                 }
             })
@@ -414,41 +393,6 @@ class RequestHandler(http.server.BaseHTTPRequestHandler):
                             "exception while connecting to or querying " + \
                             self.db_file + " to obtain stored results:\n" \
                             + str(e)
-            return BAD_GATEWAY, error_message
-
-    def delete_results_set(self, id_to_delete):
-        """
-        Connects to the past outputs database and deletes the result with ID
-        @id_to_delete.
-
-        Returns:
-            (status_code, text) where
-                status_code = OK if the operation was successful or
-                status_code = BAD_GATEWAY if not and
-                text = empty string if the operation was successful or
-                text = an error message if not
-        """
-        try:
-            conn = sqlite3.connect(self.db_file)
-            conn.row_factory = sqlite3.Row
-            c = conn.cursor()
-
-            c.execute(
-                "DELETE FROM results WHERE result_id=?", (id_to_delete,))
-            c.execute("DELETE FROM daily_results WHERE result_id=?",
-                      (id_to_delete,))
-            c.execute("DELETE FROM annual_results WHERE result_id=?",
-                      (id_to_delete,))
-
-            conn.commit()
-            conn.close()
-            return OK, ""
-
-        except Exception as e:
-            error_message = "The program has encountered the following " \
-                            "exception while connecting to and querying " + \
-                            self.db_file + " to delete result " + \
-                            str(id_to_delete) + ":\n" + str(e)
             return BAD_GATEWAY, error_message
 
     def multiple_to_csv(self, result_ids, daily_cols, annual_cols,
@@ -523,8 +467,8 @@ class RequestHandler(http.server.BaseHTTPRequestHandler):
 
             # get data from variable descriptions table
             c.execute("SELECT * FROM variable_descriptions")
-            descr_cols = [description[0] for description in c.description]
-            descr_rows = c.fetchall()
+            description_cols = [description[0] for description in c.description]
+            description_rows = c.fetchall()
 
             # get input json data
             c.execute("SELECT input_data FROM results WHERE result_id=?",
@@ -548,8 +492,8 @@ class RequestHandler(http.server.BaseHTTPRequestHandler):
             write_csv(path + 'daily_results.csv', daily_vars, daily_rows)
             write_csv(path + 'annual_results.csv', annual_vars,
                       annual_rows)
-            write_csv(path + 'variable_descriptions.csv', descr_cols,
-                      descr_rows)
+            write_csv(path + 'variable_descriptions.csv', description_cols,
+                      description_rows)
 
             input_json_file_name = path + '/' + title + '_input.json'
             input_json_file = open(input_json_file_name, "w")
@@ -574,72 +518,6 @@ class RequestHandler(http.server.BaseHTTPRequestHandler):
                             ":\n" + str(e)
             return BAD_GATEWAY, error_message
 
-    def re_title(self, id_to_re_title, new_title):
-        """
-        Connects to the past outputs database and renames the result with ID
-        @id_to_retitle to have the name @new_title.
-
-        Returns:
-            (status_code, text) where
-                status_code = OK if the operation was successful or
-                status_code = BAD_GATEWAY if not and
-                text = empty string if the operation was successful or
-                text = an error message if not
-        """
-        try:
-            conn = sqlite3.connect(self.db_file)
-            conn.row_factory = sqlite3.Row
-            c = conn.cursor()
-
-            c.execute("UPDATE results SET title = ? WHERE result_id=?",
-                      (new_title, id_to_re_title))
-            conn.commit()
-
-            conn.close()
-
-            return OK, ""
-
-        except Exception as e:
-            error_message = "The program has encountered the following " \
-                            "exception while connecting to or querying " + \
-                            self.db_file + " to rename result " + \
-                            str(id_to_re_title) + ":\n" + str(e)
-            return BAD_GATEWAY, error_message
-
-    def find_desired_cols(self, result_id, table, columns):
-        # intersection with energy_print columns
-        try:
-            conn = sqlite3.connect(self.db_file)
-            conn.row_factory = sqlite3.Row
-            c = conn.cursor()
-
-            query = "PRAGMA table_info('" + table + "');"
-            c.execute(query)
-            row = c.fetchone()
-            table_columns = set()
-            while row is not None:
-                table_columns.add(dict(row)['name'])
-                row = c.fetchone()
-
-            conn.close()
-
-            desired_cols = \
-                list(table_columns.intersection(set(
-                    columns.split(','))))
-
-            return desired_cols
-
-        except Exception as e:
-            error_message = "The program has encountered the following " \
-                            "exception while connecting to or querying " + \
-                            self.db_file + " to produce csv files from " \
-                                           "result " + str(result_id) + \
-                            ":\n" + str(e)
-            return BAD_GATEWAY, error_message
-
-    def perform_join(self):
-        pass
-
     def write_farm_es_outputs(self, result_id, write_path, farm_es_cols):
         if len(farm_es_cols['summary_cols']) > 0:
             self.write_farm_summary_outputs(write_path +
@@ -662,34 +540,6 @@ class RequestHandler(http.server.BaseHTTPRequestHandler):
         if len(farm_es_cols['energy_print_cols']) > 0:
             self.write_energy_print(write_path, result_id,
                                     farm_es_cols['energy_print_cols'])
-
-    def read_table(self, result_id, table, cols):
-        # cols: comma separated list of columsn
-        try:
-            conn = sqlite3.connect(self.db_file)
-            conn.row_factory = sqlite3.Row
-            c = conn.cursor()
-
-            result_id_param = (result_id,)
-
-            # get data from daily results
-            daily_query = "SELECT " + cols + \
-                          " FROM " + table + " WHERE result_id=?"
-            c.execute(daily_query, result_id_param)
-            result_col_names = [description[0] for description in c.description]
-            result_rows = c.fetchall()
-
-            conn.close()
-
-            return result_col_names, result_rows
-
-        except Exception as e:
-            error_message = "The program has encountered the following " \
-                            "exception while connecting to or querying " + \
-                            self.db_file + " to produce csv files from " \
-                                           "result " + str(result_id) + \
-                            ":\n" + str(e)
-            return BAD_GATEWAY, error_message
 
     def write_farm_summary_outputs(self, write_path, result_id, summary_vars):
         # find the intersection of the 'summary_vars' and the columns in
@@ -815,7 +665,7 @@ class RequestHandler(http.server.BaseHTTPRequestHandler):
             write_csv(write_path + 'feed_print.csv', result_col_names,
                       result_rows)
 
-            query = "PRAGMA table_info('purhcased_feed_info');"
+            query = "PRAGMA table_info('purchased_feed_info');"
             c.execute(query)
             row = c.fetchone()
             purchased_feed_columns = set()
@@ -824,17 +674,10 @@ class RequestHandler(http.server.BaseHTTPRequestHandler):
                 row = c.fetchone()
 
             desired_purchased_feed_cols = []
-
-            if 'total_purchased_feed' in feed_print_vars:
-                desired_purchased_feed_cols.append('total_purchased_feed')
-            if 'purchased_feed_cost' in feed_print_vars:
-                desired_purchased_feed_cols.append('total_cost')
-            if 'purchased_feed_embedded_C_footprint' in feed_print_vars:
-                desired_purchased_feed_cols.append('embedded_C_footprint')
-            if 'purchased_feed_blue_water_footprint' in feed_print_vars:
-                desired_purchased_feed_cols.append('blue_water_footprint')
-            if 'purchased_feed_grey_water_footprint' in feed_print_vars:
-                desired_purchased_feed_cols.append('grey_water_footprint')
+            for key in FEED_PRINT_PURCHASED_FEED_VARIABLE_MAPPING:
+                if key in feed_print_vars:
+                    desired_purchased_feed_cols.append(
+                        FEED_PRINT_PURCHASED_FEED_VARIABLE_MAPPING[key])
 
             if len(desired_purchased_feed_cols) > 0:
                 desired_purchased_feed_cols = ['result_id', 'year', 'feed_id',
@@ -873,26 +716,10 @@ class RequestHandler(http.server.BaseHTTPRequestHandler):
                 row = c.fetchone()
 
             desired_manure_cols = []
-
-            if 'methane_emissions' in manure_print_vars:
-                desired_manure_cols.append(
-                    'SUM(housing_methane + management_methane) '
-                    'as methane_emissions')
-            if 'nitrous_oxide_emissions' in manure_print_vars:
-                desired_manure_cols.append(
-                    'SUM(housing_direct_nitrous_oxide '
-                    '+ housing_indirect_nitrous_oxide '
-                    '+ management_direct_nitrous_oxide '
-                    '+ management_indirect_nitrous_oxide) '
-                    'as nitrous_oxide_emissions')
-            if 'ammonia_emissions' in manure_print_vars:
-                desired_manure_cols.append('SUM(housing_ammonia + '
-                                           'management_ammonia) as '
-                                           'ammonia_emissions')
-            if 'carbon_dioxide_emissions' in manure_print_vars:
-                desired_manure_cols.append('SUM(housing_carbon_dioxide + '
-                                           'management_carbon_dioxide) '
-                                           'as carbon_dioxide_emissions')
+            for key in MANURE_PRINT_VARIABLE_MAPPING:
+                if key in manure_print_vars:
+                    desired_manure_cols.append(
+                        MANURE_PRINT_VARIABLE_MAPPING[key])
 
             if len(desired_manure_cols) > 0:
                 result_id_param = (result_id,)
@@ -925,6 +752,161 @@ class RequestHandler(http.server.BaseHTTPRequestHandler):
 
         write_csv(write_path + 'energy_print.csv',
                   result_col_names, result_rows)
+
+    # GENERAL DATABASE QUERY METHODS
+    def read_table(self, result_id, table, cols):
+        # cols: comma separated list of columns
+        try:
+            conn = sqlite3.connect(self.db_file)
+            conn.row_factory = sqlite3.Row
+            c = conn.cursor()
+
+            result_id_param = (result_id,)
+
+            # get data from daily results
+            daily_query = "SELECT " + cols + \
+                          " FROM " + table + " WHERE result_id=?"
+            c.execute(daily_query, result_id_param)
+            result_col_names = [description[0] for description in c.description]
+            result_rows = c.fetchall()
+
+            conn.close()
+
+            return result_col_names, result_rows
+            # TODO fix error handling here
+
+        except Exception as e:
+            error_message = "The program has encountered the following " \
+                            "exception while connecting to or querying " + \
+                            self.db_file + " to produce csv files from " \
+                                           "result " + str(result_id) + \
+                            ":\n" + str(e)
+            return BAD_GATEWAY, error_message
+
+    def delete_results_set(self, id_to_delete):
+        """
+        Connects to the past outputs database and deletes the result with ID
+        @id_to_delete.
+
+        Returns:
+            (status_code, text) where
+                status_code = OK if the operation was successful or
+                status_code = BAD_GATEWAY if not and
+                text = empty string if the operation was successful or
+                text = an error message if not
+        """
+        try:
+            conn = sqlite3.connect(self.db_file)
+            conn.row_factory = sqlite3.Row
+            c = conn.cursor()
+
+            c.execute(
+                "DELETE FROM results WHERE result_id=?", (id_to_delete,))
+            c.execute("DELETE FROM daily_results WHERE result_id=?",
+                      (id_to_delete,))
+            c.execute("DELETE FROM annual_results WHERE result_id=?",
+                      (id_to_delete,))
+            # TODO DELETE OTHER TABLES, CASCADING DELETE??
+            conn.commit()
+            conn.close()
+            return OK, ""
+
+        except Exception as e:
+            error_message = "The program has encountered the following " \
+                            "exception while connecting to and querying " + \
+                            self.db_file + " to delete result " + \
+                            str(id_to_delete) + ":\n" + str(e)
+            return BAD_GATEWAY, error_message
+
+    def get_columns(self, table):
+        try:
+            conn = sqlite3.connect(self.db_file)
+            conn.row_factory = sqlite3.Row
+            c = conn.cursor()
+
+            query = "PRAGMA table_info('" + table + "');"
+            c.execute(query)
+            row = c.fetchone()
+            columns = []
+            while row is not None:
+                columns.append(dict(row)['name'])
+                row = c.fetchone()
+
+            return OK, columns
+
+        except Exception as e:
+            error_message = "The program has encountered the following " \
+                            "exception while connecting to or querying " + \
+                            self.db_file + " to obtain stored results:\n" \
+                            + str(e)
+            return BAD_GATEWAY, error_message
+
+    def perform_join(self):
+        # TODO this
+        pass
+
+    def find_desired_cols(self, result_id, table, columns):
+        # intersection with energy_print columns
+        try:
+            conn = sqlite3.connect(self.db_file)
+            conn.row_factory = sqlite3.Row
+            c = conn.cursor()
+
+            query = "PRAGMA table_info('" + table + "');"
+            c.execute(query)
+            row = c.fetchone()
+            table_columns = set()
+            while row is not None:
+                table_columns.add(dict(row)['name'])
+                row = c.fetchone()
+
+            conn.close()
+
+            desired_cols = \
+                list(table_columns.intersection(set(
+                    columns.split(','))))
+
+            return desired_cols
+
+        except Exception as e:
+            error_message = "The program has encountered the following " \
+                            "exception while connecting to or querying " + \
+                            self.db_file + " to produce csv files from " \
+                                           "result " + str(result_id) + \
+                            ":\n" + str(e)
+            return BAD_GATEWAY, error_message
+
+    def re_title(self, id_to_re_title, new_title):
+        """
+        Connects to the past outputs database and renames the result with ID
+        @id_to_re_title to have the name @new_title.
+
+        Returns:
+            (status_code, text) where
+                status_code = OK if the operation was successful or
+                status_code = BAD_GATEWAY if not and
+                text = empty string if the operation was successful or
+                text = an error message if not
+        """
+        try:
+            conn = sqlite3.connect(self.db_file)
+            conn.row_factory = sqlite3.Row
+            c = conn.cursor()
+
+            c.execute("UPDATE results SET title = ? WHERE result_id=?",
+                      (new_title, id_to_re_title))
+            conn.commit()
+
+            conn.close()
+
+            return OK, ""
+
+        except Exception as e:
+            error_message = "The program has encountered the following " \
+                            "exception while connecting to or querying " + \
+                            self.db_file + " to rename result " + \
+                            str(id_to_re_title) + ":\n" + str(e)
+            return BAD_GATEWAY, error_message
 
 
 # start the server locally at PORT
