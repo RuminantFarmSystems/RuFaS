@@ -526,6 +526,9 @@ class LifeCycleManager:
                 self.PGF_injection_num_h += heiferII.PGF_injections
                 self.GnRH_injection_num += cow.GnRH_injections
                 self.PGF_injection_num += cow.PGF_injections
+                self.preg_check_num_h += heiferII.preg_diagnoses
+                self.semen_num_h += heiferII.semen_num
+                self.ai_num_h += heiferII.AI_times
                 self.preg_check_num += cow.preg_diagnoses
                 self.semen_num += cow.semen_num
                 self.ai_num += cow.AI_times

@@ -481,9 +481,7 @@ class Cow(HeiferIII):
 
         Returns: the day when this estrus should occur
         """
-        estrus_cycle = np.random.normal(avg, std)
-        while estrus_cycle < avg - 2 * std or estrus_cycle > avg + 2 * std:
-            estrus_cycle = np.random.normal(avg, std)
+        estrus_cycle = truncnorm.rvs(-2, 2, avg, std)
         estrus_day = int(start_date + abs(estrus_cycle))
         self.events.add_event(estrus_day, sim_day, estrus_note)
         return estrus_day
@@ -872,16 +870,9 @@ class Cow(HeiferIII):
                     last_time_given_birth = \
                         self.events.get_most_recent_date(c.NEW_BIRTH)
                     self.calving_to_preg_time = self.days_born - last_time_given_birth
-                self.gestation_length = int(np.random.normal(
-                    AnimalBase.config['avg_gestation_len'],
-                    AnimalBase.config['std_gestation_len']))
-                while self.gestation_length < AnimalBase.config['avg_gestation_len'] \
-                        - 2 * AnimalBase.config['std_gestation_len'] \
-                        or self.gestation_length > AnimalBase.config['avg_gestation_len'] \
-                        + 2 * AnimalBase.config['std_gestation_len']:
-                    self.gestation_length = int(np.random.normal(
-                        AnimalBase.config['avg_gestation_len'],
+                self.gestation_length = int(truncnorm.rvs(-2, 2, AnimalBase.config['avg_gestation_len'],\
                         AnimalBase.config['std_gestation_len']))
+
                 # generate calf birth weight 
                 if self.breed == 'HO':
                     self.calf_birth_weight = truncnorm.rvs(-2*AnimalBase.config['birth_weight_std_ho'], 2*AnimalBase.config['birth_weight_std_ho'], \

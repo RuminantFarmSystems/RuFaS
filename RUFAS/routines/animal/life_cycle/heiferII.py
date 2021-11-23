@@ -334,16 +334,8 @@ class HeiferII(HeiferI):
         Returns: the day when this estrus should occur
 
         """
-        estrus_cycle = np.random.normal(
-            AnimalBase.config['avg_estrus_cycle_heifer'],
-            AnimalBase.config['std_estrus_cycle_heifer'])
-        while estrus_cycle < AnimalBase.config['avg_estrus_cycle_heifer'] \
-            - 2 * AnimalBase.config['std_estrus_cycle_heifer'] \
-            or estrus_cycle > AnimalBase.config['avg_estrus_cycle_heifer'] \
-                + 2 * AnimalBase.config['std_estrus_cycle_heifer']:
-            estrus_cycle = np.random.normal(
-                AnimalBase.config['avg_estrus_cycle_heifer'],
-                AnimalBase.config['std_estrus_cycle_heifer'])
+        estrus_cycle = truncnorm.rvs(-2, 2, AnimalBase.config['avg_estrus_cycle_heifer'],\
+                        AnimalBase.config['std_estrus_cycle_heifer'])
         estrus_day = int(start_date + estrus_cycle)
         self.events.add_event(estrus_day, sim_day, estrus_note)
         return estrus_day
@@ -447,10 +439,7 @@ class HeiferII(HeiferI):
             max_val: max value can go for the normal distribution,
                 avoiding negative value
         """
-        synch_ed_estrus = np.random.normal(avg, std)
-        while synch_ed_estrus < avg - 2 * std \
-                or synch_ed_estrus > avg + 2 * std:
-            synch_ed_estrus = np.random.normal(avg, std)
+        synch_ed_estrus = truncnorm.rvs(-2, 2, avg, std)
         norm = abs(synch_ed_estrus)
         if norm >= max_val:
             norm = max_val - 1
@@ -549,13 +538,11 @@ class HeiferII(HeiferI):
         if self.repro_program == 'ED':
             self.estrus_day = self.determine_estrus_day(self.abortion_day, c.ESTRUS_AFTER_ABORTION_NOTE, sim_day)
         elif self.repro_program == 'TAI':
-            self.ed_update(sim_day)
             self.estrus_day = self.determine_estrus_day(self.abortion_day, c.ESTRUS_AFTER_ABORTION_NOTE, sim_day)
-            
+            self.repro_program == 'ED'
         elif self.repro_program == 'synch-ED':
-            self.ed_update(sim_day)
             self.estrus_day = self.determine_estrus_day(self.abortion_day, c.ESTRUS_AFTER_ABORTION_NOTE, sim_day)
-            
+            self.repro_program == 'ED'
 
     # artificial inseminated and go through 3 preg checks
     def preg_update(self, sim_day):
@@ -575,27 +562,21 @@ class HeiferII(HeiferI):
         if self.days_born == self.ai_day:
             self.events.add_event(
                 self.days_born, sim_day, c.INSEMINATED_W_BASE + AnimalBase.config['semen_type'])
+            self.semen_num += 1
+            self.AI_times += 1
             # conception
             conception_rand = random()
             if conception_rand < self.conception_rate:
                 self.days_in_preg = 1
                 self.breeding_to_preg_time = self.days_born - AnimalBase.config['breeding_start_day_h']
-                self.gestation_length = int(np.random.normal(
-                    AnimalBase.config['avg_gestation_len'],
-                    AnimalBase.config['std_gestation_len']))
-                while self.gestation_length < AnimalBase.config['avg_gestation_len'] \
-                    - 2 * AnimalBase.config['std_gestation_len'] \
-                    or self.gestation_length > AnimalBase.config['avg_gestation_len'] \
-                        + 2 * AnimalBase.config['std_gestation_len']:
-                    self.gestation_length = int(np.random.normal(
-                        AnimalBase.config['avg_gestation_len'],
+                self.gestation_length = int(truncnorm.rvs(-2, 2, AnimalBase.config['avg_gestation_len'],\
                         AnimalBase.config['std_gestation_len']))
                 # generate calf birth weight 
                 if self.breed == 'HO':
-                    self.calf_birth_weight = truncnorm.rvs(-2*AnimalBase.config['birth_weight_std_ho'], 2*AnimalBase.config['birth_weight_std_ho'], \
+                    self.calf_birth_weight = truncnorm.rvs(-2, 2, \
                         AnimalBase.config['birth_weight_avg_ho'], AnimalBase.config['birth_weight_std_ho'])
                 elif self.breed == 'JE':
-                    self.calf_birth_weight = truncnorm.rvs(-2*AnimalBase.config['birth_weight_std_je'], 2*AnimalBase.config['birth_weight_std_je'], \
+                    self.calf_birth_weight = truncnorm.rvs(-2, 2, \
                         AnimalBase.config['birth_weight_avg_je'], AnimalBase.config['birth_weight_std_je'])
                 self.events.add_event(self.days_born, sim_day, c.HEIFER_PREG)
             else:
