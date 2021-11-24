@@ -758,6 +758,7 @@ class Cow(HeiferIII):
         Args:
             sim_day: the simulation day
         """
+        #print("resynch_protocol" + str(self.abortion_day))
         if self.resynch_method == 'TAIafterPD':
             if self.days_in_milk == self.abortion_day:
                 self.estrus_day = self.determine_estrus_day(
@@ -868,9 +869,70 @@ class Cow(HeiferIII):
                         AnimalBase.config['std_estrus_cycle_cow'], sim_day)
                 self.events.add_event(self.days_born, sim_day, c.COW_NOT_PREG)
                 
-        elif self.days_born > self.ai_day:
-            self.preg_check(sim_day)
+        elif self.days_born == self.ai_day + \
+            AnimalBase.config['preg_check_day_1']:
+            self.preg_diagnoses += 1
 
+            if self.days_in_preg > 0:
+                preg_loss_rand = random()
+                if preg_loss_rand > AnimalBase.config['preg_loss_rate_1']:
+                    self.events.add_event(
+                        self.days_born, sim_day, c.PREG_CHECK_1_PREG)
+                else:
+                    self.days_in_preg = 0
+                    self.abortion_day = self.days_born
+                    self.open(sim_day)
+                    self.body_weight -= self.conceptus_weight
+                    self.conceptus_weight = 0
+                    self.calf_birth_weight = 0
+                    self.p_gest_for_calf = 0
+                    self.events.add_event(
+                        self.days_born, sim_day, c.PREG_LOSS_BEFORE_1)
+            else:
+                self.abortion_day = self.days_born
+                self.open(sim_day)
+                self.events.add_event(
+                    self.days_born, sim_day, c.PREG_CHECK_1_NOT_PREG)
+        
+        # preg check 2
+        elif self.days_born == self.ai_day + \
+            AnimalBase.config['preg_check_day_2']:
+            self.preg_diagnoses += 1
+            preg_loss_rand = random()
+            if preg_loss_rand > \
+                AnimalBase.config['preg_loss_rate_2']:
+                self.events.add_event(
+                    self.days_born, sim_day, c.PREG_CHECK_2_PREG)
+            else:
+                self.days_in_preg = 0
+                self.abortion_day = self.days_born
+                self.open(sim_day)
+                self.body_weight -= self.conceptus_weight
+                self.conceptus_weight = 0
+                self.calf_birth_weight = 0
+                self.p_gest_for_calf = 0
+                self.events.add_event(
+                    self.days_born, sim_day, c.PREG_LOSS_BTWN_1_AND_2)
+        
+        # preg check 3
+        elif self.days_born == self.ai_day + \
+            AnimalBase.config['preg_check_day_3']:
+            self.preg_diagnoses += 1
+            preg_loss_rand = random()
+            if preg_loss_rand > AnimalBase.config['preg_loss_rate_3']:
+                self.events.add_event(
+                    self.days_born, sim_day, c.PREG_CHECK_3_PREG)
+            else:
+                self.days_in_preg = 0
+                self.abortion_day = self.days_born
+                self.open(sim_day)
+                self.body_weight -= self.conceptus_weight
+                self.conceptus_weight = 0
+                self.calf_birth_weight = 0
+                self.p_gest_for_calf = 0
+                self.events.add_event(
+                    self.days_born, sim_day, c.PREG_LOSS_BTWN_2_AND_3)
+                    
         if self.days_in_preg == 0 and self.days_in_milk > \
                 AnimalBase.config['do_not_breed_time']:
             # only add to events if it is the first time this occurs
@@ -879,6 +941,7 @@ class Cow(HeiferIII):
                 self.do_not_breed = True
             return True
 
+        
     # Cull methods
     def cull_update(self, sim_day):
         """
