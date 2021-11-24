@@ -125,7 +125,9 @@ class LifeCycleReport(BaseReportDriver):
                 'PGF_injections': ['life_cycle_manager.PGF_injection_num', '', []],
                 'ai_num': ['life_cycle_manager.ai_num', '', []],
                 'preg_check_num': ['life_cycle_manager.preg_check_num', '', []],
-                'sold_calf_num': ['life_cycle_manager.sold_calf_num', '', []]
+                'sold_calf_num': ['life_cycle_manager.sold_calf_num', '', []],
+                'ai_num_heifer': ['life_cycle_manager.ai_num_h', '', []],
+                'preg_check_num_heifer': ['life_cycle_manager.preg_check_num_h', '', []]
             }
 
             self.production_performance = {
@@ -134,7 +136,6 @@ class LifeCycleReport(BaseReportDriver):
 
             self.preg = {
                 'open_cow_num': ['life_cycle_manager.open_cow_num', '', []],
-                'vwp_cow_num': ['life_cycle_manager.vwp_cow_num', '', []],
                 'non_preg_cow_percent': ['life_cycle_manager.non_preg_cow_percent', '%', []],
                 'preg_cow_num': ['life_cycle_manager.preg_cow_num', '', []],
                 'preg_cow_percent': ['life_cycle_manager.preg_cow_percent', '%', []],

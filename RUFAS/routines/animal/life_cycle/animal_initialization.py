@@ -225,10 +225,10 @@ class AnimalInitialization:
                     args = heiferIII.get_heiferIII_values()
 
                     args.update(id=self.next_id())
-                    args.update(repro_program='TAI')
-                    args.update(presynch_method='PreSynch')
-                    args.update(tai_method_c='OvSynch 56')
-                    args.update(resynch_method='TAIafterPD')
+                    args.update(repro_program=AnimalBase.config['cow_repro_method'])
+                    args.update(presynch_method=AnimalBase.config['cow_presynch_protocol'])
+                    args.update(tai_method_c=AnimalBase.config['cow_TAI_protocol'])
+                    args.update(resynch_method=AnimalBase.config['cow_resynch_protocol'])
 
                     cow = Cow(args)
 
@@ -448,9 +448,9 @@ class AnimalInitialization:
                 'wean_weight': float(row[AnimalValues.wean_weight]),
                 'mature_body_weight': float(row[AnimalValues.mature_body_weight]),
                 'events': row[AnimalValues.events],
-                'repro_program': row[AnimalValues.repro_program],
-                'tai_method_h': row[AnimalValues.tai_method_h],
-                'synch_ed_method_h': row[AnimalValues.synch_ed_method_h],
+                #'repro_program': row[AnimalValues.repro_program],
+                #'tai_method_h': row[AnimalValues.tai_method_h],
+                #'synch_ed_method_h': row[AnimalValues.synch_ed_method_h],
                 'estrus_count': int(row[AnimalValues.estrus_count]),
                 'estrus_day': int(row[AnimalValues.estrus_day]),
                 'tai_program_start_day_h': int(row[AnimalValues.tai_program_start_day_h]),
@@ -500,9 +500,9 @@ class AnimalInitialization:
                 'wean_weight': float(row[AnimalValues.wean_weight]),
                 'mature_body_weight': float(row[AnimalValues.mature_body_weight]),
                 'events': row[AnimalValues.events],
-                'repro_program': row[AnimalValues.repro_program],
-                'tai_method_h': row[AnimalValues.tai_method_h],
-                'synch_ed_method_h': row[AnimalValues.synch_ed_method_h],
+                #'repro_program': row[AnimalValues.repro_program],
+                #'tai_method_h': row[AnimalValues.tai_method_h],
+                #'synch_ed_method_h': row[AnimalValues.synch_ed_method_h],
                 'estrus_count': int(row[AnimalValues.estrus_count]),
                 'estrus_day': int(row[AnimalValues.estrus_day]),
                 'tai_program_start_day_h': int(row[AnimalValues.tai_program_start_day_h]),
@@ -552,7 +552,7 @@ class AnimalInitialization:
                 'wean_weight': float(row[AnimalValues.wean_weight]),
                 'mature_body_weight': float(row[AnimalValues.mature_body_weight]),
                 'events': row[AnimalValues.events],
-                'repro_program': row[AnimalValues.repro_program],
+                #'repro_program': row[AnimalValues.repro_program],
                 'tai_method_h': row[AnimalValues.tai_method_h],
                 'synch_ed_method_h': row[AnimalValues.synch_ed_method_h],
                 'estrus_count': int(row[AnimalValues.estrus_count]),
@@ -568,9 +568,9 @@ class AnimalInitialization:
                 'gestation_length': int(row[AnimalValues.gestation_length]),
                 'p_gest_for_calf': int(row[AnimalValues.p_gest_for_calf]),
                 'calf_birth_weight': float(row[AnimalValues.calf_birth_weight]),
-                'presynch_method': row[AnimalValues.presynch_method],
-                'tai_method_c': row[AnimalValues.tai_method_c],
-                'resynch_method': row[AnimalValues.resynch_method],
+                #'presynch_method': row[AnimalValues.presynch_method],
+                #'tai_method_c': row[AnimalValues.tai_method_c],
+                #'resynch_method': row[AnimalValues.resynch_method],
                 'days_in_milk': int(row[AnimalValues.days_in_milk]),
                 'parity': int(row[AnimalValues.parity]),
                 'calving_interval': int(row[AnimalValues.calving_interval])
@@ -610,7 +610,7 @@ class AnimalInitialization:
                 'wean_weight': float(row[AnimalValues.wean_weight]),
                 'mature_body_weight': float(row[AnimalValues.mature_body_weight]),
                 'events': row[AnimalValues.events],
-                'repro_program': row[AnimalValues.repro_program],
+                #'repro_program': row[AnimalValues.repro_program],
                 'tai_method_h': row[AnimalValues.tai_method_h],
                 'synch_ed_method_h': row[AnimalValues.synch_ed_method_h],
                 'estrus_count': int(row[AnimalValues.estrus_count]),
@@ -626,9 +626,9 @@ class AnimalInitialization:
                 'gestation_length': int(row[AnimalValues.gestation_length]),
                 'p_gest_for_calf': int(row[AnimalValues.p_gest_for_calf]),
                 'calf_birth_weight': float(row[AnimalValues.calf_birth_weight]),
-                'presynch_method': row[AnimalValues.presynch_method],
-                'tai_method_c': row[AnimalValues.tai_method_c],
-                'resynch_method': row[AnimalValues.resynch_method]
+                #'presynch_method': row[AnimalValues.presynch_method],
+                #'tai_method_c': row[AnimalValues.tai_method_c],
+                #'resynch_method': row[AnimalValues.resynch_method]
             }
             cow = Cow(args)
             cows.append(cow)

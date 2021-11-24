@@ -150,18 +150,18 @@ class HeiferII(HeiferI):
         """
             Assign the repro program with given vales
         """
-        self.repro_program = args['repro_program']
+        self.repro_program = AnimalBase.config['heifer_repro_method']
 
         # Estrus variables
         self.estrus_count = args['estrus_count']
         self.estrus_day = args['estrus_day']
 
         # TAI variables
-        self.tai_method_h = args['tai_method_h']
+        self.tai_method_h = AnimalBase.config['heifer_TAI_protocol']
         self.tai_program_start_day_h = args['tai_program_start_day_h']
 
         # synch_ED variables
-        self.synch_ed_method_h = args['synch_ed_method_h']
+        self.synch_ed_method_h = AnimalBase.config['heifer_synchED_protocol']
         self.synch_ed_program_start_day_h = args['synch_ed_program_start_day_h']
         self.synch_ed_estrus_day = args['synch_ed_estrus_day']
         self.synch_ed_stop_day = args['synch_ed_stop_day']
@@ -453,7 +453,11 @@ class HeiferII(HeiferI):
         if self.days_born == self.synch_ed_program_start_day_h:
             self.events.add_event(self.days_born, sim_day, c.INJECT_PGF)
             self.PGF_injections = self.PGF_injections + 1
-            self.determine_synch_ed_estrus_day(self.days_born, 5, 3, 14)
+        if self.days_born - self.synch_ed_program_start_day_h == 14:
+                    # second round of injection
+            self.events.add_event(self.days_born, sim_day,c.INJECT_PGF)
+            self.PGF_injections = self.PGF_injections + 17
+            self.determine_synch_ed_estrus_day(self.days_born, 3, 2, 7)
 
         if self.days_born == self.synch_ed_estrus_day:
             self.events.add_event(self.days_born, sim_day, c.ESTRUS_OCCURRED)
@@ -467,23 +471,11 @@ class HeiferII(HeiferI):
                     self.conception_rate = \
                         AnimalBase.config['estrus_conception_rate']
             else:
-                if self.days_born - \
-                        self.synch_ed_program_start_day_h == 14:
-                    # second round of injection
-                    self.events.add_event(
-                        self.synch_ed_program_start_day_h + 14, sim_day,
-                            c.INJECT_PGF)
-                    self.PGF_injections = self.PGF_injections + 1
-                    self.determine_synch_ed_estrus_day(
-                        self.synch_ed_program_start_day_h + 14, 3, 2, 7)
-                else:
-                    # second round of injection also failed,
-                    # roll back to return_synch
-                    self.synch_ed_stop_day = self.synch_ed_program_start_day_h + 21
-                    self.self.synch_ed_program_start_day_h = self.synch_ed_stop_day
-        else:
-            self.synch_ed_stop_day = self.synch_ed_program_start_day_h + 21
-            self.self.synch_ed_program_start_day_h = self.synch_ed_stop_day
+                    # second round of injection failed,
+                    # finish up with TAI
+                self.synch_ed_stop_day = self.synch_ed_program_start_day_h + 21
+                self.tai_program_start_day_h = self.synch_ed_stop_day
+                self.tai_update(sim_day)
 
     def CP_update(self, sim_day):
         """
@@ -511,19 +503,19 @@ class HeiferII(HeiferI):
                         AnimalBase.config['estrus_conception_rate']
                 else:
                     self.synch_ed_stop_day = self.synch_ed_program_start_day_h + 14
-                    self.self.synch_ed_program_start_day_h = self.synch_ed_stop_day
+                    self.synch_ed_program_start_day_h = self.synch_ed_stop_day
             else:
                 self.synch_ed_stop_day = self.synch_ed_program_start_day_h + 14
-                self.self.synch_ed_program_start_day_h = self.synch_ed_stop_day
+                self.synch_ed_program_start_day_h = self.synch_ed_stop_day
 
     def synch_ed_update(self, sim_day):
         """
         Synch ed method update, assign with protocols: 2P or CP
         """
         if self.days_born == AnimalBase.config['breeding_start_day_h']:
-            self.self.synch_ed_program_start_day_h = AnimalBase.config['breeding_start_day_h']
+            self.synch_ed_program_start_day_h = AnimalBase.config['breeding_start_day_h']
 
-        if self.synch_ed_method_h == 'P2':
+        if self.synch_ed_method_h == '2P':
             self.P2_update(sim_day)
         elif self.synch_ed_method_h == 'CP':
             self.CP_update(sim_day)
@@ -544,46 +536,10 @@ class HeiferII(HeiferI):
             self.estrus_day = self.determine_estrus_day(self.abortion_day, c.ESTRUS_AFTER_ABORTION_NOTE, sim_day)
             self.repro_program == 'ED'
 
-    # artificial inseminated and go through 3 preg checks
-    def preg_update(self, sim_day):
-        """
-        update AI for heifers reach ai day, inseminate the heifer with specific
-            semen type
-        by comparing with conception rate, if conception success, gestation
-            length determined
-        for preg check 1, confirm the conception
-        for preg check 2 and 3, confirm pregnancy, there are chances of preg
-            loss in each period of time between preg checks
-        """
-        if self.days_in_preg > 0:
-            self.days_in_preg += 1
-
-        # AI
-        if self.days_born == self.ai_day:
-            self.events.add_event(
-                self.days_born, sim_day, c.INSEMINATED_W_BASE + AnimalBase.config['semen_type'])
-            self.semen_num += 1
-            self.AI_times += 1
-            # conception
-            conception_rand = random()
-            if conception_rand < self.conception_rate:
-                self.days_in_preg = 1
-                self.breeding_to_preg_time = self.days_born - AnimalBase.config['breeding_start_day_h']
-                self.gestation_length = int(truncnorm.rvs(-2, 2, AnimalBase.config['avg_gestation_len'],\
-                        AnimalBase.config['std_gestation_len']))
-                # generate calf birth weight 
-                if self.breed == 'HO':
-                    self.calf_birth_weight = truncnorm.rvs(-2, 2, \
-                        AnimalBase.config['birth_weight_avg_ho'], AnimalBase.config['birth_weight_std_ho'])
-                elif self.breed == 'JE':
-                    self.calf_birth_weight = truncnorm.rvs(-2, 2, \
-                        AnimalBase.config['birth_weight_avg_je'], AnimalBase.config['birth_weight_std_je'])
-                self.events.add_event(self.days_born, sim_day, c.HEIFER_PREG)
-            else:
-                self.events.add_event(self.days_born, sim_day, c.HEIFER_NOT_PREG)
-        
-        # preg check 1
-        elif self.days_born == self.ai_day + \
+    # preg checks
+    def preg_check(self,sim_day):
+        # preg check 1 
+        if self.days_born == self.ai_day + \
             AnimalBase.config['preg_check_day_1']:
             self.preg_diagnoses += 1
 
@@ -646,3 +602,46 @@ class HeiferII(HeiferI):
                 self.p_gest_for_calf = 0
                 self.events.add_event(
                     self.days_born, sim_day, c.PREG_LOSS_BTWN_2_AND_3)
+    
+    # artificial inseminated 
+    def preg_update(self, sim_day):
+        """
+        update AI for heifers reach ai day, inseminate the heifer with specific
+            semen type
+        by comparing with conception rate, if conception success, gestation
+            length determined
+        for preg check 1, confirm the conception
+        for preg check 2 and 3, confirm pregnancy, there are chances of preg
+            loss in each period of time between preg checks
+        """
+        if self.days_in_preg > 0:
+            self.days_in_preg += 1
+
+        # AI
+        if self.days_born == self.ai_day:
+            self.events.add_event(
+                self.days_born, sim_day, c.INSEMINATED_W_BASE + AnimalBase.config['semen_type'])
+            self.semen_num += 1
+            self.AI_times += 1
+            # conception
+            conception_rand = random()
+            if conception_rand < self.conception_rate:
+                self.days_in_preg = 1
+                self.breeding_to_preg_time = self.days_born - AnimalBase.config['breeding_start_day_h']
+                self.gestation_length = int(truncnorm.rvs(-2, 2, AnimalBase.config['avg_gestation_len'],\
+                        AnimalBase.config['std_gestation_len']))
+                # generate calf birth weight 
+                if self.breed == 'HO':
+                    self.calf_birth_weight = truncnorm.rvs(-2, 2, \
+                        AnimalBase.config['birth_weight_avg_ho'], AnimalBase.config['birth_weight_std_ho'])
+                elif self.breed == 'JE':
+                    self.calf_birth_weight = truncnorm.rvs(-2, 2, \
+                        AnimalBase.config['birth_weight_avg_je'], AnimalBase.config['birth_weight_std_je'])
+                self.events.add_event(self.days_born, sim_day, c.HEIFER_PREG)
+            else:
+                self.events.add_event(self.days_born, sim_day, c.HEIFER_NOT_PREG)
+        elif self.days_born > self.ai_day:
+            self.preg_check(sim_day)
+        
+        
+

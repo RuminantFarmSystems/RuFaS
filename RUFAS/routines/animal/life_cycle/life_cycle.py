@@ -68,6 +68,7 @@ class LifeCycleManager:
         'greater_than_3': 0
     }
 
+    preg_check_num_h = 0
     preg_check_num = 0
     CIDR_count = 0
     GnRH_injection_num_h = 0
@@ -79,7 +80,6 @@ class LifeCycleManager:
     dry_cow_num = 0
     milking_cow_num = 0
     preg_cow_num = 0
-    vwp_cow_num = 0
     dry_cow_percent = 0
     milking_cow_percent = 0
     preg_cow_percent = 0
@@ -124,6 +124,8 @@ class LifeCycleManager:
     cull_reason_stats_range = {}
     parity_culling_stats_range = {}
 
+    ai_num_h = 0
+    semen_num_h = 0
     ai_num = 0
     semen_num = 0
 
@@ -249,18 +251,21 @@ class LifeCycleManager:
         self.culled_cow_num = 0
         total_animal_num = 0
 
+        self.preg_check_num_h = 0
         self.preg_check_num = 0
         self.CIDR_count = 0
         self.GnRH_injection_num_h = 0
         self.PGF_injection_num_h = 0
         self.GnRH_injection_num = 0
         self.PGF_injection_num = 0
+        self.ai_num_h = 0
+        self.semen_num_h = 0
         self.ai_num = 0
+        self.semen_num = 0
 
         self.daily_milk_production = 0
         self.open_cow_num = 0
         self.preg_cow_num = 0
-        self.vwp_cow_num = 0
         self.milking_cow_num = 0
         self.dry_cow_num = 0
         self.avg_days_in_milk = 0
@@ -462,10 +467,8 @@ class LifeCycleManager:
                 else:
                     self.dry_cow_num += 1
 
-                if cow.days_in_milk < self.config['voluntary_waiting_period']:
-                    self.vwp_cow_num += 1
-                    if cow.days_in_preg == 0:
-                        self.open_cow_num += 1
+                if cow.days_in_milk >0 and cow.days_in_preg == 0:
+                    self.open_cow_num += 1
 
                 if cow.days_in_preg > 0:
                     self.preg_cow_num, self.avg_days_in_preg = \
@@ -583,7 +586,7 @@ class LifeCycleManager:
             self.dry_cow_percent = self.dry_cow_num / self.cow_num * 100
             self.milking_cow_percent = self.milking_cow_num / self.cow_num * 100
             self.preg_cow_percent = self.preg_cow_num / self.cow_num * 100
-            self.non_preg_cow_percent = (self.open_cow_num + self.vwp_cow_num) / self.cow_num * 100
+            self.non_preg_cow_percent = self.open_cow_num / self.cow_num * 100
 
         for cull_reason in self.cull_reason_stats:
             if self.culled_cow_num != 0:

@@ -110,6 +110,8 @@ class AnimalManagement:
         config = {}
         config.update(data['management_decisions'])
         config.update(data['farm_level']['calf'])
+        config.update(data['farm_level']['repro']['ED_related'])
+        config.update(data['farm_level']['repro']['TAI_related'])
         config.update(data['farm_level']['repro'])
         config.update(data['farm_level']['bodyweight'])
         config.update(data['from_literature']['repro'])

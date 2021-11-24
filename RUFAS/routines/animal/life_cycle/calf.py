@@ -50,7 +50,6 @@ class Calf(AnimalBase):
             self.assign_calf_values(args)
         else:
             self.init_values(args)
-
         self.target_adg_calf = self.birth_weight / AnimalBase.config['wean_day']
 
     def init_values(self, args):
