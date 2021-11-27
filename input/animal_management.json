@@ -6,8 +6,8 @@
         "csv_dir": "output/CSVs/",
         "graphic_dir": "output/graphics/",
         "run_tests": false,
-        "set_seed": false,
-        "seed": 0
+        "set_seed": true,
+        "seed": 14304
     },
     "weather": "barnyard_weather.csv",
     "output": "life_cycle_report.json",

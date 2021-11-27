@@ -34,6 +34,7 @@ FARM_ES_PATH_SUFFIX = '/farm_es_reports/'
 FARM_ES_FEED_PRINT_PATH_SUFFIX = 'feed_print/'
 FARM_ES_SUMMARY_PATH_SUFFIX = 'summary_report/'
 
+# constants for the column names visible to the user for exporting data
 MANURE_PRINT_VARIABLE_MAPPING = \
     {
         'methane_emissions': 'SUM(housing_methane + management_methane) '
@@ -50,7 +51,6 @@ MANURE_PRINT_VARIABLE_MAPPING = \
                                     'management_carbon_dioxide) '
                                     'as carbon_dioxide_emissions'
     }
-
 FEED_PRINT_PURCHASED_FEED_VARIABLE_MAPPING = \
     {
         'total_purchased_feed': 'total_purchased_feed',
@@ -59,23 +59,39 @@ FEED_PRINT_PURCHASED_FEED_VARIABLE_MAPPING = \
         'purchased_feed_blue_water_footprint': 'blue_water_footprint',
         'purchased_feed_grey_water_footprint': 'grey_water_footprint'
     }
-
-COLUMNS_TO_REMOVE = ['result_id', 'year', 'num_days_in_year']
-FEED_PRINT_COLUMNS_TO_ADD = \
-    ['total_P_runoff', 'total_N_runoff', 'total_N_leaching']
-
-FARM_ES_SUMMARY_REPORT_COLUMNS = [
-    'ghg_emissions',
-    'ghg_emission_milk_intensity',
-    'ghg_emission_land_intensity',
-    'milk_prod',
-    'crop_yield',
-    'total_hectares',
-    'total_purchased_feed'
-]
+COLUMNS_TO_REMOVE = \
+    [
+        'result_id',
+        'year',
+        'num_days_in_year'
+     ]
+FEED_PRINT_COLUMNS_TO_ADD =  \
+    [
+        'total_P_runoff',
+        'total_N_runoff',
+        'total_N_leaching'
+    ]
+FARM_ES_SUMMARY_REPORT_COLUMNS = \
+    [
+        'ghg_emissions',
+        'ghg_emission_milk_intensity',
+        'ghg_emission_land_intensity',
+        'milk_prod',
+        'crop_yield',
+        'total_hectares',
+        'total_purchased_feed'
+    ]
 
 
 def write_csv(file_name, column_headers, data_rows):
+    """
+    Writes the given data to a CSV file.
+
+    Args:
+        file_name: str of the name of the file to write to
+        column_headers: list of the column headers of the CSV file
+        data_rows: list of lists of the data of the CSV file
+    """
     file = open(file_name, "w")
     csv_writer = csv.writer(file)
     csv_writer.writerow(column_headers)
@@ -84,6 +100,18 @@ def write_csv(file_name, column_headers, data_rows):
 
 
 def create_dir(path):
+    """
+    Creates the given directory.
+
+    Args:
+        path: str of the name of the directory to create
+
+    Returns:
+        (status_code, text) where
+            status_code = one of OK or BAD_GATEWAY
+            text = the text corresponding to the result of the attempted
+                directory creation
+    """
     try:
         os.mkdir(path)
     except FileExistsError:
@@ -104,6 +132,20 @@ def create_dir(path):
 
 
 def create_all_dirs(title, result_id):
+    """
+    Creates the necessary directories for an export of a result set.
+
+    Args:
+        title: str of the result set title
+        result_id: int corresponding the ID of the result set
+
+    Returns:
+        (status_code, text, path) where
+            status_code = one of OK or BAD_GATEWAY
+            text = the text corresponding to the result of the attempted
+                directory creations
+            path = the outermost directory for this result set
+    """
     path = DB_OUTPUT_PATH + str(result_id) + '_' + title
     status, path_message = create_dir(path)
     if not status == OK:
@@ -151,17 +193,15 @@ class RequestHandler(http.server.BaseHTTPRequestHandler):
         2. '/getResults' : (GET) this signifies to the server that the client
             has requested to view the saved results that are currently in the
             'results' table of the outputs database. A JSON of this table, as
-            well as the column names in the 'daily_results' and 'annual_results'
-            tables are returned by the server. If the 'filter' parameter is
-            specified, then the text in that parameter will be appended to the
-            query.
+            well as the column names in the necessary tables are returned by
+            the server. If the 'filter' parameter is specified, then the text
+            in that parameter will be appended to the query.
         3. '/export' : (GET) this signifies to the server that the client has
             requested to export one or more entries in the 'results' table to
             csv files. The server responds by attempting to read the database
             and create the appropriate directories and csv files. The query for
-            this request contains a list of the result IDs, a list of the
-            columns from the daily results table to be exported, and a list of
-            the columns from the annual results table to be exported.
+            this request contains a list of the result IDs, and a list of the
+            columns from the results tables to be exported.
         4. '/rename' : (POST) this signifies to the server that the client has
             requested to change one of the results by renaming it. The server
             responds by attempting to rename the result. The query for this
@@ -302,22 +342,21 @@ class RequestHandler(http.server.BaseHTTPRequestHandler):
     def get_results_table(self, query_appendix=None):
         """
         Connects to the past outputs database and obtains all entries in the
-        Results table for display on the web-page. Also returns all of the daily
-        and annual column names.
+        Results table for display on the web-page. Also returns all of the
+        column names for the data that can be exported.
 
         Args:
             query_appendix: (optional) a string with further filtering for the
                 query
 
         Returns:
-            (status_code, text) where
+            (status_code, obj) where
                 status_code = OK if the operation was successful or
                 status_code = BAD_GATEWAY if not and
-                text = the JSON of the Results table in the outputs database
-                    and the daily & annual column names or
-                text = an error message if the operation was not successful
+                obj = the JSON of the results table in the outputs database
+                    and the columns that can be exported or
+                obj = an error message if the operation was not successful
         """
-
         try:
             conn = sqlite3.connect(self.db_file)
             conn.row_factory = sqlite3.Row
@@ -337,63 +376,63 @@ class RequestHandler(http.server.BaseHTTPRequestHandler):
 
             conn.close()
 
-            status, daily_columns = self.get_columns('daily_results')
-            if not status == OK:
-                return status, daily_columns
-
-            status, annual_columns = self.get_columns('annual_results')
-            if not status == OK:
-                return status, annual_columns
-
-            status, daily_manure_columns = self.get_columns('daily_manure')
-            if not status == OK:
-                return status, daily_manure_columns
-
-            status, annual_manure_columns = self.get_columns('annual_manure')
-            if not status == OK:
-                return status, annual_manure_columns
-
-            status, cow_print_columns = self.get_columns('cow_print')
-            if not status == OK:
-                return status, cow_print_columns
-
-            status, energy_print_columns = self.get_columns('energy_print')
-            if not status == OK:
-                return status, energy_print_columns
-
-            status, feed_print_columns = self.get_columns('feed_print')
-            if not status == OK:
-                return status, feed_print_columns
-
-            feed_print_columns += FEED_PRINT_COLUMNS_TO_ADD
-            feed_print_columns += \
-                list(FEED_PRINT_PURCHASED_FEED_VARIABLE_MAPPING.keys())
-            for col in COLUMNS_TO_REMOVE:
-                feed_print_columns.remove(col)
-
-            return OK, json.dumps({
-                'results_table': results_table,
-                'daily_columns': daily_columns,
-                'annual_columns': annual_columns,
-                'manure': {
-                    'daily': daily_manure_columns,
-                    'annual': annual_manure_columns
-                },
-                'farm_es': {
-                    'summary': FARM_ES_SUMMARY_REPORT_COLUMNS,
-                    'cow_print': cow_print_columns,
-                    'feed_print': feed_print_columns,
-                    'manure_print': list(MANURE_PRINT_VARIABLE_MAPPING.keys()),
-                    'energy_print': energy_print_columns
-                }
-            })
-
         except Exception as e:
             error_message = "The program has encountered the following " \
                             "exception while connecting to or querying " + \
-                            self.db_file + " to obtain stored results:\n" \
-                            + str(e)
+                            self.db_file + " to obtain stored results in " \
+                                           "get_results_table():\n" + str(e)
             return BAD_GATEWAY, error_message
+
+        status, daily_columns = self.get_columns('daily_results')
+        if not status == OK:
+            return status, daily_columns
+
+        status, annual_columns = self.get_columns('annual_results')
+        if not status == OK:
+            return status, annual_columns
+
+        status, daily_manure_columns = self.get_columns('daily_manure')
+        if not status == OK:
+            return status, daily_manure_columns
+
+        status, annual_manure_columns = self.get_columns('annual_manure')
+        if not status == OK:
+            return status, annual_manure_columns
+
+        status, cow_print_columns = self.get_columns('cow_print')
+        if not status == OK:
+            return status, cow_print_columns
+
+        status, energy_print_columns = self.get_columns('energy_print')
+        if not status == OK:
+            return status, energy_print_columns
+
+        status, feed_print_columns = self.get_columns('feed_print')
+        if not status == OK:
+            return status, feed_print_columns
+
+        feed_print_columns += FEED_PRINT_COLUMNS_TO_ADD
+        feed_print_columns += \
+            list(FEED_PRINT_PURCHASED_FEED_VARIABLE_MAPPING.keys())
+        for col in COLUMNS_TO_REMOVE:
+            feed_print_columns.remove(col)
+
+        return OK, json.dumps({
+            'results_table': results_table,
+            'daily_columns': daily_columns,
+            'annual_columns': annual_columns,
+            'manure': {
+                'daily': daily_manure_columns,
+                'annual': annual_manure_columns
+            },
+            'farm_es': {
+                'summary': FARM_ES_SUMMARY_REPORT_COLUMNS,
+                'cow_print': cow_print_columns,
+                'feed_print': feed_print_columns,
+                'manure_print': list(MANURE_PRINT_VARIABLE_MAPPING.keys()),
+                'energy_print': energy_print_columns
+            }
+        })
 
     def multiple_to_csv(self, result_ids, daily_cols, annual_cols,
                         daily_manure_cols, annual_manure_cols, farm_es_cols):
@@ -407,13 +446,19 @@ class RequestHandler(http.server.BaseHTTPRequestHandler):
                 will be in the resulting csv files
             annual_cols: string of the columns from the annual_results table
                 that will be in the resulting csv files
+            daily_manure_cols: string of the columns from the daily_manure
+                table that will be in the resulting csv files
+            annual_manure_cols: string of the columns from the annual_manure
+                table that will be in the resulting csv files
+            farm_es_cols: dictionary mapping the farm ES reports to the
+                variables in each report
 
         Returns:
             (status_code, text) where
-                status_code = OK if the operation was successful for all IDs or
+                status_code = OK if the operation was successful or
                 status_code = BAD_GATEWAY if not and
-                text = message for the success of creating the directory
-                text = an error message if the operation was not successful
+                text = success message if the operation was successful or
+                text = an error message if not
         """
         path = '../output/db_output/'
         status, folder_path_message = create_dir(path)
@@ -428,8 +473,7 @@ class RequestHandler(http.server.BaseHTTPRequestHandler):
             if not status == OK:
                 return status, message
 
-        # if none of the above queries resulted in an error, return successful
-        return OK, "Successfully created all directories"
+        return OK, "Successfully wrote to output for all result sets."
 
     def to_csv(self, result_id, daily_cols, annual_cols, daily_manure_cols,
                annual_manure_cols, farm_es_cols):
@@ -439,20 +483,25 @@ class RequestHandler(http.server.BaseHTTPRequestHandler):
         in the output/db_output directory.
 
         Args:
-            result_id: the result ID for which the daily results,
-                annual results, variable descriptions, and input file will be
+            result_id: the result ID for which the output exported files will be
                 created
             daily_cols: string of the columns from the daily_results table that
                 will be in the resulting csv files
             annual_cols: string of the columns from the annual_results table
                 that will be in the resulting csv files
+            daily_manure_cols: string of the columns from the daily_manure
+                table that will be in the resulting csv files
+            annual_manure_cols: string of the columns from the annual_manure
+                table that will be in the resulting csv files
+            farm_es_cols: dictionary mapping the farm ES reports to the
+                variables in each report
 
         Returns:
             (status_code, text) where
                 status_code = OK if the operation was successful or
                 status_code = BAD_GATEWAY if not and
-                text = message for the success of creating the directory
-                text = an error message if the operation was not successful
+                text = an empty string if the operation was successful or
+                text = an error message if not
         """
         try:
             conn = sqlite3.connect(self.db_file)
@@ -477,148 +526,254 @@ class RequestHandler(http.server.BaseHTTPRequestHandler):
             input_data = json.loads(input_rows[0][0])
             conn.close()
 
-            daily_vars, daily_rows = self.read_table(result_id, 'daily_results',
-                                                     daily_cols)
-            annual_vars, annual_rows = self.read_table(result_id,
-                                                       'annual_results',
-                                                       annual_cols)
-            daily_manure_vars, daily_manure_rows = \
-                self.read_table(result_id, 'daily_manure', daily_manure_cols)
-            annual_manure_vars, annual_manure_rows = \
-                self.read_table(result_id, 'annual_manure', annual_manure_cols)
-
-            _, _, path = create_all_dirs(title, result_id)
-
-            write_csv(path + 'daily_results.csv', daily_vars, daily_rows)
-            write_csv(path + 'annual_results.csv', annual_vars,
-                      annual_rows)
-            write_csv(path + 'variable_descriptions.csv', description_cols,
-                      description_rows)
-
-            input_json_file_name = path + '/' + title + '_input.json'
-            input_json_file = open(input_json_file_name, "w")
-            json.dump(input_data, input_json_file, indent=4)
-            input_json_file.close()
-
-            write_csv(path + MANURE_PATH_SUFFIX + 'daily_manure.csv',
-                      daily_manure_vars, daily_manure_rows)
-            write_csv(path + MANURE_PATH_SUFFIX + 'annual_manure.csv',
-                      annual_manure_vars, annual_manure_rows)
-
-            self.write_farm_es_outputs(result_id, path + FARM_ES_PATH_SUFFIX,
-                                       farm_es_cols)
-
-            return OK, "Successfully wrote to result set's outputs."
-
         except Exception as e:
             error_message = "The program has encountered the following " \
                             "exception while connecting to or querying " + \
                             self.db_file + " to produce csv files from " \
                                            "result " + str(result_id) + \
-                            ":\n" + str(e)
+                            " in to_csv():\n" + str(e)
             return BAD_GATEWAY, error_message
 
+        status, result = self.read_table(result_id, 'daily_results', daily_cols)
+        if not status == OK:
+            return status, result
+        daily_vars, daily_rows = result
+
+        status, result = self.read_table(result_id, 'annual_results',
+                                         annual_cols)
+        if not status == OK:
+            return status, result
+        annual_vars, annual_rows = result
+
+        status, result = self.read_table(result_id, 'daily_manure',
+                                         daily_manure_cols)
+        if not status == OK:
+            return status, result
+        daily_manure_vars, daily_manure_rows = result
+
+        status, result = \
+            self.read_table(result_id, 'annual_manure', annual_manure_cols)
+        if not status == OK:
+            return status, result
+        annual_manure_vars, annual_manure_rows = result
+
+        status, message, path = create_all_dirs(title, result_id)
+        if not status == OK:
+            return status, message
+
+        # write to the JSON file
+        input_json_file_name = path + '/' + title + '_input.json'
+        input_json_file = open(input_json_file_name, "w")
+        json.dump(input_data, input_json_file, indent=4)
+        input_json_file.close()
+
+        # write to the CSV files
+        write_csv(path + 'daily_results.csv', daily_vars, daily_rows)
+        write_csv(path + 'annual_results.csv', annual_vars, annual_rows)
+        write_csv(path + 'variable_descriptions.csv', description_cols,
+                  description_rows)
+        write_csv(path + MANURE_PATH_SUFFIX + 'daily_manure.csv',
+                  daily_manure_vars, daily_manure_rows)
+        write_csv(path + MANURE_PATH_SUFFIX + 'annual_manure.csv',
+                  annual_manure_vars, annual_manure_rows)
+
+        status, result = \
+            self.write_farm_es_outputs(result_id, path + FARM_ES_PATH_SUFFIX,
+                                       farm_es_cols)
+
+        return status, result
+
     def write_farm_es_outputs(self, result_id, write_path, farm_es_cols):
+        """
+        Calls the appropriate method for each of the reports.
+
+        Args:
+            result_id: int corresponding the ID of the result set
+            write_path: the directory in which to write the results
+            farm_es_cols: dictionary mapping the reports to the variables in
+                each report that the user selected
+
+        Returns:
+            (status_code, text) where
+                status_code = OK if the operation was successful or
+                status_code = BAD_GATEWAY if not and
+                text = an empty string if the operation was successful or
+                text = an error message if not
+        """
         if len(farm_es_cols['summary_cols']) > 0:
-            self.write_farm_summary_outputs(write_path +
-                                            FARM_ES_SUMMARY_PATH_SUFFIX,
-                                            result_id,
-                                            farm_es_cols['summary_cols'])
+            status, result = \
+                self.write_farm_summary_outputs(write_path +
+                                                FARM_ES_SUMMARY_PATH_SUFFIX,
+                                                result_id,
+                                                farm_es_cols['summary_cols'])
+            if not status == OK:
+                return status, result
 
         if len(farm_es_cols['cow_print_cols']) > 0:
-            self.write_cow_print(write_path, result_id,
-                                 farm_es_cols['cow_print_cols'])
+            status, result = \
+                self.write_cow_print(write_path, result_id,
+                                     farm_es_cols['cow_print_cols'])
+
+            if not status == OK:
+                return status, result
 
         if len(farm_es_cols['feed_print_cols']) > 0:
-            self.write_feed_print(write_path + FARM_ES_FEED_PRINT_PATH_SUFFIX,
-                                  result_id, farm_es_cols['feed_print_cols'])
+            status, result = \
+                self.write_feed_print(write_path +
+                                      FARM_ES_FEED_PRINT_PATH_SUFFIX,
+                                      result_id,
+                                      farm_es_cols['feed_print_cols'])
+
+            if not status == OK:
+                return status, result
 
         if len(farm_es_cols['manure_print_cols']) > 0:
-            self.write_manure_print(write_path, result_id, farm_es_cols[
-                'manure_print_cols'])
+            status, result = \
+                self.write_manure_print(write_path, result_id,
+                                        farm_es_cols['manure_print_cols'])
+
+            if not status == OK:
+                return status, result
 
         if len(farm_es_cols['energy_print_cols']) > 0:
-            self.write_energy_print(write_path, result_id,
-                                    farm_es_cols['energy_print_cols'])
+            status, result = \
+                self.write_energy_print(write_path, result_id,
+                                        farm_es_cols['energy_print_cols'])
+
+            if not status == OK:
+                return status, result
+
+        return OK, ""
 
     def write_farm_summary_outputs(self, write_path, result_id, summary_vars):
+        """
+        Writes the summary report of the Farm ES reports.
+
+        Args:
+            write_path: the directory in which to write the results
+            result_id: int corresponding the ID of the result set
+            summary_vars: str of a comma separated list of the variables to
+                be included in the CSV files
+
+        Returns:
+            (status_code, text) where
+                status_code = OK if the operation was successful or
+                status_code = BAD_GATEWAY if not and
+                text = an empty string if the operation was successful or
+                text = an error message if not:
+        """
         # find the intersection of the 'summary_vars' and the columns in
         # each of the energy_print, cow_print, grown_feed_info,
         # and purchased_feed_info tables to find the data that the user
         # specified
-        desired_energy_print_cols = self.find_desired_cols(result_id,
-                                                           'energy_print',
-                                                           summary_vars)
-        desired_cow_print_cols = self.find_desired_cols(result_id, 'cow_print',
-                                                        summary_vars)
-        desired_grown_feed_cols = self.find_desired_cols(result_id,
-                                                         'grown_feed_info',
-                                                         summary_vars)
-        desired_purchased_feed_cols = \
+        status, desired_energy_print_cols = \
+            self.find_desired_cols(result_id, 'energy_print', summary_vars)
+        if not status == OK:
+            return status, desired_energy_print_cols
+
+        status, desired_cow_print_cols = \
+            self.find_desired_cols(result_id, 'cow_print', summary_vars)
+        if not status == OK:
+            return status, desired_cow_print_cols
+
+        status, desired_grown_feed_cols = \
+            self.find_desired_cols(result_id, 'grown_feed_info', summary_vars)
+        if not status == OK:
+            return status, desired_grown_feed_cols
+
+        status, desired_purchased_feed_cols = \
             self.find_desired_cols(result_id, 'purchased_feed_info',
                                    summary_vars)
+        if not status == OK:
+            return status, desired_purchased_feed_cols
 
-        try:
-            conn = sqlite3.connect(self.db_file)
-            conn.row_factory = sqlite3.Row
-            c = conn.cursor()
+        cols_in_energy_join_cow = "energy_print.result_id, " \
+                                  "energy_print.year, " + \
+                                  ",".join(desired_energy_print_cols +
+                                           desired_cow_print_cols)
+        status, result = \
+            self.perform_join(result_id, 'energy_print', 'cow_print',
+                              cols_in_energy_join_cow)
+        if not status == OK:
+            return status, result
+        result_col_names, result_rows = result
 
-            cols_in_energy_join_cow = ",".join(desired_energy_print_cols +
-                                               desired_cow_print_cols)
+        write_csv(write_path + 'energy_and_cow_summary.csv',
+                  result_col_names, result_rows)
 
-            result_id_param = (result_id,)
-            query = 'SELECT energy_print.result_id, energy_print.year, ' \
-                    '' + cols_in_energy_join_cow + \
-                    ' FROM energy_print JOIN cow_print ' + \
-                    'ON energy_print.result_id = cow_print.result_id AND ' + \
-                    'energy_print.year = cow_print.year WHERE ' + \
-                    'energy_print.result_id =?'
-            c.execute(query, result_id_param)
-            result_col_names = [description[0] for description in c.description]
-            result_rows = c.fetchall()
+        if len(desired_grown_feed_cols) > 0:
+            desired_grown_feed_cols = 'result_id,year,feed_id,' + \
+                                      ",".join(desired_grown_feed_cols)
 
-            conn.close()
+            status, result = \
+                self.read_table(result_id, 'grown_feed_info',
+                                desired_grown_feed_cols)
+            if not status == OK:
+                return status, result
+            result_col_names, result_rows = result
 
-            write_csv(write_path + 'energy_and_cow_summary.csv',
+            write_csv(write_path + 'grown_feed_summary.csv',
                       result_col_names, result_rows)
 
-            if len(desired_grown_feed_cols) > 0:
-                desired_grown_feed_cols = 'result_id,year,feed_id,' + \
-                                          ",".join(desired_grown_feed_cols)
+        if len(desired_purchased_feed_cols) > 0:
+            desired_purchased_feed_cols = 'result_id,year,feed_id,' + \
+                                      ",".join(desired_purchased_feed_cols)
 
-                result_col_names, result_rows = \
-                    self.read_table(result_id, 'grown_feed_info',
-                                    desired_grown_feed_cols)
+            status, result = \
+                self.read_table(result_id, 'purchased_feed_info',
+                                desired_purchased_feed_cols)
+            if not status == OK:
+                return status, result
+            result_col_names, result_rows = result
 
-                write_csv(write_path + 'grown_feed_summary.csv',
-                          result_col_names, result_rows)
+            write_csv(write_path + 'purchased_feed_summary.csv',
+                      result_col_names, result_rows)
 
-            if len(desired_purchased_feed_cols) > 0:
-                desired_purchased_feed_cols = 'result_id,year,feed_id,' + \
-                                          ",".join(desired_purchased_feed_cols)
-
-                result_col_names, result_rows = \
-                    self.read_table(result_id, 'purchased_feed_info',
-                                    desired_purchased_feed_cols)
-
-                write_csv(write_path + 'purchased_feed_summary.csv',
-                          result_col_names, result_rows)
-
-        except Exception as e:
-            error_message = "The program has encountered the following " \
-                            "exception while connecting to or querying " + \
-                            self.db_file + " to produce csv files from " \
-                                           "result " + str(result_id) + \
-                            ":\n" + str(e)
-            return BAD_GATEWAY, error_message
+        return OK, ""
 
     def write_cow_print(self, write_path, result_id, cow_print_vars):
-        result_col_names, result_rows = self.read_table(result_id, 'cow_print',
-                                                        cow_print_vars)
+        """
+        Writes the cow print report of the Farm ES reports.
+
+        Args:
+            write_path: the directory in which to write the results
+            result_id: int corresponding the ID of the result set
+            cow_print_vars: str of a comma separated list of the variables to
+                be included in the CSV files
+
+        Returns:
+            (status_code, text) where
+                status_code = OK if the operation was successful or
+                status_code = BAD_GATEWAY if not and
+                text = an empty string if the operation was successful or
+                text = an error message if not:
+        """
+        status, result = self.read_table(result_id, 'cow_print', cow_print_vars)
+        if not status == OK:
+            return status, result
+        result_col_names, result_rows = result
 
         write_csv(write_path + 'cow_print.csv', result_col_names, result_rows)
 
+        return OK, ""
+
     def write_feed_print(self, write_path, result_id, feed_print_vars):
+        """
+        Writes the feed print report of the Farm ES reports.
+
+        Args:
+            write_path: the directory in which to write the results
+            result_id: int corresponding the ID of the result set
+            feed_print_vars: str of a comma separated list of the variables to
+                be included in the CSV files
+
+        Returns:
+            (status_code, text) where
+                status_code = OK if the operation was successful or
+                status_code = BAD_GATEWAY if not and
+                text = an empty string if the operation was successful or
+                text = an error message if not:
+        """
         try:
             conn = sqlite3.connect(self.db_file)
             conn.row_factory = sqlite3.Row
@@ -634,36 +789,6 @@ class RequestHandler(http.server.BaseHTTPRequestHandler):
             while row is not None:
                 feed_print_columns.add(dict(row)['name'])
                 row = c.fetchone()
-
-            desired_feed_print_cols = \
-                list(feed_print_columns.intersection(set(
-                    feed_print_vars.split(','))))
-
-            # the feed print summary also includes a few variables from other
-            # the annual_results table
-            annual_results_cols = {'total_P_runoff', 'total_N_runoff',
-                                   'total_N_leaching'}
-            desired_annual_cols = list(annual_results_cols.intersection(set(
-                feed_print_vars.split(','))))
-
-            cols_in_annual_join_feed = ",".join(desired_feed_print_cols
-                                                + desired_annual_cols)
-
-            result_id_param = (result_id,)
-            query = 'SELECT annual_results.result_id, annual_results.year, ' \
-                    'annual_results.num_days_in_year,' \
-                    '' + cols_in_annual_join_feed + \
-                    ' FROM annual_results JOIN feed_print ' + \
-                    'ON annual_results.result_id = feed_print.result_id AND '\
-                    + \
-                    'annual_results.year = feed_print.year WHERE ' + \
-                    'annual_results.result_id =?'
-            c.execute(query, result_id_param)
-            result_col_names = [description[0] for description in c.description]
-            result_rows = c.fetchall()
-
-            write_csv(write_path + 'feed_print.csv', result_col_names,
-                      result_rows)
 
             query = "PRAGMA table_info('purchased_feed_info');"
             c.execute(query)
@@ -684,9 +809,12 @@ class RequestHandler(http.server.BaseHTTPRequestHandler):
                                                'num_days_in_year'] + \
                                               desired_purchased_feed_cols
 
-                result_col_names, result_rows = \
+                status, result = \
                     self.read_table(result_id, 'purchased_feed_info',
                                     ",".join(desired_purchased_feed_cols))
+                if not status == OK:
+                    return status, result
+                result_col_names, result_rows = result
 
                 write_csv(write_path + 'purchased_feed_print.csv',
                           result_col_names, result_rows)
@@ -698,10 +826,56 @@ class RequestHandler(http.server.BaseHTTPRequestHandler):
                             "exception while connecting to or querying " + \
                             self.db_file + " to produce csv files from " \
                                            "result " + str(result_id) + \
-                            ":\n" + str(e)
+                            " in write_feed_print():\n" + str(e)
             return BAD_GATEWAY, error_message
 
+        desired_feed_print_cols = \
+            list(feed_print_columns.intersection(set(
+                feed_print_vars.split(','))))
+
+        # the feed print summary also includes a few variables from other
+        # the annual_results table
+        annual_results_cols = {'total_P_runoff', 'total_N_runoff',
+                               'total_N_leaching'}
+        desired_annual_cols = list(annual_results_cols.intersection(set(
+            feed_print_vars.split(','))))
+
+        cols_in_annual_join_feed = "annual_results.result_id, " \
+                                   "annual_results.year, " \
+                                   "annual_results.num_days_in_year," + \
+                                   ",".join(desired_feed_print_cols
+                                            + desired_annual_cols)
+
+        status, result = \
+            self.perform_join(result_id, 'annual_results', 'feed_print',
+                              cols_in_annual_join_feed)
+        if not status == OK:
+            return status, result
+        result_col_names, result_rows = result
+
+        write_csv(write_path + 'feed_print.csv', result_col_names,
+                  result_rows)
+
+        return OK, ""
+
     def write_manure_print(self, write_path, result_id, manure_print_vars):
+        """
+        Writes the manure print report of the Farm ES reports.
+
+        Args:
+            write_path: the directory in which to write the results
+            result_id: int corresponding the ID of the result set
+            manure_print_vars: str of a comma separated list of the variables to
+                be included in the CSV files
+
+        Returns:
+            (status_code, text) where
+                status_code = OK if the operation was successful or
+                status_code = BAD_GATEWAY if not and
+                text = an empty string if the operation was successful or
+                text = an error message if not:
+
+        """
         try:
             conn = sqlite3.connect(self.db_file)
             conn.row_factory = sqlite3.Row
@@ -742,20 +916,59 @@ class RequestHandler(http.server.BaseHTTPRequestHandler):
                             "exception while connecting to or querying " + \
                             self.db_file + " to produce csv files from " \
                                            "result " + str(result_id) + \
-                            ":\n" + str(e)
+                            " in write_manure_print():\n" + str(e)
             return BAD_GATEWAY, error_message
 
-    def write_energy_print(self, write_path, result_id, energy_print_vars):
-        result_col_names, result_rows = self.read_table(result_id,
-                                                        'energy_print',
-                                                        energy_print_vars)
+        return OK, ""
 
-        write_csv(write_path + 'energy_print.csv',
-                  result_col_names, result_rows)
+    def write_energy_print(self, write_path, result_id, energy_print_vars):
+        """
+        Writes the energy print report of the Farm ES reports.
+
+        Args:
+            write_path: the directory in which to write the results
+            result_id: int corresponding the ID of the result set
+            energy_print_vars: str of a comma separated list of the variables to
+                be included in the CSV files
+
+         Returns:
+            (status_code, text) where
+                status_code = OK if the operation was successful or
+                status_code = BAD_GATEWAY if not and
+                text = an empty string if the operation was successful or
+                text = an error message if not:
+        """
+        status, result = self.read_table(result_id, 'energy_print',
+                                         energy_print_vars)
+        if not status == OK:
+            return status, result
+
+        result_col_names, result_rows = result
+
+        write_csv(write_path + 'energy_print.csv', result_col_names,
+                  result_rows)
+
+        return OK, ""
 
     # GENERAL DATABASE QUERY METHODS
     def read_table(self, result_id, table, cols):
-        # cols: comma separated list of columns
+        """
+        Reads the given table and returns the data.
+
+        Args:
+            result_id: int corresponding the ID of the result set
+            table: str of the table to read from
+            cols: comma separated list of the columns to be read
+
+        Returns:
+            (status_code, obj) where
+                status_code = OK if the operation was successful or
+                status_code = BAD_GATEWAY if not and
+                obj = a tuple containing the resulting column names and
+                    the resulting rows if the operation was successful or
+                obj = an error message if not:
+
+        """
         try:
             conn = sqlite3.connect(self.db_file)
             conn.row_factory = sqlite3.Row
@@ -763,25 +976,22 @@ class RequestHandler(http.server.BaseHTTPRequestHandler):
 
             result_id_param = (result_id,)
 
-            # get data from daily results
-            daily_query = "SELECT " + cols + \
-                          " FROM " + table + " WHERE result_id=?"
-            c.execute(daily_query, result_id_param)
+            query = "SELECT " + cols + " FROM " + table + " WHERE result_id=?"
+            c.execute(query, result_id_param)
             result_col_names = [description[0] for description in c.description]
             result_rows = c.fetchall()
 
             conn.close()
-
-            return result_col_names, result_rows
-            # TODO fix error handling here
 
         except Exception as e:
             error_message = "The program has encountered the following " \
                             "exception while connecting to or querying " + \
                             self.db_file + " to produce csv files from " \
                                            "result " + str(result_id) + \
-                            ":\n" + str(e)
+                            " in read_table():\n" + str(e)
             return BAD_GATEWAY, error_message
+
+        return OK, (result_col_names, result_rows)
 
     def delete_results_set(self, id_to_delete):
         """
@@ -792,7 +1002,7 @@ class RequestHandler(http.server.BaseHTTPRequestHandler):
             (status_code, text) where
                 status_code = OK if the operation was successful or
                 status_code = BAD_GATEWAY if not and
-                text = empty string if the operation was successful or
+                text = success message if the operation was successful or
                 text = an error message if not
         """
         try:
@@ -800,25 +1010,53 @@ class RequestHandler(http.server.BaseHTTPRequestHandler):
             conn.row_factory = sqlite3.Row
             c = conn.cursor()
 
-            c.execute(
-                "DELETE FROM results WHERE result_id=?", (id_to_delete,))
+            c.execute("DELETE FROM results WHERE result_id=?", (id_to_delete,))
             c.execute("DELETE FROM daily_results WHERE result_id=?",
                       (id_to_delete,))
             c.execute("DELETE FROM annual_results WHERE result_id=?",
                       (id_to_delete,))
-            # TODO DELETE OTHER TABLES, CASCADING DELETE??
+            c.execute("DELETE FROM daily_manure WHERE result_id=?",
+                      (id_to_delete,))
+            c.execute("DELETE FROM annual_manure WHERE result_id=?",
+                      (id_to_delete,))
+            c.execute("DELETE FROM cow_print WHERE result_id=?",
+                      (id_to_delete,))
+            c.execute("DELETE FROM energy_print WHERE result_id=?",
+                      (id_to_delete,))
+            c.execute("DELETE FROM feed_print WHERE result_id=?",
+                      (id_to_delete,))
+            c.execute("DELETE FROM grown_feed_info WHERE result_id=?",
+                      (id_to_delete,))
+            c.execute("DELETE FROM purchased_feed_info WHERE result_id=?",
+                      (id_to_delete,))
+
             conn.commit()
             conn.close()
-            return OK, ""
-
         except Exception as e:
             error_message = "The program has encountered the following " \
                             "exception while connecting to and querying " + \
                             self.db_file + " to delete result " + \
-                            str(id_to_delete) + ":\n" + str(e)
+                            str(id_to_delete) + " in delete_results_set():\n"\
+                            + str(e)
             return BAD_GATEWAY, error_message
 
+        return OK, "Successfully deleted result set"
+
     def get_columns(self, table):
+        """
+        Returns the columns of the given table.
+
+        Args:
+            table: str of the table from which to read the columns
+
+        Returns:
+            (status_code, obj) where
+                status_code = OK if the operation was successful or
+                status_code = BAD_GATEWAY if not and
+                obj = the columns of the given table if the operation was
+                    successful or
+                obj = an error message if not
+        """
         try:
             conn = sqlite3.connect(self.db_file)
             conn.row_factory = sqlite3.Row
@@ -832,21 +1070,82 @@ class RequestHandler(http.server.BaseHTTPRequestHandler):
                 columns.append(dict(row)['name'])
                 row = c.fetchone()
 
-            return OK, columns
+            conn.close()
 
         except Exception as e:
             error_message = "The program has encountered the following " \
                             "exception while connecting to or querying " + \
-                            self.db_file + " to obtain stored results:\n" \
-                            + str(e)
+                            self.db_file + " to obtain stored results in " \
+                                           "get_columns():\n" + str(e)
             return BAD_GATEWAY, error_message
 
-    def perform_join(self):
-        # TODO this
-        pass
+        return OK, columns
+
+    def perform_join(self, result_id,  left_table, right_table,
+                     desired_columns):
+        """
+        Executes a SQL join on the given tables on the 'result_id' and 'year'
+        columns.
+
+        Args:
+            result_id: int corresponding the ID of the result set
+            left_table: str representing the left table of the join
+            right_table: str representing the right table of the join
+            desired_columns: the columns in the SELECT clause
+
+        Returns:
+            (status_code, obj) where
+                status_code = OK if the operation was successful or
+                status_code = BAD_GATEWAY if not and
+                obj = a tuple containing the resulting column names and
+                    the resulting rows if the operation was successful or
+                obj = an error message if not
+        """
+        try:
+            conn = sqlite3.connect(self.db_file)
+            conn.row_factory = sqlite3.Row
+            c = conn.cursor()
+
+            result_id_param = (result_id,)
+            query = 'SELECT ' + desired_columns + \
+                    ' FROM ' + left_table + ' JOIN ' + right_table + \
+                    ' ON ' + left_table + '.result_id = ' + \
+                    right_table + '.result_id AND ' + \
+                    left_table + '.year = ' + right_table + '.year WHERE ' + \
+                    left_table + '.result_id =?'
+            c.execute(query, result_id_param)
+            result_col_names = [description[0] for description in c.description]
+            result_rows = c.fetchall()
+
+            conn.close()
+
+        except Exception as e:
+            error_message = "The program has encountered the following " \
+                            "exception while connecting to or querying " + \
+                            self.db_file + " to produce csv files from " \
+                                           "result " + str(result_id) + \
+                            " in perform_join():\n" + str(e)
+            return BAD_GATEWAY, error_message
+
+        return OK, (result_col_names, result_rows)
 
     def find_desired_cols(self, result_id, table, columns):
-        # intersection with energy_print columns
+        """
+        Returns the intersection between the given columns and the columns of
+        the given table.
+
+        Args:
+            result_id: int corresponding the ID of the result set
+            table: str of the table to read the columns from
+            columns: list of columns that is the right half of the intersection
+
+        Returns:
+            (status_code, obj) where
+                status_code = OK if the operation was successful or
+                status_code = BAD_GATEWAY if not and
+                obj = the desired columns if the operation was successful or
+                obj = an error message if not
+        """
         try:
             conn = sqlite3.connect(self.db_file)
             conn.row_factory = sqlite3.Row
@@ -862,19 +1161,19 @@ class RequestHandler(http.server.BaseHTTPRequestHandler):
 
             conn.close()
 
-            desired_cols = \
-                list(table_columns.intersection(set(
-                    columns.split(','))))
-
-            return desired_cols
-
         except Exception as e:
             error_message = "The program has encountered the following " \
                             "exception while connecting to or querying " + \
                             self.db_file + " to produce csv files from " \
                                            "result " + str(result_id) + \
-                            ":\n" + str(e)
+                            " in find_desired_cols():\n" + str(e)
             return BAD_GATEWAY, error_message
+
+        desired_cols = \
+            list(table_columns.intersection(set(
+                columns.split(','))))
+
+        return OK, desired_cols
 
     def re_title(self, id_to_re_title, new_title):
         """
@@ -899,14 +1198,14 @@ class RequestHandler(http.server.BaseHTTPRequestHandler):
 
             conn.close()
 
-            return OK, ""
-
         except Exception as e:
             error_message = "The program has encountered the following " \
                             "exception while connecting to or querying " + \
                             self.db_file + " to rename result " + \
-                            str(id_to_re_title) + ":\n" + str(e)
+                            str(id_to_re_title) + " in re_title():\n" + str(e)
             return BAD_GATEWAY, error_message
+
+        return OK, ""
 
 
 # start the server locally at PORT

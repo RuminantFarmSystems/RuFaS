@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>RUFAS DB</title>
+    <title>RuFaS DB</title>
 
     <style>
         body {
@@ -41,7 +41,7 @@
 </head>
 
 <body>
-<h1>RUFAS Outputs Database</h1>
+<h1>RuFaS Outputs Database</h1>
 <details>
     <summary>Information</summary>
         Here's how you can interact with the stored outputs database: <br>
@@ -52,7 +52,7 @@
                     <li>Export data: select <b>one (or more)</b> result IDs to export <br>
                         as a group of files (CSV and JSON) to MASM/output/db_output. <br>
                         You can also select which of the columns you want to export in <br>
-                        the CSV files for the daily and annual results.</li>
+                        the CSV files for each of the different tables/output sets.</li>
                     <li>Delete data: select <b>one</b> result ID to delete from the database. <br>
                         Warning: you cannot undo this action.</li>
                     <li>Rename data: select <b>one</b> result ID to rename. Type the new <br>
@@ -75,7 +75,7 @@
 <details>
     <summary>Filter Information</summary>
     You can filter the results that you see in the table below by entering the <br>
-    body of a SQL WHERE clause. For example, if you wanted to see all results <br>
+    body of the SQL WHERE clause. For example, if you wanted to see all results <br>
     for which the user column is 'bob', you would type <i>user='bob'</i>. You can <br>
     filter by any of the columns shown in the table. <br>
     Here are some more examples of filters you can apply:
@@ -261,40 +261,58 @@
     }
 
     /**
-     * Enable the checkboxes which represent the daily_results and
-     * annual_results columns.
+     * Enable all sets of checkboxes.
      */
     function enableCheckboxes() {
-        // enable daily checkboxes
-        let daily_vars = document.getElementsByClassName('daily_var');
-        for (let i = 0; i < daily_vars.length; i++) {
-            daily_vars[i].disabled = false;
-        }
+        enableCheckboxesOfClass("daily_var");
+        enableCheckboxesOfClass("annual_var");
+        enableCheckboxesOfClass("daily_manure");
+        enableCheckboxesOfClass("annual_manure");
+        enableCheckboxesOfClass("summary");
+        enableCheckboxesOfClass("cow_print");
+        enableCheckboxesOfClass("feed_print");
+        enableCheckboxesOfClass("manure_print");
+        enableCheckboxesOfClass("energy_print");
+    }
 
-        // enable annual checkboxes
-        let annual_vars = document.getElementsByClassName('annual_var');
-        for (let i = 0; i < annual_vars.length; i++) {
-            annual_vars[i].disabled = false;
+    /**
+     * Enable the set of checkboxes under the given class name.
+     *
+     * @param className The class name of the set of checkboxes to be enabled.
+     */
+    function enableCheckboxesOfClass(className) {
+        let vars = document.getElementsByClassName(className);
+        for (let i = 0; i < vars.length; i++) {
+            vars[i].disabled = false;
         }
     }
 
     /**
-     * Disables and un-checks the checkboxes which represent the daily_results
-     * and annual_results columns.
+     * Disables and un-checks all sets of checkboxes.
      */
     function disableCheckboxes() {
-        // disable daily checkboxes
-        let daily_vars = document.getElementsByClassName('daily_var');
-        for (let i = 0; i < daily_vars.length; i++) {
-            daily_vars[i].disabled = true;
-            daily_vars[i].checked = true;
-        }
+        disableCheckboxesOfClass("daily_var");
+        disableCheckboxesOfClass("annual_var");
+        disableCheckboxesOfClass("daily_manure");
+        disableCheckboxesOfClass("annual_manure");
+        disableCheckboxesOfClass("summary");
+        disableCheckboxesOfClass("cow_print");
+        disableCheckboxesOfClass("feed_print");
+        disableCheckboxesOfClass("manure_print");
+        disableCheckboxesOfClass("energy_print");
+    }
 
-        // disable annual checkboxes
-        let annual_vars = document.getElementsByClassName('annual_var');
-        for (let i = 0; i < annual_vars.length; i++) {
-            annual_vars[i].disabled = true;
-            annual_vars[i].checked = true;
+    /**
+     * Disable and uncheck the set of checkboxes under the given class name.
+     *
+     * @param className The class name of the set of checkboxes to be disabled
+     * and unchecked.
+     */
+    function disableCheckboxesOfClass(className) {
+        let vars = document.getElementsByClassName(className);
+        for (let i = 0; i < vars.length; i++) {
+            vars[i].disabled = true;
+            vars[i].checked = true;
         }
     }
 
@@ -334,8 +352,8 @@
     /**
      * Un-selects all of the checkboxes in the grid referencing the rows in the
      * results table in the database. Also disables the radio buttons, the
-     * rename text area, and the checkboxes relating to the column names in the
-     * daily and annual results tables.
+     * rename text area, and the checkboxes referring to the column names of the
+     * data that can be exported.
      */
     function unselectAllRows() {
         let grid = document.getElementById("table");
@@ -353,7 +371,7 @@
      * Iterates through the checkboxes for the results to accumulate a list of
      * the selected ones. Returns this list.
      *
-     * @returns {Array} an array of strings of the IDs of the selected results
+     * @returns {Array} An array of strings of the IDs of the selected results
      */
     function getSelected() {
         let grid = document.getElementById("table");
@@ -392,40 +410,14 @@
     }
 
     /**
-     * Iterates through the checkboxes for the names of the daily_results
-     * columns and returns the list of the selected ones.
+     * Iterates through the checkboxes for the names of the columns returns
+     * the list of the selected ones.
      *
-     * @returns {Array} an array of strings of the checked daily column names
-     */
-    function getDailyColumnCheckboxes() {
-        let daily_cols = document.getElementsByClassName('daily_var');
-        let result = [];
-        for (let i = 0; i < daily_cols.length; i++) {
-            if (daily_cols[i].checked) {
-                result.push(daily_cols[i].getAttribute('value'));
-            }
-        }
-        return result;
-    }
-
-    /**
-     * Iterates through the checkboxes for the names of the annual_results
-     * columns and returns the list of the selected ones.
+     * @param className The name of the class of the checkboxes to iterate
+     * through
      *
-     * @returns {Array} an array of the strings of the checked annual column
-     * names
+     * @returns {Array} An array of the strings of the checked column names
      */
-    function getAnnualColumnCheckboxes() {
-        let annual_cols = document.getElementsByClassName('annual_var');
-        let result = [];
-        for (let i = 0; i < annual_cols.length; i++) {
-            if (annual_cols[i].checked) {
-                result.push(annual_cols[i].getAttribute('value'));
-            }
-        }
-        return result;
-    }
-
     function getColumnCheckBoxes(className) {
         let cols = document.getElementsByClassName(className);
         let result = [];
@@ -517,8 +509,8 @@
             }
         };
         let url = "/export?id=" + selected.join()
-            + "&daily=" + getDailyColumnCheckboxes().join()
-            + "&annual=" + getAnnualColumnCheckboxes().join()
+            + "&daily=" + getColumnCheckBoxes('daily_var').join()
+            + "&annual=" + getColumnCheckBoxes('annual_var').join()
             + "&daily_manure=" + getColumnCheckBoxes('daily_manure').join()
             + "&annual_manure=" + getColumnCheckBoxes('annual_manure').join()
             + "&summary=" + getColumnCheckBoxes('summary').join()
@@ -561,7 +553,7 @@
 
     /**
      * Sends the getResults request to the server and displays the table as well
-     * as the column names of daily_results and annual_results.
+     * as the column names of the tables with data for exporting.
      *
      * @param filter (optional) the filter text to be appended to the end of the
      * query to obtain the results in the database
@@ -583,17 +575,21 @@
     }
 
     /**
-     * Calls createTable(), displayDailyVarChecklist(), and displayAnnualVarChecklist()
-     * with the information provided by the server about what should go in the
-     * respective parts of the HTML page.
+     * Calls createTable() and displayVarChecklist() with the information
+     * provided by the server about what should go in the respective parts
+     * of the HTML page.
      *
      * @param response_json The json that contains all of the information to be
      * displayed.
      */
     function refresh(response_json) {
         createTable(response_json["results_table"]);
-        displayDailyVarChecklist(response_json["daily_columns"]);
-        displayAnnualVarChecklist(response_json["annual_columns"]);
+
+        displayVarChecklist("daily_var_checklist",
+            response_json["daily_columns"], "daily_var");
+
+        displayVarChecklist("annual_var_checklist",
+            response_json["annual_columns"], "annual_var");
 
         displayVarChecklist("daily_manure_checklist",
             response_json["manure"]["daily"], "daily_manure");
@@ -618,35 +614,12 @@
     }
 
     /**
-     * Inserts the HTML for daily variable columns.
+     * Inserts the HTML for column name checklist.
      *
-     * @param daily_vars The list of column names of the daily_results table
+     * @param elementID The ID of the div in which the checkboxes should be placed
+     * @param vars The list of column names that should become checkboxes
+     * @param type The type of column; becomes the class name of each checkbox
      */
-    function displayDailyVarChecklist(daily_vars) {
-        let divContainer = document.getElementById("daily_var_checklist");
-        divContainer.innerHTML = "";
-        for(let i = 0; i < daily_vars.length; i++) {
-            let variable = daily_vars[i];
-            let element_id = "daily_" + variable;
-            divContainer.innerHTML += "<input type=\"checkbox\" id=" + element_id + " class=\"daily_var\" value=" + variable + " checked=true disabled=true> <label for=" + element_id + ">" + variable + "</label><br>";
-        }
-    }
-
-    /**
-     * Inserts the HTML for annual variable columns.
-     *
-     * @param annual_vars The list of column names of the annual_results table
-     */
-    function displayAnnualVarChecklist(annual_vars) {
-        let divContainer = document.getElementById("annual_var_checklist");
-        divContainer.innerHTML = "";
-        for(let i = 0; i < annual_vars.length; i++) {
-            let variable = annual_vars[i];
-            let element_id = "annual_" + variable;
-            divContainer.innerHTML += "<input type=\"checkbox\" id=" + element_id + " class=\"annual_var\" value=" + variable + " checked=true disabled=true> <label for=" + element_id + ">" + variable + "</label><br>";
-        }
-    }
-
     function displayVarChecklist(elementID, vars, type) {
         let divContainer = document.getElementById(elementID);
         divContainer.innerHTML = "";
