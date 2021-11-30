@@ -458,7 +458,7 @@ class HeiferII(HeiferI):
         if self.days_born - self.synch_ed_program_start_day_h == 14:
                     # second round of injection
             self.events.add_event(self.days_born, sim_day,c.INJECT_PGF)
-            self.PGF_injections = self.PGF_injections + 17
+            self.PGF_injections = self.PGF_injections + 1
             self.determine_synch_ed_estrus_day(self.days_born, 3, 2, 7)
 
         if self.days_born == self.synch_ed_estrus_day:
@@ -472,6 +472,11 @@ class HeiferII(HeiferI):
                     self.ai_day = self.synch_ed_estrus_day + 1
                     self.conception_rate = \
                         AnimalBase.config['estrus_conception_rate']
+                else:
+                    # finish up with TAI
+                    self.synch_ed_stop_day = self.synch_ed_program_start_day_h + 21
+                    self.tai_program_start_day_h = self.synch_ed_stop_day
+                    self.tai_update(sim_day)
             else:
                     # second round of injection failed,
                     # finish up with TAI
@@ -529,6 +534,7 @@ class HeiferII(HeiferI):
         Assign breeding method for open heifers after spot open at preg check
         three methods can be assigned: ED, TAI, synch-ED
         """
+        self.ai_day = 0
         if self.repro_program == 'ED':
             self.estrus_day = self.determine_estrus_day(self.abortion_day, c.ESTRUS_AFTER_ABORTION_NOTE, sim_day)
         elif self.repro_program == 'TAI':
@@ -562,6 +568,7 @@ class HeiferII(HeiferI):
             conception_rand = random()
             if conception_rand < self.conception_rate:
                 self.days_in_preg = 1
+                self.abortion_day = 0
                 self.breeding_to_preg_time = self.days_born - AnimalBase.config['breeding_start_day_h']
                 self.gestation_length = int(truncnorm.rvs(-2, 2, AnimalBase.config['avg_gestation_len'],\
                         AnimalBase.config['std_gestation_len']))
@@ -574,7 +581,6 @@ class HeiferII(HeiferI):
                         AnimalBase.config['birth_weight_avg_je'], AnimalBase.config['birth_weight_std_je'])
                 self.events.add_event(self.days_born, sim_day, c.HEIFER_PREG)
             else:
-                self.ai_day = 0
                 self.estrus_day = self.determine_estrus_day(
                     self.estrus_day, c.ESTRUS_AFTER_AI_NOTE,sim_day)
                 self.events.add_event(self.days_born, sim_day, c.HEIFER_NOT_PREG)
