@@ -19,12 +19,12 @@ DO_NOT_BREED = "mark as do not breed"
 # estrus occurred
 ESTRUS_DETECTED = "estrus detected"
 BASIC_ESTRUS_NOTE = "estrus"
-ESTRUS_AFTER_AI_NOTE = "estrus after AI"
-ESTRUS_AFTER_ABORTION_NOTE = "estrus after abortion"
-FIRST_ESTRUS_NOTE = "first estrus"
-ESTRUS_AFTER_CALVING_NOTE = "1st estrus after calving"
-ESTRUS_BEFORE_VWP_NOTE = "estrus occurred before vwp"
-ESTRUS_AFTER_PGF_NOTE = "estrus after PGF"
+ESTRUS_AFTER_AI_NOTE = "estrus after AI scheduled"
+ESTRUS_AFTER_ABORTION_NOTE = "estrus after abortion scheduled"
+FIRST_ESTRUS_NOTE = "first estrus scheduled"
+ESTRUS_AFTER_CALVING_NOTE = "1st estrus after calving scheduled"
+ESTRUS_BEFORE_VWP_NOTE = "estrus occurred before vwp scheduled"
+ESTRUS_AFTER_PGF_NOTE = "estrus after PGF scheduled"
 
 # TAI injections
 INJECT_GNRH = "inject GnRH"
