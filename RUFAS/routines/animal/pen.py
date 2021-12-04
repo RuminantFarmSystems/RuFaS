@@ -14,6 +14,7 @@ from RUFAS.routines.animal.ration.growing_heifer_ration import \
     optimize as growing_heifer_optimize
 from RUFAS.routines.animal.ration import cow_requirements as req
 from RUFAS.routines.animal.ration import ration_driver as ration_driver
+import copy
 
 
 class Pen:
@@ -166,49 +167,8 @@ class Pen:
                                        'phosphorus': 0, 'potassium': 0, 'N': 0}
         self.ration_nutrient_conc = {}
 
-        self.manure = {"U": 0,
-                       "TAN_s": 0,
-                       "MN": 0,
-                       "Mkg": 0,
-                       "TSd": 0,
-                       "VSd": 0,
-                       "VSnd": 0,
-                       "WIP_frac": 0,
-                       "WOP_frac": 0,
-                       "p_excrt_manure": 0,
-                       "p_frac": 0,
-                       "K_manure": 0,
-                       "CH4_manure": 0
-                       }
-        self.calf_total = {"U": 0,
-                           "TAN_s": 0,
-                           "MN": 0,
-                           "Mkg": 0,
-                           "TSd": 0,
-                           "VSd": 0,
-                           "VSnd": 0,
-                           "WIP_frac": 0,
-                           "WOP_frac": 0,
-                           "p_excrt_manure": 0,
-                           "p_frac": 0,
-                           "K_manure": 0,
-                           "CH4_manure": 0
-                           }
-        self.heifer_total = {"U": 0,
-                             "TAN_s": 0,
-                             "MN": 0,
-                             "Mkg": 0,
-                             "TSd": 0,
-                             "VSd": 0,
-                             "VSnd": 0,
-                             "WIP_frac": 0,
-                             "WOP_frac": 0,
-                             "p_excrt_manure": 0,
-                             "p_frac": 0,
-                             "K_manure": 0,
-                             "CH4_manure": 0
-                             }
-        self.dry_total = {"U": 0,
+        # initial state for manure, calf_total, etc.
+        self.init_dict = {"U": 0,
                           "TAN_s": 0,
                           "MN": 0,
                           "Mkg": 0,
@@ -222,20 +182,12 @@ class Pen:
                           "K_manure": 0,
                           "CH4_manure": 0
                           }
-        self.lactating_total = {"U": 0,
-                                "TAN_s": 0,
-                                "MN": 0,
-                                "Mkg": 0,
-                                "TSd": 0,
-                                "VSd": 0,
-                                "VSnd": 0,
-                                "WIP_frac": 0,
-                                "WOP_frac": 0,
-                                "p_excrt_manure": 0,
-                                "p_frac": 0,
-                                "K_manure": 0,
-                                "CH4_manure": 0
-                                }
+
+        self.manure = copy.deepcopy(self.init_dict)
+        self.calf_total = copy.deepcopy(self.init_dict)
+        self.heifer_total = copy.deepcopy(self.init_dict)
+        self.dry_total = copy.deepcopy(self.init_dict)
+        self.lactating_total = copy.deepcopy(self.init_dict)
 
     # getters
     def get_id(self):
@@ -381,8 +333,6 @@ class Pen:
         """
         self.pen_type = pen_type
 
-
-
     def update_animals(self, new_animals):
         """
         Sets the list of animals to @new_animals and calculates the stocking
@@ -395,7 +345,8 @@ class Pen:
         for animal in new_animals:
             self.animals_in_pen.append(animal)
         self.pen_populated = not (len(self.animals_in_pen) == 0)
-        self.stocking_density = len(self.animals_in_pen) / self.num_stalls * 100
+        self.stocking_density = len(
+            self.animals_in_pen) / self.num_stalls * 100
         self.calc_daily_walking_dist()
 
         # sets the current animal classes in the pen
@@ -447,7 +398,8 @@ class Pen:
         for animal in self.animals_in_pen:
             curr_rqmts = animal.nutrient_rqmts
             if curr_rqmts == {}:
-                print(type(animal).__name__, animal.id, self.id, self.avg_calf_nutrient_rqmts)
+                print(type(animal).__name__, animal.id,
+                      self.id, self.avg_calf_nutrient_rqmts)
 
             for key in sum_dict.keys():
                 sum_dict[key] += curr_rqmts[key]['val']
@@ -532,11 +484,13 @@ class Pen:
             elif 'Cow' in self.classes_in_pen and \
                     self.animals_in_pen[0].milking:  # lactating cow
                 ration_per_animal, ration_vals = \
-                    ration_driver.ration_formulation(self, available_feeds, True)
+                    ration_driver.ration_formulation(
+                        self, available_feeds, True)
             elif 'Cow' in self.classes_in_pen and \
                     not self.animals_in_pen[0].milking:  # dry cow
                 ration_per_animal, ration_vals = \
-                    ration_driver.ration_formulation(self, available_feeds, False)
+                    ration_driver.ration_formulation(
+                        self, available_feeds, False)
 
             else:  # this should never occur
                 print('error in pen ration calculation')
@@ -631,84 +585,19 @@ class Pen:
 
     def reset_manure(self):
         # total manure excretion of the animals in the pen
-        self.manure = {"U": 0,
-                       "TAN_s": 0,
-                       "MN": 0,
-                       "Mkg": 0,
-                       "TSd": 0,
-                       "VSd": 0,
-                       "VSnd": 0,
-                       "WIP_frac": 0,
-                       "WOP_frac": 0,
-                       "p_excrt_manure": 0,
-                       "p_frac": 0,
-                       "K_manure": 0,
-                       "CH4_manure": 0
-                       }
+        self.manure = copy.deepcopy(self.init_dict)
 
         # total manure excretion of the calves in the pen
-        self.calf_total = {"U": 0,
-                           "TAN_s": 0,
-                           "MN": 0,
-                           "Mkg": 0,
-                           "TSd": 0,
-                           "VSd": 0,
-                           "VSnd": 0,
-                           "WIP_frac": 0,
-                           "WOP_frac": 0,
-                           "p_excrt_manure": 0,
-                           "p_frac": 0,
-                           "K_manure": 0,
-                           "CH4_manure": 0
-                           }
+        self.calf_total = copy.deepcopy(self.init_dict)
 
         # total manure excretion of the heifers in the pen
-        self.heifer_total = {"U": 0,
-                             "TAN_s": 0,
-                             "MN": 0,
-                             "Mkg": 0,
-                             "TSd": 0,
-                             "VSd": 0,
-                             "VSnd": 0,
-                             "WIP_frac": 0,
-                             "WOP_frac": 0,
-                             "p_excrt_manure": 0,
-                             "p_frac": 0,
-                             "K_manure": 0,
-                             "CH4_manure": 0
-                             }
+        self.heifer_total = copy.deepcopy(self.init_dict)
 
         # total manure excretion of the dry cows in the pen
-        self.dry_total = {"U": 0,
-                          "TAN_s": 0,
-                          "MN": 0,
-                          "Mkg": 0,
-                          "TSd": 0,
-                          "VSd": 0,
-                          "VSnd": 0,
-                          "WIP_frac": 0,
-                          "WOP_frac": 0,
-                          "p_excrt_manure": 0,
-                          "p_frac": 0,
-                          "K_manure": 0,
-                          "CH4_manure": 0
-                          }
+        self.dry_total = copy.deepcopy(self.init_dict)
 
         # total manure excretion of the lactating cows in the pen
-        self.lactating_total = {"U": 0,
-                                "TAN_s": 0,
-                                "MN": 0,
-                                "Mkg": 0,
-                                "TSd": 0,
-                                "VSd": 0,
-                                "VSnd": 0,
-                                "WIP_frac": 0,
-                                "WOP_frac": 0,
-                                "p_excrt_manure": 0,
-                                "p_frac": 0,
-                                "K_manure": 0,
-                                "CH4_manure": 0
-                                }
+        self.lactating_total = copy.deepcopy(self.init_dict)
 
     def calc_avg_growth(self):
         """
