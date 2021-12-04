@@ -189,150 +189,6 @@ class Pen:
         self.dry_total = copy.deepcopy(self.init_dict)
         self.lactating_total = copy.deepcopy(self.init_dict)
 
-    # getters
-    def get_id(self):
-        """
-        Returns:
-            int : the id_number, the unique id number of the pen.
-        """
-        return self.id
-
-    def get_vertical_dist_to_parlor(self):
-        """
-        Returns:
-            float : the vertical distance to milking parlor, km.
-        """
-        return self.vertical_dist_to_parlor
-
-    def get_horizontal_dist_to_parlor(self):
-        """
-        Returns:
-            float : the horizontal distance to milking parlor, km.
-        """
-        return self.horizontal_dist_to_parlor
-
-    def get_num_stalls(self):
-        """
-        Returns:
-            int : the number of stalls in the pen.
-        """
-        return self.num_stalls
-
-    def get_housing_type(self):
-        """
-        Returns:
-            string : the housing type of the pen.
-        """
-        return self.housing_type
-
-    def get_bedding_type(self):
-        """
-        Returns:
-            string : the bedding type of the pen.
-        """
-        return self.bedding_type
-
-    def get_pen_type(self):
-        """
-        Returns:
-            string : the pen type: freestall or tiestall.
-        """
-        return self.pen_type
-
-    def get_manure_handling(self):
-        """
-        Returns the manure handling method used to clean the pen.
-        """
-        return self.manure_handling
-
-    def get_manure_separator(self):
-        """
-        Returns the manure separator that processes manure excreted in this pen.
-        """
-        return self.manure_separator
-
-    def get_manure_storage(self):
-        """
-        Returns the manure storage receptacle that stores manure excreted in this pen.
-        """
-        return self.get_manure_storage
-
-    def get_stocking_density(self):
-        """
-        Returns the stocking density of the pen.
-        """
-        return self.stocking_density
-
-    def get_avg_DBW(self):
-        """
-        Returns the average daily change in (delta) body weight of the animals in the pen.
-        """
-        return self.avg_DBW
-
-    # setters
-    def set_id(self, id):
-        """
-        Sets the pen's id to id.
-
-        Args:
-            id: The pen's unique pen ID, obtained from the input file.
-        """
-        self.id = id
-
-    def set_vertical_dist_to_parlor(self, vert_dist):
-        """
-        Sets the pen's vertical distance to milking parlor, measured in kilometers, to vert_dist.
-
-        Args:
-            vert_dist: The pen's vertical distance to milking parlor, measured in kilometers.
-        """
-        self.vertical_dist_to_parlor = vert_dist
-
-    def set_horizontal_dist_to_parlor(self, hori_dist):
-        """
-        Sets the pen's horizontal distance to milking parlor, measured in kilometers, to hori_dist.
-
-        Args:
-            hori_dist: The pen's horizontal distance to milking parlor, measured in kilometers.
-        """
-        self.horizontal_dist_to_parlor = hori_dist
-
-    def set_num_stalls(self, num_stalls):
-        """
-        Sets the number of stalls in the pen to num_stalls.
-
-        Args:
-            num_stalls: The number of stalls in the pen.
-        """
-        self.num_stalls = num_stalls
-
-    def set_housing_type(self, housing_type):
-        """
-        Sets the housing type of the pen to housing_type.
-
-        Args:
-            housing_type: The housing type of the pen.
-        """
-        self.housing_type = housing_type
-
-    def set_bedding_type(self, bedding_type):
-        """
-        Sets the bedding type of the pen to bedding_type.
-
-        Args:
-            bedding_type: The bedding type of the pen.
-        """
-        self.bedding_type = bedding_type
-
-    def set_pen_type(self, pen_type):
-        """
-        Sets the pen type of the pen to pen_type.
-
-        Args:
-            pen_type: The pen type of the pen.
-        """
-        self.pen_type = pen_type
-
     def update_animals(self, new_animals):
         """
         Sets the list of animals to @new_animals and calculates the stocking
@@ -740,3 +596,148 @@ class Pen:
         self.pen_populated = False
         # self.classes_in_pen = set()
         self.avg_p_animal = 0
+
+
+# getters
+    # def get_id(self):
+    #     """
+    #     Returns:
+    #         int : the id_number, the unique id number of the pen.
+    #     """
+    #     return self.id
+
+    # def get_vertical_dist_to_parlor(self):
+    #     """
+    #     Returns:
+    #         float : the vertical distance to milking parlor, km.
+    #     """
+    #     return self.vertical_dist_to_parlor
+
+    # def get_horizontal_dist_to_parlor(self):
+    #     """
+    #     Returns:
+    #         float : the horizontal distance to milking parlor, km.
+    #     """
+    #     return self.horizontal_dist_to_parlor
+
+    # def get_num_stalls(self):
+    #     """
+    #     Returns:
+    #         int : the number of stalls in the pen.
+    #     """
+    #     return self.num_stalls
+
+    # def get_housing_type(self):
+    #     """
+    #     Returns:
+    #         string : the housing type of the pen.
+    #     """
+    #     return self.housing_type
+
+    # def get_bedding_type(self):
+    #     """
+    #     Returns:
+    #         string : the bedding type of the pen.
+    #     """
+    #     return self.bedding_type
+
+    # def get_pen_type(self):
+    #     """
+    #     Returns:
+    #         string : the pen type: freestall or tiestall.
+    #     """
+    #     return self.pen_type
+
+    # def get_manure_handling(self):
+    #     """
+    #     Returns the manure handling method used to clean the pen.
+    #     """
+    #     return self.manure_handling
+
+    # def get_manure_separator(self):
+    #     """
+    #     Returns the manure separator that processes manure excreted in this pen.
+    #     """
+    #     return self.manure_separator
+
+    # def get_manure_storage(self):
+    #     """
+    #     Returns the manure storage receptacle that stores manure excreted in this pen.
+    #     """
+    #     return self.get_manure_storage
+
+    # def get_stocking_density(self):
+    #     """
+    #     Returns the stocking density of the pen.
+    #     """
+    #     return self.stocking_density
+
+    # def get_avg_DBW(self):
+    #     """
+    #     Returns the average daily change in (delta) body weight of the animals in the pen.
+    #     """
+    #     return self.avg_DBW
+
+    # # setters
+    # def set_id(self, id):
+    #     """
+    #     Sets the pen's id to id.
+
+    #     Args:
+    #         id: The pen's unique pen ID, obtained from the input file.
+    #     """
+    #     self.id = id
+
+    # def set_vertical_dist_to_parlor(self, vert_dist):
+    #     """
+    #     Sets the pen's vertical distance to milking parlor, measured in kilometers, to vert_dist.
+
+    #     Args:
+    #         vert_dist: The pen's vertical distance to milking parlor, measured in kilometers.
+    #     """
+    #     self.vertical_dist_to_parlor = vert_dist
+
+    # def set_horizontal_dist_to_parlor(self, hori_dist):
+    #     """
+    #     Sets the pen's horizontal distance to milking parlor, measured in kilometers, to hori_dist.
+
+    #     Args:
+    #         hori_dist: The pen's horizontal distance to milking parlor, measured in kilometers.
+    #     """
+    #     self.horizontal_dist_to_parlor = hori_dist
+
+    # def set_num_stalls(self, num_stalls):
+    #     """
+    #     Sets the number of stalls in the pen to num_stalls.
+
+    #     Args:
+    #         num_stalls: The number of stalls in the pen.
+    #     """
+    #     self.num_stalls = num_stalls
+
+    # def set_housing_type(self, housing_type):
+    #     """
+    #     Sets the housing type of the pen to housing_type.
+
+    #     Args:
+    #         housing_type: The housing type of the pen.
+    #     """
+    #     self.housing_type = housing_type
+
+    # def set_bedding_type(self, bedding_type):
+    #     """
+    #     Sets the bedding type of the pen to bedding_type.
+
+    #     Args:
+    #         bedding_type: The bedding type of the pen.
+    #     """
+    #     self.bedding_type = bedding_type
+
+    # def set_pen_type(self, pen_type):
+    #     """
+    #     Sets the pen type of the pen to pen_type.
+
+    #     Args:
+    #         pen_type: The pen type of the pen.
+    #     """
+    #     self.pen_type = pen_type
