@@ -919,8 +919,8 @@ class Cow(HeiferIII):
                 self.events.add_event(
                     self.days_born, sim_day, c.PREG_LOSS_BTWN_2_AND_3)
         
-        #print(f'days born {self.days_born} days in preg {self.days_in_preg} ai day {self.ai_day} abortion day {self.abortion_day}')            
-        if self.open_stage and not self.do_not_breed and self.repro_program in ['ED-TAI','TAI']:
+        if self.open_stage and not self.do_not_breed and self.repro_program in ['ED-TAI','TAI'] \
+            and self.resynch_method in ['TAIafterPD','PGFatPD']:
             self.resynch_protocol(sim_day)
         
         if self.days_in_preg == 0 and self.days_in_milk > \
