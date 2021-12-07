@@ -14,11 +14,6 @@
     "farm":
     {
         "fields": {
-            "field_1": {
-                "soil": "barnyard_soil.json",
-                "crop": "custom_rotation.json",
-                "field_management": "hector_2.json"
-            }
         },
         "animal": "animal_management_animal.json",
         "feed": "panke_buisse_feed.json"

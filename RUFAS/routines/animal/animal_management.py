@@ -580,17 +580,6 @@ class AnimalManagement:
                 self.all_pens[i].ration = self.all_pens[i].calc_ration(feed,
                                                                        available_feeds)
 
-        # At this point, every animal should be assigned a ration, so we can calculate the amount
-        # of purchased feeds.
-        for pen in self.all_pens:
-            for animal in pen.animals_in_pen:
-                for key in animal.ration_formulation:
-                    if key != 'objective':
-                        if key in self.purchased_feed_amounts.keys():
-                            self.purchased_feed_amounts[key] += animal.ration_formulation[key]
-                        else:
-                            self.purchased_feed_amounts[key] = animal.ration_formulation[key]
-
     def calc_manure_excretion(self, feed, methane_model):
         """
         Calls each animal's method to calculate manure excretion to find the
@@ -1020,14 +1009,28 @@ class AnimalManagement:
             else:
                 self.annual_dry_cow_DMI += cow.dry_matter_intake
 
+        # At this point, every animal should be assigned a ration, so we can calculate the amount
+        # of purchased feeds.
+        for pen in self.all_pens:
+            for animal in pen.animals_in_pen:
+                for key in animal.ration_formulation:
+                    if key != 'objective':
+                        if key in self.purchased_feed_amounts.keys():
+                            self.purchased_feed_amounts[key] += \
+                            animal.ration_formulation[key]
+                        else:
+                            self.purchased_feed_amounts[key] = \
+                            animal.ration_formulation[key]
+
     def calc_milk_prod_stats(self):
         for cow in self.cows:
             if cow.milking:
                 self.annual_milk_prod += cow.estimated_daily_milk_produced
-                # TODO note that protein is hardcoded
-                self.annual_milk_protein_prod += cow.mPrt
-                # TODO did i calculate fat percent correctly?
-                self.annual_milk_fat_prod += cow.estimated_daily_milk_produced * cow.fat_percent
+                self.annual_milk_protein_prod += \
+                    (cow.mPrt / 100) * cow.estimated_daily_milk_produced
+                self.annual_milk_fat_prod += \
+                    (cow.fat_percent / 100) * cow.estimated_daily_milk_produced
             if cow.days_in_milk == 300:
-                self.total_milk_prod_per_lactation += cow.estimated_daily_milk_produced
+                self.total_milk_prod_per_lactation += \
+                    cow.calc_milk_prod_over_lactation()
                 self.num_cows_through_300_DIM += 1

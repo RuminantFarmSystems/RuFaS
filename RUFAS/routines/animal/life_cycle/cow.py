@@ -146,6 +146,35 @@ class Cow(HeiferIII):
         self.milk_production_history.append(MilkProductionHistory(sim_day, self.days_in_milk,
                                                                   self.estimated_daily_milk_produced, self.days_born))
 
+    def calc_milk_prod_over_lactation(self):
+        """
+        Calculates the total milk produced over the past 300 days. This
+        should be called when the cow reaches her 300th day of the lactation
+        as we sum up the values in the milk_production_history for the past
+        300 days.
+
+        Returns:
+            the amount of milk produced throughout the current lactation (kg)
+        """
+        total_milk = 0
+
+        # Iterate thought the milk production history in reverse order,
+        # starting from the most recent entry until we either reach the
+        # beginning of the list (meaning that the cow was not on the farm
+        # for her whole lactation) or until we reach the beginning of the
+        # latest lactation.
+        curr_index = len(self.milk_production_history) - 1
+        while curr_index >= 0:
+            milk = self.milk_production_history[curr_index]
+            total_milk += milk.milk_production
+            if milk.days_in_milk == 1:
+                # Means that we have reached the beginning of the latest
+                # lactation.
+                break
+            curr_index -= 1
+
+        return total_milk
+
     @staticmethod
     def _determine_param_value(mean, std):
         """
