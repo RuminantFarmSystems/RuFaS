@@ -729,43 +729,72 @@ class Cow(HeiferIII):
 
     def resynch_protocol(self, sim_day):
         """
-        Using ED at the resynch period of ED-TAI.
+        resynch method is applied for open cows
+        conception rate adjustment is made on the day of preg check 
         Args:
             sim_day: the simulation day
         """
         # ED program after AI, TAI atart after PD
-        if self.resynch_method == 'TAIafterPD':
-            if self.days_born < self.ai_day + 32:
+        if self.resynch_method == 'TAIafterPD':         
+            # ED before 1st preg check 
+            if self.days_born < self.ai_day + AnimalBase.config['preg_loss_rate_1']:
                 self.ed_update(sim_day)
-            if self.days_born == self.ai_day + 32:
+            # on the day of preg check
+            elif self.days_born == self.abortion_day:
+                self.conception_rate -= \
+                    AnimalBase.config['conception_rate_decrease']
                 self.estrus_day = 0
                 self.tai_program_start_day_c = self.days_born
                 self.tai_update(sim_day)
-            self.conception_rate -= \
-                AnimalBase.config['conception_rate_decrease']
+            elif self.days_born > self.abortion_day:
+            # after preg check before next preg
+                self.tai_update(sim_day)
         
         # only for TAI programs
         elif self.resynch_method == 'TAIbeforePD':
-            self.tai_program_start_day_c = self.abortion_day - 7
-            self.tai_update(sim_day)
-            self.conception_rate -= \
+            if self.days_born == self.abortion_day:
+                # because tai start day is before this simulation time 
+                self.tai_program_start_day_c = self.abortion_day - 7
+                self.conception_rate -= \
                 AnimalBase.config['conception_rate_decrease']
+                # adding past injections 
+                self.events.add_event(
+                    self.tai_program_start_day_c, sim_day, c.INJECT_GNRH)
+                self.GnRH_injections = self.GnRH_injections + 1
+                if self.tai_method_c in ['5d CoSynch']:
+                    self.events.add_event(
+                        self.tai_program_start_day_c + 1, sim_day, c.INJECT_PGF)
+                    self.events.add_event(
+                        self.tai_program_start_day_c + 2, sim_day, c.INJECT_PGF)
+                    self.PGF_injections = self.PGF_injections + 2
+            self.tai_update(sim_day)
+           
             
         # PGF injection at PD, ED for 7 days after PGF, TAI start afterwards
         elif self.resynch_method == 'PGFatPD':
-            self.events.add_event(self.days_born, sim_day, c.INJECT_PGF)
-            self.PGF_injections = self.PGF_injections + 1
-            if self.days_born < self.abortion_day + 7:
+            # ED before 1st preg check 
+            if self.days_born < self.ai_day + AnimalBase.config['preg_loss_rate_1']:
+                self.ed_update(sim_day)
+            # inject PGF at the day of preg check 
+            elif self.days_born == self.abortion_day:
+                self.PGF_injections = self.PGF_injections + 1
+                self.events.add_event(self.days_born, sim_day, c.INJECT_PGF)
                 self.estrus_day = self.determine_estrus_day(
                     self.abortion_day, c.ESTRUS_AFTER_PGF_NOTE,
                     AnimalBase.config['avg_estrus_cycle_p'],
                     AnimalBase.config['std_estrus_cycle_p'], sim_day)
+                self.conception_rate -= \
+                    AnimalBase.config['conception_rate_decrease']
+            # start TAI program 7 days after preg check
+            elif self.days_born < self.abortion_day + 7:
                 self.ed_update(sim_day)
             elif self.days_born == self.abortion_day + 7:
+                self.estrus_day = 0
                 self.tai_program_start_day_c = self.days_born
                 self.tai_update(sim_day)
-            self.conception_rate -= \
-                AnimalBase.config['conception_rate_decrease']
+            elif self.days_born > self.abortion_day + 7:
+                self.tai_update(sim_day)
+
             
 
     # Preg methods
@@ -845,7 +874,7 @@ class Cow(HeiferIII):
                         self.estrus_day, c.ESTRUS_AFTER_AI_NOTE,
                         AnimalBase.config['avg_estrus_cycle_cow'],
                         AnimalBase.config['std_estrus_cycle_cow'], sim_day)
-                elif self.resynch_method == 'TAIafterPD':
+                elif self.resynch_method in ['TAIafterPD','PGFatPD']:
                     self.estrus_day = self.determine_estrus_day(
                         self.estrus_day, c.ESTRUS_AFTER_AI_NOTE,
                         AnimalBase.config['avg_estrus_cycle_cow'],
@@ -920,8 +949,7 @@ class Cow(HeiferIII):
                 self.events.add_event(
                     self.days_born, sim_day, c.PREG_LOSS_BTWN_2_AND_3)
         
-        if self.open_stage and not self.do_not_breed and self.repro_program in ['ED-TAI','TAI'] \
-            and self.resynch_method in ['TAIafterPD','PGFatPD']:
+        if self.open_stage and not self.do_not_breed and self.repro_program in ['ED-TAI','TAI']:
             self.resynch_protocol(sim_day)
         
         if self.days_in_preg == 0 and self.days_in_milk > \
