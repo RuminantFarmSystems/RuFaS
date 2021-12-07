@@ -747,6 +747,7 @@ class Cow(HeiferIII):
         # only for TAI programs
         elif self.resynch_method == 'TAIbeforePD':
             self.tai_program_start_day_c = self.abortion_day - 7
+            self.tai_update(sim_day)
             self.conception_rate -= \
                 AnimalBase.config['conception_rate_decrease']
             
