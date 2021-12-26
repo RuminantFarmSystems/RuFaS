@@ -1,6 +1,6 @@
 """
 RUFAS: Ruminant Farm Systems Model
-File name: feed.py
+File name: test_feed.py
 Description: Implements test cases
 Author(s): Pooya Hekmati, sh2235@cornell.edu
 """

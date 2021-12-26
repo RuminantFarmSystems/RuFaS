@@ -1,6 +1,6 @@
 """
 RUFAS: Ruminant Farm Systems Model
-File name: output_handler.py
+File name: test_output_handler.py
 Description: Implements test cases
 Author(s): Pooya Hekmati, sh2235@cornell.edu
 """
