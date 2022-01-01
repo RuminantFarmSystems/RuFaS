@@ -167,6 +167,22 @@ class Pen:
                                        'phosphorus': 0, 'potassium': 0, 'N': 0}
         self.ration_nutrient_conc = {}
 
+        # template for manure, calf_total, etc.
+        self._manure_dict_template = {"U": 0,
+                                      "TAN_s": 0,
+                                      "MN": 0,
+                                      "Mkg": 0,
+                                      "TSd": 0,
+                                      "VSd": 0,
+                                      "VSnd": 0,
+                                      "WIP_frac": 0,
+                                      "WOP_frac": 0,
+                                      "p_excrt_manure": 0,
+                                      "p_frac": 0,
+                                      "K_manure": 0,
+                                      "CH4_manure": 0
+                                      }
+
         self.reset_manure()
 
     def get_id(self):
@@ -451,28 +467,15 @@ class Pen:
         self.dry_total = dry_total
         self.lactating_total = lactating_total
 
-    def reset_manure(self):
-        # template for manure, calf_total, etc.
-        self._manure_excretion_dict_template = {"U": 0,
-                                                "TAN_s": 0,
-                                                "MN": 0,
-                                                "Mkg": 0,
-                                                "TSd": 0,
-                                                "VSd": 0,
-                                                "VSnd": 0,
-                                                "WIP_frac": 0,
-                                                "WOP_frac": 0,
-                                                "p_excrt_manure": 0,
-                                                "p_frac": 0,
-                                                "K_manure": 0,
-                                                "CH4_manure": 0
-                                                }
+    def _copy_manure_template(self):
+        return copy.deepcopy(self._manure_dict_template)
 
-        self.manure = copy.deepcopy(self.init_dict)
-        self.calf_total = copy.deepcopy(self.init_dict)
-        self.heifer_total = copy.deepcopy(self.init_dict)
-        self.dry_total = copy.deepcopy(self.init_dict)
-        self.lactating_total = copy.deepcopy(self.init_dict)
+    def reset_manure(self):
+        self.manure = self._copy_manure_template()
+        self.calf_total = self._copy_manure_template()
+        self.heifer_total = self._copy_manure_template()
+        self.dry_total = self._copy_manure_template()
+        self.lactating_total = self._copy_manure_template()
 
     def calc_avg_growth(self):
         """
