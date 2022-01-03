@@ -26,7 +26,8 @@ class Pen:
     Attributes
     -------------
     id : int
-        Represents a pen's unique pen ID, obtained from the input file.
+        Represents a pen's unique pen ID.
+        Obtained from the input file.
 
     vertical_dist_to_parlor : float
         Represents the vertical distance to milking parlor, measured in kilometers.
@@ -37,17 +38,20 @@ class Pen:
         Obtained from the input file.
 
     num_stalls : int
-        Represents the number of stalls, obtained from the input file.
+        Represents the number of stalls.
+        Obtained from the input file.
 
     stocking_density : float
         Represents the stocking density of the pen, and is calculated when animals in pen are
         updated in update_animals()
 
     housing_type : string
-        Represents the housing type of the pen, obtained from the input file.
+        Represents the housing type of the pen.
+        Obtained from the input file.
 
     bedding_type : string
-        Represents the bedding type of the pen, obtained from the input file.
+        Represents the bedding type of the pen.
+        Obtained from the input file.
 
     pen_type : string
         Represents the pen type (freestall or tiestall).
@@ -141,29 +145,32 @@ class Pen:
         self.num_stalls = num_stalls
         self.housing_type = housing_type
         self.bedding_type = bedding_type
-        self.pen_type = pen_type
+        self._pen_type = pen_type
+
+        # TODO: add documentation for the following 8 attributes
         self.DBW = 0.0
         self.daily_growth = 0.0
         self.manure_handling = manure_handling
         self.manure_separator = manure_separator
         self.manure_storage = manure_storage
-        self.avg_p_intake = 0
-        self.avg_p_req = 0
-        self.avg_p_animal = 0
+        self.avg_p_intake = 0.0
+        self.avg_p_req = 0.0
+        self.avg_p_animal = 0.0
+
         self.animals_in_pen = []
         self.pen_populated = False
 
         self.classes_in_pen = set()
-        self.stocking_density = 0
+        self.stocking_density = 0.0
 
-        self.avg_BW = 0
-        self.avg_DMIest = 0
-        self.avg_DBW = 0
+        self.avg_BW = 0.0
+        self.avg_DMIest = 0.0
+        self.avg_DBW = 0.0
 
         self.avg_nutrient_rqmts = {}
         self.avg_calf_nutrient_rqmts = {}
-        self.avg_milk = 0
-        self.avg_CP_milk = 0
+        self.avg_milk = 0.0
+        self.avg_CP_milk = 0.0
 
         self.ration = {}
         self.ration_nutrient_amount = {'dm': 0, 'CP': 0, 'ADF': 0,
@@ -171,11 +178,9 @@ class Pen:
                                        'phosphorus': 0, 'potassium': 0, 'N': 0}
         self.ration_nutrient_conc = {}
 
-        # TODO: add initial value
-        self.avg_growth = None
+        self.avg_growth = 0.0
 
         # TODO: add initial value and documentation in the docstring
-        # it also seems like this variable is never used - possibly remove it?
         self.MEdiet = None
 
         # template for manure, calf_total, etc.
@@ -215,7 +220,7 @@ class Pen:
         Returns:
             string : the pen type: freestall or tiestall.
         """
-        return self.pen_type
+        return self._pen_type
 
     def set_id(self, pen_id):
         """
@@ -225,15 +230,6 @@ class Pen:
             pen_id: The pen's unique pen ID, obtained from the input file.
         """
         self.id = pen_id
-
-    def set_pen_type(self, pen_type):
-        """
-        Sets the pen type of the pen to pen_type.
-
-        Args:
-            pen_type: The pen type of the pen.
-        """
-        self.pen_type = pen_type
 
     def update_animals(self, new_animals):
         """
@@ -427,19 +423,17 @@ class Pen:
 
     def calc_manure(self, feed, methane_model):
         """
-        Calculates the total manure excretion of the animals in the pen.
+        Calculates the total manure excretion of the animals in the pen,
+         and updates the manure attributes to contain the new amounts.
 
         Args:
             feed: instance of the Feed class
             methane_model: methane model used for methane emission calculations
-
-        Returns:
-            a dictionary for the total manure of the animals in the pen
         """
-        ME_intake = self.MEdiet
+
         for animal in self.animals_in_pen:
             if type(animal).__name__ == 'Cow':
-                animal.calc_manure_excretion(feed, methane_model, ME_intake)
+                animal.calc_manure_excretion(feed, methane_model, self.MEdiet)
             else:
                 animal.calc_manure_excretion(feed)
 
