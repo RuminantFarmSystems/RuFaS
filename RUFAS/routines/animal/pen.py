@@ -98,6 +98,9 @@ class Pen:
     avg_growth : float
         Represents the average growth of the animals in the pen.
 
+    _manure_dict_template : dict
+        Represents the dictionary template for the manure attributes (manure, calf_total, etc)
+
     manure : dict
         Contains the total manure excretion of all animals in the pen.
 
@@ -110,7 +113,7 @@ class Pen:
     dry_total : dict
         Contains the total manure excretion of the dry cows in the pen.
 
-    lacatating_total : dict
+    lactating_total : dict
         Contains the total manure excretion of the lactating cows in the pen.
     """
 
@@ -155,6 +158,7 @@ class Pen:
 
         self.avg_BW = 0
         self.avg_DMIest = 0
+        self.avg_DBW = 0
 
         self.avg_nutrient_rqmts = {}
         self.avg_calf_nutrient_rqmts = {}
@@ -166,6 +170,13 @@ class Pen:
                                        'NDF': 0, 'lignin': 0, 'ash': 0,
                                        'phosphorus': 0, 'potassium': 0, 'N': 0}
         self.ration_nutrient_conc = {}
+
+        # TODO: add initial value
+        self.avg_growth = None
+
+        # TODO: add initial value and documentation in the docstring
+        # it also seems like this variable is never used - possibly remove it?
+        self.MEdiet = None
 
         # template for manure, calf_total, etc.
         self._manure_dict_template = {"U": 0,
@@ -182,6 +193,13 @@ class Pen:
                                       "K_manure": 0,
                                       "CH4_manure": 0
                                       }
+
+        # manure attributes are initialized in the reset_manure method
+        self.manure = None
+        self.calf_total = None
+        self.heifer_total = None
+        self.dry_total = None
+        self.lactating_total = None
 
         self.reset_manure()
 
