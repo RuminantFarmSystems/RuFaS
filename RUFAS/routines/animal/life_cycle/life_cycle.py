@@ -220,6 +220,9 @@ class LifeCycleManager:
             date: day number
 
         Returns:
+            daily_cows_culled: the number of cows that were culled on this day
+            daily_heifers_sold: the number of heifers sold on this day
+            daily_calves_sold: the number of calves sold on this day
             animals_added: list of animals added from replacement herd
             ids_removed: list of animal ids that were removed during this day
             calves_born: list of calves that were born during this day

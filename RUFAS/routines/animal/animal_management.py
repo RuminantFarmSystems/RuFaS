@@ -94,12 +94,6 @@ class AnimalManagement:
     # the popped pen.
     pens_needing_animals = deque([])
 
-    daily_avg_milk = 0
-
-    daily_total_milk = 0
-
-    daily_total_manure = 0
-
     # these variables are the P compositions of each class of animal. They
     # are calculated daily and are used when an animal is added to the
     # herd, whether by birth or replacement herd purchase. They are calculated
@@ -110,22 +104,6 @@ class AnimalManagement:
     heiferII_p_comp = 0
     heiferIII_p_comp = 0
     cow_p_comp = 0
-
-    num_calf_lst = []
-    num_heiferI_lst = []
-    num_heiferII_lst = []
-    num_heiferIII_lst = []
-    num_cow_lst = []
-    avg_milk_lst = []
-
-    annual_manure_prod = 0
-
-    calf_animal_days = 0
-    heiferI_animal_days = 0
-    heiferII_animal_days = 0
-    heiferIII_animal_days = 0
-    lactating_cow_animal_days = 0
-    dry_cow_animal_days = 0
 
     @staticmethod
     def get_animal_config(data):
@@ -179,6 +157,26 @@ class AnimalManagement:
         self.annual_milk_fat_prod = 0
         self.total_milk_prod_per_lactation = 0
         self.num_cows_through_300_DIM = 0
+
+        self.daily_avg_milk = 0
+        self.daily_total_milk = 0
+        self.daily_total_manure = 0
+
+        self.num_calf_lst = []
+        self.num_heiferI_lst = []
+        self.num_heiferII_lst = []
+        self.num_heiferIII_lst = []
+        self.num_cow_lst = []
+        self.avg_milk_lst = []
+
+        self.annual_manure_prod = 0
+
+        self.calf_animal_days = 0
+        self.heiferI_animal_days = 0
+        self.heiferII_animal_days = 0
+        self.heiferIII_animal_days = 0
+        self.lactating_cow_animal_days = 0
+        self.dry_cow_animal_days = 0
 
         self.purchased_feed_amounts = {}
 
@@ -690,6 +688,10 @@ class AnimalManagement:
                 pen.daily_p_update()
 
     def calc_milk_nums(self):
+        """
+        Calculates the values of the attributes relating to the milk
+        and manure statistics.
+        """
         self.daily_total_milk = 0
         self.daily_avg_milk = 0
         num_pens_producing_milk = 0
@@ -970,6 +972,10 @@ class AnimalManagement:
         return self.life_cycle_manager.initialize_db_summary
 
     def add_to_animal_days(self):
+        """
+        Increments each of the animal days attributes by the amount of the
+        appropriate animal list.
+        """
         self.calf_animal_days += len(self.calves)
         self.heiferI_animal_days += len(self.heiferIs)
         self.heiferII_animal_days += len(self.heiferIIs)
@@ -981,20 +987,42 @@ class AnimalManagement:
                 self.dry_cow_animal_days += 1
 
     def get_num_animals_from_pen_id(self, pen_id):
+        """
+        Iterates through the list of pens and returns the number of animals
+        in the desired pen.
+
+        Args:
+            pen_id: (int) ID of the pen to get the number of animals for
+
+        Returns: the number of animals in the given pen.
+        """
         for pen in self.all_pens:
             if pen.id == pen_id:
                 return len(pen.animals_in_pen)
-        raise Exception('get_num_animals_from_pen_id() was called with an invalid pen id: ' +
-                        str(pen_id))
+        raise Exception('get_num_animals_from_pen_id() was called with an '
+                        'invalid pen id: ' + str(pen_id))
 
     def get_avg_num_animals_from_pen_id(self, pen_id):
+        """
+        Calculates and returns the annual average number of animals in the
+        desired pen.
+
+        Args:
+            pen_id: (int) ID of the pen to get the number of animals for
+
+        Returns: the annual average number of animals in the given pen
+        """
         for pen in self.all_pens:
             if pen.id == pen_id:
-                return sum(pen.num_animals_lst)/ len(pen.num_animals_lst)
-        raise Exception('get_num_animals_from_pen_id() was called with an invalid pen id: ' +
-                        str(pen_id))
+                return sum(pen.num_animals_lst) / len(pen.num_animals_lst)
+        raise Exception('get_num_animals_from_pen_id() was called with an '
+                        'invalid pen id: ' + str(pen_id))
 
     def add_to_DMI_totals(self):
+        """
+        Increments each of the animal group DMI totals by the appropriate
+        amount.
+        """
         for calf in self.calves:
             self.annual_herd_DMI += calf.dry_matter_intake
 
@@ -1009,8 +1037,8 @@ class AnimalManagement:
             else:
                 self.annual_dry_cow_DMI += cow.dry_matter_intake
 
-        # At this point, every animal should be assigned a ration, so we can calculate the amount
-        # of purchased feeds.
+        # At this point, every animal should be assigned a ration, so we can
+        # calculate the amount of purchased feeds.
         for pen in self.all_pens:
             for animal in pen.animals_in_pen:
                 for key in animal.ration_formulation:
@@ -1023,6 +1051,10 @@ class AnimalManagement:
                             animal.ration_formulation[key]
 
     def calc_milk_prod_stats(self):
+        """
+        Calculates the values for the attributes relating to the milk
+        production statistics.
+        """
         for cow in self.cows:
             if cow.milking:
                 self.annual_milk_prod += cow.estimated_daily_milk_produced

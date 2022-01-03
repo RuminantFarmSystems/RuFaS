@@ -3,7 +3,7 @@
     "field_slope": 0.02,
     "slope_length": 3,
     "manning": 0.4,
-    "field_size": 2.0,
+    "field_size": 1.0,
     "practice_factor": 0.08,
     "sand": 15,
     "silt": 65,

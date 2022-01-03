@@ -321,16 +321,22 @@ class DBReport(BaseReport):
             self.conn.close()
 
     def initialize(self):
-        # method overwritten to avoid creating/writing to CSV
+        """
+        Method overwritten to avoid creating/writing to a CSV.
+        """
         pass
 
     @staticmethod
     def write_headers(output_csv, variables):
-        # method overwritten to avoid creating/writing to CSV
+        """
+        Method overwritten to avoid creating/writing to a CSV.
+        """
         pass
 
     def produce_report_graphics(self):
-        # method overwritten to avoid creating graphics
+        """
+        Method overwritten to avoid creating graphics.
+        """
         pass
 
     def finalize(self, state, weather, time):
@@ -368,7 +374,9 @@ class DBReport(BaseReport):
             self.produce_csv = False
 
     def write_annual_report(self):
-        # method overwritten to write to database instead of CSV
+        """
+        Method overwritten to write to database instead of CSV.
+        """
         try:
             c = self.conn.cursor()
             # daily table writes
@@ -527,7 +535,14 @@ class DBReport(BaseReport):
             self.produce_csv = False
 
     def daily_update(self, state, weather, time):
-        # method overwritten to also write to additional tables
+        """
+        Method overwritten to also write to additional tables.
+
+        Args:
+            state: instance of the State class
+            weather: instance of the Weather class
+            time: instance of the Time class
+        """
         super().daily_update(state, weather, time)
 
         animal_management = state.animal_management
@@ -544,7 +559,14 @@ class DBReport(BaseReport):
                          locals()))
 
     def annual_update(self, state, weather, time):
-        # method overwritten to also write to additional tables
+        """
+       Method overwritten to also write to additional tables.
+
+       Args:
+           state: instance of the State class
+           weather: instance of the Weather class
+           time: instance of the Time class
+        """
         super().annual_update(state, weather, time)
 
         animal_management = state.animal_management
@@ -600,8 +622,10 @@ class DBReport(BaseReport):
                          locals()))
 
     def annual_flush(self):
-        # method overwritten to flush all of the other variables written to
-        # the database
+        """
+        Method overwritten to flush all of the other variables written to the
+        database.
+        """
         super().annual_flush()
 
         for variable in self.daily_manure_variables:

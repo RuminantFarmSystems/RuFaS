@@ -683,7 +683,14 @@ class Pen:
         self.avg_p_animal = 0
 
     def annual_reset(self):
+        """
+        Resets the values of the necessary attributes to their defualt values.
+        """
         self.num_animals_lst = []
 
     def daily_animal_num_update(self):
+        """
+        Appends the number of animals in the pen on this day to the list
+        num_animals_lst.
+        """
         self.num_animals_lst.append(len(self.animals_in_pen))
