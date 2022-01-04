@@ -322,20 +322,20 @@ class DBReport(BaseReport):
 
     def initialize(self):
         """
-        Method overwritten to avoid creating/writing to a CSV.
+        Method overridden to avoid creating/writing to a CSV.
         """
         pass
 
     @staticmethod
     def write_headers(output_csv, variables):
         """
-        Method overwritten to avoid creating/writing to a CSV.
+        Method overridden to avoid creating/writing to a CSV.
         """
         pass
 
     def produce_report_graphics(self):
         """
-        Method overwritten to avoid creating graphics.
+        Method overridden to avoid creating graphics.
         """
         pass
 
@@ -375,7 +375,7 @@ class DBReport(BaseReport):
 
     def write_annual_report(self):
         """
-        Method overwritten to write to database instead of CSV.
+        Method overridden to write to database instead of CSV.
         """
         try:
             c = self.conn.cursor()
@@ -536,7 +536,7 @@ class DBReport(BaseReport):
 
     def daily_update(self, state, weather, time):
         """
-        Method overwritten to also write to additional tables.
+        Method overridden to also write to additional tables.
 
         Args:
             state: instance of the State class
@@ -560,7 +560,7 @@ class DBReport(BaseReport):
 
     def annual_update(self, state, weather, time):
         """
-       Method overwritten to also write to additional tables.
+       Method overridden to also write to additional tables.
 
        Args:
            state: instance of the State class
@@ -623,7 +623,7 @@ class DBReport(BaseReport):
 
     def annual_flush(self):
         """
-        Method overwritten to flush all of the other variables written to the
+        Method overridden to flush all of the other variables written to the
         database.
         """
         super().annual_flush()
