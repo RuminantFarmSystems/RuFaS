@@ -57,14 +57,6 @@ class Pen:
         The pen type (freestall or tiestall).
         Obtained from the input file.
 
-    TODO: make sure this description is correct
-    DBW : float
-        The daily change in (delta) body weight of the animals in the pen.
-        Used for ration formulation.
-
-    TODO: add description
-    daily_growth : float
-
     manure_handling : string
         The manure handling method used to clean the pen
 
@@ -293,14 +285,8 @@ class Pen:
             temp: the temperature on the current day
         """
         for animal in self.animals_in_pen:
-            # currently, only lactating cows have ration calculations, so there
-            # are different arguments
-            if type(animal).__name__ == 'Cow':
-                # old hard coded variable updates from the deleted calc_requirements in
-                # cow.py
-                self.DBW = -0.4125
-                self.daily_growth = self.DBW
-            elif type(animal).__name__ == 'Calf':
+
+            if type(animal).__name__ == 'Calf':
                 animal.calc_nutrient_rqmts(feed, temp)
             else:
                 animal.calc_nutrient_rqmts()
