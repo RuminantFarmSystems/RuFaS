@@ -26,69 +26,101 @@ class Pen:
     Attributes
     -------------
     id : int
-        Represents a pen's unique pen ID.
+        The pen's unique pen ID.
         Obtained from the input file.
 
     vertical_dist_to_parlor : float
-        Represents the vertical distance to milking parlor, measured in kilometers.
+        The vertical distance to milking parlor, measured in kilometers.
         Obtained from the input file.
 
     horizontal_dist_to_parlor : float
-        Represents the horizontal distance to milking parlor, measured in kilometers.
+        The horizontal distance to milking parlor, measured in kilometers.
         Obtained from the input file.
 
     num_stalls : int
-        Represents the number of stalls.
+        The number of stalls.
         Obtained from the input file.
 
     stocking_density : float
-        Represents the stocking density of the pen, and is calculated when animals in pen are
-        updated in update_animals()
+        The stocking density of the pen.
+        Calculated when animals in pen are updated in update_animals()
 
     housing_type : string
-        Represents the housing type of the pen.
+        The housing type of the pen.
         Obtained from the input file.
 
     bedding_type : string
-        Represents the bedding type of the pen.
+        The bedding type of the pen.
         Obtained from the input file.
 
     pen_type : string
-        Represents the pen type (freestall or tiestall).
+        The pen type (freestall or tiestall).
         Obtained from the input file.
 
+    TODO: make sure this description is correct
+    DBW : float
+        The daily change in (delta) body weight of the animals in the pen.
+        Used for ration formulation.
+
+    TODO: add description
+    daily_growth : float
+
+    manure_handling : string
+        The manure handling method used to clean the pen
+
+    manure_separator : string
+        The type of manure separator that processes manure excreted in the pen.
+
+    manure_storage : string
+        The type of manure storage receptacle that stores manure excreted in the pen.
+
+    TODO: make sure this description is correct
+    avg_p_intake : float
+        The average phosphorus intake of the animals in the pen.
+
+    TODO: make sure this description is correct
+    avg_p_req : float
+        The average phosphorus intake of the animals in the pen.
+
+    TODO: add description
+    avg_p_animal : float
+
     animals_in_pen : animal list
-        Represents the list of all animals in this pen.
+        The list of all animals in this pen.
 
     classes_in_pen : set
-        Represents the set (no repeats) of all the classes to which the animals in pen belong.
+        The set (no repeats) of all the classes to which the animals in the pen belong.
 
     pen_populated : bool
-        Is true iff there is at least 1 animal in the pen.
+        True iff there is at least 1 animal in the pen, and false otherwise.
 
     avg_DBW : float
-        Represents the average daily change in (delta) body weight of the
-        animals in the pen, and is used for ration formulation.
+        The average daily change in (delta) body weight of the animals in the pen.
+        Used for ration formulation.
 
     avg_BW : float
-        Represents the average body weight of the animals in the pen, and is used for ration formulation.
+        The average body weight of the animals in the pen.
+        Used for ration formulation.
 
     avg_DMIest : float
-        Represents the average dry matter intake estimation of the animals in the pen,
-        and is used for ration formulation
+        The average dry matter intake estimation of the animals in the pen.
+        Used for ration formulation
 
     avg_nutrient_rqmts : dict
+        Contains the average nutrient requirements of the animals in the pen.
+        Used for ration formulation
+
     avg_calf_nutrient_rqmts : dict
-        These variables represent the dictionaries containing the nutrient requirements in the pen, and
-        are used for ration formulation
+         Contains the average nutrient requirements of the calves in the pen.
+         Used for ration formulation
 
     avg_milk : float
-        Represents the average milk production of the animals in the pen, and is
-        used for (lactating cow) ration formulation
+        The average milk production of the animals in the pen.
+        Used for (lactating cow) ration formulation
 
     avg_CP_milk : float
-        Represents the average milk crude protein content of the animals in the pen, and is
-        used for (lactating cow) ration formulation
+        The average milk crude protein content of the animals in the pen.
+        Used for (lactating cow) ration formulation
 
     ration : dict
         Contains the ration for all the animals in the pen.
@@ -100,10 +132,10 @@ class Pen:
         Contains the concentration of different nutrients in the current ration.
 
     avg_growth : float
-        Represents the average growth of the animals in the pen.
+        The average growth of the animals in the pen.
 
     _manure_dict_template : dict
-        Represents the dictionary template for the manure attributes (manure, calf_total, etc)
+        The dictionary template for the manure attributes (manure, calf_total, etc)
 
     manure : dict
         Contains the total manure excretion of all animals in the pen.
@@ -135,8 +167,8 @@ class Pen:
             bedding_type: bedding type of the pen
             pen_type: freestall or tiestall
             manure_handling: the manure handling method used to clean the pen
-            manure_separator: the manure separator that processes manure excreted in this pen
-            manure_storage: the manure storage receptacle that stores manure excreted in this pen
+            manure_separator: the manure separator that processes manure excreted in the pen
+            manure_storage: the manure storage receptacle that stores manure excreted in the pen
         """
         self.id = id_number
 
@@ -147,7 +179,6 @@ class Pen:
         self.bedding_type = bedding_type
         self._pen_type = pen_type
 
-        # TODO: add documentation for the following 8 attributes
         self.DBW = 0.0
         self.daily_growth = 0.0
         self.manure_handling = manure_handling
