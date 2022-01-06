@@ -58,7 +58,7 @@ class Pen:
         Obtained from the input file.
 
     manure_handling : string
-        The manure handling method used to clean the pen
+        The manure handling method used to clean the pen.
 
     manure_separator : string
         The type of manure separator that processes manure excreted in the pen.
@@ -66,17 +66,14 @@ class Pen:
     manure_storage : string
         The type of manure storage receptacle that stores manure excreted in the pen.
 
-    TODO: make sure this description is correct
     avg_p_intake : float
         The average phosphorus intake of the animals in the pen.
 
-    TODO: make sure this description is correct
     avg_p_req : float
         The average phosphorus requirements of the animals in the pen.
 
-    TODO: add description
     avg_p_animal : float
-                            The average phosphorus content/mass of the animals in the pen
+        The average phosphorus content/mass of the animals in the pen.
 
     animals_in_pen : animal list
         The list of all animals in this pen.
@@ -127,6 +124,9 @@ class Pen:
     avg_growth : float
         The average growth of the animals in the pen.
 
+    MEdiet : float
+        The metabolizable energy concentration of the diet fed to the pen.
+
     _manure_dict_template : dict
         The dictionary template for the manure attributes (manure, calf_total, etc)
 
@@ -172,8 +172,6 @@ class Pen:
         self.bedding_type = bedding_type
         self._pen_type = pen_type
 
-        self.DBW = 0.0
-        self.daily_growth = 0.0
         self.manure_handling = manure_handling
         self.manure_separator = manure_separator
         self.manure_storage = manure_storage
@@ -204,8 +202,7 @@ class Pen:
 
         self.avg_growth = 0.0
 
-        # TODO: add initial value and documentation in the docstring
-        self.MEdiet = None
+        self.MEdiet = 0.0
 
         # template for manure, calf_total, etc.
         self._manure_dict_template = {"U": 0,
