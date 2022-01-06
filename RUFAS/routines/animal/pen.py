@@ -24,7 +24,7 @@ class Pen:
     id = -1
 
     # list of valid animal groups this pen is reserved for, (if empty any type valid)
-    animal_groups = []
+    valid_animal_groups = []
 
     # maximum stocking density allowed for this pen
     max_stocking_density = 1
@@ -171,7 +171,7 @@ class Pen:
 
     def __init__(self, id_number, vert_dist, horiz_dist, num_stalls, housing_type,
                  bedding_type, pen_type, manure_handling, manure_separator,
-                            manure_storage, animal_groups, max_stocking_density):
+                            manure_storage, valid_animal_groups, max_stocking_density):
         """
         Initializes a pen with the given arguments.
 
@@ -186,11 +186,11 @@ class Pen:
             manure_handling: the manure handling method used to clean the pen
             manure_separator: the manure separator that processes manure excreted in this pen
             manure_storage: the manure storage receptacle that stores manure excreted in this pen
-            animal_groups: list of valid animal groups this pen is reserved for, (if empty any type valid)
+            valid_animal_groups: list of valid animal groups this pen is reserved for, (if empty any type valid)
             max_stocking_density: maximum stocking density allowed for pen
         """
         self.id = id_number
-        self.animal_groups = animal_groups
+        self.valid_animal_groups = valid_animal_groups
         self.max_stocking_density = max_stocking_density
 
         self.vertical_dist_to_parlor = vert_dist
@@ -236,7 +236,7 @@ class Pen:
             stage = type(animal).__name__
             self.classes_in_pen.add(stage)
         # updates the animal class this pen holds
-        self.animal_groups = [animal_group]
+        self.valid_animal_groups = [animal_group]
 
 
     def calc_ration(self, feed, available_feeds):
@@ -595,7 +595,7 @@ class Pen:
         # self.classes_in_pen = set()
         self.avg_p_animal = 0
 
-    def animal_class_feed_subsetter(self, feed):
+    def subset_class_feeds(self, feed):
         """
         Changes the feed_ids list to appropriately include the feeds necessary for that pen object,
         based on the animal type(s) that are currently in the pen.
@@ -605,24 +605,25 @@ class Pen:
         """
         # figure a way to get values of lists into the feed_ids list without passing in the list itself
 
-
-        assert len(self.animal_groups) > -1, "No animal types in pen."
-        assert len(self.animal_groups) < 3, "Illegal amount of animal types in pen."
-
-        if len(self.animal_groups) == 1:
-            if self.animal_groups[0] == 'calf':
-                self.feed_ids.append(feed.panke_calf_feeds)
-            elif self.animal_groups[0] == 'growing':
-                self.feed_ids.append(feed.panke_growing_feeds)
-            elif self.animal_groups[0] == 'close-up':
-                self.feed_ids.append(feed.panke_close_up_feeds)
-            elif self.animal_groups[0] == 'l_cows':
-                self.feed_ids.append(feed.panke_l_cows_feeds)
-        elif len(self.animal_groups) == 2:
-            if (self.feed_ids[0] == 'growing' and self.feed_ids[1] == 'close-up') or (self.feed_ids[0] == 'close-up' and self.feed_ids[1] == 'growing'):
-                self.feed_ids.append(feed.panke_growing_feeds)
-                self.feed_ids.append(feed.panke_close_up_feeds)
+        if len(self.valid_animal_groups) == 1:
+            entry = self.valid_animal_groups[0]
+            if entry == 'calf':
+                self.feed_ids.append(feed.input_calf_feeds)
+            elif entry == 'growing':
+                self.feed_ids.append(feed.input_growing_feeds)
+            elif entry == 'close-up':
+                self.feed_ids.append(feed.input_close_up_feeds)
+            elif entry == 'l_cows':
+                self.feed_ids.append(feed.input_l_cows_feeds)
+        elif len(self.valid_animal_groups) == 2:
+            entry1 = self.valid_animal_groups[0]
+            entry2 = self.valid_animal_groups[1]
+            if (entry1 == 'growing' and entry2== 'close-up') or (entry1 == 'close-up' and entry2 == 'growing'):
+                self.feed_ids.append(feed.input_growing_feeds)
+                self.feed_ids.append(feed.input_close_up_feeds)
 
         # tester comment to see if GitHub problem is fixed.
         # we want to import the Feed Module into pen.py
         # this is done to access the panke_buisse_feed.json file that the Feed Object has access to.
+
+
