@@ -604,13 +604,13 @@ class Pen:
         if len(self.valid_animal_groups) == 1:
             entry = self.valid_animal_groups[0]
             if entry == 'calf':
-                self.feed_ids.append(feed.input_calf_feeds)
+                self.allocated_feeds.extend(feed.input_calf_feeds)
             elif entry == 'growing':
                 self.allocated_feeds.extend(feed.input_growing_feeds)
             elif entry == 'close-up':
-                self.feed_ids.append(feed.input_close_up_feeds)
+                self.allocated_feeds.extend(feed.input_close_up_feeds)
             elif entry == 'l_cows':
-                self.feed_ids.append(feed.input_l_cows_feeds)
+                self.allocated_feeds.extend(feed.input_l_cows_feeds)
         elif len(self.valid_animal_groups) == 2:
             entry1 = self.valid_animal_groups[0]
             entry2 = self.valid_animal_groups[1]
