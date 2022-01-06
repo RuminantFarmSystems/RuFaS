@@ -124,7 +124,7 @@ class PenReport(BaseReportDriver):
             # this subsets the pen's allotted feed given the animals type(s)
             # that are present within the pen that is currently being
             # simulated
-            individual_pen.animal_class_feed_subsetter(feed)
+            individual_pen.class_specific_feeds(feed)
 
             all_feeds = feed.all_feed_ids
             #print(all_feeds)

@@ -67,10 +67,10 @@ class Feed:
         self.purchased_feeds_entries = data['purchased_feeds']
         self.purchased_feeds = []  # set in the next method call
 
-        self.panke_calf_feeds = data['calf feeds']
-        self.panke_growing_feeds = data['growing feeds']
-        self.panke_close_up_feeds = data['close-up feeds']
-        self.panke_l_cows_feeds = data['l_cows feeds']
+        self.input_calf_feeds = data['calf feeds']
+        self.input_growing_feeds = data['growing feeds']
+        self.input_close_up_feeds = data['close-up feeds']
+        self.input_l_cows_feeds = data['l_cows feeds']
 
         self.all_feed_ids = self.get_all_feed_units(data['purchased_feeds'],
                                                     data['farm_grown_feeds'])
