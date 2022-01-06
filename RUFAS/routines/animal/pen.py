@@ -72,10 +72,11 @@ class Pen:
 
     TODO: make sure this description is correct
     avg_p_req : float
-        The average phosphorus intake of the animals in the pen.
+        The average phosphorus requirements of the animals in the pen.
 
     TODO: add description
     avg_p_animal : float
+                            The average phosphorus content/mass of the animals in the pen
 
     animals_in_pen : animal list
         The list of all animals in this pen.
