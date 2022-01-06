@@ -70,7 +70,7 @@ class Feed:
         self.input_calf_feeds = data['calf feeds']
         self.input_growing_feeds = data['growing feeds']
         self.input_close_up_feeds = data['close-up feeds']
-        self.input_l_cows_feeds = data['l_cows feeds']
+        self.input_l_cow_feeds = data['l_cow feeds']
 
         self.all_feed_ids = self.get_all_feed_units(data['purchased_feeds'],
                                                     data['farm_grown_feeds'])

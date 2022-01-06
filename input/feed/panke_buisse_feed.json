@@ -4,10 +4,10 @@
     "feed_quality_table": "feed_quality",
     "nutrient_table": "nutrients",
 
-    "calf feeds": [2, 86],
+    "calf feeds": [2],
     "growing feeds": [2, 26, 86, 118, 136],
     "close-up feeds": [2, 26, 86, 118, 136, 139],
-    "l_cows feeds": [26, 86, 118, 136, 139],
+    "l_cow feeds": [26, 86, 118, 136, 139],
 
     "purchased_feeds": [2, 26, 36, 86, 118, 136, 139],
     "purchased_feeds_costs": {"2": 0.17, "26": 0.1, "36": 0, "86":0,

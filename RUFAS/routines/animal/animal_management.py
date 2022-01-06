@@ -400,10 +400,10 @@ class AnimalManagement:
             if i in self.id_pen:
                 pen = self.all_pens[self.id_pen[i]]
                 #adding count to animals that left pen
-                if pen.id in grouped_pens_short[pen.animal_groups[0]]:
-                    grouped_pens_short[pen.animal_groups[0]][pen.id] += 1
+                if pen.id in grouped_pens_short[pen.valid_animal_groups[0]]:
+                    grouped_pens_short[pen.valid_animal_groups[0]][pen.id] += 1
                 else:
-                    grouped_pens_short[pen.animal_groups[0]][pen.id] = 1
+                    grouped_pens_short[pen.valid_animal_groups[0]][pen.id] = 1
 
                 del self.id_pen[i]
 
@@ -519,28 +519,28 @@ class AnimalManagement:
         #sorting the available pen types
         ##Pen types : [calf, growing, close-up, 'l_cow']
         for pen in self.all_pens:
-            if 'calf' in pen.animal_groups and len(pen.animal_groups) ==1 :
+            if 'calf' in pen.valid_animal_groups and len(pen.valid_animal_groups) ==1 :
                 calf_pens.append(pen)
                 self.pens_animal_group['calf'].append(pen)
                 stall_shortage['calf'] -= pen.num_stalls  * pen.max_stocking_density
-            elif 'growing' in pen.animal_groups and len(pen.animal_groups) == 1:
+            elif 'growing' in pen.valid_animal_groups and len(pen.valid_animal_groups) == 1:
                 growing_pens.append(pen)
                 self.pens_animal_group['growing'].append(pen)
                 stall_shortage['growing'] -= pen.num_stalls * pen.max_stocking_density
-            elif 'close-up' in pen.animal_groups and len(pen.animal_groups) == 1:
+            elif 'close-up' in pen.valid_animal_groups and len(pen.valid_animal_groups) == 1:
                 close_up_pens.append(pen)
                 self.pens_animal_group['close-up'].append(pen)
                 stall_shortage['close-up'] -= pen.num_stalls * pen.max_stocking_density
-            elif 'l_cow' in pen.animal_groups and len(pen.animal_groups) == 1:
+            elif 'l_cow' in pen.valid_animal_groups and len(pen.valid_animal_groups) == 1:
                 l_cow_pens.append(pen)
                 self.pens_animal_group['l_cow'].append(pen)
                 stall_shortage['l_cow'] -= pen.num_stalls * pen.max_stocking_density
             else:
                 mixed_type_pens[pen.id] = pen
-                if len(pen.animal_groups) == 0:
+                if len(pen.valid_animal_groups) == 0:
                     mixed_types[pen.id] = ['calf', 'growing', 'close-up', 'l_cow']
                 else:
-                    mixed_types[pen.id] = pen.animal_groups
+                    mixed_types[pen.id] = pen.valid_animal_groups
         # organzing pens by class and ensuring sufficeint storage
         while True:
             max_value = max(stall_shortage.values())

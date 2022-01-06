@@ -14,8 +14,6 @@ class PensReport(BaseReportDriver):
     def __init__(self, data, state):
         super().__init__(data)
         for pen in state.animal_management.all_pens:
-            print(pen)
-            print(pen.animal_groups)
             self.reports['pen_' + str(pen.id)] = PenReport(data, state.feed, pen, pen.id)
 
         self.reports['pens_summary'] = PensSummary(data['pens_summary'])
@@ -124,27 +122,21 @@ class PenReport(BaseReportDriver):
             # this subsets the pen's allotted feed given the animals type(s)
             # that are present within the pen that is currently being
             # simulated
-            individual_pen.class_specific_feeds(feed)
+            individual_pen.subset_class_feeds(feed)
 
+            # dictionary with all feed ids and keys and their pertaining information as values
             all_feeds = feed.all_feed_ids
-            #print(all_feeds)
 
-            #index at 0 because there is a nested list here for some unknown reason
-            print(individual_pen.feed_ids)
-            pen_id_list = individual_pen.feed_ids
-            print(pen_id_list)
+            # subsets the entirety of the feed ids for the individual pen's needs
+            pen_specific_feeds = {str(x): all_feeds[str(x)] for x in individual_pen.allocated_feeds}
 
-            pen_specific_feeds = {str(x): all_feeds[str(x)] for x in pen_id_list}
-
-
-
-            for feed_id in pen_id_list:
+            for feed_id in individual_pen.allocated_feeds:
                 feed_name = pen_specific_feeds[str(feed_id)]['feed_name']
                 units = pen_specific_feeds[str(feed_id)]['units']
 
                 self.daily_variables[str(feed_id) + "(" + feed_name + ")"] = \
                     [
-                        'pen.ration[\'%s\'] if pen.pen_populated and \'%s\' in pen.feed_ids else 0' % (
+                        'pen.ration[\'%s\'] if pen.pen_populated and \'%s\' in pen.allocated_feeds else 0' % (
                             feed_id, feed_id), units,
                         []]
 

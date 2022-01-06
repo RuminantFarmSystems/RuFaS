@@ -23,9 +23,6 @@ class Pen:
     # unique pen ID, from input file
     id = -1
 
-    # list of valid animal groups this pen is reserved for, (if empty any type valid)
-    valid_animal_groups = []
-
     # maximum stocking density allowed for this pen
     max_stocking_density = 1
 
@@ -74,9 +71,6 @@ class Pen:
 
     # ration for all the animals in the pen
     ration = {}
-
-    # # list of all the ids for the feeds allocated for this pen object
-    # feed_ids = []
 
     # total amount of different nutrients in current ration
     ration_nutrient_amount = {'dm': 0, 'CP': 0, 'ADF': 0,
@@ -210,7 +204,11 @@ class Pen:
         self.avg_p_req = 0
         self.avg_p_animal = 0
 
-        self.feed_ids = []
+        # list of all the ids for the feeds allocated for this pen object
+        self.allocated_feeds = []
+
+        # list of valid animal groups this pen is reserved for, (if empty any type valid)
+        self.valid_animal_groups = []
 
 
 
@@ -306,8 +304,6 @@ class Pen:
 
             else:  # feeds and price
                 ration[key] = ration_per_animal[key] * num_animals
-
-        print(self.feed_ids)
         return ration
 
     def calc_manure(self, feed, methane_model):
@@ -610,7 +606,7 @@ class Pen:
             if entry == 'calf':
                 self.feed_ids.append(feed.input_calf_feeds)
             elif entry == 'growing':
-                self.feed_ids.append(feed.input_growing_feeds)
+                self.allocated_feeds.extend(feed.input_growing_feeds)
             elif entry == 'close-up':
                 self.feed_ids.append(feed.input_close_up_feeds)
             elif entry == 'l_cows':
@@ -618,12 +614,8 @@ class Pen:
         elif len(self.valid_animal_groups) == 2:
             entry1 = self.valid_animal_groups[0]
             entry2 = self.valid_animal_groups[1]
-            if (entry1 == 'growing' and entry2== 'close-up') or (entry1 == 'close-up' and entry2 == 'growing'):
-                self.feed_ids.append(feed.input_growing_feeds)
-                self.feed_ids.append(feed.input_close_up_feeds)
-
-        # tester comment to see if GitHub problem is fixed.
-        # we want to import the Feed Module into pen.py
-        # this is done to access the panke_buisse_feed.json file that the Feed Object has access to.
+            if (entry1 == 'growing' and entry2 == 'close-up') or (entry1 == 'close-up' and entry2 == 'growing'):
+                self.allocated_feeds.extend(feed.input_growing_feeds)
+                self.allocated_feeds.extend(feed.input_close_up_feeds)
 
 
