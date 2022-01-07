@@ -13,6 +13,8 @@ from RUFAS.routines.animal.ration.calf_ration import optimize as calf_optimize
 from RUFAS.routines.animal.ration import ration_driver as ration_driver
 from RUFAS.routines.animal.ration import animal_requirements as req
 from RUFAS import util, errors
+from enum import Enum
+
 
 class Pen:
     """
@@ -163,9 +165,19 @@ class Pen:
     # average growth of the animals in the pen
     avg_growth = 0
 
+    class AnimalCombination(Enum):
+        """
+        Enumeration that represents the valid combinations of animals in a pen.
+        """
+        CALF = 1
+        GROWING = 2
+        CLOSE_UP = 3
+        GROWING_AND_CLOSE_UP = 4
+        LAC_COW = 5
+
     def __init__(self, id_number, vert_dist, horiz_dist, num_stalls, housing_type,
                  bedding_type, pen_type, manure_handling, manure_separator,
-                            manure_storage, valid_animal_groups, max_stocking_density):
+                 manure_storage, valid_animal_groups, max_stocking_density):
         """
         Initializes a pen with the given arguments.
 
@@ -193,7 +205,7 @@ class Pen:
         self.housing_type = housing_type
         self.bedding_type = bedding_type
         self.pen_type = pen_type
-        #self.DBW = 0.0
+        # self.DBW = 0.0
         self.daily_growth = 0.0
 
         self.manure_handling = manure_handling
@@ -204,13 +216,15 @@ class Pen:
         self.avg_p_req = 0
         self.avg_p_animal = 0
 
-        # list of all the ids for the feeds allocated for this pen object
-        self.allocated_feeds = []
+        # set of all the ids for the feeds allocated for this pen object
+        self.allocated_feeds = set()
 
         # list of valid animal groups this pen is reserved for, (if empty any type valid)
+
         self.valid_animal_groups = []
 
-
+        # the animal_combinations in this pen, utilizes the AnimalCombination Enum
+        self.animal_combination = None
 
     def update_animals(self, new_animals, animal_group):
         """
@@ -236,7 +250,6 @@ class Pen:
         # updates the animal class this pen holds
         self.valid_animal_groups = [animal_group]
 
-
     def calc_ration(self, feed, available_feeds):
         """
         Calculates and sets the ration for the pen using the average nutrient
@@ -250,9 +263,9 @@ class Pen:
         # there should only be one group of animals in a pen
 
         while True:
-            #TODO: Instead of checking if animal is in a class, check pen tag
-            #an error may be caused as result of heifers and dry cows in same pen
-            #if we only simulate with 3 pens
+            # TODO: Instead of checking if animal is in a class, check pen tag
+            # an error may be caused as result of heifers and dry cows in same pen
+            # if we only simulate with 3 pens
             if 'Calf' in self.classes_in_pen:
                 ration_per_animal = calf_optimize()
                 ration_vals = {'ME_tot': 0}
@@ -261,20 +274,20 @@ class Pen:
                     'HeiferII' in self.classes_in_pen or \
                     'HeiferIII' in self.classes_in_pen:
                 ration_per_animal, ration_vals = \
-                    ration_driver.ration_formulation(self,feed, available_feeds, \
-                                                    'heifer', False)
+                    ration_driver.ration_formulation(self, feed, available_feeds, \
+                                                     'heifer', False)
 
             elif 'Cow' in self.classes_in_pen and \
                     self.animals_in_pen[0].milking:  # lactating cow
                 ration_per_animal, ration_vals = \
-                    ration_driver.ration_formulation(self, feed,available_feeds, \
-                                                                'cow', True)
+                    ration_driver.ration_formulation(self, feed, available_feeds, \
+                                                     'cow', True)
 
             elif 'Cow' in self.classes_in_pen and \
                     not self.animals_in_pen[0].milking:  # dry cow
                 ration_per_animal, ration_vals = \
-                    ration_driver.ration_formulation(self, feed,available_feeds, \
-                                                                'cow', False)
+                    ration_driver.ration_formulation(self, feed, available_feeds, \
+                                                     'cow', False)
 
             else:  # this should never occur
                 print('error in pen ration calculation')
@@ -517,7 +530,7 @@ class Pen:
 
         if class_name == 'Cow':
             requirements = req.calc_rqmts(animal.body_weight, animal.mature_body_weight,
-                                          animal.days_in_preg,'cow', animal.calves,
+                                          animal.days_in_preg, 'cow', animal.calves,
                                           animal.CI, animal.mPrt, animal.fat_percent,
                                           animal.lactose_milk,
                                           animal.estimated_daily_milk_produced,
@@ -576,7 +589,7 @@ class Pen:
         animal.p_intake = self.avg_p_intake
 
         self.animals_in_pen.append(animal)
-        #updating stocking density
+        # updating stocking density
         self.stocking_density = len(self.animals_in_pen) / self.num_stalls * 100
 
     def clear(self):
@@ -593,7 +606,7 @@ class Pen:
 
     def subset_class_feeds(self, feed):
         """
-        Changes the feed_ids list to appropriately include the feeds necessary for that pen object,
+        Subsets the feed_ids list to appropriately include the feeds necessary for that pen object,
         based on the animal type(s) that are currently in the pen.
 
         Args:
@@ -603,19 +616,20 @@ class Pen:
 
         if len(self.valid_animal_groups) == 1:
             entry = self.valid_animal_groups[0]
-            if entry == 'calf':
-                self.allocated_feeds.extend(feed.input_calf_feeds)
-            elif entry == 'growing':
-                self.allocated_feeds.extend(feed.input_growing_feeds)
-            elif entry == 'close-up':
-                self.allocated_feeds.extend(feed.input_close_up_feeds)
-            elif entry == 'l_cows':
-                self.allocated_feeds.extend(feed.input_l_cows_feeds)
+            if self.animal_combination == Pen.AnimalCombination.CALF or entry == 'calf':
+                self.allocated_feeds |= set(feed.input_calf_feeds)
+            elif self.animal_combination == Pen.AnimalCombination.GROWING or entry == 'growing':
+                self.allocated_feeds |= set(feed.input_growing_feeds)
+            elif self.animal_combination == Pen.AnimalCombination.CLOSE_UP or entry == 'close-up':
+                self.allocated_feeds |= set(feed.input_close_up_feeds)
+            elif self.animal_combination == Pen.AnimalCombination.GROWING_AND_CLOSE_UP:
+                self.allocated_feeds |= set(feed.input_growing_feeds)
+                self.allocated_feeds |= set(feed.input_close_up_feeds)
+            elif self.animal_combination == Pen.AnimalCombination.LAC_COW or entry == 'l_cow':
+                self.allocated_feeds |= set(feed.input_l_cow_feeds)
         elif len(self.valid_animal_groups) == 2:
             entry1 = self.valid_animal_groups[0]
             entry2 = self.valid_animal_groups[1]
             if (entry1 == 'growing' and entry2 == 'close-up') or (entry1 == 'close-up' and entry2 == 'growing'):
-                self.allocated_feeds.extend(feed.input_growing_feeds)
-                self.allocated_feeds.extend(feed.input_close_up_feeds)
-
-
+                self.allocated_feeds |= set(feed.input_growing_feeds)
+                self.allocated_feeds |= set(feed.input_close_up_feeds)
