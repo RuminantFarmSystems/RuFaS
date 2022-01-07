@@ -9,7 +9,6 @@ import sys
 from pathlib import Path
 
 from RUFAS import util, errors
-import fileReader
 
 
 def input_prompt():
@@ -69,7 +68,7 @@ def input_prompt():
                     raise errors.UserInput("Specified file does not exist")
                 else:
                     print("commented json file detected, stripping comments...\n")
-                json_filename = fileReader.convert_to_json(str(input_path))
+                json_filename = util.convert_to_json(str(input_path))
                 json_path = Path(json_filename.strip())
                 return [json_path]
 
