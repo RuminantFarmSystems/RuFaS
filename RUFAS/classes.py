@@ -84,7 +84,6 @@ class Config:
         self.end_year = int(self.end_full_date[0])
         self.start_day = int(self.start_full_date[1])
         self.end_day = int(self.end_full_date[1])
-        self.run_tests = data['run_tests']
 
         # set seed attributes
         self.set_seed = data['set_seed']
