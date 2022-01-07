@@ -14,7 +14,8 @@ class PensReport(BaseReportDriver):
     def __init__(self, data, state):
         super().__init__(data)
         for pen in state.animal_management.all_pens:
-            self.reports['pen_' + str(pen.id)] = PenReport(data, state.feed, pen.id)
+            self.reports['pen_' +
+                         str(pen.id)] = PenReport(data, state.feed, pen.id)
 
         self.reports['pens_summary'] = PensSummary(data['pens_summary'])
 
@@ -55,6 +56,8 @@ class PenReport(BaseReportDriver):
             pen = state.animal_management.all_pens[self.pen_id]
 
             for variable in self.daily_variables:
+                # index 2 is the accumulator for the evauated variables
+                # index 0 is the string literal code representation of the variable
                 self.daily_variables[variable][2].append(
                     eval(self.daily_variables[variable][0], globals(), locals()))
 
@@ -64,8 +67,11 @@ class PenReport(BaseReportDriver):
             pen = state.animal_management.all_pens[self.pen_id]
 
             for variable in self.annual_variables:
+                # index 2 is the accumulator for the evauated variables
+                # index 0 is the string literal code representation of the variable
                 self.annual_variables[variable][2] = \
-                    eval(self.daily_variables[variable][0], globals(), locals())
+                    eval(self.daily_variables[variable]
+                         [0], globals(), locals())
 
     class GrowthReport(BasePenReport):
         def __init__(self, data, pen_id):
