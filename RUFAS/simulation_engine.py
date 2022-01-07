@@ -15,7 +15,8 @@ from RUFAS import routines, errors, classes
 from RUFAS.classes import Config, State, Weather, Time
 from RUFAS.util import get_base_dir, read_json_file
 from RUFAS.output_handler import OutputHandler
-from RUFAS.test import test_handler
+#TODO fix this error (RUFAS.test doesn't exist)
+#from RUFAS.test import test_handler
 import random
 import numpy
 
