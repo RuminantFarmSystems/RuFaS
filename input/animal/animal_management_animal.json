@@ -154,7 +154,7 @@
 		},
 		"pen2": {
 			"id": 2,
-			"animal_groups": ["close-up"],
+			"animal_groups": ["close_up"],
 			"vertical_dist_to_milking_parlor": 0.1,
 			"horizontal_dist_to_milking_parlor": 1.6,
 			"number_of_stalls": 300,
@@ -168,7 +168,7 @@
 		},
 		"pen3": {
 			"id": 3,
-			"animal_groups": ["l_cow"],
+			"animal_groups": ["lac_cow"],
 			"vertical_dist_to_milking_parlor": 0.1,
 			"horizontal_dist_to_milking_parlor": 1.6,
 			"number_of_stalls": 400,
