@@ -67,10 +67,11 @@ class Feed:
         self.purchased_feeds_entries = data['purchased_feeds']
         self.purchased_feeds = []  # set in the next method call
 
-        self.input_calf_feeds = data['calf feeds']
-        self.input_growing_feeds = data['growing feeds']
-        self.input_close_up_feeds = data['close-up feeds']
-        self.input_l_cow_feeds = data['l_cow feeds']
+        # TODO: possibly convert these to sets instead of lists
+        self.input_calf_feeds = data['calf_feeds']
+        self.input_growing_feeds = data['growing_feeds']
+        self.input_close_up_feeds = data['close_up_feeds']
+        self.input_lac_cow_feeds = data['lac_cow_feeds']
 
         self.all_feed_ids = self.get_all_feed_units(data['purchased_feeds'],
                                                     data['farm_grown_feeds'])
@@ -372,7 +373,7 @@ class Feed:
                     # is not reset
                     self.days_since_feedout = -30
                 self.feed_id = crop.raw_id
-                self.DM += crop.yield_actual*crop.DM_harvest_percent
+                self.DM += crop.yield_actual * crop.DM_harvest_percent
                 self.NDF += crop.NDF_yield
                 self.N += crop.N_yield
                 self.P += crop.P_yield

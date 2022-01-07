@@ -274,20 +274,17 @@ class Pen:
                     'HeiferII' in self.classes_in_pen or \
                     'HeiferIII' in self.classes_in_pen:
                 ration_per_animal, ration_vals = \
-                    ration_driver.ration_formulation(self, feed, available_feeds, \
-                                                     'heifer', False)
+                    ration_driver.ration_formulation(self, feed, available_feeds, 'heifer', False)
 
             elif 'Cow' in self.classes_in_pen and \
                     self.animals_in_pen[0].milking:  # lactating cow
                 ration_per_animal, ration_vals = \
-                    ration_driver.ration_formulation(self, feed, available_feeds, \
-                                                     'cow', True)
+                    ration_driver.ration_formulation(self, feed, available_feeds, 'cow', True)
 
             elif 'Cow' in self.classes_in_pen and \
                     not self.animals_in_pen[0].milking:  # dry cow
                 ration_per_animal, ration_vals = \
-                    ration_driver.ration_formulation(self, feed, available_feeds, \
-                                                     'cow', False)
+                    ration_driver.ration_formulation(self, feed, available_feeds, 'cow', False)
 
             else:  # this should never occur
                 print('error in pen ration calculation')
@@ -620,16 +617,16 @@ class Pen:
                 self.allocated_feeds |= set(feed.input_calf_feeds)
             elif self.animal_combination == Pen.AnimalCombination.GROWING or entry == 'growing':
                 self.allocated_feeds |= set(feed.input_growing_feeds)
-            elif self.animal_combination == Pen.AnimalCombination.CLOSE_UP or entry == 'close-up':
+            elif self.animal_combination == Pen.AnimalCombination.CLOSE_UP or entry == 'close_up':
                 self.allocated_feeds |= set(feed.input_close_up_feeds)
             elif self.animal_combination == Pen.AnimalCombination.GROWING_AND_CLOSE_UP:
                 self.allocated_feeds |= set(feed.input_growing_feeds)
                 self.allocated_feeds |= set(feed.input_close_up_feeds)
-            elif self.animal_combination == Pen.AnimalCombination.LAC_COW or entry == 'l_cow':
-                self.allocated_feeds |= set(feed.input_l_cow_feeds)
+            elif self.animal_combination == Pen.AnimalCombination.LAC_COW or entry == 'lac_cow':
+                self.allocated_feeds |= set(feed.input_lac_cow_feeds)
         elif len(self.valid_animal_groups) == 2:
             entry1 = self.valid_animal_groups[0]
             entry2 = self.valid_animal_groups[1]
-            if (entry1 == 'growing' and entry2 == 'close-up') or (entry1 == 'close-up' and entry2 == 'growing'):
+            if (entry1 == 'growing' and entry2 == 'close_up') or (entry1 == 'close_up' and entry2 == 'growing'):
                 self.allocated_feeds |= set(feed.input_growing_feeds)
                 self.allocated_feeds |= set(feed.input_close_up_feeds)
