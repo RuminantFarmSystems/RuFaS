@@ -359,12 +359,16 @@ class Pen:
 
             elif 'Cow' in self.classes_in_pen and \
                     self.animals_in_pen[0].milking:  # lactating cow
-                ration_per_animal, ration_vals = \
-                    ration_driver.ration_formulation(self, available_feeds, True)
+                ration_per_animal = growing_heifer_optimize()
+                ration_vals = {'ME_tot': 0}   
+                # ration_per_animal, ration_vals = \
+                #     ration_driver.ration_formulation(self, available_feeds, True)
             elif 'Cow' in self.classes_in_pen and \
                     not self.animals_in_pen[0].milking:  # dry cow
-                ration_per_animal, ration_vals = \
-                    ration_driver.ration_formulation(self, available_feeds, False)
+                ration_per_animal = growing_heifer_optimize()
+                ration_vals = {'ME_tot': 0}   
+                # ration_per_animal, ration_vals = \
+                #     ration_driver.ration_formulation(self, available_feeds, False)
 
             else:  # this should never occur
                 print('error in pen ration calculation')
