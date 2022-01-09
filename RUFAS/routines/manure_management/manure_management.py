@@ -6,7 +6,8 @@ Description:
 
 
 Author(s):  William Donovan, wmdonovan@wisc.edu
-            Yunus Mohammed, ymm26@cornell.edu  
+            Yunus Mohammed, ymm26@cornell.edu 
+            Sadman Chowdhury, skc86@cornell.edu 
 """
 from RUFAS.routines.manure_management import handlers, reception_pits, manure_separators, \
     treatments, storage_options
@@ -56,6 +57,50 @@ def compile_manure_for_all_pens(animal_management):
 
 
     return total_manure  
+
+"""
+    Takes a list of pen numbers and an instance of animal_management class, 
+    combines the manure information for the pens passed in, and returns a
+    dictionary with the combined information.
+
+    Parameters:
+        list_of_pen_numbers: a list of pen numbers, e.g. [1,2] means pen 1 and 2
+        animal_management: instance of animal_management class
+"""
+def combine_manure_for_different_pens(list_of_pen_numbers, animal_management):
+    pens = animal_management["all_pens"]
+    total_manure = {
+            "U": 0,
+            "TAN_s": 0,
+            "MN": 0,
+            "Mkg": 0,
+            "TSd": 0,
+            "VSd": 0,
+            "VSnd": 0,
+            "WIP_frac": 0,
+            "WOP_frac": 0,
+            "p_excrt_manure": 0,
+            "p_frac": 0,
+            "K_manure": 0,
+            "CH4_manure": 0
+    }
+    for i in list_of_pen_numbers:
+        pen = pens[i]
+        total_manure["U"] += pen["manure"]["U"]
+        total_manure["TAN_s"] += pen["manure"]["TAN_s"]
+        total_manure["MN"] += pen["manure"]["MN"]
+        total_manure["Mkg"] += pen["manure"]["Mkg"]
+        total_manure["TSd"] += pen["manure"]["TSd"]
+        total_manure["VSd"] += pen["manure"]["VSd"]
+        total_manure["VSnd"] += pen["manure"]["VSnd"]
+        total_manure["WIP_frac"] += pen["manure"]["WIP_frac"]
+        total_manure["WOP_frac"] += pen["manure"]["WOP_frac"]
+        total_manure["p_excrt_manure"] += pen["manure"]["p_excrt_manure"]
+        total_manure["p_frac"] += pen["manure"]["p_frac"]
+        total_manure["K_manure"] += pen["manure"]["K_manure"]
+        total_manure["CH4_manure"] += pen["manure"]["CH4_manure"]
+
+    return total_manure
 
 
 

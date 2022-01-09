@@ -65,10 +65,13 @@ animal_manure_input_1 : animal_management.AnimalManagement = {
     ]
         }
 
-
+animal_manure_input_2 = [0, 1]
 
 #assert(manure_management.compile_manure_for_all_pens(animal_manure_input_1) == animal_manure_output_1
 
 def test_compile_manure_for_all_pens():
 	"""Unit test for function compile_manure_for_all_pens in file routines\manure_management\manure_management.py"""
 	assert(manure_management.compile_manure_for_all_pens(animal_manure_input_1) == animal_manure_output_1)
+
+def test_combine_manure_for_different_pens():
+  assert(manure_management.combine_manure_for_different_pens(animal_manure_input_2, animal_manure_input_1) == animal_manure_output_1)
