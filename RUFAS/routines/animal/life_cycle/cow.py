@@ -515,6 +515,7 @@ class Cow(HeiferIII):
                     if estrus_service_rand < AnimalBase.config['estrus_insemination_rate']:
                         # serviced
                         self.ai_day = self.estrus_day + 1
+                        self.open_stage = False
                         self.conception_rate = AnimalBase.config['estrus_conception_rate']
                     else:
                         # go to next estrus cycle
@@ -737,7 +738,7 @@ class Cow(HeiferIII):
         # ED program after AI, TAI atart after PD
         if self.resynch_method == 'TAIafterPD':         
             # ED before 1st preg check 
-            if self.days_born < self.ai_day + AnimalBase.config['preg_loss_rate_1']:
+            if self.days_born < self.ai_day + AnimalBase.config['preg_check_day_1']:
                 self.ed_update(sim_day)
             # on the day of preg check
             elif self.days_born == self.abortion_day:
@@ -773,7 +774,7 @@ class Cow(HeiferIII):
         # PGF injection at PD, ED for 7 days after PGF, TAI start afterwards
         elif self.resynch_method == 'PGFatPD':
             # ED before 1st preg check 
-            if self.days_born < self.ai_day + AnimalBase.config['preg_loss_rate_1']:
+            if self.days_born < self.ai_day + AnimalBase.config['preg_check_day_1']:
                 self.ed_update(sim_day)
             # inject PGF at the day of preg check 
             elif self.days_born == self.abortion_day:
