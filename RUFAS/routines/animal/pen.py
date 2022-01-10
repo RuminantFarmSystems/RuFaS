@@ -121,6 +121,9 @@ class Pen:
     ration_nutrient_conc : dict
         Contains the concentration of different nutrients in the current ration.
 
+    dry_matter_intake : float
+        The dry matter intake value of the animals in the pen.
+
     avg_growth : float
         The average growth of the animals in the pen.
 
