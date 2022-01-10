@@ -252,6 +252,8 @@ class Pen:
         """
         self.id = pen_id
 
+        self.dry_matter_intake = 0
+
     def update_animals(self, new_animals):
         """
         Sets the list of animals to @new_animals and calculates the stocking
@@ -418,6 +420,7 @@ class Pen:
         self.ration_nutrient_amount = nutrient_amount
         self.ration_nutrient_conc = nutrient_conc
         self.MEdiet = ration_vals['ME_tot']
+        self.dry_matter_intake = nutrient_amount['dm']
 
         for animal in self.animals_in_pen:
             animal.set_ration(ration_per_animal, nutrient_amount['dm'])
@@ -595,6 +598,8 @@ class Pen:
         # set animal's ration to be the intake of all other animals in pen
         # if self.ration == {}:
         #     self.ration = self.calc_ration(feed, temp)
+
+        animal.dry_matter_intake = self.dry_matter_intake
 
         for key in self.ration:
             if key == 'status':
