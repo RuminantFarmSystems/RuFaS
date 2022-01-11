@@ -553,7 +553,7 @@ class Pen:
                 total_p_animal += animal.p_animal
             self.avg_p_animal = total_p_animal / len(self.animals_in_pen)
 
-    def set_up_new_animal(self, animal, p_comp, feed, temp):
+    def set_up_new_animal(self, animal, p_comp, feed, temp, num_animals_before_additions):
         """
         Sets the necessary attributes for @animal to be a replacement in this
         pen.
@@ -566,13 +566,14 @@ class Pen:
                 calf and that its p_animal attribute has already been calculated
             feed: instance of the Feed class defined in feed.py
             temp: temperature on the current day
+            num_animals_before_additions: the number of animals in this pen
+                before any new animals were added for the day
         """
-        num_animals = len(self.animals_in_pen)
-        if num_animals == 0:
+        if num_animals_before_additions == 0:
             # for the case that there are no animals currently in this pen.
             # Avoids a division by 0 error in below calculations
             # TODO is there a better way?
-            num_animals = 1
+            num_animals_before_additions = 1
 
         class_name = type(animal).__name__
         self.classes_in_pen.add(class_name)
@@ -608,12 +609,18 @@ class Pen:
                 animal.ration_formulation[key] = self.ration[key]
 
             else:  # feeds and price
-                animal.ration_formulation[key] = self.ration[key] / num_animals
+                animal.ration_formulation[key] = self.ration[key] / num_animals_before_additions
 
         # set animal's manure to be the average manure of all other
         # animals in pen
         for key in self.manure.keys():
-            animal.manure_excretion[key] = self.manure[key] / num_animals
+            animal.manure_excretion[key] = self.manure[key] / len(self.animals_in_pen)
+
+        # since the manure attribute is a total from all animals in the pen,
+        # we need to add the current animal's values to the total values for
+        # each manure key
+        for key in self.manure:
+            self.manure[key] += animal.manure_excretion[key]
 
         # set animal's nutrient requirements to be the average requirements of
         # all other animals in pen
