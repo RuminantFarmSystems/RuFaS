@@ -729,14 +729,15 @@ class Cow(HeiferIII):
             self.ed_update(sim_day)
 
         # on TAI start day, if AI not scheduled for ED method, start TAI update
-        elif self.days_in_milk == AnimalBase.config['tai_program_start_day'] and self.ai_day < self.days_born:
+        elif self.days_in_milk == AnimalBase.config['tai_program_start_day'] \
+            and self.ai_day < self.days_born and self.days_in_preg == 0:
             self.estrus_day = 0
             self.tai_program_start_day_c = self.days_born
             self.presynch_method = None
             self.tai_update(sim_day)
 
         # after TAI start day, if ED program stopped, continue TAI update
-        elif self.days_in_milk > AnimalBase.config['tai_program_start_day']:
+        elif self.days_in_milk > AnimalBase.config['tai_program_start_day'] and self.days_in_preg == 0:
             self.tai_update(sim_day)
 
     def resynch_protocol(self, sim_day):
