@@ -99,6 +99,7 @@ class LifeCycleManager:
     avg_mature_body_weight = 0
 
     cull_reason_stats = {
+        c.DEATH_CULL: 0,
         c.LOW_PROD_CULL: 0,
         c.LAMENESS_CULL: 0,
         c.INJURY_CULL: 0,
@@ -108,6 +109,7 @@ class LifeCycleManager:
         c.UNKNOWN_CULL: 0
     }
     cull_reason_stats_percent = {
+        c.DEATH_CULL: 0,
         c.LOW_PROD_CULL: 0,
         c.LAMENESS_CULL: 0,
         c.INJURY_CULL: 0,
@@ -344,7 +346,8 @@ class LifeCycleManager:
                 args.update({
                     'body_weight_history': heiferII.body_weight_history,
                     'pen_history': heiferII.pen_history,
-                    'conceptus_weight': heiferII.conceptus_weight
+                    'conceptus_weight': heiferII.conceptus_weight,
+                    'calf_birth_weight': heiferII.calf_birth_weight
                 })
                 new_heiferIII = HeiferIII(args)
                 heiferIIIs.append(new_heiferIII)
@@ -375,7 +378,8 @@ class LifeCycleManager:
                 args.update({
                     'body_weight_history': heiferIII.body_weight_history,
                     'pen_history': heiferIII.pen_history,
-                    'conceptus_weight': heiferIII.conceptus_weight
+                    'conceptus_weight': heiferIII.conceptus_weight,
+                    'calf_birth_weight': heiferIII.calf_birth_weight
                      })
                 args.update(repro_program=AnimalBase.config['cow_repro_method'])
                 args.update(presynch_method=AnimalBase.config['cow_presynch_protocol'])
@@ -517,14 +521,14 @@ class LifeCycleManager:
                 self.semen_num += cow.semen_num
                 self.ai_num += cow.AI_times
 
-            # sold calves
             if new_born:
                 args = {
                     'id': self.animal_initializer.next_id(),
                     'breed': 'HO',
                     'birth_date': date,
                     'days_born': 0,
-                    'p_init': cow.p_gest_for_calf
+                    'p_init': cow.p_gest_for_calf,
+                    'birth_weight': cow.calf_birth_weight
                 }
                 # at parturition, the sum of P absorbed for gestation rqmts is
                 # subtracted from the animal value. the sum of P absorbed for
@@ -535,6 +539,7 @@ class LifeCycleManager:
 
                 new_calf = Calf(args)
                 cow.p_gest_for_calf = 0
+                cow.calf_birth_weight = 0
 
                 if not (new_calf.culled or new_calf.sold):
                     new_calf.events.add_event(

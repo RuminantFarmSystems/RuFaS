@@ -139,7 +139,7 @@ def optimize(feed, rqmts):
                          "RATION", lower_bounds, upper_bounds)
 
 
-def calculate_rqmts(BW, BCS, CBW, pasture_concentrate, CP_Milk, DOP, DHD,
+def calculate_rqmts(BW, BCS, calf_birth_weight, pasture_concentrate, CP_Milk, DOP, DHD,
                     DVD, DIM, fat_milk, lactose_milk, milk, parity,
                     farming_type, nutrients_list):
     """
@@ -218,9 +218,9 @@ def calculate_rqmts(BW, BCS, CBW, pasture_concentrate, CP_Milk, DOP, DHD,
     if DOP < 190:
         NEpreg = 0
     elif 190 <= DOP <= 279:
-        NEpreg = ((0.00318 * DOP - 0.0352) * (CBW / 45)) / 0.218
+        NEpreg = ((0.00318 * DOP - 0.0352) * (calf_birth_weight / 45)) / 0.218
     else:
-        NEpreg = ((0.00318 * 279 - 0.0352) * (CBW / 45)) / 0.218
+        NEpreg = ((0.00318 * 279 - 0.0352) * (calf_birth_weight / 45)) / 0.218
 
     # Body Weight change requirements
     # -------------------------------

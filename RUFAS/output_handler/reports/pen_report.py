@@ -56,6 +56,8 @@ class PenReport(BaseReportDriver):
 
             print(self.daily_variables)
             for variable in self.daily_variables:
+                # index 2 is the accumulator for the evauated variables
+                # index 0 is the string literal code representation of the variable
                 self.daily_variables[variable][2].append(
                     eval(self.daily_variables[variable][0], globals(), locals()))
 
@@ -65,8 +67,11 @@ class PenReport(BaseReportDriver):
             pen = state.animal_management.all_pens[self.pen_id]
 
             for variable in self.annual_variables:
+                # index 2 is the accumulator for the evauated variables
+                # index 0 is the string literal code representation of the variable
                 self.annual_variables[variable][2] = \
-                    eval(self.daily_variables[variable][0], globals(), locals())
+                    eval(self.daily_variables[variable]
+                         [0], globals(), locals())
 
     class GrowthReport(BasePenReport):
         def __init__(self, data, pen_id):
@@ -143,7 +148,6 @@ class PenReport(BaseReportDriver):
             self.annual_variables = {
                 'year': ['time.calendar_year', '', 0]
             }
-
 
         def produce_report_graphics(self):
             super().produce_report_graphics()
