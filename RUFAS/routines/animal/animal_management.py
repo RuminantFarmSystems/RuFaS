@@ -1023,12 +1023,28 @@ class AnimalManagement:
         Increments each of the animal group DMI totals by the appropriate
         amount.
         """
-        for calf in self.calves:
-            self.annual_herd_DMI += calf.dry_matter_intake
+
+        # Note that we do not add the DMI for the calves to
+        # self.annual_herd_DMI because part of the calf diet includes
+        # whole_milk_intake, which is the milk consumed from her mother. This
+        # feed is not purchased, therefore the DMI from this feed would not
+        # have a balancing value within the purchased_feed_amounts. It does
+        # not make sense to have the feed consumed by all animals
+        # (self.annual_herd_DMI) be different from the totals of the
+        # purchased_feed_amounts, so we leave out the calf ration here.
 
         for heifer in self.heiferIs + self.heiferIIs + self.heiferIIIs:
             self.annual_herd_DMI += heifer.dry_matter_intake
             self.annual_heifer_DMI += heifer.dry_matter_intake
+
+            for key in heifer.ration_formulation:
+                if key != 'objective' and key != 'status':
+                    if key in self.purchased_feed_amounts.keys():
+                        self.purchased_feed_amounts[key] += \
+                            heifer.ration_formulation[key]
+                    else:
+                        self.purchased_feed_amounts[key] = \
+                            heifer.ration_formulation[key]
 
         for cow in self.cows:
             self.annual_herd_DMI += cow.dry_matter_intake
@@ -1037,18 +1053,14 @@ class AnimalManagement:
             else:
                 self.annual_dry_cow_DMI += cow.dry_matter_intake
 
-        # At this point, every animal should be assigned a ration, so we can
-        # calculate the amount of purchased feeds.
-        for pen in self.all_pens:
-            for animal in pen.animals_in_pen:
-                for key in animal.ration_formulation:
-                    if key != 'objective':
-                        if key in self.purchased_feed_amounts.keys():
-                            self.purchased_feed_amounts[key] += \
-                            animal.ration_formulation[key]
-                        else:
-                            self.purchased_feed_amounts[key] = \
-                            animal.ration_formulation[key]
+            for key in cow.ration_formulation:
+                if key != 'objective' and key != 'status':
+                    if key in self.purchased_feed_amounts.keys():
+                        self.purchased_feed_amounts[key] += \
+                            cow.ration_formulation[key]
+                    else:
+                        self.purchased_feed_amounts[key] = \
+                            cow.ration_formulation[key]
 
     def calc_milk_prod_stats(self):
         """
