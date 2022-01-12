@@ -16,15 +16,17 @@ INSEMINATED_W_BASE = "inseminated with "
 BREEDING_START = "breeding start"
 DO_NOT_BREED = "mark as do not breed"
 
-# estrus occurred
+# estrus 
 ESTRUS_DETECTED = "estrus detected"
-BASIC_ESTRUS_NOTE = "estrus"
+BASIC_ESTRUS_NOTE = "estrus sceduled"
 ESTRUS_AFTER_AI_NOTE = "estrus after AI scheduled"
 ESTRUS_AFTER_ABORTION_NOTE = "estrus after abortion scheduled"
 FIRST_ESTRUS_NOTE = "first estrus scheduled"
+SYNCH_ESTRUS = "synch estrus scheduled"
 ESTRUS_AFTER_CALVING_NOTE = "1st estrus after calving scheduled"
 ESTRUS_BEFORE_VWP_NOTE = "estrus scheduled during vwp estrus"
 ESTRUS_AFTER_PGF_NOTE = "estrus after PGF scheduled"
+ESTRUS_OCCURRED = "estrus"
 
 # TAI injections
 INJECT_GNRH = "inject GnRH"
