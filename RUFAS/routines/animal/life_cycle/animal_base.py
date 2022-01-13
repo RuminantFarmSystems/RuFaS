@@ -13,6 +13,18 @@ from RUFAS.routines.animal.life_cycle.animal_events import AnimalEvents
 
 
 class PenHistory:
+    """
+    Stores pen history of an animal including:
+         pen number;
+         the start and end day of a period when the animal was in that pen;
+         class of animal when the animal was in that pen.
+
+    Args:
+        start_day: the day this animal is moved into this pen
+        end_day: the day this animal id moved out of this pen
+        pen: pen nunmber
+        classes_in_pen: the class of the animal when it was in this pen
+    """
     def __init__(self, start, end, pen, classes_in_pen):
         self.start_date = start
         self.end_date = end
@@ -21,6 +33,14 @@ class PenHistory:
 
 
 class BodyWeightHistory:
+    """
+    Stores body weight history of an animal throughout its life
+
+    Args:
+        simulation_day: days of a simulation
+        days_born: age of this animal (d) when the body weight was recorded
+        body_weight: body weight (kg) on the age of days_born
+    """
     def __init__(self, sim_day, days_born, body_weight):
         self.simulation_day = sim_day
         self.days_born = days_born
@@ -28,6 +48,9 @@ class BodyWeightHistory:
 
 
 class AnimalBase(object):
+    """
+    Stores animal base information
+    """
     config = {}
     nutrients = None
 
@@ -43,16 +66,34 @@ class AnimalBase(object):
         """
         Initializes common parameters for all animals
         Args:
-            args.breed: breed of the cow
-            args.birth_date: the date of the simulation when the calf was born
-            args.days_born: age of the animal
-            arg.semen_used: semen used in the dam for the calf
-            (optional: include the following to assign animal information)
-			args.birth_weight: the birth weight of the animal
-			args.body_weight: current body weight of the animal
-			args.wean_weight: the wean weight of the animal
-			args.mature_body_weight: the mature body weight of the animal
-			args.events: events of the animal
+            id:  id of the animal
+            breed: breed of the animal
+            birth_date: the date of the simulation when the calf was born
+            days_born: age of the animal
+            semen_used: semen used in the dam for the calf
+
+            culled: whether this animal is culled from the herd
+            do_not_breed: if a cow is in a do_not_breed stage, breeding programs stoped for her
+
+            body_weight_history: daily history of its bodyweight
+            events: events of the animal life story
+            pen_history: history if pens it has been
+            daily_growth: body weight change from the previsous day to this day
+            nutrient_rqmts: nutrient requirement of the animal 
+            set_default_nutrient_rqmts: default nutrient rqmts
+            dry_matter_intake: dry matter intakeof the animal
+            manure_excretion: manure excretion of the animal
+            ration_formulation: ration formulation settings
+
+			birth_weight: the birth weight of the animal
+			body_weight: current body weight of the animal
+			wean_weight: the wean weight of the animal
+			mature_body_weight: the mature body weight of the animal
+            conceptus_weight: the weight of the conceptus of pregnant animal
+            calf_birth_weight: the weight of the calf (included in the conceptus weight)
+            tissue_changed: bodyweight changed due to milking 
+
+			
         """
         self.id = args['id']
         self.breed = args['breed']

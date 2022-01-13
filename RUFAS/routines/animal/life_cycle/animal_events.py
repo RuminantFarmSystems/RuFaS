@@ -22,7 +22,7 @@ class AnimalEvents(object):
 		Initialize event from a string
 
 		Args:
-			events_str: string representation of events
+			events: string representation of events
 		"""
 		split_by_date = list(filter(lambda x: x != '', list(
 			map(lambda x: x.strip(), events_str.lower().split('days born ')))))
@@ -61,6 +61,9 @@ class AnimalEvents(object):
 	def get_most_recent_date(self, event_description):
 		"""
 		Returns the most recent age at which the @event_description happened
+
+		Args:
+		 event_description: description of the event
 		"""
 		dates = copy.deepcopy(list(self.events.keys()))
 		dates.reverse()
