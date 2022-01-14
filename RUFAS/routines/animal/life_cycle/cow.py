@@ -895,7 +895,7 @@ class Cow(HeiferIII):
             # adding past injections in TAI start before PD programs
             if self.resynch_method in ['TAIbeforePD']:
                 self.events.add_event(
-                    self.tai_program_start_day_c, sim_day, c.INJECT_GNRH)
+                    self.days_born, sim_day, c.INJECT_GNRH)
                 self.GnRH_injections = self.GnRH_injections + 1
             
             if self.days_in_preg > 0:
