@@ -423,6 +423,10 @@ class Cow(HeiferIII):
         new_born = False
         self.days_born += 1
 
+        self.ED_days = 0
+        self.GnRH_injections = 0
+        self.PGF_injections = 0
+
         if self.days_in_preg > 0 and self.days_in_preg == self.gestation_length:
             self.calves += 1
             self.milking = True
@@ -471,26 +475,6 @@ class Cow(HeiferIII):
         return estimated_daily_milk_produced, fat_percent, \
                daily_fat_correct_milk_production, cull_stage, new_born
 
-    # ED methods
-    # def determine_estrus_day(self, start_date, estrus_note, avg, std, sim_day):
-    #     """
-    #     In estrus detection program, determine estrus day and estrus note.
-
-    #     Args:
-    #         start_date: start day of a estrus cycle, 1st day when breeding start
-    #             after calving or last estrus happened or return estrus
-    #             from preg loss
-    #         estrus_note: note of this estrus
-    #         avg: average length for an estrus cycle
-    #         std: standard deviation for an estrus cycle
-
-    #     Returns: the day when this estrus should occur
-    #     """
-    #     estrus_cycle = truncnorm.rvs(-2, 2, avg, std)
-    #     estrus_day = int(start_date + abs(estrus_cycle))
-    #     self.events.add_event(estrus_day, sim_day, estrus_note)
-    #     return estrus_day
-
     def ed_update(self, sim_day):
         """
         Estrus occur at estrus day,
@@ -535,7 +519,7 @@ class Cow(HeiferIII):
                         AnimalBase.config['avg_estrus_cycle_cow'],
                         AnimalBase.config['std_estrus_cycle_cow'], sim_day)
 
-        if self.milking and not self.do_not_breed:
+        if self.milking and self.days_in_preg == 0 and not self.do_not_breed:
             self.ED_days += 1
 
     # TAI methods
@@ -649,6 +633,9 @@ class Cow(HeiferIII):
             self.PGF_injections = self.PGF_injections + 1
             self.synch_ed_estrus_day = self.determine_synch_ed_estrus_day(self.days_born, c.SYNCH_ESTRUS, 5, 1.5, 11, sim_day)
 
+        if self.days_born > self.presynch_program_start_day + 14 and self.days_born < self.synch_ed_estrus_day:
+            self.ED_days += 1
+            
         elif self.days_born == self.synch_ed_estrus_day:
             self.events.add_event(self.days_born, sim_day, c.ESTRUS_OCCURRED)
             estrus_detection_rand = random()
@@ -856,6 +843,10 @@ class Cow(HeiferIII):
         """
         if self.days_in_preg > 0:
             self.days_in_preg += 1
+
+        self.semen_num = 0
+        self.AI_times = 0
+        self.preg_diagnoses = 0
 
         if self.days_born == self.ai_day:
             self.events.add_event(

@@ -126,8 +126,10 @@ class LifeCycleManager:
 
     ai_num_h = 0
     semen_num_h = 0
+    ed_period_h = 0
     ai_num = 0
     semen_num = 0
+    ed_period = 0
 
     config = None
 
@@ -260,8 +262,10 @@ class LifeCycleManager:
         self.PGF_injection_num = 0
         self.ai_num_h = 0
         self.semen_num_h = 0
+        self.ed_period_h = 0
         self.ai_num = 0
         self.semen_num = 0
+        self.ed_period = 0
 
         self.daily_milk_production = 0
         self.open_cow_num = 0
@@ -373,6 +377,13 @@ class LifeCycleManager:
                         self._calc_average(preg_heifer_num,
                                            self.avg_breeding_to_preg_time,
                                            heiferII.breeding_to_preg_time)
+                self.CIDR_count += heiferII.CIDR_count
+                self.GnRH_injection_num_h += heiferII.GnRH_injections
+                self.PGF_injection_num_h += heiferII.PGF_injections
+                self.preg_check_num_h += heiferII.preg_diagnoses
+                self.semen_num_h += heiferII.semen_num
+                self.ai_num_h += heiferII.AI_times
+                self.ed_period_h += heiferII.ED_days
 
         # heiferIII to cow, assign repro programs
         for index, heiferIII in enumerate(heiferIIIs):
@@ -524,17 +535,12 @@ class LifeCycleManager:
                         calving_interval_available_num,
                         self.avg_calving_interval, cow.CI)
 
-                self.CIDR_count += heiferII.CIDR_count
-                self.GnRH_injection_num_h += heiferII.GnRH_injections
-                self.PGF_injection_num_h += heiferII.PGF_injections
                 self.GnRH_injection_num += cow.GnRH_injections
                 self.PGF_injection_num += cow.PGF_injections
-                self.preg_check_num_h += heiferII.preg_diagnoses
-                self.semen_num_h += heiferII.semen_num
-                self.ai_num_h += heiferII.AI_times
                 self.preg_check_num += cow.preg_diagnoses
                 self.semen_num += cow.semen_num
                 self.ai_num += cow.AI_times
+                self.ed_period += cow.ED_days
 
             if new_born:
                 args = {

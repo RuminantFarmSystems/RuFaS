@@ -297,6 +297,10 @@ class HeiferII(HeiferI):
             self.body_weight = self.mature_body_weight
             self.events.add_event(self.days_born, sim_day, c.MATURE_BODY_WEIGHT_REGULAR)
 
+        self.ED_days = 0
+        self.GnRH_injections = 0
+        self.PGF_injections = 0
+        self.CIDR_count = 0
         # breeding method assign to heifer
         if self.days_born >= AnimalBase.config['breeding_start_day_h']:
             if self.repro_program == 'ED':
@@ -380,7 +384,8 @@ class HeiferII(HeiferI):
                     AnimalBase.config['avg_estrus_cycle_heifer'],
                     AnimalBase.config['std_estrus_cycle_heifer'], sim_day)
 
-        self.ED_days += 1
+        if self.days_in_preg == 0:
+            self.ED_days += 1
 
     # TAI methods
     # protocol 5dCG2P
@@ -469,6 +474,9 @@ class HeiferII(HeiferI):
             self.PGF_injections = self.PGF_injections + 1
             self.synch_ed_estrus_day = self.determine_synch_ed_estrus_day(self.days_born, c.SYNCH_ESTRUS, 5, 1.5, 7, sim_day)
 
+        if self.days_born > self.synch_ed_program_start_day_h + 14 and self.days_born < self.synch_ed_estrus_day:
+            self.ED_days += 1
+
         if self.days_born == self.synch_ed_estrus_day:
             self.events.add_event(self.days_born, sim_day, c.ESTRUS_OCCURRED)
             estrus_detection_rand = random()
@@ -504,6 +512,9 @@ class HeiferII(HeiferI):
             self.events.add_event(self.days_born, sim_day, c.INJECT_PGF)
             self.PGF_injections = self.PGF_injections + 1
             self.synch_ed_estrus_day = self.determine_synch_ed_estrus_day(self.days_born, c.SYNCH_ESTRUS, 5, 1.5, 7, sim_day)
+
+        if self.days_born > self.synch_ed_program_start_day_h + 7 and self.days_born < self.synch_ed_estrus_day:
+            self.ED_days += 1
 
         if self.days_born == self.synch_ed_estrus_day:
             self.events.add_event(self.days_born, sim_day, c.ESTRUS_OCCURRED)
@@ -573,6 +584,11 @@ class HeiferII(HeiferI):
         """
         if self.days_in_preg > 0:
             self.days_in_preg += 1
+
+        self.semen_num = 0
+        self.AI_times = 0
+        self.preg_diagnoses = 0
+
         # AI
         if self.days_born == self.ai_day:
             self.events.add_event(

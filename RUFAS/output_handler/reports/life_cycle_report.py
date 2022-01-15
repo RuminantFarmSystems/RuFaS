@@ -121,13 +121,15 @@ class LifeCycleReport(BaseReportDriver):
                 'CIDR_count': ['life_cycle_manager.CIDR_count', '', []],
                 'GnRH_injections_heifer': ['life_cycle_manager.GnRH_injection_num_h', '', []],
                 'PGF_injections_heifer': ['life_cycle_manager.PGF_injection_num_h', '', []],
+                'ai_num_heifer': ['life_cycle_manager.ai_num_h', '', []],
+                'preg_check_num_heifer': ['life_cycle_manager.preg_check_num_h', '', []],
+                'ed_period_h': ['life_cycle_manager.ed_period_h', '', []],
                 'GnRH_injections': ['life_cycle_manager.GnRH_injection_num', '', []],
                 'PGF_injections': ['life_cycle_manager.PGF_injection_num', '', []],
                 'ai_num': ['life_cycle_manager.ai_num', '', []],
                 'preg_check_num': ['life_cycle_manager.preg_check_num', '', []],
-                'sold_calf_num': ['life_cycle_manager.sold_calf_num', '', []],
-                'ai_num_heifer': ['life_cycle_manager.ai_num_h', '', []],
-                'preg_check_num_heifer': ['life_cycle_manager.preg_check_num_h', '', []]
+                'ed_period': ['life_cycle_manager.ed_period', '', []],
+                'sold_calf_num': ['life_cycle_manager.sold_calf_num', '', []]
             }
 
             self.production_performance = {
