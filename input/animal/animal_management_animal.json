@@ -33,13 +33,13 @@
 			},
 			"repro": {
 				"ED_related":{
-					"estrus_detection_rate_h": 0.4,
-					"estrus_insemination_rate_h": 0.9,
-					"estrus_conception_rate_h": 0.4,
+					"estrus_detection_rate_h": 0.6,
+					"estrus_insemination_rate_h": 1,
+					"estrus_conception_rate_h": 0.6,
 					"heifer_synchED_protocol": "2P",
-					"estrus_detection_rate": 0.4,
-					"estrus_insemination_rate": 0.9,
-					"estrus_conception_rate": 0.4
+					"estrus_detection_rate": 0.6,
+					"estrus_insemination_rate": 1,
+					"estrus_conception_rate": 0.5
 				},
 				"TAI_related":{
 					"heifer_TAI_protocol": "5dCG2P",

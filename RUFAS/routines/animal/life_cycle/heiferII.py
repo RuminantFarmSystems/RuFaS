@@ -467,7 +467,7 @@ class HeiferII(HeiferI):
                     # second round of injection
             self.events.add_event(self.days_born, sim_day,c.INJECT_PGF)
             self.PGF_injections = self.PGF_injections + 1
-            self.synch_ed_estrus_day = self.determine_synch_ed_estrus_day(self.days_born, c.SYNCH_ESTRUS, 3, 2, 7, sim_day)
+            self.synch_ed_estrus_day = self.determine_synch_ed_estrus_day(self.days_born, c.SYNCH_ESTRUS, 5, 1.5, 7, sim_day)
 
         if self.days_born == self.synch_ed_estrus_day:
             self.events.add_event(self.days_born, sim_day, c.ESTRUS_OCCURRED)
@@ -503,7 +503,7 @@ class HeiferII(HeiferI):
         elif self.days_born == self.synch_ed_program_start_day_h + 7:
             self.events.add_event(self.days_born, sim_day, c.INJECT_PGF)
             self.PGF_injections = self.PGF_injections + 1
-            self.synch_ed_estrus_day = self.determine_synch_ed_estrus_day(self.days_born, c.SYNCH_ESTRUS, 3, 2, 7, sim_day)
+            self.synch_ed_estrus_day = self.determine_synch_ed_estrus_day(self.days_born, c.SYNCH_ESTRUS, 5, 1.5, 7, sim_day)
 
         if self.days_born == self.synch_ed_estrus_day:
             self.events.add_event(self.days_born, sim_day, c.ESTRUS_OCCURRED)
@@ -552,12 +552,12 @@ class HeiferII(HeiferI):
             self.estrus_day = self.determine_estrus_day(self.abortion_day, c.ESTRUS_AFTER_ABORTION_NOTE, 
                 AnimalBase.config['avg_estrus_cycle_heifer'],
                 AnimalBase.config['std_estrus_cycle_heifer'], sim_day)
-            self.repro_program == 'ED'
+            self.repro_program = 'ED'
         elif self.repro_program == 'synch-ED':
             self.estrus_day = self.determine_estrus_day(self.abortion_day, c.ESTRUS_AFTER_ABORTION_NOTE, 
                 AnimalBase.config['avg_estrus_cycle_heifer'],
                 AnimalBase.config['std_estrus_cycle_heifer'], sim_day)
-            self.repro_program == 'ED'
+            self.repro_program = 'ED'
 
     
     # artificial inseminated 

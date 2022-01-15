@@ -636,7 +636,7 @@ class Cow(HeiferIII):
         elif self.days_born == self.presynch_program_start_day + 14:
             self.events.add_event(self.days_born, sim_day, c.INJECT_PGF)
             self.PGF_injections = self.PGF_injections + 1
-            self.synch_ed_estrus_day = self.determine_synch_ed_estrus_day(self.days_born, c.SYNCH_ESTRUS, 4, 2, 11, sim_day)
+            self.synch_ed_estrus_day = self.determine_synch_ed_estrus_day(self.days_born, c.SYNCH_ESTRUS, 5, 1.5, 11, sim_day)
 
         elif self.days_born == self.synch_ed_estrus_day:
             self.events.add_event(self.days_born, sim_day, c.ESTRUS_OCCURRED)
@@ -648,8 +648,8 @@ class Cow(HeiferIII):
                     self.ai_day = self.synch_ed_estrus_day + 1
                     self.conception_rate = AnimalBase.config['estrus_conception_rate']
 
-        elif self.days_born == self.presynch_program_start_day + 25 and self.days_in_preg == 0:
-            self.tai_program_start_day_c = self.days_born + 1
+        elif self.days_born == self.presynch_program_start_day + 26 and self.days_in_preg == 0:
+            self.tai_program_start_day_c = self.days_born
             self.events.add_event(self.days_born, sim_day, c.PRESYNCH_END)
 
     def doubleovsynch_update(self, sim_day):
@@ -895,7 +895,7 @@ class Cow(HeiferIII):
             # adding past injections in TAI start before PD programs
             if self.resynch_method in ['TAIbeforePD']:
                 self.events.add_event(
-                    self.tai_program_start_day_c, sim_day, c.INJECT_GNRH)
+                    self.days_born - 7, sim_day, c.INJECT_GNRH)
                 self.GnRH_injections = self.GnRH_injections + 1
             
             if self.days_in_preg > 0:
