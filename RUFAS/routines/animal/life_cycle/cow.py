@@ -557,9 +557,11 @@ class Cow(HeiferIII):
                 self.GnRH_injections = self.GnRH_injections + 1
                 # the next day ai
                 self.ai_day = self.days_born + 1
+                if self.open_stage == False:
+                    self.conception_rate = AnimalBase.config['TAI_conception_rate_1']
+                else: 
+                    self.conception_rate = AnimalBase.config['TAI_conception_rate_sub']
                 self.open_stage = False
-                self.conception_rate = AnimalBase.config['ovsynch56_conception_rate']
-
     def OvSynch48_update(self, sim_day):
         """
         OvSynch48 protocol for tai method
@@ -578,8 +580,11 @@ class Cow(HeiferIII):
                 self.GnRH_injections = self.GnRH_injections + 1
             elif self.days_born == self.tai_program_start_day_c + 10:
                 self.ai_day = self.days_born
-                self.conception_rate = \
-                    AnimalBase.config['ovsynch48_conception_rate']
+                if self.open_stage == False:
+                    self.conception_rate = AnimalBase.config['TAI_conception_rate_1']
+                else: 
+                    self.conception_rate = AnimalBase.config['TAI_conception_rate_sub']
+                self.open_stage = False
 
     def CoSynch72_update(self, sim_day):
         """
@@ -598,8 +603,11 @@ class Cow(HeiferIII):
                 self.events.add_event(self.days_born, sim_day, c.INJECT_GNRH)
                 self.GnRH_injections = self.GnRH_injections + 1
                 self.ai_day = self.days_born
-                self.conception_rate = \
-                    AnimalBase.config['cosynch72_conception_rate']
+                if self.open_stage == False:
+                    self.conception_rate = AnimalBase.config['TAI_conception_rate_1']
+                else: 
+                    self.conception_rate = AnimalBase.config['TAI_conception_rate_sub']
+                self.open_stage = False
 
     def d5CoSynch_update(self, sim_day):
         """
@@ -621,8 +629,11 @@ class Cow(HeiferIII):
                 self.events.add_event(self.days_born, sim_day, c.INJECT_GNRH)
                 self.GnRH_injections = self.GnRH_injections + 1
                 self.ai_day = self.days_born
-                self.conception_rate = \
-                    AnimalBase.config['cosynch5d_conception_rate']
+                if self.open_stage == False:
+                    self.conception_rate = AnimalBase.config['TAI_conception_rate_1']
+                else: 
+                    self.conception_rate = AnimalBase.config['TAI_conception_rate_sub']
+                self.open_stage = False
 
     def presynch_update(self, sim_day):
         """
@@ -755,8 +766,6 @@ class Cow(HeiferIII):
                 self.ed_update(sim_day)
             # on the day of preg check
             elif self.days_born == self.abortion_day:
-                self.conception_rate -= \
-                    AnimalBase.config['conception_rate_decrease']
                 self.estrus_day = 0
                 self.tai_program_start_day_c = self.days_born
                 self.tai_update(sim_day)
@@ -767,8 +776,6 @@ class Cow(HeiferIII):
         # only for TAI programs
         elif self.resynch_method == 'TAIbeforePD':
             if self.days_born == self.abortion_day: 
-                self.conception_rate -= \
-                    AnimalBase.config['conception_rate_decrease']
                 # for 1st preg check inject GnRH before PC
                 if self.days_born < self.ai_day + AnimalBase.config['preg_check_day_2']:
                     # because tai start day is before this simulation time 
@@ -791,8 +798,7 @@ class Cow(HeiferIII):
                     self.abortion_day, c.ESTRUS_AFTER_PGF_NOTE,
                     AnimalBase.config['avg_estrus_cycle_p'],
                     AnimalBase.config['std_estrus_cycle_p'], sim_day)
-                self.conception_rate -= \
-                    AnimalBase.config['conception_rate_decrease']
+
             # start TAI program 7 days after preg check
             elif self.days_born < self.abortion_day + 7:
                 self.ed_update(sim_day)
@@ -813,6 +819,8 @@ class Cow(HeiferIII):
             sim_day: the simulation day
         """
         # natural estrus happen after abortion, open_stage == false for only schedule estrus at abortion here
+        self.conception_rate -= \
+                    AnimalBase.config['conception_rate_decrease']
         if self.repro_program == 'ED' and self.open_stage == False:
             self.estrus_day = self.determine_estrus_day(
                     self.abortion_day, c.ESTRUS_AFTER_ABORTION_NOTE,

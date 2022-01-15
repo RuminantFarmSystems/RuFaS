@@ -401,7 +401,7 @@ class HeiferII(HeiferI):
             self.PGF_injections = self.PGF_injections + 1
         elif self.days_born == self.tai_program_start_day_h + 8:
             self.ai_day = self.days_born
-            self.conception_rate = AnimalBase.config['d5CG2P_conception_rate']
+            self.conception_rate = AnimalBase.config['TAI_conception_rate_h']
             self.events.add_event(self.days_born, sim_day, c.INJECT_GNRH)
             self.GnRH_injections = self.GnRH_injections + 1
 
@@ -418,7 +418,7 @@ class HeiferII(HeiferI):
             self.PGF_injections = self.PGF_injections + 1
         elif self.days_born == self.tai_program_start_day_h + 8:
             self.ai_day = self.days_born
-            self.conception_rate = AnimalBase.config['d5CGP_conception_rate']
+            self.conception_rate = AnimalBase.config['TAI_conception_rate_h']
             self.events.add_event(self.days_born, sim_day, c.INJECT_GNRH)
             self.GnRH_injections = self.GnRH_injections + 1
 
@@ -473,7 +473,7 @@ class HeiferII(HeiferI):
             self.events.add_event(self.days_born, sim_day, c.ESTRUS_OCCURRED)
             estrus_detection_rand = random()
             if estrus_detection_rand < \
-                AnimalBase.config['estrus_detection_rate']:
+                AnimalBase.config['estrus_detection_rate_h_synch']:
                 self.events.add_event(self.days_born, sim_day, c.ESTRUS_DETECTED)
                 ed_insemination_rand = random()
                 if ed_insemination_rand < AnimalBase.config['estrus_insemination_rate']:
@@ -509,7 +509,7 @@ class HeiferII(HeiferI):
             self.events.add_event(self.days_born, sim_day, c.ESTRUS_OCCURRED)
             estrus_detection_rand = random()
             if estrus_detection_rand < \
-                AnimalBase.config['estrus_detection_rate']:
+                AnimalBase.config['estrus_detection_rate_h_synch']:
                 self.events.add_event(self.days_born, sim_day, c.ESTRUS_DETECTED)
                 ed_insemination_rand = random()
                 if ed_insemination_rand < AnimalBase.config['ed_insemination_rate']:
