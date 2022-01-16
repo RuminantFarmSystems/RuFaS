@@ -806,9 +806,9 @@ class Cow(HeiferIII):
             sim_day: the simulation day
         """
         if self.repro_program == 'ED':
-            self.conception_rate -= \
-                    AnimalBase.config['conception_rate_decrease'] 
-        # natural estrus happen after abortion, open_stage == false for only schedule estrus at abortion here
+        #     self.conception_rate -= \
+        #             AnimalBase.config['conception_rate_decrease'] 
+        # assign estrus for abortion cows (only those cows have open_stage = False at this moment)
             if self.open_stage == False:
                 self.estrus_day = self.determine_estrus_day(
                         self.abortion_day, c.ESTRUS_AFTER_ABORTION_NOTE,
@@ -876,6 +876,7 @@ class Cow(HeiferIII):
                 self.events.add_event(self.days_born, sim_day, c.COW_PREG)
             else:
                 self.events.add_event(self.days_born, sim_day, c.COW_NOT_PREG) 
+                self.open_stage = True
                 if self.repro_program in ['ED']:
                     self.estrus_day = self.determine_estrus_day(
                         self.days_born, c.ESTRUS_AFTER_AI_NOTE,
@@ -886,7 +887,6 @@ class Cow(HeiferIII):
                         self.days_born, c.ESTRUS_AFTER_AI_NOTE, 
                         AnimalBase.config['avg_estrus_cycle_cow'],
                         AnimalBase.config['std_estrus_cycle_cow'], sim_day)
-                    self.open_stage = True
                 
         elif self.days_born == self.ai_day + \
             AnimalBase.config['preg_check_day_1']:
@@ -917,7 +917,6 @@ class Cow(HeiferIII):
             else:
                 self.abortion_day = self.days_born
                 self.open(sim_day)
-                self.open_stage = True
                 self.events.add_event(
                     self.days_born, sim_day, c.PREG_CHECK_1_NOT_PREG)
         
