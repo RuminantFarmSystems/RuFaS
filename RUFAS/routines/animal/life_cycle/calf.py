@@ -26,16 +26,15 @@ class Calf(AnimalBase):
         Description:
             initialize calf at the time it was born
         Args:
-            args.id: id of the animal
-            args.breed: breed of the animal
-            args.birth_date: the date of the simulation when the calf was born
-            args.daysBorn: age of the animal
+            breed: breed of the animal
+            birth_date: the date of the simulation when the calf was born
+            daysBorn: age of the animal
             (optional: include the following to assign animal information)
-            args.birth_weight: the birth weight of the animal
-            args.body_weight: current body weight of the animal
-            args.wean_weight: the wean weight of the animal
-            args.mature_body_weight: the mature body weight of the animal
-            args.events: events of the animal
+            birth_weight: the birth weight of the animal
+            body_weight: current body weight of the animal
+            wean_weight: the wean weight of the animal
+            mature_body_weight: the mature body weight of the animal
+            events: events of the animal
         """
         super().__init__(args)
 

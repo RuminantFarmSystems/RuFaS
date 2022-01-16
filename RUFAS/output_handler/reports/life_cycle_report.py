@@ -123,7 +123,7 @@ class LifeCycleReport(BaseReportDriver):
                 'PGF_injections_heifer': ['life_cycle_manager.PGF_injection_num_h', '', []],
                 'ai_num_heifer': ['life_cycle_manager.ai_num_h', '', []],
                 'preg_check_num_heifer': ['life_cycle_manager.preg_check_num_h', '', []],
-                'ed_period_h': ['life_cycle_manager.ed_period_h', '', []],
+                'ed_period_heifer': ['life_cycle_manager.ed_period_h', '', []],
                 'GnRH_injections': ['life_cycle_manager.GnRH_injection_num', '', []],
                 'PGF_injections': ['life_cycle_manager.PGF_injection_num', '', []],
                 'ai_num': ['life_cycle_manager.ai_num', '', []],

@@ -53,22 +53,22 @@ class AnimalValues(IntEnum):
 class AnimalInitialization:
     animal_id = 0
 
-    '''
-        Generates an id
-    '''
-
     def next_id(self):
+        '''
+        Generates an id
+        '''
         self.animal_id += 1
         return self.animal_id
 
-    '''
+    def __init__(self, CI, breed, set_seed, init=True):
+        '''
         Description:
             Initialize the database to store animal values. Simulate animals to store in database in init is True.
         Input:
             CI: the calving interval used in initialization
             init: whether or not update the database with new animals
-    '''
-    def __init__(self, CI, breed, set_seed, init=True):
+        '''
+        
         self.CI = CI
 
         # If set_seed is True, then we do not want the results to be ordered
@@ -151,14 +151,15 @@ class AnimalInitialization:
             self.animal_id = int(row[AnimalValues.id])
             conn.close()
 
-    '''
-        Description:
-            Simulate animals to be stored in the database
-        Inputs:
-            animal_num: number of animals to simulate
-            sim_days: number of days to simulate
-    '''
+
     def init_animals(self, breed, animal_num = 20000, sim_days=5000):
+        '''
+            Description:
+                Simulate animals to be stored in the database
+            Inputs:
+                animal_num: number of animals to simulate
+                sim_days: number of days to simulate
+        '''
         calves = []
         heiferIs = []
         heiferIIs = []
@@ -345,14 +346,15 @@ class AnimalInitialization:
         conn.commit()
         conn.close()
 
-    '''
+
+    def get_calves(self, num, breed):
+        '''
         Description:
             Get calf values from the database for initialization
         Input:
             num: number of calves to initialize
             breed: cow breed
-    '''
-    def get_calves(self, num, breed):
+        '''
         calves = []
         conn = sqlite3.connect('input/animal/animals.sqlite')
         cur = conn.cursor()
@@ -382,14 +384,14 @@ class AnimalInitialization:
         conn.close()
         return calves
 
-    '''
+    def get_heiferIs(self, num, breed):
+        '''
         Description:
             Get heiferI values from the database for initialization
         Input:
             num: number of heiferIs to initialize
             breed: cow breed
-    '''
-    def get_heiferIs(self, num, breed):
+        '''
         heiferIs = []
         conn = sqlite3.connect('input/animal/animals.sqlite')
         cur = conn.cursor()
@@ -418,14 +420,14 @@ class AnimalInitialization:
         conn.close()
         return heiferIs
 
-    '''
+    def get_heiferIIs(self, num, breed):
+        '''
         Description:
             Get heiferII values from the database for initialization
         Input:
             num: number of heiferIIs to initialize
             breed: cow breed
-    '''
-    def get_heiferIIs(self, num, breed):
+        '''
         heiferIIs = []
         conn = sqlite3.connect('input/animal/animals.sqlite')
         cur = conn.cursor()
@@ -470,14 +472,14 @@ class AnimalInitialization:
         conn.close()
         return heiferIIs
 
-    '''
+    def get_heiferIIIs(self, num, breed):
+        '''
         Description:
             Get heiferIII values from the database for initialization
         Input:
             num: number of heiferIIIs to initialize
             breed: cow breed
-    '''
-    def get_heiferIIIs(self, num, breed):
+        '''
         heiferIIIs = []
         conn = sqlite3.connect('input/animal/animals.sqlite')
         cur = conn.cursor()
@@ -522,14 +524,14 @@ class AnimalInitialization:
         conn.close()
         return heiferIIIs
 
-    '''
+    def get_cows(self, num, breed):
+        '''
         Description:
             Get cow values from the database for initialization
         Input:
             num: number of cows to initialize
             breed: cow breed
-    '''
-    def get_cows(self, num, breed):
+        '''
         cows = []
         conn = sqlite3.connect('input/animal/animals.sqlite')
         cur = conn.cursor()
@@ -580,14 +582,14 @@ class AnimalInitialization:
         conn.close()
         return cows
 
-    '''
+    def get_replacement_cows(self, num, breed):
+        '''
         Description:
             Get replacement cow values from the database for initialization
         Input:
             num: number of replacement cows to initialize
             breed: cow breed
-    '''
-    def get_replacement_cows(self, num, breed):
+        '''
         cows = []
         conn = sqlite3.connect('input/animal/animals.sqlite')
         cur = conn.cursor()

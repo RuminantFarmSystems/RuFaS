@@ -805,14 +805,15 @@ class Cow(HeiferIII):
         Args:
             sim_day: the simulation day
         """
+        if self.repro_program == 'ED':
+            self.conception_rate -= \
+                    AnimalBase.config['conception_rate_decrease'] 
         # natural estrus happen after abortion, open_stage == false for only schedule estrus at abortion here
-        self.conception_rate -= \
-                    AnimalBase.config['conception_rate_decrease']
-        if self.repro_program == 'ED' and self.open_stage == False:
-            self.estrus_day = self.determine_estrus_day(
-                    self.abortion_day, c.ESTRUS_AFTER_ABORTION_NOTE,
-                    AnimalBase.config['avg_estrus_cycle_cow'],
-                    AnimalBase.config['std_estrus_cycle_cow'], sim_day)
+            if self.open_stage == False:
+                self.estrus_day = self.determine_estrus_day(
+                        self.abortion_day, c.ESTRUS_AFTER_ABORTION_NOTE,
+                        AnimalBase.config['avg_estrus_cycle_cow'],
+                        AnimalBase.config['std_estrus_cycle_cow'], sim_day)
         # for TAI and ED-TAI program, resynch protocol starts
         if self.repro_program == 'TAI' or 'ED-TAI':
             self.presynch_method = None
