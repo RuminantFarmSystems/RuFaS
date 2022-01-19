@@ -131,7 +131,7 @@ class AnimalManagement:
             config: instance of the Config class
             feed: instance of the Feed class
         """
-
+        self.all_pens = []
         self.sim_length = config.sim_length
         animal_config = self.get_animal_config(data['animal_config'])
         self.life_cycle_manager = LifeCycleManager(animal_config)

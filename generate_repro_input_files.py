@@ -24,7 +24,7 @@ cow_strategies = [c1, c2, c3]
 
 def trial(heifer_strategy, cow_strategy, rep):
     output_file = heifer_strategy['name'] + '_' + cow_strategy['name'] + '_' + str(rep)
-    print("output_file", output_file)
+    print("\nRunning ", output_file)
 
     file = open("./input/animal/animal_management_animal.json")
     json_object = json.load(file)
@@ -47,22 +47,14 @@ def trial(heifer_strategy, cow_strategy, rep):
     json.dump(json_object, file)
     file.close()
 
-    # file = open("./input/animal/animal_management_animal.json")
-    # json_object = json.load(file)
-    # print("heifer repro menthod", json_object['animal_config']['management_decisions']['heifer_repro_method']) # it has been successfully changed
-    # file.close()
-    
-    # print("here start run main()")
     main.main()
 
-    shutil.move(
-        'output/CSVs/life_cycle_report/herd_report/herd_report.csv', 'save_directory')
-    os.rename('save_directory/herd_report.csv',
-              'save_directory/' + output_file + '.csv')
+    shutil.move('output/CSVs/life_cycle_report/herd_report/herd_report.csv', 'save_directory')
+    os.rename('save_directory/herd_report.csv', 'save_directory/' + output_file + '.csv')
 
 
-R = 3
+R = 3 #replication number
 for i in range(len(heifer_strategies)):
     for rep in range(R):
-        print("\n >>>enter point", "\n heifer: ", heifer_strategies[i], "\n cow: ", cow_strategies[i], "\n rep: ", rep)
+      #   print("\n >>>enter point", "\n heifer: ", heifer_strategies[i], "\n cow: ", cow_strategies[i], "\n rep: ", rep)
         trial(heifer_strategies[i], cow_strategies[i], rep)
