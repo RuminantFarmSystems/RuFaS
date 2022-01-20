@@ -10,15 +10,16 @@ h2 = {"name": "H2", "heifer_repro_method": "synch-ED",
 h3 = {"name": "H3", "heifer_repro_method": "TAI",
       "heifer_synchED_protocol": None, "heifer_TAI_protocol": "5dCG2P"}
 
-c1 = {"name": "C1", "cow_repro_method": "ED-TAI", "cow_presynch_protocol": None, "cow_TAI_protocol": "OvSynch 56",
-      "tai_program_start_day": 70, "voluntary_waiting_period": 50, "cow_resynch_protocol": "TAIafterPD"}
+c1 = {"name": "C1", "cow_repro_method": "ED-TAI", "cow_presynch_protocol": None, 
+      "cow_TAI_protocol": "OvSynch 56", "tai_program_start_day": 72, "voluntary_waiting_period": 45, 
+      "cow_resynch_protocol": "TAIafterPD", "TAI_conception_rate_1":0.4, "TAI_conception_rate_sub": 0.45}
 c2 = {"name": "C2", "cow_repro_method": "TAI", "cow_presynch_protocol": "PreSynch",
-      "cow_TAI_protocol": "OvSynch 56", "tai_program_start_day": 41, "voluntary_waiting_period": 50, "cow_resynch_protocol": "TAIbeforePD"}
-      # to be consistent, I put "voluntary_waiting_period" here, but what value should be put here?
+      "cow_TAI_protocol": "OvSynch 56", "tai_program_start_day": 41, "voluntary_waiting_period": 0, 
+      "cow_resynch_protocol": "TAIbeforePD", "TAI_conception_rate_1":0.4, "TAI_conception_rate_sub": 0.45}
 c3 = {"name": "C3", "cow_repro_method": "TAI", "cow_presynch_protocol": "Double OvSynch",
-      "cow_TAI_protocol": "OvSynch 56", "tai_program_start_day": 45, "voluntary_waiting_period": 50, "cow_resynch_protocol": "TAIbeforePD"}
-      # to be consistent, I put "voluntary_waiting_period" here, but what value should be put here?
-
+      "cow_TAI_protocol": "OvSynch 56", "tai_program_start_day": 45, "voluntary_waiting_period": 0, 
+      "cow_resynch_protocol": "TAIbeforePD", "TAI_conception_rate_1":0.6, "TAI_conception_rate_sub": 0.45}
+      
 heifer_strategies = [h1, h2, h3]
 cow_strategies = [c1, c2, c3]
 
@@ -42,6 +43,8 @@ def trial(heifer_strategy, cow_strategy, rep):
     json_object['animal_config']['farm_level']['repro']['TAI_related']['cow_resynch_protocol'] = cow_strategy['cow_resynch_protocol']
     json_object['animal_config']['farm_level']['voluntary_waiting_period'] = cow_strategy['voluntary_waiting_period']
     json_object['animal_config']['farm_level']['repro']['TAI_related']['cow_presynch_protocol'] = cow_strategy['cow_presynch_protocol']
+    json_object['animal_config']['farm_level']['repro']['TAI_related']['TAI_conception_rate_1'] = cow_strategy['TAI_conception_rate_1']
+    json_object['animal_config']['farm_level']['repro']['TAI_related']['TAI_conception_rate_sub'] = cow_strategy['TAI_conception_rate_sub']
 
     file = open("./input/animal/animal_management_animal.json", 'w')
     json.dump(json_object, file)
@@ -55,6 +58,7 @@ def trial(heifer_strategy, cow_strategy, rep):
 
 R = 3 #replication number
 for i in range(len(heifer_strategies)):
-    for rep in range(R):
-      #   print("\n >>>enter point", "\n heifer: ", heifer_strategies[i], "\n cow: ", cow_strategies[i], "\n rep: ", rep)
-        trial(heifer_strategies[i], cow_strategies[i], rep)
+      for j in range(len(cow_strategies)):
+            for rep in range(R):
+                  # print("\n >>>enter point", "\n heifer: ", heifer_strategies[i], "\n cow: ", cow_strategies[i], "\n rep: ", rep)
+                  trial(heifer_strategies[i], cow_strategies[j], rep)
