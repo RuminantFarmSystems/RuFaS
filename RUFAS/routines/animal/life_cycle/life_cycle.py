@@ -17,7 +17,6 @@ from RUFAS.routines.animal.life_cycle.animal_base import AnimalBase
 from RUFAS.routines.animal.life_cycle.animal_initialization import AnimalInitialization
 from RUFAS.routines.animal.life_cycle import animal_events_constants as c
 
-
 class LifeCycleManager:
     """
     Manages the life cycles of the animals.
@@ -281,6 +280,17 @@ class LifeCycleManager:
         self.avg_heifer_culling_age = 0
         self.avg_cow_culling_age = 0
         self.avg_mature_body_weight = 0
+
+        count_21_days = 0
+        num_ai_21_days = 0
+        num_cow_open_acc_21_days = 0
+        self.service_rate_sum_21_days = 0
+        num_preg_21_days = 0
+        count_21_period = 0
+        self.conception_rate_sum_21_days = 0
+        self.avg_service_rate = 0
+        self.avg_conception_rate = 0
+        self.pregnancy_rate = 0
 
         preg_heifer_num = 0
         calving_interval_available_num = 0
@@ -569,6 +579,35 @@ class LifeCycleManager:
                     calves_born.append(new_calf)
                 if new_calf.sold:
                     self.sold_calf_num += 1
+
+            # caculate reproduction indications
+            if date >= 365:
+                if cow.days_born == cow.ai_day:
+                    num_ai_21_days += 1
+                if cow.days_in_milk > 0 and cow.days_in_preg == 0 and not cow.do_not_breed:
+                    num_cow_open_acc_21_days += 1
+                if cow.days_in_preg == 1:
+                    num_preg_21_days += 1   
+            #print(f"ai num:{num_ai_21_days}, open num: {num_cow_open_acc_21_days}, preg num: {num_preg_21_days}")
+        #caculate service rate and conception rate
+        if date >= 366:
+            count_21_days += 1
+            if count_21_days % 21 == 0:
+                print(f"21 count: {count_21_days}")
+                count_21_period += 1
+                self.service_rate_sum_21_days += float(num_ai_21_days) / float(num_cow_open_acc_21_days/21)
+                self.conception_rate_sum_21_days += float(num_preg_21_days) / float(num_ai_21_days)
+                num_ai_21_days = 0
+                num_cow_open_acc_21_days = 0
+                num_preg_21_days = 0
+
+        if count_21_period % 15 == 0:
+            self.avg_service_rate = self.service_rate_sum_21_days / 15
+            self.avg_conception_rate = self.conception_rate_sum_21_days / 15
+            self.pregnancy_rate = self.avg_service_rate * self.avg_conception_rate 
+            self.service_rate_sum_21_days = 0
+            self.conception_rate_sum_21_days = 0
+            print(f"conception rate:{self.avg_conception_rate}; preg rate: {self.pregnancy_rate}")
 
         if total_animal_num == 0:
             self.calf_percent = 0

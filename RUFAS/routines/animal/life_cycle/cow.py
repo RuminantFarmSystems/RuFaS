@@ -661,7 +661,7 @@ class Cow(HeiferIII):
             self.GnRH_injections = self.GnRH_injections + 1
         elif self.days_born == self.presynch_program_start_day + 7:
             self.events.add_event(self.days_born, sim_day, c.INJECT_PGF)
-            self.PGF_injections = self.PGF_injections + 1
+            self.PGF_injections = self.PGF_injections + 2
         elif self.days_born == self.presynch_program_start_day + 10:
             self.events.add_event(self.days_born, sim_day, c.INJECT_GNRH)
             self.GnRH_injections = self.GnRH_injections + 1

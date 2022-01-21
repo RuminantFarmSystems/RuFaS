@@ -472,7 +472,7 @@ class HeiferII(HeiferI):
                     # second round of injection
             self.events.add_event(self.days_born, sim_day,c.INJECT_PGF)
             self.PGF_injections = self.PGF_injections + 1
-            self.synch_ed_estrus_day = self.determine_synch_ed_estrus_day(self.days_born, c.SYNCH_ESTRUS, 5, 1.5, 7, sim_day)
+            self.synch_ed_estrus_day = self.determine_synch_ed_estrus_day(self.days_born, c.SYNCH_ESTRUS, 4, 1.5, 7, sim_day)
 
         if self.days_born > self.synch_ed_program_start_day_h + 14 and self.days_born < self.synch_ed_estrus_day:
             self.ED_days += 1
@@ -488,17 +488,14 @@ class HeiferII(HeiferI):
                     self.ai_day = self.synch_ed_estrus_day + 1
                     self.conception_rate = \
                         AnimalBase.config['estrus_conception_rate']
-                else:
-                    # finish up with TAI
-                    self.synch_ed_stop_day = self.synch_ed_program_start_day_h + 21
-                    self.tai_program_start_day_h = self.synch_ed_stop_day
-                    self.tai_update(sim_day)
             else:
-                    # second round of injection failed,
-                    # finish up with TAI
+                # finish up with TAI
                 self.synch_ed_stop_day = self.synch_ed_program_start_day_h + 21
                 self.tai_program_start_day_h = self.synch_ed_stop_day
                 self.tai_update(sim_day)
+        elif self.days_born > self.synch_ed_stop_day:
+                    # finish up with TAI
+            self.tai_update(sim_day)
 
     def CP_update(self, sim_day):
         """
