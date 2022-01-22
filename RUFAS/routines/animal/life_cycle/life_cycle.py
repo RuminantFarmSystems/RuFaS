@@ -131,17 +131,29 @@ class LifeCycleManager:
     ed_period = 0
 
     count_21_days = 0
+    count_21_period = 0
+
     num_ai_21_days = 0
     num_cow_open_acc_21_days = 0
     service_rate_each_21_d = 0
     num_preg_21_days = 0
-    count_21_period = 0
     conception_rate_each_21_d = 0
     avg_service_rate = 0
     avg_conception_rate = 0
     pregnancy_rate = 0
     service_rate_21_d = []
     conception_rate_21_d = []
+
+    num_ai_21_days_heifer = 0
+    num_heifer_open_acc_21_days = 0
+    service_rate_each_21_d_heifer = 0
+    num_preg_21_days_heifer = 0
+    conception_rate_each_21_d_heifer = 0
+    avg_service_rate_heifer = 0
+    avg_conception_rate_heifer = 0
+    pregnancy_rate_heifer = 0
+    service_rate_21_d_heifer = []
+    conception_rate_21_d_heifer = []
 
     config = None
 
@@ -396,6 +408,29 @@ class LifeCycleManager:
                 self.semen_num_h += heiferII.semen_num
                 self.ai_num_h += heiferII.AI_times
                 self.ed_period_h += heiferII.ED_days
+               
+                # caculate reproduction indications
+            if date >= 1:
+                if heiferII.days_born == heiferII.ai_day:
+                    self.num_ai_21_days_heifer += 1
+                if heiferII.days_in_preg == 0 and heiferII.days_born > AnimalBase.config['breeding_start_day_h']:
+                    self.num_heifer_open_acc_21_days += 1
+                if heiferII.days_in_preg == 1:
+                    self.num_preg_21_days_heifer += 1   
+        
+        #caculate service rate and conception rate
+        if date >= 1:
+            self.count_21_days += 1
+            if self.count_21_days % 21 == 0 and self.count_21_days != 0:
+                self.count_21_period += 1
+                self.service_rate_each_21_d_heifer = float(self.num_ai_21_days_heifer) / float(self.num_heifer_open_acc_21_days/21)
+                self.conception_rate_each_21_d_heifer = float(self.num_preg_21_days_heifer) / float(self.num_ai_21_days_heifer)
+                self.num_ai_21_days_heifer = 0
+                self.num_heifer_open_acc_21_days = 0
+                self.num_preg_21_days_heifer = 0
+                self.avg_service_rate_heifer = self.moving_average(self.service_rate_each_21_d_heifer, 15, self.service_rate_21_d_heifer)
+                self.avg_conception_rate_heifer = self.moving_average(self.conception_rate_each_21_d_heifer, 15, self.conception_rate_21_d_heifer)
+                self.pregnancy_rate_heifer = self.avg_service_rate_heifer * self.avg_conception_rate_heifer
 
         # heiferIII to cow, assign repro programs
         for index, heiferIII in enumerate(heiferIIIs):
@@ -583,7 +618,7 @@ class LifeCycleManager:
                     self.sold_calf_num += 1
 
             # caculate reproduction indications
-            if date >= 365:
+            if date >= 1:
                 if cow.days_born == cow.ai_day:
                     self.num_ai_21_days += 1
                 if cow.days_in_preg == 0 and not cow.do_not_breed:
@@ -596,7 +631,7 @@ class LifeCycleManager:
             #print(f"ai num:{self.num_ai_21_days}, open num: {self.num_cow_open_acc_21_days}, preg num: {self.num_preg_21_days}")
         
         #caculate service rate and conception rate
-        if date >= 366:
+        if date >= 1:
             self.count_21_days += 1
             if self.count_21_days % 21 == 0 and self.count_21_days != 0:
                 self.count_21_period += 1
