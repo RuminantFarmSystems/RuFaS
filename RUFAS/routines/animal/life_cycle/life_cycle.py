@@ -133,13 +133,15 @@ class LifeCycleManager:
     count_21_days = 0
     num_ai_21_days = 0
     num_cow_open_acc_21_days = 0
-    service_rate_sum_21_days = 0
+    service_rate_each_21_d = 0
     num_preg_21_days = 0
     count_21_period = 0
-    conception_rate_sum_21_days = 0
+    conception_rate_each_21_d = 0
     avg_service_rate = 0
     avg_conception_rate = 0
     pregnancy_rate = 0
+    service_rate_21_d = []
+    conception_rate_21_d = []
 
     config = None
 
@@ -584,30 +586,28 @@ class LifeCycleManager:
             if date >= 365:
                 if cow.days_born == cow.ai_day:
                     self.num_ai_21_days += 1
-                if cow.days_in_milk > 0 and cow.days_in_preg == 0 and not cow.do_not_breed:
-                    self.num_cow_open_acc_21_days += 1
+                if cow.days_in_preg == 0 and not cow.do_not_breed:
+                    if cow.repro_program in ['ED'] and cow.days_in_milk > AnimalBase.config['voluntary_waiting_period']:
+                        self.num_cow_open_acc_21_days += 1
+                    elif cow.days_in_milk > AnimalBase.config['tai_program_start_day']:
+                        self.num_cow_open_acc_21_days += 1
                 if cow.days_in_preg == 1:
                     self.num_preg_21_days += 1   
-            print(f"ai num:{self.num_ai_21_days}, open num: {self.num_cow_open_acc_21_days}, preg num: {self.num_preg_21_days}")
+            #print(f"ai num:{self.num_ai_21_days}, open num: {self.num_cow_open_acc_21_days}, preg num: {self.num_preg_21_days}")
+        
         #caculate service rate and conception rate
         if date >= 366:
             self.count_21_days += 1
-            if self.count_21_days % 21 == 0:
-                print(f"21 count: {self.count_21_days}")
+            if self.count_21_days % 21 == 0 and self.count_21_days != 0:
                 self.count_21_period += 1
-                self.service_rate_sum_21_days += float(self.num_ai_21_days) / float(self.num_cow_open_acc_21_days/21)
-                self.conception_rate_sum_21_days += float(self.num_preg_21_days) / float(self.num_ai_21_days)
+                self.service_rate_each_21_d = float(self.num_ai_21_days) / float(self.num_cow_open_acc_21_days/21)
+                self.conception_rate_each_21_d = float(self.num_preg_21_days) / float(self.num_ai_21_days)
                 self.num_ai_21_days = 0
                 self.num_cow_open_acc_21_days = 0
                 self.num_preg_21_days = 0
-
-        if self.count_21_period % 15 == 0:
-            self.avg_service_rate = self.service_rate_sum_21_days / 15
-            self.avg_conception_rate = self.conception_rate_sum_21_days / 15
-            self.pregnancy_rate = self.avg_service_rate * self.avg_conception_rate 
-            self.service_rate_sum_21_days = 0
-            self.conception_rate_sum_21_days = 0
-            print(f"conception rate:{self.avg_conception_rate}; preg rate: {self.pregnancy_rate}")
+                self.avg_service_rate = self.moving_average(self.service_rate_each_21_d, 15, self.service_rate_21_d)
+                self.avg_conception_rate = self.moving_average(self.conception_rate_each_21_d, 15, self.conception_rate_21_d)
+                self.pregnancy_rate = self.avg_service_rate * self.avg_conception_rate
 
         if total_animal_num == 0:
             self.calf_percent = 0
@@ -666,3 +666,25 @@ class LifeCycleManager:
         new_avg = (cur_avg * num_values + new_value) / new_num_values
 
         return new_num_values, new_avg
+
+    @staticmethod
+    def moving_average(new_value, length_moving, stor_list):
+        """
+        Calcuate the new average given the number of values, the current average, and the new value.
+
+        Args:
+            new_values: the new value to be averaged
+            lenth_moving: the length of the moving average period
+            stor_list: list where stores the values between averaging period
+
+        Return:
+            avg_value: moving average value
+        """
+        if len(stor_list) == length_moving:
+            stor_list = stor_list[1:]+[new_value]
+        else: 
+            stor_list += [new_value]
+
+        avg_value = sum(stor_list)/length_moving
+        
+        return avg_value
