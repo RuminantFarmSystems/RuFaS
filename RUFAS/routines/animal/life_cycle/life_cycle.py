@@ -36,7 +36,10 @@ class LifeCycleManager:
     heiferIII_percent = 0
     cow_num = 0
     cow_percent = 0
-    sold_calf_num = 0
+    sold_calf_male_num = 0
+    sold_calf_female_num = 0
+    sold_calf_crossbred_male_num = 0
+    sold_calf_crossbred_female_num = 0
     sold_heifer_num = 0
     bought_heifer_num = 0
     culled_heifer_num = 0
@@ -270,7 +273,10 @@ class LifeCycleManager:
         self.heiferII_num = 0
         self.heiferIII_num = 0
         self.cow_num = 0
-        self.sold_calf_num = 0
+        self.sold_calf_male_num = 0
+        self.sold_calf_female_num = 0
+        self.sold_calf_crossbred_male_num = 0
+        self.sold_calf_crossbred_female_num = 0
         self.sold_heifer_num = 0
         self.bought_heifer_num = 0
         self.culled_heifer_num = 0
@@ -615,7 +621,16 @@ class LifeCycleManager:
                     # calves.append(new_calf)
                     calves_born.append(new_calf)
                 if new_calf.sold:
-                    self.sold_calf_num += 1
+                    if new_calf.breed == 'HO':
+                        if new_calf.gender == 'male':
+                            self.sold_calf_male_num += 1
+                        else:
+                            self.sold_calf_female_num += 1
+                    if new_calf.breed == 'HO-AN':
+                        if new_calf.gender == 'male':
+                            self.sold_calf_crossbred_male_num += 1
+                        else:
+                            self.sold_calf_crossbred_female_num += 1  
 
             # caculate reproduction indications
             if date >= 1:

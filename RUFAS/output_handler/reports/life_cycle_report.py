@@ -135,7 +135,10 @@ class LifeCycleReport(BaseReportDriver):
                 'avg_conception_rate': ['life_cycle_manager.avg_conception_rate', '', []],
                 'avg_service_rate': ['life_cycle_manager.avg_service_rate', '', []],
                 'pregnancy_rate': ['life_cycle_manager.pregnancy_rate', '', []],
-                'sold_calf_num': ['life_cycle_manager.sold_calf_num', '', []]
+                'sold_calf_male_num': ['life_cycle_manager.sold_calf_male_num', '', []],
+                'sold_calf_female_num': ['life_cycle_manager.sold_calf_female_num', '', []],
+                'sold_calf_crossbred_male_num': ['life_cycle_manager.sold_calf_crossbred_male_num', '', []],
+                'sold_calf_crossbred_female_num': ['life_cycle_manager.sold_calf_crossbred_female_num', '', []]
             }
 
             self.production_performance = {

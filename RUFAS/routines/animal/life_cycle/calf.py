@@ -59,8 +59,10 @@ class Calf(AnimalBase):
         if AnimalBase.config['semen_type'] == 'conventional':
             male_calf_rate = \
                 AnimalBase.config['male_calf_rate_conventional_semen']
+            self.breed = 'HO'
         else:
             male_calf_rate = AnimalBase.config['male_calf_rate_sexed_semen']
+            self.breed = 'HO-AN'
         if random() < male_calf_rate:
             self.gender = 'male'
         else:
