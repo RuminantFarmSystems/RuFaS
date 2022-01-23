@@ -158,6 +158,11 @@ class LifeCycleManager:
     service_rate_21_d_heifer = []
     conception_rate_21_d_heifer = []
 
+    total_body_weight_calf = 0
+    total_body_weight_heifer = 0
+    total_body_weight_lactating_cow = 0
+    total_body_weight_dry_cow = 0
+
     config = None
 
     replacement_market = []
@@ -312,6 +317,11 @@ class LifeCycleManager:
         self.avg_cow_culling_age = 0
         self.avg_mature_body_weight = 0
 
+        self.total_body_weight_calf = 0
+        self.total_body_weight_heifer = 0
+        self.total_body_weight_lactating_cow = 0
+        self.total_body_weight_dry_cow = 0
+
         preg_heifer_num = 0
         calving_interval_available_num = 0
         calving_age_available_num = {
@@ -352,6 +362,7 @@ class LifeCycleManager:
                 del calves[index]
             else:
                 self.calf_num += 1
+                self.total_body_weight_calf += calf.body_weight
                 total_animal_num, self.avg_mature_body_weight = \
                     self._calc_average(total_animal_num,
                                        self.avg_mature_body_weight, calf.mature_body_weight)
@@ -373,6 +384,7 @@ class LifeCycleManager:
                 del heiferIs[index]
             else:
                 self.heiferI_num += 1
+                self.total_body_weight_heifer += heiferI.body_weight
                 total_animal_num, self.avg_mature_body_weight = \
                     self._calc_average(total_animal_num,
                                        self.avg_mature_body_weight, heiferI.mature_body_weight)
@@ -399,6 +411,7 @@ class LifeCycleManager:
                 del heiferIIs[index]
             else:
                 self.heiferII_num += 1
+                self.total_body_weight_heifer += heiferII.body_weight
                 total_animal_num, self.avg_mature_body_weight = \
                     self._calc_average(total_animal_num,
                                        self.avg_mature_body_weight, heiferII.mature_body_weight)
@@ -465,6 +478,7 @@ class LifeCycleManager:
                 del heiferIIIs[index]
             else:
                 self.heiferIII_num += 1
+                self.total_body_weight_heifer += heiferIII.body_weight
                 total_animal_num, self.avg_mature_body_weight = \
                     self._calc_average(total_animal_num,
                                        self.avg_mature_body_weight, heiferIII.mature_body_weight)
@@ -524,11 +538,13 @@ class LifeCycleManager:
                                        self.avg_mature_body_weight, cow.mature_body_weight)
 
                 if cow.milking:
+                    self.total_body_weight_lactating_cow += cow.body_weight
                     self.daily_milk_production += cow.estimated_daily_milk_produced
                     self.milking_cow_num, self.avg_days_in_milk = \
                         self._calc_average(self.milking_cow_num,
                                            self.avg_days_in_milk, cow.days_in_milk)
                 else:
+                    self.total_body_weight_dry_cow += cow.body_weight
                     self.dry_cow_num += 1
 
                 if cow.days_in_milk >0 and cow.days_in_preg == 0:
@@ -694,7 +710,7 @@ class LifeCycleManager:
             else:
                 self.percent_cow_for_parity[parity] = \
                     self.num_cow_for_parity[parity] / self.cow_num * 100
-
+        # print(self.total_body_weight_calf, self.total_body_weight_heifer, self.total_body_weight_lactating_cow, self.total_body_weight_dry_cow)
         return animals_added, ids_removed, calves_born, calves, heiferIs, \
                heiferIIs, heiferIIIs, cows
 

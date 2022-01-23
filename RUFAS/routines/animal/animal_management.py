@@ -793,7 +793,10 @@ class AnimalManagement:
             'cows': {},
             'sold_heifers': {},
             'culled_cows': {},
-            'num_calves_sold': 0,
+            'num_calves_male_sold': 0,
+            'num_calves_female_sold': 0,
+            'num_calves_crossbred_male_sold': 0,
+            'num_calves_crossbred_female_sold': 0,
             'num_sold_heifers': 0,
             'num_cows_culled': 0
         }
