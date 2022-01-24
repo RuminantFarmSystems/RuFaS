@@ -113,16 +113,7 @@ class LifeCycleManager:
         c.UDDER_CULL: 0,
         c.UNKNOWN_CULL: 0
     }
-    cull_reason_stats_percent = {
-        c.DEATH_CULL: 0,
-        c.LOW_PROD_CULL: 0,
-        c.LAMENESS_CULL: 0,
-        c.INJURY_CULL: 0,
-        c.MASTITIS_CULL: 0,
-        c.DISEASE_CULL: 0,
-        c.UDDER_CULL: 0,
-        c.UNKNOWN_CULL: 0
-    }
+
     cull_reason_stats_range = {}
     parity_culling_stats_range = {}
 
@@ -346,7 +337,6 @@ class LifeCycleManager:
 
         for cull_reason in self.cull_reason_stats:
             self.cull_reason_stats[cull_reason] = 0
-            self.cull_reason_stats_percent[cull_reason] = 0
 
         # calf to heiferI
         for index, calf in enumerate(calves):
@@ -364,7 +354,7 @@ class LifeCycleManager:
                 self.calf_num += 1
                 self.total_body_weight_calf += calf.body_weight
                 total_animal_num, self.avg_mature_body_weight = \
-                    self._calc_average(total_animal_num,
+                    self.calc_average(total_animal_num,
                                        self.avg_mature_body_weight, calf.mature_body_weight)
 
         # heiferI to heiferII, assign repro programs
@@ -386,7 +376,7 @@ class LifeCycleManager:
                 self.heiferI_num += 1
                 self.total_body_weight_heifer += heiferI.body_weight
                 total_animal_num, self.avg_mature_body_weight = \
-                    self._calc_average(total_animal_num,
+                    self.calc_average(total_animal_num,
                                        self.avg_mature_body_weight, heiferI.mature_body_weight)
 
         # heiferII to heiferIII
@@ -394,7 +384,7 @@ class LifeCycleManager:
             cull_stage, third_stage = heiferII.update(date)
             if cull_stage:
                 self.culled_heifer_num, self.avg_heifer_culling_age = \
-                    self._calc_average(self.culled_heifer_num,
+                    self.calc_average(self.culled_heifer_num,
                                        self.avg_heifer_culling_age, heiferII.days_born)
                 self.culled_heifers.append(heiferII)
                 del heiferIIs[index]
@@ -413,11 +403,11 @@ class LifeCycleManager:
                 self.heiferII_num += 1
                 self.total_body_weight_heifer += heiferII.body_weight
                 total_animal_num, self.avg_mature_body_weight = \
-                    self._calc_average(total_animal_num,
+                    self.calc_average(total_animal_num,
                                        self.avg_mature_body_weight, heiferII.mature_body_weight)
                 if heiferII.breeding_to_preg_time != 0:
                     preg_heifer_num, self.avg_breeding_to_preg_time = \
-                        self._calc_average(preg_heifer_num,
+                        self.calc_average(preg_heifer_num,
                                            self.avg_breeding_to_preg_time,
                                            heiferII.breeding_to_preg_time)
                 self.CIDR_count += heiferII.CIDR_count
@@ -480,7 +470,7 @@ class LifeCycleManager:
                 self.heiferIII_num += 1
                 self.total_body_weight_heifer += heiferIII.body_weight
                 total_animal_num, self.avg_mature_body_weight = \
-                    self._calc_average(total_animal_num,
+                    self.calc_average(total_animal_num,
                                        self.avg_mature_body_weight, heiferIII.mature_body_weight)
 
         # if the number of heifers is more than needed for the herd, sell
@@ -521,27 +511,28 @@ class LifeCycleManager:
                 self.culled_cows.append(cow)
                 self.cull_reason_stats[cow.cull_reason] += 1
                 self.culled_cow_num, self.avg_cow_culling_age = \
-                    self._calc_average(self.culled_cow_num,
+                    self.calc_average(self.culled_cow_num,
                                        self.avg_cow_culling_age, cow.days_born)
 
-                # print(len(culled_cows))
                 ids_removed.append(cow.id)
                 del cows[index]
 
             else:
-                _, self.avg_cow_body_weight = self._calc_average(
+                # record average cow body weight, average parity number, and average mature body weight
+                _, self.avg_cow_body_weight = self.calc_average(
                     self.cow_num, self.avg_cow_body_weight, cow.body_weight)
-                self.cow_num, self.avg_parity_num = self._calc_average(
+                self.cow_num, self.avg_parity_num = self.calc_average(
                     self.cow_num, self.avg_parity_num, cow.calves)
                 total_animal_num, self.avg_mature_body_weight = \
-                    self._calc_average(total_animal_num,
+                    self.calc_average(total_animal_num,
                                        self.avg_mature_body_weight, cow.mature_body_weight)
 
                 if cow.milking:
+                    # record daily total milk production, average days in milk
                     self.total_body_weight_lactating_cow += cow.body_weight
                     self.daily_milk_production += cow.estimated_daily_milk_produced
                     self.milking_cow_num, self.avg_days_in_milk = \
-                        self._calc_average(self.milking_cow_num,
+                        self.calc_average(self.milking_cow_num,
                                            self.avg_days_in_milk, cow.days_in_milk)
                 else:
                     self.total_body_weight_dry_cow += cow.body_weight
@@ -552,13 +543,13 @@ class LifeCycleManager:
 
                 if cow.days_in_preg > 0:
                     self.preg_cow_num, self.avg_days_in_preg = \
-                        self._calc_average(self.preg_cow_num,
+                        self.calc_average(self.preg_cow_num,
                                            self.avg_days_in_preg, cow.days_in_preg)
 
                 if 0 < cow.calves <= 3:
                     self.num_cow_for_parity[str(cow.calves)], \
                     self.avg_age_for_parity[str(cow.calves)] = \
-                        self._calc_average(
+                        self.calc_average(
                             self.num_cow_for_parity[str(cow.calves)],
                             self.avg_age_for_parity[str(cow.calves)],
                             cow.days_born)
@@ -566,41 +557,41 @@ class LifeCycleManager:
                     if calving_age != -1:
                         calving_age_available_num[str(cow.calves)], \
                         self.avg_age_for_calving[str(cow.calves)] = \
-                            self._calc_average(
+                            self.calc_average(
                                 calving_age_available_num[str(cow.calves)],
                                 self.avg_age_for_calving[str(cow.calves)],
                                 calving_age)
                     if cow.calving_to_preg_time != 0:
                         calving_to_preg_time_available_num[str(cow.calves)], \
                         self.avg_calving_to_preg_time[str(cow.calves)] = \
-                            self._calc_average(
+                            self.calc_average(
                                 calving_to_preg_time_available_num[str(cow.calves)],
                                 self.avg_calving_to_preg_time[str(cow.calves)],
                                 cow.calving_to_preg_time)
                 else:
                     self.num_cow_for_parity['greater_than_3'], \
-                    self.avg_age_for_parity['greater_than_3'] = self._calc_average(
+                    self.avg_age_for_parity['greater_than_3'] = self.calc_average(
                         self.num_cow_for_parity['greater_than_3'],
                         self.avg_age_for_parity['greater_than_3'], cow.days_born)
                     calving_age = cow.events.get_most_recent_date(c.NEW_BIRTH)
                     if calving_age != -1:
                         calving_age_available_num['greater_than_3'], \
                         self.avg_age_for_calving['greater_than_3'] = \
-                            self._calc_average(
+                            self.calc_average(
                                 calving_age_available_num['greater_than_3'],
                                 self.avg_age_for_calving['greater_than_3'],
                                 calving_age)
                     if cow.calving_to_preg_time != 0:
                         calving_to_preg_time_available_num['greater_than_3'], \
                         self.avg_calving_to_preg_time['greater_than_3'] = \
-                            self._calc_average(
+                            self.calc_average(
                                 calving_to_preg_time_available_num['greater_than_3'],
                                 self.avg_calving_to_preg_time['greater_than_3'],
                                 cow.calving_to_preg_time)
 
                 if cow.CI != 0:
                     calving_interval_available_num, \
-                    self.avg_calving_interval = self._calc_average(
+                    self.avg_calving_interval = self.calc_average(
                         calving_interval_available_num,
                         self.avg_calving_interval, cow.CI)
 
@@ -659,10 +650,9 @@ class LifeCycleManager:
                         self.num_cow_open_acc_21_days += 1
                 if cow.days_in_preg == 1:
                     self.num_preg_21_days += 1   
-            #print(f"ai num:{self.num_ai_21_days}, open num: {self.num_cow_open_acc_21_days}, preg num: {self.num_preg_21_days}")
         
         #caculate service rate and conception rate
-        if date >= 1:
+        if date >= 365:
             self.count_21_days += 1
             if self.count_21_days % 21 == 0 and self.count_21_days != 0:
                 self.count_21_period += 1
@@ -699,23 +689,17 @@ class LifeCycleManager:
             self.preg_cow_percent = self.preg_cow_num / self.cow_num * 100
             self.non_preg_cow_percent = self.open_cow_num / self.cow_num * 100
 
-        for cull_reason in self.cull_reason_stats:
-            if self.culled_cow_num != 0:
-                self.cull_reason_stats_percent[cull_reason] = \
-                    self.cull_reason_stats[cull_reason] / \
-                    self.culled_cow_num * 100
         for parity in self.num_cow_for_parity:
             if self.cow_num == 0:
                 self.percent_cow_for_parity[parity] = 0
             else:
                 self.percent_cow_for_parity[parity] = \
                     self.num_cow_for_parity[parity] / self.cow_num * 100
-        # print(self.total_body_weight_calf, self.total_body_weight_heifer, self.total_body_weight_lactating_cow, self.total_body_weight_dry_cow)
         return animals_added, ids_removed, calves_born, calves, heiferIs, \
                heiferIIs, heiferIIIs, cows
 
     @staticmethod
-    def _calc_average(num_values, cur_avg, new_value):
+    def calc_average(num_values, cur_avg, new_value):
         """
         Calcuate the new average given the number of values, the current average, and the new value.
 

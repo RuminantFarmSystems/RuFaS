@@ -114,8 +114,6 @@ class LifeCycleReport(BaseReportDriver):
             for cull_reason in LifeCycleManager.cull_reason_stats:
                 self.herd_structure[cull_reason + '_num'] = \
                     ['life_cycle_manager.cull_reason_stats[\'' + cull_reason + '\']', '', []]
-                self.herd_structure[cull_reason + '_percent'] = \
-                    ['life_cycle_manager.cull_reason_stats_percent[\'' + cull_reason + '\']', '', []]
                         
             self.reproduction_performance = {
                 'CIDR_count': ['life_cycle_manager.CIDR_count', '', []],
@@ -166,6 +164,10 @@ class LifeCycleReport(BaseReportDriver):
                 'avg_heifer_culling_age': ['life_cycle_manager.avg_heifer_culling_age', 'd', []],
                 'avg_cow_culling_age': ['life_cycle_manager.avg_cow_culling_age', 'd', []],
                 'avg_mature_body_weight': ['life_cycle_manager.avg_mature_body_weight', 'kg', []],
+                'daily_calf_body_weight_sum': ['life_cycle_manager.total_body_weight_calf', 'kg', []],
+                'daily_heifer_body_weight_sum': ['life_cycle_manager.total_body_weight_heifer', 'kg', []],
+                'daily_milking_cow_body_weight_sum': ['life_cycle_manager.total_body_weight_lactating_cow', 'kg', []],
+                'daily_dry_cow_body_weight_sum': ['life_cycle_manager.total_body_weight_dry_cow', 'kg', []],
             }
 
             for parity in LifeCycleManager.avg_calving_to_preg_time:
