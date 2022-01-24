@@ -167,8 +167,8 @@ class LifeCycleReport(BaseReportDriver):
                 'avg_mature_body_weight': ['life_cycle_manager.avg_mature_body_weight', 'kg', []],
                 'daily_calf_body_weight_sum': ['life_cycle_manager.total_body_weight_calf', 'kg', []],
                 'daily_heifer_body_weight_sum': ['life_cycle_manager.total_body_weight_heifer', 'kg', []],
-                'daily_milking_cow_body_weight_sum': ['life_cycle_manager.total_body_weight_lactating_cow', 'kg', []],
-                'daily_dry_cow_body_weight_sum': ['life_cycle_manager.total_body_weight_dry_cow', 'kg', []],
+                'daily_milking_cow_DMI_sum': ['life_cycle_manager.total_lactating_DMI', 'kg', []],
+                'daily_dry_cow_DMI_sum': ['life_cycle_manager.total_dry_DMI', 'kg', []],
                 'daily_culled_cow_body_weight_sum': ['life_cycle_manager.total_body_weight_culled_cow', 'kg', []]
             }
 

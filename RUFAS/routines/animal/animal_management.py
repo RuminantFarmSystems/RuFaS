@@ -793,10 +793,6 @@ class AnimalManagement:
             'cows': {},
             'sold_heifers': {},
             'culled_cows': {},
-            'num_calves_male_sold': 0,
-            'num_calves_female_sold': 0,
-            'num_calves_crossbred_male_sold': 0,
-            'num_calves_crossbred_female_sold': 0,
             'num_sold_heifers': 0,
             'num_cows_culled': 0
         }
@@ -845,10 +841,6 @@ class AnimalManagement:
                 self.generate_animal_output('culled_cow', i)
             animals.append((animal, 'culled_cow', is_cow))
 
-        output['num_calves_male_sold'] = self.life_cycle_manager.sold_calf_male_num
-        output['num_calves_female_sold'] = self.life_cycle_manager.sold_calf_female_num
-        output['num_calves_crossbred_male_sold'] = self.life_cycle_manager.sold_calf_crossbred_male_num
-        output['num_calves_crossbred_female_sold'] = self.life_cycle_manager.sold_calf_crossbred_female_num
         output['num_sold_heifers'] = len(self.life_cycle_manager.sold_heifers)
         output['num_cows_culled'] = len(self.life_cycle_manager.culled_cows)
 

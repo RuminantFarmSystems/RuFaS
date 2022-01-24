@@ -158,8 +158,8 @@ class LifeCycleManager:
 
     total_body_weight_calf = 0
     total_body_weight_heifer = 0
-    total_body_weight_lactating_cow = 0
-    total_body_weight_dry_cow = 0
+    total_lactating_DMI = 0
+    total_dry_DMI = 0
     total_body_weight_culled_cow = 0
 
     cost_hormone_heifer = 0
@@ -347,8 +347,8 @@ class LifeCycleManager:
 
         self.total_body_weight_calf = 0
         self.total_body_weight_heifer = 0
-        self.total_body_weight_lactating_cow = 0
-        self.total_body_weight_dry_cow = 0
+        self.total_lactating_DMI = 0
+        self.total_dry_DMI = 0
         self.total_body_weight_culled_cow = 0
 
         preg_heifer_num = 0
@@ -607,13 +607,13 @@ class LifeCycleManager:
 
                 if cow.milking:
                     # record daily total milk production, average days in milk
-                    self.total_body_weight_lactating_cow += cow.body_weight
+                    self.total_lactating_DMI += cow.DMIest
                     self.daily_milk_production += cow.estimated_daily_milk_produced
                     self.milking_cow_num, self.avg_days_in_milk = \
                         self.calc_average(self.milking_cow_num,
                                            self.avg_days_in_milk, cow.days_in_milk)
                 else:
-                    self.total_body_weight_dry_cow += cow.body_weight
+                    self.total_dry_DMI += cow.DMIest
                     self.dry_cow_num += 1
 
                 if cow.days_in_milk >0 and cow.days_in_preg == 0:
@@ -764,8 +764,9 @@ class LifeCycleManager:
         # $2.4 per day for average weight heifer
         self.cost_feed_heifer = 0.0068 * self.total_body_weight_heifer
         # $5.5 per day for average weight milking cow
-        self.cost_feed_milking_cow = 0.0086 * self.total_body_weight_lactating_cow
-        self.cost_feed_dry_cow = 0.0068 * self.total_body_weight_dry_cow
+        # NEED TO CHANGE THE CALCULATION
+        self.cost_feed_milking_cow = 0.0086 * self.total_lactating_DMI
+        self.cost_feed_dry_cow = 0.0068 * self.total_dry_DMI
         self.income_sold_female_calf = 120 * self.sold_calf_female_num
         self.income_sold_male_calf = 50 * self.sold_calf_male_num
         self.income_sold_heifer = 1380 * self.sold_heifer_num
