@@ -168,6 +168,16 @@ class LifeCycleReport(BaseReportDriver):
                 'daily_heifer_body_weight_sum': ['life_cycle_manager.total_body_weight_heifer', 'kg', []],
                 'daily_milking_cow_body_weight_sum': ['life_cycle_manager.total_body_weight_lactating_cow', 'kg', []],
                 'daily_dry_cow_body_weight_sum': ['life_cycle_manager.total_body_weight_dry_cow', 'kg', []],
+                'daily_culled_cow_body_weight_sum': ['life_cycle_manager.total_body_weight_culled_cow', 'kg', []]
+            }
+
+            self.econmic_cal = {
+                'cost_repro_heifer': ['life_cycle_manager.repro_cost_heifer', '$/d', []],
+                'cost_repro_cow': ['life_cycle_manager.repro_cost_cow', '$/d', []],
+                'cost_feed': ['life_cycle_manager.feed_cost', '$/d', []],
+                'milk_income_over_feed_cost': ['life_cycle_manager.milk_income_over_feed_cost', '$/d', []],
+                'net_return': ['life_cycle_manager.net_return', '$/d', []]
+
             }
 
             for parity in LifeCycleManager.avg_calving_to_preg_time:
@@ -179,7 +189,8 @@ class LifeCycleReport(BaseReportDriver):
                 **self.reproduction_performance, 
                 **self.production_performance, 
                 **self.preg,
-                **self.average_animal_profile
+                **self.average_animal_profile,
+                **self.econmic_cal
             }
             
             self.annual_variables = {'year': ['time.calendar_year', '', []]}
