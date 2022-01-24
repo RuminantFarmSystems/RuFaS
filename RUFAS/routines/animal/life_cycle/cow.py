@@ -440,7 +440,7 @@ class Cow(HeiferIII):
                 self.CI_history.append(self.CI)
             self.BW_at_calving = self.body_weight
             self.events.add_event(self.days_born, sim_day, const.NEW_BIRTH)
-            self._health_cull_update()
+            self.health_cull_update()
             self.death_update()
             new_born = True
 

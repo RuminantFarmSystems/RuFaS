@@ -504,7 +504,7 @@ class LifeCycleManager:
                     self.num_preg_21_days_heifer += 1   
         
         #caculate service rate and conception rate
-        if date >= 1:
+        if date >= 22:
             self.count_21_days += 1
             if self.count_21_days % 21 == 0 and self.count_21_days != 0:
                 self.count_21_period += 1
@@ -733,7 +733,7 @@ class LifeCycleManager:
                     self.num_preg_21_days += 1   
         
         #caculate service rate and conception rate
-        if date >= 365:
+        if date >= 22:
             self.count_21_days += 1
             if self.count_21_days % 21 == 0 and self.count_21_days != 0:
                 self.count_21_period += 1
