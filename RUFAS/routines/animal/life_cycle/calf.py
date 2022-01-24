@@ -17,7 +17,7 @@ from RUFAS.routines.animal.life_cycle.animal_base import AnimalBase
 from RUFAS.routines.animal.ration.calf_ration import calc_requirements
 from RUFAS.routines.animal.manure.calf_manure_excretion import \
     manure_calculations
-from RUFAS.routines.animal.life_cycle import animal_events_constants as c
+from RUFAS.routines.animal.life_cycle import animal_events_constants as const
 
 
 class Calf(AnimalBase):
@@ -80,7 +80,7 @@ class Calf(AnimalBase):
         # calf born, with stillbirth probability
         if random() < AnimalBase.config['still_birth_rate']:
             self.culled = True
-            self.events.add_event(0, 0, c.STILL_BIRTH)
+            self.events.add_event(0, 0, const.STILL_BIRTH)
 
         # sell the male calves and the unwanted female calves
         # (if AnimalBase.config['keep_female_calf_rate'] = 1,
@@ -198,7 +198,7 @@ class Calf(AnimalBase):
         if self.days_born == AnimalBase.config['wean_day']:
             wean_day = True
             self.wean_weight = self.body_weight
-            self.events.add_event(self.days_born, sim_day, c.WEAN_DAY)
+            self.events.add_event(self.days_born, sim_day, const.WEAN_DAY)
             self.days_born -= 1  # will increment by 1 again in heifer update
         else:
             self.body_weight += self.target_adg_calf

@@ -26,7 +26,7 @@ from RUFAS.routines.animal.manure.lactating_cow_manure_excretion import \
 from RUFAS.routines.animal.manure.dry_cow_manure_excretion import \
     manure_calculations as dry_manure_calculations
 from random import random
-from RUFAS.routines.animal.life_cycle import animal_events_constants as c
+from RUFAS.routines.animal.life_cycle import animal_events_constants as const
 
 
 class MilkProductionHistory:
@@ -179,7 +179,7 @@ class Cow(HeiferIII):
         """
         if self.days_in_preg == AnimalBase.config['days_in_preg_when_dry']:
             self.milking = False
-            self.events.add_event(self.days_born, sim_day, c.DRY)
+            self.events.add_event(self.days_born, sim_day, const.DRY)
             self.days_in_milk = 0
             self.estimated_daily_milk_produced = 0
 
@@ -435,19 +435,19 @@ class Cow(HeiferIII):
             self.gestation_length = 0 
             if self.calves >= 2:
                 last_time_given_birth = \
-                    self.events.get_most_recent_date(c.NEW_BIRTH)
+                    self.events.get_most_recent_date(const.NEW_BIRTH)
                 self.CI = self.days_born - last_time_given_birth
                 self.CI_history.append(self.CI)
             self.BW_at_calving = self.body_weight
-            self.events.add_event(self.days_born, sim_day, c.NEW_BIRTH)
-            self.health_cull_update()
+            self.events.add_event(self.days_born, sim_day, const.NEW_BIRTH)
+            self._health_cull_update()
             self.death_update()
             new_born = True
 
             # restarting estrus
             if self.repro_program in ['ED','ED-TAI']:
                 self.estrus_day = self.determine_estrus_day(
-                    self.days_born, c.ESTRUS_AFTER_CALVING_NOTE,
+                    self.days_born, const.ESTRUS_AFTER_CALVING_NOTE,
                     AnimalBase.config['avg_estrus_cycle_return'],
                     AnimalBase.config['std_estrus_cycle_return'], sim_day)
             # get presynch method from input
@@ -490,15 +490,15 @@ class Cow(HeiferIII):
 
             if 1 <= self.days_in_milk < AnimalBase.config['voluntary_waiting_period']:
                 self.estrus_day = self.determine_estrus_day(
-                    self.days_born, c.ESTRUS_BEFORE_VWP_NOTE,
+                    self.days_born, const.ESTRUS_BEFORE_VWP_NOTE,
                     AnimalBase.config['avg_estrus_cycle_cow'],
                     AnimalBase.config['std_estrus_cycle_cow'], sim_day)
             elif not self.do_not_breed:
-                self.events.add_event(self.days_born, sim_day, c.ESTRUS_OCCURRED)
+                self.events.add_event(self.days_born, sim_day, const.ESTRUS_OCCURRED)
                 estrus_detection_rand = random()
                 if estrus_detection_rand < AnimalBase.config['estrus_detection_rate']:
                     # Estrus detected
-                    self.events.add_event(self.days_born, sim_day, c.ESTRUS_DETECTED)
+                    self.events.add_event(self.days_born, sim_day, const.ESTRUS_DETECTED)
                     estrus_service_rand = random()
                     if estrus_service_rand < AnimalBase.config['estrus_insemination_rate']:
                         # serviced
@@ -509,13 +509,13 @@ class Cow(HeiferIII):
                     elif self.open_stage == False or self.repro_program in ['ED']:
                         # go to next estrus cycle
                         self.estrus_day = self.determine_estrus_day(
-                            self.days_born, c.BASIC_ESTRUS_NOTE,
+                            self.days_born, const.BASIC_ESTRUS_NOTE,
                             AnimalBase.config['avg_estrus_cycle_cow'],
                             AnimalBase.config['std_estrus_cycle_cow'], sim_day)
                 # go to next estrus cycle, not back to estrus during resynch process
                 elif self.open_stage == False or self.repro_program in ['ED']:
                     self.estrus_day = self.determine_estrus_day(
-                        self.days_born, c.BASIC_ESTRUS_NOTE,
+                        self.days_born, const.BASIC_ESTRUS_NOTE,
                         AnimalBase.config['avg_estrus_cycle_cow'],
                         AnimalBase.config['std_estrus_cycle_cow'], sim_day)
 
@@ -531,13 +531,13 @@ class Cow(HeiferIII):
         """
         if not self.do_not_breed:
             if self.days_born == self.tai_program_start_day_c:
-                self.events.add_event(self.days_born, sim_day, c.INJECT_GNRH)
+                self.events.add_event(self.days_born, sim_day, const.INJECT_GNRH)
                 self.GnRH_injections = self.GnRH_injections + 1
             elif self.days_born == self.tai_program_start_day_c + 7:
-                self.events.add_event(self.days_born, sim_day, c.INJECT_PGF)
+                self.events.add_event(self.days_born, sim_day, const.INJECT_PGF)
                 self.PGF_injections = self.PGF_injections + 1
             elif self.days_born == self.tai_program_start_day_c + 9:
-                self.events.add_event(self.days_born, sim_day, c.INJECT_GNRH)
+                self.events.add_event(self.days_born, sim_day, const.INJECT_GNRH)
                 self.GnRH_injections = self.GnRH_injections + 1
                 # the next day ai
                 self.ai_day = self.days_born + 1
@@ -554,13 +554,13 @@ class Cow(HeiferIII):
         """
         if not self.do_not_breed:
             if self.days_born == self.tai_program_start_day_c:
-                self.events.add_event(self.days_born, sim_day, c.INJECT_GNRH)
+                self.events.add_event(self.days_born, sim_day, const.INJECT_GNRH)
                 self.GnRH_injections = self.GnRH_injections + 1
             elif self.days_born == self.tai_program_start_day_c + 7:
-                self.events.add_event(self.days_born, sim_day, c.INJECT_PGF)
+                self.events.add_event(self.days_born, sim_day, const.INJECT_PGF)
                 self.PGF_injections = self.PGF_injections + 1
             elif self.days_born == self.tai_program_start_day_c + 9:
-                self.events.add_event(self.days_born, sim_day, c.INJECT_GNRH)
+                self.events.add_event(self.days_born, sim_day, const.INJECT_GNRH)
                 self.GnRH_injections = self.GnRH_injections + 1
             elif self.days_born == self.tai_program_start_day_c + 10:
                 self.ai_day = self.days_born
@@ -578,13 +578,13 @@ class Cow(HeiferIII):
         """
         if not self.do_not_breed:
             if self.days_born == self.tai_program_start_day_c:
-                self.events.add_event(self.days_born, sim_day, c.INJECT_GNRH)
+                self.events.add_event(self.days_born, sim_day, const.INJECT_GNRH)
                 self.GnRH_injections = self.GnRH_injections + 1
             elif self.days_born == self.tai_program_start_day_c + 7:
-                self.events.add_event(self.days_born, sim_day, c.INJECT_PGF)
+                self.events.add_event(self.days_born, sim_day, const.INJECT_PGF)
                 self.PGF_injections = self.PGF_injections + 1
             elif self.days_born == self.tai_program_start_day_c + 10:
-                self.events.add_event(self.days_born, sim_day, c.INJECT_GNRH)
+                self.events.add_event(self.days_born, sim_day, const.INJECT_GNRH)
                 self.GnRH_injections = self.GnRH_injections + 1
                 self.ai_day = self.days_born
                 if self.open_stage == False:
@@ -601,16 +601,16 @@ class Cow(HeiferIII):
         """
         if not self.do_not_breed:
             if self.days_born == self.tai_program_start_day_c:
-                self.events.add_event(self.days_born, sim_day, c.INJECT_GNRH)
+                self.events.add_event(self.days_born, sim_day, const.INJECT_GNRH)
                 self.GnRH_injections = self.GnRH_injections + 1
             elif self.days_born == self.tai_program_start_day_c + 5:
-                self.events.add_event(self.days_born, sim_day, c.INJECT_PGF)
+                self.events.add_event(self.days_born, sim_day, const.INJECT_PGF)
                 self.PGF_injections = self.PGF_injections + 1
             elif self.days_born == self.tai_program_start_day_c + 6:
-                self.events.add_event(self.days_born, sim_day, c.INJECT_PGF)
+                self.events.add_event(self.days_born, sim_day, const.INJECT_PGF)
                 self.PGF_injections = self.PGF_injections + 1
             elif self.days_born == self.tai_program_start_day_c + 8:
-                self.events.add_event(self.days_born, sim_day, c.INJECT_GNRH)
+                self.events.add_event(self.days_born, sim_day, const.INJECT_GNRH)
                 self.GnRH_injections = self.GnRH_injections + 1
                 self.ai_day = self.days_born
                 if self.open_stage == False:
@@ -626,21 +626,21 @@ class Cow(HeiferIII):
             sim_day: the simulation day
         """
         if self.days_born == self.presynch_program_start_day:
-            self.events.add_event(self.days_born, sim_day, c.INJECT_PGF)
+            self.events.add_event(self.days_born, sim_day, const.INJECT_PGF)
             self.PGF_injections = self.PGF_injections + 1
         elif self.days_born == self.presynch_program_start_day + 14:
-            self.events.add_event(self.days_born, sim_day, c.INJECT_PGF)
+            self.events.add_event(self.days_born, sim_day, const.INJECT_PGF)
             self.PGF_injections = self.PGF_injections + 1
-            self.synch_ed_estrus_day = self.determine_synch_ed_estrus_day(self.days_born, c.SYNCH_ESTRUS, 5, 1.5, 11, sim_day)
+            self.synch_ed_estrus_day = self.determine_synch_ed_estrus_day(self.days_born, const.SYNCH_ESTRUS, 5, 1.5, 11, sim_day)
 
         if self.days_born > self.presynch_program_start_day + 14 and self.days_born < self.synch_ed_estrus_day:
             self.ED_days += 1
             
         elif self.days_born == self.synch_ed_estrus_day:
-            self.events.add_event(self.days_born, sim_day, c.ESTRUS_OCCURRED)
+            self.events.add_event(self.days_born, sim_day, const.ESTRUS_OCCURRED)
             estrus_detection_rand = random()
             if estrus_detection_rand < AnimalBase.config['estrus_detection_rate']:
-                self.events.add_event(self.days_born, sim_day, c.ESTRUS_DETECTED)
+                self.events.add_event(self.days_born, sim_day, const.ESTRUS_DETECTED)
                 ed_insemination_rand = random()
                 if ed_insemination_rand < AnimalBase.config['estrus_insemination_rate']:
                     self.ai_day = self.synch_ed_estrus_day + 1
@@ -648,7 +648,7 @@ class Cow(HeiferIII):
 
         elif self.days_born == self.presynch_program_start_day + 26 and self.days_in_preg == 0:
             self.tai_program_start_day_c = self.days_born
-            self.events.add_event(self.days_born, sim_day, c.PRESYNCH_END)
+            self.events.add_event(self.days_born, sim_day, const.PRESYNCH_END)
 
     def doubleovsynch_update(self, sim_day):
         """
@@ -657,17 +657,17 @@ class Cow(HeiferIII):
             sim_day: the simulation day
         """
         if self.days_born == self.presynch_program_start_day:
-            self.events.add_event(self.days_born, sim_day, c.INJECT_GNRH)
+            self.events.add_event(self.days_born, sim_day, const.INJECT_GNRH)
             self.GnRH_injections = self.GnRH_injections + 1
         elif self.days_born == self.presynch_program_start_day + 7:
-            self.events.add_event(self.days_born, sim_day, c.INJECT_PGF)
+            self.events.add_event(self.days_born, sim_day, const.INJECT_PGF)
             self.PGF_injections = self.PGF_injections + 2
         elif self.days_born == self.presynch_program_start_day + 10:
-            self.events.add_event(self.days_born, sim_day, c.INJECT_GNRH)
+            self.events.add_event(self.days_born, sim_day, const.INJECT_GNRH)
             self.GnRH_injections = self.GnRH_injections + 1
         elif self.days_born == self.presynch_program_start_day + 17:
             self.tai_program_start_day_c = self.days_born
-            self.events.add_event(self.days_born, sim_day, c.DOUBLE_OVSYNCH_END)
+            self.events.add_event(self.days_born, sim_day, const.DOUBLE_OVSYNCH_END)
 
     def g6g_update(self, sim_day):
         """
@@ -676,14 +676,14 @@ class Cow(HeiferIII):
             sim_day: the simulation day
         """
         if self.days_born == self.presynch_program_start_day:
-            self.events.add_event(self.days_born, sim_day, c.INJECT_PGF)
+            self.events.add_event(self.days_born, sim_day, const.INJECT_PGF)
             self.PGF_injections = self.PGF_injections + 1
         elif self.days_born == self.presynch_program_start_day + 2:
-            self.events.add_event(self.days_born, sim_day, c.INJECT_GNRH)
+            self.events.add_event(self.days_born, sim_day, const.INJECT_GNRH)
             self.GnRH_injections = self.GnRH_injections + 1
         elif self.days_born == self.presynch_program_start_day + 9:
             self.tai_program_start_day_c = self.days_born
-            self.events.add_event(self.days_born, sim_day, c.C6G_END)
+            self.events.add_event(self.days_born, sim_day, const.C6G_END)
 
     def tai_update(self, sim_day):
         """
@@ -780,9 +780,9 @@ class Cow(HeiferIII):
             # inject PGF at the day of preg check 
             elif self.days_born == self.abortion_day:
                 self.PGF_injections = self.PGF_injections + 1
-                self.events.add_event(self.days_born, sim_day, c.INJECT_PGF)
+                self.events.add_event(self.days_born, sim_day, const.INJECT_PGF)
                 self.estrus_day = self.determine_estrus_day(
-                    self.abortion_day, c.ESTRUS_AFTER_PGF_NOTE,
+                    self.abortion_day, const.ESTRUS_AFTER_PGF_NOTE,
                     AnimalBase.config['avg_estrus_cycle_p'],
                     AnimalBase.config['std_estrus_cycle_p'], sim_day)
 
@@ -811,7 +811,7 @@ class Cow(HeiferIII):
         # assign estrus for abortion cows (only those cows have open_stage = False at this moment)
             if self.open_stage == False:
                 self.estrus_day = self.determine_estrus_day(
-                        self.abortion_day, c.ESTRUS_AFTER_ABORTION_NOTE,
+                        self.abortion_day, const.ESTRUS_AFTER_ABORTION_NOTE,
                         AnimalBase.config['avg_estrus_cycle_cow'],
                         AnimalBase.config['std_estrus_cycle_cow'], sim_day)
         # for TAI and ED-TAI program, resynch protocol starts
@@ -852,7 +852,7 @@ class Cow(HeiferIII):
         if self.days_born == self.ai_day:
             self.events.add_event(
                 self.days_born, sim_day,
-                c.INSEMINATED_W_BASE + AnimalBase.config['semen_type'])
+                const.INSEMINATED_W_BASE + AnimalBase.config['semen_type'])
             self.semen_num += 1
             self.AI_times += 1
             conception_rand = random()
@@ -861,7 +861,7 @@ class Cow(HeiferIII):
                 self.open_stage = False
                 if self.calves != 0:
                     last_time_given_birth = \
-                        self.events.get_most_recent_date(c.NEW_BIRTH)
+                        self.events.get_most_recent_date(const.NEW_BIRTH)
                     self.calving_to_preg_time = self.days_born - last_time_given_birth
                 self.gestation_length = int(truncnorm.rvs(-2, 2, AnimalBase.config['avg_gestation_len'],\
                         AnimalBase.config['std_gestation_len']))
@@ -873,18 +873,18 @@ class Cow(HeiferIII):
                     self.calf_birth_weight = truncnorm.rvs(-2, 2, \
                         AnimalBase.config['birth_weight_avg_je'], AnimalBase.config['birth_weight_std_je'])
 
-                self.events.add_event(self.days_born, sim_day, c.COW_PREG)
+                self.events.add_event(self.days_born, sim_day, const.COW_PREG)
             else:
-                self.events.add_event(self.days_born, sim_day, c.COW_NOT_PREG) 
+                self.events.add_event(self.days_born, sim_day, const.COW_NOT_PREG) 
                 self.open_stage = True
                 if self.repro_program in ['ED']:
                     self.estrus_day = self.determine_estrus_day(
-                        self.days_born, c.ESTRUS_AFTER_AI_NOTE,
+                        self.days_born, const.ESTRUS_AFTER_AI_NOTE,
                         AnimalBase.config['avg_estrus_cycle_cow'],
                         AnimalBase.config['std_estrus_cycle_cow'], sim_day)
                 elif self.resynch_method in ['TAIafterPD','PGFatPD']: 
                     self.estrus_day = self.determine_estrus_day( 
-                        self.days_born, c.ESTRUS_AFTER_AI_NOTE, 
+                        self.days_born, const.ESTRUS_AFTER_AI_NOTE, 
                         AnimalBase.config['avg_estrus_cycle_cow'],
                         AnimalBase.config['std_estrus_cycle_cow'], sim_day)
                 
@@ -895,14 +895,14 @@ class Cow(HeiferIII):
             # adding past injections in TAI start before PD programs
             if self.resynch_method in ['TAIbeforePD']:
                 self.events.add_event(
-                    self.days_born - 7, sim_day, c.INJECT_GNRH)
+                    self.days_born - 7, sim_day, const.INJECT_GNRH)
                 self.GnRH_injections = self.GnRH_injections + 1
             
             if self.days_in_preg > 0:
                 preg_loss_rand = random()
                 if preg_loss_rand > AnimalBase.config['preg_loss_rate_1']:
                     self.events.add_event(
-                        self.days_born, sim_day, c.PREG_CHECK_1_PREG)
+                        self.days_born, sim_day, const.PREG_CHECK_1_PREG)
                 else:
                     self.days_in_preg = 0
                     self.abortion_day = self.days_born
@@ -913,12 +913,12 @@ class Cow(HeiferIII):
                     self.calf_birth_weight = 0
                     self.p_gest_for_calf = 0
                     self.events.add_event(
-                        self.days_born, sim_day, c.PREG_LOSS_BEFORE_1)
+                        self.days_born, sim_day, const.PREG_LOSS_BEFORE_1)
             else:
                 self.abortion_day = self.days_born
                 self.open(sim_day)
                 self.events.add_event(
-                    self.days_born, sim_day, c.PREG_CHECK_1_NOT_PREG)
+                    self.days_born, sim_day, const.PREG_CHECK_1_NOT_PREG)
         
         # preg check 2
         elif self.days_in_preg > 0 and self.days_born == self.ai_day + \
@@ -928,7 +928,7 @@ class Cow(HeiferIII):
             if preg_loss_rand > \
                 AnimalBase.config['preg_loss_rate_2']:
                 self.events.add_event(
-                    self.days_born, sim_day, c.PREG_CHECK_2_PREG)
+                    self.days_born, sim_day, const.PREG_CHECK_2_PREG)
             else:
                 self.days_in_preg = 0
                 self.abortion_day = self.days_born
@@ -939,7 +939,7 @@ class Cow(HeiferIII):
                 self.calf_birth_weight = 0
                 self.p_gest_for_calf = 0
                 self.events.add_event(
-                    self.days_born, sim_day, c.PREG_LOSS_BTWN_1_AND_2)
+                    self.days_born, sim_day, const.PREG_LOSS_BTWN_1_AND_2)
         
         # preg check 3
         elif self.days_in_preg > 0 and self.days_born == self.ai_day + \
@@ -948,7 +948,7 @@ class Cow(HeiferIII):
             preg_loss_rand = random()
             if preg_loss_rand > AnimalBase.config['preg_loss_rate_3']:
                 self.events.add_event(
-                    self.days_born, sim_day, c.PREG_CHECK_3_PREG)
+                    self.days_born, sim_day, const.PREG_CHECK_3_PREG)
             else:
                 self.days_in_preg = 0
                 self.abortion_day = self.days_born
@@ -959,7 +959,7 @@ class Cow(HeiferIII):
                 self.calf_birth_weight = 0
                 self.p_gest_for_calf = 0
                 self.events.add_event(
-                    self.days_born, sim_day, c.PREG_LOSS_BTWN_2_AND_3)
+                    self.days_born, sim_day, const.PREG_LOSS_BTWN_2_AND_3)
                     
         if self.open_stage and not self.do_not_breed and self.repro_program in ['ED-TAI','TAI']:
             self.resynch_protocol(sim_day)
@@ -968,7 +968,7 @@ class Cow(HeiferIII):
                 AnimalBase.config['do_not_breed_time']:
             # only add to events if it is the first time this occurs
             if not self.do_not_breed:
-                self.events.add_event(self.days_born, sim_day, c.DO_NOT_BREED)
+                self.events.add_event(self.days_born, sim_day, const.DO_NOT_BREED)
                 self.do_not_breed = True
             return True
 
@@ -984,8 +984,8 @@ class Cow(HeiferIII):
                 self.estimated_daily_milk_produced < \
                 AnimalBase.config['cull_milk_production']:
             self.culled = True
-            self.events.add_event(self.days_born, sim_day, c.LOW_PROD_CULL)
-            self.cull_reason = c.LOW_PROD_CULL
+            self.events.add_event(self.days_born, sim_day, const.LOW_PROD_CULL)
+            self.cull_reason = const.LOW_PROD_CULL
             return True
         if self.days_born == self.future_cull_date:
             self.culled = True
@@ -994,8 +994,8 @@ class Cow(HeiferIII):
             return True
         if self.days_born == self.future_death_date:
             self.culled = True
-            self.events.add_event(self.days_born, sim_day, c.DEATH_CULL)
-            self.cull_reason = c.DEATH_CULL
+            self.events.add_event(self.days_born, sim_day, const.DEATH_CULL)
+            self.cull_reason = const.DEATH_CULL
             return True
         return False
 
@@ -1036,22 +1036,22 @@ class Cow(HeiferIII):
             # cull_reason_cull_prob = []
             if cull_reason_rand <= 0.1633:
                 cull_reason_cull_prob = AnimalBase.config['feet_leg_cull_prob']
-                self.cull_reason = c.LAMENESS_CULL
+                self.cull_reason = const.LAMENESS_CULL
             elif cull_reason_rand <= 0.4516:
                 cull_reason_cull_prob = AnimalBase.config['injury_cull_prob']
-                self.cull_reason = c.INJURY_CULL
+                self.cull_reason = const.INJURY_CULL
             elif cull_reason_rand <= 0.6955:
                 cull_reason_cull_prob = AnimalBase.config['mastitis_cull_prob']
-                self.cull_reason = c.MASTITIS_CULL
+                self.cull_reason = const.MASTITIS_CULL
             elif cull_reason_rand <= 0.8346:
                 cull_reason_cull_prob = AnimalBase.config['disease_cull_prob']
-                self.cull_reason = c.DISEASE_CULL
+                self.cull_reason = const.DISEASE_CULL
             elif cull_reason_rand <= 0.8991:
                 cull_reason_cull_prob = AnimalBase.config['udder_cull_prob']
-                self.cull_reason = c.UDDER_CULL
+                self.cull_reason = const.UDDER_CULL
             else:
                 cull_reason_cull_prob = AnimalBase.config['unkown_cull_prob']
-                self.cull_reason = c.UNKNOWN_CULL
+                self.cull_reason = const.UNKNOWN_CULL
 
             cull_time_rand = random()
             cull_reason_upper_limit = cull_reason_lower_limit = cull_time_upper_limit = cull_time_lower_limit = 0

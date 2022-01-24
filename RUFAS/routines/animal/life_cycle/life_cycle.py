@@ -15,7 +15,7 @@ from RUFAS.routines.animal.life_cycle.heiferIII import HeiferIII
 from RUFAS.routines.animal.life_cycle.cow import Cow
 from RUFAS.routines.animal.life_cycle.animal_base import AnimalBase
 from RUFAS.routines.animal.life_cycle.animal_initialization import AnimalInitialization
-from RUFAS.routines.animal.life_cycle import animal_events_constants as c
+from RUFAS.routines.animal.life_cycle import animal_events_constants as const
 
 class LifeCycleManager:
     """
@@ -104,16 +104,15 @@ class LifeCycleManager:
     avg_mature_body_weight = 0
 
     cull_reason_stats = {
-        c.DEATH_CULL: 0,
-        c.LOW_PROD_CULL: 0,
-        c.LAMENESS_CULL: 0,
-        c.INJURY_CULL: 0,
-        c.MASTITIS_CULL: 0,
-        c.DISEASE_CULL: 0,
-        c.UDDER_CULL: 0,
-        c.UNKNOWN_CULL: 0
+        const.DEATH_CULL: 0,
+        const.LOW_PROD_CULL: 0,
+        const.LAMENESS_CULL: 0,
+        const.INJURY_CULL: 0,
+        const.MASTITIS_CULL: 0,
+        const.DISEASE_CULL: 0,
+        const.UDDER_CULL: 0,
+        const.UNKNOWN_CULL: 0
     }
-
     cull_reason_stats_range = {}
     parity_culling_stats_range = {}
 
@@ -252,23 +251,23 @@ class LifeCycleManager:
 
         calves = self.animal_initializer.get_calves(calf_num, breed)
         for calf in calves:
-            calf.events.add_event(calf.days_born, 0, c.INIT_HERD)
+            calf.events.add_event(calf.days_born, 0, const.INIT_HERD)
 
         heiferIs = self.animal_initializer.get_heiferIs(heiferI_num, breed)
         for heiferI in heiferIs:
-            heiferI.events.add_event(heiferI.days_born, 0, c.INIT_HERD)
+            heiferI.events.add_event(heiferI.days_born, 0, const.INIT_HERD)
 
         heiferIIs = self.animal_initializer.get_heiferIIs(heiferII_num, breed)
         for heiferII in heiferIIs:
-            heiferII.events.add_event(heiferII.days_born, 0, c.INIT_HERD)
+            heiferII.events.add_event(heiferII.days_born, 0, const.INIT_HERD)
 
         heiferIIIs = self.animal_initializer.get_heiferIIIs(heiferIII_num, breed)
         for heiferIII in heiferIIIs:
-            heiferIII.events.add_event(heiferIII.days_born, 0, c.INIT_HERD)
+            heiferIII.events.add_event(heiferIII.days_born, 0, const.INIT_HERD)
 
         cows = self.animal_initializer.get_cows(cow_num, breed)
         for cow in cows:
-            cow.events.add_event(cow.days_born, 0, c.INIT_HERD)
+            cow.events.add_event(cow.days_born, 0, const.INIT_HERD)
 
         self.replacement_market = self.animal_initializer.get_replacement_cows(replace_num, breed)
         return calves, heiferIs, heiferIIs, heiferIIIs, cows
@@ -563,7 +562,7 @@ class LifeCycleManager:
         while len(cows) + len(heiferIIIs) + self.bought_heifer_num < self.herd_num * 1.01 and \
                 date > 1:
             self.replacement_market[0].events.add_event(
-                self.replacement_market[0].days_born, date, c.ENTER_HERD)
+                self.replacement_market[0].days_born, date, const.ENTER_HERD)
             self.replacement_market[0].set_p_purchased()
             animals_added.append(self.replacement_market[0])
             self.bought_heifer_num += 1
@@ -631,7 +630,7 @@ class LifeCycleManager:
                             self.num_cow_for_parity[str(cow.calves)],
                             self.avg_age_for_parity[str(cow.calves)],
                             cow.days_born)
-                    calving_age = cow.events.get_most_recent_date(c.NEW_BIRTH)
+                    calving_age = cow.events.get_most_recent_date(const.NEW_BIRTH)
                     if calving_age != -1:
                         calving_age_available_num[str(cow.calves)], \
                         self.avg_age_for_calving[str(cow.calves)] = \
@@ -653,7 +652,7 @@ class LifeCycleManager:
                     self.avg_age_for_parity['greater_than_3'] = self.calc_average(
                         self.num_cow_for_parity['greater_than_3'],
                         self.avg_age_for_parity['greater_than_3'], cow.days_born)
-                    calving_age = cow.events.get_most_recent_date(c.NEW_BIRTH)
+                    calving_age = cow.events.get_most_recent_date(const.NEW_BIRTH)
                     if calving_age != -1:
                         calving_age_available_num['greater_than_3'], \
                         self.avg_age_for_calving['greater_than_3'] = \
@@ -706,7 +705,7 @@ class LifeCycleManager:
 
                 if not (new_calf.culled or new_calf.sold):
                     new_calf.events.add_event(
-                        new_calf.days_born, date, c.ENTER_HERD)
+                        new_calf.days_born, date, const.ENTER_HERD)
                     # calves.append(new_calf)
                     calves_born.append(new_calf)
                 if new_calf.sold:
