@@ -136,7 +136,8 @@ class LifeCycleReport(BaseReportDriver):
                 'sold_calf_male_num': ['life_cycle_manager.sold_calf_male_num', '', []],
                 'sold_calf_female_num': ['life_cycle_manager.sold_calf_female_num', '', []],
                 'sold_calf_crossbred_male_num': ['life_cycle_manager.sold_calf_crossbred_male_num', '', []],
-                'sold_calf_crossbred_female_num': ['life_cycle_manager.sold_calf_crossbred_female_num', '', []]
+                'sold_calf_crossbred_female_num': ['life_cycle_manager.sold_calf_crossbred_female_num', '', []],
+                'heifer_open_time': ['life_cycle_manager.heifer_open_time', '', []]
             }
 
             self.production_performance = {
@@ -183,6 +184,10 @@ class LifeCycleReport(BaseReportDriver):
             for parity in LifeCycleManager.avg_calving_to_preg_time:
                 self.average_animal_profile['avg_calving_to_preg_time_for_parity_' + parity] = \
                     ['life_cycle_manager.avg_calving_to_preg_time[\'' + parity + '\']', 'd', []]
+
+            for parity in LifeCycleManager.cow_open_time:
+                self.reproduction_performance['cow_open_time_for_parity_' + parity] = \
+                    ['life_cycle_manager.cow_open_time[\'' + parity + '\']', '', []]
 
             self.daily_variables = {
                 **self.herd_structure, 

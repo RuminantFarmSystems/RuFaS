@@ -148,6 +148,13 @@ class LifeCycleManager:
     pregnancy_rate_heifer = 0
     service_rate_21_d_heifer = []
     conception_rate_21_d_heifer = []
+    heifer_open_time = []
+    cow_open_time = {
+        '1': [],
+        '2': [],
+        '3': [],
+        'greater_than_3': []
+    }
 
     total_body_weight_calf = 0
     total_body_weight_heifer = 0
@@ -386,6 +393,14 @@ class LifeCycleManager:
         self.feed_cost = 0
         self.milk_income_over_feed_cost = 0
         self.net_return = 0
+    
+        self.heifer_open_time = []
+        self.cow_open_time = {
+            '1': [],
+            '2': [],
+            '3': [],
+            'greater_than_3': []
+        }
 
         for parity in self.num_cow_for_parity:
             self.num_cow_for_parity[parity] = 0
@@ -469,6 +484,8 @@ class LifeCycleManager:
                         self.calc_average(preg_heifer_num,
                                            self.avg_breeding_to_preg_time,
                                            heiferII.breeding_to_preg_time)
+                    if heiferII.days_in_preg == 1:
+                        self.heifer_open_time.append(heiferII.breeding_to_preg_time)
 
                 self.CIDR_count += heiferII.CIDR_count
                 self.GnRH_injection_num_h += heiferII.GnRH_injections
@@ -629,6 +646,8 @@ class LifeCycleManager:
                                 calving_to_preg_time_available_num[str(cow.calves)],
                                 self.avg_calving_to_preg_time[str(cow.calves)],
                                 cow.calving_to_preg_time)
+                        if cow.days_in_preg == 1:
+                            self.cow_open_time[str(cow.calves)].append(cow.calving_to_preg_time) 
                 else:
                     self.num_cow_for_parity['greater_than_3'], \
                     self.avg_age_for_parity['greater_than_3'] = self.calc_average(
@@ -649,6 +668,8 @@ class LifeCycleManager:
                                 calving_to_preg_time_available_num['greater_than_3'],
                                 self.avg_calving_to_preg_time['greater_than_3'],
                                 cow.calving_to_preg_time)
+                        if cow.days_in_preg == 1:
+                            self.cow_open_time['greater_than_3'].append(cow.calving_to_preg_time) 
 
                 if cow.CI != 0:
                     calving_interval_available_num, \
