@@ -44,6 +44,7 @@ class LifeCycleManager:
     bought_heifer_num = 0
     culled_heifer_num = 0
     culled_cow_num = 0
+    do_not_breed_num = 0
 
     num_cow_for_parity = {
         '1': 0,
@@ -343,6 +344,7 @@ class LifeCycleManager:
         self.avg_heifer_culling_age = 0
         self.avg_cow_culling_age = 0
         self.avg_mature_body_weight = 0
+        self.do_not_breed_num = 0
 
         self.total_body_weight_calf = 0
         self.total_body_weight_heifer = 0
@@ -595,6 +597,9 @@ class LifeCycleManager:
                 del cows[index]
 
             else:
+                if cow.do_not_breed:
+                    self.do_not_breed_num += 1
+
                 # record average cow body weight, average parity number, and average mature body weight
                 _, self.avg_cow_body_weight = self.calc_average(
                     self.cow_num, self.avg_cow_body_weight, cow.body_weight)

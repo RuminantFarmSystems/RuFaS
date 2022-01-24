@@ -99,6 +99,7 @@ class LifeCycleReport(BaseReportDriver):
                 'bought_heifer_num': ['life_cycle_manager.bought_heifer_num', '', []],
                 'culled_heifer_num': ['life_cycle_manager.culled_heifer_num', '', []],
                 'culled_cow_num': ['life_cycle_manager.culled_cow_num', '', []],
+                'do_not_breed_cow_num': ['life_cycle_manager.do_not_breed_num', '', []]
             }
             
             for parity in LifeCycleManager.num_cow_for_parity:
