@@ -772,62 +772,6 @@ def test_manure_calculations():
     """Unit test for function manure_calculations in file routines/animal/manure/lactating_cow_manure_excretion.py"""
     pass
 
-
-def test_optimize():
-    """Unit test for function optimize in file routines/animal/new_nrc_ration_not_used/calf_ration.py"""
-    pass
-
-
-def test_calculate_rqmts():
-    """Unit test for function calculate_rqmts in file routines/animal/new_nrc_ration_not_used/calf_ration.py"""
-    pass
-
-
-def test_optimize():
-    """Unit test for function optimize in file routines/animal/new_nrc_ration_not_used/dry_cow_ration.py"""
-    pass
-
-
-def test_calculate_rqmts():
-    """Unit test for function calculate_rqmts in file routines/animal/new_nrc_ration_not_used/dry_cow_ration.py"""
-    pass
-
-
-def test_optimize():
-    """Unit test for function optimize in file routines/animal/new_nrc_ration_not_used/growing_heifer_ration.py"""
-    pass
-
-
-def test_calculate_rqmts():
-    """Unit test for function calculate_rqmts in file routines/animal/new_nrc_ration_not_used/growing_heifer_ration.py"""
-    pass
-
-
-def test_set_globals():
-    """Unit test for function set_globals in file routines/animal/new_nrc_ration_not_used/lactating_cow_ration.py"""
-    pass
-
-
-def test_optimize():
-    """Unit test for function optimize in file routines/animal/new_nrc_ration_not_used/lactating_cow_ration.py"""
-    pass
-
-
-def test_calculate_rqmts():
-    """Unit test for function calculate_rqmts in file routines/animal/new_nrc_ration_not_used/lactating_cow_ration.py"""
-    pass
-
-
-def test_calculate_ME_RDP_RUP():
-    """Unit test for function calculate_ME_RDP_RUP in file routines/animal/new_nrc_ration_not_used/lactating_cow_ration.py"""
-    pass
-
-
-def test_percentage():
-    """Unit test for function percentage in file routines/animal/new_nrc_ration_not_used/lactating_cow_ration.py"""
-    pass
-
-
 def test_optimize():
     """Unit test for function optimize in file routines/animal/ration/calf_ration.py"""
     pass
