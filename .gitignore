@@ -35,3 +35,6 @@ output/*
 .idea/**
 env/
 venv/
+
+# ignore .DS_store
+.DS_store
