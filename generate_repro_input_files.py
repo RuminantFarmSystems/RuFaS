@@ -4,18 +4,18 @@ import shutil
 import os
 
 h1 = {"name": "H1", "heifer_repro_method": "ED",
-      "heifer_synchED_protocol": None, "heifer_TAI_protocol": None}
+      "heifer_synchED_protocol": None, "heifer_TAI_protocol": None, "TAI_conception_rate_h": 0}
 h2 = {"name": "H2", "heifer_repro_method": "synch-ED",
-      "heifer_synchED_protocol": "2P", "heifer_TAI_protocol": "5dCG2P"}
+      "heifer_synchED_protocol": "2P", "heifer_TAI_protocol": "5dCG2P", "TAI_conception_rate_h": 0.4}
 h3 = {"name": "H3", "heifer_repro_method": "TAI",
-      "heifer_synchED_protocol": None, "heifer_TAI_protocol": "5dCG2P"}
+      "heifer_synchED_protocol": None, "heifer_TAI_protocol": "5dCG2P", "TAI_conception_rate_h": 0.6}
 
 c1 = {"name": "C1", "cow_repro_method": "ED-TAI", "cow_presynch_protocol": None, 
       "cow_TAI_protocol": "OvSynch 56", "tai_program_start_day": 72, "voluntary_waiting_period": 45, 
       "cow_resynch_protocol": "TAIafterPD", "TAI_conception_rate_1":0.4, "TAI_conception_rate_sub": 0.45}
 c2 = {"name": "C2", "cow_repro_method": "TAI", "cow_presynch_protocol": "PreSynch",
       "cow_TAI_protocol": "OvSynch 56", "tai_program_start_day": 41, "voluntary_waiting_period": 0, 
-      "cow_resynch_protocol": "TAIbeforePD", "TAI_conception_rate_1":0.4, "TAI_conception_rate_sub": 0.45}
+      "cow_resynch_protocol": "TAIbeforePD", "TAI_conception_rate_1":0.5, "TAI_conception_rate_sub": 0.45}
 c3 = {"name": "C3", "cow_repro_method": "TAI", "cow_presynch_protocol": "Double OvSynch",
       "cow_TAI_protocol": "OvSynch 56", "tai_program_start_day": 45, "voluntary_waiting_period": 0, 
       "cow_resynch_protocol": "TAIbeforePD", "TAI_conception_rate_1":0.6, "TAI_conception_rate_sub": 0.45}

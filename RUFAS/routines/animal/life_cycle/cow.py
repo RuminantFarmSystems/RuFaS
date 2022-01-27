@@ -503,8 +503,11 @@ class Cow(HeiferIII):
                     if estrus_service_rand < AnimalBase.config['estrus_insemination_rate']:
                         # serviced
                         self.ai_day = self.estrus_day + 1
+                        if self.open_stage == False:
+                            self.conception_rate = AnimalBase.config['estrus_conception_rate']
+                        else: 
+                            self.conception_rate = AnimalBase.config['estrus_conception_rate'] - 0.05
                         self.open_stage = False
-                        self.conception_rate = AnimalBase.config['estrus_conception_rate']
                     # go to next estrus cycle, not back to estrus during resynch process
                     elif self.open_stage == False or self.repro_program in ['ED']:
                         # go to next estrus cycle

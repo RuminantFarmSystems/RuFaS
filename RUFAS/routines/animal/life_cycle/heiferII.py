@@ -371,8 +371,10 @@ class HeiferII(HeiferI):
                 if ed_insemination_rand < AnimalBase.config['estrus_insemination_rate_h']:
                     # serviced
                     self.ai_day = self.estrus_day + 1
-                    self.conception_rate = \
-                        AnimalBase.config['estrus_conception_rate_h']
+                    if self.conception_rate == 0: 
+                        self.conception_rate = AnimalBase.config['estrus_conception_rate_h']
+                    else:
+                        self.conception_rate = AnimalBase.config['estrus_conception_rate_h'] - 0.05
                 # Return estrus after estrus not serviced
                 else:
                     self.estrus_day = self.determine_estrus_day(self.days_born, const.BASIC_ESTRUS_NOTE, 
@@ -468,7 +470,7 @@ class HeiferII(HeiferI):
         if self.days_born == self.synch_ed_program_start_day_h:
             self.events.add_event(self.days_born, sim_day, const.INJECT_PGF)
             self.PGF_injections = self.PGF_injections + 1
-        if self.days_born - self.synch_ed_program_start_day_h == 14:
+        if self.days_born == self.synch_ed_program_start_day_h + 14:
                     # second round of injection
             self.events.add_event(self.days_born, sim_day,const.INJECT_PGF)
             self.PGF_injections = self.PGF_injections + 1
@@ -493,7 +495,7 @@ class HeiferII(HeiferI):
                 self.synch_ed_stop_day = self.synch_ed_program_start_day_h + 21
                 self.tai_program_start_day_h = self.synch_ed_stop_day
                 self.tai_update(sim_day)
-        elif self.days_born > self.synch_ed_stop_day:
+        elif self.synch_ed_stop_day != 0 and self.days_born >= self.synch_ed_stop_day:
                     # finish up with TAI
             self.tai_update(sim_day)
 
@@ -551,21 +553,21 @@ class HeiferII(HeiferI):
         three methods can be assigned: ED, TAI, synch-ED
         """
         self.ai_day = 0
-        if self.repro_program == 'ED':
-            if self.estrus_day < self.days_born:
-                self.estrus_day = self.determine_estrus_day(self.abortion_day, const.ESTRUS_AFTER_ABORTION_NOTE, 
-                AnimalBase.config['avg_estrus_cycle_heifer'],
-                AnimalBase.config['std_estrus_cycle_heifer'], sim_day)
-        elif self.repro_program == 'TAI':
+        # if self.repro_program == 'ED':
+        if self.estrus_day < self.days_born:
             self.estrus_day = self.determine_estrus_day(self.abortion_day, const.ESTRUS_AFTER_ABORTION_NOTE, 
-                AnimalBase.config['avg_estrus_cycle_heifer'],
-                AnimalBase.config['std_estrus_cycle_heifer'], sim_day)
-            self.repro_program = 'ED'
-        elif self.repro_program == 'synch-ED':
-            self.estrus_day = self.determine_estrus_day(self.abortion_day, const.ESTRUS_AFTER_ABORTION_NOTE, 
-                AnimalBase.config['avg_estrus_cycle_heifer'],
-                AnimalBase.config['std_estrus_cycle_heifer'], sim_day)
-            self.repro_program = 'ED'
+            AnimalBase.config['avg_estrus_cycle_heifer'],
+            AnimalBase.config['std_estrus_cycle_heifer'], sim_day)
+        # elif self.repro_program == 'TAI':
+        #     self.estrus_day = self.determine_estrus_day(self.abortion_day, const.ESTRUS_AFTER_ABORTION_NOTE, 
+        #         AnimalBase.config['avg_estrus_cycle_heifer'],
+        #         AnimalBase.config['std_estrus_cycle_heifer'], sim_day)
+        #     self.repro_program = 'ED'
+        # elif self.repro_program == 'synch-ED':
+        #     self.estrus_day = self.determine_estrus_day(self.abortion_day, const.ESTRUS_AFTER_ABORTION_NOTE, 
+        #         AnimalBase.config['avg_estrus_cycle_heifer'],
+        #         AnimalBase.config['std_estrus_cycle_heifer'], sim_day)
+        self.repro_program = 'ED'
 
     
     # artificial inseminated 

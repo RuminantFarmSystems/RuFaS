@@ -730,10 +730,10 @@ class LifeCycleManager:
                 if cow.days_born == cow.ai_day:
                     self.num_ai_21_days += 1
                 if cow.days_in_preg == 0 and not cow.do_not_breed:
-                    if cow.repro_program in ['ED'] and cow.days_in_milk > AnimalBase.config['voluntary_waiting_period']:
-                        self.num_cow_open_acc_21_days += 1
-                    elif cow.days_in_milk > AnimalBase.config['tai_program_start_day']:
-                        self.num_cow_open_acc_21_days += 1
+                    # if cow.repro_program in ['ED'] and cow.days_in_milk > AnimalBase.config['voluntary_waiting_period']:
+                    #     self.num_cow_open_acc_21_days += 1
+                    # elif cow.days_in_milk > AnimalBase.config['tai_program_start_day']:
+                    self.num_cow_open_acc_21_days += 1
                 if cow.days_in_preg == 1:
                     self.num_preg_21_days += 1   
         
@@ -767,10 +767,9 @@ class LifeCycleManager:
         self.cost_feed_calf = 0.2 * 0.1 * self.total_body_weight_calf
         # $2.4 per day for average weight heifer
         self.cost_feed_heifer = 0.0068 * self.total_body_weight_heifer
-        # $5.5 per day for average weight milking cow
-        # NEED TO CHANGE THE CALCULATION
-        self.cost_feed_milking_cow = 0.0086 * self.total_lactating_DMI
-        self.cost_feed_dry_cow = 0.0068 * self.total_dry_DMI
+        # $0.06-0.08 per lb DM
+        self.cost_feed_milking_cow = 0.0154 * self.total_lactating_DMI
+        self.cost_feed_dry_cow = 0.0154 * self.total_dry_DMI
         self.income_sold_female_calf = 120 * self.sold_calf_female_num
         self.income_sold_male_calf = 50 * self.sold_calf_male_num
         self.income_sold_heifer = 1380 * self.sold_heifer_num
