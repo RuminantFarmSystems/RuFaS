@@ -515,8 +515,8 @@ class LifeCycleManager:
                 self.num_ai_21_days_heifer = 0
                 self.num_heifer_open_acc_21_days = 0
                 self.num_preg_21_days_heifer = 0
-                self.avg_service_rate_heifer = self.moving_average(self.service_rate_each_21_d_heifer, 15, self.service_rate_21_d_heifer)
-                self.avg_conception_rate_heifer = self.moving_average(self.conception_rate_each_21_d_heifer, 15, self.conception_rate_21_d_heifer)
+                self.avg_service_rate_heifer, self.service_rate_21_d_heifer = self.moving_average(self.service_rate_each_21_d_heifer, 15, self.service_rate_21_d_heifer)
+                self.avg_conception_rate_heifer, self.conception_rate_21_d_heifer = self.moving_average(self.conception_rate_each_21_d_heifer, 15, self.conception_rate_21_d_heifer)
                 self.pregnancy_rate_heifer = self.avg_service_rate_heifer * self.avg_conception_rate_heifer
 
         # heiferIII to cow, assign repro programs
@@ -747,8 +747,8 @@ class LifeCycleManager:
                 self.num_ai_21_days = 0
                 self.num_cow_open_acc_21_days = 0
                 self.num_preg_21_days = 0
-                self.avg_service_rate = self.moving_average(self.service_rate_each_21_d, 15, self.service_rate_21_d)
-                self.avg_conception_rate = self.moving_average(self.conception_rate_each_21_d, 15, self.conception_rate_21_d)
+                self.avg_service_rate, self.service_rate_21_d = self.moving_average(self.service_rate_each_21_d, 15, self.service_rate_21_d)
+                self.avg_conception_rate, self.conception_rate_21_d = self.moving_average(self.conception_rate_each_21_d, 15, self.conception_rate_21_d)
                 self.pregnancy_rate = self.avg_service_rate * self.avg_conception_rate
 
         # income/cost calculation
@@ -858,4 +858,4 @@ class LifeCycleManager:
 
         avg_value = sum(stor_list)/length_moving
         
-        return avg_value
+        return avg_value, stor_list
