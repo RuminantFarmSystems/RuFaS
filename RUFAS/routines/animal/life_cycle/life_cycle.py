@@ -148,7 +148,14 @@ class LifeCycleManager:
     pregnancy_rate_heifer = 0
     service_rate_21_d_heifer = []
     conception_rate_21_d_heifer = []
+    culled_heifer_age = []
     heifer_open_time = []
+    culled_cow_age = {
+        '1': [],
+        '2': [],
+        '3': [],
+        'greater_than_3': []
+    }
     cow_open_time = {
         '1': [],
         '2': [],
@@ -395,7 +402,14 @@ class LifeCycleManager:
         self.milk_income_over_feed_cost = 0
         self.net_return = 0
     
+        self.culled_heifer_age = []
         self.heifer_open_time = []
+        self.culled_cow_age = {
+            '1': [],
+            '2': [],
+            '3': [],
+            'greater_than_3': []
+        }
         self.cow_open_time = {
             '1': [],
             '2': [],
@@ -461,6 +475,7 @@ class LifeCycleManager:
                 self.culled_heifer_num, self.avg_heifer_culling_age = \
                     self.calc_average(self.culled_heifer_num,
                                        self.avg_heifer_culling_age, heiferII.days_born)
+                self.culled_heifer_age.append(heiferII.days_born) 
                 self.culled_heifers.append(heiferII)
                 del heiferIIs[index]
             elif third_stage:
@@ -585,6 +600,12 @@ class LifeCycleManager:
                     self.parity_culling_stats_range[parity] += 1
                 else:
                     self.parity_culling_stats_range[parity] = 1
+
+                if cow.cull_reason == const.LOW_PROD_CULL:
+                    if 0 < cow.calves <= 3:
+                        self.culled_cow_age[str(cow.calves)].append(cow.days_born)
+                    else:
+                        self.culled_cow_age['greater_than_3'].append(cow.days_born) 
 
                 self.culled_cows.append(cow)
                 self.total_body_weight_culled_cow += cow.body_weight

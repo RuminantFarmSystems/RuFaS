@@ -79,6 +79,7 @@ class HeiferII(HeiferI):
         self.semen_num = 0
         self.AI_times = 0
         self.preg_diagnoses = 0
+        self.heifer_ai_fail_num = 0
 
     def get_bw_change(self):
         """
@@ -317,8 +318,8 @@ class HeiferII(HeiferI):
                 third_stage = True
                 self.events.add_event(self.days_born, sim_day, const.HEIFERII_TO_III)
         # cull heifer for reproduction reason
-        if self.days_in_preg == 0 and \
-            self.days_born > AnimalBase.config['heifer_repro_cull_time']:
+        if self.days_in_preg == 0 and self.heifer_ai_fail_num == 4:
+            #self.days_born > AnimalBase.config['heifer_repro_cull_time'] 
             self.events.add_event(
                 self.days_born, sim_day, const.HEIFER_REPRO_CULL)
             cull_stage = True
@@ -616,6 +617,7 @@ class HeiferII(HeiferI):
                 AnimalBase.config['avg_estrus_cycle_heifer'],
                 AnimalBase.config['std_estrus_cycle_heifer'], sim_day)
                 self.events.add_event(self.days_born, sim_day, const.HEIFER_NOT_PREG)
+                self.heifer_ai_fail_num += 1
 
         # preg check 1 
         if self.days_born == self.ai_day + \

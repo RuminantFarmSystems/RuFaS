@@ -138,6 +138,7 @@ class LifeCycleReport(BaseReportDriver):
                 'sold_calf_female_num': ['life_cycle_manager.sold_calf_female_num', '', []],
                 'sold_calf_crossbred_male_num': ['life_cycle_manager.sold_calf_crossbred_male_num', '', []],
                 'sold_calf_crossbred_female_num': ['life_cycle_manager.sold_calf_crossbred_female_num', '', []],
+                'culled_heifer_age': ['life_cycle_manager.culled_heifer_age', '', []],
                 'heifer_open_time': ['life_cycle_manager.heifer_open_time', '', []]
             }
 
@@ -174,6 +175,27 @@ class LifeCycleReport(BaseReportDriver):
             }
 
             self.econmic_cal = {
+                'cost_hormone_heifer': ['life_cycle_manager.cost_hormone_heifer', '$/d', []],
+                'cost_hormone': ['life_cycle_manager.cost_hormone', '$/d', []],
+                'cost_ed_heifer': ['life_cycle_manager.cost_ed_heifer', '$/d', []],
+                'cost_ed': ['life_cycle_manager.cost_ed', '$/d', []],
+                'cost_ai_heifer': ['life_cycle_manager.cost_ai_heifer', '$/d', []],
+                'cost_ai': ['life_cycle_manager.cost_ai', '$/d', []],
+                'cost_semen_heifer': ['life_cycle_manager.cost_semen_heifer', '$/d', []],
+                'cost_semen': ['life_cycle_manager.cost_semen', '$/d', []],
+                'cost_pc_heifer': ['life_cycle_manager.cost_pc_heifer', '$/d', []],
+                'cost_pc': ['life_cycle_manager.cost_pc', '$/d', []],
+                'cost_bought_heifer': ['life_cycle_manager.cost_bought_heifer', '$/d', []],
+                'cost_feed_calf': ['life_cycle_manager.cost_feed_calf', '$/d', []],
+                'cost_feed_heifer': ['life_cycle_manager.cost_feed_heifer', '$/d', []],
+                'cost_feed_milking_cow': ['life_cycle_manager.cost_feed_milking_cow', '$/d', []],
+                'cost_feed_dry_cow': ['life_cycle_manager.cost_feed_dry_cow', '$/d', []],
+                'income_sold_female_calf': ['life_cycle_manager.income_sold_female_calf', '$/d', []],
+                'income_sold_male_calf': ['life_cycle_manager.income_sold_male_calf', '$/d', []],
+                'income_sold_heifer': ['life_cycle_manager.income_sold_heifer', '$/d', []],
+                'income_culled_heifer': ['life_cycle_manager.income_culled_heifer', '$/d', []],
+                'income_culled_cow': ['life_cycle_manager.income_culled_cow', '$/d', []],
+                'income_milk': ['life_cycle_manager.income_milk', '$/d', []],
                 'cost_repro_heifer': ['life_cycle_manager.repro_cost_heifer', '$/d', []],
                 'cost_repro_cow': ['life_cycle_manager.repro_cost_cow', '$/d', []],
                 'cost_feed': ['life_cycle_manager.feed_cost', '$/d', []],
@@ -189,6 +211,10 @@ class LifeCycleReport(BaseReportDriver):
             for parity in LifeCycleManager.cow_open_time:
                 self.reproduction_performance['cow_open_time_for_parity_' + parity] = \
                     ['life_cycle_manager.cow_open_time[\'' + parity + '\']', '', []]
+
+            for parity in LifeCycleManager.culled_cow_age:
+                self.reproduction_performance['culled_cow_age_for_parity_' + parity] = \
+                    ['life_cycle_manager.culled_cow_age[\'' + parity + '\']', '', []]
 
             self.daily_variables = {
                 **self.herd_structure, 
