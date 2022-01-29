@@ -202,7 +202,7 @@ class Pen:
                                        'NDF': 0, 'lignin': 0, 'ash': 0,
                                        'phosphorus': 0, 'potassium': 0, 'N': 0}
         self.ration_nutrient_conc = {}
-        self.dry_matter_intake = 0
+        self.dry_matter_intake = 0.0
 
         self.avg_growth = 0.0
 
