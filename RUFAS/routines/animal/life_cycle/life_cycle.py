@@ -169,6 +169,15 @@ class LifeCycleManager:
     total_dry_DMI = 0
     total_body_weight_culled_cow = 0
 
+    sold_heifer_cost = 0
+    sold_heifer_calf_cost = 0
+    sold_heifer_hormone_cost = 0
+    sold_heifer_ed_cost = 0
+    sold_heifer_ai_cost = 0
+    sold_heifer_semen_cost = 0
+    sold_heifer_pc_cost = 0
+    sold_heifer_feed_cost = 0
+
     cost_hormone_heifer = 0
     cost_hormone = 0
     cost_ed_heifer = 0
@@ -402,6 +411,15 @@ class LifeCycleManager:
         self.milk_income_over_feed_cost = 0
         self.net_return = 0
     
+        self.sold_heifer_cost = 0
+        self.sold_heifer_calf_cost = 0
+        self.sold_heifer_hormone_cost = 0
+        self.sold_heifer_ed_cost = 0
+        self.sold_heifer_ai_cost = 0
+        self.sold_heifer_semen_cost = 0
+        self.sold_heifer_pc_cost = 0
+        self.sold_heifer_feed_cost = 0
+
         self.culled_heifer_age = []
         self.heifer_open_time = []
         self.culled_cow_age = {
@@ -434,7 +452,8 @@ class LifeCycleManager:
                 args = calf.get_calf_values()
                 args.update({
                     'body_weight_history': calf.body_weight_history,
-                    'pen_history': calf.pen_history
+                    'pen_history': calf.pen_history,
+                    'calf_cost':calf.calf_cost
                 })
                 new_heiferI = HeiferI(args)
                 heiferIs.append(new_heiferI)
@@ -453,7 +472,9 @@ class LifeCycleManager:
                 args = heiferI.get_heiferI_values()
                 args.update({
                     'body_weight_history': heiferI.body_weight_history,
-                    'pen_history': heiferI.pen_history
+                    'pen_history': heiferI.pen_history,
+                    'calf_cost': heiferI.calf_cost,
+                    'heifer_feed_cost': heiferI.heifer_feed_cost
                      })
                 args.update(repro_program=AnimalBase.config['heifer_repro_method'])
                 args.update(tai_method_h=AnimalBase.config['heifer_TAI_protocol'])
@@ -484,7 +505,13 @@ class LifeCycleManager:
                     'body_weight_history': heiferII.body_weight_history,
                     'pen_history': heiferII.pen_history,
                     'conceptus_weight': heiferII.conceptus_weight,
-                    'calf_birth_weight': heiferII.calf_birth_weight
+                    'calf_birth_weight': heiferII.calf_birth_weight,
+                    'calf_cost': heiferII.calf_cost,
+                    'heifer_feed_cost': heiferII.heifer_feed_cost,
+                    'heifer_hormone_cost': heiferII.heifer_hormone_cost,
+                    'heifer_ed_cost': heiferII.heifer_ed_cost,
+                    'heifer_ai_semen_cost': heiferII.heifer_ai_semen_cost,
+                    'heifer_pc_cost': heiferII.heifer_pc_cost
                 })
                 new_heiferIII = HeiferIII(args)
                 heiferIIIs.append(new_heiferIII)
@@ -550,7 +577,13 @@ class LifeCycleManager:
                     'body_weight_history': heiferIII.body_weight_history,
                     'pen_history': heiferIII.pen_history,
                     'conceptus_weight': heiferIII.conceptus_weight,
-                    'calf_birth_weight': heiferIII.calf_birth_weight
+                    'calf_birth_weight': heiferIII.calf_birth_weight,
+                    'calf_cost': heiferIII.calf_cost,
+                    'heifer_feed_cost': heiferIII.heifer_feed_cost,
+                    'heifer_hormone_cost': heiferIII.heifer_hormone_cost,
+                    'heifer_ed_cost': heiferIII.heifer_ed_cost,
+                    'heifer_ai_semen_cost': heiferIII.heifer_ai_semen_cost,
+                    'heifer_pc_cost': heiferIII.heifer_pc_cost
                      })
                 args.update(repro_program=AnimalBase.config['cow_repro_method'])
                 args.update(presynch_method=AnimalBase.config['cow_presynch_protocol'])
@@ -570,10 +603,19 @@ class LifeCycleManager:
         # those as replacement
         while len(heiferIIIs) + len(cows) > self.herd_num * 1.03 and len(heiferIIIs) > 0:
             removed = heiferIIIs.pop()
+            self.sold_heifer_cost += removed.calf_cost + removed.heifer_feed_cost + removed.heifer_hormone_cost\
+                + removed.heifer_ed_cost + removed.heifer_ai_semen_cost +removed.heifer_pc_cost
+            self.sold_heifer_calf_cost += removed.calf_cost
+            self.sold_heifer_hormone_cost += removed.heifer_hormone_cost
+            self.sold_heifer_ed_cost += removed.heifer_ed_cost
+            self.sold_heifer_ai_cost += removed.heifer_ai_semen_cost * 0.4
+            self.sold_heifer_semen_cost += removed.heifer_ai_semen_cost * 0.6
+            self.sold_heifer_pc_cost += removed.heifer_pc_cost
+            self.sold_heifer_feed_cost += removed.heifer_feed_cost
             ids_removed.append(removed.id)
             self.sold_heifers.append(removed)
             self.sold_heifer_num += 1
-
+        print(f'sold heifer cost is {self.sold_heifer_cost}')
         # if the number of heifers is less than needed for the herd,
         # buy replacement from the market
         while len(cows) + len(heiferIIIs) + self.bought_heifer_num < self.herd_num * 1.01 and \
@@ -773,21 +815,21 @@ class LifeCycleManager:
                 self.pregnancy_rate = self.avg_service_rate * self.avg_conception_rate
 
         # income/cost calculation
-        self.cost_hormone_heifer = 1.83 * self.GnRH_injection_num_h + 2.29 * self.PGF_injection_num_h + 12.53 * self.CIDR_count
+        self.cost_hormone_heifer = 1.83 * self.GnRH_injection_num_h + 2.29 * self.PGF_injection_num_h + 12.53 * self.CIDR_count - self.sold_heifer_hormone_cost
         self.cost_hormone = 1.83 * self.GnRH_injection_num + 2.29 * self.PGF_injection_num
-        self.cost_ed_heifer = 0.03 * self.ed_period_h
+        self.cost_ed_heifer = 0.03 * self.ed_period_h - self.sold_heifer_ed_cost
         self.cost_ed = 0.03 * self.ed_period
-        self.cost_ai_heifer = 10 * self.ai_num_h
+        self.cost_ai_heifer = 10 * self.ai_num_h - self.sold_heifer_ai_cost
         self.cost_ai = 10 * self.ai_num
-        self.cost_semen_heifer = 15 * self.semen_num_h
+        self.cost_semen_heifer = 15 * self.semen_num_h - self.sold_heifer_semen_cost
         self.cost_semen = 15 * self.semen_num
-        self.cost_pc_heifer = 4.37 * self.preg_check_num_h
+        self.cost_pc_heifer = 4.37 * self.preg_check_num_h - self.sold_heifer_pc_cost
         self.cost_pc = 4.37 * self.preg_check_num
         self.cost_bought_heifer = 1500 * self.bought_heifer_num
         # consume milk, 10% of its BW
         self.cost_feed_calf = 0.2 * 0.1 * self.total_body_weight_calf
         # $2.4 per day for average weight heifer
-        self.cost_feed_heifer = 0.0068 * self.total_body_weight_heifer
+        self.cost_feed_heifer = 0.0068 * self.total_body_weight_heifer - self.sold_heifer_feed_cost
         # $0.06-0.08 per lb DM
         self.cost_feed_milking_cow = 0.0154 * self.total_lactating_DMI
         self.cost_feed_dry_cow = 0.0154 * self.total_dry_DMI
@@ -803,9 +845,9 @@ class LifeCycleManager:
         self.repro_cost_cow = self.cost_hormone + self.cost_ed + self.cost_ai + self.cost_semen + self.cost_pc
         self.feed_cost = self.cost_feed_calf + self.cost_feed_heifer + self.cost_feed_milking_cow + self.cost_feed_dry_cow
         
-        self.milk_income_over_feed_cost = self.income_milk - self.feed_cost
-        self.net_return = self.income_milk + self.income_sold_male_calf + self.income_sold_female_calf + self.income_sold_heifer + \
-            self.income_culled_heifer + self.income_culled_cow - self.repro_cost_heifer - self.repro_cost_cow - self.feed_cost - self.cost_bought_heifer
+        self.milk_income_over_feed_cost = self.income_milk - self.cost_feed_milking_cow - self.cost_feed_dry_cow
+        self.net_return = self.income_milk + self.income_sold_male_calf + self.income_sold_female_calf + \
+            self.income_culled_heifer + self.income_culled_cow - self.repro_cost_heifer - self.repro_cost_cow - self.feed_cost 
     
         if total_animal_num == 0:
             self.calf_percent = 0

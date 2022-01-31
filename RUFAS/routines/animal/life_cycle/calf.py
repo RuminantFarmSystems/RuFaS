@@ -200,6 +200,7 @@ class Calf(AnimalBase):
             self.wean_weight = self.body_weight
             self.events.add_event(self.days_born, sim_day, const.WEAN_DAY)
             self.days_born -= 1  # will increment by 1 again in heifer update
+            self.calf_cost += 0.9 * self.wean_weight
         else:
             self.body_weight += self.target_adg_calf
 

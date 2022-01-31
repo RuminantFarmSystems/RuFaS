@@ -117,6 +117,8 @@ class HeiferI(Calf):
 
 		self.body_weight += self.daily_growth
 
+		self.heifer_feed_cost += self.body_weight * 0.0068
+
 		self.days_born += 1
 		if self.days_born == AnimalBase.config['breeding_start_day_h']:
 			second_stage = True

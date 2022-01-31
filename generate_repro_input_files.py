@@ -11,7 +11,7 @@ h3 = {"name": "H3", "heifer_repro_method": "TAI",
       "heifer_synchED_protocol": None, "heifer_TAI_protocol": "5dCG2P", "TAI_conception_rate_h": 0.6}
 
 c1 = {"name": "C1", "cow_repro_method": "ED-TAI", "cow_presynch_protocol": None, 
-      "cow_TAI_protocol": "OvSynch 56", "tai_program_start_day": 72, "voluntary_waiting_period": 45, 
+      "cow_TAI_protocol": "OvSynch 56", "tai_program_start_day": 70, "voluntary_waiting_period": 50, 
       "cow_resynch_protocol": "TAIafterPD", "TAI_conception_rate_1":0.4, "TAI_conception_rate_sub": 0.45}
 c2 = {"name": "C2", "cow_repro_method": "TAI", "cow_presynch_protocol": "PreSynch",
       "cow_TAI_protocol": "OvSynch 56", "tai_program_start_day": 41, "voluntary_waiting_period": 0, 
@@ -56,7 +56,7 @@ def trial(heifer_strategy, cow_strategy, rep):
     os.rename('save_directory/herd_report.csv', 'save_directory/' + output_file + '.csv')
 
 
-R = 3 #replication number
+R = 10 #replication number
 for i in range(len(heifer_strategies)):
       for j in range(len(cow_strategies)):
             for rep in range(R):

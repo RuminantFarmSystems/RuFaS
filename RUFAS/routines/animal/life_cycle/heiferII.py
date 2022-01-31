@@ -294,6 +294,8 @@ class HeiferII(HeiferI):
 
             self.body_weight += self.daily_growth
 
+            self.heifer_feed_cost += self.body_weight * 0.0068
+
         else:
             self.body_weight = self.mature_body_weight
             self.events.add_event(self.days_born, sim_day, const.MATURE_BODY_WEIGHT_REGULAR)
@@ -317,6 +319,12 @@ class HeiferII(HeiferI):
                 self.days_born -= 1  # will be increment again in next stage
                 third_stage = True
                 self.events.add_event(self.days_born, sim_day, const.HEIFERII_TO_III)
+
+            self.heifer_hormone_cost += 1.83 * self.GnRH_injections + 2.29 * self.PGF_injections + 12.53 * self.CIDR_count
+            self.heifer_ed_cost += self.ED_days * 0.03
+            self.heifer_ai_semen_cost += 10 * self.AI_times + 15 * self.semen_num 
+            self.heifer_pc_cost += 4.37 * self.preg_diagnoses
+        
         # cull heifer for reproduction reason
         if self.days_in_preg == 0 and self.heifer_ai_fail_num == 4:
             #self.days_born > AnimalBase.config['heifer_repro_cull_time'] 

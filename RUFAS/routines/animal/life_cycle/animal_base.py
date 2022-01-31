@@ -131,6 +131,12 @@ class AnimalBase(object):
         self.conceptus_weight = 0
         self.calf_birth_weight = 0
         self.tissue_changed = 0
+        self.calf_cost = 0
+        self.heifer_hormone_cost = 0
+        self.heifer_ed_cost = 0
+        self.heifer_ai_semen_cost = 0
+        self.heifer_pc_cost = 0
+        self.heifer_feed_cost = 0
 
         if 'body_weight_history' in args:
             self.body_weight_history = args['body_weight_history']
@@ -139,6 +145,18 @@ class AnimalBase(object):
             self.conceptus_weight = args['conceptus_weight']
         if 'calf_birth_weight' in args:
             self.calf_birth_weight = args['calf_birth_weight']
+        if 'calf_cost' in args:
+            self.calf_cost = args['calf_cost']
+        if 'heifer_hormone_cost' in args:
+            self.heifer_hormone_cost = args['heifer_hormone_cost']
+        if 'heifer_ed_cost' in args:
+            self.heifer_ed_cost = args['heifer_ed_cost']
+        if 'heifer_ai_semen_cost' in args:
+            self.heifer_ai_semen_cost = args['heifer_ai_semen_cost']
+        if 'heifer_pc_cost' in args:
+            self.heifer_pc_cost = args['heifer_pc_cost']
+        if 'heifer_feed_cost' in args:
+            self.heifer_feed_cost = args['heifer_feed_cost']
 
     def set_default_nutrient_rqmts(self):
         """

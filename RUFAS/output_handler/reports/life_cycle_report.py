@@ -192,6 +192,7 @@ class LifeCycleReport(BaseReportDriver):
                 'cost_feed_dry_cow': ['life_cycle_manager.cost_feed_dry_cow', '$/d', []],
                 'income_sold_female_calf': ['life_cycle_manager.income_sold_female_calf', '$/d', []],
                 'income_sold_male_calf': ['life_cycle_manager.income_sold_male_calf', '$/d', []],
+                'cost_sold_heifer': ['life_cycle_manager.sold_heifer_cost', '$/d', []],
                 'income_sold_heifer': ['life_cycle_manager.income_sold_heifer', '$/d', []],
                 'income_culled_heifer': ['life_cycle_manager.income_culled_heifer', '$/d', []],
                 'income_culled_cow': ['life_cycle_manager.income_culled_cow', '$/d', []],
