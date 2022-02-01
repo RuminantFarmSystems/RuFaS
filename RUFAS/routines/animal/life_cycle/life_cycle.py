@@ -150,7 +150,7 @@ class LifeCycleManager:
     conception_rate_21_d_heifer = []
     culled_heifer_age = []
     heifer_open_time = []
-    culled_cow_age = {
+    culled_cow_dim = {
         '1': [],
         '2': [],
         '3': [],
@@ -422,7 +422,7 @@ class LifeCycleManager:
 
         self.culled_heifer_age = []
         self.heifer_open_time = []
-        self.culled_cow_age = {
+        self.culled_cow_dim = {
             '1': [],
             '2': [],
             '3': [],
@@ -615,7 +615,7 @@ class LifeCycleManager:
             ids_removed.append(removed.id)
             self.sold_heifers.append(removed)
             self.sold_heifer_num += 1
-        print(f'sold heifer cost is {self.sold_heifer_cost}')
+
         # if the number of heifers is less than needed for the herd,
         # buy replacement from the market
         while len(cows) + len(heiferIIIs) + self.bought_heifer_num < self.herd_num * 1.01 and \
@@ -645,9 +645,9 @@ class LifeCycleManager:
 
                 if cow.cull_reason == const.LOW_PROD_CULL:
                     if 0 < cow.calves <= 3:
-                        self.culled_cow_age[str(cow.calves)].append(cow.days_born)
+                        self.culled_cow_dim[str(cow.calves)].append(cow.days_in_milk)
                     else:
-                        self.culled_cow_age['greater_than_3'].append(cow.days_born) 
+                        self.culled_cow_dim['greater_than_3'].append(cow.days_in_milk) 
 
                 self.culled_cows.append(cow)
                 self.total_body_weight_culled_cow += cow.body_weight

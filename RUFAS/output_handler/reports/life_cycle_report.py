@@ -213,9 +213,9 @@ class LifeCycleReport(BaseReportDriver):
                 self.reproduction_performance['cow_open_time_for_parity_' + parity] = \
                     ['life_cycle_manager.cow_open_time[\'' + parity + '\']', '', []]
 
-            for parity in LifeCycleManager.culled_cow_age:
-                self.reproduction_performance['culled_cow_age_for_parity_' + parity] = \
-                    ['life_cycle_manager.culled_cow_age[\'' + parity + '\']', '', []]
+            for parity in LifeCycleManager.culled_cow_dim:
+                self.reproduction_performance['culled_cow_dim_for_parity_' + parity] = \
+                    ['life_cycle_manager.culled_cow_dim[\'' + parity + '\']', '', []]
 
             self.daily_variables = {
                 **self.herd_structure, 
