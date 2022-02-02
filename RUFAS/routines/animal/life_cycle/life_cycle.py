@@ -847,7 +847,7 @@ class LifeCycleManager:
         
         self.milk_income_over_feed_cost = self.income_milk - self.cost_feed_milking_cow - self.cost_feed_dry_cow
         self.net_return = self.income_milk + self.income_sold_male_calf + self.income_sold_female_calf + \
-            self.income_culled_heifer + self.income_culled_cow - self.repro_cost_heifer - self.repro_cost_cow - self.feed_cost 
+            self.income_culled_heifer + self.income_culled_cow - self.repro_cost_heifer - self.repro_cost_cow - self.feed_cost - self.cost_bought_heifer
     
         if total_animal_num == 0:
             self.calf_percent = 0

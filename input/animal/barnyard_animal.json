@@ -58,7 +58,6 @@
 				"std_gestation_len": 6,
 				"prefresh_day": 30,
 				"do_not_breed_time" : 300,
-				"num_21_days_repro": 15,
 				"calving_interval": 400,
 				"use_input_calving_interval": false
 				

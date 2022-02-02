@@ -79,7 +79,6 @@ class HeiferII(HeiferI):
         self.semen_num = 0
         self.AI_times = 0
         self.preg_diagnoses = 0
-        self.heifer_ai_fail_num = 0
 
     def get_bw_change(self):
         """
@@ -109,12 +108,12 @@ class HeiferII(HeiferI):
                 self.conceptus_weight += conceptus_growth
             else:
                 conceptus_growth = 0
-
+            
             return target_ADG_heifer_preg + conceptus_growth
 
         else:
             return self.get_non_preg_bw_change()
-
+        
     def init_values(self, args):
         """
         Initialize repro program values
@@ -326,8 +325,8 @@ class HeiferII(HeiferI):
             self.heifer_pc_cost += 4.37 * self.preg_diagnoses
         
         # cull heifer for reproduction reason
-        if self.days_in_preg == 0 and self.heifer_ai_fail_num == 4:
-            #self.days_born > AnimalBase.config['heifer_repro_cull_time'] 
+        if self.days_in_preg == 0 and \
+            self.days_born > AnimalBase.config['heifer_repro_cull_time']: 
             self.events.add_event(
                 self.days_born, sim_day, const.HEIFER_REPRO_CULL)
             cull_stage = True
@@ -498,7 +497,7 @@ class HeiferII(HeiferI):
                 if ed_insemination_rand < AnimalBase.config['estrus_insemination_rate']:
                     self.ai_day = self.synch_ed_estrus_day + 1
                     self.conception_rate = \
-                        AnimalBase.config['estrus_conception_rate']
+                        AnimalBase.config['estrus_conception_rate_h']
             else:
                 # finish up with TAI
                 self.synch_ed_stop_day = self.synch_ed_program_start_day_h + 21
@@ -534,7 +533,7 @@ class HeiferII(HeiferI):
                 if ed_insemination_rand < AnimalBase.config['ed_insemination_rate']:
                     self.ai_day = self.synch_ed_estrus_day + 1
                     self.conception_rate = \
-                        AnimalBase.config['estrus_conception_rate']
+                        AnimalBase.config['estrus_conception_rate_h']
                 else:
                     self.synch_ed_stop_day = self.synch_ed_program_start_day_h + 14
                     self.synch_ed_program_start_day_h = self.synch_ed_stop_day
@@ -620,12 +619,13 @@ class HeiferII(HeiferI):
                         AnimalBase.config['birth_weight_avg_je'], AnimalBase.config['birth_weight_std_je'])
                 self.events.add_event(self.days_born, sim_day, const.HEIFER_PREG)
             else:
+                self.events.add_event(self.days_born, sim_day, const.HEIFER_NOT_PREG)
+                # estrus detection after ai before preg check
+                self.repro_program = 'ED'
                 self.estrus_day = self.determine_estrus_day(
                     self.estrus_day, const.ESTRUS_AFTER_AI_NOTE, 
                 AnimalBase.config['avg_estrus_cycle_heifer'],
                 AnimalBase.config['std_estrus_cycle_heifer'], sim_day)
-                self.events.add_event(self.days_born, sim_day, const.HEIFER_NOT_PREG)
-                self.heifer_ai_fail_num += 1
 
         # preg check 1 
         if self.days_born == self.ai_day + \

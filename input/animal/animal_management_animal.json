@@ -12,8 +12,8 @@
 	},
 	"animal_config": {
 		"management_decisions": {
-			"breeding_start_day_h": 380,
-			"heifer_repro_cull_time": 650,
+			"breeding_start_day_h": 360,
+			"heifer_repro_cull_time": 500,
 			"heifer_repro_method": "TAI",
 			"cow_repro_method": "TAI",
 			"semen_type": "conventional",
@@ -57,8 +57,7 @@
 				"avg_gestation_len": 278,
 				"std_gestation_len": 6,
 				"prefresh_day": 30,
-				"do_not_breed_time" : 300,
-				"num_21_days_repro": 15,
+				"do_not_breed_time" : 200,
 				"calving_interval": 400,
 				"use_input_calving_interval": false
 				
@@ -79,7 +78,7 @@
 				"std_estrus_cycle_heifer": 3,				
 				"preg_check_day_1": 32,
 				"preg_loss_rate_1": 0.02,
-				"preg_check_day_2": 91,
+				"preg_check_day_2": 60,
 				"preg_loss_rate_2": 0.096,
 				"preg_check_day_3": 200,
 				"preg_loss_rate_3": 0.017,
