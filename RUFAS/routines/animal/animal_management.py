@@ -407,6 +407,10 @@ class AnimalManagement:
                 self.pens_needing_animals.append(pen)
                 del self.id_pen[i]
 
+        pen_population_before_additions = {}
+        for i, pen in enumerate(self.all_pens):
+            pen_population_before_additions[i] = len(pen.animals_in_pen)
+
         for animal in animals_added:
             if len(self.pens_needing_animals) == 0:
                 # if there hasn't yet been an animal removed from a pen for this
@@ -437,7 +441,8 @@ class AnimalManagement:
                 # self.all_pens[pen].animals_in_pen.append(animal)
                 self.cows.append(animal)
 
-            self.all_pens[pen].set_up_new_animal(animal, animal_p_conc, feed, temp)
+            self.all_pens[pen].set_up_new_animal(animal, animal_p_conc, feed,
+                                                 temp, pen_population_before_additions[pen])
 
         for pen in range(len(self.all_pens)):
             if len(self.all_pens[pen].animals_in_pen) > 0 and 'Cow' in self.all_pens[pen].classes_in_pen and self.all_pens[pen].ration == {}:
@@ -445,13 +450,25 @@ class AnimalManagement:
                 available_feeds.feed_nutrients(feed)
                 self.all_pens[pen].calc_avg_stats()
                 self.all_pens[pen].ration = self.all_pens[pen].calc_ration(feed, available_feeds)
+            else:
+                # Need to adjust the ration totals for the pen attributes now
+                # that all new animals have been added
+                for key in self.all_pens[pen].ration:
+                    if key != 'status' and key != 'objective':
+                        self.all_pens[pen].ration[key] = \
+                            (self.all_pens[pen].ration[key] /
+                             pen_population_before_additions[pen]) * len(
+                                self.all_pens[pen].animals_in_pen)
 
         for calf in calves_born:
             # TODO: this is the hard coded calf pen value
             pen = 0
             self.id_pen[calf.id] = pen
             self.calves.append(calf)
-            self.all_pens[pen].set_up_new_animal(calf, self.pasture_concentrate, feed, temp)
+            self.all_pens[pen].set_up_new_animal(calf,
+                                                 self.pasture_concentrate,
+                                                 feed, temp,
+                                                 pen_population_before_additions[pen])
             # self.all_pens[pen].animals_in_pen.append(calf)
 
     def update_daily_nums(self):
