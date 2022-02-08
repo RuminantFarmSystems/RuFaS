@@ -1208,11 +1208,12 @@ class RequestHandler(http.server.BaseHTTPRequestHandler):
         return OK, ""
 
 
-# start the server locally at PORT
-with socketserver.TCPServer(("", PORT), RequestHandler) as httpd:
-    httpd.socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEPORT, 1)
-    print("serving at port", PORT)
-    print("to open connection, type 'localhost:" + str(PORT) +
-          "' into a web browser")
-    print("to close connection/end this program, ctrl-c\n")
-    httpd.serve_forever()
+if __name__ == "__main__":
+    # start the server locally at PORT
+    with socketserver.TCPServer(("", PORT), RequestHandler) as httpd:
+        httpd.socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEPORT, 1)
+        print("serving at port", PORT)
+        print("to open connection, type 'localhost:" + str(PORT) +
+              "' into a web browser")
+        print("to close connection/end this program, ctrl-c\n")
+        httpd.serve_forever()

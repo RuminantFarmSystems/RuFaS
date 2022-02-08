@@ -69,6 +69,7 @@ def unpack_input_json(f_path):
         print("Error in unpack_input_json - likely an issue because the "
               "overall structure of the input JSON files has changed and "
               "this method was not updated:", e)
+        raise e
 
     return result
 
@@ -313,7 +314,10 @@ class DBReport(BaseReport):
         if self.produce_csv:
             self.conn = sqlite3.connect(self.db_file)
             self.conn.row_factory = sqlite3.Row
-            self.store_results_setup(unpack_input_json(fPath))
+            try:
+                self.store_results_setup(unpack_input_json(fPath))
+            except Exception as e:
+                self.produce_csv = False
 
     def __del__(self):
         # close connection
