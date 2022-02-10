@@ -197,7 +197,8 @@ class DBReport(BaseReport):
             'milk_fat_prod': ['animal_management.annual_milk_fat_prod', '', 0],
             'avg_prod_per_lactation': [
                 'animal_management.total_milk_prod_per_lactation / '
-                'animal_management.num_cows_through_300_DIM', '', 0],
+                'animal_management.num_cows_through_300_DIM if '
+                'animal_management.num_cows_through_300_DIM > 0 else 0', '', 0],
             'calves_sold': ['animal_management.annual_calves_sold', '', 0],
             'heifers_sold': ['animal_management.annual_heifers_sold', '', 0],
             'cows_culled': ['animal_management.annual_cows_culled', '', 0],

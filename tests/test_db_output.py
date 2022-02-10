@@ -108,34 +108,36 @@ def test_create_all_dirs():
         assert False
 
 
+# I wasn't sure how to test the following functions since it is hard (at
+# least, I couldn't find anyway online to do so) to instantiate
+# RequestHandler (notice that in db_view.py itself, I never directly
+# instantiate it - the class is passed to the TCPServer constructor).
+# I don't think it makes sense to make all of the functions tested below static
+# just for the sake of creating test cases, but I'm not sure what else would
+# be appropriate.
+
 def test_do_GET():
     """Unit test for function do_GET in file output_db/db_view.py"""
-    # Hard to make a RequestHandler to test this.
     pass
 
 
 def test_do_POST():
     """Unit test for function do_POST in file output_db/db_view.py"""
-    # Hard to make a RequestHandler to test this.
     pass
 
 
 def test_do_DELETE():
     """Unit test for function do_DELETE in file output_db/db_view.py"""
-    # Hard to make a RequestHandler to test this.
     pass
 
 
 def test_respond():
     """Unit test for function respond in file output_db/db_view.py"""
-    # Hard to make a RequestHandler to test this.
     pass
 
 
 def test_get_results_table():
     """Unit test for function get_results_table in file output_db/db_view.py"""
-    request_handler = RequestHandler(b'\x04\x00', ("", PORT), PORT)
-    print(request_handler.get_results_table())
     pass
 
 
