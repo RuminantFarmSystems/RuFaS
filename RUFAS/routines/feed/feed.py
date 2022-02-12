@@ -18,7 +18,6 @@ Author(s): Kass Chupongstimun, kass_c@hotmail.com,
 from RUFAS.util import DatabaseReader
 from RUFAS.output_handler.reports.feed_storage_report import StorageReport
 from . import nitrogen_loss, carbon_loss, protein_degradation
-from ..animal.pen import Pen
 
 
 def daily_feed_routine(feed, fields, animal_management, feed_report):
@@ -73,14 +72,6 @@ class Feed:
         self.input_growing_feeds = data['growing_feeds']
         self.input_close_up_feeds = data['close_up_feeds']
         self.input_lac_cow_feeds = data['lac_cow_feeds']
-
-        self.input_feed_combinations = {
-            Pen.AnimalCombination.CALF: set(data['calf_feeds']),
-            Pen.AnimalCombination.GROWING: set(data['growing_feeds']),
-            Pen.AnimalCombination.CLOSE_UP: set(data['close_up_feeds']),
-            Pen.AnimalCombination.GROWING_AND_CLOSE_UP: set(data['growing_feeds']) | set(data['close_up_feeds']),
-            Pen.AnimalCombination.LAC_COW: data['lac_cow_feeds'],
-        }
 
         self.all_feed_ids = self.get_all_feed_units(data['purchased_feeds'],
                                                     data['farm_grown_feeds'])
