@@ -126,7 +126,7 @@
 	"pen_information": {
 		"pen0": {
 			"id": 0,
-			"animal_combination": "CALF",
+			"animal_groups": ["calf"],
 			"vertical_dist_to_milking_parlor": 0.1,
 			"horizontal_dist_to_milking_parlor": 1.6,
 			"number_of_stalls": 100,
@@ -140,7 +140,7 @@
 		},
 		"pen1": {
 			"id": 1,
-			"animal_combination": "GROWING",
+			"animal_groups": ["growing"],
 			"vertical_dist_to_milking_parlor": 0.1,
 			"horizontal_dist_to_milking_parlor": 1.6,
 			"number_of_stalls": 200,
@@ -154,7 +154,7 @@
 		},
 		"pen2": {
 			"id": 2,
-			"animal_combination": "CLOSE_UP",
+			"animal_groups": ["close_up"],
 			"vertical_dist_to_milking_parlor": 0.1,
 			"horizontal_dist_to_milking_parlor": 1.6,
 			"number_of_stalls": 300,
@@ -168,7 +168,7 @@
 		},
 		"pen3": {
 			"id": 3,
-			"animal_combination": "LAC_COW",
+			"animal_groups": ["lac_cow"],
 			"vertical_dist_to_milking_parlor": 0.1,
 			"horizontal_dist_to_milking_parlor": 1.6,
 			"number_of_stalls": 400,
