@@ -12,6 +12,12 @@ Author(s):  William Donovan, wmdonovan@wisc.edu
 from RUFAS.routines.manure_management import handlers, reception_pits, manure_separators, \
     treatments, storage_options
 
+# TODO figure out how to import just all_pens
+from RUFAS.routines.animal.animal_management import AnimalManagement as Animal_Module
+
+
+# TODO figure out how to run the model 
+# TODO figure out how to connect to csv values
 """
 The function takes in the animal_management class and returns a dictionary with 
 values of manure for all of the pens combined. I.e. it takes the U, the TAN_s,
@@ -22,8 +28,8 @@ Parameters:
     animal_management: animal management class
 
 """
-def compile_manure_for_all_pens(animal_management):
-    pens = animal_management["all_pens"]
+def compile_manure_for_all_pens(Animal_Module):
+    pens = Animal_Module["all_pens"]
     total_manure = {
             "U": 0,
             "TAN_s": 0,
@@ -105,7 +111,9 @@ def combine_manure_for_different_pens(list_of_pen_numbers, animal_management):
 
 
 def daily_manure_storage_routine(animal_management, manure_management):
-    manure_management.reset_daily_variables()
+    print("Before calling reset")
+    manure_management.reset_daily_variables0()
+    print("after calling reset")
 
     compile_manure_for_all_pens(animal_management)
 
@@ -436,7 +444,8 @@ class ManureManagement:
         self.other_solids = self.TS - (self.VS + self.N + self.P + self.K)
         self.other_liquids = self.TS_liquid - (self.VS_liquid + self.N_liquid + self.P_liquid + self.K_liquid)
 
-    def reset_daily_variables(self):
+    def reset_daily_variables0(self):
+        print("Line 448")
         self.CH4_emissions = 0.0
         self.TS = 0.0
         self.VS = 0.0
@@ -453,8 +462,7 @@ class ManureManagement:
         self.TS_DM_effluent = 0.0
         self.other_solids = 0.0
         self.other_liquids = 0.0
-
-        [handler.reset_daily_variables() for handler in self.handlers.values()]
+        [handler.reset_daily_variables() for handler in self.handlers.values()] 
         [reception_pit.reset_daily_variables() for reception_pit in self.reception_pits.values()]
         [separator.reset_daily_variables() for separator in self.separators.values()]
         [treatment.reset_daily_variables() for treatment in self.treatments.values()]

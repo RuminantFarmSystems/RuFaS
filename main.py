@@ -35,6 +35,7 @@ def main():
     # Runs only 1 simulation in the case of a single input file
     #
     for input_file_path in input_file_list:
+        print("Before calling simulate")
         RUFAS.simulate(input_file_path)
 
 

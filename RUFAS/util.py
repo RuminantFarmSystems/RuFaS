@@ -73,7 +73,7 @@ class DatabaseReader:
 
         try:
             # Forms a connection to the database
-            conn = sqlite3.connect(Path(self.db_file))
+            conn = sqlite3.connect(str(self.db_file))
             conn.row_factory = sqlite3.Row
             c = conn.cursor()
 

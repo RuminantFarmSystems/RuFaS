@@ -51,6 +51,7 @@ def simulate(input_file_path: Path):
     sys.stdout.write("Simulating  ")
     # MAIN Simulation Loop
     while not time.end_simulation():
+        print("Simulation engine line 54")
         annual_simulation()
 
     output.finalize(state, weather, time)
@@ -73,6 +74,7 @@ def daily_simulation():
     """Executes the daily simulation routines."""
 
     # Daily routines
+    print("Simulation.py line 77")
     routines.daily_animal_routine(state.animal_management, state.feed, weather, time)
     routines.daily_manure_storage_routine(state.manure_storage, state.animal_management)
     routines.daily_fields_routine(state.fields, state.manure_storage, weather, time)
@@ -119,6 +121,7 @@ def annual_simulation():
                 sys.stdout.write("/")
                 case = 0
 
+        print("simulation.py line 124")
         daily_simulation()
 
     # Post-Annual Routines
