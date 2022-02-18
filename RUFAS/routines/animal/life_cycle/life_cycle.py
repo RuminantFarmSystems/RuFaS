@@ -188,6 +188,13 @@ class LifeCycleManager:
     cost_semen = 0
     cost_pc_heifer = 0
     cost_pc = 0
+    cost_hormone_heifer_more = 0
+    cost_ed_heifer_more = 0
+    cost_ai_heifer_more = 0
+    cost_semen_heifer_more = 0
+    cost_pc_heifer_more = 0
+    cost_feed_calf_more = 0
+    cost_feed_heifer_more = 0
     cost_bought_heifer = 0
     cost_feed_calf = 0
     cost_feed_heifer = 0
@@ -201,10 +208,13 @@ class LifeCycleManager:
     income_milk = 0
 
     repro_cost_heifer = 0
+    repro_cost_heifer_more = 0
     repro_cost_cow = 0
     feed_cost = 0
+    feed_cost_more = 0
     milk_income_over_feed_cost = 0
     net_return = 0
+    net_return_more_heifer = 0
     
 
     config = None
@@ -393,6 +403,13 @@ class LifeCycleManager:
         self.cost_semen = 0
         self.cost_pc_heifer = 0
         self.cost_pc = 0
+        self.cost_hormone_heifer_more = 0
+        self.cost_ed_heifer_more = 0
+        self.cost_ai_heifer_more = 0
+        self.cost_semen_heifer_more = 0
+        self.cost_pc_heifer_more = 0
+        self.cost_feed_calf_more = 0
+        self.cost_feed_heifer_more = 0
         self.cost_bought_heifer = 0
         self.cost_feed_calf = 0
         self.cost_feed_heifer = 0
@@ -406,10 +423,13 @@ class LifeCycleManager:
         self.income_milk = 0
 
         self.repro_cost_heifer = 0
+        self.repro_cost_heifer_more = 0
         self.repro_cost_cow = 0
         self.feed_cost = 0
+        self.feed_cost_more = 0
         self.milk_income_over_feed_cost = 0
         self.net_return = 0
+        self.net_return_more_heifer = 0
     
         self.sold_heifer_cost = 0
         self.sold_heifer_calf_cost = 0
@@ -548,7 +568,7 @@ class LifeCycleManager:
                     self.num_preg_21_days_heifer += 1   
         
         #caculate service rate and conception rate
-        if date >= 22:
+        if date >= 106:
             self.count_21_days += 1
             if self.count_21_days % 21 == 0 and self.count_21_days != 0:
                 self.count_21_period += 1
@@ -801,12 +821,13 @@ class LifeCycleManager:
                     self.num_preg_21_days += 1   
         
         #caculate service rate and conception rate
-        if date >= 22:
+        if date >= 106:
             self.count_21_days += 1
             if self.count_21_days % 21 == 0 and self.count_21_days != 0:
                 self.count_21_period += 1
                 self.service_rate_each_21_d = float(self.num_ai_21_days) / float(self.num_cow_open_acc_21_days/21)
-                self.conception_rate_each_21_d = float(self.num_preg_21_days) / float(self.num_ai_21_days)
+                if self.num_ai_21_days >0:
+                    self.conception_rate_each_21_d = float(self.num_preg_21_days) / float(self.num_ai_21_days)
                 self.num_ai_21_days = 0
                 self.num_cow_open_acc_21_days = 0
                 self.num_preg_21_days = 0
@@ -815,25 +836,35 @@ class LifeCycleManager:
                 self.pregnancy_rate = self.avg_service_rate * self.avg_conception_rate
 
         # income/cost calculation
-        self.cost_hormone_heifer = 1.83 * self.GnRH_injection_num_h + 2.29 * self.PGF_injection_num_h + 12.53 * self.CIDR_count - self.sold_heifer_hormone_cost
+        self.cost_hormone_heifer = 1.83 * self.GnRH_injection_num_h + 2.29 * self.PGF_injection_num_h + 12.53 * self.CIDR_count
+        self.cost_ed_heifer = 0.03 * self.ed_period_h
+        self.cost_ai_heifer = 10 * self.ai_num_h
+        self.cost_semen_heifer = 15 * self.semen_num_h
+        self.cost_pc_heifer = 4.37 * self.preg_check_num_h
+
+        self.cost_hormone_heifer_more = 1.83 * self.GnRH_injection_num_h + 2.29 * self.PGF_injection_num_h + 12.53 * self.CIDR_count - self.sold_heifer_hormone_cost
+        self.cost_ed_heifer_more = 0.03 * self.ed_period_h - self.sold_heifer_ed_cost
+        self.cost_ai_heifer_more = 10 * self.ai_num_h - self.sold_heifer_ai_cost
+        self.cost_semen_heifer_more = 15 * self.semen_num_h - self.sold_heifer_semen_cost
+        self.cost_pc_heifer_more = 4.37 * self.preg_check_num_h - self.sold_heifer_pc_cost          
+
         self.cost_hormone = 1.83 * self.GnRH_injection_num + 2.29 * self.PGF_injection_num
-        self.cost_ed_heifer = 0.03 * self.ed_period_h - self.sold_heifer_ed_cost
-        self.cost_ed = 0.03 * self.ed_period
-        self.cost_ai_heifer = 10 * self.ai_num_h - self.sold_heifer_ai_cost
+        self.cost_ed = 0.03 * self.ed_period 
         self.cost_ai = 10 * self.ai_num
-        self.cost_semen_heifer = 15 * self.semen_num_h - self.sold_heifer_semen_cost
         self.cost_semen = 15 * self.semen_num
-        self.cost_pc_heifer = 4.37 * self.preg_check_num_h - self.sold_heifer_pc_cost
         self.cost_pc = 4.37 * self.preg_check_num
+
         self.cost_bought_heifer = 1500 * self.bought_heifer_num
         # consume milk, 10% of its BW
         self.cost_feed_calf = 0.2 * 0.1 * self.total_body_weight_calf
+        self.cost_feed_calf_more = 0.2 * 0.1 * self.total_body_weight_calf - self.sold_heifer_calf_cost
         # $2.4 per day for average weight heifer
-        self.cost_feed_heifer = 0.0068 * self.total_body_weight_heifer - self.sold_heifer_feed_cost
+        self.cost_feed_heifer = 0.0068 * self.total_body_weight_heifer
+        self.cost_feed_heifer_more = 0.0068 * self.total_body_weight_heifer - self.sold_heifer_feed_cost
         # $0.06-0.08 per lb DM
-        self.cost_feed_milking_cow = 0.0154 * self.total_lactating_DMI
-        self.cost_feed_dry_cow = 0.0154 * self.total_dry_DMI
-        self.income_sold_female_calf = 120 * self.sold_calf_female_num
+        self.cost_feed_milking_cow = 0.24 * self.total_lactating_DMI
+        self.cost_feed_dry_cow = 0.24 * self.total_dry_DMI
+        self.income_sold_female_calf = 120 * self.sold_heifer_num
         self.income_sold_male_calf = 50 * self.sold_calf_male_num
         self.income_sold_heifer = 1380 * self.sold_heifer_num
         self.income_culled_heifer = 124 * self.culled_heifer_num
@@ -842,12 +873,17 @@ class LifeCycleManager:
 
         self.repro_cost_heifer = self.cost_hormone_heifer + self.cost_ed_heifer + self.cost_ai_heifer + \
             self.cost_semen_heifer + self.cost_pc_heifer 
+        self.repro_cost_heifer_more = self.cost_hormone_heifer_more + self.cost_ed_heifer_more + self.cost_ai_heifer_more + \
+            self.cost_semen_heifer_more + self.cost_pc_heifer_more 
         self.repro_cost_cow = self.cost_hormone + self.cost_ed + self.cost_ai + self.cost_semen + self.cost_pc
         self.feed_cost = self.cost_feed_calf + self.cost_feed_heifer + self.cost_feed_milking_cow + self.cost_feed_dry_cow
-        
+        self.feed_cost_more = self.cost_feed_calf_more + self.cost_feed_heifer_more + self.cost_feed_milking_cow + self.cost_feed_dry_cow
         self.milk_income_over_feed_cost = self.income_milk - self.cost_feed_milking_cow - self.cost_feed_dry_cow
         self.net_return = self.income_milk + self.income_sold_male_calf + self.income_sold_female_calf + \
-            self.income_culled_heifer + self.income_culled_cow - self.repro_cost_heifer - self.repro_cost_cow - self.feed_cost - self.cost_bought_heifer
+            self.income_culled_heifer + self.income_culled_cow - self.repro_cost_heifer - self.repro_cost_cow - self.feed_cost
+        
+        self.net_return_more_heifer = self.income_milk + self.income_sold_male_calf + self.income_sold_female_calf +\
+            self.income_culled_heifer + self.income_culled_cow - self.repro_cost_heifer_more - self.repro_cost_cow - self.feed_cost_more - self.cost_bought_heifer
     
         if total_animal_num == 0:
             self.calf_percent = 0

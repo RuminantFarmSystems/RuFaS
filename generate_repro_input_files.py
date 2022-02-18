@@ -6,7 +6,7 @@ import os
 h1 = {"name": "H1", "heifer_repro_method": "ED",
       "heifer_synchED_protocol": None, "heifer_TAI_protocol": None, "TAI_conception_rate_h": 0}
 h2 = {"name": "H2", "heifer_repro_method": "synch-ED",
-      "heifer_synchED_protocol": "2P", "heifer_TAI_protocol": "5dCG2P", "TAI_conception_rate_h": 0.4}
+      "heifer_synchED_protocol": "2P", "heifer_TAI_protocol": "5dCG2P", "TAI_conception_rate_h": 0.5}
 h3 = {"name": "H3", "heifer_repro_method": "TAI",
       "heifer_synchED_protocol": None, "heifer_TAI_protocol": "5dCG2P", "TAI_conception_rate_h": 0.6}
 

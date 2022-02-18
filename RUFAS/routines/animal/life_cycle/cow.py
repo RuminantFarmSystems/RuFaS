@@ -983,13 +983,19 @@ class Cow(HeiferIII):
         The reasons are reproduction failure, low production, and health issues
         Returns: not culled
         """
-        if self.do_not_breed and self.days_in_milk > 80 and \
-                self.estimated_daily_milk_produced < \
+        if self.do_not_breed and self.days_in_milk > 80:
+            if self.calves == 1 and \
+                self.estimated_daily_milk_produced < 33:
+                self.culled = True
+                self.events.add_event(self.days_born, sim_day, const.LOW_PROD_CULL)
+                self.cull_reason = const.LOW_PROD_CULL
+                return True
+            elif self.estimated_daily_milk_produced < \
                 AnimalBase.config['cull_milk_production']:
-            self.culled = True
-            self.events.add_event(self.days_born, sim_day, const.LOW_PROD_CULL)
-            self.cull_reason = const.LOW_PROD_CULL
-            return True
+                self.culled = True
+                self.events.add_event(self.days_born, sim_day, const.LOW_PROD_CULL)
+                self.cull_reason = const.LOW_PROD_CULL
+                return True
         if self.days_born == self.future_cull_date:
             self.culled = True
             self.events.add_event(
@@ -1004,9 +1010,9 @@ class Cow(HeiferIII):
 
     def death_update(self):
         if self.calves >= 4:
-            death_rate = AnimalBase.config['parity_death_prob'][3]
+            death_rate = AnimalBase.config['parity_death_prob'][3] * 0.7
         else:
-            death_rate = AnimalBase.config['parity_death_prob'][self.calves-1]
+            death_rate = AnimalBase.config['parity_death_prob'][self.calves-1] * 0.7
         death_rand = random()
         if (death_rand <= death_rate):
             death_upper_limit = death_lower_limit = death_time_upper_limit = death_time_lower_limit = 0
@@ -1029,10 +1035,10 @@ class Cow(HeiferIII):
         """
         # inv_cull_rate = 0
         if self.calves >= 4:
-            inv_cull_rate = AnimalBase.config['parity_cull_prob'][3]
+            inv_cull_rate = AnimalBase.config['parity_cull_prob'][3] * 0.7
         else:
             inv_cull_rate = \
-                AnimalBase.config['parity_cull_prob'][self.calves - 1]
+                AnimalBase.config['parity_cull_prob'][self.calves - 1] * 0.7
         cull_rand = random()
         if cull_rand <= inv_cull_rate:
             cull_reason_rand = random()

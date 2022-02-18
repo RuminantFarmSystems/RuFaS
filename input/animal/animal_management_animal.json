@@ -19,7 +19,7 @@
 			"semen_type": "conventional",
 			"days_in_preg_when_dry": 218,
 			"lactation_curve": "wood",
-			"cull_milk_production": 22,
+			"cull_milk_production": 30,
 			"cow_times_milked_per_day": 1
 		},
 		"farm_level": {
@@ -57,7 +57,7 @@
 				"avg_gestation_len": 278,
 				"std_gestation_len": 6,
 				"prefresh_day": 30,
-				"do_not_breed_time" : 200,
+				"do_not_breed_time" : 180,
 				"calving_interval": 400,
 				"use_input_calving_interval": false
 				

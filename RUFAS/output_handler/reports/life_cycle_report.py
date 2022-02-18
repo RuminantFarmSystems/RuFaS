@@ -176,14 +176,14 @@ class LifeCycleReport(BaseReportDriver):
 
             self.econmic_cal = {
                 'cost_hormone_heifer': ['life_cycle_manager.cost_hormone_heifer', '$/d', []],
-                'cost_hormone': ['life_cycle_manager.cost_hormone', '$/d', []],
                 'cost_ed_heifer': ['life_cycle_manager.cost_ed_heifer', '$/d', []],
-                'cost_ed': ['life_cycle_manager.cost_ed', '$/d', []],
                 'cost_ai_heifer': ['life_cycle_manager.cost_ai_heifer', '$/d', []],
-                'cost_ai': ['life_cycle_manager.cost_ai', '$/d', []],
                 'cost_semen_heifer': ['life_cycle_manager.cost_semen_heifer', '$/d', []],
-                'cost_semen': ['life_cycle_manager.cost_semen', '$/d', []],
                 'cost_pc_heifer': ['life_cycle_manager.cost_pc_heifer', '$/d', []],
+                'cost_hormone': ['life_cycle_manager.cost_hormone', '$/d', []],
+                'cost_ed': ['life_cycle_manager.cost_ed', '$/d', []],
+                'cost_ai': ['life_cycle_manager.cost_ai', '$/d', []],
+                'cost_semen': ['life_cycle_manager.cost_semen', '$/d', []],
                 'cost_pc': ['life_cycle_manager.cost_pc', '$/d', []],
                 'cost_bought_heifer': ['life_cycle_manager.cost_bought_heifer', '$/d', []],
                 'cost_feed_calf': ['life_cycle_manager.cost_feed_calf', '$/d', []],
@@ -201,8 +201,17 @@ class LifeCycleReport(BaseReportDriver):
                 'cost_repro_cow': ['life_cycle_manager.repro_cost_cow', '$/d', []],
                 'cost_feed': ['life_cycle_manager.feed_cost', '$/d', []],
                 'milk_income_over_feed_cost': ['life_cycle_manager.milk_income_over_feed_cost', '$/d', []],
-                'net_return': ['life_cycle_manager.net_return', '$/d', []]
-
+                'net_return': ['life_cycle_manager.net_return', '$/d', []],
+                'cost_hormone_heifer_more': ['life_cycle_manager.cost_hormone_heifer_more', '$/d', []],
+                'cost_ed_heifer_more': ['life_cycle_manager.cost_ed_heifer_more', '$/d', []],
+                'cost_ai_heifer_more': ['life_cycle_manager.cost_ai_heifer_more', '$/d', []],
+                'cost_semen_heifer_more': ['life_cycle_manager.cost_semen_heifer_more', '$/d', []],
+                'cost_pc_heifer_more': ['life_cycle_manager.cost_pc_heifer_more', '$/d', []],
+                'cost_feed_calf_more': ['life_cycle_manager.cost_feed_calf_more', '$/d', []],
+                'cost_feed_heifer_more': ['life_cycle_manager.cost_feed_heifer_more', '$/d', []],
+                'cost_repro_heifer_more': ['life_cycle_manager.repro_cost_heifer_more', '$/d', []],
+                'cost_feed_more': ['life_cycle_manager.feed_cost_more', '$/d', []],
+                'net_return_more_heifer': ['life_cycle_manager.net_return_more_heifer', '$/d', []]
             }
 
             for parity in LifeCycleManager.avg_calving_to_preg_time:
