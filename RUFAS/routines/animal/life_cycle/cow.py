@@ -985,7 +985,7 @@ class Cow(HeiferIII):
         """
         if self.do_not_breed and self.days_in_milk > 80:
             if self.calves == 1 and \
-                self.estimated_daily_milk_produced < 33:
+                self.estimated_daily_milk_produced < 32:
                 self.culled = True
                 self.events.add_event(self.days_born, sim_day, const.LOW_PROD_CULL)
                 self.cull_reason = const.LOW_PROD_CULL

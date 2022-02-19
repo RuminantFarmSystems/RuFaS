@@ -876,14 +876,17 @@ class LifeCycleManager:
         self.repro_cost_heifer_more = self.cost_hormone_heifer_more + self.cost_ed_heifer_more + self.cost_ai_heifer_more + \
             self.cost_semen_heifer_more + self.cost_pc_heifer_more 
         self.repro_cost_cow = self.cost_hormone + self.cost_ed + self.cost_ai + self.cost_semen + self.cost_pc
+        
         self.feed_cost = self.cost_feed_calf + self.cost_feed_heifer + self.cost_feed_milking_cow + self.cost_feed_dry_cow
         self.feed_cost_more = self.cost_feed_calf_more + self.cost_feed_heifer_more + self.cost_feed_milking_cow + self.cost_feed_dry_cow
         self.milk_income_over_feed_cost = self.income_milk - self.cost_feed_milking_cow - self.cost_feed_dry_cow
-        self.net_return = self.income_milk + self.income_sold_male_calf + self.income_sold_female_calf + \
-            self.income_culled_heifer + self.income_culled_cow - self.repro_cost_heifer - self.repro_cost_cow - self.feed_cost
         
-        self.net_return_more_heifer = self.income_milk + self.income_sold_male_calf + self.income_sold_female_calf +\
-            self.income_culled_heifer + self.income_culled_cow - self.repro_cost_heifer_more - self.repro_cost_cow - self.feed_cost_more - self.cost_bought_heifer
+        # bought more than sold
+        self.net_return = self.income_milk + self.income_sold_male_calf + self.income_culled_heifer + self.income_culled_cow -\
+             self.repro_cost_heifer - self.repro_cost_cow - self.feed_cost
+        # sold more than bought
+        self.net_return_more_heifer = self.income_milk + self.income_sold_male_calf + self.income_culled_heifer + self.income_culled_cow -\
+             self.repro_cost_heifer_more - self.repro_cost_cow - self.feed_cost_more
     
         if total_animal_num == 0:
             self.calf_percent = 0
