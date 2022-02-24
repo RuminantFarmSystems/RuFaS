@@ -97,9 +97,9 @@ class AnimalManagement:
 
     # dictionary for keeping track of what animal types each pen is holding
     # (value of the dictionaries are lists of pen objects)
-    pens_animal_group = {Pen.AnimalCombination.CALF: [], Pen.AnimalCombination.GROWING: [],
-                         Pen.AnimalCombination.CLOSE_UP: [], Pen.AnimalCombination.GROWING_AND_CLOSE_UP: [],
-                         Pen.AnimalCombination.LAC_COW: []}
+    pens_by_animal_combination = {Pen.AnimalCombination.CALF: [], Pen.AnimalCombination.GROWING: [],
+                                  Pen.AnimalCombination.CLOSE_UP: [], Pen.AnimalCombination.GROWING_AND_CLOSE_UP: [],
+                                  Pen.AnimalCombination.LAC_COW: []}
 
     # these variables are the P compositions of each class of animal. They
     # are calculated daily and are used when an animal is added to the
@@ -447,7 +447,7 @@ class AnimalManagement:
             if grouped_pens_short[group] == {}:
                 # variable to track lowest stocking density
                 dens = 10000
-                for p in self.pens_animal_group[group]:
+                for p in self.pens_by_animal_combination[group]:
                     if p.stocking_density < dens:
                         pen = p
                         dens = p.stocking_density
@@ -478,7 +478,7 @@ class AnimalManagement:
             if grouped_pens_short[Pen.AnimalCombination.CALF] == {}:
                 # variable to track lowest stocking density
                 dens = 10000
-                for p in self.pens_animal_group[Pen.AnimalCombination.CALF]:
+                for p in self.pens_by_animal_combination[Pen.AnimalCombination.CALF]:
                     if p.stocking_density < dens:
                         pen = p
                         dens = p.stocking_density
@@ -531,19 +531,19 @@ class AnimalManagement:
 
             if pen.animal_combination == Pen.AnimalCombination.CALF:
                 calf_pens.append(pen)
-                self.pens_animal_group[Pen.AnimalCombination.CALF].append(pen)
+                self.pens_by_animal_combination[Pen.AnimalCombination.CALF].append(pen)
                 stall_shortage[Pen.AnimalCombination.CALF] -= pen.num_stalls * pen.max_stocking_density
             elif pen.animal_combination == Pen.AnimalCombination.GROWING:
                 growing_pens.append(pen)
-                self.pens_animal_group[Pen.AnimalCombination.GROWING].append(pen)
+                self.pens_by_animal_combination[Pen.AnimalCombination.GROWING].append(pen)
                 stall_shortage[Pen.AnimalCombination.GROWING] -= pen.num_stalls * pen.max_stocking_density
             elif pen.animal_combination == Pen.AnimalCombination.CLOSE_UP:
                 close_up_pens.append(pen)
-                self.pens_animal_group[Pen.AnimalCombination.CLOSE_UP].append(pen)
+                self.pens_by_animal_combination[Pen.AnimalCombination.CLOSE_UP].append(pen)
                 stall_shortage[Pen.AnimalCombination.CLOSE_UP] -= pen.num_stalls * pen.max_stocking_density
             elif pen.animal_combination == Pen.AnimalCombination.LAC_COW:
                 lac_cow_pens.append(pen)
-                self.pens_animal_group[Pen.AnimalCombination.LAC_COW].append(pen)
+                self.pens_by_animal_combination[Pen.AnimalCombination.LAC_COW].append(pen)
                 stall_shortage[Pen.AnimalCombination.LAC_COW] -= pen.num_stalls * pen.max_stocking_density
             else:
                 # TODO: Update mixed_types and mixed_type_pens to use enum
@@ -583,16 +583,16 @@ class AnimalManagement:
                 # Assigning pen to relevant pen list
                 if max_key[0] == 'calf':
                     calf_pens.append(pen)
-                    self.pens_animal_group[Pen.AnimalCombination.CALF].append(pen)
+                    self.pens_by_animal_combination[Pen.AnimalCombination.CALF].append(pen)
                 elif max_key[0] == 'growing':
                     growing_pens.append(pen)
-                    self.pens_animal_group[Pen.AnimalCombination.GROWING].append(pen)
+                    self.pens_by_animal_combination[Pen.AnimalCombination.GROWING].append(pen)
                 elif max_key[0] == 'close_up':
                     close_up_pens.append(pen)
-                    self.pens_animal_group[Pen.AnimalCombination.CLOSE_UP].append(pen)
+                    self.pens_by_animal_combination[Pen.AnimalCombination.CLOSE_UP].append(pen)
                 else:
                     lac_cow_pens.append(pen)
-                    self.pens_animal_group[Pen.AnimalCombination.LAC_COW].append(pen)
+                    self.pens_by_animal_combination[Pen.AnimalCombination.LAC_COW].append(pen)
                 # updating stall shortage
                 stall_shortage[max_key[0]] -= pen.num_stalls * pen.max_stocking_density
 

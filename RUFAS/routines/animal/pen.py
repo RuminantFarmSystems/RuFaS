@@ -144,6 +144,9 @@ class Pen:
 
     lactating_total : dict
         Contains the total manure excretion of the lactating cows in the pen.
+
+    animal_combination : AnimalCombination
+        Represents the valid animal type combinations in the pen.
     """
 
     class AnimalCombination(Enum):
@@ -174,13 +177,11 @@ class Pen:
             manure_handling: the manure handling method used to clean the pen
             manure_separator: the manure separator that processes manure excreted in this pen
             manure_storage: the manure storage receptacle that stores manure excreted in this pen
-            TODO: CHANGE VALID ANIMAL GROUPS
-            valid_animal_groups: list of valid animal groups this pen is reserved for, (if empty any type valid)
+            animal_combination: the valid animal combinations inside this pen, an instance of the AnimalCombination Enum
             max_stocking_density: maximum stocking density allowed for pen
         """
         self.id = id_number
 
-        # self.valid_animal_groups = valid_animal_groups
         self.max_stocking_density = max_stocking_density
 
         self.vertical_dist_to_parlor = vert_dist
@@ -283,7 +284,7 @@ class Pen:
 
         Args:
             new_animals: list of new animals in the pen
-            animal_group: a string representation of the type of group these animals are
+            animal_combination: an AnimalCombination Enum representating the type of the new animals
         """
         # self.animals_in_pen = new_animals
         for animal in new_animals:
@@ -587,26 +588,5 @@ class Pen:
         Args:
             feed: an object of the Feed class
         """
-        # figure a way to get values of lists into the feed_ids list without passing in the list itself
-
-        # if len(self.valid_animal_groups) == 1:
-        #     entry = self.valid_animal_groups[0]
-        #     if self.animal_combination == Pen.AnimalCombination.CALF or entry == 'calf':
-        #         self.allocated_feeds |= set(feed.input_calf_feeds)
-        #     elif self.animal_combination == Pen.AnimalCombination.GROWING or entry == 'growing':
-        #         self.allocated_feeds |= set(feed.input_growing_feeds)
-        #     elif self.animal_combination == Pen.AnimalCombination.CLOSE_UP or entry == 'close_up':
-        #         self.allocated_feeds |= set(feed.input_close_up_feeds)
-        #     elif self.animal_combination == Pen.AnimalCombination.GROWING_AND_CLOSE_UP:
-        #         self.allocated_feeds |= set(feed.input_growing_feeds)
-        #         self.allocated_feeds |= set(feed.input_close_up_feeds)
-        #     elif self.animal_combination == Pen.AnimalCombination.LAC_COW or entry == 'lac_cow':
-        #         self.allocated_feeds |= set(feed.input_lac_cow_feeds)
-        # elif len(self.valid_animal_groups) == 2:
-        #     entry1 = self.valid_animal_groups[0]
-        #     entry2 = self.valid_animal_groups[1]
-        #     if (entry1 == 'growing' and entry2 == 'close_up') or (entry1 == 'close_up' and entry2 == 'growing'):
-        #         self.allocated_feeds |= set(feed.input_growing_feeds)
-        #         self.allocated_feeds |= set(feed.input_close_up_feeds)
 
         self.allocated_feeds = feed.input_feed_combinations[self.animal_combination]
