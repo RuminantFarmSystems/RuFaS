@@ -54,7 +54,6 @@ class PenReport(BaseReportDriver):
             feed = state.feed
             pen = state.animal_management.all_pens[self.pen_id]
 
-            print(self.daily_variables)
             for variable in self.daily_variables:
                 # index 2 is the accumulator for the evauated variables
                 # index 0 is the string literal code representation of the variable
@@ -131,6 +130,7 @@ class PenReport(BaseReportDriver):
 
             # dictionary with all feed ids and keys and their pertaining information as values
             all_feeds = feed.all_feed_ids
+
 
             # subsets the entirety of the feed ids for the individual pen's needs
             pen_specific_feeds = {str(x): all_feeds[str(x)] for x in individual_pen.allocated_feeds}

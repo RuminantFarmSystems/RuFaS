@@ -1,5 +1,9 @@
-from .hardcoded_ration import get_ration
+# from .hardcoded_ration import get_ration
 import math
+
+
+def get_ration():
+    return {'155': 1, '157': 2, 'status': 'Optimal', 'objective': 4.5}
 
 
 def optimize():

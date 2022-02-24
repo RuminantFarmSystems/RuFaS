@@ -463,6 +463,7 @@ class AnimalManagement:
                     self.all_pens[pen].ration == {}:
                 available_feeds = ration_driver.AvailableFeeds()
                 available_feeds.feed_nutrients(feed)
+                print(available_feeds)
                 self.all_pens[pen].ration = self.all_pens[pen].calc_ration(feed, available_feeds)
 
         for calf in calves_born:
