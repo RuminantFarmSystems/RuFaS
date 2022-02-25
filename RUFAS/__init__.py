@@ -1,2 +1,2 @@
 from .user_prompt import input_prompt
-from .simulation_engine import simulate
+from .simulation_engine import SimulationEngine
