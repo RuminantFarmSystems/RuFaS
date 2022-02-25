@@ -1,12 +1,4 @@
-"""
-RUFAS: Ruminant Farm Systems Model
-File name: simulation_engine.py
-
-Description: Contains the main routines that drive the simulation
-
-Author(s): Kass Chupongstimun, kass_c@hotmail.com
-           Jit Patil, spatil5@wisc.edu
-"""
+# !/usr/bin/env python3
 
 import sys
 import time as timer
@@ -17,149 +9,159 @@ from RUFAS.util import get_base_dir, read_json_file
 from RUFAS.output_handler import OutputHandler
 import random
 import numpy
+from typing import Dict, Any, Optional
 
 global config, state, output, weather, time
 
 
-def simulate(input_file_path: Path):
-    """Executes the simulation with the json file specified.
+class SimulationEngine:
 
-    Executes the simulation with the json file at the path specified. Skips over
-    the simulation (immediately returns) when an error is present in the json
-    file. Prints out the error message to the console.
-    The parameters of the simulation are all specified by the input file.
+    def __init__(self, input_file_path: Path) -> None:
+        """
+        Args:
+            input_file_path (Path): Path to the json file that contains all the input
+                parameters to the simulation. Passed to read_json_file().
+        """
+        self._initialize_simulation(input_file_path)
 
-    Args:
-        input_file_path (Path): Path to the json file that contains all the input
-            parameters to the simulation. Passed to read_json_file().
-    """
+    def simulate(self) -> None:
+        """Executes the simulation"""
 
-    # Reads the json input file and uses the information to instantiate the
-    # simulation global variables
-    initialize_simulation(input_file_path, read_json_file(input_file_path))
+        t_start_sim = timer.time()
+        self._run_simulation_main_loop()
+        output.finalize(state, weather, time)
+        t_end_sim = timer.time()
 
-    # Creates a new directory for the output files (if doesn't already exist)
-    # Deletes existing output files of the same name from previous simulation
-    # Transfer needed (initial) data from state to report handlers
-    output.initialize_dir(config.csv_dir, config.graphic_dir)
-    output.initialize_reports()
+        print("Simulation Successful")
+        print(f"Total Simulation Time: {t_end_sim - t_start_sim} seconds")
 
-    t_start_sim = timer.time()
+        t_start_graphics = timer.time()
+        sys.stdout.write('Producing Graphics ')
+        output.produce_graphics()
+        t_end_graphics = timer.time()
 
-    sys.stdout.write("Simulating  ")
-    # MAIN Simulation Loop
-    while not time.end_simulation():
-        annual_simulation()
+        graphics_prod_time = t_end_graphics - t_start_graphics
+        total_runtime = (t_end_sim-t_start_sim) + \
+            (t_end_graphics-t_start_graphics)
+        self._show_final_messages(graphics_prod_time, total_runtime)
 
-    output.finalize(state, weather, time)
-    t_end_sim = timer.time()
-    print("\nSimulation Successful: {}".format(input_file_path.name))
-    print("Total Simulation Time: {} seconds\n".format(str(t_end_sim - t_start_sim)))
+    def _run_simulation_main_loop(self) -> None:
+        """
+        The main loop for simulation
+        """
+        sys.stdout.write("Simulating  ")
+        while not time.end_simulation():
+            self._annual_simulation()
 
-    t_start_graphics = timer.time()
-    sys.stdout.write('\nProducing Graphics ')
-    output.produce_graphics()
-    t_end_graphics = timer.time()
-    sys.stdout.write("\nOutput Successful. Graphics stored in: {}".format(config.graphic_dir))
-    sys.stdout.write(
-        "\nTime to produce graphics: {}. Total Run Time: {} seconds".format(str(t_end_graphics - t_start_graphics),
-                                                                            str((t_end_sim - t_start_sim) +
-                                                                                (t_end_graphics - t_start_graphics))))
+    def _show_final_messages(self, graphics_prod_time: float, total_runtime: float) -> None:
+        """
+        Shows the messages of the end of the simulation
+        """
+        sys.stdout.write(
+            f"Output Successful. Graphics stored in: {config.graphic_dir}")
+        sys.stdout.write(f"Time to produce graphics: {graphics_prod_time}.")
+        sys.stdout.write(f"Total Run Time: {total_runtime} seconds")
 
+    def _daily_simulation(self) -> None:
+        """Executes the daily simulation routines."""
 
-def daily_simulation():
-    """Executes the daily simulation routines."""
+        routines.daily_animal_routine(
+            state.animal_management, state.feed, weather, time)
+        routines.daily_manure_storage_routine(
+            state.manure_storage, state.animal_management)
+        routines.daily_fields_routine(
+            state.fields, state.manure_storage, weather, time)
+        routines.daily_feed_routine(state.feed, state.fields, state.animal_management,
+                                    output.reports['feed_storage_report'])
 
-    # Daily routines
-    routines.daily_animal_routine(state.animal_management, state.feed, weather, time)
-    routines.daily_manure_storage_routine(state.manure_storage, state.animal_management)
-    routines.daily_fields_routine(state.fields, state.manure_storage, weather, time)
-    routines.daily_feed_routine(state.feed, state.fields, state.animal_management,
-                                output.reports['feed_storage_report'])
+        output.daily_update(state, weather, time)
+        self._advance_time()
 
-    #
-    # Daily Output Updates
-    #
-    output.daily_update(state, weather, time)
+    def _advance_time(self, print_day: Optional[bool] = False) -> None:
+        """
+        Advances time and increments simulation_day
+        """
+        if print_day:
+            print("simulating: " + time.to_str())
+        time.advance()
+        state.animal_management.simulation_day += 1
 
-    # print("simulating: " + time.to_str()) # Print out current day of simulation
-    time.advance()
-    # have to increment simulation_day here so that the daily output has the correct simulation day
-    state.animal_management.simulation_day += 1
+    def _annual_simulation(self) -> None:
+        """Executes the annual simulation routines.
 
+        Writes the annual report to the output files
+        Flushes the data in the output object
+        Resets the state for the following year
+        """
 
-def annual_simulation():
-    """Executes the annual simulation routines.
+        # Pre-annual routines
+        routines.annual_fields_routine(state.fields, time)
+        routines.annual_feed_routine(state.feed)
 
-    Writes the annual report to the output files
-    Flushes the data in the output object
-    Resets the state for the following year
-    """
+        case = 0
+        while not time.end_year():
+            if time.day % 50 == 0:
+                sys.stdout.write("\b")
+                if case == 0:
+                    sys.stdout.write("—")
+                    case += 1
+                elif case == 1:
+                    sys.stdout.write("\\")
+                    case += 1
+                elif case == 2:
+                    sys.stdout.write("|")
+                    case += 1
+                else:
+                    sys.stdout.write("/")
+                    case = 0
 
-    # Pre-annual routines
-    routines.annual_fields_routine(state.fields, time)
-    routines.annual_feed_routine(state.feed)
+            self._daily_simulation()
 
-    case = 0
-    while not time.end_year():
-        if time.day % 50 == 0:
-            sys.stdout.write("\b")
-            if case == 0:
-                sys.stdout.write("—")
-                case += 1
-            elif case == 1:
-                sys.stdout.write("\\")
-                case += 1
-            elif case == 2:
-                sys.stdout.write("|")
-                case += 1
-            else:
-                sys.stdout.write("/")
-                case = 0
+        # Post-Annual Routines
+        state.annual_mass_balance(time)
+        output.annual_updates(state, weather, time)
+        output.write_annual_reports()
+        output.annual_flushes()
+        state.annual_reset()
+        time.advance()
 
-        daily_simulation()
+    def _initialize_simulation(self, file_path: Path) -> None:
+        """Reads the json file, writes information to the simulation variables.
 
-    # Post-Annual Routines
-    state.annual_mass_balance(time)
-    output.annual_updates(state, weather, time)
-    output.write_annual_reports()
-    output.annual_flushes()
-    state.annual_reset()
-    time.advance()
+        Reads and interprets the (json) file at the given path. Compiles the
+        information into dictionaries and instantiates the simulation objects with
+        them. Assigns the objects to the global simulation variables.
 
+        Args:
+            file_path (Path): Path to the input json file
+            data (Dict[str, Any]): initial simulation data
 
-def initialize_simulation(file_path: Path, data):
-    """Reads the json file, writes information to the simulation variables.
+        Raises:
+            InvalidJSONFileError: If the json file at the given path does not
+                conform with the format required
+        """
 
-    Reads and interprets the (json) file at the given path. Compiles the
-    information into dictionaries and instantiates the simulation objects with
-    them. Assigns the objects to the global simulation variables.
+        global config, state, output, weather, time
 
-    Args:
-        file_path (Path): Path to the input json file
-        data: initial simulation data
+        print(f"Initializing simulation environemnt from {file_path}")
+        try:
+            data = read_json_file(file_path)
+            config = Config(data['config'], data['weather'])
 
-    Raises:
-        InvalidJSONFileError: If the json file at the given path does not
-            conform with the format required
-    """
+            if config.set_seed:
+                random.seed(config.seed)
+                numpy.random.seed(config.seed)
 
-    global config, state, output, weather, time
+            weather = Weather(data['weather'], config)
+            time = Time(config)
+            state = State(data['farm'], config, weather, time)
+            output = OutputHandler(classes.read_json_file(
+                get_base_dir() / 'input/output' / data['output']), state)
 
-    # Instantiate objects using dictionary data from .json file
-    try:
-        config = Config(data['config'], data['weather'])
+        except errors.JSONfileData as e:
+            print(
+                f"JSON FILE ERROR: {file_path.name}\n\t{e.section} Section\n{e.msg}\n")
+            raise errors.InvalidJSONfile(file_path.name)
 
-        if config.set_seed:
-            random.seed(config.seed)
-            numpy.random.seed(config.seed)
-
-        weather = Weather(data['weather'], config)
-        time = Time(config)
-        state = State(data['farm'], config, weather, time)
-        output = OutputHandler(classes.read_json_file(get_base_dir() / 'input/output' / data['output']), state)
-
-    except errors.JSONfileData as e:
-        print("JSON FILE ERROR: " +
-              "{} \n\t{} Section\n{}\n".format(file_path.name, e.section, e.msg))
-        raise errors.InvalidJSONfile(file_path.name)
+        output.initialize_dir(config.csv_dir, config.graphic_dir)
+        output.initialize_reports()
