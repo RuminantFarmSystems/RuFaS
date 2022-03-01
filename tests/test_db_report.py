@@ -4,26 +4,62 @@ File name: test_db_report.py
 Description: Implements test cases
 Author(s): Militsa Sotirova, militsasotirova@gmail.com
 """
-import copy
 import os
+import sqlite3
 
 import pytest
 from pathlib import Path
+from mock.mock import MagicMock, PropertyMock
 
+from RUFAS.output_handler.reports import BaseReport
 from RUFAS.output_handler.reports.db_report import unpack_input_json
 from RUFAS.output_handler.reports.db_report import DBReport
 
 
+class MyCursor:
+    def execute(self, arg1, arg2):
+        assert isinstance(arg1, str)
+        assert isinstance(arg2, tuple)
+
+    def executemany(self, arg1, arg2):
+        assert isinstance(arg1, str)
+        assert isinstance(arg2, list)
+
+
 @pytest.fixture
-def db_report_instance():
-    data = {
-        "produce_csv": False,
+def output_json_data():
+    return {
+        "produce_csv": True,
         "produce_graphics": False,
         "report_name": "rufas_test",
         "version": "pre_v1",
         "user": "default"
     }
-    return DBReport(data, Path("input/animal_management.json"))
+
+
+@pytest.fixture
+def db_report_instance(output_json_data):
+    # Temporarily change the current working directory to the MASM folder so
+    # that the constructor can find the files using the Paths it specifies.
+    current_working_directory = os.getcwd()
+    os.chdir(current_working_directory[:current_working_directory.rindex("/")])
+
+    db = DBReport(output_json_data, Path("input/animal_management.json"))
+
+    # Change working directory back to original.
+    os.chdir(current_working_directory)
+
+    return db
+
+
+@pytest.fixture
+def base_report_instance(output_json_data):
+    return BaseReport(output_json_data)
+
+
+@pytest.fixture
+def cursor_instance():
+    return MyCursor()
 
 
 def test_unpack_input_json():
@@ -50,57 +86,87 @@ def test_unpack_input_json():
     os.chdir(current_working_directory)
 
 
-def test_initialize():
+def test_initialize(mocker, db_report_instance, base_report_instance):
     """Unit test for function initialize in file
     RUFAS/output_handler/reports/db_report.py"""
-    # Nothing to test as this function explicitly does nothing.
-    assert True
+    # This function explicitly does nothing, so this ensures that the
+    # overridden superclass method is not called.
+    spy = mocker.spy(base_report_instance, 'initialize')
+    db_report_instance.initialize()
+    assert spy.call_count == 0
 
 
-def test_write_headers():
+def test_write_headers(mocker,  db_report_instance, base_report_instance):
     """Unit test for function write_headers in file
     RUFAS/output_handler/reports/db_report.py"""
-    # Nothing to test as this function explicitly does nothing.
-    assert True
+    # This function explicitly does nothing, so this ensures that the
+    # overridden superclass method is not called.
+    spy = mocker.spy(base_report_instance, 'write_headers')
+    db_report_instance.write_headers(None, None)
+    assert spy.call_count == 0
 
 
-def test_produce_report_graphics():
+def test_produce_report_graphics(mocker,  db_report_instance,
+                                 base_report_instance):
     """Unit test for function initialize in file
     RUFAS/output_handler/reports/db_report.py"""
-    # Nothing to test as this function explicitly does nothing.
-    assert True
+    # This function explicitly does nothing, so this ensures that the
+    # overridden superclass method is not called.
+    spy = mocker.spy(base_report_instance, 'produce_report_graphics')
+    db_report_instance.produce_report_graphics()
+    assert spy.call_count == 0
 
 
-def test_finalize():
+def test_finalize(db_report_instance):
     """Unit test for function finalize in file
     RUFAS/output_handler/reports/db_report.py"""
-    # I wasn't sure how to test this.
-    pass
+    # This test mocks the Connection attribute of DBReport to ensure that
+    # calling finalize() calls commit() once.
+    db_report_instance.conn = MagicMock()
+    db_report_instance.finalize(None, None, None)
+    db_report_instance.conn.commit.assert_called_once()
 
 
-def test_store_results_setup():
+def test_get_cursor(db_report_instance):
+    """Unit test for function get_cursor in file
+    RUFAS/output_handler/reports/db_report.py"""
+    db_report_instance.conn = MagicMock()
+    _ = db_report_instance.get_cursor()
+    db_report_instance.conn.cursor.assert_called_once()
+
+
+def test_store_results_setup(mocker, db_report_instance, cursor_instance):
     """Unit test for function store_results_setup in file
     RUFAS/output_handler/reports/db_report.py"""
-    # My plan for testing this was to create a sort of “sandbox” copy of
-    # the past_outputs.sqlite file. In order to prevent lack of maintenance
-    # on the sandbox version of the file, I wanted to create a clean copy of the
-    # current state of the database in the fixture of the unit tests.
-    # However, even if I did so, I couldn't test that this function inserts the
-    # proper rows into the database because the changes aren't committed
-    # until finalize() is called at the very end of a simulation run. I don't
-    # want to change this functionality - I implemented it this way so that
-    # if an error caused the simulation to crash, there would be no database
-    # entries from it. Thus, I am not sure how to test this function.
-    pass
+    db_report_instance.get_cursor = MagicMock(return_value=cursor_instance)
+    execute_spy = mocker.spy(cursor_instance, 'execute')
+
+    db_report_instance.store_results_setup({})
+
+    # Ensures that execute() was called exactly as many times as it appears
+    # in store_results_setup().
+    assert execute_spy.call_count == 1
 
 
-def test_write_annual_report():
+def test_write_annual_report(mocker, db_report_instance,
+                             base_report_instance, cursor_instance):
     """Unit test for function write_annual_report in file
     RUFAS/output_handler/reports/db_report.py"""
-    # See comment for test_store_results_setup() - I am also not sure how to
-    # test this function since it is all insertions into the database that
-    # aren't committed until finalize().
-    pass
+    base_class_spy = mocker.spy(base_report_instance, 'write_annual_report')
+
+    db_report_instance.get_cursor = MagicMock(return_value=cursor_instance)
+    execute_spy = mocker.spy(cursor_instance, 'execute')
+    execute_many_spy = mocker.spy(cursor_instance, 'executemany')
+
+    db_report_instance.write_annual_report()
+
+    # Ensures that the overridden superclass method was not called.
+    assert base_class_spy.call_count == 0
+
+    # Ensures that execute() and executemany() were called exactly as many
+    # times as they appear in write_annual_report().
+    assert execute_spy.call_count == 4
+    assert execute_many_spy.call_count == 5
 
 
 def test_daily_update():
@@ -169,4 +235,3 @@ def test_annual_flush(db_report_instance):
 
     for variable in db_report_instance.annual_manure_variables:
         assert db_report_instance.annual_manure_variables[variable][2] == []
-

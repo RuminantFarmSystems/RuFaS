@@ -345,9 +345,26 @@ class DBReport(BaseReport):
         pass
 
     def finalize(self, state, weather, time):
+        """
+        Commits the changes made to the database if the settings of this
+        simulation has specified to do so.
+
+        Args:
+            state: instance of the State class
+            weather: instance of the Weather class
+            time: instance of the Timer class
+        """
         if self.produce_csv:
             # save changes to database
             self.conn.commit()
+
+    def get_cursor(self):
+        """
+        Returns a Cursor object from this instance's Connection.
+
+        Returns: a Cursor object from this instance's Connection.
+        """
+        return self.conn.cursor()
 
     def store_results_setup(self, input_json):
         """
@@ -357,7 +374,7 @@ class DBReport(BaseReport):
             input_json: dictionary representing the full JSON input for the run
         """
         try:
-            c = self.conn.cursor()
+            c = self.get_cursor()
 
             timestamp = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
             values = (self.report_name, timestamp, json.dumps(input_json),
@@ -369,6 +386,8 @@ class DBReport(BaseReport):
             c.execute(insert_statement, values)
 
             self.curr_result_id = c.lastrowid
+
+            print('hey')
 
         except Exception as e:
             print("The program has encountered the following exception while "
@@ -383,7 +402,7 @@ class DBReport(BaseReport):
         Method overridden to write to database instead of CSV.
         """
         try:
-            c = self.conn.cursor()
+            c = self.get_cursor()
             # daily table writes
             # daily_results table
             insert_statement = \
