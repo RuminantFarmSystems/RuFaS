@@ -70,7 +70,16 @@ class LifeCycleManager:
         '3': 0,
         'greater_than_3': 0
     }
-
+    num_cow_for_lactation_stage = {
+        '1': 0,
+        '2': 0,
+        '3': 0,
+        '4': 0,
+        '5': 0,
+        '6': 0,
+        '7': 0,
+        '8': 0
+    }
     preg_check_num_h = 0
     preg_check_num = 0
     CIDR_count = 0
@@ -464,6 +473,9 @@ class LifeCycleManager:
 
         for cull_reason in self.cull_reason_stats:
             self.cull_reason_stats[cull_reason] = 0
+        
+        for milking_stage in self.num_cow_for_lactation_stage:
+            self.num_cow_for_lactation_stage[milking_stage] = 0
 
         # calf to heiferI
         for index, calf in enumerate(calves):
@@ -703,8 +715,34 @@ class LifeCycleManager:
                     self.total_dry_DMI += cow.DMIest
                     self.dry_cow_num += 1
 
-                if cow.days_in_milk >0 and cow.days_in_preg == 0:
+                if cow.days_in_milk > 50 and cow.days_in_preg == 0 and not cow.do_not_breed:
                     self.open_cow_num += 1
+
+                if cow.days_in_milk > 0:
+                    if cow.days_in_milk > 0 and cow.days_in_milk < 51:
+                        milking_stage = 1
+                        self.num_cow_for_lactation_stage['1'] += 1
+                    elif cow.days_in_milk > 50 and cow.days_in_milk < 101:
+                        milking_stage = 2
+                        self.num_cow_for_lactation_stage['2'] += 1
+                    elif cow.days_in_milk > 100 and cow.days_in_milk < 151:
+                        milking_stage = 3
+                        self.num_cow_for_lactation_stage['3'] += 1
+                    elif cow.days_in_milk > 150 and cow.days_in_milk < 201:
+                        milking_stage = 4
+                        self.num_cow_for_lactation_stage['4'] += 1
+                    elif cow.days_in_milk > 200 and cow.days_in_milk < 251:
+                        milking_stage = 5
+                        self.num_cow_for_lactation_stage['5'] += 1
+                    elif cow.days_in_milk > 250 and cow.days_in_milk < 301:
+                        milking_stage = 6
+                        self.num_cow_for_lactation_stage['6'] += 1
+                    elif cow.days_in_milk > 300 and cow.days_in_milk < 351:
+                        milking_stage = 7
+                        self.num_cow_for_lactation_stage['7'] += 1
+                    else:
+                        milking_stage = 8
+                        self.num_cow_for_lactation_stage['8'] += 1
 
                 if cow.days_in_preg > 0:
                     self.preg_cow_num, self.avg_days_in_preg = \
@@ -812,10 +850,7 @@ class LifeCycleManager:
             if date >= 1:
                 if cow.days_born == cow.ai_day:
                     self.num_ai_21_days += 1
-                if cow.days_in_preg == 0 and not cow.do_not_breed:
-                    # if cow.repro_program in ['ED'] and cow.days_in_milk > AnimalBase.config['voluntary_waiting_period']:
-                    #     self.num_cow_open_acc_21_days += 1
-                    # elif cow.days_in_milk > AnimalBase.config['tai_program_start_day']:
+                if cow.days_in_preg == 0 and cow.days_in_milk > 50 and not cow.do_not_breed:
                     self.num_cow_open_acc_21_days += 1
                 if cow.days_in_preg == 1:
                     self.num_preg_21_days += 1   
@@ -837,19 +872,19 @@ class LifeCycleManager:
 
         # income/cost calculation
         self.cost_hormone_heifer = 1.83 * self.GnRH_injection_num_h + 2.29 * self.PGF_injection_num_h + 12.53 * self.CIDR_count
-        self.cost_ed_heifer = 0.03 * self.ed_period_h
+        self.cost_ed_heifer = 0.11 * self.ed_period_h
         self.cost_ai_heifer = 10 * self.ai_num_h
         self.cost_semen_heifer = 15 * self.semen_num_h
         self.cost_pc_heifer = 4.37 * self.preg_check_num_h
 
         self.cost_hormone_heifer_more = 1.83 * self.GnRH_injection_num_h + 2.29 * self.PGF_injection_num_h + 12.53 * self.CIDR_count - self.sold_heifer_hormone_cost
-        self.cost_ed_heifer_more = 0.03 * self.ed_period_h - self.sold_heifer_ed_cost
+        self.cost_ed_heifer_more = 0.11 * self.ed_period_h - self.sold_heifer_ed_cost
         self.cost_ai_heifer_more = 10 * self.ai_num_h - self.sold_heifer_ai_cost
         self.cost_semen_heifer_more = 15 * self.semen_num_h - self.sold_heifer_semen_cost
         self.cost_pc_heifer_more = 4.37 * self.preg_check_num_h - self.sold_heifer_pc_cost          
 
         self.cost_hormone = 1.83 * self.GnRH_injection_num + 2.29 * self.PGF_injection_num
-        self.cost_ed = 0.03 * self.ed_period 
+        self.cost_ed = 0.11 * self.ed_period 
         self.cost_ai = 10 * self.ai_num
         self.cost_semen = 15 * self.semen_num
         self.cost_pc = 4.37 * self.preg_check_num
@@ -920,7 +955,6 @@ class LifeCycleManager:
                     self.num_cow_for_parity[parity] / self.cow_num * 100
         return animals_added, ids_removed, calves_born, calves, heiferIs, \
                heiferIIs, heiferIIIs, cows
-
     @staticmethod
     def calc_average(num_values, cur_avg, new_value):
         """

@@ -12,7 +12,7 @@
 	},
 	"animal_config": {
 		"management_decisions": {
-			"breeding_start_day_h": 360,
+			"breeding_start_day_h": 380,
 			"heifer_repro_cull_time": 500,
 			"heifer_repro_method": "TAI",
 			"cow_repro_method": "TAI",

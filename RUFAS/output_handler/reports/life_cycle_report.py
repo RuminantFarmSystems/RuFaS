@@ -115,6 +115,10 @@ class LifeCycleReport(BaseReportDriver):
             for cull_reason in LifeCycleManager.cull_reason_stats:
                 self.herd_structure[cull_reason + '_num'] = \
                     ['life_cycle_manager.cull_reason_stats[\'' + cull_reason + '\']', '', []]
+            
+            for milking_satge in LifeCycleManager.num_cow_for_lactation_stage:
+                self.herd_structure['stage_' + str(milking_satge)] = \
+                    ['life_cycle_manager.num_cow_for_lactation_stage[\'' + str(milking_satge) + '\']', '', []]
                         
             self.reproduction_performance = {
                 'CIDR_count': ['life_cycle_manager.CIDR_count', '', []],
