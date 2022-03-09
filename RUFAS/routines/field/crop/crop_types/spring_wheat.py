@@ -9,10 +9,10 @@ class SpringWheat(BaseCrop):
         """GENERAL PLANT INFO"""
 
         spring_wheat_data = data
-        self.grow_years = spring_wheat_data['grow_years']
+        self.plant_years = spring_wheat_data['plant_years']
         self.repeat = spring_wheat_data['repeat']
-        self.planting_date = spring_wheat_data['planting_date']
-        self.harvest_date = spring_wheat_data['harvest_date']
+        self.planting_day = spring_wheat_data['planting_day']
+        self.harvest_day = spring_wheat_data['harvest_day']
         self.harvest_type = spring_wheat_data['harvest_type']
 
         self.crop_name = crop_name

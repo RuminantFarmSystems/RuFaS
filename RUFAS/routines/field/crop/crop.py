@@ -202,7 +202,7 @@ def is_kill_year(crop, time):
     if len(crop.grow_regimen) == time.year or \
             crop.current_crop.crop_name != crop.grow_regimen[time.year].crop_name or \
             crop.current_crop.crop_type == 'annual':
-        crop.current_crop.kill_day = crop.current_crop.harvest_date
+        crop.current_crop.kill_day = crop.current_crop.harvest_day
         return True
     return False
 
@@ -278,7 +278,7 @@ class Crop:
         """
 
         for crop_type in self.crops_list:
-            for year in crop_type.grow_years:
+            for year in crop_type.plant_years:
                 # checks requested grow years against model boundaries
                 if year - time.start_year >= len(self.grow_regimen) or year - time.start_year < 0:
                     print('\nCannot grow', crop_type.crop_name, 'in year', year,
@@ -308,11 +308,11 @@ class Crop:
         self.current_crop.NDF_yield_annual = 0.0
         self.current_crop.yield_annual = 0.0
 
-    def iterate_planting_date(self, time):
+    def iterate_planting_day(self, time):
         if time.day >= len(time.years[time.year - 1]):
             pass
         else:
-            self.current_crop.planting_date = time.day + 1
+            self.current_crop.planting_day = time.day + 1
 
 
 def calculate_start(soil, crop, field_management, weather, time):
@@ -340,7 +340,7 @@ def calculate_start(soil, crop, field_management, weather, time):
     manure_management = field_management.managed_applications['manure']
     # C.1.B.1/2
     if crop_type.harvest_type == 'scheduled':
-        if time.day == crop_type.planting_date:
+        if time.day == crop_type.planting_day:
             if time.calendar_year in manure_management.rotation_years:
                 manure_management.schedule_application(time)
             if time.calendar_year in fert_management.rotation_years:
@@ -349,7 +349,7 @@ def calculate_start(soil, crop, field_management, weather, time):
             crop_type.growing = True
     else:
         if crop_type.crop_type == 'annual':
-            if time.day == crop_type.planting_date and check_conditions_plant(soil, weather, time):
+            if time.day == crop_type.planting_day and check_conditions_plant(soil, weather, time):
                 # C.1.B.1
                 if time.calendar_year in manure_management.rotation_years or \
                         time.calendar_year in fert_management.rotation_years:
@@ -365,20 +365,20 @@ def calculate_start(soil, crop, field_management, weather, time):
                             manure_management.iterate_application(time)
                         if time.calendar_year in fert_management.rotation_years:
                             fert_management.iterate_application(time)
-                        crop.iterate_planting_date(time)
+                        crop.iterate_planting_day(time)
                 # C.1.B.2
                 else:
                     crop_type.planted = True
                     crop_type.growing = True
-            elif time.day == crop_type.planting_date:
+            elif time.day == crop_type.planting_day:
                 if time.calendar_year in manure_management.rotation_years:
                     manure_management.iterate_application(time)
                 if time.calendar_year in fert_management.rotation_years:
                     fert_management.iterate_application(time)
-                crop.iterate_planting_date(time)
+                crop.iterate_planting_day(time)
         # C.1.B.3/4
         else:
-            if time.year == 1 and time.day > crop_type.planting_date:
+            if time.year == 1 and time.day > crop_type.planting_day:
                 pass
             # C.1.B.3
             elif not in_dormancy(crop, time) and \
