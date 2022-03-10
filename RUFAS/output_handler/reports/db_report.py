@@ -323,7 +323,8 @@ class DBReport(BaseReport):
 
     def __del__(self):
         # close connection
-        if self.produce_csv or self.conn is not None:
+        close_conn = self.produce_csv and self.conn is not None
+        if close_conn:
             self.conn.close()
 
     def initialize(self):
