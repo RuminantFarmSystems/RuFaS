@@ -27,7 +27,7 @@ class SugarBeet(BaseCrop):
         self.planted = False
         self.growing = False
 
-        self.fix_nitrogen = True  # TODO: change back
+        self.fix_nitrogen = False
 
         # ===================================================================
         ''' HEAT UNIT DATA '''
