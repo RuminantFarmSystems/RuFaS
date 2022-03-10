@@ -312,6 +312,7 @@ class DBReport(BaseReport):
         # For the database report, we are not producing a CSV file. This
         # check is to see if the user enabled the database report in the
         # input files.
+        self.conn = None
         if self.produce_csv:
             self.conn = sqlite3.connect(self.db_file)
             self.conn.row_factory = sqlite3.Row
@@ -386,8 +387,6 @@ class DBReport(BaseReport):
             c.execute(insert_statement, values)
 
             self.curr_result_id = c.lastrowid
-
-            print('hey')
 
         except Exception as e:
             print("The program has encountered the following exception while "

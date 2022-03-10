@@ -231,6 +231,8 @@ class Pen:
         self.dry_total = None
         self.lactating_total = None
 
+        self.num_animals_lst = []
+
         self.reset_manure()
 
     def get_id(self):
