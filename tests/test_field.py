@@ -98,8 +98,8 @@ def test_annual_reset():
     pass
 
 
-def test_iterate_planting_date():
-    """Unit test for function iterate_planting_date in file routines/field/crop/crop.py"""
+def test_iterate_planting_day():
+    """Unit test for function iterate_planting_day in file routines/field/crop/crop.py"""
     pass
 
 
