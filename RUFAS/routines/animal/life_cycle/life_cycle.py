@@ -447,7 +447,7 @@ class LifeCycleManager:
                 ids_removed.append(cow.id)
                 del cows[index]
 
-                if cow.cull_reason != c.DEATH_CULL:
+                if cow.cull_reason != const.DEATH_CULL:
                     daily_cows_culled += 1
 
             else:
