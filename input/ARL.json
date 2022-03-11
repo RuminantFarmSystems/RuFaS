@@ -17,7 +17,7 @@
     {
         "fields": {
             "field_1": {
-                "soil": "ARL_soil.json",
+                "soil": "ARL_soil_tillage.json",
                 "crop": "ARL_rotation.json",
                 "field_management": "ARL_no_fert_field_management.json"
             }

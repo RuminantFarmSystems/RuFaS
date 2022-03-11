@@ -1,6 +1,5 @@
 import math
 
-
 def update_all(soil, crop_type, weather, time):
     """
     Description:
@@ -35,7 +34,6 @@ def residue_partitioning(soil, crop_type, weather, time):
 
     # S.6.B.I.1
     soil.AG_lignin_res_percent += 0.12 * weather.rainfall[time.year - 1][time.day - 1] * 0.01
-
     # S.6.B.I.2
     AG_L_to_N = 0
     fr_N = 0.4  # TODO calculate in RuFaS [C.5.B.1] but not "accurate" for carbon use
@@ -50,7 +48,7 @@ def residue_partitioning(soil, crop_type, weather, time):
     K2 = 0.28
     AG_met_active_decomp = K2
 
-    for layer in soil.soil_layers:
+    for index, layer in enumerate(soil.soil_layers):
         # above ground metabolic residue
         # S.6.B.I.5
         layer.AG_met_to_C_active = AG_met_active_decomp * layer.M_d * soil.T_d * layer.AG_met
@@ -59,8 +57,13 @@ def residue_partitioning(soil, crop_type, weather, time):
         AG_met_to_BG_met = layer.AG_met * layer.tillage_percent
 
         # S.6.B.I.4 / S.6.B.I.7
-        layer.AG_met += soil.residue_harvest * AG_met_percent - (
+        if index == 0:
+            layer.AG_met += soil.residue_harvest * AG_met_percent - (
                 (layer.AG_met_to_C_active - AG_met_to_BG_met) + AG_met_to_BG_met)
+        else:
+            layer.AG_met += 0 * AG_met_percent - (
+                    (layer.AG_met_to_C_active - AG_met_to_BG_met) + AG_met_to_BG_met)
+
 
         # above ground structural residue
         K1 = 0.076
@@ -73,17 +76,27 @@ def residue_partitioning(soil, crop_type, weather, time):
         layer.AG_struct_to_C_slow = AG_struct_decomp * layer.M_d * soil.T_d * layer.AG_struct
 
         # S.6.B.I.11
-        AG_struct_to_BG_struct = layer.AG_struct * layer.tillage_percent
+        if index == 0:
+            AG_struct_to_BG_struct = layer.AG_struct * layer.tillage_percent
+        else:
+            AG_struct_to_BG_struct = 0
 
-        # S.6.B.I.8 / S.6.B.I.12
-        layer.AG_struct += ((soil.residue_harvest * (1 - AG_met_percent)) - AG_struct_to_BG_struct) - \
-                          (layer.AG_struct_to_C_active + layer.AG_struct_to_C_slow)
+            # S.6.B.I.8 / S.6.B.I.12
+        if index == 0:
+            layer.AG_struct += ((soil.residue_harvest * (1 - AG_met_percent)) - AG_struct_to_BG_struct) - \
+                            (layer.AG_struct_to_C_active + layer.AG_struct_to_C_slow)
+        else:
+            layer.AG_struct += ((0 * (1 - AG_met_percent)) - AG_struct_to_BG_struct) - \
+                               (layer.AG_struct_to_C_active + layer.AG_struct_to_C_slow)
 
         # below ground metabolic residue and roots
         # S.6.B.II
 
         # S.6.B.II.1
-        residue_incorp = layer.tillage_percent * soil.residue_harvest
+        if index == 0:
+            residue_incorp = layer.tillage_percent * soil.residue_harvest
+        else:
+            residue_incorp = layer.tillage_percent * 0
 
         # S.6.B.II.2
         lignin_res_percent = 0

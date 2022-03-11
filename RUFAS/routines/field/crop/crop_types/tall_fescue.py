@@ -12,6 +12,7 @@ class TallFescue(BaseCrop):
         self.repeat = tall_fescue_data['repeat']
         self.planting_day = tall_fescue_data['planting_day']
         self.harvest_day = tall_fescue_data['harvest_day']
+        self.planting_order = tall_fescue_data['planting_order'].lower()
 
         if tall_fescue_data['harvest_type'] != 'optimal':
             print('Perennial crops are always optimally harvested')
@@ -29,6 +30,7 @@ class TallFescue(BaseCrop):
         self.kill_year = False
         self.planted = False
         self.growing = False
+        self.killed = False
 
         self.fix_nitrogen = False
 
@@ -43,7 +45,6 @@ class TallFescue(BaseCrop):
         # Internally calculated input
         self.accumulated_HU = 0.0
         self.prev_accumulated_HU = 0.0
-        self.fr_PHU_harvest_min = 0.9
 
         # output
         self.fr_PHU = 0.0
@@ -58,7 +59,8 @@ class TallFescue(BaseCrop):
         self.fr_LAI_1 = 0.01
         self.fr_LAI_2 = 0.95
         self.fr_PHU_sen = 0.8
-        self.fr_PHU_harvest = 0.3
+        self.fr_PHU_harvest = 0.6
+        self.fr_PHU_harvest_min = 0.9
         self.LAI_max = 4
         self.LAI_min = 0.75
 

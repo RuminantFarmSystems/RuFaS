@@ -14,6 +14,7 @@ class Potato(BaseCrop):
         self.planting_day = potato_data['planting_day']
         self.harvest_day = potato_data['harvest_day']
         self.harvest_type = potato_data['harvest_type']
+        self.planting_order = potato_data['planting_order'].lower()
 
         self.crop_name = crop_name
         self.crop_type = 'annual'
@@ -25,6 +26,7 @@ class Potato(BaseCrop):
         self.kill_year = True
         self.planted = False
         self.growing = False
+        self.killed = False
 
         self.fix_nitrogen = False
 
@@ -39,7 +41,6 @@ class Potato(BaseCrop):
         # Internally calculated input
         self.accumulated_HU = 0.0
         self.prev_accumulated_HU = 0.0
-        self.fr_PHU_harvest_min = 0.7
 
         # output
         self.fr_PHU = 0.0
@@ -55,6 +56,7 @@ class Potato(BaseCrop):
         self.fr_LAI_2 = 0.95
         self.fr_PHU_sen = 0.90
         self.fr_PHU_harvest = 1.2
+        self.fr_PHU_harvest_min = 0.7
         self.LAI_max = 4
         self.LAI_min = 0
 
@@ -158,8 +160,8 @@ class Potato(BaseCrop):
         self.gamma_wu = 0
 
         self.biomass_dry_down_percent = 0.0
-        self.DM_harvest_percent = 0.416  # TODO: Hard coded dry matter percent at harvest
-        self.NDF_harvest_percent = 0.0
+        self.DM_harvest_percent = 0.0001  # TODO: Hard coded dry matter percent at harvest
+        self.NDF_harvest_percent = 0.416
 
         self.bio_AG = 0
         self.yield_max = 0

@@ -7,11 +7,13 @@ class Alfalfa(BaseCrop):
         super().__init__()
 
         """GENERAL PLANT INFO"""
+
         alfalfa_data = data
         self.plant_years = alfalfa_data['plant_years']
         self.repeat = alfalfa_data['repeat']
         self.planting_day = alfalfa_data['planting_day']
         self.harvest_day = alfalfa_data['harvest_day']
+        self.planting_order = alfalfa_data['planting_order'].lower()
 
         # if alfalfa_data['harvest_type'] != 'optimal':
         #     print('Perennial crops are always optimally harvested')
@@ -28,7 +30,7 @@ class Alfalfa(BaseCrop):
         self.kill_year = False
         self.planted = False
         self.growing = False
-        self.harvested = False
+        self.killed = False
 
         self.fix_nitrogen = True
 
@@ -43,7 +45,6 @@ class Alfalfa(BaseCrop):
         # Internally calculated input
         self.accumulated_HU = 0.0
         self.prev_accumulated_HU = 0.0
-        self.fr_PHU_harvest_min = 0.9
 
         # output
         self.fr_PHU = 0.0
@@ -59,6 +60,7 @@ class Alfalfa(BaseCrop):
         self.fr_LAI_2 = 0.95
         self.fr_PHU_sen = 0.90
         self.fr_PHU_harvest = 1.2
+        self.fr_PHU_harvest_min = 0.9
         self.LAI_max = 4
         self.LAI_min = 0.75
 

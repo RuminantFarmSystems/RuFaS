@@ -324,6 +324,54 @@ class FieldReport(BaseReportDriver):
                                         'fr_N': ['crop_type.fr_N', '', []],
                                         'precipitation': ['weather.rainfall[time.year - 1][time.day - 1]', 'mm', []],
                                         'T_d': ['soil.T_d', '', []],
+                                        'AG_met_layer0': ['soil.soil_layers[0].AG_met', '%', []],
+                                        'AG_met_layer1': ['soil.soil_layers[1].AG_met', '%', []],
+                                        'AG_met_layer2': ['soil.soil_layers[2].AG_met', '%', []],
+                                        'AG_met_layer3': ['soil.soil_layers[3].AG_met', '%', []],
+                                        'AG_struct_layer0': ['soil.soil_layers[0].AG_struct', '%', []],
+                                        'AG_struct_layer1': ['soil.soil_layers[1].AG_struct', '%', []],
+                                        'AG_struct_layer2': ['soil.soil_layers[2].AG_struct', '%', []],
+                                        'AG_struct_layer3': ['soil.soil_layers[3].AG_struct', '%', []],
+                                        'BG_met_layer0': ['soil.soil_layers[0].BG_met', '%', []],
+                                        'BG_met_layer1': ['soil.soil_layers[1].BG_met', '%', []],
+                                        'BG_met_layer2': ['soil.soil_layers[2].BG_met', '%', []],
+                                        'BG_met_layer3': ['soil.soil_layers[3].BG_met', '%', []],
+                                        'BG_struct_layer0': ['soil.soil_layers[0].BG_struct', '%', []],
+                                        'BG_struct_layer1': ['soil.soil_layers[1].BG_struct', '%', []],
+                                        'BG_struct_layer2': ['soil.soil_layers[2].BG_struct', '%', []],
+                                        'BG_struct_layer3': ['soil.soil_layers[3].BG_struct', '%', []],
+                                        'AG_struct_to_C_active_loss_layer0': [
+                                            'soil.soil_layers[0].AG_struct_to_C_active_loss', '%', []],
+                                        'AG_struct_to_C_active_loss_layer1': [
+                                            'soil.soil_layers[1].AG_struct_to_C_active_loss', '%', []],
+                                        'AG_struct_to_C_active_loss_layer2': [
+                                            'soil.soil_layers[2].AG_struct_to_C_active_loss', '%', []],
+                                        'AG_struct_to_C_active_loss_layer3': [
+                                            'soil.soil_layers[3].AG_struct_to_C_active_loss', '%', []],
+                                        'AG_struct_to_C_active_act_layer0': [
+                                            'soil.soil_layers[0].AG_struct_to_C_active_act', '%', []],
+                                        'AG_struct_to_C_active_act_layer1': [
+                                            'soil.soil_layers[1].AG_struct_to_C_active_act', '%', []],
+                                        'AG_struct_to_C_active_act_layer2': [
+                                            'soil.soil_layers[2].AG_struct_to_C_active_act', '%', []],
+                                        'AG_struct_to_C_active_act_layer3': [
+                                            'soil.soil_layers[3].AG_struct_to_C_active_act', '%', []],
+                                        'AG_struct_to_C_slow_loss_layer0': [
+                                            'soil.soil_layers[0].AG_struct_to_C_slow_loss', '%', []],
+                                        'AG_struct_to_C_slow_loss_layer1': [
+                                            'soil.soil_layers[1].AG_struct_to_C_slow_loss', '%', []],
+                                        'AG_struct_to_C_slow_loss_layer2': [
+                                            'soil.soil_layers[2].AG_struct_to_C_slow_loss', '%', []],
+                                        'AG_struct_to_C_slow_loss_layer3': [
+                                            'soil.soil_layers[3].AG_struct_to_C_slow_loss', '%', []],
+                                        'AG_struct_to_C_slow_act_layer0': [
+                                            'soil.soil_layers[0].AG_struct_to_C_slow_act', '%', []],
+                                        'AG_struct_to_C_slow_act_layer1': [
+                                            'soil.soil_layers[1].AG_struct_to_C_slow_act', '%', []],
+                                        'AG_struct_to_C_slow_act_layer2': [
+                                            'soil.soil_layers[2].AG_struct_to_C_slow_act', '%', []],
+                                        'AG_struct_to_C_slow_act_layer3': [
+                                            'soil.soil_layers[3].AG_struct_to_C_slow_act', '%', []],
                                         }
 
                 self.annual_variables = {'year': ['time.calendar_year', '', 0]

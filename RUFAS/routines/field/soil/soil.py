@@ -92,7 +92,8 @@ class Soil:
         self.slope_length = data['slope_length']
         self.manning = data['manning']
         self.field_size = data['field_size']
-        self.practice_factor = data['practice_factor']
+        # self.practice_factor = data['practice_factor']
+        self.tillage = data['tillage']
         self.sand = data['sand']
         self.silt = data['silt']
 

@@ -14,17 +14,19 @@ class SpringBarley(BaseCrop):
         self.planting_day = spring_barley_data['planting_day']
         self.harvest_day = spring_barley_data['harvest_day']
         self.harvest_type = spring_barley_data['harvest_type']
+        self.planting_order = spring_barley_data['planting_order'].lower()
 
         self.crop_name = crop_name
         self.crop_type = 'annual'
         self.harvest_quality = 'null'
-        self.feed_id = '11g'
-        self.raw_id = 11
+        self.feed_id = '10g'
+        self.raw_id = 10
 
         self.kill_day = -1
         self.kill_year = True
         self.planted = False
         self.growing = False
+        self.killed = False
 
         self.fix_nitrogen = False
 
@@ -39,7 +41,6 @@ class SpringBarley(BaseCrop):
         # Internally calculated input
         self.accumulated_HU = 0.0
         self.prev_accumulated_HU = 0.0
-        self.fr_PHU_harvest_min = 0.7
 
         # output
         self.fr_PHU = 0.0
@@ -55,6 +56,7 @@ class SpringBarley(BaseCrop):
         self.fr_LAI_2 = 0.95
         self.fr_PHU_sen = 0.90
         self.fr_PHU_harvest = 1.2
+        self.fr_PHU_harvest_min = 0.7
         self.LAI_max = 4
         self.LAI_min = 0
 

@@ -22,7 +22,7 @@ def daily_fields_routine(fields, manure_storage, weather, time):
 
         # If the crop is not planted yet, determine whether it is planted today
         # Necessary here so that field management can be scheduled prior to planting
-        if not crop_type.planted and not crop_type.harvested:
+        if not crop_type.planted and not crop_type.killed:
             calculate_start(soil, crop, field_management, weather, time)
 
         daily_field_management_routine(soil, manure_storage, field_management, weather, time)

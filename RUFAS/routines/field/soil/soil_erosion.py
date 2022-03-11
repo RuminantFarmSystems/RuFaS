@@ -47,7 +47,11 @@ def calc_sed(soil, crop, weather, time):
     peak_runoff = calc_peak_runoff(soil, weather, time)
     K = calc_K(soil)
     C = calc_C(soil, crop)
-    P = soil.practice_factor
+
+    #P = soil.practice_factor
+    # we get the corresponding tillage year mapped to using time.calendar_year as the key
+    P = soil.tillage[str(time.calendar_year)]
+
     LS = calc_LS(soil)
 
     sed = 11.8 * ((runoff * peak_runoff) ** 0.56) * K * C * P * LS

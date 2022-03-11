@@ -101,8 +101,8 @@ class FieldManagement:
             "tillage": {
                 'year': -1,
                 'day': -1,
-                'percent_incorporated': 0.8,
-                'percent_mixed': 0.6,
+                'percent_manure_incorporated': 0.8, #need to check this one out and potentially change to nutrient
+                'percent_manure_mixed': 0.6, #need to check this one out and potentially change to nutrient
                 'depth': 25.0
             }
         }
@@ -264,7 +264,7 @@ class FieldManagement:
                     app_data[variable_name] = self.management_data[variable_name][application]
 
                 self.applications[(app_data['year'], app_data['day'])] = \
-                        self.BaseApplication(app_data)
+                    self.BaseApplication(app_data)
 
         def populate_rotations(self, time):
             # if there are years in which this application type occurs
@@ -292,13 +292,17 @@ class FieldManagement:
             if time.day >= len(time.years[time.year - 1]):
                 pass
             else:
-                self.applications[(time.calendar_year, time.day + 1)] = \
-                    self.applications.pop(
-                        (
-                            (time.calendar_year, -1) if (time.calendar_year, -1) in self.applications
-                            else (time.calendar_year, time.day)
-                        )
-                    )
+                if (time.calendar_year, -1) in self.applications:
+                    new_date = (time.calendar_year, -1)
+                elif (time.calendar_year, time.day) in self.applications:
+                    new_date = (time.calendar_year, time.day)
+                else:
+                    # installed to handle double cropping + default applications
+                    new_date = None
+
+                if new_date is not None:
+                    self.applications[(time.calendar_year, time.day + 1)] = \
+                        self.applications.pop(new_date)
 
         def iterate_application(self, time):
             """
@@ -307,25 +311,33 @@ class FieldManagement:
             Args:
                 time: an instance of the Time class specified in classes.py
             """
-
             # if it is the last day of the current year
             if time.day == len(time.years[time.year - 1]):
                 if time.year < len(time.years):
-                    self.applications[(time.calendar_year, 1)] = \
-                        self.applications.pop(
-                            (
-                                (time.calendar_year, -1) if (time.calendar_year, -1) in self.applications
-                                else (time.calendar_year, time.day)
-                            )
-                        )
+
+                    if (time.calendar_year, -1) in self.applications:
+                        new_date = (time.calendar_year, -1)
+                    elif (time.calendar_year, time.day) in self.applications:
+                        new_date = (time.calendar_year, time.day)
+                    else:
+                        # installed to handle double cropping + default applications
+                        new_date = None
+
+                    if new_date is not None:
+                        self.applications[(time.calendar_year + 1, 1)] = \
+                            self.applications.pop(new_date)
             else:
-                self.applications[(time.calendar_year, time.day + 1)] = \
-                    self.applications.pop(
-                        (
-                            (time.calendar_year, -1) if (time.calendar_year, -1) in self.applications
-                            else (time.calendar_year, time.day)
-                        )
-                    )
+                if (time.calendar_year, -1) in self.applications:
+                    new_date = (time.calendar_year, -1)
+                elif (time.calendar_year, time.day) in self.applications:
+                    new_date = (time.calendar_year, time.day)
+                else:
+                    # installed to handle double cropping + default applications
+                    new_date = None
+
+                if new_date is not None:
+                    self.applications[(time.calendar_year, time.day + 1)] = \
+                        self.applications.pop(new_date)
 
         class BaseApplication:
             def __init__(self, app_data):

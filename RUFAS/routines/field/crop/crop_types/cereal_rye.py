@@ -1,27 +1,26 @@
 from .base_crop import BaseCrop
 
 
-class SugarBeet(BaseCrop):
+class CerealRye(BaseCrop):
 
     def __init__(self, crop_name, data):
         super().__init__()
 
         """GENERAL PLANT INFO"""
 
-        sugar_beet_data = data
-        self.plant_years = sugar_beet_data['plant_years']
-        self.repeat = sugar_beet_data['repeat']
-        self.planting_day = sugar_beet_data['planting_day']
-        self.harvest_day = sugar_beet_data['harvest_day']
-        self.harvest_type = sugar_beet_data['harvest_type']
-        self.planting_order = sugar_beet_data['planting_order'].lower()
+        cereal_rye_data = data
+        self.plant_years = cereal_rye_data['plant_years']
+        self.repeat = cereal_rye_data['repeat']
+        self.planting_day = cereal_rye_data['planting_day']
+        self.harvest_day = cereal_rye_data['harvest_day']
+        self.harvest_type = cereal_rye_data['harvest_type']
+        self.planting_order = cereal_rye_data['planting_order'].lower()
 
         self.crop_name = crop_name
         self.crop_type = 'annual'
         self.harvest_quality = 'null'
-
-        self.feed_id = '11g'
-        self.raw_id = 11
+        self.feed_id = '107g'
+        self.raw_id = 107
 
         self.kill_day = -1
         self.kill_year = True
@@ -35,9 +34,9 @@ class SugarBeet(BaseCrop):
         ''' HEAT UNIT DATA '''
 
         # input
-        self.T_base_min = 1.1
-        self.T_base_max = 30
-        self.PHU = 1253
+        self.T_base_min = 0
+        self.T_base_max = 30  # TODO
+        self.PHU = 996  # TODO
 
         # Internally calculated input
         self.accumulated_HU = 0.0
@@ -51,14 +50,14 @@ class SugarBeet(BaseCrop):
         ''' LEAF AREA INDEX (LAI) DATA '''
 
         # input
-        self.fr_PHU_1 = 0.05
-        self.fr_PHU_2 = 0.5
-        self.fr_LAI_1 = 0.05
+        self.fr_PHU_1 = 0.15
+        self.fr_PHU_2 = 0.50
+        self.fr_LAI_1 = 0.01
         self.fr_LAI_2 = 0.95
-        self.fr_PHU_sen = 0.90
-        self.fr_PHU_harvest = 1.2
+        self.fr_PHU_sen = 0.80
+        self.fr_PHU_harvest = 1.2  # TODO
         self.fr_PHU_harvest_min = 0.7
-        self.LAI_max = 5
+        self.LAI_max = 4
         self.LAI_min = 0
 
         # Internally calculated input
@@ -73,7 +72,7 @@ class SugarBeet(BaseCrop):
         ''' ROOT DEPTH DATA '''
 
         # input
-        self.z_root_max = 2000
+        self.z_root_max = 1800
 
         # Internally calculated input
         self.fr_root = 0
@@ -85,8 +84,8 @@ class SugarBeet(BaseCrop):
         ''' BIOMASS DATA '''
 
         # input
-        self.kl = 0.65
-        self.RUE = 30
+        self.kl = 0.65  # TODO
+        self.RUE = 35
         self.T_opt = 18
 
         # Internally calculated input
@@ -101,8 +100,8 @@ class SugarBeet(BaseCrop):
         # ===================================================================
         ''' Soil Water Uptake Data '''
 
-        self.beta_w = 10  # water-use distribution parameter
-        self.epco = 0.5
+        self.beta_w = 10  # TODO: water-use distribution parameter
+        self.epco = 0.5  # TODO
 
         self.water_actual_up = 0
         self.water_uptake_each_layer = []
@@ -117,10 +116,10 @@ class SugarBeet(BaseCrop):
         self.bio_N_opt = 0
         self.bio_N = 0
 
-        self.fr_n1 = 0.055
-        self.fr_n2 = 0.02
-        self.fr_n3 = 0.012
-        self.fr_n3ish = 0.0121
+        self.fr_n1 = 0.0600
+        self.fr_n2 = 0.0231
+        self.fr_n3 = 0.0130
+        self.fr_n3ish = 0.01301  # TODO
 
         self.fr_N = 0
         self.fr_N_up = 0
@@ -138,10 +137,10 @@ class SugarBeet(BaseCrop):
 
         self.fr_PHU_50 = 0.5
         self.fr_PHU_100 = 1.0
-        self.fr_p1 = 0.006
-        self.fr_p2 = 0.0025
+        self.fr_p1 = 0.0084
+        self.fr_p2 = 0.0032
         self.fr_p3 = 0.0019
-        self.fr_p3ish = 0.00191
+        self.fr_p3ish = 0.00191  # TODO
 
         self.fr_P = 0
         self.P_up = 0
@@ -152,17 +151,17 @@ class SugarBeet(BaseCrop):
         ''' Yields Data '''
 
         self.HI_max = 0
-        self.HI_min = 0.95
+        self.HI_min = 0.2
         self.HI_actual = 0
-        self.HI_opt = 0.95
+        self.HI_opt = 0.40
 
-        self.harvest_eff = 0.549
+        self.harvest_eff = 0.9
 
         self.gamma_wu = 0
 
         self.biomass_dry_down_percent = 0.0  # TODO: Hard coded total dry down until daily method is modeled
         self.DM_harvest_percent = 0.0001  # TODO: Hard coded dry matter percent at harvest
-        self.NDF_harvest_percent = 0.458
+        self.NDF_harvest_percent = 0.416
 
         self.bio_AG = 0
         self.yield_max = 0
@@ -173,5 +172,6 @@ class SugarBeet(BaseCrop):
 
         self.N_yield_annual = 0.0
         self.P_yield_annual = 0.0
+        self.DM_yield_annual = 0.0
         self.NDF_yield_annual = 0.0
         self.yield_annual = 0

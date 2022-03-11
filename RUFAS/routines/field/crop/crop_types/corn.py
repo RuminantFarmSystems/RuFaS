@@ -13,6 +13,7 @@ class Corn(BaseCrop):
         self.planting_day = corn_data['planting_day']
         self.harvest_day = corn_data['harvest_day']
         self.harvest_type = corn_data['harvest_type']
+        self.planting_order = corn_data['planting_order'].lower()
 
         self.crop_name = crop_name
         self.crop_type = 'annual'
@@ -24,7 +25,7 @@ class Corn(BaseCrop):
         self.kill_year = True
         self.planted = False
         self.growing = False
-        self.harvested = False
+        self.killed = False
 
         self.fix_nitrogen = False
 
@@ -39,7 +40,6 @@ class Corn(BaseCrop):
         # Internally calculated input
         self.accumulated_HU = 0.0
         self.prev_accumulated_HU = 0.0
-        self.fr_PHU_harvest_min = 0.7
 
         # output
         self.fr_PHU = 0.0
@@ -55,6 +55,7 @@ class Corn(BaseCrop):
         self.fr_LAI_2 = 0.95
         self.fr_PHU_sen = 0.90
         self.fr_PHU_harvest = 1.2
+        self.fr_PHU_harvest_min = 0.7
         self.LAI_max = 3
         self.LAI_min = 0
 

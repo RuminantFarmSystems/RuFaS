@@ -1,0 +1,22 @@
+{
+    "latitude": 43.332708,
+
+    "crops": {
+        "alfalfa": {
+            "plant_years": [2009],
+            "repeat": 1,
+            "planting_day": 90,
+            "harvest_day": 200,
+            "harvest_type": "optimal",
+            "planting_order": "1st"
+        },
+        "corn": {
+            "plant_years": [2009],
+            "repeat": 1,
+            "planting_day": 210,
+            "harvest_day": 320,
+            "harvest_type": "scheduled",
+            "planting_order": "2nd"
+        }
+    }
+}

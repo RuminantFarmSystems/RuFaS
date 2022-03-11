@@ -281,7 +281,7 @@ def kill(crop_type, field_management, time):
 
     crop_type.planted = False
     crop_type.growing = False
-    crop_type.harvested = True
+    crop_type.killed = True
 
     # FM.2.2
     till_management = field_management.managed_applications['tillage']

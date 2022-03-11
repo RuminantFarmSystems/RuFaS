@@ -7,6 +7,7 @@ class BaseCrop:
         self.harvest_day = 0
 
         self.harvest_type = ''
+        self.planting_order = ''
 
         self.crop_name = 'null'
         self.crop_type = ''
