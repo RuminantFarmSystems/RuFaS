@@ -372,6 +372,22 @@ class FieldReport(BaseReportDriver):
                                             'soil.soil_layers[2].AG_struct_to_C_slow_act', '%', []],
                                         'AG_struct_to_C_slow_act_layer3': [
                                             'soil.soil_layers[3].AG_struct_to_C_slow_act', '%', []],
+                                        'AG_met_to_C_active_layer0': [
+                                            'soil.soil_layers[0].AG_met_to_C_active', '%', []],
+                                        'AG_met_to_C_active_layer1': [
+                                            'soil.soil_layers[1].AG_met_to_C_active', '%', []],
+                                        'AG_met_to_C_active_layer2': [
+                                            'soil.soil_layers[2].AG_met_to_C_active', '%', []],
+                                        'AG_met_to_C_active_layer3': [
+                                            'soil.soil_layers[3].AG_met_to_C_active', '%', []],
+                                        'BG_met_to_C_active_layer0': [
+                                            'soil.soil_layers[0].BG_met_to_C_active', '%', []],
+                                        'BG_met_to_C_active_layer1': [
+                                            'soil.soil_layers[1].BG_met_to_C_active', '%', []],
+                                        'BG_met_to_C_active_layer2': [
+                                            'soil.soil_layers[2].BG_met_to_C_active', '%', []],
+                                        'BG_met_to_C_active_layer3': [
+                                            'soil.soil_layers[3].BG_met_to_C_active', '%', []]
                                         }
 
                 self.annual_variables = {'year': ['time.calendar_year', '', 0]
