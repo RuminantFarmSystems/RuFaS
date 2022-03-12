@@ -34,6 +34,7 @@ def residue_partitioning(soil, crop_type, weather, time):
 
     # S.6.B.I.1
     soil.AG_lignin_res_percent += 0.12 * weather.rainfall[time.year - 1][time.day - 1] * 0.01
+
     # S.6.B.I.2
     AG_L_to_N = 0
     fr_N = 0.4  # TODO calculate in RuFaS [C.5.B.1] but not "accurate" for carbon use
@@ -122,8 +123,10 @@ def residue_partitioning(soil, crop_type, weather, time):
         # S.6.B.II.7
         layer.BG_met_to_C_active = BG_met_active_decomp * layer.M_d * soil.T_d * layer.BG_met
 
+        ADJ_crop_type_bio_BG = (layer.thickness / soil.profile_depth) * crop_type.bio_BG
+
         # S.6.B.II.6 / S.6.B.II.8
-        layer.BG_met += AG_met_to_BG_met + (crop_type.bio_BG * BG_met_percent) - layer.BG_met_to_C_active
+        layer.BG_met += AG_met_to_BG_met + (ADJ_crop_type_bio_BG * BG_met_percent) - layer.BG_met_to_C_active
 
         # below ground structural residue and roots
         K3 = 0.094
