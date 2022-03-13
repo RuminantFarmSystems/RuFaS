@@ -144,32 +144,33 @@ def create_all_dirs(title, result_id):
             status_code = one of OK or BAD_GATEWAY
             text = the text corresponding to the result of the attempted
                 directory creations
-            path = the outermost directory for this result set
+            path = the outermost directory for this result set (if an error
+                occurred, this will be the empty string)
     """
     path = DB_OUTPUT_PATH + str(result_id) + '_' + title
     status, path_message = create_dir(path)
     if not status == OK:
-        return status, path_message
+        return status, path_message, ''
 
     manure_path = path + MANURE_PATH_SUFFIX
     status, manure_path_message = create_dir(manure_path)
     if not status == OK:
-        return status, manure_path_message
+        return status, manure_path_message, ''
 
     farm_es_path = path + FARM_ES_PATH_SUFFIX
     status, farm_es_path_message = create_dir(farm_es_path)
     if not status == OK:
-        return status, farm_es_path_message
+        return status, farm_es_path_message, ''
 
     feed_print_path = farm_es_path + FARM_ES_FEED_PRINT_PATH_SUFFIX
     status, feed_print_path_message = create_dir(feed_print_path)
     if not status == OK:
-        return status, feed_print_path_message
+        return status, feed_print_path_message, ''
 
     summary_path = farm_es_path + FARM_ES_SUMMARY_PATH_SUFFIX
     status, summary_path_message = create_dir(summary_path)
     if not status == OK:
-        return status, summary_path_message
+        return status, summary_path_message, ''
 
     return OK, "Successfully created directories", path + "/"
 

@@ -39,15 +39,23 @@ def output_json_data():
 
 @pytest.fixture
 def db_report_instance(output_json_data):
-    # Temporarily change the current working directory to the MASM folder so
-    # that the constructor can find the files using the Paths it specifies.
+    # If the current working directory is not the MASM directory,
+    # I assume it is the MASM/tests directory. If this is the case,
+    # we temporarily change the current working directory to the MASM folder so
+    # that the function can find the files using the Paths it specifies.
+    change_cwd = False
     current_working_directory = os.getcwd()
-    os.chdir(current_working_directory[:current_working_directory.rindex("/")])
+    if not current_working_directory.endswith('/MASM'):
+        change_cwd = True
+        os.chdir(
+            current_working_directory[:current_working_directory.rindex("/")])
 
     db = DBReport(output_json_data, Path("input/animal_management.json"))
 
-    # Change working directory back to original.
-    os.chdir(current_working_directory)
+    # Change working directory back to original, if it was modified for
+    # this fixture.
+    if change_cwd:
+        os.chdir(current_working_directory)
 
     return db
 
@@ -69,10 +77,15 @@ def test_unpack_input_json():
     # which would likely be caused because the function has not been updated
     # to reflect any changes in the input JSON structure.
 
-    # Temporarily change the current working directory to the MASM folder so
+    # If the current working directory is not the MASM directory,
+    # I assume it is the MASM/tests directory. If this is the case,
+    # we temporarily change the current working directory to the MASM folder so
     # that the function can find the files using the Paths it specifies.
+    change_cwd = False
     current_working_directory = os.getcwd()
-    os.chdir(current_working_directory[:current_working_directory.rindex("/")])
+    if not current_working_directory.endswith('/MASM'):
+        change_cwd = True
+        os.chdir(current_working_directory[:current_working_directory.rindex("/")])
 
     try:
         _ = unpack_input_json(Path("input/animal_management.json"))
@@ -82,8 +95,10 @@ def test_unpack_input_json():
               "this method was not updated:", e)
         assert False
 
-    # Change working directory back to original.
-    os.chdir(current_working_directory)
+    # Change working directory back to original, if it was modified for
+    # this test.
+    if change_cwd:
+        os.chdir(current_working_directory)
 
 
 def test_initialize(mocker, db_report_instance, base_report_instance):
