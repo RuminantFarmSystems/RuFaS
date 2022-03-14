@@ -387,8 +387,106 @@ class FieldReport(BaseReportDriver):
                                         'BG_met_to_C_active_layer2': [
                                             'soil.soil_layers[2].BG_met_to_C_active', '%', []],
                                         'BG_met_to_C_active_layer3': [
-                                            'soil.soil_layers[3].BG_met_to_C_active', '%', []]
-                                        }
+                                            'soil.soil_layers[3].BG_met_to_C_active', '%', []],
+                                            ##new
+                                        'C_active_to_slow_layer0': [
+                                            'soil.soil_layers[0].C_active_to_slow', '%', []],
+                                        'C_active_to_slow_layer1': [
+                                            'soil.soil_layers[1].C_active_to_slow', '%', []],
+                                        'C_active_to_slow_layer2': [
+                                            'soil.soil_layers[2].C_active_to_slow', '%', []],
+                                        'C_active_to_slow_layer3': [
+                                            'soil.soil_layers[3].C_active_to_slow', '%', []],
+
+                                        'C_active_to_passive_layer0': [
+                                            'soil.soil_layers[0].C_active_to_passive', '%', []],
+                                        'C_active_to_passive_layer1': [
+                                            'soil.soil_layers[1].C_active_to_slow', '%', []],
+                                        'C_active_to_passive_layer2': [
+                                            'soil.soil_layers[2].C_active_to_passive', '%', []],
+                                        'C_active_to_passive_layer3': [
+                                            'soil.soil_layers[3].C_active_to_passive', '%', []],
+
+                                        'C_slow_to_active_layer0': [
+                                            'soil.soil_layers[0].C_slow_to_active', '%', []],
+                                        'C_slow_to_active_layer1': [
+                                            'soil.soil_layers[1].C_slow_to_active', '%', []],
+                                        'C_slow_to_active_layer2': [
+                                            'soil.soil_layers[2].C_slow_to_active', '%', []],
+                                        'C_slow_to_active_layer3': [
+                                            'soil.soil_layers[3].C_slow_to_active', '%', []],
+
+                                        'C_slow_to_passive_layer0': [
+                                            'soil.soil_layers[0].C_slow_to_passive', '%', []],
+                                        'C_slow_to_passive_layer1': [
+                                            'soil.soil_layers[1].C_slow_to_passive', '%', []],
+                                        'C_slow_to_passive_layer2': [
+                                            'soil.soil_layers[2].C_slow_to_passive', '%', []],
+                                        'C_slow_to_passive_layer3': [
+                                            'soil.soil_layers[3].C_slow_to_passive', '%', []],
+
+                                        'C_passive_to_active_layer0': [
+                                            'soil.soil_layers[0].C_passive_to_active', '%', []],
+                                        'C_passive_to_active_layer1': [
+                                            'soil.soil_layers[1].C_passive_to_active', '%', []],
+                                        'C_passive_to_active_layer2': [
+                                            'soil.soil_layers[2].C_passive_to_active', '%', []],
+                                        'C_passive_to_active_layer3': [
+                                            'soil.soil_layers[3].C_passive_to_active', '%', []],
+
+                                        'C_active_layer0': [
+                                            'soil.soil_layers[0].C_active', '%', []],
+                                        'C_active_layer1': [
+                                            'soil.soil_layers[1].C_active', '%', []],
+                                        'C_active_layer2': [
+                                            'soil.soil_layers[2].C_active', '%', []],
+                                        'C_active_layer3': [
+                                            'soil.soil_layers[3].C_active', '%', []],
+
+                                        'C_active_decomp_layer0': [
+                                            'soil.soil_layers[0].C_active_decomp', '%', []],
+                                        'C_active_decomp_layer1': [
+                                            'soil.soil_layers[1].C_active_decomp', '%', []],
+                                        'C_active_decomp_layer2': [
+                                            'soil.soil_layers[2].C_active_decomp', '%', []],
+                                        'C_active_decomp_layer3': [
+                                            'soil.soil_layers[3].C_active_decomp', '%', []],
+
+                                        'C_slow_layer0': [
+                                            'soil.soil_layers[0].C_slow', '%', []],
+                                        'C_slow_layer1': [
+                                            'soil.soil_layers[1].C_slow', '%', []],
+                                        'C_slow_layer2': [
+                                            'soil.soil_layers[2].C_slow', '%', []],
+                                        'C_slow_layer3': [
+                                            'soil.soil_layers[3].C_slow', '%', []],
+
+                                        'C_slow_decomp_layer0': [
+                                            'soil.soil_layers[0].C_slow_decomp', '%', []],
+                                        'C_slow_decomp_layer1': [
+                                            'soil.soil_layers[1].C_slow_decomp', '%', []],
+                                        'C_slow_decomp_layer2': [
+                                            'soil.soil_layers[2].C_slow_decomp', '%', []],
+                                        'C_slow_decomp_layer3': [
+                                            'soil.soil_layers[3].C_slow_decomp', '%', []],
+
+                                        'C_passive_layer0': [
+                                            'soil.soil_layers[0].C_passive', '%', []],
+                                        'C_passive_layer1': [
+                                            'soil.soil_layers[1].C_passive', '%', []],
+                                        'C_passive_layer2': [
+                                            'soil.soil_layers[2].C_passive', '%', []],
+                                        'C_passive_layer3': [
+                                            'soil.soil_layers[3].C_passive', '%', []],
+
+                                        'C_passive_decomp_layer0': [
+                                            'soil.soil_layers[0].C_passive_decomp', '%', []],
+                                        'C_passive_decomp_layer1': [
+                                            'soil.soil_layers[1].C_passive_decomp', '%', []],
+                                        'C_passive_decomp_layer2': [
+                                            'soil.soil_layers[2].C_passive_decomp', '%', []],
+                                        'C_passive_decomp_layer3': [
+                                            'soil.soil_layers[3].C_passive_decomp', '%', []]                                        }
 
                 self.annual_variables = {'year': ['time.calendar_year', '', 0]
                                          }
