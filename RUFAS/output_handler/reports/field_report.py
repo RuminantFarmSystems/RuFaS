@@ -388,7 +388,7 @@ class FieldReport(BaseReportDriver):
                                             'soil.soil_layers[2].BG_met_to_C_active', '%', []],
                                         'BG_met_to_C_active_layer3': [
                                             'soil.soil_layers[3].BG_met_to_C_active', '%', []],
-                                            ##new
+
                                         'C_active_to_slow_layer0': [
                                             'soil.soil_layers[0].C_active_to_slow', '%', []],
                                         'C_active_to_slow_layer1': [
