@@ -4,12 +4,11 @@ File name: test_db_report.py
 Description: Implements test cases
 Author(s): Militsa Sotirova, militsasotirova@gmail.com
 """
-import os
-import sqlite3
 
+from mock.mock import MagicMock
+import os
 import pytest
 from pathlib import Path
-from mock.mock import MagicMock, PropertyMock
 
 from RUFAS.output_handler.reports import BaseReport
 from RUFAS.output_handler.reports.db_report import unpack_input_json

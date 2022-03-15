@@ -4,3 +4,4 @@ pandas
 scipy
 pytest
 mock
+pytest-mock
