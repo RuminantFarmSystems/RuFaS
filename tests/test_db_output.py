@@ -85,15 +85,6 @@ def test_create_all_dirs():
     # this test does not overwrite any existing directories.
     result_id = "-1"
 
-    # If the current working directory is the MASM directory, we temporarily
-    # change it to be the tests directory so the the relative paths used by
-    # db_view work.
-    change_cwd = False
-    current_working_directory = os.getcwd()
-    if current_working_directory.endswith('/MASM'):
-        change_cwd = True
-        os.chdir(current_working_directory + '/tests')
-
     status, message, path = create_all_dirs(title, result_id)
     assert status == OK
     assert message == "Successfully created directories"
@@ -115,11 +106,6 @@ def test_create_all_dirs():
         print("Error: %s : %s" % (path, e.strerror))
         # Test should fail if this code is reached.
         assert False
-
-    # Change working directory back to original, if it was modified for
-    # this test.
-    if change_cwd:
-        os.chdir(current_working_directory)
 
 
 # I wasn't sure how to test the following functions since it is hard (at
