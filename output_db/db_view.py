@@ -29,7 +29,7 @@ BAD_GATEWAY = 502
 NOT_FOUND = 404
 
 # directories
-DB_OUTPUT_PATH = 'output/db_output/'
+DB_OUTPUT_PATH = './output/db_output/'
 MANURE_PATH_SUFFIX = '/manure_module/'
 FARM_ES_PATH_SUFFIX = '/farm_es_reports/'
 FARM_ES_FEED_PRINT_PATH_SUFFIX = 'feed_print/'
