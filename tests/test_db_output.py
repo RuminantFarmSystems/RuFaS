@@ -86,6 +86,7 @@ def test_create_all_dirs():
     result_id = "-1"
 
     status, message, path = create_all_dirs(title, result_id)
+    print(message)
     assert status == OK
     assert message == "Successfully created directories"
     assert os.path.isdir(path)
