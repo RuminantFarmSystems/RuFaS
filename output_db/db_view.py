@@ -2,7 +2,8 @@
 """
 RUFAS: Ruminant Farm Systems Model
 File name: db_view.py
-Description: This file contains the RequestHandler class and when this file is
+Description: This file should be run from the MASM directory. This file
+    contains the RequestHandler class and when this file is
     run, the HTTP server is started locally at the specified port. The web page
     can be accessed by 'localhost:8000' (client) and this forms a connection to
     the server. This connection is kept alive until the program is killed.
@@ -28,11 +29,15 @@ BAD_GATEWAY = 502
 NOT_FOUND = 404
 
 # directories
-DB_OUTPUT_PATH = os.path.abspath('output/db_output/')
+DB_OUTPUT_PATH = 'output/db_output/'
 MANURE_PATH_SUFFIX = '/manure_module/'
 FARM_ES_PATH_SUFFIX = '/farm_es_reports/'
 FARM_ES_FEED_PRINT_PATH_SUFFIX = 'feed_print/'
 FARM_ES_SUMMARY_PATH_SUFFIX = 'summary_report/'
+
+# files necessary
+DB_FILE = 'output_db/past_outputs.sqlite'
+INDEX_HTML_FILE = 'output_db/index.html'
 
 # constants for the column names visible to the user for exporting data
 MANURE_PRINT_VARIABLE_MAPPING = \
@@ -227,7 +232,7 @@ class RequestHandler(http.server.BaseHTTPRequestHandler):
     """
 
     def __init__(self, request, client_address, server):
-        self.db_file = 'past_outputs.sqlite'
+        self.db_file = DB_FILE
         super().__init__(request, client_address, server)
 
     def do_GET(self):
@@ -241,7 +246,7 @@ class RequestHandler(http.server.BaseHTTPRequestHandler):
             page = None
 
             try:
-                file = open('index.html')
+                file = open(INDEX_HTML_FILE)
                 page = file.read()
 
             except Exception as e:
@@ -461,7 +466,7 @@ class RequestHandler(http.server.BaseHTTPRequestHandler):
                 text = success message if the operation was successful or
                 text = an error message if not
         """
-        path = '../output/db_output/'
+        path = DB_OUTPUT_PATH
         status, folder_path_message = create_dir(path)
 
         if not status == OK:
