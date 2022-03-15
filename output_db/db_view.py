@@ -152,6 +152,10 @@ def create_all_dirs(title, result_id):
             path = the outermost directory for this result set (if an error
                 occurred, this will be the empty string)
     """
+    status, path_message = create_dir(DB_OUTPUT_PATH)
+    if not status == OK:
+        return status, path_message, ''
+
     path = DB_OUTPUT_PATH + str(result_id) + '_' + title
     status, path_message = create_dir(path)
     if not status == OK:
