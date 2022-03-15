@@ -19,9 +19,12 @@ c2 = {"name": "C2", "cow_repro_method": "TAI", "cow_presynch_protocol": "PreSync
 c3 = {"name": "C3", "cow_repro_method": "TAI", "cow_presynch_protocol": "Double OvSynch",
       "cow_TAI_protocol": "OvSynch 56", "tai_program_start_day": 45, "voluntary_waiting_period": 0, 
       "cow_resynch_protocol": "TAIbeforePD", "TAI_conception_rate_1":0.6, "TAI_conception_rate_sub": 0.45}
+c4 = {"name": "C4", "cow_repro_method": "TAI", "cow_presynch_protocol": "Double OvSynch",
+      "cow_TAI_protocol": "OvSynch 56", "tai_program_start_day": 45, "voluntary_waiting_period": 0, 
+      "cow_resynch_protocol": "TAIafterPD", "TAI_conception_rate_1":0.6, "TAI_conception_rate_sub": 0.45}
       
 heifer_strategies = [h1, h2, h3]
-cow_strategies = [c1, c2, c3]
+cow_strategies = [c1, c2, c3, c4]
 
 def trial(heifer_strategy, cow_strategy, rep):
     output_file = heifer_strategy['name'] + '_' + cow_strategy['name'] + '_' + str(rep)
