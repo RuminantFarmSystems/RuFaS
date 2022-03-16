@@ -8,10 +8,10 @@ class Soybean(BaseCrop):
         """GENERAL PLANT INFO"""
 
         soy_data = data
-        self.grow_years = soy_data['grow_years']
+        self.plant_years = soy_data['plant_years']
         self.repeat = soy_data['repeat']
-        self.planting_date = soy_data['planting_date']
-        self.harvest_date = soy_data['harvest_date']
+        self.planting_day = soy_data['planting_day']
+        self.harvest_day = soy_data['harvest_day']
         self.harvest_type = soy_data['harvest_type']
 
         self.crop_name = crop_name
