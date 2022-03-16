@@ -1,3 +1,19 @@
+[![Testing](https://github.com/RuminantFarmSystems/MASM/actions/workflows/testing_pytest.yml/badge.svg)](https://github.com/RuminantFarmSystems/MASM/actions/workflows/testing_pytest.yml)
+[![Linting](https://github.com/RuminantFarmSystems/MASM/actions/workflows/lint_flake8.yml/badge.svg)](https://github.com/RuminantFarmSystems/MASM/actions/workflows/lint_flake8.yml)
+# Biweekly Reports
+[Spreadsheet](https://docs.google.com/spreadsheets/d/1dGcfCfBmaLWbLTarOhZL7n0ozI3AV9RxWEjeBEv4R0E/edit?usp=sharing)
+
+# Uncle Bob Lessons
+[YouTube Playlist](https://youtube.com/playlist?list=PLs4sTjbm8kLhbJy-rT4DILg-kKw3ZCwDx)
+|Week|Lesson|
+|:---:|:---:|
+|Jan 31st - Feb 6th|[Lesson 1](https://www.youtube.com/watch?v=7EmboKQH8lM&list=PLs4sTjbm8kLhbJy-rT4DILg-kKw3ZCwDx)|
+|Feb 7th - Feb 13th|[Lesson 2](https://www.youtube.com/watch?v=2a_ytyt9sf8&list=PLs4sTjbm8kLhbJy-rT4DILg-kKw3ZCwDx)|
+|Feb 14th - Feb 20th|[Lesson 3](https://www.youtube.com/watch?v=Qjywrq2gM8o&list=PLs4sTjbm8kLhbJy-rT4DILg-kKw3ZCwDx)|
+|Feb 21st - Feb 27th|[Lesson 4](https://www.youtube.com/watch?v=58jGpV2Cg50&list=PLs4sTjbm8kLhbJy-rT4DILg-kKw3ZCwDx)|
+|Feb 28th - Mar 6th|[Lesson 5](https://www.youtube.com/watch?v=sn0aFEMVTpA&list=PLs4sTjbm8kLhbJy-rT4DILg-kKw3ZCwDx)|
+|Mar 7th - Mar 13th|[Lesson 6](https://www.youtube.com/watch?v=l-gF0vDhJVI&list=PLs4sTjbm8kLhbJy-rT4DILg-kKw3ZCwDx)|
+
 # 2022 Fixathon
 [Fixathon tasks](https://docs.google.com/spreadsheets/d/1SnY3c4vBXrD9ybHoswJW28FrkG4DWx4fyvotIXA85BM/edit?usp=sharing)
 # Introduction 

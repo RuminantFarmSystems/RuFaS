@@ -9,10 +9,10 @@ class SugarBeet(BaseCrop):
         """GENERAL PLANT INFO"""
 
         sugar_beet_data = data
-        self.grow_years = sugar_beet_data['grow_years']
+        self.plant_years = sugar_beet_data['plant_years']
         self.repeat = sugar_beet_data['repeat']
-        self.planting_date = sugar_beet_data['planting_date']
-        self.harvest_date = sugar_beet_data['harvest_date']
+        self.planting_day = sugar_beet_data['planting_day']
+        self.harvest_day = sugar_beet_data['harvest_day']
         self.harvest_type = sugar_beet_data['harvest_type']
 
         self.crop_name = crop_name
@@ -27,7 +27,7 @@ class SugarBeet(BaseCrop):
         self.planted = False
         self.growing = False
 
-        self.fix_nitrogen = True  # TODO: change back
+        self.fix_nitrogen = False
 
         # ===================================================================
         ''' HEAT UNIT DATA '''

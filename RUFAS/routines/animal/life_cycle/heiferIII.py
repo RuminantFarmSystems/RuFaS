@@ -11,10 +11,11 @@ Description: This file updates the heifer form close to calving to calving,
 """
 from RUFAS.routines.animal.life_cycle.heiferII import HeiferII
 from RUFAS.routines.animal.life_cycle.animal_base import AnimalBase
+
 from RUFAS.routines.animal.manure.growing_heifer_manure_excretion import \
     manure_calculations
 from RUFAS.routines.animal.ration.animal_requirements import calc_rqmts
-from RUFAS.routines.animal.life_cycle import animal_events_constants as c
+from RUFAS.routines.animal.life_cycle import animal_events_constants as const
 
 
 class HeiferIII(HeiferII):
@@ -122,7 +123,7 @@ class HeiferIII(HeiferII):
 
         else:
             self.body_weight = self.mature_body_weight
-            self.events.add_event(self.days_born, sim_day, c.MATURE_BODY_WEIGHT_REGULAR)
+            self.events.add_event(self.days_born, sim_day, const.MATURE_BODY_WEIGHT_REGULAR)
 
         if self.days_in_preg == self.gestation_length:
             self.days_born -= 1  # will be incremented again in next stage

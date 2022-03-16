@@ -3,17 +3,17 @@
 
     "crops": {
         "corn": {
-            "grow_years": [2009],
+            "plant_years": [2009],
             "repeat": 3,
-            "planting_date": 121,
-            "harvest_date": 319,
+            "planting_day": 121,
+            "harvest_day": 319,
             "harvest_type": "optimal"
         },
         "alfalfa": {
-            "grow_years": [2010, 2011],
+            "plant_years": [2010, 2011],
             "repeat": 3,
-            "planting_date": 100,
-            "harvest_date": 300,
+            "planting_day": 100,
+            "harvest_day": 300,
             "harvest_type": "optimal"
         }
     }

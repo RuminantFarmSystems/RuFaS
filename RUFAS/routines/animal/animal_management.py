@@ -413,6 +413,10 @@ class AnimalManagement:
 
                 del self.id_pen[i]
 
+        pen_population_before_additions = {}
+        for i, pen in enumerate(self.all_pens):
+            pen_population_before_additions[i] = len(pen.animals_in_pen)
+
         for animal in animals_added:
             if type(animal).__name__ == 'Calf':
                 animal_p_conc = self.calf_p_comp
@@ -463,19 +467,30 @@ class AnimalManagement:
             # updating id_pen variable
             self.id_pen[animal.id] = pen.id
             # setting up new animal
-            self.all_pens[pen.id].set_up_new_animal(animal, animal_p_conc, feed, temp)
+            self.all_pens[pen.id].set_up_new_animal(animal, animal_p_conc,
+                                                    feed, temp, pen_population_before_additions[pen.id])
+
 
         for pen in range(len(self.all_pens)):
             if len(self.all_pens[pen].animals_in_pen) > 0 and 'Cow' in self.all_pens[pen].classes_in_pen and \
                     self.all_pens[pen].ration == {}:
                 available_feeds = ration_driver.AvailableFeeds()
                 available_feeds.feed_nutrients(feed)
-                print(available_feeds)
                 self.all_pens[pen].ration = self.all_pens[pen].calc_ration(feed, available_feeds)
+            else:
+                # Need to adjust the ration totals for the pen attributes now
+                # that all new animals have been added
+                for key in self.all_pens[pen].ration:
+                    if key != 'status' and key != 'objective':
+                        self.all_pens[pen].ration[key] = \
+                            (self.all_pens[pen].ration[key] /
+                             pen_population_before_additions[pen]) * len(
+                                self.all_pens[pen].animals_in_pen)
 
         for calf in calves_born:
             # getting valid pen to place calves in
             # if there are no pens of group calves that lost animals
+            pen = None
             if grouped_pens_short[Pen.AnimalCombination.CALF] == {}:
                 # variable to track lowest stocking density
                 dens = 10000
@@ -493,7 +508,10 @@ class AnimalManagement:
                         n = v
             self.id_pen[calf.id] = pen.id
             self.calves.append(calf)
-            self.all_pens[pen.id].set_up_new_animal(calf, self.pasture_concentrate, feed, temp)
+            print(self.all_pens[pen.id])
+            print(pen_population_before_additions[pen.id])
+            self.all_pens[pen.id].set_up_new_animal(calf, self.pasture_concentrate,
+                                                    feed, temp, pen_population_before_additions[pen.id])
             # self.all_pens[pen].animals_in_pen.append(calf)
 
     def pen_allocation(self):
@@ -830,7 +848,6 @@ class AnimalManagement:
             weather: instance of the Weather class defined in classes.py
             time: instance of the Time class defined in classes.py
         """
-        print(self.simulation_day)
         if self.simulate_animals:
             for pen in self.all_pens:
                 pen.pen_populated = len(pen.animals_in_pen) > 0
