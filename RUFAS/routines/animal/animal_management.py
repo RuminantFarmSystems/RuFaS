@@ -508,7 +508,6 @@ class AnimalManagement:
                         n = v
             self.id_pen[calf.id] = pen.id
             self.calves.append(calf)
-            print(self.all_pens[pen.id])
             print(pen_population_before_additions[pen.id])
             self.all_pens[pen.id].set_up_new_animal(calf, self.pasture_concentrate,
                                                     feed, temp, pen_population_before_additions[pen.id])
