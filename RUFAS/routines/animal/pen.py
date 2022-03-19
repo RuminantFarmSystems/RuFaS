@@ -281,6 +281,13 @@ class Pen:
         """
         self.id = pen_id
 
+    def set_avg_nutrient_rqmts(self, avg_nutrient_rqmts):
+        self.avg_nutrient_rqmts = {key: value for (key, value) in avg_nutrient_rqmts.items()}
+
+    def set_milk_avgs(self, avg_milk, avg_CP_milk):
+        self.avg_milk = avg_milk
+        self.avg_CP_milk = avg_CP_milk
+
     def update_animals(self, new_animals, animal_combination):
         """
         Sets the list of animals to @new_animals and calculates the stocking
