@@ -79,7 +79,7 @@ class Feed:
             Pen.AnimalCombination.GROWING: set(data['growing_feeds']),
             Pen.AnimalCombination.CLOSE_UP: set(data['close_up_feeds']),
             Pen.AnimalCombination.GROWING_AND_CLOSE_UP: set(data['growing_feeds']) | set(data['close_up_feeds']),
-            Pen.AnimalCombination.LAC_COW: data['lac_cow_feeds'],
+            Pen.AnimalCombination.LAC_COW: set(data['lac_cow_feeds']),
         }
 
         self.all_feed_ids = self.get_all_feed_units(data['purchased_feeds'],

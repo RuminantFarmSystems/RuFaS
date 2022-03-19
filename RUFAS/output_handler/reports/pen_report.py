@@ -131,9 +131,10 @@ class PenReport(BaseReportDriver):
             # dictionary with all feed ids and keys and their pertaining information as values
             all_feeds = feed.all_feed_ids
 
-
             # subsets the entirety of the feed ids for the individual pen's needs
             pen_specific_feeds = {str(x): all_feeds[str(x)] for x in individual_pen.allocated_feeds}
+
+            print(individual_pen.allocated_feeds)
 
             for feed_id in individual_pen.allocated_feeds:
                 feed_name = pen_specific_feeds[str(feed_id)]['feed_name']
@@ -141,9 +142,13 @@ class PenReport(BaseReportDriver):
 
                 self.daily_variables[str(feed_id) + "(" + feed_name + ")"] = \
                     [
-                        'pen.ration[\'%s\'] if pen.pen_populated and \'%s\' in pen.allocated_feeds else 0' % (
+                        'pen.ration[\'%s\'] if pen.pen_populated and \'%s\' in pen.ration.keys() else 0' % (
                             feed_id, feed_id), units,
                         []]
+                # [
+                #     'pen.ration[\'%s\'] if pen.pen_populated and int(\'%s\') in pen.allocated_feeds else 0' % (
+                #         feed_id, feed_id), units,
+                #     []]
 
             self.annual_variables = {
                 'year': ['time.calendar_year', '', 0]
