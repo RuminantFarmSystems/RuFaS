@@ -134,8 +134,6 @@ class PenReport(BaseReportDriver):
             # subsets the entirety of the feed ids for the individual pen's needs
             pen_specific_feeds = {str(x): all_feeds[str(x)] for x in individual_pen.allocated_feeds}
 
-            print(individual_pen.allocated_feeds)
-
             for feed_id in individual_pen.allocated_feeds:
                 feed_name = pen_specific_feeds[str(feed_id)]['feed_name']
                 units = pen_specific_feeds[str(feed_id)]['units']

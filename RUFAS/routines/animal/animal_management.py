@@ -470,7 +470,6 @@ class AnimalManagement:
             self.all_pens[pen.id].set_up_new_animal(animal, animal_p_conc,
                                                     feed, temp, pen_population_before_additions[pen.id])
 
-
         for pen in range(len(self.all_pens)):
             if len(self.all_pens[pen].animals_in_pen) > 0 and 'Cow' in self.all_pens[pen].classes_in_pen and \
                     self.all_pens[pen].ration == {}:
@@ -508,7 +507,6 @@ class AnimalManagement:
                         n = v
             self.id_pen[calf.id] = pen.id
             self.calves.append(calf)
-            print(pen_population_before_additions[pen.id])
             self.all_pens[pen.id].set_up_new_animal(calf, self.pasture_concentrate,
                                                     feed, temp, pen_population_before_additions[pen.id])
             # self.all_pens[pen].animals_in_pen.append(calf)

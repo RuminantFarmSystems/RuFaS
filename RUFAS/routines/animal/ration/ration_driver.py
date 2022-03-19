@@ -50,9 +50,9 @@ def optimization(requirements, available_feeds, animal_type, cow_type):
                     requirements.Ca_req, requirements.P_req,
                     TDN, DE, EE, is_fat, requirements.avg_BW, calcium, phosphorus, NDF,
                     feed_type, is_wetforage, Kd, N_A, N_B, CP, dRUP, limit, cow_type,
-                    animal_type_ = animal_type,
-                    DMIest_ = requirements.DMIest)
-    #try block for catching scipy SLSQP error
+                    animal_type_=animal_type,
+                    DMIest_=requirements.DMIest)
+    # try block for catching scipy SLSQP error
     i = 0
     count = 0
     while i < 1:
@@ -63,8 +63,8 @@ def optimization(requirements, available_feeds, animal_type, cow_type):
         finally:
             i += 1
             count += 1
-    #this case should not be called, but is in place to not crash the
-    #simulation if bounds error is not resolved
+        # this case should not be called, but is in place to not crash the
+        # simulation if bounds error is not resolved
         if count > 30:
             solution = None
             break
@@ -96,10 +96,10 @@ def ration_formulation(pen, feed, available_feeds, animal_type, cow_type):
     req.set_requirements(pen, animal_type, False)
 
     ###
-    #Pyomo Nutrients Stuff
-    #available_feeds.pyomo_nutrients_data(feed, animal_type, cow_type)
-    #req.pyomo_req['BW'] = BW
-    #pslv.create_model(available_feeds.pyomo_data, req.pyomo_req, available_feeds.feeds)
+    # Pyomo Nutrients Stuff
+    # available_feeds.pyomo_nutrients_data(feed, animal_type, cow_type)
+    # req.pyomo_req['BW'] = BW
+    # pslv.create_model(available_feeds.pyomo_data, req.pyomo_req, available_feeds.feeds)
     ####
 
     solution, ration_vals = optimization(req, available_feeds, animal_type, cow_type)
@@ -132,8 +132,8 @@ def ration_formulation(pen, feed, available_feeds, animal_type, cow_type):
         ration['status'] = 'Optimal'
         ration['objective'] = NLP.objective(solution.x)
         return ration, ration_vals
-    #safeguard if scipy SLSQP bounds error still occurs after many iterations
-    #using previous cycles ration for this pen
+    # safeguard if scipy SLSQP bounds error still occurs after many iterations
+    # using previous cycles ration for this pen
     else:
         return pen.ration, ration_vals
 
@@ -223,6 +223,9 @@ class Requirements:
         self.DMIest = 0
         # average body weigth in pen
         self.avg_BW = 0
+        # TODO: add documentation for avg_milk and avg_CP_milk
+        self.avg_milk = 0
+        self.avg_CP_milk = 0
         # pyomo requirements dictionary
         self.pyomo_req = {}
 
@@ -247,9 +250,8 @@ class Requirements:
         P_req = []
         DMIest = []
         BW = []
-        milk = []
-        CP_milk = []
-
+        milk = [0]
+        CP_milk = [0]
 
         if recalc:
             # iterating through each animal in the pen and calculating requirements
@@ -259,26 +261,26 @@ class Requirements:
                 a_type = type(animal).__name__
                 if a_type == 'HeiferI':
                     req = animal_requirements.calc_rqmts(animal.body_weight,
-                        animal.mature_body_weight, None, animal_type = 'heifer',
-                                                    BCS5 = 3, PrevTemp = 15,
-                                              ADG_heifer = animal.daily_growth,
-                                                     Age = animal.days_born
-                                                      )
+                                                         animal.mature_body_weight, None, animal_type='heifer',
+                                                         BCS5=3, PrevTemp=15,
+                                                         ADG_heifer=animal.daily_growth,
+                                                         Age=animal.days_born
+                                                         )
                 elif a_type == 'HeiferII' or a_type == 'HeiferIII':
                     req = animal_requirements.calc_rqmts(animal.body_weight,
-                        animal.mature_body_weight,  animal.days_in_preg,
-                            animal_type = 'heifer', BCS5 = 3, PrevTemp = 15,
-                                            ADG_heifer = animal.daily_growth,
-                                                      Age = animal.days_born
-                                                      )
+                                                         animal.mature_body_weight, animal.days_in_preg,
+                                                         animal_type='heifer', BCS5=3, PrevTemp=15,
+                                                         ADG_heifer=animal.daily_growth,
+                                                         Age=animal.days_born
+                                                         )
                 else:
                     req = animal_requirements.calc_rqmts(animal.body_weight,
-                                    animal.mature_body_weight, animal.days_in_preg,
-                                    'cow', animal.calves, animal.CI,
-                                    animal.mPrt, animal.fat_percent, animal.lactose_milk,
-                                    animal.estimated_daily_milk_produced,
-                                    animal.days_in_milk, animal.milking
-                                                  )
+                                                         animal.mature_body_weight, animal.days_in_preg,
+                                                         'cow', animal.calves, animal.CI,
+                                                         animal.mPrt, animal.fat_percent, animal.lactose_milk,
+                                                         animal.estimated_daily_milk_produced,
+                                                         animal.days_in_milk, animal.milking
+                                                         )
 
                 animal.NEmaint = req['NEmaint']
                 animal.NEg = req['NEg']
@@ -288,7 +290,7 @@ class Requirements:
                 animal.Ca_req = req['Ca_req']
                 animal.P_req = req['P_req']
                 animal.DMIest = req['DMIest']
-                #these animal class variables are only used for grouping purposes
+                # these animal class variables are only used for grouping purposes
                 if animal_type == 'cow':
                     animal.DNED_req = (req['NEmaint'] + req['NEl']) / animal.DMIest
                     animal.DMDP_req = (req['MP_req']) / animal.DMIest
@@ -297,8 +299,8 @@ class Requirements:
                     animal.calc_daily_walking_dist(pen.vertical_dist_to_parlor,
                                                    pen.horizontal_dist_to_parlor)
                     NEa_val = animal_requirements.energy_activity_rqmts(animal.body_weight,
-                                pen.housing_type,
-                                (math.sqrt(animal.DVD ** 2 + animal.DHD ** 2)))
+                                                                        pen.housing_type,
+                                                                        (math.sqrt(animal.DVD ** 2 + animal.DHD ** 2)))
                     milk.append(animal.estimated_daily_milk_produced)
                     CP_milk.append(animal.CP_milk)
                 else:
@@ -322,8 +324,8 @@ class Requirements:
                     animal.calc_daily_walking_dist(pen.vertical_dist_to_parlor,
                                                    pen.horizontal_dist_to_parlor)
                     NEa_val = animal_requirements.energy_activity_rqmts(animal.body_weight,
-                                     pen.housing_type,
-                                    (math.sqrt(animal.DVD ** 2 + animal.DHD ** 2)))
+                                                                        pen.housing_type,
+                                                                        (math.sqrt(animal.DVD ** 2 + animal.DHD ** 2)))
                     milk.append(animal.estimated_daily_milk_produced)
                     CP_milk.append(animal.CP_milk)
                 else:
@@ -339,8 +341,8 @@ class Requirements:
                 P_req.append(animal.P_req)
                 DMIest.append(animal.DMIest)
                 BW.append(animal.body_weight)
-                milk.append(milk)
-                CP_milk.append(CP_milk)
+                # milk.append(milk)
+                # CP_milk.append(CP_milk)
         # populating the class variables as an average across cows for each requirement
         self.NEmaint = stat.mean(NEmaint)
         self.NEa = stat.mean(NEa)
@@ -352,14 +354,20 @@ class Requirements:
         self.P_req = stat.mean(P_req)
         self.DMIest = stat.mean(DMIest)
         self.avg_BW = stat.mean(BW)
+        self.avg_milk = stat.mean(milk)
+        self.avg_CP_milk = stat.mean(CP_milk)
 
-        #setting average nutrient requirements pen class variable
-        pen.avg_nutrient_rqmts = {'NEmaint': self.NEmaint, 'NEa': self.NEa,
-                        'NEg': self.NEg, 'NEpreg': self.NEpreg, 'NEl': self.NEl,
-                        'MP_req': self.MP_req, 'Ca_req': self.Ca_req, 'P_req':self.P_req,
-                        'DMIest': self.DMIest, 'avg_BW': self.avg_BW}
+        # setting average nutrient requirements pen class variable
+        avg_nutrient_rqmts = {'NEmaint': self.NEmaint, 'NEa': self.NEa,
+                              'NEg': self.NEg, 'NEpreg': self.NEpreg, 'NEl': self.NEl,
+                              'MP_req': self.MP_req, 'Ca_req': self.Ca_req, 'P_req': self.P_req,
+                              'DMIest': self.DMIest, 'avg_BW': self.avg_BW}
 
-        #pyomo requirements dictionary
+        pen.set_avg_nutrient_rqmts(avg_nutrient_rqmts)
+
+        pen.set_milk_avgs(self.avg_milk, self.avg_CP_milk)
+
+        # pyomo requirements dictionary
         self.pyomo_req['NEmaint'] = self.NEmaint
         self.pyomo_req['NEa'] = self.NEa
         self.pyomo_req['NEg'] = self.NEg
@@ -369,6 +377,7 @@ class Requirements:
         self.pyomo_req['Ca_req'] = self.Ca_req
         self.pyomo_req['P_req'] = self.P_req
         self.pyomo_req['DMIest'] = self.DMIest
+
 
 class AvailableFeeds:
     """
@@ -424,9 +433,9 @@ class AvailableFeeds:
         self.heiferI_limit = []
         # calf limit
         self.calf_limit = []
-        #pyomo dictionary structure
+        # pyomo dictionary structure
         self.pyomo_data = {}
-        #list of the feeds used in this ration
+        # list of the feeds used in this ration
         self.feeds = []
 
     def feed_nutrients(self, feed):
@@ -469,7 +478,6 @@ class AvailableFeeds:
                 self.lactating_cow_limit.append(feed['limit'])
                 self.dry_cow_limit.append(feed['limit'])
 
-
     def pyomo_nutrients_data(self, feed, animal_type, cow_type):
         """
         Class function that manipulates the available feeds nutrient information
@@ -484,46 +492,46 @@ class AvailableFeeds:
         available_feeds = feed.available_feeds
         # dictionary of feed costs
         feed_costs = feed.feed_costs
-        #list of parameters for non-LP
+        # list of parameters for non-LP
         params = ['TDN', 'DE', 'EE', 'is_fat', 'calcium',
-                'phosphorus', 'NDF', 'is_wetforage', 'Kd', 'N_A', 'N_B',
-                    'CP', 'dRUP']
-        #list of different energy types feed decision variable are split across
+                  'phosphorus', 'NDF', 'is_wetforage', 'Kd', 'N_A', 'N_B',
+                  'CP', 'dRUP']
+        # list of different energy types feed decision variable are split across
         enrg = ['mact', 'lact', 'growth']
-        #structuring empty data container
+        # structuring empty data container
         for p in params:
             self.pyomo_data[p] = {}
         self.pyomo_data['price'] = {}
         self.pyomo_data['ftype'] = {}
         self.pyomo_data['limit'] = {}
         feeds = []
-        #iterating through each feed available in formulation
+        # iterating through each feed available in formulation
         for key, feed in available_feeds.items():
             feeds.append(key)
-            #price and type data
+            # price and type data
             for s in enrg:
                 self.pyomo_data['price'][key, s] = feed_costs[key]
                 self.pyomo_data['ftype'][key, s] = feed['type']
-            #iterating through all param values for non-LP
+            # iterating through all param values for non-LP
             for p in params:
                 self.pyomo_data[p][key, 'mact'] = feed[p]
                 self.pyomo_data[p][key, 'lact'] = feed[p]
                 self.pyomo_data[p][key, 'growth'] = feed[p]
-            #checking if grown feed available and pop
+            # checking if grown feed available and pop
             if isinstance(feed['limit'], dict):
                 if cow_type:
                     for s in enrg:
                         self.pyomo_data['limit'][key, s] = \
-                                                 feed['limit']['lactating_cows']
+                            feed['limit']['lactating_cows']
                 elif animal_type == 'cow':
-                    for s in  enrg:
+                    for s in enrg:
                         self.pyomo_data['limit'][key, s] = feed['limit']['dry_cows']
                 else:
                     for s in enrg:
                         self.pyomo_data['limit'][key, s] = feed['limit']['heiferIIIs']
-            #if there are not farm grown feeds in diet
+            # if there are not farm grown feeds in diet
             else:
                 for s in enrg:
                     self.pyomo_data['limit'][key, s] = feed['limit']
-        #populating feeds list class variable
+        # populating feeds list class variable
         self.feeds = feeds
