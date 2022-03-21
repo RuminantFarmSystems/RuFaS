@@ -46,7 +46,7 @@ def residue_partitioning(soil, crop_type, weather, time):
 
     soil.AG_L_to_N = AG_L_to_N
 
-    K2 = 0.28
+    K2 = 0.04
     AG_met_active_decomp = K2
 
     for index, layer in enumerate(soil.soil_layers):
@@ -67,7 +67,7 @@ def residue_partitioning(soil, crop_type, weather, time):
 
 
         # above ground structural residue
-        K1 = 0.076
+        K1 = 0.010857
 
         # S.6.B.I.9
         AG_struct_decomp = K1 * math.exp(-3) * (1 - AG_met_percent)
@@ -117,7 +117,8 @@ def residue_partitioning(soil, crop_type, weather, time):
         # S.6.B.II.5
         BG_met_percent = 0.85 - 0.18 * BG_L_to_N
 
-        K4 = 0.35
+        K4 = 0.05
+
         BG_met_active_decomp = K4
 
         # S.6.B.II.7
@@ -129,7 +130,8 @@ def residue_partitioning(soil, crop_type, weather, time):
         layer.BG_met += AG_met_to_BG_met + (ADJ_crop_type_bio_BG * BG_met_percent) - layer.BG_met_to_C_active
 
         # below ground structural residue and roots
-        K3 = 0.094
+        K3 = 0.0134
+
         BG_struct_decomp = K3
 
         # S.6.B.II.10

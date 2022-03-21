@@ -6,15 +6,15 @@
             "plant_years": [2009],
             "repeat": 1,
             "planting_day": 90,
-            "harvest_day": 200,
+            "harvest_day": 237,
             "harvest_type": "optimal",
             "planting_order": "1st"
         },
-        "corn": {
+        "winter_wheat": {
             "plant_years": [2009],
             "repeat": 1,
-            "planting_day": 210,
-            "harvest_day": 320,
+            "planting_day": 239,
+            "harvest_day": 121,
             "harvest_type": "scheduled",
             "planting_order": "2nd"
         }

@@ -465,16 +465,16 @@ class Soil:
             # C in the soil layer
             self.M_d = 0
 
-            self.AG_met = 500
-            self.BG_met = 500
-            self.AG_struct = 500
-            self.BG_struct = 500
+            self.AG_met = 1250000
+            self.BG_met = 1250000
+            self.AG_struct = 1250000
+            self.BG_struct = 1250000
 
             self.tillage_percent = 0.0
 
-            self.C_active = 5000
-            self.C_slow = 5000
-            self.C_passive = 5000
+            self.C_active = 1250000
+            self.C_slow = 1250000
+            self.C_passive = 1250000
 
             self.AG_met_to_C_active = 0
             self.AG_struct_to_C_active = 0
