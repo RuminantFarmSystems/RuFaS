@@ -58,6 +58,8 @@ def calc_daily_root_biomass(crop_type):
     crop_type.fr_root = 0.4 - 0.2 * crop_type.fr_PHU
 
 
+
+
 def calc_z_root(crop_type):
     """
     Description:
