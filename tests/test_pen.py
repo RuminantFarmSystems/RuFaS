@@ -470,3 +470,38 @@ def test_clear(pen, calves):
     assert pen.animals_in_pen == []
     assert pen.pen_populated is False
     assert pen.avg_p_animal == 0
+
+
+def test_subset_class_feeds(mocker, pen):
+    """Unit test for function subset_class_feeds in file routines/animal/pen.py"""
+
+    feed_combinations = {
+        Pen.AnimalCombination.CALF: {155, 156, 157},
+        Pen.AnimalCombination.GROWING: {2, 51, 86, 136},
+        Pen.AnimalCombination.CLOSE_UP: {2, 26, 86, 118, 136, 139},
+        Pen.AnimalCombination.GROWING_AND_CLOSE_UP: {2, 51, 86, 136} | {2, 26, 86, 118, 136, 139},
+        Pen.AnimalCombination.LAC_COW: {26, 86, 103, 118, 136, 139},
+    }
+
+    feed = mocker.MagicMock()
+    feed.input_feed_combinations = feed_combinations
+
+    pen.animal_combination = Pen.AnimalCombination.CALF
+    pen.subset_class_feeds(feed)
+    assert pen.allocated_feeds == {155, 156, 157}
+
+    pen.animal_combination = Pen.AnimalCombination.GROWING
+    pen.subset_class_feeds(feed)
+    assert pen.allocated_feeds == {2, 51, 86, 136}
+
+    pen.animal_combination = Pen.AnimalCombination.CLOSE_UP
+    pen.subset_class_feeds(feed)
+    assert pen.allocated_feeds == {2, 26, 86, 118, 136, 139}
+
+    pen.animal_combination = Pen.AnimalCombination.GROWING_AND_CLOSE_UP
+    pen.subset_class_feeds(feed)
+    assert pen.allocated_feeds == {2, 51, 86, 136, 26, 86, 118, 136, 139}
+
+    pen.animal_combination = Pen.AnimalCombination.LAC_COW
+    pen.subset_class_feeds(feed)
+    assert pen.allocated_feeds == {26, 86, 103, 118, 136, 139}
