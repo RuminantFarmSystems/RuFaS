@@ -120,7 +120,7 @@
 	"methane_model": "IPCC",
 	"ration": {
 		"user_input": false,
-		"formulation_interval": 7
+		"formulation_interval": 30
 	},
 
 	"pen_information": {
@@ -129,7 +129,7 @@
 			"animal_combination": "CALF",
 			"vertical_dist_to_milking_parlor": 0.1,
 			"horizontal_dist_to_milking_parlor": 1.6,
-			"number_of_stalls": 100,
+			"number_of_stalls": 110,
 			"housing_type": "open air barn",
 			"bedding_type": "sand",
 			"pen_type": "freestall",
@@ -143,7 +143,7 @@
 			"animal_combination": "GROWING",
 			"vertical_dist_to_milking_parlor": 0.1,
 			"horizontal_dist_to_milking_parlor": 1.6,
-			"number_of_stalls": 200,
+			"number_of_stalls": 800,
 			"housing_type": "open air barn",
 			"bedding_type": "organic",
 			"pen_type": "freestall",
@@ -157,7 +157,7 @@
 			"animal_combination": "CLOSE_UP",
 			"vertical_dist_to_milking_parlor": 0.1,
 			"horizontal_dist_to_milking_parlor": 1.6,
-			"number_of_stalls": 300,
+			"number_of_stalls": 200,
 			"housing_type": "open air barn",
 			"bedding_type": "organic",
 			"pen_type": "tiestall",
@@ -171,7 +171,7 @@
 			"animal_combination": "LAC_COW",
 			"vertical_dist_to_milking_parlor": 0.1,
 			"horizontal_dist_to_milking_parlor": 1.6,
-			"number_of_stalls": 400,
+			"number_of_stalls": 850,
 			"housing_type": "open air barn",
 			"bedding_type": "sand",
 			"pen_type": "tiestall",

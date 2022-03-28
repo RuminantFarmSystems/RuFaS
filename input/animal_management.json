@@ -2,7 +2,7 @@
     "config":
     {
         "start_date" : "2009:244",
-        "end_date" : "2009:264",
+        "end_date" : "2011:264",
         "csv_dir": "output/CSVs/",
         "graphic_dir": "output/graphics/",
         "run_tests": true,
@@ -10,10 +10,11 @@
         "seed": 42
     },
     "weather": "barnyard_weather.csv",
-    "output": "custom_output.json",
+    "output": "life_cycle_report.json",
     "farm":
     {
-        "fields": {},
+        "fields": {
+        },
         "animal": "animal_management_animal.json",
         "feed": "panke_buisse_feed.json"
     }

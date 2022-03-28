@@ -531,6 +531,11 @@ class AnimalManagement:
         close_up_pens = []
         growing_pens = []
         calf_pens = []
+
+        self.pens_by_animal_combination = {Pen.AnimalCombination.CALF: [], Pen.AnimalCombination.GROWING: [],
+                                      Pen.AnimalCombination.CLOSE_UP: [],
+                                      Pen.AnimalCombination.GROWING_AND_CLOSE_UP: [],
+                                      Pen.AnimalCombination.LAC_COW: []}
         # hasable mixed type pens (by pen_id)
         mixed_type_pens = {}
         # lists of types hashed pen_id
@@ -589,7 +594,8 @@ class AnimalManagement:
                     # initalizing a default pen to be used for any class
                     pen = Pen(len(self.all_pens), 0.1, 1.6, max_value,
                               'open air barn', 'straw', 'tiestall', 'manual_scraping',
-                              'sedimentation', 'storage_pit', [], 1.2)
+                              'sedimentation', 'storage_pit', max_key[0], 1.2)
+
                     self.all_pens.append(pen)
                 # if available pen
                 else:
@@ -597,13 +603,13 @@ class AnimalManagement:
                     del mixed_types[pen.id]
 
                 # Assigning pen to relevant pen list
-                if max_key[0] == 'calf':
+                if max_key[0].name == 'CALF':
                     calf_pens.append(pen)
                     self.pens_by_animal_combination[Pen.AnimalCombination.CALF].append(pen)
-                elif max_key[0] == 'growing':
+                elif max_key[0].name == 'GROWING':
                     growing_pens.append(pen)
                     self.pens_by_animal_combination[Pen.AnimalCombination.GROWING].append(pen)
-                elif max_key[0] == 'close_up':
+                elif max_key[0].name == 'CLOSE_UP':
                     close_up_pens.append(pen)
                     self.pens_by_animal_combination[Pen.AnimalCombination.CLOSE_UP].append(pen)
                 else:
