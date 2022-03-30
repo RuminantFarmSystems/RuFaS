@@ -38,7 +38,7 @@ def daily_crop_routine(soil, crop, field_management, weather, time):
     # 'null'. The routine is skipped in this case
     if crop_type.crop_name != 'null':
 
-        # if the crop was killed the previous day, set the new crop
+        #if the crop was killed the previous day, set the new crop
         if crop_type.killed:
             # set the next crop to grow in a double cropping rotation
             if crop_type.harvest_day > crop_type.planting_day:
@@ -172,15 +172,12 @@ def annual_crop_routine(crop, time):
 
     # current crop year is set to the next year of crops in the regimen
     crop.current_crop_year = crop.grow_regimen[time.year - 1]
+    
+    print(crop.current_crop.crop_name )
+    # current crop is the first crop to grow in the selected year
+    crop.current_crop = crop.current_crop_year[0]
 
-    if crop.current_crop.crop_name == 'null' or crop.current_crop.killed:
-        crop.current_crop = crop.current_crop_year[0]
-
-        if crop.current_crop.crop_name == 'null':
-            # current crop is the first crop to grow in the selected year
-            crop.current_crop = crop.current_crop_year[1]
-
-        crop.current_crop.kill_year = is_kill_year(crop, time)
+    crop.current_crop.kill_year = is_kill_year(crop, time)
 
 
 def dormancy_routine(soil, crop_type, field_management, time):
@@ -244,7 +241,8 @@ def is_kill_year(crop, time):
             crop.current_crop_year[1].crop_name != 'null':
         crop.current_crop.kill_day = crop.current_crop.harvest_day
         return True
-    return False
+    else:
+        return False
 
 
 class Crop:
@@ -550,8 +548,8 @@ def in_dormancy(crop, time):
     # The current day length is less than the day length threshold for dormancy
     if T_dl < T_dl_thr:
         return True
-
-    return False
+    else:
+        return False
 
 
 def get_year_length(time):
@@ -606,4 +604,5 @@ def check_conditions_plant(soil, weather, time):
     if (weather.rainfall[curr_year][curr_day] + weather.irrigation[curr_year][curr_day]) >= 1.0:
         return False
 
-    return True
+    else:
+        return True

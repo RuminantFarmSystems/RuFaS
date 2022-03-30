@@ -2,7 +2,7 @@
     "config":
     {
         "start_date" : "2009:1",
-        "end_date" : "2009:365",
+        "end_date" : "2010:365",
         "csv_dir": "output/CSVs/",
         "graphic_dir": "output/graphics/",
         "set_seed": false,
@@ -17,9 +17,9 @@
     {
         "fields": {
             "field_1": {
-                "soil": "ARL_soil.json",
-                "crop": "double_cropping_1yr_rotation.json",
-                "field_management": "ARL_no_fert_field_management.json"
+                "soil": "base_case_soil.json",
+                "crop": "base_case_crop.json",
+                "field_management": "base_case_field_management.json"
             }
         },
         "animal": "barnyard_animal.json",

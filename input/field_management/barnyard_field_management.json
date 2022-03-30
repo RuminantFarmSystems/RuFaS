@@ -34,7 +34,7 @@
         "repeat": 1,
         "year": [],
         "day": [],
-        "percent_incorporated": [],
+        "percent_incorporated": [0.3],
         "percent_mixed": [],
         "depth": []
     }
