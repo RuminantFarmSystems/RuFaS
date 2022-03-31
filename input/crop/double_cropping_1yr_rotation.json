@@ -9,7 +9,7 @@
             "harvest_day": 237,
             "harvest_type": "optimal",
             "planting_order": "1st",
-            "extracted": "True"
+            "extracted": true
         },
         "winter_wheat": {
             "plant_years": [2009],
@@ -18,7 +18,7 @@
             "harvest_day": 121,
             "harvest_type": "scheduled",
             "planting_order": "2nd",
-            "extracted": "False"
+            "extracted": false
         }
     }
 }

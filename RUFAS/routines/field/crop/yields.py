@@ -224,7 +224,6 @@ def calc_residue(soil, crop_type, field_management, time):
     d_residue = 0
     if time.day == crop_type.kill_day or crop_type.crop_type == 'annual':
         d_residue = crop_type.biomass_actual - crop_type.yield_actual
-        crop_type.biomass_actual
         kill(crop_type, field_management, time)
     else:
         bio_frac = crop_type.yield_actual / crop_type.biomass_actual
