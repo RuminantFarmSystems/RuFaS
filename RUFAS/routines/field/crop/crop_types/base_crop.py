@@ -15,6 +15,8 @@ class BaseCrop:
         self.feed_id = 'null'
         self.raw_id = 'null'
 
+        self.extracted = False
+
         # Necessary variables for a null crop to run
         # These variables are used within the soil module and must
         # be declared and initialized even when a crop is not growing

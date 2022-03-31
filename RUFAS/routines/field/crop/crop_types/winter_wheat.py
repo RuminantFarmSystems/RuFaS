@@ -27,6 +27,7 @@ class WinterWheat(BaseCrop):
         self.planted = False
         self.growing = False
         self.killed = False
+        self.extracted = winter_wheat_data['extracted']
 
         self.fix_nitrogen = False
 

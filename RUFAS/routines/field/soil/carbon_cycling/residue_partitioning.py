@@ -58,9 +58,14 @@ def residue_partitioning(soil, crop_type, weather, time):
         AG_met_to_BG_met = layer.AG_met * layer.tillage_percent
 
         # S.6.B.I.4 / S.6.B.I.7
-        if index == 0:
-            layer.AG_met += soil.residue_harvest * AG_met_percent - (
-                (layer.AG_met_to_C_active - AG_met_to_BG_met) + AG_met_to_BG_met)
+        if index == 0: #for top layer
+            if crop_type.extracted: #if we extract biomass
+                layer.AG_met += soil.residue_harvest * AG_met_percent - (
+                    (layer.AG_met_to_C_active - AG_met_to_BG_met) + AG_met_to_BG_met)
+            else: #if we incorporate biomass
+                layer.AG_met += crop_type.biomass_actual * AG_met_percent - (
+                    (layer.AG_met_to_C_active - AG_met_to_BG_met) + AG_met_to_BG_met)
+
         else:
             layer.AG_met += 0 * AG_met_percent - (
                     (layer.AG_met_to_C_active - AG_met_to_BG_met) + AG_met_to_BG_met)
