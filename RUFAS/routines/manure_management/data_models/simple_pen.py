@@ -5,11 +5,11 @@ from manure import Manure
 class SimplePen:
     """
     A simplified Pen class that extracts only relevant information from the
-    original Pen class in the AnimalManagement class.
+    original Pen class in the AnimalManagement module.
 
     Args:
-        manure: A Manure object that captures the manure data from the passed-in Pen object
-        
+        manure: A Manure object that captures the manure data from the Pen object argument
+
     """
 
     def __init__(self, pen: Pen):
