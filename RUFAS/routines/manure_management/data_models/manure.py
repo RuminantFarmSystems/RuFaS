@@ -63,7 +63,7 @@ class Manure:
 
         Returns:
             A new Manure object with summed attributes.
-            The
+            The original operands remain intact.
 
         """
 

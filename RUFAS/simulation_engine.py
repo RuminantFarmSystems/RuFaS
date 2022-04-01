@@ -15,8 +15,6 @@ from RUFAS import routines, errors, classes
 from RUFAS.classes import Config, State, Weather, Time
 from RUFAS.util import get_base_dir, read_json_file
 from RUFAS.output_handler import OutputHandler
-#TODO fix this error (RUFAS.test doesn't exist)
-#from RUFAS.test import test_handler
 import random
 import numpy
 
@@ -51,7 +49,6 @@ def simulate(input_file_path: Path):
     sys.stdout.write("Simulating  ")
     # MAIN Simulation Loop
     while not time.end_simulation():
-        print("Simulation engine line 54")
         annual_simulation()
 
     output.finalize(state, weather, time)
@@ -74,7 +71,6 @@ def daily_simulation():
     """Executes the daily simulation routines."""
 
     # Daily routines
-    print("Simulation.py line 77")
     routines.daily_animal_routine(state.animal_management, state.feed, weather, time)
     routines.daily_manure_storage_routine(state.manure_storage, state.animal_management)
     routines.daily_fields_routine(state.fields, state.manure_storage, weather, time)
@@ -121,7 +117,6 @@ def annual_simulation():
                 sys.stdout.write("/")
                 case = 0
 
-        print("simulation.py line 124")
         daily_simulation()
 
     # Post-Annual Routines
@@ -158,9 +153,6 @@ def initialize_simulation(file_path: Path, data):
         if config.set_seed:
             random.seed(config.seed)
             numpy.random.seed(config.seed)
-
-        if config.run_tests:
-            test_handler.run_tests()
 
         weather = Weather(data['weather'], config)
         time = Time(config)

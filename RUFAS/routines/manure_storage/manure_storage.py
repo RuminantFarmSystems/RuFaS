@@ -33,8 +33,12 @@ def daily_manure_storage_routine3(manure_storage, animal_management):
     manure_storage.summarize_annual_variables()
 
 
-# TODO: To be removed after completing the final version of ManureStorage
 class ManureStorage2:
+    """
+    To be removed after completing the final version of `ManureStorage`
+
+    """
+
     def __init__(self, animal_management):
         """
         Description:
@@ -139,7 +143,7 @@ class ManureStorage2:
         """
 
         for pen in animal_management.all_pens:
-            self.pens[pen.id] = (ManureStorage.Pen(pen))
+            self.pens[pen.id] = (ManureStorage2.Pen(pen))
 
     def initialize_separators(self, animal_management):
         """
@@ -153,7 +157,7 @@ class ManureStorage2:
 
         for pen in animal_management.all_pens:
             if not self.separators.keys().__contains__(pen.manure_separator):
-                self.separators[pen.manure_separator] = (ManureStorage.Separator(pen))
+                self.separators[pen.manure_separator] = (ManureStorage2.Separator(pen))
 
     def initialize_storage(self, animal_management):
         """
@@ -167,7 +171,7 @@ class ManureStorage2:
 
         for pen in animal_management.all_pens:
             if not self.storage.keys().__contains__(pen.manure_storage):
-                self.storage[pen.manure_storage] = (ManureStorage.Storage(pen))
+                self.storage[pen.manure_storage] = (ManureStorage2.Storage(pen))
 
     def summarize_manure_storage(self):
         """
