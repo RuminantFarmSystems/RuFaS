@@ -8,6 +8,12 @@ Description: Driver for the manure storage model
 Author(s): William Donovan, wmdonovan@wisc.edu
 """
 from RUFAS.routines.manure_storage import manure_emissions, manure_handling, manure_separator
+from RUFAS.routines.animal.animal_management import AnimalManagement
+
+
+class ManureStorage:
+    def __init__(self, animal_management: AnimalManagement):
+        pass
 
 
 # TODO: To be removed after completing the final version `daily_manure_storage_routine`
@@ -31,7 +37,7 @@ def daily_manure_storage_routine3(manure_storage, animal_management):
     manure_storage.summarize_annual_variables()
 
 
-class ManureStorage:
+class ManureStorage2:
     def __init__(self, animal_management):
         """
         Description:
