@@ -9,105 +9,60 @@ Author(s):  William Donovan, wmdonovan@wisc.edu
             Yunus Mohammed, ymm26@cornell.edu 
             Sadman Chowdhury, skc86@cornell.edu 
 """
+from typing import List
+
 from RUFAS.routines.manure_management import handlers, reception_pits, manure_separators, \
     treatments, storage_options
+# TODO figure out how to run the model
+# TODO figure out how to connect to csv values
+from RUFAS.routines.manure_management.data_models.manure import Manure
+from RUFAS.routines.manure_management.data_models.simple_animal_management import SimpleAnimalManagement
+from RUFAS.routines.manure_management.data_models.simple_pen import SimplePen
+
 
 # TODO figure out how to import just all_pens
-from RUFAS.routines.animal.animal_management import AnimalManagement as Animal_Module
 
 
-# TODO figure out how to run the model 
-# TODO figure out how to connect to csv values
-"""
-The function takes in the animal_management class and returns a dictionary with 
-values of manure for all of the pens combined. I.e. it takes the U, the TAN_s,
-etc from all of the pens, adds up each respective categories, and returns a dic
-of the total manure for all of the pens.
+def compile_manure_for_all_pens(animal_management: SimpleAnimalManagement):
+    """
+    Combine the manure data from all the pens in an AnimalManagement object.
 
-Parameters:
-    animal_management: animal management class
+    Args:
+        animal_management: An AnimalManagement object that stores a list
+        of pens.
 
-"""
-def compile_manure_for_all_pens(Animal_Module):
-    pens = Animal_Module["all_pens"]
-    total_manure = {
-            "U": 0,
-            "TAN_s": 0,
-            "MN": 0,
-            "Mkg": 0,
-            "TSd": 0,
-            "VSd": 0,
-            "VSnd": 0,
-            "WIP_frac": 0,
-            "WOP_frac": 0,
-            "p_excrt_manure": 0,
-            "p_frac": 0,
-            "K_manure": 0,
-            "CH4_manure": 0
-    }
-    for pen in pens:
-        print(pen["manure"]["U"])
-        total_manure["U"] += pen["manure"]["U"]
-        total_manure["TAN_s"] += pen["manure"]["TAN_s"]
-        total_manure["MN"] += pen["manure"]["MN"]
-        total_manure["Mkg"] += pen["manure"]["Mkg"]
-        total_manure["TSd"] += pen["manure"]["TSd"]
-        total_manure["VSd"] += pen["manure"]["VSd"]
-        total_manure["VSnd"] += pen["manure"]["VSnd"]
-        total_manure["WIP_frac"] += pen["manure"]["WIP_frac"]
-        total_manure["WOP_frac"] += pen["manure"]["WOP_frac"]
-        total_manure["p_excrt_manure"] += pen["manure"]["p_excrt_manure"]
-        total_manure["p_frac"] += pen["manure"]["p_frac"]
-        total_manure["K_manure"] += pen["manure"]["K_manure"]
-        total_manure["CH4_manure"] += pen["manure"]["CH4_manure"]
+    Returns:
+        A Manure object that sums up respective categories from all the pens.
+
+    """
+
+    pen_numbers = list(range(len(animal_management.all_pens)))
+    return combine_manure_for_different_pens(pen_numbers, animal_management)
 
 
-    return total_manure  
+def combine_manure_for_different_pens(pen_numbers: List[int], animal_management: SimpleAnimalManagement):
+    """
+    Take a list of pen numbers and an AnimalManagement object and
+    combine the manure data of those selected pens.
 
-"""
-    Takes a list of pen numbers and an instance of animal_management class, 
-    combines the manure information for the pens passed in, and returns a
-    dictionary with the combined information.
+    Args:
+        pen_numbers: a list of pen numbers, e.g. [1,2] means pen 1 and 2
+        animal_management: An AnimalManagement object that stores a list
+        of pens.
 
-    Parameters:
-        list_of_pen_numbers: a list of pen numbers, e.g. [1,2] means pen 1 and 2
-        animal_management: instance of animal_management class
-"""
-def combine_manure_for_different_pens(list_of_pen_numbers, animal_management):
-    pens = animal_management["all_pens"]
-    total_manure = {
-            "U": 0,
-            "TAN_s": 0,
-            "MN": 0,
-            "Mkg": 0,
-            "TSd": 0,
-            "VSd": 0,
-            "VSnd": 0,
-            "WIP_frac": 0,
-            "WOP_frac": 0,
-            "p_excrt_manure": 0,
-            "p_frac": 0,
-            "K_manure": 0,
-            "CH4_manure": 0
-    }
-    for i in list_of_pen_numbers:
-        pen = pens[i]
-        total_manure["U"] += pen["manure"]["U"]
-        total_manure["TAN_s"] += pen["manure"]["TAN_s"]
-        total_manure["MN"] += pen["manure"]["MN"]
-        total_manure["Mkg"] += pen["manure"]["Mkg"]
-        total_manure["TSd"] += pen["manure"]["TSd"]
-        total_manure["VSd"] += pen["manure"]["VSd"]
-        total_manure["VSnd"] += pen["manure"]["VSnd"]
-        total_manure["WIP_frac"] += pen["manure"]["WIP_frac"]
-        total_manure["WOP_frac"] += pen["manure"]["WOP_frac"]
-        total_manure["p_excrt_manure"] += pen["manure"]["p_excrt_manure"]
-        total_manure["p_frac"] += pen["manure"]["p_frac"]
-        total_manure["K_manure"] += pen["manure"]["K_manure"]
-        total_manure["CH4_manure"] += pen["manure"]["CH4_manure"]
+    Returns:
+        A Manure object that sums up respective categories from
+        those selected pens.
+
+    """
+
+    pens: List[SimplePen] = animal_management.all_pens
+    total_manure = Manure()
+
+    for i in pen_numbers:
+        total_manure += pens[i].manure
 
     return total_manure
-
 
 
 def daily_manure_storage_routine(animal_management, manure_management):
@@ -462,7 +417,7 @@ class ManureManagement:
         self.TS_DM_effluent = 0.0
         self.other_solids = 0.0
         self.other_liquids = 0.0
-        [handler.reset_daily_variables() for handler in self.handlers.values()] 
+        [handler.reset_daily_variables() for handler in self.handlers.values()]
         [reception_pit.reset_daily_variables() for reception_pit in self.reception_pits.values()]
         [separator.reset_daily_variables() for separator in self.separators.values()]
         [treatment.reset_daily_variables() for treatment in self.treatments.values()]
