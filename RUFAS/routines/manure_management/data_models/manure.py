@@ -1,13 +1,28 @@
+"""
+RUFAS: Ruminant Farm Systems Model
+File name: manure.py
+
+Description: A data model that represents the manure data extracted from
+the Animal Management module.
+
+
+Author(s): Loi Pham, ltp23@cornell.edu
+
+"""
+
+from __future__ import annotations
 from dataclasses import dataclass, astuple
 from typing import Union
 
+# Declare a custom type hint
 Number = Union[int, float]
+
 
 # TODO: Add attributes description
 @dataclass
 class Manure:
-    """A class that represents the manure data extracted from the animal
-    management module.
+    """A class that represents the manure data extracted from the Animal
+    Management module.
 
     Attributes:
         U:
@@ -40,7 +55,7 @@ class Manure:
     K_manure: Number = 0
     CH4_manure: Number = 0
 
-    def __add__(self, other: 'Manure') -> 'Manure':
+    def __add__(self, other: Manure) -> Manure:
         """Add two Manure objects by summing their corresponding attributes.
 
         Args:
