@@ -10,6 +10,7 @@ Author(s): William Donovan, wmdonovan@wisc.edu
 from RUFAS.routines.manure_storage import manure_emissions, manure_handling, manure_separator
 
 
+# TODO: To be removed after completing the final version `daily_manure_storage_routine`
 def daily_manure_storage_routine3(manure_storage, animal_management):
     manure_storage.reset_daily_variables()
 

@@ -18,6 +18,8 @@ from RUFAS.routines.manure_management import handlers, reception_pits, manure_se
 from RUFAS.routines.manure_management.data_models.manure import Manure
 from RUFAS.routines.manure_management.data_models.simple_animal_management import SimpleAnimalManagement
 from RUFAS.routines.manure_management.data_models.simple_pen import SimplePen
+from ..manure_storage import ManureStorage
+from RUFAS.routines.animal.animal_management import AnimalManagement
 
 
 # TODO figure out how to import just all_pens
@@ -65,6 +67,11 @@ def combine_manure_for_different_pens(pen_numbers: List[int], animal_management:
     return total_manure
 
 
+def daily_manure_storage_routine(manure_storage: ManureStorage, _animal_management: AnimalManagement):
+    animal_management = SimpleAnimalManagement(_animal_management)
+    
+
+# TODO: To be removed after completing the final version `daily_manure_storage_routine`
 def daily_manure_storage_routine2(animal_management, manure_management):
     print("Before calling reset")
     manure_management.reset_daily_variables0()
