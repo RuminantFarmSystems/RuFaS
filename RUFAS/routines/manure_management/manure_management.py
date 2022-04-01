@@ -9,92 +9,77 @@ Author(s):  William Donovan, wmdonovan@wisc.edu
             Yunus Mohammed, ymm26@cornell.edu 
             Sadman Chowdhury, skc86@cornell.edu 
 """
-from typing import List
 
-from RUFAS.routines.manure_management import handlers, reception_pits, manure_separators, \
-    treatments, storage_options
+from RUFAS.routines.animal.animal_management import AnimalManagement
+from RUFAS.routines.manure_management import handlers, manure_separators, reception_pits, storage_options, treatments
+
+
 # TODO figure out how to run the model
 # TODO figure out how to connect to csv values
-from RUFAS.routines.manure_management.data_models.manure import Manure
-from RUFAS.routines.manure_management.data_models.simple_animal_management import SimpleAnimalManagement
-from RUFAS.routines.manure_management.data_models.simple_pen import SimplePen
-from ..manure_storage import ManureStorage
-from RUFAS.routines.animal.animal_management import AnimalManagement
 
 
-# TODO figure out how to import just all_pens
+class ManureStorage:
+    """Acts as a wrapper class for the ManureManagement class.
 
-
-def compile_manure_for_all_pens(animal_management: SimpleAnimalManagement):
-    """
-    Combine the manure data from all the pens in an AnimalManagement object.
-
-    Args:
-        animal_management: An AnimalManagement object that stores a list
-        of pens.
-
-    Returns:
-        A Manure object that sums up respective categories from all the pens.
+    After the references to `ManureStorage` in `simulation_engine.py`
+    and `classes.py` are fixed, this class should be removed.
 
     """
 
-    pen_numbers = list(range(len(animal_management.all_pens)))
-    return combine_manure_for_different_pens(pen_numbers, animal_management)
+    def __init__(self, animal_management: AnimalManagement):
+        self.manure_management = ManureManagement(animal_management)
 
+    def annual_reset(self):
+        self.manure_management.annual_reset()
 
-def combine_manure_for_different_pens(pen_numbers: List[int], animal_management: SimpleAnimalManagement):
-    """
-    Take a list of pen numbers and an AnimalManagement object and
-    combine the manure data of those selected pens.
-
-    Args:
-        pen_numbers: a list of pen numbers, e.g. [1,2] means pen 1 and 2
-        animal_management: An AnimalManagement object that stores a list
-        of pens.
-
-    Returns:
-        A Manure object that sums up respective categories from
-        those selected pens.
-
-    """
-
-    pens: List[SimplePen] = animal_management.all_pens
-    total_manure = Manure()
-
-    for i in pen_numbers:
-        total_manure += pens[i].manure
-
-    return total_manure
-
-
-def daily_manure_storage_routine(manure_storage: ManureStorage, _animal_management: AnimalManagement):
-    animal_management = SimpleAnimalManagement(_animal_management)
-    manure_storage.reset_daily_variables()
-
-
-# TODO: To be removed after completing the final version `daily_manure_storage_routine`
-def daily_manure_storage_routine2(animal_management, manure_management):
-    manure_management.reset_daily_variables0()
-
-    compile_manure_for_all_pens(animal_management)
-
-    for reception_pit in manure_management.reception_pits.values():
-        reception_pit.update_all()
-
-    for separator in manure_management.separators.values():
-        separator.update_all()
-
-    for treatment in manure_management.treatments:
-        treatment.update_all()
-
-    for storage in manure_management.storage.values():
-        storage.update_all()
-
-    manure_management.summarize_manure_management()
-    manure_management.summarize_annual_variables()
+    def annual_mass_balance(self):
+        self.manure_management.annual_mass_balance()
 
 
 class ManureManagement:
+    """A driver class for the manure module
+
+    This class should replace the ManureStorage class used in `classes.py`
+    and `simulation_engine.py`.
+
+    """
+
+    def __init__(self, animal_management: AnimalManagement):
+        pass
+
+    def initialize_manure_handler(self):
+        pass
+
+    def initialize_reception_pit(self):
+        pass
+
+    def initialize_manure_separator(self):
+        pass
+
+    def initialize_storage_option(self):
+        pass
+
+    def summarize_manure_management(self):
+        pass
+
+    def reset_daily_variables(self):
+        pass
+
+    def annual_reset(self):
+        pass
+
+    def summarize_annual_variables(self):
+        pass
+
+    def annual_mass_balance(self):
+        pass
+
+
+class ManureManagement2:
+    """To be removed after completing the final version of `ManureManagement` above
+
+    """
+
     def __init__(self, manure_management_data, animal_management):
         """
         Description:
