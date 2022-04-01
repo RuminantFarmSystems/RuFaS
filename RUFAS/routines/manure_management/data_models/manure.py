@@ -25,19 +25,18 @@ class Manure:
     Management module.
 
     Attributes:
-        U:
-        TAN_s:
-        MN:
-        Mkg:
-        TSd:
-        VSd:
-        VSnd:
-        WIP_frac:
-        WOP_frac:
-        p_excrt_manure:
-        p_frac:
-        K_manure:
-        CH4_manure:
+        U: urea concentration, mol/L
+        TAN_s: total ammoniacal nitrogen concentration in the manure slurry, mol/L
+        MN: nitrogen in liquid and solid manure, g
+        Mkg: amount of manure, kg
+        VSd: degradable volatile solids, g
+        VSnd: non-degradable volatile solids, g
+        WIP_frac: water extractable inorganic P fraction
+        WOP_frac: water extractable organic P fraction
+        p_excrt_manure: manure P excretion for manure module input (g)
+        p_frac: P fraction of manure
+        K_manure: potassium in manure, g/day
+        CH4_manure: methane emission
 
     """
 

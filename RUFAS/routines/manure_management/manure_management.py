@@ -14,7 +14,6 @@ from RUFAS.routines.animal.animal_management import AnimalManagement
 from RUFAS.routines.manure_management import handlers, manure_separators, reception_pits, storage_options, treatments
 
 
-# TODO figure out how to run the model
 # TODO figure out how to connect to csv values
 
 
@@ -22,12 +21,16 @@ class ManureStorage:
     """Acts as a wrapper class for the ManureManagement class.
 
     After the references to `ManureStorage` in `simulation_engine.py`
-    and `classes.py` are fixed, this class should be removed.
+    and `classes.py` and `manure_application.py` are changed to `ManureManagement`,
+    this class should be removed.
 
     """
 
     def __init__(self, animal_management: AnimalManagement):
         self.manure_management = ManureManagement(animal_management)
+
+    def __getattr__(self, item):
+        return getattr(self.manure_management, item)
 
     def annual_reset(self):
         self.manure_management.annual_reset()
@@ -39,13 +42,76 @@ class ManureStorage:
 class ManureManagement:
     """A driver class for the manure module
 
-    This class should replace the ManureStorage class used in `classes.py`
-    and `simulation_engine.py`.
+    This class should replace the `ManureStorage` class used in
+    `classes.py` and `simulation_engine.py` and `manure_application.py`.
 
     """
 
-    def __init__(self, animal_management: AnimalManagement):
-        pass
+    def __init__(self, _animal_management: AnimalManagement):
+        self.pens = {}
+        self.separators = {}
+        self.storage = {}
+
+        # TODO: Build dataclasses to simplify this long list of variables
+        # TODO: Break down this list into logical chunks
+        #  e.g., daily_variables, annual_variables, manure_variables, etc.
+        self.TS = 0
+        self.VS = 0
+        self.N = 0
+        self.P = 0
+        self.K = 0
+        self.TS_liquid = 0
+        self.VS_liquid = 0
+        self.N_liquid = 0
+        self.P_liquid = 0
+        self.K_liquid = 0
+        self.TS_loss = 0.0
+        self.VS_loss = 0.0
+        self.other_solids = 0.0
+        self.other_liquids = 0.0
+        self.TS_DM_effluent = 0.0
+        self.CH4_emissions = 0
+
+        self.raw_manure_annual = 0.0
+        self.initial_manure = 0.0
+        self.manure_calc = 0.0
+        self.manure_delta = 0.0
+        self.manure_management_balance_difference = 0.0
+        self.initial_manure_annual = 0.0
+        self.manure_calc_annual = 0.0
+        self.manure_delta_annual = 0.0
+        self.manure_management_balance_difference_annual = 0.0
+        self.manure_applied = 0.0
+        self.N_applied = 0.0
+        self.P_applied = 0.0
+        self.TS_annual = 0
+        self.VS_annual = 0
+        self.N_annual = 0
+        self.P_annual = 0
+        self.K_annual = 0
+        self.manure_applied_annual = 0.0
+        self.N_applied_annual = 0.0
+        self.P_applied_annual = 0.0
+        self.CH4_emissions_annual = 0.0
+        self.TS_liquid_annual = 0
+        self.VS_liquid_annual = 0
+        self.N_liquid_annual = 0
+        self.P_liquid_annual = 0
+        self.K_liquid_annual = 0
+        self.TS_loss_annual = 0.0
+        self.VS_loss_annual = 0.0
+        self.other_solids_annual = 0.0
+        self.other_liquids_annual = 0.0
+        self.TS_DM_effluent_annual = 0.0
+
+    def __getattr__(self, item):
+        """
+        For now, any missing numerical instance variables that
+        are not listed above will get a value of 0.
+
+        """
+
+        return 0
 
     def initialize_manure_handler(self):
         pass
@@ -62,17 +128,17 @@ class ManureManagement:
     def summarize_manure_management(self):
         pass
 
-    def reset_daily_variables(self):
-        pass
-
-    def annual_reset(self):
-        pass
-
     def summarize_annual_variables(self):
         pass
 
+    def reset_daily_variables(self):
+        print('Reset daily variables')
+
+    def annual_reset(self):
+        print('Annual reset')
+
     def annual_mass_balance(self):
-        pass
+        print('Annual mass balance')
 
 
 class ManureManagement2:
