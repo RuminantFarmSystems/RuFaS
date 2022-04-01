@@ -10,7 +10,7 @@ Author(s): William Donovan, wmdonovan@wisc.edu
 from RUFAS.routines.manure_storage import manure_emissions, manure_handling, manure_separator
 
 
-def daily_manure_storage_routine(manure_storage, animal_management):
+def daily_manure_storage_routine3(manure_storage, animal_management):
     manure_storage.reset_daily_variables()
 
     for pen_id in manure_storage.pens:

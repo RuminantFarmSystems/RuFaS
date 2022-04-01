@@ -65,7 +65,7 @@ def combine_manure_for_different_pens(pen_numbers: List[int], animal_management:
     return total_manure
 
 
-def daily_manure_storage_routine(animal_management, manure_management):
+def daily_manure_storage_routine2(animal_management, manure_management):
     print("Before calling reset")
     manure_management.reset_daily_variables0()
     print("after calling reset")
