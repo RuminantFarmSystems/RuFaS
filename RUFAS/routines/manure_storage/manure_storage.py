@@ -15,6 +15,9 @@ class ManureStorage:
     def __init__(self, animal_management: AnimalManagement):
         pass
 
+    def reset_daily_variables(self):
+        pass
+
 
 # TODO: To be removed after completing the final version `daily_manure_storage_routine`
 def daily_manure_storage_routine3(manure_storage, animal_management):
@@ -37,6 +40,7 @@ def daily_manure_storage_routine3(manure_storage, animal_management):
     manure_storage.summarize_annual_variables()
 
 
+# TODO: To be removed after completing the final version of ManureStorage
 class ManureStorage2:
     def __init__(self, animal_management):
         """

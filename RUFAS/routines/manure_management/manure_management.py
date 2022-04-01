@@ -69,13 +69,12 @@ def combine_manure_for_different_pens(pen_numbers: List[int], animal_management:
 
 def daily_manure_storage_routine(manure_storage: ManureStorage, _animal_management: AnimalManagement):
     animal_management = SimpleAnimalManagement(_animal_management)
+    manure_storage.reset_daily_variables()
 
 
 # TODO: To be removed after completing the final version `daily_manure_storage_routine`
 def daily_manure_storage_routine2(animal_management, manure_management):
-    print("Before calling reset")
     manure_management.reset_daily_variables0()
-    print("after calling reset")
 
     compile_manure_for_all_pens(animal_management)
 
