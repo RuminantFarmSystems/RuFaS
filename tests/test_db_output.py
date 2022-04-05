@@ -4,122 +4,58 @@ File name: test_db_output.py
 Description: Implements test cases
 Author(s): Militsa Sotirova, militsasotirova@gmail.com
 """
+import builtins
 import os.path
-import shutil
+import threading
+import time
+from urllib.request import urlopen
+import socket
+import socketserver
 
 import pytest
-from output_db.db_view import *
+from mock.mock import MagicMock
+from output_db.db_view import RequestHandler, DB_OUTPUT_PATH, PORT
 from output_db.db_view import write_csv
-from output_db.db_view import create_dir
 from output_db.db_view import create_all_dirs
 
 
-def test_write_csv():
+@pytest.fixture(scope="session", autouse=True)
+def start_server():
+    server = socketserver.TCPServer(("", PORT), RequestHandler)
+    server_thread = threading.Thread(target=server.serve_forever)
+    server.socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEPORT, 1)
+    server_thread.start()
+    # Wait a bit for the server to come up
+    time.sleep(1)
+    yield server
+    server.shutdown()
+
+
+def test_write_csv(mocker):
     """Unit test for function write_csv in file output_db/db_view.py"""
-    # Test that the file can be successfully created.
-    file_name = "../test.csv"
-    column_headers = ["col1", "col2", "col3"]
-    data_rows = [["1", "2", "3"], ["4", "5", "6"]]
-    write_csv(file_name, column_headers, data_rows)
-
-    with open(file_name) as csv_file:
-        line_count = 0
-        csv_reader = csv.reader(csv_file)
-
-        for row in csv_reader:
-            if line_count == 0:
-                assert row == column_headers
-            elif line_count == 1:
-                assert row == data_rows[0]
-            elif line_count == 2:
-                assert row == data_rows[1]
-            else:
-                # Test should fail if this code is reached.
-                assert False
-
-            line_count += 1
-
-    # (Test Cleanup) Remove created file.
-    os.remove(file_name)
+    builtins.open = MagicMock()
+    open_spy = mocker.spy(builtins, 'open')
+    write_csv('', [], [])
+    assert open_spy.call_count == 1
 
 
-def test_create_dir():
-    """Unit test for function create_dir in file output_db/db_view.py"""
-    path = '../test_dir_creation'
-
-    # Test that the directory can be successfully created.
-    status, message = create_dir(path)
-    assert status == OK
-    assert message == "Successfully created the directory %s " % path
-
-    # Test that the appropriate error message appears when the directory
-    # already exists.
-    status, message = create_dir(path)
-    assert status == OK
-    assert message == "Warning: Directory " + path + " already exists - old "\
-                                                     "data will be overwritten."
-
-    # Test that the appropriate error message appears when a different error
-    # occurs.
-    bad_path = '../test/dir/creation'
-    status, message = create_dir(bad_path)
-    assert status == BAD_GATEWAY
-    assert message.startswith("Creation of the directory " + bad_path +
-                              " failed with exception ")
-
-    # (Test Cleanup) Remove created directory.
-    try:
-        os.rmdir(path)
-    except OSError as e:
-        print("Error: %s : %s" % (path, e.strerror))
-        # Test should fail if this code is reached.
-        assert False
-
-
-def test_create_all_dirs():
+def test_create_all_dirs(mocker):
     """Unit test for function create_all_dirs in file output_db/db_view.py"""
-    # Test that the directory can be successfully created.
     title = "test_title"
-
-    # A result_id that the database will never generate, thus ensuring that
-    # this test does not overwrite any existing directories.
     result_id = "-1"
 
-    status, message, path = create_all_dirs(title, result_id)
-    print(message)
-    assert status == OK
-    assert message == "Successfully created directories"
-    assert os.path.isdir(path)
-    assert os.path.isdir(path + MANURE_PATH_SUFFIX)
-    assert os.path.isdir(path + FARM_ES_PATH_SUFFIX)
-    assert os.path.isdir(path + FARM_ES_PATH_SUFFIX +
-                         FARM_ES_FEED_PRINT_PATH_SUFFIX)
-    assert os.path.isdir(path + FARM_ES_PATH_SUFFIX +
-                         FARM_ES_SUMMARY_PATH_SUFFIX)
+    os.mkdir = MagicMock()
+    mkdir_spy = mocker.spy(os, 'mkdir')
 
-    # Edge cases for other status/warning messages are tested in
-    # test_create_dir().
+    path = create_all_dirs(title, result_id)
 
-    # (Test Cleanup) Remove created directories.
-    try:
-        shutil.rmtree(path)
-    except OSError as e:
-        print("Error: %s : %s" % (path, e.strerror))
-        # Test should fail if this code is reached.
-        assert False
+    assert path == DB_OUTPUT_PATH + str(result_id) + '_' + title + '/'
+    assert mkdir_spy.call_count == 6
 
-
-# I wasn't sure how to test the following functions since it is hard (at
-# least, I couldn't find anyway online to do so) to instantiate
-# RequestHandler (notice that in db_view.py itself, I never directly
-# instantiate it - the class is passed to the TCPServer constructor).
-# I don't think it makes sense to make all of the functions tested below static
-# just for the sake of creating test cases, but I'm not sure what else would
-# be appropriate.
 
 def test_do_GET():
     """Unit test for function do_GET in file output_db/db_view.py"""
-    pass
+    print(urlopen("http://localhost:" + str(PORT) + "/").read())
 
 
 def test_do_POST():
