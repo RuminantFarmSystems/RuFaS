@@ -17,16 +17,22 @@ class SimplePen:
 
     def __init__(self, pen: Pen):
         self.manure = Manure(**pen.manure)
+
         self.id: int = pen.id
         self.animals_in_pen = pen.animals_in_pen
         self.classes_in_pen = pen.classes_in_pen
+
         self.housing_type: str = pen.housing_type
         self.bedding_type: str = pen.bedding_type
 
+        self.manure_handler: str = pen.manure_handling
+        self.manure_separator: str = pen.manure_separator
+        self.manure_storage: str = pen.manure_storage
+
     def __str__(self) -> str:
-        return f'SimplePen data: \n' \
-               f'manure = {self.manure} \n' \
-               f'id = {self.id} \n' \
-               f'classes in pen = {self.classes_in_pen} \n' \
-               f'housing type = {self.housing_type} \n' \
-               f'bedding type = {self.bedding_type}'
+        s = 'SimplePen data: \n'
+
+        for v in vars(self):
+            s += f'{v}: {getattr(self, v)} \n'
+
+        return s
