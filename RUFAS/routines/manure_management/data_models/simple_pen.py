@@ -11,12 +11,22 @@ class SimplePen:
         manure: A Manure object that captures the manure data from the `pen` object argument
 
     Args:
-        pen: A Pen object that has a `manure` attribute
+        pen: A Pen object from the AnimalManagement module
 
     """
 
     def __init__(self, pen: Pen):
         self.manure = Manure(**pen.manure)
+        self.id: int = pen.id
+        self.animals_in_pen = pen.animals_in_pen
+        self.classes_in_pen = pen.classes_in_pen
+        self.housing_type: str = pen.housing_type
+        self.bedding_type: str = pen.bedding_type
 
     def __str__(self) -> str:
-        return f'SimplePen manure data: {str(self.manure)}'
+        return f'SimplePen data: \n' \
+               f'manure = {self.manure} \n' \
+               f'id = {self.id} \n' \
+               f'classes in pen = {self.classes_in_pen} \n' \
+               f'housing type = {self.housing_type} \n' \
+               f'bedding type = {self.bedding_type}'
