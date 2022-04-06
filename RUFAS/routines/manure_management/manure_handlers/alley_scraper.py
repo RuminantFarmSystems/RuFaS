@@ -10,10 +10,10 @@ Author(s):  William Donovan, wmdonovan@wisc.edu
 """
 
 
-from .base_handler import BaseHandler
+from .base_manure_handler import BaseManureHandler
 
 
-class AlleyScraper(BaseHandler):
+class AlleyScraper(BaseManureHandler):
     """
     Description
     ------------

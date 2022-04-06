@@ -13,7 +13,7 @@ Author(s):  William Donovan, wmdonovan@wisc.edu
 from ..sand_separators.sand_separation_lane import SandSeparationLane
 
 
-class BaseHandler:
+class BaseManureHandler:
     """
     Description
     ------------

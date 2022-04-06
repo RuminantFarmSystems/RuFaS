@@ -11,11 +11,17 @@ Author(s):  William Donovan, wmdonovan@wisc.edu
 """
 
 from RUFAS.routines.animal.animal_management import AnimalManagement
-from RUFAS.routines.manure_management import handlers, manure_separators, reception_pits, storage_options, treatments
+from RUFAS.routines.manure_management import manure_separators, reception_pits, storage_options, treatments
 
 # TODO figure out how to connect to csv values
 from RUFAS.routines.manure_management.data_models.daily_manure_variables import DailyManureVariables
 from RUFAS.routines.manure_management.data_models.daily_variables import DailyVariables
+
+from RUFAS.routines.manure_management.manure_handlers.alley_scraper import AlleyScraper
+from RUFAS.routines.manure_management.manure_handlers.custom_manure_handler import CustomManureHandler
+from RUFAS.routines.manure_management.manure_handlers.flush_system import FlushSystem
+from RUFAS.routines.manure_management.manure_handlers.manual_scraping import ManualScraping
+from RUFAS.routines.manure_management.manure_handlers.null_manure_handler import NullManureHandler
 
 
 class ManureStorage:
@@ -262,27 +268,27 @@ class ManureManagement2:
     @staticmethod
     def initialize_handler(pen, handler, reception_pit, handler_data):
         if handler.startswith('null'):
-            return handlers.null_handler.NullHandler(pen, reception_pit, handler=handler)
+            return NullManureHandler(pen, reception_pit, handler=handler)
 
         if handler.split('_pen')[0] not in handler_data:
             print(handler, 'is not defined in manure management JSON. Updating to null.')
-            return handlers.null_handler.NullHandler(pen, reception_pit, handler=handler)
+            return NullManureHandler(pen, reception_pit, handler=handler)
 
         handler_data = handler_data[handler.split('_pen')[0]]
 
         if handler.__contains__('alley_scraper'):
-            return handlers.alley_scraper.AlleyScraper(pen, handler, handler_data, reception_pit)
+            return AlleyScraper(pen, handler, handler_data, reception_pit)
         elif handler.__contains__('flush_system'):
-            return handlers.flush_system.FlushSystem(pen, handler, handler_data, reception_pit)
+            return FlushSystem(pen, handler, handler_data, reception_pit)
         elif handler.__contains__('manual_scraping'):
-            return handlers.manual_scraping.ManualScraping(pen, handler, handler_data, reception_pit)
+            return ManualScraping(pen, handler, handler_data, reception_pit)
         else:
             print(handler, 'not currently implemented for manure management. Creating custom handler.')
             if {'water_use_rate', 'time_per_cleaning', 'cleanings_per_day'} not in handler_data:
                 print('Cannot use default values for manure handler', handler, '. Setting to manual scraping.')
-                return handlers.manual_scraping.ManualScraping(pen, handler, handler_data, reception_pit)
+                return ManualScraping(pen, handler, handler_data, reception_pit)
             else:
-                return handlers.custom_handler.CustomHandler(pen, handler, handler_data, reception_pit)
+                return CustomManureHandler(pen, handler, handler_data, reception_pit)
 
     @staticmethod
     def initialize_reception_pit(reception_pit, separator, reception_pit_data):

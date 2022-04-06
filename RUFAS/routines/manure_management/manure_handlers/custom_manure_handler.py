@@ -1,7 +1,7 @@
-from .base_handler import BaseHandler
+from .base_manure_handler import BaseManureHandler
 
 
-class CustomHandler(BaseHandler):
+class CustomManureHandler(BaseManureHandler):
     def __init__(self, pen, handler, handler_data, reception_pit):
         super().__init__(pen, handler, handler_data, reception_pit)
         self.water_use_rate = handler_data['water_use_rate']

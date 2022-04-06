@@ -1,7 +1,7 @@
-from .base_handler import BaseHandler
+from .base_manure_handler import BaseManureHandler
 
 
-class NullHandler(BaseHandler):
+class NullManureHandler(BaseManureHandler):
     def __init__(self, pen, reception_pit, handler='null_handler', handler_data=None):
         if handler_data is None:
             handler_data = {
