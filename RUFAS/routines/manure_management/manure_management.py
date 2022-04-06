@@ -13,16 +13,18 @@ Author(s):  William Donovan, wmdonovan@wisc.edu
 from RUFAS.routines.animal.animal_management import AnimalManagement
 from RUFAS.routines.manure_management import handlers, manure_separators, reception_pits, storage_options, treatments
 
-
 # TODO figure out how to connect to csv values
+from RUFAS.routines.manure_management.data_models.daily_manure_variables import DailyManureVariables
+from RUFAS.routines.manure_management.data_models.daily_variables import DailyVariables
 
 
 class ManureStorage:
     """Acts as a wrapper class for the ManureManagement class.
 
-    After the references to `ManureStorage` in `simulation_engine.py`
-    and `classes.py` and `manure_application.py` are changed to `ManureManagement`,
-    this class should be removed.
+    Notes:
+        After the references to `ManureStorage` in `simulation_engine.py`
+        and `classes.py` and `manure_application.py` are changed to `ManureManagement`,
+        this class should be removed.
 
     """
 
@@ -42,8 +44,10 @@ class ManureStorage:
 class ManureManagement:
     """A driver class for the manure module
 
-    This class should replace the `ManureStorage` class used in
-    `classes.py` and `simulation_engine.py` and `manure_application.py`.
+    Notes:
+        This class should replace the `ManureStorage` class used in
+        `classes.py` and `simulation_engine.py` and
+        `manure_application.py`.
 
     """
 
@@ -52,65 +56,31 @@ class ManureManagement:
         self.separators = {}
         self.storage = {}
 
-        # TODO: Build dataclasses to simplify this long list of variables
-        # TODO: Break down this list into logical chunks
-        #  e.g., daily_variables, annual_variables, manure_variables, etc.
-        self.TS = 0
-        self.VS = 0
-        self.N = 0
-        self.P = 0
-        self.K = 0
-        self.TS_liquid = 0
-        self.VS_liquid = 0
-        self.N_liquid = 0
-        self.P_liquid = 0
-        self.K_liquid = 0
-        self.TS_loss = 0.0
-        self.VS_loss = 0.0
-        self.other_solids = 0.0
-        self.other_liquids = 0.0
-        self.TS_DM_effluent = 0.0
-        self.CH4_emissions = 0
+        self.daily_vars = DailyVariables()
+        self.daily_manure_vars = DailyManureVariables()
 
-        self.raw_manure_annual = 0.0
-        self.initial_manure = 0.0
-        self.manure_calc = 0.0
-        self.manure_delta = 0.0
-        self.manure_management_balance_difference = 0.0
-        self.initial_manure_annual = 0.0
-        self.manure_calc_annual = 0.0
-        self.manure_delta_annual = 0.0
-        self.manure_management_balance_difference_annual = 0.0
-        self.manure_applied = 0.0
-        self.N_applied = 0.0
-        self.P_applied = 0.0
-        self.TS_annual = 0
-        self.VS_annual = 0
-        self.N_annual = 0
-        self.P_annual = 0
-        self.K_annual = 0
-        self.manure_applied_annual = 0.0
-        self.N_applied_annual = 0.0
-        self.P_applied_annual = 0.0
-        self.CH4_emissions_annual = 0.0
-        self.TS_liquid_annual = 0
-        self.VS_liquid_annual = 0
-        self.N_liquid_annual = 0
-        self.P_liquid_annual = 0
-        self.K_liquid_annual = 0
-        self.TS_loss_annual = 0.0
-        self.VS_loss_annual = 0.0
-        self.other_solids_annual = 0.0
-        self.other_liquids_annual = 0.0
-        self.TS_DM_effluent_annual = 0.0
+        self.annual_vars = DailyVariables()
+        self.annual_manure_vars = DailyManureVariables()
 
     def __getattr__(self, item):
         """
-        For now, any missing numerical instance variables that
-        are not listed above will get a value of 0.
+        Notes:
+            This method is meant for those external clients (e.g.,
+            `manure_application` in `field_management` submodule)
+            that have been relying on the previous implementation.
+
+            As soon as all those external clients agree on an export
+            data model or interface that the manure module provides,
+            this method will either be rewritten or removed.
 
         """
 
+        daily_objs = [self.daily_vars, self.daily_manure_vars]
+        annual_objs = [self.annual_vars, self.annual_manure_vars]
+        objs = annual_objs if 'annual' in item else daily_objs
+        for obj in objs:
+            if item in vars(obj):
+                return getattr(obj, item)
         return 0
 
     def initialize_manure_handler(self):
@@ -133,6 +103,8 @@ class ManureManagement:
 
     def reset_daily_variables(self):
         print('Reset daily variables')
+        self.daily_vars = DailyVariables()
+        self.daily_manure_vars = DailyManureVariables()
 
     def annual_reset(self):
         print('Annual reset')

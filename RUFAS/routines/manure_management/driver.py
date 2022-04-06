@@ -7,7 +7,7 @@ from RUFAS.routines.manure_management.data_models.simple_animal_management impor
 from RUFAS.routines.manure_management.data_models.simple_pen import SimplePen
 
 
-def daily_manure_storage_routine(manure_storage: ManureStorage, _animal_management: AnimalManagement):
+def daily_manure_storage_routine(manure_storage: ManureStorage, animal_management: AnimalManagement):
     """Acts a wrapper function for `daily_manure_storage_routine` function.
 
     After the references to `ManureStorage` in `simulation_engine.py`
@@ -15,7 +15,7 @@ def daily_manure_storage_routine(manure_storage: ManureStorage, _animal_manageme
 
     """
 
-    daily_manure_storage_routine_main(manure_storage.manure_management, _animal_management)
+    daily_manure_storage_routine_main(manure_storage.manure_management, animal_management)
 
 
 def daily_manure_storage_routine_main(manure_management: ManureManagement, _animal_management: AnimalManagement):
@@ -26,7 +26,7 @@ def daily_manure_storage_routine_main(manure_management: ManureManagement, _anim
     ManureManagement object argument.
 
     This function will be renamed to `daily_manure_storage_routine`
-    after the wrapper function is removed.
+    after the wrapper function has been removed.
 
     """
     animal_management = SimpleAnimalManagement(_animal_management)
