@@ -5,7 +5,6 @@
         "end_date" : "2019:365",
         "csv_dir": "output/CSVs/",
         "graphic_dir": "output/graphics/",
-        "run_tests": false,
         "set_seed": false,
         "seed": 0
     },

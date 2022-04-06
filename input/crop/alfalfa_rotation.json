@@ -3,10 +3,10 @@
 
     "crops": {
         "alfalfa": {
-            "grow_years": [2009],
+            "plant_years": [2009],
             "repeat": 1,
-            "planting_date": 100,
-            "harvest_date": 300,
+            "planting_day": 100,
+            "harvest_day": 300,
             "harvest_type": "optimal"
         }
     }

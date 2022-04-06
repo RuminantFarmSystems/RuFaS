@@ -8,10 +8,10 @@ class Corn(BaseCrop):
         """GENERAL PLANT INFO"""
 
         corn_data = data
-        self.grow_years = corn_data['grow_years']
+        self.plant_years = corn_data['plant_years']
         self.repeat = corn_data['repeat']
-        self.planting_date = corn_data['planting_date']
-        self.harvest_date = corn_data['harvest_date']
+        self.planting_day = corn_data['planting_day']
+        self.harvest_day = corn_data['harvest_day']
         self.harvest_type = corn_data['harvest_type']
 
         self.crop_name = crop_name
@@ -26,7 +26,7 @@ class Corn(BaseCrop):
         self.growing = False
         self.harvested = False
 
-        self.fix_nitrogen = True  # TODO: change back
+        self.fix_nitrogen = False
 
         # ===================================================================
         ''' HEAT UNIT DATA '''
