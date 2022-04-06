@@ -9,18 +9,19 @@ Author(s):  William Donovan, wmdonovan@wisc.edu
             Yunus Mohammed, ymm26@cornell.edu 
             Sadman Chowdhury, skc86@cornell.edu 
 """
-
 from RUFAS.routines.animal.animal_management import AnimalManagement
 from RUFAS.routines.manure_management import manure_separators, reception_pits, storage_options, treatments
 
 # TODO figure out how to connect to csv values
 from RUFAS.routines.manure_management.data_models.daily_manure_variables import DailyManureVariables
 from RUFAS.routines.manure_management.data_models.daily_variables import DailyVariables
+from RUFAS.routines.manure_management.data_models.simple_pen import SimplePen
 
 from RUFAS.routines.manure_management.manure_handlers.alley_scraper import AlleyScraper
 from RUFAS.routines.manure_management.manure_handlers.custom_manure_handler import CustomManureHandler
 from RUFAS.routines.manure_management.manure_handlers.flush_system import FlushSystem
 from RUFAS.routines.manure_management.manure_handlers.manual_scraping import ManualScraping
+from RUFAS.routines.manure_management.manure_handlers.manure_handler_init_data import ManureHandlerInitData
 from RUFAS.routines.manure_management.manure_handlers.null_manure_handler import NullManureHandler
 
 
@@ -89,7 +90,10 @@ class ManureManagement:
                 return getattr(obj, item)
         return 0
 
-    def initialize_manure_handler(self):
+    def initialize_manure_handler(self, pen: SimplePen,
+                                  manure_handler: str,
+                                  handler_data: ManureHandlerInitData,
+                                  reception_pit):
         pass
 
     def initialize_reception_pit(self):

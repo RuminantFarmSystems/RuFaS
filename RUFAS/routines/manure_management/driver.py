@@ -1,7 +1,7 @@
 from typing import List
 
 from RUFAS.routines.animal.animal_management import AnimalManagement
-from RUFAS.routines.manure_management import ManureManagement, ManureStorage
+from RUFAS.routines.manure_management.manure_management import ManureManagement, ManureStorage
 from RUFAS.routines.manure_management.data_models.manure import Manure
 from RUFAS.routines.manure_management.data_models.simple_animal_management import SimpleAnimalManagement
 from RUFAS.routines.manure_management.data_models.simple_pen import SimplePen
