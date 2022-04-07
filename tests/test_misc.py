@@ -6,6 +6,7 @@ Author(s): Pooya Hekmati, sh2235@cornell.edu
 """
 
 import pytest
+from RUFAS.simulation_engine import SimulationEngine
 
 
 def test_annual_reset():
@@ -48,24 +49,12 @@ def test_is_leap_year():
     pass
 
 
-def test_simulate():
-    """Unit test for function simulate in file simulation_engine.py"""
-    pass
-
-
-def test_daily_simulation():
-    """Unit test for function daily_simulation in file simulation_engine.py"""
-    pass
-
-
-def test_annual_simulation():
-    """Unit test for function annual_simulation in file simulation_engine.py"""
-    pass
-
-
-def test_initialize_simulation():
-    """Unit test for function initialize_simulation in file simulation_engine.py"""
-    pass
+def init_simulation_engine(mocker):
+    mocker.patch('SimulationEngine._initialize_simulation', return_value=None)
+    print(mocker)
+    sim_eng = SimulationEngine('dummy_path')
+    import pdb;pdb.set_trace()
+    assert 1==0
 
 
 def test_input_prompt():
