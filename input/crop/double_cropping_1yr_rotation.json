@@ -3,7 +3,7 @@
 
     "crops": {
         "alfalfa": {
-            "plant_years": [2009],
+            "plant_years": [2009,2011],
             "repeat": 1,
             "planting_day": 90,
             "harvest_day": 237,
@@ -12,8 +12,8 @@
             "extracted": true
         },
         "winter_wheat": {
-            "plant_years": [2009],
-            "repeat": 1,
+            "plant_years": [2009,2011],
+            "repeat": 0,
             "planting_day": 239,
             "harvest_day": 121,
             "harvest_type": "scheduled",
