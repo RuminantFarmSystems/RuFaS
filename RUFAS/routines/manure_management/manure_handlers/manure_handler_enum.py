@@ -1,21 +1,22 @@
 from __future__ import annotations
 
-from enum import Enum
+from enum import auto
+
+from RUFAS.routines.manure_management.helpers.enum_helpers import ExtendedEnum
 
 
-class ManureHandlerEnum(Enum):
-    FLUSH_SYSTEM = 'flush_system'
-    MANUAL_SCRAPING = 'manual_scraping'
-    ALLEY_SCRAPER = 'alley_scraper'
-    NULL_MANURE_HANDLER = 'null'
-    CUSTOM_MANURE_HANDLER = 'custom'
+class ManureHandlerEnum(ExtendedEnum):
+    FLUSH_SYSTEM = auto()
+    MANUAL_SCRAPING = auto()
+    ALLEY_SCRAPER = auto()
+    NULL_MANURE_HANDLER = auto()
+    CUSTOM_MANURE_HANDLER = auto()
 
-    @classmethod
-    def get_enum(cls, manure_handler: str, default='flush_system') -> ManureHandlerEnum:
-        for e in cls:  # Iterate through each enum member
-            if manure_handler.lower() in e.value.lower():
-                return e
-        else:
-            print(f'{manure_handler} is not currently implemented as a handling method. '
-                  f'Setting to {default}')
-            return cls.get_enum(default)
+    DEFAULT = FLUSH_SYSTEM
+
+
+if __name__ == '__main__':
+    print(ManureHandlerEnum.get_enum('flush'))
+    print(ManureHandlerEnum.get_enum('scrape'))
+    print(ManureHandlerEnum.get_enum('dummy'))
+    print(ManureHandlerEnum.DEFAULT)
