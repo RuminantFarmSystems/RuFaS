@@ -54,7 +54,7 @@ def residue_partitioning(soil, crop_type, weather, time):
     # S.6.B.I.9
     AG_struct_decomp = K1 * math.exp(-3) * (1 - AG_met_percent)
 
-    for index, layer in enumerate(soil.soil_layers):
+    for layer_number, layer in enumerate(soil.soil_layers):
         # above ground metabolic residue
         # S.6.B.I.5
         layer.AG_met_to_C_active = AG_met_active_decomp * layer.M_d * soil.T_d * layer.AG_met
@@ -63,7 +63,8 @@ def residue_partitioning(soil, crop_type, weather, time):
         AG_met_to_BG_met = layer.AG_met * layer.tillage_percent
 
         # S.6.B.I.4 / S.6.B.I.7
-        if index == 0: #for top layer
+       
+        if layer_number == 0: #for top layer
 
             # S.6.B.I.11
             residue_incorp = layer.tillage_percent * soil.residue_harvest
@@ -71,35 +72,30 @@ def residue_partitioning(soil, crop_type, weather, time):
             AG_struct_to_BG_struct = layer.AG_struct * layer.tillage_percent
 
             if crop_type.extracted == True: #if we extract biomass
-
-                # S.6.B.I.4 / S.6.B.I.7
-                layer.AG_met += soil.residue_harvest * AG_met_percent - (
-                    (layer.AG_met_to_C_active - AG_met_to_BG_met) + AG_met_to_BG_met)
-
-                layer.AG_struct += ((soil.residue_harvest * (1 - AG_met_percent)) - AG_struct_to_BG_struct) - \
-                                (layer.AG_struct_to_C_active + layer.AG_struct_to_C_slow)
+                
+                ag_biomass = soil.residue_harvest
 
             else: #if we incorporate biomass
-
-                layer.AG_met += crop_type.bio_AG * AG_met_percent - (
-                        (layer.AG_met_to_C_active - AG_met_to_BG_met) + AG_met_to_BG_met)
-
-                layer.AG_struct += ((crop_type.bio_AG * (1 - AG_met_percent)) - AG_struct_to_BG_struct) - \
-                                (layer.AG_struct_to_C_active + layer.AG_struct_to_C_slow)
+                ag_biomass = crop_type.bio_AG
 
         else: #non top layers
+            
             AG_struct_to_BG_struct = 0
 
             residue_incorp = 0
 
-            layer.AG_met += 0 * AG_met_percent - (
-                    (layer.AG_met_to_C_active - AG_met_to_BG_met) + AG_met_to_BG_met)
+            ag_biomass = 0
 
-            layer.AG_struct += ((0 * (1 - AG_met_percent)) - AG_struct_to_BG_struct) - \
-                               (layer.AG_struct_to_C_active + layer.AG_struct_to_C_slow)
+        # S.6.B.I.4 / S.6.B.I.7
+        layer.AG_met += ag_biomass * AG_met_percent - (
+            (layer.AG_met_to_C_active - AG_met_to_BG_met) + AG_met_to_BG_met)
+
+        layer.AG_struct += ((ag_biomass * (1 - AG_met_percent)) - AG_struct_to_BG_struct) - \
+                        (layer.AG_struct_to_C_active + layer.AG_struct_to_C_slow)
 
         # S.6.B.I.10
         layer.AG_struct_to_C_active = AG_struct_decomp * layer.M_d * soil.T_d * layer.AG_struct
+        
         layer.AG_struct_to_C_slow = AG_struct_decomp * layer.M_d * soil.T_d * layer.AG_struct
 
 
