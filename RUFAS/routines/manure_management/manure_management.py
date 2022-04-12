@@ -21,7 +21,8 @@ from RUFAS.routines.manure_management.manure_handlers.manure_handler_factory imp
 from RUFAS.routines.manure_management.manure_separators.base_separator import BaseSeparator
 from RUFAS.routines.manure_management.output.manure_management_output import ManureManagementOutput
 from RUFAS.routines.manure_management.reception_pits.base_reception_pit import BaseReceptionPit
-from RUFAS.routines.manure_management.storage_options.base_storage import BaseStorage
+from RUFAS.routines.manure_management.storage_options.storage_option_classes.base_storage import BaseStorage
+from RUFAS.routines.manure_management.storage_options.storage_option_factory import StorageOptionFactory
 
 
 class ManureStorage:
@@ -95,8 +96,10 @@ class ManureManagement:
         return 0
 
     def build(self, animal_management: SimpleAnimalManagement):
+        """Set up all the components."""
+
         for pen in animal_management.all_pens:
-            # self.storage_options[pen.id] = BaseStorage(None, None)
+            self.storage_options[pen.id] = StorageOptionFactory.get_instance(pen=pen)
             # self.separators[pen.id] = BaseSeparator(None, None, treatment=self.storage_options[pen.id])
             # self.reception_pits[pen.id] = BaseReceptionPit(None, None, separator=self.separators[pen.id])
             # self.manure_handlers[pen.id] = ManureHandlerFactory.get_instance(pen=pen,
@@ -105,14 +108,21 @@ class ManureManagement:
             self.manure_handlers[pen.id] = ManureHandlerFactory.get_instance(pen=pen, reception_pit=None)
 
     def update(self, animal_management: SimpleAnimalManagement):
+        """
+        Update all the components and subcomponents given
+        new information from Animal Management.
+
+        """
+
         for pen in animal_management.all_pens:
             self.manure_handlers[pen.id].update(pen)
+            self.storage_options[pen.id].update(pen)
 
     def summarize_manure_management(self):
         self.summarize_manure_handlers()
         # summarize separators
         # summarize reception pits
-        # summarize storage options
+        self.summarize_storage_options()
 
     def summarize_manure_handlers(self):
         for handler in self.manure_handlers.values():
@@ -121,6 +131,14 @@ class ManureManagement:
                     raw_manure=h.raw_manure,
                     TS_loss=h.TS_loss,
                     VS_loss=h.VS_loss
+            )
+
+    # TODO: Check logic
+    def summarize_storage_options(self):
+        for storage in self.storage_options.values():
+            s = storage.daily_vars
+            self.daily_vars += DailyVariables(
+                    CH4_emissions=s.CH4
             )
 
     def summarize_annual_variables(self):
@@ -143,11 +161,14 @@ class ManureManagement:
                 WOP=tot.WOP
         )
 
+    # TODO: Simplify all the for-loops into one
     def reset_daily_variables(self):
         print('Reset daily variables')
         self.daily_vars = DailyVariables()
         for handler in self.manure_handlers.values():
             handler.reset_daily_variables()
+        for storage_option in self.storage_options.values():
+            storage_option.reset_daily_variables()
 
     def annual_reset(self):
         print('Annual reset===================================================')

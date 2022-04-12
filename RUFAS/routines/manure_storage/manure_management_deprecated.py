@@ -256,14 +256,14 @@ class ManureManagement2:
             storage = 'storage_pond'
         storage_data = storage_data[storage]
         if storage.__contains__('storage_pond'):
-            return storage_options.storage_pond.StoragePond(storage, storage_data)
+            return RUFAS.routines.manure_management.storage_options.storage_option_classes.storage_pond.StoragePond(storage, storage_data)
         elif storage.__contains__('anaerobic_lagoon'):
             return storage_options.anaerobic_lagoon.AnaerobicLagoon(storage, storage_data)
         else:
             print(storage, 'not currently implemented for manure management. Creating custom storage.')
             if storage_data['default']:
                 print('Cannot use default values for manure storage', storage, '. Setting to storage pond.')
-                return storage_options.storage_pond.StoragePond(storage, storage_data)
+                return RUFAS.routines.manure_management.storage_options.storage_option_classes.storage_pond.StoragePond(storage, storage_data)
             else:
                 return storage_options.custom_storage.CustomStorage(storage, storage_data)
 
