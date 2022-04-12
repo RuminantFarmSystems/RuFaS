@@ -5,7 +5,7 @@ from dataclasses import astuple, dataclass
 
 # TODO: Should remove unnecessary variables or consolidate with other variables in the module
 @dataclass
-class StorageOptionDailyVariables:
+class StorageOptionVariables:
     TS: float = 0.0
     VS: float = 0.0
     N: float = 0.0
@@ -24,24 +24,24 @@ class StorageOptionDailyVariables:
     WOP_frac: float = 0.0
     CH4: float = 0.0
 
-    def __add__(self, other: StorageOptionDailyVariables) -> StorageOptionDailyVariables:
+    def __add__(self, other: StorageOptionVariables) -> StorageOptionVariables:
         """
-        Add two StorageOptionDailyVariables objects by summing
+        Add two StorageOptionVariables objects by summing
         their corresponding attributes.
 
         Args:
-            other: the StorageOptionDailyVariables object to be added to the `self` object
+            other: the StorageOptionVariables object to be added to the `self` object
 
         Returns:
-            A new StorageOptionDailyVariables object with summed attributes.
+            A new StorageOptionVariables object with summed attributes.
             The original operands remain intact.
 
         """
 
-        if not isinstance(other, StorageOptionDailyVariables):
-            raise TypeError('Cannot add a non-StorageOptionDailyVariables object to a '
-                            'StorageOptionDailyVariables object.')
+        if not isinstance(other, StorageOptionVariables):
+            raise TypeError('Cannot add a non-StorageOptionVariables object to a '
+                            'StorageOptionVariables object.')
 
-        return StorageOptionDailyVariables(*[
+        return StorageOptionVariables(*[
             attr1 + attr2 for attr1, attr2 in zip(astuple(self), astuple(other))
         ])
