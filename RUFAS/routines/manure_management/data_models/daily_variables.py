@@ -21,6 +21,17 @@ class DailyVariables:
     TS_DM_effluent: float = 0.0
     other_solids: float = 0.0
     other_liquids: float = 0.0
+    WIP: float = 0.0
+    WOP: float = 0.0
+
+    raw_manure: float = 0.0
+    initial_manure: float = 0.0
+    manure_calc: float = 0.0
+    manure_delta: float = 0.0
+    manure_management_balance_difference: float = 0.0
+    manure_applied: float = 0.0
+    N_applied: float = 0.0
+    P_applied: float = 0.0
 
     def __add__(self, other: DailyVariables) -> DailyVariables:
         if not isinstance(other, DailyVariables):

@@ -18,7 +18,6 @@ from typing import Union
 Number = Union[int, float]
 
 
-# TODO: Add attributes description
 @dataclass
 class Manure:
     """A class that represents the manure data extracted from the Animal
