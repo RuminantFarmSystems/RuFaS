@@ -53,9 +53,9 @@ class BaseSeparator:
 
         """
 
-        self.effluent_liquid()
-        self.effluent_solid()
-        self.update_storage_option_variables()
+        # self.effluent_liquid()
+        # self.effluent_solid()
+        # self.update_storage_option_variables()
 
     def effluent_liquid(self):
         """

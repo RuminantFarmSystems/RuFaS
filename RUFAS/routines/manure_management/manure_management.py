@@ -128,8 +128,8 @@ class ManureManagement:
 
     def summarize_manure_management(self):
         self.summarize_manure_handlers()
-        # summarize separators
-        # summarize reception pits
+        self.summarize_manure_separators()
+        self.summarize_reception_pits()
         self.summarize_storage_options()
 
     def summarize_manure_handlers(self):
@@ -140,6 +140,12 @@ class ManureManagement:
                     TS_loss=h.TS_loss,
                     VS_loss=h.VS_loss
             )
+
+    def summarize_manure_separators(self):
+        pass
+
+    def summarize_reception_pits(self):
+        pass
 
     # TODO: Check logic
     def summarize_storage_options(self):
