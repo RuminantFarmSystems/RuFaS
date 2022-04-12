@@ -66,15 +66,15 @@ class BaseManureHandler:
             "pseudocode_manure_management" MS.3
         """
         self.update_daily_variables(pen)
-        self.flush_water()
-        self.N_loss()
-        self.P_loss()
-        self.K_loss()
-        self.solids()
-        if self.bedding_manager.bedding_enum is BeddingEnum.SAND:
-            self.sand_lane.sand_lane()
-        self.CH4_effluent()
-        self.WIP_WOP()
+        # self.flush_water()
+        # self.N_loss()
+        # self.P_loss()
+        # self.K_loss()
+        # self.solids()
+        # if self.bedding_manager.bedding_enum is BeddingEnum.SAND:
+        #     self.sand_lane.sand_lane()
+        # self.CH4_effluent()
+        # self.WIP_WOP()
 
     def update_daily_variables(self, pen: SimplePen):
         self.daily_vars += ManureHandlerVariables.get_instance_from_pen(pen)

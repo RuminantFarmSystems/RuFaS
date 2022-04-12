@@ -18,7 +18,9 @@ from RUFAS.routines.manure_management.data_models.simple_animal_management impor
 from RUFAS.routines.manure_management.manure_handlers.manure_handler_classes.base_manure_handler import \
     BaseManureHandler
 from RUFAS.routines.manure_management.manure_handlers.manure_handler_factory import ManureHandlerFactory
-from RUFAS.routines.manure_management.manure_separators.base_separator import BaseSeparator
+from RUFAS.routines.manure_management.manure_separators.manure_separator_classes.base_separator import BaseSeparator
+
+from RUFAS.routines.manure_management.manure_separators.manure_separator_factory import ManureSeparatorFactory
 from RUFAS.routines.manure_management.output.manure_management_output import ManureManagementOutput
 from RUFAS.routines.manure_management.reception_pits.base_reception_pit import BaseReceptionPit
 from RUFAS.routines.manure_management.storage_options.storage_option_classes.base_storage import BaseStorage
@@ -64,7 +66,7 @@ class ManureManagement:
 
     def __init__(self, animal_management: AnimalManagement):
         self.manure_handlers: Dict[int, BaseManureHandler] = {}
-        self.separators: Dict[int, BaseSeparator] = {}
+        self.manure_separators: Dict[int, BaseSeparator] = {}
         self.reception_pits: Dict[int, BaseReceptionPit] = {}
         self.storage_options: Dict[int, BaseStorage] = {}
 
@@ -100,7 +102,8 @@ class ManureManagement:
 
         for pen in animal_management.all_pens:
             self.storage_options[pen.id] = StorageOptionFactory.get_instance(pen=pen)
-            # self.separators[pen.id] = BaseSeparator(None, None, treatment=self.storage_options[pen.id])
+            self.manure_separators[pen.id] = ManureSeparatorFactory.get_instance(pen,
+                                                                                 storage_option=self.storage_options[pen.id])
             # self.reception_pits[pen.id] = BaseReceptionPit(None, None, separator=self.separators[pen.id])
             # self.manure_handlers[pen.id] = ManureHandlerFactory.get_instance(pen=pen,
             #                                                                  reception_pit=self.reception_pits[
@@ -116,7 +119,12 @@ class ManureManagement:
 
         for pen in animal_management.all_pens:
             self.manure_handlers[pen.id].update(pen)
+            self.manure_separators[pen.id].update(pen)
             self.storage_options[pen.id].update(pen)
+
+        print(f'Daily: {self.daily_vars}')
+        print(f'Annual: {self.annual_vars}')
+        print(f'Total: {self.total_vars}')
 
     def summarize_manure_management(self):
         self.summarize_manure_handlers()
