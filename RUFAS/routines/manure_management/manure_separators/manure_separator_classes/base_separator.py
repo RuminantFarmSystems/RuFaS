@@ -8,6 +8,10 @@ Description:
 Author(s):  William Donovan, wmdonovan@wisc.edu
             Yunus Mohammed, ymm26@cornell.edu 
 """
+from RUFAS.routines.manure_management.data_models.simple_pen import SimplePen
+from RUFAS.routines.manure_management.manure_separators.manure_separator_init_data import ManureSeparatorInitData
+from RUFAS.routines.manure_management.manure_separators.manure_separator_variables import ManureSeparatorVariables
+from RUFAS.routines.manure_management.storage_options.storage_option_classes.base_storage import BaseStorage
 
 
 class BaseSeparator:
@@ -18,9 +22,12 @@ class BaseSeparator:
     Attributes
     ----------
 
-    """ 
+    """
 
-    def __init__(self, separator, separator_data, treatment):
+    def __init__(self,
+                 pen: SimplePen,
+                 separator_data: ManureSeparatorInitData,
+                 storage_option: BaseStorage):
         """
         Description:
             An instance of this class represents an manure separator method.
@@ -28,80 +35,27 @@ class BaseSeparator:
 
         Args:
         """
-        self.separator_name = separator
-        self.treatment = treatment
+        self.pen = pen
+        self.separator_init_data = separator_data
+        self.storage_option = storage_option
 
-        self.TS_removal_efficiency = separator_data['TS_removal_efficiency'] if \
-            'TS_removal_efficiency' in separator_data else 0.3
-        self.VS_removal_efficiency = separator_data['VS_removal_efficiency'] if \
-            'VS_removal_efficiency' in separator_data else 0.55
-        self.N_removal_efficiency = separator_data['N_removal_efficiency'] if \
-            'N_removal_efficiency' in separator_data else 0.3
-        self.P_removal_efficiency = separator_data['P_removal_efficiency'] if \
-            'P_removal_efficiency' in separator_data else 0.4
-        self.K_removal_efficiency = separator_data['K_removal_efficiency'] if \
-            'K_removal_efficiency' in separator_data else 0.15
-        self.TS_DM_effluent_rate = separator_data['TS_DM_effluent_rate'] if \
-            'TS_DM_effluent_rate' in separator_data else 0.2
-
-        self.flush_water_volume = 0
-
-        self.TS = 0
-        self.VS = 0
-        self.N = 0
-        self.P = 0
-        self.K = 0
-
-        self.TS_liquid = 0
-        self.VS_liquid = 0
-        self.N_liquid = 0
-        self.P_liquid = 0
-        self.K_liquid = 0
-
-        self.TS_DM_effluent = 0
-
-        self.WIP = 0
-        self.WOP = 0
-        self.CH4 = 0
+        self.daily_vars = ManureSeparatorVariables()
 
     def reset_daily_variables(self):
-        self.TS = 0
-        self.VS = 0
-        self.N = 0
-        self.P = 0
-        self.K = 0
+        self.daily_vars = ManureSeparatorVariables()
 
-        self.TS_liquid = 0
-        self.VS_liquid = 0
-        self.N_liquid = 0
-        self.P_liquid = 0
-        self.K_liquid = 0
-
-        self.TS_DM_effluent = 0
-
-        self.WIP = 0
-        self.WOP = 0
-        self.CH4 = 0
-
-    def reset_annual_variables(self):
-        pass
-
-    def update_all(self):
+    def update(self, pen: SimplePen):
         """
         Description:
             Calls functions to calculate nutrient losses and transformations during
             manure separation.
             "pseudocode_manure_management" MS.4
 
-        Args:
-            self: an instance of the Separator class defined in
-                manure_management.py
-            manure: an instance of the ManureManagement class defined in
-                manure_management.py
         """
+
         self.effluent_liquid()
         self.effluent_solid()
-        self.update_treatment()
+        self.update_storage_option_variables()
 
     def effluent_liquid(self):
         """
@@ -132,7 +86,7 @@ class BaseSeparator:
         self.P -= self.P_liquid
         self.K -= self.K_liquid
 
-    def update_treatment(self):
+    def update_storage_option_variables(self):
         """
         Description:
             Update solid and liquid nutrient contents of the treatment receptacle
