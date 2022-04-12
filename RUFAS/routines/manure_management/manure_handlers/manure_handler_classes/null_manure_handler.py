@@ -1,15 +1,9 @@
-from .base_manure_handler import BaseManureHandler
+from RUFAS.routines.manure_management.manure_handlers.manure_handler_classes.base_manure_handler import BaseManureHandler
 
-
+# TODO: Check logic
 class NullManureHandler(BaseManureHandler):
-    def __init__(self, pen, reception_pit, handler='null_handler', handler_data=None):
-        if handler_data is None:
-            handler_data = {
-                'time_per_cleaning': 0,
-                'cleanings_per_day': 0,
-                'water_use_rate': 0
-            }
-        super().__init__(pen, handler, handler_data, reception_pit)
+    def __init__(self, pen, reception_pit, handler_data=None):
+        super().__init__(pen, handler_data, reception_pit)
 
     def update_all(self, pen):
         self.update_handler(pen)
