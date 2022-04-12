@@ -10,5 +10,5 @@ class ManureHandlerInitData:
     """
 
     water_use_rate: int = 0
-    time_per_cleaning: int = 0
-    cleanings_per_day: int = 0
+    time_per_cleaning: int = 8
+    cleanings_per_day: int = 2
