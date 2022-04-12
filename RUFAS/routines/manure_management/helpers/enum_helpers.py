@@ -14,7 +14,7 @@ class ExtendedEnum(Enum):
     Notes:
         Declare a DEFAULT member is recommended in case of an unsuccessful search.
         The DEFAULT member should act as an alias for another member
-        (i.e. `DEFAULT = A_PREVIOUS_MEMBER`).
+        (e.g., `DEFAULT = A_PREVIOUS_MEMBER`).
 
     """
 
@@ -52,9 +52,7 @@ class ExtendedEnum(Enum):
 
         """
 
-        if hasattr(cls, 'DEFAULT'):
-            return getattr(cls, 'DEFAULT')
-        raise AttributeError(f'{cls.__name__} needs a default value.')
+        return getattr(cls, 'DEFAULT')
 
 
 def format_enum_name(e: Enum, sep='_', joiner=' ', formatter=str.capitalize) -> str:
