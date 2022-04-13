@@ -1,10 +1,10 @@
 class BaseCrop:
     def __init__(self):
 
-        self.grow_years = []
+        self.plant_years = []
         self.repeat = 0
-        self.planting_date = 0
-        self.harvest_date = 0
+        self.planting_day = 0
+        self.harvest_day = 0
 
         self.harvest_type = ''
 

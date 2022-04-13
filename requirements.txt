@@ -1,4 +1,3 @@
-PuLP
 matplotlib
 numpy
 pandas
