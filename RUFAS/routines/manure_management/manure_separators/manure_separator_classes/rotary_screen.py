@@ -27,6 +27,6 @@ class RotaryScreen(BaseSeparator):
 
     def __init__(self,
                  pen: SimplePen,
-                 separator_data: ManureSeparatorInitData,
-                 storage_option: BaseStorage):
-        super().__init__(pen, separator_data, storage_option)
+                 storage_option: BaseStorage,
+                 separator_data: ManureSeparatorInitData):
+        super().__init__(pen, storage_option, separator_data)

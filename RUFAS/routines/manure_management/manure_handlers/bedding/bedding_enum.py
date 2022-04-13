@@ -10,11 +10,3 @@ class BeddingEnum(ExtendedEnum):
     SAND = auto()
 
     DEFAULT = ORGANIC
-
-
-if __name__ == '__main__':
-    for b in BeddingEnum:
-        print(b.name, b.value)
-    print(BeddingEnum.get_enum('organic'))
-    print(BeddingEnum.get_enum('sand'))
-    print(BeddingEnum.get_enum('dummy'))

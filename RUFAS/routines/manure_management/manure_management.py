@@ -23,6 +23,7 @@ from RUFAS.routines.manure_management.manure_separators.manure_separator_classes
 from RUFAS.routines.manure_management.manure_separators.manure_separator_factory import ManureSeparatorFactory
 from RUFAS.routines.manure_management.output.manure_management_output import ManureManagementOutput
 from RUFAS.routines.manure_management.reception_pits.base_reception_pit import BaseReceptionPit
+from RUFAS.routines.manure_management.reception_pits.reception_pit_factory import ReceptionPitFactory
 from RUFAS.routines.manure_management.storage_options.storage_option_classes.base_storage import BaseStorage
 from RUFAS.routines.manure_management.storage_options.storage_option_factory import StorageOptionFactory
 
@@ -90,7 +91,7 @@ class ManureManagement:
             this method will either be rewritten or removed.
 
         """
-        if item in ['pens', 'storage']:
+        if item in ['pens', 'storage', 'separators']:
             return {}
         obj = self.annual_vars if 'annual' in item else self.daily_vars
         if item in vars(obj):
@@ -102,13 +103,15 @@ class ManureManagement:
 
         for pen in animal_management.all_pens:
             self.storage_options[pen.id] = StorageOptionFactory.get_instance(pen=pen)
-            self.manure_separators[pen.id] = ManureSeparatorFactory.get_instance(pen,
-                                                                                 storage_option=self.storage_options[pen.id])
-            # self.reception_pits[pen.id] = BaseReceptionPit(None, None, separator=self.separators[pen.id])
-            # self.manure_handlers[pen.id] = ManureHandlerFactory.get_instance(pen=pen,
-            #                                                                  reception_pit=self.reception_pits[
-            #                                                                  pen.id])
-            self.manure_handlers[pen.id] = ManureHandlerFactory.get_instance(pen=pen, reception_pit=None)
+
+            self.manure_separators[pen.id] = \
+                ManureSeparatorFactory.get_instance(pen=pen, storage_option=self.storage_options[pen.id])
+
+            self.reception_pits[pen.id] = \
+                ReceptionPitFactory.get_instance(pen=pen, manure_separator=self.manure_separators[pen.id])
+
+            self.manure_handlers[pen.id] = \
+                ManureHandlerFactory.get_instance(pen=pen, reception_pit=self.reception_pits[pen.id])
 
     def update(self, animal_management: SimpleAnimalManagement):
         """
@@ -119,18 +122,26 @@ class ManureManagement:
 
         for pen in animal_management.all_pens:
             self.manure_handlers[pen.id].update(pen)
-            self.manure_separators[pen.id].update(pen)
-            self.storage_options[pen.id].update(pen)
+            print(f'manure handler for pen {pen.id}: {self.manure_handlers[pen.id].daily_vars}')
 
-        print(f'Daily: {self.daily_vars}')
-        print(f'Annual: {self.annual_vars}')
-        print(f'Total: {self.total_vars}')
+            self.manure_separators[pen.id].update(pen)
+            print(f'manure separator for pen {pen.id}: {self.manure_separators[pen.id].daily_vars}')
+
+            self.reception_pits[pen.id].update(pen)
+            print(f'reception pit for pen {pen.id}: {self.reception_pits[pen.id].daily_vars}')
+
+            self.storage_options[pen.id].update(pen)
+            print(f'storage option for pen {pen.id}: {self.storage_options[pen.id].daily_vars}')
+
+            print()
 
     def summarize_manure_management(self):
         self.summarize_manure_handlers()
         self.summarize_manure_separators()
         self.summarize_reception_pits()
         self.summarize_storage_options()
+
+        print(f'Daily: {self.daily_vars}')
 
     def summarize_manure_handlers(self):
         for handler in self.manure_handlers.values():
@@ -142,25 +153,53 @@ class ManureManagement:
             )
 
     def summarize_manure_separators(self):
-        pass
+        for separator in self.manure_separators.values():
+            s = separator.daily_vars
+            self.daily_vars += DailyVariables(
+                    TS_DM_effluent=s.TS_DM_effluent
+            )
 
+    # TODO: Check logic
     def summarize_reception_pits(self):
-        pass
+        for reception_pit in self.reception_pits.values():
+            r = reception_pit.daily_vars
+            self.daily_vars += DailyVariables(
+                    TS=r.TS,
+                    VS=r.VS,
+                    N=r.N,
+                    P=r.P,
+                    K=r.K,
+                    CH4_emissions=r.CH4,
+                    WIP=r.WIP,
+                    WOP=r.WOP
+            )
 
     # TODO: Check logic
     def summarize_storage_options(self):
         for storage in self.storage_options.values():
             s = storage.daily_vars
             self.daily_vars += DailyVariables(
+                    TS=s.TS,
+                    VS=s.VS,
+                    N=s.N,
+                    P=s.P,
+                    K=s.K,
+                    TS_liquid=s.TS_liquid,
+                    VS_liquid=s.VS_liquid,
+                    N_liquid=s.N_liquid,
+                    P_liquid=s.P_liquid,
+                    K_liquid=s.K_liquid,
                     CH4_emissions=s.CH4
             )
 
     def summarize_annual_variables(self):
         self.annual_vars += self.daily_vars
+        print(f'Annual: {self.annual_vars}')
 
     # TODO: Check logic
     def summarize_total_variables(self):
         self.total_vars += self.daily_vars
+        print(f'Total: {self.total_vars}')
 
     # TODO: Check logic
     def export_total_variables(self):
@@ -181,6 +220,10 @@ class ManureManagement:
         self.daily_vars = DailyVariables()
         for handler in self.manure_handlers.values():
             handler.reset_daily_variables()
+        for separator in self.manure_separators.values():
+            separator.reset_daily_variables()
+        for reception_pit in self.reception_pits.values():
+            reception_pit.reset_daily_variables()
         for storage_option in self.storage_options.values():
             storage_option.reset_daily_variables()
 

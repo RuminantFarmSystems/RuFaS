@@ -46,3 +46,23 @@ class ManureSeparatorVariables:
         return ManureSeparatorVariables(*[
             attr1 + attr2 for attr1, attr2 in zip(astuple(self), astuple(other))
         ])
+
+    def __sub__(self, other: ManureSeparatorVariables) -> ManureSeparatorVariables:
+        """
+        Subtract two ManureSeparatorVariables objects by subtracting
+        their corresponding attributes.
+
+        Args:
+            other: the ManureSeparatorVariables object to be subtracted from the ` object
+
+        Returns:
+            A new ManureSeparatorVariables object with subtracted attributes.
+            The original operands remain intact.
+
+        """
+
+        if not isinstance(other, ManureSeparatorVariables):
+            raise TypeError('Cannot subtract a non-ManureHandlerVariables object to a '
+                            'ManureHandlerVariables object.')
+
+        return self + ManureSeparatorVariables(*[-attr for attr in astuple(other)])

@@ -38,13 +38,9 @@ class BaseStorage:
         self.storage_option_init_data = storage_option_init_data
 
         self.daily_vars = StorageOptionVariables()
-        self.annual_vars = StorageOptionVariables()
 
     def reset_daily_variables(self):
         self.daily_vars = StorageOptionVariables()
-
-    def reset_annual_variables(self):
-        self.annual_vars = StorageOptionVariables()
 
     def update(self, pen: SimplePen):
         self.methane(pen.manure)

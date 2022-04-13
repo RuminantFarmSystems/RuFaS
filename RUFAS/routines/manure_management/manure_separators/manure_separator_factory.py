@@ -24,11 +24,10 @@ class ManureSeparatorFactory:
     @classmethod
     def get_instance(cls, pen: SimplePen, storage_option: BaseStorage) -> BaseSeparator:
         manure_separator_enum = ManureSeparatorEnum.get_enum(pen.manure_handler)
-
         params = {
             'pen': pen,
-            'separator_data': cls.get_manure_separator_init_data(manure_separator_enum),
-            'storage_option': storage_option
+            'storage_option': storage_option,
+            'separator_data': cls.get_manure_separator_init_data(manure_separator_enum)
         }
 
         enum_to_class: Dict[ManureSeparatorEnum: Type[BaseSeparator]] = {

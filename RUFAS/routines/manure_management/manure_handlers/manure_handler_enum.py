@@ -13,10 +13,3 @@ class ManureHandlerEnum(ExtendedEnum):
     CUSTOM_MANURE_HANDLER = auto()
 
     DEFAULT = FLUSH_SYSTEM
-
-
-if __name__ == '__main__':
-    print(ManureHandlerEnum.get_enum('flush'))
-    print(ManureHandlerEnum.get_enum('scrape'))
-    print(ManureHandlerEnum.get_enum('dummy'))
-    print(ManureHandlerEnum.DEFAULT)

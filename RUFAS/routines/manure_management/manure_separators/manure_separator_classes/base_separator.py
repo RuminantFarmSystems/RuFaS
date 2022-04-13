@@ -12,6 +12,7 @@ from RUFAS.routines.manure_management.data_models.simple_pen import SimplePen
 from RUFAS.routines.manure_management.manure_separators.manure_separator_init_data import ManureSeparatorInitData
 from RUFAS.routines.manure_management.manure_separators.manure_separator_variables import ManureSeparatorVariables
 from RUFAS.routines.manure_management.storage_options.storage_option_classes.base_storage import BaseStorage
+from RUFAS.routines.manure_management.storage_options.storage_option_variables import StorageOptionVariables
 
 
 class BaseSeparator:
@@ -26,8 +27,8 @@ class BaseSeparator:
 
     def __init__(self,
                  pen: SimplePen,
-                 separator_data: ManureSeparatorInitData,
-                 storage_option: BaseStorage):
+                 storage_option: BaseStorage,
+                 separator_data: ManureSeparatorInitData):
         """
         Description:
             An instance of this class represents an manure separator method.
@@ -53,62 +54,61 @@ class BaseSeparator:
 
         """
 
-        # self.effluent_liquid()
-        # self.effluent_solid()
-        # self.update_storage_option_variables()
+        self.effluent_liquid()
+        self.effluent_solid()
+        self.update_storage_option_variables()
 
+    # TODO: Check logic
     def effluent_liquid(self):
         """
         Description:
             Calculate liquid nutrient content of the separator
             "pseudocode_manure_management" MS.4.A
         """
+        d = self.daily_vars
+        d.TS_liquid = d.TS - (d.TS * self.separator_init_data.TS_removal_efficiency)
+        d.VS_liquid = d.VS - (d.VS * self.separator_init_data.VS_removal_efficiency)
+        d.N_liquid = d.N - (d.N * self.separator_init_data.N_removal_efficiency)
+        d.P_liquid = d.P - (d.P * self.separator_init_data.P_removal_efficiency)
+        d.K_liquid = d.K - (d.K * self.separator_init_data.K_removal_efficiency)
 
-        self.TS_liquid = self.TS - (self.TS * self.TS_removal_efficiency)
-        self.VS_liquid = self.VS - (self.VS * self.VS_removal_efficiency)
-        self.N_liquid = self.N - self.N * self.N_removal_efficiency
-        self.P_liquid = self.P - self.P * self.P_removal_efficiency
-        self.K_liquid = self.K - self.K * self.K_removal_efficiency
-
+    # TODO: Check logic
     def effluent_solid(self):
         """
         Description:
             Update solid nutrient content of the separator
             "pseudocode_manure_management" MS.4.B
         """
+        d = self.daily_vars
+        d.TS -= d.TS_liquid
+        d.TS_DM_effluent = d.TS * self.separator_init_data.TS_DM_effluent_rate
+        d.TS -= d.TS_DM_effluent
 
-        self.TS -= self.TS_liquid
-        self.TS_DM_effluent = self.TS * self.TS_DM_effluent_rate
-        self.TS -= self.TS_DM_effluent
+        d.VS -= d.VS_liquid
+        d.N -= d.N_liquid
+        d.P -= d.P_liquid
+        d.K -= d.K_liquid
 
-        self.VS -= self.VS_liquid
-        self.N -= self.N_liquid
-        self.P -= self.P_liquid
-        self.K -= self.K_liquid
-
+    # TODO: Check logic
     def update_storage_option_variables(self):
         """
         Description:
             Update solid and liquid nutrient contents of the treatment receptacle
             "pseudocode_manure_management" MS.4.C
         """
-
-        self.treatment.TS += self.TS
-        self.treatment.TS_liquid += self.TS_liquid
-
-        self.treatment.VS += self.VS
-        self.treatment.VS_liquid += self.VS_liquid
-
-        self.treatment.N += self.N
-        self.treatment.N_liquid += self.N_liquid
-
-        self.treatment.P += self.P
-        self.treatment.P_liquid += self.P_liquid
-
-        self.treatment.K += self.K
-        self.treatment.K_liquid += self.K_liquid
-
-        self.treatment.CH4 += self.CH4
-
-        self.treatment.WIP += self.WIP
-        self.treatment.WOP += self.WOP
+        d = self.daily_vars
+        self.storage_option.daily_vars += StorageOptionVariables(
+                TS=d.TS,
+                TS_liquid=d.TS_liquid,
+                VS=d.VS,
+                VS_liquid=d.VS_liquid,
+                N=d.N,
+                N_liquid=d.N_liquid,
+                P=d.P,
+                P_liquid=d.P_liquid,
+                K=d.K,
+                K_liquid=d.K_liquid,
+                CH4=d.CH4,
+                WIP=d.WIP,
+                WOP=d.WOP
+        )
