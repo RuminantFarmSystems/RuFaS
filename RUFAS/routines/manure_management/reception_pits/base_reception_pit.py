@@ -1,64 +1,64 @@
+from RUFAS.routines.manure_management.data_models.simple_pen import SimplePen
+from RUFAS.routines.manure_management.manure_separators.manure_separator_classes.base_separator import BaseSeparator
+from RUFAS.routines.manure_management.manure_separators.manure_separator_variables import ManureSeparatorVariables
+from RUFAS.routines.manure_management.reception_pits.reception_pit_init_data import ReceptionPitInitData
+from RUFAS.routines.manure_management.reception_pits.reception_pit_variables import ReceptionPitVariables
+
+
 class BaseReceptionPit:
-    def __init__(self, reception_pit, reception_pit_data, separator):
-        self.pit_name = reception_pit
-        self.separator = separator
-
-        self.TS = 0
-        self.VS = 0
-
-        self.N = 0
-        self.P = 0
-        self.K = 0
-        self.CH4 = 0
-        self.WIP = 0
-        self.WOP = 0
-
-        self.flush_water_volume = 0
+    def __init__(self,
+                 pen: SimplePen,
+                 manure_separator: BaseSeparator,
+                 reception_pit_init_data: ReceptionPitInitData):
+        self.pen = pen
+        self.manure_separator = manure_separator
+        self.reception_pit_init_data = reception_pit_init_data
+        self.daily_vars = ReceptionPitVariables()
 
     def reset_daily_variables(self):
-        self.TS = 0
-        self.VS = 0
+        self.daily_vars = ReceptionPitVariables()
 
-        self.N = 0
-        self.P = 0
-        self.K = 0
-        self.CH4 = 0
-        self.WIP = 0
-        self.WOP = 0
-
-        self.flush_water_volume = 0
-
-    def reset_annual_variables(self):
-        pass
-
-    def update_all(self):
-        self.flush_water()
-        self.N_effluent()
-        self.P_effluent()
-        self.K_effluent()
-        self.effluent_solids()
-        self.CH4_effluent()
-        self.WIP_WOP()
+    # TODO: Check logic
+    def update(self, pen: SimplePen):
+        d = self.daily_vars
+        self.manure_separator.daily_vars += ManureSeparatorVariables(
+                flush_water_volume=d.flush_water_volume,
+                N=d.N,
+                P=d.P,
+                K=d.K,
+                TS=d.TS,
+                VS=d.VS,
+                CH4=d.CH4,
+                WIP=d.WIP,
+                WOP=d.WOP
+        )
 
     def flush_water(self):
-        self.separator.flush_water_volume += self.flush_water_volume
+        # self.separator.flush_water_volume += self.flush_water_volume
+        pass
 
     def N_effluent(self):
-        self.separator.N += self.N
+        # self.separator.N += self.N
+        pass
 
     def P_effluent(self):
-        self.separator.P += self.P
+        # self.separator.P += self.P
+        pass
 
     def K_effluent(self):
-        self.separator.K += self.K
+        # self.separator.K += self.K
+        pass
 
     def effluent_solids(self):
-        self.separator.TS += self.TS
-        self.separator.VS += self.VS
+        # self.separator.TS += self.TS
+        # self.separator.VS += self.VS
+        pass
 
     def CH4_effluent(self):
-        self.separator.CH4 += self.CH4
+        # self.separator.CH4 += self.CH4
+        pass
 
     def WIP_WOP(self):
-        self.separator.WIP += self.WIP
-        self.separator.WOP += self.WOP
+        # self.separator.WIP += self.WIP
+        # self.separator.WOP += self.WOP
+        pass
