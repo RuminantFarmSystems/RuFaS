@@ -11,9 +11,9 @@ Description: This file updates the heifer form wean to start breeding.
 
 from RUFAS.routines.animal.life_cycle.calf import Calf
 from RUFAS.routines.animal.life_cycle.animal_base import AnimalBase
-from RUFAS.routines.animal.ration.growing_heifer_ration import calculate_rqmts
 from RUFAS.routines.animal.manure.growing_heifer_manure_excretion import \
 	manure_calculations
+from RUFAS.routines.animal.ration.animal_requirements import calc_rqmts
 from RUFAS.routines.animal.life_cycle import animal_events_constants as const
 
 
@@ -35,18 +35,30 @@ class HeiferI(Calf):
 			args.events: events of the animal
 		"""
 		super().__init__(args)
-
 	def get_heiferI_values(self):
 		"""
 		Get current information from the heiferI
 		"""
 		return self.get_calf_values()
 
-	def calc_nutrient_rqmts(self):
+	def set_nutrient_rqmts(self, temp):
 		"""
 		Calculates this heiferI's nutrient requirements.
 		"""
-		self.nutrient_rqmts, self.DMIest, self.DBW = calculate_rqmts()
+		req = calc_rqmts(self.body_weight, self.mature_body_weight, None,
+					animal_type = 'heifer', BCS5 = 3, PrevTemp = temp,
+								  ADG_heifer = self.daily_growth,
+										 Age = self.days_born
+					)
+
+		self.NEmaint = req['NEmaint']
+		self.NEg = req['NEg']
+		self.NEpreg = req['NEpreg']
+		self.NEl = req['NEl']
+		self.MP_req = req['MP_req']
+		self.Ca_req = req['Ca_req']
+		self.P_req = req['P_req']
+		self.DMIest = req['DMIest']
 
 	def calc_manure_excretion(self, feed):
 		"""

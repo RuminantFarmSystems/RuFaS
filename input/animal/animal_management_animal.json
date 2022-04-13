@@ -76,7 +76,7 @@
 		"from_literature": {
 			"repro": {
 				"avg_estrus_cycle_heifer": 21,
-				"std_estrus_cycle_heifer": 3,				
+				"std_estrus_cycle_heifer": 3,
 				"preg_check_day_1": 32,
 				"preg_loss_rate_1": 0.02,
 				"preg_check_day_2": 91,
@@ -88,7 +88,7 @@
 				"avg_estrus_cycle_cow": 21,
 				"std_estrus_cycle_cow": 2.5,
 				"avg_estrus_cycle_p": 10,
-				"std_estrus_cycle_p": 2	
+				"std_estrus_cycle_p": 2
 			},
 			"milking": {
 				"wood_l": [[16.13, 23.61, 23.81], [14.07, 19.26, 19.21]],
@@ -120,116 +120,65 @@
 	"methane_model": "IPCC",
 	"ration": {
 		"user_input": false,
-		"formulation_interval": 7
+		"formulation_interval": 30
 	},
+
 	"pen_information": {
 		"pen0": {
 			"id": 0,
+			"animal_combination": "CALF",
 			"vertical_dist_to_milking_parlor": 0.1,
 			"horizontal_dist_to_milking_parlor": 1.6,
-			"number_of_stalls": 100,
+			"number_of_stalls": 110,
 			"housing_type": "open air barn",
 			"bedding_type": "sand",
 			"pen_type": "freestall",
 			"manure_handling": "manual_scraping",
 			"manure_separator": "sedimentation",
-			"manure_storage": "storage_pit"
+			"manure_storage": "storage_pit",
+			"max_stocking_density": 1.2
 		},
 		"pen1": {
 			"id": 1,
+			"animal_combination": "GROWING",
 			"vertical_dist_to_milking_parlor": 0.1,
 			"horizontal_dist_to_milking_parlor": 1.6,
-			"number_of_stalls": 200,
+			"number_of_stalls": 800,
 			"housing_type": "open air barn",
 			"bedding_type": "organic",
 			"pen_type": "freestall",
 			"manure_handling": "flush_system",
 			"manure_separator": "sedimentation",
-			"manure_storage": "storage_pit"
+			"manure_storage": "storage_pit",
+			"max_stocking_density": 1.2
 		},
 		"pen2": {
 			"id": 2,
+			"animal_combination": "CLOSE_UP",
 			"vertical_dist_to_milking_parlor": 0.1,
 			"horizontal_dist_to_milking_parlor": 1.6,
-			"number_of_stalls": 300,
+			"number_of_stalls": 200,
 			"housing_type": "open air barn",
 			"bedding_type": "organic",
 			"pen_type": "tiestall",
 			"manure_handling": "automatic_alley_scrapers",
 			"manure_separator": "sedimentation",
-			"manure_storage": "storage_pit"
+			"manure_storage": "storage_pit",
+			"max_stocking_density": 1.2
 		},
 		"pen3": {
 			"id": 3,
+			"animal_combination": "LAC_COW",
 			"vertical_dist_to_milking_parlor": 0.1,
 			"horizontal_dist_to_milking_parlor": 1.6,
-			"number_of_stalls": 400,
+			"number_of_stalls": 850,
 			"housing_type": "open air barn",
 			"bedding_type": "sand",
 			"pen_type": "tiestall",
 			"manure_handling": "manual_scraping",
 			"manure_separator": "sedimentation",
-			"manure_storage": "anaerobic_lagoon"
-		},
-		"pen4": {
-			"id": 4,
-			"vertical_dist_to_milking_parlor": 0.1,
-			"horizontal_dist_to_milking_parlor": 1.6,
-			"number_of_stalls": 400,
-			"housing_type": "open air barn",
-			"bedding_type": "sand",
-			"pen_type": "tiestall",
-			"manure_handling": "flush_system",
-			"manure_separator": "sedimentation",
-			"manure_storage": "anaerobic_lagoon"
-		},
-		"pen5": {
-			"id": 5,
-			"vertical_dist_to_milking_parlor": 0.1,
-			"horizontal_dist_to_milking_parlor": 1.6,
-			"number_of_stalls": 200,
-			"housing_type": "open air barn",
-			"bedding_type": "sand",
-			"pen_type": "tiestall",
-			"manure_handling": "automatic_alley_scrapers",
-			"manure_separator": "sedimentation",
-			"manure_storage": "anaerobic_lagoon"
-		},
-		"pen6": {
-			"id": 6,
-			"vertical_dist_to_milking_parlor": 0.1,
-			"horizontal_dist_to_milking_parlor": 1.6,
-			"number_of_stalls": 300,
-			"housing_type": "open air barn",
-			"bedding_type": "sand",
-			"pen_type": "tiestall",
-			"manure_handling": "manual_scraping",
-			"manure_separator": "rotary_screen",
-			"manure_storage": "storage_pit_2"
-		},
-		"pen7": {
-			"id": 7,
-			"vertical_dist_to_milking_parlor": 0.2,
-			"horizontal_dist_to_milking_parlor": 1.6,
-			"number_of_stalls": 250,
-			"housing_type": "open air barn",
-			"bedding_type": "sand",
-			"pen_type": "tiestall",
-			"manure_handling": "flush_system",
-			"manure_separator": "rotary_screen",
-			"manure_storage": "storage_pit_2"
-		},
-		"pen8": {
-			"id": 8,
-			"vertical_dist_to_milking_parlor": 0.2,
-			"horizontal_dist_to_milking_parlor": 1.6,
-			"number_of_stalls": 400,
-			"housing_type": "open air barn",
-			"bedding_type": "sand",
-			"pen_type": "tiestall",
-			"manure_handling": "automatic_alley_scrapers",
-			"manure_separator": "rotary_screen",
-			"manure_storage": "storage_pit_2"
+			"manure_storage": "anaerobic_lagoon",
+			"max_stocking_density": 1.2
 		}
 	}
 }
