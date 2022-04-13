@@ -37,11 +37,6 @@ def pen():
 
 @pytest.fixture
 def configured_animal_base():
-    # error is thrown when initializing animals because AnimalBase does not have a config or a nutrient list
-    # temporary fix: initialize AnimalBase config to a copy from animal_management_animal.json and set nutrient list to
-    # the same value as in AnimalManagement
-    # TODO: update initialization of the animal config
-
     animal_config = {
         "management_decisions": {
             "breeding_start_day_h": 360,
