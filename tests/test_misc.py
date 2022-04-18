@@ -5,6 +5,7 @@ Description: Implements test cases
 Author(s): Pooya Hekmati, sh2235@cornell.edu
 """
 
+import mock
 from mock.mock import MagicMock
 from pytest_mock.plugin import MockerFixture
 import pytest
@@ -67,14 +68,6 @@ def patch_simulation_engine(mocker: MockerFixture) -> SimulationEngine:
     return sim_eng
 
 
-@pytest.fixture
-def patch_output(mocker: MockerFixture) -> None:
-    """Patches functions in output_handler which are used in simulation_engine"""
-    mocker.patch('RUFAS.output_handler.OutputHandler.__init__')
-    mocker.patch('RUFAS.output_handler.OutputHandler.finalize')
-    mocker.patch('RUFAS.output_handler.OutputHandler.produce_graphics')
-
-
 def test_init_simulation_engine(patch_simulation_engine: SimulationEngine) -> None:
     """Unit test for function __init__ in file RUFAS/simulation_engine.py"""
     patch_simulation_engine._initialize_simulation.assert_called_once_with(
@@ -93,6 +86,41 @@ def test_simulate(patch_simulation_engine: SimulationEngine, mocker: MockerFixtu
     sim_eng.output.finalize.assert_called_once_with(
         sim_eng.state, sim_eng.weather, sim_eng.time)
     sim_eng._show_final_messages.assert_called_once()
+
+
+def test_show_final_messages(
+        patch_simulation_engine: SimulationEngine, mocker: MockerFixture) -> None:
+    """Unit test for function _show_final_messages in file RUFAS/simulation_engine.py"""
+    mocker.patch('sys.stdout.write')
+    patch_simulation_engine._show_final_messages(1, 1)
+    assert mocker._mocks[1].call_count == 3
+
+
+def test_daily_simulation(
+        patch_simulation_engine: SimulationEngine, mocker: MockerFixture) -> None:
+    """Unit test for function _daily_simulation in file RUFAS/simulation_engine.py"""
+    mocker.patch('RUFAS.routines.daily_animal_routine')
+    mocker.patch('RUFAS.routines.daily_manure_storage_routine')
+    mocker.patch('RUFAS.routines.daily_fields_routine')
+    mocker.patch('RUFAS.routines.daily_feed_routine')
+    mocker.patch('RUFAS.simulation_engine.SimulationEngine._advance_time')
+    patch_simulation_engine._daily_simulation()
+    assert patch_simulation_engine.output.daily_update.call_count == 1
+    for mocked in mocker._mocks:
+        assert mocked.call_count == 1
+
+
+def test_advance_time(
+        patch_simulation_engine: SimulationEngine, mocker: MockerFixture) -> None:
+    """Unit test for function _advance_time in file RUFAS/simulation_engine.py"""
+    mocker.patch('RUFAS.classes.Time.to_str')
+    mocker.patch('RUFAS.classes.Time.advance')
+    patch_simulation_engine.state.animal_management.simulation_day = 1
+    patch_simulation_engine._advance_time(False)
+    patch_simulation_engine._advance_time(True)
+    assert patch_simulation_engine.time.advance.call_count == 2
+    assert patch_simulation_engine.time.to_str.call_count == 1
+    assert patch_simulation_engine.state.animal_management.simulation_day == 3
 
 
 def test_input_prompt():
