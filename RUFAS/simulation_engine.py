@@ -9,7 +9,7 @@ from RUFAS.util import get_base_dir, read_json_file
 from RUFAS.output_handler import OutputHandler
 import random
 import numpy
-from typing import Dict, Any, Optional
+from typing import Optional
 
 
 class SimulationEngine:
@@ -132,11 +132,10 @@ class SimulationEngine:
 
         Args:
             file_path (Path): Path to the input json file
-            data (Dict[str, Any]): initial simulation data
 
         Raises:
-            InvalidJSONFileError: If the json file at the given path does not
-                conform with the format required
+            InvalidJSONFile: If the json file at the given path does not conform 
+            with the format required
         """
 
         print(f"Initializing simulation environemnt from {file_path}")
