@@ -87,8 +87,8 @@ class Calf(AnimalBase):
 
         self.birth_weight = args['birth_weight']
         self.body_weight = args['birth_weight']
-        self.mature_body_weight = truncnorm.rvs(-2, 2,\
-                        AnimalBase.config['mature_body_weight_avg'], AnimalBase.config['mature_body_weight_std'])
+        self.mature_body_weight = truncnorm.rvs(-2, 2, AnimalBase.config['mature_body_weight_avg'], \
+            AnimalBase.config['mature_body_weight_std'])
         self.wean_weight = 0
         self.p_animal = args['p_init']
 

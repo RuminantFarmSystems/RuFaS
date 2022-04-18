@@ -635,11 +635,11 @@ class HeiferII(HeiferI):
                         AnimalBase.config['std_gestation_len']))
                 # generate calf birth weight 
                 if self.breed == 'HO':
-                    self.calf_birth_weight = truncnorm.rvs(-2, 2, \
-                        AnimalBase.config['birth_weight_avg_ho'], AnimalBase.config['birth_weight_std_ho'])
+                    self.calf_birth_weight = truncnorm.rvs(-2, 2, AnimalBase.config['birth_weight_avg_ho'],\
+                        AnimalBase.config['birth_weight_std_ho'])
                 elif self.breed == 'JE':
-                    self.calf_birth_weight = truncnorm.rvs(-2, 2, \
-                        AnimalBase.config['birth_weight_avg_je'], AnimalBase.config['birth_weight_std_je'])
+                    self.calf_birth_weight = truncnorm.rvs(-2, 2, AnimalBase.config['birth_weight_avg_je'],\
+                        AnimalBase.config['birth_weight_std_je'])
                 self.events.add_event(self.days_born, sim_day, const.HEIFER_PREG)
             else:
                 self.events.add_event(self.days_born, sim_day, const.HEIFER_NOT_PREG)
