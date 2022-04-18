@@ -2,6 +2,7 @@ matplotlib
 mock
 numpy
 pandas
+pyomo
 pytest
 pytest-mock
 scipy
