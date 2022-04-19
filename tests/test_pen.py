@@ -437,17 +437,6 @@ def test_call_p_rqmts():
 def test_daily_p_update(pen):
     """Unit test for function daily_p_update in file routines/animal/pen.py"""
 
-    # def daily_p_update(self):
-    #     """
-    #     Calls each animal's method to calculate daily phosphorus update.
-    #     """
-    #     if not len(self.animals_in_pen) == 0:
-    #         total_p_animal = 0
-    #         for animal in self.animals_in_pen:
-    #             animal.daily_p_update()
-    #             total_p_animal += animal.p_animal
-    #         self.avg_p_animal = total_p_animal / len(self.animals_in_pen)
-
 
 def test_set_up_new_animal():
     """Unit test for function set_up_new_animal in file routines/animal/pen.py"""
@@ -467,7 +456,14 @@ def test_clear(pen, calves):
     assert pen.avg_p_animal == 0
 
 
-def test_subset_class_feeds(mocker, pen):
+@pytest.mark.parametrize('test_animal_combination, expected_feed_allocation', [
+    ('CALF', {155, 156, 157}),
+    ('GROWING', {2, 51, 86, 136}),
+    ('CLOSE_UP', {2, 26, 86, 118, 136, 139}),
+    ('GROWING_AND_CLOSE_UP', {2, 51, 86, 136, 26, 86, 118, 136, 139}),
+    ('LAC_COW', {26, 86, 103, 118, 136, 139}),
+])
+def test_subset_class_feeds(mocker, pen, test_animal_combination, expected_feed_allocation):
     """Unit test for function subset_class_feeds in file routines/animal/pen.py"""
 
     feed_combinations = {
@@ -481,22 +477,6 @@ def test_subset_class_feeds(mocker, pen):
     feed = mocker.MagicMock()
     feed.input_feed_combinations = feed_combinations
 
-    pen.animal_combination = Pen.AnimalCombination.CALF
+    pen.animal_combination = Pen.AnimalCombination[test_animal_combination]
     pen.subset_class_feeds(feed)
-    assert pen.allocated_feeds == {155, 156, 157}
-
-    pen.animal_combination = Pen.AnimalCombination.GROWING
-    pen.subset_class_feeds(feed)
-    assert pen.allocated_feeds == {2, 51, 86, 136}
-
-    pen.animal_combination = Pen.AnimalCombination.CLOSE_UP
-    pen.subset_class_feeds(feed)
-    assert pen.allocated_feeds == {2, 26, 86, 118, 136, 139}
-
-    pen.animal_combination = Pen.AnimalCombination.GROWING_AND_CLOSE_UP
-    pen.subset_class_feeds(feed)
-    assert pen.allocated_feeds == {2, 51, 86, 136, 26, 86, 118, 136, 139}
-
-    pen.animal_combination = Pen.AnimalCombination.LAC_COW
-    pen.subset_class_feeds(feed)
-    assert pen.allocated_feeds == {26, 86, 103, 118, 136, 139}
+    assert pen.allocated_feeds == expected_feed_allocation
