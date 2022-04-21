@@ -17,7 +17,7 @@ from RUFAS.routines.animal.life_cycle.animal_base import AnimalBase
 from RUFAS.routines.animal.ration.calf_ration import calc_requirements
 from RUFAS.routines.animal.manure.calf_manure_excretion import \
     manure_calculations
-from RUFAS.routines.animal.life_cycle import animal_events_constants as const
+from RUFAS.routines.animal.life_cycle import animal_constants as const
 
 
 class Calf(AnimalBase):
@@ -87,7 +87,7 @@ class Calf(AnimalBase):
 
         self.birth_weight = args['birth_weight']
         self.body_weight = args['birth_weight']
-        self.mature_body_weight = truncnorm.rvs(-2, 2, AnimalBase.config['mature_body_weight_avg'], \
+        self.mature_body_weight = truncnorm.rvs(-const.STDI, const.STDI, AnimalBase.config['mature_body_weight_avg'], \
             AnimalBase.config['mature_body_weight_std'])
         self.wean_weight = 0
         self.p_animal = args['p_init']
