@@ -15,7 +15,7 @@ from RUFAS.routines.animal.life_cycle.heiferIII import HeiferIII
 from RUFAS.routines.animal.life_cycle.cow import Cow
 from RUFAS.routines.animal.life_cycle.animal_base import AnimalBase
 from RUFAS.routines.animal.life_cycle.animal_initialization import AnimalInitialization
-from RUFAS.routines.animal.life_cycle import animal_events_constants as const
+from RUFAS.routines.animal.life_cycle import animal_constants as const
 
 
 class LifeCycleManager:

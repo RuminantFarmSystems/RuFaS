@@ -1,14 +1,14 @@
 """
 RUFAS: Ruminant Farm Systems Model
-File name: animal_events_constants.py
+File name: animal_constants.py
 Author(s): Militsa Sotirova, militsasotirova@gmail.com
 Description: These constants are all of the event descriptions for the animal
     classes.
 """
+# EVENTS
 # calf
 WEAN_DAY = "wean day"
 STILL_BIRTH = "still birth happened"
-
 
 # reproduction
 INSEMINATED_W_BASE = "inseminated with "
@@ -54,7 +54,6 @@ PREG_LOSS_BTWN_1_AND_2 = "pregnancy loss happened between 1st and 2nd pregnancy 
 PREG_CHECK_3_PREG = "pregnancy check 3: confirmed"
 PREG_LOSS_BTWN_2_AND_3 = "pregnancy loss happened between 2nd and 3rd pregnancy check"
 
-
 # life cycle
 INIT_HERD = "entered herd through initialization"
 ENTER_HERD = "entered herd"
@@ -62,7 +61,6 @@ MATURE_BODY_WEIGHT_REGULAR = "mature body reached"
 HEIFERII_TO_III = "heiferII moving to heiferIII"
 NEW_BIRTH = "new birth, start milking"
 DRY = "dry"
-
 
 # culling
 HEIFER_REPRO_CULL = "culled for heifer reproductive problem"
@@ -74,3 +72,8 @@ MASTITIS_CULL = "culled for mastitis"
 DISEASE_CULL = "culled for disease"
 UDDER_CULL = "culled for udder"
 UNKNOWN_CULL = "culled for unknown"
+
+# STATS
+STDI = 2
+
+# DEFAULTS
