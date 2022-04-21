@@ -5,16 +5,20 @@ Description: Implements test cases
 Author(s): Jessica Tweneboah, jnt42@cornell.edu
 """
 
-import pytest
 import json
 import logging
 import numpy as np
+import sys
+import os 
+# insert at 1, 0 is the script path (or '' in REPL)
+sys.path.insert(0, os.path.dirname(os.path.realpath(__name__)))
 
 from RUFAS.routines.field.soil import Soil
 from RUFAS.routines.field.soil.carbon_cycling import carbon_cycle
 from config.defintions import ROOT_DIR
 
-LOGGER = logging.getLogger(__name__)
+LOGGER = logging.getLogger()
+logging.basicConfig(level=logging.INFO)
 
 LOGGER.info("Read json file: ARL_soil_tillage.json")
 soil_file = open(ROOT_DIR + "/input/soil/ARL_soil_tillage.json")
@@ -72,3 +76,6 @@ def test_soil_carbon_aggregation():
 	np.testing.assert_almost_equal(0.0, layer3.C_CO2_loss)
 
 	assert test_soil.curr_layer_depth == 0
+
+if __name__ == "__main__":
+   test_soil_carbon_aggregation()

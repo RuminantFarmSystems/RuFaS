@@ -9,6 +9,10 @@ import pytest
 import json
 import logging
 import numpy as np
+import sys 
+import os 
+
+sys.path.insert(0, os.path.dirname(os.path.realpath(__name__)))
 
 from RUFAS.routines.field.crop.crop_types.corn import Corn
 from RUFAS.routines.field.soil import Soil
@@ -18,7 +22,8 @@ from RUFAS.classes import Weather
 from RUFAS.classes import Config
 from RUFAS.classes import Time
 
-LOGGER = logging.getLogger(__name__)
+LOGGER = logging.getLogger()
+logging.basicConfig(level=logging.INFO)
 
 LOGGER.info("Read json file: ARL_soil_tillage.json")
 soil_file = open(ROOT_DIR + "/input/soil/ARL_soil_tillage.json")
@@ -112,3 +117,6 @@ def test_update_all():
     np.testing.assert_almost_equal(0.006469573596971014, layer3.BG_struct_to_C_active_act)
     np.testing.assert_almost_equal(0.0035288583256205524, layer3.BG_struct_to_C_slow_loss)
     np.testing.assert_almost_equal(0.008234002759781289, layer3.BG_struct_to_C_slow_act)
+
+if __name__ == "__main__":
+   test_update_all()

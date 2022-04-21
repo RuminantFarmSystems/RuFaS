@@ -18,7 +18,6 @@
             "harvest_day": 237,
             "harvest_type": "scheduled",
             "planting_order": "1st"
-
         },
         "corn_93": {
             "plant_years": [1993],
@@ -36,7 +35,6 @@
             "harvest_day": 302,
             "harvest_type": "scheduled",
             "planting_order": "1st"
-
         },
         "corn_97": {
             "plant_years": [1997],
