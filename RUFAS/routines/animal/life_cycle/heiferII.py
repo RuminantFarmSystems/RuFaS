@@ -21,7 +21,7 @@ from RUFAS.routines.animal.manure.growing_heifer_manure_excretion import \
 from RUFAS.routines.animal.ration.animal_requirements import calc_rqmts
 from random import random
 import math
-from RUFAS.routines.animal.life_cycle import animal_events_constants as const
+from RUFAS.routines.animal.life_cycle import animal_constants as const
 
 
 class HeiferII(HeiferI):
@@ -340,18 +340,10 @@ class HeiferII(HeiferI):
         Returns: the day when this estrus should occur
 
         """
-        estrus_cycle = np.random.normal(
-            AnimalBase.config['avg_estrus_cycle_heifer'],
+        estrus_cycle = truncnorm.rvs(-const.STDI, const.STDI, AnimalBase.config['avg_estrus_cycle_heifer'],
             AnimalBase.config['std_estrus_cycle_heifer'])
-        while estrus_cycle < AnimalBase.config['avg_estrus_cycle_heifer'] \
-            - 2 * AnimalBase.config['std_estrus_cycle_heifer'] \
-            or estrus_cycle > AnimalBase.config['avg_estrus_cycle_heifer'] \
-                + 2 * AnimalBase.config['std_estrus_cycle_heifer']:
-            estrus_cycle = np.random.normal(
-                AnimalBase.config['avg_estrus_cycle_heifer'],
-                AnimalBase.config['std_estrus_cycle_heifer'])
-        estrus_day = int(start_date + estrus_cycle)
-        self.events.add_event(estrus_day, sim_day, estrus_note)
+        estrus_day = int(start_date + abs(estrus_cycle))
+        self.events.add_event(self.days_born, sim_day, estrus_note)
         return estrus_day
 
     def _return_estrus(self, sim_day):
@@ -505,10 +497,7 @@ class HeiferII(HeiferI):
             max_val: max value can go for the normal distribution,
                 avoiding negative value
         """
-        synch_ed_estrus = np.random.normal(avg, std)
-        while synch_ed_estrus < avg - 2 * std \
-                or synch_ed_estrus > avg + 2 * std:
-            synch_ed_estrus = np.random.normal(avg, std)
+        synch_ed_estrus = truncnorm.rvs(-const.STDI, const.STDI, avg, std)
         norm = abs(synch_ed_estrus)
         if norm >= max_val:
             norm = max_val - 1
@@ -642,23 +631,15 @@ class HeiferII(HeiferI):
             if conception_rand < self.conception_rate:
                 self.days_in_preg = 1
                 self.breeding_to_preg_time = self.days_born - AnimalBase.config['breeding_start_day_h']
-                self.gestation_length = int(np.random.normal(
-                    AnimalBase.config['avg_gestation_len'],
-                    AnimalBase.config['std_gestation_len']))
-                while self.gestation_length < AnimalBase.config['avg_gestation_len'] \
-                    - 2 * AnimalBase.config['std_gestation_len'] \
-                    or self.gestation_length > AnimalBase.config['avg_gestation_len'] \
-                        + 2 * AnimalBase.config['std_gestation_len']:
-                    self.gestation_length = int(np.random.normal(
-                        AnimalBase.config['avg_gestation_len'],
+                self.gestation_length = int(truncnorm.rvs(-const.STDI, const.STDI, AnimalBase.config['avg_gestation_len'],\
                         AnimalBase.config['std_gestation_len']))
                 # generate calf birth weight 
                 if self.breed == 'HO':
-                    self.calf_birth_weight = truncnorm.rvs(-2*AnimalBase.config['birth_weight_std_ho'], 2*AnimalBase.config['birth_weight_std_ho'], \
-                        AnimalBase.config['birth_weight_avg_ho'], AnimalBase.config['birth_weight_std_ho'])
+                    self.calf_birth_weight = truncnorm.rvs(-const.STDI, const.STDI, AnimalBase.config['birth_weight_avg_ho'],\
+                        AnimalBase.config['birth_weight_std_ho'])
                 elif self.breed == 'JE':
-                    self.calf_birth_weight = truncnorm.rvs(-2*AnimalBase.config['birth_weight_std_je'], 2*AnimalBase.config['birth_weight_std_je'], \
-                        AnimalBase.config['birth_weight_avg_je'], AnimalBase.config['birth_weight_std_je'])
+                    self.calf_birth_weight = truncnorm.rvs(-const.STDI, const.STDI, AnimalBase.config['birth_weight_avg_je'],\
+                        AnimalBase.config['birth_weight_std_je'])
                 self.events.add_event(self.days_born, sim_day, const.HEIFER_PREG)
             else:
                 self.events.add_event(self.days_born, sim_day, const.HEIFER_NOT_PREG)
