@@ -56,6 +56,7 @@ def test_create_all_dirs(mocker):
 def test_do_GET():
     """Unit test for function do_GET in file output_db/db_view.py"""
     print(urlopen("http://localhost:" + str(PORT) + "/").read())
+    assert False
 
 
 def test_do_POST():

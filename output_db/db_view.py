@@ -208,7 +208,7 @@ class RequestHandler(http.server.BaseHTTPRequestHandler):
 
             except Exception as e:
                 self.respond(INTERNAL_SERVER_ERROR, str(e))
-
+            print(page)
             self.respond(OK, page)
             file.close()
 
@@ -1069,6 +1069,7 @@ class RequestHandler(http.server.BaseHTTPRequestHandler):
 if __name__ == "__main__":
     # start the server locally at PORT
     with socketserver.TCPServer(("", PORT), RequestHandler) as httpd:
+        httpd.socket.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
         httpd.socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEPORT, 1)
         print("serving at port", PORT)
         print("to open connection, type 'localhost:" + str(PORT) +
