@@ -305,12 +305,12 @@ class HeiferII(HeiferI):
         # breeding method assign to heifer
         if self.days_born >= AnimalBase.config['breeding_start_day_h']:
             if self.repro_program == 'ED':
-                self._ed_update(sim_day)
+                self.ed_update(sim_day)
             elif self.repro_program == 'TAI':
-                self._tai_update(sim_day)
+                self.tai_update(sim_day)
             elif self.repro_program == 'synch-ED':
-                self._synch_ed_update(sim_day)
-            self._preg_update(sim_day)
+                self.synch_ed_update(sim_day)
+            self.preg_update(sim_day)
             # prior to calving, heifer move to replacement group (heiferIII)
             if self.days_in_preg == self.gestation_length - \
                 AnimalBase.config['prefresh_day']:
@@ -328,7 +328,7 @@ class HeiferII(HeiferI):
 
     # ED methods
 
-    def _determine_estrus_day(self, start_date, estrus_note, sim_day):
+    def determine_estrus_day(self, start_date, estrus_note, sim_day):
         """
         In estrus detection program, determine estrus day and estrus note
 
@@ -346,28 +346,28 @@ class HeiferII(HeiferI):
         self.events.add_event(self.days_born, sim_day, estrus_note)
         return estrus_day
 
-    def _return_estrus(self, sim_day):
+    def return_estrus(self, sim_day):
         """
         Return estrus after estrus not detected or not serviced
         """
-        self.estrus_day = self._determine_estrus_day(
+        self.estrus_day = self.determine_estrus_day(
             self.estrus_day, const.BASIC_ESTRUS_NOTE, sim_day)
 
-    def _after_ai_estrus(self, sim_day):
+    def after_ai_estrus(self, sim_day):
         """
         Return estrus after AI
         """
-        self.estrus_day = self._determine_estrus_day(
+        self.estrus_day = self.determine_estrus_day(
             self.estrus_day, const.ESTRUS_AFTER_AI_NOTE, sim_day)
 
-    def _after_abortion_estrus(self, sim_day):
+    def after_abortion_estrus(self, sim_day):
         """
         Return estrus after abortion at preg check
         """
-        self.estrus_day = self._determine_estrus_day(
+        self.estrus_day = self.determine_estrus_day(
             self.abortion_day, const.ESTRUS_AFTER_ABORTION_NOTE, sim_day)
 
-    def _ed_update(self, sim_day):
+    def ed_update(self, sim_day):
         """
         Estrus occur at estrus day,
         estrus detected with detection rate,
@@ -375,7 +375,7 @@ class HeiferII(HeiferI):
         conception successed with conception rate
         """
         if self.days_born == AnimalBase.config['breeding_start_day_h']:
-            self.estrus_day = self._determine_estrus_day(
+            self.estrus_day = self.determine_estrus_day(
                 AnimalBase.config['breeding_start_day_h'], const.FIRST_ESTRUS_NOTE,
                 sim_day)
 
@@ -395,14 +395,14 @@ class HeiferII(HeiferI):
                     self.conception_rate = \
                         AnimalBase.config['estrus_conception_rate']
                 else:
-                    self._return_estrus(sim_day)
+                    self.return_estrus(sim_day)
             else:
-                self._return_estrus(sim_day)
+                self.return_estrus(sim_day)
 
         self.ED_days += 1
 
     # TAI methods
-    def _determine_tai_program_day(self, date):
+    def determine_tai_program_day(self, date):
         """
         Determine the program start time when reach breeding start time
 
@@ -411,13 +411,13 @@ class HeiferII(HeiferI):
         """
         self.tai_program_start_day_h = date
 
-    def _tai_program_day_after_abortion(self):
+    def tai_program_day_after_abortion(self):
         """
         Determine the TAI restart date after abortion preg checks
         """
         self.tai_program_start_day_h = self.abortion_day + 1
 
-    def _5dCG2P_update(self, sim_day):
+    def d5CG2P_update(self, sim_day):
         """
         5dCG2P protocol for tai method
         """
@@ -432,11 +432,11 @@ class HeiferII(HeiferI):
             self.PGF_injections = self.PGF_injections + 1
         elif self.days_born == self.tai_program_start_day_h + 8:
             self.ai_day = self.days_born
-            self.conception_rate = AnimalBase.config['m5dCG2P_conception_rate']
+            self.conception_rate = AnimalBase.config['md5CG2P_conception_rate']
             self.events.add_event(self.days_born, sim_day, const.INJECT_GNRH)
             self.GnRH_injections = self.GnRH_injections + 1
 
-    def _5dCGP_update(self, sim_day):
+    def d5CGP_update(self, sim_day):
         """
         5dCGP protocol for tai method
         """
@@ -452,7 +452,7 @@ class HeiferII(HeiferI):
             self.events.add_event(self.days_born, sim_day, const.INJECT_GNRH)
             self.GnRH_injections = self.GnRH_injections + 1
 
-    def _user_defined_update(self):
+    def user_defined_update(self):
         """
         User defined protocol for tai method
         """
@@ -461,23 +461,23 @@ class HeiferII(HeiferI):
             self.ai_day = self.days_born
             self.conception_rate = AnimalBase.config['heifer_user_defined_tai_cr']
 
-    def _tai_update(self, sim_day):
+    def tai_update(self, sim_day):
         """
         Tai method update, assign tai method
         """
         if self.days_born == AnimalBase.config['breeding_start_day_h']:
-            self._determine_tai_program_day(
+            self.determine_tai_program_day(
                 AnimalBase.config['breeding_start_day_h'])
 
         if self.tai_method_h == '5dCG2P':
-            self._5dCG2P_update(sim_day)
+            self.d5CG2P_update(sim_day)
         elif self.tai_method_h == '5dCGP':
-            self._5dCGP_update(sim_day)
+            self.d5CGP_update(sim_day)
         elif self.tai_method_h == 'user_defined':
-            self._user_defined_update()
+            self.user_defined_update()
 
     # synch-ED methods
-    def _determine_synch_ed_program_day(self, date):
+    def determine_synch_ed_program_day(self, date):
         """
         Determine the program start time when reach breeding start time
 
@@ -486,7 +486,7 @@ class HeiferII(HeiferI):
         """
         self.synch_ed_program_start_day_h = date
 
-    def _determine_synch_ed_estrus_day(self, date, avg, std, max_val):
+    def determine_synch_ed_estrus_day(self, date, avg, std, max_val):
         """
         Determine synch ed leading estrus start day, with normal distribution
 
@@ -503,13 +503,13 @@ class HeiferII(HeiferI):
             norm = max_val - 1
         self.synch_ed_estrus_day = int(date + norm)
 
-    def _synch_ed_program_day_after_abortion(self):
+    def synch_ed_program_day_after_abortion(self):
         """
         Return to synch ed after abortion when spot at the preg check
         """
         self.synch_ed_program_start_day_h = self.abortion_day
 
-    def _2P_update(self, sim_day):
+    def P2_update(self, sim_day):
         """
         2P protocol for synch ed method
         estrus detection happens when estrus occur
@@ -517,7 +517,7 @@ class HeiferII(HeiferI):
         if self.days_born == self.synch_ed_program_start_day_h:
             self.events.add_event(self.days_born, sim_day, const.INJECT_PGF)
             self.PGF_injections = self.PGF_injections + 1
-            self._determine_synch_ed_estrus_day(self.days_born, 5, 3, 14)
+            self.determine_synch_ed_estrus_day(self.days_born, 5, 3, 14)
 
         if self.days_born == self.synch_ed_estrus_day:
             self.events.add_event(self.days_born, sim_day, const.ESTRUS_OCCURRED)
@@ -538,18 +538,18 @@ class HeiferII(HeiferI):
                             self.synch_ed_program_start_day_h + 14, sim_day,
                             const.INJECT_PGF)
                         self.PGF_injections = self.PGF_injections + 1
-                        self._determine_synch_ed_estrus_day(
+                        self.determine_synch_ed_estrus_day(
                             self.synch_ed_program_start_day_h + 14, 3, 2, 7)
                     else:
                         # second round of injection also failed,
                         # roll back to return_synch
                         self.synch_ed_stop_day = self.synch_ed_program_start_day_h + 21
-                        self._determine_synch_ed_program_day(self.synch_ed_stop_day)
+                        self.determine_synch_ed_program_day(self.synch_ed_stop_day)
             else:
                 self.synch_ed_stop_day = self.synch_ed_program_start_day_h + 21
-                self._determine_synch_ed_program_day(self.synch_ed_stop_day)
+                self.determine_synch_ed_program_day(self.synch_ed_stop_day)
 
-    def _CP_update(self, sim_day):
+    def CP_update(self, sim_day):
         """
         CP protocol for synch ed method
         estrus detection happens when estrus occur
@@ -559,7 +559,7 @@ class HeiferII(HeiferI):
         elif self.days_born == self.synch_ed_program_start_day_h + 7:
             self.events.add_event(self.days_born, sim_day, const.INJECT_PGF)
             self.PGF_injections = self.PGF_injections + 1
-            self._determine_synch_ed_estrus_day(self.days_born, 3, 2, 7)
+            self.determine_synch_ed_estrus_day(self.days_born, 3, 2, 7)
 
         if self.days_born == self.synch_ed_estrus_day:
             self.events.add_event(self.days_born, sim_day, const.ESTRUS_OCCURRED)
@@ -574,42 +574,42 @@ class HeiferII(HeiferI):
                         AnimalBase.config['estrus_conception_rate']
                 else:
                     self.synch_ed_stop_day = self.synch_ed_program_start_day_h + 14
-                    self._determine_synch_ed_program_day(self.synch_ed_stop_day)
+                    self.determine_synch_ed_program_day(self.synch_ed_stop_day)
             else:
                 self.synch_ed_stop_day = self.synch_ed_program_start_day_h + 14
-                self._determine_synch_ed_program_day(self.synch_ed_stop_day)
+                self.determine_synch_ed_program_day(self.synch_ed_stop_day)
 
-    def _synch_ed_update(self, sim_day):
+    def synch_ed_update(self, sim_day):
         """
         Synch ed method update, assign with protocols: 2P or CP
         """
         if self.days_born == AnimalBase.config['breeding_start_day_h']:
-            self._determine_synch_ed_program_day(
+            self.determine_synch_ed_program_day(
                 AnimalBase.config['breeding_start_day_h'])
 
         if self.synch_ed_method_h == '2P':
-            self._2P_update(sim_day)
+            self.P2_update(sim_day)
         elif self.synch_ed_method_h == 'CP':
-            self._CP_update(sim_day)
+            self.CP_update(sim_day)
 
     # Preg stage
 
     # after preg loss between 1 and 3 preg checks, return to
     # corresponding protocols
-    def _open(self, sim_day):
+    def open(self, sim_day):
         """
         Assign breeding method for open heifers after spot open at preg check
         three methods can be assigned: ED, TAI, synch-ED
         """
         if self.repro_program == 'ED':
-            self._after_abortion_estrus(sim_day)
+            self.after_abortion_estrus(sim_day)
         elif self.repro_program == 'TAI':
-            self._tai_program_day_after_abortion()
+            self.tai_program_day_after_abortion()
         elif self.repro_program == 'synch-ED':
-            self._synch_ed_program_day_after_abortion()
+            self.synch_ed_program_day_after_abortion()
 
     # artificial inseminated and go through 3 preg checks
-    def _preg_update(self, sim_day):
+    def preg_update(self, sim_day):
         """
         update AI for heifers reach ai day, inseminate the heifer with specific
             semen type
@@ -656,7 +656,7 @@ class HeiferII(HeiferI):
                 else:
                     self.days_in_preg = 0
                     self.abortion_day = self.days_born
-                    self._open(sim_day)
+                    self.open(sim_day)
                     self.body_weight -= self.conceptus_weight
                     self.conceptus_weight = 0
                     self.calf_birth_weight = 0
@@ -665,7 +665,7 @@ class HeiferII(HeiferI):
                         self.days_born, sim_day, const.PREG_LOSS_BEFORE_1)
             else:
                 self.abortion_day = self.days_born
-                self._open(sim_day)
+                self.open(sim_day)
                 self.events.add_event(
                     self.days_born, sim_day, const.PREG_CHECK_1_NOT_PREG)
         # preg check 2
@@ -680,7 +680,7 @@ class HeiferII(HeiferI):
             else:
                 self.days_in_preg = 0
                 self.abortion_day = self.days_born
-                self._open(sim_day)
+                self.open(sim_day)
                 self.body_weight -= self.conceptus_weight
                 self.conceptus_weight = 0
                 self.calf_birth_weight = 0
@@ -698,7 +698,7 @@ class HeiferII(HeiferI):
             else:
                 self.days_in_preg = 0
                 self.abortion_day = self.days_born
-                self._open(sim_day)
+                self.open(sim_day)
                 self.body_weight -= self.conceptus_weight
                 self.conceptus_weight = 0
                 self.calf_birth_weight = 0
