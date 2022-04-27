@@ -8,7 +8,7 @@ def default_manure_obj() -> Manure:
     return Manure()
 
 
-def test_construct_a_default_manure_object(default_manure_obj):
+def test_manure_init_should_get_a_manure_obj_with_zero_attrs_when_no_params_given(default_manure_obj) -> None:
     assert default_manure_obj.U == 0
     assert default_manure_obj.TAN_s == 0
     assert default_manure_obj.MN == 0
@@ -24,23 +24,14 @@ def test_construct_a_default_manure_object(default_manure_obj):
     assert default_manure_obj.CH4_manure == 0
 
 
-def test_construct_a_manure_object_from_dictionary():
-    d = {
-        "U": 1,
-        "TAN_s": 2,
-        "MN": 3,
-        "Mkg": 0,
-        "TSd": 0,
-        "VSd": 6,
-        "VSnd": 0,
-        "WIP_frac": 0,
-        "WOP_frac": 0,
-        "p_excrt_manure": 0,
-        "p_frac": 0,
-        "K_manure": 0,
-        "CH4_manure": 0
+def test_manure_init_should_get_a_manure_obj_with_correct_attr_values_when_a_dictionary_given() -> None:
+    m = {
+        'U': 1,
+        'TAN_s': 2,
+        'MN': 3,
+        'VSd': 6,
     }
-    manure = Manure(**d)
+    manure = Manure(**m)
     assert manure.U == 1
     assert manure.TAN_s == 2
     assert manure.MN == 3
@@ -52,18 +43,19 @@ def test_construct_a_manure_object_from_dictionary():
         assert getattr(manure, attr) == 0
 
 
-def test_add_a_manure_to_a_non_manure_should_fail(default_manure_obj):
+def test_add_should_raise_type_error_when_a_manure_obj_and_a_non_manure_obj_given(default_manure_obj) -> None:
     with pytest.raises(TypeError, match=r'Cannot add a non-Manure object to a Manure object.'):
         default_manure_obj + dict()
 
 
-def test_add_two_default_manure_objects_should_return_a_different_but_equal_manure_object(default_manure_obj):
+def test_add_should_return_a_different_but_equal_manure_obj_when_two_default_manure_objs_given(
+        default_manure_obj) -> None:
     total = default_manure_obj + default_manure_obj
     assert total is not default_manure_obj
     assert total == default_manure_obj
 
 
-def test_add_two_valid_manure_objects_should_return_correct_sum():
+def test_add_should_return_correct_summed_attrs_when_two_valid_manure_objs_given() -> None:
     manure1 = Manure(U=1, TAN_s=2, MN=3)
     manure2 = Manure(U=4, MN=6)
     total = manure1 + manure2
