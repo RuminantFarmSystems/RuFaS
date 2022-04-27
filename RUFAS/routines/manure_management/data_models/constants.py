@@ -1,3 +1,5 @@
+# TODO: Explain each constant
+
 class ManureManagementConstants:
     """A class that stores constants used in calculation during the processing
     of manure data.

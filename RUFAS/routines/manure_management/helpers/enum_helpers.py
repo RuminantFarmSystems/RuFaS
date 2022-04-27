@@ -32,7 +32,7 @@ class ExtendedEnum(Enum):
         """
 
         for e in cls:  # Iterate through each enum member
-            if query_str.lower() in e.name.lower():
+            if query_str.strip().lower() in e.name.lower():
                 return e
 
         return cls.get_default_enum()
