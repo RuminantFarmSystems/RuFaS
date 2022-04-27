@@ -12,13 +12,13 @@
 	},
 	"animal_config": {
 		"management_decisions": {
-			"breeding_start_day_h": 360,
+			"breeding_start_day_h": 380,
+			"heifer_repro_cull_time": 650,
 			"heifer_repro_method": "TAI",
 			"cow_repro_method": "TAI",
 			"semen_type": "conventional",
 			"days_in_preg_when_dry": 218,
 			"lactation_curve": "wood",
-			"heifer_repro_cull_time": 650,
 			"repro_cull_time": 300,
 			"do_not_breed_time" : 300,
 			"cull_milk_production": 22,
@@ -35,16 +35,18 @@
 			},
 			"repro": {
 				"ED_related":{
-					"estrus_detection_rate": 0.4,
-					"estrus_service_rate": 0.9,
-					"ed_conception_rate": 0.4,
-					"heifer_synchED_protocol": "2P"
+					"estrus_detection_rate_h": 0.6,
+					"estrus_insemination_rate_h": 1,
+					"estrus_conception_rate_h": 0.6,
+					"estrus_detection_rate_h_synch": 0.7,
+					"heifer_synchED_protocol": "2P",
+					"estrus_detection_rate": 0.6,
+					"estrus_insemination_rate": 1,
+					"estrus_conception_rate": 0.5
 				},
 				"TAI_related":{
 					"heifer_TAI_protocol": "5dCG2P",
-					"m5dCG2P_conception_rate": 0.6,
-					"m5dCGP_conception_rate": 0.48,
-					"heifer_user_defined_tai_cr": 0.0,
+					"TAI_conception_rate_h": 0.6,
 					"cow_presynch_protocol": "Double OvSynch",
 					"user_defined_presynch_length": 0,
 					"cow_TAI_protocol": "OvSynch 56",
@@ -64,7 +66,7 @@
 				"prefresh_day": 30,
 				"num_21_days_repro": 15,
 				"calving_interval": 400,
-				"use_input_calving_interval": false
+				"user_input_calving_interval": false	
 			},
 			"bodyweight": {
 				"birth_weight_avg_ho": 43.9,

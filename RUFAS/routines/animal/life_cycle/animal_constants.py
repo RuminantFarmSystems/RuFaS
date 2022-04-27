@@ -16,15 +16,17 @@ INSEMINATED_W_BASE = "inseminated with "
 BREEDING_START = "breeding start"
 DO_NOT_BREED = "mark as do not breed"
 
-# estrus occurred
+# estrus 
 ESTRUS_DETECTED = "estrus detected"
-BASIC_ESTRUS_NOTE = "estrus"
-ESTRUS_AFTER_AI_NOTE = "estrus after AI"
-ESTRUS_AFTER_ABORTION_NOTE = "estrus after abortion"
-FIRST_ESTRUS_NOTE = "first estrus"
-ESTRUS_AFTER_CALVING_NOTE = "1st estrus after calving"
-ESTRUS_BEFORE_VWP_NOTE = "estrus occurred before vwp"
-ESTRUS_AFTER_PGF_NOTE = "estrus after PGF"
+BASIC_ESTRUS_NOTE = "estrus sceduled"
+ESTRUS_AFTER_AI_NOTE = "estrus after AI scheduled"
+ESTRUS_AFTER_ABORTION_NOTE = "estrus after abortion scheduled"
+FIRST_ESTRUS_NOTE = "first estrus scheduled"
+SYNCH_ESTRUS = "synch estrus scheduled"
+ESTRUS_AFTER_CALVING_NOTE = "1st estrus after calving scheduled"
+ESTRUS_BEFORE_VWP_NOTE = "estrus scheduled during vwp estrus"
+ESTRUS_AFTER_PGF_NOTE = "estrus after PGF scheduled"
+ESTRUS_OCCURRED = "estrus"
 
 # TAI injections
 INJECT_GNRH = "inject GnRH"
@@ -77,3 +79,7 @@ UNKNOWN_CULL = "culled for unknown"
 STDI = 2
 
 # DEFAULTS
+SEDHM = 5
+SEDHS = 1.5
+SEDHE = 7
+ECRS_DEC = 0.05

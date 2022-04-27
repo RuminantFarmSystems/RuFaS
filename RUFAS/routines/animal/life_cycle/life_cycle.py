@@ -68,7 +68,11 @@ class LifeCycleManager:
         'greater_than_3': 0
     }
 
+    preg_check_num_h = 0
     preg_check_num = 0
+    CIDR_count = 0
+    GnRH_injection_num_h = 0
+    PGF_injection_num_h = 0
     GnRH_injection_num = 0
     PGF_injection_num = 0
 
@@ -121,6 +125,9 @@ class LifeCycleManager:
     cull_reason_stats_range = {}
     parity_culling_stats_range = {}
 
+    ai_num_h = 0
+    semen_num_h = 0
+    ed_period_h = 0
     ai_num = 0
     semen_num = 0
 
@@ -175,7 +182,7 @@ class LifeCycleManager:
         self.animal_initializer = AnimalInitialization(self.config['calving_interval'], breed,
                                                        config.set_seed, herd_init)
 
-        if self.config['use_input_calving_interval']:
+        if self.config['user_input_calving_interval']:
             self.avg_CI = self.config['calving_interval']
         else:
             self.initialize_db_summary = \
@@ -246,9 +253,16 @@ class LifeCycleManager:
         self.culled_cow_num = 0
         total_animal_num = 0
 
+        self.preg_check_num_h = 0
         self.preg_check_num = 0
+        self.CIDR_count = 0
+        self.GnRH_injection_num_h = 0
+        self.PGF_injection_num_h = 0
         self.GnRH_injection_num = 0
         self.PGF_injection_num = 0
+        self.ai_num_h = 0
+        self.semen_num_h = 0
+        self.ed_period_h = 0
         self.ai_num = 0
 
         self.daily_milk_production = 0
@@ -362,6 +376,13 @@ class LifeCycleManager:
                         self.calc_average(preg_heifer_num,
                                            self.avg_breeding_to_preg_time,
                                            heiferII.breeding_to_preg_time)
+                self.CIDR_count += heiferII.CIDR_count
+                self.GnRH_injection_num_h += heiferII.GnRH_injections
+                self.PGF_injection_num_h += heiferII.PGF_injections
+                self.preg_check_num_h += heiferII.preg_diagnoses
+                self.semen_num_h += heiferII.semen_num
+                self.ai_num_h += heiferII.AI_times
+                self.ed_period_h += heiferII.ED_days
 
         # heiferIII to cow, assign repro programs
         for index, heiferIII in enumerate(heiferIIIs):
