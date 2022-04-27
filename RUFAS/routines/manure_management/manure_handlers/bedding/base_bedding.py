@@ -3,8 +3,8 @@ from __future__ import annotations
 
 class BaseBedding:
     def __init__(self, arg_mass: float, arg_density: float):
-        self.mass = arg_mass
-        self._density = arg_density
+        self.mass = arg_mass  # kg/animal/day
+        self._density = arg_density  # kg/m^3
 
     @property
     def density(self):

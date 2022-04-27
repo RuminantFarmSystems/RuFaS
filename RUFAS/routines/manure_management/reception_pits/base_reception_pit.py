@@ -10,6 +10,7 @@ class BaseReceptionPit:
                  pen: SimplePen,
                  manure_separator: BaseSeparator,
                  reception_pit_init_data: ReceptionPitInitData):
+        self.flush_water_volume = 0.0
         self.pen = pen
         self.manure_separator = manure_separator
         self.reception_pit_init_data = reception_pit_init_data
