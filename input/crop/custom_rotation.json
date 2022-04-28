@@ -2,31 +2,31 @@
     "latitude": 43.332708,
     "crops": {
         "potato": {
-            "grow_years": [2009],
+            "plant_years": [2009],
             "repeat": 4,
-            "planting_date": 121,
-            "harvest_date": 319,
+            "planting_day": 121,
+            "harvest_day": 319,
             "harvest_type": "optimal"
         },
         "spring_barley": {
-            "grow_years": [2010],
+            "plant_years": [2010],
             "repeat": 4,
-            "planting_date": 121,
-            "harvest_date": 319,
+            "planting_day": 121,
+            "harvest_day": 319,
             "harvest_type": "optimal"
         },
         "corn_1": {
-            "grow_years": [2011],
+            "plant_years": [2011],
             "repeat": 4,
-            "planting_date": 121,
-            "harvest_date": 319,
+            "planting_day": 121,
+            "harvest_day": 319,
             "harvest_type": "optimal"
         },
         "corn_2": {
-            "grow_years": [2012],
+            "plant_years": [2012],
             "repeat": 4,
-            "planting_date": 30,
-            "harvest_date": 319,
+            "planting_day": 30,
+            "harvest_day": 319,
             "harvest_type": "optimal"
         }
     }

@@ -3,10 +3,10 @@
 
     "crops": {
         "potato": {
-            "grow_years": [2009],
+            "plant_years": [2009],
             "repeat": 1,
-            "planting_date": 121,
-            "harvest_date": 319,
+            "planting_day": 121,
+            "harvest_day": 319,
             "harvest_type": "optimal"
         }
     }
