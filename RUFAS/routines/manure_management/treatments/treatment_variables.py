@@ -5,7 +5,7 @@ from dataclasses import astuple, dataclass
 
 # TODO: Should remove unnecessary variables or consolidate with other variables in the module
 @dataclass
-class StorageOptionVariables:
+class TreatmentVariables:
     TS: float = 0.0
     VS: float = 0.0
     N: float = 0.0
@@ -24,7 +24,7 @@ class StorageOptionVariables:
     WOP_frac: float = 0.0
     CH4: float = 0.0
 
-    def __add__(self, other: StorageOptionVariables) -> StorageOptionVariables:
+    def __add__(self, other: TreatmentVariables) -> TreatmentVariables:
         """
         Add two StorageOptionVariables objects by summing
         their corresponding attributes.
@@ -38,10 +38,10 @@ class StorageOptionVariables:
 
         """
 
-        if not isinstance(other, StorageOptionVariables):
+        if not isinstance(other, TreatmentVariables):
             raise TypeError('Cannot add a non-StorageOptionVariables object to a '
                             'StorageOptionVariables object.')
 
-        return StorageOptionVariables(*[
+        return TreatmentVariables(*[
             attr1 + attr2 for attr1, attr2 in zip(astuple(self), astuple(other))
         ])

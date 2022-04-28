@@ -17,16 +17,16 @@ from RUFAS.routines.manure_management.manure_separators.manure_separator_classes
 from RUFAS.routines.manure_management.manure_separators.manure_separator_classes.slope_screen import SlopeScreen
 from RUFAS.routines.manure_management.manure_separators.manure_separator_enum import ManureSeparatorEnum
 from RUFAS.routines.manure_management.manure_separators.manure_separator_init_data import ManureSeparatorInitData
-from RUFAS.routines.manure_management.storage_options.storage_option_classes.base_storage import BaseStorage
+from RUFAS.routines.manure_management.treatments.treatment_classes.base_treatment import BaseTreatment
 
 
 class ManureSeparatorFactory:
     @classmethod
-    def get_instance(cls, pen: SimplePen, storage_option: BaseStorage) -> BaseSeparator:
+    def get_instance(cls, pen: SimplePen, treatment: BaseTreatment) -> BaseSeparator:
         manure_separator_enum = ManureSeparatorEnum.get_enum(pen.manure_handler)
         params = {
             'pen': pen,
-            'storage_option': storage_option,
+            'treatment': treatment,
             'separator_data': cls.get_manure_separator_init_data(manure_separator_enum)
         }
 

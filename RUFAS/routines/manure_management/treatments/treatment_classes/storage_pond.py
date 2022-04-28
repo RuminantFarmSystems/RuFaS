@@ -10,10 +10,10 @@ Author(s):  William Donovan, wmdonovan@wisc.edu
 """
 
 
-from .base_storage import BaseStorage
+from .base_treatment import BaseTreatment
 
 
-class StoragePond(BaseStorage):
+class StoragePond(BaseTreatment):
     """
     Description
     ------------
@@ -23,5 +23,5 @@ class StoragePond(BaseStorage):
 
     """
     
-    def __init__(self, pen, storage_option_init_data):
-        super().__init__(pen, storage_option_init_data)
+    def __init__(self, pen, treatment_init_data):
+        super().__init__(pen, treatment_init_data)

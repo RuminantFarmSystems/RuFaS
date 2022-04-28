@@ -1,15 +1,15 @@
 from .base_separator import BaseSeparator
 from ..manure_separator_init_data import ManureSeparatorInitData
 from ...data_models.simple_pen import SimplePen
-from ...storage_options.storage_option_classes.base_storage import BaseStorage
+from ...treatments.treatment_classes.base_treatment import BaseTreatment
 
 
 class NullSeparator(BaseSeparator):
     def __init__(self,
                  pen: SimplePen,
-                 storage_option: BaseStorage,
+                 treatment: BaseTreatment,
                  separator_data: ManureSeparatorInitData):
-        super().__init__(pen, storage_option, separator_data)
+        super().__init__(pen, treatment, separator_data)
 
     def update(self, pen: SimplePen):
-        super().update_storage_option_variables()
+        super().update_treatment_variables()

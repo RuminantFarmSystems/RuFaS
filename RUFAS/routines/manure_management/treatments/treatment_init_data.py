@@ -2,7 +2,7 @@ from dataclasses import dataclass
 
 
 @dataclass
-class StorageOptionInitData:
+class TreatmentInitData:
     """
     A data class that contains information used in the
     creation of a ManureHandler object.

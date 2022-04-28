@@ -1,4 +1,4 @@
-from RUFAS.routines.manure_management import manure_separators, reception_pits, storage_options, treatments
+from RUFAS.routines.manure_management import manure_separators, reception_pits, treatments, treatments_deprecated
 from RUFAS.routines.manure_management.manure_handlers.manure_handler_classes.alley_scraper import AlleyScraper
 from RUFAS.routines.manure_management.manure_handlers.manure_handler_classes.custom_manure_handler import CustomManureHandler
 from RUFAS.routines.manure_management.manure_handlers.manure_handler_classes.flush_system import FlushSystem
@@ -129,7 +129,7 @@ class ManureManagement2:
 
                 self.storage[storage] = self.storage[storage] if \
                     storage in self.storage else \
-                    self.initialize_storage(storage, manure_management_data['storage_options'])
+                    self.initialize_storage(storage, manure_management_data['treatments'])
 
                 self.treatments[treatment] = self.treatments[treatment] if \
                     treatment in self.treatments else \
@@ -229,25 +229,25 @@ class ManureManagement2:
     @staticmethod
     def initialize_treatment(treatment, storage, treatment_data):
         if treatment.startswith('null'):
-            return treatments.null_treatment.NullTreatment(storage)
+            return treatments_deprecated.null_treatment.NullTreatment(storage)
 
         if treatment not in treatment_data:
-            print(treatment, 'not listed under treatments in manure management JSON file. Setting to null.')
-            return treatments.null_treatment.NullTreatment(storage)
+            print(treatment, 'not listed under treatments_deprecated in manure management JSON file. Setting to null.')
+            return treatments_deprecated.null_treatment.NullTreatment(storage)
 
         treatment_data = treatment_data[treatment]
 
         if treatment == 'base_treatment':
-            return treatments.base_treatment.BaseTreatment(treatment, treatment_data, storage)
+            return treatments_deprecated.base_treatment.BaseTreatment(treatment, treatment_data, storage)
         elif treatment == 'anaerobic_digester':
-            return treatments.anaerobic_digester.AnaerobicDigester(treatment, treatment_data, storage)
+            return treatments_deprecated.anaerobic_digester.AnaerobicDigester(treatment, treatment_data, storage)
         else:
             print(treatment, 'not currently implemented for manure management. Creating custom treatment.')
             if treatment_data['default']:
                 print('Cannot use default values for manure treatment', treatment, '. Setting to anaerobic digester.')
-                return treatments.anaerobic_digester.AnaerobicDigester(treatment, treatment_data, storage)
+                return treatments_deprecated.anaerobic_digester.AnaerobicDigester(treatment, treatment_data, storage)
             else:
-                return treatments.custom_treatment.CustomTreatment(treatment, treatment_data, storage)
+                return treatments_deprecated.custom_treatment.CustomTreatment(treatment, treatment_data, storage)
 
     @staticmethod
     def initialize_storage(storage, storage_data):
@@ -256,16 +256,16 @@ class ManureManagement2:
             storage = 'storage_pond'
         storage_data = storage_data[storage]
         if storage.__contains__('storage_pond'):
-            return RUFAS.routines.manure_management.storage_options.storage_option_classes.storage_pond.StoragePond(storage, storage_data)
+            return RUFAS.routines.manure_management.treatments.storage_option_classes.storage_pond.StoragePond(storage, storage_data)
         elif storage.__contains__('anaerobic_lagoon'):
-            return storage_options.anaerobic_lagoon.AnaerobicLagoon(storage, storage_data)
+            return treatments.anaerobic_lagoon.AnaerobicLagoon(storage, storage_data)
         else:
             print(storage, 'not currently implemented for manure management. Creating custom storage.')
             if storage_data['default']:
                 print('Cannot use default values for manure storage', storage, '. Setting to storage pond.')
-                return RUFAS.routines.manure_management.storage_options.storage_option_classes.storage_pond.StoragePond(storage, storage_data)
+                return RUFAS.routines.manure_management.treatments.storage_option_classes.storage_pond.StoragePond(storage, storage_data)
             else:
-                return storage_options.custom_storage.CustomStorage(storage, storage_data)
+                return treatments.custom_storage.CustomTreatment(storage, storage_data)
 
     def summarize_manure_management(self):
         """

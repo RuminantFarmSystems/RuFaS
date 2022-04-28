@@ -10,11 +10,11 @@ Author(s):  William Donovan, wmdonovan@wisc.edu
 """
 from RUFAS.routines.manure_management.data_models.constants import ManureManagementConstants as Constants
 from RUFAS.routines.manure_management.data_models.simple_pen import SimplePen
-from RUFAS.routines.manure_management.storage_options.storage_option_init_data import StorageOptionInitData
-from RUFAS.routines.manure_management.storage_options.storage_option_variables import StorageOptionVariables
+from RUFAS.routines.manure_management.treatments.treatment_init_data import TreatmentInitData
+from RUFAS.routines.manure_management.treatments.treatment_variables import TreatmentVariables
 
 
-class BaseStorage:
+class BaseTreatment:
     """
         Description
         ------------
@@ -24,7 +24,7 @@ class BaseStorage:
 
     """
 
-    def __init__(self, pen: SimplePen, storage_option_init_data: StorageOptionInitData):
+    def __init__(self, pen: SimplePen, treatment_init_data: TreatmentInitData):
         """
         Description:
             An instance of this class represents an storage receptacle.
@@ -32,15 +32,15 @@ class BaseStorage:
 
         Args:
             pen
-            storage_option_init_data
+            treatment_init_data
         """
         self.pen = pen
-        self.storage_option_init_data = storage_option_init_data
+        self.storage_option_init_data = treatment_init_data
 
-        self.daily_vars = StorageOptionVariables()
+        self.daily_vars = TreatmentVariables()
 
     def reset_daily_variables(self):
-        self.daily_vars = StorageOptionVariables()
+        self.daily_vars = TreatmentVariables()
 
     def update(self, pen: SimplePen):
         self.methane(pen.manure)
