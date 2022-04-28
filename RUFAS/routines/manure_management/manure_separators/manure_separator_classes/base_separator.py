@@ -11,8 +11,7 @@ Author(s):  William Donovan, wmdonovan@wisc.edu
 from RUFAS.routines.manure_management.data_models.simple_pen import SimplePen
 from RUFAS.routines.manure_management.manure_separators.manure_separator_init_data import ManureSeparatorInitData
 from RUFAS.routines.manure_management.manure_separators.manure_separator_variables import ManureSeparatorVariables
-from RUFAS.routines.manure_management.treatments.treatment_classes.base_treatment import BaseTreatment
-from RUFAS.routines.manure_management.treatments.treatment_variables import TreatmentVariables
+from RUFAS.routines.manure_management.reception_pits.base_reception_pit import BaseReceptionPit
 
 
 class BaseSeparator:
@@ -27,7 +26,7 @@ class BaseSeparator:
 
     def __init__(self,
                  pen: SimplePen,
-                 treatment: BaseTreatment,
+                 reception_pit: BaseReceptionPit,
                  separator_data: ManureSeparatorInitData):
         """
         Description:
@@ -38,14 +37,14 @@ class BaseSeparator:
         """
         self.pen = pen
         self.separator_init_data = separator_data
-        self.treatment = treatment
+        self.reception_pit = reception_pit
 
         self.daily_vars = ManureSeparatorVariables()
 
     def reset_daily_variables(self):
         self.daily_vars = ManureSeparatorVariables()
 
-    def update(self, pen: SimplePen):
+    def update(self):
         """
         Description:
             Calls functions to calculate nutrient losses and transformations during
@@ -97,18 +96,18 @@ class BaseSeparator:
             "pseudocode_manure_management" MS.4.C
         """
         d = self.daily_vars
-        self.treatment.daily_vars += TreatmentVariables(
-                TS=d.TS,
-                TS_liquid=d.TS_liquid,
-                VS=d.VS,
-                VS_liquid=d.VS_liquid,
-                N=d.N,
-                N_liquid=d.N_liquid,
-                P=d.P,
-                P_liquid=d.P_liquid,
-                K=d.K,
-                K_liquid=d.K_liquid,
-                CH4=d.CH4,
-                WIP=d.WIP,
-                WOP=d.WOP
-        )
+        # self.treatment.daily_vars += TreatmentVariables(
+        #         TS=d.TS,
+        #         TS_liquid=d.TS_liquid,
+        #         VS=d.VS,
+        #         VS_liquid=d.VS_liquid,
+        #         N=d.N,
+        #         N_liquid=d.N_liquid,
+        #         P=d.P,
+        #         P_liquid=d.P_liquid,
+        #         K=d.K,
+        #         K_liquid=d.K_liquid,
+        #         CH4=d.CH4,
+        #         WIP=d.WIP,
+        #         WOP=d.WOP
+        # )

@@ -67,8 +67,8 @@ class ManureManagement:
 
     def __init__(self, animal_management: AnimalManagement):
         self.manure_handlers: Dict[int, BaseManureHandler] = {}
-        self.manure_separators: Dict[int, BaseSeparator] = {}
         self.reception_pits: Dict[int, BaseReceptionPit] = {}
+        self.manure_separators: Dict[int, BaseSeparator] = {}
         self.treatments: Dict[int, BaseTreatment] = {}
 
         self.daily_vars = DailyVariables()
@@ -104,16 +104,16 @@ class ManureManagement:
         for pen in animal_management.all_pens:
             self.manure_handlers[pen.id] = ManureHandlerFactory.get_instance(pen=pen)
 
-            # Reception pits also optional and take value of None when absent.
+            # Reception pits are optional and take value of None when absent.
             # Reception pits and separators are either both present or both absent.
             self.reception_pits[pen.id] = \
                 ReceptionPitFactory.get_instance(pen=pen, manure_handler=self.manure_handlers[pen.id])
 
-            self.treatments[pen.id] = TreatmentFactory.get_instance(pen=pen)
-
             # Separators are optional and take value of None when absent.
             self.manure_separators[pen.id] = \
-                ManureSeparatorFactory.get_instance(pen=pen, treatment=self.treatments[pen.id])
+                ManureSeparatorFactory.get_instance(pen=pen, reception_pit=self.reception_pits[pen.id])
+
+            self.treatments[pen.id] = TreatmentFactory.get_instance(pen=pen)
 
     def update(self, animal_management: SimpleAnimalManagement):
         """
@@ -121,7 +121,9 @@ class ManureManagement:
         new information from Animal Management.
 
         """
-
+        # Only manure handlers need a pen when performing an update
+        # The remaining downstream components can just extract whatever data they
+        # need from the immediate upstream component.
         for pen in animal_management.all_pens:
             self.manure_handlers[pen.id].update(pen)
             print(f'manure handler for pen {pen.id}: {self.manure_handlers[pen.id].daily_vars}')
@@ -129,7 +131,7 @@ class ManureManagement:
             self.reception_pits[pen.id].update()
             print(f'reception pit for pen {pen.id}: {self.reception_pits[pen.id].daily_vars}')
 
-            self.manure_separators[pen.id].update(pen)
+            self.manure_separators[pen.id].update()
             print(f'manure separator for pen {pen.id}: {self.manure_separators[pen.id].daily_vars}')
 
             self.treatments[pen.id].update(pen)
