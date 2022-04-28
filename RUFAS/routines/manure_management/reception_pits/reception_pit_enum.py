@@ -4,7 +4,7 @@ from RUFAS.routines.manure_management.helpers.enum_helpers import ExtendedEnum
 
 
 class ReceptionPitEnum(ExtendedEnum):
-    NULL = auto()
-    BASE = auto()
+    NULL = auto
+    BASE = auto
 
     DEFAULT = BASE

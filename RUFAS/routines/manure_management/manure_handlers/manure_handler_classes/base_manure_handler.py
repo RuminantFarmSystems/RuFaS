@@ -9,13 +9,12 @@ Author(s):  William Donovan, wmdonovan@wisc.edu
             Yunus Mohammed, ymm26@cornell.edu 
 """
 
+from RUFAS.routines.manure_management.data_models.constants import ManureManagementConstants as Constants
+from RUFAS.routines.manure_management.data_models.simple_pen import SimplePen
 from RUFAS.routines.manure_management.manure_handlers.bedding.bedding_enum import BeddingEnum
 from RUFAS.routines.manure_management.manure_handlers.bedding.bedding_manager import BeddingManager
 from RUFAS.routines.manure_management.manure_handlers.manure_handler_init_data import ManureHandlerInitData
 from RUFAS.routines.manure_management.manure_handlers.manure_handler_variables import ManureHandlerVariables
-from RUFAS.routines.manure_management.data_models.constants import ManureManagementConstants as Constants
-from RUFAS.routines.manure_management.data_models.simple_pen import SimplePen
-from RUFAS.routines.manure_management.reception_pits.base_reception_pit import BaseReceptionPit
 from RUFAS.routines.manure_management.sand_separators.sand_separation_lane import SandSeparationLane
 
 

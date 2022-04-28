@@ -104,16 +104,16 @@ class ManureManagement:
         for pen in animal_management.all_pens:
             self.manure_handlers[pen.id] = ManureHandlerFactory.get_instance(pen=pen)
 
+            # Reception pits also optional and take value of None when absent.
+            # Reception pits and separators are either both present or both absent.
+            self.reception_pits[pen.id] = \
+                ReceptionPitFactory.get_instance(pen=pen, manure_handler=self.manure_handlers[pen.id])
+
             self.treatments[pen.id] = TreatmentFactory.get_instance(pen=pen)
 
             # Separators are optional and take value of None when absent.
             self.manure_separators[pen.id] = \
                 ManureSeparatorFactory.get_instance(pen=pen, treatment=self.treatments[pen.id])
-
-            # Reception pits are also optional and take value of None when absent.
-            # Reception pits and separators are either both present or both absent.
-            self.reception_pits[pen.id] = \
-                ReceptionPitFactory.get_instance(pen=pen, manure_separator=self.manure_separators[pen.id])
 
     def update(self, animal_management: SimpleAnimalManagement):
         """
@@ -126,11 +126,11 @@ class ManureManagement:
             self.manure_handlers[pen.id].update(pen)
             print(f'manure handler for pen {pen.id}: {self.manure_handlers[pen.id].daily_vars}')
 
+            self.reception_pits[pen.id].update()
+            print(f'reception pit for pen {pen.id}: {self.reception_pits[pen.id].daily_vars}')
+
             self.manure_separators[pen.id].update(pen)
             print(f'manure separator for pen {pen.id}: {self.manure_separators[pen.id].daily_vars}')
-
-            self.reception_pits[pen.id].update(pen)
-            print(f'reception pit for pen {pen.id}: {self.reception_pits[pen.id].daily_vars}')
 
             self.treatments[pen.id].update(pen)
             print(f'storage option for pen {pen.id}: {self.treatments[pen.id].daily_vars}')

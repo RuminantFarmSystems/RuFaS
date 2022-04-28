@@ -1,6 +1,6 @@
 from RUFAS.routines.manure_management.data_models.simple_pen import SimplePen
-from RUFAS.routines.manure_management.manure_separators.manure_separator_classes.base_separator import BaseSeparator
-from RUFAS.routines.manure_management.manure_separators.manure_separator_variables import ManureSeparatorVariables
+from RUFAS.routines.manure_management.manure_handlers.manure_handler_classes.base_manure_handler import \
+    BaseManureHandler
 from RUFAS.routines.manure_management.reception_pits.reception_pit_init_data import ReceptionPitInitData
 from RUFAS.routines.manure_management.reception_pits.reception_pit_variables import ReceptionPitVariables
 
@@ -8,11 +8,11 @@ from RUFAS.routines.manure_management.reception_pits.reception_pit_variables imp
 class BaseReceptionPit:
     def __init__(self,
                  pen: SimplePen,
-                 manure_separator: BaseSeparator,
+                 manure_handler: BaseManureHandler,
                  reception_pit_init_data: ReceptionPitInitData):
         self.flush_water_volume = 0.0
         self.pen = pen
-        self.manure_separator = manure_separator
+        self.manure_handler = manure_handler
         self.reception_pit_init_data = reception_pit_init_data
         self.daily_vars = ReceptionPitVariables()
 
@@ -20,19 +20,20 @@ class BaseReceptionPit:
         self.daily_vars = ReceptionPitVariables()
 
     # TODO: Check logic
-    def update(self, pen: SimplePen):
+    # Should rely on the variables from the manure handler
+    def update(self):
         d = self.daily_vars
-        self.manure_separator.daily_vars += ManureSeparatorVariables(
-                flush_water_volume=d.flush_water_volume,
-                N=d.N,
-                P=d.P,
-                K=d.K,
-                TS=d.TS,
-                VS=d.VS,
-                CH4=d.CH4,
-                WIP=d.WIP,
-                WOP=d.WOP
-        )
+        # self.manure_separator.daily_vars += ManureSeparatorVariables(
+        #         flush_water_volume=d.flush_water_volume,
+        #         N=d.N,
+        #         P=d.P,
+        #         K=d.K,
+        #         TS=d.TS,
+        #         VS=d.VS,
+        #         CH4=d.CH4,
+        #         WIP=d.WIP,
+        #         WOP=d.WOP
+        # )
 
     def flush_water(self):
         # self.separator.flush_water_volume += self.flush_water_volume
