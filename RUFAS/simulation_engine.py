@@ -80,48 +80,49 @@ class SimulationEngine:
         Advances time and increments simulation_day
         """
         if print_day:
-            print("simulating: " + self.time.to_str())
+            print(f"simulating day: {self.time.to_str()}")
         self.time.advance()
         self.state.animal_management.simulation_day += 1
 
-    def _annual_simulation(self) -> None:
-        """Executes the annual simulation routines.
-
-        Writes the annual report to the output files
-        Flushes the data in the output object
-        Resets the state for the following year
-        """
-
-        # Pre-annual routines
+    def _run_pre_annual_routines(self) -> None:
+        """TODO GitHub issue #137"""
         routines.annual_fields_routine(self.state.fields, self.time)
         routines.annual_feed_routine(self.state.feed)
 
-        case = 0
-        while not self.time.end_year():
-            if self.time.day % 50 == 0:
-                sys.stdout.write("\b")
-                if case == 0:
-                    sys.stdout.write("—")
-                    case += 1
-                elif case == 1:
-                    sys.stdout.write("\\")
-                    case += 1
-                elif case == 2:
-                    sys.stdout.write("|")
-                    case += 1
-                else:
-                    sys.stdout.write("/")
-                    case = 0
-
-            self._daily_simulation()
-
-        # Post-Annual Routines
+    def _run_post_annual_routines(self) -> None:
+        """
+        Writes the annual report to the output files
+        Flushes the data in the output object
+        Resets the state for the following year"""
         self.state.annual_mass_balance(self.time)
         self.output.annual_updates(self.state, self.weather, self.time)
         self.output.write_annual_reports()
         self.output.annual_flushes()
         self.state.annual_reset()
         self.time.advance()
+
+    def _visualize_sim_progress(self, day: int, update_interval: int = 50) -> None:
+        """
+        Shows a rotating char on console to confirm simulation is alive.
+
+        Args:
+            day (int): day of year
+            update_interval (int): the interval at which the char symbol is updated
+        """
+        chars = ['-', '\\', '|', '/']
+        if day % update_interval == 0:
+            sys.stdout.write("\b")
+            sys.stdout.write(chars[(day//update_interval) % len(chars)])
+
+    def _annual_simulation(self) -> None:
+        """Executes the annual simulation routines."""
+
+        self._run_pre_annual_routines()
+        while not self.time.end_year():
+            self._visualize_sim_progress(self.time.day)
+            self._daily_simulation()
+
+        self._run_post_annual_routines()
 
     def _initialize_simulation(self, file_path: Path) -> None:
         """Reads the json file, writes information to the simulation variables.
@@ -138,7 +139,7 @@ class SimulationEngine:
             with the format required
         """
 
-        print(f"Initializing simulation environemnt from {file_path}")
+        print(f"Initializing simulation environment from {file_path}")
         try:
             data = read_json_file(file_path)
             self.config = Config(data['config'], data['weather'])
