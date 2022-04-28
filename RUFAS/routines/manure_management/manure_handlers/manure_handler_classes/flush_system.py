@@ -22,5 +22,5 @@ class FlushSystem(BaseManureHandler):
 
     """
 
-    def __init__(self, pen, handler_data, reception_pit):
-        super().__init__(pen, handler_data, reception_pit)
+    def __init__(self, pen, handler_data):
+        super().__init__(pen, handler_data)

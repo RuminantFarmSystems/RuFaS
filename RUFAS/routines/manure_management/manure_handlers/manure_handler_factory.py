@@ -17,13 +17,12 @@ from RUFAS.routines.manure_management.reception_pits.base_reception_pit import B
 
 class ManureHandlerFactory:
     @classmethod
-    def get_instance(cls, pen: SimplePen, reception_pit: BaseReceptionPit) -> BaseManureHandler:
+    def get_instance(cls, pen: SimplePen) -> BaseManureHandler:
         manure_handler_enum = ManureHandlerEnum.get_enum(pen.manure_handler)
 
         params = {
             'pen': pen,
             'handler_data': cls.get_manure_handler_init_data(manure_handler_enum),
-            'reception_pit': reception_pit
         }
 
         enum_to_class: Dict[ManureHandlerEnum: Type[BaseManureHandler]] = {

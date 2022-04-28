@@ -12,7 +12,7 @@ Author(s):  William Donovan, wmdonovan@wisc.edu
 from typing import Dict
 
 from RUFAS.routines.animal.animal_management import AnimalManagement
-# TODO figure out how to connect to csv values
+# TODO: figure out how to connect to csv values
 from RUFAS.routines.manure_management.data_models.daily_variables import DailyVariables
 from RUFAS.routines.manure_management.data_models.simple_animal_management import SimpleAnimalManagement
 from RUFAS.routines.manure_management.manure_handlers.manure_handler_classes.base_manure_handler import \
@@ -102,16 +102,18 @@ class ManureManagement:
         """Set up all the components."""
 
         for pen in animal_management.all_pens:
+            self.manure_handlers[pen.id] = ManureHandlerFactory.get_instance(pen=pen)
+
             self.treatments[pen.id] = TreatmentFactory.get_instance(pen=pen)
 
+            # Separators are optional and take value of None when absent.
             self.manure_separators[pen.id] = \
                 ManureSeparatorFactory.get_instance(pen=pen, treatment=self.treatments[pen.id])
 
+            # Reception pits are also optional and take value of None when absent.
+            # Reception pits and separators are either both present or both absent.
             self.reception_pits[pen.id] = \
                 ReceptionPitFactory.get_instance(pen=pen, manure_separator=self.manure_separators[pen.id])
-
-            self.manure_handlers[pen.id] = \
-                ManureHandlerFactory.get_instance(pen=pen, reception_pit=self.reception_pits[pen.id])
 
     def update(self, animal_management: SimpleAnimalManagement):
         """

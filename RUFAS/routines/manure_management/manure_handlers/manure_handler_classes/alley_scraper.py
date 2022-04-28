@@ -23,5 +23,5 @@ class AlleyScraper(BaseManureHandler):
 
     """
 
-    def __init__(self, pen, handler_data: ManureHandlerInitData, reception_pit):
-        super().__init__(pen, handler_data, reception_pit)
+    def __init__(self, pen, handler_data: ManureHandlerInitData):
+        super().__init__(pen, handler_data)

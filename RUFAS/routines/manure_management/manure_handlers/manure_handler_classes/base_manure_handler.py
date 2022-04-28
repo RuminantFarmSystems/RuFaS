@@ -31,12 +31,10 @@ class BaseManureHandler:
 
     def __init__(self,
                  pen: SimplePen,
-                 handler_data: ManureHandlerInitData,
-                 reception_pit: BaseReceptionPit):
-
+                 handler_data: ManureHandlerInitData):
         self.pen = pen
         self.handler_init_data = handler_data
-        self.reception_pit = reception_pit
+        # self.reception_pit = reception_pit
         self.sand_lane = None
 
         self.bedding_manager = BeddingManager.get_instance(pen.bedding_type)
@@ -91,7 +89,7 @@ class BaseManureHandler:
             self.flush_water_daily,
             self.bedding_manager.bedding_washed
         ])
-        self.reception_pit.flush_water_volume += self.flush_water_volume
+        # self.reception_pit.flush_water_volume += self.flush_water_volume
 
     def N_loss(self):
         """
@@ -100,7 +98,8 @@ class BaseManureHandler:
             "pseudocode_manure_management" MS.3.B
         """
 
-        self.reception_pit.N = self.daily_vars.N_excreted
+        # self.reception_pit.N = self.daily_vars.N_excreted
+        pass
 
     def P_loss(self):
         """
@@ -109,7 +108,8 @@ class BaseManureHandler:
     "       pseudocode_manure_management" MS.3.C
         """
 
-        self.reception_pit.P = self.daily_vars.P_excreted
+        # self.reception_pit.P = self.daily_vars.P_excreted
+        pass
 
     def K_loss(self):
         """
@@ -118,7 +118,8 @@ class BaseManureHandler:
             "pseudocode_manure_management" MS.3.D
         """
 
-        self.reception_pit.K = self.daily_vars.K_excreted
+        # self.reception_pit.K = self.daily_vars.K_excreted
+        pass
 
     def solids(self):
         """
@@ -129,8 +130,9 @@ class BaseManureHandler:
         self.daily_vars.TS_loss = self.flush_water_volume * Constants.TS_loss_perc
         self.daily_vars.VS_loss = self.daily_vars.TS_loss * Constants.VS_loss_perc
 
-        self.reception_pit.TS += self.daily_vars.TS_loss
-        self.reception_pit.VS += self.daily_vars.VS_loss
+        # self.reception_pit.TS += self.daily_vars.TS_loss
+        # self.reception_pit.VS += self.daily_vars.VS_loss
+        pass
 
     # TODO: move to sand lane class
     # def sand_lane(self):
@@ -145,8 +147,10 @@ class BaseManureHandler:
     #     sand_lane.sand_volume_separated = sand_lane.sand_mass_separated / self.bedding_density  # m3/day
 
     def CH4_effluent(self):
-        self.reception_pit.CH4 += self.daily_vars.CH4
+        # self.reception_pit.CH4 += self.daily_vars.CH4
+        pass
 
     def WIP_WOP(self):
-        self.reception_pit.WIP += self.daily_vars.WIP
-        self.reception_pit.WOP += self.daily_vars.WOP
+        # self.reception_pit.WIP += self.daily_vars.WIP
+        # self.reception_pit.WOP += self.daily_vars.WOP
+        pass
