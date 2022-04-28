@@ -18,6 +18,7 @@ Author(s): Kass Chupongstimun, kass_c@hotmail.com,
 from RUFAS.util import DatabaseReader
 from RUFAS.output_handler.reports.feed_storage_report import StorageReport
 from . import nitrogen_loss, carbon_loss, protein_degradation
+from ..animal.pen import Pen
 
 
 def daily_feed_routine(feed, fields, animal_management, feed_report):
@@ -63,15 +64,29 @@ class Feed:
         self.db_reader = DatabaseReader(self.feed_database)
 
         self.entries_split_by_maturity = self.get_feeds_split_by_maturity()
-        self.growing_feeds = data['growing_feeds']
+        self.farm_grown_feeds = data['farm_grown_feeds']
         self.purchased_feeds_entries = data['purchased_feeds']
         self.purchased_feeds = []  # set in the next method call
 
+        # TODO: possibly convert these to sets instead of lists
+        self.input_calf_feeds = data['calf_feeds']
+        self.input_growing_feeds = data['growing_feeds']
+        self.input_close_up_feeds = data['close_up_feeds']
+        self.input_lac_cow_feeds = data['lac_cow_feeds']
+
+        self.input_feed_combinations = {
+            Pen.AnimalCombination.CALF: set(data['calf_feeds']),
+            Pen.AnimalCombination.GROWING: set(data['growing_feeds']),
+            Pen.AnimalCombination.CLOSE_UP: set(data['close_up_feeds']),
+            Pen.AnimalCombination.GROWING_AND_CLOSE_UP: set(data['growing_feeds']) | set(data['close_up_feeds']),
+            Pen.AnimalCombination.LAC_COW: set(data['lac_cow_feeds']),
+        }
+
         self.all_feed_ids = self.get_all_feed_units(data['purchased_feeds'],
-                                                    data['growing_feeds'])
+                                                    data['farm_grown_feeds'])
         # dictionary of nutrients needed for this run
         # initially, this only contains information for purchased feeds as none
-        # of the growing_feeds have been harvested yet
+        # of the farm_grown_feeds have been harvested yet
         self.available_feeds = \
             self.get_nutrient_vals(self.purchased_feeds, False)
         self.calf_feeds = self.get_calf_feeds()
@@ -363,9 +378,11 @@ class Feed:
             if self.storage:
                 if self.DM == 0:
                     # forage to be fed out 30 days after harvest for new yield
+                    # if there is already forage in the receptacle days_since_feedout
+                    # is not reset
                     self.days_since_feedout = -30
                 self.feed_id = crop.raw_id
-                self.DM += crop.yield_actual*crop.DM_harvest_percent
+                self.DM += crop.yield_actual * crop.DM_harvest_percent
                 self.NDF += crop.NDF_yield
                 self.N += crop.N_yield
                 self.P += crop.P_yield
@@ -1031,13 +1048,13 @@ class Feed:
             nutrient_vals[feed_key] = dictionary
         return nutrient_vals
 
-    def get_calf_feeds(self): 
+    def get_calf_feeds(self):
         feed_ids = [155, 156, 157]
         columns = ['DM', 'CP', 'EE', 'DE']
         nutrients = self.db_reader.query(
-            self.nutrient_table, 
-            cols=columns, 
-            identifier='feed_id', 
+            self.nutrient_table,
+            cols=columns,
+            identifier='feed_id',
             desired_rows=tuple(feed_ids))
         calf_feeds = {155: nutrients[0], 156: nutrients[1], 157: nutrients[2]}
         return calf_feeds

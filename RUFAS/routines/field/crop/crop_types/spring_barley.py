@@ -9,10 +9,10 @@ class SpringBarley(BaseCrop):
         """GENERAL PLANT INFO"""
 
         spring_barley_data = data
-        self.grow_years = spring_barley_data['grow_years']
+        self.plant_years = spring_barley_data['plant_years']
         self.repeat = spring_barley_data['repeat']
-        self.planting_date = spring_barley_data['planting_date']
-        self.harvest_date = spring_barley_data['harvest_date']
+        self.planting_day = spring_barley_data['planting_day']
+        self.harvest_day = spring_barley_data['harvest_day']
         self.harvest_type = spring_barley_data['harvest_type']
 
         self.crop_name = crop_name
@@ -26,7 +26,7 @@ class SpringBarley(BaseCrop):
         self.planted = False
         self.growing = False
 
-        self.fix_nitrogen = True  # TODO: change back
+        self.fix_nitrogen = False
 
         # ===================================================================
         ''' HEAT UNIT DATA '''

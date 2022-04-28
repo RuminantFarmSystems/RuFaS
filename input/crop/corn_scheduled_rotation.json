@@ -3,10 +3,10 @@
 
     "crops": {
         "corn": {
-            "grow_years": [2009],
+            "plant_years": [2009],
             "repeat": 1,
-            "planting_date": 90,
-            "harvest_date": 200,
+            "planting_day": 90,
+            "harvest_day": 200,
             "harvest_type": "scheduled"
         }
     }
