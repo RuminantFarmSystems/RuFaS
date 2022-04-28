@@ -6,7 +6,8 @@ Author(s): Pooya Hekmati, sh2235@cornell.edu, Anchey Peng, ap724@cornell.edu
 """
 
 import pytest
-from mock.mock import MagicMock
+from unittest.mock import MagicMock
+from typing import Set, List
 
 from RUFAS.routines.animal.pen import Pen
 
@@ -95,7 +96,7 @@ def test_reset_manure(pen: Pen) -> None:
 
 
 @pytest.fixture
-def calf_daily_growth_values() -> list[float]:
+def calf_daily_growth_values() -> List[float]:
     return [0.7445883642358595,
             0.7254529863013488,
             0.7342433606191534,
@@ -103,7 +104,7 @@ def calf_daily_growth_values() -> list[float]:
 
 
 @pytest.fixture
-def mock_calves_with_daily_growth(calf_daily_growth_values: list[float]) -> list[MagicMock]:
+def mock_calves_with_daily_growth(calf_daily_growth_values: List[float]) -> List[MagicMock]:
     calves = [MagicMock() for i in range(3)]
 
     for calf, daily_growth in zip(calves, calf_daily_growth_values):
@@ -112,7 +113,7 @@ def mock_calves_with_daily_growth(calf_daily_growth_values: list[float]) -> list
     return calves
 
 
-def test_calc_avg_growth(pen: Pen, mock_calves_with_daily_growth: list[MagicMock],
+def test_calc_avg_growth(pen: Pen, mock_calves_with_daily_growth: List[MagicMock],
                          calf_daily_growth_values) -> None:
     """Unit test for function calc_avg_growth in file routines/animal/pen.py"""
     pen.animals_in_pen = mock_calves_with_daily_growth
@@ -165,7 +166,7 @@ def test_clear(pen: Pen) -> None:
     (Pen.AnimalCombination.LAC_COW, {26, 86, 103, 118, 136, 139}),
 ])
 def test_subset_class_feeds(pen: Pen, test_animal_combination: Pen.AnimalCombination,
-                            expected_feed_allocation: set[int]) -> None:
+                            expected_feed_allocation: Set[int]) -> None:
     """Unit test for function subset_class_feeds in file routines/animal/pen.py"""
 
     feed_combinations = {
