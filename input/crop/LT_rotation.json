@@ -3,31 +3,31 @@
 
     "crops": {
         "spring_wheat_13": {
-            "grow_years": [2013],
+            "plant_years": [2013],
             "repeat": 0,
-            "planting_date": 92,
-            "harvest_date": 225,
+            "planting_day": 92,
+            "harvest_day": 225,
             "harvest_type": "scheduled"
         },
         "potato_14": {
-            "grow_years": [2014],
+            "plant_years": [2014],
             "repeat": 0,
-            "planting_date": 119,
-            "harvest_date": 281,
+            "planting_day": 119,
+            "harvest_day": 281,
             "harvest_type": "scheduled"
         },
         "sugar_beet_15": {
-            "grow_years": [2015],
+            "plant_years": [2015],
             "repeat": 0,
-            "planting_date": 89,
-            "harvest_date": 215,
+            "planting_day": 89,
+            "harvest_day": 215,
             "harvest_type": "scheduled"
         },
         "spring_barley_16": {
-            "grow_years": [2016],
+            "plant_years": [2016],
             "repeat": 0,
-            "planting_date": 129,
-            "harvest_date": 313,
+            "planting_day": 129,
+            "harvest_day": 313,
             "harvest_type": "scheduled"
         }
     }

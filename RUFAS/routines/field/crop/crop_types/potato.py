@@ -9,10 +9,10 @@ class Potato(BaseCrop):
         """GENERAL PLANT INFO"""
 
         potato_data = data
-        self.grow_years = potato_data['grow_years']
+        self.plant_years = potato_data['plant_years']
         self.repeat = potato_data['repeat']
-        self.planting_date = potato_data['planting_date']
-        self.harvest_date = potato_data['harvest_date']
+        self.planting_day = potato_data['planting_day']
+        self.harvest_day = potato_data['harvest_day']
         self.harvest_type = potato_data['harvest_type']
 
         self.crop_name = crop_name
@@ -26,7 +26,7 @@ class Potato(BaseCrop):
         self.planted = False
         self.growing = False
 
-        self.fix_nitrogen = True  # TODO: change back
+        self.fix_nitrogen = False
 
         # ===================================================================
         ''' HEAT UNIT DATA '''
