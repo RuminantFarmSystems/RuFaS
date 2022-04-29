@@ -1,3 +1,5 @@
+from typing import Dict, Type
+
 from RUFAS.routines.manure_management.data_models.simple_pen import SimplePen
 from RUFAS.routines.manure_management.manure_handlers.manure_handler_classes.base_manure_handler import \
     BaseManureHandler
@@ -25,7 +27,7 @@ class TreatmentFactory:
             'manure_separator': manure_separator,
             'treatment_init_data': cls.get_treatment_init_data(treatment_enum)
         }
-        enum_to_class = {
+        enum_to_class: Dict[TreatmentEnum, Type[BaseTreatment]] = {
             treatment_enum.STORAGE_POND: StoragePond,
             treatment_enum.ANAEROBIC_LAGOON: AnaerobicLagoon,
             treatment_enum.ANAEROBIC_DIGESTION: AnaerobicDigestion,

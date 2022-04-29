@@ -32,7 +32,6 @@ def daily_manure_storage_routine_main(manure_management: ManureManagement, _anim
     animal_management = SimpleAnimalManagement(_animal_management)
     print(animal_management)
 
-    # Intermediate steps
     manure_management.reset_daily_variables()
     manure_management.update(animal_management)
 

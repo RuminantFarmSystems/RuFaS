@@ -1,3 +1,4 @@
+from enum import Enum
 from typing import Dict, Type
 
 from RUFAS.routines.manure_management.data_models.simple_pen import SimplePen
@@ -8,11 +9,10 @@ from RUFAS.routines.manure_management.manure_handlers.manure_handler_classes.cus
     CustomManureHandler
 from RUFAS.routines.manure_management.manure_handlers.manure_handler_classes.flush_system import FlushSystem
 from RUFAS.routines.manure_management.manure_handlers.manure_handler_classes.manual_scraping import ManualScraping
-from RUFAS.routines.manure_management.manure_handlers.manure_handler_enum import ManureHandlerEnum
-from RUFAS.routines.manure_management.manure_handlers.manure_handler_init_data import ManureHandlerInitData
 from RUFAS.routines.manure_management.manure_handlers.manure_handler_classes.null_manure_handler import \
     NullManureHandler
-from RUFAS.routines.manure_management.reception_pits.base_reception_pit import BaseReceptionPit
+from RUFAS.routines.manure_management.manure_handlers.manure_handler_enum import ManureHandlerEnum
+from RUFAS.routines.manure_management.manure_handlers.manure_handler_init_data import ManureHandlerInitData
 
 
 class ManureHandlerFactory:
@@ -22,10 +22,10 @@ class ManureHandlerFactory:
 
         params = {
             'pen': pen,
-            'handler_data': cls.get_manure_handler_init_data(manure_handler_enum),
+            'handler_data': cls.get_manure_handler_init_data(manure_handler_enum)
         }
 
-        enum_to_class: Dict[ManureHandlerEnum: Type[BaseManureHandler]] = {
+        enum_to_class: Dict[ManureHandlerEnum, Type[BaseManureHandler]] = {
             ManureHandlerEnum.FLUSH_SYSTEM: FlushSystem,
             ManureHandlerEnum.ALLEY_SCRAPER: AlleyScraper,
             ManureHandlerEnum.MANUAL_SCRAPING: ManualScraping,
@@ -38,7 +38,7 @@ class ManureHandlerFactory:
     @classmethod
     def get_manure_handler_init_data(cls, manure_handler_enum: ManureHandlerEnum) -> ManureHandlerInitData:
         init_data = ManureHandlerInitData()
-        enum_to_water_use_rate: Dict[ManureHandlerEnum: int] = {
+        enum_to_water_use_rate: Dict[ManureHandlerEnum, int] = {
             ManureHandlerEnum.FLUSH_SYSTEM: 757,
             ManureHandlerEnum.MANUAL_SCRAPING: 10,
             ManureHandlerEnum.ALLEY_SCRAPER: 10

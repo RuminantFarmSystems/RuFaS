@@ -6,7 +6,7 @@ from RUFAS.routines.manure_management.helpers.enum_helpers import ExtendedEnum
 
 
 class BeddingEnum(ExtendedEnum):
-    ORGANIC = auto
-    SAND = auto
+    ORGANIC = auto()
+    SAND = auto()
 
     DEFAULT = SAND

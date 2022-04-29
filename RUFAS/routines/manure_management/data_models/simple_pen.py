@@ -1,5 +1,8 @@
+from typing import Set, Type
+
 from RUFAS.routines.animal.pen import Pen
 from .manure import Manure
+from ...animal.life_cycle.animal_base import AnimalBase
 
 
 class SimplePen:
@@ -19,8 +22,8 @@ class SimplePen:
         self.manure = Manure(**pen.manure)
 
         self.id: int = pen.id
-        self.animals_in_pen = pen.animals_in_pen
-        self.classes_in_pen = pen.classes_in_pen
+        self.animals_in_pen: [AnimalBase] = pen.animals_in_pen
+        self.classes_in_pen: Set[Type[AnimalBase]] = pen.classes_in_pen
 
         self.housing_type: str = pen.housing_type
         self.bedding_type: str = pen.bedding_type
@@ -30,9 +33,14 @@ class SimplePen:
         self.manure_storage: str = pen.manure_storage
 
     def __str__(self) -> str:
-        s = 'SimplePen data: \n'
+        s = ['SimplePen data:']
 
-        for v in vars(self):
-            s += f'{v}: {getattr(self, v)} \n'
+        for var in vars(self):
+            if var == 'animals_in_pen':
+                s.append(f'animals_in_pen: {[animal.__class__.__name__ for animal in self.animals_in_pen]}')
+            elif var == 'classes_in_pen':
+                s.append(f'classes_in_pen: {[klass.__name__ for klass in self.classes_in_pen]}')
+            else:
+                s.append(f'{var}: {getattr(self, var)}')
 
-        return s
+        return '\n'.join(s)

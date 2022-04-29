@@ -1,3 +1,5 @@
+from typing import Dict, Type
+
 from RUFAS.routines.manure_management.manure_handlers.bedding.base_bedding import BaseBedding
 from RUFAS.routines.manure_management.manure_handlers.bedding.bedding_enum import BeddingEnum
 from RUFAS.routines.manure_management.manure_handlers.bedding.organic_bedding import OrganicBedding
@@ -12,7 +14,7 @@ class BeddingFactory:
 
     @classmethod
     def get_instance_from_enum(cls, bedding_enum: BeddingEnum) -> BaseBedding:
-        enum_to_class = {
+        enum_to_class: Dict[BeddingEnum, BaseBedding] = {
             bedding_enum.ORGANIC: OrganicBedding(arg_mass=1.97),
             bedding_enum.SAND: SandBedding(arg_mass=25)
         }

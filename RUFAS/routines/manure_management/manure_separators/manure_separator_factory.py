@@ -30,7 +30,7 @@ class ManureSeparatorFactory:
             'separator_data': cls.get_manure_separator_init_data(manure_separator_enum)
         }
 
-        enum_to_class: Dict[ManureSeparatorEnum: Type[BaseSeparator]] = {
+        enum_to_class: Dict[ManureSeparatorEnum, Type[BaseSeparator]] = {
             ManureSeparatorEnum.BASE_SEPARATOR: BaseSeparator,
             ManureSeparatorEnum.BELT_PRESS: BeltPress,
             ManureSeparatorEnum.CUSTOM_SEPARATOR: CustomSeparator,
@@ -49,7 +49,7 @@ class ManureSeparatorFactory:
     # TODO: Check logic
     @classmethod
     def get_manure_separator_init_data(cls, manure_separator_enum: ManureSeparatorEnum) -> ManureSeparatorInitData:
-        enum_to_init_data: Dict[ManureSeparatorEnum: ManureSeparatorInitData] = {
+        enum_to_init_data: Dict[ManureSeparatorEnum, ManureSeparatorInitData] = {
             ManureSeparatorEnum.SEDIMENTATION: ManureSeparatorInitData(
                     TS_removal_efficiency=0.3,
                     VS_removal_efficiency=0.55,

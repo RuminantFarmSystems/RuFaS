@@ -4,7 +4,7 @@ from RUFAS.routines.manure_management.manure_handlers.manure_handler_classes.bas
 
 # TODO: Check logic
 class NullManureHandler(BaseManureHandler):
-    def __init__(self, pen, reception_pit, handler_data=None):
+    def __init__(self, pen, handler_data=None):
         super().__init__(pen, handler_data)
 
     def update_all(self, pen):
