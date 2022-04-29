@@ -8,14 +8,3 @@ class SandBedding(BaseBedding):
     def __add__(self, other: BaseBedding) -> BaseBedding:
         b = super().__add__(other)
         return SandBedding(b.mass, b.density)
-
-
-if __name__ == '__main__':
-    o = SandBedding(arg_mass=3000)
-    print(o)
-
-    m = SandBedding(arg_mass=4500)
-    print(m)
-
-    o += m
-    print(o)
