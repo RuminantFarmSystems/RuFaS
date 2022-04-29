@@ -1,4 +1,7 @@
 from RUFAS.routines.manure_management.data_models.simple_pen import SimplePen
+from RUFAS.routines.manure_management.manure_handlers.manure_handler_classes.base_manure_handler import \
+    BaseManureHandler
+from RUFAS.routines.manure_management.manure_separators.manure_separator_classes.base_separator import BaseSeparator
 from RUFAS.routines.manure_management.treatments.treatment_classes.anaerobic_digestion import \
     AnaerobicDigestion
 from RUFAS.routines.manure_management.treatments.treatment_classes.anaerobic_lagoon import AnaerobicLagoon
@@ -11,10 +14,15 @@ from RUFAS.routines.manure_management.treatments.treatment_classes.storage_pond 
 
 class TreatmentFactory:
     @classmethod
-    def get_instance(cls, pen: SimplePen) -> BaseTreatment:
+    def get_instance(cls,
+                     pen: SimplePen,
+                     manure_handler: BaseManureHandler,
+                     manure_separator: BaseSeparator) -> BaseTreatment:
         treatment_enum = TreatmentEnum.get_enum(pen.manure_storage)
         params = {
             'pen': pen,
+            'manure_handler': manure_handler,
+            'manure_separator': manure_separator,
             'treatment_init_data': cls.get_treatment_init_data(treatment_enum)
         }
         enum_to_class = {

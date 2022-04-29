@@ -10,6 +10,9 @@ Author(s):  William Donovan, wmdonovan@wisc.edu
 """
 from RUFAS.routines.manure_management.data_models.constants import ManureManagementConstants as Constants
 from RUFAS.routines.manure_management.data_models.simple_pen import SimplePen
+from RUFAS.routines.manure_management.manure_handlers.manure_handler_classes.base_manure_handler import \
+    BaseManureHandler
+from RUFAS.routines.manure_management.manure_separators.manure_separator_classes.base_separator import BaseSeparator
 from RUFAS.routines.manure_management.treatments.treatment_init_data import TreatmentInitData
 from RUFAS.routines.manure_management.treatments.treatment_variables import TreatmentVariables
 
@@ -24,7 +27,11 @@ class BaseTreatment:
 
     """
 
-    def __init__(self, pen: SimplePen, treatment_init_data: TreatmentInitData):
+    def __init__(self,
+                 pen: SimplePen,
+                 manure_handler: BaseManureHandler,
+                 manure_separator: BaseSeparator,
+                 treatment_init_data: TreatmentInitData):
         """
         Description:
             An instance of this class represents an storage receptacle.
@@ -35,16 +42,19 @@ class BaseTreatment:
             treatment_init_data
         """
         self.pen = pen
-        self.storage_option_init_data = treatment_init_data
+        self.manure_handler = manure_handler
+        self.manure_separator = manure_separator
+        self.treatment_init_data = treatment_init_data
 
         self.daily_vars = TreatmentVariables()
 
     def reset_daily_variables(self):
         self.daily_vars = TreatmentVariables()
 
-    def update(self, pen: SimplePen):
-        self.methane(pen.manure)
-        self.WIP_WOP_frac()
+    def update(self):
+        # self.methane(pen.manure)
+        # self.WIP_WOP_frac()
+        pass
 
     # TODO: Check logic
     def methane(self, manure):

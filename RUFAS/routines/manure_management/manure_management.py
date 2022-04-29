@@ -19,7 +19,6 @@ from RUFAS.routines.manure_management.manure_handlers.manure_handler_classes.bas
     BaseManureHandler
 from RUFAS.routines.manure_management.manure_handlers.manure_handler_factory import ManureHandlerFactory
 from RUFAS.routines.manure_management.manure_separators.manure_separator_classes.base_separator import BaseSeparator
-
 from RUFAS.routines.manure_management.manure_separators.manure_separator_factory import ManureSeparatorFactory
 from RUFAS.routines.manure_management.output.manure_management_output import ManureManagementOutput
 from RUFAS.routines.manure_management.reception_pits.base_reception_pit import BaseReceptionPit
@@ -113,7 +112,11 @@ class ManureManagement:
             self.manure_separators[pen.id] = \
                 ManureSeparatorFactory.get_instance(pen=pen, reception_pit=self.reception_pits[pen.id])
 
-            self.treatments[pen.id] = TreatmentFactory.get_instance(pen=pen)
+            self.treatments[pen.id] = TreatmentFactory.get_instance(
+                    pen=pen,
+                    manure_handler=self.manure_handlers[pen.id],
+                    manure_separator=self.manure_separators[pen.id]
+            )
 
     def update(self, animal_management: SimpleAnimalManagement):
         """
@@ -134,16 +137,16 @@ class ManureManagement:
             self.manure_separators[pen.id].update()
             print(f'manure separator for pen {pen.id}: {self.manure_separators[pen.id].daily_vars}')
 
-            self.treatments[pen.id].update(pen)
+            self.treatments[pen.id].update()
             print(f'storage option for pen {pen.id}: {self.treatments[pen.id].daily_vars}')
 
             print()
 
     # TODO: Check logic
     def summarize_manure_management(self):
-        self.summarize_manure_handlers()
-        self.summarize_manure_separators()
-        self.summarize_reception_pits()
+        # self.summarize_manure_handlers()
+        # self.summarize_manure_separators()
+        # self.summarize_reception_pits()
         self.summarize_treatments()
 
         print(f'Daily: {self.daily_vars}')
