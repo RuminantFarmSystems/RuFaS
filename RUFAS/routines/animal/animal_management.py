@@ -114,6 +114,14 @@ class AnimalManagement:
     heiferIII_p_comp = 0
     cow_p_comp = 0
 
+    p_comp = {
+        'calf': 0,
+        'heiferI': 0,
+        'heiferII': 0,
+        'heiferIII': 0,
+        'cow': 0
+    }
+
     @staticmethod
     def get_animal_config(data):
         config = {}
@@ -749,8 +757,7 @@ class AnimalManagement:
         """
 
         for pen in self.all_pens:
-            if pen.pen_populated:
-                pen.calc_avg_growth()
+            pen.calc_avg_growth()
 
     def record_pen_history(self):
         """
@@ -782,7 +789,7 @@ class AnimalManagement:
             cow.update_pen_history(curr_pen, self.simulation_day, classes_in_pen)
 
     @staticmethod
-    def p_comp(animals):
+    def _calc_p_comp(animals):
         """
         Args:
             animals: the list of animals for which the P composition should be
@@ -794,23 +801,23 @@ class AnimalManagement:
         if len(animals) == 0:
             return 0
         else:
-            total_bw = 0
-            total_p_animal = 0
-            for animal in animals:
-                total_bw += animal.body_weight
-                total_p_animal += animal.p_animal
-            return total_p_animal / total_bw
+            return sum(a.p_animal for a in animals) / sum(a.body_weight for a in animals)
 
     def calc_all_p_comp(self):
         """
         Calculates each animal class's P concentration.
         """
+        # TODO: see if there is a better way to do this using dictionary comprehension
+        self.p_comp['calf'] = self._calc_p_comp(self.calves)
+        self.p_comp['heiferI'] = self._calc_p_comp(self.heiferIs)
+        self.p_comp['heiferII'] = self._calc_p_comp(self.heiferIIs)
+        self.p_comp['cow'] = self._calc_p_comp(self.heiferIIIs)
 
-        self.calf_p_comp = self.p_comp(self.calves)
-        self.heiferI_p_comp = self.p_comp(self.heiferIs)
-        self.heiferII_p_comp = self.p_comp(self.heiferIIs)
-        self.heiferIII_p_comp = self.p_comp(self.heiferIIIs)
-        self.cow_p_comp = self.p_comp(self.cows)
+        self.calf_p_comp = self._calc_p_comp(self.calves)
+        self.heiferI_p_comp = self._calc_p_comp(self.heiferIs)
+        self.heiferII_p_comp = self._calc_p_comp(self.heiferIIs)
+        self.heiferIII_p_comp = self._calc_p_comp(self.heiferIIIs)
+        self.cow_p_comp = self._calc_p_comp(self.cows)
 
     def calc_p_rqmts(self):
         """

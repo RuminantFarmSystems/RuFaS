@@ -12,14 +12,26 @@ from pytest_mock.plugin import MockerFixture
 from RUFAS.routines.animal.animal_management import AnimalManagement
 from RUFAS.routines.animal.pen import Pen
 
-from typing import Set, List
+from typing import Set, List, Dict
+
+
+def create_mock_object_list(attribute_dicts: List[Dict]) -> List[MagicMock]:
+    mock_object_list = []
+
+    for attribute_dict in attribute_dicts:
+        mock_object = MagicMock()
+
+        for attribute, value in attribute_dict.items():
+            setattr(mock_object, attribute, value)
+
+        mock_object_list.append(mock_object)
+
+    return mock_object_list
 
 
 @pytest.fixture
 def mock_pens() -> List[MagicMock]:
-    pen_list = []
-
-    pen_attributes = [
+    pen_attribute_dicts = [
         {
             "vertical_dist_to_parlor": 1.0,
             "horizontal_dist_to_parlor": 2.0
@@ -34,15 +46,7 @@ def mock_pens() -> List[MagicMock]:
         },
     ]
 
-    for attribute_dict in pen_attributes:
-        pen = MagicMock()
-        print(attribute_dict)
-        for attribute, value in attribute_dict.items():
-            setattr(pen, attribute, value)
-
-        pen_list.append(pen)
-
-    return pen_list
+    return create_mock_object_list(pen_attribute_dicts)
 
 
 @pytest.fixture
@@ -140,8 +144,14 @@ def test_calc_manure_excretion():
     pass
 
 
-def test_calc_avg_growth():
+def test_calc_avg_growth(animal_management: AnimalManagement) -> None:
     """Unit test for function calc_avg_growth in file routines/animal/animal_management.py"""
+
+    animal_management.calc_avg_growth()
+
+    for pen in animal_management.all_pens:
+        pen.calc_avg_growth.assert_called_once()
+
     pass
 
 
@@ -150,8 +160,37 @@ def test_record_pen_history():
     pass
 
 
-def test_p_comp():
-    """Unit test for function p_comp in file routines/animal/animal_management.py"""
+@pytest.fixture
+def mock_animals() -> List[MagicMock]:
+    animal_attribute_dicts = [
+        {
+            "body_weight": 5.0,
+            "p_animal": 7.0
+        },
+        {
+            "body_weight": 1.0,
+            "p_animal": 8.0
+        },
+        {
+            "body_weight": 2.0,
+            "p_animal": 1.0
+        },
+    ]
+
+    return create_mock_object_list(animal_attribute_dicts)
+
+
+def test_calc_p_comp(mock_animals: List[MagicMock]) -> None:
+    """Unit test for function _calc_p_comp in file routines/animal/animal_management.py"""
+    expected = 0
+    actual = AnimalManagement._calc_p_comp([])
+    assert actual == expected
+
+    actual = AnimalManagement._calc_p_comp(mock_animals)
+    expected = (16.0 / 8.0)
+
+    assert actual == pytest.approx(expected)
+
     pass
 
 
