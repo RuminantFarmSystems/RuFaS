@@ -24,6 +24,8 @@ from collections import deque
 import random
 from enum import Enum
 
+from typing import Tuple
+
 
 def daily_animal_routine(animal_management, feed, weather, time):
     """
@@ -328,23 +330,15 @@ class AnimalManagement:
             cow.set_nutrient_rqmts()
             cow.p_animal = 0.0072 * cow.body_weight * 1000
 
-    def avg_pen_dist(self):
+    def avg_pen_dist(self) -> Tuple[float, float]:
         """
         Calculates the average distance from a pen to the milking parlor.
         Returns: a tuple of (average vertical distance from milking parlor,
             average horizontal distance from milking parlor)
         """
 
-        # vertical distance
-        VD_sum = 0
-
-        # horizontal distance
-        HD_sum = 0
-        for pen in self.all_pens:
-            VD_sum += pen.vertical_dist_to_parlor
-            HD_sum += pen.horizontal_dist_to_parlor
-
-        return VD_sum / len(self.all_pens), HD_sum / len(self.all_pens)
+        return sum(pen.vertical_dist_to_parlor for pen in self.all_pens) / len(self.all_pens), \
+               sum(pen.horizontal_dist_to_parlor for pen in self.all_pens) / len(self.all_pens)
 
     def calc_nutrient_rqmts(self, feed, temp):
         """
@@ -535,9 +529,9 @@ class AnimalManagement:
         calf_pens = []
 
         self.pens_by_animal_combination = {Pen.AnimalCombination.CALF: [], Pen.AnimalCombination.GROWING: [],
-                                      Pen.AnimalCombination.CLOSE_UP: [],
-                                      Pen.AnimalCombination.GROWING_AND_CLOSE_UP: [],
-                                      Pen.AnimalCombination.LAC_COW: []}
+                                           Pen.AnimalCombination.CLOSE_UP: [],
+                                           Pen.AnimalCombination.GROWING_AND_CLOSE_UP: [],
+                                           Pen.AnimalCombination.LAC_COW: []}
         # hasable mixed type pens (by pen_id)
         mixed_type_pens = {}
         # lists of types hashed pen_id
