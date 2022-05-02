@@ -29,8 +29,8 @@ class BeddingManager:
                                     ('bedding_washed_percent', float),
                                     ('bedding_mass_per_day', float)])
         enum_to_params = {
-            BeddingEnum.ORGANIC: BeddingParams(11.8, 0.9, 0.5, 1.97),
-            BeddingEnum.SAND: BeddingParams(20, 0.9, 0.8, 22.23)
+            BeddingEnum.ORGANIC: BeddingParams(1.97, 0.9, 1.0, 1.97),
+            BeddingEnum.SAND: BeddingParams(25, 0.9, 1.0, 22.23)
         }
 
         mngr = cls(bedding_type)

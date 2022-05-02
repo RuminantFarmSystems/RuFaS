@@ -33,7 +33,6 @@ class BaseManureHandler:
                  handler_data: ManureHandlerInitData):
         self.pen = pen
         self.handler_init_data = handler_data
-        # self.reception_pit = reception_pit
         self.sand_lane = None
 
         self.bedding_manager = BeddingManager.get_instance(pen.bedding_type)
@@ -89,6 +88,16 @@ class BaseManureHandler:
             self.bedding_manager.bedding_washed
         ])
         # self.reception_pit.flush_water_volume += self.flush_water_volume
+
+    def total_manure_volume(self):
+        return sum([
+            self.daily_vars.raw_manure,
+            self.flush_water_daily,
+            self.total_bedding_usage()
+        ])
+
+    def total_bedding_usage(self):
+        return self.cow_num * self.bedding_manager.bedding_added * self.bedding_manager.bedding.density
 
     def N_loss(self):
         """

@@ -32,6 +32,8 @@ class SimplePen:
         self.manure_separator: str = pen.manure_separator
         self.manure_storage: str = pen.manure_storage
 
+        self.manure_density: float = 990.0  # kg/m^3
+
     def __str__(self) -> str:
         s = ['SimplePen data:']
 
