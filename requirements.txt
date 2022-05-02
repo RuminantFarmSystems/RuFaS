@@ -1,7 +1,7 @@
-matplotlib~=3.4.2
-numpy~=1.20.3
-pandas~=1.2.4
-scipy~=1.6.3
-pytest~=6.2.5
+matplotlib
+numpy
+pandas
+scipy
+pytest
 pytest-mock
-pyomo~=6.3.0
+pyomo
