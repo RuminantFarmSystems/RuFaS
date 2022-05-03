@@ -59,10 +59,10 @@ def animal_management(mocker: MockerFixture, mock_pens: MagicMock) -> AnimalMana
     weather = MagicMock()
     time = MagicMock()
 
-    animalManagement = AnimalManagement(data, config, feed, weather, time)
-    animalManagement.all_pens = mock_pens
+    animal_management = AnimalManagement(data, config, feed, weather, time)
+    animal_management.all_pens = mock_pens
 
-    return animalManagement
+    return animal_management
 
 
 def test_daily_animal_routine():
