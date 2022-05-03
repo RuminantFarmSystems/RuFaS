@@ -12,7 +12,7 @@ def main():
     through and executes the simulation for each of the files in the list.
     """
 
-    print("RUFAS: Ruminant Farm Systems Model 2018")
+    print("RUFAS: Ruminant Farm Systems Model 2022")
 
     input_file_list = input_prompt()
 
