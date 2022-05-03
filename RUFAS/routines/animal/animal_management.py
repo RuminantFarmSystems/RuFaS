@@ -108,12 +108,6 @@ class AnimalManagement:
     # herd, whether by birth or replacement herd purchase. They are calculated
     # in calc_all_p_comp() and are the total body weight of the animals in the
     # respective class divided by the total P in the animals of the class
-    calf_p_comp = 0
-    heiferI_p_comp = 0
-    heiferII_p_comp = 0
-    heiferIII_p_comp = 0
-    cow_p_comp = 0
-
     p_comp = {
         'calf': 0,
         'heiferI': 0,
@@ -423,27 +417,27 @@ class AnimalManagement:
 
         for animal in animals_added:
             if type(animal).__name__ == 'Calf':
-                animal_p_conc = self.calf_p_comp
+                animal_p_conc = self.p_comp['calf']
                 self.calves.append(animal)
                 group = Pen.AnimalCombination.CALF
             elif type(animal).__name__ == 'HeiferI':
-                animal_p_conc = self.heiferI_p_comp
+                animal_p_conc = self.p_comp['heiferI']
                 self.heiferIs.append(animal)
                 group = Pen.AnimalCombination.GROWING
             elif type(animal).__name__ == 'HeiferII':
-                animal_p_conc = self.heiferII_p_comp
+                animal_p_conc = self.p_comp['heiferII']
                 self.heiferIIs.append(animal)
                 group = Pen.AnimalCombination.GROWING
             elif type(animal).__name__ == 'HeiferIII':
-                animal_p_conc = self.heiferIII_p_comp
+                animal_p_conc = self.p_comp['heiferIII']
                 self.heiferIIIs.append(animal)
                 group = Pen.AnimalCombination.CLOSE_UP
             elif not animal.milking:
-                animal_p_conc = self.cow_p_comp
+                animal_p_conc = self.p_comp['cow']
                 self.cows.append(animal)
                 group = Pen.AnimalCombination.CLOSE_UP
             else:  # animal is of class Cow
-                animal_p_conc = self.cow_p_comp
+                animal_p_conc = self.p_comp['cow']
                 # self.all_pens[pen].animals_in_pen.append(animal)
                 self.cows.append(animal)
                 group = Pen.AnimalCombination.LAC_COW
@@ -812,12 +806,6 @@ class AnimalManagement:
         self.p_comp['heiferI'] = self._calc_p_comp(self.heiferIs)
         self.p_comp['heiferII'] = self._calc_p_comp(self.heiferIIs)
         self.p_comp['cow'] = self._calc_p_comp(self.heiferIIIs)
-
-        self.calf_p_comp = self._calc_p_comp(self.calves)
-        self.heiferI_p_comp = self._calc_p_comp(self.heiferIs)
-        self.heiferII_p_comp = self._calc_p_comp(self.heiferIIs)
-        self.heiferIII_p_comp = self._calc_p_comp(self.heiferIIIs)
-        self.cow_p_comp = self._calc_p_comp(self.cows)
 
     def calc_p_rqmts(self):
         """
