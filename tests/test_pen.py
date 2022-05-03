@@ -135,7 +135,7 @@ def test_call_p_rqmts():
     pass
 
 
-def test_daily_p_update(pen):
+def test_daily_p_update():
     """Unit test for function daily_p_update in file routines/animal/pen.py"""
 
 
