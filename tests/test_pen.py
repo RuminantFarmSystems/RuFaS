@@ -7,7 +7,7 @@ Author(s): Pooya Hekmati, sh2235@cornell.edu, Anchey Peng, ap724@cornell.edu
 
 import pytest
 from unittest.mock import MagicMock
-from typing import Set, List
+from typing import Set, List, Dict, Tuple
 
 from RUFAS.routines.animal.pen import Pen
 
@@ -158,27 +158,34 @@ def test_clear(pen: Pen) -> None:
     assert pen.avg_p_animal == 0
 
 
-@pytest.mark.parametrize('test_animal_combination, expected_feed_allocation', [
-    (Pen.AnimalCombination.CALF, {155, 156, 157}),
-    (Pen.AnimalCombination.GROWING, {2, 51, 86, 136}),
-    (Pen.AnimalCombination.CLOSE_UP, {2, 26, 86, 118, 136, 139}),
-    (Pen.AnimalCombination.GROWING_AND_CLOSE_UP, {2, 51, 86, 136, 26, 86, 118, 136, 139}),
-    (Pen.AnimalCombination.LAC_COW, {26, 86, 103, 118, 136, 139}),
-])
-def test_subset_class_feeds(pen: Pen, test_animal_combination: Pen.AnimalCombination,
+def feed_allocations() -> Dict[Pen.AnimalCombination, Set[int]]:
+    calf = {155, 156, 157}
+    growing = {2, 51, 86, 136}
+    close_up = {2, 26, 86, 118, 136, 139}
+    lac_cow = {26, 86, 103, 118, 136, 139}
+
+    return {
+        Pen.AnimalCombination.CALF: calf,
+        Pen.AnimalCombination.GROWING: growing,
+        Pen.AnimalCombination.CLOSE_UP: close_up,
+        Pen.AnimalCombination.GROWING_AND_CLOSE_UP: growing | close_up,
+        Pen.AnimalCombination.LAC_COW: lac_cow,
+    }
+
+
+def dict_to_tuple_list(d: Dict) -> List[Tuple]:
+    return list(d.items())
+
+
+@pytest.mark.parametrize('test_animal_combination, expected_feed_allocation',
+                         dict_to_tuple_list(feed_allocations()))
+def test_subset_class_feeds(pen: Pen,
+                            test_animal_combination: Pen.AnimalCombination,
                             expected_feed_allocation: Set[int]) -> None:
     """Unit test for function subset_class_feeds in file routines/animal/pen.py"""
 
-    feed_combinations = {
-        Pen.AnimalCombination.CALF: {155, 156, 157},
-        Pen.AnimalCombination.GROWING: {2, 51, 86, 136},
-        Pen.AnimalCombination.CLOSE_UP: {2, 26, 86, 118, 136, 139},
-        Pen.AnimalCombination.GROWING_AND_CLOSE_UP: {2, 51, 86, 136} | {2, 26, 86, 118, 136, 139},
-        Pen.AnimalCombination.LAC_COW: {26, 86, 103, 118, 136, 139},
-    }
-
     feed = MagicMock()
-    feed.input_feed_combinations = feed_combinations
+    feed.input_feed_combinations = feed_allocations()
 
     pen.animal_combination = test_animal_combination
     pen.subset_class_feeds(feed)
