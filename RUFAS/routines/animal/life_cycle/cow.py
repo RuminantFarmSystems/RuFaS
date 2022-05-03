@@ -1020,7 +1020,7 @@ class Cow(HeiferIII):
                     self.days_born, sim_day, const.PREG_CHECK_3_PREG)
             else:
                 self.days_in_preg = 0
-                self.abortion_day = self.days_borní
+                self.abortion_day = self.days_born
                 self.open(sim_day)
                 self.body_weight -= self.conceptus_weight
                 self.conceptus_weight = 0
