@@ -19,12 +19,10 @@ from RUFAS.routines.animal.clustering_pen_grouping import grouping
 from RUFAS.routines.animal.life_cycle.life_cycle import LifeCycleManager
 from RUFAS.routines.animal.life_cycle.animal_base import AnimalBase
 from RUFAS.routines.animal.ration import ration_driver as ration_driver
-from RUFAS.routines.animal.ration import animal_requirements as req
 from collections import deque
 import random
-from enum import Enum
-
 from typing import Tuple
+from statistics import mean
 
 
 def daily_animal_routine(animal_management, feed, weather, time):
@@ -339,8 +337,8 @@ class AnimalManagement:
             average horizontal distance from milking parlor)
         """
 
-        return sum(pen.vertical_dist_to_parlor for pen in self.all_pens) / len(self.all_pens), \
-               sum(pen.horizontal_dist_to_parlor for pen in self.all_pens) / len(self.all_pens)
+        return mean(pen.vertical_dist_to_parlor for pen in self.all_pens), \
+               mean(pen.horizontal_dist_to_parlor for pen in self.all_pens)
 
     def calc_nutrient_rqmts(self, feed, temp):
         """
