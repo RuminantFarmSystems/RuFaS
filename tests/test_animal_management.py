@@ -1,7 +1,7 @@
 """
 RUFAS: Ruminant Farm Systems Model
 File name: test_animal_management.py
-Description: Implements test cases
+Description: Implements test cases for the AnimalManagement class
 Author(s): Pooya Hekmati, sh2235@cornell.edu, Anchey Peng, ap724@cornell.edu
 """
 
@@ -10,9 +10,8 @@ from unittest.mock import MagicMock
 from pytest_mock.plugin import MockerFixture
 
 from RUFAS.routines.animal.animal_management import AnimalManagement
-from RUFAS.routines.animal.pen import Pen
 
-from typing import Set, List, Dict
+from typing import List, Dict
 
 
 def create_mock_object_list(attribute_dicts: List[Dict]) -> List[MagicMock]:
@@ -190,8 +189,6 @@ def test_calc_p_comp(mock_animals: List[MagicMock]) -> None:
     expected = (16.0 / 8.0)
 
     assert actual == pytest.approx(expected)
-
-    pass
 
 
 def test_calc_all_p_comp():
