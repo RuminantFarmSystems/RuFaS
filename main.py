@@ -1,17 +1,9 @@
 # !/usr/bin/env python3
 
-"""
-RUFAS: Ruminant Farm Systems Model
-File name: main.py
-Description: Main entry point of RUFAS
-Author(s): Kass Chupongstimun, kass_c@hotmail.com
-"""
-
-import RUFAS
-
+from RUFAS.simulation_engine import SimulationEngine
+from RUFAS import input_prompt
 
 def main():
-
     """
     Main function of RUFAS, executes simulations for all files specified.
 
@@ -20,26 +12,14 @@ def main():
     through and executes the simulation for each of the files in the list.
     """
 
-    print("\nRUFAS: Ruminant Farm Systems Model 2018")
+    print("RUFAS: Ruminant Farm Systems Model 2022")
 
-    #
-    # Prompt user for an input
-    # Input could either be a json file when doing only 1 simulation
-    # or a directory containing json files when doing a batch simulation
-    #
-    input_file_list = RUFAS.input_prompt()
-    
-    #
-    # Begin the simulation
-    # Runs the simulation for each input file in input_file_path
-    # Runs only 1 simulation in the case of a single input file
-    #
+    input_file_list = input_prompt()
+
     for input_file_path in input_file_list:
-        RUFAS.simulate(input_file_path)
+        simulator = SimulationEngine(input_file_path)
+        simulator.simulate()
 
 
-#
-# PROGRAM ENTRY POINT
-#
 if __name__ == '__main__':
     main()
