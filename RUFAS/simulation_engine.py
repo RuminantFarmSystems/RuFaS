@@ -34,7 +34,7 @@ class SimulationEngine:
         print(f"Total Simulation Time: {t_end_sim - t_start_sim} seconds")
 
         t_start_graphics = timer.time()
-        sys.stdout.write('Producing Graphics ')
+        sys.stdout.write('Producing Graphics\n')
         self.output.produce_graphics()
         t_end_graphics = timer.time()
 
@@ -56,9 +56,9 @@ class SimulationEngine:
         Shows the messages of the end of the simulation
         """
         sys.stdout.write(
-            f"Output Successful. Graphics stored in: {self.config.graphic_dir}")
-        sys.stdout.write(f"Time to produce graphics: {graphics_prod_time}.")
-        sys.stdout.write(f"Total Run Time: {total_runtime} seconds")
+            f"Output Successful.\nGraphics stored in: {self.config.graphic_dir}\n")
+        sys.stdout.write(f"Time to produce graphics: {graphics_prod_time}\n")
+        sys.stdout.write(f"Total Run Time: {total_runtime} seconds\n")
 
     def _daily_simulation(self) -> None:
         """Executes the daily simulation routines."""
