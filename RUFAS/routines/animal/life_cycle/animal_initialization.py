@@ -6,6 +6,8 @@ Author(s): Katrina Wang, kw433@cornell.edu
 Description: This file stores and draws values of simulated
                 animals in and from the database
 """
+from typing import Dict, List, Union
+
 from RUFAS.routines.animal.life_cycle.calf import Calf
 from RUFAS.routines.animal.life_cycle.heiferI import HeiferI
 from RUFAS.routines.animal.life_cycle.heiferII import HeiferII
@@ -68,7 +70,7 @@ class AnimalInitialization:
             CI: the calving interval used in initialization
             init: whether or not update the database with new animals
     '''
-    def __init__(self, CI, breed, set_seed, init=True):
+    def __init__(self, CI: int, breed: str, set_seed: bool, init=True):
         self.CI = CI
 
         # If set_seed is True, then we do not want the results to be ordered
@@ -352,7 +354,7 @@ class AnimalInitialization:
             num: number of calves to initialize
             breed: cow breed
     '''
-    def get_calves(self, num, breed):
+    def get_calves(self, num: int, breed: str) -> List[Calf]:
         calves = []
         conn = sqlite3.connect('input/animal/animals.sqlite')
         cur = conn.cursor()
@@ -389,7 +391,7 @@ class AnimalInitialization:
             num: number of heiferIs to initialize
             breed: cow breed
     '''
-    def get_heiferIs(self, num, breed):
+    def get_heiferIs(self, num: int, breed: str) -> List[HeiferI]:
         heiferIs = []
         conn = sqlite3.connect('input/animal/animals.sqlite')
         cur = conn.cursor()
@@ -425,7 +427,7 @@ class AnimalInitialization:
             num: number of heiferIIs to initialize
             breed: cow breed
     '''
-    def get_heiferIIs(self, num, breed):
+    def get_heiferIIs(self, num: int, breed: str) -> List[HeiferII]:
         heiferIIs = []
         conn = sqlite3.connect('input/animal/animals.sqlite')
         cur = conn.cursor()
@@ -477,7 +479,7 @@ class AnimalInitialization:
             num: number of heiferIIIs to initialize
             breed: cow breed
     '''
-    def get_heiferIIIs(self, num, breed):
+    def get_heiferIIIs(self, num: int, breed: str) -> List[HeiferIII]:
         heiferIIIs = []
         conn = sqlite3.connect('input/animal/animals.sqlite')
         cur = conn.cursor()
@@ -529,7 +531,7 @@ class AnimalInitialization:
             num: number of cows to initialize
             breed: cow breed
     '''
-    def get_cows(self, num, breed):
+    def get_cows(self, num: int, breed: str) -> List[Cow]:
         cows = []
         conn = sqlite3.connect('input/animal/animals.sqlite')
         cur = conn.cursor()
@@ -636,7 +638,7 @@ class AnimalInitialization:
         return cows
 
     @staticmethod
-    def initialization_db_summary():
+    def initialization_db_summary() -> Dict[str, Union[int, float]]:
         """
         Returns: a dictionary which stores the summary of the initialization
         database
