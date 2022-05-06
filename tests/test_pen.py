@@ -8,6 +8,8 @@ Author(s): Pooya Hekmati, sh2235@cornell.edu, Anchey Peng, ap724@cornell.edu
 import pytest
 from unittest.mock import MagicMock
 from typing import Set, List, Dict, Tuple
+from statistics import mean
+from pytest_lazyfixture import lazy_fixture
 
 from RUFAS.routines.animal.pen import Pen
 
@@ -96,14 +98,6 @@ def test_reset_manure(pen: Pen) -> None:
 
 
 @pytest.fixture
-def calf_daily_growth_values() -> List[float]:
-    return [0.7445883642358595,
-            0.7254529863013488,
-            0.7342433606191534,
-            ]
-
-
-@pytest.fixture
 def mock_calves_with_daily_growth(calf_daily_growth_values: List[float]) -> List[MagicMock]:
     calves = [MagicMock() for i in range(3)]
 
@@ -113,14 +107,32 @@ def mock_calves_with_daily_growth(calf_daily_growth_values: List[float]) -> List
     return calves
 
 
-def test_calc_avg_growth(pen: Pen, mock_calves_with_daily_growth: List[MagicMock],
-                         calf_daily_growth_values) -> None:
+@pytest.fixture
+def calf_daily_growth_values() -> List[float]:
+    return [0.7445883642358595,
+            0.7254529863013488,
+            0.7342433606191534,
+            ]
+
+
+@pytest.fixture
+def avg_calf_daily_growth_values(calf_daily_growth_values: List[float]) -> float:
+    return mean(calf_daily_growth_values)
+
+
+@pytest.mark.parametrize('pen_animals, pen_populated, expected',
+                         [
+                             (lazy_fixture('mock_calves_with_daily_growth'), True,
+                              lazy_fixture('avg_calf_daily_growth_values')),
+                             ([], False, 0)
+                         ])
+def test_calc_avg_growth(pen: Pen, pen_animals, pen_populated, expected) -> None:
     """Unit test for function calc_avg_growth in file routines/animal/pen.py"""
-    pen.animals_in_pen = mock_calves_with_daily_growth
+    pen.animals_in_pen = pen_animals
+    pen.pen_populated = pen_populated
     pen.calc_avg_growth()
 
     actual = pen.avg_growth
-    expected = sum(calf_daily_growth_values) / len(calf_daily_growth_values)
 
     assert actual == expected
 
