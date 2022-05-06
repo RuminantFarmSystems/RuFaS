@@ -33,14 +33,3 @@ class BaseBedding:
                f'mass = {self.mass}, ' \
                f'density = {self.density}, ' \
                f'volume = {self.volume}'
-
-
-if __name__ == '__main__':
-    b = BaseBedding(10, 2)
-    print(b)
-
-    c = BaseBedding(20, 5)
-    print(c)
-
-    b += c
-    print(b)

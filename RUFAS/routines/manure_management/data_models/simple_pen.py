@@ -8,13 +8,13 @@ from ...animal.life_cycle.animal_base import AnimalBase
 class SimplePen:
     """
     A simplified Pen class that extracts only relevant information from the
-    original Pen class in the AnimalManagement module.
+    original Pen class in the animal module.
 
     Attributes:
         manure: A Manure object that captures the manure data from the `pen` object argument
 
     Args:
-        pen: A Pen object from the AnimalManagement module
+        pen: A Pen object from the animal module
 
     """
 
@@ -33,6 +33,14 @@ class SimplePen:
         self.manure_storage: str = pen.manure_storage
 
         self.manure_density: float = 990.0  # kg/m^3
+
+    @property
+    def manure_mass(self) -> float:
+        return self.manure.Mkg
+
+    @property
+    def manure_volume(self) -> float:
+        return self.manure.Mkg / self.manure_density
 
     def __str__(self) -> str:
         s = ['SimplePen data:']

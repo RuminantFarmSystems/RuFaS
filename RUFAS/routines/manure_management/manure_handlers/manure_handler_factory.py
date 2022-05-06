@@ -1,4 +1,3 @@
-from enum import Enum
 from typing import Dict, Type
 
 from RUFAS.routines.manure_management.data_models.simple_pen import SimplePen

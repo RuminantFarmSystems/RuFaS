@@ -5,9 +5,6 @@ File name: manure.py
 Description: A data model that represents the manure data extracted from
 the Animal Management module.
 
-
-Author(s): Loi Pham, ltp23@cornell.edu
-
 """
 
 from __future__ import annotations

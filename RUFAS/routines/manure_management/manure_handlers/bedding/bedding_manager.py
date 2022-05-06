@@ -1,9 +1,7 @@
 from __future__ import annotations
 
-from dataclasses import dataclass
 from typing import NamedTuple
 
-from RUFAS.routines.manure_management.manure_handlers.bedding.base_bedding import BaseBedding
 from RUFAS.routines.manure_management.manure_handlers.bedding.bedding_enum import BeddingEnum
 from RUFAS.routines.manure_management.manure_handlers.bedding.bedding_factory import BeddingFactory
 
