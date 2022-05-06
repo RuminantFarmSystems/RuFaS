@@ -8,13 +8,14 @@ Description:
 Author(s):  William Donovan, wmdonovan@wisc.edu
             Yunus Mohammed, ymm26@cornell.edu 
 """
-
+from RUFAS.routines.animal.life_cycle.cow import Cow
 from RUFAS.routines.manure_management.data_models.constants import ManureManagementConstants as Constants
 from RUFAS.routines.manure_management.data_models.simple_pen import SimplePen
 from RUFAS.routines.manure_management.manure_handlers.bedding.bedding_enum import BeddingEnum
 from RUFAS.routines.manure_management.manure_handlers.bedding.bedding_manager import BeddingManager
 from RUFAS.routines.manure_management.manure_handlers.manure_handler_init_data import ManureHandlerInitData
 from RUFAS.routines.manure_management.manure_handlers.manure_handler_variables import ManureHandlerVariables
+from RUFAS.routines.manure_management.manure_handlers.milking_center import MilkingCenter
 from RUFAS.routines.manure_management.sand_separators.sand_separation_lane import SandSeparationLane
 
 
@@ -37,11 +38,6 @@ class BaseManureHandler:
 
         self.bedding_manager = BeddingManager.get_instance(pen.bedding_type)
         self.cow_num = len(self.pen.animals_in_pen)
-        self.flush_water_daily = self.cow_num * self.handler_init_data.water_use_rate
-        self.flush_water_volume = 0.0
-
-        self.flush_water_volume_mlk = 0  # TODO: unused
-        self.flow_rate = 0  # TODO: unused
 
         self.daily_vars = ManureHandlerVariables()
 
@@ -75,29 +71,43 @@ class BaseManureHandler:
     def update_daily_variables(self, pen: SimplePen):
         self.daily_vars += ManureHandlerVariables.get_instance_from_pen(pen)
 
-    def flush_water(self):
+    def cleaning_water(self) -> float:
         """
         Description:
             Calculates Flush Water Volume and passes it to the associated separa
             "pseudocode_manure_management" MS.3.A
         """
+        return self.cow_num * self.handler_init_data.water_use_rate
 
-        self.flush_water_volume = sum([
-            self.daily_vars.raw_manure,
-            self.flush_water_daily,
-            self.bedding_manager.bedding_washed
-        ])
-        # self.reception_pit.flush_water_volume += self.flush_water_volume
-
-    def total_manure_volume(self):
+    def total_manure_mass(self) -> float:
         return sum([
-            self.daily_vars.raw_manure,
-            self.flush_water_daily,
-            self.total_bedding_usage()
+            self.pen.manure_mass,
+            self.cleaning_water(),
+            self.total_bedding_mass()
         ])
 
-    def total_bedding_usage(self):
-        return self.cow_num * self.bedding_manager.bedding_added * self.bedding_manager.bedding.density
+    def total_manure_volume(self) -> float:
+        return sum([
+            self.pen.manure_volume,
+            self.cleaning_water(),
+            self.total_bedding_volume()
+        ])
+
+    def total_bedding_mass(self) -> float:
+        return self.cow_num * self.bedding_manager.bedding_mass_per_day
+
+    def total_bedding_volume(self) -> float:
+        return self.total_bedding_mass() / self.bedding_manager.bedding.density
+
+    def manure_mass_deposited_in_milking_center(self) -> float:
+        if Cow in self.pen.classes_in_pen:
+            milking_center = MilkingCenter()
+            percent_time_spent = milking_center.total_percent_of_day_spent_in_milking_center
+            return self.pen.manure_mass * percent_time_spent / 100
+        return 0.0
+
+    def manure_volume_deposited_in_milking_center(self) -> float:
+        return self.manure_mass_deposited_in_milking_center() / self.pen.manure_density
 
     def N_loss(self):
         """
