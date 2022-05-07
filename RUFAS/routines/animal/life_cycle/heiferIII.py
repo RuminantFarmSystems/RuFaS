@@ -98,9 +98,9 @@ class HeiferIII(HeiferII):
             manure_calculations(self.ration_formulation, feed, 
                             self.body_weight, p_feces_excrt, p_urine)
 
-    def update(self, sim_day):
+    def update(self, sim_day: int) -> bool:
         """
-        Controls heifer's grow with average daily gain based on user's input
+        Controls heifer's growth with average daily gain based on user's input
         until breeding start day here is the place to change growth rate with
         heifer feeding methods later when we have heifer nutrition from the
         ration formulation module next to it could build the function of
