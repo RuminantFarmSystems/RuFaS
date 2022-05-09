@@ -37,7 +37,8 @@ class BaseManureHandler:
         self.sand_lane = None
 
         self.bedding_manager = BeddingManager.get_instance(pen.bedding_type)
-        self.cow_num = len(self.pen.animals_in_pen)
+        self.num_animals = len(self.pen.animals_in_pen)
+        self.milking_center = MilkingCenter()
 
         self.daily_vars = ManureHandlerVariables()
 
@@ -71,38 +72,51 @@ class BaseManureHandler:
     def update_daily_variables(self, pen: SimplePen):
         self.daily_vars += ManureHandlerVariables.get_instance_from_pen(pen)
 
-    def cleaning_water(self) -> float:
+    def cleaning_water_volume_in_main_barn(self) -> float:
         """
         Description:
             Calculates Flush Water Volume and passes it to the associated separa
             "pseudocode_manure_management" MS.3.A
         """
-        return self.cow_num * self.handler_init_data.water_use_rate
-
-    def total_manure_mass(self) -> float:
-        return sum([
-            self.pen.manure_mass,
-            self.cleaning_water(),
-            self.total_bedding_mass()
-        ])
-
-    def total_manure_volume(self) -> float:
-        return sum([
-            self.pen.manure_volume,
-            self.cleaning_water(),
-            self.total_bedding_volume()
-        ])
+        return self.num_animals * self.handler_init_data.water_use_rate  # liters
 
     def total_bedding_mass(self) -> float:
-        return self.cow_num * self.bedding_manager.bedding_mass_per_day
+        return self.num_animals * self.bedding_manager.bedding_mass_per_day  # kg/day
 
     def total_bedding_volume(self) -> float:
-        return self.total_bedding_mass() / self.bedding_manager.bedding.density
+        return self.total_bedding_mass() / self.bedding_manager.bedding.density  # m^3/day
+
+    def final_daily_mass(self) -> float:
+        return sum([
+            self.pen.manure_mass,  # kg
+            self.cleaning_water_volume_in_main_barn(),  # liters, 1L = 1kg
+            self.total_bedding_mass(),  # kg
+            self.total_water_volume_used_in_milking_center(),  # liters, 1L = 1kg
+        ])
+
+    def final_daily_volume(self) -> float:
+        return sum([
+            self.pen.manure_volume,  # m^3
+            self.cleaning_water_volume_in_main_barn() * Constants.LITERS_TO_CUBIC_METERS,  # m^3
+            self.total_bedding_volume(),  # m^3
+            self.total_water_volume_used_in_milking_center() * Constants.LITERS_TO_CUBIC_METERS  # m^3
+        ])
+
+    def wash_water_volume_used_in_holding_area(self) -> float:
+        return self.num_animals * MilkingCenter.wash_water_use_rate  # liters
+
+    def fresh_water_volume_used_for_milking(self) -> float:
+        return self.num_animals * MilkingCenter.fresh_water_use_rate  # liters
+
+    def total_water_volume_used_in_milking_center(self) -> float:
+        if Cow in self.pen.classes_in_pen:
+            return self.wash_water_volume_used_in_holding_area() + \
+                   self.fresh_water_volume_used_for_milking()  # liters
+        return 0.0
 
     def manure_mass_deposited_in_milking_center(self) -> float:
         if Cow in self.pen.classes_in_pen:
-            milking_center = MilkingCenter()
-            percent_time_spent = milking_center.total_percent_of_day_spent_in_milking_center
+            percent_time_spent = self.milking_center.total_percent_of_day_spent_in_milking_center
             return self.pen.manure_mass * percent_time_spent / 100
         return 0.0
 
@@ -145,8 +159,8 @@ class BaseManureHandler:
             Updates Total and Volatile Solids in the reception_pit from excreted manure
             "pseudocode_manure_management" MS.3.E
         """
-        self.daily_vars.TS_loss = self.flush_water_volume * Constants.TS_loss_perc
-        self.daily_vars.VS_loss = self.daily_vars.TS_loss * Constants.VS_loss_perc
+        # self.daily_vars.TS_loss = self.flush_water_volume * Constants.TS_loss_perc
+        # self.daily_vars.VS_loss = self.daily_vars.TS_loss * Constants.VS_loss_perc
 
         # self.reception_pit.TS += self.daily_vars.TS_loss
         # self.reception_pit.VS += self.daily_vars.VS_loss

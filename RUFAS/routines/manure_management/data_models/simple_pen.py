@@ -36,11 +36,11 @@ class SimplePen:
 
     @property
     def manure_mass(self) -> float:
-        return self.manure.Mkg
+        return self.manure.Mkg  # kg
 
     @property
     def manure_volume(self) -> float:
-        return self.manure.Mkg / self.manure_density
+        return self.manure_mass / self.manure_density  # m^3
 
     def __str__(self) -> str:
         s = ['SimplePen data:']
@@ -49,7 +49,7 @@ class SimplePen:
             if var == 'animals_in_pen':
                 s.append(f'animals_in_pen: {[animal.__class__.__name__ for animal in self.animals_in_pen]}')
             elif var == 'classes_in_pen':
-                s.append(f'classes_in_pen: {[klass.__name__ for klass in self.classes_in_pen]}')
+                s.append(f'classes_in_pen: {[klass for klass in self.classes_in_pen]}')
             else:
                 s.append(f'{var}: {getattr(self, var)}')
 

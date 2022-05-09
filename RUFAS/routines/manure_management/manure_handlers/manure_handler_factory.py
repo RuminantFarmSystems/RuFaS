@@ -38,9 +38,9 @@ class ManureHandlerFactory:
     def get_manure_handler_init_data(cls, manure_handler_enum: ManureHandlerEnum) -> ManureHandlerInitData:
         init_data = ManureHandlerInitData()
         enum_to_water_use_rate: Dict[ManureHandlerEnum, int] = {
-            ManureHandlerEnum.FLUSH_SYSTEM: 757,
-            ManureHandlerEnum.MANUAL_SCRAPING: 10,
-            ManureHandlerEnum.ALLEY_SCRAPER: 10
+            ManureHandlerEnum.FLUSH_SYSTEM: 757,  # liters
+            ManureHandlerEnum.MANUAL_SCRAPING: 10,  # liters
+            ManureHandlerEnum.ALLEY_SCRAPER: 10  # liters
         }
         if manure_handler_enum in enum_to_water_use_rate:
             init_data.water_use_rate = enum_to_water_use_rate[manure_handler_enum]

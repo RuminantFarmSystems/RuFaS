@@ -1,15 +1,4 @@
-# TODO: Explain each constant
-
 class ManureManagementConstants:
-    """A class that stores constants used in calculation during the processing
-    of manure data.
-
-    """
-    Bo = 0.24
-    MCF = 0.01  # Methane Conversion Factor
-    MS = 0.9  # manure handled in system (%)
-    m3 = 0.662  # factor (CH4 to kg/m3)
-
-    TS_loss_perc = 0.02
-    VS_loss_perc = 0.85
-    density = 994.0
+    WATER_DENSITY = 0.997  # kg/liter
+    LITERS_TO_CUBIC_METERS = 0.001
+    CUBIC_METERS_TO_LITERS = 1000.0

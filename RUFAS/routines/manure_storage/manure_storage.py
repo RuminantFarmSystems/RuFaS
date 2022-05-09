@@ -8,8 +8,6 @@ Description: Driver for the manure storage model
 Author(s): William Donovan, wmdonovan@wisc.edu
 """
 from RUFAS.routines.manure_storage import manure_emissions, manure_handling, manure_separator
-from RUFAS.routines.animal.animal_management import AnimalManagement
-from RUFAS.routines.manure_management.data_models.constants import ManureManagementConstants as Constants
 
 
 # TODO: To be removed after completing the final version `daily_manure_storage_routine`

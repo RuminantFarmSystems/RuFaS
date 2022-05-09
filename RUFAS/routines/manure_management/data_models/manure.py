@@ -25,6 +25,7 @@ class Manure:
         TAN_s: total ammoniacal nitrogen concentration in the manure slurry, mol/L
         MN: nitrogen in liquid and solid manure, g
         Mkg: amount of manure, kg
+        TSd: total solids, g
         VSd: degradable volatile solids, g
         VSnd: non-degradable volatile solids, g
         WIP_frac: water extractable inorganic P fraction

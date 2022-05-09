@@ -2,12 +2,12 @@ from typing import Type
 
 from pytest import approx, fixture
 
-from RUFAS.routines.manure_management.data_models.constants import ManureManagementConstants
+from RUFAS.routines.manure_management.treatments.constants import TreatmentConstants
 
 
 @fixture
-def constants() -> Type[ManureManagementConstants]:
-    return ManureManagementConstants
+def constants() -> Type[TreatmentConstants]:
+    return TreatmentConstants
 
 
 # TODO: Use proper names for the constants
