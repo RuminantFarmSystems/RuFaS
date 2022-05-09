@@ -15,7 +15,7 @@ class BeddingFactory:
     @classmethod
     def get_instance_from_enum(cls, bedding_enum: BeddingEnum) -> BaseBedding:
         enum_to_class: Dict[BeddingEnum, BaseBedding] = {
-            bedding_enum.ORGANIC: OrganicBedding(arg_mass=1.97),
+            bedding_enum.SAWDUST: OrganicBedding(arg_mass=1.97),
             bedding_enum.SAND: SandBedding(arg_mass=25)
         }
         return enum_to_class[bedding_enum]
