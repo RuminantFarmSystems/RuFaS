@@ -11,18 +11,19 @@ Description: This file updates the heifer form breeding to close to calving.
             http://www.dcrcouncil.org/wp-content/uploads/2018/12/Dairy-Heifer-Protocol-Sheet-Updated-2018.pdf
             Preg check follows AI for three times.
 """
+import math
+from random import random
 from typing import Tuple
 
-import numpy as np
 from scipy.stats import truncnorm
-from RUFAS.routines.animal.life_cycle.heiferI import HeiferI
+
+from RUFAS.routines.animal.animal_typed_dicts import HeiferIIValuesTypedDict
+from RUFAS.routines.animal.life_cycle import animal_constants as const
 from RUFAS.routines.animal.life_cycle.animal_base import AnimalBase
+from RUFAS.routines.animal.life_cycle.heiferI import HeiferI
 from RUFAS.routines.animal.manure.growing_heifer_manure_excretion import \
     manure_calculations
 from RUFAS.routines.animal.ration.animal_requirements import calc_rqmts
-from random import random
-import math
-from RUFAS.routines.animal.life_cycle import animal_constants as const
 
 
 class HeiferII(HeiferI):
@@ -191,6 +192,7 @@ class HeiferII(HeiferI):
             'body_weight': self.body_weight,
             'wean_weight': self.wean_weight,
             'events': str(self.events),
+
             'repro_program': self.repro_program,
             'tai_method_h': self.tai_method_h,
             'synch_ed_method_h': self.synch_ed_method_h,
