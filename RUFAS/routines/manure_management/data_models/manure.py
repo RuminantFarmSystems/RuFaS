@@ -8,11 +8,8 @@ the Animal Management module.
 """
 
 from __future__ import annotations
-from dataclasses import dataclass, astuple
-from typing import Union
 
-# Declare a custom type hint
-Number = Union[int, float]
+from dataclasses import dataclass, astuple
 
 
 @dataclass
@@ -37,19 +34,19 @@ class Manure:
 
     """
 
-    U: Number = 0
-    TAN_s: Number = 0
-    MN: Number = 0
-    Mkg: Number = 0
-    TSd: Number = 0
-    VSd: Number = 0
-    VSnd: Number = 0
-    WIP_frac: Number = 0
-    WOP_frac: Number = 0
-    p_excrt_manure: Number = 0
-    p_frac: Number = 0
-    K_manure: Number = 0
-    CH4_manure: Number = 0
+    U: float = 0
+    TAN_s: float = 0
+    MN: float = 0
+    Mkg: float = 0
+    TSd: float = 0
+    VSd: float = 0
+    VSnd: float = 0
+    WIP_frac: float = 0
+    WOP_frac: float = 0
+    p_excrt_manure: float = 0
+    p_frac: float = 0
+    K_manure: float = 0
+    CH4_manure: float = 0
 
     def __add__(self, other: Manure) -> Manure:
         """Add two Manure objects by summing their corresponding attributes.
