@@ -60,6 +60,12 @@ def test_residue_partitioning():
     np.testing.assert_almost_equal(17.0, test_soil.AG_lignin_res_percent)
     np.testing.assert_almost_equal(0.425, test_soil.AG_L_to_N)
 
+    LOGGER.info("Checking ADJ_crop_type_bio_BG for soil layers")
+    np.testing.assert_almost_equal(0.0, test_soil.soil_layers[0].ADJ_crop_type_bio_BG)
+    np.testing.assert_almost_equal(0.0, test_soil.soil_layers[1].ADJ_crop_type_bio_BG)
+    np.testing.assert_almost_equal(0.0, test_soil.soil_layers[2].ADJ_crop_type_bio_BG)
+    np.testing.assert_almost_equal(0.0, test_soil.soil_layers[3].ADJ_crop_type_bio_BG)
+
 
 if __name__ == "__main__":
    test_residue_partitioning()
