@@ -1,6 +1,32 @@
 from typing import Dict, List, TypedDict, Union
 
 
+class HerdInfoTypedDict(TypedDict):
+    calf_num: int
+    heiferI_num: int
+    heiferII_num: int
+    cow_num: int
+    replace_num: int
+    herd_num: int
+    herd_init: bool
+    breed: str
+
+
+class PenTypedDict(TypedDict):
+    id: int
+    animal_combination: str
+    vertical_dist_to_milking_parlor: float
+    horizontal_dist_to_milking_parlor: float
+    number_of_stalls: float
+    housing_type: str
+    bedding_type: str
+    pen_type: str
+    manure_handling: str
+    manure_separator: str
+    manure_storage: str
+    max_stocking_density: float
+
+
 class CalfValuesTypedDict(TypedDict):
     id: int
     breed: str

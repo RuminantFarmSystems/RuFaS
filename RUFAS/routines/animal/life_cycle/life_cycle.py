@@ -704,24 +704,7 @@ class LifeCycleManager:
                 self.percent_cow_for_parity[parity] = cow_frac * 100
 
 
-def remove_items_from_list_by_indices(arr: List, removed_idx: List[int]) -> None:
-    """
-    Remove items from a list given a list of indices
-
-    Args:
-        arr:
-        removed_idx:
-
-    Returns:
-
-    """
-
-    # Safer to remove elements from the back
-    for idx in sorted(removed_idx, reverse=True):
-        del arr[idx]
-
-
-def calc_average(num_values, cur_avg, new_value):
+def calc_average(num_values: int, cur_avg: float, new_value: float) -> Tuple[int, float]:
     """
     Calculate the new average given the number of values, the current average, and the new value.
 
@@ -740,7 +723,24 @@ def calc_average(num_values, cur_avg, new_value):
     return new_num_values, new_avg
 
 
-def percent_calculator(denominator: int) -> Callable[[float], float]:
+def remove_items_from_list_by_indices(arr: List, removed_idx: List[int]) -> None:
+    """
+    Remove items from a list given a list of indices
+
+    Args:
+        arr:
+        removed_idx:
+
+    Returns:
+
+    """
+
+    # Safer to remove elements from the back
+    for idx in sorted(removed_idx, reverse=True):
+        del arr[idx]
+
+
+def percent_calculator(denominator: float) -> Callable[[float], float]:
     """
     Returns a percent calculator closure that already stores the value of the given denominator.
 
