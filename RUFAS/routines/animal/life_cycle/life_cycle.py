@@ -192,13 +192,13 @@ class LifeCycleManager:
         self.animal_initializer = AnimalInitialization(self.animal_config['calving_interval'], breed,
                                                        config.set_seed, herd_init)
         self.herd_num = herd_num
-        self._set_avg_CI()
+        self._set_avg_CI(self.animal_config, self.animal_initializer)
 
-        calves = self._get_calves(calf_num, breed)
-        heiferIs = self._get_heiferIs(heiferI_num, breed)
-        heiferIIs = self._get_heiferIIs(heiferII_num, breed)
-        heiferIIIs = self._get_heiferIIIs(heiferIII_num, breed)
-        cows = self._get_cows(cow_num, breed)
+        calves = self._get_calves(calf_num, breed, self.animal_initializer)
+        heiferIs = self._get_heiferIs(heiferI_num, breed, self.animal_initializer)
+        heiferIIs = self._get_heiferIIs(heiferII_num, breed, self.animal_initializer)
+        heiferIIIs = self._get_heiferIIIs(heiferIII_num, breed, self.animal_initializer)
+        cows = self._get_cows(cow_num, breed, self.animal_initializer)
 
         self.replacement_market = self.animal_initializer.get_replacement_cows(replace_num, breed)
 
@@ -207,39 +207,45 @@ class LifeCycleManager:
     # TODO: In the animal_management_animal.json,
     #  the user_input_calving_interval attribute is set to false while the
     #  calving_interval attribute is present, maybe set that to true instead?
-    def _set_avg_CI(self) -> None:
-        if self.animal_config['user_input_calving_interval']:
-            self.avg_CI = self.animal_config['calving_interval']
+    def _set_avg_CI(self, animal_config: AnimalConfigTypedDict,
+                    animal_initializer: AnimalInitialization) -> None:
+        if animal_config['user_input_calving_interval']:
+            self.avg_CI = animal_config['calving_interval']
         else:
-            self.initialize_db_summary = self.animal_initializer.initialization_db_summary()
+            self.initialize_db_summary = animal_initializer.initialization_db_summary()
             self.avg_CI = self.initialize_db_summary['cow_avg_CI']
 
-    def _get_calves(self, calf_num: int, breed: str) -> List[Calf]:
-        calves = self.animal_initializer.get_calves(calf_num, breed)
+    @staticmethod
+    def _get_calves(calf_num: int, breed: str, animal_initializer: AnimalInitialization) -> List[Calf]:
+        calves = animal_initializer.get_calves(calf_num, breed)
         for calf in calves:
             calf.events.add_event(calf.days_born, 0, const.INIT_HERD)
         return calves
 
-    def _get_heiferIs(self, heiferI_num: int, breed: str) -> List[HeiferI]:
-        heiferIs = self.animal_initializer.get_heiferIs(heiferI_num, breed)
+    @staticmethod
+    def _get_heiferIs(heiferI_num: int, breed: str, animal_initializer) -> List[HeiferI]:
+        heiferIs = animal_initializer.get_heiferIs(heiferI_num, breed)
         for heiferI in heiferIs:
             heiferI.events.add_event(heiferI.days_born, 0, const.INIT_HERD)
         return heiferIs
 
-    def _get_heiferIIs(self, heiferII_num: int, breed: str) -> List[HeiferII]:
-        heiferIIs = self.animal_initializer.get_heiferIIs(heiferII_num, breed)
+    @staticmethod
+    def _get_heiferIIs(heiferII_num: int, breed: str, animal_initializer: AnimalInitialization) -> List[HeiferII]:
+        heiferIIs = animal_initializer.get_heiferIIs(heiferII_num, breed)
         for heiferII in heiferIIs:
             heiferII.events.add_event(heiferII.days_born, 0, const.INIT_HERD)
         return heiferIIs
 
-    def _get_heiferIIIs(self, heiferIII_num: int, breed: str) -> List[HeiferIII]:
-        heiferIIIs = self.animal_initializer.get_heiferIIIs(heiferIII_num, breed)
+    @staticmethod
+    def _get_heiferIIIs(heiferIII_num: int, breed: str, animal_initializer: AnimalInitialization) -> List[HeiferIII]:
+        heiferIIIs = animal_initializer.get_heiferIIIs(heiferIII_num, breed)
         for heiferIII in heiferIIIs:
             heiferIII.events.add_event(heiferIII.days_born, 0, const.INIT_HERD)
         return heiferIIIs
 
-    def _get_cows(self, cow_num: int, breed: str) -> List[Cow]:
-        cows = self.animal_initializer.get_cows(cow_num, breed)
+    @staticmethod
+    def _get_cows(cow_num: int, breed: str, animal_initializer: AnimalInitialization) -> List[Cow]:
+        cows = animal_initializer.get_cows(cow_num, breed)
         for cow in cows:
             cow.events.add_event(cow.days_born, 0, const.INIT_HERD)
         return cows

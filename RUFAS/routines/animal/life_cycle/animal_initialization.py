@@ -8,6 +8,7 @@ Description: This file stores and draws values of simulated
 """
 from typing import Dict, List, Union
 
+from RUFAS.routines.animal.animal_typed_dicts import InitializationDBSummaryTypedDict
 from RUFAS.routines.animal.life_cycle.calf import Calf
 from RUFAS.routines.animal.life_cycle.heiferI import HeiferI
 from RUFAS.routines.animal.life_cycle.heiferII import HeiferII
@@ -638,7 +639,7 @@ class AnimalInitialization:
         return cows
 
     @staticmethod
-    def initialization_db_summary() -> Dict[str, Union[int, float]]:
+    def initialization_db_summary() -> InitializationDBSummaryTypedDict:
         """
         Returns: a dictionary which stores the summary of the initialization
         database
@@ -712,7 +713,7 @@ class AnimalInitialization:
             c.execute(query)
             cow_avg_CI = dict(c.fetchone())['AVG(calving_interval)']
 
-            summary = {
+            summary: InitializationDBSummaryTypedDict = {
                 'num_calf': num_calf,
                 'num_heiferI': num_heiferI,
                 'num_heiferII': num_heiferII,
