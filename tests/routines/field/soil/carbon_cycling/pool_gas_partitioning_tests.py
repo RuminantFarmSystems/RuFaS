@@ -5,118 +5,89 @@ Description: Implements test cases
 Author(s): Jessica Tweneboah, jnt42@cornell.edu
 """
 
-import pytest
-import json
 import logging
+
 import numpy as np
-import sys 
-import os 
 
-sys.path.insert(0, os.path.dirname(os.path.realpath(__name__)))
-
+from RUFAS.classes import Time
+from RUFAS.classes import Weather
 from RUFAS.routines.field.crop.crop_types.corn import Corn
 from RUFAS.routines.field.soil import Soil
 from RUFAS.routines.field.soil.carbon_cycling import residue_partitioning, decomp_factors, pool_gas_partitioning
-from config.defintions import ROOT_DIR
-from RUFAS.classes import Weather
-from RUFAS.classes import Config
-from RUFAS.classes import Time
 
 LOGGER = logging.getLogger()
 logging.basicConfig(level=logging.INFO)
 
-LOGGER.info("Read json file: ARL_soil_tillage.json")
-soil_file = open(ROOT_DIR + "/input/soil/ARL_soil_tillage.json")
-LOGGER.info("Read json file: ARL_rotation.json")
-crop_file = open(ROOT_DIR + "/input/crop/ARL_rotation.json")
-path_to_weather_file = ROOT_DIR + "/input/weather/ARL_weather.csv"
+from unittest.mock import MagicMock
 
-LOGGER.info("Convert from json file format to Python dictionary")
-soil_data = json.load(soil_file)
-crop_data = json.load(crop_file)
 
 def test_update_all():
     LOGGER.info("Testing function: update_all")
-    test_soil = Soil(soil_data)
-    test_config_data = {
-        "start_date": "1990:1",
-        "end_date": "2019:365",
-        "csv_dir": "output/CSVs/",
-        "graphic_dir": "output/graphics/",
-        "set_seed": False,
-        "seed": 0
+    test_soil = MagicMock(Soil)
+    test_soil_layer = MagicMock(Soil.SoilLayer)
+    test_time = MagicMock(Time)
+    test_weather = MagicMock(Weather)
+    test_crop_type = MagicMock(Corn)
+
+    layer_attributes = {
+        "water_fac": 0.0,
+        "AG_met": 1250000,
+        "BG_met": 1250000,
+        "tillage_percent": 0.0,
+        "AG_struct": 1250000,
+        "BG_struct": 1250000,
+        "thickness": 0.0,
+        "C_active": 1250000,
+        "C_slow": 1250000,
+        "C_passive": 1250000
     }
-    test_config = Config(test_config_data, path_to_weather_file)
-    test_weather = Weather(path_to_weather_file, test_config)
-    test_time = Time(test_config)
-    corn89_data = crop_data["crops"]["corn_89"]
-    test_crop_type = Corn("corn_89", corn89_data)
+    soil_attributes = {
+        "soil_layers": [test_soil_layer],
+        "AG_lignin_res_percent": 17,
+        "residue_harvest": 0.0,
+        "BG_lignin_res_percent": 17,
+        "profile_depth": 279.4,
+        "silt_to_clay_percent": 0.5
+    }
+    weather_attributes = {
+        "T_avg": [[0]],
+        "rainfall": [[0]]
+    }
+    time_attributes = {
+        "year": 1,
+        "day": 1
+    }
+    corn_attributes = {
+        "bio_BG": 0,
+        "fr_N": 0
+    }
+    test_soil.configure_mock(**soil_attributes)
+    test_soil_layer.configure_mock(**layer_attributes)
+    test_weather.configure_mock(**weather_attributes)
+    test_time.configure_mock(**time_attributes)
+    test_crop_type.configure_mock(**corn_attributes)
 
     decomp_factors.update_all(test_soil, test_weather, test_time)
     residue_partitioning.update_all(soil=test_soil, crop_type=test_crop_type, weather=test_weather,
-                                              time=test_time)
+                                    time=test_time)
     pool_gas_partitioning.update_all(test_soil)
 
     LOGGER.info("Checking changes to soil layers")
     LOGGER.info("Checking Layer 0")
     layer0 = test_soil.soil_layers[0]
-    np.testing.assert_almost_equal(0.01931215999095825, layer0.AG_met_to_C_active_loss)
-    np.testing.assert_almost_equal(0.015800858174420382, layer0.AG_met_to_C_active_act)
-    np.testing.assert_almost_equal(4.836322822029068e-05, layer0.AG_struct_to_C_active_loss)
-    np.testing.assert_almost_equal(5.911061226924417e-05, layer0.AG_struct_to_C_active_act)
-    np.testing.assert_almost_equal(3.224215214686045e-05, layer0.AG_struct_to_C_slow_loss)
-    np.testing.assert_almost_equal(7.523168834267439e-05, layer0.AG_struct_to_C_slow_act)
-    np.testing.assert_almost_equal(0.02414019998869781, layer0.BG_met_to_C_active_loss)
-    np.testing.assert_almost_equal(0.019751072718025477, layer0.BG_met_to_C_active_act)
-    np.testing.assert_almost_equal(0.005293287488430829, layer0.BG_struct_to_C_active_loss)
-    np.testing.assert_almost_equal(0.006469573596971014, layer0.BG_struct_to_C_active_act)
-    np.testing.assert_almost_equal(0.0035288583256205524, layer0.BG_struct_to_C_slow_loss)
-    np.testing.assert_almost_equal(0.008234002759781289, layer0.BG_struct_to_C_slow_act)
+    np.testing.assert_almost_equal(0.03505788081471571, layer0.AG_met_to_C_active_loss)
+    np.testing.assert_almost_equal(0.028683720666585574, layer0.AG_met_to_C_active_act)
+    np.testing.assert_almost_equal(8.77950623625564e-05, layer0.AG_struct_to_C_active_loss)
+    np.testing.assert_almost_equal(0.00010730507622090227, layer0.AG_struct_to_C_active_act)
+    np.testing.assert_almost_equal(5.85300415750376e-05, layer0.AG_struct_to_C_slow_loss)
+    np.testing.assert_almost_equal(0.00013657009700842107, layer0.AG_struct_to_C_slow_act)
+    np.testing.assert_almost_equal(0.043822351018394635, layer0.BG_met_to_C_active_loss)
+    np.testing.assert_almost_equal(0.035854650833231964, layer0.BG_met_to_C_active_act)
+    np.testing.assert_almost_equal(0.009609046423306167, layer0.BG_struct_to_C_active_loss)
+    np.testing.assert_almost_equal(0.011744390072929762, layer0.BG_struct_to_C_active_act)
+    np.testing.assert_almost_equal(0.006406030948870778, layer0.BG_struct_to_C_slow_loss)
+    np.testing.assert_almost_equal(0.014947405547365148, layer0.BG_struct_to_C_slow_act)
 
-    LOGGER.info("Checking Layer 1")
-    layer1 = test_soil.soil_layers[1]
-    np.testing.assert_almost_equal(0.01931215999095825, layer1.AG_met_to_C_active_loss)
-    np.testing.assert_almost_equal(0.015800858174420382, layer1.AG_met_to_C_active_act)
-    np.testing.assert_almost_equal(4.836322822029068e-05, layer1.AG_struct_to_C_active_loss)
-    np.testing.assert_almost_equal(5.911061226924417e-05, layer1.AG_struct_to_C_active_act)
-    np.testing.assert_almost_equal(3.224215214686045e-05, layer1.AG_struct_to_C_slow_loss)
-    np.testing.assert_almost_equal(7.523168834267439e-05, layer1.AG_struct_to_C_slow_act)
-    np.testing.assert_almost_equal(0.02414019998869781, layer1.BG_met_to_C_active_loss)
-    np.testing.assert_almost_equal(0.019751072718025477, layer1.BG_met_to_C_active_act)
-    np.testing.assert_almost_equal(0.005293287488430829, layer1.BG_struct_to_C_active_loss)
-    np.testing.assert_almost_equal(0.006469573596971014, layer1.BG_struct_to_C_active_act)
-    np.testing.assert_almost_equal(0.0035288583256205524, layer1.BG_struct_to_C_slow_loss)
-    np.testing.assert_almost_equal(0.008234002759781289, layer1.BG_struct_to_C_slow_act)
-
-    LOGGER.info("Checking Layer 2")
-    layer2 = test_soil.soil_layers[2]
-    np.testing.assert_almost_equal(0.01931215999095825, layer2.AG_met_to_C_active_loss)
-    np.testing.assert_almost_equal(0.015800858174420382, layer2.AG_met_to_C_active_act)
-    np.testing.assert_almost_equal(4.836322822029068e-05, layer2.AG_struct_to_C_active_loss)
-    np.testing.assert_almost_equal(5.911061226924417e-05, layer2.AG_struct_to_C_active_act)
-    np.testing.assert_almost_equal(3.224215214686045e-05, layer2.AG_struct_to_C_slow_loss)
-    np.testing.assert_almost_equal(7.523168834267439e-05, layer2.AG_struct_to_C_slow_act)
-    np.testing.assert_almost_equal(0.02414019998869781, layer2.BG_met_to_C_active_loss)
-    np.testing.assert_almost_equal(0.019751072718025477, layer2.BG_met_to_C_active_act)
-    np.testing.assert_almost_equal(0.005293287488430829, layer2.BG_struct_to_C_active_loss)
-    np.testing.assert_almost_equal(0.006469573596971014, layer2.BG_struct_to_C_active_act)
-    np.testing.assert_almost_equal(0.0035288583256205524, layer2.BG_struct_to_C_slow_loss)
-    np.testing.assert_almost_equal(0.008234002759781289, layer2.BG_struct_to_C_slow_act)
-
-    LOGGER.info("Checking Layer 3")
-    layer3 = test_soil.soil_layers[3]
-    np.testing.assert_almost_equal(0.01931215999095825, layer3.AG_met_to_C_active_loss)
-    np.testing.assert_almost_equal(0.015800858174420382, layer3.AG_met_to_C_active_act)
-    np.testing.assert_almost_equal(4.836322822029068e-05, layer3.AG_struct_to_C_active_loss)
-    np.testing.assert_almost_equal(5.911061226924417e-05, layer3.AG_struct_to_C_active_act)
-    np.testing.assert_almost_equal(3.224215214686045e-05, layer3.AG_struct_to_C_slow_loss)
-    np.testing.assert_almost_equal(7.523168834267439e-05, layer3.AG_struct_to_C_slow_act)
-    np.testing.assert_almost_equal(0.02414019998869781, layer3.BG_met_to_C_active_loss)
-    np.testing.assert_almost_equal(0.019751072718025477, layer3.BG_met_to_C_active_act)
-    np.testing.assert_almost_equal(0.005293287488430829, layer3.BG_struct_to_C_active_loss)
-    np.testing.assert_almost_equal(0.006469573596971014, layer3.BG_struct_to_C_active_act)
-    np.testing.assert_almost_equal(0.0035288583256205524, layer3.BG_struct_to_C_slow_loss)
-    np.testing.assert_almost_equal(0.008234002759781289, layer3.BG_struct_to_C_slow_act)
 
 if __name__ == "__main__":
-   test_update_all()
+    test_update_all()
