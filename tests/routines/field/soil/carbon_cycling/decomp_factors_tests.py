@@ -61,3 +61,4 @@ def test_moisture_factor():
 
 if __name__ == "__main__":
     test_temp_factor()
+    test_moisture_factor()
