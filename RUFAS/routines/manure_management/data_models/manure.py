@@ -10,6 +10,7 @@ the Animal Management module.
 from __future__ import annotations
 
 from dataclasses import dataclass, astuple
+from constants import ManureManagementConstants as Constants
 
 
 @dataclass
@@ -34,19 +35,29 @@ class Manure:
 
     """
 
-    U: float = 0
-    TAN_s: float = 0
-    MN: float = 0
-    Mkg: float = 0
-    TSd: float = 0
-    VSd: float = 0
-    VSnd: float = 0
-    WIP_frac: float = 0
-    WOP_frac: float = 0
-    p_excrt_manure: float = 0
-    p_frac: float = 0
-    K_manure: float = 0
-    CH4_manure: float = 0
+    U: float = 0.0
+    TAN_s: float = 0.0
+    MN: float = 0.0
+    Mkg: float = 0.0
+    TSd: float = 0.0
+    VSd: float = 0.0
+    VSnd: float = 0.0
+    WIP_frac: float = 0.0
+    WOP_frac: float = 0.0
+    p_excrt_manure: float = 0.0
+    p_frac: float = 0.0
+    K_manure: float = 0.0
+    CH4_manure: float = 0.0
+
+    def __post_init__(self):
+        self.U *= Constants.UREA_MOLAR_MASS  # mol/L x g/mol = g/L
+        self.TAN_s *= Constants.TAN_MOLAR_MASS  # mol/L x g/mol = g/L
+        self.MN *= Constants.GRAMS_TO_KG  # kg
+        self.TSd *= Constants.GRAMS_TO_KG  # kg
+        self.VSd *= Constants.GRAMS_TO_KG  # kg
+        self.VSnd *= Constants.GRAMS_TO_KG  # kg
+        self.p_excrt_manure *= Constants.GRAMS_TO_KG  # kg
+        self.K_manure *= Constants.GRAMS_TO_KG  # kg
 
     def __add__(self, other: Manure) -> Manure:
         """Add two Manure objects by summing their corresponding attributes.

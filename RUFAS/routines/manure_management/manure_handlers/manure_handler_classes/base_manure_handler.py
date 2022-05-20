@@ -88,10 +88,19 @@ class BaseManureHandler:
 
     def final_daily_mass(self) -> float:
         return sum([
-            self.pen.manure_mass,  # kg
+            self.pen.manure_mass,  # kg. Make sure no double counting
             self.cleaning_water_volume_in_main_barn(),  # liters, 1L = 1kg
             self.total_bedding_mass(),  # kg
             self.total_water_volume_used_in_milking_center(),  # liters, 1L = 1kg
+
+            self.pen.manure.U,  # g/L
+            self.pen.manure.TAN_s,  # g/L
+            self.pen.manure.MN,  # kg
+            self.pen.manure.TSd,  # kg
+            self.pen.manure.VSd,  # kg
+            self.pen.manure.VSnd,  # kg
+            self.pen.manure.p_excrt_manure,  # kg
+            self.pen.manure.K_manure  # kg
         ])
 
     def final_daily_volume(self) -> float:
@@ -99,7 +108,16 @@ class BaseManureHandler:
             self.pen.manure_volume,  # m^3
             self.cleaning_water_volume_in_main_barn() * Constants.LITERS_TO_CUBIC_METERS,  # m^3
             self.total_bedding_volume(),  # m^3
-            self.total_water_volume_used_in_milking_center() * Constants.LITERS_TO_CUBIC_METERS  # m^3
+            self.total_water_volume_used_in_milking_center() * Constants.LITERS_TO_CUBIC_METERS,  # m^3
+
+            self.pen.manure.U,  # g/L
+            self.pen.manure.TAN_s,  # g/L
+            self.pen.manure.MN,  # kg
+            self.pen.manure.TSd,  # kg
+            self.pen.manure.VSd,  # kg
+            self.pen.manure.VSnd,  # kg
+            self.pen.manure.p_excrt_manure,  # kg
+            self.pen.manure.K_manure  # kg
         ])
 
     def wash_water_volume_used_in_holding_area(self) -> float:
