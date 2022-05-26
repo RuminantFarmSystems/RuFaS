@@ -9,7 +9,7 @@ Author(s):  William Donovan, wmdonovan@wisc.edu
             Yunus Mohammed, ymm26@cornell.edu 
             Sadman Chowdhury, skc86@cornell.edu 
 """
-from typing import Dict
+from typing import Dict, List
 
 from RUFAS.routines.animal.animal_management import AnimalManagement
 # TODO: figure out how to connect to csv values
@@ -74,6 +74,8 @@ class ManureManagement:
         self.annual_vars = DailyVariables()
         self.total_vars = DailyVariables()
 
+        self.all_data: Dict[int, List[List]] = {}
+
         self.manure_management_output = ManureManagementOutput()
 
         self.build(SimpleAnimalManagement(animal_management))
@@ -118,6 +120,8 @@ class ManureManagement:
                     manure_separator=self.manure_separators[pen.id]
             )
 
+            self.all_data[pen.id] = []
+
     def update(self, animal_management: SimpleAnimalManagement):
         """
         Update all the components and subcomponents given
@@ -140,6 +144,15 @@ class ManureManagement:
             self.treatments[pen.id].update()
             print(f'storage option for pen {pen.id}: {self.treatments[pen.id].daily_vars}')
 
+            pen_daily_data = [
+                self.manure_handlers[pen.id].daily_vars,
+                self.reception_pits[pen.id].daily_vars,
+                self.manure_separators[pen.id].daily_vars,
+                self.treatments[pen.id].daily_vars
+            ]
+
+            self.all_data[pen.id].append(pen_daily_data)
+            
             print()
 
     # TODO: Check logic
