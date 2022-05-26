@@ -305,11 +305,6 @@ class LifeCycleManager:
         return animals_added, ids_removed, calves_born, calves, heiferIs, \
                heiferIIs, heiferIIIs, cows
 
-    def _reset_cull_reason_stats(self) -> None:
-        for cull_reason in LifeCycleManager.cull_reason_stats:
-            LifeCycleManager.cull_reason_stats[cull_reason] = 0
-            self.cull_reason_stats_percent[cull_reason] = 0.0
-
     def _reset_parity(self) -> None:
         for parity in LifeCycleManager.num_cow_for_parity:
             LifeCycleManager.num_cow_for_parity[parity] = 0
@@ -317,6 +312,11 @@ class LifeCycleManager:
             self.percent_cow_for_parity[parity] = 0.0
             self.avg_age_for_parity[parity] = 0.0
             self.avg_age_for_calving[parity] = 0.0
+
+    def _reset_cull_reason_stats(self) -> None:
+        for cull_reason in LifeCycleManager.cull_reason_stats:
+            LifeCycleManager.cull_reason_stats[cull_reason] = 0
+            self.cull_reason_stats_percent[cull_reason] = 0.0
 
     def _calf_to_heiferI(self, sim_day: int, calves: List[Calf],
                          heiferIs: List[HeiferI], total_animal_num: int) -> int:
