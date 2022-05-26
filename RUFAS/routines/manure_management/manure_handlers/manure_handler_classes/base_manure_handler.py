@@ -8,6 +8,9 @@ Description:
 Author(s):  William Donovan, wmdonovan@wisc.edu
             Yunus Mohammed, ymm26@cornell.edu 
 """
+from dataclasses import asdict
+from pprint import pprint
+
 from RUFAS.routines.animal.life_cycle.cow import Cow
 from RUFAS.routines.manure_management.data_models.constants import ManureManagementConstants as Constants
 from RUFAS.routines.manure_management.data_models.simple_pen import SimplePen
@@ -41,6 +44,7 @@ class BaseManureHandler:
         self.milking_center = MilkingCenter()
 
         self.daily_vars = ManureHandlerVariables()
+        self.daily_output = None
 
     # TODO: unused
     def init_sand_lane(self, sand_lane_data):
@@ -58,7 +62,20 @@ class BaseManureHandler:
             manure handling.
             "pseudocode_manure_management" MS.3
         """
-        self.update_daily_variables(pen)
+        res = asdict(pen.manure)
+        del res['CH4_manure']
+        res['daily_mass'] = self.final_daily_mass(pen)
+        res['cleaning_water'] = self.cleaning_water_volume_in_main_barn()
+        res['total_bedding'] = self.total_bedding_mass()
+        res['total_water_volume'] = self.total_water_volume_used_in_milking_center()
+        res['num_animals'] = self.num_animals
+        # self.cleaning_water_volume_in_main_barn(),  # liters, 1L = 1kg
+        # self.total_bedding_mass(),  # kg
+        # self.total_water_volume_used_in_milking_center(),  # liters, 1L = 1kg
+
+        self.daily_output = res
+
+        # self.update_daily_variables(pen)
         # self.flush_water()
         # self.N_loss()
         # self.P_loss()
@@ -86,21 +103,22 @@ class BaseManureHandler:
     def total_bedding_volume(self) -> float:
         return self.total_bedding_mass() / self.bedding_manager.bedding.density  # m^3/day
 
-    def final_daily_mass(self) -> float:
+    # Manure handler's specific output
+    def final_daily_mass(self, pen: SimplePen) -> float:
         return sum([
-            self.pen.manure_mass,  # kg. Make sure no double counting
+            pen.manure_mass,  # kg. Make sure no double counting
             self.cleaning_water_volume_in_main_barn(),  # liters, 1L = 1kg
             self.total_bedding_mass(),  # kg
             self.total_water_volume_used_in_milking_center(),  # liters, 1L = 1kg
 
-            self.pen.manure.U,  # g/L
-            self.pen.manure.TAN_s,  # g/L
-            self.pen.manure.MN,  # kg
-            self.pen.manure.TSd,  # kg
-            self.pen.manure.VSd,  # kg
-            self.pen.manure.VSnd,  # kg
-            self.pen.manure.p_excrt_manure,  # kg
-            self.pen.manure.K_manure  # kg
+            pen.manure.U,  # g/L
+            pen.manure.TAN_s,  # g/L
+            pen.manure.MN,  # kg
+            pen.manure.TSd,  # kg
+            pen.manure.VSd,  # kg
+            pen.manure.VSnd,  # kg
+            pen.manure.p_excrt_manure,  # kg
+            pen.manure.K_manure  # kg
         ])
 
     def final_daily_volume(self) -> float:
@@ -127,7 +145,8 @@ class BaseManureHandler:
         return self.num_animals * MilkingCenter.fresh_water_use_rate  # liters
 
     def total_water_volume_used_in_milking_center(self) -> float:
-        if Cow in self.pen.classes_in_pen:
+        pprint(list(self.pen.classes_in_pen))
+        if 'Cow' in self.pen.classes_in_pen:
             return self.wash_water_volume_used_in_holding_area() + \
                    self.fresh_water_volume_used_for_milking()  # liters
         return 0.0

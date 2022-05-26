@@ -18,6 +18,7 @@ def daily_manure_storage_routine(manure_storage: ManureStorage, animal_managemen
     daily_manure_storage_routine_main(manure_storage.manure_management, animal_management)
 
 
+
 def daily_manure_storage_routine_main(manure_management: ManureManagement, _animal_management: AnimalManagement):
     """Entry point to the manure module
 
@@ -36,8 +37,8 @@ def daily_manure_storage_routine_main(manure_management: ManureManagement, _anim
     manure_management.update(animal_management)
 
     manure_management.summarize_manure_management()  # daily
-    manure_management.summarize_annual_variables()   # yearly
-    manure_management.summarize_total_variables()    # all time
+    manure_management.summarize_annual_variables()  # yearly
+    manure_management.summarize_total_variables()  # all time
 
     # Print output data
     manure_management.export_total_variables()

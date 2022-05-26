@@ -10,7 +10,7 @@ the Animal Management module.
 from __future__ import annotations
 
 from dataclasses import dataclass, astuple
-from constants import ManureManagementConstants as Constants
+from .constants import ManureManagementConstants as Constants
 
 
 @dataclass
