@@ -172,8 +172,6 @@ def annual_crop_routine(crop, time):
 
     # current crop year is set to the next year of crops in the regimen
     crop.current_crop_year = crop.grow_regimen[time.year - 1]
-
-    print(f'crop run:{crop.current_crop.crop_name}')
     # current crop is the first crop to grow in the selected year
     crop.current_crop = crop.current_crop_year[0]
 
