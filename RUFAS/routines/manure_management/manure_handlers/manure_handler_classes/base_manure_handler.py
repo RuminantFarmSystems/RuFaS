@@ -35,12 +35,12 @@ class BaseManureHandler:
     def __init__(self,
                  pen: SimplePen,
                  handler_data: ManureHandlerInitData):
-        self.pen = pen
+        # self.pen = pen
         self.handler_init_data = handler_data
         self.sand_lane = None
 
         self.bedding_manager = BeddingManager.get_instance(pen.bedding_type)
-        self.num_animals = len(self.pen.animals_in_pen)
+        self.num_animals = len(pen.animals_in_pen)
         self.milking_center = MilkingCenter()
 
         self.daily_vars = ManureHandlerVariables()
@@ -67,7 +67,7 @@ class BaseManureHandler:
         res['daily_mass'] = self.final_daily_mass(pen)
         res['cleaning_water'] = self.cleaning_water_volume_in_main_barn()
         res['total_bedding'] = self.total_bedding_mass()
-        res['total_water_volume'] = self.total_water_volume_used_in_milking_center()
+        res['total_water_volume'] = self.total_water_volume_used_in_milking_center(pen)
         res['num_animals'] = self.num_animals
         # self.cleaning_water_volume_in_main_barn(),  # liters, 1L = 1kg
         # self.total_bedding_mass(),  # kg
@@ -109,7 +109,7 @@ class BaseManureHandler:
             pen.manure_mass,  # kg. Make sure no double counting
             self.cleaning_water_volume_in_main_barn(),  # liters, 1L = 1kg
             self.total_bedding_mass(),  # kg
-            self.total_water_volume_used_in_milking_center(),  # liters, 1L = 1kg
+            self.total_water_volume_used_in_milking_center(pen),  # liters, 1L = 1kg
 
             pen.manure.U,  # g/L
             pen.manure.TAN_s,  # g/L
@@ -121,21 +121,21 @@ class BaseManureHandler:
             pen.manure.K_manure  # kg
         ])
 
-    def final_daily_volume(self) -> float:
+    def final_daily_volume(self, pen: SimplePen) -> float:
         return sum([
-            self.pen.manure_volume,  # m^3
+            pen.manure_volume,  # m^3
             self.cleaning_water_volume_in_main_barn() * Constants.LITERS_TO_CUBIC_METERS,  # m^3
             self.total_bedding_volume(),  # m^3
-            self.total_water_volume_used_in_milking_center() * Constants.LITERS_TO_CUBIC_METERS,  # m^3
+            self.total_water_volume_used_in_milking_center(pen) * Constants.LITERS_TO_CUBIC_METERS,  # m^3
 
-            self.pen.manure.U,  # g/L
-            self.pen.manure.TAN_s,  # g/L
-            self.pen.manure.MN,  # kg
-            self.pen.manure.TSd,  # kg
-            self.pen.manure.VSd,  # kg
-            self.pen.manure.VSnd,  # kg
-            self.pen.manure.p_excrt_manure,  # kg
-            self.pen.manure.K_manure  # kg
+            pen.manure.U,  # g/L
+            pen.manure.TAN_s,  # g/L
+            pen.manure.MN,  # kg
+            pen.manure.TSd,  # kg
+            pen.manure.VSd,  # kg
+            pen.manure.VSnd,  # kg
+            pen.manure.p_excrt_manure,  # kg
+            pen.manure.K_manure  # kg
         ])
 
     def wash_water_volume_used_in_holding_area(self) -> float:
@@ -144,21 +144,21 @@ class BaseManureHandler:
     def fresh_water_volume_used_for_milking(self) -> float:
         return self.num_animals * MilkingCenter.fresh_water_use_rate  # liters
 
-    def total_water_volume_used_in_milking_center(self) -> float:
-        pprint(list(self.pen.classes_in_pen))
-        if 'Cow' in self.pen.classes_in_pen:
+    def total_water_volume_used_in_milking_center(self, pen: SimplePen) -> float:
+        pprint(list(pen.classes_in_pen))
+        if 'Cow' in pen.classes_in_pen:
             return self.wash_water_volume_used_in_holding_area() + \
                    self.fresh_water_volume_used_for_milking()  # liters
         return 0.0
 
-    def manure_mass_deposited_in_milking_center(self) -> float:
-        if Cow in self.pen.classes_in_pen:
+    def manure_mass_deposited_in_milking_center(self, pen: SimplePen) -> float:
+        if Cow in pen.classes_in_pen:
             percent_time_spent = self.milking_center.total_percent_of_day_spent_in_milking_center
-            return self.pen.manure_mass * percent_time_spent / 100
+            return pen.manure_mass * percent_time_spent / 100
         return 0.0
 
-    def manure_volume_deposited_in_milking_center(self) -> float:
-        return self.manure_mass_deposited_in_milking_center() / self.pen.manure_density
+    def manure_volume_deposited_in_milking_center(self, pen: SimplePen) -> float:
+        return self.manure_mass_deposited_in_milking_center(pen) / pen.manure_density
 
     def N_loss(self):
         """
