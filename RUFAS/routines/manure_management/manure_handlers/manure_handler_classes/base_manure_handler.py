@@ -46,6 +46,8 @@ class BaseManureHandler:
         self.daily_vars = ManureHandlerVariables()
         self.daily_output = None
 
+        self.last_daily_output = None
+
     # TODO: unused
     def init_sand_lane(self, sand_lane_data):
         if self.bedding_manager.bedding_enum is BeddingEnum.SAND:
@@ -55,26 +57,13 @@ class BaseManureHandler:
         self.daily_vars = ManureHandlerVariables()
         self.flush_water_volume = 0.0
 
-    def update(self, pen: SimplePen):
+    def update(self, pen: SimplePen) -> ManureHandlerVariables:
         """
         Description:
             Calls functions to calculate nutrient losses and transformations during
             manure handling.
             "pseudocode_manure_management" MS.3
         """
-        res = asdict(pen.manure)
-        del res['CH4_manure']
-        res['daily_mass'] = self.final_daily_mass(pen)
-        res['cleaning_water'] = self.cleaning_water_volume_in_main_barn()
-        res['total_bedding'] = self.total_bedding_mass()
-        res['total_water_volume'] = self.total_water_volume_used_in_milking_center(pen)
-        res['num_animals'] = self.num_animals
-        # self.cleaning_water_volume_in_main_barn(),  # liters, 1L = 1kg
-        # self.total_bedding_mass(),  # kg
-        # self.total_water_volume_used_in_milking_center(),  # liters, 1L = 1kg
-
-        self.daily_output = res
-
         # self.update_daily_variables(pen)
         # self.flush_water()
         # self.N_loss()
@@ -85,6 +74,24 @@ class BaseManureHandler:
         #     self.sand_lane.sand_lane()
         # self.CH4_effluent()
         # self.WIP_WOP()
+
+        daily_output = ManureHandlerVariables(
+            raw_manure=pen.manure_mass,
+            urea=pen.manure.U,
+            TAN_s=pen.manure.TAN_s,
+            manure_nitrogen=pen.manure.MN,
+            TSd=pen.manure.TSd,
+            VSd=pen.manure.VSd,
+            VSnd=pen.manure.VSnd,
+            p_excrt_manure=pen.manure.p_excrt_manure,
+            K_manure=pen.manure.K_manure,
+            cleaning_water=self.cleaning_water_volume_in_main_barn(),
+            tot_bedding_mass=self.total_bedding_mass(),
+            tot_water_volume_in_milking_center=self.total_water_volume_used_in_milking_center(pen)
+        )
+        self.last_daily_output = daily_output
+        return daily_output
+
 
     def update_daily_variables(self, pen: SimplePen):
         self.daily_vars += ManureHandlerVariables.get_instance_from_pen(pen)

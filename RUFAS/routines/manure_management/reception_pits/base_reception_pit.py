@@ -1,3 +1,5 @@
+from dataclasses import asdict
+
 from RUFAS.routines.manure_management.data_models.simple_pen import SimplePen
 from RUFAS.routines.manure_management.manure_handlers.manure_handler_classes.base_manure_handler import \
     BaseManureHandler
@@ -21,19 +23,10 @@ class BaseReceptionPit:
 
     # TODO: Check logic
     # Should rely on the variables from the manure handler
-    def update(self):
-        d = self.daily_vars
-        # self.manure_separator.daily_vars += ManureSeparatorVariables(
-        #         flush_water_volume=d.flush_water_volume,
-        #         N=d.N,
-        #         P=d.P,
-        #         K=d.K,
-        #         TS=d.TS,
-        #         VS=d.VS,
-        #         CH4=d.CH4,
-        #         WIP=d.WIP,
-        #         WOP=d.WOP
-        # )
+    def update(self) -> ReceptionPitVariables:
+        o = self.manure_handler.last_daily_output
+        return ReceptionPitVariables(**asdict(o))
+
 
     def flush_water(self):
         # self.separator.flush_water_volume += self.flush_water_volume

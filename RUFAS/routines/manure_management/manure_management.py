@@ -133,22 +133,21 @@ class ManureManagement:
         # The remaining downstream components can just extract whatever data they
         # need from the immediate upstream component.
         for pen in animal_management.all_pens:
-            self.manure_handlers[pen.id].update(pen)
-            pprint(f'manure handler for pen {pen.id}: {self.manure_handlers[pen.id].daily_output}')
+            manure_handler_daily_output = self.manure_handlers[pen.id].update(pen)
+            print(f'manure_handler_daily_output: \n{manure_handler_daily_output}')
+            print(manure_handler_daily_output.total_daily_mass)
 
-            self.reception_pits[pen.id].update()
-            # print(f'reception pit for pen {pen.id}: {self.reception_pits[pen.id].daily_vars}')
+            reception_pit_daily_output = self.reception_pits[pen.id].update()
+            print(f'reception_pit_daily_output: \n{reception_pit_daily_output}')
+            print(reception_pit_daily_output.total_daily_mass)
 
             self.manure_separators[pen.id].update()
-            # print(f'manure separator for pen {pen.id}: {self.manure_separators[pen.id].daily_vars}')
 
             self.treatments[pen.id].update()
-            # print(f'storage option for pen {pen.id}: {self.treatments[pen.id].daily_vars}')
 
             pen_daily_data = [
-                self.reception_pits[pen.id].daily_vars,
-                self.manure_separators[pen.id].daily_vars,
-                self.treatments[pen.id].daily_vars
+                manure_handler_daily_output,
+                reception_pit_daily_output
             ]
 
             self.all_data[pen.id].append(pen_daily_data)
