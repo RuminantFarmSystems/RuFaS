@@ -23,6 +23,7 @@ class SimplePen:
 
         self.id: int = pen.id
         self.animals_in_pen: [AnimalBase] = pen.animals_in_pen
+        self.num_animals = len(pen.animals_in_pen)
         self.classes_in_pen: Set[Type[AnimalBase]] = pen.classes_in_pen
 
         self.housing_type: str = pen.housing_type
@@ -32,7 +33,7 @@ class SimplePen:
         self.manure_separator: str = pen.manure_separator
         self.manure_storage: str = pen.manure_storage
 
-        self.manure_density: float = 990.0  # kg/m^3
+        self.manure_density = 990.0  # kg/m^3
 
     @property
     def manure_mass(self) -> float:

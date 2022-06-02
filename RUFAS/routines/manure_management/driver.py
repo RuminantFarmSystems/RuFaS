@@ -40,10 +40,6 @@ def daily_manure_storage_routine_main(manure_management: ManureManagement, _anim
     manure_management.summarize_annual_variables()  # yearly
     manure_management.summarize_total_variables()  # all time
 
-    # Print output data
-    # manure_management.export_total_variables()
-    # print(manure_management.manure_management_output)
-
 
 def compile_manure_for_all_pens(animal_management: SimpleAnimalManagement):
     """

@@ -1,7 +1,7 @@
 from .base_reception_pit import BaseReceptionPit
 from .reception_pit_init_data import ReceptionPitInitData
 from ..data_models.simple_pen import SimplePen
-from ..manure_handlers.manure_handler_classes.base_manure_handler import BaseManureHandler
+from RUFAS.routines.manure_management.manure_handlers.manure_handler_classes import BaseManureHandler
 
 
 class NullReceptionPit(BaseReceptionPit):

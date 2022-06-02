@@ -12,7 +12,7 @@ Author(s):  William Donovan, wmdonovan@wisc.edu
 from .base_treatment import BaseTreatment
 from ..treatment_init_data import TreatmentInitData
 from ...data_models.simple_pen import SimplePen
-from ...manure_handlers.manure_handler_classes.base_manure_handler import BaseManureHandler
+from RUFAS.routines.manure_management.manure_handlers.manure_handler_classes import BaseManureHandler
 from ...manure_separators.manure_separator_classes.base_separator import BaseSeparator
 
 

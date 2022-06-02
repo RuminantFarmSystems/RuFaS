@@ -1,5 +1,5 @@
 from RUFAS.routines.manure_management.data_models.simple_pen import SimplePen
-from RUFAS.routines.manure_management.manure_handlers.manure_handler_classes.base_manure_handler import \
+from RUFAS.routines.manure_management.manure_handlers.manure_handler_classes import \
     BaseManureHandler
 from RUFAS.routines.manure_management.reception_pits.base_reception_pit import BaseReceptionPit
 from RUFAS.routines.manure_management.reception_pits.reception_pit_init_data import ReceptionPitInitData

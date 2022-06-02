@@ -10,7 +10,7 @@ Author(s):  William Donovan, wmdonovan@wisc.edu
 """
 from RUFAS.routines.manure_management.treatments.constants import TreatmentConstants as Constants
 from RUFAS.routines.manure_management.data_models.simple_pen import SimplePen
-from RUFAS.routines.manure_management.manure_handlers.manure_handler_classes.base_manure_handler import \
+from RUFAS.routines.manure_management.manure_handlers.manure_handler_classes import \
     BaseManureHandler
 from RUFAS.routines.manure_management.manure_separators.manure_separator_classes.base_separator import BaseSeparator
 from RUFAS.routines.manure_management.treatments.treatment_init_data import TreatmentInitData

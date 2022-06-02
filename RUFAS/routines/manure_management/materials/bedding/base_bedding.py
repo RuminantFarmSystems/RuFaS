@@ -1,7 +1,7 @@
 """
 RUFAS: Ruminant Farm Systems Model
 
-File name: base_bedding.py
+File name: bedding_classes.py
 
 Description: This module contains the implementation of the base Bedding Class. 
 The bedding is a material component of pens and Manure, but may also be found in 

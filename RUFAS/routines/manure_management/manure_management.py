@@ -9,16 +9,14 @@ Author(s):  William Donovan, wmdonovan@wisc.edu
             Yunus Mohammed, ymm26@cornell.edu 
             Sadman Chowdhury, skc86@cornell.edu 
 """
-from pprint import pprint
 from typing import Dict, List
 
 from RUFAS.routines.animal.animal_management import AnimalManagement
 # TODO: figure out how to connect to csv values
 from RUFAS.routines.manure_management.data_models.daily_variables import DailyVariables
 from RUFAS.routines.manure_management.data_models.simple_animal_management import SimpleAnimalManagement
-from RUFAS.routines.manure_management.manure_handlers.manure_handler_classes.base_manure_handler import \
-    BaseManureHandler
-from RUFAS.routines.manure_management.manure_handlers.manure_handler_factory import ManureHandlerFactory
+from RUFAS.routines.manure_management.manure_handlers.manure_handler_classes import \
+    BaseManureHandler, ManureHandlerFactory
 from RUFAS.routines.manure_management.manure_separators.manure_separator_classes.base_separator import BaseSeparator
 from RUFAS.routines.manure_management.manure_separators.manure_separator_factory import ManureSeparatorFactory
 from RUFAS.routines.manure_management.output.manure_management_output import ManureManagementOutput
@@ -116,9 +114,9 @@ class ManureManagement:
                 ManureSeparatorFactory.get_instance(pen=pen, reception_pit=self.reception_pits[pen.id])
 
             self.treatments[pen.id] = TreatmentFactory.get_instance(
-                pen=pen,
-                manure_handler=self.manure_handlers[pen.id],
-                manure_separator=self.manure_separators[pen.id]
+                    pen=pen,
+                    manure_handler=self.manure_handlers[pen.id],
+                    manure_separator=self.manure_separators[pen.id]
             )
 
             self.all_data[pen.id] = []
@@ -135,7 +133,6 @@ class ManureManagement:
         for pen in animal_management.all_pens:
             manure_handler_daily_output = self.manure_handlers[pen.id].update(pen)
             print(f'manure_handler_daily_output: \n{manure_handler_daily_output}')
-            print(manure_handler_daily_output.total_daily_mass)
 
             reception_pit_daily_output = self.reception_pits[pen.id].update()
             print(f'reception_pit_daily_output: \n{reception_pit_daily_output}')
@@ -168,16 +165,16 @@ class ManureManagement:
         for handler in self.manure_handlers.values():
             h = handler.daily_vars
             self.daily_vars += DailyVariables(
-                raw_manure=h.raw_manure,
-                TS_loss=h.TS_loss,
-                VS_loss=h.VS_loss
+                    raw_manure=h.raw_manure,
+                    TS_loss=h.TS_loss,
+                    VS_loss=h.VS_loss
             )
 
     def summarize_manure_separators(self):
         for separator in self.manure_separators.values():
             s = separator.daily_vars
             self.daily_vars += DailyVariables(
-                TS_DM_effluent=s.TS_DM_effluent
+                    TS_DM_effluent=s.TS_DM_effluent
             )
 
     # TODO: Check logic
@@ -185,14 +182,14 @@ class ManureManagement:
         for reception_pit in self.reception_pits.values():
             r = reception_pit.daily_vars
             self.daily_vars += DailyVariables(
-                TS=r.TS,
-                VS=r.VS,
-                N=r.N,
-                P=r.P,
-                K=r.K,
-                CH4_emissions=r.CH4,
-                WIP=r.WIP,
-                WOP=r.WOP
+                    TS=r.TS,
+                    VS=r.VS,
+                    N=r.N,
+                    P=r.P,
+                    K=r.K,
+                    CH4_emissions=r.CH4,
+                    WIP=r.WIP,
+                    WOP=r.WOP
             )
 
     # TODO: Check logic
@@ -200,17 +197,17 @@ class ManureManagement:
         for storage in self.treatments.values():
             s = storage.daily_vars
             self.daily_vars += DailyVariables(
-                TS=s.TS,
-                VS=s.VS,
-                N=s.N,
-                P=s.P,
-                K=s.K,
-                TS_liquid=s.TS_liquid,
-                VS_liquid=s.VS_liquid,
-                N_liquid=s.N_liquid,
-                P_liquid=s.P_liquid,
-                K_liquid=s.K_liquid,
-                CH4_emissions=s.CH4
+                    TS=s.TS,
+                    VS=s.VS,
+                    N=s.N,
+                    P=s.P,
+                    K=s.K,
+                    TS_liquid=s.TS_liquid,
+                    VS_liquid=s.VS_liquid,
+                    N_liquid=s.N_liquid,
+                    P_liquid=s.P_liquid,
+                    K_liquid=s.K_liquid,
+                    CH4_emissions=s.CH4
             )
 
     def summarize_annual_variables(self):
@@ -226,13 +223,13 @@ class ManureManagement:
     def export_total_variables(self):
         tot = self.total_vars
         self.manure_management_output = ManureManagementOutput(
-            tot_manure=tot.raw_manure,
-            tot_N=tot.N,
-            tot_P=tot.P,
-            tot_K=tot.K,
-            tot_DM=tot.TS_DM_effluent,
-            WIP=tot.WIP,
-            WOP=tot.WOP
+                tot_manure=tot.raw_manure,
+                tot_N=tot.N,
+                tot_P=tot.P,
+                tot_K=tot.K,
+                tot_DM=tot.TS_DM_effluent,
+                WIP=tot.WIP,
+                WOP=tot.WOP
         )
 
     # TODO: Simplify all the for-loops into one
