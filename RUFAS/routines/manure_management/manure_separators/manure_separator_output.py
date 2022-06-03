@@ -1,19 +1,30 @@
 from __future__ import annotations
 
-from dataclasses import asdict, astuple, dataclass
+from dataclasses import asdict, astuple, dataclass, field
 
 from RUFAS.routines.manure_management.misc.units import Units
 
 
 @dataclass
 class ManureSeparatorOutput:
-    flush_water_volume: float = 0.0
+    urea: float = 0.0  # g/L
+    TAN_s: float = 0.0  # g/L
+    manure_nitrogen: float = 0.0  # kg
+    TSd: float = 0.0  # kg
+    VSd: float = 0.0  # kg
+    VSnd: float = 0.0  # kg
+    p_excrt_manure: float = 0.0  # kg
+    K_manure: float = 0.0  # kg
+    # total_daily_mass: float = field(init=False)  # L
+    total_daily_mass: float = 0.0  # L
 
-    TS: float = 0.0
-    VS: float = 0.0
-    N: float = 0.0
-    P: float = 0.0
-    K: float = 0.0
+
+    flush_water_volume: float = 0.0
+    TS_solid: float = 0.0
+    VS_solid: float = 0.0
+    N_solid: float = 0.0
+    P_solid: float = 0.0
+    K_solid: float = 0.0
 
     TS_liquid: float = 0.0
     VS_liquid: float = 0.0
@@ -22,10 +33,12 @@ class ManureSeparatorOutput:
     K_liquid: float = 0.0
 
     TS_DM_effluent: float = 0.0
-
     WIP: float = 0.0
     WOP: float = 0.0
     CH4: float = 0.0
+
+    def __post_init__(self):
+        pass
 
     def clone(self) -> ManureSeparatorOutput:
         return ManureSeparatorOutput(**asdict(self))

@@ -10,7 +10,7 @@ Author(s):  William Donovan, wmdonovan@wisc.edu
 """
 from __future__ import annotations
 
-from dataclasses import dataclass
+from dataclasses import dataclass, asdict
 from enum import auto
 from typing import Dict, List, Optional, Type
 
@@ -21,6 +21,9 @@ from RUFAS.routines.manure_management.reception_pits.reception_pit_classes impor
 
 
 class ManureSeparatorEnum(ExtendedEnum):
+    ROTARY_SCREEN = auto()
+    SCREW_PRESS = auto()
+
     BASE_SEPARATOR = auto()
     BELT_PRESS = auto()
     CUSTOM_SEPARATOR = auto()
@@ -28,12 +31,10 @@ class ManureSeparatorEnum(ExtendedEnum):
     MECHANICAL_SEPARATOR = auto()
     MOVING_DISC_PRESS = auto()
     NULL_SEPARATOR = auto()
-    ROTARY_SCREEN = auto()
-    SCREW_PRESS = auto()
     SEDIMENTATION = auto()
     SLOPE_SCREEN = auto()
 
-    DEFAULT = SEDIMENTATION
+    DEFAULT = ROTARY_SCREEN
 
 
 class BaseSeparator:
@@ -69,12 +70,27 @@ class BaseSeparator:
             "pseudocode_manure_management" MS.4
 
         """
+        rp = self.reception_pit.last_output
+
         # self.effluent_liquid()
         # self.effluent_solid()
         # self.update_treatment_variables()
 
         daily_output = ManureSeparatorOutput(
-                # Add something here
+            # Add something here
+            TS_liquid=rp.TSd * (1 - self.separator_init_data.TS_removal_efficiency),
+            VS_liquid=rp.VSd * (1 - self.separator_init_data.VS_removal_efficiency),
+            N_liquid=rp.TAN_s * (1 - self.separator_init_data.N_removal_efficiency),
+            P_liquid=rp.p_excrt_manure * (1 - self.separator_init_data.P_removal_efficiency),
+            K_liquid=rp.K_manure * (1 - self.separator_init_data.K_removal_efficiency),
+
+            TS_solid=rp.TSd * self.separator_init_data.TS_removal_efficiency,
+            VS_solid=rp.VSd * self.separator_init_data.VS_removal_efficiency,
+            N_solid=rp.TAN_s * self.separator_init_data.N_removal_efficiency,
+            P_solid=rp.p_excrt_manure * self.separator_init_data.P_removal_efficiency,
+            K_solid=rp.K_manure * self.separator_init_data.K_removal_efficiency,
+
+            TS_DM_effluent=rp.TSd * self.separator_init_data.TS_DM_effluent_rate
         )
         self.all_output.append(daily_output)
         return daily_output
@@ -85,6 +101,7 @@ class BaseSeparator:
             Calculate liquid nutrient content of the separator
             "pseudocode_manure_management" MS.4.A
         """
+
         # d.TS_liquid = d.TS - (d.TS * self.separator_init_data.TS_removal_efficiency)
         # d.VS_liquid = d.VS - (d.VS * self.separator_init_data.VS_removal_efficiency)
         # d.N_liquid = d.N - (d.N * self.separator_init_data.N_removal_efficiency)
@@ -209,13 +226,21 @@ class ManureSeparatorInitData:
     @classmethod
     def get_instance(cls, manure_separator_enum: ManureSeparatorEnum) -> ManureSeparatorInitData:
         enum_to_init_data: Dict[ManureSeparatorEnum, ManureSeparatorInitData] = {
-            ManureSeparatorEnum.SEDIMENTATION: ManureSeparatorInitData(
-                    TS_removal_efficiency=0.3,
-                    VS_removal_efficiency=0.55,
-                    N_removal_efficiency=0.3,
-                    P_removal_efficiency=0.4,
-                    K_removal_efficiency=0.15,
-                    TS_DM_effluent_rate=0.2
+            ManureSeparatorEnum.ROTARY_SCREEN: ManureSeparatorInitData(
+                TS_removal_efficiency=0.55,
+                VS_removal_efficiency=0.55,
+                N_removal_efficiency=0.3,
+                P_removal_efficiency=0.4,
+                K_removal_efficiency=0.15,
+                TS_DM_effluent_rate=0.2
+            ),
+            ManureSeparatorEnum.SCREW_PRESS: ManureSeparatorInitData(
+                TS_removal_efficiency=0.30,
+                VS_removal_efficiency=0.5,
+                N_removal_efficiency=0.3,
+                P_removal_efficiency=0.2,
+                K_removal_efficiency=0.23,
+                TS_DM_effluent_rate=0.35
             )
         }
         if manure_separator_enum in enum_to_init_data:

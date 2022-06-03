@@ -20,7 +20,7 @@ class ManureHandlerOutput:
     cleaning_water: float = 0.0  # liters, 1L = 1kg
     total_bedding_mass: float = 0.0  # kg
     total_water_volume_in_milking_center: float = 0.0  # liters, 1L = 1kg
-    total_daily_mass: float = field(init=False)
+    total_daily_mass: float = field(init=False)  # kg
 
     def __post_init__(self):
         self.total_daily_mass = sum([

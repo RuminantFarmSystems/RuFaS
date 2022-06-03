@@ -151,7 +151,7 @@
 			"bedding_type": "organic",
 			"pen_type": "freestall",
 			"manure_handling": "flush_system",
-			"manure_separator": "sedimentation",
+			"manure_separator": "rotary_screen",
 			"manure_storage": "storage_pit",
 			"max_stocking_density": 1.2
 		},
@@ -165,7 +165,7 @@
 			"bedding_type": "organic",
 			"pen_type": "tiestall",
 			"manure_handling": "automatic_alley_scrapers",
-			"manure_separator": "sedimentation",
+			"manure_separator": "screw_press",
 			"manure_storage": "storage_pit",
 			"max_stocking_density": 1.2
 		},
@@ -179,7 +179,7 @@
 			"bedding_type": "sand",
 			"pen_type": "tiestall",
 			"manure_handling": "manual_scraping",
-			"manure_separator": "sedimentation",
+			"manure_separator": "screw_press",
 			"manure_storage": "anaerobic_lagoon",
 			"max_stocking_density": 1.2
 		}

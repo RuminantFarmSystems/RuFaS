@@ -12,4 +12,4 @@ class Units:
     cleaning_water = 'L'  # liters, 1L = 1kg
     total_bedding_mass = 'kg'
     total_water_volume_in_milking_center = 'L'  # liters, 1L = 1kg
-    total_daily_mass = 'kg'
+    total_daily_mass = 'kg or L'
