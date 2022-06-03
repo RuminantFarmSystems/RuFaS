@@ -2,7 +2,7 @@ from typing import Type
 
 from pytest import approx, fixture
 
-from RUFAS.routines.manure_management.treatments.constants import TreatmentConstants
+from RUFAS.routines.manure_management.treatments.treatment_constants import TreatmentConstants
 
 
 @fixture

@@ -1,6 +1,6 @@
 from typing import Dict, Type
 
-from RUFAS.routines.manure_management.data_models.simple_pen import SimplePen
+from RUFAS.routines.manure_management.misc.simple_pen import SimplePen
 from RUFAS.routines.manure_management.manure_handlers.manure_handler_classes.alley_scraper import AlleyScraper
 from RUFAS.routines.manure_management.manure_handlers.manure_handler_classes import \
     BaseManureHandler

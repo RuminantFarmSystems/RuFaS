@@ -1,10 +1,12 @@
 from __future__ import annotations
 
-from dataclasses import astuple, dataclass
+from dataclasses import asdict, astuple, dataclass
+
+from RUFAS.routines.manure_management.misc.units import Units
 
 
 @dataclass
-class ManureSeparatorVariables:
+class ManureSeparatorOutput:
     flush_water_volume: float = 0.0
 
     TS: float = 0.0
@@ -25,7 +27,10 @@ class ManureSeparatorVariables:
     WOP: float = 0.0
     CH4: float = 0.0
 
-    def __add__(self, other: ManureSeparatorVariables) -> ManureSeparatorVariables:
+    def clone(self) -> ManureSeparatorOutput:
+        return ManureSeparatorOutput(**asdict(self))
+
+    def __add__(self, other: ManureSeparatorOutput) -> ManureSeparatorOutput:
         """
         Add two ManureSeparatorVariables objects by summing
         their corresponding attributes.
@@ -39,15 +44,15 @@ class ManureSeparatorVariables:
 
         """
 
-        if not isinstance(other, ManureSeparatorVariables):
+        if not isinstance(other, ManureSeparatorOutput):
             raise TypeError('Cannot add a non-ManureHandlerVariables object to a '
                             'ManureHandlerVariables object.')
 
-        return ManureSeparatorVariables(*[
+        return ManureSeparatorOutput(*[
             attr1 + attr2 for attr1, attr2 in zip(astuple(self), astuple(other))
         ])
 
-    def __sub__(self, other: ManureSeparatorVariables) -> ManureSeparatorVariables:
+    def __sub__(self, other: ManureSeparatorOutput) -> ManureSeparatorOutput:
         """
         Subtract two ManureSeparatorVariables objects by subtracting
         their corresponding attributes.
@@ -61,8 +66,14 @@ class ManureSeparatorVariables:
 
         """
 
-        if not isinstance(other, ManureSeparatorVariables):
+        if not isinstance(other, ManureSeparatorOutput):
             raise TypeError('Cannot subtract a non-ManureHandlerVariables object to a '
                             'ManureHandlerVariables object.')
 
-        return self + ManureSeparatorVariables(*[-attr for attr in astuple(other)])
+        return self + ManureSeparatorOutput(*[-attr for attr in astuple(other)])
+
+    def __str__(self) -> str:
+        res = ['Manure separator output']
+        for key, val in asdict(self).items():
+            res.append(f'{key:40}: {val:20,.2f} {getattr(Units, key, ""):<10}')
+        return '\n'.join(res)

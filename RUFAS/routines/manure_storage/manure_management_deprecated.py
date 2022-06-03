@@ -187,7 +187,7 @@ class ManureManagement2:
 
         reception_pit_data = reception_pit_data[reception_pit]
 
-        return reception_pits.base_reception_pit.BaseReceptionPit(reception_pit, reception_pit_data, separator)
+        return reception_pits.base_reception_pit.BaseReceptionPit(reception_pit, reception_pit_data)
 
     @staticmethod
     def initialize_separator(separator, treatment, separator_data):

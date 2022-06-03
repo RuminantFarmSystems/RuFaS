@@ -1,4 +1,4 @@
-from RUFAS.routines.manure_management.data_models.simple_pen import SimplePen
+from RUFAS.routines.manure_management.misc.simple_pen import SimplePen
 
 
 # TODO: Move the following function to Utility class

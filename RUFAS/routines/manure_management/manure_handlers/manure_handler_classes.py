@@ -10,11 +10,12 @@ Author(s):  William Donovan, wmdonovan@wisc.edu
 """
 from __future__ import annotations
 
+from dataclasses import dataclass
 from enum import auto
-from typing import Dict, Type
+from typing import Dict, List, Optional, Type
 
-from RUFAS.routines.manure_management.data_models.constants import ManureManagementConstants as Constants
-from RUFAS.routines.manure_management.data_models.simple_pen import SimplePen
+from RUFAS.routines.manure_management.misc.constants import ManureManagementConstants as Constants
+from RUFAS.routines.manure_management.misc.simple_pen import SimplePen
 from RUFAS.routines.manure_management.helpers.enum_helpers import ExtendedEnum
 from RUFAS.routines.manure_management.manure_handlers.bedding_manager import BeddingManager
 from RUFAS.routines.manure_management.manure_handlers.manure_handler_output import ManureHandlerOutput
@@ -38,16 +39,15 @@ class BaseManureHandler:
         self.handler_init_data = handler_init_data
         self.sand_lane = None
 
+        self.manure_handler_enum = ManureHandlerEnum.get_enum(pen.manure_handler)
         self.bedding_manager = BeddingManager.get_instance(pen.bedding_type)
         self.milking_center = MilkingCenter()
 
-        self.last_daily_output = None
+        self.all_output: List[ManureHandlerOutput] = []
 
-    # TODO: unused
-    def init_sand_lane(self, sand_lane_data):
-        # if self.bedding_manager.bedding_enum is BeddingEnum.SAND:
-        #     self.sand_lane = SandSeparationLane(sand_lane_data)
-        pass
+    @property
+    def last_output(self) -> Optional[ManureHandlerOutput]:
+        return self.all_output[-1] if len(self.all_output) > 0 else None
 
     def reset_daily_variables(self):
         pass
@@ -74,10 +74,10 @@ class BaseManureHandler:
 
                 raw_manure=pen.manure_mass,
                 cleaning_water=self.cleaning_water_volume_in_main_barn(pen),
-                tot_bedding_mass=self.bedding_manager.total_bedding_mass(pen),
-                tot_water_volume_in_milking_center=self.milking_center.total_water_volume_used_in_milking_center(pen)
+                total_bedding_mass=self.bedding_manager.total_bedding_mass(pen),
+                total_water_volume_in_milking_center=self.milking_center.total_water_volume_used_in_milking_center(pen)
         )
-        self.last_daily_output = daily_output
+        self.all_output.append(daily_output)
         return daily_output
 
     def cleaning_water_volume_in_main_barn(self, pen: SimplePen) -> float:
@@ -100,6 +100,12 @@ class BaseManureHandler:
             pen.manure.p_excrt_manure,  # kg
             pen.manure.K_manure  # kg
         ])
+
+    # TODO: unused
+    def init_sand_lane(self, sand_lane_data):
+        # if self.bedding_manager.bedding_enum is BeddingEnum.SAND:
+        #     self.sand_lane = SandSeparationLane(sand_lane_data)
+        pass
 
     # TODO: move to sand lane class
     # def sand_lane(self):
@@ -139,17 +145,16 @@ class CustomManureHandler(BaseManureHandler):
         super().__init__(pen, handler_init_data)
 
 
+@dataclass
 class ManureHandlerInitData:
     """
     A class that contains custom initialization configuration used in the
     creation of a ManureHandler object.
 
     """
-
-    def __init__(self):
-        self.water_use_rate: int = 0  # liters/animal/day
-        self.time_per_cleaning: int = 8
-        self.cleanings_per_day: int = 2
+    water_use_rate: int = 0  # liters/animal/day
+    time_per_cleaning: int = 8
+    cleanings_per_day: int = 2
 
     @classmethod
     def get_instance(cls, manure_handler_enum: ManureHandlerEnum) -> ManureHandlerInitData:

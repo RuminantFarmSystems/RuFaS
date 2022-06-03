@@ -1,6 +1,6 @@
 import pytest
 
-from RUFAS.routines.manure_management.data_models.manure import Manure
+from RUFAS.routines.manure_management.misc.manure import Manure
 
 
 @pytest.fixture

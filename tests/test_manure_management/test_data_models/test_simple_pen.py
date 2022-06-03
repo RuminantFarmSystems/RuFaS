@@ -1,6 +1,6 @@
 from RUFAS.routines.animal.life_cycle.calf import Calf
-from RUFAS.routines.manure_management.data_models.manure import Manure
-from RUFAS.routines.manure_management.data_models.simple_pen import SimplePen
+from RUFAS.routines.manure_management.misc.manure import Manure
+from RUFAS.routines.manure_management.misc.simple_pen import SimplePen
 
 
 def test_simple_pen_init_should_get_an_obj_with_correct_attr_values(simple_pen0) -> None:

@@ -1,6 +1,6 @@
 from pytest import fixture, approx, raises
 
-from RUFAS.routines.manure_management.data_models.daily_variables import DailyVariables
+from RUFAS.routines.manure_management.misc.daily_variables import DailyVariables
 
 
 @fixture

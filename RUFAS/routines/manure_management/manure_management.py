@@ -9,21 +9,27 @@ Author(s):  William Donovan, wmdonovan@wisc.edu
             Yunus Mohammed, ymm26@cornell.edu 
             Sadman Chowdhury, skc86@cornell.edu 
 """
-from typing import Dict, List
-
+import collections
+from dataclasses import asdict
+from typing import Dict, List, Tuple
+import pandas as pd
 from RUFAS.routines.animal.animal_management import AnimalManagement
-# TODO: figure out how to connect to csv values
-from RUFAS.routines.manure_management.data_models.daily_variables import DailyVariables
-from RUFAS.routines.manure_management.data_models.simple_animal_management import SimpleAnimalManagement
 from RUFAS.routines.manure_management.manure_handlers.manure_handler_classes import \
     BaseManureHandler, ManureHandlerFactory
-from RUFAS.routines.manure_management.manure_separators.manure_separator_classes.base_separator import BaseSeparator
-from RUFAS.routines.manure_management.manure_separators.manure_separator_factory import ManureSeparatorFactory
+# TODO: figure out how to connect to csv values
+from RUFAS.routines.manure_management.manure_handlers.manure_handler_output import ManureHandlerOutput
+from RUFAS.routines.manure_management.manure_separators.manure_separator_classes import BaseSeparator, \
+    ManureSeparatorFactory
+from RUFAS.routines.manure_management.manure_separators.manure_separator_output import ManureSeparatorOutput
+from RUFAS.routines.manure_management.misc.daily_variables import DailyVariables
+from RUFAS.routines.manure_management.misc.simple_animal_management import SimpleAnimalManagement
 from RUFAS.routines.manure_management.output.manure_management_output import ManureManagementOutput
-from RUFAS.routines.manure_management.reception_pits.base_reception_pit import BaseReceptionPit
-from RUFAS.routines.manure_management.reception_pits.reception_pit_factory import ReceptionPitFactory
-from RUFAS.routines.manure_management.treatments.treatment_classes.base_treatment import BaseTreatment
-from RUFAS.routines.manure_management.treatments.treatment_factory import TreatmentFactory
+from RUFAS.routines.manure_management.reception_pits.reception_pit_classes import BaseReceptionPit, ReceptionPitFactory
+from RUFAS.routines.manure_management.reception_pits.reception_pit_output import ReceptionPitOutput
+from RUFAS.routines.manure_management.treatments.treatment_classes import BaseTreatment, TreatmentFactory
+from RUFAS.routines.manure_management.treatments.treatment_output import TreatmentOutput
+
+DailyOutputType = Tuple[ManureHandlerOutput, ReceptionPitOutput, ManureSeparatorOutput, TreatmentOutput]
 
 
 class ManureStorage:
@@ -69,11 +75,12 @@ class ManureManagement:
         self.manure_separators: Dict[int, BaseSeparator] = {}
         self.treatments: Dict[int, BaseTreatment] = {}
 
+        self.all_data: Dict[int, List[DailyOutputType]] = {}
+        self.update_count = 0
+
         self.daily_vars = DailyVariables()
         self.annual_vars = DailyVariables()
         self.total_vars = DailyVariables()
-
-        self.all_data: Dict[int, List[List]] = {}
 
         self.manure_management_output = ManureManagementOutput()
 
@@ -98,28 +105,48 @@ class ManureManagement:
             return getattr(obj, item)
         return 0
 
+    @property
+    def all_output_data(self) -> Dict[int, List[DailyOutputType]]:
+        """
+        Return all the data generated during the whole simulation.
+
+        Structure of the returned data dictionary:
+            key: pen.id
+            value: list of 4-tuples
+                Each of these 4-tuples contains daily output from
+                manure handler, reception pit, manure separator, and treatment.
+
+        For example, if there are 10 pens and the simulation is run for 365 days,
+        then the data dictionary should have 10 keys that correspond to 10 pen ids
+        and each key is associated with a list of 365 elements where
+        each element is a tuple of size 4.
+
+        """
+        return self.all_data
+
     def build(self, animal_management: SimpleAnimalManagement):
         """Set up all the components."""
 
         for pen in animal_management.all_pens:
             self.manure_handlers[pen.id] = ManureHandlerFactory.get_instance(pen=pen)
 
-            # Reception pits are optional and take value of None when absent.
-            # Reception pits and separators are either both present or both absent.
             self.reception_pits[pen.id] = \
-                ReceptionPitFactory.get_instance(pen=pen, manure_handler=self.manure_handlers[pen.id])
+                ReceptionPitFactory.get_instance(manure_handler=self.manure_handlers[pen.id])
 
-            # Separators are optional and take value of None when absent.
             self.manure_separators[pen.id] = \
                 ManureSeparatorFactory.get_instance(pen=pen, reception_pit=self.reception_pits[pen.id])
 
+            # TODO: When implementing treatments, check to see if they need to
+            # know about both handler and separator
+            # To access the manure handler, either pass it in directly or use chaining
+            # as follows: manure_separator.reception_pit.manure_handler.some_attr_or_method
             self.treatments[pen.id] = TreatmentFactory.get_instance(
                     pen=pen,
                     manure_handler=self.manure_handlers[pen.id],
                     manure_separator=self.manure_separators[pen.id]
             )
 
-            self.all_data[pen.id] = []
+            self.all_data[pen.id]: List[DailyOutputType] = []
 
     def update(self, animal_management: SimpleAnimalManagement):
         """
@@ -127,97 +154,74 @@ class ManureManagement:
         new information from Animal Management.
 
         """
-        # Only manure handlers need a pen when performing an update
-        # The remaining downstream components can just extract whatever data they
-        # need from the immediate upstream component.
+        self.update_count += 1
+        print(f'Day {self.update_count}=======================================')
+
         for pen in animal_management.all_pens:
+            print(f'Pen {pen.id}----------------------------------------------')
             manure_handler_daily_output = self.manure_handlers[pen.id].update(pen)
-            print(f'manure_handler_daily_output: \n{manure_handler_daily_output}')
+            print(f'manure_handler_daily_output: \n{manure_handler_daily_output}\n')
 
             reception_pit_daily_output = self.reception_pits[pen.id].update()
-            print(f'reception_pit_daily_output: \n{reception_pit_daily_output}')
-            print(reception_pit_daily_output.total_daily_mass)
+            print(f'reception_pit_daily_output: \n{reception_pit_daily_output}\n')
 
-            self.manure_separators[pen.id].update()
+            manure_separator_daily_output = self.manure_separators[pen.id].update(pen)
+            print(f'manure_separator_daily_output: \n{manure_separator_daily_output}\n')
 
-            self.treatments[pen.id].update()
+            treatment_daily_output = self.treatments[pen.id].update(pen)
+            print(f'treatment_daily_output: \n{treatment_daily_output}\n')
 
-            pen_daily_data = [
+            pen_daily_update_data = (
                 manure_handler_daily_output,
-                reception_pit_daily_output
-            ]
+                reception_pit_daily_output,
+                manure_separator_daily_output,
+                treatment_daily_output
+            )
 
-            self.all_data[pen.id].append(pen_daily_data)
+            self.all_data[pen.id].append(pen_daily_update_data)
 
             print()
 
-    # TODO: Check logic
+        self.export_output_to_csv()
+
+    def export_output_to_csv(self):
+        print(f'Exporting to csv')
+        pen_ids = []
+        sim_days = []
+        manure_handler_cols = collections.defaultdict(list)
+        reception_pit_cols = collections.defaultdict(list)
+        manure_separator_cols = collections.defaultdict(list)
+        treatment_cols = collections.defaultdict(list)
+        cols_list = [manure_handler_cols, reception_pit_cols, manure_separator_cols,
+                     treatment_cols]
+        for pen_id in sorted(self.all_data.keys()):
+            for idx, data in enumerate(self.all_data[pen_id]):
+                pen_ids.append(pen_id)
+                sim_days.append(idx + 1)
+                for obj, cols, prefix in zip(data, cols_list,
+                                             ['handler_', 'rp_', 'sep_', 'tx_']):
+                    for k, v in asdict(obj).items():
+                        cols[prefix + k].append(v)
+        d = {
+            'pen_id': pen_ids,
+            'sim_day': sim_days,
+            **manure_handler_cols,
+            **reception_pit_cols,
+            **manure_separator_cols,
+            **treatment_cols
+        }
+        df = pd.DataFrame(data=d)
+        df.to_csv('RUFAS/routines/manure_management/output/manure_management_output.csv',
+                  index=False)
+
     def summarize_manure_management(self):
-        # self.summarize_manure_handlers()
-        # self.summarize_manure_separators()
-        # self.summarize_reception_pits()
-        self.summarize_treatments()
-
-        print(f'Daily: {self.daily_vars}')
-
-    # TODO: Check logic
-    def summarize_manure_handlers(self):
-        for handler in self.manure_handlers.values():
-            h = handler.daily_vars
-            self.daily_vars += DailyVariables(
-                    raw_manure=h.raw_manure,
-                    TS_loss=h.TS_loss,
-                    VS_loss=h.VS_loss
-            )
-
-    def summarize_manure_separators(self):
-        for separator in self.manure_separators.values():
-            s = separator.daily_vars
-            self.daily_vars += DailyVariables(
-                    TS_DM_effluent=s.TS_DM_effluent
-            )
-
-    # TODO: Check logic
-    def summarize_reception_pits(self):
-        for reception_pit in self.reception_pits.values():
-            r = reception_pit.daily_vars
-            self.daily_vars += DailyVariables(
-                    TS=r.TS,
-                    VS=r.VS,
-                    N=r.N,
-                    P=r.P,
-                    K=r.K,
-                    CH4_emissions=r.CH4,
-                    WIP=r.WIP,
-                    WOP=r.WOP
-            )
-
-    # TODO: Check logic
-    def summarize_treatments(self):
-        for storage in self.treatments.values():
-            s = storage.daily_vars
-            self.daily_vars += DailyVariables(
-                    TS=s.TS,
-                    VS=s.VS,
-                    N=s.N,
-                    P=s.P,
-                    K=s.K,
-                    TS_liquid=s.TS_liquid,
-                    VS_liquid=s.VS_liquid,
-                    N_liquid=s.N_liquid,
-                    P_liquid=s.P_liquid,
-                    K_liquid=s.K_liquid,
-                    CH4_emissions=s.CH4
-            )
+        pass
 
     def summarize_annual_variables(self):
-        self.annual_vars += self.daily_vars
-        print(f'Annual: {self.annual_vars}')
+        pass
 
-    # TODO: Check logic
     def summarize_total_variables(self):
-        self.total_vars += self.daily_vars
-        print(f'Total: {self.total_vars}')
+        pass
 
     # TODO: Check logic
     def export_total_variables(self):

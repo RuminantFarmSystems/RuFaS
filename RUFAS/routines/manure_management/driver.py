@@ -2,9 +2,9 @@ from typing import List
 
 from RUFAS.routines.animal.animal_management import AnimalManagement
 from RUFAS.routines.manure_management.manure_management import ManureManagement, ManureStorage
-from RUFAS.routines.manure_management.data_models.manure import Manure
-from RUFAS.routines.manure_management.data_models.simple_animal_management import SimpleAnimalManagement
-from RUFAS.routines.manure_management.data_models.simple_pen import SimplePen
+from RUFAS.routines.manure_management.misc.manure import Manure
+from RUFAS.routines.manure_management.misc.simple_animal_management import SimpleAnimalManagement
+from RUFAS.routines.manure_management.misc.simple_pen import SimplePen
 
 
 def daily_manure_storage_routine(manure_storage: ManureStorage, animal_management: AnimalManagement):
@@ -16,7 +16,6 @@ def daily_manure_storage_routine(manure_storage: ManureStorage, animal_managemen
     """
 
     daily_manure_storage_routine_main(manure_storage.manure_management, animal_management)
-
 
 
 def daily_manure_storage_routine_main(manure_management: ManureManagement, _animal_management: AnimalManagement):
@@ -35,10 +34,6 @@ def daily_manure_storage_routine_main(manure_management: ManureManagement, _anim
 
     manure_management.reset_daily_variables()
     manure_management.update(animal_management)
-
-    manure_management.summarize_manure_management()  # daily
-    manure_management.summarize_annual_variables()  # yearly
-    manure_management.summarize_total_variables()  # all time
 
 
 def compile_manure_for_all_pens(animal_management: SimpleAnimalManagement):

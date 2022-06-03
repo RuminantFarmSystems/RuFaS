@@ -1,6 +1,8 @@
 from __future__ import annotations
 
-from dataclasses import asdict, astuple, dataclass
+from dataclasses import asdict, astuple, dataclass, field
+
+from RUFAS.routines.manure_management.misc.units import Units
 
 
 @dataclass
@@ -16,17 +18,20 @@ class ManureHandlerOutput:
 
     raw_manure: float = 0.0  # kg
     cleaning_water: float = 0.0  # liters, 1L = 1kg
-    tot_bedding_mass: float = 0.0  # kg
-    tot_water_volume_in_milking_center: float = 0.0  # liters, 1L = 1kg
+    total_bedding_mass: float = 0.0  # kg
+    total_water_volume_in_milking_center: float = 0.0  # liters, 1L = 1kg
+    total_daily_mass: float = field(init=False)
 
-    @property
-    def total_daily_mass(self) -> float:
-        return sum([
+    def __post_init__(self):
+        self.total_daily_mass = sum([
             self.raw_manure,
             self.cleaning_water,
-            self.tot_bedding_mass,
-            self.tot_water_volume_in_milking_center
+            self.total_bedding_mass,
+            self.total_water_volume_in_milking_center
         ])
+
+    def clone(self) -> ManureHandlerOutput:
+        return ManureHandlerOutput(**asdict(self))
 
     def __add__(self, other: ManureHandlerOutput) -> ManureHandlerOutput:
         """
@@ -52,6 +57,5 @@ class ManureHandlerOutput:
     def __str__(self) -> str:
         res = ['Manure handler output']
         for key, val in asdict(self).items():
-            res.append(f'{key:40s}: {val:20,.2f}')
-        res.append(f'{"total daily mass":40s}: {self.total_daily_mass:20,.2f}')
+            res.append(f'{key:40}: {val:20,.2f} {getattr(Units, key, ""):<10}')
         return '\n'.join(res)

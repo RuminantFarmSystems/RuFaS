@@ -1,11 +1,12 @@
 from __future__ import annotations
 
-from dataclasses import astuple, dataclass
+from dataclasses import asdict, astuple, dataclass
+
+from RUFAS.routines.manure_management.misc.units import Units
 
 
-# TODO: Should remove unnecessary variables or consolidate with other variables in the module
 @dataclass
-class TreatmentVariables:
+class TreatmentOutput:
     TS: float = 0.0
     VS: float = 0.0
     N: float = 0.0
@@ -24,7 +25,10 @@ class TreatmentVariables:
     WOP_frac: float = 0.0
     CH4: float = 0.0
 
-    def __add__(self, other: TreatmentVariables) -> TreatmentVariables:
+    def clone(self) -> TreatmentOutput:
+        return TreatmentOutput(**asdict(self))
+
+    def __add__(self, other: TreatmentOutput) -> TreatmentOutput:
         """
         Add two StorageOptionVariables objects by summing
         their corresponding attributes.
@@ -38,10 +42,16 @@ class TreatmentVariables:
 
         """
 
-        if not isinstance(other, TreatmentVariables):
+        if not isinstance(other, TreatmentOutput):
             raise TypeError('Cannot add a non-StorageOptionVariables object to a '
                             'StorageOptionVariables object.')
 
-        return TreatmentVariables(*[
+        return TreatmentOutput(*[
             attr1 + attr2 for attr1, attr2 in zip(astuple(self), astuple(other))
         ])
+
+    def __str__(self) -> str:
+        res = ['Treatment output']
+        for key, val in asdict(self).items():
+            res.append(f'{key:40}: {val:20,.2f} {getattr(Units, key, ""):<10}')
+        return '\n'.join(res)

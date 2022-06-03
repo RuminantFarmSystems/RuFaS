@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from typing import Dict, NamedTuple
 
-from RUFAS.routines.manure_management.data_models.simple_pen import SimplePen
+from RUFAS.routines.manure_management.misc.simple_pen import SimplePen
 from RUFAS.routines.manure_management.manure_handlers.bedding_classes \
     import BaseBedding, BeddingEnum, OrganicBedding, SandBedding
 

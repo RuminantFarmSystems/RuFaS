@@ -10,8 +10,8 @@ from RUFAS.routines.animal.life_cycle.heiferI import HeiferI
 from RUFAS.routines.animal.life_cycle.heiferII import HeiferII
 from RUFAS.routines.animal.life_cycle.heiferIII import HeiferIII
 from RUFAS.routines.animal.pen import Pen
-from RUFAS.routines.manure_management.data_models.simple_animal_management import SimpleAnimalManagement
-from RUFAS.routines.manure_management.data_models.simple_pen import SimplePen
+from RUFAS.routines.manure_management.misc.simple_animal_management import SimpleAnimalManagement
+from RUFAS.routines.manure_management.misc.simple_pen import SimplePen
 
 
 @fixture
