@@ -72,21 +72,29 @@ class BaseSeparator:
         """
         rp = self.reception_pit.last_output
 
-        # self.effluent_liquid()
-        # self.effluent_solid()
-        # self.update_treatment_variables()
-
         daily_output = ManureSeparatorOutput(
-            # Add something here
+            TAN_s=rp.TAN_s,
+            manure_nitrogen=rp.manure_nitrogen,
+            TSd=rp.TSd,
+            VSd=rp.VSd,
+            VSnd=rp.VSnd,
+            p_excrt_manure=rp.p_excrt_manure,
+            K_manure=rp.K_manure,
+            total_daily_mass=rp.total_daily_mass,
+
+            final_solids_dry_content=rp.TSd,
+            wet_weight_of_final_solids=rp.TSd * self.separator_init_data.TS_removal_efficiency / self.separator_init_data.percent_dry_solids,
             TS_liquid=rp.TSd * (1 - self.separator_init_data.TS_removal_efficiency),
-            VS_liquid=rp.VSd * (1 - self.separator_init_data.VS_removal_efficiency),
-            N_liquid=rp.TAN_s * (1 - self.separator_init_data.N_removal_efficiency),
+            VS_liquid=(rp.VSd + rp.VSnd) * (1 - self.separator_init_data.VS_removal_efficiency),
+            N_liquid=rp.manure_nitrogen * (1 - self.separator_init_data.N_removal_efficiency),
+            TAN_liquid=rp.TAN_s * (1 - self.separator_init_data.TAN_removal_efficiency),
             P_liquid=rp.p_excrt_manure * (1 - self.separator_init_data.P_removal_efficiency),
             K_liquid=rp.K_manure * (1 - self.separator_init_data.K_removal_efficiency),
 
             TS_solid=rp.TSd * self.separator_init_data.TS_removal_efficiency,
-            VS_solid=rp.VSd * self.separator_init_data.VS_removal_efficiency,
-            N_solid=rp.TAN_s * self.separator_init_data.N_removal_efficiency,
+            VS_solid=(rp.VSd + rp.VSnd) * self.separator_init_data.VS_removal_efficiency,
+            N_solid=rp.manure_nitrogen * self.separator_init_data.N_removal_efficiency,
+            TAN_solid=rp.TAN_s * self.separator_init_data.TAN_removal_efficiency,
             P_solid=rp.p_excrt_manure * self.separator_init_data.P_removal_efficiency,
             K_solid=rp.K_manure * self.separator_init_data.K_removal_efficiency,
 
@@ -216,9 +224,11 @@ class NullSeparator(BaseSeparator):
 
 @dataclass
 class ManureSeparatorInitData:
+    percent_dry_solids: float = 0.0
     TS_removal_efficiency: float = 0.0
     VS_removal_efficiency: float = 0.0
     N_removal_efficiency: float = 0.0
+    TAN_removal_efficiency: float = 0.0
     P_removal_efficiency: float = 0.0
     K_removal_efficiency: float = 0.0
     TS_DM_effluent_rate: float = 0.0
@@ -227,17 +237,21 @@ class ManureSeparatorInitData:
     def get_instance(cls, manure_separator_enum: ManureSeparatorEnum) -> ManureSeparatorInitData:
         enum_to_init_data: Dict[ManureSeparatorEnum, ManureSeparatorInitData] = {
             ManureSeparatorEnum.ROTARY_SCREEN: ManureSeparatorInitData(
+                percent_dry_solids=0.2,
                 TS_removal_efficiency=0.55,
                 VS_removal_efficiency=0.55,
                 N_removal_efficiency=0.3,
+                TAN_removal_efficiency=0.15,
                 P_removal_efficiency=0.4,
                 K_removal_efficiency=0.15,
                 TS_DM_effluent_rate=0.2
             ),
             ManureSeparatorEnum.SCREW_PRESS: ManureSeparatorInitData(
+                percent_dry_solids=0.35,
                 TS_removal_efficiency=0.30,
                 VS_removal_efficiency=0.5,
                 N_removal_efficiency=0.3,
+                TAN_removal_efficiency=0.10,
                 P_removal_efficiency=0.2,
                 K_removal_efficiency=0.23,
                 TS_DM_effluent_rate=0.35
