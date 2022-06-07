@@ -16,7 +16,7 @@ from RUFAS import util, errors
 from RUFAS.routines import Fields, Feed
 from RUFAS.routines.animal.animal_management import AnimalManagement
 from RUFAS.routines.manure_storage.manure_storage import ManureStorage
-from RUFAS.util import read_json_file
+from RUFAS.util import Utility
 
 
 class State:
@@ -44,10 +44,10 @@ class State:
                 initialize the state
         """
         self.fields = Fields(data['fields'], time)
-        input_dir = util.get_base_dir() / 'input'
-        self.feed = Feed(read_json_file(input_dir / 'feed' / data['feed']))
+        input_dir = Utility.get_base_dir() / 'input'
+        self.feed = Feed(Utility.read_json_file(input_dir / 'feed' / data['feed']))
         self.animal_management = AnimalManagement(
-            read_json_file(input_dir / 'animal' / data['animal']), config, self.feed, weather, time)
+            Utility.read_json_file(input_dir / 'animal' / data['animal']), config, self.feed, weather, time)
 
         self.manure_storage = ManureStorage(self.animal_management)
 
@@ -98,7 +98,7 @@ class Config:
 
         # read in the input csv file
 
-        weather_full_path = util.get_base_dir() / 'input/weather' / weather_file
+        weather_full_path = Utility.get_base_dir() / 'input/weather' / weather_file
 
         if not weather_full_path.is_file():
             raise errors.JSONfileData("WEATHER",
@@ -333,7 +333,7 @@ class Weather:
             self.irrigation.append([0.0 for _ in range(len(year))])
 
         # read in the input csv file
-        weather_full_path = util.get_base_dir() / 'input/weather' / weather_file
+        weather_full_path = Utility.get_base_dir() / 'input/weather' / weather_file
 
         if not weather_full_path.is_file():
             raise errors.JSONfileData("WEATHER",

@@ -10,6 +10,7 @@ from pathlib import Path
 
 from RUFAS import util, errors
 import fileReader
+from RUFAS.util import Utility
 
 
 def input_prompt():
@@ -56,7 +57,7 @@ def input_prompt():
             # Handle print base directory
             #
             elif user_input.lower() == 'dir':
-                print(str(util.get_base_dir()))
+                print(str(Utility.get_base_dir()))
                 continue
 
             input_path = Path(user_input.strip())
