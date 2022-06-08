@@ -1,6 +1,6 @@
 from typing import Dict, List
 
-from pytest import approx, fixture, raises
+from pytest import approx, fixture
 from pytest_mock import MockerFixture
 
 from RUFAS.classes import Config
@@ -14,7 +14,6 @@ from RUFAS.routines.animal.life_cycle.heiferII import HeiferII
 from RUFAS.routines.animal.life_cycle.heiferIII import HeiferIII
 from RUFAS.routines.animal.life_cycle.life_cycle import LifeCycleManager
 from RUFAS.routines.animal.pen import Pen
-from RUFAS.util import Utility
 
 
 @fixture
@@ -34,16 +33,17 @@ def herd_data() -> HerdInfoTypedDict:
 
 @fixture
 def life_cycle_manager(mocker: MockerFixture) -> LifeCycleManager:
-    lcm = LifeCycleManager(data=mocker.MagicMock(autospec=AnimalConfigTypedDict))
-    return lcm
+    return LifeCycleManager(data=mocker.MagicMock(autospec=AnimalConfigTypedDict))
 
 
-def test_set_avg_CI(mocker: MockerFixture, life_cycle_manager) -> None:
+def test_set_avg_CI(mocker: MockerFixture, life_cycle_manager: LifeCycleManager) -> None:
+    """Unit test for function _set_avg_CI in file life_cycle.py"""
     # Given user input calving interval,
-    # the function should correctly set the custom average calving interval.
+    # the function should correctly set the user-specified average calving interval.
+    custom_avg_CI = 400.0
     mock_animal_config_data = {
         'user_input_calving_interval': True,
-        'calving_interval': 400.0
+        'calving_interval': custom_avg_CI
     }
     mock_animal_config = mocker.MagicMock(autospec=AnimalConfigTypedDict)
     mock_animal_config.__getitem__.side_effect = mock_animal_config_data.__getitem__
@@ -54,21 +54,22 @@ def test_set_avg_CI(mocker: MockerFixture, life_cycle_manager) -> None:
 
     life_cycle_manager._set_avg_CI(mock_animal_config, mock_animal_initializer)
 
-    assert life_cycle_manager.avg_CI == approx(400.0)
+    assert life_cycle_manager.avg_CI == approx(custom_avg_CI)
     spy_set_avg_CI.assert_called_once()
 
 
 def test_set_avg_CI_2(mocker: MockerFixture, life_cycle_manager) -> None:
+    """Unit test for function _set_avg_CI in file life_cycle.py"""
     # Given no user input calving interval,
-    # the function should use the cow average calving interval.
+    # the function should use the cow average calving interval by default.
+    cow_avg_CI = 500.0
     mock_animal_config_data = {
         'user_input_calving_interval': False
     }
     mock_animal_config = mocker.MagicMock(autospec=AnimalConfigTypedDict)
     mock_animal_config.__getitem__.side_effect = mock_animal_config_data.__getitem__
-
     mock_init_db_summary = {
-        'cow_avg_CI': 500.0
+        'cow_avg_CI': cow_avg_CI
     }
     mock_animal_initializer = mocker.MagicMock(autospec=AnimalInitialization)
     mock_animal_initializer.initialization_db_summary.return_value = mock_init_db_summary
@@ -78,12 +79,13 @@ def test_set_avg_CI_2(mocker: MockerFixture, life_cycle_manager) -> None:
 
     life_cycle_manager._set_avg_CI(mock_animal_config, mock_animal_initializer)
 
-    assert life_cycle_manager.avg_CI == approx(500.0)
+    assert life_cycle_manager.avg_CI == approx(cow_avg_CI)
     spy_get_avg_CI.assert_called_once()
     mock_animal_initializer.initialization_db_summary.assert_called_once()
 
 
 def test_get_calves(mocker: MockerFixture, life_cycle_manager) -> None:
+    """Unit test for function _get_calves in file life_cycle.py"""
     calf_num = 10
     breed = 'HO'
     days_born = 50
@@ -108,7 +110,8 @@ def test_get_calves(mocker: MockerFixture, life_cycle_manager) -> None:
     mock_animal_initializer.get_calves.assert_called_once_with(calf_num, breed)
 
 
-def test_get_heiferIs(mocker: MockerFixture, life_cycle_manager) -> None:
+def test_get_heiferIs(mocker: MockerFixture, life_cycle_manager: LifeCycleManager) -> None:
+    """Unit test for function _get_heiferIs in file life_cycle.py"""
     heiferI_num = 10
     breed = 'HO'
     days_born = 350
@@ -133,7 +136,8 @@ def test_get_heiferIs(mocker: MockerFixture, life_cycle_manager) -> None:
     mock_animal_initializer.get_heiferIs.assert_called_once_with(heiferI_num, breed)
 
 
-def test_get_heiferIIs(mocker: MockerFixture, life_cycle_manager) -> None:
+def test_get_heiferIIs(mocker: MockerFixture, life_cycle_manager: LifeCycleManager) -> None:
+    """Unit test for function _get_heiferIIs in file life_cycle.py"""
     heiferII_num = 10
     breed = 'HO'
     days_born = 800
@@ -158,7 +162,8 @@ def test_get_heiferIIs(mocker: MockerFixture, life_cycle_manager) -> None:
     mock_animal_initializer.get_heiferIIs.assert_called_once_with(heiferII_num, breed)
 
 
-def test_get_heiferIIIs(mocker: MockerFixture, life_cycle_manager) -> None:
+def test_get_heiferIIIs(mocker: MockerFixture, life_cycle_manager: LifeCycleManager) -> None:
+    """Unit test for function _get_heiferIIIs in file life_cycle.py"""
     heiferIII_num = 10
     breed = 'HO'
     days_born = 650
@@ -183,7 +188,8 @@ def test_get_heiferIIIs(mocker: MockerFixture, life_cycle_manager) -> None:
     mock_animal_initializer.get_heiferIIIs.assert_called_once_with(heiferIII_num, breed)
 
 
-def test_get_cows(mocker: MockerFixture, life_cycle_manager) -> None:
+def test_get_cows(mocker: MockerFixture, life_cycle_manager: LifeCycleManager) -> None:
+    """Unit test for function _get_cows in file life_cycle.py"""
     cow_num = 10
     breed = 'HO'
     days_born = 2200
@@ -209,6 +215,7 @@ def test_get_cows(mocker: MockerFixture, life_cycle_manager) -> None:
 
 
 def test_initialize_herd(mocker: MockerFixture, life_cycle_manager, herd_data: HerdInfoTypedDict) -> None:
+    """Unit test for function initialize_herd in file life_cycle.py"""
     herd_num = herd_data['herd_num']
     calf_num = herd_data['calf_num']
     heiferI_num = herd_data['heiferI_num']
@@ -252,7 +259,8 @@ def test_initialize_herd(mocker: MockerFixture, life_cycle_manager, herd_data: H
     assert len(results) == 5
 
 
-def test_reset_parity(life_cycle_manager) -> None:
+def test_reset_parity(life_cycle_manager: LifeCycleManager) -> None:
+    """Unit test for function _reset_parity in file life_cycle.py"""
     parities = LifeCycleManager.num_cow_for_parity
     preg_times = LifeCycleManager.avg_calving_to_preg_time
     count_per_parity = 10
@@ -279,6 +287,7 @@ def test_reset_parity(life_cycle_manager) -> None:
 
 
 def test_reset_cull_reason_stats(life_cycle_manager: LifeCycleManager) -> None:
+    """Unit test for function _reset_cull_reason_stats in file life_cycle.py"""
     stats = LifeCycleManager.cull_reason_stats
     num_reasons = len(stats)
     count_per_reason = 10
@@ -296,6 +305,7 @@ def test_reset_cull_reason_stats(life_cycle_manager: LifeCycleManager) -> None:
 
 
 def test_wean_calf(mocker: MockerFixture) -> None:
+    """Unit test for function _wean_calf in file life_cycle.py"""
     calf_body_weight_history = [10.0, 20.0]
     calf_pen_history = [mocker.MagicMock(autospec=Pen) for _ in range(3)]
 
@@ -321,6 +331,7 @@ def test_wean_calf(mocker: MockerFixture) -> None:
 
 
 def test_calf_to_heiferI(mocker: MockerFixture, life_cycle_manager: LifeCycleManager) -> None:
+    """Unit test for function _calf_to_heiferI in file life_cycle.py"""
     sim_day = 10
     mock_weaned_calf = mocker.MagicMock(autospec=Calf)
     mock_weaned_calf.update.return_value = True
@@ -328,7 +339,7 @@ def test_calf_to_heiferI(mocker: MockerFixture, life_cycle_manager: LifeCycleMan
 
     mock_matured_calf = mocker.MagicMock(autospec=Calf)
     mock_matured_calf.update.return_value = False
-    mock_matured_calf.mature_body_weight = 200.0
+    mock_matured_calf.mature_body_weight = mature_body_weight = 200.0
 
     calves: List[Calf] = [mock_weaned_calf, mock_matured_calf]
     heiferIs: List[HeiferI] = []
@@ -347,106 +358,4 @@ def test_calf_to_heiferI(mocker: MockerFixture, life_cycle_manager: LifeCycleMan
     assert len(calves) == 1
     assert calves[0] == mock_matured_calf
     assert new_total_animal_num == 1
-    assert life_cycle_manager.avg_mature_body_weight == approx(200.0)
-
-
-def test_calc_average() -> None:
-    # Normal case
-    result = Utility.calc_average(num_values=9, cur_avg=5, new_value=6)
-    actual_new_num_values, actual_new_avg = result
-    assert actual_new_num_values == 10
-    assert actual_new_avg == approx(5.1)  # (9 * 5 + 6) / 10
-
-    # Given a count of 0 and an average value of 0.0,
-    # the function should return whatever the new value is.
-    result = Utility.calc_average(num_values=0, cur_avg=0.0, new_value=6.0)
-    actual_new_num_values, actual_new_avg = result
-    assert actual_new_num_values == 1
-    assert actual_new_avg == approx(6.0)
-
-    # Given a count of 1 and an average value of 0.0,
-    # the function should pass.
-    result = Utility.calc_average(num_values=1, cur_avg=0.0, new_value=6.0)
-    actual_new_num_values, actual_new_avg = result
-    assert actual_new_num_values == 2
-    assert actual_new_avg == approx(3.0)
-
-
-def test_remove_items_from_list_by_indices() -> None:
-    # Given an empty list and an empty list of removal indices,
-    # the function should do nothing.
-    arr = []
-    del_idx = []
-    Utility.remove_items_from_list_by_indices(arr, del_idx)
-    assert len(arr) == 0
-
-    # Given a non-empty list and an empty list of removal indices,
-    # the function should do nothing.
-    arr = [0, 1, 2]
-    del_idx = []
-    Utility.remove_items_from_list_by_indices(arr, del_idx)
-    assert arr == [0, 1, 2]
-
-    # Given a list of size 1 and the removal index of 0,
-    # the function should return an empty list.
-    arr = [0]
-    del_idx = [0]
-    Utility.remove_items_from_list_by_indices(arr, del_idx)
-    assert len(arr) == 0
-
-    # Given a list of size 2 and one valid removal index,
-    # the function should return a correct list of size 1.
-    arr = [10, 20]
-    del_idx = [0]
-    Utility.remove_items_from_list_by_indices(arr, del_idx)
-    assert arr == [20]
-
-    arr = [10, 20]
-    del_idx = [1]
-    Utility.remove_items_from_list_by_indices(arr, del_idx)
-    assert arr == [10]
-
-    # Given a list of size 3 and a list of 2 removal indices,
-    # the function should return a correct list of size 1.
-    arr = [10, 20, 30]
-    del_idx = [0, 1]
-    Utility.remove_items_from_list_by_indices(arr, del_idx)
-    assert arr == [30]
-
-    arr = [10, 20, 30]
-    del_idx = [1, 2]
-    Utility.remove_items_from_list_by_indices(arr, del_idx)
-    assert arr == [10]
-
-    arr = [10, 20, 30]
-    del_idx = [0, 2]
-    Utility.remove_items_from_list_by_indices(arr, del_idx)
-    assert arr == [20]
-
-    # Given an empty list and a non-empty list of removal indices,
-    # the function should raise IndexError.
-    arr = []
-    del_idx = [0]
-    with raises(IndexError):
-        Utility.remove_items_from_list_by_indices(arr, del_idx)
-
-
-def test_percent_calculator() -> None:
-    # Given denominator 100, we should get the numerator as percentage.
-    pc = Utility.percent_calculator(denominator=100)
-    assert pc(0.0) == approx(0.0)
-    assert pc(12.3) == approx(12.3)
-    assert pc(100.0) == approx(100.0)
-
-    # Given any random non-zero denominator, we should get correct percentages.
-    pc = Utility.percent_calculator(denominator=20)
-    assert pc(0) == approx(0.0)
-    assert pc(20) == approx(100.0)
-    assert pc(8) == approx(40.0)
-    assert pc(-8) == approx(-40.0)
-    assert pc(24) == approx(120.0)
-
-    # Given 0 denominator, we should get a ZeroDivisionError.
-    pc = Utility.percent_calculator(denominator=0)
-    with raises(ZeroDivisionError):
-        pc(1.0)
+    assert life_cycle_manager.avg_mature_body_weight == approx(mature_body_weight)
