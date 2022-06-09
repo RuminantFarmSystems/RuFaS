@@ -11,6 +11,7 @@ Author(s):  William Donovan, wmdonovan@wisc.edu
 """
 import collections
 from dataclasses import asdict
+from datetime import datetime
 from typing import Dict, List, Tuple
 import pandas as pd
 from RUFAS.routines.animal.animal_management import AnimalManagement
@@ -23,13 +24,18 @@ from RUFAS.routines.manure_management.manure_separators.manure_separator_classes
 from RUFAS.routines.manure_management.manure_separators.manure_separator_output import ManureSeparatorOutput
 from RUFAS.routines.manure_management.misc.daily_variables import DailyVariables
 from RUFAS.routines.manure_management.misc.simple_animal_management import SimpleAnimalManagement
+from RUFAS.routines.manure_management.misc.simple_pen import SimplePen
 from RUFAS.routines.manure_management.output.manure_management_output import ManureManagementOutput
 from RUFAS.routines.manure_management.reception_pits.reception_pit_classes import BaseReceptionPit, ReceptionPitFactory
 from RUFAS.routines.manure_management.reception_pits.reception_pit_output import ReceptionPitOutput
 from RUFAS.routines.manure_management.treatments.treatment_classes import BaseTreatment, TreatmentFactory
 from RUFAS.routines.manure_management.treatments.treatment_output import TreatmentOutput
 
-DailyOutputType = Tuple[ManureHandlerOutput, ReceptionPitOutput, ManureSeparatorOutput, TreatmentOutput]
+DailyOutputType = Tuple[SimplePen,
+                        ManureHandlerOutput,
+                        ReceptionPitOutput,
+                        ManureSeparatorOutput,
+                        TreatmentOutput]
 
 
 class ManureStorage:
@@ -160,18 +166,19 @@ class ManureManagement:
         for pen in animal_management.all_pens:
             print(f'Pen {pen.id}----------------------------------------------')
             manure_handler_daily_output = self.manure_handlers[pen.id].update(pen)
-            print(f'manure_handler_daily_output: \n{manure_handler_daily_output}\n')
+            # print(f'manure_handler_daily_output: \n{manure_handler_daily_output}\n')
 
             reception_pit_daily_output = self.reception_pits[pen.id].update()
-            print(f'reception_pit_daily_output: \n{reception_pit_daily_output}\n')
+            # print(f'reception_pit_daily_output: \n{reception_pit_daily_output}\n')
 
             manure_separator_daily_output = self.manure_separators[pen.id].update(pen)
-            print(f'manure_separator_daily_output: \n{manure_separator_daily_output}\n')
+            # print(f'manure_separator_daily_output: \n{manure_separator_daily_output}\n')
 
             treatment_daily_output = self.treatments[pen.id].update(pen)
-            print(f'treatment_daily_output: \n{treatment_daily_output}\n')
+            # print(f'treatment_daily_output: \n{treatment_daily_output}\n')
 
             pen_daily_update_data = (
+                pen,
                 manure_handler_daily_output,
                 reception_pit_daily_output,
                 manure_separator_daily_output,
@@ -186,8 +193,13 @@ class ManureManagement:
 
     def export_output_to_csv(self):
         print(f'Exporting to csv')
-        pen_ids = []
-        sim_days = []
+        pen_ids: List[int] = []
+        sim_days: List[int] = []
+        num_animals: List[int] = []
+        animal_types: List[str] = []
+        housing_types: List[str] = []
+        bedding_types: List[str] = []
+
         manure_handler_cols = collections.defaultdict(list)
         reception_pit_cols = collections.defaultdict(list)
         manure_separator_cols = collections.defaultdict(list)
@@ -198,20 +210,30 @@ class ManureManagement:
             for idx, data in enumerate(self.all_data[pen_id]):
                 pen_ids.append(pen_id)
                 sim_days.append(idx + 1)
-                for obj, cols, prefix in zip(data, cols_list,
+                pen = data[0]
+                num_animals.append(pen.num_animals)
+                animal_types.append(str(pen.classes_in_pen))
+                housing_types.append(pen.housing_type)
+                bedding_types.append(pen.bedding_type)
+                for obj, cols, prefix in zip(data[1:], cols_list,
                                              ['handler_', 'rp_', 'sep_', 'tx_']):
                     for k, v in asdict(obj).items():
                         cols[prefix + k].append(v)
         d = {
             'pen_id': pen_ids,
             'sim_day': sim_days,
+            'num_animals': num_animals,
+            'animal_types': animal_types,
+            'housing_type': housing_types,
+            'bedding_type': bedding_types,
             **manure_handler_cols,
             **reception_pit_cols,
             **manure_separator_cols,
             **treatment_cols
         }
         df = pd.DataFrame(data=d)
-        df.to_csv('RUFAS/routines/manure_management/output/manure_management_output.csv',
+        current_time = datetime.now().strftime('%m_%d_%Y__%H_%M')
+        df.to_csv(f'RUFAS/routines/manure_management/output/manure_management_output_{current_time}.csv',
                   index=False)
 
     def summarize_manure_management(self):
