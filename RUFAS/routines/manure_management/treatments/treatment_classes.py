@@ -27,7 +27,9 @@ class TreatmentEnum(ExtendedEnum):
     STORAGE_POND = auto()
     ANAEROBIC_LAGOON = auto()
     ANAEROBIC_DIGESTION = auto()
-    CUSTOM_STORAGE = auto()
+
+    SLURRY_STORAGE = STORAGE_POND
+    STORAGE_PIT = STORAGE_POND
 
     DEFAULT = STORAGE_POND
 
@@ -47,10 +49,10 @@ class BaseTreatment:
             pen
             treatment_init_data
         """
-        self.pen = pen
         self.treatment_enum = TreatmentEnum.get_enum(pen.manure_storage)
         self.treatment_init_data = treatment_init_data
-        self.manure_handler = manure_handler
+        self.manure_handler = manure_separator.reception_pit.manure_handler
+        self.reception_pit = manure_separator.reception_pit
         self.manure_separator = manure_separator
 
         self.all_output: List[TreatmentOutput] = []
@@ -65,8 +67,10 @@ class BaseTreatment:
     def update(self, pen: SimplePen) -> TreatmentOutput:
         # self.methane(pen.manure)
         # self.WIP_WOP_frac()
+        handler = self.manure_handler.last_output
+        rp = self.reception_pit.last_output
+        sep = self.manure_separator.last_output
         daily_output = TreatmentOutput(
-
         )
         self.all_output.append(daily_output)
         return daily_output
@@ -105,15 +109,6 @@ class AnaerobicLagoon(BaseTreatment):
         super().__init__(pen, manure_handler, manure_separator, treatment_init_data)
 
 
-class CustomTreatment(BaseTreatment):
-    def __init__(self,
-                 pen: SimplePen,
-                 manure_handler: BaseManureHandler,
-                 manure_separator: BaseSeparator,
-                 treatment_init_data: TreatmentInitData):
-        super().__init__(pen, manure_handler, manure_separator, treatment_init_data)
-
-
 class StoragePond(BaseTreatment):
     def __init__(self,
                  pen: SimplePen,
@@ -121,6 +116,21 @@ class StoragePond(BaseTreatment):
                  manure_separator: BaseSeparator,
                  treatment_init_data: TreatmentInitData):
         super().__init__(pen, manure_handler, manure_separator, treatment_init_data)
+        self.storage_time_period = 90  # days
+        self.freeboard = 0.0  # L
+
+    def update(self, pen: SimplePen) -> TreatmentOutput:
+        # self.methane(pen.manure)
+        # self.WIP_WOP_frac()
+        handler = self.manure_handler.last_output
+        rp = self.reception_pit.last_output
+        sep = self.manure_separator.last_output
+        daily_output = TreatmentOutput(
+            TAN_s=sep.TAN_s,
+            manure_nitrogen=sep.manure_nitrogen
+        )
+        self.all_output.append(daily_output)
+        return daily_output
 
 
 @dataclass
@@ -130,19 +140,36 @@ class TreatmentInitData:
     creation of a ManureHandler object.
 
     """
+    percent_dry_solids: float = 0.0
+    TS_removal_efficiency: float = 0.0
+    VS_removal_efficiency: float = 0.0
+    N_removal_efficiency: float = 0.0
+    TAN_removal_efficiency: float = 0.0
+    P_removal_efficiency: float = 0.0
+    K_removal_efficiency: float = 0.0
+    TS_DM_effluent_rate: float = 0.0
 
-    sludge_accumulation_volume: float = 0.00251
-    hydraulic_retention_time: int = 180
-    sludge_accumulation_period: float = 5.0
+    # sludge_accumulation_volume: float = 0.00251
+    # hydraulic_retention_time: int = 180
+    # sludge_accumulation_period: float = 5.0
 
     @classmethod
     def get_instance(cls, treatment_enum: TreatmentEnum) -> TreatmentInitData:
-        init_data = TreatmentInitData()
-
-        # Customize init data here based on enum if necessary
-        # ...
-
-        return init_data
+        enum_to_init_data: Dict[TreatmentEnum, TreatmentInitData] = {
+            TreatmentEnum.STORAGE_POND: TreatmentInitData(
+                percent_dry_solids=0.0,
+                TS_removal_efficiency=0.15,
+                VS_removal_efficiency=0.85,
+                N_removal_efficiency=0.05,
+                TAN_removal_efficiency=0.1,
+                P_removal_efficiency=0.0,
+                K_removal_efficiency=0.0,
+                TS_DM_effluent_rate=0.0
+            ),
+        }
+        if treatment_enum in enum_to_init_data:
+            return enum_to_init_data[treatment_enum]
+        return TreatmentInitData()
 
 
 class TreatmentFactory:
@@ -161,7 +188,6 @@ class TreatmentFactory:
         enum_to_class: Dict[TreatmentEnum, Type[BaseTreatment]] = {
             treatment_enum.STORAGE_POND: StoragePond,
             treatment_enum.ANAEROBIC_LAGOON: AnaerobicLagoon,
-            treatment_enum.ANAEROBIC_DIGESTION: AnaerobicDigestion,
-            treatment_enum.CUSTOM_STORAGE: CustomTreatment
+            treatment_enum.ANAEROBIC_DIGESTION: AnaerobicDigestion
         }
         return enum_to_class[treatment_enum](**params)

@@ -218,7 +218,7 @@ class ManureManagement:
                 for obj, cols, prefix in zip(data[1:], cols_list,
                                              ['handler_', 'rp_', 'sep_', 'tx_']):
                     for k, v in asdict(obj).items():
-                        cols[prefix + k].append(v)
+                        cols[prefix + k].append(round(v, 2))
         d = {
             'pen_id': pen_ids,
             'sim_day': sim_days,
@@ -232,7 +232,7 @@ class ManureManagement:
             **treatment_cols
         }
         df = pd.DataFrame(data=d)
-        current_time = datetime.now().strftime('%m_%d_%Y__%H_%M')
+        current_time = datetime.now().strftime('%m_%d_%Y__%H_00')
         df.to_csv(f'RUFAS/routines/manure_management/output/manure_management_output_{current_time}.csv',
                   index=False)
 
