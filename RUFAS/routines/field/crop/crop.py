@@ -302,10 +302,12 @@ class Crop:
         # list of the order the crops are growing in, originally set to default
         double_cropping_limit = 2
 
+
+        #TODO 1. I think this is causing issues. 
+
         self.grow_regimen = \
             [[self.current_crop for _ in range(0, double_cropping_limit)]
              for _ in range(0, len(time.years))]
-
         self.set_grow_regimen(time)
 
         # dormancy for perennial crops
