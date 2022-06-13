@@ -51,7 +51,7 @@ class BaseTreatment:
         """
         self.treatment_enum = TreatmentEnum.get_enum(pen.manure_storage)
         self.treatment_init_data = treatment_init_data
-        self.manure_handler = manure_separator.reception_pit.manure_handler
+        self.manure_handler = manure_handler
         self.reception_pit = manure_separator.reception_pit
         self.manure_separator = manure_separator
 
@@ -65,8 +65,6 @@ class BaseTreatment:
         return self.all_output[-1] if len(self.all_output) > 0 else None
 
     def update(self, pen: SimplePen) -> TreatmentOutput:
-        # self.methane(pen.manure)
-        # self.WIP_WOP_frac()
         handler = self.manure_handler.last_output
         rp = self.reception_pit.last_output
         sep = self.manure_separator.last_output
@@ -119,9 +117,11 @@ class StoragePond(BaseTreatment):
         self.storage_time_period = 90  # days
         self.freeboard = 0.0  # L
 
+    @property
+    def storage_volume(self) -> float:
+        return self.storage_time_period * self.manure_handler.last_output.total_daily_mass
+
     def update(self, pen: SimplePen) -> TreatmentOutput:
-        # self.methane(pen.manure)
-        # self.WIP_WOP_frac()
         handler = self.manure_handler.last_output
         rp = self.reception_pit.last_output
         sep = self.manure_separator.last_output

@@ -142,10 +142,6 @@ class ManureManagement:
             self.manure_separators[pen.id] = \
                 ManureSeparatorFactory.get_instance(pen=pen, reception_pit=self.reception_pits[pen.id])
 
-            # TODO: When implementing treatments, check to see if they need to
-            # know about both handler and separator
-            # To access the manure handler, either pass it in directly or use chaining
-            # as follows: manure_separator.reception_pit.manure_handler.some_attr_or_method
             self.treatments[pen.id] = TreatmentFactory.get_instance(
                     pen=pen,
                     manure_handler=self.manure_handlers[pen.id],

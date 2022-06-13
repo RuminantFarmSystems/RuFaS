@@ -22,21 +22,21 @@ class TreatmentOutput:
 
     def __add__(self, other: TreatmentOutput) -> TreatmentOutput:
         """
-        Add two StorageOptionVariables objects by summing
+        Add two TreatmentVariables objects by summing
         their corresponding attributes.
 
         Args:
-            other: the StorageOptionVariables object to be added to the `self` object
+            other: the TreatmentVariables object to be added to the `self` object
 
         Returns:
-            A new StorageOptionVariables object with summed attributes.
+            A new TreatmentVariables object with summed attributes.
             The original operands remain intact.
 
         """
 
         if not isinstance(other, TreatmentOutput):
-            raise TypeError('Cannot add a non-StorageOptionVariables object to a '
-                            'StorageOptionVariables object.')
+            raise TypeError('Cannot add a non-TreatmentVariables object to a '
+                            'TreatmentVariables object.')
 
         return TreatmentOutput(*[
             attr1 + attr2 for attr1, attr2 in zip(astuple(self), astuple(other))
