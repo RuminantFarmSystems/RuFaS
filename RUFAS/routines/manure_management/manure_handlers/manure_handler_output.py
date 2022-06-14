@@ -13,6 +13,7 @@ class ManureHandlerOutput:
     TSd: float = 0.0  # kg
     VSd: float = 0.0  # kg
     VSnd: float = 0.0  # kg
+    VS_total: float = field(init=False)
     p_excrt_manure: float = 0.0  # kg
     K_manure: float = 0.0  # kg
 
@@ -23,6 +24,8 @@ class ManureHandlerOutput:
     total_daily_mass: float = field(init=False)  # kg
 
     def __post_init__(self):
+        self.VS_total = self.VSd + self.VSnd
+
         self.total_daily_mass = sum([
             self.raw_manure,
             self.cleaning_water,

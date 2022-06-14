@@ -12,11 +12,11 @@ class TreatmentOutput:
     TSd: float = 0.0  # kg
     VSd: float = 0.0  # kg
     VSnd: float = 0.0  # kg
-    # VS_total: float = field(init=False)
-    VS_total: float = 0.0
+    VS_total: float = 0.0  # kg
     p_excrt_manure: float = 0.0  # kg
     K_manure: float = 0.0  # kg
     total_daily_mass: float = 0.0  # L
+    final_volume: float = 0.0  # m^3
 
     def clone(self) -> TreatmentOutput:
         return TreatmentOutput(**asdict(self))

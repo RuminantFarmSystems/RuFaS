@@ -14,6 +14,7 @@ class ReceptionPitOutput:
     TSd: float = 0.0
     VSd: float = 0.0
     VSnd: float = 0.0
+    VS_total: float = 0.0
     p_excrt_manure: float = 0.0
     K_manure: float = 0.0
 
