@@ -38,3 +38,4 @@ venv/
 
 # ignore .DS_store
 .DS_store
+.Rproj.user
