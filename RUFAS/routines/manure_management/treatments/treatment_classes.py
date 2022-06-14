@@ -18,6 +18,7 @@ from RUFAS.routines.manure_management.helpers.enum_helpers import ExtendedEnum
 from RUFAS.routines.manure_management.manure_handlers.manure_handler_classes import \
     BaseManureHandler
 from RUFAS.routines.manure_management.manure_separators.manure_separator_classes import BaseSeparator
+from RUFAS.routines.manure_management.misc.constants import ManureManagementConstants as Constants
 from RUFAS.routines.manure_management.misc.simple_pen import SimplePen
 from RUFAS.routines.manure_management.reception_pits.reception_pit_classes import ReceptionPitFactory
 from RUFAS.routines.manure_management.reception_pits.reception_pit_output import ReceptionPitOutput
@@ -287,8 +288,12 @@ class CustomTreatment(BaseTreatment):
                  pen: SimplePen,
                  manure_handler: BaseManureHandler,
                  manure_separator: BaseSeparator,
-                 treatment_init_data: TreatmentInitData):
+                 treatment_init_data: TreatmentInitData,
+                 storage_time_period=90,
+                 freeboard=0.0,
+                 precip=0.0):
         super().__init__(pen, manure_handler, manure_separator, treatment_init_data)
+
 
 
 class StoragePond(BaseTreatment):
@@ -298,6 +303,43 @@ class StoragePond(BaseTreatment):
                  manure_separator: BaseSeparator,
                  treatment_init_data: TreatmentInitData):
         super().__init__(pen, manure_handler, manure_separator, treatment_init_data)
+
+        self.storage_time_period = storage_time_period  # days
+        self.freeboard = freeboard  # m^3
+        self.precip = precip  # m^3 (25-year 24h storm event)
+
+    @property
+    def treatment_volume(self) -> float:
+        return self.storage_time_period * self.manure_handler.last_output.total_daily_mass  # m^3
+
+    @property
+    def total_volume(self) -> float:
+        return self.treatment_volume + self.freeboard + self.precip  # m^3
+
+    def update(self, pen: SimplePen) -> TreatmentOutput:
+        handler = self.manure_handler.last_output
+        rp = self.reception_pit.last_output
+        sep = self.manure_separator.last_output
+        daily_output = TreatmentOutput(
+            TAN_s=handler.TAN_s * (1 - self.treatment_init_data.TAN_removal_efficiency),
+            manure_nitrogen=handler.manure_nitrogen * (1 - self.treatment_init_data.N_removal_efficiency),
+            TSd=handler.TSd * (1 - self.treatment_init_data.TS_removal_efficiency),
+            VS_total=handler.VS_total * (1 - self.treatment_init_data.VS_removal_efficiency),
+            p_excrt_manure=handler.p_excrt_manure * (1 - self.treatment_init_data.P_removal_efficiency),
+            K_manure=handler.K_manure * (1 - self.treatment_init_data.K_removal_efficiency),
+        )
+
+        daily_output.final_volume = self.total_volume - (
+                (daily_output.TSd + daily_output.VS_total) * self.storage_time_period * Constants.KG_TO_CUBIC_METERS)
+
+        # If needed, modify output based on different combinations
+        # of handler and separator
+        # if self.manure_handler.manure_handler_enum == ManureHandlerEnum.FLUSH_SYSTEM:
+        #     pass
+
+        self.all_output.append(daily_output)
+        return daily_output
+
 
 
 @dataclass

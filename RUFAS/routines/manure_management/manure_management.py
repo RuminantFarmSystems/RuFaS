@@ -143,9 +143,9 @@ class ManureManagement:
                 ManureSeparatorFactory.get_instance(pen=pen, reception_pit=self.reception_pits[pen.id])
 
             self.treatments[pen.id] = TreatmentFactory.get_instance(
-                    pen=pen,
-                    manure_handler=self.manure_handlers[pen.id],
-                    manure_separator=self.manure_separators[pen.id]
+                pen=pen,
+                manure_handler=self.manure_handlers[pen.id],
+                manure_separator=self.manure_separators[pen.id]
             )
 
             self.all_data[pen.id]: List[DailyOutputType] = []
@@ -200,6 +200,9 @@ class ManureManagement:
         animal_types: List[str] = []
         housing_types: List[str] = []
         bedding_types: List[str] = []
+        handler_types: List[str] = []
+        separator_types: List[str] = []
+        treatment_types: List[str] = []
 
         manure_handler_cols = collections.defaultdict(list)
         reception_pit_cols = collections.defaultdict(list)
@@ -217,6 +220,9 @@ class ManureManagement:
                 animal_types.append(str(pen.classes_in_pen))
                 housing_types.append(pen.housing_type)
                 bedding_types.append(pen.bedding_type)
+                handler_types.append(pen.manure_handler)
+                separator_types.append(pen.manure_separator)
+                treatment_types.append(pen.manure_storage)
                 self.append_daily_data(manure_handler_output, 'handler_', manure_handler_cols)
                 self.append_daily_data(reception_pit_output, 'rp_', reception_pit_cols)
                 self.append_daily_data(manure_separator_output, 'sep__', manure_separator_cols)
@@ -229,6 +235,9 @@ class ManureManagement:
             'animal_types': animal_types,
             'housing_type': housing_types,
             'bedding_type': bedding_types,
+            'handler_type': handler_types,
+            'separator_type': separator_types,
+            'treatment_type': treatment_types,
             **manure_handler_cols,
             **reception_pit_cols,
             **manure_separator_cols,
@@ -252,13 +261,13 @@ class ManureManagement:
     def export_total_variables(self):
         tot = self.total_vars
         self.manure_management_output = ManureManagementOutput(
-                tot_manure=tot.raw_manure,
-                tot_N=tot.N,
-                tot_P=tot.P,
-                tot_K=tot.K,
-                tot_DM=tot.TS_DM_effluent,
-                WIP=tot.WIP,
-                WOP=tot.WOP
+            tot_manure=tot.raw_manure,
+            tot_N=tot.N,
+            tot_P=tot.P,
+            tot_K=tot.K,
+            tot_DM=tot.TS_DM_effluent,
+            WIP=tot.WIP,
+            WOP=tot.WOP
         )
 
     # TODO: Simplify all the for-loops into one
