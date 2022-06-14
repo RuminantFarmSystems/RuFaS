@@ -1,4 +1,4 @@
-from RUFAS.routines.manure_management import manure_separators, reception_pits, treatments, treatments_deprecated
+from RUFAS.routines.manure_management import manure_separators, reception_pits, treatments
 from RUFAS.routines.manure_management.manure_handlers.manure_handler_classes.alley_scraper import AlleyScraper
 from RUFAS.routines.manure_management.manure_handlers.manure_handler_classes.custom_manure_handler import CustomManureHandler
 from RUFAS.routines.manure_management.manure_handlers.manure_handler_classes.flush_system import FlushSystem
@@ -229,25 +229,25 @@ class ManureManagement2:
     @staticmethod
     def initialize_treatment(treatment, storage, treatment_data):
         if treatment.startswith('null'):
-            return treatments_deprecated.null_treatment.NullTreatment(storage)
+            return RUFAS.routines.manure_management.to_be_removed.treatments_deprecated.null_treatment.NullTreatment(storage)
 
         if treatment not in treatment_data:
             print(treatment, 'not listed under treatments_deprecated in manure management JSON file. Setting to null.')
-            return treatments_deprecated.null_treatment.NullTreatment(storage)
+            return RUFAS.routines.manure_management.to_be_removed.treatments_deprecated.null_treatment.NullTreatment(storage)
 
         treatment_data = treatment_data[treatment]
 
         if treatment == 'base_treatment':
-            return treatments_deprecated.base_treatment.BaseTreatment(treatment, treatment_data, storage)
+            return RUFAS.routines.manure_management.to_be_removed.treatments_deprecated.base_treatment.BaseTreatment(treatment, treatment_data, storage)
         elif treatment == 'anaerobic_digester':
-            return treatments_deprecated.anaerobic_digester.AnaerobicDigester(treatment, treatment_data, storage)
+            return RUFAS.routines.manure_management.to_be_removed.treatments_deprecated.anaerobic_digester.AnaerobicDigester(treatment, treatment_data, storage)
         else:
             print(treatment, 'not currently implemented for manure management. Creating custom treatment.')
             if treatment_data['default']:
                 print('Cannot use default values for manure treatment', treatment, '. Setting to anaerobic digester.')
-                return treatments_deprecated.anaerobic_digester.AnaerobicDigester(treatment, treatment_data, storage)
+                return RUFAS.routines.manure_management.to_be_removed.treatments_deprecated.anaerobic_digester.AnaerobicDigester(treatment, treatment_data, storage)
             else:
-                return treatments_deprecated.custom_treatment.CustomTreatment(treatment, treatment_data, storage)
+                return RUFAS.routines.manure_management.to_be_removed.treatments_deprecated.custom_treatment.CustomTreatment(treatment, treatment_data, storage)
 
     @staticmethod
     def initialize_storage(storage, storage_data):

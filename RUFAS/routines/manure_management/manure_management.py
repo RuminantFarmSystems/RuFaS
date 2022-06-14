@@ -187,6 +187,11 @@ class ManureManagement:
 
         self.export_output_to_csv()
 
+    @staticmethod
+    def append_daily_data(output_obj, prefix: str, cols: Dict):
+        for variable, value in asdict(output_obj).items():
+            cols[prefix + variable].append(round(value, 2))
+
     def export_output_to_csv(self):
         print(f'Exporting to csv')
         pen_ids: List[int] = []
@@ -200,21 +205,23 @@ class ManureManagement:
         reception_pit_cols = collections.defaultdict(list)
         manure_separator_cols = collections.defaultdict(list)
         treatment_cols = collections.defaultdict(list)
-        cols_list = [manure_handler_cols, reception_pit_cols, manure_separator_cols,
-                     treatment_cols]
         for pen_id in sorted(self.all_data.keys()):
             for idx, data in enumerate(self.all_data[pen_id]):
                 pen_ids.append(pen_id)
                 sim_days.append(idx + 1)
-                pen = data[0]
+                pen, *outputs = data
+                manure_handler_output, reception_pit_output = outputs[:2]
+                manure_separator_output, treatment_output = outputs[2:]
+
                 num_animals.append(pen.num_animals)
                 animal_types.append(str(pen.classes_in_pen))
                 housing_types.append(pen.housing_type)
                 bedding_types.append(pen.bedding_type)
-                for obj, cols, prefix in zip(data[1:], cols_list,
-                                             ['handler_', 'rp_', 'sep_', 'tx_']):
-                    for k, v in asdict(obj).items():
-                        cols[prefix + k].append(round(v, 2))
+                self.append_daily_data(manure_handler_output, 'handler_', manure_handler_cols)
+                self.append_daily_data(reception_pit_output, 'rp_', reception_pit_cols)
+                self.append_daily_data(manure_separator_output, 'sep__', manure_separator_cols)
+                self.append_daily_data(treatment_output, 'tx__', treatment_cols)
+
         d = {
             'pen_id': pen_ids,
             'sim_day': sim_days,

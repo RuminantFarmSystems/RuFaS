@@ -10,8 +10,6 @@ the SandSeparator has a method, separateSand() which does that.
 Author(s): Yunus Mohammed, ymm26@cornell.edu
 """
 
-from ..materials.bedding.sand_bedding import *
-
 
 class SandSeparator:
     """
