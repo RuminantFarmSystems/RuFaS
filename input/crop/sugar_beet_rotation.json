@@ -7,7 +7,8 @@
             "repeat": 1,
             "planting_day": 121,
             "harvest_day": 319,
-            "harvest_type": "optimal"
+            "harvest_type": "optimal",
+            "planting_order" : "1st"
         }
     }
 }
