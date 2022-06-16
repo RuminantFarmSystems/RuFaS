@@ -7,28 +7,32 @@
             "repeat": 0,
             "planting_day": 92,
             "harvest_day": 225,
-            "harvest_type": "scheduled"
+            "harvest_type": "scheduled",
+            "planting_order": "1st"
         },
         "potato_14": {
             "plant_years": [2014],
             "repeat": 0,
             "planting_day": 119,
             "harvest_day": 281,
-            "harvest_type": "scheduled"
+            "harvest_type": "scheduled",
+            "planting_order": "1st"
         },
         "sugar_beet_15": {
             "plant_years": [2015],
             "repeat": 0,
             "planting_day": 89,
             "harvest_day": 215,
-            "harvest_type": "scheduled"
+            "harvest_type": "scheduled",
+            "planting_order": "1st"
         },
         "spring_barley_16": {
             "plant_years": [2016],
             "repeat": 0,
             "planting_day": 129,
             "harvest_day": 313,
-            "harvest_type": "scheduled"
+            "harvest_type": "scheduled",
+            "planting_order": "1st"
         }
     }
 }
