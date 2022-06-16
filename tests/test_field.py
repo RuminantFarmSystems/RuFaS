@@ -7,6 +7,21 @@ Author(s): Pooya Hekmati, sh2235@cornell.edu
 
 import pytest
 
+import logging
+LOGGER = logging.getLogger()
+logging.basicConfig(level = logging.INFO)
+
+from unittest.mock import MagicMock
+import numpy as np
+import RUFAS
+
+from RUFAS.classes import Time
+from RUFAS.routines.field.soil import Soil
+from RUFAS.routines.field.field_management import FieldManagement
+from RUFAS.routines.field.crop.crop_types.soybean import Soybean
+from RUFAS.routines.field.crop.yields import calc_residue
+
+
 
 def test_daily_fields_routine():
     """Unit test for function daily_fields_routine in file routines/field/field.py"""
@@ -460,7 +475,42 @@ def test_calc_nutrient_removal():
 
 def test_calc_residue():
     """Unit test for function calc_residue in file routines/field/crop/yields.py"""
-    pass
+    try:
+        LOGGER.info("Testing function calc_residue in yields.py")
+        test_soil = MagicMock(Soil)
+        test_soil_layer = MagicMock(Soil.SoilLayer)
+
+        #using Soybean, can be any other valid crop
+        test_crop_type = MagicMock(Soybean) 
+
+        test_time = MagicMock(Time)
+        
+        crop_attributes = {
+            "fr_root" : 0,
+            "biomass_actual" : 1,
+            "yield_actual": 0,
+            "kill_day" : 1,
+            "crop_type" : 'annual',
+        }
+        time_attributes = {
+            "day" : 1
+        }
+        soil_layer_attributes = {
+            "tillage_percent" : 0.55
+        }
+        soil_attributes = {
+            "soil_layers" : [soil_layer_attributes],
+        }
+        test_crop_type.configure_mock(**crop_attributes)
+        test_soil_layer.configure_mock(**soil_layer_attributes)
+        test_soil.configure_mock(**soil_attributes)
+        test_time.configure_mock(**time_attributes)
+
+        np.testing.assert_almost_equal(0,test_soil.residue_harvest) 
+
+        assert True
+    except:
+        assert False
 
 
 def test_calc_harvest_quality():
