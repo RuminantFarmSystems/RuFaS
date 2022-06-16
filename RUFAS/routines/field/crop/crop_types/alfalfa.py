@@ -31,6 +31,7 @@ class Alfalfa(BaseCrop):
         self.planted = False
         self.growing = False
         self.killed = False
+        self.extracted = alfalfa_data['extracted']
 
         self.fix_nitrogen = True
 

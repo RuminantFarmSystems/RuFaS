@@ -215,7 +215,8 @@ def calc_residue(soil, crop_type, field_management, time):
     # for carbon, needs to be calculated only at harvest
     # C.3.A.4
     crop_type.bio_BG = crop_type.fr_root * crop_type.biomass_actual
-    soil.soil_layers[0].tillage_percent = 0.55
+    soil.soil_layers[0].tillage_percent = 0.55 #TODO. hard coded value
+
     # lignin residue reset at harvest
     soil.AG_lignin_res_percent = 17  # TODO
     soil.BG_lignin_res_percent = 17  # TODO
