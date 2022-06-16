@@ -518,6 +518,8 @@ class Soil:
 
             self.K = 0.0
 
+            self.ADJ_crop_type_bio_BG = 0.0
+
     def initialize_profile_characteristics(self):
         if self.cover == "GRASSED":
             self.cover_factor = 0.8
