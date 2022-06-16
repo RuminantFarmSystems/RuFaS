@@ -10,8 +10,8 @@ Author(s): Kass Chupongstimun, kass_c@hotmail.com
 """
 
 from math import acos, asin, sin, tan, pi
-from .crop_types import base_crop, alfalfa, corn, soybean, tall_fescue, spring_barley, potato, sugar_beet, spring_wheat,\
-    winter_wheat, cereal_rye, triticale, fall_oats
+from .crop_types import base_crop, alfalfa, corn, soybean, tall_fescue, spring_barley,\
+potato, sugar_beet, spring_wheat,winter_wheat, cereal_rye, triticale, fall_oats
 from . import heat_units, leaf_area_index, root_development, biomass, yields, \
     phosphorus_uptake, nitrogen_uptake, growth_constraints
 
@@ -34,24 +34,23 @@ def daily_crop_routine(soil, crop, field_management, weather, time):
     crop_type = crop.current_crop
 
     # If there is no crop in rotation, current crop will be named
+
     daily_reset(crop_type, soil)
     # 'null'. The routine is skipped in this case
     if crop_type.crop_name != 'null':
 
-        #if the crop was killed the previous day, set the new crop
-        if crop_type.killed:
+        crop_was_killed_yesterday = crop_type.killed
+        if crop_was_killed_yesterday:
             # set the next crop to grow in a double cropping rotation
             if crop_type.harvest_day > crop_type.planting_day:
                 if crop_type.planting_order == '1st':
-                    if crop.current_crop_year[1].crop_name != 'null':
+                    if crop.current_crop_year[0].crop_name != 'null':
                         crop_type.killed = False
-                        crop.current_crop = crop.current_crop_year[1]
+                        crop.current_crop = crop.current_crop_year[0]
                         crop.current_crop.kill_year = is_kill_year(crop, time)
 
-            # current crop year will be this years current crop while the current crop
-            # will be last years latter crop and will be replaced with this years first crop
-            # if harvest day is less than planting day this is the case
-            # otherwise it is a spring-summer, summer-fall rotation
+            # current crop year will be this years current crop, the current crop will be last years latter crop, 
+            # replaced with this years first crop when applicable
             elif crop_type.harvest_day <= crop_type.planting_day:
                 if crop.current_crop_year[0].crop_name != 'null':
                     crop_type.killed = False
@@ -69,14 +68,11 @@ def daily_crop_routine(soil, crop, field_management, weather, time):
         soil.residue_harvest = 0
         soil.soil_layers[0].fr_tillage = 0
 
-        # If the crop is not planted yet, determine whether it is planted today
         if not crop_type.planted:
             calculate_start(soil, crop, field_management, weather, time)
 
-        # Once the crop is planted:
         else:
 
-            # If the crop is growing, run the routines
             if crop_type.growing:
                 heat_units.update_all(crop_type, weather, time)
 
@@ -138,7 +134,7 @@ def daily_reset(crop_type, soil):
     crop_type.P_yield = 0
 
     crop_type.HI_actual = 0
-    crop_type.bio_BG = 0
+    #crop_type.bio_BG = 0
     soil.residue_harvest = 0
     soil.soil_layers[0].fr_tillage = 0
 
@@ -172,7 +168,6 @@ def annual_crop_routine(crop, time):
 
     # current crop year is set to the next year of crops in the regimen
     crop.current_crop_year = crop.grow_regimen[time.year - 1]
-    
     # current crop is the first crop to grow in the selected year
     crop.current_crop = crop.current_crop_year[0]
 

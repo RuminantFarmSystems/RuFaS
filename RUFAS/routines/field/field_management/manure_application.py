@@ -57,13 +57,13 @@ def formulate_manure_application(manure_storage, m_app):
     for storage in manure_storage.storage.values():
         available_manure = storage.TS + storage.TS_liquid
 
-        if available_manure == 0:
-            continue
-
         # FM.4.A.1-3
         available_N = storage.N + storage.N_liquid
         available_P = storage.P + storage.P_liquid
         available_K = storage.K + storage.K_liquid
+
+        if available_manure == 0 or available_N ==0 or available_P == 0 or available_K == 0:
+            continue
 
         # FM.4.A.4
         N_frac = available_N / available_manure
@@ -149,8 +149,8 @@ def formulate_manure_application(manure_storage, m_app):
         if desired_P != 0:
             manure_application['P_mass'] += desired_P
 
-        N_frac = 0.05 if N_frac == 0 else N_frac
-        P_frac = 0.06 if P_frac == 0 else P_frac
+        N_frac = 1 if N_frac == 0 else N_frac #TODO: this is an adjustment feature that is availabe if the manure input where total manure, not the exact values. 
+        P_frac = 1 if P_frac == 0 else P_frac #TODO: this is an adjustment feature that is availabe if the manure input where total manure, not the exact values. 
         solid_ratio = 0.65 if solid_ratio == 0 else solid_ratio
         manure_application['mass'] = max(manure_application['N_mass'] / N_frac,
                                          manure_application['P_mass'] / P_frac)

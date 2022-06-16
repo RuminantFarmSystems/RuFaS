@@ -1,5 +1,8 @@
 matplotlib
+mock
 numpy
 pandas
-scipy
+pyomo
 pytest
+pytest-mock
+scipy
