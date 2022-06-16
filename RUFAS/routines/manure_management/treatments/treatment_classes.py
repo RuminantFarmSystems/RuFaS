@@ -76,21 +76,6 @@ class BaseTreatment:
         self.all_output.append(daily_output)
         return daily_output
 
-    def methane(self, manure):
-        # manure.CH4_emissions = self.VS * manure.Bo * manure.MCF * manure.MS * manure.m3
-        # self.daily_vars.CH4 = self.daily_vars.VS * Constants.Bo * Constants.MCF * Constants.MS * Constants.m3
-        pass
-
-    def WIP_WOP_frac(self):
-        # daily = self.daily_vars
-        # if daily.TS + daily.VS == 0:
-        #     daily.WIP_frac = 0.0
-        #     daily.WOP_frac = 0.0
-        # else:
-        #     daily.WIP_frac = daily.WIP / (daily.TS + daily.VS)
-        #     daily.WOP_frac = daily.WOP / (daily.TS + daily.VS)
-        pass
-
 
 class AnaerobicDigestion(BaseTreatment):
     """
@@ -282,18 +267,6 @@ class AnaerobicLagoon(BaseTreatment):
                  manure_handler: BaseManureHandler,
                  manure_separator: BaseSeparator,
                  treatment_init_data: TreatmentInitData):
-        super().__init__(pen, manure_handler, manure_separator, treatment_init_data)
-
-
-class CustomTreatment(BaseTreatment):
-    def __init__(self,
-                 pen: SimplePen,
-                 manure_handler: BaseManureHandler,
-                 manure_separator: BaseSeparator,
-                 treatment_init_data: TreatmentInitData,
-                 storage_time_period=90,
-                 freeboard=0.0,
-                 precip=0.0):
         super().__init__(pen, manure_handler, manure_separator, treatment_init_data)
 
 
