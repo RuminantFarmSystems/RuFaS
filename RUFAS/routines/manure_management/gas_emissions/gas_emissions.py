@@ -88,5 +88,6 @@ class FakeOutput:
 
 
 if __name__ == '__main__':
-    print(GasEmissions.calc_methane(FakeOutput()))
-    print(GasEmissions.calc_methane2(FakeOutput()))
+    print(f'method1: {GasEmissions.calc_methane(FakeOutput())}')
+    print()
+    print(f'method2: {GasEmissions.calc_methane2(FakeOutput())}')
