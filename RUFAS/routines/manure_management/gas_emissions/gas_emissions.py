@@ -91,3 +91,22 @@ if __name__ == '__main__':
     print(f'method1: {GasEmissions.calc_methane(FakeOutput())}')
     print()
     print(f'method2: {GasEmissions.calc_methane2(FakeOutput())}')
+    
+
+"""
+Calculates the ECH4_floor.
+Inputs: 
+  T: ambient barn temperature, °C
+  Area_barn: area of the barn floor covered with manure, m2
+"""
+def calculate_ECH4_floor(T, Area_barn):
+  return max(0.0, 0.13 * T) * Area_barn / 1000
+
+"""
+Calculates the EC02_floor.
+Inputs:
+  T: ambient barn temperature, C
+  Area_barn: area of the barn flooor covered with manure, m2
+"""
+def calculate_EC02_floor(T, Area_barn):
+  return max (0.0, 0.0065 + 0.0192 T ) Area_barn
