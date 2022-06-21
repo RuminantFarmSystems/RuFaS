@@ -180,7 +180,7 @@
 			"pen_type": "tiestall",
 			"manure_handling": "manual_scraping",
 			"manure_separator": "screw_press",
-			"manure_storage": "anaerobic_lagoon",
+			"manure_storage": "storage_pit",
 			"max_stocking_density": 1.2
 		}
 	}
