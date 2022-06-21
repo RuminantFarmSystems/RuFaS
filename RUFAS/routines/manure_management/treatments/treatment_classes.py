@@ -148,7 +148,7 @@ class AnaerobicDigestion(BaseTreatment):
 
         total_solids = reception_pit_output_data.TSd                                                                # kg/day
         volatile_solids_loading = reception_pit_output_data.VSd + reception_pit_output_data.VSnd                    # kg/day
-        wastewater_volume = reception_pit_output_data.total_daily_mass / self.treatment_init_data.density_water     # m^3/day
+        wastewater_volume = reception_pit_output_data.total_daily_mass / Constants.DENSITY_WATER_KG_PER_M3          # m^3/day
 
         ## May use these default input values to test the calculation method
         # wastewater_volume = 270.51         # From pens-   m^3/day
@@ -161,7 +161,7 @@ class AnaerobicDigestion(BaseTreatment):
         # TODO: Check whether this variable should be an output.
         ## m^3/year  MS.3.B.1
         sav = self.treatment_init_data.SAV_FRACTION*volatile_solids_loading*self.treatment_init_data.sludge_accumulation_period* \
-            self.treatment_init_data.days_in_year/self.treatment_init_data.density_water
+            Constants.DAYS_PER_YEAR/Constants.DENSITY_WATER_KG_PER_M3
 
         # Minimum digester volume required for processing inflow  (m^3)
         # MS.3.B.2
@@ -186,12 +186,9 @@ class AnaerobicDigestion(BaseTreatment):
         #MS.3.B.7
         methane_generation_volume = biogas_generation*self.treatment_init_data.METHANE_GEN_RATIO      ## Methane content of biogas (m3)  
         
-        # TODO: Add these constants to init data or constants class in misc module
-        methane_energy_density = 55 ## MJ / kg 
-        methane_density = 0.657 ## kg/m^3
 
         ## Energy content of biogas
-        energy_content = methane_generation_volume*methane_density*methane_energy_density ###
+        energy_content = methane_generation_volume*Constants.METHANE_DENSITY*Constants.METHANE_ENERGY_DENSITY ###
 
 
 
@@ -404,9 +401,6 @@ class AnaerobicDigestorInitData(TreatmentInitData):
 
     SAV_FRACTION: float = 0.03                      ## Sludge Accumulation volume fraction 2-4% of VS loaded
 
-    density_water: float = 999                     # kg/m3
-    days_in_year: int = 365                         # days per year
-
     TOP_COVER_VOLUME_FRACTION: float = 0.2          ## Should be between 10-30% 
     BIOGAS_GEN_RATIO: float = 0.38                  ## 0.23 to 0.39 kg CH4/kg VS
     METHANE_GEN_RATIO: float = 0.65                 ## 0.5-0.65 according to spreadsheet  
@@ -421,7 +415,3 @@ class AnaerobicDigestorInitData(TreatmentInitData):
     P_FRACTION: float = 0.01                        # 0-5% P fraction
     K_FRACTION: float = 0.0                         # 0-5% K fraction
 
-    @classmethod
-    def get_instance(cls, treatment_enum: TreatmentEnum) -> TreatmentInitData:
-        init_data = AnaerobicDigestorInitData()
-        return init_data
