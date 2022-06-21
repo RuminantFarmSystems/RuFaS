@@ -231,41 +231,37 @@ class AnaerobicDigestion(BaseTreatment):
         P_content = P_from_pen-(P_from_pen_kg_per_day/total_solids)*self.treatment_init_data.P_FRACTION
         K_content = K_from_pen-(K_from_pen_kg_per_day/total_solids)*self.treatment_init_data.K_FRACTION
 
-        daily_output = AnaerobicDigesterOutput(
-            #TODO: Check difference between TS and TS_liquid for effluent
-                    TS = effluent_total_solids,
-                    VS = effluent_volatile_solids,
-                    N = N_content,
-                    P = P_content,
-                    K = K_content,
+        self.minimum_digester_volume = minimum_digester_volume,              ## Minimum Digester Volume calculated based on daily inflow (m^3)
+        self.top_cover_volume = top_cover_volume,                            ## TopCover Volume calculated based on Digester Volume (m^3)
+        self.sludge_accumulation_volume = sav,                               ## sludge_accumulation_volume (per day?)
+        
+        self.evaporated_water = evaporated_water,
 
-                    TS_liquid = 0.0,
-                    VS_liquid = 0.0,
-                    N_liquid = 0.0,
-                    P_liquid = 0.0,
-                    K_liquid = 0.0,
+        daily_output = AnaerobicDigesterOutput(
+            
+                    TS = 0.0,
+                    VS = 0.0,
+                    N = 0.0,
+                    P = 0.0,
+                    K = 0.0,
+
+                    TS_liquid = effluent_total_solids,
+                    VS_liquid = effluent_volatile_solids,
+                    N_liquid = N_content,
+                    P_liquid = P_content,
+                    K_liquid = K_content,
 
                     WIP = 0.0,
                     WOP = 0.0,
                     WIP_frac = 0.0,
                     WOP_frac = 0.0,
-                    CH4 = 0.0,  ## May use this variable name instead of methane_generation_volume
+                    #TODO: Check units on methane output
+                    CH4 = methane_generation_volume,  
 
-                    # Important Outputs from AD object
-
-                    biogas = biogas_generation,                                     ## biogas production per day (m3/day)
-                    methane_generation_volume = methane_generation_volume,          ## biogas production per day (m3/day)
-                    energy_content = energy_content,                                ## biogas energy content (MJ/m3)
-                    minimum_digester_volume = minimum_digester_volume,              ## Minimum Digester Volume calculated based on daily inflow (m^3)
-                    top_cover_volume = top_cover_volume,                            ## TopCover Volume calculated based on Digester Volume (m^3)
-                    sludge_accumulation_volume = sav,                               ## sludge_accumulation_volume (per day?)
-                    
-                    evaporated_water = evaporated_water,
-                    effluent_waste_volume = effluent_waste_volume,
-                    effluent_total_solids = effluent_total_solids,
-                    effluent_volatile_solids = effluent_volatile_solids
-
-
+                    ## Outputs for AD
+                    AD_effluent_volume = effluent_waste_volume,                     ## methane production per day (m3/day)
+                    AD_biogas = biogas_generation,                                  ## biogas production per day (m3/day)
+                    AD_biogas_energy_content = energy_content,                       ## biogas energy content (MJ/m3)                       
         )
         
         return daily_output
