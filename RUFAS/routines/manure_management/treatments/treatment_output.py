@@ -71,19 +71,10 @@ class AnaerobicDigesterOutput(TreatmentOutput):
     WOP_frac: float = 0.0
     CH4: float = 0.0
 
-
-    biogas: float = 0.0                                 ## biogas production per day (kg/day)
-    methane_generation_volume: float = 0.0              ## methane production per day (m3/day)
-    energy_content: float = 0.0                         ## biogas energy content (MJ/m3)
-    minimum_digester_volume: float = 0.0                ## Minimum Digester Volume calculated based on daily inflow (m^3)
-    top_cover_volume: float = 0.0                       ## TopCover Volume calculated based on Digester Volume (m^3)
-
-    # TODO: Check on sludge_accumulation_volume physical meaning 
-    sludge_accumulation_volume: float = 0.0             ## sludge_accumulation_volume (per day?)
-    evaporated_water: float = 0.0                       ## evaporated Water (m^3/day)
-    effluent_waste_volume: float = 0.0                  ## Effluent waste volume
-    effluent_total_solids: float = 0.0             ## sludge_accumulation_volume (per day?)
-    effluent_volatile_solids: float = 0.0             ## sludge_accumulation_volume (per day?)
+    ## Outputs for AD
+    AD_effluent_volume: float = 0.0,                            ## effluent volume of AD (m3/day)
+    AD_biogas: float = 0.0,                                     ## biogas production per day (m3/day)
+    AD_biogas_energy_content: float = 0.0,                      ## biogas energy content (MJ/m3)
 
     def clone(self) -> TreatmentOutput:
         return AnaerobicDigesterOutput(**asdict(self))
