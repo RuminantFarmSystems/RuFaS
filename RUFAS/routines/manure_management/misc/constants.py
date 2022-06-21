@@ -8,3 +8,8 @@ class ManureManagementConstants:
     UREA_DENSITY = 1.32  # g/cm^3 = g/mL = kg/L
     TAN_MOLAR_MASS = 17.0306  # g/mol
 
+    DENSITY_WATER_KG_PER_M3 = 997                   # kg/m3
+    DAYS_PER_YEAR = 365                             # days per year
+    METHANE_ENERGY_DENSITY = 55                     ## MJ / kg 
+    METHANE_DENSITY = 0.657                         ## kg/m^3
+
