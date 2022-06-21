@@ -204,6 +204,7 @@ class ManureManagement:
         separator_types: List[str] = []
         treatment_types: List[str] = []
 
+        manure_cols = collections.defaultdict(list)
         manure_handler_cols = collections.defaultdict(list)
         reception_pit_cols = collections.defaultdict(list)
         manure_separator_cols = collections.defaultdict(list)
@@ -223,6 +224,8 @@ class ManureManagement:
                 handler_types.append(pen.manure_handler)
                 separator_types.append(pen.manure_separator)
                 treatment_types.append(pen.manure_storage)
+
+                self.append_daily_data(pen.manure, 'manure_', manure_cols)
                 self.append_daily_data(manure_handler_output, 'handler_', manure_handler_cols)
                 self.append_daily_data(reception_pit_output, 'rp_', reception_pit_cols)
                 self.append_daily_data(manure_separator_output, 'sep__', manure_separator_cols)
@@ -238,6 +241,7 @@ class ManureManagement:
             'handler_type': handler_types,
             'separator_type': separator_types,
             'treatment_type': treatment_types,
+            **manure_cols,
             **manure_handler_cols,
             **reception_pit_cols,
             **manure_separator_cols,

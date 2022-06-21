@@ -385,7 +385,6 @@ class TreatmentFactory:
             treatment_enum.STORAGE_POND: StoragePond,
             treatment_enum.ANAEROBIC_LAGOON: AnaerobicLagoon,
             treatment_enum.ANAEROBIC_DIGESTION: AnaerobicDigestion,
-            treatment_enum.CUSTOM_STORAGE: CustomTreatment
         }
         return enum_to_class[treatment_enum](**params)
 
