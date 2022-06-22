@@ -149,16 +149,10 @@ class AnaerobicDigestion(BaseTreatment):
         total_solids = reception_pit_output_data.TSd                                                                # kg/day
         volatile_solids_loading = reception_pit_output_data.VSd + reception_pit_output_data.VSnd                    # kg/day
         wastewater_volume = reception_pit_output_data.total_daily_mass / Constants.DENSITY_WATER_KG_PER_M3          # m^3/day
-
-        ## May use these default input values to test the calculation method
-        # wastewater_volume = 270.51         # From pens-   m^3/day
-        # total_solids = 2548.70             # from pen - kg/day
-        # volatile_solids_loading = 1980.94  # from pen - kg/day
-        
+       
         total_solids_concentration = total_solids/wastewater_volume                 ## g/L
         volatile_solids_concentration = volatile_solids_loading/wastewater_volume   ## g/L
 
-        # TODO: Check whether this variable should be an output.
         ## m^3/year  MS.3.B.1
         sav = self.treatment_init_data.SAV_FRACTION*volatile_solids_loading*self.treatment_init_data.sludge_accumulation_period* \
             Constants.DAYS_PER_YEAR/Constants.DENSITY_WATER_KG_PER_M3
@@ -177,20 +171,15 @@ class AnaerobicDigestion(BaseTreatment):
         vs_loading_rate = volatile_solids_concentration / digester_volume_of_anaerobic_lagoon
 
         ## kg biogas generated in digester 
-
         #MS.3.B.6
         biogas_generation = self.treatment_init_data.BIOGAS_GEN_RATIO*volatile_solids_loading   
-
 
         # TODO: Double check units in spreadsheet on methane production
         #MS.3.B.7
         methane_generation_volume = biogas_generation*self.treatment_init_data.METHANE_GEN_RATIO      ## Methane content of biogas (m3)  
         
-
         ## Energy content of biogas
         energy_content = methane_generation_volume*Constants.METHANE_DENSITY*Constants.METHANE_ENERGY_DENSITY ###
-
-
 
         #### ------------------------Digester EFFLUENT Characteristics-------------------------------------
         #MS.3.B.8
@@ -205,37 +194,16 @@ class AnaerobicDigestion(BaseTreatment):
         #MS.3.B.10
         effluent_volatile_solids = self.treatment_init_data.VS_FRACTION*volatile_solids_concentration  ## g/L
 
- 
-        """ May want to save these values for testing the methods"""
-        # N_from_pen = 7.32 ## g/L 
-        # P_from_pen = 0.26 ## g/L 
-        # K_from_pen = 0.53 ## g/L 
+        # N_content of outputs
+        N_content = (1-self.treatment_init_data.N_FRACTION)*(reception_pit_output_data.manure_nitrogen/total_solids)
+        P_content = (1-self.treatment_init_data.P_FRACTION)*(reception_pit_output_data.p_excrt_manure/total_solids)
+        K_content = (1-self.treatment_init_data.K_FRACTION)*(reception_pit_output_data.K_manure/total_solids)
 
-        # N_from_pen_kg_per_day = 1980.9 ## kg/day
-        # P_from_pen_kg_per_day = 69.6 ## kg/day
-        # K_from_pen_kg_per_day = 136.0 ## kg/day
-        
-        """ These variables come from the Pen 1 sheet in spreadsheet, and  reception pit in Rufas"""
-        """ These should be replaced by mapping reception pit outputs to required inputs (TS,VS, and volumetric flow)"""
-    
-        N_from_pen = 7.32 ## g/L 
-        P_from_pen = 0.26 ## g/L 
-        K_from_pen = 0.53 ## g/L 
-
-        N_from_pen_kg_per_day = reception_pit_output_data.manure_nitrogen ## kg/day
-        P_from_pen_kg_per_day = reception_pit_output_data.p_excrt_manure  ## kg/day
-        K_from_pen_kg_per_day = reception_pit_output_data.K_manure        ## kg/day
-        # TODO: Should I use the N_FRACTION or (1-N_FRACTION)
-        #MS.3.B.11      
-        N_content = N_from_pen-(N_from_pen_kg_per_day/total_solids)*self.treatment_init_data.N_FRACTION
-        P_content = P_from_pen-(P_from_pen_kg_per_day/total_solids)*self.treatment_init_data.P_FRACTION
-        K_content = K_from_pen-(K_from_pen_kg_per_day/total_solids)*self.treatment_init_data.K_FRACTION
-
-        self.minimum_digester_volume = minimum_digester_volume,              ## Minimum Digester Volume calculated based on daily inflow (m^3)
-        self.top_cover_volume = top_cover_volume,                            ## TopCover Volume calculated based on Digester Volume (m^3)
-        self.sludge_accumulation_volume = sav,                               ## sludge_accumulation_volume (per day?)
-        
-        self.evaporated_water = evaporated_water,
+        """ Track these variables for testing but not for outputs """
+        self.minimum_digester_volume = minimum_digester_volume              ## Minimum Digester Volume calculated based on daily inflow (m^3)
+        self.top_cover_volume = top_cover_volume                            ## TopCover Volume calculated based on Digester Volume (m^3)
+        self.sludge_accumulation_volume = sav                               ## sludge_accumulation_volume (per day?)
+        self.evaporated_water = evaporated_water
 
         daily_output = AnaerobicDigesterOutput(
             
@@ -383,7 +351,7 @@ class TreatmentFactory:
 
 
 @dataclass
-class AnaerobicDigestorInitData(TreatmentInitData):
+class AnaerobicDigesterInitData(TreatmentInitData):
     """
     A data class that contains information used in the
     creation of a AnaerobicDigester object. Overrides default values from

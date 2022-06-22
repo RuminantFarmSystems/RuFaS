@@ -71,6 +71,7 @@ class AnaerobicDigesterOutput(TreatmentOutput):
     WOP_frac: float = 0.0
     CH4: float = 0.0
 
+    ##TODO convert effluent volume to total daily mass
     ## Outputs for AD
     AD_effluent_volume: float = 0.0,                            ## effluent volume of AD (m3/day)
     AD_biogas: float = 0.0,                                     ## biogas production per day (m3/day)
