@@ -14,6 +14,7 @@ class Corn(BaseCrop):
         self.harvest_day = corn_data['harvest_day']
         self.harvest_type = corn_data['harvest_type']
         self.planting_order = corn_data['planting_order'].lower()
+        self.extracted = corn_data['extracted']
 
         self.crop_name = crop_name
         self.crop_type = 'annual'

@@ -14,6 +14,7 @@ class Soybean(BaseCrop):
         self.harvest_day = soy_data['harvest_day']
         self.harvest_type = soy_data['harvest_type']
         self.planting_order = soy_data['planting_order'].lower()
+        self.extracted = soy_data['extracted']
 
         self.crop_name = crop_name
         self.crop_type = 'annual'

@@ -8,7 +8,7 @@ Author(s): Jacob Johnson, jacob8399@gmail.com
 Description: Carbon Cycle driver class.
 """
 
-from . import decomp_factors, residue_partitioning, pool_gas_partitioning
+from . import decomp_factors, pool_gas_partitioning, residue_partitioning
 
 
 def update_all(soil, crop_type, weather, time):

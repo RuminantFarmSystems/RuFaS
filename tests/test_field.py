@@ -13,7 +13,7 @@ from RUFAS.classes import Time
 from RUFAS.classes import Weather
 from RUFAS.routines.field.crop.crop_types.corn import Corn
 from RUFAS.routines.field.soil import Soil
-from RUFAS.routines.field.soil.carbon_cycling import residue_partitioning, decomp_factors, pool_gas_partitioning, carbon_cycle
+from RUFAS.routines.field.soil.carbon_cycling import decomp_factors, pool_gas_partitioning, carbon_cycle, residue_partitioning
 LOGGER = logging.getLogger()
 logging.basicConfig(level=logging.INFO)
 

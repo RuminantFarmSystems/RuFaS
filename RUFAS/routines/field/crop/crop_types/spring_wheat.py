@@ -15,6 +15,7 @@ class SpringWheat(BaseCrop):
         self.harvest_day = spring_wheat_data['harvest_day']
         self.harvest_type = spring_wheat_data['harvest_type']
         self.planting_order = spring_wheat_data['planting_order'].lower()
+        self.extracted = spring_wheat_data['extracted']
 
         self.crop_name = crop_name
         self.crop_type = 'annual'

@@ -15,6 +15,8 @@ class Potato(BaseCrop):
         self.harvest_day = potato_data['harvest_day']
         self.harvest_type = potato_data['harvest_type']
         self.planting_order = potato_data['planting_order'].lower()
+        self.extracted = potato_data['extracted']
+
 
         self.crop_name = crop_name
         self.crop_type = 'annual'

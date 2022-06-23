@@ -15,6 +15,7 @@ class WinterWheat(BaseCrop):
         self.harvest_day = winter_wheat_data['harvest_day']
         self.harvest_type = winter_wheat_data['harvest_type']
         self.planting_order = winter_wheat_data['planting_order'].lower()
+        self.extracted = winter_wheat_data['extracted']
 
         self.crop_name = crop_name
         self.crop_type = 'annual'

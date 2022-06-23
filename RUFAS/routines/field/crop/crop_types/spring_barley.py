@@ -15,6 +15,7 @@ class SpringBarley(BaseCrop):
         self.harvest_day = spring_barley_data['harvest_day']
         self.harvest_type = spring_barley_data['harvest_type']
         self.planting_order = spring_barley_data['planting_order'].lower()
+        self.extracted = spring_barley_data['extracted']
 
         self.crop_name = crop_name
         self.crop_type = 'annual'

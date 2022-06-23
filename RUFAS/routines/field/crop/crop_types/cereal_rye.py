@@ -15,6 +15,7 @@ class CerealRye(BaseCrop):
         self.harvest_day = cereal_rye_data['harvest_day']
         self.harvest_type = cereal_rye_data['harvest_type']
         self.planting_order = cereal_rye_data['planting_order'].lower()
+        self.extracted = cereal_rye_data['extracted']
 
         self.crop_name = crop_name
         self.crop_type = 'annual'
