@@ -6,3 +6,4 @@ pyomo
 pytest
 pytest-mock
 scipy
+openpyxl
