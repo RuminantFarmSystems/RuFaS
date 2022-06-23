@@ -213,39 +213,39 @@ class AnaerobicDigestion(BaseTreatment):
         K_content = K_from_pen - (K_from_pen_kg_per_day / total_solids) * self.treatment_init_data.K_FRACTION
 
         daily_output = AnaerobicDigesterOutput(
-            # TODO: Check difference between TS and TS_liquid for effluent
-            TS=effluent_total_solids,
-            VS=effluent_volatile_solids,
-            N=N_content,
-            P=P_content,
-            K=K_content,
+                # TODO: Check difference between TS and TS_liquid for effluent
+                TS=effluent_total_solids,
+                VS=effluent_volatile_solids,
+                N=N_content,
+                P=P_content,
+                K=K_content,
 
-            TS_liquid=0.0,
-            VS_liquid=0.0,
-            N_liquid=0.0,
-            P_liquid=0.0,
-            K_liquid=0.0,
+                TS_liquid=0.0,
+                VS_liquid=0.0,
+                N_liquid=0.0,
+                P_liquid=0.0,
+                K_liquid=0.0,
 
-            WIP=0.0,
-            WOP=0.0,
-            WIP_frac=0.0,
-            WOP_frac=0.0,
-            CH4=0.0,  # May use this variable name instead of methane_generation_volume
+                WIP=0.0,
+                WOP=0.0,
+                WIP_frac=0.0,
+                WOP_frac=0.0,
+                CH4=0.0,  # May use this variable name instead of methane_generation_volume
 
-            # Important Outputs from AD object
+                # Important Outputs from AD object
 
-            biogas=biogas_generation,  # biogas production per day (m3/day)
-            methane_generation_volume=methane_generation_volume,  # biogas production per day (m3/day)
-            energy_content=energy_content,  # biogas energy content (MJ/m3)
-            minimum_digester_volume=minimum_digester_volume,
-            # Minimum Digester Volume calculated based on daily inflow (m^3)
-            top_cover_volume=top_cover_volume,  # TopCover Volume calculated based on Digester Volume (m^3)
-            sludge_accumulation_volume=sav,  # sludge_accumulation_volume (per day?)
+                biogas=biogas_generation,  # biogas production per day (m3/day)
+                methane_generation_volume=methane_generation_volume,  # biogas production per day (m3/day)
+                energy_content=energy_content,  # biogas energy content (MJ/m3)
+                minimum_digester_volume=minimum_digester_volume,
+                # Minimum Digester Volume calculated based on daily inflow (m^3)
+                top_cover_volume=top_cover_volume,  # TopCover Volume calculated based on Digester Volume (m^3)
+                sludge_accumulation_volume=sav,  # sludge_accumulation_volume (per day?)
 
-            evaporated_water=evaporated_water,
-            effluent_waste_volume=effluent_waste_volume,
-            effluent_total_solids=effluent_total_solids,
-            effluent_volatile_solids=effluent_volatile_solids
+                evaporated_water=evaporated_water,
+                effluent_waste_volume=effluent_waste_volume,
+                effluent_total_solids=effluent_total_solids,
+                effluent_volatile_solids=effluent_volatile_solids
 
         )
 
@@ -287,12 +287,12 @@ class StoragePond(BaseTreatment):
     def update(self, pen: SimplePen) -> TreatmentOutput:
         handler = self.manure_handler.last_output
         daily_output = TreatmentOutput(
-            TAN_s=handler.TAN_s * (1 - self.treatment_init_data.TAN_removal_efficiency),
-            manure_nitrogen=handler.manure_nitrogen * (1 - self.treatment_init_data.N_removal_efficiency),
-            TSd=handler.TSd * (1 - self.treatment_init_data.TS_removal_efficiency),
-            VS_total=handler.VS_total * (1 - self.treatment_init_data.VS_removal_efficiency),
-            p_excrt_manure=handler.p_excrt_manure * (1 - self.treatment_init_data.P_removal_efficiency),
-            K_manure=handler.K_manure * (1 - self.treatment_init_data.K_removal_efficiency),
+                TAN_s=handler.TAN_s * (1 - self.treatment_init_data.TAN_removal_efficiency),
+                manure_nitrogen=handler.manure_nitrogen * (1 - self.treatment_init_data.N_removal_efficiency),
+                TSd=handler.TSd * (1 - self.treatment_init_data.TS_removal_efficiency),
+                VS_total=handler.VS_total * (1 - self.treatment_init_data.VS_removal_efficiency),
+                p_excrt_manure=handler.p_excrt_manure * (1 - self.treatment_init_data.P_removal_efficiency),
+                K_manure=handler.K_manure * (1 - self.treatment_init_data.K_removal_efficiency),
         )
 
         daily_output.final_volume = self.total_volume - (
@@ -319,28 +319,6 @@ class TreatmentInitData(ABC):
         pass
 
 
-@dataclass
-class StoragePondInitData(TreatmentInitData):
-    """
-    A data class that contains information used in the
-    creation of a Treatment object.
-
-    """
-
-    percent_dry_solids = 0.0
-    TS_removal_efficiency = 0.15
-    VS_removal_efficiency = 0.85
-    N_removal_efficiency = 0.05
-    TAN_removal_efficiency = 0.1
-    P_removal_efficiency = 0.0
-    K_removal_efficiency = 0.0
-    TS_DM_effluent_rate = 0.0
-
-    @classmethod
-    def get_instance(cls) -> TreatmentInitData:
-        return StoragePondInitData()
-
-
 class TreatmentFactory:
     @classmethod
     def get_instance(cls,
@@ -363,6 +341,28 @@ class TreatmentFactory:
         }
 
         return enum_to_class[treatment_enum][0](**params)
+
+
+@dataclass
+class StoragePondInitData(TreatmentInitData):
+    """
+    A data class that contains information used in the
+    creation of a Treatment object.
+
+    """
+
+    percent_dry_solids = 0.0
+    TS_removal_efficiency = 0.15
+    VS_removal_efficiency = 0.85
+    N_removal_efficiency = 0.05
+    TAN_removal_efficiency = 0.1
+    P_removal_efficiency = 0.0
+    K_removal_efficiency = 0.0
+    TS_DM_effluent_rate = 0.0
+
+    @classmethod
+    def get_instance(cls) -> TreatmentInitData:
+        return StoragePondInitData()
 
 
 @dataclass
