@@ -116,6 +116,10 @@ def calculate_ECH4_floor(T, Area_barn):
     return max(0.0, 0.13 * T) * Area_barn / 1000
 
 
+def calculate_ECH4_floor(T, Area_barn):
+    return max(0.0, 0.13 * T) * Area_barn / 1000
+
+
 """
 Calculates the EC02_floor.
 Inputs:
@@ -126,3 +130,19 @@ Inputs:
 
 def calculate_EC02_floor(T, Area_barn):
     return max(0.0, (0.0065 + 0.0192 * T)) * Area_barn
+
+
+def calculate_EC02_floor(T, Area_barn):
+    pass
+
+
+# return max (0.0, 0.0065 + 0.0192 T ) Area_barn
+
+def calculate_N2O_storage(A_storage, N2O_man=0.8, ):
+    """
+    Calculates the nitrous oxide emissions from stored manure.
+    :param A_storage: Surface area of the manure storage, m2
+    :param N2O_man: Daily emission rate of N2O, 0.8 g N2O m-2 day-1
+    :return: Emission of N2O from manure storage, kg N2O day-1
+    """
+    return (N2O_man * A_storage) / 1000
