@@ -18,7 +18,6 @@ class TreatmentOutput:
     total_daily_mass: float = 0.0  # L
     final_volume: float = 0.0  # m^3
 
-
     def clone(self) -> TreatmentOutput:
         return TreatmentOutput(**asdict(self))
 
@@ -107,4 +106,3 @@ class AnaerobicDigesterOutput(TreatmentOutput):
         for key, val in asdict(self).items():
             res.append(f'{key:40}: {val:20,.2f} {getattr(Units, key, ""):<10}')
         return '\n'.join(res)
-

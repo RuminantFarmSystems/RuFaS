@@ -1,0 +1,2 @@
+class GasEmissionConstants:
+    pass
