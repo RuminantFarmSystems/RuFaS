@@ -13,12 +13,13 @@ logging.basicConfig(level = logging.INFO)
 
 from unittest.mock import MagicMock
 import numpy as np
-import RUFAS
 
 from RUFAS.classes import Time
 from RUFAS.routines.field.soil import Soil
 from RUFAS.routines.field.field_management import FieldManagement
-from RUFAS.routines.field.crop.crop_types.soybean import Soybean
+#using Corn for all tests
+from RUFAS.routines.field.crop.crop_types.corn import Corn
+from RUFAS.routines.field.crop.crop_types.alfalfa import Alfalfa
 from RUFAS.routines.field.crop.yields import calc_residue
 
 
@@ -477,38 +478,121 @@ def test_calc_residue():
     """Unit test for function calc_residue in file routines/field/crop/yields.py"""
     try:
         LOGGER.info("Testing function calc_residue in yields.py")
-        test_soil = MagicMock(Soil)
-        test_soil_layer = MagicMock(Soil.SoilLayer)
 
-        #using Soybean, can be any other valid crop
-        test_crop_type = MagicMock(Soybean) 
 
-        test_time = MagicMock(Time)
-        
-        crop_attributes = {
+        #tests for the annual crop
+        LOGGER.info("Running tests for annual crop... Corn")
+
+        annual_soil = MagicMock(Soil)
+        annual_soil_layer = MagicMock(Soil.SoilLayer)
+        annual_crop = MagicMock(Corn) 
+        annual_time = MagicMock(Time)
+        annual_FM = MagicMock(FieldManagement)
+        annual_base_app = MagicMock(FieldManagement.BaseApplicationManagement)
+
+        corn_attributes = {
             "fr_root" : 0,
             "biomass_actual" : 1,
             "yield_actual": 0,
-            "kill_day" : 1,
+            "kill_day" : 3,
             "crop_type" : 'annual',
+            "accumulated_HU" : 0,
+            "PHU" : 2,
+            "LAI_actual" : 0,
+            "bio_P" : 0,
+            "bio_N" : 0
         }
-        time_attributes = {
-            "day" : 1
+        time_attributes_annual = {
+            "day" : 1,
+            "calendar_year" : 1990
         }
-        soil_layer_attributes = {
+        soil_layer_attributes_annual= {
             "tillage_percent" : 0.55
         }
-        soil_attributes = {
-            "soil_layers" : [soil_layer_attributes],
+        annual_soil_attributes = {
+            "soil_layers" : [annual_soil_layer],
+            "residue" : 0
         }
-        test_crop_type.configure_mock(**crop_attributes)
-        test_soil_layer.configure_mock(**soil_layer_attributes)
-        test_soil.configure_mock(**soil_attributes)
-        test_time.configure_mock(**time_attributes)
+        field_management_attributes_annual = {
+            "managed_applications" : {
+                'tillage' : annual_base_app
+            }
 
-        np.testing.assert_almost_equal(0,test_soil.residue_harvest) 
+        }
+        baseApp_attributes_annual = {
+            "applications" : {}
+        }
+        
+        annual_soil_layer.configure_mock(**soil_layer_attributes_annual)
+        annual_soil.configure_mock(**annual_soil_attributes)
+        annual_crop.configure_mock(**corn_attributes) 
+        annual_time.configure_mock(**time_attributes_annual)
+        annual_base_app.configure_mock(**baseApp_attributes_annual)
+        annual_FM.configure_mock(**field_management_attributes_annual)
 
-        assert True
+        calc_residue(annual_soil, annual_crop, annual_FM, annual_time)
+
+        LOGGER.info("Checking soil residue_harvest")
+        np.testing.assert_almost_equal(1,annual_soil.residue_harvest) 
+
+
+
+        #perennial crop
+        LOGGER.info("Running tests for perennial crop... Alfalfa")
+        perennial_soil = MagicMock(Soil)
+        perennial_soil_layer = MagicMock(Soil.SoilLayer)
+        perennial_crop = MagicMock(Alfalfa) 
+        perennial_time = MagicMock(Time)
+        perennial_FM = MagicMock(FieldManagement)
+        perennial_base_app = MagicMock(FieldManagement.BaseApplicationManagement)
+        
+
+        alfalfa_attributes = {
+             "fr_root" : 0,
+            "biomass_actual" : 1,
+            "yield_actual": 0,
+            "kill_day" : 3,
+            "crop_type" : 'perennial',
+            "accumulated_HU" : 0,
+            "PHU" : 2,
+            "LAI_actual" : 0,
+            "bio_P" : 0,
+            "bio_N" : 0
+        }
+        time_attributes_perennial = {
+            "day" : 1,
+            "calendar_year" : 1990
+        }
+        soil_layer_attributes_perennial = {
+            "tillage_percent" : 0.55
+        }
+        perennial_soil_attributes = {
+            "soil_layers" : [perennial_soil_layer],
+            "residue" : 0
+        }
+        field_management_attributes_perennial = {
+            "managed_applications" : {
+                'tillage' : perennial_base_app
+            }
+
+        }
+        baseApp_attributes_perennial = {
+            "applications" : {}
+        }
+
+        perennial_soil_layer.configure_mock(**soil_layer_attributes_perennial)
+        perennial_soil.configure_mock(**perennial_soil_attributes)
+        perennial_crop.configure_mock(**alfalfa_attributes) 
+        perennial_time.configure_mock(**time_attributes_perennial)
+        perennial_base_app.configure_mock(**baseApp_attributes_perennial)
+        perennial_FM.configure_mock(**field_management_attributes_perennial)
+
+
+        calc_residue(perennial_soil, perennial_crop, perennial_FM, perennial_time)
+
+        LOGGER.info("Checking soil residue_harvest")
+        np.testing.assert_almost_equal(0,perennial_soil.residue_harvest) 
+        
     except:
         assert False
 
