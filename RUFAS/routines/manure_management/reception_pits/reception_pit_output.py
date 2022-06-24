@@ -17,6 +17,7 @@ class ReceptionPitOutput:
     VS_total: float = 0.0
     p_excrt_manure: float = 0.0
     K_manure: float = 0.0
+    methane_floor: float = 0.0
 
     raw_manure: float = 0.0
     cleaning_water: float = 0.0

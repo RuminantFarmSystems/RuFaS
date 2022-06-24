@@ -1,7 +1,9 @@
 import math
 from dataclasses import dataclass, asdict
 from typing import Protocol
-from gas_emissions_constants import GasEmissionConstants as Constants
+
+from RUFAS.routines.manure_management.misc.simple_pen import SimplePen
+from .gas_emissions_constants import GasEmissionConstants as Constants
 
 
 @dataclass
@@ -79,7 +81,7 @@ class GasEmissions:
 
     @staticmethod
     def calc_nh3_volatilization_n(Tan, c, p, r, m, q):
-        return ((Tan * c * p) / (r * m * q))
+        return (Tan * c * p) / (r * m * q)
 
     @staticmethod
     def calc_kh(T):
@@ -89,6 +91,62 @@ class GasEmissions:
     def calc_ka(T):
         return 10 ** (1478 / (T + 273) - 1.69)
 
+    @staticmethod
+    def calc_methane_floor(pen: SimplePen, t_min=20.0, t_max=25.0, hours=24):
+        """
+        Calculates the ECH4_floor.
+        Inputs:
+          t_min:
+          t_max:
+          hours:
+          barn_area: area of the barn floor covered with manure, m2
+        """
+        if hours > 14:
+            modified_hours = - math.tanh(hours - 21.5) / 3.5
+        elif hours > 4:
+            modified_hours = math.tanh(hours - 9.5) / 2.5
+        else:
+            modified_hours = - math.tanh(hours + 3.5) / 3.5
+        t_ambient = modified_hours * (t_max - t_min) / 2 + (t_max + t_min) / 2
+        t = max(-5.0, 0.63 * t_ambient + 6.0)
+
+        if 'Cow' in pen.classes_in_pen:
+            if pen.housing_type == 'tie stall':
+                barn_area = 1.2
+            elif pen.housing_type == 'bedded pack':
+                barn_area = 5.0
+            else:  # default is free stall
+                barn_area = 3.5
+        else:
+            if pen.housing_type == 'tie stall':
+                barn_area = 1.0
+            elif pen.housing_type == 'bedded pack':
+                barn_area = 3.0
+            else:  # default is free stall
+                barn_area = 2.5
+
+        return pen.num_animals * (max(0.0, 0.13 * t) * barn_area / 1000)
+
+    @staticmethod
+    def calculate_EC02_floor(T, Area_barn):
+        """
+        Calculates the EC02_floor.
+        Inputs:
+          T: ambient barn temperature, C
+          Area_barn: area of the barn flooor covered with manure, m2
+        """
+        return max(0.0, (0.0065 + 0.0192 * T)) * Area_barn
+
+    @staticmethod
+    def calculate_N2O_storage(A_storage, N2O_man=0.8, ):
+        """
+        Calculates the nitrous oxide emissions from stored manure.
+        :param A_storage: Surface area of the manure storage, m2
+        :param N2O_man: Daily emission rate of N2O, 0.8 g N2O m-2 day-1
+        :return: Emission of N2O from manure storage, kg N2O day-1
+        """
+        return (N2O_man * A_storage) / 1000
+
 
 @dataclass
 class FakeOutput:
@@ -97,52 +155,3 @@ class FakeOutput:
 
     def __str__(self):
         return f'{self.VSd}, {self.VSnd}'
-
-
-if __name__ == '__main__':
-    print(f'method1: {GasEmissions.calc_methane(FakeOutput())}')
-    print()
-    print(f'method2: {GasEmissions.calc_methane2(FakeOutput())}')
-
-"""
-Calculates the ECH4_floor.
-Inputs: 
-  T: ambient barn temperature, °C
-  Area_barn: area of the barn floor covered with manure, m2
-"""
-
-
-def calculate_ECH4_floor(T, Area_barn):
-    return max(0.0, 0.13 * T) * Area_barn / 1000
-
-
-def calculate_ECH4_floor(T, Area_barn):
-    return max(0.0, 0.13 * T) * Area_barn / 1000
-
-
-"""
-Calculates the EC02_floor.
-Inputs:
-  T: ambient barn temperature, C
-  Area_barn: area of the barn flooor covered with manure, m2
-"""
-
-
-def calculate_EC02_floor(T, Area_barn):
-    return max(0.0, (0.0065 + 0.0192 * T)) * Area_barn
-
-
-def calculate_EC02_floor(T, Area_barn):
-    pass
-
-
-# return max (0.0, 0.0065 + 0.0192 T ) Area_barn
-
-def calculate_N2O_storage(A_storage, N2O_man=0.8, ):
-    """
-    Calculates the nitrous oxide emissions from stored manure.
-    :param A_storage: Surface area of the manure storage, m2
-    :param N2O_man: Daily emission rate of N2O, 0.8 g N2O m-2 day-1
-    :return: Emission of N2O from manure storage, kg N2O day-1
-    """
-    return (N2O_man * A_storage) / 1000
