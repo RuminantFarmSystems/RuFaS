@@ -87,11 +87,44 @@ class GasEmissions:
     def calc_kh(T):
       return 10**(1478/(T+273)-1.69)
 
-
     
     @staticmethod
-    def calc_ka(T):
-      return 10**(1478/(T+273)-1.69)
+    def calc_ka(T, pH):
+      return 1 + 10**(0.09018 + 2729.9) / (T+272 -pH)
+
+    @staticmethod
+    def calc_q(ka, kh):
+      return kh*ka
+
+    @staticmethod
+    def calc_r(hsc, T):
+      return (hsc * (1-0.027 * (20-T)))
+
+
+        """
+    Calculates the ECH4_floor.
+    Inputs: 
+      T: ambient barn temperature, °C
+      Area_barn: area of the barn floor covered with manure, m2
+    """
+    @staticmethod
+    def calculate_ECH4_floor(T, Area_barn):
+      return max(0.0, 0.13 * T) * Area_barn / 1000
+
+    """
+    Calculates the EC02_floor.
+    Inputs:
+      T: ambient barn temperature, C
+      Area_barn: area of the barn flooor covered with manure, m2
+    """
+    @staticmethod
+    def calculate_EC02_floor(T, Area_barn):
+      return max(0.0, (0.0065 + 0.0192*T) ) * Area_barn
+
+    @staticmethod
+    def calculate_en20_manure(EF_n20, A_storage):
+      return (EF_n20*A_storage)/1000
+
 
 
 @dataclass
