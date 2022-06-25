@@ -7,12 +7,13 @@ class Units:
     VSnd = 'kg'
     p_excrt_manure = 'kg'
     K_manure = 'kg'
+    methane_floor = 'kg/day'
 
     raw_manure = 'kg'
     cleaning_water = 'L'  # liters, 1L = 1kg
     total_bedding_mass = 'kg'
     total_water_volume_in_milking_center = 'L'  # liters, 1L = 1kg
-    total_daily_mass = 'kg or L'
+    total_daily_mass = 'kg_or_L'
 
     VS_total = 'kg'
     wet_weight_of_final_solids = 'kg'

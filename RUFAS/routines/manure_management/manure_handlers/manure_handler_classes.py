@@ -14,6 +14,7 @@ from dataclasses import dataclass
 from enum import auto
 from typing import Dict, List, Optional, Type
 
+from RUFAS.routines.manure_management.gas_emissions.gas_emissions import GasEmissions
 from RUFAS.routines.manure_management.misc.constants import ManureManagementConstants as Constants
 from RUFAS.routines.manure_management.misc.simple_pen import SimplePen
 from RUFAS.routines.manure_management.helpers.enum_helpers import ExtendedEnum
@@ -71,6 +72,7 @@ class BaseManureHandler:
                 VSnd=pen.manure.VSnd,
                 p_excrt_manure=pen.manure.p_excrt_manure,
                 K_manure=pen.manure.K_manure,
+                methane_floor=GasEmissions.calc_methane_floor(pen),
 
                 raw_manure=pen.manure_mass,
                 cleaning_water=self.cleaning_water_volume_in_main_barn(pen),

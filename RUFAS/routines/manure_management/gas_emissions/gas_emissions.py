@@ -1,7 +1,9 @@
 import math
 from dataclasses import dataclass, asdict
 from typing import Protocol
-from gas_emissions_constants import GasEmissionConstants as Constants
+
+from RUFAS.routines.manure_management.misc.simple_pen import SimplePen
+from .gas_emissions_constants import GasEmissionConstants as Constants
 
 
 @dataclass
@@ -77,11 +79,9 @@ class GasEmissions:
 
         return c * VS_tot * (VSd * b1 + VSnd * b2) * ex
 
-        
     @staticmethod
     def calc_nh3_volatilization_n(Tan, c, p, r, m, q):
-      return ((Tan*c*p)/(r*m*q))
-
+        return (Tan * c * p) / (r * m * q)
 
     @staticmethod
     def calc_kh(T):
@@ -134,32 +134,3 @@ class FakeOutput:
 
     def __str__(self):
         return f'{self.VSd}, {self.VSnd}'
-
-
-if __name__ == '__main__':
-    print(f'method1: {GasEmissions.calc_methane(FakeOutput())}')
-    print()
-    print(f'method2: {GasEmissions.calc_methane2(FakeOutput())}')
-
-
-
-
-
-"""
-Calculates the ECH4_floor.
-Inputs: 
-  T: ambient barn temperature, °C
-  Area_barn: area of the barn floor covered with manure, m2
-"""
-def calculate_ECH4_floor(T, Area_barn):
-  return max(0.0, 0.13 * T) * Area_barn / 1000
-
-"""
-Calculates the EC02_floor.
-Inputs:
-  T: ambient barn temperature, C
-  Area_barn: area of the barn flooor covered with manure, m2
-"""
-def calculate_EC02_floor(T, Area_barn):
-  return max(0.0, (0.0065 + 0.0192*T) ) * Area_barn
-

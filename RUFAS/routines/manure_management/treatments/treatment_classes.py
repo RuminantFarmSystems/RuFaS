@@ -10,9 +10,10 @@ Author(s):  William Donovan, wmdonovan@wisc.edu
 """
 from __future__ import annotations
 
+from abc import ABC, abstractmethod
 from dataclasses import dataclass
 from enum import auto
-from typing import Dict, List, Optional, Type
+from typing import Dict, List, Optional, Type, Tuple
 
 from RUFAS.routines.manure_management.helpers.enum_helpers import ExtendedEnum
 from RUFAS.routines.manure_management.manure_handlers.manure_handler_classes import \
@@ -20,7 +21,6 @@ from RUFAS.routines.manure_management.manure_handlers.manure_handler_classes imp
 from RUFAS.routines.manure_management.manure_separators.manure_separator_classes import BaseSeparator
 from RUFAS.routines.manure_management.misc.constants import ManureManagementConstants as Constants
 from RUFAS.routines.manure_management.misc.simple_pen import SimplePen
-from RUFAS.routines.manure_management.reception_pits.reception_pit_classes import ReceptionPitFactory
 from RUFAS.routines.manure_management.reception_pits.reception_pit_output import ReceptionPitOutput
 from RUFAS.routines.manure_management.treatments.treatment_output import TreatmentOutput, AnaerobicDigesterOutput
 
@@ -68,11 +68,7 @@ class BaseTreatment:
         return self.all_output[-1] if len(self.all_output) > 0 else None
 
     def update(self, pen: SimplePen) -> TreatmentOutput:
-        # self.methane(pen.manure)
-        # self.WIP_WOP_frac()
-        daily_output = TreatmentOutput(
-
-        )
+        daily_output = TreatmentOutput()
         self.all_output.append(daily_output)
         return daily_output
 
@@ -111,12 +107,8 @@ class AnaerobicDigestion(BaseTreatment):
                  pen: SimplePen,
                  manure_handler: BaseManureHandler,
                  manure_separator: BaseSeparator,
-                 treatment_init_data: TreatmentInitData):
+                 treatment_init_data: AnaerobicDigesterInitData):
         super().__init__(pen, manure_handler, manure_separator, treatment_init_data)
-
-        ## TODO: Check whether reception pit will always be the component preceding AD.. could move to be input.
-        self.reception_pit = ReceptionPitFactory.get_instance(manure_handler=self.manure_handler)
-        self.all_output: List[AnaerobicDigesterOutput] = []
 
     def update(self, pen: SimplePen) -> TreatmentOutput:
         ## TODO: Check whether SimplePen should be an input for update, it is not used in the BaseTreatment update
@@ -131,27 +123,18 @@ class AnaerobicDigestion(BaseTreatment):
             Uses init data from AnaerobicDigestorInitData class
             Uses outputs from manure_handler, in this case ReceptionPitOutputs       
         """
-        reception_pit_output_data = self.reception_pit.last_output  ## What to do when last output is None? (i.e.
-        # first day?)
+        reception_pit_output_data = self.reception_pit.last_output
 
-        total_solids = reception_pit_output_data.TSd  # kg/day
-        volatile_solids_loading = reception_pit_output_data.VSd + reception_pit_output_data.VSnd  # kg/day
-        wastewater_volume = reception_pit_output_data.total_daily_mass / self.treatment_init_data.density_water  #
-        # m^3/day
+        total_solids = reception_pit_output_data.TSd                                                                # kg/day
+        volatile_solids_loading = reception_pit_output_data.VSd + reception_pit_output_data.VSnd                    # kg/day
+        wastewater_volume = reception_pit_output_data.total_daily_mass / Constants.DENSITY_WATER_KG_PER_M3          # m^3/day
+       
+        total_solids_concentration = total_solids/wastewater_volume                 ## g/L
+        volatile_solids_concentration = volatile_solids_loading/wastewater_volume   ## g/L
 
-        # May use these default input values to test the calculation method
-        # wastewater_volume = 270.51         # From pens-   m^3/day
-        # total_solids = 2548.70             # from pen - kg/day
-        # volatile_solids_loading = 1980.94  # from pen - kg/day
-
-        total_solids_concentration = total_solids / wastewater_volume  ## g/L
-        volatile_solids_concentration = volatile_solids_loading / wastewater_volume  ## g/L
-
-        # TODO: Check whether this variable should be an output.
         ## m^3/year  MS.3.B.1
-        sav = self.treatment_init_data.SAV_FRACTION * volatile_solids_loading * \
-              self.treatment_init_data.sludge_accumulation_period * \
-              self.treatment_init_data.days_in_year / self.treatment_init_data.density_water
+        sav = self.treatment_init_data.SAV_FRACTION*volatile_solids_loading*self.treatment_init_data.sludge_accumulation_period* \
+            Constants.DAYS_PER_YEAR/Constants.DENSITY_WATER_KG_PER_M3
 
         # Minimum digester volume required for processing inflow  (m^3)
         # MS.3.B.2
@@ -163,25 +146,16 @@ class AnaerobicDigestion(BaseTreatment):
         # MS.3.B.4
         digester_volume_of_anaerobic_lagoon = minimum_digester_volume + top_cover_volume + sav
 
-        # MS.3.B.5
-        vs_loading_rate = volatile_solids_concentration / digester_volume_of_anaerobic_lagoon
-
-        # kg biogas generated in digester
-
-        # MS.3.B.6
-        biogas_generation = self.treatment_init_data.BIOGAS_GEN_RATIO * volatile_solids_loading
+        ## kg biogas generated in digester 
+        #MS.3.B.6
+        biogas_generation = self.treatment_init_data.BIOGAS_GEN_RATIO*volatile_solids_loading   
 
         # TODO: Double check units in spreadsheet on methane production
-        # MS.3.B.7
-        methane_generation_volume = biogas_generation * self.treatment_init_data.METHANE_GEN_RATIO  ## Methane
-        # content of biogas (m3)
-
-        # TODO: Add these constants to init data or constants class in misc module
-        methane_energy_density = 55  # MJ / kg
-        methane_density = 0.657  # kg/m^3
-
-        # Energy content of biogas
-        energy_content = methane_generation_volume * methane_density * methane_energy_density  ###
+        #MS.3.B.7
+        methane_generation_volume = biogas_generation*self.treatment_init_data.METHANE_GEN_RATIO      ## Methane content of biogas (m3)  
+        
+        ## Energy content of biogas
+        energy_content = methane_generation_volume*Constants.METHANE_DENSITY*Constants.METHANE_ENERGY_DENSITY ###
 
         # ------------------------Digester EFFLUENT Characteristics-------------------------------------
         # MS.3.B.8
@@ -196,66 +170,42 @@ class AnaerobicDigestion(BaseTreatment):
         # MS.3.B.10
         effluent_volatile_solids = self.treatment_init_data.VS_FRACTION * volatile_solids_concentration  ## g/L
 
-        """ May want to save these values for testing the methods"""
-        # N_from_pen = 7.32 # g/L
-        # P_from_pen = 0.26 # g/L
-        # K_from_pen = 0.53 # g/L
+        # N_content of outputs
+        N_content = (1-self.treatment_init_data.N_FRACTION)*(reception_pit_output_data.manure_nitrogen/total_solids)
+        P_content = (1-self.treatment_init_data.P_FRACTION)*(reception_pit_output_data.p_excrt_manure/total_solids)
+        K_content = (1-self.treatment_init_data.K_FRACTION)*(reception_pit_output_data.K_manure/total_solids)
 
-        # N_from_pen_kg_per_day = 1980.9 # kg/day
-        # P_from_pen_kg_per_day = 69.6 # kg/day
-        # K_from_pen_kg_per_day = 136.0 # kg/day
-
-        """ These variables come from the Pen 1 sheet in spreadsheet, and  reception pit in Rufas"""
-        """ These should be replaced by mapping reception pit outputs to required inputs (TS,VS, and volumetric flow)"""
-
-        N_from_pen = 7.32  # g/L
-        P_from_pen = 0.26  # g/L
-        K_from_pen = 0.53  # g/L
-
-        N_from_pen_kg_per_day = reception_pit_output_data.manure_nitrogen  # kg/day
-        P_from_pen_kg_per_day = reception_pit_output_data.p_excrt_manure  # kg/day
-        K_from_pen_kg_per_day = reception_pit_output_data.K_manure  # kg/day
-        # TODO: Should I use the N_FRACTION or (1-N_FRACTION)
-        # MS.3.B.11
-        N_content = N_from_pen - (N_from_pen_kg_per_day / total_solids) * self.treatment_init_data.N_FRACTION
-        P_content = P_from_pen - (P_from_pen_kg_per_day / total_solids) * self.treatment_init_data.P_FRACTION
-        K_content = K_from_pen - (K_from_pen_kg_per_day / total_solids) * self.treatment_init_data.K_FRACTION
+        """ Track these variables for testing but not for outputs """
+        self.minimum_digester_volume = minimum_digester_volume              ## Minimum Digester Volume calculated based on daily inflow (m^3)
+        self.top_cover_volume = top_cover_volume                            ## TopCover Volume calculated based on Digester Volume (m^3)
+        self.sludge_accumulation_volume = sav                               ## sludge_accumulation_volume (per day?)
+        self.evaporated_water = evaporated_water
 
         daily_output = AnaerobicDigesterOutput(
-                # TODO: Check difference between TS and TS_liquid for effluent
-                TS=effluent_total_solids,
-                VS=effluent_volatile_solids,
-                N=N_content,
-                P=P_content,
-                K=K_content,
+            
+                    TS = 0.0,
+                    VS = 0.0,
+                    N = 0.0,
+                    P = 0.0,
+                    K = 0.0,
 
-                TS_liquid=0.0,
-                VS_liquid=0.0,
-                N_liquid=0.0,
-                P_liquid=0.0,
-                K_liquid=0.0,
+                    TS_liquid = effluent_total_solids,
+                    VS_liquid = effluent_volatile_solids,
+                    N_liquid = N_content,
+                    P_liquid = P_content,
+                    K_liquid = K_content,
 
-                WIP=0.0,
-                WOP=0.0,
-                WIP_frac=0.0,
-                WOP_frac=0.0,
-                CH4=0.0,  # May use this variable name instead of methane_generation_volume
+                    WIP = 0.0,
+                    WOP = 0.0,
+                    WIP_frac = 0.0,
+                    WOP_frac = 0.0,
+                    #TODO: Check units on methane output
+                    CH4 = methane_generation_volume,  
 
-                # Important Outputs from AD object
-
-                biogas=biogas_generation,  # biogas production per day (m3/day)
-                methane_generation_volume=methane_generation_volume,  # biogas production per day (m3/day)
-                energy_content=energy_content,  # biogas energy content (MJ/m3)
-                minimum_digester_volume=minimum_digester_volume,
-                # Minimum Digester Volume calculated based on daily inflow (m^3)
-                top_cover_volume=top_cover_volume,  # TopCover Volume calculated based on Digester Volume (m^3)
-                sludge_accumulation_volume=sav,  # sludge_accumulation_volume (per day?)
-
-                evaporated_water=evaporated_water,
-                effluent_waste_volume=effluent_waste_volume,
-                effluent_total_solids=effluent_total_solids,
-                effluent_volatile_solids=effluent_volatile_solids
-
+                    ## Outputs for AD
+                    AD_effluent_volume = effluent_waste_volume,                     ## methane production per day (m3/day)
+                    AD_biogas = biogas_generation,                                  ## biogas production per day (m3/day)
+                    AD_biogas_energy_content = energy_content,                       ## biogas energy content (MJ/m3)                       
         )
 
         return daily_output
@@ -275,7 +225,7 @@ class StoragePond(BaseTreatment):
                  pen: SimplePen,
                  manure_handler: BaseManureHandler,
                  manure_separator: BaseSeparator,
-                 treatment_init_data: TreatmentInitData,
+                 treatment_init_data: StoragePondInitData,
                  storage_time_period=90,
                  freeboard=0.0,
                  precip=0.0):
@@ -295,8 +245,6 @@ class StoragePond(BaseTreatment):
 
     def update(self, pen: SimplePen) -> TreatmentOutput:
         handler = self.manure_handler.last_output
-        rp = self.reception_pit.last_output
-        sep = self.manure_separator.last_output
         daily_output = TreatmentOutput(
                 TAN_s=handler.TAN_s * (1 - self.treatment_init_data.TAN_removal_efficiency),
                 manure_nitrogen=handler.manure_nitrogen * (1 - self.treatment_init_data.N_removal_efficiency),
@@ -311,6 +259,7 @@ class StoragePond(BaseTreatment):
 
         # If needed, modify output based on different combinations
         # of handler and separator
+        # But if the logic is complex, then abstract that out and handle it differently
         # if self.manure_handler.manure_handler_enum == ManureHandlerEnum.FLUSH_SYSTEM:
         #     pass
 
@@ -318,54 +267,15 @@ class StoragePond(BaseTreatment):
         return daily_output
 
 
-@dataclass
-class TreatmentInitData:
-    """
-    A data class that contains information used in the
-    creation of a Treatment object.
+class TreatmentInitData(ABC):
+    def __getattr__(self, item):
+        return 0.0
 
-    """
-    percent_dry_solids: float = 0.0
-    TS_removal_efficiency: float = 0.0
-    VS_removal_efficiency: float = 0.0
-    N_removal_efficiency: float = 0.0
-    TAN_removal_efficiency: float = 0.0
-    P_removal_efficiency: float = 0.0
-    K_removal_efficiency: float = 0.0
-    TS_DM_effluent_rate: float = 0.0
-
-    # sludge_accumulation_volume: float = 0.00251
-    # hydraulic_retention_time: int = 180
-    # sludge_accumulation_period: float = 5.0
-
+    # Can remove this method altogether if we only use default values
     @classmethod
-    def get_instance(cls, treatment_enum: TreatmentEnum) -> TreatmentInitData:
-        enum_to_init_data: Dict[TreatmentEnum, TreatmentInitData] = {
-            TreatmentEnum.STORAGE_POND: TreatmentInitData(
-                    percent_dry_solids=0.0,
-                    TS_removal_efficiency=0.15,
-                    VS_removal_efficiency=0.85,
-                    N_removal_efficiency=0.05,
-                    TAN_removal_efficiency=0.1,
-                    P_removal_efficiency=0.0,
-                    K_removal_efficiency=0.0,
-                    TS_DM_effluent_rate=0.0
-            ),
-        }
-
-        if treatment_enum in enum_to_init_data:
-            return enum_to_init_data[treatment_enum]
-        return TreatmentInitData()
-
-        # init_data = TreatmentInitData()
-        #
-        # # Customize init data here based on enum if necessary
-        # # ...
-        # if(treatment_enum.name == 'ANAEROBIC_DIGESTION'):
-        #     init_data = AnaerobicDigestorInitData()
-        #
-        #
-        # return init_data
+    @abstractmethod
+    def get_instance(cls, *args, **kwargs):
+        pass
 
 
 class TreatmentFactory:
@@ -375,23 +285,47 @@ class TreatmentFactory:
                      manure_handler: BaseManureHandler,
                      manure_separator: BaseSeparator) -> BaseTreatment:
         treatment_enum = TreatmentEnum.get_enum(pen.manure_storage)
+
+        enum_to_class: Dict[TreatmentEnum, Tuple[Type[BaseTreatment], Type[TreatmentInitData]]] = {
+            treatment_enum.STORAGE_POND: (StoragePond, StoragePondInitData),
+            treatment_enum.ANAEROBIC_DIGESTION: (AnaerobicDigestion, AnaerobicDigesterInitData),
+            # treatment_enum.ANAEROBIC_LAGOON: (AnaerobicLagoon, AnaerobicLagoonInitData),
+        }
+
         params = {
             'pen': pen,
             'manure_handler': manure_handler,
             'manure_separator': manure_separator,
-            'treatment_init_data': TreatmentInitData.get_instance(treatment_enum)
+            'treatment_init_data': enum_to_class[treatment_enum][1].get_instance()
         }
-        enum_to_class: Dict[TreatmentEnum, Type[BaseTreatment]] = {
-            treatment_enum.STORAGE_POND: StoragePond,
-            treatment_enum.ANAEROBIC_LAGOON: AnaerobicLagoon,
-            treatment_enum.ANAEROBIC_DIGESTION: AnaerobicDigestion,
-            treatment_enum.CUSTOM_STORAGE: CustomTreatment
-        }
-        return enum_to_class[treatment_enum](**params)
+
+        return enum_to_class[treatment_enum][0](**params)
 
 
 @dataclass
-class AnaerobicDigestorInitData(TreatmentInitData):
+class StoragePondInitData(TreatmentInitData):
+    """
+    A data class that contains information used in the
+    creation of a Treatment object.
+
+    """
+
+    percent_dry_solids = 0.0
+    TS_removal_efficiency = 0.15
+    VS_removal_efficiency = 0.85
+    N_removal_efficiency = 0.05
+    TAN_removal_efficiency = 0.1
+    P_removal_efficiency = 0.0
+    K_removal_efficiency = 0.0
+    TS_DM_effluent_rate = 0.0
+
+    @classmethod
+    def get_instance(cls) -> TreatmentInitData:
+        return StoragePondInitData()
+
+
+@dataclass
+class AnaerobicDigesterInitData(TreatmentInitData):
     """
     A data class that contains information used in the
     creation of a AnaerobicDigester object. Overrides default values from
@@ -405,12 +339,9 @@ class AnaerobicDigestorInitData(TreatmentInitData):
 
     SAV_FRACTION: float = 0.03  # Sludge Accumulation volume fraction 2-4% of VS loaded
 
-    density_water: float = 999  # kg/m3
-    days_in_year: int = 365  # days per year
-
-    TOP_COVER_VOLUME_FRACTION: float = 0.2  # Should be between 10-30%
-    BIOGAS_GEN_RATIO: float = 0.38  # 0.23 to 0.39 kg CH4/kg VS
-    METHANE_GEN_RATIO: float = 0.65  # 0.5-0.65 according to spreadsheet
+    TOP_COVER_VOLUME_FRACTION: float = 0.2          ## Should be between 10-30% 
+    BIOGAS_GEN_RATIO: float = 0.38                  ## 0.23 to 0.39 kg CH4/kg VS
+    METHANE_GEN_RATIO: float = 0.65                 ## 0.5-0.65 according to spreadsheet  
 
     # Digester EFFLUENT Characteristics
     EVAPORATION_FRACTION: float = 0.02  # 2-5% of Wastewater Volume
@@ -422,7 +353,3 @@ class AnaerobicDigestorInitData(TreatmentInitData):
     P_FRACTION: float = 0.01  # 0-5% P fraction
     K_FRACTION: float = 0.0  # 0-5% K fraction
 
-    @classmethod
-    def get_instance(cls, treatment_enum: TreatmentEnum) -> TreatmentInitData:
-        init_data = AnaerobicDigestorInitData()
-        return init_data
