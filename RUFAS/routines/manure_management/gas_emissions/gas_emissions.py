@@ -124,6 +124,7 @@ class GasEmissions:
     @staticmethod
     def calculate_en20_manure(EF_n20, A_storage):
       return (EF_n20*A_storage)/1000
+     
 
 
 
