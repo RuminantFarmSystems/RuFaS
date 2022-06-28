@@ -181,7 +181,6 @@ class ManureManagement:
         self.update_last_output_to_df()
         self.export_output_to_csv()
         self.export_output_to_json()
-        self.export_output_to_excel()
 
     @staticmethod
     def append_daily_data(output_obj, prefix: str, cols: Dict):
@@ -264,63 +263,6 @@ class ManureManagement:
             self.df = pd.concat([self.df, temp_df], ignore_index=True)
             self.df.reset_index()
             self.df.sort_values(by=['pen_id', 'sim_day'], inplace=True)
-
-    def convert_output_to_df(self):
-        pen_ids: List[int] = []
-        sim_days: List[int] = []
-        num_animals: List[int] = []
-        animal_types: List[str] = []
-        housing_types: List[str] = []
-        bedding_types: List[str] = []
-        handler_types: List[str] = []
-        separator_types: List[str] = []
-        treatment_types: List[str] = []
-
-        manure_cols = collections.defaultdict(list)
-        manure_handler_cols = collections.defaultdict(list)
-        reception_pit_cols = collections.defaultdict(list)
-        manure_separator_cols = collections.defaultdict(list)
-        treatment_cols = collections.defaultdict(list)
-        for pen_id in sorted(self.all_data.keys()):
-            for idx, data in enumerate(self.all_data[pen_id]):
-                pen_ids.append(pen_id)
-                sim_days.append(idx + 1)
-                pen, *outputs = data
-                manure_handler_output, reception_pit_output = outputs[:2]
-                manure_separator_output, treatment_output = outputs[2:]
-
-                num_animals.append(pen.num_animals)
-                animal_types.append(str(pen.classes_in_pen))
-                housing_types.append(pen.housing_type)
-                bedding_types.append(pen.bedding_type)
-                handler_types.append(pen.manure_handler)
-                separator_types.append(pen.manure_separator)
-                treatment_types.append(pen.manure_storage)
-
-                self.append_daily_data(pen.manure, 'manure', manure_cols)
-                self.append_daily_data(manure_handler_output, 'handler', manure_handler_cols)
-                self.append_daily_data(reception_pit_output, 'rp', reception_pit_cols)
-                self.append_daily_data(manure_separator_output, 'sep', manure_separator_cols)
-                self.append_daily_data(treatment_output, 'tx', treatment_cols)
-
-        d = {
-            'pen_id': pen_ids,
-            'sim_day': sim_days,
-            'num_animals': num_animals,
-            'animal_types': animal_types,
-            'housing_type': housing_types,
-            'bedding_type': bedding_types,
-            'handler_type': handler_types,
-            'separator_type': separator_types,
-            'treatment_type': treatment_types,
-            **manure_cols,
-            **manure_handler_cols,
-            **reception_pit_cols,
-            **manure_separator_cols,
-            **treatment_cols
-        }
-
-        return pd.DataFrame(data=d)
 
     def export_output_to_csv(self):
         print(f'Exporting to csv')

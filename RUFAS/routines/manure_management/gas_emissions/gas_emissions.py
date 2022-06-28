@@ -73,10 +73,6 @@ class GasEmissions:
         VSd = (data.VSd * (Bo / E_CH4_pot) - VS_loss) / VS_tot
         VSnd = VS_tot - VSd
 
-        print(f'raw data: {data}')
-        print(f'new VSd: {VSd}')
-        print(f'new VSnd: {VSnd}')
-
         return c * VS_tot * (VSd * b1 + VSnd * b2) * ex
 
     @staticmethod
@@ -85,59 +81,89 @@ class GasEmissions:
 
     @staticmethod
     def calc_kh(T):
-      return 10**(1478/(T+273)-1.69)
+        return 10 ** (1478 / (T + 273) - 1.69)
 
-    
     @staticmethod
     def calc_ka(T, pH):
-      return 1 + 10**(0.09018 + 2729.9) / (T+272 -pH)
+        return 1 + 10 ** (0.09018 + 2729.9) / (T + 272 - pH)
 
     @staticmethod
     def calc_q(ka, kh):
-      return kh*ka
+        return kh * ka
 
     @staticmethod
     def calc_r(hsc, T):
-      return (hsc * (1-0.027 * (20-T)))
+        return hsc * (1 - 0.027 * (20 - T))
 
+    @staticmethod
+    def get_modified_hours(hours: float) -> float:
+        if hours > 14:
+            modified_hours = - math.tanh(hours - 21.5) / 3.5
+        elif hours > 4:
+            modified_hours = math.tanh(hours - 9.5) / 2.5
+        else:
+            modified_hours = - math.tanh(hours + 3.5) / 3.5
+        return modified_hours
 
+    @staticmethod
+    def calc_ambient_temp(hours, t_min, t_max):
+        modified_hours = GasEmissions.get_modified_hours(hours)
+        t_ambient = modified_hours * (t_max - t_min) / 2 + (t_max + t_min) / 2
+        return t_ambient
+
+    @staticmethod
+    def calc_barn_area(pen: SimplePen) -> float:
+        if 'Cow' in pen.classes_in_pen:
+            if pen.housing_type == 'tie stall':
+                barn_area = 1.2
+            elif pen.housing_type == 'bedded pack':
+                barn_area = 5.0
+            else:  # default is free stall
+                barn_area = 3.5
+        else:
+            if pen.housing_type == 'tie stall':
+                barn_area = 1.0
+            elif pen.housing_type == 'bedded pack':
+                barn_area = 3.0
+            else:  # default is free stall
+                barn_area = 2.5
+        return barn_area
+
+    @staticmethod
+    def calc_E_CH4_floor(pen: SimplePen, t_min=20.0, t_max=25.0, hours=24):
         """
-    Calculates the ECH4_floor.
-    Inputs: 
-      T: ambient barn temperature, °C
-      Area_barn: area of the barn floor covered with manure, m2
-    """
-    @staticmethod
-    def calculate_ECH4_floor(T, Area_barn):
-      return max(0.0, 0.13 * T) * Area_barn / 1000
+        Calculates the ECH4_floor.
 
-    """
-    Calculates the EC02_floor.
-    Inputs:
-      T: ambient barn temperature, C
-      Area_barn: area of the barn flooor covered with manure, m2
-    """
-    @staticmethod
-    def calculate_EC02_floor(T, Area_barn):
-      return max(0.0, (0.0065 + 0.0192*T) ) * Area_barn
+        Args:
+            pen:
+            t_min:
+            t_max:
+            hours:
+        """
+        t_ambient = GasEmissions.calc_ambient_temp(hours, t_min, t_max)
+        t = max(-5.0, 0.63 * t_ambient + 6.0)
+        barn_area = GasEmissions.calc_barn_area(pen)
+        return pen.num_animals * max(0.0, 0.13 * t) * barn_area / 1000
 
     @staticmethod
-    def calculate_en20_manure(EF_n20, A_storage):
-      return (EF_n20*A_storage)/1000
-     
-   EN2O,manure = emission of N2O from slurry storage, kg N2O /day 
-   EF,N2O,man = emission rate of N2O, 0.8 g N2O /m2 -day
-   Astorage = exposed surface area of the manure storage, m2
-  
-    Note: For stacked manure with a greater DM content, an emission factor of 0.005 kg N2O-N /(kg Nexcreted)
-        when a crust does not form, no N2O is formed and emitted
-        This occurs if the manure DM contentis less than 8%, manure is loaded daily onto the top surface of the storage, or an enclosed tank is used
-        
+    def calc_E_C02_floor(pen: SimplePen, t_min=20.0, t_max=25.0, hours=24):
+        """
+        """
+        t_ambient = GasEmissions.calc_ambient_temp(hours, t_min, t_max)
+        t = max(-5.0, 0.63 * t_ambient + 6.0)
+        barn_area = GasEmissions.calc_barn_area(pen)
+        return pen.num_animals * max(0.0, 0.0065 + 0.0192 * t) * barn_area / 1000
 
-@dataclass
-class FakeOutput:
-    VSd = 3546.6
-    VSnd = 4163.4
+    @staticmethod
+    def calculate_E_N20_manure(EF_n20, A_storage):
+        return (EF_n20 * A_storage) / 1000
 
-    def __str__(self):
-        return f'{self.VSd}, {self.VSnd}'
+# EN2O,manure = emission of N2O from slurry storage, kg N2O /day
+# EF,N2O,man = emission rate of N2O, 0.8 g N2O /m2 -day
+# Astorage = exposed surface area of the manure storage, m2
+#
+# Note: For stacked manure with a greater DM content, an emission factor of 0.005 kg N2O-N /(kg Nexcreted)
+#     when a crust does not form, no N2O is formed and emitted
+#     This occurs if the manure DM contentis less than 8%, manure is loaded daily onto the top surface of the
+#     storage, or an enclosed tank is used
+#
