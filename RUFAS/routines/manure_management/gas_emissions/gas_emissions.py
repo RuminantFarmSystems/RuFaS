@@ -9,7 +9,8 @@ from .gas_emissions_constants import GasEmissionConstants as Constants
 @dataclass
 class CanCalcMethane(Protocol):
     """
-    List of
+    To calculate methane emission, we need VSd and VSnd from
+    manure handlers, separators, or treatments.
     """
     VSd: float
     VSnd: float
@@ -17,7 +18,7 @@ class CanCalcMethane(Protocol):
 
 class GasEmissions:
     @staticmethod
-    def calc_methane(data: CanCalcMethane, temp=15.0) -> float:
+    def calc_E_CH4_storage(data: CanCalcMethane, temp=15.0) -> float:
         """
         ECH4,man = 	[(( 24 * Vs,d * b1)/1000) * exp[ln(A)) - (E/RT)] + (( 24 * Vs,nd *  b2)/1000) * exp[ln(A) -(E/RT)]
 
@@ -59,7 +60,7 @@ class GasEmissions:
         # Simplified: return daily_time_steps * ex * (output.VSd * b1 + output.VSnd * b2)
 
     @staticmethod
-    def calc_methane2(data: CanCalcMethane, temp=15.0, Bo=0.2, E_CH4_pot=0.48) -> float:
+    def calc_E_CH4_storage_2(data: CanCalcMethane, temp=15.0, Bo=0.2, E_CH4_pot=0.48) -> float:
         c = 0.024
         VS_tot = data.VSd + data.VSnd
         b1 = 1.0
@@ -76,27 +77,7 @@ class GasEmissions:
         return c * VS_tot * (VSd * b1 + VSnd * b2) * ex
 
     @staticmethod
-    def calc_nh3_volatilization_n(Tan, c, p, r, m, q):
-        return (Tan * c * p) / (r * m * q)
-
-    @staticmethod
-    def calc_kh(T):
-        return 10 ** (1478 / (T + 273) - 1.69)
-
-    @staticmethod
-    def calc_ka(T, pH):
-        return 1 + 10 ** (0.09018 + 2729.9) / (T + 272 - pH)
-
-    @staticmethod
-    def calc_q(ka, kh):
-        return kh * ka
-
-    @staticmethod
-    def calc_r(hsc, T):
-        return hsc * (1 - 0.027 * (20 - T))
-
-    @staticmethod
-    def get_modified_hours(hours: float) -> float:
+    def calc_modified_hours(hours: float) -> float:
         if hours > 14:
             modified_hours = - math.tanh(hours - 21.5) / 3.5
         elif hours > 4:
@@ -107,7 +88,7 @@ class GasEmissions:
 
     @staticmethod
     def calc_ambient_temp(hours, t_min, t_max):
-        modified_hours = GasEmissions.get_modified_hours(hours)
+        modified_hours = GasEmissions.calc_modified_hours(hours)
         t_ambient = modified_hours * (t_max - t_min) / 2 + (t_max + t_min) / 2
         return t_ambient
 
@@ -155,15 +136,52 @@ class GasEmissions:
         return pen.num_animals * max(0.0, 0.0065 + 0.0192 * t) * barn_area / 1000
 
     @staticmethod
-    def calculate_E_N20_manure(EF_n20, A_storage):
+    def calc_E_NH3_N(Tan, c, p, r, m, q):
+        """
+
+        """
+        return (Tan * c * p) / (r * m * q)
+
+    @staticmethod
+    def calc_kh(T):
+        """
+
+        """
+        return 10 ** (1478 / (T + 273) - 1.69)
+
+    @staticmethod
+    def calc_ka(T, pH):
+        """
+
+        """
+        return 1 + 10 ** (0.09018 + 2729.9) / (T + 272 - pH)
+
+    @staticmethod
+    def calc_q(ka, kh):
+        """
+
+        """
+        return kh * ka
+
+    @staticmethod
+    def calc_r(hsc, T):
+        """
+
+        """
+        return hsc * (1 - 0.027 * (20 - T))
+
+    @staticmethod
+    def calc_E_N20_manure(EF_n20, A_storage):
+        """
+        EN2O,manure = emission of N2O from slurry storage, kg N2O /day
+        EF,N2O,man = emission rate of N2O, 0.8 g N2O /m2 -day
+        Astorage = exposed surface area of the manure storage, m2
+
+        Note: For stacked manure with a greater DM content, an emission factor of 0.005 kg N2O-N /(kg Nexcreted)
+             when a crust does not form, no N2O is formed and emitted
+             This occurs if the manure DM contents less than 8%, manure is loaded daily onto the top surface of the
+             storage, or an enclosed tank is used
+        """
         return (EF_n20 * A_storage) / 1000
 
-# EN2O,manure = emission of N2O from slurry storage, kg N2O /day
-# EF,N2O,man = emission rate of N2O, 0.8 g N2O /m2 -day
-# Astorage = exposed surface area of the manure storage, m2
-#
-# Note: For stacked manure with a greater DM content, an emission factor of 0.005 kg N2O-N /(kg Nexcreted)
-#     when a crust does not form, no N2O is formed and emitted
-#     This occurs if the manure DM contentis less than 8%, manure is loaded daily onto the top surface of the
-#     storage, or an enclosed tank is used
 #
