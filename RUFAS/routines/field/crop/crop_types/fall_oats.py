@@ -15,6 +15,7 @@ class FallOats(BaseCrop):
         self.harvest_day = fall_oats_data['harvest_day']
         self.harvest_type = fall_oats_data['harvest_type']
         self.planting_order = fall_oats_data['planting_order'].lower()
+        self.extracted = fall_oats_data['extracted']
 
         self.crop_name = crop_name
         self.crop_type = 'annual'

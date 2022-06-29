@@ -8,7 +8,8 @@
             "planting_day": 113,
             "harvest_day": 305,
             "harvest_type": "scheduled",
-            "planting_order": "1st"
+            "planting_order": "1st",
+            "extracted": false
 
         },
         "alfalfa_90": {
@@ -17,8 +18,8 @@
             "planting_day": 113,
             "harvest_day": 237,
             "harvest_type": "scheduled",
-            "planting_order": "1st"
-
+            "planting_order": "1st",
+            "extracted": false
         },
         "corn_93": {
             "plant_years": [1993],
@@ -26,7 +27,8 @@
             "planting_day": 121,
             "harvest_day": 305,
             "harvest_type": "scheduled",
-            "planting_order": "1st"
+            "planting_order": "1st",
+            "extracted": false
 
         },
         "alfalfa_94": {
@@ -35,8 +37,8 @@
             "planting_day": 108,
             "harvest_day": 302,
             "harvest_type": "scheduled",
-            "planting_order": "1st"
-
+            "planting_order": "1st",
+            "extracted": false
         },
         "corn_97": {
             "plant_years": [1997],
@@ -44,7 +46,8 @@
             "planting_day": 115,
             "harvest_day": 305,
             "harvest_type": "scheduled",
-            "planting_order": "1st"
+            "planting_order": "1st",
+            "extracted": false
 
         },
         "alfalfa_98": {
@@ -53,7 +56,8 @@
             "planting_day": 105,
             "harvest_day": 250,
             "harvest_type": "scheduled",
-            "planting_order": "1st"
+            "planting_order": "1st",
+            "extracted": false
 
         },
         "corn_01": {
@@ -62,7 +66,8 @@
             "planting_day": 121,
             "harvest_day": 288,
             "harvest_type": "scheduled",
-            "planting_order": "1st"
+            "planting_order": "1st",
+            "extracted": false
 
         },
         "alfalfa_02": {
@@ -71,7 +76,8 @@
             "planting_day": 98,
             "harvest_day": 253,
             "harvest_type": "scheduled",
-            "planting_order": "1st"
+            "planting_order": "1st",
+            "extracted": false
 
         },
         "corn_05": {
@@ -80,7 +86,8 @@
             "planting_day": 120,
             "harvest_day": 293,
             "harvest_type": "scheduled",
-            "planting_order": "1st"
+            "planting_order": "1st",
+            "extracted": false
 
         },
         "alfalfa_06": {
@@ -89,7 +96,8 @@
             "planting_day": 97,
             "harvest_day": 256,
             "harvest_type": "scheduled",
-            "planting_order": "1st"
+            "planting_order": "1st",
+            "extracted": false
 
         },
         "corn_09": {
@@ -98,7 +106,8 @@
             "planting_day": 168,
             "harvest_day": 281,
             "harvest_type": "scheduled",
-            "planting_order": "1st"
+            "planting_order": "1st",
+            "extracted": false
         },
         "alfalfa_10": {
             "plant_years": [2010, 2011, 2012],
@@ -106,7 +115,8 @@
             "planting_day": 89,
             "harvest_day": 179,
             "harvest_type": "scheduled",
-            "planting_order": "1st"
+            "planting_order": "1st",
+            "extracted": false
         },
         "corn_13": {
             "plant_years": [2013],
@@ -114,7 +124,8 @@
             "planting_day": 127,
             "harvest_day": 298,
             "harvest_type": "scheduled",
-            "planting_order": "1st"
+            "planting_order": "1st",
+            "extracted": false
         },
         "alfalfa_14": {
             "plant_years": [2014, 2015, 2016],
@@ -122,7 +133,8 @@
             "planting_day": 89,
             "harvest_day": 179,
             "harvest_type": "scheduled",
-            "planting_order": "1st"
+            "planting_order": "1st",
+            "extracted": false
         },
         "corn_17": {
             "plant_years": [2017],
@@ -130,7 +142,8 @@
             "planting_day": 125,
             "harvest_day":300,
             "harvest_type": "scheduled",
-            "planting_order": "1st"
+            "planting_order": "1st",
+            "extracted": false
         },
         "alfalfa_18": {
             "plant_years": [2018, 2019],
@@ -138,7 +151,8 @@
             "planting_day": 120,
             "harvest_day": 180,
             "harvest_type": "scheduled",
-            "planting_order": "1st"
+            "planting_order": "1st",
+            "extracted": false
         }
     }
 }

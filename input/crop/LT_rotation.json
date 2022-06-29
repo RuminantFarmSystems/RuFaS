@@ -8,7 +8,12 @@
             "planting_day": 92,
             "harvest_day": 225,
             "harvest_type": "scheduled",
+<<<<<<< HEAD
             "planting_order" : "1st"
+=======
+            "planting_order": "1st",
+            "extracted": true
+>>>>>>> origin/sequential_v3
         },
         "potato_14": {
             "plant_years": [2014],
@@ -16,7 +21,12 @@
             "planting_day": 119,
             "harvest_day": 281,
             "harvest_type": "scheduled",
+<<<<<<< HEAD
             "planting_order" : "1st"
+=======
+            "planting_order": "1st",
+            "extracted": true
+>>>>>>> origin/sequential_v3
         },
         "sugar_beet_15": {
             "plant_years": [2015],
@@ -24,7 +34,12 @@
             "planting_day": 89,
             "harvest_day": 215,
             "harvest_type": "scheduled",
+<<<<<<< HEAD
             "planting_order" : "1st"
+=======
+            "planting_order": "1st",
+            "extracted": true
+>>>>>>> origin/sequential_v3
         },
         "spring_barley_16": {
             "plant_years": [2016],
@@ -32,7 +47,12 @@
             "planting_day": 129,
             "harvest_day": 313,
             "harvest_type": "scheduled",
+<<<<<<< HEAD
             "planting_order" : "1st"
+=======
+            "planting_order": "1st",
+            "extracted": true
+>>>>>>> origin/sequential_v3
         }
     }
 }

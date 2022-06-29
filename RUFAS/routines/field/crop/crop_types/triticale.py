@@ -15,6 +15,7 @@ class Triticale(BaseCrop):
         self.harvest_day = triticale_data['harvest_day']
         self.harvest_type = triticale_data['harvest_type']
         self.planting_order = triticale_data['planting_order'].lower()
+        self.extracted = triticale_data['extracted']
 
         self.crop_name = crop_name
         self.crop_type = 'annual'

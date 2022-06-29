@@ -306,7 +306,7 @@ class FieldReport(BaseReportDriver):
                                          'fert_P_leached': ['soil.fert_P_leached_annual', 'kg', 0],
                                          'M_leach': ['soil.M_leach_annual', 'kg', 0],
                                          'DRP_drainage': ['soil.DRP_drainage_annual', 'kg', 0],
-                                         'M_DRP_runoff': ['soil.M_DRP_runoff_annual', 'kg', 0],
+                                                 'M_DRP_runoff': ['soil.M_DRP_runoff_annual', 'kg', 0],
                                          'fert_P_runoff': ['soil.fert_P_runoff_annual', 'kg', 0],
                                          'DRP_runoff': ['soil.DRP_runoff_annual', 'kg', 0],
                                          'MIP_runoff': ['soil.MIP_runoff_annual', 'kg', 0],
@@ -318,7 +318,7 @@ class FieldReport(BaseReportDriver):
         class SoilCarbonReport(BaseSoilReport):
             def __init__(self, data, field_name):
                 super().__init__(data, field_name)
-
+            
                 self.daily_variables = {'year': ['time.calendar_year', '', []],
                                         'j_day': ['time.day', '', []],
                                         'residue_harvest': ['soil.residue_harvest', 'kg/ha', []],
@@ -488,7 +488,8 @@ class FieldReport(BaseReportDriver):
                                         'C_passive_decomp_layer2': [
                                             'soil.soil_layers[2].C_passive_decomp', '%', []],
                                         'C_passive_decomp_layer3': [
-                                            'soil.soil_layers[3].C_passive_decomp', '%', []]                                        }
+                                            'soil.soil_layers[3].C_passive_decomp', '%', []]
+                                            }
 
                 self.annual_variables = {'year': ['time.calendar_year', '', 0]
                                          }
