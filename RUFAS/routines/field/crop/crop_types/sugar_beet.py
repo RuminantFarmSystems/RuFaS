@@ -15,6 +15,7 @@ class SugarBeet(BaseCrop):
         self.harvest_day = sugar_beet_data['harvest_day']
         self.harvest_type = sugar_beet_data['harvest_type']
         self.planting_order = sugar_beet_data['planting_order'].lower()
+        self.extracted = sugar_beet_data['extracted']
 
         self.crop_name = crop_name
         self.crop_type = 'annual'

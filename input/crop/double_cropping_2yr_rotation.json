@@ -8,7 +8,8 @@
             "planting_day": 160,
             "harvest_day": 270,
             "harvest_type": "scheduled",
-            "planting_order": "1st"
+            "planting_order": "1st",
+            "extracted": true
         },
         "winter_wheat": {
             "plant_years": [2009],
@@ -16,7 +17,8 @@
             "planting_day": 280,
             "harvest_day": 150,
             "harvest_type": "scheduled",
-            "planting_order": "2nd"
+            "planting_order": "2nd",
+            "extracted": true
         }
     }
 }

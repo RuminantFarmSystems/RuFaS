@@ -101,8 +101,8 @@ class FieldManagement:
             "tillage": {
                 'year': -1,
                 'day': -1,
-                'percent_manure_incorporated': 0.8, #need to check this one out and potentially change to nutrient
-                'percent_manure_mixed': 0.6, #need to check this one out and potentially change to nutrient
+                'percent_nutrient_incorporated': 0.8, 
+                'percent_nutrient_mixed': 0.6, 
                 'depth': 25.0
             }
         }

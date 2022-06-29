@@ -17,7 +17,7 @@ from RUFAS.routines.animal.life_cycle.animal_base import AnimalBase
 from RUFAS.routines.animal.ration.calf_ration import calc_requirements
 from RUFAS.routines.animal.manure.calf_manure_excretion import \
     manure_calculations
-from RUFAS.routines.animal.life_cycle import animal_events_constants as const
+from RUFAS.routines.animal.life_cycle import animal_constants as const
 
 
 class Calf(AnimalBase):
@@ -44,7 +44,7 @@ class Calf(AnimalBase):
         self.wean_weight = 0
         self.birth_weight = 0
         self.animal_intake = 0
-        self._DBW = 0
+        self.DBW = 0
 
         if 'body_weight' in args:
             self.assign_calf_values(args)
@@ -87,8 +87,8 @@ class Calf(AnimalBase):
 
         self.birth_weight = args['birth_weight']
         self.body_weight = args['birth_weight']
-        self.mature_body_weight = truncnorm.rvs(-2*AnimalBase.config['mature_body_weight_std'], 2*AnimalBase.config['mature_body_weight_std'], \
-                        AnimalBase.config['mature_body_weight_avg'], AnimalBase.config['mature_body_weight_std'])
+        self.mature_body_weight = truncnorm.rvs(-const.STDI, const.STDI, AnimalBase.config['mature_body_weight_avg'], \
+            AnimalBase.config['mature_body_weight_std'])
         self.wean_weight = 0
         self.p_animal = args['p_init']
 
@@ -131,7 +131,7 @@ class Calf(AnimalBase):
         wean_length = AnimalBase.config['wean_length']
         milk_type = AnimalBase.config['milk_type']
         self.animal_intake, self.nutrient_rqmts = calc_requirements(self, feed, temp, wean_day, wean_length, milk_type)
-        self._DBW = self.nutrient_rqmts['live_weight_change']['val']
+        self.DBW = self.nutrient_rqmts['live_weight_change']['val']
 
     def calc_manure_excretion(self, feed):
         """

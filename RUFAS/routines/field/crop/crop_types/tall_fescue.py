@@ -13,6 +13,7 @@ class TallFescue(BaseCrop):
         self.planting_day = tall_fescue_data['planting_day']
         self.harvest_day = tall_fescue_data['harvest_day']
         self.planting_order = tall_fescue_data['planting_order'].lower()
+        self.extracted = tall_fescue_data['extracted']
 
         if tall_fescue_data['harvest_type'] != 'optimal':
             print('Perennial crops are always optimally harvested')
