@@ -26,16 +26,6 @@ import logging
 LOGGER = logging.getLogger()
 logging.basicConfig(level = logging.INFO)
 
-from unittest.mock import MagicMock
-import numpy as np
-
-from RUFAS.classes import Time
-from RUFAS.routines.field.soil import Soil
-from RUFAS.routines.field.field_management import FieldManagement
-#using Corn for all tests
-from RUFAS.routines.field.crop.crop_types.corn import Corn
-from RUFAS.routines.field.crop.crop_types.alfalfa import Alfalfa
-from RUFAS.routines.field.crop.yields import calc_residue
 
 
 
