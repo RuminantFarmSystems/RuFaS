@@ -1322,7 +1322,8 @@ def test_residue_partitioning():
             "bio_BG": 0,
             "fr_N": 0,
             "extracted" : "true",
-            "bio_AG" : 0
+            "bio_AG" : 0,
+            "yield_actual" : 0
         }
         test_soil.configure_mock(**soil_attributes)
         test_soil_layer.configure_mock(**layer_attributes)
@@ -1354,6 +1355,7 @@ def test_residue_partitioning():
         np.testing.assert_almost_equal(0, layer0.BG_struct_to_C_active)
         np.testing.assert_almost_equal(0, layer0.BG_struct_to_C_slow)
         np.testing.assert_almost_equal(1250000.0, layer0.BG_struct)
+        np.testing.assert_almost_equal(0,test_crop_type.yield_actual)
 
 
 
