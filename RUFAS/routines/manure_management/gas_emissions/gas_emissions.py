@@ -126,6 +126,77 @@ class GasEmissions:
       return (EF_n20*A_storage)/1000
 
 
+    """
+    Returns the RUC = rate of urea transformation to TAN via Eq. (1), 
+    kg/m3-h 
+    
+    Args:
+    CU = urea concentration in urine, kg/m3
+    Vmax = maximum rate of urea conversion, kg N/m3 wet feces-h 
+    Kmc = Michaelis-Menten coefficient, kg N/m3 mixture""" 
+    @staticmethod
+    def calculate_ruc(vmax, cu, Kmc):
+      return (vmax*cu/(kmc+cu))
+
+
+    """
+    Returns the Vmax, maximum rate of urea conversion, kg N/m3 wet feces-h
+    
+    Args:
+      T - temparature in Kelvin
+    """
+    @staticmethod
+    def calculate_vmax(T):
+      return (3.915 * (10**9) * math.exp(-6463/T))
+
+
+
+    """ Returns the Kmc = Michaelis-Menten coefficient, kg N/m3 mixture
+
+    Args:
+      T - temparature in Kelvin
+    """
+    @staticmethod
+    def calculate_kmc(T):
+      return ( 3.371 * (10**8) * math.exp(-5914/T))
+
+
+  
+    """
+    Returns the ammonia fraction of TAN in a manure solution, F
+
+    Args:
+
+      ph : surface pH of manure or urine
+      Ka: the dissociation constant
+    """
+    @staticmethod
+    def calculate_f(ph, Ka):
+      return 1/ (1+(10**(-ph)) /Ka)
+
+
+    """    
+    Returns the the dissociation constant, Ka
+
+    Args:
+      T - temparature in Kelvin
+    """
+    @staticmethod
+    def calculate_ka(T):
+       return 10**(0.05 - 2788/T)
+ 
+
+
+    """
+    Returns the  Henry’s Law constant for ammonia, H
+
+    Args:
+      T - temparature in Kelvin
+    
+    """
+    @staticmethod
+    def calculate_henry_constant(T):
+      return = (T/0.2138) * 10**(1825/T - 6.123) 
 
 @dataclass
 class FakeOutput:
