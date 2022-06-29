@@ -6,6 +6,21 @@ Author(s): Pooya Hekmati, sh2235@cornell.edu
 """
 
 import pytest
+import logging
+
+import numpy as np
+from RUFAS.classes import Time
+from RUFAS.classes import Weather
+from RUFAS.routines.field.field_management import FieldManagement
+from RUFAS.routines.field.crop.crop_types.corn import Corn
+from RUFAS.routines.field.crop.crop_types.alfalfa import Alfalfa
+from RUFAS.routines.field.soil import Soil
+from RUFAS.routines.field.soil.carbon_cycling import residue_partitioning, decomp_factors, pool_gas_partitioning, carbon_cycle
+from RUFAS.routines.field.crop.yields import calc_residue
+LOGGER = logging.getLogger()
+logging.basicConfig(level=logging.INFO)
+
+from unittest.mock import MagicMock
 
 
 def test_daily_fields_routine():
@@ -460,7 +475,126 @@ def test_calc_nutrient_removal():
 
 def test_calc_residue():
     """Unit test for function calc_residue in file routines/field/crop/yields.py"""
-    pass
+    try:
+        LOGGER.info("Testing function calc_residue in yields.py")
+
+
+        #tests for the annual crop
+        LOGGER.info("Running tests for annual crop... Corn")
+
+        annual_soil = MagicMock(Soil)
+        annual_soil_layer = MagicMock(Soil.SoilLayer)
+        annual_crop = MagicMock(Corn) 
+        annual_time = MagicMock(Time)
+        annual_FM = MagicMock(FieldManagement)
+        annual_base_app = MagicMock(FieldManagement.BaseApplicationManagement)
+
+        corn_attributes = {
+            "fr_root" : 0,
+            "biomass_actual" : 1,
+            "yield_actual": 0,
+            "kill_day" : 3,
+            "crop_type" : 'annual',
+            "accumulated_HU" : 0,
+            "PHU" : 2,
+            "LAI_actual" : 0,
+            "bio_P" : 0,
+            "bio_N" : 0
+        }
+        time_attributes_annual = {
+            "day" : 1,
+            "calendar_year" : 1990
+        }
+        soil_layer_attributes_annual= {
+            "tillage_percent" : 0.55
+        }
+        annual_soil_attributes = {
+            "soil_layers" : [annual_soil_layer],
+            "residue" : 0
+        }
+        field_management_attributes_annual = {
+            "managed_applications" : {
+                'tillage' : annual_base_app
+            }
+
+        }
+        baseApp_attributes_annual = {
+            "applications" : {}
+        }
+        
+        annual_soil_layer.configure_mock(**soil_layer_attributes_annual)
+        annual_soil.configure_mock(**annual_soil_attributes)
+        annual_crop.configure_mock(**corn_attributes) 
+        annual_time.configure_mock(**time_attributes_annual)
+        annual_base_app.configure_mock(**baseApp_attributes_annual)
+        annual_FM.configure_mock(**field_management_attributes_annual)
+
+        calc_residue(annual_soil, annual_crop, annual_FM, annual_time)
+
+        LOGGER.info("Checking soil residue_harvest")
+        np.testing.assert_almost_equal(1,annual_soil.residue_harvest) 
+
+
+
+        #perennial crop
+        LOGGER.info("Running tests for perennial crop... Alfalfa")
+        perennial_soil = MagicMock(Soil)
+        perennial_soil_layer = MagicMock(Soil.SoilLayer)
+        perennial_crop = MagicMock(Alfalfa) 
+        perennial_time = MagicMock(Time)
+        perennial_FM = MagicMock(FieldManagement)
+        perennial_base_app = MagicMock(FieldManagement.BaseApplicationManagement)
+        
+
+        alfalfa_attributes = {
+             "fr_root" : 0,
+            "biomass_actual" : 1,
+            "yield_actual": 0,
+            "kill_day" : 3,
+            "crop_type" : 'perennial',
+            "accumulated_HU" : 0,
+            "PHU" : 2,
+            "LAI_actual" : 0,
+            "bio_P" : 0,
+            "bio_N" : 0
+        }
+        time_attributes_perennial = {
+            "day" : 1,
+            "calendar_year" : 1990
+        }
+        soil_layer_attributes_perennial = {
+            "tillage_percent" : 0.55
+        }
+        perennial_soil_attributes = {
+            "soil_layers" : [perennial_soil_layer],
+            "residue" : 0
+        }
+        field_management_attributes_perennial = {
+            "managed_applications" : {
+                'tillage' : perennial_base_app
+            }
+
+        }
+        baseApp_attributes_perennial = {
+            "applications" : {}
+        }
+
+        perennial_soil_layer.configure_mock(**soil_layer_attributes_perennial)
+        perennial_soil.configure_mock(**perennial_soil_attributes)
+        perennial_crop.configure_mock(**alfalfa_attributes) 
+        perennial_time.configure_mock(**time_attributes_perennial)
+        perennial_base_app.configure_mock(**baseApp_attributes_perennial)
+        perennial_FM.configure_mock(**field_management_attributes_perennial)
+
+
+        calc_residue(perennial_soil, perennial_crop, perennial_FM, perennial_time)
+
+        LOGGER.info("Checking soil residue_harvest")
+        np.testing.assert_almost_equal(0,perennial_soil.residue_harvest) 
+        
+    except:
+        assert False
+    
 
 
 def test_calc_harvest_quality():
@@ -898,9 +1032,85 @@ def test_moisture_factor():
     pass
 
 
-def test_update_all():
+def test_update_all_pool_gas_partitioning():
     """Unit test for function update_all in file routines/field/soil/carbon_cycling/pool_gas_partitioning.py"""
-    pass
+    try:
+        LOGGER.info("Testing function: update_all")
+        test_soil = MagicMock(Soil)
+        test_soil_layer = MagicMock(Soil.SoilLayer)
+        test_time = MagicMock(Time)
+        test_weather = MagicMock(Weather)
+        test_crop_type = MagicMock(Corn)
+
+        layer_attributes = {
+            "water_fac": 0.0,
+            "AG_met": 1250000,
+            "BG_met": 1250000,
+            "tillage_percent": 0.0,
+            "AG_struct": 1250000,
+            "BG_struct": 1250000,
+            "thickness": 0.0,
+            "C_active": 1250000,
+            "C_slow": 1250000,
+            "C_passive": 1250000,
+            "AG_struct_to_C_active" : 0,
+            "AG_struct_to_C_slow" : 0
+        }
+        soil_attributes = {
+            "soil_layers": [test_soil_layer],
+            "AG_lignin_res_percent": 17,
+            "residue_harvest": 0.0,
+            "BG_lignin_res_percent": 17,
+            "profile_depth": 279.4,
+            "silt_to_clay_percent": 0.5
+        }
+        weather_attributes = {
+            "T_avg": [[0]],
+            "rainfall": [[0]]
+        }
+        time_attributes = {
+            "year": 1,
+            "day": 1
+        }
+        corn_attributes = {
+            "bio_AG" : 0,
+            "bio_BG": 0,
+            "fr_N": 0,
+            "extracted" : True
+        }
+        test_soil.configure_mock(**soil_attributes)
+        test_soil_layer.configure_mock(**layer_attributes)
+        test_weather.configure_mock(**weather_attributes)
+        test_time.configure_mock(**time_attributes)
+        test_crop_type.configure_mock(**corn_attributes)
+
+        decomp_factors.update_all(test_soil, test_weather, test_time)
+        residue_partitioning.update_all(soil=test_soil, crop_type=test_crop_type, weather=test_weather,
+                                        time=test_time)
+        pool_gas_partitioning.update_all(test_soil)
+
+        LOGGER.info("Checking changes to soil layers")
+        LOGGER.info("Checking Layer 0")
+        layer0 = test_soil.soil_layers[0]
+        np.testing.assert_almost_equal(0.03505788081471571, layer0.AG_met_to_C_active_loss)
+        np.testing.assert_almost_equal(0.028683720666585574, layer0.AG_met_to_C_active_act)
+        np.testing.assert_almost_equal(8.77950623625564e-05, layer0.AG_struct_to_C_active_loss)
+        np.testing.assert_almost_equal(0.00010730507622090227, layer0.AG_struct_to_C_active_act)
+        np.testing.assert_almost_equal(5.85300415750376e-05, layer0.AG_struct_to_C_slow_loss)
+        np.testing.assert_almost_equal(0.00013657009700842107, layer0.AG_struct_to_C_slow_act)
+        np.testing.assert_almost_equal(0.043822351018394635, layer0.BG_met_to_C_active_loss)
+        np.testing.assert_almost_equal(0.035854650833231964, layer0.BG_met_to_C_active_act)
+        np.testing.assert_almost_equal(0.009609046423306167, layer0.BG_struct_to_C_active_loss)
+        np.testing.assert_almost_equal(0.011744390072929762, layer0.BG_struct_to_C_active_act)
+        np.testing.assert_almost_equal(0.006406030948870778, layer0.BG_struct_to_C_slow_loss)
+        np.testing.assert_almost_equal(0.014947405547365148, layer0.BG_struct_to_C_slow_act)
+        np.testing.assert_almost_equal(0.00019510013858345867,layer0.AG_struct_to_C_active)
+        np.testing.assert_almost_equal(0.00019510013858345867,layer0.AG_struct_to_C_slow)
+        np.testing.assert_almost_equal(0,test_crop_type.bio_AG)
+
+        assert True
+    except:
+        assert False
 
 
 def test_update_all():
@@ -910,7 +1120,89 @@ def test_update_all():
 
 def test_residue_partitioning():
     """Unit test for function residue_partitioning in file routines/field/soil/carbon_cycling/residue_partitioning.py"""
-    pass
+    LOGGER.info("Testing function: residue_partitioning")
+    try:
+        test_soil = MagicMock(Soil)
+        test_soil_layer = MagicMock(Soil.SoilLayer)
+        test_time = MagicMock(Time)
+        test_weather = MagicMock(Weather)
+        test_crop_type = MagicMock(Corn)
+
+        layer_attributes = {
+            "water_fac": 0.0,
+            "AG_met": 1250000,
+            "BG_met": 1250000,
+            "tillage_percent": 0.0,
+            "AG_struct": 1250000,
+            "BG_struct": 1250000,
+            "thickness": 0.0,
+            "C_active": 1250000,
+            "C_slow": 1250000,
+            "C_passive": 1250000,
+            "M_d": 0,
+            "AG_struct_to_C_active_loss": 0,
+            "AG_struct_to_C_active" : 0,
+            "AG_struct_to_C_slow" : 0,
+            "ADJ_crop_type_bio_BG" : 0
+        }
+        soil_attributes = {
+            "soil_layers": [test_soil_layer],
+            "AG_lignin_res_percent": 17,
+            "residue_harvest": 0.0,
+            "BG_lignin_res_percent": 17,
+            "profile_depth": 279.4,
+            "AG_L_to_N" : 0
+        }
+        weather_attributes = {
+            "T_avg": [[0]],
+            "rainfall": [[0]]
+        }
+        time_attributes = {
+            "year": 1,
+            "day": 1
+        }
+        corn_attributes = {
+            "bio_BG": 0,
+            "fr_N": 0,
+            "extracted" : "true",
+            "bio_AG" : 0
+        }
+        test_soil.configure_mock(**soil_attributes)
+        test_soil_layer.configure_mock(**layer_attributes)
+        test_weather.configure_mock(**weather_attributes)
+        test_time.configure_mock(**time_attributes)
+        test_crop_type.configure_mock(**corn_attributes)
+
+        decomp_factors.temp_factor(test_soil, test_weather, test_time)
+        residue_partitioning.residue_partitioning(soil=test_soil, crop_type=test_crop_type, weather=test_weather,
+                                                    time=test_time)
+
+        LOGGER.info("Checking changes to soil")
+        np.testing.assert_almost_equal(17.0, test_soil.AG_lignin_res_percent)
+        np.testing.assert_almost_equal(0.425, test_soil.AG_L_to_N)
+
+        LOGGER.info("Checking ADJ_crop_type_bio_BG for soil layers")
+        layer0 = test_soil.soil_layers[0]
+        np.testing.assert_almost_equal(0, layer0.ADJ_crop_type_bio_BG)
+        np.testing.assert_almost_equal(17, test_soil.AG_lignin_res_percent)
+        np.testing.assert_almost_equal(0.425, test_soil.AG_L_to_N)
+        np.testing.assert_almost_equal(0, layer0.AG_met_to_C_active)
+        np.testing.assert_almost_equal(1250000.0, layer0.AG_met)
+        np.testing.assert_almost_equal(1250000.0, layer0.AG_struct)
+        np.testing.assert_almost_equal(0, layer0.AG_struct_to_C_active)
+        np.testing.assert_almost_equal(0, layer0.AG_struct_to_C_slow)
+        np.testing.assert_almost_equal(17.0, test_soil.BG_lignin_res_percent)
+        np.testing.assert_almost_equal(0, layer0.BG_met_to_C_active)
+        np.testing.assert_almost_equal(1250000.0, layer0.BG_met)
+        np.testing.assert_almost_equal(0, layer0.BG_struct_to_C_active)
+        np.testing.assert_almost_equal(0, layer0.BG_struct_to_C_slow)
+        np.testing.assert_almost_equal(1250000.0, layer0.BG_struct)
+
+
+
+        assert True
+    except: 
+        assert False
 
 
 def test_denitrification():
