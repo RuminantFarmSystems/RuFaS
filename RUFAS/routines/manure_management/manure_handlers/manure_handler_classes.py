@@ -72,7 +72,8 @@ class BaseManureHandler:
                 VSnd=pen.manure.VSnd,
                 p_excrt_manure=pen.manure.p_excrt_manure,
                 K_manure=pen.manure.K_manure,
-                methane_floor=GasEmissions.calc_methane_floor(pen),
+                CH4_floor=GasEmissions.calc_E_CH4_floor(pen),
+                CO2_floor=GasEmissions.calc_E_C02_floor(pen),
 
                 raw_manure=pen.manure_mass,
                 cleaning_water=self.cleaning_water_volume_in_main_barn(pen),

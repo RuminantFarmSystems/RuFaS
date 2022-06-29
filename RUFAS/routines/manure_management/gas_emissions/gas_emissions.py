@@ -9,7 +9,8 @@ from .gas_emissions_constants import GasEmissionConstants as Constants
 @dataclass
 class CanCalcMethane(Protocol):
     """
-    List of
+    To calculate methane emission, we need VSd and VSnd from
+    manure handlers, separators, or treatments.
     """
     VSd: float
     VSnd: float
@@ -17,7 +18,7 @@ class CanCalcMethane(Protocol):
 
 class GasEmissions:
     @staticmethod
-    def calc_methane(data: CanCalcMethane, temp=15.0) -> float:
+    def calc_E_CH4_storage(data: CanCalcMethane, temp=15.0) -> float:
         """
         ECH4,man = 	[(( 24 * Vs,d * b1)/1000) * exp[ln(A)) - (E/RT)] + (( 24 * Vs,nd *  b2)/1000) * exp[ln(A) -(E/RT)]
 
@@ -59,7 +60,7 @@ class GasEmissions:
         # Simplified: return daily_time_steps * ex * (output.VSd * b1 + output.VSnd * b2)
 
     @staticmethod
-    def calc_methane2(data: CanCalcMethane, temp=15.0, Bo=0.2, E_CH4_pot=0.48) -> float:
+    def calc_E_CH4_storage_2(data: CanCalcMethane, temp=15.0, Bo=0.2, E_CH4_pot=0.48) -> float:
         c = 0.024
         VS_tot = data.VSd + data.VSnd
         b1 = 1.0
@@ -73,58 +74,94 @@ class GasEmissions:
         VSd = (data.VSd * (Bo / E_CH4_pot) - VS_loss) / VS_tot
         VSnd = VS_tot - VSd
 
-        print(f'raw data: {data}')
-        print(f'new VSd: {VSd}')
-        print(f'new VSnd: {VSnd}')
-
         return c * VS_tot * (VSd * b1 + VSnd * b2) * ex
 
     @staticmethod
-    def calc_nh3_volatilization_n(Tan, c, p, r, m, q):
+    def calc_modified_hours(hours: float) -> float:
+        if hours > 14:
+            modified_hours = - math.tanh(hours - 21.5) / 3.5
+        elif hours > 4:
+            modified_hours = math.tanh(hours - 9.5) / 2.5
+        else:
+            modified_hours = - math.tanh(hours + 3.5) / 3.5
+        return modified_hours
+
+    @staticmethod
+    def calc_ambient_temp(hours, t_min, t_max):
+        modified_hours = GasEmissions.calc_modified_hours(hours)
+        t_ambient = modified_hours * (t_max - t_min) / 2 + (t_max + t_min) / 2
+        return t_ambient
+
+    @staticmethod
+    def calc_barn_area(pen: SimplePen) -> float:
+        if 'Cow' in pen.classes_in_pen:
+            if pen.housing_type == 'tie stall':
+                barn_area = 1.2
+            elif pen.housing_type == 'bedded pack':
+                barn_area = 5.0
+            else:  # default is free stall
+                barn_area = 3.5
+        else:
+            if pen.housing_type == 'tie stall':
+                barn_area = 1.0
+            elif pen.housing_type == 'bedded pack':
+                barn_area = 3.0
+            else:  # default is free stall
+                barn_area = 2.5
+        return barn_area
+
+    @staticmethod
+    def calc_E_CH4_floor(pen: SimplePen, t_min=20.0, t_max=25.0, hours=24):
+        """
+        Calculates the ECH4_floor.
+
+        Args:
+            pen:
+            t_min:
+            t_max:
+            hours:
+        """
+        t_ambient = GasEmissions.calc_ambient_temp(hours, t_min, t_max)
+        t = max(-5.0, 0.63 * t_ambient + 6.0)
+        barn_area = GasEmissions.calc_barn_area(pen)
+        return pen.num_animals * max(0.0, 0.13 * t) * barn_area / 1000
+
+    @staticmethod
+    def calc_E_C02_floor(pen: SimplePen, t_min=20.0, t_max=25.0, hours=24):
+        """
+        """
+        t_ambient = GasEmissions.calc_ambient_temp(hours, t_min, t_max)
+        t = max(-5.0, 0.63 * t_ambient + 6.0)
+        barn_area = GasEmissions.calc_barn_area(pen)
+        return pen.num_animals * max(0.0, 0.0065 + 0.0192 * t) * barn_area / 1000
+
+    @staticmethod
+    def calc_E_NH3_N(Tan, c, p, r, m, q):
+        """
+
+        """
         return (Tan * c * p) / (r * m * q)
 
     @staticmethod
     def calc_kh(T):
-      return 10**(1478/(T+273)-1.69)
+        """
 
-    
+        """
+        return 10 ** (1478 / (T + 273) - 1.69)
+
     @staticmethod
     def calc_ka(T, pH):
-      return 1 + 10**(0.09018 + 2729.9) / (T+272 -pH)
+        """
+
+        """
+        return 1 + 10 ** (0.09018 + 2729.9) / (T + 272 - pH)
 
     @staticmethod
     def calc_q(ka, kh):
-      return kh*ka
-
-    @staticmethod
-    def calc_r(hsc, T):
-      return (hsc * (1-0.027 * (20-T)))
-
+        """
 
         """
-    Calculates the ECH4_floor.
-    Inputs: 
-      T: ambient barn temperature, °C
-      Area_barn: area of the barn floor covered with manure, m2
-    """
-    @staticmethod
-    def calculate_ECH4_floor(T, Area_barn):
-      return max(0.0, 0.13 * T) * Area_barn / 1000
-
-    """
-    Calculates the EC02_floor.
-    Inputs:
-      T: ambient barn temperature, C
-      Area_barn: area of the barn flooor covered with manure, m2
-    """
-    @staticmethod
-    def calculate_EC02_floor(T, Area_barn):
-      return max(0.0, (0.0065 + 0.0192*T) ) * Area_barn
-
-    @staticmethod
-    def calculate_en20_manure(EF_n20, A_storage):
-      return (EF_n20*A_storage)/1000
-
+        return kh * ka
 
     """
     Returns the RUC = rate of urea transformation to TAN via Eq. (1), 
@@ -198,10 +235,21 @@ class GasEmissions:
     def calculate_henry_constant(T):
       return = (T/0.2138) * 10**(1825/T - 6.123) 
 
-@dataclass
-class FakeOutput:
-    VSd = 3546.6
-    VSnd = 4163.4
+        """
+        return hsc * (1 - 0.027 * (20 - T))
 
-    def __str__(self):
-        return f'{self.VSd}, {self.VSnd}'
+    @staticmethod
+    def calc_E_N20_manure(EF_n20, A_storage):
+        """
+        EN2O,manure = emission of N2O from slurry storage, kg N2O /day
+        EF,N2O,man = emission rate of N2O, 0.8 g N2O /m2 -day
+        Astorage = exposed surface area of the manure storage, m2
+
+        Note: For stacked manure with a greater DM content, an emission factor of 0.005 kg N2O-N /(kg Nexcreted)
+             when a crust does not form, no N2O is formed and emitted
+             This occurs if the manure DM contents less than 8%, manure is loaded daily onto the top surface of the
+             storage, or an enclosed tank is used
+        """
+        return (EF_n20 * A_storage) / 1000
+
+#

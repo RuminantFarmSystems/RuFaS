@@ -7,7 +7,8 @@ class Units:
     VSnd = 'kg'
     p_excrt_manure = 'kg'
     K_manure = 'kg'
-    methane_floor = 'kg/day'
+    CH4_floor = 'kg/day'
+    CO2_floor = 'kg/day'
 
     raw_manure = 'kg'
     cleaning_water = 'L'  # liters, 1L = 1kg

@@ -17,7 +17,6 @@ class ReceptionPitOutput:
     VS_total: float = 0.0
     p_excrt_manure: float = 0.0
     K_manure: float = 0.0
-    methane_floor: float = 0.0
 
     raw_manure: float = 0.0
     cleaning_water: float = 0.0
@@ -30,9 +29,13 @@ class ReceptionPitOutput:
 
     @classmethod
     def get_instance(cls, manure_handler_output: ManureHandlerOutput) -> ReceptionPitOutput:
-        res = ReceptionPitOutput(**asdict(manure_handler_output))
-        res.total_daily_mass = manure_handler_output.total_daily_mass
-        return res
+        excluded_attrs = ['CH4_floor', 'CO2_floor']
+        manure_handler_output_dict = asdict(manure_handler_output)
+        for key in excluded_attrs:
+            if key in manure_handler_output_dict:
+                del manure_handler_output_dict[key]
+        out = ReceptionPitOutput(**manure_handler_output_dict)
+        return out
 
     def __str__(self) -> str:
         res = ['Reception pit output']

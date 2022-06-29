@@ -16,7 +16,8 @@ class ManureHandlerOutput:
     VS_total: float = field(init=False)
     p_excrt_manure: float = 0.0  # kg
     K_manure: float = 0.0  # kg
-    methane_floor: float = 0.0  # kg/day
+    CH4_floor: float = 0.0  # kg/day
+    CO2_floor: float = 0.0  # kg/day
 
     raw_manure: float = 0.0  # kg
     cleaning_water: float = 0.0  # liters, 1L = 1kg
