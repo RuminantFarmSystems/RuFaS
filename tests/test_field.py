@@ -22,9 +22,6 @@ logging.basicConfig(level=logging.INFO)
 
 from unittest.mock import MagicMock
 
-import logging
-LOGGER = logging.getLogger()
-logging.basicConfig(level = logging.INFO)
 
 
 
