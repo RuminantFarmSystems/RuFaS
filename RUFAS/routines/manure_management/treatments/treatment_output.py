@@ -69,6 +69,7 @@ class AnaerobicDigesterOutput(TreatmentOutput):
     AD_biogas: float = 0.0,                                     ## biogas production per day (m3/day)
     AD_biogas_energy_content: float = 0.0                      ## biogas energy content (MJ/m3)
     AD_methane_generation_volume: float = 0.0
+    AD_input_energy_heating: float = 0.0
 
     def clone(self) -> TreatmentOutput:
         return AnaerobicDigesterOutput(**asdict(self))

@@ -85,7 +85,6 @@ class AnaerobicDigestion(BaseTreatment):
     ----------
     pen: SimplePen  ---> pen associated with the manure flow? -- 
                     ---> not sure this should be an input since all flow is channeled through reception pit
-
     manure_handler: BaseManureHandler ---> Associated manure handler before ReceptionPit
     manure_separator: BaseSeparator,  ---> Associated Separator
     treatment_init_data: TreatmentInitData ---> AnaerobicDigesterInitData object
@@ -107,12 +106,14 @@ class AnaerobicDigestion(BaseTreatment):
                  pen: SimplePen,
                  manure_handler: BaseManureHandler,
                  manure_separator: BaseSeparator,
-                 treatment_init_data: AnaerobicDigesterInitData):
+                 treatment_init_data: AnaerobicDigesterInitData,
+                 weather_data):
         super().__init__(pen, manure_handler, manure_separator, treatment_init_data)
 
-    def update(self, pen: SimplePen) -> TreatmentOutput:
-        ## TODO: Check whether SimplePen should be an input for update, it is not used in the BaseTreatment update
-        ## and is not used here.. why is it an input?
+        self.weather_data = weather_data
+        
+
+    def update(self) -> TreatmentOutput:
         daily_output = self.calculate_digester_outputs_daily_step()
         self.all_output.append(daily_output)
         return daily_output
@@ -131,6 +132,19 @@ class AnaerobicDigestion(BaseTreatment):
        
         total_solids_concentration = total_solids/wastewater_volume                 ## g/L
         volatile_solids_concentration = volatile_solids_loading/wastewater_volume   ## g/L
+
+        ## TODO: Check on the weather and time data classes
+        ## Objects of the AnaerobicDigester Class will need to know the day of the year to access T_avg[day_of_year]
+        ## Another option is to pass a single day of weather data to the update method, so update methods for all upstream objects 
+        ## will use the weather data from a particular day..
+        if(self.weather_data.T_avg < 4):
+            effluent_temperature = 4
+        elif(self.weather_data.T_avg < self.treatment_init_data.AD_TEMP_SETPOINT):
+            effluent_temperature = self.weather_data.T_avg
+            input_energy_heating = reception_pit_output_data.total_daily_mass*Constants.HEAT_CAPACITY_WATER * (self.treatment_init_data.AD_TEMP_SETPOINT-effluent_temperature)
+        else:
+            effluent_temperature = self.weather_data.T_avg
+            input_energy_heating = 0       
 
         ## m^3/year  MS.3.B.1
         sav = self.treatment_init_data.SAV_FRACTION*volatile_solids_loading*self.treatment_init_data.sludge_accumulation_period* \
@@ -198,7 +212,8 @@ class AnaerobicDigestion(BaseTreatment):
                     AD_effluent_volume = effluent_waste_volume,                     ## methane production per day (m3/day)
                     AD_biogas = biogas_generation,                                  ## biogas production per day (m3/day)
                     AD_biogas_energy_content = energy_content,                       ## biogas energy content (MJ/m3)  
-                    AD_methane_generation_volume =methane_generation_volume                      
+                    AD_methane_generation_volume =methane_generation_volume,   
+                    AD_input_energy_heating =input_energy_heating                   
         )
 
         return daily_output
@@ -345,4 +360,7 @@ class AnaerobicDigesterInitData(TreatmentInitData):
     N_FRACTION: float = 0.01  # 0-5% N fraction
     P_FRACTION: float = 0.01  # 0-5% P fraction
     K_FRACTION: float = 0.0  # 0-5% K fraction
+
+    AD_TEMP_SETPOINT: float = 37.5
+    AD_TEMP: float = 37.5
 
