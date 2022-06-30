@@ -119,16 +119,10 @@ class AnaerobicDigestion(BaseTreatment):
         self.top_cover_volume = None
         self.minimum_digester_volume = None
 
-<<<<<<< HEAD
         self.weather_data = weather_data
         
 
     def update(self) -> TreatmentOutput:
-=======
-    def update(self, pen: SimplePen) -> TreatmentOutput:
-        # TODO: Check whether SimplePen should be an input for update, it is not used in the BaseTreatment update
-        # and is not used here.. why is it an input?
->>>>>>> 2aa750c021f16238391b644b8a308a316c4335ac
         daily_output = self.calculate_digester_outputs_daily_step()
         self.all_output.append(daily_output)
         return daily_output
@@ -145,7 +139,6 @@ class AnaerobicDigestion(BaseTreatment):
         volatile_solids_loading = reception_pit_output_data.VSd + reception_pit_output_data.VSnd  # kg/day
         wastewater_volume = reception_pit_output_data.total_daily_mass / Constants.DENSITY_WATER_KG_PER_M3  # m^3/day
 
-<<<<<<< HEAD
 
         moisture_content = 1-total_solids/reception_pit_output_data.total_daily_mass
         T_avg = self.weather_data.T_avg
@@ -154,15 +147,6 @@ class AnaerobicDigestion(BaseTreatment):
         ## m^3/year  MS.3.B.1
         sav = self.treatment_init_data.SAV_FRACTION*volatile_solids_loading*self.treatment_init_data.sludge_accumulation_period* \
             Constants.DAYS_PER_YEAR/Constants.DENSITY_WATER_KG_PER_M3
-=======
-        total_solids_concentration = total_solids / wastewater_volume  # g/L
-        volatile_solids_concentration = volatile_solids_loading / wastewater_volume  # g/L
-
-        # m^3/year  MS.3.B.1
-        sav = self.treatment_init_data.SAV_FRACTION * volatile_solids_loading * \
-              self.treatment_init_data.sludge_accumulation_period * \
-              Constants.DAYS_PER_YEAR / Constants.DENSITY_WATER_KG_PER_M3
->>>>>>> 2aa750c021f16238391b644b8a308a316c4335ac
 
         # Minimum digester volume required for processing inflow  (m^3)
         # MS.3.B.2
@@ -214,7 +198,6 @@ class AnaerobicDigestion(BaseTreatment):
         self.evaporated_water = evaporated_water
 
         daily_output = AnaerobicDigesterOutput(
-<<<<<<< HEAD
             
                     urea = 0.0,
                     TAN_s = 0.0
@@ -233,32 +216,6 @@ class AnaerobicDigestion(BaseTreatment):
                     AD_biogas_energy_content = energy_content,                       ## biogas energy content (MJ/m3)  
                     AD_methane_generation_volume =methane_generation_volume,   
                     AD_input_energy_heating =input_energy_heating                   
-=======
-
-                TS=0.0,
-                VS=0.0,
-                N=0.0,
-                P=0.0,
-                K=0.0,
-
-                TS_liquid=effluent_total_solids,
-                VS_liquid=effluent_volatile_solids,
-                N_liquid=N_content,
-                P_liquid=P_content,
-                K_liquid=K_content,
-
-                WIP=0.0,
-                WOP=0.0,
-                WIP_frac=0.0,
-                WOP_frac=0.0,
-                # TODO: Check units on methane output
-                CH4=methane_generation_volume,
-
-                # Outputs for AD
-                AD_effluent_volume=effluent_waste_volume,  # methane production per day (m3/day)
-                AD_biogas=biogas_generation,  # biogas production per day (m3/day)
-                AD_biogas_energy_content=energy_content,  # biogas energy content (MJ/m3)
->>>>>>> 2aa750c021f16238391b644b8a308a316c4335ac
         )
 
         return daily_output
@@ -428,12 +385,6 @@ class AnaerobicDigesterInitData(TreatmentInitData):
     P_FRACTION: float = 0.01  # 0-5% P fraction
     K_FRACTION: float = 0.0  # 0-5% K fraction
 
-<<<<<<< HEAD
     AD_TEMP_SETPOINT: float = 37.5
     AD_TEMP: float = 37.5
 
-=======
-    @classmethod
-    def get_instance(cls) -> TreatmentInitData:
-        return AnaerobicDigesterInitData()
->>>>>>> 2aa750c021f16238391b644b8a308a316c4335ac
