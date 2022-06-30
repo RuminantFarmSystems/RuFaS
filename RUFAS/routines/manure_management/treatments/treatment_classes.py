@@ -183,29 +183,22 @@ class AnaerobicDigestion(BaseTreatment):
 
         daily_output = AnaerobicDigesterOutput(
             
-                    TS = 0.0,
-                    VS = 0.0,
-                    N = 0.0,
-                    P = 0.0,
-                    K = 0.0,
-
-                    TS_liquid = effluent_total_solids,
-                    VS_liquid = effluent_volatile_solids,
-                    N_liquid = N_content,
-                    P_liquid = P_content,
-                    K_liquid = K_content,
-
-                    WIP = 0.0,
-                    WOP = 0.0,
-                    WIP_frac = 0.0,
-                    WOP_frac = 0.0,
-                    #TODO: Check units on methane output
-                    CH4 = methane_generation_volume,  
+                    urea = 0.0,
+                    TAN_s = 0.0
+                    manure_nitrogen = N_content,
+                    TSd = effluent_total_solids,
+                    VSd = effluent_volatile_solids-reception_pit_output_data.VSnd,
+                    VSnd = reception_pit_output_data.VSnd,
+                    VS_total = effluent_volatile_solids,
+                    p_excrt_manure = P_content,
+                    K_manure = K_content,
+                    total_daily_mass = effluent_waste_volume*Constants.DENSITY_WATER_KG_PER_M3, 
 
                     ## Outputs for AD
                     AD_effluent_volume = effluent_waste_volume,                     ## methane production per day (m3/day)
                     AD_biogas = biogas_generation,                                  ## biogas production per day (m3/day)
-                    AD_biogas_energy_content = energy_content,                       ## biogas energy content (MJ/m3)                       
+                    AD_biogas_energy_content = energy_content,                       ## biogas energy content (MJ/m3)  
+                    AD_methane_generation_volume =methane_generation_volume                      
         )
 
         return daily_output
