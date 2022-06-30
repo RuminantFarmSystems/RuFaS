@@ -133,18 +133,10 @@ class AnaerobicDigestion(BaseTreatment):
         total_solids_concentration = total_solids/wastewater_volume                 ## g/L
         volatile_solids_concentration = volatile_solids_loading/wastewater_volume   ## g/L
 
-        ## TODO: Check on the weather and time data classes
-        ## Objects of the AnaerobicDigester Class will need to know the day of the year to access T_avg[day_of_year]
-        ## Another option is to pass a single day of weather data to the update method, so update methods for all upstream objects 
-        ## will use the weather data from a particular day..
-        if(self.weather_data.T_avg < 4):
-            effluent_temperature = 4
-        elif(self.weather_data.T_avg < self.treatment_init_data.AD_TEMP_SETPOINT):
-            effluent_temperature = self.weather_data.T_avg
-            input_energy_heating = reception_pit_output_data.total_daily_mass*Constants.HEAT_CAPACITY_WATER * (self.treatment_init_data.AD_TEMP_SETPOINT-effluent_temperature)
-        else:
-            effluent_temperature = self.weather_data.T_avg
-            input_energy_heating = 0       
+
+        moisture_content = 1-total_solids/reception_pit_output_data.total_daily_mass
+        T_avg = self.weather_data.T_avg
+        input_energy_heating = self.calcSpecificInputEnergy(T_avg,moisture_content)*reception_pit_output_data.total_daily_mass
 
         ## m^3/year  MS.3.B.1
         sav = self.treatment_init_data.SAV_FRACTION*volatile_solids_loading*self.treatment_init_data.sludge_accumulation_period* \
@@ -217,6 +209,28 @@ class AnaerobicDigestion(BaseTreatment):
         )
 
         return daily_output
+
+    def calcSpecificInputEnergy(self,T_avg,moisture_content):
+        ## TODO: Check on the weather and time data classes
+        ## Objects of the AnaerobicDigester Class will need to know the day of the year to access T_avg[day_of_year]
+        ## Another option is to pass a single day of weather data to the update method, so update methods for all upstream objects 
+        ## will use the weather data from a particular day..
+        if(T_avg < 4):
+            effluent_temperature = 4
+        else:
+            effluent_temperature = T_avg
+        heat_capacity_influent = self.calcHeatCapacityManure(self,T_avg, moisture_content)
+        heat_capacity_AD = self.calcHeatCapacityManure(self,self.treatment_init_data.AD_TEMP_SETPOINT, moisture_content)
+        avg_heat_capacity =(heat_capacity_influent+heat_capacity_AD)/2
+        input_energy_heating = avg_heat_capacity * (self.treatment_init_data.AD_TEMP_SETPOINT-effluent_temperature)
+        return input_energy_heating
+
+    def calcHeatCapacityManure(self,T_avg,moisture_content):
+        # Inputs:   T_avg,  Celsius, 
+        #           moisture_content, decimal form (0-1)
+        # Outputs:  heat capacity (kJ /kg /C)
+        return 0.68298+0.025662*T_avg+0.01306*moisture_content*100
+
 
 
 class AnaerobicLagoon(BaseTreatment):
