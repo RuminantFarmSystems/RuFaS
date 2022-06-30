@@ -330,6 +330,7 @@ class GasEmissions:
     @staticmethod
     def calculate_resistance_to_mass_transfer(Rs, Rc):
         return Rs + Rc
+        
 
 
     """
