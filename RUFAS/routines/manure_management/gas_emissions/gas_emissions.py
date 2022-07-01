@@ -183,14 +183,14 @@ class GasEmissions:
         return pen.num_animals * max(0.0, 0.0065 + 0.0192 * t) * barn_area / 1000
 
     @staticmethod
-    def calc_E_NH3_N(Tan, r, M, temp_in_C, p=990.0, pH=7.7) -> float:
+    def calc_E_NH3_N(Tan, r, U, temp_in_C, p=990.0, pH=7.7) -> float:
         """
         Calculating ammonia emissions.
 
         Args:
             Tan: total ammonia nitrogen in manure, kg N/m^2
             r:
-            M: manure urine per area of exposed surface, kg/m^2
+            U:
             temp_in_C: temperature in Celsius
             p: manure density, kg/m^3
             pH: manure acidity
@@ -200,8 +200,10 @@ class GasEmissions:
         """
         c = 86400  # time conversion, seconds/day
         temp_in_K = GasEmissions.convert_temp_C_to_K(temp_in_C)
-        q = GasEmissions.calc_Q(temp_in_K, pH)
-        return (Tan * c * p) / (r * M * q)
+        area = 6.5  # m^2 TODO: Switch based on housing type
+        M = U / area  # manure urine per area of exposed surface, kg/m^2
+        Q = GasEmissions.calc_Q(temp_in_K, pH)
+        return (Tan * c * p) / (r * M * Q)
 
     @staticmethod
     def calc_r_barn(temp_in_C) -> float:
@@ -228,14 +230,14 @@ class GasEmissions:
         """
 
         """
-        return 10 * (1478 / temp_in_K - 1.69)
+        return 10 ** (1478 / temp_in_K - 1.69)
 
     @staticmethod
     def calc_Ka(temp_in_K, pH):
         """
 
         """
-        return 1 + 10 * (0.09018 + 2729.9 / temp_in_K - pH)
+        return 1 + 10 ** (0.09018 + 2729.9 / temp_in_K - pH)
 
     @staticmethod
     def calc_Q(temp_in_K, pH):
