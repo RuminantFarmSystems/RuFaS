@@ -182,6 +182,8 @@ class GasEmissions:
     @staticmethod
     def calc_E_NH3_N(Tan, c, p, r, m, q):
         """
+        Calculating ammonia emissions.
+        TODO: 
 
         Args:
             Tan:
