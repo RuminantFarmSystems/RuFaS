@@ -182,6 +182,7 @@ class GasEmissions:
     @staticmethod
     def calc_E_NH3_N(Tan, c, p, r, m, q):
         """
+        One summary sentence
 
         Args:
             Tan:
@@ -198,6 +199,9 @@ class GasEmissions:
 
     @staticmethod
     def calc_kh(T):
+        """
+
+        """
         return 10 ** (1478 / (T + 273) - 1.69)
 
     @staticmethod
@@ -209,6 +213,8 @@ class GasEmissions:
 
     @staticmethod
     def calc_q(ka, kh):
+        """
+        """
         return kh * ka
 
     @staticmethod
@@ -268,35 +274,35 @@ class GasEmissions:
 
     @staticmethod
     def calculate_henry_constant(T):
-        H = (T/0.2138) * 10**(1825/T - 6.123) 
-        return H 
-    
+        H = (T / 0.2138) * 10 ** (1825 / T - 6.123)
+        return H
 
-    """
-    Returns the mass transfer coefficient through gaseous layer
-
-    Args:
-        U = air friction velocity near surface, m/s
-        SC = Schmidt number
-
-    """
     @staticmethod
     def calculate_mass_transfer_coefficient_gaseous(U, SC):
-        return 0.001 + 0.0462 * U * ( SC**(-0.67))
+        """
+        Returns the mass transfer coefficient through gaseous layer
 
+        Args:
+            U = air friction velocity near surface, m/s
+            SC = Schmidt number
 
-    """
-    Returns the air friction velocity
+        """
+        return 0.001 + 0.0462 * U * (SC ** (-0.67))
 
-    Args:
-        Va: ambient air velocity measured at a standard anemometer height of 
-        10 m 
-    
-    """
     @staticmethod
     def calculate_air_friction_velocity(Va):
-        return 0.02*Va**(1.5)
-    
+        """
+        Returns the air friction velocity
+
+        Args:
+            Va: ambient air velocity measured at a standard anemometer height of
+            10 m
+
+        """
+        return 0.02 * Va ** 1.5
+
+    @staticmethod
+    def calculate_henry_constant(T):
         """
         Returns the  Henry’s Law constant for ammonia, H
 
@@ -308,91 +314,83 @@ class GasEmissions:
 
         return hsc * (1 - 0.027 * (20 - T))
 
-
-    """
-    Returns the mass transfer coefficient through liquid layer
-    
-    Args:
-      T - temparature in Kelvin
-    """
     @staticmethod
     def calculate_mass_transfer_coefficient_liquid(T):
-        return 1.417 * 10**(-12) * T**(4) 
+        """
+        Returns the mass transfer coefficient through liquid layer
 
+        Args:
+          T - temperature in Kelvin
+        """
+        return 1.417 * 10 ** (-12) * T ** 4
 
-    """
-    Returns the resistance to mass transfer
-
-    Args:
-        Rs = resistance to mass transfer through the manure, s/m
-        Rc = resistance to mass transfer through a storage cover, s/m
-    """
     @staticmethod
     def calculate_resistance_to_mass_transfer(Rs, Rc):
+        """
+        Returns the resistance to mass transfer
+
+        Args:
+            Rs = resistance to mass transfer through the manure, s/m
+            Rc = resistance to mass transfer through a storage cover, s/m
+        """
         return Rs + Rc
-        
 
-
-    """
-    Returns the the overall mass transfer coefficient, the reciprocal of the 
-    sum of the three resistances to mass transfer.
-
-    Args:
-        Rm: resistance to mass transfer
-        H:  Henry’s Law constant for ammonia, dimensionless aqueous:gas
-        Kg: = mass transfer coefficient through gaseous layer, m/s
-        Kl: mass transfer coefficient through liquid layer
-    """
     @staticmethod
     def calculate_overall_mass_transfer_coefficient(H, Kg, Kl, Rm):
-        return (1 / ( H / Kg + 1/Kl + Rm )) 
- 
+        """
+        Returns the overall mass transfer coefficient, the reciprocal of the
+        sum of the three resistances to mass transfer.
 
+        Args:
+            Rm: resistance to mass transfer
+            H:  Henry’s Law constant for ammonia, dimensionless aqueous:gas
+            Kg: = mass transfer coefficient through gaseous layer, m/s
+            Kl: mass transfer coefficient through liquid layer
+        """
+        return 1 / (H / Kg + 1 / Kl + Rm)
 
-    """
-    Returns the ammonia flux, kg/m2-s
-
-    Args:
-        Cm = concentration of ammonia in manure, kg/m3
-        Ca = concentration of ammonia in ambient air, kg/m3  
-    """
     @staticmethod
     def calculate_ammonia_flux(K, Cm, H, Ca):
-        return 3600 * K * (Cm - H * (Ca))
+        """
+        Returns the ammonia flux, kg/m2-s
 
+        Args:
+            Cm = concentration of ammonia in manure, kg/m3
+            Ca = concentration of ammonia in ambient air, kg/m3
+        """
+        return 3600 * K * (Cm - H * Ca)
 
-    """
-    Returns the ammonia concentration in the manure
-
-    Args:
-        F = ammonia fraction of TAN in a manure solution
-        C_tan = concentration of TAN in the manure solution, kg/m^3
-    """
     @staticmethod
     def calculate_concentration_of_ammonia_in_manure(F, C_tan):
+        """
+        Returns the ammonia concentration in the manure
+
+        Args:
+            F = ammonia fraction of TAN in a manure solution
+            C_tan = concentration of TAN in the manure solution, kg/m^3
+        """
         return F * C_tan
 
-
-
-"""  
     @staticmethod
     def calc_E_N20_manure(EF_n20, A_storage):
+        """
 
-      
-        EN2O,manure = emission of N2O from slurry storage, kg N2O /day
-        EF,N2O,man = emission rate of N2O, 0.8 g N2O /m2 -day
-        A_storage = exposed surface area of the manure storage, m2
+        """
+        return (EF_n20 * A_storage) / 1000
 
-        Note: For stacked manure with a greater DM content, an emission factor of 0.005 kg N2O-N /(kg Nexcreted)
-             when a crust does not form, no N2O is formed and emitted
-             This occurs if the manure DM contents less than 8%, manure is loaded daily onto the top surface of the
-             storage, or an enclosed tank is used
+    # EN2O,manure = emission of N2O from slurry storage, kg N2O /day
+    # EF,N2O,man = emission rate of N2O, 0.8 g N2O /m2 -day
+    # A_storage = exposed surface area of the manure storage, m2
 
-"""
+    # Note: For stacked manure with a greater DM content, an emission factor of 0.005 kg N2O-N /(kg Nexcreted)
+    #      when a crust does not form, no N2O is formed and emitted
+    #      This occurs if the manure DM contents less than 8%, manure is loaded daily onto the top surface of the
+    #      storage, or an enclosed tank is used
+
     @staticmethod
     def convert_temp_C_to_K(temp_in_C: float):
         """
-        
+
         Args:
             temp_in_C: temperature in Celsius
 
