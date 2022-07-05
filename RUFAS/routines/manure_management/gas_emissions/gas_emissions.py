@@ -307,10 +307,10 @@ class GasEmissions:
     #     """
     #     return 10 ** (0.05 - 2788 / T)
 
-    @staticmethod
-    def calc_henry_constant(T):
-        H = (T / 0.2138) * 10 ** (1825 / T - 6.123)
-        return H
+    #@staticmethod
+    #def calc_henry_constant(T):
+    #    H = (T / 0.2138) * 10 ** (1825 / T - 6.123)
+    #    return H
 
     @staticmethod
     def calc_mass_transfer_coefficient_gaseous(U, SC):
