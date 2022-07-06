@@ -1,4 +1,4 @@
-from typing import Set, Type
+from typing import NamedTuple, Set, Type
 
 from RUFAS.routines.animal.pen import Pen
 from .manure import Manure
@@ -12,12 +12,21 @@ class SimplePen:
 
     Attributes:
         manure: A Manure object that captures the manure data from the `pen` object argument
+        id:
+        animals_in_pen:
+        num_animals:
+        classes_in_pen:
+        housing_type:
+        bedding_type:
+        manure_handler:
+        manure_separator:
+        manure_storage:
+        manure_density:
 
     Args:
         pen: A Pen object from the animal module
 
     """
-
     def __init__(self, pen: Pen):
         self.manure = Manure(**pen.manure)
 
@@ -37,13 +46,57 @@ class SimplePen:
 
     @property
     def manure_mass(self) -> float:
+        """Calculates the manure volume of this pen.
+
+        Returns:
+            Manure mass of this pen in kg.
+
+        """
         return self.manure.Mkg  # kg
 
     @property
     def manure_volume(self) -> float:
+        """Calculates the manure volume of this pen.
+
+        Returns:
+            Manure volume of this pen in m^3.
+
+        """
         return self.manure_mass / self.manure_density  # m^3
 
+    @property
+    def barn_area(self) -> float:
+        """Calculates the barn area for this pen depending on its housing type.
+
+        Returns:
+            Barn area.  TODO: Add units
+
+        """
+        BarnArea = NamedTuple('BarnArea', [('has_cows', float), ('no_cows', float)])
+        tie_stall = BarnArea(has_cows=1.2, no_cows=1.0)
+        bedded_pack = BarnArea(has_cows=5.0, no_cows=3.0)
+        free_stall = BarnArea(has_cows=3.5, no_cows=2.5)
+        default = free_stall
+
+        housing_type_to_barn_area = {
+            'tie stall': tie_stall,
+            'bedded pack': bedded_pack,
+            'free stall': free_stall
+        }
+        area = housing_type_to_barn_area.get(self.housing_type, default)
+
+        if 'Cow' in self.classes_in_pen:
+            return area.has_cows
+        else:
+            return area.no_cows
+
     def __str__(self) -> str:
+        """Returns the string representation of this pen.
+
+        Returns:
+            The string representation of this pen.
+
+        """
         s = ['SimplePen data:']
 
         for var in vars(self):
