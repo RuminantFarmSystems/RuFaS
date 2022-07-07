@@ -44,7 +44,7 @@ class GasEmissions:
             temp_in_C: temperature in Celsius.
 
         Returns:
-            CH4 emission.
+            CH4 emissions from storage.
 
         """
         daily_time_steps = 24
@@ -129,10 +129,10 @@ class GasEmissions:
         """Calculates CH4 floor emissions.
 
         Args:
-            pen:
-            t_min:
-            t_max:
-            hours:
+            pen: Housing type and numbers of aniamls.
+            t_min: Minimum barn temperature, °C
+            t_max: Maximum barn temperature, °C
+            hours: Measured barn temperature,°C within a day, Hours
 
         Returns:
             CH4 floor emissions.
