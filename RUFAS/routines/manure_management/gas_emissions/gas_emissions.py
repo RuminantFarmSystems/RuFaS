@@ -44,7 +44,7 @@ class GasEmissions:
             temp_in_C: temperature in Celsius.
 
         Returns:
-            CH4 emission.
+            CH4 emissions from storage.
 
         """
         daily_time_steps = 24
@@ -62,14 +62,13 @@ class GasEmissions:
         """TODO: Describe
 
         Args:
-            data: an output object from one of the manure management steps
-                that should follow the CanCalcMethane protocol.
+            data: an output object from one of the manure management steps that should follow the CanCalcMethane protocol.
             temp_in_C: temperature, C.
-            Bo: TODO: Describe
-            E_CH4_pot: TODO: Describe
+            Bo:  achievable emission of CH4 during anaerobic digestion, kg CH4/kg VS
+            E_CH4_pot: potential CH4 yield of the manure, kg CH4/kg VS
 
         Returns:
-            TODO: Describe
+            CH4 emission from storage.
 
         """
         c = 0.024
@@ -112,9 +111,9 @@ class GasEmissions:
         """Calculates ambient temperature.
 
         Args:
-            hours:
-            t_min:
-            t_max:
+            t_min: Minimum barn temperature, °C
+            t_max: Maximum barn temperature, °C
+            hours: Measured barn temperature,°C within a day, Hours
 
         Returns:
             Ambient temperature.
@@ -130,10 +129,10 @@ class GasEmissions:
         """Calculates CH4 floor emissions.
 
         Args:
-            pen:
-            t_min:
-            t_max:
-            hours:
+            pen: Housing type and numbers of aniamls.
+            t_min: Minimum barn temperature, °C
+            t_max: Maximum barn temperature, °C
+            hours: Measured barn temperature,°C within a day, Hours
 
         Returns:
             CH4 floor emissions.
@@ -149,10 +148,10 @@ class GasEmissions:
         """Calculates CO2 floor emissions.
 
         Args:
-            pen:
-            t_min:
-            t_max:
-            hours:
+            pen: Housing type and number of animals.
+            t_min: Minimum barn temperature, °C.
+            t_max: Maximum barn temperature, °C.
+            hours: Measured barn temperature, °C within a day, Hours.
 
         Returns:
             CO2 floor emissions.
@@ -168,8 +167,8 @@ class GasEmissions:
 
         Args:
             Tan: total ammonia nitrogen in manure, kg N/m^2.
-            r:
-            U:
+            r: resistance of NH3 transport from the manure surface to the free atmosphere, s/m.
+            U: total amount of manure urine in area of exposed surface, kg. 
             temp_in_C: temperature, C.
             p: manure density, kg/m^3.
             pH: manure acidity.
@@ -457,14 +456,15 @@ class GasEmissions:
     def calc_E_N20_manure(EF_n20, A_storage):
         return (EF_n20 * A_storage) / 1000
 
-    # EN2O,manure = emission of N2O from slurry storage, kg N2O /day
-    # EF,N2O,man = emission rate of N2O, 0.8 g N2O /m2 -day
-    # A_storage = exposed surface area of the manure storage, m2
+    """ EN2O,manure = emission of N2O from slurry storage, kg N2O /day
+        EF,N2O,man = emission rate of N2O, 0.8 g N2O /m2 -day
+        A_storage = exposed surface area of the manure storage, m2
 
-    # Note: For stacked manure with a greater DM content, an emission factor of 0.005 kg N2O-N /(kg Nexcreted)
-    #      when a crust does not form, no N2O is formed and emitted
-    #      This occurs if the manure DM contents less than 8%, manure is loaded daily onto the top surface of the
-    #      storage, or an enclosed tank is used
+     Note: For stacked manure with a greater DM content, an emission factor of 0.005 kg N2O-N /(kg Nexcreted)
+          when a crust does not form, no N2O is formed and emitted. This occurs if the manure DM contents less than 8%, manure is loaded daily onto the top surface of the
+          storage, or an enclosed tank is used.
+    
+    """
 
     @staticmethod
     def convert_temp_C_to_K(temp_in_C: float) -> float:
