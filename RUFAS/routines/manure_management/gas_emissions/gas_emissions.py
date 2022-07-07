@@ -62,14 +62,13 @@ class GasEmissions:
         """TODO: Describe
 
         Args:
-            data: an output object from one of the manure management steps
-                that should follow the CanCalcMethane protocol.
+            data: an output object from one of the manure management steps that should follow the CanCalcMethane protocol.
             temp_in_C: temperature, C.
-            Bo: TODO: Describe
-            E_CH4_pot: TODO: Describe
+            Bo:  achievable emission of CH4 during anaerobic digestion, kg CH4/kg VS
+            E_CH4_pot: potential CH4 yield of the manure, kg CH4/kg VS
 
         Returns:
-            TODO: Describe
+            CH4 emission from storage.
 
         """
         c = 0.024
