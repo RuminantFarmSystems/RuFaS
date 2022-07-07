@@ -1,6 +1,6 @@
 import math
 from dataclasses import dataclass, asdict
-from typing import Protocol
+from typing_extensions import Protocol
 
 from RUFAS.routines.manure_management.misc.simple_pen import SimplePen
 from .gas_emissions_constants import GasEmissionConstants as Constants
