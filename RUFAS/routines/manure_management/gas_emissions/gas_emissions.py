@@ -169,7 +169,7 @@ class GasEmissions:
             Tan: total ammonia nitrogen in manure, kg N/m^2.
             r: resistance of NH3 transport from the manure surface to the free atmosphere, s/m.
             U: total amount of manure urine in area of exposed surface, kg. 
-            temp_in_C: temperature, C.
+            temp_in_C: temperature, °C.
             p: manure density, kg/m^3.
             pH: manure acidity.
 
@@ -189,7 +189,7 @@ class GasEmissions:
         """TODO: Describe
 
         Args:
-            temp_in_C: temperature, C.
+            temp_in_C: temperature, °C.
 
         Returns:
             TODO: Describe
@@ -356,7 +356,7 @@ class GasEmissions:
             SC = Schmidt number
 
         Returns:
-            TODO: Describe
+            mass transfer coefficient through gaseous layer.
 
         """
         return 0.001 + 0.0462 * U * (SC ** (-0.67))
@@ -370,7 +370,7 @@ class GasEmissions:
             10 m
 
         Returns:
-            TODO: Describe
+            air friction velocity.
 
         """
         return 0.02 * Va ** 1.5
@@ -383,7 +383,7 @@ class GasEmissions:
             T - temperature in Kelvin
 
         Returns:
-            TODO: Describe
+            Henry’s Law constant for ammonia, H.
 
         """
         hsc = (T / 0.2138) * 10 ** (1825 / T - 6.123)
@@ -398,7 +398,7 @@ class GasEmissions:
             T - temperature in Kelvin
 
         Returns:
-            TODO: Describe
+            Mass transfer coefficient through liquid layer.
 
         """
         return 1.417 * 10 ** (-12) * T ** 4
@@ -412,7 +412,7 @@ class GasEmissions:
             Rc = resistance to mass transfer through a storage cover, s/m
 
         Returns:
-            TODO: Describe
+            resistance to mass transfer. 
 
         """
         return Rs + Rc
