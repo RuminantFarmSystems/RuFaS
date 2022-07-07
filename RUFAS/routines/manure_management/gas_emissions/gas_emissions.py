@@ -148,10 +148,10 @@ class GasEmissions:
         """Calculates CO2 floor emissions.
 
         Args:
-            pen:
-            t_min:
-            t_max:
-            hours:
+            pen: Housing type and number of animals.
+            t_min: Minimum barn temperature, °C.
+            t_max: Maximum barn temperature, °C.
+            hours: Measured barn temperature, °C within a day, Hours.
 
         Returns:
             CO2 floor emissions.
@@ -167,8 +167,8 @@ class GasEmissions:
 
         Args:
             Tan: total ammonia nitrogen in manure, kg N/m^2.
-            r:
-            U:
+            r: resistance of NH3 transport from the manure surface to the free atmosphere, s/m.
+            U: total amount of manure urine in area of exposed surface, kg. 
             temp_in_C: temperature, C.
             p: manure density, kg/m^3.
             pH: manure acidity.
