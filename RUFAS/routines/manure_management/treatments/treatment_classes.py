@@ -90,7 +90,6 @@ class AnaerobicDigestion(BaseTreatment):
     ----------
     pen: SimplePen  ---> pen associated with the manure flow? -- 
                     ---> not sure this should be an input since all flow is channeled through reception pit
-
     manure_handler: BaseManureHandler ---> Associated manure handler before ReceptionPit
     manure_separator: BaseSeparator,  ---> Associated Separator
     treatment_init_data: TreatmentInitData ---> AnaerobicDigesterInitData object
@@ -112,16 +111,18 @@ class AnaerobicDigestion(BaseTreatment):
                  pen: SimplePen,
                  manure_handler: BaseManureHandler,
                  manure_separator: BaseSeparator,
-                 treatment_init_data: AnaerobicDigesterInitData):
+                 treatment_init_data: AnaerobicDigesterInitData,
+                 weather_data):
         super().__init__(pen, manure_handler, manure_separator, treatment_init_data)
         self.evaporated_water = None
         self.sludge_accumulation_volume = None
         self.top_cover_volume = None
         self.minimum_digester_volume = None
 
-    def update(self, pen: SimplePen) -> TreatmentOutput:
-        # TODO: Check whether SimplePen should be an input for update, it is not used in the BaseTreatment update
-        # and is not used here.. why is it an input?
+        self.weather_data = weather_data
+        
+
+    def update(self) -> TreatmentOutput:
         daily_output = self.calculate_digester_outputs_daily_step()
         self.all_output.append(daily_output)
         return daily_output
@@ -138,13 +139,14 @@ class AnaerobicDigestion(BaseTreatment):
         volatile_solids_loading = reception_pit_output_data.VSd + reception_pit_output_data.VSnd  # kg/day
         wastewater_volume = reception_pit_output_data.total_daily_mass / Constants.DENSITY_WATER_KG_PER_M3  # m^3/day
 
-        total_solids_concentration = total_solids / wastewater_volume  # g/L
-        volatile_solids_concentration = volatile_solids_loading / wastewater_volume  # g/L
 
-        # m^3/year  MS.3.B.1
-        sav = self.treatment_init_data.SAV_FRACTION * volatile_solids_loading * \
-              self.treatment_init_data.sludge_accumulation_period * \
-              Constants.DAYS_PER_YEAR / Constants.DENSITY_WATER_KG_PER_M3
+        moisture_content = 1-total_solids/reception_pit_output_data.total_daily_mass
+        T_avg = self.weather_data.T_avg
+        input_energy_heating = self.calcSpecificInputEnergy(T_avg,moisture_content)*reception_pit_output_data.total_daily_mass
+
+        ## m^3/year  MS.3.B.1
+        sav = self.treatment_init_data.SAV_FRACTION*volatile_solids_loading*self.treatment_init_data.sludge_accumulation_period* \
+            Constants.DAYS_PER_YEAR/Constants.DENSITY_WATER_KG_PER_M3
 
         # Minimum digester volume required for processing inflow  (m^3)
         # MS.3.B.2
@@ -196,33 +198,49 @@ class AnaerobicDigestion(BaseTreatment):
         self.evaporated_water = evaporated_water
 
         daily_output = AnaerobicDigesterOutput(
+            
+                    urea = 0.0,
+                    TAN_s = 0.0
+                    manure_nitrogen = N_content,
+                    TSd = effluent_total_solids,
+                    VSd = effluent_volatile_solids-reception_pit_output_data.VSnd,
+                    VSnd = reception_pit_output_data.VSnd,
+                    VS_total = effluent_volatile_solids,
+                    p_excrt_manure = P_content,
+                    K_manure = K_content,
+                    total_daily_mass = effluent_waste_volume*Constants.DENSITY_WATER_KG_PER_M3, 
 
-                TS=0.0,
-                VS=0.0,
-                N=0.0,
-                P=0.0,
-                K=0.0,
-
-                TS_liquid=effluent_total_solids,
-                VS_liquid=effluent_volatile_solids,
-                N_liquid=N_content,
-                P_liquid=P_content,
-                K_liquid=K_content,
-
-                WIP=0.0,
-                WOP=0.0,
-                WIP_frac=0.0,
-                WOP_frac=0.0,
-                # TODO: Check units on methane output
-                CH4=methane_generation_volume,
-
-                # Outputs for AD
-                AD_effluent_volume=effluent_waste_volume,  # methane production per day (m3/day)
-                AD_biogas=biogas_generation,  # biogas production per day (m3/day)
-                AD_biogas_energy_content=energy_content,  # biogas energy content (MJ/m3)
+                    ## Outputs for AD
+                    AD_effluent_volume = effluent_waste_volume,                     ## methane production per day (m3/day)
+                    AD_biogas = biogas_generation,                                  ## biogas production per day (m3/day)
+                    AD_biogas_energy_content = energy_content,                       ## biogas energy content (MJ/m3)  
+                    AD_methane_generation_volume =methane_generation_volume,   
+                    AD_input_energy_heating =input_energy_heating                   
         )
 
         return daily_output
+
+    def calcSpecificInputEnergy(self,T_avg,moisture_content):
+        ## TODO: Check on the weather and time data classes
+        ## Objects of the AnaerobicDigester Class will need to know the day of the year to access T_avg[day_of_year]
+        ## Another option is to pass a single day of weather data to the update method, so update methods for all upstream objects 
+        ## will use the weather data from a particular day..
+        if(T_avg < 4):
+            effluent_temperature = 4
+        else:
+            effluent_temperature = T_avg
+        heat_capacity_influent = self.calcHeatCapacityManure(self,T_avg, moisture_content)
+        heat_capacity_AD = self.calcHeatCapacityManure(self,self.treatment_init_data.AD_TEMP_SETPOINT, moisture_content)
+        avg_heat_capacity =(heat_capacity_influent+heat_capacity_AD)/2
+        input_energy_heating = avg_heat_capacity * (self.treatment_init_data.AD_TEMP_SETPOINT-effluent_temperature)
+        return input_energy_heating
+
+    def calcHeatCapacityManure(self,T_avg,moisture_content):
+        # Inputs:   T_avg,  Celsius, 
+        #           moisture_content, decimal form (0-1)
+        # Outputs:  heat capacity (kJ /kg /C)
+        return 0.68298+0.025662*T_avg+0.01306*moisture_content*100
+
 
 
 class AnaerobicLagoon(BaseTreatment):
@@ -367,6 +385,6 @@ class AnaerobicDigesterInitData(TreatmentInitData):
     P_FRACTION: float = 0.01  # 0-5% P fraction
     K_FRACTION: float = 0.0  # 0-5% K fraction
 
-    @classmethod
-    def get_instance(cls) -> TreatmentInitData:
-        return AnaerobicDigesterInitData()
+    AD_TEMP_SETPOINT: float = 37.5
+    AD_TEMP: float = 37.5
+
