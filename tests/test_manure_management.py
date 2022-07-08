@@ -47,21 +47,25 @@ def test_calc_modified_hours():
 
 def test_calc_Kh():
     """Unit test for function calc_Kh in file gas_emissions.py"""
-    temp_in_k = 30
-    value_to_test = gas_emissions.gas_emissions.GasEmissions.calc_Kh(temp_in_k)
-    assert value_to_test == 0
-
-    pass
+    temp_in_k = 200
+    value_to_test = GasEmissions.calc_Kh(temp_in_k)
+    assert value_to_test == 501187.2336272715
 
 
 def test_calc_Ka():
     """Unit test for function calc_Ka in file gas_emissions.py"""
-    pass
+    temp_in_k = 200
+    ph = 10
+    value_to_test = GasEmissions.calc_Ka(temp_in_k, ph)
+    assert value_to_test == 5492.361063180863
 
 
 def test_calc_Q():
     """Unit test for function calc_Q in file gas_emissions.py"""
-    pass
+    temp_in_k = 200
+    ph = 10
+    value_to_test = GasEmissions.calc_Q(temp_in_k, 10)
+    assert value_to_test == 2752701247.3377566
 
 
 def test_calc_ruc():
@@ -81,7 +85,9 @@ def test_calc_Kmc():
 
 def test_calc_henry_constant():
     """Unit test for function calc_henry_constant in file gas_emissions.py"""
-    pass
+    T = 250
+    value_to_test = GasEmissions.calc_henry_constant(T)
+    assert value_to_test == 126726.5385349147
 
 
 def test_calc_air_friction_velocity():

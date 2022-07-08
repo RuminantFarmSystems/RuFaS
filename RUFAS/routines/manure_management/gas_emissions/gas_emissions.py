@@ -357,7 +357,7 @@ class GasEmissions:
             SC = Schmidt number
 
         Returns:
-            TODO: Describe
+            The mass transfer coefficient through gaseous layer
 
         """
         return 0.001 + 0.0462 * U * (SC ** (-0.67))
@@ -371,7 +371,7 @@ class GasEmissions:
             10 m
 
         Returns:
-            TODO: Describe
+            the air friction velocity
 
         """
         return 0.02 * Va ** 1.5
@@ -384,7 +384,7 @@ class GasEmissions:
             T - temperature in Kelvin
 
         Returns:
-            TODO: Describe
+            Henry’s Law constant for ammonia, H
 
         """
         hsc = (T / 0.2138) * 10 ** (1825 / T - 6.123)
