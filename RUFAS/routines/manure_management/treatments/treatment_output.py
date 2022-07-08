@@ -52,29 +52,24 @@ class TreatmentOutput:
 
 @dataclass
 class AnaerobicDigesterOutput(TreatmentOutput):
-    TS: float = 0.0
-    VS: float = 0.0
-    N: float = 0.0
-    P: float = 0.0
-    K: float = 0.0
-
-    TS_liquid: float = 0.0
-    VS_liquid: float = 0.0
-    N_liquid: float = 0.0
-    P_liquid: float = 0.0
-    K_liquid: float = 0.0
-
-    WIP: float = 0.0
-    WOP: float = 0.0
-    WIP_frac: float = 0.0
-    WOP_frac: float = 0.0
-    CH4: float = 0.0
+    urea: float = 0.0
+    TAN_s: float = 0.0
+    manure_nitrogen: float = 0.0
+    TSd: float = 0.0
+    VSd: float = 0.0
+    VSnd: float = 0.0
+    VS_total: float = 0.0
+    p_excrt_manure: float = 0.0
+    K_manure: float = 0.0
+    total_daily_mass: float = 0.0 
 
     ##TODO convert effluent volume to total daily mass
     ## Outputs for AD
     AD_effluent_volume: float = 0.0,                            ## effluent volume of AD (m3/day)
     AD_biogas: float = 0.0,                                     ## biogas production per day (m3/day)
-    AD_biogas_energy_content: float = 0.0,                      ## biogas energy content (MJ/m3)
+    AD_biogas_energy_content: float = 0.0                      ## biogas energy content (MJ/m3)
+    AD_methane_generation_volume: float = 0.0
+    AD_input_energy_heating: float = 0.0
 
     def clone(self) -> TreatmentOutput:
         return AnaerobicDigesterOutput(**asdict(self))

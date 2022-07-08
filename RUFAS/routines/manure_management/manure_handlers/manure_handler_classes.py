@@ -23,6 +23,7 @@ from RUFAS.routines.manure_management.misc.simple_pen import SimplePen
 
 
 class ManureHandlerEnum(ExtendedEnum):
+    """An Enum class that lists all the different types of manure handlers."""
     FLUSH_SYSTEM = 1
     MANUAL_SCRAPING = 2
     ALLEY_SCRAPER = 3
@@ -33,6 +34,11 @@ class ManureHandlerEnum(ExtendedEnum):
 
 
 class BaseManureHandler:
+    """
+    A class that contains common attributes and methods for all the different
+    subtypes of manure handlers.
+    """
+
     def __init__(self,
                  pen: SimplePen,
                  handler_init_data):
@@ -154,7 +160,7 @@ class CustomManureHandler(BaseManureHandler):
 class ManureHandlerInitData:
     """
     A class that contains custom initialization configuration used in the
-    creation of a ManureHandler object.
+    creation of a BaseManureHandler object.
 
     """
     water_use_rate: int = 0  # liters/animal/day
@@ -163,6 +169,16 @@ class ManureHandlerInitData:
 
     @classmethod
     def get_instance(cls, manure_handler_enum: ManureHandlerEnum):
+        """
+        Returns an instance of ManureHandlerInitData based on a given ManureHandlerEnum.
+
+        Args:
+            manure_handler_enum: a member of the ManureHandlerEnum.
+
+        Returns:
+            A new ManureHandlerInitData object.
+
+        """
         init_data = ManureHandlerInitData()
         enum_to_water_use_rate: Dict[ManureHandlerEnum, int] = {
             ManureHandlerEnum.FLUSH_SYSTEM: 757,  # liters
@@ -175,8 +191,22 @@ class ManureHandlerInitData:
 
 
 class ManureHandlerFactory:
+    """A class that contains the logic for creating different types of manure handlers."""
+
     @classmethod
     def get_instance(cls, pen: SimplePen) -> BaseManureHandler:
+        """
+        Returns an instance of a specific subtype of BaseManureHandler based on
+        the subtype specified in the given pen.
+
+        Args:
+            pen: A SimplePen object that specifies which subtype of BaseManureHandler
+                is needed.
+
+        Returns:
+            A new instance of a BaseManureHandler subtype.
+
+        """
         manure_handler_enum = ManureHandlerEnum.get_enum(pen.manure_handler)
 
         params = {
