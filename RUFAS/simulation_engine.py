@@ -3,13 +3,14 @@
 import sys
 import time as timer
 from pathlib import Path
-from RUFAS import routines, errors, classes
+from RUFAS import routines, errors
 from RUFAS.classes import Config, State, Weather, Time
-from RUFAS.util import get_base_dir, read_json_file
 from RUFAS.output_handler import OutputHandler
 import random
 import numpy
 from typing import Optional
+
+from RUFAS.util import Utility
 
 
 class SimulationEngine:
@@ -141,7 +142,7 @@ class SimulationEngine:
 
         print(f"Initializing simulation environment from {file_path}")
         try:
-            data = read_json_file(file_path)
+            data = Utility.read_json_file(file_path)
             self.config = Config(data['config'], data['weather'])
 
             if self.config.set_seed:
@@ -152,8 +153,8 @@ class SimulationEngine:
             self.time = Time(self.config)
             self.state = State(data['farm'], self.config,
                                self.weather, self.time)
-            self.output = OutputHandler(classes.read_json_file(
-                get_base_dir() / 'input/output' / data['output']), self.state)
+            self.output = OutputHandler(Utility.read_json_file(
+                Utility.get_base_dir() / 'input/output' / data['output']), self.state)
 
         except errors.JSONfileData as e:
             print(

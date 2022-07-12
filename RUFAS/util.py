@@ -16,13 +16,16 @@ from RUFAS import errors
 class Utility:
     @staticmethod
     def get_base_dir():
-        """Gets the base directory as reference for all relative paths.
+        """
+        Gets the base directory as reference for all relative paths.
 
         Unfrozen application - gets the project directory
         Frozen application - gets the executable directory
 
-        Returns:
-            Path: The reference directory for all paths in the program.
+        Returns
+        -------
+        Path: The reference directory for all paths in the program.
+
         """
 
         # Frozen
@@ -52,15 +55,19 @@ class Utility:
             Reads and interprets the JSON file at the given path. Compiles the
             information into dictionaries used to instantiate simulation objects.
 
-        Args:
-            file_path (Path): Path to the input json file
+        Parameters
+        ----------
+        file_path (Path): Path to the input json file
 
-        Raises:
-            InvalidJSONFileError: If the json file at the given path does not
+        Raises
+        ------
+        InvalidJSONFileError: If the json file at the given path does not
                 conform with the format required
 
-        Returns:
-            data: the data read from the json file
+        Returns
+        -------
+        data: the data read from the json file
+
         """
 
         try:
@@ -81,16 +88,20 @@ class Utility:
     @staticmethod
     def calc_average(num_values: int, cur_avg: float, new_value: float) -> Tuple[int, float]:
         """
-        Calculate the new average given the number of values, the current average, and the new value.
+        Calculate the new average given the number of values,
+        the current average, and the new value.
 
-        Args:
-            num_values: number of values for the current average
-            cur_avg: the current average value
-            new_value: the new value to be averaged
+        Parameters
+        ----------
+        num_values: number of values for the current average
+        cur_avg: the current average value
+        new_value: the new value to be averaged
 
-        Return:
-            new_num_values: the new number of values for the new average
-            new_avg: the new average value calculated
+        Returns
+        -------
+        new_num_values: the new number of values for the new average
+        new_avg: the new average value calculated
+
         """
         new_num_values = num_values + 1
         new_avg = (cur_avg * num_values + new_value) / new_num_values
@@ -100,14 +111,18 @@ class Utility:
     @staticmethod
     def remove_items_from_list_by_indices(arr: List, removed_idx: List[int]) -> None:
         """
-        Remove items from a list given a list of indices. The operation is done in-place.
+        Remove items from a list given a list of indices.
+        The operation is done in-place.
 
-        Args:
-            arr: a list of items
-            removed_idx: a list that contains indices of the items to be removed
+        Parameters
+        ----------
+        arr: a list of items
+        removed_idx: a list that contains indices of the items to be removed
 
-        Returns:
-            None
+        Returns
+        -------
+        None
+
         """
 
         # Safer to remove elements from the back
@@ -119,10 +134,14 @@ class Utility:
         """
         Return a percent calculator closure that already stores the value of the given denominator.
 
-        Args:
-            denominator:
+        Parameters
+        ----------
+        denominator: the denominator to
 
-        Returns:
+        Returns
+        -------
+        A closure function that already stores the denominator internally
+        so the user only needs to pass in the numerator.
 
         """
 
