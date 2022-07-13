@@ -73,17 +73,29 @@ def test_calc_Q():
 
 def test_calc_ruc():
     """Unit test for function calc_ruc in file gas_emissions.py"""
-    pass
+    temp_in_k = -6463
+    #kmc = 841709169.5924
+    # 10642073358.417162
+    cu = 1
+    value_to_test = GasEmissions.calc_ruc(temp_in_k, cu)
+    result = 12.643409066016016
+    assert value_to_test == result
 
 
 def test_calc_vmax():
     """Unit test for function calc_vmax in file gas_emissions.py"""
-    pass
+    temp_in_k = -6463
+    value_to_test = GasEmissions.calc_vmax(temp_in_k)
+    result = 10642073358.417162
+    assert value_to_test == result
 
 
 def test_calc_Kmc():
     """Unit test for function calc_Kmc in file gas_emissions.py"""
-    pass
+    temp_in_k = -5914
+    value_to_test = GasEmissions.calc_kmc(temp_in_k)
+    result = 916332804.3735441
+    assert value_to_test == result
 
 
 def test_calc_henry_constant():
