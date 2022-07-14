@@ -16,6 +16,9 @@ class BaseCrop:
         self.feed_id = 'null'
         self.raw_id = 'null'
 
+        self.planted = False
+        self.growing = False
+        self.killed = False
         self.extracted = False
 
         # Necessary variables for a null crop to run

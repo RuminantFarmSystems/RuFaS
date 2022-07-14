@@ -76,6 +76,8 @@ def residue_partitioning(soil, crop_type, weather, time):
                 ag_biomass = crop_type.yield_actual
                 
                 residue_incorp = layer.tillage_percent * ag_biomass
+            
+            soil.ag_biomass = ag_biomass
 
         else: #non top layers
             
@@ -84,8 +86,7 @@ def residue_partitioning(soil, crop_type, weather, time):
             residue_incorp =  0
 
             ag_biomass = 0
-
-
+        
         # S.6.B.I.4 / S.6.B.I.7
         layer.AG_met += ag_biomass * AG_met_percent - (
             (layer.AG_met_to_C_active - AG_met_to_BG_met) + AG_met_to_BG_met)

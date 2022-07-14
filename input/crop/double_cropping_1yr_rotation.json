@@ -2,23 +2,23 @@
     "latitude": 43.332708,
 
     "crops": {
-        "alfalfa": {
+        "cereal_rye": {
             "plant_years": [2009,2010,2011,2012],
-            "repeat": 0,
+            "repeat": 4,
             "planting_day": 90,
             "harvest_day": 237,
             "harvest_type": "optimal",
             "planting_order": "1st",
             "extracted": true
         },
-        "winter_wheat": {
+        "sugar_beet": {
             "plant_years": [2009,2010,2011,2012],
             "repeat": 0,
-            "planting_day": 239,
-            "harvest_day": 121,
-            "harvest_type": "scheduled",
+            "planting_day": 110,
+            "harvest_day": 240,
+            "harvest_type": "optimal",
             "planting_order": "2nd",
-            "extracted": false
+            "extracted": true
         }
     }
 }

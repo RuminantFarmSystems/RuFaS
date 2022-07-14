@@ -256,6 +256,8 @@ class Soil:
 
         self.infiltration = 0.0
         self.residue = data['initial_residue']
+        self.ag_biomass = 0.0
+
 
         # soil Nitrogen
         self.decay_rate = 0.0

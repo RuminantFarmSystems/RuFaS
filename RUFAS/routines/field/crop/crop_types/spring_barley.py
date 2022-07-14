@@ -35,7 +35,7 @@ class SpringBarley(BaseCrop):
         ''' HEAT UNIT DATA '''
 
         # input
-        self.T_base_min = 10  # TODO: unknown
+        self.T_base_min = 10  
         self.T_base_max = 35
         self.PHU = 952
 
