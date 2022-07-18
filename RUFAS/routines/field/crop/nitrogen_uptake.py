@@ -230,8 +230,10 @@ def calc_act_N_up_each_layer(soil, crop_type):
     for pot_N_up, soil_layer in zip(crop_type.pot_N_up_each_layer, soil.soil_layers):
 
         # C.5.C.4
-        act_N_up = min((pot_N_up + N_demand), soil_layer.NO3)
-
+        if not crop_type.fix_nitrogen:
+            act_N_up = min((pot_N_up + N_demand), soil_layer.NO3)
+        else: 
+            act_N_up = 0
         # C.5.C.7
         soil_layer.N_uptake = act_N_up
         act_N_up_each_layer.append(act_N_up)
@@ -254,7 +256,6 @@ def calc_act_N_up_each_layer(soil, crop_type):
 def N_uptake(soil):
     for layer in soil.soil_layers:
         layer.NO3 -= layer.N_uptake
-
 
 def calc_N_up_each_layer(soil, crop_type):
     """
