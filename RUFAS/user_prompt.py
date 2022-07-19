@@ -37,7 +37,11 @@ def input_prompt():
     return formatted_input
 
 
+<<<<<<< HEAD
 def handle_input_file(path="input/ARL.json", verbose=True):
+=======
+def handle_input_file(path = "input/ARL.json", verbose = True):
+>>>>>>> 979e80d5... initialize validation script and basic backbone
     """ Converts a file path string into usable file path objects (from pathlib package)
 
     Args:
@@ -49,14 +53,22 @@ def handle_input_file(path="input/ARL.json", verbose=True):
     """
 
     # check for global message flag
+<<<<<<< HEAD
     beverbose = False if not config.definitions.PRINT_STATUS_MESSAGES else verbose
+=======
+    beVerbose = False if not config.definitions.PRINT_STATUS_MESSAGES else verbose
+>>>>>>> 979e80d5... initialize validation script and basic backbone
 
     input_path = Path(str(path).strip())
 
     if input_path.suffix == '.txt':
         if not input_path.is_file():
             raise errors.UserInput("Specified file does not exist")
+<<<<<<< HEAD
         elif beverbose:
+=======
+        elif beVerbose:
+>>>>>>> 979e80d5... initialize validation script and basic backbone
             print("commented json file detected, stripping comments...\n")
         json_filename = fileReader.convert_to_json(str(input_path))
         json_path = Path(json_filename.strip())
@@ -65,7 +77,11 @@ def handle_input_file(path="input/ARL.json", verbose=True):
     if input_path.suffix == '.json':
         if not input_path.is_file():
             raise errors.UserInput("Specified file does not exist")
+<<<<<<< HEAD
         elif beverbose:
+=======
+        elif beVerbose:
+>>>>>>> 979e80d5... initialize validation script and basic backbone
             print("json file detected...\n")
         return [input_path]
 

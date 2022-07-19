@@ -4,6 +4,10 @@ from sys import argv
 import argparse
 from RUFAS.simulation_engine import SimulationEngine
 from RUFAS import user_prompt
+<<<<<<< HEAD
+=======
+from pathlib import Path
+>>>>>>> 979e80d5... initialize validation script and basic backbone
 
 
 def validate(inpath="input/ARL.json", make_graphs=True, verbose=True, interactive=False):
@@ -25,13 +29,22 @@ def validate(inpath="input/ARL.json", make_graphs=True, verbose=True, interactiv
     else:
         input_file_list = user_prompt.input_prompt()
 
+<<<<<<< HEAD
+=======
+
+
+>>>>>>> 979e80d5... initialize validation script and basic backbone
     # Run simulation
     for input_file_path in input_file_list:
         simulator = SimulationEngine(input_file_path)
         simulator.simulate()
 
     # compare simulation to observed outputs
+<<<<<<< HEAD
     # TODO --- neat comparison stuff ---
+=======
+    ## TODO --- neat comparison stuff ---
+>>>>>>> 979e80d5... initialize validation script and basic backbone
 
 
 if __name__ == '__main__':
@@ -41,8 +54,13 @@ if __name__ == '__main__':
     parser.add_argument("--no-graphics", help="prevent graphics from generating", action="store_true")
     parser.add_argument("-i", "--interactive", help="run in interactive mode", action="store_true")
     parser.add_argument("-v", "--verbose", help="print progress messages", action="store_true")
+<<<<<<< HEAD
     parser.add_argument("-f", "--infile", dest="infile", metavar="path", type=str,
                         help="specify the .json input file or directory")
+=======
+    parser.add_argument("-f", "--infile", dest="infile", metavar="path", help="specify the .json input file or directory",
+                        type=str)
+>>>>>>> 979e80d5... initialize validation script and basic backbone
     pargs = parser.parse_args()
 
     # check for interactive usage
@@ -51,4 +69,8 @@ if __name__ == '__main__':
     showMessages = not pargs.verbose
 
     # run validate function, passing appropriate arguments
+<<<<<<< HEAD
     validate(inpath=pargs.infile, interactive=isInteractive, make_graphs=makeGraphics, verbose=showMessages)
+=======
+    validate(inpath=pargs.infile, interactive=isInteractive, make_graphs=makeGraphics, verbose=showMessages)
+>>>>>>> 979e80d5... initialize validation script and basic backbone
