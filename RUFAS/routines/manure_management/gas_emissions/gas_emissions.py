@@ -359,7 +359,7 @@ class GasEmissions:
         vmax = GasEmissions.calc_vmax(temp_in_K)
 
         # Michaelis-Menten coefficient, kg N/m3 mixture
-        Kmc = GasEmissions.calc_kmc(temp_in_K)
+        Kmc = GasEmissions.calc_Kmc(temp_in_K)
 
         return vmax * cu / (Kmc + cu)
 
@@ -381,14 +381,9 @@ class GasEmissions:
         return 3.915 * (10 ** 9) * math.exp(-6463 / temp_in_K)
 
     @staticmethod
-<<<<<<< HEAD
-    def calc_kmc(temp_in_K: float) -> float:
-        """Returns the Michaelis-Menten coefficient (Kmc), kg N/m3 mixture.
-=======
     def calc_Kmc(temp_in_K: float) -> float:
         """
         Returns the Michaelis-Menten coefficient (Kmc), kg N/m3 mixture.
->>>>>>> 9b08aea7c0a4b0ad91940e02072fd34c54258740
 
         Parameters
         ----------
