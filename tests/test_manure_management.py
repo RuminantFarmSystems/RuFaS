@@ -174,14 +174,6 @@ def test_calc_Kmc():
     assert value_to_test == result
 
 
-def test_calc_henry_constant():
-    """Unit test for function calc_henry_constant in file gas_emissions.py"""
-    T = 250
-    value_to_test = GasEmissions.calc_henry_constant(T)
-    result = 126726.53853495147
-    assert value_to_test == result
-
-
 def test_calc_air_friction_velocity():
     """Unit test for function calc_air_friction_velocity in file
     gas_emissions.py"""
@@ -236,7 +228,7 @@ def test_calc_concentration_of_ammonia_in_manure():
     """Unit test for function calc_concentration_of_ammonia_in_manure in file gas_emissions.py"""
     F = 10
     C_tan = 3
-    value_to_test = GasEmissions.calc_concentration_of_ammonia_in_manure(
+    value_to_test = GasEmissions.calc_conc_of_NH3_in_manure(
             F, C_tan)
     result = 30
     assert value_to_test == result
@@ -244,11 +236,7 @@ def test_calc_concentration_of_ammonia_in_manure():
 
 def test_calc_E_N20_manure():
     """Unit test for function calc_E_N20_manure in file gas_emissions.py"""
-    EF_n20 = 1000
-    A_storage = 1000
-    value_to_test = GasEmissions.calc_E_N20_manure(EF_n20, A_storage)
-    result = 1000
-    assert value_to_test == result
+    pass
 
 
 def test_calc_ammonia_flux():
@@ -257,7 +245,7 @@ def test_calc_ammonia_flux():
     Cm = 2
     H = 3
     Ca = 4
-    value_to_test = GasEmissions.calc_ammonia_flux(K, Cm, H, Ca)
+    value_to_test = GasEmissions.calc_NH3_flux(K, Cm, H, Ca)
     result = -36000
     assert value_to_test == result
 

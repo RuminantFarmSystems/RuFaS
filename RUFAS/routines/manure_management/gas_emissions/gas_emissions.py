@@ -16,6 +16,10 @@ class GasEmissionConstants:
     E = 112700  # apparent activation energy, J/mol
     R = 8.314  # gas constant, J/K-mol
 
+    r_storage_for_manure_with_crust = 75
+    r_storage_for_manure_without_crust = 19
+    r_storage_for_solid_manure = 10
+
 
 @dataclass
 class CanCalcMethane(Protocol):
@@ -30,7 +34,7 @@ class CanCalcMethane(Protocol):
 
 class GasEmissions:
     @staticmethod
-    def calc_E_CH4_storage(data: CanCalcMethane, temp_in_C=15.0) -> float:
+    def calc_E_CH4_storage_v1(data: CanCalcMethane, temp_in_C=15.0) -> float:
         """
         TODO: Describe
 
@@ -38,7 +42,7 @@ class GasEmissions:
         -----
         ECH4,man = 	[(( 24 * Vs,d * b1)/1000) * exp[ln(A)) - (E/RT)] + (( 24 * Vs,nd *  b2)/1000) * exp[ln(A) -(E/RT)]
         where
-            E CH4 man = emission of CH4 from the storage, kg CH4/day
+            E_CH4_man = emission of CH4 from the storage, kg CH4/day
             VSd and VSnd = degradable and non-degradable VS in the manure, g
             b1 and b2 = rate correcting factors, dimensionless
             A = Arrhenius parameter, g CH4/kg VS-h
@@ -54,7 +58,7 @@ class GasEmissions:
 
         Returns
         -------
-        CH4 emissions from storage.
+        CH4 emissions from storage, kg CH4/day.
 
         """
         daily_time_steps = 24
@@ -68,7 +72,7 @@ class GasEmissions:
         return (daily_time_steps * data.VSd * b1 * exp) + (daily_time_steps * data.VSnd * b2 * exp)
 
     @staticmethod
-    def calc_E_CH4_storage_2(data: CanCalcMethane, temp_in_C=15.0, Bo=0.2, E_CH4_pot=0.48) -> float:
+    def calc_E_CH4_storage_v2(data: CanCalcMethane, temp_in_C=15.0, Bo=0.2, E_CH4_pot=0.48) -> float:
         """
         TODO: Describe
 
@@ -82,7 +86,7 @@ class GasEmissions:
 
         Returns
         -------
-        CH4 emission from storage.
+        CH4 emission from storage, kg CH4/day.
 
         """
 
@@ -161,7 +165,7 @@ class GasEmissions:
 
         Returns
         -------
-        CH4 floor emissions.
+        CH4 floor emissions, kg CH4/day.
 
         """
 
@@ -184,7 +188,7 @@ class GasEmissions:
 
         Returns
         -------
-        CO2 floor emissions.
+        CO2 floor emissions, kg CO2/day.
 
         """
 
@@ -193,40 +197,40 @@ class GasEmissions:
         return pen.num_animals * max(0.0, 0.0065 + 0.0192 * t) * pen.barn_area / 1000
 
     @staticmethod
-    def calc_E_NH3_N(Tan, r, U, temp_in_C, p=990.0, pH=7.7) -> float:
+    def calc_E_NH3_N(TAN: float, r: float, U: float, tempC: float, p=990.0, pH=7.7) -> float:
         """
         Calculates NH3 emissions.
 
         Parameters
         ----------
-        Tan: total ammonia nitrogen in manure, kg N/m^2.
+        TAN: total ammonia nitrogen in manure, kg N/m^2.
         r: resistance of NH3 transport from the manure surface to the free atmosphere, s/m.
         U: total amount of manure urine in area of exposed surface, kg.
-        temp_in_C: temperature, °C.
+        tempC: temperature, °C.
         p: manure density, kg/m^3.
         pH: manure acidity.
 
         Returns
         -------
-        NH3 emissions.
+        NH3 emissions, kg N/m^2/day.
 
         """
 
         c = 86400  # time conversion, seconds/day
-        temp_in_K = GasEmissions.convert_temp_C_to_K(temp_in_C)
+        tempK = GasEmissions.convert_temp_C_to_K(tempC)
         area = 6.5  # m^2 TODO: Switch based on housing type
         M = U / area  # manure urine per area of exposed surface, kg/m^2
-        Q = GasEmissions.calc_Q(temp_in_K, pH)
-        return (Tan * c * p) / (r * M * Q)
+        Q = GasEmissions.calc_Q(tempK, pH)
+        return (TAN * c * p) / (r * M * Q)
 
     @staticmethod
-    def calc_r_barn(temp_in_C) -> float:
+    def calc_r_barn(tempC) -> float:
         """
         TODO: Describe
 
         Parameters
         ----------
-        temp_in_C: temperature, °C.
+        tempC: temperature, °C.
 
         Returns
         -------
@@ -235,63 +239,16 @@ class GasEmissions:
         """
 
         hsc = 260  # housing specific constant, s/m
-        return hsc * (1 - 0.027 * (20.0 - temp_in_C))
+        return hsc * (1 - 0.027 * (20.0 - tempC))
 
     @staticmethod
-    def get_r_storage_for_manure_with_crust() -> float:
-        """
-        TODO: Describe
-
-        Returns
-        -------
-        TODO: Describe
-
-        """
-
-        return 75
-
-    @staticmethod
-    def get_r_storage_for_manure_without_crust() -> float:
-        """
-        TODO: Describe
-
-        Notes
-        -----
-        If this is a only constant, then move it to the Constants class above.
-
-        Returns
-        -------
-        TODO: Describe
-
-        """
-
-        return 19
-
-    @staticmethod
-    def get_r_storage_for_solid_manure() -> float:
-        """
-        TODO: Describe
-
-        Notes
-        -----
-        If this is only a constant, then move it to the Constants class above.
-
-        Returns
-        -------
-        TODO: Describe
-
-        """
-
-        return 10
-
-    @staticmethod
-    def calc_Kh(temp_in_K: float) -> float:
+    def calc_Kh(tempK: float) -> float:
         """
         TODO: Describe
 
         Parameters
         ----------
-        temp_in_K: temperature, K.
+        tempK: temperature, K.
 
         Returns
         -------
@@ -299,16 +256,16 @@ class GasEmissions:
 
         """
 
-        return 10 ** (1478 / temp_in_K - 1.69)
+        return 10 ** (1478 / tempK - 1.69)
 
     @staticmethod
-    def calc_Ka(temp_in_K: float, pH: float) -> float:
+    def calc_Ka(tempK: float, pH: float) -> float:
         """
         TODO: Describe
 
         Parameters
         ----------
-        temp_in_K: temperature, K.
+        tempK: temperature, K.
         pH:
 
         Returns
@@ -317,16 +274,16 @@ class GasEmissions:
 
         """
 
-        return 1 + 10 ** (0.09018 + 2729.9 / temp_in_K - pH)
+        return 1 + 10 ** (0.09018 + 2729.9 / tempK - pH)
 
     @staticmethod
-    def calc_Q(temp_in_K: float, pH: float) -> float:
+    def calc_Q(tempK: float, pH: float) -> float:
         """
         TODO: Describe
 
         Parameters
         ----------
-        temp_in_K: temperature, K.
+        tempK: temperature, K.
         pH:
 
         Returns
@@ -335,18 +292,18 @@ class GasEmissions:
 
         """
 
-        kh = GasEmissions.calc_Kh(temp_in_K)
-        ka = GasEmissions.calc_Ka(temp_in_K, pH)
-        return kh * ka
+        Kh = GasEmissions.calc_Kh(tempK)
+        Ka = GasEmissions.calc_Ka(tempK, pH)
+        return Kh * Ka
 
     @staticmethod
-    def calc_ruc(temp_in_K: float, cu: float) -> float:
+    def calc_ruc(tempK: float, cu: float) -> float:
         """
         Returns the rate of urea transformation to TAN (RUC) via Eq. (1), kg/m3-h.
 
         Parameters
         ----------
-        temp_in_K: temperature, K.
+        tempK: temperature, K.
         cu: urea concentration in urine, kg/m3.
 
         Returns
@@ -356,15 +313,15 @@ class GasEmissions:
         """
 
         # maximum rate of urea conversion, kg N/m3 wet feces-h
-        vmax = GasEmissions.calc_vmax(temp_in_K)
+        vmax = GasEmissions.calc_vmax(tempK)
 
         # Michaelis-Menten coefficient, kg N/m3 mixture
-        Kmc = GasEmissions.calc_Kmc(temp_in_K)
+        Kmc = GasEmissions.calc_Kmc(tempK)
 
         return vmax * cu / (Kmc + cu)
 
     @staticmethod
-    def calc_vmax(temp_in_K: float) -> float:
+    def calc_vmax(tempK: float) -> float:
         """
         Returns the maximum rate of urea conversion (Vmax), kg N/m3 wet feces-h.
 
@@ -378,16 +335,16 @@ class GasEmissions:
 
         """
 
-        return 3.915 * (10 ** 9) * math.exp(-6463 / temp_in_K)
+        return 3.915 * (10 ** 9) * math.exp(-6463 / tempK)
 
     @staticmethod
-    def calc_Kmc(temp_in_K: float) -> float:
+    def calc_Kmc(tempK: float) -> float:
         """
         Returns the Michaelis-Menten coefficient (Kmc), kg N/m3 mixture.
 
         Parameters
         ----------
-        temp_in_K: temperature, K.
+        tempK: temperature, K.
 
         Returns
         -------
@@ -395,8 +352,39 @@ class GasEmissions:
 
         """
 
-        return 3.371 * (10 ** 8) * math.exp(-5914 / temp_in_K)
+        return 3.371 * (10 ** 8) * math.exp(-5914 / tempK)
 
+    # TODO: Review
+    @staticmethod
+    def calc_E_N20_manure(pen: SimplePen) -> float:
+        """
+        TODO: Describe
+
+        Notes
+        -----
+        For stacked manure with a greater DM content, an emission factor
+            of 0.005 kg N2O-N /(kg N excreted) when a crust does not form,
+            no N2O is formed and emitted. This occurs if the manure DM contents
+            are less than 8%, manure is loaded daily onto the top surface of the
+            storage, or an enclosed tank is used.
+        EN2O,manure = emission of N2O from slurry storage, kg N2O /day
+
+        Parameters
+        ----------
+        pen: A SimplePen object to get the barn area from
+
+        Returns
+        -------
+
+        """
+        # emission rate of N2O, g N2O/m2-day
+        EF_N2O = 0.8
+
+        A_storage = pen.barn_area
+
+        return (EF_N2O * A_storage) / 1000
+
+    # TODO: Review
     @staticmethod
     def calc_f(pH: float, Ka: float) -> float:
         """
@@ -415,31 +403,16 @@ class GasEmissions:
 
         return 1 / (1 + (10 ** (-pH)) / Ka)
 
-    # @staticmethod
-    # def calc_Ka(T):
-    #     """
-    #     Returns the dissociation constant, Ka
-    #
-    #     Args:
-    #       T - temperature in Kelvin
-    #     """
-    #     return 10 ** (0.05 - 2788 / T)
-
-    # @staticmethod
-    # def calc_henry_constant(T):
-    #    H = (T / 0.2138) * 10 ** (1825 / T - 6.123)
-    #    return H
-
-    # TODO: Add type hints
+    # TODO: Review
     @staticmethod
-    def calc_mass_transfer_coefficient_gaseous(U, SC):
+    def calc_mass_transfer_coefficient_gaseous(U: float, SC: float) -> float:
         """
         Returns the mass transfer coefficient through gaseous layer.
 
         Parameters
         ----------
-        U = air friction velocity near surface, m/s.
-        SC = Schmidt number.
+        U: air friction velocity near surface, m/s.
+        SC: Schmidt number.
 
         Returns
         -------
@@ -449,9 +422,9 @@ class GasEmissions:
 
         return 0.001 + 0.0462 * U * (SC ** (-0.67))
 
-    # TODO: Add type hints
+    # TODO: Review
     @staticmethod
-    def calc_air_friction_velocity(Va):
+    def calc_air_friction_velocity(Va: float) -> float:
         """
         Returns the air friction velocity.
 
@@ -467,27 +440,9 @@ class GasEmissions:
 
         return 0.02 * Va ** 1.5
 
-    # TODO: Add type hints
+    # TODO: Review
     @staticmethod
-    def calc_henry_constant(T):
-        """
-        Returns the  Henry’s Law constant for ammonia, H.
-
-        Parameters
-        ----------
-        T: temperature, K.
-
-        Returns
-        -------
-            Henry’s Law constant for ammonia, H
-
-        """
-
-        hsc = (T / 0.2138) * 10 ** (1825 / T - 6.123)
-        return hsc * (1 - 0.027 * (20 - T))
-
-    @staticmethod
-    def calc_mass_transfer_coefficient_liquid(T):
+    def calc_mass_transfer_coefficient_liquid(T: float) -> float:
         """
         Returns the mass transfer coefficient through liquid layer.
 
@@ -503,8 +458,9 @@ class GasEmissions:
 
         return 1.417 * 10 ** (-12) * T ** 4
 
+    # TODO: Review
     @staticmethod
-    def calc_resistance_to_mass_transfer(Rs, Rc):
+    def calc_resistance_to_mass_transfer(Rs: float, Rc: float) -> float:
         """
         Returns the resistance to mass transfer.
 
@@ -521,8 +477,9 @@ class GasEmissions:
 
         return Rs + Rc
 
+    # TODO: Review
     @staticmethod
-    def calc_overall_mass_transfer_coefficient(H, Kg, Kl, Rm):
+    def calc_overall_mass_transfer_coefficient(H: float, Kg: float, Kl: float, Rm: float) -> float:
         """
         Returns the overall mass transfer coefficient, the reciprocal of the
         sum of the three resistances to mass transfer.
@@ -542,15 +499,16 @@ class GasEmissions:
 
         return 1 / (H / Kg + 1 / Kl + Rm)
 
+    # TODO: Review
     @staticmethod
-    def calc_ammonia_flux(K, Cm, H, Ca):
+    def calc_NH3_flux(K: float, Cm: float, H: float, Ca: float) -> float:
         """
-        Returns the ammonia flux, kg/m2-s
+        Returns the NH3 flux, kg/m2-s
 
         Parameters
         ----------
-        Cm = concentration of ammonia in manure, kg/m3
-        Ca = concentration of ammonia in ambient air, kg/m3
+        Cm = concentration of NH3 in manure, kg/m3
+        Ca = concentration of NH3 in ambient air, kg/m3
 
         Returns
         -------
@@ -559,15 +517,16 @@ class GasEmissions:
 
         return 3600 * K * (Cm - H * Ca)
 
+    # TODO: Review
     @staticmethod
-    def calc_concentration_of_ammonia_in_manure(F, C_tan):
+    def calc_conc_of_NH3_in_manure(F, C_tan):
         """
-        Returns the ammonia concentration in the manure
+        Returns the NH3 concentration in the manure
 
         Parameters
         ----------
-        F = ammonia fraction of TAN in a manure solution
-        C_tan = concentration of TAN in the manure solution, kg/m^3
+        F: NH3 fraction of TAN in a manure solution
+        C_tan: concentration of TAN in the manure solution, kg/m^3
 
         Returns
         -------
@@ -575,31 +534,6 @@ class GasEmissions:
         """
 
         return F * C_tan
-
-    @staticmethod
-    def calc_E_N20_manure(EF_n20, A_storage):
-        """
-
-        Notes
-        -----
-        For stacked manure with a greater DM content, an emission factor of 0.005 kg N2O-N /(kg N excreted)
-          when a crust does not form, no N2O is formed and emitted. This occurs if the manure DM contents less than
-          8%, manure is loaded daily onto the top surface of the
-          storage, or an enclosed tank is used.
-        EN2O,manure = emission of N2O from slurry storage, kg N2O /day
-        EF,N2O,man = emission rate of N2O, 0.8 g N2O /m2 -day
-
-        Parameters
-        ----------
-        EF_n20:
-        A_storage: exposed surface area of the manure storage, m2
-
-        Returns
-        -------
-
-        """
-
-        return (EF_n20 * A_storage) / 1000
 
     @staticmethod
     def convert_temp_C_to_K(temp_in_C: float) -> float:
