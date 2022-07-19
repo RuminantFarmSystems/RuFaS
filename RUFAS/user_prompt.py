@@ -9,6 +9,7 @@ import sys
 from pathlib import Path
 from RUFAS import util, errors
 import fileReader
+import config.definitions
 
 
 def input_prompt():
@@ -36,8 +37,7 @@ def input_prompt():
     return(formatted_input)
 
 
-
-def handle_input_file(path = "input/ARL.json"):
+def handle_input_file(path = "input/ARL.json", verbose = True):
     """ Converts a file path string into usable file path objects (from pathlib package)
 
     Args:
@@ -47,12 +47,15 @@ def handle_input_file(path = "input/ARL.json"):
 
     """
 
+    # check for global message flag
+    beVerbose = False if not config.definitions.PRINT_STATUS_MESSAGES else verbose
+
     input_path = Path(str(path).strip())
 
     if input_path.suffix == '.txt':
         if not input_path.is_file():
             raise errors.UserInput("Specified file does not exist")
-        else:
+        elif beVerbose:
             print("commented json file detected, stripping comments...\n")
         json_filename = fileReader.convert_to_json(str(input_path))
         json_path = Path(json_filename.strip())
@@ -61,7 +64,7 @@ def handle_input_file(path = "input/ARL.json"):
     if input_path.suffix == '.json':
         if not input_path.is_file():
             raise errors.UserInput("Specified file does not exist")
-        else:
+        elif beVerbose:
             print("json file detected...\n")
         return [input_path]
 
@@ -110,6 +113,7 @@ def accept_path_from_prompt():
 
 ## ToDo make tests. The following should work (from RUFAS/ dir)
 # handle_input_file("../input/ARL.json")
+# handle_input_file("../input/ARL.json", verbose=False)
 # handle_input_file("../input/")
 # handle_input_file(path=accept_path_from_prompt())
 # input_prompt()

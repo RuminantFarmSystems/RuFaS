@@ -8,7 +8,7 @@ Author(s): William Donovan wmdonovan@wisc.edu
 import csv
 from pathlib import Path
 
-import config.defintions
+import config.definitions
 from .. import graphics
 
 
@@ -22,7 +22,7 @@ class BaseReport:
         the data passed to it and assigns the properties below.
         """
 
-        _suppress_graphics = config.defintions.SUPPRESS_GRAPHICS #check for global graphics suppression flag
+        _suppress_graphics = config.definitions.SUPPRESS_GRAPHICS #check for global graphics suppression flag
 
         self.produce_csv = data['produce_csv']
         self.produce_graphics = data['produce_graphics'] if not _suppress_graphics else False #conditionally switch off graphics
