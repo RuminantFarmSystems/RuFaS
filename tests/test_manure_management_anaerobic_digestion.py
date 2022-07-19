@@ -1,6 +1,6 @@
 """
 RUFAS: Ruminant Farm Systems Model
-File name: test_manure_management_treatments.py
+File name: test_manure_management_anaerobic_digestion.py
 Description: Implements test cases
 Author(s): Mike Eaton 
 """
