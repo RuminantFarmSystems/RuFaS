@@ -123,18 +123,6 @@ def test_calcHeatCapacityManure(T_avg,moisture_content,expected,ad_fixture):
     ad = ad_fixture
     assert pytest.approx(ad.calcHeatCapacityManure(T_avg,moisture_content),0.1) == expected  
 
-
-# ##TODO: Calculate expected values for parameterization and replace in this function
-# @pytest.mark.xfail
-# @pytest.mark.parametrize("T_avg,moisture_content,expected",[
-#     (4,0,1),
-#     (25,80,2),
-
-# ])
-# def test_calcSpecificInputEnergy(T_avg,expected):
-#     ad = anaerobic_digestion0()
-#     sie = ad.calcSpecificInputEnergy(25,1)
-#     assert sie == expected
 @pytest.mark.xfail
 def test_update(ad_fixture_zeros,get_expected_values_zeros):
     ad = ad_fixture_zeros
