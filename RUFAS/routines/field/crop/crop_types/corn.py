@@ -5,6 +5,7 @@ from .base_crop import BaseCrop
 # RUFAS. This is important for the validation module.
 # ToDo: Check that the only manually initiated attributes in Corn are "internally calculated" and "output" variables
 # ToDo: Also, check that only values that actually make sense to change be includied in this dictionary
+# ToDo: All data values need to be documented in CornConfigData AND the attributes in Corn class.
 CornConfigData = {"T_base_min": 10, # Heat Unit Data ----v
                   "T_base_max": 30,
                   "PHU": 1200,
