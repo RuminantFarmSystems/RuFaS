@@ -7,7 +7,6 @@ Author(s): Kass Chupongstimun, kass_c@hotmail.com
 
 import sys
 from pathlib import Path
-
 from RUFAS import util, errors
 import fileReader
 
@@ -32,6 +31,56 @@ def input_prompt():
             The list could contain only 1 or multiple paths.
     """
 
+    user_input = accept_path_from_prompt()
+    formatted_input = handle_input_file(path=user_input)
+    return(formatted_input)
+
+
+
+def handle_input_file(path = "input/ARL.json"):
+    """ Converts a file path string into usable file path objects (from pathlib package)
+
+    Args:
+        path: The path to an input file (.json or .txt) or a directory containing .json files
+
+    Returns: a list of OS-specific files
+
+    """
+
+    input_path = Path(str(path).strip())
+
+    if input_path.suffix == '.txt':
+        if not input_path.is_file():
+            raise errors.UserInput("Specified file does not exist")
+        else:
+            print("commented json file detected, stripping comments...\n")
+        json_filename = fileReader.convert_to_json(str(input_path))
+        json_path = Path(json_filename.strip())
+        return [json_path]
+
+    if input_path.suffix == '.json':
+        if not input_path.is_file():
+            raise errors.UserInput("Specified file does not exist")
+        else:
+            print("json file detected...\n")
+        return [input_path]
+
+    elif input_path.is_dir():
+        # Grab all json files in dir
+        path_list = list(input_path.glob('*.json'))
+        # Handle no json files in dir
+        if len(path_list) < 1:
+            raise errors.UserInput("Directory contains no json files")
+        else:
+            print(str(len(path_list)) + " json files detected...\n")
+            return path_list
+
+    else:
+        raise errors.UserInput("Invalid Input")
+
+
+def accept_path_from_prompt():
+
     print("\nSingle Simulation:\n\t" +
           "Enter a json file name\n" +
           "Batch Simulation:\n\t" +
@@ -45,65 +94,22 @@ def input_prompt():
 
         try:
             user_input = 'input/' + input("\nEnter RUFAS Input: ")
-            #
-            # Handle user exiting program
-            #
+
             if user_input.upper() == 'Q':
                 print("Exiting RUFAS...")
                 sys.exit()
 
-            #
-            # Handle print base directory
-            #
             elif user_input.lower() == 'dir':
                 print(str(util.get_base_dir()))
                 continue
 
-            input_path = Path(user_input.strip())
-
-            #
-            # Handle commented json text file input
-            #
-            if input_path.suffix == '.txt':
-                if not input_path.is_file():
-                    raise errors.UserInput("Specified file does not exist")
-                else:
-                    print("commented json file detected, stripping comments...\n")
-                json_filename = fileReader.convert_to_json(str(input_path))
-                json_path = Path(json_filename.strip())
-                return [json_path]
-
-            #
-            # Handle single json file input
-            #
-            if input_path.suffix == '.json':
-                if not input_path.is_file():
-                    raise errors.UserInput("Specified file does not exist")
-                else:
-                    print("json file detected...\n")
-                return [input_path]
-
-            #
-            # Handle directory of json files input
-            #
-            elif input_path.is_dir():
-                # Grab all json files in dir
-                path_list = list(input_path.glob('*.json'))
-                # Handle no json files in dir
-                if len(path_list) < 1:
-                    raise errors.UserInput("Directory contains no json files")
-                else:
-                    print(str(len(path_list)) + " json files detected...\n")
-                    return path_list
-
-            #
-            # Handle bad input
-            #
-            else:
-                raise errors.UserInput("Invalid Input")
-
-        #
-        # Handles bad user input, prints out error messages
-        #
+            return(user_input)
         except errors.UserInput as e:
             print(e.msg)
+
+
+## ToDo make tests. The following should work (from RUFAS/ dir)
+# handle_input_file("../input/ARL.json")
+# handle_input_file("../input/")
+# handle_input_file(path=accept_path_from_prompt())
+# input_prompt()
