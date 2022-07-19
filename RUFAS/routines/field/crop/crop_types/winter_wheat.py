@@ -37,8 +37,8 @@ class WinterWheat(BaseCrop):
 
         # input
         self.T_base_min = 0
-        self.T_base_max = 30  # TODO
-        self.PHU = 1600  # 1550-1680  # TODO
+        self.T_base_max = 30  # TODO: GitHub Issue #157
+        self.PHU = 1600  # 1550-1680  # TODO Potential heat units unknown - GitHub Issue #154
 
         # Internally calculated input
         self.accumulated_HU = 0.0
@@ -86,9 +86,9 @@ class WinterWheat(BaseCrop):
         ''' BIOMASS DATA '''
 
         # input
-        self.kl = 0.65  # TODO
+        self.kl = 0.65  # TODO: GitHub Issue #157
         self.RUE = 30
-        self.T_opt = 18  # TODO
+        self.T_opt = 18  # TODO: GitHub Issue #157
 
         # Internally calculated input
         self.gamma_reg = 0
@@ -102,8 +102,8 @@ class WinterWheat(BaseCrop):
         # ===================================================================
         ''' Soil Water Uptake Data '''
 
-        self.beta_w = 10  # TODO: water-use distribution parameter
-        self.epco = 0.5  # TODO
+        self.beta_w = 10  # TODO: water-use distribution parameter - GitHub Issue #157
+        self.epco = 0.5  # TODO: GitHub Issue #157
 
         self.water_actual_up = 0
         self.water_uptake_each_layer = []
@@ -161,8 +161,8 @@ class WinterWheat(BaseCrop):
 
         self.gamma_wu = 0
 
-        self.biomass_dry_down_percent = 0.0  # TODO: Hard coded total dry down until daily method is modeled
-        self.DM_harvest_percent = 0.0001  # TODO: Hard coded dry matter percent at harvest
+        self.biomass_dry_down_percent = 0.0  # TODO: Hard coded total dry down until daily method is modeled - GitHub Issue #156
+        self.DM_harvest_percent = 0.0001  # TODO: Hard coded dry matter percent at harvest - GitHub Issue #155
         self.NDF_harvest_percent = 0.416
 
         self.bio_AG = 0

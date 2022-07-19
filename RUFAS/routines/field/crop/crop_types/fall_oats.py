@@ -36,8 +36,8 @@ class FallOats(BaseCrop):
 
         # input
         self.T_base_min = 0
-        self.T_base_max = 30  # TODO
-        self.PHU = 1600  # 1500-1750  # TODO
+        self.T_base_max = 30  # TODO: GitHub Issue #157
+        self.PHU = 1600  # 1500-1750  # TODO Potential heat units unknown - GitHub Issue #154
 
         # Internally calculated input
         self.accumulated_HU = 0.0
@@ -85,7 +85,7 @@ class FallOats(BaseCrop):
         ''' BIOMASS DATA '''
 
         # input
-        self.kl = 0.65  # TODO
+        self.kl = 0.65  # TODO: GitHub Issue #157
         self.RUE = 35
         self.T_opt = 15
 
@@ -101,8 +101,8 @@ class FallOats(BaseCrop):
         # ===================================================================
         ''' Soil Water Uptake Data '''
 
-        self.beta_w = 10  # TODO: water-use distribution parameter
-        self.epco = 0.5  # TODO
+        self.beta_w = 10  # TODO: water-use distribution parameter - GitHub Issue #157
+        self.epco = 0.5  # TODO: GitHub Issue #157
 
         self.water_actual_up = 0
         self.water_uptake_each_layer = []
@@ -120,7 +120,7 @@ class FallOats(BaseCrop):
         self.fr_n1 = 0.0600
         self.fr_n2 = 0.0231
         self.fr_n3 = 0.0134
-        self.fr_n3ish = 0.01341  # TODO
+        self.fr_n3ish = 0.01341  # TODO: GitHub Issue #157
 
         self.fr_N = 0
         self.fr_N_up = 0
@@ -141,7 +141,7 @@ class FallOats(BaseCrop):
         self.fr_p1 = 0.0084
         self.fr_p2 = 0.0032
         self.fr_p3 = 0.0019
-        self.fr_p3ish = 0.00191  # TODO
+        self.fr_p3ish = 0.00191  # TODO: GitHub Issue #157
 
         self.fr_P = 0
         self.P_up = 0
@@ -160,8 +160,8 @@ class FallOats(BaseCrop):
 
         self.gamma_wu = 0
 
-        self.biomass_dry_down_percent = 0.0  # TODO: Hard coded total dry down until daily method is modeled
-        self.DM_harvest_percent = 0.0001  # TODO: Hard coded dry matter percent at harvest
+        self.biomass_dry_down_percent = 0.0  # TODO: Hard coded total dry down until daily method is modeled - GitHub Issue #156
+        self.DM_harvest_percent = 0.0001  # TODO: Hard coded dry matter percent at harvest - GitHub Issue #155
         self.NDF_harvest_percent = 0.416
 
         self.bio_AG = 0
