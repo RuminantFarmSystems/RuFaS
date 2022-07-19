@@ -167,12 +167,11 @@ class ManureManagement:
 
         for pen in animal_management.all_pens:
             print(f'Pen {pen.id}----------------------------------------------')
-            manure_handler_daily_output = self.manure_handlers[pen.id].update(
-                pen)
+            manure_handler_daily_output = self.manure_handlers[pen.id].update(pen)
             reception_pit_daily_output = self.reception_pits[pen.id].update()
             manure_separator_daily_output = self.manure_separators[pen.id].update(
                 pen)
-            treatment_daily_output = self.treatments[pen.id].update(pen)
+            treatment_daily_output = self.treatments[pen.id].update()
 
             pen_daily_update_data = (
                 pen,
