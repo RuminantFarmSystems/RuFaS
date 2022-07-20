@@ -66,10 +66,12 @@ class SimplePen:
 
     @property
     def barn_area(self) -> float:
-        """Calculates the barn area for this pen depending on its housing type.
+        """
+        Calculates the barn area for this pen depending on its housing type.
 
-        Returns:
-            Barn area.  TODO: Add units
+        Returns
+        -------
+        Barn area, m^2/animal.
 
         """
         BarnArea = NamedTuple('BarnArea', [('has_cows', float), ('no_cows', float)])

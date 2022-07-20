@@ -8,7 +8,7 @@ Description:
 Author(s):  William Donovan, wmdonovan@wisc.edu
             Yunus Mohammed, ymm26@cornell.edu 
 """
-from __future__ import annotations
+#from __future__ import annotations
 
 from dataclasses import dataclass
 from typing import Dict, List, Optional, Type
@@ -23,6 +23,7 @@ from RUFAS.routines.manure_management.misc.simple_pen import SimplePen
 
 
 class ManureHandlerEnum(ExtendedEnum):
+    """An Enum class that lists all the different types of manure handlers."""
     FLUSH_SYSTEM = 1
     MANUAL_SCRAPING = 2
     ALLEY_SCRAPER = 3
@@ -33,13 +34,19 @@ class ManureHandlerEnum(ExtendedEnum):
 
 
 class BaseManureHandler:
+    """
+    A class that contains common attributes and methods for all the different
+    subtypes of manure handlers.
+    """
+
     def __init__(self,
                  pen: SimplePen,
-                 handler_init_data: ManureHandlerInitData):
+                 handler_init_data):
         self.handler_init_data = handler_init_data
         self.sand_lane = None
 
-        self.manure_handler_enum = ManureHandlerEnum.get_enum(pen.manure_handler)
+        self.manure_handler_enum = ManureHandlerEnum.get_enum(
+            pen.manure_handler)
         self.bedding_manager = BeddingManager.get_instance(pen.bedding_type)
         self.milking_center = MilkingCenter()
 
@@ -63,21 +70,22 @@ class BaseManureHandler:
         #     self.sand_lane.sand_lane()
 
         daily_output = ManureHandlerOutput(
-                urea=pen.manure.U,
-                TAN_s=pen.manure.TAN_s,
-                manure_nitrogen=pen.manure.MN,
-                TSd=pen.manure.TSd,
-                VSd=pen.manure.VSd,
-                VSnd=pen.manure.VSnd,
-                p_excrt_manure=pen.manure.p_excrt_manure,
-                K_manure=pen.manure.K_manure,
-                CH4_floor=GasEmissions.calc_E_CH4_floor(pen),
-                CO2_floor=GasEmissions.calc_E_C02_floor(pen),
+            urea=pen.manure.U,
+            TAN_s=pen.manure.TAN_s,
+            manure_nitrogen=pen.manure.MN,
+            TSd=pen.manure.TSd,
+            VSd=pen.manure.VSd,
+            VSnd=pen.manure.VSnd,
+            p_excrt_manure=pen.manure.p_excrt_manure,
+            K_manure=pen.manure.K_manure,
+            CH4_floor=GasEmissions.calc_E_CH4_floor(pen),
+            CO2_floor=GasEmissions.calc_E_C02_floor(pen),
 
-                raw_manure=pen.manure_mass,
-                cleaning_water=self.cleaning_water_volume_in_main_barn(pen),
-                total_bedding_mass=self.bedding_manager.total_bedding_mass(pen),
-                total_water_volume_in_milking_center=self.milking_center.total_water_volume_used_in_milking_center(pen)
+            raw_manure=pen.manure_mass,
+            cleaning_water=self.cleaning_water_volume_in_main_barn(pen),
+            total_bedding_mass=self.bedding_manager.total_bedding_mass(pen),
+            total_water_volume_in_milking_center=self.milking_center.total_water_volume_used_in_milking_center(
+                pen)
         )
         self.all_output.append(daily_output)
         return daily_output
@@ -88,9 +96,11 @@ class BaseManureHandler:
     def total_daily_volume(self, pen: SimplePen) -> float:
         return sum([
             pen.manure_volume,  # m^3
-            self.cleaning_water_volume_in_main_barn(pen) * Constants.LITERS_TO_CUBIC_METERS,  # m^3
+            self.cleaning_water_volume_in_main_barn(
+                pen) * Constants.LITERS_TO_CUBIC_METERS,  # m^3
             self.bedding_manager.total_bedding_volume(pen),  # m^3
-            self.milking_center.total_water_volume_used_in_milking_center(pen) * Constants.LITERS_TO_CUBIC_METERS,
+            self.milking_center.total_water_volume_used_in_milking_center(
+                pen) * Constants.LITERS_TO_CUBIC_METERS,
             # m^3
             pen.manure.U,  # g/L
             pen.manure.TAN_s,  # g/L
@@ -122,27 +132,27 @@ class BaseManureHandler:
 
 
 class FlushSystem(BaseManureHandler):
-    def __init__(self, pen: SimplePen, handler_init_data: ManureHandlerInitData):
+    def __init__(self, pen: SimplePen, handler_init_data):
         super().__init__(pen, handler_init_data)
 
 
 class ManualScraping(BaseManureHandler):
-    def __init__(self, pen: SimplePen, handler_init_data: ManureHandlerInitData):
+    def __init__(self, pen: SimplePen, handler_init_data):
         super().__init__(pen, handler_init_data)
 
 
 class AlleyScraper(BaseManureHandler):
-    def __init__(self, pen: SimplePen, handler_init_data: ManureHandlerInitData):
+    def __init__(self, pen: SimplePen, handler_init_data):
         super().__init__(pen, handler_init_data)
 
 
 class NullManureHandler(BaseManureHandler):
-    def __init__(self, pen: SimplePen, handler_init_data: ManureHandlerInitData):
+    def __init__(self, pen: SimplePen, handler_init_data):
         super().__init__(pen, handler_init_data)
 
 
 class CustomManureHandler(BaseManureHandler):
-    def __init__(self, pen: SimplePen, handler_init_data: ManureHandlerInitData):
+    def __init__(self, pen: SimplePen, handler_init_data):
         super().__init__(pen, handler_init_data)
 
 
@@ -150,7 +160,7 @@ class CustomManureHandler(BaseManureHandler):
 class ManureHandlerInitData:
     """
     A class that contains custom initialization configuration used in the
-    creation of a ManureHandler object.
+    creation of a BaseManureHandler object.
 
     """
     water_use_rate: int = 0  # liters/animal/day
@@ -158,7 +168,17 @@ class ManureHandlerInitData:
     cleanings_per_day: int = 2
 
     @classmethod
-    def get_instance(cls, manure_handler_enum: ManureHandlerEnum) -> ManureHandlerInitData:
+    def get_instance(cls, manure_handler_enum: ManureHandlerEnum):
+        """
+        Returns an instance of ManureHandlerInitData based on a given ManureHandlerEnum.
+
+        Args:
+            manure_handler_enum: a member of the ManureHandlerEnum.
+
+        Returns:
+            A new ManureHandlerInitData object.
+
+        """
         init_data = ManureHandlerInitData()
         enum_to_water_use_rate: Dict[ManureHandlerEnum, int] = {
             ManureHandlerEnum.FLUSH_SYSTEM: 757,  # liters
@@ -171,8 +191,22 @@ class ManureHandlerInitData:
 
 
 class ManureHandlerFactory:
+    """A class that contains the logic for creating different types of manure handlers."""
+
     @classmethod
     def get_instance(cls, pen: SimplePen) -> BaseManureHandler:
+        """
+        Returns an instance of a specific subtype of BaseManureHandler based on
+        the subtype specified in the given pen.
+
+        Args:
+            pen: A SimplePen object that specifies which subtype of BaseManureHandler
+                is needed.
+
+        Returns:
+            A new instance of a BaseManureHandler subtype.
+
+        """
         manure_handler_enum = ManureHandlerEnum.get_enum(pen.manure_handler)
 
         params = {

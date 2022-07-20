@@ -15,23 +15,24 @@ from .constants import ManureManagementConstants as Constants
 
 @dataclass
 class Manure:
-    """A class that represents the manure data extracted from the Animal
-    Management module.
+    """
+    A class that represents the manure data extracted from the Animal Management module.
 
-    Attributes:
-        U: urea concentration, mol/L
-        TAN_s: total ammoniacal nitrogen concentration in the manure slurry, mol/L
-        MN: nitrogen in liquid and solid manure, g
-        Mkg: amount of manure, kg
-        TSd: total solids, g
-        VSd: degradable volatile solids, g
-        VSnd: non-degradable volatile solids, g
-        WIP_frac: water extractable inorganic P fraction
-        WOP_frac: water extractable organic P fraction
-        p_excrt_manure: manure P excretion for manure module input (g)
-        p_frac: P fraction of manure
-        K_manure: potassium in manure, g/day
-        CH4_manure: methane emission
+    Attributes
+    ----------
+    U: urea concentration, mol/L
+    TAN_s: total ammoniacal nitrogen concentration in the manure slurry, mol/L
+    MN: nitrogen in liquid and solid manure, g
+    Mkg: amount of manure, kg
+    TSd: total solids, g
+    VSd: degradable volatile solids, g
+    VSnd: non-degradable volatile solids, g
+    WIP_frac: water extractable inorganic P fraction
+    WOP_frac: water extractable organic P fraction
+    p_excrt_manure: manure P excretion for manure module input (g)
+    p_frac: P fraction of manure
+    K_manure: potassium in manure, g/day
+    CH4_manure: methane emission
 
     """
 
@@ -60,14 +61,16 @@ class Manure:
         self.K_manure *= Constants.GRAMS_TO_KG  # kg
 
     def __add__(self, other: Manure) -> Manure:
-        """Add two Manure objects by summing their corresponding attributes.
+        """
+        Add two Manure objects by summing their corresponding attributes.
 
-        Args:
-            other: the Manure object to be added to the Self object
+        Parameters
+        ----------
+        other: the Manure object to be added to the self object
 
-        Returns:
-            A new Manure object with summed attributes.
-            The original operands remain intact.
+        Returns
+        -------
+        A new Manure object with summed attributes. The original operands remain unmodified.
 
         """
 
