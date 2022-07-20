@@ -265,7 +265,7 @@ class ManureSeparatorInitData:
 class ManureSeparatorFactory:
     @classmethod
     def get_instance(cls, pen: SimplePen, reception_pit: BaseReceptionPit) -> BaseSeparator:
-        manure_separator_enum = ManureSeparatorEnum.get_enum(pen.manure_handler)
+        manure_separator_enum = ManureSeparatorEnum.get_enum(pen.manure_separator)
         params = {
             'pen': pen,
             'reception_pit': reception_pit,
