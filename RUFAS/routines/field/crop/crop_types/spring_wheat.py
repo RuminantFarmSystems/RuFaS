@@ -29,7 +29,7 @@ class SpringWheat(BaseCrop):
         self.growing = False
         self.killed = False
 
-        self.fix_nitrogen = False  # TODO: change back
+        self.fix_nitrogen = False  # TODO: change back - GitHub Issue #160
 
         # ===================================================================
         ''' HEAT UNIT DATA '''
