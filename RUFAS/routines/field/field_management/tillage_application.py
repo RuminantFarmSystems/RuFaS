@@ -51,8 +51,7 @@ def update_all(soil, till_app):
             soil.fert_P_released = soil.fert_P_released - (soil.fert_P_released * percent_incorporated)
 
             # FM.5.3
-            # TODO: RuFaS does not track org P (03.19.20). When it does, WOP/SOP will be incorporated into organic pools
-            # TODO: RuFaS does not track org P (03.19.20). When it does, WOP/SOP will be incorporated into organic pools
+            # TODO: RuFaS does not track org P (03.19.20). When it does, WOP/SOP will be incorporated into organic pools - GitHub Issue #167
             layer.labile_P += percent_incorporated * soil.WIP
             layer.active_P += percent_incorporated * soil.SIP
 

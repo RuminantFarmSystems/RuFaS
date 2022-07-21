@@ -29,7 +29,7 @@ class SpringWheat(BaseCrop):
         self.growing = False
         self.killed = False
 
-        self.fix_nitrogen = False  # TODO: change back
+        self.fix_nitrogen = False  # TODO: change back - GitHub Issue #160
 
         # ===================================================================
         ''' HEAT UNIT DATA '''
@@ -160,8 +160,8 @@ class SpringWheat(BaseCrop):
 
         self.gamma_wu = 0
 
-        self.biomass_dry_down_percent = 0.0  # TODO: Hard coded total dry down until daily method is modeled
-        self.DM_harvest_percent = 0.0001  # TODO: Hard coded dry matter percent at harvest
+        self.biomass_dry_down_percent = 0.0  # TODO: Hard coded total dry down until daily method is modeled - GitHub Issue #156
+        self.DM_harvest_percent = 0.0001  # TODO: Hard coded dry matter percent at harvest - GitHub Issue #155
         self.NDF_harvest_percent = 0.416
 
         self.bio_AG = 0

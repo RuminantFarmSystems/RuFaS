@@ -41,7 +41,7 @@ class Alfalfa(BaseCrop):
         # input
         self.T_base_min = 4
         self.T_base_max = 43.33
-        self.PHU = 800  # TODO: still unknown
+        self.PHU = 800  # TODO: Potential heat units unknown - GitHub Issue #154
 
         # Internally calculated input
         self.accumulated_HU = 0.0
@@ -105,7 +105,7 @@ class Alfalfa(BaseCrop):
         # ===================================================================
         ''' Soil Water Uptake Data '''
 
-        self.beta_w = 10  # water-use distribution parameter  # TODO: taken from corn
+        self.beta_w = 10  # water-use distribution parameter  # TODO: taken from corn - Github issue #154
         self.epco = 1
 
         self.water_actual_up = 0
@@ -164,7 +164,7 @@ class Alfalfa(BaseCrop):
         self.gamma_wu = 0
 
         self.biomass_dry_down_percent = 0.0
-        self.DM_harvest_percent = 0.15  # TODO: Hard coded dry matter percent at harvest
+        self.DM_harvest_percent = 0.15  # TODO: Hard coded dry matter percent at harvest - GitHub Issue #155
         self.NDF_harvest_percent = 0.416
 
         self.bio_AG = 0

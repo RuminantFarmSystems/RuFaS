@@ -3,9 +3,11 @@ from .base_crop import BaseCrop
 # Define global variables containing corn parameters
 # Keeping them separate from the Class definitions allows for them to be changed before running
 # RUFAS. This is important for the validation module.
-# ToDo: Check that the only manually initiated attributes in Corn are "internally calculated" and "output" variables
-# ToDo: Also, check that only values that actually make sense to change be includied in this dictionary
-# ToDo: All data values need to be documented in CornConfigData AND the attributes in Corn class.
+
+# ToDo:
+#   Check that the only manually initiated attributes in Corn are "internally calculated" and "output" variables
+#   Also, check that only values that actually make sense to change be included in this dictionary
+#   All data values need to be documented in CornConfigData AND the attributes in Corn class.
 CornConfigData = {"T_base_min": 10, # Heat Unit Data ----v
                   "T_base_max": 30,
                   "PHU": 1200,
@@ -42,7 +44,7 @@ CornConfigData = {"T_base_min": 10, # Heat Unit Data ----v
                   "HI_actual": 0,
                   "HI_opt": 0.6,
                   "harvest_eff": 0.9,
-                  "DM_harvest_percent": 0.35,  # TODO: Hard coded dry matter percent at harvest
+                  "DM_harvest_percent": 0.35,  # TODO: Hard coded dry matter percent at harvest - GitHub Issue #155
                   "gamma_wu": 0,
                   "biomass_dry_down_percent": 0.0,
                   "NDF_harvest_percent": 0.0}
