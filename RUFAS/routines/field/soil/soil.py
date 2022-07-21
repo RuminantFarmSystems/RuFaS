@@ -295,12 +295,12 @@ class Soil:
 
         # soil carbon attributes
         self.residue_harvest = 0.0
-        # TODO unsure what this should be initialized as
+        # TODO unsure what this should be initialized as - GitHub Issue #164
         self.AG_lignin_res_percent = 17  # tied to the reset of this variable in yields, if changed, change together
         self.BG_lignin_res_percent = 17  # tied to the reset of this variable in yields, if changed, change together
 
         self.curr_layer_depth = 0
-        self.silt_to_clay_percent = 0.5  # TODO database item
+        self.silt_to_clay_percent = 0.5  # TODO database item - GitHub Issue #164
 
         self.AG_L_to_N = 0
         self.BG_L_to_N = 0
@@ -564,7 +564,7 @@ class Soil:
             layer.stable_P = layer.active_P * 4.0
             self.stable_P += layer.stable_P
 
-            # S.5.A.5 TODO organic soil pools (labile_O, and active_O) are not being tracked
+            # S.5.A.5 TODO organic soil pools (labile_O, and active_O) are not being tracked - GitHub Issue #164
             layer.org_P = layer.org_C / 8.0 / 14.0 * 10000 * layer.bulk_density \
                           * layer.thickness_cm * 0.1
             self.org_P += layer.org_P

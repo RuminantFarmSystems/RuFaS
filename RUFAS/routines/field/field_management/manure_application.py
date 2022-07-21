@@ -139,9 +139,8 @@ def formulate_manure_application(manure_storage, m_app):
         if desired_N == 0 and desired_P == 0:
             break
 
-    # TODO: this is a rudimentary method for satisfying purchased manure. A
-    #  more robust method would require drawing purchased manure from some
-    #  variety of input (likely a database)
+    # TODO: this is a rudimentary method for satisfying purchased manure. - #GitHub Issue #166
+    #  A more robust method would require drawing purchased manure from some variety of input (likely a database).
     # FM.4.A.9
     if desired_N != 0 or desired_P != 0:
         if desired_N != 0:
@@ -149,8 +148,8 @@ def formulate_manure_application(manure_storage, m_app):
         if desired_P != 0:
             manure_application['P_mass'] += desired_P
 
-        N_frac = 1 if N_frac == 0 else N_frac #TODO: this is an adjustment feature that is availabe if the manure input where total manure, not the exact values. 
-        P_frac = 1 if P_frac == 0 else P_frac #TODO: this is an adjustment feature that is availabe if the manure input where total manure, not the exact values. 
+        N_frac = 1 if N_frac == 0 else N_frac #TODO: this is an adjustment feature that is availabe if the manure input where total manure, not the exact values. - GitHub Issue #166
+        P_frac = 1 if P_frac == 0 else P_frac #TODO: this is an adjustment feature that is availabe if the manure input where total manure, not the exact values. - GitHub Issue #166
         solid_ratio = 0.65 if solid_ratio == 0 else solid_ratio
         manure_application['mass'] = max(manure_application['N_mass'] / N_frac,
                                          manure_application['P_mass'] / P_frac)

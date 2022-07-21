@@ -312,7 +312,7 @@ def calc_bcv(crop, time):
     bcv = CV / (CV + exp_part)
 
     snow = 0
-    # TODO: arbitrary snow flag
+    # TODO: arbitrary snow flag - GitHub Issue #164
     if time.day > 335 or time.day < 59:
         albedo_snow = 0.8
         snow = 10 * albedo_snow
