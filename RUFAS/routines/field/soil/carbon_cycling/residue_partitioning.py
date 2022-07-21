@@ -37,7 +37,7 @@ def residue_partitioning(soil, crop_type, weather, time):
 
     # S.6.B.I.2
     AG_L_to_N = 0
-    fr_N = 0.4  # TODO calculate in RuFaS [C.5.B.1] but not "accurate" for carbon use
+    fr_N = 0.4  # TODO calculate in RuFaS [C.5.B.1] but not "accurate" for carbon use - GitHub Issue #163
     if fr_N != 0:
         AG_L_to_N = (soil.AG_lignin_res_percent / 100) / fr_N
 

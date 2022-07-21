@@ -50,7 +50,7 @@ def update_all(soil, field_management, weather, time):
     soil.MIP_runoff = 0.0
     soil.MOP_runoff = 0.0
     MTF_1 = 1.2
-    MTF_2 = 73.1  # TODO: These are the values for a dairy application. Temporarily hard coded.
+    MTF_2 = 73.1  # TODO: These are the values for a dairy application. Temporarily hard coded. - GitHub Issue #164
     if soil.manure_mass > 0.0 and soil.manure_cov > 0.0:
         water_manure = rainfall / soil.manure_mass \
                        * soil.manure_cov * 10000.0
@@ -68,7 +68,7 @@ def update_all(soil, field_management, weather, time):
         soil.MOP_leach = min(max(0.0, manure_extr * soil.WOP / 0.6), soil.WOP)
 
         # calculates the concentration of all dissolved P in runoff in MG/L
-        if runoff > 0.0 and rainfall > 0.0:  # TODO added rainfall > 0.0 because of a divide by zero error
+        if runoff > 0.0 and rainfall > 0.0:  # TODO added rainfall > 0.0 because of a divide by zero error GitHub Issue #164
             # S.5.D.II.2
             soil.PD_factor = (runoff / rainfall) ** 0.225
 
