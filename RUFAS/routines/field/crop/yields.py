@@ -129,7 +129,7 @@ def calc_HI_act(crop_type):
 
 
 def calc_dry_down(crop_type):
-    # TODO: stand in for more sophisticated dry down method
+    # TODO: stand in for more sophisticated dry down method - GitHub Issue #162
     crop_type.bio_AG -= (crop_type.bio_AG * crop_type.biomass_dry_down_percent)
 
 
@@ -163,11 +163,10 @@ def calc_yield_act(crop_type):
     crop_type.yield_actual = crop_type.yield_max * crop_type.harvest_eff
 
 
-def calc_quality_assessment(crop_type):
+def calc_quality_assessment(crop_type):  #TODO: Stand in for more sophisticated method - GitHub Issue #161
     """
     Description:
-        TODO: Stand in for more sophisticated method
-        Assesses quality of feed at harvest
+         Assesses quality of feed at harvest
         "Feed Inventory Pseudocode" F.1.1
     Args:
         crop_type: the crop for which a quality is being assessed
@@ -215,11 +214,11 @@ def calc_residue(soil, crop_type, field_management, time):
     # for carbon, needs to be calculated only at harvest
     # C.3.A.4
     crop_type.bio_BG = crop_type.fr_root * crop_type.biomass_actual
-    soil.soil_layers[0].tillage_percent = 0.55 #TODO. hard coded value
+    soil.soil_layers[0].tillage_percent = 0.55 #TODO: hard coded value - GitHub Issue #163
 
     # lignin residue reset at harvest
-    soil.AG_lignin_res_percent = 17  # TODO
-    soil.BG_lignin_res_percent = 17  # TODO
+    soil.AG_lignin_res_percent = 17  # TODO: should depend upon crops and management - GitHub Issue #163
+    soil.BG_lignin_res_percent = 17  # TODO: should depend upon crops and management - GitHub Issue #163
 
     d_residue = 0
     if time.day == crop_type.kill_day or crop_type.crop_type == 'annual':
@@ -234,10 +233,9 @@ def calc_residue(soil, crop_type, field_management, time):
     soil.residue_harvest = soil.residue
 
 
-def calc_harvest_quality(crop_type):
+def calc_harvest_quality(crop_type): # TODO: Stand in for more sophisticated method - GitHub Issue #161
     """
     Description:
-        # TODO: Stand in for more sophisticated method
         Calculate quality of yield for grouping in feed storage
         "pseudocode_crop" C.10.G
     Args:

@@ -58,7 +58,7 @@ def calc_sed(soil, crop, weather, time):
 
     # Sediment yield is adjusted for snow on the range day < 60 or day > 350
     # "pseudocode_soil" S.3.A.17
-    # TODO: arbitrary snow flag
+    # TODO: arbitrary snow flag - GitHub Issue #164
     if time.day < 60 or time.day > 350:
         exp_part = exp(3 * 20 / 25.4)
         sed = sed / exp_part
