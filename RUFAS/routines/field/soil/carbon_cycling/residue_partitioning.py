@@ -158,5 +158,6 @@ def residue_partitioning(soil, crop_type, weather, time):
         layer.BG_struct += (AG_struct_to_BG_struct + crop_type.bio_BG * (1 - BG_met_percent)) - \
                           ((layer.BG_struct_to_C_active + layer.BG_struct_to_C_slow) + AG_struct_to_BG_struct)
 
+# TODO: add docstrings & pseudocode reference(s) - GitHub Issue #169
 def ADJ_crop_type_bio_BG_fun(layer_thickness, soil_profile_depth, crop_type_bio_BG):
     return (layer_thickness / soil_profile_depth) * crop_type_bio_BG
