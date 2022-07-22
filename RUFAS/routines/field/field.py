@@ -14,6 +14,20 @@ from ...util import read_json_file
 
 
 def daily_fields_routine(fields, manure_storage, weather, time):
+    """
+    Description:
+        execute field management, crop, and soil routines for each field and generate summaries.
+    
+    Args: 
+      fields: instance of Fields class
+      manure_storage: instance of ManureStorage class
+      weather: instance of Weather class
+      time: instance of Time class
+      
+    Return:
+      no output is created, instead, fields is updated to include summaries.
+    
+    """
     for field in fields.fields.values():
         soil = field.soil
         crop = field.crop
@@ -34,27 +48,47 @@ def daily_fields_routine(fields, manure_storage, weather, time):
 
 
 def annual_fields_routine(fields, time):
+    """
+    Description: 
+        perform annual crop routines for each field
+        
+    Args: 
+      fields: instance of Fields class
+      time: instance of Time class
+    """
     for field in fields.fields.values():
         annual_crop_routine(field.crop, time)
 
 
 class Fields:
+    """
+    Description:
+           Class defining attributes and methods for a set of agriculural fields in which crops occur. 
+           
+    Args: 
+      fields_data: a dictionary with keys corresponding to field names and values containing dictionaries of data
+         for each field
+      time: an instance of the Time class
+    """
     def __init__(self, fields_data, time):
         self.fields = {}
+        """a dictionary whose keys are field names and whose values are instances of the Field class"""
         for field_name, field_data in fields_data.items():
             self.fields[field_name] = Field(field_name, field_data, time)
 
         self.profile_SW = 0.0
+        """Soil water in the profile (mm) - Psuedocode S.1.A.5"""
         self.runoff = 0.0
-        self.drainage = 0.0
-        self.erosion = 0.0
-        self.ET = 0.0
+        """daily surface runoff volume (mm^3) - Psuedocode S.3.A.1""" #ToDo: unsure if "runoff" from S.2.A.1, S.3.A.1, S.3.A.3 (different units) - GitHub Issue #168
+        self.drainage = 0.0  #ToDo: no clear reference in psuedocode - GitHub Issue #168
+        self.erosion = 0.0  #ToDo: no clear reference in psuedocode - GitHub Issue #168
+        self.ET = 0.0  #ToDo: no reference in psuedocode - GitHub Issue #168
 
         self.runoff_annual = 0.0
         self.drainage_annual = 0.0
         self.erosion_annual = 0.0
         self.ET_annual = 0.0
-
+        
         self.manure_applied = 0.0
         self.manure_N_applied = 0.0
         self.manure_P_applied = 0.0
@@ -91,6 +125,16 @@ class Fields:
         self.P_yield_annual = 0.0
 
     def summarize_fields(self):
+        """
+        Description: 
+           Resets the attributes of a Fields instance to 0 and then adds up crop, soil, and field management attributes
+           for each field - giving the overall sum of these properties accross fields. 
+           
+        Returns: 
+           None. Attributes of the Fields instance are updated. 
+        """
+
+        # Why are these set to their initialization values again? This seems redundant (prior to the loop)
         self.profile_SW = 0.0
         self.runoff = 0.0
         self.drainage = 0.0
@@ -149,6 +193,12 @@ class Fields:
             self.P_yield += crop.P_yield
 
     def summarize_annual_variables(self):
+           """
+           Description: 
+               update attributes annually by accumulation, resulting in accross-year sums of their values.
+               
+           Return: None. Attributes of the Fields instance are updated.
+           """
         self.runoff_annual += self.runoff
         self.drainage_annual += self.drainage
         self.erosion_annual += self.erosion
@@ -170,6 +220,10 @@ class Fields:
         self.P_yield_annual += self.P_yield
 
     def annual_reset(self):
+        """
+        Description: 
+           Reset some attributes to 0 for each field.
+        """
         for field in self.fields.values():
             field.crop.annual_reset()
             field.soil.annual_reset()
@@ -196,7 +250,7 @@ class Fields:
         self.P_yield_annual = 0.0
 
 
-class Field:
+class Field:  #ToDo: This class appears to be unimplemented in RUFAS. Remove? - GitHub Issue #
     def __init__(self, field_name, field_data, time):
         """
         Description:
