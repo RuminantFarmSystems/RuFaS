@@ -79,7 +79,7 @@ class Fields:
         self.profile_SW = 0.0
         """Soil water in the profile (mm) - Psuedocode S.1.A.5"""
         self.runoff = 0.0
-        """daily surface runoff volume (mm^3) - Psuedocode S.3.A.1""" #ToDo: unsure if "runoff" from S.2.A.1, S.3.A.1, S.3.A.3 (different units) - GitHub Issue #168
+        """surface runoff - Psuedocode S.2.8.1"""
         self.drainage = 0.0  #ToDo: no clear reference in psuedocode - GitHub Issue #168
         self.erosion = 0.0  #ToDo: no clear reference in psuedocode - GitHub Issue #168
         self.ET = 0.0  #ToDo: no reference in psuedocode - GitHub Issue #168
