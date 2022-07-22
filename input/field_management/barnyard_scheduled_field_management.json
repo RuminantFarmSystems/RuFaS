@@ -16,7 +16,7 @@
         "P_mass": [5],
         "K_mass": [400],
         "depth": [0.0],
-        "surface_percent": [1.0]
+        "surface_fraction": [1.0]
     },
     "manure": {
         "rotation_years": [],
@@ -87,7 +87,7 @@
             0.0,
             0.0
         ],
-        "surface_percent": [
+        "surface_fraction": [
             1.0,
             1.0,
             1.0,

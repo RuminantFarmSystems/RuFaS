@@ -81,7 +81,7 @@ class FieldManagement:
                 'P_mass': 300,
                 'cover_percent': 0.95,
                 'depth': 0.0,
-                'surface_percent': 1.0
+                'surface_fraction': 1.0
             },
             "fertilizer": {
                 'composition': {
@@ -96,7 +96,7 @@ class FieldManagement:
                 'P_mass': 100,
                 'K_mass': 100,
                 'depth': 0.0,
-                'surface_percent': 1.0
+                'surface_fraction': 1.0
             },
             "tillage": {
                 'year': -1,

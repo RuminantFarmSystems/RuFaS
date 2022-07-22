@@ -176,7 +176,7 @@ def added_manure_P(soil, field_management, m_app):
     field_management.manure_applied = m_app['mass']
     field_management.manure_P_applied = m_app['P_mass']
     DM = m_app['DM']
-    surface_percent = m_app['surface_percent']
+    surface_fraction = m_app['surface_fraction']
     soil.WIP_applied = m_app['WIP']
     soil.WOP_applied = m_app['WOP']
     depth = m_app['depth']
@@ -203,7 +203,7 @@ def added_manure_P(soil, field_management, m_app):
     # application factors
     # FM.4.C.1
     I_fac = 1.0 - infiltration
-    S_fac = 1.0 - surface_percent
+    S_fac = 1.0 - surface_fraction
     W_fac = 1.0 - (WIP_frac + WOP_frac)
 
     # concentration factors
@@ -234,8 +234,8 @@ def added_manure_P(soil, field_management, m_app):
     soil.manure_mass += field_management.manure_applied * S_fac_mass
     soil.WIP += field_management.manure_P_applied * WIP_frac * S_fac
     soil.WOP += field_management.manure_P_applied * WOP_frac * S_fac
-    soil.SOP += field_management.manure_P_applied * W_fac * 0.75 * surface_percent * S_fac
-    soil.SIP += field_management.manure_P_applied * W_fac * 0.25 * surface_percent * S_fac
+    soil.SOP += field_management.manure_P_applied * W_fac * 0.75 * surface_fraction * S_fac
+    soil.SIP += field_management.manure_P_applied * W_fac * 0.25 * surface_fraction * S_fac
 
     # update active and labile soil pools for each layer affected by the application
     # FM.4.C.6

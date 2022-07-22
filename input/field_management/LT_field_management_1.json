@@ -16,7 +16,7 @@
         "P_mass": [],
         "K_mass": [],
         "depth": [],
-        "surface_percent": []
+        "surface_fraction": []
     },
     "manure": {
         "rotation_years": [],
@@ -27,7 +27,7 @@
         "P_mass": [82.8, 111.6, 64.8, 120.6, 99, 84.6],
         "cover_percent": [0.95, 0.95, 0.95, 0.95, 0.95, 0.95],
         "depth": [0.0, 0.0, 0.0, 0.0, 0.0, 0.0],
-        "surface_percent": [1.0, 1.0, 1.0, 1.0, 1.0, 1.0]
+        "surface_fraction": [1.0, 1.0, 1.0, 1.0, 1.0, 1.0]
     },
     "tillage": {
         "rotation_years": [],
