@@ -78,7 +78,7 @@ def calc_fr_N(crop_type):
        "pseudocode_crop" C.5.B.1
 
     Args:
-        crop_type
+        crop_type: instance of Crop type class
     """
 
     n2 = calc_n2(crop_type)
@@ -102,7 +102,7 @@ def calc_n2(crop_type):
        "pseudocode_crop" C.5.A.1
 
     Args:
-        crop_type
+        crop_type: instane of Crop type class
 
     Returns:
         float: second shape coefficient
@@ -148,7 +148,7 @@ def calc_log_term_of_shape_coefficient(crop_type, fr_PHU_frac, fr_nx):
        "pseudocode_crop" C.5.A.2
 
     Args:
-        crop_type
+        crop_type: instance of Crop type class
         fr_PHU_frac: the fraction of the fraction of potential heat units
          accumulated
         fr_nx: this function is generalized for calculating the log terms of
@@ -175,7 +175,7 @@ def calc_bio_N_opt(crop_type):
        "pseudocode_crop" C.5.B.2
 
     Args:
-        crop_type
+        crop_type: instance of Crop type class
     """
 
     crop_type.bio_N_opt = crop_type.fr_N * crop_type.biomass_actual
@@ -188,7 +188,7 @@ def calc_N_up(crop_type):
        "pseudocode_crop" C.5.B.3
 
     Args:
-        crop_type
+        crop_type: instance of Crop type class
     """
 
     if crop_type.bio_N_opt - crop_type.bio_N < 0:
@@ -211,8 +211,8 @@ def calc_act_N_up_each_layer(soil, crop_type):
         "pseudocode_crop" C.5.C.4/5/6/7
 
     Args:
-        crop_type
-        soil
+        crop_type: instance of Crop type class
+        soil: instance of Soil class
     """
 
     crop_type.pot_N_up_each_layer = calc_N_up_each_layer(soil, crop_type)
@@ -253,7 +253,8 @@ def calc_act_N_up_each_layer(soil, crop_type):
     crop_type.act_N_up_each_layer = act_N_up_each_layer
 
 
-def N_uptake(soil):
+def N_uptake(soil):  #ToDo: this is a poorly named function: perhaps drawdown_NO3()? - GitHub Issue #171
+    #ToDo: no documentation or psuedocode - GitHub Issue #170
     for layer in soil.soil_layers:
         layer.NO3 -= layer.N_uptake
 
@@ -268,8 +269,8 @@ def calc_N_up_each_layer(soil, crop_type):
        "pseudocode_crop" C.5.C.2/3
 
     Args:
-        soil
-        crop_type
+        soil: instance of Soil class
+        crop_type: instance of Crop type class
 
     Returns:
         list: nitrogen uptake per layer
@@ -300,7 +301,7 @@ def calc_N_up_z(crop_type, z):
         "pseudocode_crop" C.5.C.1
 
     Args:
-        crop_type
+        crop_type: instance of Crop type class
         z: the given depth
 
     Returns:
@@ -321,8 +322,8 @@ def calc_bio_N(soil, crop_type):
         "pseudocode_crop" C.5.E.1
 
     Args:
-        soil
-        crop_type
+        soil: instance of Soil class
+        crop_type instance of Crop type class
     """
 
     crop_type.N_fix = calc_N_fixation(soil, crop_type)
