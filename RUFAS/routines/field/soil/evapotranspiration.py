@@ -81,9 +81,9 @@ def calc_potential_evap(soil, weather, time):
         Calculates potential evapotranspiration ET_max using the Hargreaves method
         "pseudocode_soil" S.2.B.1
     Args:
-        soil
-        weather
-        time
+        soil: instance of Soil class
+        weather: instance of Weather class
+        time: instance of Time class
     """
 
     H0 = weather.radiation[time.year - 1][time.day - 1]
@@ -125,8 +125,8 @@ def calc_crop_transpiration(soil, crop):
         "pseudocode_soil" S.2.B.3
 
     Args:
-        soil
-        crop
+        soil: instance of Soil class
+        crop: instance of Crop type class
     """
 
     LAI = crop.current_crop.LAI_actual
@@ -143,8 +143,8 @@ def calc_soil_evap(soil, crop):
         "pseudocode_soil" S.2.B.4/6
 
     Args:
-        soil
-        crop
+        soil: instance of Soil class
+        crop: instance of Crop type class
     """
 
     soil_cov = calc_soil_cov(soil, crop)
@@ -163,8 +163,8 @@ def calc_soil_cov(soil, crop):
         "pseudocode_soil" S.2.B.5
 
     Args:
-        soil
-        crop
+        soil: instance of Soil class
+        crop: instance of Crop type class
     """
 
     bio_AG = crop.current_crop.bio_AG
@@ -182,7 +182,7 @@ def update_evap_z(soil):
         "pseudocode_soil" S.2.B.7-10
 
     Args:
-        soil
+        soil: instance of Soil class
     """
 
     for x in range(len(soil.soil_layers)):
