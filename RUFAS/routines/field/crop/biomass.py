@@ -72,9 +72,9 @@ def calc_act_biomass(crop_type, weather, time):
        "pseudocode_crop" C.9.A.2/3
 
     Args:
-        crop_type
-        weather
-        time
+        crop_type: instance of Crop type subclass
+        weather: instance of Weather class
+        time: instance of Time class
     """
 
     H_phosyn = calc_intercepted_radiation(crop_type, weather, time)
@@ -100,9 +100,9 @@ def calc_intercepted_radiation(crop_type, weather, time):
         "pseudocode_crop" C.9.A.1
 
     Args:
-        crop_type
-        weather
-        time
+        crop_type: instance of Crop type subclass
+        weather: instance of Weather class
+        time: instance of Time class
 
     Returns:
         int: intercepted radiation
@@ -119,7 +119,7 @@ def calc_bio_AG(crop_type):
         "pseudocode_crop" C.9.B.1
 
     Args:
-        crop_type
+        crop_type: instance of Crop type subclass
     """
 
     crop_type.bio_AG = (1 - crop_type.fr_root) * crop_type.biomass_actual
@@ -132,8 +132,8 @@ def calc_gamma_wu(soil, crop_type):
         "pseudocode_crop" C.9.C.1
 
     Args:
-        soil
-        crop_type
+        soil: instance of Soil class
+        crop_type: instance of Crop type subclass
     """
 
     if soil.ET_max_annual == 0:
