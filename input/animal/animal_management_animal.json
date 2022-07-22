@@ -64,7 +64,7 @@
 				"prefresh_day": 30,
 				"num_21_days_repro": 15,
 				"calving_interval": 400,
-				"use_input_calving_interval": false			
+				"use_input_calving_interval": false
 			},
 			"bodyweight": {
 				"birth_weight_avg_ho": 43.9,
@@ -74,7 +74,7 @@
 				"target_heifer_preg_day": 420,
 				"mature_body_weight_avg": 740.1,
         		"mature_body_weight_std": 73.5
-			}		
+			}
 		},
 		"from_literature": {
 			"repro": {
@@ -182,6 +182,21 @@
 			"manure_separator": "screw_press",
 			"manure_storage": "storage_pit",
 			"max_stocking_density": 1.2
+		},
+		"pen4": {
+			"id": 4,
+			"animal_combination": "LAC_COW",
+			"vertical_dist_to_milking_parlor": 0.1,
+			"horizontal_dist_to_milking_parlor": 1.6,
+			"number_of_stalls": 850,
+			"housing_type": "open air barn",
+			"bedding_type": "organic",
+			"pen_type": "tiestall",
+			"manure_handling": "manual_scraping",
+			"manure_separator": "rotary_screen",
+			"manure_storage": "anaerobic_digestion",
+			"max_stocking_density": 1.2
 		}
+
 	}
 }
