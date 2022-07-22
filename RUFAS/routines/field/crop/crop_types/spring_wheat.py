@@ -1,6 +1,7 @@
 from .base_crop import BaseCrop
 
-
+# TODO: add overall description of SpringWheat class, along with 
+#description of attributes - GitHub Issue #170
 class SpringWheat(BaseCrop):
 
     def __init__(self, crop_name, data):

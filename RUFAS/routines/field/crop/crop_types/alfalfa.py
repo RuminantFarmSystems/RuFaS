@@ -1,12 +1,22 @@
 from .base_crop import BaseCrop
 
 
+# TODO: add overall description of Alfalfa class, along with 
+#description of attributes - GitHub Issue #170
 class Alfalfa(BaseCrop):
+
+    """
+    Description:
+        The Alfalfa class is a child of the BaseCrop class, and one of the main crop types. 
+        This class is the container for an Alfalfa crop object, and has all of 
+        the appropriate attributes based upon the data collected for the crop. 
+        Some of the attributes override BaseCrop attributes, for those
+        descriptions, refer to the BaseCrop class in the base_crop.py file. All other attribute
+        descriptions will be provided below.
+    """
 
     def __init__(self, crop_name, data):
         super().__init__()
-
-        """GENERAL PLANT INFO"""
 
         alfalfa_data = data
         self.plant_years = alfalfa_data['plant_years']
@@ -15,6 +25,7 @@ class Alfalfa(BaseCrop):
         self.harvest_day = alfalfa_data['harvest_day']
         self.planting_order = alfalfa_data['planting_order'].lower()
 
+        
         # if alfalfa_data['harvest_type'] != 'optimal':
         #     print('Perennial crops are always optimally harvested')
 
@@ -34,22 +45,29 @@ class Alfalfa(BaseCrop):
         self.extracted = alfalfa_data['extracted']
 
         self.fix_nitrogen = True
+        """boolean indicating whether the crop can fix nitrogen"""
 
         # ===================================================================
         ''' HEAT UNIT DATA '''
 
         # input
         self.T_base_min = 4
+        """minimum temperature required for growth (Celsius)"""
         self.T_base_max = 43.33
+        """maximum temperature required to sustain growth (Celsius)"""
         self.PHU = 800  # TODO: Potential heat units unknown - GitHub Issue #154
+        """total heat units required for maturity"""
 
         # Internally calculated input
         self.accumulated_HU = 0.0
+        """Heat units accumulated including the current day of the simulation"""
         self.prev_accumulated_HU = 0.0
+        """Heat units accumulated excluding the current day of the simulation"""
 
         # output
         self.fr_PHU = 0.0
         self.prev_fr_PHU = 0.0
+        """Fraction of PHU accumulated excluding current day of simulation"""
 
         # ===================================================================
         ''' LEAF AREA INDEX (LAI) DATA '''

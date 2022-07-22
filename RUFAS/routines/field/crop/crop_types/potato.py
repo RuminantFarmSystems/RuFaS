@@ -1,6 +1,7 @@
 from .base_crop import BaseCrop
 
-
+# TODO: add overall description of Potato class, along with 
+#description of attributes - GitHub Issue #170
 class Potato(BaseCrop):
 
     def __init__(self, crop_name, data):

@@ -1,6 +1,7 @@
 from .base_crop import BaseCrop
 
-
+# TODO: add overall description of Soybean class, along with 
+#description of attributes - GitHub Issue #170
 class Soybean(BaseCrop):
 
     def __init__(self, crop_name, data):

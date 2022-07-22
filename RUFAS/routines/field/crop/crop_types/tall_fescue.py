@@ -1,6 +1,7 @@
 from .base_crop import BaseCrop
 
-
+# TODO: add overall description of TallFescue class, along with 
+#description of attributes - GitHub Issue #170
 class TallFescue(BaseCrop):
 
     def __init__(self, crop_name, data):

@@ -1,6 +1,7 @@
 from .base_crop import BaseCrop
 
-
+# TODO: add overall description of Corn class, along with 
+#description of attributes - GitHub Issue #170
 class Corn(BaseCrop):
     def __init__(self, crop_name, data):
         super().__init__()
