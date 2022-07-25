@@ -1,89 +1,77 @@
 class BaseCrop:
-
+    """BaseCrop is the parent class of all Crop type objects
+       and their respective classes. Crop attributes are initialized here first
+       and eventually overriden by the instantiation of a specific Crop object.
+       Further description of each attribute is provided beneath the attribute's
+       initialization if clarification is needed.
     """
-        Description: 
-            BaseCrop is the parent class of all Crop type objects
-            and their respective classes. Crop attributes are initialized here first
-            and eventually overriden by the instantiation of a specific Crop object.
-            Further description of each attribute is provided beneath the attribute's 
-            initialization if clarification is needed.
-        """
-
     def __init__(self):
-
+        """create an instance of ``BaseCrop``"""
         self.plant_years = []
-        """List of years that the crop will be grown"""
-
+        """:obj:`list` of :obj:`float`: a list of years in which the crop will be grown"""
         self.repeat = 0
-        """The number of years between each grow year for the crop"""
-
+        """float: the number of years between each grow year for the crop"""
         self.planting_day = 0
-        """The day of the year that the crop will be first planted (Julian calendar)"""
-
+        """float: the day of the year that the crop will be first planted (Julian calendar)"""
         self.harvest_day = 0
-        """The day of the year that the crop will be harvested (Julian calendar)"""
-
-        self.harvest_type = ''
-        """The harvest schedule that the crop will be on: scheduled, optimal..."""
-
-        self.planting_order = ''
-        """In the case of double cropping, the order in which the crop will be planted"""
-
-        self.extracted = False # - is crop extracted from the field or not: killing does not necessarily mean extracting (e.g., cover crops fallowing)
-        # TODO: figure out what this means. 
-        #   Guess is that it is biomass extracted (or not) into the residue.
-
+        """float: the day of the year that the crop will be harvested (Julian calendar)"""
+        self.harvest_type = ''  # ToDo: What strings are accepted? - GitHub Issue #174
+        """str: the harvest schedule that the crop will be on: scheduled, optimal..."""
+        self.planting_order = ''  # ToDo: What strings are accepted? - GitHub Issue #174
+        """str: in the case of double cropping, the order in which the crop will be planted"""
+        self.extracted = False
+        """bool: was the crop extracted from the field or not? 
+             This is independent of whether or not the crop was killed.
+        """
         self.crop_name = 'null'
-        """name of the crop: alfalfa, corn, etc."""
-        self.crop_type = ''
-        """the growing type of the crop: perennial, annual ..."""
-        self.harvest_quality = 'null'
-        #TODO: don't know what harvest quality is
+        """str: name of the crop: alfalfa, corn, etc."""
+        self.crop_type = ''  # ToDo: What strings are accepted? - GitHub Issue #174
+        """str: the growing type of the crop: perennial, annual ..."""
+        self.harvest_quality = 'null'  # ToDo: don't know what harvest quality is - GitHub Issue #168
+
         self.feed_id = 'null'
-        """the ID of the feed to be modified, ending in 'g' if it is a grown feed"""
+        """str: the ID of the feed to be modified, ending in 'g' if it is a grown feed"""
         self.raw_id = 'null'
-        """the raw ID of the feed to be modified"""
-
+        """str: the raw ID of the feed to be modified"""
         self.planted = False
-        """boolean denoting whether crop has been planted or not"""
+        """bool: has the crop been planted or not?"""
         self.growing = False
-        """boolean denoting whether the crop is growing or not"""
+        """bool: is the crop is currently growing?"""
         self.killed = False
-        """boolean denoting whether the crop has been killed or not"""
+        """bool: has been killed?"""
         
-
         # Necessary variables for a null crop to run
         # These variables are used within the soil module and must
         # be declared and initialized even when a crop is not growing
         self.fr_PHU = 0
-        """Fraction of Potential Heat Units"""
+        """float: fraction of Potential Heat Units"""
         self.fr_N = 0
-        "Fraction of Nitrogen"
+        "float: Fraction of Nitrogen"
         self.LAI_actual = 0
-        """Actual Leaf Area Index"""
+        """float: Actual Leaf Area Index"""
         self.z_root = 0
-        """depth of root development in the soil (mm)"""
-        self.biomass_actual = 0
-        """total plant biomass on a given day"""
+        """float: depth of root development in the soil (mm)"""
+        self.biomass_actual = 0  # ToDo: What are the units? - GitHub Issue #174
+        """float: total plant biomass on a given day"""
         self.epco = 0
-        """plant uptake compensation factor, a value between 0.01 and 1.00"""
+        """float: plant uptake compensation factor, a value between 0.01 and 1.00"""
         self.N_fix = 0.0
-        """Amount of nitrogen added to the plant biomass by fixation (kgN/ha)"""
+        """float: Amount of nitrogen added to the plant biomass by fixation (kg/ha)"""
         self.bio_N = 0
-        """Actual mass of nitrogen stored in plant material (kg N/ha)"""
+        """float: Actual mass of nitrogen stored in plant material (kg/ha)"""
         self.bio_P = 0
-        """Actual mass of phosphorus stored in plant material (kg P/ha)"""
+        """float: Actual mass of phosphorus stored in plant material (kg/ha)"""
         self.bio_AG = 0
-        """Above ground biomass (kg/ha)"""
+        """float: Above ground biomass (kg/ha)"""
         self.bio_BG = 0
-        """Below ground biomass (kg/ha)"""
+        """float: Below ground biomass (kg/ha)"""
         self.HI_actual = 0
-        """Actual harvest index"""
+        """float: Actual harvest index"""
         self.yield_actual = 0
-        """Actual crop yield at harvest (kg/ha)"""
-        self.yield_annual = 0
-        """Annual crop yield""" 
+        """float: Actual crop yield at harvest (kg/ha)"""
+        self.yield_annual = 0  # ToDo: what are the units? - GitHub Issue #174
+        """float: Annual crop yield (kg/ha)"""
         self.HI_min = 0
-        """harvest index for the plant in drought conditions"""
+        """float: harvest index for the plant in drought conditions"""
         self.HI_max = 0
-        """Maximum harvest index"""
+        """float: Maximum harvest index"""
