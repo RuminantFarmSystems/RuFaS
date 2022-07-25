@@ -193,12 +193,12 @@ class Fields:
             self.P_yield += crop.P_yield
 
     def summarize_annual_variables(self):
-           """
-           Description: 
-               update attributes annually by accumulation, resulting in accross-year sums of their values.
-               
-           Return: None. Attributes of the Fields instance are updated.
-           """
+        """
+        Description:
+           update attributes annually by accumulation, resulting in accross-year sums of their values.
+
+        Return: None. Attributes of the Fields instance are updated.
+        """
         self.runoff_annual += self.runoff
         self.drainage_annual += self.drainage
         self.erosion_annual += self.erosion

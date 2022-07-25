@@ -29,7 +29,7 @@ class BaseCrop:
         self.planting_order = ''
         """In the case of double cropping, the order in which the crop will be planted"""
 
-        self.extracted = False
+        self.extracted = False # - is crop extracted from the field or not: killing does not necessarily mean extracting (e.g., cover crops fallowing)
         # TODO: figure out what this means. 
         #   Guess is that it is biomass extracted (or not) into the residue.
 
