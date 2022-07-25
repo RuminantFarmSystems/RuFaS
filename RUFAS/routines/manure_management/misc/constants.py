@@ -10,6 +10,6 @@ class ManureManagementConstants:
 
     DENSITY_WATER_KG_PER_M3 = 997                   # kg/m3
     DAYS_PER_YEAR = 365                             # days per year
-    METHANE_ENERGY_DENSITY = 55                     ## MJ / kg 
-    METHANE_DENSITY = 0.657                         ## kg/m^3
+    METHANE_ENERGY_DENSITY = 55                     # MJ / kg
+    METHANE_DENSITY = 0.657                         # kg/m^3
 

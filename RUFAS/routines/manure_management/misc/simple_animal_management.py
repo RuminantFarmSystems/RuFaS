@@ -17,6 +17,7 @@ class SimpleAnimalManagement:
 
     def __init__(self, animal_management: AnimalManagement):
         self.all_pens = [SimplePen(pen) for pen in animal_management.all_pens]
+        self.sim_day = animal_management.simulation_day
 
     def __str__(self) -> str:
         s = ''

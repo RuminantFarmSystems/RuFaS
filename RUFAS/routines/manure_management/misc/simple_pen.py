@@ -10,21 +10,23 @@ class SimplePen:
     A simplified Pen class that extracts only relevant information from the
     original Pen class in the animal module.
 
-    Attributes:
-        manure: A Manure object that captures the manure data from the `pen` object argument
-        id:
-        animals_in_pen:
-        num_animals:
-        classes_in_pen:
-        housing_type:
-        bedding_type:
-        manure_handler:
-        manure_separator:
-        manure_storage:
-        manure_density:
+    Attributes
+    ----------
+    manure: A Manure object that captures the manure data from the `pen` object argument
+    id:
+    animals_in_pen:
+    num_animals:
+    classes_in_pen:
+    housing_type:
+    bedding_type:
+    manure_handler:
+    manure_separator:
+    manure_storage:
+    manure_density:
 
-    Args:
-        pen: A Pen object from the animal module
+    Args
+    ----
+    pen: A Pen object from the animal module
 
     """
     def __init__(self, pen: Pen):
@@ -46,20 +48,24 @@ class SimplePen:
 
     @property
     def manure_mass(self) -> float:
-        """Calculates the manure volume of this pen.
+        """
+        Calculates the manure volume of this pen.
 
-        Returns:
-            Manure mass of this pen in kg.
+        Returns
+        -------
+        Manure mass of this pen. Units: kg.
 
         """
         return self.manure.Mkg  # kg
 
     @property
     def manure_volume(self) -> float:
-        """Calculates the manure volume of this pen.
+        """
+        Calculates the manure volume of this pen.
 
-        Returns:
-            Manure volume of this pen in m^3.
+        Returns
+        -------
+        Manure volume of this pen. Units: m^3.
 
         """
         return self.manure_mass / self.manure_density  # m^3
@@ -71,7 +77,7 @@ class SimplePen:
 
         Returns
         -------
-        Barn area, m^2/animal.
+        Barn area. Units: m^2/animal.
 
         """
         BarnArea = NamedTuple('BarnArea', [('has_cows', float), ('no_cows', float)])
@@ -93,10 +99,12 @@ class SimplePen:
             return area.no_cows
 
     def __str__(self) -> str:
-        """Returns the string representation of this pen.
+        """
+        Returns the string representation of this pen.
 
-        Returns:
-            The string representation of this pen.
+        Returns
+        -------
+        The string representation of this pen.
 
         """
         s = ['SimplePen data:']

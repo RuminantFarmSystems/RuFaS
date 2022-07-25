@@ -85,7 +85,6 @@ class ManureManagement:
 
         self.all_data: Dict[int, List[DailyOutputType]] = {}
         self.df = None
-        self.update_count = 0
 
         self.daily_vars = DailyVariables()
         self.annual_vars = DailyVariables()
@@ -162,15 +161,13 @@ class ManureManagement:
         new information from Animal Management.
 
         """
-        self.update_count += 1
-        print(f'Day {self.update_count}=======================================')
+        print(f'Day {animal_management.sim_day}=======================================')
 
         for pen in animal_management.all_pens:
             print(f'Pen {pen.id}----------------------------------------------')
             manure_handler_daily_output = self.manure_handlers[pen.id].update(pen)
             reception_pit_daily_output = self.reception_pits[pen.id].update()
-            manure_separator_daily_output = self.manure_separators[pen.id].update(
-                pen)
+            manure_separator_daily_output = self.manure_separators[pen.id].update()
             treatment_daily_output = self.treatments[pen.id].update()
 
             pen_daily_update_data = (

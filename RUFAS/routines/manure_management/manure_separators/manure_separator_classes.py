@@ -42,16 +42,9 @@ class BaseSeparator:
                  pen: SimplePen,
                  reception_pit: BaseReceptionPit,
                  separator_init_data: ManureSeparatorInitData):
-        """
-        Description:
-            An instance of this class represents a manure separator method.
-            It is primarily used by the manure separator sub-module
-
-        Args:
-        """
         self.pen = pen
         self.manure_separator_enum = ManureSeparatorEnum.get_enum(pen.manure_separator)
-        self.separator_init_data = separator_init_data
+        self.init_data = separator_init_data
         self.reception_pit = reception_pit
         self.all_output: List[ManureSeparatorOutput] = []
 
@@ -62,7 +55,7 @@ class BaseSeparator:
     def last_output(self) -> Optional[ManureSeparatorOutput]:
         return self.all_output[-1] if len(self.all_output) > 0 else None
 
-    def update(self, pen: SimplePen) -> ManureSeparatorOutput:
+    def update(self) -> ManureSeparatorOutput:
         """
         Description:
             Calls functions to calculate nutrient losses and transformations during
@@ -83,62 +76,33 @@ class BaseSeparator:
             total_daily_mass=rp.total_daily_mass,
 
             final_solids_dry_content=rp.TSd,
-            wet_weight_of_final_solids=rp.TSd * self.separator_init_data.TS_removal_efficiency / self.separator_init_data.percent_dry_solids,
-            TS_liquid=rp.TSd * (1 - self.separator_init_data.TS_removal_efficiency),
-            VS_liquid=(rp.VSd + rp.VSnd) * (1 - self.separator_init_data.VS_removal_efficiency),
-            N_liquid=rp.manure_nitrogen * (1 - self.separator_init_data.N_removal_efficiency),
-            TAN_liquid=rp.TAN_s * (1 - self.separator_init_data.TAN_removal_efficiency),
-            P_liquid=rp.p_excrt_manure * (1 - self.separator_init_data.P_removal_efficiency),
-            K_liquid=rp.K_manure * (1 - self.separator_init_data.K_removal_efficiency),
+            wet_weight_of_final_solids=rp.TSd * self.init_data.TS_removal_efficiency / self.init_data.percent_dry_solids,
+            TS_liquid=rp.TSd * (1 - self.init_data.TS_removal_efficiency),
+            VS_liquid=(rp.VSd + rp.VSnd) * (1 - self.init_data.VS_removal_efficiency),
+            N_liquid=rp.manure_nitrogen * (1 - self.init_data.N_removal_efficiency),
+            TAN_liquid=rp.TAN_s * (1 - self.init_data.TAN_removal_efficiency),
+            P_liquid=rp.p_excrt_manure * (1 - self.init_data.P_removal_efficiency),
+            K_liquid=rp.K_manure * (1 - self.init_data.K_removal_efficiency),
 
-            TS_solid=rp.TSd * self.separator_init_data.TS_removal_efficiency,
-            VS_solid=(rp.VSd + rp.VSnd) * self.separator_init_data.VS_removal_efficiency,
-            N_solid=rp.manure_nitrogen * self.separator_init_data.N_removal_efficiency,
-            TAN_solid=rp.TAN_s * self.separator_init_data.TAN_removal_efficiency,
-            P_solid=rp.p_excrt_manure * self.separator_init_data.P_removal_efficiency,
-            K_solid=rp.K_manure * self.separator_init_data.K_removal_efficiency,
+            TS_solid=rp.TSd * self.init_data.TS_removal_efficiency,
+            VS_solid=(rp.VSd + rp.VSnd) * self.init_data.VS_removal_efficiency,
+            N_solid=rp.manure_nitrogen * self.init_data.N_removal_efficiency,
+            TAN_solid=rp.TAN_s * self.init_data.TAN_removal_efficiency,
+            P_solid=rp.p_excrt_manure * self.init_data.P_removal_efficiency,
+            K_solid=rp.K_manure * self.init_data.K_removal_efficiency,
 
-            TS_DM_effluent=rp.TSd * self.separator_init_data.TS_DM_effluent_rate
+            TS_DM_effluent=rp.TSd * self.init_data.TS_DM_effluent_rate
         )
         self.all_output.append(daily_output)
         return daily_output
 
     def effluent_liquid(self):
-        """
-        Description:
-            Calculate liquid nutrient content of the separator
-            "pseudocode_manure_management" MS.4.A
-        """
-
-        # d.TS_liquid = d.TS - (d.TS * self.separator_init_data.TS_removal_efficiency)
-        # d.VS_liquid = d.VS - (d.VS * self.separator_init_data.VS_removal_efficiency)
-        # d.N_liquid = d.N - (d.N * self.separator_init_data.N_removal_efficiency)
-        # d.P_liquid = d.P - (d.P * self.separator_init_data.P_removal_efficiency)
-        # d.K_liquid = d.K - (d.K * self.separator_init_data.K_removal_efficiency)
         pass
 
     def effluent_solid(self):
-        """
-        Description:
-            Update solid nutrient content of the separator
-            "pseudocode_manure_management" MS.4.B
-        """
-        # d.TS -= d.TS_liquid
-        # d.TS_DM_effluent = d.TS * self.separator_init_data.TS_DM_effluent_rate
-        # d.TS -= d.TS_DM_effluent
-        #
-        # d.VS -= d.VS_liquid
-        # d.N -= d.N_liquid
-        # d.P -= d.P_liquid
-        # d.K -= d.K_liquid
         pass
 
     def update_treatment_variables(self):
-        """
-        Description:
-            Update solid and liquid nutrient contents of the treatment receptacle
-            "pseudocode_manure_management" MS.4.C
-        """
         pass
 
 
