@@ -8,6 +8,7 @@ Author(s): William Donovan wmdonovan@wisc.edu
 import csv
 from pathlib import Path
 
+import config.definitions
 from .. import graphics
 
 
@@ -17,13 +18,14 @@ class BaseReport:
     """
     def __init__(self, data):
         """Sets the properties of each report handler initialized.
-
         This is called in the report handler's __init__() method, and takes in
         the data passed to it and assigns the properties below.
         """
 
+        _suppress_graphics = config.definitions.SUPPRESS_GRAPHICS #check for global graphics suppression flag
+
         self.produce_csv = data['produce_csv']
-        self.produce_graphics = data['produce_graphics']
+        self.produce_graphics = data['produce_graphics'] if not _suppress_graphics else False #conditionally switch off graphics
         self.report_name = data['report_name']
         self.file_name = self.report_name + '.csv'
         self.annual_file_name = self.report_name + '_annual.csv'

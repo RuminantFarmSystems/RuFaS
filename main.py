@@ -3,6 +3,7 @@
 from RUFAS.simulation_engine import SimulationEngine
 from RUFAS import input_prompt
 
+
 def main():
     """
     Main function of RUFAS, executes simulations for all files specified.
