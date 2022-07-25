@@ -2,22 +2,22 @@
     "latitude": 43.332708,
 
     "crops": {
-        "spring_barley": {
-            "plant_years": [2009],
-            "repeat": 1,
-            "planting_day": 160,
-            "harvest_day": 270,
-            "harvest_type": "scheduled",
-            "planting_order": "1st",
-            "extracted": true
-        },
         "winter_wheat": {
             "plant_years": [2009],
-            "repeat": 1,
-            "planting_day": 280,
-            "harvest_day": 150,
+            "repeat": 0,
+            "planting_day": 80,
+            "harvest_day": 250,
             "harvest_type": "scheduled",
             "planting_order": "2nd",
+            "extracted": true
+        },
+        "spring_barley": {
+            "plant_years": [2009],
+            "repeat": 0,
+            "planting_day": 100,
+            "harvest_day": 200,
+            "harvest_type": "scheduled",
+            "planting_order": "1st",
             "extracted": true
         }
     }

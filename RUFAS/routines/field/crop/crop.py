@@ -29,12 +29,10 @@ def daily_crop_routine(soil, crop, field_management, weather, time):
         weather: an instance of the Weather class defined in classes.py
         time: an instance of the Time class defined in classes.py
     """
-
     # Current crop is set at the beginning of the year in annual_crop_routine
     crop_type = crop.current_crop
-
+    print(crop_type)
     # If there is no crop in rotation, current crop will be named
-
     daily_reset(crop_type, soil)
     # 'null'. The routine is skipped in this case
     if crop_type.crop_name != 'null':
