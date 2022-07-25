@@ -1,9 +1,10 @@
 """
-RUFAS: Ruminant Farm Systems Model
+RUFAS: Ruminant Farm Systems Model (field module)
 File name: field.py
-Description:
+Description: This module contains functions and classes relevant to agricultural fields
 Author(s): William Donovan, wmdonovan@wisc.edu
            Jacob Johnson, jacob8399@gmail.com
+           Clay Morrow, morrowcj@outlook.com
 """
 
 from RUFAS import util
@@ -14,19 +15,13 @@ from ...util import read_json_file
 
 
 def daily_fields_routine(fields, manure_storage, weather, time):
-    """
-    Description:
-        execute field management, crop, and soil routines for each field and generate summaries.
+    """execute field management, crop, and soil routines for each field and generate summaries.
     
     Args: 
       fields: instance of Fields class
       manure_storage: instance of ManureStorage class
       weather: instance of Weather class
       time: instance of Time class
-      
-    Return:
-      no output is created, instead, fields is updated to include summaries.
-    
     """
     for field in fields.fields.values():
         soil = field.soil
@@ -48,92 +43,105 @@ def daily_fields_routine(fields, manure_storage, weather, time):
 
 
 def annual_fields_routine(fields, time):
-    """
-    Description: 
-        perform annual crop routines for each field
-        
-    Args: 
+    """perform annual crop routines for each field
+
+    Args:
       fields: instance of Fields class
       time: instance of Time class
+
+    Description: execute ``annual_crop_routine()`` for each field
     """
     for field in fields.fields.values():
         annual_crop_routine(field.crop, time)
 
 
 class Fields:
-    """
-    Description:
-           Class defining attributes and methods for a set of agriculural fields in which crops occur. 
-           
-    Args: 
-      fields_data: a dictionary with keys corresponding to field names and values containing dictionaries of data
-         for each field
-      time: an instance of the Time class
-    """
+    """a class defining attributes and methods for a set of agricultural fields"""
     def __init__(self, fields_data, time):
+        """create an instance of the ``Fields`` class
+
+        Args:
+          fields_data: a dictionary with keys corresponding to field names and values containing dictionaries of data
+             for each field
+          time: an instance of the Time class
+        """
         self.fields = {}
-        """a dictionary whose keys are field names and whose values are instances of the Field class"""
+        """:obj:`dict`: a dictionary whose keys are field names and whose values are instances of the 
+            ```Field``` class"""
         for field_name, field_data in fields_data.items():
             self.fields[field_name] = Field(field_name, field_data, time)
 
         self.profile_SW = 0.0
-        """Soil water in the profile (mm) - Psuedocode S.1.A.5"""
+        """water in the soil profile (mm)"""  # Psuedocode S.1.A.5
         self.runoff = 0.0
-        """surface runoff - Psuedocode S.2.8.1"""
-        self.drainage = 0.0  #ToDo: no clear reference in psuedocode - GitHub Issue #168
-        self.erosion = 0.0  #ToDo: no clear reference in psuedocode - GitHub Issue #168
-        self.ET = 0.0  #ToDo: no reference in psuedocode - GitHub Issue #168
+        """:obj:`float`: soil surface runoff"""  # Psuedocode S.2.8.1?? ToDo - GitHub Issue #174
+        self.drainage = 0.0  # ToDo: no clear reference in psuedocode - GitHub Issue #168
+        self.erosion = 0.0  # equivalent to sed (S.3.A.1)?? ToDo: no clear reference in psuedocode - GitHub Issue #168
+        self.ET = 0.0  # ToDo: no reference in psuedocode - GitHub Issue #168
 
         self.runoff_annual = 0.0
+        """:obj:`float`: annual summation of ``runoff``"""
         self.drainage_annual = 0.0
+        """:obj:`float`: annual summation of ``drainage``"""
         self.erosion_annual = 0.0
+        """:obj:`float`: annual summation of ``erosion``"""
         self.ET_annual = 0.0
+        """:obj:`float`: annual summation of ``ET``"""
         
-        self.manure_applied = 0.0
-        self.manure_N_applied = 0.0
-        self.manure_P_applied = 0.0
+        self.manure_applied = 0.0  # is this manure mass (S.5.D.III.1)? ToDo: No clear reference in pseudocode - Github Issue #168
+                                                                      # ToDo: what are the units? - GitHub Issue #174
+        self.manure_N_applied = 0.0  # ToDo: No clear reference in pseudocode - Github Issue #168
+                                     # ToDo: what are the units? - GitHub Issue #174
+        self.manure_P_applied = 0.0  # ToDo: No clear reference in pseudocode - Github Issue #168
+                                     # ToDo: what are the units? - GitHub Issue #174
 
         self.manure_applied_annual = 0.0
+        """:obj:`float`: annual summation of ``manure_applied``"""
         self.manure_N_applied_annual = 0.0
+        """:obj:`float`: annual summation of ``manure_N_applied``"""
         self.manure_P_applied_annual = 0.0
+        """:obj:`float`: annual summation of ``manure_P_applied``"""
 
-        self.profile_N = 0.0
-        self.profile_P = 0.0
+        self.profile_N = 0.0  # ToDo: what are the units? - GitHub Issue #174
+        self.profile_P = 0.0  # ToDo: what are the units? - GitHub Issue #174
 
-        self.N_runoff = 0.0
-        self.P_runoff = 0.0
+        self.N_runoff = 0.0  # ToDo: what are the units? - GitHub Issue #174
+        self.P_runoff = 0.0  # ToDo: what are the units? - GitHub Issue #174
 
-        self.N_drainage = 0.0
-        self.P_drainage = 0.0
+        self.N_drainage = 0.0  # ToDo: what are the units? - GitHub Issue #174
+        self.P_drainage = 0.0  # ToDo: what are the units? - GitHub Issue #174
 
-        self.N_erosion = 0.0
-        self.P_erosion = 0.0
+        self.N_erosion = 0.0  # ToDo: what are the units? - GitHub Issue #174
+        self.P_erosion = 0.0  # ToDo: what are the units? - GitHub Issue #174
 
         self.N_runoff_annual = 0.0
+        """:obj:`float`: annual summation of ``N_runoff``"""
         self.P_runoff_annual = 0.0
+        """:obj:`float`: annual summation of ``P_runoff``"""
         self.N_drainage_annual = 0.0
+        """:obj:`float`: annual summation of ``N_drainage``"""
         self.P_drainage_annual = 0.0
+        """:obj:`float`: annual summation of ``P_drainage``"""
         self.N_erosion_annual = 0.0
+        """:obj:`float`: annual summation of ``N_erosion``"""
         self.P_erosion_annual = 0.0
+        """:obj:`float`: annual summation of ``P_erosion``"""
 
-        self.yield_actual = 0.0
-        self.N_yield = 0.0
-        self.P_yield = 0.0
+        self.yield_actual = 0.0  # ToDo: what are the units? - GitHub Issue #174
+        self.N_yield = 0.0  # ToDo: what are the units? - GitHub Issue #174
+        self.P_yield = 0.0  # ToDo: what are the units? - GitHub Issue #174
 
         self.yield_annual = 0.0
+        """:obj:`float`: annual summation of ``yield_actual``"""
         self.N_yield_annual = 0.0
+        """:obj:`float`: annual summation of ``N_yield``"""
         self.P_yield_annual = 0.0
+        """:obj:`float`: annual summation of ``P_yield``"""
 
     def summarize_fields(self):
+        """reset the attributes of a Fields instance to 0 and then add up crop, soil, and field management attributes
+           for each field - giving the overall sum of these properties across fields.
         """
-        Description: 
-           Resets the attributes of a Fields instance to 0 and then adds up crop, soil, and field management attributes
-           for each field - giving the overall sum of these properties accross fields. 
-           
-        Returns: 
-           None. Attributes of the Fields instance are updated. 
-        """
-
         # Why are these set to their initialization values again? This seems redundant (prior to the loop)
         self.profile_SW = 0.0
         self.runoff = 0.0
@@ -193,12 +201,7 @@ class Fields:
             self.P_yield += crop.P_yield
 
     def summarize_annual_variables(self):
-        """
-        Description:
-           update attributes annually by accumulation, resulting in accross-year sums of their values.
-
-        Return: None. Attributes of the Fields instance are updated.
-        """
+        """update attributes annually by accumulation, resulting in across-year sums of their values"""
         self.runoff_annual += self.runoff
         self.drainage_annual += self.drainage
         self.erosion_annual += self.erosion
@@ -220,10 +223,7 @@ class Fields:
         self.P_yield_annual += self.P_yield
 
     def annual_reset(self):
-        """
-        Description: 
-           Reset some attributes to 0 for each field.
-        """
+        """reset some attributes to 0 for each field"""
         for field in self.fields.values():
             field.crop.annual_reset()
             field.soil.annual_reset()
@@ -250,23 +250,26 @@ class Fields:
         self.P_yield_annual = 0.0
 
 
-class Field:  #ToDo: This class appears to be unimplemented in RUFAS. Remove? - GitHub Issue #
+class Field:
+    """
+    The Field class is an organizational object for aggregating Soil,
+    Crop, and Application objects. This structure simplifies the model,
+    especially for input and output. The primary function of this class
+    is reading the JSON files specified as containing crop, soil, and
+    field management information associated with this field and assigning
+    that data to relevant simulation objects associated with this Field
+    object.
+    """
     def __init__(self, field_name, field_data, time):
-        """
-        Description:
-            The Field class is an organizational object for aggregating Soil,
-            Crop, and Application objects. This structure simplifies the model,
-            especially for input and output. The primary function of this class
-            is reading the JSON files specified as containing crop, soil, and
-            field management information associated with this field and assigning
-            that data to relevant simulation objects associated with this Field
-            object.
+        """create an instance of the ``Field`` class.
+
         Args:
             field_name: the name of the field specified in the input JSON
             field_data: data describing the field specified in the input JSON
-            time: an instance of the Time class specified in classes.py
+            time: an instance of the Time class
         """
         self.field_name = field_name
+        """str: name of the field"""
 
         input_dir = util.get_base_dir() / 'input'
 
@@ -275,5 +278,8 @@ class Field:  #ToDo: This class appears to be unimplemented in RUFAS. Remove? - 
         field_management_data = read_json_file(input_dir / 'field_management' / field_data['field_management'])
 
         self.soil = Soil(soil_data)
+        """an instance of the ``Soil`` class"""
         self.field_management = FieldManagement(field_management_data, time)
+        """an instance of the ``FieldManagement`` class"""
         self.crop = Crop(crop_data, time)
+        """an instance of the ``Crop`` class"""
