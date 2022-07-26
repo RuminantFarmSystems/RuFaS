@@ -1,7 +1,7 @@
 class BaseCrop:
     """BaseCrop is the parent class of all Crop type objects
        and their respective classes. Crop attributes are initialized here first
-       and eventually overriden by the instantiation of a specific Crop object.
+       and eventually overridden by the instantiation of a specific Crop object.
        Further description of each attribute is provided beneath the attribute's
        initialization if clarification is needed.
     """
