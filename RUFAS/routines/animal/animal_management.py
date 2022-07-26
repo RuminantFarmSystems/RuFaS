@@ -467,20 +467,22 @@ class AnimalManagement:
                                                     feed, temp, pen_population_before_additions[pen.id])
 
         for pen in range(len(self.all_pens)):
+
             if len(self.all_pens[pen].animals_in_pen) > 0 and 'Cow' in self.all_pens[pen].classes_in_pen and \
                     self.all_pens[pen].ration == {}:
                 available_feeds = ration_driver.AvailableFeeds()
                 available_feeds.feed_nutrients(feed)
                 self.all_pens[pen].ration = self.all_pens[pen].calc_ration(feed, available_feeds)
             else:
-                # Need to adjust the ration totals for the pen attributes now
-                # that all new animals have been added
-                for key in self.all_pens[pen].ration:
-                    if key != 'status' and key != 'objective':
-                        self.all_pens[pen].ration[key] = \
-                            (self.all_pens[pen].ration[key] /
-                             pen_population_before_additions[pen]) * len(
-                                self.all_pens[pen].animals_in_pen)
+                if len(self.all_pens[pen].animals_in_pen) > 0:
+                    # Need to adjust the ration totals for the pen attributes now
+                    # that all new animals have been added
+                    for key in self.all_pens[pen].ration:
+                        if key != 'status' and key != 'objective' and pen_population_before_additions[pen] > 0:
+                            self.all_pens[pen].ration[key] = \
+                                (self.all_pens[pen].ration[key] /
+                                 pen_population_before_additions[pen]) * len(
+                                    self.all_pens[pen].animals_in_pen)
 
         for calf in calves_born:
             # getting valid pen to place calves in

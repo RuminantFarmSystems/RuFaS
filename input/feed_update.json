@@ -1,0 +1,25 @@
+{
+    "config":
+    {
+        "start_date" : "2009:244",
+        "end_date" : "2011:264",
+        "csv_dir": "output/CSVs/",
+        "graphic_dir": "output/graphics/",
+        "run_tests": true,
+        "set_seed": true,
+        "seed": 42
+    },
+    "weather": "ARL_weather.csv",
+    "output": "pen_report.json",
+    "farm":
+    {
+        "fields": {"field_1": {
+                "soil": "ARL_soil.json",
+                "crop": "corn_rotation.json",
+                "field_management": "cont_corn_management.json"
+            }
+        },
+        "animal": "animal_feed_management.json",
+        "feed": "purchased_feed.json"
+    }
+}
