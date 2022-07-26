@@ -197,33 +197,6 @@ class GasEmissions:
         return pen.num_animals * max(0.0, 0.0065 + 0.0192 * t) * pen.barn_area / 1000
 
     @staticmethod
-    def calc_E_NH3_N(TAN: float, r: float, U: float, tempC: float, p=990.0, pH=7.7) -> float:
-        """
-        Calculates NH3 emissions.
-
-        Parameters
-        ----------
-        TAN: total ammonia nitrogen in manure, kg N/m^2.
-        r: resistance of NH3 transport from the manure surface to the free atmosphere, s/m.
-        U: total amount of manure urine in area of exposed surface, kg.
-        tempC: temperature, °C.
-        p: manure density, kg/m^3.
-        pH: manure acidity.
-
-        Returns
-        -------
-        NH3 emissions, kg N/m^2/day.
-
-        """
-
-        c = 86400  # time conversion, seconds/day
-        tempK = GasEmissions.convert_temp_C_to_K(tempC)
-        area = 6.5  # m^2 TODO: Switch based on housing type
-        M = U / area  # manure urine per area of exposed surface, kg/m^2
-        Q = GasEmissions.calc_Q(tempK, pH)
-        return (TAN * c * p) / (r * M * Q)
-
-    @staticmethod
     def calc_E_NH3_housing(pen: SimplePen, TAN: float, U: float, tempC: float, p=990.0, pH=7.7) -> float:
         """
         Calculates NH3 housing emissions.
@@ -252,7 +225,7 @@ class GasEmissions:
         return (TAN * c * p) / (r * M * Q)
 
     @staticmethod
-    def calc_E_NH3_storage(TS: float, TAN: float, U: float, tempC: float, p=990.0, pH=7.5) -> float:
+    def calc_E_NH3_storage(TS: float, TAN: float, U: float, tempC: float, area=6.5, p=990.0, pH=7.5) -> float:
         """
         Calculates NH3 storage emissions.
 
@@ -262,6 +235,7 @@ class GasEmissions:
         TAN: total ammonia nitrogen in manure, kg N/m^2.
         U: total amount of manure urine in area of exposed surface, kg.
         tempC: temperature, °C.
+        area: surface area for treatment, m^2.
         p: manure density, kg/m^3.
         pH: manure acidity.
 
@@ -274,7 +248,7 @@ class GasEmissions:
         c = 86400  # time conversion, seconds/day
         tempK = GasEmissions.convert_temp_C_to_K(tempC)
         r = GasEmissions.calc_r_barn(tempC, hsc=GasEmissions.calc_hsc_from_dry_matter_content(TS))
-        M = U  # manure urine per area of exposed surface, kg/m^2
+        M = U / area  # manure urine per area of exposed surface, kg/m^2
         Q = GasEmissions.calc_Q(tempK, pH)
         return (TAN * c * p) / (r * M * Q)
 
