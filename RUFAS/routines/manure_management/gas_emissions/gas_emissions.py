@@ -407,9 +407,8 @@ class GasEmissions:
 
         return 3.371 * (10 ** 8) * math.exp(-5914 / tempK)
 
-    # TODO: Review
     @staticmethod
-    def calc_E_N20_manure(pen: SimplePen) -> float:
+    def calc_E_N20_manure(TS: float, A_storage=6.5) -> float:
         """
         TODO: Describe
 
@@ -424,16 +423,15 @@ class GasEmissions:
 
         Parameters
         ----------
-        pen: A SimplePen object to get the barn area from
+        TS: total solids or dry matter content, %.
+        A_storage: # TODO: Describe
 
         Returns
         -------
 
         """
         # emission rate of N2O, g N2O/m2-day
-        EF_N2O = 0.8
-
-        A_storage = pen.barn_area
+        EF_N2O = 0.8 if TS > 8.0 else 0.005
 
         return (EF_N2O * A_storage) / 1000
 
