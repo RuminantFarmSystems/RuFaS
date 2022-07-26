@@ -50,20 +50,20 @@ class BaseCrop:
         """
 
         ## heat units
-        self.T_base_min = 0  # pseudocode C.2.A.3
+        self.T_base_min = 10  # pseudocode C.2.A.3
         """minimum temperature required for growth (Celsius)"""
-        self.T_base_max = 0  # pseudocode C.2.A.4
+        self.T_base_max = 30  # pseudocode C.2.A.4
         """maximum temperature required to sustain growth (Celsius)"""
         self.PHU = 800  # psuedocode C.2.B.1
         """crop-specific total heat units required for maturity"""
 
-        self.accumulated_HU = 0.0  # pseudocode C.2.B.1
+        self.accumulated_HU = 0  # pseudocode C.2.B.1
         """Heat units accumulated including the current day of the simulation"""
-        self.prev_accumulated_HU = 0.0  # pseudocode C.2.B.1
+        self.prev_accumulated_HU = 0  # pseudocode C.2.B.1
         """Heat units accumulated excluding the current day of the simulation"""
-        self.fr_PHU = 0.0  # pseudocode C.2.B.1
+        self.fr_PHU = 0  # pseudocode C.2.B.1
         """float: fraction of Potential Heat Units"""
-        self.prev_fr_PHU = 0.0  # pseudocode C.2.B.1
+        self.prev_fr_PHU = 0  # pseudocode C.2.B.1
         """Fraction of PHU accumulated excluding current day of simulation"""
 
         ## LAI
@@ -113,7 +113,7 @@ class BaseCrop:
         """plant growth factor (0-1)"""
         self.d_biomass_max = 0  # psuedocode C.9.A.3
         """maximum potential increase in biomass for a given day"""
-        self.d_biomass_actual = 0.0  # psuedocode C.9.A.3
+        self.d_biomass_actual = 0 # psuedocode C.9.A.3
         """calculated increase in biomass"""
         self.biomass_actual = 0  # psuedocode C.9.A.3 # ToDo: What are the units? - GitHub Issue #174
         """calculated biomass for the current day"""
@@ -132,11 +132,11 @@ class BaseCrop:
 
         ## nitrogen uptake
         self.beta_n = 10
-        self.fr_n1 = 0.0417
-        self.fr_n2 = 0.0290
-        self.fr_n3 = 0.0200
-        self.fr_n3ish = 0.02001
-        self.N_fix = 0.0
+        self.fr_n1 = 0.04
+        self.fr_n2 = 0.03
+        self.fr_n3 = 0.02
+        self.fr_n3ish = 0.02
+        self.N_fix = 0
         """float: Amount of nitrogen added to the plant biomass by fixation (kg/ha)"""
         self.bio_N_opt = 0
         self.bio_N = 0
@@ -151,10 +151,10 @@ class BaseCrop:
         self.beta_p = 10
         self.fr_PHU_50 = 0.5
         self.fr_PHU_100 = 1.0
-        self.fr_p1 = 0.0035
-        self.fr_p2 = 0.0028
-        self.fr_p3 = 0.0020
-        self.fr_p3ish = 0.00201
+        self.fr_p1 = 0.004
+        self.fr_p2 = 0.003
+        self.fr_p3 = 0.002
+        self.fr_p3ish = 0.002
         self.bio_P_opt = 0
         self.bio_P = 0
         """float: Actual mass of phosphorus stored in plant material (kg/ha)"""
@@ -164,7 +164,7 @@ class BaseCrop:
         self.P_act_up = 0
 
         ## yield
-        self.HI_max = 0
+        self.HI_max = 0  # ToDo: what is HI_max, and why is it 0?
         """float: Maximum harvest index"""
         self.HI_min = 0
         """float: harvest index for the plant in drought conditions"""
@@ -173,9 +173,9 @@ class BaseCrop:
         self.HI_opt = 0.9
         self.harvest_eff = 0.9
         self.gamma_wu = 0
-        self.biomass_dry_down_percent = 0.0
+        self.biomass_dry_down_percent = 0
         self.DM_harvest_percent = 0.15
-        self.NDF_harvest_percent = 0.416
+        self.NDF_harvest_percent = 0.42
         self.bio_AG = 0
         """float: Above ground biomass (kg/ha)"""
         self.bio_BG = 0
@@ -183,12 +183,12 @@ class BaseCrop:
         self.yield_max = 0
         self.yield_actual = 0
         """float: Actual crop yield at harvest (kg/ha)"""
-        self.NDF_yield = 0.0
+        self.NDF_yield = 0
         self.N_yield = 0
         self.P_yield = 0
-        self.N_yield_annual = 0.0
-        self.P_yield_annual = 0.0
-        self.NDF_yield_annual = 0.0
+        self.N_yield_annual = 0
+        self.P_yield_annual = 0
+        self.NDF_yield_annual = 0
         self.yield_annual = 0
         """float: Annual crop yield (kg/ha)"""
 

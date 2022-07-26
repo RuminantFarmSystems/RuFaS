@@ -12,7 +12,7 @@ class Alfalfa(BaseCrop):
        See the inherited class ``BaseCrop`` for all other attributes and member functions.
     """
     def __init__(self, crop_name, data):
-        """create an instance of ``Alfalfa``"""
+        """create an instance of Alfalfa"""
         super().__init__()
 
         # get alfalfa variables from input data:
@@ -24,6 +24,6 @@ class Alfalfa(BaseCrop):
         self.extracted = data['extracted']
         self.crop_name = crop_name
 
-        # assign attributes from crop config variable
+        # assign attributes from alfalfa dictionary in crop config file
         for key, val in crop_config.ALFALFA.items():
             setattr(self, key, val)
