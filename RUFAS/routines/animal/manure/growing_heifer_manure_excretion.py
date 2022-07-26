@@ -48,6 +48,11 @@ def manure_calculations(ration_formulation, feed, bw, p_feces_excrt, p_urine):
     NDF_conc = conc['NDF']
     EE_conc = conc["EE"]
 
+    OM_intake = dm_intake - ASH_conc
+    degradable_volatile_solids = (-1.017 + 0.364 * OM_intake + 0.029 * NDF_conc - 0.023 * cp_conc) * 1000
+    nondegradable_volatile_solids = (-0.184 + 0.038 * OM_intake + 0.007 * NDF_conc - 0.001 * cp_conc) * 1000
+
+
     # Amount of manure, kg [A.3B.A.1]
     manure = 3.886 * dm_intake - 0.029 * bw + 5.641
 
@@ -72,8 +77,8 @@ def manure_calculations(ration_formulation, feed, bw, p_feces_excrt, p_urine):
             "MN": N_manure,
             "Mkg": manure,
             "TSd": total_solids,
-            "VSd": 7087.413,  # TODO: Implement with correct equation
-            "VSnd": 859.390,  # TODO: Implement with correct equation
+            "VSd": degradable_volatile_solids,  # TODO: Implement with correct equation
+            "VSnd": nondegradable_volatile_solids,  # TODO: Implement with correct equation
             "WIP_frac": WIP_frac,
             "WOP_frac": WOP_frac,
             "p_excrt_manure": p_excrt_manure,
