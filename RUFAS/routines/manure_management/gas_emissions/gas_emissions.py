@@ -16,9 +16,9 @@ class GasEmissionConstants:
     E = 112700  # apparent activation energy, J/mol
     R = 8.314  # gas constant, J/K-mol
 
-    r_storage_for_manure_with_crust = 75
-    r_storage_for_manure_without_crust = 19
-    r_storage_for_solid_manure = 10
+    r_storage_for_manure_with_crust = 75.0
+    r_storage_for_manure_without_crust = 19.0
+    r_storage_for_solid_manure = 10.0
 
 
 @dataclass
@@ -224,13 +224,93 @@ class GasEmissions:
         return (TAN * c * p) / (r * M * Q)
 
     @staticmethod
-    def calc_r_barn(tempC) -> float:
+    def calc_E_NH3_housing(pen: SimplePen, TAN: float, U: float, tempC: float, p=990.0, pH=7.7) -> float:
+        """
+        Calculates NH3 housing emissions.
+
+        Parameters
+        ----------
+        pen: #TODO: Describe
+        TAN: total ammonia nitrogen in manure, kg N/m^2.
+        U: total amount of manure urine in area of exposed surface, kg.
+        tempC: temperature, °C.
+        p: manure density, kg/m^3.
+        pH: manure acidity.
+
+        Returns
+        -------
+        NH3 emissions, kg N/m^2/day.
+
+        """
+
+        c = 86400  # time conversion, seconds/day
+        tempK = GasEmissions.convert_temp_C_to_K(tempC)
+        area = pen.housing_area_for_NH3_emission  # m^2
+        r = GasEmissions.calc_r_barn(tempC, hsc=260.0)
+        M = U / area  # manure urine per area of exposed surface, kg/m^2
+        Q = GasEmissions.calc_Q(tempK, pH)
+        return (TAN * c * p) / (r * M * Q)
+
+    @staticmethod
+    def calc_E_NH3_storage(TS: float, TAN: float, U: float, tempC: float, p=990.0, pH=7.5) -> float:
+        """
+        Calculates NH3 storage emissions.
+
+        Parameters
+        ----------
+        TS: total solids or dry matter content, %.
+        TAN: total ammonia nitrogen in manure, kg N/m^2.
+        U: total amount of manure urine in area of exposed surface, kg.
+        tempC: temperature, °C.
+        p: manure density, kg/m^3.
+        pH: manure acidity.
+
+        Returns
+        -------
+        NH3 storage emissions, kg N/m^2/day.
+
+        """
+
+        c = 86400  # time conversion, seconds/day
+        tempK = GasEmissions.convert_temp_C_to_K(tempC)
+        r = GasEmissions.calc_r_barn(tempC, hsc=GasEmissions.calc_hsc_from_dry_matter_content(TS))
+        M = U  # manure urine per area of exposed surface, kg/m^2
+        Q = GasEmissions.calc_Q(tempK, pH)
+        return (TAN * c * p) / (r * M * Q)
+
+    @staticmethod
+    def calc_hsc_from_dry_matter_content(TS: float) -> float:
+        """
+        # TODO: Describe
+
+        Args
+        ----
+        TS: total solids or dry matter content, %.
+
+        Returns
+        -------
+        # TODO: Describe
+
+        """
+        if TS <= 5.0:  # liquid
+            return 4.1
+        elif TS <= 8.0:  # slurry
+            return 19.0
+        elif TS <= 13.0:  # semi-solid
+            return 10.0
+        else:  # solid
+            return 10.0
+
+    @staticmethod
+    def calc_r_barn(tempC, hsc=260.0) -> float:
         """
         TODO: Describe
 
         Parameters
         ----------
         tempC: temperature, °C.
+        hsc: housing specific constant, s/m
+
 
         Returns
         -------
@@ -238,7 +318,6 @@ class GasEmissions:
 
         """
 
-        hsc = 260  # housing specific constant, s/m
         return hsc * (1 - 0.027 * (20.0 - tempC))
 
     @staticmethod

@@ -29,6 +29,7 @@ class SimplePen:
     pen: A Pen object from the animal module
 
     """
+
     def __init__(self, pen: Pen):
         self.manure = Manure(**pen.manure)
 
@@ -69,6 +70,23 @@ class SimplePen:
 
         """
         return self.manure_mass / self.manure_density  # m^3
+
+    @property
+    def housing_area_for_NH3_emission(self) -> float:
+        """
+        Returns housing area used for calculating NH3 housing emission.
+
+        Returns
+        -------
+        NH3 housing area. Units: m^2/animal.
+
+        """
+        if 'Cow' in self.classes_in_pen:
+            return 3.5
+        elif 'HeiferII' in self.classes_in_pen:
+            return 2.5
+        else:
+            return 2.0
 
     @property
     def barn_area(self) -> float:
