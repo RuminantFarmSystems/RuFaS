@@ -210,9 +210,8 @@ class cropTime:
         times={
         "year" : [2009]*365+[2010]*365,
         "day" : sum(years,[])}
-        print(times)
         df=pd.DataFrame(times)
-        df['d'] = [[] for _ in range(len(df))]
+        df['crops_growing'] = [[] for _ in range(len(df))]
         for index, row in df.iterrows():
             for crop in crop_list.keys():
                 for i in range(0,len(crop_list[crop]['plant_years'])):
