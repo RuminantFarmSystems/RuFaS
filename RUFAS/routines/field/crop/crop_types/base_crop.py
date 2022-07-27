@@ -51,74 +51,74 @@ class BaseCrop:
 
         ## heat units
         self.T_base_min = 10  # pseudocode C.2.A.3
-        """minimum temperature required for growth (Celsius)"""
+        """float: minimum temperature required for growth (Celsius)"""
         self.T_base_max = 30  # pseudocode C.2.A.4
-        """maximum temperature required to sustain growth (Celsius)"""
+        """float: maximum temperature required to sustain growth (Celsius)"""
         self.PHU = 800  # psuedocode C.2.B.1
         """crop-specific total heat units required for maturity"""
 
         self.accumulated_HU = 0  # pseudocode C.2.B.1
-        """Heat units accumulated including the current day of the simulation"""
+        """float: heat units accumulated including the current day of the simulation"""
         self.prev_accumulated_HU = 0  # pseudocode C.2.B.1
-        """Heat units accumulated excluding the current day of the simulation"""
+        """float: heat units accumulated excluding the current day of the simulation"""
         self.fr_PHU = 0  # pseudocode C.2.B.1
         """float: fraction of Potential Heat Units"""
         self.prev_fr_PHU = 0  # pseudocode C.2.B.1
-        """Fraction of PHU accumulated excluding current day of simulation"""
+        """float: fraction of PHU accumulated excluding current day of simulation"""
 
         ## LAI
         self.fr_PHU_1 = 0.15  # psuedocode C.8.A
-        """first PHU shape coefficient, used in LAI calculations"""
+        """float: first PHU shape coefficient, used in LAI calculations"""
         self.fr_PHU_2 = 0.50  # psuedocode C.8.A
-        """second PHU shape coefficient, used in LAI calculations"""
+        """float: second PHU shape coefficient, used in LAI calculations"""
         self.fr_LAI_1 = 0.01  # psuedocode C.8.A.2
-        """first LAI shape coefficient, used in LAI calculations"""
+        """float: first LAI shape coefficient, used in LAI calculations"""
         self.fr_LAI_2 = 0.95  # psuedocode C.8.A.1
-        """second LAI shape coefficient, used in LAI calculations"""
+        """float: second LAI shape coefficient, used in LAI calculations"""
         self.fr_PHU_sen = 0.90  # psuedocode C.8.A.6
-        """crop-specific fraction of PHU, at which senescence becomes dominant growth process"""
+        """float: crop-specific fraction of PHU, at which senescence becomes dominant growth process"""
         self.fr_PHU_harvest = 1  # psuedocode C.10.A.1
-        """fraction of PHU at harvest"""
+        """float: fraction of PHU at harvest"""
         self.fr_PHU_harvest_min = 0.7  # psuedocode C.11.C.2
-        """minimum fraction of PHU acquired to warrant harvest"""
+        """float: minimum fraction of PHU acquired to warrant harvest"""
         self.LAI_max = 3  # psuedocode C.8.A.4
-        """crop-specific maximum LAI"""
+        """float: crop-specific maximum LAI"""
         self.LAI_min = 0  # ToDo: missing psuedocode - GitHub Issue #168
-        """crop-specific minimum possible LAI"""
+        """float: crop-specific minimum possible LAI"""
         self.prev_fr_LAI_max = 0  # psuedocode C.8.A.3
-        """accumulated LAI fraction for the previous day"""
+        """float: accumulated LAI fraction for the previous day"""
         self.fr_LAI_max = 0  # psuedocode C.8.A.3
-        """accumulated LAI fraction for the current day"""
+        """float: accumulated LAI fraction for the current day"""
         self.prev_LAI_actual = 0  # psuedocode C.8.A.4
-        """calculated LAI for the previous day"""
+        """float: calculated LAI for the previous day"""
         self.LAI_actual = 0
         """float: calculated LAI for the current day"""
 
         ## root depth
         self.z_root_max = 1500  # pseudocode C.3.A.2
-        """maximum depth of root development (mm)"""
+        """float: maximum depth of root development (mm)"""
         self.fr_root = 0  # pseudocode C.3.A.1
-        """fraction of total biomass partitioned to roots on current day"""
+        """float: fraction of total biomass partitioned to roots on current day"""
         self.z_root = 0  # pseudocode C.3.A.2
-        """depth of root development (mm)"""
+        """float: depth of root development (mm)"""
 
         ## biomass
         self.kl = 0.65  # psuedocode C.9.A.2
-        """light extinction coefficient"""
+        """float: light extinction coefficient"""
         self.RUE = 20  # psuedocode C.9.A.2
-        """crop-specific radiation use efficiency"""
+        """float: crop-specific radiation use efficiency"""
         self.T_opt = 25  # psuedocode C.7.B.2
-        """crop-specific optimal temperature for growth"""
+        """float: crop-specific optimal temperature for growth"""
         self.gamma_reg = 0  # psuedocode C.9.A.3
-        """plant growth factor (0-1)"""
+        """float: plant growth factor (0-1)"""
         self.d_biomass_max = 0  # psuedocode C.9.A.3
-        """maximum potential increase in biomass for a given day"""
+        """float: maximum potential increase in biomass for a given day"""
         self.d_biomass_actual = 0 # psuedocode C.9.A.3
-        """calculated increase in biomass"""
+        """float: calculated increase in biomass"""
         self.biomass_actual = 0  # psuedocode C.9.A.3 # ToDo: What are the units? - GitHub Issue #174
-        """calculated biomass for the current day"""
+        """float: calculated biomass for the current day"""
         self.prev_biomass_actual = 0  # psuedocode C.9.A.3
-        """calculated biomass for the previous day"""
+        """float: calculated biomass for the previous day"""
 
         ## water uptake
         self.epco = 0  # psuedocode C.4.B.2
@@ -132,63 +132,96 @@ class BaseCrop:
 
         ## nitrogen uptake
         self.beta_n = 10
-        self.fr_n1 = 0.04
-        self.fr_n2 = 0.03
-        self.fr_n3 = 0.02
-        self.fr_n3ish = 0.02
+        """float: nitrogen uptake distribution parameter.
+           This value does not significantly affect N uptake, but does impact NO3 removed 
+           from the surface by allowing plants to extract a greater percent of N from the 
+           upper soil layers.
+        """
+        self.fr_n1 = 0.04  # psuedocode C.5.A.2
+        """float: normal fraction of nitrogen in plant biomass before emergence""" # TODO - double check the stage for n1 and n2 (same for p1 and p2)
+        self.fr_n2 = 0.03  # psuedocode C.5.A.2
+        """float: normal fraction of nitrogen in plant biomass at emergence"""
+        self.fr_n3 = 0.02  # psuedocode C.5.A.2
+        """float: normal fraction of nitrogen in plant biomass at maturity"""
+        self.fr_n3ish = 0.02  # psuedocode C.5.A.2
+        """float: normal fraction of nitrogen in plant biomass near maturty"""
         self.N_fix = 0
         """float: Amount of nitrogen added to the plant biomass by fixation (kg/ha)"""
-        self.bio_N_opt = 0
-        self.bio_N = 0
+        self.bio_N_opt = 0  # psuedocode C.5.B.2
+        """float: optimal mass of nitrogen stored in the plant on a given day (kg/ha)"""
+        self.bio_N = 0  # psuedocode C.5.B.2
         """float: Actual mass of nitrogen stored in plant material (kg/ha)"""
-        self.fr_N = 0
-        "float: Fraction of Nitrogen"
-        self.N_up = 0
-        self.act_N_up_each_layer = []
-        self.N_actual_up = 0
+        self.fr_N = 0  # psuedocode C.5.A.2
+        """float: Fraction of nitrogen stored in plant biomass on a given day"""
+        self.N_up = 0  # psuedocode C.5.B.3
+        """float: potential nitrogen uptake by the plant (kg/ha)"""
+        self.act_N_up_each_layer = []  # psuedocode C.5.C.4 
+        """:obj:`list` of :obj:`float`: actual nitrogen uptake from each soil layer (kg/ha)"""
+        self.N_actual_up = 0  # psuedocode C.5.C.7
+        """float: total nitrogen uptake (kg/ha)"""
 
         ## phosphorus uptake
-        self.beta_p = 10
-        self.fr_PHU_50 = 0.5
-        self.fr_PHU_100 = 1.0
-        self.fr_p1 = 0.004
-        self.fr_p2 = 0.003
-        self.fr_p3 = 0.002
-        self.fr_p3ish = 0.002
-        self.bio_P_opt = 0
-        self.bio_P = 0
-        """float: Actual mass of phosphorus stored in plant material (kg/ha)"""
-        self.fr_P = 0
-        self.P_up = 0
-        self.act_P_up_each_layer = []
-        self.P_act_up = 0
+        self.beta_p = 10  # psuedocode C.6.C.1
+        """float: phosphorus uptake distribution parameter"""
+        self.fr_PHU_50 = 0.5  # psuedocode C.6.A.1
+        """fraction of potential heat units accumulated at 50% plant maturity"""
+        self.fr_PHU_100 = 1.0  # psuedocode C.6.A.1
+        """fraction of potential heat units accumulated at 100% plant maturity"""
+        self.fr_p1 = 0.004  # psuedocode C.6.B.1
+        """float: normal fraction of phosphorus in plant biomass before emergence"""
+        self.fr_p2 = 0.003  # psuedocode C.6.B.1
+        """float: normal fraction of phosphorus in plant biomass at emergence"""
+        self.fr_p3 = 0.002  # psuedocode C.6.B.1
+        """float: normal fraction of phosphorus in plant biomass at maturity"""
+        self.fr_p3ish = 0.002  # psuedocode C.6.B.1
+        """float: normal fraction of phosphorus in plant biomass near maturity"""
+        self.bio_P_opt = 0  # psuedocode C.6.B.2
+        """optimal mass of phosphorus stored inplant biomass on a given day (kg/ha)"""
+        self.bio_P = 0  # psuedocode C.6.B.1
+        """float: actual mass of phosphorus stored in plant material (kg/ha)"""
+        self.fr_P = 0  # psuedocode C.6.A.2
+        """float: fraction of phosphorus in the plant biomass on a given day"""
+        self.P_up = 0  # psuedocode C.6.C1
+        """float: potential phosphorus uptake (kg/ha)"""
+        self.act_P_up_each_layer = []  # psuedocode C.6.C.4
+        """:obj:`list` of :obj:`float`: phosphorus uptake from each soil layer (kg/ha)"""
+        self.P_act_up = 0  # psuedocode C.6.C.7
+        """float: total uptake of phosphorus from soil (kg/ha)"""
 
         ## yield
-        self.HI_max = 0  # ToDo: what is HI_max, and why is it 0?
-        """float: Maximum harvest index"""
-        self.HI_min = 0
-        """float: harvest index for the plant in drought conditions"""
-        self.HI_actual = 0
-        """float: Actual harvest index"""
-        self.HI_opt = 0.9
-        self.harvest_eff = 0.9
-        self.gamma_wu = 0
-        self.biomass_dry_down_percent = 0
-        self.DM_harvest_percent = 0.15
-        self.NDF_harvest_percent = 0.42
-        self.bio_AG = 0
+        self.HI_max = 0  # psuedocode C.10.B.1
+        """float: potential (maximum) harvest index"""
+        self.HI_min = 0  # psuedocode C.10.C.1
+        """float: harvest index for the plant in drought conditions (minimum)"""
+        self.HI_actual = 0  # psuedocode C.10.C.1 
+        """float: actual harvest index"""
+        self.HI_opt = 0.9  # psuedocode C.10.D.1 
+        """float: potential harvest index for the plant at maturity, given ideal growing conditions (optimal)"""
+        self.harvest_eff = 0.9  # psuedocode C.10.D.1
+        """float: harvest efficiency, as a percent of plant biomass"""
+        self.gamma_wu = 0  # psuedocode C.9.C.1
+        """float: water defficiency factor"""
+        self.biomass_dry_down_percent = 0  # TODO: no pseudocode reference - GitHub Issue #168
+        self.DM_harvest_percent = 0.15  # TODO: no pseudocode reference - GitHub Issue #168
+        self.NDF_harvest_percent = 0.42  # TODO: no pseudocode reference - GitHub Issue #168
+        self.bio_AG = 0  # psuedocode C.10.H.1
         """float: Above ground biomass (kg/ha)"""
-        self.bio_BG = 0
+        self.bio_BG = 0  # psuedocode C.10.H.4
         """float: Below ground biomass (kg/ha)"""
-        self.yield_max = 0
-        self.yield_actual = 0
-        """float: Actual crop yield at harvest (kg/ha)"""
-        self.NDF_yield = 0
-        self.N_yield = 0
-        self.P_yield = 0
+        self.yield_max = 0  # psuedocode C.10.E.1
+        """float: maximum yield (kg/ha)"""
+        self.yield_actual = 0  # psuedocode C.10.E.1
+        """float: actual crop yield at harvest (kg/ha)"""
+        self.NDF_yield = 0  # TODO: no pseudocode reference - GitHub Issue #168
+        self.N_yield = 0  # psuedocode C.10.F.1
+        """float: amount of nitrogen removed in the yield (kg/ha)"""
+        self.P_yield = 0  # psuedocode C.10.F.2
+        """float: amount of phosphorus removed in the yield (kg/ha)"""
         self.N_yield_annual = 0
+        """float: annual nitrogen yield"""
         self.P_yield_annual = 0
-        self.NDF_yield_annual = 0
+        """float: annual phosphorus yield"""
+        self.NDF_yield_annual = 0  # TODO: no pseudocode reference - GitHub Issue #168
         self.yield_annual = 0
         """float: Annual crop yield (kg/ha)"""
 
