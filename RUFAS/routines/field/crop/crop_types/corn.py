@@ -7,7 +7,12 @@ from RUFAS.routines.field.crop.crop_types import crop_config
 
 class Corn(BaseCrop):
     def __init__(self, crop_name, data):
-        """create an instance of Corn"""
+        """create an instance of Corn
+                    
+           Args: 
+            crop_name (str): the name of the crop
+            data (dict): data used to construct the class
+        """
         super().__init__()
 
         # get alfalfa variables from input data:
