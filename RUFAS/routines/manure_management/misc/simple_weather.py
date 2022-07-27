@@ -1,4 +1,3 @@
-from RUFAS.classes import Weather
 
 
 class SimpleWeather:
