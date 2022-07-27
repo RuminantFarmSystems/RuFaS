@@ -18,6 +18,7 @@ from RUFAS.routines.manure_management.helpers.enum_helpers import ExtendedEnum
 from RUFAS.routines.manure_management.manure_handlers.manure_handler_classes import \
     BaseManureHandler
 from RUFAS.routines.manure_management.manure_separators.manure_separator_classes import BaseSeparator
+from RUFAS.routines.manure_management.misc.simple_weather import SimpleWeather
 from RUFAS.routines.manure_management.misc.constants import ManureManagementConstants as Constants
 from RUFAS.routines.manure_management.misc.simple_pen import SimplePen
 from RUFAS.routines.manure_management.reception_pits.reception_pit_classes import BaseReceptionPit
@@ -123,13 +124,10 @@ class AnaerobicDigestion(BaseTreatment):
                  pen: SimplePen,
                  manure_handler: BaseManureHandler,
                  manure_separator: BaseSeparator,
-                 treatment_init_data: AnaerobicDigesterInitData,
-                 reception_pit: BaseReceptionPit,
-                 weather_data):
+                 treatment_init_data: AnaerobicDigesterInitData):
         super().__init__(pen, manure_handler, manure_separator, treatment_init_data)
-        self.weather_data = weather_data
+        self.weather_data = SimpleWeather()
 
-        self.reception_pit = reception_pit  
         reception_pit_output_data = self.reception_pit.last_output
         self.total_solids = 0.1
         self.volatile_solids = 0  
