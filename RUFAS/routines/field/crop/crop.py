@@ -312,7 +312,6 @@ class Crop:
         self.current_crop_year = []
 
         self.grow_regimen = [self.current_crop for _ in range(0, len(time.years))]
-        print(self.grow_regimen)
         self.set_grow_regimen(time)
 
         # dormancy for perennial crops
