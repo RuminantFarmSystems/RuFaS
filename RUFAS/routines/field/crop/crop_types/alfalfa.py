@@ -10,6 +10,10 @@ class Alfalfa(BaseCrop):
        Attributes of ``Alfalfa`` are derived from data collected for the crop.
        The crop-specific attributes for alfala, are located in the crop config variable ``ALFALFA`` in crop_config.py.
        See the inherited class ``BaseCrop`` for all other attributes and member functions.
+       
+       Args: 
+        crop_name (str): the name of the crop
+        data (dict): data used to construct the class
     """
     def __init__(self, crop_name, data):
         """create an instance of Alfalfa"""
