@@ -16,6 +16,7 @@ from . import heat_units, leaf_area_index, root_development, biomass, yields, \
     phosphorus_uptake, nitrogen_uptake, growth_constraints
 
 
+
 def daily_crop_routine(soil, crop, field_management, weather, time):
     """
     Description:
@@ -29,9 +30,9 @@ def daily_crop_routine(soil, crop, field_management, weather, time):
         weather: an instance of the Weather class defined in classes.py
         time: an instance of the Time class defined in classes.py
     """
+
     # Current crop is set at the beginning of the year in annual_crop_routine
     crop_type = crop.current_crop
-    print(crop_type)
     # If there is no crop in rotation, current crop will be named
     daily_reset(crop_type, soil)
     # 'null'. The routine is skipped in this case
@@ -41,18 +42,17 @@ def daily_crop_routine(soil, crop, field_management, weather, time):
         if crop_was_killed_yesterday:
             # set the next crop to grow in a double cropping rotation
             if crop_type.harvest_day > crop_type.planting_day:
-                if crop_type.planting_order == '1st':
-                    if crop.current_crop_year[0].crop_name != 'null':
-                        crop_type.killed = False
-                        crop.current_crop = crop.current_crop_year[0]
-                        crop.current_crop.kill_year = is_kill_year(crop, time)
+                if crop.current_crop_year.crop_name != 'null':
+                    crop_type.killed = False
+                    crop.current_crop = crop.current_crop_year
+                    crop.current_crop.kill_year = is_kill_year(crop, time)
 
             # current crop year will be this years current crop, the current crop will be last years latter crop, 
             # replaced with this years first crop when applicable
             elif crop_type.harvest_day <= crop_type.planting_day:
-                if crop.current_crop_year[0].crop_name != 'null':
+                if crop.current_crop_year.crop_name != 'null':
                     crop_type.killed = False
-                    crop.current_crop = crop.current_crop_year[0]
+                    crop.current_crop = crop.current_crop_year
                     crop.current_crop.kill_year = is_kill_year(crop, time)
 
         # yield is reset to 0 at the beginning of the next day so it can be
@@ -132,7 +132,7 @@ def daily_reset(crop_type, soil):
     crop_type.P_yield = 0
 
     crop_type.HI_actual = 0
-    #crop_type.bio_BG = 0
+    crop_type.bio_BG = 0
     soil.residue_harvest = 0
     soil.soil_layers[0].fr_tillage = 0
 
@@ -167,7 +167,7 @@ def annual_crop_routine(crop, time):
     # current crop year is set to the next year of crops in the regimen
     crop.current_crop_year = crop.grow_regimen[time.year - 1]
     # current crop is the first crop to grow in the selected year
-    crop.current_crop = crop.current_crop_year[0]
+    crop.current_crop = crop.current_crop_year
 
     crop.current_crop.kill_year = is_kill_year(crop, time)
 
@@ -227,10 +227,29 @@ def is_kill_year(crop, time):
     # the following code checks if the crop is annually grown,
     # if the crop is growing in the last year of the simulation,
     # if the crop is not grown the next year,
-    # or if the crop is growing in a double cropping routine
     if crop.current_crop.crop_type == 'annual' or len(crop.grow_regimen) == time.year or \
-            crop.current_crop.crop_name != crop.grow_regimen[time.year][0].crop_name or \
-            crop.current_crop_year[1].crop_name != 'null':
+            crop.current_crop.crop_name != crop.grow_regimen[time.year].crop_name:
+        crop.current_crop.kill_day = crop.current_crop.harvest_day
+        return True
+    else:
+        return False
+
+def is_kill_year(crop, time):
+    """
+    Description:
+        Determines whether the crop is killed at harvest
+
+    Args:
+        crop: an instance of the Crop class specified in crop.py containing
+            information relevant to simulating crop growth
+        time: an instance of the Time class specified in classes.py
+    """
+
+    # the following code checks if the crop is annually grown,
+    # if the crop is growing in the last year of the simulation,
+    # if the crop is not grown the next year,
+    if crop.current_crop.crop_type == 'annual' or len(crop.grow_regimen) == time.year or \
+            crop.current_crop.crop_name != crop.grow_regimen[time.year].crop_name:
         crop.current_crop.kill_day = crop.current_crop.harvest_day
         return True
     else:
@@ -292,13 +311,8 @@ class Crop:
         self.current_crop = base_crop.BaseCrop()
         self.current_crop_year = []
 
-        # list of the order the crops are growing in, originally set to default
-        double_cropping_limit = 2
-
-        self.grow_regimen = \
-            [[self.current_crop for _ in range(0, double_cropping_limit)]
-             for _ in range(0, len(time.years))]
-
+        self.grow_regimen = [self.current_crop for _ in range(0, len(time.years))]
+        print(self.grow_regimen)
         self.set_grow_regimen(time)
 
         # dormancy for perennial crops
@@ -320,10 +334,6 @@ class Crop:
 
         for crop_type in self.crops_list:
 
-            planting_order = 0
-            if crop_type.planting_order == "2nd" or crop_type.harvest_day <= crop_type.planting_day:
-                planting_order = 1
-
             for year in crop_type.plant_years:
                 # checks requested grow years against model boundaries
                 if year - time.start_year >= len(self.grow_regimen) or year - time.start_year < 0:
@@ -336,24 +346,23 @@ class Crop:
 
                         # if the crop is cold, set it to the latter year slot, if it is warm or
                         # null then it belongs in the initial year slot
-                        self.grow_regimen[curr_year][planting_order] = crop_type
+                        self.grow_regimen[curr_year] = crop_type
 
                     # populate grow regimen based on repeat if another crop is
                     # not already set for those years
                     elif crop_type.repeat > 0:
                         curr_year = year - time.start_year
                         while curr_year < len(self.grow_regimen):
-                            if self.grow_regimen[curr_year][planting_order].crop_name == 'null':
-                                self.grow_regimen[curr_year][planting_order] = crop_type
+                            if self.grow_regimen[curr_year].crop_name == 'null':
+                                self.grow_regimen[curr_year] = crop_type
 
                             # crop slot already full
                             else:
                                 print('Cannot grow', crop_type.crop_name, 'in', str(year + curr_year) + ',',
-                                      self.grow_regimen[curr_year][planting_order].crop_name,
+                                      self.grow_regimen[curr_year].crop_name,
                                       'is already growing.')
                             curr_year += crop_type.repeat
 
-        # list(filter(lambda crop: crop.crop_name != 'null', self.grow_regimen))
 
     def annual_reset(self):
         self.current_crop.N_yield_annual = 0.0

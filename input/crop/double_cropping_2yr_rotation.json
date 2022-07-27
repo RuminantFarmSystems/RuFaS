@@ -3,19 +3,19 @@
 
     "crops": {
         "winter_wheat": {
-            "plant_years": [2009],
+            "plant_years": [2009,2010],
             "repeat": 0,
-            "planting_day": 80,
-            "harvest_day": 250,
+            "planting_day": 160,
+            "harvest_day": 220,
             "harvest_type": "scheduled",
-            "planting_order": "2nd",
+            "planting_order": "1st",
             "extracted": true
         },
         "spring_barley": {
-            "plant_years": [2009],
+            "plant_years": [2009,2010],
             "repeat": 0,
-            "planting_day": 100,
-            "harvest_day": 200,
+            "planting_day": 80,
+            "harvest_day": 362,
             "harvest_type": "scheduled",
             "planting_order": "1st",
             "extracted": true

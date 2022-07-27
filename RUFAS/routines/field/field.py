@@ -5,7 +5,7 @@ Description:
 Author(s): William Donovan, wmdonovan@wisc.edu
            Jacob Johnson, jacob8399@gmail.com
 """
-
+import pandas as pd
 from RUFAS import util
 from .crop.crop import *
 from .soil.soil import *
@@ -195,6 +195,30 @@ class Fields:
         self.N_yield_annual = 0.0
         self.P_yield_annual = 0.0
 
+class cropTime:
+    def __init__(self,time, data):
+        """
+        Description:
+            This object is responsible for creating and tracking time in the simulation.
+        Args:
+            config: instance of the Config class containing information necessary
+                to initialize time
+        """
+        # number of years
+        years = time.years
+        crop_list= data['crops']
+        times={
+        "year" : [2009]*365+[2010]*365,
+        "day" : sum(years,[])}
+        print(times)
+        df=pd.DataFrame(times)
+        df['d'] = [[] for _ in range(len(df))]
+        for index, row in df.iterrows():
+            for crop in crop_list.keys():
+                for i in range(0,len(crop_list[crop]['plant_years'])):
+                    if (crop_list[crop]['plant_years'][i] == row['year'] and crop_list[crop]['planting_day'] < row['day']) and (crop_list[crop]['harvest_day'] > row['day']):
+                        df.loc[index,'d'].append(crop)
+        print(df)
 
 class Field:
     def __init__(self, field_name, field_data, time):
@@ -223,3 +247,5 @@ class Field:
         self.soil = Soil(soil_data)
         self.field_management = FieldManagement(field_management_data, time)
         self.crop = Crop(crop_data, time)
+        self.croptime= cropTime(time,crop_data)
+
