@@ -557,7 +557,8 @@ class Pen:
         # set animal's manure to be the average manure of all other
         # animals in pen
         for key in self.manure.keys():
-            animal.manure_excretion[key] = self.manure[key] / len(self.animals_in_pen)
+            # TODO find other solution to prevent div by 0 error
+            animal.manure_excretion[key] = self.manure[key] / (len(self.animals_in_pen)+ 0.01)
 
         # since the manure attribute is a total from all animals in the pen,
         # we need to add the current animal's values to the total values for
