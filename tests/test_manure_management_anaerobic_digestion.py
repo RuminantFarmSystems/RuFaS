@@ -55,13 +55,13 @@ def test_get_effluent_total_solids(get_expected_values,ad_fixture,mock_init_data
     ad = ad_fixture
     ad.update()
     expected = get_expected_values
-    assert pytest.approx(ad.get_effluent_total_solids(),0.1) == mock_init_data.TS_FRACTION * ad.total_solids/ad.wastewater_volume
+    assert pytest.approx(ad.get_effluent_total_solids(),0.1) == (1-mock_init_data.TS_FRACTION) * ad.total_solids
 
 def test_get_effluent_volatile_solids(get_expected_values,ad_fixture,mock_init_data):
     ad = ad_fixture
     ad.update()
     expected = get_expected_values
-    assert pytest.approx(ad.get_effluent_volatile_solids(),0.1) == mock_init_data.VS_FRACTION * ad.volatile_solids/ad.wastewater_volume
+    assert pytest.approx(ad.get_effluent_volatile_solids(),0.1) == (1-mock_init_data.VS_FRACTION) * ad.volatile_solids
 
 
 def test_get_evaporated_water(get_expected_values,ad_fixture,mock_init_data):
@@ -129,11 +129,9 @@ def test_calcHeatCapacityManure(T_avg,moisture_content,expected,ad_fixture):
     assert pytest.approx(ad.calcHeatCapacityManure(T_avg,moisture_content),0.1) == expected  
 
 @pytest.mark.xfail
-def test_update(ad_fixture_zeros,get_expected_values_zeros):
-    ad = ad_fixture_zeros
+def test_update(ad_fixture,get_expected_values_update):
+    ad = ad_fixture
     daily_output = ad.update()
-    for field in fields(daily_output):
-        assert pytest.approx(getattr(get_expected_values_zeros,field.name), 0.1) == getattr(daily_output,field.name)
-    
+    assert getattr(get_expected_values_update,'TSd')==getattr(daily_output,'TSd')
 
 

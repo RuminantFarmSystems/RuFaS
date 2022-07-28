@@ -212,3 +212,18 @@ def get_expected_values_sheet():
     expected_values.AD_biogas=475.4
     expected_values.AD_methane_generation_volume=309.0
     return expected_values
+
+@fixture
+def get_expected_values_update(mock_handler_output):
+    expected_values=Mock()
+    ##Non-daily_output values
+    expected_values.manure_nitrogen = 0.0
+    expected_values.TSd = mock_handler_output.TSd
+    expected_values.VSd = mock_handler_output.VSd-mock_handler_output.VSnd
+    expected_values.VSnd = mock_handler_output.VSnd
+    expected_values.VS_total = mock_handler_output.VS_total
+    expected_values.p_excrt_manure = 0.0
+    expected_values.K_manure = 0.0
+    expected_values.total_daily_mass = mock_handler_output.total_daily_mass 
+    expected_values.final_volume=mock_handler_output.total_daily_mass
+    return expected_values

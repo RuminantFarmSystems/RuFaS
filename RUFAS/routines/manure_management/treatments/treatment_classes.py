@@ -169,7 +169,7 @@ class AnaerobicDigestion(BaseTreatment):
 
         moisture_content = self.get_moisture_content()
         T_avg = self.weather_data.T_avg
-        self.input_energy_heating = self.calcSpecificInputEnergy(T_avg,moisture_content)*self.wastewater_volume
+        self.input_energy_heating = self.calcSpecificInputEnergy(T_avg,moisture_content)*self.wastewater_volume*Constants.LITERS_TO_CUBIC_METERS
         
         ## m^3/year  MS.3.B.1
         self.sludge_accumulation_volume = self.get_sav()
@@ -291,7 +291,7 @@ class AnaerobicDigestion(BaseTreatment):
         """Returns effluent_total_solids
         """
         if(self.wastewater_volume>0):
-            return self.treatment_init_data.TS_FRACTION * self.total_solids/self.wastewater_volume  ## g/L
+            return (1-self.treatment_init_data.TS_FRACTION) * self.total_solids  ## g/L
         else:
             return 0.0
             
@@ -299,7 +299,7 @@ class AnaerobicDigestion(BaseTreatment):
         """Returns effluent_volatile_solids
         """
         if(self.wastewater_volume>0):
-            return self.treatment_init_data.VS_FRACTION * self.volatile_solids/self.wastewater_volume  ## g/L
+            return (1-self.treatment_init_data.VS_FRACTION) * self.volatile_solids  ## g/L
         else:
             return 0.0
 
