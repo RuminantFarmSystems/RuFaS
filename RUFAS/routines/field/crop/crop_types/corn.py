@@ -8,7 +8,7 @@ from RUFAS.routines.field.crop.crop_types import crop_config
 class Corn(BaseCrop):
     """``Corn`` is a child of the ``BaseCrop`` class, and one of the main crop types.
        Attributes of ``Alfalfa`` are derived from data collected for the crop.
-       The crop-specific attributes for alfala, are located in the crop config variable ``CORN`` in crop_config.py.
+       The crop-specific attributes for corn, are located in the crop config variable ``CORN`` in crop_config.py.
        See the inherited class ``BaseCrop`` for all other attributes and member functions.
     """
     def __init__(self, crop_name, data):

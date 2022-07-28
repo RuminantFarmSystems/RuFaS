@@ -1,9 +1,10 @@
 from RUFAS.routines.field.crop.crop_types.base_crop import BaseCrop
 from RUFAS.routines.field.crop.crop_types import crop_config
 
-
 # TODO: add overall description of Alfalfa class, along with 
 #  description of attributes - GitHub Issue #170
+
+
 class Alfalfa(BaseCrop):
     """``Alfalfa`` is a child of the ``BaseCrop`` class, and one of the main crop types.
        Attributes of ``Alfalfa`` are derived from data collected for the crop.
@@ -24,6 +25,7 @@ class Alfalfa(BaseCrop):
         self.repeat = data['repeat']
         self.planting_day = data['planting_day']
         self.harvest_day = data['harvest_day']
+        #self.harvest_type = data['harvest_type']  # TODO: should read this from file
         self.planting_order = data['planting_order'].lower()
         self.extracted = data['extracted']
         self.crop_name = crop_name

@@ -10,9 +10,9 @@ class BaseCrop:
         ##  id variables
         self.crop_name = 'null'
         """str: name of the crop: alfalfa, corn, etc."""
-        self.crop_type = ''  # ToDo: What strings are accepted? - GitHub Issue #174
+        self.crop_type = ''  # TODO: What strings are accepted? - GitHub Issue #174
         """str: the growing type of the crop: perennial, annual ..."""
-        self.harvest_quality = 'null'  # ToDo: don't know what harvest quality is - GitHub Issue #168
+        self.harvest_quality = 'null'  # TODO: don't know what harvest quality is - GitHub Issue #168
         self.feed_id = 'null'
         """str: the ID of the feed to be modified, ending in 'g' if it is a grown feed"""
         self.raw_id = 'null'
@@ -28,9 +28,9 @@ class BaseCrop:
         """float: the day of the year that the crop will be first planted (Julian calendar)"""
         self.harvest_day = 0
         """float: the day of the year that the crop will be harvested (Julian calendar)"""
-        self.harvest_type = ''  # ToDo: What strings are accepted? - GitHub Issue #174
+        self.harvest_type = ''  # TODO: What strings are accepted? - GitHub Issue #174
         """str: the harvest schedule that the crop will be on: scheduled, optimal..."""
-        self.planting_order = ''  # ToDo: What strings are accepted? - GitHub Issue #174
+        self.planting_order = ''  # TODO: What strings are accepted? - GitHub Issue #174
         """str: in the case of double cropping, the order in which the crop will be planted"""
 
         ## starting points for crop status
@@ -48,6 +48,8 @@ class BaseCrop:
         """bool: was the crop extracted from the field or not? 
              This is independent of whether or not the crop was killed.
         """
+        self.fix_nitrogen = False
+        "bool: does this plant fix nitrogen?"
 
         ## heat units
         self.T_base_min = 10  # pseudocode C.2.A.3
@@ -83,7 +85,7 @@ class BaseCrop:
         """float: minimum fraction of PHU acquired to warrant harvest"""
         self.LAI_max = 3  # psuedocode C.8.A.4
         """float: crop-specific maximum LAI"""
-        self.LAI_min = 0  # ToDo: missing psuedocode - GitHub Issue #168
+        self.LAI_min = 0  # TODO: missing psuedocode - GitHub Issue #168
         """float: crop-specific minimum possible LAI"""
         self.prev_fr_LAI_max = 0  # psuedocode C.8.A.3
         """float: accumulated LAI fraction for the previous day"""
@@ -115,7 +117,7 @@ class BaseCrop:
         """float: maximum potential increase in biomass for a given day"""
         self.d_biomass_actual = 0 # psuedocode C.9.A.3
         """float: calculated increase in biomass"""
-        self.biomass_actual = 0  # psuedocode C.9.A.3 # ToDo: What are the units? - GitHub Issue #174
+        self.biomass_actual = 0  # psuedocode C.9.A.3 # TODO: What are the units? - GitHub Issue #174
         """float: calculated biomass for the current day"""
         self.prev_biomass_actual = 0  # psuedocode C.9.A.3
         """float: calculated biomass for the previous day"""
@@ -222,6 +224,7 @@ class BaseCrop:
         self.P_yield_annual = 0
         """float: annual phosphorus yield"""
         self.NDF_yield_annual = 0  # TODO: no pseudocode reference - GitHub Issue #168
+        self.DM_yield_annual = 0  # TODO: no pseudocode reference - GitHub Issue #168
         self.yield_annual = 0
         """float: Annual crop yield (kg/ha)"""
 

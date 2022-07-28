@@ -20,12 +20,15 @@ Description:
     or any variables that do not correspond to crop-specific parameters. They should also NOT include data that is
     normally input by the user (data derived from .json files).
 """
-# ToDo: It may be best to document all contained attributes in this file.
+# TODO: It may be best to document all contained attributes in this file.
+
+# TODO: I think that the individual classes can be removed and populated with a switch. Something like
+#   Crop(crop = "alpfalfa") vs Crop(crop = "corn")
 
 # alfalfa.py
 ALFALFA = {
         # alfalfa ID variables
-        "harvest_type": 'optimal',  # ToDo: is this always the type for alfalfa? Corn reads this from data
+        "harvest_type": 'optimal',  # TODO: is this always the type for alfalfa? Corn reads this from data
         "crop_type": 'perennial',
         "raw_id": 1,
         "feed_id": '1g',
@@ -51,7 +54,7 @@ ALFALFA = {
         "RUE": 20,
         "T_opt": 25,
         # water use
-        "beta_w": 10,  # ToDo taken from corn GitHub Issue #154
+        "beta_w": 10,  # TODO taken from corn GitHub Issue #154
         "epco": 1,
         # nitrogen uptake
         "beta_n": 10,
@@ -85,7 +88,6 @@ CORN = {
         "crop_type": 'annual',
         "raw_id": 34,
         "feed_id": '34g',
-        "fix_nitrogen": False,
         "kill_year": True,
         # heat unit variables
         "T_base_min": 10,
@@ -134,3 +136,66 @@ CORN = {
         "DM_harvest_percent": 0.35  # TODO: Hard coded dry matter percent at harvest - GitHub Issue #155
 }
 
+CEREAL_RYE = {
+        "crop_type": 'annual',
+        "feed_id": '107g',
+        "raw_id": 107,
+        "kill_year": True,
+        "T_base_min": 0,
+        "T_base_max": 30,  # TODO: GitHub Issue #157
+        "PHU": 996,  # TODO: Potential heat units unknown - GitHub Issue #154
+        "fr_PHU_sen": 0.80,
+        "fr_PHU_harvest": 1.2,  # TODO: GitHub Issue #157
+        "LAI_max": 4,
+        "z_root_max": 1800,
+        "kl": 0.65,  # TODO: GitHub Issue #157
+        "RUE": 35,
+        "T_opt": 18,
+        "beta_w": 10,  # TODO: water-use distribution parameter - GitHub Issue #157
+        "epco": 0.5,  # TODO: GitHub Issue #157
+        "fr_n1": 0.0600,
+        "fr_n2": 0.0231,
+        "fr_n3": 0.0130,
+        "fr_n3ish": 0.01301,  # TODO: GitHub Issue #157
+        "fr_p1": 0.0084,
+        "fr_p2": 0.0032,
+        "fr_p3": 0.0019,
+        "fr_p3ish": 0.00191,  # TODO: GitHub Issue #157
+        "HI_min": 0.2,
+        "HI_opt": 0.40,
+        "biomass_dry_down_percent": 0.0,  # TODO: Hard coded total dry down until daily method is modeled - GitHub Issue #156
+        "DM_harvest_percent": 0.0001,  # TODO: Hard coded dry matter percent at harvest - GitHub Issue #155
+        "NDF_harvest_percent": 0.416
+}
+
+FALL_OATS = {
+        "crop_type": 'annual',
+        "harvest_quality": 'null',
+        "feed_id": '103g',
+        "raw_id": 103,
+        "kill_year": True,
+        "T_base_min": 0,
+        "T_base_max": 30,  # TODO: GitHub Issue #157
+        "PHU": 1600, # 1500-1750  # TODO Potential heat units unknown - GitHub Issue #154
+        "fr_LAI_1": 0.02,
+        "LAI_max": 4,
+        "z_root_max": 2000,
+        "kl": 0.65,  # TODO: GitHub Issue #157
+        "RUE": 35,
+        "T_opt": 15,
+        "beta_w": 10,  # TODO: water-use distribution parameter - GitHub Issue #157
+        "epco": 0.5,  # TODO: GitHub Issue #157
+        "fr_n1": 0.0600,
+        "fr_n2": 0.0231,
+        "fr_n3": 0.0134,
+        "fr_n3ish": 0.01341,  # TODO: GitHub Issue #157
+        "fr_p1": 0.0084,
+        "fr_p2": 0.0032,
+        "fr_p3": 0.0019,
+        "fr_p3ish": 0.00191,  # TODO: GitHub Issue #157
+        "HI_min": 0.175,
+        "HI_opt": 0.42,
+        "biomass_dry_down_percent": 0.0,  # TODO: Hard coded total dry down until daily method is modeled - GitHub Issue #156
+        "DM_harvest_percent": 0.0001,  # TODO: Hard coded dry matter percent at harvest - GitHub Issue #155
+        "NDF_harvest_percent": 0.416
+}

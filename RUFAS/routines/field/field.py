@@ -74,10 +74,10 @@ class Fields:
         self.profile_SW = 0.0
         """water in the soil profile (mm)"""  # Psuedocode S.1.A.5
         self.runoff = 0.0
-        """:obj:`float`: soil surface runoff"""  # Psuedocode S.2.8.1?? ToDo - GitHub Issue #174
-        self.drainage = 0.0  # ToDo: no clear reference in psuedocode - GitHub Issue #168
-        self.erosion = 0.0  # equivalent to sed (S.3.A.1)?? ToDo: no clear reference in psuedocode - GitHub Issue #168
-        self.ET = 0.0  # ToDo: no reference in psuedocode - GitHub Issue #168
+        """:obj:`float`: soil surface runoff"""  # Psuedocode S.2.8.1?? TODO - GitHub Issue #174
+        self.drainage = 0.0  # TODO: no clear reference in psuedocode - GitHub Issue #168
+        self.erosion = 0.0  # equivalent to sed (S.3.A.1)?? TODO: no clear reference in psuedocode - GitHub Issue #168
+        self.ET = 0.0  # TODO: no reference in psuedocode - GitHub Issue #168
 
         self.runoff_annual = 0.0
         """:obj:`float`: annual summation of ``runoff``"""
@@ -88,12 +88,12 @@ class Fields:
         self.ET_annual = 0.0
         """:obj:`float`: annual summation of ``ET``"""
         
-        self.manure_applied = 0.0  # is this manure mass (S.5.D.III.1)? ToDo: No clear reference in pseudocode - Github Issue #168
-                                                                      # ToDo: what are the units? - GitHub Issue #174
-        self.manure_N_applied = 0.0  # ToDo: No clear reference in pseudocode - Github Issue #168
-                                     # ToDo: what are the units? - GitHub Issue #174
-        self.manure_P_applied = 0.0  # ToDo: No clear reference in pseudocode - Github Issue #168
-                                     # ToDo: what are the units? - GitHub Issue #174
+        self.manure_applied = 0.0  # is this manure mass (S.5.D.III.1)? TODO: No clear reference in pseudocode - Github Issue #168
+                                                                      # TODO: what are the units? - GitHub Issue #174
+        self.manure_N_applied = 0.0  # TODO: No clear reference in pseudocode - Github Issue #168
+                                     # TODO: what are the units? - GitHub Issue #174
+        self.manure_P_applied = 0.0  # TODO: No clear reference in pseudocode - Github Issue #168
+                                     # TODO: what are the units? - GitHub Issue #174
 
         self.manure_applied_annual = 0.0
         """:obj:`float`: annual summation of ``manure_applied``"""
@@ -102,17 +102,17 @@ class Fields:
         self.manure_P_applied_annual = 0.0
         """:obj:`float`: annual summation of ``manure_P_applied``"""
 
-        self.profile_N = 0.0  # ToDo: what are the units? - GitHub Issue #174
-        self.profile_P = 0.0  # ToDo: what are the units? - GitHub Issue #174
+        self.profile_N = 0.0  # TODO: what are the units? - GitHub Issue #174
+        self.profile_P = 0.0  # TODO: what are the units? - GitHub Issue #174
 
-        self.N_runoff = 0.0  # ToDo: what are the units? - GitHub Issue #174
-        self.P_runoff = 0.0  # ToDo: what are the units? - GitHub Issue #174
+        self.N_runoff = 0.0  # TODO: what are the units? - GitHub Issue #174
+        self.P_runoff = 0.0  # TODO: what are the units? - GitHub Issue #174
 
-        self.N_drainage = 0.0  # ToDo: what are the units? - GitHub Issue #174
-        self.P_drainage = 0.0  # ToDo: what are the units? - GitHub Issue #174
+        self.N_drainage = 0.0  # TODO: what are the units? - GitHub Issue #174
+        self.P_drainage = 0.0  # TODO: what are the units? - GitHub Issue #174
 
-        self.N_erosion = 0.0  # ToDo: what are the units? - GitHub Issue #174
-        self.P_erosion = 0.0  # ToDo: what are the units? - GitHub Issue #174
+        self.N_erosion = 0.0  # TODO: what are the units? - GitHub Issue #174
+        self.P_erosion = 0.0  # TODO: what are the units? - GitHub Issue #174
 
         self.N_runoff_annual = 0.0
         """:obj:`float`: annual summation of ``N_runoff``"""
@@ -127,9 +127,9 @@ class Fields:
         self.P_erosion_annual = 0.0
         """:obj:`float`: annual summation of ``P_erosion``"""
 
-        self.yield_actual = 0.0  # ToDo: what are the units? - GitHub Issue #174
-        self.N_yield = 0.0  # ToDo: what are the units? - GitHub Issue #174
-        self.P_yield = 0.0  # ToDo: what are the units? - GitHub Issue #174
+        self.yield_actual = 0.0  # TODO: what are the units? - GitHub Issue #174
+        self.N_yield = 0.0  # TODO: what are the units? - GitHub Issue #174
+        self.P_yield = 0.0  # TODO: what are the units? - GitHub Issue #174
 
         self.yield_annual = 0.0
         """:obj:`float`: annual summation of ``yield_actual``"""

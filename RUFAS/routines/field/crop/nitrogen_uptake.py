@@ -253,8 +253,8 @@ def calc_act_N_up_each_layer(soil, crop_type):
     crop_type.act_N_up_each_layer = act_N_up_each_layer
 
 
-def N_uptake(soil):  #ToDo: this is a poorly named function: perhaps drawdown_NO3()? - GitHub Issue #171
-    #ToDo: no documentation or psuedocode - GitHub Issue #170
+def N_uptake(soil):  #TODO: this is a poorly named function: perhaps drawdown_NO3()? - GitHub Issue #171
+    #TODO: no documentation or psuedocode - GitHub Issue #170
     for layer in soil.soil_layers:
         layer.NO3 -= layer.N_uptake
 
