@@ -128,10 +128,10 @@ class AnaerobicDigestion(BaseTreatment):
         super().__init__(pen, manure_handler, manure_separator, treatment_init_data)
         self.weather_data = SimpleWeather()
 
-        reception_pit_output_data = self.reception_pit.last_output
-        self.total_solids = 0.1
-        self.volatile_solids = 0  
-        self.wastewater_volume = 1
+        handler = self.manure_handler.last_output
+        self.total_solids = 0.0
+        self.volatile_solids = 0.0
+        self.wastewater_volume = 0.0
         self.minimum_digester_volume=0
         self.top_cover_volume=0
         self.biogas_generation=0
@@ -162,7 +162,7 @@ class AnaerobicDigestion(BaseTreatment):
                 Uses data from AnaerobicDigestorInitData class
                 Uses outputs from ReceptionPitOutputs       
         """
-        handler = self.reception_pit.last_output
+        handler = self.manure_handler.last_output
         self.total_solids = handler.TSd  # kg/day
         self.volatile_solids = handler.VSd + handler.VSnd  # kg/day
         self.wastewater_volume = handler.total_daily_mass
@@ -190,7 +190,6 @@ class AnaerobicDigestion(BaseTreatment):
         self.biogas_generation = self.get_biogas_generation()
 
         # MS.3.B.7
-
         self.methane_generation_volume = self.get_methane_generation_volume(self.biogas_generation)
         # content of biogas (m3)
 
@@ -204,6 +203,7 @@ class AnaerobicDigestion(BaseTreatment):
 
         # MS.3.B.9
         self.effluent_total_solids = self.get_effluent_total_solids()
+
         # MS.3.B.10
         self.effluent_volatile_solids = self.get_effluent_volatile_solids()
         # Nutrient content of outputs
@@ -478,8 +478,6 @@ class AnaerobicDigesterInitData(TreatmentInitData, ABC):
     """
 
 
-    sludge_accumulation_volume: float = 0.0  # SAV total? or is this the fraction
-
     hydraulic_retention_time: int = 25  # 25 -30 days
     sludge_accumulation_period: float = 1.0  # Sludge accumulation period 1-5 years
 
@@ -497,8 +495,8 @@ class AnaerobicDigesterInitData(TreatmentInitData, ABC):
     # Fraction of volatile solids in effluent to original concentration
     VS_FRACTION: float = 0.40
 
-    N_FRACTION: float = 0.01  # 0-5% N fraction
-    P_FRACTION: float = 0.01  # 0-5% P fraction
+    N_FRACTION: float = 0.0  # 0-5% N fraction
+    P_FRACTION: float = 0.0  # 0-5% P fraction
     K_FRACTION: float = 0.0  # 0-5% K fraction
 
     AD_TEMP_SETPOINT: float = 37.5

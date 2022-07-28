@@ -1,5 +1,6 @@
 from tkinter.ttk import Separator
-from RUFAS.routines.manure_management.manure_handlers.manure_handler_classes import BaseManureHandler, ManureHandlerFactory
+from RUFAS.routines.manure_management.manure_handlers.manure_handler_classes import BaseManureHandler
+from RUFAS.routines.manure_management.manure_handlers.manure_handler_output import ManureHandlerOutput
 from RUFAS.routines.manure_management.manure_separators.manure_separator_classes import BaseSeparator
 from pytest import fixture
 from unittest.mock import Mock, MagicMock
@@ -25,7 +26,6 @@ def default_daily_vars_obj() -> DailyVariables:
 def cow(mocker: MockerFixture) -> Cow:
     cw = mocker.MagicMock(spec=Cow)
     return cw
-
 
 @fixture
 def pen0(mocker: MockerFixture, cow: Cow) -> Pen:
@@ -66,8 +66,41 @@ def mock_pen(mocker:MockerFixture) ->SimplePen:
     return pen
 
 @fixture
-def mock_handler(mocker:MockerFixture)->BaseManureHandler:
+def mock_handler_output_simple(mocker:MockerFixture)->ManureHandlerOutput:
+    sample_output = mocker.MagicMock(spec=ManureHandlerOutput)
+    sample_output.manure_nitrogen = 1.0
+    sample_output.TSd= 10.0
+    sample_output.VSd = 2.0
+    sample_output.VSnd = 1.0
+    sample_output.VS_total = 3.0
+    sample_output.p_excrt_manure = 1.0
+    sample_output.K_manure= 1.0
+    sample_output.total_daily_mass = 100.0
+    return sample_output
+
+@fixture
+def mock_handler_output(mocker:MockerFixture)->ManureHandlerOutput:
+    sample_output = mocker.MagicMock(spec=ManureHandlerOutput)
+    sample_output.manure_nitrogen = 0
+    sample_output.TSd= 2548.70
+    sample_output.VSd = 1980.94
+    sample_output.VSnd = 0.0
+    sample_output.VS_total = 1980.94
+    sample_output.p_excrt_manure = 0
+    sample_output.K_manure= 0
+    sample_output.total_daily_mass = 270510
+    return sample_output
+
+@fixture
+def mock_handler(mocker:MockerFixture, mock_handler_output)->BaseManureHandler:
     manure_handler = mocker.MagicMock(spec=BaseManureHandler)
+    manure_handler.last_output = mock_handler_output
+    return manure_handler
+
+@fixture
+def mock_handler_simple(mocker:MockerFixture, mock_handler_output_simple)->BaseManureHandler:
+    manure_handler = mocker.MagicMock(spec=BaseManureHandler)
+    manure_handler.last_output = mock_handler_output_simple
     return manure_handler
 
 @fixture
@@ -75,8 +108,6 @@ def mock_separator(mocker:MockerFixture,mock_reception_pit)->BaseSeparator:
     manure_separator = mocker.MagicMock(spec=BaseSeparator)
     manure_separator.reception_pit = mock_reception_pit
     return manure_separator
-
-
 
 @fixture
 def mock_reception_pit_output(mocker:MockerFixture)->ReceptionPitOutput:
@@ -92,19 +123,6 @@ def mock_reception_pit_output(mocker:MockerFixture)->ReceptionPitOutput:
     return sample_output_reception_pit
 
 @fixture
-def mock_reception_pit_output_zeros(mocker:MockerFixture)->ReceptionPitOutput:
-    sample_output_reception_pit = mocker.MagicMock(spec=ReceptionPitOutput)
-    sample_output_reception_pit.manure_nitrogen = 0.0
-    sample_output_reception_pit.TSd= 0.0
-    sample_output_reception_pit.VSd = 0.0
-    sample_output_reception_pit.VSnd = 0.0
-    sample_output_reception_pit.VS_total = 0.0
-    sample_output_reception_pit.p_excrt_manure = 0.0
-    sample_output_reception_pit.K_manure= 0.0
-    sample_output_reception_pit.total_daily_mass = 1.0
-    return sample_output_reception_pit
-
-@fixture
 def mock_reception_pit(mocker:MockerFixture, mock_reception_pit_output)->BaseReceptionPit:
     reception_pit = mocker.MagicMock(spec=BaseReceptionPit)
     sample_output_reception_pit = mock_reception_pit_output
@@ -112,22 +130,9 @@ def mock_reception_pit(mocker:MockerFixture, mock_reception_pit_output)->BaseRec
     return reception_pit
 
 @fixture
-def mock_reception_pit_zeros(mocker:MockerFixture, mock_reception_pit_output_zeros)->BaseReceptionPit:
-    reception_pit = mocker.MagicMock(spec=BaseReceptionPit)
-    sample_output_reception_pit = mock_reception_pit_output_zeros
-    reception_pit.last_output = mock_reception_pit_output_zeros
-    return reception_pit
-
-@fixture
-def mock_weather_data():
-    weather_data = Mock()
-    weather_data.T_avg = 25
-    return weather_data
-
-@fixture
-def init_data(mocker:MockerFixture)->AnaerobicDigesterInitData:
+def mock_init_data(mocker:MockerFixture)->AnaerobicDigesterInitData:
     init_data = mocker.MagicMock(spec=AnaerobicDigesterInitData)
-    init_data.sludge_accumulation_volume = 0.0  
+
     init_data.hydraulic_retention_time = 25  
     init_data.sludge_accumulation_period = 1.0  
     init_data.SAV_FRACTION = 0.03  
@@ -138,8 +143,8 @@ def init_data(mocker:MockerFixture)->AnaerobicDigesterInitData:
     init_data.EVAPORATION_FRACTION = 0.02  
     init_data.TS_FRACTION = 0.45  
     init_data.VS_FRACTION = 0.40  
-    init_data.N_FRACTION = 0.01  
-    init_data.P_FRACTION = 0.01  
+    init_data.N_FRACTION = 0.0  
+    init_data.P_FRACTION = 0.0  
     init_data.K_FRACTION = 0.0  
 
     init_data.AD_TEMP_SETPOINT= 37.5
@@ -148,27 +153,21 @@ def init_data(mocker:MockerFixture)->AnaerobicDigesterInitData:
     return init_data
  
 @fixture
-def ad_fixture(pen0,mock_handler,mock_separator,init_data,mock_reception_pit,mock_weather_data):
-
+def ad_fixture(pen0,mock_handler,mock_separator,mock_init_data):
     pen= pen0
     manure_handler= mock_handler
     manure_separator= mock_separator
-    init_data = init_data
-    reception_pit = mock_reception_pit
-    weather_data = mock_weather_data
-
+    init_data = mock_init_data
     ad = AnaerobicDigestion(pen=pen,manure_handler=manure_handler,manure_separator=manure_separator, \
         treatment_init_data=init_data)
     return ad
 
 @fixture
-def ad_fixture_zeros(pen0,mock_handler,mock_separator,init_data,mock_reception_pit_zeros,mock_weather_data):
-
+def ad_fixture_simple(pen0,mock_handler_simple,mock_separator,mock_init_data):
     pen= pen0
-    manure_handler= mock_handler
+    manure_handler= mock_handler_simple
     manure_separator= mock_separator
-    init_data = init_data
-
+    init_data = mock_init_data
     ad = AnaerobicDigestion(pen=pen,manure_handler=manure_handler,manure_separator=manure_separator, \
         treatment_init_data=init_data)
     return ad
@@ -177,7 +176,7 @@ def ad_fixture_zeros(pen0,mock_handler,mock_separator,init_data,mock_reception_p
 def get_expected_values():
     expected_values=Mock()
     ##Non-daily_output values
-    expected_values.moisture_content=0.90
+    expected_values.moisture_content=0.9905
     expected_values.input_energy_heating=0.0
     expected_values.sludge_accumulation_volume=0.0
     expected_values.minimum_digester_volume=1.0
@@ -202,32 +201,14 @@ def get_expected_values():
     expected_values.AD_input_energy_heating=0.0
     return expected_values
 
-
 @fixture
-def get_expected_values_zeros():
-    expected_values=MagicMock()
+def get_expected_values_sheet():
+    expected_values=Mock()
     ##Non-daily_output values
-    expected_values.moisture_content=0.0
-    expected_values.input_energy_heating=0.0
-    expected_values.sludge_accumulation_volume=0.0
-    expected_values.minimum_digester_volume=0.0
-    expected_values.top_cover_volume=0.0
-    expected_values.energy_content=0.0
-    expected_values.evaporated_water=0.0
+    expected_values.sludge_accumulation_volume=21.69
+    expected_values.minimum_digester_volume=6763
+    expected_values.top_cover_volume=1352.57
     #daily_output values
-    expected_values.urea=0.0
-    expected_values.TAN_s=0.0
-    expected_values.manure_nitrogen=0.0
-    expected_values.TSd=0.0
-    expected_values.VSd=0.0
-    expected_values.VSnd=0.0
-    expected_values.VS_total=0.0
-    expected_values.p_excrt_manure=0.0
-    expected_values.K_manure=0.0
-    expected_values.total_daily_mass=0.0
-    expected_values.AD_effluent_volume=0.0
-    expected_values.AD_biogas=0.0
-    expected_values.AD_biogas_energy_content=0.0
-    expected_values.AD_methane_generation_volume=0.0
-    expected_values.AD_input_energy_heating=0.0
+    expected_values.AD_biogas=475.4
+    expected_values.AD_methane_generation_volume=309.0
     return expected_values
