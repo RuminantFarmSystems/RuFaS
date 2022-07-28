@@ -158,7 +158,7 @@ def ad_fixture(pen0,mock_handler,mock_separator,init_data,mock_reception_pit,moc
     weather_data = mock_weather_data
 
     ad = AnaerobicDigestion(pen=pen,manure_handler=manure_handler,manure_separator=manure_separator, \
-        treatment_init_data=init_data,reception_pit=reception_pit,weather_data=weather_data)
+        treatment_init_data=init_data)
     return ad
 
 @fixture
@@ -168,11 +168,9 @@ def ad_fixture_zeros(pen0,mock_handler,mock_separator,init_data,mock_reception_p
     manure_handler= mock_handler
     manure_separator= mock_separator
     init_data = init_data
-    reception_pit = mock_reception_pit_zeros
-    weather_data = mock_weather_data
 
     ad = AnaerobicDigestion(pen=pen,manure_handler=manure_handler,manure_separator=manure_separator, \
-        treatment_init_data=init_data,reception_pit=reception_pit,weather_data=weather_data)
+        treatment_init_data=init_data)
     return ad
 
 @fixture
