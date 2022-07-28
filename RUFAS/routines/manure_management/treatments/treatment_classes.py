@@ -314,6 +314,14 @@ class AnaerobicDigestion(BaseTreatment):
         """
         return biogas_generation * self.treatment_init_data.METHANE_GEN_RATIO  ## MethaneY_DENSITY  ###
 
+    def get_methane_volume_using_chen_equation(self):
+        """Returns methane_generation_volume as calculated by Chen and Hashimoto Model 
+        """
+        Go = 240 ## Methane potential (mL/g VS)
+        KCH = 3.1 ## Chen and Hashimoto kinetic constant 
+        sgr = 0.637 ## Specific Growth Rate (micrometers)
+        return Go*(1-KCH/(self.treatment_init_data.hydraulic_retention_time*sgr+KCH-1)) * self.effluent_volatile_solids*Constants.GRAMS_TO_KG  ##
+
     def get_energy_content(self,methane_generation_volume):
         """Returns energy content of methane
         :param methane_generation_volume: 

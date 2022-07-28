@@ -83,6 +83,11 @@ def test_get_methane_generation_volume(get_expected_values,ad_fixture,init_data)
     expected = get_expected_values
     assert pytest.approx(ad.get_methane_generation_volume(biogas_generation),0.1) == biogas_generation * init_data.METHANE_GEN_RATIO
 
+def test_get_methane_volume_using_chen_equation(ad_fixture,init_data):
+    ad = ad_fixture
+    ad.update()
+    assert pytest.approx(ad.get_methane_volume_using_chen_equation(),0.1) == 240*(1-3.1/(init_data.hydraulic_retention_time*0.637+3.1-1)) * ad.effluent_volatile_solids*Constants.GRAMS_TO_KG
+
 
 def test_get_energy_content(get_expected_values,ad_fixture,init_data):
     ad = ad_fixture
