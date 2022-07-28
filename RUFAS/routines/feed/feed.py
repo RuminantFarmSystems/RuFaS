@@ -68,11 +68,6 @@ class Feed:
         self.purchased_feeds_entries = data['purchased_feeds']
         self.purchased_feeds = []  # set in the next method call
 
-        # TODO: possibly convert these to sets instead of lists
-        self.input_calf_feeds = data['calf_feeds']
-        self.input_growing_feeds = data['growing_feeds']
-        self.input_close_up_feeds = data['close_up_feeds']
-        self.input_lac_cow_feeds = data['lac_cow_feeds']
 
         self.input_feed_combinations = {
             Pen.AnimalCombination.CALF: set(data['calf_feeds']),
