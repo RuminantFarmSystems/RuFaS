@@ -132,8 +132,22 @@ class AnaerobicDigestion(BaseTreatment):
         self.total_solids = 0.1
         self.volatile_solids = 0  
         self.wastewater_volume = 1
-
-
+        self.minimum_digester_volume=0
+        self.top_cover_volume=0
+        self.biogas_generation=0
+        self.effluent_total_solids=0
+        self.effluent_volatile_solids=0
+        self.methane_generation_volume=0
+        self.energy_content=0
+        self.input_energy_heating=0
+        self.sludge_accumulation_volume=0
+        self.evaporated_water=0
+        self.effluent_waste_volume=0
+        self.N_content=0
+        self.P_content=0
+        self.K_content=0
+        self.sludge_accumulation_volume=0
+        
 
     def update(self) -> TreatmentOutput:
         daily_output = self.calculate_digester_outputs_daily_step()
@@ -148,17 +162,15 @@ class AnaerobicDigestion(BaseTreatment):
                 Uses data from AnaerobicDigestorInitData class
                 Uses outputs from ReceptionPitOutputs       
         """
-        reception_pit_output_data = self.reception_pit.last_output
-        self.total_solids = reception_pit_output_data.TSd  # kg/day
-        self.volatile_solids = reception_pit_output_data.VSd + reception_pit_output_data.VSnd  # kg/day
-        self.wastewater_volume = reception_pit_output_data.total_daily_mass
-
+        handler = self.reception_pit.last_output
+        self.total_solids = handler.TSd  # kg/day
+        self.volatile_solids = handler.VSd + handler.VSnd  # kg/day
+        self.wastewater_volume = handler.total_daily_mass
 
         moisture_content = self.get_moisture_content()
         T_avg = self.weather_data.T_avg
-
         self.input_energy_heating = self.calcSpecificInputEnergy(T_avg,moisture_content)*self.wastewater_volume
-
+        
         ## m^3/year  MS.3.B.1
         self.sludge_accumulation_volume = self.get_sav()
 
@@ -195,21 +207,22 @@ class AnaerobicDigestion(BaseTreatment):
         # MS.3.B.10
         self.effluent_volatile_solids = self.get_effluent_volatile_solids()
         # Nutrient content of outputs
-        self.N_content = self.get_nutrient_content(self.treatment_init_data.N_FRACTION,reception_pit_output_data.manure_nitrogen)
-        self.P_content = self.get_nutrient_content(self.treatment_init_data.P_FRACTION,reception_pit_output_data.p_excrt_manure)
-        self.K_content = self.get_nutrient_content(self.treatment_init_data.K_FRACTION,reception_pit_output_data.K_manure)
-       
-        daily_output = AnaerobicDigesterOutput(
+        self.N_content = self.get_nutrient_content(self.treatment_init_data.N_FRACTION,handler.manure_nitrogen)
+        self.P_content = self.get_nutrient_content(self.treatment_init_data.P_FRACTION,handler.p_excrt_manure)
+        self.K_content = self.get_nutrient_content(self.treatment_init_data.K_FRACTION,handler.K_manure)
+
+        ad_daily_output = AnaerobicDigesterOutput(
                     urea = 0.0,
                     TAN_s = 0.0,
                     manure_nitrogen = self.N_content,
                     TSd = self.effluent_total_solids,
-                    VSd = self.effluent_volatile_solids-reception_pit_output_data.VSnd,
-                    VSnd = reception_pit_output_data.VSnd,
+                    VSd = self.effluent_volatile_solids-handler.VSnd,
+                    VSnd = handler.VSnd,
                     VS_total = self.effluent_volatile_solids,
                     p_excrt_manure = self.P_content,
                     K_manure = self.K_content,
                     total_daily_mass = self.effluent_waste_volume, 
+                    final_volume=self.effluent_waste_volume,
 
                     ## Outputs for AD
                     AD_effluent_volume = self.effluent_waste_volume,                     ## methane production per day (m3/day)
@@ -217,12 +230,20 @@ class AnaerobicDigestion(BaseTreatment):
                     AD_biogas_energy_content = self.energy_content,                       ## biogas energy content (MJ/m3)  
                     AD_methane_generation_volume =self.methane_generation_volume,   
                     AD_input_energy_heating =self.input_energy_heating                   
-
         )
 
+        daily_output = TreatmentOutput(
+                    manure_nitrogen = self.N_content,
+                    TSd = self.effluent_total_solids,
+                    VSd = self.effluent_volatile_solids-handler.VSnd,
+                    VSnd = handler.VSnd,
+                    VS_total = self.effluent_volatile_solids,
+                    p_excrt_manure = self.P_content,
+                    K_manure = self.K_content,
+                    total_daily_mass = self.effluent_waste_volume, 
+                    final_volume=self.effluent_waste_volume,
+        )
         return daily_output
-
-
 
    
     def get_moisture_content(self):
@@ -425,7 +446,7 @@ class StoragePondInitData(TreatmentInitData):
 
     """
 
-    percent_dry_solids = 0.0
+    percent_dry_solids = 1.0
     TS_removal_efficiency = 0.15
     VS_removal_efficiency = 0.85
     N_removal_efficiency = 0.05
@@ -474,3 +495,6 @@ class AnaerobicDigesterInitData(TreatmentInitData, ABC):
 
     AD_TEMP_SETPOINT: float = 37.5
     AD_TEMP: float = 37.5
+    @classmethod
+    def get_instance(cls) -> TreatmentInitData:
+        return AnaerobicDigesterInitData()
