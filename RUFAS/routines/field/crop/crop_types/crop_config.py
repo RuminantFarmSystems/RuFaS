@@ -13,7 +13,7 @@ Description:
     or genotypes)
 
     These variables should have the same name as the specific crop type that they are meant to house data for, but in
-    capital case. For example, the ``Alfalfa`` class (alfalfa.py) used the config variable ``ALFALFA``
+    capital case. For example, the ``Alfalfa`` class (alfalfa.py) uses the config variable ``ALFALFA``
 
     These configuration variables should NOT include any attributes that are calculated internally,
     iterators or accumulators, attributes whose values do not differ from those in the inherited ``BaseCrop`` class,
@@ -23,7 +23,10 @@ Description:
 # TODO: It may be best to document all contained attributes in this file.
 
 # TODO: I think that the individual classes can be removed and populated with a switch. Something like
-#   Crop(crop = "alpfalfa") vs Crop(crop = "corn")
+#   Crop(crop = "alfalfa") vs Crop(crop = "corn")
+
+from RUFAS.routines.field.crop.crop_types.base_crop import BaseCrop
+
 
 # alfalfa.py
 ALFALFA = {
@@ -170,13 +173,12 @@ CEREAL_RYE = {
 
 FALL_OATS = {
         "crop_type": 'annual',
-        "harvest_quality": 'null',
         "feed_id": '103g',
         "raw_id": 103,
         "kill_year": True,
         "T_base_min": 0,
         "T_base_max": 30,  # TODO: GitHub Issue #157
-        "PHU": 1600, # 1500-1750  # TODO Potential heat units unknown - GitHub Issue #154
+        "PHU": 1600,  # 1500-1750  # TODO Potential heat units unknown - GitHub Issue #154
         "fr_LAI_1": 0.02,
         "LAI_max": 4,
         "z_root_max": 2000,
@@ -199,3 +201,287 @@ FALL_OATS = {
         "DM_harvest_percent": 0.0001,  # TODO: Hard coded dry matter percent at harvest - GitHub Issue #155
         "NDF_harvest_percent": 0.416
 }
+
+POTATO = {
+        "crop_type": 'annual',
+        "feed_id": '105g',
+        "raw_id": 105,
+        "kill_year": True,
+        "T_base_min": 10,  # TODO: GitHub Issue #157
+        "T_base_max": 40,
+        "PHU": 1000,
+        "fr_PHU_harvest": 1.2,
+        "LAI_max": 4,
+        "z_root_max": 600,
+        "T_opt": 22,
+        "beta_w": 10,
+        "epco": 0.5,
+        "fr_n1": 0.055,
+        "fr_n2": 0.02,
+        "fr_n3": 0.012,
+        "fr_n3ish": 0.0121,
+        "fr_p1": 0.006,
+        "fr_p2": 0.0025,
+        "fr_p3": 0.0019,
+        "fr_p3ish": 0.00191,
+        "HI_min": 0.95,
+        "HI_opt": 0.95,
+        "harvest_eff": 1.2,
+        "DM_harvest_percent": 0.0001,  # TODO: Hard coded dry matter percent at harvest - GitHub Issue #155
+        "NDF_harvest_percent": 0.416,
+}
+
+SOYBEAN = {
+        "crop_type": 'annual',
+        "raw_id": 121,
+        "feed_id": '121g',
+        "kill_year": True,
+        "fix_nitrogen": True,
+        "T_base_max": 43.33,
+        "PHU": 1150,
+        "fr_LAI_1": 0.05,
+        "fr_PHU_harvest": 1.2,
+        "z_root_max": 1700,
+        "kl": 0.45,
+        "RUE": 25,
+        "T_opt": 25,
+        "beta_w": 10,
+        "epco": 1,
+        "fr_n1": 0.0524,
+        "fr_n2": 0.0265,
+        "fr_n3": 0.0258,
+        "fr_n3ish": 0.02581,
+        "fr_p1": 0.0074,
+        "fr_p2": 0.0037,
+        "fr_p3": 0.0035,
+        "fr_p3ish": 0.00351,
+        "HI_min": 0.01,
+        "HI_opt": 0.31,
+        "DM_harvest_percent": 0.15,  # TODO: Hard coded dry matter percent at harvest - GitHub Issue #155
+        "NDF_harvest_percent": 0.466
+}
+
+SPRING_BARLEY = {
+        "crop_type": 'annual',
+        "feed_id": '10g',
+        "raw_id": 10,
+        "kill_year": True,
+        "T_base_min": 10,
+        "T_base_max": 35,
+        "PHU": 952,
+        "fr_PHU_2": 0.45,
+        "fr_PHU_harvest": 1.2,
+        "LAI_max": 4,
+        "z_root_max": 1300,
+        "RUE": 35,
+        "beta_w": 10,
+        "epco": 0.5,
+        "fr_n1": 0.059,
+        "fr_n2": 0.0226,
+        "fr_n3": 0.0131,
+        "fr_n3ish": 0.01311,
+        "fr_p1": 0.0057,
+        "fr_p2": 0.0022,
+        "fr_p3": 0.0013,
+        "fr_p3ish": 0.00131,
+        "HI_min": 0.2,
+        "harvest_eff": 0.54,
+        "DM_harvest_percent": 0.0001,  # TODO: Hard coded dry matter percent at harvest - GitHub Issue #155
+        "NDF_harvest_percent": 0.416
+}
+
+SPRING_WHEAT = {
+        "crop_type": 'annual',
+        "feed_id": '130g',
+        "raw_id": 130,
+        "kill_year": True,
+        "fix_nitrogen": False,  # TODO: change back - GitHub Issue #160
+        "T_base_min": 0,
+        "T_base_max": 35,
+        "PHU": 996,
+        "fr_LAI_1": 0.05,
+        "fr_PHU_harvest": 1.2,
+        "LAI_max": 4,
+        "z_root_max": 2000,
+        "RUE": 35,
+        "T_opt": 18,
+        "beta_w": 10,
+        "epco": 0.5,
+        "fr_n1": 0.06,
+        "fr_n2": 0.0231,
+        "fr_n3": 0.0134,
+        "fr_n3ish": 0.01341,
+        "fr_p1": 0.0084,
+        "fr_p2": 0.0032,
+        "fr_p3": 0.0019,
+        "fr_p3ish": 0.00191,
+        "HI_min": 0.2,
+        "HI_opt": 0.42,
+        "DM_harvest_percent": 0.0001,  # TODO: Hard coded dry matter percent at harvest - GitHub Issue #155
+        "NDF_harvest_percent": 0.416,
+}
+
+SUGAR_BEET = {
+        "crop_type": 'annual',
+        "feed_id": '11g',
+        "raw_id": 11,
+        "kill_year": True,
+        "T_base_min": 1.1,
+        "PHU": 1253,
+        "fr_PHU_1": 0.05,
+        "fr_LAI_1": 0.05,
+        "fr_PHU_sen": 0.90,
+        "fr_PHU_harvest": 1.2,
+        "LAI_max": 5,
+        "z_root_max": 2000,
+        "RUE": 30,
+        "T_opt": 18,
+        "beta_w": 10,
+        "epco": 0.5,
+        "fr_n1": 0.055,
+        "fr_n2": 0.02,
+        "fr_n3": 0.012,
+        "fr_n3ish": 0.0121,
+        "fr_p1": 0.006,
+        "fr_p2": 0.0025,
+        "fr_p3": 0.0019,
+        "fr_p3ish": 0.00191,
+        "HI_min": 0.95,
+        "HI_opt": 0.95,
+        "harvest_eff": 0.549,
+        "DM_harvest_percent": 0.0001,  # TODO: Hard coded dry matter percent at harvest - GitHub Issue #155
+        "NDF_harvest_percent": 0.458,
+}
+
+TALL_FESCUE = {
+        "crop_type": 'perennial',
+        "feed_id": '56g',
+        "raw_id": 56,
+        "T_base_min": 10,  # TODO parameter unknown - GitHub Issue #155
+        "T_base_max": 40,
+        "PHU": 648,
+        "fr_PHU_sen": 0.8,
+        "fr_PHU_harvest": 0.6,
+        "fr_PHU_harvest_min": 0.9,
+        "LAI_max": 4,
+        "LAI_min": 0.75,
+        "z_root_max": 2000,
+        "RUE": 30,
+        "T_opt": 15,
+        "beta_w": 10,  # TODO: unknown value
+        "epco": 0.5,
+        "fr_n1": 0.0560,
+        "fr_n2": 0.0210,
+        "fr_n3": 0.0120,
+        "fr_n3ish": 0.0121,
+        "fr_p1": 0.0099,
+        "fr_p2": 0.0022,
+        "fr_p3": 0.0019,
+        "fr_p3ish": 0.00191,
+        "HI_min": 0.9,
+        "HI_opt": 0.9,
+        "DM_harvest_percent": 0.0001,  # TODO: Hard coded dry matter percent at harvest - GitHub Issue #155
+        'NDF_harvest_percent': 0.416
+}
+
+TRITICALE = {
+        "crop_type": 'annual',
+        "feed_id": '125g',
+        "raw_id": 125,
+        "kill_year": True,
+        "T_base_min": 0,
+        "T_base_max": 30,  # TODO: GitHub Issue #157
+        "PHU": 1600,  # 1550-1680  # TODO Potential heat units unknown - GitHub Issue #154
+        "fr_PHU_1": 0.05,
+        "fr_PHU_2": 0.45,
+        "fr_LAI_1": 0.05,
+        "LAI_max": 4,
+        "z_root_max": 1300,
+        "kl": 0.65,  # TODO: GitHub Issue #157
+        "RUE": 30,
+        "T_opt": 18,
+        "beta_w": 10,  # TODO: water-use distribution parameter - GitHub Issue #157
+        "epco": 0.5,  # TODO: GitHub Issue #157
+        "fr_n1": 0.0663,
+        "fr_n2": 0.0255,
+        "fr_n3": 0.0148,
+        "fr_n3ish": 0.01481,
+        "fr_p1": 0.0053,
+        "fr_p2": 0.0020,
+        "fr_p3": 0.0012,
+        "fr_p3ish": 0.00121,
+        "HI_min": 0.2,
+        "HI_opt": 0.4,
+        "DM_harvest_percent": 0.0001,  # TODO: Hard coded dry matter percent at harvest - GitHub Issue #155
+        "NDF_harvest_percent": 0.416
+}
+
+WINTER_WHEAT = {
+        "crop_type": 'annual',
+        "feed_id": '130g',
+        "raw_id": 130,
+        "kill_year": True,
+        "T_base_min": 0,
+        "T_base_max": 30,  # TODO: GitHub Issue #157
+        "PHU": 1600,  # 1550-1680  # TODO Potential heat units unknown - GitHub Issue #154
+        "fr_PHU_1": 0.05,
+        "fr_PHU_2": 0.45,
+        "fr_LAI_1": 0.05,
+        "LAI_max": 4,
+        "LAI_min": 0,
+        "z_root_max": 1300,
+        "kl": 0.65,  # TODO: GitHub Issue #157
+        "RUE": 30,
+        "T_opt": 18,  # TODO: GitHub Issue #157
+        "beta_w": 10,  # TODO: water-use distribution parameter - GitHub Issue #157
+        "epco": 0.5,  # TODO: GitHub Issue #157
+        "fr_n1": 0.0663,
+        "fr_n2": 0.0255,
+        "fr_n3": 0.0148,
+        "fr_n3ish": 0.01481,
+        "fr_p1": 0.0053,
+        "fr_p2": 0.0020,
+        "fr_p3": 0.0012,
+        "fr_p3ish": 0.00121,
+        "HI_min": 0.2,
+        "HI_opt": 0.4,
+        "DM_harvest_percent": 0.0001,  # TODO: Hard coded dry matter percent at harvest - GitHub Issue #155
+        'NDF_harvest_percent': 0.416
+}
+
+# TODO: this class is not used, but perhaps should replace all child classes, to avaid repeating code.
+#  This class is incomplete. Also, it may be best to keep classes separate if class-specific methods
+#  are planned.
+#  This functionality could simply be added to BaseCrop as well.
+class ChildCrop(BaseCrop):
+        def __init__(self, crop_name, data, species=None):
+                super().__init__()
+
+                # get soybean variables from input data:
+                self.plant_years = data['plant_years']
+                self.repeat = data['repeat']
+                self.planting_day = data['planting_day']
+                self.harvest_day = data['harvest_day']
+                self.harvest_type = data['harvest_type']
+                self.planting_order = data['planting_order'].lower()
+                self.extracted = data['extracted']
+                self.crop_name = crop_name
+
+                # get crop species
+                self.species = self.get_crop_species(species)
+
+                # assign attributes from corn dictionary in crop config file
+                crop_data_dict = globals()[self.species.upper()]
+                for key, val in crop_data_dict.items():
+                        setattr(self, key, val)
+
+        def get_crop_species(self, species):
+                if species is None:
+                        return None
+                else:
+                        return species
+
+#test_child = ChildCrop(crop_name="corn98",
+#                       data={"plant_years": 1989, "repeat": 0, "planting_day": 0, "harvest_day": 0,
+#                             "harvest_type": "optimal", "planting_order": "", "extracted": False},
+#                       species="Corn")
