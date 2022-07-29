@@ -4,17 +4,19 @@ File name: old_manure_management.py
 Description: Implements test cases
 Author(s): Sadman Chowdhury, skc86@cornell.edu
 """
+from unittest import expectedFailure
+from RUFAS.simulation_engine import SimulationEngine
+from RUFAS.routines.manure_management.misc.manure import Manure
+from RUFAS.routines.manure_management.misc.constants import ManureManagementConstants
 from typing import List
 
 from pytest import approx
 
 from RUFAS.routines.manure_management.gas_emissions.gas_emissions import GasEmissions
-from RUFAS.routines.manure_management.misc.constants import ManureManagementConstants
-from RUFAS.routines.manure_management.misc.manure import Manure
-from RUFAS.simulation_engine import SimulationEngine
-
+from RUFAS.routines.manure_management.manure_handlers.milking_center import MilkingCenter
 
 # --------------------------- Test misc module
+
 
 def test_manure_init() -> None:
     """Unit test for function __init__ in file manure.py"""
@@ -39,19 +41,19 @@ def test_manure_init() -> None:
     # Given some arguments, a new Manure object should either set the corresponding
     # attributes to the given values or do some calculations.
     manure = Manure(
-            # The following attributes should be modified.
-            U=1.0,
-            TAN_s=1.0,
-            MN=1.0,
-            VSd=1.0,
-            VSnd=1.0,
-            p_excrt_manure=1.0,
-            K_manure=1.0,
+        # The following attributes should be modified.
+        U=1.0,
+        TAN_s=1.0,
+        MN=1.0,
+        VSd=1.0,
+        VSnd=1.0,
+        p_excrt_manure=1.0,
+        K_manure=1.0,
 
-            # The following attributes should stay the same.
-            # Only pick two as an example.
-            Mkg=10.0,
-            CH4_manure=10.0
+        # The following attributes should stay the same.
+        # Only pick two as an example.
+        Mkg=10.0,
+        CH4_manure=10.0
     )
     constants = ManureManagementConstants
     assert manure.U == approx(constants.UREA_MOLAR_MASS)
@@ -73,7 +75,31 @@ def test_manure_init() -> None:
 
 
 # --------------------------- Test manure handlers module
+first_instance_of_milking_center = MilkingCenter()
 
+
+def test_total_minutes_spent_in_holding_area():
+    result = first_instance_of_milking_center.total_minutes_spent_in_holding_area
+    expected_value = 90.0
+    assert result == expected_value
+
+
+def test_total_minutes_spent_milking():
+    result = first_instance_of_milking_center.total_minutes_spent_milking
+    expected_value = 21.0
+    assert result == expected_value
+
+
+def test_total_minutes_spent_in_milking_center():
+    result = first_instance_of_milking_center.total_minutes_spent_in_milking_center
+    expected_value = 111.0
+    assert result == expected_value
+
+
+def test_total_percent_of_day_spent_in_milking_center():
+    result = first_instance_of_milking_center.total_percent_of_day_spent_in_milking_center
+    expected_value = 0
+    assert result == expected_value
 # --------------------------- Test reception pits module
 
 # --------------------------- Test manure separators module
@@ -109,7 +135,7 @@ def test_convert_temp_C_to_K():
     temps_in_C = [-273.15, 0, 100]
     expected_temps = [0, 273.15, 373.15]
     result_temps = [GasEmissions.convert_temp_C_to_K(
-            temp) for temp in temps_in_C]
+        temp) for temp in temps_in_C]
     assert_two_lists_equal(expected_temps, result_temps)
 
 
@@ -219,7 +245,7 @@ def test_calc_overall_mass_transfer_coefficient():
     Kl = 3
     Rm = 4
     value_to_test = GasEmissions.calc_overall_mass_transfer_coefficient(
-            H, Kg, Kl, Rm)
+        H, Kg, Kl, Rm)
     result = 0.20689655172413796
     assert value_to_test == result
 
@@ -229,7 +255,7 @@ def test_calc_concentration_of_ammonia_in_manure():
     F = 10
     C_tan = 3
     value_to_test = GasEmissions.calc_conc_of_NH3_in_manure(
-            F, C_tan)
+        F, C_tan)
     result = 30
     assert value_to_test == result
 
