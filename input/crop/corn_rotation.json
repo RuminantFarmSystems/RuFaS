@@ -6,8 +6,8 @@
             "plant_years": [2009],
             "repeat": 1,
             "planting_day": 121,
-            "harvest_day": 319,
-            "harvest_type": "optimal"
+            "harvest_day": 283,
+            "harvest_type": "scheduled"
         }
     }
 }
