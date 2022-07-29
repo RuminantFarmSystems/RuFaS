@@ -214,10 +214,9 @@ class BaseCrop:
         """float: harvest efficiency, as a percent of plant biomass"""
         self.gamma_wu = 0  # psuedocode C.9.C.1
         """float: water defficiency factor"""
-        self.biomass_dry_down_percent = 0  # TODO: no pseudocode reference - GitHub Issue #168
-        # TODO: Hard coded total dry down until daily method is modeled - GitHub Issue #156
-        self.DM_harvest_percent = 0.15  # TODO: no pseudocode reference - GitHub Issue #168
-        self.NDF_harvest_percent = 0.42  # TODO: no pseudocode reference - GitHub Issue #168
+        self.biomass_dry_down_percent = 0  # TODO: no pseudocode reference - GitHub Issue #168, #156
+        self.DM_harvest_percent = 0.15  # TODO: no pseudocode reference - GitHub Issue #168, #156
+        self.NDF_harvest_percent = 0.42  # TODO: no pseudocode reference - GitHub Issue #168, #156
         self.bio_AG = 0  # psuedocode C.10.H.1
         """float: Above ground biomass (kg/ha)"""
         self.bio_BG = 0  # psuedocode C.10.H.4
