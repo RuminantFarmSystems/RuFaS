@@ -337,17 +337,17 @@ class Pen:
                     'HeiferII' in self.classes_in_pen or \
                     'HeiferIII' in self.classes_in_pen:
                 ration_per_animal, ration_vals = \
-                    ration_driver.ration_formulation(self, feed, available_feeds, 'heifer', False)
+                    ration_driver.ration_formulation(self,  available_feeds, 'heifer', False)
 
             elif 'Cow' in self.classes_in_pen and \
                     self.animals_in_pen[0].milking:  # lactating cow
                 ration_per_animal, ration_vals = \
-                    ration_driver.ration_formulation(self, feed, available_feeds, 'cow', True)
+                    ration_driver.ration_formulation(self,  available_feeds, 'cow', True)
 
             elif 'Cow' in self.classes_in_pen and \
                     not self.animals_in_pen[0].milking:  # dry cow
                 ration_per_animal, ration_vals = \
-                    ration_driver.ration_formulation(self, feed, available_feeds, 'cow', False)
+                    ration_driver.ration_formulation(self,available_feeds, 'cow', False)
 
             else:  # this should never occur
                 print('error in pen ration calculation')

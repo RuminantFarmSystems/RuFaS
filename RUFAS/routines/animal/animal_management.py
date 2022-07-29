@@ -727,10 +727,12 @@ class AnimalManagement:
         Args:
             feed: instance of the Feed class
         """
+
         available_feeds = ration_driver.AvailableFeeds()
         available_feeds.feed_nutrients(feed)
         for i, pen in enumerate(self.all_pens):
             if pen.pen_populated:
+                pen.subset_class_feeds(feed)
                 self.all_pens[i].ration = self.all_pens[i].calc_ration(feed, available_feeds)
 
     def calc_manure_excretion(self, feed, methane_model):

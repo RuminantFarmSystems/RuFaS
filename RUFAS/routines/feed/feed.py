@@ -65,8 +65,8 @@ class Feed:
 
         self.entries_split_by_maturity = self.get_feeds_split_by_maturity()
         self.farm_grown_feeds = data['farm_grown_feeds']
-        self.purchased_feeds_entries = data['purchased_feeds']
-        self.purchased_feeds = []  # set in the next method call
+        #self.purchased_feeds_entries = data['purchased_feeds']
+        self.purchased_feeds = data['purchased_feeds']  # set in the next method call
 
 
         self.input_feed_combinations = {
@@ -83,7 +83,7 @@ class Feed:
         # initially, this only contains information for purchased feeds as none
         # of the farm_grown_feeds have been harvested yet
         self.available_feeds = \
-            self.get_nutrient_vals(self.purchased_feeds, False)
+            self.get_nutrient_vals(self.all_feed_ids, False)
         self.calf_feeds = self.get_calf_feeds()
         # setting up the feed costs based on the input
         self.feed_costs = data['purchased_feeds_costs']
@@ -867,7 +867,7 @@ class Feed:
             for result in dict_list}
 
         purchased_mapping = self.get_purchased_feed_ids(purchased_feeds)
-        self.purchased_feeds = list(purchased_mapping.values())
+        #self.purchased_feeds = list(purchased_mapping.values())
 
         grown_feeds_mapping = {str(feed): str(feed) + 'g'
                                for feed in grown_feeds}
