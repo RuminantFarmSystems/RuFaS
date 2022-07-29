@@ -136,7 +136,7 @@ class BaseCrop:
         # water uptake
         self.epco = 0  # psuedocode C.4.B.2
         """float: plant uptake compensation factor, a value between 0.01 and 1.00"""
-        self.beta_w = 0  # psuedocode C.4.A.1  # TODO: taken from corn - Github issue #154
+        self.beta_w = 0  # psuedocode C.4.A.1
         """water-use distribution parameter"""
         self.water_actual_up = 0  # psuedocode C.4.A.2
         """water uptake (mm)"""
