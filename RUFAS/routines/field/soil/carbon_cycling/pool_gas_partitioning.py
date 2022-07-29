@@ -39,6 +39,7 @@ def update_all(soil):
         # partitioning The Active and Slow Carbon Pools (in soil) Decomposition to Alternative Carbon Pools
         # (e.g., Active Carbon Pool to Slow Carbon Pool) or Gas Loss
 
+        #TODO: verify that the K5,K6,K7 numbers are correct, they are different in the psuedocode - GitHub Issue 176
         K5 = 0.02
         # S.6.C.2
         C_active_decomp_rate = K5 * (1 - 0.75 * soil.silt_to_clay_percent)
@@ -54,7 +55,7 @@ def update_all(soil):
         K7 = 0.0000185714
         layer.C_passive_decomp = K7 * layer.M_d * soil.T_d * layer.C_passive
 
-        # S.6.B.6
+        # S.6.C.6
         Es = 0.85 - 0.68 * soil.silt_to_clay_percent
 
         # S.6.C.7

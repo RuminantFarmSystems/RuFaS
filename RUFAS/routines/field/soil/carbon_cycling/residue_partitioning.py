@@ -8,7 +8,7 @@ def update_all(soil, crop_type, weather, time):
 
     Args:
         soil: an instance of the Soil class defined in soil.py
-        crop_type: the instance of BaseCrop stored in crop.current_crop
+        crop_type: the instance of a crop class
         weather: an instance of the Weather class defined in classes.py
         time: an instance of the Time class defined in time.py
     """
@@ -23,10 +23,10 @@ def residue_partitioning(soil, crop_type, weather, time):
         "pseudocode_soil" S.6.B
 
     Args:
-        soil
-        crop_type
-        weather
-        time
+        soil: an instance of the Soil class
+        crop_type: an instance of a crop class
+        weather: an instance of the Weather class
+        time: an instance of the Time class
     """
 
     # Above ground lignin, metabolic C, and structural C
@@ -160,4 +160,14 @@ def residue_partitioning(soil, crop_type, weather, time):
 
 # TODO: add docstrings & pseudocode reference(s) - GitHub Issue #169
 def ADJ_crop_type_bio_BG_fun(layer_thickness, soil_profile_depth, crop_type_bio_BG):
+    """
+    Description:
+        --------
+    Args:
+        layer_thickness: thickness, an attribute of the Layer class
+        soil_profile_depth: profile_depth, an attribute of the Soil class
+        crop_type_bio_BG: bio_BG, an attribute of a crop class object
+    Return:
+        --------
+    """
     return (layer_thickness / soil_profile_depth) * crop_type_bio_BG
