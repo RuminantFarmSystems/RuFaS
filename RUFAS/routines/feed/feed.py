@@ -867,7 +867,7 @@ class Feed:
             for result in dict_list}
 
         purchased_mapping = self.get_purchased_feed_ids(purchased_feeds)
-        #self.purchased_feeds = list(purchased_mapping.values())
+
 
         grown_feeds_mapping = {str(feed): str(feed) + 'g'
                                for feed in grown_feeds}
