@@ -258,6 +258,8 @@ class Crop:
 
         self.crops_list = []
         self.crops_data = data['crops']
+        # TODO: this needs refactoring, perhaps list comprehension
+        #  see supported_species in base_crop.py
         for crop_name, crop_data in self.crops_data.items():
             if crop_name.startswith("alfalfa"):
                 crop = alfalfa.Alfalfa(crop_name, crop_data)

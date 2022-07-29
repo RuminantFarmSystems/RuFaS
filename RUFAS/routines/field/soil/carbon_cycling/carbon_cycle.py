@@ -37,10 +37,10 @@ def soil_carbon_aggregation(soil):
     """
     Description:
         This function does the aggregation of carbon into pools
-        "pseudocode_soil" S.6.C
+        "pseudocode_soil" S.6.D
 
     Args:
-        soil
+        soil: an instance of the Soil class
     """
 
     for layer in soil.soil_layers:

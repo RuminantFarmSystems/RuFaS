@@ -92,18 +92,14 @@ def update_all(soil, crop_type, field_management, time):
     calc_quality_assessment(crop_type)
 
 
-#
-# Calculates max potential harvest index for a given day.
-# "pseudocode_crop" C.10.C.1
-#
 def calc_HI_max(crop_type):
     """
     Description:
         Calculates max potential harvest index for a given day.
-        "pseudocode_crop" C.10.C.1
+        "pseudocode_crop" C.10.B.1
 
     Args:
-        crop_type
+        crop_type: an instance of a crop class
     """
 
     top = 100 * crop_type.fr_PHU
@@ -118,7 +114,7 @@ def calc_HI_act(crop_type):
         "pseudocode_crop" C.10.C.1
 
     Args:
-        crop_type
+        crop_type: an instance of a crop class
     """
 
     term1 = crop_type.HI_max - crop_type.HI_min
@@ -133,10 +129,6 @@ def calc_dry_down(crop_type):
     crop_type.bio_AG -= (crop_type.bio_AG * crop_type.biomass_dry_down_percent)
 
 
-#
-# Calculates maximum crop yield at harvest.
-# "pseudocode_crop" C.10.D.1
-#
 def calc_yield_max(crop_type):
     """
     Description:
@@ -144,7 +136,7 @@ def calc_yield_max(crop_type):
         "pseudocode_crop" C.10.D.1
 
     Args:
-        crop_type
+        crop_type: an instance of a crop class
     """
 
     crop_type.yield_max = crop_type.bio_AG * crop_type.HI_actual
@@ -157,7 +149,7 @@ def calc_yield_act(crop_type):
         "pseudocode_crop" C.10.E.1
 
     Args:
-        crop_type
+        crop_type: an instance of a crop class
     """
 
     crop_type.yield_actual = crop_type.yield_max * crop_type.harvest_eff
@@ -192,7 +184,7 @@ def calc_nutrient_removal(crop_type):
         "pseudocode_crop" C.10.F.1/2
 
     Args:
-        crop_type
+        crop_type: an instance of a crop class
     """
 
     crop_type.N_yield = crop_type.fr_N * crop_type.yield_actual
@@ -206,10 +198,10 @@ def calc_residue(soil, crop_type, field_management, time):
         "pseudocode_crop" C.10.H.1/4/5
 
     Args:
-        soil
-        crop_type
-        field_management
-        time
+        soil: an instance of the Soil class
+        crop_type: an instance of a crop class
+        field_management: an instance of the FieldManagement class
+        time: an instance of the Time class specified in classes.py
     """
     # for carbon, needs to be calculated only at harvest
     # C.3.A.4
@@ -232,14 +224,14 @@ def calc_residue(soil, crop_type, field_management, time):
 
     soil.residue_harvest = soil.residue
 
-
+# TODO: missing pseudocode in pseudocode_crop Google Doc - GitHub Issue #168
 def calc_harvest_quality(crop_type): # TODO: Stand in for more sophisticated method - GitHub Issue #161
     """
     Description:
         Calculate quality of yield for grouping in feed storage
         "pseudocode_crop" C.10.G
     Args:
-        crop_type
+        crop_type: an instance of a crop class
     """
     crop_type.harvest_quality = "good"
 
@@ -253,9 +245,9 @@ def kill(crop_type, field_management, time):
         "pseudocode_crop" C.10.H.4
 
     Args:
-        crop_type
-        field_management
-        time
+        crop_type: an instance of a crop class
+        field_management: an instance of the FieldManagement class
+        time: an instance of the Time class as specified in classes.py
     """
     crop_type.accumulated_HU = 0
     crop_type.prev_accumulated_HU = 0
@@ -295,7 +287,7 @@ def cut(crop_type, bio_frac):
         "pseudocode_crop" C.10.H.2/3
 
     Args:
-        crop_type
+        crop_type: an instance of a crop class
         bio_frac: fraction of biomass removed during the cut
     """
 
