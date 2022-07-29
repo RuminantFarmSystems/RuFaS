@@ -77,7 +77,7 @@ def optimization(requirements, available_feeds, animal_type, cow_type):
     return solution, ration_vals
 
 
-def ration_formulation(pen, feed, available_feeds, animal_type, cow_type):
+def ration_formulation(pen, available_feeds, animal_type, cow_type):
     """
     Function that links the ration_driver file with the calc_ration function in
     pen.py. Returns a dictionary of the rations by feed and status of the NLP
@@ -434,9 +434,9 @@ class AvailableFeeds:
         # calf limit
         self.calf_limit = []
         # pyomo dictionary structure
-        self.pyomo_data = {}
+        #self.pyomo_data = {}
         # list of the feeds used in this ration
-        self.feeds = []
+        #self.feeds = []
 
     def feed_nutrients(self, feed):
         """
@@ -478,60 +478,3 @@ class AvailableFeeds:
                 self.lactating_cow_limit.append(feed['limit'])
                 self.dry_cow_limit.append(feed['limit'])
 
-    def pyomo_nutrients_data(self, feed, animal_type, cow_type):
-        """
-        Class function that manipulates the available feeds nutrient information
-        into a valid data input for the pyomo structured solver.
-
-        Arg(s):
-            feed: an instance of the Feed class object
-            animal_type: string representation  of the animal type
-            cow_type: boolean, True if cow is lactating
-        """
-        # available feeds dictionary from the feed module
-        available_feeds = feed.available_feeds
-        # dictionary of feed costs
-        feed_costs = feed.feed_costs
-        # list of parameters for non-LP
-        params = ['TDN', 'DE', 'EE', 'is_fat', 'calcium',
-                  'phosphorus', 'NDF', 'is_wetforage', 'Kd', 'N_A', 'N_B',
-                  'CP', 'dRUP']
-        # list of different energy types feed decision variable are split across
-        enrg = ['mact', 'lact', 'growth']
-        # structuring empty data container
-        for p in params:
-            self.pyomo_data[p] = {}
-        self.pyomo_data['price'] = {}
-        self.pyomo_data['ftype'] = {}
-        self.pyomo_data['limit'] = {}
-        feeds = []
-        # iterating through each feed available in formulation
-        for key, feed in available_feeds.items():
-            feeds.append(key)
-            # price and type data
-            for s in enrg:
-                self.pyomo_data['price'][key, s] = feed_costs[key]
-                self.pyomo_data['ftype'][key, s] = feed['type']
-            # iterating through all param values for non-LP
-            for p in params:
-                self.pyomo_data[p][key, 'mact'] = feed[p]
-                self.pyomo_data[p][key, 'lact'] = feed[p]
-                self.pyomo_data[p][key, 'growth'] = feed[p]
-            # checking if grown feed available and pop
-            if isinstance(feed['limit'], dict):
-                if cow_type:
-                    for s in enrg:
-                        self.pyomo_data['limit'][key, s] = \
-                            feed['limit']['lactating_cows']
-                elif animal_type == 'cow':
-                    for s in enrg:
-                        self.pyomo_data['limit'][key, s] = feed['limit']['dry_cows']
-                else:
-                    for s in enrg:
-                        self.pyomo_data['limit'][key, s] = feed['limit']['heiferIIIs']
-            # if there are not farm grown feeds in diet
-            else:
-                for s in enrg:
-                    self.pyomo_data['limit'][key, s] = feed['limit']
-        # populating feeds list class variable
-        self.feeds = feeds

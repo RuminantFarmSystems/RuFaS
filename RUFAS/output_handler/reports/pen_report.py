@@ -123,10 +123,6 @@ class PenReport(BaseReportDriver):
                                     'j_day': ['time.day', '', []],
                                     'num_animals': ['len(pen.animals_in_pen)', '', []]
                                     }
-            # this subsets the pen's allotted feed given the animals type(s)
-            # that are present within the pen that is currently being
-            # simulated
-            individual_pen.subset_class_feeds(feed)
 
             # dictionary with all feed ids and keys and their pertaining information as values
             all_feeds = feed.all_feed_ids
