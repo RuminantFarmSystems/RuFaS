@@ -4,31 +4,23 @@ File name: crop_config.py
 Author(s): Clay Morrow, morrowcj@outlook.com
 
 Description:
-    This module contains configuration variables, with data used to generate the various crop subclasses.
+    This module contains configuration variables, with data used to generate an instance of the crop.
     Each of these variables is a dictionary whose keys and values correspond to class attributes and their values,
     respectively.
 
-    Keeping the attribute data separate from the actual class definitions allows for the values to changed
+    Keeping the attribute data separate from the actual class definition allows for the values to changed
     dynamically (e.g., at runtime). This makes the code more robust to changes in parameters (e.g., from new varieties
     or genotypes)
 
-    These variables should have the same name as the specific crop type that they are meant to house data for, but in
-    capital case. For example, the ``Alfalfa`` class (alfalfa.py) uses the config variable ``ALFALFA``
+    These variables should have the same name as the specific crop species that they are meant to house data for, but in
+    capital case. For example, a class instance for the "alfalfa" species uses the config variable ``ALFALFA``. This
+    functionality is implemented in ``BaseClass`` in base_class.py.
 
     These configuration variables should NOT include any attributes that are calculated internally,
-    iterators or accumulators, attributes whose values do not differ from those in the inherited ``BaseCrop`` class,
-    or any variables that do not correspond to crop-specific parameters. They should also NOT include data that is
-    normally input by the user (data derived from .json files).
+    iterators or accumulators, attributes whose values do not differ from defaults of the ``BaseCrop`` class,
+    or any variables that do not correspond to crop-specific parameters.
 """
-# TODO: It may be best to document all contained attributes in this file.
 
-# TODO: I think that the individual classes can be removed and populated with a switch. Something like
-#   Crop(crop = "alfalfa") vs Crop(crop = "corn")
-
-from RUFAS.routines.field.crop.crop_types.base_crop import BaseCrop
-
-
-# alfalfa.py
 ALFALFA = {
         # alfalfa ID variables
         "harvest_type": 'optimal',  # TODO: is this always the type for alfalfa? Corn reads this from data
@@ -85,7 +77,6 @@ ALFALFA = {
         "NDF_harvest_percent": 0.416
 }
 
-# corn.py
 CORN = {
         # corn ID variables
         "crop_type": 'annual',
@@ -448,40 +439,3 @@ WINTER_WHEAT = {
         "DM_harvest_percent": 0.0001,  # TODO: Hard coded dry matter percent at harvest - GitHub Issue #155
         'NDF_harvest_percent': 0.416
 }
-
-# TODO: this class is not used, but perhaps should replace all child classes, to avaid repeating code.
-#  This class is incomplete. Also, it may be best to keep classes separate if class-specific methods
-#  are planned.
-#  This functionality could simply be added to BaseCrop as well.
-class ChildCrop(BaseCrop):
-        def __init__(self, crop_name, data, species=None):
-                super().__init__()
-
-                # get soybean variables from input data:
-                self.plant_years = data['plant_years']
-                self.repeat = data['repeat']
-                self.planting_day = data['planting_day']
-                self.harvest_day = data['harvest_day']
-                self.harvest_type = data['harvest_type']
-                self.planting_order = data['planting_order'].lower()
-                self.extracted = data['extracted']
-                self.crop_name = crop_name
-
-                # get crop species
-                self.species = self.get_crop_species(species)
-
-                # assign attributes from corn dictionary in crop config file
-                crop_data_dict = globals()[self.species.upper()]
-                for key, val in crop_data_dict.items():
-                        setattr(self, key, val)
-
-        def get_crop_species(self, species):
-                if species is None:
-                        return None
-                else:
-                        return species
-
-#test_child = ChildCrop(crop_name="corn98",
-#                       data={"plant_years": 1989, "repeat": 0, "planting_day": 0, "harvest_day": 0,
-#                             "harvest_type": "optimal", "planting_order": "", "extracted": False},
-#                       species="Corn")

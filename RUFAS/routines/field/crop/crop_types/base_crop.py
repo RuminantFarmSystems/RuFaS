@@ -1,3 +1,8 @@
+from RUFAS.routines.field.crop.crop_types import crop_config
+
+supported_species = [item.lower() for item in crop_config.__dict__.keys() if not item.startswith("__")]
+
+
 class BaseCrop:
     """BaseCrop is the parent class of all Crop type objects
        and their respective classes. Crop attributes are initialized here first
@@ -5,9 +10,15 @@ class BaseCrop:
        Further description of each attribute is provided beneath the attribute's
        initialization if clarification is needed.
     """
-    def __init__(self):
-        """create an instance of BaseCrop class"""
-        ##  id variables
+    def __init__(self, crop_name=None, data=None, species=None):
+        """create an instance of BaseCrop class
+
+            Args:
+                crop_name (str): the name of the crop
+                data (dict): a dictionary containg crop data
+                species (str): the species of the crop (see crop_config.py)
+        """
+        #  id variables
         self.crop_name = 'null'
         """str: name of the crop: alfalfa, corn, etc."""
         self.crop_type = ''  # TODO: What strings are accepted? - GitHub Issue #174
@@ -18,7 +29,7 @@ class BaseCrop:
         self.raw_id = 'null'
         """str: the raw ID of the feed to be modified"""
 
-        ## planting information
+        # planting information
         """create an instance of ``BaseCrop``"""
         self.plant_years = []
         """:obj:`list` of :obj:`float`: a list of years in which the crop will be grown"""
@@ -33,7 +44,7 @@ class BaseCrop:
         self.planting_order = ''  # TODO: What strings are accepted? - GitHub Issue #174
         """str: in the case of double cropping, the order in which the crop will be planted"""
 
-        ## starting points for crop status
+        # starting points for crop status
         self.planted = False
         """bool: has the crop been planted or not?"""
         self.growing = False
@@ -51,7 +62,7 @@ class BaseCrop:
         self.fix_nitrogen = False
         "bool: does this plant fix nitrogen?"
 
-        ## heat units
+        # heat units
         self.T_base_min = 10  # pseudocode C.2.A.3
         """float: minimum temperature required for growth (Celsius)"""
         self.T_base_max = 30  # pseudocode C.2.A.4
@@ -68,7 +79,7 @@ class BaseCrop:
         self.prev_fr_PHU = 0  # pseudocode C.2.B.1
         """float: fraction of PHU accumulated excluding current day of simulation"""
 
-        ## LAI
+        # LAI
         self.fr_PHU_1 = 0.15  # psuedocode C.8.A
         """float: first PHU shape coefficient, used in LAI calculations"""
         self.fr_PHU_2 = 0.50  # psuedocode C.8.A
@@ -96,7 +107,7 @@ class BaseCrop:
         self.LAI_actual = 0
         """float: calculated LAI for the current day"""
 
-        ## root depth
+        # root depth
         self.z_root_max = 1500  # pseudocode C.3.A.2
         """float: maximum depth of root development (mm)"""
         self.fr_root = 0  # pseudocode C.3.A.1
@@ -104,7 +115,7 @@ class BaseCrop:
         self.z_root = 0  # pseudocode C.3.A.2
         """float: depth of root development (mm)"""
 
-        ## biomass
+        # biomass
         self.kl = 0.65  # psuedocode C.9.A.2
         """float: light extinction coefficient"""
         self.RUE = 20  # psuedocode C.9.A.2
@@ -115,14 +126,14 @@ class BaseCrop:
         """float: plant growth factor (0-1)"""
         self.d_biomass_max = 0  # psuedocode C.9.A.3
         """float: maximum potential increase in biomass for a given day"""
-        self.d_biomass_actual = 0 # psuedocode C.9.A.3
+        self.d_biomass_actual = 0  # psuedocode C.9.A.3
         """float: calculated increase in biomass"""
         self.biomass_actual = 0  # psuedocode C.9.A.3 # TODO: What are the units? - GitHub Issue #174
         """float: calculated biomass for the current day"""
         self.prev_biomass_actual = 0  # psuedocode C.9.A.3
         """float: calculated biomass for the previous day"""
 
-        ## water uptake
+        # water uptake
         self.epco = 0  # psuedocode C.4.B.2
         """float: plant uptake compensation factor, a value between 0.01 and 1.00"""
         self.beta_w = 0  # psuedocode C.4.A.1  # TODO: taken from corn - Github issue #154
@@ -132,7 +143,7 @@ class BaseCrop:
         self.water_uptake_each_layer = []  # psuedocode C.4.A.2
         """water uptake from each layer (mm)"""
 
-        ## nitrogen uptake
+        # nitrogen uptake
         self.beta_n = 10
         """float: nitrogen uptake distribution parameter.
            This value does not significantly affect N uptake, but does impact NO3 removed 
@@ -140,7 +151,7 @@ class BaseCrop:
            upper soil layers.
         """
         self.fr_n1 = 0.04  # psuedocode C.5.A.2
-        """float: normal fraction of nitrogen in plant biomass before emergence""" # TODO - double check the stage for n1 and n2 (same for p1 and p2)
+        """float: normal fraction of nitrogen in plant biomass before emergence"""  # TODO - double check the stage for n1 and n2 (same for p1 and p2)
         self.fr_n2 = 0.03  # psuedocode C.5.A.2
         """float: normal fraction of nitrogen in plant biomass at emergence"""
         self.fr_n3 = 0.02  # psuedocode C.5.A.2
@@ -162,7 +173,7 @@ class BaseCrop:
         self.N_actual_up = 0  # psuedocode C.5.C.7
         """float: total nitrogen uptake (kg/ha)"""
 
-        ## phosphorus uptake
+        # phosphorus uptake
         self.beta_p = 10  # psuedocode C.6.C.1
         """float: phosphorus uptake distribution parameter"""
         self.fr_PHU_50 = 0.5  # psuedocode C.6.A.1
@@ -190,7 +201,7 @@ class BaseCrop:
         self.P_act_up = 0  # psuedocode C.6.C.7
         """float: total uptake of phosphorus from soil (kg/ha)"""
 
-        ## yield
+        # yield
         self.HI_max = 0  # psuedocode C.10.B.1
         """float: potential (maximum) harvest index"""
         self.HI_min = 0  # psuedocode C.10.C.1
@@ -204,7 +215,7 @@ class BaseCrop:
         self.gamma_wu = 0  # psuedocode C.9.C.1
         """float: water defficiency factor"""
         self.biomass_dry_down_percent = 0  # TODO: no pseudocode reference - GitHub Issue #168
-                                           # TODO: Hard coded total dry down until daily method is modeled - GitHub Issue #156
+        # TODO: Hard coded total dry down until daily method is modeled - GitHub Issue #156
         self.DM_harvest_percent = 0.15  # TODO: no pseudocode reference - GitHub Issue #168
         self.NDF_harvest_percent = 0.42  # TODO: no pseudocode reference - GitHub Issue #168
         self.bio_AG = 0  # psuedocode C.10.H.1
@@ -229,12 +240,75 @@ class BaseCrop:
         self.yield_annual = 0
         """float: Annual crop yield (kg/ha)"""
 
+        # use data to set attributes, if given
+        self._use_data(data)
+        self._set_crop_name(crop_name)
 
+        # fetch and set species-specific data, if needed
+        if (species is not None) or (crop_name is not None):
+            self._set_species(species)
+            self._set_species_attributes(self._get_crop_data())
 
+    def _use_data(self, data=None):
+        """use input data to assign some attributes
 
+           Args:
+               data (dict): a dictionary of data containing "plant_years, "repeat",
+               "planting_day", "harvest_day", "harvest_type", "planting_order",
+               and "extracted"
+        """
+        if data is not None:
+            self.plant_years = data['plant_years']
+            self.repeat = data['repeat']
+            self.planting_day = data['planting_day']
+            self.harvest_day = data['harvest_day']
+            self.harvest_type = data['harvest_type']
+            self.planting_order = data['planting_order'].lower()
+            self.extracted = data['extracted']
 
+    def _set_crop_name(self, crop_name=None):
+        """set the crop name attribute, if it is included as an argument
 
+           Args:
+               crop_name (str): the name of the crop
+        """
+        if crop_name is not None:
+            self.crop_name = crop_name
 
+    def _get_crop_data(self):
+        """get the crop-specific data variable from crop_config.py
 
+           Returns: a dictionary containing crop-specific data
+        """
+        return getattr(crop_config, self.species.upper())
 
+    def _set_species(self, species=None):  # TODO: This should be deprecated, because species should be a required input
+        """get the name of the species
 
+           Args:
+               species (str): one of the supported species
+
+           Returns:
+               if species is set to None (class default), then the species
+               is derived from the ``crop_type`` attribute.
+        """
+        if species is None:
+            # try to match the crop_name to items in the supported_species list
+            try:
+                self.species = [item.lower() for item in supported_species if self.crop_name.startswith(item.lower())].pop()
+            except NameError:
+                print("unsupported crop species")
+        else:
+            self.species = species
+
+    def _set_species_attributes(self, data_variable):
+        """set species-specific data attributes
+
+           Args:
+               data_variable: a dictionary containing BaseCrop attributes
+        """
+        for key, val in data_variable.items():
+            setattr(self, key, val)
+
+## TODO: The Crop() class needs to be updated to work with the new functionality of BaseCrop and the child
+##  crop classes should have everything removed except species-specific methods.
