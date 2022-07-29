@@ -151,9 +151,9 @@ class BaseCrop:
            upper soil layers.
         """
         self.fr_n1 = 0.04  # psuedocode C.5.A.2
-        """float: normal fraction of nitrogen in plant biomass before emergence"""  # TODO - double check the stage for n1 and n2 (same for p1 and p2)
+        """float: normal fraction of nitrogen in plant biomass before emergence"""  # TODO: GitHub Issue #179
         self.fr_n2 = 0.03  # psuedocode C.5.A.2
-        """float: normal fraction of nitrogen in plant biomass at emergence"""
+        """float: normal fraction of nitrogen in plant biomass at emergence"""  # TODO: GitHub Issue #179
         self.fr_n3 = 0.02  # psuedocode C.5.A.2
         """float: normal fraction of nitrogen in plant biomass at maturity"""
         self.fr_n3ish = 0.02  # psuedocode C.5.A.2
@@ -181,9 +181,9 @@ class BaseCrop:
         self.fr_PHU_100 = 1.0  # psuedocode C.6.A.1
         """fraction of potential heat units accumulated at 100% plant maturity"""
         self.fr_p1 = 0.004  # psuedocode C.6.B.1
-        """float: normal fraction of phosphorus in plant biomass before emergence"""
+        """float: normal fraction of phosphorus in plant biomass at emergence"""  # TODO: GitHub Issue #179
         self.fr_p2 = 0.003  # psuedocode C.6.B.1
-        """float: normal fraction of phosphorus in plant biomass at emergence"""
+        """float: normal fraction of phosphorus in plant biomass at emergence"""  # TODO: GitHub Issue #179
         self.fr_p3 = 0.002  # psuedocode C.6.B.1
         """float: normal fraction of phosphorus in plant biomass at maturity"""
         self.fr_p3ish = 0.002  # psuedocode C.6.B.1
@@ -309,5 +309,5 @@ class BaseCrop:
         for key, val in data_variable.items():
             setattr(self, key, val)
 
-## TODO: The Crop() class needs to be updated to work with the new functionality of BaseCrop and the child
+## TODO: The Crop() class needs to be updated to work with the new functionality of BaseCrop and the child - GitHub Issue #180
 ##  crop classes should have everything removed except species-specific methods.
