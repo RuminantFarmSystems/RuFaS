@@ -107,11 +107,11 @@
         "feed_storage_report": {
             "produce_csv": true,
             "produce_graphics": false,
-            "report_name": "storage_report"
+            "report_name": "feed_storage_report"
         },
         "feed_storage_summary": {
             "produce_csv": false,
-            "produce_graphics": true,
+            "produce_graphics": false,
             "report_name": "feed_storage_summary"
         }
     },
