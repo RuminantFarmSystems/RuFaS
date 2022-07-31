@@ -76,6 +76,8 @@ def test_manure_init() -> None:
 
 # --------------------------- Test manure handlers module
 first_instance_of_milking_center = MilkingCenter()
+second_instance_of_milking_center = MilkingCenter(
+    num_milkings=4,  minutes_spent_in_holding_area=40.0, minutes_spent_per_milking=8.0)
 
 
 def test_total_minutes_spent_in_holding_area():
@@ -83,11 +85,19 @@ def test_total_minutes_spent_in_holding_area():
     expected_value = 90.0
     assert result == expected_value
 
+    result2 = second_instance_of_milking_center.total_minutes_spent_in_holding_area
+    expected_value2 = 160.0
+    assert result2 == expected_value2
+
 
 def test_total_minutes_spent_milking():
     result = first_instance_of_milking_center.total_minutes_spent_milking
     expected_value = 21.0
     assert result == expected_value
+
+    result2 = second_instance_of_milking_center.total_minutes_spent_milking
+    expected_value2 = 32.0
+    assert result2 == expected_value2
 
 
 def test_total_minutes_spent_in_milking_center():
@@ -95,10 +105,17 @@ def test_total_minutes_spent_in_milking_center():
     expected_value = 111.0
     assert result == expected_value
 
+    result2 = second_instance_of_milking_center.total_minutes_spent_in_milking_center
+    expected_value2 = 192.0
+    assert result2 == expected_value2
+
+
+1
+
 
 def test_total_percent_of_day_spent_in_milking_center():
     result = first_instance_of_milking_center.total_percent_of_day_spent_in_milking_center
-    expected_value = 0
+    expected_value = 7.708333333333333
     assert result == expected_value
 # --------------------------- Test reception pits module
 
