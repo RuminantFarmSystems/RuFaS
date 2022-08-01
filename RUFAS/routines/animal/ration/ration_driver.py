@@ -8,6 +8,9 @@ Description: Main file in the ration formulation process that connects all
 
 Author(s): Chris VanKerkhove, cjv47@cornell.edu
 """
+import collections
+from typing import Dict, List, Set
+
 from RUFAS.routines.animal.ration import animal_requirements
 from RUFAS.routines.animal.ration import ration_NLP as NLP
 from RUFAS.routines.animal.ration import pyomo_solver as pslv
@@ -438,6 +441,9 @@ class AvailableFeeds:
         # list of the feeds used in this ration
         #self.feeds = []
 
+        # key = feed_id, val = index of that feed_id in self.feed_id list
+        self._feed_id_to_list_idx_dict = {}
+
     def feed_nutrients(self, feed):
         """
         Class function that manipulates the available feeds nutrient information
@@ -478,3 +484,37 @@ class AvailableFeeds:
                 self.lactating_cow_limit.append(feed['limit'])
                 self.dry_cow_limit.append(feed['limit'])
 
+    def get_feed_data_based_on_feed_ids(self, feed_ids: Set[int]):
+        """
+        Returns a subset of data from all the available feeds based on the
+        given set of feed ids.
+
+        Args
+        ----
+        feed_ids: a set of feed ids
+
+        Returns
+        -------
+        A dictionary that contains a subset of data from all the available feeds based on the
+        given set of feed ids
+
+        """
+
+        # Only need to build this dictionary one time
+        if not self._feed_id_to_list_idx_dict:
+            self._feed_id_to_list_idx_dict = {fid: i for i, fid in enumerate(self.feed_id)}
+
+        excluded_keys = ['_feed_id_to_list_idx_dict']
+        result = collections.defaultdict(list)
+        for key, vals in self.__dict__.items():
+            if key in excluded_keys:
+                continue
+
+            if not vals:
+                result[key] = []
+                continue
+
+            for feed_id in sorted(list(feed_ids)):
+                idx = self._feed_id_to_list_idx_dict[feed_id]
+                result[key].append(vals[idx])
+        return result
