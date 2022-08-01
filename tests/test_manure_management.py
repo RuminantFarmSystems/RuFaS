@@ -110,13 +110,34 @@ def test_total_minutes_spent_in_milking_center():
     assert result2 == expected_value2
 
 
-1
+def test_percent_of_day_spent_milking():
+    result = first_instance_of_milking_center.percent_of_day_spent_milking
+    expected_value = 1.4583333333333333
+    assert result == expected_value
+
+    result2 = second_instance_of_milking_center.percent_of_day_spent_milking
+    expected_value2 = 2.2222222222222222
+    assert result2 == expected_value2
+
+
+def test_percent_of_day_spent_holding():
+    result = first_instance_of_milking_center.percent_of_day_spent_in_holding
+    expected_value = 6.25
+    assert result == expected_value
+
+    result2 = second_instance_of_milking_center.percent_of_day_spent_in_holding
+    expected_value2 = 11.111111111111111
+    assert result2 == expected_value2
 
 
 def test_total_percent_of_day_spent_in_milking_center():
     result = first_instance_of_milking_center.total_percent_of_day_spent_in_milking_center
     expected_value = 7.708333333333333
     assert result == expected_value
+
+    result2 = second_instance_of_milking_center.total_percent_of_day_spent_in_milking_center
+    expected_value2 = 13.333333333333332
+    assert result2 == expected_value2
 # --------------------------- Test reception pits module
 
 # --------------------------- Test manure separators module
