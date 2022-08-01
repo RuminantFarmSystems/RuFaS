@@ -281,7 +281,7 @@ class BaseCrop:
         """
         return getattr(crop_config, self.species.upper())
 
-    def _set_species(self, species=None):  # TODO: This should be deprecated, because species should be a required input
+    def _set_species(self, species=None):  # TODO: This should be deprecated, because species should be a required input - GitHub Issue #180
         """get the name of the species
 
            Args:
