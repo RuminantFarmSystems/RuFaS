@@ -37,7 +37,7 @@ one introduces `pytest`: https://realpython.com/pytest-python-testing/
 **refer to these documents often**. Take some time to read through them before you start writing tests. I'm going
 to use `pytest` below and recommend you do the same.
 
-Start by looking at the code path diagram; https://3.basecamp.com/3486446/buckets/5296287/uploads/5162606254  
+Start by looking at the code path diagram: https://3.basecamp.com/3486446/buckets/5296287/uploads/5162606254  
 Note that each box represents a function RUFAS. Note also that each arrow shows which additional functions are called
 by the first function. For example, the very first function in the model is `main()` (at the top in blue). The main 
 function calls two functions `input_prompt()` and `SimulationEngine.simulate()`, etc. 
@@ -139,7 +139,8 @@ called `tests/test_yields.py`.
     mcrop.biomass_actual = bmass
     return mcrop
    ```
-   This code creates and returns a mock crop object each time it is called.
+   This code creates and returns a mock crop object each time it is called. Note also that I set the starting values
+   of the attributes arbitrarily - They just need to be the right type and should be somewhat reasonable. 
    * Now we can write our first test, using pytest syntax. For that, all we need is to write a function that `assert`s
    that something is True. The first test will check that `cut()` correctly updates the `accumulated_HU` attribute. We
    want our tests to have long and very descriptive names that start with "test", so we'll call it 
@@ -156,7 +157,7 @@ called `tests/test_yields.py`.
 
    Note that our tests would fail if we asserted that these quantities were exactly equal 
    (`crop.accumulated_HU == 0.1 * (1 - 0.33)`). This is because of rounding errors and is why we need `pytest.approx()`.
-8. The `test_yields.py` file should now contain this code:
+9. The `test_yields.py` file should now contain this code:
    ```python
    from RUFAS.routines.field.crop.crop_types import base_crop
    from RUFAS.routines.field.crop.yields import cut
@@ -181,71 +182,71 @@ called `tests/test_yields.py`.
    ```
    and we can run our tests from the terminal with the command `pytest -v tests/test_yields.py`. Run this command
    to ensure that your test passed.
-9. Try writing the remaining tests on your own without looking at the code below. It will be good practice. 
-   Once you're done, compare to what I've written:
-   ```python
-   def test_cut_correctly_sets_fr_PHU():
-    crop = mock_crop()
-    cut(crop, 0.33)
-    assert pytest.approx(crop.fr_PHU) == (0.1 * (1 - 0.33)) / 8.8
+10. Try writing the remaining tests on your own without looking at the code below. It will be good practice. 
+    Once you're done, compare to what I've written:
+    ```python
+    def test_cut_correctly_sets_fr_PHU():
+        crop = mock_crop()
+        cut(crop, 0.33)
+        assert pytest.approx(crop.fr_PHU) == (0.1 * (1 - 0.33)) / 8.8
 
-   def test_cut_correctly_sets_LAI_actual():
-       crop = mock_crop()
-       cut(crop, 0.33)
-       assert pytest.approx(crop.LAI_actual) == 2.3 * (1 - 0.33)
+    def test_cut_correctly_sets_LAI_actual():
+        crop = mock_crop()
+        cut(crop, 0.33)
+        assert pytest.approx(crop.LAI_actual) == 2.3 * (1 - 0.33)
    
-   def test_cut_sets_fr_LAI_max_to_zero():
-       crop = mock_crop()
-       cut(crop, 0.33)
-       assert pytest.approx(crop.fr_LAI_max) == 0
+    def test_cut_sets_fr_LAI_max_to_zero():
+        crop = mock_crop()
+        cut(crop, 0.33)
+        assert pytest.approx(crop.fr_LAI_max) == 0
    
-   def test_cut_correctly_sets_biomass_actual():
-       crop = mock_crop()
-       cut(crop, 0.33)
-       assert pytest.approx(crop.biomass_actual) == 3.2 - 3.0
+    def test_cut_correctly_sets_biomass_actual():
+        crop = mock_crop()
+        cut(crop, 0.33)
+        assert pytest.approx(crop.biomass_actual) == 3.2 - 3.0
    
-   def test_cut_correctly_sets_bio_P():
-       crop = mock_crop()
-       cut(crop, 0.33)
-       assert pytest.approx(crop.bio_P) == 0.5 * (1 - 0.33)
+    def test_cut_correctly_sets_bio_P():
+        crop = mock_crop()
+        cut(crop, 0.33)
+        assert pytest.approx(crop.bio_P) == 0.5 * (1 - 0.33)
    
-   def test_cut_correctly_sets_bio_N():
-       crop = mock_crop()
-       cut(crop, 0.33)
-       assert pytest.approx(crop.bio_N) == 0.7 * (1 - 0.33)
+    def test_cut_correctly_sets_bio_N():
+        crop = mock_crop()
+        cut(crop, 0.33)
+        assert pytest.approx(crop.bio_N) == 0.7 * (1 - 0.33)
    
-   def test_cut_sets_ET_annual_to_zero():
-       crop = mock_crop()
-       cut(crop, 0.33)
-       assert pytest.approx(crop.ET_annual) == 0
-   ```
-10. After writing these 8 tests, there is one additional test to write. `cut()` is a side-effect function, meaning that 
+    def test_cut_sets_ET_annual_to_zero():
+        crop = mock_crop()
+        cut(crop, 0.33)
+        assert pytest.approx(crop.ET_annual) == 0
+    ```
+11. After writing these 8 tests, there is one additional test to write. `cut()` is a side-effect function, meaning that 
 it doesn't return anything. Instead, it changes the objects that were given as input. One potential problem with these
 functions is that it can be hard to keep track of all the bits that have changed. Up until now, we've only tested
 attributes in an isolated way: create a mock, change the mock, test one value. But, we need to make sure that all of
 the values are calculated correctly **at the same time**. So, our final test will do just that: 
 
     ```python
-        def test_cut_correctly_sets_all():
-            crop = mock_crop()
-            cut(crop, 0.33)
-            test_list = [
-                pytest.approx(crop.accumulated_HU) == 0.1 * (1 - 0.33),
-                pytest.approx(crop.fr_PHU) == (0.1 * (1 - 0.33)) / 8.8,
-                pytest.approx(crop.LAI_actual) == 2.3 * (1 - 0.33),
-                pytest.approx(crop.fr_LAI_max) == 0,
-                pytest.approx(crop.biomass_actual) == 3.2 - 3.0,
-                pytest.approx(crop.bio_P) == 0.5 * (1 - 0.33),
-                pytest.approx(crop.bio_N) == 0.7 * (1 - 0.33),
-                pytest.approx(crop.ET_annual) == 0
-            ]
-            assert all(test_list)
+    def test_cut_correctly_sets_all():
+        crop = mock_crop()
+        cut(crop, 0.33)
+        test_list = [
+            pytest.approx(crop.accumulated_HU) == 0.1 * (1 - 0.33),
+            pytest.approx(crop.fr_PHU) == (0.1 * (1 - 0.33)) / 8.8,
+            pytest.approx(crop.LAI_actual) == 2.3 * (1 - 0.33),
+            pytest.approx(crop.fr_LAI_max) == 0,
+            pytest.approx(crop.biomass_actual) == 3.2 - 3.0,
+            pytest.approx(crop.bio_P) == 0.5 * (1 - 0.33),
+            pytest.approx(crop.bio_N) == 0.7 * (1 - 0.33),
+            pytest.approx(crop.ET_annual) == 0
+        ]
+        assert all(test_list)
     ```
     It may be tempting to **only** include this last function, but if this test fails, you won't know where it fails.
     It is better to have individual tests separated.
-11. Make sure to save these 9 tests in `test_yields.py`, and execute `pytest -v tests/test_yields.py` one last time
+12. Make sure to save these 9 tests in `test_yields.py`, and execute `pytest -v tests/test_yields.py` one last time
 to make sure that the tests all passed. Then you can commit these changes and push it to the remote branch! 
-12. Next add some tests for `calc_nutrient_removal()`, `calc_yield_act()`, `calc_yield_max()`,  `calc_dry_down()`,
+13. Next add some tests for `calc_nutrient_removal()`, `calc_yield_act()`, `calc_yield_max()`,  `calc_dry_down()`,
 `calc_HI_act()`, and `calc_HI_max()`. 
 (from `yields.py`) into the `test_yields.py` file. 
     * Notice that you'll need to mock some additional crop attributes. These can be added directly to the 
@@ -254,10 +255,10 @@ to make sure that the tests all passed. Then you can commit these changes and pu
     * you can also ignore `kill()` for now, unless you're comfortable also testing the 
     `FieldManagement.schedule_application()` function, which `kill()` calls (there's a mistake in the path diagram). 
     Or you can write some tests and a #TODO where further tests are needed.
-13. Try writing some tests for `update_all()` too. Does it actually update all the attributes it is supposed to? What
+14. Try writing some tests for `update_all()` too. Does it actually update all the attributes it is supposed to? What
 should be different when `PHU` is > 1 vs when it is > 1? 
-14. Move onto other low-level functions and work your way up. If you aren't confident in your ability to test a function,
+15. Move onto other low-level functions and work your way up. If you aren't confident in your ability to test a function,
 skip it or ask for help. 
-15. Make sure you create a list of all the tests you've written (and those that still need tests written). Also check
+16. Make sure you create a list of all the tests you've written (and those that still need tests written). Also check
 the `test_field.py` file to see which functionality has already been tested. 
-16. You've got this!
+17. You've got this!
