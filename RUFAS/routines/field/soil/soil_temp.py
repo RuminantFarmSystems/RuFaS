@@ -86,12 +86,12 @@ def calc_T_soil(soil, weather, time):
     """
     Description:
         Calculates the soil temperature for each layer given average annual air
-        temperature. "pseudocode_soil" S.1.A.1
+        temperature. "pseudocode_soil" S.1.A.1-3
 
     Args:
-        soil
-        weather
-        time
+        soil: an instance of the Soil class
+        weather: an instance of the Weather class
+        time: an instance of the Time class
     """
 
     L = 0.8
@@ -130,7 +130,7 @@ def calc_dd(soil):
         "pseudocode_soil" S.1.A.4
 
     Args:
-        soil
+        soil: an instance of the Soil class
 
     Returns:
         int: dd, damping depth of the profile (mm)
@@ -153,7 +153,7 @@ def calc_scale(soil):
         "pseudocode_soil" S.1.A.5
 
     Args:
-        soil
+        soil: an instance of the Soil class
 
     Returns:
         int: soil water scaling factor for the profile
@@ -173,7 +173,7 @@ def calc_dd_max(soil):
         "pseudocode_soil" S.1.A.6
 
     Args:
-        soil
+        soil: an instance of the Soil class
 
     Returns:
         int: dd_max, the maximum damping depth fro the profile (mm)
@@ -190,7 +190,7 @@ def sum_soil_water(soil):
        Helper method to calculates the sum of soil water in the profile.
 
     Args:
-        soil
+        soil: an instance of the Soil claass
 
     Returns:
         int: total_soil_water (mm)
@@ -213,10 +213,10 @@ def calc_T_surf(soil, crop, weather, time):
         "pseudocode_soil" S.1.A.13
 
     Args:
-        soil
-        crop
-        weather
-        time
+        soil: an instance of the Soil class
+        crop: an instance of the Crop class
+        weather: an instance of the Weather class
+        time: an instance of the Time class
     """
 
     T_bare = calc_T_bare(soil, crop, weather, time)
@@ -232,10 +232,10 @@ def calc_T_bare(soil, crop, weather, time):
         "pseudocode_soil" S.1.A.7
 
     Args:
-        soil
-        crop
-        weather
-        time
+        soil: an instance of the Soil class
+        crop: an instance of the Crop class
+        weather: an instance of the Weather class
+        time: an instance of the Time class
 
     Returns:
         int: T_bare, the theoretical temperature of the bare soil (ºC)
@@ -253,10 +253,10 @@ def calc_radiate(soil, crop, weather, time):
         "pseudocode_soil" S.1.A.8
 
     Args:
-        soil
-        crop
-        weather
-        time
+        soil: an instance of the Soil class
+        crop: an instance of the Crop class
+        weather: an instance of the Weather class
+        time: an instance of the Time class
 
     Returns:
         int: radiate, the radiation term for the temperature of bare soil
@@ -276,8 +276,8 @@ def calc_albedo(soil, crop):
         "pseudocode_soil" S.1.A.9/10
 
     Args:
-        soil
-        crop
+        soil: an instance of the Soil class
+        crop: an instance of the Crop class
 
     Returns:
         int: soil albedo
@@ -299,8 +299,8 @@ def calc_bcv(crop, time):
         "pseudocode_soil" S.1.A.11/12
 
     Args:
-        crop
-        time
+        crop: an instance of the Crop class
+        time: an instance of the Time class
 
     Returns:
         int: bcv, the bio-cover weighting factor for ground cover
