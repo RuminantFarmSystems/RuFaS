@@ -4,7 +4,10 @@
     * Add documentation to all files that remain undocumented
     * Check that all attributes and parameters have psuedocode references
     * If psuedocode (and/or docstrings) are missing and cannot be easily found and added, make sure that a `#TODO` 
-      with an appropriate GitHub Issue reference is included.
+      with an appropriate GitHub Issue reference is included
+    * Please make a list of ALL attributes and parameters that don't have pseudocode/documentation and send that list to 
+      Hector, asking him to let us know what they mean so that we can write documentation. For example 
+      `BaseCrop.fr_n1` vs `BaseCrop.fr_n2` have bad documentation (Issue #179).
 2. Make sure that all `TODO` blocks have GitHub Issues referenced. 
    * **Hint:** in a bash terminal (e.g., Mac terminal or the "Terminal" tab in Pycharm), 
    the command `grep -ir "todo" folder/ | grep -iv "GitHub"` will print a list of all the
