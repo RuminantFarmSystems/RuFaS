@@ -77,7 +77,7 @@ def residue_partitioning(soil, crop_type, weather, time):
                 
                 residue_incorp = layer.tillage_percent * ag_biomass
             
-            soil.ag_biomass = ag_biomass
+            soil.ag_biomass += ag_biomass
 
         else: #non top layers
             
