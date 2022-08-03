@@ -4,6 +4,7 @@ File name: old_manure_management.py
 Description: Implements test cases
 Author(s): Sadman Chowdhury, skc86@cornell.edu
 """
+from lib2to3.pytree import Base
 from unittest import expectedFailure
 from RUFAS.simulation_engine import SimulationEngine
 from RUFAS.routines.manure_management.misc.manure import Manure
@@ -14,8 +15,15 @@ from pytest import approx
 
 from RUFAS.routines.manure_management.gas_emissions.gas_emissions import GasEmissions
 from RUFAS.routines.manure_management.manure_handlers.milking_center import MilkingCenter
+from RUFAS.routines.manure_management.misc.simple_pen import SimplePen
+from RUFAS.routines.manure_management.manure_handlers.bedding_classes import BaseBedding
+
+from RUFAS.routines.animal.pen import Pen
 
 # --------------------------- Test misc module
+firstPen = Pen(1, 10, 10, 5, "cow", "none", "freestall",
+               "none", "none", "none", "none", "none")
+first_simple_pen = SimplePen(firstPen)
 
 
 def test_manure_init() -> None:
@@ -75,6 +83,9 @@ def test_manure_init() -> None:
 
 
 # --------------------------- Test manure handlers module
+
+# milking_center.py tests here
+
 first_instance_of_milking_center = MilkingCenter()
 second_instance_of_milking_center = MilkingCenter(
     num_milkings=4,  minutes_spent_in_holding_area=40.0, minutes_spent_per_milking=8.0)
@@ -138,6 +149,34 @@ def test_total_percent_of_day_spent_in_milking_center():
     result2 = second_instance_of_milking_center.total_percent_of_day_spent_in_milking_center
     expected_value2 = 13.333333333333332
     assert result2 == expected_value2
+
+# bedding_classes.py tests here.
+
+
+first_base_bedding_instance = BaseBedding(200.0, 250.0)
+second_base_bedding_instance = BaseBedding(400.0, 200.0)
+
+
+def test_density():
+    result = first_base_bedding_instance.density
+    expected_value = 250.0
+    assert result == expected_value
+
+    result2 = second_base_bedding_instance.density
+    expected_value2 = 200.0
+    assert result2 == expected_value2
+
+
+def test_volume():
+    result = first_base_bedding_instance.volume
+    expected_value = 0.8
+    assert result == expected_value
+
+    result2 = second_base_bedding_instance.volume
+    expected_value2 = 2
+    assert result2 == expected_value2
+
+
 # --------------------------- Test reception pits module
 
 # --------------------------- Test manure separators module
