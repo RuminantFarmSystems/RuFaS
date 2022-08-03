@@ -40,6 +40,8 @@ one introduces `pytest`: https://realpython.com/pytest-python-testing/
 **refer to these documents often**. Take some time to read through them before you start writing tests. I'm going
 to use `pytest` below and recommend you do the same.
 
+You may also want to review this video from Pooya about tests: https://www.youtube.com/watch?v=RDudLMFSUVA 
+
 Start by looking at the code path diagram: https://3.basecamp.com/3486446/buckets/5296287/uploads/5162606254  
 Note that each box represents a function RUFAS. Note also that each arrow shows which additional functions are called
 by the first function. For example, the very first function in the model is `main()` (at the top in blue). The main 
