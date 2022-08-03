@@ -14,7 +14,7 @@
 
 # ignore python compiled files
 *.pyc
-
+*.csv
 # folders
 build
 others
@@ -25,6 +25,8 @@ others
 output/*
 !output/.keep
 
+
+RUFAS/routines/manure_management/output/*
 # ignore project files
 *.sublime-project
 *.sublime-workspace
