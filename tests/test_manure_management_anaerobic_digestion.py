@@ -63,7 +63,6 @@ def test_get_effluent_volatile_solids(get_expected_values,ad_fixture,mock_init_d
     expected = get_expected_values
     assert pytest.approx(ad.get_effluent_volatile_solids(),0.1) == (1-mock_init_data.VS_FRACTION) * ad.volatile_solids
 
-
 def test_get_evaporated_water(get_expected_values,ad_fixture,mock_init_data):
     ad = ad_fixture
     ad.update()
@@ -128,7 +127,7 @@ def test_calcHeatCapacityManure(T_avg,moisture_content,expected,ad_fixture):
     ad = ad_fixture
     assert pytest.approx(ad.calcHeatCapacityManure(T_avg,moisture_content),0.1) == expected  
 
-@pytest.mark.xfail
+# @pytest.mark.xfail
 def test_update(ad_fixture,get_expected_values_update):
     ad = ad_fixture
     daily_output = ad.update()

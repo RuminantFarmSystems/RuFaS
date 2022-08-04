@@ -218,7 +218,7 @@ def get_expected_values_update(mock_handler_output):
     expected_values=Mock()
     ##Non-daily_output values
     expected_values.manure_nitrogen = 0.0
-    expected_values.TSd = mock_handler_output.TSd
+    expected_values.TSd = 1401.785
     expected_values.VSd = mock_handler_output.VSd-mock_handler_output.VSnd
     expected_values.VSnd = mock_handler_output.VSnd
     expected_values.VS_total = mock_handler_output.VS_total
