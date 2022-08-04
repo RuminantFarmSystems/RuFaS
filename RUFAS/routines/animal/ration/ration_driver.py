@@ -29,25 +29,25 @@ def optimization(requirements, available_feeds, animal_type, cow_type):
         animal_type: string representation of the animal
         cow_type: Boolean which is True if cow is lactating, False otherwise
     """
-    price = NLP.list_reconfig(available_feeds.price)
-    TDN = NLP.list_reconfig(available_feeds.TDN)
-    DE = NLP.list_reconfig(available_feeds.DE)
-    EE = NLP.list_reconfig(available_feeds.EE)
-    is_fat = NLP.list_reconfig(available_feeds.is_fat)
-    calcium = NLP.list_reconfig(available_feeds.calcium)
-    phosphorus = NLP.list_reconfig(available_feeds.phosphorus)
-    NDF = NLP.list_reconfig(available_feeds.NDF)
-    feed_type = NLP.list_reconfig(available_feeds.type)
-    is_wetforage = NLP.list_reconfig(available_feeds.is_wetforage)
-    Kd = NLP.list_reconfig(available_feeds.Kd)
-    N_A = NLP.list_reconfig(available_feeds.N_A)
-    N_B = NLP.list_reconfig(available_feeds.N_B)
-    CP = NLP.list_reconfig(available_feeds.CP)
-    dRUP = NLP.list_reconfig(available_feeds.dRUP)
+    price = NLP.list_reconfig(available_feeds['price'])
+    TDN = NLP.list_reconfig(available_feeds['TDN'])
+    DE = NLP.list_reconfig(available_feeds['DE'])
+    EE = NLP.list_reconfig(available_feeds['EE'])
+    is_fat = NLP.list_reconfig(available_feeds['is_fat'])
+    calcium = NLP.list_reconfig(available_feeds['calcium'])
+    phosphorus = NLP.list_reconfig(available_feeds['phosphorus'])
+    NDF = NLP.list_reconfig(available_feeds['NDF'])
+    feed_type = NLP.list_reconfig(available_feeds['type'])
+    is_wetforage = NLP.list_reconfig(available_feeds['is_wetforage'])
+    Kd = NLP.list_reconfig(available_feeds['Kd'])
+    N_A = NLP.list_reconfig(available_feeds['N_A'])
+    N_B = NLP.list_reconfig(available_feeds['N_B'])
+    CP = NLP.list_reconfig(available_feeds['CP'])
+    dRUP = NLP.list_reconfig(available_feeds['dRUP'])
     if cow_type:
-        limit = NLP.list_reconfig(available_feeds.lactating_cow_limit)
+        limit = NLP.list_reconfig(available_feeds['lactating_cow_limit'])
     else:
-        limit = NLP.list_reconfig(available_feeds.dry_cow_limit)
+        limit = NLP.list_reconfig(available_feeds['dry_cow_limit'])
     NLP.set_globals(price, requirements.NEmaint, requirements.NEa, requirements.NEpreg,
                     requirements.NEl, requirements.NEg, requirements.MP_req,
                     requirements.Ca_req, requirements.P_req,
@@ -126,12 +126,12 @@ def ration_formulation(pen, available_feeds, animal_type, cow_type):
 
     if solution != None:
         ration = {}
-        for feed_id in range(len(available_feeds.feed_id)):
+        for feed_id in range(len(available_feeds['feed_id'])):
             i = feed_id * 3
             num = solution.x[i]
             num += solution.x[i + 1]
             num += solution.x[i + 2]
-            ration[available_feeds.feed_key[feed_id]] = round(num, 6)
+            ration[available_feeds['feed_key'][feed_id]] = round(num, 6)
         ration['status'] = 'Optimal'
         ration['objective'] = NLP.objective(solution.x)
         return ration, ration_vals
@@ -515,6 +515,6 @@ class AvailableFeeds:
                 continue
 
             for feed_id in sorted(list(feed_ids)):
-                idx = self._feed_id_to_list_idx_dict[feed_id]
+                idx = self._feed_id_to_list_idx_dict[int(feed_id)]
                 result[key].append(vals[idx])
         return result

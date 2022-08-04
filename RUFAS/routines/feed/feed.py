@@ -65,37 +65,29 @@ class Feed:
 
         self.entries_split_by_maturity = self.get_feeds_split_by_maturity()
         self.farm_grown_feeds = data['farm_grown_feeds']
-        #self.purchased_feeds_entries = data['purchased_feeds']
-        self.purchased_feeds = data['purchased_feeds']  # set in the next method call
+        self.purchased_feeds = self.get_quality_specific_purchased_feed_ids(data['purchased_feeds'])
 
 
         self.input_feed_combinations = {
-            Pen.AnimalCombination.CALF: set(data['calf_feeds']),
-            Pen.AnimalCombination.GROWING: set(data['growing_feeds']),
-            Pen.AnimalCombination.CLOSE_UP: set(data['close_up_feeds']),
-            Pen.AnimalCombination.GROWING_AND_CLOSE_UP: set(data['growing_feeds']) | set(data['close_up_feeds']),
-            Pen.AnimalCombination.LAC_COW: set(data['lac_cow_feeds']),
+            Pen.AnimalCombination.CALF: set(self.get_quality_specific_purchased_feed_ids(data['calf_feeds'])),
+            Pen.AnimalCombination.GROWING: set(self.get_quality_specific_purchased_feed_ids(data['growing_feeds'])),
+            Pen.AnimalCombination.CLOSE_UP: set(self.get_quality_specific_purchased_feed_ids(data['close_up_feeds'])),
+            Pen.AnimalCombination.GROWING_AND_CLOSE_UP: \
+                set(self.get_quality_specific_purchased_feed_ids(data['growing_feeds'])) | \
+                set(self.get_quality_specific_purchased_feed_ids(data['close_up_feeds'])),
+            Pen.AnimalCombination.LAC_COW: set(self.get_quality_specific_purchased_feed_ids(data['lac_cow_feeds'])),
         }
 
-        self.all_feed_ids = self.get_all_feed_units(data['purchased_feeds'],
-                                                    data['farm_grown_feeds'])
+        self.all_feed_ids = self.get_all_feed_units(data['purchased_feeds'],data['farm_grown_feeds'])
         # dictionary of nutrients needed for this run
         # initially, this only contains information for purchased feeds as none
         # of the farm_grown_feeds have been harvested yet
         self.available_feeds = \
-            self.get_nutrient_vals(self.all_feed_ids, False)
+            self.get_nutrient_vals(self.purchased_feeds, False)
         self.calf_feeds = self.get_calf_feeds()
         # setting up the feed costs based on the input
         self.feed_costs = data['purchased_feeds_costs']
-        ids = []
-        for key in self.feed_costs:
-            ids.append(int(key))
-        feed_ids = self.get_purchased_feed_ids(ids)
-        updated_costs = {}
-        for key, val in self.feed_costs.items():
-            updated_costs[feed_ids[key]] = val
-        # feed value costs according to feeds split by maturity
-        self.feed_costs = updated_costs
+        self.feed_costs = self.get_quality_specific_feed_costs(data['purchased_feeds'])
 
         # The nutrient requirements used in the ration calculations.
         self.nutrient_rqmts = ['FU', 'RU', 'ME_DM', 'RDP_DM', 'RUP_DM']
@@ -866,8 +858,11 @@ class Feed:
         }
             for result in dict_list}
 
-        purchased_mapping = self.get_purchased_feed_ids(purchased_feeds)
+        purchased_mapping_ids = self.get_quality_specific_purchased_feed_ids(purchased_feeds)
 
+        purchased_mapping = {}
+        for id in range(len(purchased_feeds)):
+            purchased_mapping.update({str(purchased_feeds[id]): str(purchased_mapping_ids[id])})
 
         grown_feeds_mapping = {str(feed): str(feed) + 'g'
                                for feed in grown_feeds}
@@ -877,12 +872,13 @@ class Feed:
 
         for entry in all_feeds_mapping:
             if not entry == all_feeds_mapping[entry]:
+                all_feed_info.update({all_feeds_mapping[entry]:all_feed_info[entry]})
                 all_feed_info[all_feeds_mapping[entry]] = \
                     all_feed_info.pop(entry)
 
         return all_feed_info
 
-    def get_purchased_feed_ids(self, entries):
+    def get_quality_specific_purchased_feed_ids(self, entries):
         """
         Description:
             Constructs and returns a dictionary of the purchased feed IDs based on
@@ -896,14 +892,32 @@ class Feed:
             the feed IDs that can be used to find nutrient values in
             the nutrients table
         """
-        purchased_feed_ids = {}
-        for entry in entries:
+        if isinstance(entries, int):
+            entry_list = [entries]
+        else:
+            entry_list = entries
+
+        purchased_feed_ids = []
+        for entry in entry_list:
             if entry in self.entries_split_by_maturity:
                 # making the assumption that purchased feeds are at mid-maturity
-                purchased_feed_ids[str(entry)] = str(entry + 2)
+                purchased_feed_ids.append(entry + 2)
             else:
-                purchased_feed_ids[str(entry)] = str(entry)
+                purchased_feed_ids.append(entry)
         return purchased_feed_ids
+
+    def get_quality_specific_feed_costs(self, input_feed_ids):
+        input_ids = input_feed_ids
+        quality_specific_feed_ids = {}
+        for id in input_ids:
+            quality_id = self.get_quality_specific_purchased_feed_ids(id)[0]
+            quality_specific_feed_ids[str(id)] = str(quality_id)
+
+        updated_costs = {}
+        for key, val in self.feed_costs.items():
+            updated_costs[quality_specific_feed_ids[key]] = val
+        # feed value costs according to feeds split by maturity
+        return updated_costs
 
     def get_feed_id(self, grown_feed_entry, DM, NDF):
         """
