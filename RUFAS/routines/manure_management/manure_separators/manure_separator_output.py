@@ -15,7 +15,7 @@ class ManureSeparatorOutput:
     VS_total: float = field(init=False)
     p_excrt_manure: float = 0.0  # kg
     K_manure: float = 0.0  # kg
-    total_daily_mass: float = 0.0  # L
+    total_daily_mass: float = 0.0  # L or kg
     wet_weight_of_final_solids: float = 0.0
 
     final_solids_dry_content: float = 0.0
