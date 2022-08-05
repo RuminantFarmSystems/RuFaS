@@ -11,7 +11,7 @@
       for him to give us answers all at once. 
             *link to that list is on BaseCamp in 'Brandon Summer 2022' folder*
 2. Make sure that all `TODO` blocks have GitHub Issues referenced. 
-   * [ ] **Hint:** in a bash terminal (e.g., Mac terminal or the "Terminal" tab in Pycharm), 
+   * [x] **Hint:** in a bash terminal (e.g., Mac terminal or the "Terminal" tab in Pycharm), 
    the command `grep -ir "todo" folder/ | grep -iv "GitHub"` will print a list of all the
    lines (within all files in `folder/`) that contain the word "todo" but not the word "github" (case insensitive because of `-i`). 
    * Replace `folder/` in the above code with the path to whatever folder you're checking. You know where our code lives.
