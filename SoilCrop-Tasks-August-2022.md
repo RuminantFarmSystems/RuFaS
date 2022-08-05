@@ -1,14 +1,15 @@
 # Tasks for Brandon Aug 8-26
 
 1. Finish checking all files in `RUFAS/routines/field/` for Sphinx docstrings and for pseudocode references.
-    * [ ] Add documentation to all files that remain undocumented
-    * [ ] Check that all attributes and parameters have psuedocode references
-    * [ ] If psuedocode (and/or docstrings) are missing and cannot be easily found and added, make sure that a `#TODO` 
+    * [x] Add documentation to all files that remain undocumented
+    * [x] Check that all attributes and parameters have psuedocode references
+    * [x] If psuedocode (and/or docstrings) are missing and cannot be easily found and added, make sure that a `#TODO` 
       with an appropriate GitHub Issue reference is included
-    * [ ] Please make a list of ALL attributes and parameters that don't have pseudocode/documentation and send that list to 
+    * [x] Please make a list of ALL attributes and parameters that don't have pseudocode/documentation and send that list to 
       Hector (with me CC'd), asking him to let us know what they mean so that we can write documentation. For example 
       `BaseCrop.fr_n1` vs `BaseCrop.fr_n2` have bad documentation (Issue #179). A list of all instances will make it easier
       for him to give us answers all at once. 
+            - [ ] link to that list is on BaseCamp in 'Brandon Summer 2022' folder
 2. Make sure that all `TODO` blocks have GitHub Issues referenced. 
    * [ ] **Hint:** in a bash terminal (e.g., Mac terminal or the "Terminal" tab in Pycharm), 
    the command `grep -ir "todo" folder/ | grep -iv "GitHub"` will print a list of all the
