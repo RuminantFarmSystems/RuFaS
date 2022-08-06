@@ -155,6 +155,7 @@ def test_total_percent_of_day_spent_in_milking_center():
 
 first_base_bedding_instance = BaseBedding(200.0, 250.0)
 second_base_bedding_instance = BaseBedding(400.0, 200.0)
+third_base_bedding_instance = BaseBedding(300.0, 300.0)
 
 
 def test_density():
@@ -175,6 +176,24 @@ def test_volume():
     result2 = second_base_bedding_instance.volume
     expected_value2 = 2
     assert result2 == expected_value2
+
+
+def test_add():
+    result = first_base_bedding_instance.__add__(second_base_bedding_instance)
+    expected_mass = 600.0
+    expected_volume = 2.8
+    expected_density = 214.2857142857143
+    assert result.mass == expected_mass
+    assert result.volume == expected_volume
+    assert result.density == expected_density
+
+    result2 = first_base_bedding_instance.__add__(third_base_bedding_instance)
+    expected_mass2 = 500.0
+    expected_volume2 = 1.8
+    expected_density2 = 277.77777777777777
+    assert result2.mass == expected_mass2
+    assert result2.volume == expected_volume2
+    assert result2.density == expected_density2
 
 
 # --------------------------- Test reception pits module
