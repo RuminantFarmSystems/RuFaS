@@ -8,7 +8,7 @@ Author(s): Kass Chupongstimun, kass_c@hotmail.com
            Jacob Johnson, jacob8399@gmail.com
            Michael Tang, mstang2@wisc.edu
 """
-
+import pandas as pd
 from math import acos, asin, sin, tan, pi
 from .crop_types import base_crop, alfalfa, corn, soybean, tall_fescue, spring_barley,\
 potato, sugar_beet, spring_wheat,winter_wheat, cereal_rye, triticale, fall_oats
@@ -30,7 +30,6 @@ def daily_crop_routine(soil, crop, field_management, weather, time):
         weather: an instance of the Weather class defined in classes.py
         time: an instance of the Time class defined in classes.py
     """
-
     # Current crop is set at the beginning of the year in annual_crop_routine
     crop_type = crop.current_crop
     # If there is no crop in rotation, current crop will be named
@@ -254,6 +253,37 @@ def is_kill_year(crop, time):
         return True
     else:
         return False
+
+class cropTime:
+    def __init__(self,time, data):
+        """
+        Description:
+            This object is responsible for creating and tracking time in the simulation.
+        Args:
+            config: instance of the Config class containing information necessary
+                to initialize time
+        """
+        # number of years
+        
+        
+        years = time.years
+        crop_list= data['crops']
+        start_year= time.start_year
+        daily_year=[]
+        for k in range(start_year,start_year+len(years)):
+            x=[k for _ in range(len(years[k-start_year]))]
+            daily_year.append(x)
+        times={"year" : sum(daily_year,[]),
+        "day" : sum(years,[])}
+        
+        df=pd.DataFrame(times)
+        df['crops_growing'] = [[] for _ in range(len(df))]
+        for index, row in df.iterrows():
+            for crop in crop_list.keys():
+                for i in range(0,len(crop_list[crop]['plant_years'])):
+                    if (crop_list[crop]['plant_years'][i] == row['year'] and crop_list[crop]['planting_day'] < row['day']) and (crop_list[crop]['harvest_day'] > row['day']):
+                        df.loc[index,'crops_growing'].append(crop)
+        print(df)
 
 
 class Crop:
