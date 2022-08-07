@@ -386,9 +386,16 @@ class AnaerobicLagoon(BaseTreatment):
         )
         daily_output.final_volume = self.total_volume - (
                 (daily_output.TSd + daily_output.VS_total) * self.storage_time_period * Constants.KG_TO_CUBIC_METERS)
+        sludge_accumulation_volume = AnaerobicLagoonInitData.SAV_FRACTION*handler.TSd*AnaerobicLagoonInitData.sludge_accumulation_period*Constants.DAYS_PER_YEAR
+
+        #Sludge Nutrient Values
+
 
         return daily_output
-
+    def calc_lagoon_size(self):
+        pass
+    def calc_emissions(self):
+        pass
 
 class StoragePond(BaseTreatment):
     def __init__(self,
@@ -520,8 +527,6 @@ class AnaerobicDigestionInitData(TreatmentInitData, ABC):
     K_removal_efficiency: float = 0.0  # 0-5% K fraction
     TAN_removal_efficiency: float = 0.1
     TS_DM_effluent_rate: float = 0.0
-
-
 
     EVAPORATION_FRACTION: float = 0.02  # 2-5% of Wastewater Volume
     AD_TEMP_SETPOINT: float = 37.5
