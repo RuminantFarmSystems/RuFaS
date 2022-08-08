@@ -51,11 +51,10 @@ class TreatmentOutput:
 
 
 @dataclass
-class AnaerobicDigesterOutput(TreatmentOutput):
+class AnaerobicDigestionOutput(TreatmentOutput):
     total_daily_mass: float = 0.0
     urea: float = 0.0
 
-    AD_effluent_volume: float = 0.0,  # effluent volume of AD (m3/day)
     AD_biogas: float = 0.0,  # biogas production per day (m3/day)
     AD_biogas_energy_content: float = 0.0  # biogas energy content (MJ/m3)
     AD_methane_generation_volume: float = 0.0
@@ -65,4 +64,4 @@ class AnaerobicDigesterOutput(TreatmentOutput):
         self.total_daily_mass = 0.0  # TODO convert effluent volume to total daily mass
 
     def clone(self) -> TreatmentOutput:
-        return AnaerobicDigesterOutput(**asdict(self))
+        return AnaerobicDigestionOutput(**asdict(self))

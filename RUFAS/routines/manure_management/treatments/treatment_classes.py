@@ -23,7 +23,7 @@ from RUFAS.routines.manure_management.misc.constants import ManureManagementCons
 from RUFAS.routines.manure_management.misc.simple_pen import SimplePen
 from RUFAS.routines.manure_management.reception_pits.reception_pit_classes import BaseReceptionPit
 from RUFAS.routines.manure_management.reception_pits.reception_pit_output import ReceptionPitOutput
-from RUFAS.routines.manure_management.treatments.treatment_output import AnaerobicDigesterOutput, TreatmentOutput
+from RUFAS.routines.manure_management.treatments.treatment_output import TreatmentOutput, AnaerobicDigestionOutput
 
 
 class TreatmentEnum(ExtendedEnum):
@@ -99,9 +99,7 @@ class AnaerobicDigestion(BaseTreatment):
 
     Constructor Objects 
     -------------------
-    pen: SimplePen  ---> pen associated with the manure flow? -- 
-                    ---> not sure this should be an input since all flow is channeled through
-                     reception pit, manure handler or separator
+    pen: SimplePen  ---> Associated Pen
     manure_handler: BaseManureHandler ---> Associated manure handler before ReceptionPit
     manure_separator: BaseSeparator,  ---> Associated Separator
     treatment_init_data: TreatmentInitData ---> AnaerobicDigesterInitData object
@@ -110,13 +108,12 @@ class AnaerobicDigestion(BaseTreatment):
     Attributes
     -----------
     Same as BaseTreatment: pen, manure_handler,manure_separator,treatment_enum, treatment_init_data, all_output
-    reception_pit: a reception_pit object that can be created from the manure_handler object when being created,
-                   or could be an input. 
 
     Methods
     -----------
     Same as BaseTreatment: update,
-    calculate_digester_outputs_daily_step. --> helper function for update, returns AnaerobicDigesterOutput object
+    update_helper. --> helper function for update, returns TreatmentOutput object and calculates non-output values 
+    to track
 
     """
 
@@ -124,7 +121,7 @@ class AnaerobicDigestion(BaseTreatment):
                  pen: SimplePen,
                  manure_handler: BaseManureHandler,
                  manure_separator: BaseSeparator,
-                 treatment_init_data: AnaerobicDigesterInitData):
+                 treatment_init_data: AnaerobicDigestionInitData):
         super().__init__(pen, manure_handler, manure_separator, treatment_init_data)
         self.weather_data = SimpleWeather()
 
@@ -132,7 +129,7 @@ class AnaerobicDigestion(BaseTreatment):
         self.total_solids = 0.0
         self.volatile_solids = 0.0
         self.wastewater_volume = 0.0
-        self.minimum_digester_volume=0
+        self.minimum_Lagoon_volume=0
         self.top_cover_volume=0
         self.biogas_generation=0
         self.effluent_total_solids=0
@@ -150,12 +147,12 @@ class AnaerobicDigestion(BaseTreatment):
         
 
     def update(self) -> TreatmentOutput:
-        daily_output = self.calculate_digester_outputs_daily_step()
+        daily_output = self.update_helper()
         self.all_output.append(daily_output)
         return daily_output
 
 
-    def calculate_digester_outputs_daily_step(self):
+    def update_helper(self):
 
         """ Returns the daily_ouput of AnaerobicDigestion output
             :params self
@@ -174,18 +171,18 @@ class AnaerobicDigestion(BaseTreatment):
         ## m^3/year  MS.3.B.1
         self.sludge_accumulation_volume = self.get_sav()
 
-        # Minimum digester volume required for processing inflow  (m^3)
+        # Minimum Lagoon volume required for processing inflow  (m^3)
         # MS.3.B.2
         self.minimum_digester_volume = self.get_minimum_digester_volume()
 
         # MS.3.B.3
-        self.top_cover_volume = self.get_top_cover_volume(self.minimum_digester_volume)
+        self.top_cover_volume = self.get_top_cover_volume(self.minimum_Lagoon_volume)
 
 
         # MS.3.B.4
-        self.digester_volume_of_anaerobic_lagoon = self.minimum_digester_volume + self.top_cover_volume + self.sludge_accumulation_volume
+        self.volume_of_anaerobic_lagoon = self.minimum_digester_volume + self.top_cover_volume + self.sludge_accumulation_volume
 
-        # kg biogas generated in digester
+        # kg biogas generated in Lagoon
         # MS.3.B.6
         self.biogas_generation = self.get_biogas_generation()
 
@@ -196,7 +193,7 @@ class AnaerobicDigestion(BaseTreatment):
         # Energy content of biogas
         self.energy_content = self.get_energy_content(self.methane_generation_volume)
 
-        # ------------------------Digester EFFLUENT Characteristics-------------------------------------
+        # ------------------------Lagoon EFFLUENT Characteristics-------------------------------------
         # MS.3.B.8
         self.effluent_waste_volume = self.wastewater_volume
         self.evaporated_water = self.get_evaporated_water() ## m^3/day
@@ -207,30 +204,27 @@ class AnaerobicDigestion(BaseTreatment):
         # MS.3.B.10
         self.effluent_volatile_solids = self.get_effluent_volatile_solids()
         # Nutrient content of outputs
-        self.N_content = self.get_nutrient_content(self.treatment_init_data.N_FRACTION,handler.manure_nitrogen)
-        self.P_content = self.get_nutrient_content(self.treatment_init_data.P_FRACTION,handler.p_excrt_manure)
-        self.K_content = self.get_nutrient_content(self.treatment_init_data.K_FRACTION,handler.K_manure)
+        self.N_content = self.get_nutrient_content(self.treatment_init_data.N_removal_efficiency,handler.manure_nitrogen)
+        self.P_content = self.get_nutrient_content(self.treatment_init_data.P_removal_efficiency,handler.p_excrt_manure)
+        self.K_content = self.get_nutrient_content(self.treatment_init_data.K_removal_efficiency,handler.K_manure)
 
-        ad_daily_output = AnaerobicDigesterOutput(
-                    urea = 0.0,
-                    TAN_s = 0.0,
-                    manure_nitrogen = self.N_content,
-                    TSd = self.effluent_total_solids,
-                    VSd = self.effluent_volatile_solids-handler.VSnd,
-                    VSnd = handler.VSnd,
-                    VS_total = self.effluent_volatile_solids,
-                    p_excrt_manure = self.P_content,
-                    K_manure = self.K_content,
-                    total_daily_mass = self.effluent_waste_volume, 
-                    final_volume=self.effluent_waste_volume,
-
-                    ## Outputs for AD
-                    AD_effluent_volume = self.effluent_waste_volume,                     ## methane production per day (m3/day)
-                    AD_biogas = self.biogas_generation,                                  ## biogas production per day (m3/day)
-                    AD_biogas_energy_content = self.energy_content,                       ## biogas energy content (MJ/m3)  
-                    AD_methane_generation_volume =self.methane_generation_volume,   
-                    AD_input_energy_heating =self.input_energy_heating                   
-        )
+        # ad_daily_output = AnaerobicDigestionOutput(
+        #             urea = 0.0,
+        #             TAN_s = 0.0,
+        #             manure_nitrogen = self.N_content,
+        #             TSd = self.effluent_total_solids,
+        #             VSd = self.effluent_volatile_solids-handler.VSnd,
+        #             VSnd = handler.VSnd,
+        #             VS_total = self.effluent_volatile_solids,
+        #             p_excrt_manure = self.P_content,
+        #             K_manure = self.K_content,
+        #             total_daily_mass = self.effluent_waste_volume, 
+        #             ## Outputs for AD
+        #             AD_biogas = self.biogas_generation,                                  ## biogas production per day (m3/day)
+        #             AD_biogas_energy_content = self.energy_content,                       ## biogas energy content (MJ/m3)  
+        #             AD_methane_generation_volume =self.methane_generation_volume,   
+        #             AD_input_energy_heating =self.input_energy_heating                   
+        # )
 
         daily_output = TreatmentOutput(
                     manure_nitrogen = self.N_content,
@@ -271,13 +265,13 @@ class AnaerobicDigestion(BaseTreatment):
         return self.treatment_init_data.BIOGAS_GEN_RATIO * self.volatile_solids
 
     def get_minimum_digester_volume(self):
-        """Returns minimum digester volume required based on HRT
+        """Returns minimum Lagoon volume required based on HRT
         """
         return self.wastewater_volume * self.treatment_init_data.hydraulic_retention_time
 
     def get_top_cover_volume(self,minimum_digester_volume):
         """Returns top cover volume
-        :param minimum_digester_volume: minimum digester volume in m3
+        :param minimum_Lagoon_volume: minimum Lagoon volume in m3
         """
         return self.treatment_init_data.TOP_COVER_VOLUME_FRACTION * minimum_digester_volume
 
@@ -291,7 +285,7 @@ class AnaerobicDigestion(BaseTreatment):
         """Returns effluent_total_solids
         """
         if(self.wastewater_volume>0):
-            return (1-self.treatment_init_data.TS_FRACTION) * self.total_solids  ## g/L
+            return (1-self.treatment_init_data.TS_removal_efficiency) * self.total_solids  
         else:
             return 0.0
             
@@ -299,7 +293,7 @@ class AnaerobicDigestion(BaseTreatment):
         """Returns effluent_volatile_solids
         """
         if(self.wastewater_volume>0):
-            return (1-self.treatment_init_data.VS_FRACTION) * self.volatile_solids  ## g/L
+            return (1-self.treatment_init_data.VS_removal_efficiency) * self.volatile_solids  
         else:
             return 0.0
 
@@ -360,9 +354,48 @@ class AnaerobicLagoon(BaseTreatment):
                  pen: SimplePen,
                  manure_handler: BaseManureHandler,
                  manure_separator: BaseSeparator,
-                 treatment_init_data: TreatmentInitData):
+                 treatment_init_data: TreatmentInitData,
+                 precip=0.0,
+                 freeboard=0.0):
         super().__init__(pen, manure_handler, manure_separator, treatment_init_data)
+        self.freeboard = freeboard  # m^3
+        self.precip=precip # m^3 (25-year 24h storm event)
+        self.freeboard = freeboard  # m^3
+    @property
+    def treatment_volume(self) -> float:
+        return self.storage_time_period * self.manure_handler.last_output.total_daily_mass  # m^3
 
+    @property
+    def total_volume(self) -> float:
+        return self.treatment_volume + self.freeboard + self.precip  # m^3
+        
+    def update(self) -> TreatmentOutput:
+        daily_output = self.update_helper()
+        self.all_output.append(daily_output)
+        return daily_output
+
+    def update_helper(self):
+        handler=self.manure_handler.last_output
+        daily_output = TreatmentOutput(
+                TAN_s=handler.TAN_s * (1 - self.treatment_init_data.TAN_removal_efficiency),
+                manure_nitrogen=handler.manure_nitrogen * (1 - self.treatment_init_data.N_removal_efficiency),
+                TSd=handler.TSd * (1 - self.treatment_init_data.TS_removal_efficiency),
+                VS_total=handler.VS_total * (1 - self.treatment_init_data.VS_removal_efficiency),
+                p_excrt_manure=handler.p_excrt_manure * (1 - self.treatment_init_data.P_removal_efficiency),
+                K_manure=handler.K_manure * (1 - self.treatment_init_data.K_removal_efficiency),
+        )
+        daily_output.final_volume = self.total_volume - (
+                (daily_output.TSd + daily_output.VS_total) * self.storage_time_period * Constants.KG_TO_CUBIC_METERS)
+        sludge_accumulation_volume = AnaerobicLagoonInitData.SAV_FRACTION*handler.TSd*AnaerobicLagoonInitData.sludge_accumulation_period*Constants.DAYS_PER_YEAR
+
+        #Sludge Nutrient Values
+
+
+        return daily_output
+    def calc_lagoon_size(self):
+        pass
+    def calc_emissions(self):
+        pass
 
 class StoragePond(BaseTreatment):
     def __init__(self,
@@ -432,8 +465,8 @@ class TreatmentFactory:
 
         enum_to_class: Dict[TreatmentEnum, Tuple[Type[BaseTreatment], Type[TreatmentInitData]]] = {
             treatment_enum.STORAGE_POND: (StoragePond, StoragePondInitData),
-            treatment_enum.ANAEROBIC_DIGESTION: (AnaerobicDigestion, AnaerobicDigesterInitData),
-            # treatment_enum.ANAEROBIC_LAGOON: (AnaerobicLagoon, AnaerobicLagoonInitData),
+            treatment_enum.ANAEROBIC_DIGESTION: (AnaerobicDigestion, AnaerobicDigestionInitData),
+            treatment_enum.ANAEROBIC_LAGOON: (AnaerobicLagoon, AnaerobicLagoonInitData),
         }
 
         params = {
@@ -469,38 +502,62 @@ class StoragePondInitData(TreatmentInitData):
 
 
 @dataclass
-class AnaerobicDigesterInitData(TreatmentInitData, ABC):
+class AnaerobicDigestionInitData(TreatmentInitData, ABC):
     """
     A data class that contains information used in the
-    creation of a AnaerobicDigester object. Overrides default values from
+    creation of a AnaerobicLagoon object. Overrides default values from
     TreatmentInitData, and adds properties unique to this component
 
     """
-
-
     hydraulic_retention_time: int = 25  # 25 -30 days
     sludge_accumulation_period: float = 1.0  # Sludge accumulation period 1-5 years
-
     SAV_FRACTION: float = 0.03  # Sludge Accumulation volume fraction 2-4% of VS loaded
-
     TOP_COVER_VOLUME_FRACTION: float = 0.2  # Should be between 10-30%
     BIOGAS_GEN_RATIO: float = 0.38  # 0.23 to 0.39 kg CH4/kg VS
     METHANE_GEN_RATIO: float = 0.65  # 0.5-0.65 according to spreadsheet
 
-    # Digester EFFLUENT Characteristics
-    EVAPORATION_FRACTION: float = 0.02  # 2-5% of Wastewater Volume
+    # EFFLUENT Characteristics
 
     # Fraction of total solids loading in effluent to original concentration
-    TS_FRACTION: float = 0.45
+    TS_removal_efficiency: float = 0.45
     # Fraction of volatile solids in effluent to original concentration
-    VS_FRACTION: float = 0.40
+    VS_removal_efficiency: float = 0.40
+    N_removal_efficiency: float = 0.0  # 0-5% N fraction
+    P_removal_efficiency: float = 0.0  # 0-5% P fraction
+    K_removal_efficiency: float = 0.0  # 0-5% K fraction
+    TAN_removal_efficiency: float = 0.1
+    TS_DM_effluent_rate: float = 0.0
 
-    N_FRACTION: float = 0.0  # 0-5% N fraction
-    P_FRACTION: float = 0.0  # 0-5% P fraction
-    K_FRACTION: float = 0.0  # 0-5% K fraction
-
+    EVAPORATION_FRACTION: float = 0.02  # 2-5% of Wastewater Volume
     AD_TEMP_SETPOINT: float = 37.5
     AD_TEMP: float = 37.5
     @classmethod
     def get_instance(cls) -> TreatmentInitData:
-        return AnaerobicDigesterInitData()
+        return AnaerobicDigestionInitData()
+
+
+
+@dataclass
+class AnaerobicLagoonInitData(TreatmentInitData, ABC):
+    """
+    A data class that contains information used in the
+    creation of a AnaerobicLagoon object. Overrides default values from
+    TreatmentInitData, and adds properties unique to this component
+
+    """
+    hydraulic_retention_time: int = 365  # 180 - 365 days
+    sludge_accumulation_period: float = 5.0  # Sludge accumulation period 5-20 years
+    SAV_FRACTION: float = 0.00251  # Sludge Accumulation volume fraction 0.00274-0.00455 of VS loaded
+
+    percent_dry_solids = 1.0
+    TS_removal_efficiency = 0.75 # Between 70-85%
+    VS_removal_efficiency = 0.84 # Between 80-90%
+    N_removal_efficiency = 0.75
+    TAN_removal_efficiency = 0.75
+    P_removal_efficiency = 0.65
+    K_removal_efficiency = 0.24
+    TS_DM_effluent_rate = 0.0
+
+    @classmethod
+    def get_instance(cls) -> TreatmentInitData:
+        return AnaerobicLagoonInitData()
