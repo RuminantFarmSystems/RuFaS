@@ -136,7 +136,7 @@ class BaseCrop:
         # water uptake
         self.epco = 0  # psuedocode C.4.B.2
         """float: plant uptake compensation factor, a value between 0.01 and 1.00"""
-        self.beta_w = 0  # psuedocode C.4.A.1  # TODO: taken from corn - Github issue #154
+        self.beta_w = 0  # psuedocode C.4.A.1
         """water-use distribution parameter"""
         self.water_actual_up = 0  # psuedocode C.4.A.2
         """water uptake (mm)"""
@@ -151,9 +151,9 @@ class BaseCrop:
            upper soil layers.
         """
         self.fr_n1 = 0.04  # psuedocode C.5.A.2
-        """float: normal fraction of nitrogen in plant biomass before emergence"""  # TODO - double check the stage for n1 and n2 (same for p1 and p2)
+        """float: normal fraction of nitrogen in plant biomass before emergence"""  # TODO: GitHub Issue #179
         self.fr_n2 = 0.03  # psuedocode C.5.A.2
-        """float: normal fraction of nitrogen in plant biomass at emergence"""
+        """float: normal fraction of nitrogen in plant biomass at emergence"""  # TODO: GitHub Issue #179
         self.fr_n3 = 0.02  # psuedocode C.5.A.2
         """float: normal fraction of nitrogen in plant biomass at maturity"""
         self.fr_n3ish = 0.02  # psuedocode C.5.A.2
@@ -181,9 +181,9 @@ class BaseCrop:
         self.fr_PHU_100 = 1.0  # psuedocode C.6.A.1
         """fraction of potential heat units accumulated at 100% plant maturity"""
         self.fr_p1 = 0.004  # psuedocode C.6.B.1
-        """float: normal fraction of phosphorus in plant biomass before emergence"""
+        """float: normal fraction of phosphorus in plant biomass at emergence"""  # TODO: GitHub Issue #179
         self.fr_p2 = 0.003  # psuedocode C.6.B.1
-        """float: normal fraction of phosphorus in plant biomass at emergence"""
+        """float: normal fraction of phosphorus in plant biomass at emergence"""  # TODO: GitHub Issue #179
         self.fr_p3 = 0.002  # psuedocode C.6.B.1
         """float: normal fraction of phosphorus in plant biomass at maturity"""
         self.fr_p3ish = 0.002  # psuedocode C.6.B.1
@@ -214,10 +214,9 @@ class BaseCrop:
         """float: harvest efficiency, as a percent of plant biomass"""
         self.gamma_wu = 0  # psuedocode C.9.C.1
         """float: water defficiency factor"""
-        self.biomass_dry_down_percent = 0  # TODO: no pseudocode reference - GitHub Issue #168
-        # TODO: Hard coded total dry down until daily method is modeled - GitHub Issue #156
-        self.DM_harvest_percent = 0.15  # TODO: no pseudocode reference - GitHub Issue #168
-        self.NDF_harvest_percent = 0.42  # TODO: no pseudocode reference - GitHub Issue #168
+        self.biomass_dry_down_percent = 0  # TODO: no pseudocode reference - GitHub Issue #168, #156
+        self.DM_harvest_percent = 0.15  # TODO: no pseudocode reference - GitHub Issue #168, #156
+        self.NDF_harvest_percent = 0.42  # TODO: no pseudocode reference - GitHub Issue #168, #156
         self.bio_AG = 0  # psuedocode C.10.H.1
         """float: Above ground biomass (kg/ha)"""
         self.bio_BG = 0  # psuedocode C.10.H.4
@@ -282,7 +281,7 @@ class BaseCrop:
         """
         return getattr(crop_config, self.species.upper())
 
-    def _set_species(self, species=None):  # TODO: This should be deprecated, because species should be a required input
+    def _set_species(self, species=None):  # TODO: This should be deprecated, because species should be a required input - GitHub Issue #180
         """get the name of the species
 
            Args:
@@ -310,5 +309,5 @@ class BaseCrop:
         for key, val in data_variable.items():
             setattr(self, key, val)
 
-## TODO: The Crop() class needs to be updated to work with the new functionality of BaseCrop and the child
+## TODO: The Crop() class needs to be updated to work with the new functionality of BaseCrop and the child - GitHub Issue #180
 ##  crop classes should have everything removed except species-specific methods.

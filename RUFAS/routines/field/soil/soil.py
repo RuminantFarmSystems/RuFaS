@@ -64,19 +64,37 @@ def daily_soil_routine(soil, crop, field_management, weather, time):
     annual_variable_update(soil)
 
 
+#TODO: pseudocode (if necessary) - GitHub Issue #168
 def daily_soil_reset(soil):
+    """
+    Description: 
+        Resets the DRP_runoff and DRP_drainage attributes of the Soil instance to 0
+        "pseudocode_soil" ?
+    Args:
+        soil: an instance of the Soil class
+    """
     soil.DRP_runoff = 0.0
     soil.DRP_drainage = 0.0
 
-
+#TODO: pseudocode (if necessary) - GitHub Issue #168
 def annual_variable_update(soil):
+    """
+    Description:
+        Updates the soil_water, phosphorus_cycling, and nitrogen_cycling modules with the 
+        appropriate annual values from the Soil instance
+        "pseudocode_soil" ?
+
+
+    Args:
+        soil: an instance of the Soil class
+    """
     soil_water.update_annual_SW(soil)
     phosphorus_cycling.update_annual_P(soil)
     nitrogen_cycling.update_annual_N(soil)
 
 
 class Soil:
-
+    #TODO: add proper docstrings - GitHub Issue #169
     def __init__(self, data):
         """
         Description:
@@ -341,6 +359,7 @@ class Soil:
 
         self.initialize_profile_characteristics()
 
+    #TODO: add proper docstrings - GitHub Issue #169
     class SoilLayer:
         def __init__(self, layer_name, layer_data):
             """
@@ -523,6 +542,12 @@ class Soil:
             self.ADJ_crop_type_bio_BG = 0.0
 
     def initialize_profile_characteristics(self):
+        """
+        Description:
+            initializes the soil layer profile with the proper information given the instance of the soil class it is
+            being created for. This function is called in the __init__() of the Soil class.
+            "pseudocode_soil" S.5.A.1-6, S.4.A.1-7
+        """
         if self.cover == "GRASSED":
             self.cover_factor = 0.8
         elif self.cover == "RESIDUE COVER":
@@ -619,16 +644,30 @@ class Soil:
         self.initial_profile_SW = self.profile_SW
         self.initial_profile_N = self.profile_N
 
+    #TODO: pseudocode (if necessary) - GitHub Issue #168
     def annual_mass_balance(self, field_management, time):
         """
         Description:
-            Calculates annual water balance
+            Wrapper function that updates the annual water,phosphorus and nitrogen
+            balances by calling their appropriate functions
+        "pseudocode_soil" ?
+            
+        Args:
+            field_management: An instance of the FieldManagement class
+            time: an instance of the Time class
         """
         self.annual_water_balance()
         self.annual_phosphorus_balance(field_management, time)
         self.annual_nitrogen_balance(field_management, time)
 
+
+    #TODO: pseudocode (if necessary) - GitHub Issue #168
     def annual_water_balance(self):
+        """
+        Description:
+            Computes the annual water balance of the Soil instance...
+            "pseudocode_soil" ?
+        """
         self.delta_SW_annual = self.profile_SW - self.initial_profile_SW
 
         self.p_calc_annual = self.delta_SW_annual + \
@@ -637,7 +676,13 @@ class Soil:
 
         self.water_balance_difference_annual = self.p_act_annual - self.p_calc_annual
 
+    #TODO: pseudocode (if necessary) - GitHub Issue #168
     def annual_phosphorus_balance(self, field_management, time):
+        """
+        Description:
+            Computes the annual phosphorus balance of the Soil instance...
+            "pseudocode_soil" ?
+        """
         self.STP_annual = self.STP_annual / len(time.years[time.year - 1])
 
         self.delta_P_annual = self.profile_P - self.initial_profile_P
@@ -648,7 +693,13 @@ class Soil:
 
         self.P_balance_difference_annual = field_management.manure_P_applied_annual - self.P_calc_annual
 
+    #TODO: pseudocode (if necessary) - GitHub Issue #168
     def annual_nitrogen_balance(self, field_management, time):
+        """
+        Description:
+            Computes the annual nitrogen balance of the Soil instance...
+            "pseudocode_soil" ?
+        """
         for layer in self.soil_layers:
             layer.NO3_average = layer.NO3_average / len(time.years[time.year - 1])
             layer.NH4_average = layer.NH4_average / len(time.years[time.year - 1])
@@ -667,10 +718,12 @@ class Soil:
 
         self.N_balance_difference_annual = field_management.manure_N_applied_annual - self.N_calc_annual
 
+    #TODO: pseudocode (if necessary) - GitHub Issue #168
     def annual_reset(self):
         """
         Description:
             Resets the annual values for the next year.
+            "pseudocode_soil" ?
         """
 
         # annual mass balance reset

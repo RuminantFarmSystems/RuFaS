@@ -123,9 +123,13 @@ def calc_HI_act(crop_type):
 
     crop_type.HI_actual = term1 * term2 + crop_type.HI_min
 
-
+# TODO: add documentation and pseudocode reference - GitHub Issue #170
 def calc_dry_down(crop_type):
     # TODO: stand in for more sophisticated dry down method - GitHub Issue #162
+    """
+    Description:
+        "pseudocode_crop"?
+    """
     crop_type.bio_AG -= (crop_type.bio_AG * crop_type.biomass_dry_down_percent)
 
 

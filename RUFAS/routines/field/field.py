@@ -139,8 +139,10 @@ class Fields:
         """:obj:`float`: annual summation of ``P_yield``"""
 
     def summarize_fields(self):
-        """reset the attributes of a Fields instance to 0 and then add up crop, soil, and field management attributes
-           for each field - giving the overall sum of these properties across fields.
+        """Description:
+            reset the attributes of a Fields instance to 0 and then add up crop, soil, 
+            and field management attributes for each field - 
+            giving the overall sum of these properties across fields.
         """
         # Why are these set to their initialization values again? This seems redundant (prior to the loop)
         self.profile_SW = 0.0
@@ -201,7 +203,11 @@ class Fields:
             self.P_yield += crop.P_yield
 
     def summarize_annual_variables(self):
-        """update attributes annually by accumulation, resulting in across-year sums of their values"""
+        """
+        Description:
+            update attributes annually by accumulation, 
+            resulting in across-year sums of their values
+        """
         self.runoff_annual += self.runoff
         self.drainage_annual += self.drainage
         self.erosion_annual += self.erosion
@@ -223,7 +229,10 @@ class Fields:
         self.P_yield_annual += self.P_yield
 
     def annual_reset(self):
-        """reset some attributes to 0 for each field"""
+        """
+        Description:
+            reset some attributes to 0 for each field
+        """
         for field in self.fields.values():
             field.crop.annual_reset()
             field.soil.annual_reset()
