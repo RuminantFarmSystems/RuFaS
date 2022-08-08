@@ -31,7 +31,7 @@ ALFALFA = {
         # heat unit variables
         "T_base_min": 4,
         "T_base_max": 43.33,
-        "PHU": 800,  # TODO: Potential heat units unknown - GitHub Issue #154
+        "PHU": 800,  # TODO: Potential heat units unknown - GitHub Issue #157
         # LAI parameters
         "fr_PHU_1": 0.15,
         "fr_PHU_2": 0.50,
@@ -49,7 +49,7 @@ ALFALFA = {
         "RUE": 20,
         "T_opt": 25,
         # water use
-        "beta_w": 10,  # TODO taken from corn GitHub Issue #154
+        "beta_w": 10,  # TODO taken from corn GitHub Issue #157
         "epco": 1,
         # nitrogen uptake
         "beta_n": 10,
@@ -72,9 +72,9 @@ ALFALFA = {
         "HI_opt": 0.9,
         "harvest_eff": 0.9,
         "gamma_wu": 0,
-        "biomass_dry_down_percent": 0.0,
-        "DM_harvest_percent": 0.15,  # TODO: Hard coded dry matter percent at harvest - GitHub Issue #155
-        "NDF_harvest_percent": 0.416
+        "biomass_dry_down_percent": 0.0,  # TODO: GitHub Issue #156
+        "DM_harvest_percent": 0.15,  # TODO: Hard coded dry matter percent at harvest - GitHub Issue #156
+        "NDF_harvest_percent": 0.416  # TODO: GitHub Issue #156
 }
 
 CORN = {
@@ -126,8 +126,8 @@ CORN = {
         "HI_actual": 0,
         "HI_opt": 0.6,
         "harvest_eff": 0.9,
-        "biomass_dry_down_percent": 0.0,
-        "DM_harvest_percent": 0.35  # TODO: Hard coded dry matter percent at harvest - GitHub Issue #155
+        "biomass_dry_down_percent": 0.0,  # TODO: GitHub Issue #156
+        "DM_harvest_percent": 0.35  # TODO: Hard coded dry matter percent at harvest - GitHub Issue #156
 }
 
 CEREAL_RYE = {
@@ -137,7 +137,7 @@ CEREAL_RYE = {
         "kill_year": True,
         "T_base_min": 0,
         "T_base_max": 30,  # TODO: GitHub Issue #157
-        "PHU": 996,  # TODO: Potential heat units unknown - GitHub Issue #154
+        "PHU": 996,  # TODO: Potential heat units unknown - GitHub Issue #157
         "fr_PHU_sen": 0.80,
         "fr_PHU_harvest": 1.2,  # TODO: GitHub Issue #157
         "LAI_max": 4,
@@ -158,8 +158,8 @@ CEREAL_RYE = {
         "HI_min": 0.2,
         "HI_opt": 0.40,
         "biomass_dry_down_percent": 0.0,  # TODO: Hard coded total dry down until daily method is modeled - GitHub Issue #156
-        "DM_harvest_percent": 0.0001,  # TODO: Hard coded dry matter percent at harvest - GitHub Issue #155
-        "NDF_harvest_percent": 0.416
+        "DM_harvest_percent": 0.0001,  # TODO: Hard coded dry matter percent at harvest - GitHub Issue #156
+        "NDF_harvest_percent": 0.416  # TODO: GitHub Issue #156
 }
 
 FALL_OATS = {
@@ -189,8 +189,8 @@ FALL_OATS = {
         "HI_min": 0.175,
         "HI_opt": 0.42,
         "biomass_dry_down_percent": 0.0,  # TODO: Hard coded total dry down until daily method is modeled - GitHub Issue #156
-        "DM_harvest_percent": 0.0001,  # TODO: Hard coded dry matter percent at harvest - GitHub Issue #155
-        "NDF_harvest_percent": 0.416
+        "DM_harvest_percent": 0.0001,  # TODO: Hard coded dry matter percent at harvest - GitHub Issue #156
+        "NDF_harvest_percent": 0.416  # TODO: GitHub Issue #156
 }
 
 POTATO = {
@@ -218,8 +218,8 @@ POTATO = {
         "HI_min": 0.95,
         "HI_opt": 0.95,
         "harvest_eff": 1.2,
-        "DM_harvest_percent": 0.0001,  # TODO: Hard coded dry matter percent at harvest - GitHub Issue #155
-        "NDF_harvest_percent": 0.416,
+        "DM_harvest_percent": 0.0001,  # TODO: Hard coded dry matter percent at harvest - GitHub Issue #156
+        "NDF_harvest_percent": 0.416,  # TODO: GitHub Issue #156
 }
 
 SOYBEAN = {
@@ -248,8 +248,8 @@ SOYBEAN = {
         "fr_p3ish": 0.00351,
         "HI_min": 0.01,
         "HI_opt": 0.31,
-        "DM_harvest_percent": 0.15,  # TODO: Hard coded dry matter percent at harvest - GitHub Issue #155
-        "NDF_harvest_percent": 0.466
+        "DM_harvest_percent": 0.15,  # TODO: Hard coded dry matter percent at harvest - GitHub Issue #156
+        "NDF_harvest_percent": 0.466  # TODO: GitHub Issue #156
 }
 
 SPRING_BARLEY = {
@@ -277,8 +277,8 @@ SPRING_BARLEY = {
         "fr_p3ish": 0.00131,
         "HI_min": 0.2,
         "harvest_eff": 0.54,
-        "DM_harvest_percent": 0.0001,  # TODO: Hard coded dry matter percent at harvest - GitHub Issue #155
-        "NDF_harvest_percent": 0.416
+        "DM_harvest_percent": 0.0001,  # TODO: Hard coded dry matter percent at harvest - GitHub Issue #156
+        "NDF_harvest_percent": 0.416  # TODO: GitHub Issue #156
 }
 
 SPRING_WHEAT = {
@@ -308,8 +308,8 @@ SPRING_WHEAT = {
         "fr_p3ish": 0.00191,
         "HI_min": 0.2,
         "HI_opt": 0.42,
-        "DM_harvest_percent": 0.0001,  # TODO: Hard coded dry matter percent at harvest - GitHub Issue #155
-        "NDF_harvest_percent": 0.416,
+        "DM_harvest_percent": 0.0001,  # TODO: Hard coded dry matter percent at harvest - GitHub Issue #156
+        "NDF_harvest_percent": 0.416,  # TODO: GitHub Issue #156
 }
 
 SUGAR_BEET = {
@@ -340,15 +340,15 @@ SUGAR_BEET = {
         "HI_min": 0.95,
         "HI_opt": 0.95,
         "harvest_eff": 0.549,
-        "DM_harvest_percent": 0.0001,  # TODO: Hard coded dry matter percent at harvest - GitHub Issue #155
-        "NDF_harvest_percent": 0.458,
+        "DM_harvest_percent": 0.0001,  # TODO: Hard coded dry matter percent at harvest - GitHub Issue #156
+        "NDF_harvest_percent": 0.458,  # TODO: GitHub Issue #156
 }
 
 TALL_FESCUE = {
         "crop_type": 'perennial',
         "feed_id": '56g',
         "raw_id": 56,
-        "T_base_min": 10,  # TODO parameter unknown - GitHub Issue #155
+        "T_base_min": 10,  # TODO parameter unknown - GitHub Issue #157
         "T_base_max": 40,
         "PHU": 648,
         "fr_PHU_sen": 0.8,
@@ -359,7 +359,7 @@ TALL_FESCUE = {
         "z_root_max": 2000,
         "RUE": 30,
         "T_opt": 15,
-        "beta_w": 10,  # TODO: unknown value
+        "beta_w": 10,  # TODO: unknown value - GitHub Issue #157
         "epco": 0.5,
         "fr_n1": 0.0560,
         "fr_n2": 0.0210,
@@ -371,8 +371,8 @@ TALL_FESCUE = {
         "fr_p3ish": 0.00191,
         "HI_min": 0.9,
         "HI_opt": 0.9,
-        "DM_harvest_percent": 0.0001,  # TODO: Hard coded dry matter percent at harvest - GitHub Issue #155
-        'NDF_harvest_percent': 0.416
+        "DM_harvest_percent": 0.0001,  # TODO: Hard coded dry matter percent at harvest - GitHub Issue #156
+        'NDF_harvest_percent': 0.416  # TODO: GitHub Issue #156
 }
 
 TRITICALE = {
@@ -382,7 +382,7 @@ TRITICALE = {
         "kill_year": True,
         "T_base_min": 0,
         "T_base_max": 30,  # TODO: GitHub Issue #157
-        "PHU": 1600,  # 1550-1680  # TODO Potential heat units unknown - GitHub Issue #154
+        "PHU": 1600,  # 1550-1680  # TODO Potential heat units unknown - GitHub Issue #157
         "fr_PHU_1": 0.05,
         "fr_PHU_2": 0.45,
         "fr_LAI_1": 0.05,
@@ -403,8 +403,8 @@ TRITICALE = {
         "fr_p3ish": 0.00121,
         "HI_min": 0.2,
         "HI_opt": 0.4,
-        "DM_harvest_percent": 0.0001,  # TODO: Hard coded dry matter percent at harvest - GitHub Issue #155
-        "NDF_harvest_percent": 0.416
+        "DM_harvest_percent": 0.0001,  # TODO: Hard coded dry matter percent at harvest - GitHub Issue #156
+        "NDF_harvest_percent": 0.416  # TODO: GitHub Issue #156
 }
 
 WINTER_WHEAT = {
@@ -414,7 +414,7 @@ WINTER_WHEAT = {
         "kill_year": True,
         "T_base_min": 0,
         "T_base_max": 30,  # TODO: GitHub Issue #157
-        "PHU": 1600,  # 1550-1680  # TODO Potential heat units unknown - GitHub Issue #154
+        "PHU": 1600,  # 1550-1680  # TODO Potential heat units unknown - GitHub Issue #157
         "fr_PHU_1": 0.05,
         "fr_PHU_2": 0.45,
         "fr_LAI_1": 0.05,
@@ -436,6 +436,6 @@ WINTER_WHEAT = {
         "fr_p3ish": 0.00121,
         "HI_min": 0.2,
         "HI_opt": 0.4,
-        "DM_harvest_percent": 0.0001,  # TODO: Hard coded dry matter percent at harvest - GitHub Issue #155
-        'NDF_harvest_percent': 0.416
+        "DM_harvest_percent": 0.0001,  # TODO: Hard coded dry matter percent at harvest - GitHub Issue #156
+        'NDF_harvest_percent': 0.416  # TODO: GitHub Issue #156
 }
