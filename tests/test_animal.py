@@ -7,6 +7,8 @@ Author(s): Pooya Hekmati, sh2235@cornell.edu
 
 import pytest
 
+from RUFAS.routines.animal.ration.ration_driver import AvailableFeeds
+
 
 def test_daily_animal_routine():
     """Unit test for function daily_animal_routine in file routines/animal/animal_management.py"""
@@ -772,6 +774,7 @@ def test_manure_calculations():
     """Unit test for function manure_calculations in file routines/animal/manure/lactating_cow_manure_excretion.py"""
     pass
 
+
 def test_optimize():
     """Unit test for function optimize in file routines/animal/ration/calf_ration.py"""
     pass
@@ -920,3 +923,72 @@ def test_set_requirements():
 def test_feed_nutrients():
     """Unit test for function feed_nutrients in file routines/animal/ration/ration_driver.py"""
     pass
+
+
+def test_get_feed_data_from_feed_ids() -> None:
+    """Unit test for function get_feed_data_from_feed_ids in file routines/animal/ration/ration_driver.py"""
+
+    # Arrange
+    feed_ids = {155, 157}
+    available_feeds = AvailableFeeds()
+    available_feeds.feed_id = [136, 139, 155, 157]
+    available_feeds.CP = [0, 0, 25.4, 18]
+    available_feeds.DE = [0, 0, 5.59, 3.69]
+    available_feeds.EE = [0, 0, 30.8, 3]
+    available_feeds.Kd = [0, 0, 0, 0]
+    available_feeds.NDF = [0, 0, 0, 0]
+    available_feeds.N_A = [0, 0, 0, 0]
+    available_feeds.N_B = [0, 0, 0, 0]
+    available_feeds.TDN = [0, 0, 0, 0]
+    available_feeds.calcium = [22, 34, 1, 0.7]
+    available_feeds.dRUP = [0, 0, 0, 0]
+    available_feeds.dry_cow_limit = [100, 100, 100, 100]
+    available_feeds.feed_key = ['136', '139', '155', '157']
+    available_feeds.is_fat = [0, 0, 0, None]
+    available_feeds.is_wetforage = [0, 0, 0, None]
+    available_feeds.lactating_cow_limit = [100, 100, 100, 100]
+    available_feeds.phosphorus = [19.3, 0, 0.75, 0.45]
+    available_feeds.price = [0.1, 0.05, 0.82, 0.44]
+    available_feeds.type = ['Mineral', 'Mineral', 'Milk', 'Starter']
+
+    # Assert before
+    assert len(available_feeds._feed_id_to_list_idx_dict) == 0
+
+    # Act
+    pen_specific_feed_data = available_feeds.get_feed_data_from_feed_ids(feed_ids)
+
+    # Assert after
+    expected_feed_id_to_list_idx_dict = {
+        136: 0,
+        139: 1,
+        155: 2,
+        157: 3
+    }
+    assert available_feeds._feed_id_to_list_idx_dict == expected_feed_id_to_list_idx_dict
+
+    expected_pen_specific_feed_data = {
+        'feed_id': [155, 157],
+        'heiferIII_limit': [],
+        'heiferII_limit': [],
+        'heiferI_limit': [],
+        'calf_limit': [],
+        'CP': [25.4, 18],
+        'DE': [5.59, 3.69],
+        'EE': [30.8, 3],
+        'Kd': [0, 0],
+        'NDF': [0, 0],
+        'N_A': [0, 0],
+        'N_B': [0, 0],
+        'TDN': [0, 0],
+        'calcium': [1, 0.7],
+        'dRUP': [0, 0],
+        'dry_cow_limit': [100, 100],
+        'feed_key': ['155', '157'],
+        'is_fat': [0, None],
+        'is_wetforage': [0, None],
+        'lactating_cow_limit': [100, 100],
+        'phosphorus': [0.75, 0.45],
+        'price': [0.82, 0.44],
+        'type': ['Milk', 'Starter']
+    }
+    assert pen_specific_feed_data == expected_pen_specific_feed_data

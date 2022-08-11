@@ -484,7 +484,7 @@ class AvailableFeeds:
                 self.lactating_cow_limit.append(feed['limit'])
                 self.dry_cow_limit.append(feed['limit'])
 
-    def get_feed_data_based_on_feed_ids(self, feed_ids: Set[int]):
+    def get_feed_data_from_feed_ids(self, feed_ids: Set[int]):
         """
         Returns a subset of data from all the available feeds based on the
         given set of feed ids.

@@ -480,7 +480,7 @@ class AnimalManagement:
                 available_feeds.feed_nutrients(feed)
                 self.all_pens[pen].allocated_feeds = feed.input_feed_combinations[self.all_pens[pen].animal_combination]
                 pen_specific_feed_data = \
-                    available_feeds.get_feed_data_based_on_feed_ids(self.all_pens[pen].allocated_feeds)
+                    available_feeds.get_feed_data_from_feed_ids(self.all_pens[pen].allocated_feeds)
                 self.all_pens[pen].ration = self.all_pens[pen].calc_ration(feed, pen_specific_feed_data)
             else:
                 if len(self.all_pens[pen].animals_in_pen) > 0:
@@ -736,7 +736,7 @@ class AnimalManagement:
         for i, pen in enumerate(self.all_pens):
             if pen.pen_populated:
                 pen.subset_class_feeds(feed)
-                pen_specific_feed_data = available_feeds.get_feed_data_based_on_feed_ids(pen.allocated_feeds)
+                pen_specific_feed_data = available_feeds.get_feed_data_from_feed_ids(pen.allocated_feeds)
                 self.all_pens[i].ration = self.all_pens[i].calc_ration(feed, pen_specific_feed_data)
 
     def calc_manure_excretion(self, feed, methane_model):
