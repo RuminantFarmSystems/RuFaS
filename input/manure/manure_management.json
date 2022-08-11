@@ -3,30 +3,30 @@
     {
       "id": 0,
       "bedding_type": "organic",
-      "manure_handler": "manual_scraping",
+      "manure_handler": "flush_system",
       "manure_separator": "rotary_screen",
-      "manure_treatment": "storage_pit"
+      "manure_treatment": ["anaerobic_lagoon"]
     },
     {
       "id": 1,
       "bedding_type": "organic",
-      "manure_handler": "flush_system",
-      "manure_separator": "rotary_screen",
-      "manure_treatment": "storage_pit"
+      "manure_handler": "manual_scraping",
+      "manure_separator": "none",
+      "manure_treatment": ["anaerobic_digestion", "anaerobic_lagoon"]
     },
     {
       "id": 2,
       "bedding_type": "sand",
       "manure_handler": "flush_system",
       "manure_separator": "sand_lane",
-      "manure_treatment": "storage_pit"
+      "manure_treatment": ["anaerobic_lagoon"]
     },
     {
       "id": 3,
       "bedding_type": "organic",
       "manure_handler": "manual_scraping",
       "manure_separator": "none",
-      "manure_treatment": "anaerobic_digestion"
+      "manure_treatment": ["storage_pit"]
     }
   ]
 }
