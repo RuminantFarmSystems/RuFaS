@@ -9,6 +9,7 @@ the SandSeparator has a method, separateSand() which does that.
 
 Author(s): Yunus Mohammed, ymm26@cornell.edu
 """
+from RUFAS.routines.manure_management.manure_handlers.bedding_classes import SandBedding
 
 
 class SandSeparator:
@@ -34,12 +35,12 @@ class SandSeparator:
     Invariant: A flaot >=0.6 and <=0.9
     """
 
-    def __init__(self, efficiency=0.9, manure=None, sand=SandBedding(0.0)):
+    def __init__(self, efficiency=1.0, manure=None, sand=SandBedding(0.0)):
         """
         Initializes a SandSeparator
 
         Parameter efficiency: the sand separation efficiency
-        Precondition: float >=0.6 and <=0.9
+        Precondition: between 0.7 and 1.0
 
         Parameter manure: The manure held in this SandSeparator
         Precondition: Manure Object or None

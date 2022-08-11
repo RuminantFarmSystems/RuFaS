@@ -16,6 +16,7 @@ from typing import Dict, List, Optional, Type
 
 from RUFAS.routines.manure_management.gas_emissions.gas_emissions import GasEmissions
 from RUFAS.routines.manure_management.helpers.enum_helpers import ExtendedEnum
+from RUFAS.routines.manure_management.manure_handlers.bedding_classes import BeddingEnum
 from RUFAS.routines.manure_management.manure_handlers.bedding_manager import BeddingManager
 from RUFAS.routines.manure_management.manure_handlers.manure_handler_output import ManureHandlerOutput
 from RUFAS.routines.manure_management.manure_handlers.milking_center import MilkingCenter
@@ -78,8 +79,9 @@ class BaseManureHandler:
             manure handling.
             "pseudocode_manure_management" MS.3
         """
+        # bedding_mass = self.bedding_manager.total_bedding_mass(pen)
         # if self.bedding_manager.bedding_enum is BeddingEnum.SAND:
-        #     self.sand_lane.sand_lane()
+        #     bedding_mass *= (1 - efficiency)
 
         daily_output = ManureHandlerOutput(
                 urea=pen.manure.U,

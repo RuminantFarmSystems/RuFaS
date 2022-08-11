@@ -32,7 +32,7 @@ class ManureHandlerOutput:
             self.raw_manure,
             self.cleaning_water,
             self.total_bedding_mass,
-            self.total_water_volume_in_milking_center
+            self.total_water_volume_in_milking_center,
         ])
 
     def clone(self) -> ManureHandlerOutput:
