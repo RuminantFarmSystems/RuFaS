@@ -1,22 +1,29 @@
 from typing import List
 
 from RUFAS.routines.animal import AnimalManagement
-from .simple_pen import SimplePen
+from RUFAS.routines.manure.simple_pen.simple_pen import SimplePen
 
 
 class SimpleAnimalManagement:
     """
     A simplified AnimalManagement class that extracts only relevant information from the
-    original AnimalManagement class in the animal module.
+    original AnimalManagement class in the animal module. Since not every detail of the
+    AnimalManagement class is relevant to the manure module, this abridged version also
+    allows more flexibility via renaming or adding additional attributes and functions.
 
     """
 
     def __init__(self, animal_management: AnimalManagement):
         """
-        Initializes a SimpleAnimalManagement object.
+        Initializes a SimpleAnimalManagement object. This object does not store
+        any reference to the passed-in argument and only performs a read on it.
 
         Args:
             animal_management: An AnimalManagement object from the animal module.
+
+        Attributes:
+            _all_pens: A list of SimplePen objects created based on their Pen counterparts.
+            _sim_day: Keeps track of the simulation day on which this object was created.
 
         """
 
@@ -39,10 +46,10 @@ class SimpleAnimalManagement:
     @property
     def sim_day(self) -> int:
         """
-        Returns the simulation day when this SimpleAnimalManagement was created.
+        Returns the simulation day on which this object was created.
 
         Returns:
-            The simulation day when this SimpleAnimalManagement was created.
+            The simulation day on which this object was created.
 
         """
 

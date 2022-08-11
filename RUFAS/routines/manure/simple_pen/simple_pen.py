@@ -10,7 +10,8 @@ class SimplePen:
 
     def __init__(self, pen: Pen):
         """
-        Initializes a SimplePen object.
+        Initializes a SimplePen object. This object does not store
+        any reference to the passed-in argument and only performs a read on it.
 
         Args:
             pen: A Pen object from the animal module.
