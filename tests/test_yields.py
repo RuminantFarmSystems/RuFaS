@@ -16,7 +16,7 @@ from math import exp
 
 
 def mock_crop(HU = 0.1, PHU = 8.8, LAI = 2.3, yield_actual = 3.0, P = 0.5, N = 0.7, bmass = 3.2 \
-    ,fr_PHU = 1.3, HI_opt = 2.1, HI_max = 5.5, HI_min = 1.7, gamma_wu = 2.1 \
+    ,fr_PHU = .13, HI_opt = 2.1, HI_max = 5.5, HI_min = 1.7, gamma_wu = 2.1 \
     ,bio_AG = 5.0, dry_down_per = .75, HI_actual = 10.3, yld_max = 4.7, harv_eff = .8 \
     ,fr_N = .15, fr_P = .31):
     """
@@ -67,7 +67,7 @@ def test_calc_HI_max_correctly_sets_HI_max():
     crop = mock_crop()
     calc_HI_max(crop)
 
-    assert pytest.approx(crop.HI_max) == 2.1 * ((100*1.3)/(100*1.3 + exp(11.1 - (10 * 1.3))))
+    assert pytest.approx(crop.HI_max) == 2.1 * ((100*.13)/(100*.13 + exp(11.1 - (10 * .13))))
 
 
 #the following tests are the for the calc_HI_act() function
