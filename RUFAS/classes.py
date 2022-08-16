@@ -11,9 +11,8 @@ Author(s): Kass Chupongstimun, kass_c@hotmail.com
 """
 
 import csv
-
 from RUFAS import util, errors
-from RUFAS.routines import Fields, Feed
+from RUFAS.routines import Fields, Feed, Field
 from RUFAS.routines.animal.animal_management import AnimalManagement
 from RUFAS.routines.manure_storage.manure_storage import ManureStorage
 from RUFAS.util import read_json_file
@@ -50,6 +49,7 @@ class State:
             read_json_file(input_dir / 'animal' / data['animal']), config, self.feed, weather, time)
 
         self.manure_storage = ManureStorage(self.animal_management)
+
 
     def annual_reset(self):
         """
@@ -429,7 +429,7 @@ class Time:
             config: instance of the Config class containing information necessary
                 to initialize time
         """
-
+        
         calendar_year = config.start_year
         # number of years
         years = config.years
@@ -448,7 +448,7 @@ class Time:
             else:
                 self.day = self.years[0][i]
                 break
-
+        self.index = 0 
     def to_str(self):
         """
         Description:
@@ -466,6 +466,7 @@ class Time:
             Advances the time in the simulation by 1 day
             Automatically detects end of months and years
         """
+        self.index += 1
 
         if self.end_year():
             self.day = 1
@@ -500,7 +501,6 @@ class Time:
             return self.day > len(self.years[self.year - 1])
 
         return False
-
 
 def is_leap_year(year):
     """

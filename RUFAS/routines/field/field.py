@@ -18,6 +18,7 @@ def daily_fields_routine(fields, manure_storage, weather, time):
         soil = field.soil
         crop = field.crop
         crop_type = crop.current_crop
+        croptime = field.croptime
         field_management = field.field_management
 
         # If the crop is not planted yet, determine whether it is planted today
@@ -27,7 +28,7 @@ def daily_fields_routine(fields, manure_storage, weather, time):
 
         daily_field_management_routine(soil, manure_storage, field_management, weather, time)
         daily_soil_routine(soil, crop, field_management, weather, time)
-        daily_crop_routine(soil, crop, field_management, weather, time)
+        daily_crop_routine(soil, crop, field_management, weather, time, croptime)
 
     fields.summarize_fields()
     fields.summarize_annual_variables()
