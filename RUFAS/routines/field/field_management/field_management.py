@@ -13,7 +13,7 @@ Author(s): William Donovan, wmdonovan@wisc.edu
 from . import fertilizer_application, manure_application, tillage_application
 
 
-def daily_field_management_routine(soil, manure_storage, field_management, weather, time):
+def daily_field_management_routine(soil, manure_storage, field_management, weather, time,croptime):
     """
     Description:
         Manages the function calls for simulating field management

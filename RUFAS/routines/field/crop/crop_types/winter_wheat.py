@@ -114,7 +114,7 @@ class WinterWheat(BaseCrop):
         self.N_fix = 0.0
 
         self.beta_n = 10
-
+        self.water_act_up=0
         self.bio_N_opt = 0
         self.bio_N = 0
 
