@@ -112,7 +112,7 @@ class FieldReport(BaseReportDriver):
                 self.annual_variables[variable][2] = \
                     eval(self.annual_variables[variable][0], globals(), locals())
 
-    # ToDo: output files need crop type column (see crop_report.csv) - GitHub Issue #159
+    # TODO: output files need crop type column (see crop_report.csv) - GitHub Issue #159
     class CropReport(BaseFieldReport):
         def __init__(self, data, field_name):
             super().__init__(data, field_name)
