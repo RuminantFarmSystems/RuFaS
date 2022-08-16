@@ -235,6 +235,8 @@ class Crop:
 
         self.crops_list = {}
         self.crops_data = data['crops']
+        # TODO: this needs refactoring, perhaps list comprehension - GitHub Issue #180
+        #  see supported_species in base_crop.py
         for crop_name, crop_data in self.crops_data.items():
             if crop_name.startswith("alfalfa"):
                 crop = alfalfa.Alfalfa(crop_name, crop_data)
@@ -268,16 +270,28 @@ class Crop:
         print(self.crops_list)
         # default setting
         self.current_crop = base_crop.BaseCrop()
+        """obj: the crop instance that is being created"""
         self.current_crop_year = []
+        """list: nested list of the crops growing in each year"""
 
-        self.grow_regimen = [self.current_crop for _ in range(0, len(time.years))]
-        #self.set_grow_regimen(time)
+        double_cropping_limit = 2
+
+        self.grow_regimen = \
+            [[self.current_crop for _ in range(0, double_cropping_limit)]
+             for _ in range(0, len(time.years))]
+        """list: list of the order the crops are growing in"""
+
+        self.set_grow_regimen(time)
 
         # dormancy for perennial crops
         self.latitude = abs(data['latitude'])
-        #self.T_dl_min = calculate_minimum_day_length(self.latitude)
-        #self.t_dorm = calculate_t_dorm(self.latitude)
+        """float: latitude of where the farm is located"""
+        self.T_dl_min = calculate_minimum_day_length(self.latitude)
+        """float: minimum day length given the latitude"""
+        self.t_dorm = calculate_t_dorm(self.latitude)
+        """float: the dormancy threshold given the latitude """
         self.solar_declination = 0.0
+        """float: angle of the Sun relative to the equator, is a factor for day length"""
 
 
     def annual_reset(self):

@@ -1,4 +1,4 @@
-from .base_crop import BaseCrop
+from RUFAS.routines.field.crop.crop_types.base_crop import BaseCrop
 
 # Define global variables containing corn parameters
 # Keeping them separate from the Class definitions allows for them to be changed before running
@@ -51,103 +51,14 @@ CornConfigData = {"T_base_min": 10, # Heat Unit Data ----v
 
 
 class Corn(BaseCrop):
+    """Corn class"""
     def __init__(self, crop_name, data):
-        super().__init__()
+        """create an instance of Corn
+                    
+           Args: 
+            crop_name (str): the name of the crop
+            data (dict): data used to construct the class
+        """
+        super().__init__(crop_name=crop_name, data=data, species="corn")
 
-        """GENERAL PLANT INFO"""
-
-        corn_data = data
-        self.plant_years = corn_data['plant_years']
-        self.repeat = corn_data['repeat']
-        self.planting_day = corn_data['planting_day']
-        self.harvest_day = corn_data['harvest_day']
-        self.harvest_type = corn_data['harvest_type']
-        self.planting_order = corn_data['planting_order'].lower()
-        self.extracted = corn_data['extracted']
-
-        self.crop_name = crop_name
-        self.crop_type = 'annual'
-        self.harvest_quality = 'null'
-        self.raw_id = 34
-        self.feed_id = '34g'
-
-        self.kill_day = -1
-        self.kill_year = True
-        self.planted = False
-        self.growing = False
-        self.killed = False
-
-        self.fix_nitrogen = False
-
-        # input config data - set an attribute for each key-value pair
-        for key, val in CornConfigData.items():
-            setattr(self, key, val)
-
-        # initialize other variables
-        ''' HEAT UNIT DATA '''
-        # Internally calculated input
-        self.accumulated_HU = 0.0
-        self.prev_accumulated_HU = 0.0
-        # output
-        self.fr_PHU = 0.0
-        self.prev_fr_PHU = 0.0
-
-        ''' LEAF AREA INDEX (LAI) DATA '''
-        # Internally calculated input
-        self.prev_fr_LAI_max = 0
-        self.fr_LAI_max = 0
-        # output
-        self.prev_LAI_actual = 0
-        self.LAI_actual = 0
-
-        ''' ROOT DEPTH DATA '''
-        # Internally calculated input
-        self.fr_root = 0
-
-        # output
-        self.z_root = 0
-
-        ''' BIOMASS DATA '''
-        # Internally calculated input
-        self.gamma_reg = 0
-        self.d_biomass_max = 0
-        self.d_biomass_actual = 0.0
-        # output
-        self.biomass_actual = 0
-        self.prev_biomass_actual = 0
-
-        ''' Soil Water Uptake Data '''
-        self.water_actual_up = 0
-        self.water_uptake_each_layer = []
-
-        ''' Nitrogen Uptake Data '''
-        self.bio_N_opt = 0
-        self.bio_N = 0
-
-        self.fr_N = 0
-        self.N_up = 0
-        self.act_N_up_each_layer = []
-        self.N_actual_up = 0
-
-        ''' Phosphorus Uptake Data '''
-        self.bio_P_opt = 0
-        self.bio_P = 0
-
-        self.fr_P = 0
-        self.P_up = 0
-        self.act_P_up_each_layer = []
-        self.P_act_up = 0
-
-        ''' Yields Data '''
-        self.bio_AG = 0
-        self.bio_BG = 0
-        self.yield_max = 0
-        self.yield_actual = 0
-        self.NDF_yield = 0.0
-        self.N_yield = 0
-        self.P_yield = 0
-
-        self.N_yield_annual = 0.0
-        self.P_yield_annual = 0.0
-        self.NDF_yield_annual = 0.0
-        self.yield_annual = 0
+    # species-specific methods ...

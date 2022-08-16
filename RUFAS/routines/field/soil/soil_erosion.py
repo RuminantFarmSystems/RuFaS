@@ -37,10 +37,10 @@ def calc_sed(soil, crop, weather, time):
         "pseudocode_soil" S.3.A.1/17
 
     Args:
-        soil
-        crop
-        weather
-        time
+        soil: instance of the Soil class specified in soil.py
+        crop: instance of the Crop class specified in crop.py
+        weather: instance of the Weather class specified in classes.py
+        time: instance of the Time class specified in classes.py
     """
 
     runoff = soil.runoff
@@ -73,9 +73,9 @@ def calc_peak_runoff(soil, weather, time):
         "pseudocode_soil" S.3.A.2/3
 
     Args:
-        soil
-        weather
-        time
+        soil: instance of the Soil class specified in soil.py
+        weather: instance of the Weather class specified in classes.py
+        time: instance of the Time class specified in classes.py
 
     Returns:
         int: peak_runoff, the peak runoff rate on the current day (m^3/sec
@@ -105,9 +105,9 @@ def calc_I(soil, weather, time):
         "pseudocode_soil" S.3.A.4
 
     Args:
-        soil
-        weather
-        time
+        soil: instance of the Soil class specified in soil.py
+        weather: instance of the Weather class specified in classes.py
+        time: instance of the Time class specified in classes.py
 
     Returns:
         int: I, rainfall intensity (mm/hr)
@@ -126,7 +126,7 @@ def calc_T_conc(soil):
         "pseudocode_soil" S.3.A.5
 
     Args:
-        soil
+        soil: instance of the Soil class specified in soil.py
 
     Returns:
         int: T_conc, time of greatest concentration (h)
@@ -146,9 +146,9 @@ def calc_Rtc(soil, weather, time):
         "pseudocode_soil" S.3.A.6
 
     Args:
-        soil
-        weather
-        time
+        soil: instance of the Soil class specified in soil.py
+        weather: instance of the Weather class specified in classes.py
+        time: instance of the Time class specified in classes.py
 
     Returns:
         int: Rtc, rainfall during time of concentration (mm)
@@ -167,9 +167,9 @@ def calc_alpha(soil, weather, time):
         "pseudocode_soil" S.3.A.7
 
     Args:
-        soil
-        weather
-        time
+        soil: instance of the Soil class specified in soil.py
+        weather: instance of the Weather class specified in classes.py
+        time: instance of the Time class specified in classes.py
 
     Returns:
         int: alpha, fraction of rain that occurs during time of concentration
@@ -192,8 +192,8 @@ def calc_alpha_05(weather, time):
         "pseudocode_soil" S.3.A.8
 
     Args:
-        weather
-        time
+        weather: instance of the Weather class specified in classes.py
+        time: instance of the Time class specified in classes.py
 
     Returns:
         int: alpha_05, fraction of daily rain in the 1/2 hour of highest intensity
@@ -213,7 +213,7 @@ def calc_K(soil):
         "pseudocode_soil" S.3.A.9
 
     Args:
-        soil
+        soil: instance of the Soil class specified in soil.py
 
     Returns:
         int: K, unitless soil erodibility factor
@@ -235,7 +235,7 @@ def calc_Fc_sand(soil):
         "pseudocode_soil" S.3.A.10
 
     Args:
-        soil
+        soil: an instance of the Soil class
 
     Returns:
         int: Fc_sand, unitless sand factor
@@ -257,7 +257,7 @@ def calc_Fcl_si(soil):
         "pseudocode_soil" S.3.A.11
 
     Args:
-        soil
+        soil: an instance of the Soil class
 
     Returns:
         int: Fcl_si, unitless clay:silt ratio factor
@@ -277,7 +277,7 @@ def calc_F_org_C(soil):
         "pseudocode_soil" S.3.A.12
 
     Args:
-        soil
+        soil: an instance of the Soil class
 
     Returns:
         int: F_org_C, unitless organic carbon factor
@@ -298,7 +298,7 @@ def calc_F_sand(soil):
         "pseudocode_soil" S.3.A.13
 
     Args:
-        soil
+        soil: an instance of the Soil class
 
     Returns:
         int: F_sand, unitless sand factor
@@ -321,8 +321,8 @@ def calc_C(soil, crop):
         "pseudocode_soil" S.3.A.14
 
     Args:
-        soil
-        crop
+        soil: an instance of the Soil class
+        crop: an instance of the Crop class
 
     Returns:
         int: C, unitless cover and management factor
@@ -348,7 +348,7 @@ def calc_LS(soil):
         "pseudocode_soil" S.3.A.15
 
     Args:
-        soil
+        soil: an instance of the Soil class
 
     Returns:
         int: LS, unitless topographic factor
@@ -372,7 +372,7 @@ def calc_m(soil):
         "pseudocode_soil" S.3.A.16
 
     Args:
-        soil
+        soil: an instance of the Soil class
 
     Returns:
         int: m, unitless field slope exponent
