@@ -381,10 +381,6 @@ class AnaerobicLagoon(BaseTreatment):
                 K_manure=handler.K_manure * (1 - self.treatment_init_data.K_removal_efficiency),
                 total_daily_mass=handler.total_daily_mass
         )
-        # daily_output.final_volume = self.minimum_treatment_volume - (
-        #         (daily_output.TSd + daily_output.VS_total) * self.storage_time_period * Constants.KG_TO_CUBIC_METERS)
-        
-        ## LAgoon Sizing calculations
 
         #Sludge Nutrient Values -- Initial calcs
         sludge_TSd = handler.TSd * (self.treatment_init_data.TS_removal_efficiency)
