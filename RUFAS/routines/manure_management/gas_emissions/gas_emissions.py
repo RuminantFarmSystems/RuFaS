@@ -602,3 +602,28 @@ class GasEmissions:
         """
 
         return temp_in_C + 273.15
+
+    def anaerobic_lagoon_CH4_emission_daily(self,VS):
+        Bo=0.24
+        MCF=0.79
+        MS=0.9
+        factor= 0.67
+        return VS*Bo*MCF*MS*factor
+    
+    def anaerobic_lagoon_direct_N2O_emission_daily(self,manure_nitrogen):
+        fMMs=1.0
+        emission_factor_N2O_direct=0.002
+        ratio_atomic_mass=44/28 # N2ON to N2O
+        return manure_nitrogen*fMMs*emission_factor_N2O_direct*ratio_atomic_mass
+
+    def anaerobic_lagoon_indirect_N2O_emission_daily(self,manure_nitrogen):
+        fMMs=1.0
+        emission_factor_N2O_indirect=0.01
+        ratio_atomic_mass=44/28 # N2ON to N2O
+        fraction_N_volatilization = 0.25
+        return manure_nitrogen*fMMs*emission_factor_N2O_indirect*ratio_atomic_mass*fraction_N_volatilization
+    
+    def getCO2_equivalent_of_CH4(self,CH4):
+        return CH4*30
+    def getCO2_equivalent_of_N20(self,N2O):
+        return N2O*310

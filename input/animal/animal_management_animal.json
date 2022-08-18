@@ -196,7 +196,20 @@
 			"manure_separator": "rotary_screen",
 			"manure_storage": "anaerobic_digestion",
 			"max_stocking_density": 1.2
+		},
+		"pen5": {
+			"id": 5,
+			"animal_combination": "LAC_COW",
+			"vertical_dist_to_milking_parlor": 0.1,
+			"horizontal_dist_to_milking_parlor": 1.6,
+			"number_of_stalls": 85,
+			"housing_type": "open air barn",
+			"bedding_type": "organic",
+			"pen_type": "tiestall",
+			"manure_handling": "flush_system",
+			"manure_separator": "rotary_screen",
+			"manure_storage": "anaerobic_lagoon",
+			"max_stocking_density": 1.2
 		}
-
 	}
 }

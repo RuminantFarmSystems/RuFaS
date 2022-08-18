@@ -74,7 +74,9 @@ def mock_handler_output(mocker:MockerFixture)->ManureHandlerOutput:
     sample_output.VS_total = 1980.94
     sample_output.p_excrt_manure = 0
     sample_output.K_manure= 0
-    sample_output.total_daily_mass = 270510
+    sample_output.total_daily_mass = 270015
+    sample_output.cleaning_water = 249000
+    sample_output.TAN_s = 0.0
     return sample_output
 
 @fixture
@@ -87,7 +89,7 @@ def mock_reception_pit_output(mocker:MockerFixture)->ReceptionPitOutput:
     sample_output.VS_total = 1980.94
     sample_output.p_excrt_manure = 0
     sample_output.K_manure= 0
-    sample_output.total_daily_mass = 270510
+    sample_output.total_daily_mass = 270015
     return sample_output
 
 @fixture
@@ -187,18 +189,45 @@ def get_expected_values_anaerobic_digestion(mock_handler_output):
     expected_values.evaporated_water=0.0
     return expected_values
 
+@fixture
+def al_fixture(pen0,mock_handler,mock_separator,mock_lagoon_init_data):
+    pen= pen0
+    manure_handler= mock_handler
+    manure_separator= mock_separator
+    init_data = mock_lagoon_init_data
+    al = AnaerobicLagoon(pen=pen,manure_handler=manure_handler,manure_separator=manure_separator, \
+        treatment_init_data=init_data,storage_time_period=365,precip_input=0.0,freeboard_input=1.0)
+    return al
 
 @fixture
 def get_expected_values_anaerobic_lagoon(mock_handler_output):
     expected_values=Mock()
-    expected_values.TSd = 1401.785
-    expected_values.VSd = 1188.56
+    expected_values.TSd = 637
+    expected_values.VSd = 297
     expected_values.VSnd = 0
-    expected_values.VS_total = 1188.56
+    expected_values.VS_total = 297
 
-    expected_values.manure_nitrogen = 0.0
-    expected_values.p_excrt_manure = 0.0
-    expected_values.K_manure = 0.0
-    expected_values.total_daily_mass = mock_handler_output.total_daily_mass 
-    expected_values.final_volume=mock_handler_output.total_daily_mass
+    expected_values.manure_nitrogen = 0
+    expected_values.TAN_s = 185
+    expected_values.p_excrt_manure = 0
+    expected_values.K_manure = 0
+    expected_values.total_daily_mass= mock_handler_output.total_daily_mass
+
+    ## Sizing Expected values
+    expected_values.flushing_recycled= 249
+    expected_values.reduced_volume= 21
+    expected_values.minimum_treatment_volume= 7940
+    expected_values.sludge_accumulation_volume = 23350
+    expected_values.volume_needed = 31290
+
+    expected_values.a= 10.971
+    expected_values.b = -106.989
+    expected_values.c = -31029.37
+    expected_values.lagoon_width = 58.28
+    expected_values.lagoon_length = 174.84
+    expected_values.lagoon_surface_area = 10190
+    expected_values.precip = 259
+    expected_values.freeboard = 3106
+    expected_values.total_lagoon_volume = 34655
+    
     return expected_values

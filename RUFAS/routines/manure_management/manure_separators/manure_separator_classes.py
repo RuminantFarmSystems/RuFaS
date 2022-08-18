@@ -31,7 +31,11 @@ class ManureSeparatorEnum(ExtendedEnum):
 
     MECHANICAL_SAND_SEPARATOR = auto()
     SAND_LANE_MANURE_SEPARATION = auto()
-
+    BASE_SEPARATOR = auto()
+    CUSTOM_SEPARATOR=auto()
+    MECHANICAL_SEPARATOR=auto()
+    NULL_SEPARATOR=auto()
+    SEDIMENTATION=auto()
     DEFAULT = ROTARY_SCREEN
 
     # Organic bedding => default = rotary screen
