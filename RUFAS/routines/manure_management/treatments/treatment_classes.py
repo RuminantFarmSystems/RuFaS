@@ -355,19 +355,26 @@ class AnaerobicLagoon(BaseTreatment):
                  manure_handler: BaseManureHandler,
                  manure_separator: BaseSeparator,
                  treatment_init_data: TreatmentInitData,
+                 storage_time_period=365.0,
                  precip=0.0,
-                 freeboard=0.0):
+                 freeboard=1.0):
         super().__init__(pen, manure_handler, manure_separator, treatment_init_data)
-        self.freeboard = freeboard  # m^3
-        self.precip=precip # m^3 (25-year 24h storm event)
-        self.freeboard = freeboard  # m^3
-    @property
-    def treatment_volume(self) -> float:
-        return self.storage_time_period * self.manure_handler.last_output.total_daily_mass  # m^3
+        
+        self.sludge_accumulation_volume = AnaerobicLagoonInitData.SAV_FRACTION*manure_handler.TSd*AnaerobicLagoonInitData.sludge_accumulation_period*Constants.DAYS_PER_YEAR
+        self.treatment_volume=self.calc_treatment_volume()
+        self.freeboard = self.calc_freeboard_volume(freeboard)  # m^3
+        self.precip=self.calc_precipitation_volume(precip) # m^3 (25-year 24h storm event)
+        self.storage_time_period=storage_time_period # m^3 (25-year 24h storm event)
 
+        
+    
     @property
-    def total_volume(self) -> float:
-        return self.treatment_volume + self.freeboard + self.precip  # m^3
+    def calc_treatment_volume(self) -> float:
+        return self.manure_handler.last_output.total_daily_mass + self.storage_time_period * (self.manure_handler.last_output.total_daily_mass /
+            - self.manure_handler.last_output.cleaning_water)  # m^3
+    @property
+    def total_lagoon_volume(self) -> float:
+        return self.lagoon_volume+self.freeboard+self.precip+self.sludge_accumulation_volume
         
     def update(self) -> TreatmentOutput:
         daily_output = self.update_helper()
@@ -386,16 +393,69 @@ class AnaerobicLagoon(BaseTreatment):
         )
         daily_output.final_volume = self.total_volume - (
                 (daily_output.TSd + daily_output.VS_total) * self.storage_time_period * Constants.KG_TO_CUBIC_METERS)
-        sludge_accumulation_volume = AnaerobicLagoonInitData.SAV_FRACTION*handler.TSd*AnaerobicLagoonInitData.sludge_accumulation_period*Constants.DAYS_PER_YEAR
+        self.sludge_accumulation_volume = AnaerobicLagoonInitData.SAV_FRACTION*handler.TSd*AnaerobicLagoonInitData.sludge_accumulation_period*Constants.DAYS_PER_YEAR
 
-        #Sludge Nutrient Values
 
+        #Sludge Nutrient Values -- Initial calcs
+        sludge_TSd = handler.TSd * (self.treatment_init_data.TS_removal_efficiency)
+        sludge_VS = handler.VS_total * (self.treatment_init_data.VS_removal_efficiency)
+        sludge_nitrogen = handler.manure_nitrogen * (self.treatment_init_data.N_removal_efficiency)
+        sludge_phosphorous = handler.p_excrt_manure * (self.treatment_init_data.P_removal_efficiency)
+        sludge_potassium = handler.K_manure * (self.treatment_init_data.K_removal_efficiency)
+
+        ## Bounded Sludge Nutrient Values
+        sludge_TSd= self.boundSludgeValue(sludge_TSd,40,70)
+        sludge_VS= self.boundSludgeValue(sludge_VS,1.99,2.99)
+        sludge_nitrogen= self.boundSludgeValue(sludge_nitrogen,1.99,2.99)
+        sludge_phosphorous= self.boundSludgeValue(sludge_phosphorous,1.07,5.02)
+        sludge_potassium= self.boundSludgeValue(sludge_potassium,1.1,1.75)
 
         return daily_output
-    def calc_lagoon_size(self):
-        pass
+
+    @property
+    def volume_needed(self):
+        return self.treatment_volume+self.sludge_accumulation_volume
+    @property
+    def lagoon_depth(self):
+        return 3.657 ## meters
+    @property
+    def lagoon_slope(self):
+        return 2.0
+    def calc_abc(self):
+        a = 3*self.lagoon_depth
+        b = -4*self.lagoon_slope*self.lagoon_depth**2
+        c = 4*(self.lagoon_slope**2)*(self.lagoon_depth**3)/3 -self.volume_needed
+        return (a,b,c)
+    @property
+    def lagoon_width(self):
+        abc = self.calc_abc()
+        a,b,c=abc[0],abc[1],abc[2]
+        return (-1*b - (b**2 - 4*a*c)**0.5)/(2*a)
+    @property
+    def lagoon_length(self):
+        return self.lagoon_width*3
+    @property
+    def lagoon_surface_area(self):
+        return self.lagoon_width*self.lagoon_length
+    @property
+    def lagoon_volume(self):
+        return self.lagoon_length*self.lagoon_width*self.lagoon_depth \
+            -(self.lagoon_slope*self.lagoon_depth**2)*(self.lagoon_length+self.lagoon_width) \
+                + 4* self.lagoon_slope*self.lagoon_depth**3/3
+    @property
+    def calc_precipitation_volume(self,precip):
+        return precip*Constants.INCHES_TO_METERS*self.lagoon_surface_area ## m3 per inch of rain
+    @property
+    def calc_freeboard_volume(self,freeboard):
+        return freeboard*Constants.FEET_TO_METERS*self.lagoon_surface_area ## m3 per inch of rain
+
+    def calc_total_lagoon_volume(self):
+        return self.lagoon_volume+self.freeboard+self.precip+self.sludge_accumulation_volume
     def calc_emissions(self):
         pass
+    def boundSludgeValue(self,calculated_value,lower_bound,upper_bound):
+        return min(max(self.sludge_accumulation_volume*lower_bound,calculated_value),self.sludge_accumulation_volume*upper_bound)
+
 
 class StoragePond(BaseTreatment):
     def __init__(self,
