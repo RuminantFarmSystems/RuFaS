@@ -16,6 +16,6 @@
         "fields": {
         },
         "animal": "animal_management_animal.json",
-        "feed": "panke_buisse_feed.json"
+        "feed": "purchased_feed.json"
     }
 }
