@@ -13,3 +13,5 @@ class ManureManagementConstants:
     METHANE_ENERGY_DENSITY = 55                     # MJ / kg
     METHANE_DENSITY = 0.657                         # kg/m^3
 
+    INCHES_TO_METERS = 0.0254                       # inch/m
+    FEET_TO_METERS = 0.3048                         # ft/m
