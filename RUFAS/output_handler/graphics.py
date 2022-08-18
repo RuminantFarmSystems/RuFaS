@@ -73,7 +73,7 @@ def ration_graphics(report):
                 mp.xlabel('Dates')
                 mp.ylabel(variable + ' ' + units[counter])
                 path = str(save_dir / variable)
-                mp.savefig(path, format='png')
+                mp.savefig(path + '.png')
                 mp.close()
             counter += 1
 
@@ -225,7 +225,7 @@ def daily_graphics(report):
                 mp.ylabel(variable + ' ' + units[counter])
                 mp.tight_layout()
                 path = str(save_dir / variable)
-                mp.savefig(path, format='png')
+                mp.savefig(path + '.png')
                 mp.close()
             counter += 1
 
