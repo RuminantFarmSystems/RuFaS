@@ -452,6 +452,10 @@ class Pen:
         """
         Calculates the average growth of the animals in the pen.
         """
+
+        if not self.pen_populated:
+            return
+
         total_growth = 0
         for animal in self.animals_in_pen:
             total_growth += animal.daily_growth

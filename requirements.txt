@@ -1,6 +1,9 @@
 matplotlib
+mock
 numpy
 pandas
-scipy
-pytest
 pyomo
+pytest
+pytest-mock
+scipy
+pytest-lazy-fixture

@@ -6,11 +6,10 @@ Author(s): William Donovan, wmdonovan@wisc.edu
            Jacob Johnson, jacob8399@gmail.com
 """
 
-from RUFAS import util
 from .crop.crop import *
 from .soil.soil import *
 from .field_management.field_management import *
-from ...util import read_json_file
+from ...util import Utility
 
 
 def daily_fields_routine(fields, manure_storage, weather, time):
@@ -214,11 +213,11 @@ class Field:
         """
         self.field_name = field_name
 
-        input_dir = util.get_base_dir() / 'input'
+        input_dir = Utility.get_base_dir() / 'input'
 
-        soil_data = read_json_file(input_dir / 'soil' / field_data['soil'])
-        crop_data = read_json_file(input_dir / 'crop' / field_data['crop'])
-        field_management_data = read_json_file(input_dir / 'field_management' / field_data['field_management'])
+        soil_data = Utility.read_json_file(input_dir / 'soil' / field_data['soil'])
+        crop_data = Utility.read_json_file(input_dir / 'crop' / field_data['crop'])
+        field_management_data = Utility.read_json_file(input_dir / 'field_management' / field_data['field_management'])
 
         self.soil = Soil(soil_data)
         self.field_management = FieldManagement(field_management_data, time)

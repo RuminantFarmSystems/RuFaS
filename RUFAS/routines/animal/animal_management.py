@@ -19,10 +19,10 @@ from RUFAS.routines.animal.clustering_pen_grouping import grouping
 from RUFAS.routines.animal.life_cycle.life_cycle import LifeCycleManager
 from RUFAS.routines.animal.life_cycle.animal_base import AnimalBase
 from RUFAS.routines.animal.ration import ration_driver as ration_driver
-from RUFAS.routines.animal.ration import animal_requirements as req
 from collections import deque
 import random
-from enum import Enum
+from typing import Tuple
+from statistics import mean
 
 
 def daily_animal_routine(animal_management, feed, weather, time):
@@ -106,11 +106,13 @@ class AnimalManagement:
     # herd, whether by birth or replacement herd purchase. They are calculated
     # in calc_all_p_comp() and are the total body weight of the animals in the
     # respective class divided by the total P in the animals of the class
-    calf_p_comp = 0
-    heiferI_p_comp = 0
-    heiferII_p_comp = 0
-    heiferIII_p_comp = 0
-    cow_p_comp = 0
+    p_comp = {
+        'calf': 0,
+        'heiferI': 0,
+        'heiferII': 0,
+        'heiferIII': 0,
+        'cow': 0
+    }
 
     @staticmethod
     def get_animal_config(data):
@@ -328,23 +330,15 @@ class AnimalManagement:
             cow.set_nutrient_rqmts()
             cow.p_animal = 0.0072 * cow.body_weight * 1000
 
-    def avg_pen_dist(self):
+    def avg_pen_dist(self) -> Tuple[float, float]:
         """
         Calculates the average distance from a pen to the milking parlor.
         Returns: a tuple of (average vertical distance from milking parlor,
             average horizontal distance from milking parlor)
         """
 
-        # vertical distance
-        VD_sum = 0
-
-        # horizontal distance
-        HD_sum = 0
-        for pen in self.all_pens:
-            VD_sum += pen.vertical_dist_to_parlor
-            HD_sum += pen.horizontal_dist_to_parlor
-
-        return VD_sum / len(self.all_pens), HD_sum / len(self.all_pens)
+        return mean(pen.vertical_dist_to_parlor for pen in self.all_pens), \
+               mean(pen.horizontal_dist_to_parlor for pen in self.all_pens)
 
     def calc_nutrient_rqmts(self, feed, temp):
         """
@@ -421,27 +415,27 @@ class AnimalManagement:
 
         for animal in animals_added:
             if type(animal).__name__ == 'Calf':
-                animal_p_conc = self.calf_p_comp
+                animal_p_conc = self.p_comp['calf']
                 self.calves.append(animal)
                 group = Pen.AnimalCombination.CALF
             elif type(animal).__name__ == 'HeiferI':
-                animal_p_conc = self.heiferI_p_comp
+                animal_p_conc = self.p_comp['heiferI']
                 self.heiferIs.append(animal)
                 group = Pen.AnimalCombination.GROWING
             elif type(animal).__name__ == 'HeiferII':
-                animal_p_conc = self.heiferII_p_comp
+                animal_p_conc = self.p_comp['heiferII']
                 self.heiferIIs.append(animal)
                 group = Pen.AnimalCombination.GROWING
             elif type(animal).__name__ == 'HeiferIII':
-                animal_p_conc = self.heiferIII_p_comp
+                animal_p_conc = self.p_comp['heiferIII']
                 self.heiferIIIs.append(animal)
                 group = Pen.AnimalCombination.CLOSE_UP
             elif not animal.milking:
-                animal_p_conc = self.cow_p_comp
+                animal_p_conc = self.p_comp['cow']
                 self.cows.append(animal)
                 group = Pen.AnimalCombination.CLOSE_UP
             else:  # animal is of class Cow
-                animal_p_conc = self.cow_p_comp
+                animal_p_conc = self.p_comp['cow']
                 # self.all_pens[pen].animals_in_pen.append(animal)
                 self.cows.append(animal)
                 group = Pen.AnimalCombination.LAC_COW
@@ -540,9 +534,9 @@ class AnimalManagement:
         calf_pens = []
 
         self.pens_by_animal_combination = {Pen.AnimalCombination.CALF: [], Pen.AnimalCombination.GROWING: [],
-                                      Pen.AnimalCombination.CLOSE_UP: [],
-                                      Pen.AnimalCombination.GROWING_AND_CLOSE_UP: [],
-                                      Pen.AnimalCombination.LAC_COW: []}
+                                           Pen.AnimalCombination.CLOSE_UP: [],
+                                           Pen.AnimalCombination.GROWING_AND_CLOSE_UP: [],
+                                           Pen.AnimalCombination.LAC_COW: []}
         # hasable mixed type pens (by pen_id)
         mixed_type_pens = {}
         # lists of types hashed pen_id
@@ -763,8 +757,7 @@ class AnimalManagement:
         """
 
         for pen in self.all_pens:
-            if pen.pen_populated:
-                pen.calc_avg_growth()
+            pen.calc_avg_growth()
 
     def record_pen_history(self):
         """
@@ -796,7 +789,7 @@ class AnimalManagement:
             cow.update_pen_history(curr_pen, self.simulation_day, classes_in_pen)
 
     @staticmethod
-    def p_comp(animals):
+    def _calc_p_comp(animals):
         """
         Args:
             animals: the list of animals for which the P composition should be
@@ -808,23 +801,17 @@ class AnimalManagement:
         if len(animals) == 0:
             return 0
         else:
-            total_bw = 0
-            total_p_animal = 0
-            for animal in animals:
-                total_bw += animal.body_weight
-                total_p_animal += animal.p_animal
-            return total_p_animal / total_bw
+            return sum(a.p_animal for a in animals) / sum(a.body_weight for a in animals)
 
     def calc_all_p_comp(self):
         """
         Calculates each animal class's P concentration.
         """
-
-        self.calf_p_comp = self.p_comp(self.calves)
-        self.heiferI_p_comp = self.p_comp(self.heiferIs)
-        self.heiferII_p_comp = self.p_comp(self.heiferIIs)
-        self.heiferIII_p_comp = self.p_comp(self.heiferIIIs)
-        self.cow_p_comp = self.p_comp(self.cows)
+        # TODO: see if there is a better way to do this using dictionary comprehension
+        self.p_comp['calf'] = self._calc_p_comp(self.calves)
+        self.p_comp['heiferI'] = self._calc_p_comp(self.heiferIs)
+        self.p_comp['heiferII'] = self._calc_p_comp(self.heiferIIs)
+        self.p_comp['cow'] = self._calc_p_comp(self.heiferIIIs)
 
     def calc_p_rqmts(self):
         """
