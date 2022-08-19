@@ -1,6 +1,6 @@
 """
 RUFAS: Ruminant Farm Systems Model
-File name: test_biomass.py
+File name: test_leaf_area_index.py
 Description: Implements test cases
 Author(s): Brandon DeBoer, brdeboer@wisc.edu
 """
