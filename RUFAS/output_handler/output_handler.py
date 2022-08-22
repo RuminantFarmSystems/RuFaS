@@ -9,8 +9,8 @@ import shutil
 import sys
 from pathlib import Path
 
-from RUFAS import util
 from .reports import *
+from ..util import Utility
 
 
 class OutputHandler:
@@ -65,8 +65,8 @@ class OutputHandler:
                 all the output report graphics
         """
         # Initialize path for reports
-        base_csv_dir = util.get_base_dir() / csv_dir
-        base_graphic_dir = util.get_base_dir() / graphic_dir
+        base_csv_dir = Utility.get_base_dir() / csv_dir
+        base_graphic_dir = Utility.get_base_dir() / graphic_dir
 
         # Delete directory if previously exists
         if base_csv_dir.exists():

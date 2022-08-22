@@ -38,5 +38,7 @@ RUFAS/routines/manure_management/output/*
 env/
 venv/
 
-.DS_Store
+# ignore .DS_store
+.DS_store
+
 .pytest_cache/
