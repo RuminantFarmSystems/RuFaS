@@ -11,7 +11,7 @@
       "id": 1,
       "bedding_type": "organic",
       "manure_handler": "manual_scraping",
-      "manure_separator": "none",
+      "manure_separator": "null",
       "manure_treatment": ["anaerobic_digestion", "anaerobic_lagoon"]
     },
     {
@@ -25,7 +25,7 @@
       "id": 3,
       "bedding_type": "organic",
       "manure_handler": "manual_scraping",
-      "manure_separator": "none",
+      "manure_separator": "null",
       "manure_treatment": ["storage_pit"]
     }
   ]

@@ -551,23 +551,28 @@ class TreatmentFactory:
     def get_instance(cls,
                      pen: SimplePen,
                      manure_handler: BaseManureHandler,
-                     manure_separator: BaseSeparator) -> BaseTreatment:
-        treatment_enum = TreatmentEnum.get_enum(pen.manure_storage)
-
+                     manure_separator: BaseSeparator) -> List[BaseTreatment]:
+        treatments: List[BaseTreatment] = []
         enum_to_class: Dict[TreatmentEnum, Tuple[Type[BaseTreatment], Type[TreatmentInitData]]] = {
-            treatment_enum.STORAGE_POND: (StoragePond, StoragePondInitData),
-            treatment_enum.ANAEROBIC_DIGESTION: (AnaerobicDigestion, AnaerobicDigestionInitData),
-            treatment_enum.ANAEROBIC_LAGOON: (AnaerobicLagoon, AnaerobicLagoonInitData),
+            TreatmentEnum.STORAGE_POND: (StoragePond, StoragePondInitData),
+            TreatmentEnum.ANAEROBIC_DIGESTION: (AnaerobicDigestion, AnaerobicDigestionInitData),
+            TreatmentEnum.ANAEROBIC_LAGOON: (AnaerobicLagoon, AnaerobicLagoonInitData),
         }
 
-        params = {
-            'pen': pen,
-            'manure_handler': manure_handler,
-            'manure_separator': manure_separator,
-            'treatment_init_data': enum_to_class[treatment_enum][1].get_instance()
-        }
+        for treatment_option in pen.manure_storage:
 
-        return enum_to_class[treatment_enum][0](**params)
+            treatment_enum = TreatmentEnum.get_enum(treatment_option)
+
+            params = {
+                'pen': pen,
+                'manure_handler': manure_handler,
+                'manure_separator': manure_separator,
+                'treatment_init_data': enum_to_class[treatment_enum][1].get_instance()
+            }
+
+            treatment = enum_to_class[treatment_enum][0](**params)
+            treatments.append(treatment)
+        return treatments
 
 
 @dataclass
