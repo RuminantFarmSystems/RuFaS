@@ -16,8 +16,7 @@ from typing import Dict, List, Optional, Type
 
 from RUFAS.routines.manure_management.gas_emissions.gas_emissions import GasEmissions
 from RUFAS.routines.manure_management.helpers.enum_helpers import ExtendedEnum
-from RUFAS.routines.manure_management.manure_handlers.bedding_classes import BeddingEnum
-from RUFAS.routines.manure_management.manure_handlers.bedding_manager import BeddingManager
+from RUFAS.routines.manure_management.manure_handlers.bedding_classes import BeddingFactory
 from RUFAS.routines.manure_management.manure_handlers.manure_handler_output import ManureHandlerOutput
 from RUFAS.routines.manure_management.manure_handlers.milking_center import MilkingCenter
 from RUFAS.routines.manure_management.misc.constants import ManureManagementConstants as Constants
@@ -60,7 +59,7 @@ class BaseManureHandler:
 
         self.manure_handler_enum = ManureHandlerEnum.get_enum(
                 pen.manure_handler)
-        self.bedding_manager = BeddingManager.get_instance(pen.bedding_type)
+        self.bedding = BeddingFactory.get_instance(pen.bedding_type)
         self.milking_center = MilkingCenter()
 
         self.all_output: List[ManureHandlerOutput] = []
@@ -97,7 +96,7 @@ class BaseManureHandler:
 
                 raw_manure=pen.manure_mass,
                 cleaning_water=self.cleaning_water_volume_in_main_barn(pen),
-                total_bedding_mass=self.bedding_manager.total_bedding_mass(pen),
+                total_bedding_mass=self.bedding.total_bedding_mass(pen),
                 total_water_volume_in_milking_center=self.milking_center.total_water_volume_used_in_milking_center(
                         pen)
         )
@@ -112,7 +111,7 @@ class BaseManureHandler:
             pen.manure_volume,  # m^3
             self.cleaning_water_volume_in_main_barn(
                     pen) * Constants.LITERS_TO_CUBIC_METERS,  # m^3
-            self.bedding_manager.total_bedding_volume(pen),  # m^3
+            self.bedding.total_bedding_volume(pen),  # m^3
             self.milking_center.total_water_volume_used_in_milking_center(
                     pen) * Constants.LITERS_TO_CUBIC_METERS,
             # m^3

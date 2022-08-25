@@ -176,14 +176,14 @@
   	"manure_management_system_scenarios": [
     {
       "id": 0,
-      "bedding_type": "organic",
+      "bedding_type": "sawdust",
       "manure_handler": "flush_system",
       "manure_separator": "rotary_screen",
       "manure_treatment": "anaerobic_lagoon"
     },
     {
       "id": 1,
-      "bedding_type": "organic",
+      "bedding_type": "sawdust",
       "manure_handler": "manual_scraping",
       "manure_separator": "null",
       "manure_treatment": "anaerobic_digestion_and_lagoon"
@@ -197,7 +197,7 @@
     },
     {
       "id": 3,
-      "bedding_type": "organic",
+      "bedding_type": "sawdust",
       "manure_handler": "manual_scraping",
       "manure_separator": "null",
       "manure_treatment": "storage_pit"
