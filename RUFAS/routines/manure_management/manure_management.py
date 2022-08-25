@@ -149,7 +149,6 @@ class ManureManagement:
 
             self.treatments[pen.id] = TreatmentFactory.get_instance(
                 pen=pen,
-                manure_handler=self.manure_handlers[pen.id],
                 manure_separator=self.manure_separators[pen.id]
             )
 

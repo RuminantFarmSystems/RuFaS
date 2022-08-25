@@ -38,7 +38,7 @@ class ExtendedEnum(Enum):
         return cls.get_default_enum()
 
     @classmethod
-    def get_default_enum(cls) -> ExtendedEnum:
+    def get_default_enum(cls, *args) -> ExtendedEnum:
         """Return the DEFAULT member if there is one declared.
 
         If this method is invoked and the DEFAULT member does not exist,

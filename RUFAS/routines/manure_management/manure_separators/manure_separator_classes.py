@@ -33,10 +33,18 @@ class ManureSeparatorEnum(ExtendedEnum):
     MECHANICAL_SAND_SEPARATOR = auto()
     SAND_LANE_MANURE_SEPARATION = auto()
     NULL_SEPARATOR = auto()
-    DEFAULT = ROTARY_SCREEN
+
+    DEFAULT_ORGANIC = ROTARY_SCREEN
+    DEFAULT_SAND = SAND_LANE_MANURE_SEPARATION
 
     # Organic bedding => default = rotary screen
     # Sand bedding => default = sand lane
+
+    @classmethod
+    def get_default_enum(cls, bedding_type='ORGANIC') -> ExtendedEnum:
+        if bedding_type == 'ORGANIC':
+            return cls.DEFAULT_ORGANIC
+        return cls.DEFAULT_SAND
 
 
 class BaseSeparator:
@@ -357,7 +365,7 @@ class MechanicalSandSeparator(BaseSandSeparator):
 
 @dataclass
 class ManureSeparatorInitData:
-    percent_dry_solids: float = 0.0
+    percent_dry_solids: float = 1.0
     TS_removal_efficiency: float = 0.0
     VS_removal_efficiency: float = 0.0
     N_removal_efficiency: float = 0.0
