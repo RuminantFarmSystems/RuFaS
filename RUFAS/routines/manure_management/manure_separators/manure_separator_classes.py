@@ -10,9 +10,10 @@ Author(s):  William Donovan, wmdonovan@wisc.edu
 """
 from __future__ import annotations
 
+from abc import ABC, abstractmethod
 from dataclasses import dataclass, asdict
 from enum import auto
-from typing import Dict, List, Optional, Type
+from typing import Dict, List, Optional, Tuple, Type
 
 from RUFAS.routines.manure_management.helpers.enum_helpers import ExtendedEnum
 from RUFAS.routines.manure_management.manure_handlers.bedding_classes import BeddingEnum
@@ -48,13 +49,9 @@ class ManureSeparatorEnum(ExtendedEnum):
 
 
 class BaseSeparator:
-    def __init__(self,
-                 pen: SimplePen,
-                 reception_pit: BaseReceptionPit,
-                 separator_init_data: ManureSeparatorInitData):
+    def __init__(self, pen: SimplePen, reception_pit: BaseReceptionPit):
         self.pen = pen
         self.manure_separator_enum = ManureSeparatorEnum.get_enum(pen.manure_separator)
-        self.init_data = separator_init_data
         self.reception_pit = reception_pit
         self.all_output: List[ManureSeparatorOutput] = []
 
@@ -76,32 +73,33 @@ class BaseSeparator:
         rp = self.reception_pit.last_output
 
         daily_output = ManureSeparatorOutput(
-            TAN_s=rp.TAN_s,
-            manure_nitrogen=rp.manure_nitrogen,
-            TSd=rp.TSd,
-            VSd=rp.VSd,
-            VSnd=rp.VSnd,
-            p_excrt_manure=rp.p_excrt_manure,
-            K_manure=rp.K_manure,
-            total_daily_mass=self.total_daily_mass(),
+                TAN_s=rp.TAN_s,
+                manure_nitrogen=rp.manure_nitrogen,
+                TSd=rp.TSd,
+                VSd=rp.VSd,
+                VSnd=rp.VSnd,
+                p_excrt_manure=rp.p_excrt_manure,
+                K_manure=rp.K_manure,
+                total_daily_mass=self.total_daily_mass(),
 
-            final_solids_dry_content=rp.TSd,
-            wet_weight_of_final_solids=rp.TSd * self.init_data.TS_removal_efficiency / self.init_data.percent_dry_solids,
-            TS_liquid=rp.TSd * (1 - self.init_data.TS_removal_efficiency),
-            VS_liquid=(rp.VSd + rp.VSnd) * (1 - self.init_data.VS_removal_efficiency),
-            N_liquid=rp.manure_nitrogen * (1 - self.init_data.N_removal_efficiency),
-            TAN_liquid=rp.TAN_s * (1 - self.init_data.TAN_removal_efficiency),
-            P_liquid=rp.p_excrt_manure * (1 - self.init_data.P_removal_efficiency),
-            K_liquid=rp.K_manure * (1 - self.init_data.K_removal_efficiency),
+                final_solids_dry_content=rp.TSd,
+                wet_weight_of_final_solids=rp.TSd * self.init_data.TS_removal_efficiency /
+                                           self.init_data.percent_dry_solids,
+                TS_liquid=rp.TSd * (1 - self.init_data.TS_removal_efficiency),
+                VS_liquid=(rp.VSd + rp.VSnd) * (1 - self.init_data.VS_removal_efficiency),
+                N_liquid=rp.manure_nitrogen * (1 - self.init_data.N_removal_efficiency),
+                TAN_liquid=rp.TAN_s * (1 - self.init_data.TAN_removal_efficiency),
+                P_liquid=rp.p_excrt_manure * (1 - self.init_data.P_removal_efficiency),
+                K_liquid=rp.K_manure * (1 - self.init_data.K_removal_efficiency),
 
-            TS_solid=rp.TSd * self.init_data.TS_removal_efficiency,
-            VS_solid=(rp.VSd + rp.VSnd) * self.init_data.VS_removal_efficiency,
-            N_solid=rp.manure_nitrogen * self.init_data.N_removal_efficiency,
-            TAN_solid=rp.TAN_s * self.init_data.TAN_removal_efficiency,
-            P_solid=rp.p_excrt_manure * self.init_data.P_removal_efficiency,
-            K_solid=rp.K_manure * self.init_data.K_removal_efficiency,
+                TS_solid=rp.TSd * self.init_data.TS_removal_efficiency,
+                VS_solid=(rp.VSd + rp.VSnd) * self.init_data.VS_removal_efficiency,
+                N_solid=rp.manure_nitrogen * self.init_data.N_removal_efficiency,
+                TAN_solid=rp.TAN_s * self.init_data.TAN_removal_efficiency,
+                P_solid=rp.p_excrt_manure * self.init_data.P_removal_efficiency,
+                K_solid=rp.K_manure * self.init_data.K_removal_efficiency,
 
-            TS_DM_effluent=rp.TSd * self.init_data.TS_DM_effluent_rate
+                TS_DM_effluent=rp.TSd * self.init_data.TS_DM_effluent_rate
         )
         self.all_output.append(daily_output)
         return daily_output
@@ -119,233 +117,101 @@ class BaseSeparator:
         pass
 
 
-class BeltPress(BaseSeparator):
-    def __init__(self,
-                 pen: SimplePen,
-                 reception_pit: BaseReceptionPit,
+class BaseManureSeparator(BaseSeparator):
+
+    def __init__(self, pen: SimplePen, reception_pit: BaseReceptionPit,
                  separator_init_data: ManureSeparatorInitData):
-        super().__init__(pen, reception_pit, separator_init_data)
+        super().__init__(pen, reception_pit)
+        self.init_data = separator_init_data
+
+    def update(self) -> ManureSeparatorOutput:
+        """
+        Description:
+            Calls functions to calculate nutrient losses and transformations during
+            manure separation.
+            "pseudocode_manure_management" MS.4
+
+        """
+        rp = self.reception_pit.last_output
+
+        daily_output = ManureSeparatorOutput(
+                TAN_s=rp.TAN_s,
+                manure_nitrogen=rp.manure_nitrogen,
+                TSd=rp.TSd,
+                VSd=rp.VSd,
+                VSnd=rp.VSnd,
+                p_excrt_manure=rp.p_excrt_manure,
+                K_manure=rp.K_manure,
+                total_daily_mass=self.total_daily_mass(),
+
+                final_solids_dry_content=rp.TSd,
+                wet_weight_of_final_solids=rp.TSd * self.init_data.TS_removal_efficiency /
+                                           self.init_data.percent_dry_solids,
+                TS_liquid=rp.TSd * (1 - self.init_data.TS_removal_efficiency),
+                VS_liquid=(rp.VSd + rp.VSnd) * (1 - self.init_data.VS_removal_efficiency),
+                N_liquid=rp.manure_nitrogen * (1 - self.init_data.N_removal_efficiency),
+                TAN_liquid=rp.TAN_s * (1 - self.init_data.TAN_removal_efficiency),
+                P_liquid=rp.p_excrt_manure * (1 - self.init_data.P_removal_efficiency),
+                K_liquid=rp.K_manure * (1 - self.init_data.K_removal_efficiency),
+
+                TS_solid=rp.TSd * self.init_data.TS_removal_efficiency,
+                VS_solid=(rp.VSd + rp.VSnd) * self.init_data.VS_removal_efficiency,
+                N_solid=rp.manure_nitrogen * self.init_data.N_removal_efficiency,
+                TAN_solid=rp.TAN_s * self.init_data.TAN_removal_efficiency,
+                P_solid=rp.p_excrt_manure * self.init_data.P_removal_efficiency,
+                K_solid=rp.K_manure * self.init_data.K_removal_efficiency,
+
+                TS_DM_effluent=rp.TSd * self.init_data.TS_DM_effluent_rate
+        )
+        self.all_output.append(daily_output)
+        return daily_output
+
+
+class BeltPress(BaseSeparator):
+    pass
 
 
 class DecantingCentrifuge(BaseSeparator):
-    def __init__(self,
-                 pen: SimplePen,
-                 reception_pit: BaseReceptionPit,
-                 separator_init_data: ManureSeparatorInitData):
-        super().__init__(pen, reception_pit, separator_init_data)
+    pass
 
 
 class MechanicalSeparator(BaseSeparator):
-    def __init__(self,
-                 pen: SimplePen,
-                 reception_pit: BaseReceptionPit,
-                 separator_init_data: ManureSeparatorInitData):
-        super().__init__(pen, reception_pit, separator_init_data)
+    pass
 
 
 class MovingDiscPress(BaseSeparator):
-    def __init__(self,
-                 pen: SimplePen,
-                 reception_pit: BaseReceptionPit,
-                 separator_init_data: ManureSeparatorInitData):
-        super().__init__(pen, reception_pit, separator_init_data)
+    pass
 
 
 class RotaryScreen(BaseSeparator):
-    def __init__(self,
-                 pen: SimplePen,
-                 reception_pit: BaseReceptionPit,
-                 separator_init_data: ManureSeparatorInitData):
-        super().__init__(pen, reception_pit, separator_init_data)
+    pass
 
 
 class ScrewPress(BaseSeparator):
-    def __init__(self,
-                 pen: SimplePen,
-                 reception_pit: BaseReceptionPit,
-                 separator_init_data: ManureSeparatorInitData):
-        super().__init__(pen, reception_pit, separator_init_data)
+    pass
 
 
 class Sedimentation(BaseSeparator):
-    def __init__(self,
-                 pen: SimplePen,
-                 reception_pit: BaseReceptionPit,
-                 separator_init_data: ManureSeparatorInitData):
-        super().__init__(pen, reception_pit, separator_init_data)
+    pass
 
 
 class SlopeScreen(BaseSeparator):
-    def __init__(self,
-                 pen: SimplePen,
-                 reception_pit: BaseReceptionPit,
-                 separator_init_data: ManureSeparatorInitData):
-        super().__init__(pen, reception_pit, separator_init_data)
+    pass
 
 
 class CustomSeparator(BaseSeparator):
-    def __init__(self,
-                 pen: SimplePen,
-                 reception_pit: BaseReceptionPit,
-                 separator_init_data: ManureSeparatorInitData):
-        super().__init__(pen, reception_pit, separator_init_data)
+    pass
 
 
 class NullSeparator(BaseSeparator):
-    def __init__(self,
-                 pen: SimplePen,
-                 reception_pit: BaseReceptionPit,
-                 separator_init_data: ManureSeparatorInitData):
-        super().__init__(pen, reception_pit, separator_init_data)
+    pass
 
 
-class BaseSandSeparator:
-    """
-    Description
-    ------------
-    An instance of SandSeparator has a method separateSand() which removes sand
-    present in this SandSeparator. It also has two resetters- resetSeparator and
-    resetSand. See their implementations below for description. Each instance
-    has the following attributes and the corresponding invariants, getters, and
-    setters.
-
-    Attributes
-    ----------
-    Attribute _manure: The manure held in the SanSeparator
-    invariant: _manure must be a Manure Object or None.
-
-    Attribute _sand: The sand that has been removed from Manure.
-    Invariant: _sand must be a SandBedding Object or None
-
-    Attribute _sand_removal_efficiency: The fraction of sand removed from Manure
-    in each separation cycle.
-    Invariant: A flaot >=0.6 and <=0.9
-    """
-
-    def __init__(self, efficiency=1.0, manure=None, sand=None):
-        """
-        Initializes a SandSeparator
-
-        Parameter efficiency: the sand separation efficiency
-        Precondition: between 0.7 and 1.0
-
-        Parameter manure: The manure held in this SandSeparator
-        Precondition: Manure Object or None
-
-        Parameter sand: The sand present in this SandSeparator
-        Precondition: Must be a SandBedding Object
-        """
-        self._manure = manure
-        self._sand_bedding = sand
-        self._sand_removal_efficiency = efficiency
-
-    def output(self):
-        """
-        Returns the Manure _manure in this Separator and resets _manure to None.
-
-        Return type: Manure or None
-        """
-        manure = self._manure
-        self._manure = None
-        return manure
-
-    def separateSand(self):
-        """
-        Does one cycle of sand separation on the manure present
-        """
-        if not self._manure:  # Max
-            return
-
-        sand = self._manure.getBedding()
-
-        separated_sand_mass = self._sand_removal_efficiency * sand.getMass()
-        remaining_sand_mass = sand.getMass() - separated_sand_mass
-
-        self._sand_bedding.setMass(separated_sand_mass)
-        sand.setMass(remaining_sand_mass)
-
-    # getters
-    def getEfficiency(self):
-        """
-        Returns the effiency of this SandSeparator
-        """
-        return self._sand_removal_efficiency
-
-    def getManure(self):
-        """
-        Returns the manure in this SandSeparator
-        """
-        return self._manure
-
-    def getSand(self):
-        """
-        Returns the Sand in this SandSeparator
-        """
-        return self._sand_bedding
-
-    # resetters
-    def resetSeparator(self):
-        """
-        Reset the _sand to None and _sand to 0 mass SandBedding
-        """
-        self._manure = None
-        self.resetSand()
-
-    def resetSand(self):
-        """
-        Reset Sand to 0 mass SandBedding
-        """
-        self._sand_bedding.setMass(0.0)
-
-    # setters
-    def setEfficiency(self, efficiency):
-        """
-        Sets _efficiency to efficiency
-
-        Parameter efficiency: The new efficiency of the SandSeparator
-        Precondition: float >=0.6 and <=0.9
-        """
-        self._sand_removal_efficiency = efficiency
-
-    def setManure(self, manure=None):
-        """
-        Sets _manure to manure
-
-        Parameter manure: The new manure held by this SandSeparator.
-        Precondition: manure must be distinct from _manure.
-        manure.getBedding() must return a SandBedding.
-        """
-        assert manure != self._manure, "The Manure is already in this SandSepearator. Use a different Manure object"
-        if self._manure and manure:
-            self._manure.aggregateManure(manure)
-        else:
-            self._manure = manure
-
-    # def __init__(self, treatment_data, pen):
-    #     super().__init__(treatment_data, pen)
-    #     if self.default: self.set_defaults()
-
-    # def set_defaults(self):
-    #     self.TS_removal_efficiency = 0.3
-    #     self.VS_removal_efficiency = 0.55
-    #     self.N_removal_efficiency = 0.3
-    #     self.P_removal_efficiency = 0.4
-    #     self.K_removal_efficiency = 0.15
-    #     self.TS_DM_effluent_rate = 0.2
-
-
-class SandLaneSystem(BaseSandSeparator):
-    def __init__(self, sand_lane_data):
-        super.__init__()
-        if sand_lane_data is None or sand_lane_data['default']:
-            self.default_sand_lane()
-        else:
-            self.sand_separated = sand_lane_data['sand_separated']
-
-    def default_sand_lane(self):
-        self.sand_separated = 1.0  # range from .6-.9 USER INPUT
-
+class SandLaneSystem(BaseSeparator):
     def total_daily_mass(self):
+        manure_handler = self.reception_pit.manure_handler
+        total_bedding_mass = manure_handler.bedding.total_bedding_mass()
+        return total_bedding_mass * (1 - self.efficiency)
         # manure_handler = self.reception_pit.manure_handler
         # bedding_manager = manure_handler.bedding_manager
         # total_bedding_mass = bedding_manager.total_bedding_mass()
@@ -359,12 +225,32 @@ class SandLaneSystem(BaseSandSeparator):
         pass
 
 
-class MechanicalSandSeparator(BaseSandSeparator):
+class MechanicalSandSeparator(BaseSeparator):
     pass
 
 
 @dataclass
-class ManureSeparatorInitData:
+class BaseManureSeparatorInitData(ABC):
+    @classmethod
+    @abstractmethod
+    def get_instance(cls, manure_separator_enum: ManureSeparatorEnum) -> BaseManureSeparatorInitData:
+        pass
+
+
+@dataclass
+class SandSeparatorInitData(BaseManureSeparatorInitData):
+    efficiency: float = 1.0
+
+    @classmethod
+    def get_instance(cls, manure_separator_enum: ManureSeparatorEnum) -> SandSeparatorInitData:
+        enum_to_init_data: Dict[ManureSeparatorEnum, SandSeparatorInitData] = {
+            ManureSeparatorEnum.SAND_LANE_MANURE_SEPARATION: SandSeparatorInitData(efficiency=1.0)
+        }
+        return enum_to_init_data.get(manure_separator_enum, SandSeparatorInitData())
+
+
+@dataclass
+class ManureSeparatorInitData(BaseManureSeparatorInitData):
     percent_dry_solids: float = 1.0
     TS_removal_efficiency: float = 0.0
     VS_removal_efficiency: float = 0.0
@@ -378,50 +264,49 @@ class ManureSeparatorInitData:
     def get_instance(cls, manure_separator_enum: ManureSeparatorEnum) -> ManureSeparatorInitData:
         enum_to_init_data: Dict[ManureSeparatorEnum, ManureSeparatorInitData] = {
             ManureSeparatorEnum.ROTARY_SCREEN: ManureSeparatorInitData(
-                percent_dry_solids=0.2,
-                TS_removal_efficiency=0.55,
-                VS_removal_efficiency=0.55,
-                N_removal_efficiency=0.3,
-                TAN_removal_efficiency=0.15,
-                P_removal_efficiency=0.4,
-                K_removal_efficiency=0.15,
-                TS_DM_effluent_rate=0.2
+                    percent_dry_solids=0.2,
+                    TS_removal_efficiency=0.55,
+                    VS_removal_efficiency=0.55,
+                    N_removal_efficiency=0.3,
+                    TAN_removal_efficiency=0.15,
+                    P_removal_efficiency=0.4,
+                    K_removal_efficiency=0.15,
+                    TS_DM_effluent_rate=0.2
             ),
             ManureSeparatorEnum.SCREW_PRESS: ManureSeparatorInitData(
-                percent_dry_solids=0.35,
-                TS_removal_efficiency=0.30,
-                VS_removal_efficiency=0.5,
-                N_removal_efficiency=0.3,
-                TAN_removal_efficiency=0.10,
-                P_removal_efficiency=0.2,
-                K_removal_efficiency=0.23,
-                TS_DM_effluent_rate=0.35
+                    percent_dry_solids=0.35,
+                    TS_removal_efficiency=0.30,
+                    VS_removal_efficiency=0.5,
+                    N_removal_efficiency=0.3,
+                    TAN_removal_efficiency=0.10,
+                    P_removal_efficiency=0.2,
+                    K_removal_efficiency=0.23,
+                    TS_DM_effluent_rate=0.35
             )
         }
-        if manure_separator_enum in enum_to_init_data:
-            return enum_to_init_data[manure_separator_enum]
-        return ManureSeparatorInitData()
+        return enum_to_init_data.get(manure_separator_enum, ManureSeparatorInitData())
 
 
 class ManureSeparatorFactory:
     @classmethod
     def get_instance(cls, pen: SimplePen, reception_pit: BaseReceptionPit) -> BaseSeparator:
         manure_separator_enum = ManureSeparatorEnum.get_enum(pen.manure_separator)
+
+        enum_to_class: Dict[ManureSeparatorEnum, Tuple[Type[BaseSeparator], Type[BaseManureSeparatorInitData]]] = {
+            # ManureSeparatorEnum.BELT_PRESS: BeltPress,
+            # ManureSeparatorEnum.DECANTING_CENTRIFUGE: DecantingCentrifuge,
+            # ManureSeparatorEnum.MOVING_DISC_PRESS: MovingDiscPress,
+            ManureSeparatorEnum.NULL_SEPARATOR: (NullSeparator, ManureSeparatorInitData),
+            ManureSeparatorEnum.ROTARY_SCREEN: (RotaryScreen, ManureSeparatorInitData),
+            # ManureSeparatorEnum.SCREW_PRESS: ScrewPress,
+            # ManureSeparatorEnum.SLOPE_SCREEN: SlopeScreen,
+            ManureSeparatorEnum.SAND_LANE_MANURE_SEPARATION: (SandLaneSystem, SandSeparatorInitData)
+        }
+
         params = {
             'pen': pen,
             'reception_pit': reception_pit,
-            'separator_init_data': ManureSeparatorInitData.get_instance(manure_separator_enum)
+            'separator_init_data': enum_to_class[manure_separator_enum][1].get_instance(manure_separator_enum)
         }
 
-        enum_to_class: Dict[ManureSeparatorEnum, Type[BaseSeparator]] = {
-            ManureSeparatorEnum.BELT_PRESS: BeltPress,
-            ManureSeparatorEnum.DECANTING_CENTRIFUGE: DecantingCentrifuge,
-            ManureSeparatorEnum.MOVING_DISC_PRESS: MovingDiscPress,
-            ManureSeparatorEnum.NULL_SEPARATOR: NullSeparator,
-            ManureSeparatorEnum.ROTARY_SCREEN: RotaryScreen,
-            ManureSeparatorEnum.SCREW_PRESS: ScrewPress,
-            ManureSeparatorEnum.SLOPE_SCREEN: SlopeScreen,
-            ManureSeparatorEnum.SAND_LANE_MANURE_SEPARATION: SandLaneSystem
-        }
-
-        return enum_to_class[manure_separator_enum](**params)
+        return enum_to_class[manure_separator_enum][0](**params)

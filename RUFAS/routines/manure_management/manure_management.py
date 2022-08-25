@@ -18,7 +18,6 @@ import pandas as pd
 from RUFAS.routines.animal.animal_management import AnimalManagement
 from RUFAS.routines.manure_management.manure_handlers.manure_handler_classes import \
     BaseManureHandler, ManureHandlerFactory
-# TODO: figure out how to connect to csv values
 from RUFAS.routines.manure_management.manure_handlers.manure_handler_output import ManureHandlerOutput
 from RUFAS.routines.manure_management.manure_separators.manure_separator_classes import BaseSeparator, \
     ManureSeparatorFactory
