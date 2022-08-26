@@ -14,7 +14,7 @@ class PensReport(BaseReportDriver):
     def __init__(self, data, state):
         super().__init__(data)
         for pen in state.animal_management.all_pens:
-            self.reports['pen_' + str(pen.id)] = PenReport(data, state.feed, pen, pen.id)
+            self.reports['pen_' + str(pen.id)] = PenReport(data, state.feed, pen.id)
 
         self.reports['pens_summary'] = PensSummary(data['pens_summary'])
 
@@ -34,12 +34,12 @@ class PensSummary(BaseReport):
 
 
 class PenReport(BaseReportDriver):
-    def __init__(self, data, feed, individual_pen, pen_id):
+    def __init__(self, data, feed, pen_id):
         super().__init__(data)
         self.pen_id = pen_id
         self.report_name = 'pen_' + str(pen_id)
         self.reports = {
-            'ration_report': self.RationReport(data['ration_report'], feed, individual_pen, self.pen_id),
+            'ration_report': self.RationReport(data['ration_report'], feed, self.pen_id),
             'growth_report': self.GrowthReport(data['growth_report'], self.pen_id),
             'manure_report': self.ManureReport(data['manure_report'], self.pen_id)
         }
@@ -115,7 +115,7 @@ class PenReport(BaseReportDriver):
             self.manure_info = {}
 
     class RationReport(BasePenReport):
-        def __init__(self, data, feed, individual_pen, pen_id):
+        def __init__(self, data, feed, pen_id):
             super().__init__(data, pen_id)
             self.ration_interval = data['ration_interval']
 
@@ -127,7 +127,9 @@ class PenReport(BaseReportDriver):
             # dictionary with all feed ids and keys and their pertaining information as values
             all_feeds = feed.all_feed_ids
 
+
             for feed_id in all_feeds:
+
                 feed_name = all_feeds[str(feed_id)]['feed_name']
                 units = all_feeds[str(feed_id)]['units']
                 self.daily_variables[str(feed_id) + "(" + feed_name + ")"] = \

@@ -297,7 +297,6 @@ class Pen:
             new_animals: list of new animals in the pen
             animal_combination: an AnimalCombination Enum representating the type of the new animals
         """
-        # self.animals_in_pen = new_animals
         for animal in new_animals:
             self.animals_in_pen.append(animal)
         self.pen_populated = not (len(self.animals_in_pen) == 0)
@@ -541,9 +540,7 @@ class Pen:
                 'NEl']) / animal.DMIest
             animal.DMPD_req = (requirements['MP_req']) / animal.DMIest
 
-        # set animal's ration to be the intake of all other animals in pen
-        # if self.ration == {}:
-        #     self.ration = self.calc_ration(feed, temp)
+
 
         animal.dry_matter_intake = self.dry_matter_intake
 
@@ -557,8 +554,8 @@ class Pen:
         # set animal's manure to be the average manure of all other
         # animals in pen
         for key in self.manure.keys():
-            # TODO find other solution to prevent div by 0 error
-            animal.manure_excretion[key] = self.manure[key] / (len(self.animals_in_pen)+ 0.01)
+            if len(self.animals_in_pen) > 0:
+                animal.manure_excretion[key] = self.manure[key] / (len(self.animals_in_pen))
 
         # since the manure attribute is a total from all animals in the pen,
         # we need to add the current animal's values to the total values for
@@ -603,7 +600,6 @@ class Pen:
         # that are non-zero.
         self.animals_in_pen = []
         self.pen_populated = False
-        # self.classes_in_pen = set()
         self.avg_p_animal = 0
 
     def subset_class_feeds(self, feed):
