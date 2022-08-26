@@ -18,12 +18,27 @@ def mock_crop(fr_PHU_1 = 0.15, fr_LAI_1 = 0.01,fr_PHU_2 = 0.50, fr_LAI_2 = 0.95 
         fr_PHU_sen = 0.90, gamma_reg = .7):
     """
     Description:
-        creates the mock BaseCrop instance that will be used as
-        the basis of the leaf_area_index.py unittests. The appropriate
-        attributes of the instance will be instantiated in this function, 
-        passed in as arguments
+        Creates a BaseCrop class mocking object for use as input for functions. It is initialized with the
+        arguments provided; arguments are dynamic and can be changed/added to as needed.
+
+    Args:
+        fr_PHU_1 (float)
+        fr_LAI_1 (float)
+        fr_PHU_2 (float)
+        fr_LAI_2 (float)
+        fr_LAI_max (float)
+        fr_PHU (float)
+        LAI_actual (float)
+        LAI_max (float)
+        prev_fr_LAI_max (float)
+        fr_PHU_sen (float)
+        gamma_reg (float)
+
+    Return:
+        returns a BaseCrop mocking object instantiated with the provided arguments 
     """
     mcrop = MagicMock(base_crop.BaseCrop)
+
     mcrop.fr_PHU_1 = fr_PHU_1
     mcrop.fr_LAI_1 = fr_LAI_1
     mcrop.fr_PHU_2 = fr_PHU_2
@@ -35,6 +50,7 @@ def mock_crop(fr_PHU_1 = 0.15, fr_LAI_1 = 0.01,fr_PHU_2 = 0.50, fr_LAI_2 = 0.95 
     mcrop.prev_fr_LAI_max = prev_fr_LAI_max
     mcrop.fr_PHU_sen = fr_PHU_sen
     mcrop.gamma_reg = gamma_reg
+
     return mcrop
 
 #for testing L1, assume L2 is correct
@@ -89,6 +105,7 @@ def test_calc_fr_LAI_max_all_correct():
 
 #the following tests are for the calculate_d_LAI_actual() function:
 def test_calculate_d_LAI_actual_correctly_calculates_change_in_LAI_actual():
+    
     crop = mock_crop()
     
     assert pytest.approx(calculate_d_LAI_actual(crop,.55)) == 0.55 * sqrt(0.7)
