@@ -7,6 +7,8 @@ Author(s): Pooya Hekmati, sh2235@cornell.edu
 
 import pytest
 
+from RUFAS.routines.animal.life_cycle.animal_events import AnimalEvents
+
 
 def test_norm():
     """Unit test for function norm in file routines/animal/clustering_pen_grouping.py"""
@@ -155,7 +157,32 @@ def test___str__():
 
 def test_get_most_recent_date():
     """Unit test for function get_most_recent_date in file routines/animal/life_cycle/animal_events.py"""
-    pass
+    animal_event = AnimalEvents()
+    actual = animal_event.get_most_recent_date('dummy')
+    expected = -1
+    assert actual == expected
+
+    animal_event.add_event(1,2,'event1')
+    animal_event.add_event(3,4,'event2')
+    animal_event.add_event(5,6,'event3')
+    animal_event.add_event(7,8,'event4')
+    animal_event.add_event(9,10,'event5')
+
+    actual = animal_event.get_most_recent_date('event1')
+    expected = 1
+    assert actual == expected
+
+    actual = animal_event.get_most_recent_date('event3')
+    expected = 5
+    assert actual == expected
+
+    actual = animal_event.get_most_recent_date('event5')
+    expected = 9
+    assert actual == expected
+
+    actual = animal_event.get_most_recent_date('event6')
+    expected = -1
+    assert actual == expected
 
 
 def test_next_id():
