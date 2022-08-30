@@ -1,6 +1,6 @@
 """
 RUFAS: Ruminant Farm Systems Model
-File name: manure.py
+File name: manure_management.py
 
 Description:
 
@@ -13,7 +13,7 @@ import collections
 from typing import Dict, List, Tuple
 
 from RUFAS.routines.animal.animal_management import AnimalManagement
-from RUFAS.routines.manure.simple_animal_management.simple_animal_management import SimpleAnimalManagement
+from RUFAS.routines.manure.ManureManagementPen.manure_management_pen import ManureManagementPen
 
 
 class ManureManagement:
@@ -26,6 +26,12 @@ class ManureManagement:
     Notes:
         This class will replace the `ManureStorage` class.
 
+    Attributes:
+            manure_handlers: a dictionary that maps an animal pen's id to a ManureHandler object.
+            reception_pits: a dictionary that maps an animal pen's id to a ReceptionPit object.
+            manure_separators: a dictionary that maps an animal pen's id to a ManureSeparator object.
+            manure_treatments: a dictionary that maps an animal pen's id to a Treatment object.
+
     """
 
     def __init__(self, animal_management: AnimalManagement):
@@ -37,22 +43,14 @@ class ManureManagement:
             animal_management: A reference to the AnimalManagement object that is one of the attributes
                 of the simulation engine object.
 
-        Attributes:
-            _manure_handlers: a dictionary that maps an animal pen's id to a ManureHandler object.
-            _reception_pits: a dictionary that maps an animal pen's id to a ReceptionPit object.
-            _manure_separators: a dictionary that maps an animal pen's id to a ManureSeparator object.
-            _treatments: a dictionary that maps an animal pen's id to a Treatment object.
-            _all_data: a dictionary that maps an animal pen's id to a list of tuples that consist of
-                daily output data.
-
         """
 
-        self._manure_handlers = {}
-        self._reception_pits = {}
-        self._manure_separators = {}
-        self._treatments = {}
+        self.manure_handlers = {}
+        self.reception_pits = {}
+        self.manure_separators = {}
+        self.manure_treatments = {}
         self._all_data = collections.defaultdict(list)
-        self._setup_manure_management_components(SimpleAnimalManagement(animal_management))
+        self._setup_manure_management_components(animal_management)
 
     @property
     def all_data(self) -> Dict[int, List[Tuple]]:
@@ -66,14 +64,14 @@ class ManureManagement:
                 key = id of an animal pen
                 value = a list of tuples where each tuple represents a group of daily output objects.
                     More precisely, each such tuple is of length 5, consisting of a
-                    SimplePen object, a ManureHandlerOutput object, a ReceptionPitOutput object,
+                    ManureManagementPen object, a ManureHandlerOutput object, a ReceptionPitOutput object,
                     a ManureSeparatorOutput object, and a ManureTreatment object.
 
         """
 
         return self._all_data
 
-    def _setup_manure_management_components(self, simple_animal_management: SimpleAnimalManagement) -> None:
+    def _setup_manure_management_components(self, animal_management: AnimalManagement) -> None:
         """
         Sets up the chain of manure management components for each animal pen as follows:
             Each pen has one of each of the following components - manure handler,
@@ -89,38 +87,39 @@ class ManureManagement:
         State instance variable.
 
         Args:
-            simple_animal_management: An AnimalManagement object that has been converted to a
-                SimpleAnimalManagement object.
+            animal_management: An AnimalManagement object obtained from the animal module.
 
         """
 
         # TODO: Will add the actual components in later pull requests
-        for pen in simple_animal_management.all_pens:
-            self._manure_handlers[pen.id] = None
-            self._reception_pits[pen.id] = None
-            self._manure_separators[pen.id] = None
-            self._treatments[pen.id] = None
+        for pen in animal_management.all_pens:
+            mm_pen = ManureManagementPen(pen)
+            self.manure_handlers[mm_pen.id] = None
+            self.reception_pits[mm_pen.id] = None
+            self.manure_separators[mm_pen.id] = None
+            self.manure_treatments[mm_pen.id] = None
 
-    def update(self, simple_animal_management: SimpleAnimalManagement) -> None:
+    def update(self, animal_management: AnimalManagement) -> None:
         """
         Updates this ManureManagement object by calling the update function on
         each manure management component for each animal pen.
 
         Args:
-            simple_animal_management: A SimpleAnimalManagement object that has been created
+            animal_management: A SimpleAnimalManagement object that has been created
                 from the simulation engine's AnimalManagement object.
 
         """
 
         # TODO: Will add the actual outputs in later pull requests
-        for pen in simple_animal_management.all_pens:
+        for pen in animal_management.all_pens:
+            mm_pen = ManureManagementPen(pen)
             manure_handler_daily_output = None
             reception_pit_daily_output = None
             manure_separator_daily_output = None
             treatment_daily_output = None
 
             daily_update_data = (
-                pen,
+                mm_pen,
                 manure_handler_daily_output,
                 reception_pit_daily_output,
                 manure_separator_daily_output,
@@ -136,7 +135,7 @@ def simulate_daily_manure_management(manure_management: ManureManagement, animal
     from the animal_management object will be extracted and passed through the following
     components sequentially - manure handlers, reception pits, manure separators,
     manure storage treatments - to generate daily output data. This data is then stored
-    in the all_data property field of the manure object.
+    in the all_data attribute of the manure_management object.
 
     Args:
         manure_management: A reference to the ManureManagement object stored in the SimulationEngine.
@@ -147,5 +146,4 @@ def simulate_daily_manure_management(manure_management: ManureManagement, animal
 
     """
 
-    sam = SimpleAnimalManagement(animal_management)
-    manure_management.update(sam)
+    manure_management.update(animal_management)
