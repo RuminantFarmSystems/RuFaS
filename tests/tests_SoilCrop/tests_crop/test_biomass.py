@@ -5,11 +5,10 @@ Description: Implements test cases
 Author(s): Brandon DeBoer, brdeboer@wisc.edu
 """
 
-
 from RUFAS.routines.field.crop.crop_types import base_crop
 from RUFAS.routines.field.soil import soil
 from RUFAS import *
-from RUFAS.routines.field.crop.biomass import * 
+from RUFAS.routines.field.crop.biomass import *
 
 from unittest.mock import MagicMock
 import pytest
@@ -17,7 +16,7 @@ import pytest
 from math import gamma
 
 
-def mock_crop(fr_root = .38,biomass_actual = 4.6,kl = 2.1, LAI_actual = 3.4, RUE = 1.5, gamma_reg = .7):
+def mock_crop(fr_root=.38, biomass_actual=4.6, kl=2.1, LAI_actual=3.4, RUE=1.5, gamma_reg=.7):
     """
     Description: 
         Creates a BaseCrop class mocking object for use as input for functions. It is initialized with the
@@ -34,7 +33,7 @@ def mock_crop(fr_root = .38,biomass_actual = 4.6,kl = 2.1, LAI_actual = 3.4, RUE
     Return:
         a BaseCrop mocking object instantiated with the provided arguments 
     """
-    
+
     mcrop = MagicMock(base_crop.BaseCrop)
 
     mcrop.fr_root = fr_root
@@ -46,11 +45,16 @@ def mock_crop(fr_root = .38,biomass_actual = 4.6,kl = 2.1, LAI_actual = 3.4, RUE
 
     return mcrop
 
+
 def mock_weather():
     pass
+
+
 def mock_time():
     pass
-def mock_soil(ET_max_annual = 1.5,evap_annual = 2.1, trans_annual = 1.3):
+
+
+def mock_soil(ET_max_annual=1.5, evap_annual=2.1, trans_annual=1.3):
     """
         Description:
             Creates a Soil class mocking object for use as input for functions. It is initialized with the
@@ -66,7 +70,7 @@ def mock_soil(ET_max_annual = 1.5,evap_annual = 2.1, trans_annual = 1.3):
     """
 
     msoil = MagicMock(soil.Soil)
-    
+
     msoil.ET_max_annual = ET_max_annual
     msoil.evap_annual = evap_annual
     msoil.trans_annual = trans_annual
@@ -74,7 +78,7 @@ def mock_soil(ET_max_annual = 1.5,evap_annual = 2.1, trans_annual = 1.3):
     return msoil
 
 
-#the following tests are for the calc_bio_AG() function
+# the following tests are for the calc_bio_AG() function
 def test_calc_bio_AG_sets_bio_AG_correctly():
     """
     Description:
@@ -88,8 +92,7 @@ def test_calc_bio_AG_sets_bio_AG_correctly():
     assert pytest.approx(crop.bio_AG) == (1 - .38) * 4.6
 
 
-
-#the following tests are for the calc_gamma_wu() function
+# the following tests are for the calc_gamma_wu() function
 def test_calc_gamma_wu_sets_ET_annual_correctly_ET_max_nonzero():
     """
     Description:
@@ -99,9 +102,10 @@ def test_calc_gamma_wu_sets_ET_annual_correctly_ET_max_nonzero():
     """
     crop = mock_crop()
     soil = mock_soil()
-    calc_gamma_wu(soil,crop)
+    calc_gamma_wu(soil, crop)
 
     assert pytest.approx(soil.ET_annual) == 2.1 + 1.3
+
 
 def test_calc_gamma_wu_sets_gamma_wu_correctly_ET_max_nonzero():
     """
@@ -110,10 +114,10 @@ def test_calc_gamma_wu_sets_gamma_wu_correctly_ET_max_nonzero():
         Soil attribute gamma_wu is correctly set when soil.ET_max_annual is initially a non-zero value.
 
     """
-    
+
     crop = mock_crop()
     soil = mock_soil()
-    calc_gamma_wu(soil,crop)
+    calc_gamma_wu(soil, crop)
 
     assert pytest.approx(crop.gamma_wu) == 100 * ((2.1 + 1.3) / 1.5)
 
@@ -127,7 +131,7 @@ def test_calc_gamma_wu_sets_all_correctly_ET_max_nonzero():
     """
     crop = mock_crop()
     soil = mock_soil()
-    calc_gamma_wu(soil,crop)
+    calc_gamma_wu(soil, crop)
 
     test_list = [
         pytest.approx(soil.ET_annual) == 2.1 + 1.3,
@@ -135,6 +139,7 @@ def test_calc_gamma_wu_sets_all_correctly_ET_max_nonzero():
     ]
 
     assert all(test_list)
+
 
 def test_calc_gamma_wu_returns_zero_with_ET_max_as_zero():
     """
@@ -145,13 +150,4 @@ def test_calc_gamma_wu_returns_zero_with_ET_max_as_zero():
     crop = mock_crop()
     soil = mock_soil(ET_max_annual=0.0)
 
-    assert pytest.approx(calc_gamma_wu(soil,crop)) == 0
-
-
-
-
-
-
-
-
-
+    assert pytest.approx(calc_gamma_wu(soil, crop)) == 0
