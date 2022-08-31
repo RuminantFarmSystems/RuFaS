@@ -1,6 +1,6 @@
 """
 RUFAS: Ruminant Farm Systems Model
-File name: test_field.py
+File name: OLD_test_field.py
 Description: Implements test cases
 Author(s): Pooya Hekmati, sh2235@cornell.edu
 Author(s): Jessica Tweneboah, jnt42@cornell.edu
