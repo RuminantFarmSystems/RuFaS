@@ -1,3 +1,4 @@
+import pytest
 from pytest import approx, fixture
 from pytest_mock import MockerFixture
 
@@ -173,117 +174,70 @@ def test_manure_management_pen_init(mock_pen: Pen,
     assert mm_pen.num_animals == 5
 
 
-def test_housing_area_for_NH3_emission(mock_pen: Pen,
+@pytest.mark.parametrize(
+        "has_cows, has_heiferIIs, expected_area",
+        [(True, False, 3.5),
+         (False, True, 2.5),
+         (True, True, 3.5),
+         (False, False, 2.0),
+         ])
+def test_housing_area_for_NH3_emission(has_cows,
+                                       has_heiferIIs,
+                                       expected_area,
+                                       mock_pen: Pen,
                                        mock_calf: Calf,
                                        mock_heiferII: HeiferII,
                                        mock_cow: Cow) -> None:
     """Unit test for property housing_area_for_NH3_emission in file manure_management_pen.py"""
 
-    # Case 1: Pen contains only cows.
     # Arrange
-    mock_pen.animals_in_pen = [mock_cow]
-    mock_pen.classes_in_pen = {'Cow'}
+    animals_in_pen = []
+    classes_in_pen = set()
+
+    if has_cows:
+        animals_in_pen.append(mock_cow)
+        classes_in_pen.add('Cow')
+    if has_heiferIIs:
+        animals_in_pen.append(mock_heiferII)
+        classes_in_pen.add('HeiferII')
+    if not has_cows and not has_heiferIIs:
+        animals_in_pen.append(mock_calf)
+        classes_in_pen.add('Calf')
+
+    mock_pen.animals_in_pen = animals_in_pen
+    mock_pen.classes_in_pen = classes_in_pen
+
+    # Act
     mm_pen = ManureManagementPen(mock_pen)
 
     # Assert
-    assert mm_pen.housing_area_for_NH3_emission == approx(3.5)
-    # --------------------------------------------------------------------------
-
-    # Case 2: Pen contains only heiferIIs.
-    # Arrange
-    mock_pen.animals_in_pen = [mock_heiferII]
-    mock_pen.classes_in_pen = {'HeiferII'}
-    mm_pen = ManureManagementPen(mock_pen)
-
-    # Assert
-    assert mm_pen.housing_area_for_NH3_emission == approx(2.5)
-    # --------------------------------------------------------------------------
-
-    # Case 3: Pen contains cows and heiferIIs, but cows take precedence.
-    # Arrange
-    mock_pen.animals_in_pen = [mock_heiferII, mock_cow]
-    mock_pen.classes_in_pen = {'HeiferII', 'Cow'}
-    mm_pen = ManureManagementPen(mock_pen)
-
-    # Assert
-    assert mm_pen.housing_area_for_NH3_emission == approx(3.5)
-    # --------------------------------------------------------------------------
-
-    # Case 4: Pen contains neither cows nor heiferIIs.
-    # Arrange
-    mock_pen.animals_in_pen = [mock_calf]
-    mock_pen.classes_in_pen = {'Calf'}
-    mm_pen = ManureManagementPen(mock_pen)
-
-    # Assert
-    assert mm_pen.housing_area_for_NH3_emission == approx(2.0)
+    assert mm_pen.housing_area_for_NH3_emission == approx(expected_area)
 
 
-def test_barn_area(mock_pen: Pen) -> None:
+@pytest.mark.parametrize(
+        "housing_type, has_cows, expected_area",
+        [('tie stall', True, 1.2),
+         ('tie stall', False, 1.0),
+         ('bedded pack', True, 5.0),
+         ('bedded pack', False, 3.0),
+         ('free stall', True, 3.5),
+         ('free stall', False, 2.5),
+         ])
+def test_barn_area(housing_type,
+                   has_cows,
+                   expected_area,
+                   mock_pen: Pen,
+                   mock_cow: Cow,
+                   mock_calf: Calf) -> None:
     """Unit test for property barn_area in file manure_management_pen.py"""
 
-    # Case 1: Housing type == tie stall, and cows are present.
     # Arrange
-    mock_pen.housing_type = 'tie stall'
-    mock_pen.animals_in_pen = [mock_cow]
-    mock_pen.classes_in_pen = {'Cow'}
+    mock_pen.housing_type = housing_type
+    mock_pen.animals_in_pen = [mock_cow] if has_cows else [mock_calf]
+    mock_pen.classes_in_pen = {'Cow'} if has_cows else {'Calf'}
+
+    # Act
     mm_pen = ManureManagementPen(mock_pen)
 
     # Assert
-    assert mm_pen.barn_area == approx(1.2)
-    # --------------------------------------------------------------------------
-
-    # Case 2: Housing type == tie stall, and cows are not present.
-    # Arrange
-    mock_pen.housing_type = 'tie stall'
-    mock_pen.animals_in_pen = [mock_calf]
-    mock_pen.classes_in_pen = {'Calf'}
-    mm_pen = ManureManagementPen(mock_pen)
-
-    # Assert
-    assert mm_pen.barn_area == approx(1.0)
-    # --------------------------------------------------------------------------
-
-    # Case 3: Housing type == bedded pack, and cows are present.
-    # Arrange
-    mock_pen.housing_type = 'bedded pack'
-    mock_pen.animals_in_pen = [mock_cow]
-    mock_pen.classes_in_pen = {'Cow'}
-    mm_pen = ManureManagementPen(mock_pen)
-
-    # Assert
-    assert mm_pen.barn_area == approx(5.0)
-    # --------------------------------------------------------------------------
-
-    # Case 4: Housing type == bedded pack, and cows are not present.
-    # Arrange
-    mock_pen.housing_type = 'bedded pack'
-    mock_pen.animals_in_pen = [mock_calf]
-    mock_pen.classes_in_pen = {'Calf'}
-    mm_pen = ManureManagementPen(mock_pen)
-
-    # Assert
-    assert mm_pen.barn_area == approx(3.0)
-    # --------------------------------------------------------------------------
-
-    # Case 5: Housing type == free stall, and cows are present.
-    # Arrange
-    mock_pen.housing_type = 'free stall'
-    mock_pen.animals_in_pen = [mock_cow]
-    mock_pen.classes_in_pen = {'Cow'}
-    mm_pen = ManureManagementPen(mock_pen)
-
-    # Assert
-    assert mm_pen.barn_area == approx(3.5)
-    # --------------------------------------------------------------------------
-
-    # Case 6: Housing type == free stall, and cows are not present.
-    # Arrange
-    mock_pen.housing_type = 'free stall'
-    mock_pen.animals_in_pen = [mock_calf]
-    mock_pen.classes_in_pen = {'Calf'}
-    mm_pen = ManureManagementPen(mock_pen)
-
-    # Assert
-    assert mm_pen.barn_area == approx(2.5)
-    # --------------------------------------------------------------------------
+    assert mm_pen.barn_area == approx(expected_area)
