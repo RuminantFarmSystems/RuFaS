@@ -1,7 +1,7 @@
 """
 RUFAS: Ruminant Farm Systems Model
 File name: test_nitrogen_uptake.py
-Description: Implements test cases
+Description: Implements tests for nitrogen_uptake.py
 Author(s): Brandon DeBoer, brdeboer@wisc.edu
 """
 
