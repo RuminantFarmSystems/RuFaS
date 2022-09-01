@@ -360,11 +360,11 @@ class AnaerobicLagoon(BaseTreatment):
                  treatment_init_data: TreatmentInitData,
                  storage_time_period=365.0,
                  precip_input=0.0,
-                 freeboard_input=1.0):
+                 freeboard_input=0.3048):
         super().__init__(pen, manure_separator, treatment_init_data)
         self.storage_time_period = storage_time_period  # m^3 (25-year 24h storm event)
-        self.freeboard_input = freeboard_input  # m^3
-        self.precip_input = precip_input  # m^3 (25-year 24h storm event)
+        self.freeboard_input = freeboard_input  # m
+        self.precip_input = precip_input  # m (25-year 24h storm event)
 
     def update(self) -> TreatmentOutput:
         daily_output = self.update_helper()
@@ -487,12 +487,12 @@ class AnaerobicLagoon(BaseTreatment):
     @property
     def precip(self):
         """returns additional lagoon volume needed for precipitation in m^3"""
-        return self.precip_input * Constants.INCHES_TO_METERS * self.lagoon_surface_area  ## m3 per inch of rain
+        return self.precip_input * self.lagoon_surface_area  ## m3 of rain
 
     @property
     def freeboard(self):
         """returns additional lagoon volume needed for freeboard in m^3"""
-        return self.freeboard_input * Constants.FEET_TO_METERS * self.lagoon_surface_area  ## m3 per inch of rain
+        return self.freeboard_input * self.lagoon_surface_area  ## m3 of rain
 
     def calc_emissions(self):
         pass
