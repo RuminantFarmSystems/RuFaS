@@ -80,7 +80,7 @@ class ManureManagement:
         self.manure_handlers: Dict[int, BaseManureHandler] = {}
         self.reception_pits: Dict[int, BaseReceptionPit] = {}
         self.manure_separators: Dict[int, BaseSeparator] = {}
-        self.treatments: Dict[int, BaseTreatment] = {}
+        self.treatments: Dict[int, List[BaseTreatment]] = {}
 
         self.all_data: Dict[int, List[DailyOutputType]] = {}
         self.df = None
@@ -166,7 +166,9 @@ class ManureManagement:
             manure_handler_daily_output = self.manure_handlers[pen.id].update(pen)
             reception_pit_daily_output = self.reception_pits[pen.id].update()
             manure_separator_daily_output = self.manure_separators[pen.id].update()
-            treatment_daily_output = self.treatments[pen.id].update()
+            treatment_daily_output = self.treatments[pen.id][0].update()
+            for i in range(1, len(self.treatments[pen.id])):
+                treatment_daily_output = self.treatments[pen.id][i].update(treatment_daily_output)
 
             pen_daily_update_data = (
                 pen,

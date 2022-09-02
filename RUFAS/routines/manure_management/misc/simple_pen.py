@@ -1,4 +1,4 @@
-from typing import NamedTuple, Set, Type
+from typing import List, NamedTuple, Set, Type
 
 from RUFAS.routines.animal.pen import Pen
 from .manure import Manure
@@ -43,7 +43,7 @@ class SimplePen:
 
         self.manure_handler: str = pen.manure_handling
         self.manure_separator: str = pen.manure_separator
-        self.manure_storage: str = pen.manure_storage
+        self.manure_storage: List[str] = pen.manure_storage
 
         self.manure_density = 990.0  # kg/m^3
 
