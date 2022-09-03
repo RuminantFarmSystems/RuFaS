@@ -179,7 +179,7 @@ def test_get_most_recent_date(events_list, event_descriptions, expected_days):
 
     for event_description, expected in zip(event_descriptions, expected_days):
         actual = animal_event.get_most_recent_date(event_description)
-        assert  actual == expected
+        assert actual == expected
 
 
 def test_next_id():
