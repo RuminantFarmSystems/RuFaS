@@ -155,34 +155,31 @@ def test___str__():
     pass
 
 
-def test_get_most_recent_date():
+@pytest.mark.parametrize(
+    "events_list, event_descriptions, expected_days",
+    [
+        (
+            [],
+            ['dummy'],
+            [-1]
+        ),
+        (
+            [(1, 2, 'event1'), (3, 4, 'event2'),
+             (5, 6, 'event1'), (7, 8, 'event3')],
+            ['event1', 'event2', 'event3', 'event0'],
+            [5, 3, 7, -1]
+        )
+    ],
+)
+def test_get_most_recent_date(events_list, event_descriptions, expected_days):
     """Unit test for function get_most_recent_date in file routines/animal/life_cycle/animal_events.py"""
     animal_event = AnimalEvents()
-    actual = animal_event.get_most_recent_date('dummy')
-    expected = -1
-    assert actual == expected
+    for animal_age, simulation_day, event_description in events_list:
+        animal_event.add_event(animal_age, simulation_day, event_description)
 
-    animal_event.add_event(1,2,'event1')
-    animal_event.add_event(3,4,'event2')
-    animal_event.add_event(5,6,'event3')
-    animal_event.add_event(7,8,'event4')
-    animal_event.add_event(9,10,'event5')
-
-    actual = animal_event.get_most_recent_date('event1')
-    expected = 1
-    assert actual == expected
-
-    actual = animal_event.get_most_recent_date('event3')
-    expected = 5
-    assert actual == expected
-
-    actual = animal_event.get_most_recent_date('event5')
-    expected = 9
-    assert actual == expected
-
-    actual = animal_event.get_most_recent_date('event6')
-    expected = -1
-    assert actual == expected
+    for event_description, expected in zip(event_descriptions, expected_days):
+        actual = animal_event.get_most_recent_date(event_description)
+        assert  actual == expected
 
 
 def test_next_id():

@@ -68,7 +68,8 @@ class AnimalEvents(object):
 
                 Returns
                 -------
-                        the most recent age at which event_description, -1 if not found.
+                        the most recent age at which event_description happened,
+                         -1 if not found.
         """
         dates = list(self.events.keys())
         for i in range(-1, -len(dates)-1, -1):
