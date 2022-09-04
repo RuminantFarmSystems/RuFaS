@@ -440,6 +440,9 @@ class AvailableFeeds:
         # key = feed_id, val = index of that feed_id in self.feed_id list
         self._feed_id_to_list_idx_dict = {}
 
+        # key = feed_id, val = index of that feed_id in self.feed_id list
+        self._feed_id_to_list_idx_dict = {}
+
     def feed_nutrients(self, feed):
         """
         Class function that manipulates the available feeds nutrient information
