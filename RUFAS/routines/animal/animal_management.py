@@ -468,8 +468,6 @@ class AnimalManagement:
         for pen in range(len(self.all_pens)):
 
             if len(self.all_pens[pen].animals_in_pen) > 0:
-                #if 'Cow' in self.all_pens[pen].classes_in_pen and \
-               #     self.all_pens[pen].ration == {}:
                 if self.all_pens[pen].ration == {}:
                     available_feeds = ration_driver.AvailableFeeds()
                     available_feeds.feed_nutrients(feed)
