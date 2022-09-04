@@ -127,8 +127,6 @@ class PenReport(BaseReportDriver):
             # dictionary with all feed ids and keys and their pertaining information as values
             all_feeds = feed.all_feed_ids
 
-
-            #for feed_id in individual_pen.allocated_feeds:
             for feed_id in all_feeds:
                 feed_name = all_feeds[str(feed_id)]['feed_name']
                 units = all_feeds[str(feed_id)]['units']
