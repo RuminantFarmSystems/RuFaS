@@ -436,10 +436,6 @@ class AvailableFeeds:
         self.heiferI_limit = []
         # calf limit
         self.calf_limit = []
-        # pyomo dictionary structure
-        #self.pyomo_data = {}
-        # list of the feeds used in this ration
-        #self.feeds = []
 
         # key = feed_id, val = index of that feed_id in self.feed_id list
         self._feed_id_to_list_idx_dict = {}
@@ -484,7 +480,7 @@ class AvailableFeeds:
                 self.lactating_cow_limit.append(feed['limit'])
                 self.dry_cow_limit.append(feed['limit'])
 
-    def get_feed_data_based_on_feed_ids(self, feed_ids: Set[int]):
+    def get_feed_data_from_feed_ids(self, feed_ids: Set[int]):
         """
         Returns a subset of data from all the available feeds based on the
         given set of feed ids.

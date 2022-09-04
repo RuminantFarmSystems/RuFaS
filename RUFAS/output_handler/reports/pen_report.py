@@ -127,14 +127,10 @@ class PenReport(BaseReportDriver):
             # dictionary with all feed ids and keys and their pertaining information as values
             all_feeds = feed.all_feed_ids
 
-            # subsets the entirety of the feed ids for the individual pen's needs
-            #pen_specific_feeds = {str(x): all_feeds[str(x)] for x in individual_pen.allocated_feeds}
 
             #for feed_id in individual_pen.allocated_feeds:
             for feed_id in all_feeds:
-                #feed_name = pen_specific_feeds[str(feed_id)]['feed_name']
                 feed_name = all_feeds[str(feed_id)]['feed_name']
-                #units = pen_specific_feeds[str(feed_id)]['units']
                 units = all_feeds[str(feed_id)]['units']
                 self.daily_variables[str(feed_id) + "(" + feed_name + ")"] = \
                     [

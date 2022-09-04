@@ -14,10 +14,12 @@ Author(s): Kass Chupongstimun, kass_c@hotmail.com,
            Militsa Sotirova, militsasotirova@gmail.com
            Chris Vankerkhove, cjv47@cornell.edu
 """
+from typing import Dict, List, Union
 
 from ...database_reader import DatabaseReader
 from RUFAS.output_handler.reports.feed_storage_report import StorageReport
 from . import nitrogen_loss, carbon_loss, protein_degradation
+from .feed_typed_dicts import PurchasedFeedTypedDict
 from ..animal.pen import Pen
 
 
@@ -48,7 +50,7 @@ def annual_feed_routine(feed):
 
 
 class Feed:
-    def __init__(self, data):
+    def __init__(self, data: PurchasedFeedTypedDict):
         """
         Description:
             Stores the information for the feeds managed by the farm, and the methods
@@ -878,7 +880,7 @@ class Feed:
 
         return all_feed_info
 
-    def get_quality_specific_purchased_feed_ids(self, entries):
+    def get_quality_specific_purchased_feed_ids(self, entries: Union[int, List[int]]) -> List[int]:
         """
         Description:
             Constructs and returns a dictionary of the purchased feed IDs based on
@@ -897,7 +899,7 @@ class Feed:
         else:
             entry_list = entries
 
-        purchased_feed_ids = []
+        purchased_feed_ids: List[int] = []
         for entry in entry_list:
             if entry in self.entries_split_by_maturity:
                 # making the assumption that purchased feeds are at mid-maturity
@@ -906,14 +908,27 @@ class Feed:
                 purchased_feed_ids.append(entry)
         return purchased_feed_ids
 
-    def get_quality_specific_feed_costs(self, input_feed_ids):
-        input_ids = input_feed_ids
-        quality_specific_feed_ids = {}
-        for id in input_ids:
-            quality_id = self.get_quality_specific_purchased_feed_ids(id)[0]
-            quality_specific_feed_ids[str(id)] = str(quality_id)
+    def get_quality_specific_feed_costs(self, input_feed_ids: List[int]) -> Dict[str, float]:
+        """
+        Returns an updated version of the purchased feed costs dictionary.
+        A purchased feed id key will be updated if it is in the list of entries
+        split by mid-maturity.
 
-        updated_costs = {}
+        Args:
+            input_feed_ids: A list of purchased feed ids.
+
+        Returns:
+            A dictionary that stores key-value pairs, where the keys are
+            purchased feed ids (potentially updated) and the values are feed costs.
+
+        """
+
+        quality_specific_feed_ids: Dict[str, str] = {}
+        for input_feed_id in input_feed_ids:
+            quality_id = self.get_quality_specific_purchased_feed_ids(input_feed_id)[0]
+            quality_specific_feed_ids[str(input_feed_id)] = str(quality_id)
+
+        updated_costs: Dict[str, float] = {}
         for key, val in self.feed_costs.items():
             updated_costs[quality_specific_feed_ids[key]] = val
         # feed value costs according to feeds split by maturity

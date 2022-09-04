@@ -436,7 +436,6 @@ class AnimalManagement:
                 group = Pen.AnimalCombination.CLOSE_UP
             else:  # animal is of class Cow
                 animal_p_conc = self.p_comp['cow']
-                # self.all_pens[pen].animals_in_pen.append(animal)
                 self.cows.append(animal)
                 group = Pen.AnimalCombination.LAC_COW
 
@@ -474,7 +473,7 @@ class AnimalManagement:
                 available_feeds.feed_nutrients(feed)
                 self.all_pens[pen].allocated_feeds = feed.input_feed_combinations[self.all_pens[pen].animal_combination]
                 pen_specific_feed_data = \
-                    available_feeds.get_feed_data_based_on_feed_ids(self.all_pens[pen].allocated_feeds)
+                    available_feeds.get_feed_data_from_feed_ids(self.all_pens[pen].allocated_feeds)
                 self.all_pens[pen].ration = self.all_pens[pen].calc_ration(feed, pen_specific_feed_data)
             else:
                 if len(self.all_pens[pen].animals_in_pen) > 0:
@@ -510,7 +509,6 @@ class AnimalManagement:
             self.calves.append(calf)
             self.all_pens[pen.id].set_up_new_animal(calf, self.pasture_concentrate,
                                                     feed, temp, pen_population_before_additions[pen.id])
-            # self.all_pens[pen].animals_in_pen.append(calf)
 
     def pen_allocation(self):
         # TODO: Refactor this function, currently nearly 200 lines long
@@ -730,7 +728,7 @@ class AnimalManagement:
         for i, pen in enumerate(self.all_pens):
             if pen.pen_populated:
                 pen.subset_class_feeds(feed)
-                pen_specific_feed_data = available_feeds.get_feed_data_based_on_feed_ids(pen.allocated_feeds)
+                pen_specific_feed_data = available_feeds.get_feed_data_from_feed_ids(pen.allocated_feeds)
                 self.all_pens[i].ration = self.all_pens[i].calc_ration(feed, pen_specific_feed_data)
 
     def calc_manure_excretion(self, feed, methane_model):
