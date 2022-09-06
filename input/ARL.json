@@ -18,7 +18,7 @@
         "fields": {
             "field_1": {
                 "soil": "ARL_soil.json",
-                "crop": "double_cropping_2yr_rotation.json",
+                "crop": "double_cropping_1yr_rotation.json",
                 "field_management": "ARL_field_management.json"
             }
         },

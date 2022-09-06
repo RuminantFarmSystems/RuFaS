@@ -30,6 +30,7 @@ def daily_soil_routine(soil, crop, field_management, weather, time):
     """
     daily_soil_reset(soil)
 
+    
     # calculate and update the temperature of the soil layers
     soil_temp.update_all(soil, crop, weather, time)
 
@@ -41,7 +42,7 @@ def daily_soil_routine(soil, crop, field_management, weather, time):
 
     # transpiration is defined in the crop module, but called here as a
     # component of water balance
-    transpiration.update_all(soil, crop.current_crop)
+    transpiration.update_all(soil, crop)
 
     # calculate daily percolation
     percolation.update_all(soil)
@@ -58,7 +59,7 @@ def daily_soil_routine(soil, crop, field_management, weather, time):
 
     phosphorus_cycling.update_all(soil, field_management, weather, time)
 
-    carbon_cycle.update_all(soil, crop.current_crop, weather, time)
+    carbon_cycle.update_all(soil, crop, weather, time)
 
     # update annual sums at the end of each day
     annual_variable_update(soil)

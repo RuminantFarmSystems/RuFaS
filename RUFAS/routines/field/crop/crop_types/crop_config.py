@@ -129,7 +129,6 @@ CORN = {
         "biomass_dry_down_percent": 0.0,  # TODO: GitHub Issue #156
         "DM_harvest_percent": 0.35  # TODO: Hard coded dry matter percent at harvest - GitHub Issue #156
 }
-
 CEREAL_RYE = {
         "crop_type": 'annual',
         "feed_id": '107g',

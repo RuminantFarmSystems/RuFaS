@@ -71,9 +71,14 @@ class FieldReport(BaseReportDriver):
         super().__init__(data)
         self.field_name = field_name
         self.report_name = self.field_name
+        multi_crop_report= {}
+        for crop_type in state.field.crop.current_crop.keys():
+                multi_crop_report[f'crop_report_{crop_type}']= self.CropReport(data['crop_report'], field_name,crop_type),
         self.reports = {
             'soil_report': self.SoilReportDriver(data['soil_report'], state, field_name),
-            'crop_report': self.CropReport(data['crop_report'], field_name),
+            for crop_type in field.crop.current_crop.keys():
+                f'crop_report_{crop_type}': self.CropReport(data['crop_report'], field_name),
+        
             'field_management_report': self.FieldManagementReport(data['field_management_report'], field_name),
             'nitrogen_mass_balance': self.NitrogenBalance(data['nitrogen_balance'], field_name),
             'phosphorus_mass_balance': self.PhosphorusBalance(data['phosphorus_balance'], field_name),
@@ -94,19 +99,19 @@ class FieldReport(BaseReportDriver):
             super().__init__(data)
             self.field_name = field_name
 
-        def daily_update(self, state, weather, time):
+        def daily_update(self, state, crop_type_name):
             field = state.fields.fields[self.field_name]
             soil = field.soil
-            crop_type = field.crop.current_crop
+            crop_type = field.crop.current_crop[crop_type_name]
             field_management = field.field_management
             for variable in self.daily_variables:
                 self.daily_variables[variable][2].append(
                     eval(self.daily_variables[variable][0], globals(), locals()))
 
-        def annual_update(self, state, weather, time):
+        def annual_update(self, state,crop_type_name):
             field = state.fields.fields[self.field_name]
             soil = field.soil
-            crop_type = field.crop.current_crop
+            crop_type = field.crop.current_crop[crop_type_name]
             field_management = field.field_management
             for variable in self.annual_variables:
                 self.annual_variables[variable][2] = \
@@ -114,7 +119,7 @@ class FieldReport(BaseReportDriver):
 
     # TODO: output files need crop type column (see crop_report.csv) - GitHub Issue #159
     class CropReport(BaseFieldReport):
-        def __init__(self, data, field_name):
+        def __init__(self, data, field_name,crop):
             super().__init__(data, field_name)
             self.daily_variables = {'year': ['time.calendar_year', '', []],
                                     'j_day': ['time.day', '', []],
@@ -160,7 +165,7 @@ class FieldReport(BaseReportDriver):
             def daily_update(self, state, weather, time):
                 field = state.fields.fields[self.field_name]
                 soil = field.soil
-                crop_type = field.crop.current_crop
+                crop_type = field.crop.current_crop['BaseCrop']
                 field_management = field.field_management
 
                 for variable in self.daily_variables:

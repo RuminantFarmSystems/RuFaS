@@ -26,14 +26,14 @@ def daily_fields_routine(fields, manure_storage, weather, time):
     for field in fields.fields.values():
         soil = field.soil
         crop = field.crop
-        crop_type = crop.current_crop
         croptime = field.croptime
         field_management = field.field_management
 
         # If the crop is not planted yet, determine whether it is planted today
         # Necessary here so that field management can be scheduled prior to planting
-        if not crop_type.planted and not crop_type.killed:
-            calculate_start(soil, crop, field_management, weather, time)
+        
+        # if not crop_type.planted and not crop_type.killed:
+        #     calculate_start(soil, crop, field_management, weather, time)
 
         daily_field_management_routine(soil, manure_storage, field_management, weather, time)
         daily_soil_routine(soil, crop, field_management, weather, time)
@@ -199,9 +199,11 @@ class Fields:
             self.N_erosion += soil.N_erosion
             self.P_erosion += soil.P_erosion
 
-            self.yield_actual += crop.yield_actual
-            self.N_yield += crop.N_yield
-            self.P_yield += crop.P_yield
+
+            for crop_type in crop.values():
+                self.yield_actual += crop_type.yield_actual
+                self.N_yield += crop_type.N_yield
+                self.P_yield += crop_type.P_yield
 
     def summarize_annual_variables(self):
         """
@@ -290,7 +292,7 @@ class Field:
         """an instance of the ``Soil`` class"""
         self.field_management = FieldManagement(field_management_data, time)
         """an instance of the ``FieldManagement`` class"""
-        self.crop = Crop(crop_data, time)
+        self.crop = Crop(crop_data)
         """an instance of the ``Crop`` class"""
 
         self.croptime= cropTime(time,crop_data)
