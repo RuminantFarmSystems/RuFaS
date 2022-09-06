@@ -16,7 +16,7 @@ from pytest import approx
 from RUFAS.routines.manure_management.gas_emissions.gas_emissions import GasEmissions
 from RUFAS.routines.manure_management.manure_handlers.milking_center import MilkingCenter
 from RUFAS.routines.manure_management.misc.simple_pen import SimplePen
-from RUFAS.routines.manure_management.manure_handlers.bedding_classes import BaseBedding
+from RUFAS.routines.manure_management.manure_handlers.bedding_classes import Bedding
 
 from RUFAS.routines.animal.pen import Pen
 
@@ -153,9 +153,9 @@ def test_total_percent_of_day_spent_in_milking_center():
 # bedding_classes.py tests here.
 
 
-first_base_bedding_instance = BaseBedding(200.0, 250.0)
-second_base_bedding_instance = BaseBedding(400.0, 200.0)
-third_base_bedding_instance = BaseBedding(300.0, 300.0)
+first_base_bedding_instance = Bedding(200.0, 250.0)
+second_base_bedding_instance = Bedding(400.0, 200.0)
+third_base_bedding_instance = Bedding(300.0, 300.0)
 
 
 def test_density():
