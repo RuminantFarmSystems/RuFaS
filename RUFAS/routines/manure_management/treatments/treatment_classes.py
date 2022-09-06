@@ -62,7 +62,6 @@ class BaseTreatment:
 
         """
 
-        self.treatment_enum = TreatmentEnum.get_enum(pen.manure_storage)
         self.treatment_init_data = treatment_init_data
 
         self.manure_separator = manure_separator
@@ -83,7 +82,7 @@ class BaseTreatment:
         """
         return self.all_output[-1] if len(self.all_output) > 0 else None
 
-    def update(self) -> TreatmentOutput:
+    def update(self, prev_treatment_output: Optional[TreatmentOutput] = None) -> TreatmentOutput:
         daily_output = TreatmentOutput()
         self.all_output.append(daily_output)
         return daily_output
@@ -487,6 +486,7 @@ class AnaerobicLagoon(BaseTreatment):
                    self.sludge_accumulation_volume * upper_bound)
 
 
+
 class AnaerobicDigestionAndLagoon(BaseTreatment):
     pass
 
@@ -632,6 +632,8 @@ class SlurryStorageOutdoor(BaseTreatment):
         pass
 
 
+
+
 class StoragePond(BaseTreatment):
     def __init__(self,
                  pen: SimplePen,
@@ -654,26 +656,24 @@ class StoragePond(BaseTreatment):
     def total_volume(self) -> float:
         return self.treatment_volume + self.freeboard + self.precip  # m^3
 
-    def update(self) -> TreatmentOutput:
-        handler = self.manure_handler.last_output
+    def update(self, prev_treatment_output: TreatmentOutput = None) -> TreatmentOutput:
+        if prev_treatment_output:
+            prev_output = prev_treatment_output
+        else:
+            prev_output = self.manure_handler.last_output
         daily_output = TreatmentOutput(
-                TAN_s=handler.TAN_s * (1 - self.treatment_init_data.TAN_removal_efficiency),
-                urea=handler.urea,
-                manure_nitrogen=handler.manure_nitrogen * (1 - self.treatment_init_data.N_removal_efficiency),
-                TSd=handler.TSd * (1 - self.treatment_init_data.TS_removal_efficiency),
-                VS_total=handler.VS_total * (1 - self.treatment_init_data.VS_removal_efficiency),
-                p_excrt_manure=handler.p_excrt_manure * (1 - self.treatment_init_data.P_removal_efficiency),
-                K_manure=handler.K_manure * (1 - self.treatment_init_data.K_removal_efficiency),
+
+              TAN_s=prev_output.TAN_s * (1 - self.treatment_init_data.TAN_removal_efficiency),
+              manure_nitrogen=prev_output.manure_nitrogen * (1 - self.treatment_init_data.N_removal_efficiency),
+              TSd=prev_output.TSd * (1 - self.treatment_init_data.TS_removal_efficiency),
+              VS_total=prev_output.VS_total * (1 - self.treatment_init_data.VS_removal_efficiency),
+              p_excrt_manure=prev_output.p_excrt_manure * (1 - self.treatment_init_data.P_removal_efficiency),
+              K_manure=prev_output.K_manure * (1 - self.treatment_init_data.K_removal_efficiency),
+
         )
 
         daily_output.final_volume = self.total_volume - (
                 (daily_output.TSd + daily_output.VS_total) * self.storage_time_period * Constants.KG_TO_CUBIC_METERS)
-
-        # If needed, modify output based on different combinations
-        # of handler and separator
-        # But if the logic is complex, then abstract that out and handle it differently
-        # if self.manure_handler.manure_handler_enum == ManureHandlerEnum.FLUSH_SYSTEM:
-        #     pass
 
         self.all_output.append(daily_output)
         return daily_output
@@ -694,7 +694,7 @@ class TreatmentFactory:
     @classmethod
     def get_instance(cls,
                      pen: SimplePen,
-                     manure_separator: BaseSeparator) -> BaseTreatment:
+                     manure_separator: BaseSeparator) -> List[BaseTreatment]:
         enum_to_class: Dict[TreatmentEnum, Tuple[Type[BaseTreatment], Type[TreatmentInitData]]] = {
             TreatmentEnum.STORAGE_POND: (StoragePond, StoragePondInitData),
             TreatmentEnum.ANAEROBIC_DIGESTION: (AnaerobicDigestion, AnaerobicDigestionInitData),
@@ -704,16 +704,21 @@ class TreatmentFactory:
             TreatmentEnum.SLURRY_STORAGE_OUTDOOR: (SlurryStorageOutdoor, SlurryStorageInitData)
         }
 
-        treatment_enum = TreatmentEnum.get_enum(pen.manure_storage)
+        treatments: List[BaseTreatment] = []
+        for treatment in pen.manure_storage:
 
-        params = {
-            'pen': pen,
-            'manure_separator': manure_separator,
-            'treatment_init_data': enum_to_class[treatment_enum][1].get_instance()
-        }
+            treatment_enum = TreatmentEnum.get_enum(treatment)
 
-        treatment = enum_to_class[treatment_enum][0](**params)
-        return treatment
+            params = {
+                'pen': pen,
+                'manure_separator': manure_separator,
+                'treatment_init_data': enum_to_class[treatment_enum][1].get_instance()
+            }
+
+            treatment = enum_to_class[treatment_enum][0](**params)
+            treatments.append(treatment)
+
+        return treatments
 
 
 @dataclass

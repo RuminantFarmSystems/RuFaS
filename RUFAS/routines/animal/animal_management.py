@@ -202,7 +202,7 @@ class AnimalManagement:
 
         manure_handling = "manual_scraping"
         manure_separator = "sedimentation"
-        manure_storage = "storage_pit"
+        manure_storage = ["storage_pit"]
         animal_combination = None
         if (len(self.all_pens) == 0) and (herd_num > 0):
             print('Warning: herd_num > 0, but pen_num = 0. Initializing 3 default pens.')
@@ -599,7 +599,7 @@ class AnimalManagement:
                     # initializing a default pen to be used for any class
                     pen = Pen(len(self.all_pens), 0.1, 1.6, max_value,
                               'open air barn', 'straw', 'tiestall', 'manual_scraping',
-                              'sedimentation', 'storage_pit', max_key[0], 1.2)
+                              'sedimentation', ['storage_pit'], max_key[0], 1.2)
 
                     self.all_pens.append(pen)
                 # if available pen
