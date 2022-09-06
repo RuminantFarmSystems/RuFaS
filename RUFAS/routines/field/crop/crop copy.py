@@ -46,7 +46,7 @@ def daily_crop_routine(soil, crop, field_management, weather, time):
                     if crop.current_crop_year[0].crop_name != 'null':
                         crop_type.killed = False
                         crop.current_crop = crop.current_crop_year[0]
-                        crop.current_crop.kill_year = is_kill_year(crop, time)
+                        crop.current_crop[i].kill_year = is_kill_year(crop, time)
 
             # current crop year will be this years current crop, the current crop will be last years latter crop, 
             # replaced with this years first crop when applicable
@@ -54,7 +54,7 @@ def daily_crop_routine(soil, crop, field_management, weather, time):
                 if crop.current_crop_year[0].crop_name != 'null':
                     crop_type.killed = False
                     crop.current_crop = crop.current_crop_year[0]
-                    crop.current_crop.kill_year = is_kill_year(crop, time)
+                    crop.current_crop[i].kill_year = is_kill_year(crop, time)
 
         # yield is reset to 0 at the beginning of the next day so it can be
         # accessed by the output handler.
@@ -168,7 +168,7 @@ def annual_crop_routine(crop, time):
     # current crop is the first crop to grow in the selected year
     crop.current_crop = crop.current_crop_year[0]
 
-    crop.current_crop.kill_year = is_kill_year(crop, time)
+    crop.current_crop[i].kill_year = is_kill_year(crop, time)
 
 
 def dormancy_routine(soil, crop_type, field_management, time):
@@ -225,10 +225,10 @@ def is_kill_year(crop, time):
     # if the crop is growing in the last year of the simulation,
     # if the crop is not grown the next year,
     # or if the crop is growing in a double cropping routine
-    if crop.current_crop.crop_type == 'annual' or len(crop.grow_regimen) == time.year or \
-            crop.current_crop.crop_name != crop.grow_regimen[time.year][0].crop_name or \
+    if crop.current_crop[i].crop_type == 'annual' or len(crop.grow_regimen) == time.year or \
+            crop.current_crop[i].crop_name != crop.grow_regimen[time.year][0].crop_name or \
             crop.current_crop_year[1].crop_name != 'null':
-        crop.current_crop.kill_day = crop.current_crop.harvest_day
+        crop.current_crop[i].kill_day = crop.current_crop[i].harvest_day
         return True
     else:
         return False

@@ -240,7 +240,7 @@ class BaseCrop:
         """float: Annual crop yield (kg/ha)"""
 
         # use data to set attributes, if given
-        self._use_data(data)
+        self._use_data(data,crop_name)
         self._set_crop_name(crop_name)
 
         # fetch and set species-specific data, if needed
@@ -248,7 +248,7 @@ class BaseCrop:
             self._set_species(species)
             self._set_species_attributes(self._get_crop_data())
 
-    def _use_data(self, data=None):
+    def _use_data(self, data=None,cropname=None):
         """use input data to assign some attributes
 
            Args:
@@ -257,6 +257,7 @@ class BaseCrop:
                and "extracted"
         """
         if data is not None:
+            data=data[cropname]
             self.plant_years = data['plant_years']
             self.repeat = data['repeat']
             self.planting_day = data['planting_day']
@@ -308,6 +309,3 @@ class BaseCrop:
         """
         for key, val in data_variable.items():
             setattr(self, key, val)
-
-## TODO: The Crop() class needs to be updated to work with the new functionality of BaseCrop and the child - GitHub Issue #180
-##  crop classes should have everything removed except species-specific methods.

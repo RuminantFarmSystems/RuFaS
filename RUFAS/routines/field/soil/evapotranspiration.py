@@ -65,14 +65,15 @@ def update_all(soil, crop, weather, time):
         weather: instance of the Weather class specified in classes.py
         time: instance of the Time class specified in classes.py
     """
+    for crop_types in crop.current_crop.values():
+        
+        calc_potential_evap(soil, weather, time)
 
-    calc_potential_evap(soil, weather, time)
+        calc_crop_transpiration(soil, crop_types)
 
-    calc_crop_transpiration(soil, crop)
+        calc_soil_evap(soil, crop_types)
 
-    calc_soil_evap(soil, crop)
-
-    update_evap_z(soil)
+        update_evap_z(soil)
 
 
 def calc_potential_evap(soil, weather, time):
@@ -116,7 +117,7 @@ def calc_LHV(T_avg):
     return 2.501 - (2.361 * (10 ** (-3)) * T_avg)
 
 
-def calc_crop_transpiration(soil, crop):
+def calc_crop_transpiration(soil, crop_type):
     """
     Description:
         Calculates crop transpiration as a function of maximum transpiration on a
@@ -129,14 +130,14 @@ def calc_crop_transpiration(soil, crop):
         crop: instance of Crop type class
     """
 
-    LAI = crop.current_crop.LAI_actual
+    LAI = crop_type.LAI_actual
     if 0 <= LAI <= 3.0:
         soil.trans_max = (soil.ET_max * LAI) / 3.0
     else:
         soil.trans_max = soil.ET_max
 
 
-def calc_soil_evap(soil, crop):
+def calc_soil_evap(soil, crop_type):
     """
     Description:
         Calculates sublimation and soil evaporation
@@ -147,7 +148,7 @@ def calc_soil_evap(soil, crop):
         crop: instance of Crop type class
     """
 
-    soil_cov = calc_soil_cov(soil, crop)
+    soil_cov = calc_soil_cov(soil, crop_type)
 
     # "pseudocode_soil" S.2.B.4
     evap_max = soil.ET_max * soil_cov
@@ -156,7 +157,7 @@ def calc_soil_evap(soil, crop):
     soil.evap_max = min(evap_max, ((evap_max * soil.ET_max) / (evap_max + soil.trans_max)))
 
 
-def calc_soil_cov(soil, crop):
+def calc_soil_cov(soil, crop_type):
     """
     Description:
         Calculates soil cover for use in calculating soil evaporation
@@ -167,7 +168,7 @@ def calc_soil_cov(soil, crop):
         crop: instance of Crop type class
     """
 
-    bio_AG = crop.current_crop.bio_AG
+    bio_AG = crop_type.bio_AG
     residue = soil.residue
     bio_mass = bio_AG + residue
 

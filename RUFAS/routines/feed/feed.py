@@ -681,7 +681,7 @@ class Feed:
         """
         # aggregate crop yield across fields
         for field in fields.fields.values():
-            crop = field.crop.current_crop
+            crop = field.crop.current_crop['BaseCrop']
             # there is forage to be stored
             if crop.yield_actual != 0:
                 stored = False

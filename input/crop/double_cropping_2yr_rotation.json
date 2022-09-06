@@ -2,7 +2,7 @@
     "latitude": 43.332708,
 
     "crops": {
-        "winter_wheat": {
+        "Alfalfa": {
             "plant_years": [2009,2010],
             "repeat": 0,
             "planting_day": 160,
@@ -11,8 +11,8 @@
             "planting_order": "1st",
             "extracted": true
         },
-        "spring_barley": {
-            "plant_years": [2009,2010],
+        "Corn": {
+            "plant_years": [2010],
             "repeat": 0,
             "planting_day": 80,
             "harvest_day": 362,
