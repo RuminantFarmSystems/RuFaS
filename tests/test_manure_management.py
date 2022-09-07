@@ -200,7 +200,7 @@ def test_add():
 
 # --------------------------- Test manure separators module
 
-# --------------------------- Test treatments module
+# --------------------------- Test manure_treatments module
 
 # --------------------------- Test gas emissions module
 

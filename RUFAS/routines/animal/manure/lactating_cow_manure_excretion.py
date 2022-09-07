@@ -62,6 +62,10 @@ def manure_calculations(ration_formulation, feed, bw, days_milk, milk_protein,
     # Faecal water, kg [A.3C.A.1]
     fecal_water = 1.987 * dm_intake + 0.348 * ADF_conc - 0.412 * CP_conc - 0.074 * DM_conc - 0.0057 * days_milk
 
+    # TODO: Review - currently unused
+    # Total Solids, kg [A.3E.A.2]
+    fecal_solids = -0.576 + 0.370 * dm_intake - 0.075 * CP_conc + 0.059 * ADF_conc
+
     # Total Solids, kg [A.3C.A.2]
     total_solids = -0.576 + 0.370 * dm_intake - 0.075 * CP_conc + 0.059 * ADF_conc
 
@@ -92,15 +96,32 @@ def manure_calculations(ration_formulation, feed, bw, days_milk, milk_protein,
     # Degradable volatile solids, g [A.3C.A.5]
     degradable_volatile_solids = (-1.017 + 0.364 * OM_intake + 0.029 * NDF_conc - 0.023 * CP_conc) * 1000
 
-    # Non-degradable volatile solids, g [A.3C.A.6]
-    nondegradable_volatile_solids = (-0.184 + 0.038 * OM_intake + 0.007 * NDF_conc - 0.001 * CP_conc) * 1000
+    # TODO: Review - Newly added
+    # Total volatile solids, g [A.3E.A.6]
+    total_volatile_solids = (-1.201 + 0.402 * OM_intake + 0.036 * NDF_conc - 0.024 * CP_conc) * 1000
 
+    # TODO: Review - Been replaced with the one that follows this
+    # Non-degradable volatile solids, g [A.3C.A.6]
+    # nondegradable_volatile_solids = (-0.184 + 0.038 * OM_intake + 0.007 * NDF_conc - 0.001 * CP_conc) * 1000
+
+    nondegradable_volatile_solids = total_volatile_solids - degradable_volatile_solids
+
+    # TODO: Review - Been replaced with urine_urea_n_conc
     # Urea concentration, mol/L (Eq 5.1)
     U = (-1.16 + 0.86 * (N_urine / urine)) / 28
 
+    # Urea concentration in urine, g urea-N/L (Eq A.3E.B.4)
+    urine_urea_n_conc = -1.16 + 0.86 * ((N_urine * 1000) / urine)
+
+    # TODO: Review - Been replaced with total_ammoniacal_n_conc
     # Total ammoniacal nitrogen concentration in the manure slurry,
     # mol/L (Eq 6.1)
     TAN_s = (-162.4 * U * U + 96.4 * U) / 100
+
+    # Total ammoniacal nitrogen concentration in the manure slurry,
+    # g ammoniacal nitrogen/L manure slurry (Eq 6.1)
+    tan_percent_of_urea = 48.2 - 2.9 * urine_urea_n_conc
+    total_ammoniacal_n_conc = (tan_percent_of_urea / 100) * urine_urea_n_conc
 
     # Amount of potassium excreted, g/day [A.3C.C.1]
     K_manure = 1.822 * milk_prod + 2688.88 * (milk_protein / 100) + 156.93 * dm_intake * (K_conc / 100) - 91.755
@@ -122,8 +143,8 @@ def manure_calculations(ration_formulation, feed, bw, days_milk, milk_protein,
         phosphorus_excreted(milk_prod, manure, p_feces_excrt, p_urine)
 
     return p_excrt, \
-           {"U": U,
-            "TAN_s": TAN_s,
+           {"U": urine_urea_n_conc,
+            "TAN_s": total_ammoniacal_n_conc,
             "MN": N_manure,
             "Mkg": manure,
             "TSd": total_solids,

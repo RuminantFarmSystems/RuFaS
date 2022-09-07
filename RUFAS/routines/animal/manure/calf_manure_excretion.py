@@ -53,7 +53,7 @@ def manure_calculations(bw, p_feces_excrt, p_urine):
     return p_excrt, \
            {"U": 0.340,  # TODO: Implement with correct equation
             "TAN_s": 0.14,  # TODO: Implement with correct equation
-            "MN": 532.407,  # TODO: Implement with correct equation
+            "MN": 0.532,  # TODO: Review - Replaced 532.407
             "Mkg": manure,
             "TSd": total_solids,
             "VSd": 7087.413,  # TODO: Implement with correct equation

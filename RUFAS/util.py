@@ -149,3 +149,22 @@ class Utility:
             return numerator * 100 / denominator
 
         return calc
+
+    @staticmethod
+    def is_leap_year(year):
+        """
+        Description:
+            Helper method determines if the given year is a leap year
+        Args:
+            year: an int of the year
+        Returns:
+            bool: True if the year is a leap year
+        """
+        if year % 400 == 0:
+            return True
+        elif year % 100 == 0:
+            return False
+        elif year % 4 == 0:
+            return True
+        else:
+            return False

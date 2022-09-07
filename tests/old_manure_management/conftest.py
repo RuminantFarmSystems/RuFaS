@@ -54,7 +54,7 @@ def pen0(mocker: MockerFixture, calf: Calf) -> Pen:
     p0.bedding_type = 'sand'
     p0.manure_handling = 'manual_scraping'
     p0.manure_separator = 'sedimentation'
-    p0.manure_storage = 'storage_pit'
+    p0.manure_management = 'storage_pit'
     p0.manure = {
         'U': 0,
         'TAN_s': 0,
@@ -88,7 +88,7 @@ def pen1(mocker: MockerFixture, heiferI) -> Pen:
     p1.bedding_type = 'organic'
     p1.manure_handling = 'flush_system'
     p1.manure_separator = 'sedimentation'
-    p1.manure_storage = 'storage_pit'
+    p1.manure_management = 'storage_pit'
     p1.manure = {
         'U': 0,
         'TAN_s': 0,
@@ -122,7 +122,7 @@ def pen2(mocker: MockerFixture, heiferII) -> Pen:
     p2.bedding_type = 'organic'
     p2.manure_handling = 'automatic_alley_scrapers'
     p2.manure_separator = 'sedimentation'
-    p2.manure_storage = 'storage_pit'
+    p2.manure_management = 'storage_pit'
     p2.manure = {
         'U': 0,
         'TAN_s': 0,
@@ -156,7 +156,7 @@ def pen3(mocker: MockerFixture, heiferIII) -> Pen:
     p3.bedding_type = 'sand'
     p3.manure_handling = 'manual_scraping'
     p3.manure_separator = 'sedimentation'
-    p3.manure_storage = 'anaerobic_lagoon'
+    p3.manure_management = 'anaerobic_lagoon'
     p3.manure = {
         'U': 0,
         'TAN_s': 0,
@@ -190,7 +190,7 @@ def pen4(mocker: MockerFixture, cow) -> Pen:
     p4.bedding_type = 'sand'
     p4.manure_handling = 'flush_system'
     p4.manure_separator = 'sedimentation'
-    p4.manure_storage = 'anaerobic_lagoon'
+    p4.manure_management = 'anaerobic_lagoon'
     p4.manure = {
         'U': 41.820000000000086,
         'TAN_s': 17.22000000000003,
@@ -224,7 +224,7 @@ def pen5(mocker: MockerFixture, cow) -> Pen:
     p4.bedding_type = 'sand'
     p4.manure_handling = 'automatic_alley_scrapers'
     p4.manure_separator = 'sedimentation'
-    p4.manure_storage = 'anaerobic_lagoon'
+    p4.manure_management = 'anaerobic_lagoon'
     p4.manure = {
         'U': -8.21877023874877,
         'TAN_s': -8.471386089652981,
@@ -258,7 +258,7 @@ def pen6(mocker: MockerFixture, cow) -> Pen:
     p6.bedding_type = 'sand'
     p6.manure_handling = 'manual_scraping'
     p6.manure_separator = 'rotary_screen'
-    p6.manure_storage = 'storage_pit_2'
+    p6.manure_management = 'storage_pit_2'
     p6.manure = {
         'U': -12.31738359791296,
         'TAN_s': -12.695257841678291,
@@ -292,7 +292,7 @@ def pen7(mocker: MockerFixture, cow) -> Pen:
     p7.bedding_type = 'sand'
     p7.manure_handling = 'flush_system'
     p7.manure_separator = 'rotary_screen'
-    p7.manure_storage = 'storage_pit_2'
+    p7.manure_management = 'storage_pit_2'
     p7.manure = {
         'U': -10.217003227410219,
         'TAN_s': -10.530013513283803,
@@ -326,7 +326,7 @@ def pen8(mocker: MockerFixture, cow) -> Pen:
     p8.bedding_type = 'sand'
     p8.manure_handling = 'automatic_alley_scrapers'
     p8.manure_separator = 'rotary_screen'
-    p8.manure_storage = 'storage_pit_2'
+    p8.manure_management = 'storage_pit_2'
     p8.manure = {
         'U': -5.4129916927139545,
         'TAN_s': -5.578608713677893,
@@ -382,7 +382,7 @@ def my_pen(mocker: MockerFixture, cow) -> Pen:
     p.bedding_type = 'sand'
     p.manure_handling = 'manual_scraping'
     p.manure_separator = 'rotary_screen'
-    p.manure_storage = 'storage_pit_2'
+    p.manure_management = 'storage_pit_2'
     p.manure = {
         'U': 0,
         'TAN_s': 0,

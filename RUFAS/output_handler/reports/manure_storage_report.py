@@ -13,13 +13,13 @@ class ManureStorageReport(BaseReportDriver):
     def __init__(self, data, state):
         super().__init__(data)
 
-        for handler in state.manure_storage.pens:
+        for handler in state.manure_management.pens:
             self.reports[handler] = HandlingReport(data['handling_report'], handler)
 
-        for separator in state.manure_storage.separators:
+        for separator in state.manure_management.separators:
             self.reports[separator] = SeparatorReport(data['separator_report'], separator)
 
-        for storage in state.manure_storage.storage:
+        for storage in state.manure_management.storage:
             self.reports[storage] = StorageReport(data['storage_report'], storage)
 
         self.reports['manure_storage_summary'] = ManureStorageSummary(data['manure_storage_summary'])
@@ -68,13 +68,13 @@ class BaseHandlingReport(BaseReport):
         self.handler_name = handler
 
     def daily_update(self, state, weather, time):
-        handler = state.manure_storage.pens[self.handler_name]
+        handler = state.manure_management.pens[self.handler_name]
         for variable in self.daily_variables:
             self.daily_variables[variable][2].append(
                 eval(self.daily_variables[variable][0], globals(), locals()))
 
     def annual_update(self, state, weather, time):
-        handler = state.manure_storage.pens[self.handler_name]
+        handler = state.manure_management.pens[self.handler_name]
         for variable in self.annual_variables:
             self.annual_variables[variable][2] = \
                 eval(self.annual_variables[variable][0], globals(), locals())
@@ -87,13 +87,13 @@ class BaseSeparatorReport(BaseReport):
         self.separator_name = separator
 
     def daily_update(self, state, weather, time):
-        separator = state.manure_storage.separators[self.separator_name]
+        separator = state.manure_management.separators[self.separator_name]
         for variable in self.daily_variables:
             self.daily_variables[variable][2].append(
                 eval(self.daily_variables[variable][0], globals(), locals()))
 
     def annual_update(self, state, weather, time):
-        separator = state.manure_storage.separators[self.separator_name]
+        separator = state.manure_management.separators[self.separator_name]
         for variable in self.annual_variables:
             self.annual_variables[variable][2] = \
                 eval(self.annual_variables[variable][0], globals(), locals())
@@ -106,13 +106,13 @@ class BaseStorageReport(BaseReport):
         self.storage_name = storage
 
     def daily_update(self, state, weather, time):
-        storage = state.manure_storage.storage[self.storage_name]
+        storage = state.manure_management.storage[self.storage_name]
         for variable in self.daily_variables:
             self.daily_variables[variable][2].append(
                 eval(self.daily_variables[variable][0], globals(), locals()))
 
     def annual_update(self, state, weather, time):
-        storage = state.manure_storage.storage[self.storage_name]
+        storage = state.manure_management.storage[self.storage_name]
         for variable in self.annual_variables:
             self.annual_variables[variable][2] = \
                 eval(self.annual_variables[variable][0], globals(), locals())

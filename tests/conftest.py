@@ -11,9 +11,9 @@ from RUFAS.routines.manure_management.reception_pits.reception_pit_classes impor
 from RUFAS.routines.manure_management.reception_pits.reception_pit_output import ReceptionPitOutput
 from RUFAS.routines.manure_management.manure_handlers.manure_handler_classes import BaseManureHandler
 from RUFAS.routines.manure_management.manure_handlers.manure_handler_output import ManureHandlerOutput
-from RUFAS.routines.manure_management.manure_separators.manure_separator_classes import BaseSeparator
-from RUFAS.routines.manure_management.treatments.treatment_classes import AnaerobicDigestion, AnaerobicLagoon, TreatmentEnum
-from RUFAS.routines.manure_management.treatments.treatment_classes import AnaerobicDigestionInitData, AnaerobicLagoonInitData
+from RUFAS.routines.manure_management.manure_separators.manure_separator_classes import BaseManureSeparator
+from RUFAS.routines.manure_management.manure_treatments.treatment_classes import AnaerobicDigestion, AnaerobicLagoon, TreatmentEnum
+from RUFAS.routines.manure_management.manure_treatments.treatment_classes import AnaerobicDigestionInitData, AnaerobicLagoonInitData
 from RUFAS.routines.manure_management.misc.daily_variables import DailyVariables
 
 
@@ -36,7 +36,7 @@ def pen0(mocker: MockerFixture, cow: Cow) -> Pen:
     p0.bedding_type = 'sand'
     p0.manure_handling = 'manual_scraping'
     p0.manure_separator = 'sedimentation'
-    p0.manure_storage = 'storage_pit'
+    p0.manure_management = 'storage_pit'
     p0.manure = {
         'U': 0,
         'TAN_s': 0,
@@ -99,8 +99,8 @@ def mock_handler(mocker:MockerFixture, mock_handler_output)->BaseManureHandler:
     return manure_handler
 
 @fixture
-def mock_separator(mocker:MockerFixture,mock_reception_pit)->BaseSeparator:
-    manure_separator = mocker.MagicMock(spec=BaseSeparator)
+def mock_separator(mocker:MockerFixture,mock_reception_pit)->BaseManureSeparator:
+    manure_separator = mocker.MagicMock(spec=BaseManureSeparator)
     manure_separator.reception_pit = mock_reception_pit
     return manure_separator
 

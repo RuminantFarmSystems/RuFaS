@@ -4,13 +4,14 @@ import sys
 import time as timer
 from pathlib import Path
 from RUFAS import routines, errors
-from RUFAS.classes import Config, State, Weather, Time
+from RUFAS.classes import Config, State, Time
 from RUFAS.output_handler import OutputHandler
 import random
 import numpy
 from typing import Optional
 
 from RUFAS.util import Utility
+from RUFAS.weather import Weather
 
 
 class SimulationEngine:
@@ -66,10 +67,10 @@ class SimulationEngine:
 
         routines.daily_animal_routine(
             self.state.animal_management, self.state.feed, self.weather, self.time)
-        routines.daily_manure_storage_routine(
-            self.state.manure_storage, self.state.animal_management)
+        routines.daily_manure_management_routine(
+            self.state.manure_management, self.state.animal_management, self.weather)
         routines.daily_fields_routine(
-            self.state.fields, self.state.manure_storage, self.weather, self.time)
+            self.state.fields, self.state.manure_management, self.weather, self.time)
         routines.daily_feed_routine(self.state.feed, self.state.fields, self.state.animal_management,
                                     self.output.reports['feed_storage_report'])
 

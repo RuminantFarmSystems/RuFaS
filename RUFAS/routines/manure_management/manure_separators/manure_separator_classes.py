@@ -46,7 +46,7 @@ class ManureSeparatorEnum(ExtendedEnum):
         return cls.DEFAULT_SAND
 
 
-class BaseSeparator:
+class BaseManureSeparator:
     def __init__(self, pen: SimplePen,
                  reception_pit: BaseReceptionPit,
                  separator_init_data: ManureSeparatorInitData):
@@ -118,43 +118,43 @@ class BaseSeparator:
         pass
 
 
-class BeltPress(BaseSeparator):
+class BeltPress(BaseManureSeparator):
     pass
 
 
-class DecantingCentrifuge(BaseSeparator):
+class DecantingCentrifuge(BaseManureSeparator):
     pass
 
 
-class MechanicalSeparator(BaseSeparator):
+class MechanicalSeparator(BaseManureSeparator):
     pass
 
 
-class MovingDiscPress(BaseSeparator):
+class MovingDiscPress(BaseManureSeparator):
     pass
 
 
-class RotaryScreen(BaseSeparator):
+class RotaryScreen(BaseManureSeparator):
     pass
 
 
-class ScrewPress(BaseSeparator):
+class ScrewPress(BaseManureSeparator):
     pass
 
 
-class Sedimentation(BaseSeparator):
+class Sedimentation(BaseManureSeparator):
     pass
 
 
-class SlopeScreen(BaseSeparator):
+class SlopeScreen(BaseManureSeparator):
     pass
 
 
-class CustomSeparator(BaseSeparator):
+class CustomSeparator(BaseManureSeparator):
     pass
 
 
-class NullSeparator(BaseSeparator):
+class NullSeparator(BaseManureSeparator):
     pass
 
 
@@ -171,11 +171,11 @@ class NullSeparator(BaseSeparator):
 #     sand_lane.sand_volume_separated = sand_lane.sand_mass_separated / self.bedding_density  # m3/day
 
 
-class SandLaneSystem(BaseSeparator):
+class SandLaneSystem(BaseManureSeparator):
     pass
 
 
-class MechanicalSandSeparator(BaseSeparator):
+class MechanicalSandSeparator(BaseManureSeparator):
     pass
 
 
@@ -219,10 +219,10 @@ class ManureSeparatorInitData:
 
 class ManureSeparatorFactory:
     @classmethod
-    def get_instance(cls, pen: SimplePen, reception_pit: BaseReceptionPit) -> BaseSeparator:
+    def get_instance(cls, pen: SimplePen, reception_pit: BaseReceptionPit) -> BaseManureSeparator:
         manure_separator_enum = ManureSeparatorEnum.get_enum(pen.manure_separator)
 
-        enum_to_class: Dict[ManureSeparatorEnum, Type[BaseSeparator]] = {
+        enum_to_class: Dict[ManureSeparatorEnum, Type[BaseManureSeparator]] = {
             ManureSeparatorEnum.BELT_PRESS: BeltPress,
             ManureSeparatorEnum.DECANTING_CENTRIFUGE: DecantingCentrifuge,
             ManureSeparatorEnum.MOVING_DISC_PRESS: MovingDiscPress,

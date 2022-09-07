@@ -59,8 +59,9 @@ def manure_calculations(ration_formulation, feed, bw, p_feces_excrt, p_urine):
     # Total solids, kg/day [A.3B.A.2]
     total_solids = 0.0084 * bw
 
+    # TODO: Review - Divide by 1000
     # Nitrogen in liquid and solid manure, g/day [A.3D.B.1]
-    N_manure = 78.390 * dm_intake * cp_conc / 100 + 51.35
+    N_manure = (78.390 * dm_intake * cp_conc / 100 + 51.35)/1000
 
     # Amount of potassium excreted, g/day [A.3D.B.3]
     K_manure = 1000 * dm_intake * K_conc / 100

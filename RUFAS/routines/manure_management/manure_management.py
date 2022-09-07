@@ -14,52 +14,31 @@ import json
 from dataclasses import asdict
 from datetime import datetime
 from typing import Dict, List, Tuple
+
 import pandas as pd
+
 from RUFAS.routines.animal.animal_management import AnimalManagement
 from RUFAS.routines.manure_management.manure_handlers.manure_handler_classes import \
     BaseManureHandler, ManureHandlerFactory
 from RUFAS.routines.manure_management.manure_handlers.manure_handler_output import ManureHandlerOutput
-from RUFAS.routines.manure_management.manure_separators.manure_separator_classes import BaseSeparator, \
+from RUFAS.routines.manure_management.manure_separators.manure_separator_classes import BaseManureSeparator, \
     ManureSeparatorFactory
 from RUFAS.routines.manure_management.manure_separators.manure_separator_output import ManureSeparatorOutput
 from RUFAS.routines.manure_management.misc.daily_variables import DailyVariables
 from RUFAS.routines.manure_management.misc.simple_animal_management import SimpleAnimalManagement
 from RUFAS.routines.manure_management.misc.simple_pen import SimplePen
 from RUFAS.routines.manure_management.misc.units import Units
-from RUFAS.routines.manure_management.output.manure_management_output import ManureManagementOutput
 from RUFAS.routines.manure_management.reception_pits.reception_pit_classes import BaseReceptionPit, ReceptionPitFactory
 from RUFAS.routines.manure_management.reception_pits.reception_pit_output import ReceptionPitOutput
-from RUFAS.routines.manure_management.treatments.treatment_classes import BaseTreatment, TreatmentFactory
-from RUFAS.routines.manure_management.treatments.treatment_output import TreatmentOutput
+from RUFAS.routines.manure_management.manure_treatments.treatment_classes import BaseManureTreatment, TreatmentFactory
+from RUFAS.routines.manure_management.manure_treatments.treatment_output import TreatmentOutput
+from RUFAS.weather import Weather
 
 DailyOutputType = Tuple[SimplePen,
                         ManureHandlerOutput,
                         ReceptionPitOutput,
                         ManureSeparatorOutput,
                         TreatmentOutput]
-
-
-class ManureStorage:
-    """Acts as a wrapper class for the ManureManagement class.
-
-    Notes:
-        After the references to `ManureStorage` in `simulation_engine.py`
-        and `classes.py` and `manure_application.py` are changed to `ManureManagement`,
-        this class should be removed.
-
-    """
-
-    def __init__(self, animal_management: AnimalManagement):
-        self.manure_management = ManureManagement(animal_management)
-
-    def __getattr__(self, item):
-        return getattr(self.manure_management, item)
-
-    def annual_reset(self):
-        self.manure_management.annual_reset()
-
-    def annual_mass_balance(self):
-        self.manure_management.annual_mass_balance()
 
 
 class ManureManagement:
@@ -70,26 +49,21 @@ class ManureManagement:
         `classes.py` and `simulation_engine.py` and
         `manure_application.py`.
 
-    Attributes:
-        manure_management_output: the final data returned by ManureManagement module.
-            It is meant to be used by downstream modules (e.g., `field`).
-
     """
 
-    def __init__(self, animal_management: AnimalManagement):
+    def __init__(self, animal_management: AnimalManagement, weather: Weather):
         self.manure_handlers: Dict[int, BaseManureHandler] = {}
         self.reception_pits: Dict[int, BaseReceptionPit] = {}
-        self.manure_separators: Dict[int, BaseSeparator] = {}
-        self.treatments: Dict[int, List[BaseTreatment]] = {}
+        self.manure_separators: Dict[int, BaseManureSeparator] = {}
+        self.treatments: Dict[int, List[BaseManureTreatment]] = {}
 
+        self.weather = weather
         self.all_data: Dict[int, List[DailyOutputType]] = {}
         self.df = None
 
         self.daily_vars = DailyVariables()
         self.annual_vars = DailyVariables()
         self.total_vars = DailyVariables()
-
-        self.manure_management_output = ManureManagementOutput()
 
         self.build(SimpleAnimalManagement(animal_management))
 
@@ -136,19 +110,20 @@ class ManureManagement:
 
         for pen in animal_management.all_pens:
             self.manure_handlers[pen.id] = ManureHandlerFactory.get_instance(
-                pen=pen)
+                    pen=pen)
 
             self.reception_pits[pen.id] = \
                 ReceptionPitFactory.get_instance(
-                    manure_handler=self.manure_handlers[pen.id])
+                        manure_handler=self.manure_handlers[pen.id])
 
             self.manure_separators[pen.id] = \
                 ManureSeparatorFactory.get_instance(
-                    pen=pen, reception_pit=self.reception_pits[pen.id])
+                        pen=pen, reception_pit=self.reception_pits[pen.id])
 
             self.treatments[pen.id] = TreatmentFactory.get_instance(
-                pen=pen,
-                manure_separator=self.manure_separators[pen.id]
+                    pen=pen,
+                    manure_separator=self.manure_separators[pen.id],
+                    weather=self.weather
             )
 
             self.all_data[pen.id]: List[DailyOutputType] = []
@@ -229,7 +204,7 @@ class ManureManagement:
 
             num_animals.append(pen.num_animals)
             animal_types.append(
-                str(pen.classes_in_pen).strip("{}").replace("'", ""))
+                    str(pen.classes_in_pen).strip("{}").replace("'", ""))
             housing_types.append(pen.housing_type)
             bedding_types.append(pen.bedding_type)
             handler_types.append(pen.manure_handler)
@@ -242,7 +217,7 @@ class ManureManagement:
             self.append_daily_data(reception_pit_output,
                                    'rp', reception_pit_cols)
             self.append_daily_data(
-                manure_separator_output, 'sep', manure_separator_cols)
+                    manure_separator_output, 'sep', manure_separator_cols)
             self.append_daily_data(treatment_output, 'tx', treatment_cols)
 
         d = {
@@ -303,16 +278,7 @@ class ManureManagement:
 
     # TODO: Check logic
     def export_total_variables(self):
-        tot = self.total_vars
-        self.manure_management_output = ManureManagementOutput(
-            tot_manure=tot.raw_manure,
-            tot_N=tot.N,
-            tot_P=tot.P,
-            tot_K=tot.K,
-            tot_DM=tot.TS_DM_effluent,
-            WIP=tot.WIP,
-            WOP=tot.WOP
-        )
+        pass
 
     def reset_daily_variables(self):
         pass
