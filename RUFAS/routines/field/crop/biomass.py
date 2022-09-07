@@ -84,6 +84,7 @@ def calc_act_biomass(crop_type, weather, time):
 
     # C.9.A.3
     crop_type.d_biomass_actual = crop_type.d_biomass_max * crop_type.gamma_reg
+    print(crop_type.prev_biomass_actual)
 
     # Save value as previous day's value
     crop_type.prev_biomass_actual = crop_type.biomass_actual
