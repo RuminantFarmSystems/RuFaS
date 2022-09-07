@@ -13,6 +13,7 @@ from math import acos, asin, sin, tan, pi
 from . import heat_units, leaf_area_index, root_development, biomass, yields, \
     phosphorus_uptake, nitrogen_uptake, growth_constraints
 import importlib
+from string import digits
 
 def daily_crop_routine(soil, crop, field_management, weather, time, croptime):
     """
@@ -40,7 +41,7 @@ def daily_crop_routine(soil, crop, field_management, weather, time, croptime):
         daily_crops_killed=[]    
         daily_crops_planted =[]
     if not daily_crops_growing:
-        for crop_type_name in crop.croplist:
+        for crop_type_name in crop.croplist.keys():
             crop.current_crop[crop_type_name]=crop.setcrop('BaseCrop')
     for i in range(len(daily_crops_planted)):
         crop_type_name = daily_crops_planted[i]
@@ -173,6 +174,7 @@ class Crop(object):
         spec = importlib.util.spec_from_file_location("crop_classes", "RUFAS/routines/field/crop/crop_types/crop_classes.py")
         self.crop_classes = importlib.util.module_from_spec(spec)
         spec.loader.exec_module(self.crop_classes)
+
         self.current_crop = {}
         #self.current_crop['BaseCrop']= getattr(self.crop_classes, 'BaseCrop')()
         self.crops_data = data['crops']
@@ -181,7 +183,8 @@ class Crop(object):
         if (cropname== 'BaseCrop'): 
             return getattr(self.crop_classes, 'BaseCrop')()
         else: 
-            return getattr(self.crop_classes, cropname)(cropname, self.crops_data)
+            remove_digits = str.maketrans('', '', digits)
+            return getattr(self.crop_classes, cropname.translate(remove_digits))(cropname, self.crops_data)
 
     def annual_reset(self):
         for crop_types in self.current_crop.values():
@@ -390,8 +393,10 @@ class cropTime:
         
         
         years = time.years
-        crop_list= data['crops']
+        crop_list= list(data['crops'].keys()).translate(remove_digits) 
+        remove_digits = str.maketrans('', '', digits)
         self.crop_list=crop_list
+        print(crop_list)
         start_year= time.start_year
         daily_year=[]
         for k in range(start_year,start_year+len(years)):
@@ -404,7 +409,7 @@ class cropTime:
         crop_time['crops_killed'] = [[] for _ in range(len(crop_time['year']))]
     
         for k in range(len(crop_time['year'])):
-            for crop in crop_list.keys():
+            for crop in crop_list:
                 for i in range(0,len(crop_list[crop]['plant_years'])):
                     if (crop_list[crop]['plant_years'][i] == crop_time['year'][k] and crop_list[crop]['harvest_day'] == crop_time['day'][k]):
                             crop_time['crops_killed'][k].append(crop)
