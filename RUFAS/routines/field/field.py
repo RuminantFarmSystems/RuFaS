@@ -292,9 +292,8 @@ class Field:
         """an instance of the ``Soil`` class"""
         self.field_management = FieldManagement(field_management_data, time)
         """an instance of the ``FieldManagement`` class"""
-        self.crop = Crop(crop_data)
-        """an instance of the ``Crop`` class"""
-
         self.croptime= cropTime(time,crop_data)
-
         """an instance of the ``CropTime`` class"""
+
+        self.crop = Crop(crop_data,self.croptime)
+        """an instance of the ``Crop`` class"""

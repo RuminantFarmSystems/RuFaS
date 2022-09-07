@@ -31,6 +31,7 @@ def daily_crop_routine(soil, crop, field_management, weather, time, croptime):
     try: 
         daily_crops_planted=croptime.crops['crops_planted'][time.index]
         daily_crops_growing=croptime.crops['crops_growing'][time.index]
+
         daily_crops_killed=croptime.crops['crops_killed'][time.index]
     
     except IndexError as e:
@@ -38,18 +39,19 @@ def daily_crop_routine(soil, crop, field_management, weather, time, croptime):
         daily_crops_growing=[]    
         daily_crops_killed=[]    
         daily_crops_planted =[]
-    
+    if not daily_crops_growing:
+        for crop_type_name in crop.croplist:
+            crop.current_crop[crop_type_name]=crop.setcrop('BaseCrop')
     for i in range(len(daily_crops_planted)):
         crop_type_name = daily_crops_planted[i]
         crop.current_crop[crop_type_name]=crop.setcrop(crop_type_name)
         crop_type= crop.current_crop[crop_type_name]
         plant_crops(crop_type,field_management,time,soil,weather,crop)
     
-    for i in range(len(daily_crops_growing)):
-        crop_type_name = daily_crops_growing[i]
+    for k in range(len(daily_crops_growing)):
+        crop_type_name = daily_crops_growing[k]
         crop_type= crop.current_crop[crop_type_name]
         #plant_crops(crop_type,field_management,time,soil,weather,crop)
-        
         daily_reset(crop_type, soil)
         # yield is reset to 0 at the beginning of the next day so it can be
         # accessed by the output handler.
@@ -80,10 +82,9 @@ def daily_crop_routine(soil, crop, field_management, weather, time, croptime):
         annual_variable_update(crop_type)
         crop.current_crop[crop_type_name] = crop_type
     
-    for i in range(len(daily_crops_killed)):
-        crop_type_name = daily_crops_killed[i]
-        del crop.current_crop[crop_type_name]
-
+    # for i in range(len(daily_crops_killed)):
+    #     crop_type_name = daily_crops_killed[i]
+    #     del crop.current_crop[crop_type_name]
 def daily_reset(crop_type, soil):
     """
     Description:
@@ -144,7 +145,7 @@ def annual_crop_routine(crop, time):
 
 
 class Crop(object):
-    def __init__(self, data):
+    def __init__(self, data,croptime):
         """
         Description:
             An instance of the Crop class represents the crop module and contains
@@ -173,11 +174,14 @@ class Crop(object):
         self.crop_classes = importlib.util.module_from_spec(spec)
         spec.loader.exec_module(self.crop_classes)
         self.current_crop = {}
-        self.current_crop['BaseCrop']= getattr(self.crop_classes, 'BaseCrop')()
+        #self.current_crop['BaseCrop']= getattr(self.crop_classes, 'BaseCrop')()
         self.crops_data = data['crops']
-    
+        self.croplist = croptime.crop_list
     def setcrop(self, cropname):
-        return getattr(self.crop_classes, cropname)(cropname, self.crops_data)
+        if (cropname== 'BaseCrop'): 
+            return getattr(self.crop_classes, 'BaseCrop')()
+        else: 
+            return getattr(self.crop_classes, cropname)(cropname, self.crops_data)
 
     def annual_reset(self):
         for crop_types in self.current_crop.values():
@@ -288,24 +292,24 @@ def in_dormancy(crop, time):
         return False
 
 def kill_non_scheduled_crops(crop_type,soil,croptime,time): 
-    daily_crops_killed=croptime.crops['crops_killed'][time.index]
     if crop_type.crop_type == 'perennial':
         fr_PHU_harvest_min = crop_type.fr_PHU_harvest_min
         # C.11.C.2
         # print(fr_PHU_harvest_min)
         if crop_type.fr_PHU > fr_PHU_harvest_min:
-            daily_crops_killed.append(crop_type.crop_name)
-        crop_type.LAI_actual = max(0, min(crop_type.LAI_min, crop_type.LAI_actual))
+            croptime.crops['crops_killed'][time.index].append(crop_type.crop_name)
+        
+            crop_type.LAI_actual = max(0, min(crop_type.LAI_min, crop_type.LAI_actual))
 
-        # C .11.C.3
-        soil.residue += crop_type.biomass_actual * 0.1
-        crop_type.biomass_actual -= crop_type.biomass_actual * 0.1
-        crop_type.bio_N -= crop_type.bio_N * 0.1
-        crop_type.bio_P -= crop_type.bio_P * 0.1
+            # C .11.C.3
+            soil.residue += crop_type.biomass_actual * 0.1
+            crop_type.biomass_actual -= crop_type.biomass_actual * 0.1
+            crop_type.bio_N -= crop_type.bio_N * 0.1
+            crop_type.bio_P -= crop_type.bio_P * 0.1
 
-        crop_type.fr_LAI_max = 0
-        crop_type.accumulated_HU = 0
-        crop_type.fr_PHU = 0
+            crop_type.fr_LAI_max = 0
+            crop_type.accumulated_HU = 0
+            crop_type.fr_PHU = 0
 
 def plant_crops(crop_type,field_management,time,soil,weather,crop): 
     yearly_T_avg = weather.T_avg[time.year - 1]
@@ -387,6 +391,7 @@ class cropTime:
         
         years = time.years
         crop_list= data['crops']
+        self.crop_list=crop_list
         start_year= time.start_year
         daily_year=[]
         for k in range(start_year,start_year+len(years)):

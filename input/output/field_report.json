@@ -32,7 +32,12 @@
         "crop_report": {
             "produce_csv": true,
             "produce_graphics": true,
-            "report_name": "crop_report"
+            "report_name": "crop_report",
+            "crop_type_reports": {
+                "produce_csv": true,
+                "produce_graphics": true,
+                "report_name": "crop_type_report"
+            }
         },
         "soil_report": {
             "produce_csv": true,

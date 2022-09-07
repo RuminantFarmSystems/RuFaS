@@ -163,7 +163,7 @@ def calc_log_term_of_shape_coefficient(crop_type, fr_PHU_frac, fr_nx):
 
     #this is a bug patch for a fr_PHU_frac error
     inside = (fr_PHU_frac / bottom) - fr_PHU_frac
-    if inside < 0:
+    if inside <= 0:
         inside = 0.00001
     return log(inside)
 
