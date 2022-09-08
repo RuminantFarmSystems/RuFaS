@@ -1,0 +1,16 @@
+{
+    "latitude": 43.304346,
+
+    "crops": {
+        "tall_fescue": {
+            "plant_years": [2010,2011],
+            "repeat": 0,
+            "planting_day": 121,
+            "harvest_day": 319,
+            "harvest_type": "optimal",
+            "planting_order": "1st",
+            "extracted": true
+        }
+    } 
+}
+
