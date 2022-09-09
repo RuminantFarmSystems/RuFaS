@@ -85,6 +85,7 @@ class SimulationEngine:
             print(f"simulating day: {self.time.to_str()}")
         self.time.advance()
         self.state.animal_management.simulation_day += 1
+        self.state.manure_management.simulation_day += 1
 
     def _run_pre_annual_routines(self) -> None:
         """TODO GitHub issue #137"""

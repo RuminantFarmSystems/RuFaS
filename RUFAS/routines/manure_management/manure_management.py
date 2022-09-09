@@ -33,6 +33,7 @@ from RUFAS.routines.manure_management.reception_pits.reception_pit_output import
 from RUFAS.routines.manure_management.manure_treatments.treatment_classes import BaseManureTreatment, TreatmentFactory
 from RUFAS.routines.manure_management.manure_treatments.treatment_output import TreatmentOutput
 from RUFAS.weather import Weather
+from RUFAS.classes import Time
 
 DailyOutputType = Tuple[SimplePen,
                         ManureHandlerOutput,
@@ -51,13 +52,15 @@ class ManureManagement:
 
     """
 
-    def __init__(self, animal_management: AnimalManagement, weather: Weather):
+    def __init__(self, animal_management: AnimalManagement, weather: Weather,time: Time):
         self.manure_handlers: Dict[int, BaseManureHandler] = {}
         self.reception_pits: Dict[int, BaseReceptionPit] = {}
         self.manure_separators: Dict[int, BaseManureSeparator] = {}
         self.treatments: Dict[int, List[BaseManureTreatment]] = {}
 
         self.weather = weather
+        self.time=time
+        self.simulation_day=0 ## Index for tracking elapsed time
         self.all_data: Dict[int, List[DailyOutputType]] = {}
         self.df = None
 
@@ -123,7 +126,8 @@ class ManureManagement:
             self.treatments[pen.id] = TreatmentFactory.get_instance(
                     pen=pen,
                     manure_separator=self.manure_separators[pen.id],
-                    weather=self.weather
+                    weather=self.weather,
+                    time=self.time,
             )
 
             self.all_data[pen.id]: List[DailyOutputType] = []
@@ -141,9 +145,9 @@ class ManureManagement:
             manure_handler_daily_output = self.manure_handlers[pen.id].update(pen)
             reception_pit_daily_output = self.reception_pits[pen.id].update()
             manure_separator_daily_output = self.manure_separators[pen.id].update()
-            treatment_daily_output = self.treatments[pen.id][0].update()
+            treatment_daily_output = self.treatments[pen.id][0].update(self.simulation_day)
             for i in range(1, len(self.treatments[pen.id])):
-                treatment_daily_output = self.treatments[pen.id][i].update(treatment_daily_output)
+                treatment_daily_output = self.treatments[pen.id][i].update(self.simulation_day,treatment_daily_output)
 
             pen_daily_update_data = (
                 pen,
