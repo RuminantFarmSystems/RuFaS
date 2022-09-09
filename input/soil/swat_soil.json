@@ -1,0 +1,98 @@
+{
+    "CN2": 85.00,
+    "field_slope": 0.02,
+    "slope_length": 3,
+    "manning": 0.4,
+    "field_size": 1.0,
+    "practice_factor": 0.08,
+    "sand": 15,
+    "silt": 65,
+    "soil_albedo": 0.16,
+    "initial_residue": 0,
+    "fresh_N_mineral_rate": 0.05,
+    "soil_cover_type": "BARE",
+    "soil_layers":
+    {
+        "layer_1":
+        {
+            "bottom_depth": 150,
+            "wilting_point": 0.1,
+            "field_capacity": 0.30,
+            "saturation": 0.5,
+            "K_sat": 20,
+            "clay": 20,
+            "initial_temperature": 14.50797297,
+            "bulk_density": 1.4,
+            "org_C_percent": 0.012,
+            "NH4": 1,
+            "active_N_percent":0,
+            "labile_P": 15,
+            "active_mineral_rate": 0.0003,
+            "volatile_exchange_factor": 0.15,
+            "denitrification_rate": 0.05,
+            "soil_water_percent": 0.3,
+            "OM_percent":0
+        },
+        "layer_2":
+        {
+            "bottom_depth": 300,
+            "wilting_point": 0.1,
+            "field_capacity": 0.30,
+            "saturation": 0.5,
+            "K_sat": 20,
+            "clay": 20,
+            "initial_temperature": 14.50797297,
+            "bulk_density": 1.4,
+            "org_C_percent": 0.012,
+            "NH4": 1,
+            "labile_P": 15,
+            "active_mineral_rate": 0.0003,
+            "volatile_exchange_factor": 0.15,
+            "denitrification_rate": 0.05,
+            "soil_water_percent": 0.3,
+            "active_N_percent":0,
+            "OM_percent":0
+        },
+        "layer_3":
+        {
+            "bottom_depth": 450,
+            "wilting_point": 0.1,
+            "field_capacity": 0.30,
+            "saturation": 0.5,
+            "K_sat": 20,
+            "clay": 20,
+            "initial_temperature": 13.38632147,
+            "bulk_density": 1.4,
+            "org_C_percent": 0.012,
+            "NH4": 1,
+            "labile_P": 15,
+            "active_mineral_rate": 0.0003,
+            "volatile_exchange_factor": 0.15,
+            "denitrification_rate": 0.05,
+            "soil_water_percent": 0.3 ,
+            "active_N_percent":0,
+            "OM_percent":0
+        },
+        "layer_4":
+        {
+           "bottom_depth": 450.01,
+            "wilting_point": 0.1,
+            "field_capacity": 0.30,
+            "saturation": 0.5,
+            "K_sat": 20,
+            "clay": 20,
+            "initial_temperature": 13.38632147,
+            "bulk_density": 1.4,
+            "org_C_percent": 0.012,
+            "NH4": 1,
+            "labile_P": 15,
+            "active_mineral_rate": 0.0003,
+            "volatile_exchange_factor": 0.15,
+            "denitrification_rate": 0.05,
+            "soil_water_percent": 0.3 ,
+            "active_N_percent":0,
+            "OM_percent":0
+        }
+    }
+}
+

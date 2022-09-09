@@ -1,0 +1,28 @@
+{
+    "config":
+    {
+        "start_date" : "2010:1",
+        "end_date" : "2013:365",
+        "csv_dir": "output/CSVs/",
+        "graphic_dir": "output/graphics/",
+        "set_seed": false,
+        "seed": 0
+    },
+
+    "weather": "swat_weather.csv",
+
+    "output": "field_report.json",
+
+    "farm":
+    {
+        "fields": {
+            "field_1": {
+                "soil": "swat_soil.json",
+                "crop": "swat_rotation.json",
+                "field_management": "swat_field_management.json"
+            }
+        },
+        "animal": "barnyard_animal.json",
+        "feed": "panke_buisse_feed.json"
+    }
+}
