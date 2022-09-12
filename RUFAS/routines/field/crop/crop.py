@@ -32,7 +32,6 @@ def daily_crop_routine(soil, crop, field_management, weather, time, croptime):
     try: 
         daily_crops_planted=croptime.crops['crops_planted'][time.index]
         daily_crops_growing=croptime.crops['crops_growing'][time.index]
-
         daily_crops_killed=croptime.crops['crops_killed'][time.index]
     
     except IndexError as e:
@@ -40,6 +39,7 @@ def daily_crop_routine(soil, crop, field_management, weather, time, croptime):
         daily_crops_growing=[]    
         daily_crops_killed=[]    
         daily_crops_planted =[]
+    
     if not daily_crops_growing:
         for crop_type_name in crop.croplist.keys():
             crop.current_crop[crop_type_name]=crop.setcrop('BaseCrop')
@@ -73,7 +73,8 @@ def daily_crop_routine(soil, crop, field_management, weather, time, croptime):
 
         biomass.update_all(soil, crop_type, weather, time)
         
-        kill_non_scheduled_crops(crop_type,soil,croptime,time)
+        if in_dormancy(crop, time):
+            kill_non_scheduled_crops(crop_type,soil,croptime,time)
             # "pseudocode_crop" C.10.A.1/2
         if crop_type.crop_name in daily_crops_killed:
             yields.update_all(soil, crop_type, field_management, time)
@@ -85,7 +86,9 @@ def daily_crop_routine(soil, crop, field_management, weather, time, croptime):
     
     # for i in range(len(daily_crops_killed)):
     #     crop_type_name = daily_crops_killed[i]
-    #     del crop.current_crop[crop_type_name]
+    #     if (crop.current_crop[crop_type_name].crop_type == 'perennial'):
+    
+
 def daily_reset(crop_type, soil):
     """
     Description:
@@ -146,7 +149,7 @@ def annual_crop_routine(crop, time):
 
 
 class Crop(object):
-    def __init__(self, data,croptime):
+    def __init__(self, data):
         """
         Description:
             An instance of the Crop class represents the crop module and contains
@@ -178,7 +181,7 @@ class Crop(object):
         self.current_crop = {}
         #self.current_crop['BaseCrop']= getattr(self.crop_classes, 'BaseCrop')()
         self.crops_data = data['crops']
-        self.croplist = croptime.crop_list
+        self.croplist = data['crops']
     def setcrop(self, cropname):
         if (cropname== 'BaseCrop'): 
             return getattr(self.crop_classes, 'BaseCrop')()
@@ -290,18 +293,20 @@ def in_dormancy(crop, time):
 
     # The current day length is less than the day length threshold for dormancy
     if T_dl < T_dl_thr:
+        print('dormancy')
         return True
     else:
+        print('booo')
         return False
 
-def kill_non_scheduled_crops(crop_type,soil,croptime,time): 
+def kill_non_scheduled_crops(crop_type,soil,field_management,time): 
     if crop_type.crop_type == 'perennial':
         fr_PHU_harvest_min = crop_type.fr_PHU_harvest_min
         # C.11.C.2
         # print(fr_PHU_harvest_min)
         if crop_type.fr_PHU > fr_PHU_harvest_min:
-            croptime.crops['crops_killed'][time.index].append(crop_type.crop_name)
-        
+            yields.update_all(soil, crop_type, field_management, time)
+            print('killed it:', crop_type.crop_name, 'with:',crop_type.yield_actual)
             crop_type.LAI_actual = max(0, min(crop_type.LAI_min, crop_type.LAI_actual))
 
             # C .11.C.3
@@ -381,7 +386,7 @@ def check_conditions_plant(soil, weather, time):
 
 class cropTime:
     
-    def __init__(self,time, data):
+    def __init__(self,time, data,cropclass):
         """
         Description:
             This object is responsible for creating and tracking time in the simulation.
@@ -393,15 +398,14 @@ class cropTime:
         
         
         years = time.years
-        crop_list= list(data['crops'].keys()).translate(remove_digits) 
-        remove_digits = str.maketrans('', '', digits)
+        crop_list= data['crops']
         self.crop_list=crop_list
-        print(crop_list)
         start_year= time.start_year
         daily_year=[]
         for k in range(start_year,start_year+len(years)):
             x=[k for _ in range(len(years[k-start_year]))]
             daily_year.append(x)        
+        
         crop_time={
             "year" : sum(daily_year,[]),
             "day" : sum(years,[])}
@@ -409,17 +413,46 @@ class cropTime:
         crop_time['crops_killed'] = [[] for _ in range(len(crop_time['year']))]
     
         for k in range(len(crop_time['year'])):
-            for crop in crop_list:
-                for i in range(0,len(crop_list[crop]['plant_years'])):
-                    if (crop_list[crop]['plant_years'][i] == crop_time['year'][k] and crop_list[crop]['harvest_day'] == crop_time['day'][k]):
-                            crop_time['crops_killed'][k].append(crop)
-        
+            for crop in crop_list.keys():
+                crop_class= cropclass.setcrop(crop)
+                if (crop_class.crop_type =='Perennial'): 
+                    if crop_time['year'][k] ==  end_year:
+                            if crop_time['day'][k] == harvest_day:
+                                crop_time['crops_killed'][k].append(crop)
+                else: 
+                    for i in range(0,len(crop_list[crop]['plant_years'])):
+                        if (crop_list[crop]['plant_years'][i] == crop_time['year'][k] and crop_list[crop]['harvest_day'] == crop_time['day'][k]):
+                                crop_time['crops_killed'][k].append(crop)
+    
         crop_time['crops_growing'] = [[] for _ in range(len(crop_time['year']))]
         for k in range(len(crop_time['year'])):
             for crop in crop_list.keys():
-                for i in range(0,len(crop_list[crop]['plant_years'])):
-                    if (crop_list[crop]['plant_years'][i] == crop_time['year'][k] and crop_list[crop]['planting_day'] <= crop_time['day'][k] and crop_list[crop]['harvest_day'] >= crop_time['day'][k]):
-                        crop_time['crops_growing'][k].append(crop)
+                crop_class= cropclass.setcrop(crop)
+                if (crop_class.crop_type =='Perennial'): 
+                    grow_years=crop_list[crop]['plant_years']
+                    grow_years_length=len(crop_list[crop]['plant_years'])
+                    if grow_years_length>1:
+                        start_year=grow_years[0]
+                        end_year=grow_years[grow_years_length-1]
+                        subtract=[start_year,end_year]
+                        growing_years=[y - x for (y, x) in zip(grow_years, subtract)]
+                        planting= crop_list[crop]['planting_day']
+                        harvest_day= crop_list[crop]['harvest_day']
+                        
+                        if crop_time['year'][k] ==  end_year:
+                            if crop_time['day'][k] < harvest_day:
+                                crop_time['crops_growing'][k].append(crop)
+                        
+                        if crop_time['year'][k] ==  start_year:
+                            if crop_time['day'][k] > planting:
+                                crop_time['crops_growing'][k].append(crop)
+                        
+                        if crop_time['year'][k] in growing_years:
+                                crop_time['crops_growing'][k].append(crop)
+                else:
+                    for i in range(0,len(crop_list[crop]['plant_years'])):
+                        if (crop_list[crop]['plant_years'][i] == crop_time['year'][k] and crop_list[crop]['planting_day'] <= crop_time['day'][k] and crop_list[crop]['harvest_day'] >= crop_time['day'][k]):
+                            crop_time['crops_growing'][k].append(crop)
 
         crop_time['crops_planted'] = [[] for _ in range(len(crop_time['year']))]
         
