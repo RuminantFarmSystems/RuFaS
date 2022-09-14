@@ -26,10 +26,11 @@ def mock_soil(soil_albedo = 0.16,profile_bulk_density = 3.5, profile_depth = 200
 
     return msoil
 
-def mock_soil_layer(soil_water = 10):
+def mock_soil_layer(soil_water = 10,temperature = 22.4):
     mlayer = MagicMock(Soil.SoilLayer)
 
     mlayer.soil_water = soil_water
+    mlayer.temperature = temperature
 
     return mlayer
 
@@ -50,12 +51,46 @@ def mock_base_crop(bio_AG = 5.0):
     return mbase_crop
 
 
-def mock_time(day = 250):
+def mock_time(year = 1, day = 1):
+    """
+    Description:
+         Creates a Time class mocking object for use as input for functions. It is initialized with the
+        arguments provided; arguments are dynamic and can be changed/added to as needed.
+
+    Args:
+        year: Time attribute, current year 
+        day: Time attribute, current day
+
+    Returns:
+        Time class mocking object
+    
+    """
     mtime = MagicMock(Time)
 
+    mtime.year = year
     mtime.day = day
 
     return mtime
+
+def mock_weather(radiation = [[3.5]],T_avg = [[20]]):
+    """
+    Description:
+        Creates a Weather class mocking object for use as input for functions. It is initialized with the
+        arguments provided; arguments are dynamic and can be changed/added to as needed.
+
+    Args:
+
+    Returns:
+        Weather class mocking object
+    
+    """
+    mweather = MagicMock(Weather)
+    
+    mweather.radiation = radiation
+    mweather.T_avg = T_avg
+
+    return mweather
+
 
 
 #the following tests are for the calc_bcv() function
@@ -63,7 +98,7 @@ def mock_time(day = 250):
 #test 1 uses time.day = 250, which would not activate the snow flag
 def test_calc_bcv_correctly_calculates_weighing_factor():
     crop = mock_crop()
-    time = mock_time()
+    time = mock_time(day = 250)
 
     bcv = 5.0 / (5.0 + exp(7.563 - .0001297 * (-5.0)))
     bcv_snow = (0/ (0+ exp(6.055 - 0.3002 * 0)))
@@ -84,7 +119,7 @@ def test_calc_bcv_correctly_calculates_weighing_factor_snow():
 
 def test_calc_bcv_correctly_calculates_all_weighing_factor_scenarios():
     crop = mock_crop()
-    time1 = mock_time()
+    time1 = mock_time(day = 250)
     time2 = mock_time(day = 360)
 
     bcv = 5.0 / (5.0 + exp(7.563 - .0001297 * (-5.0)))
@@ -154,6 +189,43 @@ def test_calc_dd_correctly_calculates_damping_depth():
         ((1 - scale) / (1 + scale)) ** 2)
         
 
+#calc_radiate() tests...assumes dependencies work properly
+def test_calc_radiate_correctly_calculates_radiation_term():
+    soil = mock_soil()
+    crop = mock_crop()
+    weather = mock_weather()
+    time = mock_time()
+
+    albedo = calc_albedo(soil,crop)
+
+    assert pytest.approx(calc_radiate(soil,crop,weather,time)) == (3.5 * (1-albedo)-14) / 20
+
+#calc_T_bare()...assumes dependencies work properly
+def test_calc_T_bare_correctly_calculates_theoretical_bare_soil_temp():
+    soil = mock_soil()
+    crop = mock_crop()
+    weather = mock_weather()
+    time = mock_time()
+
+    radiate = calc_radiate(soil,crop,weather,time)
+
+    assert pytest.approx(calc_T_bare(soil,crop,weather,time)) == 20 + radiate * 20
+
+#calc_T_surf...assumes dependencies work correctly
+def test_calc_T_surf_correctly_calculates_surface_temperature():
+    soil = mock_soil()
+    crop = mock_crop()
+    weather = mock_weather()
+    time = mock_time()
+
+    T_bare = calc_T_bare(soil,crop,weather,time)
+    bcv = calc_bcv(crop,time)
+
+    calc_T_surf(soil,crop,weather,time)
+
+    assert pytest.approx(soil.T_surf) == (bcv * 22.4) + ((1-bcv) * T_bare)
+
+#calc_T_soil 
 
 
 
