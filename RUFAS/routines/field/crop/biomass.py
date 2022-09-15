@@ -58,7 +58,10 @@ def update_all(soil, crop_type, weather, time):
     """
 
     # update biomass values
-    calc_act_biomass(crop_type, weather, time)
+
+    # calc_act_biomass(crop_type, weather, time) # replace with update_biomass
+    incoming_light_energy = weather.radiation[time.year - 1][time.day - 1]
+    update_biomass(crop_type, light=incoming_light_energy)
 
     calc_bio_AG(crop_type)
 
@@ -72,12 +75,12 @@ def calc_act_biomass(crop_type, weather, time):
        "pseudocode_crop" C.9.A.2/3
 
     Args:
-        crop_type
-        weather
-        time
+        crop_type: instance of Crop type subclass
+        weather: instance of Weather class
+        time: instance of Time class
     """
 
-    H_phosyn = calc_intercepted_radiation(crop_type, weather, time)
+    H_phosyn = intercept_radiation(crop_type, weather, time)
 
     # C.9.A.2
     crop_type.d_biomass_max = crop_type.RUE * H_phosyn
@@ -91,25 +94,86 @@ def calc_act_biomass(crop_type, weather, time):
     # Update current actual biomass
     crop_type.biomass_actual += crop_type.d_biomass_actual
 
+def update_biomass(crop, light: float) -> None:
+    """
+    Description: update the biomass attributes of a crop after growth
 
-def calc_intercepted_radiation(crop_type, weather, time):
+    Args:
+        crop: a BaseCrop class object
+        light: the total light radiation available to the plant
+
+    Returns: nothing. Instead, the following `crop` attributes are updated:
+    `d_biomass_max`, `prev_biomass_actual`, `biomass_actual`, and `d_biomass_actual`
+    """
+
+    crop.d_biomass_max = limit_growth(radiation=light, efficiency=crop.RUE)
+    growth = grow_biomass(start=crop.biomass_actual, growth_factor=crop.gamma_reg, max_growth=crop.d_biomass_max)
+    crop.prev_biomass_actual = growth["start"]
+    crop.biomass_actual = growth["end"]
+    crop.d_biomass_actual = growth["accumulated biomass"]
+
+def limit_growth(radiation: float, efficiency: float) -> float:
+    """
+    Description: calculates the upper-limit to biomass accumulation during a day.
+
+    Args:
+        efficiency: crop-specific radiation use efficiency (dg/MJ)
+        radiation: total solar radiation available for the day (MJ m^-2)
+
+    Returns: the maximum biomass that can be accumulated in a day
+    """
+    if radiation < 0 or efficiency < 0:
+        raise Exception("radiation and efficiency must be positive.")
+    return radiation * efficiency
+
+def grow_biomass(start: float, growth_factor: float, max_growth: float) -> dict:
     """
     Description:
-        Calculates amount of intercepted photosynthetically active radiation
-        on a given day (MJ m^-2).
+        Calculates the biomass accumulated during the day
+
+    Args:
+        start: the biomass of the plant at the start of the day
+        growth_factor: the growth factor for the plant, which is a value from 0 to 1.
+        max_growth: the maximum amount of biomass the plant can accumulate in a day
+
+    Returns:
+        a dictionary containing the starting biomass of the plant ("start"), the biomass of the plant at the end of the
+        day ("end"), and the total biomass accumulated ("accumulated biomass")
+    """
+
+    if growth_factor < 0 or growth_factor > 1:
+        raise Exception("growth_factor must be between 0 and 1")
+    if start < 0:
+        raise Exception("start must be positive")
+
+    actual_growth = max_growth * growth_factor
+    end = start + actual_growth
+    return {"start": start, "end": end, "accumulated biomass": actual_growth}
+
+def intercept_radiation(daily_radiation: float, light_extinction: float, lai_actual: float) -> float:
+    """
+    Description:
+        Calculates amount of solar radiation intercepted for photosynthesis for a day.
         "pseudocode_crop" C.9.A.1
 
     Args:
-        crop_type
-        weather
-        time
+        daily_radiation: total solar radiation available for the day (MJ m^-2)
+        light_extinction: the light extinction coefficient
+        lai_actual: actual leaf area index of the crop
 
     Returns:
-        int: intercepted radiation
+        int: intercepted radiation (MJ m^-2)
     """
 
-    H_day = weather.radiation[time.year - 1][time.day - 1]
-    return 0.5 * H_day * (1 - exp(-1 * crop_type.kl * crop_type.LAI_actual))
+    # daily_radiation = weather.radiation[time.year - 1][time.day - 1]
+    # light_extinction = crop_type.kl
+    # lai = crop_type.LAI_actual
+
+    if daily_radiation < 0 or lai_actual < 0:
+        raise Exception("daily_radiation and lai_actual must be positive")
+
+    intercepted_radiation = 0.5 * daily_radiation * (1 - exp(-1 * light_extinction * lai_actual))
+    return intercepted_radiation
 
 
 def calc_bio_AG(crop_type):
@@ -119,7 +183,7 @@ def calc_bio_AG(crop_type):
         "pseudocode_crop" C.9.B.1
 
     Args:
-        crop_type
+        crop_type: instance of Crop type subclass
     """
 
     crop_type.bio_AG = (1 - crop_type.fr_root) * crop_type.biomass_actual
@@ -132,8 +196,8 @@ def calc_gamma_wu(soil, crop_type):
         "pseudocode_crop" C.9.C.1
 
     Args:
-        soil
-        crop_type
+        soil: instance of Soil class
+        crop_type: instance of Crop type subclass
     """
 
     if soil.ET_max_annual == 0:
