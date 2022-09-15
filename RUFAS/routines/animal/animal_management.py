@@ -163,18 +163,26 @@ class AnimalManagement:
 
             self.all_pens.append(pen)
 
-        herd_num = herd_data['herd_num']
+        self.init_default_pens(herd_data['herd_num'])
+
+    def init_default_pens(self, herd_num):
+        # TODO: add unit test
+        """
+            Initializes default pens if not enough exist in the simulation.
+            Args:
+                herd_num: number of animals in the herd
+            """
 
         # Minimum number of pens in the simulation
         MIN_NUM_PENS = 3
 
         num_pens_needed = MIN_NUM_PENS - len(self.all_pens)
 
-        # Check if any default pens are needed
+        # Check if any default pens need to be added
         if num_pens_needed > 0 and herd_num > 0:
+            self.init_default_pens(num_pens_needed)
             print('Warning: herd_num > 0, but num_pens =', len(self.all_pens), '. Initilizing', num_pens_needed,
                   'default pens.')
-            # Initialize default pens if not enough exist
             for i in range(num_pens_needed):
                 new_default_pen = Pen(0, 0.1, 1.6, 100, 'open air barn', 'sand', 'freestall',
                                       "manual_scraping", "sedimentation", "storage_pit",
@@ -200,6 +208,12 @@ class AnimalManagement:
             time: instance of the Time class defined in classes.py
         """
 
+        animal_keys = {"calf_num", "heiferI_num", "heiferII_num", "heiferIII_num", "cow_num"}
+        animal_nums = dict()
+
+        for key in animal_keys:
+            animal_nums[key] = herd_data[key]
+
         calf_num = herd_data['calf_num']
         heiferI_num = herd_data['heiferI_num']
         heiferII_num = herd_data['heiferII_num']
@@ -208,6 +222,11 @@ class AnimalManagement:
         replace_num = herd_data['replace_num']
         herd_num = herd_data['herd_num']
         breed = herd_data['breed']
+
+        # QUESTION: what do calf_num, heifer_num, etc do?
+        # if herd_num ==
+
+        # QUESTION: what is the point of simulate_animals?
 
         if herd_num == 0:
             self.simulate_animals = False
@@ -244,9 +263,16 @@ class AnimalManagement:
                                                           replace_num, herd_init,
                                                           breed, config)
 
+        # QUESTION: Should this be moved to init_pens?
         if len(pen_data) > 0:
             self.init_nutrient_rqmts(weather, time, feed)
             self.pen_allocation()
+
+    @staticmethod
+    def print_animal_num_warnings(animal_keys, herd_data):
+        for key in animal_keys:
+            if herd_data[key] == 0:
+                print("Warning: herd_num = 0, but", key, "!= 0.")
 
     def init_nutrient_rqmts(self, weather, time, feed):
         """

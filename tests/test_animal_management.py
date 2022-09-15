@@ -7,12 +7,10 @@ Author(s): Pooya Hekmati, sh2235@cornell.edu, Anchey Peng, ap724@cornell.edu
 
 import pytest
 from unittest.mock import MagicMock, patch
-from pytest_mock.plugin import MockerFixture
 
 from RUFAS.routines.animal.animal_management import AnimalManagement
 
-from typing import List, Dict, Union, Any, Callable
-import copy
+from typing import List, Dict, Union
 
 
 def create_mock_object_list(attribute_dicts: List[Dict]) -> List[MagicMock]:
@@ -127,29 +125,20 @@ def herd_information() -> Dict[str, Union[str, int, bool]]:
 
 
 @pytest.fixture
-def animal_management(mock_pens: MagicMock, pen_information,
-                      herd_information) -> AnimalManagement:
+def animal_management() -> AnimalManagement:
     init_pens_patch = patch('RUFAS.routines.animal.animal_management.AnimalManagement.init_pens')
     init_animals_patch = patch('RUFAS.routines.animal.animal_management.AnimalManagement.init_animals')
 
     init_pens_patch.start()
     init_animals_patch.start()
 
-    dataMock = MagicMock()
-    # data = dict()
-    # data['pen_information'] = pen_information
-    # data['herd_information'] = herd_information
-    # dataMock.pen_information = copy.deepcopy(pen_information)
-    # dataMock.herd_information = herd_information
-    # dataMock.__getitem__.side_effect = lambda x: getattr(dataMock, x)
-
+    data = MagicMock()
     config = MagicMock()
     feed = MagicMock()
     weather = MagicMock()
     time = MagicMock()
 
-    animal_management = AnimalManagement(dataMock, config, feed, weather, time)
-    # animal_management.all_pens = mock_pens
+    animal_management = AnimalManagement(data, config, feed, weather, time)
 
     init_pens_patch.stop()
     init_animals_patch.stop()
@@ -157,9 +146,11 @@ def animal_management(mock_pens: MagicMock, pen_information,
     return animal_management
 
 
-# @pytest.fixture
-# def animal_management(mocker: MockerFixture, mock_pens: MagicMock, pen_information,
-#                       herd_information) -> AnimalManagement:
+@pytest.fixture
+def animal_management_with_mock_pens(animal_management: AnimalManagement,
+                                     mock_pens: List[MagicMock]) -> AnimalManagement:
+    animal_management.all_pens = mock_pens
+    return animal_management
 
 
 def test_daily_animal_routine():
@@ -203,10 +194,10 @@ def test_init_nutrient_rqmts():
     pass
 
 
-def test_avg_pen_dist(animal_management: AnimalManagement) -> None:
+def test_avg_pen_dist(animal_management_with_mock_pens: AnimalManagement) -> None:
     """Unit test for function avg_pen_dist in file routines/animal/animal_management.py"""
 
-    actual = animal_management.avg_pen_dist()
+    actual = animal_management_with_mock_pens.avg_pen_dist()
     expected = (10 / 3, 20 / 3)
 
     assert actual == pytest.approx(expected)
@@ -232,11 +223,11 @@ def test_pen_allocation():
     pass
 
 
-def test_clear_pens(animal_management: AnimalManagement) -> None:
+def test_clear_pens(animal_management_with_mock_pens: AnimalManagement) -> None:
     """Unit test for function clear_pens in file routines/animal/animal_management.py"""
-    animal_management.clear_pens()
+    animal_management_with_mock_pens.clear_pens()
 
-    for pen in animal_management.all_pens:
+    for pen in animal_management_with_mock_pens.all_pens:
         pen.clear.assert_called_once()
 
 
@@ -255,12 +246,12 @@ def test_calc_manure_excretion():
     pass
 
 
-def test_calc_avg_growth(animal_management: AnimalManagement) -> None:
+def test_calc_avg_growth(animal_management_with_mock_pens: AnimalManagement) -> None:
     """Unit test for function calc_avg_growth in file routines/animal/animal_management.py"""
 
-    animal_management.calc_avg_growth()
+    animal_management_with_mock_pens.calc_avg_growth()
 
-    for pen in animal_management.all_pens:
+    for pen in animal_management_with_mock_pens.all_pens:
         pen.calc_avg_growth.assert_called_once()
 
     pass
