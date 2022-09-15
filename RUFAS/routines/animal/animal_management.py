@@ -49,70 +49,6 @@ class AnimalManagement:
     well as an instance of the LifeCycleManager class in order to update the
     animals' life cycles.
     """
-    # list of all the animals in the simulation
-    calves = []
-    heiferIs = []
-    heiferIIs = []
-    heiferIIIs = []
-    cows = []
-    heifers_sold = []
-    cows_culled = []
-
-    # list of all the pens on the farm
-    all_pens = []
-
-    # simulation length, days
-    sim_length = -1
-
-    # instance of LifeCycleManager class
-    life_cycle_manager = None
-
-    # housing type: barn or pasture
-    housing = ""
-
-    # concentrate supplementation when farming type is "pasture", kg
-    pasture_concentrate = -1
-
-    ration_user_input = False
-
-    # how often a ration is calculated, days
-    formulation_interval = 0
-
-    # day in the simulation
-    simulation_day = 1
-
-    # if False, there are no animals being simulated on the farm
-    simulate_animals = False
-
-    # dictionary: key is animal ID, value is the pen ID that animal is in
-    id_pen = {}
-
-    # queue: pens from which animals have been removed in the order in which
-    # they have had animals removed. Elements (pen ids) will be added to the
-    # right of the queue and popped off the left. Pen ids are popped off the
-    # queue when animals are added (i.e. calves are born or animals are
-    # purchased from the replacement herd), and those new animals are placed in
-    # the popped pen.
-    pens_needing_animals = deque([])
-
-    # dictionary for keeping track of what animal types each pen is holding
-    # (value of the dictionaries are lists of pen objects)
-    pens_by_animal_combination = {Pen.AnimalCombination.CALF: [], Pen.AnimalCombination.GROWING: [],
-                                  Pen.AnimalCombination.CLOSE_UP: [], Pen.AnimalCombination.GROWING_AND_CLOSE_UP: [],
-                                  Pen.AnimalCombination.LAC_COW: []}
-
-    # these variables are the P compositions of each class of animal. They
-    # are calculated daily and are used when an animal is added to the
-    # herd, whether by birth or replacement herd purchase. They are calculated
-    # in calc_all_p_comp() and are the total body weight of the animals in the
-    # respective class divided by the total P in the animals of the class
-    p_comp = {
-        'calf': 0,
-        'heiferI': 0,
-        'heiferII': 0,
-        'heiferIII': 0,
-        'cow': 0
-    }
 
     @staticmethod
     def get_animal_config(data):
@@ -141,18 +77,74 @@ class AnimalManagement:
             feed: instance of the Feed class
         """
 
+        # simulation length, days
         self.sim_length = config.sim_length
+
+        # day in the simulation
+        self.simulation_day = 1
+
         animal_config = self.get_animal_config(data['animal_config'])
+
+        # instance of LifeCycleManager class
         self.life_cycle_manager = LifeCycleManager(animal_config)
+
         AnimalBase.set_config(animal_config)
         AnimalBase.set_nutrient_list(feed.nutrient_rqmts)
-        self.init_pens(data['pen_information'], data['herd_information'])
-        self.init_animals(data['herd_information'], self.all_pens, weather, time, config, feed)
+
+        # if False, there are no animals being simulated on the farm
+        self.simulate_animals = False
+
+        # list of all the animals in the simulation
+        self.calves = []
+        self.heiferIs = []
+        self.heiferIIs = []
+        self.heiferIIIs = []
+        self.cows = []
+        self.heifers_sold = []
+        self.cows_culled = []
+
+        # list of all the pens on the farm
+        self.all_pens = []
+
+        # dictionary: key is animal ID, value is the pen ID that animal is in
+        self.id_pen = {}
+
+        # dictionary for keeping track of what animal types each pen is holding
+        # (value of the dictionaries are lists of pen objects)
+        self.pens_by_animal_combination = {Pen.AnimalCombination.CALF: [], Pen.AnimalCombination.GROWING: [],
+                                           Pen.AnimalCombination.CLOSE_UP: [],
+                                           Pen.AnimalCombination.GROWING_AND_CLOSE_UP: [],
+                                           Pen.AnimalCombination.LAC_COW: []}
+
+        # these variables are the P compositions of each class of animal. They
+        # are calculated daily and are used when an animal is added to the
+        # herd, whether by birth or replacement herd purchase. They are calculated
+        # in calc_all_p_comp() and are the total body weight of the animals in the
+        # respective class divided by the total P in the animals of the class
+        self.p_comp = {
+            'calf': 0,
+            'heiferI': 0,
+            'heiferII': 0,
+            'heiferIII': 0,
+            'cow': 0
+        }
+
+        # housing type: barn or pasture
         self.housing = data['housing']
+
+        # concentrate supplementation when farming type is "pasture", kg
         self.pasture_concentrate = data['pasture_concentrate']
+
         self.ration_user_input = data['ration']['user_input']
+
+        # how often a ration is calculated, days
         self.formulation_interval = data['ration']['formulation_interval']
+
         self.methane_model = data['methane_model']
+
+        self.init_pens(data['pen_information'], data['herd_information'])
+
+        self.init_animals(data['herd_information'], self.all_pens, weather, time, config, feed)
 
     def init_pens(self, all_pens_data, herd_data):
         """
@@ -337,8 +329,8 @@ class AnimalManagement:
             average horizontal distance from milking parlor)
         """
 
-        return mean(pen.vertical_dist_to_parlor for pen in self.all_pens), \
-               mean(pen.horizontal_dist_to_parlor for pen in self.all_pens)
+        return mean(pen.vertical_dist_to_parlor for pen in self.all_pens), mean(
+            pen.horizontal_dist_to_parlor for pen in self.all_pens)
 
     def calc_nutrient_rqmts(self, feed, temp):
         """
