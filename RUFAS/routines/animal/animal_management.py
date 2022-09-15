@@ -142,11 +142,11 @@ class AnimalManagement:
 
         self.methane_model = data['methane_model']
 
-        self.init_pens_refactor(data['pen_information'], data['herd_information'])
+        self.init_pens(data['pen_information'], data['herd_information'])
 
         self.init_animals(data['herd_information'], self.all_pens, weather, time, config, feed)
 
-    def init_pens_refactor(self, all_pen_data, herd_data):
+    def init_pens(self, all_pen_data, herd_data):
         """
         Populates the list of pens with the information from the input json file.
         Args:
@@ -166,7 +166,7 @@ class AnimalManagement:
         herd_num = herd_data['herd_num']
 
         # Minimum number of pens in the simulation
-        MIN_NUM_PENS = 10
+        MIN_NUM_PENS = 3
 
         num_pens_needed = MIN_NUM_PENS - len(self.all_pens)
 
