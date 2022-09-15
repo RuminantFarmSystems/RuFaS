@@ -11,7 +11,7 @@ from pytest_mock.plugin import MockerFixture
 
 from RUFAS.routines.animal.animal_management import AnimalManagement
 
-from typing import List, Dict
+from typing import List, Dict, Union, Any
 
 
 def create_mock_object_list(attribute_dicts: List[Dict]) -> List[MagicMock]:
@@ -63,6 +63,83 @@ def animal_management(mocker: MockerFixture, mock_pens: MagicMock) -> AnimalMana
     animal_management.all_pens = mock_pens
 
     return animal_management
+
+
+@pytest.fixture
+def pen_information() -> Dict[str, Dict[Union[str, Any], Union[Union[int, str, float], Any]]]:
+    return {
+        "pen0": {
+            "id": 0,
+            "animal_combination": "CALF",
+            "vertical_dist_to_milking_parlor": 0.1,
+            "horizontal_dist_to_milking_parlor": 1.6,
+            "number_of_stalls": 110,
+            "housing_type": "open air barn",
+            "bedding_type": "sand",
+            "pen_type": "freestall",
+            "manure_handling": "manual_scraping",
+            "manure_separator": "sedimentation",
+            "manure_storage": "storage_pit",
+            "max_stocking_density": 1.2
+        },
+        "pen1": {
+            "id": 1,
+            "animal_combination": "GROWING",
+            "vertical_dist_to_milking_parlor": 0.1,
+            "horizontal_dist_to_milking_parlor": 1.6,
+            "number_of_stalls": 800,
+            "housing_type": "open air barn",
+            "bedding_type": "organic",
+            "pen_type": "freestall",
+            "manure_handling": "flush_system",
+            "manure_separator": "sedimentation",
+            "manure_storage": "storage_pit",
+            "max_stocking_density": 1.2
+        },
+        "pen2": {
+            "id": 2,
+            "animal_combination": "CLOSE_UP",
+            "vertical_dist_to_milking_parlor": 0.1,
+            "horizontal_dist_to_milking_parlor": 1.6,
+            "number_of_stalls": 200,
+            "housing_type": "open air barn",
+            "bedding_type": "organic",
+            "pen_type": "tiestall",
+            "manure_handling": "automatic_alley_scrapers",
+            "manure_separator": "sedimentation",
+            "manure_storage": "storage_pit",
+            "max_stocking_density": 1.2
+        },
+        "pen3": {
+            "id": 3,
+            "animal_combination": "LAC_COW",
+            "vertical_dist_to_milking_parlor": 0.1,
+            "horizontal_dist_to_milking_parlor": 1.6,
+            "number_of_stalls": 850,
+            "housing_type": "open air barn",
+            "bedding_type": "sand",
+            "pen_type": "tiestall",
+            "manure_handling": "manual_scraping",
+            "manure_separator": "sedimentation",
+            "manure_storage": "anaerobic_lagoon",
+            "max_stocking_density": 1.2
+        }
+    }
+
+
+@pytest.fixture
+def herd_information() -> Dict[str, Union[str, int, bool]]:
+    return {
+        "calf_num": 80,
+        "heiferI_num": 440,
+        "heiferII_num": 380,
+        "heiferIII_num": 50,
+        "cow_num": 1000,
+        "replace_num": 5000,
+        "herd_num": 1000,
+        "herd_init": False,
+        "breed": "HO"
+    }
 
 
 def test_daily_animal_routine():
