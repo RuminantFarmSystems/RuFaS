@@ -142,9 +142,24 @@ class AnimalManagement:
 
         self.methane_model = data['methane_model']
 
-        self.init_pens(data['pen_information'], data['herd_information'])
+        self.init_pens_refactor(data['pen_information'], data['herd_information'])
 
         self.init_animals(data['herd_information'], self.all_pens, weather, time, config, feed)
+
+    def init_pens_refactor(self, all_pen_data, herd_data):
+        """
+        Populates the list of pens with the information from the input json file.
+        Args:
+            all_pen_data: dictionary containing information about the pens
+            herd_data: dictionary containing information about the herd
+        """
+        for pen_data in all_pen_data.values():
+            pen_data['pen_id'] = pen_data.pop('id')
+            pen_data['animal_combination'] = Pen.AnimalCombination[pen_data.pop('animal_combination')]
+
+            pen = Pen(**pen_data)
+
+            self.all_pens.append(pen)
 
     def init_pens(self, all_pens_data, herd_data):
         """

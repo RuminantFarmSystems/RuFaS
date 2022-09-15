@@ -25,7 +25,7 @@ class Pen:
 
     Attributes
     -------------
-    id : int
+    pen_id : int
         The pen's unique pen ID.
         Obtained from the input file.
 
@@ -163,16 +163,16 @@ class Pen:
         GROWING_AND_CLOSE_UP = 4
         LAC_COW = 5
 
-    def __init__(self, id_number, vert_dist, horiz_dist, num_stalls, housing_type,
+    def __init__(self, pen_id, vertical_dist_to_parlor, horizontal_dist_to_parlor, num_stalls, housing_type,
                  bedding_type, pen_type, manure_handling, manure_separator,
                  manure_storage, animal_combination, max_stocking_density):
         """
         Initializes a pen with the given arguments.
 
         Args:
-            id_number: the unique id number of the pen
-            vert_dist: vertical distance to milking parlor, km
-            horiz_dist: horizontal distance to milking parlor, km
+            pen_id: the unique id number of the pen
+            vertical_dist_to_parlor: vertical distance to milking parlor, km
+            horizontal_dist_to_parlor: horizontal distance to milking parlor, km
             num_stalls: number of stalls in the pen
             housing_type: housing type of the pen
             bedding_type: bedding type of the pen
@@ -183,12 +183,12 @@ class Pen:
             animal_combination: the valid animal combinations inside this pen, an instance of the AnimalCombination Enum
             max_stocking_density: maximum stocking density allowed for pen
         """
-        self.id = id_number
+        self.id = pen_id
 
         self.max_stocking_density = max_stocking_density
 
-        self.vertical_dist_to_parlor = vert_dist
-        self.horizontal_dist_to_parlor = horiz_dist
+        self.vertical_dist_to_parlor = vertical_dist_to_parlor
+        self.horizontal_dist_to_parlor = horizontal_dist_to_parlor
         self.num_stalls = num_stalls
         self.housing_type = housing_type
         self.bedding_type = bedding_type
