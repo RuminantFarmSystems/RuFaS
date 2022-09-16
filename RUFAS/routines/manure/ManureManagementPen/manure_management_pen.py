@@ -2,6 +2,7 @@ from typing import NamedTuple, Set, Type
 
 from RUFAS.routines.animal.life_cycle.animal_base import AnimalBase
 from RUFAS.routines.animal.pen import Pen
+from RUFAS.routines.manure.manure.manure import Manure
 
 
 class ManureManagementPen:
@@ -25,9 +26,10 @@ class ManureManagementPen:
     """
 
     def __init__(self, pen: Pen):
-        """
-        Initializes a SimplePen object. This object does not store
-        any reference to the passed-in argument and only performs a read on it.
+        """Initializes a ManureManagementPen object.
+
+        The newly created object does not store any reference to the passed-in argument
+        and only performs a read on it.
 
         Args:
             pen: A Pen object from the animal module.
@@ -47,13 +49,11 @@ class ManureManagementPen:
         self.manure_treatment: str = pen.manure_storage
 
         self.manure_density = 990.0  # kg/m^3
-
-        # TODO: Add manure-related attributes next, along with the PenManure class.
+        self.manure = Manure(**pen.manure)
 
     @property
     def housing_area_for_NH3_emission(self) -> float:
-        """
-        Returns housing area used for calculating NH3 housing emission.
+        """Returns housing area used for calculating NH3 housing emission.
 
         Returns:
             NH3 housing area. Units: m^2/animal.
@@ -68,8 +68,7 @@ class ManureManagementPen:
 
     @property
     def barn_area(self) -> float:
-        """
-        Calculates the barn area for this pen based on its housing type.
+        """Calculates the barn area for this pen based on its housing type.
 
         Returns:
             Barn area. Units: m^2/animal.

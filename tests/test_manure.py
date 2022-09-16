@@ -1,5 +1,8 @@
+from enum import auto
+
 import pytest
-from pytest import approx, fixture
+from pytest import approx
+from pytest import fixture
 from pytest_mock import MockerFixture
 
 from RUFAS.routines import AnimalManagement
@@ -9,6 +12,9 @@ from RUFAS.routines.animal.life_cycle.heiferI import HeiferI
 from RUFAS.routines.animal.life_cycle.heiferII import HeiferII
 from RUFAS.routines.animal.life_cycle.heiferIII import HeiferIII
 from RUFAS.routines.animal.pen import Pen
+from RUFAS.routines.manure.constants.constants import ManureManagementConstants
+from RUFAS.routines.manure.extended_enum.extended_enum import ExtendedEnum
+from RUFAS.routines.manure.manure.manure import Manure
 from RUFAS.routines.manure.manure_management import ManureManagement
 from RUFAS.routines.manure.ManureManagementPen.manure_management_pen import ManureManagementPen
 
@@ -82,6 +88,74 @@ def mock_animal_management(mocker: MockerFixture) -> AnimalManagement:
     #         feed=mocker.MagicMock(autospec=Feed),
     #         time=mocker.MagicMock(autospec=True)
     # )
+
+
+class DummyExtendedEnum(ExtendedEnum):
+    SUCCESS = auto()
+    FAILURE = auto()
+    DEFAULT = SUCCESS
+
+
+def test_get_type() -> None:
+    assert DummyExtendedEnum.get_default_type() is DummyExtendedEnum.SUCCESS
+    assert DummyExtendedEnum.get_type('success') is DummyExtendedEnum.SUCCESS
+    assert DummyExtendedEnum.get_type('failure') is DummyExtendedEnum.FAILURE
+
+
+def test_manure_init() -> None:
+    """Unit test for function __init__ in file manure.py"""
+
+    # Given no arguments, a new Manure object should have all attributes
+    # initially set to 0.
+    manure = Manure()
+    assert manure.U == approx(0.0)
+    assert manure.TAN_s == approx(0.0)
+    assert manure.MN == approx(0.0)
+    assert manure.Mkg == approx(0.0)
+    assert manure.TSd == approx(0.0)
+    assert manure.VSd == approx(0.0)
+    assert manure.VSnd == approx(0.0)
+    assert manure.WIP_frac == approx(0.0)
+    assert manure.WOP_frac == approx(0.0)
+    assert manure.p_excrt_manure == approx(0.0)
+    assert manure.p_frac == approx(0.0)
+    assert manure.K_manure == approx(0.0)
+    assert manure.CH4_manure == approx(0.0)
+
+    # Given some arguments, a new Manure object should either set the corresponding
+    # attributes to the given values or do some calculations.
+    manure = Manure(
+            # The following attributes should be modified.
+            U=1.0,
+            TAN_s=1.0,
+            MN=1.0,
+            VSd=1.0,
+            VSnd=1.0,
+            p_excrt_manure=1.0,
+            K_manure=1.0,
+
+            # The following attributes should stay the same.
+            # Only pick two as an example.
+            Mkg=10.0,
+            CH4_manure=10.0
+    )
+    constants = ManureManagementConstants
+    assert manure.U == approx(constants.UREA_MOLAR_MASS)
+    assert manure.TAN_s == approx(constants.TAN_MOLAR_MASS)
+    assert manure.MN == approx(constants.GRAMS_TO_KG)
+    assert manure.VSd == approx(constants.GRAMS_TO_KG)
+    assert manure.VSnd == approx(constants.GRAMS_TO_KG)
+    assert manure.p_excrt_manure == approx(constants.GRAMS_TO_KG)
+    assert manure.K_manure == approx(constants.GRAMS_TO_KG)
+
+    assert manure.Mkg == approx(10.0)
+    assert manure.CH4_manure == approx(10.0)
+
+    # Attributes that are not set to anything should be set to the default value of 0.
+    assert manure.TSd == approx(0.0)
+    assert manure.WIP_frac == approx(0.0)
+    assert manure.WOP_frac == approx(0.0)
+    assert manure.p_frac == approx(0.0)
 
 
 # Test ManureManagement class
