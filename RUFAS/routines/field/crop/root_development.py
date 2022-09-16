@@ -56,10 +56,10 @@ def calc_daily_root_biomass(crop_type):
     """
 
     fr_root=0.4 - 0.2 * crop_type.fr_PHU
-    if fr_root > 0:
-        crop_type.fr_root = 0.4 - 0.2 * crop_type.fr_PHU
-    else: 
+    if fr_root < 0:
         crop_type.fr_root = 0
+    else: 
+        crop_type.fr_root = fr_root
 
 
 
