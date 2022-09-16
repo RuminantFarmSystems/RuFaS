@@ -23,14 +23,14 @@ class Manure:
         TAN_s: total ammoniacal nitrogen concentration in the manure slurry, g/L.
         MN: nitrogen in liquid and solid manure, kg.
         Mkg: amount of manure, kg.
-        TSd: total solids, g.
+        TSd: total solids, kg.
         VSd: degradable volatile solids, kg.
         VSnd: non-degradable volatile solids, kg.
         WIP_frac: water extractable inorganic P fraction, unitless.
         WOP_frac: water extractable organic P fraction, unitless.
         p_excrt_manure: manure P excretion for manure module input, kg.
         p_frac: P fraction of manure.
-        K_manure: potassium in manure, kg/day.
+        K_manure: potassium in manure, kg.
         CH4_manure: methane emission, g/day.
 
     """
@@ -55,7 +55,6 @@ class Manure:
         self.U *= Constants.UREA_MOLAR_MASS  # mol/L x g/mol = g/L
         self.TAN_s *= Constants.TAN_MOLAR_MASS  # mol/L x g/mol = g/L
         self.MN *= Constants.GRAMS_TO_KG  # kg
-        # self.TSd *= Constants.GRAMS_TO_KG  # kg
         self.VSd *= Constants.GRAMS_TO_KG  # kg
         self.VSnd *= Constants.GRAMS_TO_KG  # kg
         self.p_excrt_manure *= Constants.GRAMS_TO_KG  # kg
