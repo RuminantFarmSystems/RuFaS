@@ -114,7 +114,7 @@ def test_update_biomass(start, g, rad, ext, eff, lai):
     check_limit = limit_growth(incpt_light, eff)
     check_grow = grow_biomass(start, g, check_limit)
     # execute function
-    update_biomass(mc, light=incpt_light)
+    update_biomass(mc, light=rad)
 
     assert [mc.d_biomass_max, mc.d_biomass_actual, mc.prev_biomass_actual, mc.biomass_actual] == \
            [check_limit, check_grow["accumulated biomass"], start, check_grow["end"]]
