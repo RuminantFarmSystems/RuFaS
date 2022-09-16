@@ -10,6 +10,7 @@ import random
 import numpy
 from typing import Optional
 
+from RUFAS.routines.manure.manure_management import simulate_daily_manure_management
 from RUFAS.util import Utility
 
 
@@ -68,6 +69,7 @@ class SimulationEngine:
             self.state.animal_management, self.state.feed, self.weather, self.time)
         routines.daily_manure_storage_routine(
             self.state.manure_storage, self.state.animal_management)
+        simulate_daily_manure_management(self.state.manure_management, self.state.animal_management)
         routines.daily_fields_routine(
             self.state.fields, self.state.manure_storage, self.weather, self.time)
         routines.daily_feed_routine(self.state.feed, self.state.fields, self.state.animal_management,
