@@ -20,15 +20,14 @@ class TreatmentEnum(ExtendedEnum):
     Enumerates available treatment options.
     """
 
-    STORAGE_POND = auto()
+    SLURRY_STORAGE_UNDERFLOOR = auto()
+    SLURRY_STORAGE_OUTDOOR = auto()
+
     ANAEROBIC_LAGOON = auto()
     ANAEROBIC_DIGESTION = auto()
     ANAEROBIC_DIGESTION_AND_LAGOON = auto()
 
-    SLURRY_STORAGE_UNDERFLOOR = auto()
-    SLURRY_STORAGE_OUTDOOR = auto()
-    STORAGE_PIT = STORAGE_POND
-    DEFAULT = STORAGE_POND
+    DEFAULT = SLURRY_STORAGE_UNDERFLOOR
 
 
 class BaseManureTreatment:
