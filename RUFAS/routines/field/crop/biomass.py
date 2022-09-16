@@ -60,8 +60,6 @@ def update_all(crop_type, soil, weather, time):
     """
 
     # update biomass values
-
-    # calc_act_biomass(crop_type, weather, time) # replace with update_biomass
     incoming_light_energy = weather.radiation[time.year - 1][time.day - 1]
     update_biomass(crop_type, light=incoming_light_energy)
     update_bio_AG(crop_type)
