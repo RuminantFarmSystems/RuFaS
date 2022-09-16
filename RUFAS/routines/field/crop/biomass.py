@@ -44,7 +44,9 @@ CropType values updated by update_all():
 from math import exp
 
 
-def update_all(soil, crop_type, weather, time):
+# TODO: These functions should probably be moved to the base_crop class as member functions
+
+def update_all(crop_type, soil, weather, time):
     """
     Description:
         Called from crop.py, This function updates all biomass information
@@ -62,37 +64,12 @@ def update_all(soil, crop_type, weather, time):
     # calc_act_biomass(crop_type, weather, time) # replace with update_biomass
     incoming_light_energy = weather.radiation[time.year - 1][time.day - 1]
     update_biomass(crop_type, light=incoming_light_energy)
+    update_bio_AG(crop_type)
 
-    calc_bio_AG(crop_type)
+    update_evapotrans(soil)  # TODO: it seems odd that we're updating soil attributes in a crop method...
 
-    calc_gamma_wu(soil, crop_type)
+    update_water_def(crop_type, et=soil.ET_annual, et_max=soil.ET_max_annual)
 
-
-def calc_act_biomass(crop_type, weather, time):
-    """
-    Description:
-        Calculates current actual biomass
-       "pseudocode_crop" C.9.A.2/3
-
-    Args:
-        crop_type: instance of Crop type subclass
-        weather: instance of Weather class
-        time: instance of Time class
-    """
-
-    H_phosyn = intercept_radiation(crop_type, weather, time)
-
-    # C.9.A.2
-    crop_type.d_biomass_max = crop_type.RUE * H_phosyn
-
-    # C.9.A.3
-    crop_type.d_biomass_actual = crop_type.d_biomass_max * crop_type.gamma_reg
-
-    # Save value as previous day's value
-    crop_type.prev_biomass_actual = crop_type.biomass_actual
-
-    # Update current actual biomass
-    crop_type.biomass_actual += crop_type.d_biomass_actual
 
 def update_biomass(crop, light: float) -> None:
     """
@@ -106,11 +83,13 @@ def update_biomass(crop, light: float) -> None:
     `d_biomass_max`, `prev_biomass_actual`, `biomass_actual`, and `d_biomass_actual`
     """
 
-    crop.d_biomass_max = limit_growth(radiation=light, efficiency=crop.RUE)
+    incpt_light = intercept_radiation(daily_radiation=light, light_extinction=crop.kl, lai_actual=crop.LAI_actual)
+    crop.d_biomass_max = limit_growth(radiation=incpt_light, efficiency=crop.RUE)
     growth = grow_biomass(start=crop.biomass_actual, growth_factor=crop.gamma_reg, max_growth=crop.d_biomass_max)
     crop.prev_biomass_actual = growth["start"]
     crop.biomass_actual = growth["end"]
     crop.d_biomass_actual = growth["accumulated biomass"]
+
 
 def limit_growth(radiation: float, efficiency: float) -> float:
     """
@@ -118,13 +97,14 @@ def limit_growth(radiation: float, efficiency: float) -> float:
 
     Args:
         efficiency: crop-specific radiation use efficiency (dg/MJ)
-        radiation: total solar radiation available for the day (MJ m^-2)
+        radiation: intercepted solar radiation for the day (MJ m^-2)
 
     Returns: the maximum biomass that can be accumulated in a day
     """
     if radiation < 0 or efficiency < 0:
         raise Exception("radiation and efficiency must be positive.")
     return radiation * efficiency
+
 
 def grow_biomass(start: float, growth_factor: float, max_growth: float) -> dict:
     """
@@ -140,7 +120,6 @@ def grow_biomass(start: float, growth_factor: float, max_growth: float) -> dict:
         a dictionary containing the starting biomass of the plant ("start"), the biomass of the plant at the end of the
         day ("end"), and the total biomass accumulated ("accumulated biomass")
     """
-
     if growth_factor < 0 or growth_factor > 1:
         raise Exception("growth_factor must be between 0 and 1")
     if start < 0:
@@ -149,6 +128,7 @@ def grow_biomass(start: float, growth_factor: float, max_growth: float) -> dict:
     actual_growth = max_growth * growth_factor
     end = start + actual_growth
     return {"start": start, "end": end, "accumulated biomass": actual_growth}
+
 
 def intercept_radiation(daily_radiation: float, light_extinction: float, lai_actual: float) -> float:
     """
@@ -164,11 +144,6 @@ def intercept_radiation(daily_radiation: float, light_extinction: float, lai_act
     Returns:
         int: intercepted radiation (MJ m^-2)
     """
-
-    # daily_radiation = weather.radiation[time.year - 1][time.day - 1]
-    # light_extinction = crop_type.kl
-    # lai = crop_type.LAI_actual
-
     if daily_radiation < 0 or lai_actual < 0:
         raise Exception("daily_radiation and lai_actual must be positive")
 
@@ -176,32 +151,73 @@ def intercept_radiation(daily_radiation: float, light_extinction: float, lai_act
     return intercepted_radiation
 
 
-def calc_bio_AG(crop_type):
+def update_bio_AG(crop) -> None:
+    """
+    Description: Updates above ground biomass for a crop, using `calc_bio_AG()`
+
+    Args:
+        crop: a BaseCrop class object
+    """
+    crop.bio_AG = calc_bio_AG(fr_root=crop.fr_root, biomass_actual=crop.biomass_actual)
+
+
+def calc_bio_AG(fr_root: float, biomass_actual: float) -> float:
     """
     Description:
         Calculates above ground biomass.
         "pseudocode_crop" C.9.B.1
 
     Args:
-        crop_type: instance of Crop type subclass
+        fr_root: fraction of biomass stored in roots
+        biomass_actual: the actual biomass of the plant
+
+    Returns: above ground biomass
     """
+    bio_AG = (1 - fr_root) * biomass_actual
+    return bio_AG
 
-    crop_type.bio_AG = (1 - crop_type.fr_root) * crop_type.biomass_actual
+
+def update_evapotrans(soil) -> None:  # TODO: belongs in Soil class
+    if soil.ET_max_annual != 0:
+        soil.ET_annual = soil.evap_annual + soil.trans_annual
 
 
-def calc_gamma_wu(soil, crop_type):
+def calc_evapotrans(evap: float, trans: float) -> float:  # TODO: belongs in Soil class
     """
-    Description:
-        Calculates water deficiency factor (AKA gamma_wu).
-        "pseudocode_crop" C.9.C.1
+    Description: calculate the annual evapotranspiration
 
     Args:
-        soil: instance of Soil class
-        crop_type: instance of Crop type subclass
+        evap: annual evaporation
+        trans: annual transpiration
+
+    Returns: annul evapotranspiration
     """
+    return evap + trans
 
-    if soil.ET_max_annual == 0:
+
+def update_water_def(crop, et: float, et_max: float) -> None:
+    """
+    Description: update the water use efficiency attribute of a crop
+
+    Args:
+        crop: a BaseCrop instance
+        et: annual soil evapotranspiration
+        et_max: maximum annual soil evapotranspiration
+    """
+    crop.gamma_wu = calc_water_def(et, et_max)  # TODO: attribute "gamma_wu" needs a more intuitive name
+
+
+def calc_water_def(et: float, et_max: float) -> float:
+    """
+    Description: calculate water deficiency factor
+
+    Args:
+        et: annual evapotranspiration
+        et_max: maximum annual evapotranspiration
+
+    Returns: water deficiency factor
+    """
+    if et_max != 0:
+        return 100 * (et / et_max)
+    else:
         return 0
-
-    soil.ET_annual = soil.evap_annual + soil.trans_annual
-    crop_type.gamma_wu = 100 * (soil.ET_annual / soil.ET_max_annual)

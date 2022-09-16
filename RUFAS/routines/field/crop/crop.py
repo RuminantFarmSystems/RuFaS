@@ -65,7 +65,7 @@ def daily_crop_routine(soil, crop, field_management, weather, time):
 
                 leaf_area_index.update_all(crop_type)
 
-                biomass.update_all(soil, crop_type, weather, time)
+                biomass.update_all(crop_type, soil, weather, time)
 
                 # "pseudocode_crop" C.10.A.1/2
                 if crop_type.harvest_type == 'scheduled':
