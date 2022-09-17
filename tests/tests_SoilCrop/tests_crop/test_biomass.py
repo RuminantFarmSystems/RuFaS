@@ -139,7 +139,7 @@ def test_calc_bio_AG(fr, bm):
     assert calc_bio_AG(fr, bm) == (1-fr)*bm
 
 
-@pytest.mark.parameterize("fr,bm", [
+@pytest.mark.parametrize("fr,bm", [
     (0.5, 1),  # half biomass in roots
     (0.5, 50),  # increase biomass
     (0, 1),  # no roots
