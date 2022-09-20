@@ -48,8 +48,9 @@ CropType values updated by calling update_all():
 """
 
 from math import log, exp
-from .nitrogen_fixation import calc_N_fixation
+from RUFAS.routines.field.crop.nitrogen_fixation import calc_N_fixation
 
+# TODO: These functions should probably be moved to the base_crop class as member functions
 
 def update_all(soil, crop_type):
     """
@@ -62,7 +63,7 @@ def update_all(soil, crop_type):
         crop_type: an instance of a crop class
     """
 
-    calc_fr_N(crop_type)
+    update_nfrac(crop_type)
     calc_bio_N_opt(crop_type)
     calc_N_up(crop_type)
     calc_act_N_up_each_layer(soil, crop_type)
@@ -71,99 +72,127 @@ def update_all(soil, crop_type):
     N_uptake(soil)
 
 
-def calc_fr_N(crop_type):
+def calc_nfrac(phu_frac: float, nfrac_1: float, nfrac_3: float, shape1:float, shape2:float) -> float:
     """
     Description:
         Calculates the fraction of nitrogen in the plant biomass on a given day.
        "pseudocode_crop" C.5.B.1
 
     Args:
-        crop_type
+        phu_frac: the fraction of total PHU accumulated to date
+        nfrac_1: the fraction nitrogen in the biomass at stage 1
+        nfrac_3: the fraction nitrogen in the biomass at stage 3
+        shape1: first shape parameter
+        shape2: second shape parameter
     """
 
-    n2 = calc_n2(crop_type)
-    n1 = calc_n1(crop_type, n2)
-
-    if crop_type.prev_biomass_actual == 0:
-        crop_type.fr_N = 0
-    else:
-        term1 = crop_type.fr_n1 - crop_type.fr_n3
-
-        exp_part = exp(n1 + n2 * crop_type.prev_fr_PHU)
-        term2 = 1 - crop_type.prev_fr_PHU / (crop_type.prev_fr_PHU + exp_part)
-
-        crop_type.fr_N = term1 * term2 + crop_type.fr_n3
+    ndiff = nfrac_1 - nfrac_3
+    e_term = exp(shape1 + (shape2 * phu_frac))
+    brackies = 1 - (phu_frac / (phu_frac + e_term))
+    return (ndiff * brackies) + nfrac_3
 
 
-def calc_n2(crop_type):
+    ## TODO: This used to be calculated from the **previous** day's values but I don't understand why. - Clay
+    # shape2 = calc_nshape2(heatfrac_half, heatfrac_full, nfrac_1, nfrac_2, nfrac_near, nfrac_3)
+    # shape1 = calc_nshape1(heatfrac_half, nfrac_2, nfrac_1, nfrac_3)
+    #
+    # if crop_type.prev_biomass_actual == 0:
+    #     crop_type.fr_N = 0
+    # else:
+    #     term1 = crop_type.fr_n1 - crop_type.fr_n3
+    #
+    #     exp_part = exp(n1 + n2 * crop_type.prev_fr_PHU)
+    #     term2 = 1 - crop_type.prev_fr_PHU / (crop_type.prev_fr_PHU + exp_part)
+    #
+    #     crop_type.fr_N = term1 * term2 + crop_type.fr_n3
+
+
+def update_nfrac(crop) -> None:
+    """
+    Description: update a crop's nitrogen fraction
+
+    Args:
+        crop: an instance of BaseCrop
+
+    Returns: Nothing. Instead, the crop.fr_N attribute is updated.
+    """
+    shapes = calc_nshapes(heatfrac_half=crop.fr_PHU_50, heatfrac_full=crop.fr_PHU_100, nfrac_1=crop.fr_n1,
+                          nfrac_2=crop.fr_n2, nfrac_near=crop.fr_n3ish ,nfrac_3=crop.fr_n3)
+
+    crop.fr_N = calc_nfrac(phu_frac=crop.fr_PHU, nfrac_1=crop.fr_n3, nfrac_3=crop.fr_n3,
+                           shape1=shapes[0], shape2=shapes[1])
+
+def calc_nshapes(heatfrac_half: float, heatfrac_full: float, nfrac_1: float, nfrac_2: float,
+                 nfrac_near: float, nfrac_3: float) -> list[float]:
     """
     Description:
-        Calculates the second shape coefficient.
+        Calculates the shape coefficient for nitrogen fraction.
        "pseudocode_crop" C.5.A.1
 
     Args:
-        crop_type
+        heatfrac_half: the fraction of potential heat units at half maturity
+        heatfrac_full: the fraction of potential heat units at full maturity
+        nfrac_1: the fraction nitrogen in the biomass at stage 1
+        nfrac_2: the fraction nitrogen in the biomass at stage 2
+        nfrac_near: the fraction nitrogen in the biomass near maturity (stage 3)
+        nfrac_3: the fraction nitrogen in the biomass at stage 3
+        shape2: the second shape coefficient
 
     Returns:
-        float: second shape coefficient
+        a list of the first and second shape coefficients
     """
 
-    term1 = calc_log_term_of_shape_coefficient(
-        crop_type, crop_type.fr_PHU_50, crop_type.fr_n2
-    )
+    if heatfrac_full == heatfrac_half:  # leads to divide by 0
+        raise ValueError("heatfrac_half must not equal heatfrac_full")
 
-    term2 = calc_log_term_of_shape_coefficient(
-        crop_type, crop_type.fr_PHU_100, crop_type.fr_n3ish
-    )
+    # 1st shape parameter
+    log_half = calc_shape_log(heat_frac=heatfrac_half, nfrac_x=nfrac_2, nfrac_3=nfrac_3, nfrac_1=nfrac_1)
+    log_full = calc_shape_log(heat_frac=heatfrac_full, nfrac_x=nfrac_near, nfrac_3=nfrac_3, nfrac_1=nfrac_1)
+    s2 = (log_half - log_full) / (heatfrac_full - heatfrac_half)
 
-    term3 = crop_type.fr_PHU_100 - crop_type.fr_PHU_50
+    # second shape parameter
+    log_term = calc_shape_log(heat_frac=heatfrac_half, nfrac_x=nfrac_2, nfrac_1=nfrac_1, nfrac_3=nfrac_3)
+    s1 = log_term + s2 * heatfrac_half
+    return [s1, s2]
 
-    return (term1 - term2) / term3
 
-
-def calc_n1(crop_type, n2):
+def calc_shape_log(heat_frac:float, nfrac_x:float, nfrac_3:float, nfrac_1:float) -> float:
     """
     Description:
-        Calculates the first shape coefficient.
-       "pseudocode_crop" C.5.A.2
+    Calculate the log component of shape coefficient formulae
+    "pseudocode_crop" C.5.A.2
 
     Args:
-        crop_type
-        n2: the second shape coefficient
+        heat_frac: the fraction of potential heat units of interest
+        nfrac_x: the fraction of biomass that is nitrogen at the stage of interest
+        nfrac_3: the fraction of nitrogen at maturity
+        nfrac_1: the fraction of nitrogen at emergence
 
     Returns:
-        float: the first shape coefficient
+        the log term of shape coefficient formula
     """
 
-    term1 = calc_log_term_of_shape_coefficient(
-        crop_type, crop_type.fr_PHU_50, crop_type.fr_n2)
+    # throw an error if any parameters do not satisfy [0-1]
+    frac_error_msg = "nfrac_x, heat_frac, nfrac_3, and nfrac_1 must all be between 0 and 1"
+    if nfrac_x < 0 or nfrac_x > 1 or heat_frac < 0 or heat_frac > 1 or nfrac_3 < 0 or nfrac_3 > 1 \
+            or nfrac_1 < 0 or nfrac_1 > 1:
+        raise ValueError(frac_error_msg)
 
-    return term1 + n2 * crop_type.fr_PHU_50
+    # raise other errors # TODO: perhaps rather than throwing errors, we should set values to sensible edge case?
+    if nfrac_1 <= nfrac_3:  # leads to division by zero or ln(-x)
+        raise ValueError("nfrac_1 must be less than nfrac_3")
 
+    if nfrac_x > nfrac_1 or nfrac_x == nfrac_1: # leads to ln(-x) or divide by 0
+        raise ValueError("nfrac_x must be less than nfrac_1")
 
-def calc_log_term_of_shape_coefficient(crop_type, fr_PHU_frac, fr_nx):
-    """
-    Description:
-        Helper function. Calculates the log term in the shape coefficient calculations
-       "pseudocode_crop" C.5.A.2
+    if nfrac_x == 0: # leads to ln(0)
+        raise ValueError("nfrac_x must be greater than 0")
+    if heat_frac == 0:
+        raise ValueError("heat_x must be greater than 0")
 
-    Args:
-        crop_type
-        fr_PHU_frac: the fraction of the fraction of potential heat units
-         accumulated
-        fr_nx: this function is generalized for calculating the log terms of
-         multiple shape coefficient, fr_nx represents the fraction of shape
-         coefficient x
-
-    Returns:
-        float: log term in the calculations
-    """
-
-    bottom = 1 - (fr_nx - crop_type.fr_n3) / (crop_type.fr_n1 - crop_type.fr_n3)
-    inside = (fr_PHU_frac / bottom) - fr_PHU_frac
-
-    return log(inside)
-
+    # calculate results
+    denominator = 1 - ((nfrac_x - nfrac_3) / (nfrac_1 - nfrac_3))
+    return log((heat_frac / denominator) - heat_frac)
 
 def calc_bio_N_opt(crop_type):
     """
