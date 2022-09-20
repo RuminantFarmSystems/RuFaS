@@ -1,7 +1,7 @@
 class ManureManagementConstants:
     """This class stores constants related to unit conversion and manure calculations.
 
-    All the constant names are capitalized. To make code look more natural, the
+    All the constant names are fully capitalized. To make code look more natural, the
     general way of using these constants is through multiplication.
 
     """
@@ -11,8 +11,8 @@ class ManureManagementConstants:
     KG_TO_CUBIC_METERS = 0.001
     CUBIC_METERS_TO_LITERS = 1000.0
     GRAMS_TO_KG = 0.001
-    INCHES_TO_METERS = 0.0254  # inch/m
-    FEET_TO_METERS = 0.3048  # ft/m
+    INCHES_TO_METERS = 0.0254
+    FEET_TO_METERS = 0.3048
 
     # Specific constants
     UREA_MOLAR_MASS = 60.06  # g/mol
@@ -24,6 +24,3 @@ class ManureManagementConstants:
     WATER_DENSITY_KG_PER_LITER = 0.997  # kg/liter
     WATER_DENSITY_KG_PER_M3 = WATER_DENSITY_KG_PER_LITER * LITERS_TO_CUBIC_METERS
     DAYS_PER_YEAR = 365  # days per year
-
-
-

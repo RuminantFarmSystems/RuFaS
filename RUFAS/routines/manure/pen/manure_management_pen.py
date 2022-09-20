@@ -22,11 +22,12 @@ class ManureManagementPen:
         manure_separator: The type of manure separator used for this pen.
         manure_treatment: The type of manure treatment(s) used for this pen.
         manure_density: The manure density used for calculating manure volume.
+        manure: The manure data extracted from the animal module.
 
     """
 
     def __init__(self, pen: Pen):
-        """Initializes a ManureManagementPen object.
+        """Initializes a pen object.
 
         The newly created object does not store any reference to the passed-in argument
         and only performs a read on it.

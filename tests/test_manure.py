@@ -1,4 +1,6 @@
-from enum import auto
+from typing import Callable
+from typing import Dict
+from typing import List
 
 import pytest
 from pytest import approx
@@ -13,11 +15,13 @@ from RUFAS.routines.animal.life_cycle.heiferII import HeiferII
 from RUFAS.routines.animal.life_cycle.heiferIII import HeiferIII
 from RUFAS.routines.animal.pen import Pen
 from RUFAS.routines.manure.constants.constants import ManureManagementConstants
-from RUFAS.routines.manure.extended_enum.extended_enum import ExtendedEnum
+from RUFAS.routines.manure.default_enum.default_enum import DefaultEnum
 from RUFAS.routines.manure.manure.manure import Manure
 from RUFAS.routines.manure.manure_management import ManureManagement
-from RUFAS.routines.manure.ManureManagementPen.manure_management_pen import ManureManagementPen
+from RUFAS.routines.manure.pen.manure_management_pen import ManureManagementPen
 
+
+# Test fixtures
 
 @fixture
 def mock_calf(mocker: MockerFixture) -> Calf:
@@ -55,12 +59,28 @@ def mock_cow(mocker: MockerFixture) -> Cow:
 
 
 @fixture
+def manure_attributes() -> List[str]:
+    return ['U', 'TAN_s', 'MN', 'Mkg', 'TSd',
+            'VSd', 'VSnd', 'WIP_frac', 'WOP_frac', 'p_excrt_manure',
+            'K_manure', 'CH4_manure']
+
+
+@fixture
+def generate_animal_manure(manure_attributes) -> Callable[[float], Dict[str, float]]:
+    def generate(dummy_val=2.0):
+        return {attr: dummy_val for attr in manure_attributes}
+
+    return generate
+
+
+@fixture
 def mock_pen(mocker: MockerFixture,
              mock_calf: Calf,
              mock_heiferI: HeiferI,
              mock_heiferII: HeiferII,
              mock_heiferIII: HeiferIII,
-             mock_cow: Cow) -> Pen:
+             mock_cow: Cow,
+             generate_animal_manure: Callable[[float], Dict[str, float]]) -> Pen:
     """Returns a Pen mocker object"""
 
     mock_pen: Pen = mocker.MagicMock(autospec=Pen)
@@ -72,6 +92,7 @@ def mock_pen(mocker: MockerFixture,
     mock_pen.manure_handling = 'manual_scraping'
     mock_pen.manure_separator = 'sand_lane'
     mock_pen.manure_storage = 'storage_pit'
+    mock_pen.manure = generate_animal_manure()
     return mock_pen
 
 
@@ -81,58 +102,97 @@ def mock_animal_management(mocker: MockerFixture) -> AnimalManagement:
 
     return mocker.MagicMock(autospec=AnimalManagement)
 
-    # return AnimalManagement(
-    #         data=mocker.MagicMock(autospec=True),
-    #         config=mocker.MagicMock(autospec=Config),
-    #         weather=mocker.MagicMock(autospec=Weather),
-    #         feed=mocker.MagicMock(autospec=Feed),
-    #         time=mocker.MagicMock(autospec=True)
-    # )
 
+# Test ManureManagementConstants class
 
-class DummyExtendedEnum(ExtendedEnum):
-    SUCCESS = auto()
-    FAILURE = auto()
+def test_manure_management_constants_class() -> None:
+    constants = ManureManagementConstants
+    assert constants.LITERS_TO_CUBIC_METERS == approx(0.001)
+    assert constants.KG_TO_CUBIC_METERS == approx(0.001)
+    assert constants.CUBIC_METERS_TO_LITERS == approx(1000.0)
+    assert constants.GRAMS_TO_KG == approx(0.001)
+    assert constants.INCHES_TO_METERS == approx(0.0254)
+    assert constants.FEET_TO_METERS == approx(0.3048)
+
+    assert constants.UREA_MOLAR_MASS == approx(60.06)
+    assert constants.UREA_DENSITY == approx(1.32)
+    assert constants.TAN_MOLAR_MASS == approx(17.0306)
+    assert constants.METHANE_ENERGY_DENSITY == approx(55)
+    assert constants.METHANE_DENSITY == approx(0.657)
+
+    assert constants.WATER_DENSITY_KG_PER_LITER == approx(0.997)
+    assert constants.WATER_DENSITY_KG_PER_M3 == approx(9.97e-4)
+    assert constants.DAYS_PER_YEAR == 365
+
+# Test DefaultEnum class
+
+class DummyDefaultEnumWithDefault(DefaultEnum):
+    SUCCESS = 1
+    FAILED = 2
     DEFAULT = SUCCESS
 
 
-def test_get_type() -> None:
-    assert DummyExtendedEnum.get_default_type() is DummyExtendedEnum.SUCCESS
-    assert DummyExtendedEnum.get_type('success') is DummyExtendedEnum.SUCCESS
-    assert DummyExtendedEnum.get_type('failure') is DummyExtendedEnum.FAILURE
+class DummyDefaultEnumNoDefault(DefaultEnum):
+    SUCCESS = 1
+    FAILED = 2
 
 
-def test_manure_init() -> None:
+@pytest.mark.parametrize(
+        "enum_type, expected_default",
+        [(DummyDefaultEnumWithDefault, DummyDefaultEnumWithDefault.SUCCESS),
+         (DummyDefaultEnumNoDefault, DummyDefaultEnumNoDefault.SUCCESS),
+         ])
+def test_get_default_type(enum_type: DefaultEnum, expected_default: DefaultEnum) -> None:
+    """Unit test for function get_default_type in file default_enum.py"""
+
+    assert enum_type.get_default_type() is expected_default
+
+
+@pytest.mark.parametrize(
+        "enum_type, lookup_member, expected_type",
+        [(DummyDefaultEnumWithDefault, 'success', DummyDefaultEnumWithDefault.SUCCESS),
+         (DummyDefaultEnumWithDefault, 'failed', DummyDefaultEnumWithDefault.FAILED),
+         (DummyDefaultEnumWithDefault, 'dummy', DummyDefaultEnumWithDefault.DEFAULT),
+         (DummyDefaultEnumNoDefault, 'success', DummyDefaultEnumNoDefault.SUCCESS),
+         (DummyDefaultEnumNoDefault, 'failed', DummyDefaultEnumNoDefault.FAILED),
+         (DummyDefaultEnumNoDefault, 'dummy', DummyDefaultEnumNoDefault.SUCCESS),
+         ])
+def test_get_type(enum_type: DefaultEnum, lookup_member: str, expected_type: DefaultEnum) -> None:
+    """Unit test for function get_type in file default_enum.py"""
+
+    assert enum_type.get_type(lookup_member) is expected_type
+
+
+def test_manure_init(manure_attributes: List[str],
+                     generate_animal_manure: Callable[[float], Dict[str, float]]) -> None:
     """Unit test for function __init__ in file manure.py"""
 
     # Given no arguments, a new Manure object should have all attributes
     # initially set to 0.
     manure = Manure()
-    assert manure.U == approx(0.0)
-    assert manure.TAN_s == approx(0.0)
-    assert manure.MN == approx(0.0)
-    assert manure.Mkg == approx(0.0)
-    assert manure.TSd == approx(0.0)
-    assert manure.VSd == approx(0.0)
-    assert manure.VSnd == approx(0.0)
-    assert manure.WIP_frac == approx(0.0)
-    assert manure.WOP_frac == approx(0.0)
-    assert manure.p_excrt_manure == approx(0.0)
-    assert manure.p_frac == approx(0.0)
-    assert manure.K_manure == approx(0.0)
-    assert manure.CH4_manure == approx(0.0)
+    for attr in manure_attributes:
+        assert hasattr(manure, attr)
+        assert getattr(manure, attr) == approx(0.0)
 
-    # Given some arguments, a new Manure object should either set the corresponding
-    # attributes to the given values or do some calculations.
+    # Given a dictionary of arguments, a new Manure object should have all attributes
+    # initially set to the correct values.
+    manure_data = generate_animal_manure(0.0)
+    manure = Manure(**manure_data)
+    for attr in manure_attributes:
+        assert hasattr(manure, attr)
+        assert getattr(manure, attr) == approx(0.0)
+
+    # Given one or more arguments, a new Manure object should either set
+    # the corresponding attributes to the given values or do some calculations.
     manure = Manure(
             # The following attributes should be modified.
-            U=1.0,
-            TAN_s=1.0,
-            MN=1.0,
-            VSd=1.0,
-            VSnd=1.0,
-            p_excrt_manure=1.0,
-            K_manure=1.0,
+            U=2.0,
+            TAN_s=3.0,
+            MN=4.0,
+            VSd=5.0,
+            VSnd=6.0,
+            p_excrt_manure=7.0,
+            K_manure=8.0,
 
             # The following attributes should stay the same.
             # Only pick two as an example.
@@ -140,18 +200,18 @@ def test_manure_init() -> None:
             CH4_manure=10.0
     )
     constants = ManureManagementConstants
-    assert manure.U == approx(constants.UREA_MOLAR_MASS)
-    assert manure.TAN_s == approx(constants.TAN_MOLAR_MASS)
-    assert manure.MN == approx(constants.GRAMS_TO_KG)
-    assert manure.VSd == approx(constants.GRAMS_TO_KG)
-    assert manure.VSnd == approx(constants.GRAMS_TO_KG)
-    assert manure.p_excrt_manure == approx(constants.GRAMS_TO_KG)
-    assert manure.K_manure == approx(constants.GRAMS_TO_KG)
+    assert manure.U == approx(2.0 * constants.UREA_MOLAR_MASS)
+    assert manure.TAN_s == approx(3.0 * constants.TAN_MOLAR_MASS)
+    assert manure.MN == approx(4.0 * constants.GRAMS_TO_KG)
+    assert manure.VSd == approx(5.0 * constants.GRAMS_TO_KG)
+    assert manure.VSnd == approx(6.0 * constants.GRAMS_TO_KG)
+    assert manure.p_excrt_manure == approx(7.0 * constants.GRAMS_TO_KG)
+    assert manure.K_manure == approx(8.0 * constants.GRAMS_TO_KG)
 
     assert manure.Mkg == approx(10.0)
     assert manure.CH4_manure == approx(10.0)
 
-    # Attributes that are not set to anything should be set to the default value of 0.
+    # The remaining attributes should be set to the default value of 0.
     assert manure.TSd == approx(0.0)
     assert manure.WIP_frac == approx(0.0)
     assert manure.WOP_frac == approx(0.0)
@@ -222,7 +282,7 @@ def test_manure_management_update(mocker: MockerFixture,
     assert len(manure_management.all_data) == num_pens
 
 
-# Test ManureManagementPen class
+# Test pen class
 
 
 def test_manure_management_pen_init(mock_pen: Pen,
@@ -230,7 +290,8 @@ def test_manure_management_pen_init(mock_pen: Pen,
                                     mock_heiferI: HeiferI,
                                     mock_heiferII: HeiferII,
                                     mock_heiferIII: HeiferIII,
-                                    mock_cow: Cow) -> None:
+                                    mock_cow: Cow,
+                                    generate_animal_manure: Callable[[float], Dict[str, float]]) -> None:
     """Unit test for function __init__ in file manure_management_pen.py"""
 
     # Act
@@ -246,6 +307,7 @@ def test_manure_management_pen_init(mock_pen: Pen,
     assert mm_pen.manure_separator == 'sand_lane'
     assert mm_pen.manure_treatment == 'storage_pit'
     assert mm_pen.num_animals == 5
+    assert mm_pen.manure == Manure(**generate_animal_manure())
 
 
 @pytest.mark.parametrize(
