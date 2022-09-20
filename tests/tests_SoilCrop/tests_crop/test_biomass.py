@@ -5,265 +5,232 @@ Description: Implements test cases
 Author(s): Brandon DeBoer, brdeboer@wisc.edu
 """
 
-from RUFAS.routines.field.crop.crop_types import base_crop
-from RUFAS.routines.field.soil import soil
-from RUFAS.classes import Weather, Time
-from RUFAS import *
-from RUFAS.routines.field.crop.biomass import *
-
-from unittest.mock import MagicMock
 import pytest
 
-from math import gamma
+from RUFAS.routines.field.crop.biomass import *
+from tests.tests_SoilCrop.mock_classes import mock_crop, mock_soil
 
 
-def mock_crop(fr_root=.38, biomass_actual=4.6, kl=2.1, LAI_actual=3.4, RUE=1.5, gamma_reg=.7):
+@pytest.mark.parametrize("h_day,k_l,lai_act", [
+    (1, 1, 1),
+    (0, 0, 0),
+    (1, 0, 1),
+    (.2, -.38, 0.75),
+    (.2, .38, 0.75)
+])
+def test_intercept_radiation(h_day, k_l, lai_act):
     """
-    Description: 
-        Creates a BaseCrop class mocking object for use as input for functions. It is initialized with the
-        arguments provided; arguments are dynamic and can be changed/added to as needed.
+    Description: test calculation of solar radiation intercepted for photosynthesis
 
     Args:
-        fr_root (float): BaseCrop fr_root attribute
-        biomass_actual (float): BaseCrop biomass_actual attribute
-        kl (float): BaseCrop kl attribute
-        LAI_actual (float): BaseCrop LAI_actual attribute
-        RUE (float): BaseCrop RUE attribute
-        gamma_reg (float): BaseCrop gamma_reg attribute
-
-    Return:
-        a BaseCrop mocking object instantiated with the provided arguments 
+        h_day: solar radiation on the current day
+        k_l: light extinction coefficient
+        lai_act: actual LAI
     """
 
-    mcrop = MagicMock(base_crop.BaseCrop)
-
-    mcrop.fr_root = fr_root
-    mcrop.biomass_actual = biomass_actual
-    mcrop.kl = kl
-    mcrop.LAI_actual = LAI_actual
-    mcrop.RUE = RUE
-    mcrop.gamma_reg = gamma_reg
-
-    return mcrop
+    h_photo = 0.5 * h_day * (1 - exp(-k_l * lai_act))
+    result = intercept_radiation(h_day, k_l, lai_act)
+    assert result == h_photo
 
 
-def mock_weather(radiation = [[3.5]]):
+@pytest.mark.parametrize("h_day,lai_act", [
+    (-1, 1),
+    (1, -1),
+    (-1, -1)
+])
+def test_intercept_radiation_error(h_day, lai_act):
     """
-    Description: 
-        Creates a Weather class mocking object for use as input for functions. It is initialized with the
-        arguments provided; arguments are dynamic and can be changed/added to as needed.
+    Description: test that `intercept_radiation()` raises exceptions when appropriate
+    Args:
+        h_day: solar radiation on the current day
+        lai_act: actual LAI
+    """
+
+    with pytest.raises(Exception):
+        intercept_radiation(h_day, 0.8, lai_act)
+
+
+@pytest.mark.parametrize("rad,eff,expected", [
+    (0, 0, 0),
+    (1000, 0.33, 330),
+    (1961.67, 0.217, 1961.67 * 0.217)
+])
+def test_limit_growth(rad, eff, expected):
+    """
+    Description: test that `limit_growth()` matches expectations
 
     Args:
-        radiation (float): Weather attribute, measured amount of radiation
-
-    Return:
-        a Time mocking object instantiated with the provided arguments 
+        rad: incoming light radiation
+        eff: light use efficiency
+        expected: expected output
     """
-    mweather = MagicMock(Weather)
 
-    mweather.radiation = radiation
-    
-    return mweather
+    assert limit_growth(rad, eff) == expected
 
 
-
-def mock_time(day = 1, year = 1):
+@pytest.mark.parametrize("rad,eff", [
+    (-1000, 0.33),
+    (1000, -0.33),
+    (-1000, -0.33)
+])
+def test_limit_growth_errors(rad, eff):
     """
-    Description: 
-        Creates a Time class mocking object for use as input for functions. It is initialized with the
-        arguments provided; arguments are dynamic and can be changed/added to as needed.
+    Description: test that `limit_growth()` raises errors if negative values are given
 
     Args:
-        year (int): Time attribute, current year in simulation
-        day (int): Time attribute, current day in the simulation
-
-    Return:
-        a Time mocking object instantiated with the provided arguments 
-    """
-    mtime = MagicMock(Time)
-
-    mtime.year = year
-    mtime.day = day
-
-    return mtime
-
-
-def mock_soil(ET_max_annual=1.5, evap_annual=2.1, trans_annual=1.3):
-    """
-        Description:
-            Creates a Soil class mocking object for use as input for functions. It is initialized with the
-            arguments provided; arguments are dynamic and can be changed/added to as needed.
-
-        Args:
-            ET_max_annual (float): Soil ET_max_annual attribute
-            evap_annual (float): Soil evap_annual attribute
-            trans_annual (float): Soil trans_annual attribute
-
-        Return:
-            A Soil class mocking object instantiated with the provided arguments
+        rad: incoming light radiation
+        eff: light use efficiency
     """
 
-    msoil = MagicMock(soil.Soil)
-
-    msoil.ET_max_annual = ET_max_annual
-    msoil.evap_annual = evap_annual
-    msoil.trans_annual = trans_annual
-
-    return msoil
+    with pytest.raises(Exception):
+        limit_growth(rad, eff)
 
 
-# the following tests are for the calc_bio_AG() function
-def test_calc_bio_AG_sets_bio_AG_correctly():
+@pytest.mark.parametrize("start,g,rad,ext,eff,lai", [
+    (0, 0.2, 1000, 0.33, 1, 0.7),  # no initial size
+    (1, 0, 1000, 0.33, 1, 0.7),  # no growth
+    (1, 0.2, 0, 0.33, 1, 0.7),  # no light
+    (1, 0.2, 1000, 0, 1, 0.7),  # no light extinction
+    (1, 0.2, 1000, 1, 1, 0.7),  # total light extinction
+    (1, 0.2, 1000, 0.33, 1, 0.3),  # lower lai
+    (0, 0, 0, 0, 0, 0),  # all zero
+    (137.2, 0.37, 10379, 0.375, 0.872, 0.69)  # arbitrary case
+])
+def test_update_biomass(start, g, rad, ext, eff, lai):
     """
-    Description:
-        Unittest for calc_bio_AG() in routines/field/crop/biomass.py. Checks that the
-        BaseCrop attribute bio_AG is correctly set
+    Description: test that `update_biomass()` properly updates attributes
+
+    Args:
+        start: starting size of the plant
+        g: growth factor of the plant
+        rad: total incoming solar radiation
+        ext: light extinction coefficient
+        eff: light use efficiency of the plant
+        lai: actual leaf area index
     """
+    mc = mock_crop(biomass_actual=start, gamma_reg=g, d_biomass_max=0, d_biomass_actual=0, prev_biomass_actual=0,
+                   RUE=eff, kl=ext, LAI_actual=lai)
+    # expected values
+    incpt_light = intercept_radiation(rad, ext, lai)
+    check_limit = limit_growth(incpt_light, eff)
+    check_grow = grow_biomass(start, g, check_limit)
+    # execute function
+    update_biomass(mc, light=rad)
 
-    crop = mock_crop()
-    calc_bio_AG(crop)
-
-    assert pytest.approx(crop.bio_AG) == (1 - .38) * 4.6
+    assert [mc.d_biomass_max, mc.d_biomass_actual, mc.prev_biomass_actual, mc.biomass_actual] == \
+           [check_limit, check_grow["accumulated biomass"], start, check_grow["end"]]
 
 
-# the following tests are for the calc_gamma_wu() function
-def test_calc_gamma_wu_sets_ET_annual_correctly_ET_max_nonzero():
+@pytest.mark.parametrize("fr,bm", [
+    (0.5, 1),  # half biomass in roots
+    (0.5, 50),  # increase biomass
+    (0, 1),  # no roots
+    (1, 1),  # all roots
+    (-0.5, 1),  # negative roots?
+    (0.297, 132.1) # arbitrary
+])
+def test_calc_bio_AG(fr, bm):
     """
-    Description:
-        Unittest for calc_gamma_wu in routines/field/crop/biomass.py. Checks that the
-        Soil attribute ET_max_annual is correctly set when it is initially a non-zero value.
+    Description: Test `calc_bio_AG()`
 
+    Args:
+        fr: fraction of biomass in roots
+        bm: actual plant biomass
     """
-    crop = mock_crop()
-    soil = mock_soil()
-    calc_gamma_wu(soil, crop)
-
-    assert pytest.approx(soil.ET_annual) == 2.1 + 1.3
+    assert calc_bio_AG(fr, bm) == (1-fr)*bm
 
 
-def test_calc_gamma_wu_sets_gamma_wu_correctly_ET_max_nonzero():
+@pytest.mark.parametrize("fr,bm", [
+    (0.5, 1),  # half biomass in roots
+    (0.5, 50),  # increase biomass
+    (0, 1),  # no roots
+    (1, 1),  # all roots
+    (-0.5, 1),  # negative roots?
+    (0.297, 132.1)  # arbitrary
+])
+def test_update_bio_AG(fr, bm):
     """
-    Description:
-        Unittest for calc_gamma_wu in routines/field/crop/biomass.py. Checks that the
-        Soil attribute gamma_wu is correctly set when soil.ET_max_annual is initially a non-zero value.
+    Description: Test `update_bio_AG()`
 
+    Args:
+        fr: fraction of biomass in roots
+        bm: actual plant biomass
     """
-
-    crop = mock_crop()
-    soil = mock_soil()
-    calc_gamma_wu(soil, crop)
-
-    assert pytest.approx(crop.gamma_wu) == 100 * ((2.1 + 1.3) / 1.5)
+    mc = mock_crop(fr_root=fr, biomass_actual=bm, bio_AG=0)
+    update_bio_AG(mc)
+    assert mc.bio_AG == calc_bio_AG(fr, bm)
 
 
-def test_calc_gamma_wu_sets_all_correctly_ET_max_nonzero():
+@pytest.mark.parametrize("evap,trans", [
+    (0, 0),
+    (0, 1),
+    (1, 0),
+    (1, 0),
+    (-1, 0),
+    (0, -1),
+    (-1, -1),
+    (0.32, 1.357)
+])
+def test_calc_evapotrans(evap, trans):
     """
-    Description:
-        Blanket test to check that all values set in calc_gamma_wu() are set appropriately
-        when soil.ET_max_annual is initially a non-zero value.
+    Description: Test `calc_evapotrans()`
 
+    Args:
+        evap: evaporation
+        trans: transpiration
     """
-    crop = mock_crop()
-    soil = mock_soil()
-    calc_gamma_wu(soil, crop)
-
-    test_list = [
-        pytest.approx(soil.ET_annual) == 2.1 + 1.3,
-        pytest.approx(crop.gamma_wu) == 100 * ((2.1 + 1.3) / 1.5)
-    ]
-
-    assert all(test_list)
+    assert calc_evapotrans(evap, trans) == evap+trans
 
 
-def test_calc_gamma_wu_returns_zero_with_ET_max_as_zero():
+@pytest.mark.parametrize("evap,trans,evap_max,start_et", [
+    (1, 1, 1, 1),  # all 1
+    (0, 1, 1, 1),  # no evap
+    (1, 0, 1, 1),  # no trans
+    (1, 1, 0, 1),  # max = 0
+    (1, 1, 1, 0),  # start = 0
+    (0, 0, 0, 0),  # all 0
+    (0.48, 0.33, 1.33, 1.05),  # arbitrary values
+    (0.48, 0.33, 0, 1.05)  # arbitrary & max = 0
+])
+def test_update_evapotrans(evap, trans, evap_max, start_et):
     """
-    Description:
-        Unittest for calc_gamma_wu() in routines/field/crop/biomass.py. Checks that
-        the function returns 0 if the Soil attribute ET_max_annual is initially set to zero.
+    Description: Test `update_evapotrans()`
+
+    Args:
+        evap: evaporation
+        trans: transpiration
     """
-    crop = mock_crop()
-    soil = mock_soil(ET_max_annual=0.0)
+    ms = mock_soil(evap_annual=evap, trans_annual=trans, ET_max_annual=evap_max,
+                   ET_annual=start_et)
+    update_evapotrans(ms)
 
-    assert pytest.approx(calc_gamma_wu(soil, crop)) == 0
+    if evap_max != 0:  # conditional assertion
+        assert ms.ET_annual == evap + trans
+    else:
+        assert ms.ET_annual == start_et
 
 
-#calc_intercepted_radiation()
-def test_calc_intercepted_radiation_correctly_calculates_active_radiation():
-    """
-    Description:
-        Unittest for calc_intercepted_radiation() in routines/field/crop/biomass.py. Checks
-        that the function calculates and returns the correct value for intercepted radiation
-        on the provided day and year of the simulation
-    """
-    crop = mock_crop()
-    weather = mock_weather()
-    time = mock_time()
-
-    assert pytest.approx(calc_intercepted_radiation(crop,weather,time)) \
-                     == 0.5 * 3.5 * (1 - exp(-1 * 2.1 * 3.4))
-
-#calc_act_biomass()...assumes dependencies work properly
-def test_calc_act_biomass_correctly_calculates_d_biomass_max():
-    """
-    Description:
-        Unittest for calc_act_biomass in routines/field/crop/biomass.py. Checks
-        that the function correctly updates the BaseCrop attribute d_biomass_max.
-    """
-    crop = mock_crop()
-    weather = mock_weather()
-    time = mock_time()
-
-    H_phosyn = calc_intercepted_radiation(crop,weather,time)
-
-    calc_act_biomass(crop,weather,time)
-
-    assert pytest.approx(crop.d_biomass_max) == 1.5 * H_phosyn
-
-def test_calc_act_biomass_correctly_calculates_d_biomass_actual():
+@pytest.mark.parametrize("et,et_max", [
+    (1, 1),
+    (0, 0),
+    (0, 1),
+    (1, 0),
+    (0.38, 0),
+    (0, 0.29),
+    (0.38, 0.29)
+])
+def test_calc_water_def(et, et_max):
     """
     Description:
-        Unittest for calc_act_biomass in routines/field/crop/biomass.py. Checks
-        that the function correctly updates the BaseCrop attribute d_biomass_actual.
+
+    Args:
+        et: evapotranspiration
+        et_max: maximum evapotranspiration
     """
-    crop = mock_crop()
-    weather = mock_weather()
-    time = mock_time()
+    if et_max != 0:
+        assert calc_water_def(et, et_max) == 100 * (et / et_max)
+    else:
+        assert calc_water_def(et, et_max) == 0
 
-    H_phosyn = calc_intercepted_radiation(crop,weather,time)
-
-    calc_act_biomass(crop,weather,time)
-
-    assert pytest.approx(crop.d_biomass_actual) == (1.5 * H_phosyn) * .7
-
-def test_calc_act_biomass_correctly_calculates_prev_biomass_actual():
-    """
-    Description:
-        Unittest for calc_act_biomass in routines/field/crop/biomass.py. Checks
-        that the function correctly updates the BaseCrop attribute pre_biomass_actual.
-    """
-    crop = mock_crop()
-    weather = mock_weather()
-    time = mock_time()
-
-    calc_act_biomass(crop,weather,time)
-
-    assert pytest.approx(crop.prev_biomass_actual) == 4.6
-
-def test_calc_biomass_correctly_calculates_biomass_actual():
-    """
-    Description:
-        Unittest for calc_act_biomass in routines/field/crop/biomass.py. Checks
-        that the function correctly updates the BaseCrop attribute biomass_actual.
-    """
-    crop = mock_crop()
-    weather = mock_weather()
-    time = mock_time()
-
-    H_phosyn = calc_intercepted_radiation(crop,weather,time)
-
-    calc_act_biomass(crop,weather,time)
-
-    assert pytest.approx(crop.biomass_actual) == 4.6 + (1.5 * H_phosyn) * .7
-
-
-
+def test_update_all():
+    assert False  # TODO: I don't yet know how to properly mock the radiation object

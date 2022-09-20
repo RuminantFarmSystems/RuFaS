@@ -42,3 +42,6 @@ venv/
 # ignore R files
 .RData
 .RHistory
+
+# ignore pytest cache folder
+.pytest_cache/
