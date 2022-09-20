@@ -86,14 +86,15 @@ def test_limit_growth_errors(rad, eff):
         limit_growth(rad, eff)
 
 
-@pytest.mark.parametrize("start,g,rad,ext,eff", [
-    (0, 0.2, 1000, 0.33, 1),  # no initial size
-    (1, 0, 1000, 0.33, 1),  # no growth
-    (1, 0.2, 0, 0.33, 1),  # no light
-    (1, 0.2, 1000, 0, 1),  # no light extinction
-    (1, 0.2, 1000, 1, 1),  # total light extinction
-    (0, 0, 0, 0, 0),  # all zero
-    (137.2, 0.37, 10379, 0.375, 0.872)  # arbitrary case
+@pytest.mark.parametrize("start,g,rad,ext,eff,lai", [
+    (0, 0.2, 1000, 0.33, 1, 0.7),  # no initial size
+    (1, 0, 1000, 0.33, 1, 0.7),  # no growth
+    (1, 0.2, 0, 0.33, 1, 0.7),  # no light
+    (1, 0.2, 1000, 0, 1, 0.7),  # no light extinction
+    (1, 0.2, 1000, 1, 1, 0.7),  # total light extinction
+    (1, 0.2, 1000, 0.33, 1, 0.3),  # lower lai
+    (0, 0, 0, 0, 0, 0),  # all zero
+    (137.2, 0.37, 10379, 0.375, 0.872, 0.69)  # arbitrary case
 ])
 def test_update_biomass(start, g, rad, ext, eff, lai):
     """
