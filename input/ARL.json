@@ -1,8 +1,8 @@
 {
     "config":
     {
-        "start_date" : "1989:1",
-        "end_date" : "2019:365",
+        "start_date" : "2009:1",
+        "end_date" : "2010:365",
         "csv_dir": "output/CSVs/",
         "graphic_dir": "output/graphics/",
         "set_seed": false,

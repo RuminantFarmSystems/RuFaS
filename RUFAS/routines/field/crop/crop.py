@@ -293,10 +293,8 @@ def in_dormancy(crop, time):
 
     # The current day length is less than the day length threshold for dormancy
     if T_dl < T_dl_thr:
-        print('dormancy')
         return True
     else:
-        print('booo')
         return False
 
 def kill_non_scheduled_crops(crop_type,soil,field_management,time): 
