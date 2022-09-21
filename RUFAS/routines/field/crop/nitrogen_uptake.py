@@ -52,6 +52,7 @@ from RUFAS.routines.field.crop.nitrogen_fixation import calc_N_fixation
 
 # TODO: These functions should probably be moved to the base_crop class as member functions
 
+
 def update_all(soil, crop_type):
     """
     Description:
@@ -64,15 +65,16 @@ def update_all(soil, crop_type):
     """
 
     update_nfrac(crop_type)
-    calc_bio_N_opt(crop_type)
-    calc_N_up(crop_type)
-    calc_act_N_up_each_layer(soil, crop_type)
-    crop_type.N_act_up = sum(crop_type.act_N_up_each_layer)
-    calc_bio_N(soil, crop_type)
-    N_uptake(soil)
+    update_optimal_nitrogen(crop_type)
+    update_max_nitrogen_uptake(crop_type)
+
+    calc_act_N_up_each_layer(soil, crop_type)  # - update
+    crop_type.N_act_up = sum(crop_type.act_N_up_each_layer)  # - update
+    calc_bio_N(soil, crop_type)  # - update
+    N_uptake(soil)  # - update
 
 
-def calc_nfrac(phu_frac: float, nfrac_1: float, nfrac_3: float, shape1:float, shape2:float) -> float:
+def calc_nfrac(phu_frac: float, nfrac_1: float, nfrac_3: float, shape1: float, shape2: float) -> float:
     """
     Description:
         Calculates the fraction of nitrogen in the plant biomass on a given day.
@@ -91,8 +93,7 @@ def calc_nfrac(phu_frac: float, nfrac_1: float, nfrac_3: float, shape1:float, sh
     brackies = 1 - (phu_frac / (phu_frac + e_term))
     return (ndiff * brackies) + nfrac_3
 
-
-    ## TODO: This used to be calculated from the **previous** day's values but I don't understand why. - Clay
+    # TODO: This used to be calculated from the **previous** day's values but I don't understand why. - Clay
     # shape2 = calc_nshape2(heatfrac_half, heatfrac_full, nfrac_1, nfrac_2, nfrac_near, nfrac_3)
     # shape1 = calc_nshape1(heatfrac_half, nfrac_2, nfrac_1, nfrac_3)
     #
@@ -117,13 +118,14 @@ def update_nfrac(crop) -> None:
     Returns: Nothing. Instead, the crop.fr_N attribute is updated.
     """
     shapes = calc_nshapes(heatfrac_half=crop.fr_PHU_50, heatfrac_full=crop.fr_PHU_100, nfrac_1=crop.fr_n1,
-                          nfrac_2=crop.fr_n2, nfrac_near=crop.fr_n3ish ,nfrac_3=crop.fr_n3)
-    # TODO: using current PHU instead of previous
+                          nfrac_2=crop.fr_n2, nfrac_near=crop.fr_n3ish, nfrac_3=crop.fr_n3)
+    # TODO: using current PHU and biomass instead of previous
     if crop.biomass_actual == 0:
         crop.fr_N = 0
     else:
-        crop.fr_N = calc_nfrac(phu_frac=crop.fr_PHU, nfrac_1=crop.fr_n3, nfrac_3=crop.fr_n3,
+        crop.fr_N = calc_nfrac(phu_frac=crop.fr_PHU, nfrac_1=crop.fr_n1, nfrac_3=crop.fr_n3,
                                shape1=shapes[0], shape2=shapes[1])
+
 
 def calc_nshapes(heatfrac_half: float, heatfrac_full: float, nfrac_1: float, nfrac_2: float,
                  nfrac_near: float, nfrac_3: float) -> list[float]:
@@ -139,7 +141,6 @@ def calc_nshapes(heatfrac_half: float, heatfrac_full: float, nfrac_1: float, nfr
         nfrac_2: the fraction nitrogen in the biomass at stage 2
         nfrac_near: the fraction nitrogen in the biomass near maturity (stage 3)
         nfrac_3: the fraction nitrogen in the biomass at stage 3
-        shape2: the second shape coefficient
 
     Returns:
         a list of the first and second shape coefficients
@@ -159,7 +160,7 @@ def calc_nshapes(heatfrac_half: float, heatfrac_full: float, nfrac_1: float, nfr
     return [s1, s2]
 
 
-def calc_shape_log(heat_frac:float, nfrac_x:float, nfrac_3:float, nfrac_1:float) -> float:
+def calc_shape_log(heat_frac: float, nfrac_x: float, nfrac_3: float, nfrac_1: float) -> float:
     """
     Description:
     Calculate the log component of shape coefficient formulae
@@ -182,51 +183,101 @@ def calc_shape_log(heat_frac:float, nfrac_x:float, nfrac_3:float, nfrac_1:float)
         raise ValueError(frac_error_msg)
 
     # raise other errors # TODO: perhaps rather than throwing errors, we should set values to sensible edge case?
-    if nfrac_1 <= nfrac_3:  # leads to division by zero or ln(-x)
-        raise ValueError("nfrac_1 must be less than nfrac_3")
+    if nfrac_1 == nfrac_3:  # leads to divide by zero
+        raise ValueError("nfrac_1 must not be equivalent to nfrac_3")
 
-    if nfrac_x > nfrac_1 or nfrac_x == nfrac_1: # leads to ln(-x) or divide by 0
+    if nfrac_x == nfrac_1:  # leads to divide by zero
+        raise ValueError("nfrac_x must not be equivalent to nfrac_1")
+
+    if nfrac_x == nfrac_3:  # leads to log(0)
+        raise ValueError("nfrac_x must not be equivalent to nfrac_3")
+
+    if nfrac_x > nfrac_1 or nfrac_x == nfrac_1:  # leads to ln(-y) or divide by 0
         raise ValueError("nfrac_x must be less than nfrac_1")
 
-    if nfrac_x == 0: # leads to ln(0)
+    if nfrac_x == 0:  # leads to ln(0)
         raise ValueError("nfrac_x must be greater than 0")
     if heat_frac == 0:
         raise ValueError("heat_x must be greater than 0")
 
-    # calculate results
     denominator = 1 - ((nfrac_x - nfrac_3) / (nfrac_1 - nfrac_3))
+
+    if denominator > 1:  # leads to log(-y)
+        raise ValueError("the quantity (nfrac_x-nfrac_3)/(nfrac_1-nfrac_3) is negative." +
+                         "\nIs nfrac_x < nfrac_3 or nfrac_1 < nfrac_3?")
+    # calculate results
     return log((heat_frac / denominator) - heat_frac)
 
-def calc_bio_N_opt(crop_type):
+
+def calc_optimal_nitrogen(nfrac: float, biomass: float) -> float:
     """
     Description:
         Calculates the optimal mass of nitrogen stored in plant biomass.
        "pseudocode_crop" C.5.B.2
 
     Args:
-        crop_type
+        nfrac: the fraction of the plant biomass that is nitrogen
+        biomass: the biomass of the plant
+
+    Returns:
+        the optimal nitrogen mass
     """
 
-    crop_type.bio_N_opt = crop_type.fr_N * crop_type.biomass_actual
+    return nfrac * biomass
 
 
-def calc_N_up(crop_type):
+def update_optimal_nitrogen(crop) -> None:
     """
     Description:
-        Calculates potential nitrogen uptake.
+        Updates a crops optimal nitrogen based on its current biomass and nitrogen fraction
+
+    Args:
+        crop: an instance of a BaseCrop object
+
+    Returns:
+        Nothing. Instead, crop.bio_N_opt is updated
+    """
+    crop.bio_N_opt += calc_optimal_nitrogen(nfrac=crop.fr_N, biomass=crop.biomass_actual)
+
+
+def calc_max_nitrogen_uptake(optimal_nitrogen: float, previous_nitrogen: float,
+                             mature_nfrac: float, max_growth: float) -> float:
+    """
+    Description:
+        Calculates potential nitrogen uptake for a given day.
        "pseudocode_crop" C.5.B.3
 
     Args:
-        crop_type
+        optimal_nitrogen: the optimal mass of nitrogen stored in the plant on a given day
+        previous_nitrogen: the actual biomass of nitrogen in the plant on the previous day
+        mature_nfrac:, the nitrogen fraction of the plant at maturity
+        max_growth: the maximum potential biomass the plant can grow on a given day
+
+    Returns:
+        The potential nitrogen uptake for the day
     """
+    return min(optimal_nitrogen - previous_nitrogen, 4 * mature_nfrac * max_growth)
 
-    if crop_type.bio_N_opt - crop_type.bio_N < 0:
-        crop_type.N_up = 0
+
+def update_max_nitrogen_uptake(crop):
+    """
+    Description:
+        Update a plant's potential nitrogen uptake
+
+    Args:
+        crop: an instance of the BaseCrop class
+
+    Returns:
+        Nothing. Instead, updates crop.N_up
+    """
+    if crop.bio_N_opt - crop.bio_N < 0:
+        crop.N_up = 0
     else:
-        option1 = crop_type.bio_N_opt - crop_type.bio_N
-        option2 = 4 * crop_type.fr_n3 * crop_type.d_biomass_max
-
-        crop_type.N_up = min(option1, option2)
+        option1 = crop.bio_N_opt - crop.bio_N
+        option2 = 4 * crop.fr_n3 * crop.d_biomass_max
+        # TODO: previous nitrogen biomass needs to be added to the crop class (.prev_bio_N)
+        crop.N_up = calc_max_nitrogen_uptake(optimal_nitrogen=crop.bio_N_opt, previous_nitrogen=crop.prev_bio_N,
+                                             mature_nfrac=crop.fr_n3, max_growth=crop.d_biomass_max)
 
 
 def calc_act_N_up_each_layer(soil, crop_type):
