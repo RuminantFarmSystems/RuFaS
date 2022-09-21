@@ -732,34 +732,29 @@ class AnimalManagement:
         for pen in self.all_pens:
             pen.calc_avg_growth()
 
+    def gather_cow_class_history(self, cow_class):
+        """
+        Gathers all the pen history data for a given cow class type. Checks the current pen
+        and pen composition of all animals of a given cow class, before then update the
+        pen history for that class using the update_pen_history() method
+
+        Args:
+            cow_class: instance of whatever cow type's pen history is being gathered
+        """
+        for cow in cow_class:
+            current_pen = self.id_pen[cow_class.id]
+            classes_in_pen = self.all_pens[current_pen].classes_in_pen
+            cow_class.update_pen_history(current_pen, self.simulation_day, classes_in_pen)
+
     def record_pen_history(self):
         """
         Records the pen history of all of the animals.
         """
-        for calf in self.calves:
-            curr_pen = self.id_pen[calf.id]
-            classes_in_pen = self.all_pens[curr_pen].classes_in_pen
-            calf.update_pen_history(curr_pen, self.simulation_day, classes_in_pen)
-
-        for heiferI in self.heiferIs:
-            curr_pen = self.id_pen[heiferI.id]
-            classes_in_pen = self.all_pens[curr_pen].classes_in_pen
-            heiferI.update_pen_history(curr_pen, self.simulation_day, classes_in_pen)
-
-        for heiferII in self.heiferIIs:
-            curr_pen = self.id_pen[heiferII.id]
-            classes_in_pen = self.all_pens[curr_pen].classes_in_pen
-            heiferII.update_pen_history(curr_pen, self.simulation_day, classes_in_pen)
-
-        for heiferIII in self.heiferIIIs:
-            curr_pen = self.id_pen[heiferIII.id]
-            classes_in_pen = self.all_pens[curr_pen].classes_in_pen
-            heiferIII.update_pen_history(curr_pen, self.simulation_day, classes_in_pen)
-
-        for cow in self.cows:
-            curr_pen = self.id_pen[cow.id]
-            classes_in_pen = self.all_pens[curr_pen].classes_in_pen
-            cow.update_pen_history(curr_pen, self.simulation_day, classes_in_pen)
+        self.gather_cow_class_history(self.calves)
+        self.gather_cow_class_history(self.heiferIs)
+        self.gather_cow_class_history(self.heiferIIs)
+        self.gather_cow_class_history(self.heiferIIIs)
+        self.gather_cow_class_history(self.cows)
 
     @staticmethod
     def _calc_p_comp(animals):
