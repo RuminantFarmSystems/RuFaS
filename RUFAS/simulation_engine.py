@@ -4,7 +4,8 @@ import sys
 import time as timer
 from pathlib import Path
 from RUFAS import routines, errors
-from RUFAS.classes import Config, State, Time
+from RUFAS.classes import Config, State
+from RUFAS.time import Time
 from RUFAS.output_handler import OutputHandler
 import random
 import numpy

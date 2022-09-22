@@ -33,7 +33,7 @@ from RUFAS.routines.manure_management.reception_pits.reception_pit_output import
 from RUFAS.routines.manure_management.manure_treatments.treatment_classes import BaseManureTreatment, TreatmentFactory
 from RUFAS.routines.manure_management.manure_treatments.treatment_output import TreatmentOutput
 from RUFAS.weather import Weather
-from RUFAS.classes import Time
+from RUFAS.time import Time
 
 DailyOutputType = Tuple[SimplePen,
                         ManureHandlerOutput,

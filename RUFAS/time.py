@@ -1,0 +1,80 @@
+class Time:
+    def __init__(self, config):
+        """
+        Description:
+            This object is responsible for creating and tracking time in the simulation.
+        Args:
+            config: instance of the Config class containing information necessary
+                to initialize time
+        """
+
+        calendar_year = config.start_year
+        # number of years
+        years = config.years
+
+        self.start_year = calendar_year
+        self.calendar_year = calendar_year
+        self.years = years
+        self.year = 1  # current year
+        self.leap_year_length = config.leap_year_length
+        self.year_length = config.year_length
+
+        # finds the first non-null day of the first year
+        for i in range(0, len(self.years[0])):
+            if self.years[0][i] is None:
+                continue
+            else:
+                self.day = self.years[0][i]
+                break
+
+    def to_str(self):
+        """
+        Description:
+            Returns a string representation of the current time.
+        Returns:
+            str: a String representation of the current time in the simulation
+                in the format "Year: <year> Day: <day>"
+        """
+
+        return "Year: {} Day: {}".format(self.year, self.day)
+
+    def advance(self):
+        """
+        Description:
+            Advances the time in the simulation by 1 day
+            Automatically detects end of months and years
+        """
+
+        if self.end_year():
+            self.day = 1
+            self.year += 1
+            self.calendar_year += 1
+        else:
+            self.day += 1
+
+    def end_year(self):
+        """
+        Description:
+            Returns a bool signifying the end of a year.
+        Returns:
+            bool: True if it is the end of a year, False otherwise
+        """
+
+        # if the day is > the length of the current year, then the year is over
+        return self.day > len(self.years[self.year - 1])
+
+    def end_simulation(self):
+        """
+        Description:
+            Checks whether the simulation has ended
+        Returns:
+            bool: True if the simulation has ended, false otherwise
+        """
+
+        # midyear end date adjusted
+        if self.year > len(self.years):
+            return True
+        elif self.year == len(self.years):
+            return self.day > len(self.years[self.year - 1])
+
+        return False

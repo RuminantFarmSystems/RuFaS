@@ -12,7 +12,7 @@ from RUFAS.routines.manure_management.misc.simple_pen import SimplePen
 from RUFAS.routines.manure_management.reception_pits.reception_pit_output import ReceptionPitOutput
 from RUFAS.routines.manure_management.manure_treatments.treatment_output import TreatmentOutput
 from RUFAS.weather import Weather
-from RUFAS.classes import Time
+from RUFAS.time import Time
 
 
 class TreatmentEnum(ExtendedEnum):
@@ -116,7 +116,7 @@ class AnaerobicDigestion(BaseManureTreatment):
                  weather: Weather,
                  time:Time,
                  treatment_init_data: AnaerobicDigestionInitData):
-        super().__init__(pen, manure_separator, weather, treatment_init_data)
+        super().__init__(pen, manure_separator, weather, time, treatment_init_data)
         # self.weather_data = SimpleWeather()
 
         handler = self.manure_handler.last_output
@@ -511,7 +511,7 @@ class SlurryStorageUnderfloor(BaseManureTreatment):
                  time:Time,
                  treatment_init_data: TreatmentInitData,
                  storage_time_period=120.0):
-        super().__init__(pen, manure_separator, weather, treatment_init_data)
+        super().__init__(pen, manure_separator, weather, time, treatment_init_data)
 
         self.storage_time_period = storage_time_period  # days
         self.simulation_day=0
@@ -528,7 +528,7 @@ class SlurryStorageUnderfloor(BaseManureTreatment):
         handler = self.manure_handler.last_output
         daily_output = TreatmentOutput(
                 TAN_s=handler.TAN_s * (1 - self.treatment_init_data.TAN_removal_efficiency),
-                urea=handler.urea,
+                # urea=handler.U,
                 manure_nitrogen=handler.manure_nitrogen * (1 - self.treatment_init_data.N_removal_efficiency),
                 TSd=handler.TSd * (1 - self.treatment_init_data.TS_removal_efficiency),
                 VS_total=handler.VS_total * (1 - self.treatment_init_data.VS_removal_efficiency),
@@ -707,7 +707,6 @@ class TreatmentFactory:
                      weather: Weather,
                      time:Time) -> List[BaseManureTreatment]:
         enum_to_class: Dict[TreatmentEnum, Tuple[Type[BaseManureTreatment], Type[TreatmentInitData]]] = {
-            TreatmentEnum.STORAGE_POND: (StoragePond, StoragePondInitData),
             TreatmentEnum.ANAEROBIC_DIGESTION: (AnaerobicDigestion, AnaerobicDigestionInitData),
             TreatmentEnum.ANAEROBIC_LAGOON: (AnaerobicLagoon, AnaerobicLagoonInitData),
             TreatmentEnum.SLURRY_STORAGE_UNDERFLOOR: (SlurryStorageUnderfloor, SlurryStorageInitData),
