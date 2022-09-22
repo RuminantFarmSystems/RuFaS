@@ -223,7 +223,7 @@ class AnimalManagement:
         # QUESTION: Should this be moved to init_pens?
         if len(pen_data) > 0:
             self.init_nutrient_rqmts(weather, time, feed)
-            self.pen_allocation()
+            self.allocate_all_pens()
 
     @staticmethod
     def _print_animal_num_warnings(herd_data):
@@ -446,7 +446,86 @@ class AnimalManagement:
                                                     feed, temp, pen_population_before_additions[pen.id])
             # self.all_pens[pen].animals_in_pen.append(calf)
 
-    def pen_allocation(self):
+    def allocate_calf_pens(self, calf_pens):
+        stalls = [pen.num_stalls for pen in calf_pens]
+        # density per-pen for even distribution across pens for calves
+        density = len(self.calves) / sum(stalls)
+        group = []
+        for calf in self.calves:
+            if len(group) / calf_pens[0].num_stalls <= density:
+                group.append(calf)
+            else:
+                # condition to make sure all animals are grouped
+                if len(calf_pens) > 1:
+                    calf_pens[0].update_animals(group, Pen.AnimalCombination.CALF)
+                    calf_pens.pop(0)
+                    group = [calf]
+        # final pen for this class
+        calf_pens[0].update_animals(group, Pen.AnimalCombination.CALF)
+
+    def allocate_growing_pens(self, growing_pens):
+        stalls = [pen.num_stalls for pen in growing_pens]
+        # density per-pen for even distribution
+        density = (len(self.heiferIs) + len(self.heiferIIs)) / sum(stalls)
+        group = []
+        # grouping by heiferIs first
+        for hef1 in self.heiferIs:
+            if len(group) / growing_pens[0].num_stalls <= density:
+                group.append(hef1)
+            else:
+                growing_pens[0].update_animals(group, Pen.AnimalCombination.GROWING)
+                growing_pens.pop(0)
+                group = [hef1]
+        # continuing with heiferIIs
+        for hef2 in self.heiferIIs:
+            if len(group) / growing_pens[0].num_stalls <= density:
+                group.append(hef2)
+            else:
+                if len(growing_pens) > 1:
+                    growing_pens[0].update_animals(group, Pen.AnimalCombination.GROWING)
+                    growing_pens.pop(0)
+                    group = [hef2]
+        # final pen for this class
+        growing_pens[0].update_animals(group, Pen.AnimalCombination.GROWING)
+
+
+    def allocate_close_up_pens(self, dry_cows, close_up_pens):
+        stalls = [pen.num_stalls for pen in close_up_pens]
+        # density per-pen for even distribution
+        density = (len(self.heiferIIIs) + len(dry_cows)) / sum(stalls)
+        group = []
+        # grouping by heiferIIs first
+        for hef3 in self.heiferIIIs:
+            if len(group) / close_up_pens[0].num_stalls <= density:
+                group.append(hef3)
+            else:
+                close_up_pens[0].update_animals(group, Pen.AnimalCombination.CLOSE_UP)
+                close_up_pens.pop(0)
+                group = [hef3]
+        # continuing with dry cows
+        for cow in dry_cows:
+            if len(group) / close_up_pens[0].num_stalls <= density:
+                group.append(cow)
+            else:
+                if len(close_up_pens) > 1:
+                    close_up_pens[0].update_animals(group, Pen.AnimalCombination.CLOSE_UP)
+                    close_up_pens.pop(0)
+                    group = [cow]
+        # final pen for this class
+        close_up_pens[0].update_animals(group, Pen.AnimalCombination.CLOSE_UP)
+
+    def allocate_lactating_cow_pens(self, lactating_cows, lac_cow_pens):
+        stalls = [pen.num_stalls for pen in lac_cow_pens]
+        # density per-pen for even distribution
+        density = len(lactating_cows) / sum(stalls)
+        # Grouping for Lactating Cows
+        pen_grouping = grouping(lactating_cows, lac_cow_pens, density)
+        # Assigning Lactating Cows to Pens based on the grouping output
+        for key in pen_grouping:
+            lac_cow_pens[0].update_animals(pen_grouping[key], Pen.AnimalCombination.LAC_COW)
+            lac_cow_pens.remove(lac_cow_pens[0])
+
+    def allocate_all_pens(self):
         # TODO: Refactor this function, currently nearly 200 lines long
         # TODO
         # -mark pens after grouping
@@ -560,84 +639,14 @@ class AnimalManagement:
         # Assigning animals (sans Lactating Cows) to appropriate pens
         ###########################
         # Calf pen allocation
-        stalls = [pen.num_stalls for pen in calf_pens]
-        # density per-pen for even distribution across pens for calves
-        density = len(self.calves) / sum(stalls)
-        group = []
-        for calf in self.calves:
-            if len(group) / calf_pens[0].num_stalls <= density:
-                group.append(calf)
-            else:
-                # condition to make sure all animals are grouped
-                if len(calf_pens) > 1:
-                    calf_pens[0].update_animals(group, Pen.AnimalCombination.CALF)
-                    calf_pens.pop(0)
-                    group = [calf]
-        # final pen for this class
-        calf_pens[0].update_animals(group, Pen.AnimalCombination.CALF)
-
+        self.allocate_calf_pens(calf_pens)
         # Growing Pen Allocation
-        stalls = [pen.num_stalls for pen in growing_pens]
-        # density per-pen for even distribution
-        density = (len(self.heiferIs) + len(self.heiferIIs)) / sum(stalls)
-        group = []
-        # grouping by heiferIs first
-        for hef1 in self.heiferIs:
-            if len(group) / growing_pens[0].num_stalls <= density:
-                group.append(hef1)
-            else:
-                growing_pens[0].update_animals(group, Pen.AnimalCombination.GROWING)
-                growing_pens.pop(0)
-                group = [hef1]
-        # continuing with heiferIIs
-        for hef2 in self.heiferIIs:
-            if len(group) / growing_pens[0].num_stalls <= density:
-                group.append(hef2)
-            else:
-                if len(growing_pens) > 1:
-                    growing_pens[0].update_animals(group, Pen.AnimalCombination.GROWING)
-                    growing_pens.pop(0)
-                    group = [hef2]
-        # final pen for this class
-        growing_pens[0].update_animals(group, Pen.AnimalCombination.GROWING)
-
+        self.allocate_growing_pens(growing_pens)
         # Close_up Pen Allocation
-        stalls = [pen.num_stalls for pen in close_up_pens]
-        # density per-pen for even distribution
-        density = (len(self.heiferIIIs) + len(dry_cows)) / sum(stalls)
-        group = []
-        # grouping by heiferIIs first
-        for hef3 in self.heiferIIIs:
-            if len(group) / close_up_pens[0].num_stalls <= density:
-                group.append(hef3)
-            else:
-                close_up_pens[0].update_animals(group, Pen.AnimalCombination.CLOSE_UP)
-                close_up_pens.pop(0)
-                group = [hef3]
-        # continuing with dry cows
-        for cow in dry_cows:
-            if len(group) / close_up_pens[0].num_stalls <= density:
-                group.append(cow)
-            else:
-                if len(close_up_pens) > 1:
-                    close_up_pens[0].update_animals(group, Pen.AnimalCombination.CLOSE_UP)
-                    close_up_pens.pop(0)
-                    group = [cow]
-        # final pen for this class
-        close_up_pens[0].update_animals(group, Pen.AnimalCombination.CLOSE_UP)
-
+        self.allocate_close_up_pens(dry_cows, close_up_pens)
+        # Lactating Cow Pen Allocation
+        self.allocate_lactating_cow_pens(lactating_cows)
         #####################
-        # Pen Allocation for lactating cows
-        #####################
-        stalls = [pen.num_stalls for pen in lac_cow_pens]
-        # density per-pen for even distribution
-        density = len(lactating_cows) / sum(stalls)
-        # Grouping for Lactating Cows
-        pen_grouping = grouping(lactating_cows, lac_cow_pens, density)
-        # Assigning Lactating Cows to Pens based on the grouping output
-        for key in pen_grouping:
-            lac_cow_pens[0].update_animals(pen_grouping[key], Pen.AnimalCombination.LAC_COW)
-            lac_cow_pens.remove(lac_cow_pens[0])
 
         self.fully_update_id_pen()
 
@@ -690,34 +699,29 @@ class AnimalManagement:
         for pen in self.all_pens:
             pen.calc_avg_growth()
 
+    def gather_cow_class_history(self, cow_class):
+        """
+        Gathers all the pen history data for a given cow class type. Checks the current pen
+        and pen composition of all animals of a given cow class, before then update the
+        pen history for that class using the update_pen_history() method
+
+        Args:
+            cow_class: instance of whatever cow type's pen history is being gathered
+        """
+        for cow in cow_class:
+            current_pen = self.id_pen[cow_class.id]
+            classes_in_pen = self.all_pens[current_pen].classes_in_pen
+            cow_class.update_pen_history(current_pen, self.simulation_day, classes_in_pen)
+
     def record_pen_history(self):
         """
         Records the pen history of all of the animals.
         """
-        for calf in self.calves:
-            curr_pen = self.id_pen[calf.id]
-            classes_in_pen = self.all_pens[curr_pen].classes_in_pen
-            calf.update_pen_history(curr_pen, self.simulation_day, classes_in_pen)
-
-        for heiferI in self.heiferIs:
-            curr_pen = self.id_pen[heiferI.id]
-            classes_in_pen = self.all_pens[curr_pen].classes_in_pen
-            heiferI.update_pen_history(curr_pen, self.simulation_day, classes_in_pen)
-
-        for heiferII in self.heiferIIs:
-            curr_pen = self.id_pen[heiferII.id]
-            classes_in_pen = self.all_pens[curr_pen].classes_in_pen
-            heiferII.update_pen_history(curr_pen, self.simulation_day, classes_in_pen)
-
-        for heiferIII in self.heiferIIIs:
-            curr_pen = self.id_pen[heiferIII.id]
-            classes_in_pen = self.all_pens[curr_pen].classes_in_pen
-            heiferIII.update_pen_history(curr_pen, self.simulation_day, classes_in_pen)
-
-        for cow in self.cows:
-            curr_pen = self.id_pen[cow.id]
-            classes_in_pen = self.all_pens[curr_pen].classes_in_pen
-            cow.update_pen_history(curr_pen, self.simulation_day, classes_in_pen)
+        self.gather_cow_class_history(self.calves)
+        self.gather_cow_class_history(self.heiferIs)
+        self.gather_cow_class_history(self.heiferIIs)
+        self.gather_cow_class_history(self.heiferIIIs)
+        self.gather_cow_class_history(self.cows)
 
     @staticmethod
     def _calc_p_comp(animals):
@@ -799,7 +803,7 @@ class AnimalManagement:
             if self.end_ration_interval():
                 self.calc_nutrient_rqmts(feed, temp)  # per animal
                 self.clear_pens()
-                self.pen_allocation()
+                self.allocate_all_pens()
                 self.calc_ration(feed)  # per pen
                 self.calc_avg_growth()  # per pen
 
