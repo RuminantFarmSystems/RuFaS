@@ -52,7 +52,7 @@ def test_error_calc_shape_log(heat, nfrac, n3, n1):
 ])
 def test_calc_nshape2(hh, hf, n1, n2, nn, n3):
     """Description: check that the shape parameters are correctly calculated by calc_nshapes"""
-    observe = calc_nshapes(heatfrac_half=hh, heatfrac_full=hf, nfrac_1=n1, nfrac_2=n2, nfrac_near=nn, nfrac_3=n3)
+    observe = calc_shape_parameters(heatfrac_half=hh, heatfrac_full=hf, nfrac_1=n1, nfrac_2=n2, nfrac_near=nn, nfrac_3=n3)
     expect_2 = (calc_shape_log(hh, n2, n3, n1) - calc_shape_log(hf, nn, n3, n1)) / (hf - hh)
     expect_1 = calc_shape_log(hh, n2, n3, n1) + (expect_2 * hh)
     assert observe == [expect_1, expect_2]
@@ -67,7 +67,7 @@ def test_calc_nshape2(hh, hf, n1, n2, nn, n3):
     (0.789, 0.587, 0.501, 0.138, 0.920),  # arbitrary
 ])
 def test_calc_nfrac(p, n1, n3, shape1, shape2):
-    observe = calc_nfrac(phu_frac=p, nfrac_1=n1, nfrac_3=n3, shape1=shape1, shape2=shape2)
+    observe = calc_nitrogen_fraction(phu_frac=p, nfrac_1=n1, nfrac_3=n3, shape1=shape1, shape2=shape2)
     expect = (n1 - n3) * (1 - (p / (p + exp(shape1 + shape2*p)))) + n3
     assert observe == expect
 
@@ -84,17 +84,17 @@ def test_calc_nfrac(p, n1, n3, shape1, shape2):
     (0.782, 0.533, 0.440, 0.331, 0.002, 0.975, 0.987, 1357.94),  # arbitrary
 ])
 def test_update_nfrac(heatfrac, n1, n2, n3star, n3, phu_half, phu_full, bmass):
-
+    """test that nitrogen fraction is properly updated by update_nfrac()"""
     if bmass == 0:
         expect = 0
     else:
-        shapes = calc_nshapes(heatfrac_half=phu_half, heatfrac_full=phu_full, nfrac_1=n1, nfrac_2=n2,
-                              nfrac_near=n3star, nfrac_3=n3)
-        expect = calc_nfrac(phu_frac=heatfrac, nfrac_1=n1, nfrac_3=n3, shape1=shapes[0], shape2=shapes[1])
+        shapes = calc_shape_parameters(heatfrac_half=phu_half, heatfrac_full=phu_full, nfrac_1=n1, nfrac_2=n2,
+                                       nfrac_near=n3star, nfrac_3=n3)
+        expect = calc_nitrogen_fraction(phu_frac=heatfrac, nfrac_1=n1, nfrac_3=n3, shape1=shapes[0], shape2=shapes[1])
 
     mc = mock_crop(biomass_actual=bmass, prev_biomass_actual=bmass, fr_PHU_50=phu_half, fr_PHU_100=phu_full,
                    fr_PHU=heatfrac, prev_fr_PHU=heatfrac, fr_n1=n1, fr_n2=n2, fr_n3ish=n3star, fr_n3=n3)
-    update_nfrac(mc)
+    update_nitrogen_fraction(mc)
     observe = mc.fr_N
 
     assert observe == expect
@@ -126,11 +126,44 @@ def test_calc_optimial_nitrogen(nstart, nf, bm):
     assert mc.bio_N_opt == nstart + (nf*bm)
 
 
-def test_calc_max_nitrogen_uptake():
+@pytest.mark.parametrize("opt,prev,mat,growth", [
+    (1, 1, 1, 1),  # all 1
+    (0, 1, 1, 1),  # optimal N = 0
+    (1, 0, 1, 1),  # previous N = 0
+    (1, 1, 0, 1),  # mature N fraction = 0
+    (1, 1, 1, 0),  # maximum growth = 0
+    (0, 0, 0, 0),  # all 0
+    (189.4, 105.01, 0.355, 233.59),  # arbitrary (first route) min(84, 331)
+    (189.4, 105.01, 0.355, 23.359),  # arbitrary (second route) min(84, 33.1)
+])
+def test_calc_max_nitrogen_uptake(opt, prev, mat, growth):
     """test that potential nitrogen uptake is correctly calculated by calc_max_nitrogen_uptake()"""
-    assert False
+    expect = min(opt - prev, 4*mat*growth)
+    observe = calc_nitrogen_demand(demand=opt, nitrogen_start=prev, mature_nfrac=mat, max_growth=growth)
+    assert expect == observe
 
 
-def test_update_max_nitrogen_uptake():
-    """check that potential nitrogen uptake is correctly uptated for a plant by update_max_nitrogen_uptake()"""
+@pytest.mark.parametrize("opt_n,prev_n,mat_nfrac,grow_max", [
+    (1, 1, 1, 1),  # all 1
+    (0, 1, 1, 1),  # optimal N = 0
+    (1, 0, 1, 1),  # previous N = 0
+    (1, 1, 0, 1),  # mature N fraction = 0
+    (1, 1, 1, 0),  # maximum growth = 0
+    (0, 0, 0, 0),  # all 0
+    (189.4, 105.01, 0.355, 233.59),  # arbitrary (first route) min(84, 331)
+    (189.4, 105.01, 0.355, 23.359),  # arbitrary (second route) min(84, 33.1)
+    (189.4, 189.4, 0.355, 23.359),  # opt_n = prev_n
+])
+def test_update_max_nitrogen_uptake(opt_n, prev_n, mat_nfrac, grow_max):
+    """check that potential nitrogen uptake is correctly updated for a plant by update_max_nitrogen_uptake()"""
+    mc = mock_crop(bio_N_opt=opt_n, prev_bio_N=prev_n, fr_n3=mat_nfrac, d_biomass_max=grow_max, N_up=0)
+    update_nitrogen_demand(mc)
+    if opt_n - prev_n < 0:
+        expect = 0
+    else:
+        expect = calc_nitrogen_demand(opt_n, prev_n, mat_nfrac, grow_max)
+    assert mc.N_up == expect
+
+
+def test_update_all():
     assert False
