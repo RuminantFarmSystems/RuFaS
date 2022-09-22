@@ -208,60 +208,17 @@ class AnimalManagement:
             time: instance of the Time class defined in classes.py
         """
 
-        animal_keys = {"calf_num", "heiferI_num", "heiferII_num", "heiferIII_num", "cow_num"}
-        animal_nums = dict()
-
-        for key in animal_keys:
-            animal_nums[key] = herd_data[key]
-
-        calf_num = herd_data['calf_num']
-        heiferI_num = herd_data['heiferI_num']
-        heiferII_num = herd_data['heiferII_num']
-        heiferIII_num = herd_data['heiferIII_num']
-        cow_num = herd_data['cow_num']
-        replace_num = herd_data['replace_num']
-        herd_num = herd_data['herd_num']
-        breed = herd_data['breed']
-
         # QUESTION: what do calf_num, heifer_num, etc do?
-        # if herd_num ==
-
         # QUESTION: what is the point of simulate_animals?
 
-        if herd_num == 0:
-            self.simulate_animals = False
-            if not calf_num == 0:
-                print("Warning: herd_num is 0, but calf_num is not. "
-                      "Setting calf_num = 0.")
-                calf_num = 0
-            if not heiferI_num == 0:
-                print("Warning: herd_num is 0, but heiferI_num is not. "
-                      "Setting heiferI_num = 0.")
-                heiferI_num = 0
-            if not heiferII_num == 0:
-                print("Warning: herd_num is 0, but heiferII_num is not. "
-                      "Setting heiferII_num = 0.")
-                heiferII_num = 0
-            if not heiferIII_num == 0:
-                print("Warning: herd_num is 0, but heiferIII_num is not. "
-                      "Setting heiferIII_num = 0.")
-                heiferIII_num = 0
-            if not cow_num == 0:
-                print("Warning: herd_num is 0, but cow_num is not. "
-                      "Setting cow_num = 0.")
-                cow_num = 0
-        else:
-            self.simulate_animals = True
-
-        herd_init = herd_data['herd_init']
+        self.simulate_animals = herd_data['herd_num'] != 0
 
         if self.simulate_animals:
+            herd_data['config'] = config
             self.calves, self.heiferIs, self.heiferIIs, self.heiferIIIs, self.cows \
-                = self.life_cycle_manager.initialize_herd(herd_num, calf_num,
-                                                          heiferI_num, heiferII_num,
-                                                          heiferIII_num, cow_num,
-                                                          replace_num, herd_init,
-                                                          breed, config)
+                = self.life_cycle_manager.initialize_herd(**herd_data)
+        else:
+            AnimalManagement._print_animal_num_warnings(herd_data)
 
         # QUESTION: Should this be moved to init_pens?
         if len(pen_data) > 0:
@@ -269,7 +226,8 @@ class AnimalManagement:
             self.pen_allocation()
 
     @staticmethod
-    def print_animal_num_warnings(animal_keys, herd_data):
+    def _print_animal_num_warnings(herd_data):
+        animal_keys = {"calf_num", "heiferI_num", "heiferII_num", "heiferIII_num", "cow_num"}
         for key in animal_keys:
             if herd_data[key] == 0:
                 print("Warning: herd_num = 0, but", key, "!= 0.")
