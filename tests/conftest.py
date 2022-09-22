@@ -2,6 +2,8 @@ from pytest import fixture
 from unittest.mock import Mock, MagicMock
 from pytest_mock import MockerFixture
 from tkinter.ttk import Separator
+from RUFAS.classes import Time
+from RUFAS.weather import Weather
 
 from RUFAS.routines.animal.life_cycle.calf import Calf
 from RUFAS.routines.animal.life_cycle.cow import Cow
@@ -15,7 +17,6 @@ from RUFAS.routines.manure_management.manure_separators.manure_separator_classes
 from RUFAS.routines.manure_management.manure_treatments.treatment_classes import AnaerobicDigestion, AnaerobicLagoon, TreatmentEnum
 from RUFAS.routines.manure_management.manure_treatments.treatment_classes import AnaerobicDigestionInitData, AnaerobicLagoonInitData
 from RUFAS.routines.manure_management.misc.daily_variables import DailyVariables
-
 
 @fixture
 def default_daily_vars_obj() -> DailyVariables:
@@ -53,7 +54,6 @@ def pen0(mocker: MockerFixture, cow: Cow) -> Pen:
         'CH4_manure': 0
     }
     return p0
-
 
 @fixture
 def simple_pen0(pen0: Pen) -> SimplePen:
@@ -97,11 +97,21 @@ def mock_handler(mocker:MockerFixture, mock_handler_output)->BaseManureHandler:
     manure_handler = mocker.MagicMock(spec=BaseManureHandler)
     manure_handler.last_output = mock_handler_output
     return manure_handler
+@fixture
+def mock_time(mocker:MockerFixture)->Time:
+    time = mocker.MagicMock(spec=Time)
+    return time
 
 @fixture
-def mock_separator(mocker:MockerFixture,mock_reception_pit)->BaseManureSeparator:
+def mock_weather(mocker:MockerFixture)->Weather:
+    weather = mocker.MagicMock(spec=Weather)
+    return weather
+
+@fixture
+def mock_separator(mocker:MockerFixture,mock_reception_pit,mock_handler)->BaseManureSeparator:
     manure_separator = mocker.MagicMock(spec=BaseManureSeparator)
     manure_separator.reception_pit = mock_reception_pit
+    manure_separator.manure_handler = mock_handler
     return manure_separator
 
 @fixture
@@ -149,12 +159,13 @@ def mock_lagoon_init_data(mocker:MockerFixture)->AnaerobicLagoonInitData:
     return init_data
  
 @fixture
-def ad_fixture(pen0,mock_handler,mock_separator,mock_ad_init_data):
+def ad_fixture(pen0,mock_separator,mock_ad_init_data,mock_time,mock_weather):
     pen= pen0
-    manure_handler= mock_handler
     manure_separator= mock_separator
     init_data = mock_ad_init_data
-    ad = AnaerobicDigestion(pen=pen,manure_handler=manure_handler,manure_separator=manure_separator, \
+    time=mock_time
+    weather=mock_weather
+    ad = AnaerobicDigestion(pen=pen,manure_separator=manure_separator, time=time,weather=weather,\
         treatment_init_data=init_data)
     return ad
 
@@ -190,13 +201,14 @@ def get_expected_values_anaerobic_digestion(mock_handler_output):
     return expected_values
 
 @fixture
-def al_fixture(pen0,mock_handler,mock_separator,mock_lagoon_init_data):
+def al_fixture(pen0,mock_separator,mock_lagoon_init_data,mock_time,mock_weather):
     pen= pen0
-    manure_handler= mock_handler
     manure_separator= mock_separator
     init_data = mock_lagoon_init_data
-    al = AnaerobicLagoon(pen=pen,manure_handler=manure_handler,manure_separator=manure_separator, \
-        treatment_init_data=init_data,storage_time_period=365,precip_input=0.0,freeboard_input=1.0)
+    time=mock_time
+    weather=mock_weather
+    al = AnaerobicLagoon(pen=pen,manure_separator=manure_separator,time=time,weather=weather, \
+        treatment_init_data=init_data)
     return al
 
 @fixture
