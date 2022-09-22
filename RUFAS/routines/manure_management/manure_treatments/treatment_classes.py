@@ -20,14 +20,15 @@ class TreatmentEnum(ExtendedEnum):
     Enumerates available treatment options.
     """
 
-    SLURRY_STORAGE_UNDERFLOOR = auto()
-    SLURRY_STORAGE_OUTDOOR = auto()
-
+    STORAGE_POND = auto()
     ANAEROBIC_LAGOON = auto()
     ANAEROBIC_DIGESTION = auto()
     ANAEROBIC_DIGESTION_AND_LAGOON = auto()
 
-    DEFAULT = SLURRY_STORAGE_UNDERFLOOR
+    SLURRY_STORAGE_UNDERFLOOR = auto()
+    SLURRY_STORAGE_OUTDOOR = auto()
+    STORAGE_PIT = STORAGE_POND
+    DEFAULT = STORAGE_POND
 
 
 class BaseManureTreatment:
@@ -63,6 +64,8 @@ class BaseManureTreatment:
         self.time = time
         self.prev_output = None
         self.all_output: List[TreatmentOutput] = []
+        self.accumulated_output=TreatmentOutput()
+        self.simulation_day=0
 
     def reset_daily_variables(self):
         pass
@@ -76,11 +79,17 @@ class BaseManureTreatment:
         """
         return self.all_output[-1] if len(self.all_output) > 0 else None
 
-    def update(self, simulation_day=0,prev_treatment_output: Optional[TreatmentOutput] = None) -> TreatmentOutput:
+    def update(self, prev_treatment_output: Optional[TreatmentOutput] = None) -> TreatmentOutput:
         daily_output = TreatmentOutput()
         self.all_output.append(daily_output)
+        self.accumulated_output.__add__(daily_output)
+        self.simulation_day+=1
         return daily_output
 
+    def land_application_day(self):
+        outputs_for_land_application = self.accumulated_output
+        self.accumulated_output=TreatmentOutput()
+        return outputs_for_land_application
 
 class AnaerobicDigestion(BaseManureTreatment):
     """
@@ -138,21 +147,22 @@ class AnaerobicDigestion(BaseManureTreatment):
         self.P_content = 0
         self.K_content = 0
         self.sludge_accumulation_volume = 0
-        self.simulation_day=0
 
-    def update(self,simulation_day, prev_treatment_output: Optional[TreatmentOutput] = None) -> TreatmentOutput:
-        daily_output = self.update_helper(simulation_day=simulation_day,prev_treatment_output=prev_treatment_output)
+    def update(self, prev_treatment_output: Optional[TreatmentOutput] = None) -> TreatmentOutput:
+        daily_output = self.update_helper(prev_treatment_output=prev_treatment_output)
         self.all_output.append(daily_output)
+        self.simulation_day+=1
+
         return daily_output
 
-    def update_helper(self, simulation_day, prev_treatment_output: Optional[TreatmentOutput] = None):
+    def update_helper(self, prev_treatment_output: Optional[TreatmentOutput] = None):
 
         """ Returns the daily_ouput of AnaerobicDigestion output
             :params self
                 Uses data from AnaerobicDigestorInitData class
                 Uses outputs from ReceptionPitOutputs       
         """
-        self.simulation_day=simulation_day
+        
         if prev_treatment_output:
             self.prev_output = prev_treatment_output
         else:
@@ -353,15 +363,16 @@ class AnaerobicLagoon(BaseManureTreatment):
         self.storage_time_period = storage_time_period  # m^3 (25-year 24h storm event)
         self.freeboard_input = freeboard_input  # m
         self.precip_input = precip_input  # m (25-year 24h storm event)
-        self.simulation_day=0
 
-    def update(self,simulation_day, prev_treatment_output: TreatmentOutput = None) -> TreatmentOutput:
-        daily_output = self.update_helper(simulation_day=simulation_day,prev_treatment_output=prev_treatment_output)
+
+    def update(self, prev_treatment_output: TreatmentOutput = None) -> TreatmentOutput:
+        daily_output = self.update_helper(prev_treatment_output=prev_treatment_output)
         self.all_output.append(daily_output)
+        self.accumulated_output.__add__(daily_output)
+        self.simulation_day+=1
         return daily_output
 
-    def update_helper(self,simulation_day, prev_treatment_output: TreatmentOutput = None):
-        self.simulation_day=simulation_day
+    def update_helper(self, prev_treatment_output: TreatmentOutput = None):
         if prev_treatment_output:
             self.prev_output = prev_treatment_output
         else:
@@ -514,7 +525,6 @@ class SlurryStorageUnderfloor(BaseManureTreatment):
         super().__init__(pen, manure_separator, weather, treatment_init_data)
 
         self.storage_time_period = storage_time_period  # days
-        self.simulation_day=0
 
     @property
     def treatment_volume(self) -> float:
@@ -524,7 +534,8 @@ class SlurryStorageUnderfloor(BaseManureTreatment):
     def total_volume(self) -> float:
         return self.treatment_volume  # m^3
 
-    def update(self,simulation_day=0) -> TreatmentOutput:
+    def update(self) -> TreatmentOutput:
+
         handler = self.manure_handler.last_output
         daily_output = TreatmentOutput(
                 TAN_s=handler.TAN_s * (1 - self.treatment_init_data.TAN_removal_efficiency),
@@ -540,6 +551,8 @@ class SlurryStorageUnderfloor(BaseManureTreatment):
                 (daily_output.TSd + daily_output.VS_total) * self.storage_time_period * Constants.KG_TO_CUBIC_METERS)
 
         self.all_output.append(daily_output)
+        self.accumulated_output.__add__(daily_output)
+        self.simulation_day+=1
         return daily_output
 
 
@@ -557,15 +570,15 @@ class SlurryStorageOutdoor(BaseManureTreatment):
         self.storage_time_period = storage_time_period  # m^3 (25-year 24h storm event)
         self.freeboard_input = freeboard_input  # m
         self.precip_input = precip_input  # m (25-year 24h storm event)
-        self.simulation_day=0
 
-    def update(self,simulation_day) -> TreatmentOutput:
-        daily_output = self.update_helper(simulation_day=simulation_day)
+    def update(self) -> TreatmentOutput:
+        daily_output = self.update_helper()
         self.all_output.append(daily_output)
+        self.accumulated_output.__add__(daily_output)
+        self.simulation_day+=1
         return daily_output
 
-    def update_helper(self,simulation_day):
-        self.simulation_day=simulation_day
+    def update_helper(self):
         handler = self.manure_handler.last_output
         daily_output = TreatmentOutput(
                 TAN_s=handler.TAN_s * (1 - self.treatment_init_data.TAN_removal_efficiency),
@@ -676,7 +689,7 @@ class StoragePond(BaseManureTreatment):
     def total_volume(self) -> float:
         return self.treatment_volume + self.freeboard + self.precip  # m^3
 
-    def update(self,simulation_day=0, prev_treatment_output: TreatmentOutput = None) -> TreatmentOutput:
+    def update(self,prev_treatment_output: TreatmentOutput = None) -> TreatmentOutput:
         if prev_treatment_output:
             self.prev_output = prev_treatment_output
         else:
@@ -696,6 +709,8 @@ class StoragePond(BaseManureTreatment):
                 (daily_output.TSd + daily_output.VS_total) * self.storage_time_period * Constants.KG_TO_CUBIC_METERS)
 
         self.all_output.append(daily_output)
+        self.accumulated_output.__add__(daily_output)
+        self.simulation_day+=1
         return daily_output
 
 
