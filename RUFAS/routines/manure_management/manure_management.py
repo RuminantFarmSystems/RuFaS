@@ -60,7 +60,6 @@ class ManureManagement:
 
         self.weather = weather
         self.time=time
-        self.simulation_day=0 ## Index for tracking elapsed time
         self.all_data: Dict[int, List[DailyOutputType]] = {}
         self.df = None
 
@@ -145,9 +144,9 @@ class ManureManagement:
             manure_handler_daily_output = self.manure_handlers[pen.id].update(pen)
             reception_pit_daily_output = self.reception_pits[pen.id].update()
             manure_separator_daily_output = self.manure_separators[pen.id].update()
-            treatment_daily_output = self.treatments[pen.id][0].update(self.simulation_day)
+            treatment_daily_output = self.treatments[pen.id][0].update()
             for i in range(1, len(self.treatments[pen.id])):
-                treatment_daily_output = self.treatments[pen.id][i].update(self.simulation_day,treatment_daily_output)
+                treatment_daily_output = self.treatments[pen.id][i].update(prev_treatment_output=treatment_daily_output)
 
             pen_daily_update_data = (
                 pen,
