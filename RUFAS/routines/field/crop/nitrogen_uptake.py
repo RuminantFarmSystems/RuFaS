@@ -64,9 +64,9 @@ def update_all(soil, crop_type):
         crop_type: an instance of a crop class
     """
 
-    update_nfrac(crop_type)
+    update_nitrogen_fraction(crop_type)
     update_optimal_nitrogen(crop_type)
-    update_max_nitrogen_uptake(crop_type)
+    update_nitrogen_demand(crop_type)
 
     calc_act_N_up_each_layer(soil, crop_type)  # - update
     crop_type.N_act_up = sum(crop_type.act_N_up_each_layer)  # - update
@@ -74,7 +74,7 @@ def update_all(soil, crop_type):
     N_uptake(soil)  # - update
 
 
-def calc_nfrac(phu_frac: float, nfrac_1: float, nfrac_3: float, shape1: float, shape2: float) -> float:
+def calc_nitrogen_fraction(phu_frac: float, nfrac_1: float, nfrac_3: float, shape1: float, shape2: float) -> float:
     """
     Description:
         Calculates the fraction of nitrogen in the plant biomass on a given day.
@@ -108,7 +108,7 @@ def calc_nfrac(phu_frac: float, nfrac_1: float, nfrac_3: float, shape1: float, s
     #     crop_type.fr_N = term1 * term2 + crop_type.fr_n3
 
 
-def update_nfrac(crop) -> None:
+def update_nitrogen_fraction(crop) -> None:
     """
     Description: update a crop's nitrogen fraction
 
@@ -117,18 +117,18 @@ def update_nfrac(crop) -> None:
 
     Returns: Nothing. Instead, the crop.fr_N attribute is updated.
     """
-    shapes = calc_nshapes(heatfrac_half=crop.fr_PHU_50, heatfrac_full=crop.fr_PHU_100, nfrac_1=crop.fr_n1,
-                          nfrac_2=crop.fr_n2, nfrac_near=crop.fr_n3ish, nfrac_3=crop.fr_n3)
+    shapes = calc_shape_parameters(heatfrac_half=crop.fr_PHU_50, heatfrac_full=crop.fr_PHU_100, nfrac_1=crop.fr_n1,
+                                   nfrac_2=crop.fr_n2, nfrac_near=crop.fr_n3ish, nfrac_3=crop.fr_n3)
     # TODO: using current PHU and biomass instead of previous
     if crop.biomass_actual == 0:
         crop.fr_N = 0
     else:
-        crop.fr_N = calc_nfrac(phu_frac=crop.fr_PHU, nfrac_1=crop.fr_n1, nfrac_3=crop.fr_n3,
-                               shape1=shapes[0], shape2=shapes[1])
+        crop.fr_N = calc_nitrogen_fraction(phu_frac=crop.fr_PHU, nfrac_1=crop.fr_n1, nfrac_3=crop.fr_n3,
+                                           shape1=shapes[0], shape2=shapes[1])
 
 
-def calc_nshapes(heatfrac_half: float, heatfrac_full: float, nfrac_1: float, nfrac_2: float,
-                 nfrac_near: float, nfrac_3: float) -> list[float]:
+def calc_shape_parameters(heatfrac_half: float, heatfrac_full: float, nfrac_1: float, nfrac_2: float,
+                          nfrac_near: float, nfrac_3: float) -> list[float]:
     """
     Description:
         Calculates the shape coefficient for nitrogen fraction.
@@ -222,7 +222,6 @@ def calc_optimal_nitrogen(nfrac: float, biomass: float) -> float:
     Returns:
         the optimal nitrogen mass
     """
-
     return nfrac * biomass
 
 
@@ -240,26 +239,25 @@ def update_optimal_nitrogen(crop) -> None:
     crop.bio_N_opt += calc_optimal_nitrogen(nfrac=crop.fr_N, biomass=crop.biomass_actual)
 
 
-def calc_max_nitrogen_uptake(optimal_nitrogen: float, previous_nitrogen: float,
-                             mature_nfrac: float, max_growth: float) -> float:
+def calc_nitrogen_demand(demand: float, nitrogen_start: float, mature_nfrac: float, max_growth: float) -> float:
     """
     Description:
         Calculates potential nitrogen uptake for a given day.
        "pseudocode_crop" C.5.B.3
 
     Args:
-        optimal_nitrogen: the optimal mass of nitrogen stored in the plant on a given day
-        previous_nitrogen: the actual biomass of nitrogen in the plant on the previous day
+        demand: the nitrogen demand of a plant on a given day
+        nitrogen_start: the actual biomass of nitrogen in the plant at the end of the previous day
         mature_nfrac:, the nitrogen fraction of the plant at maturity
         max_growth: the maximum potential biomass the plant can grow on a given day
 
     Returns:
         The potential nitrogen uptake for the day
     """
-    return min(optimal_nitrogen - previous_nitrogen, 4 * mature_nfrac * max_growth)
+    return min(demand - nitrogen_start, 4 * mature_nfrac * max_growth)
 
 
-def update_max_nitrogen_uptake(crop):
+def update_nitrogen_demand(crop):
     """
     Description:
         Update a plant's potential nitrogen uptake
@@ -270,14 +268,13 @@ def update_max_nitrogen_uptake(crop):
     Returns:
         Nothing. Instead, updates crop.N_up
     """
-    if crop.bio_N_opt - crop.bio_N < 0:
+    if crop.bio_N_opt - crop.prev_bio_N < 0:
         crop.N_up = 0
     else:
-        option1 = crop.bio_N_opt - crop.bio_N
-        option2 = 4 * crop.fr_n3 * crop.d_biomass_max
-        # TODO: previous nitrogen biomass needs to be added to the crop class (.prev_bio_N)
-        crop.N_up = calc_max_nitrogen_uptake(optimal_nitrogen=crop.bio_N_opt, previous_nitrogen=crop.prev_bio_N,
-                                             mature_nfrac=crop.fr_n3, max_growth=crop.d_biomass_max)
+        # TODO: previous nitrogen biomass needs to be added to the crop class (.prev_bio_N)??
+        #  This needs to be re-assessed in the context of the full routines (bio_N vs prev_bio_N)??
+        crop.N_up = calc_nitrogen_demand(demand=crop.bio_N_opt, nitrogen_start=crop.prev_bio_N, mature_nfrac=crop.fr_n3,
+                                         max_growth=crop.d_biomass_max)
 
 
 def calc_act_N_up_each_layer(soil, crop_type):
