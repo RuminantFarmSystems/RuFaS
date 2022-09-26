@@ -7,6 +7,8 @@ Author(s): Pooya Hekmati, sh2235@cornell.edu
 
 import pytest
 
+from RUFAS.routines.animal.life_cycle.animal_events import AnimalEvents
+
 
 def test_norm():
     """Unit test for function norm in file routines/animal/clustering_pen_grouping.py"""
@@ -153,9 +155,31 @@ def test___str__():
     pass
 
 
-def test_get_most_recent_date():
+@pytest.mark.parametrize(
+    "events_list, event_descriptions, expected_days",
+    [
+        (
+            [],
+            ['dummy'],
+            [-1]
+        ),
+        (
+            [(1, 2, 'event1'), (3, 4, 'event2'),
+             (5, 6, 'event1'), (7, 8, 'event3')],
+            ['event1', 'event2', 'event3', 'event0'],
+            [5, 3, 7, -1]
+        )
+    ],
+)
+def test_get_most_recent_date(events_list, event_descriptions, expected_days):
     """Unit test for function get_most_recent_date in file routines/animal/life_cycle/animal_events.py"""
-    pass
+    animal_event = AnimalEvents()
+    for animal_age, simulation_day, event_description in events_list:
+        animal_event.add_event(animal_age, simulation_day, event_description)
+
+    for event_description, expected in zip(event_descriptions, expected_days):
+        actual = animal_event.get_most_recent_date(event_description)
+        assert actual == expected
 
 
 def test_next_id():
