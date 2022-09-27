@@ -179,36 +179,35 @@
       "bedding_type": "sawdust",
       "manure_handler": "flush_system",
       "manure_separator": "rotary_screen",
-      "manure_treatment": ["anaerobic_digestion"]
+      "manure_treatment": "anaerobic_digestion"
     },
     {
       "id": 1,
       "bedding_type": "sawdust",
       "manure_handler": "manual_scraping",
       "manure_separator": "null",
-      "manure_treatment": ["anaerobic_digestion_lagoon"]
+      "manure_treatment": "anaerobic_digestion_and_lagoon"
     },
     {
       "id": 2,
       "bedding_type": "sand",
       "manure_handler": "flush_system",
       "manure_separator": "sand_lane",
-      "manure_treatment": ["anaerobic_lagoon"]
+      "manure_treatment": "anaerobic_lagoon"
     },
     {
       "id": 3,
       "bedding_type": "sawdust",
       "manure_handler": "manual_scraping",
       "manure_separator": "null",
-      "manure_treatment": ["slurry_storage_underfloor"]
+      "manure_treatment": "slurry_storage_underfloor"
     },
-	{
+    {
       "id": 4,
       "bedding_type": "sawdust",
       "manure_handler": "manual_scraping",
       "manure_separator": "null",
-      "manure_treatment": ["slurry_storage_outdoor"]
+      "manure_treatment": "slurry_storage_outdoor"
     }
-	]
-
+  ]
 }

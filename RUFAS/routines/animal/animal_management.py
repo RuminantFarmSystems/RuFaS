@@ -24,6 +24,8 @@ import random
 from typing import Tuple
 from statistics import mean
 
+from RUFAS.util import Utility
+
 
 def daily_animal_routine(animal_management, feed, weather, time):
     """
@@ -202,7 +204,7 @@ class AnimalManagement:
 
         manure_handling = "manual_scraping"
         manure_separator = "sedimentation"
-        manure_storage = ["storage_pit"]
+        manure_storage = "slurry_storage_underfloor"
         animal_combination = None
         if (len(self.all_pens) == 0) and (herd_num > 0):
             print('Warning: herd_num > 0, but pen_num = 0. Initializing 3 default pens.')

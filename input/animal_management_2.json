@@ -16,6 +16,7 @@
         "fields": {
         },
         "animal": "animal_management_animal_modified.json",
+        "manure": "manure_management_system_scenarios.json",
         "feed": "panke_buisse_feed.json"
     }
 }

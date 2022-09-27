@@ -46,8 +46,11 @@ class State:
         self.fields = Fields(data['fields'], time)
         input_dir = Utility.get_base_dir() / 'input'
         self.feed = Feed(Utility.read_json_file(input_dir / 'feed' / data['feed']))
-        self.animal_management = AnimalManagement(
-                Utility.read_json_file(input_dir / 'animal' / data['animal']), config, self.feed, weather, time)
+        manure_management_system_scenarios = Utility.read_json_file(input_dir / 'manure' / data[
+            'manure'])['manure_management_system_scenarios']
+        animal_data = Utility.read_json_file(input_dir / 'animal' / data['animal'])
+        animal_data['manure_management_system_scenarios'] = manure_management_system_scenarios
+        self.animal_management = AnimalManagement(animal_data, config, self.feed, weather, time)
 
         self.manure_management = ManureManagement(self.animal_management, weather, time)
 
@@ -263,5 +266,3 @@ class Config:
                 sim_length += len(self.years[i])
 
         return sim_length + 1
-
-

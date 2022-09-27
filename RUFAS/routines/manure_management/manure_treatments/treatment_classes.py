@@ -20,22 +20,20 @@ class TreatmentEnum(ExtendedEnum):
     Enumerates available treatment options.
     """
 
-    STORAGE_POND = auto()
     ANAEROBIC_LAGOON = auto()
     ANAEROBIC_DIGESTION = auto()
     ANAEROBIC_DIGESTION_AND_LAGOON = auto()
 
     SLURRY_STORAGE_UNDERFLOOR = auto()
     SLURRY_STORAGE_OUTDOOR = auto()
-    STORAGE_PIT = STORAGE_POND
-    DEFAULT = STORAGE_POND
+    DEFAULT = SLURRY_STORAGE_UNDERFLOOR
 
 
 class BaseManureTreatment:
     def __init__(self, pen: SimplePen,
                  manure_separator: BaseManureSeparator,
                  weather: Weather,
-                 time:Time,
+                 time: Time,
                  treatment_init_data: TreatmentInitData):
         """
         An instance of this class represents a storage receptacle.
@@ -64,8 +62,8 @@ class BaseManureTreatment:
         self.time = time
         self.prev_output = None
         self.all_output: List[TreatmentOutput] = []
-        self.accumulated_output=TreatmentOutput()
-        self.simulation_day=0
+        self.accumulated_output = TreatmentOutput()
+        self.simulation_day = 0
 
     def reset_daily_variables(self):
         pass
@@ -83,13 +81,14 @@ class BaseManureTreatment:
         daily_output = TreatmentOutput()
         self.all_output.append(daily_output)
         self.accumulated_output.__add__(daily_output)
-        self.simulation_day+=1
+        self.simulation_day += 1
         return daily_output
 
     def land_application_day(self):
         outputs_for_land_application = self.accumulated_output
-        self.accumulated_output=TreatmentOutput()
+        self.accumulated_output = TreatmentOutput()
         return outputs_for_land_application
+
 
 class AnaerobicDigestion(BaseManureTreatment):
     """
@@ -123,7 +122,7 @@ class AnaerobicDigestion(BaseManureTreatment):
                  pen: SimplePen,
                  manure_separator: BaseManureSeparator,
                  weather: Weather,
-                 time:Time,
+                 time: Time,
                  treatment_init_data: AnaerobicDigestionInitData):
         super().__init__(pen, manure_separator, weather, time, treatment_init_data)
         # self.weather_data = SimpleWeather()
@@ -151,7 +150,7 @@ class AnaerobicDigestion(BaseManureTreatment):
     def update(self, prev_treatment_output: Optional[TreatmentOutput] = None) -> TreatmentOutput:
         daily_output = self.update_helper(prev_treatment_output=prev_treatment_output)
         self.all_output.append(daily_output)
-        self.simulation_day+=1
+        self.simulation_day += 1
 
         return daily_output
 
@@ -162,7 +161,7 @@ class AnaerobicDigestion(BaseManureTreatment):
                 Uses data from AnaerobicDigestorInitData class
                 Uses outputs from ReceptionPitOutputs       
         """
-        
+
         if prev_treatment_output:
             self.prev_output = prev_treatment_output
         else:
@@ -354,22 +353,21 @@ class AnaerobicLagoon(BaseManureTreatment):
                  pen: SimplePen,
                  manure_separator: BaseManureSeparator,
                  weather: Weather,
-                 time:Time,
+                 time: Time,
                  treatment_init_data: AnaerobicLagoonInitData,
                  storage_time_period=365.0,
                  precip_input=0.0,
                  freeboard_input=0.3048):
-        super().__init__(pen, manure_separator, weather, treatment_init_data)
+        super().__init__(pen, manure_separator, weather, time, treatment_init_data)
         self.storage_time_period = storage_time_period  # m^3 (25-year 24h storm event)
         self.freeboard_input = freeboard_input  # m
         self.precip_input = precip_input  # m (25-year 24h storm event)
-
 
     def update(self, prev_treatment_output: TreatmentOutput = None) -> TreatmentOutput:
         daily_output = self.update_helper(prev_treatment_output=prev_treatment_output)
         self.all_output.append(daily_output)
         self.accumulated_output.__add__(daily_output)
-        self.simulation_day+=1
+        self.simulation_day += 1
         return daily_output
 
     def update_helper(self, prev_treatment_output: TreatmentOutput = None):
@@ -418,7 +416,7 @@ class AnaerobicLagoon(BaseManureTreatment):
     @property
     def flushing_recycled(self):
         """returns flushing water recycled in m^3"""
-        if self.simulation_day>0:
+        if self.simulation_day > 0:
             return self.manure_handler.last_output.cleaning_water * Constants.LITERS_TO_CUBIC_METERS
         else:
             return 0
@@ -514,12 +512,16 @@ class AnaerobicLagoon(BaseManureTreatment):
                    self.sludge_accumulation_volume * upper_bound)
 
 
+class AnaerobicDigestionAndLagoon(AnaerobicLagoon):
+    pass
+
+
 class SlurryStorageUnderfloor(BaseManureTreatment):
     def __init__(self,
                  pen: SimplePen,
                  manure_separator: BaseManureSeparator,
                  weather: Weather,
-                 time:Time,
+                 time: Time,
                  treatment_init_data: TreatmentInitData,
                  storage_time_period=120.0):
         super().__init__(pen, manure_separator, weather, time, treatment_init_data)
@@ -535,7 +537,6 @@ class SlurryStorageUnderfloor(BaseManureTreatment):
         return self.treatment_volume  # m^3
 
     def update(self) -> TreatmentOutput:
-
         handler = self.manure_handler.last_output
         daily_output = TreatmentOutput(
                 TAN_s=handler.TAN_s * (1 - self.treatment_init_data.TAN_removal_efficiency),
@@ -552,7 +553,7 @@ class SlurryStorageUnderfloor(BaseManureTreatment):
 
         self.all_output.append(daily_output)
         self.accumulated_output.__add__(daily_output)
-        self.simulation_day+=1
+        self.simulation_day += 1
         return daily_output
 
 
@@ -561,7 +562,7 @@ class SlurryStorageOutdoor(BaseManureTreatment):
                  pen: SimplePen,
                  manure_separator: BaseManureSeparator,
                  weather: Weather,
-                 time:Time,
+                 time: Time,
                  treatment_init_data: TreatmentInitData,
                  storage_time_period=120.0,
                  precip_input=0.0,
@@ -575,7 +576,7 @@ class SlurryStorageOutdoor(BaseManureTreatment):
         daily_output = self.update_helper()
         self.all_output.append(daily_output)
         self.accumulated_output.__add__(daily_output)
-        self.simulation_day+=1
+        self.simulation_day += 1
         return daily_output
 
     def update_helper(self):
@@ -670,7 +671,7 @@ class StoragePond(BaseManureTreatment):
                  pen: SimplePen,
                  manure_separator: BaseManureSeparator,
                  weather: Weather,
-                 time:Time,
+                 time: Time,
                  treatment_init_data: StoragePondInitData,
                  storage_time_period=90,
                  freeboard=0.0,
@@ -689,7 +690,7 @@ class StoragePond(BaseManureTreatment):
     def total_volume(self) -> float:
         return self.treatment_volume + self.freeboard + self.precip  # m^3
 
-    def update(self,prev_treatment_output: TreatmentOutput = None) -> TreatmentOutput:
+    def update(self, prev_treatment_output: TreatmentOutput = None) -> TreatmentOutput:
         if prev_treatment_output:
             self.prev_output = prev_treatment_output
         else:
@@ -710,7 +711,7 @@ class StoragePond(BaseManureTreatment):
 
         self.all_output.append(daily_output)
         self.accumulated_output.__add__(daily_output)
-        self.simulation_day+=1
+        self.simulation_day += 1
         return daily_output
 
 
@@ -720,30 +721,26 @@ class TreatmentFactory:
                      pen: SimplePen,
                      manure_separator: BaseManureSeparator,
                      weather: Weather,
-                     time:Time) -> List[BaseManureTreatment]:
+                     time: Time) -> BaseManureTreatment:
         enum_to_class: Dict[TreatmentEnum, Tuple[Type[BaseManureTreatment], Type[TreatmentInitData]]] = {
             TreatmentEnum.ANAEROBIC_DIGESTION: (AnaerobicDigestion, AnaerobicDigestionInitData),
             TreatmentEnum.ANAEROBIC_LAGOON: (AnaerobicLagoon, AnaerobicLagoonInitData),
+            TreatmentEnum.ANAEROBIC_DIGESTION_AND_LAGOON: (AnaerobicDigestionAndLagoon, AnaerobicLagoonInitData),
+            # Fix the init data for this mixed class
             TreatmentEnum.SLURRY_STORAGE_UNDERFLOOR: (SlurryStorageUnderfloor, SlurryStorageInitData),
             TreatmentEnum.SLURRY_STORAGE_OUTDOOR: (SlurryStorageOutdoor, SlurryStorageInitData)
         }
 
-        treatments: List[BaseManureTreatment] = []
-        for treatment in pen.manure_storage:
-            treatment_enum = TreatmentEnum.get_enum(treatment)
-
-            params = {
-                'pen': pen,
-                'manure_separator': manure_separator,
-                'weather': weather,
-                'time':time,
-                'treatment_init_data': enum_to_class[treatment_enum][1].get_instance()
-            }
-
-            treatment = enum_to_class[treatment_enum][0](**params)
-            treatments.append(treatment)
-
-        return treatments
+        treatment_enum = TreatmentEnum.get_enum(pen.manure_storage)
+        params = {
+            'pen': pen,
+            'manure_separator': manure_separator,
+            'weather': weather,
+            'time': time,
+            'treatment_init_data': enum_to_class[treatment_enum][1].get_instance()
+        }
+        treatment = enum_to_class[treatment_enum][0](**params)
+        return treatment
 
 
 class TreatmentInitData(ABC):

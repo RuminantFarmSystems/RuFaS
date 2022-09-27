@@ -38,7 +38,7 @@ class SimulationEngine:
 
         t_start_graphics = timer.time()
         sys.stdout.write('Producing Graphics\n')
-        self.output.produce_graphics()
+        # self.output.produce_graphics()
         t_end_graphics = timer.time()
 
         graphics_prod_time = t_end_graphics - t_start_graphics
