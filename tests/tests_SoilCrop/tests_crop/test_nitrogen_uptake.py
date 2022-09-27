@@ -165,5 +165,70 @@ def test_update_max_nitrogen_uptake(opt_n, prev_n, mat_nfrac, grow_max):
     assert mc.N_up == expect
 
 
+@pytest.mark.parametrize("d,z,r,b", [
+    (1, 1, 1, 1),  # all 1
+    (0, 1, 1, 1),  # no demand
+    (1, 0, 1, 1),  # surface only
+    (1, 1, 0, 1),  # no root depth
+    (1, 1, 1, -1),  # negative distribution coefficient
+    (98.63, 20.2, 32.28, 0.38),  # arbitrary
+    (98.63, 20.2, 32.28, 1.21),  # coefficient > 1
+    (98.63, 20.2, 32.28, -0.38),  # coefficient < 0
+    (98.63, 20.2, 12.28, 0.38),  # depth > root depth
+])
+def test_calc_surface_nitrogen_uptake(d, z, r, b):
+    """check that nitrogen uptake is correctly calculated by calc_surface_nitrogen_uptake()"""
+    observe = calc_nitrogen_uptake_to_depth(demand=d, depth=z, root_depth=r, ndistro=b)
+    if r <= 0:
+        expect = 0
+    else:
+        expect = (d / (1 - exp(-b))) * (1 - exp(-b * (z / r)))
+    assert observe == expect
+
+@pytest.mark.parametrize("d,z,r,b", [
+    (1, 1, 1, 0),  # no coefficient (error)
+    (0, 0, 0, 0),  # all 0
+    (0.3, 0.28, 0.11, 0)
+])
+def test_error_surface_nitrogen_uptake(d, z, r, b):
+    """"check that errors are appropriately thrown for calc_surface_nitrogen_uptake()"""
+    with pytest.raises(Exception):
+        calc_nitrogen_uptake_to_depth(demand=d, depth=z, root_depth=r, ndistro=b)
+
+
+@pytest.mark.parametrize("bounds,d,r,b", [
+    ([0.25, 0.50, 0.75, 1.00], 1, 1, 1),  # four layers
+    ([0.25, 0.50, 0.75, 1.00], 0.5, 1, 1),  # reduced demand
+    ([0.25, 0.50, 0.75, 1.00], 1, 0.5, 1),  # reduced root depth
+    ([0.25, 0.50, 0.75, 1.00], 1, 1.5, 1),  # increased root depth
+    ([0.25, 0.50, 0.75, 1.00], 1, 1, 0.5),  # reduced distribution
+    ([0.2, 0.40, 0.6, 0.8, 1.0], 1, 1, 1),  # five layers
+    ([1/3, 2/3, 1], 1, 1, 1),  # three layers
+    ([0.991, 3.7, 3.89, 12.01, 15], 338.97, 12.88, 0.395),  # arbitrary (roots in 5th)
+    ([0.991, 3.7, 3.89, 12.01, 15], 338.97, 4.33, 0.395),  # arbitrary (roots in 4th)
+    ([0.991, 3.7, 3.89, 12.01, 15], 338.97, 1.25, 0.395),  # arbitrary (roots in 2nd)
+])
+def test_calc_layer_nitrogen_potential(bounds, d, r, b):
+    """test that potential nitrogen uptake is calculated correctly for each soil layer with calc_layer_nitrogen_potential()"""
+    layer_nitrogen = []  # empty list to fill
+    upper_nitrogen = 0  # nitrogen in the top boundary (soil surface) is 0
+    for i in range(len(bounds)):
+        lower_nitrogen = calc_nitrogen_uptake_to_depth(demand=d, depth=bounds[i],
+                                                       root_depth=r, ndistro=b)
+        layer_nitrogen.append(lower_nitrogen - upper_nitrogen)
+        upper_nitrogen = lower_nitrogen
+    expect = layer_nitrogen
+    observe = calc_layer_nitrogen_potential(boundaries=bounds, demand=d, root_depth=r, ndistro=b)
+    assert expect == observe
+
+def test_N_uptake():
+    assert False
+
+def test_calc_N_up_each_layer():
+    assert False
+
+def calc_bio_N():
+    assert False
+
 def test_update_all():
     assert False

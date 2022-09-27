@@ -292,7 +292,7 @@ def calc_act_N_up_each_layer(soil, crop_type):
         soil
     """
 
-    crop_type.pot_N_up_each_layer = calc_N_up_each_layer(soil, crop_type)
+    crop_type.pot_N_up_each_layer = calc_layer_nitrogen_potential(soil, crop_type)
     act_N_up_each_layer = []
 
     # Running total of potential nitrogen uptake in overlying layers
@@ -333,7 +333,8 @@ def N_uptake(soil):
         layer.NO3 -= layer.N_uptake
 
 
-def calc_N_up_each_layer(soil, crop_type):
+def calc_layer_nitrogen_potential(boundaries: list[float], demand: float,
+                                  root_depth: float, ndistro: float) -> list[float]:
     """
     Description:
         Calculates the potential nitrogen uptake from soil solution in each
@@ -344,50 +345,70 @@ def calc_N_up_each_layer(soil, crop_type):
        "pseudocode_crop" C.5.C.2/3
 
     Args:
-        soil
-        crop_type
+        boundaries: a list of depths of the lower boundaries for each soil layer
+        demand: the plants nitrogen demand
+        root_depth: the current depth of the plant's roots
+        ndistro: the nitrogen distribution parameter
 
     Returns:
-        list: nitrogen uptake per layer
+        a list of potential nitrogen uptake from each layer
     """
 
-    N_up_each_layer = []
+    boundary_nitrogen = [calc_nitrogen_uptake_to_depth(demand, x, root_depth, ndistro) for x in boundaries]  # N at each boundary
+    boundary_nitrogen.insert(0, 0)  # 0 N uptake at soil surface
+    layer_nitrogen = [below - above for below, above in zip(boundary_nitrogen[1:], boundary_nitrogen)]  # subtract previous layer
+    return(layer_nitrogen)
 
-    N_up_for_top_of_layer = 0
-    for layer in soil.soil_layers:
-        N_up_for_bottom_of_layer = calc_N_up_z(crop_type, layer.bottom_depth)
+    # N_up_each_layer = []
+    #
+    # N_up_for_top_of_layer = 0
+    # for layer in soil.soil_layers:
+    #     N_up_for_bottom_of_layer = calc_nitrogen_uptake_to_depth(crop_type, layer.bottom_depth)
+    #
+    #     # C.5.C.3
+    #     N_up_ly = N_up_for_bottom_of_layer - N_up_for_top_of_layer
+    #
+    #     N_up_each_layer.append(N_up_ly)
+    #
+    #     # Set the top for next layer equal to bottom of this layer
+    #     N_up_for_top_of_layer = N_up_for_bottom_of_layer
+    #
+    # return N_up_each_layer
 
-        # C.5.C.3
-        N_up_ly = N_up_for_bottom_of_layer - N_up_for_top_of_layer
-
-        N_up_each_layer.append(N_up_ly)
-
-        # Set the top for next layer equal to bottom of this layer
-        N_up_for_top_of_layer = N_up_for_bottom_of_layer
-
-    return N_up_each_layer
 
 
-def calc_N_up_z(crop_type, z):
+
+def calc_nitrogen_uptake_to_depth(demand: float, depth: float, root_depth: float, ndistro: float) -> float:
     """
     Description:
-        Calculates potential nitrogen uptake from soil solution at the surface
-        to depth z. This function is used in calc_N_up_each_layer.
+        Calculates potential nitrogen uptake from soil solution from the surface
+        to a specified depth.
         "pseudocode_crop" C.5.C.1
 
     Args:
-        crop_type
-        z: the given depth
+        demand: the current nitrogen demand
+        depth: the depth to which nitrogen uptake is calculated
+        root_depth: the current root depth
+        ndistro: the nitrogen uptake distribution parameter
 
     Returns:
-        float: nitrogen uptake from the surface to a depth
+        the potential amount of nitrogen taken up
     """
 
-    if crop_type.z_root == 0:
+    if ndistro == 0:
+        raise ValueError("ndistro cannot equal 0")
+
+    if root_depth <= 0:
         return 0
-    term1 = crop_type.N_up / (1 - exp(-1 * crop_type.beta_n))
-    term2 = 1 - exp(-1 * crop_type.beta_n * z / crop_type.z_root)
-    return term1 * term2
+    else:
+        first_term = demand / (1 - exp(-ndistro))
+        second_term = 1 - exp(-ndistro * (depth / root_depth))
+        return first_term * second_term
+    # if crop_type.z_root == 0:
+    #     return 0
+    # term1 = crop_type.N_up / (1 - exp(-1 * crop_type.beta_n))
+    # term2 = 1 - exp(-1 * crop_type.beta_n * z / crop_type.z_root)
+    # return term1 * term2
 
 
 def calc_bio_N(soil, crop_type):
