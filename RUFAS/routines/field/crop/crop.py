@@ -57,7 +57,7 @@ def daily_crop_routine(soil, crop, field_management, weather, time):
 
                 root_development.update_all(crop_type)
 
-                nitrogen_uptake.update_all(soil, crop_type)
+                nitrogen_uptake.update_all(crop_type, soil)
 
                 phosphorus_uptake.update_all(soil, crop_type)
 

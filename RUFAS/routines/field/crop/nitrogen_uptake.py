@@ -48,12 +48,13 @@ CropType values updated by calling update_all():
 """
 
 from math import log, exp
+from itertools import accumulate
 from RUFAS.routines.field.crop.nitrogen_fixation import calc_N_fixation
 
 # TODO: These functions should probably be moved to the base_crop class as member functions
 
 
-def update_all(soil, crop_type):
+def update_all(crop_type, soil):
     """
     Description:
         Updates nitrogen uptake information for the given crop.
@@ -63,15 +64,13 @@ def update_all(soil, crop_type):
             the current state of the soil profile
         crop_type: an instance of a crop class
     """
-
     update_nitrogen_fraction(crop_type)
     update_optimal_nitrogen(crop_type)
-    update_nitrogen_demand(crop_type)
+    update_potential_nitrogen_uptake(crop_type)
+    uptake_nitrogen(crop_type, soil)
+    fix_nitrogen(crop_type)  # TODO: needs updating
+    update_stored_nitrogen(crop_type)
 
-    calc_act_N_up_each_layer(soil, crop_type)  # - update
-    crop_type.N_act_up = sum(crop_type.act_N_up_each_layer)  # - update
-    calc_bio_N(soil, crop_type)  # - update
-    N_uptake(soil)  # - update
 
 
 def calc_nitrogen_fraction(phu_frac: float, nfrac_1: float, nfrac_3: float, shape1: float, shape2: float) -> float:
@@ -239,7 +238,8 @@ def update_optimal_nitrogen(crop) -> None:
     crop.bio_N_opt += calc_optimal_nitrogen(nfrac=crop.fr_N, biomass=crop.biomass_actual)
 
 
-def calc_nitrogen_demand(demand: float, nitrogen_start: float, mature_nfrac: float, max_growth: float) -> float:
+def calc_potential_nitrogen_uptake(demand: float, nitrogen_start: float, mature_nfrac: float,
+                                   max_growth: float) -> float:
     """
     Description:
         Calculates potential nitrogen uptake for a given day.
@@ -257,7 +257,7 @@ def calc_nitrogen_demand(demand: float, nitrogen_start: float, mature_nfrac: flo
     return min(demand - nitrogen_start, 4 * mature_nfrac * max_growth)
 
 
-def update_nitrogen_demand(crop):
+def update_potential_nitrogen_uptake(crop) -> None:
     """
     Description:
         Update a plant's potential nitrogen uptake
@@ -273,11 +273,12 @@ def update_nitrogen_demand(crop):
     else:
         # TODO: previous nitrogen biomass needs to be added to the crop class (.prev_bio_N)??
         #  This needs to be re-assessed in the context of the full routines (bio_N vs prev_bio_N)??
-        crop.N_up = calc_nitrogen_demand(demand=crop.bio_N_opt, nitrogen_start=crop.prev_bio_N, mature_nfrac=crop.fr_n3,
-                                         max_growth=crop.d_biomass_max)
+        crop.N_up = calc_potential_nitrogen_uptake(demand=crop.bio_N_opt, nitrogen_start=crop.prev_bio_N, mature_nfrac=crop.fr_n3,
+                                                   max_growth=crop.d_biomass_max)
 
 
-def calc_act_N_up_each_layer(soil, crop_type):
+def calc_layer_nitrogen_uptake(layer_demand: list[float], layer_potential: list[float],
+                               layer_nitrate: list[float]) -> list[float]:
     """
     Description:
         Calculates the actual nitrogen uptake from soil solution in each layer.
@@ -288,49 +289,97 @@ def calc_act_N_up_each_layer(soil, crop_type):
         "pseudocode_crop" C.5.C.4/5/6/7
 
     Args:
-        crop_type
-        soil
+        deficit: the demand for nitrogen by the plant not met by the above layers
+        layer_nitrogen: a list of nitrogen amounts in each soil layer
+        layer_nitrate: a list of nitrate amounts in each soil layer
+
+    Returns:
+        a list of the actual nitrogen taken up from each layer
     """
 
-    crop_type.pot_N_up_each_layer = calc_layer_nitrogen_potential(soil, crop_type)
-    act_N_up_each_layer = []
+    if len(layer_potential) != len(layer_demand) or len(layer_potential) != len(layer_nitrate):
+        raise ValueError("layer_potential, layer_demand, and layer_nitrate must be the same length")
 
-    # Running total of potential nitrogen uptake in overlying layers
-    N_up_over = 0
+    layer_desired = [potential + demand for potential, demand in zip(layer_potential, layer_demand)]
+    return [min(desired, nitrate) for desired, nitrate in zip(layer_desired, layer_nitrate)]
 
-    # Running total of nitrate in overlying soil layers
-    NO3_over = 0
+def update_layer_nitrogen_uptake() -> None:
+    # TODO: I'm not sure if this function is needed, or of uptake_nitrogen() should handle all updates
+    #  I'm leaning toward the latter option.
+    pass
 
-    # Nitrogen uptake demand not met in overlying soil layers
-    N_demand = 0
+def calc_layer_nitrogen_demand(uptake_potentials: list[float], nitrate_availabilities: list[float]) -> list[float]:
+    """
+    Description:
+        calculates the nitrogen demand of the plant from each soil layer
 
-    for pot_N_up, soil_layer in zip(crop_type.pot_N_up_each_layer, soil.soil_layers):
+    Args:
+        uptake_potentials: the maximum potential nitrogen uptake by the plant from each soil layer
+        nitrate_availabilities: the available nitrates (NO3) in each soil layer
 
-        # C.5.C.4
-        act_N_up = min((pot_N_up + N_demand), soil_layer.NO3)
+    Returns: a list of nitrogen demands from each soil layer
+    """
+    layer_delta = [desired - available for desired, available in zip(uptake_potentials, nitrate_availabilities)]
+    layer_demand = [sum(layer_delta[:i]) for i in range(len(layer_delta))] # cumulative sum
+    return [max(val, 0) for val in layer_demand]  # constrain to zero
 
-        # C.5.C.7
-        soil_layer.N_uptake = act_N_up
-        act_N_up_each_layer.append(act_N_up)
+    # crop_type.pot_N_up_each_layer = calc_layer_nitrogen_potential(soil, crop_type)
+    # act_N_up_each_layer = []
+    #
+    # # Running total of potential nitrogen uptake in overlying layers
+    # N_up_over = 0
+    #
+    # # Running total of nitrate in overlying soil layers
+    # NO3_over = 0
+    #
+    # # Nitrogen uptake demand not met in overlying soil layers
+    # N_demand = 0
+    #
+    # for pot_N_up, soil_layer in zip(crop_type.pot_N_up_each_layer, soil.soil_layers):
+    #
+    #     # C.5.C.4
+    #     act_N_up = min((pot_N_up + N_demand), soil_layer.NO3)
+    #
+    #     # C.5.C.7
+    #     soil_layer.N_uptake = act_N_up
+    #     act_N_up_each_layer.append(act_N_up)
+    #
+    #     # Update values so ready for the next layer
+    #     N_up_over += pot_N_up
+    #
+    #     # C.5.C.6
+    #     NO3_over += soil_layer.NO3
+    #
+    #     # C.5.C.5
+    #     N_demand = max(N_up_over - NO3_over, 0)
+    #
+    #     if N_demand < 0:
+    #         N_demand = 0
+    #
+    # crop_type.act_N_up_each_layer = act_N_up_each_layer
 
-        # Update values so ready for the next layer
-        N_up_over += pot_N_up
+def uptake_nitrogen(crop, soil) -> None:
+    """
+    Description:
+        uptake nitrogen from the soil and reallocate it into the crop
 
-        # C.5.C.6
-        NO3_over += soil_layer.NO3
+    Args:
+        crop: an instance of the BaseCrop class
+        soil: an instance of the Soil class
+    """
+    # pre-uptake conditions
+    layer_bounds = [layer.bottom_depth for layer in soil.soil_layers]
+    layer_nitrates = [layer.NO3 for layer in soil.soil_layers]
+    # calculate layer values
+    potentials = calc_layer_nitrogen_potential(boundaries=layer_bounds, demand=crop.N_up, root_depth=crop.z_root, ndistro=crop.beta_n)
+    demands = calc_layer_nitrogen_demand(uptake_potentials=potentials, nitrate_availabilities=layer_nitrates)
+    uptakes = calc_layer_nitrogen_uptake(layer_demand=demands, layer_potential=potentials, layer_nitrate=layer_nitrates)
+    # update attributes
+    for uptake, layer in zip(uptakes, soil.soil_layers):
+        layer.N_uptake = uptake
+        layer.NO3 -= uptake  # remove from soil
+    crop.N_act_up = sum(uptakes)  # give to crop
 
-        # C.5.C.5
-        N_demand = max(N_up_over - NO3_over, 0)
-
-        if N_demand < 0:
-            N_demand = 0
-
-    crop_type.act_N_up_each_layer = act_N_up_each_layer
-
-
-def N_uptake(soil):
-    for layer in soil.soil_layers:
-        layer.NO3 -= layer.N_uptake
 
 
 def calc_layer_nitrogen_potential(boundaries: list[float], demand: float,
@@ -357,25 +406,7 @@ def calc_layer_nitrogen_potential(boundaries: list[float], demand: float,
     boundary_nitrogen = [calc_nitrogen_uptake_to_depth(demand, x, root_depth, ndistro) for x in boundaries]  # N at each boundary
     boundary_nitrogen.insert(0, 0)  # 0 N uptake at soil surface
     layer_nitrogen = [below - above for below, above in zip(boundary_nitrogen[1:], boundary_nitrogen)]  # subtract previous layer
-    return(layer_nitrogen)
-
-    # N_up_each_layer = []
-    #
-    # N_up_for_top_of_layer = 0
-    # for layer in soil.soil_layers:
-    #     N_up_for_bottom_of_layer = calc_nitrogen_uptake_to_depth(crop_type, layer.bottom_depth)
-    #
-    #     # C.5.C.3
-    #     N_up_ly = N_up_for_bottom_of_layer - N_up_for_top_of_layer
-    #
-    #     N_up_each_layer.append(N_up_ly)
-    #
-    #     # Set the top for next layer equal to bottom of this layer
-    #     N_up_for_top_of_layer = N_up_for_bottom_of_layer
-    #
-    # return N_up_each_layer
-
-
+    return layer_nitrogen
 
 
 def calc_nitrogen_uptake_to_depth(demand: float, depth: float, root_depth: float, ndistro: float) -> float:
@@ -404,23 +435,35 @@ def calc_nitrogen_uptake_to_depth(demand: float, depth: float, root_depth: float
         first_term = demand / (1 - exp(-ndistro))
         second_term = 1 - exp(-ndistro * (depth / root_depth))
         return first_term * second_term
-    # if crop_type.z_root == 0:
-    #     return 0
-    # term1 = crop_type.N_up / (1 - exp(-1 * crop_type.beta_n))
-    # term2 = 1 - exp(-1 * crop_type.beta_n * z / crop_type.z_root)
-    # return term1 * term2
 
 
-def calc_bio_N(soil, crop_type):
+def calc_stored_nitrogen(uptake: float, previous: float, fixed: float = 0) -> float:
     """
     Description:
-        Calculates actual mass of nitrogen stored in plant material.
+        Calculates actual mass of nitrogen stored in plant material on the current day.
         "pseudocode_crop" C.5.E.1
 
     Args:
-        soil
-        crop_type
-    """
+        uptake: the mass of the nitrogen taken up by the plant on the current day
+        previous: the mass of the plant's stored nitrogen from the previous day
+        fixed: the mass of nitrogen fixed by the plant on the current day
 
-    crop_type.N_fix = calc_N_fixation(soil, crop_type)
-    crop_type.bio_N = crop_type.bio_N + crop_type.N_act_up + crop_type.N_fix
+    Returns:
+        the total mass of nitrogen in the plant on the current day
+    """
+    return previous + uptake + fixed
+    # crop_type.N_fix = calc_N_fixation(soil, crop_type)
+    # crop_type.bio_N = crop_type.bio_N + crop_type.N_act_up + crop_type.N_fix
+
+
+def fix_nitrogen(crop, soil) -> None:
+    crop.N_fix = calc_N_fixation(soil, crop)
+
+def update_stored_nitrogen(crop) -> None:
+    """
+    Description: updates the nitrogen biomass of a crop
+
+    Args:
+        crop: an instance of the BaseCrop class
+    """
+    crop.bio_N = calc_stored_nitrogen(uptake=crop.N_act_up, previous=crop.bio_N, fixed=crop.N_fix)

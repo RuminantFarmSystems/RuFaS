@@ -108,7 +108,7 @@ def test_update_nfrac(heatfrac, n1, n2, n3star, n3, phu_half, phu_full, bmass):
     (.25, .3),
     (.10, .257)
 ])
-def test_calc_optimial_nitrogen(nf, bm):
+def test_calc_optimal_nitrogen(nf, bm):
     """test that optimal nitrogen is correctly calculated by calc_optimal_nitrogen()"""
     assert calc_optimal_nitrogen(nf, bm) == nf*bm
 
@@ -119,7 +119,7 @@ def test_calc_optimial_nitrogen(nf, bm):
     (1, 1, 1),  # N=1
     (237.3, .18, 1192.112)  # arbitrary
 ])
-def test_calc_optimial_nitrogen(nstart, nf, bm):
+def test_update_optimal_nitrogen(nstart, nf, bm):
     """test that a plant's optimal nitrogen is correctly updated by update_optimal_nitrogen()"""
     mc = mock_crop(biomass_actual=bm, fr_N=nf, bio_N_opt=nstart)
     update_optimal_nitrogen(mc)
@@ -136,10 +136,10 @@ def test_calc_optimial_nitrogen(nstart, nf, bm):
     (189.4, 105.01, 0.355, 233.59),  # arbitrary (first route) min(84, 331)
     (189.4, 105.01, 0.355, 23.359),  # arbitrary (second route) min(84, 33.1)
 ])
-def test_calc_max_nitrogen_uptake(opt, prev, mat, growth):
+def test_calc_potential_nitrogen_uptake(opt, prev, mat, growth):
     """test that potential nitrogen uptake is correctly calculated by calc_max_nitrogen_uptake()"""
     expect = min(opt - prev, 4*mat*growth)
-    observe = calc_nitrogen_demand(demand=opt, nitrogen_start=prev, mature_nfrac=mat, max_growth=growth)
+    observe = calc_potential_nitrogen_uptake(demand=opt, nitrogen_start=prev, mature_nfrac=mat, max_growth=growth)
     assert expect == observe
 
 
@@ -154,14 +154,14 @@ def test_calc_max_nitrogen_uptake(opt, prev, mat, growth):
     (189.4, 105.01, 0.355, 23.359),  # arbitrary (second route) min(84, 33.1)
     (189.4, 189.4, 0.355, 23.359),  # opt_n = prev_n
 ])
-def test_update_max_nitrogen_uptake(opt_n, prev_n, mat_nfrac, grow_max):
+def test_update_potential_nitrogen_uptake(opt_n, prev_n, mat_nfrac, grow_max):
     """check that potential nitrogen uptake is correctly updated for a plant by update_max_nitrogen_uptake()"""
     mc = mock_crop(bio_N_opt=opt_n, prev_bio_N=prev_n, fr_n3=mat_nfrac, d_biomass_max=grow_max, N_up=0)
-    update_nitrogen_demand(mc)
+    update_potential_nitrogen_uptake(mc)
     if opt_n - prev_n < 0:
         expect = 0
     else:
-        expect = calc_nitrogen_demand(opt_n, prev_n, mat_nfrac, grow_max)
+        expect = calc_potential_nitrogen_uptake(opt_n, prev_n, mat_nfrac, grow_max)
     assert mc.N_up == expect
 
 
@@ -176,7 +176,7 @@ def test_update_max_nitrogen_uptake(opt_n, prev_n, mat_nfrac, grow_max):
     (98.63, 20.2, 32.28, -0.38),  # coefficient < 0
     (98.63, 20.2, 12.28, 0.38),  # depth > root depth
 ])
-def test_calc_surface_nitrogen_uptake(d, z, r, b):
+def test_nitrogen_uptake_to_depth(d, z, r, b):
     """check that nitrogen uptake is correctly calculated by calc_surface_nitrogen_uptake()"""
     observe = calc_nitrogen_uptake_to_depth(demand=d, depth=z, root_depth=r, ndistro=b)
     if r <= 0:
@@ -190,7 +190,7 @@ def test_calc_surface_nitrogen_uptake(d, z, r, b):
     (0, 0, 0, 0),  # all 0
     (0.3, 0.28, 0.11, 0)
 ])
-def test_error_surface_nitrogen_uptake(d, z, r, b):
+def test_error_nitrogen_uptake_to_depth(d, z, r, b):
     """"check that errors are appropriately thrown for calc_surface_nitrogen_uptake()"""
     with pytest.raises(Exception):
         calc_nitrogen_uptake_to_depth(demand=d, depth=z, root_depth=r, ndistro=b)
@@ -221,14 +221,91 @@ def test_calc_layer_nitrogen_potential(bounds, d, r, b):
     observe = calc_layer_nitrogen_potential(boundaries=bounds, demand=d, root_depth=r, ndistro=b)
     assert expect == observe
 
-def test_N_uptake():
+@pytest.mark.parametrize("pots,avails", [
+    ([0.5, 0.25, 0.05], [0.3, 0.2, 0.01]),
+    ([0.5, 0.25, 0.05], [0.6, 0.3, 0.06]),  # abundant nitrates
+    ([0.5, 0.25, 0.05], [0, 0, 0]),  # no nitrates
+    ([0.5, 0.25, 0.05, .01], [0.3, 0.2, 0.01, 0.01]),  # 4 layers
+    ([0.5, 0.25, 0.05], [0.5, 0.25, 0.05]),  # exactly met demands
+    ([112.3, 50.44, 17, 12.99], [50.33, 15.10, 8.05, 6.66]),  # arbitrary
+])
+def test_calc_layer_nitrogen_demand(pots, avails):
+    """test that nitrogen demand is correctly calculated for each layer by calc_layer_nitrogen_demand()"""
+    observe = calc_layer_nitrogen_demand(uptake_potentials=pots, nitrate_availabilities=avails)
+
+    # # test structure adapted from old version of code
+    # # TODO: this test code (and therefore, the old function code) gives something other than expected
+    # #   I need to triple-check this with the pseudocode.
+    # cumulative_uptake_potential = 0
+    # cumulative_nitrates = 0
+    # nitrogen_demand = 0  # a layer's demand starts at 0
+    # layer_demand = []
+    # actual_uptake = []
+    # for potential, available in zip(pots, avails):
+    #     nitrogen_uptake = min((potential + nitrogen_demand), available)
+    #     actual_uptake.append(nitrogen_uptake)
+    #     cumulative_uptake_potential += potential
+    #     cumulative_nitrates += available
+    #     demand = max(cumulative_uptake_potential - cumulative_nitrates, 0)
+    #     layer_demand.append(demand)
+    #     nitrogen_demand = demand
+    # expect = layer_demand
+    # assert expect == observe
+
+    # new version (based on my interpretation of psuedocode) - this version works
+    # starting values
+    no3_sum = 0
+    up_sum = 0
+    demand_list = []
+    for pot_up, no3 in zip(pots, avails):  # loop over layers
+        # demand = previous up_sum - previous no3_sum:
+        demand = up_sum - no3_sum  # difference between potential and available
+        demand = max(demand, 0) # constrain to zero
+        demand_list.append(demand)
+
+        # add to totals for next loop
+        up_sum += pot_up
+        no3_sum += no3
+    assert demand_list == pytest.approx(observe, rel=0.00001)
+
+@pytest.mark.parametrize("demand,potential,nitrate", [
+    ([1, 1, 1], [0.5, 0.5, 0.5], [0.3, 0.3, 0.3]),  # use nitrate
+    ([1, 1, 1], [0.5, 0.5, 0.5], [0.6, 0.6, 0.6]),  # use nitrogen
+    ([1, 1, 1], [0.5, 0.5, 0.5], [0.6, 0.3, 0.6]),  # use nitrogen, then nitrate, then nitrogen
+    ([1, 1, 1], [0.5, 0.5, 0.5], [0.6, 0.3, 0.6]),  # increased demand
+    ([0.01, 0.01, 0.01], [0.5, 0.5, 0.5], [0.6, 0.3, 0.6]),  # decreased demand
+    ([25, 8.33, 2.05, 12.99, 0.5], [22.5, 15.98, 2.22, 35.4, 0.001], [15.5, 20.99, 8, 5.5, 0.1])  # arbitrary
+])
+def test_calc_layer_nitrogen_uptake(demand, potential, nitrate):
+    """test that actual nitrogen uptake from each layer is properly calculated by calc_layer_nitrogen_uptake()"""
+    observe = calc_layer_nitrogen_uptake(layer_demand=demand, layer_potential=potential, layer_nitrate=nitrate)
+    expect = []
+    for d, p, n in zip(demand, potential, nitrate):
+        uptake = min(p + d, n)
+        expect.append(uptake)
+    assert observe == expect
+
+@pytest.mark.parametrize("prev,new,fix", [
+    (1, 1, 1),  # all 1
+    (1, 1, 0),  # no fixation
+    (1, 0, 1),  # no new nitrogen
+    (0, 1, 1),  # no previous nitrogen
+    (0, 0, 0),  # all 0
+    (50.39, 10.55, 3.05)  # arbitrary
+])
+def calc_stored_nitogen(prev, new, fix):
+    """test the stored nitrogen is properly calculated by calc_stored_nitrogen()"""
+    observe = calc_stored_nitrogen(uptake=new, previous=prev, fixed=fix)
+    assert observe == prev + new + fix
+
+def test_uptake_nitrogen():
     assert False
 
-def test_calc_N_up_each_layer():
+def test_update_stored_nitrogen():
     assert False
 
-def calc_bio_N():
-    assert False
+def test_fix_nitrogen():
+    raise Exception("fix_nitrogen() needs to be changed once nitrogen_fixation.py (calc_N_fixation()) has been refactored and tested")
 
 def test_update_all():
     assert False
