@@ -48,13 +48,12 @@ CropType values updated by calling update_all():
 """
 
 from math import log, exp
-from itertools import accumulate
 from RUFAS.routines.field.crop.nitrogen_fixation import calc_N_fixation
 
 # TODO: These functions should probably be moved to the base_crop class as member functions
 
 
-def update_all(crop_type, soil):
+def update_nitrogen(crop_type, soil):
     """
     Description:
         Updates nitrogen uptake information for the given crop.
@@ -68,7 +67,7 @@ def update_all(crop_type, soil):
     update_optimal_nitrogen(crop_type)
     update_potential_nitrogen_uptake(crop_type)
     uptake_nitrogen(crop_type, soil)
-    fix_nitrogen(crop_type)  # TODO: needs updating
+    fix_nitrogen(crop_type, soil)  # TODO: needs updating
     update_stored_nitrogen(crop_type)
 
 
@@ -303,11 +302,6 @@ def calc_layer_nitrogen_uptake(layer_demand: list[float], layer_potential: list[
     layer_desired = [potential + demand for potential, demand in zip(layer_potential, layer_demand)]
     return [min(desired, nitrate) for desired, nitrate in zip(layer_desired, layer_nitrate)]
 
-def update_layer_nitrogen_uptake() -> None:
-    # TODO: I'm not sure if this function is needed, or of uptake_nitrogen() should handle all updates
-    #  I'm leaning toward the latter option.
-    pass
-
 def calc_layer_nitrogen_demand(uptake_potentials: list[float], nitrate_availabilities: list[float]) -> list[float]:
     """
     Description:
@@ -366,6 +360,9 @@ def uptake_nitrogen(crop, soil) -> None:
     Args:
         crop: an instance of the BaseCrop class
         soil: an instance of the Soil class
+
+    Returns:
+        Nothing. Instead, nitrogen attributes are updated in crop and soil
     """
     # pre-uptake conditions
     layer_bounds = [layer.bottom_depth for layer in soil.soil_layers]
@@ -375,11 +372,12 @@ def uptake_nitrogen(crop, soil) -> None:
     demands = calc_layer_nitrogen_demand(uptake_potentials=potentials, nitrate_availabilities=layer_nitrates)
     uptakes = calc_layer_nitrogen_uptake(layer_demand=demands, layer_potential=potentials, layer_nitrate=layer_nitrates)
     # update attributes
+    crop.pot_N_up_each_layer = potentials  # todo: needed?
+    crop.act_N_up_each_layer = uptakes  # todo: needed?
     for uptake, layer in zip(uptakes, soil.soil_layers):
         layer.N_uptake = uptake
         layer.NO3 -= uptake  # remove from soil
     crop.N_act_up = sum(uptakes)  # give to crop
-
 
 
 def calc_layer_nitrogen_potential(boundaries: list[float], demand: float,
@@ -402,6 +400,14 @@ def calc_layer_nitrogen_potential(boundaries: list[float], demand: float,
     Returns:
         a list of potential nitrogen uptake from each layer
     """
+    # check that boundaries are in ascending order
+    sorted = boundaries.copy()
+    sorted.sort()
+    if sorted != boundaries:
+        raise ValueError("boundaries must be in ascending order (deeper layers follow shallower ones)")
+    # check that there aren't duplicates (each layer should have a unique depth)
+    if len(boundaries) != len(set(boundaries)):
+        raise ValueError("multiple soil boundaries cannot have the same depths. Remove the redundant layer?")
 
     boundary_nitrogen = [calc_nitrogen_uptake_to_depth(demand, x, root_depth, ndistro) for x in boundaries]  # N at each boundary
     boundary_nitrogen.insert(0, 0)  # 0 N uptake at soil surface
