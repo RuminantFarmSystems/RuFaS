@@ -314,7 +314,16 @@ def calc_layer_nitrogen_demand(uptake_potentials: list[float], nitrate_availabil
     Returns: a list of nitrogen demands from each soil layer
     """
     layer_delta = [desired - available for desired, available in zip(uptake_potentials, nitrate_availabilities)]
-    layer_demand = [sum(layer_delta[:i]) for i in range(len(layer_delta))] # cumulative sum
+    layer_demand = [sum(layer_delta[:i]) for i in range(len(layer_delta))] # cumulative sum, starting at 0
+
+    ## ---- above lead to yield issues, trying old version: (this wasn't it)
+    # demand = 0
+    # layer_demand = []
+    # for i in range(len(layer_delta)):
+    #     demand = demand + layer_delta[i]
+    #     layer_demand.append(demand)
+    ## ---- End
+
     return [max(val, 0) for val in layer_demand]  # constrain to zero
 
     # crop_type.pot_N_up_each_layer = calc_layer_nitrogen_potential(soil, crop_type)

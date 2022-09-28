@@ -282,6 +282,7 @@ def test_calc_layer_nitrogen_demand(pots, avails):
         up_sum += pot_up
         no3_sum += no3
     assert demand_list == pytest.approx(observe, rel=0.00001)
+    raise Exception("This function is the likely culprit for significantly reduced yields... (no, it's something else)")
 
 @pytest.mark.parametrize("demand,potential,nitrate", [
     ([1, 1, 1], [0.5, 0.5, 0.5], [0.3, 0.3, 0.3]),  # use nitrate
