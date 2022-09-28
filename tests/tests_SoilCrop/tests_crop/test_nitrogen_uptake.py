@@ -7,7 +7,7 @@ Author(s): Brandon DeBoer, brdeboer@wisc.edu
 
 import pytest
 from RUFAS.routines.field.crop.nitrogen_uptake import *
-from tests.tests_SoilCrop.mock_classes import mock_crop
+from tests.tests_SoilCrop.mock_classes import mock_crop, mock_soil, mock_soil_layer
 
 
 @pytest.mark.parametrize("heat,nfrac,n3,n1", [
@@ -221,6 +221,21 @@ def test_calc_layer_nitrogen_potential(bounds, d, r, b):
     observe = calc_layer_nitrogen_potential(boundaries=bounds, demand=d, root_depth=r, ndistro=b)
     assert expect == observe
 
+@pytest.mark.parametrize("bounds,d,r,b", [
+    ([1, 0], 1, 1, 1),
+    ([1, .5, 3], 1, 1, 1),
+    ([1, 2, 3, 2.9], 1, 1, 1),
+    ([100, 100.1, 100.01], 1, 1, 1),
+    ([0.5, 0.4, 0.3], 0.53, .9, 0.11),
+    ([1, 2, 3, 3], 1, 1, 1),  # ascending with redundant layer
+    ([1, 1, 1, 1], 1, 1, 1),  # redundant layers
+    ([3, 2, 1, 1], 1, 1, 1),  # descending with redundant layer
+])
+def test_error_calc_layer_nitrogen_potential(bounds, d, r, b):
+    """check that calc_layer_nitrogen_potential throws an error when soil boundaries are not properly ordered"""
+    with pytest.raises(Exception):
+        calc_layer_nitrogen_potential(bounds, d, r, b)
+
 @pytest.mark.parametrize("pots,avails", [
     ([0.5, 0.25, 0.05], [0.3, 0.2, 0.01]),
     ([0.5, 0.25, 0.05], [0.6, 0.3, 0.06]),  # abundant nitrates
@@ -298,14 +313,70 @@ def calc_stored_nitogen(prev, new, fix):
     observe = calc_stored_nitrogen(uptake=new, previous=prev, fixed=fix)
     assert observe == prev + new + fix
 
-def test_uptake_nitrogen():
-    assert False
+@pytest.mark.parametrize("uptake_potential,root_depth,ndistro,layer_depths,layer_nitrates", [
+    (1, 1, 0.5, [0.25, 0.5, 0.75, 1.0], [0.5, 0.25, 0.04, 0.01]),  # roots = max depth, even layers, unit sums
+    (1.5, 1, 0.5, [0.25, 0.5, 0.75, 1.0], [0.5, 0.25, 0.04, 0.01]),  # increased demand
+    (0.05, 1, 0.5, [0.25, 0.5, 0.75, 1.0], [0.5, 0.25, 0.04, 0.01]),  # decreased demand
+    (0, 1, 0.5, [0.25, 0.5, 0.75, 1.0], [0.5, 0.25, 0.04, 0.01]),  # no demand
+    (1, 1.5, 0.5, [0.25, 0.5, 0.75, 1.0], [0.5, 0.25, 0.04, 0.01]),  # increased root depth
+    (1, 0.5, 0.5, [0.25, 0.5, 0.75, 1.0], [0.5, 0.25, 0.04, 0.01]),  # decreased root depth
+    (1, 0, 0.5, [0.25, 0.5, 0.75, 1.0], [0.5, 0.25, 0.04, 0.01]),  # no roots
+    (1, 1, 1, [0.25, 0.5, 0.75, 1.0], [0.5, 0.25, 0.04, 0.01]),  # ndistro = 1
+    (1, 1, -1, [0.25, 0.5, 0.75, 1.0], [0.5, 0.25, 0.04, 0.01]),  # ndistro < 0
+    (1, 1, 0.5, [0.25, 0.5, 0.75, 1.0], [1, 0.75, 0.5, 0.25]),  # increased nitrates
+    (1, 1, 1, [0.25, 0.5, 0.75, 1.0], [0.25, 0.05, 0.01, 0.001]),  # decreased nitrates
+    (1, 1, 1, [0.25, 0.5, 0.75, 1.0], [0, 0, 0, 0]),  # no nitrates
+    (1, 1, 1, [0.25, 0.5, 0.75, 1.0, 1.2], [0.5, 0.25, 0.04, 0.01, 0.005]),  # extra soil layer
+    (332.33, 50.08, 0.298, [20.22, 31.85, 33.01, 40.12], [20, 5.51, 1.01, 10.01]),  # arbitrary
+    (1050, 85, 0.66, [37.1, 71.97, 90.33, 113.9], [309, 453.2, 1007.3, 500.22]),  # arbitrary 2
+])
+def test_uptake_nitrogen(uptake_potential, root_depth, ndistro, layer_depths, layer_nitrates):
+    """integration test for the uptake_nitrogen() function, which updates class attributes with many functions"""
+    # observed
+    ms = mock_soil(soil_layers=[])
+    for depth, nitrate in zip(layer_depths, layer_nitrates):
+        ml = mock_soil_layer(bottom_depth=depth, NO3=nitrate, N_uptake=0)
+        ms.soil_layers.append(ml)
+    mc = mock_crop(N_up=uptake_potential, z_root=root_depth, beta_n=ndistro, N_act_up=0)
+    uptake_nitrogen(mc, ms)
+    observe_soil_uptakes = [layer.N_uptake for layer in ms.soil_layers]
+    observe_soil_nitrates = [layer.NO3 for layer in ms.soil_layers]
+    # expected
+    expect_potentials = calc_layer_nitrogen_potential(boundaries=layer_depths, demand=uptake_potential,
+                                                      root_depth=root_depth, ndistro=ndistro)
+    expect_demands = calc_layer_nitrogen_demand(uptake_potentials=expect_potentials,
+                                                nitrate_availabilities=layer_nitrates)
+    expect_uptakes = calc_layer_nitrogen_uptake(layer_demand=expect_demands, layer_potential=expect_potentials,
+                                                layer_nitrate=layer_nitrates)
+    expect_nitrates = [nitrate - uptake for nitrate, uptake in zip(layer_nitrates, expect_uptakes)]
+    # collect results
+    observe = [mc.pot_N_up_each_layer, mc.act_N_up_each_layer, mc.N_act_up, observe_soil_uptakes, observe_soil_nitrates]
+    expect = [expect_potentials, expect_uptakes, sum(expect_uptakes), expect_uptakes, expect_nitrates]
+    # assertion
+    assert observe == expect
 
-def test_update_stored_nitrogen():
-    assert False
+@pytest.mark.parametrize("total_uptake,nitrogen_start,fixed", [
+    (1, 0, 0),  # uptake only
+    (0, 0, 1),  # fixation only
+    (1, 0, 1),  # uptake and fixation
+    (1, 1, 1),  # start with some N
+    (0, 0, 0),  # no change
+    (0, 1, 0),  # no change - start with some N
+    (23.59, 12.5, 1.033),  # arbitrary
+    (19.79, 22.08, 0.051),  # arbitrary
+])
+def test_update_stored_nitrogen(total_uptake, nitrogen_start, fixed):
+    """test that stored nitrogen is properly updated by update_stored_nitrogen()"""
+    mc = mock_crop(N_act_up=total_uptake, bio_N=nitrogen_start, N_fix=fixed)
+    update_stored_nitrogen(mc)
+    expect = calc_stored_nitrogen(uptake=total_uptake, previous=nitrogen_start, fixed=fixed)
+    assert mc.bio_N == expect
 
 def test_fix_nitrogen():
-    raise Exception("fix_nitrogen() needs to be changed once nitrogen_fixation.py (calc_N_fixation()) has been refactored and tested")
+    motivational_message = "fix_nitrogen() needs to be changed once nitrogen_fixation.py" +\
+                           "(calc_N_fixation()) has been refactored and tested - Clay"
+    raise Exception(motivational_message)
 
-def test_update_all():
-    assert False
+
+def test_update_nitrogen():
+    raise Exception("I still need to write an integration test for update_nitrogen() - Clay")
