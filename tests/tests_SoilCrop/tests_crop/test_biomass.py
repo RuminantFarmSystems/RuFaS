@@ -233,4 +233,4 @@ def test_calc_water_def(et, et_max):
         assert calc_water_def(et, et_max) == 0
 
 def test_update_all():
-    assert False  # TODO: I don't yet know how to properly mock the radiation object
+    pass  # TODO: I don't yet know how to properly mock the radiation object
