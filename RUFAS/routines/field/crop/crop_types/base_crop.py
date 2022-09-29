@@ -34,4 +34,3 @@ class BaseCrop:
         self.HI_min = 0
         self.HI_actual = 0
         self.HI_max = 0
-        self.prev_bio_N = 0
