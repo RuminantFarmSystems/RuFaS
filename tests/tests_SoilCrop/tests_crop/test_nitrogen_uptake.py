@@ -1,8 +1,6 @@
 """
-RUFAS: Ruminant Farm Systems Model
-File name: test_nitrogen_uptake.py
-Description: Implements test cases
-Author(s): Brandon DeBoer, brdeboer@wisc.edu
+Description: Implements test cases for the nitrogen_uptake.py submodule
+Author(s): Clay Morrow (morrowcj@outlook.com); Brandon DeBoer (brdeboer@wisc.edu)
 """
 
 import pytest
@@ -16,7 +14,7 @@ from tests.tests_SoilCrop.mock_classes import mock_crop, mock_soil, mock_soil_la
     (0.32, .5, .25, .75),  # arbitrary
 ])
 def test_calc_shape_log(heat, nfrac, n3, n1):
-    """Description: check that calc_shape_log() calculates correct output"""
+    """check that calc_shape_log() calculates correct output"""
     observe = calc_shape_log(heat_frac=heat, nfrac_x=nfrac, nfrac_3=n3, nfrac_1=n1)
     bottom = 1 - ((nfrac - n3) / (n1 - n3))
     inside = (heat / bottom) - heat
@@ -39,7 +37,7 @@ def test_calc_shape_log(heat, nfrac, n3, n1):
     # (1, 0.3, 0.29, 0.8),  # no error
 ])
 def test_error_calc_shape_log(heat, nfrac, n3, n1):
-    """Description: check that calc_shape_log() throws erros when appropriate"""
+    """check that calc_shape_log() throws errors when appropriate"""
     with pytest.raises(Exception):
         calc_shape_log(heat_frac=heat, nfrac_x=nfrac, nfrac_3=n3, nfrac_1=n1)
 
@@ -50,9 +48,10 @@ def test_error_calc_shape_log(heat, nfrac, n3, n1):
     (0.8, 1, 0.9, 0.6, 0.25000001, 0.25),  # small difference in nfrac_near and nfrac_3
     (0.633, 0.691, 0.530, 0.101, 0.057, 0.013),  # arbitrary
 ])
-def test_calc_nshape2(hh, hf, n1, n2, nn, n3):
-    """Description: check that the shape parameters are correctly calculated by calc_nshapes"""
-    observe = calc_shape_parameters(heatfrac_half=hh, heatfrac_full=hf, nfrac_1=n1, nfrac_2=n2, nfrac_near=nn, nfrac_3=n3)
+def test_calc_shape_parameters(hh, hf, n1, n2, nn, n3):
+    """check that the shape parameters are correctly calculated by calc_nshapes()"""
+    observe = calc_shape_parameters(heatfrac_half=hh, heatfrac_full=hf, nfrac_1=n1, nfrac_2=n2, nfrac_near=nn,
+                                    nfrac_3=n3)
     expect_2 = (calc_shape_log(hh, n2, n3, n1) - calc_shape_log(hf, nn, n3, n1)) / (hf - hh)
     expect_1 = calc_shape_log(hh, n2, n3, n1) + (expect_2 * hh)
     assert observe == [expect_1, expect_2]
@@ -66,7 +65,8 @@ def test_calc_nshape2(hh, hf, n1, n2, nn, n3):
     (0.2, 0.8, 0.5, -0.5, -0.1),  # both negative
     (0.789, 0.587, 0.501, 0.138, 0.920),  # arbitrary
 ])
-def test_calc_nfrac(p, n1, n3, shape1, shape2):
+def test_calc_nitrogen_fraction(p, n1, n3, shape1, shape2):
+    """ensure that nitrogen fraction is correctly calculated by calc_nitrogen_fraction()"""
     observe = calc_nitrogen_fraction(phu_frac=p, nfrac_1=n1, nfrac_3=n3, shape1=shape1, shape2=shape2)
     expect = (n1 - n3) * (1 - (p / (p + exp(shape1 + shape2*p)))) + n3
     assert observe == expect
@@ -83,8 +83,8 @@ def test_calc_nfrac(p, n1, n3, shape1, shape2):
     (0.6, 0.8, 0.6, 0.3, 0.01, 0.8, 1, 0),  # no bmass
     (0.782, 0.533, 0.440, 0.331, 0.002, 0.975, 0.987, 1357.94),  # arbitrary
 ])
-def test_update_nfrac(heatfrac, n1, n2, n3star, n3, phu_half, phu_full, bmass):
-    """test that nitrogen fraction is properly updated by update_nfrac()"""
+def test_update_nitrogen_fraction(heatfrac, n1, n2, n3star, n3, phu_half, phu_full, bmass):
+    """test that nitrogen fraction is properly updated by update_nitrogen_fraction()"""
     if bmass == 0:
         expect = 0
     else:
@@ -96,7 +96,6 @@ def test_update_nfrac(heatfrac, n1, n2, n3star, n3, phu_half, phu_full, bmass):
                    fr_PHU=heatfrac, prev_fr_PHU=heatfrac, fr_n1=n1, fr_n2=n2, fr_n3ish=n3star, fr_n3=n3)
     update_nitrogen_fraction(mc)
     observe = mc.fr_N
-
     assert observe == expect
 
 
@@ -185,6 +184,7 @@ def test_nitrogen_uptake_to_depth(d, z, r, b):
         expect = (d / (1 - exp(-b))) * (1 - exp(-b * (z / r)))
     assert observe == expect
 
+
 @pytest.mark.parametrize("d,z,r,b", [
     (1, 1, 1, 0),  # no coefficient (error)
     (0, 0, 0, 0),  # all 0
@@ -209,7 +209,9 @@ def test_error_nitrogen_uptake_to_depth(d, z, r, b):
     ([0.991, 3.7, 3.89, 12.01, 15], 338.97, 1.25, 0.395),  # arbitrary (roots in 2nd)
 ])
 def test_calc_layer_nitrogen_potential(bounds, d, r, b):
-    """test that potential nitrogen uptake is calculated correctly for each soil layer with calc_layer_nitrogen_potential()"""
+    """
+    test that potential nitrogen uptake is calculated correctly for each soil layer with calc_layer_nitrogen_potential()
+    """
     layer_nitrogen = []  # empty list to fill
     upper_nitrogen = 0  # nitrogen in the top boundary (soil surface) is 0
     for i in range(len(bounds)):
@@ -220,6 +222,7 @@ def test_calc_layer_nitrogen_potential(bounds, d, r, b):
     expect = layer_nitrogen
     observe = calc_layer_nitrogen_potential(boundaries=bounds, demand=d, root_depth=r, ndistro=b)
     assert expect == observe
+
 
 @pytest.mark.parametrize("bounds,d,r,b", [
     ([1, 0], 1, 1, 1),
@@ -236,6 +239,7 @@ def test_error_calc_layer_nitrogen_potential(bounds, d, r, b):
     with pytest.raises(Exception):
         calc_layer_nitrogen_potential(bounds, d, r, b)
 
+
 @pytest.mark.parametrize("pots,avails", [
     ([0.5, 0.25, 0.05], [0.3, 0.2, 0.01]),
     ([0.5, 0.25, 0.05], [0.6, 0.3, 0.06]),  # abundant nitrates
@@ -247,42 +251,19 @@ def test_error_calc_layer_nitrogen_potential(bounds, d, r, b):
 def test_calc_layer_nitrogen_demand(pots, avails):
     """test that nitrogen demand is correctly calculated for each layer by calc_layer_nitrogen_demand()"""
     observe = calc_layer_nitrogen_demand(uptake_potentials=pots, nitrate_availabilities=avails)
-
-
-    # # test structure adapted from old version of code
-    # # TODO: this test code (and therefore, the old function code) gives something other than expected
-    # #   I need to triple-check this with the pseudocode.
-    # cumulative_uptake_potential = 0
-    # cumulative_nitrates = 0
-    # nitrogen_demand = 0  # a layer's demand starts at 0
-    # layer_demand = []
-    # actual_uptake = []
-    # for potential, available in zip(pots, avails):
-    #     nitrogen_uptake = min((potential + nitrogen_demand), available)
-    #     actual_uptake.append(nitrogen_uptake)
-    #     cumulative_uptake_potential += potential
-    #     cumulative_nitrates += available
-    #     demand = max(cumulative_uptake_potential - cumulative_nitrates, 0)
-    #     layer_demand.append(demand)
-    #     nitrogen_demand = demand
-    # expect = layer_demand
-    # assert expect == observe
-
-    # new version (based on my interpretation of psuedocode) - this version works
     # starting values
     no3_sum = 0
     up_sum = 0
     demand_list = []
-    for pot_up, no3 in zip(pots, avails):  # loop over layers
-        # demand = previous up_sum - previous no3_sum:
+    # loop over layers
+    for pot_up, no3 in zip(pots, avails):
         demand = up_sum - no3_sum  # difference between potential and available
-        demand = max(demand, 0) # constrain to zero
+        demand = max(demand, 0)  # constrain to zero
         demand_list.append(demand)
-
-        # add to totals for next loop
         up_sum += pot_up
         no3_sum += no3
     assert demand_list == pytest.approx(observe, rel=0.00001)
+
 
 @pytest.mark.parametrize("demand,potential,nitrate", [
     ([1, 1, 1], [0.5, 0.5, 0.5], [0.3, 0.3, 0.3]),  # use nitrate
@@ -301,6 +282,7 @@ def test_calc_layer_nitrogen_uptake(demand, potential, nitrate):
         expect.append(uptake)
     assert observe == expect
 
+
 @pytest.mark.parametrize("prev,new,fix", [
     (1, 1, 1),  # all 1
     (1, 1, 0),  # no fixation
@@ -313,6 +295,7 @@ def calc_stored_nitogen(prev, new, fix):
     """test the stored nitrogen is properly calculated by calc_stored_nitrogen()"""
     observe = calc_stored_nitrogen(uptake=new, previous=prev, fixed=fix)
     assert observe == prev + new + fix
+
 
 @pytest.mark.parametrize("uptake_potential,root_depth,ndistro,layer_depths,layer_nitrates", [
     (1, 1, 0.5, [0.25, 0.5, 0.75, 1.0], [0.5, 0.25, 0.04, 0.01]),  # roots = max depth, even layers, unit sums
@@ -356,6 +339,7 @@ def test_uptake_nitrogen(uptake_potential, root_depth, ndistro, layer_depths, la
     # assertion
     assert observe == expect
 
+
 @pytest.mark.parametrize("total_uptake,nitrogen_start,fixed", [
     (1, 0, 0),  # uptake only
     (0, 0, 1),  # fixation only
@@ -366,12 +350,13 @@ def test_uptake_nitrogen(uptake_potential, root_depth, ndistro, layer_depths, la
     (23.59, 12.5, 1.033),  # arbitrary
     (19.79, 22.08, 0.051),  # arbitrary
 ])
-def test_update_stored_nitrogen(total_uptake, nitrogen_start, fixed):
-    """test that stored nitrogen is properly updated by update_stored_nitrogen()"""
+def test_store_nitrogen(total_uptake, nitrogen_start, fixed):
+    """test that stored nitrogen is properly updated by store_nitrogen()"""
     mc = mock_crop(N_act_up=total_uptake, bio_N=nitrogen_start, N_fix=fixed)
-    update_stored_nitrogen(mc)
+    store_nitrogen_biomass(mc)
     expect = calc_stored_nitrogen(uptake=total_uptake, previous=nitrogen_start, fixed=fixed)
     assert mc.bio_N == expect
+
 
 def test_fix_nitrogen():
     motivational_message = "fix_nitrogen() needs to be changed once nitrogen_fixation.py" +\
@@ -379,5 +364,59 @@ def test_fix_nitrogen():
     raise Exception(motivational_message)
 
 
-def test_update_nitrogen():
-    raise Exception("I still need to write an integration test for update_nitrogen() - Clay")
+# TODO: need to add more test cases for this integration test
+@pytest.mark.parametrize("hf50,hf100,phf,nf1,nf2,nfn,nf3,bm,nmo,ns,mg,rd,nds,nfx,sbs,sns", [
+    (0.5, 1.0, 0.75, 0.8, 0.6, 0.3, 0.2, 100, 10, 50, 20, 1, 0.5, 0, [0.3, 0.6, 1], [0.2, 0.1, 0.01]),
+])
+def test_update_nitrogen(hf50, hf100, phf, nf1, nf2, nfn, nf3, bm, nmo, ns, mg, rd, nds, nfx,
+                         sbs, sns):
+    """integration test for update_nitrogen()"""
+    # observe
+    mc = mock_crop(fr_PHU_50=hf50, fr_PHU_100=hf100, fr_n1=nf1, fr_n2=nf2, fr_n3ish=nfn, fr_n3=nf3,
+                   prev_fr_PHU=phf, bio_N_opt=nmo, bio_N=ns, d_biomass_max=mg, z_root=rd, beta_n=nds,
+                   biomass_actual=bm)
+    ms = mock_soil(soil_layers=[])
+    for depth, nitrate in zip(sbs, sns):
+        ml = mock_soil_layer(bottom_depth=depth, NO3=nitrate, N_uptake=0)
+        ms.soil_layers.append(ml)
+    reallocate_nitrogen(mc, ms)
+    observe_layer_leftovers = [layer.NO3 for layer in ms.soil_layers]
+    observe_layer_uptakes = [layer.N_uptake for layer in ms.soil_layers]
+
+    # expect
+        # update_nitrogen_fraction()
+    nshapes = calc_shape_parameters(heatfrac_half=hf50, heatfrac_full=hf100, nfrac_1=nf1, nfrac_2=nf2, nfrac_near=nfn,
+                                    nfrac_3=nf3, biomass_actual=bm)
+    nfrac = calc_nitrogen_fraction(phu_frac=phf, nfrac_1=nf1, nfrac_3=nf3, shape1=nshapes[0], shape2=nshapes[1])
+        # update_optimal_nitrogen()
+    optimal_nitrogen = calc_optimal_nitrogen(nfrac=nfrac, biomass=bm)
+        # update_potential_nitrogen_uptake()
+    if nmo - ns < 0:
+        potential_uptake = 0
+    else:
+        potential_uptake = calc_potential_nitrogen_uptake(demand=nmo, nitrogen_start=ns, mature_nfrac=nf3,
+                                                          max_growth=mg)
+        # uptake_nitrogen()
+    layer_potentials = calc_layer_nitrogen_potential(boundaries=sbs, demand=potential_uptake, root_depth=rd,
+                                                     ndistro=nds)
+    layer_demands = calc_layer_nitrogen_demand(uptake_potentials=layer_potentials, nitrate_availabilities=sns)
+    layer_uptakes = calc_layer_nitrogen_uptake(layer_demand=layer_demands, layer_potential=layer_potentials,
+                                               layer_nitrate=sns)
+    layer_leftovers = [available - uptake for available, uptake in zip(sns, layer_uptakes)]
+    total_uptake = sum(layer_uptakes)
+        # fix_nitrogen()
+    # TODO: need to update this section of the test after nitrogen_fixation.py is cleaned up
+        # store_nitrogen_biomass()
+    nitrogen_biomass = calc_stored_nitrogen(uptake=total_uptake, previous=ns, fixed=nfx)
+
+    # make assertions (the full test fails on first failed assumption)
+    assert mc.fr_N == nfrac
+    assert mc.bio_N_opt == optimal_nitrogen
+    assert mc.N_up == potential_uptake
+    assert mc.pot_N_up_each_layer == layer_potentials
+    assert mc.act_N_up_each_layer == layer_uptakes
+    assert observe_layer_uptakes == layer_uptakes
+    assert observe_layer_leftovers == layer_leftovers
+    assert mc.N_act_up == total_uptake
+    assert mc.bio_N == nitrogen_biomass
+    raise Exception("refactoring nitrogen_uptake.py may have slowed down the model... double check")
