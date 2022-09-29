@@ -48,9 +48,7 @@ CropType values updated by calling update_all():
 """
 
 from math import log, exp
-from RUFAS.routines.field.crop.nitrogen_fixation import calc_N_fixation
-
-# TODO: These functions should probably be moved to the base_crop class as member functions
+from .nitrogen_fixation import calc_N_fixation
 
 
 def update_nitrogen(crop_type, soil):
@@ -63,11 +61,24 @@ def update_nitrogen(crop_type, soil):
             the current state of the soil profile
         crop_type: an instance of a crop class
     """
-    update_nitrogen_fraction(crop_type)
-    update_optimal_nitrogen(crop_type)
-    update_potential_nitrogen_uptake(crop_type)
-    uptake_nitrogen(crop_type, soil)
-    fix_nitrogen(crop_type, soil)  # TODO: needs updating
+
+    # calc_fr_N(crop_type)
+    update_nitrogen_fraction(crop_type) # - works
+
+    # calc_bio_N_opt(crop_type)
+    update_optimal_nitrogen(crop_type) # ---- fixed ---- #
+
+    # calc_N_up(crop_type)
+    update_potential_nitrogen_uptake(crop_type) # - works
+
+    # calc_act_N_up_each_layer(soil, crop_type)
+    # crop_type.N_act_up = sum(crop_type.act_N_up_each_layer)
+    # N_uptake(soil)
+    uptake_nitrogen(crop_type, soil) # - works
+
+
+    # calc_bio_N(soil, crop_type)
+    fix_nitrogen(crop_type, soil)
     update_stored_nitrogen(crop_type)
 
 
@@ -123,6 +134,7 @@ def update_nitrogen_fraction(crop) -> None:
     else:
         crop.fr_N = calc_nitrogen_fraction(phu_frac=crop.fr_PHU, nfrac_1=crop.fr_n1, nfrac_3=crop.fr_n3,
                                            shape1=shapes[0], shape2=shapes[1])
+
 
 
 def calc_shape_parameters(heatfrac_half: float, heatfrac_full: float, nfrac_1: float, nfrac_2: float,
@@ -207,6 +219,7 @@ def calc_shape_log(heat_frac: float, nfrac_x: float, nfrac_3: float, nfrac_1: fl
     return log((heat_frac / denominator) - heat_frac)
 
 
+
 def calc_optimal_nitrogen(nfrac: float, biomass: float) -> float:
     """
     Description:
@@ -234,7 +247,8 @@ def update_optimal_nitrogen(crop) -> None:
     Returns:
         Nothing. Instead, crop.bio_N_opt is updated
     """
-    crop.bio_N_opt += calc_optimal_nitrogen(nfrac=crop.fr_N, biomass=crop.biomass_actual)
+    crop.bio_N_opt = calc_optimal_nitrogen(nfrac=crop.fr_N, biomass=crop.biomass_actual)
+
 
 
 def calc_potential_nitrogen_uptake(demand: float, nitrogen_start: float, mature_nfrac: float,
@@ -267,13 +281,12 @@ def update_potential_nitrogen_uptake(crop) -> None:
     Returns:
         Nothing. Instead, updates crop.N_up
     """
-    if crop.bio_N_opt - crop.prev_bio_N < 0:
+    if crop.bio_N_opt - crop.bio_N < 0:
         crop.N_up = 0
     else:
-        # TODO: previous nitrogen biomass needs to be added to the crop class (.prev_bio_N)??
-        #  This needs to be re-assessed in the context of the full routines (bio_N vs prev_bio_N)??
-        crop.N_up = calc_potential_nitrogen_uptake(demand=crop.bio_N_opt, nitrogen_start=crop.prev_bio_N, mature_nfrac=crop.fr_n3,
+       crop.N_up = calc_potential_nitrogen_uptake(demand=crop.bio_N_opt, nitrogen_start=crop.bio_N, mature_nfrac=crop.fr_n3,
                                                    max_growth=crop.d_biomass_max)
+
 
 
 def calc_layer_nitrogen_uptake(layer_demand: list[float], layer_potential: list[float],
@@ -470,6 +483,29 @@ def calc_stored_nitrogen(uptake: float, previous: float, fixed: float = 0) -> fl
     # crop_type.N_fix = calc_N_fixation(soil, crop_type)
     # crop_type.bio_N = crop_type.bio_N + crop_type.N_act_up + crop_type.N_fix
 
+def N_uptake(soil):  #TODO: this is a poorly named function: perhaps drawdown_NO3()? - GitHub Issue #171
+    #TODO: no documentation or psuedocode - GitHub Issue #170
+    for layer in soil.soil_layers:
+        layer.NO3 -= layer.N_uptake
+
+def calc_stored_nitrogen(uptake: float, previous: float, fixed: float = 0) -> float:
+    """
+    Description:
+        Calculates actual mass of nitrogen stored in plant material on the current day.
+        "pseudocode_crop" C.5.E.1
+
+    Args:
+        uptake: the mass of the nitrogen taken up by the plant on the current day
+        previous: the mass of the plant's stored nitrogen from the previous day
+        fixed: the mass of nitrogen fixed by the plant on the current day
+
+    Returns:
+        the total mass of nitrogen in the plant on the current day
+    """
+    return previous + uptake + fixed
+    # crop_type.N_fix = calc_N_fixation(soil, crop_type)
+    # crop_type.bio_N = crop_type.bio_N + crop_type.N_act_up + crop_type.N_fix
+
 
 def fix_nitrogen(crop, soil) -> None:
     crop.N_fix = calc_N_fixation(soil, crop)
@@ -482,3 +518,4 @@ def update_stored_nitrogen(crop) -> None:
         crop: an instance of the BaseCrop class
     """
     crop.bio_N = calc_stored_nitrogen(uptake=crop.N_act_up, previous=crop.bio_N, fixed=crop.N_fix)
+

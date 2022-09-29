@@ -123,7 +123,7 @@ def test_update_optimal_nitrogen(nstart, nf, bm):
     """test that a plant's optimal nitrogen is correctly updated by update_optimal_nitrogen()"""
     mc = mock_crop(biomass_actual=bm, fr_N=nf, bio_N_opt=nstart)
     update_optimal_nitrogen(mc)
-    assert mc.bio_N_opt == nstart + (nf*bm)
+    assert mc.bio_N_opt == nf*bm
 
 
 @pytest.mark.parametrize("opt,prev,mat,growth", [
@@ -156,7 +156,7 @@ def test_calc_potential_nitrogen_uptake(opt, prev, mat, growth):
 ])
 def test_update_potential_nitrogen_uptake(opt_n, prev_n, mat_nfrac, grow_max):
     """check that potential nitrogen uptake is correctly updated for a plant by update_max_nitrogen_uptake()"""
-    mc = mock_crop(bio_N_opt=opt_n, prev_bio_N=prev_n, fr_n3=mat_nfrac, d_biomass_max=grow_max, N_up=0)
+    mc = mock_crop(bio_N_opt=opt_n, bio_N=prev_n, fr_n3=mat_nfrac, d_biomass_max=grow_max, N_up=0)
     update_potential_nitrogen_uptake(mc)
     if opt_n - prev_n < 0:
         expect = 0
@@ -248,6 +248,7 @@ def test_calc_layer_nitrogen_demand(pots, avails):
     """test that nitrogen demand is correctly calculated for each layer by calc_layer_nitrogen_demand()"""
     observe = calc_layer_nitrogen_demand(uptake_potentials=pots, nitrate_availabilities=avails)
 
+
     # # test structure adapted from old version of code
     # # TODO: this test code (and therefore, the old function code) gives something other than expected
     # #   I need to triple-check this with the pseudocode.
@@ -282,7 +283,6 @@ def test_calc_layer_nitrogen_demand(pots, avails):
         up_sum += pot_up
         no3_sum += no3
     assert demand_list == pytest.approx(observe, rel=0.00001)
-    raise Exception("This function is the likely culprit for significantly reduced yields... (no, it's something else)")
 
 @pytest.mark.parametrize("demand,potential,nitrate", [
     ([1, 1, 1], [0.5, 0.5, 0.5], [0.3, 0.3, 0.3]),  # use nitrate
