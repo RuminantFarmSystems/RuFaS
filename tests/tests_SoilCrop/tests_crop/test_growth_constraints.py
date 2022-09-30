@@ -9,151 +9,166 @@ from RUFAS.routines.field.crop.crop_types.base_crop import BaseCrop
 from RUFAS.routines.field.soil.soil import Soil
 from RUFAS.classes import Weather, Time
 from RUFAS.routines.field.crop.growth_constraints import *
+from tests.tests_SoilCrop.mock_classes import *
 
 from unittest.mock import MagicMock
 import pytest
 
 from math import exp
 
-def mock_crop(bio_P_opt = 150.0, bio_P = 90.0, bio_N_opt = 120.0,bio_N = 72.0,\
-                water_act_up = 33.2):
-    """
+
+@pytest.mark.parametrize(("bio_P", "bio_P_opt"),[
+    (90,130),  #arbitrary values
+    (0, 0), #all zeroes
+    (1, 1), #all ones
+    (-1, 140), #bio_P negative
+    (78, -1), #bio_P_opt negative
+    (82, 0), #bio_P_opt zero
+    (81,200)
+])
+def test_calc_phi_P(bio_P,bio_P_opt):
+    """ 
     Description:
-        Creates a BaseCrop class mocking object for use as input for functions. It is initialized with the
-        arguments provided; arguments are dynamic and can be changed/added to as needed.
-
-    Args:
-        bio_P_opt (float): BaseCrop attribute, optimal mass of phosphorus stored in plant material (kg P/ha)
-        bio_P (float): BaseCrop attribute, actual mass of phosphorus stored in plant material (kg P/ha
-        bio_N_opt (float): BaseCrop attribute, optimal mass of nitrogen stored in plant material (kg P/ha)
-        bio_N (float): BaseCrop attribute, actual mass of nitrogen stored in plant material (kg P/ha)
-        water_act_up (float): BaseCrop attribute, tottal plant water uptake on a given day (mm H20)
-
-    Returns:
-        BaseCrop class mocking object
+        Unit test for calc_phi_P in routines/field/crop/growth_constraints.py. Makes
+        use of the pytest parametrization to conduct many test cases at once.
     """
-    mcrop = MagicMock(BaseCrop)
+    crop = mock_crop(bio_P = bio_P, bio_P_opt = bio_P_opt)
 
-    mcrop.bio_P_opt = bio_P_opt
-    mcrop.bio_P = bio_P
-    mcrop.bio_N_opt = bio_N_opt
-    mcrop.bio_N = bio_N
-    mcrop.water_act_up = water_act_up
-
-    return mcrop
-
-def mock_soil(trans_max = 42.7):
-    """
-    Description:
-        Creates a Soil class mocking object for use as input for functions. It is initialized with the
-        arguments provided; arguments are dynamic and can be changed/added to as needed.
-
-    Args:
-        trans_max (float): Soil attribute, maximum plant transpiration on a given day (mm H20)
-
-    Returns:
-        Soil class mocking object
-    """
-    msoil = MagicMock(Soil)
-
-    msoil.trans_max = trans_max
-
-    return msoil
-
-def mock_weather():
-    """
-    Description:
-        Creates a Weather class mocking object for use as input for functions. It is initialized with the
-        arguments provided; arguments are dynamic and can be changed/added to as needed.
-
-    Args:
-
-    Returns:
-        Weather class mocking object
-    """
-    pass
-
-def mock_time():
-    """
-    Description:
-        Creates a Time class mocking object for use as input for functions. It is initialized with the
-        arguments provided; arguments are dynamic and can be changed/added to as needed.
-
-    Args:
-
-    Returns:
-        Time class mocking object
-    """
-    pass
-
-
-#calc_phi_P()
-def test_calc_phi_P_correctly_calculates_phi_P_for_non_zero_optimal_P():
-    crop = mock_crop()
-
-    assert pytest.approx(calc_phi_P(crop)) == max(0,200 * ((90.0/150.0) - 0.5))
-
-def test_calc_phi_P_correctly_calculates_phi_P_for_zero_optimal_P():
-    crop = mock_crop(bio_P_opt = 0)
-
-    assert pytest.approx(calc_phi_P(crop)) == 300
-
-#calc_p_stress()...assumes calc_phi_P() works properly
-def test_calc_p_sress_correctly_calculates_phos_stress_for_non_zero_optimal_P():
-    crop = mock_crop()
-
-    phi_P = calc_phi_P(crop)
-    p_stress = 1 - phi_P / (phi_P + exp(3.535 - 0.02597 * phi_P))
-
-    assert pytest.approx(calc_p_stress(crop)) == min(0.99,p_stress)
-
-def test_calc_p_sress_correctly_calculates_phos_stress_for_zero_optimal_P():
-    crop = mock_crop(bio_P_opt= 0.0)
-
-    assert pytest.approx(calc_p_stress(crop)) == 0
-
-#calc_phi_N()
-def test_calc_phi_N_correctly_calculates_phi_N_non_zero_optimal_N():
-    crop = mock_crop()
-
-    assert pytest.approx(calc_phi_N(crop)) == max(0,200 * ((72.0/120.0) - 0.5))
-
-def test_calc_phi_N_correctly_calculates_phi_N_zero_optimal_N():
-    crop = mock_crop(bio_N_opt = 0)
-
-    assert pytest.approx(calc_phi_N(crop)) == 300
-
-#calc_n_stress()...assumes calc_phi_N() works properly
-def test_calc_n_sress_correctly_calculates_nitrogen_stress_for_non_zero_optimal_N():
-    crop = mock_crop()
-
-    phi_N = calc_phi_N(crop)
-    n_stress = 1 - phi_N / (phi_N + exp(3.535 - 0.02597 * phi_N))
-
-    assert pytest.approx(calc_p_stress(crop)) == min(0.99,n_stress)
-
-def test_calc_n_sress_correctly_calculates_nitrogen_stress_for_zero_optimal_N():
-    crop = mock_crop(bio_N_opt= 0.0)
-
-    assert pytest.approx(calc_n_stress(crop)) == 0
-
-#calc_t_stress()
-
-#calc_w_stress()
-def test_w_stress_correctly_calculates_w_stress_larger_water_act_up():
-    crop = mock_crop(water_act_up= 62.3)
-    soil = mock_soil()
+    #
+    if bio_P_opt == 0:
+        phi_P = 300
+    else:
+        phi_P = max(0, 200 * ((bio_P / bio_P_opt) - 0.5))
     
-    assert pytest.approx(calc_w_stress(soil,crop)) == 0
+    assert pytest.approx(calc_phi_P(crop)) == phi_P
 
-def test_w_stress_correctly_calculates_w_stress_smaller_water_act_up():
-    crop = mock_crop()
-    soil = mock_soil()
 
-    assert pytest.approx(calc_w_stress(soil,crop)) == min(0.99,1.0 - (33.2 / 42.7))
 
-def test_w_stress_correctly_calculates_w_stress_trans_max_zero():
-    crop = mock_crop()
-    soil = mock_soil(trans_max=0)
+@pytest.mark.parametrize(("bio_P", "bio_P_opt"),[
+    (81, 200), #arbitrary
+    (0, 0), #zeroes
+    (1, 1), #ones
+    (-1, 250), #negaitve bio_P
+    (80, -1), #negative bio_P_opt
+    (90,0), #bio_P_opt = 0 to induce if statement
+])
+def test_calc_p_stress(bio_P, bio_P_opt):
+    """ 
+    Description:
+        Unit test for calc_P_stress in routines/field/crop/growth_constraints.py. Makes
+        use of the pytest parametrization to conduct many test cases at once. Any functions used as a
+        dependency are assumed to be correct (i.e previously tested before implementation of this test function)
+    """
+    
+    crop = mock_crop(bio_P = bio_P, bio_P_opt = bio_P_opt)
 
-    assert pytest.approx(calc_w_stress(soil,crop)) == 0
+    if bio_P_opt == 0:
+        p_stress = 0
+    else:
+        phi_p = calc_phi_P(crop)
+        print(phi_p)
+        p_stress = min(0.99, 1 - (phi_p / (phi_p + exp(3.535 - (0.02597* phi_p)))))
+    
+    assert pytest.approx(calc_p_stress(crop)) == p_stress
+
+
+@pytest.mark.parametrize(("bio_N", "bio_N_opt"),[
+    (90,130),  #arbitrary values
+    (0, 0), #all zeroes
+    (1, 1), #all ones
+    (-1, 140), #bio_N negative
+    (78, -1), #bio_N_opt negative
+    (82, 0), #bio_N_opt zero
+    (81,200)
+])
+def test_calc_phi_N(bio_N,bio_N_opt):
+    """ 
+    Description:
+        Unit test for calc_phi_N in routines/field/crop/growth_constraints.py. Makes
+        use of the pytest parametrization to conduct many test cases at once.
+    """
+    crop = mock_crop(bio_N = bio_N, bio_N_opt = bio_N_opt)
+
+    #
+    if bio_N_opt == 0:
+        phi_N = 300
+    else:
+        phi_N = max(0, 200 * ((bio_N / bio_N_opt) - 0.5))
+    
+    assert pytest.approx(calc_phi_N(crop)) == phi_N
+
+
+@pytest.mark.parametrize(("bio_N", "bio_N_opt"),[
+    (81, 200), #arbitrary
+    (0, 0), #zeroes
+    (1, 1), #ones
+    (-1, 250), #negaitve bio_P
+    (80, -1), #negative bio_P_opt
+    (90,0), #bio_P_opt = 0 to induce if statement
+])
+def test_calc_n_stress(bio_N, bio_N_opt):
+    """ 
+    Description:
+        Unit test for calc_P_stress in routines/field/crop/growth_constraints.py. Makes
+        use of the pytest parametrization to conduct many test cases at once. Any functions used as a
+        dependency are assumed to be correct (i.e previously tested before implementation of this test function)
+    """
+    
+    crop = mock_crop(bio_N = bio_N, bio_N_opt = bio_N_opt)
+
+    if bio_N_opt == 0:
+        N_stress = 0
+    else:
+        phi_N = calc_phi_N(crop)
+        print(phi_N)
+        N_stress = min(0.99, 1 - (phi_N / (phi_N + exp(3.535 - (0.02597* phi_N)))))
+    
+    assert pytest.approx(calc_n_stress(crop)) == N_stress
+
+@pytest.mark.parametrize(("water_act_up","trans_max"),[
+    (20,40), #arbitrary int
+    (0,0), #zeroes
+    (1,1), #ones
+    (-1,-1), #negative
+    (26.8,34.1), #arbitrary floats
+])
+def test_calc_w_stress(water_act_up, trans_max):
+    """
+    Description:
+        Unit test for calc_w_stress() in routines/field/crop/growth_constraints.py.
+        Makes use of pytest parametrization to conduct many tests at once.
+    """
+    crop = mock_crop(water_act_up = water_act_up)
+    soil = mock_soil(trans_max = trans_max)
+
+    if trans_max == 0:
+        w_stress = 0
+    else:
+        w_stress = 1.0 - (water_act_up / trans_max)
+    if w_stress < 0:
+        w_stress = 0
+    else:
+        w_stress = min(0.99, w_stress)
+
+    assert pytest.approx(calc_w_stress(soil,crop)) == w_stress
+
+
+
+# @pytest.mark.parametrize((),[])
+# def test_calc_t_stress():
+#     """
+#     Description:
+#         Tests calc_t_stress in routines/field/crop/growth_constraints.py.    
+#     """
+#     crop = mock_crop()
+#     time = mock_time()
+#     weather = mock_weather()
+
+
+
+
+#     assert pytest.approx(calc_t_stress(crop,weather,time)) == True
+
+
+
+
