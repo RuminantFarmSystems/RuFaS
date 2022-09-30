@@ -113,7 +113,7 @@ class GasEmissions:
         """Calculates ambient temperature.
 
         Parameters
-            hours: Measured barn temperature, °C within a day, Hours  # TODO: what is this?
+            hours: Measured barn temperature, °C within a day, Hours  # TODO: what is this? H = hour of the day from 1 to 24
             t_min: Minimum barn temperature, °C
             t_max: Maximum barn temperature, °C
 
@@ -133,7 +133,7 @@ class GasEmissions:
 
         Parameters
             pen: A SimplePen object.
-            hours: Measured barn temperature,°C within a day, Hours  # TODO: what is this?
+            hours: Measured barn temperature,°C within a day, Hours  # TODO: what is this? H = hour of the day from 1 to 24
             t_min: Minimum barn temperature, °C
             t_max: Maximum barn temperature, °C
 
@@ -153,7 +153,7 @@ class GasEmissions:
 
         Parameters
             pen: A SimplePen object.
-            hours: Measured barn temperature, °C within a day, Hours. # TODO: what is this?
+            hours: Measured barn temperature, °C within a day, Hours. # TODO: what is this? H = hour of the day from 1 to 24
             t_min: Minimum barn temperature, °C.
             t_max: Maximum barn temperature, °C.
 
