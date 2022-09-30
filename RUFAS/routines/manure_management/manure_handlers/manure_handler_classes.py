@@ -89,6 +89,8 @@ class BaseManureHandler:
                 TSd=pen.manure.TSd,
                 VSd=pen.manure.VSd,
                 VSnd=pen.manure.VSnd,
+                WIP_frac=pen.manure.WIP_frac,
+                WOP_frac=pen.manure.WOP_frac,
                 p_excrt_manure=pen.manure.p_excrt_manure,
                 K_manure=pen.manure.K_manure,
                 CH4_floor=GasEmissions.calc_E_CH4_floor(pen),

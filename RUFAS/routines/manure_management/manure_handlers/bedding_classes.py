@@ -24,11 +24,12 @@ class BaseBedding(ABC):
     """Base class for all bedding types.
 
     Attributes
-        mass: , kg/animal/day.  # TODO: Describe this better
+        mass: , kg/day.  # TODO: Describe this better
         density: Density of the bedding, kg/m^3.
         bedding_dry_matter: Dry matter content of the bedding, kg. # TODO: What is the unit of this?
         bedding_washed_percent: Percent of the bedding that is washed away, %.
-        bedding_mass_per_day: Amount of bedding needed for each animal per day, kg/animal/day.
+        bedding_mass_per_day: Amount of bedding needed for each animal per day, kg/animal/day. # TODO:
+        bedding_mass_per_animal_per_day
         bedding_type: Type of bedding.
 
     """
