@@ -18,7 +18,7 @@ def check_formatted_substrs_should_get_same_expected_enum(full_name: str,
                                                           formatter: Callable[[str], str]):
     cls = expected_enum.__class__
     for j in range(idx, len(full_name)):
-        assert cls.get_enum(formatter(full_name[:j])) is expected_enum
+        assert cls.get_type(formatter(full_name[:j])) is expected_enum
 
 
 def check_lower_case_substrs_should_get_same_expected_enum(full_name: str,
@@ -70,15 +70,15 @@ def check_all_valid_substrs_should_get_same_expected_enum(full_name: str,
 def test_get_enum_should_return_flush_system_when_correct_flush_system_substr_given() -> None:
     full_name = 'flush_system'
     for j in range(2, len(full_name)):
-        assert ManureHandlerEnum.get_enum(full_name[:j]) is ManureHandlerEnum.FLUSH_SYSTEM
-        assert ManureHandlerEnum.get_enum(' ' + full_name[:j] + '  ') is ManureHandlerEnum.FLUSH_SYSTEM
-        assert ManureHandlerEnum.get_enum(full_name[:j].upper()) is ManureHandlerEnum.FLUSH_SYSTEM
-        assert ManureHandlerEnum.get_enum(full_name[:j].capitalize()) is ManureHandlerEnum.FLUSH_SYSTEM
+        assert ManureHandlerEnum.get_type(full_name[:j]) is ManureHandlerEnum.FLUSH_SYSTEM
+        assert ManureHandlerEnum.get_type(' ' + full_name[:j] + '  ') is ManureHandlerEnum.FLUSH_SYSTEM
+        assert ManureHandlerEnum.get_type(full_name[:j].upper()) is ManureHandlerEnum.FLUSH_SYSTEM
+        assert ManureHandlerEnum.get_type(full_name[:j].capitalize()) is ManureHandlerEnum.FLUSH_SYSTEM
 
 
 def test_get_enum_should_return_default_enum_when_incorrect_flush_system_substr_given() -> None:
-    assert ManureHandlerEnum.get_enum('_flush') is ManureHandlerEnum.DEFAULT
-    assert ManureHandlerEnum.get_enum('flu sh') is ManureHandlerEnum.DEFAULT
+    assert ManureHandlerEnum.get_type('_flush') is ManureHandlerEnum.DEFAULT
+    assert ManureHandlerEnum.get_type('flu sh') is ManureHandlerEnum.DEFAULT
 
 
 def test_get_enum_should_return_manual_scraping_when_correct_manual_scraping_substr_given() -> None:

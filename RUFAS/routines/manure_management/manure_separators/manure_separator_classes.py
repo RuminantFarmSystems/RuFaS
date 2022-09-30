@@ -51,7 +51,7 @@ class BaseManureSeparator:
                  reception_pit: BaseReceptionPit,
                  separator_init_data: ManureSeparatorInitData):
         self.pen = pen
-        self.manure_separator_enum = ManureSeparatorEnum.get_enum(pen.manure_separator)
+        self.manure_separator_enum = ManureSeparatorEnum.get_type(pen.manure_separator)
         self.reception_pit = reception_pit
         self.init_data = separator_init_data
         self.all_output: List[ManureSeparatorOutput] = []
@@ -220,7 +220,7 @@ class ManureSeparatorInitData:
 class ManureSeparatorFactory:
     @classmethod
     def get_instance(cls, pen: SimplePen, reception_pit: BaseReceptionPit) -> BaseManureSeparator:
-        manure_separator_enum = ManureSeparatorEnum.get_enum(pen.manure_separator)
+        manure_separator_enum = ManureSeparatorEnum.get_type(pen.manure_separator)
 
         enum_to_class: Dict[ManureSeparatorEnum, Type[BaseManureSeparator]] = {
             ManureSeparatorEnum.BELT_PRESS: BeltPress,

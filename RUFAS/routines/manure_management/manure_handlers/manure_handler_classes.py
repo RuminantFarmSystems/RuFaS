@@ -56,7 +56,7 @@ class BaseManureHandler:
 
         self.handler_init_data = handler_init_data
 
-        self.manure_handler_enum = ManureHandlerEnum.get_enum(
+        self.manure_handler_enum = ManureHandlerEnum.get_type(
                 pen.manure_handler)
         self.bedding = BeddingFactory.get_instance(pen.bedding_type)
         self.milking_center = MilkingCenter()
@@ -189,7 +189,7 @@ class ManureHandlerFactory:
             A new instance of a BaseManureHandler subtype.
 
         """
-        manure_handler_enum = ManureHandlerEnum.get_enum(pen.manure_handler)
+        manure_handler_enum = ManureHandlerEnum.get_type(pen.manure_handler)
 
         params = {
             'pen': pen,

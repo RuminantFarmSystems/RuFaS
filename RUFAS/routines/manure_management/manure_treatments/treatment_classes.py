@@ -731,7 +731,7 @@ class TreatmentFactory:
             TreatmentEnum.SLURRY_STORAGE_OUTDOOR: (SlurryStorageOutdoor, SlurryStorageInitData)
         }
 
-        treatment_enum = TreatmentEnum.get_enum(pen.manure_storage)
+        treatment_enum = TreatmentEnum.get_type(pen.manure_storage)
         params = {
             'pen': pen,
             'manure_separator': manure_separator,

@@ -1,5 +1,5 @@
 class Units:
-    urea = 'g/L'  # g/L
+    urea = 'g/L'
     TAN_s = 'g/L'
     manure_nitrogen = 'kg'
     TSd = 'kg'

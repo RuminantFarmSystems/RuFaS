@@ -6,9 +6,7 @@ from RUFAS.routines.manure_management.misc.simple_pen import SimplePen
 
 
 class GasEmissionConstants:
-    """
-    Stores a list of constants useful for evaluating gas emission equations.
-    """
+    """Constants for gas emission calculations."""
 
     b1 = 1.0  # rate correcting factor, dimensionless
     b2 = 0.01  # rate correcting factor, dimensionless
@@ -22,43 +20,38 @@ class GasEmissionConstants:
 
 
 @dataclass
-class CanCalcMethane(Protocol):
-    """
-    To calculate methane emission, we need VSd and VSnd from
-    manure handlers, separators, or treatments.
-    """
+class HasVolatileSolidsAttributes(Protocol):
+    """Protocol for objects that have volatile solids attributes."""
 
     VSd: float
     VSnd: float
 
 
 class GasEmissions:
-    @staticmethod
-    def calc_E_CH4_storage_v1(data: CanCalcMethane, temp_in_C=15.0) -> float:
-        """
-        TODO: Describe
+
+    @classmethod
+    def calc_E_CH4_storage_v1(cls, data: HasVolatileSolidsAttributes, tempC=15.0) -> float:
+        """Calculates methane emissions from manure storage.
 
         Notes
-        -----
-        ECH4,man = 	[(( 24 * Vs,d * b1)/1000) * exp[ln(A)) - (E/RT)] + (( 24 * Vs,nd *  b2)/1000) * exp[ln(A) -(E/RT)]
-        where
-            E_CH4_man = emission of CH4 from the storage, kg CH4/day
-            VSd and VSnd = degradable and non-degradable VS in the manure, g
-            b1 and b2 = rate correcting factors, dimensionless
-            A = Arrhenius parameter, g CH4/kg VS-h
-            E = apparent activation energy, J/mol
-            R = gas constant, J/K-mol
-            T = temperature, K
+            ECH4,man = 	[(( 24 * Vs,d * b1)/1000) * exp[ln(A)) - (E/RT)] + (( 24 * Vs,nd *  b2)/1000) * exp[ln(A) -(
+            E/RT)]
+            where
+                E_CH4_man = emission of CH4 from the storage, kg CH4/day
+                VSd and VSnd = degradable and non-degradable VS in the manure, g
+                b1 and b2 = rate correcting factors, dimensionless
+                A = Arrhenius parameter, g CH4/kg VS-h
+                E = apparent activation energy, J/mol
+                R = gas constant, J/K-mol
+                T = temperature, K
 
         Parameters
-        ----------
-        data: an output object from one of the manure management steps
-            that should follow the CanCalcMethane protocol.
-        temp_in_C: temperature, C.
+            data: an output object from one of the manure management steps
+                that should follow the HasVolatileSolidsAttributes protocol.
+            tempC: temperature in Celsius, C.
 
         Returns
-        -------
-        CH4 emissions from storage, kg CH4/day.
+            CH4 emissions from storage, kg CH4/day.
 
         """
         daily_time_steps = 24
@@ -66,27 +59,24 @@ class GasEmissions:
         b1, b2 = const.b1, const.b2
 
         lnA, E, R = const.lnA, const.E, const.R
-        temp_in_K = GasEmissions.convert_temp_C_to_K(temp_in_C)
-        exp = math.exp(lnA - (E / (R * temp_in_K)))
+        tempK = cls._convert_temp_C_to_K(tempC)
+        exp = math.exp(lnA - (E / (R * tempK)))
 
         return (daily_time_steps * data.VSd * b1 * exp) + (daily_time_steps * data.VSnd * b2 * exp)
 
     @staticmethod
-    def calc_E_CH4_storage_v2(data: CanCalcMethane, temp_in_C=15.0, Bo=0.2, E_CH4_pot=0.48) -> float:
-        """
-        TODO: Describe
+    def calc_E_CH4_storage_v2(data: HasVolatileSolidsAttributes, tempC=15.0, Bo=0.2, E_CH4_pot=0.48) -> float:
+        """Calculates methane emissions from manure storage.
 
         Parameters
-        ----------
-        data: an output object from one of the manure management steps
-            that should follow the CanCalcMethane protocol.
-        temp_in_C: temperature, C.
-        Bo:  achievable emission of CH4 during anaerobic digestion, kg CH4/kg VS.
-        E_CH4_pot: potential CH4 yield of the manure, kg CH4/kg VS.
+            data: an output object from one of the manure management steps
+                that should follow the CanCalcMethane protocol.
+            tempC: temperature, C.
+            Bo: achievable emission of CH4 during anaerobic digestion, kg CH4/kg VS.
+            E_CH4_pot: potential CH4 yield of the manure, kg CH4/kg VS.
 
         Returns
-        -------
-        CH4 emission from storage, kg CH4/day.
+            CH4 emissions from storage, kg CH4/day.
 
         """
 
@@ -96,7 +86,7 @@ class GasEmissions:
         b1, b2 = const.b1, const.b2
 
         lnA, E, R = const.lnA, const.E, const.R
-        temp_in_K = GasEmissions.convert_temp_C_to_K(temp_in_C)
+        temp_in_K = GasEmissions._convert_temp_C_to_K(tempC)
         ex = math.exp(lnA - (E / (R * temp_in_K)))
 
         VS_loss = 3 * Bo
@@ -106,19 +96,8 @@ class GasEmissions:
         return c * VS_tot * (VSd * b1 + VSnd * b2) * ex
 
     @staticmethod
-    def calc_modified_hours(hours: float) -> float:
-        """
-        TODO: Describe
-
-        Parameters
-        ----------
-        hours:
-
-        Returns
-        -------
-        TODO: Describe
-
-        """
+    def _calc_modified_hours(hours: float) -> float:
+        """Calculate modified hours."""
 
         if hours > 14:
             modified_hours = - math.tanh(hours - 21.5) / 3.5
@@ -129,143 +108,126 @@ class GasEmissions:
 
         return modified_hours
 
-    @staticmethod
-    def calc_ambient_temp(hours: float, t_min: float, t_max: float) -> float:
-        """
-        Calculates ambient temperature.
+    @classmethod
+    def _calc_ambient_temp(cls, hours: float, t_min: float, t_max: float) -> float:
+        """Calculates ambient temperature.
 
         Parameters
-        ----------
-        t_min: Minimum barn temperature, °C
-        t_max: Maximum barn temperature, °C
-        hours: Measured barn temperature, °C within a day, Hours
+            hours: Measured barn temperature, °C within a day, Hours  # TODO: what is this?
+            t_min: Minimum barn temperature, °C
+            t_max: Maximum barn temperature, °C
 
         Returns
-        -------
-        Ambient temperature, °C.
+            Ambient temperature, °C.
 
         """
 
-        modified_hours = GasEmissions.calc_modified_hours(hours)
+        modified_hours = cls._calc_modified_hours(hours)
         t_ambient = modified_hours * (t_max - t_min) / 2 + (t_max + t_min) / 2
 
         return t_ambient
 
-    @staticmethod
-    def calc_E_CH4_floor(pen: SimplePen, t_min=20.0, t_max=25.0, hours=24) -> float:
-        """
-        Calculates CH4 floor emissions.
+    @classmethod
+    def calc_E_CH4_floor(cls, pen: SimplePen, hours=24, t_min=20.0, t_max=25.0) -> float:
+        """Calculates methane floor emissions.
 
         Parameters
-        ----------
-        pen: Housing type and numbers of animals.
-        t_min: Minimum barn temperature, °C
-        t_max: Maximum barn temperature, °C
-        hours: Measured barn temperature,°C within a day, Hours
+            pen: A SimplePen object.
+            hours: Measured barn temperature,°C within a day, Hours  # TODO: what is this?
+            t_min: Minimum barn temperature, °C
+            t_max: Maximum barn temperature, °C
 
         Returns
-        -------
-        CH4 floor emissions, kg CH4/day.
+            Methane floor emissions, kg CH4/day.
 
         """
 
-        t_ambient = GasEmissions.calc_ambient_temp(hours, t_min, t_max)
+        t_ambient = cls._calc_ambient_temp(hours, t_min, t_max)
         t = max(-5.0, 0.63 * t_ambient + 6.0)
 
         return pen.num_animals * max(0.0, 0.13 * t) * pen.barn_area / 1000
 
-    @staticmethod
-    def calc_E_C02_floor(pen: SimplePen, t_min=20.0, t_max=25.0, hours=24) -> float:
-        """
-        Calculates CO2 floor emissions.
+    @classmethod
+    def calc_E_C02_floor(cls, pen: SimplePen, hours=24, t_min=20.0, t_max=25.0) -> float:
+        """Calculates carbon dioxide floor emissions.
 
         Parameters
-        ----------
-        pen: Housing type and number of animals.
-        t_min: Minimum barn temperature, °C.
-        t_max: Maximum barn temperature, °C.
-        hours: Measured barn temperature, °C within a day, Hours.
+            pen: A SimplePen object.
+            hours: Measured barn temperature, °C within a day, Hours. # TODO: what is this?
+            t_min: Minimum barn temperature, °C.
+            t_max: Maximum barn temperature, °C.
 
         Returns
-        -------
-        CO2 floor emissions, kg CO2/day.
+            Carbon dioxide floor emissions, kg CO2/day.
 
         """
 
-        t_ambient = GasEmissions.calc_ambient_temp(hours, t_min, t_max)
+        t_ambient = cls._calc_ambient_temp(hours, t_min, t_max)
         t = max(-5.0, 0.63 * t_ambient + 6.0)
         return pen.num_animals * max(0.0, 0.0065 + 0.0192 * t) * pen.barn_area / 1000
 
-    @staticmethod
-    def calc_E_NH3_housing(pen: SimplePen, TAN: float, U: float, tempC: float, p=990.0, pH=7.7) -> float:
-        """
-        Calculates NH3 housing emissions.
+    @classmethod
+    def calc_E_NH3_housing(cls, pen: SimplePen, TAN: float, U: float, tempC: float, p=990.0, pH=7.7) -> float:
+        """Calculates ammonia housing emissions.
 
         Parameters
-        ----------
-        pen: #TODO: Describe
-        TAN: total ammonia nitrogen in manure, kg N/m^2.
-        U: total amount of manure urine in area of exposed surface, kg.
-        tempC: temperature, °C.
-        p: manure density, kg/m^3.
-        pH: manure acidity.
+            pen: A SimplePen object.
+            TAN: total ammonia nitrogen in manure, kg N/m^2.
+            U: total amount of manure urine in area of exposed surface, kg.
+            tempC: temperature in Celsius, °C.
+            p: manure density, kg/m^3.
+            pH: manure acidity, dimensionless.
 
         Returns
-        -------
-        NH3 emissions, kg N/m^2/day.
+            Ammonia emissions, kg N/m^2/day.
 
         """
 
-        c = 86400  # time conversion, seconds/day
-        tempK = GasEmissions.convert_temp_C_to_K(tempC)
+        c = 86_400  # seconds in a day
+        tempK = cls._convert_temp_C_to_K(tempC)
         area = pen.housing_area_for_NH3_emission  # m^2
-        r = GasEmissions.calc_r_barn(tempC, hsc=260.0)
+        r = cls._calc_r_barn(tempC, hsc=260.0)
         M = U / area  # manure urine per area of exposed surface, kg/m^2
-        Q = GasEmissions.calc_Q(tempK, pH)
+        Q = cls._calc_Q(tempK, pH)
         return (TAN * c * p) / (r * M * Q)
 
-    @staticmethod
-    def calc_E_NH3_storage(TS: float, TAN: float, U: float, tempC: float, area=6.5, p=990.0, pH=7.5) -> float:
-        """
-        Calculates NH3 storage emissions.
+    @classmethod
+    def calc_E_NH3_storage(cls, TS: float, TAN: float, U: float, tempC: float, area=6.5, p=990.0, pH=7.5) -> float:
+        """Calculates NH3 storage emissions.
 
         Parameters
-        ----------
-        TS: total solids or dry matter content, %.
-        TAN: total ammonia nitrogen in manure, kg N/m^2.
-        U: total amount of manure urine in area of exposed surface, kg.
-        tempC: temperature, °C.
-        area: surface area for treatment, m^2.
-        p: manure density, kg/m^3.
-        pH: manure acidity.
+            TS: total solids or dry matter content, %.
+            TAN: total ammonia nitrogen in manure, kg N/m^2.
+            U: total amount of manure urine in area of exposed surface, kg.
+            tempC: temperature, °C.
+            area: surface area for treatment, m^2.
+            p: manure density, kg/m^3.
+            pH: manure acidity, dimensionless.
 
         Returns
-        -------
-        NH3 storage emissions, kg N/m^2/day.
+            NH3 storage emissions, kg N/m^2/day.
 
         """
 
-        c = 86400  # time conversion, seconds/day
-        tempK = GasEmissions.convert_temp_C_to_K(tempC)
-        r = GasEmissions.calc_r_barn(tempC, hsc=GasEmissions.calc_hsc_from_dry_matter_content(TS))
+        c = 86_400  # seconds in a day
+        tempK = cls._convert_temp_C_to_K(tempC)
+        r = cls._calc_r_barn(tempC, hsc=cls._calc_hsc_from_dry_matter_content(TS))
         M = U / area  # manure urine per area of exposed surface, kg/m^2
-        Q = GasEmissions.calc_Q(tempK, pH)
+        Q = cls._calc_Q(tempK, pH)
         return (TAN * c * p) / (r * M * Q)
 
     @staticmethod
-    def calc_hsc_from_dry_matter_content(TS: float) -> float:
-        """
-        # TODO: Describe
+    def _calc_hsc_from_dry_matter_content(TS: float) -> float:
+        """Calculates heat storage capacity from dry matter content.
 
-        Args
-        ----
-        TS: total solids or dry matter content, %.
+        Parameters
+            TS: total solids or dry matter content, %.
 
         Returns
-        -------
-        # TODO: Describe
+            Heat storage capacity, J/kg/K.
 
         """
+
         if TS <= 5.0:  # liquid
             return 4.1
         elif TS <= 8.0:  # slurry
@@ -276,132 +238,110 @@ class GasEmissions:
             return 10.0
 
     @staticmethod
-    def calc_r_barn(tempC, hsc=260.0) -> float:
-        """
-        TODO: Describe
+    def _calc_r_barn(tempC, hsc=260.0) -> float:
+        """Calculates barn resistance.
 
         Parameters
-        ----------
-        tempC: temperature, °C.
-        hsc: housing specific constant, s/m
-
+            tempC: temperature in Celsius, °C.
+            hsc: housing specific constant, s/m
 
         Returns
-        -------
-        TODO: Describe
+            Barn resistance, s/m.
 
         """
 
         return hsc * (1 - 0.027 * (20.0 - tempC))
 
     @staticmethod
-    def calc_Kh(tempK: float) -> float:
-        """
-        TODO: Describe
+    def _calc_Kh(tempK: float) -> float:
+        """Calculates Henry's constant.
 
         Parameters
-        ----------
-        tempK: temperature, K.
+            tempK: temperature in Kelvin, K.
 
         Returns
-        -------
-        TODO: Describe
+            Henry's constant, M/atm.
 
         """
 
         return 10 ** (1478 / tempK - 1.69)
 
     @staticmethod
-    def calc_Ka(tempK: float, pH: float) -> float:
-        """
-        TODO: Describe
+    def _calc_Ka(tempK: float, pH: float) -> float:
+        """Calculates acid dissociation constant.
 
         Parameters
-        ----------
-        tempK: temperature, K.
-        pH:
+            tempK: temperature in Kelvin, K.
+            pH: manure acidity, dimensionless.
 
         Returns
-        -------
-        TODO: Describe
+            Acid dissociation constant, dimensionless.
 
         """
 
         return 1 + 10 ** (0.09018 + 2729.9 / tempK - pH)
 
-    @staticmethod
-    def calc_Q(tempK: float, pH: float) -> float:
-        """
-        TODO: Describe
+    @classmethod
+    def _calc_Q(cls, tempK: float, pH: float) -> float:
+        """Calculates Q. # TODO: What is Q?
 
         Parameters
-        ----------
-        tempK: temperature, K.
-        pH:
+            tempK: temperature in Kelvin, K.
+            pH: manure acidity, dimensionless.
 
         Returns
-        -------
-        TODO: Describe
+            Q.
 
         """
 
-        Kh = GasEmissions.calc_Kh(tempK)
-        Ka = GasEmissions.calc_Ka(tempK, pH)
+        Kh = cls._calc_Kh(tempK)
+        Ka = cls._calc_Ka(tempK, pH)
         return Kh * Ka
 
-    @staticmethod
-    def calc_ruc(tempK: float, cu: float) -> float:
-        """
-        Returns the rate of urea transformation to TAN (RUC) via Eq. (1), kg/m3-h.
+    @classmethod
+    def calc_ruc(cls, tempK: float, cu: float) -> float:
+        """Calculates the rate of urea transformation to TAN (RUC) via Eq. (1), kg/m3-h.
 
         Parameters
-        ----------
-        tempK: temperature, K.
-        cu: urea concentration in urine, kg/m3.
+            tempK: temperature in Kelvin, K.
+            cu: urea concentration in urine, kg/m3.
 
         Returns
-        -------
-        Rate of urea transformation to TAN (RUC), kg/m3-h.
+            Rate of urea transformation to TAN (RUC), kg/m3-h.
 
         """
 
         # maximum rate of urea conversion, kg N/m3 wet feces-h
-        vmax = GasEmissions.calc_vmax(tempK)
+        vmax = cls._calc_vmax(tempK)
 
         # Michaelis-Menten coefficient, kg N/m3 mixture
-        Kmc = GasEmissions.calc_Kmc(tempK)
+        Kmc = cls._calc_Kmc(tempK)
 
         return vmax * cu / (Kmc + cu)
 
     @staticmethod
-    def calc_vmax(tempK: float) -> float:
-        """
-        Returns the maximum rate of urea conversion (Vmax), kg N/m3 wet feces-h.
+    def _calc_vmax(tempK: float) -> float:
+        """Calculates the maximum rate of urea conversion (Vmax) via Eq. (2).
 
         Parameters
-        ----------
-        temp_in_K - temperature in Kelvin.
+            tempK: temperature in Kelvin, K.
 
         Returns
-        -------
-        Maximum rate of urea conversion (Vmax), kg N/m3 wet feces-h.
+            Maximum rate of urea conversion (Vmax), kg N/m3 wet feces-h.
 
         """
 
         return 3.915 * (10 ** 9) * math.exp(-6463 / tempK)
 
     @staticmethod
-    def calc_Kmc(tempK: float) -> float:
-        """
-        Returns the Michaelis-Menten coefficient (Kmc), kg N/m3 mixture.
+    def _calc_Kmc(tempK: float) -> float:
+        """Calculates the Michaelis-Menten coefficient (Kmc).
 
         Parameters
-        ----------
-        tempK: temperature, K.
+            tempK: temperature in Kelvin, K.
 
         Returns
-        -------
-        The Michaelis-Menten coefficient (Kmc), kg N/m3 mixture.
+            The Michaelis-Menten coefficient (Kmc), kg N/m3 mixture.
 
         """
 
@@ -409,27 +349,24 @@ class GasEmissions:
 
     @staticmethod
     def calc_E_N20_manure(TS: float, A_storage=6.5) -> float:
-        """
-        TODO: Describe
+        """Calculates nitrous oxide emissions from slurry storage.
 
         Notes
-        -----
-        For stacked manure with a greater DM content, an emission factor
-            of 0.005 kg N2O-N /(kg N excreted) when a crust does not form,
-            no N2O is formed and emitted. This occurs if the manure DM contents
-            are less than 8%, manure is loaded daily onto the top surface of the
-            storage, or an enclosed tank is used.
-        EN2O,manure = emission of N2O from slurry storage, kg N2O /day
+            For stacked manure with a greater DM content, an emission factor
+                of 0.005 kg N2O-N /(kg N excreted) when a crust does not form,
+                no N2O is formed and emitted. This occurs if the manure DM contents
+                are less than 8%, manure is loaded daily onto the top surface of the
+                storage, or an enclosed tank is used.
 
         Parameters
-        ----------
-        TS: total solids or dry matter content, %.
-        A_storage: # TODO: Describe
+            TS: total solids or dry matter content, %.
+            A_storage: surface area for treatment, m^2. Default is 6.5 m^2. # TODO: Verify this.
 
         Returns
-        -------
+            Nitrous oxide emissions from slurry storage, kg N2O-N /day.
 
         """
+
         # emission rate of N2O, g N2O/m2-day
         EF_N2O = 0.8 if TS > 8.0 else 0.005
 
@@ -437,18 +374,15 @@ class GasEmissions:
 
     # TODO: Review
     @staticmethod
-    def calc_f(pH: float, Ka: float) -> float:
-        """
-        Returns the NH3 fraction of TAN in a manure solution (F).
+    def _calc_f(pH: float, Ka: float) -> float:
+        """Returns the NH3 fraction of TAN in a manure solution (F).
 
         Parameters
-        ----------
-        pH : surface pH of manure or urine.
-        Ka: the dissociation constant.
+            pH: surface pH of manure or urine.
+            Ka: acid dissociation constant, dimensionless.
 
         Returns
-        -------
-        NH3 fraction of TAN in a manure solution (F).
+            NH3 fraction of TAN in a manure solution (F).
 
         """
 
@@ -456,18 +390,15 @@ class GasEmissions:
 
     # TODO: Review
     @staticmethod
-    def calc_mass_transfer_coefficient_gaseous(U: float, SC: float) -> float:
-        """
-        Returns the mass transfer coefficient through gaseous layer.
+    def _calc_mass_transfer_coefficient_gaseous(U: float, SC: float) -> float:
+        """Calculates the mass transfer coefficient through gaseous layer.
 
         Parameters
-        ----------
-        U: air friction velocity near surface, m/s.
-        SC: Schmidt number.
+            U: air friction velocity near surface, m/s.
+            SC: Schmidt number, dimensionless.
 
         Returns
-        -------
-        Mass transfer coefficient through gaseous layer.
+            Mass transfer coefficient through gaseous layer. # TODO: What is the unit?
 
         """
 
@@ -475,17 +406,14 @@ class GasEmissions:
 
     # TODO: Review
     @staticmethod
-    def calc_air_friction_velocity(Va: float) -> float:
-        """
-        Returns the air friction velocity.
+    def _calc_air_friction_velocity(Va: float) -> float:
+        """Calculates the air friction velocity near surface.
 
         Parameters
-        ----------
-        Va: ambient air velocity measured at a standard anemometer height of 10 m
+            Va: ambient air velocity measured at a standard anemometer height of 10 m.
 
         Returns
-        -------
-        Air friction velocity
+            Air friction velocity near surface, m/s.
 
         """
 
@@ -493,36 +421,29 @@ class GasEmissions:
 
     # TODO: Review
     @staticmethod
-    def calc_mass_transfer_coefficient_liquid(T: float) -> float:
-        """
-        Returns the mass transfer coefficient through liquid layer.
+    def _calc_mass_transfer_coefficient_liquid(T: float) -> float:
+        """Calculates the mass transfer coefficient through liquid layer.
 
         Parameters
-        ----------
-        T: temperature, K.
+            T: temperature in Kelvin, K.
 
         Returns
-        -------
-        Mass transfer coefficient through liquid layer.
+            Mass transfer coefficient through liquid layer. # TODO: What is the unit?
 
         """
 
-        return 1.417 * 10 ** (-12) * T ** 4
+        return 1.417 * 1E-12 * (T ** 4)
 
-    # TODO: Review
     @staticmethod
-    def calc_resistance_to_mass_transfer(Rs: float, Rc: float) -> float:
-        """
-        Returns the resistance to mass transfer.
+    def _calc_resistance_to_mass_transfer(Rs: float, Rc: float) -> float:
+        """Calculates the resistance to mass transfer.
 
         Parameters
-        ----------
-        Rs = resistance to mass transfer through the manure, s/m
-        Rc = resistance to mass transfer through a storage cover, s/m
+            Rs: resistance to mass transfer through the manure, s/m
+            Rc: resistance to mass transfer through a storage cover, s/m
 
         Returns
-        -------
-        resistance to mass transfer.
+            Resistance to mass transfer, s/m.
 
         """
 
@@ -530,39 +451,36 @@ class GasEmissions:
 
     # TODO: Review
     @staticmethod
-    def calc_overall_mass_transfer_coefficient(H: float, Kg: float, Kl: float, Rm: float) -> float:
-        """
-        Returns the overall mass transfer coefficient, the reciprocal of the
-        sum of the three resistances to mass transfer.
+    def _calc_overall_mass_transfer_coefficient(H: float, Kg: float, Kl: float, Rm: float) -> float:
+        """Calculates the overall mass transfer coefficient.
+
+        It is equal to the reciprocal of the sum of the three resistances to mass transfer.
 
         Parameters
-        ----------
-        Rm: resistance to mass transfer
-        H:  Henry’s Law constant for ammonia, dimensionless aqueous:gas
-        Kg: = mass transfer coefficient through gaseous layer, m/s
-        Kl: mass transfer coefficient through liquid layer
+            Rm: Resistance to mass transfer. # TODO: What is the unit?
+            H:  Henry’s Law constant for ammonia, dimensionless aqueous:gas. # TODO: What is the unit?
+            Kg: Mass transfer coefficient through gaseous layer, m/s. # TODO: What is the unit?
+            Kl: Mass transfer coefficient through liquid layer. # TODO: What is the unit?
 
         Returns
-        -------
-
+            Overall mass transfer coefficient, m/s.
 
         """
 
         return 1 / (H / Kg + 1 / Kl + Rm)
 
-    # TODO: Review
     @staticmethod
-    def calc_NH3_flux(K: float, Cm: float, H: float, Ca: float) -> float:
-        """
+    def _calc_NH3_flux(K: float, Cm: float, H: float, Ca: float) -> float:
+        """Calculates the ammonia flux.
+
         Returns the NH3 flux, kg/m2-s
 
         Parameters
-        ----------
-        Cm = concentration of NH3 in manure, kg/m3
-        Ca = concentration of NH3 in ambient air, kg/m3
+            Cm: concentration of NH3 in manure, kg/m3.
+            Ca: concentration of NH3 in ambient air, kg/m3.
 
         Returns
-        -------
+            Ammonia flux, kg/m2-s.
 
         """
 
@@ -570,60 +488,116 @@ class GasEmissions:
 
     # TODO: Review
     @staticmethod
-    def calc_conc_of_NH3_in_manure(F, C_tan):
-        """
-        Returns the NH3 concentration in the manure
+    def _calc_NH3_conc_in_manure(F: float, C_tan: float) -> float:
+        """Calculates the ammonia concentration in manure.
 
         Parameters
-        ----------
-        F: NH3 fraction of TAN in a manure solution
-        C_tan: concentration of TAN in the manure solution, kg/m^3
+            F: NH3 fraction of TAN in a manure solution, dimensionless.
+            C_tan: concentration of TAN in the manure solution, kg/m^3
 
         Returns
-        -------
+            Ammonia concentration in manure, kg/m^3.
 
         """
 
         return F * C_tan
 
     @staticmethod
-    def convert_temp_C_to_K(temp_in_C: float) -> float:
-        """
-        Converts a temperature from Celsius to Kelvin.
+    def _convert_temp_C_to_K(tempC: float) -> float:
+        """Converts a temperature from Celsius to Kelvin.
 
         Parameters
-        ----------
-        temp_in_C: temperature, C.
+            tempC: temperature in Celsius, C.
 
         Returns
-        -------
-        Temperature, K.
+            Temperature in Kelvin, K.
 
         """
 
-        return temp_in_C + 273.15
+        return tempC + 273.15
 
-    def anaerobic_lagoon_CH4_emission_daily(self,VS):
-        Bo=0.24
-        MCF=0.79
-        MS=0.9
-        factor= 0.67
-        return VS*Bo*MCF*MS*factor
-    
-    def anaerobic_lagoon_direct_N2O_emission_daily(self,manure_nitrogen):
-        fMMs=1.0
-        emission_factor_N2O_direct=0.002
-        ratio_atomic_mass=44/28 # N2ON to N2O
-        return manure_nitrogen*fMMs*emission_factor_N2O_direct*ratio_atomic_mass
+    @staticmethod
+    def calc_E_CH4_anaerobic_lagoon(VS: float) -> float:
+        """Calculates methane emissions from anaerobic lagoon.
 
-    def anaerobic_lagoon_indirect_N2O_emission_daily(self,manure_nitrogen):
-        fMMs=1.0
-        emission_factor_N2O_indirect=0.01
-        ratio_atomic_mass=44/28 # N2ON to N2O
+        Parameters
+            VS: volatile solids.  # TODO: What is the unit?
+
+        Returns
+            Methane emissions from anaerobic lagoon, kg CH4-N /day.
+
+        """
+
+        # TODO: Probably should move the following constants to the GasEmissionsConstants class.
+        Bo = 0.24
+        MCF = 0.79
+        MS = 0.9
+        factor = 0.67  # TODO: Use more descriptive variable name
+        return VS * Bo * MCF * MS * factor
+
+    @staticmethod
+    def calc_direct_E_N2O_anaerobic_lagoon(manure_nitrogen: float) -> float:
+        """Calculates direct nitrous oxide emissions from anaerobic lagoon.
+
+        Parameters
+            manure_nitrogen: manure nitrogen, kg N /day.
+
+        Returns
+            Direct nitrous oxide emissions from anaerobic lagoon, kg N2O-N /day.
+
+        """
+
+        fMMs = 1.0
+        emission_factor_N2O_direct = 0.002
+        ratio_atomic_mass = 44 / 28  # N2ON to N2O
+        return manure_nitrogen * fMMs * emission_factor_N2O_direct * ratio_atomic_mass
+
+    @staticmethod
+    def calc_indirect_N2O_anaerobic_lagoon(manure_nitrogen: float) -> float:
+        """Calculates indirect nitrous oxide emissions from anaerobic lagoon.
+
+        Parameters
+            manure_nitrogen: manure nitrogen, kg N /day.
+
+        Returns
+            Indirect nitrous oxide emissions from anaerobic lagoon, kg N2O-N /day.
+
+        """
+
+        fMMs = 1.0
+        emission_factor_N2O_indirect = 0.01
+        ratio_atomic_mass = 44 / 28  # N2ON to N2O
         fraction_N_volatilization = 0.25
-        return manure_nitrogen*fMMs*emission_factor_N2O_indirect*ratio_atomic_mass*fraction_N_volatilization
-    
-    def getCO2_equivalent_of_CH4(self,CH4):
-        return CH4*30
-    def getCO2_equivalent_of_N20(self,N2O):
-        return N2O*310
+        return manure_nitrogen * fMMs * emission_factor_N2O_indirect * ratio_atomic_mass * fraction_N_volatilization
+
+    @staticmethod
+    def calc_CO2_equivalent_of_CH4(CH4: float) -> float:
+        """Calculates the CO2 equivalent of CH4.
+
+        Parameters
+            CH4: methane. # TODO: What is the unit?
+
+        Returns
+            CO2 equivalent of CH4. # TODO: What is the unit?
+
+        """
+
+        return CH4 * 30
+
+    @staticmethod
+    def calc_CO2_equivalent_of_N20(N2O: float) -> float:
+        """Calculates the CO2 equivalent of N2O.
+
+        Parameters
+            N2O: nitrous oxide. # TODO: What is the unit?
+
+        Returns
+            CO2 equivalent of N2O. # TODO: What is the unit?
+
+        """
+
+        return N2O * 310
+
+
+if __name__ == '__main__':
+    print(help(GasEmissions))

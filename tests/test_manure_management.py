@@ -230,7 +230,7 @@ def test_convert_temp_C_to_K():
     """Unit test for function convert_temp_C_to_K in file gas_emissions.py"""
     temps_in_C = [-273.15, 0, 100]
     expected_temps = [0, 273.15, 373.15]
-    result_temps = [GasEmissions.convert_temp_C_to_K(
+    result_temps = [GasEmissions._convert_temp_C_to_K(
         temp) for temp in temps_in_C]
     assert_two_lists_equal(expected_temps, result_temps)
 
@@ -239,14 +239,14 @@ def test_calc_modified_hours():
     """Unit test for function calc_modified_hours in file gas_emissions.py"""
     hours = [15, 14, 5, 4]
     expected_hours = [0.2857129, 0.3999013, -0.3999013, -0.2857141]
-    result_hours = [GasEmissions.calc_modified_hours(hour) for hour in hours]
+    result_hours = [GasEmissions._calc_modified_hours(hour) for hour in hours]
     assert_two_lists_equal(expected_hours, result_hours)
 
 
 def test_calc_Kh():
     """Unit test for function calc_Kh in file gas_emissions.py"""
     temp_in_k = 200
-    value_to_test = GasEmissions.calc_Kh(temp_in_k)
+    value_to_test = GasEmissions._calc_Kh(temp_in_k)
     result = 501187.2336272715
     assert value_to_test == result
 
@@ -255,7 +255,7 @@ def test_calc_Ka():
     """Unit test for function calc_Ka in file gas_emissions.py"""
     temp_in_k = 200
     ph = 10
-    value_to_test = GasEmissions.calc_Ka(temp_in_k, ph)
+    value_to_test = GasEmissions._calc_Ka(temp_in_k, ph)
     result = 5492.361063180863
     assert value_to_test == result
 
@@ -264,7 +264,7 @@ def test_calc_Q():
     """Unit test for function calc_Q in file gas_emissions.py"""
     temp_in_k = 200
     ph = 10
-    value_to_test = GasEmissions.calc_Q(temp_in_k, 10)
+    value_to_test = GasEmissions._calc_Q(temp_in_k, 10)
     result = 2752701247.3377566
     assert value_to_test == result
 
@@ -283,7 +283,7 @@ def test_calc_ruc():
 def test_calc_vmax():
     """Unit test for function calc_vmax in file gas_emissions.py"""
     temp_in_k = -6463
-    value_to_test = GasEmissions.calc_vmax(temp_in_k)
+    value_to_test = GasEmissions._calc_vmax(temp_in_k)
     result = 10642073358.417162
     assert value_to_test == result
 
@@ -291,7 +291,7 @@ def test_calc_vmax():
 def test_calc_Kmc():
     """Unit test for function calc_Kmc in file gas_emissions.py"""
     temp_in_k = -5914
-    value_to_test = GasEmissions.calc_Kmc(temp_in_k)
+    value_to_test = GasEmissions._calc_Kmc(temp_in_k)
     result = 916332804.3735441
     assert value_to_test == result
 
@@ -300,7 +300,7 @@ def test_calc_air_friction_velocity():
     """Unit test for function calc_air_friction_velocity in file
     gas_emissions.py"""
     Va = 1
-    value_to_test = GasEmissions.calc_air_friction_velocity(Va)
+    value_to_test = GasEmissions._calc_air_friction_velocity(Va)
     result = 0.02
     assert value_to_test == result
 
@@ -310,7 +310,7 @@ def test_calc_mass_transfer_coefficient_gaseous():
    gas_emissions.py"""
     U = 1
     SC = 2
-    value_to_test = GasEmissions.calc_mass_transfer_coefficient_gaseous(U, SC)
+    value_to_test = GasEmissions._calc_mass_transfer_coefficient_gaseous(U, SC)
     result = 0.030037008951454235
     assert value_to_test == result
 
@@ -319,7 +319,7 @@ def test_calc_mass_transfer_coefficient_liquid():
     """Unit test for function calc_mass_transfer_coefficient_liquid in file 
     gas_emissions.py"""
     T = 100
-    value_to_test = GasEmissions.calc_mass_transfer_coefficient_liquid(T)
+    value_to_test = GasEmissions._calc_mass_transfer_coefficient_liquid(T)
     result = 0.0001417
     assert value_to_test == result
 
@@ -329,7 +329,7 @@ def test_calc_resistance_to_mass_transfer():
     gas_emissions.py"""
     Rs = 3.456
     Rc = 6.544
-    value_to_test = GasEmissions.calc_resistance_to_mass_transfer(Rs, Rc)
+    value_to_test = GasEmissions._calc_resistance_to_mass_transfer(Rs, Rc)
     result = 10.0
     assert value_to_test == result
 
@@ -340,7 +340,7 @@ def test_calc_overall_mass_transfer_coefficient():
     Kg = 2
     Kl = 3
     Rm = 4
-    value_to_test = GasEmissions.calc_overall_mass_transfer_coefficient(
+    value_to_test = GasEmissions._calc_overall_mass_transfer_coefficient(
         H, Kg, Kl, Rm)
     result = 0.20689655172413796
     assert value_to_test == result
@@ -350,7 +350,7 @@ def test_calc_concentration_of_ammonia_in_manure():
     """Unit test for function calc_concentration_of_ammonia_in_manure in file gas_emissions.py"""
     F = 10
     C_tan = 3
-    value_to_test = GasEmissions.calc_conc_of_NH3_in_manure(
+    value_to_test = GasEmissions._calc_NH3_conc_in_manure(
         F, C_tan)
     result = 30
     assert value_to_test == result
@@ -367,7 +367,7 @@ def test_calc_ammonia_flux():
     Cm = 2
     H = 3
     Ca = 4
-    value_to_test = GasEmissions.calc_NH3_flux(K, Cm, H, Ca)
+    value_to_test = GasEmissions._calc_NH3_flux(K, Cm, H, Ca)
     result = -36000
     assert value_to_test == result
 

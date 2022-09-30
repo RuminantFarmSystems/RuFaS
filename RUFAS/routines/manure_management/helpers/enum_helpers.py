@@ -19,7 +19,7 @@ class ExtendedEnum(Enum):
     """
 
     @classmethod
-    def get_enum(cls, query_str: str) -> ExtendedEnum:
+    def get_type(cls, query_str: str) -> ExtendedEnum:
         """Return the first enum member whose name contains the query string.
 
         Args:
