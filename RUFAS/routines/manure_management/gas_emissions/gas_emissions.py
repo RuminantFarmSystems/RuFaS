@@ -283,7 +283,7 @@ class GasEmissions:
 
     @classmethod
     def _calc_Q(cls, tempK: float, pH: float) -> float:
-        """Calculates Q. # TODO: What is Q?
+        """Calculates Q. # TODO: What is Q? Q = dimensionless equilibrium coefficient for the NH3 gas in the air for a given concentration of TAN in the solution.
 
         Parameters
             tempK: temperature in Kelvin, K.
@@ -575,10 +575,10 @@ class GasEmissions:
         """Calculates the CO2 equivalent of CH4.
 
         Parameters
-            CH4: methane. # TODO: What is the unit?
+            CH4: methane. # TODO: What is the unit? kg/day
 
         Returns
-            CO2 equivalent of CH4. # TODO: What is the unit?
+            CO2 equivalent of CH4. # TODO: What is the unit? kg/day
 
         """
 
@@ -589,10 +589,10 @@ class GasEmissions:
         """Calculates the CO2 equivalent of N2O.
 
         Parameters
-            N2O: nitrous oxide. # TODO: What is the unit?
+            N2O: nitrous oxide. # TODO: What is the unit? kg/day
 
         Returns
-            CO2 equivalent of N2O. # TODO: What is the unit?
+            CO2 equivalent of N2O. # TODO: What is the unit? kg/day
 
         """
 
