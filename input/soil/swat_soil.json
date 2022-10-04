@@ -4,6 +4,12 @@
     "slope_length": 3,
     "manning": 0.4,
     "field_size": 1.0,
+    "tillage": {
+        "2010": 0.05,
+        "2011": 0.05,
+        "2012": 0.05,
+        "2013": 0.05
+    },
     "practice_factor": 0.08,
     "sand": 15,
     "silt": 65,
