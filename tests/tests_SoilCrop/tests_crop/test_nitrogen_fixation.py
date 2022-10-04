@@ -12,7 +12,7 @@ from RUFAS.routines.field.crop.nitrogen_fixation import *
     (-0.5, [0.25, 0.5, 0.75, 1.0], None),  # negative roots (invalid)
 ])
 def test_get_root_accessible_layer(depth, bounds, expect):
-    assert get_root_accessible_layer(root_depth=depth, layer_bounds=bounds) == expect
+    assert get_deepest_root_accessible_layer(root_depth=depth, layer_bounds=bounds) == expect
 
 
 @pytest.mark.parametrize("hf,exp", [

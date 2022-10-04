@@ -50,7 +50,7 @@ def fix_nitrogen(crop, soil) -> None:
     # TODO: this function needs updating once nitrogen_fixation.py is refactored
     # accessible resources TODO: (should be own function)
     layer_bounds = [layer.bottom_depth for layer in soil.soil_layers]
-    deepest_layer = get_root_accessible_layer(crop.z_root, layer_bounds=layer_bounds)
+    deepest_layer = get_deepest_root_accessible_layer(crop.z_root, layer_bounds=layer_bounds)
     accessible_layers = [layer for layer in soil.soil_layers[slice(deepest_layer)]]
     accessible_water = sum([layer.soil_water for layer in accessible_layers])
     at_capacity_water = sum([layer.fc_water for layer in accessible_layers])
@@ -67,7 +67,7 @@ def fix_nitrogen(crop, soil) -> None:
     crop.N_fix = calc_fixed_nitrogen(demand, growth_factor, water_factor, nitrate_factor)
 
 
-def get_root_accessible_layer(root_depth: float, layer_bounds: list[float]):  # pseudocode: C.5.D.8
+def get_deepest_root_accessible_layer(root_depth: float, layer_bounds: list[float]):  # pseudocode: C.5.D.8
     """
     Description:
         Determines the deepest soil layer that is accessible to root biomass.
