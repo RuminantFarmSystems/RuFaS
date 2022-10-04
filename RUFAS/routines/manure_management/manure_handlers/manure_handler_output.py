@@ -61,9 +61,3 @@ class ManureHandlerOutput:
         return ManureHandlerOutput(*[
             attr1 + attr2 for attr1, attr2 in zip(astuple(self), astuple(other))
         ])
-
-    def __str__(self) -> str:
-        res = ['Manure handler output']
-        for key, val in asdict(self).items():
-            res.append(f'{key:40}: {val:20,.2f} {getattr(Units, key, ""):<10}')
-        return '\n'.join(res)

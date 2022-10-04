@@ -4,21 +4,16 @@ File name: old_manure_management.py
 Description: Implements test cases
 Author(s): Sadman Chowdhury, skc86@cornell.edu
 """
-from lib2to3.pytree import Base
-from unittest import expectedFailure
-from RUFAS.simulation_engine import SimulationEngine
-from RUFAS.routines.manure_management.misc.manure import Manure
-from RUFAS.routines.manure_management.misc.constants import ManureManagementConstants
 from typing import List
 
 from pytest import approx
 
+from RUFAS.routines.animal.pen import Pen
 from RUFAS.routines.manure_management.gas_emissions.gas_emissions import GasEmissions
 from RUFAS.routines.manure_management.manure_handlers.milking_center import MilkingCenter
+from RUFAS.routines.manure_management.misc.constants import ManureManagementConstants
+from RUFAS.routines.manure_management.misc.manure import Manure
 from RUFAS.routines.manure_management.misc.simple_pen import SimplePen
-from RUFAS.routines.manure_management.manure_handlers.bedding_classes import Bedding
-
-from RUFAS.routines.animal.pen import Pen
 
 # --------------------------- Test misc module
 firstPen = Pen(1, 10, 10, 5, "cow", "none", "freestall",
@@ -153,47 +148,47 @@ def test_total_percent_of_day_spent_in_milking_center():
 # bedding_classes.py tests here.
 
 
-first_base_bedding_instance = Bedding(200.0, 250.0)
-second_base_bedding_instance = Bedding(400.0, 200.0)
-third_base_bedding_instance = Bedding(300.0, 300.0)
+# first_base_bedding_instance = Bedding(200.0, 250.0)
+# second_base_bedding_instance = Bedding(400.0, 200.0)
+# third_base_bedding_instance = Bedding(300.0, 300.0)
 
 
-def test_density():
-    result = first_base_bedding_instance.density
-    expected_value = 250.0
-    assert result == expected_value
-
-    result2 = second_base_bedding_instance.density
-    expected_value2 = 200.0
-    assert result2 == expected_value2
-
-
-def test_volume():
-    result = first_base_bedding_instance.volume
-    expected_value = 0.8
-    assert result == expected_value
-
-    result2 = second_base_bedding_instance.volume
-    expected_value2 = 2
-    assert result2 == expected_value2
+# def test_density():
+#     result = first_base_bedding_instance.density
+#     expected_value = 250.0
+#     assert result == expected_value
+#
+#     result2 = second_base_bedding_instance.density
+#     expected_value2 = 200.0
+#     assert result2 == expected_value2
 
 
-def test_add():
-    result = first_base_bedding_instance.__add__(second_base_bedding_instance)
-    expected_mass = 600.0
-    expected_volume = 2.8
-    expected_density = 214.2857142857143
-    assert result.mass == expected_mass
-    assert result.volume == expected_volume
-    assert result.density == expected_density
+# def test_volume():
+#     result = first_base_bedding_instance.volume
+#     expected_value = 0.8
+#     assert result == expected_value
+#
+#     result2 = second_base_bedding_instance.volume
+#     expected_value2 = 2
+#     assert result2 == expected_value2
 
-    result2 = first_base_bedding_instance.__add__(third_base_bedding_instance)
-    expected_mass2 = 500.0
-    expected_volume2 = 1.8
-    expected_density2 = 277.77777777777777
-    assert result2.mass == expected_mass2
-    assert result2.volume == expected_volume2
-    assert result2.density == expected_density2
+
+# def test_add():
+#     result = first_base_bedding_instance.__add__(second_base_bedding_instance)
+#     expected_mass = 600.0
+#     expected_volume = 2.8
+#     expected_density = 214.2857142857143
+#     assert result.mass == expected_mass
+#     assert result.volume == expected_volume
+#     assert result.density == expected_density
+#
+#     result2 = first_base_bedding_instance.__add__(third_base_bedding_instance)
+#     expected_mass2 = 500.0
+#     expected_volume2 = 1.8
+#     expected_density2 = 277.77777777777777
+#     assert result2.mass == expected_mass2
+#     assert result2.volume == expected_volume2
+#     assert result2.density == expected_density2
 
 
 # --------------------------- Test reception pits module

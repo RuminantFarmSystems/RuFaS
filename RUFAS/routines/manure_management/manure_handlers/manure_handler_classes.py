@@ -15,7 +15,7 @@ from enum import auto
 from typing import Dict, List, Optional, Type
 
 from RUFAS.routines.manure_management.gas_emissions.gas_emissions import GasEmissions
-from RUFAS.routines.manure_management.helpers.enum_helpers import ExtendedEnum
+from RUFAS.routines.manure_management.helpers.enum_helpers import DefaultEnum
 from RUFAS.routines.manure_management.manure_handlers.bedding_classes import BeddingFactory
 from RUFAS.routines.manure_management.manure_handlers.manure_handler_output import ManureHandlerOutput
 from RUFAS.routines.manure_management.manure_handlers.milking_center import MilkingCenter
@@ -23,7 +23,7 @@ from RUFAS.routines.manure_management.misc.constants import ManureManagementCons
 from RUFAS.routines.manure_management.misc.simple_pen import SimplePen
 
 
-class ManureHandlerEnum(ExtendedEnum):
+class ManureHandlerType(DefaultEnum):
     """
     An Enum class that lists all the different types of manure handlers.
     """
@@ -41,31 +41,21 @@ class BaseManureHandler:
     """
 
     def __init__(self,
-                 pen: SimplePen,
-                 handler_init_data: ManureHandlerInitData):
-        """
-        Initializes a BaseManureHandler object.
+                 bedding_type_name: str,
+                 manure_handler_config: ManureHandlerConfig):
+        """Initializes a BaseManureHandler object.
 
         Args
-        ----
-        pen: A SimplePen object that specifies the types of manure handler and bedding used.
-        handler_init_data: A ManureHandlerInitData object that specifies default data
-            specific to the choice of manure handler.
+            bedding_type_name: The name of the bedding type.
+            manure_handler_config: A ManureHandlerInitData object that specifies default data
+                specific to the choice of manure handler.
 
         """
 
-        self.handler_init_data = handler_init_data
-
-        self.manure_handler_enum = ManureHandlerEnum.get_type(
-                pen.manure_handler)
-        self.bedding = BeddingFactory.get_instance(pen.bedding_type)
+        self.config = manure_handler_config
+        self.bedding = BeddingFactory.get_instance(bedding_type_name)
         self.milking_center = MilkingCenter()
-
         self.all_output: List[ManureHandlerOutput] = []
-
-    @property
-    def sand_removal_efficiency(self) -> float:
-        return self.bedding.sand_removal_efficiency
 
     @property
     def last_output(self) -> Optional[ManureHandlerOutput]:
@@ -106,17 +96,15 @@ class BaseManureHandler:
         return daily_output
 
     def cleaning_water_volume_in_main_barn(self, pen: SimplePen) -> float:
-        return pen.num_animals * self.handler_init_data.water_use_rate  # liters
+        return pen.num_animals * self.config.water_use_rate  # liters
 
     def total_daily_volume(self, pen: SimplePen) -> float:
         return sum([
             pen.manure_volume,  # m^3
-            self.cleaning_water_volume_in_main_barn(
-                    pen) * Constants.LITERS_TO_CUBIC_METERS,  # m^3
+            self.cleaning_water_volume_in_main_barn(pen) * Constants.LITERS_TO_CUBIC_METERS,  # m^3
             self.bedding.total_bedding_volume(pen),  # m^3
-            self.milking_center.total_water_volume_used_in_milking_center(
-                    pen) * Constants.LITERS_TO_CUBIC_METERS,
-            # m^3
+            self.milking_center.total_water_volume_used_in_milking_center(pen) * \
+            Constants.LITERS_TO_CUBIC_METERS,  # m^3
             pen.manure.U,  # g/L
             pen.manure.TAN_s,  # g/L
             pen.manure.MN,  # kg
@@ -141,7 +129,7 @@ class AlleyScraper(BaseManureHandler):
 
 
 @dataclass
-class ManureHandlerInitData:
+class ManureHandlerConfig:
     """
     A class that contains custom initialization configuration used in the
     creation of a BaseManureHandler object.
@@ -151,57 +139,64 @@ class ManureHandlerInitData:
     time_per_cleaning: int = 8
     cleanings_per_day: int = 2
 
+
+class DefaultManureHandlerConfigFactory:
+    FLUSH_SYSTEM_CONFIG = ManureHandlerConfig(
+            water_use_rate=757,  # liters
+    )
+    MANUAL_SCRAPING_CONFIG = ManureHandlerConfig(
+            water_use_rate=10,  # liters
+    )
+    ALLEY_SCRAPER_CONFIG = ManureHandlerConfig(
+            water_use_rate=10,  # liters
+    )
+
     @classmethod
-    def get_instance(cls, manure_handler_enum: ManureHandlerEnum):
-        """
-        Returns an instance of ManureHandlerInitData based on a given ManureHandlerEnum.
-
-        Args:
-            manure_handler_enum: a member of the ManureHandlerEnum.
-
-        Returns:
-            A new ManureHandlerInitData object.
-
-        """
-        init_data = ManureHandlerInitData()
-        enum_to_water_use_rate: Dict[ManureHandlerEnum, int] = {
-            ManureHandlerEnum.FLUSH_SYSTEM: 757,  # liters
-            ManureHandlerEnum.MANUAL_SCRAPING: 10,  # liters
-            ManureHandlerEnum.ALLEY_SCRAPER: 10  # liters
+    def get_instance(cls, manure_handler_type: ManureHandlerType):
+        manure_handler_config_by_type = {
+            ManureHandlerType.FLUSH_SYSTEM: cls.FLUSH_SYSTEM_CONFIG,
+            ManureHandlerType.MANUAL_SCRAPING: cls.MANUAL_SCRAPING_CONFIG,
+            ManureHandlerType.ALLEY_SCRAPER: cls.ALLEY_SCRAPER_CONFIG
         }
-        if manure_handler_enum in enum_to_water_use_rate:
-            init_data.water_use_rate = enum_to_water_use_rate[manure_handler_enum]
-        return init_data
+        return manure_handler_config_by_type[manure_handler_type]
 
 
 class ManureHandlerFactory:
     """A class that contains the logic for creating different types of manure handlers."""
 
     @classmethod
-    def get_instance(cls, pen: SimplePen) -> BaseManureHandler:
+    def get_instance(cls,
+                     manure_handler_type_name: str,
+                     bedding_type_name: str,
+                     manure_handler_config: Optional[ManureHandlerConfig] = None) \
+            -> BaseManureHandler:
         """
         Returns an instance of a specific subtype of BaseManureHandler based on
         the subtype specified in the given pen.
 
         Args:
-            pen: A SimplePen object that specifies which subtype of BaseManureHandler
-                is needed.
+            manure_handler_type_name: A string that specifies the type of manure handler.
+            bedding_type_name: A string that specifies the type of bedding.
+            manure_handler_config: A ManureHandlerConfig object that contains
+                custom initialization data.
 
         Returns:
             A new instance of a BaseManureHandler subtype.
 
         """
-        manure_handler_enum = ManureHandlerEnum.get_type(pen.manure_handler)
 
-        params = {
-            'pen': pen,
-            'handler_init_data': ManureHandlerInitData.get_instance(manure_handler_enum)
+        manure_handler_class_by_type: Dict[ManureHandlerType, Type[BaseManureHandler]] = {
+            ManureHandlerType.FLUSH_SYSTEM: FlushSystem,
+            ManureHandlerType.ALLEY_SCRAPER: AlleyScraper,
+            ManureHandlerType.MANUAL_SCRAPING: ManualScraping,
         }
 
-        enum_to_class: Dict[ManureHandlerEnum, Type[BaseManureHandler]] = {
-            ManureHandlerEnum.FLUSH_SYSTEM: FlushSystem,
-            ManureHandlerEnum.ALLEY_SCRAPER: AlleyScraper,
-            ManureHandlerEnum.MANUAL_SCRAPING: ManualScraping,
-        }
+        manure_handler_type = ManureHandlerType.get_type(manure_handler_type_name)
+        manure_handler_class = manure_handler_class_by_type[manure_handler_type]
 
-        return enum_to_class[manure_handler_enum](**params)
+        if manure_handler_config:
+            return manure_handler_class(bedding_type_name, manure_handler_config)
+        else:
+            default_manure_handler_config = DefaultManureHandlerConfigFactory.get_instance(
+                    manure_handler_type)
+            return manure_handler_class(bedding_type_name, default_manure_handler_config)

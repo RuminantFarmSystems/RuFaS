@@ -113,7 +113,8 @@ class GasEmissions:
         """Calculates ambient temperature.
 
         Parameters
-            hours: Measured barn temperature, °C within a day, Hours  # TODO: what is this? H = hour of the day from 1 to 24
+            hours: Measured barn temperature, °C within a day, Hours  # TODO: what is this? H = hour of the day from
+            1 to 24
             t_min: Minimum barn temperature, °C
             t_max: Maximum barn temperature, °C
 
@@ -133,7 +134,8 @@ class GasEmissions:
 
         Parameters
             pen: A SimplePen object.
-            hours: Measured barn temperature,°C within a day, Hours  # TODO: what is this? H = hour of the day from 1 to 24
+            hours: Measured barn temperature,°C within a day, Hours  # TODO: what is this? H = hour of the day from 1
+            to 24
             t_min: Minimum barn temperature, °C
             t_max: Maximum barn temperature, °C
 
@@ -153,7 +155,8 @@ class GasEmissions:
 
         Parameters
             pen: A SimplePen object.
-            hours: Measured barn temperature, °C within a day, Hours. # TODO: what is this? H = hour of the day from 1 to 24
+            hours: Measured barn temperature, °C within a day, Hours. # TODO: what is this? H = hour of the day from
+            1 to 24
             t_min: Minimum barn temperature, °C.
             t_max: Maximum barn temperature, °C.
 
@@ -283,7 +286,8 @@ class GasEmissions:
 
     @classmethod
     def _calc_Q(cls, tempK: float, pH: float) -> float:
-        """Calculates Q. # TODO: What is Q? Q = dimensionless equilibrium coefficient for the NH3 gas in the air for a given concentration of TAN in the solution.
+        """Calculates Q. # TODO: What is Q? Q = dimensionless equilibrium coefficient for the NH3 gas in the air for
+        a given concentration of TAN in the solution.
 
         Parameters
             tempK: temperature in Kelvin, K.
@@ -597,7 +601,3 @@ class GasEmissions:
         """
 
         return N2O * 310
-
-
-if __name__ == '__main__':
-    print(help(GasEmissions))

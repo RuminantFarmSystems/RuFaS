@@ -14,13 +14,13 @@ from dataclasses import dataclass
 from enum import auto
 from typing import Dict, List, Optional, Type
 
-from RUFAS.routines.manure_management.helpers.enum_helpers import ExtendedEnum
+from RUFAS.routines.manure_management.helpers.enum_helpers import DefaultEnum
 from RUFAS.routines.manure_management.manure_separators.manure_separator_output import ManureSeparatorOutput
 from RUFAS.routines.manure_management.misc.simple_pen import SimplePen
 from RUFAS.routines.manure_management.reception_pits.reception_pit_classes import BaseReceptionPit
 
 
-class ManureSeparatorEnum(ExtendedEnum):
+class ManureSeparatorType(DefaultEnum):
     ROTARY_SCREEN = auto()
     SCREW_PRESS = auto()
 
@@ -36,24 +36,19 @@ class ManureSeparatorEnum(ExtendedEnum):
     DEFAULT_ORGANIC = ROTARY_SCREEN
     DEFAULT_SAND = SAND_LANE_MANURE_SEPARATION
 
-    # Organic bedding => default = rotary screen
-    # Sand bedding => default = sand lane
-
     @classmethod
-    def get_default_enum(cls, bedding_type='ORGANIC') -> ExtendedEnum:
+    def get_default_type(cls, bedding_type='ORGANIC') -> DefaultEnum:
         if bedding_type == 'ORGANIC':
             return cls.DEFAULT_ORGANIC
         return cls.DEFAULT_SAND
 
 
 class BaseManureSeparator:
-    def __init__(self, pen: SimplePen,
+    def __init__(self,
                  reception_pit: BaseReceptionPit,
-                 separator_init_data: ManureSeparatorInitData):
-        self.pen = pen
-        self.manure_separator_enum = ManureSeparatorEnum.get_type(pen.manure_separator)
+                 manure_separator_config: ManureSeparatorConfig):
         self.reception_pit = reception_pit
-        self.init_data = separator_init_data
+        self.config = manure_separator_config
         self.all_output: List[ManureSeparatorOutput] = []
 
     def reset_daily_variables(self):
@@ -81,32 +76,30 @@ class BaseManureSeparator:
                 VSnd=rp.VSnd,
                 p_excrt_manure=rp.p_excrt_manure,
                 K_manure=rp.K_manure,
-                total_daily_mass=self.total_daily_mass(),
+                total_daily_mass=rp.total_daily_mass,
 
                 final_solids_dry_content=rp.TSd,
-                wet_weight_of_final_solids=rp.TSd * self.init_data.TS_removal_efficiency /
-                                           self.init_data.percent_dry_solids,
-                TS_liquid=rp.TSd * (1 - self.init_data.TS_removal_efficiency),
-                VS_liquid=(rp.VSd + rp.VSnd) * (1 - self.init_data.VS_removal_efficiency),
-                N_liquid=rp.manure_nitrogen * (1 - self.init_data.N_removal_efficiency),
-                TAN_liquid=rp.TAN_s * (1 - self.init_data.TAN_removal_efficiency),
-                P_liquid=rp.p_excrt_manure * (1 - self.init_data.P_removal_efficiency),
-                K_liquid=rp.K_manure * (1 - self.init_data.K_removal_efficiency),
+                wet_weight_of_final_solids=(
+                        rp.TSd * self.config.TS_removal_efficiency / self.config.percent_dry_solids
+                ),
+                TS_liquid=rp.TSd * (1 - self.config.TS_removal_efficiency),
+                VS_liquid=(rp.VSd + rp.VSnd) * (1 - self.config.VS_removal_efficiency),
+                N_liquid=rp.manure_nitrogen * (1 - self.config.N_removal_efficiency),
+                TAN_liquid=rp.TAN_s * (1 - self.config.TAN_removal_efficiency),
+                P_liquid=rp.p_excrt_manure * (1 - self.config.P_removal_efficiency),
+                K_liquid=rp.K_manure * (1 - self.config.K_removal_efficiency),
 
-                TS_solid=rp.TSd * self.init_data.TS_removal_efficiency,
-                VS_solid=(rp.VSd + rp.VSnd) * self.init_data.VS_removal_efficiency,
-                N_solid=rp.manure_nitrogen * self.init_data.N_removal_efficiency,
-                TAN_solid=rp.TAN_s * self.init_data.TAN_removal_efficiency,
-                P_solid=rp.p_excrt_manure * self.init_data.P_removal_efficiency,
-                K_solid=rp.K_manure * self.init_data.K_removal_efficiency,
+                TS_solid=rp.TSd * self.config.TS_removal_efficiency,
+                VS_solid=(rp.VSd + rp.VSnd) * self.config.VS_removal_efficiency,
+                N_solid=rp.manure_nitrogen * self.config.N_removal_efficiency,
+                TAN_solid=rp.TAN_s * self.config.TAN_removal_efficiency,
+                P_solid=rp.p_excrt_manure * self.config.P_removal_efficiency,
+                K_solid=rp.K_manure * self.config.K_removal_efficiency,
 
-                TS_DM_effluent=rp.TSd * self.init_data.TS_DM_effluent_rate
+                TS_DM_effluent=rp.TSd * self.config.TS_DM_effluent_rate
         )
         self.all_output.append(daily_output)
         return daily_output
-
-    def total_daily_mass(self):
-        return self.reception_pit.last_output.total_daily_mass
 
     def effluent_liquid(self):
         pass
@@ -158,19 +151,6 @@ class NullSeparator(BaseManureSeparator):
     pass
 
 
-# TODO: move to sand lane class
-# def sand_lane(self):
-#     """
-#     Description:
-#         Sand separation lane. Method only called for sand bedding.
-#     """
-#     sand_lane = self.sand_lane
-#     sand_lane.sand_washed_with_water = self.bedding_mass_per_day  # kg/day
-#     sand_lane.sand_mass_separated = sand_lane.sand_separation_efficiency * \
-#                                     sand_lane.sand_washed_with_water  # kg/day
-#     sand_lane.sand_volume_separated = sand_lane.sand_mass_separated / self.bedding_density  # m3/day
-
-
 class SandLaneSystem(BaseManureSeparator):
     pass
 
@@ -180,7 +160,7 @@ class MechanicalSandSeparator(BaseManureSeparator):
 
 
 @dataclass
-class ManureSeparatorInitData:
+class ManureSeparatorConfig:
     percent_dry_solids: float = 1.0
     TS_removal_efficiency: float = 0.0
     VS_removal_efficiency: float = 0.0
@@ -190,53 +170,62 @@ class ManureSeparatorInitData:
     K_removal_efficiency: float = 0.0
     TS_DM_effluent_rate: float = 0.0
 
+
+class DefaultManureSeparatorConfigFactory:
+    ROTARY_SCREEN_CONFIG = ManureSeparatorConfig(
+            percent_dry_solids=0.2,
+            TS_removal_efficiency=0.55,
+            VS_removal_efficiency=0.55,
+            N_removal_efficiency=0.3,
+            TAN_removal_efficiency=0.15,
+            P_removal_efficiency=0.4,
+            K_removal_efficiency=0.15,
+            TS_DM_effluent_rate=0.2
+    )
+    SCREW_PRESS_CONFIG = ManureSeparatorConfig(
+            percent_dry_solids=0.35,
+            TS_removal_efficiency=0.30,
+            VS_removal_efficiency=0.5,
+            N_removal_efficiency=0.3,
+            TAN_removal_efficiency=0.10,
+            P_removal_efficiency=0.2,
+            K_removal_efficiency=0.23,
+            TS_DM_effluent_rate=0.35
+    )
+
     @classmethod
-    def get_instance(cls, manure_separator_enum: ManureSeparatorEnum) -> ManureSeparatorInitData:
-        enum_to_init_data: Dict[ManureSeparatorEnum, ManureSeparatorInitData] = {
-            ManureSeparatorEnum.ROTARY_SCREEN: ManureSeparatorInitData(
-                    percent_dry_solids=0.2,
-                    TS_removal_efficiency=0.55,
-                    VS_removal_efficiency=0.55,
-                    N_removal_efficiency=0.3,
-                    TAN_removal_efficiency=0.15,
-                    P_removal_efficiency=0.4,
-                    K_removal_efficiency=0.15,
-                    TS_DM_effluent_rate=0.2
-            ),
-            ManureSeparatorEnum.SCREW_PRESS: ManureSeparatorInitData(
-                    percent_dry_solids=0.35,
-                    TS_removal_efficiency=0.30,
-                    VS_removal_efficiency=0.5,
-                    N_removal_efficiency=0.3,
-                    TAN_removal_efficiency=0.10,
-                    P_removal_efficiency=0.2,
-                    K_removal_efficiency=0.23,
-                    TS_DM_effluent_rate=0.35
-            )
+    def get_instance(cls, manure_separator_type: ManureSeparatorType) -> ManureSeparatorConfig:
+        manure_separator_config_by_type: Dict[ManureSeparatorType, ManureSeparatorConfig] = {
+            ManureSeparatorType.ROTARY_SCREEN: cls.ROTARY_SCREEN_CONFIG,
+            ManureSeparatorType.SCREW_PRESS: cls.SCREW_PRESS_CONFIG
         }
-        return enum_to_init_data.get(manure_separator_enum, ManureSeparatorInitData())
+        return manure_separator_config_by_type.get(manure_separator_type, ManureSeparatorConfig())
 
 
 class ManureSeparatorFactory:
     @classmethod
-    def get_instance(cls, pen: SimplePen, reception_pit: BaseReceptionPit) -> BaseManureSeparator:
-        manure_separator_enum = ManureSeparatorEnum.get_type(pen.manure_separator)
+    def get_instance(cls,
+                     manure_separator_type_name: str,
+                     reception_pit: BaseReceptionPit,
+                     manure_separator_config: Optional[ManureSeparatorConfig] = None) \
+            -> BaseManureSeparator:
 
-        enum_to_class: Dict[ManureSeparatorEnum, Type[BaseManureSeparator]] = {
-            ManureSeparatorEnum.BELT_PRESS: BeltPress,
-            ManureSeparatorEnum.DECANTING_CENTRIFUGE: DecantingCentrifuge,
-            ManureSeparatorEnum.MOVING_DISC_PRESS: MovingDiscPress,
-            ManureSeparatorEnum.NULL_SEPARATOR: NullSeparator,
-            ManureSeparatorEnum.ROTARY_SCREEN: RotaryScreen,
-            ManureSeparatorEnum.SCREW_PRESS: ScrewPress,
-            ManureSeparatorEnum.SLOPE_SCREEN: SlopeScreen,
-            ManureSeparatorEnum.SAND_LANE_MANURE_SEPARATION: SandLaneSystem
+        manure_separator_class_by_type: Dict[ManureSeparatorType, Type[BaseManureSeparator]] = {
+            ManureSeparatorType.BELT_PRESS: BeltPress,
+            ManureSeparatorType.DECANTING_CENTRIFUGE: DecantingCentrifuge,
+            ManureSeparatorType.MOVING_DISC_PRESS: MovingDiscPress,
+            ManureSeparatorType.NULL_SEPARATOR: NullSeparator,
+            ManureSeparatorType.ROTARY_SCREEN: RotaryScreen,
+            ManureSeparatorType.SCREW_PRESS: ScrewPress,
+            ManureSeparatorType.SLOPE_SCREEN: SlopeScreen,
+            ManureSeparatorType.SAND_LANE_MANURE_SEPARATION: SandLaneSystem
         }
 
-        params = {
-            'pen': pen,
-            'reception_pit': reception_pit,
-            'separator_init_data': ManureSeparatorInitData.get_instance(manure_separator_enum)
-        }
+        manure_separator_type = ManureSeparatorType.get_type(manure_separator_type_name)
+        manure_separator_class = manure_separator_class_by_type.get(manure_separator_type, NullSeparator)
 
-        return enum_to_class[manure_separator_enum](**params)
+        if manure_separator_config:
+            return manure_separator_class(reception_pit, manure_separator_config)
+        else:
+            default_manure_separator_config = DefaultManureSeparatorConfigFactory.get_instance(manure_separator_type)
+            return manure_separator_class(reception_pit, default_manure_separator_config)

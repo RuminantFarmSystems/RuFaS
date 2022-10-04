@@ -14,7 +14,7 @@ from RUFAS.routines.manure_management.reception_pits.reception_pit_output import
 from RUFAS.routines.manure_management.manure_handlers.manure_handler_classes import BaseManureHandler
 from RUFAS.routines.manure_management.manure_handlers.manure_handler_output import ManureHandlerOutput
 from RUFAS.routines.manure_management.manure_separators.manure_separator_classes import BaseManureSeparator
-from RUFAS.routines.manure_management.manure_treatments.treatment_classes import AnaerobicDigestion, AnaerobicLagoon, TreatmentEnum
+from RUFAS.routines.manure_management.manure_treatments.treatment_classes import AnaerobicDigestion, AnaerobicLagoon, TreatmentType
 from RUFAS.routines.manure_management.manure_treatments.treatment_classes import AnaerobicDigestionInitData, AnaerobicLagoonInitData
 from RUFAS.routines.manure_management.misc.daily_variables import DailyVariables
 
@@ -126,10 +126,10 @@ def mock_ad_init_data(mocker:MockerFixture)->AnaerobicDigestionInitData:
     init_data = mocker.MagicMock(spec=AnaerobicDigestionInitData)
     init_data.hydraulic_retention_time = 25  
     init_data.sludge_accumulation_period = 1.0  
-    init_data.SAV_FRACTION = 0.03  
-    init_data.TOP_COVER_VOLUME_FRACTION = 0.2  
-    init_data.BIOGAS_GEN_RATIO = 0.38  
-    init_data.EVAPORATION_FRACTION = 0.02  
+    init_data.SAV_fraction = 0.03
+    init_data.top_cover_volume_fraction = 0.2
+    init_data.biogas_gen_ratio = 0.38
+    init_data.evaporation_fraction = 0.02
 
     init_data.TS_removal_efficiency = 0.45  
     init_data.VS_removal_efficiency = 0.40  
@@ -137,8 +137,8 @@ def mock_ad_init_data(mocker:MockerFixture)->AnaerobicDigestionInitData:
     init_data.P_removal_efficiency = 0.0  
     init_data.K_removal_efficiency = 0.0  
 
-    init_data.AD_TEMP_SETPOINT= 37.5
-    init_data.AD_TEMP= 37.5
+    init_data.AD_temp_set_point= 37.5
+    init_data.AD_temp= 37.5
     return init_data
 
 @fixture
@@ -146,7 +146,7 @@ def mock_lagoon_init_data(mocker:MockerFixture)->AnaerobicLagoonInitData:
     init_data = mocker.MagicMock(spec=AnaerobicLagoonInitData)
     init_data.hydraulic_retention_time: int = 365  # 180 - 365 days
     init_data.sludge_accumulation_period: float = 5.0  # Sludge accumulation period 5-20 years
-    init_data.SAV_FRACTION: float = 0.00251  # Sludge Accumulation volume fraction 0.00274-0.00455 of VS loaded
+    init_data.SAV_fraction: float = 0.00251  # Sludge Accumulation volume fraction 0.00274-0.00455 of VS loaded
 
     init_data.percent_dry_solids = 1.0
     init_data.TS_removal_efficiency = 0.75 # Between 70-85%
@@ -165,8 +165,8 @@ def ad_fixture(pen0,mock_separator,mock_ad_init_data,mock_time,mock_weather):
     init_data = mock_ad_init_data
     time=mock_time
     weather=mock_weather
-    ad = AnaerobicDigestion(pen=pen,manure_separator=manure_separator, time=time,weather=weather,\
-        treatment_init_data=init_data)
+    ad = AnaerobicDigestion(pen=pen, manure_separator=manure_separator, time=time, weather=weather, \
+                            manure_treatment_config=init_data)
     return ad
 
 @fixture
@@ -207,8 +207,8 @@ def al_fixture(pen0,mock_separator,mock_lagoon_init_data,mock_time,mock_weather)
     init_data = mock_lagoon_init_data
     time=mock_time
     weather=mock_weather
-    al = AnaerobicLagoon(pen=pen,manure_separator=manure_separator,time=time,weather=weather, \
-        treatment_init_data=init_data)
+    al = AnaerobicLagoon(pen=pen, manure_separator=manure_separator, time=time, weather=weather, \
+                         manure_treatment_config=init_data)
     return al
 
 @fixture

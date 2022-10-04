@@ -15,6 +15,8 @@ class ReceptionPitOutput:
     VSd: float = 0.0
     VSnd: float = 0.0
     VS_total: float = 0.0
+    WIP_frac: float = 0.0
+    WOP_frac: float = 0.0
     p_excrt_manure: float = 0.0
     K_manure: float = 0.0
 
@@ -29,16 +31,10 @@ class ReceptionPitOutput:
 
     @classmethod
     def get_instance(cls, manure_handler_output: ManureHandlerOutput) -> ReceptionPitOutput:
-        excluded_attrs = ['CH4_floor', 'CO2_floor']
+        excluded_attrs = ['WIP_frac', 'WOP_frac', 'CH4_floor', 'CO2_floor', 'NH3_floor']
         manure_handler_output_dict = asdict(manure_handler_output)
         for key in excluded_attrs:
             if key in manure_handler_output_dict:
                 del manure_handler_output_dict[key]
         out = ReceptionPitOutput(**manure_handler_output_dict)
         return out
-
-    def __str__(self) -> str:
-        res = ['Reception pit output']
-        for key, val in asdict(self).items():
-            res.append(f'{key:40}: {val:20,.2f} {getattr(Units, key, ""):<10}')
-        return '\n'.join(res)

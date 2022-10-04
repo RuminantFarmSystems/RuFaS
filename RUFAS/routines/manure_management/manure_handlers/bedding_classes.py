@@ -6,11 +6,11 @@ from dataclasses import asdict, dataclass
 from enum import auto
 from typing import Dict, Optional, Tuple, Type
 
-from RUFAS.routines.manure_management.helpers.enum_helpers import ExtendedEnum
+from RUFAS.routines.manure_management.helpers.enum_helpers import DefaultEnum
 from RUFAS.routines.manure_management.misc.simple_pen import SimplePen
 
 
-class BeddingType(ExtendedEnum):
+class BeddingType(DefaultEnum):
     """Enumerates the different types of bedding."""
 
     SAWDUST = auto()
@@ -37,8 +37,7 @@ class BaseBedding(ABC):
     def __init__(self, bedding_config: BeddingConfig) -> None:
         """Initialize the bedding class."""
 
-        self.mass = bedding_config.mass  # kg/animal/day
-        self.density = bedding_config.density
+        self.bedding_density = bedding_config.bedding_density
         self.bedding_dry_matter = bedding_config.bedding_dry_matter
         self.bedding_washed_percent = bedding_config.bedding_washed_percent
         self.bedding_mass_per_day = bedding_config.bedding_mass_per_day
@@ -74,18 +73,7 @@ class BaseBedding(ABC):
 
         """
 
-        return self.total_bedding_mass(pen) / self.density
-
-    @property
-    def volume(self):
-        """Return the volume of the bedding.
-
-        Returns
-            Volume of the bedding, m^3.
-
-        """
-
-        return self.mass / self.density
+        return self.total_bedding_mass(pen) / self.bedding_density
 
 
 class BaseOrganicBedding(BaseBedding):
@@ -144,8 +132,7 @@ class BeddingConfig:
     """Class for storing the configuration of a bedding.
 
     Attributes
-        mass: , kg/animal/day.  # TODO: Describe this better
-        density: Density of the bedding, kg/m^3.
+        bedding_density: Density of the bedding, kg/m^3.
         bedding_dry_matter: Dry matter content of the bedding, kg. # TODO: What is the unit of this?
         bedding_washed_percent: Percent of the bedding that is washed away, %.
         bedding_mass_per_day: Amount of bedding needed for each animal per day, kg/animal/day.
@@ -153,35 +140,37 @@ class BeddingConfig:
 
     """
 
-    mass: float
-    density: float
+    bedding_mass_per_day: float
+    bedding_density: float
     bedding_dry_matter: float
     bedding_washed_percent: float
-    bedding_mass_per_day: float
     sand_removal_efficiency: float = 0.0
 
 
 class DefaultBeddingConfigFactory:
     """Class for creating default bedding configurations."""
 
-    SAWDUST_BEDDING_CONFIG = BeddingConfig(mass=1.97,
-                                           density=250.0,
-                                           bedding_dry_matter=0.9,
-                                           bedding_washed_percent=1.0,
-                                           bedding_mass_per_day=1.97)
+    SAWDUST_BEDDING_CONFIG = BeddingConfig(
+            bedding_mass_per_day=1.97,
+            bedding_density=250.0,
+            bedding_dry_matter=0.9,
+            bedding_washed_percent=1.0,
+    )
 
-    MANURE_SOLIDS_BEDDING_CONFIG = BeddingConfig(mass=1.97,
-                                                 density=250.0,
-                                                 bedding_dry_matter=0.9,
-                                                 bedding_washed_percent=1.0,
-                                                 bedding_mass_per_day=1.97)
+    MANURE_SOLIDS_BEDDING_CONFIG = BeddingConfig(
+            bedding_mass_per_day=1.97,
+            bedding_density=250.0,
+            bedding_dry_matter=0.9,
+            bedding_washed_percent=1.0,
+    )
 
-    SAND_BEDDING_CONFIG = BeddingConfig(mass=25.0,
-                                        density=1500.0,
-                                        bedding_dry_matter=0.9,
-                                        bedding_washed_percent=25.0,
-                                        bedding_mass_per_day=1.0,
-                                        sand_removal_efficiency=0.5)  # TODO: This is a placeholder value
+    SAND_BEDDING_CONFIG = BeddingConfig(
+            bedding_mass_per_day=25.0,
+            bedding_density=1500.0,
+            bedding_dry_matter=0.9,
+            bedding_washed_percent=25.0,
+            sand_removal_efficiency=0.5,  # TODO: This is a placeholder value
+    )
 
     @classmethod
     def get_instance(cls, bedding_type: BeddingType) -> BeddingConfig:
@@ -207,7 +196,10 @@ class BeddingFactory:
     """Class for creating bedding objects."""
 
     @classmethod
-    def get_instance(cls, bedding_name: str, bedding_config: Optional[BeddingConfig] = None) -> BaseBedding:
+    def get_instance(cls,
+                     bedding_name: str,
+                     bedding_config: Optional[BeddingConfig] = None) \
+            -> BaseBedding:
         """Return the bedding object for the given bedding name.
 
         Parameters
@@ -229,10 +221,10 @@ class BeddingFactory:
         bedding_class = bedding_class_by_type[bedding_type]
 
         if bedding_config:
-            bedding = bedding_class(bedding_config)
+            bedding_obj = bedding_class(bedding_config)
         else:
             default_bedding_config = DefaultBeddingConfigFactory.get_instance(bedding_type)
-            bedding = bedding_class(default_bedding_config)
+            bedding_obj = bedding_class(default_bedding_config)
 
-        bedding.bedding_type = bedding_type
-        return bedding
+        bedding_obj.bedding_type = bedding_type
+        return bedding_obj

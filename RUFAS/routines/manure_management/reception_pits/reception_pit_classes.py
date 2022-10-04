@@ -3,13 +3,14 @@ from __future__ import annotations
 from enum import auto
 from typing import List, Optional
 
-from RUFAS.routines.manure_management.helpers.enum_helpers import ExtendedEnum
+from RUFAS.routines.manure_management.helpers.enum_helpers import DefaultEnum
 from RUFAS.routines.manure_management.manure_handlers.manure_handler_classes import \
     BaseManureHandler
+from RUFAS.routines.manure_management.misc.simple_pen import SimplePen
 from RUFAS.routines.manure_management.reception_pits.reception_pit_output import ReceptionPitOutput
 
 
-class ReceptionPitEnum(ExtendedEnum):
+class ReceptionPitType(DefaultEnum):
     BASE = auto()
     NULL = auto()
 
@@ -19,7 +20,6 @@ class ReceptionPitEnum(ExtendedEnum):
 class BaseReceptionPit:
     def __init__(self, manure_handler: BaseManureHandler):
         self.manure_handler = manure_handler
-        self.daily_vars = ReceptionPitOutput()
         self.all_output: List[ReceptionPitOutput] = []
 
     @property
@@ -36,14 +36,20 @@ class BaseReceptionPit:
 
 
 class NullReceptionPit(BaseReceptionPit):
-    def __init__(self, manure_handler: BaseManureHandler):
-        super().__init__(manure_handler)
+    pass
 
 
 class ReceptionPitFactory:
     @classmethod
-    def get_instance(cls, manure_handler: BaseManureHandler) -> BaseReceptionPit:
-        params = {
-            'manure_handler': manure_handler
+    def get_instance(cls,
+                     reception_pit_type_name: str,
+                     manure_handler: BaseManureHandler) \
+            -> BaseReceptionPit:
+        reception_pit_class_by_type = {
+            ReceptionPitType.BASE: BaseReceptionPit,
+            ReceptionPitType.NULL: NullReceptionPit,
         }
-        return BaseReceptionPit(**params)
+
+        reception_pit_type = ReceptionPitType.get_type(reception_pit_type_name)
+        reception_pit_class = reception_pit_class_by_type[reception_pit_type]
+        return reception_pit_class(manure_handler)

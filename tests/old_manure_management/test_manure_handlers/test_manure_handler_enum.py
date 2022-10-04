@@ -1,6 +1,6 @@
 from typing import Callable
 
-from RUFAS.routines.manure_management.helpers.enum_helpers import ExtendedEnum
+from RUFAS.routines.manure_management.helpers.enum_helpers import DefaultEnum
 from RUFAS.routines.manure_management.manure_handlers.manure_handler_enum import ManureHandlerEnum
 
 
@@ -9,12 +9,12 @@ def test_default_enum_member_should_return_flush_system_enum() -> None:
 
 
 def test_get_default_enum_should_return_flush_system_enum_as_default() -> None:
-    assert ManureHandlerEnum.get_default_enum() is ManureHandlerEnum.FLUSH_SYSTEM
+    assert ManureHandlerEnum.get_default_type() is ManureHandlerEnum.FLUSH_SYSTEM
 
 
 def check_formatted_substrs_should_get_same_expected_enum(full_name: str,
                                                           idx: int,
-                                                          expected_enum: ExtendedEnum,
+                                                          expected_enum: DefaultEnum,
                                                           formatter: Callable[[str], str]):
     cls = expected_enum.__class__
     for j in range(idx, len(full_name)):
@@ -23,7 +23,7 @@ def check_formatted_substrs_should_get_same_expected_enum(full_name: str,
 
 def check_lower_case_substrs_should_get_same_expected_enum(full_name: str,
                                                            idx: int,
-                                                           expected_enum: ExtendedEnum):
+                                                           expected_enum: DefaultEnum):
     check_formatted_substrs_should_get_same_expected_enum(full_name,
                                                           idx,
                                                           expected_enum,
@@ -32,7 +32,7 @@ def check_lower_case_substrs_should_get_same_expected_enum(full_name: str,
 
 def check_upper_case_substrs_should_get_same_expected_enum(full_name: str,
                                                            idx: int,
-                                                           expected_enum: ExtendedEnum):
+                                                           expected_enum: DefaultEnum):
     check_formatted_substrs_should_get_same_expected_enum(full_name,
                                                           idx,
                                                           expected_enum,
@@ -41,7 +41,7 @@ def check_upper_case_substrs_should_get_same_expected_enum(full_name: str,
 
 def check_capitalize_case_substrs_should_get_same_expected_enum(full_name: str,
                                                                 idx: int,
-                                                                expected_enum: ExtendedEnum):
+                                                                expected_enum: DefaultEnum):
     check_formatted_substrs_should_get_same_expected_enum(full_name,
                                                           idx,
                                                           expected_enum,
@@ -50,7 +50,7 @@ def check_capitalize_case_substrs_should_get_same_expected_enum(full_name: str,
 
 def check_substrs_with_leading_and_trailing_spaces_should_get_same_expected_enum(full_name: str,
                                                                                  idx: int,
-                                                                                 expected_enum: ExtendedEnum):
+                                                                                 expected_enum: DefaultEnum):
     check_formatted_substrs_should_get_same_expected_enum(full_name,
                                                           idx,
                                                           expected_enum,
@@ -58,7 +58,7 @@ def check_substrs_with_leading_and_trailing_spaces_should_get_same_expected_enum
 
 
 def check_all_valid_substrs_should_get_same_expected_enum(full_name: str,
-                                                          expected_enum: ExtendedEnum,
+                                                          expected_enum: DefaultEnum,
                                                           idx: int = 3):
     params = {'full_name': full_name, 'expected_enum': expected_enum, 'idx': idx}
     check_lower_case_substrs_should_get_same_expected_enum(**params)

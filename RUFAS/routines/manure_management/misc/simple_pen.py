@@ -115,24 +115,3 @@ class SimplePen:
             return area.has_cows
         else:
             return area.no_cows
-
-    def __str__(self) -> str:
-        """
-        Returns the string representation of this pen.
-
-        Returns
-        -------
-        The string representation of this pen.
-
-        """
-        s = ['SimplePen data:']
-
-        for var in vars(self):
-            if var == 'animals_in_pen':
-                s.append(f'animals_in_pen: {[animal.__class__.__name__ for animal in self.animals_in_pen]}')
-            elif var == 'classes_in_pen':
-                s.append(f'classes_in_pen: {[klass for klass in self.classes_in_pen]}')
-            else:
-                s.append(f'{var}: {getattr(self, var)}')
-
-        return '\n'.join(s)

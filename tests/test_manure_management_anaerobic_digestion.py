@@ -35,13 +35,13 @@ def test_get_minimum_digester_volume(ad_fixture,mock_ad_init_data):
 def test_get_top_cover_volume(ad_fixture,mock_ad_init_data):
     ad = ad_fixture
     minimum_digester_volume=ad.get_minimum_digester_volume()
-    assert pytest.approx(ad.get_top_cover_volume(minimum_digester_volume),0.1) == minimum_digester_volume*mock_ad_init_data.TOP_COVER_VOLUME_FRACTION  
+    assert pytest.approx(ad.get_top_cover_volume(minimum_digester_volume),0.1) == minimum_digester_volume*mock_ad_init_data.top_cover_volume_fraction
 
 def test_sav(ad_fixture,mock_ad_init_data):
     ad = ad_fixture
     ad.update()
-    assert pytest.approx(ad.get_sav(),0.1) == mock_ad_init_data.SAV_FRACTION*ad.volatile_solids*mock_ad_init_data.sludge_accumulation_period* \
-            365/1000
+    assert pytest.approx(ad.get_sav(),0.1) == mock_ad_init_data.SAV_fraction * ad.volatile_solids * mock_ad_init_data.sludge_accumulation_period * \
+           365 / 1000
 
 def test_get_effluent_total_solids(ad_fixture,mock_ad_init_data):
     ad = ad_fixture
@@ -56,18 +56,18 @@ def test_get_effluent_volatile_solids(ad_fixture,mock_ad_init_data):
 def test_get_evaporated_water(ad_fixture,mock_ad_init_data):
     ad = ad_fixture
     ad.update()
-    assert pytest.approx(ad.get_evaporated_water(),0.1) == mock_ad_init_data.EVAPORATION_FRACTION * ad.wastewater_volume  ## m^3/day
+    assert pytest.approx(ad.get_evaporated_water(),0.1) == mock_ad_init_data.evaporation_fraction * ad.wastewater_volume  ## m^3/day
 
 def test_get_biogas_generation(ad_fixture,mock_ad_init_data):
     ad = ad_fixture
     ad.update()
-    assert pytest.approx(ad.get_biogas_generation(),0.1) == mock_ad_init_data.BIOGAS_GEN_RATIO * ad.volatile_solids
+    assert pytest.approx(ad.get_biogas_generation(),0.1) == mock_ad_init_data.biogas_gen_ratio * ad.volatile_solids
 
 def test_get_methane_generation_volume(ad_fixture,mock_ad_init_data):
     ad = ad_fixture
     ad.update()
     biogas_generation = ad.get_biogas_generation()
-    assert pytest.approx(ad.get_methane_generation_volume(biogas_generation),0.1) == biogas_generation * mock_ad_init_data.METHANE_GEN_RATIO
+    assert pytest.approx(ad.get_methane_generation_volume(biogas_generation),0.1) == biogas_generation * mock_ad_init_data.methane_gen_ratio
 
 def test_get_methane_volume_using_chen_equation(ad_fixture,mock_ad_init_data):
     ad = ad_fixture
@@ -109,7 +109,7 @@ def test_bound_influent_temperature(T_avg,expected,ad_fixture):
 ])
 def test_calcHeatCapacityManure(T_avg,moisture_content,expected,ad_fixture):
     ad = ad_fixture
-    assert pytest.approx(ad.calcHeatCapacityManure(T_avg,moisture_content),0.1) == expected  
+    assert pytest.approx(ad.calc_heat_capacity_manure(T_avg, moisture_content), 0.1) == expected
 
 # @pytest.mark.xfail
 def test_ad_update(ad_fixture,get_expected_values_anaerobic_digestion):

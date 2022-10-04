@@ -3,7 +3,7 @@ from RUFAS.routines.manure_management.misc.simple_animal_management import Simpl
 from RUFAS.weather import Weather
 
 
-def daily_manure_management_routine(manure_management: ManureManagement, _animal_management, weather: Weather):
+def daily_manure_management_routine(manure_management: ManureManagement, animal_management, weather: Weather):
     """Entry point to the manure module
 
     This function should coordinate the big-picture steps in the processing
@@ -14,7 +14,7 @@ def daily_manure_management_routine(manure_management: ManureManagement, _animal
     `daily_manure_management_routine` after the wrapper function has been removed.
 
     """
-    animal_management = SimpleAnimalManagement(_animal_management)
+
     manure_management.update(animal_management)
 
 

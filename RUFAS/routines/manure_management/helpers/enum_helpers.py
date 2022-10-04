@@ -6,7 +6,7 @@ from __future__ import annotations
 from enum import Enum
 
 
-class ExtendedEnum(Enum):
+class DefaultEnum(Enum):
     """
     An extended version of the built-in Enum class that allows searching
     for the member that matches or partially matches a search pattern.
@@ -19,37 +19,31 @@ class ExtendedEnum(Enum):
     """
 
     @classmethod
-    def get_type(cls, query_str: str) -> ExtendedEnum:
-        """Return the first enum member whose name contains the query string.
-
+    def get_type(cls, member_name: str) -> DefaultEnum:
+        """Return the enum member that matches the given name.
         Args:
-            query_str: name of the desired enum member
-
+            member_name: name of the desired enum member.
         Returns:
-            The first enum member whose name contains the query string.
-                Otherwise, return the DEFAULT member.
-
+            The enum member that matches the given name.
+                Otherwise, return the default type.
         """
 
-        for e in cls:  # Iterate through each enum member
-            if query_str.strip().lower() in e.name.lower():
-                return e
+        for member in cls:
+            if member.name.upper() == member_name.strip().upper():
+                return member
 
-        return cls.get_default_enum()
+        return cls.get_default_type()
 
     @classmethod
-    def get_default_enum(cls, *args) -> ExtendedEnum:
-        """Return the DEFAULT member if there is one declared.
-
-        If this method is invoked and the DEFAULT member does not exist,
-        an `AttributeError` is raised.
-
-        Notes:
-            If DEFAULT has some other contextual meaning, please override this method.
+    def get_default_type(cls, *args) -> DefaultEnum:
+        """Return either the DEFAULT member if it exists or the first member.
 
         Returns:
-            The DEFAULT member of this enum class.
-
+            The DEFAULT member of this enum class if it exists. Otherwise, the
+                first member is returned.
         """
 
-        return getattr(cls, 'DEFAULT')
+        if hasattr(cls, 'DEFAULT'):
+            return getattr(cls, 'DEFAULT')
+
+        return list(cls)[0]
