@@ -15,9 +15,9 @@ from math import exp
 
 
 @pytest.mark.parametrize("C,rate,water,fc,NO3,temp",[
-    (1, 3, 4, 7, 3, 5) #arbitrary starting integer values,
-    (0, 0, 0, 0, 0, 0) #all zeroes
-    (1, 1, 1, 1, 1, 1) #all ones
+    (1, 3, 4, 7, 3, 5), #arbitrary starting integer values
+    (0, 0, 0, 0, 0, 0), #all zeroes
+    (1, 1, 1, 1, 1, 1), #all ones
     (2.5, 1, 3.4, 1.1, 4, 2), # SW > fc
     (2, 3.3, 1, 4, 6.4, 3) #fc > SW
 ])

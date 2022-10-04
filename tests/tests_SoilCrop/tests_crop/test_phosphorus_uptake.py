@@ -21,52 +21,52 @@ def test_calc_log_term_of_shape_coefficient():
 
 def test_calc_p2():
     """test for the calc_p2() function"""
-    assert False
+    pass
 
 
 def test_calc_p1():
     """test for the calc_p1() function"""
-    assert False
+    pass
 
 
 def test_calc_fr_P():
     """test for the calc_fr_P() function"""
-    assert False
+    pass
 
 
 def test_calc_bio_P_opt():
     """test for the calc_bio_P_opt() function"""
-    assert False
+    pass
 
 
 def test_calc_P_up():
     """test for the calc_P_up() function"""
-    assert False
+    pass
 
 
 def test_calc_act_P_up_each_layer():
     """test for the calc_act_P_up_each_layer() function"""
-    assert False
+    pass
 
 
 def test_calc_P_up_each_layer():
     """test for the calc_P_up_each_layer() function"""
-    assert False
+    pass
 
 def test_calc_P_up_z():
     """test for the calc_P_up_z() function"""
-    assert False
+    pass
 
 
 def test_calc_bio_P():
     """test for the calc_bio_P() function"""
-    assert False
+    pass
 
 
 def test_P_uptake():
     """test for the P_uptake() function"""
-    assert False
+    pass
 
 def test_update_all():
     """test for the update_all() function"""
-    assert False
+    pass

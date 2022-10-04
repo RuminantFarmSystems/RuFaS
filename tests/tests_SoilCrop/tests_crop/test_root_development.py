@@ -5,40 +5,70 @@ Description: Implements test cases
 Author(s): Brandon DeBoer, brdeboer@wisc.edu
 """
 
+from re import A
 from RUFAS.routines.field.crop.root_development import *
 from RUFAS.routines.field.crop.crop_types.base_crop import BaseCrop
+from tests.tests_SoilCrop.mock_classes import *
 
-from unittest.mock import MagicMock
 import pytest
 
 
-def mock_crop_type(fr_PHU = 0.45,z_root = 800 , z_root_max = 1800):
-    mcrop = MagicMock(BaseCrop)
+@pytest.mark.parametrize("fr_PHU,z_root,z_root_max",[
+    (0.45, 800, 1000), #arbitrary starting case
+    (0, 0, 0), #all zeroes
+    (1, 1, 1), #all ones
+    (2.5,750, 980) #creates scenario where fr_root < 0
+])
+def test_calc_daily_root_biomass(fr_PHU, z_root, z_root_max):
+    """
+    Description:   
+        Unit test for calc_daily_root_biomass in routines/field/crop/root_development.py.
+        Uses pytest parametrization to test several scenarios of possible values.
+    """
+    crop = mock_crop(fr_PHU = fr_PHU, z_root = z_root, z_root_max = z_root_max)
 
-    mcrop.fr_PHU = fr_PHU
-    mcrop.z_root = z_root
-    mcrop.z_root_max = z_root_max
-    
-    return mcrop
+    #calculate expected results based on crop pseudocode C.3.A.1
+    fr_root = 0.40 - 0.20 * fr_PHU
+    if fr_root < 0:
+        fr_root = 0
+    #if fr_root is >= 0 its value does not need to be changed from
+    #original calculation
 
-
-#the following tests are for the calc_daily_root_biomass() function
-
-#test 1 is to simulate an instance where fr_root is > 0
-def test_calc_daily_root_biomass_correctly_calculates_root_biomass():
-    crop = mock_crop_type()
     calc_daily_root_biomass(crop)
 
-    assert pytest.approx(crop.fr_root) == 0.4 - 0.2 * 0.45
-
-#test 2 is to simulate instance where fr_root is <= 0
-def test_calc_daily_root_biomass_correctly_calculates_root_biomass_zero():
-    crop = mock_crop_type(fr_PHU = 2)
-    calc_daily_root_biomass(crop)
-
-    assert pytest.approx(crop.fr_root) == 0
+    assert pytest.approx(crop.fr_root) == fr_root
 
 
-#the following test is for the calc_z_root()
+
+
+@pytest.mark.parametrize("z_root_max,fr_PHU,z_root",[
+    (1000, 0.45, 800), #arbitrary starting case
+    (0, 0, 0), #all zeroes
+    (1, 1, 1), #all ones
+    (1000, .5, 1000), #z_root_max = z_root
+    (910, .31, 680), #fr_PHU < 0.4
+    (925, .60, 490) #fr_PHU > 0.4
+])
+def test_calc_z_root(z_root_max,fr_PHU,z_root):
+    """
+    Description:   
+        Unit test for calc_z_root in routines/field/crop/root_development.py.
+        Uses pytest parametrization to test several scenarios of possible values.
+    """
+    crop = mock_crop(z_root_max = z_root_max,fr_PHU = fr_PHU,z_root = z_root)
+
+    #calculate expected results based on crop pseudocode C.3.A.2/3
+    if z_root != z_root_max:
+        if fr_PHU > 0.4:
+            z_root = z_root_max
+        else:
+            z_root = 2.5 * fr_PHU * z_root_max
+
+    calc_z_root(crop)
+
+    assert pytest.approx(crop.z_root) == z_root
+
+
+
 
 
