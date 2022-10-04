@@ -241,7 +241,7 @@ def test_calc_N_fixation():
 
 
 def test_get_root_accessible_layers():
-    """Unit test for function get_root_accessible_layers in file routines/field/crop/nitrogen_fixation.py"""
+    """Unit test for function get_root_accessible_layer in file routines/field/crop/nitrogen_fixation.py"""
     pass
 
 

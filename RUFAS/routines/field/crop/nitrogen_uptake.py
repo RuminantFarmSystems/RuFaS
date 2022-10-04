@@ -9,7 +9,7 @@ Description: This module contains the necessary functions for calculating and
 """
 
 from math import log, exp
-from RUFAS.routines.field.crop.nitrogen_fixation import calc_N_fixation
+from RUFAS.routines.field.crop.nitrogen_fixation import fix_nitrogen
 
 
 def reallocate_nitrogen(crop, soil) -> None:
@@ -24,7 +24,8 @@ def reallocate_nitrogen(crop, soil) -> None:
     update_optimal_nitrogen(crop)
     update_potential_nitrogen_uptake(crop)
     uptake_nitrogen(crop, soil)
-    fix_nitrogen(crop, soil)
+    if crop.is_nitrogen_fixer:
+        fix_nitrogen(crop, soil)
     store_nitrogen_biomass(crop)
 
 
@@ -317,9 +318,9 @@ def calc_stored_nitrogen(uptake: float, previous: float, fixed: float = 0) -> fl
     return previous + uptake + fixed
 
 
-def fix_nitrogen(crop, soil) -> None:
-    # TODO: this function needs updating once nitrogen_fixation.py is refactored
-    crop.N_fix = calc_N_fixation(soil, crop)
+# def fix_nitrogen(crop, soil) -> None:
+#     # TODO: this function needs updating once nitrogen_fixation.py is refactored
+#     crop.N_fix = calc_N_fixation(soil, crop)
 
 
 def store_nitrogen_biomass(crop) -> None:

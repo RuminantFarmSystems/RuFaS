@@ -30,7 +30,7 @@ class TallFescue(BaseCrop):
         self.planted = False
         self.growing = False
 
-        self.fix_nitrogen = False
+        self.is_nitrogen_fixer = False
 
         # ===================================================================
         ''' HEAT UNIT DATA '''

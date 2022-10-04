@@ -5,6 +5,7 @@ Author(s): Clay Morrow (morrowcj@outlook.com); Brandon DeBoer (brdeboer@wisc.edu
 
 import pytest
 from RUFAS.routines.field.crop.nitrogen_uptake import *
+from RUFAS.routines.field.crop.nitrogen_fixation import calc_fixed_nitrogen
 from tests.tests_SoilCrop.mock_classes import mock_crop, mock_soil, mock_soil_layer
 
 
@@ -68,7 +69,7 @@ def test_calc_shape_parameters(hh, hf, n1, n2, nn, n3):
 def test_calc_nitrogen_fraction(p, n1, n3, shape1, shape2):
     """ensure that nitrogen fraction is correctly calculated by calc_nitrogen_fraction()"""
     observe = calc_nitrogen_fraction(phu_frac=p, nfrac_1=n1, nfrac_3=n3, shape1=shape1, shape2=shape2)
-    expect = (n1 - n3) * (1 - (p / (p + exp(shape1 + shape2*p)))) + n3
+    expect = (n1 - n3) * (1 - (p / (p + exp(shape1 + shape2 * p)))) + n3
     assert observe == expect
 
 
@@ -109,7 +110,7 @@ def test_update_nitrogen_fraction(heatfrac, n1, n2, n3star, n3, phu_half, phu_fu
 ])
 def test_calc_optimal_nitrogen(nf, bm):
     """test that optimal nitrogen is correctly calculated by calc_optimal_nitrogen()"""
-    assert calc_optimal_nitrogen(nf, bm) == nf*bm
+    assert calc_optimal_nitrogen(nf, bm) == nf * bm
 
 
 @pytest.mark.parametrize("nstart,nf,bm", [
@@ -122,7 +123,7 @@ def test_update_optimal_nitrogen(nstart, nf, bm):
     """test that a plant's optimal nitrogen is correctly updated by update_optimal_nitrogen()"""
     mc = mock_crop(biomass_actual=bm, fr_N=nf, bio_N_opt=nstart)
     update_optimal_nitrogen(mc)
-    assert mc.bio_N_opt == nf*bm
+    assert mc.bio_N_opt == nf * bm
 
 
 @pytest.mark.parametrize("opt,prev,mat,growth", [
@@ -137,7 +138,7 @@ def test_update_optimal_nitrogen(nstart, nf, bm):
 ])
 def test_calc_potential_nitrogen_uptake(opt, prev, mat, growth):
     """test that potential nitrogen uptake is correctly calculated by calc_max_nitrogen_uptake()"""
-    expect = min(opt - prev, 4*mat*growth)
+    expect = min(opt - prev, 4 * mat * growth)
     observe = calc_potential_nitrogen_uptake(demand=opt, nitrogen_start=prev, mature_nfrac=mat, max_growth=growth)
     assert expect == observe
 
@@ -203,7 +204,7 @@ def test_error_nitrogen_uptake_to_depth(d, z, r, b):
     ([0.25, 0.50, 0.75, 1.00], 1, 1.5, 1),  # increased root depth
     ([0.25, 0.50, 0.75, 1.00], 1, 1, 0.5),  # reduced distribution
     ([0.2, 0.40, 0.6, 0.8, 1.0], 1, 1, 1),  # five layers
-    ([1/3, 2/3, 1], 1, 1, 1),  # three layers
+    ([1 / 3, 2 / 3, 1], 1, 1, 1),  # three layers
     ([0.991, 3.7, 3.89, 12.01, 15], 338.97, 12.88, 0.395),  # arbitrary (roots in 5th)
     ([0.991, 3.7, 3.89, 12.01, 15], 338.97, 4.33, 0.395),  # arbitrary (roots in 4th)
     ([0.991, 3.7, 3.89, 12.01, 15], 338.97, 1.25, 0.395),  # arbitrary (roots in 2nd)
@@ -359,42 +360,55 @@ def test_store_nitrogen(total_uptake, nitrogen_start, fixed):
 
 
 def test_fix_nitrogen():
-    motivational_message = "fix_nitrogen() needs to be changed once nitrogen_fixation.py" +\
+    motivational_message = "fix_nitrogen() needs to be changed once nitrogen_fixation.py" + \
                            "(calc_N_fixation()) has been refactored and tested - Clay"
     raise Exception(motivational_message)
 
 
 # TODO: need to add more test cases for this integration test
-@pytest.mark.parametrize("hf50,hf100,phf,nf1,nf2,nfn,nf3,bm,nmo,ns,mg,rd,nds,nfx,sbs,sns", [
-    (0.5, 1.0, 0.75, 0.8, 0.6, 0.3, 0.2, 100, 10, 50, 20, 1, 0.5, 0, [0.3, 0.6, 1], [0.2, 0.1, 0.01]),
-])
-def test_update_nitrogen(hf50, hf100, phf, nf1, nf2, nfn, nf3, bm, nmo, ns, mg, rd, nds, nfx,
-                         sbs, sns):
+@pytest.mark.parametrize("hf,hf50,hf100,phf,"
+                         "nf1,nf2,nfn,nf3,"
+                         "bm,nmo,ns,mg,"
+                         "rd,nds,nfx,fix,"
+                         "sbs,sns,sw,scw", [
+                             (0.7, 0.5, 1.0, 0.75,  # case 1 (no fixation)
+                              0.8, 0.6, 0.3, 0.2,
+                              100, 10, 50, 20,
+                              1, 0.5, 0, False,
+                              [0.3, 0.6, 1], [0.2, 0.1, 0.01], [.9, .5, .8], [1, 1, 1]),
+                             # (0.7, 0.5, 1.0, 0.75,  # case 1 (with fixation)
+                             #  0.8, 0.6, 0.3, 0.2,
+                             #  100, 10, 50, 20,
+                             #  1, 0.5, 0, False,
+                             #  [0.3, 0.6, 1], [0.2, 0.1, 0.01], [.9, .5, .8], [1, 1, 1]),
+                         ])
+def test_update_nitrogen(hf, hf50, hf100, phf, nf1, nf2, nfn, nf3, bm, nmo, ns, mg, rd, nds, nfx, fix,
+                         sbs, sns, sw, scw):
     """integration test for update_nitrogen()"""
     # observe
     mc = mock_crop(fr_PHU_50=hf50, fr_PHU_100=hf100, fr_n1=nf1, fr_n2=nf2, fr_n3ish=nfn, fr_n3=nf3,
                    prev_fr_PHU=phf, bio_N_opt=nmo, bio_N=ns, d_biomass_max=mg, z_root=rd, beta_n=nds,
-                   biomass_actual=bm)
+                   biomass_actual=bm, fr_PHU=hf, N_fix=nfx, is_nitrogen_fixer=fix)
     ms = mock_soil(soil_layers=[])
-    for depth, nitrate in zip(sbs, sns):
-        ml = mock_soil_layer(bottom_depth=depth, NO3=nitrate, N_uptake=0)
+    for depth, nitrate, water, cap_water in zip(sbs, sns, sw, scw):
+        ml = mock_soil_layer(bottom_depth=depth, NO3=nitrate, N_uptake=0, soil_water=water, fc_water=cap_water)
         ms.soil_layers.append(ml)
     reallocate_nitrogen(mc, ms)
     observe_layer_leftovers = [layer.NO3 for layer in ms.soil_layers]
     observe_layer_uptakes = [layer.N_uptake for layer in ms.soil_layers]
 
     # expect
-        # update_nitrogen_fraction()
+    # update_nitrogen_fraction()
     nshapes = calc_shape_parameters(heatfrac_half=hf50, heatfrac_full=hf100, nfrac_1=nf1, nfrac_2=nf2, nfrac_near=nfn,
-                                    nfrac_3=nf3, biomass_actual=bm)
+                                    nfrac_3=nf3)
     nfrac = calc_nitrogen_fraction(phu_frac=phf, nfrac_1=nf1, nfrac_3=nf3, shape1=nshapes[0], shape2=nshapes[1])
-        # update_optimal_nitrogen()
+    # update_optimal_nitrogen()
     optimal_nitrogen = calc_optimal_nitrogen(nfrac=nfrac, biomass=bm)
-        # update_potential_nitrogen_uptake()
-    if nmo - ns < 0:
+    # update_potential_nitrogen_uptake()
+    if optimal_nitrogen - ns < 0:
         potential_uptake = 0
     else:
-        potential_uptake = calc_potential_nitrogen_uptake(demand=nmo, nitrogen_start=ns, mature_nfrac=nf3,
+        potential_uptake = calc_potential_nitrogen_uptake(demand=optimal_nitrogen, nitrogen_start=ns, mature_nfrac=nf3,
                                                           max_growth=mg)
         # uptake_nitrogen()
     layer_potentials = calc_layer_nitrogen_potential(boundaries=sbs, demand=potential_uptake, root_depth=rd,
@@ -404,9 +418,13 @@ def test_update_nitrogen(hf50, hf100, phf, nf1, nf2, nfn, nf3, bm, nmo, ns, mg, 
                                                layer_nitrate=sns)
     layer_leftovers = [available - uptake for available, uptake in zip(sns, layer_uptakes)]
     total_uptake = sum(layer_uptakes)
-        # fix_nitrogen()
+
+    # fix_nitrogen()
+    if fix:
+        raise Exception("fixation testing not yet implemented")
     # TODO: need to update this section of the test after nitrogen_fixation.py is cleaned up
-        # store_nitrogen_biomass()
+
+    # store_nitrogen_biomass()
     nitrogen_biomass = calc_stored_nitrogen(uptake=total_uptake, previous=ns, fixed=nfx)
 
     # make assertions (the full test fails on first failed assumption)

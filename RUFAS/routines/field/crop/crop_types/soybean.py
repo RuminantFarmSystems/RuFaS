@@ -26,7 +26,7 @@ class Soybean(BaseCrop):
         self.growing = False
         self.harvested = False
 
-        self.fix_nitrogen = True
+        self.is_nitrogen_fixer = True
 
         # ===================================================================
         ''' HEAT UNIT DATA '''
