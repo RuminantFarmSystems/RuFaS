@@ -11,5 +11,3 @@ class Corn(BaseCrop):
             data (dict): data used to construct the class
         """
         super().__init__(crop_name=crop_name, data=data, species="corn")
-
-    # species-specific methods ...

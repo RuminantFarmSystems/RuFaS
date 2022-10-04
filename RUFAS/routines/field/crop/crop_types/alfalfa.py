@@ -13,4 +13,3 @@ class Alfalfa(BaseCrop):
         super().__init__(crop_name=crop_name, data=data, species="alfalfa")
 
     # species-specific methods ...
-

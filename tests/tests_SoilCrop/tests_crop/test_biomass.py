@@ -129,7 +129,7 @@ def test_update_biomass(start, g, rad, ext, eff, lai):
     (-0.5, 1),  # negative roots?
     (0.297, 132.1) # arbitrary
 ])
-def test_calc_bio_AG(fr, bm):
+def test_calc_above_ground_biomass(fr, bm):
     """
     Description: Test `calc_bio_AG()`
 
@@ -137,7 +137,7 @@ def test_calc_bio_AG(fr, bm):
         fr: fraction of biomass in roots
         bm: actual plant biomass
     """
-    assert calc_bio_AG(fr, bm) == (1-fr)*bm
+    assert calc_above_ground_biomass(fr, bm) == (1 - fr) * bm
 
 
 @pytest.mark.parametrize("fr,bm", [
@@ -148,7 +148,7 @@ def test_calc_bio_AG(fr, bm):
     (-0.5, 1),  # negative roots?
     (0.297, 132.1)  # arbitrary
 ])
-def test_update_bio_AG(fr, bm):
+def test_update_above_ground_biomass(fr, bm):
     """
     Description: Test `update_bio_AG()`
 
@@ -157,8 +157,8 @@ def test_update_bio_AG(fr, bm):
         bm: actual plant biomass
     """
     mc = mock_crop(fr_root=fr, biomass_actual=bm, bio_AG=0)
-    update_bio_AG(mc)
-    assert mc.bio_AG == calc_bio_AG(fr, bm)
+    update_above_ground_biomass(mc)
+    assert mc.bio_AG == calc_above_ground_biomass(fr, bm)
 
 
 @pytest.mark.parametrize("evap,trans", [
@@ -232,5 +232,7 @@ def test_calc_water_def(et, et_max):
     else:
         assert calc_water_def(et, et_max) == 0
 
-def test_update_all():
-    assert False  # TODO: I don't yet know how to properly mock the radiation object
+def test_allocate_biomass():
+    motivational_message = "I still need to write an integration test for allocate_biomass()." +\
+                     "I need to learn about the weather and time classes to mock them - Clay"
+    raise Exception(motivational_message)

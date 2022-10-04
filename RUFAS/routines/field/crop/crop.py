@@ -74,19 +74,14 @@ def daily_crop_routine(soil, crop, field_management, weather, time):
         else:
 
             if crop_type.growing:
+                # crop_type.grow()
                 heat_units.update_all(crop_type, weather, time)
-
                 root_development.update_all(crop_type)
-
-                nitrogen_uptake.update_all(soil, crop_type)
-
+                nitrogen_uptake.reallocate_nitrogen(crop_type, soil)
                 phosphorus_uptake.update_all(soil, crop_type)
-
                 growth_constraints.update_all(soil, crop_type, weather, time)
-
                 leaf_area_index.update_all(crop_type)
-
-                biomass.update_all(crop_type, soil, weather, time)
+                biomass.allocate_biomass(crop_type, soil, weather, time)
 
                 # "pseudocode_crop" C.10.A.1/2
                 if crop_type.harvest_type == 'scheduled':
