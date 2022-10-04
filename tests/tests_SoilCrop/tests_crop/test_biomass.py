@@ -127,7 +127,7 @@ def test_update_biomass(start, g, rad, ext, eff, lai):
     (0, 1),  # no roots
     (1, 1),  # all roots
     (-0.5, 1),  # negative roots?
-    (0.297, 132.1)  # arbitrary
+    (0.297, 132.1) # arbitrary
 ])
 def test_calc_above_ground_biomass(fr, bm):
     """
@@ -231,7 +231,6 @@ def test_calc_water_def(et, et_max):
         assert calc_water_def(et, et_max) == 100 * (et / et_max)
     else:
         assert calc_water_def(et, et_max) == 0
-
 
 def test_allocate_biomass():
     motivational_message = "I still need to write an integration test for allocate_biomass()." +\
