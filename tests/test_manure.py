@@ -17,6 +17,13 @@ from RUFAS.routines.animal.pen import Pen
 from RUFAS.routines.manure.constants.constants import ManureManagementConstants
 from RUFAS.routines.manure.default_enum.default_enum import DefaultEnum
 from RUFAS.routines.manure.manure.manure import Manure
+from RUFAS.routines.manure.manure_handlers.bedding_classes import BeddingConfig
+from RUFAS.routines.manure.manure_handlers.bedding_classes import BeddingFactory
+from RUFAS.routines.manure.manure_handlers.bedding_classes import BeddingType
+from RUFAS.routines.manure.manure_handlers.bedding_classes import DefaultBeddingConfigFactory
+from RUFAS.routines.manure.manure_handlers.bedding_classes import ManureSolidsBedding
+from RUFAS.routines.manure.manure_handlers.bedding_classes import SandBedding
+from RUFAS.routines.manure.manure_handlers.bedding_classes import SawdustBedding
 from RUFAS.routines.manure.manure_management import ManureManagement
 from RUFAS.routines.manure.pen.manure_management_pen import ManureManagementPen
 
@@ -60,6 +67,8 @@ def mock_cow(mocker: MockerFixture) -> Cow:
 
 @fixture
 def manure_attributes() -> List[str]:
+    """Returns a list of manure attributes"""
+
     return ['U', 'TAN_s', 'MN', 'Mkg', 'TSd',
             'VSd', 'VSnd', 'WIP_frac', 'WOP_frac', 'p_excrt_manure',
             'K_manure', 'CH4_manure']
@@ -67,7 +76,11 @@ def manure_attributes() -> List[str]:
 
 @fixture
 def generate_animal_manure(manure_attributes) -> Callable[[float], Dict[str, float]]:
+    """Returns a function that generates a dictionary of animal manure attributes"""
+
     def generate(dummy_val=2.0):
+        """Generates a dictionary of animal manure attributes with dummy values"""
+
         return {attr: dummy_val for attr in manure_attributes}
 
     return generate
@@ -92,7 +105,7 @@ def mock_pen(mocker: MockerFixture,
     mock_pen.manure_handling = 'manual_scraping'
     mock_pen.manure_separator = 'sand_lane'
     mock_pen.manure_storage = 'storage_pit'
-    mock_pen.manure = generate_animal_manure()
+    mock_pen.manure = generate_animal_manure(0.0)
     return mock_pen
 
 
@@ -104,6 +117,7 @@ def mock_animal_management(mocker: MockerFixture) -> AnimalManagement:
 
 
 # Test ManureManagementConstants class
+# ====================================
 
 def test_manure_management_constants_class() -> None:
     constants = ManureManagementConstants
@@ -124,7 +138,9 @@ def test_manure_management_constants_class() -> None:
     assert constants.WATER_DENSITY_KG_PER_M3 == approx(9.97e-4)
     assert constants.DAYS_PER_YEAR == 365
 
+
 # Test DefaultEnum class
+# ======================
 
 class DummyDefaultEnumWithDefault(DefaultEnum):
     SUCCESS = 1
@@ -163,6 +179,9 @@ def test_get_type(enum_type: DefaultEnum, lookup_member: str, expected_type: Def
     assert enum_type.get_type(lookup_member) is expected_type
 
 
+# Test Manure class
+# =================
+
 def test_manure_init(manure_attributes: List[str],
                      generate_animal_manure: Callable[[float], Dict[str, float]]) -> None:
     """Unit test for function __init__ in file manure.py"""
@@ -185,7 +204,7 @@ def test_manure_init(manure_attributes: List[str],
     # Given one or more arguments, a new Manure object should either set
     # the corresponding attributes to the given values or do some calculations.
     manure = Manure(
-            # The following attributes should be modified.
+            # The following attributes should be modified via unit conversion.
             U=2.0,
             TAN_s=3.0,
             MN=4.0,
@@ -219,6 +238,8 @@ def test_manure_init(manure_attributes: List[str],
 
 
 # Test ManureManagement class
+# ===========================
+
 def test_manure_management_init(mocker: MockerFixture, mock_animal_management: AnimalManagement) -> None:
     """Unit test for function __init__ in file manure_management.py"""
 
@@ -282,8 +303,8 @@ def test_manure_management_update(mocker: MockerFixture,
     assert len(manure_management.all_data) == num_pens
 
 
-# Test pen class
-
+# Test ManureManagementPen class
+# ==============================
 
 def test_manure_management_pen_init(mock_pen: Pen,
                                     mock_calf: Calf,
@@ -294,20 +315,28 @@ def test_manure_management_pen_init(mock_pen: Pen,
                                     generate_animal_manure: Callable[[float], Dict[str, float]]) -> None:
     """Unit test for function __init__ in file manure_management_pen.py"""
 
+    # Arrange
+    mock_pen.manure['Mkg'] = 100.0
+    dummy_manure_data = generate_animal_manure(0.0)
+    dummy_manure_data['Mkg'] = 100.0
+
     # Act
-    mm_pen = ManureManagementPen(mock_pen)
+    pen = ManureManagementPen(mock_pen)
 
     # Assert
-    assert mm_pen.id == 1
-    assert mm_pen.animals_in_pen == [mock_calf, mock_heiferI, mock_heiferII, mock_heiferIII, mock_cow]
-    assert mm_pen.classes_in_pen == {'Calf', 'HeiferI', 'HeiferII', 'HeiferIII', 'Cow'}
-    assert mm_pen.housing_type == 'free stall'
-    assert mm_pen.bedding_type == 'sand'
-    assert mm_pen.manure_handler == 'manual_scraping'
-    assert mm_pen.manure_separator == 'sand_lane'
-    assert mm_pen.manure_treatment == 'storage_pit'
-    assert mm_pen.num_animals == 5
-    assert mm_pen.manure == Manure(**generate_animal_manure())
+    assert pen.id == 1
+    assert pen.animals_in_pen == [mock_calf, mock_heiferI, mock_heiferII, mock_heiferIII, mock_cow]
+    assert pen.classes_in_pen == {'Calf', 'HeiferI', 'HeiferII', 'HeiferIII', 'Cow'}
+    assert pen.housing_type == 'free stall'
+    assert pen.bedding_type == 'sand'
+    assert pen.manure_handler == 'manual_scraping'
+    assert pen.manure_separator == 'sand_lane'
+    assert pen.manure_treatment == 'storage_pit'
+    assert pen.num_animals == 5
+    assert pen.manure_density == 990.0  # kg/m3
+    assert pen.manure == Manure(**dummy_manure_data)
+    assert pen.manure_mass == approx(100.0)
+    assert pen.manure_volume == approx(100.0 / 990.0)
 
 
 @pytest.mark.parametrize(
@@ -377,3 +406,193 @@ def test_barn_area(housing_type,
 
     # Assert
     assert mm_pen.barn_area == approx(expected_area)
+
+
+# Test bedding classes
+# ====================
+
+@pytest.mark.parametrize(
+        "bedding_type_name, expected_bedding_type",
+        [('sawdust', BeddingType.SAWDUST),
+         ('manure solids', BeddingType.MANURE_SOLIDS),
+         ('sand', BeddingType.SAND),
+         ('dummy', BeddingType.DEFAULT),
+         ('dummy', BeddingType.SAND),
+         ('default', BeddingType.SAND),
+         ])
+def test_bedding_type(bedding_type_name, expected_bedding_type) -> None:
+    """Unit test for class BeddingType in file bedding_classes.py"""
+
+    # Act
+    bedding_type = BeddingType.get_type(bedding_type_name)
+
+    # Assert
+    assert bedding_type == expected_bedding_type
+
+
+# Test BeddingConfig class
+# ========================
+
+def test_bedding_config_init() -> None:
+    """Unit test for BeddingConfig dataclass in file bedding_classes.py"""
+
+    # Act
+    bedding_config = BeddingConfig(
+            bedding_mass_per_day=1.0,
+            bedding_density=2.0,
+            bedding_dry_matter=3.0,
+            bedding_washed_percent=4.0,
+            bedding_type=BeddingType.DEFAULT,
+            sand_removal_efficiency=5.0,
+    )
+
+    # Assert
+    assert bedding_config.bedding_mass_per_day == 1.0
+    assert bedding_config.bedding_density == 2.0
+    assert bedding_config.bedding_dry_matter == 3.0
+    assert bedding_config.bedding_washed_percent == 4.0
+    assert bedding_config.bedding_type == BeddingType.DEFAULT
+    assert bedding_config.sand_removal_efficiency == 5.0
+
+
+# Test DefaultBeddingConfigFactory class
+# ======================================
+
+@pytest.mark.parametrize(
+        "bedding_config, expected_bedding_mass_per_day, expected_bedding_density, "
+        "expected_bedding_dry_matter, expected_bedding_washed_percent, "
+        "expected_bedding_type, expected_sand_removal_efficiency",
+        [(DefaultBeddingConfigFactory.SAWDUST_BEDDING_CONFIG, 1.97, 250.0, 0.9, 1.0, BeddingType.SAWDUST, 0.0),
+         (DefaultBeddingConfigFactory.MANURE_SOLIDS_BEDDING_CONFIG, 1.97, 250.0, 0.9, 1.0, BeddingType.MANURE_SOLIDS,
+          0.0),
+         (DefaultBeddingConfigFactory.SAND_BEDDING_CONFIG, 25.0, 1500.0, 0.9, 25.0, BeddingType.SAND, 0.5),
+         ])
+def test_default_bedding_config_values(bedding_config,
+                                       expected_bedding_mass_per_day,
+                                       expected_bedding_density,
+                                       expected_bedding_dry_matter,
+                                       expected_bedding_washed_percent,
+                                       expected_bedding_type,
+                                       expected_sand_removal_efficiency) -> None:
+    """Unit test for  default bedding config values in file bedding_classes.py"""
+
+    # Assert
+    assert bedding_config.bedding_mass_per_day == approx(expected_bedding_mass_per_day)
+    assert bedding_config.bedding_density == approx(expected_bedding_density)
+    assert bedding_config.bedding_dry_matter == approx(expected_bedding_dry_matter)
+    assert bedding_config.bedding_washed_percent == approx(expected_bedding_washed_percent)
+    assert bedding_config.bedding_type is expected_bedding_type
+    assert bedding_config.sand_removal_efficiency == approx(expected_sand_removal_efficiency)
+
+
+@pytest.mark.parametrize(
+        "bedding_type, expected_default_bedding_config",
+        [(BeddingType.SAWDUST, DefaultBeddingConfigFactory.SAWDUST_BEDDING_CONFIG),
+         (BeddingType.MANURE_SOLIDS, DefaultBeddingConfigFactory.MANURE_SOLIDS_BEDDING_CONFIG),
+         (BeddingType.SAND, DefaultBeddingConfigFactory.SAND_BEDDING_CONFIG)
+         ])
+def test_default_bedding_config_factory_get_instance(bedding_type, expected_default_bedding_config) -> None:
+    """Unit test for class DefaultBeddingConfigFactory in file bedding_classes.py"""
+
+    # Act
+    default_bedding_config = DefaultBeddingConfigFactory.get_instance(bedding_type)
+
+    # Assert
+    assert default_bedding_config == expected_default_bedding_config
+
+
+# Test BeddingFactory class
+# =========================
+
+@pytest.fixture
+def dummy_bedding_config() -> BeddingConfig:
+    """Fixture for BeddingConfig dataclass in file bedding_classes.py"""
+
+    return BeddingConfig(
+            bedding_mass_per_day=1.0,
+            bedding_density=2.0,
+            bedding_dry_matter=3.0,
+            bedding_washed_percent=4.0,
+            bedding_type=BeddingType.DEFAULT,
+            sand_removal_efficiency=5.0,
+    )
+
+
+@pytest.mark.parametrize(
+        "bedding_type_name, expected_bedding",
+        [('sawdust', SawdustBedding),
+         ('manure solids', ManureSolidsBedding),
+         ('sand', SandBedding),
+         ])
+def test_bedding_factory_get_instance(bedding_type_name,
+                                      expected_bedding,
+                                      dummy_bedding_config) -> None:
+    """Unit test for class BeddingFactory in file bedding_classes.py"""
+
+    # Use default bedding configs
+    # Act
+    bedding = BeddingFactory.get_instance(bedding_type_name)
+
+    # Assert
+    assert isinstance(bedding, expected_bedding)
+    assert bedding.bedding_type == BeddingType.get_type(bedding_type_name)
+
+    default_bedding_config = DefaultBeddingConfigFactory.get_instance(bedding.bedding_type)
+    assert bedding.bedding_mass_per_day == default_bedding_config.bedding_mass_per_day
+    assert bedding.bedding_density == default_bedding_config.bedding_density
+    assert bedding.bedding_dry_matter == default_bedding_config.bedding_dry_matter
+    assert bedding.bedding_washed_percent == default_bedding_config.bedding_washed_percent
+    assert bedding.bedding_type is default_bedding_config.bedding_type
+
+    if isinstance(bedding, SandBedding):
+        assert bedding.sand_removal_efficiency == default_bedding_config.sand_removal_efficiency
+
+    # Use custom bedding configs
+    # Act
+    bedding = BeddingFactory.get_instance(bedding_type_name, dummy_bedding_config)
+
+    # Assert
+    assert isinstance(bedding, expected_bedding)
+    assert bedding.bedding_mass_per_day == dummy_bedding_config.bedding_mass_per_day
+    assert bedding.bedding_density == dummy_bedding_config.bedding_density
+    assert bedding.bedding_dry_matter == dummy_bedding_config.bedding_dry_matter
+    assert bedding.bedding_washed_percent == dummy_bedding_config.bedding_washed_percent
+    assert bedding.bedding_type is dummy_bedding_config.bedding_type
+
+    if isinstance(bedding, SandBedding):
+        assert bedding.sand_removal_efficiency == dummy_bedding_config.sand_removal_efficiency
+
+
+@pytest.mark.parametrize(
+        "bedding_type_name, bedding_config",
+        [('sawdust', DefaultBeddingConfigFactory.SAWDUST_BEDDING_CONFIG),
+         ('manure solids', DefaultBeddingConfigFactory.MANURE_SOLIDS_BEDDING_CONFIG),
+         ('sand', DefaultBeddingConfigFactory.SAND_BEDDING_CONFIG),
+         ])
+def test_total_bedding_mass_and_volume(bedding_type_name, bedding_config, mock_pen: Pen) -> None:
+    """Unit test for total_bedding_mass and total_bedding_volume in file bedding_classes.py"""
+
+    # Arrange
+    pen = ManureManagementPen(mock_pen)
+    num_animals = pen.num_animals
+    bedding_mass_per_day = bedding_config.bedding_mass_per_day
+    sand_removal_efficiency = bedding_config.sand_removal_efficiency
+    expected_total_bedding_mass = num_animals * bedding_mass_per_day * \
+                                  (1 - sand_removal_efficiency)
+
+    bedding_density = bedding_config.bedding_density
+    expected_total_bedding_volume = expected_total_bedding_mass / bedding_density
+
+    bedding_washed_percent = bedding_config.bedding_washed_percent
+    expected_total_bedding_washed = expected_total_bedding_mass * bedding_washed_percent
+
+    # Act
+    bedding = BeddingFactory.get_instance(bedding_type_name)
+    total_bedding_mass = bedding.total_bedding_mass(pen)
+    total_bedding_volume = bedding.total_bedding_volume(pen)
+    total_bedding_washed = bedding.total_bedding_washed(pen)
+
+    # Assert
+    assert total_bedding_mass == approx(expected_total_bedding_mass)
+    assert total_bedding_volume == approx(expected_total_bedding_volume)
+    assert total_bedding_washed == approx(expected_total_bedding_washed)

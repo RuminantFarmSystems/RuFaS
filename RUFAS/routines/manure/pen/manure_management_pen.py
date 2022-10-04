@@ -11,7 +11,7 @@ class ManureManagementPen:
     some relevant information from the  original Pen class and then adds some
     extra attributes that can be used in the gas emissions equations.
 
-    Attributes:
+    Attributes
         id: Pen id.
         animals_in_pen: A list of animal objects in this pen.
         num_animals: The number of animals in this pen.
@@ -32,7 +32,7 @@ class ManureManagementPen:
         The newly created object does not store any reference to the passed-in argument
         and only performs a read on it.
 
-        Args:
+        Args
             pen: A Pen object from the animal module.
 
         """
@@ -53,11 +53,31 @@ class ManureManagementPen:
         self.manure = Manure(**pen.manure)
 
     @property
+    def manure_mass(self) -> float:
+        """Calculates the manure volume of this pen.
+
+        Returns
+            Manure mass of this pen, kg.
+
+        """
+        return self.manure.Mkg
+
+    @property
+    def manure_volume(self) -> float:
+        """Calculates the manure volume of this pen.
+
+        Returns
+            Manure volume of this pen, m^3.
+
+        """
+        return self.manure_mass / self.manure_density
+
+    @property
     def housing_area_for_NH3_emission(self) -> float:
         """Returns housing area used for calculating NH3 housing emission.
 
-        Returns:
-            NH3 housing area. Units: m^2/animal.
+        Returns
+            NH3 housing area, m^2/animal.
 
         """
         if 'Cow' in self.classes_in_pen:
@@ -71,8 +91,8 @@ class ManureManagementPen:
     def barn_area(self) -> float:
         """Calculates the barn area for this pen based on its housing type.
 
-        Returns:
-            Barn area. Units: m^2/animal.
+        Returns
+            Barn area, m^2/animal.
 
         """
         BarnArea = NamedTuple('BarnArea', [('has_cows', float), ('no_cows', float)])

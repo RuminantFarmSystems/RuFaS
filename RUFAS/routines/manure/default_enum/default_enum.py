@@ -31,6 +31,8 @@ class DefaultEnum(Enum):
         for member in cls:
             if member.name.upper() == member_name.strip().upper():
                 return member
+            elif type(member.value) == str and member.value.upper() == member_name.strip().upper():
+                return member
 
         return cls.get_default_type()
 
