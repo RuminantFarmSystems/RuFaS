@@ -70,16 +70,12 @@ def calc_shape_parameters(heatfrac_half: float, heatfrac_full: float, nfrac_1: f
     Description: calculates the shape coefficient for nitrogen fraction
 
     Args:
-<<<<<<< HEAD
-        crop_type: instane of Crop type class
-=======
         heatfrac_half: the PHU fraction halfway to maturity
         heatfrac_full: the PHU fraction at full maturity
         nfrac_1: the nitrogen fraction at emergence
         nfrac_2: the nitrogen fraction after emergence
         nfrac_near: the nitrogen fraction *near* maturity
         nfrac_3: the nitrogen fraction *at* maturity
->>>>>>> master_validation_morrowcj
 
     Returns: a list of the first and second shape coefficients
     """

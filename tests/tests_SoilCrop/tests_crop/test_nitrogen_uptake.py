@@ -5,7 +5,7 @@ Author(s): Clay Morrow (morrowcj@outlook.com); Brandon DeBoer (brdeboer@wisc.edu
 
 import pytest
 from RUFAS.routines.field.crop.nitrogen_uptake import *
-from RUFAS.routines.field.crop.nitrogen_fixation import calc_fixed_nitrogen
+from RUFAS.routines.field.crop.nitrogen_fixation import *
 from tests.tests_SoilCrop.mock_classes import mock_crop, mock_soil, mock_soil_layer
 
 
@@ -359,12 +359,6 @@ def test_store_nitrogen(total_uptake, nitrogen_start, fixed):
     assert mc.bio_N == expect
 
 
-def test_fix_nitrogen():
-    motivational_message = "fix_nitrogen() needs to be changed once nitrogen_fixation.py" + \
-                           "(calc_N_fixation()) has been refactored and tested - Clay"
-    raise Exception(motivational_message)
-
-
 # TODO: need to add more test cases for this integration test
 @pytest.mark.parametrize("hf,hf50,hf100,phf,"
                          "nf1,nf2,nfn,nf3,"
@@ -396,7 +390,6 @@ def test_update_nitrogen(hf, hf50, hf100, phf, nf1, nf2, nfn, nf3, bm, nmo, ns, 
     reallocate_nitrogen(mc, ms)
     observe_layer_leftovers = [layer.NO3 for layer in ms.soil_layers]
     observe_layer_uptakes = [layer.N_uptake for layer in ms.soil_layers]
-
     # expect
     # update_nitrogen_fraction()
     nshapes = calc_shape_parameters(heatfrac_half=hf50, heatfrac_full=hf100, nfrac_1=nf1, nfrac_2=nf2, nfrac_near=nfn,
@@ -418,14 +411,22 @@ def test_update_nitrogen(hf, hf50, hf100, phf, nf1, nf2, nfn, nf3, bm, nmo, ns, 
                                                layer_nitrate=sns)
     layer_leftovers = [available - uptake for available, uptake in zip(sns, layer_uptakes)]
     total_uptake = sum(layer_uptakes)
-
     # fix_nitrogen()
     if fix:
-        raise Exception("fixation testing not yet implemented")
-    # TODO: need to update this section of the test after nitrogen_fixation.py is cleaned up
+        accessible_resources = get_accessible_soil_resources(ms, rd)
+        deepest_layer = accessible_resources["deepest layer"]
+        accessible_layers = [layer for layer in ms.soil_layers[slice(deepest_layer)]]
+        demand = calc_N_demand(crop_type=mc, accessible_layers=accessible_layers)
+        growth_factor = calc_growth_stage_factor(heatfrac=phf)
+        water_factor = calc_soil_water_factor(accessible_water=accessible_resources["water"],
+                                              at_capacity_water=accessible_resources["water capacity"])
+        nitrate_factor = calc_nitrate_factor(accessible_nitrates=accessible_resources["nitrates"])
+        nitrogen_fixed = calc_fixed_nitrogen(demand, growth_factor, water_factor, nitrate_factor)
+    else:
+        nitrogen_fixed = 0
 
     # store_nitrogen_biomass()
-    nitrogen_biomass = calc_stored_nitrogen(uptake=total_uptake, previous=ns, fixed=nfx)
+    nitrogen_biomass = calc_stored_nitrogen(uptake=total_uptake, previous=ns, fixed=nitrogen_fixed)
 
     # make assertions (the full test fails on first failed assumption)
     assert mc.fr_N == nfrac
@@ -437,3 +438,5 @@ def test_update_nitrogen(hf, hf50, hf100, phf, nf1, nf2, nfn, nf3, bm, nmo, ns, 
     assert observe_layer_leftovers == layer_leftovers
     assert mc.N_act_up == total_uptake
     assert mc.bio_N == nitrogen_biomass
+    if fix:
+        assert mc.N_fix == nitrogen_fixed

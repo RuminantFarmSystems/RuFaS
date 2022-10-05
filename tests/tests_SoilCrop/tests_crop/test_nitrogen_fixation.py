@@ -1,5 +1,6 @@
 import pytest
 from RUFAS.routines.field.crop.nitrogen_fixation import *
+from tests.tests_SoilCrop.mock_classes import mock_soil, mock_soil_layer, mock_crop
 
 
 @pytest.mark.parametrize("depth,bounds,expect", [
@@ -74,3 +75,61 @@ def test_calc_fixed_nitrogen(d, g, w, n):
     if expect < d:
         expect = d
     assert calc_fixed_nitrogen(d, g, w, n) == expect
+
+
+@pytest.mark.parametrize("depth, bounds, nitrates, water, field_caps", [
+    (1, [0.3, 0.5, 1], [0.2, 0.5, 0.3], [0.5, 0.3, 0.2], [1, 1, 1]),    # all layers accessible
+    (0.4, [0.3, 0.5, 1], [0.2, 0.5, 0.3], [0.5, 0.3, 0.2], [1, 1, 1]),  # second layer accessible
+    (1.5, [0.3, 0.5, 1], [0.2, 0.5, 0.3], [0.5, 0.3, 0.2], [1, 1, 1]),  # deeper than all layers
+    (20.25, [15.32, 22.70, 31.09], [22.1, 5.96, 13.0], [10.5, 15.17, 8.90], [12.0, 19.9, 8.8]),  # arbitrary
+])
+def test_get_accessible_soil_resources(depth, bounds, nitrates, water, field_caps):
+    # observed
+    ms = mock_soil(soil_layers=[])
+    for b, n, w, c in zip(bounds, nitrates, water, field_caps):
+        ml = mock_soil_layer(bottom_depth=b, NO3=n, soil_water=w, fc_water=c)
+        ms.soil_layers.append(ml)
+    observe = get_accessible_soil_resources(soil=ms, root_depth=depth)
+    observe = list(observe.values())
+    # expected
+    deepest = get_deepest_root_accessible_layer(root_depth=depth, layer_bounds=bounds)
+    accessible_water = 0
+    capacity = 0
+    accessible_nitrates = 0
+    for layer in ms.soil_layers[slice(deepest)]:
+        accessible_water += layer.soil_water
+        capacity += layer.fc_water
+        accessible_nitrates += layer.NO3
+    expect = [deepest, accessible_water, capacity, accessible_nitrates]
+    # check equivalence
+    assert observe == expect
+
+
+@pytest.mark.parametrize("cdepth,cheatfrac,cuptakes,sbounds,swater,scapacity,snitrate", [
+    (1, .5, [.5, .25, .05], [0.3, 0.6, 1], [.5, .6, .8], [1, 1, 1], [0.3, 0.5, 0.25]),  # all layers accessible
+    (0.4, .5, [.5, .25, .05], [0.3, 0.6, 1], [.5, .6, .8], [1, 1, 1], [0.3, 0.5, 0.25]),  # second layer accessible
+    (1.5, .5, [.5, .25, .05], [0.3, 0.6, 1], [.5, .6, .8], [1, 1, 1], [0.3, 0.5, 0.25]),  # deeper than layers
+    (1, .5, [.5, .25, .05], [0.3, 0.6, 1], [.5, .6, .8], [.6, .6, 1.2], [0.3, 0.5, 0.25]),  # altered capacity
+    (37.9, 0.83, [15.3, 5.9, 0.99], [22.9, 37.0, 45.3], [83.2, 15.9, 8.8], [79.0, 16.0, 10.3], [15.3, 6.3, 0.05]),  # aribtrary
+])
+def test_fix_nitrogen(cdepth, cheatfrac, cuptakes, sbounds, swater, scapacity, snitrate):
+    # observe
+    msoil = mock_soil(soil_layers=[])
+    for boundary, water, capacity, nitrate in zip(sbounds, swater, scapacity, snitrate):
+        mlayer = mock_soil_layer(bottom_depth=boundary, soil_water=water, fc_water=capacity, NO3=nitrate)
+        msoil.soil_layers.append(mlayer)
+    mcrop = mock_crop(z_root=cdepth, fr_PHU=cheatfrac, pot_N_up_each_layer=cuptakes)
+    fix_nitrogen(crop=mcrop, soil=msoil)
+    # expect
+    accessible_resources = get_accessible_soil_resources(soil=msoil, root_depth=cdepth)
+    deepest_layer=accessible_resources["deepest layer"]
+    accessible_layers = [layer for layer in msoil.soil_layers[slice(deepest_layer)]]
+    demand = calc_N_demand(crop_type=mcrop, accessible_layers=accessible_layers)
+    growth_factor = calc_growth_stage_factor(heatfrac=cheatfrac)
+    water_factor = calc_soil_water_factor(accessible_water=accessible_resources["water"],
+                                          at_capacity_water=accessible_resources["water capacity"])
+    nitrate_factor = calc_nitrate_factor(accessible_nitrates=accessible_resources["nitrates"])
+    fixed_nitrogen = calc_fixed_nitrogen(demand, growth_factor, water_factor, nitrate_factor)
+    # assertion
+    assert fixed_nitrogen == mcrop.N_fix
+

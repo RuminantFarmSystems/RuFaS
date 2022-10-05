@@ -8,7 +8,7 @@ Author(s): Brandon DeBoer, brdeboer@wisc.edu
 import pytest
 
 from RUFAS.routines.field.crop.biomass import *
-from tests.tests_SoilCrop.mock_classes import mock_crop, mock_soil
+from tests.tests_SoilCrop.mock_classes import mock_crop, mock_soil, mock_weather, mock_time
 
 
 @pytest.mark.parametrize("h_day,k_l,lai_act", [
@@ -232,7 +232,8 @@ def test_calc_water_def(et, et_max):
     else:
         assert calc_water_def(et, et_max) == 0
 
+
 def test_allocate_biomass():
-    motivational_message = "I still need to write an integration test for allocate_biomass()." +\
-                     "I need to learn about the weather and time classes to mock them - Clay"
-    raise Exception(motivational_message)
+    # TODO: integration test for allocate_biomass needed. - GitHub Issue #
+    #   This involves mocking complex Time, Weather, and Config classes that I don't yet understand.
+    pass

@@ -46,23 +46,46 @@ def calc_fixed_nitrogen(demand, growth_factor, water_factor, nitrate_factor):  #
         return fixed
 
 
-def fix_nitrogen(crop, soil) -> None:
-    # TODO: this function needs updating once nitrogen_fixation.py is refactored
-    # accessible resources TODO: (should be own function)
-    layer_bounds = [layer.bottom_depth for layer in soil.soil_layers]
-    deepest_layer = get_deepest_root_accessible_layer(crop.z_root, layer_bounds=layer_bounds)
-    accessible_layers = [layer for layer in soil.soil_layers[slice(deepest_layer)]]
-    accessible_water = sum([layer.soil_water for layer in accessible_layers])
-    at_capacity_water = sum([layer.fc_water for layer in accessible_layers])
-    accessible_nitrates = sum(layer.NO3 for layer in accessible_layers)
+def get_accessible_soil_resources(soil, root_depth: float) -> dict:
+    """
+    Description: get the soil resources available to a plant, based on root depth
 
-    ## TODO -- this all needs incorporating into Soil and Crop
-    # demand = calc_layer_nitrogen_demand(uptake_potentials=, nitrate_availabilities=)
+    Args:
+        soil: an instance of Soil
+        root_depth: depth of the plant roots
+
+    Returns: a dictionary containing the following elements:
+        "deepest_layer": an index of the deepest soil layer accessible to the roots;
+        "water": the total water available from the soil surface to the deepest layer;
+        "water_capacity": the total water capacity from the soil surface to the deepest layer;
+        "nitrates": the total nitrates available from the soil surface to the deepest layer
+    """
+    layer_bounds = [layer.bottom_depth for layer in soil.soil_layers]
+    deepest_layer = get_deepest_root_accessible_layer(root_depth=root_depth, layer_bounds=layer_bounds)
+    accessible_soil_layers = [layer for layer in soil.soil_layers[slice(deepest_layer)]]
+    accessible_water = sum([layer.soil_water for layer in accessible_soil_layers])
+    at_capacity_water = sum([layer.fc_water for layer in accessible_soil_layers])
+    accessible_nitrates = sum(layer.NO3 for layer in accessible_soil_layers)
+
+    output = {"deepest layer": deepest_layer,
+              "water": accessible_water,
+              "water capacity": at_capacity_water,
+              "nitrates": accessible_nitrates
+              }
+    return output
+
+def fix_nitrogen(crop, soil) -> None:
+
+    accessible_resources = get_accessible_soil_resources(soil, root_depth=crop.z_root)
+
+    # TODO redundant function calc_N_demand can be removed once these functions are integrated into Soil and Crop classes
+    # demand = calc_layer_nitrogen_demand()
+    accessible_layers = [layer for layer in soil.soil_layers[slice(accessible_resources["deepest layer"])]]
     demand = calc_N_demand(crop, accessible_layers)
 
     growth_factor = calc_growth_stage_factor(heatfrac=crop.fr_PHU)
-    water_factor = calc_soil_water_factor(accessible_water, at_capacity_water)
-    nitrate_factor = calc_nitrate_factor(accessible_nitrates)
+    water_factor = calc_soil_water_factor(accessible_resources["water"], accessible_resources["water capacity"])
+    nitrate_factor = calc_nitrate_factor(accessible_resources["nitrates"])
 
     crop.N_fix = calc_fixed_nitrogen(demand, growth_factor, water_factor, nitrate_factor)
 
