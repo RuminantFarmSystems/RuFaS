@@ -180,6 +180,17 @@ def test_get_type(enum_type: DefaultEnum, lookup_member: str, expected_type: Def
     assert enum_type.get_type(lookup_member) is expected_type
 
 
+class DummyDefaultEnumWithNoMembers(DefaultEnum):
+    pass
+
+
+def test_get_type_no_members() -> None:
+    """Unit test for function get_type() in file default_enum.py"""
+
+    with pytest.raises(IndexError):
+        DummyDefaultEnumWithNoMembers.get_type('dummy')
+
+
 # Test Manure class
 # =================
 

@@ -47,7 +47,7 @@ class BaseBedding(ABC):
         Parameters
             pen: A ManureManagementPen object.
 
-        Returns:
+        Returns
             Total amount of bedding that is washed away, kg/animal/day.
 
         """
@@ -90,13 +90,23 @@ class BaseOrganicBedding(BaseBedding):
 
 
 class SawdustBedding(BaseOrganicBedding):
-    """Class for sawdust bedding."""
+    """Class for sawdust bedding.
+
+    Attributes
+        Inherited from BaseOrganicBedding.
+
+    """
 
     pass
 
 
 class ManureSolidsBedding(BaseOrganicBedding):
-    """Class for manure solids bedding."""
+    """Class for manure solids bedding.
+
+    Attributes
+        Inherited from BaseOrganicBedding.
+
+    """
 
     pass
 
