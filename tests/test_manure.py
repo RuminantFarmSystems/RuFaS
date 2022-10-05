@@ -24,6 +24,7 @@ from RUFAS.routines.manure.manure_handlers.bedding_classes import DefaultBedding
 from RUFAS.routines.manure.manure_handlers.bedding_classes import ManureSolidsBedding
 from RUFAS.routines.manure.manure_handlers.bedding_classes import SandBedding
 from RUFAS.routines.manure.manure_handlers.bedding_classes import SawdustBedding
+from RUFAS.routines.manure.manure_handlers.milking_center import MilkingCenter
 from RUFAS.routines.manure.manure_management import ManureManagement
 from RUFAS.routines.manure.pen.manure_management_pen import ManureManagementPen
 
@@ -102,9 +103,9 @@ def mock_pen(mocker: MockerFixture,
     mock_pen.classes_in_pen = {'Calf', 'HeiferI', 'HeiferII', 'HeiferIII', 'Cow'}
     mock_pen.housing_type = 'free stall'
     mock_pen.bedding_type = 'sand'
-    mock_pen.manure_handling = 'manual_scraping'
-    mock_pen.manure_separator = 'sand_lane'
-    mock_pen.manure_storage = 'storage_pit'
+    mock_pen.manure_handling = 'manual scraping'
+    mock_pen.manure_separator = 'sand lane'
+    mock_pen.manure_storage = 'storage pit'
     mock_pen.manure = generate_animal_manure(0.0)
     return mock_pen
 
@@ -329,9 +330,9 @@ def test_manure_management_pen_init(mock_pen: Pen,
     assert pen.classes_in_pen == {'Calf', 'HeiferI', 'HeiferII', 'HeiferIII', 'Cow'}
     assert pen.housing_type == 'free stall'
     assert pen.bedding_type == 'sand'
-    assert pen.manure_handler == 'manual_scraping'
-    assert pen.manure_separator == 'sand_lane'
-    assert pen.manure_treatment == 'storage_pit'
+    assert pen.manure_handler == 'manual scraping'
+    assert pen.manure_separator == 'sand lane'
+    assert pen.manure_treatment == 'storage pit'
     assert pen.num_animals == 5
     assert pen.manure_density == 990.0  # kg/m3
     assert pen.manure == Manure(**dummy_manure_data)
@@ -596,3 +597,326 @@ def test_total_bedding_mass_and_volume(bedding_type_name, bedding_config, mock_p
     assert total_bedding_mass == approx(expected_total_bedding_mass)
     assert total_bedding_volume == approx(expected_total_bedding_volume)
     assert total_bedding_washed == approx(expected_total_bedding_washed)
+
+
+# Test MilkingCenter class
+# ========================
+
+@pytest.fixture
+def mock_milking_center() -> MilkingCenter:
+    """Fixture for MilkingCenter class in file milking_center.py"""
+
+    return MilkingCenter(
+            num_milkings=3,
+            minutes_spent_in_holding_area=30.0,
+            minutes_spent_per_milking=10.0,
+            wash_water_use_rate=20.0,
+            fresh_water_use_rate=10.0
+    )
+
+
+def test_milking_center_init(mock_milking_center: MilkingCenter) -> None:
+    """Unit test for __init__() of class MilkingCenter in file milking_center.py"""
+
+    # Assert
+    assert mock_milking_center.num_milkings == 3
+    assert mock_milking_center.minutes_spent_in_holding_area == 30.0
+    assert mock_milking_center.minutes_spent_per_milking == 10.0
+    assert mock_milking_center.wash_water_use_rate == 20.0
+    assert mock_milking_center.fresh_water_use_rate == 10.0
+
+
+def test_milking_center_total_minutes_spent_in_holding_area(mock_milking_center: MilkingCenter) -> None:
+    """Unit test for total_minutes_spent_in_holding_area() of class MilkingCenter in file milking_center.py"""
+
+    # Arrange
+    expected_total_minutes_spent_in_holding_area = mock_milking_center.num_milkings * \
+                                                   mock_milking_center.minutes_spent_in_holding_area
+
+    # Act
+    total_minutes_spent_in_holding_area = mock_milking_center.total_minutes_spent_in_holding_area
+
+    # Assert
+    assert total_minutes_spent_in_holding_area == approx(expected_total_minutes_spent_in_holding_area)
+
+
+def test_milking_center_total_minutes_spent_milking(mock_milking_center: MilkingCenter) -> None:
+    """Unit test for total_minutes_spent_milking() of class MilkingCenter in file milking_center.py"""
+
+    # Arrange
+    expected_total_minutes_spent_milking = mock_milking_center.num_milkings * \
+                                           mock_milking_center.minutes_spent_per_milking
+
+    # Act
+    total_minutes_spent_milking = mock_milking_center.total_minutes_spent_milking
+
+    # Assert
+    assert total_minutes_spent_milking == approx(expected_total_minutes_spent_milking)
+
+
+def test_has_cow_in_pen(mock_pen: Pen, mock_calf: Calf, mock_cow: Cow) -> None:
+    """Unit test for _has_cow_in_pen() of class MilkingCenter in file milking_center.py"""
+
+    # Case 1: There are cows in the pen.
+    # Arrange
+    pen = ManureManagementPen(mock_pen)
+    pen.animals_in_pen = [mock_cow] * 5
+    pen.classes_in_pen = {'Cow'}
+
+    # Act
+    has_cow_in_pen = MilkingCenter._has_cow_in_pen(pen)
+
+    # Assert
+    assert has_cow_in_pen
+
+    # Case 2: There are no cows in the pen.
+    # Arrange
+    pen = ManureManagementPen(mock_pen)
+    pen.animals_in_pen = [mock_calf] * 5
+    pen.classes_in_pen = {'Calf'}
+
+    # Act
+    has_cow_in_pen = MilkingCenter._has_cow_in_pen(pen)
+
+    # Assert
+    assert not has_cow_in_pen
+
+
+def test_milking_center_wash_water_volume_used_in_holding_area(mock_milking_center: MilkingCenter,
+                                                               mock_pen: Pen) -> None:
+    """Unit test for wash_water_volume_used_in_holding_area() of class MilkingCenter in file
+    milking_center.py"""
+
+    # Case 1: There are cows in the pen.
+    # Arrange
+    pen = ManureManagementPen(mock_pen)
+    expected_wash_water_volume_used_in_holding_area = pen.num_animals * \
+                                                      mock_milking_center.wash_water_use_rate
+
+    # Act
+    wash_water_volume_used_in_holding_area = mock_milking_center.wash_water_volume_used_in_holding_area(pen)
+
+    # Assert
+    assert 'Cow' in pen.classes_in_pen
+    assert wash_water_volume_used_in_holding_area == approx(expected_wash_water_volume_used_in_holding_area)
+
+    # Case 2: There are no cows in the pen.
+    # Arrange
+    mock_pen.animals_in_pen = [mock_calf] * 5
+    mock_pen.classes_in_pen = {'Calf'}
+    pen = ManureManagementPen(mock_pen)
+    expected_wash_water_volume_used_in_holding_area = 0.0
+
+    # Act
+    wash_water_volume_used_in_holding_area = mock_milking_center.wash_water_volume_used_in_holding_area(pen)
+
+    # Assert
+    assert 'Cow' not in pen.classes_in_pen
+    assert wash_water_volume_used_in_holding_area == approx(expected_wash_water_volume_used_in_holding_area)
+
+
+def test_milking_center_fresh_water_volume_used_for_milking(mock_milking_center: MilkingCenter,
+                                                            mock_pen: Pen,
+                                                            mock_calf: Calf) -> None:
+    """Unit test for fresh_water_volume_used_for_milking() of class MilkingCenter in file milking_center.py"""
+
+    # Case 1: There are cows in the pen
+    # Arrange
+    pen = ManureManagementPen(mock_pen)
+    expected_fresh_water_volume_used_for_milking = pen.num_animals * \
+                                                   mock_milking_center.fresh_water_use_rate
+
+    # Act
+    fresh_water_volume_used_for_milking = mock_milking_center.fresh_water_volume_used_for_milking(pen)
+
+    # Assert
+    assert 'Cow' in pen.classes_in_pen
+    assert fresh_water_volume_used_for_milking == approx(expected_fresh_water_volume_used_for_milking)
+
+    # Case 2: There are no cows in the pen
+    # Arrange
+    mock_pen.animals_in_pen = [mock_calf] * 5
+    mock_pen.classes_in_pen = {'Calf'}
+    pen = ManureManagementPen(mock_pen)
+    expected_fresh_water_volume_used_for_milking = 0.0
+
+    # Act
+    fresh_water_volume_used_for_milking = mock_milking_center.fresh_water_volume_used_for_milking(pen)
+
+    # Assert
+    assert 'Cow' not in pen.classes_in_pen
+    assert fresh_water_volume_used_for_milking == approx(expected_fresh_water_volume_used_for_milking)
+
+
+def test_total_minutes_spent_in_milking_center(mock_milking_center: MilkingCenter,
+                                               mock_pen: Pen) -> None:
+    """Unit test for total_minutes_spent_in_milking_center() of class MilkingCenter in file
+    milking_center.py"""
+
+    # Arrange
+    total_minutes_spent_in_holding_area = mock_milking_center.total_minutes_spent_in_holding_area
+    total_minutes_spent_milking = mock_milking_center.total_minutes_spent_milking
+    expected_total_minutes_spent_in_milking_center = \
+        total_minutes_spent_in_holding_area + total_minutes_spent_milking
+
+    # Act
+    total_minutes_spent_in_milking_center = mock_milking_center.total_minutes_spent_in_milking_center
+
+    # Assert
+    assert total_minutes_spent_in_milking_center == approx(expected_total_minutes_spent_in_milking_center)
+
+
+def test_total_water_volume_used_in_milking_center(mock_milking_center: MilkingCenter,
+                                                   mock_pen: Pen) -> None:
+    """Unit test for total_water_volume_used_in_milking_center() of class MilkingCenter in file
+    milking_center.py"""
+
+    # Case 1: There are cows in the pen.
+    # Arrange
+    pen = ManureManagementPen(mock_pen)
+    wash_water_volume_used_in_holding_area = \
+        mock_milking_center.wash_water_volume_used_in_holding_area(pen)
+    fresh_water_volume_used_for_milking = \
+        mock_milking_center.fresh_water_volume_used_for_milking(pen)
+    expected_total_water_volume_used_in_milking_center = \
+        wash_water_volume_used_in_holding_area + fresh_water_volume_used_for_milking
+
+    # Act
+    total_water_volume_used_in_milking_center = mock_milking_center.total_water_volume_used_in_milking_center(pen)
+
+    # Assert
+    assert total_water_volume_used_in_milking_center == approx(expected_total_water_volume_used_in_milking_center)
+
+    # Case 2: There are no cows in the pen.
+    # Arrange
+    mock_pen.animals_in_pen = [mock_calf] * 5
+    mock_pen.classes_in_pen = {'Calf'}
+    pen = ManureManagementPen(mock_pen)
+
+    # Act
+    total_water_volume_used_in_milking_center = mock_milking_center.total_water_volume_used_in_milking_center(pen)
+
+    # Assert
+    assert 'Cow' not in pen.classes_in_pen
+    assert total_water_volume_used_in_milking_center == approx(0.0)
+
+
+@pytest.mark.parametrize(
+        'minutes, expected_percent_of_day',
+        [(0, 0.0),
+         (1440.0, 100.0),
+         (720.0, 50.0),
+         (360.0, 25.0),
+         ])
+def test_calc_percent_of_day_from_minutes(minutes, expected_percent_of_day) -> None:
+    """Unit test for calc_percent_of_day_from_minutes() of class MilkingCenter in file milking_center.py"""
+
+    assert MilkingCenter._calc_percent_of_day_from_minutes(minutes) == approx(expected_percent_of_day)
+
+
+def test_percent_of_day_spent_in_holding_area(mock_milking_center: MilkingCenter) -> None:
+    """Unit test for percent_of_day_spent_in_holding_area() of class MilkingCenter in file milking_center.py"""
+
+    # Arrange
+    total_minutes_spent_in_holding_area = mock_milking_center.total_minutes_spent_in_holding_area
+    expected_percent_of_day_spent_in_holding_area = \
+        MilkingCenter._calc_percent_of_day_from_minutes(total_minutes_spent_in_holding_area)
+
+    # Act
+    percent_of_day_spent_in_holding_area = mock_milking_center.percent_of_day_spent_in_holding_area
+
+    # Assert
+    assert percent_of_day_spent_in_holding_area == approx(expected_percent_of_day_spent_in_holding_area)
+
+
+def test_percent_of_day_spent_milking(mock_milking_center: MilkingCenter) -> None:
+    """Unit test for percent_of_day_spent_milking() of class MilkingCenter in file milking_center.py"""
+
+    # Arrange
+    total_minutes_spent_milking = mock_milking_center.total_minutes_spent_milking
+    expected_percent_of_day_spent_milking = \
+        MilkingCenter._calc_percent_of_day_from_minutes(total_minutes_spent_milking)
+
+    # Act
+    percent_of_day_spent_milking = mock_milking_center.percent_of_day_spent_milking
+
+    # Assert
+    assert percent_of_day_spent_milking == approx(expected_percent_of_day_spent_milking)
+
+
+def test_total_percent_of_day_spent_in_milking_center(mock_milking_center: MilkingCenter) -> None:
+    """Unit test for total_percent_of_day_spent_in_milking_center() of class MilkingCenter in file
+    milking_center.py"""
+
+    # Arrange
+    percent_of_day_spent_in_holding_area = mock_milking_center.percent_of_day_spent_in_holding_area
+    percent_of_day_spent_milking = mock_milking_center.percent_of_day_spent_milking
+    expected_total_percent_of_day_spent_in_milking_center = \
+        percent_of_day_spent_in_holding_area + percent_of_day_spent_milking
+
+    # Act
+    total_percent_of_day_spent_in_milking_center = mock_milking_center.total_percent_of_day_spent_in_milking_center
+
+    # Assert
+    assert total_percent_of_day_spent_in_milking_center == approx(expected_total_percent_of_day_spent_in_milking_center)
+
+
+def test_manure_mass_deposited_in_milking_center(mock_milking_center: MilkingCenter,
+                                                 mock_pen: Pen) -> None:
+    """Unit test for manure_mass_deposited_in_milking_center() in file milking_center.py"""
+
+    # Case 1: There are cows in the pen.
+    # Arrange
+    pen = ManureManagementPen(mock_pen)
+    pen.manure.Mkg = 100.0
+    expected_manure_mass_deposited_in_milking_center = \
+        pen.manure.Mkg * mock_milking_center.total_percent_of_day_spent_in_milking_center / 100.0
+
+    # Act
+    manure_mass_deposited_in_milking_center = mock_milking_center.manure_mass_deposited_in_milking_center(pen)
+
+    # Assert
+    assert manure_mass_deposited_in_milking_center == approx(expected_manure_mass_deposited_in_milking_center)
+
+    # Case 2: There are no cows in the pen.
+    # Arrange
+    pen = ManureManagementPen(mock_pen)
+    pen.animals_in_pen = [mock_calf] * 5
+    pen.classes_in_pen = {'Calf'}
+    expected_manure_mass_deposited_in_milking_center = 0.0
+
+    # Act
+    manure_mass_deposited_in_milking_center = mock_milking_center.manure_mass_deposited_in_milking_center(pen)
+
+    # Assert
+    assert manure_mass_deposited_in_milking_center == approx(expected_manure_mass_deposited_in_milking_center)
+
+
+def test_manure_volume_deposited_in_milking_center(mock_milking_center: MilkingCenter,
+                                                   mock_pen: Pen) -> None:
+    """Unit test for manure_volume_deposited_in_milking_center() in file milking_center.py"""
+
+    # Case 1: There are cows in the pen.
+    # Arrange
+    pen = ManureManagementPen(mock_pen)
+    expected_manure_volume_deposited_in_milking_center = \
+        mock_milking_center.manure_mass_deposited_in_milking_center(pen) / pen.manure_density
+
+    # Act
+    manure_volume_deposited_in_milking_center = mock_milking_center.manure_volume_deposited_in_milking_center(pen)
+
+    # Assert
+    assert manure_volume_deposited_in_milking_center == approx(expected_manure_volume_deposited_in_milking_center)
+
+    # Case 2: There are no cows in the pen.
+    # Arrange
+    pen = ManureManagementPen(mock_pen)
+    pen.animals_in_pen = [mock_calf] * 5
+    pen.classes_in_pen = {'Calf'}
+    expected_manure_volume_deposited_in_milking_center = 0.0
+
+    # Act
+    manure_volume_deposited_in_milking_center = mock_milking_center.manure_volume_deposited_in_milking_center(pen)
+
+    # Assert
+    assert manure_volume_deposited_in_milking_center == approx(expected_manure_volume_deposited_in_milking_center)
