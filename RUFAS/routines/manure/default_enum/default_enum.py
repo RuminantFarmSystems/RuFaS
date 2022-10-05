@@ -16,22 +16,22 @@ class DefaultEnum(Enum):
     """
 
     @classmethod
-    def get_type(cls, member_name: str) -> DefaultEnum:
+    def get_type(cls, lookup_name: str) -> DefaultEnum:
         """Return the enum member that matches the given name.
 
-        Args:
-            member_name: name of the desired enum member.
+        Parameters
+            lookup_name: name of the lookup enum member.
 
-        Returns:
+        Returns
             The enum member that matches the given name.
                 Otherwise, return the default type.
 
         """
 
         for member in cls:
-            if member.name.upper() == member_name.strip().upper():
+            if member.name.upper() == lookup_name.strip().upper():
                 return member
-            elif type(member.value) == str and member.value.upper() == member_name.strip().upper():
+            elif type(member.value) == str and member.value.upper() == lookup_name.strip().upper():
                 return member
 
         return cls.get_default_type()
@@ -40,7 +40,10 @@ class DefaultEnum(Enum):
     def get_default_type(cls) -> DefaultEnum:
         """Return either the DEFAULT member if it exists or the first member.
 
-        Returns:
+        Raises
+            IndexError: If the enum has no members.
+
+        Returns
             The DEFAULT member of this enum class if it exists. Otherwise, the
                 first member is returned.
 
@@ -49,4 +52,47 @@ class DefaultEnum(Enum):
         if hasattr(cls, 'DEFAULT'):
             return getattr(cls, 'DEFAULT')
 
-        return list(cls)[0]
+        try:
+            return list(cls)[0]
+        except IndexError:
+            raise IndexError(f'Enum {cls.__name__} has no members.')
+
+
+class DummyEnum(DefaultEnum):
+    """Dummy enum class for testing purposes."""
+
+    A = 'A'
+    B = 'B'
+    C = 'C'
+    D = 'D'
+    E = 'E'
+    F = 'F'
+    G = 'G'
+    H = 'H'
+    I = 'I'
+    J = 'J'
+    K = 'K'
+    L = 'L'
+    M = 'M'
+    N = 'N'
+    O = 'O'
+    P = 'P'
+    Q = 'Q'
+    R = 'R'
+    S = 'S'
+    T = 'T'
+    U = 'U'
+    V = 'V'
+    W = 'W'
+    X = 'X'
+    Y = 'Y'
+    Z = 'Z'
+    DEFAULT = A
+
+
+if __name__ == '__main__':
+    print(type(DummyEnum.get_type('A')))
+    print(type(DummyEnum.get_type('B')) == DummyEnum)
+    print(type(DummyEnum.get_type('B')) == DefaultEnum)
+    print(isinstance(DummyEnum.get_type('A'), DummyEnum))
+    print(isinstance(DummyEnum.get_type('B'), DefaultEnum))
