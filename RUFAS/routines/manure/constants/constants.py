@@ -11,8 +11,6 @@ class ManureManagementConstants:
     KG_TO_CUBIC_METERS = 0.001
     CUBIC_METERS_TO_LITERS = 1000.0
     GRAMS_TO_KG = 0.001
-    INCHES_TO_METERS = 0.0254
-    FEET_TO_METERS = 0.3048
 
     # Specific constants
     UREA_MOLAR_MASS = 60.06  # g/mol
