@@ -1,3 +1,4 @@
+from RUFAS.routines.animal.pen import Pen
 from RUFAS.routines.manure.pen.manure_management_pen import ManureManagementPen
 
 
@@ -69,7 +70,7 @@ class MilkingCenter:
 
         """
 
-        if self._has_cow_in_pen(pen):
+        if self._has_lac_cow_in_pen(pen):
             return pen.num_animals * self.wash_water_use_rate
         return 0.0
 
@@ -104,7 +105,7 @@ class MilkingCenter:
 
         """
 
-        if self._has_cow_in_pen(pen):
+        if self._has_lac_cow_in_pen(pen):
             return pen.num_animals * self.fresh_water_use_rate
         return 0.0
 
@@ -145,7 +146,7 @@ class MilkingCenter:
 
         """
 
-        if self._has_cow_in_pen(pen):
+        if self._has_lac_cow_in_pen(pen):
             return self.wash_water_volume_used_in_holding_area(pen) + \
                    self.fresh_water_volume_used_for_milking(pen)  # liters
         return 0.0
@@ -161,7 +162,7 @@ class MilkingCenter:
 
         """
 
-        if self._has_cow_in_pen(pen):
+        if self._has_lac_cow_in_pen(pen):
             return pen.manure.Mkg * self.total_percent_of_day_spent_in_milking_center / 100
         return 0.0
 
@@ -176,23 +177,23 @@ class MilkingCenter:
 
         """
 
-        if self._has_cow_in_pen(pen):
+        if self._has_lac_cow_in_pen(pen):
             return self.manure_mass_deposited_in_milking_center(pen) / pen.manure_density
         return 0.0
 
     @staticmethod
-    def _has_cow_in_pen(pen: ManureManagementPen) -> bool:
-        """Returns True if there is at least one cow in the pen
+    def _has_lac_cow_in_pen(pen: ManureManagementPen) -> bool:
+        """Check if pen has lactating cows.
 
         Parameters
             pen: A ManureManagementPen object
 
         Returns
-            True if there is at least one cow in the pen, False otherwise
+            True if pen has lactating cows, False otherwise.
 
         """
 
-        return 'Cow' in pen.classes_in_pen
+        return pen.animal_combination is Pen.AnimalCombination.LAC_COW
 
     @staticmethod
     def _calc_percent_of_day_from_minutes(minutes: float) -> float:
