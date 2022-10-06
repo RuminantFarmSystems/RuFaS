@@ -91,8 +91,7 @@ def daily_crop_routine(soil, crop, field_management, weather, time):
                 # harvests when the crop has grown more than the required harvest PHU or
                 # when it is past the harvest day
                 elif crop_type.harvest_type == 'optimal':
-                    if crop_type.fr_PHU >= crop_type.fr_PHU_harvest \
-                            or time.day == crop_type.harvest_day:
+                    if crop_type.fr_PHU >= crop_type.fr_PHU_harvest:
                         yields.update_all(soil, crop_type, field_management, time)
 
                 else:
@@ -433,7 +432,7 @@ def calculate_start(soil, crop, field_management, weather, time):
             if time.calendar_year in fert_management.rotation_years:
                 fert_management.iterate_application(time)
             crop.iterate_planting_day(time)
-            
+
     crop.current_crop = crop_type
 
 
