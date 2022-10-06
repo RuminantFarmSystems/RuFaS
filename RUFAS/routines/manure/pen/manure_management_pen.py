@@ -16,6 +16,8 @@ class ManureManagementPen:
         animals_in_pen: A list of animal objects in this pen.
         num_animals: The number of animals in this pen.
         classes_in_pen: Set of unique animal classes in this pen.
+        animal_combination: An AnimalCombination enum that describes the current
+            animal makeup in this pen.
         housing_type: The type of housing used for this pen.
         bedding_type: The type of bedding used for this pen.
         manure_handler: The type of manure handler used for this pen.
@@ -41,6 +43,7 @@ class ManureManagementPen:
         self.animals_in_pen: [AnimalBase] = pen.animals_in_pen
         self.num_animals = len(pen.animals_in_pen)
         self.classes_in_pen: Set[Type[AnimalBase]] = pen.classes_in_pen
+        self.animal_combination: Pen.AnimalCombination = pen.animal_combination
 
         self.housing_type: str = pen.housing_type
         self.bedding_type: str = pen.bedding_type
@@ -54,7 +57,7 @@ class ManureManagementPen:
 
     @property
     def manure_mass(self) -> float:
-        """Calculates the manure volume of this pen.
+        """Calculates the manure mass of this pen.
 
         Returns
             Manure mass of this pen, kg.
