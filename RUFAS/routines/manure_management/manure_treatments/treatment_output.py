@@ -65,3 +65,29 @@ class AnaerobicDigestionOutput(TreatmentOutput):
 
     def clone(self) -> TreatmentOutput:
         return AnaerobicDigestionOutput(**asdict(self))
+
+
+
+@dataclass
+class AggregatedManureOutputforField(TreatmentOutput):
+    """Description: This class is an API for field application of stored manure
+        The attributes of this dataclass should be identical to the attributes
+        expected in the RUFAS.routines.field.field_management.manure_application update_all method. 
+    """
+    mass: float = 0.0  # total manure mass kg
+    N_mass:float=0.0
+    P_mass:float=0.0
+    K_mass:float=0.0
+    WIP:float=0.0
+    WOP:float=0.0
+    DM:float=0.0
+    def convert_treatment_ouput_to_field_outputs(self,daily_output):
+        """converts TreatmentOutputs attributes to attributes names in class"""
+        self.N_mass=daily_output.manure_nitrogen
+        self.P_mass=daily_output.p_excrt_manure
+        self.K_mass=daily_output.K_manure
+        self.mass =daily_output.total_daily_mass 
+        self.DM =daily_output.DM
+        self.WIP =daily_output.VS_total*0.5
+        self.WOP =daily_output.VS_total*0.5
+
