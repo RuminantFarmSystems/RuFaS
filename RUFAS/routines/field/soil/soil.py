@@ -255,7 +255,7 @@ class Soil:
 
         self.runoff = 0.0
         self.evap = 0.0
-        self.trans = 0.0
+        self.trans = 0.0  # TODO: why on earth is plant transpiration stored in the soil object???
         self.drainage = 0.0
 
         self.ET_max_annual = 0.0
