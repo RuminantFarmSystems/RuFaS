@@ -172,7 +172,7 @@ class AnaerobicDigestion(BaseManureTreatment):
         self.wastewater_volume = handler_output.total_daily_mass
 
         moisture_content = self.get_moisture_content()
-        T_avg = self.weather_data.T_avg
+
         T_avg = self.weather_data.T_avg[self.time.year - 1][self.time.day - 1]  # TODO: Fix this
 
         self.input_energy_heating = self.calc_specific_input_energy(T_avg,
