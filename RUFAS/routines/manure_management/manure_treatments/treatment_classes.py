@@ -9,7 +9,7 @@ from typing import Type
 
 from RUFAS.routines.manure_management.helpers.enum_helpers import DefaultEnum
 from RUFAS.routines.manure_management.manure_separators.manure_separator_classes import BaseManureSeparator
-from RUFAS.routines.manure_management.manure_treatments.treatment_output import TreatmentOutput
+from RUFAS.routines.manure_management.manure_treatments.treatment_output import TreatmentOutput,AggregatedManureOutputforField
 from RUFAS.routines.manure_management.misc.constants import ManureManagementConstants as Constants
 from RUFAS.routines.manure_management.misc.simple_pen import SimplePen
 from RUFAS.time import Time
@@ -72,10 +72,26 @@ class BaseManureTreatment:
         self.simulation_day = simulation_day
         return daily_output
 
-    def land_application_day(self):
+    def land_application_day_check_available_manure(self):
+        """
+        Description: Allows Field Module to check nutrient content of manure storage without modifying.
+        Returns: AggregatedManureOutputforField object containing accumulated attributes
+        """
+        ## Convert aggregated outputs from TreatmentOutput type, to object type expected in Field
+        output_to_field = AggregatedManureOutputforField()
+        output_to_field.convert_treatment_ouput_to_field_outputs(self.accumulated_output)
+        return output_to_field
+    def land_application_day_update_manure_storage(self,requested_manure_mass):
+        """
+        Returns: AggregatedOutput object for field application before resetting self.accumulated_output to new levels
         outputs_for_land_application = self.accumulated_output
+        """
+        ## Convert aggregated outputs from TreatmentOutput type, to object type expected in Field
+        output_to_field = AggregatedManureOutputforField()
+        output_to_field.convert_treatment_ouput_to_field_outputs(self.accumulated_output)
+        #TODO Currently resets accumulated outputs to zero, but should reset to new levels based on requested_manure_mass
         self.accumulated_output = TreatmentOutput()
-        return outputs_for_land_application
+        return output_to_field
 
 
 class AnaerobicDigestion(BaseManureTreatment):
@@ -156,7 +172,7 @@ class AnaerobicDigestion(BaseManureTreatment):
         self.wastewater_volume = handler_output.total_daily_mass
 
         moisture_content = self.get_moisture_content()
-        T_avg = self.weather_data.T_avg
+
         T_avg = self.weather_data.T_avg[self.time.year - 1][self.time.day - 1]  # TODO: Fix this
 
         self.input_energy_heating = self.calc_specific_input_energy(T_avg,

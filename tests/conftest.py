@@ -243,3 +243,103 @@ def get_expected_values_anaerobic_lagoon(mock_handler_output):
     expected_values.total_lagoon_volume = 34655
     
     return expected_values
+
+
+@fixture
+def mock_ssuf_init_data(mocker:MockerFixture)->SlurryStorageInitData:
+    init_data = mocker.MagicMock(spec=SlurryStorageInitData)
+    init_data.percent_dry_solids = 1.0
+
+    init_data.TS_removal_efficiency = 0.1  # Between 10-30%
+    init_data.VS_removal_efficiency = 0.85  # Between 80-90%
+    init_data.N_removal_efficiency = 0.1  # # Between 10-30%
+    init_data.TAN_removal_efficiency = 0.45  # Between 61-80%
+    init_data.P_removal_efficiency = 0.05  # # Between 5-30%
+    init_data.K_removal_efficiency = 0.05  # # Between 5-30%
+    init_data.TS_DM_effluent_rate = 0.0
+    return init_data
+ 
+@fixture
+def ssuf_fixture(pen0,mock_separator,mock_ssuf_init_data,mock_time,mock_weather):
+    pen= pen0
+    init_data = mock_ssuf_init_data
+    manure_separator= mock_separator
+    time=mock_time
+    weather=mock_weather
+    ssuf = SlurryStorageUnderfloor(pen=pen,manure_separator=manure_separator,time=time,weather=weather,treatment_init_data=init_data)
+    return ssuf
+
+@fixture
+def get_expected_values_ssuf(mock_handler_output):
+    ##TODO Update these values based on spreadsheet
+    
+    expected_values=Mock()
+    expected_values.TSd = 2294
+    expected_values.VSd = 1950
+    expected_values.VSnd = 0
+    expected_values.VS_total = 1950
+
+    expected_values.manure_nitrogen = 1783
+    expected_values.TAN_s = 338
+    expected_values.p_excrt_manure = 66
+    expected_values.K_manure = 129
+    expected_values.total_daily_mass= mock_handler_output.total_daily_mass
+
+    ## Sizing Expected values
+
+    expected_values.minimum_treatment_volume= 7940
+    expected_values.sludge_accumulation_volume = 23350
+    expected_values.volume_needed = 31290
+
+    expected_values.a= 10.971
+    expected_values.b = -106.989
+    expected_values.c = -31029.37
+    expected_values.lagoon_width = 58.28
+    expected_values.lagoon_length = 174.84
+    expected_values.lagoon_surface_area = 10190
+    expected_values.precip = 259
+    expected_values.freeboard = 3106
+    expected_values.total_lagoon_volume = 34655
+    return expected_values
+    
+@fixture
+def ssod_fixture(pen0,mock_separator,mock_ssuf_init_data,mock_time,mock_weather):
+    pen= pen0
+    init_data = mock_ssuf_init_data
+    manure_separator= mock_separator
+    time=mock_time
+    weather=mock_weather
+    ssuf = SlurryStorageOutdoor(pen=pen,manure_separator=manure_separator,time=time,weather=weather,treatment_init_data=init_data)
+    return ssuf
+
+@fixture
+def get_expected_values_ssod(mock_handler_output):
+    ##TODO Update these values based on spreadsheet
+    expected_values=Mock()
+    expected_values.TSd = 2294
+    expected_values.VSd = 1950
+    expected_values.VSnd = 0
+    expected_values.VS_total = 1950
+
+    expected_values.manure_nitrogen = 1783
+    expected_values.TAN_s = 338
+    expected_values.p_excrt_manure = 66
+    expected_values.K_manure = 129
+    expected_values.total_daily_mass= mock_handler_output.total_daily_mass
+
+    ## Sizing Expected values
+
+    expected_values.minimum_treatment_volume= 7940
+    expected_values.sludge_accumulation_volume = 23350
+    expected_values.volume_needed = 31290
+
+    expected_values.a= 10.971
+    expected_values.b = -106.989
+    expected_values.c = -31029.37
+    expected_values.lagoon_width = 58.28
+    expected_values.lagoon_length = 174.84
+    expected_values.lagoon_surface_area = 10190
+    expected_values.precip = 259
+    expected_values.freeboard = 3106
+    expected_values.total_lagoon_volume = 34655
+    return expected_values
