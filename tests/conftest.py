@@ -302,7 +302,7 @@ def get_expected_values_ssuf(mock_handler_output):
     expected_values.total_lagoon_volume = 34655
     return expected_values
     
- @fixture
+@fixture
 def ssod_fixture(pen0,mock_separator,mock_ssuf_init_data,mock_time,mock_weather):
     pen= pen0
     init_data = mock_ssuf_init_data

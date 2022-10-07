@@ -157,3 +157,33 @@ def test_AL_sizing(al_fixture,get_expected_values_anaerobic_lagoon):
     assert pytest.approx(getattr(get_expected_values_anaerobic_lagoon,'total_lagoon_volume'),0.1)==al.total_lagoon_volume
 
 
+
+# @pytest.mark.xfail
+def test_SSUF_update(ssuf_fixture,get_expected_values_ssuf):
+    ssuf = ssuf_fixture
+    daily_output = ssuf.update()
+    assert pytest.approx(getattr(get_expected_values_ssuf,'TSd'),0.1)==getattr(daily_output,'TSd')
+    assert pytest.approx(getattr(get_expected_values_ssuf,'VS_total'),0.1)==getattr(daily_output,'VS_total')
+    assert getattr(get_expected_values_ssuf,'p_excrt_manure')==getattr(daily_output,'p_excrt_manure')
+    assert getattr(get_expected_values_ssuf,'K_manure')==getattr(daily_output,'K_manure')
+    assert getattr(get_expected_values_ssuf,'manure_nitrogen')==getattr(daily_output,'manure_nitrogen')
+    assert getattr(get_expected_values_ssuf,'total_daily_mass')==getattr(daily_output,'total_daily_mass')
+    # assert getattr(get_expected_values_update,'final_volume')==getattr(daily_output,'final_volume')
+
+
+# def test_SSUF_sizing(ssuf_fixture,get_expected_values_ssuf):
+#     ssuf = ssuf_fixture
+#     daily_output = ssuf.update()
+#     abc = ssuf.calc_abc()
+
+#     #assert pytest.approx(getattr(get_expected_values_anaerobic_lagoon,'volume_needed'),0.1)==al.volume_needed
+#     assert pytest.approx(getattr(get_expected_values_ssuf,'minimum_treatment_volume'),0.01)==ssuf.minimum_treatment_volume
+#     assert pytest.approx(getattr(get_expected_values_ssuf,'sludge_accumulation_volume'),0.01)==ssuf.sludge_accumulation_volume
+#     assert pytest.approx(getattr(get_expected_values_ssuf,'a'),0.1)==abc[0]
+#     assert pytest.approx(getattr(get_expected_values_ssuf,'b'),0.1)==abc[1]
+#     assert pytest.approx(getattr(get_expected_values_ssuf,'c'),0.1)==abc[2]
+#     assert pytest.approx(getattr(get_expected_values_ssuf,'lagoon_width'),0.1)==ssuf.lagoon_width
+#     assert pytest.approx(getattr(get_expected_values_ssuf,'lagoon_length'),0.1)==ssuf.lagoon_width*3
+#     assert pytest.approx(getattr(get_expected_values_ssuf,'lagoon_surface_area'),0.1)==ssuf.lagoon_surface_area
+#     assert pytest.approx(getattr(get_expected_values_ssuf,'total_lagoon_volume'),0.1)==ssuf.total_lagoon_volume
+
