@@ -38,3 +38,10 @@ venv/
 
 # ignore .DS_store
 .DS_store
+
+# ignore R files
+.RData
+.RHistory
+
+# ignore pytest cache folder
+.pytest_cache/

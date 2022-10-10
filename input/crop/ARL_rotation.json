@@ -17,7 +17,7 @@
             "repeat": 0,
             "planting_day": 113,
             "harvest_day": 237,
-            "harvest_type": "scheduled",
+            "harvest_type": "optimal",
             "planting_order": "1st",
             "extracted": true
         },
@@ -36,7 +36,7 @@
             "repeat": 0,
             "planting_day": 108,
             "harvest_day": 302,
-            "harvest_type": "scheduled",
+            "harvest_type": "optimal",
             "planting_order": "1st",
             "extracted": true
         },
@@ -45,7 +45,7 @@
             "repeat": 0,
             "planting_day": 115,
             "harvest_day": 305,
-            "harvest_type": "scheduled",
+            "harvest_type": "optimal",
             "planting_order": "1st",
             "extracted": true
 
@@ -55,7 +55,7 @@
             "repeat": 0,
             "planting_day": 105,
             "harvest_day": 250,
-            "harvest_type": "scheduled",
+            "harvest_type": "optimal",
             "planting_order": "1st",
             "extracted": true
 
@@ -75,7 +75,7 @@
             "repeat": 0,
             "planting_day": 98,
             "harvest_day": 253,
-            "harvest_type": "scheduled",
+            "harvest_type": "optimal",
             "planting_order": "1st",
             "extracted": true
 
@@ -95,7 +95,7 @@
             "repeat": 0,
             "planting_day": 97,
             "harvest_day": 256,
-            "harvest_type": "scheduled",
+            "harvest_type": "optimal",
             "planting_order": "1st",
             "extracted": true
 
@@ -114,7 +114,7 @@
             "repeat": 0,
             "planting_day": 89,
             "harvest_day": 179,
-            "harvest_type": "scheduled",
+            "harvest_type": "optimal",
             "planting_order": "1st",
             "extracted": true
         },
@@ -132,7 +132,7 @@
             "repeat": 0,
             "planting_day": 89,
             "harvest_day": 179,
-            "harvest_type": "scheduled",
+            "harvest_type": "optimal",
             "planting_order": "1st",
             "extracted": true
         },
@@ -150,7 +150,7 @@
             "repeat": 0,
             "planting_day": 120,
             "harvest_day": 180,
-            "harvest_type": "scheduled",
+            "harvest_type": "optimal",
             "planting_order": "1st",
             "extracted": true
         }

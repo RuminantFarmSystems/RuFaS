@@ -13,7 +13,7 @@ Description: This module contains the necessary functions for calculating the
 
 CropType attribute definitions:
 
-    fix_nitrogen = boolean indicating whether the crop can fix nitrogen
+    is_nitrogen_fixer = boolean indicating whether the crop can fix nitrogen
 
     z_root = Depth of root development in the soil on a given day
 
@@ -23,150 +23,151 @@ CropType attribute definitions:
     act_N_up_each_layer = List of actual nitrogen uptakes from each soil layer.
 """
 
+from bisect import bisect
+# from RUFAS.routines.field.crop.nitrogen_uptake import calc_layer_nitrogen_demand
 
-def calc_N_fixation(soil, crop_type):
+
+def calc_fixed_nitrogen(demand, growth_factor, water_factor, nitrate_factor):  # pseudocode C.5.D.1
     """
-    Description:
-        Calculates the amount of nitrogen added to the plant biomass via fixation.
-        Unlike other files in this folder, the functions defined in this file are
-        only called for nitrogen fixing crops and are therefore not called from
-        crop.py but instead from nitrogen_uptake.py. They should be considered
-        helper methods for nitrogen fixing plants
-        "pseudocode_crop" C.5.D.1
+    Description: calculates the amount of nitrogen added to the plant biomass via fixation
 
     Args:
-        soil: an instance of the Soil class specified in soil.py representing
-            the current state of the soil profile
-        crop_type: an instance of a crop class
+        demand: total plant nitrogen demand
+        growth_factor: growth stage factor of the plant
+        water_factor: soil water factor
+        nitrate_factor: soil nitrate factor
 
-    Returns:
-        float: nitrogen fixated by the crop
+    Returns: nitrogen fixed by the crop
     """
-
-    # Check if this crop can form symbiotic nitrogen fixation associations
-    if not crop_type.fix_nitrogen:
-        return 0
+    fixed = demand * growth_factor * min(water_factor, nitrate_factor, 1)
+    if fixed < demand:
+        return demand
     else:
-        accessible_layers = get_root_accessible_layers(soil, crop_type)
-        f_gr = calc_f_gr(crop_type)
-        f_NO3 = calc_f_NO3(accessible_layers)
-        f_sw = calc_f_sw(accessible_layers)
-        N_demand = calc_N_demand(crop_type, accessible_layers)
-
-        N_fix = N_demand * f_gr * min(f_sw, f_NO3, 1)
-
-        if N_fix > N_demand:
-            N_fix = N_demand
-
-        return N_fix
+        return fixed
 
 
-def get_root_accessible_layers(soil, crop_type):
+def get_accessible_soil_resources(soil, root_depth: float) -> dict:
     """
-    Description:
-        Determines the soil layer of lowest depth which is accessible to root
-        biomass. Returns a list containing all of the soil layers accessible
-        to root biomass.
-        "pseudocode_crop" C.5.D.8
+    Description: get the soil resources available to a plant, based on root depth
 
     Args:
-        crop_type
-        soil
-    Returns:
-        layers of the soil profile currently accessible to the roots
+        soil: an instance of Soil
+        root_depth: depth of the plant roots
+
+    Returns: a dictionary containing the following elements:
+        "deepest_layer": an index of the deepest soil layer accessible to the roots;
+        "water": the total water available from the soil surface to the deepest layer;
+        "water_capacity": the total water capacity from the soil surface to the deepest layer;
+        "nitrates": the total nitrates available from the soil surface to the deepest layer
     """
+    layer_bounds = [layer.bottom_depth for layer in soil.soil_layers]
+    deepest_layer = get_deepest_root_accessible_layer(root_depth=root_depth, layer_bounds=layer_bounds)
+    accessible_soil_layers = [layer for layer in soil.soil_layers[slice(deepest_layer)]]
+    accessible_water = sum([layer.soil_water for layer in accessible_soil_layers])
+    at_capacity_water = sum([layer.fc_water for layer in accessible_soil_layers])
+    accessible_nitrates = sum(layer.NO3 for layer in accessible_soil_layers)
 
-    accessible_layers = []
+    output = {"deepest layer": deepest_layer,
+              "water": accessible_water,
+              "water capacity": at_capacity_water,
+              "nitrates": accessible_nitrates
+              }
+    return output
 
-    if crop_type.z_root == 0:
-        return accessible_layers
+def fix_nitrogen(crop, soil) -> None:
 
-    for layer in soil.soil_layers:
-        accessible_layers.append(layer)
+    accessible_resources = get_accessible_soil_resources(soil, root_depth=crop.z_root)
 
-        if crop_type.z_root <= layer.bottom_depth:
-            break
-    return accessible_layers
+    # TODO redundant function calc_N_demand can be removed once these functions are integrated into Soil and Crop classes
+    # demand = calc_layer_nitrogen_demand()
+    accessible_layers = [layer for layer in soil.soil_layers[slice(accessible_resources["deepest layer"])]]
+    demand = calc_N_demand(crop, accessible_layers)
+
+    growth_factor = calc_growth_stage_factor(heatfrac=crop.fr_PHU)
+    water_factor = calc_soil_water_factor(accessible_resources["water"], accessible_resources["water capacity"])
+    nitrate_factor = calc_nitrate_factor(accessible_resources["nitrates"])
+
+    crop.N_fix = calc_fixed_nitrogen(demand, growth_factor, water_factor, nitrate_factor)
 
 
-def calc_f_gr(crop_type):
+def get_deepest_root_accessible_layer(root_depth: float, layer_bounds: list[float]):  # pseudocode: C.5.D.8
     """
     Description:
-        Calculates growth stage factor.
-        "pseudocode_crop" C.5.D.2
+        Determines the deepest soil layer that is accessible to root biomass.
 
     Args:
-        crop_type
+        root_depth: the root depth of a plant
+        layer_bounds: the depths of the lower boundaries of each soil layer
+
     Returns:
-        float: growth stage factor
+        an integer indicating the deepest soil layer that the roots can access
     """
 
-    fr_PHU = crop_type.fr_PHU
+    if root_depth <= 0:  # handle no roots
+        return None
+    else:
+        deepest_layer = bisect(layer_bounds, root_depth)
+        if deepest_layer >= len(layer_bounds) - 1:  # handle roots deeper than soil
+            deepest_layer = len(layer_bounds) - 1  # TODO: this should probably be handled differently. but how?
+            Warning("root_depth is deeper than the lowest soil layer")
+        return deepest_layer
 
-    if fr_PHU <= 0.15:
+
+def calc_growth_stage_factor(heatfrac: float) -> float:  # pseudocode C.5.D.2
+    """
+    Description: calculates plant growth stage factor
+
+    Args:
+        heatfrac: the accumulated fraction of potential heat units
+
+    Returns: growth stage factor
+    """
+    if heatfrac <= 0.15:
         return 0
 
-    elif fr_PHU <= 0.3:
-        return 6.67 * fr_PHU - 1
+    elif heatfrac <= 0.3:
+        return (6.67 * heatfrac) - 1
 
-    elif fr_PHU <= 0.55:
+    elif heatfrac <= 0.55:
         return 1
 
-    elif fr_PHU <= 0.75:
-        return 3.75 - 5 * fr_PHU
-
+    elif heatfrac <= 0.75:
+        return 3.75 - (5 * heatfrac)
     else:
         return 0
 
 
-def calc_f_NO3(accessible_layers):
+def calc_nitrate_factor(accessible_nitrates):  # pseudocode: C.5.4
     """
-    Description:
-        Calculates soil nitrate factor.
-        "pseudocode_crop" C.5.D.3/4
+    Description: calculates soil nitrate factor
 
     Args:
-        accessible_layers: the root accessible layers (determined in get_root_accessible_layers)
-    Returns:
-        float: growth stage factor
+        accessible_nitrates: total nitrates available in the soil layers accessible to roots
+
+    Returns: the nitrate factor
     """
-
-    # C.5.D.3
-    NO3_root = sum([layer.NO3 for layer in accessible_layers])
-
-    # C.5.D.4
-    if NO3_root <= 100:
+    if accessible_nitrates <= 100:
         return 1
-
-    elif NO3_root <= 300:
-        return 1.5 - 0.0005 * NO3_root
-
+    elif accessible_nitrates <= 300:
+        return 1.5 - (0.0005 * accessible_nitrates)
     else:
         return 0
 
 
-def calc_f_sw(accessible_layers):
+def calc_soil_water_factor(accessible_water: float, at_capacity_water: float) -> float:  # pseudocode: C.5.D.5
     """
-    Description:
-        Calculates soil water factor.
-        "pseudocode_crop" C.5.D.5/6
+    Description: calculates soil water factor
 
     Args:
-        accessible_layers
-    Returns:
-        float: soil water factor
+        accessible_water: the water content accessible to root biomass
+        at_capacity_water: the water accessible at field capacity
+
+    Returns: soil water factor
     """
-
-    SW_root = sum([layer.soil_water for layer in accessible_layers])
-    FC_root = sum([layer.fc_water for layer in accessible_layers])
-
-    if FC_root == 0:
-        return 0
-
-    return SW_root / (0.85 * FC_root)
+    return accessible_water / 0.85 * at_capacity_water
 
 
-def calc_N_demand(crop_type, accessible_layers):
+def calc_N_demand(crop_type, accessible_layers):  # TODO: why is this different from demand calculated by calc_layer_nitrogen_demand()?
     """
     Description:
         Calculates N demand

@@ -1,7 +1,7 @@
 {
     "config":
     {
-        "start_date" : "2009:1",
+        "start_date" : "2010:1",
         "end_date" : "2013:365",
         "csv_dir": "output/CSVs/",
         "graphic_dir": "output/graphics/",
@@ -9,7 +9,7 @@
         "seed": 0
     },
 
-    "weather": "ARL_weather.csv",
+    "weather": "swat_weather.csv",
 
     "output": "field_report.json",
 
@@ -17,9 +17,9 @@
     {
         "fields": {
             "field_1": {
-                "soil": "ARL_soil.json",
-                "crop": "double_cropping_1yr_rotation.json",
-                "field_management": "ARL_field_management.json"
+                "soil": "swat_soil.json",
+                "crop": "swat_rotation.json",
+                "field_management": "swat_field_management.json"
             }
         },
         "animal": "barnyard_animal.json",

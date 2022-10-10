@@ -15,7 +15,7 @@ Author(s): Kass Chupongstimun, kass_c@hotmail.com,
            Chris Vankerkhove, cjv47@cornell.edu
 """
 
-from RUFAS.util import DatabaseReader
+from ...database_reader import DatabaseReader
 from RUFAS.output_handler.reports.feed_storage_report import StorageReport
 from . import nitrogen_loss, carbon_loss, protein_degradation
 from ..animal.pen import Pen

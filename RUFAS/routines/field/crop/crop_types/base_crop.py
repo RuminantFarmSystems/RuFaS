@@ -59,7 +59,7 @@ class BaseCrop:
         """bool: was the crop extracted from the field or not? 
              This is independent of whether or not the crop was killed.
         """
-        self.fix_nitrogen = False
+        self.is_nitrogen_fixer = False
         "bool: does this plant fix nitrogen?"
 
         # heat units

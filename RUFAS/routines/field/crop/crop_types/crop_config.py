@@ -226,7 +226,7 @@ SOYBEAN = {
         "raw_id": 121,
         "feed_id": '121g',
         "kill_year": True,
-        "fix_nitrogen": True,
+        "is_nitrogen_fixer": True,
         "T_base_max": 43.33,
         "PHU": 1150,
         "fr_LAI_1": 0.05,
@@ -285,7 +285,7 @@ SPRING_WHEAT = {
         "feed_id": '130g',
         "raw_id": 130,
         "kill_year": True,
-        "fix_nitrogen": False,  # TODO: change back - GitHub Issue #160
+        "is_nitrogen_fixer": False,  # TODO: change back - GitHub Issue #160
         "T_base_min": 0,
         "T_base_max": 35,
         "PHU": 996,
