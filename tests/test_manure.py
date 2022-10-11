@@ -24,6 +24,7 @@ from RUFAS.routines.manure.manure_handlers.bedding_classes import DefaultBedding
 from RUFAS.routines.manure.manure_handlers.bedding_classes import ManureSolidsBedding
 from RUFAS.routines.manure.manure_handlers.bedding_classes import SandBedding
 from RUFAS.routines.manure.manure_handlers.bedding_classes import SawdustBedding
+from RUFAS.routines.manure.manure_handlers.manure_handler_daily_output import ManureHandlerDailyOutput
 from RUFAS.routines.manure.manure_handlers.milking_center import MilkingCenter
 from RUFAS.routines.manure.manure_management import ManureManagement
 from RUFAS.routines.manure.pen.manure_management_pen import ManureManagementPen
@@ -936,3 +937,56 @@ def test_manure_volume_deposited_in_milking_center(mock_milking_center: MilkingC
 
     # Assert
     assert manure_volume_deposited_in_milking_center == approx(expected_manure_volume_deposited_in_milking_center)
+
+
+# Test ManureHandlerOutput
+
+def test_manure_handler_output_init() -> None:
+    """Unit test for __init__() of class ManureHandlerDailyOutput in file manure_handler_daily_output.py"""
+
+    # Act
+    manure_handler_output = ManureHandlerDailyOutput(
+            simulation_day=1,
+            pen_id=1,
+            urea=1.0,
+            TAN_s=2.0,
+            manure_nitrogen=3.0,
+            TSd=4.0,
+            VSd=5.0,
+            VSnd=6.0,
+            WIP_frac=0.70,
+            WOP_frac=0.80,
+            p_excrt_manure=9.0,
+            K_manure=10.0,
+            CH4_floor=11.0,
+            CO2_floor=12.0,
+            NH3_floor=13.0,
+            raw_manure=14.0,
+            cleaning_water=15.0,
+            total_bedding_mass=16.0,
+            total_water_volume_in_milking_center=17.0
+    )
+
+    # Assert
+    assert manure_handler_output.simulation_day == 1
+    assert manure_handler_output.pen_id == 1
+    assert manure_handler_output.urea == approx(1.0)
+    assert manure_handler_output.TAN_s == approx(2.0)
+    assert manure_handler_output.manure_nitrogen == approx(3.0)
+    assert manure_handler_output.TSd == approx(4.0)
+    assert manure_handler_output.VSd == approx(5.0)
+    assert manure_handler_output.VSnd == approx(6.0)
+    assert manure_handler_output.VS_total == approx(5.0 + 6.0)
+    assert manure_handler_output.WIP_frac == approx(0.70)
+    assert manure_handler_output.WOP_frac == approx(0.80)
+    assert manure_handler_output.p_excrt_manure == approx(9.0)
+    assert manure_handler_output.K_manure == approx(10.0)
+    assert manure_handler_output.CH4_floor == approx(11.0)
+    assert manure_handler_output.CO2_floor == approx(12.0)
+    assert manure_handler_output.NH3_floor == approx(13.0)
+    assert manure_handler_output.raw_manure == approx(14.0)
+    assert manure_handler_output.cleaning_water == approx(15.0)
+    assert manure_handler_output.total_bedding_mass == approx(16.0)
+    assert manure_handler_output.total_water_volume_in_milking_center == approx(17.0)
+    assert manure_handler_output.total_daily_mass == approx(14.0 + 15.0 + 16.0 + 17.0)
+
