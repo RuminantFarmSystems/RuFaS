@@ -3,6 +3,19 @@ from RUFAS.routines.manure.pen.manure_management_pen import ManureManagementPen
 
 
 class MilkingCenter:
+    """A class that calculates the time spent and water usage in the milking center by cows.
+
+    Note that only cows are considered in this class.
+
+    Attributes
+        num_milkings: Number of milkings per animal per day.
+        minutes_spent_per_milking: Number of minutes spent per milking per animal.
+        minutes_spent_in_holding_area: Number of minutes spent in holding area per animal per milking.
+        wash_water_use_rate: Wash water use rate in the holding area, liters/animal/day.
+        fresh_water_use_rate: Fresh water use rate for milking, liters/animal/day.
+
+    """
+
     def __init__(self,
                  num_milkings=3,
                  minutes_spent_in_holding_area=30.0,
@@ -25,19 +38,6 @@ class MilkingCenter:
         self.minutes_spent_per_milking = minutes_spent_per_milking
         self.wash_water_use_rate = wash_water_use_rate
         self.fresh_water_use_rate = fresh_water_use_rate
-
-    """A class that calculates the time spent and water usage in the milking center by cows.
-
-    Note that only cows are considered in this class.
-
-    Attributes
-        num_milkings: Number of milkings per animal per day.
-        minutes_spent_per_milking: Number of minutes spent per milking per animal.
-        minutes_spent_in_holding_area: Number of minutes spent in holding area per animal per milking.
-        wash_water_use_rate: Wash water use rate in the holding area, liters/animal/day.
-        fresh_water_use_rate: Fresh water use rate for milking, liters/animal/day.
-
-    """
 
     # In holding area
     @property

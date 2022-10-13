@@ -27,7 +27,7 @@ class BaseBedding(ABC):
         bedding_mass_per_day: Amount of bedding needed for each animal per day, kg/animal/day.
         bedding_density: Density of the bedding, kg/m^3.
         bedding_dry_matter_mass: Dry matter mass of the bedding, kg.
-        bedding_cleaned_frac: Fraction of the bedding removed from the barn (0.0 - 1.0).
+        bedding_cleaned_frac: Fraction of bedding removed from the barn (0.0 - 1.0).
         bedding_type: Type of bedding.
 
     """

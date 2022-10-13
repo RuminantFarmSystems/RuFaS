@@ -26,8 +26,8 @@ class Manure:
         TSd: total solids, kg.
         VSd: degradable volatile solids, kg.
         VSnd: non-degradable volatile solids, kg.
-        WIP_frac: water extractable inorganic P fraction, unitless.
-        WOP_frac: water extractable organic P fraction, unitless.
+        WIP_frac: water extractable inorganic P fraction, dimensionless.
+        WOP_frac: water extractable organic P fraction, dimensionless.
         p_excrt_manure: manure P excretion for manure module input, kg.
         p_frac: P fraction of manure.
         K_manure: potassium in manure, kg.
