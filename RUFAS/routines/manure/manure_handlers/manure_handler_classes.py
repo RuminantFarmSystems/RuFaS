@@ -1,7 +1,7 @@
 """
 RUFAS: Ruminant Farm Systems Model
 
-File name: base_handler.py
+File name: manure_handler_classes.py
 
 Description:
 
@@ -11,13 +11,11 @@ Author(s):  William Donovan, wmdonovan@wisc.edu
 from __future__ import annotations
 
 from dataclasses import dataclass
-from enum import auto
 from typing import Dict
 from typing import List
 from typing import Optional
 from typing import Type
 
-from RUFAS.routines.manure.constants.constants import ManureManagementConstants
 from RUFAS.routines.manure.default_enum.default_enum import DefaultEnum
 from RUFAS.routines.manure.manure_handlers.bedding_classes import BeddingFactory
 from RUFAS.routines.manure.manure_handlers.manure_handler_daily_output import ManureHandlerDailyOutput
@@ -26,9 +24,7 @@ from RUFAS.routines.manure.pen.manure_management_pen import ManureManagementPen
 
 
 class ManureHandlerType(DefaultEnum):
-    """
-    An Enum class that lists all the different types of manure handlers.
-    """
+    """Enumerates the different types of manure handlers."""
 
     FLUSH_SYSTEM = 'flush system'
     MANUAL_SCRAPING = 'manual scraping'
@@ -37,15 +33,23 @@ class ManureHandlerType(DefaultEnum):
 
 
 class BaseManureHandler:
-    """
-    A class that contains common attributes and methods for all the different
-    subtypes of manure handlers.
+    """Base class for all manure handlers.
+
+    Attributes
+        config: A ManureHandlerConfig object that specifies default data specific to the choice of
+            manure handler.
+        bedding: A Bedding object that specifies the type of bedding used.
+        milking_center: A MilkingCenter object that handles relevant calculations
+            related to the time lactating cows spent there.
+        all_output: A list of ManureHandlerDailyOutput objects that stores the daily output of the
+            manure handler.
+
     """
 
     def __init__(self,
                  bedding_type_name: str,
                  manure_handler_config: ManureHandlerConfig):
-        """Initializes a BaseManureHandler object.
+        """Initialize a BaseManureHandler object.
 
         Args
             bedding_type_name: The name of the bedding type.
@@ -61,20 +65,37 @@ class BaseManureHandler:
 
     @property
     def last_output(self) -> Optional[ManureHandlerDailyOutput]:
+        """Return the last ManureHandlerDailyOutput object in self.all_output.
+
+        Returns
+            The last ManureHandlerDailyOutput object in self.all_output.
+            If self.all_output is empty, return None.
+
+        """
+
         return self.all_output[-1] if len(self.all_output) > 0 else None
 
-    def update(self, pen: ManureManagementPen) -> ManureHandlerDailyOutput:
-        """
-        Description:
-            Calls functions to calculate nutrient losses and transformations during
-            manure handling.
+    def daily_update(self, pen: ManureManagementPen, sim_day: int) -> ManureHandlerDailyOutput:
+        """Calculate and store the daily output of the manure handler.
+
+        Notes
             "pseudocode_manure_management" MS.3
+
+        Parameters
+            pen: A ManureManagementPen object.
+            sim_day: The current simulation day.
+
+        Returns
+            A ManureHandlerDailyOutput object.
+
         """
 
         daily_output = ManureHandlerDailyOutput(
+                simulation_day=sim_day,
+                pen_id=pen.id,
                 urea=pen.manure.U,
                 TAN_s=pen.manure.TAN_s,
-                manure_nitrogen=pen.manure.MN,
+                N_manure=pen.manure.MN,
                 TSd=pen.manure.TSd,
                 VSd=pen.manure.VSd,
                 VSnd=pen.manure.VSnd,
@@ -82,11 +103,6 @@ class BaseManureHandler:
                 WOP_frac=pen.manure.WOP_frac,
                 p_excrt_manure=pen.manure.p_excrt_manure,
                 K_manure=pen.manure.K_manure,
-
-                # TODO: Add gas emissions later
-                # CH4_floor=GasEmissions.calc_E_CH4_floor(pen),
-                # CO2_floor=GasEmissions.calc_E_C02_floor(pen),
-
                 raw_manure=pen.manure_mass,
                 cleaning_water=self.cleaning_water_volume_in_main_barn(pen),
                 total_bedding_mass=self.bedding.total_bedding_mass(pen),
@@ -97,63 +113,92 @@ class BaseManureHandler:
         return daily_output
 
     def cleaning_water_volume_in_main_barn(self, pen: ManureManagementPen) -> float:
-        return pen.num_animals * self.config.water_use_rate  # liters
+        """Calculate the volume of cleaning water needed for all the animals in pen.
 
-    def total_daily_volume(self, pen: ManureManagementPen) -> float:
-        return sum([
-            pen.manure_volume,  # m^3
-            self.cleaning_water_volume_in_main_barn(pen) * ManureManagementConstants.LITERS_TO_CUBIC_METERS,  # m^3
-            self.bedding.total_bedding_volume(pen),  # m^3
-            self.milking_center.total_water_volume_used_in_milking_center(pen) * \
-            ManureManagementConstants.LITERS_TO_CUBIC_METERS,  # m^3
-            pen.manure.U,  # g/L
-            pen.manure.TAN_s,  # g/L
-            pen.manure.MN,  # kg
-            pen.manure.TSd,  # kg
-            pen.manure.VSd,  # kg
-            pen.manure.VSnd,  # kg
-            pen.manure.p_excrt_manure,  # kg
-            pen.manure.K_manure  # kg
-        ])
+        Parameters
+            pen: A ManureManagementPen object.
+
+        Returns
+            Volume of cleaning water needed for the given pen, L.
+
+        """
+
+        return pen.num_animals * self.config.cleaning_water_use_rate
 
 
 class FlushSystem(BaseManureHandler):
+    """A class that handles calculations related to a flush system.
+
+    Attributes
+        All inherited from BaseManureHandler.
+
+    """
+
     pass
 
 
 class ManualScraping(BaseManureHandler):
+    """A class that handles calculations related to manual scraping.
+
+    Attributes
+        All inherited from BaseManureHandler.
+
+    """
+
     pass
 
 
 class AlleyScraper(BaseManureHandler):
+    """A class that handles calculations related to an alley scraper.
+
+    Attributes
+        All inherited from BaseManureHandler.
+
+    """
     pass
 
 
 @dataclass
 class ManureHandlerConfig:
-    """
-    A class that contains custom initialization configuration used in the
-    creation of a BaseManureHandler object.
+    """Class for storing the configuration of a manure handler.
+
+    Attributes:
+        cleaning_water_use_rate: Amount of cleaning water used per animal per day, L.
+        minutes_per_cleaning: Number of minutes needed per animal per cleaning, minutes.
+        cleanings_per_day: Number of cleanings per day.
 
     """
-    water_use_rate: int = 0  # liters/animal/day
-    time_per_cleaning: int = 8
+
+    cleaning_water_use_rate: float = 0.0
+    minutes_per_cleaning: int = 8
     cleanings_per_day: int = 2
 
 
 class DefaultManureHandlerConfigFactory:
+    """Class for creating default manure handler configurations."""
+
     FLUSH_SYSTEM_CONFIG = ManureHandlerConfig(
-            water_use_rate=757,  # liters
+            cleaning_water_use_rate=757.0,
     )
     MANUAL_SCRAPING_CONFIG = ManureHandlerConfig(
-            water_use_rate=10,  # liters
+            cleaning_water_use_rate=10.0,
     )
     ALLEY_SCRAPER_CONFIG = ManureHandlerConfig(
-            water_use_rate=10,  # liters
+            cleaning_water_use_rate=10.0,
     )
 
     @classmethod
     def get_instance(cls, manure_handler_type: ManureHandlerType):
+        """Returns a default manure handler configuration for the given manure handler type.
+
+        Parameters
+            manure_handler_type: The type of manure handler.
+
+        Returns
+            A default ManureHandlerConfig object for the given manure handler type.
+
+        """
+
         manure_handler_config_by_type = {
             ManureHandlerType.FLUSH_SYSTEM: cls.FLUSH_SYSTEM_CONFIG,
             ManureHandlerType.MANUAL_SCRAPING: cls.MANUAL_SCRAPING_CONFIG,
