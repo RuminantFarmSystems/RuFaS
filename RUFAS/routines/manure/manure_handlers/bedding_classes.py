@@ -13,7 +13,6 @@ from RUFAS.routines.manure.pen.manure_management_pen import ManureManagementPen
 
 class BeddingType(DefaultEnum):
     """Enumerates the different types of bedding."""
-
     SAWDUST = 'sawdust'
     MANURE_SOLIDS = 'manure solids'
     SAND = 'sand'
@@ -23,7 +22,7 @@ class BeddingType(DefaultEnum):
 class BaseBedding(ABC):
     """Base class for all bedding types.
 
-    Attributes
+    Attributes:
         bedding_mass_per_day: Amount of bedding needed for each animal per day, kg/animal/day.
         bedding_density: Density of the bedding, kg/m^3.
         bedding_dry_matter_mass: Dry matter mass of the bedding, kg.
@@ -33,8 +32,13 @@ class BaseBedding(ABC):
     """
 
     def __init__(self, bedding_config: BeddingConfig) -> None:
-        """Initialize the base bedding class."""
+        """Initialize the base bedding class.
 
+        Args:
+            bedding_config: A BeddingConfig object that specifies config data specific to the choice
+                of bedding.
+
+        """
         self.bedding_mass_per_day = bedding_config.bedding_mass_per_day
         self.bedding_density = bedding_config.bedding_density
         self.bedding_dry_matter_mass = bedding_config.bedding_dry_matter_mass
@@ -44,35 +48,32 @@ class BaseBedding(ABC):
     def total_bedding_washed(self, pen: ManureManagementPen) -> float:
         """Return the total amount of bedding that is washed away.
 
-        Parameters
+        Args:
             pen: A ManureManagementPen object.
 
-        Returns
+        Returns:
             Total amount of bedding that is washed away, kg/animal/day.
 
         """
-
         return self.bedding_cleaned_frac * self.total_bedding_mass(pen)
 
     @abstractmethod
     def total_bedding_mass(self, pen: ManureManagementPen) -> float:
         """Return the total amount of bedding needed for all animals in the given pen.
 
-        Returns
+        Returns:
             Total amount of bedding needed for all animals in the given pen, kg/day.
 
         """
-
         pass
 
     def total_bedding_volume(self, pen: ManureManagementPen) -> float:
         """Return the total volume of bedding needed for all animals in the given pen.
 
-        Returns
+        Returns:
             Total volume of bedding needed for all animals in the given pen, m^3/day.
 
         """
-
         return self.total_bedding_mass(pen) / self.bedding_density
 
 
@@ -82,7 +83,7 @@ class BaseOrganicBedding(BaseBedding):
     def total_bedding_mass(self, pen: ManureManagementPen) -> float:
         """Return the total amount of bedding needed for all animals in the given pen.
 
-        Returns
+        Returns:
             Total amount of bedding needed for all animals in the given pen, kg/day.
 
         """
@@ -92,29 +93,27 @@ class BaseOrganicBedding(BaseBedding):
 class SawdustBedding(BaseOrganicBedding):
     """Class for sawdust bedding.
 
-    Attributes
+    Attributes:
         Inherited from BaseOrganicBedding.
 
     """
-
     pass
 
 
 class ManureSolidsBedding(BaseOrganicBedding):
     """Class for manure solids bedding.
 
-    Attributes
+    Attributes:
         Inherited from BaseOrganicBedding.
 
     """
-
     pass
 
 
 class SandBedding(BaseBedding):
     """Class for sand bedding.
 
-    Attributes
+    Attributes:
         All inherited attributes from the parent classes.
         In addition:
         sand_removal_efficiency: Efficiency of removing sand from the bedding, [0.0, 1.0], unitless.
@@ -122,20 +121,23 @@ class SandBedding(BaseBedding):
     """
 
     def __init__(self, bedding_config: BeddingConfig) -> None:
-        """Initialize the sand bedding class."""
+        """Initialize the sand bedding class.
 
+        Args:
+            bedding_config: A BeddingConfig object that specifies config data for sand bedding.
+
+        """
         super().__init__(bedding_config)
         self.sand_removal_efficiency = bedding_config.sand_removal_efficiency
 
     def total_bedding_mass(self, pen: ManureManagementPen) -> float:
         """Return the total amount of bedding needed for all animals in the given pen.
 
-        Returns
+        Returns:
             Total amount of bedding needed for all animals in the given pen, kg/day.
 
         """
-
-        bedding_mass = pen.num_animals * self.bedding_mass_per_day  # kg/day
+        bedding_mass = pen.num_animals * self.bedding_mass_per_day
         return bedding_mass * (1 - self.sand_removal_efficiency)
 
 
@@ -143,7 +145,7 @@ class SandBedding(BaseBedding):
 class BeddingConfig:
     """Class for storing the configuration of a bedding.
 
-    Attributes
+    Attributes:
         bedding_mass_per_day: Amount of bedding needed for each animal per day, kg/animal/day.
         bedding_density: Density of the bedding, kg/m^3.
         bedding_dry_matter_mass: Dry matter content of the bedding, kg.
@@ -151,7 +153,6 @@ class BeddingConfig:
         sand_removal_efficiency: Efficiency of removing sand from the bedding, [0.0, 1.0], unitless.
 
     """
-
     bedding_mass_per_day: float
     bedding_density: float
     bedding_dry_matter_mass: float
@@ -192,10 +193,10 @@ class DefaultBeddingConfigFactory:
     def get_instance(cls, bedding_type: BeddingType) -> BeddingConfig:
         """Return the default bedding configuration for the given bedding type.
 
-        Parameters
+        Args:
             bedding_type: Type of bedding.
 
-        Returns
+        Returns:
             Default bedding configuration for the given bedding type.
 
         """
@@ -218,11 +219,11 @@ class BeddingFactory:
             -> BaseBedding:
         """Return the bedding object for the given bedding type name.
 
-        Parameters
-            bedding_name: Name of the bedding type.
+        Args:
+            bedding_type_name: Name of the bedding type.
             bedding_config: Custom configuration of the bedding, if any.
 
-        Returns
+        Returns:
             Bedding object for the given bedding type name.
 
         """
