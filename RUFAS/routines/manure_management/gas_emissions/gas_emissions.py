@@ -96,6 +96,44 @@ class GasEmissions:
         return c * VS_tot * (VSd * b1 + VSnd * b2) * ex
 
     @staticmethod
+    def calc_E_CH4_storage_v3(Ts,enclosed=False,tempC=15.0,Pvs=0.68, Bo=0.2, E_CH4_pot=0.48,n_eff=0.99,VS_loss_yesterday=0.0) -> float:
+        """Calculates methane emissions from manure storage using total solids and manure kg.
+
+        Parameters
+            manure_kg: total kg of manure
+            Ts: Total solids in kg
+            enclosed: Boolean True if manure storage is enclosed, else False if manure storage is open to air
+            tempC: temperature, C.
+            Pvs: Fraction (0-1) volatile solids
+            Bo: achievable emission of CH4 during anaerobic digestion, kg CH4/kg VS.
+            E_CH4_pot: potential CH4 yield of the manure, kg CH4/kg VS.
+            n_eff: efficicency of process              TODO: confirm n_eff meaning
+            VS_loss_yesterday: VS loss from previous day. 
+
+
+
+        Returns
+            CH4 emissions from storage, kg CH4/day.
+        """
+
+        c = 0.024
+        VS_tot = Ts*Pvs
+        const = GasEmissionConstants
+        b1, b2 = const.b1, const.b2
+
+        lnA, E, R = const.lnA, const.E, const.R
+        temp_in_K = GasEmissions._convert_temp_C_to_K(tempC)
+        ex = math.exp(lnA - (E / (R * temp_in_K)))
+
+        VSd = (VS_tot * (Bo / E_CH4_pot) - VS_loss_yesterday) 
+        VSnd = VS_tot - VSd
+
+        if(enclosed):
+            return c * VS_tot * (VSd * b1 + VSnd * b2) * ex
+        else:
+            return c * VS_tot * (VSd * b1 + VSnd * b2) * ex* (1-n_eff)
+
+    @staticmethod
     def _calc_modified_hours(hours: float) -> float:
         """Calculate modified hours."""
 
