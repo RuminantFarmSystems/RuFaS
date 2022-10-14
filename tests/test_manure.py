@@ -17,6 +17,7 @@ from RUFAS.routines.animal.pen import Pen
 from RUFAS.routines.manure.constants.constants import ManureManagementConstants
 from RUFAS.routines.manure.default_enum.default_enum import DefaultEnum
 from RUFAS.routines.manure.manure.manure import Manure
+from RUFAS.routines.manure.manure_handlers.bedding_classes import BaseBedding
 from RUFAS.routines.manure.manure_handlers.bedding_classes import BeddingConfig
 from RUFAS.routines.manure.manure_handlers.bedding_classes import BeddingFactory
 from RUFAS.routines.manure.manure_handlers.bedding_classes import BeddingType
@@ -24,8 +25,13 @@ from RUFAS.routines.manure.manure_handlers.bedding_classes import DefaultBedding
 from RUFAS.routines.manure.manure_handlers.bedding_classes import ManureSolidsBedding
 from RUFAS.routines.manure.manure_handlers.bedding_classes import SandBedding
 from RUFAS.routines.manure.manure_handlers.bedding_classes import SawdustBedding
+from RUFAS.routines.manure.manure_handlers.manure_handler_classes import AlleyScraper
+from RUFAS.routines.manure.manure_handlers.manure_handler_classes import BaseManureHandler
 from RUFAS.routines.manure.manure_handlers.manure_handler_classes import DefaultManureHandlerConfigFactory
+from RUFAS.routines.manure.manure_handlers.manure_handler_classes import FlushSystem
+from RUFAS.routines.manure.manure_handlers.manure_handler_classes import ManualScraping
 from RUFAS.routines.manure.manure_handlers.manure_handler_classes import ManureHandlerConfig
+from RUFAS.routines.manure.manure_handlers.manure_handler_classes import ManureHandlerFactory
 from RUFAS.routines.manure.manure_handlers.manure_handler_classes import ManureHandlerType
 from RUFAS.routines.manure.manure_handlers.manure_handler_daily_output import ManureHandlerDailyOutput
 from RUFAS.routines.manure.manure_handlers.milking_center import MilkingCenter
@@ -943,6 +949,7 @@ def test_manure_volume_deposited_in_milking_center(mock_milking_center: MilkingC
 
 
 # Test ManureHandlerOutput
+# ========================
 
 def test_manure_handler_daily_output_init() -> None:
     """Unit test for __init__() of class ManureHandlerDailyOutput in file manure_handler_daily_output.py"""
@@ -989,6 +996,7 @@ def test_manure_handler_daily_output_init() -> None:
 
 
 # Test ManureHandlerConfig
+# ========================
 
 def test_manure_handler_config_init_() -> None:
     """Unit test for __init__() of class ManureHandlerConfig"""
@@ -1034,6 +1042,7 @@ def test_default_manure_handler_config_factory_get_instance(manure_handler_type:
 
 
 # Test ManureHandlerType
+# ======================
 
 def test_manure_handler_type_enum() -> None:
     """Unit test for enum ManureHandlerType"""
@@ -1045,3 +1054,104 @@ def test_manure_handler_type_enum() -> None:
     assert ManureHandlerType.get_type('default') is ManureHandlerType.DEFAULT
     assert ManureHandlerType.DEFAULT is ManureHandlerType.FLUSH_SYSTEM
     assert ManureHandlerType.get_type('dummy') is ManureHandlerType.FLUSH_SYSTEM
+
+
+# Test ManureHandlerFactory
+# =========================
+
+@pytest.fixture
+def mock_manure_handler_config() -> ManureHandlerConfig:
+    """Mock ManureHandlerConfig"""
+    return ManureHandlerConfig(
+            cleaning_water_use_rate=20.0,
+            minutes_per_cleaning=10,
+            cleanings_per_day=3
+    )
+
+
+@pytest.mark.parametrize(
+        'manure_handler_type_name, bedding_type_name, '
+        'manure_handler_config, expected_manure_handler_class,'
+        'expected_bedding_type, expected_manure_handler_config',
+        [
+            ('flush system', 'sawdust', None, FlushSystem, SawdustBedding,
+             DefaultManureHandlerConfigFactory.FLUSH_SYSTEM_CONFIG),
+            ('manual scraping', 'sawdust', None, ManualScraping, SawdustBedding,
+             DefaultManureHandlerConfigFactory.MANUAL_SCRAPING_CONFIG),
+            ('alley scraper', 'sawdust', None, AlleyScraper, SawdustBedding,
+             DefaultManureHandlerConfigFactory.ALLEY_SCRAPER_CONFIG),
+            ('dummy', 'sawdust', None, FlushSystem, SawdustBedding,
+             DefaultManureHandlerConfigFactory.FLUSH_SYSTEM_CONFIG),
+            ('flush system', 'manure solids', None, FlushSystem, ManureSolidsBedding,
+             DefaultManureHandlerConfigFactory.FLUSH_SYSTEM_CONFIG),
+            ('manual scraping', 'manure solids', None, ManualScraping, ManureSolidsBedding,
+             DefaultManureHandlerConfigFactory.MANUAL_SCRAPING_CONFIG),
+            ('alley scraper', 'manure solids', None, AlleyScraper, ManureSolidsBedding,
+             DefaultManureHandlerConfigFactory.ALLEY_SCRAPER_CONFIG),
+            ('dummy', 'manure solids', None, FlushSystem, ManureSolidsBedding,
+             DefaultManureHandlerConfigFactory.FLUSH_SYSTEM_CONFIG),
+            ('flush system', 'sand', None, FlushSystem, SandBedding,
+             DefaultManureHandlerConfigFactory.FLUSH_SYSTEM_CONFIG),
+            ('manual scraping', 'sand', None, ManualScraping, SandBedding,
+             DefaultManureHandlerConfigFactory.MANUAL_SCRAPING_CONFIG),
+            ('alley scraper', 'sand', None, AlleyScraper, SandBedding,
+             DefaultManureHandlerConfigFactory.ALLEY_SCRAPER_CONFIG),
+            ('dummy', 'sand', None, FlushSystem, SandBedding,
+             DefaultManureHandlerConfigFactory.FLUSH_SYSTEM_CONFIG),
+            ('flush system', 'sawdust', mock_manure_handler_config,
+             FlushSystem, SawdustBedding, mock_manure_handler_config),
+            ('manual scraping', 'sawdust', mock_manure_handler_config,
+             ManualScraping, SawdustBedding, mock_manure_handler_config),
+            ('alley scraper', 'sawdust', mock_manure_handler_config,
+             AlleyScraper, SawdustBedding, mock_manure_handler_config),
+            ('dummy', 'sawdust', mock_manure_handler_config,
+             FlushSystem, SawdustBedding, mock_manure_handler_config),
+        ])
+def test_manure_handler_factory_get_instance(manure_handler_type_name: str,
+                                             bedding_type_name: str,
+                                             manure_handler_config: ManureHandlerConfig,
+                                             expected_manure_handler_class: BaseManureHandler,
+                                             expected_bedding_type: BaseBedding,
+                                             expected_manure_handler_config: ManureHandlerConfig) \
+        -> None:
+    """Unit test for get_instance() of class ManureHandlerFactory"""
+
+    # Act
+    manure_handler = ManureHandlerFactory.get_instance(
+            manure_handler_type_name=manure_handler_type_name,
+            bedding_type_name=bedding_type_name,
+            manure_handler_config=manure_handler_config
+    )
+
+    # Assert
+    assert type(manure_handler) is expected_manure_handler_class
+    assert type(manure_handler.bedding) is expected_bedding_type
+    assert manure_handler.config == expected_manure_handler_config
+    assert manure_handler.milking_center is not None
+    assert manure_handler.all_output is not None
+    assert len(manure_handler.all_output) == 0
+    assert manure_handler.last_output is None
+
+
+def test_manure_handler_daily_update(mocker: MockerFixture) -> None:
+    """Unit test for daily_update() of class BaseManureHandler in file manure_handler_classes.py"""
+
+    # Arrange
+    pen = mocker.MagicMock(autospec=ManureManagementPen)
+    pen.num_animals = 100
+    flush_system = ManureHandlerFactory.get_instance('flush system', 'sawdust')
+    flush_system.config.cleaning_water_use_rate = 20.0
+
+    # Act
+    daily_output1 = flush_system.daily_update(pen, sim_day=1)
+    daily_output2 = flush_system.daily_update(pen, sim_day=2)
+
+    # Assert
+    assert flush_system.cleaning_water_volume_in_main_barn(pen) == approx(2000.0)
+    assert len(flush_system.all_output) == 2
+    assert daily_output1 == flush_system.all_output[0]
+    assert daily_output2 == flush_system.all_output[1]
+    assert daily_output1.simulation_day == 1
+    assert daily_output2.simulation_day == 2
+    assert daily_output2 == flush_system.last_output
+    assert all([type(daily_output) is ManureHandlerDailyOutput for daily_output in flush_system.all_output])
