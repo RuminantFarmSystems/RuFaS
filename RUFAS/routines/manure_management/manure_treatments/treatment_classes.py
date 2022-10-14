@@ -81,7 +81,8 @@ class BaseManureTreatment:
         output_to_field = AggregatedManureOutputforField()
         output_to_field.convert_treatment_ouput_to_field_outputs(self.accumulated_output)
         return output_to_field
-    def land_application_day_update_manure_storage(self,requested_manure_mass):
+
+    def land_application_day_update_manure_storage(self,requested_manure_fraction=1):
         """
         Returns: AggregatedOutput object for field application before resetting self.accumulated_output to new levels
         outputs_for_land_application = self.accumulated_output
@@ -89,7 +90,10 @@ class BaseManureTreatment:
         ## Convert aggregated outputs from TreatmentOutput type, to object type expected in Field
         output_to_field = AggregatedManureOutputforField()
         output_to_field.convert_treatment_ouput_to_field_outputs(self.accumulated_output)
-        #TODO Currently resets accumulated outputs to zero, but should reset to new levels based on requested_manure_mass
+        # TODO Currently resets accumulated outputs to zero, 
+        # but should reset to new levels based on requested_manure_mass. Should be based on
+        #  percentage requested
+        # Input requested_manure_fraction for calculating remainder in tank
         self.accumulated_output = TreatmentOutput()
         return output_to_field
 
@@ -548,6 +552,9 @@ class SlurryStorageUnderfloor(BaseManureTreatment):
         self.accumulated_output.__add__(daily_output)
         self.simulation_day = simulation_day
         return daily_output
+    def calc_gas(self):
+        pass
+
 
 
 class SlurryStorageOutdoor(BaseManureTreatment):
