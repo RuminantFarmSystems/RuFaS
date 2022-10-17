@@ -2,7 +2,7 @@ from pytest import fixture
 from unittest.mock import Mock, MagicMock
 from pytest_mock import MockerFixture
 from tkinter.ttk import Separator
-from RUFAS.classes import Time
+from RUFAS.time import Time
 from RUFAS.weather import Weather
 
 from RUFAS.routines.animal.life_cycle.calf import Calf
@@ -14,8 +14,8 @@ from RUFAS.routines.manure_management.reception_pits.reception_pit_output import
 from RUFAS.routines.manure_management.manure_handlers.manure_handler_classes import BaseManureHandler
 from RUFAS.routines.manure_management.manure_handlers.manure_handler_output import ManureHandlerOutput
 from RUFAS.routines.manure_management.manure_separators.manure_separator_classes import BaseManureSeparator
-from RUFAS.routines.manure_management.manure_treatments.treatment_classes import AnaerobicDigestion, AnaerobicLagoon, TreatmentType
-from RUFAS.routines.manure_management.manure_treatments.treatment_classes import AnaerobicDigestionInitData, AnaerobicLagoonInitData
+from RUFAS.routines.manure_management.manure_treatments.treatment_classes import AnaerobicDigestion, AnaerobicLagoon, TreatmentType, SlurryStorageOutdoor, SlurryStorageUnderfloor
+from RUFAS.routines.manure_management.manure_treatments.treatment_classes import ManureTreatmentConfig
 from RUFAS.routines.manure_management.misc.daily_variables import DailyVariables
 
 @fixture
@@ -122,8 +122,8 @@ def mock_reception_pit(mocker:MockerFixture, mock_reception_pit_output)->BaseRec
     return reception_pit
 
 @fixture
-def mock_ad_init_data(mocker:MockerFixture)->AnaerobicDigestionInitData:
-    init_data = mocker.MagicMock(spec=AnaerobicDigestionInitData)
+def mock_ad_init_data(mocker:MockerFixture)->ManureTreatmentConfig:
+    init_data = mocker.MagicMock(spec=ManureTreatmentConfig)
     init_data.hydraulic_retention_time = 25  
     init_data.sludge_accumulation_period = 1.0  
     init_data.SAV_fraction = 0.03
@@ -142,8 +142,8 @@ def mock_ad_init_data(mocker:MockerFixture)->AnaerobicDigestionInitData:
     return init_data
 
 @fixture
-def mock_lagoon_init_data(mocker:MockerFixture)->AnaerobicLagoonInitData:
-    init_data = mocker.MagicMock(spec=AnaerobicLagoonInitData)
+def mock_lagoon_init_data(mocker:MockerFixture)->ManureTreatmentConfig:
+    init_data = mocker.MagicMock(spec=ManureTreatmentConfig)
     init_data.hydraulic_retention_time: int = 365  # 180 - 365 days
     init_data.sludge_accumulation_period: float = 5.0  # Sludge accumulation period 5-20 years
     init_data.SAV_fraction: float = 0.00251  # Sludge Accumulation volume fraction 0.00274-0.00455 of VS loaded
@@ -246,8 +246,8 @@ def get_expected_values_anaerobic_lagoon(mock_handler_output):
 
 
 @fixture
-def mock_ssuf_init_data(mocker:MockerFixture)->SlurryStorageInitData:
-    init_data = mocker.MagicMock(spec=SlurryStorageInitData)
+def mock_ssuf_init_data(mocker:MockerFixture)->ManureTreatmentConfig:
+    init_data = mocker.MagicMock(spec=ManureTreatmentConfig)
     init_data.percent_dry_solids = 1.0
 
     init_data.TS_removal_efficiency = 0.1  # Between 10-30%
