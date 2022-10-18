@@ -74,8 +74,8 @@ class Feed:
             Pen.AnimalCombination.CALF: set(self.get_quality_specific_purchased_feed_ids(data['calf_feeds'])),
             Pen.AnimalCombination.GROWING: set(self.get_quality_specific_purchased_feed_ids(data['growing_feeds'])),
             Pen.AnimalCombination.CLOSE_UP: set(self.get_quality_specific_purchased_feed_ids(data['close_up_feeds'])),
-            Pen.AnimalCombination.GROWING_AND_CLOSE_UP: \
-                set(self.get_quality_specific_purchased_feed_ids(data['growing_feeds'])) | \
+            Pen.AnimalCombination.GROWING_AND_CLOSE_UP:
+                set(self.get_quality_specific_purchased_feed_ids(data['growing_feeds'])) |
                 set(self.get_quality_specific_purchased_feed_ids(data['close_up_feeds'])),
             Pen.AnimalCombination.LAC_COW: set(self.get_quality_specific_purchased_feed_ids(data['lac_cow_feeds'])),
         }
