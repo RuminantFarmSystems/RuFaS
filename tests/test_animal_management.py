@@ -175,12 +175,24 @@ def test_init_pens(animal_management: AnimalManagement, pen_information: Dict[st
     assert actual == expected
 
     # Less than the minimum num of pens - 0 pens
-    # 3 default pens should be created
+    # MIN_NUM_PENS default pens should be created
     animal_management.all_pens = []
     animal_management.init_pens({}, herd_information)
 
     actual = len(animal_management.all_pens)
-    expected = 3
+    expected = animal_management.MIN_NUM_PENS
+    assert actual == expected
+
+
+def test_init_default_pens(animal_management: AnimalManagement) -> None:
+    # Less than the minimum num of pens - 0 pens
+    # MIN_NUM_PENS default pens should be created
+
+    animal_management.all_pens = []
+    animal_management._init_default_pens(1)
+
+    actual = len(animal_management.all_pens)
+    expected = animal_management.MIN_NUM_PENS
     assert actual == expected
 
 

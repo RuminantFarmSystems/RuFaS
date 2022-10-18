@@ -92,7 +92,7 @@ class AnimalManagement:
         AnimalBase.set_nutrient_list(feed.nutrient_rqmts)
 
         # if False, there are no animals being simulated on the farm
-        self.simulate_animals = False
+        self.simulate_animals = config.simulate_animals
 
         # list of all the animals in the simulation
         self.calves = []
@@ -142,6 +142,9 @@ class AnimalManagement:
 
         self.methane_model = data['methane_model']
 
+        # Minimum number of pens in the simulation (for default pen initialization)
+        self.MIN_NUM_PENS = 3
+
         self.init_pens(data['pen_information'], data['herd_information'])
 
         self.init_animals(data['herd_information'], self.all_pens, weather, time, config, feed)
@@ -163,24 +166,19 @@ class AnimalManagement:
 
             self.all_pens.append(pen)
 
-        self.init_default_pens(herd_data['herd_num'])
+        self._init_default_pens(herd_data['herd_num'])
 
-    def init_default_pens(self, herd_num):
-        # TODO: add unit test
+    def _init_default_pens(self, herd_num):
         """
             Initializes default pens if not enough exist in the simulation.
             Args:
                 herd_num: number of animals in the herd
             """
 
-        # Minimum number of pens in the simulation
-        MIN_NUM_PENS = 3
-
-        num_pens_needed = MIN_NUM_PENS - len(self.all_pens)
+        num_pens_needed = self.MIN_NUM_PENS - len(self.all_pens)
 
         # Check if any default pens need to be added
         if num_pens_needed > 0 and herd_num > 0:
-            self.init_default_pens(num_pens_needed)
             print('Warning: herd_num > 0, but num_pens =', len(self.all_pens), '. Initilizing', num_pens_needed,
                   'default pens.')
             for i in range(num_pens_needed):
@@ -190,6 +188,7 @@ class AnimalManagement:
                 self.all_pens.append(new_default_pen)
 
     def init_animals(self, herd_data, pen_data, weather, time, config, feed):
+        # TODO: add unit test
         """
         Populates the list of animals with the information from the
         input JSON file: constructs the calves, heiferI’s, heiferII’s,
@@ -208,11 +207,6 @@ class AnimalManagement:
             time: instance of the Time class defined in classes.py
         """
 
-        # QUESTION: what do calf_num, heifer_num, etc do?
-        # QUESTION: what is the point of simulate_animals?
-
-        self.simulate_animals = herd_data['herd_num'] != 0
-
         if self.simulate_animals:
             herd_data['config'] = config
             self.calves, self.heiferIs, self.heiferIIs, self.heiferIIIs, self.cows \
@@ -220,17 +214,25 @@ class AnimalManagement:
         else:
             AnimalManagement._print_animal_num_warnings(herd_data)
 
-        # QUESTION: Should this be moved to init_pens?
         if len(pen_data) > 0:
             self.init_nutrient_rqmts(weather, time, feed)
+
+            # potentially move later on once we refactor
             self.allocate_all_pens()
 
     @staticmethod
     def _print_animal_num_warnings(herd_data):
+        # TODO: add unit test
+        """
+        Prints out warnings if there are more than 0 animals for any of the animal types
+
+        Args:
+            herd_data: dictionary containing information about the herd
+        """
         animal_keys = {"calf_num", "heiferI_num", "heiferII_num", "heiferIII_num", "cow_num"}
         for key in animal_keys:
             if herd_data[key] == 0:
-                print("Warning: herd_num = 0, but", key, "!= 0.")
+                print("Warning: simulate_animals is false , but", key, "!= 0.")
 
     def init_nutrient_rqmts(self, weather, time, feed):
         """
@@ -487,7 +489,6 @@ class AnimalManagement:
                     group = [hef2]
         # final pen for this class
         growing_pens[0].update_animals(group, Pen.AnimalCombination.GROWING)
-
 
     def allocate_close_up_pens(self, dry_cows, close_up_pens):
         stalls = [pen.num_stalls for pen in close_up_pens]
