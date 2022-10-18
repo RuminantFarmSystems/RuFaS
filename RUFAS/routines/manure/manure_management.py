@@ -11,9 +11,14 @@ Author(s):  William Donovan, wmdonovan@wisc.edu
 """
 import collections
 from typing import Dict, List, Tuple
+from typing import Optional
 
 from RUFAS.routines.animal.animal_management import AnimalManagement
+from RUFAS.routines.manure.manure_handlers.manure_handler_classes import BaseManureHandler
+from RUFAS.routines.manure.manure_handlers.manure_handler_classes import ManureHandlerFactory
+from RUFAS.routines.manure.manure_separators.manure_separator_classes import ManureSeparatorFactory
 from RUFAS.routines.manure.pen.manure_management_pen import ManureManagementPen
+from RUFAS.routines.manure.reception_pits.reception_pit import ReceptionPit
 
 
 class ManureManagement:
@@ -45,8 +50,8 @@ class ManureManagement:
 
         """
 
-        self.manure_handlers = {}
-        self.reception_pits = {}
+        self.manure_handlers: Dict[int, BaseManureHandler] = {}
+        self.reception_pits: Dict[int, Optional[ReceptionPit]] = {}
         self.manure_separators = {}
         self.manure_treatments = {}
         self._all_data = collections.defaultdict(list)
@@ -91,12 +96,23 @@ class ManureManagement:
 
         """
 
-        # TODO: Will add the actual components in later pull requests
         for pen in animal_management.all_pens:
             mm_pen = ManureManagementPen(pen)
-            self.manure_handlers[mm_pen.id] = None
-            self.reception_pits[mm_pen.id] = None
-            self.manure_separators[mm_pen.id] = None
+            self.manure_handlers[mm_pen.id] = ManureHandlerFactory.get_instance(
+                    manure_handler_type_name=mm_pen.manure_handler,
+                    bedding_type_name=mm_pen.bedding_type,
+                    manure_handler_config=None
+            )
+            self.reception_pits[mm_pen.id] = ReceptionPit()
+
+            if mm_pen.manure_separator == 'null':
+                self.manure_separators[mm_pen.id] = None
+            else:
+                self.manure_separators[mm_pen.id] = ManureSeparatorFactory.get_instance(
+                        manure_separator_type_name=mm_pen.manure_separator,
+                        manure_separator_config=None
+                )
+
             self.manure_treatments[mm_pen.id] = None
 
     def update(self, animal_management: AnimalManagement) -> None:
@@ -110,13 +126,31 @@ class ManureManagement:
 
         """
 
-        # TODO: Will add the actual outputs in later pull requests
         for pen in animal_management.all_pens:
             mm_pen = ManureManagementPen(pen)
-            manure_handler_daily_output = None
-            reception_pit_daily_output = None
-            manure_separator_daily_output = None
+
+            manure_handler_daily_output = \
+                self.manure_handlers[mm_pen.id].daily_update(mm_pen, animal_management.simulation_day)
+
+            reception_pit_daily_output = \
+                self.reception_pits[mm_pen.id].daily_update(manure_handler_daily_output)
+
+            if self.manure_separators[mm_pen] is None:
+                manure_separator_daily_output = None
+            else:
+                manure_separator_daily_output = \
+                    self.manure_separators[mm_pen.id].daily_update(reception_pit_daily_output)
+
             treatment_daily_output = None
+            # TODO: call to treatment's daily_update(
+            #  manure_handler_daily_output,
+            #  reception_pit_daily_output,
+            #  manure_separator_daily_output)
+            # Slurry storage: yes, no(but yes is ok and easier), no (yes is ok)
+            # Lagoon: yes, no(but yes is ok and easier), no (yes is ok)
+            # Lagoon: yes, yes, yes
+            # AD: yes, yes, no
+            # AD: yes, yes, yes
 
             daily_update_data = (
                 mm_pen,
