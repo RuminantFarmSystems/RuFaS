@@ -6,7 +6,7 @@ from dataclasses import field
 class ManureHandlerDailyOutput:
     """Daily output of a manure handler.
 
-    Attributes
+    Attributes:
         simulation_day: Number of days into the simulation.
         pen_id: ID of the pen that this output is associated with.
         urea: Urea concentration in manure, g/L.
@@ -19,7 +19,6 @@ class ManureHandlerDailyOutput:
         WIP_frac: Fraction of water extractable inorganic phosphorus, dimensionless.
         WOP_frac: Fraction of water extractable organic phosphorus, dimensionless.
         p_excrt_manure: Amount of phosphorus excreted in manure, kg.
-        p_frac: Fraction of phosphorus in manure, dimensionless.
         K_manure: Amount of potassium in manure, kg.
         raw_manure: Amount of raw manure, kg.
         cleaning_water: Volume of cleaning water used in main barn, L.
@@ -29,7 +28,6 @@ class ManureHandlerDailyOutput:
         total_daily_mass: Total amount of manure, bedding, and water combined, kg.
 
     """
-
     simulation_day: int = -1
     pen_id: int = -1
     urea: float = 0.0
@@ -51,7 +49,7 @@ class ManureHandlerDailyOutput:
     total_daily_mass: float = field(init=False)
 
     def __post_init__(self) -> None:
-        """Calculates total volatile solids and total daily mass after initialization."""
+        """Calculate total volatile solids and total daily mass after initialization."""
 
         self.VS_total = self.VSd + self.VSnd
 
