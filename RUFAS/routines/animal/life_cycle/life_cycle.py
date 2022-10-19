@@ -214,7 +214,7 @@ class LifeCycleManager:
     #  calving_interval attribute is present, maybe set that to true instead?
     def _set_avg_CI(self, animal_config: AnimalConfigTypedDict,
                     animal_initializer: AnimalInitialization) -> None:
-        if 'user_input_calving_interval' in animal_config:
+        if 'user_input_calving_interval' in animal_config and animal_config['user_input_calving_interval']:
             self.avg_CI = animal_config['calving_interval']
         else:
             self.initialize_db_summary = animal_initializer.initialization_db_summary()
