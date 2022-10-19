@@ -2,7 +2,7 @@ from typing import NamedTuple, Set, Type
 
 from RUFAS.routines.animal.life_cycle.animal_base import AnimalBase
 from RUFAS.routines.animal.pen import Pen
-from RUFAS.routines.manure.manure.manure import Manure
+from RUFAS.routines.manure.manure.pen_manure import PenManure
 
 
 class ManureManagementPen:
@@ -53,7 +53,7 @@ class ManureManagementPen:
         self.manure_treatment: str = pen.manure_storage
 
         self.manure_density = 990.0  # kg/m^3
-        self.manure = Manure(**pen.manure)
+        self.manure = PenManure.get_instance(pen.manure)
 
     @property
     def manure_mass(self) -> float:
@@ -63,7 +63,7 @@ class ManureManagementPen:
             Manure mass of this pen, kg.
 
         """
-        return self.manure.Mkg
+        return self.manure.manure_mass
 
     @property
     def manure_volume(self) -> float:

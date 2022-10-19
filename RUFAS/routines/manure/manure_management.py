@@ -143,7 +143,6 @@ class ManureManagement:
 
             treatment_daily_output = None
             # TODO: call to treatment's daily_update(
-            #  manure_handler_daily_output,
             #  reception_pit_daily_output,
             #  manure_separator_daily_output)
             # Slurry storage: yes, no(but yes is ok and easier), no (yes is ok)
@@ -151,6 +150,9 @@ class ManureManagement:
             # Lagoon: yes, yes, yes
             # AD: yes, yes, no
             # AD: yes, yes, yes
+
+            # convert treatment output to usable form for field module
+            # convert(treatment output, wip, wop)
 
             daily_update_data = (
                 mm_pen,

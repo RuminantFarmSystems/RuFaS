@@ -64,35 +64,34 @@ class BaseManureSeparator:
         daily_output = ManureSeparatorDailyOutput(
                 simulation_day=rp.simulation_day,
                 pen_id=rp.pen_id,
-                TAN_s=rp.TAN_s,
-                N_manure=rp.N_manure,
-                TSd=rp.TSd,
-                VSd=rp.VSd,
-                VSnd=rp.VSnd,
+                TAN=rp.TAN,
+                N=rp.N,
+                TS=rp.TS,
                 VS_total=rp.VS_total,
-                p_excrt_manure=rp.p_excrt_manure,
-                K_manure=rp.K_manure,
-                total_daily_mass=rp.total_daily_mass,
-                wet_weight_of_final_solids=(
-                        rp.TSd * self.config.TS_removal_efficiency / self.config.percent_dry_solids
+                P=rp.P,
+                K=rp.K,
+                total_daily_manure_volume=rp.total_daily_manure_volume,
+
+                final_solids_wet_mass=(
+                        rp.TS * self.config.TS_removal_efficiency / self.config.percent_dry_solids
                 ),
 
-                final_solids_dry_content=rp.TSd,
-                TS_liquid=rp.TSd * (1 - self.config.TS_removal_efficiency),
+                final_solids_dry_mass=rp.TS,  # TODO: Review this
+
+                TS_liquid=rp.TS * (1 - self.config.TS_removal_efficiency),
                 VS_liquid=rp.VS_total * (1 - self.config.VS_removal_efficiency),
-                N_liquid=rp.N_manure * (1 - self.config.N_removal_efficiency),
-                TAN_liquid=rp.TAN_s * (1 - self.config.TAN_removal_efficiency),
-                P_liquid=rp.p_excrt_manure * (1 - self.config.P_removal_efficiency),
-                K_liquid=rp.K_manure * (1 - self.config.K_removal_efficiency),
+                N_liquid=rp.N * (1 - self.config.N_removal_efficiency),
+                TAN_liquid=rp.TAN * (1 - self.config.TAN_removal_efficiency),
+                P_liquid=rp.P * (1 - self.config.P_removal_efficiency),
+                K_liquid=rp.K * (1 - self.config.K_removal_efficiency),
 
-                TS_solid=rp.TSd * self.config.TS_removal_efficiency,
+                TS_solid=rp.TS * self.config.TS_removal_efficiency,
                 VS_solid=rp.VS_total * self.config.VS_removal_efficiency,
-                N_solid=rp.N_manure * self.config.N_removal_efficiency,
-                TAN_solid=rp.TAN_s * self.config.TAN_removal_efficiency,
-                P_solid=rp.p_excrt_manure * self.config.P_removal_efficiency,
-                K_solid=rp.K_manure * self.config.K_removal_efficiency,
+                N_solid=rp.N * self.config.N_removal_efficiency,
+                P_solid=rp.P * self.config.P_removal_efficiency,
+                K_solid=rp.K * self.config.K_removal_efficiency,
 
-                TS_DM_effluent=rp.TSd * self.config.TS_DM_effluent_rate
+                TS_DM_effluent=rp.TS * self.config.TS_DM_effluent_rate  # TODO: Review this
         )
         self.all_output.append(daily_output)
         return daily_output

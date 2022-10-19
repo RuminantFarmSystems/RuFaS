@@ -138,11 +138,11 @@ class MilkingCenter:
     def total_water_volume_used_in_milking_center(self, pen: ManureManagementPen) -> float:
         """Total volume of water used in the milking center.
 
-        Parameters
+        Args:
             pen: ManureManagementPen object.
 
-        Returns
-            Total volume of water used in the milking center, liters.
+        Returns:
+            Total volume of water used in the milking center, L.
 
         """
 
@@ -163,7 +163,7 @@ class MilkingCenter:
         """
 
         if self._has_lac_cow_in_pen(pen):
-            return pen.manure.Mkg * self.total_percent_of_day_spent_in_milking_center / 100
+            return pen.manure.manure_mass * self.total_percent_of_day_spent_in_milking_center / 100
         return 0.0
 
     def manure_volume_deposited_in_milking_center(self, pen: ManureManagementPen) -> float:

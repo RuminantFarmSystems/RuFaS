@@ -16,7 +16,7 @@ from RUFAS.routines.animal.life_cycle.heiferIII import HeiferIII
 from RUFAS.routines.animal.pen import Pen
 from RUFAS.routines.manure.constants.constants import ManureManagementConstants
 from RUFAS.routines.manure.default_enum.default_enum import DefaultEnum
-from RUFAS.routines.manure.manure.manure import Manure
+from RUFAS.routines.manure.manure.pen_manure import PenManure
 from RUFAS.routines.manure.manure_handlers.bedding_classes import BaseBedding
 from RUFAS.routines.manure.manure_handlers.bedding_classes import BeddingConfig
 from RUFAS.routines.manure.manure_handlers.bedding_classes import BeddingFactory
@@ -80,9 +80,9 @@ def mock_cow(mocker: MockerFixture) -> Cow:
 def manure_attributes() -> List[str]:
     """Returns a list of manure attributes"""
 
-    return ['U', 'TAN_s', 'MN', 'Mkg', 'TSd',
-            'VSd', 'VSnd', 'WIP_frac', 'WOP_frac', 'p_excrt_manure',
-            'K_manure', 'CH4_manure']
+    return ['urea', 'TAN', 'N', 'manure_mass', 'TS',
+            'VSd', 'VSnd', 'WIP_frac', 'WOP_frac', 'P',
+            'K', 'CH4_animal']
 
 
 @fixture
@@ -200,62 +200,62 @@ def test_get_type_no_members() -> None:
         DummyDefaultEnumWithNoMembers.get_type('dummy')
 
 
-# Test Manure class
+# Test PenManure class
 # =================
 
 def test_manure_init(manure_attributes: List[str],
                      generate_animal_manure: Callable[[float], Dict[str, float]]) -> None:
-    """Unit test for function __init__ in file manure.py"""
+    """Unit test for function __init__ in file pen_manure.py"""
 
-    # Given no arguments, a new Manure object should have all attributes
+    # Given no arguments, a new PenManure object should have all attributes
     # initially set to 0.
-    manure = Manure()
+    manure = PenManure()
     for attr in manure_attributes:
         assert hasattr(manure, attr)
         assert getattr(manure, attr) == approx(0.0)
 
-    # Given a dictionary of arguments, a new Manure object should have all attributes
+    # Given a dictionary of arguments, a new PenManure object should have all attributes
     # initially set to the correct values.
     manure_data = generate_animal_manure(0.0)
-    manure = Manure(**manure_data)
+    manure = PenManure(**manure_data)
     for attr in manure_attributes:
         assert hasattr(manure, attr)
         assert getattr(manure, attr) == approx(0.0)
 
-    # Given one or more arguments, a new Manure object should either set
+    # Given one or more arguments, a new PenManure object should either set
     # the corresponding attributes to the given values or do some calculations.
-    manure = Manure(
+    manure = PenManure(
             # The following attributes should be modified via unit conversion.
-            U=2.0,
-            TAN_s=3.0,
-            MN=4.0,
+            urea=2.0,
+            TAN=3.0,
+            N=4.0,
             VSd=5.0,
             VSnd=6.0,
-            p_excrt_manure=7.0,
-            K_manure=8.0,
+            P=7.0,
+            K=8.0,
 
             # The following attributes should stay the same.
             # Only pick two as an example.
-            Mkg=10.0,
-            CH4_manure=10.0
+            manure_mass=10.0,
+            CH4_animal=10.0
     )
     constants = ManureManagementConstants
-    assert manure.U == approx(2.0 * constants.UREA_MOLAR_MASS)
-    assert manure.TAN_s == approx(3.0 * constants.TAN_MOLAR_MASS)
-    assert manure.MN == approx(4.0 * constants.GRAMS_TO_KG)
+    assert manure.urea == approx(2.0 * constants.UREA_MOLAR_MASS)
+    assert manure.TAN == approx(3.0 * constants.TAN_MOLAR_MASS)
+    assert manure.N == approx(4.0 * constants.GRAMS_TO_KG)
     assert manure.VSd == approx(5.0 * constants.GRAMS_TO_KG)
     assert manure.VSnd == approx(6.0 * constants.GRAMS_TO_KG)
-    assert manure.p_excrt_manure == approx(7.0 * constants.GRAMS_TO_KG)
-    assert manure.K_manure == approx(8.0 * constants.GRAMS_TO_KG)
+    assert manure.P == approx(7.0 * constants.GRAMS_TO_KG)
+    assert manure.K == approx(8.0 * constants.GRAMS_TO_KG)
 
-    assert manure.Mkg == approx(10.0)
-    assert manure.CH4_manure == approx(10.0)
+    assert manure.manure_mass == approx(10.0)
+    assert manure.CH4_animal == approx(10.0)
 
     # The remaining attributes should be set to the default value of 0.
-    assert manure.TSd == approx(0.0)
+    assert manure.TS == approx(0.0)
     assert manure.WIP_frac == approx(0.0)
     assert manure.WOP_frac == approx(0.0)
-    assert manure.p_frac == approx(0.0)
+    assert manure.P_frac == approx(0.0)
 
 
 # Test ManureManagement class
@@ -339,7 +339,7 @@ def test_manure_management_pen_init(mock_pen: Pen,
     # Arrange
     mock_pen.manure['Mkg'] = 100.0
     dummy_manure_data = generate_animal_manure(0.0)
-    dummy_manure_data['Mkg'] = 100.0
+    dummy_manure_data['manure_mass'] = 100.0
 
     # Act
     pen = ManureManagementPen(mock_pen)
@@ -356,7 +356,7 @@ def test_manure_management_pen_init(mock_pen: Pen,
     assert pen.manure_treatment == 'storage pit'
     assert pen.num_animals == len(mock_pen.animals_in_pen)
     assert pen.manure_density == 990.0  # kg/m3
-    assert pen.manure == Manure(**dummy_manure_data)
+    assert pen.manure == PenManure(**dummy_manure_data)
     assert pen.manure_mass == approx(100.0)
     assert pen.manure_volume == approx(100.0 / 990.0)
 
@@ -894,9 +894,9 @@ def test_manure_mass_deposited_in_milking_center(mock_milking_center: MilkingCen
     # Case 1: There are cows in the pen.
     # Arrange
     pen = ManureManagementPen(mock_pen)
-    pen.manure.Mkg = 100.0
+    pen.manure.manure_mass = 100.0
     expected_manure_mass_deposited_in_milking_center = \
-        pen.manure.Mkg * mock_milking_center.total_percent_of_day_spent_in_milking_center / 100.0
+        pen.manure.manure_mass * mock_milking_center.total_percent_of_day_spent_in_milking_center / 100.0
 
     # Act
     manure_mass_deposited_in_milking_center = mock_milking_center.manure_mass_deposited_in_milking_center(pen)
@@ -959,18 +959,18 @@ def test_manure_handler_daily_output_init() -> None:
             simulation_day=1,
             pen_id=1,
             urea=1.0,
-            TAN_s=2.0,
-            N_manure=3.0,
-            TSd=4.0,
+            TAN=2.0,
+            N=3.0,
+            TS=4.0,
             VSd=5.0,
             VSnd=6.0,
             WIP_frac=0.70,
             WOP_frac=0.80,
-            p_excrt_manure=9.0,
-            K_manure=10.0,
-            raw_manure=14.0,
-            cleaning_water=15.0,
-            total_bedding_mass=16.0,
+            P=9.0,
+            K=10.0,
+            manure_volume=14.0,
+            cleaning_water_volume=15.0,
+            total_bedding_volume=16.0,
             total_water_volume_in_milking_center=17.0
     )
 
@@ -978,21 +978,21 @@ def test_manure_handler_daily_output_init() -> None:
     assert manure_handler_output.simulation_day == 1
     assert manure_handler_output.pen_id == 1
     assert manure_handler_output.urea == approx(1.0)
-    assert manure_handler_output.TAN_s == approx(2.0)
-    assert manure_handler_output.N_manure == approx(3.0)
-    assert manure_handler_output.TSd == approx(4.0)
+    assert manure_handler_output.TAN == approx(2.0)
+    assert manure_handler_output.N == approx(3.0)
+    assert manure_handler_output.TS == approx(4.0)
     assert manure_handler_output.VSd == approx(5.0)
     assert manure_handler_output.VSnd == approx(6.0)
     assert manure_handler_output.VS_total == approx(5.0 + 6.0)
     assert manure_handler_output.WIP_frac == approx(0.70)
     assert manure_handler_output.WOP_frac == approx(0.80)
-    assert manure_handler_output.p_excrt_manure == approx(9.0)
-    assert manure_handler_output.K_manure == approx(10.0)
-    assert manure_handler_output.raw_manure == approx(14.0)
-    assert manure_handler_output.cleaning_water == approx(15.0)
-    assert manure_handler_output.total_bedding_mass == approx(16.0)
+    assert manure_handler_output.P == approx(9.0)
+    assert manure_handler_output.K == approx(10.0)
+    assert manure_handler_output.manure_volume == approx(14.0)
+    assert manure_handler_output.cleaning_water_volume == approx(15.0)
+    assert manure_handler_output.total_bedding_volume == approx(16.0)
     assert manure_handler_output.total_water_volume_in_milking_center == approx(17.0)
-    assert manure_handler_output.total_daily_mass == approx(14.0 + 15.0 + 16.0 + 17.0)
+    assert manure_handler_output.total_daily_manure_volume == approx(14.0 + 15.0 + 16.0 + 17.0)
 
 
 # Test ManureHandlerConfig

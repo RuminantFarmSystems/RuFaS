@@ -89,19 +89,17 @@ class BaseManureHandler:
         daily_output = ManureHandlerDailyOutput(
                 simulation_day=sim_day,
                 pen_id=pen.id,
-                urea=pen.manure.U,
-                TAN_s=pen.manure.TAN_s,
-                N_manure=pen.manure.MN,
-                TSd=pen.manure.TSd,
+                urea=pen.manure.urea,
+                TAN=pen.manure.TAN,
+                N=pen.manure.N,
+                TS=pen.manure.TS,
                 VSd=pen.manure.VSd,
                 VSnd=pen.manure.VSnd,
-                WIP_frac=pen.manure.WIP_frac,
-                WOP_frac=pen.manure.WOP_frac,
-                p_excrt_manure=pen.manure.p_excrt_manure,
-                K_manure=pen.manure.K_manure,
-                raw_manure=pen.manure_mass,
-                cleaning_water=self.cleaning_water_volume_in_main_barn(pen),
-                total_bedding_mass=self.bedding.total_bedding_mass(pen),
+                P=pen.manure.P,
+                K=pen.manure.K,
+                manure_volume=pen.manure_volume,
+                cleaning_water_volume=self.cleaning_water_volume_in_main_barn(pen),
+                total_bedding_volume=self.bedding.total_bedding_volume(pen),
                 total_water_volume_in_milking_center=self.milking_center.total_water_volume_used_in_milking_center(
                         pen)
         )
