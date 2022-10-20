@@ -2,7 +2,7 @@
     "latitude": 43.304346,
 
     "crops": {
-        "corn": {
+        "Corn": {
             "plant_years": [2010,2011,2012,2013],
             "repeat": 0,
             "planting_day": 121,
