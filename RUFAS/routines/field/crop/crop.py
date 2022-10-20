@@ -79,7 +79,7 @@ def daily_crop_routine(soil, crop, field_management, weather, time):
                 root_development.update_all(crop_type)
                 nitrogen_uptake.reallocate_nitrogen(crop_type, soil)
                 phosphorus_uptake.update_all(soil, crop_type)
-                growth_constraints.update_growth_factor(soil, crop_type, weather, time)
+                growth_constraints.update_growth_factor(crop_type, soil, weather, time)
                 leaf_area_index.update_all(crop_type)
                 biomass.allocate_biomass(crop_type, soil, weather, time)
 
