@@ -55,7 +55,7 @@ def update_nitrogen_fraction(crop) -> None:
 
     Returns: Nothing. Instead, the crop.fr_N attribute is updated.
     """
-    shapes = calc_shape_parameters(heatfrac_half=crop.fr_PHU_50, heatfrac_full=crop.fr_PHU_100, nfrac_1=crop.fr_n1,
+    shapes = calc_shape_parameters(heatfrac_half= crop.fr_PHU_50, heatfrac_full=crop.fr_PHU_100, nfrac_1=crop.fr_n1,
                                    nfrac_2=crop.fr_n2, nfrac_near=crop.fr_n3ish, nfrac_3=crop.fr_n3)
     if crop.biomass_actual == 0:
         crop.fr_N = 0
@@ -113,7 +113,9 @@ def calc_shape_log(heat_frac: float, nfrac_x: float, nfrac_3: float, nfrac_1: fl
         raise ValueError("nfrac_1 must not be equivalent to nfrac_3")
     if nfrac_x == nfrac_1:  # leads to divide by zero
         raise ValueError("nfrac_x must not be equivalent to nfrac_1")
-    if nfrac_x == nfrac_3:  # leads to log(0)
+    if nfrac_x == nfrac_3: 
+        print(nfrac_x)
+        nfrac_x=nfrac_x + 0.001 # leads to log(0)
         raise ValueError("nfrac_x must not be equivalent to nfrac_3")
     if nfrac_x > nfrac_1 or nfrac_x == nfrac_1:  # leads to ln(-y) or divide by 0
         raise ValueError("nfrac_x must be less than nfrac_1")

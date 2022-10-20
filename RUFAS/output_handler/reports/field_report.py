@@ -118,7 +118,6 @@ class FieldReport(BaseReportDriver):
         def __init__(self, data, state, field_name):
             super().__init__(data)
             self.field_name = field_name
-            print(state.fields.fields[self.field_name].crop.croplist)
             for crop_type_name in state.fields.fields[self.field_name].crop.croplist:
                     self.reports['crop_' + str(crop_type_name)] = \
                         self.CropTypeReport(data['crop_type_reports'], field_name, crop_type_name)
