@@ -64,10 +64,8 @@ def daily_crop_routine(soil, crop, field_management, weather, time, croptime):
             heat_units.update_all(crop_type, weather, time)
 
             root_development.update_all(crop_type)
-            try: 
-                nitrogen_uptake.reallocate_nitrogen(crop_type,soil)
-            except:
-                print(time.index)
+            
+            nitrogen_uptake.reallocate_nitrogen(crop_type,soil)
 
             phosphorus_uptake.update_all(soil, crop_type)
 
@@ -87,7 +85,8 @@ def daily_crop_routine(soil, crop, field_management, weather, time, croptime):
         
         annual_variable_update(crop_type)
         crop.current_crop[crop_type_name] = crop_type
-
+        crop.crop_biomass_totals = crop_type.bio_AG
+        crop.crop_yield_totals = crop_type.yield_actual
 
 def daily_reset(crop_type, soil):
     """
@@ -181,7 +180,8 @@ class Crop(object):
         self.current_crop = {}
         self.crops_data = data['crops']
         self.croplist = data['crops']
-    
+        self.crop_biomass_totals = 0
+        self.crop_yield_totals=0
     def setcrop(self, cropname):
         if (cropname== 'BaseCrop'): 
             return getattr(self.crop_classes, 'BaseCrop')()

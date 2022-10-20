@@ -73,7 +73,7 @@ class FieldReport(BaseReportDriver):
         self.report_name = self.field_name
         self.reports = {
             'soil_report': self.SoilReportDriver(data['soil_report'], state, field_name),
-            'crop_report': self.CropReportDriver(data['crop_report'], state,field_name),
+            'crop_report': self.CropReportDriver(data['crop_report'], state, field_name),
             'field_management_report': self.FieldManagementReport(data['field_management_report'], field_name),
             'nitrogen_mass_balance': self.NitrogenBalance(data['nitrogen_balance'], field_name),
             'phosphorus_mass_balance': self.PhosphorusBalance(data['phosphorus_balance'], field_name),
@@ -122,6 +122,8 @@ class FieldReport(BaseReportDriver):
                     self.reports['crop_' + str(crop_type_name)] = \
                         self.CropTypeReport(data['crop_type_reports'], field_name, crop_type_name)
 
+            self.reports['crop_full'] = self.CropReport(data, field_name)
+        
         class BaseCropTypeReport(BaseReport):
             def __init__(self, data, field_name, crop_type_name):
                 super().__init__(data)
@@ -137,6 +139,7 @@ class FieldReport(BaseReportDriver):
                 for variable in self.daily_variables:
                     self.daily_variables[variable][2].append(
                         eval(self.daily_variables[variable][0], globals(), locals()))
+            
 
             def annual_update(self, state, weather, time):
                 field = state.fields.fields[self.field_name]
@@ -145,7 +148,6 @@ class FieldReport(BaseReportDriver):
                 for variable in self.annual_variables:
                     self.annual_variables[variable][2] = \
                         eval(self.annual_variables[variable][0], globals(), locals())
-
         class CropTypeReport(BaseCropTypeReport):
             def __init__(self, data, field_name, crop_type_name):
                 super().__init__(data, field_name, crop_type_name)
@@ -162,10 +164,34 @@ class FieldReport(BaseReportDriver):
                                     'HI_act': ['crop_type.HI_actual', 'dmnl', []],
                                     'fr_root': ['crop_type.fr_root', 'dmnl', []]
                                     }
-
+        
                 self.annual_variables = {'year': ['time.calendar_year', '', 0],
                                         'yield': ['crop_type.yield_annual', 'kg/ha', 0]
                                         }
+
+
+        class BaseFieldReport(BaseReport):
+            def __init__(self, data, field_name):
+                super().__init__(data)
+                self.field_name = field_name
+                self.crop = field_name
+
+            def daily_update(self, state, weather, time):
+                        field = state.fields.fields[self.field_name]
+                        soil = field.soil
+                        crop = state.fields.fields[self.field_name].crop
+                        for variable in self.daily_variables:
+                            self.daily_variables[variable][2].append(
+                                eval(self.daily_variables[variable][0], globals(), locals()))
+
+        class CropReport(BaseFieldReport):
+            def __init__(self, data, field_name):
+                super().__init__(data, field_name)
+                self.daily_variables = {'year': ['time.calendar_year', '', []],
+                                    'j_day': ['time.day', '', []],
+                                    'ag_biomass': ['crop.crop_biomass_totals', 'kg ha^-1', []],
+                                    'yield_total': ['crop.crop_yield_totals', 'm^2/m^2', []]
+                                    }
 
 
     class SoilReportDriver(BaseReportDriver):
