@@ -1,238 +1,139 @@
 """
-RUFAS: Ruminant Farm Systems Model
-
-File name: growth_constraints.py
-
-Author(s): Andy Achenreiner, achenreiner@wisc.edu
-           Jacob Johnson, jacob8399@gmail.com
+Author(s): Clay Morrow (morrowcj@outlook.com); Andy Achenreiner (achenreiner@wisc.edu);
+           Jacob Johnson (jacob8399@gmail.com)
 
 Description: This module contains the necessary functions for calculating and
-             updating the growth constraints of a crop_type. Currently the only
-             function meant to be used outside of this file is the update_all()
-             function. The other functions are meant to serve as helper
-             functions within this file.
-
-CropType attribute definitions:
-
-    bio_N = Actual mass of nitrogen stored in plant material (kg N/ha)
-
-    bio_N_opt = Optimal mass of nitrogen stored in plant material for current
-                growth stage (kg N/ha)
-
-    phi_N = scaling factor for nitrogen stress
-
-    bio_P = Actual mass of phosphorus stored in plant material (kg P/ha)
-
-    bio_P_opt = Optimal mass of phosphorus stored in plant material for current
-                growth stage (kg P/ha)
-
-    phi_P = scaling factor for phosphorus stress
-
-    w_stress = Water stress for a given day
-
-    t_stress = Temperature stress for a given day
-
-    n_stress = Nitrogen stress for a given day
-
-    p_stress = Phosphorus stress for a given day
-
-    gamma_reg = Plant growth factor
-
-
-CropType values updated by update_all():
-
-    gamma_reg
-
+             updating the growth constraints of a crop.
 """
 
 from math import exp
 
 
-def update_all(soil, crop_type, weather, time):
+def update_growth_factor(crop, soil, weather, time) -> None:
     """
-    Description:
-        Updates crop information relevant to growth constraints
+    Description: Updates the crop growth factor
 
     Args:
-        soil: an instance of the Soil class specified in soil.py representing
-            the current state of the soil profile
-        crop_type: an instance of a crop class
-            containing environmental information
-        weather: an instance of the Weather class specified in classes.py
-            containing environmental information
-        time: an instance of the Time class specified in classes.py
+        crop: an instance of BaseCrop
+        soil: an instance of Soil
+        weather: an instance of Weather
+        time: an instance of Time
 
-    """
-
-    # update gamma_reg value
-    calc_gamma_reg(soil, crop_type, weather, time)
-
-
-def calc_gamma_reg(soil, crop_type, weather, time):
-    """
-    Description:
-        Calculates plant growth factor (AKA gamma_reg).
-        "pseudocode_crop" C.7
-
-    Args:
-        crop_type
-        time
-        weather
-        soil
-    """
-
-    w_stress = calc_w_stress(soil, crop_type)
-    t_stress = calc_t_stress(crop_type, weather, time)
-    n_stress = calc_n_stress(crop_type)
-    p_stress = calc_p_stress(crop_type)
-
-    # C.7.E.1
-    crop_type.gamma_reg = 1.0 - max(w_stress, t_stress, n_stress, p_stress)
-
-
-"""
-The following functions comprise the "Growth Constraints".
-This includes the water, temperature, nitrogen, and phosphorus stress
-for a given day. These values are needed to calculate the gamma_reg value.
-They do not modify the values of any State class.
-"""
-
-
-def calc_w_stress(soil, crop_type):
-    """
-    Description:
-        Calculates water stress for a given day.
-        "pseudocode_crop" C.7.A.1
-
-    Args:
-        crop_type
-        soil
     Returns:
-        float: water stress
+        Noting. Instead, the crop.gamma_reg attribute is updated
+    """
+    #  TODO: plant transpiration should be an attribute of the crop, not the soil
+    w_stress = calc_water_stress(water_uptake=crop.water_act_up, max_transpiration=soil.trans_max)
+
+    avg_air_temp = weather.T_avg[time.year - 1][time.day - 1]
+    t_stress = calc_temperature_stress(air_temp=avg_air_temp, min_temp=crop.T_base_min, optimal_temp=crop.T_opt)
+
+    n_stress_factor = calc_nutrient_stress_scaling_factor(stored=crop.bio_N, optimal=crop.bio_N_opt)
+    n_stress = calc_nutrient_stress(optimal=crop.bio_N_opt, stress_factor=n_stress_factor)
+
+    p_stress_factor = calc_nutrient_stress_scaling_factor(stored=crop.bio_P, optimal=crop.bio_P_opt)
+    p_stress = calc_nutrient_stress(optimal=crop.bio_P_opt, stress_factor=p_stress_factor)
+
+    crop.gamma_reg = calc_growth_factor(w_stress, t_stress, n_stress, p_stress)
+
+
+def calc_growth_factor(water_stress, temperature_stress, nitrogen_stress, phosphorus_stress) -> float:  # pseudocode: C.7.E.1
+    """
+    Description: Calculates plant growth factor
+
+    Args:
+        water_stress: plant water stress
+        temperature_stress: plant temperature stress
+        nitrogen_stress: plant nitrogen stress
+        phosphorus_stress: plant phosphorus stress
+
+    Returns: plant growth factor
+    """
+    # TODO: all the stress values seem like they should be constrained to [0, 1]
+    return 1.0 - max(water_stress, temperature_stress, nitrogen_stress, phosphorus_stress)
+
+
+def calc_water_stress(water_uptake: float, max_transpiration: float) -> float:  # pseudocode: C.7.A.1
+    """
+    Description: Calculates water stress for a given day.
+
+    Args:
+        water_uptake: the water taken up by the plant from the soil
+        max_transpiration: the maximum plant transpiration on a given day
+
+    Returns: the plant's water stress
+    """
+    if max_transpiration == 0:  # avoid division by zero
+        return 0
+
+    stress = 1 - (water_uptake / max_transpiration)
+    stress = max(0., stress)  # constrain to 0
+    stress = min(1., stress)  # constrain to 1
+    # todo - old code also constrained stress to 0.99, but why? (not in pseudocode)
+    # stress = min(0.99, stress)
+
+    return stress
+
+
+def calc_temperature_stress(air_temp: float, min_temp: float, optimal_temp: float) -> float:  # pseudocode C.7.B.
+    """
+    Description: Calculates temperature stress for a given day.
+
+    Args:
+        air_temp: average air temperature (Celsius)
+        min_temp: minimum temperature for plant growth (Celsius)
+        optimal_temp: optimal temperature for plant growth (Celsius)
+
+    Returns: the plant's temperature stress
     """
 
-    if soil.trans_max == 0:
-        return 0
-    w_stress = 1.0 - (crop_type.water_act_up / soil.trans_max)
-    if w_stress < 0:
-        return 0
+    numerator = -0.1054 * (optimal_temp - air_temp)**2
+    double_diff = 2*optimal_temp - min_temp
+
+    if min_temp < air_temp <= optimal_temp:
+        stress = 1 - exp(numerator / (air_temp - min_temp)**2)
+
+    elif optimal_temp < air_temp <= double_diff:
+        stress = 1 - exp(numerator / (double_diff - min_temp)**2)
+
     else:
-        return min(0.99, w_stress)
+        stress = 1
+
+    return stress
 
 
-def calc_t_stress(crop_type, weather, time):
+def calc_nutrient_stress(optimal: float, stress_factor) -> float:  # pseudocode C.7.C.2
     """
-    Description:
-        Calculates temperature stress for a given day.
-        "pseudocode_crop" C.7.B.1-4
+    Description: Calculates plant nutrient stress for the day.
 
     Args:
-        crop_type
-        time
-        weather
-    Returns;
-        float: temperature stress
+        optimal: the optimal mass of the nutrient stored in the plant
+        stress_factor: the stress scaling factor of the nutrient
+
+    Returns: nutrient stress
     """
-
-    # C.7.B.1
-    T_avg = weather.T_avg[time.year - 1][time.day - 1]
-    T_opt = crop_type.T_opt
-    T_base_min = crop_type.T_base_min
-    MAX = 0.99
-
-    if T_avg <= T_base_min:
-        t_stress = MAX
-
-    # C.7.B.2
-    elif T_base_min < T_avg <= T_opt:
-        top_half_eq = -0.1054 * (T_opt - T_avg) ** 2
-        bottom_half_eq = (T_avg - T_base_min) ** 2
-        t_stress = 1 - (0 if bottom_half_eq == 0 else exp(top_half_eq / bottom_half_eq))
-
-    # C.7.B.3
-    elif T_opt < T_avg <= (2 * T_opt - T_base_min):
-        top_half_eq = -0.1054 * (T_opt - T_avg) ** 2
-        bottom_half_eq = ((2 * T_opt - T_avg) - T_base_min) ** 2
-        t_stress = 1 - (0 if bottom_half_eq == 0 else exp(top_half_eq / bottom_half_eq))
-
-    # C.7.B.4
-    else:  # T_avg > (2*T_opt - T_base_min):
-        t_stress = MAX
-
-    return min(t_stress, MAX)
-
-
-def calc_n_stress(crop_type):
-    """
-    Description:
-        Calculates nitrogen stress for a given day.
-        "pseudocode_crop" C.7.C.2
-
-    Args:
-        crop_type
-    Returns:
-        float: nitrogen stress
-    """
-
-    if crop_type.bio_N_opt == 0:
-        return 0
-    phi_n = calc_phi_N(crop_type)
-    n_stress = 1 - phi_n / (phi_n + exp(3.535 - 0.02597 * phi_n))
-    return min(0.99, n_stress)
-
-
-def calc_phi_N(crop_type):
-    """
-    Description:
-        Calculates nitrogen stress scaling factor.
-        "pseudocode_crop" C.7.C.1
-
-    Args:
-        crop_type
-    Returns:
-        float: scaling factor
-    """
-
-    if crop_type.bio_N_opt == 0:
-        return 300
+    if optimal == 0:
+        # TODO - Why was the stress factor set to 300 if it doesn't get used in this case.
+        #   Also, why is there no stress in this case?
+        stress = 0
     else:
-        phi_n = 200 * ((crop_type.bio_N / crop_type.bio_N_opt) - 0.5)
-        return max(0, phi_n)
+        stress = 1 - stress_factor / (stress_factor + exp(3.535 - 0.02597 * stress_factor))
+    return min(1, stress)
 
 
-def calc_p_stress(crop_type):
+def calc_nutrient_stress_scaling_factor(stored: float, optimal: float) -> float:  # pseudocode C.7.C.1
     """
-    Description:
-        Calculates phosphorus stress for a given day.
-        "pseudocode_crop" C.7.D.2
+    Description: Calculates nutrient stress scaling factor.
 
     Args:
-        crop_type
-    Returns:
-        float: phosphorus stress
+        stored: amount of the nutrient stored in the plant
+        optimal: optimal amount of the nutrient stored
+
+    Returns: nutrient scaling factor
     """
-
-    if crop_type.bio_P_opt == 0:
-        return 0
-    phi_p = calc_phi_P(crop_type)
-    p_stress = 1 - phi_p / (phi_p + exp(3.535 - 0.02597 * phi_p))
-    return min(0.99, p_stress)
-
-
-def calc_phi_P(crop_type):
-    """
-    Description:
-        Calculates phosphorus stress scaling factor.
-        "pseudocode_crop" C.7.D.1
-
-    Args:
-        crop_type
-    Returns:
-        float: phosphorous stress scaling factor, phi_p
-    """
-
-    if crop_type.bio_P_opt == 0:
-        return 300
+    if optimal == 0:
+        stress_factor = 300
     else:
-        phi_p = 200 * ((crop_type.bio_P / crop_type.bio_P_opt) - 0.5)
-        return max(0, phi_p)
+        stress_factor = 200*(stored / optimal - 0.5)
+
+    return max(0, stress_factor)

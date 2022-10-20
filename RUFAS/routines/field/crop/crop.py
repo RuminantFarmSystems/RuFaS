@@ -181,7 +181,7 @@ class Crop(object):
         self.crops_data = data['crops']
         self.croplist = data['crops']
         self.crop_biomass_totals = 0
-        self.crop_yield_totals=0
+        self.crop_yield_totals= 0
     def setcrop(self, cropname):
         if (cropname== 'BaseCrop'): 
             return getattr(self.crop_classes, 'BaseCrop')()
