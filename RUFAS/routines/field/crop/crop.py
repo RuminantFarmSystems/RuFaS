@@ -69,7 +69,7 @@ def daily_crop_routine(soil, crop, field_management, weather, time, croptime):
 
             phosphorus_uptake.update_all(soil, crop_type)
 
-            growth_constraints.update_growth_factor(soil, crop_type, weather, time)
+            growth_constraints.update_growth_factor(crop_type, soil,weather, time)
 
             leaf_area_index.update_all(crop_type)
 
