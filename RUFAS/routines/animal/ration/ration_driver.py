@@ -499,12 +499,9 @@ class AvailableFeeds:
 
         """
 
-        # Build a dictionary that keeps track of the list index of each feed_id.
-        # Because attributes within the AvailableFeeds class are mainly stored as lists,
-        # knowing the index of a feed_id allows quick retrieval of corresponding value for
-        # the attribute of interest. For example, let say, the feed_id #26 is stored at index 1
-        # in the self.feed_id list, so we know the price of this feed_id is also stored
-        # at index 1 in the self.price list.
+        # An explanation of code seen below can be found in Basecamp with the following path:
+        # RuFaS > Docs & Files > Animal Module > Ration Driver Logic
+
         if not self._feed_id_to_list_idx_dict:
             self._feed_id_to_list_idx_dict = {fid: i for i, fid in enumerate(self.feed_id)}
 
@@ -513,15 +510,9 @@ class AvailableFeeds:
         for key, vals in self.__dict__.items():
             if key in excluded_keys:
                 continue
-
-            # If the value of an attribute is an empty list,
-            # we also keep it as an empty list in the returned data.
             if not vals:
                 result[key] = []
                 continue
-
-            # For those attributes that are lists of numbers (e.g., CP, DE, EE, etc.),
-            # we only want to select the numbers at the same indices as given feed ids.
             for feed_id in sorted(list(feed_ids)):
                 # Get the list index of the feed_id in self.feed_id list.
                 idx = self._feed_id_to_list_idx_dict[int(feed_id)]
