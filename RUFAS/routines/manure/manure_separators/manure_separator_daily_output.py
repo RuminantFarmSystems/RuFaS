@@ -19,7 +19,7 @@ class ManureSeparatorDailyOutput:
         K: Amount of potassium in manure, kg.
         total_daily_manure_volume: Total amount of manure, bedding, and water combined, m^3.
         final_solids_wet_mass: Total mass of the solids on wet-weight basis, kg.
-        final_solids_dry_mass: Total mass of the solids on dry-weight basis, kg.
+        final_solids_wet_mass_volume: Total volume of the solids on wet-weight basis, m^3.
 
         TS_solid: Total amount of solids in the separated solids, kg.
         VS_solid: Total amount of volatile solids in the separated solids, kg.
@@ -34,21 +34,20 @@ class ManureSeparatorDailyOutput:
         P_liquid: Total amount of phosphorus in the manure volume, kg.
         K_liquid: Total amount of potassium in the manure volume, kg.
 
-        TS_DM_effluent:
-        final_daily_volume:
+        final_daily_volume: Total manure volume after separation, m^3.
 
     """
     simulation_day: int = -1
     pen_id: int = -1
-    TAN: float = 0.0  # g/L
-    N: float = 0.0  # kg
-    TS: float = 0.0  # kg
-    VS_total: float = 0.0  # kg
-    P: float = 0.0  # kg
-    K: float = 0.0  # kg
-    total_daily_manure_volume: float = 0.0  # m^3
+    TAN: float = 0.0
+    N: float = 0.0
+    TS: float = 0.0
+    VS_total: float = 0.0
+    P: float = 0.0
+    K: float = 0.0
+    total_daily_manure_volume: float = 0.0
     final_solids_wet_mass: float = 0.0
-    final_solids_dry_mass: float = 0.0
+    final_solids_wet_mass_volume: float = field(init=False)
 
     TS_solid: float = 0.0
     VS_solid: float = 0.0
@@ -63,8 +62,9 @@ class ManureSeparatorDailyOutput:
     P_liquid: float = 0.0
     K_liquid: float = 0.0
 
-    TS_DM_effluent: float = 0.0
     final_daily_volume: float = field(init=False)
 
     def __post_init__(self):
-        self.final_daily_volume = self.total_daily_manure_volume - self.final_solids_wet_mass
+        self.final_solids_wet_mass_volume = self.final_solids_wet_mass / 400.0
+        # TODO: Replace hardcoded value, but this one comes from manure solids bedding
+        self.final_daily_volume = self.total_daily_manure_volume - self.final_solids_wet_mass_volume

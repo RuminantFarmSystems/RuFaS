@@ -30,7 +30,7 @@ class ReceptionPitDailyOutput:
     TAN: float = 0.0
     N: float = 0.0
     TS: float = 0.0
-    # TODO: total_bedding_dry_solids = total_bedding_mass/bedding_dry_matter_mass
+    # TODO: total_bedding_dry_solids = total_bedding_mass/bedding_dry_matter_content, kg
     # TODO: TS = Add handler.TS + total_bedding_dry_solids, kg
 
     VSd: float = 0.0

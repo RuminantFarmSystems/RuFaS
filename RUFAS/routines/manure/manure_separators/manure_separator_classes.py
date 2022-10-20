@@ -76,8 +76,6 @@ class BaseManureSeparator:
                         rp.TS * self.config.TS_removal_efficiency / self.config.percent_dry_solids
                 ),
 
-                final_solids_dry_mass=rp.TS,  # TODO: Review this
-
                 TS_liquid=rp.TS * (1 - self.config.TS_removal_efficiency),
                 VS_liquid=rp.VS_total * (1 - self.config.VS_removal_efficiency),
                 N_liquid=rp.N * (1 - self.config.N_removal_efficiency),
@@ -91,7 +89,6 @@ class BaseManureSeparator:
                 P_solid=rp.P * self.config.P_removal_efficiency,
                 K_solid=rp.K * self.config.K_removal_efficiency,
 
-                TS_DM_effluent=rp.TS * self.config.TS_DM_effluent_rate  # TODO: Review this
         )
         self.all_output.append(daily_output)
         return daily_output
@@ -166,7 +163,6 @@ class DefaultManureSeparatorConfigFactory:
             TAN_removal_efficiency=0.15,
             P_removal_efficiency=0.4,
             K_removal_efficiency=0.15,
-            TS_DM_effluent_rate=0.2
     )
     SCREW_PRESS_CONFIG = ManureSeparatorConfig(
             percent_dry_solids=0.35,
@@ -176,7 +172,6 @@ class DefaultManureSeparatorConfigFactory:
             TAN_removal_efficiency=0.10,
             P_removal_efficiency=0.2,
             K_removal_efficiency=0.23,
-            TS_DM_effluent_rate=0.35
     )
 
     @classmethod

@@ -17,8 +17,7 @@ class TreatmentDailyOutput:
     VS_total: float = 0.0  # kg
     p_excrt_manure: float = 0.0  # kg
     K_manure: float = 0.0  # kg
-    total_daily_mass: float = 0.0  # L
-    final_volume: float = 0.0  # m^3
+    final_manure_volume: float = 0.0  # m^3
 
     def clone(self) -> TreatmentDailyOutput:
         return TreatmentDailyOutput(**asdict(self))
@@ -45,22 +44,6 @@ class TreatmentDailyOutput:
         ])
 
 
-@dataclass
-class AnaerobicDigestionDailyOutput(TreatmentDailyOutput):
-    total_daily_mass: float = 0.0
-    urea: float = 0.0
-
-    AD_biogas: float = 0.0,  # biogas production per day (m3/day)
-    AD_biogas_energy_content: float = 0.0  # biogas energy content (MJ/m3)
-    AD_methane_generation_volume: float = 0.0
-    AD_input_energy_heating: float = 0.0
-
-    def __post_init__(self):
-        self.total_daily_mass = 0.0  # TODO convert effluent volume to total daily mass
-
-    def clone(self) -> TreatmentDailyOutput:
-        return AnaerobicDigestionDailyOutput(**asdict(self))
-
 
 # TODO: move to a separate file
 @dataclass
@@ -86,3 +69,4 @@ class AggregatedManureDailyOutputForField(TreatmentDailyOutput):
         self.DM = daily_output.DM
         self.WIP = daily_output.VS_total * 0.5
         self.WOP = daily_output.VS_total * 0.5
+
