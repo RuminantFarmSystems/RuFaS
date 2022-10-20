@@ -45,3 +45,6 @@ venv/
 
 # ignore pytest cache folder
 .pytest_cache/
+
+# ignore croptime json output
+sample.json
