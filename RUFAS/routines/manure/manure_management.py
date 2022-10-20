@@ -13,10 +13,17 @@ import collections
 from typing import Dict, List, Tuple
 from typing import Optional
 
+from RUFAS.classes import Weather
+from RUFAS.classes import Time
 from RUFAS.routines.animal.animal_management import AnimalManagement
+from RUFAS.routines.manure.beddings.bedding_classes import BaseBedding
+from RUFAS.routines.manure.beddings.bedding_classes import BeddingFactory
 from RUFAS.routines.manure.manure_handlers.manure_handler_classes import BaseManureHandler
 from RUFAS.routines.manure.manure_handlers.manure_handler_classes import ManureHandlerFactory
+from RUFAS.routines.manure.manure_separators.manure_separator_classes import BaseManureSeparator
 from RUFAS.routines.manure.manure_separators.manure_separator_classes import ManureSeparatorFactory
+from RUFAS.routines.manure.manure_treatments.manure_treatment_classes import BaseManureTreatment
+from RUFAS.routines.manure.manure_treatments.manure_treatment_classes import ManureTreatmentFactory
 from RUFAS.routines.manure.pen.manure_management_pen import ManureManagementPen
 from RUFAS.routines.manure.reception_pits.reception_pit import ReceptionPit
 
@@ -39,7 +46,10 @@ class ManureManagement:
 
     """
 
-    def __init__(self, animal_management: AnimalManagement):
+    def __init__(self,
+                 animal_management: AnimalManagement,
+                 weather: Weather,
+                 time: Time):
         """
         Initializes a ManureManagement object by setting up the appropriate manure
         management components as specified by the data in the animal_management object.
@@ -47,13 +57,17 @@ class ManureManagement:
         Args:
             animal_management: A reference to the AnimalManagement object that is one of the attributes
                 of the simulation engine object.
+            weather: The Weather object used to initialize State variables.
+            time: The Time object used to initialize State variables.
 
         """
-
+        self.beddings: Dict[int, BaseBedding] = {}
         self.manure_handlers: Dict[int, BaseManureHandler] = {}
-        self.reception_pits: Dict[int, Optional[ReceptionPit]] = {}
-        self.manure_separators = {}
-        self.manure_treatments = {}
+        self.reception_pits: Dict[int, ReceptionPit] = {}
+        self.manure_separators: Dict[int, Optional[BaseManureSeparator]] = {}
+        self.manure_treatments: Dict[int, BaseManureTreatment] = {}
+        self.weather = weather
+        self.time = time
         self._all_data = collections.defaultdict(list)
         self._setup_manure_management_components(animal_management)
 
@@ -98,10 +112,13 @@ class ManureManagement:
 
         for pen in animal_management.all_pens:
             mm_pen = ManureManagementPen(pen)
+            self.beddings[pen.id] = BeddingFactory.get_instance(
+                    bedding_type_name=mm_pen.bedding_type,
+                    custom_bedding_config=None
+            )
             self.manure_handlers[mm_pen.id] = ManureHandlerFactory.get_instance(
                     manure_handler_type_name=mm_pen.manure_handler,
-                    bedding_type_name=mm_pen.bedding_type,
-                    manure_handler_config=None
+                    custom_manure_handler_config=None
             )
             self.reception_pits[mm_pen.id] = ReceptionPit()
 
@@ -110,10 +127,15 @@ class ManureManagement:
             else:
                 self.manure_separators[mm_pen.id] = ManureSeparatorFactory.get_instance(
                         manure_separator_type_name=mm_pen.manure_separator,
-                        manure_separator_config=None
+                        custom_manure_separator_config=None
                 )
 
-            self.manure_treatments[mm_pen.id] = None
+            self.manure_treatments[mm_pen.id] = ManureTreatmentFactory.get_instance(
+                    manure_treatment_type_name=mm_pen.manure_treatment,
+                    weather=self.weather,
+                    time=self.time,
+                    custom_manure_treatment_config=None
+            )
 
     def update(self, animal_management: AnimalManagement) -> None:
         """
@@ -125,31 +147,37 @@ class ManureManagement:
                 from the simulation engine's AnimalManagement object.
 
         """
-
         for pen in animal_management.all_pens:
             mm_pen = ManureManagementPen(pen)
 
             manure_handler_daily_output = \
-                self.manure_handlers[mm_pen.id].daily_update(mm_pen, animal_management.simulation_day)
+                self.manure_handlers[mm_pen.id].daily_update(
+                        pen=mm_pen,
+                        bedding=self.beddings[mm_pen.id],
+                        sim_day=animal_management.simulation_day
+                )
 
             reception_pit_daily_output = \
-                self.reception_pits[mm_pen.id].daily_update(manure_handler_daily_output)
+                self.reception_pits[mm_pen.id].daily_update(
+                        manure_handler_daily_output=manure_handler_daily_output,
+                        pen=mm_pen,
+                        bedding=self.beddings[mm_pen.id]
+                )
 
-            if self.manure_separators[mm_pen] is None:
+            if self.manure_separators[mm_pen.id] is None:
                 manure_separator_daily_output = None
             else:
                 manure_separator_daily_output = \
-                    self.manure_separators[mm_pen.id].daily_update(reception_pit_daily_output)
+                    self.manure_separators[mm_pen.id].daily_update(
+                            reception_pit_daily_output=reception_pit_daily_output
+                    )
 
-            treatment_daily_output = None
-            # TODO: call to treatment's daily_update(
-            #  reception_pit_daily_output,
-            #  manure_separator_daily_output)
-            # Slurry storage: yes, no(but yes is ok and easier), no (yes is ok)
-            # Lagoon: yes, no(but yes is ok and easier), no (yes is ok)
-            # Lagoon: yes, yes, yes
-            # AD: yes, yes, no
-            # AD: yes, yes, yes
+            treatment_daily_output = \
+                self.manure_treatments[mm_pen.id].daily_update(
+                        reception_pit_daily_output=reception_pit_daily_output,
+                        manure_separator_daily_output=manure_separator_daily_output,
+                        sim_day=animal_management.simulation_day
+                )
 
             # convert treatment output to usable form for field module
             # convert(treatment output, wip, wop)

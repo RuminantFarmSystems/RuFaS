@@ -16,8 +16,8 @@ from typing import List
 from typing import Optional
 from typing import Type
 
+from RUFAS.routines.manure.beddings.bedding_classes import BaseBedding
 from RUFAS.routines.manure.default_enum.default_enum import DefaultEnum
-from RUFAS.routines.manure.manure_handlers.bedding_classes import BeddingFactory
 from RUFAS.routines.manure.manure_handlers.manure_handler_daily_output import ManureHandlerDailyOutput
 from RUFAS.routines.manure.manure_handlers.milking_center import MilkingCenter
 from RUFAS.routines.manure.pen.manure_management_pen import ManureManagementPen
@@ -37,7 +37,6 @@ class BaseManureHandler:
     Attributes:
         config: A ManureHandlerConfig object that specifies default data specific to the choice of
             manure handler.
-        bedding: A Bedding object that specifies the type of bedding used.
         milking_center: A MilkingCenter object that handles relevant calculations
             related to the time lactating cows spent there.
         all_output: A list of ManureHandlerDailyOutput objects that stores the daily output of the
@@ -45,19 +44,15 @@ class BaseManureHandler:
 
     """
 
-    def __init__(self,
-                 bedding_type_name: str,
-                 manure_handler_config: ManureHandlerConfig):
+    def __init__(self, manure_handler_config: ManureHandlerConfig):
         """Initialize a BaseManureHandler object.
 
         Args:
-            bedding_type_name: The name of the bedding type.
             manure_handler_config: A ManureHandlerInitData object that specifies default data
                 specific to the choice of manure handler.
 
         """
         self.config = manure_handler_config
-        self.bedding = BeddingFactory.get_instance(bedding_type_name)
         self.milking_center = MilkingCenter()
         self.all_output: List[ManureHandlerDailyOutput] = []
 
@@ -72,14 +67,18 @@ class BaseManureHandler:
         """
         return self.all_output[-1] if len(self.all_output) > 0 else None
 
-    def daily_update(self, pen: ManureManagementPen, sim_day: int) -> ManureHandlerDailyOutput:
+    def daily_update(self,
+                     pen: ManureManagementPen,
+                     bedding: BaseBedding,
+                     sim_day: int) -> ManureHandlerDailyOutput:
         """Calculate and store the daily output of the manure handler.
 
-        Note:
+        Notes:
             "pseudocode_manure_management" MS.3
 
         Args:
             pen: A ManureManagementPen object.
+            bedding: A BaseBedding object that specifies the type of bedding used.
             sim_day: The current simulation day.
 
         Returns:
@@ -99,7 +98,7 @@ class BaseManureHandler:
                 K=pen.manure.K,
                 manure_volume=pen.manure_volume,
                 cleaning_water_volume=self.cleaning_water_volume_in_main_barn(pen),
-                total_bedding_volume=self.bedding.total_bedding_volume(pen),
+                total_bedding_volume=bedding.total_bedding_volume(pen),
                 total_water_volume_in_milking_center=self.milking_center.total_water_volume_used_in_milking_center(
                         pen)
         )
@@ -178,7 +177,7 @@ class DefaultManureHandlerConfigFactory:
     )
 
     @classmethod
-    def get_instance(cls, manure_handler_type: ManureHandlerType):
+    def get_instance(cls, manure_handler_type: ManureHandlerType) -> ManureHandlerConfig:
         """Return a default manure handler configuration for the given manure handler type.
 
         Args:
@@ -202,15 +201,13 @@ class ManureHandlerFactory:
     @classmethod
     def get_instance(cls,
                      manure_handler_type_name: str,
-                     bedding_type_name: str,
-                     manure_handler_config: Optional[ManureHandlerConfig] = None) \
+                     custom_manure_handler_config: Optional[ManureHandlerConfig] = None) \
             -> BaseManureHandler:
         """Return an instance of a specific subtype of BaseManureHandler.
 
         Args:
             manure_handler_type_name: A string that specifies the type of manure handler.
-            bedding_type_name: A string that specifies the type of bedding.
-            manure_handler_config: A ManureHandlerConfig object that contains
+            custom_manure_handler_config: A ManureHandlerConfig object that contains
                 custom initialization data.
 
         Returns:
@@ -226,9 +223,9 @@ class ManureHandlerFactory:
         manure_handler_type = ManureHandlerType.get_type(manure_handler_type_name)
         manure_handler_class = manure_handler_class_by_type[manure_handler_type]
 
-        if manure_handler_config:
-            return manure_handler_class(bedding_type_name, manure_handler_config)
+        if custom_manure_handler_config:
+            return manure_handler_class(custom_manure_handler_config)
         else:
             default_manure_handler_config = DefaultManureHandlerConfigFactory.get_instance(
                     manure_handler_type)
-            return manure_handler_class(bedding_type_name, default_manure_handler_config)
+            return manure_handler_class(default_manure_handler_config)

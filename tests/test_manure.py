@@ -17,14 +17,14 @@ from RUFAS.routines.animal.pen import Pen
 from RUFAS.routines.manure.constants.constants import ManureManagementConstants
 from RUFAS.routines.manure.default_enum.default_enum import DefaultEnum
 from RUFAS.routines.manure.manure.pen_manure import PenManure
-from RUFAS.routines.manure.manure_handlers.bedding_classes import BaseBedding
-from RUFAS.routines.manure.manure_handlers.bedding_classes import BeddingConfig
-from RUFAS.routines.manure.manure_handlers.bedding_classes import BeddingFactory
-from RUFAS.routines.manure.manure_handlers.bedding_classes import BeddingType
-from RUFAS.routines.manure.manure_handlers.bedding_classes import DefaultBeddingConfigFactory
-from RUFAS.routines.manure.manure_handlers.bedding_classes import ManureSolidsBedding
-from RUFAS.routines.manure.manure_handlers.bedding_classes import SandBedding
-from RUFAS.routines.manure.manure_handlers.bedding_classes import SawdustBedding
+from RUFAS.routines.manure.beddings.bedding_classes import BaseBedding
+from RUFAS.routines.manure.beddings.bedding_classes import BeddingConfig
+from RUFAS.routines.manure.beddings.bedding_classes import BeddingFactory
+from RUFAS.routines.manure.beddings.bedding_classes import BeddingType
+from RUFAS.routines.manure.beddings.bedding_classes import DefaultBeddingConfigFactory
+from RUFAS.routines.manure.beddings.bedding_classes import ManureSolidsBedding
+from RUFAS.routines.manure.beddings.bedding_classes import SandBedding
+from RUFAS.routines.manure.beddings.bedding_classes import SawdustBedding
 from RUFAS.routines.manure.manure_handlers.manure_handler_classes import AlleyScraper
 from RUFAS.routines.manure.manure_handlers.manure_handler_classes import BaseManureHandler
 from RUFAS.routines.manure.manure_handlers.manure_handler_classes import DefaultManureHandlerConfigFactory
@@ -1071,7 +1071,7 @@ def mock_manure_handler_config() -> ManureHandlerConfig:
 
 @pytest.mark.parametrize(
         'manure_handler_type_name, bedding_type_name, '
-        'manure_handler_config, expected_manure_handler_class,'
+        'custom_manure_handler_config, expected_manure_handler_class,'
         'expected_bedding_type, expected_manure_handler_config',
         [
             ('flush system', 'sawdust', None, FlushSystem, SawdustBedding,
@@ -1117,11 +1117,8 @@ def test_manure_handler_factory_get_instance(manure_handler_type_name: str,
     """Unit test for get_instance() of class ManureHandlerFactory"""
 
     # Act
-    manure_handler = ManureHandlerFactory.get_instance(
-            manure_handler_type_name=manure_handler_type_name,
-            bedding_type_name=bedding_type_name,
-            manure_handler_config=manure_handler_config
-    )
+    manure_handler = ManureHandlerFactory.get_instance(manure_handler_type_name=manure_handler_type_name,
+                                                       custom_manure_handler_config=manure_handler_config)
 
     # Assert
     assert type(manure_handler) is expected_manure_handler_class
@@ -1139,7 +1136,7 @@ def test_manure_handler_daily_update(mocker: MockerFixture) -> None:
     # Arrange
     pen = mocker.MagicMock(autospec=ManureManagementPen)
     pen.num_animals = 100
-    flush_system = ManureHandlerFactory.get_instance('flush system', 'sawdust')
+    flush_system = ManureHandlerFactory.get_instance('flush system')
     flush_system.config.cleaning_water_use_rate = 20.0
 
     # Act

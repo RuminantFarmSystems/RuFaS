@@ -65,6 +65,7 @@ class ManureSeparatorDailyOutput:
     final_daily_volume: float = field(init=False)
 
     def __post_init__(self):
+        """Calculate the final solids wet mass volume and the final daily volume."""
+        # TODO: After parsing json input, replace 400.0 with custom manure solids bedding density
         self.final_solids_wet_mass_volume = self.final_solids_wet_mass / 400.0
-        # TODO: Replace hardcoded value, but this one comes from manure solids bedding
         self.final_daily_volume = self.total_daily_manure_volume - self.final_solids_wet_mass_volume

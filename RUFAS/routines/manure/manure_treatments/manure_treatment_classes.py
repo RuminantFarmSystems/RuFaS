@@ -1,64 +1,70 @@
 from __future__ import annotations
 
+from abc import ABC
+from abc import ABC
+from abc import abstractmethod
 from dataclasses import dataclass
 from enum import auto
 from typing import Dict
 from typing import List
 from typing import Optional
 from typing import Type
+from typing import Union
+
+from RUFAS.classes import Weather
+from RUFAS.classes import Time
+from RUFAS.routines.manure.constants.constants import ManureManagementConstants
+from RUFAS.routines.manure.default_enum.default_enum import DefaultEnum
+from RUFAS.routines.manure.manure_separators.manure_separator_daily_output import ManureSeparatorDailyOutput
+from RUFAS.routines.manure.manure_treatments.manure_treatment_daily_output import ManureTreatmentDailyOutput
+from RUFAS.routines.manure.reception_pits.reception_pit_daily_output import ReceptionPitDailyOutput
 
 
 class TreatmentType(DefaultEnum):
-    """
-    Enumerates available treatment options.
-    """
-
+    """Enumerates the different types of manure treatments."""
     SLURRY_STORAGE_UNDERFLOOR = auto()
     SLURRY_STORAGE_OUTDOOR = auto()
     DEFAULT = SLURRY_STORAGE_UNDERFLOOR
 
 
-class BaseManureTreatment:
-    def __init__(self,
-                 manure_separator: BaseManureSeparator,
-                 weather: Weather,
-                 time: Time,
-                 manure_treatment_config: ManureTreatmentConfig):
-        """
-        An instance of this class represents a storage receptacle.
-        It is primarily used by the emissions sub-module
-
-        """
-
-        self.config = manure_treatment_config
-        self.manure_separator = manure_separator
-        self.reception_pit = self.manure_separator.reception_pit
-        self.manure_handler = self.reception_pit.manure_handler
-        self.weather_data = weather
+class BaseManureTreatment(ABC):
+    def __init__(self, weather: Weather, time: Time, manure_treatment_config: ManureTreatmentConfig) -> None:
+        self.weather = weather
         self.time = time
-        self.all_output: List[TreatmentOutput] = []
-        self.accumulated_output = TreatmentOutput()
+        self.config = manure_treatment_config
+        self.all_output: List[ManureTreatmentDailyOutput] = []
+        self.accumulated_output = ManureTreatmentDailyOutput()
         self.simulation_day = 0
 
-    def reset_daily_variables(self):
-        pass
-
     @property
-    def last_output(self) -> Optional[TreatmentOutput]:
-        """
-
-        Returns:
-
-        """
+    def last_output(self) -> Optional[ManureTreatmentDailyOutput]:
         return self.all_output[-1] if len(self.all_output) > 0 else None
 
-    def update(self, reception_pit_daily_output,
-               manure_separator_daily_output: Optional) -> TreatmentOutput:
-        daily_output = TreatmentOutput()
+    @staticmethod
+    def _pick_input_data(reception_pit_daily_output: ReceptionPitDailyOutput,
+                         manure_separator_daily_output: ManureSeparatorDailyOutput) \
+            -> Union[ReceptionPitDailyOutput, ManureSeparatorDailyOutput]:
+        if manure_separator_daily_output is not None:
+            return manure_separator_daily_output
+        else:
+            return reception_pit_daily_output
+
+    @abstractmethod
+    def _update_helper(self,
+                       reception_pit_daily_output: ReceptionPitDailyOutput,
+                       manure_separator_daily_output: Optional[ManureSeparatorDailyOutput]
+                       ) -> ManureTreatmentDailyOutput:
+        pass
+
+    def daily_update(self,
+                     reception_pit_daily_output: ReceptionPitDailyOutput,
+                     manure_separator_daily_output: Optional[ManureSeparatorDailyOutput],
+                     sim_day: int
+                     ) -> ManureTreatmentDailyOutput:
+        daily_output = self._update_helper(reception_pit_daily_output, manure_separator_daily_output)
         self.all_output.append(daily_output)
-        # self.accumulated_output.__add__(daily_output)
-        self.accumulated_output += daily_output  # TODO: Check if this is intended
-        self.simulation_day = simulation_day
+        self.accumulated_output += daily_output
+        self.simulation_day += 1
         return daily_output
 
     def land_application_day_check_available_manure(self):
@@ -88,80 +94,59 @@ class BaseManureTreatment:
 
 
 class SlurryStorageUnderfloor(BaseManureTreatment):
-    def __init__(self,
-                 manure_separator: BaseManureSeparator,
-                 weather: Weather,
-                 time: Time,
-                 manure_treatment_config: ManureTreatmentConfig):
-        super().__init__(manure_separator, weather, time, manure_treatment_config)
 
-        self.storage_time_period = manure_treatment_config.storage_time_period  # days
+    def __init__(self, weather: Weather, time: Time, manure_treatment_config: ManureTreatmentConfig) -> None:
+        super().__init__(weather, time, manure_treatment_config)
+        self.storage_time_period = self.config.storage_time_period  # days
 
-    @property
-    def treatment_volume(self) -> float:
-        return self.storage_time_period * self.manure_handler.last_output.total_daily_manure_volume  # m^3
+    def _calc_total_volume(self, input_data: Union[ManureSeparatorDailyOutput, ReceptionPitDailyOutput]) -> float:
+        return self.storage_time_period * input_data.total_daily_manure_volume
 
-    @property
-    def total_volume(self) -> float:
-        return self.treatment_volume  # m^3
-
-    def update(self, reception_pit_daily_output, manure_separator_daily_output: Optional) -> TreatmentOutput:
-        input_data = reception_pit_daily_output
-        if manure_separator_daily_output is not None:
-            input_data = manure_separator_daily_output
-
-        daily_output = TreatmentOutput(
-                TAN_s=input_data.TAN_s * (1 - self.config.TAN_removal_efficiency),
-                # urea=handler.U,
-                manure_nitrogen=handler.manure_nitrogen * (1 - self.config.N_removal_efficiency),
-                TSd=handler.TSd * (1 - self.config.TS_removal_efficiency),
-                VS_total=handler.VS_total * (1 - self.config.VS_removal_efficiency),
-                p_excrt_manure=handler.p_excrt_manure * (1 - self.config.P_removal_efficiency),
-                K_manure=handler.K_manure * (1 - self.config.K_removal_efficiency),
+    def _calc_final_manure_volume(self, input_data: Union[ManureSeparatorDailyOutput, ReceptionPitDailyOutput]) -> float:
+        return self._calc_total_volume(input_data) - (
+                (input_data.TS + input_data.VS_total) * self.storage_time_period *
+                ManureManagementConstants.KG_TO_CUBIC_METERS
         )
 
-        daily_output.final_manure_volume = self.total_volume - (
-                (daily_output.TSd + daily_output.VS_total)
-                * self.storage_time_period * Constants.KG_TO_CUBIC_METERS)
+    def _update_helper(self,
+                       reception_pit_daily_output: ReceptionPitDailyOutput,
+                       manure_separator_daily_output: Optional[ManureSeparatorDailyOutput]) \
+            -> ManureTreatmentDailyOutput:
+        input_data = super()._pick_input_data(reception_pit_daily_output, manure_separator_daily_output)
 
-        self.all_output.append(daily_output)
-        self.accumulated_output.__add__(daily_output)
-        self.simulation_day = simulation_day
+        daily_output = ManureTreatmentDailyOutput(
+                simulation_day=input_data.simulation_day,
+                pen_id=input_data.pen_id,
+                TAN=input_data.TAN * (1 - self.config.TAN_removal_efficiency),
+                N=input_data.N * (1 - self.config.N_removal_efficiency),
+                TS=input_data.TS * (1 - self.config.TS_removal_efficiency),
+                VS_total=input_data.VS_total * (1 - self.config.VS_removal_efficiency),
+                P=input_data.P * (1 - self.config.P_removal_efficiency),
+                K=input_data.K * (1 - self.config.K_removal_efficiency),
+        )
+        daily_output.final_manure_volume = self._calc_final_manure_volume(input_data)
         return daily_output
-
-    def calc_gas(self):
-        pass
 
 
 class SlurryStorageOutdoor(BaseManureTreatment):
-    def __init__(self,
-                 manure_separator: BaseManureSeparator,
-                 weather: Weather,
-                 time: Time,
-                 manure_treatment_config: ManureTreatmentConfig) -> None:
-        super().__init__(manure_separator, weather, time, manure_treatment_config)
-        self.storage_time_period = manure_treatment_config.storage_time_period  # m^3 (25-year 24h storm event)
-        self.freeboard_input = manure_treatment_config.freeboard_input  # m
-        self.precip_input = manure_treatment_config.precip_input  # m (25-year 24h storm event)
+    def __init__(self, weather: Weather, time: Time, manure_treatment_config: ManureTreatmentConfig) -> None:
+        super().__init__(weather, time, manure_treatment_config)
+        self.storage_time_period = self.config.storage_time_period  # m^3 (25-year 24h storm event)
+        self.freeboard_input = self.config.freeboard_input  # m
+        self.precip_input = self.config.precip_input  # m (25-year 24h storm event)
 
-    def update(self, simulation_day: int) -> TreatmentOutput:
-        daily_output = self.update_helper()
-        self.all_output.append(daily_output)
-        # self.accumulated_output.__add__(daily_output)
-        self.accumulated_output += daily_output  # TODO: Check if this is intended
-        self.simulation_day += 1
-        return daily_output
-
-    def update_helper(self):
-        handler = self.manure_handler.last_output
-        daily_output = TreatmentOutput(
-                TAN_s=handler.TAN_s * (1 - self.config.TAN_removal_efficiency),
-                # urea=handler.urea,  # TODO: check if this is correct
-                manure_nitrogen=handler.manure_nitrogen * (1 - self.config.N_removal_efficiency),
-                TSd=handler.TSd * (1 - self.config.TS_removal_efficiency),
-                VS_total=handler.VS_total * (1 - self.config.VS_removal_efficiency),
-                p_excrt_manure=handler.p_excrt_manure * (1 - self.config.P_removal_efficiency),
-                K_manure=handler.K_manure * (1 - self.config.K_removal_efficiency),
+    def _update_helper(self,
+                       reception_pit_daily_output: ReceptionPitDailyOutput,
+                       manure_separator_daily_output: Optional[ManureSeparatorDailyOutput],
+                       ) -> ManureTreatmentDailyOutput:
+        input_data = super()._pick_input_data(reception_pit_daily_output, manure_separator_daily_output)
+        daily_output = ManureTreatmentDailyOutput(
+                TAN=input_data.TAN * (1 - self.config.TAN_removal_efficiency),
+                N=input_data.N * (1 - self.config.N_removal_efficiency),
+                TS=input_data.TS * (1 - self.config.TS_removal_efficiency),
+                VS_total=input_data.VS_total * (1 - self.config.VS_removal_efficiency),
+                P=input_data.P * (1 - self.config.P_removal_efficiency),
+                K=input_data.K * (1 - self.config.K_removal_efficiency),
         )
         return daily_output
 
@@ -229,16 +214,13 @@ class SlurryStorageOutdoor(BaseManureTreatment):
     @property
     def precip(self):
         """returns additional lagoon volume needed for precipitation in m^3"""
-        current_day_rainfall = self.weather_data.rainfall[self.time.year - 1][self.time.day - 1]
+        current_day_rainfall = self.weather.rainfall[self.time.year - 1][self.time.day - 1]
         return current_day_rainfall * self.pit_surface_area  # m3 of rain
 
     @property
     def freeboard(self):
         """returns additional lagoon volume needed for freeboard in m^3"""
         return self.freeboard_input * self.pit_surface_area  # m3 of rain
-
-    def calc_emissions(self):
-        pass
 
 
 @dataclass
@@ -295,7 +277,6 @@ class DefaultManureTreatmentConfigFactory:
             freeboard_input=0.3048
     )
 
-
     @classmethod
     def get_instance(cls, treatment_type: TreatmentType) -> ManureTreatmentConfig:
         manure_treatment_config_by_type = {
@@ -305,14 +286,12 @@ class DefaultManureTreatmentConfigFactory:
         return manure_treatment_config_by_type[treatment_type]
 
 
-class TreatmentFactory:
-    @classmethod
-    def get_instance(cls,
-                     manure_treatment_type_name: str,
-                     manure_separator: BaseManureSeparator,
+class ManureTreatmentFactory:
+    @staticmethod
+    def get_instance(manure_treatment_type_name: str,
                      weather: Weather,
                      time: Time,
-                     manure_treatment_config: Optional[ManureTreatmentConfig] = None) \
+                     customer_manure_treatment_config: Optional[ManureTreatmentConfig] = None) \
             -> BaseManureTreatment:
 
         manure_treatment_class_by_type: Dict[TreatmentType, Type[BaseManureTreatment]] = {
@@ -323,8 +302,8 @@ class TreatmentFactory:
         manure_treatment_type = TreatmentType.get_type(manure_treatment_type_name)
         manure_treatment_class = manure_treatment_class_by_type[manure_treatment_type]
 
-        if manure_treatment_config:
-            return manure_treatment_class(manure_separator, weather, time, manure_treatment_config)
+        if customer_manure_treatment_config:
+            return manure_treatment_class(weather, time, customer_manure_treatment_config)
         else:
             default_manure_treatment_config = DefaultManureTreatmentConfigFactory.get_instance(manure_treatment_type)
-            return manure_treatment_class(manure_separator, weather, time, default_manure_treatment_config)
+            return manure_treatment_class(weather, time, default_manure_treatment_config)

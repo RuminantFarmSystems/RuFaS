@@ -25,8 +25,8 @@ class BaseBedding(ABC):
     Attributes:
         bedding_mass_per_day: Amount of bedding needed for each animal per day, kg/animal/day.
         bedding_density: Density of the bedding, kg/m^3.
-        bedding_dry_matter_content: Dry matter mass of the bedding, (0.0 - 1.0].
-        bedding_cleaned_frac: Fraction of bedding removed from the barn [0.0 - 1.0].
+        bedding_dry_matter_content: Dry matter mass of the bedding, [0.7 - 1.0].
+        bedding_cleaned_frac: Fraction of bedding removed from the barn [0.7 - 1.0].
         bedding_type: Type of bedding.
 
     """
@@ -75,6 +75,15 @@ class BaseBedding(ABC):
 
         """
         return self.total_bedding_mass(pen) / self.bedding_density
+
+    def total_bedding_dry_solids(self, pen: ManureManagementPen) -> float:
+        """Return the total amount of dry solids in the bedding.
+
+        Returns:
+            Total amount of dry solids in the bedding, kg/day.
+
+        """
+        return self.total_bedding_mass(pen) / self.bedding_dry_matter_content
 
 
 class BaseOrganicBedding(BaseBedding):
@@ -215,13 +224,13 @@ class BeddingFactory:
     @classmethod
     def get_instance(cls,
                      bedding_type_name: str,
-                     bedding_config: Optional[BeddingConfig] = None) \
+                     custom_bedding_config: Optional[BeddingConfig] = None) \
             -> BaseBedding:
         """Return the bedding object for the given bedding type name.
 
         Args:
             bedding_type_name: Name of the bedding type.
-            bedding_config: Custom configuration of the bedding, if any.
+            custom_bedding_config: Custom configuration of the bedding, if any.
 
         Returns:
             Bedding object for the given bedding type name.
@@ -237,8 +246,8 @@ class BeddingFactory:
         bedding_type = BeddingType.get_type(bedding_type_name)
         bedding_class = bedding_class_by_type[bedding_type]
 
-        if bedding_config:
-            bedding_obj = bedding_class(bedding_config)
+        if custom_bedding_config:
+            bedding_obj = bedding_class(custom_bedding_config)
         else:
             default_bedding_config = DefaultBeddingConfigFactory.get_instance(bedding_type)
             bedding_obj = bedding_class(default_bedding_config)

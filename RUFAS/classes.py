@@ -51,7 +51,7 @@ class State:
             Utility.read_json_file(input_dir / 'animal' / data['animal']), config, self.feed, weather, time)
 
         self.manure_storage = ManureStorage(self.animal_management)
-        self.manure_management = ManureManagement(self.animal_management)
+        self.manure_management = ManureManagement(self.animal_management, weather, time)
 
     def annual_reset(self):
         """
