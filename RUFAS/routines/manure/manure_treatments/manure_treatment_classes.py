@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from abc import ABC
+import math
 from abc import ABC
 from abc import abstractmethod
 from dataclasses import dataclass
@@ -8,19 +8,23 @@ from enum import auto
 from typing import Dict
 from typing import List
 from typing import Optional
+from typing import Tuple
 from typing import Type
 from typing import Union
 
-from RUFAS.classes import Weather
 from RUFAS.classes import Time
-from RUFAS.routines.manure.constants.constants import ManureManagementConstants
+from RUFAS.classes import Weather
 from RUFAS.routines.manure.default_enum.default_enum import DefaultEnum
 from RUFAS.routines.manure.manure_separators.manure_separator_daily_output import ManureSeparatorDailyOutput
+from RUFAS.routines.manure.manure_treatments.manure_treatment_daily_output import \
+    AggregatedManureDailyOutputForFieldManure
 from RUFAS.routines.manure.manure_treatments.manure_treatment_daily_output import ManureTreatmentDailyOutput
 from RUFAS.routines.manure.reception_pits.reception_pit_daily_output import ReceptionPitDailyOutput
 
+ManureTreatmentInputDataType = Union[ReceptionPitDailyOutput, ManureSeparatorDailyOutput]
 
-class TreatmentType(DefaultEnum):
+
+class ManureTreatmentType(DefaultEnum):
     """Enumerates the different types of manure treatments."""
     SLURRY_STORAGE_UNDERFLOOR = auto()
     SLURRY_STORAGE_OUTDOOR = auto()
@@ -35,6 +39,7 @@ class BaseManureTreatment(ABC):
         self.all_output: List[ManureTreatmentDailyOutput] = []
         self.accumulated_output = ManureTreatmentDailyOutput()
         self.simulation_day = 0
+        self._current_input_data: Optional[ManureTreatmentInputDataType] = None
 
     @property
     def last_output(self) -> Optional[ManureTreatmentDailyOutput]:
@@ -43,7 +48,7 @@ class BaseManureTreatment(ABC):
     @staticmethod
     def _pick_input_data(reception_pit_daily_output: ReceptionPitDailyOutput,
                          manure_separator_daily_output: ManureSeparatorDailyOutput) \
-            -> Union[ReceptionPitDailyOutput, ManureSeparatorDailyOutput]:
+            -> ManureTreatmentInputDataType:
         if manure_separator_daily_output is not None:
             return manure_separator_daily_output
         else:
@@ -61,6 +66,7 @@ class BaseManureTreatment(ABC):
                      manure_separator_daily_output: Optional[ManureSeparatorDailyOutput],
                      sim_day: int
                      ) -> ManureTreatmentDailyOutput:
+        self._current_input_data = self._pick_input_data(reception_pit_daily_output, manure_separator_daily_output)
         daily_output = self._update_helper(reception_pit_daily_output, manure_separator_daily_output)
         self.all_output.append(daily_output)
         self.accumulated_output += daily_output
@@ -73,7 +79,7 @@ class BaseManureTreatment(ABC):
         Returns: AggregatedManureOutputforField object containing accumulated attributes
         """
         ## Convert aggregated outputs from TreatmentOutput type, to object type expected in Field
-        output_to_field = AggregatedManureOutputforField()
+        output_to_field = AggregatedManureDailyOutputForFieldManure()
         output_to_field.convert_treatment_ouput_to_field_outputs(self.accumulated_output)
         return output_to_field
 
@@ -83,13 +89,13 @@ class BaseManureTreatment(ABC):
         outputs_for_land_application = self.accumulated_output
         """
         ## Convert aggregated outputs from TreatmentOutput type, to object type expected in Field
-        output_to_field = AggregatedManureOutputforField()
+        output_to_field = AggregatedManureDailyOutputForFieldManure()
         output_to_field.convert_treatment_ouput_to_field_outputs(self.accumulated_output)
         # TODO Currently resets accumulated outputs to zero,
         # but should reset to new levels based on requested_manure_mass. Should be based on
         #  percentage requested
         # Input requested_manure_fraction for calculating remainder in tank
-        self.accumulated_output = TreatmentOutput()
+        self.accumulated_output = ManureTreatmentDailyOutput()
         return output_to_field
 
 
@@ -99,32 +105,37 @@ class SlurryStorageUnderfloor(BaseManureTreatment):
         super().__init__(weather, time, manure_treatment_config)
         self.storage_time_period = self.config.storage_time_period  # days
 
-    def _calc_total_volume(self, input_data: Union[ManureSeparatorDailyOutput, ReceptionPitDailyOutput]) -> float:
-        return self.storage_time_period * input_data.total_daily_manure_volume
-
-    def _calc_final_manure_volume(self, input_data: Union[ManureSeparatorDailyOutput, ReceptionPitDailyOutput]) -> float:
-        return self._calc_total_volume(input_data) - (
-                (input_data.TS + input_data.VS_total) * self.storage_time_period *
-                ManureManagementConstants.KG_TO_CUBIC_METERS
-        )
-
     def _update_helper(self,
                        reception_pit_daily_output: ReceptionPitDailyOutput,
-                       manure_separator_daily_output: Optional[ManureSeparatorDailyOutput]) \
-            -> ManureTreatmentDailyOutput:
-        input_data = super()._pick_input_data(reception_pit_daily_output, manure_separator_daily_output)
+                       manure_separator_daily_output: Optional[ManureSeparatorDailyOutput],
+                       ) -> ManureTreatmentDailyOutput:
+        if manure_separator_daily_output:
+            input_data = manure_separator_daily_output
+            daily_output = ManureTreatmentDailyOutput(
+                    simulation_day=input_data.simulation_day,
+                    pen_id=input_data.pen_id,
+                    TAN=input_data.TAN_liquid * (1 - self.config.TAN_removal_efficiency_for_treatment),
+                    N=input_data.N_liquid * (1 - self.config.N_removal_efficiency_for_treatment),
+                    TS=input_data.TS_liquid * (1 - self.config.TS_removal_efficiency_for_treatment),
+                    VS_total=input_data.VS_liquid * (1 - self.config.VS_removal_efficiency_for_treatment),
+                    P=input_data.P_liquid * (1 - self.config.P_removal_efficiency_for_treatment),
+                    K=input_data.K_liquid * (1 - self.config.K_removal_efficiency_for_treatment),
+                    final_manure_volume=input_data.final_daily_volume
+            )
+        else:
+            input_data = reception_pit_daily_output
+            daily_output = ManureTreatmentDailyOutput(
+                    simulation_day=input_data.simulation_day,
+                    pen_id=input_data.pen_id,
+                    TAN=input_data.TAN * (1 - self.config.TAN_removal_efficiency_for_treatment),
+                    N=input_data.N * (1 - self.config.N_removal_efficiency_for_treatment),
+                    TS=input_data.TS * (1 - self.config.TS_removal_efficiency_for_treatment),
+                    VS_total=input_data.VS_total * (1 - self.config.VS_removal_efficiency_for_treatment),
+                    P=input_data.P * (1 - self.config.P_removal_efficiency_for_treatment),
+                    K=input_data.K * (1 - self.config.K_removal_efficiency_for_treatment),
+                    final_manure_volume=input_data.total_daily_manure_volume
+            )
 
-        daily_output = ManureTreatmentDailyOutput(
-                simulation_day=input_data.simulation_day,
-                pen_id=input_data.pen_id,
-                TAN=input_data.TAN * (1 - self.config.TAN_removal_efficiency),
-                N=input_data.N * (1 - self.config.N_removal_efficiency),
-                TS=input_data.TS * (1 - self.config.TS_removal_efficiency),
-                VS_total=input_data.VS_total * (1 - self.config.VS_removal_efficiency),
-                P=input_data.P * (1 - self.config.P_removal_efficiency),
-                K=input_data.K * (1 - self.config.K_removal_efficiency),
-        )
-        daily_output.final_manure_volume = self._calc_final_manure_volume(input_data)
         return daily_output
 
 
@@ -137,35 +148,58 @@ class SlurryStorageOutdoor(BaseManureTreatment):
 
     def _update_helper(self,
                        reception_pit_daily_output: ReceptionPitDailyOutput,
-                       manure_separator_daily_output: Optional[ManureSeparatorDailyOutput],
+                       manure_separator_daily_output: Optional[ManureSeparatorDailyOutput]
                        ) -> ManureTreatmentDailyOutput:
-        input_data = super()._pick_input_data(reception_pit_daily_output, manure_separator_daily_output)
-        daily_output = ManureTreatmentDailyOutput(
-                TAN=input_data.TAN * (1 - self.config.TAN_removal_efficiency),
-                N=input_data.N * (1 - self.config.N_removal_efficiency),
-                TS=input_data.TS * (1 - self.config.TS_removal_efficiency),
-                VS_total=input_data.VS_total * (1 - self.config.VS_removal_efficiency),
-                P=input_data.P * (1 - self.config.P_removal_efficiency),
-                K=input_data.K * (1 - self.config.K_removal_efficiency),
-        )
+        input_data = self._current_input_data
+        if manure_separator_daily_output:
+            input_data = manure_separator_daily_output
+            daily_output = ManureTreatmentDailyOutput(
+                    simulation_day=input_data.simulation_day,
+                    pen_id=input_data.pen_id,
+                    TAN=input_data.TAN_liquid * (1 - self.config.TAN_removal_efficiency_for_treatment),
+                    N=input_data.N_liquid * (1 - self.config.N_removal_efficiency_for_treatment),
+                    TS=input_data.TS_liquid * (1 - self.config.TS_removal_efficiency_for_treatment),
+                    VS_total=input_data.VS_liquid * (1 - self.config.VS_removal_efficiency_for_treatment),
+                    P=input_data.P_liquid * (1 - self.config.P_removal_efficiency_for_treatment),
+                    K=input_data.K_liquid * (1 - self.config.K_removal_efficiency_for_treatment),
+                    final_manure_volume=input_data.final_daily_volume
+            )
+        else:
+            input_data = reception_pit_daily_output
+            daily_output = ManureTreatmentDailyOutput(
+                    simulation_day=input_data.simulation_day,
+                    pen_id=input_data.pen_id,
+                    TAN=input_data.TAN * (1 - self.config.TAN_removal_efficiency_for_treatment),
+                    N=input_data.N * (1 - self.config.N_removal_efficiency_for_treatment),
+                    TS=input_data.TS * (1 - self.config.TS_removal_efficiency_for_treatment),
+                    VS_total=input_data.VS_total * (1 - self.config.VS_removal_efficiency_for_treatment),
+                    P=input_data.P * (1 - self.config.P_removal_efficiency_for_treatment),
+                    K=input_data.K * (1 - self.config.K_removal_efficiency_for_treatment),
+                    final_manure_volume=input_data.total_daily_manure_volume
+            )
+
         return daily_output
 
     @property
-    def wastewater_volume(self):
+    def wastewater_volume(self) -> float:
         """returns wastewater volume in m^3"""
-        return self.manure_handler.last_output.total_daily_manure_volume
+        if self._current_input_data:
+            return self._current_input_data.total_daily_manure_volume
+        return 0.0
 
     @property
     def treatment_volume(self) -> float:
         """returns minimum treatment volume in m^3"""
-        return (
-                self.manure_handler.last_output.total_daily_manure_volume *
-                self.storage_time_period)  # m^3
+        if self._current_input_data:
+            return self._current_input_data.total_daily_manure_volume * self.storage_time_period  # m^3
+        return 0.0
 
     @property
     def total_pit_volume(self) -> float:
         """returns Total Lagoon Volume in m^3"""
-        return self.treatment_volume + self.freeboard + self.precip
+        if self._current_input_data:
+            return self.treatment_volume + self.freeboard + self.precip
+        return 0.0
 
     @property
     def pit_depth(self):
@@ -177,42 +211,41 @@ class SlurryStorageOutdoor(BaseManureTreatment):
         """returns lagoon slope (unitless)"""
         return 2.0
 
-    def calc_abc(self):
+    def _calc_abc(self) -> Tuple[float, float, float]:
         """returns coefficients for volume calculations as tuple (a,b,c)"""
         a = 3 * self.pit_depth
         b = -4 * self.pit_slope * self.pit_depth ** 2
-        c = 4 * (self.pit_slope ** 2) * (self.pit_depth ** 3) / 3 - self.total_treatment_volume
+        c = 4 * (self.pit_slope ** 2) * (self.pit_depth ** 3) / 3 - self.treatment_volume
         # TODO: Check if it is self.total_pit_volume or self.treatment_volume
         return a, b, c
 
     @property
-    def pit_width(self):
+    def pit_width(self) -> float:
         """returns lagoon width in meters"""
-        abc = self.calc_abc()
-        a, b, c = abc[0], abc[1], abc[2]
-        return (-1 * b + (b ** 2 - 4 * a * c) ** 0.5) / (2 * a)
+        if self._current_input_data:
+            a, b, c = self._calc_abc()
+            return (-b + math.sqrt(b ** 2 - 4 * a * c)) / (2 * a)
+        return 0.0
 
     @property
-    def pit_length(self):
+    def pit_length(self) -> float:
         """returns lagoon width in meters"""
-        # return self.lagoon_width * 3
-        return self.pit_width * 3  # TODO: Check if this is intended
+        return self.pit_width * 3
 
     @property
-    def pit_surface_area(self):
+    def pit_surface_area(self) -> float:
         """returns lagoon surface area in m^2"""
-        # return self.lagoon_width * self.lagoon_length
-        return self.pit_width * self.pit_length  # TODO: Check if this is intended
+        return self.pit_width * self.pit_length
 
     @property
-    def pit_volume(self):
+    def pit_volume(self) -> float:
         """returns lagoon volume in m^3, should match volume needed"""
         return self.pit_length * self.pit_width * self.pit_depth \
-               - (self.pit_slope * self.pit_depth ** 2) * (self.pit_length + self.pit_width) \
-               + 4 * self.pit_slope * self.pit_depth ** 3 / 3
+               - (self.pit_slope * (self.pit_depth ** 2)) * (self.pit_length + self.pit_width) \
+               + (4 * self.pit_slope * (self.pit_depth ** 3) / 3)
 
     @property
-    def precip(self):
+    def precip(self) -> float:
         """returns additional lagoon volume needed for precipitation in m^3"""
         current_day_rainfall = self.weather.rainfall[self.time.year - 1][self.time.day - 1]
         return current_day_rainfall * self.pit_surface_area  # m3 of rain
@@ -225,18 +258,44 @@ class SlurryStorageOutdoor(BaseManureTreatment):
 
 @dataclass
 class ManureTreatmentConfig:
-    percent_dry_solids: float = 1.0
-    TS_removal_efficiency: float = 0.0
-    VS_removal_efficiency: float = 0.0
-    N_removal_efficiency: float = 0.0
-    TAN_removal_efficiency: float = 0.0
-    P_removal_efficiency: float = 0.0
-    K_removal_efficiency: float = 0.0
-    TS_DM_effluent_rate: float = 0.0
+    """Class for storing manure treatment configuration data.
+
+    Attributes:
+        TS_removal_efficiency_for_treatment: Percent of total solids removed from manure during treatment.
+        VS_removal_efficiency_for_treatment: Percent of volatile solids removed from manure during treatment.
+        N_removal_efficiency_for_treatment: Percent of nitrogen removed from manure during treatment.
+        TAN_removal_efficiency_for_treatment: Percent of total ammoniacal nitrogen removed from manure during treatment.
+        P_removal_efficiency_for_treatment: Percent of phosphorus removed from manure during treatment.
+        K_removal_efficiency_for_treatment: Percent of potassium removed from manure during treatment.
+
+        hydraulic_retention_time: Time in days spent in the treatment system.
+        sludge_accumulation_period: Time in days/years that sludge accumulates in the treatment system.
+        SAV_fraction: Sludge Accumulation Volume (SAV) fraction based on the manure solids
+            entering the treatment system.
+        top_cover_volume_fraction: Fraction of the total volume of the treatment system
+            that is assumed to be the top cover volume.
+        biogas_gen_ratio: Amount of biogas generated from the treatment system.
+        methane_gen_ratio: Amount of methane generated from the treatment system
+            (calculated from the amount of biogas generated).
+        evaporation_fraction: Fraction of the liquid portion evaporated from the treatment system.
+        AD_temp_set_point: Temperature set point for the anaerobic digestion.
+        AD_temp: Temperature of the anaerobic digestion.
+
+        storage_time_period: Time in days that manure is stored in the treatment system.
+        precip_input: Storage space for the amount of precipitation that falls onto the treatment system.
+        freeboard_input: Empty storage space above the manure in the treatment system.
+
+    """
+    TS_removal_efficiency_for_treatment: float = 0.0
+    VS_removal_efficiency_for_treatment: float = 0.0
+    N_removal_efficiency_for_treatment: float = 0.0
+    TAN_removal_efficiency_for_treatment: float = 0.0
+    P_removal_efficiency_for_treatment: float = 0.0
+    K_removal_efficiency_for_treatment: float = 0.0
 
     hydraulic_retention_time: int = 0
     sludge_accumulation_period: float = 0.0
-    SAV_fraction: float = 0.0  # Sludge Accumulation Volume fraction
+    SAV_fraction: float = 0.0
     top_cover_volume_fraction: float = 0.0
     biogas_gen_ratio: float = 0.0
     methane_gen_ratio: float = 0.0
@@ -252,36 +311,32 @@ class ManureTreatmentConfig:
 
 class DefaultManureTreatmentConfigFactory:
     SLURRY_STORAGE_UNDERFLOOR_CONFIG = ManureTreatmentConfig(
-            percent_dry_solids=1.0,
-            TS_removal_efficiency=0.1,  # Between 10-30%
-            VS_removal_efficiency=0.85,  # Between 80-90%
-            N_removal_efficiency=0.1,  # # Between 10-30%
-            TAN_removal_efficiency=0.45,  # Between 61-80%
-            P_removal_efficiency=0.05,  # # Between 5-30%
-            K_removal_efficiency=0.05,  # # Between 5-30%
-            TS_DM_effluent_rate=0.0,
+            TS_removal_efficiency_for_treatment=0.1,  # Between 10-30%
+            VS_removal_efficiency_for_treatment=0.20,  # Between 20-40%
+            N_removal_efficiency_for_treatment=0.1,  # # Between 10-30%
+            TAN_removal_efficiency_for_treatment=0.45,  # Between 61-80%
+            P_removal_efficiency_for_treatment=0.05,  # # Between 5-30%
+            K_removal_efficiency_for_treatment=0.05,  # # Between 5-30%
             storage_time_period=120.0,
     )
 
     SLURRY_STORAGE_OUTDOOR_CONFIG = ManureTreatmentConfig(
-            percent_dry_solids=1.0,
-            TS_removal_efficiency=0.1,  # Between 10-30%
-            VS_removal_efficiency=0.85,  # Between 80-90%
-            N_removal_efficiency=0.1,  # # Between 10-30%
-            TAN_removal_efficiency=0.45,  # Between 61-80%
-            P_removal_efficiency=0.05,  # # Between 5-30%
-            K_removal_efficiency=0.05,  # # Between 5-30%
-            TS_DM_effluent_rate=0.0,
+            TS_removal_efficiency_for_treatment=0.1,  # Between 10-30%
+            VS_removal_efficiency_for_treatment=0.20,  # Between 20-40%
+            N_removal_efficiency_for_treatment=0.1,  # # Between 10-30%
+            TAN_removal_efficiency_for_treatment=0.45,  # Between 61-80%
+            P_removal_efficiency_for_treatment=0.05,  # # Between 5-30%
+            K_removal_efficiency_for_treatment=0.05,  # # Between 5-30%
             storage_time_period=120.0,
             precip_input=0.0,
             freeboard_input=0.3048
     )
 
     @classmethod
-    def get_instance(cls, treatment_type: TreatmentType) -> ManureTreatmentConfig:
+    def get_instance(cls, treatment_type: ManureTreatmentType) -> ManureTreatmentConfig:
         manure_treatment_config_by_type = {
-            TreatmentType.SLURRY_STORAGE_UNDERFLOOR: cls.SLURRY_STORAGE_UNDERFLOOR_CONFIG,
-            TreatmentType.SLURRY_STORAGE_OUTDOOR: cls.SLURRY_STORAGE_OUTDOOR_CONFIG,
+            ManureTreatmentType.SLURRY_STORAGE_UNDERFLOOR: cls.SLURRY_STORAGE_UNDERFLOOR_CONFIG,
+            ManureTreatmentType.SLURRY_STORAGE_OUTDOOR: cls.SLURRY_STORAGE_OUTDOOR_CONFIG,
         }
         return manure_treatment_config_by_type[treatment_type]
 
@@ -294,12 +349,12 @@ class ManureTreatmentFactory:
                      customer_manure_treatment_config: Optional[ManureTreatmentConfig] = None) \
             -> BaseManureTreatment:
 
-        manure_treatment_class_by_type: Dict[TreatmentType, Type[BaseManureTreatment]] = {
-            TreatmentType.SLURRY_STORAGE_UNDERFLOOR: SlurryStorageUnderfloor,
-            TreatmentType.SLURRY_STORAGE_OUTDOOR: SlurryStorageOutdoor,
+        manure_treatment_class_by_type: Dict[ManureTreatmentType, Type[BaseManureTreatment]] = {
+            ManureTreatmentType.SLURRY_STORAGE_UNDERFLOOR: SlurryStorageUnderfloor,
+            ManureTreatmentType.SLURRY_STORAGE_OUTDOOR: SlurryStorageOutdoor,
         }
 
-        manure_treatment_type = TreatmentType.get_type(manure_treatment_type_name)
+        manure_treatment_type = ManureTreatmentType.get_type(manure_treatment_type_name)
         manure_treatment_class = manure_treatment_class_by_type[manure_treatment_type]
 
         if customer_manure_treatment_config:

@@ -91,29 +91,23 @@ class BaseManureSeparator:
         daily_output = ManureSeparatorDailyOutput(
                 simulation_day=rp.simulation_day,
                 pen_id=rp.pen_id,
-                TAN=rp.TAN,
-                N=rp.N,
-                TS=rp.TS,
-                VS_total=rp.VS_total,
-                P=rp.P,
-                K=rp.K,
                 total_daily_manure_volume=rp.total_daily_manure_volume,
                 final_solids_wet_mass=(
-                        rp.TS * self.config.TS_removal_efficiency / self.config.percent_dry_solids
+                        rp.TS * self.config.TS_removal_efficiency_for_separator / self.config.percent_dry_solids
                 ),
 
-                TS_solid=rp.TS * self.config.TS_removal_efficiency,
-                VS_solid=rp.VS_total * self.config.VS_removal_efficiency,
-                N_solid=rp.N * self.config.N_removal_efficiency,
-                P_solid=rp.P * self.config.P_removal_efficiency,
-                K_solid=rp.K * self.config.K_removal_efficiency,
+                TS_solid=rp.TS * self.config.TS_removal_efficiency_for_separator,
+                VS_solid=rp.VS_total * self.config.VS_removal_efficiency_for_separator,
+                N_solid=rp.N * self.config.N_removal_efficiency_for_separator,
+                P_solid=rp.P * self.config.P_removal_efficiency_for_separator,
+                K_solid=rp.K * self.config.K_removal_efficiency_for_separator,
 
-                TS_liquid=rp.TS * (1 - self.config.TS_removal_efficiency),
-                VS_liquid=rp.VS_total * (1 - self.config.VS_removal_efficiency),
-                N_liquid=rp.N * (1 - self.config.N_removal_efficiency),
-                TAN_liquid=rp.TAN * (1 - self.config.TAN_removal_efficiency),
-                P_liquid=rp.P * (1 - self.config.P_removal_efficiency),
-                K_liquid=rp.K * (1 - self.config.K_removal_efficiency),
+                TS_liquid=rp.TS * (1 - self.config.TS_removal_efficiency_for_separator),
+                VS_liquid=rp.VS_total * (1 - self.config.VS_removal_efficiency_for_separator),
+                N_liquid=rp.N * (1 - self.config.N_removal_efficiency_for_separator),
+                TAN_liquid=rp.TAN * (1 - self.config.TAN_removal_efficiency_for_separator),
+                P_liquid=rp.P * (1 - self.config.P_removal_efficiency_for_separator),
+                K_liquid=rp.K * (1 - self.config.K_removal_efficiency_for_separator),
         )
         self.all_output.append(daily_output)
         return daily_output
@@ -224,22 +218,22 @@ class ManureSeparatorConfig:
     """Class for storing manure separator configuration data.
 
     Attributes:
-        percent_dry_solids: Percent dry solids in manure solids.
-        TS_removal_efficiency: Percent of total solids removed from manure.
-        VS_removal_efficiency: Percent of volatile solids removed from manure.
-        N_removal_efficiency: Percent of nitrogen removed from manure.
-        TAN_removal_efficiency: Percent of total ammonia nitrogen removed from manure.
-        P_removal_efficiency: Percent of phosphorus removed from manure.
-        K_removal_efficiency: Percent of potassium removed from manure.
+        percent_dry_solids: Percent dry content in manure solids.
+        TS_removal_efficiency_for_separator: Percent of total solids removed from manure.
+        VS_removal_efficiency_for_separator: Percent of volatile solids removed from manure.
+        N_removal_efficiency_for_separator: Percent of nitrogen removed from manure.
+        TAN_removal_efficiency_for_separator: Percent of total ammonia nitrogen removed from manure.
+        P_removal_efficiency_for_separator: Percent of phosphorus removed from manure.
+        K_removal_efficiency_for_separator: Percent of potassium removed from manure.
 
     """
     percent_dry_solids: float = 1.0
-    TS_removal_efficiency: float = 0.0
-    VS_removal_efficiency: float = 0.0
-    N_removal_efficiency: float = 0.0
-    TAN_removal_efficiency: float = 0.0
-    P_removal_efficiency: float = 0.0
-    K_removal_efficiency: float = 0.0
+    TS_removal_efficiency_for_separator: float = 0.0
+    VS_removal_efficiency_for_separator: float = 0.0
+    N_removal_efficiency_for_separator: float = 0.0
+    TAN_removal_efficiency_for_separator: float = 0.0
+    P_removal_efficiency_for_separator: float = 0.0
+    K_removal_efficiency_for_separator: float = 0.0
 
 
 class DefaultManureSeparatorConfigFactory:
@@ -247,21 +241,21 @@ class DefaultManureSeparatorConfigFactory:
 
     ROTARY_SCREEN_CONFIG = ManureSeparatorConfig(
             percent_dry_solids=0.2,
-            TS_removal_efficiency=0.55,
-            VS_removal_efficiency=0.55,
-            N_removal_efficiency=0.3,
-            TAN_removal_efficiency=0.15,
-            P_removal_efficiency=0.4,
-            K_removal_efficiency=0.15,
+            TS_removal_efficiency_for_separator=0.55,
+            VS_removal_efficiency_for_separator=0.55,
+            N_removal_efficiency_for_separator=0.3,
+            TAN_removal_efficiency_for_separator=0.15,
+            P_removal_efficiency_for_separator=0.4,
+            K_removal_efficiency_for_separator=0.15,
     )
     SCREW_PRESS_CONFIG = ManureSeparatorConfig(
             percent_dry_solids=0.35,
-            TS_removal_efficiency=0.30,
-            VS_removal_efficiency=0.5,
-            N_removal_efficiency=0.3,
-            TAN_removal_efficiency=0.10,
-            P_removal_efficiency=0.2,
-            K_removal_efficiency=0.23,
+            TS_removal_efficiency_for_separator=0.30,
+            VS_removal_efficiency_for_separator=0.5,
+            N_removal_efficiency_for_separator=0.3,
+            TAN_removal_efficiency_for_separator=0.10,
+            P_removal_efficiency_for_separator=0.2,
+            K_removal_efficiency_for_separator=0.23,
     )
 
     @classmethod
