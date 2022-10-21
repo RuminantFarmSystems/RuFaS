@@ -42,3 +42,4 @@ venv/
 .DS_store
 
 .pytest_cache/
+.ipynb_checkpoints/

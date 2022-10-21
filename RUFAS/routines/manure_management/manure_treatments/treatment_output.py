@@ -91,3 +91,14 @@ class AggregatedManureOutputforField(TreatmentOutput):
         self.WIP =daily_output.VS_total*0.5
         self.WOP =daily_output.VS_total*0.5
 
+
+@dataclass
+class SludgeOutput(TreatmentOutput):
+    """Description: This class is for tracking sludge accumulated properties. 
+    """
+    TS: float = 0.0  
+    VS: float = 0.0  
+    N_mass:float=0.0
+    P_mass:float=0.0
+    K_mass:float=0.0
+
