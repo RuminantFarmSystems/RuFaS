@@ -353,8 +353,8 @@ class ManureStorage:
             elif self.handling_system.startswith("automatic_alley_scrapers"):
                 self.water_use_rate = 100
             else:
-                print(self.handling_system, 'is not currently implemented as a handling method. '
-                                            'Setting to flush system')
+                # print(self.handling_system, 'is not currently implemented as a handling method. '
+                #                             'Setting to flush system')
                 self.handling_system = "flush_system"
                 self.calibrate_water_use()
 
@@ -375,8 +375,8 @@ class ManureStorage:
                 self.bedding_dry_matter = 0.9
                 self.bedding_washed_perc = 0.8
             else:
-                print(self.bedding, 'is not currently implemented as a bedding type for manure storage. '
-                                    'Setting to organic bedding')
+                # print(self.bedding, 'is not currently implemented as a bedding type for manure storage. '
+                #                     'Setting to organic bedding')
                 self.bedding = "organic"
                 self.calibrate_bedding()
 
@@ -518,7 +518,7 @@ class ManureStorage:
                 self.TS_DM_effluent_rate = 0.2
 
             else:
-                print(self.separator, 'is not currently implemented as a separator. Setting to sedimentation')
+                # print(self.separator, 'is not currently implemented as a separator. Setting to sedimentation')
                 self.separator = "sedimentation"
                 self.calibrate_separator()
 

@@ -417,7 +417,7 @@ class ManureTreatmentConfig:
     AD_temp_set_point: float = 0.0
     AD_temp: float = 0.0
 
-    storage_time_period: float = 0.0,
+    storage_time_period: int = 0,
     precip_input: float = 0.0,
     freeboard_input: float = 0.0
 
@@ -426,23 +426,23 @@ class DefaultManureTreatmentConfigFactory:
     """Class for creating default manure treatment configuration data."""
 
     SLURRY_STORAGE_UNDERFLOOR_CONFIG = ManureTreatmentConfig(
-            TS_removal_efficiency_for_treatment=0.1,  # Between 10-30%
+            TS_removal_efficiency_for_treatment=0.10,  # Between 10-30%
             VS_removal_efficiency_for_treatment=0.20,  # Between 20-40%
-            N_removal_efficiency_for_treatment=0.1,  # # Between 10-30%
+            N_removal_efficiency_for_treatment=0.10,  # # Between 10-30%
             TAN_removal_efficiency_for_treatment=0.45,  # Between 61-80%
             P_removal_efficiency_for_treatment=0.05,  # # Between 5-30%
             K_removal_efficiency_for_treatment=0.05,  # # Between 5-30%
-            storage_time_period=120.0,
+            storage_time_period=120,
     )
 
     SLURRY_STORAGE_OUTDOOR_CONFIG = ManureTreatmentConfig(
-            TS_removal_efficiency_for_treatment=0.1,  # Between 10-30%
+            TS_removal_efficiency_for_treatment=0.10,  # Between 10-30%
             VS_removal_efficiency_for_treatment=0.20,  # Between 20-40%
-            N_removal_efficiency_for_treatment=0.1,  # # Between 10-30%
+            N_removal_efficiency_for_treatment=0.10,  # # Between 10-30%
             TAN_removal_efficiency_for_treatment=0.45,  # Between 61-80%
             P_removal_efficiency_for_treatment=0.05,  # # Between 5-30%
             K_removal_efficiency_for_treatment=0.05,  # # Between 5-30%
-            storage_time_period=120.0,
+            storage_time_period=120,
             precip_input=0.0,
             freeboard_input=0.3048
     )

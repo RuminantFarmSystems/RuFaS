@@ -146,7 +146,7 @@ class AnimalManagement:
         self.life_cycle_manager = LifeCycleManager(animal_config)
         AnimalBase.set_config(animal_config)
         AnimalBase.set_nutrient_list(feed.nutrient_rqmts)
-        self.init_pens(data['pen_information'], data['herd_information'])
+        self.init_pens(data['pen_information'], data['herd_information'], data['manure_management_scenarios'])
         self.init_animals(data['herd_information'], self.all_pens, weather, time, config, feed)
         self.housing = data['housing']
         self.pasture_concentrate = data['pasture_concentrate']
@@ -154,12 +154,14 @@ class AnimalManagement:
         self.formulation_interval = data['ration']['formulation_interval']
         self.methane_model = data['methane_model']
 
-    def init_pens(self, all_pens_data, herd_data):
+    def init_pens(self, all_pens_data, herd_data, manure_management_scenarios):
         """
         Populates the list of pens with the information from the input json file.
         Args:
             all_pens_data: dictionary containing information about the pens
             herd_data: dictionary containing information about the herd
+            manure_management_scenarios: dictionary containing information about
+                different manure management scenarios
         """
 
         for pen_name in all_pens_data:
@@ -176,53 +178,56 @@ class AnimalManagement:
                 pen_data['horizontal_dist_to_milking_parlor']
             num_stalls = pen_data['number_of_stalls']
             housing_type = pen_data['housing_type']
-            bedding_type = pen_data['bedding_type']
             pen_type = pen_data['pen_type']
 
-            manure_handling = pen_data['manure_handling']
-            manure_separator = pen_data['manure_separator']
-            manure_storage = pen_data['manure_storage']
+            manure_management_scenario_id = pen_data['manure_management_scenario_id']
+            manure_management_scenario = manure_management_scenarios[manure_management_scenario_id]
+            bedding_type = manure_management_scenario['bedding_type']
+            manure_handler = manure_management_scenario['manure_handler']
+            manure_separator = manure_management_scenario['manure_separator']
+            manure_treatment = manure_management_scenario['manure_treatment']
+
             pen = Pen(pen_id, vertical_dist_to_parlor, horizontal_dist_to_parlor,
-                      num_stalls, housing_type, bedding_type, pen_type, manure_handling,
-                      manure_separator, manure_storage, animal_combination,
+                      num_stalls, housing_type, bedding_type, pen_type, manure_handler,
+                      manure_separator, manure_treatment, animal_combination,
                       max_stocking_density)
 
             self.all_pens.append(pen)
 
         herd_num = herd_data['herd_num']
 
-        manure_handling = "manual_scraping"
+        manure_handler = "manual_scraping"
         manure_separator = "sedimentation"
-        manure_storage = "storage_pit"
+        manure_treatment = "storage_pit"
         animal_combination = None
         if (len(self.all_pens) == 0) and (herd_num > 0):
-            print('Warning: herd_num > 0, but pen_num = 0. Initilizing 3 default pens.')
+            print('Warning: herd_num > 0, but pen_num = 0. Initializing 3 default pens.')
             pen_1 = Pen(0, 0.1, 1.6, 100, 'open air barn', 'sand', 'freestall',
-                        manure_handling, manure_separator, manure_storage,
+                        manure_handler, manure_separator, manure_treatment,
                         animal_combination, 1.2)
             pen_2 = Pen(1, 0.1, 1.6, 200, 'open air barn', 'sawdust', 'freestall',
-                        manure_handling, manure_separator, manure_storage,
+                        manure_handler, manure_separator, manure_treatment,
                         animal_combination, 1.2)
             pen_3 = Pen(2, 0.1, 1.6, 100, 'open air barn', 'sand', 'freestall',
-                        manure_handling, manure_separator, manure_storage,
+                        manure_handler, manure_separator, manure_treatment,
                         animal_combination, 1.2)
             self.all_pens.append(pen_1)
             self.all_pens.append(pen_2)
             self.all_pens.append(pen_3)
         elif (len(self.all_pens) == 1) and (herd_num > 0):
-            print('Warning: herd_num > 0, but pen_num = 1. Initilizing 2 default pens.')
+            print('Warning: herd_num > 0, but pen_num = 1. Initializing 2 default pens.')
             pen_2 = Pen(1, 0.1, 1.6, 300, 'open air barn', 'sawdust', 'freestall',
-                        manure_handling, manure_separator, manure_storage,
+                        manure_handler, manure_separator, manure_treatment,
                         animal_combination, 1.2)
             pen_3 = Pen(2, 0.1, 1.6, 300, 'open air barn', 'straw', 'tiestall',
-                        manure_handling, manure_separator, manure_storage,
+                        manure_handler, manure_separator, manure_treatment,
                         animal_combination, 1.2)
             self.all_pens.append(pen_2)
             self.all_pens.append(pen_3)
         elif (len(self.all_pens) == 2) and (herd_num > 0):
-            print('Warning: herd_num > 0, but pen_num = 2. Initilizing 1 default pen.')
+            print('Warning: herd_num > 0, but pen_num = 2. Initializing 1 default pen.')
             pen_3 = Pen(2, 0.1, 1.6, 300, 'open air barn', 'straw', 'tiestall',
-                        manure_handling, manure_separator, manure_storage,
+                        manure_handler, manure_separator, manure_treatment,
                         animal_combination, 1.2)
             self.all_pens.append(pen_3)
 

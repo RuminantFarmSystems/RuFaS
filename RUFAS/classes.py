@@ -47,11 +47,13 @@ class State:
         self.fields = Fields(data['fields'], time)
         input_dir = Utility.get_base_dir() / 'input'
         self.feed = Feed(Utility.read_json_file(input_dir / 'feed' / data['feed']))
-        self.animal_management = AnimalManagement(
-            Utility.read_json_file(input_dir / 'animal' / data['animal']), config, self.feed, weather, time)
+        manure_management_config = Utility.read_json_file(input_dir / 'manure' / data['manure'])
+        animal_config = Utility.read_json_file(input_dir / 'animal' / data['animal'])
+        animal_config['manure_management_scenarios'] = manure_management_config['manure_management_scenarios']
+        self.animal_management = AnimalManagement(animal_config, config, self.feed, weather, time)
 
         self.manure_storage = ManureStorage(self.animal_management)
-        self.manure_management = ManureManagement(self.animal_management, weather, time)
+        self.manure_management = ManureManagement(self.animal_management, weather, time, manure_management_config)
 
     def annual_reset(self):
         """

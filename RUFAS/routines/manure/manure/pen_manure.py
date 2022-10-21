@@ -63,7 +63,7 @@ class PenManure:
     def get_instance(animal_manure) -> PenManure:
         return PenManure(
                 urea=animal_manure['U'],
-                TAN=animal_manure['TAN'],
+                TAN=animal_manure['TAN_s'],
                 N=animal_manure['MN'],
                 manure_mass=animal_manure['Mkg'],
                 TS=animal_manure['TSd'],
@@ -71,7 +71,7 @@ class PenManure:
                 VSnd=animal_manure['VSnd'],
                 WIP_frac=animal_manure['WIP_frac'],
                 WOP_frac=animal_manure['WOP_frac'],
-                P=animal_manure['P'],
+                P=animal_manure['p_excrt_manure'],
                 P_frac=animal_manure['p_frac'],
                 CH4_animal=animal_manure['CH4_manure']
         )

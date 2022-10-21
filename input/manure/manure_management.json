@@ -1,0 +1,129 @@
+{
+  "manure_management_scenarios": [
+    {
+      "scenario_id": 0,
+      "bedding_type": "sawdust",
+      "manure_handler": "flush system",
+      "manure_separator": "rotary screen",
+      "manure_treatment": "anaerobic digestion"
+    },
+    {
+      "scenario_id": 1,
+      "bedding_type": "sawdust",
+      "manure_handler": "manual scraping",
+      "manure_separator": "null",
+      "manure_treatment": "anaerobic digestion and lagoon"
+    },
+    {
+      "scenario_id": 2,
+      "bedding_type": "sand",
+      "manure_handler": "flush system",
+      "manure_separator": "sand lane",
+      "manure_treatment": "anaerobic lagoon"
+    },
+    {
+      "scenario_id": 3,
+      "bedding_type": "sawdust",
+      "manure_handler": "manual scraping",
+      "manure_separator": "null",
+      "manure_treatment": "slurry storage underfloor"
+    },
+    {
+      "scenario_id": 4,
+      "bedding_type": "sawdust",
+      "manure_handler": "manual scraping",
+      "manure_separator": "null",
+      "manure_treatment": "slurry storage outdoor"
+    }
+  ],
+  "bedding_configs": [
+    {
+      "bedding_type": "sawdust",
+      "bedding_mass_per_day": 1.97,
+      "bedding_density": 250.0,
+      "bedding_dry_matter_content": 0.9,
+      "bedding_cleaned_frac": 1.0
+    },
+    {
+      "bedding_type": "manure solids",
+      "bedding_mass_per_day": 2.50,
+      "bedding_density": 400.0,
+      "bedding_dry_matter_content": 0.9,
+      "bedding_cleaned_frac": 1.0
+    },
+    {
+      "bedding_type": "sand",
+      "bedding_mass_per_day": 25.0,
+      "bedding_density": 1500.0,
+      "bedding_dry_matter_content": 0.9,
+      "bedding_cleaned_frac": 1.0,
+      "sand_removal_efficiency": 1.0
+    }
+  ],
+  "manure_handler_configs": [
+    {
+      "manure_handler_type": "flush system",
+      "cleaning_water_use_rate": 757.0,
+      "minutes_per_cleaning": 8,
+      "cleanings_per_day": 2
+    },
+    {
+      "manure_handler_type": "manual scraping",
+      "cleaning_water_use_rate": 10.0,
+      "minutes_per_cleaning": 8,
+      "cleanings_per_day": 2
+    },
+    {
+      "manure_handler_type": "alley scraper",
+      "cleaning_water_use_rate": 10.0,
+      "minutes_per_cleaning": 8,
+      "cleanings_per_day": 2
+    }
+  ],
+  "manure_separator_configs": [
+    {
+      "manure_separator_type": "rotary screen",
+      "percent_dry_solids": 0.20,
+      "TS_removal_efficiency_for_separator": 0.55,
+      "VS_removal_efficiency_for_separator": 0.55,
+      "N_removal_efficiency_for_separator": 0.30,
+      "TAN_removal_efficiency_for_separator": 0.15,
+      "P_removal_efficiency_for_separator": 0.40,
+      "K_removal_efficiency_for_separator": 0.15
+    },
+    {
+      "manure_separator_type": "screw press",
+      "percent_dry_solids": 0.35,
+      "TS_removal_efficiency_for_separator": 0.30,
+      "VS_removal_efficiency_for_separator": 0.50,
+      "N_removal_efficiency_for_separator": 0.30,
+      "TAN_removal_efficiency_for_separator": 0.10,
+      "P_removal_efficiency_for_separator": 0.20,
+      "K_removal_efficiency_for_separator": 0.23
+    }
+  ],
+  "manure_treatment_configs": [
+    {
+      "manure_treatment_type": "slurry storage underfloor",
+      "TS_removal_efficiency_for_treatment": 0.10,
+      "VS_removal_efficiency_for_treatment": 0.20,
+      "N_removal_efficiency_for_treatment": 0.10,
+      "TAN_removal_efficiency_for_treatment": 0.45,
+      "P_removal_efficiency_for_treatment": 0.05,
+      "K_removal_efficiency_for_treatment": 0.05,
+      "storage_time_period": 120
+    },
+    {
+      "manure_treatment_type": "slurry storage outdoor",
+      "TS_removal_efficiency_for_treatment": 0.10,
+      "VS_removal_efficiency_for_treatment": 0.20,
+      "N_removal_efficiency_for_treatment": 0.10,
+      "TAN_removal_efficiency_for_treatment": 0.45,
+      "P_removal_efficiency_for_treatment": 0.05,
+      "K_removal_efficiency_for_treatment": 0.05,
+      "storage_time_period": 120,
+      "precip_input": 0.0,
+      "freeboard_input": 0.0
+    }
+  ]
+}

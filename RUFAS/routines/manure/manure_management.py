@@ -16,12 +16,14 @@ from typing import Optional
 from RUFAS.routines.animal.animal_management import AnimalManagement
 from RUFAS.routines.manure.beddings.bedding_classes import BaseBedding
 from RUFAS.routines.manure.beddings.bedding_classes import BeddingFactory
+from RUFAS.routines.manure.input_handler.manure_management_config_handler import ManureManagementConfigHandler
 from RUFAS.routines.manure.manure_handlers.manure_handler_classes import BaseManureHandler
 from RUFAS.routines.manure.manure_handlers.manure_handler_classes import ManureHandlerFactory
 from RUFAS.routines.manure.manure_separators.manure_separator_classes import BaseManureSeparator
 from RUFAS.routines.manure.manure_separators.manure_separator_classes import ManureSeparatorFactory
 from RUFAS.routines.manure.manure_treatments.manure_treatment_classes import BaseManureTreatment
 from RUFAS.routines.manure.manure_treatments.manure_treatment_classes import ManureTreatmentFactory
+from RUFAS.routines.manure.output_handler.manure_management_output_handler import ManureManagementOutputHandler
 from RUFAS.routines.manure.pen.manure_management_pen import ManureManagementPen
 from RUFAS.routines.manure.reception_pits.reception_pit import ReceptionPit
 
@@ -47,7 +49,8 @@ class ManureManagement:
     def __init__(self,
                  animal_management: AnimalManagement,
                  weather,
-                 time):
+                 time,
+                 manure_management_config):
         """
         Initializes a ManureManagement object by setting up the appropriate manure
         management components as specified by the data in the animal_management object.
@@ -57,6 +60,8 @@ class ManureManagement:
                 of the simulation engine object.
             weather: The Weather object used to initialize State variables.
             time: The Time object used to initialize State variables.
+            manure_management_config: A dictionary that contains the configuration data for
+                different manure management scenarios.
 
         """
         self.beddings: Dict[int, BaseBedding] = {}
@@ -66,6 +71,8 @@ class ManureManagement:
         self.manure_treatments: Dict[int, BaseManureTreatment] = {}
         self.weather = weather
         self.time = time
+        self.manure_management_config_handler = ManureManagementConfigHandler(manure_management_config)
+        self.manure_management_output_handler = ManureManagementOutputHandler()
         self._all_data = collections.defaultdict(list)
         self._setup_manure_management_components(animal_management)
 
@@ -110,29 +117,39 @@ class ManureManagement:
 
         for pen in animal_management.all_pens:
             mm_pen = ManureManagementPen(pen)
+
+            custom_bedding_config = self.manure_management_config_handler.get_custom_bedding_config(mm_pen.bedding_type)
             self.beddings[pen.id] = BeddingFactory.get_instance(
                     bedding_type_name=mm_pen.bedding_type,
-                    custom_bedding_config=None
+                    custom_bedding_config=custom_bedding_config
             )
+
+            custom_manure_handler_config = \
+                self.manure_management_config_handler.get_custom_manure_handler_config(mm_pen.manure_handler)
             self.manure_handlers[mm_pen.id] = ManureHandlerFactory.get_instance(
                     manure_handler_type_name=mm_pen.manure_handler,
-                    custom_manure_handler_config=None
+                    custom_manure_handler_config=custom_manure_handler_config
             )
+
             self.reception_pits[mm_pen.id] = ReceptionPit()
 
             if mm_pen.manure_separator == 'null':
                 self.manure_separators[mm_pen.id] = None
             else:
+                custom_manure_separator_config = \
+                    self.manure_management_config_handler.get_custom_manure_separator_config(mm_pen.manure_separator)
                 self.manure_separators[mm_pen.id] = ManureSeparatorFactory.get_instance(
                         manure_separator_type_name=mm_pen.manure_separator,
-                        custom_manure_separator_config=None
+                        custom_manure_separator_config=custom_manure_separator_config
                 )
 
+            custom_manure_treatment_config = \
+                self.manure_management_config_handler.get_custom_manure_treatment_config(mm_pen.manure_treatment)
             self.manure_treatments[mm_pen.id] = ManureTreatmentFactory.get_instance(
                     manure_treatment_type_name=mm_pen.manure_treatment,
                     weather=self.weather,
                     time=self.time,
-                    custom_manure_treatment_config=None
+                    custom_manure_treatment_config=custom_manure_treatment_config
             )
 
     def update(self, animal_management: AnimalManagement) -> None:
@@ -185,6 +202,9 @@ class ManureManagement:
                 treatment_daily_output
             )
             self._all_data[pen.id].append(daily_update_data)
+
+        self.manure_management_output_handler.append_last_output(self._all_data, animal_management.simulation_day)
+        self.manure_management_output_handler.export_all_data_to_csv()
 
 
 def simulate_daily_manure_management(manure_management: ManureManagement, animal_management: AnimalManagement) -> None:
