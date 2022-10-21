@@ -260,7 +260,7 @@ class DefaultManureSeparatorConfigFactory:
 
     @classmethod
     def get_instance(cls, manure_separator_type: ManureSeparatorType) -> ManureSeparatorConfig:
-        """Return a default manure separator configuration data instance.
+        """Return a default manure separator configuration data instance for the given separator type.
 
         Args:
             manure_separator_type: The type of manure separator.
