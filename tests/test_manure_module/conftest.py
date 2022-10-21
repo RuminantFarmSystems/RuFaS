@@ -1,0 +1,112 @@
+from typing import Callable
+from typing import Dict
+from typing import List
+
+from pytest import fixture
+from pytest_mock import MockerFixture
+
+from RUFAS.routines import AnimalManagement
+from RUFAS.routines.animal.life_cycle.calf import Calf
+from RUFAS.routines.animal.life_cycle.cow import Cow
+from RUFAS.routines.animal.life_cycle.heiferI import HeiferI
+from RUFAS.routines.animal.life_cycle.heiferII import HeiferII
+from RUFAS.routines.animal.life_cycle.heiferIII import HeiferIII
+from RUFAS.routines.animal.pen import Pen
+
+
+@fixture
+def mock_calf(mocker: MockerFixture) -> Calf:
+    """Returns a Calf mocker object"""
+
+    return mocker.MagicMock(autospec=Calf)
+
+
+@fixture
+def mock_heiferI(mocker: MockerFixture) -> HeiferI:
+    """Returns a HeiferI mocker object"""
+
+    return mocker.MagicMock(autospec=HeiferI)
+
+
+@fixture
+def mock_heiferII(mocker: MockerFixture) -> HeiferII:
+    """Returns a HeiferII mocker object"""
+
+    return mocker.MagicMock(autospec=HeiferII)
+
+
+@fixture
+def mock_heiferIII(mocker: MockerFixture) -> HeiferIII:
+    """Returns a HeiferIII mocker object"""
+
+    return mocker.MagicMock(autospec=HeiferIII)
+
+
+@fixture
+def mock_cow(mocker: MockerFixture) -> Cow:
+    """Returns a Cow mocker object"""
+
+    return mocker.MagicMock(autospec=Cow)
+
+
+@fixture
+def mock_animal_management(mocker: MockerFixture) -> AnimalManagement:
+    """Returns a AnimalManagement fixture object"""
+
+    return mocker.MagicMock(autospec=AnimalManagement)
+
+
+@fixture
+def manure_attributes() -> List[str]:
+    """Returns a list of manure attributes"""
+
+    return [
+        'U',
+        'TAN_s',
+        'MN',
+        'Mkg',
+        'TSd',
+        'VSd',
+        'WIP_frac',
+        'WOP_frac',
+        'p_excrt_manure',
+        'p_frac',
+        'K_manure',
+        'CH4_manure'
+    ]
+
+
+@fixture
+def generate_animal_manure(manure_attributes) -> Callable[[float], Dict[str, float]]:
+    """Returns a function that generates a dictionary of animal manure attributes"""
+
+    def generate(dummy_val=2.0):
+        """Generates a dictionary of animal manure attributes with dummy values"""
+
+        return {attr: dummy_val for attr in manure_attributes}
+
+    return generate
+
+
+@fixture
+def mock_pen(mocker: MockerFixture,
+             mock_calf: Calf,
+             mock_heiferI: HeiferI,
+             mock_heiferII: HeiferII,
+             mock_heiferIII: HeiferIII,
+             mock_cow: Cow,
+             generate_animal_manure: Callable[[float], Dict[str, float]]) -> Pen:
+    """Returns a Pen mocker object"""
+
+    mock_pen: Pen = mocker.MagicMock(autospec=Pen)
+    mock_pen.id = 1
+    mock_pen.animals_in_pen = [mock_cow] * 5
+    mock_pen.classes_in_pen = {'Cow'}
+    mock_pen.animal_combination = Pen.AnimalCombination.LAC_COW
+    mock_pen.housing_type = 'free stall'
+    mock_pen.bedding_type = 'sand'
+    mock_pen.manure_handling = 'manual scraping'
+    mock_pen.manure_separator = 'sand lane'
+    mock_pen.manure_storage = 'storage pit'
+    mock_pen.manure = generate_animal_manure(0.0)
+    return mock_pen

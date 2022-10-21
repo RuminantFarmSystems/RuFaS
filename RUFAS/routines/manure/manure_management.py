@@ -13,8 +13,6 @@ import collections
 from typing import Dict, List, Tuple
 from typing import Optional
 
-from RUFAS.classes import Weather
-from RUFAS.classes import Time
 from RUFAS.routines.animal.animal_management import AnimalManagement
 from RUFAS.routines.manure.beddings.bedding_classes import BaseBedding
 from RUFAS.routines.manure.beddings.bedding_classes import BeddingFactory
@@ -48,8 +46,8 @@ class ManureManagement:
 
     def __init__(self,
                  animal_management: AnimalManagement,
-                 weather: Weather,
-                 time: Time):
+                 weather,
+                 time):
         """
         Initializes a ManureManagement object by setting up the appropriate manure
         management components as specified by the data in the animal_management object.
@@ -178,9 +176,6 @@ class ManureManagement:
                         manure_separator_daily_output=manure_separator_daily_output,
                         sim_day=animal_management.simulation_day
                 )
-
-            # convert treatment output to usable form for field module
-            # convert(treatment output, wip, wop)
 
             daily_update_data = (
                 mm_pen,
