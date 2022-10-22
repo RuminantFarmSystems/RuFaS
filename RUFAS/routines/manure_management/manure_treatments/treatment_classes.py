@@ -376,6 +376,7 @@ class AnaerobicLagoon(BaseManureTreatment):
     def update_helper(self):
         handler_output = self.manure_handler.last_output
         # prev_output = self.manure_handler.last_output
+        rain_volume_added = self.precip
         daily_output = TreatmentOutput(
                 TAN_s=handler_output.TAN_s * (1 - self.config.TAN_removal_efficiency),
                 # urea=prev_output.urea,  # TODO: unexpected attribute
@@ -384,7 +385,7 @@ class AnaerobicLagoon(BaseManureTreatment):
                 VS_total=handler_output.VS_total * (1 - self.config.VS_removal_efficiency),
                 p_excrt_manure=handler_output.p_excrt_manure * (1 - self.config.P_removal_efficiency),
                 K_manure=handler_output.K_manure * (1 - self.config.K_removal_efficiency),
-                total_daily_mass=handler_output.total_daily_mass
+                total_daily_mass=handler_output.total_daily_mass+rain_volume_added
         )
 
         sludge_output = SludgeOutput(
@@ -400,9 +401,9 @@ class AnaerobicLagoon(BaseManureTreatment):
 
     @property
     def sludge_accumulation_volume(self):
-        """Returns sludge accumulation volume in kg
+        """Returns sludge accumulation volume in m^3
         """
-        return self.accumulated_sludge.TS
+        return self.accumulated_sludge.TS/1000
 
     @property
     def flushing_recycled(self):
@@ -476,8 +477,9 @@ class AnaerobicLagoon(BaseManureTreatment):
         return self.lagoon_width * self.lagoon_length
 
     @property
-    def lagoon_volume(self):
-        """returns lagoon volume in m^3, should match volume needed"""
+    def modeled_lagoon_volume(self):
+        """returns modeled lagoon volume in m^3. This modeled volume is used to verify 
+        that equations for surface area, with slope assumptions, match the volume needed for treatment"""
         return self.lagoon_length * self.lagoon_width * self.lagoon_depth \
                - (self.lagoon_slope * self.lagoon_depth ** 2) * (self.lagoon_length + self.lagoon_width) \
                + 4 * self.lagoon_slope * self.lagoon_depth ** 3 / 3
@@ -566,15 +568,15 @@ class SlurryStorageOutdoor(BaseManureTreatment):
 
     def update_helper(self):
         handler = self.manure_handler.last_output
+        rain_volume_added = self.precip
         daily_output = TreatmentOutput(
                 TAN_s=handler.TAN_s * (1 - self.config.TAN_removal_efficiency),
-                # urea=handler.urea,  # TODO: check if this is correct
                 manure_nitrogen=handler.manure_nitrogen * (1 - self.config.N_removal_efficiency),
                 TSd=handler.TSd * (1 - self.config.TS_removal_efficiency),
                 VS_total=handler.VS_total * (1 - self.config.VS_removal_efficiency),
                 p_excrt_manure=handler.p_excrt_manure * (1 - self.config.P_removal_efficiency),
                 K_manure=handler.K_manure * (1 - self.config.K_removal_efficiency),
-                total_daily_mass=handler.total_daily_mass
+                total_daily_mass=handler.total_daily_mass+rain_volume_added
         )
         return daily_output
 
@@ -629,8 +631,9 @@ class SlurryStorageOutdoor(BaseManureTreatment):
         return self.pit_width * self.pit_length 
 
     @property
-    def pit_volume(self):
-        """returns lagoon volume in m^3, should match volume needed"""
+    def modeled_pit_volume(self):
+        """returns lagoon volume in m^3, This modeled volume is used to verify 
+        that equations for surface area, with slope assumptions, match the volume needed for treatment"""
         return self.pit_length * self.pit_width * self.pit_depth \
                - (self.pit_slope * self.pit_depth ** 2) * (self.pit_length + self.pit_width) \
                + 4 * self.pit_slope * self.pit_depth ** 3 / 3
