@@ -28,8 +28,8 @@ class PenManure:
         VSnd: non-degradable volatile solids, kg.
         WIP_frac: water extractable inorganic P fraction, dimensionless.
         WOP_frac: water extractable organic P fraction, dimensionless.
-        P: manure P excretion for manure module input, kg.
-        P_frac: P fraction of manure.
+        P: manure phosphorus excretion for manure module input, kg.
+        P_frac: phosphorus fraction of manure.
         K: potassium in manure, kg.
         CH4_animal: methane emission, g/day.
 

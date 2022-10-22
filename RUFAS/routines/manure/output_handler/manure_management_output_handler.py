@@ -12,6 +12,7 @@ from RUFAS.routines.manure.manure_separators.manure_separator_daily_output impor
 from RUFAS.routines.manure.manure_treatments.manure_treatment_daily_output import ManureTreatmentDailyOutput
 from RUFAS.routines.manure.pen.manure_management_pen import ManureManagementPen
 from RUFAS.routines.manure.reception_pits.reception_pit_daily_output import ReceptionPitDailyOutput
+from RUFAS.routines.manure.units.units import Units
 
 DailyOutputType = Tuple[ManureManagementPen,
                         ManureHandlerDailyOutput,
@@ -45,10 +46,9 @@ class ManureManagementOutputHandler:
             return
         for col_var, value in asdict(today_data).items():
             col_name = col_prefix + delimiter + col_var
-            # TODO: Add units
-            # if col_var in vars(Units):
-            #     col_name += delimiter + vars(Units)[col_var]
-            accumulated_data[col_name].append(round(value, 2))
+            if col_var in vars(Units):
+                col_name += delimiter + vars(Units)[col_var]
+            accumulated_data[col_name].append(round(value, 6))
 
     def append_last_output(self,
                            all_manure_management_data: Dict[int, List[DailyOutputType]],
