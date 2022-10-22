@@ -97,9 +97,22 @@ class BaseManureTreatment:
                 current simulation day.
 
         """
+        input_data = self._current_input_data
+        daily_output = ManureTreatmentDailyOutput(
+                simulation_day=input_data.simulation_day,
+                pen_id=input_data.pen_id,
+                TAN=input_data.TAN * (1 - self.config.TAN_removal_efficiency_for_treatment),
+                N=input_data.N * (1 - self.config.N_removal_efficiency_for_treatment),
+                TS=input_data.TS * (1 - self.config.TS_removal_efficiency_for_treatment),
+                VS_total=input_data.VS_total * (1 - self.config.VS_removal_efficiency_for_treatment),
+                P=input_data.P * (1 - self.config.P_removal_efficiency_for_treatment),
+                K=input_data.K * (1 - self.config.K_removal_efficiency_for_treatment),
+        )
         if isinstance(self._current_input_data, ManureSeparatorDailyOutput):
-            return self._process_manure_separator_daily_output(self._current_input_data)
-        return self._process_reception_pit_daily_output(self._current_input_data)
+            daily_output.final_manure_volume = input_data.final_daily_volume
+        else:
+            daily_output.final_manure_volume = input_data.total_daily_manure_volume
+        return daily_output
 
     def daily_update(self,
                      reception_pit_daily_output: ReceptionPitDailyOutput,
@@ -123,60 +136,6 @@ class BaseManureTreatment:
         self._current_input_data = self._pick_input_data(reception_pit_daily_output, manure_separator_daily_output)
         daily_output = self._update_helper()
         self.all_output.append(daily_output)
-        return daily_output
-
-    def _process_manure_separator_daily_output(self,
-                                               manure_separator_daily_output: ManureSeparatorDailyOutput) \
-            -> ManureTreatmentDailyOutput:
-        """Process the manure separator daily output object.
-
-        Args:
-            manure_separator_daily_output: A ManureSeparatorDailyOutput object.
-
-        Returns:
-            A ManureTreatmentDailyOutput object containing the output for the
-                current simulation day.
-
-        """
-        input_data = manure_separator_daily_output
-        daily_output = ManureTreatmentDailyOutput(
-                simulation_day=input_data.simulation_day,
-                pen_id=input_data.pen_id,
-                TAN=input_data.TAN_liquid * (1 - self.config.TAN_removal_efficiency_for_treatment),
-                N=input_data.N_liquid * (1 - self.config.N_removal_efficiency_for_treatment),
-                TS=input_data.TS_liquid * (1 - self.config.TS_removal_efficiency_for_treatment),
-                VS_total=input_data.VS_liquid * (1 - self.config.VS_removal_efficiency_for_treatment),
-                P=input_data.P_liquid * (1 - self.config.P_removal_efficiency_for_treatment),
-                K=input_data.K_liquid * (1 - self.config.K_removal_efficiency_for_treatment),
-                final_manure_volume=input_data.final_daily_volume
-        )
-        return daily_output
-
-    def _process_reception_pit_daily_output(self,
-                                            reception_pit_daily_output: ReceptionPitDailyOutput) \
-            -> ManureTreatmentDailyOutput:
-        """Process the reception pit daily output object.
-
-        Args:
-            reception_pit_daily_output: A ReceptionPitDailyOutput object.
-
-        Returns:
-            A ManureTreatmentDailyOutput object containing the output for the
-                current simulation day.
-
-        """
-        input_data = reception_pit_daily_output
-        daily_output = ManureTreatmentDailyOutput(
-                simulation_day=input_data.simulation_day,
-                pen_id=input_data.pen_id,
-                TAN=input_data.TAN * (1 - self.config.TAN_removal_efficiency_for_treatment),
-                N=input_data.N * (1 - self.config.N_removal_efficiency_for_treatment),
-                TS=input_data.TS * (1 - self.config.TS_removal_efficiency_for_treatment),
-                VS_total=input_data.VS_total * (1 - self.config.VS_removal_efficiency_for_treatment),
-                P=input_data.P * (1 - self.config.P_removal_efficiency_for_treatment),
-                K=input_data.K * (1 - self.config.K_removal_efficiency_for_treatment),
-                final_manure_volume=input_data.total_daily_manure_volume
-        )
         return daily_output
 
 

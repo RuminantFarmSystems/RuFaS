@@ -133,7 +133,7 @@ class ManureManagement:
 
             self.reception_pits[mm_pen.id] = ReceptionPit()
 
-            if mm_pen.manure_separator == 'null':
+            if mm_pen.manure_separator == 'none':
                 self.manure_separators[mm_pen.id] = None
             else:
                 custom_manure_separator_config = \

@@ -102,12 +102,12 @@ class BaseManureSeparator:
                 P_solid=rp.P * self.config.P_removal_efficiency_for_separator,
                 K_solid=rp.K * self.config.K_removal_efficiency_for_separator,
 
-                TS_liquid=rp.TS * (1 - self.config.TS_removal_efficiency_for_separator),
-                VS_liquid=rp.VS_total * (1 - self.config.VS_removal_efficiency_for_separator),
-                N_liquid=rp.N * (1 - self.config.N_removal_efficiency_for_separator),
-                TAN_liquid=rp.TAN * (1 - self.config.TAN_removal_efficiency_for_separator),
-                P_liquid=rp.P * (1 - self.config.P_removal_efficiency_for_separator),
-                K_liquid=rp.K * (1 - self.config.K_removal_efficiency_for_separator),
+                TS=rp.TS * (1 - self.config.TS_removal_efficiency_for_separator),
+                VS_total=rp.VS_total * (1 - self.config.VS_removal_efficiency_for_separator),
+                N=rp.N * (1 - self.config.N_removal_efficiency_for_separator),
+                TAN=rp.TAN * (1 - self.config.TAN_removal_efficiency_for_separator),
+                P=rp.P * (1 - self.config.P_removal_efficiency_for_separator),
+                K=rp.K * (1 - self.config.K_removal_efficiency_for_separator),
         )
         self.all_output.append(daily_output)
         return daily_output

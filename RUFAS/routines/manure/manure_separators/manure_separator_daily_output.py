@@ -21,12 +21,12 @@ class ManureSeparatorDailyOutput:
         P_solid: Total amount of phosphorus in the separated solids, kg.
         K_solid: Total amount of potassium in the separated solids, kg.
 
-        TS_liquid: Total amount of solids in the manure volume, kg.
-        VS_liquid: Total amount of volatile solids in the manure volume, kg.
-        N_liquid: Amount of nitrogen in the manure volume, kg.
-        TAN_liquid: Total ammonia nitrogen concentration in the manure volume, g/L.
-        P_liquid: Total amount of phosphorus in the manure volume, kg.
-        K_liquid: Total amount of potassium in the manure volume, kg.
+        TS: Total amount of solids in the manure volume, kg.
+        VS_total: Total amount of volatile solids in the manure volume, kg.
+        N: Amount of nitrogen in the manure volume, kg.
+        TAN: Total ammonia nitrogen concentration in the manure volume, g/L.
+        P: Total amount of phosphorus in the manure volume, kg.
+        K: Total amount of potassium in the manure volume, kg.
 
         final_daily_volume: Total manure volume after separation, m^3.
 
@@ -43,12 +43,12 @@ class ManureSeparatorDailyOutput:
     P_solid: float = 0.0
     K_solid: float = 0.0
 
-    TS_liquid: float = 0.0
-    VS_liquid: float = 0.0
-    N_liquid: float = 0.0
-    TAN_liquid: float = 0.0
-    P_liquid: float = 0.0
-    K_liquid: float = 0.0
+    TS: float = 0.0
+    VS_total: float = 0.0
+    N: float = 0.0
+    TAN: float = 0.0
+    P: float = 0.0
+    K: float = 0.0
 
     final_daily_volume: float = field(init=False)
 
