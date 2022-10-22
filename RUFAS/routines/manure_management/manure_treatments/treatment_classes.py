@@ -408,7 +408,7 @@ class AnaerobicLagoon(BaseManureTreatment):
     @property
     def flushing_recycled(self):
         """returns flushing water recycled in m^3"""
-        if self.simulation_day > 0:
+        if(self.simulation_day > 0 and self.manure_handler.last_output.cleaning_water is not None):
             return self.manure_handler.last_output.cleaning_water * Constants.LITERS_TO_CUBIC_METERS
         else:
             return 0
@@ -434,8 +434,8 @@ class AnaerobicLagoon(BaseManureTreatment):
 
     @property
     def total_lagoon_volume(self) -> float:
-        """returns Total Lagoon Volume in m^3"""
-        return self.volume_needed + self.freeboard + self.precip
+        """returns Total Lagoon Volume in m^3. The precipitation is already included in volume_needed"""
+        return self.volume_needed + self.freeboard
 
     @property
     def volume_needed(self):
@@ -592,8 +592,8 @@ class SlurryStorageOutdoor(BaseManureTreatment):
 
     @property
     def total_pit_volume(self) -> float:
-        """returns Total Lagoon Volume in m^3"""
-        return self.treatment_volume + self.freeboard + self.precip
+        """returns Total Lagoon Volume in m^3. The precipitation is already included in treatment_volume"""
+        return self.treatment_volume + self.freeboard
 
     @property
     def pit_depth(self):
