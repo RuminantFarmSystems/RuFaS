@@ -133,7 +133,7 @@ class AnaerobicDigestion(BaseManureTreatment):
                  time: Time,
                  manure_treatment_config: ManureTreatmentConfig):
         super().__init__(manure_separator, weather, time, manure_treatment_config)
-        # self.weather_data = SimpleWeather()
+
 
         self.total_solids = 0.0
         self.volatile_solids = 0.0
@@ -178,7 +178,7 @@ class AnaerobicDigestion(BaseManureTreatment):
 
         moisture_content = self.get_moisture_content()
 
-        T_avg = self.weather_data.T_avg[self.time.year - 1][self.time.day - 1]  # TODO: Fix this
+        T_avg = self.weather_data.T_avg[self.time.year - 1][self.time.day - 1] 
 
         self.input_energy_heating = self.calc_specific_input_energy(T_avg,
                                                                     moisture_content) * self.wastewater_volume * \
@@ -375,17 +375,16 @@ class AnaerobicLagoon(BaseManureTreatment):
 
     def update_helper(self):
         handler_output = self.manure_handler.last_output
-        # prev_output = self.manure_handler.last_output
         rain_volume_added = self.precip
+        reduced_volume_from_recycled_flush = self.flushing_recycled
         daily_output = TreatmentOutput(
                 TAN_s=handler_output.TAN_s * (1 - self.config.TAN_removal_efficiency),
-                # urea=prev_output.urea,  # TODO: unexpected attribute
                 manure_nitrogen=handler_output.manure_nitrogen * (1 - self.config.N_removal_efficiency),
                 TSd=handler_output.TSd * (1 - self.config.TS_removal_efficiency),
                 VS_total=handler_output.VS_total * (1 - self.config.VS_removal_efficiency),
                 p_excrt_manure=handler_output.p_excrt_manure * (1 - self.config.P_removal_efficiency),
                 K_manure=handler_output.K_manure * (1 - self.config.K_removal_efficiency),
-                total_daily_mass=handler_output.total_daily_mass+rain_volume_added
+                total_daily_mass=handler_output.total_daily_mass+rain_volume_added-reduced_volume_from_recycled_flush
         )
 
         sludge_output = SludgeOutput(
@@ -527,7 +526,6 @@ class SlurryStorageUnderfloor(BaseManureTreatment):
         handler = self.manure_handler.last_output
         daily_output = TreatmentOutput(
                 TAN_s=handler.TAN_s * (1 - self.config.TAN_removal_efficiency),
-                # urea=handler.U,
                 manure_nitrogen=handler.manure_nitrogen * (1 - self.config.N_removal_efficiency),
                 TSd=handler.TSd * (1 - self.config.TS_removal_efficiency),
                 VS_total=handler.VS_total * (1 - self.config.VS_removal_efficiency),
