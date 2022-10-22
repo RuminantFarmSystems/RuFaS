@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from enum import auto
+from tkinter import N
 from typing import Dict
 from typing import List
 from typing import Optional
@@ -360,7 +361,7 @@ class AnaerobicLagoon(BaseManureTreatment):
                  time: Time,
                  manure_treatment_config: ManureTreatmentConfig):
         super().__init__(manure_separator, weather, time, manure_treatment_config)
-        self.storage_time_period = manure_treatment_config.storage_time_period  # m^3 (25-year 24h storm event)
+        self.storage_time_period = manure_treatment_config.storage_time_period  # days
         self.freeboard_input = manure_treatment_config.freeboard_input  # m
         self.precip_input = manure_treatment_config.freeboard_input  # m (25-year 24h storm event)
         self.accumulated_sludge=SludgeOutput()
@@ -386,33 +387,22 @@ class AnaerobicLagoon(BaseManureTreatment):
                 total_daily_mass=handler_output.total_daily_mass
         )
 
-        # Sludge Nutrient Values -- Initial calcs
-        sludge_TSd = handler_output.TSd * self.config.TS_removal_efficiency
-        sludge_VS = handler_output.VS_total * self.config.VS_removal_efficiency
-        sludge_nitrogen = handler_output.manure_nitrogen * self.config.N_removal_efficiency
-        sludge_phosphorous = handler_output.p_excrt_manure * self.config.P_removal_efficiency
-        sludge_potassium = handler_output.K_manure * self.config.K_removal_efficiency
-
-        # TODO: The following values are not being used.
-        # Bounded Sludge Nutrient Values
-        sludge_TSd = self.boundSludgeValue(sludge_TSd, 40, 70)
-        sludge_VS = self.boundSludgeValue(sludge_VS, 1.99, 2.99)
-        sludge_nitrogen = self.boundSludgeValue(sludge_nitrogen, 1.99, 2.99)
-        sludge_phosphorous = self.boundSludgeValue(sludge_phosphorous, 1.07, 5.02)
-        sludge_potassium = self.boundSludgeValue(sludge_potassium, 1.1, 1.75)
-
+        sludge_output = SludgeOutput(
+            TS=handler_output.TSd * self.config.TS_removal_efficiency,
+            VS=handler_output.VS_total * self.config.VS_removal_efficiency,
+            N_mass=handler_output.manure_nitrogen * self.config.N_removal_efficiency,
+            P_mass=handler_output.p_excrt_manure * self.config.P_removal_efficiency,
+            K_mass=handler_output.K_manure * self.config.K_removal_efficiency
+        )
+        self.accumulated_sludge.__add__(sludge_output)
 
         return daily_output
 
     @property
     def sludge_accumulation_volume(self):
-        """Returns sludge accumulation volume in m^3
+        """Returns sludge accumulation volume in kg
         """
-        if self.manure_handler.last_output:
-            return self.config.SAV_fraction * self.manure_handler.last_output.TSd * \
-                   self.config.sludge_accumulation_period * Constants.DAYS_PER_YEAR
-        else:
-            return 0
+        return self.accumulated_sludge.TS
 
     @property
     def flushing_recycled(self):
@@ -654,7 +644,7 @@ class SlurryStorageOutdoor(BaseManureTreatment):
     @property
     def freeboard(self):
         """returns additional lagoon volume needed for freeboard in m^3"""
-        return self.freeboard_input * self.pit_surface_area  # m3 of rain
+        return self.freeboard_input * self.pit_surface_area  # m3 of freeboard
 
     def calc_emissions(self):
         pass
