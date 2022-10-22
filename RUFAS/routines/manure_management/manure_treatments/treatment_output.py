@@ -88,8 +88,8 @@ class AggregatedManureOutputforField(TreatmentOutput):
         self.K_mass=daily_output.K_manure
         self.mass =daily_output.total_daily_mass 
         self.DM =daily_output.DM
-        self.WIP =daily_output.VS_total*0.5
-        self.WOP =daily_output.VS_total*0.5
+        self.WIP =self.P_mass.self.mass*0.5/self.mass/1000
+        self.WOP =self.P_mass.self.mass*0.05/self.mass/1000
 
 
 @dataclass
