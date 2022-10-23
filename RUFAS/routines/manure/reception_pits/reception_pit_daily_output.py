@@ -8,8 +8,8 @@ class ReceptionPitDailyOutput:
     """Daily output of a reception pit.
 
     Attributes
-        simulation_day: Number of days into the simulation.
         pen_id: ID of the pen that this output is associated with.
+        simulation_day: Number of days into the simulation.
         urea: Urea concentration in manure, g/L.
         TAN: Total ammonia nitrogen concentration, g/L.
         N: Amount of nitrogen in manure, kg.
@@ -22,8 +22,8 @@ class ReceptionPitDailyOutput:
         total_daily_manure_volume: Total amount of manure, bedding, and water combined, m^3.
 
     """
-    simulation_day: int = -1
     pen_id: int = -1
+    simulation_day: int = -1
     urea: float = 0.0
     TAN: float = 0.0
     N: float = 0.0

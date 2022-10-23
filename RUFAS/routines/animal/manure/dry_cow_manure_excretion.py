@@ -82,18 +82,34 @@ def manure_calculations(ration_formulation, feed, bw, milk_prod, p_feces_excrt,
     p_excrt, WIP_frac, WOP_frac, p_excrt_manure, p_frac = \
         phosphorus_excreted(milk_prod, manure, p_feces_excrt, p_urine)
     
+    # return p_excrt, \
+    #        {"U": 0.340,  # TODO: Implement with correct equation
+    #         "TAN_s": 0.14,  # TODO: Implement with correct equation
+    #         "MN": N_manure,
+    #         "Mkg": manure,
+    #         "TSd": total_solids,
+    #         "VSd": 7087.413,  # TODO: Implement with correct equation
+    #         "VSnd": 859.390,  # TODO: Implement with correct equation
+    #         "WIP_frac": WIP_frac,
+    #         "WOP_frac": WOP_frac,
+    #         "p_excrt_manure": p_excrt_manure,
+    #         "p_frac": p_frac,
+    #         "K_manure": K_manure,
+    #         "CH4_manure": methane_emis
+    #         }
+
     return p_excrt, \
-           {"U": 0.340,  # TODO: Implement with correct equation
-            "TAN_s": 0.14,  # TODO: Implement with correct equation
-            "MN": N_manure,
-            "Mkg": manure,
-            "TSd": total_solids,
-            "VSd": 7087.413,  # TODO: Implement with correct equation
-            "VSnd": 859.390,  # TODO: Implement with correct equation
-            "WIP_frac": WIP_frac,
-            "WOP_frac": WOP_frac,
-            "p_excrt_manure": p_excrt_manure,
-            "p_frac": p_frac,
-            "K_manure": K_manure,
-            "CH4_manure": methane_emis
-            }
+               {"U": 0.34,  # g/L
+                "TAN_s": 0.14,  # g/L
+                "MN": 0.19,  # kg
+                "Mkg": 32.21,  # kg
+                "TSd": 4.13,  # kg
+                "VSd": 2.49,  # kg
+                "VSnd": 1.0,  # kg
+                "WIP_frac": 0.00046,  # dimensionless
+                "WOP_frac": 0.00005,  # dimensionless
+                "p_excrt_manure": 0.03,  # kg
+                "p_frac": 0.00092,  # dimensionless
+                "K_manure": 0.12,  # kg
+                "CH4_manure": 1.2  # kg
+                }

@@ -1,6 +1,7 @@
 from typing import NamedTuple, Set, Type
 
 from RUFAS.routines.animal.life_cycle.animal_base import AnimalBase
+from RUFAS.routines.animal.life_cycle.cow import Cow
 from RUFAS.routines.animal.pen import Pen
 from RUFAS.routines.manure.manure.pen_manure import PenManure
 
@@ -15,6 +16,7 @@ class ManureManagementPen:
         id: Pen id.
         animals_in_pen: A list of animal objects in this pen.
         num_animals: The number of animals in this pen.
+        num_cows: The number of cows in this pen.
         classes_in_pen: Set of unique animal classes in this pen.
         animal_combination: An AnimalCombination enum that describes the current
             animal makeup in this pen.
@@ -23,7 +25,7 @@ class ManureManagementPen:
         manure_handler: The type of manure handler used for this pen.
         manure_separator: The type of manure separator used for this pen.
         manure_treatment: The type of manure treatment(s) used for this pen.
-        manure_density: The manure density used for calculating manure volume.
+        manure_density: The manure density used for calculating manure volume, kg/m^3.
         manure: The manure data extracted from the animal module.
 
     """
@@ -52,8 +54,13 @@ class ManureManagementPen:
         self.manure_separator: str = pen.manure_separator
         self.manure_treatment: str = pen.manure_storage
 
-        self.manure_density = 990.0  # kg/m^3
-        self.manure = PenManure.get_instance(pen.manure)
+        self.manure_density = 990.0  # TODO: Add this to manure config file
+        self.manure = PenManure.get_instance(pen.manure, self.num_animals)
+
+        self.num_cows = 0
+        for animal in self.animals_in_pen:
+            if type(animal) is Cow:
+                self.num_cows += 1
 
     @property
     def manure_mass(self) -> float:

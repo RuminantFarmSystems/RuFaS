@@ -25,14 +25,14 @@
       "scenario_id": 3,
       "bedding_type": "sawdust",
       "manure_handler": "manual scraping",
-      "manure_separator": "rotary screen",
+      "manure_separator": "none",
       "manure_treatment": "slurry storage underfloor"
     },
     {
       "scenario_id": 4,
       "bedding_type": "sawdust",
       "manure_handler": "manual scraping",
-      "manure_separator": "rotary screen",
+      "manure_separator": "none",
       "manure_treatment": "slurry storage outdoor"
     }
   ],

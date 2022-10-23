@@ -10,8 +10,10 @@ Author(s):  William Donovan, wmdonovan@wisc.edu
             Sadman Chowdhury, skc86@cornell.edu
 """
 import collections
-from typing import Dict, List, Tuple
+from typing import Dict
+from typing import List
 from typing import Optional
+from typing import Tuple
 
 from RUFAS.routines.animal.animal_management import AnimalManagement
 from RUFAS.routines.manure.beddings.bedding_classes import BaseBedding

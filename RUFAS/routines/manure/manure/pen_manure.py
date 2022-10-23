@@ -51,27 +51,31 @@ class PenManure:
     def __post_init__(self):
         """Performs any necessary unit conversion after initialization."""
 
-        self.urea *= Constants.UREA_MOLAR_MASS  # mol/L x g/mol = g/L
-        self.TAN *= Constants.TAN_MOLAR_MASS  # mol/L x g/mol = g/L
-        self.N *= Constants.GRAMS_TO_KG  # kg
-        self.VSd *= Constants.GRAMS_TO_KG  # kg
-        self.VSnd *= Constants.GRAMS_TO_KG  # kg
-        self.P *= Constants.GRAMS_TO_KG  # kg
-        self.K *= Constants.GRAMS_TO_KG  # kg
+        # The following calculations will need to agree with
+        # how the animal module produces manure data
+        # self.urea *= Constants.UREA_MOLAR_MASS  # mol/L x g/mol = g/L
+        # self.TAN *= Constants.TAN_MOLAR_MASS  # mol/L x g/mol = g/L
+        # self.N *= Constants.GRAMS_TO_KG  # kg
+        # self.VSd *= Constants.GRAMS_TO_KG  # kg
+        # self.VSnd *= Constants.GRAMS_TO_KG  # kg
+        # self.P *= Constants.GRAMS_TO_KG  # kg
+        # self.K *= Constants.GRAMS_TO_KG  # kg
+        pass
 
     @staticmethod
-    def get_instance(animal_manure) -> PenManure:
+    def get_instance(animal_manure, num_animals: int) -> PenManure:
         return PenManure(
-                urea=animal_manure['U'],
-                TAN=animal_manure['TAN_s'],
+                urea=animal_manure['U'] / num_animals,
+                TAN=animal_manure['TAN_s'] / num_animals,
                 N=animal_manure['MN'],
                 manure_mass=animal_manure['Mkg'],
                 TS=animal_manure['TSd'],
                 VSd=animal_manure['VSd'],
                 VSnd=animal_manure['VSnd'],
-                WIP_frac=animal_manure['WIP_frac'],
-                WOP_frac=animal_manure['WOP_frac'],
+                WIP_frac=animal_manure['WIP_frac'] / num_animals,
+                WOP_frac=animal_manure['WOP_frac'] / num_animals,
                 P=animal_manure['p_excrt_manure'],
-                P_frac=animal_manure['p_frac'],
+                P_frac=animal_manure['p_frac'] / num_animals,
+                K=animal_manure['K_manure'],
                 CH4_animal=animal_manure['CH4_manure']
         )

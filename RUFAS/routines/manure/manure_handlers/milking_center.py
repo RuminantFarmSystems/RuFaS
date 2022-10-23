@@ -32,7 +32,6 @@ class MilkingCenter:
             fresh_water_use_rate: Fresh water use rate for milking, liters/animal/day.
 
         """
-
         self.num_milkings = num_milkings
         self.minutes_spent_in_holding_area = minutes_spent_in_holding_area
         self.minutes_spent_per_milking = minutes_spent_per_milking
@@ -48,7 +47,6 @@ class MilkingCenter:
             Total number of minutes spent in holding area per animal per day.
 
         """
-
         return self.num_milkings * self.minutes_spent_in_holding_area
 
     @property
@@ -59,7 +57,6 @@ class MilkingCenter:
             Percentage of day spent in holding area.
 
         """
-
         return self._calc_percent_of_day_from_minutes(self.total_minutes_spent_in_holding_area)
 
     def wash_water_volume_used_in_holding_area(self, pen: ManureManagementPen) -> float:
@@ -69,10 +66,7 @@ class MilkingCenter:
             Volume of wash water used in holding area, liters.
 
         """
-
-        if self._has_lac_cow_in_pen(pen):
-            return pen.num_animals * self.wash_water_use_rate
-        return 0.0
+        return pen.num_cows * self.wash_water_use_rate
 
     # Milking
     @property
@@ -83,7 +77,6 @@ class MilkingCenter:
             Total number of minutes spent milking per animal per day.
 
         """
-
         return self.num_milkings * self.minutes_spent_per_milking
 
     @property
@@ -94,7 +87,6 @@ class MilkingCenter:
             Percentage of day spent milking.
 
         """
-
         return self._calc_percent_of_day_from_minutes(self.total_minutes_spent_milking)
 
     def fresh_water_volume_used_for_milking(self, pen: ManureManagementPen) -> float:
@@ -104,10 +96,7 @@ class MilkingCenter:
             Volume of fresh water used for milking, liters.
 
         """
-
-        if self._has_lac_cow_in_pen(pen):
-            return pen.num_animals * self.fresh_water_use_rate
-        return 0.0
+        return pen.num_cows * self.fresh_water_use_rate
 
     # Overall
     @property
@@ -121,7 +110,6 @@ class MilkingCenter:
             Total number of minutes spent in the milking center per animal per day.
 
         """
-
         return self.total_minutes_spent_in_holding_area + self.total_minutes_spent_milking
 
     @property
@@ -132,7 +120,6 @@ class MilkingCenter:
             Total percentage of day spent in the milking center per animal.
 
         """
-
         return self.percent_of_day_spent_in_holding_area + self.percent_of_day_spent_milking
 
     def total_water_volume_used_in_milking_center(self, pen: ManureManagementPen) -> float:
@@ -145,11 +132,7 @@ class MilkingCenter:
             Total volume of water used in the milking center, L.
 
         """
-
-        if self._has_lac_cow_in_pen(pen):
-            return self.wash_water_volume_used_in_holding_area(pen) + \
-                   self.fresh_water_volume_used_for_milking(pen)  # liters
-        return 0.0
+        return self.wash_water_volume_used_in_holding_area(pen) + self.fresh_water_volume_used_for_milking(pen)
 
     def manure_mass_deposited_in_milking_center(self, pen: ManureManagementPen) -> float:
         """Total mass of manure deposited in the milking center by all cows in pen.
@@ -161,9 +144,8 @@ class MilkingCenter:
             Total mass of manure deposited in the milking center, kg.
 
         """
-
-        if self._has_lac_cow_in_pen(pen):
-            return pen.manure.manure_mass * self.total_percent_of_day_spent_in_milking_center / 100
+        if pen.num_cows > 0:
+            return pen.manure.manure_mass * self.total_percent_of_day_spent_in_milking_center / 100.0
         return 0.0
 
     def manure_volume_deposited_in_milking_center(self, pen: ManureManagementPen) -> float:
@@ -176,10 +158,7 @@ class MilkingCenter:
             Total volume of manure deposited in the milking center, liters.
 
         """
-
-        if self._has_lac_cow_in_pen(pen):
-            return self.manure_mass_deposited_in_milking_center(pen) / pen.manure_density
-        return 0.0
+        return self.manure_mass_deposited_in_milking_center(pen) / pen.manure.density
 
     @staticmethod
     def _has_lac_cow_in_pen(pen: ManureManagementPen) -> bool:

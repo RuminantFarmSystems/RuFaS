@@ -29,7 +29,7 @@ class ManureManagementOutputHandler:
     def _append_daily_data(today_data,
                            accumulated_data: Dict[str, List[float]],
                            col_prefix: str = '',
-                           delimiter: str = '')\
+                           delimiter: str = '') \
             -> None:
         """
 
@@ -56,6 +56,7 @@ class ManureManagementOutputHandler:
         pen_ids: List[int] = []
         sim_days: List[int] = []
         num_animals: List[int] = []
+        num_cows: List[int] = []
         animal_types: List[str] = []
         housing_types: List[str] = []
         bedding_types: List[str] = []
@@ -83,6 +84,7 @@ class ManureManagementOutputHandler:
             treatment_output = latest_data[4]
 
             num_animals.append(pen.num_animals)
+            num_cows.append(pen.num_cows)
             animal_types.append(
                     str(pen.classes_in_pen).strip("{}").replace("'", ""))
             housing_types.append(pen.housing_type)
@@ -102,6 +104,7 @@ class ManureManagementOutputHandler:
             'pen_id': pen_ids,
             'sim_day': sim_days,
             'num_animals': num_animals,
+            'num_cows': num_cows,
             'animal_types': animal_types,
             'housing_type': housing_types,
             'bedding_type': bedding_types,

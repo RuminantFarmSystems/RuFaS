@@ -9,8 +9,8 @@ class ManureTreatmentDailyOutput:
     """Daily output of a manure treatment.
 
     Attributes:
-        simulation_day: Number of days into the simulation.
         pen_id: ID of the pen that this output is associated with.
+        simulation_day: Number of days into the simulation.
         TAN: Total ammonia nitrogen concentration, g/L.
         N: Amount of nitrogen in manure, kg.
         TS: Total amount of solids from the manure and the bedding, kg.
@@ -20,8 +20,8 @@ class ManureTreatmentDailyOutput:
         final_manure_volume: Final manure volume after treatment, m^3.
 
     """
-    simulation_day: int = -1
     pen_id: int = -1
+    simulation_day: int = -1
     TAN: float = 0.0
     N: float = 0.0
     TS: float = 0.0

@@ -9,8 +9,8 @@ class ManureSeparatorDailyOutput:
     """Daily output of a manure separator.
 
     Attributes:
-        simulation_day: Number of days into the simulation.
         pen_id: ID of the pen that this output is associated with.
+        simulation_day: Number of days into the simulation.
         total_daily_manure_volume: Total amount of manure, bedding, and water combined, m^3.
         final_solids_wet_mass: Total mass of the solids on wet-weight basis, kg.
         final_solids_wet_mass_volume: Total volume of the solids on wet-weight basis, m^3.
@@ -31,8 +31,8 @@ class ManureSeparatorDailyOutput:
         final_daily_volume: Total manure volume after separation, m^3.
 
     """
-    simulation_day: int = -1
     pen_id: int = -1
+    simulation_day: int = -1
     total_daily_manure_volume: float = 0.0
     final_solids_wet_mass: float = 0.0
     final_solids_wet_mass_volume: float = field(init=False)

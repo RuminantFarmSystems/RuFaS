@@ -50,18 +50,34 @@ def manure_calculations(bw, p_feces_excrt, p_urine):
     p_excrt, WIP_frac, WOP_frac, p_excrt_manure, p_frac = \
         phosphorus_excreted(0, manure, p_feces_excrt, p_urine)
 
+    # return p_excrt, \
+    #        {"U": 0.340,  # TODO: Implement with correct equation
+    #         "TAN_s": 0.14,  # TODO: Implement with correct equation
+    #         "MN": 532.407,  # TODO: Implement with correct equation
+    #         "Mkg": manure,
+    #         "TSd": total_solids,
+    #         "VSd": 7087.413,  # TODO: Implement with correct equation
+    #         "VSnd": 859.390,  # TODO: Implement with correct equation
+    #         "WIP_frac": WIP_frac,
+    #         "WOP_frac": WOP_frac,
+    #         "p_excrt_manure": p_excrt_manure,
+    #         "p_frac": p_frac,
+    #         "K_manure": 0,
+    #         "CH4_manure": methane_emis
+    #         }
+
     return p_excrt, \
-           {"U": 0.340,  # TODO: Implement with correct equation
-            "TAN_s": 0.14,  # TODO: Implement with correct equation
-            "MN": 532.407,  # TODO: Implement with correct equation
-            "Mkg": manure,
-            "TSd": total_solids,
-            "VSd": 7087.413,  # TODO: Implement with correct equation
-            "VSnd": 859.390,  # TODO: Implement with correct equation
-            "WIP_frac": WIP_frac,
-            "WOP_frac": WOP_frac,
-            "p_excrt_manure": p_excrt_manure,
-            "p_frac": p_frac,
-            "K_manure": 0,
-            "CH4_manure": methane_emis
+           {"U": 0.06,  # g/L
+            "TAN_s": 0.03,  # g/L
+            "MN": 0.05,  # kg
+            "Mkg": 9.07,  # kg
+            "TSd": 1.09,  # kg
+            "VSd": 0.61,  # kg
+            "VSnd": 0.30,  # kg
+            "WIP_frac": 0.00022,  # dimensionless
+            "WOP_frac": 0.00002,  # dimensionless
+            "p_excrt_manure": 0.00001,  # kg
+            "p_frac": 0.00044,  # dimensionless
+            "K_manure": 0.03,  # kg
+            "CH4_manure": 1.0  # kg
             }
