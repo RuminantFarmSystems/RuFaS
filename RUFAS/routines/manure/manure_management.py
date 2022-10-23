@@ -206,6 +206,7 @@ class ManureManagement:
             self._all_data[pen.id].append(daily_update_data)
 
         self.manure_management_output_handler.append_last_output(self._all_data, animal_management.simulation_day)
+        self.manure_management_output_handler.sort_by_pen_id_and_sim_day()
         self.manure_management_output_handler.export_all_data_to_csv()
 
 

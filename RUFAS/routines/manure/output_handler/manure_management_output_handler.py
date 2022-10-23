@@ -1,12 +1,14 @@
 import collections
-from dataclasses import asdict
+from dataclasses import fields
 from datetime import datetime
 from typing import Dict
 from typing import List
 from typing import Tuple
 
+import numpy as np
 import pandas as pd
 
+from RUFAS.routines.manure.manure.pen_manure import PenManure
 from RUFAS.routines.manure.manure_handlers.manure_handler_daily_output import ManureHandlerDailyOutput
 from RUFAS.routines.manure.manure_separators.manure_separator_daily_output import ManureSeparatorDailyOutput
 from RUFAS.routines.manure.manure_treatments.manure_treatment_daily_output import ManureTreatmentDailyOutput
@@ -27,7 +29,8 @@ class ManureManagementOutputHandler:
 
     @staticmethod
     def _append_daily_data(today_data,
-                           accumulated_data: Dict[str, List[float]],
+                           data_fields,
+                           accumulator: Dict[str, List[float]],
                            col_prefix: str = '',
                            delimiter: str = '') \
             -> None:
@@ -35,20 +38,20 @@ class ManureManagementOutputHandler:
 
         Args:
             today_data: A dataclass object
+            data_fields: A list of dataclass fields
             col_prefix: prepend each column name with this prefix
-            accumulated_data: A dictionary whose key is column name and value is a list of values
+            accumulator: A dictionary whose key is column name and value is a list of values
+            delimiter: A delimiter to use between the prefix and the column name
 
         Returns:
             None
 
         """
-        if not today_data:
-            return
-        for col_var, value in asdict(today_data).items():
-            col_name = col_prefix + delimiter + col_var
-            if col_var in vars(Units):
-                col_name += delimiter + vars(Units)[col_var]
-            accumulated_data[col_name].append(round(value, 6))
+        for field in data_fields:
+            unit = vars(Units).get(field.name, '')
+            col_name = f'{col_prefix}{delimiter}{field.name}{f"{delimiter}{unit}" if unit else ""}'
+            value = getattr(today_data, field.name, np.nan)
+            accumulator[col_name].append(round(value, 6))
 
     def append_last_output(self,
                            all_manure_management_data: Dict[int, List[DailyOutputType]],
@@ -94,11 +97,16 @@ class ManureManagementOutputHandler:
             treatment_types.append(pen.manure_treatment)
 
             delimiter = '__'
-            self._append_daily_data(pen.manure, manure_cols, 'manure', delimiter)
-            self._append_daily_data(manure_handler_output, manure_handler_cols, 'handler', delimiter)
-            self._append_daily_data(reception_pit_output, reception_pit_cols, 'rp', delimiter)
-            self._append_daily_data(manure_separator_output, manure_separator_cols, 'sep', delimiter)
-            self._append_daily_data(treatment_output, treatment_cols, 'tx', delimiter)
+            self._append_daily_data(pen.manure, fields(PenManure),
+                                    manure_cols, 'manure', delimiter)
+            self._append_daily_data(manure_handler_output, fields(ManureHandlerDailyOutput),
+                                    manure_handler_cols, 'handler', delimiter)
+            self._append_daily_data(reception_pit_output, fields(ReceptionPitDailyOutput),
+                                    reception_pit_cols, 'rp', delimiter)
+            self._append_daily_data(manure_separator_output, fields(ManureSeparatorDailyOutput),
+                                    manure_separator_cols, 'sep', delimiter)
+            self._append_daily_data(treatment_output, fields(ManureTreatmentDailyOutput),
+                                    treatment_cols, 'tx', delimiter)
 
         d = {
             'pen_id': pen_ids,
@@ -124,7 +132,22 @@ class ManureManagementOutputHandler:
         else:
             self.df = pd.concat([self.df, temp_df], ignore_index=True)
             self.df.reset_index()
-            self.df.sort_values(by=['pen_id', 'sim_day'], inplace=True)
+
+    @staticmethod
+    def _get_fields_of_dataclass(dataclass):
+        return [field.name for field in fields(dataclass)]
+
+    def sort_by(self, cols: List[str]):
+        self.df.sort_values(by=cols, inplace=True)
+
+    def move_columns_to_front_inplace(self, cols: List[str]):
+        cols_to_move = [col for col in cols if col in self.df.columns]
+        for i, col in enumerate(cols_to_move):
+            self.df.insert(i, col, self.df.pop(col))
+
+    def sort_by_pen_id_and_sim_day(self):
+        self.sort_by(['pen_id', 'sim_day'])
+        self.move_columns_to_front_inplace(['pen_id', 'sim_day'])
 
     def export_all_data_to_csv(self):
         # print(f'Exporting to csv')

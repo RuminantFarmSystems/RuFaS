@@ -169,7 +169,7 @@
 			"housing_type": "open air barn",
 			"pen_type": "tiestall",
 			"max_stocking_density": 1.2,
-			"manure_management_scenario_id": 4
+			"manure_management_scenario_id": 5
 		}
 	}
 }
