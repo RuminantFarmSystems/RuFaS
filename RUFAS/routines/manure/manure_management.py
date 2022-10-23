@@ -204,10 +204,14 @@ class ManureManagement:
                 treatment_daily_output
             )
             self._all_data[pen.id].append(daily_update_data)
+            self.manure_management_output_handler.append_daily_update_data_for_pen(
+                    animal_management.simulation_day,
+                    daily_update_data
+            )
 
-        self.manure_management_output_handler.append_last_output(self._all_data, animal_management.simulation_day)
         self.manure_management_output_handler.sort_by_pen_id_and_sim_day()
         self.manure_management_output_handler.export_all_data_to_csv()
+        self.manure_management_output_handler.export_summary_to_csv()
 
 
 def simulate_daily_manure_management(manure_management: ManureManagement, animal_management: AnimalManagement) -> None:
