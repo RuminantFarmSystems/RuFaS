@@ -9,6 +9,10 @@ Description: The class which represents a pen on the farm. Each pen has
 Author(s): Militsa Sotirova, militsasotirova@gmail.com
            Joseph Merhi, jm2257@cornell.edu
 """
+import collections
+
+from RUFAS.routines.animal.life_cycle.calf import Calf
+from RUFAS.routines.animal.life_cycle.cow import Cow
 from RUFAS.routines.animal.life_cycle.heiferI import HeiferI
 from RUFAS.routines.animal.life_cycle.heiferII import HeiferII
 from RUFAS.routines.animal.life_cycle.heiferIII import HeiferIII
@@ -392,57 +396,51 @@ class Pen:
             feed: instance of the Feed class
             methane_model: methane model used for methane emission calculations
         """
-
         for animal in self.animals_in_pen:
-            if type(animal).__name__ == 'Cow':
+            if type(animal) is Cow:
                 animal.calc_manure_excretion(feed, methane_model, self.MEdiet)
             else:
                 animal.calc_manure_excretion(feed)
 
-        manure = {}
-        calf_total = {}
-        heifer_total = {}
-        dry_total = {}
-        lactating_total = {}
-
-        # obtain keys of manure composition calculations
-        first_animal_manure = self.animals_in_pen[0].manure_excretion
-        for key in first_animal_manure.keys():
-            manure[key] = 0
-            calf_total[key] = 0
-            heifer_total[key] = 0
-            dry_total[key] = 0
-            lactating_total[key] = 0
+        self.manure = self._copy_manure_template()
+        self.calf_total = self._copy_manure_template()
+        self.heifer_total = self._copy_manure_template()
+        self.dry_total = self._copy_manure_template()
+        self.lactating_total = self._copy_manure_template()
 
         # find sums of manure components for each animal in the pen for
         # total manure in pen and total manure by animal type
         for animal in self.animals_in_pen:
             curr_manure = animal.manure_excretion
-            if type(animal).__name__ == 'Calf':
-                for key in manure.keys():
-                    manure[key] += curr_manure[key]
-                    calf_total[key] += curr_manure[key]
-            elif type(animal) is HeiferI or type(animal) is HeiferII or type(animal) is HeiferIII:
-                for key in manure.keys():
-                    manure[key] += curr_manure[key]
-                    heifer_total[key] += curr_manure[key]
-            elif type(animal).__name__ == 'Cow' and not animal.milking:
-                for key in manure.keys():
-                    manure[key] += curr_manure[key]
-                    dry_total[key] += curr_manure[key]
-            elif type(animal).__name__ == 'Cow' and animal.milking:
-                for key in manure.keys():
-                    manure[key] += curr_manure[key]
-                    lactating_total[key] += curr_manure[key]
+            self._add_manure_to_accumulator(curr_manure, self.manure)
 
-        self.manure = manure
-        self.calf_total = calf_total
-        self.heifer_total = heifer_total
-        self.dry_total = dry_total
-        self.lactating_total = lactating_total
+            if type(animal) is Calf:
+                self._add_manure_to_accumulator(curr_manure, self.calf_total)
+            elif type(animal) in [HeiferI, HeiferII, HeiferIII]:
+                self._add_manure_to_accumulator(curr_manure, self.heifer_total)
+            elif type(animal) is Cow:
+                if not animal.milking:
+                    self._add_manure_to_accumulator(curr_manure, self.dry_total)
+                else:
+                    self._add_manure_to_accumulator(curr_manure, self.lactating_total)
+
+    @staticmethod
+    def _add_manure_to_accumulator(curr_manure, accumulator):
+        """Adds a manure data object to an accumulator by summing corresponding attribute.
+
+        Args:
+            curr_manure: a manure data object
+            accumulator: a manure data object
+
+        Returns:
+            None
+
+        """
+        for key in curr_manure.keys():
+            accumulator[key] += curr_manure[key]
 
     def _copy_manure_template(self):
-        return copy.deepcopy(self._manure_dict_template)
+        return self._manure_dict_template.copy()
 
     def reset_manure(self):
         self.manure = self._copy_manure_template()
