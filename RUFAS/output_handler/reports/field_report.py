@@ -190,7 +190,8 @@ class FieldReport(BaseReportDriver):
                 self.daily_variables = {'year': ['time.calendar_year', '', []],
                                     'j_day': ['time.day', '', []],
                                     'ag_biomass': ['crop.crop_biomass_totals', 'kg ha^-1', []],
-                                    'yield_total': ['crop.crop_yield_totals', 'm^2/m^2', []]
+                                    'yield_total': ['crop.crop_yield_totals', 'm^2/m^2', []],
+                                    'n_uptake': ['crop.crop_n_uptake', 'm^2/m^2', []]
                                     }
 
 

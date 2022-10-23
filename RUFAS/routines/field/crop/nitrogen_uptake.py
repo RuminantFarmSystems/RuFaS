@@ -24,7 +24,7 @@ def reallocate_nitrogen(crop, soil) -> None:
     update_optimal_nitrogen(crop)
     update_potential_nitrogen_uptake(crop)
     uptake_nitrogen(crop, soil)
-    if crop.is_nitrogen_fixer:
+    if crop.fix_nitrogen:
         fix_nitrogen(crop, soil)
     store_nitrogen_biomass(crop)
 
@@ -114,8 +114,6 @@ def calc_shape_log(heat_frac: float, nfrac_x: float, nfrac_3: float, nfrac_1: fl
     if nfrac_x == nfrac_1:  # leads to divide by zero
         raise ValueError("nfrac_x must not be equivalent to nfrac_1")
     if nfrac_x == nfrac_3: 
-        print(nfrac_x)
-        nfrac_x=nfrac_x + 0.001 # leads to log(0)
         raise ValueError("nfrac_x must not be equivalent to nfrac_3")
     if nfrac_x > nfrac_1 or nfrac_x == nfrac_1:  # leads to ln(-y) or divide by 0
         raise ValueError("nfrac_x must be less than nfrac_1")

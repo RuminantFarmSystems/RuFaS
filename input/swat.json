@@ -9,7 +9,7 @@
         "seed": 0
     },
 
-    "weather": "swat_weather.csv",
+    "weather": "ARL_weather.csv",
 
     "output": "field_report.json",
 

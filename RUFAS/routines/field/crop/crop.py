@@ -87,6 +87,8 @@ def daily_crop_routine(soil, crop, field_management, weather, time, croptime):
         crop.current_crop[crop_type_name] = crop_type
         crop.crop_biomass_totals = crop_type.bio_AG
         crop.crop_yield_totals = crop_type.yield_actual
+        crop.crop_n_uptake = crop_type.N_act_up
+
 
 def daily_reset(crop_type, soil):
     """
@@ -182,6 +184,8 @@ class Crop(object):
         self.croplist = data['crops']
         self.crop_biomass_totals = 0
         self.crop_yield_totals= 0
+        self.crop_n_uptake= 0
+
     def setcrop(self, cropname):
         if (cropname== 'BaseCrop'): 
             return getattr(self.crop_classes, 'BaseCrop')()
@@ -447,6 +451,10 @@ class cropTime:
                                 crop_time['crops_growing'][day].append(crop)
                         
                         if crop_time['year'][day] in growing_years:
+                                crop_time['crops_growing'][day].append(crop)
+                    else: 
+                        for year in range(0,len(crop_list[crop]['plant_years'])):
+                            if (crop_list[crop]['plant_years'][year] == crop_time['year'][day] and crop_list[crop]['planting_day'] <= crop_time['day'][day] and crop_list[crop]['harvest_day'] >= crop_time['day'][day]):
                                 crop_time['crops_growing'][day].append(crop)
                 else:
                     for year in range(0,len(crop_list[crop]['plant_years'])):

@@ -33,7 +33,6 @@ def update_growth_factor(crop, soil, weather, time) -> None:
 
     p_stress_factor = calc_nutrient_stress_scaling_factor(stored=crop.bio_P, optimal=crop.bio_P_opt)
     p_stress = calc_nutrient_stress(optimal=crop.bio_P_opt, stress_factor=p_stress_factor)
-
     crop.gamma_reg = calc_growth_factor(w_stress, t_stress, n_stress, p_stress)
 
 
