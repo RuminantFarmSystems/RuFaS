@@ -52,13 +52,12 @@ class TreatmentOutput:
 
 @dataclass
 class AnaerobicDigestionOutput(TreatmentOutput):
-    total_daily_mass: float = 0.0
-    urea: float = 0.0
-
-    AD_biogas: float = 0.0,  # biogas production per day (m3/day)
-    AD_biogas_energy_content: float = 0.0  # biogas energy content (MJ/m3)
-    AD_methane_generation_volume: float = 0.0
-    AD_input_energy_heating: float = 0.0
+    biogas: float = 0.0  # biogas production per day (m3/day)
+    biogas_energy_content: float = 0.0  # biogas energy content (MJ/m3)
+    methane_generation_volume: float = 0.0
+    input_energy_heating: float = 0.0
+    top_cover_volume: float = 0.0
+    evaporated_water:float=0.0
 
     def __post_init__(self):
         self.total_daily_mass = 0.0  # TODO convert effluent volume to total daily mass

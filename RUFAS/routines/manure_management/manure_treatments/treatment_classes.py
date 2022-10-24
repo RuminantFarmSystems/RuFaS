@@ -607,8 +607,7 @@ class SlurryStorageOutdoor(BaseManureTreatment):
         """returns coefficients for volume calculations as tuple (a,b,c)"""
         a = 3 * self.pit_depth
         b = -4 * self.pit_slope * self.pit_depth ** 2
-        c = 4 * (self.pit_slope ** 2) * (self.pit_depth ** 3) / 3 - self.total_pit_volume
-        # TODO: Check if it is self.total_pit_volume or self.treatment_volume
+        c = 4 * (self.pit_slope ** 2) * (self.pit_depth ** 3) / 3 - self.treatment_volume
         return a, b, c
 
     @property
@@ -673,8 +672,8 @@ class ManureTreatmentConfig:
     AD_temp_set_point: float = 0.0
     AD_temp: float = 0.0
 
-    storage_time_period: float = 0.0,
-    precip_input: float = 0.0,
+    storage_time_period: float = 0.0
+    precip_input: float = 0.0
     freeboard_input: float = 0.0
 
 
