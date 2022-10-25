@@ -146,7 +146,7 @@
 			"number_of_stalls": 800,
 			"housing_type": "open air barn",
 			"pen_type": "freestall",
-			"manure_management_system_scenario": 3,
+			"manure_management_system_scenario": 4,
 			"max_stocking_density": 1.2
 		},
 		"pen2": {
@@ -157,7 +157,7 @@
 			"number_of_stalls": 200,
 			"housing_type": "open air barn",
 			"pen_type": "tiestall",
-			"manure_management_system_scenario": 3,
+			"manure_management_system_scenario": 5,
 			"max_stocking_density": 1.2
 		},
 		"pen3": {
@@ -168,7 +168,7 @@
 			"number_of_stalls": 850,
 			"housing_type": "open air barn",
 			"pen_type": "tiestall",
-			"manure_management_system_scenario": 0,
+			"manure_management_system_scenario": 5,
 			"max_stocking_density": 1.2
 		}
 	}

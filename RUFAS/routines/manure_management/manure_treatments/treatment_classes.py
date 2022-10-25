@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from enum import auto
+from tkinter import N
 from typing import Dict
 from typing import List
 from typing import Optional
@@ -9,7 +10,7 @@ from typing import Type
 
 from RUFAS.routines.manure_management.helpers.enum_helpers import DefaultEnum
 from RUFAS.routines.manure_management.manure_separators.manure_separator_classes import BaseManureSeparator
-from RUFAS.routines.manure_management.manure_treatments.treatment_output import TreatmentOutput,AggregatedManureOutputforField
+from RUFAS.routines.manure_management.manure_treatments.treatment_output import TreatmentOutput,AggregatedManureOutputforField,SludgeOutput
 from RUFAS.routines.manure_management.misc.constants import ManureManagementConstants as Constants
 from RUFAS.routines.manure_management.misc.simple_pen import SimplePen
 from RUFAS.time import Time
@@ -132,7 +133,7 @@ class AnaerobicDigestion(BaseManureTreatment):
                  time: Time,
                  manure_treatment_config: ManureTreatmentConfig):
         super().__init__(manure_separator, weather, time, manure_treatment_config)
-        # self.weather_data = SimpleWeather()
+
 
         self.total_solids = 0.0
         self.volatile_solids = 0.0
@@ -177,7 +178,7 @@ class AnaerobicDigestion(BaseManureTreatment):
 
         moisture_content = self.get_moisture_content()
 
-        T_avg = self.weather_data.T_avg[self.time.year - 1][self.time.day - 1]  # TODO: Fix this
+        T_avg = self.weather_data.T_avg[self.time.year - 1][self.time.day - 1] 
 
         self.input_energy_heating = self.calc_specific_input_energy(T_avg,
                                                                     moisture_content) * self.wastewater_volume * \
@@ -360,9 +361,10 @@ class AnaerobicLagoon(BaseManureTreatment):
                  time: Time,
                  manure_treatment_config: ManureTreatmentConfig):
         super().__init__(manure_separator, weather, time, manure_treatment_config)
-        self.storage_time_period = manure_treatment_config.storage_time_period  # m^3 (25-year 24h storm event)
+        self.storage_time_period = manure_treatment_config.storage_time_period  # days
         self.freeboard_input = manure_treatment_config.freeboard_input  # m
         self.precip_input = manure_treatment_config.freeboard_input  # m (25-year 24h storm event)
+        self.accumulated_sludge=SludgeOutput()
 
     def update(self, simulation_day: int) -> TreatmentOutput:
         daily_output = self.update_helper()
@@ -373,32 +375,26 @@ class AnaerobicLagoon(BaseManureTreatment):
 
     def update_helper(self):
         handler_output = self.manure_handler.last_output
-        # prev_output = self.manure_handler.last_output
+        rain_volume_added = self.precip
+        reduced_volume_from_recycled_flush = self.flushing_recycled
         daily_output = TreatmentOutput(
                 TAN_s=handler_output.TAN_s * (1 - self.config.TAN_removal_efficiency),
-                # urea=prev_output.urea,  # TODO: unexpected attribute
                 manure_nitrogen=handler_output.manure_nitrogen * (1 - self.config.N_removal_efficiency),
                 TSd=handler_output.TSd * (1 - self.config.TS_removal_efficiency),
                 VS_total=handler_output.VS_total * (1 - self.config.VS_removal_efficiency),
                 p_excrt_manure=handler_output.p_excrt_manure * (1 - self.config.P_removal_efficiency),
                 K_manure=handler_output.K_manure * (1 - self.config.K_removal_efficiency),
-                total_daily_mass=handler_output.total_daily_mass
+                total_daily_mass=handler_output.total_daily_mass+rain_volume_added-reduced_volume_from_recycled_flush
         )
 
-        # Sludge Nutrient Values -- Initial calcs
-        sludge_TSd = handler_output.TSd * self.config.TS_removal_efficiency
-        sludge_VS = handler_output.VS_total * self.config.VS_removal_efficiency
-        sludge_nitrogen = handler_output.manure_nitrogen * self.config.N_removal_efficiency
-        sludge_phosphorous = handler_output.p_excrt_manure * self.config.P_removal_efficiency
-        sludge_potassium = handler_output.K_manure * self.config.K_removal_efficiency
-
-        # TODO: The following values are not being used.
-        # Bounded Sludge Nutrient Values
-        sludge_TSd = self.boundSludgeValue(sludge_TSd, 40, 70)
-        sludge_VS = self.boundSludgeValue(sludge_VS, 1.99, 2.99)
-        sludge_nitrogen = self.boundSludgeValue(sludge_nitrogen, 1.99, 2.99)
-        sludge_phosphorous = self.boundSludgeValue(sludge_phosphorous, 1.07, 5.02)
-        sludge_potassium = self.boundSludgeValue(sludge_potassium, 1.1, 1.75)
+        sludge_output = SludgeOutput(
+            TS=handler_output.TSd * self.config.TS_removal_efficiency,
+            VS=handler_output.VS_total * self.config.VS_removal_efficiency,
+            N_mass=handler_output.manure_nitrogen * self.config.N_removal_efficiency,
+            P_mass=handler_output.p_excrt_manure * self.config.P_removal_efficiency,
+            K_mass=handler_output.K_manure * self.config.K_removal_efficiency
+        )
+        self.accumulated_sludge.__add__(sludge_output)
 
         return daily_output
 
@@ -406,16 +402,12 @@ class AnaerobicLagoon(BaseManureTreatment):
     def sludge_accumulation_volume(self):
         """Returns sludge accumulation volume in m^3
         """
-        if self.manure_handler.last_output:
-            return self.config.SAV_fraction * self.manure_handler.last_output.TSd * \
-                   self.config.sludge_accumulation_period * Constants.DAYS_PER_YEAR
-        else:
-            return 0
+        return self.accumulated_sludge.TS/1000
 
     @property
     def flushing_recycled(self):
         """returns flushing water recycled in m^3"""
-        if self.simulation_day > 0:
+        if(self.simulation_day > 0 and self.manure_handler.last_output.cleaning_water is not None):
             return self.manure_handler.last_output.cleaning_water * Constants.LITERS_TO_CUBIC_METERS
         else:
             return 0
@@ -441,8 +433,8 @@ class AnaerobicLagoon(BaseManureTreatment):
 
     @property
     def total_lagoon_volume(self) -> float:
-        """returns Total Lagoon Volume in m^3"""
-        return self.volume_needed + self.freeboard + self.precip
+        """returns Total Lagoon Volume in m^3. The precipitation is already included in volume_needed"""
+        return self.volume_needed + self.freeboard
 
     @property
     def volume_needed(self):
@@ -484,8 +476,9 @@ class AnaerobicLagoon(BaseManureTreatment):
         return self.lagoon_width * self.lagoon_length
 
     @property
-    def lagoon_volume(self):
-        """returns lagoon volume in m^3, should match volume needed"""
+    def modeled_lagoon_volume(self):
+        """returns modeled lagoon volume in m^3. This modeled volume is used to verify 
+        that equations for surface area, with slope assumptions, match the volume needed for treatment"""
         return self.lagoon_length * self.lagoon_width * self.lagoon_depth \
                - (self.lagoon_slope * self.lagoon_depth ** 2) * (self.lagoon_length + self.lagoon_width) \
                + 4 * self.lagoon_slope * self.lagoon_depth ** 3 / 3
@@ -526,18 +519,13 @@ class SlurryStorageUnderfloor(BaseManureTreatment):
         self.storage_time_period = manure_treatment_config.storage_time_period  # days
 
     @property
-    def treatment_volume(self) -> float:
-        return self.storage_time_period * self.manure_handler.last_output.total_daily_mass  # m^3
-
-    @property
     def total_volume(self) -> float:
-        return self.treatment_volume  # m^3
+        return self.accumulated_output.total_daily_mass # m^3
 
     def update(self, simulation_day: int) -> TreatmentOutput:
         handler = self.manure_handler.last_output
         daily_output = TreatmentOutput(
                 TAN_s=handler.TAN_s * (1 - self.config.TAN_removal_efficiency),
-                # urea=handler.U,
                 manure_nitrogen=handler.manure_nitrogen * (1 - self.config.N_removal_efficiency),
                 TSd=handler.TSd * (1 - self.config.TS_removal_efficiency),
                 VS_total=handler.VS_total * (1 - self.config.VS_removal_efficiency),
@@ -546,7 +534,7 @@ class SlurryStorageUnderfloor(BaseManureTreatment):
         )
 
         daily_output.final_volume = self.total_volume - (
-                (daily_output.TSd + daily_output.VS_total) * self.storage_time_period * Constants.KG_TO_CUBIC_METERS)
+                (daily_output.TSd + daily_output.VS_total) * Constants.KG_TO_CUBIC_METERS)
 
         self.all_output.append(daily_output)
         self.accumulated_output.__add__(daily_output)
@@ -564,29 +552,29 @@ class SlurryStorageOutdoor(BaseManureTreatment):
                  time: Time,
                  manure_treatment_config: ManureTreatmentConfig) -> None:
         super().__init__(manure_separator, weather, time, manure_treatment_config)
-        self.storage_time_period = manure_treatment_config.storage_time_period  # m^3 (25-year 24h storm event)
+        self.storage_time_period = manure_treatment_config.storage_time_period  # days
         self.freeboard_input = manure_treatment_config.freeboard_input  # m
         self.precip_input = manure_treatment_config.precip_input  # m (25-year 24h storm event)
 
     def update(self, simulation_day: int) -> TreatmentOutput:
         daily_output = self.update_helper()
         self.all_output.append(daily_output)
-        # self.accumulated_output.__add__(daily_output)
-        self.accumulated_output += daily_output  # TODO: Check if this is intended
+
+        self.accumulated_output += daily_output 
         self.simulation_day += 1
         return daily_output
 
     def update_helper(self):
         handler = self.manure_handler.last_output
+        rain_volume_added = self.precip
         daily_output = TreatmentOutput(
                 TAN_s=handler.TAN_s * (1 - self.config.TAN_removal_efficiency),
-                # urea=handler.urea,  # TODO: check if this is correct
                 manure_nitrogen=handler.manure_nitrogen * (1 - self.config.N_removal_efficiency),
                 TSd=handler.TSd * (1 - self.config.TS_removal_efficiency),
                 VS_total=handler.VS_total * (1 - self.config.VS_removal_efficiency),
                 p_excrt_manure=handler.p_excrt_manure * (1 - self.config.P_removal_efficiency),
                 K_manure=handler.K_manure * (1 - self.config.K_removal_efficiency),
-                total_daily_mass=handler.total_daily_mass
+                total_daily_mass=handler.total_daily_mass+rain_volume_added
         )
         return daily_output
 
@@ -597,15 +585,13 @@ class SlurryStorageOutdoor(BaseManureTreatment):
 
     @property
     def treatment_volume(self) -> float:
-        """returns minimum treatment volume in m^3"""
-        return (
-                self.manure_handler.last_output.total_daily_mass * Constants.LITERS_TO_CUBIC_METERS *
-                self.storage_time_period)  # m^3
+        """returns  treatment volume in m^3"""
+        return self.accumulated_output.total_daily_mass # m^3
 
     @property
     def total_pit_volume(self) -> float:
-        """returns Total Lagoon Volume in m^3"""
-        return self.treatment_volume + self.freeboard + self.precip
+        """returns Total Lagoon Volume in m^3. The precipitation is already included in treatment_volume"""
+        return self.treatment_volume + self.freeboard
 
     @property
     def pit_depth(self):
@@ -621,8 +607,7 @@ class SlurryStorageOutdoor(BaseManureTreatment):
         """returns coefficients for volume calculations as tuple (a,b,c)"""
         a = 3 * self.pit_depth
         b = -4 * self.pit_slope * self.pit_depth ** 2
-        c = 4 * (self.pit_slope ** 2) * (self.pit_depth ** 3) / 3 - self.total_pit_volume
-        # TODO: Check if it is self.total_pit_volume or self.treatment_volume
+        c = 4 * (self.pit_slope ** 2) * (self.pit_depth ** 3) / 3 - self.treatment_volume
         return a, b, c
 
     @property
@@ -635,18 +620,17 @@ class SlurryStorageOutdoor(BaseManureTreatment):
     @property
     def pit_length(self):
         """returns lagoon width in meters"""
-        # return self.lagoon_width * 3
-        return self.pit_width * 3  # TODO: Check if this is intended
+        return self.pit_width * 3  
 
     @property
     def pit_surface_area(self):
         """returns lagoon surface area in m^2"""
-        # return self.lagoon_width * self.lagoon_length
-        return self.pit_width * self.pit_length  # TODO: Check if this is intended
+        return self.pit_width * self.pit_length 
 
     @property
-    def pit_volume(self):
-        """returns lagoon volume in m^3, should match volume needed"""
+    def modeled_pit_volume(self):
+        """returns lagoon volume in m^3, This modeled volume is used to verify 
+        that equations for surface area, with slope assumptions, match the volume needed for treatment"""
         return self.pit_length * self.pit_width * self.pit_depth \
                - (self.pit_slope * self.pit_depth ** 2) * (self.pit_length + self.pit_width) \
                + 4 * self.pit_slope * self.pit_depth ** 3 / 3
@@ -660,7 +644,7 @@ class SlurryStorageOutdoor(BaseManureTreatment):
     @property
     def freeboard(self):
         """returns additional lagoon volume needed for freeboard in m^3"""
-        return self.freeboard_input * self.pit_surface_area  # m3 of rain
+        return self.freeboard_input * self.pit_surface_area  # m3 of freeboard
 
     def calc_emissions(self):
         pass
@@ -688,8 +672,8 @@ class ManureTreatmentConfig:
     AD_temp_set_point: float = 0.0
     AD_temp: float = 0.0
 
-    storage_time_period: float = 0.0,
-    precip_input: float = 0.0,
+    storage_time_period: float = 0.0
+    precip_input: float = 0.0
     freeboard_input: float = 0.0
 
 

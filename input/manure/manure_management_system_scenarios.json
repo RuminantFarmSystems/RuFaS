@@ -34,6 +34,14 @@
       "manure_handler": "manual_scraping",
       "manure_separator": "null",
       "manure_treatment": "slurry_storage_outdoor"
+    },
+    
+    {
+      "id": 5,
+      "bedding_type": "manure_solids",
+      "manure_handler": "flush_system",
+      "manure_separator": "rotary_screen",
+      "manure_treatment": "slurry_storage_outdoor"
     }
   ]
 }

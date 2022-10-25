@@ -52,13 +52,12 @@ class TreatmentOutput:
 
 @dataclass
 class AnaerobicDigestionOutput(TreatmentOutput):
-    total_daily_mass: float = 0.0
-    urea: float = 0.0
-
-    AD_biogas: float = 0.0,  # biogas production per day (m3/day)
-    AD_biogas_energy_content: float = 0.0  # biogas energy content (MJ/m3)
-    AD_methane_generation_volume: float = 0.0
-    AD_input_energy_heating: float = 0.0
+    biogas: float = 0.0  # biogas production per day (m3/day)
+    biogas_energy_content: float = 0.0  # biogas energy content (MJ/m3)
+    methane_generation_volume: float = 0.0
+    input_energy_heating: float = 0.0
+    top_cover_volume: float = 0.0
+    evaporated_water:float=0.0
 
     def __post_init__(self):
         self.total_daily_mass = 0.0  # TODO convert effluent volume to total daily mass
@@ -88,6 +87,17 @@ class AggregatedManureOutputforField(TreatmentOutput):
         self.K_mass=daily_output.K_manure
         self.mass =daily_output.total_daily_mass 
         self.DM =daily_output.DM
-        self.WIP =daily_output.VS_total*0.5
-        self.WOP =daily_output.VS_total*0.5
+        self.WIP =self.P_mass.self.mass*0.5/self.mass/1000
+        self.WOP =self.P_mass.self.mass*0.05/self.mass/1000
+
+
+@dataclass
+class SludgeOutput(TreatmentOutput):
+    """Description: This class is for tracking sludge accumulated properties. 
+    """
+    TS: float = 0.0  
+    VS: float = 0.0  
+    N_mass:float=0.0
+    P_mass:float=0.0
+    K_mass:float=0.0
 

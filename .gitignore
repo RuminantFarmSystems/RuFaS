@@ -42,3 +42,6 @@ venv/
 .DS_store
 
 .pytest_cache/
+.ipynb_checkpoints/
+*.ipynb
+RUFAS/routines/manure_management/gas_emissions/gas_emissions_tests.py
