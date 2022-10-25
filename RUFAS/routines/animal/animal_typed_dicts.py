@@ -175,7 +175,7 @@ class AnimalConfigTypedDict(TypedDict):
     prefresh_day: int
     num_21_days_repro: int
     calving_interval: int
-    user_input_calving_interval: bool
+    use_input_calving_interval: bool
 
     # farm level -> bodyweight
     birth_weight_avg_ho: float
