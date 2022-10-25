@@ -7,6 +7,7 @@ from typing import Dict
 from typing import List
 from typing import Optional
 from typing import Type
+from RUFAS.routines.manure_management.gas_emissions.gas_emissions import GasEmissions
 
 from RUFAS.routines.manure_management.helpers.enum_helpers import DefaultEnum
 from RUFAS.routines.manure_management.manure_separators.manure_separator_classes import BaseManureSeparator
@@ -15,7 +16,6 @@ from RUFAS.routines.manure_management.misc.constants import ManureManagementCons
 from RUFAS.routines.manure_management.misc.simple_pen import SimplePen
 from RUFAS.time import Time
 from RUFAS.weather import Weather
-
 
 class TreatmentType(DefaultEnum):
     """
@@ -53,6 +53,7 @@ class BaseManureTreatment:
         self.accumulated_output = TreatmentOutput()
         self.simulation_day = 0
 
+
     def reset_daily_variables(self):
         pass
 
@@ -80,7 +81,7 @@ class BaseManureTreatment:
         """
         ## Convert aggregated outputs from TreatmentOutput type, to object type expected in Field
         output_to_field = AggregatedManureOutputforField()
-        output_to_field.convert_treatment_ouput_to_field_outputs(self.accumulated_output)
+        output_to_field.convert_treatment_output_to_field_outputs(self.accumulated_output)
         return output_to_field
 
     def land_application_day_update_manure_storage(self,requested_manure_fraction=1):
@@ -90,7 +91,7 @@ class BaseManureTreatment:
         """
         ## Convert aggregated outputs from TreatmentOutput type, to object type expected in Field
         output_to_field = AggregatedManureOutputforField()
-        output_to_field.convert_treatment_ouput_to_field_outputs(self.accumulated_output)
+        output_to_field.convert_treatment_output_to_field_outputs(self.accumulated_output)
         # TODO Currently resets accumulated outputs to zero, 
         # but should reset to new levels based on requested_manure_mass. Should be based on
         #  percentage requested
@@ -487,7 +488,6 @@ class AnaerobicLagoon(BaseManureTreatment):
     def precip(self):
         """returns additional lagoon volume needed for precipitation in m^3"""
         current_day_rainfall = self.weather_data.rainfall[self.time.year - 1][self.time.day - 1]
-
         return current_day_rainfall * self.lagoon_surface_area  # m3 of rain
 
     @property
@@ -496,7 +496,7 @@ class AnaerobicLagoon(BaseManureTreatment):
         return self.freeboard_input * self.lagoon_surface_area  # m3 of rain
 
     def calc_emissions(self):
-        pass
+        return GasEmissions.calc_E_CH4_anaerobic_lagoon(self.accumulated_output.VS_total)
 
     def boundSludgeValue(self, calculated_value, lower_bound, upper_bound):
         """returns value bounded by lower and upper bounds"""
@@ -540,8 +540,8 @@ class SlurryStorageUnderfloor(BaseManureTreatment):
         self.accumulated_output.__add__(daily_output)
         self.simulation_day = simulation_day
         return daily_output
-    def calc_gas(self):
-        pass
+    def calc_emissions(self):
+        return GasEmissions.calc_E_CH4_slurry_storage_v3(self.accumulated_output.TSd,enclosed=True)
 
 
 
@@ -579,14 +579,9 @@ class SlurryStorageOutdoor(BaseManureTreatment):
         return daily_output
 
     @property
-    def wastewater_volume(self):
-        """returns wastewater volume in m^3"""
-        return self.manure_handler.last_output.total_daily_mass * Constants.LITERS_TO_CUBIC_METERS
-
-    @property
     def treatment_volume(self) -> float:
         """returns  treatment volume in m^3"""
-        return self.accumulated_output.total_daily_mass # m^3
+        return self.accumulated_output.final_volume # m^3
 
     @property
     def total_pit_volume(self) -> float:
@@ -647,7 +642,7 @@ class SlurryStorageOutdoor(BaseManureTreatment):
         return self.freeboard_input * self.pit_surface_area  # m3 of freeboard
 
     def calc_emissions(self):
-        pass
+        return GasEmissions.calc_E_CH4_slurry_storage_v3(self.accumulated_output.TSd,enclosed=False)
 
 
 @dataclass

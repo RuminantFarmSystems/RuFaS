@@ -80,7 +80,7 @@ class AggregatedManureOutputforField(TreatmentOutput):
     WIP:float=0.0
     WOP:float=0.0
     DM:float=0.0
-    def convert_treatment_ouput_to_field_outputs(self,daily_output):
+    def convert_treatment_output_to_field_outputs(self,daily_output):
         """converts TreatmentOutputs attributes to attributes names in class"""
         self.N_mass=daily_output.manure_nitrogen
         self.P_mass=daily_output.p_excrt_manure
