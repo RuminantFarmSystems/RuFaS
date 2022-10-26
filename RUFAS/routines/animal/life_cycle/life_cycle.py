@@ -547,6 +547,16 @@ class LifeCycleManager:
         self.culled_cow_num, self.avg_cow_culling_age = temp
 
     def _handle_cow_body_weight(self, cow: Cow, total_animal_num: int) -> int:
+        """Adjusts the average cow body weight, average parity number, and average mature body weight
+
+        Args:
+            cow (Cow): A Cow object.
+            total_animal_num: The total number of animals in the herd.
+
+        Returns:
+            total_animal_num: The newly updated total number of animals in the herd.
+
+        """
         _, self.avg_cow_body_weight = Utility.calc_average(
                 self.cow_num, self.avg_cow_body_weight, cow.body_weight)
         self.cow_num, self.avg_parity_num = Utility.calc_average(
@@ -557,6 +567,15 @@ class LifeCycleManager:
         return total_animal_num
 
     def _handle_cow_milking(self, cow: Cow) -> None:
+        """Adjusts the daily milk production quantity, average days in milking.
+
+        Args:
+            cow: A Cow object.
+
+        Returns:
+            None
+
+        """
         if cow.milking:
             self.daily_milk_production += cow.estimated_daily_milk_produced
             temp = Utility.calc_average(self.milking_cow_num, self.avg_days_in_milk, cow.days_in_milk)

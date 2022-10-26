@@ -1,14 +1,18 @@
 import collections
-from typing import Dict, List
+from typing import Dict
+from typing import List
 from typing import Type
 
 import pytest
-from pytest import approx, fixture
+from pytest import approx
+from pytest import fixture
 from pytest_mock import MockerFixture
 
 from RUFAS.classes import Config
-from RUFAS.routines.animal.animal_typed_dicts import AnimalConfigTypedDict, HerdInfoTypedDict
-from RUFAS.routines.animal.life_cycle.animal_constants import ENTER_HERD, INIT_HERD, LOW_PROD_CULL
+from RUFAS.routines.animal.animal_typed_dicts import AnimalConfigTypedDict
+from RUFAS.routines.animal.life_cycle.animal_constants import ENTER_HERD
+from RUFAS.routines.animal.life_cycle.animal_constants import INIT_HERD
+from RUFAS.routines.animal.life_cycle.animal_constants import LOW_PROD_CULL
 from RUFAS.routines.animal.life_cycle.animal_initialization import AnimalInitialization
 from RUFAS.routines.animal.life_cycle.calf import Calf
 from RUFAS.routines.animal.life_cycle.cow import Cow
@@ -820,12 +824,81 @@ def test_cull_cow(mocker: MockerFixture, life_cycle_manager: LifeCycleManager) -
     assert life_cycle_manager.avg_cow_culling_age == approx(100.0)
 
 
-def test_handle_cow_body_weight():
-    pass
+def test_handle_cow_body_weight(mocker: MockerFixture,
+                                life_cycle_manager: LifeCycleManager) -> None:
+    """Unit test for function _handle_cow_body_weight() in file life_cycle.py"""
+    # Arrange
+    total_animal_num = 100
+    mock_cow = mocker.MagicMock(autospec=Cow)
+    mock_cow.body_weight = 1100.0
+    mock_cow.calves = 20
+    mock_cow.mature_body_weight = 1300.0
+
+    life_cycle_manager.cow_num = 10
+    life_cycle_manager.avg_cow_body_weight = 1000.0
+    life_cycle_manager.avg_parity_num = 2.0
+    life_cycle_manager.avg_mature_body_weight = 1200.0
+
+    expected_new_cow_num = 11
+    expected_new_avg_cow_body_weight = (life_cycle_manager.avg_cow_body_weight *
+                                        life_cycle_manager.cow_num +
+                                        mock_cow.body_weight) / expected_new_cow_num
+    expected_new_avg_parity_num = (life_cycle_manager.avg_parity_num *
+                                   life_cycle_manager.cow_num +
+                                   mock_cow.calves) / expected_new_cow_num
+
+    expected_new_total_animal_num = total_animal_num + 1
+    expected_new_avg_mature_body_weight = (life_cycle_manager.avg_mature_body_weight *
+                                           total_animal_num +
+                                           mock_cow.mature_body_weight) / expected_new_total_animal_num
+    spy_handle_cow_body_weight = mocker.spy(life_cycle_manager, '_handle_cow_body_weight')
+
+    # Act
+    new_total_animal_num = life_cycle_manager._handle_cow_body_weight(mock_cow, total_animal_num)
+
+    # Assert
+    assert new_total_animal_num == expected_new_total_animal_num
+    assert life_cycle_manager.cow_num == expected_new_cow_num
+    assert life_cycle_manager.avg_cow_body_weight == approx(expected_new_avg_cow_body_weight)
+    assert life_cycle_manager.avg_parity_num == approx(expected_new_avg_parity_num)
+    assert life_cycle_manager.avg_mature_body_weight == approx(expected_new_avg_mature_body_weight)
+    spy_handle_cow_body_weight.assert_called_once_with(mock_cow, total_animal_num)
 
 
-def test_handle_cow_milking():
-    pass
+@pytest.mark.parametrize('is_cow_milking', [True, False])
+def test_handle_cow_milking(mocker: MockerFixture,
+                            life_cycle_manager: LifeCycleManager,
+                            is_cow_milking: bool) -> None:
+    # Arrange
+    mock_cow = mocker.MagicMock(autospec=Cow)
+    mock_cow.milking = is_cow_milking
+    mock_cow.estimated_daily_milk_produced = 15
+    mock_cow.days_in_milk = 8
+
+    life_cycle_manager.daily_milk_production = 100
+    life_cycle_manager.milking_cow_num = 20
+    life_cycle_manager.avg_days_in_milk = 7
+    life_cycle_manager.dry_cow_num = 9
+
+    expected_new_daily_milk_production = (life_cycle_manager.daily_milk_production +
+                                          mock_cow.estimated_daily_milk_produced)
+    expected_new_milking_cow_num = life_cycle_manager.milking_cow_num + 1
+    expected_new_avg_days_in_milk = (life_cycle_manager.avg_days_in_milk * life_cycle_manager.milking_cow_num +
+                                     mock_cow.days_in_milk) / expected_new_milking_cow_num
+    expected_new_dry_cow_num = life_cycle_manager.dry_cow_num + 1
+    spy_handle_cow_milking = mocker.spy(life_cycle_manager, '_handle_cow_milking')
+
+    # Act
+    life_cycle_manager._handle_cow_milking(mock_cow)
+
+    # Assert
+    spy_handle_cow_milking.assert_called_once_with(mock_cow)
+    if is_cow_milking:
+        assert life_cycle_manager.daily_milk_production == expected_new_daily_milk_production
+        assert life_cycle_manager.milking_cow_num == expected_new_milking_cow_num
+        assert life_cycle_manager.avg_days_in_milk == approx(expected_new_avg_days_in_milk)
+    else:
+        assert life_cycle_manager.dry_cow_num == expected_new_dry_cow_num
 
 
 def test__handle_cow_days_in_milk():
