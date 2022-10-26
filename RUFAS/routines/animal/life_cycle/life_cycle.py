@@ -393,7 +393,7 @@ class LifeCycleManager:
                 removed_heiferIIs_idx.append(idx)
             else:
                 total_animal_num, preg_heifer_num = \
-                    self._keep_heiferII_as_pregnant(heiferII, total_animal_num, preg_heifer_num)
+                    self._remain_heiferII(heiferII, total_animal_num, preg_heifer_num)
 
         Utility.remove_items_from_list_by_indices(heiferIIs, removed_heiferIIs_idx)
         return total_animal_num, preg_heifer_num
@@ -410,7 +410,7 @@ class LifeCycleManager:
         new_heiferIII = HeiferIII(heiferII_vals)
         heiferIIIs.append(new_heiferIII)
 
-    def _keep_heiferII_as_pregnant(self, heiferII: HeiferII, total_animal_num: int, preg_heifer_num: int):
+    def _remain_heiferII(self, heiferII: HeiferII, total_animal_num: int, preg_heifer_num: int):
         self.heiferII_num += 1
         temp = Utility.calc_average(total_animal_num, self.avg_mature_body_weight,
                                     heiferII.mature_body_weight)
@@ -436,11 +436,6 @@ class LifeCycleManager:
         removed_heiferIIIs_idx: List[int] = []
 
         for idx, heiferIII in enumerate(heiferIIIs):
-            # TODO: Review this
-            # if type(heiferIII) is HeiferIII:
-            #     cow_stage = heiferIII.update(sim_day)
-            # else:
-            #     cow_stage = heiferIII.update(sim_day, self.avg_CI)
             cow_stage = heiferIII.update(sim_day)
             if cow_stage:
                 self._move_heiferIII_to_cow_stage(heiferIII, cows)
@@ -472,21 +467,21 @@ class LifeCycleManager:
 
     def _check_if_heifers_need_to_be_sold(self, heiferIIIs: List[HeiferIII], cows: List[Cow],
                                           ids_removed: List[int]) -> None:
-        # if the number of heifers is more than needed for the herd,
+        # If the number of heifers exceeds what is needed for the herd,
         # sell those as replacement
-        ratio = 1.03  # TODO: use a better name
-        while len(heiferIIIs) + len(cows) > self.herd_num * ratio and len(heiferIIIs) > 0:
-            removed = heiferIIIs.pop()
-            ids_removed.append(removed.id)
-            self.sold_heifers.append(removed)
+        sell_threshold = 1.03
+        while len(heiferIIIs) + len(cows) > self.herd_num * sell_threshold and len(heiferIIIs) > 0:
+            removed_heiferIII = heiferIIIs.pop()
+            ids_removed.append(removed_heiferIII.id)
+            self.sold_heifers.append(removed_heiferIII)
             self.sold_heifer_num += 1
 
     def _check_if_replacement_heifers_needed(self, sim_day: int, heiferIIIs: List[HeiferIII], cows: List[Cow],
                                              animals_added: List[Cow]) -> None:
         # if the number of heifers is less than needed for the herd,
         # buy replacement from the market
-        ratio = 1.01  # TODO: use a better name
-        while len(cows) + len(heiferIIIs) + self.bought_heifer_num < self.herd_num * ratio \
+        buy_threshold = 1.01
+        while len(cows) + len(heiferIIIs) + self.bought_heifer_num < self.herd_num * buy_threshold \
                 and sim_day > 1:
             replacement = self.replacement_market.pop(0)
             replacement.events.add_event(replacement.days_born, sim_day, animal_constants.ENTER_HERD)
@@ -521,7 +516,7 @@ class LifeCycleManager:
                 ids_removed.append(cow.id)
                 removed_cows_idx.append(index)
             else:
-                total_animal_num = self._handle_cow_body_weight(cow, total_animal_num)
+                total_animal_num = self._handle_cow_body_weight_and_parity(cow, total_animal_num)
                 self._handle_cow_milking(cow)
                 self._handle_cow_days_in_milk(cow)
                 self._handle_cow_days_in_preg(cow)
@@ -546,7 +541,7 @@ class LifeCycleManager:
         temp = Utility.calc_average(self.culled_cow_num, self.avg_cow_culling_age, cow.days_born)
         self.culled_cow_num, self.avg_cow_culling_age = temp
 
-    def _handle_cow_body_weight(self, cow: Cow, total_animal_num: int) -> int:
+    def _handle_cow_body_weight_and_parity(self, cow: Cow, total_animal_num: int) -> int:
         """Adjusts the average cow body weight, average parity number, and average mature body weight
 
         Args:
@@ -580,14 +575,14 @@ class LifeCycleManager:
             self.daily_milk_production += cow.estimated_daily_milk_produced
             temp = Utility.calc_average(self.milking_cow_num, self.avg_days_in_milk, cow.days_in_milk)
             self.milking_cow_num, self.avg_days_in_milk = temp
-        else:
-            self.dry_cow_num += 1
 
-    def _handle_cow_days_in_milk(self, cow: Cow) -> None:
-        if cow.days_in_milk < self.animal_config['voluntary_waiting_period']:
-            self.vwp_cow_num += 1
+            if cow.days_in_milk < self.animal_config['voluntary_waiting_period']:
+                self.vwp_cow_num += 1
+
             if cow.days_in_preg == 0:
                 self.open_cow_num += 1
+        else:
+            self.dry_cow_num += 1
 
     def _handle_cow_days_in_preg(self, cow: Cow) -> None:
         if cow.days_in_preg > 0:
