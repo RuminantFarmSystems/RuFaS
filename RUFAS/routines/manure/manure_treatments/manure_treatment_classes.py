@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import math
 from dataclasses import dataclass
 from enum import auto
 from typing import Dict
@@ -8,8 +9,6 @@ from typing import Optional
 from typing import Tuple
 from typing import Type
 from typing import Union
-
-import math
 
 from RUFAS.routines.manure.default_enum.default_enum import DefaultEnum
 from RUFAS.routines.manure.manure_separators.manure_separator_daily_output import ManureSeparatorDailyOutput

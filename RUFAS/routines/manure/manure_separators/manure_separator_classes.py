@@ -241,8 +241,8 @@ class DefaultManureSeparatorConfigFactory:
 
     ROTARY_SCREEN_CONFIG = ManureSeparatorConfig(
             percent_dry_solids=0.2,
-            TS_removal_efficiency_for_separator=0.55,
-            VS_removal_efficiency_for_separator=0.55,
+            TS_removal_efficiency_for_separator=0.35,
+            VS_removal_efficiency_for_separator=0.40,
             N_removal_efficiency_for_separator=0.3,
             TAN_removal_efficiency_for_separator=0.15,
             P_removal_efficiency_for_separator=0.4,
@@ -250,8 +250,8 @@ class DefaultManureSeparatorConfigFactory:
     )
     SCREW_PRESS_CONFIG = ManureSeparatorConfig(
             percent_dry_solids=0.35,
-            TS_removal_efficiency_for_separator=0.30,
-            VS_removal_efficiency_for_separator=0.5,
+            TS_removal_efficiency_for_separator=0.25,
+            VS_removal_efficiency_for_separator=0.30,
             N_removal_efficiency_for_separator=0.3,
             TAN_removal_efficiency_for_separator=0.10,
             P_removal_efficiency_for_separator=0.2,
