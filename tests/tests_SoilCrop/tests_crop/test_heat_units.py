@@ -1,254 +1,160 @@
 """
 RUFAS: Ruminant Farm Systems Model
 File name: test_heat_units.py
-Description: Implements test cases
+Description: Test cases for heat_units.py
 Author(s): Brandon DeBoer, brdeboer@wisc.edu
 """
 
 from RUFAS.routines.field.crop.crop_types.base_crop import BaseCrop
 from RUFAS.classes import Weather, Time
 from RUFAS.routines.field.crop.heat_units import *
+from tests.tests_SoilCrop.mock_classes import *
 from unittest.mock import MagicMock
 import pytest
 
 
-def mock_crop(T_base_min = 2.5,T_base_max = 40 ,fr_PHU = .42,PHU = 8.8,accumulated_HU= .25):
+@pytest.mark.parametrize(("T_HU_min","T_HU_max","T_base_min"),[
+    (15, 23, 16), #arbitrary ints
+    (0,0, 0), #zeroes
+    (-1,-1, -1), #negatives
+    (1, 1, 1), #ones
+    (20.5, 25.3, 22.7)#T_base_min greater than T_HU
+])
+def test_calc_HU(T_HU_min, T_HU_max, T_base_min):
     """
     Description:
-        Creates a BaseCrop class mocking object for use as input for functions. It is initialized with the
-        arguments provided; arguments are dynamic and can be changed/added to as needed.
-
+        Unit test for the calc_HU function in routines/field/crop/heat_units.py.
+        Uses pytest.mark.parametrize to run several test cases at once.
     Args:
-        T_base_min (float): BaseCrop attribute, minimum temperature required for crop growth
-        T_base_max (float): BaseCrop attribute, maximum temperature required to sustain growth
-        fr_PHU (float): BaseCrop attribute, fraction of PHU accumulated including current day
-        PHU (float): BaseCrop attribute, total heat units required for maturity
-        accumulated_HU (float): BaseCrop attribute, heat units accumulated including current day
-
-    Returns:
-        BaseCrop class mocking object
+        T_HU_min
+        T_HU_max
+        T_base_min
+    
     """
-    mcrop = MagicMock(BaseCrop)
+    crop = mock_crop(T_base_min = T_base_min)
 
-    mcrop.T_base_min = T_base_min
-    mcrop.T_base_max = T_base_max
-    mcrop.fr_PHU = fr_PHU
-    mcrop.PHU = PHU
-    mcrop.accumulated_HU = accumulated_HU
+    #using pseudocode C.2.A.1/2
+    T_HU = (T_HU_min + T_HU_max) / 2
 
-    return mcrop
+    if T_HU < T_base_min:
+        T_HU = 0
+    else:
+        T_HU -= T_base_min
+    
+    assert pytest.approx(calc_HU(crop,T_HU_min,T_HU_max)) == T_HU
 
-def mock_weather(T_min = [[2.5]], T_max = [[40]]):
+
+@pytest.mark.parametrize(("T_max","T_base_max"),[
+    (18, 20), #T_base_max larger than T_max
+    (0,0), #zeroes
+    (1,1), #ones
+    (-1,-1), #negatives
+    (20,20), #equal
+    (24.2, 23.1) #arbitrary floats, T_max larger than T_base_max
+])
+def test_calc_T_HU_max(T_max,T_base_max):
     """
     Description:
-        Creates a Weather class mocking object for use as input for functions. It is initialized with the
-        arguments provided; arguments are dynamic and can be changed/added to as needed.
-
+        Unit test for the calc_T_HU_max function in routines/field/crop/heat_units.py.
+        Uses pytest.mark.parametrize to run several test cases at once.
     Args:
-        T_min (obj): Weather attribute, nested list  containing the minimum temperature of each day in each year
-        T_max (obj): Weather attribute, nested list containing the maximum temperature of each day in each year
-
-    Returns:
-        Weather class mocking object
-    
+        T_max
+        T_base_max
     """
-    mweather = MagicMock(Weather)
+    crop = mock_crop(T_base_max = T_base_max)
 
-    mweather.T_min = T_min
-    mweather.T_max = T_max
+    #from crop pseudocode C.2.A.4
+    max_temp = None
+    if T_max > T_base_max:
+        max_temp = T_base_max
+    else:
+        max_temp = T_max
     
-    return mweather
+    assert pytest.approx(calc_T_HU_max(crop,T_max)) == max_temp
 
-def mock_time(year = 1, day = 1):
+
+@pytest.mark.parametrize(("T_min","T_base_min"),[
+    (5, 6), #
+    (0,0), #zeroes
+    (1,1), #ones
+    (-1,-1), #negatives
+    (7.8,7.8), #equal
+    (14.2, 13.1) #
+])
+def test_calc_T_HU_min(T_min, T_base_min):
     """
     Description:
-         Creates a Time class mocking object for use as input for functions. It is initialized with the
-        arguments provided; arguments are dynamic and can be changed/added to as needed.
-
+        Unit test for the calc_T_HU_min function in routines/field/crop/heat_units.py.
+        Uses pytest.mark.parametrize to run several test cases at once.
     Args:
-        year: Time attribute, current year 
-        day: Time attribute, current day
+        T_min
+        T_base_min
+    """
+    crop = mock_crop(T_base_min = T_base_min)
 
-    Returns:
-        Time class mocking object
+    #from crop pseudocode C.2.A.4
+    min_temp = None
+    if T_min < T_base_min:
+        min_temp = T_base_min
+    else:
+        min_temp = T_min
     
-    """
-    mtime = MagicMock(Time)
-
-    mtime.year = year
-    mtime.day = day
-
-    return mtime
+    assert pytest.approx(calc_T_HU_min(crop,T_min)) == min_temp
 
 
-
-#calc_HU
-def test_calc_HU_correctly_calculates_available_heat_units():
-    """
-    Description:
-        Using mocking, tests if the calc_HU() function in RUFAS/routines/field/crop/heat_units.py
-        correctly returns the proper available HU given that the average heat units temperature on the
-        given day is larger than the T_base_min of the crop.
-
-    """
-    crop = mock_crop()
-
-    T_HU_min = 15
-    T_HU_max = 23
-
-    assert pytest.approx(calc_HU(crop,T_HU_min,T_HU_max)) == ((T_HU_min + T_HU_max)/2) - 2.5
-
-def test_calc_HU_correctly_returns_zero_for_large_min_HU_temp():
+#for ease of mocking, year and day will remain 1 due 
+#to the way they are used to access T_min and T_max in the weather object
+@pytest.mark.parametrize(("fr_PHU","PHU","accumulated_HU","T_base_min","T_base_max",\
+    "T_min","T_max","year","day"),[
+        (.42,8.8,.25,6,19,[[2.5]],[[40]],1,1), #arbitrary numbers
+        # (0,0,0,0,0,[[0]],[[0]],1,1), #zeroes
+        (1,1,1,1,1,[[1]],[[1]],1,1), #ones
+        (.78 ,12.1,.5,3.7,19.7,[[3.8]],[[29]],1,1), #more arbitrary numbers
+])
+def test_calculate_fr_PHU(fr_PHU, PHU, accumulated_HU,T_base_min,T_base_max, T_min, T_max, year, day):
     """
     Description:
-        Using mocking, tests if the calc_HU() function in RUFAS/routines/field/crop/heat_units.py
-        correctly returns 0 given that the T_base_min of the crop is larger than the average heat units
-        temperature on the given day.
-        
+        Unit test for calculate_fr_PHU() in routines/field/crop/heat_units.py.
+        Uses pytest.mark.paramtrize to run multiple test cases for a single unittest.
+        Any functions used inside of this unit test are assumed to be correct and properly
+        tested.
+    Args:
+        fr_PHU
+        PHU
+        accumulated_HU
+        T_base_min
+        T_base_max
+        T_min
+        T_max
+        year
+        day
     """
-    crop = mock_crop()
+    crop = mock_crop(fr_PHU = fr_PHU, PHU = PHU, accumulated_HU = accumulated_HU,T_base_min = T_base_min,T_base_max = T_base_max)
+    weather = mock_weather(T_min = T_min, T_max = T_max)
+    time = mock_time(year = year, day = day)
 
-    T_HU_min = 1.5
-    T_HU_max = 2.7
+    #based on crop pseudocode C.2.B.1
 
-    assert pytest.approx(calc_HU(crop,T_HU_min,T_HU_max)) == 0.0
+    min = T_min[year-1][day-1]
+    max = T_max[year-1][day-1]
 
+    T_HU_min = calc_T_HU_min(crop,min)
+    T_HU_max = calc_T_HU_max(crop,max)
+    HU = calc_HU(crop,T_HU_min, T_HU_max)
 
-#calc_T_HU_max()
-def test_calc_T_HU_max_correctly_calculates_max_HU_temp_larger_T_base_max():
-    """
-    Description:
-        Using mocking, tests if the calc_T_HU_max() function in RUFAS/routines/field/crop/heat_units.py
-        correctly returns the correct maximum heat unit temperature given that the crop T_base_max is larger 
-        than the maximum HU temperature of the current day
+    prev_accumulated_HU = accumulated_HU
+    accumulated_HU += HU
+    prev_fr_PHU = fr_PHU
+    fr_PHU = accumulated_HU / PHU
 
-    """
-    crop = mock_crop()
+    calculate_fr_PHU(crop,weather,time)
 
-    T_max = 30
-
-    assert pytest.approx(calc_T_HU_max(crop,T_max)) == 30
-
-def test_calc_T_HU_max_correctly_calculates_max_HU_temp_smaller_T_base_max():
-    """
-    Description:
-        Using mocking, tests if the calc_T_HU_max() function in RUFAS/routines/field/crop/heat_units.py
-        correctly returns the correct maximum heat unit temperature given that the maximum HU temperature
-        for the current day is larger than the crop's T_base_max.
-
-    """
-    crop = mock_crop(T_base_max=23)
-
-    T_max = 30
-
-    assert pytest.approx(calc_T_HU_max(crop,T_max)) == 23
+    assert pytest.approx([crop.prev_accumulated_HU,crop.accumulated_HU,crop.prev_fr_PHU,crop.fr_PHU])\
+        == [prev_accumulated_HU,accumulated_HU,prev_fr_PHU,fr_PHU]
 
 
-#calc_T_HU_min
-def test_calc_T_HU_min_correctly_calculates_min_HU_temp_larger_T_base_min():
-    """
-    Description:
-        Using mocking, tests if the calc_T_HU_max() function in RUFAS/routines/field/crop/heat_units.py
-        correctly returns the correct maximum heat unit temperature given that the crop's T_base_min is 
-        larger than the minimum HU temperature on the given day.
-
-    """
-    crop = mock_crop()
-
-    T_min = 1.5
-
-    assert pytest.approx(calc_T_HU_min(crop,T_min)) == 2.5
-
-
-def test_calc_T_HU_min_correctly_calculates_min_HU_temp_smaller_T_base_min():
-    """
-    Description:
-        Using mocking, tests if the calc_T_HU_min() function in RUFAS/routines/field/crop/heat_units.py
-        correctly returns the correct minimum heat unit temperature given that the minimum HU temperature
-        for the current day is larger than the crop's T_base_min.
-
-    """
-    crop = mock_crop(T_base_min = 1.0)
-
-    T_min = 1.5
-
-    assert pytest.approx(calc_T_HU_min(crop,T_min)) == 1.5
-
-#calculate_fr_PHU()
-#all tests assume correctness of inner function calls
-def test_calculate_fr_PHU_correctly_sets_prev_accumulated_HU():
-    """
-    Description:
-        Tests that the BaseCrop attribute prev_accumulated_HU is set correctly during the 
-        execution of the calculate_fr_PHU() function in RUFAS/routines/field/crop/heat_units.py
-
-    """
-    crop = mock_crop()
-    weather = mock_weather()
-    time = mock_time()
-
-    calculate_fr_PHU(crop, weather, time)
-
-    assert pytest.approx(crop.prev_accumulated_HU) == .25
-
-def test_calculate_fr_PHU_correctly_sets_accumulated_HU():
-    """
-    Description:
-        Tests that the BaseCrop attribute accumulated_HU is calculated and set correctly during the 
-        execution of the calculate_fr_PHU() function in RUFAS/routines/field/crop/heat_units.py
-
-    """
-    crop = mock_crop()
-    weather = mock_weather()
-    time = mock_time()
-
-    calculate_fr_PHU(crop, weather, time)
-
-    T_min = 2.5
-    T_max = 40
-    T_HU_min = calc_T_HU_min(crop,T_min)
-    T_HU_max = calc_T_HU_max(crop,T_max)
-    HU = calc_HU(crop,T_HU_min,T_HU_max)
-
-    assert pytest.approx(crop.accumulated_HU) == HU + .25
-    
-def test_calculate_fr_PHU_correctly_sets_prev_fr_PHU():
-    """
-    Description:
-        Tests that the BaseCrop attribute prev_fr_PHU is set correctly during the 
-        execution of the calculate_fr_PHU() function in RUFAS/routines/field/crop/heat_units.py
-
-    """
-    crop = mock_crop()
-    weather = mock_weather()
-    time = mock_time()
-
-    calculate_fr_PHU(crop, weather, time)
-
-    assert pytest.approx(crop.prev_fr_PHU) == .42
-
-def test_calculate_fr_PHU_correctly_sets_fr_PHU():
-    """
-    Description:
-        Tests that the BaseCrop attribute fr_PHU is calculated and set correctly during the 
-        execution of the calculate_fr_PHU() function in RUFAS/routines/field/crop/heat_units.py
-
-    """
-    crop = mock_crop()
-    weather = mock_weather()
-    time = mock_time()
-
-    calculate_fr_PHU(crop, weather, time)
-
-    T_min = 2.5
-    T_max = 40
-    T_HU_min = calc_T_HU_min(crop,T_min)
-    T_HU_max = calc_T_HU_max(crop,T_max)
-    HU = calc_HU(crop,T_HU_min,T_HU_max)
-
-    assert pytest.approx(crop.fr_PHU) == (.25 + HU) / 8.8
-
-
+# def test_update_all():
+#     pass
 
 
 
