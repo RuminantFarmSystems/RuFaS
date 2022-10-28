@@ -75,7 +75,7 @@
 #             # The following attributes should stay the same.
 #             # Only pick two as an example.
 #             manure_mass=10.0,
-#             CH4_animal=10.0
+#             CH4=10.0
 #     )
 #     constants = ManureManagementConstants
 #     assert manure.urea == approx(2.0 * constants.UREA_MOLAR_MASS)
@@ -87,7 +87,7 @@
 #     assert manure.K == approx(8.0 * constants.GRAMS_TO_KG)
 #
 #     assert manure.manure_mass == approx(10.0)
-#     assert manure.CH4_animal == approx(10.0)
+#     assert manure.CH4 == approx(10.0)
 #
 #     # The remaining attributes should be set to the default value of 0.
 #     assert manure.TS == approx(0.0)

@@ -46,3 +46,34 @@ class ManureTreatmentDailyOutput:
         return ManureTreatmentDailyOutput(*[
             attr1 + attr2 for attr1, attr2 in zip(astuple(self), astuple(other))
         ])
+
+    def __sub__(self, other: ManureTreatmentDailyOutput) -> ManureTreatmentDailyOutput:
+        """Subtracts corresponding attributes between this output and another.
+
+        Args:
+            other: ManureTreatmentDailyOutput object to subtract.
+
+        Returns:
+            ManureTreatmentDailyOutput with corresponding attributes subtracted.
+
+        """
+        if not isinstance(other, ManureTreatmentDailyOutput):
+            raise TypeError('Other must be of type ManureTreatmentDailyOutput.')
+
+        return ManureTreatmentDailyOutput(*[
+            attr1 - attr2 for attr1, attr2 in zip(astuple(self), astuple(other))
+        ])
+
+    def __mul__(self, by: float) -> ManureTreatmentDailyOutput:
+        """Multiplies corresponding attributes by a scalar.
+
+        Args:
+            by: Scalar to multiply by.
+
+        Returns:
+            ManureTreatmentDailyOutput with corresponding attributes multiplied.
+
+        """
+        return ManureTreatmentDailyOutput(*[
+            attr * by for attr in astuple(self)
+        ])

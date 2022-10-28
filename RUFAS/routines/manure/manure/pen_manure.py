@@ -31,7 +31,7 @@ class PenManure:
         P: manure phosphorus excretion for manure module input, kg.
         P_frac: phosphorus fraction of manure.
         K: potassium in manure, kg.
-        CH4_animal: methane emission, g/day.
+        CH4: methane emission, g/day.
 
     """
     urea: float = 0.0
@@ -46,7 +46,7 @@ class PenManure:
     P: float = 0.0
     P_frac: float = 0.0
     K: float = 0.0
-    CH4_animal: float = 0.0
+    CH4: float = 0.0
 
     def __post_init__(self):
         """Performs any necessary unit conversion after initialization."""
@@ -77,5 +77,5 @@ class PenManure:
                 P=animal_manure['p_excrt_manure'],
                 P_frac=animal_manure['p_frac'] / num_animals,
                 K=animal_manure['K_manure'],
-                CH4_animal=animal_manure['CH4_manure']
+                CH4=animal_manure['CH4_manure']
         )

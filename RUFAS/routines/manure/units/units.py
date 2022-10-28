@@ -1,8 +1,8 @@
 class Units:
     """Units for quantities in manure management output objects."""
 
-    urea = 'g/L'
-    TAN = 'g/L'
+    urea = 'g_per_L'
+    TAN = 'g_per_L'
     N = 'kg'
     manure_mass = 'kg'
     TS = 'kg'
@@ -11,7 +11,7 @@ class Units:
     VS_total = 'kg'
     P = 'kg'
     K = 'kg'
-    CH4_animal = 'g/day'
+    CH4 = 'g_per_day'
 
     manure_volume = 'm^3'
     cleaning_water_volume = 'm^3'

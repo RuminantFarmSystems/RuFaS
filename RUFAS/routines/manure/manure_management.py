@@ -18,6 +18,7 @@ from typing import Tuple
 from RUFAS.routines.animal.animal_management import AnimalManagement
 from RUFAS.routines.manure.beddings.bedding_classes import BaseBedding
 from RUFAS.routines.manure.beddings.bedding_classes import BeddingFactory
+from RUFAS.routines.manure.field_connector.field_connector import FieldConnector
 from RUFAS.routines.manure.input_handler.manure_management_config_handler import ManureManagementConfigHandler
 from RUFAS.routines.manure.manure_handlers.manure_handler_classes import BaseManureHandler
 from RUFAS.routines.manure.manure_handlers.manure_handler_classes import ManureHandlerFactory
@@ -71,6 +72,7 @@ class ManureManagement:
         self.reception_pits: Dict[int, ReceptionPit] = {}
         self.manure_separators: Dict[int, Optional[BaseManureSeparator]] = {}
         self.manure_treatments: Dict[int, BaseManureTreatment] = {}
+        self.field_connector = FieldConnector()
         self.weather = weather
         self.time = time
         self.manure_management_config_handler = ManureManagementConfigHandler(manure_management_config)
@@ -211,7 +213,9 @@ class ManureManagement:
 
         self.manure_management_output_handler.sort_by_pen_id_and_sim_day()
         self.manure_management_output_handler.export_all_data_to_csv()
-        self.manure_management_output_handler.export_summary_to_csv()
+
+        if animal_management.simulation_day == 751:
+            self.manure_management_output_handler.produce_graphics()
 
 
 def simulate_daily_manure_management(manure_management: ManureManagement, animal_management: AnimalManagement) -> None:

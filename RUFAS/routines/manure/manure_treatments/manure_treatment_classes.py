@@ -68,26 +68,6 @@ class BaseManureTreatment:
         """
         return self.all_output[-1] if len(self.all_output) > 0 else None
 
-    @staticmethod
-    def _pick_input_data(reception_pit_daily_output: ReceptionPitDailyOutput,
-                         manure_separator_daily_output: ManureSeparatorDailyOutput) \
-            -> ManureTreatmentInputDataType:
-        """Return the manure separator daily output object if it is not None.
-
-        Args:
-            reception_pit_daily_output: A ReceptionPitDailyOutput object.
-            manure_separator_daily_output: A ManureSeparatorDailyOutput object.
-
-        Returns:
-            The manure separator daily output object if it is not None.
-            Otherwise, the reception pit daily output object is returned.
-
-        """
-        if manure_separator_daily_output is not None:
-            return manure_separator_daily_output
-        else:
-            return reception_pit_daily_output
-
     def _update_helper(self) -> ManureTreatmentDailyOutput:
         """Decide how to process the input data passed into the daily_update() method.
 
@@ -132,7 +112,7 @@ class BaseManureTreatment:
                 treatment for the current simulation day.
 
         """
-        self._current_input_data = self._pick_input_data(reception_pit_daily_output, manure_separator_daily_output)
+        self._current_input_data = manure_separator_daily_output or reception_pit_daily_output
         daily_output = self._update_helper()
         self.all_output.append(daily_output)
         return daily_output
