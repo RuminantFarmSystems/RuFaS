@@ -98,11 +98,11 @@ class ManureManagementOutputHandler:
         }
         return {f'{prefix}{self.HEADER_PRIMARY_DELIMITER}{k}': v for k, v in temp.items()}
 
-    def _process_dataclass_output_obj(self, dataclass_obj, obj_fields):
+    def _process_dataclass_output_obj(self, dataclass_obj, obj_type):
         return self._convert_dataclass_obj_to_formatted_dict(
                 dataclass_obj,
-                obj_fields,
-                prefix=self.HEADER_PREFIXES.get(type(dataclass_obj), ''),
+                fields(obj_type),
+                prefix=self.HEADER_PREFIXES.get(obj_type, ''),
                 delimiter=self.HEADER_PRIMARY_DELIMITER
         )
 
@@ -125,11 +125,11 @@ class ManureManagementOutputHandler:
             'pen_id': [pen.id],
             'sim_day': [simulation_day],
             **self._process_pen(pen),
-            **self._process_dataclass_output_obj(pen.manure, fields(PenManure)),
-            **self._process_dataclass_output_obj(manure_handler_output, fields(ManureHandlerDailyOutput)),
-            **self._process_dataclass_output_obj(reception_pit_output, fields(ReceptionPitDailyOutput)),
-            **self._process_dataclass_output_obj(manure_separator_output, fields(ManureSeparatorDailyOutput)),
-            **self._process_dataclass_output_obj(treatment_output, fields(ManureTreatmentDailyOutput)),
+            **self._process_dataclass_output_obj(pen.manure, PenManure),
+            **self._process_dataclass_output_obj(manure_handler_output, ManureHandlerDailyOutput),
+            **self._process_dataclass_output_obj(reception_pit_output, ReceptionPitDailyOutput),
+            **self._process_dataclass_output_obj(manure_separator_output, ManureSeparatorDailyOutput),
+            **self._process_dataclass_output_obj(treatment_output, ManureTreatmentDailyOutput),
         }
         self._append_df(d)
 

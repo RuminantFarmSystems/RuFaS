@@ -91,6 +91,7 @@ class BaseManureTreatment:
             daily_output.final_manure_volume = input_data.final_daily_volume
         else:
             daily_output.final_manure_volume = input_data.total_daily_manure_volume
+        daily_output.final_manure_volume -= (input_data.TS - daily_output.TS) / 1000.0
         return daily_output
 
     def daily_update(self,
