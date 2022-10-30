@@ -17,6 +17,8 @@ class TreatmentOutput:
     K_manure: float = 0.0  # kg
     total_daily_mass: float = 0.0  # L
     final_volume: float = 0.0  # m^3
+    accumulated_TS: float = 0.0
+    ch4_emissions: float = 0.0
 
     def clone(self) -> TreatmentOutput:
         return TreatmentOutput(**asdict(self))

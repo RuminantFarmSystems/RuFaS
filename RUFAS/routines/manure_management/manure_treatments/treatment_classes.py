@@ -68,11 +68,19 @@ class BaseManureTreatment:
 
     def update(self, simulation_day: int) -> TreatmentOutput:
         daily_output = TreatmentOutput()
-        self.all_output.append(daily_output)
-        # self.accumulated_output.__add__(daily_output)
+
         self.accumulated_output += daily_output  # TODO: Check if this is intended
         self.simulation_day = simulation_day
+        daily_output.accumulated_TS = self.accumulated_output.TSd
+        daily_output.ch4_emissions = self.calc_emissions()
+        self.all_output.append(daily_output)
         return daily_output
+    @property
+    def treatment_volume(self) -> float:
+        """returns  treatment volume in L"""
+        return self.accumulated_output.total_daily_mass # L
+    def calc_emissions(self) -> float:
+        return 0.0
 
     def land_application_day_check_available_manure(self):
         """
@@ -520,7 +528,7 @@ class SlurryStorageUnderfloor(BaseManureTreatment):
 
     @property
     def total_volume(self) -> float:
-        return self.accumulated_output.total_daily_mass # m^3
+        return self.accumulated_output.total_daily_mass # L
 
     def update(self, simulation_day: int) -> TreatmentOutput:
         handler = self.manure_handler.last_output
@@ -536,7 +544,8 @@ class SlurryStorageUnderfloor(BaseManureTreatment):
 
         daily_output.final_volume = self.total_volume - (
                 (daily_output.TSd + daily_output.VS_total) * Constants.KG_TO_CUBIC_METERS)
-
+        daily_output.accumulated_TS +=daily_output.TSd
+        daily_output.ch4_emissions =self.calc_emissions()
         self.all_output.append(daily_output)
         self.accumulated_output.__add__(daily_output)
         self.simulation_day = simulation_day
@@ -577,12 +586,14 @@ class SlurryStorageOutdoor(BaseManureTreatment):
                 K_manure=handler.K_manure * (1 - self.config.K_removal_efficiency),
                 total_daily_mass=handler.total_daily_mass+rain_volume_added
         )
+        daily_output.accumulated_TS +=daily_output.TSd
+        daily_output.ch4_emissions =self.calc_emissions()
         return daily_output
 
     @property
     def treatment_volume(self) -> float:
-        """returns  treatment volume in m^3"""
-        return self.accumulated_output.final_volume # m^3
+        """returns  treatment volume in L"""
+        return self.accumulated_output.total_daily_mass # L
 
     @property
     def total_pit_volume(self) -> float:
