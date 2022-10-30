@@ -531,6 +531,7 @@ class SlurryStorageUnderfloor(BaseManureTreatment):
                 VS_total=handler.VS_total * (1 - self.config.VS_removal_efficiency),
                 p_excrt_manure=handler.p_excrt_manure * (1 - self.config.P_removal_efficiency),
                 K_manure=handler.K_manure * (1 - self.config.K_removal_efficiency),
+                total_daily_mass=handler.total_daily_mass
         )
 
         daily_output.final_volume = self.total_volume - (
@@ -635,6 +636,7 @@ class SlurryStorageOutdoor(BaseManureTreatment):
         """returns additional lagoon volume needed for precipitation in m^3"""
         current_day_rainfall = self.weather_data.rainfall[self.time.year - 1][self.time.day - 1]
         return current_day_rainfall * self.pit_surface_area  # m3 of rain
+        #TODO Check rain input units are mm or meter. 
 
     @property
     def freeboard(self):

@@ -73,7 +73,8 @@ class AggregatedManureOutputforField(TreatmentOutput):
         The attributes of this dataclass should be identical to the attributes
         expected in the RUFAS.routines.field.field_management.manure_application update_all method. 
     """
-    mass: float = 0.0  # total manure mass kg
+    mass: float = 0.0  # total manure volume L
+    final_volume: float = 0.0 # Total manure volume m3
     N_mass:float=0.0
     P_mass:float=0.0
     K_mass:float=0.0
@@ -86,6 +87,7 @@ class AggregatedManureOutputforField(TreatmentOutput):
         self.P_mass=daily_output.p_excrt_manure
         self.K_mass=daily_output.K_manure
         self.mass =daily_output.total_daily_mass 
+        self.final_volume =daily_output.final_volume 
         self.DM =daily_output.DM
         self.WIP =self.P_mass.self.mass*0.5/self.mass/1000
         self.WOP =self.P_mass.self.mass*0.05/self.mass/1000
