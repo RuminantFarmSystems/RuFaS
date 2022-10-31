@@ -123,7 +123,7 @@ class LifeCycleManager:
         self.preg_cow_percent = 0.0
         self.non_preg_cow_percent = 0.0
 
-        self.daily_milk_production = 0
+        self.daily_milk_production = 0.0
         self.avg_days_in_milk = 0.0
         self.avg_days_in_preg = 0.0
         self.avg_cow_body_weight = 0.0
@@ -302,8 +302,8 @@ class LifeCycleManager:
         self._calc_cull_reason_stats_percent()
         self._calc_percent_cow_per_parity()
 
-        return animals_added, ids_removed, calves_born, calves, heiferIs, \
-               heiferIIs, heiferIIIs, cows
+        return (animals_added, ids_removed, calves_born, calves, heiferIs,
+                heiferIIs, heiferIIIs, cows)
 
     def _reset_parity(self) -> None:
         for parity in LifeCycleManager.num_cow_for_parity:
@@ -518,10 +518,9 @@ class LifeCycleManager:
             else:
                 total_animal_num = self._handle_cow_body_weight_and_parity(cow, total_animal_num)
                 self._handle_cow_milking(cow)
-                self._handle_cow_days_in_milk(cow)
                 self._handle_cow_days_in_preg(cow)
                 self._handle_cow_calves(cow, calving_age_avail_num, calf_to_preg_time_avail_num)
-                calving_interval_avail_num = self._handle_cow_ci(cow, calving_interval_avail_num)
+                calving_interval_avail_num = self._handle_cow_CI(cow, calving_interval_avail_num)
                 self._extract_repro_stats_from_cow(cow)
 
             if new_born:
@@ -567,27 +566,29 @@ class LifeCycleManager:
         Args:
             cow: A Cow object.
 
-        Returns:
-            None
-
         """
         if cow.milking:
             self.daily_milk_production += cow.estimated_daily_milk_produced
-            temp = Utility.calc_average(self.milking_cow_num, self.avg_days_in_milk, cow.days_in_milk)
-            self.milking_cow_num, self.avg_days_in_milk = temp
+            self.milking_cow_num, self.avg_days_in_milk = \
+                Utility.calc_average(self.milking_cow_num, self.avg_days_in_milk, cow.days_in_milk)
 
             if cow.days_in_milk < self.animal_config['voluntary_waiting_period']:
                 self.vwp_cow_num += 1
-
-            if cow.days_in_preg == 0:
-                self.open_cow_num += 1
         else:
             self.dry_cow_num += 1
 
     def _handle_cow_days_in_preg(self, cow: Cow) -> None:
-        if cow.days_in_preg > 0:
-            temp = Utility.calc_average(self.preg_cow_num, self.avg_days_in_preg, cow.days_in_preg)
-            self.preg_cow_num, self.avg_days_in_preg = temp
+        """Adjusts the average days in pregnancy.
+
+        Args:
+            cow: A Cow object.
+
+        """
+        if cow.days_in_preg == 0:
+            self.open_cow_num += 1
+        elif cow.days_in_preg > 0:
+            self.preg_cow_num, self.avg_days_in_preg = \
+                Utility.calc_average(self.preg_cow_num, self.avg_days_in_preg, cow.days_in_preg)
 
     def _handle_cow_calves(self, cow: Cow, calving_age_avail_num, calf_to_preg_time_avail_num) -> None:
         if 0 < cow.calves <= 3:
@@ -596,26 +597,42 @@ class LifeCycleManager:
             key = 'greater_than_3'
 
         parity_counts = LifeCycleManager.num_cow_for_parity
-        temp = Utility.calc_average(parity_counts[key], self.avg_age_for_parity[key], cow.days_born)
-        parity_counts[key], self.avg_age_for_parity[key] = temp
+        parity_counts[key], self.avg_age_for_parity[key] = \
+            Utility.calc_average(parity_counts[key], self.avg_age_for_parity[key], cow.days_born)
 
         calving_age = cow.events.get_most_recent_date(animal_constants.NEW_BIRTH)
         if calving_age != -1:
-            temp2 = Utility.calc_average(calving_age_avail_num[key], self.avg_age_for_calving[key], calving_age)
-            calving_age_avail_num[key], self.avg_age_for_calving[key] = temp2
+            calving_age_avail_num[key], self.avg_age_for_calving[key] = \
+                Utility.calc_average(calving_age_avail_num[key], self.avg_age_for_calving[key], calving_age)
 
         if cow.calving_to_preg_time != 0:
             avg_times = LifeCycleManager.avg_calving_to_preg_time
-            temp3 = Utility.calc_average(calf_to_preg_time_avail_num[key], avg_times[key], cow.calving_to_preg_time)
-            calf_to_preg_time_avail_num[key], avg_times[key] = temp3
+            calf_to_preg_time_avail_num[key], avg_times[key] = \
+                Utility.calc_average(calf_to_preg_time_avail_num[key], avg_times[key], cow.calving_to_preg_time)
 
-    def _handle_cow_ci(self, cow: Cow, calving_interval_avail_num: int) -> int:
+    def _handle_cow_CI(self, cow: Cow, calving_interval_avail_num: int) -> int:
+        """Adjusts the average calving interval.
+
+        Args:
+            cow: A Cow object.
+            calving_interval_avail_num: The number of cows with a calving interval.
+
+        Returns:
+            calving_interval_avail_num: The newly updated number of cows with a calving interval.
+
+        """
         if cow.CI != 0:
-            temp = Utility.calc_average(calving_interval_avail_num, self.avg_calving_interval, cow.CI)
-            calving_interval_avail_num, self.avg_calving_interval = temp
+            calving_interval_avail_num, self.avg_calving_interval = \
+                Utility.calc_average(calving_interval_avail_num, self.avg_calving_interval, cow.CI)
         return calving_interval_avail_num
 
     def _extract_repro_stats_from_cow(self, cow: Cow) -> None:
+        """Extracts the reproduction statistics from a cow and updates life cycle manager.
+
+        Args:
+            cow: A Cow object.
+
+        """
         self.GnRH_injection_num += cow.GnRH_injections
         self.PGF_injection_num += cow.PGF_injections
         self.preg_check_num += cow.preg_diagnoses
@@ -635,8 +652,7 @@ class LifeCycleManager:
         # subtracted from the animal value. the sum of P absorbed for
         # gestation is equal to the initial animal P value for the calf
         # (A.1G.A.4)
-        cow.p_animal = cow.p_animal - cow.p_gest_for_calf + \
-                       cow.p_growth + cow.dP_reserves
+        cow.p_animal = cow.p_animal - cow.p_gest_for_calf + cow.p_growth + cow.dP_reserves
         new_calf = Calf(args)
         cow.p_gest_for_calf = 0
         cow.calf_birth_weight = 0

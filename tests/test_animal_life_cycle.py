@@ -872,9 +872,8 @@ def test_handle_cow_milking(mocker: MockerFixture,
     # Arrange
     mock_cow = mocker.MagicMock(autospec=Cow)
     mock_cow.milking = is_cow_milking
-    mock_cow.estimated_daily_milk_produced = 15
+    mock_cow.estimated_daily_milk_produced = 15.0
     mock_cow.days_in_milk = 8
-    mock_cow.days_in_preg = 0
 
     life_cycle_manager.daily_milk_production = 100
     life_cycle_manager.milking_cow_num = 20
@@ -890,9 +889,7 @@ def test_handle_cow_milking(mocker: MockerFixture,
     expected_new_milking_cow_num = life_cycle_manager.milking_cow_num + 1
     expected_new_avg_days_in_milk = (life_cycle_manager.avg_days_in_milk * life_cycle_manager.milking_cow_num +
                                      mock_cow.days_in_milk) / expected_new_milking_cow_num
-    expected_vwp_cow_num = 3
-    expected_open_cow_num = 1
-
+    expected_vwp_cow_num = life_cycle_manager.vwp_cow_num + 1
     expected_new_dry_cow_num = life_cycle_manager.dry_cow_num + 1
     spy_handle_cow_milking = mocker.spy(life_cycle_manager, '_handle_cow_milking')
 
@@ -906,6 +903,98 @@ def test_handle_cow_milking(mocker: MockerFixture,
         assert life_cycle_manager.milking_cow_num == expected_new_milking_cow_num
         assert life_cycle_manager.avg_days_in_milk == approx(expected_new_avg_days_in_milk)
         assert life_cycle_manager.vwp_cow_num == expected_vwp_cow_num
-        assert life_cycle_manager.open_cow_num == expected_open_cow_num
     else:
         assert life_cycle_manager.dry_cow_num == expected_new_dry_cow_num
+
+
+@pytest.mark.parametrize('days_in_preg', [0, 1, 8])
+def test_handle_cow_days_in_preg(mocker: MockerFixture, life_cycle_manager: LifeCycleManager,
+                                 days_in_preg: int) -> None:
+    """Unit test for function _handle_cow_days_in_preg() in file life_cycle.py"""
+    # Arrange
+    mock_cow = mocker.MagicMock(autospec=Cow)
+    mock_cow.days_in_preg = days_in_preg
+
+    life_cycle_manager.preg_cow_num = 20
+    life_cycle_manager.avg_days_in_preg = 7.0
+    life_cycle_manager.open_cow_num = 5
+
+    expected_new_pregnant_cow_num = life_cycle_manager.preg_cow_num + 1
+    expected_new_avg_days_in_preg = (life_cycle_manager.avg_days_in_preg * life_cycle_manager.preg_cow_num +
+                                     mock_cow.days_in_preg) / expected_new_pregnant_cow_num
+    expected_new_open_cow_num = life_cycle_manager.open_cow_num + 1
+    spy_handle_cow_days_in_preg = mocker.spy(life_cycle_manager, '_handle_cow_days_in_preg')
+
+    # Act
+    life_cycle_manager._handle_cow_days_in_preg(mock_cow)
+
+    # Assert
+    spy_handle_cow_days_in_preg.assert_called_once_with(mock_cow)
+    if mock_cow.days_in_preg > 0:
+        assert life_cycle_manager.preg_cow_num == expected_new_pregnant_cow_num
+        assert life_cycle_manager.avg_days_in_preg == approx(expected_new_avg_days_in_preg)
+    else:
+        assert life_cycle_manager.open_cow_num == expected_new_open_cow_num
+
+
+@pytest.mark.parametrize('cow_CI', [0, 1])
+def test_handle_cow_CI(mocker: MockerFixture, life_cycle_manager: LifeCycleManager,
+                       cow_CI: int) -> None:
+    """Unit test for function _handle_cow_CI() in file life_cycle.py"""
+    # Arrange
+    mock_cow = mocker.MagicMock(autospec=Cow)
+    mock_cow.CI = cow_CI
+    calving_interval_avail_num = 5
+    life_cycle_manager.avg_calving_interval = 7.0
+    expected_new_calving_interval_avail_num = calving_interval_avail_num + 1
+    expected_new_avg_calving_interval = (life_cycle_manager.avg_calving_interval * calving_interval_avail_num +
+                                         mock_cow.CI) / expected_new_calving_interval_avail_num
+    spy_handle_cow_CI = mocker.spy(life_cycle_manager, '_handle_cow_CI')
+
+    # Act
+    new_calving_interval_avail_num = life_cycle_manager._handle_cow_CI(mock_cow, calving_interval_avail_num)
+
+    # Assert
+    spy_handle_cow_CI.assert_called_once_with(mock_cow, calving_interval_avail_num)
+    if mock_cow.CI != 0:
+        assert new_calving_interval_avail_num == expected_new_calving_interval_avail_num
+        assert life_cycle_manager.avg_calving_interval == approx(expected_new_avg_calving_interval)
+    else:
+        assert new_calving_interval_avail_num == calving_interval_avail_num
+
+
+def test_extract_repro_stats_from_cow(mocker: MockerFixture, life_cycle_manager: LifeCycleManager) -> None:
+    """Unit test for function _extract_repro_stats_from_cow() in file life_cycle.py"""
+
+    # Arrange
+    mock_cow = mocker.MagicMock(autospec=Cow)
+    mock_cow.GnRH_injections = 1
+    mock_cow.PGF_injections = 2
+    mock_cow.preg_diagnoses = 3
+    mock_cow.semen_num = 4
+    mock_cow.AI_times = 5
+
+    life_cycle_manager.GnRH_injection_num = 1
+    life_cycle_manager.PGF_injection_num = 1
+    life_cycle_manager.preg_check_num = 1
+    life_cycle_manager.semen_num = 1
+    life_cycle_manager.ai_num = 1
+
+    expected_GnRH_injection_num = life_cycle_manager.GnRH_injection_num + mock_cow.GnRH_injections
+    expected_PGF_injections = life_cycle_manager.PGF_injection_num + mock_cow.PGF_injections
+    expected_preg_check_num = life_cycle_manager.preg_check_num + mock_cow.preg_diagnoses
+    expected_semen_num = life_cycle_manager.semen_num + mock_cow.semen_num
+    expected_ai_num = life_cycle_manager.ai_num + mock_cow.AI_times
+
+    spy_extract_repro_stats_from_cow = mocker.spy(life_cycle_manager, '_extract_repro_stats_from_cow')
+
+    # Act
+    life_cycle_manager._extract_repro_stats_from_cow(mock_cow)
+
+    # Assert
+    spy_extract_repro_stats_from_cow.assert_called_once_with(mock_cow)
+    assert life_cycle_manager.GnRH_injection_num == expected_GnRH_injection_num
+    assert life_cycle_manager.PGF_injection_num == expected_PGF_injections
+    assert life_cycle_manager.preg_check_num == expected_preg_check_num
+    assert life_cycle_manager.semen_num == expected_semen_num
+    assert life_cycle_manager.ai_num == expected_ai_num
