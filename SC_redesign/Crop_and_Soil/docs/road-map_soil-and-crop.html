@@ -1580,7 +1580,7 @@ div.tocify {
 
 <h1 class="title toc-ignore">Soil and Crop Road Map</h1>
 <h4 class="author">Clay J. Morrow (<a href="mailto:morrowcj@outlook.com" class="email">morrowcj@outlook.com</a>)</h4>
-<h4 class="date">28 October, 2022</h4>
+<h4 class="date">31 October, 2022</h4>
 
 </div>
 
@@ -1612,8 +1612,8 @@ module</p></li>
 <li><p>Documentation, both for the module components and the overall
 model, is severely lacking and sometimes conflicts with what the code
 does in actuality.</p></li>
-<li><p>Names of module entities are poorly selected and
-unintuitive.</p></li>
+<li><p>Names of module entities are poorly selected and not
+intuitive.</p></li>
 </ul>
 </div>
 </div>
@@ -1780,8 +1780,8 @@ entities that need them.</li>
 </div>
 <div id="fielddirector-simulation-example" class="section level3">
 <h3>FieldDirector simulation example</h3>
-<p>Below is a detailed example of a how <code>FieldDirector</code> might
-behave for a system with 3 fields over a two-year simulation.
+<p>Below is a detailed example of a how <code>FieldDirector</code>
+should behave for a system with 3 fields over a two-year simulation.
 <strong>Note:</strong> This example is meant to display the flexibility
 of the model, not a realistic scenario.</p>
 <p><strong>Example details:</strong></p>
@@ -1958,7 +1958,7 @@ aggregate/summarize these data.</p>
 </div>
 <div id="code-guidelines" class="section level2">
 <h2>Code guidelines</h2>
-<p>Below is a bulleted list of format/organization guidelines that the
+<p>Below is a bullet list of format/organization guidelines that the
 Soil and Crop module will follow:</p>
 <ul>
 <li><p>All names and attributes should be descriptive and long enough to
@@ -2094,8 +2094,97 @@ reused:</p>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>phosphorus_biomass <span class="op">=</span> calc_mass_from_fraction(phosphorus_fraction, biomass)</span></code></pre></div>
 </div>
+<div id="model-documentation" class="section level2">
+<h2>Model Documentation</h2>
+<p><strong>Under Construction</strong></p>
+</div>
+<div id="code-review" class="section level2">
+<h2>Code Review</h2>
+<p>A code review process will facilitate that the module components meet
+the consistency and standardization laid out here. A new github branch
+called <code>SC_redesign</code> has been created, and will house the
+Soil and Crop redesign until it is ready to be merged with the
+<code>master</code> branch. Development will occur on user-specific
+sub-branches that will be added to <code>SC_redesign</code> via pull
+request.</p>
+</div>
 <div id="milestones" class="section level2">
 <h2>Milestones</h2>
+<p>Below are measurable components that the module should have, which
+will be tracked as development continues.</p>
+<ul>
+<li>All the main process files (<code>.py</code>) need to be 1)
+reformatted and reorganized to the new design,</li>
+</ul>
+<ol start="2" style="list-style-type: decimal">
+<li>cross-checked with source documentation, 3) tested, 4) documented
+(updated pseudocode). In total, there are:</li>
+</ol>
+<ul>
+<li><p>10 crop files (<code>RUFAS/routines/field/crop/</code>)</p></li>
+<li><p>23 soil files files
+(<code>RUFAS/routines/field/soil/</code>)</p></li>
+<li><p>4 field management files
+(<code>RUFAS/routines/field/field_management</code>)</p></li>
+<li><p>The main classes (<code>Soil,</code> <code>Crop</code>, and
+<code>Field</code>) need to be rewritten with new formatting guidelines,
+and linked to the process classes.</p></li>
+<li><p>The current <code>Crop.py</code> file
+(<code>RUFAS/routines/field/crop/</code>) need to be re-written and
+organized into the new <code>FieldDirector</code> class.</p></li>
+<li><p>the new <code>DataCurator</code> and <code>SCInput</code> classes
+need to be created</p></li>
+</ul>
+<p>Here are a list of things that the code needs to do (see <a href="SC_redesign/Functionality-Requirements.html"><code>SC_redesign/Functionality-Requirements</code></a>
+for more details about what SC should do):</p>
+<ul>
+<li><code>Crop</code> should be able to initialize with different
+species-specific attributes and from input data</li>
+<li><code>Crop</code> methods should reflect daily crop processes (e.g.,
+SWAT)</li>
+<li><code>Soil</code> should be able to initialize with soil profile
+attributes from input data</li>
+<li><code>Soil</code> methods should reflect daily soil processes (e.g.,
+SWAT)</li>
+<li><code>Field</code> should be able to initialize with different
+dimensions and geography, + input data
+<ul>
+<li>should be able to initialize <code>Crop</code> and
+<code>Soil</code>, passing them the data they need</li>
+<li>needs to have one <code>Soil</code> and 0-n <code>Crop</code></li>
+</ul></li>
+<li><code>Field</code> methods should reflect field management processes
+(apply manure/fert, plant/harvest crops,
+<ul>
+<li>methods should manage crops one by one etc.) and will often be
+wrappers that call <code>Soil</code> and <code>Crop</code> methods</li>
+</ul></li>
+<li><code>FieldDirector</code> should be able initialized based on input
+data
+<ul>
+<li>should be able to initialize a number of <code>Fields</code>,
+passing them data they need</li>
+</ul></li>
+<li><code>FieldDirector</code> methods should reflect management of the
+system
+<ul>
+<li>should track which <code>Field</code>/<code>Soil</code> processes
+need to run and execute them accordingly, such as:
+<ul>
+<li><code>Crop</code> planting/multi-cropping</li>
+<li>following cropping patterns</li>
+<li><code>Crop</code> growing season/dormancy</li>
+<li><code>Crop</code> cutting/harvesting/killing/cover-cropping</li>
+<li>fertilizer/manure addition to <code>Soil</code></li>
+<li><code>Soil</code> tillage</li>
+</ul></li>
+<li>should manage fields one by one</li>
+<li>should pass relevant weather and time data to
+<code>Field</code></li>
+<li>should accept input from <code>SCInput</code> and pass output to
+<code>OutputCurator</code></li>
+</ul></li>
+</ul>
 </div>
 
 
