@@ -49,7 +49,7 @@ component's integrity is suspect.
 * Documentation, both for the module components and the overall model, is 
 severely lacking and sometimes conflicts with what the code does in actuality.
 
-* Names of module entities are poorly selected and unintuitive. 
+* Names of module entities are poorly selected and not intuitive. 
 
 ## Basic structure: Field, Soil, and Crop
 
@@ -185,7 +185,7 @@ weather and passess the values to entities that need them.
 
 ### FieldDirector simulation example
 
-Below is a detailed example of a how `FieldDirector` might behave for a system with 3 fields over a
+Below is a detailed example of a how `FieldDirector` should behave for a system with 3 fields over a
 two-year simulation. **Note:** This example is meant to display the flexibility of the model, not a 
 realistic scenario.
 
@@ -311,7 +311,7 @@ aggregate/summarize these data.
 
 ## Code guidelines
 
-Below is a bulleted list of format/organization guidelines that the Soil and Crop module will
+Below is a bullet list of format/organization guidelines that the Soil and Crop module will
 follow:
 
 * All names and attributes should be descriptive and long enough to be
@@ -428,4 +428,64 @@ from nitrogen_incorporation import calc_mass_from_fraction
 phosphorus_biomass = calc_mass_from_fraction(phosphorus_fraction, biomass)
 ```
 
+## Model Documentation 
+
+**Under Construction**
+
+## Code Review
+
+A code review process will facilitate that the module components meet the consistency and 
+standardization laid out here. A new github branch called `SC_redesign` has been created, and will 
+house the Soil and Crop redesign until it is ready to be merged with the `master` branch.
+Development will occur on user-specific sub-branches that will be added to `SC_redesign` via 
+pull request. 
+
 ## Milestones 
+
+Below are measurable components that the module should have, which will be tracked as development
+continues. 
+
+* All the main process files (`.py`) need to be 1) reformatted and reorganized to the new design, 
+2) cross-checked with source documentation, 3) tested, 4) documented (updated pseudocode). In total, 
+there are:
+  - 10 crop files (`RUFAS/routines/field/crop/`)
+  - 23 soil files files (`RUFAS/routines/field/soil/`)
+  - 4 field management files (`RUFAS/routines/field/field_management`)
+  
+* The main classes (`Soil,` `Crop`, and `Field`) need to be rewritten with new formatting 
+guidelines, and linked to the process classes.
+
+* The current `Crop.py` file (`RUFAS/routines/field/crop/`) need to be re-written and organized 
+into the new `FieldDirector` class. 
+
+* the new `DataCurator` and `SCInput` classes need to be created
+
+Here are a list of things that the code needs to do (see 
+[`SC_redesign/Functionality-Requirements`](SC_redesign/Functionality-Requirements.html) for more 
+details about what SC should do):
+
+* `Crop` should be able to initialize with different species-specific attributes and from input data
+* `Crop` methods should reflect daily crop processes (e.g., SWAT)
+* `Soil` should be able to initialize with soil profile attributes from input data
+* `Soil` methods should reflect daily soil processes (e.g., SWAT)
+* `Field` should be able to initialize with different dimensions and geography, + input data
+  - should be able to initialize `Crop` and `Soil`, passing them the data they need
+  - needs to have one `Soil` and 0-n `Crop`
+* `Field` methods should reflect field management processes (apply manure/fert, plant/harvest crops,
+  - methods should manage crops one by one
+etc.) and will often be wrappers that call `Soil` and `Crop` methods
+* `FieldDirector` should be able initialized based on input data
+  - should be able to initialize a number of `Fields`, passing them data they need
+* `FieldDirector` methods should reflect management of the system
+  - should track which `Field`/`Soil` processes need to run and execute them accordingly, such as: 
+    + `Crop` planting/multi-cropping
+    + following cropping patterns
+    + `Crop` growing season/dormancy
+    + `Crop` cutting/harvesting/killing/cover-cropping
+    + fertilizer/manure addition to `Soil`
+    + `Soil` tillage
+  - should manage fields one by one
+  - should pass relevant weather and time data to `Field`
+  - should accept input from `SCInput` and pass output to `OutputCurator`
+
+  
