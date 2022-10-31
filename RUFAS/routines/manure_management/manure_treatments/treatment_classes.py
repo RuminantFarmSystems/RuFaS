@@ -378,7 +378,7 @@ class AnaerobicLagoon(BaseManureTreatment):
     def update(self, simulation_day: int) -> TreatmentOutput:
         daily_output = self.update_helper()
         self.all_output.append(daily_output)
-        self.accumulated_output.__add__(daily_output)
+        self.accumulated_output+=daily_output
         self.simulation_day = simulation_day
         return daily_output
 
@@ -403,7 +403,7 @@ class AnaerobicLagoon(BaseManureTreatment):
             P_mass=handler_output.p_excrt_manure * self.config.P_removal_efficiency,
             K_mass=handler_output.K_manure * self.config.K_removal_efficiency
         )
-        self.accumulated_sludge.__add__(sludge_output)
+        self.accumulated_sludge+=sludge_output
 
         return daily_output
 
@@ -541,17 +541,23 @@ class SlurryStorageUnderfloor(BaseManureTreatment):
                 K_manure=handler.K_manure * (1 - self.config.K_removal_efficiency),
                 total_daily_mass=handler.total_daily_mass
         )
-
+        daily_output.accumulated_TS =self.accumulated_output.TSd
+        daily_output.accumulated_volume =self.accumulated_output.total_daily_mass/1000
+        daily_output.ch4_emissions = self.calc_emissions()
+        daily_output.tempC = self.weather_data.T_avg[self.time.year - 1][self.time.day - 1]
+        daily_output.rainfall = self.weather_data.rainfall[self.time.year - 1][self.time.day - 1]
         daily_output.final_volume = self.total_volume - (
                 (daily_output.TSd + daily_output.VS_total) * Constants.KG_TO_CUBIC_METERS)
-        daily_output.accumulated_TS +=daily_output.TSd
-        daily_output.ch4_emissions =self.calc_emissions()
+
         self.all_output.append(daily_output)
-        self.accumulated_output.__add__(daily_output)
+        self.accumulated_output+=daily_output
         self.simulation_day = simulation_day
+        if(simulation_day%self.storage_time_period ==0):
+            self.land_application_day_update_manure_storage(1)
         return daily_output
     def calc_emissions(self):
-        return GasEmissions.calc_E_CH4_slurry_storage_v3(self.accumulated_output.TSd,enclosed=True)
+        tempC = self.weather_data.T_avg[self.time.year - 1][self.time.day - 1]
+        return GasEmissions.calc_E_CH4_slurry_storage_v3(self.accumulated_output.TSd,enclosed=True,tempC=tempC)
 
 
 
@@ -571,7 +577,9 @@ class SlurryStorageOutdoor(BaseManureTreatment):
         self.all_output.append(daily_output)
 
         self.accumulated_output += daily_output 
-        self.simulation_day += 1
+        self.simulation_day =simulation_day
+        if(simulation_day%self.storage_time_period ==0):
+            self.land_application_day_update_manure_storage(1)
         return daily_output
 
     def update_helper(self):
@@ -584,10 +592,13 @@ class SlurryStorageOutdoor(BaseManureTreatment):
                 VS_total=handler.VS_total * (1 - self.config.VS_removal_efficiency),
                 p_excrt_manure=handler.p_excrt_manure * (1 - self.config.P_removal_efficiency),
                 K_manure=handler.K_manure * (1 - self.config.K_removal_efficiency),
-                total_daily_mass=handler.total_daily_mass+rain_volume_added
+                total_daily_mass=handler.total_daily_mass +rain_volume_added/1000
         )
-        daily_output.accumulated_TS +=daily_output.TSd
-        daily_output.ch4_emissions =self.calc_emissions()
+        daily_output.accumulated_TS =self.accumulated_output.TSd
+        daily_output.accumulated_volume =self.accumulated_output.total_daily_mass/1000
+        daily_output.ch4_emissions = self.calc_emissions()
+        daily_output.tempC = self.weather_data.T_avg[self.time.year - 1][self.time.day - 1]
+        daily_output.rainfall = self.weather_data.rainfall[self.time.year - 1][self.time.day - 1]
         return daily_output
 
     @property
@@ -655,7 +666,8 @@ class SlurryStorageOutdoor(BaseManureTreatment):
         return self.freeboard_input * self.pit_surface_area  # m3 of freeboard
 
     def calc_emissions(self):
-        return GasEmissions.calc_E_CH4_slurry_storage_v3(self.accumulated_output.TSd,enclosed=False)
+        tempC = self.weather_data.T_avg[self.time.year - 1][self.time.day - 1]
+        return GasEmissions.calc_E_CH4_slurry_storage_v3(self.accumulated_output.TSd,enclosed=False,tempC=tempC)
 
 
 @dataclass
