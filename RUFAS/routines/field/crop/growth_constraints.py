@@ -33,7 +33,9 @@ def update_growth_factor(crop, soil, weather, time) -> None:
 
     p_stress_factor = calc_nutrient_stress_scaling_factor(stored=crop.bio_P, optimal=crop.bio_P_opt)
     p_stress = calc_nutrient_stress(optimal=crop.bio_P_opt, stress_factor=p_stress_factor)
+   # print([w_stress, t_stress, n_stress, p_stress])
     crop.gamma_reg = calc_growth_factor(w_stress, t_stress, n_stress, p_stress)
+    #crop.gamma_reg =1
 
 
 def calc_growth_factor(water_stress, temperature_stress, nitrogen_stress, phosphorus_stress) -> float:  # pseudocode: C.7.E.1
@@ -62,9 +64,11 @@ def calc_water_stress(water_uptake: float, max_transpiration: float) -> float:  
 
     Returns: the plant's water stress
     """
+    #print(max_transpiration)
+    #print(water_uptake)
     if max_transpiration == 0:  # avoid division by zero
         return 0
-
+    water_uptake
     stress = 1 - (water_uptake / max_transpiration)
     stress = max(0., stress)  # constrain to 0
     stress = min(1., stress)  # constrain to 1
@@ -97,7 +101,6 @@ def calc_temperature_stress(air_temp: float, min_temp: float, optimal_temp: floa
 
     else:
         stress = 1
-
     return stress
 
 

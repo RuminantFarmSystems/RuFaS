@@ -131,11 +131,16 @@ def calc_crop_transpiration(soil, crop_type):
     """
 
     LAI = crop_type.LAI_actual
+   # print(LAI)
     if 0 <= LAI <= 3.0:
-        soil.trans_max = (soil.ET_max * LAI) / 3.0
-    else:
-        soil.trans_max = soil.ET_max
+        #print((soil.ET_max * LAI) / 3.0)
+        soil.trans_max = 0
 
+        #soil.trans_max = (soil.ET_max * LAI) / 3.0
+    else:
+        print('nope')
+        soil.trans_max = soil.ET_max
+    #print('t:',soil.trans_max)
 
 def calc_soil_evap(soil, crop_type):
     """

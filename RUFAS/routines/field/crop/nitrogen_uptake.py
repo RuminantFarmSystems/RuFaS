@@ -184,6 +184,7 @@ def update_potential_nitrogen_uptake(crop) -> None:
     if crop.bio_N_opt - crop.bio_N < 0:
         crop.N_up = 0
     else:
+        #print(crop.bio_N_opt)
         crop.N_up = calc_potential_nitrogen_uptake(demand=crop.bio_N_opt, nitrogen_start=crop.bio_N,
                                                    mature_nfrac=crop.fr_n3, max_growth=crop.d_biomass_max)
 
@@ -242,6 +243,9 @@ def uptake_nitrogen(crop, soil) -> None:
                                                ndistro=crop.beta_n)
     demands = calc_layer_nitrogen_demand(uptake_potentials=potentials, nitrate_availabilities=layer_nitrates)
     uptakes = calc_layer_nitrogen_uptake(layer_demand=demands, layer_potential=potentials, layer_nitrate=layer_nitrates)
+    #print('layer demands',demands)
+
+    #print('layer uptakes',uptakes)
     # update attributes
     crop.pot_N_up_each_layer = potentials  # todo: needed?
     crop.act_N_up_each_layer = uptakes  # todo: needed?
@@ -292,6 +296,7 @@ def calc_nitrogen_uptake_to_depth(demand: float, depth: float, root_depth: float
 
     Returns: the potential amount of nitrogen taken up
     """
+    #print(f'{demand},{depth},{root_depth},{ndistro}')
     # error checks
     if ndistro == 0:
         raise ValueError("ndistro cannot equal 0")

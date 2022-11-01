@@ -161,8 +161,7 @@ def calc_log_term_of_shape_coefficient(crop_type, fr_PHU_frac, fr_px):
 
     bottom = 1 - (fr_px - crop_type.fr_p3) / (crop_type.fr_p1 - crop_type.fr_p3)
     inside = (fr_PHU_frac / bottom) - fr_PHU_frac
-    if inside <= 0:
-        inside=0.0001
+    
     return log(inside)
 
 
