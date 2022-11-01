@@ -10,6 +10,7 @@ from pytest_mock import MockerFixture
 
 from RUFAS.classes import Config
 from RUFAS.routines.animal.animal_typed_dicts import AnimalConfigTypedDict
+from RUFAS.routines.animal.life_cycle import animal_constants
 from RUFAS.routines.animal.life_cycle.animal_constants import ENTER_HERD
 from RUFAS.routines.animal.life_cycle.animal_constants import INIT_HERD
 from RUFAS.routines.animal.life_cycle.animal_constants import LOW_PROD_CULL
@@ -998,3 +999,79 @@ def test_extract_repro_stats_from_cow(mocker: MockerFixture, life_cycle_manager:
     assert life_cycle_manager.preg_check_num == expected_preg_check_num
     assert life_cycle_manager.semen_num == expected_semen_num
     assert life_cycle_manager.ai_num == expected_ai_num
+
+
+@pytest.mark.parametrize('cow_calves', [1, 2, 3, 4])
+def test_handle_cow_calves(mocker: MockerFixture, life_cycle_manager: LifeCycleManager,
+                           cow_calves: int) -> None:
+    """Unit test for function _handle_cow_calves() in file life_cycle.py."""
+    # Arrange
+    mock_cow = mocker.MagicMock(autospec=Cow)
+    mock_cow.calves = cow_calves
+    key = 'greater_than_3' if cow_calves > 3 else str(cow_calves)
+    calving_age_avail_num = {
+        '1': 0,
+        '2': 0,
+        '3': 0,
+        'greater_than_3': 0
+    }
+    calf_to_preg_time_avail_num = calving_age_avail_num.copy()
+    spy_handle_cow_calves = mocker.spy(life_cycle_manager, '_handle_cow_calves')
+
+    mock_cow.days_born = 300
+    expected_avg_age_for_parity_for_key = 300.0
+
+    mock_cow.events.get_most_recent_date.return_value = 100
+    expected_avg_age_for_calving_for_key = 100.0
+
+    mock_cow.calving_to_preg_time = 200
+    expected_avg_calving_to_preg_time = 200.0
+
+    # Act
+    life_cycle_manager._handle_cow_calves(mock_cow, calving_age_avail_num, calf_to_preg_time_avail_num)
+
+    # Assert
+    spy_handle_cow_calves.assert_called_once_with(mock_cow, calving_age_avail_num, calf_to_preg_time_avail_num)
+    assert life_cycle_manager.num_cow_for_parity[key] == 1
+    assert life_cycle_manager.avg_age_for_parity[key] == approx(expected_avg_age_for_parity_for_key)
+
+    mock_cow.events.get_most_recent_date.assert_called_once_with(animal_constants.NEW_BIRTH)
+    assert calving_age_avail_num[key] == 1
+    assert life_cycle_manager.avg_age_for_calving[key] == approx(expected_avg_age_for_calving_for_key)
+
+    assert calf_to_preg_time_avail_num[key] == 1
+    assert life_cycle_manager.avg_calving_to_preg_time[key] == approx(expected_avg_calving_to_preg_time)
+
+
+@pytest.mark.parametrize('total_animal_num', [0, 50, 100])
+def test_calc_herd_percentages(mocker: MockerFixture, life_cycle_manager: LifeCycleManager,
+                               total_animal_num: int) -> None:
+    """Unit test for function _calc_herd_percentages() in file life_cycle.py."""
+    calf_num = heiferI_num = heiferII_num = heiferIII_num = cow_num = 0
+    # Arrange
+    if total_animal_num > 0:
+        life_cycle_manager.calf_num = calf_num = int(0.2 * total_animal_num)
+        life_cycle_manager.heiferI_num = heiferI_num = int(0.2 * total_animal_num)
+        life_cycle_manager.heiferII_num = heiferII_num = int(0.2 * total_animal_num)
+        life_cycle_manager.heiferIII_num = heiferIII_num = int(0.2 * total_animal_num)
+        life_cycle_manager.cow_num = cow_num = (total_animal_num - calf_num - heiferI_num
+                                                - heiferII_num - heiferIII_num)
+    spy_calc_herd_percentages = mocker.spy(life_cycle_manager, '_calc_herd_percentages')
+
+    # Act
+    life_cycle_manager._calc_herd_percentages(total_animal_num)
+
+    # Assert
+    spy_calc_herd_percentages.assert_called_once_with(total_animal_num)
+    if total_animal_num > 0:
+        assert life_cycle_manager.calf_percent == approx(calf_num * 100.0 / total_animal_num)
+        assert life_cycle_manager.heiferI_percent == approx(heiferI_num * 100.0 / total_animal_num)
+        assert life_cycle_manager.heiferII_percent == approx(heiferII_num * 100.0 / total_animal_num)
+        assert life_cycle_manager.heiferIII_percent == approx(heiferIII_num * 100.0 / total_animal_num)
+        assert life_cycle_manager.cow_percent == approx(cow_num * 100.0 / total_animal_num)
+    elif total_animal_num == 0:
+        assert life_cycle_manager.calf_percent == approx(0.0)
+        assert life_cycle_manager.heiferI_percent == approx(0.0)
+        assert life_cycle_manager.heiferII_percent == approx(0.0)
+        assert life_cycle_manager.heiferIII_percent == approx(0.0)
+        assert life_cycle_manager.cow_percent == approx(0.0)
