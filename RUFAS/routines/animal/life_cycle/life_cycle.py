@@ -37,7 +37,6 @@ class LifeCycleManager:
     """
     Manages the life cycles of the animals.
     """
-
     # The following class variables are used in HerdReport.
     num_cow_for_parity = {
         '1': 0,
@@ -591,6 +590,7 @@ class LifeCycleManager:
                 Utility.calc_average(self.preg_cow_num, self.avg_days_in_preg, cow.days_in_preg)
 
     def _handle_cow_calves(self, cow: Cow, calving_age_avail_num, calf_to_preg_time_avail_num) -> None:
+        """Adjusts the average cow age per parity, average calving age, and average time from calf to pregnant."""
         if 0 < cow.calves <= 3:
             key = str(cow.calves)
         else:
@@ -664,29 +664,22 @@ class LifeCycleManager:
             self.sold_calf_num += 1
 
     def _calc_herd_percentages(self, total_animal_num: int) -> None:
-        """
-        Calculate percentage of each animal class in the herd
+        """Calculates percentage of each animal class in the herd.
+
+        When the total number of animals is 0, it is assumed that the count of
+        each animal class has already been set to or initialized with 0.
 
         Args:
-            total_animal_num:
-
-        Returns:
+            total_animal_num: The total number of animals in the herd.
 
         """
-
-        if total_animal_num == 0:
-            self.calf_percent = 0.0
-            self.heiferI_percent = 0.0
-            self.heiferII_percent = 0.0
-            self.heiferIII_percent = 0.0
-            self.cow_percent = 0.0
-        else:
-            pc = Utility.percent_calculator(denominator=total_animal_num)
-            self.calf_percent = pc(self.calf_num)
-            self.heiferI_percent = pc(self.heiferI_num)
-            self.heiferII_percent = pc(self.heiferII_num)
-            self.heiferIII_percent = pc(self.heiferIII_num)
-            self.cow_percent = pc(self.cow_num)
+        denominator = total_animal_num if total_animal_num > 0 else 1
+        pc = Utility.percent_calculator(denominator)
+        self.calf_percent = pc(self.calf_num)
+        self.heiferI_percent = pc(self.heiferI_num)
+        self.heiferII_percent = pc(self.heiferII_num)
+        self.heiferIII_percent = pc(self.heiferIII_num)
+        self.cow_percent = pc(self.cow_num)
 
     def _calc_cow_percentages(self) -> None:
         """
