@@ -147,7 +147,11 @@ class AnimalManagement:
 
         self.init_pens(data['pen_information'], data['herd_information'])
 
-        self.init_animals(data['herd_information'], self.all_pens, weather, time, config, feed)
+        self.init_animals(data['herd_information'], config)
+
+        self.init_nutrient_rqmts(weather, time, feed)
+
+        self.allocate_all_pens()
 
     def init_pens(self, all_pen_data, herd_data):
         """
@@ -187,8 +191,7 @@ class AnimalManagement:
                                       Pen.AnimalCombination.NONE, 1.2)
                 self.all_pens.append(new_default_pen)
 
-    def init_animals(self, herd_data, pen_data, weather, time, config, feed):
-        # TODO: add unit test
+    def init_animals(self, herd_data, config):
         """
         Populates the list of animals with the information from the
         input JSON file: constructs the calves, heiferI’s, heiferII’s,
@@ -198,14 +201,14 @@ class AnimalManagement:
         are calculated and the animals are allocated to pens.
 
         Args:
-            feed: an instance of the Feed class defined in feed.py
             config: an instance of the Config class defined in classes.py
                 contains model configuration information
             herd_data: dictionary containing information about the herd
-            pen_data: dictionary containing information about the pens
-            weather: instance of the Weather class defined in classes.py
-            time: instance of the Time class defined in classes.py
         """
+
+        # TODO: resolve disrepency: pen_data is not a dictionary of pen information -- it is just self.all_pens
+        #  current solution -- get rid of usage of pen_data, because self.all_pens will always have > 0 bc
+        #  init_default_pens initializes default pens
 
         if self.simulate_animals:
             herd_data['config'] = config
@@ -213,12 +216,6 @@ class AnimalManagement:
                 = self.life_cycle_manager.initialize_herd(**herd_data)
         else:
             AnimalManagement._print_animal_num_warnings(herd_data)
-
-        if len(pen_data) > 0:
-            self.init_nutrient_rqmts(weather, time, feed)
-
-            # potentially move later on once we refactor
-            self.allocate_all_pens()
 
     @staticmethod
     def _print_animal_num_warnings(herd_data):
@@ -232,7 +229,7 @@ class AnimalManagement:
         animal_keys = {"calf_num", "heiferI_num", "heiferII_num", "heiferIII_num", "cow_num"}
         for key in animal_keys:
             if herd_data[key] == 0:
-                print("Warning: simulate_animals is false , but", key, "!= 0.")
+                print("Warning: simulate_animals is false, but", key, "!= 0.")
 
     def init_nutrient_rqmts(self, weather, time, feed):
         """
@@ -646,7 +643,7 @@ class AnimalManagement:
         # Close_up Pen Allocation
         self.allocate_close_up_pens(dry_cows, close_up_pens)
         # Lactating Cow Pen Allocation
-        self.allocate_lactating_cow_pens(lactating_cows)
+        self.allocate_lactating_cow_pens(lactating_cows, lac_cow_pens)
         #####################
 
         self.fully_update_id_pen()
@@ -710,9 +707,9 @@ class AnimalManagement:
             cow_class: instance of whatever cow type's pen history is being gathered
         """
         for cow in cow_class:
-            current_pen = self.id_pen[cow_class.id]
+            current_pen = self.id_pen[cow.id]
             classes_in_pen = self.all_pens[current_pen].classes_in_pen
-            cow_class.update_pen_history(current_pen, self.simulation_day, classes_in_pen)
+            cow.update_pen_history(current_pen, self.simulation_day, classes_in_pen)
 
     def record_pen_history(self):
         """

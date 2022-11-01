@@ -7,6 +7,7 @@ Author(s): Pooya Hekmati, sh2235@cornell.edu, Anchey Peng, ap724@cornell.edu
 
 import pytest
 from unittest.mock import MagicMock, patch
+from pytest_mock.plugin import MockerFixture
 
 from RUFAS.routines.animal.animal_management import AnimalManagement
 
@@ -48,7 +49,7 @@ def mock_pens() -> List[MagicMock]:
 
 
 @pytest.fixture
-def pen_information() -> Dict[str, Dict[str, Union[str, float, int]]]:
+def mock_pen_data() -> Dict[str, Dict[str, Union[str, float, int]]]:
     return {
         "pen0": {
             "id": 0,
@@ -110,7 +111,7 @@ def pen_information() -> Dict[str, Dict[str, Union[str, float, int]]]:
 
 
 @pytest.fixture
-def herd_information() -> Dict[str, Union[str, int, bool]]:
+def mock_herd_data() -> Dict[str, Union[str, int, bool]]:
     return {
         "calf_num": 80,
         "heiferI_num": 440,
@@ -128,9 +129,13 @@ def herd_information() -> Dict[str, Union[str, int, bool]]:
 def animal_management() -> AnimalManagement:
     init_pens_patch = patch('RUFAS.routines.animal.animal_management.AnimalManagement.init_pens')
     init_animals_patch = patch('RUFAS.routines.animal.animal_management.AnimalManagement.init_animals')
+    init_nutrient_rqmts_patch = patch('RUFAS.routines.animal.animal_management.AnimalManagement.init_nutrient_rqmts')
+    init_allocate_all_pens_patch = patch('RUFAS.routines.animal.animal_management.AnimalManagement.allocate_all_pens')
 
     init_pens_patch.start()
     init_animals_patch.start()
+    init_nutrient_rqmts_patch.start()
+    init_allocate_all_pens_patch.start()
 
     data = MagicMock()
     config = MagicMock()
@@ -142,6 +147,8 @@ def animal_management() -> AnimalManagement:
 
     init_pens_patch.stop()
     init_animals_patch.stop()
+    init_nutrient_rqmts_patch.stop()
+    init_allocate_all_pens_patch.stop()
 
     return animal_management
 
@@ -163,25 +170,20 @@ def test_get_animal_config():
     pass
 
 
-def test_init_pens(animal_management: AnimalManagement, pen_information: Dict[str, Dict[str, Union[str, float, int]]],
-                   herd_information: Dict[str, Union[str, int, bool]]) -> None:
+def test_init_pens(animal_management: AnimalManagement, mock_pen_data: Dict[str, Dict[str, Union[str, float, int]]],
+                   mock_herd_data: Dict[str, Union[str, int, bool]], mocker: MockerFixture) -> None:
     """Unit test for function init_pens in file routines/animal/animal_management.py"""
 
+    mocker.patch('RUFAS.routines.animal.animal_management.AnimalManagement._init_default_pens')
+
     # More than the minimum num of pens - 4 pens
-    animal_management.init_pens(pen_information, herd_information)
+    animal_management.init_pens(mock_pen_data, mock_herd_data)
 
     actual = len(animal_management.all_pens)
     expected = 4
     assert actual == expected
 
-    # Less than the minimum num of pens - 0 pens
-    # MIN_NUM_PENS default pens should be created
-    animal_management.all_pens = []
-    animal_management.init_pens({}, herd_information)
-
-    actual = len(animal_management.all_pens)
-    expected = animal_management.MIN_NUM_PENS
-    assert actual == expected
+    animal_management._init_default_pens.assert_called_once()
 
 
 def test_init_default_pens(animal_management: AnimalManagement) -> None:
@@ -196,9 +198,26 @@ def test_init_default_pens(animal_management: AnimalManagement) -> None:
     assert actual == expected
 
 
-def test_init_animals():
+def test_init_animals(animal_management: AnimalManagement, mocker: MockerFixture):
     """Unit test for function init_animals in file routines/animal/animal_management.py"""
-    pass
+
+    mocker.patch('RUFAS.routines.animal.life_cycle.life_cycle.LifeCycleManager.initialize_herd',
+                 return_value=[None, None, None, None, None])
+    mocker.patch('RUFAS.routines.animal.animal_management.AnimalManagement._print_animal_num_warnings')
+
+    animal_management.simulate_animals = True
+
+    herd_data = MagicMock()
+    config = MagicMock()
+
+    animal_management.init_animals(herd_data, config)
+
+    animal_management.life_cycle_manager.initialize_herd.assert_called_once()
+
+    animal_management.simulate_animals = False
+
+    animal_management.init_animals(herd_data, config)
+    animal_management._print_animal_num_warnings.assert_called_once()
 
 
 def test_init_nutrient_rqmts():
