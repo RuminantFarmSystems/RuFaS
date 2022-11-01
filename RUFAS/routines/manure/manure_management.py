@@ -214,6 +214,7 @@ class ManureManagement:
 
         if animal_management.simulation_day == 751:
             self.manure_management_output_handler.produce_graphics()
+            # self.manure_management_output_handler.make_dash_app()
 
 
 def simulate_daily_manure_management(manure_management: ManureManagement, animal_management: AnimalManagement) -> None:

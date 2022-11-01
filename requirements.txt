@@ -7,3 +7,6 @@ pytest
 pytest-mock
 scipy
 pytest-lazy-fixture
+dash
+plotly
+plotly_express

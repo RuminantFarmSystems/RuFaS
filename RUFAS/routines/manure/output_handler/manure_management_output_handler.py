@@ -9,8 +9,14 @@ from typing import Dict
 from typing import List
 from typing import Tuple
 
+import dash
 import numpy as np
 import pandas as pd
+import plotly_express as px
+from dash import dcc
+from dash import html
+from dash import Input
+from dash import Output
 from matplotlib import pyplot as plt
 
 from RUFAS.routines.manure.manure.pen_manure import PenManure
@@ -158,8 +164,7 @@ class ManureManagementOutputHandler:
 
     def export_all_data_to_csv(self) -> None:
         """Exports all data to a csv file."""
-        output_path = f'{self._get_csv_dir()}/manure_management_output_{self._get_current_time_str()}.csv'
-        self.df.to_csv(output_path, index=False)
+        self.df.to_csv(self._get_output_csv_path(), index=False)
 
     @staticmethod
     def _capitalize_first_letters(s: str, delimiter=' ') -> str:
@@ -301,6 +306,10 @@ class ManureManagementOutputHandler:
         os.makedirs(csv_dir, exist_ok=True)
         return csv_dir
 
+    def _get_output_csv_path(self) -> str:
+        """Returns the output csv path."""
+        return f'{self._get_csv_dir()}/manure_management_output_{self._get_current_time_str()}.csv'
+
     @staticmethod
     def _delete_files_and_subdirectories(path: str) -> None:
         """Deletes all files and subdirectories in the specified path."""
@@ -367,3 +376,31 @@ class ManureManagementOutputHandler:
         self.group_by_pen_id().to_csv(f'{self._get_csv_dir()}/manure_management_summary_'
                                       f'{self._get_current_time_str()}.csv',
                                       index=False)
+
+    def make_dash_app(self) -> None:
+        """Makes a dash app."""
+        app = dash.Dash()
+        app.layout = html.Div(children=[
+            html.H1(children='Manure Management'),
+            dcc.Dropdown(
+                    id='pen_id',
+                    options=[{'label': pen_id, 'value': pen_id} for pen_id in self.df['pen_id'].unique()],
+                    value=self.df['pen_id'].unique()[0]
+            ),
+            dcc.Graph(id='manure_management_graph')
+        ])
+
+        @app.callback(
+                Output('manure_management_graph', 'figure'),
+                [Input('pen_id', 'value')]
+        )
+        def update_graph(pen_id):
+            df = self.df[self.df['pen_id'] == pen_id]
+            return px.line(
+                    df,
+                    x='sim_day',
+                    y='manure__Manure_Mass__(kg)',
+                    title=f'Manure Mass for Pen {pen_id}'
+            )
+
+        app.run_server()
