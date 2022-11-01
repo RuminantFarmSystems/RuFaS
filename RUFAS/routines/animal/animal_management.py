@@ -219,7 +219,6 @@ class AnimalManagement:
 
     @staticmethod
     def _print_animal_num_warnings(herd_data):
-        # TODO: add unit test
         """
         Prints out warnings if there are more than 0 animals for any of the animal types
 
