@@ -404,3 +404,72 @@ class ManureManagementOutputHandler:
             )
 
         app.run_server()
+
+
+class DashApp:
+    def __init__(self):
+        self.df = pd.read_csv('../output/csv/manure_management_output_10_31_2022__20_00.csv')
+
+    @staticmethod
+    def _format_label(label: str) -> str:
+        """Formats the specified label."""
+        return label.replace('pen__', 'Pen - ') \
+            .replace('manure__', 'Input manure - ') \
+            .replace('handler__', 'Handler - ') \
+            .replace('rp__', 'Reception Pit - ') \
+            .replace('sep__', 'Separator - ') \
+            .replace('tx__', 'Treatment - ') \
+            .replace('__', ' ').replace('_', ' ')
+
+    def make_dash_app(self) -> None:
+        app = dash.Dash()
+        variables = [{'label': self._format_label(variable), 'value': variable} for variable in self.df.columns
+                     if all([marker not in variable.lower() for marker in ['pen_id', 'simulation_day', 'sim_day']]) and
+                     self.df[variable].dtype.kind in 'iuf']
+        app.layout = html.Div(children=[
+            html.H2(children='Manure Management',
+                    ),
+            html.Label('Variable:'),
+            dcc.Dropdown(
+                    id='variable',
+                    options=variables,
+                    value=variables[0]['value'],
+                    style={'border-radius': '15px', 'margin': '10px 0 20px 0'}
+            ),
+            dcc.Graph(id='manure_management_graph',
+                      style={'border-radius': '15px'})
+        ], style={'backgroundColor': '#BCCEF8', 'color': '#3F0071', 'fontFamily': 'Helvetica',
+                  'textAlign': 'center', 'border-radius': '15px', 'padding': '20px', 'margin': '0'})
+
+        @app.callback(
+                Output('manure_management_graph', 'figure'),
+                [
+                    Input('variable', 'value')
+                ]
+        )
+        def update_graph(variable):
+            df = self.df[['pen_id', 'sim_day', variable]]
+            print(df)
+            return px.line(
+                    df,
+                    x='sim_day',
+                    y=variable,
+                    color='pen_id',
+                    title=f'{self._format_label(variable)}'
+            ).update_layout(
+                    xaxis_title='Simulation Day',
+                    yaxis_title=self._format_label(variable),
+                    legend_title='Pen id',
+                    font=dict(
+                            family="Roboto, sans-serif",
+                            size=14,
+                            color="#7f7f7f"
+                    )
+            )
+
+        app.run_server()
+
+
+if __name__ == '__main__':
+    app = DashApp()
+    app.make_dash_app()
