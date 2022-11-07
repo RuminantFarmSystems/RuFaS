@@ -3,6 +3,8 @@
 import sys
 import time as timer
 from pathlib import Path
+
+import config.global_variables
 from RUFAS import routines, errors
 from RUFAS.classes import Config, State, Weather, Time
 from RUFAS.output_handler import OutputHandler
@@ -35,14 +37,16 @@ class SimulationEngine:
         print("Simulation Successful")
         print(f"Total Simulation Time: {t_end_sim - t_start_sim} seconds")
 
-        t_start_graphics = timer.time()
-        sys.stdout.write('Producing Graphics\n')
-        self.output.produce_graphics()
-        t_end_graphics = timer.time()
+        if not config.global_variables.SUPPRESS_GRAPHICS:
+            sys.stdout.write('Producing Graphics\n')
+            t_start_graphics = timer.time()
+            self.output.produce_graphics()
+            t_end_graphics = timer.time()
+            graphics_prod_time = t_end_graphics - t_start_graphics
+        else:
+            graphics_prod_time = 0
 
-        graphics_prod_time = t_end_graphics - t_start_graphics
-        total_runtime = (t_end_sim-t_start_sim) + \
-            (t_end_graphics-t_start_graphics)
+        total_runtime = (t_end_sim - t_start_sim) + graphics_prod_time
         self._show_final_messages(graphics_prod_time, total_runtime)
 
     def _run_simulation_main_loop(self) -> None:
@@ -57,10 +61,10 @@ class SimulationEngine:
         """
         Shows the messages of the end of the simulation
         """
-        sys.stdout.write(
-            f"Output Successful.\nGraphics stored in: {self.config.graphic_dir}\n")
-        sys.stdout.write(f"Time to produce graphics: {graphics_prod_time}\n")
-        sys.stdout.write(f"Total Run Time: {total_runtime} seconds\n")
+        if not config.global_variables.SUPPRESS_GRAPHICS:
+            sys.stdout.write(f"Time to produce graphics: {graphics_prod_time}\n")
+            sys.stdout.write(f"Output Successful.\nGraphics stored in: {self.config.graphic_dir}\n")
+            sys.stdout.write(f"Total Run Time: {total_runtime} seconds\n")
 
     def _daily_simulation(self) -> None:
         """Executes the daily simulation routines."""
