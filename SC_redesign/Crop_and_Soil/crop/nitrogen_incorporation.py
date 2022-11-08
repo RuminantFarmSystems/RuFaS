@@ -1,6 +1,7 @@
 from math import log, exp
 
 from SC_redesign.Crop_and_Soil.soil.soil import Soil
+from bisect import bisect
 
 
 class NitrogenIncorporation:
@@ -23,12 +24,14 @@ class NitrogenIncorporation:
         self.shapes_nitrogen_uptake = None
         self.optimal_nitrogen = None
         self.previous_nitrogen = None
-        self.potential_nitrogen_uptake = None
+        self.potential_nitrogen_uptake = None # demand
         self.layer_nitrogen_potentials = None
         self.layer_nitrogen_demands = None
         self.layer_nitrogen_uptakes = None
         self.total_nitrogen_uptake = None
         self.fixed_nitrogen = None
+        self.fixation_stage_factor = None
+        self.deepest_accessible_layer = None
 
     def incorporate_nitrogen(self, soil: Soil) -> None:
         """main nitrogen incorporation function - runs all nitrogen processes and stores nitrogen as biomass"""
@@ -55,15 +58,17 @@ class NitrogenIncorporation:
 
     def determine_nitrogen_fraction(self) -> None:
         """evaluate the plant's nitrogen fraction, using the shape parameters"""
-        self.optimal_nitrogen_fraction = calc_nitrogen_fraction(self.heat_fraction, self.emergence_nfrac, self.mature_nfrac,
-                                                                self.shapes_nitrogen_uptake[0], self.shapes_nitrogen_uptake[1])
+        self.optimal_nitrogen_fraction = calc_nitrogen_fraction(self.heat_fraction, self.emergence_nfrac,
+                                                                self.mature_nfrac,
+                                                                self.shapes_nitrogen_uptake[0],
+                                                                self.shapes_nitrogen_uptake[1])
 
     def determine_optimal_nitrogen(self) -> None:
         """ determines the optimal nitrogen based on its current biomass and nitrogen fraction"""
         self.optimal_nitrogen = calc_mass_from_fraction(self.optimal_nitrogen_fraction, self.biomass)
 
-    def shift_nitrogen_time(self) -> None:
-        self.previous_nitrogen = self.nitrogen
+    # def shift_nitrogen_time(self) -> None:
+    #     self.previous_nitrogen = self.nitrogen
 
     def determine_potential_nitrogen_uptake(self) -> None:
         if self.optimal_nitrogen - self.previous_nitrogen < 0:
@@ -112,9 +117,34 @@ class NitrogenIncorporation:
         else:
             self.fixed_nitrogen = 0
 
-    def fix_nitrogen(self) -> None:
-        # self.fixed_nitrogen = ...
-        raise ValueError("Nitrogen Fixation not yet implemented")  # TODO: combine with nitrogen_fixation.py
+    def determine_fixation_stage_factor(self):
+        self.fixation_stage_factor = calc_fixation_stage_factor(self.heat_fraction)
+
+    # TODO: need to make sure that nutrients are only uptaken from accessible root zone and that fixation
+    #   only occurs for any **unmet** nitrogen demands
+    def fix_nitrogen(self, water_factor: float, nitrate_factor: float) -> None:
+        """fix nitrogen, based on any remaining demand not met by uptake"""
+        unmet_demand = self.potential_nitrogen_uptake - self.total_nitrogen_uptake
+        if unmet_demand > 0:
+            self.fixed_nitrogen = calc_fixed_nitrogen(unmet_demand, stage_factor=self.fixation_stage_factor,
+                                                      water_factor=water_factor, nitrate_factor=nitrate_factor)
+        else:
+            self.fixed_nitrogen = 0
+
+    def determine_deepest_accessible_soil_layer(self, depths: list[float]) -> None:
+        self.deepest_accessible_layer = calc_deepest_accessible_layer(self.root_depth, depths)
+        
+    def access_layers(self, resource_profile: list) -> list:
+        """
+        Details: obtains the list of resources accessible by roots, from a full list of layer resources
+
+        Args:
+            resource_profile: a list containing the amount of a resource present in each layer of the soil profile
+
+        Returns: a trimmed resource list with an element for each soil layer that is accessible to the plant's roots
+        """
+        return resource_profile[slice(self.deepest_accessible_layer)]
+
 
 
 # ---- helper functions ----
@@ -137,7 +167,8 @@ def calc_nitrogen_fraction(heat_fraction: float, emergence_nfrac: float, mature_
 
 
 def calc_shape_parameters(half_mature_heatfrac: float, mature_heatfrac: float, emergence_nfrac: float,
-                          half_mature_nfrac: float, near_mature_nfrac: float, mature_nfrac: float) -> list[float]:  # pseudocode: C.5.A.1, C.5.A.2
+                          half_mature_nfrac: float, near_mature_nfrac: float, mature_nfrac: float) -> list[
+    float]:  # pseudocode: C.5.A.1, C.5.A.2
     """
     Description: calculates the shape coefficients for the nitrogen fraction equation
 
@@ -258,7 +289,8 @@ def calc_layer_nitrogen_uptake(layer_demands: list[float], layer_uptake_potentia
     return [min(desired, nitrate) for desired, nitrate in zip(layer_desired, layer_nitrates)]
 
 
-def calc_layer_nitrogen_demands(uptake_potentials: list[float], nitrate_availabilities: list[float]) -> list[float]:  # pseudocode: C.5.C.5
+def calc_layer_nitrogen_demands(uptake_potentials: list[float], nitrate_availabilities: list[float]) -> list[
+    float]:  # pseudocode: C.5.C.5
     """
     Description: calculates nitrogen demand of the plant from each soil layer
 
@@ -299,7 +331,8 @@ def calc_nitrogen_uptake_to_depth(demand: float, depth: float, root_depth: float
 
 
 def calc_layer_nitrogen_uptake_potential(layer_bounds: list[float], total_demand: float,
-                                         root_depth: float, ndistro_param: float) -> list[float]:  # pseudocode: C.5.C.2, C.5.C.3
+                                         root_depth: float, ndistro_param: float) -> list[
+    float]:  # pseudocode: C.5.C.2, C.5.C.3
     """
     Description: calculates potential nitrogen uptake from each soil layer
 
@@ -360,6 +393,112 @@ def calc_stored_nitrogen(uptake: float, previous: float, fixed: float = 0) -> fl
     Returns: the total mass of nitrogen in the plant at the end of current day
     """
     return previous + uptake + fixed
+
+
+def calc_fixed_nitrogen(demand: float, stage_factor: float, water_factor: float, nitrate_factor: float):
+    """
+    Description: calculate the amount of nitrogen fixed by a plant
+
+    Args:
+        demand: nitrogen demand not met by uptake from soil
+        stage_factor: growth stage factor [0, 1]
+        water_factor: soil water factor [0, 1]
+        nitrate_factor: soil nitrate factor [0, 1]
+
+    Returns: the amount of nitrogen added to plant biomass through fixation, capped at demand.
+    """
+    if 0 > stage_factor > 1:
+        raise ValueError("stage_factor must be between 0 and 1")
+    if 0 > water_factor > 1:
+        raise ValueError("water_factor must be between 0 and 1")
+    if 0 > nitrate_factor > 1:
+        raise ValueError("nitrate_factor must be between 0 and 1")
+
+    fixed = demand * stage_factor * min(water_factor, nitrate_factor, 1)
+    return min(fixed, demand)
+
+
+def calc_fixation_stage_factor(heatfrac: float) -> float:
+    """
+    Description: calculates plant growth stage factor
+
+    Args:
+        heatfrac: the accumulated fraction of potential heat units
+
+    Returns: growth stage factor
+    """
+    # piece-wise function:
+    if heatfrac <= 0.15:
+        return 0
+
+    elif heatfrac <= 0.3:
+        return (6.67 * heatfrac) - 1
+
+    elif heatfrac <= 0.55:
+        return 1
+
+    elif heatfrac <= 0.75:
+        return 3.75 - (5 * heatfrac)
+
+    else:
+        return 0
+
+
+def calc_nitrate_factor(accessible_nitrates):
+    """
+    Description: calculates soil nitrate factor
+
+    Args:
+        accessible_nitrates: total nitrates available in the soil layers accessible to roots
+
+    Returns: the nitrate factor
+    """
+    if accessible_nitrates <= 100:
+        return 1
+    elif accessible_nitrates <= 300:
+        return 1.5 - (0.0005 * accessible_nitrates)
+    else:
+        return 0
+
+
+def calc_soil_water_factor(available_water: float, capacity_water: float) -> float:  # pseudocode: C.5.D.5
+    """
+    Description: calculates soil water factor
+
+    Args:
+        available_water: the water available in the soil profile (mm)
+        capacity_water: the water accessible at field capacity (mm)
+
+    Returns: soil water factor
+    """
+    return available_water / 0.85 * capacity_water
+
+def calc_deepest_accessible_layer(root_depth: float, layer_bounds: list[float]) -> int:
+    """
+    Description:
+        Determines the deepest soil layer that is accessible to roots.
+
+    Args:
+        root_depth: the root depth of a plant
+        layer_bounds: the depths of the lower boundaries of each soil layer
+
+    Returns:
+        an integer indicating the deepest soil layer that the roots can access
+    """
+
+    if root_depth <= 0:  # handle no roots
+        raise ValueError("root_depth cannot be less than zero")
+    else:
+        insert_position = bisect(layer_bounds, root_depth)
+        deepest_layer = len(layer_bounds) - 1
+        return min(insert_position, deepest_layer)
+        # if insert_position >= deepest_layer:  # handle roots deeper than soil
+        #     Warning("root_depth is deeper than the lowest soil layer")
+        #     return deepest_layer
+        # else:
+        #     return insert_position
+
+
 
 # TODO: Nitrogen fixation still needs to be updated
 ## -- OLD --

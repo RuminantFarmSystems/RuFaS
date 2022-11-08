@@ -75,7 +75,7 @@ def test_calc_nitrogen_fraction(heatfrac, emerge, mature, shape1, shape2):
     (.25, .3),
     (.10, .257)
 ])
-def test_calc_optimal_nitrogen(nfrac, biomass):
+def test_calc_mass_from_fraction(nfrac, biomass):
     """test that optimal nitrogen is correctly calculated by calc_optimal_nitrogen()"""
     assert calc_mass_from_fraction(nfrac, biomass) == nfrac * biomass
 
@@ -180,7 +180,7 @@ def test_error_calc_layer_nitrogen_uptake_potential(bounds, demand, root_depth, 
     ([0.5, 0.25, 0.05], [0.5, 0.25, 0.05]),  # exactly met demands
     ([112.3, 50.44, 17, 12.99], [50.33, 15.10, 8.05, 6.66]),  # arbitrary
 ])
-def test_calc_layer_nitrogen_demand(pots, avails):
+def test_calc_layer_nitrogen_demands(pots, avails):
     """test that nitrogen demand is correctly calculated for each layer by calc_layer_nitrogen_demand()"""
     observe = calc_layer_nitrogen_demands(pots, avails)
     # starting values
@@ -222,8 +222,8 @@ def test_calc_layer_nitrogen_uptake(demand, potential, nitrate):
     (1.5, 1),  # request > available
     (85.93, 232.7)  # arbitrary
 ])
-def test_calc_extracted_nitrogen(requested, available):
-    """ensure that extracted nitrogen is correctly calculated by calc_extracted_nitrogen()"""
+def test_calc_extracted_resource(requested, available):
+    """ensure that extracted resource is correctly calculated by calc_extracted_resource()"""
     if available < 0:
         drawn = 0
     elif requested > available:
@@ -256,11 +256,43 @@ def test_calc_layer_extracted_resource(reqs, srcs):
     (0, 0, 0),  # all 0
     (50.39, 10.55, 3.05)  # arbitrary
 ])
-def calc_stored_nitogen(prev, new, fix):
+def calc_stored_nitrogen(prev, new, fix):
     """test the stored nitrogen is properly calculated by calc_stored_nitrogen()"""
     observe = calc_stored_nitrogen(new, prev, fix)
     assert observe == prev + new + fix
 
+
+@pytest.mark.parametrize("heatfrac,expect", [
+    (-1.0, 0.0),  # piece A
+    (0.00, 0.0),
+    (0.05, 0.0),
+    (0.15, 0.0),
+    (0.22, 6.67 * 0.22 - 1),  # piece B
+    (0.30, 6.67 * 0.30 - 1),
+    (0.43, 1.0),  # piece C
+    (0.55, 1.0),
+    (0.67, 3.75 - 5 * 0.67),  # piece D
+    (0.75, 3.75 - 5 * 0.75),
+    (0.76, 0.0),  # piece E
+    (1.39, 0.0)
+])
+def test_calc_fixation_stage_factor(heatfrac, expect):
+    assert calc_fixation_stage_factor(heatfrac) == expect
+
+
+def test_calc_fixed_nitrogen(demand, stage, water, nitrate):
+    assert False
+
+
+def test_calc_nitrate_factor(nitrates):
+    assert False
+
+def test_calc_soil_water_factor(available, capacity):
+    assert False
+
+
+def test_calc_deepest_accessible_layer(depth, bounds):
+    assert False
 
 # ---- initialization functions (reusable) ----
 def init_nu(**kwargs):
@@ -321,16 +353,16 @@ def test_determine_nfrac_shape_parameters(half_heat, mat_heat, emerge, half, nea
 ])
 def test_determine_optimal_nitrogen(nfrac, biomass):
     """test that a plant's optimal nitrogen is correctly updated by update_optimal_nitrogen()"""
-    nu = init_nu(biomass=biomass, nitrogen_fraction=nfrac)
+    nu = init_nu(biomass=biomass, optimal_nitrogen_fraction=nfrac)
     nu.determine_optimal_nitrogen()
     assert nu.optimal_nitrogen == calc_mass_from_fraction(nfrac, biomass)
 
 
-@pytest.mark.parametrize("nitrogen", [0, 0.2, 0.5, 1, 237.32])
-def test_shift_nitrogen_time(nitrogen):
-    nu = init_nu(nitrogen=nitrogen)
-    nu.shift_nitrogen_time()
-    assert nu.previous_nitrogen == nitrogen
+# @pytest.mark.parametrize("nitrogen", [0, 0.2, 0.5, 1, 237.32])
+# def test_shift_nitrogen_time(nitrogen):
+#     nu = init_nu(nitrogen=nitrogen)
+#     nu.shift_nitrogen_time()
+#     assert nu.previous_nitrogen == nitrogen
 
 
 @pytest.mark.parametrize("opt_n,prev_n,mat_nfrac,grow_max", [
@@ -422,12 +454,40 @@ def test_reassess_nitrogen_availability(uptakes, nitrates):
     ([87.36, 86.40, 30.33], [82.4, 83.0, 29.9]),  # nitrates limited
 ])
 def test_extract_nitrogen_from_soil(uptakes, nitrates):
-    nu = init_nu(layer_nitrogen_uptakes=uptakes, total_nitrogen_uptakes=sum(uptakes), nitrogen=100)
+    nu = init_nu(layer_nitrogen_uptakes=uptakes, total_nitrogen_uptake=sum(uptakes), nitrogen=100)
     soil = init_soil(nitrates=nitrates)
     nu.extract_nitrogen_from_soil(soil)
+
+    total_uptake = sum(uptakes)
+    remaining = []
+    for i in range(len(uptakes)):
+        remaining.append(nitrates[i] - uptakes[i])
+
+    assert soil.layer_extracted_nitrogen == nu.layer_nitrogen_uptakes
+    assert soil.total_extracted_nitrogen == nu.total_nitrogen_uptake == total_uptake
+    assert soil.nitrates == remaining
+    assert nu.nitrogen == 100 + total_uptake
+
+
+def test_incorporate_nitrogen():
     assert False
 
-def test_NITROGEN_INCOMPORTATION():
+def test_store_nitrogen_biomass():
+    assert False
+
+def test_uptake_nitrogen():
+    assert False
+
+def test_try_fixation():
+    assert False
+
+def test_fix_nitrogen(water, nitrate):
+    assert False
+
+def test_determine_deepest_accessible_soil_layer(depths):
+    assert False
+
+def test_access_layers(full):
     assert False
 
 
