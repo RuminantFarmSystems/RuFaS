@@ -30,10 +30,12 @@ def test_convert_path_string_to_list(path):
     """check that convert_path_string_to_list() properly returns a Path list"""
     pass
 
+@pytest.mark.parametrize("path", [dir_path])
 def test_get_json_list_from_dir(path):
     """check that get_json_list_from_dir() properly detects all json files in a directory"""
     pass
 
+@pytest.mark.parametrize("path", [file_path])
 def test_convert_json_path_to_list(path):
     """check that convert_json_path_to_list() properly returns a Path list from a json path string"""
     pass
@@ -42,3 +44,4 @@ def test_convert_json_path_to_list(path):
 def test_prompt_user_for_input(input):
     """check that prompt_user_for_input correctly returns the users input and that other options work as expected"""
     pass
+
