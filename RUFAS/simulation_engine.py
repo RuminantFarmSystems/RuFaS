@@ -37,7 +37,7 @@ class SimulationEngine:
         print("Simulation Successful")
         print(f"Total Simulation Time: {t_end_sim - t_start_sim} seconds")
 
-        if not config.global_variables.SUPPRESS_GRAPHICS:
+        if config.global_variables.PRODUCE_GRAPHICS:
             sys.stdout.write('Producing Graphics\n')
             t_start_graphics = timer.time()
             self.output.produce_graphics()
@@ -61,7 +61,7 @@ class SimulationEngine:
         """
         Shows the messages of the end of the simulation
         """
-        if not config.global_variables.SUPPRESS_GRAPHICS:
+        if config.global_variables.PRODUCE_GRAPHICS:
             sys.stdout.write(f"Time to produce graphics: {graphics_prod_time}\n")
             sys.stdout.write(f"Output Successful.\nGraphics stored in: {self.config.graphic_dir}\n")
             sys.stdout.write(f"Total Run Time: {total_runtime} seconds\n")
