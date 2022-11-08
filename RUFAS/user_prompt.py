@@ -9,7 +9,6 @@ import sys
 from pathlib import Path
 from RUFAS import util, errors
 import fileReader
-import config.global_variables
 
 
 def obtain_file_list(path=None, verbose: bool = True) -> list[Path]:
@@ -66,11 +65,11 @@ def convert_path_string_to_list(path: str, verbose: bool = True):
         Warning("ability to use .txt files is deprecated. Please use .json input files in the future")
         if not input_path.is_file():
             raise errors.UserInput("Specified file does not exist")
-        if verbose: print("commented json file detected, stripping comments...\n")
+        if verbose:
+            print("commented json file detected, stripping comments...\n")
         json_filename = fileReader.convert_to_json(str(input_path))
         json_path = Path(json_filename.strip())
         return [json_path]
-
 
     if input_path.suffix == '.json':
         return convert_json_path_to_list(input_path, verbose)
@@ -113,7 +112,8 @@ def convert_json_path_to_list(json_path: Path, verbose: bool) -> list[Path]:
     if not json_path.is_file():
         raise errors.UserInput("Specified file does not exist")
 
-    if verbose: print("json file detected... \n")
+    if verbose:
+        print("json file detected... \n")
 
     return [json_path]
 

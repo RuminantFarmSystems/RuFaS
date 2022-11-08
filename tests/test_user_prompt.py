@@ -1,11 +1,11 @@
 import os.path
 
 import pytest
+from config import global_variables
 import unittest.mock
-
 from RUFAS.user_prompt import *
 
-dir_path = os.path.join(config.global_variables.ROOT_DIR, "input")
+dir_path = os.path.join(global_variables.ROOT_DIR, "input")
 file_path = os.path.join(dir_path, "input/ARL.json")
 
 # TODO: Tests remain unimplemented - GitHub Issue #209
