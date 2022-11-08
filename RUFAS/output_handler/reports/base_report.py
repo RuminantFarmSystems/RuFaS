@@ -23,10 +23,8 @@ class BaseReport:
         the data passed to it and assigns the properties below.
         """
 
-        _suppress_graphics = config.global_variables.SUPPRESS_GRAPHICS
-
         self.produce_csv = data['produce_csv']
-        self.produce_graphics = data['produce_graphics'] if not _suppress_graphics else False
+        self.produce_graphics = data['produce_graphics'] if config.global_variables.PRODUCE_GRAPHICS else False
         self.report_name = data['report_name']
         self.file_name = self.report_name + '.csv'
         self.annual_file_name = self.report_name + '_annual.csv'
