@@ -96,7 +96,7 @@ class GasEmissions:
         return c * VS_tot * (VSd * b1 + VSnd * b2) * ex
 
     
-    def calc_E_CH4_storage_v3(Ts,enclosed=False,tempC=15.0,Pvs=0.68, Bo=0.2, E_CH4_pot=0.48,n_eff=0.99,VS_loss_yesterday=0.0) -> float:
+    def calc_E_CH4_slurry_storage_v3(Ts,enclosed=False,tempC=15.0,Pvs=0.68, Bo=0.2, E_CH4_pot=0.48,n_eff=0.99,VS_loss_yesterday=0.0) -> float:
         """Calculates methane emissions from manure storage using total solids and manure kg.
 
         Parameters

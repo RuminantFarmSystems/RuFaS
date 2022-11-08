@@ -51,14 +51,15 @@ class Manure:
     CH4_manure: float = 0.0
 
     def __post_init__(self):
-        self.U *= Constants.UREA_MOLAR_MASS  # mol/L x g/mol = g/L
-        self.TAN_s *= Constants.TAN_MOLAR_MASS  # mol/L x g/mol = g/L
-        self.MN *= Constants.GRAMS_TO_KG  # kg
-        # self.TSd *= Constants.GRAMS_TO_KG  # kg
-        self.VSd *= Constants.GRAMS_TO_KG  # kg
-        self.VSnd *= Constants.GRAMS_TO_KG  # kg
-        self.p_excrt_manure *= Constants.GRAMS_TO_KG  # kg
-        self.K_manure *= Constants.GRAMS_TO_KG  # kg
+        # self.U *= Constants.UREA_MOLAR_MASS  # mol/L x g/mol = g/L
+        # self.TAN_s *= Constants.TAN_MOLAR_MASS  # mol/L x g/mol = g/L
+        # self.MN *= Constants.GRAMS_TO_KG  # kg
+        # # self.TSd *= Constants.GRAMS_TO_KG  # kg
+        # self.VSd *= Constants.GRAMS_TO_KG  # kg
+        # self.VSnd *= Constants.GRAMS_TO_KG  # kg
+        # self.p_excrt_manure *= Constants.GRAMS_TO_KG  # kg
+        # self.K_manure *= Constants.GRAMS_TO_KG  # kg
+        return
 
     def __add__(self, other: Manure) -> Manure:
         """

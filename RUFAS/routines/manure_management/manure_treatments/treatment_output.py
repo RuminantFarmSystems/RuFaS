@@ -17,6 +17,11 @@ class TreatmentOutput:
     K_manure: float = 0.0  # kg
     total_daily_mass: float = 0.0  # L
     final_volume: float = 0.0  # m^3
+    accumulated_TS: float = 0.0
+    accumulated_volume: float = 0.0
+    ch4_emissions: float = 0.0
+    tempC:float = 0.0
+    rainfall:float = 0.0
 
     def clone(self) -> TreatmentOutput:
         return TreatmentOutput(**asdict(self))
@@ -73,22 +78,22 @@ class AggregatedManureOutputforField(TreatmentOutput):
         The attributes of this dataclass should be identical to the attributes
         expected in the RUFAS.routines.field.field_management.manure_application update_all method. 
     """
-    mass: float = 0.0  # total manure mass kg
+    mass: float = 0.0  # total manure volume L
+    final_volume: float = 0.0 # Total manure volume m3
     N_mass:float=0.0
     P_mass:float=0.0
     K_mass:float=0.0
     WIP:float=0.0
     WOP:float=0.0
-    DM:float=0.0
-    def convert_treatment_ouput_to_field_outputs(self,daily_output):
+    def convert_treatment_output_to_field_outputs(self,daily_output):
         """converts TreatmentOutputs attributes to attributes names in class"""
         self.N_mass=daily_output.manure_nitrogen
         self.P_mass=daily_output.p_excrt_manure
         self.K_mass=daily_output.K_manure
         self.mass =daily_output.total_daily_mass 
-        self.DM =daily_output.DM
-        self.WIP =self.P_mass.self.mass*0.5/self.mass/1000
-        self.WOP =self.P_mass.self.mass*0.05/self.mass/1000
+        self.final_volume =daily_output.final_volume 
+        self.WIP =self.P_mass*0.5/self.mass/1000
+        self.WOP =self.P_mass*0.05/self.mass/1000
 
 
 @dataclass
