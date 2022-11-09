@@ -3,7 +3,6 @@ from math import log, exp
 from SC_redesign.Crop_and_Soil.soil.soil import Soil
 from bisect import bisect
 
-
 class NitrogenIncorporation:
     def __init__(self):
         self.emergence_nfrac = 0.04
@@ -24,7 +23,7 @@ class NitrogenIncorporation:
         self.shapes_nitrogen_uptake = None
         self.optimal_nitrogen = None
         self.previous_nitrogen = None
-        self.potential_nitrogen_uptake = None # demand
+        self.potential_nitrogen_uptake = None  # demand
         self.layer_nitrogen_potentials = None
         self.layer_nitrogen_demands = None
         self.layer_nitrogen_uptakes = None
@@ -79,6 +78,8 @@ class NitrogenIncorporation:
                                                                             self.mature_nfrac,
                                                                             self.biomass_growth_max)
 
+
+    # TODO: I'm pretty sure N is being taken up beyond what roots can reach...
     def stratify_potential_nitrogen_uptake(self, layer_bounds: list[float]) -> None:
         self.layer_nitrogen_potentials = calc_layer_nitrogen_uptake_potential(layer_bounds,
                                                                               self.potential_nitrogen_uptake,
@@ -497,7 +498,6 @@ def calc_deepest_accessible_layer(root_depth: float, layer_bounds: list[float]) 
         #     return deepest_layer
         # else:
         #     return insert_position
-
 
 
 # TODO: Nitrogen fixation still needs to be updated
