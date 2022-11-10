@@ -18,6 +18,7 @@ from dash import html
 from dash import Input
 from dash import Output
 from matplotlib import pyplot as plt
+from matplotlib.ticker import MaxNLocator
 
 from RUFAS.routines.manure.manure.pen_manure import PenManure
 from RUFAS.routines.manure.manure_handlers.manure_handler_daily_output import ManureHandlerDailyOutput
@@ -48,7 +49,7 @@ class ManureManagementOutputHandler:
 
     def __init__(self):
         self.df = None
-        self._delete_files_and_subdirectories(self._get_output_main_directory())
+        self._delete_files_and_subdirectories(self._get_graphics_dir())
 
     def _convert_dataclass_obj_to_formatted_dict(self,
                                                  dataclass_obj,
@@ -273,18 +274,35 @@ class ManureManagementOutputHandler:
             return
         small, medium, large = 10, 12, 16
         plt.style.use('fivethirtyeight')
-        plt.figure()
-        plt.scatter(x, y, alpha=0.7, c='#1746A2', s=25)
-        plt.xlabel(x_label, fontsize=medium)
-        plt.ylabel(y_label, fontsize=medium)
-        plt.title(title, fontsize=large)
+        # plt.figure()
+        # plt.scatter(x, y, alpha=0.7, c='#1746A2', s=25)
+        # plt.plot(x, y, c='#1746A2', linewidth=2)
+        fig, ax = plt.subplots(nrows=1, ncols=2, figsize=(12, 6))
+        ax[0].scatter(x, y, alpha=0.7, c='#1746A2', s=25)
+        ax[1].plot(x, y, c='#1746A2', linewidth=2)
+        # ax.scatter(x, y, alpha=0.7, c='#1746A2', s=25)
+        # ax.plot(x, y, c='#1746A2', linewidth=2)
+        ax[0].set_xlabel(x_label, fontsize=medium)
+        ax[1].set_xlabel(x_label, fontsize=medium)
+        ax[0].set_ylabel(y_label, fontsize=medium)
+        # ax[1].set_ylabel(y_label, fontsize=medium)
+        ax[0].set_title(title, fontsize=large)
+        # ax.tick_params(axis='both', which='major', labelsize=small)
+        # set integer x-axis ticks
+        ax[0].xaxis.set_major_locator(MaxNLocator(integer=True))
+        ax[1].xaxis.set_major_locator(MaxNLocator(integer=True))
 
-        locs, _ = plt.xticks()
-        plt.xticks([int(loc) for loc in locs if loc >= 0], fontsize=medium)
-        plt.yticks(fontsize=medium)
-        plt.legend([f'{y_label}'], loc='best', frameon=False, fontsize=small)
-
-        plt.savefig(output_path, dpi=400, bbox_inches='tight', pad_inches=0.3)
+        # plt.xlabel(x_label, fontsize=medium)
+        # plt.ylabel(y_label, fontsize=medium)
+        # plt.title(title, fontsize=large)
+        #
+        # locs, _ = plt.xticks()
+        # plt.xticks([int(loc) for loc in locs if loc >= 0], fontsize=medium)
+        # plt.yticks(fontsize=medium)
+        # plt.legend([f'{y_label}'], loc='best', frameon=False, fontsize=small)
+        ax[0].legend([f'{y_label}'], loc='best', frameon=False, fontsize=small)
+        ax[1].legend([f'{y_label}'], loc='best', frameon=False, fontsize=small)
+        plt.savefig(output_path, dpi=400, bbox_inches='tight', pad_inches=0.2)
         plt.close()
 
     @staticmethod
