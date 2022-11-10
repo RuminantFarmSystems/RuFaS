@@ -89,6 +89,7 @@ def annual_variable_update(soil):
     Args:
         soil: an instance of the Soil class
     """
+    #soil.ag_biomass=0
     soil_water.update_annual_SW(soil)
     phosphorus_cycling.update_annual_P(soil)
     nitrogen_cycling.update_annual_N(soil)
@@ -411,8 +412,7 @@ class Soil:
             self.percolation = 0.0  # amount of water that percolates to next layer
 
             # Variable to simulate nitrogen Cycling
-            # self.org_C = layer_data['org_C_percent']
-            self.org_C = 0
+            self.org_C = layer_data['org_C_percent']
             self.active_mineral_rate = layer_data['active_mineral_rate']
             self.denitrification_rate = layer_data['denitrification_rate']
             self.NH4 = layer_data['NH4']
@@ -606,6 +606,7 @@ class Soil:
 
             # S.4.A.2
             org_C = layer.org_C
+            print(layer.org_C)
             org_N = (10 ** 4) * (org_C / 14)
 
             # S.4.A.3
