@@ -57,11 +57,13 @@ def update_nitrogen_fraction(crop) -> None:
     """
     shapes = calc_shape_parameters(heatfrac_half= crop.fr_PHU_50, heatfrac_full=crop.fr_PHU_100, nfrac_1=crop.fr_n1,
                                    nfrac_2=crop.fr_n2, nfrac_near=crop.fr_n3ish, nfrac_3=crop.fr_n3)
+                                
     if crop.biomass_actual == 0:
         crop.fr_N = 0
     else:
         crop.fr_N = calc_nitrogen_fraction(phu_frac=crop.prev_fr_PHU, nfrac_1=crop.fr_n1, nfrac_3=crop.fr_n3,
                                            shape1=shapes[0], shape2=shapes[1])
+    #print('fr_n:',crop.fr_N)
 
 
 def calc_shape_parameters(heatfrac_half: float, heatfrac_full: float, nfrac_1: float, nfrac_2: float,

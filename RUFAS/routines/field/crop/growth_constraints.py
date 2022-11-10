@@ -24,13 +24,16 @@ def update_growth_factor(crop, soil, weather, time) -> None:
     """
     #  TODO: plant transpiration should be an attribute of the crop, not the soil
     w_stress = calc_water_stress(water_uptake=crop.water_act_up, max_transpiration=soil.trans_max)
-
+    w_stress=0
     avg_air_temp = weather.T_avg[time.year - 1][time.day - 1]
     t_stress = calc_temperature_stress(air_temp=avg_air_temp, min_temp=crop.T_base_min, optimal_temp=crop.T_opt)
 
     n_stress_factor = calc_nutrient_stress_scaling_factor(stored=crop.bio_N, optimal=crop.bio_N_opt)
+    #print('n_stress', n_stress_factor)
+    #print('bio_n:',crop.bio_N,'bio_n_opt',crop.bio_N_opt)
+    #n_stress_factor = 100
     n_stress = calc_nutrient_stress(optimal=crop.bio_N_opt, stress_factor=n_stress_factor)
-
+    #print('n_stress', n_stress)
     p_stress_factor = calc_nutrient_stress_scaling_factor(stored=crop.bio_P, optimal=crop.bio_P_opt)
     p_stress = calc_nutrient_stress(optimal=crop.bio_P_opt, stress_factor=p_stress_factor)
    # print([w_stress, t_stress, n_stress, p_stress])
