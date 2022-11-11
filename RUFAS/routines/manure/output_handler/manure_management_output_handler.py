@@ -9,14 +9,8 @@ from typing import Dict
 from typing import List
 from typing import Tuple
 
-import dash
 import numpy as np
 import pandas as pd
-import plotly_express as px
-from dash import dcc
-from dash import html
-from dash import Input
-from dash import Output
 from matplotlib import pyplot as plt
 from matplotlib.ticker import MaxNLocator
 
@@ -236,13 +230,16 @@ class ManureManagementOutputHandler:
             )
 
     def _get_header_prefixes(self) -> List[str]:
+        """Returns a list of all header prefixes."""
         return list(self.HEADER_PREFIXES.values())
 
     @staticmethod
     def _get_excluded_attrs() -> List[str]:
+        """Returns a list of attributes to exclude from the output."""
         return ['pen_id', 'sim_day', 'simulation_day']
 
     def _get_headers(self) -> List[str]:
+        """Returns a list of all headers."""
         headers = [col for col in self.df.columns
                    for prefix in self._get_header_prefixes()
                    if col.startswith(prefix + self.HEADER_PRIMARY_DELIMITER)]
@@ -250,6 +247,7 @@ class ManureManagementOutputHandler:
                 if all([attr.lower() not in header.lower() for attr in self._get_excluded_attrs()])]
 
     def produce_graphics(self):
+        """Produces graphics from the data."""
         for header in self._get_headers():
             self._make_scatter_plot_with_anchor_column(
                     output_dir=self._get_graphics_dir(),
@@ -394,100 +392,3 @@ class ManureManagementOutputHandler:
         self.group_by_pen_id().to_csv(f'{self._get_csv_dir()}/manure_management_summary_'
                                       f'{self._get_current_time_str()}.csv',
                                       index=False)
-
-    def make_dash_app(self) -> None:
-        """Makes a dash app."""
-        app = dash.Dash()
-        app.layout = html.Div(children=[
-            html.H1(children='Manure Management'),
-            dcc.Dropdown(
-                    id='pen_id',
-                    options=[{'label': pen_id, 'value': pen_id} for pen_id in self.df['pen_id'].unique()],
-                    value=self.df['pen_id'].unique()[0]
-            ),
-            dcc.Graph(id='manure_management_graph')
-        ])
-
-        @app.callback(
-                Output('manure_management_graph', 'figure'),
-                [Input('pen_id', 'value')]
-        )
-        def update_graph(pen_id):
-            df = self.df[self.df['pen_id'] == pen_id]
-            return px.line(
-                    df,
-                    x='sim_day',
-                    y='manure__Manure_Mass__(kg)',
-                    title=f'Manure Mass for Pen {pen_id}'
-            )
-
-        app.run_server()
-
-
-class DashApp:
-    def __init__(self):
-        self.df = pd.read_csv('../output/csv/manure_management_output_10_31_2022__20_00.csv')
-
-    @staticmethod
-    def _format_label(label: str) -> str:
-        """Formats the specified label."""
-        return label.replace('pen__', 'Pen - ') \
-            .replace('manure__', 'Input manure - ') \
-            .replace('handler__', 'Handler - ') \
-            .replace('rp__', 'Reception Pit - ') \
-            .replace('sep__', 'Separator - ') \
-            .replace('tx__', 'Treatment - ') \
-            .replace('__', ' ').replace('_', ' ')
-
-    def make_dash_app(self) -> None:
-        app = dash.Dash()
-        variables = [{'label': self._format_label(variable), 'value': variable} for variable in self.df.columns
-                     if all([marker not in variable.lower() for marker in ['pen_id', 'simulation_day', 'sim_day']]) and
-                     self.df[variable].dtype.kind in 'iuf']
-        app.layout = html.Div(children=[
-            html.H2(children='Manure Management',
-                    ),
-            html.Label('Variable:'),
-            dcc.Dropdown(
-                    id='variable',
-                    options=variables,
-                    value=variables[0]['value'],
-                    style={'border-radius': '15px', 'margin': '10px 0 20px 0'}
-            ),
-            dcc.Graph(id='manure_management_graph',
-                      style={'border-radius': '15px'})
-        ], style={'backgroundColor': '#BCCEF8', 'color': '#3F0071', 'fontFamily': 'Helvetica',
-                  'textAlign': 'center', 'border-radius': '15px', 'padding': '20px', 'margin': '0'})
-
-        @app.callback(
-                Output('manure_management_graph', 'figure'),
-                [
-                    Input('variable', 'value')
-                ]
-        )
-        def update_graph(variable):
-            df = self.df[['pen_id', 'sim_day', variable]]
-            print(df)
-            return px.line(
-                    df,
-                    x='sim_day',
-                    y=variable,
-                    color='pen_id',
-                    title=f'{self._format_label(variable)}'
-            ).update_layout(
-                    xaxis_title='Simulation Day',
-                    yaxis_title=self._format_label(variable),
-                    legend_title='Pen id',
-                    font=dict(
-                            family="Roboto, sans-serif",
-                            size=14,
-                            color="#7f7f7f"
-                    )
-            )
-
-        app.run_server()
-
-
-if __name__ == '__main__':
-    app = DashApp()
-    app.make_dash_app()
