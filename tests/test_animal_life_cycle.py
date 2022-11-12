@@ -142,19 +142,19 @@ def test_initialize_herd(mocker: MockerFixture, life_cycle_manager: LifeCycleMan
     mocker.patch('RUFAS.routines.animal.life_cycle.life_cycle.AnimalInitialization',
                  return_value=mock_animal_initializer)
 
-    mock_set_avg_CI = mocker.patch.object(life_cycle_manager, '_set_avg_CI')
-    mock_get_animals = mocker.patch.object(life_cycle_manager, '_get_animals')
+    patch_set_avg_CI = mocker.patch.object(life_cycle_manager, '_set_avg_CI')
+    patch_get_animals = mocker.patch.object(life_cycle_manager, '_get_animals')
 
     results = life_cycle_manager.initialize_herd(**herd_data)
 
     assert life_cycle_manager.herd_num == herd_data['herd_num']
-    mock_set_avg_CI.assert_called_once()
-    assert mock_get_animals.call_count == 5
-    assert mock_get_animals.call_args_list[0] == mocker.call(Calf, herd_data['calf_num'], breed)
-    assert mock_get_animals.call_args_list[1] == mocker.call(HeiferI, herd_data['heiferI_num'], breed)
-    assert mock_get_animals.call_args_list[2] == mocker.call(HeiferII, herd_data['heiferII_num'], breed)
-    assert mock_get_animals.call_args_list[3] == mocker.call(HeiferIII, herd_data['heiferIII_num'], breed)
-    assert mock_get_animals.call_args_list[4] == mocker.call(Cow, herd_data['cow_num'], breed)
+    patch_set_avg_CI.assert_called_once()
+    assert patch_get_animals.call_count == 5
+    assert patch_get_animals.call_args_list[0] == mocker.call(Calf, herd_data['calf_num'], breed)
+    assert patch_get_animals.call_args_list[1] == mocker.call(HeiferI, herd_data['heiferI_num'], breed)
+    assert patch_get_animals.call_args_list[2] == mocker.call(HeiferII, herd_data['heiferII_num'], breed)
+    assert patch_get_animals.call_args_list[3] == mocker.call(HeiferIII, herd_data['heiferIII_num'], breed)
+    assert patch_get_animals.call_args_list[4] == mocker.call(Cow, herd_data['cow_num'], breed)
     mock_animal_initializer.get_replacement_cows.assert_called_once_with(herd_data['replace_num'], breed)
     assert life_cycle_manager.replacement_market == mock_replacement_cows
     assert len(results) == 5
@@ -205,8 +205,8 @@ def test_reset_cull_reason_stats(life_cycle_manager: LifeCycleManager) -> None:
         assert life_cycle_manager.cull_reason_stats_percent[cull_reason] == approx(0.0)
 
 
-def test_wean_calf(mocker: MockerFixture) -> None:
-    """Unit test for function _wean_calf in file life_cycle.py"""
+def test_convert_calf_to_heiferI(mocker: MockerFixture) -> None:
+    """Unit test for function _convert_calf_to_heiferI in file life_cycle.py"""
     calf_body_weight_history = [10.0, 20.0]
     calf_pen_history = [mocker.MagicMock(autospec=Pen) for _ in range(2)]
 
@@ -221,7 +221,7 @@ def test_wean_calf(mocker: MockerFixture) -> None:
     mock_new_heiferI = mocker.MagicMock(autospec=HeiferI)
     mocker.patch('RUFAS.routines.animal.life_cycle.life_cycle.HeiferI',
                  return_value=mock_new_heiferI)
-    LifeCycleManager._wean_calf(mock_calf, heiferIs)
+    LifeCycleManager._convert_calf_to_heiferI(mock_calf, heiferIs)
 
     mock_calf_vals.update.assert_called_once_with({
         'body_weight_history': calf_body_weight_history,
@@ -231,12 +231,12 @@ def test_wean_calf(mocker: MockerFixture) -> None:
     assert heiferIs[0] == mock_new_heiferI  # check identity
 
 
-def test_calf_to_heiferI(mocker: MockerFixture, life_cycle_manager: LifeCycleManager) -> None:
-    """Unit test for function _calf_to_heiferI in file life_cycle.py"""
+def test_evaluate_calves_for_weaning(mocker: MockerFixture, life_cycle_manager: LifeCycleManager) -> None:
+    """Unit test for function _evaluate_calves_for_weaning in file life_cycle.py"""
     sim_day = 10
     mock_weaned_calf = mocker.MagicMock(autospec=Calf)
     mock_weaned_calf.update.return_value = True
-    mock_wean_calf = mocker.patch.object(life_cycle_manager, '_wean_calf')
+    patch_convert_calf_to_heiferI = mocker.patch.object(life_cycle_manager, '_convert_calf_to_heiferI')
 
     mock_matured_calf = mocker.MagicMock(autospec=Calf)
     mock_matured_calf.update.return_value = False
@@ -248,10 +248,11 @@ def test_calf_to_heiferI(mocker: MockerFixture, life_cycle_manager: LifeCycleMan
     total_animal_num = 0
     life_cycle_manager.avg_mature_body_weight = 0.0
 
-    new_total_animal_num = life_cycle_manager._calf_to_heiferI(sim_day, mock_calves, heiferIs, total_animal_num)
+    new_total_animal_num = life_cycle_manager._evaluate_calves_for_weaning(sim_day, mock_calves, heiferIs,
+                                                                           total_animal_num)
 
     mock_weaned_calf.update.assert_called_once_with(sim_day)
-    mock_wean_calf.assert_called_once_with(mock_weaned_calf, heiferIs)
+    patch_convert_calf_to_heiferI.assert_called_once_with(mock_weaned_calf, heiferIs)
 
     mock_matured_calf.update.assert_called_once_with(sim_day)
     assert life_cycle_manager.calf_num == 1
@@ -262,8 +263,8 @@ def test_calf_to_heiferI(mocker: MockerFixture, life_cycle_manager: LifeCycleMan
     assert life_cycle_manager.avg_mature_body_weight == approx(mature_body_weight)
 
 
-def test_move_heiferI_to_second_stage(mocker: MockerFixture) -> None:
-    """Unit test for function _move_heiferI_to_second_stage in file life_cycle.py"""
+def test_convert_heiferI_to_heiferII(mocker: MockerFixture) -> None:
+    """Unit test for function _convert_heiferI_to_heiferII in file life_cycle.py"""
     heiferI_body_weight_history = [30.0, 40.0]
     heiferI_pen_history = [mocker.MagicMock(autospec=Pen) for _ in range(2)]
 
@@ -289,7 +290,7 @@ def test_move_heiferI_to_second_stage(mocker: MockerFixture) -> None:
     }
     mocker.patch('RUFAS.routines.animal.life_cycle.life_cycle.AnimalBase.config', animal_base_config)
 
-    LifeCycleManager._move_heiferI_to_second_stage(mock_heiferI, heiferIIs)
+    LifeCycleManager._convert_heiferI_to_heiferII(mock_heiferI, heiferIIs)
 
     assert mock_heiferI_vals.update.mock_calls == [
         mocker.call({
@@ -305,13 +306,14 @@ def test_move_heiferI_to_second_stage(mocker: MockerFixture) -> None:
     assert heiferIIs[0] == mock_new_heiferII  # check identity
 
 
-def test_heiferI_to_heiferII(mocker: MockerFixture, life_cycle_manager: LifeCycleManager) -> None:
-    """Unit test for function _heiferI_to_heiferII in file life_cycle.py"""
+def test_evaluate_heiferIs_for_transitioning_to_heiferIIs(mocker: MockerFixture,
+                                                          life_cycle_manager: LifeCycleManager) -> None:
+    """Unit test for function _evaluate_heiferIs_for_transitioning_to_heiferIIs in file life_cycle.py"""
     sim_day = 100
     mock_heiferI_second_stage = mocker.MagicMock(autospec=HeiferI)
     mock_heiferI_second_stage.update.return_value = True
-    mock_move_heiferI_to_second_stage = mocker.patch.object(life_cycle_manager,
-                                                            '_move_heiferI_to_second_stage')
+    patch_convert_heiferI_to_heiferII = mocker.patch.object(life_cycle_manager,
+                                                            '_convert_heiferI_to_heiferII')
 
     mock_matured_heiferI = mocker.MagicMock(autospec=HeiferI)
     mock_matured_heiferI.update.return_value = False
@@ -323,12 +325,12 @@ def test_heiferI_to_heiferII(mocker: MockerFixture, life_cycle_manager: LifeCycl
     total_animal_num = 0
     life_cycle_manager.avg_mature_body_weight = 0.0
 
-    new_total_animal_num = life_cycle_manager._heiferI_to_heiferII(sim_day, mock_heiferIs,
-                                                                   mock_heiferIIs,
-                                                                   total_animal_num)
+    new_total_animal_num = life_cycle_manager._evaluate_heiferIs_for_transitioning_to_heiferIIs(sim_day, mock_heiferIs,
+                                                                                                mock_heiferIIs,
+                                                                                                total_animal_num)
 
     mock_heiferI_second_stage.update.assert_called_once_with(sim_day)
-    mock_move_heiferI_to_second_stage.assert_called_once_with(mock_heiferI_second_stage, mock_heiferIIs)
+    patch_convert_heiferI_to_heiferII.assert_called_once_with(mock_heiferI_second_stage, mock_heiferIIs)
 
     mock_matured_heiferI.update.assert_called_once_with(sim_day)
     assert life_cycle_manager.heiferI_num == 1
@@ -339,8 +341,8 @@ def test_heiferI_to_heiferII(mocker: MockerFixture, life_cycle_manager: LifeCycl
     assert life_cycle_manager.avg_mature_body_weight == approx(mature_body_weight)
 
 
-def test_move_heiferII_to_third_stage(mocker: MockerFixture) -> None:
-    """Unit test for function _move_heiferII_to_third_stage in file life_cycle.py"""
+def test_convert_heiferII_to_heiferIII(mocker: MockerFixture) -> None:
+    """Unit test for function _convert_heiferII_to_heiferIII in file life_cycle.py"""
     heiferII_body_weight_history = [50.0, 60.0]
     heiferII_pen_history = [mocker.MagicMock(autospec=Pen) for _ in range(2)]
     heiferII_conceptus_weight = 10.0
@@ -359,7 +361,7 @@ def test_move_heiferII_to_third_stage(mocker: MockerFixture) -> None:
     mock_new_heiferIII = mocker.MagicMock(autospec=HeiferIII)
     mocker.patch('RUFAS.routines.animal.life_cycle.life_cycle.HeiferIII',
                  return_value=mock_new_heiferIII)
-    LifeCycleManager._move_heiferII_to_third_stage(mock_heiferII, heiferIIIs)
+    LifeCycleManager._convert_heiferII_to_heiferIII(mock_heiferII, heiferIIIs)
 
     mock_heiferII_vals.update.assert_called_once_with({
         'body_weight_history': heiferII_body_weight_history,
@@ -416,12 +418,10 @@ def test_extract_repro_stats_from_heiferII(mocker: MockerFixture,
     assert life_cycle_manager.ed_period_h == mock_data['ED_days']
 
 
-def test_keep_heiferII_as_pregnant(mocker: MockerFixture, life_cycle_manager: LifeCycleManager) -> None:
-    """Unit test for function _keep_heiferII_as_pregnant in file life_cycle.py"""
-    # Set up
+def test_remain_heiferII(mocker: MockerFixture, life_cycle_manager: LifeCycleManager) -> None:
+    """Unit test for function _remain_heiferII in file life_cycle.py"""
+    # Arrange
     mock_heiferII = mocker.MagicMock(autospec=HeiferII)
-    spy_extract_repro_stats = mocker.spy(life_cycle_manager, '_extract_repro_stats_from_heiferII')
-
     total_animal_num = 10
     life_cycle_manager.avg_mature_body_weight = 20.0
     mock_heiferII.mature_body_weight = 42.0
@@ -430,7 +430,7 @@ def test_keep_heiferII_as_pregnant(mocker: MockerFixture, life_cycle_manager: Li
     life_cycle_manager.avg_breeding_to_preg_time = 20.0
     mock_heiferII.breeding_to_preg_time = 42.0
 
-    # Before
+    # Assert before
     assert life_cycle_manager.heiferII_num == 0
     assert life_cycle_manager.avg_mature_body_weight == approx(20.0)
     assert life_cycle_manager.avg_breeding_to_preg_time == approx(20.0)
@@ -439,17 +439,17 @@ def test_keep_heiferII_as_pregnant(mocker: MockerFixture, life_cycle_manager: Li
     result = life_cycle_manager._remain_heiferII(mock_heiferII, total_animal_num, preg_heifer_num)
     new_total_animal_num, new_preg_heifer_num = result
 
-    # After
+    # Assert after
     assert life_cycle_manager.heiferII_num == 1
     assert new_total_animal_num == 11
     assert life_cycle_manager.avg_mature_body_weight == approx(22.0)
     assert new_preg_heifer_num == 11
     assert life_cycle_manager.avg_breeding_to_preg_time == approx(22.0)
-    spy_extract_repro_stats.assert_called_once()
 
 
-def test_heiferII_to_heiferIII(mocker: MockerFixture, life_cycle_manager: LifeCycleManager) -> None:
-    """Unit test for function _heiferII_to_heiferIII in file life_cycle.py"""
+def test_evaluate_heiferIIs_for_transitioning_to_heiferIIIs(mocker: MockerFixture,
+                                                            life_cycle_manager: LifeCycleManager) -> None:
+    """Unit test for function _evaluate_heiferIIs_for_transitioning_to_heiferIIIs in file life_cycle.py"""
     # Set up
     sim_day = 300
     mock_heiferII_cull_stage = mocker.MagicMock(autospec=HeiferII)
@@ -461,14 +461,14 @@ def test_heiferII_to_heiferIII(mocker: MockerFixture, life_cycle_manager: LifeCy
 
     mock_heiferII_third_stage = mocker.MagicMock(autospec=HeiferII)
     mock_heiferII_third_stage.update.return_value = [False, True]  # cull_stage = False, third_stage = True
-    mock_move_heiferII_to_third_stage = mocker.patch.object(life_cycle_manager,
-                                                            '_move_heiferII_to_third_stage')
+    patch_convert_heiferII_to_heiferIII = mocker.patch.object(life_cycle_manager,
+                                                              '_convert_heiferII_to_heiferIII')
 
     mock_heiferII_pregnant_stage = mocker.MagicMock(autospec=HeiferII)
     mock_heiferII_pregnant_stage.update.return_value = [False, False]  # cull_stage = False, third_stage = False
-    mock_keep_heiferII_as_pregnant = mocker.patch.object(life_cycle_manager,
-                                                         '_remain_heiferII')
-    mock_keep_heiferII_as_pregnant.return_value = (1, 1)  # new_total_animal_num = 1, new_preg_heifer_num = 1
+    patch_remain_heiferII = mocker.patch.object(life_cycle_manager,
+                                                '_remain_heiferII')
+    patch_remain_heiferII.return_value = (1, 1)  # new_total_animal_num = 1, new_preg_heifer_num = 1
     total_animal_num = 0
     preg_heifer_num = 0
 
@@ -483,9 +483,9 @@ def test_heiferII_to_heiferIII(mocker: MockerFixture, life_cycle_manager: LifeCy
     assert len(life_cycle_manager.culled_heifers) == 0
 
     # Act
-    result = life_cycle_manager._heiferII_to_heiferIII(sim_day, mock_heiferIIs,
-                                                       mock_heiferIIIs, preg_heifer_num,
-                                                       total_animal_num)
+    result = life_cycle_manager._evaluate_heiferIIs_for_transitioning_to_heiferIIIs(sim_day, mock_heiferIIs,
+                                                                                    mock_heiferIIIs, preg_heifer_num,
+                                                                                    total_animal_num)
     new_total_animal_num, new_preg_heifer_num = result
 
     # After
@@ -495,10 +495,10 @@ def test_heiferII_to_heiferIII(mocker: MockerFixture, life_cycle_manager: LifeCy
     assert life_cycle_manager.culled_heifers[0] == mock_heiferII_cull_stage
     mock_heiferII_cull_stage.update.assert_called_once_with(sim_day)
 
-    mock_move_heiferII_to_third_stage.assert_called_once_with(mock_heiferII_third_stage, mock_heiferIIIs)
+    patch_convert_heiferII_to_heiferIII.assert_called_once_with(mock_heiferII_third_stage, mock_heiferIIIs)
 
-    mock_keep_heiferII_as_pregnant.assert_called_once_with(mock_heiferII_pregnant_stage,
-                                                           total_animal_num, preg_heifer_num)
+    patch_remain_heiferII.assert_called_once_with(mock_heiferII_pregnant_stage,
+                                                  total_animal_num, preg_heifer_num)
     assert new_total_animal_num == 1
     assert new_preg_heifer_num == 1
     assert len(mock_heiferIIs) == 1
@@ -506,7 +506,7 @@ def test_heiferII_to_heiferIII(mocker: MockerFixture, life_cycle_manager: LifeCy
 
 
 def test_move_heiferIII_to_cow_stage(mocker: MockerFixture) -> None:
-    """Unit test for function _move_heiferIII_to_cow_stage in file life_cycle.py"""
+    """Unit test for function _convert_heiferIII_to_cow in file life_cycle.py"""
     # Arrange
     heiferIII_body_weight_history = [30.0, 40.0]
     heiferIII_pen_history = [mocker.MagicMock(autospec=Pen) for _ in range(2)]
@@ -540,7 +540,7 @@ def test_move_heiferIII_to_cow_stage(mocker: MockerFixture) -> None:
     mocker.patch('RUFAS.routines.animal.life_cycle.life_cycle.AnimalBase.config', animal_base_config)
 
     # Act
-    LifeCycleManager._move_heiferIII_to_cow_stage(mock_heiferIII, cows)
+    LifeCycleManager._convert_heiferIII_to_cow(mock_heiferIII, cows)
 
     # Assert
     assert mock_heiferIII_vals.update.mock_calls == [
@@ -560,13 +560,13 @@ def test_move_heiferIII_to_cow_stage(mocker: MockerFixture) -> None:
     assert cows[0] == mock_new_cow  # check identity
 
 
-def test_heiferIII_to_cow(mocker: MockerFixture, life_cycle_manager: LifeCycleManager) -> None:
-    """Unit test for function _heiferIII_to_cow in file life_cycle.py"""
+def test_transition_heiferIII_to_cow(mocker: MockerFixture, life_cycle_manager: LifeCycleManager) -> None:
+    """Unit test for function _evaluate_heiferIIIs_for_transitioning_to_cows in file life_cycle.py"""
     sim_day = 400
     mock_heiferIII_cow_stage = mocker.MagicMock(autospec=HeiferIII)
     mock_heiferIII_cow_stage.update.return_value = True
-    mock_move_heiferIII_to_cow_stage = mocker.patch.object(life_cycle_manager,
-                                                           '_move_heiferIII_to_cow_stage')
+    patch_convert_heiferIII_to_cow = mocker.patch.object(life_cycle_manager,
+                                                         '_convert_heiferIII_to_cow')
 
     mock_matured_heiferIII = mocker.MagicMock(autospec=HeiferIII)
     mock_matured_heiferIII.update.return_value = False
@@ -584,13 +584,13 @@ def test_heiferIII_to_cow(mocker: MockerFixture, life_cycle_manager: LifeCycleMa
     assert life_cycle_manager.avg_mature_body_weight == approx(0.0)
 
     # Act
-    new_total_animal_num = life_cycle_manager._heiferIII_to_cow(sim_day, mock_heiferIIIs,
-                                                                mock_cows,
-                                                                total_animal_num)
+    new_total_animal_num = life_cycle_manager._evaluate_heiferIIIs_for_transitioning_to_cows(sim_day, mock_heiferIIIs,
+                                                                                             mock_cows,
+                                                                                             total_animal_num)
 
     # Assert after
     mock_heiferIII_cow_stage.update.assert_called_once_with(sim_day)
-    mock_move_heiferIII_to_cow_stage.assert_called_once_with(mock_heiferIII_cow_stage, mock_cows)
+    patch_convert_heiferIII_to_cow.assert_called_once_with(mock_heiferIII_cow_stage, mock_cows)
 
     mock_matured_heiferIII.update.assert_called_once_with(sim_day)
     assert life_cycle_manager.heiferIII_num == 1
@@ -784,8 +784,7 @@ def test_check_if_replacement_heifers_needed(mocker: MockerFixture,
 
 
 def test_cull_cow(mocker: MockerFixture, life_cycle_manager: LifeCycleManager) -> None:
-    """Unit test for function _cull_cow in file life_cycle.py"""
-
+    """Unit test for function _cull_cow() in file life_cycle.py"""
     # Arrange
     mock_cow: Cow = mocker.MagicMock(autospec=Cow)
     mock_cow.cull_reason = LOW_PROD_CULL
@@ -870,6 +869,7 @@ def test_handle_cow_body_weight_and_parity(mocker: MockerFixture,
 def test_handle_cow_milking(mocker: MockerFixture,
                             life_cycle_manager: LifeCycleManager,
                             is_cow_milking: bool) -> None:
+    """Unit test for function _handle_cow_milking() in file life_cycle.py"""
     # Arrange
     mock_cow = mocker.MagicMock(autospec=Cow)
     mock_cow.milking = is_cow_milking
@@ -966,7 +966,6 @@ def test_handle_cow_CI(mocker: MockerFixture, life_cycle_manager: LifeCycleManag
 
 def test_extract_repro_stats_from_cow(mocker: MockerFixture, life_cycle_manager: LifeCycleManager) -> None:
     """Unit test for function _extract_repro_stats_from_cow() in file life_cycle.py"""
-
     # Arrange
     mock_cow = mocker.MagicMock(autospec=Cow)
     mock_cow.GnRH_injections = 1
@@ -999,6 +998,10 @@ def test_extract_repro_stats_from_cow(mocker: MockerFixture, life_cycle_manager:
     assert life_cycle_manager.preg_check_num == expected_preg_check_num
     assert life_cycle_manager.semen_num == expected_semen_num
     assert life_cycle_manager.ai_num == expected_ai_num
+
+
+def test_handle_new_born(mocker: MockerFixture, life_cycle_manager: LifeCycleManager) -> None:
+    pass
 
 
 @pytest.mark.parametrize('cow_calves', [1, 2, 3, 4])
@@ -1044,11 +1047,11 @@ def test_handle_cow_calves(mocker: MockerFixture, life_cycle_manager: LifeCycleM
 
 
 @pytest.mark.parametrize('total_animal_num', [0, 50, 100])
-def test_calc_herd_percentages(mocker: MockerFixture, life_cycle_manager: LifeCycleManager,
-                               total_animal_num: int) -> None:
-    """Unit test for function _calc_herd_percentages() in file life_cycle.py."""
-    calf_num = heiferI_num = heiferII_num = heiferIII_num = cow_num = 0
+def test_calculate_herd_percentages(mocker: MockerFixture, life_cycle_manager: LifeCycleManager,
+                                    total_animal_num: int) -> None:
+    """Unit test for function _calculate_herd_percentages() in file life_cycle.py."""
     # Arrange
+    calf_num = heiferI_num = heiferII_num = heiferIII_num = cow_num = 0
     if total_animal_num > 0:
         life_cycle_manager.calf_num = calf_num = int(0.2 * total_animal_num)
         life_cycle_manager.heiferI_num = heiferI_num = int(0.2 * total_animal_num)
@@ -1056,10 +1059,10 @@ def test_calc_herd_percentages(mocker: MockerFixture, life_cycle_manager: LifeCy
         life_cycle_manager.heiferIII_num = heiferIII_num = int(0.2 * total_animal_num)
         life_cycle_manager.cow_num = cow_num = (total_animal_num - calf_num - heiferI_num
                                                 - heiferII_num - heiferIII_num)
-    spy_calc_herd_percentages = mocker.spy(life_cycle_manager, '_calc_herd_percentages')
+    spy_calc_herd_percentages = mocker.spy(life_cycle_manager, '_calculate_herd_percentages')
 
     # Act
-    life_cycle_manager._calc_herd_percentages(total_animal_num)
+    life_cycle_manager._calculate_herd_percentages(total_animal_num)
 
     # Assert
     spy_calc_herd_percentages.assert_called_once_with(total_animal_num)
@@ -1075,3 +1078,103 @@ def test_calc_herd_percentages(mocker: MockerFixture, life_cycle_manager: LifeCy
         assert life_cycle_manager.heiferII_percent == approx(0.0)
         assert life_cycle_manager.heiferIII_percent == approx(0.0)
         assert life_cycle_manager.cow_percent == approx(0.0)
+
+
+@pytest.mark.parametrize('cow_num', [0, 50, 100])
+def test_calc_cow_percentages(mocker: MockerFixture, life_cycle_manager: LifeCycleManager,
+                              cow_num: int) -> None:
+    """Unit test for function _calculate_cow_percentages() in file life_cycle.py."""
+    # Arrange
+    dry_cow_num = milking_cow_num = preg_cow_num = open_cow_num = vwp_cow_num = 0
+    life_cycle_manager.cow_num = cow_num
+    if cow_num > 0:
+        life_cycle_manager.dry_cow_num = dry_cow_num = int(0.2 * cow_num)
+        life_cycle_manager.milking_cow_num = milking_cow_num = int(0.2 * cow_num)
+        life_cycle_manager.preg_cow_num = preg_cow_num = int(0.2 * cow_num)
+        life_cycle_manager.open_cow_num = open_cow_num = int(0.2 * cow_num)
+        life_cycle_manager.vwp_cow_num = vwp_cow_num = (cow_num - dry_cow_num - milking_cow_num
+                                                        - preg_cow_num - open_cow_num)
+    spy_calc_cow_percentages = mocker.spy(life_cycle_manager, '_calculate_cow_percentages')
+
+    # Act
+    life_cycle_manager._calculate_cow_percentages()
+
+    # Assert
+    spy_calc_cow_percentages.assert_called_once()
+    if cow_num > 0:
+        assert life_cycle_manager.dry_cow_percent == approx(dry_cow_num * 100.0 / cow_num)
+        assert life_cycle_manager.milking_cow_percent == approx(milking_cow_num * 100.0 / cow_num)
+        assert life_cycle_manager.preg_cow_percent == approx(preg_cow_num * 100.0 / cow_num)
+        assert life_cycle_manager.non_preg_cow_percent == approx((open_cow_num + vwp_cow_num)
+                                                                 * 100.0 / cow_num)
+    elif cow_num == 0:
+        assert life_cycle_manager.dry_cow_percent == approx(0.0)
+        assert life_cycle_manager.milking_cow_percent == approx(0.0)
+        assert life_cycle_manager.preg_cow_percent == approx(0.0)
+        assert life_cycle_manager.non_preg_cow_percent == approx(0.0)
+
+
+@pytest.mark.parametrize('cow_num', [0, 50, 100])
+def test_calc_cull_reason_stats_percent(mocker: MockerFixture, life_cycle_manager: LifeCycleManager,
+                                        cow_num: int) -> None:
+    """Unit test for function _calculate_cull_reason_stats_percent() in file life_cycle.py."""
+    # Arrange
+    life_cycle_manager.cow_num = cow_num
+    num_reasons = len(LifeCycleManager.cull_reason_stats)
+    LifeCycleManager.cull_reason_stats.update({
+        animal_constants.DEATH_CULL: int(cow_num / num_reasons),
+        animal_constants.LOW_PROD_CULL: int(cow_num / num_reasons),
+        animal_constants.LAMENESS_CULL: int(cow_num / num_reasons),
+        animal_constants.INJURY_CULL: int(cow_num / num_reasons),
+        animal_constants.MASTITIS_CULL: int(cow_num / num_reasons),
+        animal_constants.DISEASE_CULL: int(cow_num / num_reasons),
+        animal_constants.UDDER_CULL: int(cow_num / num_reasons),
+        animal_constants.UNKNOWN_CULL: 0  # Initialized with 0
+    })
+    LifeCycleManager.cull_reason_stats[animal_constants.UNKNOWN_CULL] = \
+        cow_num - sum(LifeCycleManager.cull_reason_stats.values())
+
+    spy_calc_cull_reason_stats_percent = mocker.spy(life_cycle_manager, '_calculate_cull_reason_stats_percent')
+
+    # Act
+    life_cycle_manager._calculate_cull_reason_stats_percent()
+
+    # Assert
+    spy_calc_cull_reason_stats_percent.assert_called_once()
+    for cull_reason in life_cycle_manager.cull_reason_stats_percent:
+        if cow_num > 0:
+            assert life_cycle_manager.cull_reason_stats_percent[cull_reason] == \
+                   approx(LifeCycleManager.cull_reason_stats[cull_reason] * 100.0 / cow_num)
+        elif cow_num == 0:
+            assert life_cycle_manager.cull_reason_stats_percent[cull_reason] == approx(0.0)
+
+
+@pytest.mark.parametrize('cow_num', [0, 50, 100])
+def test_calc_percent_cow_per_parity(mocker: MockerFixture, life_cycle_manager: LifeCycleManager,
+                                     cow_num: int) -> None:
+    """Unit test for function _calculate_percent_cow_per_parity() in file life_cycle.py."""
+    # Arrange
+    life_cycle_manager.cow_num = cow_num
+    num_parities = len(LifeCycleManager.num_cow_for_parity)
+    LifeCycleManager.num_cow_for_parity.update({
+        '1': int(cow_num / num_parities),
+        '2': int(cow_num / num_parities),
+        '3': int(cow_num / num_parities),
+        'greater_than_3': 0
+    })
+    LifeCycleManager.num_cow_for_parity['greater_than_3'] = \
+        cow_num - sum(LifeCycleManager.num_cow_for_parity.values())
+
+    spy_calc_percent_cow_per_parity = mocker.spy(life_cycle_manager, '_calculate_percent_cow_per_parity')
+
+    # Act
+    life_cycle_manager._calculate_percent_cow_per_parity()
+
+    # Assert
+    spy_calc_percent_cow_per_parity.assert_called_once()
+    for parity in life_cycle_manager.num_cow_for_parity:
+        if cow_num > 0:
+            assert life_cycle_manager.percent_cow_for_parity[parity] == \
+                   approx(LifeCycleManager.num_cow_for_parity[parity] * 100.0 / cow_num)
+        elif cow_num == 0:
+            assert life_cycle_manager.percent_cow_for_parity[parity] == approx(0.0)
