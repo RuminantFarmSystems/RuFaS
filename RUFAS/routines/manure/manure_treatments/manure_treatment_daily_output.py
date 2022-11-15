@@ -30,6 +30,15 @@ class ManureTreatmentDailyOutput:
     K: float = 0.0
     final_manure_volume: float = 0.0
 
+    sludge_TS: float = 0.0
+    sludge_VS: float = 0.0
+    sludge_N: float = 0.0
+    sludge_P: float = 0.0
+    sludge_K: float = 0.0
+
+    accumulated_sludge_TS: float = 0.0
+    accumulated_minimum_treatment_volume: float = 0.0
+
     def __add__(self, other: ManureTreatmentDailyOutput) -> ManureTreatmentDailyOutput:
         """Adds corresponding attributes between this output and another.
 
@@ -47,12 +56,30 @@ class ManureTreatmentDailyOutput:
             attr1 + attr2 for attr1, attr2 in zip(astuple(self), astuple(other))
         ])
 
-# @dataclass
-# class SludgeOutput(TreatmentOutput):
-#     """Description: This class is for tracking sludge accumulated properties.
-#     """
-#     TS: float = 0.0
-#     VS: float = 0.0
-#     N_mass:float=0.0
-#     P_mass:float=0.0
-#     K_mass:float=0.0
+
+@dataclass
+class SludgeOutput:
+    """Description: This class is for tracking sludge accumulated properties.
+    """
+    TS: float = 0.0
+    VS: float = 0.0
+    N: float = 0.0
+    P: float = 0.0
+    K: float = 0.0
+
+    def __add__(self, other: SludgeOutput) -> SludgeOutput:
+        """Adds corresponding attributes between this output and another.
+
+        Args:
+            other: SludgeOutput object to add.
+
+        Returns:
+            SludgeOutput with corresponding attributes summed.
+
+        """
+        if not isinstance(other, SludgeOutput):
+            raise TypeError('Other must be of type SludgeOutput.')
+
+        return SludgeOutput(*[
+            attr1 + attr2 for attr1, attr2 in zip(astuple(self), astuple(other))
+        ])

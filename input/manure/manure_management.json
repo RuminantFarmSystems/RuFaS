@@ -129,8 +129,18 @@
       "P_removal_efficiency_for_treatment": 0.05,
       "K_removal_efficiency_for_treatment": 0.05,
       "storage_time_period": 120,
-      "precip_input": 0.0,
-      "freeboard_input": 0.0
+      "freeboard_input": 0.3048
+    },
+    {
+      "manure_treatment_type": "anaerobic lagoon",
+      "TS_removal_efficiency_for_treatment": 0.35,
+      "VS_removal_efficiency_for_treatment": 0.45,
+      "N_removal_efficiency_for_treatment": 0.30,
+      "TAN_removal_efficiency_for_treatment": 0.45,
+      "P_removal_efficiency_for_treatment": 0.35,
+      "K_removal_efficiency_for_treatment": 0.45,
+      "storage_time_period": 365,
+      "freeboard_input": 0.3048
     }
   ]
 }

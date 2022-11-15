@@ -39,7 +39,7 @@ class GasEmissions:
             Pvs: Fraction (0-1) volatile solids
             Bo: achievable emission of CH4 during anaerobic digestion, kg CH4/kg VS.
             E_CH4_pot: potential CH4 yield of the manure, kg CH4/kg VS.
-            n_eff: efficicency of process              TODO: confirm n_eff meaning
+            n_eff: efficiency of process              TODO: confirm n_eff meaning
             VS_loss_yesterday: VS loss from previous day.
 
 

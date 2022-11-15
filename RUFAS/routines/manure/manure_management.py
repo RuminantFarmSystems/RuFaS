@@ -191,6 +191,7 @@ class ManureManagement:
 
             treatment_daily_output = \
                 self.manure_treatments[mm_pen.id].daily_update(
+                        manure_handler_daily_output=manure_handler_daily_output,
                         reception_pit_daily_output=reception_pit_daily_output,
                         manure_separator_daily_output=manure_separator_daily_output,
                         sim_day=animal_management.simulation_day
