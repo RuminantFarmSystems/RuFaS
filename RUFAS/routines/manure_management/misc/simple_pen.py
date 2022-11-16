@@ -40,6 +40,7 @@ class SimplePen:
 
         self.housing_type: str = pen.housing_type
         self.bedding_type: str = pen.bedding_type
+        self.pen_type: str = pen.get_pen_type()
 
         self.manure_handler: str = pen.manure_handling
         self.manure_separator: str = pen.manure_separator
@@ -115,3 +116,27 @@ class SimplePen:
             return area.has_cows
         else:
             return area.no_cows
+
+
+    @property
+    def barn_area_from_pen_type(self) -> float:
+        """
+        Calculates the barn area for this pen depending on its housing type.
+
+        Returns
+        -------
+        Barn area. Units: m^2/animal.
+
+        """
+        BarnArea = NamedTuple('BarnArea', [('has_cows', float), ('no_cows', float)])
+        tie_stall = BarnArea(has_cows=1.5, no_cows=1.0)
+        free_stall = BarnArea(has_cows=3.5, no_cows=2.5)
+        default = free_stall
+
+        pen_type_to_barn_area = {
+            'tiestall': tie_stall,
+            'freestall': free_stall
+        }
+        area = pen_type_to_barn_area.get(self.pen_type, default)
+
+        return area.has_cows
