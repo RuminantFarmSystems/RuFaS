@@ -282,7 +282,10 @@ class GasEmissions:
         r = cls._calc_r_barn(tempC, hsc=HSC)
         M = U / area  # manure urine per area of exposed surface, kg/m^2
         Q = cls._calc_Q(tempK, pH)
-        return (TAN * c * p) / (r * M * Q)
+        if(r*M*Q>0):
+            return (TAN * c * p) / (r * M * Q)
+        else:
+            return 0
 
 
     @staticmethod
