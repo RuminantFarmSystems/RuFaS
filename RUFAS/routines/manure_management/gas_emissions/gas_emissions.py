@@ -256,6 +256,34 @@ class GasEmissions:
         M = U / area  # manure urine per area of exposed surface, kg/m^2
         Q = cls._calc_Q(tempK, pH)
         return (TAN * c * p) / (r * M * Q)
+    
+    @classmethod
+    def calc_E_NH3_storage_v2(cls,pen:SimplePen,TAN: float,U:float, tempC: float,HSC=260, area=3.5 ) -> float:
+        """Calculates NH3 storage emissions.
+        Parameters
+            pen: Simple pen to use lookup area
+            TAN: total ammonia nitrogen in manure, kg N/m^2.
+            U: total amount of manure urine in area of exposed surface, kg.
+            tempC: temperature, °C.
+            area: surface area for treatment, m^2.
+        Returns
+            NH3 storage emissions, kg N/m^2/day.
+        """
+        """ Constants
+                p: manure density, kg/m^3.
+                pH: manure acidity, dimensionless.
+                c: seconds in a day
+        """
+        p=990.0
+        pH=7.5
+        area = pen.barn_area_from_pen_type
+        c = 86_400  # seconds in a day
+        tempK = cls._convert_temp_C_to_K(tempC)
+        r = cls._calc_r_barn(tempC, hsc=HSC)
+        M = U / area  # manure urine per area of exposed surface, kg/m^2
+        Q = cls._calc_Q(tempK, pH)
+        return (TAN * c * p) / (r * M * Q)
+
 
     @staticmethod
     def _calc_hsc_from_dry_matter_content(TS: float) -> float:
