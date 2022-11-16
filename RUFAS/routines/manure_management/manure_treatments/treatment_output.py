@@ -20,6 +20,7 @@ class TreatmentOutput:
     accumulated_TS: float = 0.0
     accumulated_volume: float = 0.0
     ch4_emissions: float = 0.0
+    nh3_emissions: float = 0.0
     tempC:float = 0.0
     rainfall:float = 0.0
 
