@@ -1,23 +1,32 @@
 # !/usr/bin/env python3
 
-from typing import Any, Dict, Optional
+from typing import Any, Dict, List, Union
 import time
+
 
 class OutputManager (object):
     """
-    Output manager for Rufas simulation results. Works by collecting variables into
-    the pool, and populates requested output channels from the pool once the simulation
-    is done. 
+    Output manager for Rufas simulation results. Works by collecting variables
+    into the pool, and populates requested output channels from the pool once
+    the simulation is done. Warnings and errors are added to their own pools.
 
     Attributes
     ----------
-        pool (Dict[str, Any]): Contains variables reported from simulation engine
+    pool : Dict[str, Any]
+        Contains variables reported from simulation engine
+    warnings_pool : Dict[str, Any]
+        Contains warnings reported from simulation engine
+    errors_pool : Dict[str, Any]
+        Contains errors reported from simulation engine
     """
 
     def __init__(self) -> None:
         self.pool: Dict[str, Any] = {}
+        self.warnings_pool: Dict[str, Any] = {}
+        self.errors_pool: Dict[str, Any] = {}
 
-    def add_to_pool(self, name: str, value: Any, **kwargs: Dict[Any, Any]) -> None:
+    def add_to_pool(self, name: str, value: Any,
+                    **kwargs: Dict[str, Union[str, bool]]) -> None:
         """
         Adds a variable to the output pool.
 
@@ -27,7 +36,7 @@ class OutputManager (object):
             The name of the variable
         value : Any
             The value of the variable
-        kwargs : Dict[Any, Any]
+        kwargs : Dict[str, Union[str,bool]]
             Additional args, some are non-optional
         kwargs['caller_class'] : str
             The name of the class which called this function
@@ -39,10 +48,10 @@ class OutputManager (object):
             If present, overrides the automated suffix
         kwargs['suppress_prefix'] : bool, optional
             If present and True, suppresses the automated prefix generation.
-            Has no effect on manual prefixes.
+            Has no effect on manual prefix overrides.
         kwargs['suppress_suffix'] : bool, optional
             If present and True, suppresses the automated suffix generation.
-            Has no effect on manual suffix.
+            Has no effect on manual suffix overrides.
         kwargs['enforce_override'] : bool, optional
             If present and True, overrides the existing value in the pool if a
             name collision happens.
@@ -57,6 +66,7 @@ class OutputManager (object):
             **kwargs['fail_silently'] or **kwargs['enforce_override'] 
             are not set to True.
         """
+        function_name = self.add_to_pool.__name__
         key = self.__generate_key(name, kwargs)
         key_not_exists = self.pool.get(key) is None
         if key_not_exists:
@@ -64,14 +74,62 @@ class OutputManager (object):
             return
         if kwargs.get('enforce_override', False):
             self.pool[key] = value
+            self.add_warning(
+                "Key collision happened; the value was overriden per given flag.",
+                self.__class__.__name__, function_name, [key], kwargs)
             return
-        if not kwargs.get('fail_silently', False):
-            raise ValueError(f"Key {key} already exists in the pool." +
-                             "Consider using different name, prefix/suffix;" +
-                             "or turn the automated prefix/suffix generation on"
-                             )
+        if kwargs.get('fail_silently', False):
+            self.add_warning(
+                "Key collision happened; the value was overriden per given flag.",
+                self.__class__.__name__, function_name, [key], kwargs)
+            return
+        raise ValueError(f"Key {key} already exists in the pool." +
+                         "Consider using different name, prefix/suffix;" +
+                         "or turn the automated prefix/suffix generation on"
+                         )
 
-    def __generate_key(self, name: str, **kwargs: Dict[Any, Any]) -> str:
+    def add_warning(self, msg: str, caller_class: str, caller_function: str,
+                    *args: List[Any], **kwargs: Dict[Any, Any]) -> None:
+        """
+        Adds a warning message to the pool of warnings.
+
+        Parameters
+        ----------
+        msg : str
+            The warning message to be added to the pool
+        caller_class : str
+            The name of the class which called this function
+        caller_function : str
+            The name of the function which called this function    
+        *args: List[Any]
+            Contains any additional information to be added to the message  
+        **kwargs: Dict[Any, Any]
+            Contains any additional information to be added to the message
+        """
+        pass
+
+    def add_error(self, msg: str, caller_class: str, caller_function: str,
+                  *args: List[Any], **kwargs: Dict[Any, Any]) -> None:
+        """
+        Adds an error message to the pool of errors.
+
+        Parameters
+        ----------
+        msg : str
+            The error message to be added to the pool
+        caller_class : str
+            The name of the class which called this function
+        caller_function : str
+            The name of the function which called this function    
+        *args: List[Any]
+            Contains any additional information to be added to the message  
+        **kwargs: Dict[Any, Any]
+            Contains any additional information to be added to the message
+        """
+        pass
+
+    def __generate_key(self, name: str,
+                       **kwargs: Dict[str, Union[str, bool]]) -> str:
         """
         Generates key for the pool.
         See 'add_to_pool' docs for detailed arg description.
@@ -122,13 +180,7 @@ class OutputManager (object):
 
     def __get_suffix(self) -> str:
         """
-        Returns a suffix for a key in the pool by usin timestamp in ns.
+        Returns a suffix for a key in the pool by using timestamp in ns.
         This gurrantees that no name collision will happen.
         """
         return str(time.time())
-
-    def __read_json_configs(self) -> None:
-        pass
-
-    def save_to_file(self) -> None:
-        pass
