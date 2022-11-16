@@ -8,5 +8,9 @@ class Soil:
         self.lower_boundaries = [5, 8, 20]
         self.nitrates = [0.5, 1, 5]
 
+        #attrs for phosphorus_uptake
+        self.labile_phosphorus = []
+        self.phosphorus_uptake = []
+
     def update_evapotranspiration(self):
         self.evapotranspiration = self.evaporation + self.transpiration

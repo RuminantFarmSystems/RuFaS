@@ -1,20 +1,30 @@
 from math import log, exp
+from typing import List
+from SC_redesign.Crop_and_Soil.soil.soil import Soil
 
 class PhosphorusUptake:
     def __init__(self):
 
         #these attrs DO need initial values
-        self.optimal_phosphorus_biomass = None
-        self.actual_phosphorus_biomass = None
-        self.potential_phosphorus_uptake = None
-        self.mature_fractional_phosphorus = None
-        self.potential_phosphorus_biomass_increase = None
-        
+        self.actual_phosphorus_biomass = None       #bio_P
+        self.potential_phosphorus_uptake = None     #P_up
+        self.mature_fractional_phosphorus = None    #fr_p3
+        self.potential_phosphorus_biomass_increase = None  #d_biomass_max    ##i think clay has a diff name for this
+        self.previous_actual_biomass = None         #prev_biomass_actual
+        self.emergent_fractional_phosphorus = None  #fr_p1
+        self.previous_fraction_potential_heat_units = None #prev_fr_PHU
+        self.fraction_potential_heat_units_half_maturity = None #fr_PHU_50
+        self.half_mature_fractional_phosphorus = None #fr_p2
+        self.fraction_potential_heat_units_full_maturity = None #fr_PHU_100
+        self.near_mature_fractional_phosphorus = None #fr_p3ish
 
 
         #these attrs are to be set later, start out as None
+        self.fractional_biomass_phosphorus = None   #fr_P
+        self.optimal_phosphorus_biomass = None      #bio_P_opt
 
-    def update_all(soil, crop_type):
+
+    def phosphorus_uptake_driver(self,soil: Soil):
         """
         Description:
             Invokes the functions necessary to update phosphorus uptake information
@@ -26,16 +36,93 @@ class PhosphorusUptake:
             crop_type: an instance of a crop class
         """
 
-        calc_fr_P()
-        calc_optimal_phosphorus_biomass()
-        calc_potential_phosphorus_uptake()
-        calc_act_potential_phosphorus_uptake_each_layer(soil)
-        calc_actual_phosphorus_biomass(soil)
-        potential_phosphorus_uptaketake(soil)
+        self.determine_fractional_biomass_phosphorus()
+        self.determine_optimal_phosphorus_biomass()
+        # calc_potential_phosphorus_uptake()
+        # calc_act_potential_phosphorus_uptake_each_layer(soil)
+        # calc_actual_phosphorus_biomass(soil)
+        # potential_phosphorus_uptake(soil)
 
-    def determine_potential_phosphorus_uptake(self):
+    def determine_fractional_biomass_phosphorus(self) -> None:
+        """determine the fraction of phosphorus in the plant biomass"""
+
+        second = calc_second_shape_coefficient(self.fraction_potential_heat_units_half_maturity,self.half_mature_fractional_phosphorus,
+                        self.fraction_potential_heat_units_full_maturity,self.near_mature_fractional_phosphorus)
+        first = calc_first_shape_coefficient(second,self.fraction_potential_heat_units_half_maturity,self.half_mature_fractional_phosphorus)
+
+        self.fraction_biomass_phosphorus = calculate_fractional_biomass_phosphorus(first, second, self.previous_actual_biomass, 
+                    self.emergent_fractional_phosphorus, self.mature_fractional_phosphorus,self.previous_fraction_potential_heat_units)
+
+    def determine_potential_phosphorus_uptake(self) -> None:
+        """determine the plants potential phosphorus uptake"""
         self.potential_phosphorus_uptake = calc_potential_phosphorus_uptake(self.optimal_phosphorus_biomass, self.actual_phosphorus_biomass,
                                                             self.mature_fractional_phosphorus, self.potential_phosphorus_biomass_increase)
+
+    def determine_optimal_phosphorus_biomass(self) -> None:
+        self.optimal_phosphorus_biomass = calc_optimal_phosphorus_biomass(self.previous_actual_biomass, self.fraction_biomass_phosphorus)
+
+    def determine_actual_phosphorus_biomass(self) -> None:
+        pass 
+
+
+
+
+
+def calc_second_shape_coefficient(fraction_potential_heat_units_half_maturity: float, half_mature_fractional_phosphorus: float,
+                            fraction_potential_heat_units_full_maturity: float, near_mature_fractional_phosphorus: float) -> float:
+    """Description:
+            Calculates the second shape coefficient
+
+        Args:
+            fraction_potential_heat_units_half_mature: fractional potential heat units at 50% maturity
+            half_mature_fractional_phosphorus: fraction of phosphorus in the biomass at 50% maturity
+            fraction_potential_heat_units_full_maturity: fractional potential heat unit at 100% maturity
+            near_mature_fractional_phosphorus: fraction of phosphorus in the biomass at near 100% maturity
+
+        Returns:
+            the second shape coefficient
+    """
+
+    first_term = calc_logarithmic_term_of_coefficient(fraction_potential_heat_units_half_maturity,half_mature_fractional_phosphorus)
+    second_term = calc_logarithmic_term_of_coefficient(fraction_potential_heat_units_full_maturity,near_mature_fractional_phosphorus)
+
+    third_term = fraction_potential_heat_units_full_maturity - fraction_potential_heat_units_half_maturity
+    return (first_term - second_term) / third_term
+
+
+def calc_first_shape_coefficient(second_shape_coefficient: float,fraction_potential_heat_units_half_maturity: float,
+                                half_mature_fractional_phosphorus: float) -> float:
+    """Description:
+            Calculates the first shape coefficient
+
+        Args:
+            second_shape_coeffiient: 
+            fraction_potential_heat_units_half_mature: fractional potential heat units at 50% maturity
+            half_mature_fractional_phosphorus: fraction of phosphorus in the biomass at 50% maturity
+
+        Returns:
+            the first shape coefficient
+
+    """
+    
+    first_term = calc_logarithmic_term_of_coefficient(fraction_potential_heat_units_half_maturity, half_mature_fractional_phosphorus)
+
+    return first_term + second_shape_coefficient * fraction_potential_heat_units_half_maturity
+
+
+def calculate_fractional_biomass_phosphorus(first_shape_coefficient: float,second_shape_coefficient: float,
+                    previous_actual_biomass: float, emergent_fractional_biomass: float, mature_fractional_biomass: float,
+                    previous_fraction_potential_heat_units: float) -> None:
+
+    if previous_actual_biomass == 0:
+        return 0
+    first_term = emergent_fractional_biomass - mature_fractional_biomass
+    exponent_part = exp(first_shape_coefficient - second_shape_coefficient * previous_fraction_potential_heat_units)
+    second_term = 1 - (previous_fraction_potential_heat_units / (previous_fraction_potential_heat_units + exponent_part))
+
+    return first_term * second_term + mature_fractional_biomass
+
+
 
 
 
@@ -89,121 +176,52 @@ def calc_depth_dependent_potential_phosphorus_uptake(bottom_depth: float, soil_d
     term2 = 1 - exp(-1 * phosphorus_uptake_distribution_param * bottom_depth / soil_development_depth)
     
     return term1 * term2
+
+
+
+
+def calc_optimal_phosphorus_biomass(previous_actual_biomass: float, fraction_biomass_phosphorus: float) -> float:
+    """calculates the optimal biomass of phosphorus in the plant"""
+    
+    return previous_actual_biomass * fraction_biomass_phosphorus
+
+
+
+
+#fr_PHU_frac, fr_px.... fr_PHU_frac needs better name, also need clarity on what fr_PHU_frac actually represents
+#TODO: bottom and inside need better name
+def calc_logarithmic_term_of_coefficient(fractional_potential_heat_units: float, fractional_x_coefficient: float,
+                mature_fractional_phosphorus: float, emergent_fractional_phosphorus: float):
+    """helper function used to calculate the logarithmic portion of the shape coefficient"""
+
+    bottom = 1 - (fractional_x_coefficient - mature_fractional_phosphorus) / (emergent_fractional_phosphorus - mature_fractional_phosphorus)
+    return log((fractional_potential_heat_units/bottom) - fractional_potential_heat_units)
+
+
+
+
+def calc_layer_phosphorus_uptake(layer_labile_phosphorus: List[float], layer_phosphorus_uptake: List[float]) -> List[float]:
+    """
+    Description:
+
+    Args:
+        layer_labile_phosphorus: list of labile phosphorus values, one for each soil layer
+        layer_phosphorus_uptake: list of phosphorus_uptake values, one for each soil layer
+
+    Returns:
+        list of per layer labile phosphorus updated to reflect phosphorus uptake
     
     
-
-
-
-
-
-
-
-
-
-
-
-def calc_fr_P(crop_type):
     """
-    Description:
-        Calculates fraction of phosphorus in the plant biomass.
-        "pseudocode_crop" C.6.B.1
+    updated_labile_phosphorus = []
+    for labile,uptake in zip(layer_labile_phosphorus,layer_phosphorus_uptake):
+        updated_labile_phosphorus.append(labile - uptake)
 
-    Args:
-        crop_type
-    """
-
-    p2 = calc_p2(crop_type)
-    p1 = calc_p1(crop_type, p2)
-    if crop_type.prev_biomass_actual == 0:
-        crop_type.fr_P = 0
-    else:
-        first_term = crop_type.fr_p1 - mature_fractional_phosphorus
-
-        exp_part = exp(p1 - p2 * crop_type.prev_fr_PHU)
-        second_term = 1 - (crop_type.prev_fr_PHU / (crop_type.prev_fr_PHU + exp_part))
-
-        crop_type.fr_P = first_term * second_term + mature_fractional_phosphorus
+    return updated_labile_phosphorus
 
 
-def calc_p2(crop_type):
-    """
-    Description:
-        Calculates the second shape coefficient.
-        "pseudocode_crop" C.6.A.1
-
-    Args:
-        crop_type
-
-    Returns:
-        float: second shape coefficient
-    """
-
-    first_term = calc_log_term_of_shape_coefficient(
-        crop_type, crop_type.fr_PHU_50, crop_type.fr_p2
-    )
-
-    second_term = calc_log_term_of_shape_coefficient(
-        crop_type, crop_type.fr_PHU_100, mature_fractional_phosphorusish
-    )
-
-    third_term = crop_type.fr_PHU_100 - crop_type.fr_PHU_50
-
-    return (first_term - second_term) / third_term
 
 
-def calc_p1(crop_type, p2):
-    """
-    Description:
-        Calculates the first shape coefficient.
-        "pseudocode_crop" C.6.A.2
-
-    Args:
-        crop_type
-        p2: second shape coefficient
-
-    Returns:
-        float: first shape coefficient
-    """
-
-    first_term = calc_log_term_of_shape_coefficient(
-        crop_type, crop_type.fr_PHU_50, crop_type.fr_p2
-    )
-
-    return first_term + p2 * crop_type.fr_PHU_50
-
-
-def calc_log_term_of_shape_coefficient(crop_type, fr_PHU_frac, fr_px):
-    """
-    Description:
-        Helper function. Calculates the log term in the shape coefficient calculations
-        "pseudocode_crop" C.6.A.2
-
-    Args:
-        crop_type
-        fr_PHU_frac: the fraction of the fraction of potential heat units
-        fr_px: this function is used to calculate the log term in the calculations
-            of multiple shape coefficients. The fraction of p shape coefficient x
-
-    Returns:
-        float: log term in the calculations
-    """
-
-    bottom = 1 - (fr_px - mature_fractional_phosphorus) / (crop_type.fr_p1 - mature_fractional_phosphorus)
-    inside = (fr_PHU_frac / bottom) - fr_PHU_frac
-    return log(inside)
-
-
-def calc_optimal_phosphorus_biomass(crop_type):
-    """
-    Description:
-        Calculates optimal mass of phosphorus stored in plant material.
-        "pseudocode_crop" C.6.B.2
-
-    Args:
-        crop_type
-    """
-
-    crop_type.optimal_phosphorus_biomass = crop_type.prev_biomass_actual * crop_type.fr_P
 
 
 
@@ -238,7 +256,7 @@ def calc_act_potential_phosphorus_uptake_each_layer(soil, crop_type):
         # C.6.C.4
         act_potential_phosphorus_uptake = min((pot_potential_phosphorus_uptake + P_demand), layer.labile_P)
         # C.6.C.7
-        layer.potential_phosphorus_uptaketake = act_potential_phosphorus_uptake
+        layer.potential_phosphorus_uptake = act_potential_phosphorus_uptake
 
         # C.6.C.6
         # Update values for next layer
@@ -279,28 +297,6 @@ def calc_potential_phosphorus_uptake_each_layer(soil, crop_type):
     return potential_phosphorus_uptake_each_layer
 
 
-def calc_potential_phosphorus_uptake_z(crop_type, z):
-    """
-    Description:
-        Calculates potential phosphorus uptake from soil solution at the surface to
-        depth z. This function is used in calc_potential_phosphorus_uptake_each_layer.
-        "pseudocode_crop" C.6.C.1
-
-    Args:
-        crop_type
-        z: the given depth
-
-    Returns:
-        float: nitrogen uptake from the surface to a depth
-    """
-
-    if crop_type.z_root == 0:
-        return 0
-    term1 = crop_type.potential_phosphorus_uptake / (1 - exp(-1 * crop_type.beta_p))
-    term2 = 1 - exp(-1 * crop_type.beta_p * z / crop_type.z_root)
-    return term1 * term2
-
-
 def calc_actual_phosphorus_biomass(soil, crop_type):
     """
     Description:
@@ -312,9 +308,6 @@ def calc_actual_phosphorus_biomass(soil, crop_type):
     """
 
     for layer in soil.soil_layers:
-        crop_type.actual_phosphorus_biomass += layer.potential_phosphorus_uptaketake
+        crop_type.actual_phosphorus_biomass += layer.potential_phosphorus_uptake
 
 
-def potential_phosphorus_uptaketake(soil):
-    for layer in soil.soil_layers:
-        layer.labile_P -= layer.potential_phosphorus_uptaketake
