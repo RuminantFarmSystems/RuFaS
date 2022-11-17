@@ -1,7 +1,7 @@
 ---
 title: "Soil and Crop Road Map"
 author: "Clay J. Morrow (morrowcj@outlook.com)"
-date: "31 October, 2022"
+date: "09 November, 2022"
 output: 
   html_document: 
     keep_md: yes
@@ -160,16 +160,16 @@ tracking (e.g., from `Crop`, `Soil`, and `Field`) at the end of each iteration/d
 Like `SCInput` this class needs to be agnostic to the output structure and can have methods that
 reformat the data to the output desired depending upon interface/View. 
 
-## Managing the system: FieldDirector
+## Managing the system: FieldManager
 
 An SC simulation contains many instances of fields and thier crops that need to change
-independently through time. The `FieldDirector` class will be the high-level container that 
+independently through time. The `FieldManager` class will be the high-level container that 
 initializes and and stores all the fields according to user input (from `SCInput`), tracks them 
 through time, directs them to perform their tasks, and pushes their output to `OutputCurator`
 
-### FieldDirector details
+### FieldManager details
 
-Here are some specifics about how `FieldDirector` should work:
+Here are some specifics about how `FieldManager` should work:
 
 * the main method `.direct_fields()`, which executes all field events for a day, is called by the
 simulation engine every day. 
@@ -178,12 +178,12 @@ simulation engine every day.
   - within a field, it tells the soil to complete all its daily routines
   - within a field, it tells each crop - one at a time - to complete their daily routines (remember,
   multiple crops in a field need to share soil resources)
-* `FieldDirector` handles dependence on temporal variables such as the current day, year, and 
+* `FieldManager` handles dependence on temporal variables such as the current day, year, and 
 weather and passess the values to entities that need them.
 
-### FieldDirector simulation example
+### FieldManager simulation example
 
-Below is a detailed example of a how `FieldDirector` should behave for a system with 3 fields over a
+Below is a detailed example of a how `FieldManager` should behave for a system with 3 fields over a
 two-year simulation. **Note:** This example is meant to display the flexibility of the model, not a 
 realistic scenario.
 
@@ -207,7 +207,7 @@ realistic scenario.
   - grass is planted on day 15 of the second year
   - grazing occurs both years, starting on day 50 and ending day 100. The grazers prefer grass
 
-`FieldDirector.direct_fields()` is called every day and does the following:
+`FieldManager.direct_fields()` is called every day and does the following:
 
 **Example steps:**
 
@@ -331,7 +331,7 @@ intuitive. Generally:
   attribute with the amount of  nitrogen fixed during the day.
   - Most often they will take no arguments directly. When arguments are needed, 
   they should accept values (not objects) whenever possible. For example 
-  `NitrogenIncorporation.stratify_nitrogen_uptake(layer_nitrates)` requires a list of nitrates 
+  `NitrogenIncorporation.stratify_nitrogen_uptake_requests(layer_nitrates)` requires a list of nitrates 
   available in each soil layer, and **not** a `Soil` object.
   - An exception to the above rule is when a direct interaction/exchange between
   classes is needed. For example, `NitrogenIncorporation.extract_nitrogen_from_soil(soil)` 
@@ -445,8 +445,8 @@ pull request.
 Below are measurable components that the module should have, which will be tracked as development
 continues. 
 
-* All the main process files (`.py`) need to be 1) reformatted and reorganized to the new design, 
-2) cross-checked with source documentation, 3) tested, 4) documented (updated pseudocode). In total, 
+* All the main process files (`.py`) need to be reformatted and reorganized to the new design, 
+cross-checked with source documentation, tested, and documented (updated pseudocode). In total, 
 there are:
   - 10 crop files (`RUFAS/routines/field/crop/`)
   - 23 soil files files (`RUFAS/routines/field/soil/`)
@@ -456,7 +456,7 @@ there are:
 guidelines, and linked to the process classes.
 
 * The current `Crop.py` file (`RUFAS/routines/field/crop/`) need to be re-written and organized 
-into the new `FieldDirector` class. 
+into the new `FieldManager` class. 
 
 * the new `DataCurator` and `SCInput` classes need to be created
 
@@ -474,9 +474,9 @@ details about what SC should do):
 * `Field` methods should reflect field management processes (apply manure/fert, plant/harvest crops,
   - methods should manage crops one by one
 etc.) and will often be wrappers that call `Soil` and `Crop` methods
-* `FieldDirector` should be able initialized based on input data
+* `FieldManager` should be able initialized based on input data
   - should be able to initialize a number of `Fields`, passing them data they need
-* `FieldDirector` methods should reflect management of the system
+* `FieldManager` methods should reflect management of the system
   - should track which `Field`/`Soil` processes need to run and execute them accordingly, such as: 
     + `Crop` planting/multi-cropping
     + following cropping patterns

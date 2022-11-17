@@ -1580,7 +1580,7 @@ div.tocify {
 
 <h1 class="title toc-ignore">Soil and Crop Road Map</h1>
 <h4 class="author">Clay J. Morrow (<a href="mailto:morrowcj@outlook.com" class="email">morrowcj@outlook.com</a>)</h4>
-<h4 class="date">31 October, 2022</h4>
+<h4 class="date">09 November, 2022</h4>
 
 </div>
 
@@ -1749,17 +1749,17 @@ class needs to be agnostic to the output structure and can have methods
 that reformat the data to the output desired depending upon
 interface/View.</p>
 </div>
-<div id="managing-the-system-fielddirector" class="section level2">
-<h2>Managing the system: FieldDirector</h2>
+<div id="managing-the-system-fieldmanager" class="section level2">
+<h2>Managing the system: FieldManager</h2>
 <p>An SC simulation contains many instances of fields and thier crops
 that need to change independently through time. The
-<code>FieldDirector</code> class will be the high-level container that
+<code>FieldManager</code> class will be the high-level container that
 initializes and and stores all the fields according to user input (from
 <code>SCInput</code>), tracks them through time, directs them to perform
 their tasks, and pushes their output to <code>OutputCurator</code></p>
-<div id="fielddirector-details" class="section level3">
-<h3>FieldDirector details</h3>
-<p>Here are some specifics about how <code>FieldDirector</code> should
+<div id="fieldmanager-details" class="section level3">
+<h3>FieldManager details</h3>
+<p>Here are some specifics about how <code>FieldManager</code> should
 work:</p>
 <ul>
 <li>the main method <code>.direct_fields()</code>, which executes all
@@ -1773,15 +1773,15 @@ routines</li>
 their daily routines (remember, multiple crops in a field need to share
 soil resources)</li>
 </ul></li>
-<li><code>FieldDirector</code> handles dependence on temporal variables
+<li><code>FieldManager</code> handles dependence on temporal variables
 such as the current day, year, and weather and passess the values to
 entities that need them.</li>
 </ul>
 </div>
-<div id="fielddirector-simulation-example" class="section level3">
-<h3>FieldDirector simulation example</h3>
-<p>Below is a detailed example of a how <code>FieldDirector</code>
-should behave for a system with 3 fields over a two-year simulation.
+<div id="fieldmanager-simulation-example" class="section level3">
+<h3>FieldManager simulation example</h3>
+<p>Below is a detailed example of a how <code>FieldManager</code> should
+behave for a system with 3 fields over a two-year simulation.
 <strong>Note:</strong> This example is meant to display the flexibility
 of the model, not a realistic scenario.</p>
 <p><strong>Example details:</strong></p>
@@ -1814,7 +1814,7 @@ planted once)</li>
 The grazers prefer grass</li>
 </ul></li>
 </ul>
-<p><code>FieldDirector.direct_fields()</code> is called every day and
+<p><code>FieldManager.direct_fields()</code> is called every day and
 does the following:</p>
 <p><strong>Example steps:</strong></p>
 <ul>
@@ -1989,7 +1989,7 @@ amount of nitrogen fixed during the day.</li>
 <li>Most often they will take no arguments directly. When arguments are
 needed, they should accept values (not objects) whenever possible. For
 example
-<code>NitrogenIncorporation.stratify_nitrogen_uptake(layer_nitrates)</code>
+<code>NitrogenIncorporation.stratify_nitrogen_uptake_requests(layer_nitrates)</code>
 requires a list of nitrates available in each soil layer, and
 <strong>not</strong> a <code>Soil</code> object.</li>
 <li>An exception to the above rule is when a direct interaction/exchange
@@ -2113,25 +2113,22 @@ request.</p>
 <p>Below are measurable components that the module should have, which
 will be tracked as development continues.</p>
 <ul>
-<li>All the main process files (<code>.py</code>) need to be 1)
-reformatted and reorganized to the new design,</li>
-</ul>
-<ol start="2" style="list-style-type: decimal">
-<li>cross-checked with source documentation, 3) tested, 4) documented
-(updated pseudocode). In total, there are:</li>
-</ol>
+<li><p>All the main process files (<code>.py</code>) need to be
+reformatted and reorganized to the new design, cross-checked with source
+documentation, tested, and documented (updated pseudocode). In total,
+there are:</p>
 <ul>
-<li><p>10 crop files (<code>RUFAS/routines/field/crop/</code>)</p></li>
-<li><p>23 soil files files
-(<code>RUFAS/routines/field/soil/</code>)</p></li>
-<li><p>4 field management files
-(<code>RUFAS/routines/field/field_management</code>)</p></li>
+<li>10 crop files (<code>RUFAS/routines/field/crop/</code>)</li>
+<li>23 soil files files (<code>RUFAS/routines/field/soil/</code>)</li>
+<li>4 field management files
+(<code>RUFAS/routines/field/field_management</code>)</li>
+</ul></li>
 <li><p>The main classes (<code>Soil,</code> <code>Crop</code>, and
 <code>Field</code>) need to be rewritten with new formatting guidelines,
 and linked to the process classes.</p></li>
 <li><p>The current <code>Crop.py</code> file
 (<code>RUFAS/routines/field/crop/</code>) need to be re-written and
-organized into the new <code>FieldDirector</code> class.</p></li>
+organized into the new <code>FieldManager</code> class.</p></li>
 <li><p>the new <code>DataCurator</code> and <code>SCInput</code> classes
 need to be created</p></li>
 </ul>
@@ -2159,13 +2156,13 @@ dimensions and geography, + input data
 <li>methods should manage crops one by one etc.) and will often be
 wrappers that call <code>Soil</code> and <code>Crop</code> methods</li>
 </ul></li>
-<li><code>FieldDirector</code> should be able initialized based on input
+<li><code>FieldManager</code> should be able initialized based on input
 data
 <ul>
 <li>should be able to initialize a number of <code>Fields</code>,
 passing them data they need</li>
 </ul></li>
-<li><code>FieldDirector</code> methods should reflect management of the
+<li><code>FieldManager</code> methods should reflect management of the
 system
 <ul>
 <li>should track which <code>Field</code>/<code>Soil</code> processes

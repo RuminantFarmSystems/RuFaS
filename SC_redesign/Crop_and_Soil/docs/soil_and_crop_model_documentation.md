@@ -141,7 +141,7 @@ fix nitrogen from the atmosphere
 
 #### G.3.6 nitrogen storage
 
-(`store_nitrogen_biomass()`)
+(`store_obtained_nitrogen()`)
 store the newly acquired nitrogen as biomass
 
 
