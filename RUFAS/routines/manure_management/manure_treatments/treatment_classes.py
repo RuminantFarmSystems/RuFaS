@@ -33,6 +33,7 @@ class TreatmentType(DefaultEnum):
 
 class BaseManureTreatment:
     def __init__(self,
+                 pen: SimplePen,
                  manure_separator: BaseManureSeparator,
                  weather: Weather,
                  time: Time,
@@ -42,7 +43,7 @@ class BaseManureTreatment:
         It is primarily used by the emissions sub-module
 
         """
-
+        self.pen=pen
         self.config = manure_treatment_config
         self.manure_separator = manure_separator
         self.reception_pit = self.manure_separator.reception_pit
@@ -73,6 +74,7 @@ class BaseManureTreatment:
         self.simulation_day = simulation_day
         daily_output.accumulated_TS = self.accumulated_output.TSd
         daily_output.ch4_emissions = self.calc_emissions()
+        daily_output.nh3_emissions = self.calc_NH3_emissions()
         self.all_output.append(daily_output)
         return daily_output
     @property
@@ -80,6 +82,8 @@ class BaseManureTreatment:
         """returns  treatment volume in L"""
         return self.accumulated_output.total_daily_mass # L
     def calc_emissions(self) -> float:
+        return 0.0
+    def calc_NH3_emissions(self) -> float:
         return 0.0
 
     def land_application_day_check_available_manure(self):
@@ -365,11 +369,12 @@ class AnaerobicDigestion(BaseManureTreatment):
 
 class AnaerobicLagoon(BaseManureTreatment):
     def __init__(self,
+                 pen:SimplePen,
                  manure_separator: BaseManureSeparator,
                  weather: Weather,
                  time: Time,
                  manure_treatment_config: ManureTreatmentConfig):
-        super().__init__(manure_separator, weather, time, manure_treatment_config)
+        super().__init__(pen,manure_separator, weather, time, manure_treatment_config)
         self.storage_time_period = manure_treatment_config.storage_time_period  # days
         self.freeboard_input = manure_treatment_config.freeboard_input  # m
         self.precip_input = manure_treatment_config.freeboard_input  # m (25-year 24h storm event)
@@ -505,6 +510,10 @@ class AnaerobicLagoon(BaseManureTreatment):
 
     def calc_emissions(self):
         return GasEmissions.calc_E_CH4_anaerobic_lagoon(self.accumulated_output.VS_total)
+    def calc_NH3_emissions(self):
+        tempC = self.weather_data.T_avg[self.time.year - 1][self.time.day - 1]
+        pen=SimplePen(pen=None)
+        return GasEmissions.calc_E_NH3_storage_v2(pen=pen,TAN = self.accumulated_output.TAN_s,U=21,tempC=tempC)
 
     def boundSludgeValue(self, calculated_value, lower_bound, upper_bound):
         """returns value bounded by lower and upper bounds"""
@@ -518,11 +527,12 @@ class AnaerobicDigestionAndLagoon(AnaerobicLagoon):
 
 class SlurryStorageUnderfloor(BaseManureTreatment):
     def __init__(self,
+                 pen:SimplePen,
                  manure_separator: BaseManureSeparator,
                  weather: Weather,
                  time: Time,
                  manure_treatment_config: ManureTreatmentConfig):
-        super().__init__(manure_separator, weather, time, manure_treatment_config)
+        super().__init__(pen,manure_separator, weather, time, manure_treatment_config)
 
         self.storage_time_period = manure_treatment_config.storage_time_period  # days
 
@@ -532,6 +542,7 @@ class SlurryStorageUnderfloor(BaseManureTreatment):
 
     def update(self, simulation_day: int) -> TreatmentOutput:
         handler = self.manure_handler.last_output
+        
         daily_output = TreatmentOutput(
                 TAN_s=handler.TAN_s * (1 - self.config.TAN_removal_efficiency),
                 manure_nitrogen=handler.manure_nitrogen * (1 - self.config.N_removal_efficiency),
@@ -544,6 +555,7 @@ class SlurryStorageUnderfloor(BaseManureTreatment):
         daily_output.accumulated_TS =self.accumulated_output.TSd
         daily_output.accumulated_volume =self.accumulated_output.total_daily_mass/1000
         daily_output.ch4_emissions = self.calc_emissions()
+        daily_output.nh3_emissions = self.calc_NH3_emissions()
         daily_output.tempC = self.weather_data.T_avg[self.time.year - 1][self.time.day - 1]
         daily_output.rainfall = self.weather_data.rainfall[self.time.year - 1][self.time.day - 1]
         daily_output.final_volume = self.total_volume - (
@@ -558,16 +570,21 @@ class SlurryStorageUnderfloor(BaseManureTreatment):
     def calc_emissions(self):
         tempC = self.weather_data.T_avg[self.time.year - 1][self.time.day - 1]
         return GasEmissions.calc_E_CH4_slurry_storage_v3(self.accumulated_output.TSd,enclosed=True,tempC=tempC)
+    def calc_NH3_emissions(self):
+        tempC = self.weather_data.T_avg[self.time.year - 1][self.time.day - 1]
+        
+        return GasEmissions.calc_E_NH3_storage_v2(pen=self.pen,TAN = self.accumulated_output.TAN_s,U=self.accumulated_output.accumulated_volume*Constants.CUBIC_METERS_TO_LITERS,tempC=tempC)
 
 
 
 class SlurryStorageOutdoor(BaseManureTreatment):
     def __init__(self,
+                 pen:SimplePen,
                  manure_separator: BaseManureSeparator,
                  weather: Weather,
                  time: Time,
-                 manure_treatment_config: ManureTreatmentConfig) -> None:
-        super().__init__(manure_separator, weather, time, manure_treatment_config)
+                 manure_treatment_config: ManureTreatmentConfig):
+        super().__init__(pen,manure_separator, weather, time, manure_treatment_config)
         self.storage_time_period = manure_treatment_config.storage_time_period  # days
         self.freeboard_input = manure_treatment_config.freeboard_input  # m
         self.precip_input = manure_treatment_config.precip_input  # m (25-year 24h storm event)
@@ -597,6 +614,7 @@ class SlurryStorageOutdoor(BaseManureTreatment):
         daily_output.accumulated_TS =self.accumulated_output.TSd
         daily_output.accumulated_volume =self.accumulated_output.total_daily_mass/1000
         daily_output.ch4_emissions = self.calc_emissions()
+        daily_output.nh3_emissions = self.calc_NH3_emissions()
         daily_output.tempC = self.weather_data.T_avg[self.time.year - 1][self.time.day - 1]
         daily_output.rainfall = self.weather_data.rainfall[self.time.year - 1][self.time.day - 1]
         return daily_output
@@ -667,7 +685,12 @@ class SlurryStorageOutdoor(BaseManureTreatment):
 
     def calc_emissions(self):
         tempC = self.weather_data.T_avg[self.time.year - 1][self.time.day - 1]
-        return GasEmissions.calc_E_CH4_slurry_storage_v3(self.accumulated_output.TSd,enclosed=False,tempC=tempC)
+        return GasEmissions.calc_E_CH4_slurry_storage_v3(Ts =self.accumulated_output.TSd,enclosed=False,tempC=tempC)
+    
+    def calc_NH3_emissions(self):
+        tempC = self.weather_data.T_avg[self.time.year - 1][self.time.day - 1]
+
+        return GasEmissions.calc_E_NH3_storage_v2(pen=self.pen,TAN = self.accumulated_output.TAN_s,U=21,tempC=tempC)
 
 
 @dataclass
@@ -780,6 +803,7 @@ class TreatmentFactory:
     @classmethod
     def get_instance(cls,
                      manure_treatment_type_name: str,
+                     pen: SimplePen,
                      manure_separator: BaseManureSeparator,
                      weather: Weather,
                      time: Time,
@@ -799,7 +823,7 @@ class TreatmentFactory:
         manure_treatment_class = manure_treatment_class_by_type[manure_treatment_type]
 
         if manure_treatment_config:
-            return manure_treatment_class(manure_separator, weather, time, manure_treatment_config)
+            return manure_treatment_class(pen,manure_separator, weather, time, manure_treatment_config)
         else:
             default_manure_treatment_config = DefaultManureTreatmentConfigFactory.get_instance(manure_treatment_type)
-            return manure_treatment_class(manure_separator, weather, time, default_manure_treatment_config)
+            return manure_treatment_class(pen,manure_separator, weather, time, default_manure_treatment_config)

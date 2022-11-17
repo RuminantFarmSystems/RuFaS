@@ -107,7 +107,9 @@ class ManureManagement:
             manure_pen = SimplePen(animal_pen)
             self.manure_handlers[manure_pen.id] = ManureHandlerFactory.get_instance(
                     manure_handler_type_name=manure_pen.manure_handler,
-                    bedding_type_name=manure_pen.bedding_type)
+                    bedding_type_name=manure_pen.bedding_type,
+                    weather=self.weather,
+                    time=self.time)
 
             self.reception_pits[manure_pen.id] = \
                 ReceptionPitFactory.get_instance(
@@ -121,6 +123,7 @@ class ManureManagement:
 
             self.treatments[manure_pen.id] = TreatmentFactory.get_instance(
                     manure_treatment_type_name=manure_pen.manure_storage,
+                    pen=manure_pen,
                     manure_separator=self.manure_separators[manure_pen.id],
                     weather=self.weather,
                     time=self.time,

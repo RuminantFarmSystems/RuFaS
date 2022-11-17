@@ -42,7 +42,9 @@ class BaseManureHandler:
 
     def __init__(self,
                  bedding_type_name: str,
-                 manure_handler_config: ManureHandlerConfig):
+                 manure_handler_config: ManureHandlerConfig,
+                 weather,
+                 time):
         """Initializes a BaseManureHandler object.
 
         Args
@@ -56,6 +58,8 @@ class BaseManureHandler:
         self.bedding = BeddingFactory.get_instance(bedding_type_name)
         self.milking_center = MilkingCenter()
         self.all_output: List[ManureHandlerOutput] = []
+        self.weather_data=weather
+        self.time=time
 
     @property
     def last_output(self) -> Optional[ManureHandlerOutput]:
@@ -72,9 +76,15 @@ class BaseManureHandler:
             "pseudocode_manure_management" MS.3
         """
 
+
+        converted_TAN = pen.manure.TAN_s*pen.manure.Mkg*Constants.GRAMS_TO_KG ## Converting TAN from g/L to kg
+        pen_urine = 21 ## Get this from animal module manure output 
+        urine_TAN = converted_TAN*0.5
+        tempC = self.weather_data.T_avg[self.time.year - 1][self.time.day - 1]
+        NH3_loss_in_housing = pen.num_animals*GasEmissions.calc_E_NH3_storage_v2(pen=pen,TAN =urine_TAN, U=pen_urine, tempC=tempC)
         daily_output = ManureHandlerOutput(
                 urea=pen.manure.U,
-                TAN_s=pen.manure.TAN_s,
+                TAN_s=converted_TAN-NH3_loss_in_housing,
                 manure_nitrogen=pen.manure.MN,
                 TSd=pen.manure.TSd,
                 VSd=pen.manure.VSd,
@@ -168,7 +178,9 @@ class ManureHandlerFactory:
     def get_instance(cls,
                      manure_handler_type_name: str,
                      bedding_type_name: str,
-                     manure_handler_config: Optional[ManureHandlerConfig] = None) \
+                     manure_handler_config: Optional[ManureHandlerConfig] = None,
+                     weather=None,
+                     time=None) \
             -> BaseManureHandler:
         """
         Returns an instance of a specific subtype of BaseManureHandler based on
@@ -195,8 +207,8 @@ class ManureHandlerFactory:
         manure_handler_class = manure_handler_class_by_type[manure_handler_type]
 
         if manure_handler_config:
-            return manure_handler_class(bedding_type_name, manure_handler_config)
+            return manure_handler_class(bedding_type_name, manure_handler_config,weather,time)
         else:
             default_manure_handler_config = DefaultManureHandlerConfigFactory.get_instance(
                     manure_handler_type)
-            return manure_handler_class(bedding_type_name, default_manure_handler_config)
+            return manure_handler_class(bedding_type_name, default_manure_handler_config,weather,time)
