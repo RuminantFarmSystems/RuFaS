@@ -1,6 +1,10 @@
 from math import log, exp
 from bisect import bisect
 
+"""
+This module is based upon the Nitrogen Uptake section of 
+"""
+
 class NitrogenIncorporation:
     def __init__(self):
         # constant declarations with defaults (unchanged during simulations)
@@ -257,7 +261,7 @@ class NitrogenIncorporation:
         else:
             self.fixed_nitrogen = 0
 
-    def store_obtained_nitrogen(self) -> None:
+    def store_obtained_nitrogen(self) -> None:  # TODO: fixing nitrogen does not increase biomass. Why not?
         """adds nitrogen obtained through soil uptake and fixation into the plant biomass"""
         self.nitrogen = calc_stored_nitrogen(self.total_nitrogen_uptake, self.nitrogen, self.fixed_nitrogen)
 
@@ -314,8 +318,9 @@ def calc_shape_log(heat_fraction: float, nitrogen_fraction: float, mature_nitrog
     Returns: the log term of nitrogen shape coefficients
     """
     # throw an error if any parameters do not satisfy [0-1]
-    if nitrogen_fraction < 0 or nitrogen_fraction > 1 or heat_fraction < 0 or heat_fraction > 1 or mature_nitrogen_fraction < 0 or \
-            mature_nitrogen_fraction > 1 or emergence_nitrogen_fraction < 0 or emergence_nitrogen_fraction > 1:
+    if nitrogen_fraction < 0 or nitrogen_fraction > 1 or heat_fraction < 0 or heat_fraction > 1 or \
+            mature_nitrogen_fraction < 0 or mature_nitrogen_fraction > 1 or \
+            emergence_nitrogen_fraction < 0 or emergence_nitrogen_fraction > 1:
         frac_error_msg = "nitrogen_fraction, heat_fraction, mature_nitrogen_fraction, and" + \
                          " emergence_nitrogen_fraction must all be between 0 and 1"
         raise ValueError(frac_error_msg)
@@ -334,7 +339,8 @@ def calc_shape_log(heat_fraction: float, nitrogen_fraction: float, mature_nitrog
         raise ValueError("heat_fraction must be greater than 0")
 
     # calculate first component of formula
-    denominator = 1 - ((nitrogen_fraction - mature_nitrogen_fraction) / (emergence_nitrogen_fraction - mature_nitrogen_fraction))
+    denominator = 1 - ((nitrogen_fraction - mature_nitrogen_fraction) /
+                       (emergence_nitrogen_fraction - mature_nitrogen_fraction))
 
     # additional check
     if denominator > 1:  # leads to log(-y)
@@ -346,8 +352,8 @@ def calc_shape_log(heat_fraction: float, nitrogen_fraction: float, mature_nitrog
     return log((heat_fraction / denominator) - heat_fraction)
 
 
-def calc_optimal_nitrogen_fraction(heat_fraction: float, emergence_nitrogen_fraction: float, mature_nitrogen_fraction: float,
-                                   shape1: float, shape2: float) -> float:  # pseudocode: C.5.B.1
+def calc_optimal_nitrogen_fraction(heat_fraction: float, emergence_nitrogen_fraction: float,
+                                   mature_nitrogen_fraction: float, shape1: float, shape2: float) -> float:  # pseudocode: C.5.B.1
     """
     Description: calculates the optimal fraction of nitrogen in the plant biomass on a given day
 
@@ -475,8 +481,8 @@ def calc_layer_nitrogen_uptake_potential(layer_bounds: list[float], total_demand
     if len(layer_bounds) != len(set(layer_bounds)):
         raise ValueError("multiple soil boundaries cannot have the same depths. Remove the redundant layer?")
     # calculate results
-    boundary_nitrogen = [calc_nitrogen_uptake_to_depth(total_demand, x, root_depth, nitrogen_distribution_parameter) for x in
-                         layer_bounds]  # N at each boundary
+    boundary_nitrogen = [calc_nitrogen_uptake_to_depth(total_demand, x, root_depth, nitrogen_distribution_parameter)
+                         for x in layer_bounds]  # N at each boundary
     boundary_nitrogen.insert(0, 0)  # 0 N uptake at soil surface
     layer_nitrogen = [below - above for below, above in
                       zip(boundary_nitrogen[1:], boundary_nitrogen)]  # subtract previous layer
@@ -607,8 +613,3 @@ def calc_deepest_accessible_layer(root_depth: float, layer_bounds: list[float]) 
         insert_position = bisect(layer_bounds, root_depth)
         deepest_layer = len(layer_bounds)
         return min(insert_position + 1, deepest_layer)
-        # if insert_position >= deepest_layer:  # handle roots deeper than soil
-        #     Warning("root_depth is deeper than the lowest soil layer")
-        #     return deepest_layer
-        # else:
-        #     return insert_position
