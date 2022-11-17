@@ -75,7 +75,7 @@ class NitrogenIncorporation:
         Details: after the actual nitrogen uptake is calculated for each accessible soil layer, that amount is removed
         from the layer_nitrates list given as input to the function.
         """
-        self.determine_deepest_accessible_soil_layer(layer_nitrates)
+        self.determine_deepest_accessible_soil_layer(layer_depths)
         accessible_depths = self.access_layers(layer_depths)
         accessible_nitrates = self.access_layers(layer_nitrates)
         self.stratify_potential_nitrogen_uptake(accessible_depths)
@@ -133,7 +133,7 @@ class NitrogenIncorporation:
         """
         self.total_soil_layers = len(depths)
         self.accessible_soil_layers = calc_deepest_accessible_layer(self.root_depth, depths)
-        self.inaccessible_soil_layers = min(len(depths) - self.accessible_soil_layers, 0)
+        self.inaccessible_soil_layers = max(len(depths) - self.accessible_soil_layers, 0)
 
     def access_layers(self, layer_list: list) -> list:
         """utility function that removes any inaccessible layers from a list
@@ -509,7 +509,7 @@ def calc_layer_extracted_resource(requests: list[float], sources: list[float]) -
     return [calc_extracted_resource(req, src) for req, src in zip(requests, sources)]
 
 
-def calc_stored_nitrogen(uptake: float, previous: float, fixed: float = 0) -> float:  # C.5.E.1
+def calc_stored_nitrogen(uptake: float, previous: float, fixed: float) -> float:  # C.5.E.1
     """
     Description: calculates nitrogen mass stored in plant material after the current day's growth cycle
 
