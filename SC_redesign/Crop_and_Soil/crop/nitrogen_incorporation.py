@@ -12,7 +12,6 @@ class NitrogenIncorporation:
         self.mature_nitrogen_fraction = 0.01
         self.nitrogen_distro_param = 10
         self.is_nitrogen_fixer = False
-
         # current declarations with defaults (change throughout simulations)
         # TODO: what module sets/updates these variables?
         self.nitrogen = 0
@@ -20,7 +19,6 @@ class NitrogenIncorporation:
         self.biomass = 12.5
         self.biomass_growth_max = 100
         self.root_depth = 0
-
         # empty declarations
         self.previous_nitrogen = None
         self.shapes_nitrogen_uptake = None
@@ -82,7 +80,7 @@ class NitrogenIncorporation:
         self.determine_actual_nitrogen_uptakes(accessible_nitrates)
         self.extend_nitrate_uptakes_to_full_profile()
         self.extract_nitrogen_from_soil_layers(layer_nitrates)
-        self.sum_total_nitrogen_uptake()
+        self.tally_total_nitrogen_uptake()
 
     # ---- member functions (setters, internal utility, call sub-routines) ----
     def shift_nitrogen_time(self) -> None:
@@ -208,9 +206,9 @@ class NitrogenIncorporation:
         Details: the layer_nitrates list is updated in place. Actual nitrogen uptake values are subtracted from
         each layer
         """
-        layer_nitrates[:] = [source - sink for source, sink in zip(layer_nitrates, self.actual_nitrogen_uptakes)]
+        layer_nitrates[:] = [max(src - snk, 0) for src, snk in zip(layer_nitrates, self.actual_nitrogen_uptakes)]
 
-    def sum_total_nitrogen_uptake(self):
+    def tally_total_nitrogen_uptake(self):
         """determines total nitrogen extracted from soil by summing actual uptake from each layer"""
         self.total_nitrogen_uptake = sum(self.actual_nitrogen_uptakes)
 
@@ -531,11 +529,11 @@ def calc_fixed_nitrogen(demand: float, stage_factor: float, water_factor: float,
 
     Returns: the amount of nitrogen added to plant biomass through fixation, capped at demand.
     """
-    if 0 > stage_factor > 1:
+    if not 0 <= stage_factor <= 1:
         raise ValueError("stage_factor must be between 0 and 1")
-    if 0 > water_factor > 1:
+    if not 0 <= water_factor <= 1:
         raise ValueError("water_factor must be between 0 and 1")
-    if 0 > nitrate_factor > 1:
+    if not 0 <= nitrate_factor <= 1:
         raise ValueError("nitrate_factor must be between 0 and 1")
 
     fixed = demand * stage_factor * min(water_factor, nitrate_factor, 1)
