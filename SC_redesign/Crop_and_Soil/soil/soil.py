@@ -1,32 +1,33 @@
+from itertools import groupby
+
 class Soil:
     def __init__(self):
-        self.evaporation = 0
-        self.transpiration = 0
-        self.evapotranspiration_max = 0
-        self.available_water = 80
-        self.water_capacity = 100
-
-        self.lower_boundaries = [5, 8, 20]
-        self.nitrates = [0.5, 1, 5]
+        # whole-profile attributes
+        self.evaporation = 20  # arbitrary
+        self.transpiration = 30  # arbitrary
+        self.evapotranspiration_max = 100  # arbitrary
+        self.available_water = 80  # arbitrary
+        self.water_capacity = 100  # arbitrary
 
         self.evapotranspiration = None
-        self.extracted_nitrates = None
-        self.total_extracted_nitrates = None
         self.water_factor = None
 
-    def get_total_extracted_nitrates(self) -> None:
-        self.total_extracted_nitrates = sum(self.extracted_nitrates)
+        # profile layer attributes
+        self.depths = [5, 8, 20]  # arbitrary
+        self.nitrates = [0.5, 1, 5]  # arbitrary
 
-    def remove_nitrates(self, to_be_removed: list[float]) -> None:
-        length_diff = min(len(self.nitrates) - len(to_be_removed), 0)
-        extracted_from_all_layers = to_be_removed + ([0] * length_diff)
-        self.nitrates = [source - sink for source, sink in zip(self.nitrates, extracted_from_all_layers)]
+    def check_layer_lengths_match(self):
+        """check that soil layer attributes are all the same length"""
+        layer_attribute_list = [self.depths, self.nitrates]  # TODO: update as new varibales are added
+        g = groupby([len(item) for item in layer_attribute_list])
+        return next(g, True) and not next(g, False)
 
     def update_soil_water_factor(self):
+        """updates the soil water factor from available water and the maximum water at field capacity on a given day"""
         self.water_factor = calc_soil_water_factor(self.available_water, self.water_capacity)
 
-
     def update_evapotranspiration(self):
+        """updates the daily evapotranspiration"""
         self.evapotranspiration = self.evaporation + self.transpiration
 
 

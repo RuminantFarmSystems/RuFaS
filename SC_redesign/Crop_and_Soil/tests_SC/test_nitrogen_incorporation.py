@@ -18,8 +18,8 @@ def test_calc_shape_parameters(halfheat, heatfrac, emerge, half, near, mature):
 
 
 @pytest.mark.parametrize("heatfrac,current,mature,emergence", [
-    (1, .5, .25, .75),  # max heatfrac
-    (0.8, .5, .25, 1),  # max mature nfrac
+    (1, .5, .25, .75),  # max_evapotranspiration heatfrac
+    (0.8, .5, .25, 1),  # max_evapotranspiration mature nfrac
     (0.32, .5, .25, .75),  # arbitrary
 ])
 def test_calc_shape_log(heatfrac, current, mature, emergence):
@@ -322,7 +322,7 @@ def test_calc_nitrate_factor(nitrates, expect):
 @pytest.mark.parametrize("root,depths,expect", [
     (1.5, [0, 1, 2, 3], 3),  # roots access layer 3
     (2.7, [0, 1, 2, 3], 4),  # 4th layer
-    (3.8, [0, 1, 2, 3], 4),  # beyond max depth
+    (3.8, [0, 1, 2, 3], 4),  # beyond max_evapotranspiration depth
     (83.33, [10.4, 18.20, 63.7, 100, 1937.8], 4)  # arbitrary
 ])
 def test_calc_deepest_accessible_layer(root, depths, expect):

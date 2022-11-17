@@ -112,7 +112,7 @@ def test_intercept_radiation(rad, ext, lai):
     (12.86, 20.37)  # rad < eff
 ])
 def test_determine_max_growth(rad, eff):
-    """ensure that max growth is properly updated"""
+    """ensure that max_evapotranspiration growth is properly updated"""
     bioal = init_bioal(light_conversion=eff, usable_light=rad)
     bioal.determine_max_growth()
     assert bioal.biomass_growth_max == calc_max_accumulation(rad, eff)

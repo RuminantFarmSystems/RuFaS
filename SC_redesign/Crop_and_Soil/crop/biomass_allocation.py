@@ -33,7 +33,7 @@ class BiomassAllocation:
         self.usable_light = calc_intercepted_radiation(light, self.light_extinction, self.leaf_area_index)
 
     def determine_max_growth(self):
-        """determine how much the plant can grow under ideal circumstance, from the light captured"""
+        """determine how much the plant can grow_crop under ideal circumstance, from the light captured"""
         self.biomass_growth_max = calc_max_accumulation(self.usable_light, self.light_conversion)
 
     def accumulate_biomass(self):

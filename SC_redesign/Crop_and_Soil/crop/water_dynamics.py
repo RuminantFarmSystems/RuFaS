@@ -9,23 +9,23 @@ class WaterDynamics:
         self.evapotranspiration_max = None
         self.water_deficiency = None
 
-    def cycle_water(self, soil: Soil):
-        self.update_evaporation(soil)
-        self.update_transpiration(soil)
-        self.update_max_evapotranspiration(soil)
+    def cycle_water(self, evaporation: float, transpiration: float, max_evapotranspiration: float) -> None:
+        self.set_evaporation(evaporation)
+        self.set_transpiration(transpiration)
+        self.set_max_evapotranspiration(max_evapotranspiration)
         self.update_evapotranspiration()
         self.assess_water_deficiency()
 
-    def update_evaporation(self, soil: Soil) -> None:  # TODO: need to make sure it makes sense to keep these values in soil
-        """update evaporation by copying it from the soil class"""
-        self.evaporation = soil.evaporation
+    def set_evaporation(self, evaporation: float) -> None:  # TODO: need to make sure it makes sense to keep these values in soil
+        """sets evaporation"""
+        self.evaporation = evaporation
 
-    def update_transpiration(self, soil: Soil) -> None:  # TODO: need to make sure it makes sense to keep these values in soil
+    def set_transpiration(self, transpiration: float) -> None:  # TODO: need to make sure it makes sense to keep these values in soil
         """update transpiration by copying it from the soil class"""
-        self.transpiration = soil.transpiration
+        self.transpiration = transpiration
 
-    def update_max_evapotranspiration(self, soil: Soil) -> None:  # TODO: need to make sure it makes sense to keep these values in soil
-        self.evapotranspiration_max = soil.evapotranspiration_max
+    def set_max_evapotranspiration(self, max_evapotranspiration: float) -> None:
+        self.evapotranspiration_max = max_evapotranspiration
 
     def update_evapotranspiration(self) -> None:
         self.evapotranspiration = calc_evapotranspiration(self.evaporation, self.transpiration)
@@ -48,17 +48,17 @@ def calc_evapotranspiration(evaporation: float, transpiration: float) -> float: 
     return evaporation + transpiration
 
 
-def calc_water_deficiency(evapotrans: float, evapotrans_max: float) -> float:  # pseudocode: C.9.C.1
+def calc_water_deficiency(evapotranspiration: float, max_evapotranspiration: float) -> float:  # pseudocode: C.9.C.1
     """
     Description: calculate water deficiency factor
 
     Args:
-        evapotrans: annual evapotranspiration
-        evapotrans_max: maximum annual evapotranspiration
+        evapotranspiration: annual evapotranspiration
+        max_evapotranspiration: maximum annual evapotranspiration
 
     Returns: water deficiency factor
     """
-    if evapotrans_max != 0:
-        return 100 * (evapotrans / evapotrans_max)
+    if max_evapotranspiration != 0:
+        return 100 * (evapotranspiration / max_evapotranspiration)
     else:
         return 0

@@ -2,7 +2,7 @@ from math import log, exp
 from bisect import bisect
 
 """
-This module is based upon the Nitrogen Uptake section of 
+This module is based upon the 'Nitrogen Uptake" section of of the SWAT model documentation 
 """
 
 class NitrogenIncorporation:
@@ -19,10 +19,10 @@ class NitrogenIncorporation:
         # current declarations with defaults (change throughout simulations)
         # TODO: what module sets/updates these variables?
         self.nitrogen = 0
-        self.heat_fraction = 0.73
-        self.biomass = 12.5
-        self.biomass_growth_max = 100
-        self.root_depth = 0
+        self.heat_fraction = 0.73  # arbitrary
+        self.biomass = 12.5  # arbitrary
+        self.biomass_growth_max = 100  # arbitrary
+        self.root_depth = 1  # arbitrary
         # empty declarations
         self.previous_nitrogen = None
         self.shapes_nitrogen_uptake = None
