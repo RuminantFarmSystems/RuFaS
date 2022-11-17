@@ -255,7 +255,7 @@ def test_calc_layer_extracted_resource(reqs, srcs):
     (0, 0, 0),  # all 0
     (50.39, 10.55, 3.05)  # arbitrary
 ])
-def calc_stored_nitrogen(prev, new, fix):
+def test_calc_stored_nitrogen(prev, new, fix):
     """test the stored nitrogen is properly calculated by calc_stored_nitrogen()"""
     observe = calc_stored_nitrogen(new, prev, fix)
     assert observe == prev + new + fix
@@ -319,8 +319,22 @@ def test_calc_nitrate_factor(nitrates, expect):
     assert calc_nitrate_factor(nitrates) == expect
 
 
-def test_calc_deepest_accessible_layer():
-    assert False
+@pytest.mark.parametrize("root,depths,expect", [
+    (1.5, [0, 1, 2, 3], 3),  # roots access layer 3
+    (2.7, [0, 1, 2, 3], 4),  # 4th layer
+    (3.8, [0, 1, 2, 3], 4),  # beyond max depth
+    (83.33, [10.4, 18.20, 63.7, 100, 1937.8], 4)  # arbitrary
+])
+def test_calc_deepest_accessible_layer(root, depths, expect):
+    assert calc_deepest_accessible_layer(root, depths) == expect
+
+@pytest.mark.parametrize("root,depths", [
+    (-1, [0, 1, 2, 3]),  # root < 0
+    (0, [0, 1, 2, 3]),  # root = 0
+])
+def test_error_calc_deepest_accessible_layer(root, depths):
+    with pytest.raises(ValueError):
+        calc_deepest_accessible_layer(root, depths)
 
 # ---- initialization functions (reusable) ----
 def init_incorp(**kwargs):
@@ -416,11 +430,32 @@ def test_determine_potential_nitrogen_uptake(opt_n, prev_n, mat_nfrac, grow_max)
     assert incorp.potential_nitrogen_uptake == expect
 
 
-def test_determine_deepest_accessible_soil_layer():
-    assert False
+@pytest.mark.parametrize("root_depth,depths,expect", [
+    (1.5, [0, 1, 2, 3], [4, 1]),
+    (2.6, [0, 1, 2, 3], [4, 0]),
+    (0.3, [0, 0.5, 1, 2, 3], [5, 3]),
+    (28.4, [18.2, 21.6, 100.4], [3, 0])
+])
+def test_determine_deepest_accessible_soil_layer(root_depth, depths, expect):
+    """ensure that layers are partitioned correctly by determine_deepest_accessible_soil_layer"""
+    crop = init_incorp(root_depth=root_depth)
+    crop.determine_deepest_accessible_soil_layer(depths)
+    assert crop.total_soil_layers == expect[0]
+    assert crop.accessible_soil_layers == calc_deepest_accessible_layer(root_depth, depths)
+    assert crop.inaccessible_soil_layers == expect[1]
 
-def test_access_layers():
-    assert False
+
+@pytest.mark.parametrize("deepest,layers", [
+    (1, [1, 2, 3, 4]),  # one layer
+    (2, [1, 2, 3, 4]),  # two layers
+    (3, [1, 2, 3, 4]),  # three layers
+    (4, [1, 2, 3, 4]),  # four layers
+    (2, [22.5, 80.6, 100.0, 199.9]),  # arbitrary list
+])
+def test_access_layers(deepest, layers):
+    """check that soil layers are accessed correctly with access_layers()"""
+    crop = init_incorp(accessible_soil_layers=deepest)
+    assert crop.access_layers(layers) == layers[slice(deepest)]
 
 
 @pytest.mark.parametrize("bounds,desire,depth,ndistro", [
@@ -481,8 +516,18 @@ def test_determine_actual_nitrogen_uptakes(requests, nitrates):
     assert incorp.actual_nitrogen_uptakes == expect
 
 
-def test_extend_nitrate_uptakes_to_full_profile():
-    assert False
+@pytest.mark.parametrize("missed,uptakes,expect", [
+    (-1, [0.25, 0.5, 1], [0.25, 0.5, 1]),  # negative missed layers
+    (0, [0.25, 0.5, 1], [0.25, 0.5, 1]),  # no missed layers
+    (1, [0.25, 0.5, 1], [0.25, 0.5, 1, 0]),  # one missed layer
+    (2, [0.25, 0.5, 1], [0.25, 0.5, 1, 0, 0]),  # 2 missed layers
+    (3, [12.5, 8.3, 22.2, 7.8], [12.5, 8.3, 22.2, 7.8, 0, 0, 0]),  # arbitrary, 3 missed
+])
+def test_extend_nitrate_uptakes_to_full_profile(missed, uptakes, expect):
+    """check that the correct number of zeros are padded to uptakes by extend_nitrate_uptakes_to_full_profile()"""
+    crop = init_incorp(inaccessible_soil_layers=missed, actual_nitrogen_uptakes=uptakes)
+    crop.extend_nitrate_uptakes_to_full_profile()
+    assert crop.actual_nitrogen_uptakes == expect
 
 @pytest.mark.parametrize("uptakes,nitrates", [
     ([1], [1]),  # start
@@ -509,31 +554,91 @@ def test_extract_nitrogen_from_soil_layers(uptakes, nitrates):
     assert nitrates == remaining
 
 
-def test_tally_total_nitrogen_uptake():
-    assert False
+@pytest.mark.parametrize("uptakes", [
+    [1],  # one layer
+    [1, 1, 1, 1],   # four layers
+    [81.2, 0],  # arbitrary with zero
+    [15.3, 18.2, 4, 20.33]
+])
+def test_tally_total_nitrogen_uptake(uptakes):
+    """check that total nitrogen is correctly calculated by tally_total_nitrogen_uptake()"""
+    crop = init_incorp(actual_nitrogen_uptakes=uptakes)
+    crop.tally_total_nitrogen_uptake()
+    assert crop.total_nitrogen_uptake == sum(uptakes)
 
-def test_try_fixation():
-    assert False
+@pytest.mark.parametrize("fixer,nitrates,water", [
+    (True, 100, 0.5),  # fixer with nitrates
+    (True, 0, 0.5),  # fixer without nitrates
+    (False, 100, 0.5),  # non-fixer with nitrates
+    (False, 0, 0.5),  # non-fixer without nitrates
+])
+def test_try_fixation(fixer, nitrates, water):
+    """check that try_fixation calls its sub-functions if fixation occurs"""
+    crop = init_incorp(is_nitrogen_fixer=fixer)
+    # crop.try_fixation(nitrates, water)
+    if fixer:
+        raise Exception("need to check that crop.update_fixation_attributes()" +
+                        " and crop.fix_nitrogen() are both called once")
+    else:
+        raise Exception("need to chack that neither above function is called and that fixed_nitrogen is 0")
+
 
 def test_update_fixation_attributes():
-    assert False
+    """"check that update_nitrate_attributes calls both its sub-functions"""
+    crop = init_incorp()
+    # crop.update_fixation_attributes(100)
+    raise Exception("check that determine_nitrate_factor() and determine_fixation_stage_factor() are both called once")
 
-def test_determine_nitrate_factor():
-    assert False
+@pytest.mark.parametrize("nitrates", [0, 0.5, 100, -1])
+def test_determine_nitrate_factor(nitrates):
+    """check that nitrate factor is set properly by determine_nitrate_factor"""
+    crop = init_incorp()
+    crop.determine_nitrate_factor(nitrates)
+    assert crop.nitrate_factor == calc_nitrate_factor(nitrates)
 
-def test_determine_fixation_stage_factor():
-    assert False
+@pytest.mark.parametrize("heatfrac", [0, 0.5, 1, -1])
+def test_determine_fixation_stage_factor(heatfrac):
+    """check that fixation stage factor is properly set by determine_fixation_stage_factor()"""
+    crop = init_incorp(heat_fraction=heatfrac)
+    crop.determine_fixation_stage_factor()
+    assert crop.fixation_stage_factor == calc_fixation_stage_factor(heatfrac)
 
-def test_fix_nitrogen():
-    assert False
+@pytest.mark.parametrize("uptake,demand,water,fixfact,nitrate", [
+    (0, 10, 0.5, 0.25, 0.3),  # unmet demand, water > nitrate > fix
+    (10, 10, 0.5, 0.25, 0.3),  # no unmet demand, water > nitrate > fix
+    (5, 10, 0.2, 0.25, 0.3),  # unmet demand, water < fix < nitrate
+    (5, 10, 0.2, 0.25, 0.22),  # unmet demand, water < nitrate < fix
+    (73.4, 112.5, 0.83, 0.11, 0.44),  # arbitrary
+])
+def test_fix_nitrogen(uptake, demand, water, fixfact, nitrate):
+    """check that fixed nitrogen is properly calculated by fix_nitrogen()"""
+    crop = init_incorp(potential_nitrogen_uptake=demand, total_nitrogen_uptake=uptake, fixation_stage_factor=fixfact,
+                       nitrate_factor=nitrate)
+    crop.fix_nitrogen(water)
+    if (demand - uptake) > 0:
+        assert crop.fixed_nitrogen == calc_fixed_nitrogen(demand-uptake, fixfact, water, nitrate)
+    else:
+        assert crop.fixed_nitrogen == 0
 
-def test_store_obtained_nitrogen():
-    assert False
+@pytest.mark.parametrize("up,nitro,fix", [
+    (10, 0, 0),  # up, no start or fixed
+    (0, 0, 10),  # fixation, no start or up
+    (10, 0, 10),  # no start
+    (0, 10, 10),  # no up
+    (10, 10, 0),  # no fixation
+    (10, 10, 10),  # up + fixation
+    (26.7, 15.4, 3.39),  # arbirary
+])
+def test_store_obtained_nitrogen(up, nitro, fix):
+    """check that nitrogen is properly stored in the plant with store_obtained_nitrogen()"""
+    crop = init_incorp(total_nitrogen_uptake=up, nitrogen=nitro, fixed_nitrogen=fix)
+    crop.store_obtained_nitrogen()
+    assert crop.nitrogen == calc_stored_nitrogen(up, nitro, fix)
 
 def test_uptake_nitrogen():
     """integration test for uptake_nitrogen()"""
-    assert False
+    raise Exception("need to write an integration test for uptake_nitrogen")
 
 def test_incorporate_nitrogen():
     """integration test for incorporate_nitrogen()"""
-    assert False
+    raise Exception("need to write an integration test for incorporate_nitrogen")
