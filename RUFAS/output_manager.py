@@ -13,13 +13,13 @@ class OutputManager (object):
     Attributes
     ----------
     pool : Dict[str, Any]
-        Contains variables reported from simulation engine
+        Contains variables reported to the output manager
     warnings_pool : Dict[str, Any]
-        Contains warnings reported from simulation engine
+        Contains warnings reported to the output manager
     errors_pool : Dict[str, Any]
-        Contains errors reported from simulation engine
+        Contains errors reported to the output manager
     logs_pool : Dict[str, Any]
-        Contains logs reported from simulation engine
+        Contains logs reported to the output manager 
     """
 
     def __init__(self) -> None:
