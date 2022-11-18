@@ -1,9 +1,11 @@
 import os.path
+from pathlib import Path
 
 import pytest
 from pytest_mock import MockerFixture
 
 from config import global_variables
+from RUFAS.user_prompt import get_json_list_from_dir
 from RUFAS.user_prompt import obtain_file_list
 
 dir_path = os.path.join(global_variables.ROOT_DIR, "input")
@@ -18,7 +20,8 @@ def test_obtain_file_list(mocker: MockerFixture, path):
     # Arrange
     verbose = True
     patch_for_user_prompt = mocker.patch("RUFAS.user_prompt.user_prompt")
-    patch_for_convert_path_string_to_list = mocker.patch("RUFAS.user_prompt.convert_path_string_to_list", return_value=[path])
+    patch_for_convert_path_string_to_list = mocker.patch("RUFAS.user_prompt.convert_path_string_to_list",
+                                                         return_value=[path])
 
     # Act
     obtain_file_list(path, verbose)
@@ -50,10 +53,62 @@ def test_convert_path_string_to_list(path):
     pass
 
 
-@pytest.mark.parametrize("path", [dir_path])
-def test_get_json_list_from_dir(path):
+def test_get_json_list_from_dir(mocker: MockerFixture,
+                                capsys: pytest.CaptureFixture):
     """check that get_json_list_from_dir() properly detects all json files in a directory"""
-    pass
+    verbose = True
+
+    # Case 1: Input path is not a directory
+    # Arrange
+    dummy_path = Path('dummy_path')
+
+    # Act
+    # check an error is raised
+    with pytest.raises(IsADirectoryError) as e:
+        get_json_list_from_dir(dummy_path, verbose)
+        assert "specified path is not a directory" in str(e.value)
+
+    # ------------------------------
+
+    # Case 2: Input path is a directory, but contains no json files
+    # Arrange
+    # Print current directory
+    dummy_dir = Path('dummy_dir')
+    dummy_dir.mkdir()
+    empty_json_paths = []
+    patch_for_glob = mocker.patch("RUFAS.user_prompt.Path.glob", return_value=empty_json_paths)
+
+    # Act
+    with pytest.raises(FileExistsError) as e:
+        get_json_list_from_dir(dummy_dir, verbose)
+        assert "Directory contains no json files" in str(e.value)
+
+    # Assert
+    patch_for_glob.assert_called_once_with('*.json')
+
+    # Cleanup
+    dummy_dir.rmdir()
+
+    # ------------------------------
+
+    # Case 3: Input path is a directory, and contains json files
+    # Arrange
+    dummy_dir = Path('dummy_dir')
+    dummy_dir.mkdir()
+    expected_json_paths = ['dummy.json', 'dummy2.json']
+    patch_for_glob = mocker.patch("RUFAS.user_prompt.Path.glob", return_value=expected_json_paths)
+
+    # Act
+    actual_json_paths = get_json_list_from_dir(dummy_dir, verbose)
+
+    # Assert
+    patch_for_glob.assert_called_once_with('*.json')
+    captured = capsys.readouterr()
+    assert f'{len(expected_json_paths)} json files detected...' in captured.out
+    assert actual_json_paths == expected_json_paths
+
+    # Cleanup
+    dummy_dir.rmdir()
 
 
 @pytest.mark.parametrize("path", [file_path])
