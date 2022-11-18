@@ -2,10 +2,11 @@ from SC_redesign.Crop_and_Soil.crop.growth_constraints import GrowthConstraints
 from SC_redesign.Crop_and_Soil.crop.biomass_allocation import BiomassAllocation
 from SC_redesign.Crop_and_Soil.crop.nitrogen_incorporation import NitrogenIncorporation
 from SC_redesign.Crop_and_Soil.crop.water_dynamics import WaterDynamics
+from SC_redesign.Crop_and_Soil.crop.heat_units import HeatUnits
 from SC_redesign.Crop_and_Soil.soil.soil import Soil
 
 
-class Crop(GrowthConstraints, BiomassAllocation, WaterDynamics, NitrogenIncorporation):
+class Crop(GrowthConstraints, BiomassAllocation, WaterDynamics, NitrogenIncorporation, HeatUnits):
     def __init__(self):
         GrowthConstraints.__init__(self)
         BiomassAllocation.__init__(self)
@@ -15,7 +16,8 @@ class Crop(GrowthConstraints, BiomassAllocation, WaterDynamics, NitrogenIncorpor
     def grow_crop(self, layer_nitrates: list[float], layer_depths: list[float], soil_water_factor: float,
                   max_transpiration: float, air_temperature: float,
                   incoming_light: float,
-                  evaporation: float, transpiration: float, max_evapotranspiration: float) -> None:
+                  evaporation: float, transpiration: float, max_evapotranspiration: float,
+                  mean_air_temperature: float, min_air_temperature: float, max_air_temperature: float) -> None:
         """main function for growing the crop on a daily basis
 
         Args:
@@ -33,12 +35,16 @@ class Crop(GrowthConstraints, BiomassAllocation, WaterDynamics, NitrogenIncorpor
             max_evapotranspiration: maximum amount of evapotranspiration possible (mm), as determined by soil
                 on a given day.
 
+            mean_air_temperature:
+            min_air_temperature:
+            max_air_temperature:
+
         Details: grow_crop is a wrapper function for all the Crop growth process sub-routines. It should be called
         every day that the crop is alive and growing in the simulation
         """
-        # heat_units.update_all()
+        self.absorb_heat_units(mean_air_temperature, min_air_temperature, max_air_temperature)
         #
-        # root_developement_update_all()
+        # root_development_update_all()
         #
         self.incorporate_nitrogen(layer_nitrates, layer_depths, soil_water_factor)
         #

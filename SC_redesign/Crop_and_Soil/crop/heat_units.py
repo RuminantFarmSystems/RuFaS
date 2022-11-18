@@ -1,0 +1,199 @@
+class HeatUnits:
+    def __init__(self, use_heat_unit_temperature: bool = False):
+        self.minimum_temperature = 20
+        self.maximum_temperature = 38
+        self.potential_heat_units = 800
+        self.accumulated_heat_units = 0  # accumulator
+        self.is_growing = True  # TODO: not currently using
+        self.is_mature = False  # TODO: not currently using
+        self.use_heat_unit_temperature = use_heat_unit_temperature
+        # self.heat_unit_scheduling = True
+
+        self.new_heat_units = None
+        self.heat_fraction = None
+        self.minimum_heat_unit_temperature = None
+        self.maximum_heat_unit_temperature = None
+        self.heat_unit_temperature = None
+
+    def absorb_heat_units(self, mean_air_temperature: float = None,
+                          min_air_temperature: float = None, max_air_temperature: float = None) -> None:
+        """main function for absorbing heat units during a day and accumulating them
+
+        Args:
+            mean_air_temperature: average air temperature for the day (C)
+            min_air_temperature: minimum air temperature for the day (C)
+            max_air_temperature: maximum air temperature for the day (C)
+
+        Details: if the attribute use_heat_unit_temperature is false, both min_air_temperature and max_air_temperature
+        are optional. Otherwise, they are used to determine heat unit accumulation rather than average air temperature.
+        """
+        self.__check_absorb_heat_for_input_errors(mean_air_temperature, min_air_temperature, max_air_temperature)
+
+        if self.use_heat_unit_temperature:
+            self.determine_heat_unit_temperature(min_air_temperature, max_air_temperature)
+
+        self.check_growth_conditions(mean_air_temperature)
+        self.accumulate_heat_units(mean_air_temperature)
+        self.shift_heat_unit_time()
+        self.determine_heat_fraction()
+        self.check_maturity_by_heat_units()
+
+    def check_growth_conditions(self, air_temperature: float = None) -> None:
+        """checks if the temperature is suitable for growth"""
+        if self.use_heat_unit_temperature or air_temperature is None:
+            use_temp = self.heat_unit_temperature
+        else:
+            use_temp = air_temperature
+        self.is_growing = self.minimum_temperature <= use_temp <= self.maximum_temperature
+
+    # def check_temperature_above_minimum(self, temperature: float) -> bool:
+    #     """checks if a temperature is greater than the crop's minimum temperature for growth"""
+    #     return temperature > self.minimum_temperature
+    #
+    # def check_temperature_below_maximum(self, temperature: float) -> bool:
+    #     """checks if a temperature is less than the crop's maximum temperature for growth"""
+    #     return temperature < self.maximum_temperature
+
+    def decide_to_use_heat_unit_temperature(self, use_heat_unit_temperature: bool):
+        """sets the boolean that determines if heat unit temperature will be used for heat unit accumulation.
+
+        Details: This function will primarily be used outside this class during when
+            If use_heat_unit_temperature is False, the average daily temperature will be used to accumulate heat
+            units. If use_heat_unit_temperature is True, then an alternative heat unit temperature is used to determine
+            accumulated heat units.
+        """
+        self.use_heat_unit_temperature = use_heat_unit_temperature
+
+    def _check_absorb_heat_for_input_errors(self, mean_air_temperature: float = None,
+                                             min_air_temperature: float = None,
+                                             max_air_temperature: float = None):
+        """raises errors if inputs given for absorb_heat_units don't make sense with the value of the
+        use_heat_unit_temperature attribute"""
+        if self.use_heat_unit_temperature and (min_air_temperature is None or max_air_temperature is None):
+            raise ValueError("min_air_temperature and max_air_temperature must be provided" +
+                             " when use_heat_unit_temperature is True")
+        if not self.use_heat_unit_temperature and mean_air_temperature is None:
+            raise ValueError("mean_air_temperature must be provided when use_heat_temperature is False")
+
+    def determine_heat_unit_temperature(self, min_air_temp=None, max_air_temp=None) -> None:
+        """determines the heat unit temperature for calculating accumulation of heat units via the alternative method
+        Args:
+            min_air_temp: minimum air temperature during the day (C)
+            max_air_temp: maximum air temperature during the day (C)
+        """
+        self.set_maximum_heat_units(max_air_temp)
+        self.set_minimum_heat_unit_temperature(min_air_temp)
+        self.set_heat_unit_temperature()
+
+    def set_minimum_heat_unit_temperature(self, min_air_temp):
+        """sets minimum heat unit temperature for alternative heat unit accumulation method
+        Args:
+            min_air_temp: minimum air temperature during the day (C)
+        """
+        self.minimum_heat_unit_temperature = calc_minimum_heat_unit_temperature(min_air_temp, self.minimum_temperature)
+
+    def set_maximum_heat_units(self, max_air_temp):
+        """sets aximum heat unit temperature for alternative heat unit accumulation method
+        Args:
+            max_air_temp: maximum air temperature during the day (C)
+        """
+        self.maximum_heat_unit_temperature = calc_maximum_heat_unit_temperature(max_air_temp, self.maximum_temperature)
+
+    def set_heat_unit_temperature(self) -> None:
+        """finds the heat unit temperature to be used as an alternative to mean air temperature in calculating
+        accumulated heat units"""
+        self.heat_unit_temperature = (self.minimum_heat_unit_temperature + self.maximum_heat_unit_temperature) / 2
+
+    def accumulate_heat_units(self, air_temperature=None):
+        """accumulates heat units during a day
+
+        Args:
+            air_temperature: the average air temperature during the day (C)
+
+        Details:
+            If the attribute use_heat_unit_temperature is False, then the main
+            accumulation method occurs (as in SWAT manual). This method accumulates every degree C above the crop's
+            minimum temperature for growth as heat units.
+
+            If use_heat_unit_temperature is True (or air_temperature=None), then the alternative method is used. in this
+            method, the heat_unit_temperature attribute is used in place of average air temperature.
+
+            Whereas heat units accumulated by the main method are always equal to the average air temperature (when
+            above the minimum threshold), the alternative method is context dependent:
+                1. if the minimum and maximum air temperature are both **higher** than the crop's minimum and maximum
+                growth temperatures, then accumulation will be greater than with the main method
+                2. if the minimum and maximum air temperatures are both **lower** than the crop's miniimum and maximum
+                temperatures, then accumulation will be greater than with the main method
+                3. if the air temperature window is entirely contained within the crop temperature window
+                (i.e., crop min < air min < air max < crop max), then accumulation will be equal to the middle of the
+                crop temperature window
+                4. if the crop temperature window is entirely contained withing the air temperature window, then
+                accumulation will equal the middle of the temperature window
+        """
+        self.assign_new_heat_units(air_temperature)
+        self.add_heat_units()
+
+    def assign_new_heat_units(self, air_temperature=None) -> None:
+        """assign new heat units based on if the alternative accumulation method is to be used"""
+        if self.use_heat_unit_temperature or (air_temperature is None):  # alternative method
+            self.new_heat_units = calc_new_heat_units(self.heat_unit_temperature, self.minimum_temperature)
+        else:  # main method
+            self.new_heat_units = calc_new_heat_units(air_temperature, self.minimum_temperature)
+
+    def add_heat_units(self) -> None:
+        """add newly acquired heat units to accumulated heat units
+        Args:
+            new_units: newly acquired heat units
+        """
+        self.accumulated_heat_units += self.new_heat_units
+
+
+    def determine_heat_fraction(self):
+        """determine the fraction of potential heat units accumulated to date"""
+        self.heat_fraction = self.accumulated_heat_units / self.potential_heat_units
+
+    def check_maturity_by_heat_units(self):
+        """checks if maturity has been reached based on the fraction of potential heat units accumulated"""
+        self.is_mature = self.heat_fraction >= 1.0
+
+    def shift_heat_unit_time(self):
+        """shifts the time window for the heat units"""
+        self.previous_heat_fraction = self.heat_fraction
+
+# ---- helper functions ----
+
+def calc_new_heat_units(temperature, min_temperature):
+    """calculates the heat units that will be accumulated during a day
+
+        Args:
+            temperature: the temperature to be compared to min_temp for accumulating heat units (C)
+            min_temperature: the minimum temperature below which a crop cannot grow (C)
+        """
+    return max(temperature - min_temperature, 0)  # from SWAT:
+
+def calc_minimum_heat_unit_temperature(min_air_temp: float, min_growth_temp: float) -> float: # pseudocode_crop" C.2.A.3
+    """ calculates minimum heat unit temperature on current day.
+
+    Args:
+        min_air_temp: minimum temperature on the current day
+        min_growth_temp: minimum temperature at which a crop can grow_crop
+
+    Returns:
+        float: minimum heat unit temperature
+    """
+    return max(min_air_temp, min_growth_temp)
+
+def calc_maximum_heat_unit_temperature(max_air_temp: float, max_growth_temp: float) -> float:
+    """calculates maximum heat unit temperature on current day.
+        "pseudocode_crop" C.2.A.4
+
+    Args:
+        max_air_temp: maximum temperature on the current day
+        max_growth_temp: maximum temperature at which a crop can grow_crop
+
+    Returns:
+        maximum heat unit temperature
+    """
+    return min(max_air_temp, max_growth_temp)
+
+

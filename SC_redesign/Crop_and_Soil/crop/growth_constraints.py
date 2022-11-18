@@ -9,8 +9,8 @@ class GrowthConstraints:
         self.optimal_nitrogen = 100
         self.phosphorus = 20
         self.optimal_phosphorus = 80
-        self.minimum_temp = 15
-        self.optimal_temp = 22
+        self.minimum_temperature = 15
+        self.optimal_temperature = 22
 
         self.growth_factor = 1.0
         self.water_stress = None
@@ -37,7 +37,7 @@ class GrowthConstraints:
         self.water_stress = calc_water_stress(self.water_uptake, max_transpiration)
 
     def assess_temp_stress(self, temperature: float) -> None:
-        self.temp_stress = calc_temperature_stress(temperature, self.minimum_temp, self.optimal_temp)
+        self.temp_stress = calc_temperature_stress(temperature, self.minimum_temperature, self.optimal_temperature)
 
     def assess_nitrogen_stress(self) -> None:
         self.nitrogen_stress = calc_nutrient_stress(self.nitrogen, self.optimal_nitrogen)

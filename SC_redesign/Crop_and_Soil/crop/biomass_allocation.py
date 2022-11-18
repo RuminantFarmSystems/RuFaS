@@ -8,7 +8,7 @@ class BiomassAllocation:
         self.light_conversion = 20
         self.biomass = 0
         self.growth_factor = 1.0
-        self.root_frac = 1 / 3
+        self.root_fraction = 1 / 3
 
         self.usable_light = None
         self.biomass_growth_max = None
@@ -44,8 +44,8 @@ class BiomassAllocation:
 
     def partition_biomass(self):
         """partition the accumulated biomass into above ground and below grown portions"""
-        self.green_biomass = calc_above_ground_biomass(self.root_frac, self.biomass)
-        self.root_biomass = calc_below_ground_biomass(self.root_frac, self.biomass)
+        self.green_biomass = calc_above_ground_biomass(self.root_fraction, self.biomass)
+        self.root_biomass = calc_below_ground_biomass(self.root_fraction, self.biomass)
 
 
 def calc_intercepted_radiation(radiation: float, extinction: float, lai: float) -> float:  # pseudocode: C.9.A.1

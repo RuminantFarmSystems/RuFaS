@@ -62,3 +62,5 @@ def calc_water_deficiency(evapotranspiration: float, max_evapotranspiration: flo
         return 100 * (evapotranspiration / max_evapotranspiration)
     else:
         return 0
+
+# TODO: Further functions in RUFAS/routines/field/crop/transpiration.py need to be translated (into soil methods?)
