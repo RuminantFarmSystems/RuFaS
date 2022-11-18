@@ -100,7 +100,7 @@ def get_json_list_from_dir(dir_path: Path, verbose: bool) -> list[Path]:
         raise FileExistsError("Directory contains no json files")
     else:
         if verbose:
-            print(str(len(json_paths)) + "json files detected...\n")
+            print(str(len(json_paths)) + " json files detected...\n")
         return json_paths
 
 
