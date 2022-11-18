@@ -36,8 +36,15 @@ class PhosphorusUptake:
             crop_type: an instance of a crop class
         """
 
-        self.determine_fractional_biomass_phosphorus()
-        self.determine_optimal_phosphorus_biomass()
+        self.determine_fractional_biomass_phosphorus() #fr_P
+        self.determine_optimal_phosphorus_biomass()    #bio_P_opt
+        self.determine_potential_phosphorus_uptake()   #P_up
+        self.determine_actual_phosphorus_uptake_each_layer()
+        self.determine_actual_phosphorus_biomass()
+        #self.determine_actual_uptake_per_layer()
+        #self.determine_actual_phosphorus_biomass()
+
+
         # calc_potential_phosphorus_uptake()
         # calc_act_potential_phosphorus_uptake_each_layer(soil)
         # calc_actual_phosphorus_biomass(soil)
@@ -53,18 +60,25 @@ class PhosphorusUptake:
         self.fraction_biomass_phosphorus = calculate_fractional_biomass_phosphorus(first, second, self.previous_actual_biomass, 
                     self.emergent_fractional_phosphorus, self.mature_fractional_phosphorus,self.previous_fraction_potential_heat_units)
 
+
     def determine_potential_phosphorus_uptake(self) -> None:
         """determine the plants potential phosphorus uptake"""
         self.potential_phosphorus_uptake = calc_potential_phosphorus_uptake(self.optimal_phosphorus_biomass, self.actual_phosphorus_biomass,
                                                             self.mature_fractional_phosphorus, self.potential_phosphorus_biomass_increase)
 
+
     def determine_optimal_phosphorus_biomass(self) -> None:
+        """determine optimal biomass of phosphorus stored in plant material"""
         self.optimal_phosphorus_biomass = calc_optimal_phosphorus_biomass(self.previous_actual_biomass, self.fraction_biomass_phosphorus)
 
-    def determine_actual_phosphorus_biomass(self) -> None:
-        pass 
 
+    def determine_actual_phosphorus_uptake_each_layer(self,soil: Soil) -> None:
+        """determine actual phosphorus uptake for each soil layer"""
+        pass
 
+    def determine_actual_phosphorus_biomass(self,soil: Soil) -> None:
+        """determine the actual phosphorus biomass in the plant"""
+        self.actual_phosphorus_biomass += calc_actual_phosphorus_biomass(soil.phosphorus_uptake)
 
 
 
@@ -124,10 +138,8 @@ def calculate_fractional_biomass_phosphorus(first_shape_coefficient: float,secon
 
 
 
-
-
-
 #TODO: option1/2 need better names
+#calc_P_up
 def calc_potential_phosphorus_uptake(optimal_phosphorus_biomass: float, actual_phosphorus_biomass: float,
                                 mature_fractional_phosphorus: float ,potential_phosphorus_biomass_increase: float) -> float:
     """
@@ -153,6 +165,7 @@ def calc_potential_phosphorus_uptake(optimal_phosphorus_biomass: float, actual_p
 
 
 #TODO term1 and term2 need better names
+#calc_P_up_z
 def calc_depth_dependent_potential_phosphorus_uptake(bottom_depth: float, soil_development_depth: float, 
                         potential_phosphorus_uptake: float, phosphorus_uptake_distribution_param: float) -> float:
     """
@@ -179,7 +192,7 @@ def calc_depth_dependent_potential_phosphorus_uptake(bottom_depth: float, soil_d
 
 
 
-
+#calc_bio_P_opt
 def calc_optimal_phosphorus_biomass(previous_actual_biomass: float, fraction_biomass_phosphorus: float) -> float:
     """calculates the optimal biomass of phosphorus in the plant"""
     
@@ -198,8 +211,28 @@ def calc_logarithmic_term_of_coefficient(fractional_potential_heat_units: float,
     return log((fractional_potential_heat_units/bottom) - fractional_potential_heat_units)
 
 
+#calc_bio_P
+def calc_actual_phosphorus_biomass(uptake: list) -> float:
+    """
+    Description:
+        Calculates the actual mass of phosphorus stored in the plant material
+
+    Args:
+        uptake: list of phosphorus uptake values from an instance of a Soil object
+
+    Returns:
+        the total phosphorus stored in plant material
+    """
+    actual_phos = 0
+
+    for uptake_val in uptake:
+        actual_phos += uptake_val
+
+    return actual_phos
 
 
+
+#P_uptake
 def calc_layer_phosphorus_uptake(layer_labile_phosphorus: List[float], layer_phosphorus_uptake: List[float]) -> List[float]:
     """
     Description:
@@ -220,94 +253,64 @@ def calc_layer_phosphorus_uptake(layer_labile_phosphorus: List[float], layer_pho
     return updated_labile_phosphorus
 
 
+#needs depth_dependent_potential_phosphorus_uptake
+def calc_potential_phosphorus_uptake_each_layer(bottom_depths: List[float], soil_development_depth: float,
+                potential_phosphorus_uptake: float, phosphorus_uptake_distribution_param) -> List[float]:
+    
+    uptake_each_layer = []
+    top_layer_uptake = 0
+
+    for depth in bottom_depths:
+        bottom_layer_uptake = calc_depth_dependent_potential_phosphorus_uptake(depth, soil_development_depth, 
+            potential_phosphorus_uptake,phosphorus_uptake_distribution_param)
+        phos_uptake_layer = bottom_layer_uptake - top_layer_uptake
+
+        uptake_each_layer.append(phos_uptake_layer)
+
+
+        top_layer_uptake = bottom_layer_uptake
+
+    return uptake_each_layer
 
 
 
+#list of bottom depths (soil),
+def calc_actual_phosphorus_uptake_each_layer(layer_bottom_depths: List[float], layer_labile_phosphorus: List[float], 
+        soil_development_depth, potential_phosphorus_uptake, phosphorus_uptake_distribution_param):
+    
+    each_layer_uptake = calc_potential_phosphorus_uptake_each_layer(layer_bottom_depths, soil_development_depth,potential_phosphorus_uptake,phosphorus_uptake_distribution_param)
+    
+    phos_uptake_overlying = 0
+
+    phos_soil_solution_overlying = 0
+
+    phos_uptake_demand = 0
+
+    actual_phosphorus_uptake = []
+
+    if len(layer_bottom_depths) != len(each_layer_uptake):
+        raise Exception("mismatching number of layers")
+
+    for layer in range(len(each_layer_uptake)):
+        actual_uptake = min((each_layer_uptake[layer] + phos_uptake_demand), layer_labile_phosphorus[layer])
+
+        actual_phosphorus_uptake.append(actual_uptake)
+
+        phos_uptake_overlying += each_layer_uptake[layer]
+        phos_soil_solution_overlying += layer_labile_phosphorus[layer]
+
+        phos_uptake_demand = phos_uptake_overlying - phos_soil_solution_overlying
+        if phos_uptake_demand < 0:
+            phos_uptake_demand = 0
+
+    return actual_phosphorus_uptake
 
 
 
-def calc_act_potential_phosphorus_uptake_each_layer(soil, crop_type):
-    """
-    Description:
-        Calculates the actual phosphorus uptake from soil solution in each layer.
-        Saves the list containing these values to act_potential_phosphorus_uptake_each_layer attribute.
-        The order of the values in the list corresponds with the order of the layers
-        in soil.soil_layers. The soil layers in that list need to be in order
-        of shallowest to deepest for this to work correctly.
-        "pseudocode_crop" C.6.C.4-7
+##########################################################################################################################
+##########################################################################################################################
+##########################################################################################################################
+##########################################################################################################################
 
-    Args:
-        soil
-        crop_type
-    """
-
-    potential_phosphorus_uptake_each_layer = calc_potential_phosphorus_uptake_each_layer(soil, crop_type)
-
-    # Running total of potential phosphorus uptake in overlying layers
-    potential_phosphorus_uptake_over = 0
-
-    # Running total of phosphorus content of soil solution in overlying layers
-    P_sol_over = 0
-
-    # Phosphorus uptake demand not met in overlying soil layers
-    P_demand = 0
-
-    for pot_potential_phosphorus_uptake, layer in zip(potential_phosphorus_uptake_each_layer, soil.soil_layers):
-        # C.6.C.4
-        act_potential_phosphorus_uptake = min((pot_potential_phosphorus_uptake + P_demand), layer.labile_P)
-        # C.6.C.7
-        layer.potential_phosphorus_uptake = act_potential_phosphorus_uptake
-
-        # C.6.C.6
-        # Update values for next layer
-        potential_phosphorus_uptake_over += pot_potential_phosphorus_uptake
-        P_sol_over += layer.labile_P
-        # C.6.C.5
-        P_demand = potential_phosphorus_uptake_over - P_sol_over
-        if P_demand < 0:
-            P_demand = 0
-
-
-def calc_potential_phosphorus_uptake_each_layer(soil, crop_type):
-    """
-    Description:
-        Calculates the potential phosphorus uptake from soil solution in each layer.
-        Returns a list containing these values. The order of the values in the list
-        corresponds with the order of the layers in soil.soil_layers. The soil
-        layers in that list need to be in order of shallowest to deepest for this
-        to work correctly.
-        "pseudocode_crop" C.6.C.3
-
-    Args:
-        soil
-        crop_type
-    """
-
-    potential_phosphorus_uptake_each_layer = []
-    potential_phosphorus_uptake_for_top_of_layer = 0
-    for layer in soil.soil_layers:
-        potential_phosphorus_uptake_for_bottom_of_layer = calc_potential_phosphorus_uptake_z(crop_type, layer.bottom_depth)
-        potential_phosphorus_uptake_ly = potential_phosphorus_uptake_for_bottom_of_layer - potential_phosphorus_uptake_for_top_of_layer
-
-        potential_phosphorus_uptake_each_layer.append(potential_phosphorus_uptake_ly)
-
-        # Set the top for next layer equal to bottom of this layer
-        potential_phosphorus_uptake_for_top_of_layer = potential_phosphorus_uptake_for_bottom_of_layer
-
-    return potential_phosphorus_uptake_each_layer
-
-
-def calc_actual_phosphorus_biomass(soil, crop_type):
-    """
-    Description:
-        Calculates actual mass of phosphorus stored in plant material.
-
-    Args:
-        crop_type
-        soil
-    """
-
-    for layer in soil.soil_layers:
-        crop_type.actual_phosphorus_biomass += layer.potential_phosphorus_uptake
 
 
