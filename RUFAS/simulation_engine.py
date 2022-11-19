@@ -26,7 +26,6 @@ class SimulationEngine:
 
     def simulate(self) -> None:
         """Executes the simulation"""
-
         t_start_sim = timer.time()
         self._run_simulation_main_loop()
         self.output.finalize(self.state, self.weather, self.time)
