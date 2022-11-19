@@ -32,7 +32,7 @@ class OutputManager (object):
             cls.instance = super(OutputManager, cls).__new__(cls)
         return cls.instance
 
-    def __init__(self,cls) -> None:
+    def __init__(self, cls) -> None:
         if OutputManager.__instance is None:
             OutputManager.__instance = self
             self.x = 0
@@ -41,11 +41,11 @@ class OutputManager (object):
             self.errors_pool: Dict[str, Any] = {}
             self.logs_pool: Dict[str, Any] = {}
             self.add_log("Output Manager instantiated.",
-                         caller_class=self.__class__.__name__,
-                         caller_function=self.__init__.__name__)
+                         info_map={'caller_class': self.__class__.__name__,
+                                   'caller_function': self.__init__.__name__})
 
     def add_variable(self, name: str, value: Any,
-                     **kwargs: Dict[str, Union[str, bool]]) -> None:
+                     info_map: Dict[str, Union[str, bool]]) -> None:
         """
         Adds a variable to the pool.
 
@@ -55,26 +55,26 @@ class OutputManager (object):
             The name of the variable
         value : Any
             The value of the variable
-        kwargs : Dict[str, Union[str,bool]]
+        info_map : Dict[str, Union[str,bool]]
             Additional args, some are non-optional
-        kwargs['caller_class'] : str
+        info_map['caller_class'] : str
             The name of the class which called this function
-        kwargs['caller_function'] : str
+        info_map['caller_function'] : str
             The name of the function which called this function 
-        kwargs['prefix'] : str, optional
+        info_map['prefix'] : str, optional
             If present, overrides the automated prefix
-        kwargs['suffix'] : str, optional
+        info_map['suffix'] : str, optional
             If present, overrides the automated suffix
-        kwargs['suppress_prefix'] : bool, optional
+        info_map['suppress_prefix'] : bool, optional
             If present and True, suppresses the automated prefix generation.
             Has no effect on manual prefix overrides.
-        kwargs['suppress_suffix'] : bool, optional
+        info_map['suppress_suffix'] : bool, optional
             If present and True, suppresses the automated suffix generation.
             Has no effect on manual suffix overrides.
-        kwargs['enforce_override'] : bool, optional
+        info_map['enforce_override'] : bool, optional
             If present and True, overrides the existing value in the pool if a
             key collision happens.
-        kwargs['fail_silently'] : bool, optional
+        info_map['fail_silently'] : bool, optional
             If present and True, suppresses raising error if a key collision
             happens.
 
@@ -82,33 +82,32 @@ class OutputManager (object):
         ------
         ValueError
             If a key collision happens in the pool and either
-            **kwargs['fail_silently'] or **kwargs['enforce_override'] 
+            info_map['fail_silently'] or info_map['enforce_override'] 
             are not set to True.
         """
-        function_name = self.add_to_pool.__name__
-        key = self.__generate_key(name, kwargs)
+        key = self.__generate_key(name, info_map)
         key_not_exists = self.pool.get(key) is None
         if key_not_exists:
             self.pool[key] = value
             return
-        if kwargs.get('enforce_override', False):
+        info_map['key'] = key
+        info_map['caller_function'] = self.add_to_pool.__name__
+        info_map['caller_class'] = self.__class__.__name__
+        if info_map.get('enforce_override', False):
             self.pool[key] = value
             self.add_warning(
-                "Key collision happened; the value was overriden per given flag.",
-                self.__class__.__name__, function_name, [key], kwargs)
+                "Key collision happened; the value was overriden per given flag.", info_map)
             return
-        if kwargs.get('fail_silently', False):
-            self.add_warning(
-                "Key collision happened; the event was ignored per given flag.",
-                self.__class__.__name__, function_name, [key], kwargs)
+        if info_map.get('fail_silently', False):
+            self.add_error(
+                "Key collision happened; the event was ignored per given flag.", info_map)
             return
         raise ValueError(f"Key {key} already exists in the pool." +
                          "Consider using different name, prefix/suffix;" +
                          "or turn the automated prefix/suffix generation on"
                          )
 
-    def add_log(
-            self, msg: str, *args: List[Any], **kwargs: Dict[Any, Any]) -> None:
+    def add_log(self, msg: str, info_map: Dict[str, Any]) -> None:
         """
         Adds a log message to the pool of logs.
 
@@ -116,20 +115,17 @@ class OutputManager (object):
         ----------
         msg : str
             The log message to be added to the pool
-        *args: List[Any]
-            Contains any additional information to be added to the message  
-        **kwargs: Dict[Any, Any]
+        info_map: Dict[Any, Any]
             Additional args, some are non-optional
-        kwargs['caller_class'] : str
+        info_map['caller_class'] : str
             The name of the class which called this function
-        kwargs['caller_function'] : str
+        info_map['caller_function'] : str
             The name of the function which called this function 
         """
-        key = self.__generate_key('log_entry', **kwargs)
-        self.logs_pool[key] = {'msg': msg, 'args': args, 'kwargs': kwargs}
+        key = self.__generate_key('log_entry', info_map)
+        self.logs_pool[key] = {'msg': msg, 'info_map': info_map}
 
-    def add_warning(
-            self, msg: str, *args: List[Any], **kwargs: Dict[Any, Any]) -> None:
+    def add_warning(self, msg: str, info_map: Dict[str, Any]) -> None:
         """
         Adds a warning message to the pool of warnings.
 
@@ -137,20 +133,17 @@ class OutputManager (object):
         ----------
         msg : str
             The warning message to be added to the pool
-        *args: List[Any]
-            Contains any additional information to be added to the message  
-        **kwargs: Dict[Any, Any]
+        info_map: Dict[Any, Any]
             Additional args, some are non-optional
-        kwargs['caller_class'] : str
+        info_map['caller_class'] : str
             The name of the class which called this function
-        kwargs['caller_function'] : str
+        info_map['caller_function'] : str
             The name of the function which called this function 
         """
-        key = self.__generate_key('warning_entry', kwargs)
-        self.warnings_pool[key] = {'msg': msg, 'args': args, 'kwargs': kwargs}
+        key = self.__generate_key('warning_entry', info_map)
+        self.warnings_pool[key] = {'msg': msg, 'info_map': info_map}
 
-    def add_error(self, msg: str, caller_class: str, caller_function: str,
-                  *args: List[Any], **kwargs: Dict[Any, Any]) -> None:
+    def add_error(self, msg: str, info_map: Dict[str, Any]) -> None:
         """
         Adds an error message to the pool of errors.
 
@@ -158,20 +151,18 @@ class OutputManager (object):
         ----------
         msg : str
             The error message to be added to the pool
-        *args: List[Any]
-            Contains any additional information to be added to the message  
-        **kwargs: Dict[Any, Any]
+        info_map: Dict[str, Any]
             Additional args, some are non-optional
-        kwargs['caller_class'] : str
+        info_map['caller_class'] : str
             The name of the class which called this function
-        kwargs['caller_function'] : str
+        info_map['caller_function'] : str
             The name of the function which called this function 
         """
-        key = self.__generate_key('error_entry', kwargs)
-        self.errors_pool[key] = {'msg': msg, 'args': args, 'kwargs': kwargs}
+        key = self.__generate_key('error_entry', info_map)
+        self.errors_pool[key] = {'msg': msg, 'info_map': info_map}
 
     def __generate_key(self, name: str,
-                       **kwargs: Dict[str, Union[str, bool]]) -> str:
+                       info_map: Dict[str, Union[str, bool]]) -> str:
         """
         Generates key for the pool.
         See 'add_to_pool' docs for detailed arg description.
@@ -179,25 +170,25 @@ class OutputManager (object):
         Raises
         ------
         KeyError
-            If either kwargs['caller_class'] or kwargs['caller_function'] are 
+            If either info_map['caller_class'] or info_map['caller_function'] are 
             not present.
         """
-        if kwargs.get('caller_class') is None:
-            raise KeyError("'caller_class' were not found in kwargs")
-        if kwargs.get('caller_function') is None:
-            raise KeyError("'caller_function' were not found in kwargs")
+        if info_map.get('caller_class') is None:
+            raise KeyError("'caller_class' were not found in info_map")
+        if info_map.get('caller_function') is None:
+            raise KeyError("'caller_function' were not found in info_map")
 
         prefix = ""
-        if kwargs.get('prefix') is not None:
-            prefix = kwargs.get('prefix') + "."
-        elif not kwargs.get('suppress_prefix', False):
-            prefix = self.__get_prefix(kwargs.get(
-                'caller_class'), kwargs.get('caller_function')) + "."
+        if info_map.get('prefix') is not None:
+            prefix = info_map.get('prefix') + "."
+        elif not info_map.get('suppress_prefix', False):
+            prefix = self.__get_prefix(info_map.get(
+                'caller_class'), info_map.get('caller_function')) + "."
 
         suffix = ""
-        if kwargs.get('suffix') is not None:
-            suffix = "." + kwargs.get('suffix')
-        elif not kwargs.get('suppress_suffix', False):
+        if info_map.get('suffix') is not None:
+            suffix = "." + info_map.get('suffix')
+        elif not info_map.get('suppress_suffix', False):
             suffix = "." + self.__get_suffix()
 
         return f"{prefix}{name}{suffix}"
