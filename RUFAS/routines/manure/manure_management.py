@@ -15,7 +15,6 @@ from typing import Dict, List, Tuple
 from RUFAS.routines.animal.animal_management import AnimalManagement
 from RUFAS.routines.manure.ManureManagementPen.manure_management_pen import ManureManagementPen
 
-
 class ManureManagement:
     """
     A class that sets up and manages different manure management components including manure handlers,

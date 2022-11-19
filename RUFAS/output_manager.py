@@ -6,9 +6,13 @@ import time
 
 class OutputManager (object):
     """
-    Output manager for RufaS simulation results. Works by collecting variables
-    into the pool, and populates requested output channels from the pool once
-    the simulation is done. Warnings and errors are added to their own pools.
+    Output manager for RufaS simulation results. Works by collecting variables,
+    logs, warnings, and errors into the pools, and populates requested output
+    channels from the pool once the simulation is done. 
+
+    OutputManager is singleton, i.e., only one instance of it can exist. After
+    the first instance is created, future calls to the constructor method 
+    returns the first instance. Also, the initilizer method only works once.
 
     Attributes
     ----------
@@ -21,18 +25,27 @@ class OutputManager (object):
     logs_pool : Dict[str, Any]
         Contains logs reported to the output manager 
     """
+    __instance = None
 
-    def __init__(self) -> None:
-        self.pool: Dict[str, Any] = {}
-        self.warnings_pool: Dict[str, Any] = {}
-        self.errors_pool: Dict[str, Any] = {}
-        self.logs_pool: Dict[str, Any] = {}
-        self.add_log("Output Manager instantiated.",
-                     caller_class=self.__class__.__name__,
-                     caller_function=self.__init__.__name__)
+    def __new__(cls):
+        if not hasattr(cls, 'instance'):
+            cls.instance = super(OutputManager, cls).__new__(cls)
+        return cls.instance
+
+    def __init__(self,cls) -> None:
+        if OutputManager.__instance is None:
+            OutputManager.__instance = self
+            self.x = 0
+            self.pool: Dict[str, Any] = {}
+            self.warnings_pool: Dict[str, Any] = {}
+            self.errors_pool: Dict[str, Any] = {}
+            self.logs_pool: Dict[str, Any] = {}
+            self.add_log("Output Manager instantiated.",
+                         caller_class=self.__class__.__name__,
+                         caller_function=self.__init__.__name__)
 
     def add_variable(self, name: str, value: Any,
-                    **kwargs: Dict[str, Union[str, bool]]) -> None:
+                     **kwargs: Dict[str, Union[str, bool]]) -> None:
         """
         Adds a variable to the pool.
 
@@ -112,7 +125,7 @@ class OutputManager (object):
         kwargs['caller_function'] : str
             The name of the function which called this function 
         """
-        key = self.__generate_key('log_entry', kwargs)
+        key = self.__generate_key('log_entry', **kwargs)
         self.logs_pool[key] = {'msg': msg, 'args': args, 'kwargs': kwargs}
 
     def add_warning(

@@ -10,6 +10,7 @@ from mock.mock import MagicMock
 from pytest import approx, raises
 from pytest_mock.plugin import MockerFixture
 
+from RUFAS.output_manager import OutputManager
 from RUFAS.simulation_engine import SimulationEngine
 from RUFAS.util import Utility
 

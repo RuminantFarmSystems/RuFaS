@@ -15,7 +15,6 @@ def main():
     print("RUFAS: Ruminant Farm Systems Model 2022")
 
     input_file_list = input_prompt()
-
     for input_file_path in input_file_list:
         simulator = SimulationEngine(input_file_path)
         simulator.simulate()
