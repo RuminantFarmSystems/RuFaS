@@ -12,7 +12,7 @@ class OutputManager (object):
 
     OutputManager is singleton, i.e., only one instance of it can exist. After
     the first instance is created, future calls to the constructor method 
-    returns the first instance. Also, the initilizer method only works once.
+    returns the first instance. Also, the initializer method only works once.
 
     Attributes
     ----------
@@ -103,9 +103,10 @@ class OutputManager (object):
                            "Key collision happened; the event was ignored per given flag.",
                            info_map)
             return
-        raise ValueError(f"Key {key} already exists in the variables_pool." +
-                         "Consider using different name, prefix/suffix;" +
-                         "or turn the automated prefix/suffix generation on"
+        raise ValueError(f"Key {key} already exists in the variables_pool."
+                         + "Consider using different name, prefix/suffix;"
+                         + "or turn the automated prefix/suffix generation on."
+                         + f"info_map is: {info_map}"
                          )
 
     def add_log(self, name: str, msg: str, info_map: Dict[str, Any]) -> None:
@@ -230,6 +231,6 @@ class OutputManager (object):
     def _get_time_based_suffix(self) -> str:
         """
         Returns a suffix for a key in the pool by using timestamp in ns.
-        This gurrantees that no name collision will happen.
+        This guarantees that no name collision will happen.
         """
         return str(time.time())
