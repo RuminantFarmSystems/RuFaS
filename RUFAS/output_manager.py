@@ -6,9 +6,9 @@ import time
 
 class OutputManager (object):
     """
-    Output manager for RufaS simulation results. Works by collecting variables,
-    logs, warnings, and errors into the pools, and populates requested output
-    channels from the pool once the simulation is done. 
+    Output manager for RuFaS simulation results. Works by collecting variables,
+    logs, warnings, and errors into separate pools, and populates requested
+    output channels from the pools once the simulation is done. 
 
     OutputManager is singleton, i.e., only one instance of it can exist. After
     the first instance is created, future calls to the constructor method 
@@ -16,7 +16,7 @@ class OutputManager (object):
 
     Attributes
     ----------
-    pool : Dict[str, Any]
+    variables_pool : Dict[str, Any]
         Contains variables reported to the output manager
     warnings_pool : Dict[str, Any]
         Contains warnings reported to the output manager
@@ -35,7 +35,7 @@ class OutputManager (object):
     def __init__(self) -> None:
         if OutputManager.__instance is None:
             OutputManager.__instance = self
-            self.pool: Dict[str, Any] = {}
+            self.variables_pool: Dict[str, Any] = {}
             self.warnings_pool: Dict[str, Any] = {}
             self.errors_pool: Dict[str, Any] = {}
             self.logs_pool: Dict[str, Any] = {}
@@ -85,15 +85,15 @@ class OutputManager (object):
             are not set to True.
         """
         key = self._generate_key(name, info_map)
-        key_not_exists = self.pool.get(key) is None
+        key_not_exists = self.variables_pool.get(key) is None
         if key_not_exists:
-            self.pool[key] = value
+            self.variables_pool[key] = value
             return
         info_map['key'] = key
         info_map['caller_function'] = self.add_variable.__name__
         info_map['caller_class'] = self.__class__.__name__
         if info_map.get('enforce_override', False):
-            self.pool[key] = value
+            self.variables_pool[key] = value
             self.add_warning('key_collision',
                              "Key collision happened; the value was overriden per given flag.",
                              info_map)
@@ -103,7 +103,7 @@ class OutputManager (object):
                            "Key collision happened; the event was ignored per given flag.",
                            info_map)
             return
-        raise ValueError(f"Key {key} already exists in the pool." +
+        raise ValueError(f"Key {key} already exists in the variables_pool." +
                          "Consider using different name, prefix/suffix;" +
                          "or turn the automated prefix/suffix generation on"
                          )
@@ -205,7 +205,7 @@ class OutputManager (object):
         if info_map.get('suffix') is not None:
             suffix = "." + info_map.get('suffix')
         elif not info_map.get('suppress_suffix', False):
-            suffix = "." + self._get_suffix()
+            suffix = "." + self._get_time_based_suffix()
 
         return f"{prefix}{name}{suffix}"
 
@@ -227,7 +227,7 @@ class OutputManager (object):
         """
         return f"{caller_class}.{caller_function}"
 
-    def _get_suffix(self) -> str:
+    def _get_time_based_suffix(self) -> str:
         """
         Returns a suffix for a key in the pool by using timestamp in ns.
         This gurrantees that no name collision will happen.

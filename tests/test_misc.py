@@ -287,12 +287,12 @@ def test_percent_calculator() -> None:
         pc(1.0)
 
 
-def test_get_suffix(mocker: MockerFixture) -> None:
+def test_get_time_based_suffix(mocker: MockerFixture) -> None:
     """Unit test for function _get_suffix in file output_manager.py"""
     auto_suffix = '1669002803.9697945'
     mocker.patch('time.time', return_value=auto_suffix)
     om = OutputManager()
-    assert om._get_suffix() == auto_suffix
+    assert om._get_time_based_suffix() == auto_suffix
 
 
 def test_get_prefix() -> None:
@@ -393,7 +393,7 @@ def test_add_variable(mocker: MockerFixture) -> None:
     om = OutputManager()
     info_map = {'caller_class': 'dummy_class', 'caller_function': 'dummy_func'}
     om.add_variable('dummy_name', 'dummy_value', info_map)
-    assert om.pool[key] == 'dummy_value'
+    assert om.variables_pool[key] == 'dummy_value'
 
     with raises(ValueError):
         om.add_variable('dummy_name', 'dummy_value', info_map)
@@ -402,12 +402,11 @@ def test_add_variable(mocker: MockerFixture) -> None:
 
 def test_output_manager_singleton(mocker: MockerFixture) -> None:
     """Test case to ensure output_manager is singleton"""
-    key = 'key'
+    key = 'key1'
     mocker.patch('RUFAS.output_manager.OutputManager._generate_key',
                  return_value=key)
     om1 = OutputManager()
     om2 = OutputManager()
     info_map = {'caller_class': 'dummy_class', 'caller_function': 'dummy_func'}
-    om1.add_log('dummy_name', 'dummy_msg', info_map)
-    assert om2.logs_pool[key] == {'info_map': {
-        'caller_class': 'dummy_class', 'caller_function': 'dummy_func'}, 'msg': 'dummy_msg'}
+    om1.add_variable('dummy_name', 'dummy_value', info_map)    
+    assert om2.variables_pool[key] == 'dummy_value'
