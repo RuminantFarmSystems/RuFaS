@@ -54,21 +54,42 @@ class TreatmentOutput:
         for key, val in asdict(self).items():
             res.append(f'{key:40}: {val:20,.2f} {getattr(Units, key, ""):<10}')
         return '\n'.join(res)
+    
 
 
 @dataclass
-class AnaerobicDigestionOutput(TreatmentOutput):
+class AnaerobicDigestionOutput:
     biogas: float = 0.0  # biogas production per day (m3/day)
     biogas_energy_content: float = 0.0  # biogas energy content (MJ/m3)
     methane_generation_volume: float = 0.0
     input_energy_heating: float = 0.0
-    top_cover_volume: float = 0.0
     evaporated_water:float=0.0
-
+    minimum_digester_volume: float = 0.0
+    top_cover_volume: float = 0.0
     def __post_init__(self):
         self.total_daily_mass = 0.0  # TODO convert effluent volume to total daily mass
+    def __add__(self, other: AnaerobicDigestionOutput) -> AnaerobicDigestionOutput:
+        """
+        Add two AnaerobicDigestionVariables objects by summing
+        their corresponding attributes.
 
-    def clone(self) -> TreatmentOutput:
+        Args:
+            other: the AnaerobicDigestionVariables object to be added to the `self` object
+
+        Returns:
+            A new AnaerobicDigestionVariables object with summed attributes.
+            The original operands remain intact.
+
+        """
+
+        if not isinstance(other, AnaerobicDigestionOutput):
+            raise TypeError('Cannot add a non-StorageOptionVariables object to a '
+                            'StorageOptionVariables object.')
+
+        return AnaerobicDigestionOutput(*[
+            attr1 + attr2 for attr1, attr2 in zip(astuple(self), astuple(other))
+        ])
+    def clone(self) -> AnaerobicDigestionOutput:
         return AnaerobicDigestionOutput(**asdict(self))
 
 
