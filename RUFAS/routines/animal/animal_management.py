@@ -24,7 +24,6 @@ import random
 from typing import Tuple
 from statistics import mean
 
-
 def daily_animal_routine(animal_management, feed, weather, time):
     """
     Executes daily routines relating to Animals. This method is called every day
@@ -38,7 +37,6 @@ def daily_animal_routine(animal_management, feed, weather, time):
         weather: instance of the Weather class as defined in classes.py
         time: instance of the Time class as defined in classes.py
     """
-
     animal_management.daily_updates(feed, weather, time)
 
 
