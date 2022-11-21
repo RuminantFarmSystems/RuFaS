@@ -159,7 +159,7 @@ def manure_calculations(ration_formulation, feed, bw, days_milk, milk_protein,
     #         }
     return p_excrt, \
            {"U": 0.34,  # g/L
-            "TAN_s": 0.14,  # g/L
+            "TAN_s": 0.23,  # kg
             "MN": 0.46,  # kg
             "Mkg": 70.31,  # kg
             "TSd": 9.07,  # kg
@@ -170,5 +170,6 @@ def manure_calculations(ration_formulation, feed, bw, days_milk, milk_protein,
             "p_excrt_manure": 0.1,  # kg
             "p_frac": 0.00146,  # dimensionless
             "K_manure": 0.21,  # kg
-            "CH4_manure": 1.50  # kg
+            "CH4_manure": 1.50,  # kg
+            # "urine": 21  # kg
             }
