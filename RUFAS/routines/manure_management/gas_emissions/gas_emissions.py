@@ -258,7 +258,7 @@ class GasEmissions:
         return (TAN * c * p) / (r * M * Q)
     
     @classmethod
-    def calc_E_NH3_storage_v2(cls,pen:SimplePen,TAN: float,U:float, tempC: float,HSC=260, area=3.5 ) -> float:
+    def calc_E_NH3_storage_v2(cls,barn_area:float,TAN: float,U:float, tempC: float,HSC=260 ) -> float:
         """Calculates NH3 storage emissions.
         Parameters
             pen: Simple pen to use lookup area
@@ -276,11 +276,11 @@ class GasEmissions:
         """
         p=990.0
         pH=7.5
-        area = pen.barn_area_from_pen_type
+        area = barn_area
         c = 86_400  # seconds in a day
         tempK = cls._convert_temp_C_to_K(tempC)
         r = cls._calc_r_barn(tempC, hsc=HSC)
-        M = U / area  # manure urine per area of exposed surface, kg/m^2
+        M = U / area  # manure per area of exposed surface, kg/m^2
         Q = cls._calc_Q(tempK, pH)
         if(r*M*Q>0):
             return (TAN * c * p) / (r * M * Q)
