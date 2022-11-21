@@ -1,5 +1,4 @@
 from __future__ import annotations
-
 from dataclasses import dataclass
 from enum import auto
 from tkinter import N
@@ -8,10 +7,9 @@ from typing import List
 from typing import Optional
 from typing import Type
 from RUFAS.routines.manure_management.gas_emissions.gas_emissions import GasEmissions
-
 from RUFAS.routines.manure_management.helpers.enum_helpers import DefaultEnum
 from RUFAS.routines.manure_management.manure_separators.manure_separator_classes import BaseManureSeparator
-from RUFAS.routines.manure_management.manure_treatments.treatment_output import TreatmentOutput,AggregatedManureOutputforField,SludgeOutput
+from RUFAS.routines.manure_management.manure_treatments.treatment_output import TreatmentOutput,AggregatedManureOutputforField,SludgeOutput, AnaerobicDigestionOutput
 from RUFAS.routines.manure_management.misc.constants import ManureManagementConstants as Constants
 from RUFAS.routines.manure_management.misc.simple_pen import SimplePen
 from RUFAS.time import Time
@@ -141,39 +139,19 @@ class AnaerobicDigestion(BaseManureTreatment):
     """
 
     def __init__(self,
+                 pen: SimplePen,
                  manure_separator: BaseManureSeparator,
                  weather: Weather,
                  time: Time,
                  manure_treatment_config: ManureTreatmentConfig):
-        super().__init__(manure_separator, weather, time, manure_treatment_config)
-
-
-        self.total_solids = 0.0
-        self.volatile_solids = 0.0
-        self.wastewater_volume = 0.0
-        self.minimum_Lagoon_volume = 0
-        self.top_cover_volume = 0
-        self.biogas_generation = 0
-        self.effluent_total_solids = 0
-        self.effluent_volatile_solids = 0
-        self.methane_generation_volume = 0
-        self.energy_content = 0
-        self.input_energy_heating = 0
-        self.sludge_accumulation_volume = 0
-        self.evaporated_water = 0
-        self.effluent_waste_volume = 0
-        self.N_content = 0
-        self.P_content = 0
-        self.K_content = 0
-        self.sludge_accumulation_volume = 0
-        self.minimum_digester_volume = 0.0
-        self.volume_of_anaerobic_lagoon = 0.0
+        super().__init__(pen,manure_separator, weather, time, manure_treatment_config)
+        self.accumulated_sludge = SludgeOutput()
+        self.all_ad_output: List[AnaerobicDigestionOutput] = []
 
     def update(self, simulation_day: int) -> TreatmentOutput:
         daily_output = self.update_helper()
         self.all_output.append(daily_output)
         self.simulation_day = simulation_day
-
         return daily_output
 
     def update_helper(self) -> TreatmentOutput:
@@ -183,148 +161,56 @@ class AnaerobicDigestion(BaseManureTreatment):
                 Uses data from AnaerobicDigestorInitData class
                 Uses outputs from ReceptionPitOutputs       
         """
-
         handler_output = self.manure_handler.last_output
-        self.total_solids = handler_output.TSd  # kg/day
-        self.volatile_solids = handler_output.VSd + handler_output.VSnd  # kg/day
-        self.wastewater_volume = handler_output.total_daily_mass
+        daily_output = TreatmentOutput(
+                TAN_s=handler_output.TAN_s * (1 - self.config.TAN_removal_efficiency),
+                manure_nitrogen=handler_output.manure_nitrogen * (1 - self.config.N_removal_efficiency),
+                TSd=handler_output.TSd * (1 - self.config.TS_removal_efficiency),
+                VS_total=handler_output.VS_total * (1 - self.config.VS_removal_efficiency),
+                p_excrt_manure=handler_output.p_excrt_manure * (1 - self.config.P_removal_efficiency),
+                K_manure=handler_output.K_manure * (1 - self.config.K_removal_efficiency),
+                total_daily_mass=handler_output.total_daily_mass,
+                final_volume=handler_output.total_daily_mass
+        )
+        sludge_output = SludgeOutput(
+            TS=handler_output.TSd * self.config.TS_removal_efficiency,
+            VS=handler_output.VS_total * self.config.VS_removal_efficiency,
+            N_mass=handler_output.manure_nitrogen * self.config.N_removal_efficiency,
+            P_mass=handler_output.p_excrt_manure * self.config.P_removal_efficiency,
+            K_mass=handler_output.K_manure * self.config.K_removal_efficiency
+        )
+        self.accumulated_sludge+=sludge_output
 
-        moisture_content = self.get_moisture_content()
-
+        moisture_content = self.get_moisture_content(daily_output.total_daily_mass,handler_output.TSd)
         T_avg = self.weather_data.T_avg[self.time.year - 1][self.time.day - 1] 
-
-        self.input_energy_heating = self.calc_specific_input_energy(T_avg,
-                                                                    moisture_content) * self.wastewater_volume * \
+        input_energy_heating = self.calc_specific_input_energy(T_avg,
+                                                                    moisture_content) * daily_output.total_daily_mass * \
                                     Constants.LITERS_TO_CUBIC_METERS
-
-        # m^3/year  MS.3.B.1
-        self.sludge_accumulation_volume = self.get_sav()
-
-        # Minimum Lagoon volume required for processing inflow  (m^3)
-        # MS.3.B.2
-        self.minimum_digester_volume = self.get_minimum_digester_volume()
-
-        # MS.3.B.3
-        self.top_cover_volume = self.get_top_cover_volume(self.minimum_Lagoon_volume)
-
-        # MS.3.B.4
-        self.volume_of_anaerobic_lagoon = self.minimum_digester_volume + self.top_cover_volume + \
-                                          self.sludge_accumulation_volume
-
-        # kg biogas generated in Lagoon
-        # MS.3.B.6
-        self.biogas_generation = self.get_biogas_generation()
+        ad_output = AnaerobicDigestionOutput(
+                biogas = self.config.biogas_gen_ratio * handler_output.VS_total,   # biogas production per day (m3/day)                             
+                input_energy_heating= input_energy_heating,
+                evaporated_water=self.config.evaporation_fraction * handler_output.total_daily_mass,
+        )
 
         # MS.3.B.7
-        self.methane_generation_volume = self.get_methane_generation_volume(self.biogas_generation)
-        # content of biogas (m3)
-
-        # Energy content of biogas
-        self.energy_content = self.get_energy_content(self.methane_generation_volume)
-
-        # ------------------------Lagoon EFFLUENT Characteristics-------------------------------------
-        # MS.3.B.8
-        self.effluent_waste_volume = self.wastewater_volume
-        self.evaporated_water = self.get_evaporated_water()  # m^3/day
-
-        # MS.3.B.9
-        self.effluent_total_solids = self.get_effluent_total_solids()
-
-        # MS.3.B.10
-        self.effluent_volatile_solids = self.get_effluent_volatile_solids()
-        # Nutrient content of outputs
-        self.N_content = self.get_nutrient_content(self.config.N_removal_efficiency,
-                                                   handler_output.manure_nitrogen)
-        self.P_content = self.get_nutrient_content(self.config.P_removal_efficiency,
-                                                   handler_output.p_excrt_manure)
-        self.K_content = self.get_nutrient_content(self.config.K_removal_efficiency,
-                                                   handler_output.K_manure)
-
-        daily_output = TreatmentOutput(
-                manure_nitrogen=self.N_content,
-                # urea=prev_output.urea,  # TODO: unexpected attributes
-                TAN_s=handler_output.TAN_s * (1 - self.config.TAN_removal_efficiency),
-                TSd=self.effluent_total_solids,
-                VSd=self.effluent_volatile_solids - handler_output.VSnd,
-                VSnd=handler_output.VSnd,
-                VS_total=self.effluent_volatile_solids,
-                p_excrt_manure=self.P_content,
-                K_manure=self.K_content,
-                total_daily_mass=self.effluent_waste_volume,
-                final_volume=self.effluent_waste_volume,
-        )
+        ad_output.methane_generation_volume= ad_output.biogas * self.config.methane_gen_ratio
+        ad_output.biogas_energy_content = ad_output.methane_generation_volume * Constants.METHANE_DENSITY * Constants.METHANE_ENERGY_DENSITY  # biogas energy content (MJ/m3)
+        # MS.3.B.2
+        ad_output.minimum_digester_volume = daily_output.total_daily_mass * self.config.hydraulic_retention_time
+        # MS.3.B.3
+        ad_output.top_cover_volume = self.config.top_cover_volume_fraction * ad_output.minimum_digester_volume        
+        self.all_ad_output.append(ad_output)
         return daily_output
 
-    def get_moisture_content(self):
+    def get_moisture_content(self,total_daily_mass,TSd):
         """Returns moisture_content of influent as decimal (0-1)
         """
-        if self.wastewater_volume > 0.0:
-            return 1 - self.total_solids / self.wastewater_volume
+        if total_daily_mass > 0.0:
+            return 1 - TSd / total_daily_mass
         else:
             return 0
 
-    def get_nutrient_content(self, nutrient_fraction, manure_nutrient_content):
-        """Returns nutrient content of effluent
-        :param nutrient_fraction: the predefined fraction from init_data.
-        :param manure_nutrient_content: manure_nutrient_content from reception_pit_output_data 
-        """
-        if self.total_solids > 0:
-            return (1 - nutrient_fraction) * (
-                    manure_nutrient_content / self.total_solids)
-        else:
-            return 0.0
-
-    def get_biogas_generation(self):
-        """Returns biogas generation volume
-        """
-        return self.config.biogas_gen_ratio * self.volatile_solids
-
-    def get_minimum_digester_volume(self) -> float:
-        """Returns minimum Lagoon volume required based on HRT
-        """
-        return self.wastewater_volume * self.config.hydraulic_retention_time
-
-    def get_top_cover_volume(self, minimum_digester_volume):
-        """Returns top cover volume
-        :param minimum_Lagoon_volume: minimum Lagoon volume in m3
-        """
-        return self.config.top_cover_volume_fraction * minimum_digester_volume
-
-    def get_sav(self):
-        """Returns sludge_accumulation_volume
-        """
-        return self.config.SAV_fraction * self.volatile_solids * \
-               self.config.sludge_accumulation_period * \
-               Constants.DAYS_PER_YEAR / Constants.DENSITY_WATER_KG_PER_M3
-
-    def get_effluent_total_solids(self):
-        """Returns effluent_total_solids
-        """
-        if self.wastewater_volume > 0:
-            return (1 - self.config.TS_removal_efficiency) * self.total_solids
-        else:
-            return 0.0
-
-    def get_effluent_volatile_solids(self):
-        """Returns effluent_volatile_solids
-        """
-        if self.wastewater_volume > 0:
-            return (1 - self.config.VS_removal_efficiency) * self.volatile_solids
-        else:
-            return 0.0
-
-    def get_evaporated_water(self):
-        """Returns evaporated water volume
-        """
-        return self.config.evaporation_fraction * self.wastewater_volume  # m^3/day
-
-    def get_methane_generation_volume(self, biogas_generation):
-        """Returns methane_generation_volume
-        :param biogas_generation: 
-        """
-        return biogas_generation * self.config.methane_gen_ratio  # MethaneY_DENSITY  ###
-
-    def get_methane_volume_using_chen_equation(self):
+    def get_methane_volume_using_chen_equation(self,VS_total):
         """Returns methane_generation_volume as calculated by Chen and Hashimoto Model 
         """
         Go = 240  # Methane potential (mL/g VS)
@@ -332,13 +218,7 @@ class AnaerobicDigestion(BaseManureTreatment):
         sgr = 0.637  # Specific Growth Rate (micrometers)
         return Go * (1 - KCH / (
                 self.config.hydraulic_retention_time * sgr + KCH - 1)) * \
-               self.effluent_volatile_solids * Constants.GRAMS_TO_KG  #
-
-    def get_energy_content(self, methane_generation_volume):
-        """Returns energy content of methane
-        :param methane_generation_volume: 
-        """
-        return methane_generation_volume * Constants.METHANE_DENSITY * Constants.METHANE_ENERGY_DENSITY  ###
+               VS_total * Constants.GRAMS_TO_KG  #
 
     def calc_specific_input_energy(self, T_avg, moisture_content):
         """ Returns the energy required to maintain AD temperature at setpoint
@@ -409,7 +289,7 @@ class AnaerobicLagoon(BaseManureTreatment):
             K_mass=handler_output.K_manure * self.config.K_removal_efficiency
         )
         self.accumulated_sludge+=sludge_output
-
+        daily_output.nh3_emissions = self.calc_NH3_emissions()
         return daily_output
 
     @property
@@ -512,8 +392,8 @@ class AnaerobicLagoon(BaseManureTreatment):
         return GasEmissions.calc_E_CH4_anaerobic_lagoon(self.accumulated_output.VS_total)
     def calc_NH3_emissions(self):
         tempC = self.weather_data.T_avg[self.time.year - 1][self.time.day - 1]
-        pen=SimplePen(pen=None)
-        return GasEmissions.calc_E_NH3_storage_v2(pen=pen,TAN = self.accumulated_output.TAN_s,U=21,tempC=tempC)
+        
+        return max(0,GasEmissions.calc_E_NH3_storage_v2(barn_area=self.pen.barn_area_from_pen_type,TAN = self.accumulated_output.TAN_s,U=self.accumulated_output.total_daily_mass,tempC=tempC))
 
     def boundSludgeValue(self, calculated_value, lower_bound, upper_bound):
         """returns value bounded by lower and upper bounds"""
@@ -573,8 +453,7 @@ class SlurryStorageUnderfloor(BaseManureTreatment):
     def calc_NH3_emissions(self):
         tempC = self.weather_data.T_avg[self.time.year - 1][self.time.day - 1]
         
-        return GasEmissions.calc_E_NH3_storage_v2(pen=self.pen,TAN = self.accumulated_output.TAN_s,U=self.accumulated_output.accumulated_volume*Constants.CUBIC_METERS_TO_LITERS,tempC=tempC)
-
+        return max(0,GasEmissions.calc_E_NH3_storage_v2(barn_area=self.pen.barn_area_from_pen_type,TAN = self.accumulated_output.TAN_s,U=self.accumulated_output.total_daily_mass,tempC=tempC))
 
 
 class SlurryStorageOutdoor(BaseManureTreatment):
@@ -690,7 +569,7 @@ class SlurryStorageOutdoor(BaseManureTreatment):
     def calc_NH3_emissions(self):
         tempC = self.weather_data.T_avg[self.time.year - 1][self.time.day - 1]
 
-        return GasEmissions.calc_E_NH3_storage_v2(pen=self.pen,TAN = self.accumulated_output.TAN_s,U=21,tempC=tempC)
+        return max(0,GasEmissions.calc_E_NH3_storage_v2(barn_area=self.pen.barn_area_from_pen_type,TAN = self.accumulated_output.TAN_s,U=self.accumulated_output.total_daily_mass,tempC=tempC))
 
 
 @dataclass
