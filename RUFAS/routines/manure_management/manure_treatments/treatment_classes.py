@@ -1,5 +1,4 @@
 from __future__ import annotations
-
 from dataclasses import dataclass
 from enum import auto
 from tkinter import N
@@ -8,7 +7,6 @@ from typing import List
 from typing import Optional
 from typing import Type
 from RUFAS.routines.manure_management.gas_emissions.gas_emissions import GasEmissions
-
 from RUFAS.routines.manure_management.helpers.enum_helpers import DefaultEnum
 from RUFAS.routines.manure_management.manure_separators.manure_separator_classes import BaseManureSeparator
 from RUFAS.routines.manure_management.manure_treatments.treatment_output import TreatmentOutput,AggregatedManureOutputforField,SludgeOutput, AnaerobicDigestionOutput
