@@ -32,15 +32,14 @@ class OutputManager (object):
             cls.instance = super(OutputManager, cls).__new__(cls)
         return cls.instance
 
-    def __init__(self, cls) -> None:
+    def __init__(self) -> None:
         if OutputManager.__instance is None:
             OutputManager.__instance = self
-            self.x = 0
             self.pool: Dict[str, Any] = {}
             self.warnings_pool: Dict[str, Any] = {}
             self.errors_pool: Dict[str, Any] = {}
             self.logs_pool: Dict[str, Any] = {}
-            self.add_log("Output Manager instantiated.",
+            self.add_log("init_log", "Output Manager instantiated.",
                          info_map={'caller_class': self.__class__.__name__,
                                    'caller_function': self.__init__.__name__})
 
@@ -85,87 +84,104 @@ class OutputManager (object):
             info_map['fail_silently'] or info_map['enforce_override'] 
             are not set to True.
         """
-        key = self.__generate_key(name, info_map)
+        key = self._generate_key(name, info_map)
         key_not_exists = self.pool.get(key) is None
         if key_not_exists:
             self.pool[key] = value
             return
         info_map['key'] = key
-        info_map['caller_function'] = self.add_to_pool.__name__
+        info_map['caller_function'] = self.add_variable.__name__
         info_map['caller_class'] = self.__class__.__name__
         if info_map.get('enforce_override', False):
             self.pool[key] = value
-            self.add_warning(
-                "Key collision happened; the value was overriden per given flag.", info_map)
+            self.add_warning('key_collision',
+                             "Key collision happened; the value was overriden per given flag.",
+                             info_map)
             return
         if info_map.get('fail_silently', False):
-            self.add_error(
-                "Key collision happened; the event was ignored per given flag.", info_map)
+            self.add_error('key_collision',
+                           "Key collision happened; the event was ignored per given flag.",
+                           info_map)
             return
         raise ValueError(f"Key {key} already exists in the pool." +
                          "Consider using different name, prefix/suffix;" +
                          "or turn the automated prefix/suffix generation on"
                          )
 
-    def add_log(self, msg: str, info_map: Dict[str, Any]) -> None:
+    def add_log(self, name: str, msg: str, info_map: Dict[str, Any]) -> None:
         """
         Adds a log message to the pool of logs.
 
         Parameters
         ----------
+        name : str
+            The name of the log
         msg : str
             The log message to be added to the pool
-        info_map: Dict[Any, Any]
-            Additional args, some are non-optional
+        info_map: Dict[str, Any]
+            Additional args to be logged, some are non-optional
         info_map['caller_class'] : str
             The name of the class which called this function
         info_map['caller_function'] : str
             The name of the function which called this function 
         """
-        key = self.__generate_key('log_entry', info_map)
+        key = self._generate_key(name,
+                                 {
+                                     'caller_class': info_map['caller_class'],
+                                     'caller_function': info_map['caller_function']})
         self.logs_pool[key] = {'msg': msg, 'info_map': info_map}
 
-    def add_warning(self, msg: str, info_map: Dict[str, Any]) -> None:
+    def add_warning(self, name: str, msg: str, info_map: Dict[str, Any]) -> None:
         """
         Adds a warning message to the pool of warnings.
 
         Parameters
         ----------
+        name : str
+            The name of the warning
         msg : str
             The warning message to be added to the pool
-        info_map: Dict[Any, Any]
-            Additional args, some are non-optional
+        info_map: Dict[str, Any]
+            Additional args to be logged, some are non-optional
         info_map['caller_class'] : str
             The name of the class which called this function
         info_map['caller_function'] : str
             The name of the function which called this function 
         """
-        key = self.__generate_key('warning_entry', info_map)
+        key = self._generate_key(name,
+                                 {
+                                     'caller_class': info_map['caller_class'],
+                                     'caller_function': info_map['caller_function']})
         self.warnings_pool[key] = {'msg': msg, 'info_map': info_map}
 
-    def add_error(self, msg: str, info_map: Dict[str, Any]) -> None:
+    def add_error(self, name: str, msg: str, info_map: Dict[str, Any]) -> None:
         """
         Adds an error message to the pool of errors.
 
         Parameters
         ----------
+        name : str
+            The name of the error
         msg : str
             The error message to be added to the pool
         info_map: Dict[str, Any]
-            Additional args, some are non-optional
+            Additional args to be logged, some are non-optional
         info_map['caller_class'] : str
             The name of the class which called this function
         info_map['caller_function'] : str
             The name of the function which called this function 
         """
-        key = self.__generate_key('error_entry', info_map)
+        key = self._generate_key(name,
+                                 {
+                                     'caller_class': info_map['caller_class'],
+                                     'caller_function': info_map['caller_function']})
         self.errors_pool[key] = {'msg': msg, 'info_map': info_map}
 
-    def __generate_key(self, name: str,
-                       info_map: Dict[str, Union[str, bool]]) -> str:
+    def _generate_key(self, name: str,
+                      info_map: Dict[str, Union[str, bool]]) -> str:
         """
         Generates key for the pool.
-        See 'add_to_pool' docs for detailed arg description.
+        See 'add_variable' docs for detailed arg description.
 
         Raises
         ------
@@ -182,18 +198,18 @@ class OutputManager (object):
         if info_map.get('prefix') is not None:
             prefix = info_map.get('prefix') + "."
         elif not info_map.get('suppress_prefix', False):
-            prefix = self.__get_prefix(info_map.get(
+            prefix = self._get_prefix(info_map.get(
                 'caller_class'), info_map.get('caller_function')) + "."
 
         suffix = ""
         if info_map.get('suffix') is not None:
             suffix = "." + info_map.get('suffix')
         elif not info_map.get('suppress_suffix', False):
-            suffix = "." + self.__get_suffix()
+            suffix = "." + self._get_suffix()
 
         return f"{prefix}{name}{suffix}"
 
-    def __get_prefix(self, caller_class: str, caller_function: str) -> str:
+    def _get_prefix(self, caller_class: str, caller_function: str) -> str:
         """
         Returns the prefix for a key in the pool.
 
@@ -211,7 +227,7 @@ class OutputManager (object):
         """
         return f"{caller_class}.{caller_function}"
 
-    def __get_suffix(self) -> str:
+    def _get_suffix(self) -> str:
         """
         Returns a suffix for a key in the pool by using timestamp in ns.
         This gurrantees that no name collision will happen.
