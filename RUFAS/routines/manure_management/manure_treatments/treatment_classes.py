@@ -409,7 +409,7 @@ class AnaerobicLagoon(BaseManureTreatment):
             K_mass=handler_output.K_manure * self.config.K_removal_efficiency
         )
         self.accumulated_sludge+=sludge_output
-
+        daily_output.nh3_emissions = self.calc_NH3_emissions()
         return daily_output
 
     @property
@@ -512,8 +512,8 @@ class AnaerobicLagoon(BaseManureTreatment):
         return GasEmissions.calc_E_CH4_anaerobic_lagoon(self.accumulated_output.VS_total)
     def calc_NH3_emissions(self):
         tempC = self.weather_data.T_avg[self.time.year - 1][self.time.day - 1]
-        pen=SimplePen(pen=None)
-        return GasEmissions.calc_E_NH3_storage_v2(pen=pen,TAN = self.accumulated_output.TAN_s,U=21,tempC=tempC)
+        
+        return max(0,GasEmissions.calc_E_NH3_storage_v2(barn_area=self.pen.barn_area_from_pen_type,TAN = self.accumulated_output.TAN_s,U=self.accumulated_output.total_daily_mass,tempC=tempC))
 
     def boundSludgeValue(self, calculated_value, lower_bound, upper_bound):
         """returns value bounded by lower and upper bounds"""
@@ -573,7 +573,7 @@ class SlurryStorageUnderfloor(BaseManureTreatment):
     def calc_NH3_emissions(self):
         tempC = self.weather_data.T_avg[self.time.year - 1][self.time.day - 1]
         
-        return GasEmissions.calc_E_NH3_storage_v2(pen=self.pen,TAN = self.accumulated_output.TAN_s,U=self.accumulated_output.accumulated_volume*Constants.CUBIC_METERS_TO_LITERS,tempC=tempC)
+        return max(0,GasEmissions.calc_E_NH3_storage_v2(barn_area=self.pen.barn_area_from_pen_type,TAN = self.accumulated_output.TAN_s,U=self.accumulated_output.total_daily_mass,tempC=tempC))
 
 
 
@@ -690,7 +690,7 @@ class SlurryStorageOutdoor(BaseManureTreatment):
     def calc_NH3_emissions(self):
         tempC = self.weather_data.T_avg[self.time.year - 1][self.time.day - 1]
 
-        return GasEmissions.calc_E_NH3_storage_v2(pen=self.pen,TAN = self.accumulated_output.TAN_s,U=21,tempC=tempC)
+        return max(0,GasEmissions.calc_E_NH3_storage_v2(barn_area=self.pen.barn_area_from_pen_type,TAN = self.accumulated_output.TAN_s,U=self.accumulated_output.total_daily_mass,tempC=tempC))
 
 
 @dataclass

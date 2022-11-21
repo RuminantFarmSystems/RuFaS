@@ -77,14 +77,15 @@ class BaseManureHandler:
         """
 
 
-        converted_TAN = pen.manure.TAN_s*pen.manure.Mkg*Constants.GRAMS_TO_KG ## Converting TAN from g/L to kg
-        pen_urine = 21 ## Get this from animal module manure output 
-        urine_TAN = converted_TAN*0.5
+                
+        pen_urine = 21 ##  (kg) Get this from animal module manure output 
+        urine_TAN = pen.manure.TAN_s*0.45  ## Can also get from animal module
         tempC = self.weather_data.T_avg[self.time.year - 1][self.time.day - 1]
-        NH3_loss_in_housing = pen.num_animals*GasEmissions.calc_E_NH3_storage_v2(pen=pen,TAN =urine_TAN, U=pen_urine, tempC=tempC)
+        NH3_loss_in_housing = pen.num_animals*GasEmissions.calc_E_NH3_storage_v2(barn_area=pen.barn_area_from_pen_type,TAN =urine_TAN, U=pen_urine, tempC=tempC)
+        
         daily_output = ManureHandlerOutput(
                 urea=pen.manure.U,
-                TAN_s=converted_TAN-NH3_loss_in_housing,
+                TAN_s=pen.manure.TAN_s-NH3_loss_in_housing,
                 manure_nitrogen=pen.manure.MN,
                 TSd=pen.manure.TSd,
                 VSd=pen.manure.VSd,
