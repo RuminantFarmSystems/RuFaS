@@ -1,5 +1,7 @@
 import pytest
+
 from SC_redesign.Crop_and_Soil.crop.nitrogen_incorporation import *
+from pytest_mock import MockerFixture
 
 # --- helper function tests ----
 @pytest.mark.parametrize("halfheat,heatfrac,emerge,half,near,mature", [
@@ -572,22 +574,33 @@ def test_tally_total_nitrogen_uptake(uptakes):
     (False, 100, 0.5),  # non-fixer with nitrates
     (False, 0, 0.5),  # non-fixer without nitrates
 ])
-def test_try_fixation(fixer, nitrates, water):
+def test_try_fixation(fixer, nitrates, water, mocker: MockerFixture):
     """check that try_fixation calls its sub-functions if fixation occurs"""
+    patch_update_fixation_attributes = mocker.patch(
+        "SC_redesign.Crop_and_Soil.crop.nitrogen_incorporation.NitrogenIncorporation.update_fixation_attributes")
+    patch_fix_nitrogen = mocker.patch(
+        "SC_redesign.Crop_and_Soil.crop.nitrogen_incorporation.NitrogenIncorporation.fix_nitrogen")
     crop = init_incorp(is_nitrogen_fixer=fixer)
-    # crop.try_fixation(nitrates, water)
+    crop.try_fixation(nitrates, water)
     if fixer:
-        raise Exception("need to check that crop.update_fixation_attributes()" +
-                        " and crop.fix_nitrogen() are both called once")
+        patch_update_fixation_attributes.assert_called_once()
+        patch_fix_nitrogen.assert_called_once()
     else:
-        raise Exception("need to chack that neither above function is called and that fixed_nitrogen is 0")
+        patch_update_fixation_attributes.assert_not_called()
+        patch_fix_nitrogen.assert_not_called()
+        assert crop.fixed_nitrogen == 0
 
 
-def test_update_fixation_attributes():
+def test_update_fixation_attributes(mocker: MockerFixture):
     """"check that update_nitrate_attributes calls both its sub-functions"""
+    patch_determine_nitrate_factor = mocker.patch(
+        "SC_redesign.Crop_and_Soil.crop.nitrogen_incorporation.NitrogenIncorporation.determine_nitrate_factor")
+    patch_determine_determine_fixation_stage_factor = mocker.patch(
+        "SC_redesign.Crop_and_Soil.crop.nitrogen_incorporation.NitrogenIncorporation.determine_fixation_stage_factor")
     crop = init_incorp()
-    # crop.update_fixation_attributes(100)
-    raise Exception("check that determine_nitrate_factor() and determine_fixation_stage_factor() are both called once")
+    crop.update_fixation_attributes(100)
+    patch_determine_nitrate_factor.assert_called_once()
+    patch_determine_determine_fixation_stage_factor.assert_called_once()
 
 @pytest.mark.parametrize("nitrates", [0, 0.5, 100, -1])
 def test_determine_nitrate_factor(nitrates):
@@ -635,10 +648,10 @@ def test_store_obtained_nitrogen(up, nitro, fix):
     crop.store_obtained_nitrogen()
     assert crop.nitrogen == calc_stored_nitrogen(up, nitro, fix)
 
-def test_uptake_nitrogen():
-    """integration test for uptake_nitrogen()"""
-    raise Exception("need to write an integration test for uptake_nitrogen")
-
-def test_incorporate_nitrogen():
-    """integration test for incorporate_nitrogen()"""
-    raise Exception("need to write an integration test for incorporate_nitrogen")
+# def test_uptake_nitrogen():
+#     """integration test for uptake_nitrogen()"""
+#     raise Exception("need to write an integration test for uptake_nitrogen")
+#
+# def test_incorporate_nitrogen():
+#     """integration test for incorporate_nitrogen()"""
+#     raise Exception("need to write an integration test for incorporate_nitrogen")
