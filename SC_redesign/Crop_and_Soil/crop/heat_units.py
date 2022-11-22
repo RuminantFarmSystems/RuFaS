@@ -14,6 +14,7 @@ class HeatUnits:
         self.minimum_heat_unit_temperature = None
         self.maximum_heat_unit_temperature = None
         self.heat_unit_temperature = None
+        self.previous_heat_fraction = None
 
     def absorb_heat_units(self, mean_air_temperature: float = None,
                           min_air_temperature: float = None, max_air_temperature: float = None) -> None:
@@ -46,14 +47,6 @@ class HeatUnits:
             use_temp = air_temperature
         self.is_growing = self.minimum_temperature <= use_temp <= self.maximum_temperature
 
-    # def check_temperature_above_minimum(self, temperature: float) -> bool:
-    #     """checks if a temperature is greater than the crop's minimum temperature for growth"""
-    #     return temperature > self.minimum_temperature
-    #
-    # def check_temperature_below_maximum(self, temperature: float) -> bool:
-    #     """checks if a temperature is less than the crop's maximum temperature for growth"""
-    #     return temperature < self.maximum_temperature
-
     def decide_to_use_heat_unit_temperature(self, use_heat_unit_temperature: bool):
         """sets the boolean that determines if heat unit temperature will be used for heat unit accumulation.
 
@@ -65,8 +58,8 @@ class HeatUnits:
         self.use_heat_unit_temperature = use_heat_unit_temperature
 
     def _check_absorb_heat_for_input_errors(self, mean_air_temperature: float = None,
-                                             min_air_temperature: float = None,
-                                             max_air_temperature: float = None):
+                                            min_air_temperature: float = None,
+                                            max_air_temperature: float = None):
         """raises errors if inputs given for absorb_heat_units don't make sense with the value of the
         use_heat_unit_temperature attribute"""
         if self.use_heat_unit_temperature and (min_air_temperature is None or max_air_temperature is None):
@@ -125,7 +118,7 @@ class HeatUnits:
                 2. if the minimum and maximum air temperatures are both **lower** than the crop's miniimum and maximum
                 temperatures, then accumulation will be greater than with the main method
                 3. if the air temperature window is entirely contained within the crop temperature window
-                (i.e., crop min < air min < air max < crop max), then accumulation will be equal to the middle of the
+                (i.e., crop mint < air mint < air maxt < crop maxt), then accumulation will be equal to the middle of the
                 crop temperature window
                 4. if the crop temperature window is entirely contained withing the air temperature window, then
                 accumulation will equal the middle of the temperature window
@@ -141,12 +134,8 @@ class HeatUnits:
             self.new_heat_units = calc_new_heat_units(air_temperature, self.minimum_temperature)
 
     def add_heat_units(self) -> None:
-        """add newly acquired heat units to accumulated heat units
-        Args:
-            new_units: newly acquired heat units
-        """
+        """add newly acquired heat units to accumulated heat units"""
         self.accumulated_heat_units += self.new_heat_units
-
 
     def determine_heat_fraction(self):
         """determine the fraction of potential heat units accumulated to date"""
@@ -195,5 +184,3 @@ def calc_maximum_heat_unit_temperature(max_air_temp: float, max_growth_temp: flo
         maximum heat unit temperature
     """
     return min(max_air_temp, max_growth_temp)
-
-
