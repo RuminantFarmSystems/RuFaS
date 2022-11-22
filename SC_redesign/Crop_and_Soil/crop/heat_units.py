@@ -27,7 +27,7 @@ class HeatUnits:
         Details: if the attribute use_heat_unit_temperature is false, both min_air_temperature and max_air_temperature
         are optional. Otherwise, they are used to determine heat unit accumulation rather than average air temperature.
         """
-        self.__check_absorb_heat_for_input_errors(mean_air_temperature, min_air_temperature, max_air_temperature)
+        self._check_absorb_heat_for_input_errors(mean_air_temperature, min_air_temperature, max_air_temperature)
 
         if self.use_heat_unit_temperature:
             self.determine_heat_unit_temperature(min_air_temperature, max_air_temperature)

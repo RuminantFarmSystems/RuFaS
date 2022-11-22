@@ -132,32 +132,40 @@ def test_accumulate_biomass(start, factor, gmax):
     bioal.accumulate_biomass()
     expect_growth = calc_biomass_accumulation(factor, gmax)
     expect_end = start + expect_growth
-    assert [bioal.previous_biomass, bioal.biomass, bioal.biomass_growth] == [start, expect_end, expect_growth]
+
+    assert bioal.previous_biomass == start
+    assert bioal.biomass == expect_end
+    assert bioal.biomass_growth == expect_growth
 
 
 @pytest.mark.parametrize("light,ext,conv,gfact,rfrac", [
     (1000, 0.7, 20, 1, 1/3),  # start
-    (1000, 0.7, 20, 1, 2/3),  # increased root proportion
-    (1000, 0.7, 20, 0.83, 1/3),  # restricted growth
-    (1000, 0.7, 16.3, 1, 1/3),  # reduced energy conversion
-    (1000, 0.8, 20, 1, 1/3),  # greater light extinction
-    (824.6, 0.7, 20, 1, 1/3),  # lower incoming light
+    (1000, 0.7, 20, 1, 0.66),  # increased root proportion
+    (1000, 0.7, 20, 0.83, 0.33),  # restricted growth
+    (1000, 0.7, 16.3, 1, 0.33),  # reduced energy conversion
+    (1000, 0.8, 20, 1, 0.33),  # greater light extinction
+    (824.6, 0.7, 20, 1, 0.33),  # lower incoming light
     (2372.55, 0.29, 15.17, 0.663, 0.205),  # arbitrary
 ])
 def test_allocate_biomass(light, ext, conv, gfact, rfrac):
     """integration check to check that biomass gets allocated correctly"""
     bioal = init_bioal(light_extinction=ext, leaf_area_index=1.87, light_conversion=conv, growth_factor=gfact,
-                       root_frac=rfrac, biomass=89.0)
+                       root_fraction=rfrac, biomass=89.0)
     bioal.allocate_biomass(light)
-    observed = [bioal.usable_light, bioal.biomass_growth_max, bioal.previous_biomass, bioal.biomass_growth,
-                bioal.biomass, bioal.green_biomass, bioal.root_biomass]
 
+    # photosynthesize
     energy = calc_intercepted_radiation(light, ext, lai=1.87)
     max_growth = calc_max_accumulation(energy, conv)
     growth = calc_biomass_accumulation(gfact, max_growth)
-    biomass = 89.0 + growth
-    green = calc_above_ground_biomass(rfrac, biomass)
-    root = calc_below_ground_biomass(rfrac, biomass)
-    expected = [energy, max_growth, 89.0, growth, biomass, green, root]
+    mass = 89.0 + growth
+    # partition_biomass
+    green = calc_above_ground_biomass(rfrac, mass)
+    root = calc_below_ground_biomass(rfrac, mass)
 
-    assert observed == expected
+    assert bioal.usable_light == energy
+    assert bioal.biomass_growth_max == max_growth
+    assert bioal.previous_biomass == 89.0
+    assert bioal.biomass_growth == growth
+    assert bioal.biomass == mass
+    assert bioal.green_biomass == green
+    assert bioal.root_biomass == root
