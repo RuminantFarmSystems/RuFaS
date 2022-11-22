@@ -1,8 +1,8 @@
 {
     "config":
     {
-        "start_date" : "2010:2",
-        "end_date" : "2010:362",
+        "start_date" : "2010:180",
+        "end_date" : "2010:210",
         "csv_dir": "output/CSVs/",
         "graphic_dir": "output/graphics/",
         "run_tests": true,
