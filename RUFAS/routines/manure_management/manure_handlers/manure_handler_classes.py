@@ -78,8 +78,8 @@ class BaseManureHandler:
 
 
                 
-        pen_urine = 21 ##  (kg) Get this from animal module manure output 
-        urine_TAN = pen.manure.TAN_s*0.45  ## Can also get from animal module
+        pen_urine = 21*pen.num_animals ##  (kg) Get this from animal module manure output 
+        urine_TAN = pen.manure.MN*0.45  ## Can also get from animal module
         tempC = self.weather_data.T_avg[self.time.year - 1][self.time.day - 1]
         NH3_loss_in_housing = pen.num_animals*GasEmissions.calc_E_NH3_storage_v2(barn_area=pen.barn_area_from_pen_type,TAN =urine_TAN, U=pen_urine, tempC=tempC)
         
@@ -96,6 +96,7 @@ class BaseManureHandler:
                 K_manure=pen.manure.K_manure,
                 CH4_floor=GasEmissions.calc_E_CH4_floor(pen),
                 CO2_floor=GasEmissions.calc_E_C02_floor(pen),
+                NH3_floor=NH3_loss_in_housing,
 
                 raw_manure=pen.manure_mass,
                 cleaning_water=self.cleaning_water_volume_in_main_barn(pen),

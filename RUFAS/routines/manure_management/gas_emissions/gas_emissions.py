@@ -100,7 +100,6 @@ class GasEmissions:
         """Calculates methane emissions from manure storage using total solids and manure kg.
 
         Parameters
-            manure_kg: total kg of manure
             Ts: Total solids in kg
             enclosed: Boolean True if manure storage is enclosed, else False if manure storage is open to air
             tempC: temperature, C.
