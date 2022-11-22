@@ -66,33 +66,6 @@ class AnaerobicDigestionOutput:
     evaporated_water:float=0.0
     minimum_digester_volume: float = 0.0
     top_cover_volume: float = 0.0
-    def __post_init__(self):
-        self.total_daily_mass = 0.0  # TODO convert effluent volume to total daily mass
-    def __add__(self, other: AnaerobicDigestionOutput) -> AnaerobicDigestionOutput:
-        """
-        Add two AnaerobicDigestionVariables objects by summing
-        their corresponding attributes.
-
-        Args:
-            other: the AnaerobicDigestionVariables object to be added to the `self` object
-
-        Returns:
-            A new AnaerobicDigestionVariables object with summed attributes.
-            The original operands remain intact.
-
-        """
-
-        if not isinstance(other, AnaerobicDigestionOutput):
-            raise TypeError('Cannot add a non-StorageOptionVariables object to a '
-                            'StorageOptionVariables object.')
-
-        return AnaerobicDigestionOutput(*[
-            attr1 + attr2 for attr1, attr2 in zip(astuple(self), astuple(other))
-        ])
-    def clone(self) -> AnaerobicDigestionOutput:
-        return AnaerobicDigestionOutput(**asdict(self))
-
-
 
 @dataclass
 class AggregatedManureOutputforField(TreatmentOutput):
@@ -119,7 +92,7 @@ class AggregatedManureOutputforField(TreatmentOutput):
 
 
 @dataclass
-class SludgeOutput(TreatmentOutput):
+class SludgeOutput:
     """Description: This class is for tracking sludge accumulated properties. 
     """
     TS: float = 0.0  
@@ -127,4 +100,25 @@ class SludgeOutput(TreatmentOutput):
     N_mass:float=0.0
     P_mass:float=0.0
     K_mass:float=0.0
+    
+    def __add__(self, other: SludgeOutput) -> SludgeOutput:
+        """
+        Add two AnaerobicDigestionVariables objects by summing
+        their corresponding attributes.
 
+        Args:
+            other: the AnaerobicDigestionVariables object to be added to the `self` object
+
+        Returns:
+            A new AnaerobicDigestionVariables object with summed attributes.
+            The original operands remain intact.
+
+        """
+
+        if not isinstance(other, AnaerobicDigestionOutput):
+            raise TypeError('Cannot add a non-StorageOptionVariables object to a '
+                            'StorageOptionVariables object.')
+
+        return AnaerobicDigestionOutput(*[
+            attr1 + attr2 for attr1, attr2 in zip(astuple(self), astuple(other))
+        ])
