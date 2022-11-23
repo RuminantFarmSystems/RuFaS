@@ -393,12 +393,12 @@ class AnaerobicLagoon(BaseManureTreatment):
     def calc_emissions(self):
         tempC = self.weather_data.T_avg[self.time.year - 1][self.time.day - 1]
         ch4_loss = GasEmissions.calc_E_CH4_anaerobic_lagoon(self.accumulated_output.VS_total)
-        self.accumulated_output.TSd = self.accumulated_output.TSd -ch4_loss
+        self.accumulated_output.TSd = max(0,self.accumulated_output.TSd -ch4_loss)
         return ch4_loss
     def calc_NH3_emissions(self):
         tempC = self.weather_data.T_avg[self.time.year - 1][self.time.day - 1]
         nh3_loss = max(0,self.pen.num_animals*GasEmissions.calc_E_NH3_storage_v2(barn_area=self.pen.barn_area_from_pen_type,TAN = self.accumulated_output.TAN_s,U=self.accumulated_output.total_daily_mass,tempC=tempC))
-        self.accumulated_output.TAN_s = self.accumulated_output.TAN_s-nh3_loss
+        self.accumulated_output.TAN_s = max(0,self.accumulated_output.TAN_s-nh3_loss)
         return nh3_loss
 
     def boundSludgeValue(self, calculated_value, lower_bound, upper_bound):
@@ -435,30 +435,31 @@ class SlurryStorageUnderfloor(BaseManureTreatment):
                 K_manure=handler.K_manure * (1 - self.config.K_removal_efficiency),
                 total_daily_mass=handler.total_daily_mass
         )
-        daily_output.accumulated_TS =self.accumulated_output.TSd
-        daily_output.accumulated_volume =self.accumulated_output.total_daily_mass/1000
+        self.accumulated_output+=daily_output   
         daily_output.ch4_emissions = self.calc_emissions()
         daily_output.nh3_emissions = self.calc_NH3_emissions()
+        daily_output.accumulated_TS =self.accumulated_output.TSd
+        daily_output.accumulated_volume =self.accumulated_output.total_daily_mass/1000
         daily_output.tempC = self.weather_data.T_avg[self.time.year - 1][self.time.day - 1]
         daily_output.rainfall = self.weather_data.rainfall[self.time.year - 1][self.time.day - 1]
         daily_output.final_volume = self.total_volume - (
                 (daily_output.TSd + daily_output.VS_total) * Constants.KG_TO_CUBIC_METERS)
 
         self.all_output.append(daily_output)
-        self.accumulated_output+=daily_output
         self.simulation_day = simulation_day
         if(simulation_day%self.storage_time_period ==0):
             self.land_application_day_update_manure_storage(1)
         return daily_output
     def calc_emissions(self):
         tempC = self.weather_data.T_avg[self.time.year - 1][self.time.day - 1]
-        ch4_loss = GasEmissions.calc_E_CH4_slurry_storage_v3(self.accumulated_output.TSd,enclosed=True,tempC=tempC)
-        self.accumulated_output.TSd = self.accumulated_output.TSd -ch4_loss
+        ch4_loss = GasEmissions.calc_E_CH4_slurry_storage_v3(Ts = self.accumulated_output.TSd,enclosed=True,tempC=tempC)
+        self.accumulated_output.TSd = max(0,self.accumulated_output.TSd -ch4_loss)
         return ch4_loss
+
     def calc_NH3_emissions(self):
         tempC = self.weather_data.T_avg[self.time.year - 1][self.time.day - 1]
         nh3_loss = max(0,self.pen.num_animals*GasEmissions.calc_E_NH3_storage_v2(barn_area=self.pen.barn_area_from_pen_type,TAN = self.accumulated_output.TAN_s,U=self.accumulated_output.total_daily_mass,tempC=tempC))
-        self.accumulated_output.TAN_s = self.accumulated_output.TAN_s-nh3_loss
+        self.accumulated_output.TAN_s = max(0,self.accumulated_output.TAN_s-nh3_loss)
         return nh3_loss
 
 class SlurryStorageOutdoor(BaseManureTreatment):
@@ -494,12 +495,14 @@ class SlurryStorageOutdoor(BaseManureTreatment):
                 K_manure=handler.K_manure * (1 - self.config.K_removal_efficiency),
                 total_daily_mass=handler.total_daily_mass +rain_volume_added/1000
         )
-        daily_output.accumulated_TS =self.accumulated_output.TSd
-        daily_output.accumulated_volume =self.accumulated_output.total_daily_mass/1000
+        self.accumulated_output+=daily_output   
         daily_output.ch4_emissions = self.calc_emissions()
         daily_output.nh3_emissions = self.calc_NH3_emissions()
+        daily_output.accumulated_TS =self.accumulated_output.TSd
+        daily_output.accumulated_volume =self.accumulated_output.total_daily_mass/1000
         daily_output.tempC = self.weather_data.T_avg[self.time.year - 1][self.time.day - 1]
         daily_output.rainfall = self.weather_data.rainfall[self.time.year - 1][self.time.day - 1]
+        
         return daily_output
 
     @property
@@ -568,16 +571,16 @@ class SlurryStorageOutdoor(BaseManureTreatment):
 
     def calc_emissions(self):
         tempC = self.weather_data.T_avg[self.time.year - 1][self.time.day - 1]
-        ch4_loss = GasEmissions.calc_E_CH4_slurry_storage_v3(self.accumulated_output.TSd,enclosed=False,tempC=tempC)
-        self.accumulated_output.TSd = max(0,self.accumulated_output.TSd -ch4_loss)
+        TS_input = self.accumulated_output.TSd
+        ch4_loss = GasEmissions.calc_E_CH4_slurry_storage_v3(Ts = TS_input, enclosed=False,tempC=tempC)
+        self.accumulated_output.TSd = max(0,self.accumulated_output.TSd)
         return ch4_loss
 
     def calc_NH3_emissions(self):
         tempC = self.weather_data.T_avg[self.time.year - 1][self.time.day - 1]
         nh3_loss = max(0,self.pen.num_animals*GasEmissions.calc_E_NH3_storage_v2(barn_area=self.pen.barn_area_from_pen_type,TAN = self.accumulated_output.TAN_s,U=self.accumulated_output.total_daily_mass,tempC=tempC))
-        self.accumulated_output.TAN_s = self.accumulated_output.TAN_s-nh3_loss
+        self.accumulated_output.TAN_s = max(0,self.accumulated_output.TAN_s-nh3_loss)
         return nh3_loss
-
 @dataclass
 class ManureTreatmentConfig:
     percent_dry_solids: float = 1.0
