@@ -397,7 +397,8 @@ class AnaerobicLagoon(BaseManureTreatment):
         return ch4_loss
     def calc_NH3_emissions(self):
         tempC = self.weather_data.T_avg[self.time.year - 1][self.time.day - 1]
-        nh3_loss = max(0,self.pen.num_animals*GasEmissions.calc_E_NH3_storage_v2(barn_area=self.pen.barn_area_from_pen_type,TAN = self.accumulated_output.TAN_s,U=self.accumulated_output.total_daily_mass,tempC=tempC))
+        nh3_loss = max(0,self.pen.num_animals*GasEmissions.calc_E_NH3_storage_v2(barn_area=self.pen.barn_area_from_pen_type*self.pen.num_animals, \
+        TAN = self.accumulated_output.TAN_s,U=self.accumulated_output.total_daily_mass,tempC=tempC))        
         self.accumulated_output.TAN_s = max(0,self.accumulated_output.TAN_s-nh3_loss)
         return nh3_loss
 
@@ -458,7 +459,8 @@ class SlurryStorageUnderfloor(BaseManureTreatment):
 
     def calc_NH3_emissions(self):
         tempC = self.weather_data.T_avg[self.time.year - 1][self.time.day - 1]
-        nh3_loss = max(0,self.pen.num_animals*GasEmissions.calc_E_NH3_storage_v2(barn_area=self.pen.barn_area_from_pen_type,TAN = self.accumulated_output.TAN_s,U=self.accumulated_output.total_daily_mass,tempC=tempC))
+        nh3_loss = max(0,self.pen.num_animals*GasEmissions.calc_E_NH3_storage_v2(barn_area=self.pen.barn_area_from_pen_type*self.pen.num_animals, \
+        TAN = self.accumulated_output.TAN_s,U=self.accumulated_output.total_daily_mass,tempC=tempC))
         self.accumulated_output.TAN_s = max(0,self.accumulated_output.TAN_s-nh3_loss)
         return nh3_loss
 
@@ -578,7 +580,8 @@ class SlurryStorageOutdoor(BaseManureTreatment):
 
     def calc_NH3_emissions(self):
         tempC = self.weather_data.T_avg[self.time.year - 1][self.time.day - 1]
-        nh3_loss = max(0,self.pen.num_animals*GasEmissions.calc_E_NH3_storage_v2(barn_area=self.pen.barn_area_from_pen_type,TAN = self.accumulated_output.TAN_s,U=self.accumulated_output.total_daily_mass,tempC=tempC))
+        nh3_loss = max(0,self.pen.num_animals*GasEmissions.calc_E_NH3_storage_v2(barn_area=self.pen.barn_area_from_pen_type*self.pen.num_animals, \
+        TAN = self.accumulated_output.TAN_s,U=self.accumulated_output.total_daily_mass,tempC=tempC))
         self.accumulated_output.TAN_s = max(0,self.accumulated_output.TAN_s-nh3_loss)
         return nh3_loss
 @dataclass
