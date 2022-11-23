@@ -9,8 +9,10 @@ import sys
 from pathlib import Path
 
 from RUFAS import util, errors
+from RUFAS.output_manager import OutputManager
 import fileReader
 
+om = OutputManager()
 
 def input_prompt():
     """Prompts the user for an input to RUFAS.
@@ -107,3 +109,4 @@ def input_prompt():
         #
         except errors.UserInput as e:
             print(e.msg)
+            om.add_error(f"{e}", f"{e.msg}",{'caller_class': 'RUFAS.user_input', 'caller_function': 'input_prompt'})

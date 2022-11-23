@@ -11,7 +11,9 @@ from pathlib import Path
 from typing import Callable, List, Tuple
 
 from RUFAS import errors
+from RUFAS.output_manager import OutputManager
 
+om = OutputManager()
 
 class Utility:
     @staticmethod
@@ -84,6 +86,7 @@ class Utility:
 
         except errors.UserInput as e:
             print(e.msg)
+            om.add_error(f"{e}", f"{e.msg}",{'caller_class': 'Utility', 'caller_function': 'read_json_file'})
 
     @staticmethod
     def calc_average(num_values: int, cur_avg: float, new_value: float) -> Tuple[int, float]:
