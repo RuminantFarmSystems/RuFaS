@@ -12,7 +12,9 @@ from typing import Optional
 
 from RUFAS.routines.manure.manure_management import simulate_daily_manure_management
 from RUFAS.util import Utility
+from RUFAS.output_manager import OutputManager
 
+om = OutputManager()
 
 class SimulationEngine:
 
@@ -27,12 +29,16 @@ class SimulationEngine:
     def simulate(self) -> None:
         """Executes the simulation"""
         t_start_sim = timer.time()
+        
         self._run_simulation_main_loop()
         self.output.finalize(self.state, self.weather, self.time)
         t_end_sim = timer.time()
 
         print("Simulation Successful")
         print(f"Total Simulation Time: {t_end_sim - t_start_sim} seconds")
+        total_simulation_time = t_end_sim - t_start_sim
+        om.add_variable('total_simulation_time', total_simulation_time, {'caller_class': 'SimulationEngine', 'caller_function': 'simulate'})
+
 
         t_start_graphics = timer.time()
         sys.stdout.write('Producing Graphics\n')
@@ -40,9 +46,13 @@ class SimulationEngine:
         t_end_graphics = timer.time()
 
         graphics_prod_time = t_end_graphics - t_start_graphics
+        om.add_variable('graphics_prod_time', graphics_prod_time, {'caller_class': 'SimulationEngine', 'caller_function': 'simulate'})
         total_runtime = (t_end_sim-t_start_sim) + \
             (t_end_graphics-t_start_graphics)
+        om.add_variable('total_runtime', total_runtime, {'caller_class': 'SimulationEngine', 'caller_function': 'simulate'})
         self._show_final_messages(graphics_prod_time, total_runtime)
+        
+        om.print_pools()
 
     def _run_simulation_main_loop(self) -> None:
         """
@@ -143,6 +153,8 @@ class SimulationEngine:
         """
 
         print(f"Initializing simulation environment from {file_path}")
+        om.add_variable('simulation_initialization_file_path', file_path, {'caller_class': 'SimulationEngine', 'caller_function': '_initialize_simulation'})
+
         try:
             data = Utility.read_json_file(file_path)
             self.config = Config(data['config'], data['weather'])
@@ -161,6 +173,7 @@ class SimulationEngine:
         except errors.JSONfileData as e:
             print(
                 f"JSON FILE ERROR: {file_path.name}\n\t{e.section} Section\n{e.msg}\n")
+            om.add_error(f"{e}", f"{e.msg}",{'caller_class': 'SimulationEngine', 'caller_function': '_initialize_simulation'})
             raise errors.InvalidJSONfile(file_path.name)
 
         self.output.initialize_dir(
