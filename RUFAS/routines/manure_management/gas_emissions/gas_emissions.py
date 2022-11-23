@@ -109,8 +109,6 @@ class GasEmissions:
             n_eff: efficicency of process              TODO: confirm n_eff meaning
             VS_loss_yesterday: VS loss from previous day. 
 
-
-
         Returns
             CH4 emissions from storage, kg CH4/day.
         """
@@ -124,8 +122,8 @@ class GasEmissions:
         temp_in_K = GasEmissions._convert_temp_C_to_K(tempC)
         ex = math.exp(lnA - (E / (R * temp_in_K)))
 
-        VSd = (VS_tot * (Bo / E_CH4_pot) - VS_loss_yesterday) 
-        VSnd = VS_tot - VSd
+        VSd = (Bo / E_CH4_pot)
+        VSnd = 1 - VSd
 
         if(not enclosed):
             return c * VS_tot * (VSd * b1 + VSnd * b2) * ex
