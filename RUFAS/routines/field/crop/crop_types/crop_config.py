@@ -21,6 +21,9 @@ Description:
     or any variables that do not correspond to crop-specific parameters.
 """
 
+# TODO: SWAT distributes with a database of plant-growth parameters by species. This file needs to be cross-referenced
+#       with that database. source: https://swat.tamu.edu/media/69341/ch14_input_plantdb.pdf
+
 ALFALFA = {
         # alfalfa ID variables
         "harvest_type": 'optimal',  # TODO: is this always the type for alfalfa? Corn reads this from data
