@@ -147,6 +147,7 @@ class Config:
 
             # compares actual size of the file to expected size
             if file_line - 1 != expected_w_file_size + 1:
+                #TODO add warnings to warning pool for each of these
                 print("Start and end dates of the Weather CSV file do not match the size.")
                 if file_line - 1 > expected_w_file_size + 1:
                     print("There may be duplicate days in: " + weather_full_path.name)

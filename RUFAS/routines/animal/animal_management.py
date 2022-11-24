@@ -19,10 +19,13 @@ from RUFAS.routines.animal.clustering_pen_grouping import grouping
 from RUFAS.routines.animal.life_cycle.life_cycle import LifeCycleManager
 from RUFAS.routines.animal.life_cycle.animal_base import AnimalBase
 from RUFAS.routines.animal.ration import ration_driver as ration_driver
+from RUFAS.output_manager import OutputManager
 from collections import deque
 import random
 from typing import Tuple
 from statistics import mean
+
+om = OutputManager()
 
 def daily_animal_routine(animal_management, feed, weather, time):
     """
@@ -195,6 +198,8 @@ class AnimalManagement:
         animal_combination = None
         if (len(self.all_pens) == 0) and (herd_num > 0):
             print('Warning: herd_num > 0, but pen_num = 0. Initilizing 3 default pens.')
+            om.add_warning('invalid_pen_num_warning', 'Warning: herd_num > 0, but pen_num = 0. Initilizing 3 default pens.',
+                             {'caller_class': 'AnimalManagement', 'caller_function': 'init_pens'})
             pen_1 = Pen(0, 0.1, 1.6, 100, 'open air barn', 'sand', 'freestall',
                         manure_handling, manure_separator, manure_storage,
                         animal_combination, 1.2)
@@ -209,6 +214,8 @@ class AnimalManagement:
             self.all_pens.append(pen_3)
         elif (len(self.all_pens) == 1) and (herd_num > 0):
             print('Warning: herd_num > 0, but pen_num = 1. Initilizing 2 default pens.')
+            om.add_warning('invalid_pen_num_warning', 'Warning: herd_num > 0, but pen_num = 1. Initilizing 2 default pens.',
+                             {'caller_class': 'AnimalManagement', 'caller_function': 'init_pens'})
             pen_2 = Pen(1, 0.1, 1.6, 300, 'open air barn', 'sawdust', 'freestall',
                         manure_handling, manure_separator, manure_storage,
                         animal_combination, 1.2)
@@ -219,6 +226,8 @@ class AnimalManagement:
             self.all_pens.append(pen_3)
         elif (len(self.all_pens) == 2) and (herd_num > 0):
             print('Warning: herd_num > 0, but pen_num = 2. Initilizing 1 default pen.')
+            om.add_warning('invalid_pen_num_warning', 'Warning: herd_num > 0, but pen_num = 2. Initilizing 1 default pen.',
+                             {'caller_class': 'AnimalManagement', 'caller_function': 'init_pens'})
             pen_3 = Pen(2, 0.1, 1.6, 300, 'open air barn', 'straw', 'tiestall',
                         manure_handling, manure_separator, manure_storage,
                         animal_combination, 1.2)
@@ -257,22 +266,32 @@ class AnimalManagement:
             if not calf_num == 0:
                 print("Warning: herd_num is 0, but calf_num is not. "
                       "Setting calf_num = 0.")
+                om.add_warning('invalid_calf_num_warning', 'Warning: herd_num is 0, but calf_num is not. '
+                            'Setting calf_num = 0.', {'caller_class': 'AnimalManagement', 'caller_function': 'init_animals'})
                 calf_num = 0
             if not heiferI_num == 0:
                 print("Warning: herd_num is 0, but heiferI_num is not. "
                       "Setting heiferI_num = 0.")
+                om.add_warning('invalid_heiferI_num_warning', 'Warning: herd_num is 0, but heiferI_num is not. '
+                            'Setting heiferI_num = 0.', {'caller_class': 'AnimalManagement', 'caller_function': 'init_animals'})
                 heiferI_num = 0
             if not heiferII_num == 0:
                 print("Warning: herd_num is 0, but heiferII_num is not. "
                       "Setting heiferII_num = 0.")
+                om.add_warning('invalid_heiferII_num_warning', 'Warning: herd_num is 0, but heiferII_num is not. '
+                            'Setting heiferII_num = 0.', {'caller_class': 'AnimalManagement', 'caller_function': 'init_animals'})
                 heiferII_num = 0
             if not heiferIII_num == 0:
                 print("Warning: herd_num is 0, but heiferIII_num is not. "
                       "Setting heiferIII_num = 0.")
+                om.add_warning('invalid_heiferIII_num_warning', 'Warning: herd_num is 0, but heiferIII_num is not. '
+                            'Setting heiferII_num = 0.', {'caller_class': 'AnimalManagement', 'caller_function': 'init_animals'})
                 heiferIII_num = 0
             if not cow_num == 0:
                 print("Warning: herd_num is 0, but cow_num is not. "
                       "Setting cow_num = 0.")
+                om.add_warning('invalid_cow_num_warning', 'Warning: herd_num is 0, but cow_num is not. '
+                            'Setting cow_num = 0.', {'caller_class': 'AnimalManagement', 'caller_function': 'init_animals'})
                 cow_num = 0
         else:
             self.simulate_animals = True
@@ -585,6 +604,8 @@ class AnimalManagement:
                 # if no available pens for this group in mixed types
                 if pen is None:
                     print('Warning: shortage of ', max_key[0].name, ' pens, initializing new pen')
+                    om.add_warning('pen_shortage_warning', f'Warning: shortage of {max_key[0].name} pens, initializing new pen,' 
+                                    {'caller_class': 'AnimalManagement', 'caller_function': 'init_animals'})
                     # initalizing a default pen to be used for any class
                     pen = Pen(len(self.all_pens), 0.1, 1.6, max_value,
                               'open air barn', 'straw', 'tiestall', 'manual_scraping',
@@ -970,6 +991,10 @@ class AnimalManagement:
                   ' so ' + str(num_animals) + ' of each animal class cannot ' +
                   'be in the life cycle output. Only ' + str(minimum_num) +
                   ' of each animal type will be in the life cycle output.')
+            om.add_warning('invalid_animal_list_size_warning', f'The smallest animal list is of size {minimum_num} '
+                            f'so {num_animals} of each animal class cannot be in the life cycle output. Only '
+                            f'{minimum_num} of each animal type will be in the life cycle output.',
+                            {'caller_class': 'AnimalManagement', 'caller_function': 'init_animals'})
             num_animals = minimum_num
 
         output = {

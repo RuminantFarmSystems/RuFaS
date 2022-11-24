@@ -12,9 +12,11 @@ from RUFAS.routines.animal.life_cycle.heiferII import HeiferII
 from RUFAS.routines.animal.life_cycle.heiferIII import HeiferIII
 from RUFAS.routines.animal.life_cycle.cow import Cow
 from RUFAS.routines.animal.life_cycle.animal_base import AnimalBase
+from RUFAS.output_manager import OutputManager
 import sqlite3
 from enum import IntEnum
 
+om = OutputManager()
 
 class AnimalValues(IntEnum):
     id = 0
@@ -736,4 +738,5 @@ class AnimalInitialization:
             print("The program encountered the following exception while "
                   "connecting to and querying the animal initialization "
                   "database: ", e, "\nExiting.")
+
             exit(1)

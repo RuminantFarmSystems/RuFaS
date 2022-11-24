@@ -19,7 +19,7 @@ class BaseReportDriver:
                 if not report.produce_csv and report.produce_graphics:
                     print("Warning: Cannot produce graphics for inactive report:", report.report_name,
                           ". Setting produce_graphics to False")
-                    om.add_warning('inactive_report_warning', f'Warning: Cannot produce graphics for inactive report:, {report.report_name}. '
+                    om.add_warning('inactive_report_warning', f'Warning: Cannot produce graphics for inactive report: {report.report_name}. '
                       f'Setting produce_graphics to False', {'caller_class': 'BaseReportDriver', 'caller_function': 'initialize'})
                     report.produce_graphics = False
                 if report.produce_csv:

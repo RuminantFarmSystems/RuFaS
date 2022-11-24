@@ -109,4 +109,4 @@ def input_prompt():
         #
         except errors.UserInput as e:
             print(e.msg)
-            om.add_error(f"{e}", f"{e.msg}",{'caller_class': 'RUFAS.user_input', 'caller_function': 'input_prompt'})
+            om.add_error(f"{e}", f"{e.msg}",{'caller_class': 'no_class', 'caller_function': 'input_prompt'})
