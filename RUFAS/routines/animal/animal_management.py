@@ -604,7 +604,7 @@ class AnimalManagement:
                 # if no available pens for this group in mixed types
                 if pen is None:
                     print('Warning: shortage of ', max_key[0].name, ' pens, initializing new pen')
-                    om.add_warning('pen_shortage_warning', f'Warning: shortage of {max_key[0].name} pens, initializing new pen,' 
+                    om.add_warning('pen_shortage_warning', f'Warning: shortage of {max_key[0].name} pens, initializing new pen,', 
                                     {'caller_class': 'AnimalManagement', 'caller_function': 'init_animals'})
                     # initalizing a default pen to be used for any class
                     pen = Pen(len(self.all_pens), 0.1, 1.6, max_value,
