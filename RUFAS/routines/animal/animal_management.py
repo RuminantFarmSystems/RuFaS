@@ -232,7 +232,7 @@ class AnimalManagement:
         if not self.simulate_animals:
             animal_keys = {"calf_num", "heiferI_num", "heiferII_num", "heiferIII_num", "cow_num"}
             for key in animal_keys:
-                if herd_data[key] == 0:
+                if herd_data[key] != 0:
                     # send this to warning pool later
                     print("Warning: simulate_animals is false, but", key, "!= 0.")
                     counter += 1
