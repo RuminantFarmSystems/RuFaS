@@ -215,48 +215,75 @@ def test_init_animals(animal_management: AnimalManagement, mocker: MockerFixture
 
     animal_management.init_animals(herd_data, config)
 
-    animal_management.life_cycle_manager.initialize_herd.assert_called_once()
-
-    animal_management.simulate_animals = False
-
-    animal_management.init_animals(herd_data, config)
     animal_management._print_animal_num_warnings.assert_called_once()
+
+    animal_management.life_cycle_manager.initialize_herd.assert_called_once()
 
 
 def test_print_animal_num_warnings(animal_management: AnimalManagement):
     """Unit test for function _print_animal_num_warnings in file routines/animal/animal_management.py"""
 
-    # warnings print when herd_data is 0
-
     animal_keys = {"calf_num", "heiferI_num", "heiferII_num", "heiferIII_num", "cow_num"}
     herd_data = dict()
 
+    animal_management.simulate_animals = True
     actual_output = io.StringIO()
     sys.stdout = actual_output
-    expected_output = ""
-
-    for key in animal_keys:
-        herd_data[key] = 0
-        expected_output += "Warning: simulate_animals is false, but " + key + " != 0." + "\n"
+    expected_output = "Simulate animals_is true\n"
 
     animal_management._print_animal_num_warnings(herd_data)
 
     assert actual_output.getvalue() == expected_output
 
-    # no warnings print when herd_data is non zero
-
+    animal_management.simulate_animals = False
     actual_output = io.StringIO()
     sys.stdout = actual_output
     expected_output = ""
 
     for key in animal_keys:
         herd_data[key] = 1
+        expected_output += "Warning: simulate_animals is false, but " + key + " != 0." + "\n"
+
+    expected_output += "5 warnings were associated with simulate_animals\n"
 
     animal_management._print_animal_num_warnings(herd_data)
 
     assert actual_output.getvalue() == expected_output
 
     sys.stdout = sys.__stdout__
+
+
+    # warnings print when herd_data is 0
+    # pass
+    # animal_keys = {"calf_num", "heiferI_num", "heiferII_num", "heiferIII_num", "cow_num"}
+    # herd_data = dict()
+    #
+    # actual_output = io.StringIO()
+    # sys.stdout = actual_output
+    # expected_output = ""
+    #
+    # for key in animal_keys:
+    #     herd_data[key] = 0
+    #     expected_output += "Warning: simulate_animals is false, but " + key + " != 0." + "\n"
+    #
+    # animal_management._print_animal_num_warnings(herd_data)
+    #
+    # assert actual_output.getvalue() == expected_output
+    #
+    # # no warnings print when herd_data is non zero
+    #
+    # actual_output = io.StringIO()
+    # sys.stdout = actual_output
+    # expected_output = ""
+    #
+    # for key in animal_keys:
+    #     herd_data[key] = 1
+    #
+    # animal_management._print_animal_num_warnings(herd_data)
+    #
+    # assert actual_output.getvalue() == expected_output
+    #
+    # sys.stdout = sys.__stdout__
 
 
 def test_init_nutrient_rqmts():
