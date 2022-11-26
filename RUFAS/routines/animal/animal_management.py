@@ -179,13 +179,13 @@ class AnimalManagement:
                 herd_num: number of animals in the herd
             """
 
-        num_pens_needed = self.MIN_NUM_PENS - len(self.all_pens)
+        num_additional_pens_needed = self.MIN_NUM_PENS - len(self.all_pens)
 
         # Check if any default pens need to be added
-        if num_pens_needed > 0 and herd_num > 0:
-            print('Warning: herd_num > 0, but num_pens =', len(self.all_pens), '. Initilizing', num_pens_needed,
-                  'default pens.')
-            for i in range(num_pens_needed):
+        if num_additional_pens_needed > 0 and herd_num > 0:
+            print('Warning: herd_num > 0, but num_pens =', len(self.all_pens), '. Initializing',
+                  num_additional_pens_needed, 'additional pens.')
+            for i in range(num_additional_pens_needed):
                 new_default_pen = Pen(0, 0.1, 1.6, 100, 'open air barn', 'sand', 'freestall',
                                       "manual_scraping", "sedimentation", "storage_pit",
                                       Pen.AnimalCombination.NONE, 1.2)
@@ -206,7 +206,7 @@ class AnimalManagement:
             herd_data: dictionary containing information about the herd
         """
 
-        # TODO: resolve disrepency: pen_data is not a dictionary of pen information -- it is just self.all_pens
+        # TODO: resolve discrepancy: pen_data is not a dictionary of pen information -- it is just self.all_pens
         #  current solution -- get rid of usage of pen_data, because self.all_pens will always have > 0 bc
         #  init_default_pens initializes default pens
 
@@ -214,21 +214,33 @@ class AnimalManagement:
             herd_data['config'] = config
             self.calves, self.heiferIs, self.heiferIIs, self.heiferIIIs, self.cows \
                 = self.life_cycle_manager.initialize_herd(**herd_data)
-        else:
-            AnimalManagement._print_animal_num_warnings(herd_data)
 
-    @staticmethod
-    def _print_animal_num_warnings(herd_data):
+        self._print_animal_num_warnings(herd_data)
+
+    # @staticmethod
+    def _print_animal_num_warnings(self, herd_data):
         """
-        Prints out warnings if there are more than 0 animals for any of the animal types
+        If simulate_animals is false, prints out warnings if there are more than 0 animals for any of the animal types,
+            and logs how many warnings were generated
+        Otherwise, if simulate_animals is true, logs that it is true
 
         Args:
             herd_data: dictionary containing information about the herd
         """
-        animal_keys = {"calf_num", "heiferI_num", "heiferII_num", "heiferIII_num", "cow_num"}
-        for key in animal_keys:
-            if herd_data[key] == 0:
-                print("Warning: simulate_animals is false, but", key, "!= 0.")
+        counter = 0
+
+        if not self.simulate_animals:
+            animal_keys = {"calf_num", "heiferI_num", "heiferII_num", "heiferIII_num", "cow_num"}
+            for key in animal_keys:
+                if herd_data[key] == 0:
+                    # send this to warning pool later
+                    print("Warning: simulate_animals is false, but", key, "!= 0.")
+                    counter += 1
+            # send to log pool
+            print(counter, "warnings were associated with simulate_animals")
+        else:
+            # send to log pool
+            print("Simulate animals_is true")
 
     def init_nutrient_rqmts(self, weather, time, feed):
         """
