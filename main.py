@@ -6,6 +6,7 @@ This file serves as a main entry point to RuFaS.
 The main function run_rufas() will execute the model simulation(s). It accepts a path to the location of the input
 file(s) or, if this input is not given, it will run in interactive mode and accept input from the user.
 """
+from typing import List
 
 import config.global_variables
 import argparse
@@ -31,7 +32,7 @@ def set_global_variables(make_graphs: bool, verbose: bool) -> None:
     config.global_variables.PRINT_STATUS_MESSAGES = verbose  # TODO: this is currently unimplemented - GitHub Issue #211
 
 
-def execute_simulations_from_files(files: list[Path]) -> None:
+def execute_simulations_from_files(files: List[Path]) -> None:
     """execute simulations for each file"""
     for f in files:
         simulator = SimulationEngine(f)

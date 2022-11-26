@@ -5,8 +5,10 @@ import pytest
 from pytest_mock import MockerFixture
 
 from config import global_variables
+from RUFAS import errors
 from RUFAS.user_prompt import get_json_list_from_dir
 from RUFAS.user_prompt import obtain_file_list
+from RUFAS.user_prompt import prompt_user_for_input
 
 dir_path = os.path.join(global_variables.ROOT_DIR, "input")
 file_path = os.path.join(dir_path, "input/ARL.json")
@@ -117,7 +119,43 @@ def test_convert_json_path_to_list(path):
     pass
 
 
-@pytest.mark.parametrize("input", ["Q", "q", "dir", file_path, dir_path])
-def test_prompt_user_for_input(input):
+@pytest.mark.parametrize("user_input", ['Q', 'q', file_path, dir_path, 'dir', 'error'])
+def test_prompt_user_for_input(mocker: MockerFixture, capsys: pytest.CaptureFixture, user_input: str) -> None:
     """check that prompt_user_for_input correctly returns the users input and that other options work as expected"""
-    pass
+
+    # Arrange
+    def mock_user_input_error_side_effect(*args, **kwargs):
+        raise errors.UserInput("test error")
+
+    side_effect_by_user_input = {
+        'dir': ['dir', 'Q'],
+        'error': mock_user_input_error_side_effect
+    }
+    patch_for_input = mocker.patch("builtins.input",
+                                   side_effect=side_effect_by_user_input.get(user_input, [user_input]))
+
+    patch_for_exit = mocker.patch("sys.exit")
+    current_dir_path = Path.cwd()
+    patch_for_get_base_dir = mocker.patch("RUFAS.user_prompt.Utility.get_base_dir", return_value=current_dir_path)
+
+    # Act
+    actual_user_input = prompt_user_for_input()
+
+    # Assert
+    captured = capsys.readouterr().out.split('\n')
+
+    if user_input in ["Q", "q"]:
+        patch_for_input.assert_called_once_with("\nEnter RUFAS Input: ")
+        patch_for_exit.assert_called_once()
+        assert "Exiting RUFAS..." in captured
+    elif user_input == "dir":
+        assert patch_for_input.call_count == 2
+        patch_for_get_base_dir.assert_called_once()
+        patch_for_exit.assert_called_once()
+        assert "Exiting RUFAS..." in captured
+        assert str(current_dir_path) in captured
+    elif user_input == "error":
+        assert 'USER INPUT ERROR: test error' in captured
+    else:
+        patch_for_input.assert_called_once_with("\nEnter RUFAS Input: ")
+        assert actual_user_input == 'input/' + user_input

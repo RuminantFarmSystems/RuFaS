@@ -7,11 +7,14 @@ Author(s): Kass Chupongstimun, kass_c@hotmail.com
 
 import sys
 from pathlib import Path
-from RUFAS import util, errors
+from typing import List
+
 import fileReader
+from RUFAS import errors
+from RUFAS.util import Utility
 
 
-def obtain_file_list(path=None, verbose: bool = True) -> list[Path]:
+def obtain_file_list(path=None, verbose: bool = True) -> List[Path]:
     """
     Description: obtains a json file list, usable by RuFaS, from the user. The location of the files is given
     directly as a path string, or as a response to an input prompt.
@@ -32,7 +35,7 @@ def obtain_file_list(path=None, verbose: bool = True) -> list[Path]:
     return path_list
 
 
-def user_prompt() -> list[Path]:
+def user_prompt() -> List[Path]:
     """
     Description: prompts the user for an input path to RuFaS data.
 
@@ -81,7 +84,7 @@ def convert_path_string_to_list(path: str, verbose: bool = True):
         raise ValueError("Invalid input path")
 
 
-def get_json_list_from_dir(dir_path: Path, verbose: bool) -> list[Path]:
+def get_json_list_from_dir(dir_path: Path, verbose: bool) -> List[Path]:
     """gets a list of all json files contained in a directory.
 
     Details: throws an error if the directory does not exist or if not json files are found.
@@ -104,7 +107,7 @@ def get_json_list_from_dir(dir_path: Path, verbose: bool) -> list[Path]:
         return json_paths
 
 
-def convert_json_path_to_list(json_path: Path, verbose: bool) -> list[Path]:
+def convert_json_path_to_list(json_path: Path, verbose: bool) -> List[Path]:
     """converts a path to a json file into a list of libpath.Path objects
 
     Details: throws an error if the file is not found.
@@ -134,22 +137,23 @@ def prompt_user_for_input() -> str:
           "Exit RUFAS:\n\t" +
           "Enter \'Q\' or \'q\'")
 
-    while True:
+    try:
+        rel_root = 'input/'
 
-        try:
-            user_input = 'input/' + input("\nEnter RUFAS Input: ")
+        user_input = input("\nEnter RUFAS Input: ")
 
-            if user_input.upper() == 'Q':
-                print("Exiting RUFAS...")
-                sys.exit()
+        while user_input == 'dir':
+            print(str(Utility.get_base_dir()))
+            user_input = input("\nEnter RUFAS Input: ")
 
-            elif user_input.lower() == 'dir':
-                print(str(util.get_base_dir()))  # TODO: No such function, likely cause of GitHub Issue #208
-                continue
+        if user_input.upper() == 'Q':
+            print("Exiting RUFAS...")
+            sys.exit()
 
-            return user_input
-        except errors.UserInput as e:
-            print(e.msg)
+        return rel_root + user_input
+
+    except errors.UserInput as e:
+        print(e.msg)
 
 # TODO make tests. The following should work (from RUFAS/ dir) - GitHub Issue #209
 # convert_path_string_to_list("../input/ARL.json")
