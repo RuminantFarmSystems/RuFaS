@@ -29,7 +29,6 @@ from RUFAS.routines.manure.output_handler.manure_management_output_handler impor
 from RUFAS.routines.manure.pen.manure_management_pen import ManureManagementPen
 from RUFAS.routines.manure.reception_pits.reception_pit import ReceptionPit
 
-
 class ManureManagement:
     """
     A class that sets up and manages different manure management components including manure handlers,
