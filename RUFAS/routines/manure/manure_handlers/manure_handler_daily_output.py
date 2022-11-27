@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 from dataclasses import field
 
-from RUFAS.routines.manure.constants.constants import ManureManagementConstants
+from RUFAS.routines.manure.constants.general_constants import GeneralConstants
 
 
 @dataclass
@@ -20,10 +20,13 @@ class ManureHandlerDailyOutput:
         VS_total: Total amount of volatile solids, kg.
         P: Amount of phosphorus excreted in manure, kg.
         K: Amount of potassium in manure, kg.
+        CH4_floor: Methane emissions from ..., kg.  # TODO: Fill in.
+        CO2_floor: Carbon dioxide emissions from ..., kg.  # TODO: Fill in.
+        NH3_floor: Ammonia emissions from ..., kg.  # TODO: Fill in.
         manure_volume: Amount of raw manure, m^3.
         cleaning_water_volume: Volume of cleaning water used in main barn, m^3.
         total_bedding_volume: Total amount of bedding needed for all the animals in pen, m^3.
-        total_water_volume_in_milking_center: Total volume of water used for
+        total_water_volume_in_milking_parlor: Total volume of water used for
             lactating cows in the milking center, m^3.
         total_daily_manure_volume: Total amount of manure, bedding, and water combined, m^3.
 
@@ -40,22 +43,26 @@ class ManureHandlerDailyOutput:
     P: float = 0.0
     K: float = 0.0
 
+    CH4_floor: float = 0.0
+    CO2_floor: float = 0.0
+    NH3_floor: float = 0.0
+
     manure_volume: float = 0.0
     cleaning_water_volume: float = 0.0
     total_bedding_volume: float = 0.0
-    total_water_volume_in_milking_center: float = 0.0
+    total_water_volume_in_milking_parlor: float = 0.0
     total_daily_manure_volume: float = field(init=False)
 
     def __post_init__(self) -> None:
         """Calculate total volatile solids and total daily manure volume after initialization."""
 
         self.VS_total = self.VSd + self.VSnd
-        self.cleaning_water_volume *= ManureManagementConstants.LITERS_TO_CUBIC_METERS
-        self.total_water_volume_in_milking_center *= ManureManagementConstants.LITERS_TO_CUBIC_METERS
+        self.cleaning_water_volume *= GeneralConstants.LITERS_TO_CUBIC_METERS
+        self.total_water_volume_in_milking_parlor *= GeneralConstants.LITERS_TO_CUBIC_METERS
 
         self.total_daily_manure_volume = sum([
             self.manure_volume,
             self.cleaning_water_volume,
             self.total_bedding_volume,
-            self.total_water_volume_in_milking_center,
+            self.total_water_volume_in_milking_parlor,
         ])

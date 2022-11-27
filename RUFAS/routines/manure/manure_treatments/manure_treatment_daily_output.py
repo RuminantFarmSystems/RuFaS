@@ -30,12 +30,16 @@ class ManureTreatmentDailyOutput:
     K: float = 0.0
     final_manure_volume: float = 0.0
 
+    CH4: float = 0.0
+    NH3: float = 0.0
+
+    # Extra variable for development purposes
+    # Will be removed when done
     sludge_TS: float = 0.0
     sludge_VS: float = 0.0
     sludge_N: float = 0.0
     sludge_P: float = 0.0
     sludge_K: float = 0.0
-
     accumulated_sludge_TS: float = 0.0
     accumulated_minimum_treatment_volume: float = 0.0
 
@@ -55,6 +59,17 @@ class ManureTreatmentDailyOutput:
         return ManureTreatmentDailyOutput(*[
             attr1 + attr2 for attr1, attr2 in zip(astuple(self), astuple(other))
         ])
+
+
+@dataclass
+class AnaerobicDigestionOutput:
+    biogas: float = 0.0  # biogas production per day (m3/day)
+    biogas_energy_content: float = 0.0  # biogas energy content (MJ/m3)
+    methane_generation_volume: float = 0.0
+    input_energy_heating: float = 0.0
+    evaporated_water: float = 0.0
+    minimum_digester_volume: float = 0.0
+    top_cover_volume: float = 0.0
 
 
 @dataclass

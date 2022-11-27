@@ -100,6 +100,7 @@ def manure_calculations(ration_formulation, feed, bw, milk_prod, p_feces_excrt,
 
     return p_excrt, \
                {"U": 0.34,  # g/L
+                "Urine": 21,  # kg
                 "TAN_s": 0.14,  # g/L
                 "MN": 0.19,  # kg
                 "Mkg": 32.21,  # kg

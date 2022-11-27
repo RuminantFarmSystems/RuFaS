@@ -89,7 +89,7 @@ class ManureManagementOutputHandler:
         temp = {
             'pen_id': [pen.id],
             'num_animals': [pen.num_animals],
-            'num_cows': [pen.num_cows],
+            'num_lactating_cows': [pen.num_lactating_cows],
             'animal_types': [str(pen.classes_in_pen).strip("{}").replace("'", "")],
             'housing_type': [pen.housing_type],
             'bedding_type': [pen.bedding_type],

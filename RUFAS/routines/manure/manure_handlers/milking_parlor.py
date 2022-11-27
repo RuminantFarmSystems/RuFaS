@@ -1,11 +1,11 @@
 from RUFAS.routines.animal.pen import Pen
-from RUFAS.routines.manure.pen.manure_management_pen import ManureManagementPen
+from RUFAS.routines.manure.constants.manure_constants import ManureConstants
 
 
-class MilkingCenter:
-    """A class that calculates the time spent and water usage in the milking center by cows.
+class MilkingParlor:
+    """A class that calculates the time spent and water usage in the milking parlor by cows.
 
-    Note that only cows are considered in this class.
+    Note that only lactating cows are considered in this class.
 
     Attributes
         num_milkings: Number of milkings per animal per day.
@@ -22,7 +22,7 @@ class MilkingCenter:
                  minutes_spent_per_milking=7.0,
                  wash_water_use_rate=20.0,
                  fresh_water_use_rate=10.0):
-        """Initialize the milking center.
+        """Initialize the milking parlor.
 
         Parameters
             num_milkings: Number of milkings per animal per day.
@@ -59,14 +59,17 @@ class MilkingCenter:
         """
         return self._calc_percent_of_day_from_minutes(self.total_minutes_spent_in_holding_area)
 
-    def wash_water_volume_used_in_holding_area(self, pen: ManureManagementPen) -> float:
-        """Volume of wash water used in holding area.
+    def calc_wash_water_volume_used_in_holding_area(self, num_cows: int) -> float:
+        """Calculates the volume of wash water used in holding area.
 
-        Returns
+        Args:
+            num_cows: Number of cows in the pen.
+
+        Returns:
             Volume of wash water used in holding area, liters.
 
         """
-        return pen.num_cows * self.wash_water_use_rate
+        return num_cows * self.wash_water_use_rate
 
     # Milking
     @property
@@ -89,90 +92,82 @@ class MilkingCenter:
         """
         return self._calc_percent_of_day_from_minutes(self.total_minutes_spent_milking)
 
-    def fresh_water_volume_used_for_milking(self, pen: ManureManagementPen) -> float:
-        """Volume of fresh water used for milking.
+    def calc_fresh_water_volume_used_for_milking(self, num_cows: int) -> float:
+        """Returns volume of fresh water used for milking.
 
-        Returns
+        Args:
+            num_cows: Number of cows in the pen.
+
+        Returns:
             Volume of fresh water used for milking, liters.
 
         """
-        return pen.num_cows * self.fresh_water_use_rate
+        return num_cows * self.fresh_water_use_rate
 
     # Overall
     @property
-    def total_minutes_spent_in_milking_center(self) -> float:
-        """Total number of minutes spent in the milking center per animal per day.
+    def total_minutes_spent_in_milking_parlor(self) -> float:
+        """Total number of minutes spent in the milking parlor per animal per day.
 
         Note that this includes both the time spent in the holding area
         and the time spent milking.
 
         Returns
-            Total number of minutes spent in the milking center per animal per day.
+            Total number of minutes spent in the milking parlor per animal per day.
 
         """
         return self.total_minutes_spent_in_holding_area + self.total_minutes_spent_milking
 
     @property
-    def total_percent_of_day_spent_in_milking_center(self) -> float:
-        """Total percentage of day spent in the milking center per animal.
+    def total_percent_of_day_spent_in_milking_parlor(self) -> float:
+        """Total percentage of day spent in the milking parlor per animal.
 
         Returns
-            Total percentage of day spent in the milking center per animal.
+            Total percentage of day spent in the milking parlor per animal.
 
         """
         return self.percent_of_day_spent_in_holding_area + self.percent_of_day_spent_milking
 
-    def total_water_volume_used_in_milking_center(self, pen: ManureManagementPen) -> float:
-        """Total volume of water used in the milking center.
+    def calc_total_water_volume_used_in_milking_parlor(self, num_cows: int) -> float:
+        """Calculates total volume of water used in the milking parlor.
 
         Args:
-            pen: ManureManagementPen object.
+            num_cows: Number of cows in the pen.
 
         Returns:
-            Total volume of water used in the milking center, L.
+            Total volume of water used in the milking parlor, L.
 
         """
-        return self.wash_water_volume_used_in_holding_area(pen) + self.fresh_water_volume_used_for_milking(pen)
+        return (self.calc_wash_water_volume_used_in_holding_area(num_cows) +
+                self.calc_fresh_water_volume_used_for_milking(num_cows))
 
-    def manure_mass_deposited_in_milking_center(self, pen: ManureManagementPen) -> float:
-        """Total mass of manure deposited in the milking center by all cows in pen.
+    def calc_manure_mass_deposited_in_milking_parlor(self, num_cows: int, manure_mass: float) -> float:
+        """Calculates total mass of manure deposited in the milking parlor by all cows in pen.
 
-        Parameters
-            pen: ManureManagementPen object.
+        Args:
+            num_cows: Number of cows in the pen.
+            manure_mass: Manure mass in the pen, kg.
 
         Returns
-            Total mass of manure deposited in the milking center, kg.
+            Total mass of manure deposited in the milking parlor, kg.
 
         """
-        if pen.num_cows > 0:
-            return pen.manure.manure_mass * self.total_percent_of_day_spent_in_milking_center / 100.0
+        if num_cows > 0:
+            return manure_mass * self.total_percent_of_day_spent_in_milking_parlor / 100.0
         return 0.0
 
-    def manure_volume_deposited_in_milking_center(self, pen: ManureManagementPen) -> float:
-        """Total volume of manure deposited in the milking center.
+    def calc_manure_volume_deposited_in_milking_parlor(self, num_cows: int, manure_mass: float) -> float:
+        """Calculates total volume of manure deposited in the milking parlor.
 
-        Parameters
-            pen: ManureManagementPen object.
+        Args:
+            num_cows: Number of cows in the pen.
+            manure_mass: Manure mass in the pen, kg.
 
-        Returns
-            Total volume of manure deposited in the milking center, liters.
-
-        """
-        return self.manure_mass_deposited_in_milking_center(pen) / pen.manure.density
-
-    @staticmethod
-    def _has_lac_cow_in_pen(pen: ManureManagementPen) -> bool:
-        """Check if pen has lactating cows.
-
-        Parameters
-            pen: A ManureManagementPen object
-
-        Returns
-            True if pen has lactating cows, False otherwise.
+        Returns:
+            Total volume of manure deposited in the milking parlor, m^3.
 
         """
-
-        return pen.animal_combination is Pen.AnimalCombination.LAC_COW
+        return self.calc_manure_mass_deposited_in_milking_parlor(num_cows, manure_mass) / ManureConstants.MANURE_DENSITY
 
     @staticmethod
     def _calc_percent_of_day_from_minutes(minutes: float) -> float:

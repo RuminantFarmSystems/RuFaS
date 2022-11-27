@@ -8,8 +8,8 @@ from RUFAS.routines.manure.manure_handlers.manure_handler_classes import ManureH
 from RUFAS.routines.manure.manure_handlers.manure_handler_classes import ManureHandlerType
 from RUFAS.routines.manure.manure_separators.manure_separator_classes import ManureSeparatorConfig
 from RUFAS.routines.manure.manure_separators.manure_separator_classes import ManureSeparatorType
-from RUFAS.routines.manure.manure_treatments.manure_treatment_classes import ManureTreatmentConfig
-from RUFAS.routines.manure.manure_treatments.manure_treatment_classes import ManureTreatmentType
+from RUFAS.routines.manure.manure_treatments.manure_treatment_configs import ManureTreatmentConfig
+from RUFAS.routines.manure.manure_treatments.manure_treatment_types import ManureTreatmentType
 
 
 class ManureManagementConfigHandler:

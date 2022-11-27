@@ -1,0 +1,214 @@
+from __future__ import annotations
+
+from typing import Tuple
+
+import math
+
+from RUFAS.routines.manure.gas_emissions.gas_emissions import GasEmissions
+from RUFAS.routines.manure.manure_treatments.base_manure_treatment import BaseManureTreatment
+from RUFAS.routines.manure.manure_treatments.manure_treatment_configs import ManureTreatmentConfig
+from RUFAS.routines.manure.manure_treatments.manure_treatment_daily_output import ManureTreatmentDailyOutput
+
+
+class SlurryStorageOutdoor(BaseManureTreatment):
+    """Class for the outdoor slurry storage.
+
+    Attributes:
+        All attributes inherited from BaseManureTreatment.
+        In addition, the following attributes are defined:
+        storage_time_period: Time in days that the manure is stored in the manure
+            treatment system, days.
+        freeboard_input: Empty storage space above the manure in the treatment system.
+            onto the treatment system.
+
+    """
+
+    def __init__(self, weather, time, manure_treatment_config: ManureTreatmentConfig) -> None:
+        """Initialize the outdoor slurry storage manure treatment.
+
+        Args:
+            weather: A Weather object.
+            time: A Time object.
+            manure_treatment_config: A ManureTreatmentConfig object containing
+                the configuration data for the manure treatment system.
+        """
+
+        super().__init__(weather, time, manure_treatment_config)
+        self.storage_time_period = self.config.storage_time_period
+        self.freeboard_input = self.config.freeboard_input
+
+    @property
+    def wastewater_volume(self) -> float:
+        """Calculate the volume of wastewater in the treatment system.
+
+        Returns:
+            The volume of wastewater in the treatment system, m^3.
+
+        """
+        if self._current_input_data:
+            return self._get_input_manure_volume(self._current_input_data)
+        return 0.0
+
+    @property
+    def treatment_volume(self) -> float:
+        """Calculates the minimum treatment volume.
+
+        Returns:
+            The minimum treatment volume, m^3.
+
+        """
+        if self._current_input_data:
+            return self._get_input_manure_volume(self._current_input_data) * self.storage_time_period  # m^3
+        return 0.0
+
+    @property
+    def total_pit_volume(self) -> float:
+        """Calculate the total pit volume.
+
+        Returns:
+            The total lagoon pit, m^3.
+
+        """
+        if self._current_input_data:
+            return self.treatment_volume + self.freeboard + self.precip
+        return 0.0
+
+    @property
+    def pit_depth(self):
+        """Return the depth of the pit.
+
+        Returns:
+            The depth of the pit, m.
+
+        """
+        return 3.657
+
+    @property
+    def pit_slope(self):
+        """Return the slope of the pit.
+
+        Returns:
+            The slope of the pit, dimensionless.
+
+        """
+        return 2.0
+
+    def _calc_abc(self) -> Tuple[float, float, float]:
+        """Calculate the coefficients a, b, and c for volume calculations.
+
+        Returns:
+            A tuple containing the coefficients a, b, and c for volume calculations.
+
+        """
+        a = 3 * self.pit_depth
+        b = -4 * self.pit_slope * self.pit_depth ** 2
+        c = 4 * (self.pit_slope ** 2) * (self.pit_depth ** 3) / 3 - self.treatment_volume
+        return a, b, c
+
+    @property
+    def pit_width(self) -> float:
+        """Calculate the width of the pit.
+
+        Returns:
+            The width of the pit, m.
+
+        """
+        if self._current_input_data:
+            a, b, c = self._calc_abc()
+            return (-b + math.sqrt(b ** 2 - 4 * a * c)) / (2 * a)
+        return 0.0
+
+    @property
+    def pit_length(self) -> float:
+        """Calculate the length of the pit.
+
+        Returns:
+            The length of the pit, m.
+
+        """
+        return self.pit_width * 3
+
+    @property
+    def pit_surface_area(self) -> float:
+        """Calculate the surface area of the pit.
+
+        Returns:
+            The surface area of the pit, m^2.
+
+        """
+        return self.pit_width * self.pit_length
+
+    @property
+    def pit_volume(self) -> float:
+        """Calculates the volume of the pit.
+
+        Returns:
+            The volume of the pit, m^3.
+
+        """
+        return (self.pit_length * self.pit_width * self.pit_depth
+                - (self.pit_slope * (self.pit_depth ** 2)) * (self.pit_length + self.pit_width)
+                + (4 * self.pit_slope * (self.pit_depth ** 3) / 3))
+
+    @property
+    def precip(self) -> float:
+        """Calculates the additional pit volume needed for precipitation.
+
+        Returns:
+            The additional pit volume needed for precipitation, m^3.
+
+        """
+        return self._get_current_day_rainfall() * self.pit_surface_area
+
+    @property
+    def freeboard(self):
+        """Calculates the additional pit volume needed for freeboard.
+
+        Returns:
+            The additional pit volume needed for freeboard, m^3.
+
+        """
+        return self.freeboard_input * self.pit_surface_area
+
+    def calc_CH4_emission(self, accumulated_TS: float) -> Tuple[float, float]:
+        avg_tempC = self._get_current_day_avg_tempC()
+        CH4_loss = GasEmissions.calc_E_CH4_slurry_storage(
+                TS=accumulated_TS,
+                enclosed=False,  # This is what differs from the slurry storage underfloor
+                tempC=avg_tempC
+        )
+        new_accumulated_TS = max(accumulated_TS - CH4_loss, 0.0)
+        return CH4_loss, new_accumulated_TS
+
+    def calc_NH3_emission(self, num_animals: int, barn_area: float,
+                          accumulated_pen_urine: float,
+                          accumulated_pen_urine_TAN: float) -> Tuple[float, float]:
+        avg_tempC = self._get_current_day_avg_tempC()
+        NH3_loss = GasEmissions.calc_E_NH3_storage(
+                num_animals=num_animals,
+                barn_area=barn_area,
+                pen_urine=accumulated_pen_urine,
+                pen_urine_TAN=accumulated_pen_urine_TAN,
+                tempC=avg_tempC
+        )
+        new_accumulated_pen_urine_TAN = max(accumulated_pen_urine_TAN - NH3_loss, 0.0)
+        return NH3_loss, new_accumulated_pen_urine_TAN
+
+    # TODO: review this
+    def _daily_update_helper(self) -> ManureTreatmentDailyOutput:
+        daily_output = self._initialize_daily_output_during_update()
+        self._accumulate_daily_output(daily_output)
+
+        CH4_loss, new_accumulated_TS = self.calc_CH4_emission(self._accumulated_output.TS)
+        daily_output.CH4 = CH4_loss
+        self._accumulated_output.TS = new_accumulated_TS
+
+        NH3_loss, new_accumulated_pen_urine_TAN = self.calc_NH3_emission(
+                num_animals=self._current_pen.num_animals,
+                barn_area=self._current_pen.barn_area_from_pen_type,
+                accumulated_pen_urine=0.0,
+                accumulated_pen_urine_TAN=self._accumulated_output.TAN,
+        )
+        daily_output.NH3 = NH3_loss
+        self._accumulated_output.TAN = new_accumulated_pen_urine_TAN
+        return daily_output

@@ -8,7 +8,6 @@ from typing import Optional
 from typing import Type
 
 from RUFAS.routines.manure.default_enum.default_enum import DefaultEnum
-from RUFAS.routines.manure.pen.manure_management_pen import ManureManagementPen
 
 
 class BeddingType(DefaultEnum):
@@ -45,21 +44,24 @@ class BaseBedding(ABC):
         self.bedding_cleaned_frac = bedding_config.bedding_cleaned_frac
         self.bedding_type = bedding_config.bedding_type
 
-    def total_bedding_washed(self, pen: ManureManagementPen) -> float:
+    def total_bedding_washed(self, num_animals: int) -> float:
         """Return the total amount of bedding that is washed away.
 
         Args:
-            pen: A ManureManagementPen object.
+            num_animals: Number of animals in the pen.
 
         Returns:
             Total amount of bedding that is washed away, kg/animal/day.
 
         """
-        return self.bedding_cleaned_frac * self.total_bedding_mass(pen)
+        return self.bedding_cleaned_frac * self.total_bedding_mass(num_animals)
 
     @abstractmethod
-    def total_bedding_mass(self, pen: ManureManagementPen) -> float:
+    def total_bedding_mass(self, num_animals: int) -> float:
         """Return the total amount of bedding needed for all animals in the given pen.
+
+        Args:
+            num_animals: Number of animals in the pen.
 
         Returns:
             Total amount of bedding needed for all animals in the given pen, kg/day.
@@ -67,36 +69,45 @@ class BaseBedding(ABC):
         """
         pass
 
-    def total_bedding_volume(self, pen: ManureManagementPen) -> float:
+    def total_bedding_volume(self, num_animals: int) -> float:
         """Return the total volume of bedding needed for all animals in the given pen.
+
+        Args:
+            num_animals: Number of animals in the pen.
 
         Returns:
             Total volume of bedding needed for all animals in the given pen, m^3/day.
 
         """
-        return self.total_bedding_mass(pen) / self.bedding_density
+        return self.total_bedding_mass(num_animals) / self.bedding_density
 
-    def total_bedding_dry_solids(self, pen: ManureManagementPen) -> float:
+    def total_bedding_dry_solids(self, num_animals: int) -> float:
         """Return the total amount of dry solids in the bedding.
+
+        Args:
+            num_animals: Number of animals in the pen.
 
         Returns:
             Total amount of dry solids in the bedding, kg/day.
 
         """
-        return self.total_bedding_mass(pen) / self.bedding_dry_matter_content
+        return self.total_bedding_mass(num_animals) / self.bedding_dry_matter_content
 
 
 class BaseOrganicBedding(BaseBedding):
     """Base class for all organic bedding types."""
 
-    def total_bedding_mass(self, pen: ManureManagementPen) -> float:
-        """Return the total amount of bedding needed for all animals in the given pen.
+    def total_bedding_mass(self, num_animals: int) -> float:
+        """Returns the total amount of bedding needed for all animals in the given pen.
+
+        Args:
+            num_animals: Number of animals in the pen.
 
         Returns:
             Total amount of bedding needed for all animals in the given pen, kg/day.
 
         """
-        return pen.num_animals * self.bedding_mass_per_day  # kg/day
+        return num_animals * self.bedding_mass_per_day  # kg/day
 
 
 class SawdustBedding(BaseOrganicBedding):
@@ -139,14 +150,17 @@ class SandBedding(BaseBedding):
         super().__init__(bedding_config)
         self.sand_removal_efficiency = bedding_config.sand_removal_efficiency
 
-    def total_bedding_mass(self, pen: ManureManagementPen) -> float:
-        """Return the total amount of bedding needed for all animals in the given pen.
+    def total_bedding_mass(self, num_animals: int) -> float:
+        """Returns the total amount of bedding needed for all animals in the given pen.
+
+        Args:
+            num_animals: Number of animals in the pen.
 
         Returns:
             Total amount of bedding needed for all animals in the given pen, kg/day.
 
         """
-        bedding_mass = pen.num_animals * self.bedding_mass_per_day
+        bedding_mass = num_animals * self.bedding_mass_per_day
         return bedding_mass * (1 - self.sand_removal_efficiency)
 
 

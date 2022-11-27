@@ -10,8 +10,9 @@ the Animal Management module.
 from __future__ import annotations
 
 from dataclasses import dataclass
+from dataclasses import field
 
-from RUFAS.routines.manure.constants.constants import ManureManagementConstants as Constants
+from RUFAS.routines.manure.constants.manure_constants import ManureConstants
 
 
 @dataclass
@@ -20,9 +21,11 @@ class PenManure:
 
     Attributes:
         urea: urea concentration, g/L.
+        urine: amount of urine, kg.
         TAN: total ammoniacal nitrogen concentration in the manure slurry, g/L.
         N: nitrogen in liquid and solid manure, kg.
         manure_mass: amount of manure, kg.
+        manure_volume: volume of manure, m^3.
         TS: total solids, kg.
         VSd: degradable volatile solids, kg.
         VSnd: non-degradable volatile solids, kg.
@@ -35,9 +38,12 @@ class PenManure:
 
     """
     urea: float = 0.0
+    urine: float = 0.0
+    urine_TAN: float = 0.0
     TAN: float = 0.0
     N: float = 0.0
     manure_mass: float = 0.0
+    manure_volume: float = field(init=False)
     TS: float = 0.0
     VSd: float = 0.0
     VSnd: float = 0.0
@@ -60,12 +66,24 @@ class PenManure:
         # self.VSnd *= Constants.GRAMS_TO_KG  # kg
         # self.P *= Constants.GRAMS_TO_KG  # kg
         # self.K *= Constants.GRAMS_TO_KG  # kg
-        pass
+        self.manure_volume = self.manure_mass / ManureConstants.MANURE_DENSITY
 
     @staticmethod
     def get_instance(animal_manure, num_animals: int) -> PenManure:
+        """Returns a PenManure object based on the information given in the manure data.
+
+        Args:
+            animal_manure: The manure data extracted from the animal module.
+            num_animals: The number of animals in the pen.
+
+        Returns:
+            A PenManure object.
+
+        """
         return PenManure(
                 urea=animal_manure['U'] / num_animals,
+                urine=animal_manure['Urine'],
+                urine_TAN=animal_manure['MN'] * ManureConstants.URINE_TAN_FACTOR / num_animals,
                 TAN=animal_manure['TAN_s'] / num_animals,
                 N=animal_manure['MN'],
                 manure_mass=animal_manure['Mkg'],

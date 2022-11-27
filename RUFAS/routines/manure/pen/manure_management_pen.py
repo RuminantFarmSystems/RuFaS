@@ -16,7 +16,7 @@ class ManureManagementPen:
         id: Pen id.
         animals_in_pen: A list of animal objects in this pen.
         num_animals: The number of animals in this pen.
-        num_cows: The number of cows in this pen.
+        num_lactating_cows: The number of cows in this pen.
         classes_in_pen: Set of unique animal classes in this pen.
         animal_combination: An AnimalCombination enum that describes the current
             animal makeup in this pen.
@@ -36,7 +36,7 @@ class ManureManagementPen:
         The newly created object does not store any reference to the passed-in argument
         and only performs a read on it.
 
-        Args
+        Args:
             pen: A Pen object from the animal module.
 
         """
@@ -45,48 +45,43 @@ class ManureManagementPen:
         self.animals_in_pen: [AnimalBase] = pen.animals_in_pen
         self.num_animals = len(pen.animals_in_pen)
         self.classes_in_pen: Set[Type[AnimalBase]] = pen.classes_in_pen
-        self.animal_combination: Pen.AnimalCombination = pen.animal_combination
 
         self.housing_type: str = pen.housing_type
         self.bedding_type: str = pen.bedding_type
+        self.pen_type: str = pen._pen_type
 
         self.manure_handler: str = pen.manure_handling
         self.manure_separator: str = pen.manure_separator
         self.manure_treatment: str = pen.manure_storage
 
-        self.manure_density = 990.0  # TODO: Add this to manure config file
         self.manure = PenManure.get_instance(pen.manure, self.num_animals)
+        self.num_lactating_cows = self.count_lactating_cows(pen.animal_combination, pen.animals_in_pen)
 
-        self.num_cows = 0
-        for animal in self.animals_in_pen:
-            if type(animal) is Cow:
-                self.num_cows += 1
+    @classmethod
+    def count_lactating_cows(cls, animal_combination: Pen.AnimalCombination, animals_in_pen: [AnimalBase]) -> int:
+        """Counts the number of lactating cows in the pen.
 
-    @property
-    def manure_mass(self) -> float:
-        """Calculates the manure mass of this pen.
+        Args:
+            animal_combination: An AnimalCombination enum that describes the current
+                animal makeup in this pen.
+            animals_in_pen: A list of animal objects in this pen.
 
-        Returns
-            Manure mass of this pen, kg.
-
-        """
-        return self.manure.manure_mass
-
-    @property
-    def manure_volume(self) -> float:
-        """Calculates the manure volume of this pen.
-
-        Returns
-            Manure volume of this pen, m^3.
+        Returns:
+            The number of lactating cows in the pen.
 
         """
-        return self.manure_mass / self.manure_density
+        num_lac_cows = 0
+        if animal_combination is Pen.AnimalCombination.LAC_COW:
+            for animal in animals_in_pen:
+                if type(animal) is Cow:
+                    num_lac_cows += 1
+        return num_lac_cows
 
     @property
     def housing_area_for_NH3_emission(self) -> float:
         """Returns housing area used for calculating NH3 housing emission.
 
-        Returns
+        Returns:
             NH3 housing area, m^2/animal.
 
         """
@@ -98,25 +93,51 @@ class ManureManagementPen:
             return 2.0
 
     @property
-    def barn_area(self) -> float:
+    def barn_area_from_housing_type(self) -> float:
         """Calculates the barn area for this pen based on its housing type.
 
-        Returns
+        Returns:
             Barn area, m^2/animal.
 
         """
         BarnArea = NamedTuple('BarnArea', [('has_cows', float), ('no_cows', float)])
-        tie_stall = BarnArea(has_cows=1.2, no_cows=1.0)
+        tiestall = BarnArea(has_cows=1.2, no_cows=1.0)
         bedded_pack = BarnArea(has_cows=5.0, no_cows=3.0)
-        free_stall = BarnArea(has_cows=3.5, no_cows=2.5)
-        default = free_stall
+        freestall = BarnArea(has_cows=3.5, no_cows=2.5)
+        default = freestall
 
-        housing_type_to_barn_area = {
-            'tie stall': tie_stall,
+        barn_area_by_housing_type = {
+            'tiestall': tiestall,
             'bedded pack': bedded_pack,
-            'free stall': free_stall
+            'freestall': freestall
         }
-        barn_area = housing_type_to_barn_area.get(self.housing_type, default)
+
+        barn_area = barn_area_by_housing_type.get(self.housing_type, default)
+
+        if 'Cow' in self.classes_in_pen:
+            return barn_area.has_cows
+        else:
+            return barn_area.no_cows
+
+    @property
+    def barn_area_from_pen_type(self) -> float:
+        """Calculates the barn area for this pen depending on its pen type.
+
+        Returns:
+            Barn area, m^2/animal.
+
+        """
+        BarnArea = NamedTuple('BarnArea', [('has_cows', float), ('no_cows', float)])
+        tiestall = BarnArea(has_cows=1.5, no_cows=1.0)
+        freestall = BarnArea(has_cows=3.5, no_cows=2.5)
+        default = freestall
+
+        barn_area_by_pen_type = {
+            'tiestall': tiestall,
+            'freestall': freestall
+        }
+
+        barn_area = barn_area_by_pen_type.get(self.pen_type, default)
 
         if 'Cow' in self.classes_in_pen:
             return barn_area.has_cows

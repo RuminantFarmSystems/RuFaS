@@ -23,8 +23,8 @@ from RUFAS.routines.manure.manure_handlers.manure_handler_classes import BaseMan
 from RUFAS.routines.manure.manure_handlers.manure_handler_classes import ManureHandlerFactory
 from RUFAS.routines.manure.manure_separators.manure_separator_classes import BaseManureSeparator
 from RUFAS.routines.manure.manure_separators.manure_separator_classes import ManureSeparatorFactory
-from RUFAS.routines.manure.manure_treatments.manure_treatment_classes import BaseManureTreatment
-from RUFAS.routines.manure.manure_treatments.manure_treatment_classes import ManureTreatmentFactory
+from RUFAS.routines.manure.manure_treatments.base_manure_treatment import BaseManureTreatment
+from RUFAS.routines.manure.manure_treatments.manure_treatment_factory import ManureTreatmentFactory
 from RUFAS.routines.manure.output_handler.manure_management_output_handler import ManureManagementOutputHandler
 from RUFAS.routines.manure.pen.manure_management_pen import ManureManagementPen
 from RUFAS.routines.manure.reception_pits.reception_pit import ReceptionPit
@@ -130,12 +130,14 @@ class ManureManagement:
                 self.manure_management_config_handler.get_custom_manure_handler_config(mm_pen.manure_handler)
             self.manure_handlers[mm_pen.id] = ManureHandlerFactory.get_instance(
                     manure_handler_type_name=mm_pen.manure_handler,
-                    custom_manure_handler_config=custom_manure_handler_config
+                    weather=self.weather,
+                    time=self.time,
+                    custom_manure_handler_config=custom_manure_handler_config,
             )
 
             self.reception_pits[mm_pen.id] = ReceptionPit()
 
-            if mm_pen.manure_separator == 'none':
+            if mm_pen.manure_separator.lower() == 'none':
                 self.manure_separators[mm_pen.id] = None
             else:
                 custom_manure_separator_config = \
@@ -194,6 +196,7 @@ class ManureManagement:
                         manure_handler_daily_output=manure_handler_daily_output,
                         reception_pit_daily_output=reception_pit_daily_output,
                         manure_separator_daily_output=manure_separator_daily_output,
+                        pen=mm_pen,
                         sim_day=animal_management.simulation_day
                 )
 
