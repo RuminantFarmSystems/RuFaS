@@ -86,6 +86,10 @@ class Config:
             weather_file: path to the weather file specified in the json file
         """
 
+        info_map = {'caller_class': self.__class__.__name__, 
+                    'caller_function': self.__init__.__name__,
+                    'data': data,
+                    'weather_file': weather_file}
         
         # gets a start/end date in the format year:julian-day. That way the program
         # can start in the middle of the year
@@ -169,18 +173,19 @@ class Config:
             print("Start date invalid. Starting simulation on "
                   + str(w_start_year) + ":" + str(w_start_day))
             self.start_day = w_start_day
-            om.add_variable('start_day', start_day, {'caller_class': 'Config', 'caller_function': '__init__'})
+
+            om.add_variable('start_day', start_day, info_map)
             self.start_year = w_start_year
-            om.add_variable('start_year', start_year, {'caller_class': 'Config', 'caller_function': '__init__'})
+            om.add_variable('start_year', start_year, info_map)
 
         if self.end_year == w_end_year and self.end_day > w_end_day \
                 or self.end_year > w_end_year:
             print("End date invalid. Ending simulation on "
                   + str(w_end_year) + ":" + str(w_end_day))
             self.end_day = w_end_day
-            om.add_variable('end_day', end_day, {'caller_class': 'Config', 'caller_function': '__init__'})
+            om.add_variable('end_day', end_day, info_map)
             self.end_year = w_end_year
-            om.add_variable('end_year', end_year, {'caller_class': 'Config', 'caller_function': '__init__'})
+            om.add_variable('end_year', end_year, info_map)
 
         # start date errors if the simulation starts before day 1 or after
         # the last possible day of the year
@@ -188,19 +193,19 @@ class Config:
             print("Start date invalid. Starting simulation on "
                   + str(self.start_year) + ":" + str(1))
             self.start_day = 1
-            om.add_variable('start_day', start_day, {'caller_class': 'Config', 'caller_function': '__init__'})
+            om.add_variable('start_day', start_day, info_map)
         if not is_leap_year(self.start_year):
             if self.start_day > year_length:
                 print("Start date invalid. Starting simulation on "
                       + str(self.start_year) + ":" + str(year_length))
                 self.start_day = year_length
-                om.add_variable('start_day', start_day, {'caller_class': 'Config', 'caller_function': '__init__'})
+                om.add_variable('start_day', start_day, info_map)
         else:
             if self.start_day > leap_year_length:
                 print("Start date invalid. Starting simulation on "
                       + str(self.start_year) + ":" + str(leap_year_length))
                 self.start_day = leap_year_length
-                om.add_variable('start_day', start_day, {'caller_class': 'Config', 'caller_function': '__init__'})
+                om.add_variable('start_day', start_day, info_map)
 
         # end date errors if the simulation ends before day 1 or after
         # the last possible day of the year
@@ -208,19 +213,19 @@ class Config:
             print("End date invalid. Ending simulation on "
                   + str(self.end_year) + ":" + str(1))
             self.end_day = 1
-            om.add_variable('end_day', end_day, {'caller_class': 'Config', 'caller_function': '__init__'})
+            om.add_variable('end_day', end_day, info_map)
         if not is_leap_year(self.end_year):
             if self.end_day > year_length:
                 print("End date invalid. Ending simulation on "
                       + str(self.end_year) + ":" + str(year_length))
                 self.end_day = year_length
-                om.add_variable('end_day', end_day, {'caller_class': 'Config', 'caller_function': '__init__'})
+                om.add_variable('end_day', end_day, info_map)
         else:
             if self.end_day > leap_year_length:
                 print("End date invalid. Ending simulation on "
                       + str(self.end_year) + ":" + str(leap_year_length))
                 self.end_day = leap_year_length
-                om.add_variable('end_day', end_day, {'caller_class': 'Config', 'caller_function': '__init__'})
+                om.add_variable('end_day', end_day, info_map)
 
         # checks that start date is not after end date
         if self.start_year > self.end_year \
