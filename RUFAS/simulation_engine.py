@@ -53,6 +53,7 @@ class SimulationEngine:
         om.add_variable('total_runtime', total_runtime, {'caller_class': 'SimulationEngine', 'caller_function': 'simulate'})
         self._show_final_messages(graphics_prod_time, total_runtime)
         
+        #TODO delete this method call prior to merging
         om.print_pools()
 
     def _run_simulation_main_loop(self) -> None:
