@@ -236,10 +236,11 @@ class OutputManager (object):
         """
         return str(time.time())
 
+    #TODO delete before merging
     def print_pools(self) -> None:
         """
         quick and dirty way to print pool contents after simulation runs.
-        using to ensure data is being collected into pools.
+        for PR reviewer-purposes only.
         """
         print('Variables pool:')
         pprint(self.variables_pool)
