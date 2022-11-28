@@ -6,13 +6,14 @@ from pathlib import Path
 from RUFAS import routines, errors
 from RUFAS.classes import Config, State, Weather, Time
 from RUFAS.output_handler import OutputHandler
+from RUFAS.output_manager import OutputManager
 import random
 import numpy
 from typing import Optional
 
 from RUFAS.routines.manure.manure_management import simulate_daily_manure_management
 from RUFAS.util import Utility
-from RUFAS.output_manager import OutputManager
+
 
 om = OutputManager()
 
