@@ -262,18 +262,18 @@ class OutputManager (object):
         Saves the logs_pool into the given path as a json file
         """
         file_path=os.path.join(path,self._generate_file_name("logs","json"))
-        self._dict_to_file_json(self.logs_pool, path)
+        self._dict_to_file_json(self.logs_pool, file_path)
 
     def save_warnings(self, path: str) -> None:
         """
         Saves the warnings_pool into the given path as a json file
         """
         file_path=os.path.join(path,self._generate_file_name("warnings","json"))
-        self._dict_to_file_json(self.warnings_pool, path)
+        self._dict_to_file_json(self.warnings_pool, file_path)
 
     def save_errors(self, path: str) -> None:
         """
         Saves the errors_pool into the given path as a json file
         """
         file_path=os.path.join(path,self._generate_file_name("errors","json"))
-        self._dict_to_file_json(self.errors_pool, path)
+        self._dict_to_file_json(self.errors_pool, file_path)
