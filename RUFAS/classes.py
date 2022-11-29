@@ -89,7 +89,7 @@ class Config:
         info_map = {'caller_class': self.__class__.__name__, 
                     'caller_function': self.__init__.__name__,
                     'data': data,
-                    'weather_file': weather_file}
+                    'weather_file': weather_file,}
         
         # gets a start/end date in the format year:julian-day. That way the program
         # can start in the middle of the year

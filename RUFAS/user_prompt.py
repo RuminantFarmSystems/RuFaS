@@ -44,7 +44,7 @@ def input_prompt():
           "Enter \'Q\' or \'q\'")
 
     info_map = {'caller_class': 'no_class', 
-                'caller_function': input_prompt.__name__}
+                'caller_function': input_prompt.__name__,}
     while True:
 
         try:

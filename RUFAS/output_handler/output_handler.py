@@ -86,11 +86,12 @@ class OutputHandler:
         """Transfer needed (initial) data from state to report handlers."""
 
         info_map = {'caller_class': self.__class__.__name__, 
-                    'caller_function': self.initialize_reports.__name__}
+                    'caller_function': self.initialize_reports.__name__,}
 
         for report_name in self.reports:
             report = self.reports[report_name]
             if not report.produce_csv and report.produce_graphics:
+                info_map['report'] = report
                 om.add_warning('inactive_report_warning', 
                                 'Warning: Cannot produce graphics for' 
                                 + f' inactive report: {report.report_name}.'
