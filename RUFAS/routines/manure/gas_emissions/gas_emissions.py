@@ -91,8 +91,8 @@ class GasEmissions:
         return t_ambient
 
     @classmethod
-    def calc_E_CH4_floor(cls, num_animals: int, barn_area: float, hours=24, t_min=20.0, t_max=25.0) -> float:
-        """Calculates methane floor emissions.
+    def calc_E_CH4_housing(cls, num_animals: int, barn_area: float, hours=24, t_min=20.0, t_max=25.0) -> float:
+        """Calculates methane housing emissions.
 
         Args:
             num_animals: Number of animals in the pen.
@@ -110,8 +110,8 @@ class GasEmissions:
         return num_animals * max(0.0, 0.13 * t) * barn_area / 1000
 
     @classmethod
-    def calc_E_C02_floor(cls, num_animals: int, barn_area: float, hours=24, t_min=20.0, t_max=25.0) -> float:
-        """Calculates carbon dioxide floor emissions.
+    def calc_E_C02_housing(cls, num_animals: int, barn_area: float, hours=24, t_min=20.0, t_max=25.0) -> float:
+        """Calculates carbon dioxide housing emissions.
 
         Args:
             num_animals: Number of animals in the pen.
@@ -129,31 +129,34 @@ class GasEmissions:
         return num_animals * max(0.0, 0.0065 + 0.0192 * t) * barn_area / 1000
 
     @classmethod
-    def calc_E_NH3_storage(cls, num_animals: int, barn_area: float, pen_urine_TAN: float, pen_urine: float,
-                           tempC: float, hsc=GasEmissionConstants.DEFAULT_HOUSING_SPECIFIC_CONSTANT) -> float:
+    def calc_E_NH3_emission(cls, num_animals: int,
+                            barn_area: float,
+                            urine_TAN: float,
+                            urine: float,
+                            tempC: float, hsc=GasEmissionConstants.DEFAULT_HOUSING_SPECIFIC_CONSTANT) -> float:
         """Calculates NH3 storage emissions.
 
         Args:
             num_animals: Number of animals in the pen.
             barn_area: surface area for treatment, m^2.
-            pen_urine_TAN: total ammoniacal nitrogen in manure urine, kg N/m^2.
-            pen_urine: total amount of manure urine in exposed surface area, kg.
+            urine_TAN: total ammoniacal nitrogen in manure urine, kg N.
+            urine: total amount of manure urine in exposed surface area, kg.
             tempC: temperature, C.
             hsc: housing specific constant, s/m.
 
         Returns:
-            NH3 storage emissions, kg N/m^2/day.
+            NH3 storage emissions, kg N/day.
 
         """
-        p = ManureConstants.MANURE_DENSITY
+        p = ManureConstants.MANURE_DENSITY  # kg/m^3
         pH = 7.5
-        c = GeneralConstants.SECONDS_PER_DAY
-        tempK = cls._convert_tempC_to_tempK(tempC)
+        c = GeneralConstants.SECONDS_PER_DAY  # s/day
+        tempK = cls._convert_tempC_to_tempK(tempC)  # K
         r = cls._calc_r_barn(tempC, hsc)
-        M = pen_urine / barn_area  # manure per area of exposed surface, kg/m^2
+        M = urine / barn_area  # manure per area of exposed surface, kg/m^2
         Q = cls._calc_Q(tempK, pH)
         if r * M * Q > 0:
-            return num_animals * (pen_urine_TAN * c * p) / (r * M * Q)
+            return num_animals * (urine_TAN * c * p) / (r * M * Q)
         else:
             return 0
 

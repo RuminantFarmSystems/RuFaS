@@ -12,7 +12,7 @@ class ManureHandlerDailyOutput:
         pen_id: ID of the pen that this output is associated with.
         simulation_day: Number of days into the simulation.
         urea: Urea concentration in manure, g/L.
-        TAN: Total ammonia nitrogen concentration, g/L.
+        TAN: Total ammoniacal nitrogen, kg.
         N: Amount of nitrogen in manure, kg.
         TS: Total amount of solids from the manure, kg.
         VSd: Amount of degradable volatile solids, kg.
@@ -20,9 +20,9 @@ class ManureHandlerDailyOutput:
         VS_total: Total amount of volatile solids, kg.
         P: Amount of phosphorus excreted in manure, kg.
         K: Amount of potassium in manure, kg.
-        CH4_floor: Methane emissions from ..., kg.  # TODO: Fill in.
-        CO2_floor: Carbon dioxide emissions from ..., kg.  # TODO: Fill in.
-        NH3_floor: Ammonia emissions from ..., kg.  # TODO: Fill in.
+        CH4_housing: Methane emissions from ..., kg.  # TODO: Fill in.
+        CO2_housing: Carbon dioxide emissions from ..., kg.  # TODO: Fill in.
+        NH3_housing: Ammonia emissions from ..., kg.  # TODO: Fill in.
         manure_volume: Amount of raw manure, m^3.
         cleaning_water_volume: Volume of cleaning water used in main barn, m^3.
         total_bedding_volume: Total amount of bedding needed for all the animals in pen, m^3.
@@ -43,9 +43,9 @@ class ManureHandlerDailyOutput:
     P: float = 0.0
     K: float = 0.0
 
-    CH4_floor: float = 0.0
-    CO2_floor: float = 0.0
-    NH3_floor: float = 0.0
+    CH4_housing: float = 0.0
+    CO2_housing: float = 0.0
+    NH3_housing: float = 0.0
 
     manure_volume: float = 0.0
     cleaning_water_volume: float = 0.0

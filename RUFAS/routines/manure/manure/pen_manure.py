@@ -82,9 +82,9 @@ class PenManure:
         """
         return PenManure(
                 urea=animal_manure['U'] / num_animals,
-                urine=animal_manure['Urine'],
+                urine=animal_manure['Urine'] / num_animals,
                 urine_TAN=animal_manure['MN'] * ManureConstants.URINE_TAN_FACTOR / num_animals,
-                TAN=animal_manure['TAN_s'] / num_animals,
+                TAN=animal_manure['TAN_s'],
                 N=animal_manure['MN'],
                 manure_mass=animal_manure['Mkg'],
                 TS=animal_manure['TSd'],

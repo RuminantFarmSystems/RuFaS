@@ -43,17 +43,17 @@ class SlurryStorageUnderfloor(BaseManureTreatment):
         return CH4_loss, new_accumulated_TS
 
     def calc_NH3_emission(self, num_animals: int, barn_area: float,
-                          accumulated_pen_urine: float,
-                          accumulated_pen_urine_TAN: float) -> Tuple[float, float]:
+                          accumulated_urine: float,
+                          accumulated_urine_TAN: float) -> Tuple[float, float]:
         tempC = self._get_current_day_avg_tempC()
-        NH3_loss = GasEmissions.calc_E_NH3_storage(
+        NH3_loss = GasEmissions.calc_E_NH3_emission(
                 num_animals=num_animals,
                 barn_area=barn_area,
-                pen_urine=accumulated_pen_urine,
-                pen_urine_TAN=accumulated_pen_urine_TAN,
+                urine=accumulated_urine,
+                urine_TAN=accumulated_urine_TAN,
                 tempC=tempC
         )
-        new_accumulated_pen_urine_TAN = max(accumulated_pen_urine_TAN - NH3_loss, 0.0)
+        new_accumulated_pen_urine_TAN = max(accumulated_urine_TAN - NH3_loss, 0.0)
         return NH3_loss, new_accumulated_pen_urine_TAN
 
     # TODO: review this
@@ -68,8 +68,8 @@ class SlurryStorageUnderfloor(BaseManureTreatment):
         NH3_loss, new_accumulated_pen_urine_TAN = self.calc_NH3_emission(
                 num_animals=self._current_pen.num_animals,
                 barn_area=self._current_pen.barn_area_from_pen_type,
-                accumulated_pen_urine=0.0,
-                accumulated_pen_urine_TAN=self._accumulated_output.TAN,
+                accumulated_urine=0.0,
+                accumulated_urine_TAN=self._accumulated_output.TAN,
         )
         daily_output.NH3 = NH3_loss
         self._accumulated_output.TAN = new_accumulated_pen_urine_TAN

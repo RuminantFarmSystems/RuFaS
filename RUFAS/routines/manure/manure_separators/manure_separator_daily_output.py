@@ -24,7 +24,7 @@ class ManureSeparatorDailyOutput:
         TS: Total amount of solids in the manure volume, kg.
         VS_total: Total amount of volatile solids in the manure volume, kg.
         N: Amount of nitrogen in the manure volume, kg.
-        TAN: Total ammonia nitrogen concentration in the manure volume, g/L.
+        TAN: Total ammoniacal nitrogen in the manure volume, kg.
         P: Total amount of phosphorus in the manure volume, kg.
         K: Total amount of potassium in the manure volume, kg.
 

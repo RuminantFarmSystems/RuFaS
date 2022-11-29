@@ -11,7 +11,7 @@ class ReceptionPitDailyOutput:
         pen_id: ID of the pen that this output is associated with.
         simulation_day: Number of days into the simulation.
         urea: Urea concentration in manure, g/L.
-        TAN: Total ammonia nitrogen concentration, g/L.
+        TAN: Total ammoniacal nitrogen, kg.
         N: Amount of nitrogen in manure, kg.
         TS: Total amount of solids from the manure and the bedding, kg.
         VSd: Amount of degradable volatile solids, kg.

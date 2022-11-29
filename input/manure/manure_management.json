@@ -3,44 +3,58 @@
     {
       "scenario_id": 0,
       "bedding_type": "sawdust",
-      "manure_handler": "flush system",
-      "manure_separator": "rotary screen",
-      "manure_treatment": "anaerobic digestion"
+      "manure_handler": "manual scraping",
+      "manure_separator": "none",
+      "manure_treatment": "slurry storage underfloor"
     },
     {
       "scenario_id": 1,
       "bedding_type": "sawdust",
       "manure_handler": "manual scraping",
       "manure_separator": "none",
-      "manure_treatment": "anaerobic digestion and lagoon"
+      "manure_treatment": "slurry storage outdoor"
     },
     {
       "scenario_id": 2,
+      "bedding_type": "sawdust",
+      "manure_handler": "manual scraping",
+      "manure_separator": "screw press",
+      "manure_treatment": "slurry storage outdoor"
+    },
+    {
+      "scenario_id": 3,
+      "bedding_type": "sawdust",
+      "manure_handler": "flush system",
+      "manure_separator": "none",
+      "manure_treatment": "anaerobic lagoon"
+    },
+    {
+      "scenario_id": 4,
       "bedding_type": "sand",
       "manure_handler": "flush system",
       "manure_separator": "sand lane",
       "manure_treatment": "anaerobic lagoon"
     },
     {
-      "scenario_id": 3,
-      "bedding_type": "sawdust",
-      "manure_handler": "manual scraping",
-      "manure_separator": "none",
-      "manure_treatment": "slurry storage underfloor"
-    },
-    {
-      "scenario_id": 4,
-      "bedding_type": "sawdust",
-      "manure_handler": "manual scraping",
-      "manure_separator": "none",
-      "manure_treatment": "slurry storage outdoor"
-    },
-    {
       "scenario_id": 5,
+      "bedding_type": "sawdust",
+      "manure_handler": "manual scraping",
+      "manure_separator": "none",
+      "manure_treatment": "anaerobic digestion and lagoon"
+    },
+    {
+      "scenario_id": 6,
       "bedding_type": "sawdust",
       "manure_handler": "flush system",
       "manure_separator": "rotary screen",
-      "manure_treatment": "slurry storage outdoor"
+      "manure_treatment": "anaerobic digestion and lagoon"
+    },
+    {
+      "scenario_id": 7,
+      "bedding_type": "sawdust",
+      "manure_handler": "flush system",
+      "manure_separator": "rotary screen",
+      "manure_treatment": "anaerobic digestion and lagoon with split"
     }
   ],
   "bedding_configs": [

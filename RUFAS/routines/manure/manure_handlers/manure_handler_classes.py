@@ -59,7 +59,7 @@ class BaseManureHandler:
         self.config = manure_handler_config
         self.milking_parlor = MilkingParlor()
 
-    def _get_tempC(self) -> float:
+    def _get_current_day_avg_tempC(self) -> float:
         """Gets the average temperature of the day, in Celsius.
 
         Returns:
@@ -86,27 +86,27 @@ class BaseManureHandler:
             A ManureHandlerDailyOutput object.
 
         """
-        NH3_housing_loss = GasEmissions.calc_E_NH3_storage(
+        NH3_housing_loss = GasEmissions.calc_E_NH3_emission(
                 num_animals=pen.num_animals,
-                barn_area=pen.barn_area_from_pen_type,
-                pen_urine_TAN=pen.manure.urine_TAN,
-                pen_urine=pen.manure.urine,
-                tempC=self._get_tempC()
+                barn_area=pen.barn_area_from_pen_type,  # m^2/animal
+                urine_TAN=pen.manure.urine_TAN,  # kg/animal
+                urine=pen.manure.urine / pen.num_animals,  # kg/animal
+                tempC=self._get_current_day_avg_tempC()
         )
         daily_output = ManureHandlerDailyOutput(
                 simulation_day=sim_day,
                 pen_id=pen.id,
                 urea=pen.manure.urea,
-                TAN=max(0, pen.manure.TAN - NH3_housing_loss),
+                TAN=max(0, pen.manure.TAN - NH3_housing_loss),  # kg - kg
                 N=pen.manure.N,
                 TS=pen.manure.TS,
                 VSd=pen.manure.VSd,
                 VSnd=pen.manure.VSnd,
                 P=pen.manure.P,
                 K=pen.manure.K,
-                CH4_floor=GasEmissions.calc_E_CH4_floor(pen.num_animals, pen.barn_area_from_housing_type),
-                CO2_floor=GasEmissions.calc_E_C02_floor(pen.num_animals, pen.barn_area_from_housing_type),
-                NH3_floor=NH3_housing_loss,
+                CH4_housing=GasEmissions.calc_E_CH4_housing(pen.num_animals, pen.barn_area_from_pen_type),
+                CO2_housing=GasEmissions.calc_E_C02_housing(pen.num_animals, pen.barn_area_from_pen_type),
+                NH3_housing=NH3_housing_loss,
                 manure_volume=pen.manure.manure_volume,
                 cleaning_water_volume=self.cleaning_water_volume_in_main_barn(pen.num_animals),
                 total_bedding_volume=bedding.total_bedding_volume(pen.num_animals),

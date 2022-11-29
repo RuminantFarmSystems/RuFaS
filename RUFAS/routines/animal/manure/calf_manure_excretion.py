@@ -68,8 +68,8 @@ def manure_calculations(bw, p_feces_excrt, p_urine):
 
     return p_excrt, \
            {"U": 0.06,  # g/L
-            "Urine": 21,  # kg
-            "TAN_s": 0.03,  # g/L
+            "Urine": 2,  # kg
+            "TAN_s": 0.00027,  # kg
             "MN": 0.05,  # kg
             "Mkg": 9.07,  # kg
             "TSd": 1.09,  # kg

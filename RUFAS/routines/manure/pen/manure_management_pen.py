@@ -78,22 +78,7 @@ class ManureManagementPen:
         return num_lac_cows
 
     @property
-    def housing_area_for_NH3_emission(self) -> float:
-        """Returns housing area used for calculating NH3 housing emission.
-
-        Returns:
-            NH3 housing area, m^2/animal.
-
-        """
-        if 'Cow' in self.classes_in_pen:
-            return 3.5
-        elif 'HeiferII' in self.classes_in_pen:
-            return 2.5
-        else:
-            return 2.0
-
-    @property
-    def barn_area_from_housing_type(self) -> float:
+    def barn_area_from_pen_type(self) -> float:
         """Calculates the barn area for this pen based on its housing type.
 
         Returns:
@@ -106,34 +91,9 @@ class ManureManagementPen:
         freestall = BarnArea(has_cows=3.5, no_cows=2.5)
         default = freestall
 
-        barn_area_by_housing_type = {
-            'tiestall': tiestall,
-            'bedded pack': bedded_pack,
-            'freestall': freestall
-        }
-
-        barn_area = barn_area_by_housing_type.get(self.housing_type, default)
-
-        if 'Cow' in self.classes_in_pen:
-            return barn_area.has_cows
-        else:
-            return barn_area.no_cows
-
-    @property
-    def barn_area_from_pen_type(self) -> float:
-        """Calculates the barn area for this pen depending on its pen type.
-
-        Returns:
-            Barn area, m^2/animal.
-
-        """
-        BarnArea = NamedTuple('BarnArea', [('has_cows', float), ('no_cows', float)])
-        tiestall = BarnArea(has_cows=1.5, no_cows=1.0)
-        freestall = BarnArea(has_cows=3.5, no_cows=2.5)
-        default = freestall
-
         barn_area_by_pen_type = {
             'tiestall': tiestall,
+            'bedded pack': bedded_pack,
             'freestall': freestall
         }
 
@@ -143,3 +103,4 @@ class ManureManagementPen:
             return barn_area.has_cows
         else:
             return barn_area.no_cows
+

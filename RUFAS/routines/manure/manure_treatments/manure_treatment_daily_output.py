@@ -11,7 +11,7 @@ class ManureTreatmentDailyOutput:
     Attributes:
         pen_id: ID of the pen that this output is associated with.
         simulation_day: Number of days into the simulation.
-        TAN: Total ammonia nitrogen concentration, g/L.
+        TAN: Total ammoniacal nitrogen, kg.
         N: Amount of nitrogen in manure, kg.
         TS: Total amount of solids from the manure and the bedding, kg.
         VS_total: Total amount of volatile solids, kg.
