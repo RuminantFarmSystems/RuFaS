@@ -166,7 +166,7 @@ class AnimalManagement:
         info_map = {'caller_class': self.__class__.__name__, 
                     'caller_function': self.init_pens.__name__,
                     'all_pens_data': all_pens_data,
-                    'herd_data': herd_data}
+                    'herd_data': herd_data,}
 
         for pen_name in all_pens_data:
             pen_data = all_pens_data[pen_name]
@@ -201,6 +201,7 @@ class AnimalManagement:
         manure_separator = "sedimentation"
         manure_storage = "storage_pit"
         animal_combination = None
+        info_map['all_pens'] = self.all_pens
         if (len(self.all_pens) == 0) and (herd_num > 0):
             om.add_warning('invalid_pen_num_warning', 
                             'Warning: herd_num > 0, but pen_num = 0.'
@@ -266,7 +267,7 @@ class AnimalManagement:
                     'weather': weather,
                     'time': time,
                     'config': config,
-                    'feed': feed}
+                    'feed': feed,}
         calf_num = herd_data['calf_num']
         heiferI_num = herd_data['heiferI_num']
         heiferII_num = herd_data['heiferII_num']
@@ -546,8 +547,6 @@ class AnimalManagement:
         # -mark pens after grouping
         # -adding new animals to pens with lowest stocking density
 
-        info_map = {'caller_class': self.__class__.__name__, 
-                    'caller_function': self.pen_allocation.__name__}
         # separate into lactating and dry cow pens
         lactating_cows = []
         dry_cows = []
@@ -607,6 +606,9 @@ class AnimalManagement:
                 else:
                     mixed_types[pen.id] = pen.animal_combination
         # organzing pens by class and ensuring sufficeint storage
+        info_map = {'caller_class': self.__class__.__name__, 
+                    'caller_function': self.pen_allocation.__name__,
+                    'all_pens': self.all_pens,}
         while True:
             max_value = max(stall_shortage.values())
             if max_value > 0:

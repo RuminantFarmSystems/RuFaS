@@ -30,7 +30,7 @@ class SimulationEngine:
     def simulate(self) -> None:
         """Executes the simulation"""
         info_map = {'caller_class': self.__class__.__name__, 
-                    'caller_function': self.simulate.__name__}
+                    'caller_function': self.simulate.__name__,}
         t_start_sim = timer.time()
         
         self._run_simulation_main_loop()
@@ -157,7 +157,7 @@ class SimulationEngine:
         """
         info_map = {'caller_class': self.__class__.__name__, 
                     'caller_function': self._initialize_simulation.__name__,
-                    'file_path': file_path}
+                    'file_path': file_path,}
         print(f"Initializing simulation environment from {file_path}")
         om.add_variable('simulation_initialization_file_path', file_path, info_map)
 
