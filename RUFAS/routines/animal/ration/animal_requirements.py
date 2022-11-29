@@ -7,7 +7,7 @@ Author(s): Chris VanKerkhove, cjv47@cornell.edu
 """
 
 import math
-
+from RUFAS.routines.animal.life_cycle.animal_base import AnimalBase
 
 def calc_rqmts(BW, MW, DOP, animal_type, parity=None, CI=None , TP_Milk=None, Fat_Milk=None,
                 Lactose_Milk=None, Milk=None, DIM=None, lactating=None,
@@ -263,24 +263,94 @@ def calc_rqmts(BW, MW, DOP, animal_type, parity=None, CI=None , TP_Milk=None, Fa
     # The sum of dry matter intake of each feed is assumed to be less than
     # dry matter intake estimation (Sum of Feed < DMIest).
     # --------------------------------------------
-    if animal_type == 'cow':
-        # [A.Cow.D.1]
-        # Fat corrected milk (kg)
-        FCM = (0.4 * Milk) + (15 * Fat_Milk * (Milk / 100))
-        # [A.Cow.D.2]
-        # Dry matter intake estimation (kg)
-        if lactating:
-            DMIest = (0.372 * FCM + 0.0968 * BW ** 0.75) * (1 - math.exp(-0.192 * ((DIM / 7) + 3.67)))
-        else:
-            DMIest = ((1.97 - 0.75 * math.exp(0.16 * (DOP - 280))) / 100) * BW
-    elif animal_type == 'heifer':
-        #TODO: Actual calculation for DMIest
-        DMIest = 0
+    if AnimalBase.config['NASEM_or_NRC_requirement_calculations'] == 'NASEM':
+        DMIest = calculate_DMI_NASEM(BW, MW, DIM, lactating, NEl, BCS5, parity)
+    elif  AnimalBase.config['NASEM_or_NRC_requirement_calculations'] == 'NRC':
+        DMIest = calculate_DMI_NRC(animal_type, BW, DOP, DIM, lactating, Milk, Fat_Milk)
+    else:
+        DMIest=[]
+        print(f"DMI estimation method \
+            {AnimalBase.config['NASEM_or_NRC_requirement_calculations']}\
+            not supported")
     # Requirements summary dictionary
     return {'NEmaint': NEmaint, 'NEg': NEg, 'NEpreg': NEpreg,
             'NEl': NEl, 'MP_req': MP_req, 'Ca_req': Ca_req, 'P_req': P_req,
             'DMIest': DMIest}
 
+
+def calculate_DMI_NRC(animal_type: str, BW: float, DOP: int, DIM: int|None, 
+                    lactating: bool|None, Milk:float, Fat_Milk:float):
+    """
+    Method to calculate dry matter intake in kg
+        following NRC book 2001, Equations 1-2, pg.4, & Eq. on pg. 325
+    Args:
+        BW: Body weight (kg)
+        DIM: Days in milk
+        DOP: Days of pregnancy (d) (except Heifer Is)
+        lactating: Boolean value which is true for lactating cows
+             and false for dry cows
+        Milk: Milk production (kg)
+        Fat_Milk: Milk fat content (% of milk)
+    Return: 
+        DMIest: estimate of dry matter intake
+    """
+    if animal_type=='cow':
+        if lactating:
+            FCM = (0.4 * Milk) + (15 * Fat_Milk * (Milk / 100))
+            DMIest = (0.372 * FCM + 0.0968 * BW ** 0.75) \
+                * (1 - math.exp(-0.192 * ((DIM / 7) + 3.67)))
+        else:
+            DMIest = ((1.97 - 0.75 * math.exp(0.16 * (DOP - 280))) / 100) * BW
+    else:
+        DMIest = 0 # TODO: Actual calculation for DMIest
+                    # this comment is a holdover from the previous version
+    return DMIest
+
+def calculate_DMI_NASEM(BW: float, MW:float, DIM: int|None, 
+                        lactating: bool | None, NEl: float,
+                        BCS5: int|None, parity: int|None):
+    """
+    Method to calculate dry matter intake in kg
+        following NASEM book 2021, Equation 2-1, pg.12 & Eq.2-3, pg.14
+    Args:
+        BW: Body weight (kg)
+        MW: Mature body weight(kg)
+        DIM: Days in milk
+        lactating: Boolean value which is true for lactating cows and false for dry cows
+        NEl: net energy requirement for lactation (Mcal)
+        BCS5: Body Condition Score (1-5 basis)
+        parity: Number of parity
+    Return: 
+        DMIest: estimate of dry matter intake
+    """
+    if BCS5==None:
+        BCS5=3
+        # print("Body condition score was 'None'")
+    if lactating:
+        DMIest = ((3.7 + parity*5.7)+0.305*NEl \
+            +0.022*BW+(-0.689-1.87*parity)*BCS5) \
+                *(1-(0.212+parity*0.136)*math.exp(-0.053*DIM))
+    else:
+        DMIest = 0.022*MW*(1-math.exp(-1.54*(BW/MW)))
+        """
+        # TODO: implement this by getting NDF_concentration_percentage
+            (neutral detergent fiber) from the feeds
+        DMIest = (0.0226*MW*(1-math.exp(-1.47*(BW/MW))))\
+            -(0.082*(NDF_concentration_percentage\
+            -(23.1+56*(BW/MW)-30.6(BW/MW)^2)))
+        """
+    return DMIest
+
+# TODO: change MW to mature_body_weight
+# TODO: Change DOP to days_of_pregnancy
+# TODO: Change BW to body_weight_kg
+# TODO: Change FCM to fat_corrected_milk_kg
+# TODO: Change DIM to days_in_milk
+# TODO: Change BCS5 to body_condition_score_5
+# TODO: Change Milk to milk_production_daily_kg
+# TODO: Milken to milk_energy_Mcal_per_kg
+# TODO: Change NEl to net_energy_for_lactation
+# TODO: change other energy units - NEg, NEm, NEa, etc.
 
 def energy_activity_rqmts(BW, housing, distance):
     """
