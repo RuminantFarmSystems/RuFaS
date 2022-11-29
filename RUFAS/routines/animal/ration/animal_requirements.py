@@ -265,7 +265,7 @@ def calc_rqmts(BW, MW, DOP, animal_type, parity=None, CI=None , TP_Milk=None, Fa
     # --------------------------------------------
     if AnimalBase.config['NASEM_or_NRC_requirement_calculations'] == 'NASEM':
         DMIest = calculate_DMI_NASEM(BW, MW, DIM, lactating, NEl, BCS5, parity)
-    elif  AnimalBase.config['NASEM_or_NRC_requirement_calculations'] == 'NRC':
+    elif AnimalBase.config['NASEM_or_NRC_requirement_calculations'] == 'NRC':
         DMIest = calculate_DMI_NRC(animal_type, BW, DOP, DIM, lactating, Milk, Fat_Milk)
     else:
         DMIest=[]
@@ -327,7 +327,7 @@ def calculate_DMI_NASEM(BW: float, MW:float, DIM: int|None,
         BCS5=3
         # print("Body condition score was 'None'")
     if lactating:
-        DMIest = ((3.7 + parity*5.7)+0.305*NEl \
+        DMIest = ((3.7 + parity*5.7)+0.305*NEl
             +0.022*BW+(-0.689-1.87*parity)*BCS5) \
                 *(1-(0.212+parity*0.136)*math.exp(-0.053*DIM))
     else:
