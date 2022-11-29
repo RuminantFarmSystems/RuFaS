@@ -1,10 +1,12 @@
 from __future__ import annotations
 
+import typing
 from typing import Dict
 from typing import Optional
 from typing import Type
 
 from RUFAS.routines.manure.manure_treatments.anaerobic_digestion import AnaerobicDigestion
+from RUFAS.routines.manure.manure_treatments.anaerobic_digestion_and_digestion import AnaerobicDigestionAndLagoon
 from RUFAS.routines.manure.manure_treatments.anaerobic_lagoon import AnaerobicLagoon
 from RUFAS.routines.manure.manure_treatments.base_manure_treatment import BaseManureTreatment
 from RUFAS.routines.manure.manure_treatments.manure_treatment_configs import DefaultManureTreatmentConfigFactory
@@ -40,14 +42,22 @@ class ManureTreatmentFactory:
             ManureTreatmentType.SLURRY_STORAGE_UNDERFLOOR: SlurryStorageUnderfloor,
             ManureTreatmentType.SLURRY_STORAGE_OUTDOOR: SlurryStorageOutdoor,
             ManureTreatmentType.ANAEROBIC_LAGOON: AnaerobicLagoon,
-            ManureTreatmentType.ANAEROBIC_DIGESTION: AnaerobicDigestion
+            ManureTreatmentType.ANAEROBIC_DIGESTION: AnaerobicDigestion,
+            ManureTreatmentType.ANAEROBIC_DIGESTION_AND_LAGOON: AnaerobicDigestionAndLagoon,
+            ManureTreatmentType.ANAEROBIC_DIGESTION_AND_LAGOON_WITH_SPLIT: AnaerobicDigestionAndLagoon
         }
 
         manure_treatment_type = ManureTreatmentType.get_type(manure_treatment_type_name)
         manure_treatment_class = manure_treatment_class_by_type[manure_treatment_type]
 
         if custom_manure_treatment_config:
-            return manure_treatment_class(weather, time, custom_manure_treatment_config)
+            manure_treatment_obj = manure_treatment_class(weather, time, custom_manure_treatment_config)
         else:
             default_manure_treatment_config = DefaultManureTreatmentConfigFactory.get_instance(manure_treatment_type)
-            return manure_treatment_class(weather, time, default_manure_treatment_config)
+            manure_treatment_obj = manure_treatment_class(weather, time, default_manure_treatment_config)
+
+        if manure_treatment_type == ManureTreatmentType.ANAEROBIC_DIGESTION_AND_LAGOON_WITH_SPLIT:
+            typing.cast(AnaerobicDigestionAndLagoon, manure_treatment_obj).with_split = True
+
+        return manure_treatment_obj
+

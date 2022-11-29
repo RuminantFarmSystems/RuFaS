@@ -48,6 +48,8 @@ class BaseManureTreatment(ABC):
         self._sim_day = -1
         self._current_pen: Optional[ManureManagementPen] = None
         self._manure_handler_daily_output = None
+        self._reception_pit_daily_output = None
+        self._manure_separator_daily_output = None
         self._current_input_data: Optional[ManureTreatmentInputDataType] = None
 
         self._accumulated_output = ManureTreatmentDailyOutput()
@@ -56,11 +58,14 @@ class BaseManureTreatment(ABC):
                                                      current_pen: ManureManagementPen,
                                                      manure_handler_daily_output: ManureHandlerDailyOutput,
                                                      reception_pit_daily_output: ReceptionPitDailyOutput,
-                                                     manure_separator_daily_output: ManureSeparatorDailyOutput) \
+                                                     manure_separator_daily_output: Optional[
+                                                         ManureSeparatorDailyOutput]) \
             -> None:
         self._sim_day = sim_day
         self._current_pen = current_pen
         self._manure_handler_daily_output = manure_handler_daily_output
+        self._reception_pit_daily_output = reception_pit_daily_output
+        self._manure_separator_daily_output = manure_separator_daily_output
         self._current_input_data = manure_separator_daily_output or reception_pit_daily_output
 
     def _initialize_daily_output_during_update(self) -> ManureTreatmentDailyOutput:

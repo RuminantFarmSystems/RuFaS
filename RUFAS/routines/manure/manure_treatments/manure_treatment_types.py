@@ -7,4 +7,6 @@ class ManureTreatmentType(DefaultEnum):
     SLURRY_STORAGE_OUTDOOR = 'slurry storage outdoor'
     ANAEROBIC_LAGOON = 'anaerobic lagoon'
     ANAEROBIC_DIGESTION = 'anaerobic digestion'
+    ANAEROBIC_DIGESTION_AND_LAGOON = 'anaerobic digestion and lagoon'
+    ANAEROBIC_DIGESTION_AND_LAGOON_WITH_SPLIT = 'anaerobic digestion and lagoon with split'
     DEFAULT = SLURRY_STORAGE_UNDERFLOOR

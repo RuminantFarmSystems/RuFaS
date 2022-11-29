@@ -173,6 +173,26 @@
       "evaporation_fraction": 0.02,
       "AD_temp_set_point": 37.5,
       "AD_temp": 37.5
+    },
+    {
+      "manure_treatment_type": "anaerobic digestion and lagoon",
+      "TS_removal_efficiency_for_treatment": 0.45,
+      "VS_removal_efficiency_for_treatment": 0.40,
+      "N_removal_efficiency_for_treatment": 0.0,
+      "TAN_removal_efficiency_for_treatment": 0.1,
+      "P_removal_efficiency_for_treatment": 0.0,
+      "K_removal_efficiency_for_treatment": 0.0,
+      "storage_time_period": 365,
+      "freeboard_input": 0.3048,
+      "hydraulic_retention_time": 25,
+      "sludge_accumulation_period": 1.0,
+      "SAV_fraction": 0.03,
+      "top_cover_volume_fraction": 0.2,
+      "biogas_gen_ratio": 0.38,
+      "methane_gen_ratio": 0.65,
+      "evaporation_fraction": 0.02,
+      "AD_temp_set_point": 37.5,
+      "AD_temp": 37.5
     }
   ]
 }

@@ -339,11 +339,3 @@ class AnaerobicLagoon(BaseManureTreatment):
         return min(max(self.sludge_accumulation_volume * lower_bound, calculated_SAV_value),
                    self.sludge_accumulation_volume * upper_bound)
 
-# 0 - handler - reception pit - underfloor
-# 1 - handler - reception pit - outdoor
-# 2 - handler - reception pit - separator - outdoor
-# 3 - handler - reception pit - lagoon
-# 4 - handler - reception pit - separator - lagoon
-# 5 - handler - reception pit - [digester - lagoon] ('anaerobic digestion and lagoon')
-# 6 - handler - reception pit - separator - [digester - lagoon] ('anaerobic digestion and lagoon')
-# 7 - handler - reception pit - digester - separator - lagoon ('anaerobic digestion and lagoon with split')

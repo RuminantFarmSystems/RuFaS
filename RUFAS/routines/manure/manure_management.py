@@ -10,6 +10,7 @@ Author(s):  William Donovan, wmdonovan@wisc.edu
             Sadman Chowdhury, skc86@cornell.edu
 """
 import collections
+import typing
 from typing import Dict
 from typing import List
 from typing import Optional
@@ -23,11 +24,13 @@ from RUFAS.routines.manure.manure_handlers.manure_handler_classes import BaseMan
 from RUFAS.routines.manure.manure_handlers.manure_handler_classes import ManureHandlerFactory
 from RUFAS.routines.manure.manure_separators.manure_separator_classes import BaseManureSeparator
 from RUFAS.routines.manure.manure_separators.manure_separator_classes import ManureSeparatorFactory
+from RUFAS.routines.manure.manure_treatments.anaerobic_digestion_and_digestion import AnaerobicDigestionAndLagoon
 from RUFAS.routines.manure.manure_treatments.base_manure_treatment import BaseManureTreatment
 from RUFAS.routines.manure.manure_treatments.manure_treatment_factory import ManureTreatmentFactory
 from RUFAS.routines.manure.output_handler.manure_management_output_handler import ManureManagementOutputHandler
 from RUFAS.routines.manure.pen.manure_management_pen import ManureManagementPen
 from RUFAS.routines.manure.reception_pits.reception_pit import ReceptionPit
+
 
 class ManureManagement:
     """
@@ -75,7 +78,7 @@ class ManureManagement:
         self.manure_management_config_handler = ManureManagementConfigHandler(manure_management_config)
         self.manure_management_output_handler = ManureManagementOutputHandler()
         self._all_data = collections.defaultdict(list)
-        self._setup_manure_management_components(animal_management)
+        self._configure_manure_management_components(animal_management)
 
     @property
     def all_data(self) -> Dict[int, List[Tuple]]:
@@ -96,9 +99,9 @@ class ManureManagement:
 
         return self._all_data
 
-    def _setup_manure_management_components(self, animal_management: AnimalManagement) -> None:
+    def _configure_manure_management_components(self, animal_management: AnimalManagement) -> None:
         """
-        Sets up the chain of manure management components for each animal pen as follows:
+        Configures the chain of manure management components for each animal pen as follows:
             Each pen has one of each of the following components - manure handler,
             reception pit, manure separator, and manure storage treatment.
             These four components, in that order, form a chain such that each downstream
@@ -168,36 +171,46 @@ class ManureManagement:
         for pen in animal_management.all_pens:
             mm_pen = ManureManagementPen(pen)
 
-            manure_handler_daily_output = \
-                self.manure_handlers[mm_pen.id].daily_update(
-                        pen=mm_pen,
-                        bedding=self.beddings[mm_pen.id],
-                        sim_day=animal_management.simulation_day
-                )
+            manure_handler_daily_output = self.manure_handlers[mm_pen.id].daily_update(
+                    pen=mm_pen,
+                    bedding=self.beddings[mm_pen.id],
+                    sim_day=animal_management.simulation_day
+            )
 
-            reception_pit_daily_output = \
-                self.reception_pits[mm_pen.id].daily_update(
-                        manure_handler_daily_output=manure_handler_daily_output,
-                        pen=mm_pen,
-                        bedding=self.beddings[mm_pen.id]
-                )
+            reception_pit_daily_output = self.reception_pits[mm_pen.id].daily_update(
+                    manure_handler_daily_output=manure_handler_daily_output,
+                    pen=mm_pen,
+                    bedding=self.beddings[mm_pen.id]
+            )
 
-            if self.manure_separators[mm_pen.id] is None:
-                manure_separator_daily_output = None
+            # if type(self.manure_treatments[mm_pen.id]) is AnaerobicDigestionAndLagoon:
+            #     tx = typing.cast(AnaerobicDigestionAndLagoon, self.manure_treatments[mm_pen.id])
+            #     if tx.with_split:
+            #         output = tx.daily_update_with_separator_as_middle_step(
+            #                 manure_handler_daily_output=manure_handler_daily_output,
+            #                 reception_pit_daily_output=reception_pit_daily_output,
+            #                 manure_separator=self.manure_separators[mm_pen.id],
+            #                 pen=mm_pen,
+            #                 sim_day=animal_management.simulation_day
+            #         )
+            # else:
+            #     # Do the following
+            #     pass
+
+            if self.manure_separators[mm_pen.id]:
+                manure_separator_daily_output = self.manure_separators[mm_pen.id].daily_update(
+                        reception_pit_daily_output=reception_pit_daily_output
+                )
             else:
-                manure_separator_daily_output = \
-                    self.manure_separators[mm_pen.id].daily_update(
-                            reception_pit_daily_output=reception_pit_daily_output
-                    )
+                manure_separator_daily_output = None
 
-            treatment_daily_output = \
-                self.manure_treatments[mm_pen.id].daily_update(
-                        manure_handler_daily_output=manure_handler_daily_output,
-                        reception_pit_daily_output=reception_pit_daily_output,
-                        manure_separator_daily_output=manure_separator_daily_output,
-                        pen=mm_pen,
-                        sim_day=animal_management.simulation_day
-                )
+            treatment_daily_output = self.manure_treatments[mm_pen.id].daily_update(
+                    manure_handler_daily_output=manure_handler_daily_output,
+                    reception_pit_daily_output=reception_pit_daily_output,
+                    manure_separator_daily_output=manure_separator_daily_output,
+                    pen=mm_pen,
+                    sim_day=animal_management.simulation_day
+            )
 
             daily_update_data = (
                 mm_pen,
@@ -215,6 +228,7 @@ class ManureManagement:
         self.manure_management_output_handler.sort_by_pen_id_and_sim_day()
         self.manure_management_output_handler.export_all_data_to_csv()
 
+        # TODO: Get the last day of simulation
         if animal_management.simulation_day == 751:
             self.manure_management_output_handler.produce_graphics()
 

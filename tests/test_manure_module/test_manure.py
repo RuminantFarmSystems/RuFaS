@@ -46,7 +46,7 @@
 #
 #     # Arrange
 #     mock_set_up_components = mocker.patch('RUFAS.routines.manure.manure_management.ManureManagement'
-#                                           '._setup_manure_management_components', return_value=None)
+#                                           '._configure_manure_management_components', return_value=None)
 #
 #     # Act
 #     manure_management = ManureManagement(mock_animal_management)
@@ -62,7 +62,7 @@
 #
 # def test_setup_manure_management_components(mocker: MockerFixture,
 #                                             mock_animal_management: AnimalManagement) -> None:
-#     """Unit test for function _setup_manure_management_components in file manure_management.py"""
+#     """Unit test for function _configure_manure_management_components in file manure_management.py"""
 #
 #     # Arrange
 #     num_pens = 3

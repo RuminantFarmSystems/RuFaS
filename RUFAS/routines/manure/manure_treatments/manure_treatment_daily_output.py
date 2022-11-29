@@ -60,6 +60,15 @@ class ManureTreatmentDailyOutput:
             attr1 + attr2 for attr1, attr2 in zip(astuple(self), astuple(other))
         ])
 
+    def clone(self) -> ManureTreatmentDailyOutput:
+        """Creates a copy of this object.
+
+        Returns:
+            A copy of this object.
+
+        """
+        return ManureTreatmentDailyOutput(*astuple(self))
+
 
 @dataclass
 class AnaerobicDigestionOutput:

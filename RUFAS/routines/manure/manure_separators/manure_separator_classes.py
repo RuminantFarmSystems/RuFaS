@@ -18,6 +18,7 @@ from typing import Type
 
 from RUFAS.routines.manure.default_enum.default_enum import DefaultEnum
 from RUFAS.routines.manure.manure_separators.manure_separator_daily_output import ManureSeparatorDailyOutput
+from RUFAS.routines.manure.manure_treatments.manure_treatment_daily_output import ManureTreatmentDailyOutput
 from RUFAS.routines.manure.reception_pits.reception_pit_daily_output import ReceptionPitDailyOutput
 
 
@@ -49,7 +50,6 @@ class BaseManureSeparator:
 
     Attributes:
         config: ManureSeparatorConfig object containing the configuration for the manure separator.
-        all_output: List of ManureSeparatorDailyOutput objects containing the output for each day.
 
     """
 
@@ -62,7 +62,6 @@ class BaseManureSeparator:
 
         """
         self.config = manure_separator_config
-        self.all_output: List[ManureSeparatorDailyOutput] = []
 
     def daily_update(self, reception_pit_daily_output: ReceptionPitDailyOutput) -> ManureSeparatorDailyOutput:
         """Calculate and store the daily output of the manure separator.
@@ -100,8 +99,13 @@ class BaseManureSeparator:
                 P=rp.P * (1 - self.config.P_removal_efficiency_for_separator),
                 K=rp.K * (1 - self.config.K_removal_efficiency_for_separator),
         )
-        self.all_output.append(daily_output)
         return daily_output
+
+    # TODO: Fill this in
+    def daily_update_with_anaerobic_digestion_input(self,
+                                                    anaerobic_digestion_daily_output: ManureTreatmentDailyOutput) \
+            -> ManureSeparatorDailyOutput:
+        return ManureSeparatorDailyOutput()
 
 
 class BeltPress(BaseManureSeparator):
