@@ -43,6 +43,8 @@ def input_prompt():
           "Exit RUFAS:\n\t" +
           "Enter \'Q\' or \'q\'")
 
+    info_map = {'caller_class': 'no_class', 
+                'caller_function': input_prompt.__name__}
     while True:
 
         try:
@@ -109,4 +111,3 @@ def input_prompt():
         #
         except errors.UserInput as e:
             print(e.msg)
-            om.add_error(f"{e}", f"{e.msg}",{'caller_class': 'no_class', 'caller_function': 'input_prompt'})

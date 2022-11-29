@@ -29,6 +29,8 @@ class SimulationEngine:
 
     def simulate(self) -> None:
         """Executes the simulation"""
+        info_map = {'caller_class': self.__class__.__name__, 
+                    'caller_function': self.simulate.__name__}
         t_start_sim = timer.time()
         
         self._run_simulation_main_loop()
@@ -38,7 +40,7 @@ class SimulationEngine:
         print("Simulation Successful")
         print(f"Total Simulation Time: {t_end_sim - t_start_sim} seconds")
         total_simulation_time = t_end_sim - t_start_sim
-        om.add_variable('total_simulation_time', total_simulation_time, {'caller_class': 'SimulationEngine', 'caller_function': 'simulate'})
+        om.add_variable('total_simulation_time', total_simulation_time, info_map)
 
 
         t_start_graphics = timer.time()
@@ -47,10 +49,10 @@ class SimulationEngine:
         t_end_graphics = timer.time()
 
         graphics_prod_time = t_end_graphics - t_start_graphics
-        om.add_variable('graphics_prod_time', graphics_prod_time, {'caller_class': 'SimulationEngine', 'caller_function': 'simulate'})
+        om.add_variable('graphics_prod_time', graphics_prod_time, info_map)
         total_runtime = (t_end_sim-t_start_sim) + \
             (t_end_graphics-t_start_graphics)
-        om.add_variable('total_runtime', total_runtime, {'caller_class': 'SimulationEngine', 'caller_function': 'simulate'})
+        om.add_variable('total_runtime', total_runtime, info_map)
         self._show_final_messages(graphics_prod_time, total_runtime)
         
         #TODO delete this method call prior to merging
@@ -153,9 +155,11 @@ class SimulationEngine:
             InvalidJSONFile: If the json file at the given path does not conform 
             with the format required
         """
-
+        info_map = {'caller_class': self.__class__.__name__, 
+                    'caller_function': self._initialize_simulation.__name__,
+                    'file_path': file_path}
         print(f"Initializing simulation environment from {file_path}")
-        om.add_variable('simulation_initialization_file_path', file_path, {'caller_class': 'SimulationEngine', 'caller_function': '_initialize_simulation'})
+        om.add_variable('simulation_initialization_file_path', file_path, info_map)
 
         try:
             data = Utility.read_json_file(file_path)
@@ -175,7 +179,6 @@ class SimulationEngine:
         except errors.JSONfileData as e:
             print(
                 f"JSON FILE ERROR: {file_path.name}\n\t{e.section} Section\n{e.msg}\n")
-            om.add_error(f"{e}", f"{e.msg}",{'caller_class': 'SimulationEngine', 'caller_function': '_initialize_simulation'})
             raise errors.InvalidJSONfile(file_path.name)
 
         self.output.initialize_dir(
