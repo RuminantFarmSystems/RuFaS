@@ -54,9 +54,6 @@ class SimulationEngine:
             (t_end_graphics-t_start_graphics)
         om.add_variable('total_runtime', total_runtime, info_map)
         self._show_final_messages(graphics_prod_time, total_runtime)
-        
-        #TODO delete this method call prior to merging
-        om.print_pools()
 
     def _run_simulation_main_loop(self) -> None:
         """

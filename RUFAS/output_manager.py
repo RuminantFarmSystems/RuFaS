@@ -235,18 +235,3 @@ class OutputManager (object):
         This guarantees that no name collision will happen.
         """
         return str(time.time())
-
-    #TODO delete before merging
-    def print_pools(self) -> None:
-        """
-        quick and dirty way to print pool contents after simulation runs.
-        for PR reviewer-purposes only.
-        """
-        print('Variables pool:')
-        pprint(self.variables_pool)
-        print('Warnings pool:')
-        pprint(self.warnings_pool)
-        print('Errors pool:')
-        pprint(self.errors_pool)
-        print('Logs pool:')
-        pprint(self.logs_pool)
