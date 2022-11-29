@@ -1,6 +1,7 @@
 # !/usr/bin/env python3
 
 from typing import Any, Dict, List, Union
+import os
 import time
 
 
@@ -234,3 +235,45 @@ class OutputManager (object):
         This guarantees that no name collision will happen.
         """
         return str(time.time())
+
+    def _dict_to_file_json(self, dict: Dict[str, Any], path: str) -> None:
+        """Saves a dictionary into a JSON file"""
+        try:
+            with open(path, 'w') as json_file:
+                json_file.write(str(dict))
+        except Exception as e:
+            raise e
+
+    def _generate_file_name(self, base_name: str, extension: str = "json") -> str:
+        """
+        Returns a file name using the given base_name and timestamp
+        """
+        return f"{base_name}_{self._get_time_based_suffix()}.{extension}"
+
+    def save_variables(self, path: str) -> None:
+        """
+        Saves the variables_pool into the given path as a json file
+        """
+        file_path=os.path.join(path,self._generate_file_name("variables","json"))
+        self._dict_to_file_json(self.variables_pool, file_path)
+
+    def save_logs(self, path: str) -> None:
+        """
+        Saves the logs_pool into the given path as a json file
+        """
+        file_path=os.path.join(path,self._generate_file_name("logs","json"))
+        self._dict_to_file_json(self.logs_pool, path)
+
+    def save_warnings(self, path: str) -> None:
+        """
+        Saves the warnings_pool into the given path as a json file
+        """
+        file_path=os.path.join(path,self._generate_file_name("warnings","json"))
+        self._dict_to_file_json(self.warnings_pool, path)
+
+    def save_errors(self, path: str) -> None:
+        """
+        Saves the errors_pool into the given path as a json file
+        """
+        file_path=os.path.join(path,self._generate_file_name("errors","json"))
+        self._dict_to_file_json(self.errors_pool, path)
