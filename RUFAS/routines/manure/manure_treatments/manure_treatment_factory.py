@@ -6,7 +6,7 @@ from typing import Optional
 from typing import Type
 
 from RUFAS.routines.manure.manure_treatments.anaerobic_digestion import AnaerobicDigestion
-from RUFAS.routines.manure.manure_treatments.anaerobic_digestion_and_digestion import AnaerobicDigestionAndLagoon
+from RUFAS.routines.manure.manure_treatments.anaerobic_digestion_and_lagoon import AnaerobicDigestionAndLagoon
 from RUFAS.routines.manure.manure_treatments.anaerobic_lagoon import AnaerobicLagoon
 from RUFAS.routines.manure.manure_treatments.base_manure_treatment import BaseManureTreatment
 from RUFAS.routines.manure.manure_treatments.manure_treatment_configs import DefaultManureTreatmentConfigFactory

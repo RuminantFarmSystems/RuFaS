@@ -33,7 +33,7 @@ class ManureTreatmentDailyOutput:
     CH4: float = 0.0
     NH3: float = 0.0
 
-    # Extra variable for development purposes
+    # Extra variables for development purposes
     # Will be removed when done
     sludge_TS: float = 0.0
     sludge_VS: float = 0.0
@@ -41,7 +41,7 @@ class ManureTreatmentDailyOutput:
     sludge_P: float = 0.0
     sludge_K: float = 0.0
     accumulated_sludge_TS: float = 0.0
-    accumulated_minimum_treatment_volume: float = 0.0
+    accumulated_treatment_volume: float = 0.0
 
     def __add__(self, other: ManureTreatmentDailyOutput) -> ManureTreatmentDailyOutput:
         """Adds corresponding attributes between this output and another.

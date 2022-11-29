@@ -83,7 +83,8 @@ class BaseManureSeparator:
                 pen_id=rp.pen_id,
                 total_daily_manure_volume=rp.total_daily_manure_volume,
                 final_solids_wet_mass=(
-                        rp.TS * self.config.TS_removal_efficiency_for_separator / self.config.percent_dry_solids
+                        rp.TS * self.config.TS_removal_efficiency_for_separator /
+                        self.config.percent_dry_solids
                 ),
 
                 TS_solid=rp.TS * self.config.TS_removal_efficiency_for_separator,

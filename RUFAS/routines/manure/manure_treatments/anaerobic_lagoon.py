@@ -2,11 +2,14 @@ from __future__ import annotations
 
 from typing import Tuple
 
+from RUFAS.routines.manure.constants.manure_constants import ManureConstants
 from RUFAS.routines.manure.gas_emissions.gas_emissions import GasEmissions
+from RUFAS.routines.manure.manure_separators.manure_separator_daily_output import ManureSeparatorDailyOutput
 from RUFAS.routines.manure.manure_treatments.base_manure_treatment import BaseManureTreatment
 from RUFAS.routines.manure.manure_treatments.manure_treatment_configs import ManureTreatmentConfig
 from RUFAS.routines.manure.manure_treatments.manure_treatment_daily_output import ManureTreatmentDailyOutput
 from RUFAS.routines.manure.manure_treatments.manure_treatment_daily_output import SludgeOutput
+from RUFAS.routines.manure.reception_pits.reception_pit_daily_output import ReceptionPitDailyOutput
 
 
 class AnaerobicLagoon(BaseManureTreatment):
@@ -60,7 +63,7 @@ class AnaerobicLagoon(BaseManureTreatment):
         daily_output.sludge_P = daily_sludge_output.P
         daily_output.sludge_K = daily_sludge_output.K
         daily_output.accumulated_sludge_TS = self._accumulated_sludge_output.TS
-        daily_output.accumulated_minimum_treatment_volume = self._accumulated_minimum_treatment_volume
+        daily_output.accumulated_treatment_volume = self._accumulated_minimum_treatment_volume
 
     def calc_CH4_emission(self, accumulated_VS_total: float, accumulated_TS: float) -> Tuple[float, float]:
         """Calculates CH4 emission from the anaerobic lagoon.
@@ -78,30 +81,18 @@ class AnaerobicLagoon(BaseManureTreatment):
         return CH4_loss, new_accumulated_TS
 
     def calc_NH3_emission(self, num_animals: int, barn_area: float,
-                          accumulated_pen_urine: float,
-                          accumulated_pen_urine_TAN: float) -> Tuple[float, float]:
-        """Calculates NH3 emission from the anaerobic lagoon.
-
-        Args:
-            num_animals: The number of animals in the pen.
-            barn_area: The barn area of the pen.
-            accumulated_pen_urine: The accumulated urine in the pen.
-            accumulated_pen_urine_TAN: The accumulated TAN in the pen.
-
-        Returns:
-            The NH3 emission from the anaerobic lagoon and the new accumulated pen urine TAN in the pen.
-
-        """
-        tempC = self._get_current_day_avg_tempC()
+                          accumulated_manure_volume: float,
+                          accumulated_TAN: float) -> Tuple[float, float]:
+        avg_tempC = self._get_current_day_avg_tempC()
         NH3_loss = GasEmissions.calc_E_NH3_emission(
                 num_animals=num_animals,
                 barn_area=barn_area,
-                urine=accumulated_pen_urine,
-                urine_TAN=accumulated_pen_urine_TAN,
-                tempC=tempC
+                urine=accumulated_manure_volume * ManureConstants.MANURE_DENSITY / num_animals,
+                urine_TAN=accumulated_TAN / num_animals,
+                tempC=avg_tempC
         )
-        new_accumulated_pen_urine_TAN = max(accumulated_pen_urine_TAN - NH3_loss, 0.0)
-        return NH3_loss, new_accumulated_pen_urine_TAN
+        new_accumulated_TAN = max(accumulated_TAN - NH3_loss, 0.0)
+        return NH3_loss, new_accumulated_TAN
 
     def _daily_update_helper(self) -> ManureTreatmentDailyOutput:
         """Updates the daily output variables for the anaerobic lagoon.
@@ -112,8 +103,8 @@ class AnaerobicLagoon(BaseManureTreatment):
         """
         daily_output = self._initialize_daily_output_during_update()
         daily_output.final_manure_volume = self._adjust_final_manure_volume(daily_output.final_manure_volume)
-        self._accumulate_daily_output(daily_output)
-        self._accumulate_minimum_treatment_volume()
+        self._adjust_accumulated_output(daily_output)
+        daily_output.accumulated_treatment_volume = self._accumulated_output.final_manure_volume
         self._accumulate_precip()
 
         daily_sludge_output = self._create_daily_sludge_output(daily_output)
@@ -127,8 +118,8 @@ class AnaerobicLagoon(BaseManureTreatment):
         NH3_loss, new_accumulated_pen_urine_TAN = self.calc_NH3_emission(
                 num_animals=self._current_pen.num_animals,
                 barn_area=self._current_pen.barn_area_from_pen_type,
-                accumulated_pen_urine=0.0,
-                accumulated_pen_urine_TAN=self._accumulated_output.TAN,
+                accumulated_manure_volume=self._accumulated_output.final_manure_volume,
+                accumulated_TAN=self._accumulated_output.TAN
         )
         daily_output.NH3 = NH3_loss
         self._accumulated_output.TAN = new_accumulated_pen_urine_TAN
@@ -138,7 +129,7 @@ class AnaerobicLagoon(BaseManureTreatment):
         return daily_output
 
     def _adjust_final_manure_volume(self, current_day_final_manure_volume: float):
-        """Adjust the final manure volume to account for the precipitation and the storage time period.
+        """Adjusts the final manure volume to account for the precipitation and the storage time period.
 
         Args:
             current_day_final_manure_volume: The final manure volume for the current day.
@@ -171,49 +162,14 @@ class AnaerobicLagoon(BaseManureTreatment):
         """
         return self._manure_handler_daily_output.cleaning_water_volume
 
-    @property
-    def wastewater_volume(self) -> float:
-        """Calculates the volume of wastewater in the treatment system.
+    def _should_reset_accumulated_output(self):
+        return self._sim_day % self.storage_time_period == 1
 
-        Returns:
-            The volume of wastewater in the treatment system, m^3.
-
-        """
-        if self._current_input_data:
-            return self._get_input_manure_volume(self._current_input_data)
-        return 0.0
-
-    @property
-    def reduced_volume(self) -> float:
-        """Returns reduced volume.
-
-        Returns:
-            The reduced volume, m^3.
-
-        """
-        return self.wastewater_volume - self.flushing_volume  # m^3
-
-    def _accumulate_minimum_treatment_volume(self) -> None:
-        """Returns minimum treatment volume.
-
-        Returns:
-            Minimum treatment volume, m^3.
-
-        """
-        if self._sim_day % self.storage_time_period == 1:
-            self._accumulated_minimum_treatment_volume = self._get_input_manure_volume(self._current_input_data)
+    def _adjust_accumulated_output(self, manure_treatment_daily_output: ManureTreatmentDailyOutput):
+        if self._should_reset_accumulated_output():
+            self._accumulated_output = manure_treatment_daily_output
         else:
-            self._accumulated_minimum_treatment_volume += self.reduced_volume
-
-    @property
-    def total_lagoon_volume(self) -> float:
-        """Returns total lagoon volume.
-
-        Returns:
-            Total lagoon volume, m^3.
-
-        """
-        return self.volume_needed + self.freeboard + self._accumulated_precip
+            self._accumulated_output += manure_treatment_daily_output
 
     @property
     def volume_needed(self):
@@ -223,7 +179,7 @@ class AnaerobicLagoon(BaseManureTreatment):
             Volume needed, m^3.
 
         """
-        return self._accumulated_minimum_treatment_volume + self.sludge_accumulation_volume
+        return self._accumulated_output.final_manure_volume + self.sludge_accumulation_volume
 
     @property
     def lagoon_depth(self):
@@ -338,4 +294,3 @@ class AnaerobicLagoon(BaseManureTreatment):
         """
         return min(max(self.sludge_accumulation_volume * lower_bound, calculated_SAV_value),
                    self.sludge_accumulation_volume * upper_bound)
-
