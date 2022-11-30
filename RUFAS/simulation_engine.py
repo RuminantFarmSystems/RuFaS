@@ -52,6 +52,7 @@ class SimulationEngine:
         total_runtime = (t_end_sim-t_start_sim) + \
             (t_end_graphics-t_start_graphics)
         om.add_log('total_runtime', total_runtime, info_map)
+        self._show_final_messages(graphics_prod_time, total_runtime)
 
     def _run_simulation_main_loop(self) -> None:
         """
