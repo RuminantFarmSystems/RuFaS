@@ -11,9 +11,7 @@ from pathlib import Path
 from typing import Callable, List, Tuple
 
 from RUFAS import errors
-from RUFAS.output_manager import OutputManager
 
-om = OutputManager()
 
 class Utility:
     @staticmethod

@@ -9,10 +9,8 @@ import sys
 from pathlib import Path
 
 from RUFAS import util, errors
-from RUFAS.output_manager import OutputManager
 import fileReader
 
-om = OutputManager()
 
 def input_prompt():
     """Prompts the user for an input to RUFAS.

@@ -236,7 +236,7 @@ class AnimalManagement:
             om.add_warning('invalid_pen_num_warning', 
                             'Warning: herd_num > 0, but pen_num = 2.' 
                             + ' Initilizing 1 default pen.',
-                             {'caller_class': 'AnimalManagement', 'caller_function': 'init_pens'})
+                             info_map)
             pen_3 = Pen(2, 0.1, 1.6, 300, 'open air barn', 'straw', 'tiestall',
                         manure_handling, manure_separator, manure_storage,
                         animal_combination, 1.2)

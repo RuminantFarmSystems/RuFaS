@@ -38,9 +38,8 @@ class SimulationEngine:
         t_end_sim = timer.time()
 
         print("Simulation Successful")
-        print(f"Total Simulation Time: {t_end_sim - t_start_sim} seconds")
         total_simulation_time = t_end_sim - t_start_sim
-        om.add_variable('total_simulation_time', total_simulation_time, info_map)
+        om.add_log('total_simulation_time', total_simulation_time, info_map)
 
 
         t_start_graphics = timer.time()
@@ -49,11 +48,10 @@ class SimulationEngine:
         t_end_graphics = timer.time()
 
         graphics_prod_time = t_end_graphics - t_start_graphics
-        om.add_variable('graphics_prod_time', graphics_prod_time, info_map)
+        om.add_log('graphics_prod_time', graphics_prod_time, info_map)
         total_runtime = (t_end_sim-t_start_sim) + \
             (t_end_graphics-t_start_graphics)
-        om.add_variable('total_runtime', total_runtime, info_map)
-        self._show_final_messages(graphics_prod_time, total_runtime)
+        om.add_log('total_runtime', total_runtime, info_map)
 
     def _run_simulation_main_loop(self) -> None:
         """
