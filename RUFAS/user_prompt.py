@@ -41,8 +41,6 @@ def input_prompt():
           "Exit RUFAS:\n\t" +
           "Enter \'Q\' or \'q\'")
 
-    info_map = {'caller_class': 'no_class', 
-                'caller_function': input_prompt.__name__,}
     while True:
 
         try:
