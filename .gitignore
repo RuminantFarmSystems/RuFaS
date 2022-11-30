@@ -35,6 +35,7 @@ output/*
 .idea/**
 env/
 venv/
+pycallexp.py
 
 # ignore .DS_store
 .DS_store
