@@ -3,6 +3,7 @@
 from RUFAS.simulation_engine import SimulationEngine
 from RUFAS import input_prompt
 
+
 def main():
     """
     Main function of RUFAS, executes simulations for all files specified.
@@ -15,11 +16,9 @@ def main():
     print("RUFAS: Ruminant Farm Systems Model 2022")
 
     input_file_list = input_prompt()
-
     for input_file_path in input_file_list:
         simulator = SimulationEngine(input_file_path)
         simulator.simulate()
-
 
 if __name__ == '__main__':
     main()
