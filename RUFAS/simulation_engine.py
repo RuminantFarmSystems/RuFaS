@@ -6,6 +6,7 @@ from pathlib import Path
 from RUFAS import routines, errors
 from RUFAS.classes import Config, State, Weather, Time
 from RUFAS.output_handler import OutputHandler
+from RUFAS.output_manager import OutputManager
 import random
 import numpy
 from typing import Optional
@@ -13,6 +14,8 @@ from typing import Optional
 from RUFAS.routines.manure.manure_management import simulate_daily_manure_management
 from RUFAS.util import Utility
 
+
+om = OutputManager()
 
 class SimulationEngine:
 
@@ -26,14 +29,18 @@ class SimulationEngine:
 
     def simulate(self) -> None:
         """Executes the simulation"""
-
+        info_map = {'caller_class': self.__class__.__name__, 
+                    'caller_function': self.simulate.__name__,}
         t_start_sim = timer.time()
+        
         self._run_simulation_main_loop()
         self.output.finalize(self.state, self.weather, self.time)
         t_end_sim = timer.time()
 
         print("Simulation Successful")
-        print(f"Total Simulation Time: {t_end_sim - t_start_sim} seconds")
+        total_simulation_time = t_end_sim - t_start_sim
+        om.add_log('total_simulation_time', total_simulation_time, info_map)
+
 
         t_start_graphics = timer.time()
         sys.stdout.write('Producing Graphics\n')
@@ -41,8 +48,10 @@ class SimulationEngine:
         t_end_graphics = timer.time()
 
         graphics_prod_time = t_end_graphics - t_start_graphics
+        om.add_log('graphics_prod_time', graphics_prod_time, info_map)
         total_runtime = (t_end_sim-t_start_sim) + \
             (t_end_graphics-t_start_graphics)
+        om.add_log('total_runtime', total_runtime, info_map)
         self._show_final_messages(graphics_prod_time, total_runtime)
 
     def _run_simulation_main_loop(self) -> None:
@@ -69,7 +78,8 @@ class SimulationEngine:
             self.state.animal_management, self.state.feed, self.weather, self.time)
         routines.daily_manure_storage_routine(
             self.state.manure_storage, self.state.animal_management)
-        simulate_daily_manure_management(self.state.manure_management, self.state.animal_management)
+        simulate_daily_manure_management(
+            self.state.manure_management, self.state.animal_management)
         routines.daily_fields_routine(
             self.state.fields, self.state.manure_storage, self.weather, self.time)
         routines.daily_feed_routine(self.state.feed, self.state.fields, self.state.animal_management,
@@ -141,8 +151,12 @@ class SimulationEngine:
             InvalidJSONFile: If the json file at the given path does not conform 
             with the format required
         """
-
+        info_map = {'caller_class': self.__class__.__name__, 
+                    'caller_function': self._initialize_simulation.__name__,
+                    'file_path': file_path,}
         print(f"Initializing simulation environment from {file_path}")
+        om.add_variable('simulation_initialization_file_path', file_path, info_map)
+
         try:
             data = Utility.read_json_file(file_path)
             self.config = Config(data['config'], data['weather'])
