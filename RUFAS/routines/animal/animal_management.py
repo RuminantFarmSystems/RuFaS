@@ -163,8 +163,8 @@ class AnimalManagement:
             herd_data: dictionary containing information about the herd
         """
 
-        info_map = {'caller_class': self.__class__.__name__, 
-                    'caller_function': self.init_pens.__name__,
+        info_map = {"class": self.__class__.__name__, 
+                    "function": self.init_pens.__name__,
                     'all_pens_data': all_pens_data,
                     'herd_data': herd_data,}
 
@@ -260,8 +260,8 @@ class AnimalManagement:
             weather: instance of the Weather class defined in classes.py
             time: instance of the Time class defined in classes.py
         """
-        info_map = {'caller_class': self.__class__.__name__, 
-                    'caller_function': self.__init__.__name__,
+        info_map = {"class": self.__class__.__name__, 
+                    "function": self.__init__.__name__,
                     'herd_data': herd_data,
                     'pen_data': pen_data,
                     'weather': weather,
@@ -606,9 +606,9 @@ class AnimalManagement:
                 else:
                     mixed_types[pen.id] = pen.animal_combination
         # organzing pens by class and ensuring sufficeint storage
-        info_map = {'caller_class': self.__class__.__name__, 
-                    'caller_function': self.pen_allocation.__name__,
-                    'all_pens': self.all_pens,}
+        info_map = {"class": self.__class__.__name__, 
+                    "function": self.pen_allocation.__name__,
+                    "all_pens": self.all_pens,}
         while True:
             max_value = max(stall_shortage.values())
             if max_value > 0:
@@ -1010,8 +1010,8 @@ class AnimalManagement:
                           len(self.life_cycle_manager.sold_heifers),
                           len(self.life_cycle_manager.culled_cows))
 
-        info_map = {'caller_class': self.__class__.__name__, 
-                    'caller_function': self.get_life_cycle_output.__name__,
+        info_map = {"class": self.__class__.__name__, 
+                    "function": self.get_life_cycle_output.__name__,
                     'num_animals': num_animals,
                     'minimum_num': minimum_num,}
 

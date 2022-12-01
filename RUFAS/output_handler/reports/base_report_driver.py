@@ -14,8 +14,8 @@ class BaseReportDriver:
         self.reports = {}
 
     def initialize(self):
-        info_map = {'caller_class': self.__class__.__name__, 
-                    'caller_function': self.initialize.__name__,}
+        info_map = {"class": self.__class__.__name__, 
+                    "function": self.initialize.__name__,}
         if self.produce_csv:
             for report in self.reports.values():
                 if not report.produce_csv and report.produce_graphics:

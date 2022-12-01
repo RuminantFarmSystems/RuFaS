@@ -29,8 +29,8 @@ class SimulationEngine:
 
     def simulate(self) -> None:
         """Executes the simulation"""
-        info_map = {'caller_class': self.__class__.__name__, 
-                    'caller_function': self.simulate.__name__,}
+        info_map = {"class": self.__class__.__name__, 
+                    "function": self.simulate.__name__,}
         t_start_sim = timer.time()
         
         self._run_simulation_main_loop()
@@ -39,7 +39,7 @@ class SimulationEngine:
 
         print("Simulation Successful")
         total_simulation_time = t_end_sim - t_start_sim
-        om.add_log('total_simulation_time', total_simulation_time, info_map)
+        om.add_log("total_simulation_time", total_simulation_time, info_map)
 
 
         t_start_graphics = timer.time()
@@ -151,11 +151,11 @@ class SimulationEngine:
             InvalidJSONFile: If the json file at the given path does not conform 
             with the format required
         """
-        info_map = {'caller_class': self.__class__.__name__, 
-                    'caller_function': self._initialize_simulation.__name__,
-                    'file_path': file_path,}
+        info_map = {"class": self.__class__.__name__, 
+                    "function": self._initialize_simulation.__name__,
+                    "file_path": file_path,}
         print(f"Initializing simulation environment from {file_path}")
-        om.add_variable('simulation_initialization_file_path', file_path, info_map)
+        om.add_variable("simulation_initialization_file_path", file_path, info_map)
 
         try:
             data = Utility.read_json_file(file_path)
