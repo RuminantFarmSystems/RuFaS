@@ -67,7 +67,7 @@ class SimulationEngine:
         Shows the messages of the end of the simulation
         """
         sys.stdout.write(
-            f"Output Successful.\nGraphics stored in: {self.config.graphic_dir}\n")
+            f"Graphics stored in: {self.config.graphic_dir}\n")
         sys.stdout.write(f"Time to produce graphics: {graphics_prod_time}\n")
         sys.stdout.write(f"Total Run Time: {total_runtime} seconds\n")
 

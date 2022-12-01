@@ -277,3 +277,12 @@ class OutputManager (object):
         """
         file_path=os.path.join(path,self._generate_file_name("errors","json"))
         self._dict_to_file_json(self.errors_pool, file_path)
+
+    def save_all_pools(self, path:str)->None:
+        """
+        Saves all pool into the given path
+        """
+        self.save_variables(path)
+        self.save_errors(path)
+        self.save_logs(path)
+        self.save_warnings(path)
