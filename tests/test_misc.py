@@ -310,7 +310,7 @@ def test_generate_key(mocker: MockerFixture) -> None:
     auto_suffix = '1669002803.9697945'
     mocker.patch('time.time', return_value=auto_suffix)
 
-    info_map = {'caller_class': 'dummy_class', 'caller_function': 'dummy_func'}
+    info_map = {"class": "dummy_class", "function": "dummy_func"}
     key = om._generate_key('key_name', info_map)
     assert key == f'dummy_class.dummy_func.key_name.{auto_suffix}'
 
@@ -352,10 +352,10 @@ def test_add_error(mocker: MockerFixture) -> None:
     mocker.patch('RUFAS.output_manager.OutputManager._generate_key',
                  return_value=key)
     om = OutputManager()
-    info_map = {'caller_class': 'dummy_class', 'caller_function': 'dummy_func'}
-    om.add_error('dummy_name', 'dummy_msg', info_map)
-    assert om.errors_pool[key] == {'info_map': {
-        'caller_class': 'dummy_class', 'caller_function': 'dummy_func'}, 'msg': 'dummy_msg'}
+    info_map = {"class": "dummy_class", "function": "dummy_func"}
+    om.add_error("dummy_name", "dummy_msg", info_map)
+    assert om.errors_pool[key] == {"info_map": {
+        "class": "dummy_class", "function": "dummy_func"}, "msg": "dummy_msg"}
 
 
 def test_add_warning(mocker: MockerFixture) -> None:
@@ -365,10 +365,10 @@ def test_add_warning(mocker: MockerFixture) -> None:
     mocker.patch('RUFAS.output_manager.OutputManager._generate_key',
                  return_value=key)
     om = OutputManager()
-    info_map = {'caller_class': 'dummy_class', 'caller_function': 'dummy_func'}
-    om.add_warning('dummy_name', 'dummy_msg', info_map)
-    assert om.warnings_pool[key] == {'info_map': {
-        'caller_class': 'dummy_class', 'caller_function': 'dummy_func'}, 'msg': 'dummy_msg'}
+    info_map = {"class": "dummy_class", "function": "dummy_func"}
+    om.add_warning("dummy_name", "dummy_msg", info_map)
+    assert om.warnings_pool[key] == {"info_map": {
+        "class": "dummy_class", "function": "dummy_func"}, "msg": "dummy_msg"}
 
 
 def test_add_log(mocker: MockerFixture) -> None:
@@ -378,10 +378,10 @@ def test_add_log(mocker: MockerFixture) -> None:
     mocker.patch('RUFAS.output_manager.OutputManager._generate_key',
                  return_value=key)
     om = OutputManager()
-    info_map = {'caller_class': 'dummy_class', 'caller_function': 'dummy_func'}
-    om.add_log('dummy_name', 'dummy_msg', info_map)
-    assert om.logs_pool[key] == {'info_map': {
-        'caller_class': 'dummy_class', 'caller_function': 'dummy_func'}, 'msg': 'dummy_msg'}
+    info_map = {"class": "dummy_class", "function": "dummy_func"}
+    om.add_log("dummy_name", "dummy_msg", info_map)
+    assert om.logs_pool[key] == {"info_map": {
+        "class": "dummy_class", "function": "dummy_func"}, "msg": "dummy_msg"}
 
 
 def test_add_variable(mocker: MockerFixture) -> None:
@@ -391,12 +391,12 @@ def test_add_variable(mocker: MockerFixture) -> None:
     mocker.patch('RUFAS.output_manager.OutputManager._generate_key',
                  return_value=key)
     om = OutputManager()
-    info_map = {'caller_class': 'dummy_class', 'caller_function': 'dummy_func'}
-    om.add_variable('dummy_name', 'dummy_value', info_map)
+    info_map = {"class": "dummy_class", "function": "dummy_func"}
+    om.add_variable("dummy_name", 'dummy_value', info_map)
     assert om.variables_pool[key] == 'dummy_value'
 
     with raises(ValueError):
-        om.add_variable('dummy_name', 'dummy_value', info_map)
+        om.add_variable("dummy_name", 'dummy_value', info_map)
     # TODO issue 214
 
 
@@ -407,6 +407,6 @@ def test_output_manager_singleton(mocker: MockerFixture) -> None:
                  return_value=key)
     om1 = OutputManager()
     om2 = OutputManager()
-    info_map = {'caller_class': 'dummy_class', 'caller_function': 'dummy_func'}
-    om1.add_variable('dummy_name', 'dummy_value', info_map)    
+    info_map = {"class": "dummy_class", "function": "dummy_func"}
+    om1.add_variable("dummy_name", 'dummy_value', info_map)    
     assert om2.variables_pool[key] == 'dummy_value'
