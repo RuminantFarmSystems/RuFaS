@@ -96,7 +96,7 @@ def test_show_final_messages(
     """Unit test for function _show_final_messages in file RUFAS/simulation_engine.py"""
     mocker.patch('sys.stdout.write')
     patch_simulation_engine._show_final_messages(1, 1)
-    assert mocker._mocks[1].call_count == 3
+    assert mocker._patches_and_mocks[1][1].call_count == 3
 
 
 def test_daily_simulation(
@@ -109,8 +109,8 @@ def test_daily_simulation(
     mocker.patch('RUFAS.simulation_engine.SimulationEngine._advance_time')
     patch_simulation_engine._daily_simulation()
     assert patch_simulation_engine.output.daily_update.call_count == 1
-    for mocked in mocker._mocks:
-        assert mocked.call_count == 1
+    for mocked in mocker._patches_and_mocks:
+        assert mocked[1].call_count == 1
 
 
 def test_advance_time(

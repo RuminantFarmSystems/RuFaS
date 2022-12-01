@@ -1,21 +1,30 @@
 [![Testing](https://github.com/RuminantFarmSystems/MASM/actions/workflows/testing_pytest.yml/badge.svg)](https://github.com/RuminantFarmSystems/MASM/actions/workflows/testing_pytest.yml)
 [![Linting](https://github.com/RuminantFarmSystems/MASM/actions/workflows/lint_flake8.yml/badge.svg)](https://github.com/RuminantFarmSystems/MASM/actions/workflows/lint_flake8.yml)
-# Biweekly Reports
-[Spreadsheet](https://docs.google.com/spreadsheets/d/1dGcfCfBmaLWbLTarOhZL7n0ozI3AV9RxWEjeBEv4R0E/edit?usp=sharing)
+# Vision
+To support research and sustainable decision-making in ruminant animal production through a state-of-art, open-source modeling environment that is continuously adapting as technology and scientific knowledge advance.
 
-# Uncle Bob Lessons
-[YouTube Playlist](https://youtube.com/playlist?list=PLs4sTjbm8kLhbJy-rT4DILg-kKw3ZCwDx)
-|Week|Lesson|
-|:---:|:---:|
-|Jan 31st - Feb 6th|[Lesson 1](https://www.youtube.com/watch?v=7EmboKQH8lM&list=PLs4sTjbm8kLhbJy-rT4DILg-kKw3ZCwDx)|
-|Feb 7th - Feb 13th|[Lesson 2](https://www.youtube.com/watch?v=2a_ytyt9sf8&list=PLs4sTjbm8kLhbJy-rT4DILg-kKw3ZCwDx)|
-|Feb 14th - Feb 20th|[Lesson 3](https://www.youtube.com/watch?v=Qjywrq2gM8o&list=PLs4sTjbm8kLhbJy-rT4DILg-kKw3ZCwDx)|
-|Feb 21st - Feb 27th|[Lesson 4](https://www.youtube.com/watch?v=58jGpV2Cg50&list=PLs4sTjbm8kLhbJy-rT4DILg-kKw3ZCwDx)|
-|Feb 28th - Mar 6th|[Lesson 5](https://www.youtube.com/watch?v=sn0aFEMVTpA&list=PLs4sTjbm8kLhbJy-rT4DILg-kKw3ZCwDx)|
-|Mar 7th - Mar 13th|[Lesson 6](https://www.youtube.com/watch?v=l-gF0vDhJVI&list=PLs4sTjbm8kLhbJy-rT4DILg-kKw3ZCwDx)|
+# Mission
+To build an integrated, whole-farm model that simulates milk, meat, and crop production, greenhouse gas emissions, water quality impacts, soil health, and other sustainability outcomes of ruminant farms. We strive to achieve the highest standards for prediction accuracy, code structure and clarity, documentation, and accessibility. Through continuous learning and improvement of our methods and algorithms, we are creating an open and inclusive platform for scientific collaboration. 
 
-# 2022 Fixathon
-[Fixathon tasks](https://docs.google.com/spreadsheets/d/1SnY3c4vBXrD9ybHoswJW28FrkG4DWx4fyvotIXA85BM/edit?usp=sharing)
+# Priorities
+When decision making is difficult and doubtful, we use these as our North Star to navigate the uncertain and unknown world.
+## Current
+* Deliver Minimum Viable Product (MVP)
+* Payoff the tech debt
+* Establish positive and inclusive team culture
+
+## Past
+N/A
+
+# Resources
+
+[Onboarding Document](https://public.3.basecamp.com/p/ucfdkV7n5WxSzj8XnRUFYKG2)
+
+[Uncle Bob Clean Code Lessons](https://youtube.com/playlist?list=PLs4sTjbm8kLhbJy-rT4DILg-kKw3ZCwDx)
+
+[2022 Fixathon tasks](https://docs.google.com/spreadsheets/d/1SnY3c4vBXrD9ybHoswJW28FrkG4DWx4fyvotIXA85BM/edit?usp=sharing)
+
+<!---
 # Introduction 
 TODO: Give a short introduction of your project. Let this section explain the objectives or the motivation behind this project. 
 
@@ -36,3 +45,4 @@ If you want to learn more about creating good readme files then refer the follow
 - [ASP.NET Core](https://github.com/aspnet/Home)
 - [Visual Studio Code](https://github.com/Microsoft/vscode)
 - [Chakra Core](https://github.com/Microsoft/ChakraCore)
+--->

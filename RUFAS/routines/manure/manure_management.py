@@ -13,7 +13,7 @@ import collections
 from typing import Dict, List, Tuple
 
 from RUFAS.routines.animal.animal_management import AnimalManagement
-from RUFAS.routines.manure.ManureManagementPen.manure_management_pen import ManureManagementPen
+from RUFAS.routines.manure.pen.manure_management_pen import ManureManagementPen
 
 class ManureManagement:
     """
@@ -63,7 +63,7 @@ class ManureManagement:
                 key = id of an animal pen
                 value = a list of tuples where each tuple represents a group of daily output objects.
                     More precisely, each such tuple is of length 5, consisting of a
-                    ManureManagementPen object, a ManureHandlerOutput object, a ReceptionPitOutput object,
+                    pen object, a ManureHandlerOutput object, a ReceptionPitOutput object,
                     a ManureSeparatorOutput object, and a ManureTreatment object.
 
         """
