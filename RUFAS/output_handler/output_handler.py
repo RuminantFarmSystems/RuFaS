@@ -91,7 +91,7 @@ class OutputHandler:
         for report_name in self.reports:
             report = self.reports[report_name]
             if not report.produce_csv and report.produce_graphics:
-                info_map['report'] = report
+                info_map["report"] = report
                 om.add_warning("inactive_report_warning", 
                                 "Warning: Cannot produce graphics for" 
                                 + f" inactive report: {report.report_name}."
