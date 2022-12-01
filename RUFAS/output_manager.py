@@ -210,7 +210,7 @@ class OutputManager (object):
 
         return f"{prefix}{name}{suffix}"
 
-    def _get_prefix(self, class: str, function: str) -> str:
+    def _get_prefix(self, class_: str, function: str) -> str:
         """
         Returns the prefix for a key in the pool.
 
@@ -226,7 +226,7 @@ class OutputManager (object):
         str
             {class}.{function}
         """
-        return f"{class}.{function}"
+        return f"{class_}.{function}"
 
     def _get_time_based_suffix(self) -> str:
         """
