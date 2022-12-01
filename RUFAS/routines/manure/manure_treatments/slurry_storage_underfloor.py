@@ -34,6 +34,15 @@ class SlurryStorageUnderfloor(BaseManureTreatment):
         self.storage_time_period = self.config.storage_time_period
 
     def calc_CH4_emission(self, accumulated_TS: float) -> Tuple[float, float]:
+        """Calculates the CH4 emission from the underfloor slurry storage.
+
+        Args:
+            accumulated_TS: Accumulated TS in the treatment system, kg.
+
+        Returns:
+            CH4_loss: CH4 emission from the underfloor slurry storage, kg.
+
+        """
         tempC = self._get_current_day_avg_tempC()
         CH4_loss = GasEmissions.calc_E_CH4_slurry_storage(
                 TS=accumulated_TS,
@@ -46,6 +55,20 @@ class SlurryStorageUnderfloor(BaseManureTreatment):
     def calc_NH3_emission(self, num_animals: int, barn_area: float,
                           accumulated_manure_volume: float,
                           accumulated_TAN: float) -> Tuple[float, float]:
+        """Calculates the NH3 emission from the underfloor slurry storage.
+
+        Args:
+            num_animals: Number of animals in the pen, animals.
+            barn_area: Area of the barn per animal, m^2/animal.
+            accumulated_manure_volume: Accumulated manure volume in the treatment system, m^3.
+            accumulated_TAN: Accumulated TAN in the treatment system, kg.
+
+        Returns:
+            NH3_loss: NH3 emission from the underfloor slurry storage, kg.
+            new_accumulated_TAN: Accumulated TAN in the treatment system after the
+                NH3 emission is calculated, kg.
+
+        """
         avg_tempC = self._get_current_day_avg_tempC()
         NH3_loss = GasEmissions.calc_E_NH3_emission(
                 num_animals=num_animals,
@@ -58,7 +81,14 @@ class SlurryStorageUnderfloor(BaseManureTreatment):
         return NH3_loss, new_accumulated_TAN
 
     def _daily_update_helper(self) -> ManureTreatmentDailyOutput:
-        daily_output = self._initialize_daily_output_during_update()
+        """Returns the daily output of the slurry storage underfloor system.
+
+        Returns:
+            A ManureTreatmentDailyOutput object containing the daily output of the
+            slurry storage underfloor system.
+
+        """
+        daily_output = self._initialize_daily_output_during_update(self._current_manure_treatment_daily_input)
         self._accumulate_daily_output(daily_output)
 
         CH4_loss, new_accumulated_TS = self.calc_CH4_emission(self._accumulated_output.TS)

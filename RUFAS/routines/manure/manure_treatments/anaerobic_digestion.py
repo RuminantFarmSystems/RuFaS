@@ -9,34 +9,48 @@ from RUFAS.routines.manure.manure_treatments.manure_treatment_configs import Man
 from RUFAS.routines.manure.manure_treatments.manure_treatment_daily_output import AnaerobicDigestionOutput
 from RUFAS.routines.manure.manure_treatments.manure_treatment_daily_output import ManureTreatmentDailyOutput
 from RUFAS.routines.manure.manure_treatments.manure_treatment_daily_output import SludgeOutput
+from RUFAS.routines.manure.protocols.liquid_manure_portion_protocol import LiquidManurePortionProtocol
 
 
 class AnaerobicDigestion(BaseManureTreatment):
+    """A class that calculates the output of an anaerobic digester.
+
+    Attributes:
+        Same as BaseManureTreatment.
+
+    """
+
     def __init__(self, weather, time, manure_treatment_config: ManureTreatmentConfig) -> None:
         super().__init__(weather, time, manure_treatment_config)
         self._accumulated_sludge_output = SludgeOutput()
         self.all_ad_output: List[AnaerobicDigestionOutput] = []
 
-    def _create_daily_sludge_output(self, manure_treatment_daily_output: ManureTreatmentDailyOutput) -> SludgeOutput:
+    def _create_daily_sludge_output(self, manure_treatment_daily_input: LiquidManurePortionProtocol) -> SludgeOutput:
         """Returns the daily sludge output from anaerobic digestion.
 
         Args:
-            manure_treatment_daily_output: The daily output from the manure treatment.
+            manure_treatment_daily_input: The daily output from the manure treatment.
 
         Returns:
             The daily sludge output from anaerobic digestion.
 
         """
         return SludgeOutput(
-                TS=manure_treatment_daily_output.TS * self.config.TS_removal_efficiency_for_treatment,
-                VS=manure_treatment_daily_output.VS_total * self.config.VS_removal_efficiency_for_treatment,
-                N=manure_treatment_daily_output.N * self.config.N_removal_efficiency_for_treatment,
-                P=manure_treatment_daily_output.P * self.config.P_removal_efficiency_for_treatment,
-                K=manure_treatment_daily_output.K * self.config.K_removal_efficiency_for_treatment
+                TS=manure_treatment_daily_input.TS * self.config.TS_removal_efficiency_for_treatment,
+                VS=manure_treatment_daily_input.VS_total * self.config.VS_removal_efficiency_for_treatment,
+                N=manure_treatment_daily_input.N * self.config.N_removal_efficiency_for_treatment,
+                P=manure_treatment_daily_input.P * self.config.P_removal_efficiency_for_treatment,
+                K=manure_treatment_daily_input.K * self.config.K_removal_efficiency_for_treatment,
+                daily_sludge_volume=manure_treatment_daily_input.VS_total * 0.03 / 1000.0
         )
 
     def _accumulate_daily_sludge_output(self, daily_sludge_output: SludgeOutput) -> None:
-        """Accumulates the daily sludge output from anaerobic digestion."""
+        """Accumulates the daily sludge output from anaerobic digestion.
+
+        Args:
+            daily_sludge_output: The daily sludge output from anaerobic digestion.
+
+        """
         self._accumulated_sludge_output += daily_sludge_output
 
     def _assign_extra_output_variables(self, daily_output: ManureTreatmentDailyOutput,
@@ -53,22 +67,23 @@ class AnaerobicDigestion(BaseManureTreatment):
         daily_output.sludge_N = daily_sludge_output.N
         daily_output.sludge_P = daily_sludge_output.P
         daily_output.sludge_K = daily_sludge_output.K
-        daily_output.accumulated_sludge_TS = self._accumulated_sludge_output.TS
+        daily_output.sludge_volume = daily_sludge_output.daily_sludge_volume
+        daily_output.accumulated_sludge_volume = self._accumulated_sludge_output.daily_sludge_volume
+        daily_output.accumulated_final_manure_volume = self._accumulated_output.final_manure_volume
 
     def _daily_update_helper(self) -> ManureTreatmentDailyOutput:
         """Updates the anaerobic digestion model for a single day."""
 
-        daily_output = self._initialize_daily_output_during_update()
+        daily_output = self._initialize_daily_output_during_update(self._current_manure_treatment_daily_input)
         self._accumulate_daily_output(daily_output)
 
-        daily_sludge_output = self._create_daily_sludge_output(daily_output)
+        daily_sludge_output = self._create_daily_sludge_output(self._current_manure_treatment_daily_input)
         self._accumulate_daily_sludge_output(daily_sludge_output)
 
         anaerobic_digestion_daily_output = self._create_anaerobic_digestion_daily_output(
                 daily_output.final_manure_volume)
         self.all_ad_output.append(anaerobic_digestion_daily_output)
 
-        # TODO: Remove after development
         self._assign_extra_output_variables(daily_output, daily_sludge_output)
         return daily_output
 

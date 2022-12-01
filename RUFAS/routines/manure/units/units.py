@@ -27,6 +27,7 @@ class Units:
     total_bedding_volume = 'm^3'
     total_water_volume_in_milking_center = 'm^3'
     total_daily_manure_volume = 'm^3'
+    daily_volume = 'm^3'
 
     # Specific to manure separator output
     final_solids_wet_mass = 'kg'
@@ -38,3 +39,12 @@ class Units:
     K_solid = 'kg'
 
     final_manure_volume = 'm^3'
+
+    sludge_TS = 'kg'
+    sludge_VS = 'kg'
+    sludge_N = 'kg'
+    sludge_P = 'kg'
+    sludge_K = 'kg'
+    daily_sludge_volume = 'm^3'
+    accumulated_sludge_volume = 'm^3'
+    accumulated_final_manure_volume = 'm^3'

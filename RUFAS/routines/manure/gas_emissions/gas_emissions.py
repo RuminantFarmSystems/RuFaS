@@ -1,19 +1,8 @@
-from dataclasses import dataclass
-from typing import Protocol
-
 import math
 
 from RUFAS.routines.manure.constants.gas_emission_constants import GasEmissionConstants
 from RUFAS.routines.manure.constants.general_constants import GeneralConstants
 from RUFAS.routines.manure.constants.manure_constants import ManureConstants
-
-
-@dataclass
-class HasVolatileSolidsAttributes(Protocol):
-    """Protocol for objects that have volatile solids attributes."""
-
-    VSd: float
-    VSnd: float
 
 
 class GasEmissions:
@@ -23,19 +12,15 @@ class GasEmissions:
                                   enclosed=False,
                                   tempC=15.0,
                                   VS_frac=GasEmissionConstants.DEFAULT_VOLATILE_SOLIDS_FRACTION,
-                                  Bo=GasEmissionConstants.Bo,
-                                  E_CH4_pot=GasEmissionConstants.POTENTIAL_METHANE_YIELD_OF_MANURE,
                                   n_eff=0.99,
                                   VS_loss_yesterday=0.0) -> float:
         """Calculates methane emissions from manure storage using total solids and manure kg.
 
         Args:
-            TS: Total solids in kg
-            enclosed: Boolean True if manure storage is enclosed, else False if manure storage is open to air
+            TS: Total solids, kg.
+            enclosed: True if manure storage is enclosed, and False if manure storage is open to air.
             tempC: temperature, C.
-            VS_frac: Fraction (0-1) volatile solids
-            Bo: achievable emission of CH4 during anaerobic digestion, kg CH4/kg VS.
-            E_CH4_pot: potential CH4 yield of the manure, kg CH4/kg VS.
+            VS_frac: Fraction (0-1) volatile solids.
             n_eff: efficiency of process              TODO: confirm n_eff meaning
             VS_loss_yesterday: VS loss from previous day.
 
@@ -45,20 +30,27 @@ class GasEmissions:
         """
         c = 0.024
         VS_tot = TS * VS_frac
-        const = GasEmissionConstants
-        b1, b2 = const.b1, const.b2
-        lnA, E, R = const.lnA, const.E, const.R
+
+        constants = GasEmissionConstants
+        b1 = constants.b1
+        b2 = constants.b2
+        lnA = constants.lnA
+        E = constants.E
+        R = constants.R
+        Bo = constants.Bo
+        E_CH4_pot = constants.POTENTIAL_METHANE_YIELD_OF_MANURE
 
         tempK = cls._convert_tempC_to_tempK(tempC)
         ex = math.exp(lnA - (E / (R * tempK)))
 
         VSd = (Bo / E_CH4_pot)
         VSnd = 1 - VSd
+        E_CH4_open_air = c * VS_tot * (VSd * b1 + VSnd * b2) * ex
 
         if not enclosed:
-            return c * VS_tot * (VSd * b1 + VSnd * b2) * ex
+            return E_CH4_open_air
         else:
-            return c * VS_tot * (VSd * b1 + VSnd * b2) * ex * (1 - n_eff)
+            return E_CH4_open_air * (1 - n_eff)
 
     @staticmethod
     def _calc_modified_hours(hours: float) -> float:
@@ -156,7 +148,7 @@ class GasEmissions:
         M = urine / barn_area  # manure per area of exposed surface, kg/m^2
         Q = cls._calc_Q(tempK, pH)
         if r * M * Q > 0:
-            return num_animals * (urine_TAN * c * p) / (r * M * Q)
+            return num_animals * barn_area * ((urine_TAN / barn_area) * c * p) / (r * M * Q)
         else:
             return 0
 
@@ -278,8 +270,12 @@ class GasEmissions:
             Methane emissions from anaerobic lagoon, kg CH4-N /day.
 
         """
-        return (VS * GasEmissionConstants.Bo * GasEmissionConstants.MCF *
-                GasEmissionConstants.MS * GasEmissionConstants.METHANE_FACTOR)
+        constants = GasEmissionConstants
+        Bo = constants.Bo
+        MCF = constants.MCF
+        MS = constants.MS
+        METHANE_FACTOR = constants.METHANE_FACTOR
+        return VS * Bo * MCF * MS * METHANE_FACTOR
 
     @classmethod
     def calc_CO2_equivalent_of_CH4(cls, CH4: float) -> float:

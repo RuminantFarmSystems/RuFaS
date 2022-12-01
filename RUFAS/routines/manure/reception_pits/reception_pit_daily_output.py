@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
+from dataclasses import field
 
 
 @dataclass
@@ -34,3 +35,8 @@ class ReceptionPitDailyOutput:
     P: float = 0.0
     K: float = 0.0
     total_daily_manure_volume: float = 0.0
+    daily_volume: float = field(init=False)  # To satisfy the LiquidManurePortionProtocol
+
+    def __post_init__(self):
+        """Ensures that the daily volume is set to the total daily manure volume."""
+        self.daily_volume = self.total_daily_manure_volume

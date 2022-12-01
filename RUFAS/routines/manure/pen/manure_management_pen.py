@@ -1,4 +1,5 @@
-from typing import NamedTuple, Set, Type
+from typing import NamedTuple
+from typing import Set
 
 from RUFAS.routines.animal.life_cycle.animal_base import AnimalBase
 from RUFAS.routines.animal.life_cycle.cow import Cow
@@ -16,17 +17,19 @@ class ManureManagementPen:
         id: Pen id.
         animals_in_pen: A list of animal objects in this pen.
         num_animals: The number of animals in this pen.
-        num_lactating_cows: The number of cows in this pen.
+        num_lactating_cows: The number of lactating cows in this pen.
         classes_in_pen: Set of unique animal classes in this pen.
         animal_combination: An AnimalCombination enum that describes the current
             animal makeup in this pen.
         housing_type: The type of housing used for this pen.
         bedding_type: The type of bedding used for this pen.
+        pen_type: The type of pen used for this pen.
         manure_handler: The type of manure handler used for this pen.
         manure_separator: The type of manure separator used for this pen.
         manure_treatment: The type of manure treatment(s) used for this pen.
         manure_density: The manure density used for calculating manure volume, kg/m^3.
-        manure: The manure data extracted from the animal module.
+        manure: The manure data extracted from the animal module and converted to usable
+            form for the manure module.
 
     """
 
@@ -40,15 +43,14 @@ class ManureManagementPen:
             pen: A Pen object from the animal module.
 
         """
-
         self.id: int = pen.id
         self.animals_in_pen: [AnimalBase] = pen.animals_in_pen
         self.num_animals = len(pen.animals_in_pen)
-        self.classes_in_pen: Set[Type[AnimalBase]] = pen.classes_in_pen
+        self.classes_in_pen: Set[str] = pen.classes_in_pen
 
         self.housing_type: str = pen.housing_type
-        self.bedding_type: str = pen.bedding_type
         self.pen_type: str = pen._pen_type
+        self.bedding_type: str = pen.bedding_type
 
         self.manure_handler: str = pen.manure_handling
         self.manure_separator: str = pen.manure_separator
@@ -103,4 +105,3 @@ class ManureManagementPen:
             return barn_area.has_cows
         else:
             return barn_area.no_cows
-

@@ -56,16 +56,6 @@ class PenManure:
 
     def __post_init__(self):
         """Performs any necessary unit conversion after initialization."""
-
-        # The following calculations will need to agree with
-        # how the animal module produces manure data
-        # self.urea *= Constants.UREA_MOLAR_MASS  # mol/L x g/mol = g/L
-        # self.TAN *= Constants.TAN_MOLAR_MASS  # mol/L x g/mol = g/L
-        # self.N *= Constants.GRAMS_TO_KG  # kg
-        # self.VSd *= Constants.GRAMS_TO_KG  # kg
-        # self.VSnd *= Constants.GRAMS_TO_KG  # kg
-        # self.P *= Constants.GRAMS_TO_KG  # kg
-        # self.K *= Constants.GRAMS_TO_KG  # kg
         self.manure_volume = self.manure_mass / ManureConstants.MANURE_DENSITY
 
     @staticmethod
@@ -83,7 +73,7 @@ class PenManure:
         return PenManure(
                 urea=animal_manure['U'] / num_animals,
                 urine=animal_manure['Urine'] / num_animals,
-                urine_TAN=animal_manure['MN'] * ManureConstants.URINE_TAN_FACTOR / num_animals,
+                urine_TAN=animal_manure['TAN_s'] * ManureConstants.URINE_TAN_FACTOR / num_animals,
                 TAN=animal_manure['TAN_s'],
                 N=animal_manure['MN'],
                 manure_mass=animal_manure['Mkg'],

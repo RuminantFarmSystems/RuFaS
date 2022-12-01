@@ -25,7 +25,7 @@ class SlurryStorageOutdoor(BaseManureTreatment):
     """
 
     def __init__(self, weather, time, manure_treatment_config: ManureTreatmentConfig) -> None:
-        """Initialize the outdoor slurry storage manure treatment.
+        """Initializes the outdoor slurry storage manure treatment.
 
         Args:
             weather: A Weather object.
@@ -40,14 +40,14 @@ class SlurryStorageOutdoor(BaseManureTreatment):
 
     @property
     def wastewater_volume(self) -> float:
-        """Calculate the volume of wastewater in the treatment system.
+        """Calculates the volume of wastewater in the treatment system.
 
         Returns:
             The volume of wastewater in the treatment system, m^3.
 
         """
-        if self._current_input_data:
-            return self._get_input_manure_volume(self._current_input_data)
+        if self._current_manure_treatment_daily_input:
+            return self._current_manure_treatment_daily_input.daily_volume
         return 0.0
 
     @property
@@ -58,25 +58,23 @@ class SlurryStorageOutdoor(BaseManureTreatment):
             The minimum treatment volume, m^3.
 
         """
-        if self._current_input_data:
-            return self._get_input_manure_volume(self._current_input_data) * self.storage_time_period  # m^3
-        return 0.0
+        return self.wastewater_volume * self.storage_time_period
 
     @property
     def total_pit_volume(self) -> float:
-        """Calculate the total pit volume.
+        """Calculates the total pit volume.
 
         Returns:
             The total lagoon pit, m^3.
 
         """
-        if self._current_input_data:
+        if self._current_manure_treatment_daily_input:
             return self.treatment_volume + self.freeboard + self.precip
         return 0.0
 
     @property
     def pit_depth(self):
-        """Return the depth of the pit.
+        """Returns the depth of the pit.
 
         Returns:
             The depth of the pit, m.
@@ -86,7 +84,7 @@ class SlurryStorageOutdoor(BaseManureTreatment):
 
     @property
     def pit_slope(self):
-        """Return the slope of the pit.
+        """Returns the slope of the pit.
 
         Returns:
             The slope of the pit, dimensionless.
@@ -95,7 +93,7 @@ class SlurryStorageOutdoor(BaseManureTreatment):
         return 2.0
 
     def _calc_abc(self) -> Tuple[float, float, float]:
-        """Calculate the coefficients a, b, and c for volume calculations.
+        """Calculates the coefficients a, b, and c for volume calculations.
 
         Returns:
             A tuple containing the coefficients a, b, and c for volume calculations.
@@ -108,13 +106,13 @@ class SlurryStorageOutdoor(BaseManureTreatment):
 
     @property
     def pit_width(self) -> float:
-        """Calculate the width of the pit.
+        """Calculates the width of the pit.
 
         Returns:
             The width of the pit, m.
 
         """
-        if self._current_input_data:
+        if self._current_manure_treatment_daily_input:
             a, b, c = self._calc_abc()
             return (-b + math.sqrt(b ** 2 - 4 * a * c)) / (2 * a)
         return 0.0
@@ -172,6 +170,16 @@ class SlurryStorageOutdoor(BaseManureTreatment):
         return self.freeboard_input * self.pit_surface_area
 
     def calc_CH4_emission(self, accumulated_TS: float) -> Tuple[float, float]:
+        """Calculates the CH4 emission from the outdoor slurry storage treatment system.
+
+        Args:
+            accumulated_TS: The accumulated TS in the treatment system, kg TS.
+
+        Returns:
+            A tuple containing the CH4 emission (kg) and the new accumulated TS (kg).
+
+        """
+
         avg_tempC = self._get_current_day_avg_tempC()
         CH4_loss = GasEmissions.calc_E_CH4_slurry_storage(
                 TS=accumulated_TS,
@@ -184,6 +192,20 @@ class SlurryStorageOutdoor(BaseManureTreatment):
     def calc_NH3_emission(self, num_animals: int, barn_area: float,
                           accumulated_manure_volume: float,
                           accumulated_TAN: float) -> Tuple[float, float]:
+        """Calculates the ammonia emission from the outdoor slurry storage treatment system.
+
+        Args:
+            num_animals: The number of animals in the barn.
+            barn_area: The area of the barn per animal, m^2/animal.
+            accumulated_manure_volume: The accumulated manure volume in the treatment system, m^3.
+            accumulated_TAN: The accumulated TAN in the treatment system, kg.
+
+        Returns:
+            NH3_loss: NH3 emission from the outdoor slurry storage, kg.
+            new_accumulated_TAN: Accumulated TAN in the treatment system after the
+                NH3 emission is calculated, kg.
+
+        """
         avg_tempC = self._get_current_day_avg_tempC()
         NH3_loss = GasEmissions.calc_E_NH3_emission(
                 num_animals=num_animals,
@@ -196,7 +218,15 @@ class SlurryStorageOutdoor(BaseManureTreatment):
         return NH3_loss, new_accumulated_TAN
 
     def _daily_update_helper(self) -> ManureTreatmentDailyOutput:
-        daily_output = self._initialize_daily_output_during_update()
+        """Returns the daily output of the outdoor slurry storage treatment system.
+
+        Returns:
+            A ManureTreatmentDailyOutput object containing the daily output of the
+            slurry storage outdoor treatment system.
+
+        """
+
+        daily_output = self._initialize_daily_output_during_update(self._current_manure_treatment_daily_input)
         self._accumulate_daily_output(daily_output)
 
         CH4_loss, new_accumulated_TS = self.calc_CH4_emission(self._accumulated_output.TS)

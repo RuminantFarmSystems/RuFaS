@@ -121,35 +121,19 @@ def manure_calculations(ration_formulation, feed, bw, days_milk, milk_protein,
     p_excrt, WIP_frac, WOP_frac, p_excrt_manure, p_frac = \
         phosphorus_excreted(milk_prod, manure, p_feces_excrt, p_urine)
 
-    # return p_excrt, \
-    #        {"U": U,
-    #         "TAN_s": TAN_s,
-    #         "MN": N_manure,
-    #         "Mkg": manure,
-    #         "TSd": total_solids,
-    #         "VSd": degradable_volatile_solids,
-    #         "VSnd": nondegradable_volatile_solids,
-    #         "WIP_frac": WIP_frac,
-    #         "WOP_frac": WOP_frac,
-    #         "p_excrt_manure": p_excrt_manure,
-    #         "p_frac": p_frac,
-    #         "K_manure": K_manure,
-    #         "CH4_manure": methane_emis
-    #         }
-
     return p_excrt, \
-           {"U": 0.34,  # g/L
-            "Urine": 21,  # kg
-            "TAN_s": 0.01,  # kg
-            "MN": 0.46,  # kg
-            "Mkg": 70.31,  # kg
-            "TSd": 9.07,  # kg
-            "VSd": 5.01,  # kg
-            "VSnd": 2.70,  # kg
-            "WIP_frac": 0.00073,  # dimensionless
-            "WOP_frac": 0.00007,  # dimensionless
-            "p_excrt_manure": 0.1,  # kg
-            "p_frac": 0.00146,  # dimensionless
-            "K_manure": 0.21,  # kg
-            "CH4_manure": 1.50  # kg
+           {"U": U,
+            "Urine": urine,
+            "TAN_s": TAN_s,
+            "MN": N_manure,
+            "Mkg": manure,
+            "TSd": total_solids,
+            "VSd": degradable_volatile_solids,
+            "VSnd": nondegradable_volatile_solids,
+            "WIP_frac": WIP_frac,
+            "WOP_frac": WOP_frac,
+            "p_excrt_manure": p_excrt_manure,
+            "p_frac": p_frac,
+            "K_manure": K_manure,
+            "CH4_manure": methane_emis
             }

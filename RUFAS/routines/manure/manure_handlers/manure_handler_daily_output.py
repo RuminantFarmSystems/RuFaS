@@ -53,6 +53,8 @@ class ManureHandlerDailyOutput:
     total_water_volume_in_milking_parlor: float = 0.0
     total_daily_manure_volume: float = field(init=False)
 
+    tempC: float = 0.0
+
     def __post_init__(self) -> None:
         """Calculate total volatile solids and total daily manure volume after initialization."""
 

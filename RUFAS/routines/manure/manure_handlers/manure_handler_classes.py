@@ -10,6 +10,7 @@ Author(s):  William Donovan, wmdonovan@wisc.edu
 """
 from __future__ import annotations
 
+import math
 from dataclasses import dataclass
 from typing import Dict
 from typing import Optional
@@ -86,6 +87,7 @@ class BaseManureHandler:
             A ManureHandlerDailyOutput object.
 
         """
+
         NH3_housing_loss = GasEmissions.calc_E_NH3_emission(
                 num_animals=pen.num_animals,
                 barn_area=pen.barn_area_from_pen_type,  # m^2/animal
@@ -111,8 +113,10 @@ class BaseManureHandler:
                 cleaning_water_volume=self.cleaning_water_volume_in_main_barn(pen.num_animals),
                 total_bedding_volume=bedding.total_bedding_volume(pen.num_animals),
                 total_water_volume_in_milking_parlor=(
-                    self.milking_parlor.calc_total_water_volume_used_in_milking_parlor(pen.num_lactating_cows))
+                    self.milking_parlor.calc_total_water_volume_used_in_milking_parlor(pen.num_lactating_cows)),
+                tempC=self._get_current_day_avg_tempC()
         )
+
         return daily_output
 
     def cleaning_water_volume_in_main_barn(self, num_animals: int) -> float:

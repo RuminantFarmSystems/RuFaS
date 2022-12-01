@@ -12,14 +12,12 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from typing import Dict
-from typing import List
 from typing import Optional
 from typing import Type
 
 from RUFAS.routines.manure.default_enum.default_enum import DefaultEnum
 from RUFAS.routines.manure.manure_separators.manure_separator_daily_output import ManureSeparatorDailyOutput
-from RUFAS.routines.manure.manure_treatments.manure_treatment_daily_output import ManureTreatmentDailyOutput
-from RUFAS.routines.manure.reception_pits.reception_pit_daily_output import ReceptionPitDailyOutput
+from RUFAS.routines.manure.protocols.liquid_manure_portion_protocol import LiquidManurePortionProtocol
 
 
 class ManureSeparatorType(DefaultEnum):
@@ -63,50 +61,43 @@ class BaseManureSeparator:
         """
         self.config = manure_separator_config
 
-    def daily_update(self, reception_pit_daily_output: ReceptionPitDailyOutput) -> ManureSeparatorDailyOutput:
+    def daily_update(self, manure_separator_daily_input: LiquidManurePortionProtocol) -> ManureSeparatorDailyOutput:
         """Calculate and store the daily output of the manure separator.
 
         Notes:
             "pseudocode_manure_management" MS.4
 
         Args:
-            reception_pit_daily_output: ReceptionPitDailyOutput object containing the daily output
-                of the reception pit.
+            manure_separator_daily_input: TODO
 
         Returns:
             ManureSeparatorDailyOutput object containing the daily output of the manure separator.
 
         """
-        rp = reception_pit_daily_output
+        daily_input = manure_separator_daily_input
         daily_output = ManureSeparatorDailyOutput(
-                simulation_day=rp.simulation_day,
-                pen_id=rp.pen_id,
-                total_daily_manure_volume=rp.total_daily_manure_volume,
+                simulation_day=daily_input.simulation_day,
+                pen_id=daily_input.pen_id,
+                total_daily_manure_volume=daily_input.daily_volume,
                 final_solids_wet_mass=(
-                        rp.TS * self.config.TS_removal_efficiency_for_separator /
+                        daily_input.TS * self.config.TS_removal_efficiency_for_separator /
                         self.config.percent_dry_solids
                 ),
 
-                TS_solid=rp.TS * self.config.TS_removal_efficiency_for_separator,
-                VS_solid=rp.VS_total * self.config.VS_removal_efficiency_for_separator,
-                N_solid=rp.N * self.config.N_removal_efficiency_for_separator,
-                P_solid=rp.P * self.config.P_removal_efficiency_for_separator,
-                K_solid=rp.K * self.config.K_removal_efficiency_for_separator,
+                TS_solid=daily_input.TS * self.config.TS_removal_efficiency_for_separator,
+                VS_solid=daily_input.VS_total * self.config.VS_removal_efficiency_for_separator,
+                N_solid=daily_input.N * self.config.N_removal_efficiency_for_separator,
+                P_solid=daily_input.P * self.config.P_removal_efficiency_for_separator,
+                K_solid=daily_input.K * self.config.K_removal_efficiency_for_separator,
 
-                TS=rp.TS * (1 - self.config.TS_removal_efficiency_for_separator),
-                VS_total=rp.VS_total * (1 - self.config.VS_removal_efficiency_for_separator),
-                N=rp.N * (1 - self.config.N_removal_efficiency_for_separator),
-                TAN=rp.TAN * (1 - self.config.TAN_removal_efficiency_for_separator),
-                P=rp.P * (1 - self.config.P_removal_efficiency_for_separator),
-                K=rp.K * (1 - self.config.K_removal_efficiency_for_separator),
+                TS=daily_input.TS * (1 - self.config.TS_removal_efficiency_for_separator),
+                VS_total=daily_input.VS_total * (1 - self.config.VS_removal_efficiency_for_separator),
+                N=daily_input.N * (1 - self.config.N_removal_efficiency_for_separator),
+                TAN=daily_input.TAN * (1 - self.config.TAN_removal_efficiency_for_separator),
+                P=daily_input.P * (1 - self.config.P_removal_efficiency_for_separator),
+                K=daily_input.K * (1 - self.config.K_removal_efficiency_for_separator),
         )
         return daily_output
-
-    # TODO: Fill this in
-    def daily_update_with_anaerobic_digestion_input(self,
-                                                    anaerobic_digestion_daily_output: ManureTreatmentDailyOutput) \
-            -> ManureSeparatorDailyOutput:
-        return ManureSeparatorDailyOutput()
 
 
 class BeltPress(BaseManureSeparator):

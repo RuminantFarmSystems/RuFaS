@@ -29,6 +29,7 @@ class ManureTreatmentDailyOutput:
     P: float = 0.0
     K: float = 0.0
     final_manure_volume: float = 0.0
+    daily_volume: float = 0.0  # To satisfy the LiquidManurePortionProtocol
 
     CH4: float = 0.0
     NH3: float = 0.0
@@ -40,8 +41,13 @@ class ManureTreatmentDailyOutput:
     sludge_N: float = 0.0
     sludge_P: float = 0.0
     sludge_K: float = 0.0
-    accumulated_sludge_TS: float = 0.0
-    accumulated_treatment_volume: float = 0.0
+    daily_sludge_volume: float = 0.0
+    accumulated_sludge_volume: float = 0.0
+    accumulated_final_manure_volume: float = 0.0
+
+    def __post_init__(self):
+        """Ensures that the daily volume is set to the final manure volume."""
+        self.daily_volume = self.final_manure_volume
 
     def __add__(self, other: ManureTreatmentDailyOutput) -> ManureTreatmentDailyOutput:
         """Adds corresponding attributes between this output and another.
@@ -90,6 +96,7 @@ class SludgeOutput:
     N: float = 0.0
     P: float = 0.0
     K: float = 0.0
+    daily_sludge_volume: float = 0.0
 
     def __add__(self, other: SludgeOutput) -> SludgeOutput:
         """Adds corresponding attributes between this output and another.

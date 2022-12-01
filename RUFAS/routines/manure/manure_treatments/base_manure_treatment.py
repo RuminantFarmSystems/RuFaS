@@ -4,17 +4,14 @@ from __future__ import annotations
 from abc import ABC
 from abc import abstractmethod
 from typing import Optional
-from typing import Union
 
 from RUFAS.routines.manure.manure_handlers.manure_handler_daily_output import ManureHandlerDailyOutput
+from RUFAS.routines.manure.manure_separators.manure_separator_classes import BaseManureSeparator
 from RUFAS.routines.manure.manure_separators.manure_separator_daily_output import ManureSeparatorDailyOutput
 from RUFAS.routines.manure.manure_treatments.manure_treatment_configs import ManureTreatmentConfig
 from RUFAS.routines.manure.manure_treatments.manure_treatment_daily_output import ManureTreatmentDailyOutput
 from RUFAS.routines.manure.pen.manure_management_pen import ManureManagementPen
-from RUFAS.routines.manure.reception_pits.reception_pit_daily_output import ReceptionPitDailyOutput
-
-# Tne input for a manure treatment can come from a reception pit or a manure separator.
-ManureTreatmentInputDataType = Union[ReceptionPitDailyOutput, ManureSeparatorDailyOutput]
+from RUFAS.routines.manure.protocols.liquid_manure_portion_protocol import LiquidManurePortionProtocol
 
 
 class BaseManureTreatment(ABC):
@@ -37,7 +34,7 @@ class BaseManureTreatment(ABC):
                 configuration for the manure treatment.
 
         Private attributes:
-            _current_input_data: The current input data assigned based on the
+            _current_manure_treatment_daily_input: The current input data assigned based on the
                 input data passed into the daily_update() method.
 
         """
@@ -48,75 +45,63 @@ class BaseManureTreatment(ABC):
         self._sim_day = -1
         self._current_pen: Optional[ManureManagementPen] = None
         self._manure_handler_daily_output = None
-        self._reception_pit_daily_output = None
-        self._manure_separator_daily_output = None
-        self._current_input_data: Optional[ManureTreatmentInputDataType] = None
-
+        self._current_manure_treatment_daily_input: Optional[LiquidManurePortionProtocol] = None
+        self._manure_separator: Optional[BaseManureSeparator] = None
+        self._manure_separator_daily_output: Optional[ManureSeparatorDailyOutput] = None
         self._accumulated_output = ManureTreatmentDailyOutput()
+
+    @property
+    def manure_separator_daily_output(self) -> Optional[ManureSeparatorDailyOutput]:
+        return self._manure_separator_daily_output
 
     def _initialize_private_attributes_during_update(self, sim_day: int,
                                                      current_pen: ManureManagementPen,
                                                      manure_handler_daily_output: ManureHandlerDailyOutput,
-                                                     reception_pit_daily_output: ReceptionPitDailyOutput,
-                                                     manure_separator_daily_output: Optional[
-                                                         ManureSeparatorDailyOutput]) \
-            -> None:
+                                                     manure_treatment_daily_input: LiquidManurePortionProtocol,
+                                                     manure_separator: BaseManureSeparator) -> \
+            None:
         self._sim_day = sim_day
         self._current_pen = current_pen
         self._manure_handler_daily_output = manure_handler_daily_output
-        self._reception_pit_daily_output = reception_pit_daily_output
-        self._manure_separator_daily_output = manure_separator_daily_output
-        self._current_input_data = manure_separator_daily_output or reception_pit_daily_output
+        self._current_manure_treatment_daily_input = manure_treatment_daily_input
+        self._manure_separator = manure_separator
 
-    def _initialize_daily_output_during_update(self) -> ManureTreatmentDailyOutput:
-        if not self._current_input_data:
-            raise ValueError('No input data was passed into the daily_update() method.')
+    def _initialize_daily_output_during_update(self, manure_treatment_daily_input: LiquidManurePortionProtocol) -> \
+            ManureTreatmentDailyOutput:
+        final_manure_volume = (manure_treatment_daily_input.daily_volume -
+                               (manure_treatment_daily_input.TS * self.config.TS_removal_efficiency_for_treatment) /
+                               1000.0)
 
-        final_manure_volume = (self._get_input_manure_volume(self._current_input_data) -
-                               (self._current_input_data.TS * self.config.TS_removal_efficiency_for_treatment) / 1000.0)
-
-        daily_output = ManureTreatmentDailyOutput(
-                simulation_day=self._current_input_data.simulation_day,
-                pen_id=self._current_input_data.pen_id,
-                TAN=self._current_input_data.TAN * (1 - self.config.TAN_removal_efficiency_for_treatment),
-                N=self._current_input_data.N * (1 - self.config.N_removal_efficiency_for_treatment),
-                TS=self._current_input_data.TS * (1 - self.config.TS_removal_efficiency_for_treatment),
-                VS_total=self._current_input_data.VS_total * (1 - self.config.VS_removal_efficiency_for_treatment),
-                P=self._current_input_data.P * (1 - self.config.P_removal_efficiency_for_treatment),
-                K=self._current_input_data.K * (1 - self.config.K_removal_efficiency_for_treatment),
+        return ManureTreatmentDailyOutput(
+                simulation_day=manure_treatment_daily_input.simulation_day,
+                pen_id=manure_treatment_daily_input.pen_id,
+                TAN=manure_treatment_daily_input.TAN * (1 - self.config.TAN_removal_efficiency_for_treatment),
+                N=manure_treatment_daily_input.N * (1 - self.config.N_removal_efficiency_for_treatment),
+                TS=manure_treatment_daily_input.TS * (1 - self.config.TS_removal_efficiency_for_treatment),
+                VS_total=manure_treatment_daily_input.VS_total * (1 - self.config.VS_removal_efficiency_for_treatment),
+                P=manure_treatment_daily_input.P * (1 - self.config.P_removal_efficiency_for_treatment),
+                K=manure_treatment_daily_input.K * (1 - self.config.K_removal_efficiency_for_treatment),
                 final_manure_volume=final_manure_volume,
         )
-        return daily_output
-
-    @classmethod
-    def _get_input_manure_volume(cls, current_input_data: ManureTreatmentInputDataType) -> float:
-        if not current_input_data:
-            raise ValueError('No input data was passed into the daily_update() method.')
-        elif isinstance(current_input_data, ManureSeparatorDailyOutput):
-            return current_input_data.final_daily_volume
-        elif isinstance(current_input_data, ReceptionPitDailyOutput):
-            return current_input_data.total_daily_manure_volume
-        else:
-            raise ValueError('Invalid input data type.')
 
     def daily_update(self,
                      manure_handler_daily_output: ManureHandlerDailyOutput,
-                     reception_pit_daily_output: ReceptionPitDailyOutput,
-                     manure_separator_daily_output: Optional[ManureSeparatorDailyOutput],
+                     manure_treatment_daily_input: LiquidManurePortionProtocol,
                      pen: ManureManagementPen,
-                     sim_day: int
+                     sim_day: int,
+                     manure_separator: Optional[BaseManureSeparator] = None
                      ) -> ManureTreatmentDailyOutput:
         """Calculates and stores the daily output of the manure treatment.
 
         Args:
             manure_handler_daily_output: A ManureHandlerDailyOutput object containing the
                 daily output of the manure handler.
-            reception_pit_daily_output: ReceptionPitDailyOutput object containing
-                the daily output of the reception pit.
-            manure_separator_daily_output: ManureSeparatorDailyOutput object containing
-                the daily output of the manure separator.
+            manure_treatment_daily_input: A LiquidManurePortionProtocol object containing
+                the daily input of the manure treatment.
             pen: A ManureManagementPen object.
             sim_day: The current simulation day.
+            manure_separator: A optional BaseManureSeparator object meant to be used in the special
+                case of digester-separator-lagoon configuration triple.
 
         Returns:
             A ManureTreatmentDailyOutput object containing the output of the manure
@@ -124,7 +109,7 @@ class BaseManureTreatment(ABC):
 
         """
         self._initialize_private_attributes_during_update(sim_day, pen, manure_handler_daily_output,
-                                                          reception_pit_daily_output, manure_separator_daily_output)
+                                                          manure_treatment_daily_input, manure_separator)
         return self._daily_update_helper()
 
     @abstractmethod

@@ -66,36 +66,22 @@ def manure_calculations(ration_formulation, feed, bw, p_feces_excrt, p_urine):
     p_excrt, WIP_frac, WOP_frac, p_excrt_manure, p_frac = \
         phosphorus_excreted(0, manure, p_feces_excrt, p_urine)
 
-    # return p_excrt, \
-    #        {"U": 0.340,  # TODO: Implement with correct equation
-    #         "TAN_s": 0.14,  # TODO: Implement with correct equation
-    #         "MN": N_manure,
-    #         "Mkg": manure,
-    #         "TSd": total_solids,
-    #         "VSd": 7087.413,  # TODO: Implement with correct equation
-    #         "VSnd": 859.390,  # TODO: Implement with correct equation
-    #         "WIP_frac": WIP_frac,
-    #         "WOP_frac": WOP_frac,
-    #         "p_excrt_manure": p_excrt_manure,
-    #         "p_frac": p_frac,
-    #         "K_manure": K_manure,
-    #         "CH4_manure": methane_emis
-    #         }
-
     return p_excrt, \
-           {"U": 0.24,  # g/L
-            "Urine": 7,  # kg
-            "TAN_s": 0.0027,  # kg
-            "MN": 0.14,  # kg
-            "Mkg": 27.22,  # kg
-            "TSd": 4.04,  # kg
-            "VSd": 2.45,  # kg
-            "VSnd": 1.00,  # kg
-            "WIP_frac": 0.00036,  # dimensionless
-            "WOP_frac": 0.00004,  # dimensionless
-            "p_excrt_manure": 0.02,  # kg
-            "p_frac": 0.00073,  # dimensionless
-            "K_manure": 0.12,  # kg
-            "CH4_manure": 1.20  # kg
+           {"U": 0.340,  # TODO: Implement with correct equation
+            "Urine": 7,
+            "TAN_s": 0.14,  # TODO: Implement with correct equation
+            "MN": N_manure,
+            "Mkg": manure,
+            "TSd": total_solids,
+            "VSd": 7087.413,  # TODO: Implement with correct equation
+            "VSnd": 859.390,  # TODO: Implement with correct equation
+            "WIP_frac": WIP_frac,
+            "WOP_frac": WOP_frac,
+            "p_excrt_manure": p_excrt_manure,
+            "p_frac": p_frac,
+            "K_manure": K_manure,
+            "CH4_manure": methane_emis
             }
+
+
 

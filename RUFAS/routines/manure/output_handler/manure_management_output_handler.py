@@ -120,8 +120,8 @@ class ManureManagementOutputHandler:
             None
 
         """
-        pen, manure_handler_output, reception_pit_output, \
-        manure_separator_output, treatment_output = data
+        (pen, manure_handler_output, reception_pit_output,
+         manure_separator_output, treatment_output) = data
         d = {
             'pen_id': [pen.id],
             'sim_day': [simulation_day],

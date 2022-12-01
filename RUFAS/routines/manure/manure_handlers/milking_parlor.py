@@ -1,4 +1,3 @@
-from RUFAS.routines.animal.pen import Pen
 from RUFAS.routines.manure.constants.manure_constants import ManureConstants
 
 
@@ -50,14 +49,14 @@ class MilkingParlor:
         return self.num_milkings * self.minutes_spent_in_holding_area
 
     @property
-    def percent_of_day_spent_in_holding_area(self) -> float:
-        """Percentage of day spent in holding area.
+    def fraction_of_day_spent_in_holding_area(self) -> float:
+        """Returns fraction of day spent in holding area.
 
-        Returns
-            Percentage of day spent in holding area.
+        Returns:
+            Fraction of day spent in holding area.
 
         """
-        return self._calc_percent_of_day_from_minutes(self.total_minutes_spent_in_holding_area)
+        return self._calc_fraction_of_day_from_minutes(self.total_minutes_spent_in_holding_area)
 
     def calc_wash_water_volume_used_in_holding_area(self, num_cows: int) -> float:
         """Calculates the volume of wash water used in holding area.
@@ -83,14 +82,14 @@ class MilkingParlor:
         return self.num_milkings * self.minutes_spent_per_milking
 
     @property
-    def percent_of_day_spent_milking(self) -> float:
-        """Percentage of day spent milking.
+    def fraction_of_day_spent_milking(self) -> float:
+        """Returns fraction of day spent milking.
 
-        Returns
-            Percentage of day spent milking.
+        Returns:
+            Fraction of day spent milking.
 
         """
-        return self._calc_percent_of_day_from_minutes(self.total_minutes_spent_milking)
+        return self._calc_fraction_of_day_from_minutes(self.total_minutes_spent_milking)
 
     def calc_fresh_water_volume_used_for_milking(self, num_cows: int) -> float:
         """Returns volume of fresh water used for milking.
@@ -119,14 +118,14 @@ class MilkingParlor:
         return self.total_minutes_spent_in_holding_area + self.total_minutes_spent_milking
 
     @property
-    def total_percent_of_day_spent_in_milking_parlor(self) -> float:
-        """Total percentage of day spent in the milking parlor per animal.
+    def total_fraction_of_day_spent_in_milking_parlor(self) -> float:
+        """Returns total fraction of day spent in the milking parlor per animal.
 
-        Returns
-            Total percentage of day spent in the milking parlor per animal.
+        Returns:
+            Total fraction of day spent in the milking parlor per animal.
 
         """
-        return self.percent_of_day_spent_in_holding_area + self.percent_of_day_spent_milking
+        return self.fraction_of_day_spent_in_holding_area + self.fraction_of_day_spent_milking
 
     def calc_total_water_volume_used_in_milking_parlor(self, num_cows: int) -> float:
         """Calculates total volume of water used in the milking parlor.
@@ -153,7 +152,7 @@ class MilkingParlor:
 
         """
         if num_cows > 0:
-            return manure_mass * self.total_percent_of_day_spent_in_milking_parlor / 100.0
+            return manure_mass * self.total_fraction_of_day_spent_in_milking_parlor
         return 0.0
 
     def calc_manure_volume_deposited_in_milking_parlor(self, num_cows: int, manure_mass: float) -> float:
@@ -169,17 +168,17 @@ class MilkingParlor:
         """
         return self.calc_manure_mass_deposited_in_milking_parlor(num_cows, manure_mass) / ManureConstants.MANURE_DENSITY
 
-    @staticmethod
-    def _calc_percent_of_day_from_minutes(minutes: float) -> float:
-        """Convert minutes to percent of day.
+    @classmethod
+    def _calc_fraction_of_day_from_minutes(cls, minutes: float) -> float:
+        """Converts minutes to fraction of day.
 
-        Parameters
+        Args:
             minutes: Number of minutes.
 
-        Returns
-            Percent of day from minutes.
+        Returns:
+            Fraction of day from minutes.
 
         """
 
         minutes_in_a_day = 60.0 * 24.0
-        return minutes * 100 / minutes_in_a_day
+        return minutes / minutes_in_a_day

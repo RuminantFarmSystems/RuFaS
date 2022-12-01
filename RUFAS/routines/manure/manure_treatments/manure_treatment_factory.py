@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import typing
 from typing import Dict
 from typing import Optional
 from typing import Type
@@ -56,8 +55,4 @@ class ManureTreatmentFactory:
             default_manure_treatment_config = DefaultManureTreatmentConfigFactory.get_instance(manure_treatment_type)
             manure_treatment_obj = manure_treatment_class(weather, time, default_manure_treatment_config)
 
-        if manure_treatment_type == ManureTreatmentType.ANAEROBIC_DIGESTION_AND_LAGOON_WITH_SPLIT:
-            typing.cast(AnaerobicDigestionAndLagoon, manure_treatment_obj).with_split = True
-
         return manure_treatment_obj
-
