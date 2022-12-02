@@ -9,9 +9,12 @@ Author(s): Kass Chupongstimun, kass_c@hotmail.com
 """
 
 from math import acos, asin, sin, tan, pi
+from RUFAS.output_manager import OutputManager
 from .crop_types import base_crop, alfalfa, corn, soybean, tall_fescue, spring_barley, potato, sugar_beet, spring_wheat
 from . import heat_units, leaf_area_index, root_development, biomass, yields, \
     phosphorus_uptake, nitrogen_uptake, growth_constraints
+
+om = OutputManager()
 
 
 def daily_crop_routine(soil, crop, field_management, weather, time):
@@ -32,6 +35,14 @@ def daily_crop_routine(soil, crop, field_management, weather, time):
     crop_type = crop.current_crop
 
     daily_reset(crop_type, soil)
+
+    info_map = {'class': 'no_caller_class',
+                'function': self.daily_crop_routine.__name__,
+                'soil': soil,
+                'crop': crop,
+                'field_management': field_management,
+                'weather': weather,
+                'time': time, }
 
     # If there is no crop in rotation this year, current crop will be named
     # 'null'. The routine is skipped in this case
@@ -70,13 +81,20 @@ def daily_crop_routine(soil, crop, field_management, weather, time):
                 # "pseudocode_crop" C.10.A.1/2
                 if crop_type.harvest_type == 'scheduled':
                     if time.day == crop_type.kill_day:
-                        yields.update_all(soil, crop_type, field_management, time)
+                        yields.update_all(
+                            soil, crop_type, field_management, time)
 
                 elif crop_type.harvest_type == 'optimal':
                     if crop_type.fr_PHU >= crop_type.fr_PHU_harvest:
-                        yields.update_all(soil, crop_type, field_management, time)
+                        yields.update_all(
+                            soil, crop_type, field_management, time)
 
                 else:
+                    harvest_type_warning = f'{crop_type.harvest_type} is not a recognized harvest type." \
+                                            " Harvesting on optimal date.'
+                    om.add_warning('harvest_type',
+                                   harvest_type_warning,
+                                   info_map)
                     print('"' + crop_type.harvest_type + '"', 'is not a recognized harvest type.'
                                                               ' Harvesting on optimal date.')
                     crop_type.harvest_type = 'optimal'
@@ -176,7 +194,8 @@ def dormancy_routine(soil, crop_type, field_management, time):
         # C.11.C.2
         if crop_type.fr_PHU > fr_PHU_harvest_min:
             yields.update_all(soil, crop_type, field_management, time)
-        crop_type.LAI_actual = max(0, min(crop_type.LAI_min, crop_type.LAI_actual))
+        crop_type.LAI_actual = max(
+            0, min(crop_type.LAI_min, crop_type.LAI_actual))
 
         # C.11.C.3
         soil.residue += crop_type.biomass_actual * 0.1
@@ -244,7 +263,8 @@ class Crop:
             elif crop_name.startswith("spring_wheat"):
                 crop = spring_wheat.SpringWheat(crop_name, crop_data)
             else:
-                print(crop_name, "is an invalid crop_type. Please consult the list of crop_types")
+                print(
+                    crop_name, "is an invalid crop_type. Please consult the list of crop_types")
                 continue
 
             self.crops_list.append(crop)
@@ -257,7 +277,8 @@ class Crop:
 
         self.current_crop = base_crop.BaseCrop()
 
-        self.grow_regimen = [self.current_crop for _ in range(0, len(time.years))]
+        self.grow_regimen = [
+            self.current_crop for _ in range(0, len(time.years))]
         self.set_grow_regimen(time)
 
         # dormancy for perennial crops
@@ -429,7 +450,8 @@ def calculate_minimum_day_length(latitude):
     solar_declination = -0.4102
     latitude_radians = latitude * pi / 180
 
-    T_dl_min = 2 * acos(-tan(solar_declination) * tan(latitude_radians)) / angular_velocity
+    T_dl_min = 2 * acos(-tan(solar_declination) *
+                        tan(latitude_radians)) / angular_velocity
 
     return T_dl_min
 
@@ -479,7 +501,8 @@ def in_dormancy(crop, time):
     angular_velocity = 0.2618
     latitude_radians = crop.latitude * pi / 180
 
-    T_dl = 2 * acos(-tan(solar_declination) * tan(latitude_radians)) / angular_velocity
+    T_dl = 2 * acos(-tan(solar_declination) *
+                    tan(latitude_radians)) / angular_velocity
 
     T_dl_thr = crop.T_dl_min + crop.t_dorm
 
