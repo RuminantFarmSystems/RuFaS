@@ -9,7 +9,9 @@ Author(s): Chris VanKerkhove, cjv47@cornell.edu
 """
 
 import pyomo.environ as pyo
+from RUFAS.output_manager import OutputManager
 
+om = OutputManager()
 
 def model_shell():
     """
@@ -159,9 +161,18 @@ def create_model(feeds_data, req_data, feeds):
     m1 = model.create_instance(data)
     results = pyo.SolverFactory('APOPT').solve(m1)
 
-    print('\nCost = ', m1.cost())
-    for i,j in m1.feed*m1.nrg:
-        print(i, j, m1.x[i,j]())
+    info_map = {"class": "no_caller_class",
+                "function": self.create_model.__name__,
+                "feeds_data": feeds_data,
+                "req_data": req_data,
+                "feeds": feeds,}
+
+    om.add_variable("m1", 
+                    m1,
+                    info_map)  
+    
+    # for i,j in m1.feed*m1.nrg:
+    #     print(i, j, m1.x[i,j]())
 
     #print('\nConstraints')
     #print('NDF Con 1  = ', m1.NDF_con1())
