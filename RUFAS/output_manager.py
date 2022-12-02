@@ -210,13 +210,13 @@ class OutputManager (object):
 
         return f"{prefix}{name}{suffix}"
 
-    def _get_prefix(self, class_: str, function: str) -> str:
+    def _get_prefix(self, caller_class: str, function: str) -> str:
         """
         Returns the prefix for a key in the pool.
 
         Parameters
         ----------
-        class : str
+        caller_class : str
             The name of the class in which this key-value pair is originated
         function : str
             The name of the function in which this key-value pair is originated
@@ -226,7 +226,7 @@ class OutputManager (object):
         str
             {class}.{function}
         """
-        return f"{class_}.{function}"
+        return f"{caller_class}.{function}"
 
     def _get_time_based_suffix(self) -> str:
         """
