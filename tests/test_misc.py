@@ -60,9 +60,9 @@ def test_is_leap_year():
 def patch_simulation_engine(mocker: MockerFixture) -> SimulationEngine:
     """Returns a mocked SimulationEngine"""
     mocker.patch(
-        'RUFAS.simulation_engine.SimulationEngine._initialize_simulation')
+        "RUFAS.simulation_engine.SimulationEngine._initialize_simulation")
 
-    sim_eng = SimulationEngine('dummy_path')
+    sim_eng = SimulationEngine("dummy_path")
     sim_eng.config = MagicMock()
     sim_eng.weather = MagicMock()
     sim_eng.time = MagicMock()
@@ -75,15 +75,15 @@ def patch_simulation_engine(mocker: MockerFixture) -> SimulationEngine:
 def test_init_simulation_engine(patch_simulation_engine: SimulationEngine) -> None:
     """Unit test for function __init__ in file RUFAS/simulation_engine.py"""
     patch_simulation_engine._initialize_simulation.assert_called_once_with(
-        'dummy_path')
+        "dummy_path")
 
 
 def test_simulate(patch_simulation_engine: SimulationEngine, mocker: MockerFixture) -> None:
     """Unit test for function simulate in file RUFAS/simulation_engine.py"""
     mocker.patch(
-        'RUFAS.simulation_engine.SimulationEngine._run_simulation_main_loop')
+        "RUFAS.simulation_engine.SimulationEngine._run_simulation_main_loop")
     mocker.patch(
-        'RUFAS.simulation_engine.SimulationEngine._show_final_messages')
+        "RUFAS.simulation_engine.SimulationEngine._show_final_messages")
     sim_eng = patch_simulation_engine
     sim_eng.simulate()
     sim_eng._run_simulation_main_loop.assert_called_once()
@@ -95,7 +95,7 @@ def test_simulate(patch_simulation_engine: SimulationEngine, mocker: MockerFixtu
 def test_show_final_messages(
         patch_simulation_engine: SimulationEngine, mocker: MockerFixture) -> None:
     """Unit test for function _show_final_messages in file RUFAS/simulation_engine.py"""
-    mocker.patch('sys.stdout.write')
+    mocker.patch("sys.stdout.write")
     patch_simulation_engine._show_final_messages(1, 1)
     assert mocker._patches_and_mocks[1][1].call_count == 3
 
@@ -103,11 +103,11 @@ def test_show_final_messages(
 def test_daily_simulation(
         patch_simulation_engine: SimulationEngine, mocker: MockerFixture) -> None:
     """Unit test for function _daily_simulation in file RUFAS/simulation_engine.py"""
-    mocker.patch('RUFAS.routines.daily_animal_routine')
-    mocker.patch('RUFAS.routines.daily_manure_storage_routine')
-    mocker.patch('RUFAS.routines.daily_fields_routine')
-    mocker.patch('RUFAS.routines.daily_feed_routine')
-    mocker.patch('RUFAS.simulation_engine.SimulationEngine._advance_time')
+    mocker.patch("RUFAS.routines.daily_animal_routine")
+    mocker.patch("RUFAS.routines.daily_manure_storage_routine")
+    mocker.patch("RUFAS.routines.daily_fields_routine")
+    mocker.patch("RUFAS.routines.daily_feed_routine")
+    mocker.patch("RUFAS.simulation_engine.SimulationEngine._advance_time")
     patch_simulation_engine._daily_simulation()
     assert patch_simulation_engine.output.daily_update.call_count == 1
     for mocked in mocker._patches_and_mocks:
@@ -117,8 +117,8 @@ def test_daily_simulation(
 def test_advance_time(
         patch_simulation_engine: SimulationEngine, mocker: MockerFixture) -> None:
     """Unit test for function _advance_time in file RUFAS/simulation_engine.py"""
-    mocker.patch('RUFAS.classes.Time.to_str')
-    mocker.patch('RUFAS.classes.Time.advance')
+    mocker.patch("RUFAS.classes.Time.to_str")
+    mocker.patch("RUFAS.classes.Time.advance")
     patch_simulation_engine.state.animal_management.simulation_day = 1
     patch_simulation_engine._advance_time(False)
     patch_simulation_engine._advance_time(True)
@@ -290,8 +290,8 @@ def test_percent_calculator() -> None:
 
 def test_get_time_based_suffix(mocker: MockerFixture) -> None:
     """Unit test for function _get_suffix in file output_manager.py"""
-    auto_suffix = '1669002803.9697945'
-    mocker.patch('time.time', return_value=auto_suffix)
+    auto_suffix = "1669002803.9697945"
+    mocker.patch("time.time", return_value=auto_suffix)
     om = OutputManager()
     assert om._get_time_based_suffix() == auto_suffix
 
@@ -299,7 +299,7 @@ def test_get_time_based_suffix(mocker: MockerFixture) -> None:
 def test_get_prefix() -> None:
     """Unit test for function _get_prefix in file output_manager.py"""
     om = OutputManager()
-    assert om._get_prefix('class', 'func') == 'class.func'
+    assert om._get_prefix("class", "func") == "class.func"
 
 
 @pytest.fixture
@@ -312,109 +312,109 @@ def test_generate_key(mocker: MockerFixture) -> None:
     """Unit test for function _generate_key in file output_manager.py"""
     om = OutputManager()
     with raises(KeyError):
-        om._generate_key('name', {})
+        om._generate_key("name", {})
 
-    auto_suffix = '1669002803.9697945'
-    mocker.patch('time.time', return_value=auto_suffix)
+    auto_suffix = "1669002803.9697945"
+    mocker.patch("time.time", return_value=auto_suffix)
 
-    info_map = {'caller_class': 'dummy_class', 'caller_function': 'dummy_func'}
-    key = om._generate_key('key_name', info_map)
-    assert key == f'dummy_class.dummy_func.key_name.{auto_suffix}'
+    info_map = {"class": "dummy_class", "function": "dummy_func"}
+    key = om._generate_key("key_name", info_map)
+    assert key == f"dummy_class.dummy_func.key_name.{auto_suffix}"
 
-    info_map['suppress_prefix'] = True
-    key = om._generate_key('key_name', info_map)
-    assert key == f'key_name.{auto_suffix}'
+    info_map["suppress_prefix"] = True
+    key = om._generate_key("key_name", info_map)
+    assert key == f"key_name.{auto_suffix}"
 
-    info_map['suppress_prefix'] = False
-    key = om._generate_key('key_name', info_map)
-    assert key == f'dummy_class.dummy_func.key_name.{auto_suffix}'
+    info_map["suppress_prefix"] = False
+    key = om._generate_key("key_name", info_map)
+    assert key == f"dummy_class.dummy_func.key_name.{auto_suffix}"
 
-    info_map['suppress_suffix'] = True
-    key = om._generate_key('key_name', info_map)
-    assert key == 'dummy_class.dummy_func.key_name'
+    info_map["suppress_suffix"] = True
+    key = om._generate_key("key_name", info_map)
+    assert key == "dummy_class.dummy_func.key_name"
 
-    info_map['suppress_suffix'] = False
-    key = om._generate_key('key_name', info_map)
-    assert key == f'dummy_class.dummy_func.key_name.{auto_suffix}'
+    info_map["suppress_suffix"] = False
+    key = om._generate_key("key_name", info_map)
+    assert key == f"dummy_class.dummy_func.key_name.{auto_suffix}"
 
-    info_map['suppress_prefix'] = True
-    info_map['suppress_suffix'] = True
-    key = om._generate_key('key_name', info_map)
-    assert key == 'key_name'
+    info_map["suppress_prefix"] = True
+    info_map["suppress_suffix"] = True
+    key = om._generate_key("key_name", info_map)
+    assert key == "key_name"
 
-    info_map['prefix'] = 'dummy_prefix'
-    info_map['suppress_suffix'] = False
-    key = om._generate_key('key_name', info_map)
-    assert key == f'dummy_prefix.key_name.{auto_suffix}'
+    info_map["prefix"] = "dummy_prefix"
+    info_map["suppress_suffix"] = False
+    key = om._generate_key("key_name", info_map)
+    assert key == f"dummy_prefix.key_name.{auto_suffix}"
 
-    info_map['suffix'] = 'dummy_suffix'
-    key = om._generate_key('key_name', info_map)
-    assert key == 'dummy_prefix.key_name.dummy_suffix'
+    info_map["suffix"] = "dummy_suffix"
+    key = om._generate_key("key_name", info_map)
+    assert key == "dummy_prefix.key_name.dummy_suffix"
 
 
 def test_add_error(mock_output_manager: OutputManager) -> None:
     """Unit test for function add_error in file output_manager.py"""
-    key = 'key'
+    key = "key"
     mock_output_manager._generate_key = MagicMock(return_value=key)
-    info_map = {'caller_class': 'dummy_class', 'caller_function': 'dummy_func'}
-    mock_output_manager.add_error('dummy_name', 'dummy_msg', info_map)
-    assert mock_output_manager.errors_pool[key] == {'info_map': {
-        'caller_class': 'dummy_class', 'caller_function': 'dummy_func'}, 'msg': 'dummy_msg'}
+    info_map = {"class": "dummy_class", "function": "dummy_func"}
+    mock_output_manager.add_error("dummy_name", "dummy_msg", info_map)
+    assert mock_output_manager.errors_pool[key] == {"info_map": {
+        "class": "dummy_class", "function": "dummy_func"}, "msg": "dummy_msg"}
 
 
 def test_add_warning(mock_output_manager: OutputManager) -> None:
     """Unit test for function add_warning in file output_manager.py"""
-    key = 'key'
+    key = "key"
     mock_output_manager._generate_key = MagicMock(return_value=key)
-    info_map = {'caller_class': 'dummy_class', 'caller_function': 'dummy_func'}
-    mock_output_manager.add_warning('dummy_name', 'dummy_msg', info_map)
-    assert mock_output_manager.warnings_pool[key] == {'info_map': {
-        'caller_class': 'dummy_class', 'caller_function': 'dummy_func'}, 'msg': 'dummy_msg'}
+    info_map = {"class": "dummy_class", "function": "dummy_func"}
+    mock_output_manager.add_warning("dummy_name", "dummy_msg", info_map)
+    assert mock_output_manager.warnings_pool[key] == {"info_map": {
+        "class": "dummy_class", "function": "dummy_func"}, "msg": "dummy_msg"}
 
 
 def test_add_log(mock_output_manager: OutputManager) -> None:
     """Unit test for function add_log in file output_manager.py"""
-    key = 'key'
+    key = "key"
     mock_output_manager._generate_key = MagicMock(return_value=key)
-    info_map = {'caller_class': 'dummy_class', 'caller_function': 'dummy_func'}
-    mock_output_manager.add_log('dummy_name', 'dummy_msg', info_map)
-    assert mock_output_manager.logs_pool[key] == {'info_map': {
-        'caller_class': 'dummy_class', 'caller_function': 'dummy_func'}, 'msg': 'dummy_msg'}
+    info_map = {"class": "dummy_class", "function": "dummy_func"}
+    mock_output_manager.add_log("dummy_name", "dummy_msg", info_map)
+    assert mock_output_manager.logs_pool[key] == {"info_map": {
+        "class": "dummy_class", "function": "dummy_func"}, "msg": "dummy_msg"}
 
 
 def test_add_variable(mock_output_manager: OutputManager) -> None:
     """Unit test for function add_variable in file output_manager.py"""
-    key = 'key'
+    key = "key"
     mock_output_manager._generate_key = MagicMock(return_value=key)
-    info_map = {'caller_class': 'dummy_class', 'caller_function': 'dummy_func'}
-    mock_output_manager.add_variable('dummy_name', 'dummy_value', info_map)
-    assert mock_output_manager.variables_pool[key] == 'dummy_value'
+    info_map = {"class": "dummy_class", "function": "dummy_func"}
+    mock_output_manager.add_variable("dummy_name", "dummy_value", info_map)
+    assert mock_output_manager.variables_pool[key] == "dummy_value"
 
     with raises(ValueError):
-        mock_output_manager.add_variable('dummy_name', 'dummy_value', info_map)
+        mock_output_manager.add_variable("dummy_name", "dummy_value", info_map)
     # TODO issue 214
 
 
 def test_output_manager_singleton(mocker: MockerFixture) -> None:
     """Test case to ensure output_manager is singleton"""
-    key = 'key1'
-    mocker.patch('RUFAS.output_manager.OutputManager._generate_key',
+    key = "key1"
+    mocker.patch("RUFAS.output_manager.OutputManager._generate_key",
                  return_value=key)
     om1 = OutputManager()
     om2 = OutputManager()
-    info_map = {'caller_class': 'dummy_class', 'caller_function': 'dummy_func'}
-    om1.add_variable('dummy_name', 'dummy_value', info_map)
-    assert om2.variables_pool[key] == 'dummy_value'
+    info_map = {"class": "dummy_class", "function": "dummy_func"}
+    om1.add_variable("dummy_name", "dummy_value", info_map)
+    assert om2.variables_pool[key] == "dummy_value"
 
 
 def test_flush_pools() -> None:
     """Test case for function flush_pools in output_manager.py"""
     om = OutputManager()
-    info_map = {'caller_class': 'dummy_class', 'caller_function': 'dummy_func'}
-    om.add_variable('dummy_name', 'dummy_value', info_map)
-    om.add_log('dummy_name', 'dummy_msg', info_map)
-    om.add_warning('dummy_name', 'dummy_msg', info_map)
-    om.add_error('dummy_name', 'dummy_msg', info_map)
+    info_map = {"class": "dummy_class", "function": "dummy_func"}
+    om.add_variable("dummy_name", "dummy_value", info_map)
+    om.add_log("dummy_name", "dummy_msg", info_map)
+    om.add_warning("dummy_name", "dummy_msg", info_map)
+    om.add_error("dummy_name", "dummy_msg", info_map)
     om.flush_pools()
     assert om.variables_pool == {}
     assert om.logs_pool == {}
@@ -424,7 +424,7 @@ def test_flush_pools() -> None:
 
 def test_save_all_pools(mock_output_manager: OutputManager) -> None:
     """Test case for function save_all_pools in output_manager.py"""
-    path = 'dummy_path'
+    path = "dummy_path"
     mock_output_manager.save_errors = MagicMock()
     mock_output_manager.save_warnings = MagicMock()
     mock_output_manager.save_logs = MagicMock()
@@ -441,10 +441,10 @@ def test_save_all_pools(mock_output_manager: OutputManager) -> None:
 def test_generate_file_name(mocker: MockerFixture) -> None:
     """Unit test for function _generate_file_name in file output_manager.py"""
     om = OutputManager()
-    auto_suffix = '1669002803.9697945'
-    mocker.patch('time.time', return_value=auto_suffix)
-    name = om._generate_file_name('base_name', 'json')
-    assert name == 'base_name_1669002803.9697945.json'
+    auto_suffix = "1669002803.9697945"
+    mocker.patch("time.time", return_value=auto_suffix)
+    name = om._generate_file_name("base_name", "json")
+    assert name == "base_name_1669002803.9697945.json"
 
 
 def test_save_variables(mock_output_manager: OutputManager) -> None:
@@ -453,7 +453,7 @@ def test_save_variables(mock_output_manager: OutputManager) -> None:
         return_value="dummy_name")
     mock_output_manager._dict_to_file_json = MagicMock()
 
-    mock_output_manager.save_variables('dummy_path')
+    mock_output_manager.save_variables("dummy_path")
 
     mock_output_manager._generate_file_name.assert_called_once_with(
         "variables", "json")
@@ -467,7 +467,7 @@ def test_save_logs(mock_output_manager: OutputManager) -> None:
         return_value="dummy_name")
     mock_output_manager._dict_to_file_json = MagicMock()
 
-    mock_output_manager.save_logs('dummy_path')
+    mock_output_manager.save_logs("dummy_path")
 
     mock_output_manager._generate_file_name.assert_called_once_with(
         "logs", "json")
@@ -481,7 +481,7 @@ def test_save_warnings(mock_output_manager: OutputManager) -> None:
         return_value="dummy_name")
     mock_output_manager._dict_to_file_json = MagicMock()
 
-    mock_output_manager.save_warnings('dummy_path')
+    mock_output_manager.save_warnings("dummy_path")
 
     mock_output_manager._generate_file_name.assert_called_once_with(
         "warnings", "json")
@@ -495,7 +495,7 @@ def test_save_errors(mock_output_manager: OutputManager) -> None:
         return_value="dummy_name")
     mock_output_manager._dict_to_file_json = MagicMock()
 
-    mock_output_manager.save_errors('dummy_path')
+    mock_output_manager.save_errors("dummy_path")
 
     mock_output_manager._generate_file_name.assert_called_once_with(
         "errors", "json")
