@@ -246,43 +246,52 @@ class OutputManager (object):
 
     def _generate_file_name(self, base_name: str, extension: str = "json") -> str:
         """
-        Returns a file name using the given base_name and timestamp
+        Returns a file name using the given base_name and timestamp.
         """
         return f"{base_name}_{self._get_time_based_suffix()}.{extension}"
 
     def save_variables(self, path: str) -> None:
         """
-        Saves the variables_pool into the given path as a json file
+        Saves the variables_pool into a json file in the given path to a directory.
         """
         file_path=os.path.join(path,self._generate_file_name("variables","json"))
         self._dict_to_file_json(self.variables_pool, file_path)
 
     def save_logs(self, path: str) -> None:
         """
-        Saves the logs_pool into the given path as a json file
+        Saves the logs_pool into a json file in the given path to a directory.
         """
         file_path=os.path.join(path,self._generate_file_name("logs","json"))
         self._dict_to_file_json(self.logs_pool, file_path)
 
     def save_warnings(self, path: str) -> None:
         """
-        Saves the warnings_pool into the given path as a json file
+        Saves the warnings_pool into a json file in the given path to a directory.
         """
         file_path=os.path.join(path,self._generate_file_name("warnings","json"))
         self._dict_to_file_json(self.warnings_pool, file_path)
 
     def save_errors(self, path: str) -> None:
         """
-        Saves the errors_pool into the given path as a json file
+        Saves the errors_pool into a json file in the given path to a directory.
         """
         file_path=os.path.join(path,self._generate_file_name("errors","json"))
         self._dict_to_file_json(self.errors_pool, file_path)
 
     def save_all_pools(self, path:str)->None:
         """
-        Saves all pool into the given path
+        Saves all pool into the given path to a directory.
         """
         self.save_variables(path)
         self.save_errors(path)
         self.save_logs(path)
         self.save_warnings(path)
+
+    def flush_pools(self)->None:
+        """
+        Sets all pools to an empty dictionary.
+        """   
+        self.variables_pool: Dict[str, Any] = {}
+        self.warnings_pool: Dict[str, Any] = {}
+        self.errors_pool: Dict[str, Any] = {}
+        self.logs_pool: Dict[str, Any] = {}
