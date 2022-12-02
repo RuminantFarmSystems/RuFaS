@@ -5,8 +5,9 @@ Description: Implements test cases
 Author(s): Pooya Hekmati, sh2235@cornell.edu
 """
 
+import os
 import pytest
-from mock.mock import MagicMock
+from mock.mock import MagicMock,mock_open
 from pytest import approx, raises
 from pytest_mock.plugin import MockerFixture
 
@@ -301,6 +302,12 @@ def test_get_prefix() -> None:
     assert om._get_prefix('class', 'func') == 'class.func'
 
 
+@pytest.fixture
+def mock_output_manager(mocker) -> OutputManager:
+    output_manager = OutputManager()
+    return output_manager
+
+
 def test_generate_key(mocker: MockerFixture) -> None:
     """Unit test for function _generate_key in file output_manager.py"""
     om = OutputManager()
@@ -345,58 +352,46 @@ def test_generate_key(mocker: MockerFixture) -> None:
     assert key == 'dummy_prefix.key_name.dummy_suffix'
 
 
-def test_add_error(mocker: MockerFixture) -> None:
+def test_add_error(mock_output_manager: OutputManager) -> None:
     """Unit test for function add_error in file output_manager.py"""
-
     key = 'key'
-    mocker.patch('RUFAS.output_manager.OutputManager._generate_key',
-                 return_value=key)
-    om = OutputManager()
+    mock_output_manager._generate_key = MagicMock(return_value=key)
     info_map = {'caller_class': 'dummy_class', 'caller_function': 'dummy_func'}
-    om.add_error('dummy_name', 'dummy_msg', info_map)
-    assert om.errors_pool[key] == {'info_map': {
+    mock_output_manager.add_error('dummy_name', 'dummy_msg', info_map)
+    assert mock_output_manager.errors_pool[key] == {'info_map': {
         'caller_class': 'dummy_class', 'caller_function': 'dummy_func'}, 'msg': 'dummy_msg'}
 
 
-def test_add_warning(mocker: MockerFixture) -> None:
+def test_add_warning(mock_output_manager: OutputManager) -> None:
     """Unit test for function add_warning in file output_manager.py"""
-
     key = 'key'
-    mocker.patch('RUFAS.output_manager.OutputManager._generate_key',
-                 return_value=key)
-    om = OutputManager()
+    mock_output_manager._generate_key = MagicMock(return_value=key)
     info_map = {'caller_class': 'dummy_class', 'caller_function': 'dummy_func'}
-    om.add_warning('dummy_name', 'dummy_msg', info_map)
-    assert om.warnings_pool[key] == {'info_map': {
+    mock_output_manager.add_warning('dummy_name', 'dummy_msg', info_map)
+    assert mock_output_manager.warnings_pool[key] == {'info_map': {
         'caller_class': 'dummy_class', 'caller_function': 'dummy_func'}, 'msg': 'dummy_msg'}
 
 
-def test_add_log(mocker: MockerFixture) -> None:
+def test_add_log(mock_output_manager: OutputManager) -> None:
     """Unit test for function add_log in file output_manager.py"""
-
     key = 'key'
-    mocker.patch('RUFAS.output_manager.OutputManager._generate_key',
-                 return_value=key)
-    om = OutputManager()
+    mock_output_manager._generate_key = MagicMock(return_value=key)
     info_map = {'caller_class': 'dummy_class', 'caller_function': 'dummy_func'}
-    om.add_log('dummy_name', 'dummy_msg', info_map)
-    assert om.logs_pool[key] == {'info_map': {
+    mock_output_manager.add_log('dummy_name', 'dummy_msg', info_map)
+    assert mock_output_manager.logs_pool[key] == {'info_map': {
         'caller_class': 'dummy_class', 'caller_function': 'dummy_func'}, 'msg': 'dummy_msg'}
 
 
-def test_add_variable(mocker: MockerFixture) -> None:
+def test_add_variable(mock_output_manager: OutputManager) -> None:
     """Unit test for function add_variable in file output_manager.py"""
-
     key = 'key'
-    mocker.patch('RUFAS.output_manager.OutputManager._generate_key',
-                 return_value=key)
-    om = OutputManager()
+    mock_output_manager._generate_key = MagicMock(return_value=key)
     info_map = {'caller_class': 'dummy_class', 'caller_function': 'dummy_func'}
-    om.add_variable('dummy_name', 'dummy_value', info_map)
-    assert om.variables_pool[key] == 'dummy_value'
+    mock_output_manager.add_variable('dummy_name', 'dummy_value', info_map)
+    assert mock_output_manager.variables_pool[key] == 'dummy_value'
 
     with raises(ValueError):
-        om.add_variable('dummy_name', 'dummy_value', info_map)
+        mock_output_manager.add_variable('dummy_name', 'dummy_value', info_map)
     # TODO issue 214
 
 
@@ -408,5 +403,101 @@ def test_output_manager_singleton(mocker: MockerFixture) -> None:
     om1 = OutputManager()
     om2 = OutputManager()
     info_map = {'caller_class': 'dummy_class', 'caller_function': 'dummy_func'}
-    om1.add_variable('dummy_name', 'dummy_value', info_map)    
+    om1.add_variable('dummy_name', 'dummy_value', info_map)
     assert om2.variables_pool[key] == 'dummy_value'
+
+
+def test_flush_pools() -> None:
+    """Test case for function flush_pools in output_manager.py"""
+    om = OutputManager()
+    info_map = {'caller_class': 'dummy_class', 'caller_function': 'dummy_func'}
+    om.add_variable('dummy_name', 'dummy_value', info_map)
+    om.add_log('dummy_name', 'dummy_msg', info_map)
+    om.add_warning('dummy_name', 'dummy_msg', info_map)
+    om.add_error('dummy_name', 'dummy_msg', info_map)
+    om.flush_pools()
+    assert om.variables_pool == {}
+    assert om.logs_pool == {}
+    assert om.warnings_pool == {}
+    assert om.errors_pool == {}
+
+
+def test_save_all_pools(mock_output_manager: OutputManager) -> None:
+    """Test case for function save_all_pools in output_manager.py"""
+    path = 'dummy_path'
+    mock_output_manager.save_errors = MagicMock()
+    mock_output_manager.save_warnings = MagicMock()
+    mock_output_manager.save_logs = MagicMock()
+    mock_output_manager.save_variables = MagicMock()
+
+    mock_output_manager.save_all_pools(path)
+
+    mock_output_manager.save_errors.assert_called_once_with(path)
+    mock_output_manager.save_warnings.assert_called_once_with(path)
+    mock_output_manager.save_logs.assert_called_once_with(path)
+    mock_output_manager.save_variables.assert_called_once_with(path)
+
+
+def test_generate_file_name(mocker: MockerFixture) -> None:
+    """Unit test for function _generate_file_name in file output_manager.py"""
+    om = OutputManager()
+    auto_suffix = '1669002803.9697945'
+    mocker.patch('time.time', return_value=auto_suffix)
+    name = om._generate_file_name('base_name', 'json')
+    assert name == 'base_name_1669002803.9697945.json'
+
+
+def test_save_variables(mock_output_manager: OutputManager) -> None:
+    """Test case for function save_variables in output_manager.py"""
+    mock_output_manager._generate_file_name = MagicMock(
+        return_value="dummy_name")
+    mock_output_manager._dict_to_file_json = MagicMock()
+
+    mock_output_manager.save_variables('dummy_path')
+
+    mock_output_manager._generate_file_name.assert_called_once_with(
+        "variables", "json")
+    mock_output_manager._dict_to_file_json.assert_called_once_with(
+        mock_output_manager.variables_pool, os.path.join("dummy_path", "dummy_name"))
+
+
+def test_save_logs(mock_output_manager: OutputManager) -> None:
+    """Test case for function save_logs in output_manager.py"""
+    mock_output_manager._generate_file_name = MagicMock(
+        return_value="dummy_name")
+    mock_output_manager._dict_to_file_json = MagicMock()
+
+    mock_output_manager.save_logs('dummy_path')
+
+    mock_output_manager._generate_file_name.assert_called_once_with(
+        "logs", "json")
+    mock_output_manager._dict_to_file_json.assert_called_once_with(
+        mock_output_manager.logs_pool, os.path.join("dummy_path", "dummy_name"))
+
+
+def test_save_warnings(mock_output_manager: OutputManager) -> None:
+    """Test case for function save_warnings in output_manager.py"""
+    mock_output_manager._generate_file_name = MagicMock(
+        return_value="dummy_name")
+    mock_output_manager._dict_to_file_json = MagicMock()
+
+    mock_output_manager.save_warnings('dummy_path')
+
+    mock_output_manager._generate_file_name.assert_called_once_with(
+        "warnings", "json")
+    mock_output_manager._dict_to_file_json.assert_called_once_with(
+        mock_output_manager.warnings_pool, os.path.join("dummy_path", "dummy_name"))
+
+
+def test_save_errors(mock_output_manager: OutputManager) -> None:
+    """Test case for function save_errors in output_manager.py"""
+    mock_output_manager._generate_file_name = MagicMock(
+        return_value="dummy_name")
+    mock_output_manager._dict_to_file_json = MagicMock()
+
+    mock_output_manager.save_errors('dummy_path')
+
+    mock_output_manager._generate_file_name.assert_called_once_with(
+        "errors", "json")
+    mock_output_manager._dict_to_file_json.assert_called_once_with(
+        mock_output_manager.errors_pool, os.path.join("dummy_path", "dummy_name"))
