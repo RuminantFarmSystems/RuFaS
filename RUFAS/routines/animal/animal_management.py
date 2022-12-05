@@ -376,25 +376,41 @@ class AnimalManagement:
 
         # stratefying the pens that lost animals by animal group
         # (values are dictionaries of pen IDs, with values being the number of animals removed)
+        # IS THIS EVEN RIGHT? The keys are ENUMS
+
+        # creates a dictionary with animal combinations as keys and dictionaries as values
         grouped_pens_short = {Pen.AnimalCombination.CALF: {}, Pen.AnimalCombination.GROWING: {},
                               Pen.AnimalCombination.CLOSE_UP: {}, Pen.AnimalCombination.GROWING_AND_CLOSE_UP: {},
                               Pen.AnimalCombination.LAC_COW: {}}
+        # loops through id_removed, which is a list of the animals IDs that have been removed from the herd
         for i in ids_removed:
+            # loops through animal ID/pen ID dictionary
             if i in self.id_pen:
+                # creates pen variable that grabs the current pen of the animal removed?
                 pen = self.all_pens[self.id_pen[i]]
-                # adding count to animals that left pen
+                # adding count to animals that left pen, according to the animal combination and pen
                 if pen.id in grouped_pens_short[pen.animal_combination]:
                     grouped_pens_short[pen.animal_combination][pen.id] += 1
                 else:
                     grouped_pens_short[pen.animal_combination][pen.id] = 1
 
+                # deletes the pen according to the id of the animal removed
                 del self.id_pen[i]
 
+        # initializes pen population before additions?
         pen_population_before_additions = {}
+        # loops through the pens objects and grabs their indices
         for i, pen in enumerate(self.all_pens):
+            # populates dictionary with indices of pens as keys and amount of animals in pen as key
             pen_population_before_additions[i] = len(pen.animals_in_pen)
 
+        # loops through the animal IDs that were added to the herd
         for animal in animals_added:
+
+            # check the animal type, before then setting animal_p_conc variable to the P composition of that class
+            # adds animal id to list of animal class that id pertains to
+            # then sets the group variable to the correct Animal Combination type
+
             if type(animal).__name__ == 'Calf':
                 animal_p_conc = self.p_comp['calf']
                 self.calves.append(animal)
@@ -426,17 +442,24 @@ class AnimalManagement:
             # stocking density
             # if there are no pens of group calves that lost animals
             if grouped_pens_short[group] == {}:
-                # variable to track lowest stocking density
+                # variable to track lowest stocking density, should be renamed to density
+                # why is the density initialized to 10,000?
                 dens = 10000
+                # loops through a dictionary for keeping track of what animal types each pen is holding, where
+                # the value of the dictionaries are lists of pen objects, is this even pen specific?
                 for p in self.pens_by_animal_combination[group]:
                     if p.stocking_density < dens:
+                        # set pen and density to the pen in question and the stocking density within it
                         pen = p
                         dens = p.stocking_density
             # if there are pens of group calves that lost animals
             else:
-                # variable to track highest animal shortage across these pens
+                # variable to track highest animal shortage across these pens, WHY IS THIS CALLED N??
                 n = 0
+
+                # loops through keys and values of the grouped_pen_short for the cow class in question
                 for id, v in grouped_pens_short[group].items():
+                    # if the pen_id value is greater than n, then we
                     if v > n:
                         pen = self.all_pens[id]
                         n = v
