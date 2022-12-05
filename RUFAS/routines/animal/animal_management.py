@@ -374,17 +374,22 @@ class AnimalManagement:
             temp: the temperature on the current day
         """
 
-        # stratefying the pens that lost animals by animal group
+        # Stratefying the pens that lost animals by animal group
         # (values are dictionaries of pen IDs, with values being the number of animals removed)
         # IS THIS EVEN RIGHT? The keys are ENUMS
 
-        # creates a dictionary with animal combinations as keys and dictionaries as values
+        # Creates a dictionary with animal combinations as keys and dictionaries as values.
+        # A better name should be implemented here in the future.
         grouped_pens_short = {Pen.AnimalCombination.CALF: {}, Pen.AnimalCombination.GROWING: {},
                               Pen.AnimalCombination.CLOSE_UP: {}, Pen.AnimalCombination.GROWING_AND_CLOSE_UP: {},
                               Pen.AnimalCombination.LAC_COW: {}}
-        # loops through id_removed, which is a list of the animals IDs that have been removed from the herd
+
+        # Loops through ids_removed, which is a list of the animals IDs that have been removed from the herd.
+        # Loop variable should be changed from "i" to something more intuitive.
         for i in ids_removed:
-            # loops through animal ID/pen ID dictionary
+            # If the given animal ID is in the animal ID/pen ID dictionary
+            # Why would a removed animal still be in a pen?
+            # Is this if statement even useful, shouldn't we be doing this anyway?
             if i in self.id_pen:
                 # creates pen variable that grabs the current pen of the animal removed?
                 pen = self.all_pens[self.id_pen[i]]
