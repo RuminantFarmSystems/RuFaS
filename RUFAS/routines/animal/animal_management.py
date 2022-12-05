@@ -391,7 +391,7 @@ class AnimalManagement:
             # Why would a removed animal still be in a pen?
             # Is this if statement even useful, shouldn't we be doing this anyway?
             if i in self.id_pen:
-                # creates pen variable that grabs the current pen of the animal removed?
+                # Creates pen variable that grabs the current pen of the animal removed?
                 pen = self.all_pens[self.id_pen[i]]
                 # adding count to animals that left pen, according to the animal combination and pen
                 if pen.id in grouped_pens_short[pen.animal_combination]:
