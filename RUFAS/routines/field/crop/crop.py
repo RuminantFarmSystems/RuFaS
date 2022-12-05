@@ -37,7 +37,7 @@ def daily_crop_routine(soil, crop, field_management, weather, time):
     daily_reset(crop_type, soil)
 
     info_map = {"class": "no_caller_class",
-                "function": self.daily_crop_routine.__name__,
+                "function": daily_crop_routine.__name__,
                 "soil": soil,
                 "crop": crop,
                 "field_management": field_management,

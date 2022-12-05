@@ -162,7 +162,7 @@ def create_model(feeds_data, req_data, feeds):
     results = pyo.SolverFactory('APOPT').solve(m1)
 
     info_map = {"class": "no_caller_class",
-                "function": self.create_model.__name__,
+                "function": create_model.__name__,
                 "feeds_data": feeds_data,
                 "req_data": req_data,
                 "feeds": feeds,}
