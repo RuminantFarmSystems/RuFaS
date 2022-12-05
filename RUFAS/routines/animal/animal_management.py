@@ -389,32 +389,36 @@ class AnimalManagement:
         for i in ids_removed:
             # If the given animal ID is in the animal ID/pen ID dictionary
             # Why would a removed animal still be in a pen?
-            # Is this if statement even useful, shouldn't we be doing this anyway?
+            # Is this if statement even useful, shouldn't we be doing this regardless of whether the animal ID
+            #     is in the dictionary?
             if i in self.id_pen:
-                # Creates pen variable that grabs the current pen of the animal removed?
+                # Creates a "pen" variable that grabs the current pen of the animal removed
+                # Is all_pens pen ID indexed or normally zero-indexed?
                 pen = self.all_pens[self.id_pen[i]]
-                # adding count to animals that left pen, according to the animal combination and pen
+                # Adds count of animal that have been removed from the herd,
+                #     based on what animal combination and pen they were in
                 if pen.id in grouped_pens_short[pen.animal_combination]:
                     grouped_pens_short[pen.animal_combination][pen.id] += 1
                 else:
                     grouped_pens_short[pen.animal_combination][pen.id] = 1
 
-                # deletes the pen according to the id of the animal removed
+                # Deletes the animal ID key entry corresponding to the id of the animal removed
                 del self.id_pen[i]
 
-        # initializes pen population before additions?
+        # Initializes pen population dictionary before additions are made
         pen_population_before_additions = {}
-        # loops through the pens objects and grabs their indices
+        # Loops through the pens objects on the farm and their indices from the all_pens list
         for i, pen in enumerate(self.all_pens):
-            # populates dictionary with indices of pens as keys and amount of animals in pen as key
+            # Populates dictionary with indices of pens as keys and amount of animals in pen as key
             pen_population_before_additions[i] = len(pen.animals_in_pen)
 
-        # loops through the animal IDs that were added to the herd
+        # Loops through the animal IDs pertaining to the animals that were added to the herd
         for animal in animals_added:
 
-            # check the animal type, before then setting animal_p_conc variable to the P composition of that class
-            # adds animal id to list of animal class that id pertains to
-            # then sets the group variable to the correct Animal Combination type
+            # Check the animal type, before then setting animal_p_conc variable to the P(hosphorus)
+            #      composition of that cow class
+            # We then add the animal ID to the list of animal class that animal ID pertains to
+            # Last, we set a group variable to the correct Animal Combination type, depending on the animal type
 
             if type(animal).__name__ == 'Calf':
                 animal_p_conc = self.p_comp['calf']
@@ -445,45 +449,62 @@ class AnimalManagement:
             # Choosing pen to place new animal first by checking if there are
             # pens that lost animals, and choosing the pen with the lowest
             # stocking density
-            # if there are no pens of group calves that lost animals
+
+            # If there are no pens holding the cow type within "group" that lost animals
             if grouped_pens_short[group] == {}:
-                # variable to track lowest stocking density, should be renamed to density
-                # why is the density initialized to 10,000?
+                # We create variable to track the lowest stocking density, should be renamed to density
+                # Is there a reason why the density is initialized to 10,000?
                 dens = 10000
-                # loops through a dictionary for keeping track of what animal types each pen is holding, where
-                # the value of the dictionaries are lists of pen objects, is this even pen specific?
+                # We loop through all the pens that are holding the animal type stored in "group" variable
                 for p in self.pens_by_animal_combination[group]:
+                    # If the stocking density is less than our density variable
                     if p.stocking_density < dens:
-                        # set pen and density to the pen in question and the stocking density within it
+                        # We set pen and density variable to the pen in question and its stocking density
                         pen = p
                         dens = p.stocking_density
-            # if there are pens of group calves that lost animals
+            # If there are pens holding the cow type within the "group" variable that lost animals
             else:
-                # variable to track highest animal shortage across these pens, WHY IS THIS CALLED N??
+                # Create a variable to track the highest animal shortage across these pens
+                # Rename this variable from "n"
                 n = 0
 
-                # loops through keys and values of the grouped_pen_short for the cow class in question
+                # We loop through the keys and values of the grouped_pen_short dictionary for the cow class in question
+                # The keys are pen IDs, and the values are the number of animals removed from those pens
                 for id, v in grouped_pens_short[group].items():
-                    # if the pen_id value is greater than n, then we
+                    # If the number of animals removed from the current pen is larger than n
                     if v > n:
+                        # We set the pen variable to the pen at the correct id
+                        # Suggestion to change "id" to "index"
                         pen = self.all_pens[id]
+                        # Update the variable tracking the highest animal shortage across these pens
                         n = v
 
-            # updating id_pen variable
+            # Updating id_pen variable to reflect the right pen ID for the animal ID added
             self.id_pen[animal.id] = pen.id
-            # setting up new animal
+            # Setting up new animal and inserting it into the pen in question?
             self.all_pens[pen.id].set_up_new_animal(animal, animal_p_conc,
                                                     feed, temp, pen_population_before_additions[pen.id])
 
+        # We loop through the numbers of all the pens on the farm
+        # I would suggest we rename the loop variable pen as it is an index and not an actual pen
         for pen in range(len(self.all_pens)):
+            # If there are animals in the pen, the only animal type of the pen is 'Cow'
+            #     and the ration has yet to be formulated
             if len(self.all_pens[pen].animals_in_pen) > 0 and 'Cow' in self.all_pens[pen].classes_in_pen and \
                     self.all_pens[pen].ration == {}:
+                # We create an "available_feeds" variable (instance of AvailableFeeds class)
+                #    calculated using the ration driver
                 available_feeds = ration_driver.AvailableFeeds()
+                # Creates a list with the available feed information
                 available_feeds.feed_nutrients(feed)
+                # We set the ration of the pen in question by calling calc_ration() on the aforementioned pen
                 self.all_pens[pen].ration = self.all_pens[pen].calc_ration(feed, available_feeds)
             else:
-                # Need to adjust the ration totals for the pen attributes now
-                # that all new animals have been added
+                # This else statement needs to be reworked because we don't know which one of the three conditionals
+                #     was not met above
+                # From Militsa: "We need to adjust the ration totals for the pen attributes now
+                #     that all new animals have been added"
+                # Need clarification on what this does
                 for key in self.all_pens[pen].ration:
                     if key != 'status' and key != 'objective':
                         self.all_pens[pen].ration[key] = \
@@ -491,30 +512,47 @@ class AnimalManagement:
                              pen_population_before_additions[pen]) * len(
                                 self.all_pens[pen].animals_in_pen)
 
+        # Here, we loop though the calf objects that were added to the pen (they were born)
         for calf in calves_born:
-            # getting valid pen to place calves in
-            # if there are no pens of group calves that lost animals
+            # We initialize a pen variable that will be edited later to place these calves in
+            # From Chris VKH: "getting valid pen to place calves in
+            #      if there are no pens of group calves that lost animals"
             pen = None
+            # If no calves have been removed from the herd
             if grouped_pens_short[Pen.AnimalCombination.CALF] == {}:
-                # variable to track lowest stocking density
+                # Variable to track lowest stocking density
+                # Once again, we should rename this to "density" and why is it initialized to 10000?
                 dens = 10000
+                # We loop through the pens that contains calves currently
                 for p in self.pens_by_animal_combination[Pen.AnimalCombination.CALF]:
+                    # If the pen in question has a lower stocking density than our "dens" variable
                     if p.stocking_density < dens:
+                        # We will update our pen variable and density variable to those of that pen
                         pen = p
                         dens = p.stocking_density
-            # if there are pens of group calves that lost animals
+            # If there are pens of holding calves that lost animals
             else:
-                # variable to track highest animal shortage across these pens
+                # Initialize variable to track highest animal shortage across these pens
+                # Once agin, this needs to be renamed from "n"
                 n = 0
+                # We loop through the keys and values of the grouped_pen_short dictionary for the calf class
+                # The keys are pen IDs, and the values are the number of animals removed from those pens
                 for id, v in grouped_pens_short[Pen.AnimalCombination.CALF].items():
+                    # If the number of animals removed from the pen observed is greater than "n"
                     if v > n:
+                        # We set the pen variable to the pen at the correct id
+                        # Suggestion to change "id" to "index"
                         pen = self.all_pens[id]
+                        # Update the variable tracking the highest animal shortage across these pens
                         n = v
+            # Why do we have a special case here for calves?
+            # We then assign the animal ID for the calf in question the pen ID where it will be housed
             self.id_pen[calf.id] = pen.id
+            # We add the calf object to the list of calves in the herd
             self.calves.append(calf)
+            #  We set up a new animal and insert it into the pen in question?
             self.all_pens[pen.id].set_up_new_animal(calf, self.pasture_concentrate,
                                                     feed, temp, pen_population_before_additions[pen.id])
-            # self.all_pens[pen].animals_in_pen.append(calf)
 
     def allocate_calf_pens(self, calf_pens):
         stalls = [pen.num_stalls for pen in calf_pens]
