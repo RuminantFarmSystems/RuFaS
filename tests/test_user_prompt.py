@@ -1,14 +1,17 @@
+import argparse
 import os.path
 from pathlib import Path
 
 import pytest
 from pytest_mock import MockerFixture
 
-from config import global_variables
-from RUFAS import errors
-from RUFAS.user_prompt import get_json_list_from_dir
+import config.global_variables
+from RUFAS import errors, SimulationEngine
+from RUFAS.user_prompt import get_json_list_from_dir, user_prompt, convert_path_string_to_list
 from RUFAS.user_prompt import obtain_file_list
 from RUFAS.user_prompt import prompt_user_for_input
+from config import global_variables
+from main import parse_gnu_args, run_rufas, set_global_variables, execute_simulations_from_files
 
 dir_path = os.path.join(global_variables.ROOT_DIR, "input")
 file_path = os.path.join(dir_path, "input/ARL.json")
@@ -37,22 +40,83 @@ def test_obtain_file_list(mocker: MockerFixture, path):
         patch_for_user_prompt.assert_not_called()
 
 
-@pytest.mark.parametrize("path", [file_path, dir_path])
-def test_convert_path_string_to_list(path):
+@pytest.mark.parametrize("path, is_file, is_dir", [
+    ("dummy_json.json", True, False),
+    ("dummy_dir", False, True),
+    ("valid_dummy_txt_file.txt", True, False),
+    ("invalid_dummy_txt_file.txt", False, False),
+    ("invalid_file_path", False, False)
+])
+def test_convert_path_string_to_list(path: str,
+                                     is_file: bool,
+                                     is_dir: bool,
+                                     mocker: MockerFixture,
+                                     capsys: pytest.CaptureFixture):
     """check that convert_path_string_to_list provides correct file lists"""
-    pass
+    # Arrange
+    input_path = mocker.MagicMock(auto_spec=Path)
+    input_path.__str__.return_value = path
+    input_path.is_dir.return_value = is_dir
+    input_path.is_file.return_value = is_file
+    input_path.suffix = '.' + path.split(".")[-1]
+    verbose = True
+    json_filename = "dummy.json"
+    patch_for_path_init = mocker.patch("RUFAS.user_prompt.Path", side_effect=[input_path, input_path])
+    patch_for_convert_to_json = mocker.patch("RUFAS.user_prompt.fileReader.convert_to_json",
+                                             return_value=json_filename)
+    patch_for_convert_json_path_to_list = mocker.patch("RUFAS.user_prompt.convert_json_path_to_list",
+                                                       return_value=[input_path])
+    patch_for_get_json_list_from_dir = mocker.patch("RUFAS.user_prompt.get_json_list_from_dir",
+                                                    return_value=[json_filename])
+    patch_for_builtin_warning = mocker.patch("builtins.Warning")
+
+    # Act
+    if not is_file and not is_dir:
+        if input_path.suffix == ".txt":
+            with pytest.raises(errors.UserInput) as e:
+                convert_path_string_to_list(path, verbose)
+        else:
+            with pytest.raises(ValueError) as e:
+                convert_path_string_to_list(path, verbose)
+                assert "Invalid input path" in str(e.value)
+        return
+
+    actual_file_list = convert_path_string_to_list(path, verbose)
+
+    # Assert
+    if is_dir:
+        patch_for_path_init.assert_called_once_with(path)
+        input_path.is_dir.assert_called_once()
+        patch_for_get_json_list_from_dir.assert_called_once_with(input_path, verbose)
+    elif input_path.suffix == ".txt":
+        patch_for_builtin_warning.assert_called_once()
+        input_path.is_file.assert_called_once()
+        patch_for_convert_to_json.assert_called_once_with(str(input_path))
+        assert actual_file_list == [input_path]
+        if verbose:
+            captured = capsys.readouterr()
+            assert "commented json file detected, stripping comments" in captured.out
+    elif input_path.suffix == ".json":
+        patch_for_path_init.assert_called_once_with(path)
+        patch_for_convert_json_path_to_list.assert_called_once_with(input_path, verbose)
 
 
 @pytest.mark.parametrize("user_input", [file_path, dir_path])
-def test_user_prompt(user_input):
+def test_user_prompt(user_input: str, mocker: MockerFixture):
     """check that user_prompt() correctly accepts user input and returns a Path list"""
-    pass
+    # Arrange
+    patch_for_prompt_user_for_input = mocker.patch("RUFAS.user_prompt.prompt_user_for_input",
+                                                   return_value=user_input)
+    patch_for_convert_path_string_to_list = mocker.patch("RUFAS.user_prompt.convert_path_string_to_list",
+                                                         return_value=[user_input])
 
+    # Act
+    actual = user_prompt()
 
-@pytest.mark.parametrize("path", [file_path, dir_path])
-def test_convert_path_string_to_list(path):
-    """check that convert_path_string_to_list() properly returns a Path list"""
-    pass
+    # Assert
+    patch_for_prompt_user_for_input.assert_called_once()
+    patch_for_convert_path_string_to_list.assert_called_once_with(path=user_input)
+    assert actual == [user_input]
 
 
 def test_get_json_list_from_dir(mocker: MockerFixture,
@@ -116,7 +180,6 @@ def test_get_json_list_from_dir(mocker: MockerFixture,
 @pytest.mark.parametrize("path", [file_path])
 def test_convert_json_path_to_list(path):
     """check that convert_json_path_to_list() properly returns a Path list from a json path string"""
-    pass
 
 
 @pytest.mark.parametrize("user_input", ['Q', 'q', file_path, dir_path, 'dir', 'error'])
@@ -159,3 +222,98 @@ def test_prompt_user_for_input(mocker: MockerFixture, capsys: pytest.CaptureFixt
     else:
         patch_for_input.assert_called_once_with("\nEnter RUFAS Input: ")
         assert actual_user_input == 'input/' + user_input
+
+
+@pytest.mark.parametrize("input_path, make_graphs, verbose", [
+    ("dummy_path", True, True),
+    ("dummy_path", False, True),
+    ("dummy_path", True, False),
+    ("dummy_path", False, False)
+])
+def test_run_rufas(input_path: str,
+                   make_graphs: bool,
+                   verbose: bool,
+                   mocker: MockerFixture) -> None:
+    """Checks that run_rufas() calls the correct functions in the correct order"""
+    # Arrange
+    patch_for_set_global_variables = mocker.patch("main.set_global_variables")
+    file_list = ['file1.json', 'file2.json']
+    patch_for_obtain_file_list = mocker.patch("main.obtain_file_list", return_value=file_list)
+    patch_for_execute_simulations_from_files = mocker.patch("main.execute_simulations_from_files")
+
+    # Act
+    run_rufas(input_path, make_graphs, verbose)
+
+    # Assert
+    patch_for_set_global_variables.assert_called_once_with(make_graphs, verbose)
+    patch_for_obtain_file_list.assert_called_once_with(input_path, verbose)
+    patch_for_execute_simulations_from_files.assert_called_once_with(file_list)
+
+
+@pytest.mark.parametrize("make_graphs, verbose", [
+    (True, True),
+    (False, True),
+    (True, False),
+    (False, False)
+])
+def test_set_global_variables(make_graphs: bool,
+                              verbose: bool,
+                              mocker: MockerFixture) -> None:
+    """Checks that set_global_variables() sets the global variables correctly"""
+    # Arrange
+    old_make_graphs = config.global_variables.PRODUCE_GRAPHICS
+    old_verbose = config.global_variables.PRINT_STATUS_MESSAGES
+
+    # Act
+    set_global_variables(make_graphs, verbose)
+
+    # Assert
+    assert config.global_variables.PRODUCE_GRAPHICS == make_graphs
+    assert config.global_variables.PRINT_STATUS_MESSAGES == verbose
+
+    # Cleanup
+    config.global_variables.PRODUCE_GRAPHICS = old_make_graphs
+    config.global_variables.PRINT_STATUS_MESSAGES = old_verbose
+
+
+def test_execute_simulations_from_files(mocker: MockerFixture) -> None:
+    """Checks that execute_simulations_from_files() calls the correct functions in the correct order"""
+    # Arrange
+    file_path1 = Path('file1.json')
+    file_path2 = Path('file2.json')
+    file_list = [file_path1, file_path2]
+    mock_simulator = mocker.MagicMock(auto_spec=SimulationEngine)
+    mock_simulator.simulate.return_value = None
+    patch_for_simulation_engine_init = mocker.patch("main.SimulationEngine", return_value=mock_simulator)
+
+    # Act
+    execute_simulations_from_files(file_list)
+
+    # Assert
+    assert patch_for_simulation_engine_init.call_count == 2
+    assert patch_for_simulation_engine_init.call_args_list == [mocker.call(file_path1), mocker.call(file_path2)]
+    assert mock_simulator.simulate.call_count == 2
+
+
+def test_parse_gnu_args(mocker: MockerFixture) -> None:
+    """Checks that parse_gnu_args() correctly parses the user's input."""
+    # Arrange
+    mock_parser = mocker.MagicMock(auto_spec=argparse.ArgumentParser)
+    mock_add_argument = mocker.patch.object(mock_parser, "add_argument")
+    mock_parse_args = mocker.patch.object(mock_parser, "parse_args", return_value="test_args")
+    mocker.patch("main.argparse.ArgumentParser",
+                 return_value=mock_parser)
+
+    # Act
+    actual_args = parse_gnu_args()
+
+    # Assert
+    assert mock_add_argument.call_count == 3
+    assert mock_add_argument.call_args_list == [
+        mocker.call("input_path", type=str, metavar="path", nargs="?",
+                    help="path to input .json file or directory of .json files"),
+        mocker.call("-ng", "--no-graphics", help="prevent graphics from generating", action="store_true"),
+        mocker.call("-v", "--verbose", help="print progress messages", action="store_true")
+    ]
+    mock_parse_args.assert_called_once()
+    assert actual_args == "test_args"

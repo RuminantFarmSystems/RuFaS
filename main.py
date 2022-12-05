@@ -6,13 +6,13 @@ This file serves as a main entry point to RuFaS.
 The main function run_rufas() will execute the model simulation(s). It accepts a path to the location of the input
 file(s) or, if this input is not given, it will run in interactive mode and accept input from the user.
 """
+import argparse
+from pathlib import Path
 from typing import List
 
 import config.global_variables
-import argparse
 from RUFAS.simulation_engine import SimulationEngine
 from RUFAS.user_prompt import obtain_file_list
-from pathlib import Path
 
 
 def run_rufas(input_path=None, make_graphs=True, verbose=True):
