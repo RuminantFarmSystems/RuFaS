@@ -7,6 +7,7 @@ from pytest_mock import MockerFixture
 
 import config.global_variables
 from RUFAS import errors, SimulationEngine
+from RUFAS.output_manager import OutputManager
 from RUFAS.user_prompt import get_json_list_from_dir, user_prompt, convert_path_string_to_list
 from RUFAS.user_prompt import obtain_file_list
 from RUFAS.user_prompt import prompt_user_for_input
@@ -279,6 +280,10 @@ def test_set_global_variables(make_graphs: bool,
 def test_execute_simulations_from_files(mocker: MockerFixture) -> None:
     """Checks that execute_simulations_from_files() calls the correct functions in the correct order"""
     # Arrange
+    mock_output_manager = mocker.MagicMock(auto_spec=OutputManager)
+    mock_output_manager.flush_pools.return_value = None
+    mock_output_manager.save_all_pools.return_value = None
+    mocker.patch("main.OutputManager", return_value=mock_output_manager)
     file_path1 = Path('file1.json')
     file_path2 = Path('file2.json')
     file_list = [file_path1, file_path2]
@@ -290,9 +295,12 @@ def test_execute_simulations_from_files(mocker: MockerFixture) -> None:
     execute_simulations_from_files(file_list)
 
     # Assert
-    assert patch_for_simulation_engine_init.call_count == 2
+    assert patch_for_simulation_engine_init.call_count == len(file_list)
     assert patch_for_simulation_engine_init.call_args_list == [mocker.call(file_path1), mocker.call(file_path2)]
-    assert mock_simulator.simulate.call_count == 2
+    assert mock_simulator.simulate.call_count == len(file_list)
+    assert mock_output_manager.flush_pools.call_count == len(file_list)
+    assert mock_output_manager.save_all_pools.call_count == len(file_list)
+    assert mock_output_manager.save_all_pools.call_args_list == [mocker.call('output')] * len(file_list)
 
 
 def test_parse_gnu_args(mocker: MockerFixture) -> None:
