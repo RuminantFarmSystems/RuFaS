@@ -606,8 +606,7 @@ class Soil:
 
             # S.4.A.2
             org_C = layer.org_C
-            print(layer.org_C)
-            org_N = (10 ** 4) * (org_C / 14)
+            org_N = (10 ** 4) * (org_C / 14) #nitrogen bug
 
             # S.4.A.3
             frac_N = 0.02

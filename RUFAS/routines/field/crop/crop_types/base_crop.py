@@ -118,7 +118,7 @@ class BaseCrop:
         # biomass
         self.kl = 0.65  # psuedocode C.9.A.2
         """float: light extinction coefficient"""
-        self.RUE = 20  # psuedocode C.9.A.2
+        self.RUE = 100  # psuedocode C.9.A.2
         """float: crop-specific radiation use efficiency"""
         self.T_opt = 25  # psuedocode C.7.B.2
         """float: crop-specific optimal temperature for growth"""

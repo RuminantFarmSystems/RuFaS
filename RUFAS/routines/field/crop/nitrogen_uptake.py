@@ -223,6 +223,7 @@ def calc_layer_nitrogen_demand(uptake_potentials: list[float], nitrate_availabil
     """
     layer_delta = [desired - available for desired, available in zip(uptake_potentials, nitrate_availabilities)]
     layer_demand = [sum(layer_delta[:i]) for i in range(len(layer_delta))]  # cumulative sum, starting at 0
+    
     return [max(val, 0) for val in layer_demand]  # results constrained to zero
 
 
@@ -245,7 +246,7 @@ def uptake_nitrogen(crop, soil) -> None:
                                                ndistro=crop.beta_n)
     demands = calc_layer_nitrogen_demand(uptake_potentials=potentials, nitrate_availabilities=layer_nitrates)
     uptakes = calc_layer_nitrogen_uptake(layer_demand=demands, layer_potential=potentials, layer_nitrate=layer_nitrates)
-    #print('layer demands',demands)
+    #print('layer potentials',potentials)
 
     #print('layer uptakes',uptakes)
     # update attributes
@@ -272,6 +273,7 @@ def calc_layer_nitrogen_potential(boundaries: list[float], demand: float,
     Returns: a list of potential nitrogen uptake from each layer
     """
     # check that boundaries are in ascending order
+
     sorted_boundaries = boundaries.copy()
     sorted_boundaries.sort()
     if sorted_boundaries != boundaries:
@@ -280,7 +282,8 @@ def calc_layer_nitrogen_potential(boundaries: list[float], demand: float,
     if len(boundaries) != len(set(boundaries)):
         raise ValueError("multiple soil boundaries cannot have the same depths. Remove the redundant layer?")
     # calculate results
-    boundary_nitrogen = [calc_nitrogen_uptake_to_depth(demand, x, root_depth, ndistro) for x in boundaries]  # N at each boundary
+    boundary_nitrogen = [calc_nitrogen_uptake_to_depth(demand, x, root_depth, ndistro) for x in boundaries] 
+ # N at each boundary
     boundary_nitrogen.insert(0, 0)  # 0 N uptake at soil surface
     layer_nitrogen = [below - above for below, above in zip(boundary_nitrogen[1:], boundary_nitrogen)]  # subtract previous layer
     return layer_nitrogen

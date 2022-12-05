@@ -96,13 +96,13 @@ CORN = {
         "fr_PHU_sen": 0.90,
         "fr_PHU_harvest": 1.2,
         "fr_PHU_harvest_min": 0.7,
-        "LAI_max": 3,
+        "LAI_max": 10,
         "LAI_min": 0,
         # root depth
         "z_root_max": 2000,
         # biomass
         "kl": 0.65,
-        "RUE": 39,
+        "RUE": 700,
         "T_opt": 25,
         # water uptake
         "beta_w": 10,

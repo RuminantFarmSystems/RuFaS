@@ -56,7 +56,6 @@ def daily_crop_routine(soil, crop, field_management, weather, time, croptime):
     for k in range(len(daily_crops_growing)):
         crop_type_name = daily_crops_growing[k]
         crop_type= crop.current_crop[crop_type_name]
-        
         if not in_dormancy(crop, time):
         
             daily_reset(crop_type, soil)
@@ -305,7 +304,6 @@ def kill_non_scheduled_crops(crop_type,soil,field_management,time):
     if crop_type.crop_type == 'perennial':
         fr_PHU_harvest_min = crop_type.fr_PHU_harvest_min
         # C.11.C.2
-        
         if crop_type.fr_PHU > fr_PHU_harvest_min:
             yields.update_all(soil, crop_type, field_management, time)
             print('killed it:', crop_type.crop_name, 'with:',crop_type.yield_actual)

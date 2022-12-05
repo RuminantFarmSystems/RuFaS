@@ -93,12 +93,9 @@ def mineralization_decomp(soil):
     layer.NH4 += (0.8 * fresh_min)
 
     # "pseudocode_soil" S.4.E.7/8
-    #print(soil.ag_biomass)
     soil.fresh_N += 0.0015 * soil.ag_biomass
     soil.ag_biomass=0
     
-    #soil.fresh_N += 0
-
     soil.soil_layers[0] = layer
 
     soil.residue = soil.residue * (1 - soil.decay_rate)
