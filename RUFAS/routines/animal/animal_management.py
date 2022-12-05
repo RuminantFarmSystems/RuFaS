@@ -14,6 +14,7 @@ Author(s): Militsa Sotirova, militsasotirova@gmail.com
            Chris VanKerkhove, cjv47@cornell.edu
            Joseph Merhi, jm2257@cornell.edu
 """
+from RUFAS.output_manager import OutputManager
 from RUFAS.routines.animal.pen import Pen
 from RUFAS.routines.animal.clustering_pen_grouping import grouping
 from RUFAS.routines.animal.life_cycle.life_cycle import LifeCycleManager
@@ -23,6 +24,8 @@ from collections import deque
 import random
 from typing import Tuple
 from statistics import mean
+
+om = OutputManager()
 
 def daily_animal_routine(animal_management, feed, weather, time):
     """
@@ -160,6 +163,11 @@ class AnimalManagement:
             herd_data: dictionary containing information about the herd
         """
 
+        info_map = {"class": self.__class__.__name__, 
+                    "function": self.init_pens.__name__,
+                    "all_pens_data": all_pens_data,
+                    "herd_data": herd_data,}
+
         for pen_name in all_pens_data:
             pen_data = all_pens_data[pen_name]
             pen_id = pen_data['id']
@@ -193,8 +201,12 @@ class AnimalManagement:
         manure_separator = "sedimentation"
         manure_storage = "storage_pit"
         animal_combination = None
+        info_map["all_pens"] = self.all_pens
         if (len(self.all_pens) == 0) and (herd_num > 0):
-            print('Warning: herd_num > 0, but pen_num = 0. Initilizing 3 default pens.')
+            om.add_warning("invalid_pen_num_warning", 
+                            "Warning: herd_num > 0, but pen_num = 0."
+                            + " Initilizing 3 default pens.",
+                             info_map)
             pen_1 = Pen(0, 0.1, 1.6, 100, 'open air barn', 'sand', 'freestall',
                         manure_handling, manure_separator, manure_storage,
                         animal_combination, 1.2)
@@ -208,7 +220,10 @@ class AnimalManagement:
             self.all_pens.append(pen_2)
             self.all_pens.append(pen_3)
         elif (len(self.all_pens) == 1) and (herd_num > 0):
-            print('Warning: herd_num > 0, but pen_num = 1. Initilizing 2 default pens.')
+            om.add_warning("invalid_pen_num_warning", 
+                            "Warning: herd_num > 0, but pen_num = 1."
+                            + " Initilizing 2 default pens.",
+                             info_map)
             pen_2 = Pen(1, 0.1, 1.6, 300, 'open air barn', 'sawdust', 'freestall',
                         manure_handling, manure_separator, manure_storage,
                         animal_combination, 1.2)
@@ -218,7 +233,10 @@ class AnimalManagement:
             self.all_pens.append(pen_2)
             self.all_pens.append(pen_3)
         elif (len(self.all_pens) == 2) and (herd_num > 0):
-            print('Warning: herd_num > 0, but pen_num = 2. Initilizing 1 default pen.')
+            om.add_warning("invalid_pen_num_warning", 
+                            "Warning: herd_num > 0, but pen_num = 2." 
+                            + " Initilizing 1 default pen.",
+                             info_map)
             pen_3 = Pen(2, 0.1, 1.6, 300, 'open air barn', 'straw', 'tiestall',
                         manure_handling, manure_separator, manure_storage,
                         animal_combination, 1.2)
@@ -242,7 +260,14 @@ class AnimalManagement:
             weather: instance of the Weather class defined in classes.py
             time: instance of the Time class defined in classes.py
         """
-
+        info_map = {"class": self.__class__.__name__, 
+                    "function": self.__init__.__name__,
+                    "herd_data": herd_data,
+                    "pen_data": pen_data,
+                    "weather": weather,
+                    "time": time,
+                    "config": config,
+                    "feed": feed,}
         calf_num = herd_data['calf_num']
         heiferI_num = herd_data['heiferI_num']
         heiferII_num = herd_data['heiferII_num']
@@ -255,24 +280,35 @@ class AnimalManagement:
         if herd_num == 0:
             self.simulate_animals = False
             if not calf_num == 0:
-                print("Warning: herd_num is 0, but calf_num is not. "
-                      "Setting calf_num = 0.")
+                om.add_warning("invalid_calf_num_warning", 
+                                "Warning: herd_num is 0, but calf_num is not."
+                                + " Setting calf_num = 0.", 
+                                info_map)
                 calf_num = 0
             if not heiferI_num == 0:
-                print("Warning: herd_num is 0, but heiferI_num is not. "
-                      "Setting heiferI_num = 0.")
+                om.add_warning("invalid_heiferI_num_warning", 
+                                "Warning: herd_num is 0, but heiferI_num is not."
+                                + " Setting heiferI_num = 0.", 
+                                info_map)
                 heiferI_num = 0
             if not heiferII_num == 0:
-                print("Warning: herd_num is 0, but heiferII_num is not. "
-                      "Setting heiferII_num = 0.")
+                om.add_warning("invalid_heiferII_num_warning", 
+                                "Warning: herd_num is 0, but heiferII_num is not."
+                                + " Setting heiferII_num = 0.", 
+                                info_map)
                 heiferII_num = 0
             if not heiferIII_num == 0:
-                print("Warning: herd_num is 0, but heiferIII_num is not. "
-                      "Setting heiferIII_num = 0.")
+                om.add_warning("invalid_heiferIII_num_warning", 
+                                "Warning: herd_num is 0, but heiferIII_num is not."
+                                + " Setting heiferII_num = 0.", 
+                                info_map)
                 heiferIII_num = 0
             if not cow_num == 0:
-                print("Warning: herd_num is 0, but cow_num is not. "
-                      "Setting cow_num = 0.")
+
+                om.add_warning("invalid_cow_num_warning", 
+                                "Warning: herd_num is 0, but cow_num is not."
+                                + " Setting cow_num = 0.", 
+                                info_map)
                 cow_num = 0
         else:
             self.simulate_animals = True
@@ -570,6 +606,9 @@ class AnimalManagement:
                 else:
                     mixed_types[pen.id] = pen.animal_combination
         # organzing pens by class and ensuring sufficeint storage
+        info_map = {"class": self.__class__.__name__, 
+                    "function": self.pen_allocation.__name__,
+                    "all_pens": self.all_pens,}
         while True:
             max_value = max(stall_shortage.values())
             if max_value > 0:
@@ -584,7 +623,10 @@ class AnimalManagement:
                         stalls = pen.num_stalls
                 # if no available pens for this group in mixed types
                 if pen is None:
-                    print('Warning: shortage of ', max_key[0].name, ' pens, initializing new pen')
+                    om.add_warning("pen_shortage_warning", 
+                                    f"Warning: shortage of {max_key[0].name} pens," 
+                                    + " initializing new pen,", 
+                                    info_map)
                     # initalizing a default pen to be used for any class
                     pen = Pen(len(self.all_pens), 0.1, 1.6, max_value,
                               'open air barn', 'straw', 'tiestall', 'manual_scraping',
@@ -943,7 +985,7 @@ class AnimalManagement:
                 [pen_hist.__dict__ for pen_hist in animal.pen_history],
             'event_history': animal.events.events,
             'CI_avg': CI_avg
-        }
+        } 
 
     def get_life_cycle_output(self, num_animals):
         """
@@ -960,16 +1002,26 @@ class AnimalManagement:
 
         Returns: a dictionary which contains the individual life cycle output
         """
+
+        
         minimum_num = min(len(self.calves), len(self.heiferIs),
                           len(self.heiferIIs), len(self.heiferIIIs),
                           len(self.cows),
                           len(self.life_cycle_manager.sold_heifers),
                           len(self.life_cycle_manager.culled_cows))
+
+        info_map = {"class": self.__class__.__name__, 
+                    "function": self.get_life_cycle_output.__name__,
+                    "num_animals": num_animals,
+                    "minimum_num": minimum_num,}
+
         if num_animals > minimum_num:
-            print('\nThe smallest animal list is of size ' + str(minimum_num) +
-                  ' so ' + str(num_animals) + ' of each animal class cannot ' +
-                  'be in the life cycle output. Only ' + str(minimum_num) +
-                  ' of each animal type will be in the life cycle output.')
+            om.add_warning("invalid_animal_list_size", 
+                            f"The smallest animal list is of size {minimum_num}"
+                            + f" so {num_animals} of each animal class cannot be" 
+                            + f" in the life cycle output. Only {minimum_num} of" 
+                            + " each animal type will be in the life cycle output.",
+                            info_map)
             num_animals = minimum_num
 
         output = {

@@ -13,6 +13,7 @@ from typing import List
 import config.global_variables
 from RUFAS.simulation_engine import SimulationEngine
 from RUFAS.user_prompt import obtain_file_list
+from RUFAS.output_manager import OutputManager
 
 
 def run_rufas(input_path=None, make_graphs=True, verbose=True):
@@ -34,10 +35,13 @@ def set_global_variables(make_graphs: bool, verbose: bool) -> None:
 
 def execute_simulations_from_files(files: List[Path]) -> None:
     """execute simulations for each file"""
-    for f in files:
-        simulator = SimulationEngine(f)
+    output_manager = OutputManager()
+    input_file_list = files
+    for input_file_path in input_file_list:
+        output_manager.flush_pools()
+        simulator = SimulationEngine(input_file_path)
         simulator.simulate()
-
+        output_manager.save_all_pools(r'output')
 
 def parse_gnu_args():
     """parse command line options, if applicable"""
