@@ -64,7 +64,10 @@ def convert_path_string_to_list(path: str, verbose: bool = True):
     """
     input_path = Path(str(path).strip())
 
-    if input_path.suffix == '.txt':  # TODO: Deprecated - GitHub Issue #210
+    if input_path.is_dir():
+        return get_json_list_from_dir(input_path, verbose)
+
+    elif input_path.suffix == '.txt':  # TODO: Deprecated - GitHub Issue #210
         Warning("ability to use .txt files is deprecated. Please use .json input files in the future")
         if not input_path.is_file():
             raise errors.UserInput("Specified file does not exist")
@@ -74,11 +77,8 @@ def convert_path_string_to_list(path: str, verbose: bool = True):
         json_path = Path(json_filename.strip())
         return [json_path]
 
-    if input_path.suffix == '.json':
+    elif input_path.suffix == '.json':
         return convert_json_path_to_list(input_path, verbose)
-
-    elif input_path.is_dir():
-        return get_json_list_from_dir(input_path, verbose)
 
     else:
         raise ValueError("Invalid input path")
