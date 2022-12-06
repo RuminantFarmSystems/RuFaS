@@ -62,6 +62,7 @@ class Crop(GrowthConstraints, BiomassAllocation, WaterDynamics, NitrogenIncorpor
         self.cycle_water(evaporation, transpiration, max_evapotranspiration)
 
     def list_all_var_names(self):
+        """list all variables used by Crop"""  # TODO: check for duplicates or conflicts among parents
         return vars(self)
 
 
