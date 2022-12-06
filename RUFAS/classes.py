@@ -153,25 +153,20 @@ class Config:
 
             # compares actual size of the file to expected size
             if file_line - 1 != expected_w_file_size + 1:
-                dates_not_matching_size = "Start and end dates of the Weather CSV file do not match the size."
-                om.add_warning("dates_not_matching_size",
-                               dates_not_matching_size,
+                dates_not_matching_size = "Start and end dates of the Weather CSV file" \
+                    " do not match the size."
+                om.add_warning("dates_not_matching_size", dates_not_matching_size,
                                info_map)
                 if file_line - 1 > expected_w_file_size + 1:
                     info_map["weather_full_path.name"] = weather_full_path.name
                     duplicate_days = f"There may be duplicate days in {weather_full_path.name}"
-                    om.add_warning("duplicate_days",
-                                   duplicate_days,
-                                   info_map)
+                    om.add_warning("duplicate_days", duplicate_days, info_map)
                 else:
                     missing_days = f"There may be missing days in: {weather_full_path.name}"
-                    om.add_warning("missing_days",
-                                   missing_days,
-                                   info_map)
+                    om.add_warning("missing_days", missing_days, info_map)
                 expected_weather_file_size = f"Weather File Size: {file_line - 1}\n" \
                                              f" Expected size: {expected_w_file_size + 1}"
-                om.add_log("expected_weather_file_size",
-                           expected_weather_file_size,
+                om.add_log("expected_weather_file_size", expected_weather_file_size,
                            info_map)
 
         self.w_start_year = w_start_year
@@ -185,100 +180,65 @@ class Config:
                 or self.start_year < w_start_year:
             start_date_error = "Start date invalid. Starting simulation on " \
                 f"{w_start_year}:{w_start_day}"
-            om.add_error("invalid_start_date",
-                         start_date_error,
-                         info_map)
+            om.add_error("invalid_start_date", start_date_error, info_map)
             self.start_day = w_start_day
-
-            om.add_variable("start_day",
-                            self.start_day,
-                            info_map)
+            om.add_variable("start_day", self.start_day, info_map)
             self.start_year = w_start_year
-            om.add_variable("start_year",
-                            self.start_year,
-                            info_map)
+            om.add_variable("start_year", self.start_year, info_map)
 
         if self.end_year == w_end_year and self.end_day > w_end_day \
                 or self.end_year > w_end_year:
             end_date_error = "End date invalid. Ending simulation on " \
                 f"{w_end_year}:{w_end_day}"
-            om.add_error("invalid_end_date",
-                         end_date_error,
-                         info_map)
+            om.add_error("invalid_end_date", end_date_error, info_map)
             self.end_day = w_end_day
-            om.add_variable("end_day",
-                            self.end_day,
-                            info_map)
+            om.add_variable("end_day", self.end_day, info_map)
             self.end_year = w_end_year
-            om.add_variable("end_year",
-                            self.end_year,
-                            info_map)
+            om.add_variable("end_year", self.end_year, info_map)
 
         # start date errors if the simulation starts before day 1 or after
         # the last possible day of the year
         if self.start_day < 1:
             start_date_error_2 = "Start date invalid. Starting simulation on " \
                 f"{self.start_year}:1"
-            om.add_error("invalid_start_date_2",
-                         start_date_error_2,
-                         info_map)
+            om.add_error("invalid_start_date_2", start_date_error_2, info_map)
             self.start_day = 1
-            om.add_variable("start_day",
-                            self.start_day,
-                            info_map)
+            om.add_variable("start_day", self.start_day, info_map)
         if not is_leap_year(self.start_year):
             if self.start_day > year_length:
                 start_date_error_3 = "Start date invalid. Starting simulation on " \
                     f"{self.start_year}:{year_length}"
-                om.add_error("invalid_start_date_3",
-                             start_date_error_3,
-                             info_map)
+                om.add_error("invalid_start_date_3", start_date_error_3, info_map)
                 self.start_day = year_length
-                om.add_variable("start_day",
-                                self.start_day,
-                                info_map)
+                om.add_variable("start_day", self.start_day, info_map)
         else:
             if self.start_day > leap_year_length:
                 start_date_error_4 = "Start date invalid. Starting simulation on " \
                     f"{self.start_year}:{leap_year_length}"
-                om.add_error("invalid_start_date_4",
-                             start_date_error_4,
-                             info_map)
+                om.add_error("invalid_start_date_4", start_date_error_4, info_map)
                 self.start_day = leap_year_length
-                om.add_variable("start_day",
-                                self.start_day,
-                                info_map)
+                om.add_variable("start_day", self.start_day, info_map)
 
         # end date errors if the simulation ends before day 1 or after
         # the last possible day of the year
         if self.end_day < 1:
             end_date_error_2 = "End date invalid. Ending simulation on " \
                 f"{self.end_year}:1"
-            om.add_error("invalid_end_date_2",
-                         end_date_error_2,
-                         info_map)
+            om.add_error("invalid_end_date_2", end_date_error_2, info_map)
             self.end_day = 1
-            om.add_variable("end_day",
-                            self.end_day,
-                            info_map)
+            om.add_variable("end_day", self.end_day, info_map)
         if not is_leap_year(self.end_year):
             if self.end_day > year_length:
                 end_date_error_3 = "End date invalid. Ending simulation on " \
                     f"{self.end_year}:{year_length}"
-                om.add_error("invalid_end_date_3",
-                             end_date_error_3,
-                             info_map)
+                om.add_error("invalid_end_date_3", end_date_error_3, info_map)
                 self.end_day = year_length
-                om.add_variable("end_day",
-                                self.end_day,
-                                info_map)
+                om.add_variable("end_day", self.end_day, info_map)
         else:
             if self.end_day > leap_year_length:
                 end_date_error_4 = "End date invalid. Ending simulation on " \
                     f"{self.end_year}:{leap_year_length}"
-                om.add_error("invalid_end_date_4",
-                             end_date_error_4,
-                             info_map)
+                om.add_error("invalid_end_date_4", end_date_error_4, info_map)
                 self.end_day = leap_year_length
                 om.add_variable("end_day", self.end_day, info_map)
 
@@ -496,9 +456,7 @@ class Weather:
             if skips > 5:
                 weather_csv_error_pt3 = "Only printing first 5 invalid rows, there are" \
                     f" {skips} total invalid rows."
-                om.add_error("weather_csv_error_pt3",
-                             weather_csv_error_pt3,
-                             info_map)
+                om.add_error("weather_csv_error_pt3", weather_csv_error_pt3, info_map)
 
             # calculates T_avg_annual for each year
             for i in range(len(years)):
