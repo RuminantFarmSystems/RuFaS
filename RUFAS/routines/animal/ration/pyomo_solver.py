@@ -167,6 +167,7 @@ def create_model(feeds_data, req_data, feeds):
                 "req_data": req_data,
                 "feeds": feeds,}
 
+    # TODO update "m1" variable to a more descriptive name.
     om.add_variable("m1", m1, info_map)  
     
     # for i,j in m1.feed*m1.nrg:
