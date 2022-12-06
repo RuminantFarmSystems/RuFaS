@@ -139,11 +139,11 @@ def calc_shape_log(heat_fraction: float, leaf_area_fraction: float) -> float:
 def calc_shape_parameters(first_heat_fraction: float, second_heat_fraction: float,
                           first_leaf_fraction: float, second_leaf_fraction: float) -> list[float]:
     """calculates the shape coefficients for optimal LAI formula"""
-    if not 0 < first_heat_fraction:
+    if first_heat_fraction <= 0:
         raise ValueError("first_heat_fraction must be greater than 0")
-    if not 0 < second_heat_fraction:
+    if second_heat_fraction <= 0:
         raise ValueError("second_heat_fraction must be greater than 0")
-    if not 0 < first_leaf_fraction < 1:
+    if no 0 < first_leaf_fraction < 1:
         raise ValueError("first_leaf_fraction must not be greater than 0 or less than 1")
     if not 0 < second_leaf_fraction < 1:
         raise ValueError("second_leaf_fraction must not be greater than 0 or less than 1")

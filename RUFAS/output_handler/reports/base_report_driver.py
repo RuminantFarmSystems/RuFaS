@@ -14,16 +14,16 @@ class BaseReportDriver:
         self.reports = {}
 
     def initialize(self):
-        info_map = {'caller_class': self.__class__.__name__, 
-                    'caller_function': self.initialize.__name__,}
+        info_map = {"class": self.__class__.__name__, 
+                    "function": self.initialize.__name__,}
         if self.produce_csv:
             for report in self.reports.values():
                 if not report.produce_csv and report.produce_graphics:
-                    info_map['report'] = report
-                    om.add_warning('inactive_report_warning', 
-                                    'Warning: Cannot produce graphics for'
-                                    + f' inactive report: {report.report_name}.'
-                                    + ' Setting produce_graphics to False', 
+                    info_map["report"] = report
+                    om.add_warning("inactive_report_warning", 
+                                    "Warning: Cannot produce graphics for"
+                                    + f" inactive report: {report.report_name}."
+                                    + " Setting produce_graphics to False", 
                                     info_map)
                     report.produce_graphics = False
                 if report.produce_csv:
