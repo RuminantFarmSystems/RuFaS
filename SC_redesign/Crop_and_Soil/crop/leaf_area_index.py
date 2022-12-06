@@ -143,7 +143,7 @@ def calc_shape_parameters(first_heat_fraction: float, second_heat_fraction: floa
         raise ValueError("first_heat_fraction must be greater than 0")
     if second_heat_fraction <= 0:
         raise ValueError("second_heat_fraction must be greater than 0")
-    if first_leaf_fraction <= 0:
+    if no 0 < first_leaf_fraction < 1:
         raise ValueError("first_leaf_fraction must not be greater than 0 or less than 1")
     if not 0 < second_leaf_fraction < 1:
         raise ValueError("second_leaf_fraction must not be greater than 0 or less than 1")
