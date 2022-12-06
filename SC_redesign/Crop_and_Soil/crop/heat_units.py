@@ -4,8 +4,8 @@ class HeatUnits:
         self.maximum_temperature = 38
         self.potential_heat_units = 800
         self.accumulated_heat_units = 0  # accumulator
-        self.is_growing = True  # TODO: not currently using
-        self.is_mature = False  # TODO: not currently using
+        self.is_growing = True  # TODO: not currently using SWAT 5:2.1.4
+        self.is_mature = False  # TODO: not currently using SWAT 5:2.1.4
         self.use_heat_unit_temperature = use_heat_unit_temperature
         # self.heat_unit_scheduling = True
 
