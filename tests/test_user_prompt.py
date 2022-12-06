@@ -18,8 +18,6 @@ dir_path = os.path.join(global_variables.ROOT_DIR, "input")
 file_path = os.path.join(dir_path, "input/ARL.json")
 
 
-# TODO: Tests remain unimplemented - GitHub Issue #209
-
 @pytest.mark.parametrize("path", [file_path, None])
 def test_obtain_file_list(mocker: MockerFixture, path):
     """check that obtain_file_list correctly calls input_prompt or convert_path_string_to_list"""
@@ -76,6 +74,7 @@ def test_convert_path_string_to_list(path: str,
         if input_path.suffix == ".txt":
             with pytest.raises(errors.UserInput) as e:
                 convert_path_string_to_list(path, verbose)
+                assert "does not exist" in str(e.value)
         else:
             with pytest.raises(ValueError) as e:
                 convert_path_string_to_list(path, verbose)
