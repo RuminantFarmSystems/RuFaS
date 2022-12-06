@@ -468,5 +468,3 @@ class cropTime:
                         crop_time['crops_planted'][day].append(crop)
                         
         self.crops = crop_time
-        with open("sample.json", "w") as outfile:
-            json.dump( crop_time, outfile)
