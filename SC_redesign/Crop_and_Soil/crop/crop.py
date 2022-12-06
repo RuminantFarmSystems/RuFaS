@@ -55,9 +55,7 @@ class Crop(GrowthConstraints, BiomassAllocation, WaterDynamics, NitrogenIncorpor
         # phosphorus_uptake.update_all()
         #
         self.constrain_growth(max_transpiration, air_temperature)
-        #
-        # leaf_area_index.update_all()
-        #
+        self.grow_canopy()
         self.allocate_biomass(incoming_light)
         self.cycle_water(evaporation, transpiration, max_evapotranspiration)
 
