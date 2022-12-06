@@ -289,8 +289,8 @@ def test_percent_calculator() -> None:
 
 def test_get_time_based_suffix(mocker: MockerFixture) -> None:
     """Unit test for function _get_suffix in file output_manager.py"""
-    auto_suffix = '1669002803.9697945'
-    mocker.patch('time.time', return_value=auto_suffix)
+    auto_suffix = "1669002803.9697945"
+    mocker.patch("time.time", return_value=auto_suffix)
     om = OutputManager()
     assert om._get_time_based_suffix() == auto_suffix
 
@@ -298,115 +298,115 @@ def test_get_time_based_suffix(mocker: MockerFixture) -> None:
 def test_get_prefix() -> None:
     """Unit test for function _get_prefix in file output_manager.py"""
     om = OutputManager()
-    assert om._get_prefix('class', 'func') == 'class.func'
+    assert om._get_prefix("class", "func") == "class.func"
 
 
 def test_generate_key(mocker: MockerFixture) -> None:
     """Unit test for function _generate_key in file output_manager.py"""
     om = OutputManager()
     with raises(KeyError):
-        om._generate_key('name', {})
+        om._generate_key("name", {})
 
-    auto_suffix = '1669002803.9697945'
-    mocker.patch('time.time', return_value=auto_suffix)
+    auto_suffix = "1669002803.9697945"
+    mocker.patch("time.time", return_value=auto_suffix)
 
-    info_map = {'caller_class': 'dummy_class', 'caller_function': 'dummy_func'}
-    key = om._generate_key('key_name', info_map)
-    assert key == f'dummy_class.dummy_func.key_name.{auto_suffix}'
+    info_map = {"class": "dummy_class", "function": "dummy_func"}
+    key = om._generate_key("key_name", info_map)
+    assert key == f"dummy_class.dummy_func.key_name.{auto_suffix}"
 
-    info_map['suppress_prefix'] = True
-    key = om._generate_key('key_name', info_map)
-    assert key == f'key_name.{auto_suffix}'
+    info_map["suppress_prefix"] = True
+    key = om._generate_key("key_name", info_map)
+    assert key == f"key_name.{auto_suffix}"
 
-    info_map['suppress_prefix'] = False
-    key = om._generate_key('key_name', info_map)
-    assert key == f'dummy_class.dummy_func.key_name.{auto_suffix}'
+    info_map["suppress_prefix"] = False
+    key = om._generate_key("key_name", info_map)
+    assert key == f"dummy_class.dummy_func.key_name.{auto_suffix}"
 
-    info_map['suppress_suffix'] = True
-    key = om._generate_key('key_name', info_map)
-    assert key == 'dummy_class.dummy_func.key_name'
+    info_map["suppress_suffix"] = True
+    key = om._generate_key("key_name", info_map)
+    assert key == "dummy_class.dummy_func.key_name"
 
-    info_map['suppress_suffix'] = False
-    key = om._generate_key('key_name', info_map)
-    assert key == f'dummy_class.dummy_func.key_name.{auto_suffix}'
+    info_map["suppress_suffix"] = False
+    key = om._generate_key("key_name", info_map)
+    assert key == f"dummy_class.dummy_func.key_name.{auto_suffix}"
 
-    info_map['suppress_prefix'] = True
-    info_map['suppress_suffix'] = True
-    key = om._generate_key('key_name', info_map)
-    assert key == 'key_name'
+    info_map["suppress_prefix"] = True
+    info_map["suppress_suffix"] = True
+    key = om._generate_key("key_name", info_map)
+    assert key == "key_name"
 
-    info_map['prefix'] = 'dummy_prefix'
-    info_map['suppress_suffix'] = False
-    key = om._generate_key('key_name', info_map)
-    assert key == f'dummy_prefix.key_name.{auto_suffix}'
+    info_map["prefix"] = "dummy_prefix"
+    info_map["suppress_suffix"] = False
+    key = om._generate_key("key_name", info_map)
+    assert key == f"dummy_prefix.key_name.{auto_suffix}"
 
-    info_map['suffix'] = 'dummy_suffix'
-    key = om._generate_key('key_name', info_map)
-    assert key == 'dummy_prefix.key_name.dummy_suffix'
+    info_map["suffix"] = "dummy_suffix"
+    key = om._generate_key("key_name", info_map)
+    assert key == "dummy_prefix.key_name.dummy_suffix"
 
 
 def test_add_error(mocker: MockerFixture) -> None:
     """Unit test for function add_error in file output_manager.py"""
 
-    key = 'key'
-    mocker.patch('RUFAS.output_manager.OutputManager._generate_key',
+    key = "key"
+    mocker.patch("RUFAS.output_manager.OutputManager._generate_key",
                  return_value=key)
     om = OutputManager()
-    info_map = {'caller_class': 'dummy_class', 'caller_function': 'dummy_func'}
-    om.add_error('dummy_name', 'dummy_msg', info_map)
-    assert om.errors_pool[key] == {'info_map': {
-        'caller_class': 'dummy_class', 'caller_function': 'dummy_func'}, 'msg': 'dummy_msg'}
+    info_map = {"class": "dummy_class", "function": "dummy_func"}
+    om.add_error("dummy_name", "dummy_msg", info_map)
+    assert om.errors_pool[key] == {"info_map": {
+        "class": "dummy_class", "function": "dummy_func"}, "msg": "dummy_msg"}
 
 
 def test_add_warning(mocker: MockerFixture) -> None:
     """Unit test for function add_warning in file output_manager.py"""
 
-    key = 'key'
-    mocker.patch('RUFAS.output_manager.OutputManager._generate_key',
+    key = "key"
+    mocker.patch("RUFAS.output_manager.OutputManager._generate_key",
                  return_value=key)
     om = OutputManager()
-    info_map = {'caller_class': 'dummy_class', 'caller_function': 'dummy_func'}
-    om.add_warning('dummy_name', 'dummy_msg', info_map)
-    assert om.warnings_pool[key] == {'info_map': {
-        'caller_class': 'dummy_class', 'caller_function': 'dummy_func'}, 'msg': 'dummy_msg'}
+    info_map = {"class": "dummy_class", "function": "dummy_func"}
+    om.add_warning("dummy_name", "dummy_msg", info_map)
+    assert om.warnings_pool[key] == {"info_map": {
+        "class": "dummy_class", "function": "dummy_func"}, "msg": "dummy_msg"}
 
 
 def test_add_log(mocker: MockerFixture) -> None:
     """Unit test for function add_log in file output_manager.py"""
 
-    key = 'key'
-    mocker.patch('RUFAS.output_manager.OutputManager._generate_key',
+    key = "key"
+    mocker.patch("RUFAS.output_manager.OutputManager._generate_key",
                  return_value=key)
     om = OutputManager()
-    info_map = {'caller_class': 'dummy_class', 'caller_function': 'dummy_func'}
-    om.add_log('dummy_name', 'dummy_msg', info_map)
-    assert om.logs_pool[key] == {'info_map': {
-        'caller_class': 'dummy_class', 'caller_function': 'dummy_func'}, 'msg': 'dummy_msg'}
+    info_map = {"class": "dummy_class", "function": "dummy_func"}
+    om.add_log("dummy_name", "dummy_msg", info_map)
+    assert om.logs_pool[key] == {"info_map": {
+        "class": "dummy_class", "function": "dummy_func"}, "msg": "dummy_msg"}
 
 
 def test_add_variable(mocker: MockerFixture) -> None:
     """Unit test for function add_variable in file output_manager.py"""
 
-    key = 'key'
-    mocker.patch('RUFAS.output_manager.OutputManager._generate_key',
+    key = "key"
+    mocker.patch("RUFAS.output_manager.OutputManager._generate_key",
                  return_value=key)
     om = OutputManager()
-    info_map = {'caller_class': 'dummy_class', 'caller_function': 'dummy_func'}
-    om.add_variable('dummy_name', 'dummy_value', info_map)
-    assert om.variables_pool[key] == 'dummy_value'
+    info_map = {"class": "dummy_class", "function": "dummy_func"}
+    om.add_variable("dummy_name", "dummy_value", info_map)
+    assert om.variables_pool[key] == "dummy_value"
 
     with raises(ValueError):
-        om.add_variable('dummy_name', 'dummy_value', info_map)
+        om.add_variable("dummy_name", "dummy_value", info_map)
     # TODO issue 214
 
 
 def test_output_manager_singleton(mocker: MockerFixture) -> None:
     """Test case to ensure output_manager is singleton"""
-    key = 'key1'
-    mocker.patch('RUFAS.output_manager.OutputManager._generate_key',
+    key = "key1"
+    mocker.patch("RUFAS.output_manager.OutputManager._generate_key",
                  return_value=key)
     om1 = OutputManager()
     om2 = OutputManager()
-    info_map = {'caller_class': 'dummy_class', 'caller_function': 'dummy_func'}
-    om1.add_variable('dummy_name', 'dummy_value', info_map)    
-    assert om2.variables_pool[key] == 'dummy_value'
+    info_map = {"class": "dummy_class", "function": "dummy_func"}
+    om1.add_variable("dummy_name", "dummy_value", info_map)    
+    assert om2.variables_pool[key] == "dummy_value"
