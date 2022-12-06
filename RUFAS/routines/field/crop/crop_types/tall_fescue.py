@@ -24,9 +24,7 @@ class TallFescue(BaseCrop):
         if tall_fescue_data['harvest_type'] != 'optimal':
             harvest_type_warning = "Perennial crops are always optimally harvested"
             info_map["harvest_type"] = tall_fescue_data["harvest_type"]
-            om.add_warning("harvest_type",
-                           harvest_type_warning,
-                           info_map)
+            om.add_warning("harvest_type", harvest_type_warning, info_map)
 
         self.harvest_type = 'optimal'
 

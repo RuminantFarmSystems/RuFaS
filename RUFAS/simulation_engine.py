@@ -42,8 +42,7 @@ class SimulationEngine:
         total_simulation_time = t_end_sim - t_start_sim
         total_simulation_time_log = f"Total simulation time is: {total_simulation_time}"
         om.add_log("total_simulation_time",
-                   total_simulation_time_log,
-                   info_map)
+                   total_simulation_time_log, info_map)
 
         t_start_graphics = timer.time()
         sys.stdout.write('Producing Graphics\n')
@@ -52,15 +51,13 @@ class SimulationEngine:
 
         graphics_prod_time = t_end_graphics - t_start_graphics
         graphics_prod_time_log = f"Graphics production time is: {graphics_prod_time}"
-        om.add_log("graphics_prod_time",
-                   graphics_prod_time_log,
-                   info_map)
+        om.add_log("graphics_prod_time", graphics_prod_time_log, info_map)
+
         total_runtime = (t_end_sim-t_start_sim) + \
             (t_end_graphics-t_start_graphics)
         total_runtime_log = f"Total runtime is: {total_runtime}"
-        om.add_log("total_runtime",
-                   total_runtime_log,
-                   info_map)
+        om.add_log("total_runtime", total_runtime_log, info_map)
+
         self._show_final_messages(graphics_prod_time, total_runtime)
 
     def _run_simulation_main_loop(self) -> None:

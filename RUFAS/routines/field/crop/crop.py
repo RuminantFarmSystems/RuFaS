@@ -90,11 +90,10 @@ def daily_crop_routine(soil, crop, field_management, weather, time):
                             soil, crop_type, field_management, time)
 
                 else:
-                    harvest_type_warning = f"{crop_type.harvest_type} is not a recognized harvest type." \
-                        " Harvesting on optimal date."
-                    om.add_warning("harvest_type",
-                                   harvest_type_warning,
-                                   info_map)
+                    harvest_type_warning = f"{crop_type.harvest_type} is not a recognized" \
+                        " harvest type. Harvesting on optimal date."
+                    om.add_warning(
+                        "harvest_type", harvest_type_warning, info_map)
                     crop_type.harvest_type = 'optimal'
 
             # If the crop is perennial, determine whether it is dormant
@@ -268,9 +267,7 @@ class Crop:
             else:
                 crop_type_error = f"{crop_name} is an invalid crop_type." \
                     " Please consult the list of crop_types."
-                om.add_error("crop_type",
-                             crop_type_error,
-                             info_map)
+                om.add_error("crop_type", crop_type_error, info_map)
             self.crops_list.append(crop)
 
         # self.alfalfa = alfalfa.Alfalfa(data)
@@ -310,12 +307,11 @@ class Crop:
             for year in crop_type.plant_years:
                 # checks requested grow years against model boundaries
                 if year - time.start_year >= len(self.grow_regimen) or year - time.start_year < 0:
-                    crop_year_error = f"Cannot grow {crop_type.crop_name} in year {year} because {year}" \
-                        " is outside of the scope of the simulation."
+                    crop_year_error = f"Cannot grow {crop_type.crop_name} in" \
+                        f" year {year} because {year} is outside of the scope" \
+                        " of the simulation."
                     info_map["year"] = year
-                    om.add_error("crop_year",
-                                 crop_year_error,
-                                 info_map)
+                    om.add_error("crop_year", crop_year_error, info_map)
                 else:
                     # specified grow years have priority over cycles (specified by repeat)
                     if crop_type.repeat == 0:
@@ -330,8 +326,9 @@ class Crop:
                                 self.grow_regimen[curr_year] = crop_type
                             else:
                                 crop_duplicate_error = f"Cannot grow {crop_type.crop_name} in" \
-                                    f"{year + curr_year}; {self.grow_regimen[curr_year].crop_name}" \
-                                    "is already growing"
+                                    f"{year + curr_year};" \
+                                    f" {self.grow_regimen[curr_year].crop_name}" \
+                                    " is already growing"
                                 info_map["crop_name"] = crop_type.crop_name
                                 om.add_error("crop_duplicate",
                                              crop_duplicate_error,

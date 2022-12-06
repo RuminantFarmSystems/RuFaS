@@ -368,9 +368,7 @@ class ManureStorage:
                 handling_system_log = f"{self.handling_system} is not currently implemented" \
                     " as a handling method."
                 " Setting to flush system."
-                om.add_log("handling_system",
-                           handling_system_log,
-                           info_map)
+                om.add_log("handling_system", handling_system_log, info_map)
                 self.handling_system = "flush_system"
                 self.calibrate_water_use()
 
@@ -397,9 +395,7 @@ class ManureStorage:
                 info_map["bedding"] = self.bedding
                 bedding_log = f"{self.bedding}, is not currently implemented as a bedding type"
                 " for manure storage. Setting to organic bedding."
-                om.add_log("bedding",
-                           bedding_log,
-                           info_map)
+                om.add_log("bedding", bedding_log, info_map)
                 self.bedding = "organic"
                 self.calibrate_bedding()
 
@@ -547,9 +543,7 @@ class ManureStorage:
                 info_map["separator"] = self.separator
                 separator_log = f"{self.separator} is not currently implemented as a separator." \
                     " Setting to sedimentation."
-                om.add_log("separator",
-                           separator_log,
-                           info_map)
+                om.add_log("separator", separator_log, info_map)
                 self.separator = "sedimentation"
                 self.calibrate_separator()
 

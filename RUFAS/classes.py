@@ -208,14 +208,16 @@ class Config:
             if self.start_day > year_length:
                 start_date_error_3 = "Start date invalid. Starting simulation on " \
                     f"{self.start_year}:{year_length}"
-                om.add_error("invalid_start_date_3", start_date_error_3, info_map)
+                om.add_error("invalid_start_date_3",
+                             start_date_error_3, info_map)
                 self.start_day = year_length
                 om.add_variable("start_day", self.start_day, info_map)
         else:
             if self.start_day > leap_year_length:
                 start_date_error_4 = "Start date invalid. Starting simulation on " \
                     f"{self.start_year}:{leap_year_length}"
-                om.add_error("invalid_start_date_4", start_date_error_4, info_map)
+                om.add_error("invalid_start_date_4",
+                             start_date_error_4, info_map)
                 self.start_day = leap_year_length
                 om.add_variable("start_day", self.start_day, info_map)
 
@@ -456,7 +458,8 @@ class Weather:
             if skips > 5:
                 weather_csv_error_pt3 = "Only printing first 5 invalid rows, there are" \
                     f" {skips} total invalid rows."
-                om.add_error("weather_csv_error_pt3", weather_csv_error_pt3, info_map)
+                om.add_error("weather_csv_error_pt3",
+                             weather_csv_error_pt3, info_map)
 
             # calculates T_avg_annual for each year
             for i in range(len(years)):
