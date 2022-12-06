@@ -3,17 +3,19 @@ from SC_redesign.Crop_and_Soil.crop.biomass_allocation import BiomassAllocation
 from SC_redesign.Crop_and_Soil.crop.nitrogen_incorporation import NitrogenIncorporation
 from SC_redesign.Crop_and_Soil.crop.water_dynamics import WaterDynamics
 from SC_redesign.Crop_and_Soil.crop.heat_units import HeatUnits
-from SC_redesign.Crop_and_Soil.soil.soil import Soil
+from SC_redesign.Crop_and_Soil.crop.root_development import RootDevelopment
+
+from typing import List
 
 
-class Crop(GrowthConstraints, BiomassAllocation, WaterDynamics, NitrogenIncorporation, HeatUnits):
+class Crop(GrowthConstraints, BiomassAllocation, WaterDynamics, NitrogenIncorporation, HeatUnits, RootDevelopment):
     def __init__(self):
         GrowthConstraints.__init__(self)
         BiomassAllocation.__init__(self)
         WaterDynamics.__init__(self)
         NitrogenIncorporation.__init__(self)
 
-    def grow_crop(self, layer_nitrates: list[float], layer_depths: list[float], soil_water_factor: float,
+    def grow_crop(self, layer_nitrates: List[float], layer_depths: List[float], soil_water_factor: float,
                   max_transpiration: float, air_temperature: float,
                   incoming_light: float,
                   evaporation: float, transpiration: float, max_evapotranspiration: float,
@@ -56,6 +58,12 @@ class Crop(GrowthConstraints, BiomassAllocation, WaterDynamics, NitrogenIncorpor
         #
         self.allocate_biomass(incoming_light)
         self.cycle_water(evaporation, transpiration, max_evapotranspiration)
+
+    def list_all_var_names(self):
+        return vars(self)
+
+
+
 
 # class CropSoilInterface:
 #     def __init__(self):
