@@ -247,6 +247,9 @@ class Config:
         # checks that start date is not after end date
         if self.start_year > self.end_year \
                 or (self.start_year == self.end_year and self.start_day > self.end_day):
+            # TODO determine if this below raised error should be rewritten to reassign 
+            # either the the start or end year to then allow the simulation to continue 
+            # instead of crashing.
             raise errors.JSONfileData(
                 "CONFIG", "\tThe start date must be before the end date")
 
