@@ -6,13 +6,20 @@ import pytest
 from pytest_mock import MockerFixture
 
 import config.global_variables
-from RUFAS import errors, SimulationEngine
+from config import global_variables
+from main import execute_simulations_from_files
+from main import parse_gnu_args
+from main import run_rufas
+from main import set_global_variables
+from RUFAS import errors
+from RUFAS import SimulationEngine
 from RUFAS.output_manager import OutputManager
-from RUFAS.user_prompt import get_json_list_from_dir, user_prompt, convert_path_string_to_list
+from RUFAS.user_prompt import convert_json_path_to_list
+from RUFAS.user_prompt import convert_path_string_to_list
+from RUFAS.user_prompt import get_json_list_from_dir
 from RUFAS.user_prompt import obtain_file_list
 from RUFAS.user_prompt import prompt_user_for_input
-from config import global_variables
-from main import parse_gnu_args, run_rufas, set_global_variables, execute_simulations_from_files
+from RUFAS.user_prompt import user_prompt
 
 dir_path = os.path.join(global_variables.ROOT_DIR, "input")
 file_path = os.path.join(dir_path, "input/ARL.json")
@@ -126,60 +133,81 @@ def test_get_json_list_from_dir(mocker: MockerFixture,
 
     # Case 1: Input path is not a directory
     # Arrange
-    dummy_path = Path('dummy_path')
+    mock_dir_path = mocker.MagicMock(auto_spec=Path)
+    mock_dir_path.is_dir.return_value = False
 
     # Act
     # check an error is raised
     with pytest.raises(IsADirectoryError) as e:
-        get_json_list_from_dir(dummy_path, verbose)
+        get_json_list_from_dir(mock_dir_path, verbose)
         assert "specified path is not a directory" in str(e.value)
 
     # ------------------------------
 
     # Case 2: Input path is a directory, but contains no json files
     # Arrange
-    # Print current directory
-    dummy_dir = Path('dummy_dir')
-    dummy_dir.mkdir()
-    empty_json_paths = []
-    patch_for_glob = mocker.patch("RUFAS.user_prompt.Path.glob", return_value=empty_json_paths)
+    mock_dir_path = mocker.MagicMock(auto_spec=Path)
+    mock_dir_path.is_dir.return_value = True
+    mock_dir_path.glob.return_value = []
 
     # Act
     with pytest.raises(FileExistsError) as e:
-        get_json_list_from_dir(dummy_dir, verbose)
+        get_json_list_from_dir(mock_dir_path, verbose)
         assert "Directory contains no json files" in str(e.value)
 
     # Assert
-    patch_for_glob.assert_called_once_with('*.json')
-
-    # Cleanup
-    dummy_dir.rmdir()
+    mock_dir_path.is_dir.assert_called_once()
+    mock_dir_path.glob.assert_called_once_with('*.json')
 
     # ------------------------------
 
     # Case 3: Input path is a directory, and contains json files
     # Arrange
-    dummy_dir = Path('dummy_dir')
-    dummy_dir.mkdir()
+    mock_dir_path = mocker.MagicMock(auto_spec=Path)
+    mock_dir_path.is_dir.return_value = True
     expected_json_paths = ['dummy.json', 'dummy2.json']
-    patch_for_glob = mocker.patch("RUFAS.user_prompt.Path.glob", return_value=expected_json_paths)
+    mock_dir_path.glob.return_value = expected_json_paths
 
     # Act
-    actual_json_paths = get_json_list_from_dir(dummy_dir, verbose)
+    actual_json_paths = get_json_list_from_dir(mock_dir_path, verbose)
 
     # Assert
-    patch_for_glob.assert_called_once_with('*.json')
+    mock_dir_path.glob.assert_called_once_with('*.json')
     captured = capsys.readouterr()
     assert f'{len(expected_json_paths)} json files detected...' in captured.out
     assert actual_json_paths == expected_json_paths
 
-    # Cleanup
-    dummy_dir.rmdir()
 
-
-@pytest.mark.parametrize("path", [file_path])
-def test_convert_json_path_to_list(path):
+def test_convert_json_path_to_list(mocker: MockerFixture,
+                                   capsys: pytest.CaptureFixture):
     """check that convert_json_path_to_list() properly returns a Path list from a json path string"""
+    # Case 1: Input path is not a json file
+    # Arrange
+    mock_json_path = mocker.MagicMock(auto_spec=Path)
+    mock_json_path.is_file.return_value = False
+    verbose = True
+
+    # Act
+    with pytest.raises(errors.UserInput) as e:
+        convert_json_path_to_list(mock_json_path, verbose)
+        assert "Specified file does not exist" in str(e.value)
+
+    # ------------------------------
+
+    # Case 2: Input path is a json file
+    # Arrange
+    mock_json_path = mocker.MagicMock(auto_spec=Path)
+    mock_json_path.is_file.return_value = True
+    verbose = True
+
+    # Act
+    actual = convert_json_path_to_list(mock_json_path, verbose)
+
+    # Assert
+    mock_json_path.is_file.assert_called_once()
+    captured = capsys.readouterr()
+    assert "json file detected" in captured.out
+    assert actual == [mock_json_path]
 
 
 @pytest.mark.parametrize("user_input", ['Q', 'q', file_path, dir_path, 'dir', 'error'])
@@ -257,8 +285,7 @@ def test_run_rufas(input_path: str,
     (False, False)
 ])
 def test_set_global_variables(make_graphs: bool,
-                              verbose: bool,
-                              mocker: MockerFixture) -> None:
+                              verbose: bool) -> None:
     """Checks that set_global_variables() sets the global variables correctly"""
     # Arrange
     old_make_graphs = config.global_variables.PRODUCE_GRAPHICS
