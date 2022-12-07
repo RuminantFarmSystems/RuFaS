@@ -1,6 +1,4 @@
 from dataclasses import fields
-from typing import Callable
-from typing import Dict
 
 from pytest import approx
 
