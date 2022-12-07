@@ -25,6 +25,7 @@ def test_manure_constants() -> None:
     assert constants.UREA_DENSITY == approx(1.32)
     assert constants.TAN_MOLAR_MASS == approx(17.0306)
     assert constants.URINE_TAN_FACTOR == approx(0.45)
+    assert constants.MANURE_SOLIDS_BEDDING_DENSITY == approx(400.0)
 
 
 def test_gas_emission_constants() -> None:

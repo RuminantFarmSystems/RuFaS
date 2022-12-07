@@ -44,8 +44,8 @@ class BaseBedding(ABC):
         self.bedding_cleaned_frac = bedding_config.bedding_cleaned_frac
         self.bedding_type = bedding_config.bedding_type
 
-    def total_bedding_washed(self, num_animals: int) -> float:
-        """Return the total amount of bedding that is washed away.
+    def calc_total_bedding_washed(self, num_animals: int) -> float:
+        """Returns the total amount of bedding that is washed away.
 
         Args:
             num_animals: Number of animals in the pen.
@@ -54,11 +54,11 @@ class BaseBedding(ABC):
             Total amount of bedding that is washed away, kg/animal/day.
 
         """
-        return self.bedding_cleaned_frac * self.total_bedding_mass(num_animals)
+        return self.bedding_cleaned_frac * self.calc_total_bedding_mass(num_animals)
 
     @abstractmethod
-    def total_bedding_mass(self, num_animals: int) -> float:
-        """Return the total amount of bedding needed for all animals in the given pen.
+    def calc_total_bedding_mass(self, num_animals: int) -> float:
+        """Returns the total amount of bedding needed for all animals in the given pen.
 
         Args:
             num_animals: Number of animals in the pen.
@@ -69,7 +69,7 @@ class BaseBedding(ABC):
         """
         pass
 
-    def total_bedding_volume(self, num_animals: int) -> float:
+    def calc_total_bedding_volume(self, num_animals: int) -> float:
         """Return the total volume of bedding needed for all animals in the given pen.
 
         Args:
@@ -79,10 +79,10 @@ class BaseBedding(ABC):
             Total volume of bedding needed for all animals in the given pen, m^3/day.
 
         """
-        return self.total_bedding_mass(num_animals) / self.bedding_density
+        return self.calc_total_bedding_mass(num_animals) / self.bedding_density
 
-    def total_bedding_dry_solids(self, num_animals: int) -> float:
-        """Return the total amount of dry solids in the bedding.
+    def calc_total_bedding_dry_solids(self, num_animals: int) -> float:
+        """Returns the total amount of dry solids in the bedding.
 
         Args:
             num_animals: Number of animals in the pen.
@@ -91,13 +91,13 @@ class BaseBedding(ABC):
             Total amount of dry solids in the bedding, kg/day.
 
         """
-        return self.total_bedding_mass(num_animals) / self.bedding_dry_matter_content
+        return self.calc_total_bedding_mass(num_animals) / self.bedding_dry_matter_content
 
 
 class BaseOrganicBedding(BaseBedding):
     """Base class for all organic bedding types."""
 
-    def total_bedding_mass(self, num_animals: int) -> float:
+    def calc_total_bedding_mass(self, num_animals: int) -> float:
         """Returns the total amount of bedding needed for all animals in the given pen.
 
         Args:
@@ -150,7 +150,7 @@ class SandBedding(BaseBedding):
         super().__init__(bedding_config)
         self.sand_removal_efficiency = bedding_config.sand_removal_efficiency
 
-    def total_bedding_mass(self, num_animals: int) -> float:
+    def calc_total_bedding_mass(self, num_animals: int) -> float:
         """Returns the total amount of bedding needed for all animals in the given pen.
 
         Args:

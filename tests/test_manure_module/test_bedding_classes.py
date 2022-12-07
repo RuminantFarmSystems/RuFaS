@@ -164,7 +164,7 @@ def test_bedding_factory_get_instance(bedding_type_name,
          ('sand', DefaultBeddingConfigFactory.SAND_BEDDING_CONFIG),
          ])
 def test_bedding_public_methods(bedding_type_name, bedding_config) -> None:
-    """Unit test for total_bedding_mass and total_bedding_volume in file bedding_classes.py"""
+    """Unit test for calc_total_bedding_mass and calc_total_bedding_volume in file bedding_classes.py"""
 
     # Arrange
     num_animals = 10
@@ -176,10 +176,10 @@ def test_bedding_public_methods(bedding_type_name, bedding_config) -> None:
 
     # Act
     bedding = BeddingFactory.get_instance(bedding_type_name)
-    actual_total_bedding_mass = bedding.total_bedding_mass(num_animals)
-    actual_total_bedding_volume = bedding.total_bedding_volume(num_animals)
-    actual_total_bedding_washed = bedding.total_bedding_washed(num_animals)
-    actual_total_bedding_dry_solids = bedding.total_bedding_dry_solids(num_animals)
+    actual_total_bedding_mass = bedding.calc_total_bedding_mass(num_animals)
+    actual_total_bedding_volume = bedding.calc_total_bedding_volume(num_animals)
+    actual_total_bedding_washed = bedding.calc_total_bedding_washed(num_animals)
+    actual_total_bedding_dry_solids = bedding.calc_total_bedding_dry_solids(num_animals)
 
     # Assert
     assert actual_total_bedding_mass == approx(expected_total_bedding_mass)

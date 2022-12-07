@@ -3,9 +3,11 @@ from __future__ import annotations
 from dataclasses import astuple
 from dataclasses import dataclass
 
+from RUFAS.routines.manure.protocols.liquid_manure_portion_protocol import LiquidManurePortionProtocol
+
 
 @dataclass
-class ManureTreatmentDailyOutput:
+class ManureTreatmentDailyOutput(LiquidManurePortionProtocol):
     """Daily output of a manure treatment.
 
     Attributes:

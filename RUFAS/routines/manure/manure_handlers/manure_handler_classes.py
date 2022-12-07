@@ -10,7 +10,6 @@ Author(s):  William Donovan, wmdonovan@wisc.edu
 """
 from __future__ import annotations
 
-import math
 from dataclasses import dataclass
 from typing import Dict
 from typing import Optional
@@ -73,7 +72,7 @@ class BaseManureHandler:
                      pen: ManureManagementPen,
                      bedding: BaseBedding,
                      sim_day: int) -> ManureHandlerDailyOutput:
-        """Calculates and store the daily output of the manure handler.
+        """Calculates and stores the daily output of the manure handler.
 
         Notes:
             "pseudocode_manure_management" MS.3
@@ -87,7 +86,6 @@ class BaseManureHandler:
             A ManureHandlerDailyOutput object.
 
         """
-
         NH3_housing_loss = GasEmissions.calc_E_NH3_emission(
                 num_animals=pen.num_animals,
                 barn_area=pen.barn_area_from_pen_type,  # m^2/animal
@@ -99,7 +97,7 @@ class BaseManureHandler:
                 simulation_day=sim_day,
                 pen_id=pen.id,
                 urea=pen.manure.urea,
-                TAN=max(0, pen.manure.TAN - NH3_housing_loss),  # kg - kg
+                TAN=max(0.0, pen.manure.TAN - NH3_housing_loss),  # kg - kg
                 N=pen.manure.N,
                 TS=pen.manure.TS,
                 VSd=pen.manure.VSd,
@@ -107,19 +105,18 @@ class BaseManureHandler:
                 P=pen.manure.P,
                 K=pen.manure.K,
                 CH4_housing=GasEmissions.calc_E_CH4_housing(pen.num_animals, pen.barn_area_from_pen_type),
-                CO2_housing=GasEmissions.calc_E_C02_housing(pen.num_animals, pen.barn_area_from_pen_type),
+                CO2_housing=GasEmissions.calc_E_CO2_housing(pen.num_animals, pen.barn_area_from_pen_type),
                 NH3_housing=NH3_housing_loss,
                 manure_volume=pen.manure.manure_volume,
-                cleaning_water_volume=self.cleaning_water_volume_in_main_barn(pen.num_animals),
-                total_bedding_volume=bedding.total_bedding_volume(pen.num_animals),
+                cleaning_water_volume=self.calc_cleaning_water_volume_in_main_barn(pen.num_animals),
+                total_bedding_volume=bedding.calc_total_bedding_volume(pen.num_animals),
                 total_water_volume_in_milking_parlor=(
                     self.milking_parlor.calc_total_water_volume_used_in_milking_parlor(pen.num_lactating_cows)),
                 tempC=self._get_current_day_avg_tempC()
         )
-
         return daily_output
 
-    def cleaning_water_volume_in_main_barn(self, num_animals: int) -> float:
+    def calc_cleaning_water_volume_in_main_barn(self, num_animals: int) -> float:
         """Calculate the volume of cleaning water needed for all the animals in pen.
 
         Args:

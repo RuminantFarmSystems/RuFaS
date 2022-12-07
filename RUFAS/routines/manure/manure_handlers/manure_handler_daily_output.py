@@ -2,10 +2,11 @@ from dataclasses import dataclass
 from dataclasses import field
 
 from RUFAS.routines.manure.constants.general_constants import GeneralConstants
+from RUFAS.routines.manure.protocols.liquid_manure_portion_protocol import LiquidManurePortionProtocol
 
 
 @dataclass
-class ManureHandlerDailyOutput:
+class ManureHandlerDailyOutput(LiquidManurePortionProtocol):
     """Daily output of a manure handler.
 
     Attributes:
@@ -29,6 +30,7 @@ class ManureHandlerDailyOutput:
         total_water_volume_in_milking_parlor: Total volume of water used for
             lactating cows in the milking center, m^3.
         total_daily_manure_volume: Total amount of manure, bedding, and water combined, m^3.
+        daily_volume: Same as total_daily_manure_volume. Used for satisfying the LiquidManurePortionProtocol.
 
     """
     pen_id: int = -1
@@ -52,6 +54,7 @@ class ManureHandlerDailyOutput:
     total_bedding_volume: float = 0.0
     total_water_volume_in_milking_parlor: float = 0.0
     total_daily_manure_volume: float = field(init=False)
+    daily_volume: float = field(init=False)  # To satisfy the LiquidManurePortionProtocol
 
     tempC: float = 0.0
 
@@ -68,3 +71,4 @@ class ManureHandlerDailyOutput:
             self.total_bedding_volume,
             self.total_water_volume_in_milking_parlor,
         ])
+        self.daily_volume = self.total_daily_manure_volume

@@ -3,9 +3,12 @@ from __future__ import annotations
 from dataclasses import dataclass
 from dataclasses import field
 
+from RUFAS.routines.manure.constants.manure_constants import ManureConstants
+from RUFAS.routines.manure.protocols.liquid_manure_portion_protocol import LiquidManurePortionProtocol
+
 
 @dataclass
-class ManureSeparatorDailyOutput:
+class ManureSeparatorDailyOutput(LiquidManurePortionProtocol):
     """Daily output of a manure separator.
 
     Attributes:
@@ -55,7 +58,6 @@ class ManureSeparatorDailyOutput:
 
     def __post_init__(self):
         """Calculates the final daily volume and the final solids wet mass volume."""
-        # TODO: After parsing json input, replace 400.0 with custom manure solids bedding density
-        self.final_solids_wet_mass_volume = self.final_solids_wet_mass / 400.0
+        self.final_solids_wet_mass_volume = self.final_solids_wet_mass / ManureConstants.MANURE_SOLIDS_BEDDING_DENSITY
         self.final_daily_volume = self.total_daily_manure_volume - self.final_solids_wet_mass_volume
         self.daily_volume = self.final_daily_volume

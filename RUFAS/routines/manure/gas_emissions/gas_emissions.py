@@ -12,8 +12,7 @@ class GasEmissions:
                                   enclosed=False,
                                   tempC=15.0,
                                   VS_frac=GasEmissionConstants.DEFAULT_VOLATILE_SOLIDS_FRACTION,
-                                  n_eff=0.99,
-                                  VS_loss_yesterday=0.0) -> float:
+                                  n_eff=0.99) -> float:
         """Calculates methane emissions from manure storage using total solids and manure kg.
 
         Args:
@@ -22,7 +21,6 @@ class GasEmissions:
             tempC: temperature, C.
             VS_frac: Fraction (0-1) volatile solids.
             n_eff: efficiency of process              TODO: confirm n_eff meaning
-            VS_loss_yesterday: VS loss from previous day.
 
         Returns:
             CH4 emissions from storage, kg CH4/day.
@@ -52,9 +50,9 @@ class GasEmissions:
         else:
             return E_CH4_open_air * (1 - n_eff)
 
-    @staticmethod
-    def _calc_modified_hours(hours: float) -> float:
-        """Calculate modified hours."""
+    @classmethod
+    def _calc_modified_hours(cls, hours: float) -> float:
+        """Calculates modified hours."""
 
         if hours > 14:
             modified_hours = - math.tanh(hours - 21.5) / 3.5
@@ -102,7 +100,7 @@ class GasEmissions:
         return num_animals * max(0.0, 0.13 * t) * barn_area / 1000
 
     @classmethod
-    def calc_E_C02_housing(cls, num_animals: int, barn_area: float, hours=24, t_min=20.0, t_max=25.0) -> float:
+    def calc_E_CO2_housing(cls, num_animals: int, barn_area: float, hours=24, t_min=20.0, t_max=25.0) -> float:
         """Calculates carbon dioxide housing emissions.
 
         Args:
@@ -125,7 +123,8 @@ class GasEmissions:
                             barn_area: float,
                             urine_TAN: float,
                             urine: float,
-                            tempC: float, hsc=GasEmissionConstants.DEFAULT_HOUSING_SPECIFIC_CONSTANT) -> float:
+                            tempC: float,
+                            hsc=GasEmissionConstants.DEFAULT_HOUSING_SPECIFIC_CONSTANT) -> float:
         """Calculates NH3 storage emissions.
 
         Args:
@@ -150,7 +149,7 @@ class GasEmissions:
         if r * M * Q > 0:
             return num_animals * barn_area * ((urine_TAN / barn_area) * c * p) / (r * M * Q)
         else:
-            return 0
+            return 0.0
 
     @classmethod
     def _calc_r_barn(cls, tempC: float, hsc=GasEmissionConstants.DEFAULT_HOUSING_SPECIFIC_CONSTANT) -> float:
@@ -213,8 +212,8 @@ class GasEmissions:
         Ka = cls._calc_Ka(tempK, pH)
         return Kh * Ka
 
-    @staticmethod
-    def _convert_tempC_to_tempK(tempC: float) -> float:
+    @classmethod
+    def _convert_tempC_to_tempK(cls, tempC: float) -> float:
         """Converts a temperature from Celsius to Kelvin.
 
         Args:
@@ -226,7 +225,6 @@ class GasEmissions:
         """
         return tempC + 273.15
 
-    # TODO: Review the units
     @classmethod
     def calc_CH4_volume_using_Chen_equation(cls, VS_total: float,
                                             hydraulic_retention_time: int) -> float:
@@ -276,30 +274,3 @@ class GasEmissions:
         MS = constants.MS
         METHANE_FACTOR = constants.METHANE_FACTOR
         return VS * Bo * MCF * MS * METHANE_FACTOR
-
-    @classmethod
-    def calc_CO2_equivalent_of_CH4(cls, CH4: float) -> float:
-        """Calculates the CO2 equivalent of CH4.
-
-        Args:
-            CH4: methane, kg/day.
-
-        Returns:
-            CO2 equivalent of CH4, kg/day.
-
-        """
-
-        return CH4 * 30
-
-    @classmethod
-    def calc_CO2_equivalent_of_N20(cls, N2O: float) -> float:
-        """Calculates the CO2 equivalent of N2O.
-
-        Args:
-            N2O: nitrous oxide, kg/day.
-
-        Returns:
-            CO2 equivalent of N2O, kg/day.
-
-        """
-        return N2O * 310

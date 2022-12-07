@@ -3,9 +3,11 @@ from __future__ import annotations
 from dataclasses import dataclass
 from dataclasses import field
 
+from RUFAS.routines.manure.protocols.liquid_manure_portion_protocol import LiquidManurePortionProtocol
+
 
 @dataclass
-class ReceptionPitDailyOutput:
+class ReceptionPitDailyOutput(LiquidManurePortionProtocol):
     """Daily output of a reception pit.
 
     Attributes
@@ -21,6 +23,7 @@ class ReceptionPitDailyOutput:
         P: Amount of phosphorus excreted in manure, kg.
         K: Amount of potassium in manure, kg.
         total_daily_manure_volume: Total amount of manure, bedding, and water combined, m^3.
+        daily_volume: Same as total_daily_manure_volume. Used for satisfying the LiquidManurePortionProtocol.
 
     """
     pen_id: int = -1
