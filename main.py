@@ -2,7 +2,7 @@
 
 from RUFAS.simulation_engine import SimulationEngine
 from RUFAS import input_prompt
-
+from RUFAS.output_manager import OutputManager
 
 def main():
     """
@@ -15,10 +15,13 @@ def main():
 
     print("RUFAS: Ruminant Farm Systems Model 2022")
 
+    output_manager = OutputManager()
     input_file_list = input_prompt()
     for input_file_path in input_file_list:
+        output_manager.flush_pools()
         simulator = SimulationEngine(input_file_path)
         simulator.simulate()
+        output_manager.save_all_pools(r'output')
 
 if __name__ == '__main__':
     main()
