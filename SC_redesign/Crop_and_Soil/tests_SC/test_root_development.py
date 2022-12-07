@@ -1,89 +1,85 @@
 from SC_redesign.Crop_and_Soil.crop.root_development import *
 import pytest
 
+
 # ---- Helper function tests ----
-def test_calc_root_fraction():
+@pytest.mark.parametrize("heatfrac,expect", [
+    (-1, 0.4),
+    (0, 0.4),
+    (0.5, 0.4 - (0.2 * 0.5)),
+    (1, 0.4 - (0.2 * 1)),
+    (1.2, 0.4 - (0.2 * 1.2)),
+    (2, 0),
+    (2.1, 0)
+])
+def test_calc_root_fraction(heatfrac, expect):
     """check that root fraction is properly calculated by calc_root_fraction()"""
-    assert False
+    assert calc_root_fraction(heatfrac) == expect
 
 
-def test_calc_root_depth():
+@pytest.mark.parametrize("maxd,heatfrac", [
+    (1, 0.5),
+    (1, 0.3),
+    (1, 0),
+    (1, 1),
+    (1, 1.2),
+    (0, 0.5),
+    (100, 0.5),
+])
+def test_calc_root_depth(maxd, heatfrac):
     """check that root depths are properly calculated by calc_root_depths()"""
-    assert False
+    if heatfrac > 0.4:
+        expect = maxd
+    else:
+        expect = 2.5 * heatfrac * maxd
+    assert calc_root_depth(maxd, heatfrac) == expect
+
 
 # ---- Initializer functions ----
 def init_rootdev(**kwargs):
     """helper function to initialize RootDevelopment object, with specified attributes"""
-    rootdev = RootDevelopment()
+    rd = RootDevelopment()
     for key, val in kwargs.items():
-        setattr(rootdev, key, val)
-    return rootdev
+        setattr(rd, key, val)
+    return rd
+
 
 # ---- Member function tests ----
-def test_determine_root_fraction():
+@pytest.mark.parametrize("heatfrac", [-1, 0, 0.2, 0.5, 1, 1.2, 2, 2.2])
+def test_determine_root_fraction(heatfrac):
     """check that root fractions are correctly set by determine_root_fraction()"""
-    assert False
+    rd = init_rootdev(heat_fraction=heatfrac)
+    rd.determine_root_fraction()
+    assert rd.root_fraction == calc_root_fraction(heatfrac)
 
-
-def test_determine_root_depth():
+@pytest.mark.parametrize("maxd, heatfrac", [
+    (1, 0.5),
+    (1, 0.3),
+    (1, 0),
+    (1, 1),
+    (1, 1.2),
+    (0, 0.5),
+    (100, 0.5),
+])
+def test_determine_root_depth(heatfrac, maxd):
     """check that root depths are appropriately set by determine_root_depth()"""
-    assert False
+    rd = init_rootdev(heat_fraction=heatfrac, max_root_depth=maxd)
+    rd.determine_root_depth()
+    assert rd.root_depth == calc_root_depth(maxd, heatfrac)
 
 
-def test_develop_roots():
+@pytest.mark.parametrize("maxd, heatfrac", [
+    (1, 0.5),
+    (1, 0.3),
+    (1, 0),
+    (1, 1),
+    (1, 1.2),
+    (0, 0.5),
+    (100, 0.5),
+])
+def test_develop_roots(maxd, heatfrac):
     """integration test for main root development function develop_roots()"""
-    assert False
-
-
-# @pytest.mark.parametrize("fr_PHU,z_root,z_root_max",[
-#     (0.45, 800, 1000), #arbitrary starting case
-#     (0, 0, 0), #all zeroes
-#     (1, 1, 1), #all ones
-#     (2.5,750, 980) #creates scenario where fr_root < 0
-# ])
-# def test_calc_daily_root_biomass(fr_PHU, z_root, z_root_max):
-#     """
-#     Description:
-#         Unit test for calc_daily_root_biomass in routines/field/crop/root_development.py.
-#         Uses pytest parametrization to test several scenarios of possible values.
-#     """
-#     crop = mock_crop(fr_PHU = fr_PHU, z_root = z_root, z_root_max = z_root_max)
-#
-#     #calculate expected results based on crop pseudocode C.3.A.1
-#     fr_root = 0.40 - 0.20 * fr_PHU
-#     if fr_root < 0:
-#         fr_root = 0
-#     #if fr_root is >= 0 its value does not need to be changed from
-#     #original calculation
-#
-#     calc_daily_root_biomass(crop)
-#
-#     assert pytest.approx(crop.fr_root) == fr_root
-#
-#
-# @pytest.mark.parametrize("z_root_max,fr_PHU,z_root",[
-#     (1000, 0.45, 800), #arbitrary starting case
-#     (0, 0, 0), #all zeroes
-#     (1, 1, 1), #all ones
-#     (1000, .5, 1000), #z_root_max = z_root
-#     (910, .31, 680), #fr_PHU < 0.4
-#     (925, .60, 490) #fr_PHU > 0.4
-# ])
-# def test_calc_z_root(z_root_max,fr_PHU,z_root):
-#     """
-#     Description:
-#         Unit test for calc_z_root in routines/field/crop/root_development.py.
-#         Uses pytest parametrization to test several scenarios of possible values.
-#     """
-#     crop = mock_crop(z_root_max = z_root_max,fr_PHU = fr_PHU,z_root = z_root)
-#
-#     #calculate expected results based on crop pseudocode C.3.A.2/3
-#     if z_root != z_root_max:
-#         if fr_PHU > 0.4:
-#             z_root = z_root_max
-#         else:
-#             z_root = 2.5 * fr_PHU * z_root_max
-#
-#     calc_z_root(crop)
-#
-#     assert pytest.approx(crop.z_root) == z_root
+    rd = init_rootdev(heat_fraction=heatfrac, max_root_depth=maxd)
+    rd.develop_roots()
+    assert rd.root_fraction == calc_root_fraction(heatfrac)
+    assert rd.root_depth == calc_root_depth(maxd, heatfrac)
