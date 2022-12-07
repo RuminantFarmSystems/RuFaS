@@ -287,7 +287,7 @@ class FieldReport(BaseReportDriver):
                     'M_d': ['layer.M_d', '', []],
                     'fr_tillage': ['layer.tillage_percent', '', []],
                     'water_fac': ['layer.water_fac', '', []],
-                    'active': ['layer.C_active', 'kg/ha', []],
+                    'active_C': ['layer.C_active', 'kg/ha', []],
                     'slow': ['layer.C_slow', 'kg/ha', []],
                     'passive': ['layer.C_passive', 'kg/ha', []]
                 }
