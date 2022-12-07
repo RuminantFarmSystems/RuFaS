@@ -1,4 +1,7 @@
 from .base_crop import BaseCrop
+from RUFAS.output_manager import OutputManager
+
+om = OutputManager()
 
 
 class TallFescue(BaseCrop):
@@ -13,8 +16,15 @@ class TallFescue(BaseCrop):
         self.planting_day = tall_fescue_data['planting_day']
         self.harvest_day = tall_fescue_data['harvest_day']
 
+        info_map = {"class": self.__class__.__name__,
+                    "function": self.__init__.__name__,
+                    "crop_name": crop_name,
+                    "data": data, }
+
         if tall_fescue_data['harvest_type'] != 'optimal':
-            print('Perennial crops are always optimally harvested')
+            harvest_type_warning = "Perennial crops are always optimally harvested"
+            info_map["harvest_type"] = tall_fescue_data["harvest_type"]
+            om.add_warning("harvest_type", harvest_type_warning, info_map)
 
         self.harvest_type = 'optimal'
 
