@@ -178,9 +178,9 @@ class Config:
         # special error statements for start and end years
         if self.start_year == w_start_year and self.start_day < w_start_day \
                 or self.start_year < w_start_year:
-            start_date_error = "Start date invalid. Starting simulation on " \
+            start_date_warning = "Start date invalid. Starting simulation on " \
                 f"{w_start_year}:{w_start_day}"
-            om.add_error("invalid_start_date", start_date_error, info_map)
+            om.add_warning("invalid_start_date", start_date_warning, info_map)
             self.start_day = w_start_day
             om.add_variable("start_day", self.start_day, info_map)
             self.start_year = w_start_year
@@ -188,9 +188,9 @@ class Config:
 
         if self.end_year == w_end_year and self.end_day > w_end_day \
                 or self.end_year > w_end_year:
-            end_date_error = "End date invalid. Ending simulation on " \
+            end_date_warning = "End date invalid. Ending simulation on " \
                 f"{w_end_year}:{w_end_day}"
-            om.add_error("invalid_end_date", end_date_error, info_map)
+            om.add_warning("invalid_end_date", end_date_warning, info_map)
             self.end_day = w_end_day
             om.add_variable("end_day", self.end_day, info_map)
             self.end_year = w_end_year
@@ -199,57 +199,54 @@ class Config:
         # start date errors if the simulation starts before day 1 or after
         # the last possible day of the year
         if self.start_day < 1:
-            start_date_error_2 = "Start date invalid. Starting simulation on " \
+            start_date_warning_2 = "Start date invalid. Starting simulation on " \
                 f"{self.start_year}:1"
-            om.add_error("invalid_start_date_2", start_date_error_2, info_map)
+            om.add_warning("invalid_start_date_2", start_date_warning_2, info_map)
             self.start_day = 1
             om.add_variable("start_day", self.start_day, info_map)
         if not is_leap_year(self.start_year):
             if self.start_day > year_length:
-                start_date_error_3 = "Start date invalid. Starting simulation on " \
+                start_date_warning_3 = "Start date invalid. Starting simulation on " \
                     f"{self.start_year}:{year_length}"
-                om.add_error("invalid_start_date_3",
-                             start_date_error_3, info_map)
+                om.add_warning("invalid_start_date_3",
+                             start_date_warning_3, info_map)
                 self.start_day = year_length
                 om.add_variable("start_day", self.start_day, info_map)
         else:
             if self.start_day > leap_year_length:
-                start_date_error_4 = "Start date invalid. Starting simulation on " \
+                start_date_warning_4 = "Start date invalid. Starting simulation on " \
                     f"{self.start_year}:{leap_year_length}"
-                om.add_error("invalid_start_date_4",
-                             start_date_error_4, info_map)
+                om.add_warning("invalid_start_date_4",
+                             start_date_warning_4, info_map)
                 self.start_day = leap_year_length
                 om.add_variable("start_day", self.start_day, info_map)
 
         # end date errors if the simulation ends before day 1 or after
         # the last possible day of the year
         if self.end_day < 1:
-            end_date_error_2 = "End date invalid. Ending simulation on " \
+            end_date_warning_2 = "End date invalid. Ending simulation on " \
                 f"{self.end_year}:1"
-            om.add_error("invalid_end_date_2", end_date_error_2, info_map)
+            om.add_warning("invalid_end_date_2", end_date_warning_2, info_map)
             self.end_day = 1
             om.add_variable("end_day", self.end_day, info_map)
         if not is_leap_year(self.end_year):
             if self.end_day > year_length:
-                end_date_error_3 = "End date invalid. Ending simulation on " \
+                end_date_warning_3 = "End date invalid. Ending simulation on " \
                     f"{self.end_year}:{year_length}"
-                om.add_error("invalid_end_date_3", end_date_error_3, info_map)
+                om.add_warning("invalid_end_date_3", end_date_warning_3, info_map)
                 self.end_day = year_length
                 om.add_variable("end_day", self.end_day, info_map)
         else:
             if self.end_day > leap_year_length:
-                end_date_error_4 = "End date invalid. Ending simulation on " \
+                end_date_warning_4 = "End date invalid. Ending simulation on " \
                     f"{self.end_year}:{leap_year_length}"
-                om.add_error("invalid_end_date_4", end_date_error_4, info_map)
+                om.add_warning("invalid_end_date_4", end_date_warning_4, info_map)
                 self.end_day = leap_year_length
                 om.add_variable("end_day", self.end_day, info_map)
 
         # checks that start date is not after end date
         if self.start_year > self.end_year \
                 or (self.start_year == self.end_year and self.start_day > self.end_day):
-            # TODO determine if this below raised error should be rewritten to reassign 
-            # either the the start or end year to then allow the simulation to continue 
-            # instead of crashing.
             raise errors.JSONfileData(
                 "CONFIG", "\tThe start date must be before the end date")
 
