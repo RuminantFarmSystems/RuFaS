@@ -11,16 +11,16 @@ class RootDevelopment:
         self.root_depth = None
         self.root_fraction = None
 
-    def develop_roots(self):
+    def develop_roots(self) -> None:
         """main root development function"""
         self.determine_root_fraction()
         self.determine_root_depth()
 
-    def determine_root_fraction(self):
+    def determine_root_fraction(self) -> None:
         """updates root fraction"""
         self.root_fraction = calc_root_fraction(self.heat_fraction)  # also in biomass_allocation.py
 
-    def determine_root_depth(self):
+    def determine_root_depth(self) -> None:
         """updates root depth"""
         if self.is_perennial:
             self.root_depth = calc_root_depth(self.max_root_depth, self.heat_fraction)  # also nitrogen_incorporation.py
