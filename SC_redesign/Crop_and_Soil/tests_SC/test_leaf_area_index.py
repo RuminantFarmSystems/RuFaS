@@ -227,7 +227,11 @@ def test_senesce_leaf_area(opt_lai_frac, heatfrac, cutoff):
     lai.senesce_leaf_area()
     assert lai.leaf_area_index == calc_senescent_leaf_area_index(heatfrac, cutoff, opt_lai_frac)
 
-@pytest.mark.parametrize("opt_lai_frac,heatfrac,cutoff", [])
+@pytest.mark.parametrize("opt_lai_frac,heatfrac,cutoff", [
+    (1, 1.2, 1 - 1e-9),  # cutoff approx 1
+    (0.9, 0.87, 0.8),
+    (0.5, 0.43, 0.44)
+])
 def test_calc_senescent_leaf_area_index(opt_lai_frac, heatfrac, cutoff):
     """check that LAI is calculated correctly during senescence with calc_senescent_leaf_area_index()"""
     if cutoff == 1:
