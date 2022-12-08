@@ -6,7 +6,6 @@ Author(s): Katrina Wang, kw433@cornell.edu
 Description: This file stores and draws values of simulated
                 animals in and from the database
 """
-from RUFAS.output_manager import OutputManager
 from RUFAS.routines.animal.life_cycle.calf import Calf
 from RUFAS.routines.animal.life_cycle.heiferI import HeiferI
 from RUFAS.routines.animal.life_cycle.heiferII import HeiferII
@@ -16,7 +15,6 @@ from RUFAS.routines.animal.life_cycle.animal_base import AnimalBase
 import sqlite3
 from enum import IntEnum
 
-om = OutputManager()
 
 class AnimalValues(IntEnum):
     id = 0

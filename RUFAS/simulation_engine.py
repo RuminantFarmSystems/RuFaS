@@ -19,6 +19,7 @@ from RUFAS.util import Utility
 
 om = OutputManager()
 
+
 class SimulationEngine:
 
     def __init__(self, input_file_path: Path) -> None:
@@ -31,18 +32,19 @@ class SimulationEngine:
 
     def simulate(self) -> None:
         """Executes the simulation"""
-        info_map = {"class": self.__class__.__name__, 
-                    "function": self.simulate.__name__,}
+        info_map = {"class": self.__class__.__name__,
+                    "function": self.simulate.__name__, }
         t_start_sim = timer.time()
-        
+
         self._run_simulation_main_loop()
         self.output.finalize(self.state, self.weather, self.time)
         t_end_sim = timer.time()
 
         print("Simulation Successful")
         total_simulation_time = t_end_sim - t_start_sim
-        om.add_log("total_simulation_time", f"Total simulation time is: {total_simulation_time}", info_map)
-
+        total_simulation_time_log = f"Total simulation time is: {total_simulation_time}"
+        om.add_log("total_simulation_time",
+                   total_simulation_time_log, info_map)
 
         if config.global_variables.PRODUCE_GRAPHICS:
             sys.stdout.write('Producing Graphics\n')
@@ -96,8 +98,15 @@ class SimulationEngine:
         """
         Advances time and increments simulation_day
         """
+
+        info_map = {"class": self.__class__.__name__,
+                    "function": self._advance_time.__name__,
+                    "print_day": print_day, }
         if print_day:
-            print(f"simulating day: {self.time.to_str()}")
+            simulating_day_log = f"simulating day: {self.time.to_str()}"
+            om.add_log("simulation_day",
+                       simulating_day_log,
+                       info_map)
         self.time.advance()
         self.state.animal_management.simulation_day += 1
 
@@ -155,11 +164,12 @@ class SimulationEngine:
             InvalidJSONFile: If the json file at the given path does not conform 
             with the format required
         """
-        info_map = {"class": self.__class__.__name__, 
+        info_map = {"class": self.__class__.__name__,
                     "function": self._initialize_simulation.__name__,
-                    "file_path": file_path,}
+                    "file_path": file_path, }
         print(f"Initializing simulation environment from {file_path}")
-        om.add_variable("simulation_initialization_file_path", file_path, info_map)
+        om.add_variable("simulation_initialization_file_path",
+                        file_path, info_map)
 
         try:
             data = Utility.read_json_file(file_path)
