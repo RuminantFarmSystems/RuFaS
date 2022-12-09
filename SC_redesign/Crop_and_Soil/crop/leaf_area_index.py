@@ -5,6 +5,7 @@ from typing import List
 This module is based off of the 'Canopy Cover and Height' section of SWAT
 """
 
+
 class LeafAreaIndex:
     def __init__(self):
         # fixed attributes (unchanged during simulations)
@@ -32,25 +33,55 @@ class LeafAreaIndex:
     def grow_canopy(self):
         """main leaf area index function"""
         # self.determine_optimal_leaf_area_fraction()
-        self._determine_lai_shapes()
-        self.optimal_leaf_area_fraction = calc_optimal_leaf_area_fraction(self.heat_fraction,
-                                                                          self._lai_shapes[0],
-                                                                          self._lai_shapes[1])
+        self.optimal_leaf_area_fraction = self.determine_optimal_leaf_area_fraction(self.heat_fraction,
+                                                                                    self._lai_shapes[0],
+                                                                                    self._lai_shapes[1])
+        # self._determine_lai_shapes()
+        self._lai_shapes = self.determine_lai_shapes(self.first_heat_fraction_point, self.second_heat_fraction_point,
+                                                     self.first_leaf_fraction_point, self.second_leaf_fraction_point)
+
         self.determine_canopy_height()
         self.check_for_senescence()
         if self.is_in_senescence:  # senescence
-            self.senesce_leaf_area()
+            self.leaf_area_index = self.determine_senescent_leaf_area_index(self.heat_fraction,
+                                                                            self.senescent_heat_fraction,
+                                                                            self.optimal_leaf_area_fraction)
         else:  # normal growth
             self.check_previous_leaf_area_values()
-            self.determine_max_leaf_area_change()
+            self.max_leaf_area_change = self.determine_max_leaf_area_change(self.optimal_leaf_area_fraction,
+                                                                            self.previous_optimal_leaf_area_fraction,
+                                                                            self.max_leaf_area_index,
+                                                                            self.previous_leaf_area_index)
             self.determine_leaf_area_added()
             self.add_leaf_area()
         self.shift_leaf_area_time()
 
-    def _determine_lai_shapes(self):
-        """sets lai shape parameters for optimal leaf area fraction calculations"""
-        self._lai_shapes = calc_shape_parameters(self.first_heat_fraction_point, self.second_heat_fraction_point,
-                                                 self.first_leaf_fraction_point, self.second_leaf_fraction_point)
+    @staticmethod
+    def determine_lai_shapes(first_heat_fraction: float, second_heat_fraction: float,
+                             first_leaf_fraction: float, second_leaf_fraction: float) -> List[float]:
+        """calculates the shape coefficients for optimal LAI formula"""
+        if first_heat_fraction <= 0:
+            raise ValueError("first_heat_fraction must be greater than 0")
+        if second_heat_fraction <= 0:
+            raise ValueError("second_heat_fraction must be greater than 0")
+        if not 0 < first_leaf_fraction < 1:
+            raise ValueError("first_leaf_fraction must not be greater than 0 or less than 1")
+        if not 0 < second_leaf_fraction < 1:
+            raise ValueError("second_leaf_fraction must not be greater than 0 or less than 1")
+        if first_heat_fraction == second_heat_fraction:
+            # TODO: perhaps a way to handle this instead of throwing an error would be better
+            #   something like: second_heat_fraction += 1e-9
+            raise ValueError("first_heat_fraction cannot be exactly equal to second_heat_fractions")
+
+        # TODO: add error handling (see test_error_calc_shape_log() for conditions that fail)
+
+        first_log = LeafAreaIndex.calc_shape_log(first_heat_fraction, first_leaf_fraction)
+        second_log = LeafAreaIndex.calc_shape_log(second_heat_fraction, second_leaf_fraction)
+
+        second_shape = (first_log - second_log) / (second_heat_fraction - first_heat_fraction)
+        first_shape = first_log + (second_shape * first_heat_fraction)
+
+        return [first_shape, second_shape]
 
     @staticmethod
     def determine_optimal_leaf_area_fraction(heat_fraction: float, shape1: float, shape2: float) -> float:
@@ -91,13 +122,29 @@ class LeafAreaIndex:
         if self.previous_leaf_area_index is None:
             self.previous_leaf_area_index = 0
 
-    def determine_max_leaf_area_change(self):
-        """sets the maximum amount that leaf area can change under ideal circumstances
-        SWAT Reference: 5:2.1.16"""
-        self.max_leaf_area_change = calc_max_leaf_area_change(self.optimal_leaf_area_fraction,
-                                                              self.previous_optimal_leaf_area_fraction,
-                                                              self.max_leaf_area_index,
-                                                              self.previous_leaf_area_index)
+    @staticmethod
+    def determine_max_leaf_area_change(leaf_area_fraction: float, previous_leaf_area_fraction: float,
+                                       max_leaf_area_index: float, previous_leaf_area_index: float) -> float:
+        """
+        calculates the maximum leaf area added during the day
+
+        Args:
+            leaf_area_fraction: optimal leaf area fraction for the day
+            previous_leaf_area_fraction: previous day's optimal leaf area fraction
+            max_leaf_area_index: the maximum leaf area index achievable by the plant
+            previous_leaf_area_index: the previous day's leaf area index
+
+        Returns:
+            the maximum leaf area added during the day
+
+        Details: because actual leaf area index (LAI) is corrected for growth constraints, the previous
+        day's optimal leaf area fraction may not be the same as the previous day's LAI divided by the
+        max LAI.
+
+        SWAT Reference: 5:2.1.16
+        """
+        return (leaf_area_fraction - previous_leaf_area_fraction) * max_leaf_area_index * \
+            (1 - exp(5 * previous_leaf_area_index - max_leaf_area_index))
 
     def determine_leaf_area_added(self):
         """sets actual leaf area added, by adjusting for the plant growth factor
@@ -110,94 +157,41 @@ class LeafAreaIndex:
         SWAT Reference: 5:2.1.18"""
         self.leaf_area_index = max(0, self.previous_leaf_area_index + self.leaf_area_added)
 
-    def check_for_senescence(self):
+    @property
+    def check_for_senescence(self) -> bool:
         """check if the plant is in senescence"""
-        self.is_in_senescence = self.heat_fraction > self.senescent_heat_fraction
+        return self.heat_fraction > self.senescent_heat_fraction
 
-    def senesce_leaf_area(self):
-        """determines the leaf area index during senescence
+    @staticmethod
+    def determine_senescent_leaf_area_index(heat_fraction: float, senescent_heat_fraction: float,
+                                            optimal_leaf_area_fraction: float) -> float:
+        """calculates a plant's leaf area index during senescence
+
+        Args:
+            heat_fraction: the current fraction of potential heat units
+            senescent_heat_fraction: the fraction of potential heat units at which senescence begins
+            optimal_leaf_area_fraction: the optimal leaf area fraction for the plant
+
+        Returns: the plant's leaf area index
+
         SWAT Reference: 5:2.1.19
         """
-        self.leaf_area_index = calc_senescent_leaf_area_index(self.heat_fraction, self.senescent_heat_fraction,
-                                                              self.optimal_leaf_area_fraction)
+        if senescent_heat_fraction >= 1:
+            raise ValueError("Senescent heat fraction must be less than 1")
+        else:
+            prop = (1 - heat_fraction) / (1 - senescent_heat_fraction)
 
+        return max(prop * optimal_leaf_area_fraction, 0)
 
-def calc_senescent_leaf_area_index(heat_fraction, senescent_heat_fraction, optimal_leaf_area_fraction):
-    """calculates a plant's leaf area index during senescence
+    @staticmethod
+    def calc_shape_log(heat_fraction: float, leaf_area_fraction: float) -> float:
+        """calculates the log term of LAI shape parameter function
 
-    Args:
-        heat_fraction: the current fraction of potential heat units
-        senescent_heat_fraction: the fraction of potential heat units at which senescence begins
-        optimal_leaf_area_fraction: the optimal leaf area fraction for the plant
+        Args:
+            heat_fraction: fraction of heat units accumulated; must be greater than zero
+            leaf_area_fraction: fraction of max leaf area; must be greater than zero, less than one, and not
+                equal to heat_fraction
 
-    Returns: the plant's leaf area index
-    """
-    if senescent_heat_fraction == 1:
-        prop = 1 - heat_fraction
-    else:
-        prop = (1 - heat_fraction) / (1 - senescent_heat_fraction)
-
-    return max(prop * optimal_leaf_area_fraction, 0)
-
-# ---- helper functions ----
-
-def calc_shape_log(heat_fraction: float, leaf_area_fraction: float) -> float:
-    """calculates the log term of LAI shape parameter function
-
-    Args:
-        heat_fraction: fraction of heat units accumulated; must be greater than zero
-        leaf_area_fraction: fraction of max leaf area; must be greater than zero, less than one, and not
-            equal to heat_fraction
-
-    Details: used by calc_shape_parameters, where errors are handled
-    """
-    return log((heat_fraction/leaf_area_fraction) - heat_fraction)
-
-def calc_shape_parameters(first_heat_fraction: float, second_heat_fraction: float,
-                          first_leaf_fraction: float, second_leaf_fraction: float) -> List[float]:
-    """calculates the shape coefficients for optimal LAI formula"""
-    if first_heat_fraction <= 0:
-        raise ValueError("first_heat_fraction must be greater than 0")
-    if second_heat_fraction <= 0:
-        raise ValueError("second_heat_fraction must be greater than 0")
-    if not 0 < first_leaf_fraction < 1:
-        raise ValueError("first_leaf_fraction must not be greater than 0 or less than 1")
-    if not 0 < second_leaf_fraction < 1:
-        raise ValueError("second_leaf_fraction must not be greater than 0 or less than 1")
-    if first_heat_fraction == second_heat_fraction:
-        # TODO: perhaps a way to handle this instead of throwing an error would be better
-        #   something like: second_heat_fraction += 1e-9
-        raise ValueError("first_heat_fraction cannot be exactly equal to second_heat_fractions")
-
-
-    # TODO: add error handling (see test_error_calc_shape_log() for conditions that fail)
-
-    first_log = calc_shape_log(first_heat_fraction, first_leaf_fraction)
-    second_log = calc_shape_log(second_heat_fraction, second_leaf_fraction)
-
-    second_shape = (first_log - second_log) / (second_heat_fraction - first_heat_fraction)
-    first_shape = first_log + (second_shape * first_heat_fraction)
-
-    return [first_shape, second_shape]
-
-def calc_max_leaf_area_change(leaf_area_fraction, previous_leaf_area_fraction,
-                              max_leaf_area_index, previous_leaf_area_index):
-    """
-    calculates the maximum leaf area added during the day
-
-    Args:
-        leaf_area_fraction: optimal leaf area fraction for the day
-        previous_leaf_area_fraction: previous day's optimal leaf area fraction
-        max_leaf_area_index: the maximum leaf area index achievable by the plant
-        previous_leaf_area_index: the previous day's leaf area index
-
-    Returns:
-        the maximum leaf area added during the day
-
-    Details: because actual leaf area index (LAI) is corrected for growth constraints, the previous
-    day's optimal leaf area fraction may not be the same as the previous day's LAI divided by the
-    max LAI.
-    """
-    return (leaf_area_fraction - previous_leaf_area_fraction) * max_leaf_area_index * \
-           (1 - exp(5 * previous_leaf_area_index - max_leaf_area_index))
-
+        Details: used by calc_shape_parameters, where errors are handled
+        """
+        return log((heat_fraction / leaf_area_fraction) - heat_fraction)
