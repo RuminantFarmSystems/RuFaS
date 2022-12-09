@@ -20,7 +20,7 @@ class PenManure:
     """A class that represents the manure data extracted from the animal module.
 
     Attributes:
-        urea: urea concentration, g/L.
+        urea: urea concentration in the manure, g/L.
         urine: amount of urine, kg.
         TAN: total ammoniacal nitrogen concentration in the manure slurry, g/L.
         N: nitrogen in liquid and solid manure, kg.
@@ -58,8 +58,8 @@ class PenManure:
         """Performs any necessary unit conversion after initialization."""
         self.manure_volume = self.manure_mass / ManureConstants.MANURE_DENSITY
 
-    @staticmethod
-    def get_instance(animal_manure, num_animals: int) -> PenManure:
+    @classmethod
+    def get_instance(cls, animal_manure, num_animals: int) -> PenManure:
         """Returns a PenManure object based on the information given in the manure data.
 
         Args:
@@ -70,7 +70,7 @@ class PenManure:
             A PenManure object.
 
         """
-        return PenManure(
+        return cls(
                 urea=animal_manure['U'] / num_animals,
                 urine=animal_manure['Urine'] / num_animals,
                 urine_TAN=animal_manure['TAN_s'] * ManureConstants.URINE_TAN_FACTOR / num_animals,

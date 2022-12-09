@@ -37,7 +37,7 @@ def test_bedding_config_init() -> None:
             bedding_mass_per_day=1.0,
             bedding_density=2.0,
             bedding_dry_matter_content=3.0,
-            bedding_cleaned_frac=4.0,
+            bedding_cleaned_fraction=4.0,
             bedding_type=BeddingType.DEFAULT,
             sand_removal_efficiency=5.0,
     )
@@ -46,7 +46,7 @@ def test_bedding_config_init() -> None:
     assert bedding_config.bedding_mass_per_day == 1.0
     assert bedding_config.bedding_density == 2.0
     assert bedding_config.bedding_dry_matter_content == 3.0
-    assert bedding_config.bedding_cleaned_frac == 4.0
+    assert bedding_config.bedding_cleaned_fraction == 4.0
     assert bedding_config.bedding_type == BeddingType.DEFAULT
     assert bedding_config.sand_removal_efficiency == 5.0
 
@@ -73,7 +73,7 @@ def test_default_bedding_config_values(bedding_config,
     assert bedding_config.bedding_mass_per_day == approx(expected_bedding_mass_per_day)
     assert bedding_config.bedding_density == approx(expected_bedding_density)
     assert bedding_config.bedding_dry_matter_content == approx(expected_bedding_dry_matter_mass)
-    assert bedding_config.bedding_cleaned_frac == approx(expected_bedding_cleaned_frac)
+    assert bedding_config.bedding_cleaned_fraction == approx(expected_bedding_cleaned_frac)
     assert bedding_config.bedding_type is expected_bedding_type
     assert bedding_config.sand_removal_efficiency == approx(expected_sand_removal_efficiency)
 
@@ -102,7 +102,7 @@ def dummy_bedding_config() -> BeddingConfig:
             bedding_mass_per_day=1.0,
             bedding_density=2.0,
             bedding_dry_matter_content=3.0,
-            bedding_cleaned_frac=4.0,
+            bedding_cleaned_fraction=4.0,
             bedding_type=BeddingType.DEFAULT,
             sand_removal_efficiency=5.0,
     )
@@ -132,7 +132,7 @@ def test_bedding_factory_get_instance(bedding_type_name,
     assert bedding.bedding_mass_per_day == default_bedding_config.bedding_mass_per_day
     assert bedding.bedding_density == default_bedding_config.bedding_density
     assert bedding.bedding_dry_matter_content == default_bedding_config.bedding_dry_matter_content
-    assert bedding.bedding_cleaned_frac == default_bedding_config.bedding_cleaned_frac
+    assert bedding.bedding_cleaned_fraction == default_bedding_config.bedding_cleaned_fraction
     assert bedding.bedding_type is default_bedding_config.bedding_type
 
     if isinstance(bedding, SandBedding):
@@ -150,7 +150,7 @@ def test_bedding_factory_get_instance(bedding_type_name,
     assert bedding.bedding_mass_per_day == dummy_bedding_config.bedding_mass_per_day
     assert bedding.bedding_density == dummy_bedding_config.bedding_density
     assert bedding.bedding_dry_matter_content == dummy_bedding_config.bedding_dry_matter_content
-    assert bedding.bedding_cleaned_frac == dummy_bedding_config.bedding_cleaned_frac
+    assert bedding.bedding_cleaned_fraction == dummy_bedding_config.bedding_cleaned_fraction
     assert bedding.bedding_type is dummy_bedding_config.bedding_type
 
     if isinstance(bedding, SandBedding):
@@ -171,7 +171,7 @@ def test_bedding_public_methods(bedding_type_name, bedding_config) -> None:
     expected_total_bedding_mass = (num_animals * bedding_config.bedding_mass_per_day *
                                    (1 - bedding_config.sand_removal_efficiency))
     expected_total_bedding_volume = expected_total_bedding_mass / bedding_config.bedding_density
-    expected_total_bedding_washed = expected_total_bedding_mass * bedding_config.bedding_cleaned_frac
+    expected_total_bedding_washed = expected_total_bedding_mass * bedding_config.bedding_cleaned_fraction
     expected_total_bedding_dry_solids = expected_total_bedding_mass / bedding_config.bedding_dry_matter_content
 
     # Act

@@ -3,10 +3,10 @@ from dataclasses import fields
 from pytest import approx
 
 from RUFAS.routines.manure.constants.manure_constants import ManureConstants
-from RUFAS.routines.manure.manure.pen_manure import PenManure
+from RUFAS.routines.manure.pen_manure.pen_manure import PenManure
 
 
-def test_manure_init() -> None:
+def test_pen_manure_init() -> None:
     """Unit test for function __init__ in file pen_manure.py"""
     # Case 1: Given no arguments, a new PenManure object should have all attributes
     # initially set to 0.

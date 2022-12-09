@@ -3,7 +3,7 @@ from pytest_mock import MockerFixture
 
 from RUFAS.routines.animal.life_cycle.cow import Cow
 from RUFAS.routines.animal.pen import Pen
-from RUFAS.routines.manure.manure.pen_manure import PenManure
+from RUFAS.routines.manure.pen_manure.pen_manure import PenManure
 from RUFAS.routines.manure.pen.manure_management_pen import ManureManagementPen
 
 
