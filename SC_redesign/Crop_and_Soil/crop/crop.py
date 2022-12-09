@@ -17,6 +17,10 @@ class Crop(GrowthConstraints, BiomassAllocation, WaterDynamics, NitrogenIncorpor
         BiomassAllocation.__init__(self)
         WaterDynamics.__init__(self)
         NitrogenIncorporation.__init__(self)
+        HeatUnits.__init__(self)
+        LeafAreaIndex.__init__(self)
+        RootDevelopment.__init__(self)
+
 
     def grow_crop(self, layer_nitrates: List[float], layer_depths: List[float], soil_water_factor: float,
                   max_transpiration: float, air_temperature: float,
