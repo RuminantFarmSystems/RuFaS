@@ -3,11 +3,12 @@ from SC_redesign.Crop_and_Soil.crop.biomass_allocation import BiomassAllocation
 from SC_redesign.Crop_and_Soil.crop.nitrogen_incorporation import NitrogenIncorporation
 from SC_redesign.Crop_and_Soil.crop.water_dynamics import WaterDynamics
 from SC_redesign.Crop_and_Soil.crop.heat_units import HeatUnits
+from SC_redesign.Crop_and_Soil.crop.leaf_area_index import LeafAreaIndex
 from SC_redesign.Crop_and_Soil.soil.soil import Soil
 
 # TODO: Should use an ENUM class to represent the supported species??
 
-class Crop(GrowthConstraints, BiomassAllocation, WaterDynamics, NitrogenIncorporation, HeatUnits):
+class Crop(GrowthConstraints, BiomassAllocation, WaterDynamics, NitrogenIncorporation, HeatUnits, LeafAreaIndex):
     def __init__(self):
         GrowthConstraints.__init__(self)
         BiomassAllocation.__init__(self)
@@ -52,9 +53,7 @@ class Crop(GrowthConstraints, BiomassAllocation, WaterDynamics, NitrogenIncorpor
         # phosphorus_uptake.update_all()
         #
         self.constrain_growth(max_transpiration, air_temperature)
-        #
-        # leaf_area_index.update_all()
-        #
+        self.grow_canopy()
         self.allocate_biomass(incoming_light)
         self.cycle_water(evaporation, transpiration, max_evapotranspiration)
 
