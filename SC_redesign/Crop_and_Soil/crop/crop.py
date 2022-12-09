@@ -5,6 +5,7 @@ from SC_redesign.Crop_and_Soil.crop.water_dynamics import WaterDynamics
 from SC_redesign.Crop_and_Soil.crop.heat_units import HeatUnits
 from SC_redesign.Crop_and_Soil.soil.soil import Soil
 
+# TODO: Should use an ENUM class to represent the supported species??
 
 class Crop(GrowthConstraints, BiomassAllocation, WaterDynamics, NitrogenIncorporation, HeatUnits):
     def __init__(self):
