@@ -30,7 +30,11 @@ class LeafAreaIndex:
 
     def grow_canopy(self):
         """main leaf area index function"""
-        self.determine_optimal_leaf_area_fraction()
+        # self.determine_optimal_leaf_area_fraction()
+        self._determine_lai_shapes()
+        self.optimal_leaf_area_fraction = calc_optimal_leaf_area_fraction(self.heat_fraction,
+                                                                          self._lai_shapes[0],
+                                                                          self._lai_shapes[1])
         self.determine_canopy_height()
         self.check_for_senescence()
         if self.is_in_senescence:  # senescence
@@ -47,13 +51,25 @@ class LeafAreaIndex:
         self._lai_shapes = calc_shape_parameters(self.first_heat_fraction_point, self.second_heat_fraction_point,
                                                  self.first_leaf_fraction_point, self.second_leaf_fraction_point)
 
-    def determine_optimal_leaf_area_fraction(self):
-        """sets optimal leaf area fraction
-        SWAT Reference: 5:2.1.10"""
-        self._determine_lai_shapes()
-        self.optimal_leaf_area_fraction = calc_optimal_leaf_area_fraction(self.heat_fraction,
-                                                                          self._lai_shapes[0],
-                                                                          self._lai_shapes[1])
+    @staticmethod
+    def determine_optimal_leaf_area_fraction(heat_fraction: float, shape1: float, shape2: float) -> float:
+        """calculates leaf area index fraction, from the optimal leaf area development curve, for the initial period of
+        plant growth
+
+        Args:
+            heat_fraction: fraction of potential heat units
+            shape1: first shape coefficient
+            shape2: second shape coefficient
+
+        Returns:
+            fraction of the plant's maximum leaf area index
+
+        Details: specifically, the calculated value is the 'fraction of the plant's maximum leaf area index corresponding
+        to a given fraction of potential heat units for the plant' (heat_fraction), constrained to be bounded at zero.
+
+        SWAT Reference: 5:2.1.10
+        """
+        return max(heat_fraction / (heat_fraction + exp(shape1 - (shape2 * heat_fraction))), 0)
 
     def shift_leaf_area_time(self):
         """shifts the time window by one step for leaf area attributes"""
@@ -184,21 +200,3 @@ def calc_max_leaf_area_change(leaf_area_fraction, previous_leaf_area_fraction,
     return (leaf_area_fraction - previous_leaf_area_fraction) * max_leaf_area_index * \
            (1 - exp(5 * previous_leaf_area_index - max_leaf_area_index))
 
-def calc_optimal_leaf_area_fraction(heat_fraction: float, shape1: float, shape2: float) -> float:
-    """calculates leaf area index fraction, from the optimal leaf area development curve, for the initial period of
-    plant growth
-
-    Args:
-        heat_fraction: fraction of potential heat units
-        shape1: first shape coefficient
-        shape2: second shape coefficient
-
-    Returns:
-        fraction of the plant's maximum leaf area index
-
-    Details: specifically, the calculated value is the 'fraction of the plant's maximum leaf area index corresponding
-    to a given fraction of potential heat units for the plant' (heat_fraction), constrained to be bounded at zero.
-
-    SWAT Reference: 5:2.1.10
-    """
-    return max(heat_fraction / (heat_fraction + exp(shape1 - (shape2 * heat_fraction))), 0)

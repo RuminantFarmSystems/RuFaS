@@ -11,14 +11,14 @@ from SC_redesign.Crop_and_Soil.crop.leaf_area_index import *
     (0.239, 1.2, -2.33),  # arbitrary
     (-1, 1, 1)
 ])
-def test_calc_optimal_leaf_area_fraction(heatfrac, s1, s2):
+def test_determine_optimal_leaf_area_fraction(heatfrac, s1, s2):
     """ensure that optimal leaf area fraction is properly calculated by calc_optimal_leaf_area_fraction()"""
     x = heatfrac + exp(s1 - s2*heatfrac)
     if heatfrac/x < 0:
         expect = 0
     else:
         expect = heatfrac/x
-    assert calc_optimal_leaf_area_fraction(heatfrac, s1, s2) == expect
+    assert LeafAreaIndex.determine_optimal_leaf_area_fraction(heatfrac, s1, s2) == expect
 
 @pytest.mark.parametrize("heatfrac,areafrac", [
     (0.5, 0.5),  # heatfrac = areafrac
@@ -117,15 +117,15 @@ def init_lai(**kwargs):
 
 # ---- Member functions
 
-@pytest.mark.parametrize("heatfrac", [-1, 0, 0.11, 0.25, 0.5, 0.8, 1])
-def test_determine_optimal_leaf_area_fraction(heatfrac):
-    """ensure that the optimal leaf area fraction is properly set by determine_optimal_leaf_area_fraction"""
-    lai = init_lai(heat_fraction=heatfrac, first_heat_fraction_point=0.15, second_heat_fraction_point=0.50,
-                   first_leaf_fraction_point=0.01, second_leaf_fraction_point=0.95)
-    lai.determine_optimal_leaf_area_fraction()
-    assert [lai._lai_shapes[0], lai._lai_shapes[1]] == calc_shape_parameters(0.15, 0.50, 0.01, 0.95)
-    assert lai.optimal_leaf_area_fraction == calc_optimal_leaf_area_fraction(heatfrac, lai._lai_shapes[0],
-                                                                             lai._lai_shapes[1])
+# @pytest.mark.parametrize("heatfrac", [-1, 0, 0.11, 0.25, 0.5, 0.8, 1])
+# def test_determine_optimal_leaf_area_fraction(heatfrac):
+#     """ensure that the optimal leaf area fraction is properly set by determine_optimal_leaf_area_fraction"""
+#     lai = init_lai(heat_fraction=heatfrac, first_heat_fraction_point=0.15, second_heat_fraction_point=0.50,
+#                    first_leaf_fraction_point=0.01, second_leaf_fraction_point=0.95)
+#     lai.determine_optimal_leaf_area_fraction()
+#     assert [lai._lai_shapes[0], lai._lai_shapes[1]] == calc_shape_parameters(0.15, 0.50, 0.01, 0.95)
+#     assert lai.optimal_leaf_area_fraction == calc_optimal_leaf_area_fraction(heatfrac, lai._lai_shapes[0],
+#                                                                              lai._lai_shapes[1])
 
 @pytest.mark.parametrize("leaf_area,optimal_fraction", [
     (1, 1),
@@ -241,8 +241,9 @@ def test_calc_senescent_leaf_area_index(opt_lai_frac, heatfrac, cutoff):
         expect = 0
     assert calc_senescent_leaf_area_index(heatfrac, cutoff, opt_lai_frac) == expect
 
+# TODO: rewrite test to reflect update functions
 @pytest.mark.parametrize("heatfrac", [0, 0.2, 0.5, 0.75, 0.9, 0.95, 1, 1.2, -1])
-def test_determine_leaf_area(heatfrac):
+def test_grow_canopy(heatfrac):
     """integration test for leaf area processes via grow_canopy()"""
     # observe
     lai = init_lai(heat_fraction=heatfrac, leaf_area_index=0.7,
