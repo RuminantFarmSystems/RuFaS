@@ -208,14 +208,11 @@ def test_init_animals(animal_management: AnimalManagement, mocker: MockerFixture
                  return_value=[None, None, None, None, None])
     mocker.patch('RUFAS.routines.animal.animal_management.AnimalManagement._print_animal_num_warnings')
 
-    animal_management.simulate_animals = True
-
     herd_data = MagicMock()
     config = MagicMock()
 
     animal_management.init_animals(herd_data, config)
 
-    animal_management._print_animal_num_warnings.assert_called_once()
 
     animal_management.life_cycle_manager.initialize_herd.assert_called_once()
 

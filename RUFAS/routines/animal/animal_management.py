@@ -147,11 +147,14 @@ class AnimalManagement:
 
         self.init_pens(data['pen_information'], data['herd_information'])
 
-        self.init_animals(data['herd_information'], config)
+        if self.simulate_animals:
+            self.init_animals(data['herd_information'], config)
 
-        self.init_nutrient_rqmts(weather, time, feed)
+            self.init_nutrient_rqmts(weather, time, feed)
 
-        self.allocate_all_pens()
+            self.allocate_all_pens()
+
+        self._print_animal_num_warnings(data['herd_information'])
 
     def init_pens(self, all_pen_data, herd_data):
         """
@@ -206,18 +209,10 @@ class AnimalManagement:
             herd_data: dictionary containing information about the herd
         """
 
-        # TODO: resolve discrepancy: pen_data is not a dictionary of pen information -- it is just self.all_pens
-        #  current solution -- get rid of usage of pen_data, because self.all_pens will always have > 0 bc
-        #  init_default_pens initializes default pens
+        herd_data['config'] = config
+        self.calves, self.heiferIs, self.heiferIIs, self.heiferIIIs, self.cows \
+            = self.life_cycle_manager.initialize_herd(**herd_data)
 
-        if self.simulate_animals:
-            herd_data['config'] = config
-            self.calves, self.heiferIs, self.heiferIIs, self.heiferIIIs, self.cows \
-                = self.life_cycle_manager.initialize_herd(**herd_data)
-
-        self._print_animal_num_warnings(herd_data)
-
-    # @staticmethod
     def _print_animal_num_warnings(self, herd_data):
         """
         If simulate_animals is false, prints out warnings if there are more than 0 animals for any of the animal types,
