@@ -15,7 +15,11 @@ class Yields():
         self.potential_harvest_index = None
         self.harvest_index = None
     def obtain_yields(self):
-        # calc_HI_max(crop_type)
+        self.potential_harvest_index = self.determine_potential_harvest_index(self.heat_fraction,
+                                                                             self.optimal_harvest_index)
+        self.harvest_index = self.adjust_harvest_index(self.potential_harvest_index,
+                                                       self.min_harvest_index,
+                                                       self.water_deficiency)
         # calc_HI_act(crop_type)
         #
         # if crop_type.fr_PHU > 1.0:
@@ -29,18 +33,8 @@ class Yields():
         # calc_quality_assessment(crop_type)
         pass
 
-    def determine_potential_harvest_index(self):
-        """updates the potential harvest index for the day"""
-        self.potential_harvest_index = self.calc_potential_harvest_index(self.heat_fraction, self.optimal_harvest_index)
-
-    def adjust_harvest_index(self):
-        """adjusts the plant's harvest index for """
-        # TODO: how to pass collect warnings from calc_actual_harvest_index and pass them to output manager?
-        self.harvest_index = self.calc_actual_harvest_index(self.potential_harvest_index, self.min_harvest_index,
-                                                            self.water_deficiency)
-
     @staticmethod
-    def calc_potential_harvest_index(heat_fraction, optimal_harvest_index):
+    def determine_potential_harvest_index(heat_fraction, optimal_harvest_index):
         """calculates the potential harvest index for a plant on a given day
 
         Args:
@@ -55,7 +49,7 @@ class Yields():
         return optimal_harvest_index * heat_percent / (heat_percent + exp(11.1 - 10 * heat_fraction))
 
     @staticmethod
-    def calc_actual_harvest_index(harvest_index: float, min_harvest_index: float, water_deficiency: float) -> float:
+    def adjust_harvest_index(harvest_index: float, min_harvest_index: float, water_deficiency: float) -> float:
         """calculates the actual harvest index for a given day, adjusted for water deficiency
 
         Args:
@@ -66,16 +60,19 @@ class Yields():
         Returns: actual harvest index
         """
         if harvest_index < 0:
-            warnings.warn("harvest index is less than zero, setting to zero", Warning)
+            # warnings.warn("harvest index is less than zero, setting to zero", Warning)
             harvest_index = 0
         if harvest_index < min_harvest_index:
-            warnings.warn("harvest index is lower than minimum possible harvest index, setting it to the minimum",
-                          Warning)
+            # warnings.warn("harvest index is lower than minimum possible harvest index, setting it to the minimum",
+            #               Warning)
             harvest_index = min_harvest_index
 
         adj_harvest_index = (harvest_index - min_harvest_index) * water_deficiency / \
                             (water_deficiency + exp(6.13 - 0.883 * water_deficiency)) + min_harvest_index
         return max(adj_harvest_index, 0)  # bound to zero
+
+
+
 
 
 # -- OLD
