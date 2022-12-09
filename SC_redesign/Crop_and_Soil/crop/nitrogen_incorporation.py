@@ -1,5 +1,6 @@
 from math import log, exp
 from bisect import bisect
+from typing import List
 
 """
 This module is based upon the 'Nitrogen Uptake" section of of the SWAT model documentation 
@@ -42,7 +43,7 @@ class NitrogenIncorporation:
         self.fixation_stage_factor = None
 
     # ---- wrapper functions (main routines) ----
-    def incorporate_nitrogen(self, layer_nitrates: list[float], layer_depths: list[float],
+    def incorporate_nitrogen(self, layer_nitrates: List[float], layer_depths: List[float],
                              soil_water_factor: float) -> None:
         """main nitrogen incorporation function - runs all nitrogen processes and stores nitrogen as biomass
 
@@ -65,7 +66,7 @@ class NitrogenIncorporation:
         self.try_fixation(total_accessible_nitrates, soil_water_factor)
         self.store_obtained_nitrogen()
 
-    def uptake_nitrogen(self, layer_nitrates: list[float], layer_depths: list[float]) -> None:
+    def uptake_nitrogen(self, layer_nitrates: List[float], layer_depths: List[float]) -> None:
         """conducts steps necessary to uptake nitrogen from soil
 
         Args:
@@ -122,7 +123,7 @@ class NitrogenIncorporation:
                                                                             self.mature_nitrogen_fraction,
                                                                             self.biomass_growth_max)
 
-    def determine_deepest_accessible_soil_layer(self, depths: list[float]) -> None:
+    def determine_deepest_accessible_soil_layer(self, depths: List[float]) -> None:
         """evaluates the accessibility of layers in the soil profile by plant roots
 
         Args:
@@ -145,7 +146,7 @@ class NitrogenIncorporation:
         """
         return layer_list[0:self.accessible_soil_layers]
 
-    def stratify_potential_nitrogen_uptake(self, accessible_depths: list[float]) -> None:
+    def stratify_potential_nitrogen_uptake(self, accessible_depths: List[float]) -> None:
         """stratifies potential nitrogen uptake by the accessible soil layers.
 
         Args:
@@ -161,7 +162,7 @@ class NitrogenIncorporation:
                                                                               self.root_depth,
                                                                               self.nitrogen_distro_param)
 
-    def stratify_unmet_nitrogen_demand(self, accessible_nitrates: list[float]) -> None:
+    def stratify_unmet_nitrogen_demand(self, accessible_nitrates: List[float]) -> None:
         """determines the nitrogen demand at each accessible soil layer that remains unmet by the above layers
 
         Args:
@@ -169,7 +170,7 @@ class NitrogenIncorporation:
         """
         self.unmet_nitrogen_demands = calc_layer_nitrogen_demands(self.layer_nitrogen_potentials, accessible_nitrates)
 
-    def stratify_nitrogen_uptake_requests(self, accessible_nitrates: list[float]) -> None:
+    def stratify_nitrogen_uptake_requests(self, accessible_nitrates: List[float]) -> None:
         """determines the amount of nitrogen the plant would like to request from each soil layer
 
         Args:
@@ -200,7 +201,7 @@ class NitrogenIncorporation:
         if self.inaccessible_soil_layers > 0:
             self.actual_nitrogen_uptakes += [0] * self.inaccessible_soil_layers
 
-    def extract_nitrogen_from_soil_layers(self, layer_nitrates: list[float]) -> None:
+    def extract_nitrogen_from_soil_layers(self, layer_nitrates: List[float]) -> None:
         """extracts nitrogen from the soil profile by layer.
 
         Args:
@@ -269,7 +270,7 @@ class NitrogenIncorporation:
 # TODO: these should maybe be static methods instead?
 def calc_shape_parameters(half_mature_heat_fraction: float, mature_heat_fraction: float,
                           emergence_nitrogen_fraction: float, half_mature_nitrogen_fraction: float,
-                          near_mature_nitrogen_fraction: float, mature_nitrogen_fraction: float) -> list[float]:  # pseudocode: C.5.A.1, C.5.A.2
+                          near_mature_nitrogen_fraction: float, mature_nitrogen_fraction: float) -> List[float]:  # pseudocode: C.5.A.1, C.5.A.2
     """
     Description: calculates the shape coefficients for the nitrogen fraction equation
 
@@ -399,8 +400,8 @@ def calc_potential_nitrogen_uptake(demand: float, nitrogen_start: float, mature_
     return min(demand - nitrogen_start, 4 * mature_nitrogen_fraction * max_growth)
 
 
-def calc_layer_nitrogen_uptake(layer_demands: list[float], layer_uptake_potentials: list[float],
-                               layer_nitrates: list[float]) -> list[float]:  # pseudocode: C.5.C.4
+def calc_layer_nitrogen_uptake(layer_demands: List[float], layer_uptake_potentials: List[float],
+                               layer_nitrates: List[float]) -> List[float]:  # pseudocode: C.5.C.4
     """
     Description: calculates nitrogen uptake from each soil layer
 
@@ -419,7 +420,7 @@ def calc_layer_nitrogen_uptake(layer_demands: list[float], layer_uptake_potentia
     return [min(desired, nitrate) for desired, nitrate in zip(layer_desired, layer_nitrates)]
 
 
-def calc_layer_nitrogen_demands(uptake_potentials: list[float], nitrate_availabilities: list[float]) -> list[float]:  # pseudocode: C.5.C.5
+def calc_layer_nitrogen_demands(uptake_potentials: List[float], nitrate_availabilities: List[float]) -> List[float]:  # pseudocode: C.5.C.5
     """
     Description: calculates nitrogen demand of the plant from each soil layer
 
@@ -459,8 +460,8 @@ def calc_nitrogen_uptake_to_depth(demand: float, depth: float, root_depth: float
         return first_term * second_term
 
 
-def calc_layer_nitrogen_uptake_potential(layer_bounds: list[float], total_demand: float, root_depth: float,
-                                         nitrogen_distribution_parameter: float) -> list[float]:  # pseudocode: C.5.C.2, C.5.C.3
+def calc_layer_nitrogen_uptake_potential(layer_bounds: List[float], total_demand: float, root_depth: float,
+                                         nitrogen_distribution_parameter: float) -> List[float]:  # pseudocode: C.5.C.2, C.5.C.3
     """
     Description: calculates potential nitrogen uptake from each soil layer
 
@@ -502,7 +503,7 @@ def calc_extracted_resource(request: float, source: float) -> float:
     return min(request, max(0.0, source))
 
 
-def calc_layer_extracted_resource(requests: list[float], sources: list[float]) -> list[float]:
+def calc_layer_extracted_resource(requests: List[float], sources: List[float]) -> List[float]:
     if len(requests) != len(sources):
         raise ValueError("requests and sources should be the same length")
 
@@ -591,7 +592,7 @@ def calc_nitrate_factor(total_accessible_nitrates):
     else:
         return 0
 
-def calc_deepest_accessible_layer(root_depth: float, layer_bounds: list[float]) -> int:
+def calc_deepest_accessible_layer(root_depth: float, layer_bounds: List[float]) -> int:
     """
     Description:
         Determines the deepest soil layer that is accessible to roots.

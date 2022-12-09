@@ -21,8 +21,7 @@ Description:
     or any variables that do not correspond to crop-specific parameters.
 """
 
-# TODO: SWAT distributes with a database of plant-growth parameters by species. This file needs to be cross-referenced
-#       with that database. source: https://swat.tamu.edu/media/69341/ch14_input_plantdb.pdf
+# TODO: Validate species-specific growth parameters - GitHub Issue #231
 
 ALFALFA = {
         # alfalfa ID variables
