@@ -287,9 +287,13 @@ class FieldReport(BaseReportDriver):
                     'M_d': ['layer.M_d', '', []],
                     'fr_tillage': ['layer.tillage_percent', '', []],
                     'water_fac': ['layer.water_fac', '', []],
+                    'temp_fac': ['layer.temp_fac', '', []],
                     'active_C': ['layer.C_active', 'kg/ha', []],
                     'slow': ['layer.C_slow', 'kg/ha', []],
-                    'passive': ['layer.C_passive', 'kg/ha', []]
+                    'passive': ['layer.C_passive', 'kg/ha', []],
+                    'fc_water': ['layer.fc_water', 'kg/ha', []],
+                    'soil_water': ['layer.soil_water', 'kg/ha', []],
+                    'wilting_water': ['layer.wilting_water', 'kg/ha', []]
                 }
 
                 self.annual_variables = {
