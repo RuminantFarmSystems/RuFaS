@@ -1,4 +1,5 @@
 from math import exp, log, sqrt
+from typing import List
 
 """
 This module is based off of the 'Canopy Cover and Height' section of SWAT
@@ -153,13 +154,13 @@ def calc_shape_log(heat_fraction: float, leaf_area_fraction: float) -> float:
     return log((heat_fraction/leaf_area_fraction) - heat_fraction)
 
 def calc_shape_parameters(first_heat_fraction: float, second_heat_fraction: float,
-                          first_leaf_fraction: float, second_leaf_fraction: float) -> list[float]:
+                          first_leaf_fraction: float, second_leaf_fraction: float) -> List[float]:
     """calculates the shape coefficients for optimal LAI formula"""
     if first_heat_fraction <= 0:
         raise ValueError("first_heat_fraction must be greater than 0")
     if second_heat_fraction <= 0:
         raise ValueError("second_heat_fraction must be greater than 0")
-    if no 0 < first_leaf_fraction < 1:
+    if not 0 < first_leaf_fraction < 1:
         raise ValueError("first_leaf_fraction must not be greater than 0 or less than 1")
     if not 0 < second_leaf_fraction < 1:
         raise ValueError("second_leaf_fraction must not be greater than 0 or less than 1")

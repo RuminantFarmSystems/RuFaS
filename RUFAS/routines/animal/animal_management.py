@@ -163,11 +163,6 @@ class AnimalManagement:
             herd_data: dictionary containing information about the herd
         """
 
-        info_map = {"class": self.__class__.__name__, 
-                    "function": self.init_pens.__name__,
-                    "all_pens_data": all_pens_data,
-                    "herd_data": herd_data,}
-
         for pen_name in all_pens_data:
             pen_data = all_pens_data[pen_name]
             pen_id = pen_data['id']
@@ -201,7 +196,11 @@ class AnimalManagement:
         manure_separator = "sedimentation"
         manure_storage = "storage_pit"
         animal_combination = None
-        info_map["all_pens"] = self.all_pens
+        info_map = {"class": self.__class__.__name__, 
+                    "function": self.init_pens.__name__,
+                    "all_pens_data": all_pens_data,
+                    "herd_data": herd_data,
+                    "all_pens": self.all_pens,}
         if (len(self.all_pens) == 0) and (herd_num > 0):
             om.add_warning("invalid_pen_num_warning", 
                             "Warning: herd_num > 0, but pen_num = 0."
@@ -261,7 +260,7 @@ class AnimalManagement:
             time: instance of the Time class defined in classes.py
         """
         info_map = {"class": self.__class__.__name__, 
-                    "function": self.__init__.__name__,
+                    "function": self.init_animals.__name__,
                     "herd_data": herd_data,
                     "pen_data": pen_data,
                     "weather": weather,
