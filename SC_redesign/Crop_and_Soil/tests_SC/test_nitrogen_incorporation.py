@@ -648,6 +648,7 @@ def test_store_obtained_nitrogen(up, nitro, fix):
     crop.store_obtained_nitrogen()
     assert crop.nitrogen == calc_stored_nitrogen(up, nitro, fix)
 
+# TODO: Integration tests needed
 # def test_uptake_nitrogen():
 #     """integration test for uptake_nitrogen()"""
 #     raise Exception("need to write an integration test for uptake_nitrogen")
