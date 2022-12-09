@@ -8,7 +8,7 @@
         "run_tests": true,
         "set_seed": true,
         "seed": 42,
-        "simulate_animals": true
+        "simulate_animals": false
     },
     "weather": "barnyard_weather.csv",
     "output": "life_cycle_report.json",

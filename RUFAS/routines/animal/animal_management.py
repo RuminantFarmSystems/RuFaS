@@ -14,6 +14,7 @@ Author(s): Militsa Sotirova, militsasotirova@gmail.com
            Chris VanKerkhove, cjv47@cornell.edu
            Joseph Merhi, jm2257@cornell.edu
 """
+from RUFAS.output_manager import OutputManager
 from RUFAS.routines.animal.pen import Pen
 from RUFAS.routines.animal.clustering_pen_grouping import grouping
 from RUFAS.routines.animal.life_cycle.life_cycle import LifeCycleManager
@@ -23,6 +24,8 @@ from collections import deque
 import random
 from typing import Tuple
 from statistics import mean
+
+om = OutputManager()
 
 
 def daily_animal_routine(animal_management, feed, weather, time):
@@ -182,12 +185,22 @@ class AnimalManagement:
                 herd_num: number of animals in the herd
             """
 
+        num_pens = len(self.all_pens)
         num_additional_pens_needed = self.MIN_NUM_PENS - len(self.all_pens)
+
+        info_map = {"class": self.__class__.__name__,
+                    "function": self.init_pens.__name__,
+                    "MIN_NUM_PENS": self.MIN_NUM_PENS,
+                    "num_pens": num_pens,
+                    "num_additional_pens_needed": num_additional_pens_needed
+                    }
 
         # Check if any default pens need to be added
         if num_additional_pens_needed > 0 and herd_num > 0:
-            print('Warning: herd_num > 0, but num_pens =', len(self.all_pens), '. Initializing',
-                  num_additional_pens_needed, 'additional pens.')
+            om.add_warning("invalid_pen_num_warning",
+                           f"Warning: herd_num > 0, but num_pens = {num_pens}."
+                           + f" Initializing {num_additional_pens_needed} additional pens.",
+                           info_map)
             for i in range(num_additional_pens_needed):
                 new_default_pen = Pen(0, 0.1, 1.6, 100, 'open air barn', 'sand', 'freestall',
                                       "manual_scraping", "sedimentation", "storage_pit",
@@ -215,27 +228,38 @@ class AnimalManagement:
 
     def _print_animal_num_warnings(self, herd_data):
         """
-        If simulate_animals is false, prints out warnings if there are more than 0 animals for any of the animal types,
+        If simulate_animals is false, creates warnings if there are more than 0 animals for any of the animal types,
             and logs how many warnings were generated
         Otherwise, if simulate_animals is true, logs that it is true
 
         Args:
             herd_data: dictionary containing information about the herd
         """
+
+        info_map = {
+            "class": self.__class__.__name__,
+            "function": self._print_animal_num_warnings.__name__,
+            "herd_data": herd_data
+        }
+
         counter = 0
 
         if not self.simulate_animals:
             animal_keys = {"calf_num", "heiferI_num", "heiferII_num", "heiferIII_num", "cow_num"}
             for key in animal_keys:
                 if herd_data[key] != 0:
-                    # send this to warning pool later
-                    print("Warning: simulate_animals is false, but", key, "!= 0.")
+
+                    om.add_warning("invalid_cow_num_warning",
+                                   f"Warning: herd_num is 0, but {key} is not.",
+                                   info_map)
                     counter += 1
-            # send to log pool
-            print(counter, "warnings were associated with simulate_animals")
+            om.add_log("num_warnings_associated_with_simulate_animals",
+                       f"{counter} warnings were associated with simulate_animals",
+                       info_map)
         else:
-            # send to log pool
-            print("Simulate animals_is true")
+            om.add_log("simulate_animals_flag",
+                       "simulate_animals is true",
+                       info_map)
 
     def init_nutrient_rqmts(self, weather, time, feed):
         """
@@ -593,7 +617,10 @@ class AnimalManagement:
                                            Pen.AnimalCombination.CLOSE_UP, Pen.AnimalCombination.LAC_COW]
                 else:
                     mixed_types[pen.id] = pen.animal_combination
-        # organzing pens by class and ensuring sufficeint storage
+        # organizing pens by class and ensuring sufficient storage
+        info_map = {"class": self.__class__.__name__,
+                    "function": self.allocate_all_pens.__name__,
+                    "all_pens": self.all_pens, }
         while True:
             max_value = max(stall_shortage.values())
             if max_value > 0:
@@ -608,8 +635,11 @@ class AnimalManagement:
                         stalls = pen.num_stalls
                 # if no available pens for this group in mixed types
                 if pen is None:
-                    print('Warning: shortage of ', max_key[0].name, ' pens, initializing new pen')
-                    # initalizing a default pen to be used for any class
+                    om.add_warning("pen_shortage_warning",
+                                   f"Warning: shortage of {max_key[0].name} pens,"
+                                   + " initializing new pen,",
+                                   info_map)
+                    # initializing a default pen to be used for any class
                     pen = Pen(len(self.all_pens), 0.1, 1.6, max_value,
                               'open air barn', 'straw', 'tiestall', 'manual_scraping',
                               'sedimentation', 'storage_pit', max_key[0], 1.2)
@@ -914,11 +944,19 @@ class AnimalManagement:
                           len(self.cows),
                           len(self.life_cycle_manager.sold_heifers),
                           len(self.life_cycle_manager.culled_cows))
+
+        info_map = {"class": self.__class__.__name__,
+                    "function": self.get_life_cycle_output.__name__,
+                    "num_animals": num_animals,
+                    "minimum_num": minimum_num, }
+
         if num_animals > minimum_num:
-            print('\nThe smallest animal list is of size ' + str(minimum_num) +
-                  ' so ' + str(num_animals) + ' of each animal class cannot ' +
-                  'be in the life cycle output. Only ' + str(minimum_num) +
-                  ' of each animal type will be in the life cycle output.')
+            om.add_warning("invalid_animal_list_size",
+                           f"The smallest animal list is of size {minimum_num}"
+                           + f" so {num_animals} of each animal class cannot be"
+                           + f" in the life cycle output. Only {minimum_num} of"
+                           + " each animal type will be in the life cycle output.",
+                           info_map)
             num_animals = minimum_num
 
         output = {
