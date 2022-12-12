@@ -5,9 +5,9 @@ name: Linting
 
 on:
   push:
-    branches: [ master ]
+    branches: [ master, SC_redesign ]
   pull_request:
-    branches: [ master ]
+    branches: [ master, SC_redesign ]
 
 jobs:
   build:
