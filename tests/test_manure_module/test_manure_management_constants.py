@@ -52,4 +52,3 @@ def test_gas_emission_constants() -> None:
     assert constants.SPECIFIC_GROWTH_RATE == approx(0.637)
 
     assert constants.DEFAULT_HOUSING_SPECIFIC_CONSTANT == approx(260.0)
-

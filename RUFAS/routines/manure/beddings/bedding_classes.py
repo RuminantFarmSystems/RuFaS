@@ -24,8 +24,8 @@ class BaseBedding(ABC):
     Attributes:
         bedding_mass_per_day: Amount of bedding needed for each animal per day, kg/animal/day.
         bedding_density: Density of the bedding, kg/m^3.
-        bedding_dry_matter_content: Dry matter mass of the bedding, [0.7 - 1.0].
-        bedding_cleaned_frac: Fraction of bedding removed from the barn [0.7 - 1.0].
+        bedding_dry_matter_content: Dry matter content of the bedding, [0.7 - 1.0].
+        bedding_cleaned_fraction: Fraction of bedding removed from the barn [0.7 - 1.0].
         bedding_type: Type of bedding.
 
     """
@@ -41,7 +41,7 @@ class BaseBedding(ABC):
         self.bedding_mass_per_day = bedding_config.bedding_mass_per_day
         self.bedding_density = bedding_config.bedding_density
         self.bedding_dry_matter_content = bedding_config.bedding_dry_matter_content
-        self.bedding_cleaned_frac = bedding_config.bedding_cleaned_frac
+        self.bedding_cleaned_fraction = bedding_config.bedding_cleaned_fraction
         self.bedding_type = bedding_config.bedding_type
 
     def calc_total_bedding_washed(self, num_animals: int) -> float:
@@ -54,7 +54,7 @@ class BaseBedding(ABC):
             Total amount of bedding that is washed away, kg/animal/day.
 
         """
-        return self.bedding_cleaned_frac * self.calc_total_bedding_mass(num_animals)
+        return self.bedding_cleaned_fraction * self.calc_total_bedding_mass(num_animals)
 
     @abstractmethod
     def calc_total_bedding_mass(self, num_animals: int) -> float:
@@ -171,15 +171,16 @@ class BeddingConfig:
     Attributes:
         bedding_mass_per_day: Amount of bedding needed for each animal per day, kg/animal/day.
         bedding_density: Density of the bedding, kg/m^3.
-        bedding_dry_matter_content: Dry matter content of the bedding, [0.7, 1.0], dimensionless.
-        bedding_cleaned_frac: Percent of the bedding that is washed away, [0.7, 1.0], dimensionless.
+        bedding_dry_matter_content: Dry matter content of the bedding as a fraction of the total mass, [0.7, 1.0],
+        dimensionless.
+        bedding_cleaned_fraction: Percent of the bedding that is washed away, [0.7, 1.0], dimensionless.
         sand_removal_efficiency: Efficiency of removing sand from the bedding, [0.7, 1.0], dimensionless.
 
     """
     bedding_mass_per_day: float
     bedding_density: float
     bedding_dry_matter_content: float
-    bedding_cleaned_frac: float
+    bedding_cleaned_fraction: float
     bedding_type: BeddingType
     sand_removal_efficiency: float = 0.0
 
@@ -191,7 +192,7 @@ class DefaultBeddingConfigFactory:
             bedding_mass_per_day=1.97,
             bedding_density=250.0,
             bedding_dry_matter_content=0.9,
-            bedding_cleaned_frac=1.0,
+            bedding_cleaned_fraction=1.0,
             bedding_type=BeddingType.SAWDUST,
     )
 
@@ -199,7 +200,7 @@ class DefaultBeddingConfigFactory:
             bedding_mass_per_day=2.50,
             bedding_density=400.0,
             bedding_dry_matter_content=0.9,
-            bedding_cleaned_frac=1.0,
+            bedding_cleaned_fraction=1.0,
             bedding_type=BeddingType.MANURE_SOLIDS,
     )
 
@@ -207,7 +208,7 @@ class DefaultBeddingConfigFactory:
             bedding_mass_per_day=25.0,
             bedding_density=1500.0,
             bedding_dry_matter_content=0.9,
-            bedding_cleaned_frac=1.0,
+            bedding_cleaned_fraction=1.0,
             bedding_type=BeddingType.SAND,
             sand_removal_efficiency=1.0,
     )
