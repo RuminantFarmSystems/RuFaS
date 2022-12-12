@@ -161,7 +161,6 @@ class LeafAreaIndex:
         SWAT Reference: 5:2.1.18"""
         self.leaf_area_index = max(0, self.previous_leaf_area_index + self.leaf_area_added)
 
-    # TODO CHECKME: having this method with an @property decorator and having the is_in_senescence field seems redundant
     @property
     def is_in_senescence(self) -> bool:
         """check if the plant is in senescence"""
