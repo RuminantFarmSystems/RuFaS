@@ -32,16 +32,15 @@ class LeafAreaIndex:
 
     def grow_canopy(self):
         """main leaf area index function"""
-        # self.determine_optimal_leaf_area_fraction()
-        self.optimal_leaf_area_fraction = self.determine_optimal_leaf_area_fraction(self.heat_fraction,
-                                                                                    self._lai_shapes[0],
-                                                                                    self._lai_shapes[1])
-        # self._determine_lai_shapes()
         self._lai_shapes = self.determine_lai_shapes(self.first_heat_fraction_point, self.second_heat_fraction_point,
                                                      self.first_leaf_fraction_point, self.second_leaf_fraction_point)
 
+        self.optimal_leaf_area_fraction = self.determine_optimal_leaf_area_fraction(self.heat_fraction,
+                                                                                    self._lai_shapes[0],
+                                                                                    self._lai_shapes[1])
+
         self.determine_canopy_height()
-        self.check_for_senescence()
+        self.is_in_senescence = self.check_for_senescence
         if self.is_in_senescence:  # senescence
             self.leaf_area_index = self.determine_senescent_leaf_area_index(self.heat_fraction,
                                                                             self.senescent_heat_fraction,
@@ -59,7 +58,10 @@ class LeafAreaIndex:
     @staticmethod
     def determine_lai_shapes(first_heat_fraction: float, second_heat_fraction: float,
                              first_leaf_fraction: float, second_leaf_fraction: float) -> List[float]:
-        """calculates the shape coefficients for optimal LAI formula"""
+        """
+        calculates the shape coefficients for optimal LAI formula
+        replaces method calc_shape_parameters
+        """
         if first_heat_fraction <= 0:
             raise ValueError("first_heat_fraction must be greater than 0")
         if second_heat_fraction <= 0:
@@ -87,6 +89,8 @@ class LeafAreaIndex:
     def determine_optimal_leaf_area_fraction(heat_fraction: float, shape1: float, shape2: float) -> float:
         """calculates leaf area index fraction, from the optimal leaf area development curve, for the initial period of
         plant growth
+
+        replaces method calc_optimal_leaf_area_fraction
 
         Args:
             heat_fraction: fraction of potential heat units
@@ -128,6 +132,8 @@ class LeafAreaIndex:
         """
         calculates the maximum leaf area added during the day
 
+        replaces method calc_max_leaf_area_change
+
         Args:
             leaf_area_fraction: optimal leaf area fraction for the day
             previous_leaf_area_fraction: previous day's optimal leaf area fraction
@@ -157,6 +163,7 @@ class LeafAreaIndex:
         SWAT Reference: 5:2.1.18"""
         self.leaf_area_index = max(0, self.previous_leaf_area_index + self.leaf_area_added)
 
+    # TODO CHECKME: having this method with an @property decorator and having the is_in_senescence field seems redundant
     @property
     def check_for_senescence(self) -> bool:
         """check if the plant is in senescence"""
@@ -166,6 +173,8 @@ class LeafAreaIndex:
     def determine_senescent_leaf_area_index(heat_fraction: float, senescent_heat_fraction: float,
                                             optimal_leaf_area_fraction: float) -> float:
         """calculates a plant's leaf area index during senescence
+
+        replaces method calc_senescent_leaf_area_index
 
         Args:
             heat_fraction: the current fraction of potential heat units
@@ -192,6 +201,6 @@ class LeafAreaIndex:
             leaf_area_fraction: fraction of max leaf area; must be greater than zero, less than one, and not
                 equal to heat_fraction
 
-        Details: used by calc_shape_parameters, where errors are handled
+        Details: used by determine_lai_shapes, where errors are handled
         """
         return log((heat_fraction / leaf_area_fraction) - heat_fraction)
