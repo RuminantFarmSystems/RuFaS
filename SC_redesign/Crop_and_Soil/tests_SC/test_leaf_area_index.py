@@ -73,7 +73,7 @@ def test_determine_lai_shapes(heatfrac1, heatfrac2, areafrac1, areafrac2):
     y = LeafAreaIndex.calc_shape_log(heatfrac2, areafrac2)
     s2 = (x - y) / (heatfrac2 - heatfrac1)
     s1 = x + s2 * heatfrac1
-    assert LeafAreaIndex.determine_lai_shapes(heatfrac1, heatfrac2, areafrac1, areafrac2) == [s1, s2]
+    assert LeafAreaIndex._determine_lai_shapes(heatfrac1, heatfrac2, areafrac1, areafrac2) == [s1, s2]
 
 
 @pytest.mark.parametrize("heatfrac1,heatfrac2,areafrac1,areafrac2", [
@@ -93,7 +93,7 @@ def test_determine_lai_shapes(heatfrac1, heatfrac2, areafrac1, areafrac2):
 def test_error_determine_lai_shape(heatfrac1, heatfrac2, areafrac1, areafrac2):
     """check that invalid input to test_error_calc_shape_parameters throws errors"""
     with pytest.raises(ValueError):
-        LeafAreaIndex.determine_lai_shapes(heatfrac1, heatfrac2, areafrac1, areafrac2)
+        LeafAreaIndex._determine_lai_shapes(heatfrac1, heatfrac2, areafrac1, areafrac2)
 
 
 @pytest.mark.parametrize("heatfrac,senheatfrac,optareafrac", [
@@ -139,6 +139,30 @@ def test_determine_max_leaf_area_change(frac, prev_frac, max_lai, prev_lai):
     assert LeafAreaIndex.determine_max_leaf_area_change(frac, prev_frac, max_lai, prev_lai) == scaled_diff * expo
 
 
+@pytest.mark.parametrize("max_can_height, opt_leaf_area_frac", [
+    (0, 0),
+    (1, 1),
+    (1.3, 0.4),
+    (2.4, 0.9)
+])
+def test_determine_canopy_height(max_can_height, opt_leaf_area_frac):
+    sqrt_opt = sqrt(opt_leaf_area_frac)
+    product = max_can_height * sqrt_opt
+    expect = min(max_can_height, product)
+    assert expect == LeafAreaIndex.determine_canopy_height(max_can_height, opt_leaf_area_frac)
+
+
+@pytest.mark.parametrize("max_can_height, opt_leaf_area_frac", [
+    (-0.1, 0),  # Negative max canopy height
+    (1, 1.5),   # Optimal leaf frac > 1
+    (1, -0.3),  # Optimal leaf frac negative
+    (-0.5, 1.3)  # Negative max canopy height and optimal leaf height > 1
+])
+def test_error_determine_canopy_height(max_can_height, opt_leaf_area_frac):
+    with pytest.raises(ValueError):
+        LeafAreaIndex.determine_canopy_height(max_can_height, opt_leaf_area_frac)
+
+
 # ---- Initializer functions
 def init_lai(**kwargs):
     """helper function to create GrowthConstraint instance, with specified attributes"""
@@ -146,6 +170,7 @@ def init_lai(**kwargs):
     for key, val in kwargs.items():
         setattr(lai, key, val)
     return lai
+
 
 @pytest.mark.parametrize("heatfrac", [0, 0.2, 0.5, 0.75, 0.9, 0.95, 1, 1.2, -1])
 def test_grow_canopy(heatfrac):
@@ -157,11 +182,12 @@ def test_grow_canopy(heatfrac):
                    senescent_heat_fraction=0.9, previous_leaf_area_index=0.1, previous_optimal_leaf_area_fraction=0.01)
     lai.grow_canopy()
     # expect
-    shapes = LeafAreaIndex.determine_lai_shapes(0.2, 0.33, 0.05, 0.95)
+    shapes = LeafAreaIndex._determine_lai_shapes(0.2, 0.33, 0.05, 0.95)
     assert lai._lai_shapes == shapes
     optimal_lai = LeafAreaIndex.determine_optimal_leaf_area_fraction(heatfrac, shapes[0], shapes[1])
     assert lai.optimal_leaf_area_fraction == optimal_lai
-    assert lai.canopy_height == 2.5*sqrt(optimal_lai)
+    assert lai.canopy_height == LeafAreaIndex.determine_canopy_height(lai.max_canopy_height,
+                                                                      lai.optimal_leaf_area_fraction)
     if heatfrac <= 0.9:  # normal growth
         assert lai.is_in_senescence is False
         max_change = LeafAreaIndex.determine_max_leaf_area_change(optimal_lai, 0.01, 3.0, 0.1)
