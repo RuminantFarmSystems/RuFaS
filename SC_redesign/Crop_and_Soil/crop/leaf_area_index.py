@@ -20,7 +20,6 @@ class LeafAreaIndex:
         # variable attributes (change throughout simulations)
         self.leaf_area_index = 0
         self.heat_fraction = 0.73
-        self.is_in_senescence = False
         # empty variables
         self._lai_shapes = None
         self.optimal_leaf_area_fraction = None
@@ -40,7 +39,6 @@ class LeafAreaIndex:
                                                                                     self._lai_shapes[1])
 
         self.determine_canopy_height()
-        self.is_in_senescence = self.check_for_senescence
         if self.is_in_senescence:  # senescence
             self.leaf_area_index = self.determine_senescent_leaf_area_index(self.heat_fraction,
                                                                             self.senescent_heat_fraction,
@@ -165,7 +163,7 @@ class LeafAreaIndex:
 
     # TODO CHECKME: having this method with an @property decorator and having the is_in_senescence field seems redundant
     @property
-    def check_for_senescence(self) -> bool:
+    def is_in_senescence(self) -> bool:
         """check if the plant is in senescence"""
         return self.heat_fraction > self.senescent_heat_fraction
 
