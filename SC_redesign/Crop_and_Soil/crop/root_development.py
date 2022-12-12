@@ -11,7 +11,7 @@ class RootDevelopment:
         self.root_depth = None
         self.root_fraction = None
 
-    def develop_roots(self):
+    def develop_roots(self) -> None:
         """main root development function
 
         Details: updates the root_fraction and root_depth attributes. The latter is updated differently
