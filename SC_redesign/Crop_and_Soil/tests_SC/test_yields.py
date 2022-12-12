@@ -1,7 +1,7 @@
 import pytest
 from SC_redesign.Crop_and_Soil.crop.yields import *
 
-
+# ---- Test Static Functions ----
 @pytest.mark.parametrize("heatfrac,optimal_index", [
     (0, 1),
     (1, 1),
@@ -11,12 +11,12 @@ from SC_redesign.Crop_and_Soil.crop.yields import *
     (0.5, 100),
     (0.326, 12.2)  # arbitrary
 ])
-def test_calc_potential_harvest_index(heatfrac, optimal_index):
+def test_determine_potential_harvest_index(heatfrac, optimal_index):
     """ensure that the potential harvest index is properly calculated"""
     top = 100 * heatfrac
     bottom = (100 * heatfrac) + exp(11.1 - (10 * heatfrac))
     expect = optimal_index * (top/bottom)
-    assert Yields.calc_potential_harvest_index(heatfrac, optimal_index) == expect
+    assert Yields.determine_potential_harvest_index(heatfrac, optimal_index) == expect
 
 @pytest.mark.parametrize("idx,min_index,deficiency", [
     (1, .5, .5),  # start case
@@ -30,7 +30,7 @@ def test_calc_potential_harvest_index(heatfrac, optimal_index):
     (1.35, 0.83, 0.29)  # arbitrary
 ])
 @pytest.mark.filterwarnings("ignore")  # ignore warnings for these tests
-def test_calc_actual_harvest_index(idx, min_index, deficiency):
+def test_adjust_harvest_index(idx, min_index, deficiency):
     """ensure that actual harvest index is properly calculated by calc_actual_harvest_index()"""
     if min_index < 0:
         adj_min = 0
@@ -47,9 +47,17 @@ def test_calc_actual_harvest_index(idx, min_index, deficiency):
     expect = diff * deficiency / bottom + adj_min
     if expect < 0:
         expect = 0
-    assert Yields.calc_actual_harvest_index(min_index, idx, deficiency) == expect
+    assert Yields.adjust_harvest_index(idx, min_index, deficiency) == expect
 
+# ---- Test Member functions
+def init_ylds(**kwargs):
+    """helper function to create GrowthConstraint instance, with specified attributes"""
+    ylds = Yields()
+    for key, val in kwargs.items():
+        setattr(ylds, key, val)
+    return ylds
 
+<<<<<<< HEAD
 def init_yields(**kwargs):
     """helper function to initialize Yields object, with specified attributes"""
     yld = Yields()
@@ -57,22 +65,24 @@ def init_yields(**kwargs):
         setattr(yld, key, val)
     return yld
 
-@pytest.mark.parametrize("heatfrac,optimal_index", [
-    (0, 1),
-    (1, 1),
-    (0.5, 1),
-    (1.2, 1),
-    (0.5, 0),
-    (0.5, 100),
-    (0.326, 12.2)  # arbitrary
-])
-def test_determine_potential_harvest_index(heatfrac, optimal_index):
-    """ensure that potential harvest index is properly updated by determine_potential_harvest_index()"""
-    yld = init_yields(heat_fraction=heatfrac, optimal_harvest_index=optimal_index)
-    yld.determine_potential_harvest_index()
-    assert yld.potential_harvest_index == Yields.calc_potential_harvest_index(heatfrac, optimal_index)
+def test_obtain_yields():
+    ylds = init_ylds()
+    ylds.obtain_yields()
+    assert False
 
+# @pytest.mark.parametrize("idx,min_index,deficiency", [
+#     (0, 0.5, 0.5),  # 0 = harvest index < min
+#     (0.2, 0.5, 0.5),  # harvest index < min
+#     (-1, 0.5, 0.5),  # harvest index < 0
+# ])
+# def test_warn_calc_actual_harvest_index(idx, min_index, deficiency):
+#     """ensure that warnings are raised appropriately by calc_actual_harvest_index()"""
+#     with pytest.warns() as record:
+#         Yields.calc_actual_harvest_index(idx, min_index, deficiency)
+#     assert len(record) > 0
 
+# def test_error_calc_actual_harvest_index(idx, min_index, deficiency):
+#     with pytest.w
 
 # from math import exp
 #
