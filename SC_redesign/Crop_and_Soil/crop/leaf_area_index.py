@@ -38,7 +38,6 @@ class LeafAreaIndex:
                                                                                     self._lai_shapes[0],
                                                                                     self._lai_shapes[1])
 
-        # self.determine_canopy_height(self)
         self.canopy_height = self.determine_canopy_height(self.max_canopy_height, self.optimal_leaf_area_fraction)
         if self.is_in_senescence:  # senescence
             self.leaf_area_index = self.determine_senescent_leaf_area_index(self.heat_fraction,
