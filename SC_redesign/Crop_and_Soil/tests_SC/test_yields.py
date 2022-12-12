@@ -32,33 +32,46 @@ def test_calc_potential_harvest_index(heatfrac, optimal_index):
 @pytest.mark.filterwarnings("ignore")  # ignore warnings for these tests
 def test_calc_actual_harvest_index(idx, min_index, deficiency):
     """ensure that actual harvest index is properly calculated by calc_actual_harvest_index()"""
-    adj_idx = max(idx, 0)  # hard bound at zero
-    adj_idx = max(adj_idx, min_index)  # idx can't be greater than min
-    diff = adj_idx - min_index
+    if min_index < 0:
+        adj_min = 0
+    else:
+        adj_min = min_index
+
+    if idx < adj_min:
+        adj_idx = adj_min
+    else:
+        adj_idx = idx
+
+    diff = adj_idx - adj_min
     bottom = deficiency + exp(6.13 - 0.883 * deficiency)
-    expect = diff * deficiency / bottom + min_index
+    expect = diff * deficiency / bottom + adj_min
     if expect < 0:
         expect = 0
-    assert Yields.calc_actual_harvest_index(idx, min_index, deficiency) == expect
+    assert Yields.calc_actual_harvest_index(min_index, idx, deficiency) == expect
 
 
-@pytest.mark.parametrize("idx,min_index,deficiency", [
-    (0, 0.5, 0.5),  # 0 = harvest index < min
-    (0.2, 0.5, 0.5),  # harvest index < min
-    (-1, 0.5, 0.5),  # harvest index < 0
+def init_yields(**kwargs):
+    """helper function to initialize Yields object, with specified attributes"""
+    yld = Yields()
+    for key, val in kwargs.items():
+        setattr(yld, key, val)
+    return yld
+
+@pytest.mark.parametrize("heatfrac,optimal_index", [
+    (0, 1),
+    (1, 1),
+    (0.5, 1),
+    (1.2, 1),
+    (0.5, 0),
+    (0.5, 100),
+    (0.326, 12.2)  # arbitrary
 ])
-def test_warn_calc_actual_harvest_index(idx, min_index, deficiency):
-    """ensure that warnings are raised appropriately by calc_actual_harvest_index()"""
-    with pytest.warns() as record:
-        Yields.calc_actual_harvest_index(idx, min_index, deficiency)
-    assert len(record) > 0
-
-
-# def test_error_calc_actual_harvest_index(idx, min_index, deficiency):
-#     with pytest.w
-def test_determine_potential_harvest_index():
+def test_determine_potential_harvest_index(heatfrac, optimal_index):
     """ensure that potential harvest index is properly updated by determine_potential_harvest_index()"""
-    assert False
+    yld = init_yields(heat_fraction=heatfrac, optimal_harvest_index=optimal_index)
+    yld.determine_potential_harvest_index()
+    assert yld.potential_harvest_index == Yields.calc_potential_harvest_index(heatfrac, optimal_index)
+
 
 
 # from math import exp

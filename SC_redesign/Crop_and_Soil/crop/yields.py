@@ -1,6 +1,4 @@
 from math import exp
-import warnings
-from RUFAS.output_manager import OutputManager
 
 """
 This module is based upon the "Crop Yield" section of the SWAT model (5.2.4)
@@ -12,11 +10,12 @@ class Yields():
         self.optimal_harvest_index = 3.5
         self.water_deficiency = 0.2  # also in water_dynamics.py
         self.min_harvest_index = 0.2
+        self.is_mature = True
         self.potential_harvest_index = None
         self.harvest_index = None
     def obtain_yields(self):
-        # calc_HI_max(crop_type)
-        # calc_HI_act(crop_type)
+        self.determine_potential_harvest_index()
+        self.adjust_harvest_index()
         #
         # if crop_type.fr_PHU > 1.0:
         #     calc_dry_down(crop_type)
@@ -55,28 +54,36 @@ class Yields():
         return optimal_harvest_index * heat_percent / (heat_percent + exp(11.1 - 10 * heat_fraction))
 
     @staticmethod
-    def calc_actual_harvest_index(harvest_index: float, min_harvest_index: float, water_deficiency: float) -> float:
+    def calc_actual_harvest_index(min_harvest_index: float, harvest_index: float,  water_deficiency: float) -> float:
         """calculates the actual harvest index for a given day, adjusted for water deficiency
 
         Args:
-            harvest_index: potential harvest index
-            min_harvest_index: harvest index in drought conditions; minimum possible harvest index for the plant
+            min_harvest_index: harvest index in drought conditions; minimum possible harvest index for the plant,
+                [0, Inf)
+            harvest_index: potential harvest index for the day, [min_harvest_index, Inf)
             water_deficiency: water deficiency factor for the plant
+
+        Details: values of min_harvest_index and harvest_index are input below their bounds, they are updated to
+        equal their lower bounds.
 
         Returns: actual harvest index
         """
-        if harvest_index < 0:
-            warnings.warn("harvest index is less than zero, setting to zero", Warning)
-            harvest_index = 0
-        if harvest_index < min_harvest_index:
-            warnings.warn("harvest index is lower than minimum possible harvest index, setting it to the minimum",
-                          Warning)
-            harvest_index = min_harvest_index
+        min_harvest_index = max(0, min_harvest_index)
+        harvest_index = max(min_harvest_index, harvest_index)  # lower bound at min value
 
         adj_harvest_index = (harvest_index - min_harvest_index) * water_deficiency / \
                             (water_deficiency + exp(6.13 - 0.883 * water_deficiency)) + min_harvest_index
         return max(adj_harvest_index, 0)  # bound to zero
 
+    @staticmethod
+    def calc_dry_down():
+        # TODO: stand in for more sophisticated dry down method - GitHub Issue #162
+        """
+        Description:
+            "pseudocode_crop"?
+        """
+        pass
+        # crop_type.bio_AG -= (crop_type.bio_AG * crop_type.biomass_dry_down_percent)
 
 # -- OLD
 # def update_all(soil, crop_type, field_management, time):
@@ -114,31 +121,7 @@ class Yields():
 #     # bottom = 100 * crop_type.fr_PHU + exp(11.1 - (10 * crop_type.fr_PHU))
 #     # crop_type.HI_max = crop_type.HI_opt * top / bottom
 #
-#
-# def calc_HI_act(crop_type):
-#     """
-#     Description:
-#         Calculates the actual harvest index (HI_actual).
-#         "pseudocode_crop" C.10.C.1
-#
-#     Args:
-#         crop_type: an instance of a crop class
-#     """
-#
-#     term1 = crop_type.HI_max - crop_type.HI_min
-#     exp_part = exp(6.13 - (0.883 * crop_type.gamma_wu))
-#     term2 = crop_type.gamma_wu / (crop_type.gamma_wu + exp_part)
-#
-#     crop_type.HI_actual = term1 * term2 + crop_type.HI_min
-#
-# # TODO: add documentation and pseudocode reference - GitHub Issue #170
-# def calc_dry_down(crop_type):
-#     # TODO: stand in for more sophisticated dry down method - GitHub Issue #162
-#     """
-#     Description:
-#         "pseudocode_crop"?
-#     """
-#     crop_type.bio_AG -= (crop_type.bio_AG * crop_type.biomass_dry_down_percent)
+
 #
 #
 # def calc_yield_max(crop_type):
