@@ -50,6 +50,8 @@ class RootDevelopment:
             max_depth: maximum possible root depth (mm)
             heat_fraction: fraction of potential heat units
 
+SWAT Reference: 5:2.1.23, 24
+
         Returns: root depth (mm)
         """
         if heat_fraction <= 0.4:
