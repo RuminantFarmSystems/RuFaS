@@ -88,8 +88,6 @@ class LeafAreaIndex:
         """calculates leaf area index fraction, from the optimal leaf area development curve, for the initial period of
         plant growth
 
-        replaces method calc_optimal_leaf_area_fraction
-
         Args:
             heat_fraction: fraction of potential heat units
             shape1: first shape coefficient
