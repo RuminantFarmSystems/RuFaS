@@ -5,8 +5,8 @@ class ManureConstants:
         MANURE_DENSITY: The density of manure, kg/m^3.
         UREA_MOLAR_MASS: The molar mass of urea, g/mol.
         UREA_DENSITY: The density of urea, g/cm^3.
-        TAN_MOLAR_MASS: The molar mass of TAN, g/mol.
-        URINE_TAN_FACTOR: The factor to convert manure nitrogen to urine TAN, dimensionless.
+        TAN_MOLAR_MASS: The molar mass of total_ammoniacal_nitrogen, g/mol.
+        URINE_TAN_FACTOR: The factor to convert manure nitrogen to urine total_ammoniacal_nitrogen, dimensionless.
         MANURE_SOLIDS_BEDDING_DENSITY: The density of manure solids bedding, kg/m^3.
 
     """

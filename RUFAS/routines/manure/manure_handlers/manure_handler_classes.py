@@ -89,7 +89,7 @@ class BaseManureHandler:
         NH3_housing_loss = GasEmissions.calc_E_NH3_emission(
                 num_animals=pen.num_animals,
                 barn_area=pen.barn_area_from_pen_type,  # m^2/animal
-                urine_TAN=pen.manure.urine_TAN,  # kg/animal
+                urine_TAN=pen.manure.urine_ammoniacal_nitrogen,  # kg/animal
                 urine=pen.manure.urine / pen.num_animals,  # kg/animal
                 tempC=self._get_current_day_avg_tempC()
         )
@@ -97,12 +97,12 @@ class BaseManureHandler:
                 simulation_day=sim_day,
                 pen_id=pen.id,
                 urea=pen.manure.urea,
-                TAN=max(0.0, pen.manure.TAN - NH3_housing_loss),  # kg - kg
-                N=pen.manure.N,
+                TAN=max(0.0, pen.manure.total_ammoniacal_nitrogen - NH3_housing_loss),  # kg - kg
+                N=pen.manure.manure_nitrogen,
                 TS=pen.manure.TS,
                 VSd=pen.manure.VSd,
                 VSnd=pen.manure.VSnd,
-                P=pen.manure.P,
+                P=pen.manure.manure_phosphorus,
                 K=pen.manure.K,
                 CH4_housing=GasEmissions.calc_E_CH4_housing(pen.num_animals, pen.barn_area_from_pen_type),
                 CO2_housing=GasEmissions.calc_E_CO2_housing(pen.num_animals, pen.barn_area_from_pen_type),

@@ -198,7 +198,7 @@ class GasEmissions:
     def _calc_Q(cls, tempK: float, pH: float) -> float:
         """Calculates Q, the equilibrium coefficient for the NH3 gas in the air.
 
-        This is calculated based on a given concentration of TAN in the solution.
+        This is calculated based on a given concentration of total_ammoniacal_nitrogen in the solution.
 
         Args:
             tempK: temperature in Kelvin, K.

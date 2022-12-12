@@ -6,7 +6,6 @@ from RUFAS.classes import Time
 from RUFAS.classes import Weather
 from RUFAS.routines.manure.beddings.bedding_classes import BaseBedding
 from RUFAS.routines.manure.constants.general_constants import GeneralConstants
-from RUFAS.routines.manure.manure.pen_manure import PenManure
 from RUFAS.routines.manure.manure_handlers.manure_handler_classes import AlleyScraper
 from RUFAS.routines.manure.manure_handlers.manure_handler_classes import BaseManureHandler
 from RUFAS.routines.manure.manure_handlers.manure_handler_classes import DefaultManureHandlerConfigFactory
@@ -18,6 +17,7 @@ from RUFAS.routines.manure.manure_handlers.manure_handler_classes import ManureH
 from RUFAS.routines.manure.manure_handlers.manure_handler_daily_output import ManureHandlerDailyOutput
 from RUFAS.routines.manure.manure_handlers.milking_parlor import MilkingParlor
 from RUFAS.routines.manure.pen.manure_management_pen import ManureManagementPen
+from RUFAS.routines.manure.pen_manure.pen_manure import PenManure
 
 
 # Test ManureHandlerDailyOutput
@@ -301,15 +301,15 @@ def test_manure_handler_daily_update(mocker: MockerFixture) -> None:
 
     # Arrange
     mock_manure = mocker.MagicMock(autospec=PenManure)
-    mock_manure.TAN = TAN = 19.0
+    mock_manure.total_ammoniacal_nitrogen = TAN = 19.0
     mock_manure.urea = urea = 20.0
-    mock_manure.urine_TAN = urine_TAN = 21.0
+    mock_manure.urine_ammoniacal_nitrogen = urine_ammoniacal_nitrogen = 21.0
     mock_manure.urine = urine = 22.0
-    mock_manure.N = N = 23.0
+    mock_manure.manure_nitrogen = N = 23.0
     mock_manure.TS = TS = 24.0
     mock_manure.VSd = VSd = 25.0
     mock_manure.VSnd = VSnd = 26.0
-    mock_manure.P = P = 27.0
+    mock_manure.manure_phosphorus = P = 27.0
     mock_manure.K = K = 28.0
     mock_manure.manure_volume = manure_volume = 29.0
 
@@ -368,7 +368,7 @@ def test_manure_handler_daily_update(mocker: MockerFixture) -> None:
     patch_for_calc_E_NH3_emission.assert_called_once_with(
             num_animals=num_animals,
             barn_area=barn_area_from_pen_type,
-            urine_TAN=urine_TAN,
+            urine_TAN=urine_ammoniacal_nitrogen,
             urine=urine / num_animals,
             tempC=current_day_avg_tempC
     )

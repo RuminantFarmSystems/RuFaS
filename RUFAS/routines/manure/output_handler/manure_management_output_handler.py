@@ -14,11 +14,11 @@ import pandas as pd
 from matplotlib import pyplot as plt
 from matplotlib.ticker import MaxNLocator
 
-from RUFAS.routines.manure.manure.pen_manure import PenManure
 from RUFAS.routines.manure.manure_handlers.manure_handler_daily_output import ManureHandlerDailyOutput
 from RUFAS.routines.manure.manure_separators.manure_separator_daily_output import ManureSeparatorDailyOutput
 from RUFAS.routines.manure.manure_treatments.manure_treatment_daily_output import ManureTreatmentDailyOutput
 from RUFAS.routines.manure.pen.manure_management_pen import ManureManagementPen
+from RUFAS.routines.manure.pen_manure.pen_manure import PenManure
 from RUFAS.routines.manure.reception_pits.reception_pit_daily_output import ReceptionPitDailyOutput
 from RUFAS.routines.manure.units.units import Units
 
