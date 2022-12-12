@@ -29,7 +29,6 @@ def test_determine_potential_harvest_index(heatfrac, optimal_index):
     (1, 0.5, 0),  # no deficiency
     (1.35, 0.83, 0.29)  # arbitrary
 ])
-@pytest.mark.filterwarnings("ignore")  # ignore warnings for these tests
 def test_adjust_harvest_index(idx, min_index, deficiency):
     """ensure that actual harvest index is properly calculated by calc_actual_harvest_index()"""
     if min_index < 0:
@@ -49,15 +48,11 @@ def test_adjust_harvest_index(idx, min_index, deficiency):
         expect = 0
     assert Yields.adjust_harvest_index(idx, min_index, deficiency) == expect
 
-# ---- Test Member functions
-def init_ylds(**kwargs):
-    """helper function to create GrowthConstraint instance, with specified attributes"""
-    ylds = Yields()
-    for key, val in kwargs.items():
-        setattr(ylds, key, val)
-    return ylds
 
-<<<<<<< HEAD
+def test_dry_down(start, percent, expect):
+    assert Yields.dry_down(start, percent) == expect
+
+# ---- Test Member functions
 def init_yields(**kwargs):
     """helper function to initialize Yields object, with specified attributes"""
     yld = Yields()
@@ -66,9 +61,14 @@ def init_yields(**kwargs):
     return yld
 
 def test_obtain_yields():
-    ylds = init_ylds()
+    ylds = init_yields()
     ylds.obtain_yields()
     assert False
+
+
+
+
+
 
 # @pytest.mark.parametrize("idx,min_index,deficiency", [
 #     (0, 0.5, 0.5),  # 0 = harvest index < min

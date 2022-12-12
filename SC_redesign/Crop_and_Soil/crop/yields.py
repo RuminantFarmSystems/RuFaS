@@ -11,6 +11,9 @@ class Yields():
         self.water_deficiency = 0.2  # also in water_dynamics.py
         self.min_harvest_index = 0.2
         self.is_mature = True
+        self.above_ground_biomass = 15  # kg
+        self.dry_down_percent = 0.2
+
         self.potential_harvest_index = None
         self.harvest_index = None
 
@@ -20,7 +23,7 @@ class Yields():
         self.harvest_index = self.adjust_harvest_index(self.potential_harvest_index,
                                                        self.min_harvest_index,
                                                        self.water_deficiency)
-        # calc_HI_act(crop_type)
+        self.above_ground_biomass = self.dry_down(self.above_ground_biomass, self.dry_down_percent)
         #
         # if crop_type.fr_PHU > 1.0:
         #     calc_dry_down(crop_type)
@@ -61,30 +64,29 @@ class Yields():
         Details: values of min_harvest_index and harvest_index are input below their bounds, they are updated to
         equal their lower bounds.
 
+        SWAT Reference:
+
         Returns: actual harvest index
         """
-        # TODO: Change to min-max form now that warnings are removed
-        if harvest_index < 0:
-            # warnings.warn("harvest index is less than zero, setting to zero", Warning)
-            harvest_index = 0
-        if harvest_index < min_harvest_index:
-            # warnings.warn("harvest index is lower than minimum possible harvest index, setting it to the minimum",
-            #               Warning)
-            harvest_index = min_harvest_index
+        harvest_index = max(harvest_index, 0)  # bound to zero
+        harvest_index = max(harvest_index, min_harvest_index)  # prevent harvest_index < min_harvest_index
 
         adj_harvest_index = (harvest_index - min_harvest_index) * water_deficiency / \
                             (water_deficiency + exp(6.13 - 0.883 * water_deficiency)) + min_harvest_index
         return max(adj_harvest_index, 0)  # bound to zero
 
     @staticmethod
-    def calc_dry_down():
+    def dry_down(above_ground_biomass: float, dry_down_percent: float) -> float:
         # TODO: stand in for more sophisticated dry down method - GitHub Issue #162
+        """ calculates the above ground biomass after water mass is lost in dry-down
+
+        Args:
+             above_ground_biomass: plant biomass stored above ground (non-root biomass)
+             dry_down_percent: mass lost as water during dry-down, as a percentage of above ground biomass.
+
+        Returns: the above ground biomass, after dry-down
         """
-        Description:
-            "pseudocode_crop"?
-        """
-        pass
-        # crop_type.bio_AG -= (crop_type.bio_AG * crop_type.biomass_dry_down_percent)
+        return above_ground_biomass - (above_ground_biomass * dry_down_percent)
 
 
 
