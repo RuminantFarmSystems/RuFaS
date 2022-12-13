@@ -7,27 +7,28 @@ from RUFAS.routines.manure.constants.manure_constants import ManureConstants
 
 class GasEmissions:
     @classmethod
-    def calc_E_CH4_slurry_storage(cls,
-                                  TS: float,
-                                  enclosed=False,
-                                  tempC=15.0,
-                                  VS_frac=GasEmissionConstants.DEFAULT_VOLATILE_SOLIDS_FRACTION,
-                                  n_eff=0.99) -> float:
-        """Calculates methane emissions from manure storage using total solids and manure kg.
+    def calc_methane_emission_for_slurry_storage(cls,
+                                                 manure_total_solids: float,
+                                                 is_enclosed=False,
+                                                 tempC=15.0,
+                                                 manure_volatile_solids_fraction=(
+                                                         GasEmissionConstants.DEFAULT_VOLATILE_SOLIDS_FRACTION),
+                                                 efficiency_fraction=0.99) -> float:
+        """Calculates methane emissions from manure storage using total solids.
 
         Args:
-            TS: Total solids, kg.
-            enclosed: True if manure storage is enclosed, and False if manure storage is open to air.
-            tempC: temperature, C.
-            VS_frac: Fraction (0-1) volatile solids.
-            n_eff: efficiency of process              TODO: confirm n_eff meaning
+            manure_total_solids: Total solids, kg.
+            is_enclosed: True if manure storage is is_enclosed, and False if manure storage is open to air.
+            tempC: temperature in Celsius, C.
+            manure_volatile_solids_fraction: Fraction (0-1) volatile solids.
+            efficiency_fraction: efficiency of process, unitless.
 
         Returns:
             CH4 emissions from storage, kg CH4/day.
 
         """
         c = 0.024
-        VS_tot = TS * VS_frac
+        VS_tot = manure_total_solids * manure_volatile_solids_fraction
 
         constants = GasEmissionConstants
         b1 = constants.b1
@@ -45,14 +46,22 @@ class GasEmissions:
         VSnd = 1 - VSd
         E_CH4_open_air = c * VS_tot * (VSd * b1 + VSnd * b2) * ex
 
-        if not enclosed:
+        if not is_enclosed:
             return E_CH4_open_air
         else:
-            return E_CH4_open_air * (1 - n_eff)
+            return E_CH4_open_air * (1 - efficiency_fraction)
 
     @classmethod
     def _calc_modified_hours(cls, hours: float) -> float:
-        """Calculates modified hours."""
+        """Calculates modified hours.
+
+        Args:
+            hours: number of hours.
+
+        Returns:
+            modified hours.
+
+        """
 
         if hours > 14:
             modified_hours = - math.tanh(hours - 21.5) / 3.5
@@ -81,8 +90,9 @@ class GasEmissions:
         return t_ambient
 
     @classmethod
-    def calc_E_CH4_housing(cls, num_animals: int, barn_area: float, hours=24, t_min=20.0, t_max=25.0) -> float:
-        """Calculates methane housing emissions.
+    def calc_methane_housing_emission(cls, num_animals: int, barn_area: float, hours=24, t_min=20.0,
+                                      t_max=25.0) -> float:
+        """Calculates methane housing emission.
 
         Args:
             num_animals: Number of animals in the pen.
@@ -100,7 +110,12 @@ class GasEmissions:
         return num_animals * max(0.0, 0.13 * t) * barn_area / 1000
 
     @classmethod
-    def calc_E_CO2_housing(cls, num_animals: int, barn_area: float, hours=24, t_min=20.0, t_max=25.0) -> float:
+    def calc_carbon_dioxide_housing_emission(cls,
+                                             num_animals: int,
+                                             barn_area: float,
+                                             hours=24,
+                                             t_min=20.0,
+                                             t_max=25.0) -> float:
         """Calculates carbon dioxide housing emissions.
 
         Args:
@@ -119,19 +134,19 @@ class GasEmissions:
         return num_animals * max(0.0, 0.0065 + 0.0192 * t) * barn_area / 1000
 
     @classmethod
-    def calc_E_NH3_emission(cls, num_animals: int,
-                            barn_area: float,
-                            urine_TAN: float,
-                            urine: float,
-                            tempC: float,
-                            hsc=GasEmissionConstants.DEFAULT_HOUSING_SPECIFIC_CONSTANT) -> float:
+    def calc_ammonia_housing_emission(cls, num_animals: int,
+                                      barn_area: float,
+                                      manure_urine_total_ammoniacal_nitrogen: float,
+                                      manure_urine: float,
+                                      tempC: float,
+                                      hsc=GasEmissionConstants.DEFAULT_HOUSING_SPECIFIC_CONSTANT) -> float:
         """Calculates NH3 storage emissions.
 
         Args:
             num_animals: Number of animals in the pen.
             barn_area: surface area for treatment, m^2.
-            urine_TAN: total ammoniacal nitrogen in manure urine, kg N.
-            urine: total amount of manure urine in exposed surface area, kg.
+            manure_urine_total_ammoniacal_nitrogen: total ammoniacal nitrogen in manure urine, kg N.
+            manure_urine: total amount of manure urine in exposed surface area, kg.
             tempC: temperature, C.
             hsc: housing specific constant, s/m.
 
@@ -143,16 +158,17 @@ class GasEmissions:
         pH = 7.5
         c = GeneralConstants.SECONDS_PER_DAY  # s/day
         tempK = cls._convert_tempC_to_tempK(tempC)  # K
-        r = cls._calc_r_barn(tempC, hsc)
-        M = urine / barn_area  # manure per area of exposed surface, kg/m^2
+        r = cls._calc_barn_resistance(tempC, hsc)
+        M = manure_urine / barn_area  # manure per area of exposed surface, kg/m^2
         Q = cls._calc_Q(tempK, pH)
         if r * M * Q > 0:
-            return num_animals * barn_area * ((urine_TAN / barn_area) * c * p) / (r * M * Q)
+            return num_animals * barn_area * ((manure_urine_total_ammoniacal_nitrogen / barn_area) * c * p) / (
+                    r * M * Q)
         else:
             return 0.0
 
     @classmethod
-    def _calc_r_barn(cls, tempC: float, hsc=GasEmissionConstants.DEFAULT_HOUSING_SPECIFIC_CONSTANT) -> float:
+    def _calc_barn_resistance(cls, tempC: float, hsc=GasEmissionConstants.DEFAULT_HOUSING_SPECIFIC_CONSTANT) -> float:
         """Calculates barn resistance.
 
         Args:
@@ -226,12 +242,12 @@ class GasEmissions:
         return tempC + 273.15
 
     @classmethod
-    def calc_CH4_volume_using_Chen_equation(cls, VS_total: float,
-                                            hydraulic_retention_time: int) -> float:
+    def calc_methane_volume_via_Chen_equation(cls, manure_total_volatile_solids: float,
+                                              hydraulic_retention_time: int) -> float:
         """Calculates CH4 generation volume using the Chen-Hashimoto equation.
 
         Args:
-            VS_total: total volatile solids, kg.
+            manure_total_volatile_solids: total volatile solids, kg.
             hydraulic_retention_time: hydraulic retention time, days.
 
         Returns:
@@ -242,27 +258,27 @@ class GasEmissions:
                 (1 - GasEmissionConstants.CHEN_HASHIMOTO_KINETIC_CONSTANT_KCH /
                  (hydraulic_retention_time * GasEmissionConstants.SPECIFIC_GROWTH_RATE +
                   GasEmissionConstants.CHEN_HASHIMOTO_KINETIC_CONSTANT_KCH - 1)) *
-                VS_total * GeneralConstants.GRAMS_TO_KG)
+                manure_total_volatile_solids * GeneralConstants.GRAMS_TO_KG)
 
     @classmethod
-    def calc_biogas_energy_content(cls, CH4_volume: float) -> float:
+    def calc_biogas_energy_content(cls, methane_volume: float) -> float:
         """Calculates biogas energy content.
 
         Args:
-            CH4_volume: CH4 generation volume, m^3.
+            methane_volume: Methane generation volume, m^3.
 
         Returns:
             Biogas energy content, MJ.
 
         """
-        return CH4_volume * GasEmissionConstants.METHANE_DENSITY * GasEmissionConstants.METHANE_ENERGY_DENSITY
+        return methane_volume * GasEmissionConstants.METHANE_DENSITY * GasEmissionConstants.METHANE_ENERGY_DENSITY
 
     @classmethod
-    def calc_E_CH4_anaerobic_lagoon(cls, VS: float) -> float:
+    def calc_methane_emission_for_anaerobic_lagoon(cls, manure_volatile_solids: float) -> float:
         """Calculates methane emissions from anaerobic lagoon.
 
         Args:
-            VS: volatile solids, kg.
+            manure_volatile_solids: volatile solids, kg.
 
         Returns:
             Methane emissions from anaerobic lagoon, kg CH4-N /day.
@@ -273,4 +289,4 @@ class GasEmissions:
         MCF = constants.MCF
         MS = constants.MS
         METHANE_FACTOR = constants.METHANE_FACTOR
-        return VS * Bo * MCF * MS * METHANE_FACTOR
+        return manure_volatile_solids * Bo * MCF * MS * METHANE_FACTOR

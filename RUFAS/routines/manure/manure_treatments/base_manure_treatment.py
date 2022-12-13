@@ -78,19 +78,23 @@ class BaseManureTreatment(ABC):
                 simulation_day=manure_treatment_daily_input.simulation_day,
                 pen_id=manure_treatment_daily_input.pen_id,
                 liquid_manure_total_ammoniacal_nitrogen=(
-                        manure_treatment_daily_input.liquid_manure_total_ammoniacal_nitrogen * (
-                        1 - self.config.TAN_removal_efficiency_for_treatment)),
-                liquid_manure_nitrogen=manure_treatment_daily_input.liquid_manure_nitrogen * (
-                        1 - self.config.N_removal_efficiency_for_treatment),
-                liquid_manure_total_solids=manure_treatment_daily_input.liquid_manure_total_solids * (
-                        1 - self.config.TS_removal_efficiency_for_treatment),
+                        manure_treatment_daily_input.liquid_manure_total_ammoniacal_nitrogen *
+                        (1 - self.config.TAN_removal_efficiency_for_treatment)),
+                liquid_manure_nitrogen=(
+                        manure_treatment_daily_input.liquid_manure_nitrogen *
+                        (1 - self.config.N_removal_efficiency_for_treatment)),
+                liquid_manure_total_solids=(
+                        manure_treatment_daily_input.liquid_manure_total_solids *
+                        (1 - self.config.TS_removal_efficiency_for_treatment)),
                 liquid_manure_total_volatile_solids=(
                         manure_treatment_daily_input.liquid_manure_total_volatile_solids *
                         (1 - self.config.VS_removal_efficiency_for_treatment)),
-                liquid_manure_phosphorus=manure_treatment_daily_input.liquid_manure_phosphorus * (
-                        1 - self.config.P_removal_efficiency_for_treatment),
-                liquid_manure_potassium=manure_treatment_daily_input.liquid_manure_potassium * (
-                        1 - self.config.K_removal_efficiency_for_treatment),
+                liquid_manure_phosphorus=(
+                        manure_treatment_daily_input.liquid_manure_phosphorus *
+                        (1 - self.config.P_removal_efficiency_for_treatment)),
+                liquid_manure_potassium=(
+                        manure_treatment_daily_input.liquid_manure_potassium *
+                        (1 - self.config.K_removal_efficiency_for_treatment)),
                 final_manure_volume=final_manure_volume,
         )
 

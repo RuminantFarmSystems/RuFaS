@@ -75,7 +75,8 @@ class PenManure:
         return cls(
                 manure_urea=animal_manure['U'] / num_animals,
                 manure_urine=animal_manure['Urine'] / num_animals,
-                manure_urine_ammoniacal_nitrogen=animal_manure['TAN_s'] * ManureConstants.URINE_TAN_FACTOR / num_animals,
+                manure_urine_ammoniacal_nitrogen=(
+                        animal_manure['TAN_s'] * ManureConstants.URINE_TAN_FACTOR / num_animals),
                 manure_total_ammoniacal_nitrogen=animal_manure['TAN_s'],
                 manure_nitrogen=animal_manure['MN'],
                 manure_mass=animal_manure['Mkg'],

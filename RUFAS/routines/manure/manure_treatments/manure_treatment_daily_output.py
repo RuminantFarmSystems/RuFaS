@@ -33,23 +33,23 @@ class ManureTreatmentDailyOutput(LiquidManurePortionProtocol):
     final_manure_volume: float = 0.0
     liquid_manure_daily_volume: float = 0.0  # To satisfy the LiquidManurePortionProtocol
 
-    CH4: float = 0.0
-    NH3: float = 0.0
+    storage_methane: float = 0.0
+    storage_ammonia: float = 0.0
 
     # Extra variables for development purposes
     # Will be removed when done
-    sludge_TS: float = 0.0
-    sludge_VS: float = 0.0
-    sludge_N: float = 0.0
-    sludge_P: float = 0.0
-    sludge_K: float = 0.0
-    daily_sludge_volume: float = 0.0
+    sludge_manure_total_solids: float = 0.0
+    sludge_manure_total_volatile_solids: float = 0.0
+    sludge_manure_nitrogen: float = 0.0
+    sludge_manure_phosphorus: float = 0.0
+    sludge_manure_potassium: float = 0.0
+    sludge_manure_daily_volume: float = 0.0
     accumulated_sludge_volume: float = 0.0
     accumulated_final_manure_volume: float = 0.0
 
     def __post_init__(self):
         """Ensures that the daily volume is set to the final manure volume."""
-        self.daily_volume = self.final_manure_volume
+        self.liquid_manure_daily_volume = self.final_manure_volume
 
     def __add__(self, other: ManureTreatmentDailyOutput) -> ManureTreatmentDailyOutput:
         """Adds corresponding attributes between this output and another.
@@ -93,12 +93,12 @@ class AnaerobicDigestionOutput:
 class SludgeOutput:
     """Description: This class is for tracking sludge accumulated properties.
     """
-    TS: float = 0.0
-    VS: float = 0.0
-    N: float = 0.0
-    P: float = 0.0
-    K: float = 0.0
-    daily_sludge_volume: float = 0.0
+    sludge_manure_total_solids: float = 0.0
+    sludge_manure_total_volatile_solids: float = 0.0
+    sludge_manure_nitrogen: float = 0.0
+    sludge_manure_phosphorus: float = 0.0
+    sludge_manure_potassium: float = 0.0
+    sludge_manure_daily_volume: float = 0.0
 
     def __add__(self, other: SludgeOutput) -> SludgeOutput:
         """Adds corresponding attributes between this output and another.

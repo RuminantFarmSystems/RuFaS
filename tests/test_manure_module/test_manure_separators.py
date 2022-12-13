@@ -35,11 +35,11 @@ def test_manure_separator_daily_output() -> None:
     def assert_manure_separator_daily_output(output: ManureSeparatorDailyOutput) -> None:
         assert output.pen_id == pen_id
         assert output.simulation_day == sim_day
-        assert output.TS_solid == TS_solid
-        assert output.VS_solid == VS_solid
-        assert output.N_solid == N_solid
-        assert output.P_solid == P_solid
-        assert output.K_solid == K_solid
+        assert output.solid_manure_total_solids == TS_solid
+        assert output.solid_manure_total_volatile_solids == VS_solid
+        assert output.solid_manure_nitrogen == N_solid
+        assert output.solid_manure_phosphorus == P_solid
+        assert output.solid_manure_potassium == K_solid
         assert output.liquid_manure_total_solids == TS
         assert output.liquid_manure_total_volatile_solids == VS_total
         assert output.liquid_manure_nitrogen == N
@@ -50,7 +50,7 @@ def test_manure_separator_daily_output() -> None:
         assert output.final_solids_wet_mass == final_solids_wet_mass
         assert output.final_solids_wet_mass_volume == approx(expected_final_solids_wet_mass_volume)
         assert output.final_daily_volume == approx(expected_final_daily_volume)
-        assert output.daily_volume == approx(expected_final_daily_volume)
+        assert output.liquid_manure_daily_volume == approx(expected_final_daily_volume)
 
     # --------------------
 
@@ -60,11 +60,11 @@ def test_manure_separator_daily_output() -> None:
     manure_separator_daily_output = ManureSeparatorDailyOutput(
             pen_id=pen_id,
             simulation_day=sim_day,
-            TS_solid=TS_solid,
-            VS_solid=VS_solid,
-            N_solid=N_solid,
-            P_solid=P_solid,
-            K_solid=K_solid,
+            solid_manure_total_solids=TS_solid,
+            solid_manure_total_volatile_solids=VS_solid,
+            solid_manure_nitrogen=N_solid,
+            solid_manure_phosphorus=P_solid,
+            solid_manure_potassium=K_solid,
             liquid_manure_total_solids=TS,
             liquid_manure_total_volatile_solids=VS_total,
             liquid_manure_nitrogen=N,
@@ -85,11 +85,11 @@ def test_manure_separator_daily_output() -> None:
     data = {
         "pen_id": pen_id,
         "simulation_day": sim_day,
-        "TS_solid": TS_solid,
-        "VS_solid": VS_solid,
-        "N_solid": N_solid,
-        "P_solid": P_solid,
-        "K_solid": K_solid,
+        "solid_manure_total_solids": TS_solid,
+        "solid_manure_total_volatile_solids": VS_solid,
+        "solid_manure_nitrogen": N_solid,
+        "solid_manure_phosphorus": P_solid,
+        "solid_manure_potassium": K_solid,
         "liquid_manure_total_solids": TS,
         "liquid_manure_total_volatile_solids": VS_total,
         "liquid_manure_nitrogen": N,

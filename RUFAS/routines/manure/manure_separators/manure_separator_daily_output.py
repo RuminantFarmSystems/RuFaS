@@ -18,20 +18,22 @@ class ManureSeparatorDailyOutput(LiquidManurePortionProtocol):
         final_solids_wet_mass: Total mass of the solids on wet-weight basis, kg.
         final_solids_wet_mass_volume: Total volume of the solids on wet-weight basis, m^3.
 
-        TS_solid: Total amount of solids in the separated solids, kg.
-        VS_solid: Total amount of volatile solids in the separated solids, kg.
-        N_solid: Amount of nitrogen in the separated solids, kg.
-        P_solid: Total amount of phosphorus in the separated solids, kg.
-        K_solid: Total amount of potassium in the separated solids, kg.
+        solid_manure_total_solids: Total amount of solids in the separated solids, kg.
+        solid_manure_total_volatile_solids: Total amount of volatile solids in the separated solids, kg.
+        solid_manure_nitrogen: Amount of nitrogen in the separated solids, kg.
+        solid_manure_phosphorus: Total amount of phosphorus in the separated solids, kg.
+        solid_manure_potassium: Total amount of potassium in the separated solids, kg.
 
-        TS: Total amount of solids in the manure volume, kg.
-        VS_total: Total amount of volatile solids in the manure volume, kg.
-        N: Amount of nitrogen in the manure volume, kg.
-        TAN: Total ammoniacal nitrogen in the manure volume, kg.
-        P: Total amount of phosphorus in the manure volume, kg.
-        K: Total amount of potassium in the manure volume, kg.
+        liquid_manure_total_solids: Total amount of solids in the manure volume, kg.
+        liquid_manure_total_volatile_solids: Total amount of volatile solids in the manure volume, kg.
+        liquid_manure_nitrogen: Amount of nitrogen in the manure volume, kg.
+        liquid_manure_total_ammoniacal_nitrogen: Total ammoniacal nitrogen in the manure volume, kg.
+        liquid_manure_phosphorus: Total amount of phosphorus in the manure volume, kg.
+        liquid_manure_potassium: Total amount of potassium in the manure volume, kg.
 
         final_daily_volume: Total manure volume after separation, m^3.
+        liquid_manure_daily_volume: Same as final_daily_volume. 
+        Used for satisfying the LiquidManurePortionProtocol.
 
     """
     pen_id: int = -1
@@ -40,11 +42,11 @@ class ManureSeparatorDailyOutput(LiquidManurePortionProtocol):
     final_solids_wet_mass: float = 0.0
     final_solids_wet_mass_volume: float = field(init=False)
 
-    TS_solid: float = 0.0
-    VS_solid: float = 0.0
-    N_solid: float = 0.0
-    P_solid: float = 0.0
-    K_solid: float = 0.0
+    solid_manure_total_solids: float = 0.0
+    solid_manure_total_volatile_solids: float = 0.0
+    solid_manure_nitrogen: float = 0.0
+    solid_manure_phosphorus: float = 0.0
+    solid_manure_potassium: float = 0.0
 
     liquid_manure_total_solids: float = 0.0
     liquid_manure_total_volatile_solids: float = 0.0
@@ -60,4 +62,4 @@ class ManureSeparatorDailyOutput(LiquidManurePortionProtocol):
         """Calculates the final daily volume and the final solids wet mass volume."""
         self.final_solids_wet_mass_volume = self.final_solids_wet_mass / ManureConstants.MANURE_SOLIDS_BEDDING_DENSITY
         self.final_daily_volume = self.total_daily_manure_volume - self.final_solids_wet_mass_volume
-        self.daily_volume = self.final_daily_volume
+        self.liquid_manure_daily_volume = self.final_daily_volume
