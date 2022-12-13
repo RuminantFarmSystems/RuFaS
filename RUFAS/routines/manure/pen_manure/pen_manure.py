@@ -20,40 +20,41 @@ class PenManure:
     """A class that represents the manure data extracted from the animal module.
 
     Attributes:
-        urea: urea concentration in the manure, g/L.
-        urine: amount of urine, kg.
-        urine_ammoniacal_nitrogen: ammoniacal nitrogen concentration in the urine, g/L.
-        total_ammoniacal_nitrogen: total ammoniacal nitrogen concentration in the manure slurry, g/L.
+        manure_urea: manure_urea concentration in the manure, g/L.
+        manure_urine: amount of urine, kg.
+        manure_urine_ammoniacal_nitrogen: ammoniacal nitrogen concentration in the urine, g/L.
+        manure_total_ammoniacal_nitrogen: total ammoniacal nitrogen concentration in the manure slurry, g/L.
         manure_nitrogen: nitrogen in liquid and solid manure, kg.
         manure_mass: amount of manure, kg.
         manure_volume: volume of manure, m^3.
-        TS: total solids, kg.
-        VSd: degradable volatile solids, kg.
-        VSnd: non-degradable volatile solids, kg.
-        WIP_frac: water extractable inorganic manure_phosphorus fraction, dimensionless.
-        WOP_frac: water extractable organic manure_phosphorus fraction, dimensionless.
+        manure_total_solids: total solids, kg.
+        manure_degradable_volatile_solids: degradable volatile solids, kg.
+        manure_non_degradable_volatile_solids: non-degradable volatile solids, kg.
+        manure_inorganic_phosphorus_fraction: water extractable inorganic manure_phosphorus fraction,
+        unitless.
+        manure_organic_phosphorus_fraction: water extractable organic manure_phosphorus fraction, unitless.
         manure_phosphorus: manure phosphorus excretion for manure module input, kg.
-        P_frac: phosphorus fraction of manure.
-        K: potassium in manure, kg.
-        CH4: methane emission, g/day.
+        manure_phosphorus_fraction: phosphorus fraction of manure, unitless.
+        manure_potassium: potassium in manure, kg.
+        manure_methane: methane emission, g/day.
 
     """
-    urea: float = 0.0
-    urine: float = 0.0
-    urine_ammoniacal_nitrogen: float = 0.0
-    total_ammoniacal_nitrogen: float = 0.0
+    manure_urea: float = 0.0
+    manure_urine: float = 0.0
+    manure_urine_ammoniacal_nitrogen: float = 0.0
+    manure_total_ammoniacal_nitrogen: float = 0.0
     manure_nitrogen: float = 0.0
     manure_mass: float = 0.0
     manure_volume: float = field(init=False)
-    TS: float = 0.0
-    VSd: float = 0.0
-    VSnd: float = 0.0
-    WIP_frac: float = 0.0
-    WOP_frac: float = 0.0
+    manure_total_solids: float = 0.0
+    manure_degradable_volatile_solids: float = 0.0
+    manure_non_degradable_volatile_solids: float = 0.0
+    manure_inorganic_phosphorus_fraction: float = 0.0
+    manure_organic_phosphorus_fraction: float = 0.0
     manure_phosphorus: float = 0.0
-    P_frac: float = 0.0
-    K: float = 0.0
-    CH4: float = 0.0
+    manure_phosphorus_fraction: float = 0.0
+    manure_potassium: float = 0.0
+    manure_methane: float = 0.0
 
     def __post_init__(self):
         """Performs any necessary unit conversion after initialization."""
@@ -72,19 +73,19 @@ class PenManure:
 
         """
         return cls(
-                urea=animal_manure['U'] / num_animals,
-                urine=animal_manure['Urine'] / num_animals,
-                urine_ammoniacal_nitrogen=animal_manure['TAN_s'] * ManureConstants.URINE_TAN_FACTOR / num_animals,
-                total_ammoniacal_nitrogen=animal_manure['TAN_s'],
+                manure_urea=animal_manure['U'] / num_animals,
+                manure_urine=animal_manure['Urine'] / num_animals,
+                manure_urine_ammoniacal_nitrogen=animal_manure['TAN_s'] * ManureConstants.URINE_TAN_FACTOR / num_animals,
+                manure_total_ammoniacal_nitrogen=animal_manure['TAN_s'],
                 manure_nitrogen=animal_manure['MN'],
                 manure_mass=animal_manure['Mkg'],
-                TS=animal_manure['TSd'],
-                VSd=animal_manure['VSd'],
-                VSnd=animal_manure['VSnd'],
-                WIP_frac=animal_manure['WIP_frac'] / num_animals,
-                WOP_frac=animal_manure['WOP_frac'] / num_animals,
+                manure_total_solids=animal_manure['TSd'],
+                manure_degradable_volatile_solids=animal_manure['VSd'],
+                manure_non_degradable_volatile_solids=animal_manure['VSnd'],
+                manure_inorganic_phosphorus_fraction=animal_manure['WIP_frac'] / num_animals,
+                manure_organic_phosphorus_fraction=animal_manure['WOP_frac'] / num_animals,
                 manure_phosphorus=animal_manure['p_excrt_manure'],
-                P_frac=animal_manure['p_frac'] / num_animals,
-                K=animal_manure['K_manure'],
-                CH4=animal_manure['CH4_manure']
+                manure_phosphorus_fraction=animal_manure['p_frac'] / num_animals,
+                manure_potassium=animal_manure['K_manure'],
+                manure_methane=animal_manure['CH4_manure']
         )

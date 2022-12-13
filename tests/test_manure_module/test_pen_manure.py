@@ -29,43 +29,43 @@ def test_pen_manure_init() -> None:
 
     # Arrange
     manure_data = {
-        'urea': 1.0,
-        'urine': 2.0,
-        'urine_ammoniacal_nitrogen': 3.0,
-        'total_ammoniacal_nitrogen': 4.0,
+        'manure_urea': 1.0,
+        'manure_urine': 2.0,
+        'manure_urine_ammoniacal_nitrogen': 3.0,
+        'manure_total_ammoniacal_nitrogen': 4.0,
         'manure_nitrogen': 5.0,
         'manure_mass': 6.0,
-        'TS': 7.0,
-        'VSd': 8.0,
-        'VSnd': 9.0,
-        'WIP_frac': 10.0,
-        'WOP_frac': 11.0,
+        'manure_total_solids': 7.0,
+        'manure_degradable_volatile_solids': 8.0,
+        'manure_non_degradable_volatile_solids': 9.0,
+        'manure_inorganic_phosphorus_fraction': 10.0,
+        'manure_organic_phosphorus_fraction': 11.0,
         'manure_phosphorus': 12.0,
-        'P_frac': 13.0,
-        'K': 14.0,
-        'CH4': 15.0
+        'manure_phosphorus_fraction': 13.0,
+        'manure_potassium': 14.0,
+        'manure_methane': 15.0
     }
 
     # Act
     manure = PenManure(**manure_data)
 
     # Assert
-    assert manure.urea == approx(1.0)
-    assert manure.urine == approx(2.0)
-    assert manure.urine_ammoniacal_nitrogen == approx(3.0)
-    assert manure.total_ammoniacal_nitrogen == approx(4.0)
+    assert manure.manure_urea == approx(1.0)
+    assert manure.manure_urine == approx(2.0)
+    assert manure.manure_urine_ammoniacal_nitrogen == approx(3.0)
+    assert manure.manure_total_ammoniacal_nitrogen == approx(4.0)
     assert manure.manure_nitrogen == approx(5.0)
     assert manure.manure_mass == approx(6.0)
     assert manure.manure_volume == approx(manure.manure_mass / ManureConstants.MANURE_DENSITY)
-    assert manure.TS == approx(7.0)
-    assert manure.VSd == approx(8.0)
-    assert manure.VSnd == approx(9.0)
-    assert manure.WIP_frac == approx(10.0)
-    assert manure.WOP_frac == approx(11.0)
+    assert manure.manure_total_solids == approx(7.0)
+    assert manure.manure_degradable_volatile_solids == approx(8.0)
+    assert manure.manure_non_degradable_volatile_solids == approx(9.0)
+    assert manure.manure_inorganic_phosphorus_fraction == approx(10.0)
+    assert manure.manure_organic_phosphorus_fraction == approx(11.0)
     assert manure.manure_phosphorus == approx(12.0)
-    assert manure.P_frac == approx(13.0)
-    assert manure.K == approx(14.0)
-    assert manure.CH4 == approx(15.0)
+    assert manure.manure_phosphorus_fraction == approx(13.0)
+    assert manure.manure_potassium == approx(14.0)
+    assert manure.manure_methane == approx(15.0)
 
     # --------------------------------------------------------------------------- #
 
@@ -95,18 +95,18 @@ def test_pen_manure_init() -> None:
     manure = PenManure.get_instance(animal_manure, num_animals)
 
     # Assert
-    assert manure.urea == approx(animal_manure['U'] / num_animals)
-    assert manure.urine == approx(animal_manure['Urine'] / num_animals)
-    assert manure.urine_ammoniacal_nitrogen == approx(animal_manure['TAN_s'] * ManureConstants.URINE_TAN_FACTOR / num_animals)
-    assert manure.total_ammoniacal_nitrogen == approx(animal_manure['TAN_s'])
+    assert manure.manure_urea == approx(animal_manure['U'] / num_animals)
+    assert manure.manure_urine == approx(animal_manure['Urine'] / num_animals)
+    assert manure.manure_urine_ammoniacal_nitrogen == approx(animal_manure['TAN_s'] * ManureConstants.URINE_TAN_FACTOR / num_animals)
+    assert manure.manure_total_ammoniacal_nitrogen == approx(animal_manure['TAN_s'])
     assert manure.manure_nitrogen == approx(animal_manure['MN'])
     assert manure.manure_mass == approx(animal_manure['Mkg'])
-    assert manure.TS == approx(animal_manure['TSd'])
-    assert manure.VSd == approx(animal_manure['VSd'])
-    assert manure.VSnd == approx(animal_manure['VSnd'])
-    assert manure.WIP_frac == approx(animal_manure['WIP_frac'] / num_animals)
-    assert manure.WOP_frac == approx(animal_manure['WOP_frac'] / num_animals)
+    assert manure.manure_total_solids == approx(animal_manure['TSd'])
+    assert manure.manure_degradable_volatile_solids == approx(animal_manure['VSd'])
+    assert manure.manure_non_degradable_volatile_solids == approx(animal_manure['VSnd'])
+    assert manure.manure_inorganic_phosphorus_fraction == approx(animal_manure['WIP_frac'] / num_animals)
+    assert manure.manure_organic_phosphorus_fraction == approx(animal_manure['WOP_frac'] / num_animals)
     assert manure.manure_phosphorus == approx(animal_manure['p_excrt_manure'])
-    assert manure.P_frac == approx(animal_manure['p_frac'] / num_animals)
-    assert manure.K == approx(animal_manure['K_manure'])
-    assert manure.CH4 == approx(animal_manure['CH4_manure'])
+    assert manure.manure_phosphorus_fraction == approx(animal_manure['p_frac'] / num_animals)
+    assert manure.manure_potassium == approx(animal_manure['K_manure'])
+    assert manure.manure_methane == approx(animal_manure['CH4_manure'])

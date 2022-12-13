@@ -301,16 +301,16 @@ def test_manure_handler_daily_update(mocker: MockerFixture) -> None:
 
     # Arrange
     mock_manure = mocker.MagicMock(autospec=PenManure)
-    mock_manure.total_ammoniacal_nitrogen = TAN = 19.0
-    mock_manure.urea = urea = 20.0
-    mock_manure.urine_ammoniacal_nitrogen = urine_ammoniacal_nitrogen = 21.0
-    mock_manure.urine = urine = 22.0
+    mock_manure.manure_total_ammoniacal_nitrogen = TAN = 19.0
+    mock_manure.manure_urea = urea = 20.0
+    mock_manure.manure_urine_ammoniacal_nitrogen = urine_ammoniacal_nitrogen = 21.0
+    mock_manure.manure_urine = urine = 22.0
     mock_manure.manure_nitrogen = N = 23.0
-    mock_manure.TS = TS = 24.0
-    mock_manure.VSd = VSd = 25.0
-    mock_manure.VSnd = VSnd = 26.0
+    mock_manure.manure_total_solids = TS = 24.0
+    mock_manure.manure_degradable_volatile_solids = VSd = 25.0
+    mock_manure.manure_non_degradable_volatile_solids = VSnd = 26.0
     mock_manure.manure_phosphorus = P = 27.0
-    mock_manure.K = K = 28.0
+    mock_manure.manure_potassium = K = 28.0
     mock_manure.manure_volume = manure_volume = 29.0
 
     mock_pen = mocker.MagicMock(autospec=ManureManagementPen)
