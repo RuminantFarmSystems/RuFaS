@@ -86,27 +86,28 @@ class BaseManureHandler:
             A ManureHandlerDailyOutput object.
 
         """
-        NH3_housing_loss = GasEmissions.calc_E_NH3_emission(
+        NH3_housing_emission = GasEmissions.calc_ammonia_housing_emission(
                 num_animals=pen.num_animals,
                 barn_area=pen.barn_area_from_pen_type,  # m^2/animal
-                urine_TAN=pen.manure.urine_TAN,  # kg/animal
-                urine=pen.manure.urine / pen.num_animals,  # kg/animal
+                manure_urine_total_ammoniacal_nitrogen=pen.manure.manure_urine_ammoniacal_nitrogen,  # kg/animal
+                manure_urine=pen.manure.manure_urine / pen.num_animals,  # kg/animal
                 tempC=self._get_current_day_avg_tempC()
         )
         daily_output = ManureHandlerDailyOutput(
                 simulation_day=sim_day,
                 pen_id=pen.id,
-                urea=pen.manure.urea,
-                TAN=max(0.0, pen.manure.TAN - NH3_housing_loss),  # kg - kg
-                N=pen.manure.N,
-                TS=pen.manure.TS,
-                VSd=pen.manure.VSd,
-                VSnd=pen.manure.VSnd,
-                P=pen.manure.P,
-                K=pen.manure.K,
-                CH4_housing=GasEmissions.calc_E_CH4_housing(pen.num_animals, pen.barn_area_from_pen_type),
-                CO2_housing=GasEmissions.calc_E_CO2_housing(pen.num_animals, pen.barn_area_from_pen_type),
-                NH3_housing=NH3_housing_loss,
+                manure_urea=pen.manure.manure_urea,
+                liquid_manure_total_ammoniacal_nitrogen=(
+                    max(0.0, pen.manure.manure_total_ammoniacal_nitrogen - NH3_housing_emission)),  # kg - kg
+                liquid_manure_nitrogen=pen.manure.manure_nitrogen,
+                liquid_manure_total_solids=pen.manure.manure_total_solids,
+                manure_degradable_volatile_solids=pen.manure.manure_degradable_volatile_solids,
+                manure_non_degradable_volatile_solids=pen.manure.manure_non_degradable_volatile_solids,
+                liquid_manure_phosphorus=pen.manure.manure_phosphorus,
+                liquid_manure_potassium=pen.manure.manure_potassium,
+                housing_methane=GasEmissions.calc_methane_housing_emission(pen.num_animals, pen.barn_area_from_pen_type),
+                housing_carbon_dioxide=GasEmissions.calc_carbon_dioxide_housing_emission(pen.num_animals, pen.barn_area_from_pen_type),
+                housing_ammonia=NH3_housing_emission,
                 manure_volume=pen.manure.manure_volume,
                 cleaning_water_volume=self.calc_cleaning_water_volume_in_main_barn(pen.num_animals),
                 total_bedding_volume=bedding.calc_total_bedding_volume(pen.num_animals),
