@@ -13,14 +13,14 @@ class ManureHandlerDailyOutput(LiquidManurePortionProtocol):
         pen_id: ID of the pen that this output is associated with.
         simulation_day: Number of days into the simulation.
         urea: Urea concentration in manure, g/L.
-        TAN: Total ammoniacal nitrogen, kg.
-        N: Amount of nitrogen in manure, kg.
-        TS: Total amount of solids from the manure, kg.
+        liquid_manure_total_ammoniacal_nitrogen: Total ammoniacal nitrogen, kg.
+        liquid_manure_nitrogen: Amount of nitrogen in manure, kg.
+        liquid_manure_total_solids: Total amount of solids from the manure, kg.
         VSd: Amount of degradable volatile solids, kg.
         VSnd: Amount of non-degradable volatile solids, kg.
-        VS_total: Total amount of volatile solids, kg.
-        P: Amount of phosphorus excreted in manure, kg.
-        K: Amount of potassium in manure, kg.
+        liquid_manure_total_volatile_solids: Total amount of volatile solids, kg.
+        liquid_manure_phosphorus: Amount of phosphorus excreted in manure, kg.
+        liquid_manure_potassium: Amount of potassium in manure, kg.
         CH4_housing: Methane emissions from ..., kg.  # TODO: Fill in.
         CO2_housing: Carbon dioxide emissions from ..., kg.  # TODO: Fill in.
         NH3_housing: Ammonia emissions from ..., kg.  # TODO: Fill in.
@@ -36,14 +36,14 @@ class ManureHandlerDailyOutput(LiquidManurePortionProtocol):
     pen_id: int = -1
     simulation_day: int = -1
     urea: float = 0.0
-    TAN: float = 0.0
-    N: float = 0.0
-    TS: float = 0.0
+    liquid_manure_total_ammoniacal_nitrogen: float = 0.0
+    liquid_manure_nitrogen: float = 0.0
+    liquid_manure_total_solids: float = 0.0
     VSd: float = 0.0
     VSnd: float = 0.0
-    VS_total: float = field(init=False)
-    P: float = 0.0
-    K: float = 0.0
+    liquid_manure_total_volatile_solids: float = field(init=False)
+    liquid_manure_phosphorus: float = 0.0
+    liquid_manure_potassium: float = 0.0
 
     CH4_housing: float = 0.0
     CO2_housing: float = 0.0
@@ -54,14 +54,14 @@ class ManureHandlerDailyOutput(LiquidManurePortionProtocol):
     total_bedding_volume: float = 0.0
     total_water_volume_in_milking_parlor: float = 0.0
     total_daily_manure_volume: float = field(init=False)
-    daily_volume: float = field(init=False)  # To satisfy the LiquidManurePortionProtocol
+    liquid_manure_daily_volume: float = field(init=False)  # To satisfy the LiquidManurePortionProtocol
 
     tempC: float = 0.0
 
     def __post_init__(self) -> None:
         """Calculate total volatile solids and total daily manure volume after initialization."""
 
-        self.VS_total = self.VSd + self.VSnd
+        self.liquid_manure_total_volatile_solids = self.VSd + self.VSnd
         self.cleaning_water_volume *= GeneralConstants.LITERS_TO_CUBIC_METERS
         self.total_water_volume_in_milking_parlor *= GeneralConstants.LITERS_TO_CUBIC_METERS
 

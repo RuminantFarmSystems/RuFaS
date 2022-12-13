@@ -30,12 +30,12 @@ class AnaerobicLagoon(BaseManureTreatment):
 
         """
         return SludgeOutput(
-                TS=manure_treatment_daily_input.TS * self.config.TS_removal_efficiency_for_treatment,
-                VS=manure_treatment_daily_input.VS_total * self.config.VS_removal_efficiency_for_treatment,
-                N=manure_treatment_daily_input.N * self.config.N_removal_efficiency_for_treatment,
-                P=manure_treatment_daily_input.P * self.config.P_removal_efficiency_for_treatment,
-                K=manure_treatment_daily_input.K * self.config.K_removal_efficiency_for_treatment,
-                daily_sludge_volume=manure_treatment_daily_input.VS_total * 0.03 / 1000.0
+                TS=manure_treatment_daily_input.liquid_manure_total_solids * self.config.TS_removal_efficiency_for_treatment,
+                VS=manure_treatment_daily_input.liquid_manure_total_volatile_solids * self.config.VS_removal_efficiency_for_treatment,
+                N=manure_treatment_daily_input.liquid_manure_nitrogen * self.config.N_removal_efficiency_for_treatment,
+                P=manure_treatment_daily_input.liquid_manure_phosphorus * self.config.P_removal_efficiency_for_treatment,
+                K=manure_treatment_daily_input.liquid_manure_potassium * self.config.K_removal_efficiency_for_treatment,
+                daily_sludge_volume=manure_treatment_daily_input.liquid_manure_total_volatile_solids * 0.03 / 1000.0
         )
 
     def _accumulate_daily_sludge_output(self, daily_sludge_output: SludgeOutput) -> None:
@@ -126,7 +126,7 @@ class AnaerobicLagoon(BaseManureTreatment):
         daily_sludge_output = self._create_daily_sludge_output(self._current_manure_treatment_daily_input)
         self._accumulate_daily_sludge_output(daily_sludge_output)
 
-        CH4_loss, new_accumulated_TS = self.calc_CH4_emission(self._accumulated_output.VS_total,
+        CH4_loss, new_accumulated_TS = self.calc_CH4_emission(self._accumulated_output.liquid_manure_total_volatile_solids,
                                                               self._accumulated_output.TS)
         daily_output.CH4 = CH4_loss
         self._accumulated_output.TS = new_accumulated_TS

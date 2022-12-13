@@ -91,17 +91,17 @@ class SlurryStorageUnderfloor(BaseManureTreatment):
         daily_output = self._initialize_daily_output_during_update(self._current_manure_treatment_daily_input)
         self._accumulate_daily_output(daily_output)
 
-        CH4_loss, new_accumulated_TS = self.calc_CH4_emission(self._accumulated_output.TS)
+        CH4_loss, new_accumulated_TS = self.calc_CH4_emission(self._accumulated_output.liquid_manure_total_solids)
         daily_output.CH4 = CH4_loss
-        self._accumulated_output.TS = new_accumulated_TS
+        self._accumulated_output.liquid_manure_total_solids = new_accumulated_TS
 
         NH3_loss, new_accumulated_TAN = self.calc_NH3_emission(
                 num_animals=self._current_pen.num_animals,
                 barn_area=self._current_pen.barn_area_from_pen_type,
                 accumulated_manure_volume=self._accumulated_output.final_manure_volume,
-                accumulated_TAN=self._accumulated_output.TAN
+                accumulated_TAN=self._accumulated_output.liquid_manure_total_ammoniacal_nitrogen
         )
         daily_output.NH3 = NH3_loss
-        self._accumulated_output.TAN = new_accumulated_TAN
+        self._accumulated_output.liquid_manure_total_ammoniacal_nitrogen = new_accumulated_TAN
 
         return daily_output

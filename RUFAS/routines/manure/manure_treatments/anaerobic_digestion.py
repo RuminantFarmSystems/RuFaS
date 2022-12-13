@@ -36,12 +36,12 @@ class AnaerobicDigestion(BaseManureTreatment):
 
         """
         return SludgeOutput(
-                TS=manure_treatment_daily_input.TS * self.config.TS_removal_efficiency_for_treatment,
-                VS=manure_treatment_daily_input.VS_total * self.config.VS_removal_efficiency_for_treatment,
-                N=manure_treatment_daily_input.N * self.config.N_removal_efficiency_for_treatment,
-                P=manure_treatment_daily_input.P * self.config.P_removal_efficiency_for_treatment,
-                K=manure_treatment_daily_input.K * self.config.K_removal_efficiency_for_treatment,
-                daily_sludge_volume=manure_treatment_daily_input.VS_total * 0.03 / 1000.0
+                TS=manure_treatment_daily_input.liquid_manure_total_solids * self.config.TS_removal_efficiency_for_treatment,
+                VS=manure_treatment_daily_input.liquid_manure_total_volatile_solids * self.config.VS_removal_efficiency_for_treatment,
+                N=manure_treatment_daily_input.liquid_manure_nitrogen * self.config.N_removal_efficiency_for_treatment,
+                P=manure_treatment_daily_input.liquid_manure_phosphorus * self.config.P_removal_efficiency_for_treatment,
+                K=manure_treatment_daily_input.liquid_manure_potassium * self.config.K_removal_efficiency_for_treatment,
+                daily_sludge_volume=manure_treatment_daily_input.liquid_manure_total_volatile_solids * 0.03 / 1000.0
         )
 
     def _accumulate_daily_sludge_output(self, daily_sludge_output: SludgeOutput) -> None:
@@ -107,7 +107,7 @@ class AnaerobicDigestion(BaseManureTreatment):
                                 GeneralConstants.LITERS_TO_CUBIC_METERS)
         # MS.3.B.7
         methane_generation_volume = GasEmissions.calc_CH4_volume_using_Chen_equation(
-                VS_total=self._manure_handler_daily_output.VS_total,
+                VS_total=self._manure_handler_daily_output.liquid_manure_total_volatile_solids,
                 hydraulic_retention_time=self.config.hydraulic_retention_time
         )
         biogas_energy_content = GasEmissions.calc_biogas_energy_content(CH4_volume=methane_generation_volume)
@@ -117,7 +117,7 @@ class AnaerobicDigestion(BaseManureTreatment):
         top_cover_volume = minimum_digester_volume * self.config.top_cover_volume_fraction
 
         anaerobic_digestion_daily_output = AnaerobicDigestionOutput(
-                biogas=self.config.biogas_gen_ratio * self._manure_handler_daily_output.VS_total,
+                biogas=self.config.biogas_gen_ratio * self._manure_handler_daily_output.liquid_manure_total_volatile_solids,
                 input_energy_heating=input_energy_heating,
                 evaporated_water=self.config.evaporation_fraction * final_manure_volume,
                 methane_generation_volume=methane_generation_volume,

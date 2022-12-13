@@ -40,12 +40,12 @@ def test_manure_separator_daily_output() -> None:
         assert output.N_solid == N_solid
         assert output.P_solid == P_solid
         assert output.K_solid == K_solid
-        assert output.TS == TS
-        assert output.VS_total == VS_total
-        assert output.N == N
-        assert output.TAN == TAN
-        assert output.P == P
-        assert output.K == K
+        assert output.liquid_manure_total_solids == TS
+        assert output.liquid_manure_total_volatile_solids == VS_total
+        assert output.liquid_manure_nitrogen == N
+        assert output.liquid_manure_total_ammoniacal_nitrogen == TAN
+        assert output.liquid_manure_phosphorus == P
+        assert output.liquid_manure_potassium == K
         assert output.total_daily_manure_volume == total_daily_manure_volume
         assert output.final_solids_wet_mass == final_solids_wet_mass
         assert output.final_solids_wet_mass_volume == approx(expected_final_solids_wet_mass_volume)
@@ -65,12 +65,12 @@ def test_manure_separator_daily_output() -> None:
             N_solid=N_solid,
             P_solid=P_solid,
             K_solid=K_solid,
-            TS=TS,
-            VS_total=VS_total,
-            N=N,
-            TAN=TAN,
-            P=P,
-            K=K,
+            liquid_manure_total_solids=TS,
+            liquid_manure_total_volatile_solids=VS_total,
+            liquid_manure_nitrogen=N,
+            liquid_manure_total_ammoniacal_nitrogen=TAN,
+            liquid_manure_phosphorus=P,
+            liquid_manure_potassium=K,
             total_daily_manure_volume=total_daily_manure_volume,
             final_solids_wet_mass=final_solids_wet_mass
     )
@@ -90,12 +90,12 @@ def test_manure_separator_daily_output() -> None:
         "N_solid": N_solid,
         "P_solid": P_solid,
         "K_solid": K_solid,
-        "TS": TS,
-        "VS_total": VS_total,
-        "N": N,
-        "TAN": TAN,
-        "P": P,
-        "K": K,
+        "liquid_manure_total_solids": TS,
+        "liquid_manure_total_volatile_solids": VS_total,
+        "liquid_manure_nitrogen": N,
+        "liquid_manure_total_ammoniacal_nitrogen": TAN,
+        "liquid_manure_phosphorus": P,
+        "liquid_manure_potassium": K,
         "total_daily_manure_volume": total_daily_manure_volume,
         "final_solids_wet_mass": final_solids_wet_mass
     }

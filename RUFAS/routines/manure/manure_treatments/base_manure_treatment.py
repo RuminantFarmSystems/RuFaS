@@ -68,19 +68,29 @@ class BaseManureTreatment(ABC):
 
     def _initialize_daily_output_during_update(self, manure_treatment_daily_input: LiquidManurePortionProtocol) -> \
             ManureTreatmentDailyOutput:
-        final_manure_volume = (manure_treatment_daily_input.daily_volume -
-                               (manure_treatment_daily_input.TS * self.config.TS_removal_efficiency_for_treatment) /
+        final_manure_volume = (manure_treatment_daily_input.liquid_manure_daily_volume -
+                               (
+                                       manure_treatment_daily_input.liquid_manure_total_solids *
+                                       self.config.TS_removal_efficiency_for_treatment) /
                                1000.0)
 
         return ManureTreatmentDailyOutput(
                 simulation_day=manure_treatment_daily_input.simulation_day,
                 pen_id=manure_treatment_daily_input.pen_id,
-                TAN=manure_treatment_daily_input.TAN * (1 - self.config.TAN_removal_efficiency_for_treatment),
-                N=manure_treatment_daily_input.N * (1 - self.config.N_removal_efficiency_for_treatment),
-                TS=manure_treatment_daily_input.TS * (1 - self.config.TS_removal_efficiency_for_treatment),
-                VS_total=manure_treatment_daily_input.VS_total * (1 - self.config.VS_removal_efficiency_for_treatment),
-                P=manure_treatment_daily_input.P * (1 - self.config.P_removal_efficiency_for_treatment),
-                K=manure_treatment_daily_input.K * (1 - self.config.K_removal_efficiency_for_treatment),
+                liquid_manure_total_ammoniacal_nitrogen=(
+                        manure_treatment_daily_input.liquid_manure_total_ammoniacal_nitrogen * (
+                        1 - self.config.TAN_removal_efficiency_for_treatment)),
+                liquid_manure_nitrogen=manure_treatment_daily_input.liquid_manure_nitrogen * (
+                        1 - self.config.N_removal_efficiency_for_treatment),
+                liquid_manure_total_solids=manure_treatment_daily_input.liquid_manure_total_solids * (
+                        1 - self.config.TS_removal_efficiency_for_treatment),
+                liquid_manure_total_volatile_solids=(
+                        manure_treatment_daily_input.liquid_manure_total_volatile_solids *
+                        (1 - self.config.VS_removal_efficiency_for_treatment)),
+                liquid_manure_phosphorus=manure_treatment_daily_input.liquid_manure_phosphorus * (
+                        1 - self.config.P_removal_efficiency_for_treatment),
+                liquid_manure_potassium=manure_treatment_daily_input.liquid_manure_potassium * (
+                        1 - self.config.K_removal_efficiency_for_treatment),
                 final_manure_volume=final_manure_volume,
         )
 

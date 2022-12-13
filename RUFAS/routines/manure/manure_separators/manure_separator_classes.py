@@ -78,24 +78,26 @@ class BaseManureSeparator:
         daily_output = ManureSeparatorDailyOutput(
                 simulation_day=daily_input.simulation_day,
                 pen_id=daily_input.pen_id,
-                total_daily_manure_volume=daily_input.daily_volume,
+                total_daily_manure_volume=daily_input.liquid_manure_daily_volume,
                 final_solids_wet_mass=(
-                        daily_input.TS * self.config.TS_removal_efficiency_for_separator /
+                        daily_input.liquid_manure_total_solids * self.config.TS_removal_efficiency_for_separator /
                         self.config.percent_dry_solids
                 ),
 
-                TS_solid=daily_input.TS * self.config.TS_removal_efficiency_for_separator,
-                VS_solid=daily_input.VS_total * self.config.VS_removal_efficiency_for_separator,
-                N_solid=daily_input.N * self.config.N_removal_efficiency_for_separator,
-                P_solid=daily_input.P * self.config.P_removal_efficiency_for_separator,
-                K_solid=daily_input.K * self.config.K_removal_efficiency_for_separator,
+                TS_solid=daily_input.liquid_manure_total_solids * self.config.TS_removal_efficiency_for_separator,
+                VS_solid=daily_input.liquid_manure_total_volatile_solids * self.config.VS_removal_efficiency_for_separator,
+                N_solid=daily_input.liquid_manure_nitrogen * self.config.N_removal_efficiency_for_separator,
+                P_solid=daily_input.liquid_manure_phosphorus * self.config.P_removal_efficiency_for_separator,
+                K_solid=daily_input.liquid_manure_potassium * self.config.K_removal_efficiency_for_separator,
 
-                TS=daily_input.TS * (1 - self.config.TS_removal_efficiency_for_separator),
-                VS_total=daily_input.VS_total * (1 - self.config.VS_removal_efficiency_for_separator),
-                N=daily_input.N * (1 - self.config.N_removal_efficiency_for_separator),
-                TAN=daily_input.TAN * (1 - self.config.TAN_removal_efficiency_for_separator),
-                P=daily_input.P * (1 - self.config.P_removal_efficiency_for_separator),
-                K=daily_input.K * (1 - self.config.K_removal_efficiency_for_separator),
+                TS=daily_input.liquid_manure_total_solids * (1 - self.config.TS_removal_efficiency_for_separator),
+                VS_total=daily_input.liquid_manure_total_volatile_solids * (1 - self.config.VS_removal_efficiency_for_separator),
+                liquid_manure_nitrogen=daily_input.liquid_manure_nitrogen * (
+                            1 - self.config.N_removal_efficiency_for_separator),
+                manure_total_ammoniacal_nitrogen=daily_input.liquid_manure_total_ammoniacal_nitrogen * (
+                        1 - self.config.TAN_removal_efficiency_for_separator),
+                P=daily_input.liquid_manure_phosphorus * (1 - self.config.P_removal_efficiency_for_separator),
+                K=daily_input.liquid_manure_potassium * (1 - self.config.K_removal_efficiency_for_separator),
         )
         return daily_output
 

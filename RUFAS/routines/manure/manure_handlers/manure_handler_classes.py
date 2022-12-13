@@ -97,13 +97,14 @@ class BaseManureHandler:
                 simulation_day=sim_day,
                 pen_id=pen.id,
                 urea=pen.manure.manure_urea,
-                TAN=max(0.0, pen.manure.manure_total_ammoniacal_nitrogen - NH3_housing_loss),  # kg - kg
-                N=pen.manure.manure_nitrogen,
-                TS=pen.manure.manure_total_solids,
+                liquid_manure_total_ammoniacal_nitrogen=(
+                    max(0.0, pen.manure.liquid_manure_total_ammoniacal_nitrogen - NH3_housing_loss)),  # kg - kg
+                liquid_manure_nitrogen=pen.manure.manure_nitrogen,
+                liquid_manure_total_solids=pen.manure.manure_total_solids,
                 VSd=pen.manure.manure_degradable_volatile_solids,
                 VSnd=pen.manure.manure_non_degradable_volatile_solids,
-                P=pen.manure.manure_phosphorus,
-                K=pen.manure.manure_potassium,
+                liquid_manure_phosphorus=pen.manure.manure_phosphorus,
+                liquid_manure_potassium=pen.manure.manure_potassium,
                 CH4_housing=GasEmissions.calc_E_CH4_housing(pen.num_animals, pen.barn_area_from_pen_type),
                 CO2_housing=GasEmissions.calc_E_CO2_housing(pen.num_animals, pen.barn_area_from_pen_type),
                 NH3_housing=NH3_housing_loss,

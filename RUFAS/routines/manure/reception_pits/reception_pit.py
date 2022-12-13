@@ -33,14 +33,14 @@ class ReceptionPit:
                 simulation_day=mh.simulation_day,
                 pen_id=mh.pen_id,
                 urea=mh.urea,
-                TAN=mh.TAN,
-                N=mh.N,
-                TS=mh.TS + bedding.calc_total_bedding_dry_solids(pen.num_animals),
+                liquid_manure_total_ammoniacal_nitrogen=mh.liquid_manure_total_ammoniacal_nitrogen,
+                liquid_manure_nitrogen=mh.liquid_manure_nitrogen,
+                liquid_manure_total_solids=mh.liquid_manure_total_solids + bedding.calc_total_bedding_dry_solids(pen.num_animals),
                 VSd=mh.VSd,
                 VSnd=mh.VSnd,
-                VS_total=mh.VS_total,
-                P=mh.P,
-                K=mh.K,
+                liquid_manure_total_volatile_solids=mh.liquid_manure_total_volatile_solids,
+                liquid_manure_phosphorus=mh.liquid_manure_phosphorus,
+                liquid_manure_potassium=mh.liquid_manure_potassium,
                 total_daily_manure_volume=mh.total_daily_manure_volume
         )
         return daily_output

@@ -46,15 +46,15 @@ class ManureSeparatorDailyOutput(LiquidManurePortionProtocol):
     P_solid: float = 0.0
     K_solid: float = 0.0
 
-    TS: float = 0.0
-    VS_total: float = 0.0
-    N: float = 0.0
-    TAN: float = 0.0
-    P: float = 0.0
-    K: float = 0.0
+    liquid_manure_total_solids: float = 0.0
+    liquid_manure_total_volatile_solids: float = 0.0
+    liquid_manure_nitrogen: float = 0.0
+    liquid_manure_total_ammoniacal_nitrogen: float = 0.0
+    liquid_manure_phosphorus: float = 0.0
+    liquid_manure_potassium: float = 0.0
 
     final_daily_volume: float = field(init=False)
-    daily_volume: float = field(init=False)  # To satisfy the LiquidManurePortionProtocol
+    liquid_manure_daily_volume: float = field(init=False)  # To satisfy the LiquidManurePortionProtocol
 
     def __post_init__(self):
         """Calculates the final daily volume and the final solids wet mass volume."""

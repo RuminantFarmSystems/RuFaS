@@ -21,14 +21,14 @@ def test_reception_pit_daily_output() -> None:
     assert reception_pit_daily_output.pen_id == -1
     assert reception_pit_daily_output.simulation_day == -1
     assert reception_pit_daily_output.urea == 0.0
-    assert reception_pit_daily_output.TAN == 0.0
-    assert reception_pit_daily_output.N == 0.0
-    assert reception_pit_daily_output.TS == 0.0
+    assert reception_pit_daily_output.liquid_manure_total_ammoniacal_nitrogen == 0.0
+    assert reception_pit_daily_output.liquid_manure_nitrogen == 0.0
+    assert reception_pit_daily_output.liquid_manure_total_solids == 0.0
     assert reception_pit_daily_output.VSd == 0.0
     assert reception_pit_daily_output.VSnd == 0.0
-    assert reception_pit_daily_output.VS_total == 0.0
-    assert reception_pit_daily_output.P == 0.0
-    assert reception_pit_daily_output.K == 0.0
+    assert reception_pit_daily_output.liquid_manure_total_volatile_solids == 0.0
+    assert reception_pit_daily_output.liquid_manure_phosphorus == 0.0
+    assert reception_pit_daily_output.liquid_manure_potassium == 0.0
     assert reception_pit_daily_output.total_daily_manure_volume == 0.0
     assert reception_pit_daily_output.daily_volume == 0.0
 
@@ -40,14 +40,14 @@ def test_reception_pit_daily_output() -> None:
             pen_id=1,
             simulation_day=1,
             urea=1.0,
-            TAN=2.0,
-            N=3.0,
-            TS=4.0,
+            liquid_manure_total_ammoniacal_nitrogen=2.0,
+            liquid_manure_nitrogen=3.0,
+            liquid_manure_total_solids=4.0,
             VSd=5.0,
             VSnd=6.0,
-            VS_total=7.0,
-            P=8.0,
-            K=9.0,
+            liquid_manure_total_volatile_solids=7.0,
+            liquid_manure_phosphorus=8.0,
+            liquid_manure_potassium=9.0,
             total_daily_manure_volume=10.0
     )
 
@@ -55,14 +55,14 @@ def test_reception_pit_daily_output() -> None:
     assert reception_pit_daily_output.pen_id == 1
     assert reception_pit_daily_output.simulation_day == 1
     assert reception_pit_daily_output.urea == 1.0
-    assert reception_pit_daily_output.TAN == 2.0
-    assert reception_pit_daily_output.N == 3.0
-    assert reception_pit_daily_output.TS == 4.0
+    assert reception_pit_daily_output.liquid_manure_total_ammoniacal_nitrogen == 2.0
+    assert reception_pit_daily_output.liquid_manure_nitrogen == 3.0
+    assert reception_pit_daily_output.liquid_manure_total_solids == 4.0
     assert reception_pit_daily_output.VSd == 5.0
     assert reception_pit_daily_output.VSnd == 6.0
-    assert reception_pit_daily_output.VS_total == 7.0
-    assert reception_pit_daily_output.P == 8.0
-    assert reception_pit_daily_output.K == 9.0
+    assert reception_pit_daily_output.liquid_manure_total_volatile_solids == 7.0
+    assert reception_pit_daily_output.liquid_manure_phosphorus == 8.0
+    assert reception_pit_daily_output.liquid_manure_potassium == 9.0
     assert reception_pit_daily_output.total_daily_manure_volume == 10.0
     assert reception_pit_daily_output.daily_volume == 10.0
 
@@ -74,14 +74,14 @@ def test_reception_pit_daily_output() -> None:
         'pen_id': 1,
         'simulation_day': 1,
         'urea': 1.0,
-        'TAN': 2.0,
-        'N': 3.0,
-        'TS': 4.0,
+        'liquid_manure_total_ammoniacal_nitrogen': 2.0,
+        'liquid_manure_nitrogen': 3.0,
+        'liquid_manure_total_solids': 4.0,
         'VSd': 5.0,
         'VSnd': 6.0,
-        'VS_total': 7.0,
-        'P': 8.0,
-        'K': 9.0,
+        'liquid_manure_total_volatile_solids': 7.0,
+        'liquid_manure_phosphorus': 8.0,
+        'liquid_manure_potassium': 9.0,
         'total_daily_manure_volume': 10.0
     }
 
@@ -92,14 +92,14 @@ def test_reception_pit_daily_output() -> None:
     assert reception_pit_daily_output.pen_id == 1
     assert reception_pit_daily_output.simulation_day == 1
     assert reception_pit_daily_output.urea == 1.0
-    assert reception_pit_daily_output.TAN == 2.0
-    assert reception_pit_daily_output.N == 3.0
-    assert reception_pit_daily_output.TS == 4.0
+    assert reception_pit_daily_output.liquid_manure_total_ammoniacal_nitrogen == 2.0
+    assert reception_pit_daily_output.liquid_manure_nitrogen == 3.0
+    assert reception_pit_daily_output.liquid_manure_total_solids == 4.0
     assert reception_pit_daily_output.VSd == 5.0
     assert reception_pit_daily_output.VSnd == 6.0
-    assert reception_pit_daily_output.VS_total == 7.0
-    assert reception_pit_daily_output.P == 8.0
-    assert reception_pit_daily_output.K == 9.0
+    assert reception_pit_daily_output.liquid_manure_total_volatile_solids == 7.0
+    assert reception_pit_daily_output.liquid_manure_phosphorus == 8.0
+    assert reception_pit_daily_output.liquid_manure_potassium == 9.0
     assert reception_pit_daily_output.total_daily_manure_volume == 10.0
     assert reception_pit_daily_output.daily_volume == 10.0
 
@@ -114,14 +114,14 @@ def test_daily_update(mocker: MockerFixture) -> None:
     mock_manure_handler_daily_output.simulation_day = sim_day = 1
     mock_manure_handler_daily_output.pen_id = pen_id = 1
     mock_manure_handler_daily_output.urea = urea = 1.0
-    mock_manure_handler_daily_output.TAN = TAN = 2.0
-    mock_manure_handler_daily_output.N = N = 3.0
-    mock_manure_handler_daily_output.TS = TS = 4.0
+    mock_manure_handler_daily_output.liquid_manure_total_ammoniacal_nitrogen = TAN = 2.0
+    mock_manure_handler_daily_output.liquid_manure_nitrogen = N = 3.0
+    mock_manure_handler_daily_output.liquid_manure_total_solids = TS = 4.0
     mock_manure_handler_daily_output.VSd = VSd = 5.0
     mock_manure_handler_daily_output.VSnd = VSnd = 6.0
-    mock_manure_handler_daily_output.VS_total = VS_total = 7.0
-    mock_manure_handler_daily_output.P = P = 8.0
-    mock_manure_handler_daily_output.K = K = 9.0
+    mock_manure_handler_daily_output.liquid_manure_total_volatile_solids = VS_total = 7.0
+    mock_manure_handler_daily_output.liquid_manure_phosphorus = P = 8.0
+    mock_manure_handler_daily_output.liquid_manure_potassium = K = 9.0
     mock_manure_handler_daily_output.total_daily_manure_volume = total_daily_manure_volume = 10.0
 
     mock_pen = mocker.MagicMock(auto_spec=ManureManagementPen)
@@ -143,14 +143,14 @@ def test_daily_update(mocker: MockerFixture) -> None:
     assert reception_pit_daily_output.simulation_day == sim_day
     assert reception_pit_daily_output.pen_id == pen_id
     assert reception_pit_daily_output.urea == approx(urea)
-    assert reception_pit_daily_output.TAN == approx(TAN)
-    assert reception_pit_daily_output.N == approx(N)
-    assert reception_pit_daily_output.TS == approx(expected_TS)
+    assert reception_pit_daily_output.liquid_manure_total_ammoniacal_nitrogen == approx(TAN)
+    assert reception_pit_daily_output.liquid_manure_nitrogen == approx(N)
+    assert reception_pit_daily_output.liquid_manure_total_solids == approx(expected_TS)
     assert reception_pit_daily_output.VSd == approx(VSd)
     assert reception_pit_daily_output.VSnd == approx(VSnd)
-    assert reception_pit_daily_output.VS_total == approx(VS_total)
-    assert reception_pit_daily_output.P == approx(P)
-    assert reception_pit_daily_output.K == approx(K)
+    assert reception_pit_daily_output.liquid_manure_total_volatile_solids == approx(VS_total)
+    assert reception_pit_daily_output.liquid_manure_phosphorus == approx(P)
+    assert reception_pit_daily_output.liquid_manure_potassium == approx(K)
     assert reception_pit_daily_output.total_daily_manure_volume == approx(total_daily_manure_volume)
     assert reception_pit_daily_output.daily_volume == approx(total_daily_manure_volume)
 
