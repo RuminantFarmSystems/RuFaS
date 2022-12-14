@@ -9,10 +9,7 @@ birth date, and age for all animals to be identified.
 """
 ###############################################################################
 
-from RUFAS.output_manager import OutputManager
 from RUFAS.routines.animal.life_cycle.animal_events import AnimalEvents
-
-om = OutputManager()
 
 
 class PenHistory:
@@ -28,13 +25,6 @@ class BodyWeightHistory:
         self.simulation_day = sim_day
         self.days_born = days_born
         self.body_weight = body_weight
-        info_map = {"class": self.__class__.__name__,
-                    "function": self.__init__.__name__,
-                    "sim_day": sim_day,
-                    "days_born": days_born,
-                    "body_weight": body_weight, }
-        om.add_log("body_weight_history", "body weight history updated",
-                   info_map)
 
 
 class AnimalBase(object):
@@ -107,12 +97,6 @@ class AnimalBase(object):
             self.conceptus_weight = args['conceptus_weight']
         if 'calf_birth_weight' in args:
             self.calf_birth_weight = args['calf_birth_weight']
-        
-        info_map = {"class": self.__class__.__name__,
-                    "function": self.init_pens.__name__,
-                    "animal_base_args": args, }
-
-        om.add_log("init_of_animal", self, info_map)
 
     def set_default_nutrient_rqmts(self):
         """

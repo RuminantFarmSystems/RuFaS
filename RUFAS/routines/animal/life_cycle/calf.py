@@ -22,6 +22,7 @@ from RUFAS.routines.animal.life_cycle import animal_constants as const
 
 om = OutputManager()
 
+
 class Calf(AnimalBase):
     def __init__(self, args):
         """
@@ -53,7 +54,8 @@ class Calf(AnimalBase):
         else:
             self.init_values(args)
 
-        self.target_adg_calf = self.birth_weight / AnimalBase.config['wean_day']
+        self.target_adg_calf = self.birth_weight / \
+            AnimalBase.config['wean_day']
 
     def init_values(self, args):
         """
@@ -89,10 +91,19 @@ class Calf(AnimalBase):
 
         self.birth_weight = args['birth_weight']
         self.body_weight = args['birth_weight']
-        self.mature_body_weight = truncnorm.rvs(-const.STDI, const.STDI, AnimalBase.config['mature_body_weight_avg'], \
-            AnimalBase.config['mature_body_weight_std'])
+        self.mature_body_weight = truncnorm.rvs(-const.STDI, const.STDI, AnimalBase.config['mature_body_weight_avg'],
+                                                AnimalBase.config['mature_body_weight_std'])
         self.wean_weight = 0
         self.p_animal = args['p_init']
+
+        info_map = {"class": self.__class__.__name__,
+                    "function": self.init_values.__name__,
+                    "args": args,
+                    "birth_weight": self.birth_weight,
+                    "body_weight": self.body_weight,
+                    "wean_weight": self.wean_weight}
+        om.add_variable("mature_body_weight_calf",
+                        self.mature_body_weight, info_map)
 
     def assign_calf_values(self, args):
         """
@@ -132,7 +143,8 @@ class Calf(AnimalBase):
         wean_day = AnimalBase.config['wean_day']
         wean_length = AnimalBase.config['wean_length']
         milk_type = AnimalBase.config['milk_type']
-        self.animal_intake, self.nutrient_rqmts = calc_requirements(self, feed, temp, wean_day, wean_length, milk_type)
+        self.animal_intake, self.nutrient_rqmts = calc_requirements(
+            self, feed, temp, wean_day, wean_length, milk_type)
         self.DBW = self.nutrient_rqmts['live_weight_change']['val']
 
     def calc_manure_excretion(self, feed):
@@ -202,5 +214,12 @@ class Calf(AnimalBase):
             self.body_weight += self.target_adg_calf
 
         self.daily_growth = self.body_weight - prev_weight
+
+        info_map = {"class": self.__class__.__name__,
+                    "function": self.update.__name__,
+                    "sim_day": sim_day, }
+        om.add_variable("calf_body_weight_after_update",
+                        self.body_weight, info_map)
+        om.add_variable("calf_daily_growth", self.daily_growth, info_map)
 
         return wean_day

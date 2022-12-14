@@ -137,6 +137,11 @@ class Cow(HeiferIII):
             self.milking = self.days_in_milk != 0
             self.calves = args['parity']
             self.CI = args['calving_interval']
+        
+        info_map = {"class": self.__class__.__name__,
+                    "function": self.__init__.__name__,
+                    "args": args, }
+        om.add_variable("cow_body_weight_at_init", args.body_weight, info_map)
 
     def update_milk_production_history(self, sim_day):
         """
@@ -244,6 +249,13 @@ class Cow(HeiferIII):
         self.daily_growth = self.get_bw_change(calving_interval)
 
         self.body_weight += self.daily_growth
+
+        info_map = {"class": self.__class__.__name__,
+                    "function": self.milking_update.__name__,
+                    "sim_day": sim_day, 
+                    "calving_interval": calving_interval, }
+        om.add_variable("cow_daily_growth", self.daily_growth, info_map)
+        om.add_variable("cow_body_weight_milking_update", self.body_weight, info_map)
 
         # if not self.milking:
         # 	self.daily_growth = self.body_weight - prev_weight
@@ -981,6 +993,11 @@ class Cow(HeiferIII):
         Args:
             sim_day: the simulation day
         """
+
+        info_map = {"class": self.__class__.__name__,
+                    "function": self.preg_update.__name__,
+                    "sim_day": sim_day, }
+
         if self.days_in_preg > 0:
             self.days_in_preg += 1
 
@@ -1071,6 +1088,9 @@ class Cow(HeiferIII):
                 self.p_gest_for_calf = 0
                 self.events.add_event(
                     self.days_born, sim_day, const.PREG_LOSS_BTWN_2_AND_3)
+        
+        om.add_variable("cow_preg_body_weight", self.body_weight, info_map)
+
         if self.days_in_preg == 0 and self.days_in_milk > \
                 AnimalBase.config['do_not_breed_time']:
             # only add to events if it is the first time this occurs
