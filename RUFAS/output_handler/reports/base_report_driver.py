@@ -3,6 +3,7 @@ from RUFAS.output_manager import OutputManager
 
 om = OutputManager()
 
+
 class BaseReportDriver:
     def __init__(self, data):
 
@@ -15,7 +16,7 @@ class BaseReportDriver:
 
     def initialize(self):
         info_map = {"class": self.__class__.__name__, 
-                    "function": self.initialize.__name__,}
+                    "function": self.initialize.__name__, }
         if self.produce_csv:
             for report in self.reports.values():
                 if not report.produce_csv and report.produce_graphics:

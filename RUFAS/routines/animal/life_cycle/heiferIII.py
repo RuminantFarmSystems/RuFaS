@@ -9,6 +9,7 @@ Description: This file updates the heifer form close to calving to calving,
             average daily gain, once mature body weight or grow end day reached,
             grow stop.
 """
+from RUFAS.output_manager import OutputManager
 from RUFAS.routines.animal.life_cycle.heiferII import HeiferII
 from RUFAS.routines.animal.life_cycle.animal_base import AnimalBase
 
@@ -16,6 +17,8 @@ from RUFAS.routines.animal.manure.growing_heifer_manure_excretion import \
     manure_calculations
 from RUFAS.routines.animal.ration.animal_requirements import calc_rqmts
 from RUFAS.routines.animal.life_cycle import animal_constants as const
+
+om = OutputManager()
 
 
 class HeiferIII(HeiferII):
@@ -61,7 +64,14 @@ class HeiferIII(HeiferII):
             self.conceptus_weight = args['conceptus_weight']
         if 'calf_birth_weight' in args:
             self.calf_birth_weight = args['calf_birth_weight']
-    
+
+        info_map = {"class": self.__class__.__name__,
+                    "function": self.__init__.__name__,
+                    "args": args, }
+
+        om.add_variable("heiferIII_body_weight_at_init",
+                        args.body_weight, info_map)
+
     def get_heiferIII_values(self):
         """
         Get current information from the heiferIII
@@ -73,9 +83,9 @@ class HeiferIII(HeiferII):
         Calculates this heiferIII's nutrient requirements.
         """
         req = calc_rqmts(self.body_weight, self.mature_body_weight, self.days_in_preg,
-					           animal_type = 'heifer', BCS5 = 3, PrevTemp = temp,
-							ADG_heifer = self.daily_growth, Age = self.days_born
-					)
+                         animal_type='heifer', BCS5=3, PrevTemp=temp,
+                         ADG_heifer=self.daily_growth, Age=self.days_born
+                         )
         self.NEmaint = req['NEmaint']
         self.NEg = req['NEg']
         self.NEpreg = req['NEpreg']
@@ -93,10 +103,18 @@ class HeiferIII(HeiferII):
             feed: instance of the Feed class
         """
         p_urine, p_feces_excrt = self.calc_base_manure()
+        info_map = {"class": self.__class__.__name__,
+                    "function": self.calc_manure_excretion.__name__,
+                    "feed": feed, }
+        om.add_variable("heiferIII_p_urine", p_urine, info_map)
+        om.add_variable("heiferIII_p_feces_excrt", p_feces_excrt, info_map)
 
         self.p_excrt, self.manure_excretion = \
-            manure_calculations(self.ration_formulation, feed, 
-                            self.body_weight, p_feces_excrt, p_urine)
+            manure_calculations(self.ration_formulation, feed,
+                                self.body_weight, p_feces_excrt, p_urine)
+        om.add_variable("heiferIII_p_excrt", self.p_excrt, info_map)
+        om.add_variable("heiferIII_manure_excretion",
+                        self.manure_excretion, info_map)
 
     def update(self, sim_day):
         """
@@ -108,6 +126,11 @@ class HeiferIII(HeiferII):
 
         Returns: cow_stage - heifer close to calving, move to cow stage
         """
+
+        info_map = {"class": self.__class__.__name__,
+                    "function": self.update.__name__,
+                    "sim_day": sim_day, }
+
         self.update_body_weight_history(sim_day)
         cow_stage = False
         self.days_born += 1
@@ -123,7 +146,11 @@ class HeiferIII(HeiferII):
 
         else:
             self.body_weight = self.mature_body_weight
-            self.events.add_event(self.days_born, sim_day, const.MATURE_BODY_WEIGHT_REGULAR)
+            self.events.add_event(self.days_born, sim_day,
+                                  const.MATURE_BODY_WEIGHT_REGULAR)
+
+        om.add_variable("heiferIII_update_body_weight",
+                        self.body_weight, info_map)
 
         if self.days_in_preg == self.gestation_length:
             self.days_born -= 1  # will be incremented again in next stage

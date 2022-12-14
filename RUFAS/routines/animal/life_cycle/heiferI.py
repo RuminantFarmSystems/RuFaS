@@ -9,12 +9,15 @@ Description: This file updates the heifer form wean to start breeding.
 """
 ###############################################################################
 
+from RUFAS.output_manager import OutputManager
 from RUFAS.routines.animal.life_cycle.calf import Calf
 from RUFAS.routines.animal.life_cycle.animal_base import AnimalBase
 from RUFAS.routines.animal.manure.growing_heifer_manure_excretion import \
 	manure_calculations
 from RUFAS.routines.animal.ration.animal_requirements import calc_rqmts
 from RUFAS.routines.animal.life_cycle import animal_constants as const
+
+om = OutputManager()
 
 
 class HeiferI(Calf):
@@ -35,6 +38,12 @@ class HeiferI(Calf):
 			args.events: events of the animal
 		"""
 		super().__init__(args)
+
+		info_map = {"class": self.__class__.__name__,
+                    "function": self.__init__.__name__,
+                    "args": args, }
+		om.add_variable("heiferI_body_weight_at_init", args.body_weight, info_map)
+
 	def get_heiferI_values(self):
 		"""
 		Get current information from the heiferI
@@ -68,10 +77,20 @@ class HeiferI(Calf):
 			feed: instance of the Feed class
 		"""
 		p_urine, p_feces_excrt = self.calc_base_manure()
+		info_map = {"class": self.__class__.__name__,
+                    "function": self.calc_manure_excretion.__name__,
+                    "feed": feed, }
+
+		om.add_variable("heiferI_p_urine", p_urine, info_map)
+		om.add_variable("heiferI_p_feces_excrt", p_feces_excrt, info_map)
 
 		self.p_excrt, self.manure_excretion = \
 			manure_calculations(self.ration_formulation, feed, 
                        self.body_weight, p_feces_excrt, p_urine)
+
+		om.add_variable("heiferI_p_excrt", self.p_excrt, info_map)
+		om.add_variable("heiferI_manure_excretion",
+                        self.manure_excretion, info_map)
 
 	def phosphorus_rqmts(self, DMI):
 		"""
@@ -122,6 +141,11 @@ class HeiferI(Calf):
 
 		Returns: the second stage of heifer -- breeding stage starts
 		"""
+
+		info_map = {"class": self.__class__.__name__,
+                    "function": self.update.__name__,
+                    "sim_day": sim_day, }
+
 		self.update_body_weight_history(sim_day)
 		second_stage = False
 
@@ -134,5 +158,7 @@ class HeiferI(Calf):
 			second_stage = True
 			self.events.add_event(self.days_born, sim_day, const.BREEDING_START)
 			self.days_born -= 1  # will increment in next stage again
+
+		om.add_variable("heiferI_update_body_weight", self.body_weight, info_map)
 
 		return second_stage
