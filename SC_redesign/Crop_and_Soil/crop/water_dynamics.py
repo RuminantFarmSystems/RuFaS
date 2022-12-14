@@ -34,6 +34,8 @@ class WaterDynamics:
         """
         Description: calculate water deficiency factor
 
+        SWAT Reference: 5:3.3.2
+
         Args:
             evapotranspiration: annual evapotranspiration
             max_evapotranspiration: maximum annual evapotranspiration
