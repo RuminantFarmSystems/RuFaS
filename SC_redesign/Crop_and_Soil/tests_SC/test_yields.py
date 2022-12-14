@@ -1,6 +1,7 @@
 import pytest
 from SC_redesign.Crop_and_Soil.crop.yields import *
 
+
 # ---- Test Static Functions ----
 @pytest.mark.parametrize("heatfrac,optimal_index", [
     (0, 1),
@@ -15,8 +16,9 @@ def test_determine_potential_harvest_index(heatfrac, optimal_index):
     """ensure that the potential harvest index is properly calculated"""
     top = 100 * heatfrac
     bottom = (100 * heatfrac) + exp(11.1 - (10 * heatfrac))
-    expect = optimal_index * (top/bottom)
+    expect = optimal_index * (top / bottom)
     assert Yields.determine_potential_harvest_index(heatfrac, optimal_index) == expect
+
 
 @pytest.mark.parametrize("idx,min_index,deficiency", [
     (1, .5, .5),  # start case
@@ -57,6 +59,63 @@ def test_adjust_harvest_index(idx, min_index, deficiency):
 def test_dry_down(start, percent, expect):
     assert Yields.dry_down(start, percent) == pytest.approx(expect)
 
+
+@pytest.mark.parametrize("ag_biomass,harv_ind", [
+    (1, 1),
+    (26, 0.8),
+    (12, 1.2)
+])
+def test_determine_yield(ag_biomass, harv_ind):
+    expect = ag_biomass * harv_ind
+    assert Yields.determine_yield(ag_biomass, harv_ind)
+
+
+@pytest.mark.parametrize("crop_yield,harvest_efficiency", [
+    (1, 1),
+    (8, 0.9),
+    (13, 0.896),
+    (22, 0.5663)
+])
+def test_determine_actual_yield(crop_yield, harvest_efficiency):
+    expect = crop_yield * harvest_efficiency
+    assert Yields.determine_actual_yield(crop_yield, harvest_efficiency) == expect
+
+
+@pytest.mark.parametrize("crop_yield,harvest_efficiency", [
+    (12, 0),
+    (13, 1.001)
+])
+def test_error_determine_actual_yield(crop_yield, harvest_efficiency):
+    with pytest.raises(ValueError):
+        Yields.determine_actual_yield(crop_yield, harvest_efficiency)
+
+
+@pytest.mark.parametrize("n_frac,actual_yield", [
+    (0.03, 11.6),
+    (0.009, 12.5)
+])
+def test_determine_nitrogen_yield(n_frac, actual_yield):
+    expect = n_frac * actual_yield
+    assert Yields.determine_nitrogen_yield(n_frac, actual_yield) == expect
+
+
+@pytest.mark.parametrize("p_frac,actual_yield", [
+    (0.01, 13.01),
+    (0.023, 12.083)
+])
+def test_determine_phosphorus_yield(p_frac, actual_yield):
+    expect = p_frac * actual_yield
+    assert Yields.determine_phosphorus_yield(p_frac, actual_yield) == expect
+
+
+@pytest.mark.parametrize("crop_yield, harvest_eff", [
+    (12.6, 0.89),
+    (8.3, 0.76)
+])
+def test_determine_residue_change(crop_yield, harvest_eff):
+    expect = crop_yield * (1 - harvest_eff)
+    assert Yields.determine_residue_change(crop_yield, harvest_eff) == expect
+
 # ---- Test Member functions
 def init_yields(**kwargs):
     """helper function to initialize Yields object, with specified attributes"""
@@ -64,6 +123,7 @@ def init_yields(**kwargs):
     for key, val in kwargs.items():
         setattr(yld, key, val)
     return yld
+
 
 @pytest.mark.parametrize("frac,expect", [
     (0, False),
@@ -76,15 +136,11 @@ def test_is_mature_property(frac, expect):
     ylds = init_yields(heat_fraction=frac)
     assert ylds.is_mature == expect
 
+
 def test_obtain_yields():
     ylds = init_yields()
     ylds.obtain_yields()
     assert False
-
-
-
-
-
 
 # @pytest.mark.parametrize("idx,min_index,deficiency", [
 #     (0, 0.5, 0.5),  # 0 = harvest index < min
