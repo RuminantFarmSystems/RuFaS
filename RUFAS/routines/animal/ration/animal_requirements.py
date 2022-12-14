@@ -43,11 +43,43 @@ def calc_rqmts(BW, MW, DOP, animal_type, parity=None, CI=None , TP_Milk=None, Fa
         Age: Current age, month
 
     """
-
+    # TODO: put the following original comments into a wiki or other resource
     # A: ENERGY REQUIREMENTS:
     # (divided into the following 5 components: maintenance,
     # activity, growth, pregnancy, and lactation requirements)
     # --------------------------------------------
+    
+    # --------------------------------------------
+    if AnimalBase.config['NASEM_or_NRC_requirement_calculations'] == 'NASEM':
+        NEmaint, CW, CBW = calculate_NASEM_energy_maintenance_requirements(BW, MW, DOP, BCS5, PrevTemp, animal_type)
+        NEg, ADG, EQSBW = calculate_NASEM_energy_growth_requirements(BW, MW, CW, animal_type, parity, CI, ADG_heifer)
+        NEpreg = calculate_NASEM_energy_pregnancy_requirements(DOP, CBW)
+        NEl = calculate_NASEM_energy_lactation_requirements(animal_type, Fat_Milk, TP_Milk, Lactose_Milk, Milk)
+        MP_req = calculate_NASEM_protein_requirements(BW,MW,CW,DOP,animal_type,Milk,TP_Milk, CBW, NEg,ADG,EQSBW)
+        Ca_req = calculate_NASEM_calcium_requirements(BW, MW, DOP, animal_type, lactating, ADG, Milk)
+        P_req = calculate_NASEM_P_requirements(BW, MW, DOP, Milk, animal_type, ADG)
+        DMIest = calculate_DMI_NASEM(BW, MW, DIM, lactating, NEl, BCS5, parity)
+    elif AnimalBase.config['NASEM_or_NRC_requirement_calculations'] == 'NRC':
+        NEmaint, CW, CBW = calculate_NRC_energy_maintenance_requirements(BW, MW, DOP, BCS5, PrevTemp, animal_type)
+        NEg, ADG, EQSBW = calculate_NRC_energy_growth_requirements(BW, MW, CW, animal_type, parity, CI, ADG_heifer)
+        NEpreg = calculate_NRC_energy_pregnancy_requirements(DOP, CBW)
+        NEl = calculate_NRC_energy_lactation_requirements(animal_type, Fat_Milk, TP_Milk, Lactose_Milk, Milk)
+        MP_req = calculate_NRC_protein_requirements(BW,MW,CW,DOP,animal_type,Milk,TP_Milk, CBW, NEg,ADG,EQSBW)
+        Ca_req = calculate_NRC_calcium_requirements(BW, MW, DOP, animal_type, lactating, ADG, Milk)
+        P_req = calculate_NRC_P_requirements(BW, MW, DOP, Milk, animal_type, ADG)
+        DMIest = calculate_DMI_NRC(animal_type, BW, DOP, DIM, lactating, Milk, Fat_Milk)
+    else:
+        DMIest=[]
+        print(f"DMI estimation method \
+            {AnimalBase.config['NASEM_or_NRC_requirement_calculations']}\
+            not supported")
+    # Requirements summary dictionary
+    return {'NEmaint': NEmaint, 'NEg': NEg, 'NEpreg': NEpreg,
+            'NEl': NEl, 'MP_req': MP_req, 'Ca_req': Ca_req, 'P_req': P_req,
+            'DMIest': DMIest}
+
+
+def calculate_NRC_energy_maintenance_requirements(BW, MW, DOP, BCS5, PrevTemp, animal_type):
     # Maintenance requirements
     # ---------------------
     # [A.Cow.A.1]-[A.Heifer.A.1]
@@ -74,6 +106,18 @@ def calc_rqmts(BW, MW, DOP, animal_type, parity=None, CI=None , TP_Milk=None, Fa
         # [A.Heifer.A.4]
         # Net energy for maintenance requirement, Mcal
         NEmaint = (BW-CW)**(0.75) * (0.086*(0.8+ (BCDS9 - 1) * 0.5)) + 0.0007*(20-PrevTemp)
+    return NEmaint, CW, CBW
+
+def calculate_NASEM_energy_maintenance_requirements():
+    pass
+
+def calculate_NRC_energy_activity_requirements():
+    pass
+
+def calculate_NASEM_energy_activity_requirements():
+    pass
+
+def calculate_NRC_energy_growth_requirements(BW, MW, CW, animal_type, parity, CI, ADG_heifer):
     # Activity requirements
     # ---------------------
     # Activity requirements must be calculated after grouping and thus is in a
@@ -114,6 +158,12 @@ def calc_rqmts(BW, MW, DOP, animal_type, parity=None, CI=None , TP_Milk=None, Fa
     # [A.Cow.A.14]-[A.Heifer.A.15]
     # Net energy for growth requirement (Mcal)
     NEg = 0.0635 * EQEBW ** 0.75 * EQEBG ** 1.097
+    return NEg, ADG, EQSBW
+
+def calculate_NASEM_energy_growth_requirements():
+    pass
+
+def calculate_NRC_energy_pregnancy_requirements(DOP, CBW):
     # Pregnancy requirement
     # ---------------------
     # [A.Cow.A.15]-[A.Heifer.A.16]
@@ -127,6 +177,12 @@ def calc_rqmts(BW, MW, DOP, animal_type, parity=None, CI=None , TP_Milk=None, Fa
     # [A.Cow.A.16]-[A.Heifer.A.17]
     # Net energy requirement for pregnancy (Mcal)
     NEpreg = MEpreg * 0.64
+    return NEpreg
+
+def calculate_NASEM_energy_pregnancy_requirements(DOP, CBW):
+    pass
+
+def calculate_NRC_energy_lactation_requirements(animal_type, Fat_Milk, TP_Milk, Lactose_Milk, Milk):
     # Lactation requirement
     # ---------------------
     if animal_type == 'cow':
@@ -138,7 +194,12 @@ def calc_rqmts(BW, MW, DOP, animal_type, parity=None, CI=None , TP_Milk=None, Fa
         NEl = Milken * Milk
     else:
         NEl = 0
+    return NEl
 
+def calculate_NASEM_energy_lactation_requirements(animal_type, Fat_Milk, TP_Milk, Lactose_Milk, Milk):
+    pass
+
+def calculate_NRC_protein_requirements(BW,MW,CW,DOP,animal_type,Milk,TP_Milk, CBW, NEg,ADG,EQSBW):
     # B: PROTEIN REQUIREMENTS:
     # divided into 4 components: maintenance, growth, pregnancy, and lactation
     # --------------------------------------------
@@ -189,7 +250,12 @@ def calc_rqmts(BW, MW, DOP, animal_type, parity=None, CI=None , TP_Milk=None, Fa
     elif animal_type == 'heifer':
         # [A.Heifer.B.6]
         MP_req = MPm + MPg + MPpreg
+    return MP_req
 
+def calculate_NASEM_protein_requirements():
+    pass
+
+def calculate_NRC_calcium_requirements(BW, MW, DOP, animal_type, lactating, ADG, Milk):
     # C: MINERAL REQUIREMENTS
     # Calcium and Phosphorus are the only requirements tracked currently
     # --------------------------------------------
@@ -230,6 +296,13 @@ def calc_rqmts(BW, MW, DOP, animal_type, parity=None, CI=None , TP_Milk=None, Fa
         # [A.Heifer.C.4]
         # Total calcium requirement (g)
         Ca_req = Ca_main + Ca_growth + Ca_preg
+    return Ca_req
+
+def calculate_NASEM_calcium_requirements():
+    pass
+
+# Mineral: Ca and P
+def calculate_NRC_P_requirements(BW, MW, DOP, Milk, animal_type, ADG):
     # Phosphorus Requirements
     # ----------------------
     # [A.Cow.C.7]-[A.Heifer.C.6]
@@ -258,31 +331,19 @@ def calc_rqmts(BW, MW, DOP, animal_type, parity=None, CI=None , TP_Milk=None, Fa
     elif animal_type == 'heifer':
         # [A.Heifer.C.8]
         P_req = P_growth + P_preg
+    return P_req
 
-    # D: DMI ESTIMATION:
-    # The sum of dry matter intake of each feed is assumed to be less than
-    # dry matter intake estimation (Sum of Feed < DMIest).
-    # --------------------------------------------
-    if AnimalBase.config['NASEM_or_NRC_requirement_calculations'] == 'NASEM':
-        DMIest = calculate_DMI_NASEM(BW, MW, DIM, lactating, NEl, BCS5, parity)
-    elif AnimalBase.config['NASEM_or_NRC_requirement_calculations'] == 'NRC':
-        DMIest = calculate_DMI_NRC(animal_type, BW, DOP, DIM, lactating, Milk, Fat_Milk)
-    else:
-        DMIest=[]
-        print(f"DMI estimation method \
-            {AnimalBase.config['NASEM_or_NRC_requirement_calculations']}\
-            not supported")
-    # Requirements summary dictionary
-    return {'NEmaint': NEmaint, 'NEg': NEg, 'NEpreg': NEpreg,
-            'NEl': NEl, 'MP_req': MP_req, 'Ca_req': Ca_req, 'P_req': P_req,
-            'DMIest': DMIest}
-
+def calculate_NASEM_P_requirements():
+    pass
 
 def calculate_DMI_NRC(animal_type: str, BW: float, DOP: int, DIM: int|None, 
                     lactating: bool|None, Milk:float, Fat_Milk:float):
     """
     Method to calculate dry matter intake in kg
         following NRC book 2001, Equations 1-2, pg.4, & Eq. on pg. 325
+    # D: DMI ESTIMATION:
+    # The sum of dry matter intake of each feed is assumed to be less than
+    # dry matter intake estimation (Sum of Feed < DMIest).
     Args:
         BW: Body weight (kg)
         DIM: Days in milk
@@ -312,7 +373,10 @@ def calculate_DMI_NASEM(BW: float, MW:float, DIM: int|None,
     """
     Method to calculate dry matter intake in kg
         following NASEM book 2021, Equation 2-1, pg.12 & Eq.2-3, pg.14
-    Args:
+    # D: DMI ESTIMATION:
+    # The sum of dry matter intake of each feed is assumed to be less than
+    # dry matter intake estimation (Sum of Feed < DMIest).
+    # Args:
         BW: Body weight (kg)
         MW: Mature body weight(kg)
         DIM: Days in milk
@@ -350,7 +414,8 @@ def calculate_DMI_NASEM(BW: float, MW:float, DIM: int|None,
 # TODO: Change Milk to milk_production_daily_kg
 # TODO: Milken to milk_energy_Mcal_per_kg
 # TODO: Change NEl to net_energy_for_lactation
-# TODO: change other energy units - NEg, NEm, NEa, etc.
+# TODO: change other energy units - NEg, NEm, NEa
+# TODO: change ADG, TP_Milk, CBW, EQSBW
 
 def energy_activity_rqmts(BW, housing, distance):
     """
