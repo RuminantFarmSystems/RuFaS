@@ -6,13 +6,15 @@ from SC_redesign.Crop_and_Soil.crop.heat_units import HeatUnits
 from SC_redesign.Crop_and_Soil.crop.leaf_area_index import LeafAreaIndex
 from SC_redesign.Crop_and_Soil.crop.root_development import RootDevelopment
 
+from __future__ import annotations
+
 from typing import List
 
 # TODO: Should use an ENUM class to represent the supported species??
 
 class Crop(GrowthConstraints, BiomassAllocation, WaterDynamics, NitrogenIncorporation, HeatUnits, LeafAreaIndex,
            RootDevelopment):
-    def __init__(self):
+    def __init__(self, species: str):
         GrowthConstraints.__init__(self)
         BiomassAllocation.__init__(self)
         WaterDynamics.__init__(self)
@@ -58,9 +60,30 @@ class Crop(GrowthConstraints, BiomassAllocation, WaterDynamics, NitrogenIncorpor
         self.allocate_biomass(incoming_light)
         self.cycle_water(evaporation, transpiration, max_evapotranspiration)
 
-    def list_all_var_names(self):
-        """list all variables used by Crop"""  # TODO: check for duplicates or conflicts among parents
-        return vars(self)
+    @classmethod
+    def plant_species(cls, species) -> Crop:
+        return cls(species)
+
+    def cut(self):
+        """cuts the crop and return the cut biomass"""
+        pass
+
+    def harvest(self):
+        """harvests the crop's yield"""
+        pass
+
+    def reset_perennial(self):
+        """resets some attributes for perennial crops at the start of the new growing season"""
+        pass
+
+    def kill(self):
+        """kills the crop - Destructor class. This prevents the crop from growing after harvest
+        (i.e., for annual crops)"""
+        pass
+
+    def _list_all_parent_var_names(self):
+        """list all variables used by Crop"""
+        return vars(self)  # TODO: check for duplicates or conflicts among parents
 
 
 
