@@ -27,6 +27,7 @@ from statistics import mean
 
 om = OutputManager()
 
+
 def daily_animal_routine(animal_management, feed, weather, time):
     """
     Executes daily routines relating to Animals. This method is called every day
@@ -148,7 +149,8 @@ class AnimalManagement:
         AnimalBase.set_config(animal_config)
         AnimalBase.set_nutrient_list(feed.nutrient_rqmts)
         self.init_pens(data['pen_information'], data['herd_information'])
-        self.init_animals(data['herd_information'], self.all_pens, weather, time, config, feed)
+        self.init_animals(data['herd_information'],
+                          self.all_pens, weather, time, config, feed)
         self.housing = data['housing']
         self.pasture_concentrate = data['pasture_concentrate']
         self.ration_user_input = data['ration']['user_input']
@@ -196,16 +198,16 @@ class AnimalManagement:
         manure_separator = "sedimentation"
         manure_storage = "storage_pit"
         animal_combination = None
-        info_map = {"class": self.__class__.__name__, 
+        info_map = {"class": self.__class__.__name__,
                     "function": self.init_pens.__name__,
                     "all_pens_data": all_pens_data,
                     "herd_data": herd_data,
-                    "all_pens": self.all_pens,}
+                    "all_pens": self.all_pens, }
         if (len(self.all_pens) == 0) and (herd_num > 0):
-            om.add_warning("invalid_pen_num_warning", 
-                            "Warning: herd_num > 0, but pen_num = 0."
-                            + " Initilizing 3 default pens.",
-                             info_map)
+            om.add_warning("invalid_pen_num_warning",
+                           "Warning: herd_num > 0, but pen_num = 0."
+                           + " Initilizing 3 default pens.",
+                           info_map)
             pen_1 = Pen(0, 0.1, 1.6, 100, 'open air barn', 'sand', 'freestall',
                         manure_handling, manure_separator, manure_storage,
                         animal_combination, 1.2)
@@ -219,10 +221,10 @@ class AnimalManagement:
             self.all_pens.append(pen_2)
             self.all_pens.append(pen_3)
         elif (len(self.all_pens) == 1) and (herd_num > 0):
-            om.add_warning("invalid_pen_num_warning", 
-                            "Warning: herd_num > 0, but pen_num = 1."
-                            + " Initilizing 2 default pens.",
-                             info_map)
+            om.add_warning("invalid_pen_num_warning",
+                           "Warning: herd_num > 0, but pen_num = 1."
+                           + " Initilizing 2 default pens.",
+                           info_map)
             pen_2 = Pen(1, 0.1, 1.6, 300, 'open air barn', 'sawdust', 'freestall',
                         manure_handling, manure_separator, manure_storage,
                         animal_combination, 1.2)
@@ -232,10 +234,10 @@ class AnimalManagement:
             self.all_pens.append(pen_2)
             self.all_pens.append(pen_3)
         elif (len(self.all_pens) == 2) and (herd_num > 0):
-            om.add_warning("invalid_pen_num_warning", 
-                            "Warning: herd_num > 0, but pen_num = 2." 
-                            + " Initilizing 1 default pen.",
-                             info_map)
+            om.add_warning("invalid_pen_num_warning",
+                           "Warning: herd_num > 0, but pen_num = 2."
+                           + " Initilizing 1 default pen.",
+                           info_map)
             pen_3 = Pen(2, 0.1, 1.6, 300, 'open air barn', 'straw', 'tiestall',
                         manure_handling, manure_separator, manure_storage,
                         animal_combination, 1.2)
@@ -259,14 +261,14 @@ class AnimalManagement:
             weather: instance of the Weather class defined in classes.py
             time: instance of the Time class defined in classes.py
         """
-        info_map = {"class": self.__class__.__name__, 
+        info_map = {"class": self.__class__.__name__,
                     "function": self.init_animals.__name__,
                     "herd_data": herd_data,
                     "pen_data": pen_data,
                     "weather": weather,
                     "time": time,
                     "config": config,
-                    "feed": feed,}
+                    "feed": feed, }
         calf_num = herd_data['calf_num']
         heiferI_num = herd_data['heiferI_num']
         heiferII_num = herd_data['heiferII_num']
@@ -279,35 +281,35 @@ class AnimalManagement:
         if herd_num == 0:
             self.simulate_animals = False
             if not calf_num == 0:
-                om.add_warning("invalid_calf_num_warning", 
-                                "Warning: herd_num is 0, but calf_num is not."
-                                + " Setting calf_num = 0.", 
-                                info_map)
+                om.add_warning("invalid_calf_num_warning",
+                               "Warning: herd_num is 0, but calf_num is not."
+                               + " Setting calf_num = 0.",
+                               info_map)
                 calf_num = 0
             if not heiferI_num == 0:
-                om.add_warning("invalid_heiferI_num_warning", 
-                                "Warning: herd_num is 0, but heiferI_num is not."
-                                + " Setting heiferI_num = 0.", 
-                                info_map)
+                om.add_warning("invalid_heiferI_num_warning",
+                               "Warning: herd_num is 0, but heiferI_num is not."
+                               + " Setting heiferI_num = 0.",
+                               info_map)
                 heiferI_num = 0
             if not heiferII_num == 0:
-                om.add_warning("invalid_heiferII_num_warning", 
-                                "Warning: herd_num is 0, but heiferII_num is not."
-                                + " Setting heiferII_num = 0.", 
-                                info_map)
+                om.add_warning("invalid_heiferII_num_warning",
+                               "Warning: herd_num is 0, but heiferII_num is not."
+                               + " Setting heiferII_num = 0.",
+                               info_map)
                 heiferII_num = 0
             if not heiferIII_num == 0:
-                om.add_warning("invalid_heiferIII_num_warning", 
-                                "Warning: herd_num is 0, but heiferIII_num is not."
-                                + " Setting heiferII_num = 0.", 
-                                info_map)
+                om.add_warning("invalid_heiferIII_num_warning",
+                               "Warning: herd_num is 0, but heiferIII_num is not."
+                               + " Setting heiferII_num = 0.",
+                               info_map)
                 heiferIII_num = 0
             if not cow_num == 0:
 
-                om.add_warning("invalid_cow_num_warning", 
-                                "Warning: herd_num is 0, but cow_num is not."
-                                + " Setting cow_num = 0.", 
-                                info_map)
+                om.add_warning("invalid_cow_num_warning",
+                               "Warning: herd_num is 0, but cow_num is not."
+                               + " Setting cow_num = 0.",
+                               info_map)
                 cow_num = 0
         else:
             self.simulate_animals = True
@@ -338,7 +340,11 @@ class AnimalManagement:
             weather: instance of the Weather class defined in classes.py
             time: instance of the Time class defined in classes.py
         """
-
+        info_map = {"class": self.__class__.__name__,
+                    "function": self.init_nutrient_rqmts.__name__,
+                    "weather_instance": weather,
+                    "time_instance": time,
+                    "feed_instance": feed, }
         # average vertical & horizontal distance (VD, HD) of pens to the
         # milking parlor
         # avg_VD_parlor, avg_HD_parlor = self.avg_pen_dist()
@@ -346,22 +352,27 @@ class AnimalManagement:
             temp = weather.T_avg[time.year - 1][time.day - 1]
             calf.calc_nutrient_rqmts(feed, temp)
             calf.p_animal = 0.0072 * calf.body_weight * 1000
+            om.add_variable("calf_at_init", calf, info_map)
 
         for heiferI in self.heiferIs:
             heiferI.set_nutrient_rqmts(temp)
             heiferI.p_animal = 0.0072 * heiferI.body_weight * 1000
+            om.add_variable("heiferI_at_init", heiferI, info_map)
 
         for heiferII in self.heiferIIs:
             heiferII.set_nutrient_rqmts(temp)
             heiferII.p_animal = 0.0072 * heiferII.body_weight * 1000
+            om.add_variable("heiferII_at_init", heiferII, info_map)
 
         for heiferIII in self.heiferIIIs:
             heiferIII.set_nutrient_rqmts(temp)
             heiferIII.p_animal = 0.0072 * heiferIII.body_weight * 1000
+            om.add_variable("heiferIII_at_init", heiferIII, info_map)
 
         for cow in self.cows:
             cow.set_nutrient_rqmts()
             cow.p_animal = 0.0072 * cow.body_weight * 1000
+            om.add_variable("cow_at_init", cow, info_map)
 
     def avg_pen_dist(self) -> Tuple[float, float]:
         """
@@ -371,7 +382,7 @@ class AnimalManagement:
         """
 
         return mean(pen.vertical_dist_to_parlor for pen in self.all_pens), \
-               mean(pen.horizontal_dist_to_parlor for pen in self.all_pens)
+            mean(pen.horizontal_dist_to_parlor for pen in self.all_pens)
 
     def calc_nutrient_rqmts(self, feed, temp):
         """
@@ -504,7 +515,8 @@ class AnimalManagement:
                     self.all_pens[pen].ration == {}:
                 available_feeds = ration_driver.AvailableFeeds()
                 available_feeds.feed_nutrients(feed)
-                self.all_pens[pen].ration = self.all_pens[pen].calc_ration(feed, available_feeds)
+                self.all_pens[pen].ration = self.all_pens[pen].calc_ration(
+                    feed, available_feeds)
             else:
                 # Need to adjust the ration totals for the pen attributes now
                 # that all new animals have been added
@@ -581,20 +593,28 @@ class AnimalManagement:
 
             if pen.animal_combination == Pen.AnimalCombination.CALF:
                 calf_pens.append(pen)
-                self.pens_by_animal_combination[Pen.AnimalCombination.CALF].append(pen)
-                stall_shortage[Pen.AnimalCombination.CALF] -= pen.num_stalls * pen.max_stocking_density
+                self.pens_by_animal_combination[Pen.AnimalCombination.CALF].append(
+                    pen)
+                stall_shortage[Pen.AnimalCombination.CALF] -= pen.num_stalls * \
+                    pen.max_stocking_density
             elif pen.animal_combination == Pen.AnimalCombination.GROWING:
                 growing_pens.append(pen)
-                self.pens_by_animal_combination[Pen.AnimalCombination.GROWING].append(pen)
-                stall_shortage[Pen.AnimalCombination.GROWING] -= pen.num_stalls * pen.max_stocking_density
+                self.pens_by_animal_combination[Pen.AnimalCombination.GROWING].append(
+                    pen)
+                stall_shortage[Pen.AnimalCombination.GROWING] -= pen.num_stalls * \
+                    pen.max_stocking_density
             elif pen.animal_combination == Pen.AnimalCombination.CLOSE_UP:
                 close_up_pens.append(pen)
-                self.pens_by_animal_combination[Pen.AnimalCombination.CLOSE_UP].append(pen)
-                stall_shortage[Pen.AnimalCombination.CLOSE_UP] -= pen.num_stalls * pen.max_stocking_density
+                self.pens_by_animal_combination[Pen.AnimalCombination.CLOSE_UP].append(
+                    pen)
+                stall_shortage[Pen.AnimalCombination.CLOSE_UP] -= pen.num_stalls * \
+                    pen.max_stocking_density
             elif pen.animal_combination == Pen.AnimalCombination.LAC_COW:
                 lac_cow_pens.append(pen)
-                self.pens_by_animal_combination[Pen.AnimalCombination.LAC_COW].append(pen)
-                stall_shortage[Pen.AnimalCombination.LAC_COW] -= pen.num_stalls * pen.max_stocking_density
+                self.pens_by_animal_combination[Pen.AnimalCombination.LAC_COW].append(
+                    pen)
+                stall_shortage[Pen.AnimalCombination.LAC_COW] -= pen.num_stalls * \
+                    pen.max_stocking_density
             else:
                 # TODO: Update mixed_types and mixed_type_pens to use enum
                 # also figure out what mixed type does
@@ -605,13 +625,14 @@ class AnimalManagement:
                 else:
                     mixed_types[pen.id] = pen.animal_combination
         # organzing pens by class and ensuring sufficeint storage
-        info_map = {"class": self.__class__.__name__, 
+        info_map = {"class": self.__class__.__name__,
                     "function": self.pen_allocation.__name__,
-                    "all_pens": self.all_pens,}
+                    "all_pens": self.all_pens, }
         while True:
             max_value = max(stall_shortage.values())
             if max_value > 0:
-                max_key = [k for k, v in stall_shortage.items() if v == max_value]
+                max_key = [k for k, v in stall_shortage.items() if v ==
+                           max_value]
                 pen = None
                 stalls = 0
                 # finding best pen for group with max stall_shortage
@@ -622,10 +643,10 @@ class AnimalManagement:
                         stalls = pen.num_stalls
                 # if no available pens for this group in mixed types
                 if pen is None:
-                    om.add_warning("pen_shortage_warning", 
-                                    f"Warning: shortage of {max_key[0].name} pens," 
-                                    + " initializing new pen,", 
-                                    info_map)
+                    om.add_warning("pen_shortage_warning",
+                                   f"Warning: shortage of {max_key[0].name} pens,"
+                                   + " initializing new pen,",
+                                   info_map)
                     # initalizing a default pen to be used for any class
                     pen = Pen(len(self.all_pens), 0.1, 1.6, max_value,
                               'open air barn', 'straw', 'tiestall', 'manual_scraping',
@@ -640,18 +661,23 @@ class AnimalManagement:
                 # Assigning pen to relevant pen list
                 if max_key[0].name == 'CALF':
                     calf_pens.append(pen)
-                    self.pens_by_animal_combination[Pen.AnimalCombination.CALF].append(pen)
+                    self.pens_by_animal_combination[Pen.AnimalCombination.CALF].append(
+                        pen)
                 elif max_key[0].name == 'GROWING':
                     growing_pens.append(pen)
-                    self.pens_by_animal_combination[Pen.AnimalCombination.GROWING].append(pen)
+                    self.pens_by_animal_combination[Pen.AnimalCombination.GROWING].append(
+                        pen)
                 elif max_key[0].name == 'CLOSE_UP':
                     close_up_pens.append(pen)
-                    self.pens_by_animal_combination[Pen.AnimalCombination.CLOSE_UP].append(pen)
+                    self.pens_by_animal_combination[Pen.AnimalCombination.CLOSE_UP].append(
+                        pen)
                 else:
                     lac_cow_pens.append(pen)
-                    self.pens_by_animal_combination[Pen.AnimalCombination.LAC_COW].append(pen)
+                    self.pens_by_animal_combination[Pen.AnimalCombination.LAC_COW].append(
+                        pen)
                 # updating stall shortage
-                stall_shortage[max_key[0]] -= pen.num_stalls * pen.max_stocking_density
+                stall_shortage[max_key[0]] -= pen.num_stalls * \
+                    pen.max_stocking_density
 
             else:
                 break
@@ -670,7 +696,8 @@ class AnimalManagement:
             else:
                 # condition to make sure all animals are grouped
                 if len(calf_pens) > 1:
-                    calf_pens[0].update_animals(group, Pen.AnimalCombination.CALF)
+                    calf_pens[0].update_animals(
+                        group, Pen.AnimalCombination.CALF)
                     calf_pens.pop(0)
                     group = [calf]
         # final pen for this class
@@ -686,7 +713,8 @@ class AnimalManagement:
             if len(group) / growing_pens[0].num_stalls <= density:
                 group.append(hef1)
             else:
-                growing_pens[0].update_animals(group, Pen.AnimalCombination.GROWING)
+                growing_pens[0].update_animals(
+                    group, Pen.AnimalCombination.GROWING)
                 growing_pens.pop(0)
                 group = [hef1]
         # continuing with heiferIIs
@@ -695,7 +723,8 @@ class AnimalManagement:
                 group.append(hef2)
             else:
                 if len(growing_pens) > 1:
-                    growing_pens[0].update_animals(group, Pen.AnimalCombination.GROWING)
+                    growing_pens[0].update_animals(
+                        group, Pen.AnimalCombination.GROWING)
                     growing_pens.pop(0)
                     group = [hef2]
         # final pen for this class
@@ -711,7 +740,8 @@ class AnimalManagement:
             if len(group) / close_up_pens[0].num_stalls <= density:
                 group.append(hef3)
             else:
-                close_up_pens[0].update_animals(group, Pen.AnimalCombination.CLOSE_UP)
+                close_up_pens[0].update_animals(
+                    group, Pen.AnimalCombination.CLOSE_UP)
                 close_up_pens.pop(0)
                 group = [hef3]
         # continuing with dry cows
@@ -720,7 +750,8 @@ class AnimalManagement:
                 group.append(cow)
             else:
                 if len(close_up_pens) > 1:
-                    close_up_pens[0].update_animals(group, Pen.AnimalCombination.CLOSE_UP)
+                    close_up_pens[0].update_animals(
+                        group, Pen.AnimalCombination.CLOSE_UP)
                     close_up_pens.pop(0)
                     group = [cow]
         # final pen for this class
@@ -736,7 +767,8 @@ class AnimalManagement:
         pen_grouping = grouping(lactating_cows, lac_cow_pens, density)
         # Assigning Lactating Cows to Pens based on the grouping output
         for key in pen_grouping:
-            lac_cow_pens[0].update_animals(pen_grouping[key], Pen.AnimalCombination.LAC_COW)
+            lac_cow_pens[0].update_animals(
+                pen_grouping[key], Pen.AnimalCombination.LAC_COW)
             lac_cow_pens.remove(lac_cow_pens[0])
 
         self.fully_update_id_pen()
@@ -762,7 +794,8 @@ class AnimalManagement:
         available_feeds.feed_nutrients(feed)
         for i, pen in enumerate(self.all_pens):
             if pen.pen_populated:
-                self.all_pens[i].ration = self.all_pens[i].calc_ration(feed, available_feeds)
+                self.all_pens[i].ration = self.all_pens[i].calc_ration(
+                    feed, available_feeds)
 
     def calc_manure_excretion(self, feed, methane_model):
         """
@@ -797,27 +830,32 @@ class AnimalManagement:
         for calf in self.calves:
             curr_pen = self.id_pen[calf.id]
             classes_in_pen = self.all_pens[curr_pen].classes_in_pen
-            calf.update_pen_history(curr_pen, self.simulation_day, classes_in_pen)
+            calf.update_pen_history(
+                curr_pen, self.simulation_day, classes_in_pen)
 
         for heiferI in self.heiferIs:
             curr_pen = self.id_pen[heiferI.id]
             classes_in_pen = self.all_pens[curr_pen].classes_in_pen
-            heiferI.update_pen_history(curr_pen, self.simulation_day, classes_in_pen)
+            heiferI.update_pen_history(
+                curr_pen, self.simulation_day, classes_in_pen)
 
         for heiferII in self.heiferIIs:
             curr_pen = self.id_pen[heiferII.id]
             classes_in_pen = self.all_pens[curr_pen].classes_in_pen
-            heiferII.update_pen_history(curr_pen, self.simulation_day, classes_in_pen)
+            heiferII.update_pen_history(
+                curr_pen, self.simulation_day, classes_in_pen)
 
         for heiferIII in self.heiferIIIs:
             curr_pen = self.id_pen[heiferIII.id]
             classes_in_pen = self.all_pens[curr_pen].classes_in_pen
-            heiferIII.update_pen_history(curr_pen, self.simulation_day, classes_in_pen)
+            heiferIII.update_pen_history(
+                curr_pen, self.simulation_day, classes_in_pen)
 
         for cow in self.cows:
             curr_pen = self.id_pen[cow.id]
             classes_in_pen = self.all_pens[curr_pen].classes_in_pen
-            cow.update_pen_history(curr_pen, self.simulation_day, classes_in_pen)
+            cow.update_pen_history(
+                curr_pen, self.simulation_day, classes_in_pen)
 
     @staticmethod
     def _calc_p_comp(animals):
@@ -838,11 +876,20 @@ class AnimalManagement:
         """
         Calculates each animal class's P concentration.
         """
+
+        info_map = {"class": self.__class__.__name__,
+                    "function": self.calc_all_p_comp.__name__, }
         # TODO: see if there is a better way to do this using dictionary comprehension
         self.p_comp['calf'] = self._calc_p_comp(self.calves)
+        om.add_variable("calf_p_comp", self.p_comp["calf"], info_map)
         self.p_comp['heiferI'] = self._calc_p_comp(self.heiferIs)
+        om.add_variable("heiferI_p_comp", self.p_comp["heiferI"], info_map)
         self.p_comp['heiferII'] = self._calc_p_comp(self.heiferIIs)
+        om.add_variable("heiferII_p_comp", self.p_comp["heiferII"], info_map)
         self.p_comp['cow'] = self._calc_p_comp(self.heiferIIIs)
+        # TODO check if this is set up correctly. Currently p_comp for the cow class is
+        # being set by calculating the p_comp for heiferIIIs (line 889 directly above)
+        om.add_variable("cow_p_comp", self.p_comp["heiferIII"], info_map)
 
     def calc_p_rqmts(self):
         """
@@ -882,16 +929,18 @@ class AnimalManagement:
         if self.simulate_animals:
             for pen in self.all_pens:
                 pen.pen_populated = len(pen.animals_in_pen) > 0
+                
 
             animals_added, ids_removed, calves_born, self.calves, self.heiferIs, \
-            self.heiferIIs, self.heiferIIIs, self.cows = \
+                self.heiferIIs, self.heiferIIIs, self.cows = \
                 self.life_cycle_manager.daily_update(self.simulation_day,
                                                      self.calves,
                                                      self.heiferIs,
                                                      self.heiferIIs,
                                                      self.heiferIIIs, self.cows)
             temp = weather.T_avg[time.year - 1][time.day - 1]
-            self.daily_update_id_pen(animals_added, ids_removed, calves_born, feed, temp)
+            self.daily_update_id_pen(
+                animals_added, ids_removed, calves_born, feed, temp)
 
             # phosphorus requirements for daily updates
             self.calc_p_rqmts()  # per animal
@@ -984,7 +1033,7 @@ class AnimalManagement:
                 [pen_hist.__dict__ for pen_hist in animal.pen_history],
             'event_history': animal.events.events,
             'CI_avg': CI_avg
-        } 
+        }
 
     def get_life_cycle_output(self, num_animals):
         """
@@ -1002,25 +1051,24 @@ class AnimalManagement:
         Returns: a dictionary which contains the individual life cycle output
         """
 
-        
         minimum_num = min(len(self.calves), len(self.heiferIs),
                           len(self.heiferIIs), len(self.heiferIIIs),
                           len(self.cows),
                           len(self.life_cycle_manager.sold_heifers),
                           len(self.life_cycle_manager.culled_cows))
 
-        info_map = {"class": self.__class__.__name__, 
+        info_map = {"class": self.__class__.__name__,
                     "function": self.get_life_cycle_output.__name__,
                     "num_animals": num_animals,
-                    "minimum_num": minimum_num,}
+                    "minimum_num": minimum_num, }
 
         if num_animals > minimum_num:
-            om.add_warning("invalid_animal_list_size", 
-                            f"The smallest animal list is of size {minimum_num}"
-                            + f" so {num_animals} of each animal class cannot be" 
-                            + f" in the life cycle output. Only {minimum_num} of" 
-                            + " each animal type will be in the life cycle output.",
-                            info_map)
+            om.add_warning("invalid_animal_list_size",
+                           f"The smallest animal list is of size {minimum_num}"
+                           + f" so {num_animals} of each animal class cannot be"
+                           + f" in the life cycle output. Only {minimum_num} of"
+                           + " each animal type will be in the life cycle output.",
+                           info_map)
             num_animals = minimum_num
 
         output = {

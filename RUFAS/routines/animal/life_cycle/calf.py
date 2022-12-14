@@ -13,12 +13,14 @@ Body weight gain with user input calf average daily gain.
 import numpy as np
 from random import random
 from scipy.stats import truncnorm
+from RUFAS.output_manager import OutputManager
 from RUFAS.routines.animal.life_cycle.animal_base import AnimalBase
 from RUFAS.routines.animal.ration.calf_ration import calc_requirements
 from RUFAS.routines.animal.manure.calf_manure_excretion import \
     manure_calculations
 from RUFAS.routines.animal.life_cycle import animal_constants as const
 
+om = OutputManager()
 
 class Calf(AnimalBase):
     def __init__(self, args):
@@ -144,6 +146,11 @@ class Calf(AnimalBase):
 
         self.p_excrt, self.manure_excretion = \
             manure_calculations(self.body_weight, p_feces_excrt, p_urine)
+        info_map = {"class": self.__class__.__name__,
+                    "function": self.init_nutrient_rqmts.__name__,
+                    "feed": feed, }
+        om.add_variable("p_excrt_manure", self.p_excrt, info_map)
+        om.add_variable("manure_excretion", self.manure_excretion, info_map)
 
     def phosphorus_rqmts(self, DMI):
         """

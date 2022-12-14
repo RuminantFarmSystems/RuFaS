@@ -9,7 +9,10 @@ birth date, and age for all animals to be identified.
 """
 ###############################################################################
 
+from RUFAS.output_manager import OutputManager
 from RUFAS.routines.animal.life_cycle.animal_events import AnimalEvents
+
+om = OutputManager()
 
 
 class PenHistory:
@@ -25,6 +28,13 @@ class BodyWeightHistory:
         self.simulation_day = sim_day
         self.days_born = days_born
         self.body_weight = body_weight
+        info_map = {"class": self.__class__.__name__,
+                    "function": self.__init__.__name__,
+                    "sim_day": sim_day,
+                    "days_born": days_born,
+                    "body_weight": body_weight, }
+        om.add_log("body_weight_history", "body weight history updated",
+                   info_map)
 
 
 class AnimalBase(object):
@@ -48,11 +58,11 @@ class AnimalBase(object):
             args.days_born: age of the animal
             arg.semen_used: semen used in the dam for the calf
             (optional: include the following to assign animal information)
-			args.birth_weight: the birth weight of the animal
-			args.body_weight: current body weight of the animal
-			args.wean_weight: the wean weight of the animal
-			args.mature_body_weight: the mature body weight of the animal
-			args.events: events of the animal
+                        args.birth_weight: the birth weight of the animal
+                        args.body_weight: current body weight of the animal
+                        args.wean_weight: the wean weight of the animal
+                        args.mature_body_weight: the mature body weight of the animal
+                        args.events: events of the animal
         """
         self.id = args['id']
         self.breed = args['breed']
@@ -97,6 +107,12 @@ class AnimalBase(object):
             self.conceptus_weight = args['conceptus_weight']
         if 'calf_birth_weight' in args:
             self.calf_birth_weight = args['calf_birth_weight']
+        
+        info_map = {"class": self.__class__.__name__,
+                    "function": self.init_pens.__name__,
+                    "animal_base_args": args, }
+
+        om.add_log("init_of_animal", self, info_map)
 
     def set_default_nutrient_rqmts(self):
         """
@@ -146,7 +162,7 @@ class AnimalBase(object):
 
         # amount of P in the animal (A.1G.A.3)
         self.p_animal = self.p_animal + self.p_gest + self.p_growth + \
-                        (self.dP_reserves - dP_reserves_prev)
+            (self.dP_reserves - dP_reserves_prev)
 
     def calc_base_manure(self):
         """
@@ -156,11 +172,13 @@ class AnimalBase(object):
             p_urine: amount of P required for urine production (g)
             p_feces_excrt: amount of P excreted by an animal (g)
         """
+
         # amount of P required for urine production (g) (A.1G.B.1)
         p_urine = 0.000002 * self.body_weight * 1000
 
         # excess P in the diet (g) (A.1G.A.1)
         self.p_excess = max(self.p_intake - self.p_req, 0)
+
 
         # amount of P excreted by an animal (g) (A.1G.B.2)
         if self.dP_reserves == 0 and self.p_intake >= self.p_req:
@@ -168,9 +186,10 @@ class AnimalBase(object):
         elif self.dP_reserves < 0 and self.p_intake >= self.p_req and \
                 self.p_excess >= (-1) * self.dP_reserves / 0.7:
             p_feces_excrt = self.p_intake - self.p_req + self.p_maint_feces + \
-                            self.dP_reserves / 0.7
+                self.dP_reserves / 0.7
         else:
             p_feces_excrt = self.p_maint_feces
+
 
         return p_urine, p_feces_excrt
 
@@ -180,6 +199,7 @@ class AnimalBase(object):
         """
         # (A.1G.C.1) from P tracking
         self.p_animal = 0.0072 * self.body_weight * 1000
+        
 
     def update_pen_history(self, curr_pen, curr_day, classes_in_pen):
         """
@@ -193,7 +213,8 @@ class AnimalBase(object):
             curr_day: the current simulation day
             classes_in_pen: the classes in the animal's current pen
         """
-        last_pen = self.pen_history[-1].pen if len(self.pen_history) > 0 else None
+        last_pen = self.pen_history[-1].pen if len(
+            self.pen_history) > 0 else None
         if last_pen is None or last_pen != curr_pen:
             self.pen_history.append(PenHistory(curr_day, curr_day, curr_pen,
                                                list(classes_in_pen)))
