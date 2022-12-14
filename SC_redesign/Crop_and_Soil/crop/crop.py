@@ -4,18 +4,21 @@ from SC_redesign.Crop_and_Soil.crop.nitrogen_incorporation import NitrogenIncorp
 from SC_redesign.Crop_and_Soil.crop.water_dynamics import WaterDynamics
 from SC_redesign.Crop_and_Soil.crop.heat_units import HeatUnits
 from SC_redesign.Crop_and_Soil.crop.leaf_area_index import LeafAreaIndex
-from SC_redesign.Crop_and_Soil.soil.soil import Soil
+from SC_redesign.Crop_and_Soil.crop.root_development import RootDevelopment
+
+from typing import List
 
 # TODO: Should use an ENUM class to represent the supported species??
 
-class Crop(GrowthConstraints, BiomassAllocation, WaterDynamics, NitrogenIncorporation, HeatUnits, LeafAreaIndex):
+class Crop(GrowthConstraints, BiomassAllocation, WaterDynamics, NitrogenIncorporation, HeatUnits, LeafAreaIndex,
+           RootDevelopment):
     def __init__(self):
         GrowthConstraints.__init__(self)
         BiomassAllocation.__init__(self)
         WaterDynamics.__init__(self)
         NitrogenIncorporation.__init__(self)
 
-    def grow_crop(self, layer_nitrates: list[float], layer_depths: list[float], soil_water_factor: float,
+    def grow_crop(self, layer_nitrates: List[float], layer_depths: List[float], soil_water_factor: float,
                   max_transpiration: float, air_temperature: float,
                   incoming_light: float,
                   evaporation: float, transpiration: float, max_evapotranspiration: float,
@@ -45,9 +48,7 @@ class Crop(GrowthConstraints, BiomassAllocation, WaterDynamics, NitrogenIncorpor
         every day that the crop is alive and growing in the simulation
         """
         self.absorb_heat_units(mean_air_temperature, min_air_temperature, max_air_temperature)
-        #
-        # root_development_update_all()
-        #
+        self.develop_roots()
         self.incorporate_nitrogen(layer_nitrates, layer_depths, soil_water_factor)
         #
         # phosphorus_uptake.update_all()
@@ -56,6 +57,13 @@ class Crop(GrowthConstraints, BiomassAllocation, WaterDynamics, NitrogenIncorpor
         self.grow_canopy()
         self.allocate_biomass(incoming_light)
         self.cycle_water(evaporation, transpiration, max_evapotranspiration)
+
+    def list_all_var_names(self):
+        """list all variables used by Crop"""  # TODO: check for duplicates or conflicts among parents
+        return vars(self)
+
+
+
 
 # class CropSoilInterface:
 #     def __init__(self):
