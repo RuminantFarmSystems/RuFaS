@@ -49,8 +49,13 @@ def test_adjust_harvest_index(idx, min_index, deficiency):
     assert Yields.adjust_harvest_index(idx, min_index, deficiency) == expect
 
 
+@pytest.mark.parametrize("start,percent,expect", [
+    (1, 0, 1),  # no dry down
+    (1, .2, .8),  # 20% loss
+    (215.3, 0.347, (1 - 0.347) * 215.3)  # arbitrary
+])
 def test_dry_down(start, percent, expect):
-    assert Yields.dry_down(start, percent) == expect
+    assert Yields.dry_down(start, percent) == pytest.approx(expect)
 
 # ---- Test Member functions
 def init_yields(**kwargs):
@@ -59,6 +64,17 @@ def init_yields(**kwargs):
     for key, val in kwargs.items():
         setattr(yld, key, val)
     return yld
+
+@pytest.mark.parametrize("frac,expect", [
+    (0, False),
+    (0.5, False),
+    (1, True),
+    (1.5, True)
+])
+def test_is_mature_property(frac, expect):
+    """check that the is_mature property is properly assigning maturity by heat fraction"""
+    ylds = init_yields(heat_fraction=frac)
+    assert ylds.is_mature == expect
 
 def test_obtain_yields():
     ylds = init_yields()

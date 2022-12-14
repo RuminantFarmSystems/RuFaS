@@ -10,23 +10,27 @@ class Yields():
         self.optimal_harvest_index = 3.5
         self.water_deficiency = 0.2  # also in water_dynamics.py
         self.min_harvest_index = 0.2
-        self.is_mature = True
         self.above_ground_biomass = 15  # kg
         self.dry_down_percent = 0.2
 
         self.potential_harvest_index = None
         self.harvest_index = None
 
+    @property
+    def is_mature(self):
+        """checks if maturity has been reached based on the fraction of potential heat units accumulated"""
+        return self.heat_fraction >= 1.0
+
     def obtain_yields(self):
+        """Main yields function; updates Yields attributes for a given day's growth"""
         self.potential_harvest_index = self.determine_potential_harvest_index(self.heat_fraction,
-                                                                             self.optimal_harvest_index)
+                                                                              self.optimal_harvest_index)
         self.harvest_index = self.adjust_harvest_index(self.potential_harvest_index,
                                                        self.min_harvest_index,
                                                        self.water_deficiency)
         self.above_ground_biomass = self.dry_down(self.above_ground_biomass, self.dry_down_percent)
-        #
-        # if crop_type.fr_PHU > 1.0:
-        #     calc_dry_down(crop_type)
+        if self.is_mature:
+            self.above_ground_biomass = self.dry_down(self.above_ground_biomass, self.dry_down_percent)
         #
         # calc_yield_max(crop_type)
         # calc_yield_act(crop_type)
@@ -35,6 +39,8 @@ class Yields():
         # calc_residue(soil, crop_type, field_management, time)
         # calc_quality_assessment(crop_type)
         pass
+
+
 
     @staticmethod
     def determine_potential_harvest_index(heat_fraction, optimal_harvest_index):
@@ -92,44 +98,7 @@ class Yields():
 
 
 # -- OLD
-# def update_all(soil, crop_type, field_management, time):
-#     """
-#     Description:
-#         Runs all the yield calculations
-#
-#     Args:
-#         soil: an instance of the Soil class specified in soil.py representing
-#             the current state of the soil profile
-#         crop_type: an instance of a crop class
-#         field_management: an instance of the FieldManagement class
-#             specified in field_management.py
-#         time: an instance of the Time class specified in classes.py
-#     """
-#
-#
-#     calc_HI_max(crop_type)
-#     calc_HI_act(crop_type)
-#
-#     if crop_type.fr_PHU > 1.0:
-#         calc_dry_down(crop_type)
-#
-#     calc_yield_max(crop_type)
-#     calc_yield_act(crop_type)
-#     calc_harvest_quality(crop_type)
-#     calc_nutrient_removal(crop_type)
-#     calc_residue(soil, crop_type, field_management, time)
-#     calc_quality_assessment(crop_type)
-#
-#
-#
-#
-#     # top = 100 * crop_type.fr_PHU
-#     # bottom = 100 * crop_type.fr_PHU + exp(11.1 - (10 * crop_type.fr_PHU))
-#     # crop_type.HI_max = crop_type.HI_opt * top / bottom
-#
 
-#
-#
 # def calc_yield_max(crop_type):
 #     """
 #     Description:
