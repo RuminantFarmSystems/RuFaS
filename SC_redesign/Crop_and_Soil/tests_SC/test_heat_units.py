@@ -19,40 +19,40 @@ from pytest_mock import MockerFixture
     (23.59, 18.4),  # arbitrary
     (13.77, 29.9),  # arbitrary
 ])
-def test_calc_new_heat_units(temp, min_t):
+def test_determine_new_heat_units(temp, min_t):
     """check that new heat units are correctly calculated by calc_new_heat_units()"""
     diff = temp - min_t
     if diff < 0:
         expect = 0
     else:
         expect = diff
-    assert calc_new_heat_units(temp, min_t) == expect
+    assert HeatUnits.determine_new_heat_units(temp, min_t) == expect
 
 @pytest.mark.parametrize("air,plant", [
     (100, 50),
     (50, 100),
     (100, 100)
 ])
-def test_calc_minimum_heat_unit_temperature(air, plant):
+def test_determine_minimum_heat_unit_temperature(air, plant):
     """check that minimum heat units are properly calculated by calc_minimum_heat_unit_temperature()"""
     if air < plant:
         expect = plant
     else:
         expect = air
-    assert calc_minimum_heat_unit_temperature(air, plant) == expect
+    assert HeatUnits.determine_minimum_heat_unit_temperature(air, plant) == expect
 
 @pytest.mark.parametrize("air,plant", [
     (100, 50),
     (50, 100),
     (100, 100)
 ])
-def test_calc_maximum_heat_unit_temperature(air, plant):
+def test_determine_maximum_heat_unit_temperature(air, plant):
     """check that maximum heat units are properly calculated by calc_maximum_heat_unit_temperature()"""
     if air > plant:
         expect = plant
     else:
         expect = air
-    assert calc_maximum_heat_unit_temperature(air, plant) == expect
+    assert HeatUnits.determine_maximum_heat_unit_temperature(air, plant) == expect
 
 # ---- initializer function ----
 def init_heat(**kwargs):
@@ -61,29 +61,6 @@ def init_heat(**kwargs):
     for key, val in kwargs.items():
         setattr(heat, key, val)
     return heat
-
-@pytest.mark.parametrize("use_alt,temp", [
-    (False, 12.6),  # main method
-    (False, 18.9),  # main method
-    (False, 35.5),  # alt method
-    (False, None),  # main method, no temp
-    (True, 9.4),  # alt method
-    (True, 25.3),  # alt method
-    (True, 32.0),  # alt method
-    (True, None),  # alt method, no temp
-])
-def test_check_growth_conditions(use_alt, temp):
-    """check that the is_growing flag is properly set according to heat units"""
-    heat = init_heat(use_heat_unit_temperature=use_alt, minimum_temperature=15.6, maximum_temperature=30.1,
-                     heat_unit_temperature=22.4)
-    heat.check_growth_conditions(temp)
-    if use_alt or temp is None:
-        above = 22.4 >= 15.6
-        below = 22.4 <= 30.1
-    else:
-        above = temp >= 15.6
-        below = temp <= 30.1
-    assert heat.is_growing == (above and below)
 
 @pytest.mark.parametrize("yes", [True, False])
 def test_decide_to_use_heat_unit_temperature(yes):
@@ -105,28 +82,6 @@ def test_check_absorb_heat_for_input_errors(use_alt, meant, min_t, max_t):
     heat = init_heat(use_heat_unit_temperature=use_alt)
     with pytest.raises(ValueError):
         heat._check_absorb_heat_for_input_errors(meant, min_t, max_t)
-
-@pytest.mark.parametrize("air_min,air_max,crop_min,crop_max", [
-    (1, 1, 1, 1),
-    (0, 0, 0, 0),
-    (0, 1, 0, 1),
-    (0, 3, 1, 2),
-    (1, 2, 0, 3),
-    # arbitrary
-    (18.25, 33.4, 15.0, 35.0),  # air within crop
-    (12.31, 33.4, 15.0, 35.0),  # air_min < crop_min
-    (18.25, 40.7, 15.0, 35.0),  # air_max > crop_max
-    (12.31, 40.7, 15.0, 35.0),  # crop within air
-])
-def test_determine_heat_unit_temperature(air_min, air_max, crop_min, crop_max):
-    """check that heat unit temperature sets variables correctly"""
-    obs_min = calc_minimum_heat_unit_temperature(air_min, crop_min)
-    obs_max = calc_maximum_heat_unit_temperature(air_max, crop_max)
-    heat = init_heat(minimum_temperature=crop_min, maximum_temperature=crop_max)
-    heat.determine_heat_unit_temperature(air_min, air_max)
-    assert heat.minimum_heat_unit_temperature == obs_min
-    assert heat.maximum_heat_unit_temperature == obs_max
-    assert heat.heat_unit_temperature == ((obs_min + obs_max) / 2)
 
 @pytest.mark.parametrize("temp", [0, 20.5, None])
 def test_accumulate_heat_units(temp, mocker: MockerFixture):
@@ -154,9 +109,9 @@ def test_assign_new_heat_units(use_alt, temp):
                      minimum_temperature=15)
     heat.assign_new_heat_units(temp)
     if use_alt or (temp is None):
-        assert heat.new_heat_units == calc_new_heat_units(25, 15)
+        assert heat.new_heat_units == HeatUnits.determine_new_heat_units(25, 15)
     else:
-        assert heat.new_heat_units == calc_new_heat_units(temp, 15)
+        assert heat.new_heat_units == HeatUnits.determine_new_heat_units(temp, 15)
 
 @pytest.mark.parametrize("start,new", [
     (0, 0),
@@ -170,34 +125,3 @@ def test_add_heat_units(start, new):
     heat = init_heat(accumulated_heat_units=start, new_heat_units=new)
     heat.add_heat_units()
     assert heat.accumulated_heat_units == start + new
-
-@pytest.mark.parametrize("now,max_t,expect", [
-    (1, 2, 0.5),
-    (1, 1, 1),
-    (0.25, 100, 0.0025),
-    (133.59, 99.63, 133.59/99.63)
-])
-def test_determine_heat_fraction(now, max_t, expect):
-    """check that heat fraction is properly calculated"""
-    heat = init_heat(accumulated_heat_units=now, potential_heat_units=max_t)
-    heat.determine_heat_fraction()
-    assert heat.heat_fraction == expect
-
-@pytest.mark.parametrize("frac,expect", [
-    (0, False),
-    (0.5, False),
-    (1, True),
-    (1.5, True)
-])
-def test_check_maturity_by_heat_units(frac, expect):
-    """check that check_maturity_by_heat_units is properly assigning maturity by heat fraction"""
-    heat = init_heat(heat_fraction=frac)
-    heat.check_maturity_by_heat_units()
-    assert heat.is_mature == expect
-
-@pytest.mark.parametrize("now", [0, 0.5, 1, 100, 35.399, -1])
-def test_shift_heat_unit_time(now):
-    """check that heat unit time is properly shifted"""
-    heat = init_heat(heat_fraction=now)
-    heat.shift_heat_unit_time()
-    assert heat.previous_heat_fraction == now
