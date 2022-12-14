@@ -1,5 +1,7 @@
 from itertools import groupby
 
+from __future__ import annotations
+
 class Soil:
     def __init__(self):
         # whole-profile attributes
@@ -15,6 +17,12 @@ class Soil:
         # profile layer attributes
         self.depths = [5, 8, 20]  # arbitrary
         self.nitrates = [0.5, 1, 5]  # arbitrary
+
+    @classmethod
+    def make_from_config(cls, soil_config) -> Soil:
+        """"""
+        Warning("create from config file not yet implement, returning default Soil()")
+        return Soil()
 
     def check_layer_lengths_match(self):
         """check that soil layer attributes are all the same length"""
