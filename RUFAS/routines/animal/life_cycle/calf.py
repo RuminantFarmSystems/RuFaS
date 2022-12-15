@@ -218,7 +218,7 @@ class Calf(AnimalBase):
         info_map = {"class": self.__class__.__name__,
                     "function": self.update.__name__,
                     "sim_day": sim_day, }
-        om.add_variable("calf_body_weight_after_update",
+        om.add_variable("end_of_day_calf_weight",
                         self.body_weight, info_map)
         om.add_variable("calf_daily_growth", self.daily_growth, info_map)
 
