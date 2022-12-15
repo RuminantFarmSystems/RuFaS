@@ -4,11 +4,11 @@ from enum import Enum
 
 
 class DefaultEnum(Enum):
-    """An Enum-derived class that helps find members or returns default type as fallback.
+    """An Enum-derived class that helps find members or returns a default type as fallback.
 
-    For any subclass that extends from this class, declare a DEFAULT member is
-    recommended in case of an unsuccessful lookup. The DEFAULT member could act
-    as an alias for another member (i.e., `DEFAULT = A_PREVIOUS_MEMBER`).
+    For any subclass that extends from this class, declaring a DEFAULT member is
+    recommended in case of an unsuccessful lookup. The DEFAULT member should act
+    as an alias for another member (i.e., `DEFAULT = AN_EXISTING_MEMBER`).
 
     Also note how this class does not declare any members, because it is meant
     to be subclassed.
@@ -17,17 +17,16 @@ class DefaultEnum(Enum):
 
     @classmethod
     def get_type(cls, lookup_name: str) -> DefaultEnum:
-        """Return the enum member that matches the given name.
+        """Returns the enum member that matches the given name, case-insensitive.
 
-        Parameters
+        Args:
             lookup_name: name of the lookup enum member.
 
-        Returns
-            The enum member that matches the given name.
-                Otherwise, return the default type.
+        Returns:
+            The enum member that matches the given name. If no match is found,
+            the DEFAULT member is returned.
 
         """
-
         for member in cls:
             if member.name.upper() == lookup_name.strip().upper():
                 return member
@@ -38,17 +37,16 @@ class DefaultEnum(Enum):
 
     @classmethod
     def get_default_type(cls) -> DefaultEnum:
-        """Return either the DEFAULT member if it exists or the first member.
+        """Returns either the DEFAULT member if it exists or the first member.
 
-        Raises
+        Raises:
             IndexError: If the enum has no members.
 
-        Returns
+        Returns:
             The DEFAULT member of this enum class if it exists. Otherwise, the
                 first member is returned.
 
         """
-
         if hasattr(cls, 'DEFAULT'):
             return getattr(cls, 'DEFAULT')
 
