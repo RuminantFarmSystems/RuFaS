@@ -70,7 +70,7 @@ class HeiferIII(HeiferII):
                     "args": args, }
 
         om.add_variable("heiferIII_body_weight_at_init",
-                        args.body_weight, info_map)
+                        args["body_weight"], info_map)
 
     def get_heiferIII_values(self):
         """

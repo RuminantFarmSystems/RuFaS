@@ -42,7 +42,9 @@ class HeiferI(Calf):
 		info_map = {"class": self.__class__.__name__,
                     "function": self.__init__.__name__,
                     "args": args, }
-		om.add_variable("heiferI_body_weight_at_init", args.body_weight, info_map)
+		
+		om.add_variable("heiferI_body_weight_at_init", args["body_weight"], info_map)
+
 
 	def get_heiferI_values(self):
 		"""
