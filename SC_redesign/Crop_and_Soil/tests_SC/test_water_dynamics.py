@@ -13,7 +13,7 @@ from SC_redesign.Crop_and_Soil.crop.water_dynamics import *
     (-1, -1),
     (0.32, 1.357)
 ])
-def test_calc_evapotranspiration(evap, trans):
+def test_determine_evapotranspiration(evap, trans):
     """ensure that evapotranspiration is correclty calculated"""
     assert WaterDynamics.determine_evapotranspiration(evap, trans) == evap + trans
 
@@ -29,7 +29,7 @@ def test_calc_evapotranspiration(evap, trans):
     (821.0, 533.53)  # arbitrary evapotranspiration > max_evapotranspiration
 
 ])
-def test_calc_water_deficiency(et, max_et):
+def test_determine_water_deficiency(et, max_et):
     """ensure that water deficiency is properly calculated"""
     if max_et == 0:
         expect = 0
