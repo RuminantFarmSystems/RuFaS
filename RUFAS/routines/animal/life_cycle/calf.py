@@ -159,7 +159,7 @@ class Calf(AnimalBase):
         self.p_excrt, self.manure_excretion = \
             manure_calculations(self.body_weight, p_feces_excrt, p_urine)
         info_map = {"class": self.__class__.__name__,
-                    "function": self.init_nutrient_rqmts.__name__,
+                    "function": self.calc_manure_excretion.__name__,
                     "feed": feed, }
         om.add_variable("p_excrt_manure", self.p_excrt, info_map)
         om.add_variable("manure_excretion", self.manure_excretion, info_map)

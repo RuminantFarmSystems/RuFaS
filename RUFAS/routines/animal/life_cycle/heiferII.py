@@ -85,8 +85,11 @@ class HeiferII(HeiferI):
         info_map = {"class": self.__class__.__name__,
                     "function": self.__init__.__name__,
                     "args": args, }
-
-        om.add_variable("heiferII_body_weight_at_init", args.body_weight, info_map)
+        # if "body_weight" in args:
+        #     om.add_variable("heiferII_body_weight_at_init", args.body_weight, info_map)
+        # else:
+        #     print(args)
+        #     om.add_variable("heiferII_body_weight_at_init", "body_weight_not_available", info_map)
 
     def get_bw_change(self):
         """
