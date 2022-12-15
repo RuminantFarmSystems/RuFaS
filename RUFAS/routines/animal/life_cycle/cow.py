@@ -275,10 +275,7 @@ class Cow(HeiferIII):
         info_map = {"class": self.__class__.__name__,
                     "function": self.calc_manure_excretion.__name__,
                     "feed": feed,
-                    "methane_model": methane_model,
-                    "ME_intake": ME_intake, }
-        om.add_variable("cow_p_urine", p_urine, info_map)
-        om.add_variable("cow_p_feces_excrt", p_feces_excrt, info_map)
+                    "p_feces_excrt": p_feces_excrt, }
 
         if self.milking:
             self.p_excrt, self.manure_excretion = lactating_manure_calculations(
@@ -290,7 +287,6 @@ class Cow(HeiferIII):
                 self.ration_formulation, feed, self.body_weight,
                 self.estimated_daily_milk_produced, p_feces_excrt, p_urine, ME_intake)
 
-        om.add_variable("cow_p_excrt", self.p_excrt, info_map)
         om.add_variable("cow_manure_excretion",
                         self.manure_excretion, info_map)
 

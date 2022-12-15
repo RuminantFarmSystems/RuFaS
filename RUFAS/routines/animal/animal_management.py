@@ -340,11 +340,7 @@ class AnimalManagement:
             weather: instance of the Weather class defined in classes.py
             time: instance of the Time class defined in classes.py
         """
-        info_map = {"class": self.__class__.__name__,
-                    "function": self.init_nutrient_rqmts.__name__,
-                    "weather_instance": weather,
-                    "time_instance": time,
-                    "feed_instance": feed, }
+        
         # average vertical & horizontal distance (VD, HD) of pens to the
         # milking parlor
         # avg_VD_parlor, avg_HD_parlor = self.avg_pen_dist()
@@ -352,27 +348,22 @@ class AnimalManagement:
             temp = weather.T_avg[time.year - 1][time.day - 1]
             calf.calc_nutrient_rqmts(feed, temp)
             calf.p_animal = 0.0072 * calf.body_weight * 1000
-            om.add_variable("calf_at_init", calf, info_map)
 
         for heiferI in self.heiferIs:
             heiferI.set_nutrient_rqmts(temp)
             heiferI.p_animal = 0.0072 * heiferI.body_weight * 1000
-            om.add_variable("heiferI_at_init", heiferI, info_map)
 
         for heiferII in self.heiferIIs:
             heiferII.set_nutrient_rqmts(temp)
             heiferII.p_animal = 0.0072 * heiferII.body_weight * 1000
-            om.add_variable("heiferII_at_init", heiferII, info_map)
 
         for heiferIII in self.heiferIIIs:
             heiferIII.set_nutrient_rqmts(temp)
             heiferIII.p_animal = 0.0072 * heiferIII.body_weight * 1000
-            om.add_variable("heiferIII_at_init", heiferIII, info_map)
 
         for cow in self.cows:
             cow.set_nutrient_rqmts()
             cow.p_animal = 0.0072 * cow.body_weight * 1000
-            om.add_variable("cow_at_init", cow, info_map)
 
     def avg_pen_dist(self) -> Tuple[float, float]:
         """

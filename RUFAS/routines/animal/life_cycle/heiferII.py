@@ -85,11 +85,8 @@ class HeiferII(HeiferI):
         info_map = {"class": self.__class__.__name__,
                     "function": self.__init__.__name__,
                     "args": args, }
-        # if "body_weight" in args:
-        #     om.add_variable("heiferII_body_weight_at_init", args.body_weight, info_map)
-        # else:
-        #     print(args)
-        #     om.add_variable("heiferII_body_weight_at_init", "body_weight_not_available", info_map)
+        om.add_variable("heiferII_body_weight_at_init", args["body_weight"], info_map)
+        
 
     def get_bw_change(self):
         """
@@ -243,14 +240,13 @@ class HeiferII(HeiferI):
         p_urine, p_feces_excrt = self.calc_base_manure()
         info_map = {"class": self.__class__.__name__,
                     "function": self.calc_manure_excretion.__name__,
-                    "feed": feed, }
-        om.add_variable("heiferII_p_urine", p_urine, info_map)
-        om.add_variable("heiferII_p_feces_excrt", p_feces_excrt, info_map)
+                    "feed": feed, 
+                    "p_feces_excrt": p_feces_excrt}
 
         self.p_excrt, self.manure_excretion = \
             manure_calculations(self.ration_formulation, feed,
                                 self.body_weight, p_feces_excrt, p_urine)
-        om.add_variable("heiferII_p_excrt", self.p_excrt, info_map)
+        
         om.add_variable("heiferII_manure_excretion",
                         self.manure_excretion, info_map)
 

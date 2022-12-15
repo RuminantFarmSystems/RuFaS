@@ -300,12 +300,7 @@ class LifeCycleManager:
 
         info_map = {"class": self.__class__.__name__,
                     "function": self.daily_update.__name__,
-                    "date": date,
-                    "calves": calves,
-                    "heiferIs": heiferIs,
-                    "heiferIIs": heiferIIs,
-                    "heiferIIIs": heiferIIIs,
-                    "cows": cows, }
+                    "date": date, }
 
         # calf to heiferI
         for index, calf in enumerate(calves):
@@ -319,8 +314,6 @@ class LifeCycleManager:
                 new_heiferI = HeiferI(args)
                 heiferIs.append(new_heiferI)
                 del calves[index]
-                om.add_variable("calf_body_weight_history",
-                                calf.body_weight_history, info_map)
             else:
                 self.calf_num += 1
                 total_animal_num, self.avg_mature_body_weight = \
@@ -347,8 +340,7 @@ class LifeCycleManager:
                 new_heiferII = HeiferII(args)
                 heiferIIs.append(new_heiferII)
                 del heiferIs[index]
-                om.add_variable("heiferI_body_weight_history",
-                                heiferI.body_weight_history, info_map)
+                
             else:
                 self.heiferI_num += 1
                 total_animal_num, self.avg_mature_body_weight = \
@@ -377,8 +369,7 @@ class LifeCycleManager:
                 new_heiferIII = HeiferIII(args)
                 heiferIIIs.append(new_heiferIII)
                 del heiferIIs[index]
-                om.add_variable("heiferII_body_weight_history",
-                                heiferII.body_weight_history, info_map)
+
             else:
                 self.heiferII_num += 1
                 total_animal_num, self.avg_mature_body_weight = \
@@ -420,8 +411,7 @@ class LifeCycleManager:
                 new_cow = Cow(args)
                 cows.append(new_cow)
                 del heiferIIIs[index]
-                om.add_variable("heiferIII_body_weight_history",
-                                heiferIII.body_weight_history, info_map)
+
             else:
                 self.heiferIII_num += 1
                 total_animal_num, self.avg_mature_body_weight = \
