@@ -889,7 +889,7 @@ class AnimalManagement:
         self.p_comp['cow'] = self._calc_p_comp(self.heiferIIIs)
         # TODO check if this is set up correctly. Currently p_comp for the cow class is
         # being set by calculating the p_comp for heiferIIIs (line 889 directly above)
-        om.add_variable("cow_p_comp", self.p_comp["heiferIII"], info_map)
+        # om.add_variable("cow_p_comp", self.p_comp["heiferIII"], info_map)
 
     def calc_p_rqmts(self):
         """
