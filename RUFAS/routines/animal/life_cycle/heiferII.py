@@ -82,12 +82,6 @@ class HeiferII(HeiferI):
         self.AI_times = 0
         self.preg_diagnoses = 0
 
-        info_map = {"class": self.__class__.__name__,
-                    "function": self.__init__.__name__,
-                    "args": args, }
-        om.add_variable("heiferII_body_weight_at_init", args["body_weight"], info_map)
-        
-
     def get_bw_change(self):
         """
         Calculates the body weight change for a heifer, depending on if she
@@ -238,17 +232,10 @@ class HeiferII(HeiferI):
             feed: instance of the Feed class
         """
         p_urine, p_feces_excrt = self.calc_base_manure()
-        info_map = {"class": self.__class__.__name__,
-                    "function": self.calc_manure_excretion.__name__,
-                    "feed": feed, 
-                    "p_feces_excrt": p_feces_excrt}
 
         self.p_excrt, self.manure_excretion = \
             manure_calculations(self.ration_formulation, feed,
                                 self.body_weight, p_feces_excrt, p_urine)
-        
-        om.add_variable("heiferII_manure_excretion",
-                        self.manure_excretion, info_map)
 
     def phosphorus_rqmts(self, DMI):
         """
@@ -303,10 +290,6 @@ class HeiferII(HeiferI):
             third_stage: move to next stage -- heiferIII stage when time comes
         """
 
-        info_map = {"class": self.__class__.__name__,
-                    "function": self.update.__name__,
-                    "sim_day": sim_day, }
-
         self.update_body_weight_history(sim_day)
         cull_stage = False
         third_stage = False
@@ -322,8 +305,6 @@ class HeiferII(HeiferI):
         else:
             self.body_weight = self.mature_body_weight
             self.events.add_event(self.days_born, sim_day, const.MATURE_BODY_WEIGHT_REGULAR)
-
-        om.add_variable("heiferII_body_weight_update", self.body_weight, info_map)
 
         # breeding method assign to heifer
         if self.days_born >= AnimalBase.config['breeding_start_day_h']:
@@ -643,10 +624,6 @@ class HeiferII(HeiferI):
             loss in each period of time between preg checks
         """
 
-        info_map = {"class": self.__class__.__name__,
-                    "function": self.preg_update.__name__,
-                    "sim_day": sim_day, }
-
         if self.days_in_preg > 0:
             self.days_in_preg += 1
 
@@ -734,4 +711,3 @@ class HeiferII(HeiferI):
                 self.events.add_event(
                     self.days_born, sim_day, const.PREG_LOSS_BTWN_2_AND_3)
         
-        om.add_variable("heiferII_preg_body_weight", self.body_weight, info_map)

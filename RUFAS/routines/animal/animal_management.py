@@ -868,19 +868,13 @@ class AnimalManagement:
         Calculates each animal class's P concentration.
         """
 
-        info_map = {"class": self.__class__.__name__,
-                    "function": self.calc_all_p_comp.__name__, }
         # TODO: see if there is a better way to do this using dictionary comprehension
         self.p_comp['calf'] = self._calc_p_comp(self.calves)
-        om.add_variable("calf_p_comp", self.p_comp["calf"], info_map)
         self.p_comp['heiferI'] = self._calc_p_comp(self.heiferIs)
-        om.add_variable("heiferI_p_comp", self.p_comp["heiferI"], info_map)
         self.p_comp['heiferII'] = self._calc_p_comp(self.heiferIIs)
-        om.add_variable("heiferII_p_comp", self.p_comp["heiferII"], info_map)
         self.p_comp['cow'] = self._calc_p_comp(self.heiferIIIs)
         # TODO check if this is set up correctly. Currently p_comp for the cow class is
         # being set by calculating the p_comp for heiferIIIs (line 889 directly above)
-        # om.add_variable("cow_p_comp", self.p_comp["heiferIII"], info_map)
 
     def calc_p_rqmts(self):
         """
