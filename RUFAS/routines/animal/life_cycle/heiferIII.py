@@ -65,13 +65,6 @@ class HeiferIII(HeiferII):
         if 'calf_birth_weight' in args:
             self.calf_birth_weight = args['calf_birth_weight']
 
-        info_map = {"class": self.__class__.__name__,
-                    "function": self.__init__.__name__,
-                    "args": args, }
-
-        om.add_variable("heiferIII_body_weight_at_init",
-                        args["body_weight"], info_map)
-
     def get_heiferIII_values(self):
         """
         Get current information from the heiferIII
@@ -103,16 +96,10 @@ class HeiferIII(HeiferII):
             feed: instance of the Feed class
         """
         p_urine, p_feces_excrt = self.calc_base_manure()
-        info_map = {"class": self.__class__.__name__,
-                    "function": self.calc_manure_excretion.__name__,
-                    "feed": feed, 
-                    "p_feces_excrt": p_feces_excrt}
 
         self.p_excrt, self.manure_excretion = \
             manure_calculations(self.ration_formulation, feed,
                                 self.body_weight, p_feces_excrt, p_urine)
-        om.add_variable("heiferIII_manure_excretion",
-                        self.manure_excretion, info_map)
 
     def update(self, sim_day):
         """
@@ -124,10 +111,6 @@ class HeiferIII(HeiferII):
 
         Returns: cow_stage - heifer close to calving, move to cow stage
         """
-
-        info_map = {"class": self.__class__.__name__,
-                    "function": self.update.__name__,
-                    "sim_day": sim_day, }
 
         self.update_body_weight_history(sim_day)
         cow_stage = False
@@ -146,9 +129,6 @@ class HeiferIII(HeiferII):
             self.body_weight = self.mature_body_weight
             self.events.add_event(self.days_born, sim_day,
                                   const.MATURE_BODY_WEIGHT_REGULAR)
-
-        om.add_variable("heiferIII_update_body_weight",
-                        self.body_weight, info_map)
 
         if self.days_in_preg == self.gestation_length:
             self.days_born -= 1  # will be incremented again in next stage

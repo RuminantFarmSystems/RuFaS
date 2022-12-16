@@ -96,14 +96,6 @@ class Calf(AnimalBase):
         self.wean_weight = 0
         self.p_animal = args['p_init']
 
-        info_map = {"class": self.__class__.__name__,
-                    "function": self.init_values.__name__,
-                    "birth_weight": self.birth_weight,
-                    "wean_weight": self.wean_weight,
-                    "mature_body_weight": self.mature_body_weight, }
-        om.add_variable("calf_body_weight_at_init",
-                        self.body_weight, info_map)
-
     def assign_calf_values(self, args):
         """
         Assign calf with given values
@@ -154,15 +146,9 @@ class Calf(AnimalBase):
             feed: instance of the Feed class
         """
         p_urine, p_feces_excrt = self.calc_base_manure()
-        info_map = {"class": self.__class__.__name__,
-                    "function": self.calc_manure_excretion.__name__,
-                    "feed": feed,
-                    "p_feces_excrt": p_feces_excrt, }
 
         self.p_excrt, self.manure_excretion = \
             manure_calculations(self.body_weight, p_feces_excrt, p_urine)
-
-        om.add_variable("manure_excretion", self.manure_excretion, info_map)
 
     def phosphorus_rqmts(self, DMI):
         """
@@ -214,12 +200,5 @@ class Calf(AnimalBase):
             self.body_weight += self.target_adg_calf
 
         self.daily_growth = self.body_weight - prev_weight
-
-        info_map = {"class": self.__class__.__name__,
-                    "function": self.update.__name__,
-                    "sim_day": sim_day, }
-        om.add_variable("end_of_day_calf_weight",
-                        self.body_weight, info_map)
-        om.add_variable("calf_daily_growth", self.daily_growth, info_map)
 
         return wean_day
