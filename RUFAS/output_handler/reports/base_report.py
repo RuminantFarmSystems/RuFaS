@@ -7,15 +7,18 @@ Author(s): William Donovan wmdonovan@wisc.edu
 
 import csv
 from pathlib import Path
-
+from RUFAS.output_manager import OutputManager
 import config.global_variables
 from .. import graphics
+
+om = OutputManager()
 
 
 class BaseReport:
     """
     Interface for report handlers
     """
+
     def __init__(self, data):
         """Sets the properties of each report handler initialized.
 
@@ -67,8 +70,10 @@ class BaseReport:
             writer.writerow(units)
 
     def initialize(self):
-        self.write_headers(Path(str(self.csv_dir) + '/' + self.file_name), self.daily_variables)
-        self.write_headers(Path(str(self.csv_dir) + '/' + self.annual_file_name), self.annual_variables)
+        self.write_headers(Path(str(self.csv_dir) + '/' +
+                           self.file_name), self.daily_variables)
+        self.write_headers(Path(str(self.csv_dir) + '/' +
+                           self.annual_file_name), self.annual_variables)
 
     # stores specified daily values. NOTE: the eval() method is limited
     # to the scope of variables. If a specified output is not a soil
@@ -100,20 +105,36 @@ class BaseReport:
     #
     def write_annual_report(self):
 
-        mode = 'a+' if Path(str(self.csv_dir) + '/' + self.file_name).exists() else 'w+'
+        info_map = {"class": self.__class__.__name__,
+                    "function": self.daily_update.__name__,
+                    }
+
+        mode = 'a+' if Path(str(self.csv_dir) + '/' +
+                            self.file_name).exists() else 'w+'
 
         with Path(str(self.csv_dir) + '/' + self.file_name).open(mode) as csv_file:
             # Write data day by day
             writer = csv.DictWriter(csv_file, fieldnames=self.daily_variables.keys(),
                                     lineterminator='\n')
-
+            data_for_om = {"average_cow_body_weight": [],
+                           "avg_mature_body_weight": [],
+                           "cumulated_milk_production": [],
+                           "milking_cow_num": [],
+                           "milking_cow_percent": [],
+                           "average_days_in_milk": [], }
             for day in range(len(self.daily_variables['j_day'][2])):
                 row = {}
                 for variable in self.daily_variables:
                     row[variable] = self.daily_variables[variable][2][day]
+                    if variable in data_for_om:
+                        data_for_om[variable].append(self.daily_variables[variable][2][day])
                 writer.writerow(row)
+            for key in data_for_om:
+                if data_for_om[key]:
+                    om.add_variable(f"{key}", data_for_om[key], info_map)
 
-        mode = 'a+' if Path(str(self.csv_dir) + '/' + self.annual_file_name).exists() else 'w+'
+        mode = 'a+' if Path(str(self.csv_dir) + '/' +
+                            self.annual_file_name).exists() else 'w+'
 
         with Path(str(self.csv_dir) + '/' + self.annual_file_name).open(mode) as csv_file:
             writer = csv.DictWriter(csv_file, fieldnames=self.annual_variables.keys(),

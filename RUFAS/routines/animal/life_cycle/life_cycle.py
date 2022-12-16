@@ -298,10 +298,6 @@ class LifeCycleManager:
             self.cull_reason_stats[cull_reason] = 0
             self.cull_reason_stats_percent[cull_reason] = 0
 
-        info_map = {"class": self.__class__.__name__,
-                    "function": self.daily_update.__name__,
-                    "date": date, }
-
         # calf to heiferI
         for index, calf in enumerate(calves):
             wean_day = calf.update(date)
@@ -319,8 +315,6 @@ class LifeCycleManager:
                 total_animal_num, self.avg_mature_body_weight = \
                     self.calc_average(total_animal_num,
                                       self.avg_mature_body_weight, calf.mature_body_weight)
-                om.add_variable("avg_mature_calf_body_weight",
-                                self.avg_mature_body_weight, info_map)
 
         # heiferI to heiferII, assign repro programs
         for index, heiferI in enumerate(heiferIs):
@@ -346,8 +340,6 @@ class LifeCycleManager:
                 total_animal_num, self.avg_mature_body_weight = \
                     self.calc_average(total_animal_num,
                                       self.avg_mature_body_weight, heiferI.mature_body_weight)
-                om.add_variable("avg_mature_heiferI_body_weight",
-                                self.avg_mature_body_weight, info_map)
 
         # heiferII to heiferIII
         for index, heiferII in enumerate(heiferIIs):
@@ -375,8 +367,6 @@ class LifeCycleManager:
                 total_animal_num, self.avg_mature_body_weight = \
                     self.calc_average(total_animal_num,
                                       self.avg_mature_body_weight, heiferII.mature_body_weight)
-                om.add_variable("avg_mature_heiferII_body_weight",
-                                self.avg_mature_body_weight, info_map)
                 if heiferII.breeding_to_preg_time != 0:
                     preg_heifer_num, self.avg_breeding_to_preg_time = \
                         self.calc_average(preg_heifer_num,
@@ -417,8 +407,6 @@ class LifeCycleManager:
                 total_animal_num, self.avg_mature_body_weight = \
                     self.calc_average(total_animal_num,
                                       self.avg_mature_body_weight, heiferIII.mature_body_weight)
-                om.add_variable("avg_mature_heiferIII_body_weight",
-                                self.avg_mature_body_weight, info_map)
 
         # if the number of heifers is more than needed for the herd, sell
         # those as replacement
@@ -473,10 +461,7 @@ class LifeCycleManager:
                 total_animal_num, self.avg_mature_body_weight = \
                     self.calc_average(total_animal_num,
                                       self.avg_mature_body_weight, cow.mature_body_weight)
-                om.add_variable("avg_cow_body_weight_not_culled",
-                                self.avg_cow_body_weight, info_map)
-                om.add_variable("avg_mature_cow_body_weight_not_culled",
-                                self.avg_mature_body_weight, info_map)
+
                 if cow.milking:
                     self.daily_milk_production += cow.estimated_daily_milk_produced
                     self.milking_cow_num, self.avg_days_in_milk = \
