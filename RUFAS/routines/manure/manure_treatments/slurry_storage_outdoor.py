@@ -184,7 +184,7 @@ class SlurryStorageOutdoor(BaseManureTreatment):
         CH4_loss = GasEmissions.calc_methane_emission_for_slurry_storage(
                 manure_total_solids=accumulated_manure_total_solids,
                 is_enclosed=False,  # This is what differs from the slurry storage underfloor
-                tempC=avg_tempC
+                temperature_celsius=avg_tempC
         )
         new_accumulated_TS = max(accumulated_manure_total_solids - CH4_loss, 0.0)
         return CH4_loss, new_accumulated_TS
@@ -212,7 +212,7 @@ class SlurryStorageOutdoor(BaseManureTreatment):
                 barn_area=barn_area,
                 manure_urine=accumulated_manure_volume * ManureConstants.MANURE_DENSITY / num_animals,
                 manure_urine_total_ammoniacal_nitrogen=accumulated_manure_total_ammoniacal_nitrogen / num_animals,
-                tempC=avg_tempC
+                temperature_celsius=avg_tempC
         )
         new_accumulated_TAN = max(accumulated_manure_total_ammoniacal_nitrogen - NH3_loss, 0.0)
         return NH3_loss, new_accumulated_TAN

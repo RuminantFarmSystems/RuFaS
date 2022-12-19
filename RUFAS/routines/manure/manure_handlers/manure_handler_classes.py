@@ -91,7 +91,7 @@ class BaseManureHandler:
                 barn_area=pen.barn_area_from_pen_type,  # m^2/animal
                 manure_urine_total_ammoniacal_nitrogen=pen.manure.manure_urine_ammoniacal_nitrogen,  # kg/animal
                 manure_urine=pen.manure.manure_urine / pen.num_animals,  # kg/animal
-                tempC=self._get_current_day_avg_tempC()
+                temperature_celsius=self._get_current_day_avg_tempC()
         )
         daily_output = ManureHandlerDailyOutput(
                 simulation_day=sim_day,

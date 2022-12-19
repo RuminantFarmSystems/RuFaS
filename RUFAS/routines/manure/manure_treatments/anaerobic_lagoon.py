@@ -109,7 +109,7 @@ class AnaerobicLagoon(BaseManureTreatment):
                 barn_area=barn_area,
                 manure_urine=accumulated_manure_volume * ManureConstants.MANURE_DENSITY / num_animals,
                 manure_urine_total_ammoniacal_nitrogen=accumulated_TAN / num_animals,
-                tempC=avg_tempC
+                temperature_celsius=avg_tempC
         )
         new_accumulated_TAN = max(accumulated_TAN - NH3_loss, 0.0)
         return NH3_loss, new_accumulated_TAN

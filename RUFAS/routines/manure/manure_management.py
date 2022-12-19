@@ -10,6 +10,7 @@ Author(s):  William Donovan, wmdonovan@wisc.edu
             Sadman Chowdhury, skc86@cornell.edu
 """
 import collections
+import typing
 from typing import Dict
 from typing import List
 from typing import Optional
@@ -23,6 +24,7 @@ from RUFAS.routines.manure.manure_handlers.manure_handler_classes import BaseMan
 from RUFAS.routines.manure.manure_handlers.manure_handler_classes import ManureHandlerFactory
 from RUFAS.routines.manure.manure_separators.manure_separator_classes import BaseManureSeparator
 from RUFAS.routines.manure.manure_separators.manure_separator_classes import ManureSeparatorFactory
+from RUFAS.routines.manure.manure_treatments.anaerobic_digestion_and_lagoon import AnaerobicDigestionAndLagoon
 from RUFAS.routines.manure.manure_treatments.base_manure_treatment import BaseManureTreatment
 from RUFAS.routines.manure.manure_treatments.manure_treatment_factory import ManureTreatmentFactory
 from RUFAS.routines.manure.manure_treatments.manure_treatment_types import ManureTreatmentType
@@ -182,6 +184,8 @@ class ManureManagement:
                     bedding=self.beddings[mm_pen.id]
             )
 
+            anaerobic_digestion_daily_output = None
+
             if ManureTreatmentType.get_type(mm_pen.manure_treatment) is \
                     ManureTreatmentType.ANAEROBIC_DIGESTION_AND_LAGOON_WITH_SPLIT:
                 manure_treatment_daily_output = self.manure_treatments[mm_pen.id].daily_update(
@@ -191,6 +195,9 @@ class ManureManagement:
                         sim_day=animal_management.simulation_day,
                         manure_separator=self.manure_separators[mm_pen.id]
                 )
+                anaerobic_digestion_daily_output = (
+                    typing.cast(AnaerobicDigestionAndLagoon, self.manure_treatments[mm_pen.id])
+                    .anaerobic_digestion_daily_output)
                 manure_separator_daily_output = self.manure_treatments[mm_pen.id].manure_separator_daily_output
             else:
                 manure_separator_daily_output = self.manure_separators[mm_pen.id].daily_update(
@@ -209,7 +216,8 @@ class ManureManagement:
                 manure_handler_daily_output,
                 reception_pit_daily_output,
                 manure_separator_daily_output,
-                manure_treatment_daily_output
+                manure_treatment_daily_output,
+                anaerobic_digestion_daily_output
             )
             self._all_data[pen.id].append(daily_update_data)
             self.manure_management_output_handler.append_daily_update_data_for_pen(

@@ -298,7 +298,7 @@ def test_manure_handler_daily_update(mocker: MockerFixture) -> None:
 
     # Arrange
     mock_manure = mocker.MagicMock(autospec=PenManure)
-    mock_manure.liquid_manure_total_ammoniacal_nitrogen = TAN = 19.0
+    mock_manure.manure_total_ammoniacal_nitrogen = TAN = 19.0
     mock_manure.manure_urea = urea = 20.0
     mock_manure.manure_urine_ammoniacal_nitrogen = urine_ammoniacal_nitrogen = 21.0
     mock_manure.manure_urine = urine = 22.0
@@ -368,7 +368,7 @@ def test_manure_handler_daily_update(mocker: MockerFixture) -> None:
             barn_area=barn_area_from_pen_type,
             manure_urine_total_ammoniacal_nitrogen=urine_ammoniacal_nitrogen,
             manure_urine=urine / num_animals,
-            tempC=current_day_avg_tempC
+            temperature_celsius=current_day_avg_tempC
     )
     assert manure_handler_daily_output.simulation_day == sim_day
     assert manure_handler_daily_output.pen_id == pen_id

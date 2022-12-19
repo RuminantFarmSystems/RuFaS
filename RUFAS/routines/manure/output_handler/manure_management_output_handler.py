@@ -26,6 +26,7 @@ PenDailyUpdateDataType = Tuple[ManureManagementPen,
                                ManureHandlerDailyOutput,
                                ReceptionPitDailyOutput,
                                ManureSeparatorDailyOutput,
+                               ManureTreatmentDailyOutput,
                                ManureTreatmentDailyOutput]
 
 
@@ -99,11 +100,11 @@ class ManureManagementOutputHandler:
         }
         return {f'{prefix}{self.HEADER_PRIMARY_DELIMITER}{k}': v for k, v in temp.items()}
 
-    def _process_dataclass_output_obj(self, dataclass_obj, obj_type):
+    def _process_dataclass_output_obj(self, dataclass_obj, obj_type, extra_prefix=''):
         return self._convert_dataclass_obj_to_formatted_dict(
                 dataclass_obj,
                 fields(obj_type),
-                prefix=self.HEADER_PREFIXES.get(obj_type, ''),
+                prefix=self.HEADER_PREFIXES.get(obj_type, '') + self.HEADER_SECONDARY_DELIMITER + extra_prefix,
                 delimiter=self.HEADER_PRIMARY_DELIMITER
         )
 
@@ -121,7 +122,7 @@ class ManureManagementOutputHandler:
 
         """
         (pen, manure_handler_output, reception_pit_output,
-         manure_separator_output, treatment_output) = data
+         manure_separator_output, treatment_output, anaerobic_digestion_output) = data
         d = {
             'pen_id': [pen.id],
             'sim_day': [simulation_day],
@@ -131,6 +132,7 @@ class ManureManagementOutputHandler:
             **self._process_dataclass_output_obj(reception_pit_output, ReceptionPitDailyOutput),
             **self._process_dataclass_output_obj(manure_separator_output, ManureSeparatorDailyOutput),
             **self._process_dataclass_output_obj(treatment_output, ManureTreatmentDailyOutput),
+            **self._process_dataclass_output_obj(anaerobic_digestion_output, ManureTreatmentDailyOutput, 'ad'),
         }
         self._append_df(d)
 
@@ -176,6 +178,7 @@ class ManureManagementOutputHandler:
             'rp': 'Reception Pit',
             'sep': 'Separator',
             'tx': 'Treatment',
+            'tx_ad': 'Treatment AD',
         }.get(prefix, prefix)
 
     def _remove_prefix(self, header: str) -> str:

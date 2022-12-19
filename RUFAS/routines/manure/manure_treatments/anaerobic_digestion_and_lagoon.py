@@ -22,6 +22,7 @@ class AnaerobicDigestionAndLagoon(BaseManureTreatment):
     def __init__(self, weather, time, manure_treatment_config: ManureTreatmentConfig) -> None:
         super().__init__(weather, time, manure_treatment_config)
         self._anaerobic_digestion = AnaerobicDigestion(weather, time, manure_treatment_config)
+        self._anaerobic_digestion_daily_output = None
         self._anaerobic_lagoon = AnaerobicLagoon(weather, time, manure_treatment_config)
 
     def _create_anaerobic_digestion_daily_output(self) -> ManureTreatmentDailyOutput:
@@ -46,17 +47,17 @@ class AnaerobicDigestionAndLagoon(BaseManureTreatment):
             the anaerobic digestion and lagoon model.
 
         """
-        anaerobic_digestion_daily_output = self._create_anaerobic_digestion_daily_output()
+        self.anaerobic_digestion_daily_output = self._create_anaerobic_digestion_daily_output()
 
         manure_separator_daily_output = self._manure_separator.daily_update(
-                manure_separator_daily_input=anaerobic_digestion_daily_output,
+                manure_separator_daily_input=self.anaerobic_digestion_daily_output,
         ) if self._manure_separator else None
 
         self._manure_separator_daily_output = manure_separator_daily_output
 
         anaerobic_lagoon_daily_output = self._anaerobic_lagoon.daily_update(
                 manure_handler_daily_output=self._manure_handler_daily_output,
-                manure_treatment_daily_input=manure_separator_daily_output or anaerobic_digestion_daily_output,
+                manure_treatment_daily_input=manure_separator_daily_output or self.anaerobic_digestion_daily_output,
                 pen=self._current_pen,
                 sim_day=self._sim_day
         )
