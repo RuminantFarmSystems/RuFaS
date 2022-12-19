@@ -17,16 +17,17 @@ class OutputManager (object):
 
     Attributes
     ----------
-    variables_pool : Dict[str, Any]
+    variables_pool : Dict[str, Dict[str, List[Dict[str, Any]] | List[Any]]]
         Contains variables reported to the output manager
-    warnings_pool : Dict[str, Any]
+    warnings_pool : Dict[str, Dict[str, List[Dict[str, Any]] | List[Any]]]
         Contains warnings reported to the output manager
-    errors_pool : Dict[str, Any]
+    errors_pool : Dict[str, Dict[str, List[Dict[str, Any]] | List[Any]]]
         Contains errors reported to the output manager
-    logs_pool : Dict[str, Any]
+    logs_pool : Dict[str, Dict[str, List[Dict[str, Any]] | List[Any]]]
         Contains logs reported to the output manager 
     """
     __instance = None
+    pool_element_type = Dict[str, List[Dict[str, Any]] | List[Any]]
 
     def __new__(cls):
         if not hasattr(cls, 'instance'):
@@ -36,17 +37,22 @@ class OutputManager (object):
     def __init__(self) -> None:
         if OutputManager.__instance is None:
             OutputManager.__instance = self
-            self.variables_pool: Dict[str, Any] = {}
-            self.warnings_pool: Dict[str, Any] = {}
-            self.errors_pool: Dict[str, Any] = {}
-            self.logs_pool: Dict[str, Any] = {}
-            self.counter = 1
+            self.variables_pool: Dict[str,
+                                      OutputManager.pool_element_type] = {}
+            self.warnings_pool: Dict[str, OutputManager.pool_element_type] = {}
+            self.errors_pool: Dict[str, OutputManager.pool_element_type] = {}
+            self.logs_pool: Dict[str, OutputManager.pool_element_type] = {}
             self.add_log("init_log", "Output Manager instantiated.",
                          info_map={"class": self.__class__.__name__,
                                    "function": self.__init__.__name__})            
 
-    def add_variable(self, name: str, value: Any,
-                     info_map: Dict[str, Union[str, bool]]) -> None:
+    def _pool_element_factory(self) -> pool_element_type:
+        """Factory for elements added to pools"""
+        info_maps: List[Dict[str, Any]] = []
+        values: List[Any] = []
+        return {'info_maps': info_maps, 'values': values}
+
+    def add_variable(self, name: str, value: Any, info_map: Dict[str, Any]) -> None:
         """
         Adds a variable to the pool.
 
@@ -56,7 +62,7 @@ class OutputManager (object):
             The name of the variable
         value : Any
             The value of the variable
-        info_map : Dict[str, Union[str,bool]]
+        info_map : Dict[str, Any]
             Additional args, some are non-optional
         info_map["class"] : str
             The name of the class which called this function
@@ -65,26 +71,10 @@ class OutputManager (object):
         info_map["prefix"] : str, optional
             If present, overrides the automated prefix
         info_map["suffix"] : str, optional
-            If present, overrides the automated suffix
+            If present, gets appended to the key
         info_map["suppress_prefix"] : bool, optional
             If present and True, suppresses the automated prefix generation.
-            Has no effect on manual prefix overrides.
-        info_map["suppress_suffix"] : bool, optional
-            If present and True, suppresses the automated suffix generation.
-            Has no effect on manual suffix overrides.
-        info_map["enforce_override"] : bool, optional
-            If present and True, overrides the existing value in the pool if a
-            key collision happens.
-        info_map["fail_silently"] : bool, optional
-            If present and True, suppresses raising error if a key collision
-            happens.
-
-        Raises
-        ------
-        ValueError
-            If a key collision happens in the pool and either
-            info_map["fail_silently"] or info_map["enforce_override"] 
-            are not set to True.
+            Has no effect on manual prefix overrides.        
         """
         key = self._generate_key(name, info_map)
         key_not_exists = self.variables_pool.get(key) is None
