@@ -23,7 +23,7 @@ class Yields():
         self.harvest_index = self.adjust_harvest_index(self.potential_harvest_index,
                                                        self.min_harvest_index,
                                                        self.water_deficiency)
-        self.above_ground_biomass = self.dry_down(self.above_ground_biomass, self.dry_down_percent)
+        self.above_ground_biomass = self.adjust_biomass_for_dry_down(self.above_ground_biomass, self.dry_down_percent)
         #
         # if crop_type.fr_PHU > 1.0:
         #     calc_dry_down(crop_type)
@@ -76,7 +76,7 @@ class Yields():
         return max(adj_harvest_index, 0)  # bound to zero
 
     @staticmethod
-    def dry_down(above_ground_biomass: float, dry_down_percent: float) -> float:
+    def adjust_biomass_for_dry_down(above_ground_biomass: float, dry_down_percent: float) -> float:
         # TODO: stand in for more sophisticated dry down method - GitHub Issue #162
         """ calculates the above ground biomass after water mass is lost in dry-down
 

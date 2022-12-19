@@ -48,9 +48,12 @@ def test_adjust_harvest_index(idx, min_index, deficiency):
         expect = 0
     assert Yields.adjust_harvest_index(idx, min_index, deficiency) == expect
 
-
-def test_dry_down(start, percent, expect):
-    assert Yields.dry_down(start, percent) == expect
+@pytest.mark.parametrize("start,percent,expect", [
+    (1, 0, 1)
+])
+def test_adjust_biomass_for_dry_down(start, percent, expect):
+    assert Yields.adjust_biomass_for_dry_down(start, percent) == expect
+    assert False
 
 # ---- Test Member functions
 def init_yields(**kwargs):
