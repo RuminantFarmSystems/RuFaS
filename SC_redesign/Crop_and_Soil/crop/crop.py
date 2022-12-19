@@ -8,6 +8,7 @@ from SC_redesign.Crop_and_Soil.crop.root_development import RootDevelopment
 
 from typing import List
 
+# TODO: Should use an ENUM class to represent the supported species??
 
 class Crop(GrowthConstraints, BiomassAllocation, WaterDynamics, NitrogenIncorporation, HeatUnits, LeafAreaIndex,
            RootDevelopment):

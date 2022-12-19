@@ -5,7 +5,6 @@ class HeatUnits:
         self.potential_heat_units = 800
         self.accumulated_heat_units = 0  # accumulator
         self.is_growing = True  # TODO: not currently using SWAT 5:2.1.4
-        self.is_mature = False
         self.use_heat_unit_temperature = use_heat_unit_temperature
         # self.heat_unit_scheduling = True
 
@@ -140,10 +139,6 @@ class HeatUnits:
     def determine_heat_fraction(self):
         """determine the fraction of potential heat units accumulated to date"""
         self.heat_fraction = self.accumulated_heat_units / self.potential_heat_units
-
-    def check_maturity_by_heat_units(self):
-        """checks if maturity has been reached based on the fraction of potential heat units accumulated"""
-        self.is_mature = self.heat_fraction >= 1.0
 
     def shift_heat_unit_time(self):
         """shifts the time window for the heat units"""

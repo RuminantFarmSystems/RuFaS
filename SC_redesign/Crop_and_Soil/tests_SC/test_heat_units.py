@@ -176,17 +176,6 @@ def test_determine_heat_fraction(now, max_t, expect):
     heat.determine_heat_fraction()
     assert heat.heat_fraction == expect
 
-@pytest.mark.parametrize("frac,expect", [
-    (0, False),
-    (0.5, False),
-    (1, True),
-    (1.5, True)
-])
-def test_check_maturity_by_heat_units(frac, expect):
-    """check that check_maturity_by_heat_units is properly assigning maturity by heat fraction"""
-    heat = init_heat(heat_fraction=frac)
-    heat.check_maturity_by_heat_units()
-    assert heat.is_mature == expect
 
 @pytest.mark.parametrize("now", [0, 0.5, 1, 100, 35.399, -1])
 def test_shift_heat_unit_time(now):
