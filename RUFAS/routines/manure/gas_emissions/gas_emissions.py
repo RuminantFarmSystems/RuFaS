@@ -176,7 +176,8 @@ class GasEmissions:
     # TODO: Be more descriptive
     @classmethod
     def _calc_barn_resistance(cls, temperature_celsius: float,
-                              housing_specific_constant=GasEmissionConstants.DEFAULT_HOUSING_SPECIFIC_CONSTANT) -> float:
+                              housing_specific_constant=GasEmissionConstants.DEFAULT_HOUSING_SPECIFIC_CONSTANT) -> \
+            float:
         """Calculates barn resistance.
 
         Args:
