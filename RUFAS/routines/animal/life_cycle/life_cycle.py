@@ -334,7 +334,7 @@ class LifeCycleManager:
                 new_heiferII = HeiferII(args)
                 heiferIIs.append(new_heiferII)
                 del heiferIs[index]
-                
+
             else:
                 self.heiferI_num += 1
                 total_animal_num, self.avg_mature_body_weight = \
@@ -372,7 +372,7 @@ class LifeCycleManager:
                         self.calc_average(preg_heifer_num,
                                           self.avg_breeding_to_preg_time,
                                           heiferII.breeding_to_preg_time)
-                    
+
         # heiferIII to cow, assign repro programs
         for index, heiferIII in enumerate(heiferIIIs):
 
@@ -467,6 +467,12 @@ class LifeCycleManager:
                     self.milking_cow_num, self.avg_days_in_milk = \
                         self.calc_average(self.milking_cow_num,
                                           self.avg_days_in_milk, cow.days_in_milk)
+                    om.add_variable("daily_milk_production",
+                                    self.daily_milk_production, info_map)
+                    om.add_variable("milking_cow_num",
+                                    self.milking_cow_num, info_map)
+                    om.add_variable("average_days_in_milk",
+                                    self.avg_days_in_milk, info_map)
                 else:
                     self.dry_cow_num += 1
 
@@ -590,6 +596,8 @@ class LifeCycleManager:
             self.preg_cow_percent = self.preg_cow_num / self.cow_num * 100
             self.non_preg_cow_percent = (
                 self.open_cow_num + self.vwp_cow_num) / self.cow_num * 100
+            om.add_variable("milking_cow_percent",
+                            self.milking_cow_percent, info_map)
 
         for cull_reason in self.cull_reason_stats:
             if self.culled_cow_num != 0:
