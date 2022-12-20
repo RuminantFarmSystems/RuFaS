@@ -51,8 +51,8 @@ class BaseManureSeparator:
 
     """
 
-    def __init__(self, manure_separator_config: ManureSeparatorConfig):
-        """Initialize the manure separator.
+    def __init__(self, manure_separator_config: ManureSeparatorConfig) -> None:
+        """Initializes the manure separator.
 
         Args:
             manure_separator_config: ManureSeparatorConfig object containing the
@@ -62,54 +62,63 @@ class BaseManureSeparator:
         self.config = manure_separator_config
 
     def daily_update(self, manure_separator_daily_input: LiquidManurePortionProtocol) -> ManureSeparatorDailyOutput:
-        """Calculate and store the daily output of the manure separator.
+        """Calculates the daily output of the manure separator.
 
         Notes:
             "pseudocode_manure_management" MS.4
 
         Args:
-            manure_separator_daily_input: TODO
+            manure_separator_daily_input: A daily output object that can come from a reception pit
+            or an anaerobic digester.
 
         Returns:
             ManureSeparatorDailyOutput object containing the daily output of the manure separator.
 
         """
-        daily_input = manure_separator_daily_input
         daily_output = ManureSeparatorDailyOutput(
-                simulation_day=daily_input.simulation_day,
-                pen_id=daily_input.pen_id,
-                total_daily_manure_volume=daily_input.liquid_manure_daily_volume,
+                simulation_day=manure_separator_daily_input.simulation_day,
+                pen_id=manure_separator_daily_input.pen_id,
+                total_daily_manure_volume=manure_separator_daily_input.liquid_manure_daily_volume,
                 final_solids_wet_mass=(
-                        daily_input.liquid_manure_total_solids * self.config.TS_removal_efficiency_for_separator /
+                        manure_separator_daily_input.liquid_manure_total_solids *
+                        self.config.total_solids_removal_efficiency_for_separator /
                         self.config.percent_dry_solids
                 ),
 
                 solid_manure_total_solids=(
-                        daily_input.liquid_manure_total_solids * self.config.TS_removal_efficiency_for_separator),
+                        manure_separator_daily_input.liquid_manure_total_solids *
+                        self.config.total_solids_removal_efficiency_for_separator),
                 solid_manure_total_volatile_solids=(
-                        daily_input.liquid_manure_total_volatile_solids *
-                        self.config.VS_removal_efficiency_for_separator),
+                        manure_separator_daily_input.liquid_manure_total_volatile_solids *
+                        self.config.volatile_solids_removal_efficiency_for_separator),
                 solid_manure_nitrogen=(
-                        daily_input.liquid_manure_nitrogen * self.config.N_removal_efficiency_for_separator),
+                        manure_separator_daily_input.liquid_manure_nitrogen *
+                        self.config.nitrogen_removal_efficiency_for_separator),
                 solid_manure_phosphorus=(
-                        daily_input.liquid_manure_phosphorus * self.config.P_removal_efficiency_for_separator),
+                        manure_separator_daily_input.liquid_manure_phosphorus *
+                        self.config.phosphorus_removal_efficiency_for_separator),
                 solid_manure_potassium=(
-                        daily_input.liquid_manure_potassium * self.config.K_removal_efficiency_for_separator),
+                        manure_separator_daily_input.liquid_manure_potassium *
+                        self.config.potassium_removal_efficiency_for_separator),
 
                 liquid_manure_total_solids=(
-                        daily_input.liquid_manure_total_solids * (1 - self.config.TS_removal_efficiency_for_separator)),
+                        manure_separator_daily_input.liquid_manure_total_solids *
+                        (1 - self.config.total_solids_removal_efficiency_for_separator)),
                 liquid_manure_total_volatile_solids=(
-                        daily_input.liquid_manure_total_volatile_solids *
-                        (1 - self.config.VS_removal_efficiency_for_separator)),
+                        manure_separator_daily_input.liquid_manure_total_volatile_solids *
+                        (1 - self.config.volatile_solids_removal_efficiency_for_separator)),
                 liquid_manure_nitrogen=(
-                        daily_input.liquid_manure_nitrogen * (1 - self.config.N_removal_efficiency_for_separator)),
+                        manure_separator_daily_input.liquid_manure_nitrogen *
+                        (1 - self.config.nitrogen_removal_efficiency_for_separator)),
                 liquid_manure_total_ammoniacal_nitrogen=(
-                        daily_input.liquid_manure_total_ammoniacal_nitrogen *
-                        (1 - self.config.TAN_removal_efficiency_for_separator)),
+                        manure_separator_daily_input.liquid_manure_total_ammoniacal_nitrogen *
+                        (1 - self.config.total_ammoniacal_nitrogen_removal_efficiency_for_separator)),
                 liquid_manure_phosphorus=(
-                        daily_input.liquid_manure_phosphorus * (1 - self.config.P_removal_efficiency_for_separator)),
+                        manure_separator_daily_input.liquid_manure_phosphorus *
+                        (1 - self.config.phosphorus_removal_efficiency_for_separator)),
                 liquid_manure_potassium=(
-                        daily_input.liquid_manure_potassium * (1 - self.config.K_removal_efficiency_for_separator)),
+                        manure_separator_daily_input.liquid_manure_potassium *
+                        (1 - self.config.potassium_removal_efficiency_for_separator)),
         )
         return daily_output
 
@@ -220,21 +229,22 @@ class ManureSeparatorConfig:
 
     Attributes:
         percent_dry_solids: Percent dry content in manure solids.
-        TS_removal_efficiency_for_separator: Percent of total solids removed from manure.
-        VS_removal_efficiency_for_separator: Percent of volatile solids removed from manure.
-        N_removal_efficiency_for_separator: Percent of nitrogen removed from manure.
-        TAN_removal_efficiency_for_separator: Percent of total ammonia nitrogen removed from manure.
-        P_removal_efficiency_for_separator: Percent of phosphorus removed from manure.
-        K_removal_efficiency_for_separator: Percent of potassium removed from manure.
+        total_solids_removal_efficiency_for_separator: Percent of total solids removed from manure.
+        volatile_solids_removal_efficiency_for_separator: Percent of volatile solids removed from manure.
+        nitrogen_removal_efficiency_for_separator: Percent of nitrogen removed from manure.
+        total_ammoniacal_nitrogen_removal_efficiency_for_separator: Percent of total ammonia nitrogen removed from 
+        manure.
+        phosphorus_removal_efficiency_for_separator: Percent of phosphorus removed from manure.
+        potassium_removal_efficiency_for_separator: Percent of potassium removed from manure.
 
     """
     percent_dry_solids: float = 1.0
-    TS_removal_efficiency_for_separator: float = 0.0
-    VS_removal_efficiency_for_separator: float = 0.0
-    N_removal_efficiency_for_separator: float = 0.0
-    TAN_removal_efficiency_for_separator: float = 0.0
-    P_removal_efficiency_for_separator: float = 0.0
-    K_removal_efficiency_for_separator: float = 0.0
+    total_solids_removal_efficiency_for_separator: float = 0.0
+    volatile_solids_removal_efficiency_for_separator: float = 0.0
+    nitrogen_removal_efficiency_for_separator: float = 0.0
+    total_ammoniacal_nitrogen_removal_efficiency_for_separator: float = 0.0
+    phosphorus_removal_efficiency_for_separator: float = 0.0
+    potassium_removal_efficiency_for_separator: float = 0.0
 
 
 class DefaultManureSeparatorConfigFactory:
@@ -242,21 +252,21 @@ class DefaultManureSeparatorConfigFactory:
 
     ROTARY_SCREEN_CONFIG = ManureSeparatorConfig(
             percent_dry_solids=0.2,
-            TS_removal_efficiency_for_separator=0.35,
-            VS_removal_efficiency_for_separator=0.40,
-            N_removal_efficiency_for_separator=0.3,
-            TAN_removal_efficiency_for_separator=0.15,
-            P_removal_efficiency_for_separator=0.4,
-            K_removal_efficiency_for_separator=0.15,
+            total_solids_removal_efficiency_for_separator=0.35,
+            volatile_solids_removal_efficiency_for_separator=0.40,
+            nitrogen_removal_efficiency_for_separator=0.3,
+            total_ammoniacal_nitrogen_removal_efficiency_for_separator=0.15,
+            phosphorus_removal_efficiency_for_separator=0.4,
+            potassium_removal_efficiency_for_separator=0.15,
     )
     SCREW_PRESS_CONFIG = ManureSeparatorConfig(
             percent_dry_solids=0.35,
-            TS_removal_efficiency_for_separator=0.25,
-            VS_removal_efficiency_for_separator=0.30,
-            N_removal_efficiency_for_separator=0.3,
-            TAN_removal_efficiency_for_separator=0.10,
-            P_removal_efficiency_for_separator=0.2,
-            K_removal_efficiency_for_separator=0.23,
+            total_solids_removal_efficiency_for_separator=0.25,
+            volatile_solids_removal_efficiency_for_separator=0.30,
+            nitrogen_removal_efficiency_for_separator=0.3,
+            total_ammoniacal_nitrogen_removal_efficiency_for_separator=0.10,
+            phosphorus_removal_efficiency_for_separator=0.2,
+            potassium_removal_efficiency_for_separator=0.23,
     )
 
     @classmethod
@@ -304,6 +314,7 @@ class ManureSeparatorFactory:
             ManureSeparatorType.ROTARY_SCREEN: RotaryScreen,
             ManureSeparatorType.SCREW_PRESS: ScrewPress,
             ManureSeparatorType.SLOPE_SCREEN: SlopeScreen,
+            ManureSeparatorType.MECHANICAL_SAND_SEPARATOR: MechanicalSandSeparator,
             ManureSeparatorType.SAND_LANE_MANURE_SEPARATION: SandLaneSystem
         }
 

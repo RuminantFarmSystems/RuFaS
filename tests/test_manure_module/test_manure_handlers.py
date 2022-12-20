@@ -272,7 +272,7 @@ def test_calc_cleaning_water_volume_in_main_barn(mocker: MockerFixture) -> None:
     assert cleaning_water_volume_in_main_barn == expected_cleaning_water_volume_in_main_barn
 
 
-def test_get_current_day_avg_tempC(mocker: MockerFixture) -> None:
+def test_get_current_day_avg_temperature_celsius(mocker: MockerFixture) -> None:
     # Arrange
     expected_current_day_avg_tempC = 42.0
     mock_time = mocker.MagicMock(auto_spec=Time)
@@ -287,7 +287,7 @@ def test_get_current_day_avg_tempC(mocker: MockerFixture) -> None:
                                             manure_handler_config=mocker.MagicMock(auto_spec=ManureHandlerConfig))
 
     # Act
-    current_day_avg_tempC = mock_manure_handler._get_current_day_avg_tempC()
+    current_day_avg_tempC = mock_manure_handler._get_current_day_average_temperature_in_celsius()
 
     # Assert
     assert current_day_avg_tempC == expected_current_day_avg_tempC
@@ -298,16 +298,16 @@ def test_manure_handler_daily_update(mocker: MockerFixture) -> None:
 
     # Arrange
     mock_manure = mocker.MagicMock(autospec=PenManure)
-    mock_manure.manure_total_ammoniacal_nitrogen = TAN = 19.0
-    mock_manure.manure_urea = urea = 20.0
-    mock_manure.manure_urine_ammoniacal_nitrogen = urine_ammoniacal_nitrogen = 21.0
-    mock_manure.manure_urine = urine = 22.0
-    mock_manure.manure_nitrogen = N = 23.0
-    mock_manure.manure_total_solids = TS = 24.0
-    mock_manure.manure_degradable_volatile_solids = VSd = 25.0
-    mock_manure.manure_non_degradable_volatile_solids = VSnd = 26.0
-    mock_manure.manure_phosphorus = P = 27.0
-    mock_manure.manure_potassium = K = 28.0
+    mock_manure.total_ammoniacal_nitrogen = TAN = 19.0
+    mock_manure.urea = urea = 20.0
+    mock_manure.urine_ammoniacal_nitrogen = urine_ammoniacal_nitrogen = 21.0
+    mock_manure.urine = urine = 22.0
+    mock_manure.nitrogen = N = 23.0
+    mock_manure.total_solids = TS = 24.0
+    mock_manure.degradable_volatile_solids = VSd = 25.0
+    mock_manure.non_degradable_volatile_solids = VSnd = 26.0
+    mock_manure.phosphorus = P = 27.0
+    mock_manure.potassium = K = 28.0
     mock_manure.manure_volume = manure_volume = 29.0
 
     mock_pen = mocker.MagicMock(autospec=ManureManagementPen)
@@ -352,7 +352,7 @@ def test_manure_handler_daily_update(mocker: MockerFixture) -> None:
     )
     current_day_avg_tempC = 42.0
     patch_for_get_current_day_avg_tempC = mocker.patch.object(mock_manure_handler,
-                                                              '_get_current_day_avg_tempC',
+                                                              '_get_current_day_average_temperature_in_celsius',
                                                               return_value=current_day_avg_tempC)
 
     # Act
