@@ -95,7 +95,7 @@ class PenReport(BaseReportDriver):
             self.daily_variables = {'year': ['time.calendar_year', '', []],
                                     'j_day': ['time.day', '', []],
                                     'num_animals': ['len(pen.animals_in_pen)', '', []],
-                                    'manure': ['pen.manure[\'p_excrt_manure\']', 'kg', []],
+                                    'manure': ['pen.manure[\'Mkg\']', 'kg', []],
                                     'urea_conc': ['pen.manure[\'U\']', 'mol/L', []],
                                     'ammoniacal_N_conc': ['pen.manure[\'TAN_s\']', 'mol/L', []],
                                     'manure_N': ['pen.manure[\'MN\']', 'g', []],
