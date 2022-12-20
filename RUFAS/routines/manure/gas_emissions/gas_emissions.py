@@ -40,7 +40,7 @@ class GasEmissions:
         Bo = constants.Bo
         E_CH4_pot = constants.POTENTIAL_METHANE_YIELD_OF_MANURE
 
-        tempK = cls._convert_tempC_to_tempK(temperature_celsius)
+        tempK = cls._convert_temperature_celsius_to_kelvin(temperature_celsius)
         ex = math.exp(lnA - (E / (R * tempK)))
 
         VSd = (Bo / E_CH4_pot)
@@ -163,7 +163,7 @@ class GasEmissions:
         p = ManureConstants.MANURE_DENSITY  # kg/m^3
         pH = 7.5
         c = GeneralConstants.SECONDS_PER_DAY  # s/day
-        tempK = cls._convert_tempC_to_tempK(temperature_celsius)  # K
+        tempK = cls._convert_temperature_celsius_to_kelvin(temperature_celsius)  # K
         r = cls._calc_barn_resistance(temperature_celsius, housing_specific_constant)
         M = manure_urine / barn_area  # manure per area of exposed surface, kg/m^2
         Q = cls._calc_Q(tempK, pH)
@@ -238,7 +238,7 @@ class GasEmissions:
         return Kh * Ka
 
     @classmethod
-    def _convert_tempC_to_tempK(cls, temperature_celsius: float) -> float:
+    def _convert_temperature_celsius_to_kelvin(cls, temperature_celsius: float) -> float:
         """Converts a temperature from Celsius to Kelvin.
 
         Args:
