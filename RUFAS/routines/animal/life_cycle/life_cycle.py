@@ -287,6 +287,10 @@ class LifeCycleManager:
             'greater_than_3': 0
         }
 
+        info_map = {"class": self.__class__.__name__,
+                    "function": self.daily_update.__name__,
+                    "date": date, }
+
         for parity in self.num_cow_for_parity:
             self.num_cow_for_parity[parity] = 0
             self.percent_cow_for_parity[parity] = 0
@@ -461,6 +465,10 @@ class LifeCycleManager:
                 total_animal_num, self.avg_mature_body_weight = \
                     self.calc_average(total_animal_num,
                                       self.avg_mature_body_weight, cow.mature_body_weight)
+                om.add_variable("average_cow_body_weight",
+                                self.avg_cow_body_weight, info_map)
+                om.add_variable("average_mature_body_weight",
+                                self.avg_mature_body_weight, info_map)
 
                 if cow.milking:
                     self.daily_milk_production += cow.estimated_daily_milk_produced
