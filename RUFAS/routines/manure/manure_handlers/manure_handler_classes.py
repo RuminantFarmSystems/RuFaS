@@ -59,7 +59,7 @@ class BaseManureHandler:
         self.config = manure_handler_config
         self.milking_parlor = MilkingParlor()
 
-    def _get_current_day_avg_tempC(self) -> float:
+    def _get_current_day_average_temperature_in_celsius(self) -> float:
         """Gets the average temperature of the day, in Celsius.
 
         Returns:
@@ -89,22 +89,22 @@ class BaseManureHandler:
         NH3_housing_emission = GasEmissions.calc_ammonia_housing_emission(
                 num_animals=pen.num_animals,
                 barn_area=pen.barn_area_from_pen_type,  # m^2/animal
-                manure_urine_total_ammoniacal_nitrogen=pen.manure.manure_urine_ammoniacal_nitrogen,  # kg/animal
-                manure_urine=pen.manure.manure_urine / pen.num_animals,  # kg/animal
-                tempC=self._get_current_day_avg_tempC()
+                manure_urine_total_ammoniacal_nitrogen=pen.manure.urine_ammoniacal_nitrogen,  # kg/animal
+                manure_urine=pen.manure.urine / pen.num_animals,  # kg/animal
+                temperature_celsius=self._get_current_day_average_temperature_in_celsius()
         )
         daily_output = ManureHandlerDailyOutput(
                 simulation_day=sim_day,
                 pen_id=pen.id,
-                manure_urea=pen.manure.manure_urea,
+                manure_urea=pen.manure.urea,
                 liquid_manure_total_ammoniacal_nitrogen=(
-                    max(0.0, pen.manure.manure_total_ammoniacal_nitrogen - NH3_housing_emission)),  # kg - kg
-                liquid_manure_nitrogen=pen.manure.manure_nitrogen,
-                liquid_manure_total_solids=pen.manure.manure_total_solids,
-                manure_degradable_volatile_solids=pen.manure.manure_degradable_volatile_solids,
-                manure_non_degradable_volatile_solids=pen.manure.manure_non_degradable_volatile_solids,
-                liquid_manure_phosphorus=pen.manure.manure_phosphorus,
-                liquid_manure_potassium=pen.manure.manure_potassium,
+                    max(0.0, pen.manure.total_ammoniacal_nitrogen - NH3_housing_emission)),  # kg - kg
+                liquid_manure_nitrogen=pen.manure.nitrogen,
+                liquid_manure_total_solids=pen.manure.total_solids,
+                manure_degradable_volatile_solids=pen.manure.degradable_volatile_solids,
+                manure_non_degradable_volatile_solids=pen.manure.non_degradable_volatile_solids,
+                liquid_manure_phosphorus=pen.manure.phosphorus,
+                liquid_manure_potassium=pen.manure.potassium,
                 housing_methane=GasEmissions.calc_methane_housing_emission(pen.num_animals, pen.barn_area_from_pen_type),
                 housing_carbon_dioxide=GasEmissions.calc_carbon_dioxide_housing_emission(pen.num_animals, pen.barn_area_from_pen_type),
                 housing_ammonia=NH3_housing_emission,
@@ -113,7 +113,7 @@ class BaseManureHandler:
                 total_bedding_volume=bedding.calc_total_bedding_volume(pen.num_animals),
                 total_water_volume_in_milking_parlor=(
                     self.milking_parlor.calc_total_water_volume_used_in_milking_parlor(pen.num_lactating_cows)),
-                tempC=self._get_current_day_avg_tempC()
+                tempC=self._get_current_day_average_temperature_in_celsius()
         )
         return daily_output
 
