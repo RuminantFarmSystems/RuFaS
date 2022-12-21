@@ -126,7 +126,7 @@ def calculate_NASEM_energy_maintenance_requirements(BW, MW, DOP, DIM):
 
     # GrUterW = (CBW * 1.825) *  〖exp〗 ** (-0.0243 - (0.0000245 * DayGest) * (280 - DayGest))
     # UterW = ((CBW * 0.2288) * 〖exp〗** (-0.2*DIM)) )+0.204)
-    GrUterW = CBW * 1.825 *  math.exp(-0.0243 - (0.0000245 * DOP) * (280 - DOP))
+    GrUterW = CBW * 1.825 * math.exp(-0.0243 - (0.0000245 * DOP) * (280 - DOP))
     UterW = (CBW * 0.2288 * math.exp(-0.2*DIM)) + 0.204 # TODO ASK EDWARD IF THE PARENTHESES MATCH
 
     # where,
@@ -169,7 +169,7 @@ def calculate_NASEM_energy_activity_requirements(BW, housing, distance):
 
     # NEa =	Horiz_Locomotion + Positive_Vert_Locom + Grazing_Act
     if housing == 'Barn':
-        NEa =  distance * 0.00035 * BW  # ?????? TODO ASK EDWARD
+        NEa = distance * 0.00035 * BW  # ?????? TODO ASK EDWARD
     else:
         nonpasturekgDMI = 9999 # TODO ASK EDWARD IF THIS IS SAME AS DMI FROM RATION, then import DMI amount
         NEa = distance * BW * 0.75 * ((600-12*nonpasturekgDMI))/600
@@ -283,7 +283,8 @@ def calculate_NASEM_energy_pregnancy_requirements(DOP, DIM, GrUterW, UterW):
     GrUterWGain2 = -0.2 * DIM * (UterW - 0.204)
     # NElPreg  = GrUterWGain * (0.882 / 0.14) * 0.66
     # TODO IS THIS 1 + 2?
-    NEpreg  = GrUterWGain * (0.882 / 0.14) * 0.66
+    GrUterWGain = GrUterWGain1 + GrUterWGain2
+    NEpreg = GrUterWGain * (0.882 / 0.14) * 0.66
 
     # where,
     # DGest = Day of gestation (this must be between 12 and 280 DGest)
