@@ -3,6 +3,8 @@
 import sys
 import time as timer
 from pathlib import Path
+
+import config.global_variables
 from RUFAS import routines, errors
 from RUFAS.classes import Config, State, Weather, Time
 from RUFAS.output_handler import OutputHandler
@@ -44,20 +46,18 @@ class SimulationEngine:
         om.add_log("total_simulation_time",
                    total_simulation_time_log, info_map)
 
-        t_start_graphics = timer.time()
-        sys.stdout.write('Producing Graphics\n')
-        self.output.produce_graphics()
-        t_end_graphics = timer.time()
+        if config.global_variables.PRODUCE_GRAPHICS:
+            sys.stdout.write('Producing Graphics\n')
+            t_start_graphics = timer.time()
+            self.output.produce_graphics()
+            t_end_graphics = timer.time()
+            graphics_prod_time = t_end_graphics - t_start_graphics
+        else:
+            graphics_prod_time = 0
 
-        graphics_prod_time = t_end_graphics - t_start_graphics
-        graphics_prod_time_log = f"Graphics production time is: {graphics_prod_time}"
-        om.add_log("graphics_prod_time", graphics_prod_time_log, info_map)
-
-        total_runtime = (t_end_sim-t_start_sim) + \
-            (t_end_graphics-t_start_graphics)
-        total_runtime_log = f"Total runtime is: {total_runtime}"
-        om.add_log("total_runtime", total_runtime_log, info_map)
-
+        om.add_log("graphics_prod_time", f"Graphics production time is: {graphics_prod_time}", info_map)
+        total_runtime = (t_end_sim-t_start_sim) + graphics_prod_time
+        om.add_log("total_runtime", f"Total runtime is: {total_runtime}", info_map)
         self._show_final_messages(graphics_prod_time, total_runtime)
 
     def _run_simulation_main_loop(self) -> None:
