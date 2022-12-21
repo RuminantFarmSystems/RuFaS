@@ -21,8 +21,8 @@ class GasEmissions:
             manure_total_solids: Total solids, kg.
             is_enclosed: True if manure storage is enclosed, and False if manure storage is open to air.
             temperature_celsius: temperature in Celsius, C.
-            manure_volatile_solids_fraction: Fraction (0-1) volatile solids. # TODO: review this
-            efficiency_fraction: efficiency of process, unitless. # TODO: review this
+            manure_volatile_solids_fraction: Fraction of volatile solids from total solids. # TODO: review this
+            efficiency_fraction: efficiency of process, dimensionless (unitless). # TODO: review this
 
         Returns:
             CH4 emissions from storage, kg CH4/day.
@@ -100,7 +100,7 @@ class GasEmissions:
 
         Args:
             num_animals: Number of animals in the pen.
-            barn_area: Area of the barn based on housing type, m^2 per animal.
+            barn_area: Animal spacing area of the barn based on housing type, m^2 per animal.
             hours: hours of the day from 1 to 24.
             temperature_min: Minimum barn temperature, C.
             temperature_max: Maximum barn temperature, C.
@@ -124,7 +124,7 @@ class GasEmissions:
 
         Args:
             num_animals: Number of animals in the pen.
-            barn_area: Area of the barn based on housing type, m^2.
+            barn_area: Animal spacing area of the barn based on housing type, m^2 per animal.
             hours: hours of the day from 1 to 24.
             temperature_min: Minimum barn temperature, C.
             temperature_max: Maximum barn temperature, C.
