@@ -17,7 +17,7 @@ def test_calc_E_CH4_slurry_storage(is_enclosed: bool, mocker: MockerFixture) -> 
     tempC = 15.0
     tempK = 288.15
     patch_for_convert_tempC_to_tempK = mocker.patch(
-            'RUFAS.routines.manure.gas_emissions.gas_emissions.GasEmissions._convert_tempC_to_tempK',
+            'RUFAS.routines.manure.gas_emissions.gas_emissions.GasEmissions._convert_temperature_celsius_to_kelvin',
             return_value=tempK,
     )
     manure_volatile_solids_fraction = 0.5
@@ -146,7 +146,7 @@ def test_calc_ammonia_housing_emission(sign_of_RMQ: int, mocker: MockerFixture) 
     tempC = 20.0
     tempK = 293.15
     patch_for_convert_tempC_to_tempK = mocker.patch(
-            'RUFAS.routines.manure.gas_emissions.gas_emissions.GasEmissions._convert_tempC_to_tempK',
+            'RUFAS.routines.manure.gas_emissions.gas_emissions.GasEmissions._convert_temperature_celsius_to_kelvin',
             return_value=tempK,
     )
     hsc = 200.0
@@ -250,14 +250,14 @@ def test_calc_Q(mocker: MockerFixture) -> None:
 
 
 def test_convert_tempC_to_tempK() -> None:
-    """Tests _convert_tempC_to_tempK() in gas_emissions.py."""
+    """Tests _convert_temperature_celsius_to_kelvin() in gas_emissions.py."""
 
     # Arrange
     tempC = 15.0
     expected = tempC + 273.15
 
     # Act
-    actual = GasEmissions._convert_tempC_to_tempK(tempC)
+    actual = GasEmissions._convert_temperature_celsius_to_kelvin(tempC)
 
     # Assert
     assert actual == expected
