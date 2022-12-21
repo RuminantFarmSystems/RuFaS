@@ -134,7 +134,7 @@ class ManureStorage:
             animal_management
         """
 
-        for pen in animal_management.all_pens:
+        for pen in animal_management.all_pens_ids:
             self.pens[pen.id] = (ManureStorage.Pen(pen))
 
     def initialize_separators(self, animal_management):
@@ -147,7 +147,7 @@ class ManureStorage:
             animal_management
         """
 
-        for pen in animal_management.all_pens:
+        for pen in animal_management.all_pens_ids:
             if not self.separators.keys().__contains__(pen.manure_separator):
                 self.separators[pen.manure_separator] = (ManureStorage.Separator(pen))
 
@@ -161,7 +161,7 @@ class ManureStorage:
             animal_management
         """
 
-        for pen in animal_management.all_pens:
+        for pen in animal_management.all_pens_ids:
             if not self.storage.keys().__contains__(pen.manure_storage):
                 self.storage[pen.manure_storage] = (ManureStorage.Storage(pen))
 
@@ -324,7 +324,7 @@ class ManureStorage:
             self.flush_water_daily = self.water_use_rate * self.cow_num
 
         def update_pen(self, animal_management):
-            pen = animal_management.all_pens[self.pen_id]
+            pen = animal_management.all_pens_ids[self.pen_id]
             self.raw_manure = pen.manure['Mkg']
             self.VS_excreted = pen.manure['VSd'] + pen.manure['VSnd']
             self.TS_excreted = pen.manure['TSd']

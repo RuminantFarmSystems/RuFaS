@@ -149,7 +149,7 @@ def animal_management() -> AnimalManagement:
 @pytest.fixture
 def animal_management_with_mock_pens(animal_management: AnimalManagement,
                                      mock_pens: List[MagicMock]) -> AnimalManagement:
-    animal_management.all_pens = mock_pens
+    animal_management.all_pens_ids = mock_pens
     return animal_management
 
 
@@ -170,16 +170,16 @@ def test_init_pens(animal_management: AnimalManagement, pen_information: Dict[st
     # More than the minimum num of pens - 4 pens
     animal_management.init_pens(pen_information, herd_information)
 
-    actual = len(animal_management.all_pens)
+    actual = len(animal_management.all_pens_ids)
     expected = 4
     assert actual == expected
 
     # Less than the minimum num of pens - 0 pens
     # 3 default pens should be created
-    animal_management.all_pens = []
+    animal_management.all_pens_ids = []
     animal_management.init_pens({}, herd_information)
 
-    actual = len(animal_management.all_pens)
+    actual = len(animal_management.all_pens_ids)
     expected = 3
     assert actual == expected
 
@@ -208,8 +208,8 @@ def test_calc_nutrient_rqmts():
     pass
 
 
-def test_fully_update_id_pen():
-    """Unit test for function fully_update_id_pen in file routines/animal/animal_management.py"""
+def test_fully_update_animal_to_pen_id_map():
+    """Unit test for function fully_update_animal_to_pen_id_map in file routines/animal/animal_management.py"""
     pass
 
 
@@ -247,7 +247,7 @@ def test_clear_pens(animal_management_with_mock_pens: AnimalManagement) -> None:
     """Unit test for function clear_pens in file routines/animal/animal_management.py"""
     animal_management_with_mock_pens.clear_pens()
 
-    for pen in animal_management_with_mock_pens.all_pens:
+    for pen in animal_management_with_mock_pens.all_pens_ids:
         pen.clear.assert_called_once()
 
 
@@ -271,7 +271,7 @@ def test_calc_avg_growth(animal_management_with_mock_pens: AnimalManagement) -> 
 
     animal_management_with_mock_pens.calc_avg_growth()
 
-    for pen in animal_management_with_mock_pens.all_pens:
+    for pen in animal_management_with_mock_pens.all_pens_ids:
         pen.calc_avg_growth.assert_called_once()
 
     pass

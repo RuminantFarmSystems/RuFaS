@@ -24,7 +24,6 @@ import random
 from typing import Tuple
 from statistics import mean
 
-
 def daily_animal_routine(animal_management, feed, weather, time):
     """
     Executes daily routines relating to Animals. This method is called every day
@@ -104,10 +103,10 @@ class AnimalManagement:
         self.cows_culled = []
 
         # list of all the pens on the farm
-        self.all_pens = []
+        self.all_pens_ids = []
 
         # dictionary: key is animal ID, value is the pen ID that animal is in
-        self.id_pen = {}
+        self.animal_to_pen_id_map = {}
 
         # dictionary for keeping track of what animal types each pen is holding
         # (value of the dictionaries are lists of pen objects)
@@ -144,7 +143,7 @@ class AnimalManagement:
 
         self.init_pens(data['pen_information'], data['herd_information'])
 
-        self.init_animals(data['herd_information'], self.all_pens, weather, time, config, feed)
+        self.init_animals(data['herd_information'], self.all_pens_ids, weather, time, config, feed)
 
     def init_pens(self, all_pen_data, herd_data):
         """
@@ -161,7 +160,7 @@ class AnimalManagement:
 
             pen = Pen(**pen_data)
 
-            self.all_pens.append(pen)
+            self.all_pens_ids.append(pen)
 
         self.init_default_pens(herd_data['herd_num'])
 
@@ -176,18 +175,18 @@ class AnimalManagement:
         # Minimum number of pens in the simulation
         MIN_NUM_PENS = 3
 
-        num_pens_needed = MIN_NUM_PENS - len(self.all_pens)
+        num_pens_needed = MIN_NUM_PENS - len(self.all_pens_ids)
 
         # Check if any default pens need to be added
         if num_pens_needed > 0 and herd_num > 0:
             self.init_default_pens(num_pens_needed)
-            print('Warning: herd_num > 0, but num_pens =', len(self.all_pens), '. Initilizing', num_pens_needed,
+            print('Warning: herd_num > 0, but num_pens =', len(self.all_pens_ids), '. Initilizing', num_pens_needed,
                   'default pens.')
             for i in range(num_pens_needed):
                 new_default_pen = Pen(0, 0.1, 1.6, 100, 'open air barn', 'sand', 'freestall',
                                       "manual_scraping", "sedimentation", "storage_pit",
                                       Pen.AnimalCombination.NONE, 1.2)
-                self.all_pens.append(new_default_pen)
+                self.all_pens_ids.append(new_default_pen)
 
     def init_animals(self, herd_data, pen_data, weather, time, config, feed):
         """
@@ -266,7 +265,7 @@ class AnimalManagement:
         # QUESTION: Should this be moved to init_pens?
         if len(pen_data) > 0:
             self.init_nutrient_rqmts(weather, time, feed)
-            self.allocate_all_pens()
+            self.allocate_all_pens_ids()
 
     @staticmethod
     def print_animal_num_warnings(animal_keys, herd_data):
@@ -318,8 +317,8 @@ class AnimalManagement:
             average horizontal distance from milking parlor)
         """
 
-        return mean(pen.vertical_dist_to_parlor for pen in self.all_pens), mean(
-            pen.horizontal_dist_to_parlor for pen in self.all_pens)
+        return mean(pen.vertical_dist_to_parlor for pen in self.all_pens_ids), mean(
+            pen.horizontal_dist_to_parlor for pen in self.all_pens_ids)
 
     def calc_nutrient_rqmts(self, feed, temp):
         """
@@ -344,15 +343,15 @@ class AnimalManagement:
         for cow in self.cows:
             cow.set_nutrient_rqmts()
 
-    def fully_update_id_pen(self):
+    def fully_update_animal_to_pen_id_map(self):
         """
-        Updates the entire id_pen dictionary so that each animal's ID is
+        Updates the entire animal_to_pen_id_map dictionary so that each animal's ID is
         associated with the pen that animal is in.
         """
-        for pen in self.all_pens:
+        for pen in self.all_pens_ids:
             animals_in_pen = pen.animals_in_pen
             for animal in animals_in_pen:
-                self.id_pen[animal.id] = pen.id
+                self.animal_to_pen_id_map[animal.id] = pen.id
 
     def daily_update_id_pen(self, animals_added, ids_removed, calves_born, feed, temp):
         """
@@ -391,14 +390,14 @@ class AnimalManagement:
             # Why would a removed animal still be in a pen?
             # Is this if statement even useful, shouldn't we be doing this regardless of whether the animal ID
             #     is in the dictionary?
-            # If we delete an animal ID key from id_pen we don't want to do it again, if statement should be fine
+            # If we delete an animal ID key from animal_to_pen_id_map we don't want to do it again, if statement should be fine
             # Should add whether or not we are checking if it's in the dictionary's keys or values
             # TODO: specify that we're looping through keys
-            if i in self.id_pen:
+            if i in self.animal_to_pen_id_map:
                 # Creates a "pen" variable that grabs the current pen of the animal removed
                 # Pen ID is zero-indexed
                 # Animal ID is not zero-indexed always
-                pen = self.all_pens[self.id_pen[i]]
+                pen = self.all_pens_ids[self.animal_to_pen_id_map[i]]
                 # Adds count of animal that have been removed from the herd,
                 #     based on what animal combination and pen they were in
                 if pen.id in grouped_pens_short[pen.animal_combination]:
@@ -407,20 +406,17 @@ class AnimalManagement:
                     grouped_pens_short[pen.animal_combination][pen.id] = 1
 
                 # Deletes the animal ID key entry corresponding to the id of the animal removed
-                del self.id_pen[i]
+                del self.animal_to_pen_id_map[i]
         # return values for a function made from line 389-410 would be the counts of animals removed
         # From Doctor Reed: redesign how we assign new animals to a pen
 
-        # Initializes pen population dictionary before additions are made
-        # TODO: remake into a list if the pen IDs are in fact 0-indexed, initialize list to length of self.all_pens
-        pen_population_before_additions = {}
-        # Loops through the pens objects on the farm and their indices from the all_pens list
-        for i, pen in enumerate(self.all_pens):
-            # Populates dictionary with indices of pens as keys and amount of animals in pen as key
-            pen_population_before_additions[i] = len(pen.animals_in_pen)
-
-        # TODO: rename all_pens to all_pen_ids
-        # TODO: rename id_pen to something more intuitive, animal's_penID, using the term "map" in name is appropriate
+        # Initializes pen population list before additions are made
+        pen_population_before_additions = [None] * len(self.all_pens_ids)
+        # Loops through the pens objects on the farm and their indices from the all_pens_ids list
+        for index, pen in enumerate(self.all_pens_ids):
+            # Populates list with the number of animals as the values, and the indices pertainining to different pens
+            #  since pens are zero-indexed
+            pen_population_before_additions[index] = len(pen.animals_in_pen)
 
         # Loops through the animal IDs pertaining to the animals that are going to be added to the herd
         for animal in animals_added:
@@ -456,7 +452,7 @@ class AnimalManagement:
                 group = Pen.AnimalCombination.CLOSE_UP
             else:  # animal is of class Cow
                 animal_p_conc = self.p_comp['cow']
-                # self.all_pens[pen].animals_in_pen.append(animal)
+                # self.all_pens_ids[pen].animals_in_pen.append(animal)
                 self.cows.append(animal)
                 group = Pen.AnimalCombination.LAC_COW
 
@@ -464,79 +460,29 @@ class AnimalManagement:
             # pens that lost animals, and choosing the pen with the lowest
             # stocking density
 
-            # If there are no pens holding the cow type within "group" that lost animals
-            if grouped_pens_short[group] == {}:
-                # We create variable to track the lowest stocking density, should be renamed to density
-                # Is there a reason why the density is initialized to 10,000?
-                # 10,000 might have been done on purpose, not magic value, clarify with Kristan
-                # If we have a default initial value for density we should make a class variable or
-                #     variable outside of class, maybe a global variable declared in all CAPS
-                dens = 10000
-                # We loop through all the pens that are holding the animal type stored in "group" variable
-                # Some improvement should be made to loop variable name
-                # TODO: Use argmin() function as opposed to loop through all of the pens
-                for p in self.pens_by_animal_combination[group]:
-                    # If the stocking density is less than our density variable
-                    if p.stocking_density < dens:
-                        # We set pen and density variable to the pen in question and its stocking density
-                        pen = p
-                        dens = p.stocking_density
-            # If there are pens holding the cow type within the "group" variable that lost animals
-            else:
-                # Create a variable to track the highest animal shortage across these pens
-                # Rename this variable from "n"
-                n = 0
-                # TODO: argmax() function to find the maximum animal shortage across pens
+            # Grabs the pen with the current lowest stocking density for a given cow group
+            candidate_pens = self.pens_by_animal_combination[group]
+            pen_for_insert = min(candidate_pens, key=lambda p: p.stocking_density)
 
-
-                # We loop through the keys and values of the grouped_pen_short dictionary for the cow class in question
-                # The keys are pen IDs, and the values are the number of animals removed from those pens
-                # Rename "v" to something more informative
-                for id, v in grouped_pens_short[group].items():
-                    # If the number of animals removed from the current pen is larger than n
-                    if v > n:
-                        # We set the pen variable to the pen at the correct id
-                        # Suggestion to change "id" to "index"
-                        pen = self.all_pens[id]
-                        # Update the variable tracking the highest animal shortage across these pens
-                        n = v
-
-            # Updating id_pen variable to reflect the right pen ID for the animal ID added
-            self.id_pen[animal.id] = pen.id
+            # Updating animal_to_pen_id_map variable to reflect the right pen ID for the animal ID added
+            self.animal_to_pen_id_map[animal.id] = pen_for_insert.id
             # Setting up new animal and inserting it into the pen in question?
             # set_up_new_animal() could be the reason behind the Github issue, just a possibility
-            self.all_pens[pen.id].set_up_new_animal(animal, animal_p_conc,
-                                                    feed, temp, pen_population_before_additions[pen.id])
+            self.all_pens_ids[pen_for_insert.id].set_up_new_animal(animal, animal_p_conc, feed, temp,
+                                                                   pen_population_before_additions[pen_for_insert.id])
 
 
         # We loop through the numbers of all the pens on the farm
         # I would suggest we rename the loop variable pen as it is an index and not an actual pen
         # A better loop variable name might be good here, we're looping through numbers
         # TODO: change loop to loop through actual pens, not the number of pens
-        for pen in range(len(self.all_pens)):
-            # If there are animals in the pen, the only animal type of the pen is 'Cow'
-            #     and the ration has yet to be formulated
-            # TODO: Create explanatory variables, three, for the three clauses in the AND clause
-            # if animals_exist_in_pen and animal_type_is_cow.... (pen_is_occupied as another suggestion)
-            if len(self.all_pens[pen].animals_in_pen) > 0 and 'Cow' in self.all_pens[pen].classes_in_pen and \
-                    self.all_pens[pen].ration == {}:
-                # We create an "available_feeds" variable (instance of AvailableFeeds class)
-                #    calculated using the ration driver
-                available_feeds = ration_driver.AvailableFeeds()
-                # Creates a list with the available feed information
-                available_feeds.feed_nutrients(feed)
-                # We set the ration of the pen in question by calling calc_ration() on the aforementioned pen
-                self.all_pens[pen].ration = self.all_pens[pen].calc_ration(feed, available_feeds)
-            else:
-                # This else statement needs to be reworked because we don't know which one of the three conditionals
-                #     was not met above
-                # Does this matter? Ask Doctor Reed
-                # From Militsa: "We need to adjust the ration totals for the pen attributes now
-                #     that all new animals have been added"
-                # Need clarification on what this does
-                for key in self.all_pens[pen].ration:
-                    if key != 'status' and key != 'objective':
-                        self.all_pens[pen].ration[key] = (self.all_pens[pen].ration[key] / pen_population_before_additions[pen]) * len(self.all_pens[pen].animals_in_pen)
+        for index, pen in enumerate(self.all_pens_ids):
+            #     that all new animals have been added"
+            # Need clarification on what this does
+            for key in pen.ration:
+                if key != 'status' and key != 'objective':
+                    pen.ration[key] = (pen.ration[key] / pen_population_before_additions[index]) * \
+                                      len(pen.animals_in_pen)
 
         # TODO: Use argmin and argmax are pointed earlier and make a calf-specific function call if needed
         # Here, we loop though the calf objects that were added to the pen (they were born)
@@ -569,16 +515,16 @@ class AnimalManagement:
                     if v > n:
                         # We set the pen variable to the pen at the correct id
                         # Suggestion to change "id" to "index"
-                        pen = self.all_pens[id]
+                        pen = self.all_pens_ids[id]
                         # Update the variable tracking the highest animal shortage across these pens
                         n = v
             # Question for Doctor Reed: why do we have a special case here for calves?
             # We then assign the animal ID for the calf in question the pen ID where it will be housed
-            self.id_pen[calf.id] = pen.id
+            self.animal_to_pen_id_map[calf.id] = pen.id
             # We add the calf object to the list of calves in the herd
             self.calves.append(calf)
             #  We set up a new animal and insert it into the pen in question?
-            self.all_pens[pen.id].set_up_new_animal(calf, self.pasture_concentrate,
+            self.all_pens_ids[pen.id].set_up_new_animal(calf, self.pasture_concentrate,
                                                     feed, temp, pen_population_before_additions[pen.id])
 
     def allocate_calf_pens(self, calf_pens):
@@ -660,7 +606,7 @@ class AnimalManagement:
             lac_cow_pens[0].update_animals(pen_grouping[key], Pen.AnimalCombination.LAC_COW)
             lac_cow_pens.remove(lac_cow_pens[0])
 
-    def allocate_all_pens(self):
+    def allocate_all_pens_ids(self):
         # TODO: Refactor this function, currently nearly 200 lines long
         # TODO
         # -mark pens after grouping
@@ -697,7 +643,7 @@ class AnimalManagement:
 
         # sorting the available pen types
         # Pen types : [calf, growing, close_up, 'lac_cow']
-        for pen in self.all_pens:
+        for pen in self.all_pens_ids:
 
             if pen.animal_combination == Pen.AnimalCombination.CALF:
                 calf_pens.append(pen)
@@ -741,11 +687,11 @@ class AnimalManagement:
                 if pen is None:
                     print('Warning: shortage of ', max_key[0].name, ' pens, initializing new pen')
                     # initalizing a default pen to be used for any class
-                    pen = Pen(len(self.all_pens), 0.1, 1.6, max_value,
+                    pen = Pen(len(self.all_pens_ids), 0.1, 1.6, max_value,
                               'open air barn', 'straw', 'tiestall', 'manual_scraping',
                               'sedimentation', 'storage_pit', max_key[0], 1.2)
 
-                    self.all_pens.append(pen)
+                    self.all_pens_ids.append(pen)
                 # if available pen
                 else:
                     del mixed_type_pens[pen.id]
@@ -783,7 +729,7 @@ class AnimalManagement:
         self.allocate_lactating_cow_pens(lactating_cows)
         #####################
 
-        self.fully_update_id_pen()
+        self.fully_update_animal_to_pen_id_map()
 
     def clear_pens(self):
         """
@@ -791,7 +737,7 @@ class AnimalManagement:
         routines that happen every ration interval.
         """
 
-        for pen in self.all_pens:
+        for pen in self.all_pens_ids:
             pen.clear()
 
     def calc_ration(self, feed):
@@ -804,9 +750,9 @@ class AnimalManagement:
         """
         available_feeds = ration_driver.AvailableFeeds()
         available_feeds.feed_nutrients(feed)
-        for i, pen in enumerate(self.all_pens):
+        for i, pen in enumerate(self.all_pens_ids):
             if pen.pen_populated:
-                self.all_pens[i].ration = self.all_pens[i].calc_ration(feed, available_feeds)
+                self.all_pens_ids[i].ration = self.all_pens_ids[i].calc_ration(feed, available_feeds)
 
     def calc_manure_excretion(self, feed, methane_model):
         """
@@ -818,7 +764,7 @@ class AnimalManagement:
             feed: instance of the feed class
             methane_model: methane model used for methane emission calculations
         """
-        for pen in self.all_pens:
+        for pen in self.all_pens_ids:
             if pen.pen_populated:
                 pen.calc_manure(feed, methane_model)
             else:
@@ -831,7 +777,7 @@ class AnimalManagement:
         ration interval.
         """
 
-        for pen in self.all_pens:
+        for pen in self.all_pens_ids:
             pen.calc_avg_growth()
 
     def gather_cow_class_history(self, cow_class):
@@ -844,8 +790,8 @@ class AnimalManagement:
             cow_class: instance of whatever cow type's pen history is being gathered
         """
         for cow in cow_class:
-            current_pen = self.id_pen[cow_class.id]
-            classes_in_pen = self.all_pens[current_pen].classes_in_pen
+            current_pen = self.animal_to_pen_id_map[cow_class.id]
+            classes_in_pen = self.all_pens_ids[current_pen].classes_in_pen
             cow_class.update_pen_history(current_pen, self.simulation_day, classes_in_pen)
 
     def record_pen_history(self):
@@ -891,7 +837,7 @@ class AnimalManagement:
         Args:
         """
 
-        for pen in self.all_pens:
+        for pen in self.all_pens_ids:
             if pen.pen_populated:
                 pen.call_p_rqmts()
 
@@ -901,7 +847,7 @@ class AnimalManagement:
         update. This method is called daily.
         """
 
-        for pen in self.all_pens:
+        for pen in self.all_pens_ids:
             if pen.pen_populated:
                 pen.daily_p_update()
 
@@ -919,7 +865,7 @@ class AnimalManagement:
             time: instance of the Time class defined in classes.py
         """
         if self.simulate_animals:
-            for pen in self.all_pens:
+            for pen in self.all_pens_ids:
                 pen.pen_populated = len(pen.animals_in_pen) > 0
 
             animals_added, ids_removed, calves_born, self.calves, self.heiferIs, \
@@ -938,7 +884,7 @@ class AnimalManagement:
             if self.end_ration_interval():
                 self.calc_nutrient_rqmts(feed, temp)  # per animal
                 self.clear_pens()
-                self.allocate_all_pens()
+                self.allocate_all_pens_ids()
                 self.calc_ration(feed)  # per pen
                 self.calc_avg_growth()  # per pen
 

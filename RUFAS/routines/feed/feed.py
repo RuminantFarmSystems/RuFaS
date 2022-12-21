@@ -762,7 +762,7 @@ class Feed:
         feeds_fed = []
         for key, silo in self.storage_options.items():
             if silo.days_since_feedout >= 0 and silo.DM > 0:
-                for pen in animal_management.all_pens:
+                for pen in animal_management.all_pens_ids:
                     if silo.feed_key in pen.ration and silo.feed_key not in \
                             feeds_fed:
                         if (silo.DM - pen.ration[silo.feed_key]) > 0:

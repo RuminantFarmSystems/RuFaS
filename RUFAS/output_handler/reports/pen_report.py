@@ -13,7 +13,7 @@ from .. import graphics
 class PensReport(BaseReportDriver):
     def __init__(self, data, state):
         super().__init__(data)
-        for pen in state.animal_management.all_pens:
+        for pen in state.animal_management.all_pens_ids:
             self.reports['pen_' + str(pen.id)] = PenReport(data, state.feed, pen, pen.id)
 
         self.reports['pens_summary'] = PensSummary(data['pens_summary'])
@@ -52,7 +52,7 @@ class PenReport(BaseReportDriver):
         def daily_update(self, state, weather, time):
             animal_management = state.animal_management
             feed = state.feed
-            pen = state.animal_management.all_pens[self.pen_id]
+            pen = state.animal_management.all_pens_ids[self.pen_id]
 
             for variable in self.daily_variables:
                 # index 2 is the accumulator for the evauated variables
@@ -63,7 +63,7 @@ class PenReport(BaseReportDriver):
         def annual_update(self, state, weather, time):
             animal_management = state.animal_management
             feed = state.feed
-            pen = state.animal_management.all_pens[self.pen_id]
+            pen = state.animal_management.all_pens_ids[self.pen_id]
 
             for variable in self.annual_variables:
                 # index 2 is the accumulator for the evauated variables
