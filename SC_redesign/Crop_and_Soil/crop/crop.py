@@ -17,6 +17,10 @@ class Crop(GrowthConstraints, BiomassAllocation, WaterDynamics, NitrogenIncorpor
         BiomassAllocation.__init__(self)
         WaterDynamics.__init__(self)
         NitrogenIncorporation.__init__(self)
+        HeatUnits.__init__(self)
+        LeafAreaIndex.__init__(self)
+        RootDevelopment.__init__(self)
+
 
     def grow_crop(self, layer_nitrates: List[float], layer_depths: List[float], soil_water_factor: float,
                   max_transpiration: float, air_temperature: float,
@@ -58,7 +62,7 @@ class Crop(GrowthConstraints, BiomassAllocation, WaterDynamics, NitrogenIncorpor
         self.allocate_biomass(incoming_light)
         self.cycle_water(evaporation, transpiration, max_evapotranspiration)
 
-    def list_all_var_names(self):
+    def list_all_var_names(self) -> dict:
         """list all variables used by Crop"""  # TODO: check for duplicates or conflicts among parents
         return vars(self)
 
