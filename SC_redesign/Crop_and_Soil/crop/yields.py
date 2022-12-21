@@ -68,7 +68,7 @@ class Yields():
             self.above_ground_biomass = self.adjust_biomass_for_dry_down(self.above_ground_biomass,
                                                                          self.dry_down_percent)
         # Yield
-        if self.harvest_index >= 1.0:
+        if self.harvest_index <= 1.0:
             self.crop_yield = self.determine_yield_from_shoot_biomass(self.above_ground_biomass, self.harvest_index)
         else:
             self.crop_yield = self.determine_yield_from_total_biomass(self.biomass, self.harvest_index)
@@ -79,7 +79,7 @@ class Yields():
         # Yield nutrient makeup
         if self.given_harvest_index:
             self.collected_nitrogen = self.optimal_nitrogen_fraction * self.yield_collected  # SWAT 5:2.4.7
-            self.collected_phosphorus = self.optimal_nitrogen_fraction * self.yield_collected  # SWAT 5:2.4.8
+            self.collected_phosphorus = self.optimal_phosphorus_fraction * self.yield_collected  # SWAT 5:2.4.8
         else:
             self.collected_nitrogen = self.yield_nitrogen_fraction * self.yield_collected  # SWAT 5:2.4.5
             self.collected_phosphorus = self.yield_phosphorus_fraction * self.yield_collected  # SWAT 5:2.4.6
@@ -107,6 +107,9 @@ class Yields():
         pass
 
     # ---- Sub-Methods ----
+    # TBD
+
+    # ---- Other Methods ----
     # TBD
 
     # ---- Static Methods ----
@@ -211,7 +214,7 @@ class Yields():
 
         Returns: biomass of yield extracted (kg/ha)
         """
-        if 0 <= harvest_efficiency <= 1:
+        if not 0 <= harvest_efficiency <= 1.0:
             raise ValueError("harvest_efficiency must be between 0 and 1 (inclusive)")
 
         return crop_yield * harvest_efficiency
@@ -229,50 +232,13 @@ class Yields():
 
         Returns: biomass of yield not extracted (kg/ha)
         """
-        if 0 <= harvest_efficiency <= 1:
+        if not 0 <= harvest_efficiency <= 1:
             raise ValueError("harvest_efficiency must be between 0 and 1 (inclusive)")
 
         return crop_yield * (1 - harvest_efficiency)
 
-    # # TODO: SWAT uses optimal nitrogen fraction to determine yield_nitrogen fraction instead of actual_nitrogen
-    # #  fraction, why (same for phosphorus?)?
-    # @staticmethod
-    # def determine_nitrogen_yield(nitrogen_fraction: float, actual_yield: float) -> float:
-    #     """
-    #     Description:
-    #         Calculates amount of nitrogen in the crop yield or harvest
-    #
-    #     SWAT Reference: 5:2.4.7
-    #
-    #     Args:
-    #         nitrogen_fraction: optimal nitrogen fraction (SWAT 5:2.3.1)
-    #         actual_yield: actual crop yield or harvest (SWAT 5:3.3.4)
-    #
-    #     Returns:
-    #         Amount of nitrogen in the yield (kg N/ha)
-    #     """
-    #     return nitrogen_fraction * actual_yield
-    #
-    # @staticmethod
-    # def determine_phosphorus_yield(phosphorus_fraction: float, actual_yield: float) -> float:
-    #     """
-    #     Description:
-    #         Calculates amount of phosphorus in the crop yield or harvest
-    #
-    #     SWAT Reference: 5:2.4.8
-    #
-    #     Replaces: calc_nutrient_removal(crop_type)
-    #
-    #     Args:
-    #         phosphorus_fraction: optimal phosphorus fraction (SWAT 5:2.3.19)
-    #         actual_yield: actual crop yield or harvest (SWAT 5:3.3.4)
-    #
-    #     Returns:
-    #         Amount of phosphorus in the yield (kg P/ha)
-    #     """
-    #     return phosphorus_fraction * actual_yield
-    #
-    # # TODO: this is a dummy method, needs to be rewritten
+
+    # # TODO: this is a dummy method, needs to be rewritten - and moved to Crop
     # def kill(crop_type, field_management, time):
     #     """
     #     Description:
