@@ -254,6 +254,7 @@ def calculate_NASEM_energy_growth_requirements(BW, MW, ADG_heifer):
     NElFrameADG= REFADG/0.61
     # The efficiency of converting NEl to NEg is based on the conversions of 0.40 for ME to NEg
     # and 0.66 for ME to NEl and is thus 0.40/0.66 = 0.61.
+    NEg = []
     return NEg # TODO ASK EDWARD HOW TO GET NEg
 
 def calculate_NRC_energy_pregnancy_requirements(DOP, CBW):
