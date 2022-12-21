@@ -100,7 +100,7 @@ class GasEmissions:
 
         Args:
             num_animals: Number of animals in the pen.
-            barn_area: Area of the barn based on housing type, m^2.
+            barn_area: Area of the barn based on housing type, m^2 per animal.
             hours: hours of the day from 1 to 24.
             temperature_min: Minimum barn temperature, C.
             temperature_max: Maximum barn temperature, C.
