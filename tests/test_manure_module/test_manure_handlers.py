@@ -323,7 +323,7 @@ def test_manure_handler_daily_update(mocker: MockerFixture) -> None:
     sim_day = 10
     NH3_housing_loss = 1.0
     patch_for_calc_E_NH3_emission = mocker.patch(
-            'RUFAS.routines.manure.manure_handlers.manure_handler_classes.GasEmissions.calc_ammonia_housing_emission',
+            'RUFAS.routines.manure.manure_handlers.manure_handler_classes.GasEmissions.calc_ammonia_emission',
             return_value=NH3_housing_loss
     )
     CH4_housing_loss = 2.0

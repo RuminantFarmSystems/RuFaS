@@ -70,11 +70,11 @@ class SlurryStorageUnderfloor(BaseManureTreatment):
 
         """
         avg_tempC = self._get_current_day_avg_tempC()
-        NH3_loss = GasEmissions.calc_ammonia_housing_emission(
+        NH3_loss = GasEmissions.calc_ammonia_emission(
                 num_animals=num_animals,
                 barn_area=barn_area,
-                manure_urine=accumulated_manure_volume * ManureConstants.MANURE_DENSITY / num_animals,
                 manure_urine_total_ammoniacal_nitrogen=accumulated_manure_total_ammoniacal_nitrogen / num_animals,
+                manure_urine=accumulated_manure_volume * ManureConstants.MANURE_DENSITY / num_animals,
                 temperature_celsius=avg_tempC
         )
         new_accumulated_TAN = max(accumulated_manure_total_ammoniacal_nitrogen - NH3_loss, 0.0)
@@ -99,7 +99,8 @@ class SlurryStorageUnderfloor(BaseManureTreatment):
                 num_animals=self._current_pen.num_animals,
                 barn_area=self._current_pen.barn_area_from_pen_type,
                 accumulated_manure_volume=self._accumulated_output.final_manure_volume,
-                accumulated_manure_total_ammoniacal_nitrogen=self._accumulated_output.liquid_manure_total_ammoniacal_nitrogen
+                accumulated_manure_total_ammoniacal_nitrogen=self._accumulated_output
+                .liquid_manure_total_ammoniacal_nitrogen
         )
         daily_output.storage_ammonia = NH3_loss
         self._accumulated_output.liquid_manure_total_ammoniacal_nitrogen = new_accumulated_TAN

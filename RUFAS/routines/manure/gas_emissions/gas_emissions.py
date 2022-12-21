@@ -138,15 +138,15 @@ class GasEmissions:
         return num_animals * max(0.0, 0.0065 + 0.0192 * t) * barn_area / 1000
 
     @classmethod
-    def calc_ammonia_housing_emission(cls, num_animals: int,
-                                      barn_area: float,
-                                      manure_urine_total_ammoniacal_nitrogen: float,
-                                      manure_urine: float,
-                                      temperature_celsius: float,
-                                      housing_specific_constant=(
+    def calc_ammonia_emission(cls, num_animals: int,
+                              barn_area: float,
+                              manure_urine_total_ammoniacal_nitrogen: float,
+                              manure_urine: float,
+                              temperature_celsius: float,
+                              housing_specific_constant=(
                                               GasEmissionConstants.DEFAULT_HOUSING_SPECIFIC_CONSTANT),
-                                      ) -> float:
-        """Calculates NH3 storage emissions.
+                              ) -> float:
+        """Calculates ammonia emission for both housing and storage.
 
         Args:
             num_animals: Number of animals in the pen.
@@ -157,7 +157,7 @@ class GasEmissions:
             housing_specific_constant: housing specific constant, s/m.
 
         Returns:
-            NH3 storage emissions, kg N/day.
+            Ammonia emission, kg N/day.
 
         """
         p = ManureConstants.MANURE_DENSITY  # kg/m^3

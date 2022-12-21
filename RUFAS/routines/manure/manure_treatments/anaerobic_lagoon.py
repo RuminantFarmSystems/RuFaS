@@ -104,7 +104,7 @@ class AnaerobicLagoon(BaseManureTreatment):
 
         """
         avg_tempC = self._get_current_day_avg_tempC()
-        NH3_loss = GasEmissions.calc_ammonia_housing_emission(
+        NH3_loss = GasEmissions.calc_ammonia_emission(
                 num_animals=num_animals,
                 barn_area=barn_area,
                 manure_urine=accumulated_manure_volume * ManureConstants.MANURE_DENSITY / num_animals,
