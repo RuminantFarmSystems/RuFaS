@@ -115,12 +115,12 @@ class AnimalManagement:
                                            Pen.AnimalCombination.GROWING_AND_CLOSE_UP: [],
                                            Pen.AnimalCombination.LAC_COW: []}
 
-        # these variables are the P compositions of each class of animal. They
+        # these variables are the P concentrations of each class of animal. They
         # are calculated daily and are used when an animal is added to the
         # herd, whether by birth or replacement herd purchase. They are calculated
-        # in calc_all_p_comp() and are the total body weight of the animals in the
-        # respective class divided by the total P in the animals of the class
-        self.p_comp = {
+        # in calc_all_p_conc() and are calculated by dividing the total P in the animals of the class
+        # by the total body weight of the animals, on a per-animal basis
+        self.p_conc = {
             'calf': 0,
             'heiferI': 0,
             'heiferII': 0,
@@ -373,18 +373,16 @@ class AnimalManagement:
             temp: the temperature on the current day
         """
 
+        calf_ids = []
+        for calf in calves_born:
+            calf_ids.append(calf.id)
+
+
+        animals_added.extend(calf_ids)
 
 
         # Adds animals to pens, remove animals from pens, assign diets
 
-        # Stratefying the pens that lost animals by animal group
-        # (values are dictionaries of pen IDs, with values being the number of animals removed)
-
-        # Creates a dictionary with animal combinations as keys and dictionaries as values.
-        # A better name should be implemented here in the future.
-        grouped_pens_short = {Pen.AnimalCombination.CALF: {}, Pen.AnimalCombination.GROWING: {},
-                              Pen.AnimalCombination.CLOSE_UP: {}, Pen.AnimalCombination.GROWING_AND_CLOSE_UP: {},
-                              Pen.AnimalCombination.LAC_COW: {}}
 
         # Loops through ids_removed, which is a list of the animals IDs that have been removed from the herd.
         # Loop variable should be changed from "i" to something more intuitive.
@@ -403,10 +401,9 @@ class AnimalManagement:
                 pen = self.all_pens_ids[self.animal_to_pen_id_map[i]]
                 # Adds count of animal that have been removed from the herd,
                 #     based on what animal combination and pen they were in
-                if pen.id in grouped_pens_short[pen.animal_combination]:
-                    grouped_pens_short[pen.animal_combination][pen.id] += 1
-                else:
-                    grouped_pens_short[pen.animal_combination][pen.id] = 1
+
+                #TODO: updates stocking density for pen after removal of animal
+
 
                 # Deletes the animal ID key entry corresponding to the id of the animal removed
                 del self.animal_to_pen_id_map[i]
@@ -434,15 +431,15 @@ class AnimalManagement:
             # TODO: Either this calf clause shouldn't be here, or the second case handling calves is wrong
 
             animal_type_mapping_dict = {
-                'Calf': {'p_conc': self.p_comp['calf'], 'animal_list': self.calves,
+                'Calf': {'p_conc': self.p_conc['calf'], 'animal_list': self.calves,
                          'animal_group': Pen.AnimalCombination.CALF},
-                'HeiferI': {'p_conc': self.p_comp['heiferI'], 'animal_list': self.heiferIs,
+                'HeiferI': {'p_conc': self.p_conc['heiferI'], 'animal_list': self.heiferIs,
                             'animal_group': Pen.AnimalCombination.GROWING},
-                'HeiferII': {'p_conc': self.p_comp['heiferII'], 'animal_list': self.heiferIIs,
+                'HeiferII': {'p_conc': self.p_conc['heiferII'], 'animal_list': self.heiferIIs,
                              'animal_group': Pen.AnimalCombination.GROWING},
-                'HeiferIII': {'p_conc': self.p_comp['heiferIII'], 'animal_list': self.heiferIIIs,
+                'HeiferIII': {'p_conc': self.p_conc['heiferIII'], 'animal_list': self.heiferIIIs,
                               'animal_group': Pen.AnimalCombination.CLOSE_UP},
-                'Cow': {'p_conc': self.p_comp['cow'], 'animal_list': self.cows,
+                'Cow': {'p_conc': self.p_conc['cow'], 'animal_list': self.cows,
                         'animal_group': Pen.AnimalCombination.LAC_COW if animal.milking
                         else Pen.AnimalCombination.CLOSE_UP}}
 
@@ -461,62 +458,19 @@ class AnimalManagement:
             # Updating animal_to_pen_id_map variable to reflect the right pen ID for the animal ID added
             self.animal_to_pen_id_map[animal.id] = pen_for_insert.id
             # Setting up new animal and inserting it into the pen in question?
-            # set_up_new_animal() could be the reason behind the Github issue, just a possibility
+            # set_up_new_animal() could be the reason behind the GitHub issue, just a possibility
             self.all_pens_ids[pen_for_insert.id].set_up_new_animal(animal, animal_p_conc, feed, temp,
                                                                    pen_population_before_additions[pen_for_insert.id])
 
-
         # We loop through the numbers of all the pens on the farm and their indices
         for index, pen in enumerate(self.all_pens_ids):
-            #     that all new animals have been added"
+            # From Militsa: "We need to adjust the ration totals for the pen attributes now
+            # that all new animals have been added"
             # Need clarification on what this does
             for key in pen.ration:
                 if key != 'status' and key != 'objective':
                     pen.ration[key] = (pen.ration[key] / pen_population_before_additions[index]) * \
                                       len(pen.animals_in_pen)
-
-        # TODO: Use argmin and argmax are pointed earlier and make a calf-specific function call if needed
-        # Here, we loop though the calf objects that were added to the pen (they were born)
-        for calf in calves_born:
-            # We initialize a pen variable that will be edited later to place these calves in
-            # From Chris VKH: "getting valid pen to place calves in
-            #      if there are no pens of group calves that lost animals"
-            pen = None
-            # If no calves have been removed from the herd
-            if grouped_pens_short[Pen.AnimalCombination.CALF] == {}:
-                # Variable to track lowest stocking density
-                # Once again, we should rename this to "density" and why is it initialized to 10000?
-                dens = 10000
-                # We loop through the pens that contains calves currently
-                for p in self.pens_by_animal_combination[Pen.AnimalCombination.CALF]:
-                    # If the pen in question has a lower stocking density than our "dens" variable
-                    if p.stocking_density < dens:
-                        # We will update our pen variable and density variable to those of that pen
-                        pen = p
-                        dens = p.stocking_density
-            # If there are pens of holding calves that lost animals
-            else:
-                # Initialize variable to track highest animal shortage across these pens
-                # Once again, this needs to be renamed from "n"
-                n = 0
-                # We loop through the keys and values of the grouped_pen_short dictionary for the calf class
-                # The keys are pen IDs, and the values are the number of animals removed from those pens
-                for id, v in grouped_pens_short[Pen.AnimalCombination.CALF].items():
-                    # If the number of animals removed from the pen observed is greater than "n"
-                    if v > n:
-                        # We set the pen variable to the pen at the correct id
-                        # Suggestion to change "id" to "index"
-                        pen = self.all_pens_ids[id]
-                        # Update the variable tracking the highest animal shortage across these pens
-                        n = v
-            # Question for Doctor Reed: why do we have a special case here for calves?
-            # We then assign the animal ID for the calf in question the pen ID where it will be housed
-            self.animal_to_pen_id_map[calf.id] = pen.id
-            # We add the calf object to the list of calves in the herd
-            self.calves.append(calf)
-            #  We set up a new animal and insert it into the pen in question?
-            self.all_pens_ids[pen.id].set_up_new_animal(calf, self.pasture_concentrate,
-                                                    feed, temp, pen_population_before_additions[pen.id])
 
     def allocate_calf_pens(self, calf_pens):
         stalls = [pen.num_stalls for pen in calf_pens]
@@ -796,13 +750,13 @@ class AnimalManagement:
         self.gather_cow_class_history(self.cows)
 
     @staticmethod
-    def _calc_p_comp(animals):
+    def _calc_p_conc(animals):
         """
         Args:
-            animals: the list of animals for which the P composition should be
+            animals: the list of animals for which the P concentration should be
                 calculated
         Returns:
-            p_comp: the P composition of @animals
+            p_conc: the P concentration of @animals
         """
 
         if len(animals) == 0:
@@ -810,15 +764,15 @@ class AnimalManagement:
         else:
             return sum(a.p_animal for a in animals) / sum(a.body_weight for a in animals)
 
-    def calc_all_p_comp(self):
+    def calc_all_p_conc(self):
         """
         Calculates each animal class's P concentration.
         """
         # TODO: see if there is a better way to do this using dictionary comprehension
-        self.p_comp['calf'] = self._calc_p_comp(self.calves)
-        self.p_comp['heiferI'] = self._calc_p_comp(self.heiferIs)
-        self.p_comp['heiferII'] = self._calc_p_comp(self.heiferIIs)
-        self.p_comp['cow'] = self._calc_p_comp(self.heiferIIIs)
+        self.p_conc['calf'] = self._calc_p_conc(self.calves)
+        self.p_conc['heiferI'] = self._calc_p_conc(self.heiferIs)
+        self.p_conc['heiferII'] = self._calc_p_conc(self.heiferIIs)
+        self.p_conc['cow'] = self._calc_p_conc(self.heiferIIIs)
 
     def calc_p_rqmts(self):
         """
@@ -884,7 +838,7 @@ class AnimalManagement:
 
             # phosphorus updates
             self.daily_p_update()  # per animal
-            self.calc_all_p_comp()  # per animal
+            self.calc_all_p_conc()  # per animal
 
             self.record_pen_history()
 

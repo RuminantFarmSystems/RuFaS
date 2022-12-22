@@ -302,20 +302,20 @@ def mock_animals() -> List[MagicMock]:
     return create_mock_object_list(animal_attribute_dicts)
 
 
-def test_calc_p_comp(mock_animals: List[MagicMock]) -> None:
-    """Unit test for function _calc_p_comp in file routines/animal/animal_management.py"""
+def test_calc_p_conc(mock_animals: List[MagicMock]) -> None:
+    """Unit test for function _calc_p_conc in file routines/animal/animal_management.py"""
     expected = 0
-    actual = AnimalManagement._calc_p_comp([])
+    actual = AnimalManagement._calc_p_conc([])
     assert actual == expected
 
-    actual = AnimalManagement._calc_p_comp(mock_animals)
+    actual = AnimalManagement._calc_p_conc(mock_animals)
     expected = (16.0 / 8.0)
 
     assert actual == pytest.approx(expected)
 
 
-def test_calc_all_p_comp():
-    """Unit test for function calc_all_p_comp in file routines/animal/animal_management.py"""
+def test_calc_all_p_conc():
+    """Unit test for function calc_all_p_conc in file routines/animal/animal_management.py"""
     pass
 
 
