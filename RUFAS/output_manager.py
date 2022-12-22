@@ -40,9 +40,10 @@ class OutputManager (object):
             self.warnings_pool: Dict[str, Any] = {}
             self.errors_pool: Dict[str, Any] = {}
             self.logs_pool: Dict[str, Any] = {}
+            self.counter = 1
             self.add_log("init_log", "Output Manager instantiated.",
                          info_map={"class": self.__class__.__name__,
-                                   "function": self.__init__.__name__})
+                                   "function": self.__init__.__name__})            
 
     def add_variable(self, name: str, value: Any,
                      info_map: Dict[str, Union[str, bool]]) -> None:
@@ -207,7 +208,8 @@ class OutputManager (object):
         if info_map.get("suffix") is not None:
             suffix = "." + info_map.get("suffix")
         elif not info_map.get("suppress_suffix", False):
-            suffix = "." + self._get_time_based_suffix()
+            suffix = f".{self.counter}"
+            self.counter += 1
 
         return f"{prefix}{name}{suffix}"
 
@@ -254,31 +256,35 @@ class OutputManager (object):
         """
         Saves the variables_pool into a json file in the given path to a directory.
         """
-        file_path=os.path.join(path,self._generate_file_name("variables","json"))
+        file_path = os.path.join(
+            path, self._generate_file_name("variables", "json"))
         self._dict_to_file_json(self.variables_pool, file_path)
 
     def save_logs(self, path: str) -> None:
         """
         Saves the logs_pool into a json file in the given path to a directory.
         """
-        file_path=os.path.join(path,self._generate_file_name("logs","json"))
+        file_path = os.path.join(
+            path, self._generate_file_name("logs", "json"))
         self._dict_to_file_json(self.logs_pool, file_path)
 
     def save_warnings(self, path: str) -> None:
         """
         Saves the warnings_pool into a json file in the given path to a directory.
         """
-        file_path=os.path.join(path,self._generate_file_name("warnings","json"))
+        file_path = os.path.join(
+            path, self._generate_file_name("warnings", "json"))
         self._dict_to_file_json(self.warnings_pool, file_path)
 
     def save_errors(self, path: str) -> None:
         """
         Saves the errors_pool into a json file in the given path to a directory.
         """
-        file_path=os.path.join(path,self._generate_file_name("errors","json"))
+        file_path = os.path.join(
+            path, self._generate_file_name("errors", "json"))
         self._dict_to_file_json(self.errors_pool, file_path)
 
-    def save_all_pools(self, path:str)->None:
+    def save_all_pools(self, path: str) -> None:
         """
         Saves all pool into the given path to a directory.
         """
@@ -287,10 +293,10 @@ class OutputManager (object):
         self.save_logs(path)
         self.save_warnings(path)
 
-    def flush_pools(self)->None:
+    def flush_pools(self) -> None:
         """
         Sets all pools to an empty dictionary.
-        """   
+        """
         self.variables_pool: Dict[str, Any] = {}
         self.warnings_pool: Dict[str, Any] = {}
         self.errors_pool: Dict[str, Any] = {}
