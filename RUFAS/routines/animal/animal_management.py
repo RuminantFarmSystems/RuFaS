@@ -372,6 +372,9 @@ class AnimalManagement:
             feed: an instance of the Feed class defined in feed.py
             temp: the temperature on the current day
         """
+
+
+
         # Adds animals to pens, remove animals from pens, assign diets
 
         # Stratefying the pens that lost animals by animal group
@@ -426,35 +429,26 @@ class AnimalManagement:
             # TODO: We need to either stick with comp(osition) or conc(entration), decide on one at some point
             # We then add the animal ID to the list of animal class that animal ID pertains to
             # Last, we set a group variable to the correct Animal Combination type, depending on the animal type
-            # TODO: We could use a dictionary here instead of repeated if statements (nested dictionary,three values)
             # Three values would tell you what variables to use in the three lines under the if statements
 
             # TODO: Either this calf clause shouldn't be here, or the second case handling calves is wrong
-            if type(animal).__name__ == 'Calf':
-                animal_p_conc = self.p_comp['calf']
-                self.calves.append(animal)
-                group = Pen.AnimalCombination.CALF
-            elif type(animal).__name__ == 'HeiferI':
-                animal_p_conc = self.p_comp['heiferI']
-                self.heiferIs.append(animal)
-                group = Pen.AnimalCombination.GROWING
-            elif type(animal).__name__ == 'HeiferII':
-                animal_p_conc = self.p_comp['heiferII']
-                self.heiferIIs.append(animal)
-                group = Pen.AnimalCombination.GROWING
-            elif type(animal).__name__ == 'HeiferIII':
-                animal_p_conc = self.p_comp['heiferIII']
-                self.heiferIIIs.append(animal)
-                group = Pen.AnimalCombination.CLOSE_UP
-            elif not animal.milking:
-                animal_p_conc = self.p_comp['cow']
-                self.cows.append(animal)
-                group = Pen.AnimalCombination.CLOSE_UP
-            else:  # animal is of class Cow
-                animal_p_conc = self.p_comp['cow']
-                # self.all_pens_ids[pen].animals_in_pen.append(animal)
-                self.cows.append(animal)
-                group = Pen.AnimalCombination.LAC_COW
+
+            animal_type_mapping_dict = {
+                'Calf': {'p_conc': self.p_comp['calf'], 'animal_list': self.calves,
+                         'animal_group': Pen.AnimalCombination.CALF},
+                'HeiferI': {'p_conc': self.p_comp['heiferI'], 'animal_list': self.heiferIs,
+                            'animal_group': Pen.AnimalCombination.GROWING},
+                'HeiferII': {'p_conc': self.p_comp['heiferII'], 'animal_list': self.heiferIIs,
+                             'animal_group': Pen.AnimalCombination.GROWING},
+                'HeiferIII': {'p_conc': self.p_comp['heiferIII'], 'animal_list': self.heiferIIIs,
+                              'animal_group': Pen.AnimalCombination.CLOSE_UP},
+                'Cow': {'p_conc': self.p_comp['cow'], 'animal_list': self.cows,
+                        'animal_group': Pen.AnimalCombination.LAC_COW if animal.milking
+                        else Pen.AnimalCombination.CLOSE_UP}}
+
+            animal_p_conc = animal_type_mapping_dict.get(type(animal).__name__)['p_conc']
+            animal_type_mapping_dict.get(type(animal).__name__)['animal_list'].append(animal)
+            group = animal_type_mapping_dict.get(type(animal).__name__)['animal_group']
 
             # Choosing pen to place new animal first by checking if there are
             # pens that lost animals, and choosing the pen with the lowest
@@ -472,10 +466,7 @@ class AnimalManagement:
                                                                    pen_population_before_additions[pen_for_insert.id])
 
 
-        # We loop through the numbers of all the pens on the farm
-        # I would suggest we rename the loop variable pen as it is an index and not an actual pen
-        # A better loop variable name might be good here, we're looping through numbers
-        # TODO: change loop to loop through actual pens, not the number of pens
+        # We loop through the numbers of all the pens on the farm and their indices
         for index, pen in enumerate(self.all_pens_ids):
             #     that all new animals have been added"
             # Need clarification on what this does
