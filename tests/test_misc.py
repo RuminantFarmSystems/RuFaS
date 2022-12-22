@@ -319,15 +319,15 @@ def test_generate_key(mocker: MockerFixture) -> None:
 
     info_map = {"class": "dummy_class", "function": "dummy_func"}
     key = om._generate_key("key_name", info_map)
-    assert key == f"dummy_class.dummy_func.key_name.{2}"
+    assert key == f"dummy_class.dummy_func.key_name.{6}"
 
     info_map["suppress_prefix"] = True
     key = om._generate_key("key_name", info_map)
-    assert key == f"key_name.{3}"
+    assert key == f"key_name.{7}"
 
     info_map["suppress_prefix"] = False
     key = om._generate_key("key_name", info_map)
-    assert key == f"dummy_class.dummy_func.key_name.{4}"
+    assert key == f"dummy_class.dummy_func.key_name.{8}"
 
     info_map["suppress_suffix"] = True
     key = om._generate_key("key_name", info_map)
@@ -335,7 +335,7 @@ def test_generate_key(mocker: MockerFixture) -> None:
 
     info_map["suppress_suffix"] = False
     key = om._generate_key("key_name", info_map)
-    assert key == f"dummy_class.dummy_func.key_name.{5}"
+    assert key == f"dummy_class.dummy_func.key_name.{9}"
 
     info_map["suppress_prefix"] = True
     info_map["suppress_suffix"] = True
@@ -345,7 +345,7 @@ def test_generate_key(mocker: MockerFixture) -> None:
     info_map["prefix"] = "dummy_prefix"
     info_map["suppress_suffix"] = False
     key = om._generate_key("key_name", info_map)
-    assert key == f"dummy_prefix.key_name.{6}"
+    assert key == f"dummy_prefix.key_name.{10}"
 
     info_map["suffix"] = "dummy_suffix"
     key = om._generate_key("key_name", info_map)
