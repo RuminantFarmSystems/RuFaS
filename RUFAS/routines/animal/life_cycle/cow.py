@@ -19,6 +19,7 @@ Description: This file updates the cow form first calving to leaving the herd.
 import math
 import numpy as np
 from scipy.stats import truncnorm
+from RUFAS.output_manager import OutputManager
 from RUFAS.routines.animal.life_cycle.heiferIII import HeiferIII
 from RUFAS.routines.animal.life_cycle.animal_base import AnimalBase
 from RUFAS.routines.animal.manure.lactating_cow_manure_excretion import \
@@ -28,6 +29,8 @@ from RUFAS.routines.animal.manure.dry_cow_manure_excretion import \
 from RUFAS.routines.animal.ration.animal_requirements import calc_rqmts
 from random import random
 from RUFAS.routines.animal.life_cycle import animal_constants as const
+
+om = OutputManager()
 
 
 class MilkProductionHistory:
@@ -71,16 +74,16 @@ class Cow(HeiferIII):
             args.mature_body_weight: the mature body weight of the animal
             args.events: events of the animal
             args.estrus_count : number of estrus during ED program
-			args.estrus_day: the age when the heifer is estrus in ED program
-			args.tai_program_start_day_h: start day for heifers in TAI program
-			args.synch_ed_program_start_day_h: start day for heifers in synch_ED program
-			args.synch_ed_estrus_day: the age when the heifer is estrus in synch_ED program
-			args.synch_ed_stop_day: the age the the synch protocol stop for this round
-			args.conception_rate: conception rate associated with repro programs and protocols
-			args.ai_day: the age of animal for scheduled AI
-			args.abortion_day: the age of the animal when abortion happens
-			args.days_in_preg: days science pregnancy
-			args.gestation_length: the prejected gestation
+                        args.estrus_day: the age when the heifer is estrus in ED program
+                        args.tai_program_start_day_h: start day for heifers in TAI program
+                        args.synch_ed_program_start_day_h: start day for heifers in synch_ED program
+                        args.synch_ed_estrus_day: the age when the heifer is estrus in synch_ED program
+                        args.synch_ed_stop_day: the age the the synch protocol stop for this round
+                        args.conception_rate: conception rate associated with repro programs and protocols
+                        args.ai_day: the age of animal for scheduled AI
+                        args.abortion_day: the age of the animal when abortion happens
+                        args.days_in_preg: days science pregnancy
+                        args.gestation_length: the prejected gestation
             args.p_gest_for_calf
             args.days_in_milk: cow's current day in milk
             args.parity: parity of the cow
@@ -99,8 +102,8 @@ class Cow(HeiferIII):
         self.DHD = 0  # daily horizontal distance, km
         self.CI = 0  # calving interval, days
         self.CI_history = []
-        self.BW_at_calving = 0 # weight of cow when she gives birth
-        self.calf_birth_weight = args['calf_birth_weight'] # calf birth weight
+        self.BW_at_calving = 0  # weight of cow when she gives birth
+        self.calf_birth_weight = args['calf_birth_weight']  # calf birth weight
         self.daily_growth = 0  # change in body weight, kg
         self.calves = 0
         self.calving_to_preg_time = 0
@@ -217,9 +220,9 @@ class Cow(HeiferIII):
                 math.exp((0 - n) * self.days_in_milk)
         elif AnimalBase.config['lactation_curve'] == 'milkbot':
             estimated_daily_milk_produced = AnimalBase.config['a'] * \
-                                            (1 - math.exp((AnimalBase.config['c'] - self.days_in_milk) /
-                                                          AnimalBase.config['b']) / 2) * \
-                                            math.exp((0 - AnimalBase.config['d']) * self.days_in_milk)
+                (1 - math.exp((AnimalBase.config['c'] - self.days_in_milk) /
+                              AnimalBase.config['b']) / 2) * \
+                math.exp((0 - AnimalBase.config['d']) * self.days_in_milk)
         if self.milking:
             self.estimated_daily_milk_produced = estimated_daily_milk_produced
         else:
@@ -230,7 +233,7 @@ class Cow(HeiferIII):
         if self.milking:
             fat_percent = 12.86 * self.days_in_milk ** (-1.081) * math.exp(
                 0.0926 * (math.log(self.days_in_milk)) ** 2) * \
-                          (math.log(self.days_in_milk) ** 1.107)
+                (math.log(self.days_in_milk) ** 1.107)
             daily_fat_correct_milk_production = \
                 0.4 * estimated_daily_milk_produced + \
                 0.15 * fat_percent * estimated_daily_milk_produced
@@ -246,7 +249,7 @@ class Cow(HeiferIII):
         # 	self.daily_growth = self.body_weight - prev_weight
 
         return estimated_daily_milk_produced, fat_percent, \
-               daily_fat_correct_milk_production
+            daily_fat_correct_milk_production
 
     def calc_manure_excretion(self, feed, methane_model, ME_intake):
         """
@@ -273,10 +276,10 @@ class Cow(HeiferIII):
         Calculates this Cow's nutrient requirements.
         """
         req = calc_rqmts(self.body_weight, self.mature_body_weight, self.days_in_preg,
-                        'cow', self.calves, self.CI, self.mPrt, self.fat_percent,
-                        self.lactose_milk, self.estimated_daily_milk_produced,
-                        self.days_in_milk, self.milking)
-                        
+                         'cow', self.calves, self.CI, self.mPrt, self.fat_percent,
+                         self.lactose_milk, self.estimated_daily_milk_produced,
+                         self.days_in_milk, self.milking)
+
         self.NEmaint = req['NEmaint']
         self.NEg = req['NEg']
         self.NEpreg = req['NEpreg']
@@ -311,12 +314,13 @@ class Cow(HeiferIII):
 
         # absorbed P retained for fetal growth (g) (A.1EF.E.4)
         if self.days_in_preg >= 190:
-            exp_1 = (0.05527 - 0.000075 * self.days_in_preg) * self.days_in_preg
+            exp_1 = (0.05527 - 0.000075 * self.days_in_preg) * \
+                self.days_in_preg
             exp_2 = (0.05527 - 0.000075 * (self.days_in_preg - 1)) * \
                     (self.days_in_preg - 1)
             self.p_gest = (
-                                  0.00002743 * math.exp(exp_1) -
-                                  0.00002743 * math.exp(exp_2)) * 1000
+                0.00002743 * math.exp(exp_1) -
+                0.00002743 * math.exp(exp_2)) * 1000
             self.p_gest_for_calf += self.p_gest
         else:
             self.p_gest = 0
@@ -329,13 +333,13 @@ class Cow(HeiferIII):
 
         # absorbed P required by the animal (g) (A.1EF.E.6)
         p_absorb = p_urine + self.p_maint_feces + self.p_growth + \
-                   self.p_gest + p_milk
+            self.p_gest + p_milk
 
         # requirement of P from the ration (g) (A.1EF.E.7)
         if self.milking:
             self.p_req = p_absorb / \
-                         (1.86696 - 5.01238 * self.p_conc + 5.12286 *
-                          self.p_conc ** 2)
+                (1.86696 - 5.01238 * self.p_conc + 5.12286 *
+                 self.p_conc ** 2)
         else:
             self.p_req = p_absorb / 0.664
 
@@ -350,9 +354,9 @@ class Cow(HeiferIII):
         """
         # multiplied by 2 for return trip
         self.DVD = 2 * vertical_dist_to_parlor * \
-                   AnimalBase.config['cow_times_milked_per_day']
+            AnimalBase.config['cow_times_milked_per_day']
         self.DHD = 2 * horizontal_dist_to_parlor * \
-                   AnimalBase.config['cow_times_milked_per_day']
+            AnimalBase.config['cow_times_milked_per_day']
 
     def get_bw_change(self, CI):
         """
@@ -364,7 +368,7 @@ class Cow(HeiferIII):
                 change calculation
 
         Returns: the daily body weight change for a cow.
-        
+
         """
         # on the calving day
         if self.days_in_preg == self.gestation_length:
@@ -373,28 +377,33 @@ class Cow(HeiferIII):
             self.tissue_changed = 0
         # conceptus weight change during pregnancy
         elif self.days_in_preg > 50:
-            conceptus_total_weight = (0.0148 * self.gestation_length - 2.408) * self.calf_birth_weight
-            conceptus_param = conceptus_total_weight ** (1 / 3) / (self.gestation_length - 50)
-            conceptus_growth = 3 * conceptus_param ** 3 * (self.days_in_preg - 50) ** 2
+            conceptus_total_weight = (
+                0.0148 * self.gestation_length - 2.408) * self.calf_birth_weight
+            conceptus_param = conceptus_total_weight ** (
+                1 / 3) / (self.gestation_length - 50)
+            conceptus_growth = 3 * conceptus_param ** 3 * \
+                (self.days_in_preg - 50) ** 2
             self.conceptus_weight += conceptus_growth
         else:
             conceptus_growth = 0
 
         # growth for 1st and 2nd lactation cows
         if self.calves == 1:
-            if self.days_in_preg < 1: # before pregnancy
-                 target_adg_cow = \
-                     (0.92 - 0.82) * 0.96 * self.mature_body_weight / CI
-            else: # after pregnancy
+            if self.days_in_preg < 1:  # before pregnancy
                 target_adg_cow = \
-                     (0.92 * self.mature_body_weight - self.body_weight)/(self.gestation_length - self.days_in_preg+1)
+                    (0.92 - 0.82) * 0.96 * self.mature_body_weight / CI
+            else:  # after pregnancy
+                target_adg_cow = \
+                    (0.92 * self.mature_body_weight - self.body_weight) / \
+                    (self.gestation_length - self.days_in_preg+1)
         elif self.calves == 2:
-            if self.days_in_preg < 1: # before pregnancy
+            if self.days_in_preg < 1:  # before pregnancy
                 target_adg_cow = \
-                     (1 - 0.92) * 0.96 * self.mature_body_weight / CI
-            else: # after pregnancy
+                    (1 - 0.92) * 0.96 * self.mature_body_weight / CI
+            else:  # after pregnancy
                 target_adg_cow = \
-                     (self.mature_body_weight - self.body_weight)/(self.gestation_length - self.days_in_preg+1)
+                    (self.mature_body_weight - self.body_weight) / \
+                    (self.gestation_length - self.days_in_preg+1)
         else:  # parity > 2
             target_adg_cow = 0
 
@@ -405,16 +414,20 @@ class Cow(HeiferIII):
                     20 / (65 ** 2) * self.days_in_milk * \
                     math.exp(1 - self.days_in_milk / 65)
                 if self.days_in_preg == AnimalBase.config['days_in_preg_when_dry'] - 1:
-                     self.tissue_changed = 20 * self.days_in_milk/65 * math.exp(1 - self.days_in_milk/65)
+                    self.tissue_changed = 20 * self.days_in_milk / \
+                        65 * math.exp(1 - self.days_in_milk/65)
             else:  # parity > 1
                 bodyweight_tissue = \
                     -40 / 70 * math.exp(1 - self.days_in_milk / 70) + \
                     40 / (70 ** 2) * self.days_in_milk * \
                     math.exp(1 - self.days_in_milk / 70)
                 if self.days_in_preg == AnimalBase.config['days_in_preg_when_dry'] - 1:
-                     self.tissue_changed = 40 * self.days_in_milk/70 * math.exp(1 - self.days_in_milk/70)
-        else: # dry period
-            bodyweight_tissue = self.tissue_changed / (self.gestation_length - AnimalBase.config['days_in_preg_when_dry'])
+                    self.tissue_changed = 40 * self.days_in_milk / \
+                        70 * math.exp(1 - self.days_in_milk/70)
+        else:  # dry period
+            bodyweight_tissue = self.tissue_changed / \
+                (self.gestation_length -
+                 AnimalBase.config['days_in_preg_when_dry'])
 
         return target_adg_cow + conceptus_growth + bodyweight_tissue
 
@@ -466,7 +479,8 @@ class Cow(HeiferIII):
 
         # if self.milking:
         estimated_daily_milk_produced, fat_percent, \
-        daily_fat_correct_milk_production = self.milking_update(sim_day, calving_interval)
+            daily_fat_correct_milk_production = self.milking_update(
+                sim_day, calving_interval)
         if not self.do_not_breed:
             if self.repro_program == 'ED':
                 self.ed_update(sim_day)
@@ -482,7 +496,7 @@ class Cow(HeiferIII):
         cull_stage = self.cull_update(sim_day)
 
         return estimated_daily_milk_produced, fat_percent, \
-               daily_fat_correct_milk_production, cull_stage, new_born
+            daily_fat_correct_milk_production, cull_stage, new_born
 
     # ED methods
     def determine_estrus_day(self, start_date, estrus_note, avg, std, sim_day):
@@ -569,7 +583,8 @@ class Cow(HeiferIII):
                 if estrus_detection_rand < \
                         AnimalBase.config['estrus_detection_rate']:
                     # Estrus detected
-                    self.events.add_event(self.days_born, sim_day, const.ESTRUS_DETECTED)
+                    self.events.add_event(
+                        self.days_born, sim_day, const.ESTRUS_DETECTED)
                     estrus_service_rand = random()
                     if estrus_service_rand < \
                             AnimalBase.config['estrus_service_rate']:
@@ -628,13 +643,16 @@ class Cow(HeiferIII):
         """
         if not self.do_not_breed:
             if self.days_born == self.tai_program_start_day_c:
-                self.events.add_event(self.days_born, sim_day, const.INJECT_GNRH)
+                self.events.add_event(
+                    self.days_born, sim_day, const.INJECT_GNRH)
                 self.GnRH_injections = self.GnRH_injections + 1
             elif self.days_born == self.tai_program_start_day_c + 7:
-                self.events.add_event(self.days_born, sim_day, const.INJECT_PGF)
+                self.events.add_event(
+                    self.days_born, sim_day, const.INJECT_PGF)
                 self.PGF_injections = self.PGF_injections + 1
             elif self.days_born == self.tai_program_start_day_c + 9:
-                self.events.add_event(self.days_born, sim_day, const.INJECT_GNRH)
+                self.events.add_event(
+                    self.days_born, sim_day, const.INJECT_GNRH)
                 self.GnRH_injections = self.GnRH_injections + 1
             elif self.days_born == self.tai_program_start_day_c + 10:
                 self.ai_day = self.days_born
@@ -648,13 +666,16 @@ class Cow(HeiferIII):
         """
         if not self.do_not_breed:
             if self.days_born == self.tai_program_start_day_c:
-                self.events.add_event(self.days_born, sim_day, const.INJECT_GNRH)
+                self.events.add_event(
+                    self.days_born, sim_day, const.INJECT_GNRH)
                 self.GnRH_injections = self.GnRH_injections + 1
             elif self.days_born == self.tai_program_start_day_c + 7:
-                self.events.add_event(self.days_born, sim_day, const.INJECT_PGF)
+                self.events.add_event(
+                    self.days_born, sim_day, const.INJECT_PGF)
                 self.PGF_injections = self.PGF_injections + 1
             elif self.days_born == self.tai_program_start_day_c + 9:
-                self.events.add_event(self.days_born, sim_day, const.INJECT_GNRH)
+                self.events.add_event(
+                    self.days_born, sim_day, const.INJECT_GNRH)
                 self.GnRH_injections = self.GnRH_injections + 1
             elif self.days_born == self.tai_program_start_day_c + 10:
                 self.ai_day = self.days_born
@@ -669,13 +690,16 @@ class Cow(HeiferIII):
         """
         if not self.do_not_breed:
             if self.days_born == self.tai_program_start_day_c:
-                self.events.add_event(self.days_born, sim_day, const.INJECT_GNRH)
+                self.events.add_event(
+                    self.days_born, sim_day, const.INJECT_GNRH)
                 self.GnRH_injections = self.GnRH_injections + 1
             elif self.days_born == self.tai_program_start_day_c + 7:
-                self.events.add_event(self.days_born, sim_day, const.INJECT_PGF)
+                self.events.add_event(
+                    self.days_born, sim_day, const.INJECT_PGF)
                 self.PGF_injections = self.PGF_injections + 1
             elif self.days_born == self.tai_program_start_day_c + 10:
-                self.events.add_event(self.days_born, sim_day, const.INJECT_GNRH)
+                self.events.add_event(
+                    self.days_born, sim_day, const.INJECT_GNRH)
                 self.GnRH_injections = self.GnRH_injections + 1
                 self.ai_day = self.days_born
                 self.conception_rate = \
@@ -689,16 +713,20 @@ class Cow(HeiferIII):
         """
         if not self.do_not_breed:
             if self.days_born == self.tai_program_start_day_c:
-                self.events.add_event(self.days_born, sim_day, const.INJECT_GNRH)
+                self.events.add_event(
+                    self.days_born, sim_day, const.INJECT_GNRH)
                 self.GnRH_injections = self.GnRH_injections + 1
             elif self.days_born == self.tai_program_start_day_c + 5:
-                self.events.add_event(self.days_born, sim_day, const.INJECT_PGF)
+                self.events.add_event(
+                    self.days_born, sim_day, const.INJECT_PGF)
                 self.PGF_injections = self.PGF_injections + 1
             elif self.days_born == self.tai_program_start_day_c + 6:
-                self.events.add_event(self.days_born, sim_day, const.INJECT_PGF)
+                self.events.add_event(
+                    self.days_born, sim_day, const.INJECT_PGF)
                 self.PGF_injections = self.PGF_injections + 1
             elif self.days_born == self.tai_program_start_day_c + 8:
-                self.events.add_event(self.days_born, sim_day, const.INJECT_GNRH)
+                self.events.add_event(
+                    self.days_born, sim_day, const.INJECT_GNRH)
                 self.GnRH_injections = self.GnRH_injections + 1
                 self.ai_day = self.days_born
                 self.conception_rate = \
@@ -758,7 +786,8 @@ class Cow(HeiferIII):
             self.GnRH_injections = self.GnRH_injections + 1
         elif self.days_born == self.presynch_program_start_day + 17:
             self.tai_program_start_day_c = self.days_born
-            self.events.add_event(self.days_born, sim_day, const.DOUBLE_OVSYNCH_END)
+            self.events.add_event(self.days_born, sim_day,
+                                  const.DOUBLE_OVSYNCH_END)
 
     def g6g_update(self, sim_day):
         """
@@ -783,7 +812,8 @@ class Cow(HeiferIII):
 
         if self.days_born == self.presynch_program_start_day:
             self.tai_program_start_day_c = \
-                self.days_born + AnimalBase.config['user_defined_presynch_length']
+                self.days_born + \
+                AnimalBase.config['user_defined_presynch_length']
 
     def tai_update(self, sim_day):
         """
@@ -838,7 +868,8 @@ class Cow(HeiferIII):
                 if estrus_detection_rand < \
                         AnimalBase.config['estrus_detection_rate']:
                     # Estrus detected
-                    self.events.add_event(self.days_born, sim_day, const.ESTRUS_DETECTED)
+                    self.events.add_event(
+                        self.days_born, sim_day, const.ESTRUS_DETECTED)
                     estrus_service_rand = random()
                     if estrus_service_rand < \
                             AnimalBase.config['estrus_service_rate']:
@@ -939,6 +970,7 @@ class Cow(HeiferIII):
         Args:
             sim_day: the simulation day
         """
+
         if self.days_in_preg > 0:
             self.days_in_preg += 1
 
@@ -955,22 +987,23 @@ class Cow(HeiferIII):
                     last_time_given_birth = \
                         self.events.get_most_recent_date(const.NEW_BIRTH)
                     self.calving_to_preg_time = self.days_born - last_time_given_birth
-                self.gestation_length = int(truncnorm.rvs(-const.STDI, const.STDI, AnimalBase.config['avg_gestation_len'],\
-                        AnimalBase.config['std_gestation_len']))
-                # generate calf birth weight 
+                self.gestation_length = int(truncnorm.rvs(-const.STDI, const.STDI, AnimalBase.config['avg_gestation_len'],
+                                                          AnimalBase.config['std_gestation_len']))
+                # generate calf birth weight
                 if self.breed == 'HO':
-                    self.calf_birth_weight = truncnorm.rvs(-const.STDI, const.STDI, AnimalBase.config['birth_weight_avg_ho'],\
-                        AnimalBase.config['birth_weight_std_ho'])
+                    self.calf_birth_weight = truncnorm.rvs(-const.STDI, const.STDI, AnimalBase.config['birth_weight_avg_ho'],
+                                                           AnimalBase.config['birth_weight_std_ho'])
                 elif self.breed == 'JE':
-                    self.calf_birth_weight = truncnorm.rvs(-const.STDI, const.STDI, AnimalBase.config['birth_weight_avg_je'], \
-                        AnimalBase.config['birth_weight_std_je'])
+                    self.calf_birth_weight = truncnorm.rvs(-const.STDI, const.STDI, AnimalBase.config['birth_weight_avg_je'],
+                                                           AnimalBase.config['birth_weight_std_je'])
 
                 self.events.add_event(self.days_born, sim_day, const.COW_PREG)
             else:
                 if self.repro_program in ['ED', 'ED-TAI']:
                     self.ai_day = 0
                     self.after_ai_estrus(sim_day)
-                self.events.add_event(self.days_born, sim_day, const.COW_NOT_PREG)
+                self.events.add_event(
+                    self.days_born, sim_day, const.COW_NOT_PREG)
         elif self.days_born == self.ai_day + \
                 AnimalBase.config['preg_check_day_1']:
             self.preg_diagnoses += 1
@@ -1028,11 +1061,13 @@ class Cow(HeiferIII):
                 self.p_gest_for_calf = 0
                 self.events.add_event(
                     self.days_born, sim_day, const.PREG_LOSS_BTWN_2_AND_3)
+
         if self.days_in_preg == 0 and self.days_in_milk > \
                 AnimalBase.config['do_not_breed_time']:
             # only add to events if it is the first time this occurs
             if not self.do_not_breed:
-                self.events.add_event(self.days_born, sim_day, const.DO_NOT_BREED)
+                self.events.add_event(
+                    self.days_born, sim_day, const.DO_NOT_BREED)
                 self.do_not_breed = True
             return True
 
@@ -1077,8 +1112,10 @@ class Cow(HeiferIII):
                     death_upper_limit = AnimalBase.config['death_cull_prob'][i+1]
                     death_time_lower_limit = AnimalBase.config['death_cull_prob'][i]
                     death_time_upper_limit = AnimalBase.config['death_cull_prob'][i+1]
-            n = (death_time_upper_limit-death_time_lower_limit) / (death_upper_limit-death_lower_limit)
-            self.future_death_date = round(death_time_lower_limit + n * (death_date_random - death_lower_limit) + self.days_born)
+            n = (death_time_upper_limit-death_time_lower_limit) / \
+                (death_upper_limit-death_lower_limit)
+            self.future_death_date = round(
+                death_time_lower_limit + n * (death_date_random - death_lower_limit) + self.days_born)
 
     def health_cull_update(self):
         """
@@ -1124,6 +1161,7 @@ class Cow(HeiferIII):
                     cull_reason_upper_limit = cull_reason_cull_prob[i + 1]
                     cull_time_lower_limit = AnimalBase.config['cull_day_count'][i]
                     cull_time_upper_limit = AnimalBase.config['cull_day_count'][i + 1]
-            x = (cull_time_upper_limit - cull_time_lower_limit) / (cull_reason_upper_limit - cull_reason_lower_limit)
+            x = (cull_time_upper_limit - cull_time_lower_limit) / \
+                (cull_reason_upper_limit - cull_reason_lower_limit)
             self.future_cull_date = round(
                 cull_time_lower_limit + x * (cull_time_rand - cull_reason_lower_limit) + self.days_born)

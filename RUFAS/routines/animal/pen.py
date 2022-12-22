@@ -9,12 +9,15 @@ Description: The class which represents a pen on the farm. Each pen has
 Author(s): Militsa Sotirova, militsasotirova@gmail.com
            Joseph Merhi, jm2257@cornell.edu
 """
+from RUFAS.output_manager import OutputManager
 from RUFAS.routines.animal.ration.calf_ration import optimize as calf_optimize
 from RUFAS.routines.animal.ration import ration_driver as ration_driver
 import copy
 from RUFAS.routines.animal.ration import animal_requirements as req
 from RUFAS import util, errors
 from enum import Enum
+
+om = OutputManager()
 
 
 class Pen:
@@ -378,6 +381,13 @@ class Pen:
 
             else:  # feeds and price
                 ration[key] = ration_per_animal[key] * num_animals
+        
+        info_map = {"class": self.__class__.__name__,
+                    "function": self.calc_ration.__name__, 
+                    "feed": feed, 
+                    "available_feeds": available_feeds, }
+        om.add_variable("pen_ration_data", self.ration, info_map)
+
         return ration
 
     def calc_manure(self, feed, methane_model):
@@ -437,6 +447,10 @@ class Pen:
         self.heifer_total = heifer_total
         self.dry_total = dry_total
         self.lactating_total = lactating_total
+        info_map = {"class": self.__class__.__name__,
+                    "function": self.calc_manure.__name__, 
+                    "feed": feed, }
+        om.add_variable("pen_manure_data", self.manure, info_map)
 
     def _copy_manure_template(self):
         return copy.deepcopy(self._manure_dict_template)
