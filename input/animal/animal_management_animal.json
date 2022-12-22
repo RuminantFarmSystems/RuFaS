@@ -23,7 +23,7 @@
 			"do_not_breed_time" : 300,
 			"cull_milk_production": 22,
 			"cow_times_milked_per_day": 1,
-			"NASEM_or_NRC_requirement_calculations": "NRC"
+			"NASEM_or_NRC_requirement_calculations": "NASEM"
 		},
 		"farm_level": {
 			"calf": {
