@@ -293,8 +293,8 @@ def test_percent_calculator() -> None:
 
 def test_get_time_based_suffix(mocker: MockerFixture) -> None:
     """Unit test for function _get_suffix in file output_manager.py"""
-    auto_suffix = "1669002803.9697945"
-    mocker.patch("time.time", return_value=auto_suffix)
+    auto_suffix = "1671674366502655500"
+    mocker.patch("time.time_ns", return_value=auto_suffix)
     om = OutputManager()
     assert om._get_time_based_suffix() == auto_suffix
 
@@ -317,8 +317,8 @@ def test_generate_key(mocker: MockerFixture) -> None:
     with raises(KeyError):
         om._generate_key("name", {})
 
-    auto_suffix = "1669002803.9697945"
-    mocker.patch("time.time", return_value=auto_suffix)
+    auto_suffix = "1671674366502655500"
+    mocker.patch("time.time_ns", return_value=auto_suffix)
 
     info_map = {"class": "dummy_class", "function": "dummy_func"}
     key = om._generate_key("key_name", info_map)
@@ -464,10 +464,10 @@ def test_save_all_pools(mock_output_manager: OutputManager,
 def test_generate_file_name(mocker: MockerFixture) -> None:
     """Unit test for function _generate_file_name in file output_manager.py"""
     om = OutputManager()
-    auto_suffix = "1669002803.9697945"
-    mocker.patch("time.time", return_value=auto_suffix)
+    auto_suffix = "1671674366502655500"
+    mocker.patch("time.time_ns", return_value=auto_suffix)
     name = om._generate_file_name("base_name", "json")
-    assert name == "base_name_1669002803.9697945.json"
+    assert name == f"base_name_{auto_suffix}.json"
 
 
 def test_save_variables(mock_output_manager: OutputManager,

@@ -234,7 +234,7 @@ class OutputManager (object):
         Returns a suffix for a key in the pool by using timestamp in ns.
         This guarantees that no name collision will happen.
         """
-        return str(time.time())
+        return str(time.time_ns())
 
     def _dict_to_file_json(self, dict: Dict[str, Any], path: str) -> None:
         """Saves a dictionary into a JSON file"""
