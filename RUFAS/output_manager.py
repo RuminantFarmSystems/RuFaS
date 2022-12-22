@@ -53,6 +53,15 @@ class OutputManager (object):
         values: List[Any] = []
         return {'info_maps': info_maps, 'values': values}
 
+    def _add_to_pool(self, pool: Dict[str, pool_element_type],
+                     key: str, value: Any, info_map: Dict[str, Any]) -> None:
+        """Adds value and info map at key in the given pool."""
+        key_not_exists_in_pool = pool.get(key) is None
+        if key_not_exists_in_pool:
+            pool[key] = self._pool_element_factory()
+        pool[key]['info_maps'].append(info_map)
+        pool[key]['values'].append(value)
+
     def add_variable(self, name: str, value: Any, info_map: Dict[str, Any]) -> None:
         """
         Adds a variable to the pool.
@@ -78,29 +87,7 @@ class OutputManager (object):
             Has no effect on manual prefix overrides.        
         """
         key = self._generate_key(name, info_map)
-        key_not_exists = self.variables_pool.get(key) is None
-        if key_not_exists:
-            self.variables_pool[key] = value
-            return
-        info_map["key"] = key
-        info_map["function"] = self.add_variable.__name__
-        info_map["class"] = self.__class__.__name__
-        if info_map.get("enforce_override", False):
-            self.variables_pool[key] = value
-            self.add_warning("key_collision",
-                             "Key collision happened; the value was overriden per given flag.",
-                             info_map)
-            return
-        if info_map.get("fail_silently", False):
-            self.add_error("key_collision",
-                           "Key collision happened; the event was ignored per given flag.",
-                           info_map)
-            return
-        raise ValueError(f"Key {key} already exists in the variables_pool."
-                         + "Consider using different name, prefix/suffix;"
-                         + "or turn the automated prefix/suffix generation on."
-                         + f"info_map is: {info_map}"
-                         )
+        self._add_to_pool(self.variables_pool, key, value, info_map)
 
     def add_log(self, name: str, msg: str, info_map: Dict[str, Any]) -> None:
         """
@@ -119,11 +106,8 @@ class OutputManager (object):
         info_map["function"] : str
             The name of the function which called this function 
         """
-        key = self._generate_key(name,
-                                 {
-                                     "class": info_map["class"],
-                                     "function": info_map["function"]})
-        self.logs_pool[key] = {"msg": msg, "info_map": info_map}
+        key = self._generate_key(name, info_map)
+        self._add_to_pool(self.logs_pool, key, msg, info_map)
 
     def add_warning(self, name: str, msg: str, info_map: Dict[str, Any]) -> None:
         """
@@ -142,11 +126,8 @@ class OutputManager (object):
         info_map["function"] : str
             The name of the function which called this function 
         """
-        key = self._generate_key(name,
-                                 {
-                                     "class": info_map["class"],
-                                     "function": info_map["function"]})
-        self.warnings_pool[key] = {"msg": msg, "info_map": info_map}
+        key = self._generate_key(name, info_map)
+        self._add_to_pool(self.warnings_pool, key, msg, info_map)
 
     def add_error(self, name: str, msg: str, info_map: Dict[str, Any]) -> None:
         """
@@ -165,11 +146,8 @@ class OutputManager (object):
         info_map["function"] : str
             The name of the function which called this function 
         """
-        key = self._generate_key(name,
-                                 {
-                                     "class": info_map["class"],
-                                     "function": info_map["function"]})
-        self.errors_pool[key] = {"msg": msg, "info_map": info_map}
+        key = self._generate_key(name, info_map)
+        self._add_to_pool(self.errors_pool, key, msg, info_map)
 
     def _generate_key(self, name: str,
                       info_map: Dict[str, Union[str, bool]]) -> str:
