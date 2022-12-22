@@ -180,7 +180,7 @@ class SlurryStorageOutdoor(BaseManureTreatment):
 
         """
 
-        avg_tempC = self._get_current_day_avg_tempC()
+        avg_tempC = self._get_current_day_average_temperature_celsius()
         CH4_loss = GasEmissions.calc_methane_emission_for_slurry_storage(
                 manure_total_solids=accumulated_manure_total_solids,
                 is_enclosed=False,  # This is what differs from the slurry storage underfloor
@@ -206,7 +206,7 @@ class SlurryStorageOutdoor(BaseManureTreatment):
                 NH3 emission is calculated, kg.
 
         """
-        avg_tempC = self._get_current_day_avg_tempC()
+        avg_tempC = self._get_current_day_average_temperature_celsius()
         NH3_loss = GasEmissions.calc_ammonia_emission(
                 num_animals=num_animals,
                 barn_area=barn_area,

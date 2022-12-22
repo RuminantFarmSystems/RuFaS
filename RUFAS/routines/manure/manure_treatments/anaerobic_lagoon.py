@@ -31,15 +31,15 @@ class AnaerobicLagoon(BaseManureTreatment):
         """
         return SludgeOutput(
                 sludge_manure_total_solids=manure_treatment_daily_input.liquid_manure_total_solids *
-                                           self.config.TS_removal_efficiency_for_treatment,
+                                           self.config.total_solids_removal_efficiency_for_treatment,
                 sludge_manure_total_volatile_solids=manure_treatment_daily_input.liquid_manure_total_volatile_solids
-                                                    * self.config.VS_removal_efficiency_for_treatment,
+                                                    * self.config.volatile_solids_removal_efficiency_for_treatment,
                 sludge_manure_nitrogen=manure_treatment_daily_input.liquid_manure_nitrogen *
-                                       self.config.N_removal_efficiency_for_treatment,
+                                       self.config.nitrogen_removal_efficiency_for_treatment,
                 sludge_manure_phosphorus=manure_treatment_daily_input.liquid_manure_phosphorus *
-                                         self.config.P_removal_efficiency_for_treatment,
+                                         self.config.phosphorus_removal_efficiency_for_treatment,
                 sludge_manure_potassium=manure_treatment_daily_input.liquid_manure_potassium *
-                                        self.config.K_removal_efficiency_for_treatment,
+                                        self.config.potassium_removal_efficiency_for_treatment,
                 sludge_manure_daily_volume=manure_treatment_daily_input.liquid_manure_total_volatile_solids * 0.03 /
                                            1000.0
         )
@@ -103,7 +103,7 @@ class AnaerobicLagoon(BaseManureTreatment):
             new_accumulated_TAN: The new accumulated TAN in the lagoon, kg.
 
         """
-        avg_tempC = self._get_current_day_avg_tempC()
+        avg_tempC = self._get_current_day_average_temperature_celsius()
         NH3_loss = GasEmissions.calc_ammonia_emission(
                 num_animals=num_animals,
                 barn_area=barn_area,

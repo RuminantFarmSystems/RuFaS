@@ -70,7 +70,7 @@ class BaseManureTreatment(ABC):
         final_manure_volume = (manure_treatment_daily_input.liquid_manure_daily_volume -
                                (
                                        manure_treatment_daily_input.liquid_manure_total_solids *
-                                       self.config.TS_removal_efficiency_for_treatment) /
+                                       self.config.total_solids_removal_efficiency_for_treatment) /
                                1000.0)
 
         return ManureTreatmentDailyOutput(
@@ -78,22 +78,22 @@ class BaseManureTreatment(ABC):
                 pen_id=manure_treatment_daily_input.pen_id,
                 liquid_manure_total_ammoniacal_nitrogen=(
                         manure_treatment_daily_input.liquid_manure_total_ammoniacal_nitrogen *
-                        (1 - self.config.TAN_removal_efficiency_for_treatment)),
+                        (1 - self.config.total_ammoniacal_nitrogen_removal_efficiency_for_treatment)),
                 liquid_manure_nitrogen=(
                         manure_treatment_daily_input.liquid_manure_nitrogen *
-                        (1 - self.config.N_removal_efficiency_for_treatment)),
+                        (1 - self.config.nitrogen_removal_efficiency_for_treatment)),
                 liquid_manure_total_solids=(
                         manure_treatment_daily_input.liquid_manure_total_solids *
-                        (1 - self.config.TS_removal_efficiency_for_treatment)),
+                        (1 - self.config.total_solids_removal_efficiency_for_treatment)),
                 liquid_manure_total_volatile_solids=(
                         manure_treatment_daily_input.liquid_manure_total_volatile_solids *
-                        (1 - self.config.VS_removal_efficiency_for_treatment)),
+                        (1 - self.config.volatile_solids_removal_efficiency_for_treatment)),
                 liquid_manure_phosphorus=(
                         manure_treatment_daily_input.liquid_manure_phosphorus *
-                        (1 - self.config.P_removal_efficiency_for_treatment)),
+                        (1 - self.config.phosphorus_removal_efficiency_for_treatment)),
                 liquid_manure_potassium=(
                         manure_treatment_daily_input.liquid_manure_potassium *
-                        (1 - self.config.K_removal_efficiency_for_treatment)),
+                        (1 - self.config.potassium_removal_efficiency_for_treatment)),
                 final_manure_volume=final_manure_volume,
         )
 
@@ -135,7 +135,7 @@ class BaseManureTreatment(ABC):
     def calc_NH3_emission(self, *args, **kwargs) -> float:
         return 0.0
 
-    def _get_current_day_avg_tempC(self) -> float:
+    def _get_current_day_average_temperature_celsius(self) -> float:
         return self.weather.T_avg[self.time.year - 1][self.time.day - 1]
 
     def _get_current_day_rainfall(self) -> float:

@@ -36,14 +36,14 @@ class ManureTreatmentDailyOutput(LiquidManurePortionProtocol):
     storage_methane: float = 0.0
     storage_ammonia: float = 0.0
 
-    # Extra variables for development purposes
-    # Will be removed when done
     sludge_manure_total_solids: float = 0.0
     sludge_manure_total_volatile_solids: float = 0.0
     sludge_manure_nitrogen: float = 0.0
     sludge_manure_phosphorus: float = 0.0
     sludge_manure_potassium: float = 0.0
     sludge_manure_daily_volume: float = 0.0
+
+    # Temporary variables used for making plots
     accumulated_sludge_volume: float = 0.0
     accumulated_final_manure_volume: float = 0.0
 
@@ -67,15 +67,6 @@ class ManureTreatmentDailyOutput(LiquidManurePortionProtocol):
         return ManureTreatmentDailyOutput(*[
             attr1 + attr2 for attr1, attr2 in zip(astuple(self), astuple(other))
         ])
-
-    def clone(self) -> ManureTreatmentDailyOutput:
-        """Creates a copy of this object.
-
-        Returns:
-            A copy of this object.
-
-        """
-        return ManureTreatmentDailyOutput(*astuple(self))
 
 
 @dataclass

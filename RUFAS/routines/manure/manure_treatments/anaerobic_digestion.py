@@ -36,12 +36,18 @@ class AnaerobicDigestion(BaseManureTreatment):
 
         """
         return SludgeOutput(
-                sludge_manure_total_solids=manure_treatment_daily_input.liquid_manure_total_solids * self.config.TS_removal_efficiency_for_treatment,
-                sludge_manure_total_volatile_solids=manure_treatment_daily_input.liquid_manure_total_volatile_solids * self.config.VS_removal_efficiency_for_treatment,
-                sludge_manure_nitrogen=manure_treatment_daily_input.liquid_manure_nitrogen * self.config.N_removal_efficiency_for_treatment,
-                sludge_manure_phosphorus=manure_treatment_daily_input.liquid_manure_phosphorus * self.config.P_removal_efficiency_for_treatment,
-                sludge_manure_potassium=manure_treatment_daily_input.liquid_manure_potassium * self.config.K_removal_efficiency_for_treatment,
-                sludge_manure_daily_volume=manure_treatment_daily_input.liquid_manure_total_volatile_solids * 0.03 / 1000.0
+                sludge_manure_total_solids=(manure_treatment_daily_input.liquid_manure_total_solids *
+                                            self.config.total_solids_removal_efficiency_for_treatment),
+                sludge_manure_total_volatile_solids=(manure_treatment_daily_input.liquid_manure_total_volatile_solids
+                                                     * self.config.volatile_solids_removal_efficiency_for_treatment),
+                sludge_manure_nitrogen=(manure_treatment_daily_input.liquid_manure_nitrogen *
+                                        self.config.nitrogen_removal_efficiency_for_treatment),
+                sludge_manure_phosphorus=(manure_treatment_daily_input.liquid_manure_phosphorus *
+                                          self.config.phosphorus_removal_efficiency_for_treatment),
+                sludge_manure_potassium=(manure_treatment_daily_input.liquid_manure_potassium *
+                                         self.config.potassium_removal_efficiency_for_treatment),
+                sludge_manure_daily_volume=(manure_treatment_daily_input.liquid_manure_total_volatile_solids * 0.03 /
+                                            1000.0)
         )
 
     def _accumulate_daily_sludge_output(self, daily_sludge_output: SludgeOutput) -> None:
@@ -101,7 +107,7 @@ class AnaerobicDigestion(BaseManureTreatment):
                 total_daily_mass=final_manure_volume,
                 TS=self._manure_handler_daily_output.liquid_manure_total_solids
         )
-        avg_tempC = self._get_current_day_avg_tempC()
+        avg_tempC = self._get_current_day_average_temperature_celsius()
         input_energy_heating = (self._calc_specific_input_energy(avg_tempC, moisture_content) *
                                 final_manure_volume *
                                 GeneralConstants.LITERS_TO_CUBIC_METERS)
@@ -117,7 +123,8 @@ class AnaerobicDigestion(BaseManureTreatment):
         top_cover_volume = minimum_digester_volume * self.config.top_cover_volume_fraction
 
         anaerobic_digestion_daily_output = AnaerobicDigestionOutput(
-                biogas=self.config.biogas_gen_ratio * self._manure_handler_daily_output.liquid_manure_total_volatile_solids,
+                biogas=self.config.biogas_generation_ratio *
+                       self._manure_handler_daily_output.liquid_manure_total_volatile_solids,
                 input_energy_heating=input_energy_heating,
                 evaporated_water=self.config.evaporation_fraction * final_manure_volume,
                 methane_generation_volume=methane_generation_volume,
@@ -163,9 +170,11 @@ class AnaerobicDigestion(BaseManureTreatment):
         """
         effluent_temperature = self._bound_influent_temperature(avg_tempC)
         heat_capacity_influent = self._calc_heat_capacity_manure(avg_tempC, moisture_content)
-        heat_capacity_AD = self._calc_heat_capacity_manure(self.config.AD_temp_set_point, moisture_content)
+        heat_capacity_AD = self._calc_heat_capacity_manure(self.config.anaerobic_digestion_temperature_set_point,
+                                                           moisture_content)
         avg_heat_capacity = (heat_capacity_influent + heat_capacity_AD) / 2
-        input_energy_heating = avg_heat_capacity * (self.config.AD_temp_set_point - effluent_temperature)
+        input_energy_heating = avg_heat_capacity * (
+                    self.config.anaerobic_digestion_temperature_set_point - effluent_temperature)
         return input_energy_heating
 
     @classmethod
