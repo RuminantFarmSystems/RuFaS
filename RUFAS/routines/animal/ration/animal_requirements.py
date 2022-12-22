@@ -12,7 +12,7 @@ from RUFAS.routines.animal.life_cycle.animal_base import AnimalBase
 def calc_rqmts(BW, MW, DOP, animal_type, parity=None, CI=None , TP_Milk=None, Fat_Milk=None,
                 Lactose_Milk=None, Milk=None, DIM=None, lactating=None,
                 BCS5= None, PrevTemp = None,
-                ADG_heifer = None, Age = None):
+                ADG_heifer = None, Age = None, NDF_conc = 0.3):
     """
     Calculates the dietary requirements of a single animal. These values are used
     on the RHS of the linear program and furthermore will be used in constraint
@@ -51,15 +51,14 @@ def calc_rqmts(BW, MW, DOP, animal_type, parity=None, CI=None , TP_Milk=None, Fa
     
     # --------------------------------------------
     if AnimalBase.config['NASEM_or_NRC_requirement_calculations'] == 'NASEM':
-        DMIest = calculate_DMI_NASEM(BW, MW, DIM, lactating, NEl, BCS5, parity)
-        NEmaint, GrUterW, UterW = calculate_NASEM_energy_maintenance_requirements(BW, MW, DOP, DIM)
-        NEg, ADG, Frame_Weight_Gain_g = calculate_NASEM_energy_growth_requirements(BW, housing, distance)
-        NEpreg, GrUterWGain = calculate_NASEM_energy_pregnancy_requirements(lactating, DOP, DIM, GrUterW, UterW)
         NEl = calculate_NASEM_energy_lactation_requirements(animal_type, Fat_Milk, TP_Milk, Lactose_Milk, Milk)
-
-        MP_req = calculate_NASEM_protein_requirements(lactating, BW, NDF_conc, Frame_Weight_Gain_g, GrUterWGain, DMIest, TP_Milk, Milk)
+        DMIest = calculate_DMI_NASEM(BW, MW, DIM, lactating, NEl, parity, BCS5)
+        NEmaint, GrUterW, UterW = calculate_NASEM_energy_maintenance_requirements(BW, MW, DOP, DIM)
+        NEg, ADG, Frame_Weight_Gain_g = calculate_NASEM_energy_growth_requirements(BW, MW, ADG_heifer, animal_type, parity, CI)
+        NEpreg, GrUterWGain = calculate_NASEM_energy_pregnancy_requirements(lactating, DOP, DIM, GrUterW, UterW)
+        MP_req = calculate_NASEM_protein_requirements(lactating, BW, Frame_Weight_Gain_g, GrUterWGain, DMIest, TP_Milk, Milk)
         Ca_req = calculate_NASEM_calcium_requirements(BW, MW, DOP, ADG, DMIest, TP_Milk, Milk)
-        P_req = calculate_NASEM_P_requirements(BW, MW, animal_type, DOP, ADG_heifer, DMIest, TP_Milk, Milk)
+        P_req = calculate_NASEM_P_requirements(BW, MW, animal_type, DOP, ADG, DMIest, TP_Milk, Milk)
 
     elif AnimalBase.config['NASEM_or_NRC_requirement_calculations'] == 'NRC':
         NEmaint, CW, CBW = calculate_NRC_energy_maintenance_requirements(BW, MW, DOP, BCS5, PrevTemp, animal_type)
@@ -110,13 +109,16 @@ def calculate_NRC_energy_maintenance_requirements(BW, MW, DOP, BCS5, PrevTemp, a
         NEmaint = (BW-CW)**(0.75) * (0.086*(0.8+ (BCDS9 - 1) * 0.5)) + 0.0007*(20-PrevTemp)
     return NEmaint, CW, CBW
 
-def calculate_NASEM_energy_maintenance_requirements(BW, MW, DOP, DIM):
-    NEmaint = []
+def calculate_NASEM_energy_maintenance_requirements(BW, MW, DOP: int|None, DIM):
+    """
+    Calculates the net energy for maintenance requirement portion of the energy
+    requirements for animals.
+
+    Arg(s):
     # Maintenance requirement is calculated based on:
     # metabolic body weight (MBW; body weight0.75), gain in pregnancy tissues, and activity (locomotion).
     #CBW = input variable; otherwise MW * 0.06275
     # where, CBW = Calf birth weight (kg); MW = Mature body weight (kg)
-    CBW = MW * 0.06275
 
     # CBW = Calf birth weight (kg) can be estimated using the equation above,
     # otherwise there is an input variable depending on breed. Holstein = 42 kg; Jersey = 31 kg
@@ -128,8 +130,6 @@ def calculate_NASEM_energy_maintenance_requirements(BW, MW, DOP, DIM):
 
     # GrUterW = (CBW * 1.825) *  〖exp〗 ** (-0.0243 - (0.0000245 * DayGest) * (280 - DayGest))
     # UterW = ((CBW * 0.2288) * 〖exp〗** (-0.2*DIM)) )+0.204)
-    GrUterW = (CBW * 1.825) * math.exp(-0.0243 - (0.0000245 * DOP) * (280 - DOP))
-    UterW = ((CBW * 0.2288) * math.exp(-0.2*DIM)) + 0.204
 
     # where,
     # DGest = Day of gestation (this must be between 12 and 280 DGest)
@@ -138,18 +138,31 @@ def calculate_NASEM_energy_maintenance_requirements(BW, MW, DOP, DIM):
     # UterW = Uterine weight
 
     # NEmaint=〖0.10*(BW-GrUterW - UterW)〗**0.75
-    NEmaint=(0.10*(BW-GrUterW - UterW))**0.75
     # This formula is for normal activity in confinement conditions,
     # otherwise adjustments for activity requirement under grazing conditions should be included (Celina module?)
     # NEmaint = Net energy for maintenance requirement, Mcal NEL/day
+    """
+    if DOP==None:
+        NEmaint=0.10*(BW)**0.75
+        GrUterW=0
+        UterW=0
+    else:
+        CBW = MW * 0.06275
+        GrUterW = (CBW * 1.825) * math.exp(-0.0243 - (0.0000245 * DOP) * (280 - DOP))
+        if DIM == None: DIM = 0
+        UterW = ((CBW * 0.2288) * math.exp(-0.2*DIM)) + 0.204
+        NEmaint=0.10*(BW-GrUterW - UterW)**0.75
     return NEmaint, GrUterW, UterW
 
 def calculate_NRC_energy_activity_requirements():
     pass
 
 def calculate_NASEM_energy_activity_requirements(BW, housing, distance):
+    """
+    Calculates the net energy for maintenance requirement portion of the energy
+    requirements for animals.
+
     #(NEa, Horiz_Locomotion, DistParlor*NtripsParlor, Positive_Vert_Locom,Graz_Act, km_Vert_Dist, nonpasturekgDMI):
-    pass
     # Activity requirement (NEa) is proportional to body weight and daily walking distance.
     # The maintenance requirement is assumed to provide adequate energy for normal activity of cows in confinement.
     # Grazing system and hilly topography will cost additional energy.
@@ -170,12 +183,17 @@ def calculate_NASEM_energy_activity_requirements(BW, housing, distance):
     # nonpasturekgDMI = consumption of concentrate supplement, kg/day (on a DM basis)
 
     # NEa =	Horiz_Locomotion + Positive_Vert_Locom + Grazing_Act
-    if housing == 'Barn':
-        NEa = distance * 0.00035 * BW  # TODO ASK K.Reed how to implement this
-    else:
-        nonpasturekgDMI = 9999 # TODO not DMIest, but the remainder DMI after grazing - requires implementation
-        NEa = distance * BW * 0.75 * ((600-12*nonpasturekgDMI))/600
     # NEa = Total net energy requirement for activity, Mcal NEL/day
+    Arg(s):
+    """    
+    if housing == 'Barn':
+        NEa = distance * 0.00035 * BW  # TODO This logic is the same as NRC \
+                # following instructions by Edward C.G., but can or should be updated according to Kristan R.
+    elif housing =='Grazing':
+        nonpasturekgDMI = 1 # TODO This will be the DMI supplemented after grazing - requires implementation with grazing module
+        NEa = distance * BW * 0.75 * ((600-12*nonpasturekgDMI))/600
+    else:
+        NEa = 0
     return NEa
 
 def calculate_NRC_energy_growth_requirements(BW, MW, CW, animal_type, parity, CI, ADG_heifer):
@@ -222,14 +240,38 @@ def calculate_NRC_energy_growth_requirements(BW, MW, CW, animal_type, parity, CI
     return NEg, ADG, EQSBW
 
 def calculate_NASEM_energy_growth_requirements(BW, MW, ADG_heifer, animal_type, parity, CI):
+    """
     # In NASEM (2021), body frame gain (fat + protein) corresponds to the true growth and it is part
     # of the calculation which is further partitioned to body reserves or condition gain (or loss),
     # and pregnancy-associated gain (considered a pregnancy requirement).
-
     # EBW =	0.85*BW
     # EBW = Empty body weight (without digesta contents), kg
     # TODO UPDATE THE ADG CALCS? THIS IS THE SAME AS THE NRC, EDWARD THINKS OK FOR NOW
     # Mature shrunk body weight (kg)
+    MSBW = 0.96 * MW
+    # [A.Heifer.A.12]
+    # Average Daily Gain (kg)
+    # EBG = 0.85*ADG
+    # EBG = Empty body weight gain, kg/day
+    # ADG = Average daily gain, kg/day
+    # FatADG =(0.067 + 0.375*(BW/MW))*EBG/ADG
+    # FatADG = Fat constituent of average daily gain, g/g
+    # EBG = Empty body weight gain, kg/day
+    # ADG = Average daily gain, kg/day
+    # FatADG =(0.067 + 0.375*(BW/MW))*EBG/ADG
+    # FatADG = Fat constituent of average daily gain, g/g
+    # ProtADG=(0.201 + 0.081*(BW/MW))*EBG/ADG
+    # ProtADG = Protein constituent of average daily gain, g/g
+    # REFADG = 9.4*FatADG+5.55*ProtADG
+    # REFADG = Retained energy of frame ADG, Mcal/kg
+    # MEFrameADG= REFADG/0.4
+    # MEFrameADG = Metabolizable energy for frame ADG, Mcal/kg. The value 0.4
+    # is assumed to be the efficiency of converting feed ME to NE for gain (NEg).
+    # NElFrameADG= REFADG/0.61
+    # NElFrameADG = Net energy for frame ADG, Mcal/kg.
+    # The efficiency of converting NEl to NEg is based on the conversions of 0.40 for ME to NEg
+    # and 0.66 for ME to NEl and is thus 0.40/0.66 = 0.61.
+    """
     MSBW = 0.96 * MW
     if animal_type == 'cow':
         if parity == 1 and CI != 0:
@@ -238,37 +280,17 @@ def calculate_NASEM_energy_growth_requirements(BW, MW, ADG_heifer, animal_type, 
             ADG = ((1 - 0.92) * MSBW) / CI
         else:
             ADG = 0
-    # [A.Heifer.A.12]
-    # Average Daily Gain (kg)
     elif animal_type == 'heifer':
         ADG = max(ADG_heifer, 0)
-    # EBG = 0.85*ADG
+    else: ADG = 0
+    # ADGg = ADG/0.001 # converting to g
     EBG = 0.85*ADG
-    # EBG = Empty body weight gain, kg/day
-
-    # ADG = Average daily gain, kg/day
-    # FatADG =(0.067 + 0.375*(BW/MW))*EBG/ADG
-    # FatADG = Fat constituent of average daily gain, g/g
+    if ADG ==0: ADG = 0.0001 # TODO check this logic, simply to avoid div0 error
     FatADG = (0.067 + 0.375*(BW/MW))*EBG/ADG
-
-    # ProtADG=(0.201 + 0.081*(BW/MW))*EBG/ADG
-    # ProtADG = Protein constituent of average daily gain, g/g
-    ProtADG=(0.201 + 0.081*(BW/MW))*EBG/ADG
-
+    ProtADG = (0.201 - 0.081*(BW/MW))*EBG/ADG
     Frame_Weight_Gain_g = FatADG + ProtADG
-    # REFADG = 9.4*FatADG+5.55*ProtADG
-    # REFADG = Retained energy of frame ADG, Mcal/kg
-    REFADG = 9.4*FatADG+5.55*ProtADG
-
-    # MEFrameADG= REFADG/0.4
-    # MEFrameADG = Metabolizable energy for frame ADG, Mcal/kg. The value 0.4
-    # is assumed to be the efficiency of converting feed ME to NE for gain (NEg).
-    MEFrameADG= REFADG/0.4
-
-    # NElFrameADG= REFADG/0.61
-    # NElFrameADG = Net energy for frame ADG, Mcal/kg.
-    # The efficiency of converting NEl to NEg is based on the conversions of 0.40 for ME to NEg
-    # and 0.66 for ME to NEl and is thus 0.40/0.66 = 0.61.
+    REFADG = (9.4*FatADG + 5.55*ProtADG)*ADG
+    MEFrameADG= REFADG/0.4 # Possible future use for this calc, see docstring notes
     NEg= REFADG/0.61
     return NEg, ADG, Frame_Weight_Gain_g
 
@@ -289,6 +311,7 @@ def calculate_NRC_energy_pregnancy_requirements(DOP, CBW):
     return NEpreg
 
 def calculate_NASEM_energy_pregnancy_requirements(lactating, DOP, DIM, GrUterW, UterW):
+    """
     # (GrUterWGain1, DayGEst, GrUterW, GrUterWGain2, DIM, GrUterW, UterW, NElPreg)                                                  ):
     # Daily rates of wet tissue deposition(kg/day) are derived from equations previously described in the maintenance
     # requirements section.
@@ -298,14 +321,6 @@ def calculate_NASEM_energy_pregnancy_requirements(lactating, DOP, DIM, GrUterW, 
     # GrUterWGain2 = –0.2 * DIM * (UterW – 0.204)
     # GrUterWGain2 = -0.2 * DIM * (UterW - 0.204)
     # NElPreg  = GrUterWGain * (0.882 / 0.14) * 0.66
-
-    if lactating: # and after the first month?
-        GrUterWGain = -0.2 * DIM * (UterW - 0.204)
-    elif DOP>12:
-        GrUterWGain = (0.0243 - (0.0000245 * DOP)) *GrUterW
-    else:
-        GrUterWGain = 0
-    NEpreg = GrUterWGain * (0.882 / 0.14) * 0.66
 
     # where,
     # DGest = Day of gestation (this must be between 12 and 280 DGest)
@@ -317,6 +332,15 @@ def calculate_NASEM_energy_pregnancy_requirements(lactating, DOP, DIM, GrUterW, 
     # NElPreg = Net energy (lactation) requirement for pregnancy, Mcal NEL/d.
     # Assumptions: tissue contains 0.882 Mcal of energy / kg; an ME to gestation energy efficiency of 0.14;
     # and ME to NEl efficiency of 0.66.MEpreg = Metabolizable energy requirement for pregnancy, Mcal NEl/day
+
+    """
+    if lactating: # and after the first month?
+        GrUterWGain = -0.2 * DIM * (UterW - 0.204)
+    elif DOP==None:
+        GrUterWGain = 0        
+    else:
+        GrUterWGain = (0.0243 - (0.0000245 * DOP)) *GrUterW
+    NEpreg = GrUterWGain * (0.882 / 0.14) * 0.66
     return NEpreg, GrUterWGain
 
 def calculate_NRC_energy_lactation_requirements(animal_type, Fat_Milk, TP_Milk, Lactose_Milk, Milk):
@@ -334,14 +358,17 @@ def calculate_NRC_energy_lactation_requirements(animal_type, Fat_Milk, TP_Milk, 
     return NEl
 
 def calculate_NASEM_energy_lactation_requirements(animal_type, Fat_Milk, TP_Milk, Lactose_Milk, Milk):
+    """
+    Calculating energy requirements for lactation, following NRC (Unchanged in NASEM)
     # Lactation requirement
     # ---------------------
+    # [A.Cow.A.17]
+    # Milk energy (Mcal/kg of milk production)
+    # [A.Cow.A.18]
+    # Net energy requirement for lactation (Mcal)
+    """
     if animal_type == 'cow':
-        # [A.Cow.A.17]
-        # Milk energy (Mcal/kg of milk production)
         Milken = 0.0929 * Fat_Milk + (0.0547 / 0.93) * TP_Milk + 0.0395 * Lactose_Milk
-        # [A.Cow.A.18]
-        # Net energy requirement for lactation (Mcal)
         NEl = Milken * Milk
     else:
         NEl = 0
@@ -400,10 +427,8 @@ def calculate_NRC_protein_requirements(BW,MW,CW,DOP,animal_type,Milk,TP_Milk, CB
         MP_req = MPm + MPg + MPpreg
     return MP_req
 
-
- # TODO get  the NDF_conc
-
-def calculate_NASEM_protein_requirements(lactating, BW, NDF_conc, Frame_Weight_Gain_g, GrUterWGain, DMIest, TP_Milk, Milk):
+def calculate_NASEM_protein_requirements(lactating, BW, Frame_Weight_Gain_g, GrUterWGain, DMIest, TP_Milk, Milk):
+    """
     # An overall description is provided here.
 
     # As in NRC (2021), the protein requirement is also divided into 4 components: maintenance, growth, pregnancy,
@@ -429,9 +454,8 @@ def calculate_NASEM_protein_requirements(lactating, BW, NDF_conc, Frame_Weight_G
     # to obtain requirements in terms either of total metabolizable protein (MP) or total metabolizable aminoacids.
 
     # Scurf
-    # NPscurf=0.20×BW**(0.60)×0.85
-    NPscurf=0.20*BW**(0.60)*0.85
-    # NetAA-scurf= NPscurf×[AACorrScurf]/100
+    # NPscurf=0.20*BW**(0.60)*0.85
+    # NetAA-scurf= NPscurf*[AACorrScurf]/100
 
     # Where, NPscurf= Net protein requirement for scurf in grams per day: BW = body weight in kg;
     # NetAA-scurf = Net AA demand for scurf excretion in grams per day.
@@ -439,9 +463,8 @@ def calculate_NASEM_protein_requirements(lactating, BW, NDF_conc, Frame_Weight_G
     # to column four in Table 6-2 (page 79) in the NASEM (2021) book.
 
     # Endogenous urinary excretion
-    # NPEndUrin= 53×6.25 ×BW ×0.001
-    NPEndUrin= 53*6.25 * BW * 0.001
-    # NetAAEndUrin= 0.010×6.25×BW×[AACorrWholeEmptyBody]/100
+    # NPEndUrin= 53*6.25 *BW *0.001
+    # NetAAEndUrin= 0.010*6.25*BW*[AACorrWholeEmptyBody]/100
 
     # Where, NPEndUrin =  Net protein requirement for endogenous urinary excretion;
     # NetAAEndUrin= Net aminoacids requirement for endogenous urinary excretion.
@@ -451,22 +474,16 @@ def calculate_NASEM_protein_requirements(lactating, BW, NDF_conc, Frame_Weight_G
     # Metabolic fecal protein
     # The daily loss of CP as metabolic fecal protein (MFP) is estimated using the following equation.
 
-    # CPMFP=(11.62+0.134×NDF)×DMI)
-    if NDF_conc == None:
-        NDF_conc = 0.3 # TODO CHECK THIS LOGIC< IMPORT NDF_conc 
-        # 0.45 heifers
-        # 0.25 vacas
-    CPMFP=(11.62+0.134*NDF_conc)*DMIest
-
+    # CPMFP=(11.62+0.134*NDF)*DMI)
+    
     # Where, CPMFP = Crude protein (CP) in metabolic fecal protein MFP in grams per day;
     # NDF = Neutral detergent fiber in the diet, as a % on dry matter basis; DMI = Dry matter intake, kg/d
 
-    # NPMFP=CPMFP×0.73
-    NPMFP=CPMFP*0.73
+    # NPMFP=CPMFP*0.73
     # Where, NPMFP = Net protein requirement for metabolic fecal protein in grams per day;
     # there is an assumption: 73 percent of true protein (TP) in MFP.
 
-    # NetAAMFP= NPMFP×[AACorrMFP]/100
+    # NetAAMFP= NPMFP*[AACorrMFP]/100
     # Where, NetAAMFP= Net aminoacids requirement for metabolic fecal protein in grams per day;
     # AACorrMFP = aminoacids corrected for MFP. There is a fixed value for each individual aminoacid in column six
     # in Table 6-2 (page 79)in the NASEM (2021) book.
@@ -474,24 +491,22 @@ def calculate_NASEM_protein_requirements(lactating, BW, NDF_conc, Frame_Weight_G
     # GROWTH REQUIREMENT
     # There are two important concepts: frame growth and BW changes related to mobilization of body reserves.
 
-    # NPGrowth= FrameWG×0.11×0.86
-    NPGrowth= Frame_Weight_Gain_g*0.11*0.86
-
+    # NPGrowth= FrameWG*0.11*0.86
+    
     # Where,NPGrowth= Net protein requirement for body frame weight gain in grams per day.
     # If the change in BW is not frame growth but rather a change in body reserves, the protein content
     # is assumed to be 8.0 percent protein. In that case, 0.11 coefficient should be replaced  by 0.08
     # in the above equation.
 
-    # NetAAGrowth= NPgrowth×[AAcorrWholeEmptyBW]/100
+    # NetAAGrowth= NPgrowth*[AAcorrWholeEmptyBW]/100
 
     # Where, NetAAGrowth = Net aminoacids requirement for body frame weight gain in grams per day.
     # AACorrWholeEmptyBody = For each individual aminoacid, a fixed value for each AA excreted as whole empty body
     # is assumed according to column five in Table 6-2 (page 79) in the NASEM (2021) book.
 
     # PREGNANCY REQUIREMENT
-    # NPGest=GainGrUter×125
-    NPGest=GrUterWGain * 125
-    # NetAAGest=NPGest×[AAcorrWholeEmptyBW]/100
+    # NPGest=GainGrUter*125
+    # NetAAGest=NPGest*[AAcorrWholeEmptyBW]/100
 
     # Where, NPGest= Net protein requirement for pregnancy in grams per day; GainGrUter = daily gain in mass of the
     # gravid uterus in kilograms per day.
@@ -505,8 +520,7 @@ def calculate_NASEM_protein_requirements(lactating, BW, NDF_conc, Frame_Weight_G
 
     # NPMilk = net protein in milk. This refers to milk true protein (TP) yield in grams per day.
     # NPMilk = net protein in milk. This refers to milk true protein (TP) yield in grams per day.
-    NPMilk = TP_Milk * Milk*1000 # TODO CHECK THAT TP_MILK is in % or 0.1 decimal percent etc.
-
+    
     # NetAA-Milk = NPMilk * [AAcalcMilk]/100
 
     # Where, NetAA-Milk = Net aminoacids yield in milk in grams per day;
@@ -529,15 +543,33 @@ def calculate_NASEM_protein_requirements(lactating, BW, NDF_conc, Frame_Weight_G
 
     # Recom-IndAASupply2 = [(NetAA-scurf + NetAAMFP) / TargetEffAA] + (NetAAGest/0.33) + (NetAAGrowth/0.40) +
     # NetAAEndUrin
+    # TargetEffMP and TargetEffAA= Proposed target efficiencies of converting metabolizable protein (MP) and
+    # essential aminoacids (EAA) to export proteins and body gain. See Table 6-4 in page 88 in the NASEM (2021) book.
     TargetEffMP = 0.69 # from NASEM 2021
+    """
+    NPscurf=0.20*BW**(0.60)*0.85
+    NPEndUrin= 53*6.25 * BW * 0.001
+    NDF_conc = 0.3
+    # TODO get the correct NDF_conc
+    # In pen.py, cow.py, heiferI, II, III, ration_driver. add the variable to the calc_rqmts call each time
+    # something like: 
+    # NDF_conc = conc['NDF']
+    # amount, conc = ration_report(self.ration, feed.available_feeds)
+    CPMFP = (11.62+0.134*NDF_conc)*DMIest
+    NPMFP = CPMFP*0.73
+    NPGrowth = Frame_Weight_Gain_g*0.11*0.86
+    NPGest = GrUterWGain * 125
+    if TP_Milk==None: TP_Milk = 0
+    if Milk==None: Milk = 0
+    NPMilk = TP_Milk*Milk*1000 # TODO CHECK THAT TP_MILK is in % or 0.1 decimal percent etc.
+    TargetEffMP = 0.69
     if lactating: # TODO COPY THE LOGIC FROM PREVIOUS and from NRC
-        MP_req = [(NPscurf + NPMFP + NPMilk + NPGrowth) / TargetEffMP] + (NPGest/0.33) + NPEndUrin
+        MP_req = ((NPscurf + NPMFP + NPMilk + NPGrowth) / TargetEffMP) + (NPGest/0.33) + NPEndUrin
     else:
         # ESTE PARA GESTACION TARDIAS - DESPUES DE 190 mas o menos - o heifer
         MP_req = (NPscurf + NPMFP) / TargetEffMP + (NPGest/0.33) + (NPGrowth/0.40) + NPEndUrin
+    MP_req = MP_req/100 # correcting the units g/kg 
     return MP_req
-    # TargetEffMP and TargetEffAA= Proposed target efficiencies of converting metabolizable protein (MP) and
-    # essential aminoacids (EAA) to export proteins and body gain. See Table 6-4 in page 88 in the NASEM (2021) book.
 
 def calculate_NRC_calcium_requirements(BW, MW, DOP, animal_type, lactating, ADG, Milk):
     # C: MINERAL REQUIREMENTS
@@ -583,17 +615,16 @@ def calculate_NRC_calcium_requirements(BW, MW, DOP, animal_type, lactating, ADG,
     return Ca_req
 
 def calculate_NASEM_calcium_requirements(BW, MW, DOP, ADG, DMIest, TP_Milk, Milk):
+    """
     # MAINTENANCE REQUIREMENT
 
     # Ca_Maint = 0.90*DMI
-    Ca_Maint = 0.90*DMIest
     # Where, Ca_Maint = Calcium requirements for maintenance in grams per day; DMI = dry matter intake in kg/day.
     # This equation applies to all metabolic stages
 
     # GROWTH REQUIREMENT
 
     # Ca_Growth =  (9.83 * MW**-0.22) * BW**-0.22) *ADG
-    Ca_Growth =  ((9.83 * MW**-0.22) * BW**-0.22)*ADG 
     # Where, Ca_Growth = Calcium requirements for growth in grams per day; MW = mature body weight in kg;
     # ADG = average daily gain in grams per day.
 
@@ -602,9 +633,6 @@ def calculate_NASEM_calcium_requirements(BW, MW, DOP, ADG, DMIest, TP_Milk, Milk
     # If DOP (days of pregnancy are > 190, use the following equation
     # Ca_Preg = (0.02456 * exp((0.05581-0.00007*DOP)*DOP) - 0.02456 * exp ((0.05581-0.00007*(DOP-1)) * (DOP - 1))
     #           * (BW/715).
-    Ca_Preg = 0.02456 * math.exp((0.05581-0.00007*DOP)*DOP) - 0.02456 * \
-        math.exp ((0.05581-0.00007*(DOP-1)) * (DOP - 1)) * (BW/715) 
-
     # Where, Ca_Preg = Calcium requirements for pregnancy in grams per day; DOP = days of pregnancy; BW = Body weight
     # in kg; 715 is the average cow weight in the study by House and Bell (1993); therefore, pregnancy (gestation)
     # requirement is scaled to that BW. For details see Page 107 in Minerals chapter of NASEM (2021) book.
@@ -613,15 +641,25 @@ def calculate_NASEM_calcium_requirements(BW, MW, DOP, ADG, DMIest, TP_Milk, Milk
     # LACTATION REQUIREMENT
 
     # Ca_Lact = (0.295 + 0.239 * MilkTP) * Milk
-    Ca_Lact = (0.295 + 0.239 * TP_Milk) * Milk
     # Where, Ca_Lact = Calcium requirement for lactation in grams per day; MilkTP = Milk true protein percent;
     # Milk = daily milk yield in kg per day.
 
     # TOTAL CALCIUM REQUIREMENT
 
     # Ca_Req = Ca_Maint + Ca_Growth + Ca_Preg + Ca_Lact
-    Ca_Req = Ca_Maint + Ca_Growth + Ca_Preg + Ca_Lact
     # Total Ca requirements expressed in grams of Calcium per day.
+    """
+    Ca_Maint = 0.90*DMIest
+    Ca_Growth =  ((9.83 * MW**-0.22) * BW**-0.22)*ADG
+    if DOP==None:
+        Ca_Preg=0
+    else:
+        Ca_Preg = 0.02456 * math.exp((0.05581-0.00007*DOP)*DOP) - 0.02456 * \
+            math.exp ((0.05581-0.00007*(DOP-1)) * (DOP - 1)) * (BW/715) 
+    if TP_Milk==None: TP_Milk=0
+    if Milk==None: Milk=0
+    Ca_Lact = (0.295 + 0.239 * TP_Milk) * Milk
+    Ca_Req = Ca_Maint + Ca_Growth + Ca_Preg + Ca_Lact
     return Ca_Req
 
 def calculate_NRC_P_requirements(BW, MW, DOP, Milk, animal_type, ADG):
@@ -655,19 +693,15 @@ def calculate_NRC_P_requirements(BW, MW, DOP, Milk, animal_type, ADG):
         P_req = P_growth + P_preg
     return P_req
 
-def calculate_NASEM_P_requirements(BW, MW, animal_type, DOP, ADG_heifer, DMIest, TP_Milk, Milk):
+def calculate_NASEM_P_requirements(BW, MW, animal_type, DOP, ADG, DMIest, TP_Milk, Milk):
+    """
+
     # MAINTENANCE REQUIREMENT
 
     # For adult cows
     # P_Maint1 = 1.0 x DMI + 0.0006 * BW
     # For growing heifers
     # P_Maint2 = 0.8 x DMI + 0.0006 * BW
-    if animal_type == "cow":
-        P_Maint = 1.0 * DMIest + 0.0006 * BW
-    elif animal_type == "heifer":
-        P_Maint = 0.8 * DMIest + 0.0006 * BW
-    else:
-        P_Maint = []
     
     # Where, P_Maint = Phosphorus requirement for maintenance in grams per day; DMI = dry matter intake in kg;
     # BW = body weight in kg
@@ -675,7 +709,6 @@ def calculate_NASEM_P_requirements(BW, MW, animal_type, DOP, ADG_heifer, DMIest,
     # GROWTH REQUIREMENT
 
     # P_Growth = (1.2+4.635*MW**0.22 * BW **-0.22) * ADG
-    P_Growth = (1.2+4.635*MW**0.22 * BW **-0.22) * ADG_heifer
     # Where, P_Growth = Phosphorus requirement for growth in grams per day; MW = mature body weight in kg;
     # BW = body weight in kg; ADG = average daily BW gain in grams per day.
 
@@ -685,8 +718,6 @@ def calculate_NASEM_P_requirements(BW, MW, animal_type, DOP, ADG_heifer, DMIest,
     # If DOP (days of pregnancy are > 190, use the following equation
     # P_Preg = (0.02743 * exp(0.05527-0.000075)*DOP - 0.02743 * exp(0.05527-0.000075*(DOP-1)*(DOP-1))
     #          * (BW / 715)
-    P_Preg = 0.02743 * math.exp(0.05527-0.000075)*DOP - 0.02743 * \
-        math.exp((0.05527-0.000075*(DOP-1))*(DOP-1)*(BW / 715))
 
     # Where, P_Preg = Phosphorus requirement for pregnancy in grams per day; DOP = days of pregnancy; BW = Body weight
     # in kg; 715 is the average cow weight in the study by House and Bell (1993); therefore, pregnancy (gestation)
@@ -702,7 +733,6 @@ def calculate_NASEM_P_requirements(BW, MW, animal_type, DOP, ADG_heifer, DMIest,
 
     # Otherwise, use the alternative equation as follows:
     # P_Lact2 = Milk * (0.49+ 0.13*MilkTP)
-    P_Lact = Milk * (0.49+ 0.13*TP_Milk)
 
     # Where, P_Lact2 = Phosphorus requirement for lactation in grams per day when the contents of milk protein
     # are known; Milk = daily milk yield in kg per day; MilkTP = Milk true protein percent
@@ -710,8 +740,25 @@ def calculate_NASEM_P_requirements(BW, MW, animal_type, DOP, ADG_heifer, DMIest,
     # TOTAL PHOSPHORUS REQUIREMENT
 
     # P_Req = P_Maint + P_Growth + P_Preg + P_Lact
-    P_Req = P_Maint + P_Growth + P_Preg + P_Lact
     # Total p requirements expressed in grams of pHosphorus per day.
+    """
+    if animal_type == "cow":
+        P_Maint = 1.0 * DMIest + 0.0006 * BW
+    elif animal_type == "heifer":
+        P_Maint = 0.8 * DMIest + 0.0006 * BW
+    else:
+        P_Maint = 0
+    P_Growth = (1.2+4.635*MW**0.22 * BW **-0.22) * ADG
+    if DOP == None:
+        P_Preg = 0
+    else:
+        P_Preg = 0.02743 * math.exp(0.05527-0.000075)*DOP - 0.02743 * \
+            math.exp((0.05527-0.000075*(DOP-1))*(DOP-1)*(BW / 715))
+    if TP_Milk==None or Milk==None:
+        P_Lact = 0
+    else:
+        P_Lact = Milk * (0.49+ 0.13*TP_Milk)
+    P_Req = P_Maint + P_Growth + P_Preg + P_Lact
     return P_Req
 
 def calculate_DMI_NRC(animal_type: str, BW: float, DOP: int, DIM: int|None, 
@@ -746,8 +793,8 @@ def calculate_DMI_NRC(animal_type: str, BW: float, DOP: int, DIM: int|None,
     return DMIest
 
 def calculate_DMI_NASEM(BW: float, MW:float, DIM: int|None, 
-                        lactating: bool | None, NEl: float,
-                        BCS5: int|None, parity: int|None):
+                        lactating: bool|None, NEl: float,
+                        parity: int|None, BCS5: int=3):
     """
     Method to calculate dry matter intake in kg
         following NASEM book 2021, Equation 2-1, pg.12 & Eq.2-3, pg.14
@@ -767,7 +814,6 @@ def calculate_DMI_NASEM(BW: float, MW:float, DIM: int|None,
     """
     if BCS5==None:
         BCS5=3
-        # print("Body condition score was 'None'")
     if lactating:
         DMIest = ((3.7 + parity*5.7)+0.305*NEl
             +0.022*BW+(-0.689-1.87*parity)*BCS5) \
