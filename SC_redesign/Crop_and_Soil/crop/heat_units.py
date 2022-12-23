@@ -43,7 +43,7 @@ class HeatUnits:
         else:
             use_temp = mean_air_temperature
         self.is_growing = self.minimum_temperature <= use_temp <= self.maximum_temperature
-        self.accumulate_heat_units(mean_air_temperature) # Keep
+        self.accumulate_heat_units(mean_air_temperature)
         self.previous_heat_fraction = self.heat_fraction
         self.heat_fraction = self.accumulated_heat_units / self.potential_heat_units
         self.is_mature = self.heat_fraction >= 1.0
