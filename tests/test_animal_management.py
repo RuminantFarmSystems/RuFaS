@@ -254,6 +254,9 @@ def test_print_animal_num_warnings(animal_management: AnimalManagement, mocker: 
                                 f"{len(animal_keys)} warnings were associated with simulate_animals",
                                 expected_info_map)
 
+        assert add_warning.call_count == len(animal_keys)
+        assert add_log.call_count == 2
+
 
 def test_init_nutrient_rqmts():
     """Unit test for function init_nutrient_rqmts in file routines/animal/animal_management.py"""
@@ -355,7 +358,7 @@ def test_calc_p_conc(mock_animals: List[MagicMock]) -> None:
     assert actual == expected
 
     actual = AnimalManagement._calc_p_conc(mock_animals)
-    expected = (16.0 / 8.0)
+    expected = (16.0 / 8.0) / 1000.0
 
     assert actual == pytest.approx(expected)
 

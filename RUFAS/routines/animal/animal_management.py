@@ -761,7 +761,7 @@ class AnimalManagement:
         if len(animals) == 0:
             return 0
         else:
-            return (sum(a.p_animal for a in animals) / 1000 )/ sum(a.body_weight for a in animals)
+            return (sum(a.p_animal for a in animals) / 1000) / sum(a.body_weight for a in animals)
 
     def calc_all_p_conc(self):
         """
