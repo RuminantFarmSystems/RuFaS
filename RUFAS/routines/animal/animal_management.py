@@ -248,7 +248,6 @@ class AnimalManagement:
             animal_keys = {"calf_num", "heiferI_num", "heiferII_num", "heiferIII_num", "cow_num"}
             for key in animal_keys:
                 if herd_data[key] != 0:
-
                     om.add_warning(f"invalid_{key}_warning",
                                    f"Warning: herd_num is 0, but {key} is not.",
                                    info_map)
@@ -306,7 +305,7 @@ class AnimalManagement:
         """
 
         return mean(pen.vertical_dist_to_parlor for pen in self.all_pens), \
-            mean(pen.horizontal_dist_to_parlor for pen in self.all_pens)
+               mean(pen.horizontal_dist_to_parlor for pen in self.all_pens)
 
     def calc_nutrient_rqmts(self, feed, temp):
         """
@@ -361,7 +360,7 @@ class AnimalManagement:
             temp: the temperature on the current day
         """
 
-        # stratefying the pens that lost animals by animal group
+        # stratifying the pens that lost animals by animal group
         # (values are dictionaries of pen IDs, with values being the number of animals removed)
         grouped_pens_short = {Pen.AnimalCombination.CALF: {}, Pen.AnimalCombination.GROWING: {},
                               Pen.AnimalCombination.CLOSE_UP: {}, Pen.AnimalCombination.GROWING_AND_CLOSE_UP: {},
@@ -519,25 +518,25 @@ class AnimalManagement:
                 self.pens_by_animal_combination[Pen.AnimalCombination.CALF].append(
                     pen)
                 stall_shortage[Pen.AnimalCombination.CALF] -= pen.num_stalls * \
-                    pen.max_stocking_density
+                                                              pen.max_stocking_density
             elif pen.animal_combination == Pen.AnimalCombination.GROWING:
                 growing_pens.append(pen)
                 self.pens_by_animal_combination[Pen.AnimalCombination.GROWING].append(
                     pen)
                 stall_shortage[Pen.AnimalCombination.GROWING] -= pen.num_stalls * \
-                    pen.max_stocking_density
+                                                                 pen.max_stocking_density
             elif pen.animal_combination == Pen.AnimalCombination.CLOSE_UP:
                 close_up_pens.append(pen)
                 self.pens_by_animal_combination[Pen.AnimalCombination.CLOSE_UP].append(
                     pen)
                 stall_shortage[Pen.AnimalCombination.CLOSE_UP] -= pen.num_stalls * \
-                    pen.max_stocking_density
+                                                                  pen.max_stocking_density
             elif pen.animal_combination == Pen.AnimalCombination.LAC_COW:
                 lac_cow_pens.append(pen)
                 self.pens_by_animal_combination[Pen.AnimalCombination.LAC_COW].append(
                     pen)
                 stall_shortage[Pen.AnimalCombination.LAC_COW] -= pen.num_stalls * \
-                    pen.max_stocking_density
+                                                                 pen.max_stocking_density
             else:
                 # TODO: Update mixed_types and mixed_type_pens to use enum
                 # also figure out what mixed type does
@@ -599,7 +598,7 @@ class AnimalManagement:
                         pen)
                 # updating stall shortage
                 stall_shortage[max_key[0]] -= pen.num_stalls * \
-                    pen.max_stocking_density
+                                              pen.max_stocking_density
 
             else:
                 break
@@ -625,7 +624,6 @@ class AnimalManagement:
                     group = [calf]
         # final pen for this class
         calf_pens[0].update_animals(group, Pen.AnimalCombination.CALF)
-
 
         # Growing Pen Allocation
         stalls = [pen.num_stalls for pen in growing_pens]
@@ -836,7 +834,6 @@ class AnimalManagement:
         if self.simulate_animals:
             for pen in self.all_pens:
                 pen.pen_populated = len(pen.animals_in_pen) > 0
-
 
             animals_added, ids_removed, calves_born, self.calves, self.heiferIs, \
                 self.heiferIIs, self.heiferIIIs, self.cows = \
