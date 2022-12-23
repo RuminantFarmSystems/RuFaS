@@ -249,7 +249,7 @@ class AnimalManagement:
             for key in animal_keys:
                 if herd_data[key] != 0:
 
-                    om.add_warning("invalid_cow_num_warning",
+                    om.add_warning(f"invalid_{key}_warning",
                                    f"Warning: herd_num is 0, but {key} is not.",
                                    info_map)
                     counter += 1
