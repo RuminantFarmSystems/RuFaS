@@ -305,8 +305,8 @@ class AnimalManagement:
             average horizontal distance from milking parlor)
         """
 
-        return mean(pen.vertical_dist_to_parlor for pen in self.all_pens), mean(
-            pen.horizontal_dist_to_parlor for pen in self.all_pens)
+        return mean(pen.vertical_dist_to_parlor for pen in self.all_pens), \
+            mean(pen.horizontal_dist_to_parlor for pen in self.all_pens)
 
     def calc_nutrient_rqmts(self, feed, temp):
         """
@@ -516,20 +516,28 @@ class AnimalManagement:
 
             if pen.animal_combination == Pen.AnimalCombination.CALF:
                 calf_pens.append(pen)
-                self.pens_by_animal_combination[Pen.AnimalCombination.CALF].append(pen)
-                stall_shortage[Pen.AnimalCombination.CALF] -= pen.num_stalls * pen.max_stocking_density
+                self.pens_by_animal_combination[Pen.AnimalCombination.CALF].append(
+                    pen)
+                stall_shortage[Pen.AnimalCombination.CALF] -= pen.num_stalls * \
+                    pen.max_stocking_density
             elif pen.animal_combination == Pen.AnimalCombination.GROWING:
                 growing_pens.append(pen)
-                self.pens_by_animal_combination[Pen.AnimalCombination.GROWING].append(pen)
-                stall_shortage[Pen.AnimalCombination.GROWING] -= pen.num_stalls * pen.max_stocking_density
+                self.pens_by_animal_combination[Pen.AnimalCombination.GROWING].append(
+                    pen)
+                stall_shortage[Pen.AnimalCombination.GROWING] -= pen.num_stalls * \
+                    pen.max_stocking_density
             elif pen.animal_combination == Pen.AnimalCombination.CLOSE_UP:
                 close_up_pens.append(pen)
-                self.pens_by_animal_combination[Pen.AnimalCombination.CLOSE_UP].append(pen)
-                stall_shortage[Pen.AnimalCombination.CLOSE_UP] -= pen.num_stalls * pen.max_stocking_density
+                self.pens_by_animal_combination[Pen.AnimalCombination.CLOSE_UP].append(
+                    pen)
+                stall_shortage[Pen.AnimalCombination.CLOSE_UP] -= pen.num_stalls * \
+                    pen.max_stocking_density
             elif pen.animal_combination == Pen.AnimalCombination.LAC_COW:
                 lac_cow_pens.append(pen)
-                self.pens_by_animal_combination[Pen.AnimalCombination.LAC_COW].append(pen)
-                stall_shortage[Pen.AnimalCombination.LAC_COW] -= pen.num_stalls * pen.max_stocking_density
+                self.pens_by_animal_combination[Pen.AnimalCombination.LAC_COW].append(
+                    pen)
+                stall_shortage[Pen.AnimalCombination.LAC_COW] -= pen.num_stalls * \
+                    pen.max_stocking_density
             else:
                 # TODO: Update mixed_types and mixed_type_pens to use enum
                 # also figure out what mixed type does
@@ -575,18 +583,23 @@ class AnimalManagement:
                 # Assigning pen to relevant pen list
                 if max_key[0].name == 'CALF':
                     calf_pens.append(pen)
-                    self.pens_by_animal_combination[Pen.AnimalCombination.CALF].append(pen)
+                    self.pens_by_animal_combination[Pen.AnimalCombination.CALF].append(
+                        pen)
                 elif max_key[0].name == 'GROWING':
                     growing_pens.append(pen)
-                    self.pens_by_animal_combination[Pen.AnimalCombination.GROWING].append(pen)
+                    self.pens_by_animal_combination[Pen.AnimalCombination.GROWING].append(
+                        pen)
                 elif max_key[0].name == 'CLOSE_UP':
                     close_up_pens.append(pen)
-                    self.pens_by_animal_combination[Pen.AnimalCombination.CLOSE_UP].append(pen)
+                    self.pens_by_animal_combination[Pen.AnimalCombination.CLOSE_UP].append(
+                        pen)
                 else:
                     lac_cow_pens.append(pen)
-                    self.pens_by_animal_combination[Pen.AnimalCombination.LAC_COW].append(pen)
+                    self.pens_by_animal_combination[Pen.AnimalCombination.LAC_COW].append(
+                        pen)
                 # updating stall shortage
-                stall_shortage[max_key[0]] -= pen.num_stalls * pen.max_stocking_density
+                stall_shortage[max_key[0]] -= pen.num_stalls * \
+                    pen.max_stocking_density
 
             else:
                 break
@@ -606,7 +619,8 @@ class AnimalManagement:
             else:
                 # condition to make sure all animals are grouped
                 if len(calf_pens) > 1:
-                    calf_pens[0].update_animals(group, Pen.AnimalCombination.CALF)
+                    calf_pens[0].update_animals(
+                        group, Pen.AnimalCombination.CALF)
                     calf_pens.pop(0)
                     group = [calf]
         # final pen for this class
@@ -623,7 +637,8 @@ class AnimalManagement:
             if len(group) / growing_pens[0].num_stalls <= density:
                 group.append(hef1)
             else:
-                growing_pens[0].update_animals(group, Pen.AnimalCombination.GROWING)
+                growing_pens[0].update_animals(
+                    group, Pen.AnimalCombination.GROWING)
                 growing_pens.pop(0)
                 group = [hef1]
         # continuing with heiferIIs
@@ -632,7 +647,8 @@ class AnimalManagement:
                 group.append(hef2)
             else:
                 if len(growing_pens) > 1:
-                    growing_pens[0].update_animals(group, Pen.AnimalCombination.GROWING)
+                    growing_pens[0].update_animals(
+                        group, Pen.AnimalCombination.GROWING)
                     growing_pens.pop(0)
                     group = [hef2]
         # final pen for this class
@@ -648,7 +664,8 @@ class AnimalManagement:
             if len(group) / close_up_pens[0].num_stalls <= density:
                 group.append(hef3)
             else:
-                close_up_pens[0].update_animals(group, Pen.AnimalCombination.CLOSE_UP)
+                close_up_pens[0].update_animals(
+                    group, Pen.AnimalCombination.CLOSE_UP)
                 close_up_pens.pop(0)
                 group = [hef3]
         # continuing with dry cows
@@ -657,7 +674,8 @@ class AnimalManagement:
                 group.append(cow)
             else:
                 if len(close_up_pens) > 1:
-                    close_up_pens[0].update_animals(group, Pen.AnimalCombination.CLOSE_UP)
+                    close_up_pens[0].update_animals(
+                        group, Pen.AnimalCombination.CLOSE_UP)
                     close_up_pens.pop(0)
                     group = [cow]
         # final pen for this class
@@ -671,7 +689,8 @@ class AnimalManagement:
         pen_grouping = grouping(lactating_cows, lac_cow_pens, density)
         # Assigning Lactating Cows to Pens based on the grouping output
         for key in pen_grouping:
-            lac_cow_pens[0].update_animals(pen_grouping[key], Pen.AnimalCombination.LAC_COW)
+            lac_cow_pens[0].update_animals(
+                pen_grouping[key], Pen.AnimalCombination.LAC_COW)
             lac_cow_pens.remove(lac_cow_pens[0])
         #####################
 
@@ -698,7 +717,8 @@ class AnimalManagement:
         available_feeds.feed_nutrients(feed)
         for i, pen in enumerate(self.all_pens):
             if pen.pen_populated:
-                self.all_pens[i].ration = self.all_pens[i].calc_ration(feed, available_feeds)
+                self.all_pens[i].ration = self.all_pens[i].calc_ration(
+                    feed, available_feeds)
 
     def calc_manure_excretion(self, feed, methane_model):
         """
@@ -769,11 +789,14 @@ class AnimalManagement:
         """
         Calculates each animal class's P concentration.
         """
+
         # TODO: see if there is a better way to do this using dictionary comprehension
         self.p_comp['calf'] = self._calc_p_comp(self.calves)
         self.p_comp['heiferI'] = self._calc_p_comp(self.heiferIs)
         self.p_comp['heiferII'] = self._calc_p_comp(self.heiferIIs)
         self.p_comp['cow'] = self._calc_p_comp(self.heiferIIIs)
+        # TODO check if this is set up correctly. Currently p_comp for the cow class is
+        # being set by calculating the p_comp for heiferIIIs (line 889 directly above)
 
     def calc_p_rqmts(self):
         """
@@ -814,15 +837,17 @@ class AnimalManagement:
             for pen in self.all_pens:
                 pen.pen_populated = len(pen.animals_in_pen) > 0
 
+
             animals_added, ids_removed, calves_born, self.calves, self.heiferIs, \
-            self.heiferIIs, self.heiferIIIs, self.cows = \
+                self.heiferIIs, self.heiferIIIs, self.cows = \
                 self.life_cycle_manager.daily_update(self.simulation_day,
                                                      self.calves,
                                                      self.heiferIs,
                                                      self.heiferIIs,
                                                      self.heiferIIIs, self.cows)
             temp = weather.T_avg[time.year - 1][time.day - 1]
-            self.daily_update_id_pen(animals_added, ids_removed, calves_born, feed, temp)
+            self.daily_update_id_pen(
+                animals_added, ids_removed, calves_born, feed, temp)
 
             # phosphorus requirements for daily updates
             self.calc_p_rqmts()  # per animal
