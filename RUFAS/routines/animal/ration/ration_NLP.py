@@ -518,23 +518,23 @@ def userbounds():
     values2= []
     for key, value in rationall.items():
         [values2.append(int(i)) for i in value['ration'].keys()]
-    setted=set(values2)
-    setted2 = [i for i in setted]
-    setted2.sort()
-    setted2 = [str(i) for i in setted2]
-    triplethreat = []
+    uniqueset=set(values2) # TODO fix tortured logic 
+    uniqueset2 = [i for i in uniqueset]
+    uniqueset2.sort()
+    uniqueset2 = [str(i) for i in uniqueset2]
+    tribounds = []
     wiggleroom = 0.15
-    for key in setted2:
+    for key in uniqueset2:
         if key in rationtouse.keys():
             target = rationtouse[key]/100*(DMIest) # change from percent to decimal percent
-            triplethreat.append((target-target*wiggleroom,target+target*wiggleroom))
-            triplethreat.append((target-target*wiggleroom,target+target*wiggleroom))
-            triplethreat.append((target-target*wiggleroom,target+target*wiggleroom))
+            tribounds.append((target-target*wiggleroom,target+target*wiggleroom))
+            tribounds.append((target-target*wiggleroom,target+target*wiggleroom))
+            tribounds.append((target-target*wiggleroom,target+target*wiggleroom))
         else:
-            triplethreat.append((0,0))
-            triplethreat.append((0,0))
-            triplethreat.append((0,0))
-    return triplethreat
+            tribounds.append((0,0))
+            tribounds.append((0,0))
+            tribounds.append((0,0))
+    return tribounds
 
 def optimize():
     """

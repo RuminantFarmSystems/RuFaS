@@ -58,7 +58,7 @@ def optimization(requirements, available_feeds, animal_type, cow_type):
     while i < 1:
         try:
             solution = NLP.optimize()
-            # TODO here we need to add a way to check why this is failing to optimize
+            # TODO here we need to add a way to check why this is failing to optimize and
             # certainly happening at the minimize step, but we must  quantify which requirements aren't being met
         except:
             i -= 1
