@@ -6,7 +6,8 @@ class HeatUnits:
         self.accumulated_heat_units = 0  # accumulator
         self.is_growing = True  # TODO: not currently using
         self.is_mature = False  # TODO: not currently using
-        self.use_heat_unit_temperature = use_heat_unit_temperature
+        self.use_heat_unit_temperature: bool = use_heat_unit_temperature
+        """determines if heat unit temperature will be used for heat unit accumulation."""
         # self.heat_unit_scheduling = True
 
         self.new_heat_units = None
@@ -48,16 +49,6 @@ class HeatUnits:
         self.heat_fraction = self.accumulated_heat_units / self.potential_heat_units
         self.is_mature = self.heat_fraction >= 1.0
 
-    def decide_to_use_heat_unit_temperature(self, use_heat_unit_temperature: bool) -> None:
-        """sets the boolean that determines if heat unit temperature will be used for heat unit accumulation.
-
-        Details: This function will primarily be used outside this class during when
-            If use_heat_unit_temperature is False, the average daily temperature will be used to accumulate heat
-            units. If use_heat_unit_temperature is True, then an alternative heat unit temperature is used to determine
-            accumulated heat units.
-        """
-        self.use_heat_unit_temperature = use_heat_unit_temperature
-
     # TODO: add these warnings to output manager at a later date.
     def _check_absorb_heat_for_input_errors(self, mean_air_temperature: float = None,
                                             min_air_temperature: float = None,
@@ -88,7 +79,7 @@ class HeatUnits:
             above the minimum threshold), the alternative method is context dependent:
                 1. if the minimum and maximum air temperature are both **higher** than the crop's minimum and maximum
                 growth temperatures, then accumulation will be greater than with the main method
-                2. if the minimum and maximum air temperatures are both **lower** than the crop's miniimum and maximum
+                2. if the minimum and maximum air temperatures are both **lower** than the crop's minimum and maximum
                 temperatures, then accumulation will be greater than with the main method
                 3. if the air temperature window is entirely contained within the crop temperature window
                 (i.e., crop mint < air mint < air maxt < crop maxt), then accumulation will be equal to the middle of
@@ -121,7 +112,7 @@ class HeatUnits:
         return max(temperature - min_temperature, 0)  # from SWAT:
 
     @staticmethod
-    def determine_minimum_heat_unit_temperature(min_air_temp: float, min_growth_temp: float) -> float: # pseudocode_crop" C.2.A.3
+    def determine_minimum_heat_unit_temperature(min_air_temp: float, min_growth_temp: float) -> float:
         """ calculates minimum heat unit temperature on current day.
 
         Args:
