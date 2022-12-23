@@ -284,26 +284,6 @@ def test_daily_update_id_pen():
     pass
 
 
-def test_allocate_calf_pens():
-    """Unit test for function allocate_calf_pens in file routines/animal/animal_management.py"""
-    pass
-
-
-def test_allocate_growing_pens():
-    """Unit test for function allocate_growing_pens in file routines/animal/animal_management.py"""
-    pass
-
-
-def test_allocate_close_up_pens():
-    """Unit test for function allocate_close_up_pens in file routines/animal/animal_management.py"""
-    pass
-
-
-def test_allocate_lactating_cow_pens():
-    """Unit test for function allocate_lactating_cow_pens in file routines/animal/animal_management.py"""
-    pass
-
-
 def test_allocate_all_pens():
     """Unit test for function allocate_all_pens in file routines/animal/animal_management.py"""
     pass
