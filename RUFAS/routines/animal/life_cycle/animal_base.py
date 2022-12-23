@@ -48,11 +48,11 @@ class AnimalBase(object):
             args.days_born: age of the animal
             arg.semen_used: semen used in the dam for the calf
             (optional: include the following to assign animal information)
-			args.birth_weight: the birth weight of the animal
-			args.body_weight: current body weight of the animal
-			args.wean_weight: the wean weight of the animal
-			args.mature_body_weight: the mature body weight of the animal
-			args.events: events of the animal
+                        args.birth_weight: the birth weight of the animal
+                        args.body_weight: current body weight of the animal
+                        args.wean_weight: the wean weight of the animal
+                        args.mature_body_weight: the mature body weight of the animal
+                        args.events: events of the animal
         """
         self.id = args['id']
         self.breed = args['breed']
@@ -75,7 +75,7 @@ class AnimalBase(object):
         #self.DBW = 0
         self.p_animal = 0
         self.p_intake = 0
-        self.p_conc = 0
+        self.p_conc_ration = 0
         self.p_excrt = 0
         self.birth_weight = 0
         self.body_weight = 0
@@ -116,16 +116,16 @@ class AnimalBase(object):
         self.ration_formulation = ration
         self.dry_matter_intake = DMI
 
-    def set_p_intake(self, p_intake, p_conc):
+    def set_p_intake(self, p_intake, p_conc_ration):
         """
         Sets this animal's phosphorus intake.
 
         Args:
             p_intake: the phosphorus intake
-            p_conc: the concentration of P in the ration
+            p_conc_ration: the concentration of P in the ration
         """
         self.p_intake = p_intake
-        self.p_conc = p_conc
+        self.p_conc_ration = p_conc_ration
 
     def daily_p_update(self):
         """
@@ -146,7 +146,7 @@ class AnimalBase(object):
 
         # amount of P in the animal (A.1G.A.3)
         self.p_animal = self.p_animal + self.p_gest + self.p_growth + \
-                        (self.dP_reserves - dP_reserves_prev)
+            (self.dP_reserves - dP_reserves_prev)
 
     def calc_base_manure(self):
         """
@@ -156,11 +156,13 @@ class AnimalBase(object):
             p_urine: amount of P required for urine production (g)
             p_feces_excrt: amount of P excreted by an animal (g)
         """
+
         # amount of P required for urine production (g) (A.1G.B.1)
         p_urine = 0.000002 * self.body_weight * 1000
 
         # excess P in the diet (g) (A.1G.A.1)
         self.p_excess = max(self.p_intake - self.p_req, 0)
+
 
         # amount of P excreted by an animal (g) (A.1G.B.2)
         if self.dP_reserves == 0 and self.p_intake >= self.p_req:
@@ -168,9 +170,10 @@ class AnimalBase(object):
         elif self.dP_reserves < 0 and self.p_intake >= self.p_req and \
                 self.p_excess >= (-1) * self.dP_reserves / 0.7:
             p_feces_excrt = self.p_intake - self.p_req + self.p_maint_feces + \
-                            self.dP_reserves / 0.7
+                self.dP_reserves / 0.7
         else:
             p_feces_excrt = self.p_maint_feces
+
 
         return p_urine, p_feces_excrt
 
@@ -180,6 +183,7 @@ class AnimalBase(object):
         """
         # (A.1G.C.1) from P tracking
         self.p_animal = 0.0072 * self.body_weight * 1000
+        
 
     def update_pen_history(self, curr_pen, curr_day, classes_in_pen):
         """
@@ -193,7 +197,8 @@ class AnimalBase(object):
             curr_day: the current simulation day
             classes_in_pen: the classes in the animal's current pen
         """
-        last_pen = self.pen_history[-1].pen if len(self.pen_history) > 0 else None
+        last_pen = self.pen_history[-1].pen if len(
+            self.pen_history) > 0 else None
         if last_pen is None or last_pen != curr_pen:
             self.pen_history.append(PenHistory(curr_day, curr_day, curr_pen,
                                                list(classes_in_pen)))
