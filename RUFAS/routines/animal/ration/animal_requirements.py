@@ -50,7 +50,7 @@ def calc_rqmts(BW, MW, DOP, animal_type, parity=None, CI=None , TP_Milk=None, Fa
     # --------------------------------------------
     
     # --------------------------------------------
-    if AnimalBase.config['NASEM_or_NRC_requirement_calculations'] == 'NASEM':
+    if AnimalBase.config['energy_and_nutrient_calculation_method'] == 'NASEM':
         NEl = calculate_NASEM_energy_lactation_requirements(animal_type, Fat_Milk, TP_Milk, Lactose_Milk, Milk)
         DMIest = calculate_DMI_NASEM(BW, MW, DIM, lactating, NEl, parity, BCS5)
         NEmaint, GrUterW, UterW = calculate_NASEM_energy_maintenance_requirements(BW, MW, DOP, DIM)
@@ -60,7 +60,7 @@ def calc_rqmts(BW, MW, DOP, animal_type, parity=None, CI=None , TP_Milk=None, Fa
         Ca_req = calculate_NASEM_calcium_requirements(BW, MW, DOP, ADG, DMIest, TP_Milk, Milk)
         P_req = calculate_NASEM_P_requirements(BW, MW, animal_type, DOP, ADG, DMIest, TP_Milk, Milk)
 
-    elif AnimalBase.config['NASEM_or_NRC_requirement_calculations'] == 'NRC':
+    elif AnimalBase.config['energy_and_nutrient_calculation_method'] == 'NRC':
         NEmaint, CW, CBW = calculate_NRC_energy_maintenance_requirements(BW, MW, DOP, BCS5, PrevTemp, animal_type)
         NEg, ADG, EQSBW = calculate_NRC_energy_growth_requirements(BW, MW, CW, animal_type, parity, CI, ADG_heifer)
         NEpreg = calculate_NRC_energy_pregnancy_requirements(DOP, CBW)
@@ -559,8 +559,8 @@ def calculate_NASEM_protein_requirements(lactating, BW, Frame_Weight_Gain_g, GrU
     NPMFP = CPMFP*0.73
     NPGrowth = Frame_Weight_Gain_g*0.11*0.86
     NPGest = GrUterWGain * 125
-    if TP_Milk==None: TP_Milk = 0
-    if Milk==None: Milk = 0
+    if TP_Milk is None: TP_Milk = 0
+    if Milk is None: Milk = 0
     NPMilk = TP_Milk*Milk*1000 # TODO CHECK THAT TP_MILK is in % or 0.1 decimal percent etc.
     TargetEffMP = 0.69
     if lactating: # TODO COPY THE LOGIC FROM PREVIOUS and from NRC
