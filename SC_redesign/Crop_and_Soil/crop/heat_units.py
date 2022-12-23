@@ -58,6 +58,7 @@ class HeatUnits:
         """
         self.use_heat_unit_temperature = use_heat_unit_temperature
 
+    # TODO: add these warnings to output manager at a later date.
     def _check_absorb_heat_for_input_errors(self, mean_air_temperature: float = None,
                                             min_air_temperature: float = None,
                                             max_air_temperature: float = None):
