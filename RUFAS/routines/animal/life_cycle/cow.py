@@ -334,8 +334,8 @@ class Cow(HeiferIII):
         # requirement of P from the ration (g) (A.1EF.E.7)
         if self.milking:
             self.p_req = p_absorb / \
-                         (1.86696 - 5.01238 * self.p_conc + 5.12286 *
-                          self.p_conc ** 2)
+                         (1.86696 - 5.01238 * self.p_conc_ration + 5.12286 *
+                          self.p_conc_ration ** 2)
         else:
             self.p_req = p_absorb / 0.664
 

@@ -75,6 +75,7 @@ class Feed:
         self.input_lac_cow_feeds = data['lac_cow_feeds']
 
         self.input_feed_combinations = {
+            Pen.AnimalCombination.NONE: set(),
             Pen.AnimalCombination.CALF: set(data['calf_feeds']),
             Pen.AnimalCombination.GROWING: set(data['growing_feeds']),
             Pen.AnimalCombination.CLOSE_UP: set(data['close_up_feeds']),
