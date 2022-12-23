@@ -10,6 +10,7 @@ from unittest.mock import MagicMock, patch
 from pytest_mock.plugin import MockerFixture
 
 from RUFAS.routines.animal.animal_management import AnimalManagement
+from RUFAS.output_manager import OutputManager
 
 from typing import List, Dict, Union
 
@@ -213,74 +214,45 @@ def test_init_animals(animal_management: AnimalManagement, mocker: MockerFixture
 
     animal_management.init_animals(herd_data, config)
 
-
     animal_management.life_cycle_manager.initialize_herd.assert_called_once()
 
 
-def test_print_animal_num_warnings(animal_management: AnimalManagement):
+def test_print_animal_num_warnings(animal_management: AnimalManagement, mocker: MockerFixture):
     """Unit test for function _print_animal_num_warnings in file routines/animal/animal_management.py"""
+    with patch("RUFAS.output_manager.OutputManager.add_log") as add_log, \
+            patch("RUFAS.output_manager.OutputManager.add_warning") as add_warning:
 
-    animal_keys = {"calf_num", "heiferI_num", "heiferII_num", "heiferIII_num", "cow_num"}
-    herd_data = dict()
+        animal_keys = {"calf_num", "heiferI_num", "heiferII_num", "heiferIII_num", "cow_num"}
+        herd_data = dict()
 
-    animal_management.simulate_animals = True
-    actual_output = io.StringIO()
-    sys.stdout = actual_output
-    expected_output = "Simulate animals_is true\n"
+        expected_info_map = {
+            "class": "AnimalManagement",
+            "function": "_print_animal_num_warnings",
+            "herd_data": herd_data
+        }
 
-    animal_management._print_animal_num_warnings(herd_data)
+        # test for simulate_animals = True
+        animal_management.simulate_animals = True
+        animal_management._print_animal_num_warnings(herd_data)
+        add_log.assert_called_once_with("simulate_animals_flag",
+                                        "simulate_animals is true",
+                                        expected_info_map)
 
-    assert actual_output.getvalue() == expected_output
+        # test for warnings for every animal key and simulate_animals = False
+        animal_management.simulate_animals = False
+        for key in animal_keys:
+            herd_data[key] = 1
+        animal_management._print_animal_num_warnings(herd_data)
 
-    animal_management.simulate_animals = False
-    actual_output = io.StringIO()
-    sys.stdout = actual_output
-    expected_output = ""
+        for key in animal_keys:
+            add_warning.assert_any_call(f"invalid_{key}_warning",
+                                        f"Warning: herd_num is 0, but {key} is not.",
+                                        expected_info_map)
 
-    for key in animal_keys:
-        herd_data[key] = 1
-        expected_output += "Warning: simulate_animals is false, but " + key + " != 0." + "\n"
-
-    expected_output += "5 warnings were associated with simulate_animals\n"
-
-    animal_management._print_animal_num_warnings(herd_data)
-
-    assert actual_output.getvalue() == expected_output
-
-    sys.stdout = sys.__stdout__
-
-
-    # warnings print when herd_data is 0
-    # pass
-    # animal_keys = {"calf_num", "heiferI_num", "heiferII_num", "heiferIII_num", "cow_num"}
-    # herd_data = dict()
-    #
-    # actual_output = io.StringIO()
-    # sys.stdout = actual_output
-    # expected_output = ""
-    #
-    # for key in animal_keys:
-    #     herd_data[key] = 0
-    #     expected_output += "Warning: simulate_animals is false, but " + key + " != 0." + "\n"
-    #
-    # animal_management._print_animal_num_warnings(herd_data)
-    #
-    # assert actual_output.getvalue() == expected_output
-    #
-    # # no warnings print when herd_data is non zero
-    #
-    # actual_output = io.StringIO()
-    # sys.stdout = actual_output
-    # expected_output = ""
-    #
-    # for key in animal_keys:
-    #     herd_data[key] = 1
-    #
-    # animal_management._print_animal_num_warnings(herd_data)
-    #
-    # assert actual_output.getvalue() == expected_output
-    #
-    # sys.stdout = sys.__stdout__
+        # question: how to reset assert_called_once with
+        add_log.assert_any_call("num_warnings_associated_with_simulate_animals",
+                                f"{len(animal_keys)} warnings were associated with simulate_animals",
+                                expected_info_map)
 
 
 def test_init_nutrient_rqmts():
