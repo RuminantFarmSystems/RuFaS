@@ -119,12 +119,12 @@ class AnimalManagement:
                                            Pen.AnimalCombination.GROWING_AND_CLOSE_UP: [],
                                            Pen.AnimalCombination.LAC_COW: []}
 
-        # these variables are the P compositions of each class of animal. They
+        # these variables are the P concentrations of each class of animal. They
         # are calculated daily and are used when an animal is added to the
         # herd, whether by birth or replacement herd purchase. They are calculated
-        # in calc_all_p_comp() and are the total body weight of the animals in the
-        # respective class divided by the total P in the animals of the class
-        self.p_comp = {
+        # in calc_all_p_conc() and are calculated by dividing the total P in the animals
+        # of the class by the total body weight of the animals, on a per-animal basis
+        self.p_conc = {
             'calf': 0,
             'heiferI': 0,
             'heiferII': 0,
@@ -383,27 +383,27 @@ class AnimalManagement:
 
         for animal in animals_added:
             if type(animal).__name__ == 'Calf':
-                animal_p_conc = self.p_comp['calf']
+                animal_p_conc = self.p_conc['calf']
                 self.calves.append(animal)
                 group = Pen.AnimalCombination.CALF
             elif type(animal).__name__ == 'HeiferI':
-                animal_p_conc = self.p_comp['heiferI']
+                animal_p_conc = self.p_conc['heiferI']
                 self.heiferIs.append(animal)
                 group = Pen.AnimalCombination.GROWING
             elif type(animal).__name__ == 'HeiferII':
-                animal_p_conc = self.p_comp['heiferII']
+                animal_p_conc = self.p_conc['heiferII']
                 self.heiferIIs.append(animal)
                 group = Pen.AnimalCombination.GROWING
             elif type(animal).__name__ == 'HeiferIII':
-                animal_p_conc = self.p_comp['heiferIII']
+                animal_p_conc = self.p_conc['heiferIII']
                 self.heiferIIIs.append(animal)
                 group = Pen.AnimalCombination.CLOSE_UP
             elif not animal.milking:
-                animal_p_conc = self.p_comp['cow']
+                animal_p_conc = self.p_conc['cow']
                 self.cows.append(animal)
                 group = Pen.AnimalCombination.CLOSE_UP
             else:  # animal is of class Cow
-                animal_p_conc = self.p_comp['cow']
+                animal_p_conc = self.p_conc['cow']
                 # self.all_pens[pen].animals_in_pen.append(animal)
                 self.cows.append(animal)
                 group = Pen.AnimalCombination.LAC_COW
@@ -751,29 +751,29 @@ class AnimalManagement:
         self.gather_cow_class_history(self.cows)
 
     @staticmethod
-    def _calc_p_comp(animals):
+    def _calc_p_conc(animals):
         """
         Args:
-            animals: the list of animals for which the P composition should be
+            animals: the list of animals for which the P concentration should be
                 calculated
         Returns:
-            p_comp: the P composition of @animals
+            p_conc: the P concentration of @animals
         """
 
         if len(animals) == 0:
             return 0
         else:
-            return sum(a.p_animal for a in animals) / sum(a.body_weight for a in animals)
+            return (sum(a.p_animal for a in animals) / 1000 )/ sum(a.body_weight for a in animals)
 
-    def calc_all_p_comp(self):
+    def calc_all_p_conc(self):
         """
         Calculates each animal class's P concentration.
         """
         # TODO: see if there is a better way to do this using dictionary comprehension
-        self.p_comp['calf'] = self._calc_p_comp(self.calves)
-        self.p_comp['heiferI'] = self._calc_p_comp(self.heiferIs)
-        self.p_comp['heiferII'] = self._calc_p_comp(self.heiferIIs)
-        self.p_comp['cow'] = self._calc_p_comp(self.heiferIIIs)
+        self.p_conc['calf'] = self._calc_p_conc(self.calves)
+        self.p_conc['heiferI'] = self._calc_p_conc(self.heiferIs)
+        self.p_conc['heiferII'] = self._calc_p_conc(self.heiferIIs)
+        self.p_conc['cow'] = self._calc_p_conc(self.heiferIIIs)
 
     def calc_p_rqmts(self):
         """
@@ -839,7 +839,7 @@ class AnimalManagement:
 
             # phosphorus updates
             self.daily_p_update()  # per animal
-            self.calc_all_p_comp()  # per animal
+            self.calc_all_p_conc()  # per animal
 
             self.record_pen_history()
 
