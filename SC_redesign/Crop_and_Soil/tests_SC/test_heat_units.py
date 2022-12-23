@@ -1,10 +1,3 @@
-"""
-RUFAS: Ruminant Farm Systems Model
-File name: test_heat_units.py
-Description: Implements test cases
-Author(s): Brandon DeBoer, brdeboer@wisc.edu
-"""
-
 import pytest
 
 from SC_redesign.Crop_and_Soil.crop.heat_units import *
