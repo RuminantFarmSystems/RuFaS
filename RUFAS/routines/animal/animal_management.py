@@ -373,62 +373,59 @@ class AnimalManagement:
             temp: the temperature on the current day
         """
 
+        # _____________________________________________________________________________________________
+        # Calf preprocessing logic
+        # _____________________________________________________________________________________________
+
+        # Here we reformat the calves_born list so that it can be added to the animals_added list
+        # We do this since we no longer need calf-specific logic within this function
         calf_ids = []
         for calf in calves_born:
             calf_ids.append(calf.id)
 
-
+        # We add the ids of the born calves to the animals_added list
         animals_added.extend(calf_ids)
 
-
-        # Adds animals to pens, remove animals from pens, assign diets
-
+        # _____________________________________________________________________________________________
+        # Animal removal logic
+        # _____________________________________________________________________________________________
 
         # Loops through ids_removed, which is a list of the animals IDs that have been removed from the herd.
-        # Loop variable should be changed from "i" to something more intuitive.
-        for i in ids_removed:
+        for id in ids_removed:
             # If the given animal ID is in the animal ID/pen ID dictionary
-            # Why would a removed animal still be in a pen?
-            # Is this if statement even useful, shouldn't we be doing this regardless of whether the animal ID
-            #     is in the dictionary?
-            # If we delete an animal ID key from animal_to_pen_id_map we don't want to do it again, if statement should be fine
-            # Should add whether or not we are checking if it's in the dictionary's keys or values
-            # TODO: specify that we're looping through keys
-            if i in self.animal_to_pen_id_map:
+            # Here, we are looping through the keys of a dictionary pertaining to animal IDs
+            if id in self.animal_to_pen_id_map:
                 # Creates a "pen" variable that grabs the current pen of the animal removed
-                # Pen ID is zero-indexed
-                # Animal ID is not zero-indexed always
-                pen = self.all_pens_ids[self.animal_to_pen_id_map[i]]
-                # Adds count of animal that have been removed from the herd,
-                #     based on what animal combination and pen they were in
-
-                #TODO: updates stocking density for pen after removal of animal
-
-
+                pen = self.all_pens_ids[self.animal_to_pen_id_map[id]]
+                # Readjusts the stocking density value of the pen in question
+                pen.stocking_density = (len(pen.animals_in_pen) - 1)/pen.num_stalls
                 # Deletes the animal ID key entry corresponding to the id of the animal removed
-                del self.animal_to_pen_id_map[i]
+                del self.animal_to_pen_id_map[id]
         # return values for a function made from line 389-410 would be the counts of animals removed
         # From Doctor Reed: redesign how we assign new animals to a pen
+
+        # _____________________________________________________________________________________________
+        # Population tracker logic
+        # _____________________________________________________________________________________________
 
         # Initializes pen population list before additions are made
         pen_population_before_additions = [None] * len(self.all_pens_ids)
         # Loops through the pens objects on the farm and their indices from the all_pens_ids list
         for index, pen in enumerate(self.all_pens_ids):
-            # Populates list with the number of animals as the values, and the indices pertainining to different pens
+            # Populates list with the number of animals as the values, and the indices pertaining to different pens
             #  since pens are zero-indexed
             pen_population_before_additions[index] = len(pen.animals_in_pen)
 
+        # _____________________________________________________________________________________________
+        # Pen selection/animal-to-pen insertion logic (could be split but for loop is rather long)
+        # _____________________________________________________________________________________________
+
         # Loops through the animal IDs pertaining to the animals that are going to be added to the herd
         for animal in animals_added:
-
             # Check the animal type, before then setting animal_p_conc variable to the P(hosphorus)
             #      composition of that cow class
-            # TODO: We need to either stick with comp(osition) or conc(entration), decide on one at some point
             # We then add the animal ID to the list of animal class that animal ID pertains to
             # Last, we set a group variable to the correct Animal Combination type, depending on the animal type
-            # Three values would tell you what variables to use in the three lines under the if statements
-
-            # TODO: Either this calf clause shouldn't be here, or the second case handling calves is wrong
 
             animal_type_mapping_dict = {
                 'Calf': {'p_conc': self.p_conc['calf'], 'animal_list': self.calves,
@@ -447,9 +444,7 @@ class AnimalManagement:
             animal_type_mapping_dict.get(type(animal).__name__)['animal_list'].append(animal)
             group = animal_type_mapping_dict.get(type(animal).__name__)['animal_group']
 
-            # Choosing pen to place new animal first by checking if there are
-            # pens that lost animals, and choosing the pen with the lowest
-            # stocking density
+            # Choosing pen to place new animal by choosing the pen with the lowest stocking density
 
             # Grabs the pen with the current lowest stocking density for a given cow group
             candidate_pens = self.pens_by_animal_combination[group]
@@ -461,6 +456,10 @@ class AnimalManagement:
             # set_up_new_animal() could be the reason behind the GitHub issue, just a possibility
             self.all_pens_ids[pen_for_insert.id].set_up_new_animal(animal, animal_p_conc, feed, temp,
                                                                    pen_population_before_additions[pen_for_insert.id])
+
+        # _____________________________________________________________________________________________
+        # Ration-specific logic
+        # _____________________________________________________________________________________________
 
         # We loop through the numbers of all the pens on the farm and their indices
         for index, pen in enumerate(self.all_pens_ids):
