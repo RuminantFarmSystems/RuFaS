@@ -11,7 +11,7 @@ Author(s):
 import numpy as np
 import random
 from scipy.optimize import minimize
-
+import json
 
 def set_globals(price_, NEmaint_, NEa_, NEpreg_, NEl_, NEg_, MP_req_, C_req_, P_req_,
                  TDN_, DE_, EE_, is_fat_, BW_, calcium_, phosphorus_, NDF_, type_,
@@ -498,6 +498,44 @@ def get_ration_vals(x):
     ration_vals = {'ME_tot': ME_tot}
     return ration_vals
 
+def userbounds():
+    # TODO use the util.py read_json_file method instead
+    with open('input/userdefinedration/userdefinedration_test.json', 'r') as f:
+        rationall = json.load(f)
+    ration_calf = rationall['calf']['ration']
+    ration_all_heifers = rationall['all_heifers']['ration']
+    ration_cow_lactating = rationall['cow_lactating']['ration']
+    ration_cow_dry = rationall['cow_dry']['ration']
+    if animal_type == 'cow':
+        if cow_type == True:
+            rationtouse = ration_cow_lactating
+        else:
+            rationtouse = ration_cow_dry
+    elif animal_type == 'heifer':
+        rationtouse = ration_all_heifers
+    else: 
+        rationtouse = ration_calf
+    values2= []
+    for key, value in rationall.items():
+        [values2.append(int(i)) for i in value['ration'].keys()]
+    setted=set(values2)
+    setted2 = [i for i in setted]
+    setted2.sort()
+    setted2 = [str(i) for i in setted2]
+    triplethreat = []
+    wiggleroom = 0.15
+    for key in setted2:
+        if key in rationtouse.keys():
+            target = rationtouse[key]/100*(DMIest) # change from percent to decimal percent
+            triplethreat.append((target-target*wiggleroom,target+target*wiggleroom))
+            triplethreat.append((target-target*wiggleroom,target+target*wiggleroom))
+            triplethreat.append((target-target*wiggleroom,target+target*wiggleroom))
+        else:
+            triplethreat.append((0,0))
+            triplethreat.append((0,0))
+            triplethreat.append((0,0))
+    return triplethreat
+
 def optimize():
     """
     Calls the objective function and constraint functions and formulates
@@ -518,10 +556,14 @@ def optimize():
     # establishing the bounds of the NLP
     bnds = []
     # Dividing limit by 3 for tri-decision variables for farm grown feeds
-    for i in range(len(limit)):
-        bnds.append((0, (limit[i] / 3) + 0.0001))
-    bnds = tuple(bnds)
-    #print(bnds)
+    user_defined_ration = True
+    if user_defined_ration:
+        bnds = userbounds()
+    else:    
+        for i in range(len(limit)):
+            bnds.append((0, (limit[i] / 3) + 0.0001))
+        bnds = tuple(bnds)
+        #print(bnds)
 
     # establishing the constraints of the NLP
     con1 = {'type': 'ineq', 'fun': NEmact_constraint}
@@ -537,7 +579,8 @@ def optimize():
     con11 = {'type': 'ineq', 'fun': DMI_constraint}
     cow_cons = [con1, con2, con3, con4, con5, con6, con7, con8, con9, con10, con11]
     heifer_cons = [con1, con3, con4, con5, con6, con7, con8, con9, con10]
-
+    user_bnds = [con1, con2, con3, con4, con5, con6, con7, con9, con10] 
+    # removing DMI and upper NDF constraint allows for better chance of convergence, but this needs reevaluation
     #t_start_1 = timer.time()
     #sol1 = minimize(objective, x0, method='SLSQP', bounds=bnds, constraints=cons,
     #options = { 'maxiter': 50, 'ftol': 1e-06, 'iprint': 1, 'disp': False,
@@ -554,7 +597,9 @@ def optimize():
     #        writer.writerow(data)
     #t1 = t_end_2 - t_end_1
     #write_csv([t1, obj1])
-    if animal_type ==  'cow':
+    if user_defined_ration:
+        return minimize(objective, x0, method='SLSQP', bounds=bnds, constraints=user_bnds)
+    elif animal_type ==  'cow':
         return minimize(objective, x0, method='SLSQP', bounds=bnds, constraints=cow_cons)
     elif animal_type == 'heifer':
         return minimize(objective, x0, method='SLSQP', bounds=bnds, constraints=heifer_cons)

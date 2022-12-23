@@ -58,6 +58,8 @@ def optimization(requirements, available_feeds, animal_type, cow_type):
     while i < 1:
         try:
             solution = NLP.optimize()
+            # TODO here we need to add a way to check why this is failing to optimize
+            # certainly happening at the minimize step, but we must  quantify which requirements aren't being met
         except:
             i -= 1
         finally:
@@ -110,6 +112,9 @@ def ration_formulation(pen, feed, available_feeds, animal_type, cow_type):
             # are based on fastest case runtime testing
             # TODO: continue testing for more efficient reductions
             NEl_con = NLP.NEl_constraint(solution.x)
+            # TODO refactor this logic, and fix it to a set percentage of estimated milk production
+            # Once this is implemented, if the user defined ration is wanted, we can determine a cutoff for lowest production
+            # then if reached, we can add option (or force as default) that warnings are produced, but ration is set to the user ration
             if NEl_con < -0.5:
                 reduction = 3 * (-NEl_con)
             else:
