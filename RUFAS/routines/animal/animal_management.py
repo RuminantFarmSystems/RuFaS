@@ -18,7 +18,7 @@ from RUFAS.output_manager import OutputManager
 from RUFAS.routines.animal.pen import Pen
 from RUFAS.routines.animal.clustering_pen_grouping import grouping
 from RUFAS.routines.animal.life_cycle.life_cycle import LifeCycleManager
-from RUFAS.routines.general_constants import GeneralConstants
+from RUFAS.general_constants import GeneralConstants
 from RUFAS.routines.animal.life_cycle.animal_base import AnimalBase
 from RUFAS.routines.animal.ration import ration_driver as ration_driver
 from collections import deque

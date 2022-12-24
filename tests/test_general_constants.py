@@ -1,6 +1,6 @@
 from pytest import approx
 
-from RUFAS.routines.general_constants import GeneralConstants
+from RUFAS.general_constants import GeneralConstants
 
 
 def test_general_constants() -> None:
