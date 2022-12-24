@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 from dataclasses import field
 
-from RUFAS.routines.manure.constants.general_constants import GeneralConstants
+from RUFAS.routines.general_constants import GeneralConstants
 from RUFAS.routines.manure.protocols.liquid_manure_portion_protocol import LiquidManurePortionProtocol
 
 
