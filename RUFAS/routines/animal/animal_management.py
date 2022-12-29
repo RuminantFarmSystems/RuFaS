@@ -18,6 +18,7 @@ from RUFAS.output_manager import OutputManager
 from RUFAS.routines.animal.pen import Pen
 from RUFAS.routines.animal.clustering_pen_grouping import grouping
 from RUFAS.routines.animal.life_cycle.life_cycle import LifeCycleManager
+from RUFAS.general_constants import GeneralConstants
 from RUFAS.routines.animal.life_cycle.animal_base import AnimalBase
 from RUFAS.routines.animal.ration import ration_driver as ration_driver
 from collections import deque
@@ -761,7 +762,7 @@ class AnimalManagement:
         if len(animals) == 0:
             return 0
         else:
-            return (sum(a.p_animal for a in animals) / 1000) / sum(a.body_weight for a in animals)
+            return (sum(a.p_animal for a in animals) * GeneralConstants.GRAMS_TO_KG) / sum(a.body_weight for a in animals)
 
     def calc_all_p_conc(self):
         """
