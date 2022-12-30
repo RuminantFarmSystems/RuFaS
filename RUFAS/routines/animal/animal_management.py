@@ -438,13 +438,9 @@ class AnimalManagement:
         # Calf preprocessing logic
         # _____________________________________________________________________________________________
 
-        # Here we reformat the calves_born list so that it can be added to the animals_added list
-        # We do this since we no longer need calf-specific logic within this function
         calf_ids = []
         for calf in calves_born:
             calf_ids.append(calf.id)
-
-        # We add the ids of the born calves to the animals_added list
         animals_added.extend(calf_ids)
 
         # _____________________________________________________________________________________________
@@ -475,36 +471,25 @@ class AnimalManagement:
             'Dry_Cow': {'p_conc': self.p_conc['cow'], 'animal_list': self.cows,
                         'animal_group': Pen.AnimalCombination.CLOSE_UP}}
 
-        # Loops through the animal IDs pertaining to the animals that are going to be added to the herd
         for animal in animals_added:
-            # Check the animal type, before then setting animal_p_conc variable to the P(hosphorus)
-            #      composition of that cow class
-            # We then add the animal ID to the list of animal class that animal ID pertains to
-            # Last, we set a group variable to the correct Animal Combination type, depending on the animal type
             animal_class = type(animal).__name__
 
             if animal_class == 'Cow':
                 if animal.milking:
-                    animal_class == 'Lac_Cow'
+                    animal_class = 'Lac_Cow'
                 else:
-                    animal_class == 'Dry_Cow'
+                    animal_class = 'Dry_Cow'
 
             animal_p_conc = animal_type_mapping_dict.get(animal_class)['p_conc']
             animal_type_mapping_dict.get(animal_class)['animal_list'].append(animal)
             group = animal_type_mapping_dict.get(animal_class)['animal_group']
 
-            # Choosing pen to place new animal by choosing the pen with the lowest stocking density
-
-            # Grabs the pen with the current lowest stocking density for a given cow group
             candidate_pens = self.pens_by_animal_combination[group]
             pen_for_insert = min(candidate_pens, key=lambda p: p.stocking_density)
 
-            # Updating animal_to_pen_id_map variable to reflect the right pen ID for the animal ID added
-            self.animal_to_pen_id_map[animal.id] = pen_for_insert.id
-            # Setting up new animal and inserting it into the pen in question?
-            # set_up_new_animal() could be the reason behind the GitHub issue, just a possibility
-            self.all_pens_ids[pen_for_insert.id].set_up_new_animal(animal, animal_p_conc, feed, temp,
-                                                                   original_pen_populations[pen_for_insert.id])
+        self.animal_to_pen_id_map[animal.id] = pen_for_insert.id
+        self.all_pens_ids[pen_for_insert.id].set_up_new_animal(animal, animal_p_conc, feed, temp,
+                                                               original_pen_populations[pen_for_insert.id])
 
         # _____________________________________________________________________________________________
         # Ration-specific logic
@@ -720,7 +705,6 @@ class AnimalManagement:
         Removes animals from pens for re-allocation. This is part of the
         routines that happen every ration interval.
         """
-
         for pen in self.all_pens_ids:
             pen.clear()
 
