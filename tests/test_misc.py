@@ -10,7 +10,7 @@ from typing import Callable
 from typing import Dict
 
 import pytest
-from mock.mock import MagicMock, mock_open
+from mock.mock import MagicMock,mock_open
 from pytest import approx, raises
 from pytest_mock.plugin import MockerFixture
 
@@ -66,7 +66,6 @@ def test_general_constants() -> None:
     assert constants.WATER_DENSITY_KG_PER_LITER == approx(0.997)
     assert constants.WATER_DENSITY_KG_PER_M3 == approx(0.997 * 0.001)
 
-
 def test_is_leap_year():
     """Unit test for function is_leap_year in file classes.py"""
     pass
@@ -112,10 +111,8 @@ def test_show_final_messages(
         patch_simulation_engine: SimulationEngine, mocker: MockerFixture) -> None:
     """Unit test for function _show_final_messages in file RUFAS/simulation_engine.py"""
     mocker.patch("sys.stdout.write")
-    dummy_input = 1
-    patch_simulation_engine._show_final_messages(dummy_input, dummy_input)
-    sys_stdout_write_idx = 1
-    assert mocker._mocks[sys_stdout_write_idx].call_count == 3
+    patch_simulation_engine._show_final_messages(1, 1)
+    assert mocker._patches_and_mocks[1][1].call_count == 3
 
 
 def test_daily_simulation(
@@ -128,8 +125,8 @@ def test_daily_simulation(
     mocker.patch("RUFAS.simulation_engine.SimulationEngine._advance_time")
     patch_simulation_engine._daily_simulation()
     assert patch_simulation_engine.output.daily_update.call_count == 1
-    for mocked in mocker._mocks:
-        assert mocked.call_count == 1
+    for mocked in mocker._patches_and_mocks:
+        assert mocked[1].call_count == 1
 
 
 def test_advance_time(
@@ -329,9 +326,6 @@ def mock_output_manager(mocker) -> OutputManager:
 def test_generate_key(mocker: MockerFixture) -> None:
     """Unit test for function _generate_key in file output_manager.py"""
     om = OutputManager()
-    del om
-    om = OutputManager()
-    om = OutputManager()
     with raises(KeyError):
         om._generate_key("name", {})
 
@@ -409,8 +403,7 @@ def test_add_variable(mock_output_manager: OutputManager, mocker: MockerFixture)
         assert mock_output_manager.variables_pool[key] == "dummy_value"
 
         with raises(ValueError):
-            mock_output_manager.add_variable(
-                "dummy_name", "dummy_value", info_map)
+            mock_output_manager.add_variable("dummy_name", "dummy_value", info_map)
         # TODO issue 214
 
 
@@ -471,11 +464,9 @@ def test_save_all_pools(mock_output_manager: OutputManager,
     mock_output_manager.save_variables.assert_called_once_with(path)
 
     # Restore original methods
-    mock_output_manager.save_variables = output_manager_original_method_states[
-        'save_variables']
+    mock_output_manager.save_variables = output_manager_original_method_states['save_variables']
     mock_output_manager.save_logs = output_manager_original_method_states['save_logs']
-    mock_output_manager.save_warnings = output_manager_original_method_states[
-        'save_warnings']
+    mock_output_manager.save_warnings = output_manager_original_method_states['save_warnings']
     mock_output_manager.save_errors = output_manager_original_method_states['save_errors']
 
 
@@ -504,10 +495,8 @@ def test_save_variables(mock_output_manager: OutputManager,
         mock_output_manager.variables_pool, os.path.join("dummy_path", "dummy_name"))
 
     # Restore original methods
-    mock_output_manager._generate_file_name = output_manager_original_method_states[
-        '_generate_file_name']
-    mock_output_manager._dict_to_file_json = output_manager_original_method_states[
-        '_dict_to_file_json']
+    mock_output_manager._generate_file_name = output_manager_original_method_states['_generate_file_name']
+    mock_output_manager._dict_to_file_json = output_manager_original_method_states['_dict_to_file_json']
 
 
 def test_save_logs(mock_output_manager: OutputManager,
@@ -526,10 +515,8 @@ def test_save_logs(mock_output_manager: OutputManager,
         mock_output_manager.logs_pool, os.path.join("dummy_path", "dummy_name"))
 
     # Restore original methods
-    mock_output_manager._generate_file_name = output_manager_original_method_states[
-        '_generate_file_name']
-    mock_output_manager._dict_to_file_json = output_manager_original_method_states[
-        '_dict_to_file_json']
+    mock_output_manager._generate_file_name = output_manager_original_method_states['_generate_file_name']
+    mock_output_manager._dict_to_file_json = output_manager_original_method_states['_dict_to_file_json']
 
 
 def test_save_warnings(mock_output_manager: OutputManager,
@@ -548,10 +535,8 @@ def test_save_warnings(mock_output_manager: OutputManager,
         mock_output_manager.warnings_pool, os.path.join("dummy_path", "dummy_name"))
 
     # Restore original methods
-    mock_output_manager._generate_file_name = output_manager_original_method_states[
-        '_generate_file_name']
-    mock_output_manager._dict_to_file_json = output_manager_original_method_states[
-        '_dict_to_file_json']
+    mock_output_manager._generate_file_name = output_manager_original_method_states['_generate_file_name']
+    mock_output_manager._dict_to_file_json = output_manager_original_method_states['_dict_to_file_json']
 
 
 def test_save_errors(mock_output_manager: OutputManager,
@@ -570,7 +555,5 @@ def test_save_errors(mock_output_manager: OutputManager,
         mock_output_manager.errors_pool, os.path.join("dummy_path", "dummy_name"))
 
     # Restore original methods
-    mock_output_manager._generate_file_name = output_manager_original_method_states[
-        '_generate_file_name']
-    mock_output_manager._dict_to_file_json = output_manager_original_method_states[
-        '_dict_to_file_json']
+    mock_output_manager._generate_file_name = output_manager_original_method_states['_generate_file_name']
+    mock_output_manager._dict_to_file_json = output_manager_original_method_states['_dict_to_file_json']
