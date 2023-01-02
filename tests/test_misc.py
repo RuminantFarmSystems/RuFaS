@@ -330,24 +330,36 @@ def test_generate_key(mocker: MockerFixture) -> None:
         om._generate_key("name", {})
 
     info_map = {"class": "dummy_class", "function": "dummy_func"}
+    counter_before = om.counter
+    om.counter = 6
     key = om._generate_key("key_name", info_map)
     assert key == f"dummy_class.dummy_func.key_name.{6}"
+    om.counter = counter_before
 
     info_map["suppress_prefix"] = True
+    counter_before = om.counter
+    om.counter = 7
     key = om._generate_key("key_name", info_map)
     assert key == f"key_name.{7}"
+    om.counter = counter_before
 
     info_map["suppress_prefix"] = False
+    counter_before = om.counter
+    om.counter = 8
     key = om._generate_key("key_name", info_map)
     assert key == f"dummy_class.dummy_func.key_name.{8}"
+    om.counter = counter_before
 
     info_map["suppress_suffix"] = True
     key = om._generate_key("key_name", info_map)
     assert key == "dummy_class.dummy_func.key_name"
 
     info_map["suppress_suffix"] = False
+    counter_before = om.counter
+    om.counter = 9
     key = om._generate_key("key_name", info_map)
     assert key == f"dummy_class.dummy_func.key_name.{9}"
+    om.counter = counter_before
 
     info_map["suppress_prefix"] = True
     info_map["suppress_suffix"] = True
@@ -356,8 +368,11 @@ def test_generate_key(mocker: MockerFixture) -> None:
 
     info_map["prefix"] = "dummy_prefix"
     info_map["suppress_suffix"] = False
+    counter_before = om.counter
+    om.counter = 10
     key = om._generate_key("key_name", info_map)
     assert key == f"dummy_prefix.key_name.{10}"
+    om.counter = counter_before
 
     info_map["suffix"] = "dummy_suffix"
     key = om._generate_key("key_name", info_map)
