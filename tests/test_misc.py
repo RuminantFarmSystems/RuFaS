@@ -14,6 +14,7 @@ from mock.mock import MagicMock,mock_open
 from pytest import approx, raises
 from pytest_mock.plugin import MockerFixture
 
+from RUFAS.general_constants import GeneralConstants
 from RUFAS.output_manager import OutputManager
 from RUFAS.simulation_engine import SimulationEngine
 from RUFAS.util import Utility
@@ -53,6 +54,17 @@ def test_end_simulation():
     """Unit test for function end_simulation in file classes.py"""
     pass
 
+
+def test_general_constants() -> None:
+    """Tests the general constants in file general_constants.py."""
+    constants = GeneralConstants
+    assert constants.GRAMS_TO_KG == approx(0.001)
+    assert constants.LITERS_TO_CUBIC_METERS == approx(0.001)
+    assert constants.KG_TO_CUBIC_METERS == approx(0.001)
+    assert constants.DAYS_PER_YEAR == 365
+    assert constants.SECONDS_PER_DAY == 86400
+    assert constants.WATER_DENSITY_KG_PER_LITER == approx(0.997)
+    assert constants.WATER_DENSITY_KG_PER_M3 == approx(0.997 * 0.001)
 
 def test_is_leap_year():
     """Unit test for function is_leap_year in file classes.py"""
@@ -293,8 +305,8 @@ def test_percent_calculator() -> None:
 
 def test_get_time_based_suffix(mocker: MockerFixture) -> None:
     """Unit test for function _get_suffix in file output_manager.py"""
-    auto_suffix = "1669002803.9697945"
-    mocker.patch("time.time", return_value=auto_suffix)
+    auto_suffix = "1671674366502655500"
+    mocker.patch("time.time_ns", return_value=auto_suffix)
     om = OutputManager()
     assert om._get_time_based_suffix() == auto_suffix
 
@@ -317,20 +329,17 @@ def test_generate_key(mocker: MockerFixture) -> None:
     with raises(KeyError):
         om._generate_key("name", {})
 
-    auto_suffix = "1669002803.9697945"
-    mocker.patch("time.time", return_value=auto_suffix)
-
     info_map = {"class": "dummy_class", "function": "dummy_func"}
     key = om._generate_key("key_name", info_map)
-    assert key == f"dummy_class.dummy_func.key_name.{auto_suffix}"
+    assert key == f"dummy_class.dummy_func.key_name.{6}"
 
     info_map["suppress_prefix"] = True
     key = om._generate_key("key_name", info_map)
-    assert key == f"key_name.{auto_suffix}"
+    assert key == f"key_name.{7}"
 
     info_map["suppress_prefix"] = False
     key = om._generate_key("key_name", info_map)
-    assert key == f"dummy_class.dummy_func.key_name.{auto_suffix}"
+    assert key == f"dummy_class.dummy_func.key_name.{8}"
 
     info_map["suppress_suffix"] = True
     key = om._generate_key("key_name", info_map)
@@ -338,7 +347,7 @@ def test_generate_key(mocker: MockerFixture) -> None:
 
     info_map["suppress_suffix"] = False
     key = om._generate_key("key_name", info_map)
-    assert key == f"dummy_class.dummy_func.key_name.{auto_suffix}"
+    assert key == f"dummy_class.dummy_func.key_name.{9}"
 
     info_map["suppress_prefix"] = True
     info_map["suppress_suffix"] = True
@@ -348,7 +357,7 @@ def test_generate_key(mocker: MockerFixture) -> None:
     info_map["prefix"] = "dummy_prefix"
     info_map["suppress_suffix"] = False
     key = om._generate_key("key_name", info_map)
-    assert key == f"dummy_prefix.key_name.{auto_suffix}"
+    assert key == f"dummy_prefix.key_name.{10}"
 
     info_map["suffix"] = "dummy_suffix"
     key = om._generate_key("key_name", info_map)
@@ -464,10 +473,10 @@ def test_save_all_pools(mock_output_manager: OutputManager,
 def test_generate_file_name(mocker: MockerFixture) -> None:
     """Unit test for function _generate_file_name in file output_manager.py"""
     om = OutputManager()
-    auto_suffix = "1669002803.9697945"
-    mocker.patch("time.time", return_value=auto_suffix)
+    auto_suffix = "1671674366502655500"
+    mocker.patch("time.time_ns", return_value=auto_suffix)
     name = om._generate_file_name("base_name", "json")
-    assert name == "base_name_1669002803.9697945.json"
+    assert name == f"base_name_{auto_suffix}.json"
 
 
 def test_save_variables(mock_output_manager: OutputManager,

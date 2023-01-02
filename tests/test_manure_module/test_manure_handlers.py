@@ -5,7 +5,7 @@ from pytest_mock import MockerFixture
 from RUFAS.classes import Time
 from RUFAS.classes import Weather
 from RUFAS.routines.manure.beddings.bedding_classes import BaseBedding
-from RUFAS.routines.manure.constants.general_constants import GeneralConstants
+from RUFAS.general_constants import GeneralConstants
 from RUFAS.routines.manure.manure_handlers.manure_handler_classes import AlleyScraper
 from RUFAS.routines.manure.manure_handlers.manure_handler_classes import BaseManureHandler
 from RUFAS.routines.manure.manure_handlers.manure_handler_classes import DefaultManureHandlerConfigFactory
