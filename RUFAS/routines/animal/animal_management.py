@@ -438,11 +438,14 @@ class AnimalManagement:
         # Calf preprocessing logic
         # _____________________________________________________________________________________________
 
-        calf_ids = []
-        for calf in calves_born:
-            calf_ids.append(calf.id)
-        animals_added.extend(calf_ids)
+        # calf_ids = []
+        # for calf in calves_born:
+        #     calf_ids.append(calf.id)
+        # animals_added.extend(calf_ids)
+        # print(type(animals_added[0]))
+        print(len(animals_added))
 
+        animals_added.extend(calves_born)
         # _____________________________________________________________________________________________
         # Animal removal logic
         # _____________________________________________________________________________________________
