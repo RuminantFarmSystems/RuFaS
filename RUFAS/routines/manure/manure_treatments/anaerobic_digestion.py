@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from typing import List
 
-from RUFAS.routines.manure.constants.general_constants import GeneralConstants
+from RUFAS.general_constants import GeneralConstants
 from RUFAS.routines.manure.gas_emissions.gas_emissions import GasEmissions
 from RUFAS.routines.manure.manure_treatments.base_manure_treatment import BaseManureTreatment
 from RUFAS.routines.manure.manure_treatments.manure_treatment_configs import ManureTreatmentConfig
