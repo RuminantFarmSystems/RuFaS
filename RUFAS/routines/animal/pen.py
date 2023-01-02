@@ -28,19 +28,19 @@ class Pen:
 
     Attributes
     -------------
-    id : int
+    pen_id : int
         The pen's unique pen ID.
         Obtained from the input file.
 
-    vertical_dist_to_parlor : float
+    vertical_dist_to_milking_parlor : float
         The vertical distance to milking parlor, measured in kilometers.
         Obtained from the input file.
 
-    horizontal_dist_to_parlor : float
+    horizontal_dist_to_milking_parlor : float
         The horizontal distance to milking parlor, measured in kilometers.
         Obtained from the input file.
 
-    num_stalls : int
+    number_of_stalls : int
         The number of stalls.
         Obtained from the input file.
 
@@ -166,17 +166,18 @@ class Pen:
         GROWING_AND_CLOSE_UP = 4
         LAC_COW = 5
 
-    def __init__(self, id_number, vert_dist, horiz_dist, num_stalls, housing_type,
+    def __init__(self, pen_id, vertical_dist_to_milking_parlor, horizontal_dist_to_milking_parlor, number_of_stalls,
+                 housing_type,
                  bedding_type, pen_type, manure_handling, manure_separator,
                  manure_storage, animal_combination, max_stocking_density):
         """
         Initializes a pen with the given arguments.
 
         Args:
-            id_number: the unique id number of the pen
-            vert_dist: vertical distance to milking parlor, km
-            horiz_dist: horizontal distance to milking parlor, km
-            num_stalls: number of stalls in the pen
+            pen_id: the unique id number of the pen
+            vertical_dist_to_milking_parlor: vertical distance to milking parlor, km
+            horizontal_dist_to_milking_parlor: horizontal distance to milking parlor, km
+            number_of_stalls: number of stalls in the pen
             housing_type: housing type of the pen
             bedding_type: bedding type of the pen
             pen_type: freestall or tiestall
@@ -186,13 +187,13 @@ class Pen:
             animal_combination: the valid animal combinations inside this pen, an instance of the AnimalCombination Enum
             max_stocking_density: maximum stocking density allowed for pen
         """
-        self.id = id_number
+        self.id = pen_id
 
         self.max_stocking_density = max_stocking_density
 
-        self.vertical_dist_to_parlor = vert_dist
-        self.horizontal_dist_to_parlor = horiz_dist
-        self.num_stalls = num_stalls
+        self.vertical_dist_to_parlor = vertical_dist_to_milking_parlor
+        self.horizontal_dist_to_parlor = horizontal_dist_to_milking_parlor
+        self.num_stalls = number_of_stalls
         self.housing_type = housing_type
         self.bedding_type = bedding_type
         self._pen_type = pen_type
@@ -510,7 +511,7 @@ class Pen:
                 total_p_animal += animal.p_animal
             self.avg_p_animal = total_p_animal / len(self.animals_in_pen)
 
-    def set_up_new_animal(self, animal, p_comp, feed, temp, num_animals_before_additions):
+    def set_up_new_animal(self, animal, p_conc, feed, temp, num_animals_before_additions):
         """
         Sets the necessary attributes for @animal to be a replacement in this
         pen.
@@ -518,7 +519,7 @@ class Pen:
         Args:
             animal: the replacement animal which needs to have necessary values
                 for later computations
-            p_comp: P composition of @animal's class, used to calculate the
+            p_conc: P concentration of @animal's class, used to calculate the
                 P in @animal. -1 for this value indicates that @animal is a
                 calf and that its p_animal attribute has already been calculated
             feed: instance of the Feed class defined in feed.py
@@ -598,8 +599,8 @@ class Pen:
 
         # set this animal's p_animal to be the average P concentration of other
         # animals in its class times its body weight
-        if not p_comp == -1:
-            animal.p_animal = animal.body_weight * p_comp
+        if not p_conc == -1:
+            animal.p_animal = animal.body_weight * p_conc
 
         animal.p_intake = self.avg_p_intake
 

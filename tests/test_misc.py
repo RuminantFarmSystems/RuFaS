@@ -14,6 +14,7 @@ from mock.mock import MagicMock,mock_open
 from pytest import approx, raises
 from pytest_mock.plugin import MockerFixture
 
+from RUFAS.general_constants import GeneralConstants
 from RUFAS.output_manager import OutputManager
 from RUFAS.simulation_engine import SimulationEngine
 from RUFAS.util import Utility
@@ -53,6 +54,17 @@ def test_end_simulation():
     """Unit test for function end_simulation in file classes.py"""
     pass
 
+
+def test_general_constants() -> None:
+    """Tests the general constants in file general_constants.py."""
+    constants = GeneralConstants
+    assert constants.GRAMS_TO_KG == approx(0.001)
+    assert constants.LITERS_TO_CUBIC_METERS == approx(0.001)
+    assert constants.KG_TO_CUBIC_METERS == approx(0.001)
+    assert constants.DAYS_PER_YEAR == 365
+    assert constants.SECONDS_PER_DAY == 86400
+    assert constants.WATER_DENSITY_KG_PER_LITER == approx(0.997)
+    assert constants.WATER_DENSITY_KG_PER_M3 == approx(0.997 * 0.001)
 
 def test_is_leap_year():
     """Unit test for function is_leap_year in file classes.py"""
